@@ -1,185 +1,171 @@
-Return-Path: <netdev+bounces-173416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17320A58B9A
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 06:18:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B388A58BB1
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 06:33:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCC5B3ABD05
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 05:17:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFB24188CFC6
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 05:33:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9239F1B87D1;
-	Mon, 10 Mar 2025 05:18:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D055F1A9B5D;
+	Mon, 10 Mar 2025 05:33:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c3b7+P4x"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eYEMCrO2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E89582F28;
-	Mon, 10 Mar 2025 05:18:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4605F18FDAB;
+	Mon, 10 Mar 2025 05:33:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741583887; cv=none; b=opj5bvRLXhus7gxglsjpDpoaI89+orFUQN+cTm3lMKhvzJU26r8OnwqjQ+cQN/0cG/1fqv747Z6SF3PXhss8lM+hxRlKeJ39kI/5IErww6V1vyp/BGuXws0MRh5wN3t4rHt7BQmokxriarjeRw900HlXTiUzmYu7QYRhd5NR2IY=
+	t=1741584798; cv=none; b=nCTkzppcoyqd6B6skRgv5FZi8FvNvVKwpjhKiQPOo65KWEzSXAesmhZgUiuul8gyp0LFrOGoCqBNoRskbZRw+ASl1tchLqiuU9v32QgQ7NsSucnjv2296YI27TyhVXKgus0XtSx5gPgKbA6mMK4pwUgFNHrdwjS9u3TavZaXKYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741583887; c=relaxed/simple;
-	bh=Hr6dm8+vaqc3OqPrz1rHRqYhRKP7Pxqi/dGeBP+3CIo=;
+	s=arc-20240116; t=1741584798; c=relaxed/simple;
+	bh=5EKnPa+Gv0TJNMpmdI3U2XN1GU78PygLTBll5PGGiwk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SwezCNmAEVxTuLD13obInQfXMt+dxIUDxOAspmsPBzBEKKOznFlYugRKHBngHfms6QtcNf4bMqxS55GI3gq5mQRg1cdj8FS0nONjwyDiTpO9hQqdaG4JqYZVvjbrOOQCnIqOXBwSwIEn48Z58DitQrzSslz2mA9akeOk1ePJlX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c3b7+P4x; arc=none smtp.client-ip=209.85.166.50
+	 To:Cc:Content-Type; b=IqVVRllt+x6EAX8gwSEz69gAgBhF+HknLZFshg7X6ic3JGylZQWEe1rolCcY4XXKrtHLXUNLgqASEIxfaQQdaRJ66MNhgeZv1pohe3ob0bKWuXnEbSUuQ7ugBQARVzbmycTD+7KtDwylsWOclxi2lEI+RDypLDn7ZYkMZ/i0rHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eYEMCrO2; arc=none smtp.client-ip=209.85.166.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-851c4ee2a37so255511339f.3;
-        Sun, 09 Mar 2025 22:18:05 -0700 (PDT)
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3cf8e017abcso13195575ab.1;
+        Sun, 09 Mar 2025 22:33:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741583885; x=1742188685; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1741584796; x=1742189596; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bnjrLHP+/mAR/fM/nAqiOmcoWWA8l8pmKRt+RSb9P44=;
-        b=c3b7+P4xKXLeM7puh4xH3epGX6eTnxUXWNMX91tdBpL0kB+u+FcmI53czlix6q9A1r
-         I+A4TDv0h/G+h7lWpVQgRj7UO3wK/fByGQOOkhJfBk7R/pXrB6ABTilAywvKIoo6n+2H
-         /58uz0zEsFWkb7Ig2accTl2WZuIUydZoyNFvWoLslTY5ZXUVEp7edKuWCJH2BRZfB0Mk
-         E4W4q69kGffN23ay2MuW17J787UNf0A1c517IHAkHq+GRwrDl4ZD0PnIi8XBSJ3Irfmu
-         3hq/YrZy7kZVaNkXShFhPmFxNfPWdc7WDZjTNGRfOrO2oFk953BsQ/xzvrjLlsCNfkuF
-         hsVg==
+        bh=FsZKVlTDMWzNmkdJJwpbPAsZ+Q8KwbX4bNw/XQxeEfI=;
+        b=eYEMCrO2X9Xpdcd2K/sxz172C6dAGzVhAARpI98bXAFRY5bQLpBDTobt1kT2vIPXVy
+         2RJl57i5D/WQbPevyZ5gH1DVnrQZxPm9MqG+b2tjgnBoI2tUYpwmPQugTdeprAcLvtm7
+         SawbO8mpkyyLe41/QTZX6koRuN/cZ5b2i7h4vjuI9jX3zMLTPWzM7f68UHVW3qeqdwx4
+         jqHQ9C0YA9nR5DCsDq56qAais+bUNbgq76X15fIMERA3HH4zG7btfaDcKOn4z6WtZ1ed
+         cV8RRJxAuBRvYcFBluoLjWMozNvJnLXbx44MmUFhzAJkltY/0vbQqE59o7EBzNlw6LXt
+         x5lQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741583885; x=1742188685;
+        d=1e100.net; s=20230601; t=1741584796; x=1742189596;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bnjrLHP+/mAR/fM/nAqiOmcoWWA8l8pmKRt+RSb9P44=;
-        b=tjUcUWbdRMXigSR9OMtkKwN8VWw/XvYtdcWJanCSHYfgib6jYNtZiPm8y5CCspQEG9
-         n6zIv2BUg6OEDkT2lQnAPwUoThMoDh0Yq1ZX4h0O3CbmY7KF1MDJvEaRXOn1advtjK3A
-         OM4V2zUDHpayMIOlZhoMrRqsGRGomna4cHdCZKZW4BhFwGAznJZuE8RgQ8GeK9JRceRr
-         dZ6Q3tz1Agy9H1Xhx/rM+DXORfa1uzVDegBYC0+JLUBU3BfIGy/0gUHG52CxY2jOMi0A
-         toQTdMKLz6P2/OvRdysFuqEfQkmfzQg+m6BlWM2wFbGipDJnwkyAVYYxJtk1drd4iYU7
-         gsiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWqGuPWXdv8/N5DDt1KwOH48PoO/5zHe5MvRDAC8kVhZo7Og0PqeURAnfA946vSVLvWiEyjthta@vger.kernel.org, AJvYcCXxUj1RwF92pVpGfh+OeaPrEkvQjIABfGKLmQyBURnhEUPDzGNG56+elhTy56SLWq5GtNWbeT0wmc4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/Mdkw/kPpCrQa/dRuS+EaMF8DJJWSNd9+X4ElwgiM/LvT7E5Z
-	XWSjSaOxCFwCZbJ9td9G7971nCRz4N933uZwVJ9o6K2ch0KnObzIh3COjRHC4pmiD4Uj2wxS+fc
-	TEzeCgVaaAFqp/faWtDhoqg1bma0=
-X-Gm-Gg: ASbGncu+4idUJDghci6yY+pZO4mLoGf0fLLHD2lua2APr8Wq8IgyiEo1SZehMqTtjOv
-	BfSPC/eU6SCC5E7qCGdASmmu5WjLXH+9UWlQysenrCMflKpT0zDyQAsTtNMSEE0Ngfvg2qv+WxF
-	QcItlr643+yXR2ABYLZoe80M8l
-X-Google-Smtp-Source: AGHT+IFP+n3sL1pJWnj8bm6Gk8h3kDSQpJ6gaLpfsSjtdIFOsfGnMHwOuEOqSD1UlAxSyQuCDHFxEmFe2SV3FKGCutQ=
-X-Received: by 2002:a05:6e02:221c:b0:3d3:d965:62c3 with SMTP id
- e9e14a558f8ab-3d441943943mr160523555ab.15.1741583884941; Sun, 09 Mar 2025
- 22:18:04 -0700 (PDT)
+        bh=FsZKVlTDMWzNmkdJJwpbPAsZ+Q8KwbX4bNw/XQxeEfI=;
+        b=qrNfFrftHwKw0RR9yFJKP828O4KRilwj+/UQsscv9SNHH9m0vCCuK2nagDxKUjHKEf
+         0hoy/I+/PrrPBmu99NPqenfwYGrL2ZUMpAxsuMXYAFP10ZrEeMGQBja8nLRtJLREqyS2
+         N5OxYw03alAqfiBEwurcz7OmxnU2BBybKiVrRFWXD5Uch0fE/mqqcqGMzA1RQgeWVS58
+         w+F/HmCA8lGCXav2C/NMNZQdFPp/KlS2Ypo2mVNgSapsRdp0lfn2JNzgHO68yXnP2v6h
+         VahQEjj8nVz4vzVxqxjYTeedYpkGMSWgLJ/bNBR8mtTdk13FiwVQIvo4KsyuDS5Lngh3
+         CEkw==
+X-Forwarded-Encrypted: i=1; AJvYcCWt4HrvWJkCYNy4CB4YhEjJmL7XtiCAaywRET02a7PCphg9EzGd7GBDM65gm/bN7CZnjfpwmCDF@vger.kernel.org, AJvYcCXSi33HbXVZSjyokI+0/ePS8qXvBAXqR/han/ump4g37AO7ey9qqmg2GgCeHp/XCHlX9q6CGIPBOdC12Ts=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXuouNYy3qco9De+g/Y/EXDeSefFXKmW/cOyw5b+8CIbp+VkXm
+	mfhe8jGk27YSxU22GUqrTBAlqwgvloGd96wMYZOF5QbRrxmirA7NlJ3WfsPrKQBcbt/fPrygbuM
+	mS87v2fCPfPgRbfzNP8IUpckLoQU=
+X-Gm-Gg: ASbGncscWYQKzPC+aMO6hTUxYKjibbzN10jlzKHrdsBMONo6Uc1ZsIYgy8wfuSzsnto
+	sEVAN3kCIGclpjZUfemI8zBtJ2Xz80QJGHFd0f6YodkSOHPqszq73fj0pZWCikB/EjjQvjK52j1
+	/wGY1eW4gD2nWc7TwnnLx/AJYE
+X-Google-Smtp-Source: AGHT+IGBGSMPs2GTHwSND0prawtDiEkRhRYzDk1J9LiPH4k9q5iJ7z5+KR4h5r3PptDgdAb4dqjmg3WjD8T17POF/pU=
+X-Received: by 2002:a05:6e02:3a06:b0:3d3:ff09:432c with SMTP id
+ e9e14a558f8ab-3d441947300mr137825135ab.4.1741584796241; Sun, 09 Mar 2025
+ 22:33:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <FC9BF302-0724-49F3-AD7C-6761D65024A1@Easton24.com>
-In-Reply-To: <FC9BF302-0724-49F3-AD7C-6761D65024A1@Easton24.com>
+References: <20250309121526.86670-1-aleksandr.mikhalitsyn@canonical.com>
+In-Reply-To: <20250309121526.86670-1-aleksandr.mikhalitsyn@canonical.com>
 From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 10 Mar 2025 06:17:28 +0100
-X-Gm-Features: AQ5f1Jph8R5O_2QQgzMO0MCThPMCP2F_G6ndzKT3w47zZAIVTe9_hYEncpdWV6o
-Message-ID: <CAL+tcoB=4-dCWaEZL7HqLM+2j__iW+LrZANd+RAL4PkxE+kkCw@mail.gmail.com>
-Subject: Re: Add sysctl for tcp_delayed_ack
-To: Andrew Easton <Andrew@easton24.com>
-Cc: "David S. Miller" <davem@davemloft.net>, "David S. Ahern" <dsahern@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, 
-	"Linux Kernel Mailing List, Network Subsystem" <netdev@vger.kernel.org>, 
-	"Linux Kernel Mailing List, Sysctl API ABI" <linux-api@vger.kernel.org>
+Date: Mon, 10 Mar 2025 06:32:39 +0100
+X-Gm-Features: AQ5f1Jpx0SVCDs32H-oMiMAiaBWqfvJfV_H7pcz2o0HavBzGZk4aBE4z9L8bg2w
+Message-ID: <CAL+tcoDhPe3G_iheA0M_9dO-Tij-dYROfneiGS3SUr8w7bhH8A@mail.gmail.com>
+Subject: Re: [PATCH net-next] tools headers: Sync uapi/asm-generic/socket.h
+ with the kernel sources
+To: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Cc: edumazet@google.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	Jakub Kicinski <kuba@kernel.org>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	Willem de Bruijn <willemb@google.com>, Anna Emese Nyiri <annaemesenyiri@gmail.com>, 
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+On Sun, Mar 9, 2025 at 1:15=E2=80=AFPM Alexander Mikhalitsyn
+<aleksandr.mikhalitsyn@canonical.com> wrote:
+>
+> This also fixes a wrong definitions for SCM_TS_OPT_ID & SO_RCVPRIORITY.
+>
+> Accidentally found while working on another patchset.
+>
+> Cc: linux-kernel@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> Cc: Willem de Bruijn <willemb@google.com>
+> Cc: Jason Xing <kerneljasonxing@gmail.com>
+> Cc: Anna Emese Nyiri <annaemesenyiri@gmail.com>
+> Fixes: a89568e9be75 ("selftests: txtimestamp: add SCM_TS_OPT_ID test")
+> Fixes: e45469e594b2 ("sock: Introduce SO_RCVPRIORITY socket option")
+> Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com=
+>
 
-On Mon, Mar 10, 2025 at 2:33=E2=80=AFAM Andrew Easton <Andrew@easton24.com>=
- wrote:
->
-> Subject: Add sysctl for tcp_delayed_ack
->
-> Hi everyone,
->
-> this is a proposed patch for adding a sysctl for
-> disabling TCP delayed ACK (IETF RFC 1122)  without
-> having to patch software to constantly poke sockets
-> with TCP_QUICKACK which apparently resets on
-> subsequent operations, see tcp(7).
->
-> For my personal computer networks experimenting with
-> globally disabling TCP delayed ACK across two other
-> operating systems seems to have considerably improved
-> congestion control.  (While I propose only anecdotal
-> evidence, there is more to it.  Am open to the
-> ensuing technical discussion, but only if that turns
-> out to be a good use of other people's time.)
->
-> This is my first proposed kernel patch and it is
+I'm not sure if it's a bug. As you may notice, in
+arch/parisc/include/uapi/asm/socket.h, it has its own management of
+definitions.
 
-Thanks for proposing this patch :)
+I'm worried that since this file is uapi, is it allowed to adjust the
+number like this patch does if it's not a bug.
 
-As to the idea itself, my personal feelings are:
-1) It might be suitable for local kernels instead of public kernels,
-even though we internally have a similar patch a few years ago
-already.
-2) The reason why I hesitated to submit a patch like this before is it
-may change/override the default socket behavior which may bring
-unexpected impacts. It's a global knob...
-3) To be frank, the delayed ack mechanism prevails for so many years
-and truly solves too many pure ack packets on the wire issue. And I
-believe only a minority of clients try to turn it off.
-4) Recently, I was thinking of implementing a delayed ack max timeout
-(which you can refer to tcp_delack_max() and see how it works). As I
-mentioned, I also hesitate to do so.
-
-Of course, no matter what my thoughts are, it finally depends on the
-TCP maintainer's call :)
+Otherwise, the change looks good to me.
 
 Thanks,
 Jason
 
-> likely missing a whole bunch of details.  For
-> example:
+> ---
+>  tools/include/uapi/asm-generic/socket.h | 21 +++++++++++++++++++--
+>  1 file changed, 19 insertions(+), 2 deletions(-)
 >
-> 1. Where is the TCP ACK delay computed for IPv6?
-> Could not identify this in file net/ipv6/tcp_ipv6.c .
+> diff --git a/tools/include/uapi/asm-generic/socket.h b/tools/include/uapi=
+/asm-generic/socket.h
+> index ffff554a5230..aa5016ff3d91 100644
+> --- a/tools/include/uapi/asm-generic/socket.h
+> +++ b/tools/include/uapi/asm-generic/socket.h
+> @@ -119,14 +119,31 @@
 >
-> 2. Perhaps, adding kernel configuration options for
-> the ncurses interface is desireable.  What is a good
-> example to learn from?
+>  #define SO_DETACH_REUSEPORT_BPF 68
 >
-> 3. Perhaps, setting constants in file
-> include/uapi/linux/sysctl.h may be unnecessary, but I
-> have not found any guidelines on when these CTL
-> numbers are necessary.  Likely, because I did not
-> read the documentation carefully enough.  Any
-> pointers are appreciated.
+> +#define SO_PREFER_BUSY_POLL    69
+> +#define SO_BUSY_POLL_BUDGET    70
+> +
+> +#define SO_NETNS_COOKIE                71
+> +
+> +#define SO_BUF_LOCK            72
+> +
+> +#define SO_RESERVE_MEM         73
+> +
+> +#define SO_TXREHASH            74
+> +
+>  #define SO_RCVMARK             75
 >
-> 4. The default should probably be a value like
-> net.ipv4.tcp_delayed_ack=3D1 that preserves the current
-> behavior and hence is backwards compatible for user
-> space.  A value of net.ipv4.tcp_delayed_ack=3D0 should
-> globally (for IPv4) disable TCP delayed ACK.  Would
-> also like to add the option for IPv6, but see point
-> (1).
+>  #define SO_PASSPIDFD           76
+>  #define SO_PEERPIDFD           77
 >
+> -#define SCM_TS_OPT_ID          78
+> +#define SO_DEVMEM_LINEAR       78
+> +#define SCM_DEVMEM_LINEAR      SO_DEVMEM_LINEAR
+> +#define SO_DEVMEM_DMABUF       79
+> +#define SCM_DEVMEM_DMABUF      SO_DEVMEM_DMABUF
+> +#define SO_DEVMEM_DONTNEED     80
+> +
+> +#define SCM_TS_OPT_ID          81
 >
-> In case a similar sysctl has already been proposed
-> and rejected in the past, please point me to the
-> mailing list archives, if that is not too
-> inconvenient.
+> -#define SO_RCVPRIORITY         79
+> +#define SO_RCVPRIORITY         82
 >
+>  #if !defined(__KERNEL__)
 >
-> Which questions have I failed to ask that I should
-> have asked?
->
-> Errors and lack of research are on me.
->
-> Thank you for sharing your time.
->
-> Andrew
->
->
->
->
+> --
+> 2.43.0
 >
 
