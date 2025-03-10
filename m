@@ -1,100 +1,203 @@
-Return-Path: <netdev+bounces-173536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F6BFA59532
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 13:54:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8E4AA5953D
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 13:54:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3348C188DF31
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:54:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0096D188EF20
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:54:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A765226D1B;
-	Mon, 10 Mar 2025 12:53:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7654D22A4D3;
+	Mon, 10 Mar 2025 12:54:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sINWN16n"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MwZP10U3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4062235963;
-	Mon, 10 Mar 2025 12:53:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B175A2288FE
+	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 12:54:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741611238; cv=none; b=NXLF2lhXeVeQJ51ZBK3SWBgcJD92wv8LNgVpFrb2/R51TOE8A9ELdvTei6K5XvgjOVzGR39nKEeur99bWCpixPYSxsa7sFUeElgSiN6LMTv+K6WNmFXnMbkOYlLCjoNVOTJ3beglQ2HqM3fEEG9KEbYe1Ndfkw3SAtueEJdwe5E=
+	t=1741611251; cv=none; b=W4J7TJLr/2JyLlBQcsLBmhntoc26LLjgtX2lOWgwGq4cMQ/+jLJGGq45VED6xTOCmwDgbZbUwGdR936LS3GtVdH1Z5UCC2By0nP4KU3nj2usx5KKJo2Z5ta2nkhkWZ5WCBhPi0uTrF+0YNz6u+5d/P16AxQeqzALwGygVCwhiac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741611238; c=relaxed/simple;
-	bh=J1e0tuX0R2dKRPJ+pB6GcyRcQHThRSNrXsdiWBni5Qk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PH2Wq7U+9BZZv3yuYfls/YVTQy1eQzCnXyF+Id01Joa7okfdjtdEJZBiYlbf0DBVgyrFMrM0jinILsvbmZ/+8Ol+9wYLFBT0j2r2FMc9gQwLZ08xXLRY6LPW4qYUoVTKW7rDfrwdh+aQvsUNYzaC9SyuVbP+2UicNKBWui+3jAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sINWN16n; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7079CC4CEE5;
+	s=arc-20240116; t=1741611251; c=relaxed/simple;
+	bh=xsKwuaT+kl/9LxkTzq9+F+i2EjGR0W72fihNUXW6VbA=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=DUxJNCWt5C9+KsihIFfeiX8K6LVUicr+G+/YmcHQWrg5CAnDwo++HIxSK3FN2Gxs+9knlqXBPwIn5RAs1Ig4Xjn6bBoxMobcK/zqohQYIwQx2ejvVNBhEHuaA7yBiQ5nUgtecix9Oqb6BZElS2QSRYO8P+e0C6ZHDrv8UQR32Rc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MwZP10U3; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741611248;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=QOWCKaCbmlFC0Efy5SeEAE0DBijaDRqz9slfsvo05nc=;
+	b=MwZP10U3UgghJctYjGLoMYdrTUou0H1ti/iLdBvdU0DvSseHCcNuCCrWSP9oQxIM3nFate
+	cWGkGIhNTw9UcA1g0GKa68rmVeb9MgObL6pu6BDsmpKAiLbmwF3CM2KUARAK1UwEySNjxG
+	D2CRaW+7mVkh7ui1mmOux5YBpHa4scY=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-155-jIPLHhpaPTWVNadJ5e4jKQ-1; Mon,
+ 10 Mar 2025 08:54:03 -0400
+X-MC-Unique: jIPLHhpaPTWVNadJ5e4jKQ-1
+X-Mimecast-MFC-AGG-ID: jIPLHhpaPTWVNadJ5e4jKQ_1741611241
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4531B1955D6C;
+	Mon, 10 Mar 2025 12:54:01 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.61])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DC13B1828A8C;
 	Mon, 10 Mar 2025 12:53:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741611237;
-	bh=J1e0tuX0R2dKRPJ+pB6GcyRcQHThRSNrXsdiWBni5Qk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sINWN16ngmfU2lykcPSvEltv8suz+4O4FzbpqqAf8sN1TkxAateKk8xaWROXzZlg/
-	 4lKExBHdAJhTMm/zIyb7EjXGys2rB3rHGsL9TxpkaSK9WzmatdOIuYHViAbazwRVRx
-	 IS2iaG3Ocpg2eRRLOJdc+t5PDggdRzoe+fOKYDFI2WjPO1G3fEl3/mZAQZe+Pdnhsd
-	 yzfgHJadIf7kxez3j5tOJkx/cPK3eQ2lcqMaIl4R2CIPdG5y32mnhK+XpT5rLaF+BC
-	 KkJV7Vt9a4FqNJME2iX0fxvjPhZFHGtPSgfKx91tzXj0w69Q4R8z7/Dw3TJXqDx9JE
-	 68olY1HAX1M+g==
-Date: Mon, 10 Mar 2025 07:53:55 -0500
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	"David S. Miller" <davem@davemloft.net>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Minda Chen <minda.chen@starfivetech.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	devicetree@vger.kernel.org, Jose Abreu <joabreu@synopsys.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Andrew Lunn <andrew@lunn.ch>, linux-riscv@lists.infradead.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>, Conor Dooley <conor@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 6/7] dt-bindings: deprecate
- "snps,en-tx-lpi-clockgating" property
-Message-ID: <174161123533.3885448.13844393493565707617.robh@kernel.org>
-References: <Z82tWYZulV12Pjir@shell.armlinux.org.uk>
- <E1trIAQ-005nto-3w@rmk-PC.armlinux.org.uk>
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org
+cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Jakub Kicinski <kuba@kernel.org>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+    Simon Horman <horms@kernel.org>,
+    Chuck Lever <chuck.lever@oracle.com>, linux-crypto@vger.kernel.org,
+    linux-afs@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: [GIT PULL net-next] crypto: Add Kerberos crypto lib
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1trIAQ-005nto-3w@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <953586.1741611236.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 10 Mar 2025 12:53:56 +0000
+Message-ID: <953587.1741611236@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
+Hi,
 
-On Sun, 09 Mar 2025 15:02:14 +0000, Russell King (Oracle) wrote:
-> Whether the MII transmit clock can be stopped is primarily a property
-> of the PHY (there is a capability bit that should be checked first.)
-> Whether the MAC is capable of stopping the transmit clock is a separate
-> issue, but this is already handled by the core DesignWare MAC code.
-> 
-> Therefore, snps,en-tx-lpi-clockgating is technically incorrect, so this
-> commit deprecates the property in the binding.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
->  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 1 +
->  1 file changed, 1 insertion(+)
-> 
+Could you pull this into the net-next tree please (it has been pulled into
+the crypto tree[1])?  This provides the Kerberos-5 crypto parts needed by
+the AF_RXRPC RxGK (GSSAPI) security class.  In the future, it could also b=
+e
+used by NFS and SunRPC as much of the code is abstracted from there.  This
+is a prerequisite for the rxrpc patches[2].
 
-Acked-by: Rob Herring (Arm) <robh@kernel.org>
+It does a couple of things:
+
+ (1) Provide an AEAD crypto driver, krb5enc, that mirrors the authenc
+     driver, but that hashes the plaintext, not the ciphertext.  This was
+     made a separate module rather than just being a part of the authenc
+     driver because it has to do all of the constituent operations in the
+     opposite order - which impacts the async op handling.
+
+     Testmgr data is provided for AES+SHA2 and Camellia combinations of
+     authenc and krb5enc used by the krb5 library.  AES+SHA1 is not
+     provided as the RFCs don't contain usable test vectors.
+
+ (2) Provide a Kerberos 5 crypto library.  This is an extract from the
+     sunrpc driver as that code can be shared between sunrpc/nfs and
+     rxrpc/afs.  This provides encryption, decryption, get MIC and verify
+     MIC routines that use and wrap the crypto functions, along with some
+     functions to provide layout management.
+
+     This supports AES+SHA1, AES+SHA2 and Camellia encryption types.
+
+     Self-testing is provided that goes further than is possible with
+     testmgr, doing subkey derivation as well.
+
+David
+
+Link: https://lore.kernel.org/linux-crypto/3709378.1740991489@warthog.proc=
+yon.org.uk/ [1]
+Link: https://web.git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-f=
+s.git/log/?h=3Drxrpc-next [2]
+
+---
+The following changes since commit 1e15510b71c99c6e49134d756df91069f7d1814=
+1:
+
+  Merge tag 'net-6.14-rc5' of git://git.kernel.org/pub/scm/linux/kernel/gi=
+t/netdev/net (2025-02-27 09:32:42 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags=
+/crypto-krb5-20250228
+
+for you to fetch changes up to 0dd8f8533a833eeb8e51034072a59930bcbec725:
+
+  crypto/krb5: Implement crypto self-testing (2025-02-28 09:42:42 +0000)
+
+----------------------------------------------------------------
+crypto: Add Kerberos crypto lib
+
+----------------------------------------------------------------
+David Howells (17):
+      crypto/krb5: Add API Documentation
+      crypto/krb5: Add some constants out of sunrpc headers
+      crypto: Add 'krb5enc' hash and cipher AEAD algorithm
+      crypto/krb5: Test manager data
+      crypto/krb5: Implement Kerberos crypto core
+      crypto/krb5: Add an API to query the layout of the crypto section
+      crypto/krb5: Add an API to alloc and prepare a crypto object
+      crypto/krb5: Add an API to perform requests
+      crypto/krb5: Provide infrastructure and key derivation
+      crypto/krb5: Implement the Kerberos5 rfc3961 key derivation
+      crypto/krb5: Provide RFC3961 setkey packaging functions
+      crypto/krb5: Implement the Kerberos5 rfc3961 encrypt and decrypt fun=
+ctions
+      crypto/krb5: Implement the Kerberos5 rfc3961 get_mic and verify_mic
+      crypto/krb5: Implement the AES enctypes from rfc3962
+      crypto/krb5: Implement the AES enctypes from rfc8009
+      crypto/krb5: Implement the Camellia enctypes from rfc6803
+      crypto/krb5: Implement crypto self-testing
+
+ Documentation/crypto/index.rst   |   1 +
+ Documentation/crypto/krb5.rst    | 262 +++++++++++++
+ crypto/Kconfig                   |  13 +
+ crypto/Makefile                  |   3 +
+ crypto/krb5/Kconfig              |  26 ++
+ crypto/krb5/Makefile             |  18 +
+ crypto/krb5/internal.h           | 247 ++++++++++++
+ crypto/krb5/krb5_api.c           | 452 ++++++++++++++++++++++
+ crypto/krb5/krb5_kdf.c           | 145 +++++++
+ crypto/krb5/rfc3961_simplified.c | 797 ++++++++++++++++++++++++++++++++++=
++++++
+ crypto/krb5/rfc3962_aes.c        | 115 ++++++
+ crypto/krb5/rfc6803_camellia.c   | 237 ++++++++++++
+ crypto/krb5/rfc8009_aes2.c       | 362 ++++++++++++++++++
+ crypto/krb5/selftest.c           | 544 ++++++++++++++++++++++++++
+ crypto/krb5/selftest_data.c      | 291 ++++++++++++++
+ crypto/krb5enc.c                 | 504 +++++++++++++++++++++++++
+ crypto/testmgr.c                 |  16 +
+ crypto/testmgr.h                 | 351 +++++++++++++++++
+ include/crypto/authenc.h         |   2 +
+ include/crypto/krb5.h            | 160 ++++++++
+ 20 files changed, 4546 insertions(+)
+ create mode 100644 Documentation/crypto/krb5.rst
+ create mode 100644 crypto/krb5/Kconfig
+ create mode 100644 crypto/krb5/Makefile
+ create mode 100644 crypto/krb5/internal.h
+ create mode 100644 crypto/krb5/krb5_api.c
+ create mode 100644 crypto/krb5/krb5_kdf.c
+ create mode 100644 crypto/krb5/rfc3961_simplified.c
+ create mode 100644 crypto/krb5/rfc3962_aes.c
+ create mode 100644 crypto/krb5/rfc6803_camellia.c
+ create mode 100644 crypto/krb5/rfc8009_aes2.c
+ create mode 100644 crypto/krb5/selftest.c
+ create mode 100644 crypto/krb5/selftest_data.c
+ create mode 100644 crypto/krb5enc.c
+ create mode 100644 include/crypto/krb5.h
 
 
