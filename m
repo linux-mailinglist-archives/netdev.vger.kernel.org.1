@@ -1,51 +1,52 @@
-Return-Path: <netdev+bounces-173912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2808AA5C36C
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 15:13:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4C8DA5C36B
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 15:13:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B13463B120B
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:13:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84DDE167C32
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:13:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EBF025B69D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 841C125BAA6;
 	Tue, 11 Mar 2025 14:13:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="XqaWMu8p"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="DYSnrtWD"
 X-Original-To: netdev@vger.kernel.org
 Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2C4225B679
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6F825B669
 	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 14:13:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741702393; cv=none; b=m9YX1XhGgIJx/slQR+vqA7O1lGlTn5qtrTfwxLBv6KDc0H519EDSmhg9tRcSB/CldWwmOnSfdPJMyAx25017js7ZAWlsjtG71KcEfiDW9DnwjQdVFLJ3e1faNlNG1NVaWg4n2AKV2xH3bwLc3DRGLeD6u+qn8RcVmZik8bSKFJY=
+	t=1741702393; cv=none; b=CRCs01fRbw5s1ZHr7MLqtYQ5pDWPETWR3INuPSVdu1ddWL74p996NpBFb+sEfNWwvDo+bP3np2klEaDJaX2U71Kss4+rvflS04njnyZt/8GcaDhwLtA8Sk8RQIkUWL8CGyLbnqg3ykiUfmxf9St09o9AtdPoftQ8I6Q3M6pV6Is=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1741702393; c=relaxed/simple;
-	bh=QOpsUjqDGF2gMRhCl/pcmdgDv0beCn9yyCa5DHDdDRE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nzCWh9azVPY0hXQJ/14xHX1PJYT6tJeURDskrGz4TSMJ44PvTq2W0C10bnmbOrVDg0//MCfYoYUwIDlOI0BRAF91ulTpYSX1IUdSKj+eImgOVyg0Ikm/yl5JXrEQ7R8apW66dq4VRu/5VBxY8gNUswowMHX/m6m3Yw/bf8iVg5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=XqaWMu8p; arc=none smtp.client-ip=139.165.32.111
+	bh=7lGqBClSSjyfxt8qcHmSGKs2y62wqql2e+bX2Acp64k=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=m6qJj3VSMLMTh9QfR0HILoEML9iMSkQrFzF9mWo5JCtTu3N64cF82PIx3OzngR6qdN5CtUwtlZfnUIQY1q7a5bUfUxLkrBP0TfrrTHVKQBOEstExEj01Y8Ip2PkvHaP8VAia56gYFY5WpKb6rTJmRS+CmNA45NfGVPIA1bbcHYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=DYSnrtWD; arc=none smtp.client-ip=139.165.32.111
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
 Received: from localhost.localdomain (unknown [195.29.54.243])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id C4174200E1C2;
-	Tue, 11 Mar 2025 15:13:00 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be C4174200E1C2
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id C1FE6200E1C5;
+	Tue, 11 Mar 2025 15:13:03 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be C1FE6200E1C5
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1741702383;
-	bh=1RLi/PZH36dlPYVUF6V2wz4qlMB5zHEEXzkKpKqAF+U=;
-	h=From:To:Cc:Subject:Date:From;
-	b=XqaWMu8pXY/3570nEmSC1wn6ZIAdZzVubYkHSp/KF2MGOjNI7uj4ZjrHJvf6o3tM7
-	 5pv86RjyHwbvuYvREf+GF5/lQZQ43jP5OQoICPNUMRMCIcW1ZGrjxz3zc0pflW8fVD
-	 Ud4AiZD6Qm9lVDRy3NkSLLS+un4LklWf2l0gGlyhtFSOL5W4aG4oVNu62XrznI9HvX
-	 AcqQNPtVxhSwzx7vU1+jRth5oYH3Q2tOZJBFe0NsGbNzYpHTyUhrx6NBd74HSHHRHS
-	 nW46iobk7c7GjpzPmg9oTau8b6mY/oeIP0qdVa6wo9fFBSLSOw8BtV7zQu8MvC1GZd
-	 h5O22HgaEJSSQ==
+	s=ulg20190529; t=1741702389;
+	bh=fhPTJcnJhGaIdlNdiWlJmdxebAZMfi41h3DDJqCYoTQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=DYSnrtWD9XIGdwpBI2Lj77UObuCdacsDtQaagpCAaWLihpv0CEpYTN1xh5G1Mtucl
+	 2PFxfp2Uo1bim3ivoR9VekQ9Tb9ypY+g/4XbIUc2o9QT5snFPpbr53hdv16ntJmybS
+	 ldM3Y+JSYAfmmov7HQel90mhhSmrCamlWSZidGTRKMi8gywNCE8TpwxtrMsjKO6PBR
+	 yTBGp/GQx2GXx1hiO2DYWJS4txPdMWn7OVJhA3F5LtuMKosqXzD38XqrLKsPRHVjHX
+	 67UPKngw+5axHzxxbmWB9fqGqjquStjUCpuSf8GABpyOz23vdVVrhNSHmDgfVIy55B
+	 1ufOFhVZDk8Qg==
 From: Justin Iurman <justin.iurman@uliege.be>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -54,11 +55,14 @@ Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	horms@kernel.org,
-	justin.iurman@uliege.be
-Subject: [PATCH net 0/7] net: fix lwtunnel reentry loops
-Date: Tue, 11 Mar 2025 15:12:31 +0100
-Message-Id: <20250311141238.19862-1-justin.iurman@uliege.be>
+	justin.iurman@uliege.be,
+	Ido Schimmel <idosch@nvidia.com>
+Subject: [PATCH net 1/7] net: ipv6: ioam6: fix lwtunnel_output() loop
+Date: Tue, 11 Mar 2025 15:12:32 +0100
+Message-Id: <20250311141238.19862-2-justin.iurman@uliege.be>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250311141238.19862-1-justin.iurman@uliege.be>
+References: <20250311141238.19862-1-justin.iurman@uliege.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,55 +71,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When the destination is the same after the transformation, we enter a
-lwtunnel loop. This is true for most of lwt users: ioam6, rpl, seg6,
-seg6_local, ila_lwt, and lwt_bpf. It can happen in their input() and
-output() handlers respectively, where either dst_input() or dst_output()
-is called at the end. It can also happen in xmit() handlers. This patch
-prevents that kind of reentry loop by redirecting to the origin input()
-or output() when the destination is the same after the transformation.
+Fix the lwtunnel_output() reentry loop in ioam6_iptunnel when the
+destination is the same after transformation. Note that a check on the
+destination address was already performed, but it was not enough.
 
-Here is an example for rpl_input():
+Fixes: 8cb3bf8bff3c ("ipv6: ioam: Add support for the ip6ip6 encapsulation")
+Cc: Ido Schimmel <idosch@nvidia.com>
+Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
+---
+ net/ipv6/ioam6_iptunnel.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-dump_stack_lvl+0x60/0x80
-rpl_input+0x9d/0x320
-lwtunnel_input+0x64/0xa0
-lwtunnel_input+0x64/0xa0
-lwtunnel_input+0x64/0xa0
-lwtunnel_input+0x64/0xa0
-lwtunnel_input+0x64/0xa0
-[...]
-lwtunnel_input+0x64/0xa0
-lwtunnel_input+0x64/0xa0
-lwtunnel_input+0x64/0xa0
-lwtunnel_input+0x64/0xa0
-lwtunnel_input+0x64/0xa0
-ip6_sublist_rcv_finish+0x85/0x90
-ip6_sublist_rcv+0x236/0x2f0
-
-... until rpl_do_srh() fails, which means skb_cow_head() failed.
-
-Justin Iurman (7):
-  net: ipv6: ioam6: fix lwtunnel_output() loop
-  net: ipv6: rpl: fix lwtunnel_input/output loop
-  net: ipv6: seg6: fix lwtunnel_input/output loop
-  net: ipv6: seg6_local: fix lwtunnel_input() loop
-  net: ipv6: ila: fix lwtunnel_output() loop
-  net: core: bpf: fix lwtunnel_input/xmit loop
-  selftests: net: test for lwtunnel dst ref loops
-
- net/core/lwt_bpf.c                            |  21 ++
- net/ipv6/ila/ila_lwt.c                        |   8 +
- net/ipv6/ioam6_iptunnel.c                     |   8 +-
- net/ipv6/rpl_iptunnel.c                       |  14 +
- net/ipv6/seg6_iptunnel.c                      |  37 ++-
- net/ipv6/seg6_local.c                         |  85 +++++-
- tools/testing/selftests/net/Makefile          |   1 +
- tools/testing/selftests/net/config            |   2 +
- .../selftests/net/lwt_dst_cache_ref_loop.sh   | 250 ++++++++++++++++++
- 9 files changed, 412 insertions(+), 14 deletions(-)
- create mode 100755 tools/testing/selftests/net/lwt_dst_cache_ref_loop.sh
-
+diff --git a/net/ipv6/ioam6_iptunnel.c b/net/ipv6/ioam6_iptunnel.c
+index 2c383c12a431..9d7a9be9a4d0 100644
+--- a/net/ipv6/ioam6_iptunnel.c
++++ b/net/ipv6/ioam6_iptunnel.c
+@@ -337,7 +337,6 @@ static int ioam6_do_encap(struct net *net, struct sk_buff *skb,
+ static int ioam6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ {
+ 	struct dst_entry *dst = skb_dst(skb), *cache_dst = NULL;
+-	struct in6_addr orig_daddr;
+ 	struct ioam6_lwt *ilwt;
+ 	int err = -EINVAL;
+ 	u32 pkt_cnt;
+@@ -352,8 +351,6 @@ static int ioam6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 	if (pkt_cnt % ilwt->freq.n >= ilwt->freq.k)
+ 		goto out;
+ 
+-	orig_daddr = ipv6_hdr(skb)->daddr;
+-
+ 	local_bh_disable();
+ 	cache_dst = dst_cache_get(&ilwt->cache);
+ 	local_bh_enable();
+@@ -422,7 +419,10 @@ static int ioam6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 			goto drop;
+ 	}
+ 
+-	if (!ipv6_addr_equal(&orig_daddr, &ipv6_hdr(skb)->daddr)) {
++	/* avoid lwtunnel_output() reentry loop when destination is the same
++	 * after transformation
++	 */
++	if (dst->lwtstate != cache_dst->lwtstate) {
+ 		skb_dst_drop(skb);
+ 		skb_dst_set(skb, cache_dst);
+ 		return dst_output(net, sk, skb);
 -- 
 2.34.1
 
