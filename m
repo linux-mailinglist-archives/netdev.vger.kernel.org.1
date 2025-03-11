@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-174029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FEE4A5D0E2
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 21:43:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54AC6A5D0E3
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 21:43:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38C30189E3F0
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 20:43:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 810387A870F
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 20:42:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3309264A83;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B333F264A87;
 	Tue, 11 Mar 2025 20:42:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HIa6XxGn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XIC7Sl8P"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9733C25D8F1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9229264A81
 	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 20:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741725775; cv=none; b=PsIDlUmOrx1nvuo03wqm1FPKfpGlnpYBSkyoxxXjRiQS8X/RdHRkWpG4cOn0ZFLr/c4HflFUPaDzCuFy2nCrnwwa/MvyxLuS+nicKgrOAA6SBuU0U5IUIKG4lbMBU1osCPGZtg40HIS1Mtnr1pP36i6coyzpt+965V/VBgwfpgU=
+	t=1741725775; cv=none; b=im/cP8xPHLNuNafQKxKdYrfIJUHunyD/QqYmdwPZ2l7wg0f6/ClAA27ZvQ9CUAUAeN0/XH1MSbf4BxDnD5AoX1VvRl7dmY2V3st7zEjpnx1qyqyHisjdgR6R7guU+8/Y3ClYa/c7aFtPZ8ZiIXZT0B8adUUA9fMVucbCprk5LDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1741725775; c=relaxed/simple;
-	bh=p9qIEz6mvyMQ3lQe0q5LrQvJcQzC/fdYPn7Vhw3DEXI=;
+	bh=WdnB12w/bbag1OOo0C84Xb5+mhBBWkBKJnVTUCz7Gp8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gOsJyjgyAqNEOO4A/aqdNkqwE/CHjAbqKvoNtMmOcU8cZmTkMiJ/zy4D4iCj7Qt0I0PJ7v6yqqU6RhICx9MIPGgC5Te04cb466il+553DpcDQYIo+CtUXXNwUJ+uVSrUSQr9gvQKh19ZaX0i39q/z+7WwrENERSm/RxcMN7k0tI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HIa6XxGn; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=UP/pwNZR9f8lacD37aVmY70LJXx/tZ+PiO63qA3qvSCPAKc6rjHpigXre4Fkj2HvqK1n2Af43uULBAm5Gq2Lx5ocGh74HawVrQml+I7xdTu9WQaMQM2/ACfUqY9WwfdBjxvlDyROE3sMWti1FSZcvuoyvHVid9RutfLY9GQV4yE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XIC7Sl8P; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
@@ -37,26 +37,26 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=eA7C4euNm9WdDwW6tgoLCuSzGWO6ONbcgL+SxELt0oc=;
-	b=HIa6XxGnaRH/s9B2lplPG5S8IvFlU3VgYxPxsUBv+m8NdWMPS2JtpPHzDjo0ikZswiKw60
-	nVnNt8fympRbBVkZAQhGVPi+IVUNFzqMydy15WBvJZ0PgLE3HUuXDHUHhrccdZJIGJLM22
-	TWtTd0nnl8UvcsOZlkuGI6tFdzoli18=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=JD9YD3F4uTBTL2GOHAuiqCecLYNeKJ7N6ymXn7HPB0Y=;
+	b=XIC7Sl8PXCeS1P9gkzcq+tg/4IFdhZGrI4p0rwnEWeBfTWfMp7pbj6sxoeaKoYdHVD7sVx
+	AoH+tkTqmOxzEKObJhOqpktFvLj27VhKFIIzt0wYmAxRM0L6ZG37KirfTdvWHHjvEWXUaC
+	3BFioQ4WuacmkOF/ClvY2/n2+M2q3G8=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-586-yKXNxTbJPKGxrh2sm1SVpA-1; Tue,
- 11 Mar 2025 16:42:47 -0400
-X-MC-Unique: yKXNxTbJPKGxrh2sm1SVpA-1
-X-Mimecast-MFC-AGG-ID: yKXNxTbJPKGxrh2sm1SVpA_1741725765
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-70-6yWEU9zfNF-zm9uBLiaSvg-1; Tue,
+ 11 Mar 2025 16:42:51 -0400
+X-MC-Unique: 6yWEU9zfNF-zm9uBLiaSvg-1
+X-Mimecast-MFC-AGG-ID: 6yWEU9zfNF-zm9uBLiaSvg_1741725769
 Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B1ACE180035C;
-	Tue, 11 Mar 2025 20:42:45 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A458119560B3;
+	Tue, 11 Mar 2025 20:42:49 +0000 (UTC)
 Received: from gerbillo.redhat.com (unknown [10.45.224.66])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5943E18001F6;
-	Tue, 11 Mar 2025 20:42:42 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 439D618001F6;
+	Tue, 11 Mar 2025 20:42:45 +0000 (UTC)
 From: Paolo Abeni <pabeni@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
@@ -66,9 +66,9 @@ Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
 	Simon Horman <horms@kernel.org>,
 	David Ahern <dsahern@kernel.org>,
 	kuniyu@amazon.com
-Subject: [PATCH v4 net-next 1/2] udp_tunnel: create a fastpath GRO lookup.
-Date: Tue, 11 Mar 2025 21:42:28 +0100
-Message-ID: <4d5c319c4471161829f50cb8436841de81a5edae.1741718157.git.pabeni@redhat.com>
+Subject: [PATCH v4 net-next 2/2] udp_tunnel: use static call for GRO hooks when possible
+Date: Tue, 11 Mar 2025 21:42:29 +0100
+Message-ID: <6fd1f9c7651151493ecab174e7b8386a1534170d.1741718157.git.pabeni@redhat.com>
 In-Reply-To: <cover.1741718157.git.pabeni@redhat.com>
 References: <cover.1741718157.git.pabeni@redhat.com>
 Precedence: bulk
@@ -80,323 +80,232 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Most UDP tunnels bind a socket to a local port, with ANY address, no
-peer and no interface index specified.
-Additionally it's quite common to have a single tunnel device per
-namespace.
+It's quite common to have a single UDP tunnel type active in the
+whole system. In such a case we can replace the indirect call for
+the UDP tunnel GRO callback with a static call.
 
-Track in each namespace the UDP tunnel socket respecting the above.
-When only a single one is present, store a reference in the netns.
-
-When such reference is not NULL, UDP tunnel GRO lookup just need to
-match the incoming packet destination port vs the socket local port.
-
-The tunnel socket never sets the reuse[port] flag[s]. When bound to no
-address and interface, no other socket can exist in the same netns
-matching the specified local port.
-
-Matching packets with non-local destination addresses will be
-aggregated, and eventually segmented as needed - no behavior changes
-intended.
-
-Note that the UDP tunnel socket reference is stored into struct
-netns_ipv4 for both IPv4 and IPv6 tunnels. That is intentional to keep
-all the fastpath-related netns fields in the same struct and allow
-cacheline-based optimization. Currently both the IPv4 and IPv6 socket
-pointer share the same cacheline as the `udp_table` field.
+Add the related accounting in the control path and switch to static
+call when possible. To keep the code simple use a static array for
+the registered tunnel types, and size such array based on the kernel
+config.
 
 Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
 v3 -> v4:
- - another RCU_INIT_POINTER use-case
- - clarified forwarding packets handling
+ - fix CONFIG_FOE typo
+ - avoid gaps in gro types array
+ - drop WARN_ON in dummy_gro_rcv()
 
 v2 -> v3:
- - use RCU_INIT_POINTER() when possible
- - drop 'inline' from c file
+ - avoid unneeded checks in udp_tunnel_update_gro_rcv()
 
 v1 -> v2:
- - fix [1] -> [i] typo
- - avoid replacing static_branch_dec(udp_encap_needed_key) with
-   udp_encap_disable() (no-op)
- - move ipv6 cleanup after encap disable
- - clarified the design choice in the commit message
+ - fix UDP_TUNNEL=n build
 ---
- include/linux/udp.h        | 16 ++++++++++++++++
- include/net/netns/ipv4.h   | 11 +++++++++++
- include/net/udp.h          |  1 +
- include/net/udp_tunnel.h   | 18 ++++++++++++++++++
- net/ipv4/udp.c             | 13 ++++++++++++-
- net/ipv4/udp_offload.c     | 37 +++++++++++++++++++++++++++++++++++++
- net/ipv4/udp_tunnel_core.c | 12 ++++++++++++
- net/ipv6/udp.c             |  2 ++
- net/ipv6/udp_offload.c     |  5 +++++
- 9 files changed, 114 insertions(+), 1 deletion(-)
+ include/net/udp_tunnel.h   |   4 ++
+ net/ipv4/udp_offload.c     | 130 ++++++++++++++++++++++++++++++++++++-
+ net/ipv4/udp_tunnel_core.c |   2 +
+ 3 files changed, 135 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/udp.h b/include/linux/udp.h
-index 0807e21cfec95..895240177f4f4 100644
---- a/include/linux/udp.h
-+++ b/include/linux/udp.h
-@@ -101,6 +101,13 @@ struct udp_sock {
- 
- 	/* Cache friendly copy of sk->sk_peek_off >= 0 */
- 	bool		peeking_with_offset;
-+
-+	/*
-+	 * Accounting for the tunnel GRO fastpath.
-+	 * Unprotected by compilers guard, as it uses space available in
-+	 * the last UDP socket cacheline.
-+	 */
-+	struct hlist_node	tunnel_list;
- };
- 
- #define udp_test_bit(nr, sk)			\
-@@ -219,4 +226,13 @@ static inline void udp_allow_gso(struct sock *sk)
- 
- #define IS_UDPLITE(__sk) (__sk->sk_protocol == IPPROTO_UDPLITE)
- 
-+static inline struct sock *udp_tunnel_sk(const struct net *net, bool is_ipv6)
-+{
-+#if IS_ENABLED(CONFIG_NET_UDP_TUNNEL)
-+	return rcu_dereference(net->ipv4.udp_tunnel_gro[is_ipv6].sk);
-+#else
-+	return NULL;
-+#endif
-+}
-+
- #endif	/* _LINUX_UDP_H */
-diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
-index 650b2dc9199f4..6373e3f17da84 100644
---- a/include/net/netns/ipv4.h
-+++ b/include/net/netns/ipv4.h
-@@ -47,6 +47,11 @@ struct sysctl_fib_multipath_hash_seed {
- };
- #endif
- 
-+struct udp_tunnel_gro {
-+	struct sock __rcu *sk;
-+	struct hlist_head list;
-+};
-+
- struct netns_ipv4 {
- 	/* Cacheline organization can be found documented in
- 	 * Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst.
-@@ -85,6 +90,11 @@ struct netns_ipv4 {
- 	struct inet_timewait_death_row tcp_death_row;
- 	struct udp_table *udp_table;
- 
-+#if IS_ENABLED(CONFIG_NET_UDP_TUNNEL)
-+	/* Not in a pernet subsys because need to be available at GRO stage */
-+	struct udp_tunnel_gro udp_tunnel_gro[2];
-+#endif
-+
- #ifdef CONFIG_SYSCTL
- 	struct ctl_table_header	*forw_hdr;
- 	struct ctl_table_header	*frags_hdr;
-@@ -277,4 +287,5 @@ struct netns_ipv4 {
- 	struct hlist_head	*inet_addr_lst;
- 	struct delayed_work	addr_chk_work;
- };
-+
- #endif
-diff --git a/include/net/udp.h b/include/net/udp.h
-index 6e89520e100dc..a772510b2aa58 100644
---- a/include/net/udp.h
-+++ b/include/net/udp.h
-@@ -290,6 +290,7 @@ static inline void udp_lib_init_sock(struct sock *sk)
- 	struct udp_sock *up = udp_sk(sk);
- 
- 	skb_queue_head_init(&up->reader_queue);
-+	INIT_HLIST_NODE(&up->tunnel_list);
- 	up->forward_threshold = sk->sk_rcvbuf >> 2;
- 	set_bit(SOCK_CUSTOM_SOCKOPT, &sk->sk_socket->flags);
- }
 diff --git a/include/net/udp_tunnel.h b/include/net/udp_tunnel.h
-index a93dc51f6323e..eda0f3e2f65fa 100644
+index eda0f3e2f65fa..a7b230867eb14 100644
 --- a/include/net/udp_tunnel.h
 +++ b/include/net/udp_tunnel.h
-@@ -203,6 +203,24 @@ static inline void udp_tunnel_encap_enable(struct sock *sk)
- 	udp_encap_enable();
- }
+@@ -205,9 +205,11 @@ static inline void udp_tunnel_encap_enable(struct sock *sk)
  
-+#if IS_ENABLED(CONFIG_NET_UDP_TUNNEL)
-+void udp_tunnel_update_gro_lookup(struct net *net, struct sock *sk, bool add);
-+#else
-+static inline void udp_tunnel_update_gro_lookup(struct net *net,
-+						struct sock *sk, bool add) {}
-+#endif
-+
-+static inline void udp_tunnel_cleanup_gro(struct sock *sk)
-+{
-+	struct udp_sock *up = udp_sk(sk);
-+	struct net *net = sock_net(sk);
-+
-+	if (!up->tunnel_list.pprev)
-+		return;
-+
-+	udp_tunnel_update_gro_lookup(net, sk, false);
-+}
-+
- #define UDP_TUNNEL_NIC_MAX_TABLES	4
+ #if IS_ENABLED(CONFIG_NET_UDP_TUNNEL)
+ void udp_tunnel_update_gro_lookup(struct net *net, struct sock *sk, bool add);
++void udp_tunnel_update_gro_rcv(struct sock *sk, bool add);
+ #else
+ static inline void udp_tunnel_update_gro_lookup(struct net *net,
+ 						struct sock *sk, bool add) {}
++static inline void udp_tunnel_update_gro_rcv(struct sock *sk, bool add) {}
+ #endif
  
- enum udp_tunnel_nic_info_flags {
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 17c7736d83494..26863e51801fb 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -2891,8 +2891,10 @@ void udp_destroy_sock(struct sock *sk)
- 			if (encap_destroy)
- 				encap_destroy(sk);
- 		}
--		if (udp_test_bit(ENCAP_ENABLED, sk))
-+		if (udp_test_bit(ENCAP_ENABLED, sk)) {
- 			static_branch_dec(&udp_encap_needed_key);
-+			udp_tunnel_cleanup_gro(sk);
-+		}
- 	}
- }
+ static inline void udp_tunnel_cleanup_gro(struct sock *sk)
+@@ -215,6 +217,8 @@ static inline void udp_tunnel_cleanup_gro(struct sock *sk)
+ 	struct udp_sock *up = udp_sk(sk);
+ 	struct net *net = sock_net(sk);
  
-@@ -3804,6 +3806,15 @@ static void __net_init udp_set_table(struct net *net)
- 
- static int __net_init udp_pernet_init(struct net *net)
- {
-+#if IS_ENABLED(CONFIG_NET_UDP_TUNNEL)
-+	int i;
++	udp_tunnel_update_gro_rcv(sk, false);
 +
-+	/* No tunnel is configured */
-+	for (i = 0; i < ARRAY_SIZE(net->ipv4.udp_tunnel_gro); ++i) {
-+		INIT_HLIST_HEAD(&net->ipv4.udp_tunnel_gro[i].list);
-+		RCU_INIT_POINTER(net->ipv4.udp_tunnel_gro[i].sk, NULL);
-+	}
-+#endif
- 	udp_sysctl_init(net);
- 	udp_set_table(net);
+ 	if (!up->tunnel_list.pprev)
+ 		return;
  
 diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index 2c0725583be39..e36d8a234848f 100644
+index e36d8a234848f..088aa8cb8ac0c 100644
 --- a/net/ipv4/udp_offload.c
 +++ b/net/ipv4/udp_offload.c
-@@ -12,6 +12,38 @@
- #include <net/udp.h>
- #include <net/protocol.h>
- #include <net/inet_common.h>
-+#include <net/udp_tunnel.h>
+@@ -15,6 +15,37 @@
+ #include <net/udp_tunnel.h>
+ 
+ #if IS_ENABLED(CONFIG_NET_UDP_TUNNEL)
 +
-+#if IS_ENABLED(CONFIG_NET_UDP_TUNNEL)
-+static DEFINE_SPINLOCK(udp_tunnel_gro_lock);
-+
-+void udp_tunnel_update_gro_lookup(struct net *net, struct sock *sk, bool add)
++/*
++ * Dummy GRO tunnel callback, exists mainly to avoid dangling/NULL
++ * values for the udp tunnel static call.
++ */
++static struct sk_buff *dummy_gro_rcv(struct sock *sk,
++				     struct list_head *head,
++				     struct sk_buff *skb)
 +{
-+	bool is_ipv6 = sk->sk_family == AF_INET6;
-+	struct udp_sock *tup, *up = udp_sk(sk);
-+	struct udp_tunnel_gro *udp_tunnel_gro;
++	NAPI_GRO_CB(skb)->flush = 1;
++	return NULL;
++}
 +
-+	spin_lock(&udp_tunnel_gro_lock);
-+	udp_tunnel_gro = &net->ipv4.udp_tunnel_gro[is_ipv6];
-+	if (add)
-+		hlist_add_head(&up->tunnel_list, &udp_tunnel_gro->list);
-+	else
-+		hlist_del_init(&up->tunnel_list);
++typedef struct sk_buff *(*udp_tunnel_gro_rcv_t)(struct sock *sk,
++						struct list_head *head,
++						struct sk_buff *skb);
 +
-+	if (udp_tunnel_gro->list.first &&
-+	    !udp_tunnel_gro->list.first->next) {
-+		tup = hlist_entry(udp_tunnel_gro->list.first, struct udp_sock,
-+				  tunnel_list);
++struct udp_tunnel_type_entry {
++	udp_tunnel_gro_rcv_t gro_receive;
++	refcount_t count;
++};
 +
-+		rcu_assign_pointer(udp_tunnel_gro->sk, (struct sock *)tup);
++#define UDP_MAX_TUNNEL_TYPES (IS_ENABLED(CONFIG_GENEVE) + \
++			      IS_ENABLED(CONFIG_VXLAN) * 2 + \
++			      IS_ENABLED(CONFIG_NET_FOU) * 2)
++
++DEFINE_STATIC_CALL(udp_tunnel_gro_rcv, dummy_gro_rcv);
++static DEFINE_STATIC_KEY_FALSE(udp_tunnel_static_call);
++static struct mutex udp_tunnel_gro_type_lock;
++static struct udp_tunnel_type_entry udp_tunnel_gro_types[UDP_MAX_TUNNEL_TYPES];
++static unsigned int udp_tunnel_gro_type_nr;
+ static DEFINE_SPINLOCK(udp_tunnel_gro_lock);
+ 
+ void udp_tunnel_update_gro_lookup(struct net *net, struct sock *sk, bool add)
+@@ -43,6 +74,101 @@ void udp_tunnel_update_gro_lookup(struct net *net, struct sock *sk, bool add)
+ 	spin_unlock(&udp_tunnel_gro_lock);
+ }
+ EXPORT_SYMBOL_GPL(udp_tunnel_update_gro_lookup);
++
++void udp_tunnel_update_gro_rcv(struct sock *sk, bool add)
++{
++	struct udp_tunnel_type_entry *cur = NULL;
++	struct udp_sock *up = udp_sk(sk);
++	int i, old_gro_type_nr;
++
++	if (!up->gro_receive)
++		return;
++
++	mutex_lock(&udp_tunnel_gro_type_lock);
++	for (i = 0; i < udp_tunnel_gro_type_nr; i++)
++		if (udp_tunnel_gro_types[i].gro_receive == up->gro_receive)
++			cur = &udp_tunnel_gro_types[i];
++
++	old_gro_type_nr = udp_tunnel_gro_type_nr;
++	if (add) {
++		/*
++		 * Update the matching entry, if found, or add a new one
++		 * if needed
++		 */
++		if (cur) {
++			refcount_inc(&cur->count);
++			goto out;
++		}
++
++		if (unlikely(udp_tunnel_gro_type_nr == UDP_MAX_TUNNEL_TYPES)) {
++			pr_err_once("Too many UDP tunnel types, please increase UDP_MAX_TUNNEL_TYPES\n");
++			/* Ensure static call will never be enabled */
++			udp_tunnel_gro_type_nr = UDP_MAX_TUNNEL_TYPES + 2;
++			goto out;
++		}
++
++		cur = &udp_tunnel_gro_types[udp_tunnel_gro_type_nr++];
++		refcount_set(&cur->count, 1);
++		cur->gro_receive = up->gro_receive;
 +	} else {
-+		RCU_INIT_POINTER(udp_tunnel_gro->sk, NULL);
++		/*
++		 * The stack cleanups only successfully added tunnel, the
++		 * lookup on removal should never fail.
++		 */
++		if (WARN_ON_ONCE(!cur))
++			goto out;
++
++		if (!refcount_dec_and_test(&cur->count))
++			goto out;
++
++		/* avoid gaps, so that the enable tunnel has always id 0 */
++		*cur = udp_tunnel_gro_types[--udp_tunnel_gro_type_nr];
 +	}
 +
-+	spin_unlock(&udp_tunnel_gro_lock);
++	if (udp_tunnel_gro_type_nr == 1) {
++		static_call_update(udp_tunnel_gro_rcv,
++				   udp_tunnel_gro_types[0].gro_receive);
++		static_branch_enable(&udp_tunnel_static_call);
++	} else if (old_gro_type_nr == 1) {
++		static_branch_disable(&udp_tunnel_static_call);
++		static_call_update(udp_tunnel_gro_rcv, dummy_gro_rcv);
++	}
++
++out:
++	mutex_unlock(&udp_tunnel_gro_type_lock);
 +}
-+EXPORT_SYMBOL_GPL(udp_tunnel_update_gro_lookup);
-+#endif
++EXPORT_SYMBOL_GPL(udp_tunnel_update_gro_rcv);
++
++static void udp_tunnel_gro_init(void)
++{
++	mutex_init(&udp_tunnel_gro_type_lock);
++}
++
++static struct sk_buff *udp_tunnel_gro_rcv(struct sock *sk,
++					  struct list_head *head,
++					  struct sk_buff *skb)
++{
++	if (static_branch_likely(&udp_tunnel_static_call)) {
++		if (unlikely(gro_recursion_inc_test(skb))) {
++			NAPI_GRO_CB(skb)->flush |= 1;
++			return NULL;
++		}
++		return static_call(udp_tunnel_gro_rcv)(sk, head, skb);
++	}
++	return call_gro_receive_sk(udp_sk(sk)->gro_receive, sk, head, skb);
++}
++
++#else
++
++static void udp_tunnel_gro_init(void) {}
++
++static struct sk_buff *udp_tunnel_gro_rcv(struct sock *sk,
++					  struct list_head *head,
++					  struct sk_buff *skb)
++{
++	return call_gro_receive_sk(udp_sk(sk)->gro_receive, sk, head, skb);
++}
++
+ #endif
  
  static struct sk_buff *__skb_udp_tunnel_segment(struct sk_buff *skb,
- 	netdev_features_t features,
-@@ -635,8 +667,13 @@ static struct sock *udp4_gro_lookup_skb(struct sk_buff *skb, __be16 sport,
- {
- 	const struct iphdr *iph = skb_gro_network_header(skb);
- 	struct net *net = dev_net_rcu(skb->dev);
-+	struct sock *sk;
- 	int iif, sdif;
+@@ -654,7 +780,7 @@ struct sk_buff *udp_gro_receive(struct list_head *head, struct sk_buff *skb,
  
-+	sk = udp_tunnel_sk(net, false);
-+	if (sk && dport == htons(sk->sk_num))
-+		return sk;
+ 	skb_gro_pull(skb, sizeof(struct udphdr)); /* pull encapsulating udp header */
+ 	skb_gro_postpull_rcsum(skb, uh, sizeof(struct udphdr));
+-	pp = call_gro_receive_sk(udp_sk(sk)->gro_receive, sk, head, skb);
++	pp = udp_tunnel_gro_rcv(sk, head, skb);
+ 
+ out:
+ 	skb_gro_flush_final(skb, pp, flush);
+@@ -804,5 +930,7 @@ int __init udpv4_offload_init(void)
+ 			.gro_complete =	udp4_gro_complete,
+ 		},
+ 	};
 +
- 	inet_get_iif_sdif(skb, &iif, &sdif);
- 
- 	return __udp4_lib_lookup(net, iph->saddr, sport,
++	udp_tunnel_gro_init();
+ 	return inet_add_offload(&net_hotdata.udpv4_offload, IPPROTO_UDP);
+ }
 diff --git a/net/ipv4/udp_tunnel_core.c b/net/ipv4/udp_tunnel_core.c
-index 619a53eb672da..b5695826e57ad 100644
+index b5695826e57ad..c49fceea83139 100644
 --- a/net/ipv4/udp_tunnel_core.c
 +++ b/net/ipv4/udp_tunnel_core.c
-@@ -58,6 +58,15 @@ int udp_sock_create4(struct net *net, struct udp_port_cfg *cfg,
- }
- EXPORT_SYMBOL(udp_sock_create4);
- 
-+static bool sk_saddr_any(struct sock *sk)
-+{
-+#if IS_ENABLED(CONFIG_IPV6)
-+	return ipv6_addr_any(&sk->sk_v6_rcv_saddr);
-+#else
-+	return !sk->sk_rcv_saddr;
-+#endif
-+}
-+
- void setup_udp_tunnel_sock(struct net *net, struct socket *sock,
- 			   struct udp_tunnel_sock_cfg *cfg)
- {
-@@ -80,6 +89,9 @@ void setup_udp_tunnel_sock(struct net *net, struct socket *sock,
- 	udp_sk(sk)->gro_complete = cfg->gro_complete;
+@@ -90,6 +90,8 @@ void setup_udp_tunnel_sock(struct net *net, struct socket *sock,
  
  	udp_tunnel_encap_enable(sk);
+ 
++	udp_tunnel_update_gro_rcv(sock->sk, true);
 +
-+	if (!sk->sk_dport && !sk->sk_bound_dev_if && sk_saddr_any(sock->sk))
-+		udp_tunnel_update_gro_lookup(net, sock->sk, true);
+ 	if (!sk->sk_dport && !sk->sk_bound_dev_if && sk_saddr_any(sock->sk))
+ 		udp_tunnel_update_gro_lookup(net, sock->sk, true);
  }
- EXPORT_SYMBOL_GPL(setup_udp_tunnel_sock);
- 
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 3a0d6c5a8286b..4701b0dee8c4e 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -46,6 +46,7 @@
- #include <net/tcp_states.h>
- #include <net/ip6_checksum.h>
- #include <net/ip6_tunnel.h>
-+#include <net/udp_tunnel.h>
- #include <net/xfrm.h>
- #include <net/inet_hashtables.h>
- #include <net/inet6_hashtables.h>
-@@ -1825,6 +1826,7 @@ void udpv6_destroy_sock(struct sock *sk)
- 		if (udp_test_bit(ENCAP_ENABLED, sk)) {
- 			static_branch_dec(&udpv6_encap_needed_key);
- 			udp_encap_disable();
-+			udp_tunnel_cleanup_gro(sk);
- 		}
- 	}
- }
-diff --git a/net/ipv6/udp_offload.c b/net/ipv6/udp_offload.c
-index 404212dfc99ab..d8445ac1b2e43 100644
---- a/net/ipv6/udp_offload.c
-+++ b/net/ipv6/udp_offload.c
-@@ -118,8 +118,13 @@ static struct sock *udp6_gro_lookup_skb(struct sk_buff *skb, __be16 sport,
- {
- 	const struct ipv6hdr *iph = skb_gro_network_header(skb);
- 	struct net *net = dev_net_rcu(skb->dev);
-+	struct sock *sk;
- 	int iif, sdif;
- 
-+	sk = udp_tunnel_sk(net, true);
-+	if (sk && dport == htons(sk->sk_num))
-+		return sk;
-+
- 	inet6_get_iif_sdif(skb, &iif, &sdif);
- 
- 	return __udp6_lib_lookup(net, &iph->saddr, sport,
 -- 
 2.48.1
 
