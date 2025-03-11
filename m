@@ -1,163 +1,137 @@
-Return-Path: <netdev+bounces-173968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 099B2A5CAFE
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 17:38:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99A30A5CB01
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 17:38:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49C1A168A73
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 16:38:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FC8B189CD37
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 16:38:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C021A260391;
-	Tue, 11 Mar 2025 16:38:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C666F25FA33;
+	Tue, 11 Mar 2025 16:38:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="CcS3x7I1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fLYXdqe0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C201125E818
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 16:38:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF18260378
+	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 16:38:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741711093; cv=none; b=eFl30rDYtu5U8YpLXGjhVYJgABjV4Wz9l7P1ZLLoh7d162VVbqJ2Kz0J/mUgV3nrZ9lHPArNlPZGeNYZLiVtRd/0s4R9iDapfkQaD2ALxXj87rXyaAOQMtg/EVDVNuY4Yp8lt9u5yUaCy3c6fCxPoBzfEP66hIQ7uPGAdtR9t/w=
+	t=1741711114; cv=none; b=AY+xCCaYE7AY1uH6Hf2En1XhyN97l2yBOWqq6rmh1aA8tlrzjdSvA3sKdR2TMUod3IeCna0akNYX2vn2QvDQ7H1PTF1f/x+69HC1A4v9EJZPZCZFV8A9cMXUb7wv5qMQKhGhGkwOiYGjTlB/iYatis6cGE4yi6T7Rl71bStGouA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741711093; c=relaxed/simple;
-	bh=k/qqYE18dumnTrExg52yxnDgHqbEw22SqqHqyAXOR34=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GbyqtCaJuF910bgiV+m3j/qAlxLFaqKxRPfgQVsFtvhbhE1m/68LhDNwyxSpPiTRDTePO2Fbr5SlfJE+vXPSjQmaKYIDZkw2KB1UJRQd7TrJ1mS5w/aWh/RhvZNZR9ZWeV8Xaj1TPUhXa0KCe4vQDIfak83jYf6fZQbRpCkzR4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=CcS3x7I1; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-30761be8fcfso63531661fa.0
-        for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 09:38:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1741711090; x=1742315890; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O2J/hC01hBS+/+SHi16lHvEsy7aFLaWqMUUObIUNbiY=;
-        b=CcS3x7I1Def8YQPhV2sP4D3Jaw73ir+Hqb2lRf8CvdOJs1E/ruu7l1w0x5BUpNd33x
-         pnwTtsQQnnfAwAzfNiYVtiamjBPaE8N/N2OwTyRYsPDwJie3vdd6MOU6ZOjN5WnQUD8L
-         NmGhhDt3lMKlpQYGGYJraQoCgcTYy3tvWD/lY=
+	s=arc-20240116; t=1741711114; c=relaxed/simple;
+	bh=D5rx9+r45ClO+mejUwb0pGj9stkPAgCLtxItwi0XoLA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mJUdr1s238pyjvazDitIQehxN8hsQWnfaim4W4c6chLRbEtPba8aD3i7U5d0nKPw7CgwTT2bh79FlG+YKNkqItV8AtF8GWl6nshOBLKW3+s/8xNpx8t+Rp1a8kzWk/Ht31B+ADQmwA4Xef7WPFJfI1aFxA+DHs+x89de7O7oNH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fLYXdqe0; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741711112;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EGxrIsD3g8N8X/R0b8cIdpik24wuVRncDpmaS/+eRiw=;
+	b=fLYXdqe0uujHTXlXMtZe3darscSkBtpSPiF41fc3Gjfwh+zBrTDpaYoyOEAcapYoHKV/A5
+	FWxNFMNsCyioQXIZ5urCcM8EfjpSglAwi/eQBWn4L27vkyLxKGBzF3LL4KKuvcrYj9RBXZ
+	/wHCfGkUETanwd9IUqLk1V8JLJhj61Q=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-685-7cBf5ME-OTCaVxBoOJ2k-w-1; Tue, 11 Mar 2025 12:38:30 -0400
+X-MC-Unique: 7cBf5ME-OTCaVxBoOJ2k-w-1
+X-Mimecast-MFC-AGG-ID: 7cBf5ME-OTCaVxBoOJ2k-w_1741711109
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43ceb011ea5so17756155e9.2
+        for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 09:38:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741711090; x=1742315890;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=O2J/hC01hBS+/+SHi16lHvEsy7aFLaWqMUUObIUNbiY=;
-        b=M5ZscIweTyLNd5+YeA8B5bIkgytvMGEte+NOefmf/FMN/L1TV8MGQZ05l/cB8XVi00
-         bXpGIroXj0qWLY+qEW2qtCJzHzDcFeET/oKTiu5zR+My0mivnEhaGts3EAZ+eh0hn2Hb
-         CW63eGGi8ZR9saxiQBFikuDEEKXFs8wtuSB4vidwvFGtQAfeoY5Bjk9uNkooKQ45ML93
-         abSUnxHF4xwGhxwmpqPgz7ERF+9edejKIj2gW2dwumuLKhgbdPX7FuZfHjyyncxO3XtT
-         fvF/EiR272tGTUItg4y/lvHLVkoJvVYDSkAnq03X+kbnEbXPBvEvlgC3k4Uy/k3Wa5at
-         w7Eg==
-X-Forwarded-Encrypted: i=1; AJvYcCWiO+wtmuiuqB4OVB4kvG3APvLVzyBEu+CkVgmobc7pweempudWYCIDJIMWFvCA7X6wG9hSmDQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNeyXVM5mfunAphCLZBnSSppU1hsmORB+VHQ87GWK5k7DAa6pO
-	XxSBbjFvdVd7XLgCihC88FI2Zie8puwj2HLmXSaG59kUBd9fjtg0x33R7JecqwIDtpz41w+RZxH
-	uLHXy/KtjJRp+RpkHfe6oOaIIZWOu3HmvTMmX
-X-Gm-Gg: ASbGncufMmEMzxzOe7uAmxipA59g3Q9tgV5OxASCuSrMQzX1NxjiE/78XZs4uCbAy1a
-	tWZEEGj8yWwEtuRcYAeCweXMddEv1n9+A3Oc9YhPhU/ZsTzQ0UMlPUHOC1y0f9TzA44Dhy6Vv/b
-	BJu5GrdqrlRe2PjBdv4Vsm506s6dUGHOgfOjnm
-X-Google-Smtp-Source: AGHT+IE17lMcS87AcZdY9lwHljntIGFjrdX/tIws8/mMJWqlvfj4BKIje8AtAeZJAoP34LDD7scalOwGJSBgf3KZaUc=
-X-Received: by 2002:a05:6512:118a:b0:549:4a13:3a82 with SMTP id
- 2adb3069b0e04-54990e5db47mr6045073e87.21.1741711089888; Tue, 11 Mar 2025
- 09:38:09 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1741711109; x=1742315909;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EGxrIsD3g8N8X/R0b8cIdpik24wuVRncDpmaS/+eRiw=;
+        b=pDJhfSKmcVoFXf+9l2hdISn0DWc+dWoSSdSrvbg9vuhjJcYw1HoAnRxckOfeilO3Xp
+         lCbKqMjFpl92WzcakzkOUIjoUNyEXlIPL0/EcOoM/c+Pn/66IRKuY5+FawshDxdj9zsr
+         8eWf2MFR/biFsbgAE3o48HEo3kFzCDsVxp7m9bq96CRdpEaZhhPuj3fvIP2nFXGDMVZd
+         gNltEFvr7toXgOrfE1U8AoOOWwb50kNFCwEZ8Kmt8tGka+iBBlugosXb23vta2lqyaWj
+         Vuy5SJLvAf/EtXGJ+S+wsEuhIU7OrJhIoZHHwV9nIh/3sW0ObmWpvnk9DfoXIu7teWe9
+         AQmA==
+X-Forwarded-Encrypted: i=1; AJvYcCX4Rn6qmD8ldyMrS2BGF+2CDAufHhdmYZ8LAGHpxti2V/Wkw5PLZSDmtglBsZJ4ZCl+FXGuVxY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwTkgBgHCGkwy5cQOiTvJ0UNO3WkD0DT1K6GIZ6MGrwb89d+wEP
+	MOpBEi0MJqFKxw5HjNbzaP5cG7EHh40fyLKpwC9nNwPbx2yPzOSCkQGnDNJ2O9IPar4yoFAxsGB
+	f3eRLWZszp25hhzLe+jJEprrLug6wTZ5JO3ue6HArF4+vU2eGQNnQKg==
+X-Gm-Gg: ASbGnctsL67oY/Tw+6Dszq5tnLfqI7f2JhB/ST3VhJ15vMXbnKFp/PsVAqTaWAX8cq4
+	XR8kN6ri/Yw1uaQlp9duB5v8WhI/4ftyFW+mjhFrTFJKVTn5WsdZPH29eG27+N+MbmkR3LptgBa
+	ItmKbfce8PpcDmAfYDBmW6jhrOT9TGz/3lbq43kknr3SgVzEOh8OD4qdRUEiD5esxbmH1pC/0zX
+	ofzzYNMohMMx0afoYvMYIUBz6K8sM39B5QodLO40PcUKYUzhE9yTPUqbAe/d5hGJC439usxDKbb
+	d2wi4a+3lOin+qIb4lbLopeWMoL/69mknIyfy5Yg6AC5KQ==
+X-Received: by 2002:a05:600c:350f:b0:43c:f3e4:d6f6 with SMTP id 5b1f17b1804b1-43cf3e4da0bmr100598395e9.31.1741711109210;
+        Tue, 11 Mar 2025 09:38:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGNDzvlNOcfBJb5Yz1mXAnVcVX6WHQzdEidsmYPg97wRQhdWZ0araIinBGLkPWXTmQritaHow==
+X-Received: by 2002:a05:600c:350f:b0:43c:f3e4:d6f6 with SMTP id 5b1f17b1804b1-43cf3e4da0bmr100598265e9.31.1741711108872;
+        Tue, 11 Mar 2025 09:38:28 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-12-146.dyn.eolo.it. [146.241.12.146])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d03dfeef6sm29119685e9.8.2025.03.11.09.38.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Mar 2025 09:38:28 -0700 (PDT)
+Message-ID: <7a4c78fa-1eeb-4fa9-9360-269821ff5fdb@redhat.com>
+Date: Tue, 11 Mar 2025 17:38:27 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250303200212.3294679-1-dualli@chromium.org> <20250303200212.3294679-2-dualli@chromium.org>
- <CAHC9VhRiZS2Dh+0-GqHE+um7T05p4_=EXG7tOtC5pciWMteDDw@mail.gmail.com>
-In-Reply-To: <CAHC9VhRiZS2Dh+0-GqHE+um7T05p4_=EXG7tOtC5pciWMteDDw@mail.gmail.com>
-From: Li Li <dualli@chromium.org>
-Date: Tue, 11 Mar 2025 09:37:59 -0700
-X-Gm-Features: AQ5f1Jq-kymgLHVS7YmwSl159Xa7tY4tbyEsovgee_yrgxg5Hu6qlOytWyioff4
-Message-ID: <CANBPYPhkYPYGSxhBWbJ2pMqf_iYqNE6H9=ND9ONuTxoPviW=3g@mail.gmail.com>
-Subject: Re: [PATCH v16 1/3] lsm, selinux: Add setup_report permission to binder
-To: Paul Moore <paul@paul-moore.com>
-Cc: dualli@google.com, corbet@lwn.net, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	donald.hunter@gmail.com, gregkh@linuxfoundation.org, arve@android.com, 
-	tkjos@android.com, maco@android.com, joel@joelfernandes.org, 
-	brauner@kernel.org, cmllamas@google.com, surenb@google.com, 
-	omosnace@redhat.com, shuah@kernel.org, arnd@arndb.de, masahiroy@kernel.org, 
-	bagasdotme@gmail.com, horms@kernel.org, tweek@google.com, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	netdev@vger.kernel.org, selinux@vger.kernel.org, hridya@google.com, 
-	smoreland@google.com, ynaffit@google.com, kernel-team@android.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 net-next 1/2] udp_tunnel: create a fastpath GRO lookup.
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
+ kuniyu@amazon.com
+References: <cover.1741632298.git.pabeni@redhat.com>
+ <fe46117f2eaf14cf4e89a767d04170a900390fe0.1741632298.git.pabeni@redhat.com>
+ <67cfa0c7382ef_28a0b3294dd@willemb.c.googlers.com.notmuch>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <67cfa0c7382ef_28a0b3294dd@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 7, 2025 at 1:47=E2=80=AFPM Paul Moore <paul@paul-moore.com> wro=
-te:
->
-> On Mon, Mar 3, 2025 at 3:02=E2=80=AFPM Li Li <dualli@chromium.org> wrote:
-> >
-> > From: Thi=C3=A9baud Weksteen <tweek@google.com>
-> >
-> > Introduce a new permission "setup_report" to the "binder" class.
-> > This persmission controls the ability to set up the binder generic
-> > netlink driver to report certain binder transactions.
-> >
-> > Signed-off-by: Thi=C3=A9baud Weksteen <tweek@google.com>
-> > Signed-off-by: Li Li <dualli@google.com>
-> > ---
-> >  include/linux/lsm_hook_defs.h       |  1 +
-> >  include/linux/security.h            |  6 ++++++
-> >  security/security.c                 | 13 +++++++++++++
-> >  security/selinux/hooks.c            |  7 +++++++
-> >  security/selinux/include/classmap.h |  3 ++-
-> >  5 files changed, 29 insertions(+), 1 deletion(-)
->
-> ...
->
-> > diff --git a/security/security.c b/security/security.c
-> > index 8aa839232c73..382e3bbab215 100644
-> > --- a/security/security.c
-> > +++ b/security/security.c
-> > @@ -1043,6 +1043,19 @@ int security_binder_transfer_file(const struct c=
-red *from,
-> >         return call_int_hook(binder_transfer_file, from, to, file);
-> >  }
-> >
-> > +/**
-> > + * security_binder_setup_report() - Check if process allowed to set up=
- binder reports.
->
-> Please keep the line length in the LSM and SELinux code to 80
-> characters or less.
->
-> > diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
-> > index 0d958f38ff9f..2fafa8feafdf 100644
-> > --- a/security/selinux/hooks.c
-> > +++ b/security/selinux/hooks.c
-> > @@ -2092,6 +2092,12 @@ static int selinux_binder_transfer_file(const st=
-ruct cred *from,
-> >                             &ad);
-> >  }
-> >
-> > +static int selinux_binder_setup_report(const struct cred *to)
-> > +{
-> > +       return avc_has_perm(current_sid(), cred_sid(to), SECCLASS_BINDE=
-R,
-> > +                           BINDER__SETUP_REPORT, NULL);
-> > +}
->
-> There should also be an associated patch{set} against the
-> selinux-testsuite to add tests for the binder/setup_report permission
-> introduced here.  My apologies if you've already posted one, but I'm
-> looking now and I don't see anything either on the lists or on GH.
->
-> * https://github.com/SELinuxProject/selinux-testsuite
->
-> --
-> paul-moore.com
+On 3/11/25 3:32 AM, Willem de Bruijn wrote:
+> Paolo Abeni wrote:
+>> Most UDP tunnels bind a socket to a local port, with ANY address, no
+>> peer and no interface index specified.
+>> Additionally it's quite common to have a single tunnel device per
+>> namespace.
+>>
+>> Track in each namespace the UDP tunnel socket respecting the above.
+>> When only a single one is present, store a reference in the netns.
+>>
+>> When such reference is not NULL, UDP tunnel GRO lookup just need to
+>> match the incoming packet destination port vs the socket local port.
+>>
+>> The tunnel socket never sets the reuse[port] flag[s]. When bound to no
+>> address and interface, no other socket can exist in the same netns
+>> matching the specified local port.
+> 
+> What about packets with a non-local daddr (e.g., forwarding)?
 
-Thank you very much! I'll add such a test, along with other binder
-fixes mentioned by Carlos.
+I'm unsure if I understand the question. Such incoming packets at the
+GRO stage will match the given tunnel socket, either by full socket
+lookup or by dport only selection.
+
+If the GSO packet will be forwarded, it will segmented an xmit time.
+
+Possibly you mean something entirely different?!?
+
+Thanks!
+
+Paolo
+
 
