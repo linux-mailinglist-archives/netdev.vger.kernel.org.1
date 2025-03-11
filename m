@@ -1,204 +1,283 @@
-Return-Path: <netdev+bounces-174022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE84DA5D074
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 21:10:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3A2AA5D08C
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 21:13:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E1A23A2CA4
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 20:10:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C543189D81B
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 20:13:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15918264625;
-	Tue, 11 Mar 2025 20:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96C72264A70;
+	Tue, 11 Mar 2025 20:13:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="bPMjhQFS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11020143.outbound.protection.outlook.com [52.101.85.143])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EB882641CF
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 20:10:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741723838; cv=none; b=cePa2xK/0aHFgTw8WE1AuESBR27zzcxzk3CPPP/lNvFlV6SnzAiY9NMmAv9UVDTXXXd/rqpkvqaEnqk4AAHQwuz5DtpE/udatiyoDPdnpXJBxda0HepfyzpAaz5gSUoVqw/FUlg1uWNHPbP7bWt4LX++rdrlM7XWzoJu6qPo5L0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741723838; c=relaxed/simple;
-	bh=aFKCZfdFsIRkZFINLV3BJZd9xCFjDiAUkZlsIIwzK+g=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=XR5ccHha3vWuCKLSzN+LRy3QVuJ5vG0NsYeLVTT0XLkIPiwZRFWX7prL8BGMyjD5ZLR6RfdGryjPApeiS2ZpAuB9fiOy+TlmV9khu5I1C0RsvQsODRNPNCiFs7vY2yRJJfiRLpZXwHU9nHRoplIvpRrLQk8Xf86vTCyXLD5cMTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3d2a40e470fso46076835ab.3
-        for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 13:10:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741723835; x=1742328635;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fAbR6M7N3OQb11wp6aQIDILnV5A7+sMu1XUbDZI3luU=;
-        b=jRjBDXjk7cYZDgPSbn/B7oTK504mGF9/M8C1Cqf+lfzW2+S9LMkHj29sIYZQjZymKo
-         beQsAqy74ffFZGEYM+PcAjwz4+Dfn0chIW+CqUwZLvk/52C+xCvCFdJp3lpozESQc5pL
-         vRMJJGMphcxy59hjQGkYpq4SlW8+uvW+OmRNVKOTR8M4qji4VVcFwadspZtRt5Oo6jjm
-         njB8TpcjJTFgUhmZ13EyOMXvK9Uez2os3icqGgg0/NcEJvAUMMFMZbaVFHcEkjRcf+mb
-         RCGRcbcPRy3adT4daiFHhrvJHiqSxCaU8FxLxb7QlUKEkn+5TFDv6bAWkdxfxbZ+jSB3
-         Dnew==
-X-Forwarded-Encrypted: i=1; AJvYcCXJZfd+I/pPf6VFUx+OTJd5SV/zC5uJ38gUdKoe6u5aNhMoZ/hDhVQ9hk5G/NfyfGOYjdDacJw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrqjsoU9WflgMxyOS/cohQE0WYQa+Te+xZnepjKGUSQEsYOIjI
-	4+kxjyg2YghyjtLcaEyoJuTs30IVIMermtWKMWqdX+2o4FwBNWjMMpYmcEbLhoL6AbpwSIOlUoT
-	p9UPKKXl5pLEDG2l2TDh2C/A9TC8CgS3gNrgPM1m+bq6MtleJgugau3E=
-X-Google-Smtp-Source: AGHT+IF5s4PMrGgLsIT1nPJQVuQQlu1V9L+gjvWcCgskMjLrTbU4svnxxi5cKdFVTtX2DVp+uruNWwnHbgPYqx+CMrpHZgFEFwQK
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15DA26462C;
+	Tue, 11 Mar 2025 20:13:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.143
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741724008; cv=fail; b=BZtz9mnfLrrRnEQco2zHFuwb8GL2GIwAiJwAgdnKuz6S6FOpZiF246LI3KFd3TjS0zEMXVRUk9HDtKL9EM12xBJRGNfmDnEFBZRy5+Hr6tq6x355Dz0k7r3SXl5d9VgOSpmvjYXdj8iPfP64mKpwavjnfT7cdjH/FBPqdCo/n+c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741724008; c=relaxed/simple;
+	bh=LgPH+DyIlSRITmrnlMnG10XrRBzOJ4PmfZNZR0pR3E4=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=oc2HIfsrsmVw4XCVQ7R3jG5SWGmC1UQKIrFc1DOunYs9QGKfWkknb40ACvsF+oVF0VyHECYg53Iul4nCa9MUduphQYSwzZuSCJ3g1WX5wco7WvX2q+dPnbeaxTWrqD10Y1f9on2SyQUNGc33YO48pYiljocQM4xFcJD+OokmCRc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=bPMjhQFS; arc=fail smtp.client-ip=52.101.85.143
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=D1Vitpqevki20Kp8kxf+h+5gv2UTUlS5ekAsPqibOsxO/n2QdTnRTuEewdr/D5mjmm5QtXfeb4gooH5fkR7xUladWbi/rGFav9YTQMD3Uejb4mt1SIjuOQSH+ZsTHfRgMM0/+lJQ9fXkS92BalLdJo7uh5wpaaFFQZ1tOd4T0FEpWPTwUhpnDl5XwICleVVibcOAkM2tjAXLfIhsWyRbXf164d6nZMR4lJaGpShhWW6lKpNnukSCtfyojJ1PttubMKz/V4n6GMPn7rR/742IJuzjOjuarZRwylyyogSfWjX3fvvvUXIYODJilBYQzfewCoqGsBRgbytqf8yycreJzQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=IwfUjudnt9L6qZ9VPPEDvpVZrWWTW5TFNeQ6a60MwIs=;
+ b=eNcnJr/a/Ud2A96jhW1YQJ2JNuLbwmyFI0DCNgtR9QJH2Rj9VKt+5KTpfSQxh/LBkTsPUxiVt62nXBicqhMPEXCOoncTHYpZI2h8IEEPKwxyPM0UtSc9nZqJ50fFVKiaOOu0+HSUaGlwbJMpMZMv2HbXfei8bzEgLfeXHgoodGyZbtcOQ7zzxIBk6rXpgYLvXrfkSfJBjqVdoh7GFaiXDDk/XJbazw9BtRxorrdjZen7oYz51qZqnbnfj2pmmVAu6COY8O3PMSkrqhuOoV3S+9DYH/XwmhFFiMtpOxlduUzaehVObDPVXABZx0RWKoxMpOEbyHP0p8ngm29aImNaUw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IwfUjudnt9L6qZ9VPPEDvpVZrWWTW5TFNeQ6a60MwIs=;
+ b=bPMjhQFSlmBn+hJB21TNvmwRpDA6jdwRMX6NMoIERZ2i4bXb6IbDrJEscjyLi2P+l8b78ls7YEN9zCPA3hT61iixIXRRJ5dqWz7mJ8U3QfTvTC8nXUBVL9IAm1Yn8KHvHH/lOoqhVp/6hmT02IBYgEbL2kp2u0RDq93UtMZtcVw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+Received: from BY5PR21MB1443.namprd21.prod.outlook.com (2603:10b6:a03:21f::18)
+ by SJ1PR21MB3576.namprd21.prod.outlook.com (2603:10b6:a03:454::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.8; Tue, 11 Mar
+ 2025 20:13:23 +0000
+Received: from BY5PR21MB1443.namprd21.prod.outlook.com
+ ([fe80::5490:14c7:52e2:e12f]) by BY5PR21MB1443.namprd21.prod.outlook.com
+ ([fe80::5490:14c7:52e2:e12f%7]) with mapi id 15.20.8534.018; Tue, 11 Mar 2025
+ 20:13:23 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: haiyangz@microsoft.com,
+	decui@microsoft.com,
+	stephen@networkplumber.org,
+	kys@microsoft.com,
+	paulros@microsoft.com,
+	olaf@aepfle.de,
+	vkuznets@redhat.com,
+	davem@davemloft.net,
+	wei.liu@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	leon@kernel.org,
+	longli@microsoft.com,
+	ssengar@linux.microsoft.com,
+	linux-rdma@vger.kernel.org,
+	daniel@iogearbox.net,
+	john.fastabend@gmail.com,
+	bpf@vger.kernel.org,
+	ast@kernel.org,
+	hawk@kernel.org,
+	tglx@linutronix.de,
+	shradhagupta@linux.microsoft.com,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH net, v2] net: mana: Support holes in device list reply msg
+Date: Tue, 11 Mar 2025 13:12:54 -0700
+Message-Id: <1741723974-1534-1-git-send-email-haiyangz@microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
+Content-Type: text/plain
+X-ClientProxiedBy: MW2PR16CA0016.namprd16.prod.outlook.com (2603:10b6:907::29)
+ To BY5PR21MB1443.namprd21.prod.outlook.com (2603:10b6:a03:21f::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:11:b0:3d1:79a1:5b85 with SMTP id
- e9e14a558f8ab-3d441a470aemr271006985ab.21.1741723835443; Tue, 11 Mar 2025
- 13:10:35 -0700 (PDT)
-Date: Tue, 11 Mar 2025 13:10:35 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67d098bb.050a0220.14e108.001c.GAE@google.com>
-Subject: [syzbot] [net?] possible deadlock in dev_set_allmulti
-From: syzbot <syzbot+b0c03d76056ef6cd12a6@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Sender: LKML haiyangz <lkmlhyz@microsoft.com>
+X-MS-Exchange-MessageSentRepresentingType: 2
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BY5PR21MB1443:EE_|SJ1PR21MB3576:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3f64be3f-9354-4c37-70c0-08dd60d92ca2
+X-LD-Processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+ BCL:0;ARA:13230040|366016|1800799024|52116014|376014|7416014|38350700014;
+X-Microsoft-Antispam-Message-Info:
+ =?us-ascii?Q?aJShAhVlBcanItYY8PbVrdLY6EIjyiF4dH39uBtOG7QTLTw6eM3DRMDW57oU?=
+ =?us-ascii?Q?N8nywHF4gN2ue+rUnjoQ0F8wjdMpKJ9NpvnmQQW2CG7+aHTtVIGdMYNcrkIe?=
+ =?us-ascii?Q?Z4qKPmnj8Ki/OdXi3k7ACddYPrR/8nofq9UU5/w0fs7F2iEubevlfjQUMoIU?=
+ =?us-ascii?Q?yjbA4lJNLhNc01Jmw/T2uqxuoEeeb14/yS3X+uiQvUSa0W3+gyzHDyLdAbBA?=
+ =?us-ascii?Q?ndmlHcTHB4+nuO8rFWHkzZMOMxOIaVCkX0ZULcccIuwkbtRwTA0S/EFOhnfz?=
+ =?us-ascii?Q?jSCehGgWdfUILcJd3VE2d6RHR55Mf0TbUy9myIFG2XgbZQWeYuq9NJ2wXyTz?=
+ =?us-ascii?Q?58Jmjdh45lSYD8FjM331ZYhgLx9mKpd09R3GQFjjZpf1xMRhB7JS+2O8i5Ku?=
+ =?us-ascii?Q?SpcCyLsYLCbeZB/YXOl+qjjsIrFs0rr8niuJmW1ZB8LlpyNdg0Q81N4Jh5sa?=
+ =?us-ascii?Q?ZhPvuTxBWXPtK51zyuhlePh/tigd6vxBf6ooH8LyudD0VxWaTq6EkXPKtpZ2?=
+ =?us-ascii?Q?7pHeoGLliinqtdGIRq5SIuYJfcMGxiWcFmM6mgiQbp7vVyl+ldXFWo1xMkC+?=
+ =?us-ascii?Q?a7M6Xsi1l5/faV5nnMmiNZR5xYIGJOVTULrBDd5PGBhHz6jZmx0kMchjIJkw?=
+ =?us-ascii?Q?RS7cMjQuLpiGXAWlqUsJOkNjI1Wke3r7iYGhPy/wVeUZ8XyeLGb/F8GVf22x?=
+ =?us-ascii?Q?YmcXqRQD5GggoojIQP+2R8Z+N9T0GcE6Eb3KoQw3C/s3XpDCklt6rRfAJLR6?=
+ =?us-ascii?Q?gluzjJ2m+7QDIyzDEz6XhxMVJYDteyfRVFu8Lo02FRh4kWKDSZjqIleNUZHq?=
+ =?us-ascii?Q?yClcTzt6tSk5itQeiugBJJmAITq4GRdoWdkcpfnrGpoC84ok9ErzsXMLQLM6?=
+ =?us-ascii?Q?jHVNecZGRlDOnAV6o/YMEkWF6sk0MzL8nQdABdJOHGcgtrGlVvaUWDq4KP9x?=
+ =?us-ascii?Q?h0qDUddO1FWvEJKVM+bTV525NSpbqiX7c6yusF5joyUP3Sgm2GmJcxwOV5S8?=
+ =?us-ascii?Q?85PiqcUW/ejvK7vT2OCXmrLni23o64jqbBVEdtebxnuNdysla4yYHspflPjC?=
+ =?us-ascii?Q?WbsuvXqItLlnH/q9a/gnLv3DLpiiLvzhS6OLqEF4ov03Ow3Wny4OddTLHmeo?=
+ =?us-ascii?Q?uLpv2lUc4Yv4fBahu5Axzt8bj+pusQnzHrapd7nybGaAyihalcn3kwq9d+U/?=
+ =?us-ascii?Q?IjfS6KFGUjXLLwoXWKMfQq6xePeZJUdROqKYmRS1Wiow1GSBFqZP14v8wIWI?=
+ =?us-ascii?Q?+077PPEESE8A7HL3uRnyjcvriB/rKB9e3WOZ2tEpbyLXBHw7yOxeIO/ThANX?=
+ =?us-ascii?Q?yHv/fJNKCFAlKVZnWAbShEcci+2XpSKeuO7SH01Sg7lWdecIxuMcoApHAEfu?=
+ =?us-ascii?Q?3SM/G23RMabPXiyjRdNP31al1GsW2EAYZCOT6PnMIMZmIJLMcFPij8CYxGV4?=
+ =?us-ascii?Q?a1NbBl6ka9nqXiS6v+v+7645Z+QcpW51?=
+X-Forefront-Antispam-Report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR21MB1443.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(52116014)(376014)(7416014)(38350700014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+ =?us-ascii?Q?w9b26j7KeMPGR1pxCg9IpfmoqjEvC5f2nrPEr4zvht2T2jUspqEmLAfxY4Tt?=
+ =?us-ascii?Q?JrkvUJz1Bm9tqcpyQsXoLydIosl4l1IIGuHr1rUpFWJoNXj88ugw+2r2xDXH?=
+ =?us-ascii?Q?RJ8RcNTELiT3k1bUPbrow7+5JbUfVSQN6QB7Qc+cDehN3neYlYo9jGH5UwJe?=
+ =?us-ascii?Q?M5KN82v6dQUYY11zqPlysOnjX/ckmFNrEgb5ZDzKHj92ws7DtWF+JTtLkmRq?=
+ =?us-ascii?Q?9uvzczKtLE2ef7UttXnDS8/CrFIkyCtYTJNWzSXjDok1lleSRo3x6qToYtby?=
+ =?us-ascii?Q?KQTEbZhHCCD/+IHWLj/W9zqknxE6qkZS7qV2gwEYbcmcHSMtTXb/EUN54o2n?=
+ =?us-ascii?Q?qgzwSZdsD8mxkFNBV2FBdo5qEqFj5jJdchTamowPXVCgnH74KYIMu0iuBUdU?=
+ =?us-ascii?Q?9YX5+G+Ius6sQ1HRkB8q03OQWz19isCadJP7uSSLrcG9WFEIYKED7fK84ivs?=
+ =?us-ascii?Q?sRTLTo2QkuYPhWuUE8cFVoF/BjcupDUM/X0f0zmM0aXd8qjP9vOtlwzP/+1a?=
+ =?us-ascii?Q?lGojnvJAa1c/PCiT3jKZdZ0mDI7CzmIQroh056zM04GtJIsl0ulpraRcSGJ3?=
+ =?us-ascii?Q?kn5MTdTLRUFeYEDn5xacc8FdPKBieZPBykC5QOVJHUvKSdLbPaXifoyZEvad?=
+ =?us-ascii?Q?SpzeOipgKzr4Zl9W2qFrpzR/ubzDmWopTJYC97BGdDfVRo2NDsgJXbdO7WIo?=
+ =?us-ascii?Q?qS7uPQNWv3eDh6T/gGJFfbhsc56dg6t6TwG99+oGGWI7UpFWycnkFnPE7O3/?=
+ =?us-ascii?Q?9L2HJQQC+WUlEN2aaEe+PiMbnkXksY0VKGm5UMBXXhLtCfFYNBTAQ9UdLjAc?=
+ =?us-ascii?Q?gmCYl6fTB54lI7YdnKdNQ/uA5tQzcxLwJx7k1kXEveAEz6RzWWWRJUAZwX9X?=
+ =?us-ascii?Q?Gv3mW27CRqO5av4rzhN9uB1tB5F4x5nDkv3h/8+t0ZifqlkLPaZZq2bGpvfr?=
+ =?us-ascii?Q?bygi+1FuRKgPEKiQPrDxlYBxCy3CBCs2jvBRPgOsXqRRhxiNYrVH7A/kWVnV?=
+ =?us-ascii?Q?Ysyzo6/pJXSkBc/isLSP1n5R4ShPwYQMWc/x17kwjT6UzblDGVFvAae/IqlX?=
+ =?us-ascii?Q?aFj2dnQ6Ce8eQWY23zZh72ciFk2iAijkJggv1fmNElVqJbCvpS9aJtv9/T/T?=
+ =?us-ascii?Q?rnpXXZA9hCvj45DAXZAoHkivZ/3X7UCtAlF4cSE7GpMZNcFEo9JMi75bZqvK?=
+ =?us-ascii?Q?3NMxAVLzokapHe/RkEk2q6G3CXd7ToxqZ+bju8dcKt8f5U2BKThzUqcRYSz4?=
+ =?us-ascii?Q?iJBW5xoo7cuL3GSVTD8IYk1L4mzvzYgPImayKiw/AokX7TB20gCJBDsiRmsp?=
+ =?us-ascii?Q?NjDM+p3iJAOG6Vv6Hy4y6fLatHBQxM6NRV4xs7fAo4arqN1WsSOHAbnaOm13?=
+ =?us-ascii?Q?b5Df2ZkTtJaPLF/U/98DQb8xaQ5WvzVDuATfKNbwi1O1Plr4KAdRYoBQDHQH?=
+ =?us-ascii?Q?pozPjowMmidhM8a7F949CT4DWDY2pHJyBmJrJ8TGeZ/VZFp5dYU3AlY9iw0M?=
+ =?us-ascii?Q?WHKVVwoI6EmHOutn+tyvY9lSTj/i029dc7UR8J/r6jm0cr44CoDEGPsxoBRp?=
+ =?us-ascii?Q?kyGu3FGpcug76j+L/q14tLAlPBCIc0dYN4vU+nGb?=
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3f64be3f-9354-4c37-70c0-08dd60d92ca2
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR21MB1443.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2025 20:13:23.3763
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8vE6jDjDFOKe1Ti3S2CeUXfq6BuEE0Ye0sfLGyVepxk45b2qcNB4Sb2oYMhFlpZcoHxtdpiuNyyjQzv9X1qGbw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR21MB3576
 
-Hello,
+According to GDMA protocol, holes (zeros) are allowed at the beginning
+or middle of the gdma_list_devices_resp message. The existing code
+cannot properly handle this, and may miss some devices in the list.
 
-syzbot found the following issue on:
+To fix, scan the entire list until the num_of_devs are found, or until
+the end of the list.
 
-HEAD commit:    40587f749df2 Merge branch 'enic-enable-32-64-byte-cqes-and..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=128b1f8c580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ca99d9d1f4a8ecfa
-dashboard link: https://syzkaller.appspot.com/bug?extid=b0c03d76056ef6cd12a6
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/6d02993a9211/disk-40587f74.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/2c8b300bf362/vmlinux-40587f74.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/2d5be21882cf/bzImage-40587f74.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b0c03d76056ef6cd12a6@syzkaller.appspotmail.com
-
-netlink: 'syz.4.478': attribute type 10 has an invalid length.
-netdevsim netdevsim4 netdevsim0: left allmulticast mode
-============================================
-WARNING: possible recursive locking detected
-6.14.0-rc5-syzkaller-01183-g40587f749df2 #0 Not tainted
---------------------------------------------
-syz.4.478/7361 is trying to acquire lock:
-ffff88807b5e4d28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2731 [inline]
-ffff88807b5e4d28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock_ops include/net/netdev_lock.h:40 [inline]
-ffff88807b5e4d28 (&dev->lock){+.+.}-{4:4}, at: dev_set_allmulti+0x11c/0x270 net/core/dev_api.c:279
-
-but task is already holding lock:
-ffff88807b5e4d28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2731 [inline]
-ffff88807b5e4d28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock_ops include/net/netdev_lock.h:40 [inline]
-ffff88807b5e4d28 (&dev->lock){+.+.}-{4:4}, at: dev_open+0x11c/0x260 net/core/dev_api.c:190
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(&dev->lock);
-  lock(&dev->lock);
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-2 locks held by syz.4.478/7361:
- #0: ffffffff8fed6908 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
- #0: ffffffff8fed6908 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock net/core/rtnetlink.c:341 [inline]
- #0: ffffffff8fed6908 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0xc4c/0x1d90 net/core/rtnetlink.c:4054
- #1: ffff88807b5e4d28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2731 [inline]
- #1: ffff88807b5e4d28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock_ops include/net/netdev_lock.h:40 [inline]
- #1: ffff88807b5e4d28 (&dev->lock){+.+.}-{4:4}, at: dev_open+0x11c/0x260 net/core/dev_api.c:190
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 7361 Comm: syz.4.478 Not tainted 6.14.0-rc5-syzkaller-01183-g40587f749df2 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- print_deadlock_bug+0x483/0x620 kernel/locking/lockdep.c:3039
- check_deadlock kernel/locking/lockdep.c:3091 [inline]
- validate_chain+0x15e2/0x5920 kernel/locking/lockdep.c:3893
- __lock_acquire+0x1397/0x2100 kernel/locking/lockdep.c:5228
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5851
- __mutex_lock_common kernel/locking/mutex.c:585 [inline]
- __mutex_lock+0x19c/0x1010 kernel/locking/mutex.c:730
- netdev_lock include/linux/netdevice.h:2731 [inline]
- netdev_lock_ops include/net/netdev_lock.h:40 [inline]
- dev_set_allmulti+0x11c/0x270 net/core/dev_api.c:279
- vlan_dev_open+0x2be/0x8a0 net/8021q/vlan_dev.c:278
- __dev_open+0x45a/0x8a0 net/core/dev.c:1644
- __dev_change_flags+0x1e2/0x6f0 net/core/dev.c:9375
- netif_change_flags+0x8b/0x1a0 net/core/dev.c:9438
- dev_change_flags+0x146/0x270 net/core/dev_api.c:68
- vlan_device_event+0x1b81/0x1de0 net/8021q/vlan.c:469
- notifier_call_chain+0x1a5/0x3f0 kernel/notifier.c:85
- call_netdevice_notifiers_extack net/core/dev.c:2244 [inline]
- call_netdevice_notifiers net/core/dev.c:2258 [inline]
- netif_open+0x13a/0x1b0 net/core/dev.c:1672
- dev_open+0x13e/0x260 net/core/dev_api.c:191
- bond_enslave+0x103c/0x3910 drivers/net/bonding/bond_main.c:2135
- do_set_master+0x579/0x730 net/core/rtnetlink.c:2943
- do_setlink+0xfee/0x40f0 net/core/rtnetlink.c:3149
- rtnl_changelink net/core/rtnetlink.c:3759 [inline]
- __rtnl_newlink net/core/rtnetlink.c:3918 [inline]
- rtnl_newlink+0x15a6/0x1d90 net/core/rtnetlink.c:4055
- rtnetlink_rcv_msg+0x791/0xcf0 net/core/rtnetlink.c:6945
- netlink_rcv_skb+0x206/0x480 net/netlink/af_netlink.c:2534
- netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
- netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1339
- netlink_sendmsg+0x8de/0xcb0 net/netlink/af_netlink.c:1883
- sock_sendmsg_nosec net/socket.c:709 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:724
- ____sys_sendmsg+0x53a/0x860 net/socket.c:2564
- ___sys_sendmsg net/socket.c:2618 [inline]
- __sys_sendmsg+0x269/0x350 net/socket.c:2650
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f191f98d169
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f192081c038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f191fba5fa0 RCX: 00007f191f98d169
-RDX: 0000000000000000 RSI: 0000400000000680 RDI: 0000000000000003
-RBP: 00007f191fa0e2a0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f191fba5fa0 R15: 00007ffc4fecad18
- </TASK>
-
+Cc: stable@vger.kernel.org
+Fixes: ca9c54d2d6a5 ("net: mana: Add a driver for Microsoft Azure Network Adapter (MANA)")
+Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
+Reviewed-by: Long Li <longli@microsoft.com>
+Reviewed-by: Shradha Gupta <shradhagupta@microsoft.com>
+---
+v2: Fix alignment, extra dmesg.
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/net/ethernet/microsoft/mana/gdma_main.c | 14 ++++++++++----
+ include/net/mana/gdma.h                         | 11 +++++++----
+ 2 files changed, 17 insertions(+), 8 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+index c15a5ef4674e..af63d844b3bc 100644
+--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
++++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+@@ -134,9 +134,10 @@ static int mana_gd_detect_devices(struct pci_dev *pdev)
+ 	struct gdma_list_devices_resp resp = {};
+ 	struct gdma_general_req req = {};
+ 	struct gdma_dev_id dev;
+-	u32 i, max_num_devs;
++	int found_dev = 0;
+ 	u16 dev_type;
+ 	int err;
++	u32 i;
+ 
+ 	mana_gd_init_req_hdr(&req.hdr, GDMA_LIST_DEVICES, sizeof(req),
+ 			     sizeof(resp));
+@@ -148,12 +149,17 @@ static int mana_gd_detect_devices(struct pci_dev *pdev)
+ 		return err ? err : -EPROTO;
+ 	}
+ 
+-	max_num_devs = min_t(u32, MAX_NUM_GDMA_DEVICES, resp.num_of_devs);
+-
+-	for (i = 0; i < max_num_devs; i++) {
++	for (i = 0; i < GDMA_DEV_LIST_SIZE &&
++	     found_dev < resp.num_of_devs; i++) {
+ 		dev = resp.devs[i];
+ 		dev_type = dev.type;
+ 
++		/* Skip empty devices */
++		if (dev.as_uint32 == 0)
++			continue;
++
++		found_dev++;
++
+ 		/* HWC is already detected in mana_hwc_create_channel(). */
+ 		if (dev_type == GDMA_DEVICE_HWC)
+ 			continue;
+diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
+index 90f56656b572..62e9d7673862 100644
+--- a/include/net/mana/gdma.h
++++ b/include/net/mana/gdma.h
+@@ -408,8 +408,6 @@ struct gdma_context {
+ 	struct gdma_dev		mana_ib;
+ };
+ 
+-#define MAX_NUM_GDMA_DEVICES	4
+-
+ static inline bool mana_gd_is_mana(struct gdma_dev *gd)
+ {
+ 	return gd->dev_id.type == GDMA_DEVICE_MANA;
+@@ -556,11 +554,15 @@ enum {
+ #define GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG BIT(3)
+ #define GDMA_DRV_CAP_FLAG_1_VARIABLE_INDIRECTION_TABLE_SUPPORT BIT(5)
+ 
++/* Driver can handle holes (zeros) in the device list */
++#define GDMA_DRV_CAP_FLAG_1_DEV_LIST_HOLES_SUP BIT(11)
++
+ #define GDMA_DRV_CAP_FLAGS1 \
+ 	(GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
+ 	 GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX | \
+ 	 GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG | \
+-	 GDMA_DRV_CAP_FLAG_1_VARIABLE_INDIRECTION_TABLE_SUPPORT)
++	 GDMA_DRV_CAP_FLAG_1_VARIABLE_INDIRECTION_TABLE_SUPPORT | \
++	 GDMA_DRV_CAP_FLAG_1_DEV_LIST_HOLES_SUP)
+ 
+ #define GDMA_DRV_CAP_FLAGS2 0
+ 
+@@ -621,11 +623,12 @@ struct gdma_query_max_resources_resp {
+ }; /* HW DATA */
+ 
+ /* GDMA_LIST_DEVICES */
++#define GDMA_DEV_LIST_SIZE 64
+ struct gdma_list_devices_resp {
+ 	struct gdma_resp_hdr hdr;
+ 	u32 num_of_devs;
+ 	u32 reserved;
+-	struct gdma_dev_id devs[64];
++	struct gdma_dev_id devs[GDMA_DEV_LIST_SIZE];
+ }; /* HW DATA */
+ 
+ /* GDMA_REGISTER_DEVICE */
+-- 
+2.34.1
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
