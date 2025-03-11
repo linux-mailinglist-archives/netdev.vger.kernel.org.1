@@ -1,208 +1,253 @@
-Return-Path: <netdev+bounces-173926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12055A5C3D7
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 15:33:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ECE2EA5C3F4
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 15:36:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C0C8189933B
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:33:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 779861890AB2
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:36:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84FD925C6FF;
-	Tue, 11 Mar 2025 14:32:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFF9B25CC86;
+	Tue, 11 Mar 2025 14:36:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="NyjgEq5u"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="V0o+I1cU"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C643F1D516C;
-	Tue, 11 Mar 2025 14:32:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26CD825C717;
+	Tue, 11 Mar 2025 14:36:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741703569; cv=none; b=ulzxFRnNxxgto8Wr12CKQCmATOrLcNMp4QI3P/ziNmqcKr5tUfT1qhoMM0aNGSxWySYMq+NQz7r4HreYnlqi6AHl0DwA+4yIuXryQbfo8Ofg2q5HKRj8jewksVx3H/5g7Rog1mJlKWX5E3qa3J9/Xmbaif0bA+tRLv2cWIOBJdo=
+	t=1741703779; cv=none; b=GhjytBTvXPb26Xy7A+q39tvP7yryxWHRd7o0Swn5LQPcSldIlNUGlCesmO48WQbOdlb9nf4p0IEMTMJ5y+jnVkqm5B203E+QvWz+lO/mii/B2j/3pMSaHLtHh4ahzmntS4riL15v3/M3cxjywUBgDijZikuBy0xB4D3dyeczpE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741703569; c=relaxed/simple;
-	bh=6LRWqagH50pWtOvWLzmPECzX8JInGE4+p6WZsOeip2o=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Y3PJJ5lhUQOQwtbhgm4u9NUl5vPh7RuPLetBCRKJkDWTFQu5rrXmD0BEcK9jfujLxV9Z7iBhMKagLLXb1FXU+NxxTlTdVKpNvPqlcx/xtL4fnDYTXXzpmfXxym+ofsSyhyt7drq76CR6V1o/01A+ZEPdvK7xF2OyRmo//n1gT2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=NyjgEq5u; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 689B844293;
-	Tue, 11 Mar 2025 14:32:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1741703559;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=03SEpe76buerxO1Tyt/a95sW01GQX/8qXbwOFtLXNuw=;
-	b=NyjgEq5uNCMIvDFGJV4PzI9PBcADaiZ+rts7F1XijZiBRgxbhADNqb4p0IdN4cEJu6WMpi
-	JxUHcKEk/q2Pdw/oF/ikapdSxAyUThyvIWkCUCFakseQp8l45mVbcXUilmvFTzhBA7UWLC
-	PfvzwTymO1lcAjJzoafWUpNjDfGZ7XIrxIzaOOLdLLxruovnbTEiaupjv0tMPiRjNh2xJz
-	owTVU6I/Ndid2IM4CRuC0Y0pqkdhvJhqbPOO+4h/RO+DVyXePQ4miKTXZjFaWyKhW6B6Yo
-	gJN5eJtTocgxk7BGSc3dA3oSbs6fCxcuQZ0B4DsR7Y64QwyEaAuRw5mRJMo6XQ==
-Date: Tue, 11 Mar 2025 15:32:35 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Philipp Hahn <phahn-oss@avm.de>
-Cc: netdev@vger.kernel.org, Oliver Neukum <oliver@neukum.org>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, linux-usb@vger.kernel.org,
- linux-kernel@vger.kernel.org, Leon Schuermann <leon@is.currently.online>
-Subject: Re: [PATCH v2] net-next: cdc_ether|r8152: ThinkPad Hybrid USB-C/A
- Dock quirk
-Message-ID: <20250311153235.6cae893a@kmaincent-XPS-13-7390>
-In-Reply-To: <f736f5bd20e465656ebe2cc2e7be69c0ada852e3.1741627632.git.p.hahn@avm.de>
-References: <f736f5bd20e465656ebe2cc2e7be69c0ada852e3.1741627632.git.p.hahn@avm.de>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1741703779; c=relaxed/simple;
+	bh=QpK53emxzundB3boPQwv2DDoyNFHOdeOqIuWMFSBX84=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UfjZKuw5V3hB87I3qKZa51+7YCosYAmEnW9Gp7xj76CbO+equUrcb7a8yXCK8jSm+PvGFZbMyWW+nzOg2LuXzeK2E0T1d48EiwTuEDgWilTQTtSsQ0slZVlf4Iw4XamdS0opTnhz5dWk2SsMfgXR+XkA00uxRY8xioRnmkPdSg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=V0o+I1cU; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52BA09M0004515;
+	Tue, 11 Mar 2025 14:36:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=+gJJGx
+	RnLVbsWoeczP6FG8yWHlZQ5ofOXHgWg+4VQzQ=; b=V0o+I1cUSA2jJpM51uVhWP
+	1UTmlgDvrstXM+Nwh3Prk0PKsmCcAa5pVHTOPheQkrSQhd/Ihb3pZpUCAh2qnrLQ
+	FfhHAEeuoTCE7zSQ9OmFT4C8wGIZ/bNv+sU9I2OZRSz3YmpZn+2YvmHfaKk30Xha
+	kzuOtL29hBtEheeFGjb8khDb+Et9z+9jxY1b/U/+paMXPQsnpnKwPc8gwzGErSgk
+	jiT6NC7Ap0xW4ol2cT2rfhPrFigCGcSotXHbf3n3zryPDyRPK4cLCdbTBi3jd+rI
+	AE+mrPSreS7o/Xw2jdqCOFVUqdIoTnDAiAey+jT7CdPOS19Pag63NVJm0nD17sfA
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45a78qvghk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Mar 2025 14:36:11 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 52BEKG21003836;
+	Tue, 11 Mar 2025 14:36:11 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45a78qvghh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Mar 2025 14:36:11 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52BBVjMM014003;
+	Tue, 11 Mar 2025 14:36:10 GMT
+Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4592x1v7re-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 11 Mar 2025 14:36:10 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52BEa9P014025446
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 11 Mar 2025 14:36:09 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 42D6C58054;
+	Tue, 11 Mar 2025 14:36:09 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4663458050;
+	Tue, 11 Mar 2025 14:36:06 +0000 (GMT)
+Received: from [9.152.224.242] (unknown [9.152.224.242])
+	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 11 Mar 2025 14:36:06 +0000 (GMT)
+Message-ID: <77e4653d-6ad2-4b97-9952-99d506276b1a@linux.ibm.com>
+Date: Tue, 11 Mar 2025 15:36:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduvddvgeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeetgeeghfduhefhleelueeuueejjeegueegffdviedtheejieekhedvveejteehnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghdplhgvnhhovhhordgtohhmpdgsohhothhlihhnrdgtohhmnecukfhppeduleehrddvledrheegrddvgeefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepudelhedrvdelrdehgedrvdegfedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepuddvpdhrtghpthhtohepphhhrghhnhdqohhsshesrghvmhdruggvpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepohhlihhvvghrsehnvghukhhumhdrohhrghdprhgtphhtthhopegrnhgurhgvfidon
- hgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
-X-GND-Sasl: kory.maincent@bootlin.com
-
-On Tue, 11 Mar 2025 11:21:34 +0100
-Philipp Hahn <phahn-oss@avm.de> wrote:
-
-> Lenovo ThinkPad Hybrid USB-C with USB-A Dock (17ef:a359) is affected by
-> the same problem as the Lenovo Powered USB-C Travel Hub (17ef:721e):
-> Both are based on the Realtek RTL8153B chip used to use the cdc_ether
-> driver. However, using this driver, with the system suspended the device
-> constantly sends pause-frames as soon as the receive buffer fills up.
-> This causes issues with other devices, where some Ethernet switches stop
-> forwarding packets altogether.
->=20
-> Using the Realtek driver (r8152) fixes this issue. Pause frames are no
-> longer sent while the host system is suspended.
-
-It seems patchwork detects it for net-next tree but nonetheless the subject
-of your patch should look like this:
-[PATCH net-next v2] cdc_ether|r8152: ThinkPad Hybrid USB-C/A Dock quirk
-
-Regards,
-
-> Cc: Oliver Neukum <oliver@neukum.org>
-> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: linux-usb@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: Leon Schuermann <leon@is.currently.online>
-> Link: https://git.kernel.org/netdev/net/c/cb82a54904a9
-> Link: https://git.kernel.org/netdev/net/c/2284bbd0cf39
-> Link:
-> https://www.lenovo.com/de/de/p/accessories-and-software/docking/docking-u=
-sb-docks/40af0135eu
-> Signed-off-by: Philipp Hahn <phahn-oss@avm.de> Reviewed-by: Kory Maincent
-> <kory.maincent@bootlin.com> ---
-> V1 -> V2: Prefix subject with `net-next:`
-> V1 -> V2: Add additional Cc:s
->  drivers/net/usb/cdc_ether.c | 7 +++++++
->  drivers/net/usb/r8152.c     | 6 ++++++
->  drivers/net/usb/r8153_ecm.c | 6 ++++++
->  3 files changed, 19 insertions(+)
->=20
-> diff --git a/drivers/net/usb/cdc_ether.c b/drivers/net/usb/cdc_ether.c
-> index a6469235d904..a032c1ded406 100644
-> --- a/drivers/net/usb/cdc_ether.c
-> +++ b/drivers/net/usb/cdc_ether.c
-> @@ -783,6 +783,13 @@ static const struct usb_device_id	products[] =3D {
->  	.driver_info =3D 0,
->  },
-> =20
-> +/* Lenovo ThinkPad Hybrid USB-C with USB-A Dock (40af0135eu, based on
-> Realtek RTL8153) */ +{
-> +	USB_DEVICE_AND_INTERFACE_INFO(LENOVO_VENDOR_ID, 0xa359,
-> USB_CLASS_COMM,
-> +			USB_CDC_SUBCLASS_ETHERNET, USB_CDC_PROTO_NONE),
-> +	.driver_info =3D 0,
-> +},
-> +
->  /* Aquantia AQtion USB to 5GbE Controller (based on AQC111U) */
->  {
->  	USB_DEVICE_AND_INTERFACE_INFO(AQUANTIA_VENDOR_ID, 0xc101,
-> diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-> index 468c73974046..96fa3857d8e2 100644
-> --- a/drivers/net/usb/r8152.c
-> +++ b/drivers/net/usb/r8152.c
-> @@ -785,6 +785,7 @@ enum rtl8152_flags {
->  #define DEVICE_ID_THINKPAD_USB_C_DONGLE			0x720c
->  #define DEVICE_ID_THINKPAD_USB_C_DOCK_GEN2		0xa387
->  #define DEVICE_ID_THINKPAD_USB_C_DOCK_GEN3		0x3062
-> +#define DEVICE_ID_THINKPAD_HYBRID_USB_C_DOCK		0xa359
-> =20
->  struct tally_counter {
->  	__le64	tx_packets;
-> @@ -9787,6 +9788,7 @@ static bool rtl8152_supports_lenovo_macpassthru(str=
-uct
-> usb_device *udev) case DEVICE_ID_THINKPAD_USB_C_DOCK_GEN2:
->  		case DEVICE_ID_THINKPAD_USB_C_DOCK_GEN3:
->  		case DEVICE_ID_THINKPAD_USB_C_DONGLE:
-> +		case DEVICE_ID_THINKPAD_HYBRID_USB_C_DOCK:
->  			return 1;
->  		}
->  	} else if (vendor_id =3D=3D VENDOR_ID_REALTEK && parent_vendor_id =3D=3D
-> VENDOR_ID_LENOVO) { @@ -10064,6 +10066,8 @@ static const struct usb_devic=
-e_id
-> rtl8152_table[] =3D { { USB_DEVICE(VENDOR_ID_MICROSOFT, 0x0927) },
->  	{ USB_DEVICE(VENDOR_ID_MICROSOFT, 0x0c5e) },
->  	{ USB_DEVICE(VENDOR_ID_SAMSUNG, 0xa101) },
-> +
-> +	/* Lenovo */
->  	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x304f) },
->  	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x3054) },
->  	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x3062) },
-> @@ -10074,7 +10078,9 @@ static const struct usb_device_id rtl8152_table[]=
- =3D {
->  	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x720c) },
->  	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x7214) },
->  	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x721e) },
-> +	{ USB_DEVICE(VENDOR_ID_LENOVO,  0xa359) },
->  	{ USB_DEVICE(VENDOR_ID_LENOVO,  0xa387) },
-> +
->  	{ USB_DEVICE(VENDOR_ID_LINKSYS, 0x0041) },
->  	{ USB_DEVICE(VENDOR_ID_NVIDIA,  0x09ff) },
->  	{ USB_DEVICE(VENDOR_ID_TPLINK,  0x0601) },
-> diff --git a/drivers/net/usb/r8153_ecm.c b/drivers/net/usb/r8153_ecm.c
-> index 20b2df8d74ae..8d860dacdf49 100644
-> --- a/drivers/net/usb/r8153_ecm.c
-> +++ b/drivers/net/usb/r8153_ecm.c
-> @@ -135,6 +135,12 @@ static const struct usb_device_id products[] =3D {
->  				      USB_CDC_SUBCLASS_ETHERNET,
-> USB_CDC_PROTO_NONE), .driver_info =3D (unsigned long)&r8153_info,
->  },
-> +/* Lenovo ThinkPad Hybrid USB-C with USB-A Dock (40af0135eu, based on
-> Realtek RTL8153) */ +{
-> +	USB_DEVICE_AND_INTERFACE_INFO(VENDOR_ID_LENOVO, 0xa359,
-> USB_CLASS_COMM,
-> +				      USB_CDC_SUBCLASS_ETHERNET,
-> USB_CDC_PROTO_NONE),
-> +	.driver_info =3D (unsigned long)&r8153_info,
-> +},
-> =20
->  	{ },		/* END */
->  };
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] net/smc: use the correct ndev to find pnetid
+ by pnetid table
+To: Paolo Abeni <pabeni@redhat.com>,
+        Guangguan Wang <guangguan.wang@linux.alibaba.com>, pasic@linux.ibm.com,
+        jaka@linux.ibm.com, alibuda@linux.alibaba.com,
+        tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
+        mjambigi@linux.ibm.com, sidraya@linux.ibm.com
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        horms@kernel.org, linux-rdma@vger.kernel.org,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20250304124304.13732-1-guangguan.wang@linux.alibaba.com>
+ <2c9accbd-fd6f-421c-9d00-1f36a6152b8d@redhat.com>
+Content-Language: en-US
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <2c9accbd-fd6f-421c-9d00-1f36a6152b8d@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 8JyPt17XETZmYuWNC-l4JQSMMxY5YMh1
+X-Proofpoint-ORIG-GUID: w2dWjNPE_sJVQ19EQ9OjxDoJDdrL6PGb
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-11_03,2025-03-11_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ spamscore=0 adultscore=0 mlxlogscore=999 phishscore=0 priorityscore=1501
+ lowpriorityscore=0 malwarescore=0 bulkscore=0 suspectscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2502100000
+ definitions=main-2503110091
 
 
 
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+On 11.03.25 09:59, Paolo Abeni wrote:
+> On 3/4/25 1:43 PM, Guangguan Wang wrote:
+>> When using smc_pnet in SMC, it will only search the pnetid in the
+>> base_ndev of the netdev hierarchy(both HW PNETID and User-defined
+>> sw pnetid). This may not work for some scenarios when using SMC in
+>> container on cloud environment.
+>> In container, there have choices of different container network,
+>> such as directly using host network, virtual network IPVLAN, veth,
+>> etc. Different choices of container network have different netdev
+>> hierarchy. Examples of netdev hierarchy show below. (eth0 and eth1
+>> in host below is the netdev directly related to the physical device).
+>>              _______________________________
+>>             |   _________________           |
+>>             |  |POD              |          |
+>>             |  |                 |          |
+>>             |  | eth0_________   |          |
+>>             |  |____|         |__|          |
+>>             |       |         |             |
+>>             |       |         |             |
+>>             |   eth1|base_ndev| eth0_______ |
+>>             |       |         |    | RDMA  ||
+>>             | host  |_________|    |_______||
+>>             ---------------------------------
+>>       netdev hierarchy if directly using host network
+>>             ________________________________
+>>             |   _________________           |
+>>             |  |POD  __________  |          |
+>>             |  |    |upper_ndev| |          |
+>>             |  |eth0|__________| |          |
+>>             |  |_______|_________|          |
+>>             |          |lower netdev        |
+>>             |        __|______              |
+>>             |   eth1|         | eth0_______ |
+>>             |       |base_ndev|    | RDMA  ||
+>>             | host  |_________|    |_______||
+>>             ---------------------------------
+>>              netdev hierarchy if using IPVLAN
+>>              _______________________________
+>>             |   _____________________       |
+>>             |  |POD        _________ |      |
+>>             |  |          |base_ndev||      |
+>>             |  |eth0(veth)|_________||      |
+>>             |  |____________|________|      |
+>>             |               |pairs          |
+>>             |        _______|_              |
+>>             |       |         | eth0_______ |
+>>             |   veth|base_ndev|    | RDMA  ||
+>>             |       |_________|    |_______||
+>>             |        _________              |
+>>             |   eth1|base_ndev|             |
+>>             | host  |_________|             |
+>>             ---------------------------------
+>>               netdev hierarchy if using veth
+>> Due to some reasons, the eth1 in host is not RDMA attached netdevice,
+>> pnetid is needed to map the eth1(in host) with RDMA device so that POD
+>> can do SMC-R. Because the eth1(in host) is managed by CNI plugin(such
+>> as Terway, network management plugin in container environment), and in
+>> cloud environment the eth(in host) can dynamically be inserted by CNI
+>> when POD create and dynamically be removed by CNI when POD destroy and
+>> no POD related to the eth(in host) anymore. It is hard to config the
+>> pnetid to the eth1(in host). But it is easy to config the pnetid to the
+>> netdevice which can be seen in POD. When do SMC-R, both the container
+>> directly using host network and the container using veth network can
+>> successfully match the RDMA device, because the configured pnetid netdev
+>> is a base_ndev. But the container using IPVLAN can not successfully
+>> match the RDMA device and 0x03030000 fallback happens, because the
+>> configured pnetid netdev is not a base_ndev. Additionally, if config
+>> pnetid to the eth1(in host) also can not work for matching RDMA device
+>> when using veth network and doing SMC-R in POD.
+>>
+>> To resolve the problems list above, this patch extends to search user
+>> -defined sw pnetid in the clc handshake ndev when no pnetid can be found
+>> in the base_ndev, and the base_ndev take precedence over ndev for backward
+>> compatibility. This patch also can unify the pnetid setup of different
+>> network choices list above in container(Config user-defined sw pnetid in
+>> the netdevice can be seen in POD).
+>>
+>> Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+>> ---
+>>   net/smc/smc_pnet.c | 8 +++++---
+>>   1 file changed, 5 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
+>> index 716808f374a8..b391c2ef463f 100644
+>> --- a/net/smc/smc_pnet.c
+>> +++ b/net/smc/smc_pnet.c
+>> @@ -1079,14 +1079,16 @@ static void smc_pnet_find_roce_by_pnetid(struct net_device *ndev,
+>>   					 struct smc_init_info *ini)
+>>   {
+>>   	u8 ndev_pnetid[SMC_MAX_PNETID_LEN];
+>> +	struct net_device *base_ndev;
+>>   	struct net *net;
+>>   
+>> -	ndev = pnet_find_base_ndev(ndev);
+>> +	base_ndev = pnet_find_base_ndev(ndev);
+>>   	net = dev_net(ndev);
+>> -	if (smc_pnetid_by_dev_port(ndev->dev.parent, ndev->dev_port,
+>> +	if (smc_pnetid_by_dev_port(base_ndev->dev.parent, base_ndev->dev_port,
+>>   				   ndev_pnetid) &&
+>> +	    smc_pnet_find_ndev_pnetid_by_table(base_ndev, ndev_pnetid) &&
+>>   	    smc_pnet_find_ndev_pnetid_by_table(ndev, ndev_pnetid)) {
+>> -		smc_pnet_find_rdma_dev(ndev, ini);
+>> +		smc_pnet_find_rdma_dev(base_ndev, ini);
+>>   		return; /* pnetid could not be determined */
+>>   	}
+>>   	_smc_pnet_find_roce_by_pnetid(ndev_pnetid, ini, NULL, net);
+> 
+> I understand Wenjia opposed to this solution as it may create invalid
+> topologies ?!?
+> 
+> https://lore.kernel.org/netdev/08cd6e15-3f8c-47a0-8490-103d59abf910@linux.ibm.com/#t
+> 
+> Wenjia, could you please confirm?
+> 
+> Thanks,
+> 
+> Paolo
+> 
+
+Hi Paolo,
+
+Thanks for asking! I really appreciate it.
+
+I was initially opposed, but after discussing with Halil, I agreed that 
+my concerns might be not necessary. Halil and I reached an agreement 
+that he responded to the emails (v1) to ask for the version as he 
+already did, and we will double-check version 2 to ensure it works 
+correctly.
+
+In any case, I still need to review it carefully and will provide my 
+answer as soon as possible.
+
+Thanks,
+Wenjia
 
