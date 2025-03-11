@@ -1,91 +1,116 @@
-Return-Path: <netdev+bounces-174050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1729A5D2A6
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 23:41:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 117BDA5D2A9
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 23:44:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 305CD178887
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 22:41:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D06617A365
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 22:44:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13829264F9D;
-	Tue, 11 Mar 2025 22:41:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08BF7265603;
+	Tue, 11 Mar 2025 22:44:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Aq8ybwVl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RH5kDlGd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA7691E7C2B;
-	Tue, 11 Mar 2025 22:41:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D17F71C6FFD;
+	Tue, 11 Mar 2025 22:44:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741732893; cv=none; b=oL2EPqvLvJAFJ+tB0+ud14nspc9k3H9O5dUP0iZbvNKbkHm9fqR2XEjPh50HRajmKCzemn2o04YPt0fITGzalwR1UMilY1yHHQ9XEaYdRQKxw1ig2pAtbjC4XFPSZTb0pVpce77kT9dRzsFm4CG34AWf7sZbEfgu333BiFx1XzE=
+	t=1741733061; cv=none; b=adSaJPG4/6fRod+5oH7zlBs0Msxx0qhbv33mHOS+KRtiAvkaYq7BfPxn3aMoORDYQhevSrcB6nlnlrvyCTdP6BhTcwm5L+d3xjLHTo7gNAvMci1QlMU0XVQgddGlcx5p+K9kj1SEORbciWHIuDnpVETIFTP8vLcrGYCPmmlX/Xs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741732893; c=relaxed/simple;
-	bh=+coG37l2eGCn++hwp9pjgurrJsYlGaIgrcTm4zrjQq8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o/KX6f2z8I79+uO8n/CJ0YphfzvSVYiR3iZxskux4EJvcK9AjKcQKdb4wLDR8bXBM92XVGVMdINHFJ07gXdaKTwVPCdrZk8VgkRCjrtbzfqavlW3DzqypshFFDKyHWRduTy7Io7V6QPUGmGerbozn89fmtMzm6Oe3PzaFI0ezPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Aq8ybwVl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A91A0C4CEE9;
-	Tue, 11 Mar 2025 22:41:32 +0000 (UTC)
+	s=arc-20240116; t=1741733061; c=relaxed/simple;
+	bh=R2t2dsZHE8G4DvXieL1oM1sFlGJJH5yJg2LKNxJRjaQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bPZIzW2Rc/kYz8pb22o8jvaaoomLk63v7aLYwFcJnU/+FFuwU9aUdOO4YDDsyULWVoTjmRfq3gSlf4FP10HiKZDUaXIZ8yBW4tESerJCL8XAwY9ue/PI9usQ5X857m4H3SoPsYob9girvbGcNH9jD3ATmQ9HgvDcfesV4Iq34n8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RH5kDlGd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AE3FC4CEE9;
+	Tue, 11 Mar 2025 22:44:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741732892;
-	bh=+coG37l2eGCn++hwp9pjgurrJsYlGaIgrcTm4zrjQq8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Aq8ybwVla2q0KOz660iw1mOT9EYn0dH46xGvjhQN0XgvJMXkj4L1dZBFcemoaGqGW
-	 Vd8qJDDvNqtkjPXSJq4GQnt4LnEayMlnaKq4/N1c5BBbA12It51mC9zV8RXkIKdLLK
-	 Iv2QEBYvpADJ/47SfWwToq3xR5kMcIPn0pH+Jhf9gVuQVwQBR38WslOwUlRwH/LfTl
-	 HwLKkKKxX/Vft2tic54DhftabJH2Oyyl1JFiO1BoQrAGO5eVxeuua3GYE9QUxHAzcu
-	 2VoJGU4pLbcRn+kicCib5IEhj7TrK8WHyQSSenrQGkyJSAj/uEZZlfjQSrPxSKH9ne
-	 L8TVGExGlLPLg==
-Date: Tue, 11 Mar 2025 15:41:29 -0700
+	s=k20201202; t=1741733061;
+	bh=R2t2dsZHE8G4DvXieL1oM1sFlGJJH5yJg2LKNxJRjaQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=RH5kDlGdaNtO7pSD+oJ2ybLDVedsQ/IDghWHoQOcchWbxVFt9s/ubDO9zrSPmYn0M
+	 5/WfmrGHl0htrSPrqmw9f53ViVyYIvW+GAsc1uD6cH4i00IYh6t1/V7yNC6hhKC8r2
+	 g1NJ+BdZ8r+J5Ohwu3tdAYxkcMgPviltuZjzpA3M8sSQ7FiYYy59NerE6dXUqdh8Yx
+	 S+l5T2LBU8eOK7/txzQKm7sUU6Nff+iIYINudsMLpuJTkUJLNXwbYnkHiLSjavoY0X
+	 PuykQSpcT/yg62zfBJZKbz5gVlYCOHzvytRf8tonhzpvSGD6FFYiCfDAq29pxkb31w
+	 A77uvWAozNoyQ==
 From: Kees Cook <kees@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
+To: Nicolas Ferre <nicolas.ferre@microchip.com>
+Cc: Kees Cook <kees@kernel.org>,
 	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] net: macb: Truncate TX1519CNT for trailing NUL
-Message-ID: <202503111540.8EB9B4702@keescook>
-References: <20250310222415.work.815-kees@kernel.org>
- <64b35f60-2ed4-4ab0-8f4e-0dba042b4d4d@lunn.ch>
+Subject: [PATCH v2] net: macb: Add __nonstring annotations for unterminated strings
+Date: Tue, 11 Mar 2025 15:44:16 -0700
+Message-Id: <20250311224412.it.153-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <64b35f60-2ed4-4ab0-8f4e-0dba042b4d4d@lunn.ch>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1882; i=kees@kernel.org; h=from:subject:message-id; bh=R2t2dsZHE8G4DvXieL1oM1sFlGJJH5yJg2LKNxJRjaQ=; b=owGbwMvMwCVmps19z/KJym7G02pJDOkX9uzv3Kopyu9jm6Dj+oQlYSLjI/N3OxVeL//4+uXWB bIf2h0XdpSyMIhxMciKKbIE2bnHuXi8bQ93n6sIM4eVCWQIAxenAEwkhY3hf2U019YbpVdSf/pv CHoVucz25Qf3qojnMg1TOKXbWvQ85jH8j5llayTVNfXORF6vt9eeq5SYsMcH3vYx4fqUc2iu3Vx DPgA=
+X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
+Content-Transfer-Encoding: 8bit
 
-On Tue, Mar 11, 2025 at 03:12:00PM +0100, Andrew Lunn wrote:
-> On Mon, Mar 10, 2025 at 03:24:16PM -0700, Kees Cook wrote:
-> > GCC 15's -Wunterminated-string-initialization saw that this string was
-> > being truncated. Adjust the initializer so that the needed final NUL
-> > character will be present.
-> 
-> This is where we get into the ugliness of the ethtool API for strings.
-> It is not actually NUL terminated. The code uses memcpy(), see:
-> 
-> https://elixir.bootlin.com/linux/v6.13.6/source/drivers/net/ethernet/cadence/macb_main.c#L3193
-> 
-> The kAPI is that userspace provides a big buffer, and the kernel then
-> copies these strings into the buffer at 32 byte offsets. There is no
-> requirement for a NUL between them since they are all 32 bytes long.
+When a character array without a terminating NUL character has a static
+initializer, GCC 15's -Wunterminated-string-initialization will only
+warn if the array lacks the "nonstring" attribute[1]. Mark the arrays
+with __nonstring to and correctly identify the char array as "not a C
+string" and thereby eliminate the warning.
 
-Oh right! Yes, I always forget these are not NUL terminated. Okay, I
-will resend this with a proper __nonstring annotation. I see the title
-use in drivers/net/ethernet/cadence/macb_main.c and can confirm it's not
-using C String APIs.
+Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=117178 [1]
+Signed-off-by: Kees Cook <kees@kernel.org>
+---
+ v1: https://lore.kernel.org/lkml/20250310222415.work.815-kees@kernel.org/
+ v2: switch to __nonstring annotation
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>
+Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org
+---
+ drivers/net/ethernet/cadence/macb.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
+index 2847278d9cd4..003483073223 100644
+--- a/drivers/net/ethernet/cadence/macb.h
++++ b/drivers/net/ethernet/cadence/macb.h
+@@ -1027,7 +1027,7 @@ struct gem_stats {
+  * this register should contribute to.
+  */
+ struct gem_statistic {
+-	char stat_string[ETH_GSTRING_LEN];
++	char stat_string[ETH_GSTRING_LEN] __nonstring;
+ 	int offset;
+ 	u32 stat_bits;
+ };
+@@ -1068,6 +1068,7 @@ static const struct gem_statistic gem_statistics[] = {
+ 	GEM_STAT_TITLE(TX512CNT, "tx_512_1023_byte_frames"),
+ 	GEM_STAT_TITLE(TX1024CNT, "tx_1024_1518_byte_frames"),
+ 	GEM_STAT_TITLE(TX1519CNT, "tx_greater_than_1518_byte_frames"),
++
+ 	GEM_STAT_TITLE_BITS(TXURUNCNT, "tx_underrun",
+ 			    GEM_BIT(NDS_TXERR)|GEM_BIT(NDS_TXFIFOERR)),
+ 	GEM_STAT_TITLE_BITS(SNGLCOLLCNT, "tx_single_collision_frames",
 -- 
-Kees Cook
+2.34.1
+
 
