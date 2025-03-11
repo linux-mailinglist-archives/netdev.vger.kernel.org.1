@@ -1,121 +1,256 @@
-Return-Path: <netdev+bounces-173738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25737A5B892
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 06:33:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95821A5B8AC
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 06:56:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD52B1890C0B
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 05:34:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8C0416DC89
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 05:56:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C28E61EB1A3;
-	Tue, 11 Mar 2025 05:33:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35ABB1EB5DC;
+	Tue, 11 Mar 2025 05:56:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OPNJQ9WO"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Iq/S4jZv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2055.outbound.protection.outlook.com [40.107.21.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 094BF320F;
-	Tue, 11 Mar 2025 05:33:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741671230; cv=none; b=XZiwXdRMdgkl9RmbpszxDZYYA/DovCi+EtcRwvBm2FY44vezRSDYQ4ZD/LfMUduh25riE4PXml9k1n/6t45un3bfXVkdeL6dAn3eg9csE8NTx9zMkQIeNmMkv/e0Roov7e1fVdjviNLCJxw1qZYgbAjwVJZ345p44DQ8ciTQ08k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741671230; c=relaxed/simple;
-	bh=DLYuGmG8iFWf5LcT050MwmMyWf6njd/yrSqW870b0NQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kq+7V+qIMUaOck/6JqMh6gwNSgTnfnCXlIw+JPCjIwPWbgewxrOXmmYf3sfCXJuwRq5KG5ICpYUA8YW+Kq6UoAIpOi3UFfZJF7TNARjiS/fKgDsBIU9lhMB8SyCUlyeB/Ce8Lxuoz/3QTzjy7dfylP/ciieI0nzoJTxf/ejZQU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OPNJQ9WO; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741671229; x=1773207229;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=DLYuGmG8iFWf5LcT050MwmMyWf6njd/yrSqW870b0NQ=;
-  b=OPNJQ9WO6owtRiG51u+pD9WpnMUnZXJcfsF0Hk+kBgMbWLk+TX6xHMbJ
-   OHZwngz3pK/euluvYvI2LYYlDfBuFsDg20l9BTlkrQc7agvabwmp1jnJW
-   K5evkPWdt6RQRkXCQ/y0FFDRTUHZ7qN7Wyc1bQn80brjeAUPwGX0dHzxm
-   Iq0SvZgtvTpKvfIrGwoBD3Ji9owwXECjPC9lRJ7WopeZN4MY8ugcnbkBR
-   I1W0E4gjLhdl9eE9RYJpqs4h3G06mTBbqrGivQF90Pjd+rSPGuOrc6U/4
-   apk5PIuTFsK9wx8ru41YAx0Sh7+OroLMGufMotJwHLDOJFBgmhl5bu2Yx
-   g==;
-X-CSE-ConnectionGUID: IfEg6M00RiGDIwGV+PMVHg==
-X-CSE-MsgGUID: luwnjhpdRSaWxN3gEvg08g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11369"; a="42602730"
-X-IronPort-AV: E=Sophos;i="6.14,238,1736841600"; 
-   d="scan'208";a="42602730"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 22:33:47 -0700
-X-CSE-ConnectionGUID: CWULG/1UQUuYYhAiVQ7Zew==
-X-CSE-MsgGUID: nO6dDApWTfWOLHIaR7SBuA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,238,1736841600"; 
-   d="scan'208";a="143395086"
-Received: from choongyo-mobl.gar.corp.intel.com (HELO [10.247.21.123]) ([10.247.21.123])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 22:33:44 -0700
-Message-ID: <3bc2cc11-3a87-479e-a0e0-c593e3214540@linux.intel.com>
-Date: Tue, 11 Mar 2025 13:33:42 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C89371E9B2A;
+	Tue, 11 Mar 2025 05:55:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.55
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741672562; cv=fail; b=YV64Z6SDTdZBzoTQ0eQP/Zwdz0peXiYc8a/+LLO25IOAGtdzozf1qL5xpSg1F3x+m+qm2ayH8UV/d4Pn3W2ueYSQjQR8+MPzy6NIqtrTeRlyaVrtTwHBmeekR/1/Pp58O0EwW3cGVqlAUbKm88EAdnxt75Z+DZEG2ArvbxJ/QLk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741672562; c=relaxed/simple;
+	bh=LA56qsNfitK1/YzDeScKAwaHJC2gMr0RGF7eABZP1ZM=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=Bb7/jeZvIIgsnB9O5TNIb851kvVdm6snDQkKGEE+jytcc5Uwu8Zwk8ew3AFnE+6uonmblZN/yF+Tci8MbfmXs1umcIDeaP2A1TgTlkPsvQCk7Whhyk6CSNP1FPUl4k7Ey3kzO4jBMT56iA9r7ZdcQ8ziRWztc6w0dW4NszhimA4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Iq/S4jZv; arc=fail smtp.client-ip=40.107.21.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=GhsNDAuTqHntJg7J9ZfVQEgXmXkm8lFDLmy9NayCXhhPzf70dOIdJmVOyzJxTfrLWrUHuY/ekBbOmA0ljgHS6GteJRpetAUUxcyUmyZW4dcZyKBJUXgANv6DocduuaQSJyh5cuaDyDEmQu7+IARlaPkM7PqXUNcYbkLR5HEcztvm12gqvRQk/TOyxxAj8P2iXWy4PGJaGDCoijYB8nHgBqmLhCSOhr4k0xle6gchstleIcpkCYWZ0ovqrVL70JRX77RPG2cOOE6s5Qtnkat+1FW8MYhReAyn9F5mteIBjpqK9/TAkyklgzXhHPVFZ12X1MgRETUGAhUUfxNyb3B2rQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=A62TCjHpAIowI6C5MOaEaTbqvEa8Jw1SMF6ThCCAVqo=;
+ b=LdfGY5cEK2VxzVRWT8vVJeDh86ppaWHBfuW96TuXhSqK4lshwyTfPGlOqn1fbNSCnf6R8BDMDN/h6xHk1KHQqE+aPX8+v0am2np1jv282iiZQ5Iw+HuwScxOtJScSUWqbjLT9+JWJrKLDwzmP+SlKVsJEX1iKUhSJZ0itDguxZbc4Qm8ApYvi0/1MgjjTsQhioUH2/zDD/zhtJgxMtxMUbzmVxpk3UyjclUzfPesqIRmBuUZHkq2MLXF9YU6Hl745x5/RKQo7purTuCFcsc1H+5pE1C39aiQwx/pOdREgcx1lHkuOXDal0hnLAK+b+SewGFUA1HCMqDgd+jiFkAi4g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=A62TCjHpAIowI6C5MOaEaTbqvEa8Jw1SMF6ThCCAVqo=;
+ b=Iq/S4jZvqbN91t1jAxO60XYFTn5vaVP7uCgVe6Hr9WZr3v3vCSW0ofLQ2FhMqtCroV1CjhnIgcPj44WsezqmXjOv37R++DVO43HX2ATxqWCaMF9qhiqH4w96kiXtegBJzKzgZuczl7lGh5GMH27A5ocYl3abr7r5HKYMgjlp6UwHnnR8Ev6JaJi1HFxYKYBKtxEIN7fkSI4ahrN8JKjwxjTOKmBjTAsQ1wSiN47lIgYOmKgplFZFudLg/haccDw7eDA4uwL8CMXOitQKFdLVzcdb0iZO4N6V+1WMcu+RXE95B8UHZvvwu6wGz9V1I5+sHbpU+qp8/dL4eA+UUU+LFw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by GV1PR04MB10941.eurprd04.prod.outlook.com (2603:10a6:150:201::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.27; Tue, 11 Mar
+ 2025 05:55:56 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%5]) with mapi id 15.20.8511.026; Tue, 11 Mar 2025
+ 05:55:56 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: claudiu.manoil@nxp.com,
+	vladimir.oltean@nxp.com,
+	xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: christophe.leroy@csgroup.eu,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: [PATCH v4 net-next 00/14] Add more feautues for ENETC v4 - round 2
+Date: Tue, 11 Mar 2025 13:38:16 +0800
+Message-Id: <20250311053830.1516523-1-wei.fang@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SGBP274CA0011.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b0::23)
+ To PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v1 1/1] stmmac: intel: Fix warning message for
- return value in intel_tsn_lane_is_available()
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Dan Carpenter <dan.carpenter@linaro.org>,
- netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20250310050835.808870-1-yong.liang.choong@linux.intel.com>
- <20250310152014.1d593255@kmaincent-XPS-13-7390>
-Content-Language: en-US
-From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-In-Reply-To: <20250310152014.1d593255@kmaincent-XPS-13-7390>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|GV1PR04MB10941:EE_
+X-MS-Office365-Filtering-Correlation-Id: 972477a3-3905-4341-6517-08dd606162b2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|376014|52116014|7416014|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?OD1OuQoqWYLwtw7kwHqQddzuBaCTtjM43d1BIY/oNd2C94vkSKjhI1t/r4hq?=
+ =?us-ascii?Q?XpNBq43aoY+e2sXfkfADvvfCetAockMzVGx8nWtHhAYkP3FNJUZdAFDOBjFF?=
+ =?us-ascii?Q?UoEFZRYtcrsW1fz1H8v5jsTU3A9pU4FOfXOD+E/I7X5an9QEQQ9A567k6wsL?=
+ =?us-ascii?Q?Z2Pstxt+CSY96ne8y6I9f3UaSuHU6LdL+PT1dr1UQXv6FFceho4K9VXI9096?=
+ =?us-ascii?Q?QibJ26pb/JIBc8GPJs+MIxNYKfFnrqk57U1moIQv8ICsPr4dMc5fh6jp41hc?=
+ =?us-ascii?Q?R8RCWuaDIRbt9O2yrBaZfmYBkqFqj72aaPVLUt6g0K2qeSyN+NbO9MPTcY0Y?=
+ =?us-ascii?Q?4BWpOWv2ydavNanuo9zM4tEXgymW+vP1BxdsRsPOEEXCqLvqw2+6lH5OY2CQ?=
+ =?us-ascii?Q?3FiCWxOBrVmYX7HxmgUUyFkFVO4AZsIFlSxmAZIy4mktaiY+gIlsmYW5F2RT?=
+ =?us-ascii?Q?QDpO8HVwuFvpbwTy9InqBnAJIH/88NGAtgwOiRwACTJ+xOoyDWCPMAXoHW8d?=
+ =?us-ascii?Q?NPOT3VTKyknUnCC3msnWKptWsrUQcyCpITbsDVuSiaVzq4qJStvSfMXCr/Zp?=
+ =?us-ascii?Q?4sfsuBsBdwN7KJ95+Asn9YYt2qXuQo1YZzAlox3DWkRAWcYxnloIC0wv19MA?=
+ =?us-ascii?Q?ll/uNx5CPZosCdAp6pWJfsC32YCCj7/vrsbkabDh7/8kGqaW8ziHT37O6I0j?=
+ =?us-ascii?Q?gOx/rCtBerFCSVggpwyahd77PeWQQfYAFGXcQLBwD6J7bUHbSx9zq54aQwwh?=
+ =?us-ascii?Q?yUFkZo8/qkDtq1eezpyjqXmDg0WNcb68G2F+cpHtVh84Q7rTcu5/Nl1dUJ+q?=
+ =?us-ascii?Q?cmDSQo64y8Yp+9xiIRaajvkP0sYCOsDiLckdRnTQWg8ExJafCmt0rz7+B194?=
+ =?us-ascii?Q?T6szNrYCL2AhOyHQJT3jBx3K/OtCdN9cqwwQvpmSm1aGyzrAyyDRJTGmFqx9?=
+ =?us-ascii?Q?zu9X2AjbMEMHXB1NRPxiJmX0k+4+buEGiFJ3tRE6RpZVs3JN7SGRSgXfAhLN?=
+ =?us-ascii?Q?HCPeIyYbkaD7XBkiJ9qKYWebGGopNnqDe7/z/ux9/pdEvFfDE6TDlRF6W07Z?=
+ =?us-ascii?Q?RsIQzZT1G5+d10tasvRSjTDGK8xFW6oH1B8nod6b0RfzqsYj9/fLct0xmfLp?=
+ =?us-ascii?Q?vhMcM1zMKBVh7MZ8jgYBQQPiHW+XkHt/hFRPNKWAB1kASn7kgJFadxKXw4D/?=
+ =?us-ascii?Q?HqSdTW0fmqC1NYKIdoZbvSlkiSQ+VWfXYlzZ62/wm2zqUfeIKAt+9FfuXXWO?=
+ =?us-ascii?Q?97C8UTtncCp0a40yV9juAdyNJW0AvqrgkLIFXWZt5ffC8iPDXZ9k1y6BSMN4?=
+ =?us-ascii?Q?pY+zdk5N6efu5sZC1iye3XPE8xFymZuDEURrh/Bim7TUV6Vse/s/8WkkSocV?=
+ =?us-ascii?Q?APlnycId7Dr3dGL2QaX38hWuVuYg+pj1FcmsYKcFwJzOALLw7UhPZn5ZEwFl?=
+ =?us-ascii?Q?E8oiL2sRdIbHtyKFbbpGTQg29347LocZ1thb6swjme1g5QQTA1Z/jQ=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(52116014)(7416014)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?XwTWAirVAtLILh6SQ2UMbZhH8SkAdjGnjTMvPpRwHvF7HxZ9+E6KCOfgi1Mq?=
+ =?us-ascii?Q?3MafRLjGUag500HKmoHw+vyMObrsNpzbDZD5+RlCoFeK6RbBpt90YSFCdvyc?=
+ =?us-ascii?Q?gKVal6HscOePdOHhjOLaWfXq5vWbW9USfQkQvctGx5Ez4ZQHoD3W0agtjq9I?=
+ =?us-ascii?Q?Rx/yFXirw7CUuAji5+pbsEK65wZN3FelpJsmx5qwMeJoyyZNuBqcY8GpSwba?=
+ =?us-ascii?Q?ZixlGykYKeNvG2cUHXwvE9GPIoHqm09VBHB3mx+Zj6mOySNJ65P/GD+47dEq?=
+ =?us-ascii?Q?CcNL6BpDbdLFtYpWa3jdEFi2vrgS/QBAEHs6X/sM2gxc6vNpUzoJY1Dx7Ve2?=
+ =?us-ascii?Q?zvTtVpCnQvHLoX0rKjLsSfDVZ9MRbghSZcWm7ma1jUzLiOv/2nIdbQUdajeU?=
+ =?us-ascii?Q?CgOTihpIYIPGopAN6a8PyF72bc0s2xoX8KyBT4+rbZDwbHslNW9lyiIVkXsG?=
+ =?us-ascii?Q?1eAZjXTvaxX8hheJI8g11Y7pQFF0W9nD/pLeGvh8WXdg8DMLbfPoCURRkW4d?=
+ =?us-ascii?Q?oc3DlTTI9xSHHHMg52ydGa/8DVGmUwG7w0Yr4KsvGYkgnfZpPAZxWf06jz4b?=
+ =?us-ascii?Q?qTlOoUgjzOkHuH3OolRk+UYpM/aeUXK1ogDNY6/Jms8D9UeRUBtWDKcFMFbg?=
+ =?us-ascii?Q?kMDWo6H+iLagfhBwBwx1OZ33vMXNuqI6Ff//gboM2Kwbb/dqXA7DWFgy9c3N?=
+ =?us-ascii?Q?dd3TJXYFWu8qFntP3GbfQPorVU177yPqnAtmd0HjaBnHb7xDSSO7sgP+axjn?=
+ =?us-ascii?Q?EZSqrf04rc8gCpprINhp2qfvHn67PD//Vt1clCm3nBKDLU9xFjSKS7WRuV8t?=
+ =?us-ascii?Q?+mYHhq6oa3GXMspK5BOHOXQqQYEDZdqF1/DnQh7XOoGfIIvLz+RQFcVws4s+?=
+ =?us-ascii?Q?ksiyw0Eyka3aZ5C9vvwed/i445/SZH/hpfr3Z7FChOi53HKPO5VWs6JcIETP?=
+ =?us-ascii?Q?W8jVA8VnzzrbPcqOkxSznmGwxRx7X/NYUxoYjvLlaXHmcjvsKkyf0gTbUhVn?=
+ =?us-ascii?Q?xFKnIpQsCRCpUmB44f0jssQah/HpoHY1uAzHJWi3+Sk1g15dVITRY0svX/Au?=
+ =?us-ascii?Q?YkGw2j8iXsg21m8OmdwJM1pyBwx6Mfqxf1PWO+pbL4mBcU/KOfT+L6VEMrD9?=
+ =?us-ascii?Q?urBjSGYMCNGecQYk6dfyAmrDs9uJ3TbF1hqvbHTevmf8EzgdgCYjL2R+aUBo?=
+ =?us-ascii?Q?QwVEtB1E2+KnQQzG1YQ2uLKSEAMGtHqfbcQbMHAejnSEfhPm15TcJIdNJ/rS?=
+ =?us-ascii?Q?k2Up1dgBA8ZCS5MG0kfO03HcXbQ1SDf0vk95BCT2isJ7nc7FJBZ71fhCfsYM?=
+ =?us-ascii?Q?RN5g/KSPogZ/3bKSGzoP+2MeLr0AfQ7VDXWcL5KPXvnLJyhaDeRNVMxJ3E5m?=
+ =?us-ascii?Q?/FLMeiB9SedjoFck3E5zulaga4GPSUPA5nmtT6Yg3F+q1rxPaonqWHBlBMjV?=
+ =?us-ascii?Q?QP14G/JwGBUw4rzOPBkRH+K14SCC8SG9x7ZoH3RKAuTIF3MAMiEsaHXYXDIR?=
+ =?us-ascii?Q?XL01dO0DbzEUywDfoUDCroDeHAHLmU9XYeTge5Nmuzqwencs5+9+A5cGz8HX?=
+ =?us-ascii?Q?8dNrXMmUOpiqUJcdiU/y9yV0tAH3yOy9+LyGWjDr?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 972477a3-3905-4341-6517-08dd606162b2
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2025 05:55:56.1059
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: dJZtlRkpmbHhnx69ix8iDyUtQL8sZKV4R0sLeqQies4SVkuOg8x9HPRqqsnMEZB4K8vH21Uqa0ZjE6H+wyIhAQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR04MB10941
 
+This patch set adds the following features.
+1. Compared with ENETC v1, the formats of tables and command BD of ENETC
+v4 have changed significantly, and the two are not compatible. Therefore,
+in order to support the NETC Table Management Protocol (NTMP) v2.0, we
+introduced the netc-lib driver and added support for MAC address filter
+table and RSS table.
+2. Add MAC filter and VLAN filter support for i.MX95 ENETC PF.
+3. Add RSS support for i.MX95 ENETC PF.
+4. Add loopback support for i.MX95 ENETC PF.
 
+---
+v1 Link: https://lore.kernel.org/imx/20250103060610.2233908-1-wei.fang@nxp.com/
+v2 changes
+1. Change NTMP_FILL_CRD() and NTMP_FILL_CRD_EID to functions
+2. Fix the compile warning in enetc4_pf.c
+v2 Link: https://lore.kernel.org/imx/20250113082245.2332775-1-wei.fang@nxp.com/
+v3 changes
+1. Rename ntmp_formats.h to ntmp_private.h, becuase in addition to
+   defining some table formats, some macros and function declarations
+   will be added to this header file in the future
+2. Add struct ntmp_dma_buf, so refactor ntmp_alloc_data_mem() and
+   ntmp_free_data_mem() accordingly
+3. Add the setting for cache attributes of command BD Ring in
+   enetc4_setup_cbdr()
+4. Remove __free() and scoped_guard() from patch "net: enetc: add MAC
+   filter for i.MX95 ENETC PF", as these cleanup APIs are discouraged
+   within networking drivers.
+5. Remove patch "net: enetc: make enetc_set_rxfh() and enetc_get_rxfh()
+   reusable" in v2, and add enetc_set_rss_key() and enetc_get_rss_key()
+   instead of adding .set_rss_key() and .get_rss_key() to enetc_pf_ops
+6. Separate patch " net: enetc: check if the RSS hfunc is toeplitz" from
+   patch "net: enetc: add RSS support for i.MX95 ENETC PF"
+v3 Link:https://lore.kernel.org/imx/20250304072201.1332603-1-wei.fang@nxp.com/
+v4 changes
+1. Optimize the indentation in patch "net: enetc: add MAC filter for
+   i.MX95 ENETC PF"
+2. Remove pack(1) from ntmp.h and ntmp_private.h
+3. Remove the string after "tristate" from CONFG_NXP_NETC_LIB
+4. Separate two patches from the patch "net: enetc: add RSS support for
+   i.MX95 ENETC PF", one is "net: enetc: add set/get_rss_table() to
+   enetc_si_ops", the other one is "net: enetc: make enetc_set_rss_key()
+   reusable"
+5. Remove patch "net: enetc: check if the RSS hfunc is toeplitz" from
+   this patch set.
+---
 
-On 10/3/2025 10:20 pm, Kory Maincent wrote:
-> On Mon, 10 Mar 2025 13:08:35 +0800
-> Choong Yong Liang <yong.liang.choong@linux.intel.com> wrote:
-> 
->> Fix the warning "warn: missing error code? 'ret'" in the
->> intel_tsn_lane_is_available() function.
->>
->> The function now returns 0 to indicate that a TSN lane was found and
->> returns -EINVAL when it is not found.
->>
->> Fixes: a42f6b3f1cc1 ("net: stmmac: configure SerDes according to the
->> interface mode")
->> Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-> 
-> This patch is a fix it should go net instead net-next.
-> Could you resend the patch with net prefix?
-> 
-> Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
-> 
-> Thank you!
+Wei Fang (14):
+  net: enetc: add initial netc-lib driver to support NTMP
+  net: enetc: add command BD ring support for i.MX95 ENETC
+  net: enetc: move generic MAC filterng interfaces to enetc-core
+  net: enetc: add MAC filter for i.MX95 ENETC PF
+  net: enetc: add debugfs interface to dump MAC filter
+  net: enetc: add set/get_rss_table() to enetc_si_ops
+  net: enetc: make enetc_set_rss_key() reusable
+  net: enetc: add RSS support for i.MX95 ENETC PF
+  net: enetc: enable RSS feature by default
+  net: enetc: move generic VLAN filter interfaces to enetc-core
+  net: enetc: move generic VLAN hash filter functions to
+    enetc_pf_common.c
+  net: enetc: add VLAN filtering support for i.MX95 ENETC PF
+  net: enetc: add loopback support for i.MX95 ENETC PF
+  MAINTAINERS: add new file ntmp.h to ENETC driver
 
-Hi Kory,
+ MAINTAINERS                                   |   1 +
+ drivers/net/ethernet/freescale/enetc/Kconfig  |   8 +
+ drivers/net/ethernet/freescale/enetc/Makefile |   4 +
+ drivers/net/ethernet/freescale/enetc/enetc.c  | 103 +++-
+ drivers/net/ethernet/freescale/enetc/enetc.h  |  59 +-
+ .../ethernet/freescale/enetc/enetc4_debugfs.c |  93 +++
+ .../ethernet/freescale/enetc/enetc4_debugfs.h |  20 +
+ .../net/ethernet/freescale/enetc/enetc4_hw.h  |  12 +
+ .../net/ethernet/freescale/enetc/enetc4_pf.c  | 533 +++++++++++++++++-
+ .../net/ethernet/freescale/enetc/enetc_cbdr.c |  69 ++-
+ .../ethernet/freescale/enetc/enetc_ethtool.c  |  69 ++-
+ .../net/ethernet/freescale/enetc/enetc_hw.h   |   6 +
+ .../net/ethernet/freescale/enetc/enetc_pf.c   | 124 +---
+ .../net/ethernet/freescale/enetc/enetc_pf.h   |  30 +-
+ .../freescale/enetc/enetc_pf_common.c         |  46 +-
+ .../freescale/enetc/enetc_pf_common.h         |   2 +
+ .../net/ethernet/freescale/enetc/enetc_vf.c   |  19 +-
+ drivers/net/ethernet/freescale/enetc/ntmp.c   | 458 +++++++++++++++
+ .../ethernet/freescale/enetc/ntmp_private.h   |  63 +++
+ include/linux/fsl/ntmp.h                      | 174 ++++++
+ 20 files changed, 1702 insertions(+), 191 deletions(-)
+ create mode 100644 drivers/net/ethernet/freescale/enetc/enetc4_debugfs.c
+ create mode 100644 drivers/net/ethernet/freescale/enetc/enetc4_debugfs.h
+ create mode 100644 drivers/net/ethernet/freescale/enetc/ntmp.c
+ create mode 100644 drivers/net/ethernet/freescale/enetc/ntmp_private.h
+ create mode 100644 include/linux/fsl/ntmp.h
 
-Thank you for your feedback. I understand that the patch is a fix. However, 
-since the code is not yet in the 'net' tree, we are unable to apply the fix 
-there.
+-- 
+2.34.1
 
-I'm not sure if there is another way to handle this fix other than sending 
-it to the 'net-next' tree. I would appreciate any guidance you might have 
-on this matter.
 
