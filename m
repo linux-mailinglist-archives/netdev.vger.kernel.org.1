@@ -1,78 +1,65 @@
-Return-Path: <netdev+bounces-173737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21FC8A5B84C
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 06:16:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25737A5B892
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 06:33:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61AE4170704
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 05:16:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD52B1890C0B
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 05:34:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B88021E231E;
-	Tue, 11 Mar 2025 05:16:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C28E61EB1A3;
+	Tue, 11 Mar 2025 05:33:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hEY8ksQK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OPNJQ9WO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D8441C72
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 05:16:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 094BF320F;
+	Tue, 11 Mar 2025 05:33:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741670169; cv=none; b=PT5880EVKLGqJ8EMmofODZQsx9+V+mGuIEo47queljSZ0mfFzImbwqJRhHrpiOOCHuLJ7cPNUzyCxvoV6bCF0U+ECRX17i0HEyGLlddbbrgC1WZ7NLS2FhXgflC8hshspq9LlBEhR4Hps/B7kE1fzSArPlIRQpszBqHB5N9Z2Y8=
+	t=1741671230; cv=none; b=XZiwXdRMdgkl9RmbpszxDZYYA/DovCi+EtcRwvBm2FY44vezRSDYQ4ZD/LfMUduh25riE4PXml9k1n/6t45un3bfXVkdeL6dAn3eg9csE8NTx9zMkQIeNmMkv/e0Roov7e1fVdjviNLCJxw1qZYgbAjwVJZ345p44DQ8ciTQ08k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741670169; c=relaxed/simple;
-	bh=If8TTXT/Wai6M4qRo3feeR4EXUWakyg46ExpYc0jMXQ=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=oRxjOKjSn62jRofST7TUyh+n997OK4JVkmv9L4EvxaAuIqA+AIoWOqel7fPpfSsSq1kYjMKweg6ycZ/mR6DPT02p9BtH+gkjr3hSrtdXZ3ApEVxzxNcvpSoSrESrNEXewZU7usF1oPPv0FIQkDhja06jCqEpEy7tM8h2QBeQJ/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hEY8ksQK; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2f42992f608so8442645a91.0
-        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 22:16:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741670167; x=1742274967; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gLdloximMvRWgEEGkWNTCSJkS0eV4oAKG5hy6Bb4LfE=;
-        b=hEY8ksQKuP/L1b0OGF7cYPlHRsuMd+OcgMdw1aW1071q1cs8BZC0C32Z1TgGNhyCZb
-         NX4rHpEpWBRYVUohUJ9PkQDBPYcrkdYm1naKiBajOV9QBRWLhRDpSS3ortV+e7KaF6sG
-         S/CRLZEreO+mHyeRX2ItiuiTZ56XHVQzvxlhcIHmiMI24/euerORQHhmtYByIEIXz8S/
-         nQR0cvIiFKs3qUTAuOuyfOZebNq/FaHeX0JtWSz5pTsd6AL1km+1fpmaTsaBv01n6MYq
-         QsEimjRkb+xhxly56L65woE+A4FGFURB+dwAhpM1VA41smxZvVC/p7ZB3iJhmDQYmS8M
-         mmbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741670167; x=1742274967;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=gLdloximMvRWgEEGkWNTCSJkS0eV4oAKG5hy6Bb4LfE=;
-        b=Wg6/ihfOZkKZm458x4OTYYXYggTJnSvjnZFd+FrM2CtUhM0fP6CjrcICKILzvE8XVC
-         koLvhvBAT0v58st2g6EKHB3pFGTZkUhrHD9zttmdPz3c0pAirkAyU5alGoZWqe+lCind
-         ptRdtexiceLYHynPe2wqbHwA99FWpStBGvj/ao0OvcCii/qAXbgKk4A0lLbNfSgAnl2M
-         F5kXsbuZvmXIYTETYpiuehB2htln61hWUTp6YxaWA5quw+d179RpxbfzBAZnxzfT4vIu
-         HUmb2IygPTM1FOimqvNUkwjiSPfs81i7EnlwlGD+Q+1WZKhlBbrMUxMdu8+IeSA6o6Hj
-         LM2A==
-X-Forwarded-Encrypted: i=1; AJvYcCV88bHj7rsIAlI61I1qiCDood/4HXQD0h28eMxqayEgWNBLkKp4QMU7ofFECxN9gQ94dP48wO4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyeCf48/mdGw723UQCYZ+lzrlaXCrkyKh2Wv7qUXgw3QpxP/epN
-	ojRua8QQYU2G6OIR5f/sc03vo5IG4roaMC+/ny4Tx5gKyS/hFlxe
-X-Gm-Gg: ASbGnctsoWvWkh2j89kesRFDKPl4HpFbCh2W8Ba6qMwZJq7A/ebEkf3L5GoLjA+0HR8
-	Hl89x3xVby/jgxDdKA9hSDgPwa7P9DFcNyvp+f7lJ3PJLMJVZ2zhY7rzxL+c2ZA59NMi+X/2ra/
-	zidrv3HV8dxd24GjNuw0KypIvwrD7CPe4gdKkZIr4ZFQ8XQQmmV1YsrT+P9G9zFDueMKE/tkK1g
-	qnGYFWllwcOghj1r253dewAIMZNnjJkRD9V3sb2hE+96WQYIYuKQ3J3eA+Q0Z+uMtcUD8Or+dj1
-	7reFL7KZcI7J4sWzdlcLWzuHk8Bb4hpKb5Kjj61WOsnIsz29ACyyn8Y=
-X-Google-Smtp-Source: AGHT+IFAtmecsBqXBSwYoPthA8fUaN2nJlg0QONOJ+jC1nVEU/KTQhxfhegnqcnJlYqJSVPEqBHA1A==
-X-Received: by 2002:a05:6a21:4910:b0:1f5:8179:4f47 with SMTP id adf61e73a8af0-1f5817954aamr8270747637.20.1741670166166;
-        Mon, 10 Mar 2025 22:16:06 -0700 (PDT)
-Received: from [147.47.189.163] ([147.47.189.163])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-736cf005d87sm4063798b3a.49.2025.03.10.22.16.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Mar 2025 22:16:05 -0700 (PDT)
-Message-ID: <e7e4e5d5-931d-4506-9d75-b87783011379@gmail.com>
-Date: Tue, 11 Mar 2025 14:16:02 +0900
+	s=arc-20240116; t=1741671230; c=relaxed/simple;
+	bh=DLYuGmG8iFWf5LcT050MwmMyWf6njd/yrSqW870b0NQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kq+7V+qIMUaOck/6JqMh6gwNSgTnfnCXlIw+JPCjIwPWbgewxrOXmmYf3sfCXJuwRq5KG5ICpYUA8YW+Kq6UoAIpOi3UFfZJF7TNARjiS/fKgDsBIU9lhMB8SyCUlyeB/Ce8Lxuoz/3QTzjy7dfylP/ciieI0nzoJTxf/ejZQU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OPNJQ9WO; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741671229; x=1773207229;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=DLYuGmG8iFWf5LcT050MwmMyWf6njd/yrSqW870b0NQ=;
+  b=OPNJQ9WO6owtRiG51u+pD9WpnMUnZXJcfsF0Hk+kBgMbWLk+TX6xHMbJ
+   OHZwngz3pK/euluvYvI2LYYlDfBuFsDg20l9BTlkrQc7agvabwmp1jnJW
+   K5evkPWdt6RQRkXCQ/y0FFDRTUHZ7qN7Wyc1bQn80brjeAUPwGX0dHzxm
+   Iq0SvZgtvTpKvfIrGwoBD3Ji9owwXECjPC9lRJ7WopeZN4MY8ugcnbkBR
+   I1W0E4gjLhdl9eE9RYJpqs4h3G06mTBbqrGivQF90Pjd+rSPGuOrc6U/4
+   apk5PIuTFsK9wx8ru41YAx0Sh7+OroLMGufMotJwHLDOJFBgmhl5bu2Yx
+   g==;
+X-CSE-ConnectionGUID: IfEg6M00RiGDIwGV+PMVHg==
+X-CSE-MsgGUID: luwnjhpdRSaWxN3gEvg08g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11369"; a="42602730"
+X-IronPort-AV: E=Sophos;i="6.14,238,1736841600"; 
+   d="scan'208";a="42602730"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 22:33:47 -0700
+X-CSE-ConnectionGUID: CWULG/1UQUuYYhAiVQ7Zew==
+X-CSE-MsgGUID: nO6dDApWTfWOLHIaR7SBuA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,238,1736841600"; 
+   d="scan'208";a="143395086"
+Received: from choongyo-mobl.gar.corp.intel.com (HELO [10.247.21.123]) ([10.247.21.123])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 22:33:44 -0700
+Message-ID: <3bc2cc11-3a87-479e-a0e0-c593e3214540@linux.intel.com>
+Date: Tue, 11 Mar 2025 13:33:42 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,55 +67,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1 1/1] stmmac: intel: Fix warning message for
+ return value in intel_tsn_lane_is_available()
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Dan Carpenter <dan.carpenter@linaro.org>,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20250310050835.808870-1-yong.liang.choong@linux.intel.com>
+ <20250310152014.1d593255@kmaincent-XPS-13-7390>
 Content-Language: en-US
-To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-From: Kyungwook Boo <bookyungwook@gmail.com>
-Subject: [PATCH iwl-next v2] i40e: fix MMIO write access to an invalid page in
- i40e_clear_hw
-Content-Type: text/plain; charset=UTF-8
+From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+In-Reply-To: <20250310152014.1d593255@kmaincent-XPS-13-7390>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-When the device sends a specific input, an integer underflow can occur, leading
-to MMIO write access to an invalid page.
 
-Prevent the integer underflow by changing the type of related variables.
 
-Signed-off-by: Kyungwook Boo <bookyungwook@gmail.com>
-Link: https://lore.kernel.org/lkml/ffc91764-1142-4ba2-91b6-8c773f6f7095@gmail.com/T/
----
-Changes in v2:
-- Formatting properly
-- Fix variable shadowing
-- Link to v1: https://lore.kernel.org/netdev/55acc5dc-8d5a-45bc-a59c-9304071e4579@gmail.com/
----
- drivers/net/ethernet/intel/i40e/i40e_common.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+On 10/3/2025 10:20 pm, Kory Maincent wrote:
+> On Mon, 10 Mar 2025 13:08:35 +0800
+> Choong Yong Liang <yong.liang.choong@linux.intel.com> wrote:
+> 
+>> Fix the warning "warn: missing error code? 'ret'" in the
+>> intel_tsn_lane_is_available() function.
+>>
+>> The function now returns 0 to indicate that a TSN lane was found and
+>> returns -EINVAL when it is not found.
+>>
+>> Fixes: a42f6b3f1cc1 ("net: stmmac: configure SerDes according to the
+>> interface mode")
+>> Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+> 
+> This patch is a fix it should go net instead net-next.
+> Could you resend the patch with net prefix?
+> 
+> Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
+> 
+> Thank you!
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_common.c b/drivers/net/ethernet/intel/i40e/i40e_common.c
-index 370b4bddee44..b11c35e307ca 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_common.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_common.c
-@@ -817,10 +817,11 @@ int i40e_pf_reset(struct i40e_hw *hw)
- void i40e_clear_hw(struct i40e_hw *hw)
- {
- 	u32 num_queues, base_queue;
--	u32 num_pf_int;
--	u32 num_vf_int;
-+	s32 num_pf_int;
-+	s32 num_vf_int;
- 	u32 num_vfs;
--	u32 i, j;
-+	s32 i;
-+	u32 j;
- 	u32 val;
- 	u32 eol = 0x7ff;
- 
----
-base-commit: 4d872d51bc9d7b899c1f61534e3dbde72613f627
+Hi Kory,
 
-Best regards,
-Kyungwook Boo
+Thank you for your feedback. I understand that the patch is a fix. However, 
+since the code is not yet in the 'net' tree, we are unable to apply the fix 
+there.
+
+I'm not sure if there is another way to handle this fix other than sending 
+it to the 'net-next' tree. I would appreciate any guidance you might have 
+on this matter.
 
