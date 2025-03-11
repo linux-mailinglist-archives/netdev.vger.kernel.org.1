@@ -1,208 +1,145 @@
-Return-Path: <netdev+bounces-173892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19F51A5C26B
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:22:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32338A5C271
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:22:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC6DB1891BA8
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 13:21:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B40317017A
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 13:22:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDC7B1D61A2;
-	Tue, 11 Mar 2025 13:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CFE11ACEB0;
+	Tue, 11 Mar 2025 13:22:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E/SYiNO4"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IVhwc+ZA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D251B87E8;
-	Tue, 11 Mar 2025 13:20:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 367CE1B85C5;
+	Tue, 11 Mar 2025 13:22:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741699231; cv=none; b=gmsQ3z/N60pksvIQ1pA4ROHuwZQsJ3uUKTD2Jj9RDv53lY3ss3tZv+yLP6a+D8POD2Mtc0Ibbd2o1NtYTZAgxHH5EVDqUFcJIyiOHSHqlcLNDfzVZA7Hwv5ufPLLy07AmpAw/MpXGMOw2k3pwNrtexh4lmtKINZqxb1s3r49eh8=
+	t=1741699372; cv=none; b=OsHt31XNqYv8tXo+jkTYX8Tc8eiU60jabKQVLJfjGMBY8oeHD8lmHTjzx5/xwgVUAnFL1+A8+r/2ra4KeKYqMzCexh9ydLcfbce9VkjG/1bQNH7qsW99Sr+ciY0N025jZnXXXQS4GDcLm3k5xciC40uh4mUV2Xq7zXplqm3D7Xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741699231; c=relaxed/simple;
-	bh=ujZv7E5nYkpDuJ4+Pi2QwrZaRLwVykgpid5Kgg0Kjug=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=H7PRZSnQ3tdqG6EaL8pH8zSSZP/qcxyQFa7IWITxe5mawYMRrNIrVh5zCbjbr92LrfKSkGO8GvpY2G5ELgwzuATRe0b5A6T+XruCK0VLysYVxet9gfk9ZyRIomPAvGpHtwQwo66AK4MfY+CgzueUwKQzvcjVwQqdDIyXdM5cLa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E/SYiNO4; arc=none smtp.client-ip=209.85.221.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-524038ba657so2411903e0c.0;
-        Tue, 11 Mar 2025 06:20:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741699229; x=1742304029; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jG32Oauz2hDV9q2BpFy552F2Ma60RDkGby0ei11tRlQ=;
-        b=E/SYiNO4m9EaRIdhiFJW7hTXwcwLOjFDPC+vCVOeV/QDlBFW1lew7Lhowdc5UMVs17
-         2gIXnmIsGCZcgChnBuSdq12S1ch5S9z8TJz5y4hR/CN4a1Wn1iaVo6BMiZnl9LF6jaYN
-         Yl5XAUdTiqmlbz51K0HWAP0WW4Zy93L3rsOiURqhWVwMG0gsBkREXphH2Beeh0l+NAif
-         t+lwy0mRy0NV/5sJ7jIqTjir2OFArgGZo7KjaX/yj5ShVHfmQZDROR8OSv5ISt76Qjcc
-         4cbMQ/TQ4Msi/lejh2MQBjVdBieMFP7BpOkvt8pxGRLHNLuUeZDMmJh+3akfhe67Ne6J
-         Mf0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741699229; x=1742304029;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jG32Oauz2hDV9q2BpFy552F2Ma60RDkGby0ei11tRlQ=;
-        b=cGRCxaBjs9FXwlVToyf3AzbtN2fQbZH5lY7hRG8bLT+w9395ah8/QpKWkgWYOFz93S
-         +CElZl+o48+M2OEsNRYq8x6GW8uRFT4mzxrBbk0SGg5MVmFfi4SH8VGzEMCQqm7dAzU6
-         omCf56jcVhIuGL0nv/gePahiYOIzQW7nFpOAEJeqpUNu/YiX6hWSudf26vjsLraEAvIa
-         HlEB2mFBaM+/H4siNHV1yyZCNCTNLxVGRG9cGM2maTp3crfVhhpQzGQdm0NgkiRpw/1o
-         V5xRuu1IcP3Hxmr/CZTc+z7/JHXF0rhcOSLfMIyeB3mN0pQQ9gbveE55WoUwL0nPGML/
-         mXrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVJ7nJvxoqZDgkzf3WWBr71JRu5zD3LVsF3PQiXphQ2MbdCRfmu1kli/J34EhTyaJ58e+dtldytXSAV@vger.kernel.org, AJvYcCXcmP+tXdHzU7BDVt3KZhtAJjK3ZCULqZghUW/Wcx4Bhm/ipS4qyo8u5n1QwWCsIdJkQQldGhhq@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQ87vyyywE7PpeLfYV4GIA0hOWtarx9RTb1W1EO1D6EDxOkDcO
-	9dC0PU1tMI6R0SGzW3BUnRz7bNQWrkv9yS6P4vhay8OFle9G0R8bu1PzQk9tktPxfWxoOMxESsK
-	fRboFtjdQBD69FyJh758YHd0HOlA=
-X-Gm-Gg: ASbGncvlYF5xxiYkslodBI9OF1XlqWT6LgArDNkEzNUjZNa0yuk/v/rgpDJZfNp1BFd
-	S/wgBO7zWoxaybRdBhMd3xCuXEcSgYq6hLAHXfTCkd2EtKjBn2i9/w/ssCrwHoJVjTNptJNw5hC
-	geynDwhYqymLQs6ewE/LbU+jcVMA==
-X-Google-Smtp-Source: AGHT+IH5Ot4qDEn+dcG95GX7rHERBDIZE9g/5SbpzTjYL9a5kZXtGTj07DwxdqUsxTS40Unad1vxI6B/ZQaIH1FxayY=
-X-Received: by 2002:a05:6122:3d47:b0:523:dbd5:4e7f with SMTP id
- 71dfb90a1353d-52419754983mr2351687e0c.3.1741699228735; Tue, 11 Mar 2025
- 06:20:28 -0700 (PDT)
+	s=arc-20240116; t=1741699372; c=relaxed/simple;
+	bh=I+SCe9MX6V3blbxDTOuaalfFAo7Cc3wjzO0ktOoJzk8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H0SVUinQcCGqZ8O7F5uS4p+t9cM2+C0gnBv5vHSPAqb1xIV7p/+cOH6o2s4h2zaEe3DkYYZ7ukd7yao7W/s2I6koSxTqXG8HA/UaaEi3ww6jcEKfVFDoMgVDVLBbw+KcmlxdHMZa1+G+a+jNX2IqZfs2sa79Tf4UQTqyhXc+4Eg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=IVhwc+ZA; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=q2lRJqxioOkDdgMU0m5I8o/nVWV18+O78LM9RQ0Z25c=; b=IVhwc+ZAAZYERH3aWpS/qKKgSL
+	GLdw9NG8k6Y0LXQyJEFMnB4JGYiiD8w+jWjY3TpwE6Vl2IKq+TT8Kr1VzvQrEFec/cXRAKuzjZr10
+	PUapSgnzpwnOncMnx0owt40uKNXh831iHGYxpOMx1JCaPZOZCwDDKg7Ydl3BpSl9uwQc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1trzZA-004LfG-0m; Tue, 11 Mar 2025 14:22:40 +0100
+Date: Tue, 11 Mar 2025 14:22:40 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Fiona Klute <fiona.klute@gmx.de>
+Cc: netdev@vger.kernel.org,
+	Thangaraj Samynathan <Thangaraj.S@microchip.com>,
+	Rengarajan Sundararajan <Rengarajan.S@microchip.com>,
+	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-list@raspberrypi.com, stable@vger.kernel.org
+Subject: Re: [PATCH] net: usb: lan78xx: Enforce a minimum interrupt polling
+ period
+Message-ID: <42b5d49b-caf8-492d-8dba-b5292279478a@lunn.ch>
+References: <20250310165932.1201702-1-fiona.klute@gmx.de>
+ <11f5be1d-9250-4aba-8f51-f231b09d3992@lunn.ch>
+ <4577e7d7-cadc-41c6-b93f-eca7d5a8eb46@gmx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <Z82tWYZulV12Pjir@shell.armlinux.org.uk> <E1trIA0-005ntK-FS@rmk-PC.armlinux.org.uk>
-In-Reply-To: <E1trIA0-005ntK-FS@rmk-PC.armlinux.org.uk>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Tue, 11 Mar 2025 13:20:02 +0000
-X-Gm-Features: AQ5f1JrO_7vudADXigeeN9yXWooM4iHlgYUlKMy4_xyai_AoXvej3y5kzsc7Vh0
-Message-ID: <CA+V-a8sCxs4MFZgo0q=0HmpyWXk7hYSGq0awm2YuAFZk+x6BEA@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/7] net: stmmac: allow platforms to use PHY tx
- clock stop capability
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Conor Dooley <conor+dt@kernel.org>, Conor Dooley <conor@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, devicetree@vger.kernel.org, 
-	Emil Renner Berthing <kernel@esmil.dk>, Eric Dumazet <edumazet@google.com>, 
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Jose Abreu <joabreu@synopsys.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Minda Chen <minda.chen@starfivetech.com>, 
-	netdev@vger.kernel.org, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Rob Herring <robh@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4577e7d7-cadc-41c6-b93f-eca7d5a8eb46@gmx.de>
 
-On Sun, Mar 9, 2025 at 3:02=E2=80=AFPM Russell King (Oracle)
-<rmk+kernel@armlinux.org.uk> wrote:
->
-> Allow platform glue to instruct stmmac to make use of the PHY transmit
-> clock stop capability when deciding whether to allow the transmit clock
-> from the DWMAC core to be stopped.
->
-> Cc: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac.h     |  1 +
->  .../net/ethernet/stmicro/stmmac/stmmac_main.c    | 16 ++++++++++++----
->  include/linux/stmmac.h                           |  3 ++-
->  3 files changed, 15 insertions(+), 5 deletions(-)
->
-Reviewed-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+On Tue, Mar 11, 2025 at 01:30:54PM +0100, Fiona Klute wrote:
+> Am 10.03.25 um 22:27 schrieb Andrew Lunn:
+> > On Mon, Mar 10, 2025 at 05:59:31PM +0100, Fiona Klute wrote:
+> > > If a new reset event appears before the previous one has been
+> > > processed, the device can get stuck into a reset loop. This happens
+> > > rarely, but blocks the device when it does, and floods the log with
+> > > messages like the following:
+> > > 
+> > >    lan78xx 2-3:1.0 enp1s0u3: kevent 4 may have been dropped
+> > > 
+> > > The only bit that the driver pays attention to in the interrupt data
+> > > is "link was reset". If there's a flapping status bit in that endpoint
+> > > data (such as if PHY negotiation needs a few tries to get a stable
+> > > link), polling at a slower rate allows the state to settle.
+> > 
+> > Could you expand on this a little bit more. What is the issue you are
+> > seeing?
+> 
+> What happens is that *sometimes* when the interface is activated (up, im
+> my case via NetworkManager) during boot, the "kevent 4 may have been
+> dropped" message starts to be emitted about every 6 or 7 ms.
 
-Cheers,
-Prabhakar
+This sounding a bit like an interrupt storm. The PHY interrupt is not
+being cleared correctly. PHY interrupts are level interrupts, so if
+you don't clear the interrupt at the source, it will fire again as
+soon as you re-enable it.
 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/e=
-thernet/stmicro/stmmac/stmmac.h
-> index d87275c1cf23..bddfa0f4aa21 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> @@ -306,6 +306,7 @@ struct stmmac_priv {
->         struct timer_list eee_ctrl_timer;
->         int lpi_irq;
->         u32 tx_lpi_timer;
-> +       bool tx_lpi_clk_stop;
->         bool eee_enabled;
->         bool eee_active;
->         bool eee_sw_timer_en;
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/=
-net/ethernet/stmicro/stmmac/stmmac_main.c
-> index fa1d7d3a2f43..6f29804148b6 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -457,8 +457,7 @@ static void stmmac_try_to_start_sw_lpi(struct stmmac_=
-priv *priv)
->         /* Check and enter in LPI mode */
->         if (!priv->tx_path_in_lpi_mode)
->                 stmmac_set_lpi_mode(priv, priv->hw, STMMAC_LPI_FORCED,
-> -                       priv->plat->flags & STMMAC_FLAG_EN_TX_LPI_CLOCKGA=
-TING,
-> -                       0);
-> +                                   priv->tx_lpi_clk_stop, 0);
->  }
->
->  /**
-> @@ -1104,13 +1103,18 @@ static int stmmac_mac_enable_tx_lpi(struct phylin=
-k_config *config, u32 timer,
->
->         priv->eee_enabled =3D true;
->
-> +       /* Update the transmit clock stop according to PHY capability if
-> +        * the platform allows
-> +        */
-> +       if (priv->plat->flags & STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP)
-> +               priv->tx_lpi_clk_stop =3D tx_clk_stop;
-> +
->         stmmac_set_eee_timer(priv, priv->hw, STMMAC_DEFAULT_LIT_LS,
->                              STMMAC_DEFAULT_TWT_LS);
->
->         /* Try to cnfigure the hardware timer. */
->         ret =3D stmmac_set_lpi_mode(priv, priv->hw, STMMAC_LPI_TIMER,
-> -                                 priv->plat->flags & STMMAC_FLAG_EN_TX_L=
-PI_CLOCKGATING,
-> -                                 priv->tx_lpi_timer);
-> +                                 priv->tx_lpi_clk_stop, priv->tx_lpi_tim=
-er);
->
->         if (ret) {
->                 /* Hardware timer mode not supported, or value out of ran=
-ge.
-> @@ -1269,6 +1273,10 @@ static int stmmac_phy_setup(struct stmmac_priv *pr=
-iv)
->         if (!(priv->plat->flags & STMMAC_FLAG_RX_CLK_RUNS_IN_LPI))
->                 priv->phylink_config.eee_rx_clk_stop_enable =3D true;
->
-> +       /* Set the default transmit clock stop bit based on the platform =
-glue */
-> +       priv->tx_lpi_clk_stop =3D priv->plat->flags &
-> +                               STMMAC_FLAG_EN_TX_LPI_CLOCKGATING;
-> +
->         mdio_bus_data =3D priv->plat->mdio_bus_data;
->         if (mdio_bus_data)
->                 priv->phylink_config.default_an_inband =3D
-> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-> index b6f03ab12595..c4ec8bb8144e 100644
-> --- a/include/linux/stmmac.h
-> +++ b/include/linux/stmmac.h
-> @@ -183,7 +183,8 @@ struct dwmac4_addrs {
->  #define STMMAC_FLAG_INT_SNAPSHOT_EN            BIT(9)
->  #define STMMAC_FLAG_RX_CLK_RUNS_IN_LPI         BIT(10)
->  #define STMMAC_FLAG_EN_TX_LPI_CLOCKGATING      BIT(11)
-> -#define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY   BIT(12)
-> +#define STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP      BIT(12)
-> +#define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY   BIT(13)
->
->  struct plat_stmmacenet_data {
->         int bus_id;
-> --
-> 2.30.2
->
+So which PHY driver is being used? If you look for the first kernel
+message about the lan78xx it probably tells you.
+
+> [   27.918335] Call trace:
+> [   27.918338]  console_flush_all+0x2b0/0x4f8 (P)
+> [   27.918346]  console_unlock+0x8c/0x170
+> [   27.918352]  vprintk_emit+0x238/0x3b8
+> [   27.918357]  dev_vprintk_emit+0xe4/0x1b8
+> [   27.918364]  dev_printk_emit+0x64/0x98
+> [   27.918368]  __netdev_printk+0xc8/0x228
+> [   27.918376]  netdev_info+0x70/0xa8
+> [   27.918382]  phy_print_status+0xcc/0x138
+> [   27.918386]  lan78xx_link_status_change+0x78/0xb0
+> [   27.918392]  phy_link_change+0x38/0x70
+> [   27.918398]  phy_check_link_status+0xa8/0x110
+> [   27.918405]  _phy_start_aneg+0x5c/0xb8
+> [   27.918409]  lan88xx_link_change_notify+0x5c/0x128
+> [   27.918416]  _phy_state_machine+0x12c/0x2b0
+> [   27.918420]  phy_state_machine+0x34/0x80
+> [   27.918425]  process_one_work+0x150/0x3b8
+> [   27.918432]  worker_thread+0x2a4/0x4b8
+> [   27.918438]  kthread+0xec/0xf8
+> [   27.918442]  ret_from_fork+0x10/0x20
+> [   27.918534] lan78xx 2-3:1.0 enp1s0u3: kevent 4 may have been dropped
+> [   27.924985] lan78xx 2-3:1.0 enp1s0u3: kevent 4 may have been dropped
+
+Ah, O.K. This tells me the PHY is a lan88xx. And there is a workaround
+involved for an issue in this PHY. Often PHYs are driven by polling
+for status changes once per second. Not all PHYs/boards support
+interrupts. It could be this workaround has only been tested with
+polling, not interrupts, and so is broken when interrupts are used.
+
+As a quick hack test, in lan78xx_phy_init()
+
+	/* if phyirq is not set, use polling mode in phylib */
+	if (dev->domain_data.phyirq > 0)
+		phydev->irq = dev->domain_data.phyirq;
+	else
+		phydev->irq = PHY_POLL;
+
+Hard code phydev->irq to PHY_POLL, so interrupts are not used.
+
+See if you can reproduce the issue when interrupts are not used.
+
+	Andrew
 
