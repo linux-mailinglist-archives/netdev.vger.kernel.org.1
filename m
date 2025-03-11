@@ -1,122 +1,203 @@
-Return-Path: <netdev+bounces-173900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6BBBA5C2D7
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:38:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F0A5A5C2F2
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:44:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4BC3176718
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 13:38:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6715316CE7A
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 13:44:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9547F156C62;
-	Tue, 11 Mar 2025 13:38:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 451EC1C5F14;
+	Tue, 11 Mar 2025 13:44:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="AYP64sv5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EUqtzIUq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0A9378F5D
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 13:38:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FF3B1F94D
+	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 13:44:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741700315; cv=none; b=LNNgP6IUm3qnr7RAtkGLuZ9m2E02iXTC/OEsjlbh8Aqm+zrxJGEYVX3mXx0KWDBCsaX15jctujUHzGroiai2wE+neX0E1zAevEZNrLDwHhGEcJbN3GpUF+K2H3Y5q1QTDDpNc/IYxGmPKHDi0ep8HZuulMOlodHzRkI7JD3l5qs=
+	t=1741700667; cv=none; b=d9cKmOM+LEbdtfmWLSQ5EyAJ2tB9sly5LxGA6xuPOYxksnhvVJyfmbISlfhbvZ6GrcUF1yKZ1RxKPWRZ9XMb69rv2Qi1yEYPPY1e1u7DUvQJ8vY06h16BX4LFSNAvKnF48o31RJJo6c9jXE2iKoJDXtW1yfTIxUYud3w2hMS8k0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741700315; c=relaxed/simple;
-	bh=bBJQCSVDhR9SsbJ+kSxMhSOrKIM8NEQTA0tZt72ZIBE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gfSEyels2fas76ZgX7ULxWLI+ghUosXl44x1fM4Zm4Re3KSphOMMeMN20DsPxsciEoRto4hMb9/VxDLPDrNwfqCbF1JzWTiGW55f6fXYMpzrLaBf2MbourWfr9d0+GxdYwn51RxA1Uk9Z3J4Ou4Rz3Da141L+vp5Gf2hqVHkI6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=AYP64sv5; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43cef035a3bso17604565e9.1
-        for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 06:38:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1741700311; x=1742305111; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bBJQCSVDhR9SsbJ+kSxMhSOrKIM8NEQTA0tZt72ZIBE=;
-        b=AYP64sv5VjWmcle8THL2IQRxH/cq8d74cNOK1X7kH6/mBhaa/FsPHt5BZtWAR9QzDm
-         xmHPqk42Yz4I+QUo9S95P4ke4aKGW9Ps8XOAABM88fEqpblbSaZpsNLRUwH8UQP2ycya
-         C08MNO/Nb7+dYz8sTLTz4GrVbRvUGyFMDzSJagJv4hg3sJBTt2+XsPpJv6+6mx9/T1a9
-         lyTGXfub46IDd+d8sUCTdvi3iZqYPO99PEOkgakCVX+QjnpFkbJvgOFLiOnzblQxUSWQ
-         +wcvyRvAbPvxjU39U5tINf94oXHEGK1N73BWbdIeIAN13GMqljKJ7BaELI6mQTfZl8VN
-         x1yA==
+	s=arc-20240116; t=1741700667; c=relaxed/simple;
+	bh=ZDvh640mXUQQF6buBwSlPYU4wimDdWWpP0QsQuvfiII=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=BI9qlV66LbTyd+KbolPnDVH6HeFq2WeH0ujNofEaPhj+2DptAY80bDiwt4+zhzDE69M973sffY474OiuQaCgXvDw2Bh2n9yd7ywJvgydnj+9mPC7o0PA/cawqdmjTJD+5bXcaBeAZ/T0BN+uOVAZq4OqrZJN1Lqf0B3zuMucGiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EUqtzIUq; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741700664;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZDvh640mXUQQF6buBwSlPYU4wimDdWWpP0QsQuvfiII=;
+	b=EUqtzIUqKzfXAOUwhXqGf2YO36s7nD4smKam1WKzfi1viK2xDlEusTTgS3I3s6mTA65xJ+
+	gRgry3/7G6nZllgRJ/BZf4ch4JbSbvMlfHH5Gy9s+bWIGzPHdmNjjP2iKJvpC7h6YhbMA3
+	NUgqTm6LARYvGkaI0imY3u360+3dO+4=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-175-uKRNHMF1OeykszuG5e1mMw-1; Tue, 11 Mar 2025 09:44:22 -0400
+X-MC-Unique: uKRNHMF1OeykszuG5e1mMw-1
+X-Mimecast-MFC-AGG-ID: uKRNHMF1OeykszuG5e1mMw_1741700661
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-308fefb2bd0so24731751fa.1
+        for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 06:44:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741700311; x=1742305111;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bBJQCSVDhR9SsbJ+kSxMhSOrKIM8NEQTA0tZt72ZIBE=;
-        b=q34VYjiwflPzqtU6L2Fl8fezGK1XX79TKtl3ORNpyk+Ey6ggBTFhjUh+aQEN+cSRbB
-         L7J1VfUE7dKc/zTOlvsqAhP6BwYq8e1GtNopRHhMGvKiod7/xizGxP7vsm9EjDN9SrmX
-         LwPgNMXrqZfCxTD+DyFeVuaYg3mIdEw0dfZjkpCXUQXY6zc5yRoWk42pNH5fLMSEMA36
-         aEid4AaxVkdcdBfX8/BhWWwQBu8K/r4+Q4SF4n7JUm6Uad7bl5q4wyU1MTVc5ryYblM/
-         C35Pw6QgWiqiaMMprJ/2/YuAO3JMfJcdloH1UR9EZTGdJLXa1L9RdOmWerC90t+GeG/i
-         UYYg==
-X-Gm-Message-State: AOJu0YwIcxhULSPylgtAY7/NXK/r3GaKT8brIRRszdmC1CMrtGbjwQ0M
-	KLWGQYM+JaAT6kPG+aGjPNqq95c58UD1zLguyGnRjBYWEo8WL+B2EVH0aHBq+1Y=
-X-Gm-Gg: ASbGncscrLCcz5Le9MYseDg1Pk/yhvUvaakBk55QS2eTPhMsX/w5oG/FtxFWYhaepI7
-	QSLA6cc82O794VJ5Kg80m/4Rey0plzyorMvFEypFFlDTq4X1wGxFUXIfWI+pJ9+6Ge1ek32SmK2
-	kwN94US2Up0D5QYO3CTxYp8BQ20k6bmqx51Z5nkVR2qF+B7MBmXOFBxStK7E+gh6KZgJKFen7/7
-	7rDdW7hgjyv38q1whDwZivWt4k7lmsz1kVKW8tyqQpuIDBhA9BNHxNpb3MlSqQNQhpGpRgz3PA1
-	i0inpXswD2AIGPWLtt38qvgXAOscXjfdlt60Xxj4JV9cnpoxrfKLtSsmZffbqogRNgOymzM=
-X-Google-Smtp-Source: AGHT+IHI30fvE7HydHTlO20/cfGLT5bdzqrK3KYWhu8babl7x/IMoS1GTjRhMhqNQEazIh5LGz/89g==
-X-Received: by 2002:a05:6000:1862:b0:391:2c09:bdef with SMTP id ffacd0b85a97d-39132d87f62mr14447036f8f.30.1741700310880;
-        Tue, 11 Mar 2025 06:38:30 -0700 (PDT)
-Received: from jiri-mlt.client.nvidia.com ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c0e34fasm18264807f8f.75.2025.03.11.06.38.25
+        d=1e100.net; s=20230601; t=1741700660; x=1742305460;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZDvh640mXUQQF6buBwSlPYU4wimDdWWpP0QsQuvfiII=;
+        b=ZfabmE8eXtEamJrEqdHo33L0tTTD22n9v++NY9HTdXXxlY7aphjEM47TeGlISGDkIJ
+         5SYmG67hcV9JM7smiVwhmuYKcTA9ZaOHnlQU0s3GyoSeZCHrkPH2mTR+c3yYKFqsLOYy
+         mfWkJ0eN7aJTfY/pDA6kgFdc6lf4gndfMD3uq9w+MkrGyNC7KL381H2YtDgNUZZV8kC1
+         XoTXUCn1CyqYUZ6s0F5Vk66Uxwlfg7ZLcWE6KA8WKlME6HYwXrt0Lt0NGYlvvu0QiGBS
+         klft+mZ75WfZjqQeL2dYCmdGzzURzVRiw2XXSUcQ3D+cMQc1+kFeoFztXchZRFJs9STr
+         ULhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX129bWyLHWi2xgM8xmTPnKtdQhmh4nycZpq2hwO/2cxFLIdwJdwTn1VgFS1v5kAebm7sONlRQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7gECJgMB3rmf1fOKOrIJwoVvqz97XnVqWUPxWGwcEv1mLJWIm
+	Po1JqSudMHV11X4ny5Zow3JDsnE8ESftc35QaPLX+uCHb7rmvtJOGUyUjY9FWTnIrYmuKI9sx+f
+	u+skUmeecVVIpoZ64ie3Hrg3Wr09iVsyWaV1FNyK9O03OZWSu0KpzSA==
+X-Gm-Gg: ASbGncs3PDBN9FCmgF4GQloxTkkUHkSWFlTxamO5mFPYxO9dc0hQJlDL6s919ei4IMO
+	C9eeqpBGt0EYpGOwBSEYnSvscmocg0to3bxQNk2/Wrutyv9auhVmJFUdvtKu+PrKhD4YOQHr9s8
+	nA8+kgMjgfC0izqQ59rpNZ8OVqbM3G6pcGjLJ/LGgAqfVBUUABukRhGUY+JsJeRG/IcVs4lpfqR
+	9W6oue1IDGMh1tYiGX3gnt/4Ivnx2MHpssnkZFgzKx3Ih7fDENQjdmhp8dcav8jLqvelu9X4ILS
+	OezDZvkIKTmJ
+X-Received: by 2002:a2e:b8d2:0:b0:308:eb58:6580 with SMTP id 38308e7fff4ca-30bf46387a6mr58649101fa.33.1741700660354;
+        Tue, 11 Mar 2025 06:44:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG1tGX9fEpRk8FaOlpVoYgpzUcN+2qhGPldpH8b1ULOUF6Trv2KpWAfRh7Mt31RQi4bHuMV0w==
+X-Received: by 2002:a2e:b8d2:0:b0:308:eb58:6580 with SMTP id 38308e7fff4ca-30bf46387a6mr58648961fa.33.1741700659848;
+        Tue, 11 Mar 2025 06:44:19 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-30bfd2737a6sm14329771fa.103.2025.03.11.06.44.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Mar 2025 06:38:30 -0700 (PDT)
-Date: Tue, 11 Mar 2025 14:38:22 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Cosmin Ratiu <cratiu@nvidia.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"horms@kernel.org" <horms@kernel.org>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, 
-	"davem@davemloft.net" <davem@davemloft.net>, Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, 
-	Leon Romanovsky <leonro@nvidia.com>, "edumazet@google.com" <edumazet@google.com>, 
-	"kuba@kernel.org" <kuba@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Carolina Jubran <cjubran@nvidia.com>, "pabeni@redhat.com" <pabeni@redhat.com>
-Subject: Re: net-shapers plan
-Message-ID: <czbmzydl32avn6gnwfrsmilemcmajcklnsv6rrlhrcas7iwpjc@wmqwsth6wj27>
-References: <d9831d0c940a7b77419abe7c7330e822bbfd1cfb.camel@nvidia.com>
+        Tue, 11 Mar 2025 06:44:18 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 9882818FA5AA; Tue, 11 Mar 2025 14:44:15 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Pavel Begunkov <asml.silence@gmail.com>, Mina Almasry
+ <almasrymina@google.com>, David Wei <dw@davidwei.uk>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, "David
+ S. Miller" <davem@davemloft.net>, Yunsheng Lin <linyunsheng@huawei.com>,
+ Yonglong Liu <liuyonglong@huawei.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, linux-mm@kvack.org, netdev@vger.kernel.org
+Subject: Re: [RFC PATCH net-next] page_pool: Track DMA-mapped pages and
+ unmap them when destroying the pool
+In-Reply-To: <edc407d1-bd76-4c6b-a2b1-0f1313ca3be7@gmail.com>
+References: <20250308145500.14046-1-toke@redhat.com>
+ <CAHS8izPLDaF8tdDrXgUp4zLCQ4M+3rz-ncpi8ACxtcAbCNSGrg@mail.gmail.com>
+ <87cyeqml3d.fsf@toke.dk> <edc407d1-bd76-4c6b-a2b1-0f1313ca3be7@gmail.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Tue, 11 Mar 2025 14:44:15 +0100
+Message-ID: <87tt7ziswg.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d9831d0c940a7b77419abe7c7330e822bbfd1cfb.camel@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Thu, Mar 06, 2025 at 03:03:54PM +0100, cratiu@nvidia.com wrote:
+Pavel Begunkov <asml.silence@gmail.com> writes:
 
-[...]
-
+> On 3/9/25 12:42, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>> Mina Almasry <almasrymina@google.com> writes:
+>>=20
+>>> On Sat, Mar 8, 2025 at 6:55=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen=
+ <toke@redhat.com> wrote:
+>>>>
+>>>> When enabling DMA mapping in page_pool, pages are kept DMA mapped until
+>>>> they are released from the pool, to avoid the overhead of re-mapping t=
+he
+>>>> pages every time they are used. This causes problems when a device is
+>>>> torn down, because the page pool can't unmap the pages until they are
+>>>> returned to the pool. This causes resource leaks and/or crashes when
+>>>> there are pages still outstanding while the device is torn down, becau=
+se
+>>>> page_pool will attempt an unmap of a non-existent DMA device on the
+>>>> subsequent page return.
+>>>>
+>>>> To fix this, implement a simple tracking of outstanding dma-mapped pag=
+es
+>>>> in page pool using an xarray. This was first suggested by Mina[0], and
+>>>> turns out to be fairly straight forward: We simply store pointers to
+>>>> pages directly in the xarray with xa_alloc() when they are first DMA
+>>>> mapped, and remove them from the array on unmap. Then, when a page pool
+>>>> is torn down, it can simply walk the xarray and unmap all pages still
+>>>> present there before returning, which also allows us to get rid of the
+>>>> get/put_device() calls in page_pool.
+>>>
+>>> THANK YOU!! I had been looking at the other proposals to fix this here
+>>> and there and I had similar feelings to you. They add lots of code
+>>> changes and the code changes themselves were hard for me to
+>>> understand. I hope we can make this simpler approach work.
+>>=20
+>> You're welcome :)
+>> And yeah, me too!
+>>=20
+>>>> Using xa_cmpxchg(), no additional
+>>>> synchronisation is needed, as a page will only ever be unmapped once.
+>>>>
+>>>
+>>> Very clever. I had been wondering how to handle the concurrency. I
+>>> also think this works.
+>>=20
+>> Thanks!
+>>=20
+>>>> To avoid having to walk the entire xarray on unmap to find the page
+>>>> reference, we stash the ID assigned by xa_alloc() into the page
+>>>> structure itself, in the field previously called '_pp_mapping_pad' in
+>>>> the page_pool struct inside struct page. This field overlaps with the
+>>>> page->mapping pointer, which may turn out to be problematic, so an
+>>>> alternative is probably needed. Sticking the ID into some of the upper
+>>>> bits of page->pp_magic may work as an alternative, but that requires
+>>>> further investigation. Using the 'mapping' field works well enough as
+>>>> a demonstration for this RFC, though.
+>>>>
+>>>
+>>> I'm unsure about this. I think page->mapping may be used when we map
+>>> the page to the userspace in TCP zerocopy, but I'm really not sure.
+>>> Yes, finding somewhere else to put the id would be ideal. Do we really
+>>> need a full unsigned long for the pp_magic?
+>>=20
+>> No, pp_magic was also my backup plan (see the other thread). Tried
+>> actually doing that now, and while there's a bit of complication due to
+>> the varying definitions of POISON_POINTER_DELTA across architectures,
+>> but it seems that this can be defined at compile time. I'll send a v2
+>> RFC with this change.
 >
->3. Add a new DEVLINK binding type for the hierarchy, to be able to
->represent netdev groups. That part of the hierarchy would be stored in
->the devlink object instead of the netdev. This allows separation
->between the VM and the hypervisor parts of the hierarchy.
-
-[...]
-
+> FWIW, personally I like this one much more than an extra indirection
+> to pp.
 >
->3. Extend NODE scope to group multiple netdevs and new DEVLINK binding
->Today, all net-shapers objects are owned by a netdevice. Who should own
->a net shaper that represents a group of netdevices? It needs to be a
->stable object that isn't affected by group membership changes and
->therefore cannot be any netdev from the group. The only sensible option
->would be to pick an object corresponding to the eswitch to own such
->groups, which neatly corresponds to the devlink object today.
+> If we're out of space in the page, why can't we use struct page *
+> as indices into the xarray? Ala
+>
+> struct page *p =3D ...;
+> xa_store(xarray, index=3D(unsigned long)p, p);
+>
+> Indices wouldn't be nicely packed, but it's still a map. Is there
+> a problem with that I didn't consider?
 
-Could you be litte bit more descriptive about this? I don't understand
-why you need group of netdevices. I understand that for devlink binding,
-you have usecase for group (devlink rate node). But do you have a
-usecase for group of netdevices? Perhaps I'm missing something.
+Huh. As I just replied to Yunsheng, I was under the impression that this
+was not supported. But since you're now the second person to suggest
+this, I looked again, and it looks like I was wrong. There does indeed
+seem to be other places in the kernel that does this.
 
-[...]
+As you say the indices won't be as densely packed, though. So I'm
+wondering if using the bits in pp_magic would be better in any case to
+get the better packing? I guess we can try benchmarking both approaches
+and see if there's a measurable difference.
+
+-Toke
+
 
