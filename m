@@ -1,136 +1,147 @@
-Return-Path: <netdev+bounces-173805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99DFDA5BBEA
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 10:20:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0CC4A5BC0C
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 10:25:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51C73188B02D
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 09:21:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF0B5172950
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 09:25:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7083A1EBFED;
-	Tue, 11 Mar 2025 09:20:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66B9822A4EC;
+	Tue, 11 Mar 2025 09:25:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X8jLv+lx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IpIfQsS8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A25DF1E32D6
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 09:20:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E63622425D
+	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 09:25:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741684851; cv=none; b=TrKJNlZit/oxYsOpowRXQruZ/Lyzr9ROFBi0wIhwTOWxdUGOW+aEJxYIHwRvnntAQOuNMUlkimvGoGy5lK4xLCTOw7f/2ieSJNXQcvkOVcI2MjqzX1OnoKQK5VV9PzgcCfhR93u9xW0lByjBa78c++V62NWYQl9874pR0F0ekKw=
+	t=1741685117; cv=none; b=CLhckEx54Rc+ZO42oAsNAg03soJgkZOB6uvspxk/p11e7WvKX6IsZ53AGZnqd8B4CTRF30ox6rdWOriCYAuaXvJlNIDblVC4BjD1u14S6sALMrcwSmdJ+ypmjpvRpCoEWVOyioCIvhku0rNCTDHJay2Z3Jj5QEN1sw8THaoSQ4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741684851; c=relaxed/simple;
-	bh=Eitzj/kDcL0rzS7h1KOU4+wpLzl1Qpg7WKR2rHgnWdE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dfI4XUvqK1JXxyUyzYnK1Z31IJlzOx9cpqGgdp263WqdrBgRnRFoZ88oBUE5hVZMuyenJvh0q5wlCDq/iZWAk38w7yW2dl5U7KEbDc0wEhCh/g4UPEEznnjLaebFwdWkVT5KtQAChzql6hkPH49872rK32WLALjfN2GsbjDfOsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X8jLv+lx; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741684849; x=1773220849;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Eitzj/kDcL0rzS7h1KOU4+wpLzl1Qpg7WKR2rHgnWdE=;
-  b=X8jLv+lx/WdXZRtlR3AjT1Rxl/VXKvYfE+0Pq6Q9UZYRw9ml5Fbv264N
-   vcS99jf5C5ONjVLANgyjZWSWoJI9xgLnR4th/FLhX69vU27ibrRnCpQN6
-   GNeloObff45t2J28GnnjFslDzpYDNa15UDxkjtGQh7TQnFLcyo03wfp9r
-   Z6M+Bh/LrPntLYNgt+FL5ZRFY6gRMXJjoP0/bkYU5UgX6mbxKhM9jgKGh
-   RLzdG3nH2q9hNijv8yZGI2aTA7R5vnZZd/DxJz76wK+jF6cJ0sZTcoLAm
-   BW6oKgYpnI3/BcjxmKcvMynJkVNFy6QVjWNYw6cLMrFMchC+RWxLa6zhL
-   A==;
-X-CSE-ConnectionGUID: cMKspIUVQT240PslZOPo+w==
-X-CSE-MsgGUID: We/j8mS4Q9yY5XJo4jED9A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11369"; a="46360869"
-X-IronPort-AV: E=Sophos;i="6.14,238,1736841600"; 
-   d="scan'208";a="46360869"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2025 02:20:49 -0700
-X-CSE-ConnectionGUID: Lk4bLG3sQ4+JDLrx7MzvGg==
-X-CSE-MsgGUID: Yb4aYY9CQB+XmigzkorN1g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,238,1736841600"; 
-   d="scan'208";a="120187881"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2025 02:20:47 -0700
-Date: Tue, 11 Mar 2025 10:16:55 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Pierre Riteau <pierre@stackhpc.com>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, horms@kernel.org,
-	Dan Carpenter <error27@gmail.com>
-Subject: Re: [net v1] devlink: fix xa_alloc_cyclic error handling
-Message-ID: <Z8//h7IT3cf01bxB@mev-dev.igk.intel.com>
-References: <20250214132453.4108-1-michal.swiatkowski@linux.intel.com>
- <2fcd3d16-c259-4356-82b7-2f1a3ad45dfa@lunn.ch>
- <Z69MESaQ4cUvIy4z@mev-dev.igk.intel.com>
- <c22f5a47-7fe0-4e83-8a0c-6da78143ceb3@redhat.com>
- <CA+ny2sxC2Y7bxhkO7HqX+6E_Myf24_trmCUrroKFkyoce7QC9A@mail.gmail.com>
+	s=arc-20240116; t=1741685117; c=relaxed/simple;
+	bh=AqhQEZMgKAb1ifuwL1FBr3WdjgDEuno+K3aftA8cbus=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mKfr3xLaOzMC4OrsQ5JEL21sNEYmedrM5ZK7e07AMtEyxIfzdwqI55FZbxyP7VH4SKmv+zbVS+/VgoywPBq9/wTcOlymbVFM0RfIpHgqnSGXk2dPGbMYbkVKl93dG9B/BN2xK/Kq0gFsEml2ndSmLtjGkzJXazICsAEq4AhE7RE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IpIfQsS8; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741685114;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9/SZDq6Z6N3N3ep/tmjky/rB67JOIGO9Ha7z2u/VzHQ=;
+	b=IpIfQsS8OT4HRyZ0BXLFyHZZ44F5pPl6nDBLvjdwzyLb8cqjabuNgf6DBEsCrFIplB/I5J
+	IsUsXjuW0IovArhUC4And8GdD7g8P8mup2SZRTWwM1qPgBBKKzjl33kaN4wFXJR/4IJRdn
+	kEA1IpTm+NI5TKCWIfLTMfcCcz97QTQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-611-AtqSzCk6PtuLO5c0UQKFLg-1; Tue, 11 Mar 2025 05:25:12 -0400
+X-MC-Unique: AtqSzCk6PtuLO5c0UQKFLg-1
+X-Mimecast-MFC-AGG-ID: AtqSzCk6PtuLO5c0UQKFLg_1741685111
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43cf1af74f7so11840075e9.2
+        for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 02:25:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741685111; x=1742289911;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9/SZDq6Z6N3N3ep/tmjky/rB67JOIGO9Ha7z2u/VzHQ=;
+        b=KtNa3rz1mcpnsBfwMrhcNr3hIIBLkdbjwXQ7VcQBejVtCnZ7JnKdnXP4dQzuE0hWtr
+         fWZIIXvbvr/2JC8ETXuM5vPPisM/YKiVBhnEzbWWs5LDNDAfNpLotcQw+36uh5cuNWdi
+         vval8YTghwOhdqjL6qnB9Gw0/DE+o00JIaipFL/iMoT7+ARiA6+c6GWH2iKTpZhBahPa
+         +CuaHUGLLQvkx+q//ls3u49njTQQy1OoTZvbiFGGhQ6wCvwdKB0N/O0DcmJLHBONsLLn
+         MKKpOQLASsLj0a5M+FRFBZ/ZeY641ACtSBLyH3SN59p6ElZOHs7KUEWDJGy6fDIrPCOD
+         KTkg==
+X-Forwarded-Encrypted: i=1; AJvYcCU0m8a8N+DyRGPvlVOlP3oMM1W+I7XEdWi81APupt1xNbVGHgBmMBLlMHvO4jSOKmbjCYPOsyc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyW+PvtVtRw0xHiR3YsCpLydR2z4wcJcmUrzT3N9uUjHN0Z+hpx
+	lM5/+TGCjgTZgRwrGqBB5C1MTBg/EwlWWKF6GnuGPYNEn3EBEXT15jcJQdzew/ISXBSIwdl9T4K
+	mgIxGHjgjJGMSNGLWLUxp5GmFCrbtzrtK9eqXV+o5gNBFa0vS2dxzXQ==
+X-Gm-Gg: ASbGnct8JLmvH0lVFsPPL9hlfNvIJQoa7ZhLRWY2hYpQh/eUKuHx80LA/aGn6Ybwfl+
+	oR+2kClJTOCBGqkhQSOO7wq+qUQsJWOKREBMLzyjy2U1xMJCzAd2UYrufXuN97hL2OcD3USUr9c
+	1Z/nMeiAVZ+s1oqplnzTsOZFsimgmALOZ7bFjaw/j5iX4ZxirsgoxTwA5WNgczVfVC2KbwCc+jd
+	3qHgNBHTds60du1gTa2aBPtT03FwIU+lFlZM0XeQZ5hhAW5DxeutCcmTDEJyY3h6e2pjxjxCjuu
+	GVXcZxw7qgVtruhRXdYK4sRonDBNOoKiFrq7d+AIn1CetA==
+X-Received: by 2002:a05:600c:510e:b0:43d:683:8caa with SMTP id 5b1f17b1804b1-43d068397bemr9363265e9.15.1741685111358;
+        Tue, 11 Mar 2025 02:25:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGqZDh76W9UzPli/AM+ArV3FiA6G6KprrtJ2Fr44sE+79dvvLKGAWbiOxHsNDTPh/JHiULugQ==
+X-Received: by 2002:a05:600c:510e:b0:43d:683:8caa with SMTP id 5b1f17b1804b1-43d068397bemr9362935e9.15.1741685111020;
+        Tue, 11 Mar 2025 02:25:11 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-12-146.dyn.eolo.it. [146.241.12.146])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912bfdfb16sm17334070f8f.29.2025.03.11.02.25.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Mar 2025 02:25:10 -0700 (PDT)
+Message-ID: <978a9d2c-b82c-4209-ba95-8674b149294a@redhat.com>
+Date: Tue, 11 Mar 2025 10:25:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+ny2sxC2Y7bxhkO7HqX+6E_Myf24_trmCUrroKFkyoce7QC9A@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 0/8] enic:enable 32, 64 byte cqes and get max
+ rx/tx ring size from hw
+To: Simon Horman <horms@kernel.org>, satishkh@cisco.com
+Cc: Christian Benvenuti <benve@cisco.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Nelson Escobar <neescoba@cisco.com>, John Daley <johndale@cisco.com>
+References: <20250304-enic_cleanup_and_ext_cq-v2-0-85804263dad8@cisco.com>
+ <20250306145604.GB3666230@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250306145604.GB3666230@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 10, 2025 at 12:42:13PM +0100, Pierre Riteau wrote:
-> On Tue, 18 Feb 2025 at 12:56, Paolo Abeni <pabeni@redhat.com> wrote:
-> >
-> >
-> >
-> > On 2/14/25 2:58 PM, Michal Swiatkowski wrote:
-> > > On Fri, Feb 14, 2025 at 02:44:49PM +0100, Andrew Lunn wrote:
-> > >> On Fri, Feb 14, 2025 at 02:24:53PM +0100, Michal Swiatkowski wrote:
-> > >>> Pierre Riteau <pierre@stackhpc.com> found suspicious handling an error
-> > >>> from xa_alloc_cyclic() in scheduler code [1]. The same is done in
-> > >>> devlink_rel_alloc().
-> > >>
-> > >> If the same bug exists twice it might exist more times. Did you find
-> > >> this instance by searching the whole tree? Or just networking?
-> > >>
-> > >> This is also something which would be good to have the static
-> > >> analysers check for. I wounder if smatch can check this?
-> > >>
-> > >>      Andrew
-> > >>
-> > >
-> > > You are right, I checked only net folder and there are two usage like
-> > > that in drivers. I will send v2 with wider fixing, thanks.
-> >
-> > While at that, please add the suitable fixes tag(s).
-> >
-> > Thanks,
-> >
-> > Paolo
+On 3/6/25 3:56 PM, Simon Horman wrote:
+> On Tue, Mar 04, 2025 at 07:56:36PM -0500, Satish Kharat via B4 Relay wrote:
+>> This series enables using the max rx and tx ring sizes read from hw.
+>> For newer hw that can be up to 16k entries. This requires bigger
+>> completion entries for rx queues. This series enables the use of the
+>> 32 and 64 byte completion queues entries for enic rx queues on
+>> supported hw versions. This is in addition to the exiting (default)
+>> 16 byte rx cqes.
+>>
+>> Signed-off-by: Satish Kharat <satishkh@cisco.com>
+>> ---
+>> Changes in v2:
+>> - Added net-next to the subject line.
+>> - Removed inlines from function defs in .c file.
+>> - Fixed function local variable style issues.
+>> - Added couple of helper functions to common code.
+>> - Fixed checkpatch errors and warnings.
+>> - Link to v1: https://lore.kernel.org/r/20250227-enic_cleanup_and_ext_cq-v1-0-c314f95812bb@cisco.com
+>>
+>> ---
+>> Satish Kharat (8):
+>>       enic: Move function from header file to c file
+>>       enic: enic rq code reorg
+>>       enic: enic rq extended cq defines
+>>       enic: enable rq extended cq support
+>>       enic : remove unused function cq_enet_wq_desc_dec
+>>       enic : added enic_wq.c and enic_wq.h
+>>       enic : cleanup of enic wq request completion path
+>>       enic : get max rq & wq entries supported by hw, 16K queues
 > 
-> Hello,
-> 
-> I haven't seen a v2 patch from Michal Swiatkowski. Would it be okay to
-> at least merge this net/devlink/core.c fix for inclusion in 6.14? I
-> can send a revised patch adding the Fixes tag. Driver fixes could be
-> addressed separately.
-> 
+> nit: please consistently use "enic: " as the subject prefix for
+>      the cover-letter and all patches in this patch-set.
 
-Sorry that I didn't send v2, but I have seen that Dan wrote to Jiri
-about this code and also found more places to fix. I assumed that he
-will send a fix for all cases that he found.
-
-Dan, do you plan to send it or I should send v2?
+Since it looks otherwise good to me, I'll adjust the above while
+applying the patches.
 
 Thanks,
-Michal
 
-> Thanks,
-> Pierre
+Paolo
+
 
