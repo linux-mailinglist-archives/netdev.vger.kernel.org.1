@@ -1,193 +1,267 @@
-Return-Path: <netdev+bounces-173733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAD58A5B801
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 05:32:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B68B3A5B80D
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 05:43:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7922171BAD
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 04:32:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 280323B0212
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 04:43:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 981491EA7FC;
-	Tue, 11 Mar 2025 04:32:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19C761EB182;
+	Tue, 11 Mar 2025 04:43:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HFhrsUql"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OY3sULxk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08B2B1DEFF3;
-	Tue, 11 Mar 2025 04:32:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741667569; cv=none; b=ACN8Yz1oWbiPRbyHg9WuLTFPBxWmShmjc9Co1uflnZMhvjz5GJV1He4V/wZifHwc9LPGNt9YUJ5zBBNKpl+fZpYOpPFjyrAZIDuCyYyZ6KF/IkcldQFsf9FMz+JSeW0a1AJ3AT94PC8i09wbwgxs7iH+kcxzlf7LPLIKAtJlkIw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741667569; c=relaxed/simple;
-	bh=37ux8iyEWWB9ed6gLYmpWbgzzlUkyqEkrpow+L4VVQc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mtPx2ClX+4ZOalS3v0f2jpw0HupkGMLnwPMq6IZxNhsN7QXTkyN4Xr8p49Dw+MRjVrvX/gZaPG8LV/caLWjvVSqLrMlz7wr3HQ3iQ5lHawO/mzcgY5L8KIoL4uR0IOmPv/sO/4JUalGMfNeMjYRftSrCh29ZZSpizZP01rPBsj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HFhrsUql; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52AKFaEB028830;
-	Tue, 11 Mar 2025 04:32:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=emHXY3
-	4nUGK7e99fHYDPih2r00/7gj841rkTYUwHmc0=; b=HFhrsUqlKASIBzfR98U2pz
-	9h3spfbcyOmbxfj9N4DD1QRAf/6PKEcdrRhWV8b0XWhdycRF0/1oXMg0BqxWImUz
-	5R/gxcRNNvi67ppfL5GPGiufC64CEKYJRKZi3gnO01Wws5/ndgri+qKILRiA6DaO
-	pBECF7o1yz6Dhq+D5hck7pBLiown1EqP/YLMCnNCmTMPgyo5H85gfjo+2G9HWpzi
-	cgatCBFr/HW5FG4docnfbng4z+CnFQrk69kGNHbmrFDP139SMXSZ/NyX/sM5Fqfj
-	UrQs09hqrJfZS0GT4ccOUKrE5z039H2h4VphUMXkulNSOvPpIBEFEtU/s/jOiG0Q
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45a042v50a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Mar 2025 04:32:19 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 52B4WIpx007482;
-	Tue, 11 Mar 2025 04:32:18 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45a042v508-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Mar 2025 04:32:18 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52B3cXtr014011;
-	Tue, 11 Mar 2025 04:32:17 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4592x1ssxg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Mar 2025 04:32:17 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52B4WEJA32309962
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 11 Mar 2025 04:32:14 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0FFF02004D;
-	Tue, 11 Mar 2025 04:32:14 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6922920040;
-	Tue, 11 Mar 2025 04:32:09 +0000 (GMT)
-Received: from linux.ibm.com (unknown [9.43.112.86])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Tue, 11 Mar 2025 04:32:09 +0000 (GMT)
-Date: Tue, 11 Mar 2025 10:02:06 +0530
-From: Saket Kumar Bhaskar <skb99@linux.ibm.com>
-To: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ast@kernel.org, hbathini@linux.ibm.com, andrii@kernel.org,
-        aleksander.lobakin@intel.com, daniel@iogearbox.net,
-        davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
-        martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
-        yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org
-Subject: Re: [PATCH v2 0/2] Fix xdp_adjust_frags_tail_grow selftest on powerpc
-Message-ID: <Z8+8xoSUri3u6+JB@linux.ibm.com>
-References: <cover.1741188826.git.skb99@linux.ibm.com>
- <96a959ec-c6a6-4740-a560-34134b2af7f7@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39A791EB5D8
+	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 04:43:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741668184; cv=fail; b=Nz2ds/zL9t5xHf2GDlxULiK5OzSbrrUtHeJublG26NaLAUWMcqA3yQGAPyo0LW+oGOmH5MUMolcV82qHrwLduOVqQKd/VXMnctN+Pu0MG20GuasvIpx/ynEDxAKKMdesNlWEBrGG8sYvMAFyjLzdUFtVbMyGM7yB20uyyzIJnKM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741668184; c=relaxed/simple;
+	bh=TVTl0miQoj/+jD9i+xRMJLj0MnAViKizL9t14BKgbPw=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=bwxwXk8GZRC+7RPipMk88KOhM45o3Q6d2KBYvT0AcCPuImztlGpkUY0TpquxNR9NzUgYMBfF6bcl9cysVhQTIF4lZ8nUvTAJc4Wgvpc2HmHwBzOK0E9RqD2+9m3IHzIa0otK6c2aWFu33zH3k3ff2E98koGlihFFCt90VTKuJ1U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OY3sULxk; arc=fail smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741668182; x=1773204182;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=TVTl0miQoj/+jD9i+xRMJLj0MnAViKizL9t14BKgbPw=;
+  b=OY3sULxkEtImIxGD1SIqd3h2ioMgtbvDH0oVF3UnCjqfXpeJHm3g/+pd
+   4/XdS5bYF6Uth8Tj1dGRAifRV4YrObVdEWlygYYWIUqJR+Gqhw4tTBwx8
+   ZuPPFnUCRnB3z93yQHtl22KDLMcKIJwCz6D86gPonsCf7Nc6CWioGenkN
+   hLihQg2B7BT+LusRGfbLYa8mYdG4EcEFNYRijP67irZU1US0vrpdynvHs
+   9bvlPadp9k8YXxZCwooUamHJmmeCvzz4mHnA1lnOXs8NTFWdEh/jzvq/9
+   /EDNXfQl+Wq4PWfrONaORMwbK+LDj9fD6r6UVQ2y731toExYZ9y6czQ9x
+   g==;
+X-CSE-ConnectionGUID: A9PPEogPQW6ePYHc4wUr1A==
+X-CSE-MsgGUID: CNdO/hl2QSGZkjI966L+QQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11369"; a="42563080"
+X-IronPort-AV: E=Sophos;i="6.14,238,1736841600"; 
+   d="scan'208";a="42563080"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 21:43:02 -0700
+X-CSE-ConnectionGUID: LS2YzeWMQ8SllsPDJ7CIyw==
+X-CSE-MsgGUID: Pvpx/JWMSeqamnFEO5Quzg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,238,1736841600"; 
+   d="scan'208";a="157398700"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 21:43:01 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Mon, 10 Mar 2025 21:43:00 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Mon, 10 Mar 2025 21:43:00 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.170)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Mon, 10 Mar 2025 21:43:00 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=OArI9piAdFm0mGxD7S/mwGHWH+mFBnkEVNJukjOrrANND0ik1Omb8e4SxHaRLQOL6jfkvtjrRvefLxN9AU0PQsEQeGQBSS5AzDHr29YWoa4rYGK6ms1RWYEC0oqlkuyWATflCJ9GcNAy5ab3nb3Wht8jlyGk719WZqHsC6lDeTdL96uhQJBFUJzkFWjUer9meAvz/TL+WgosybY5R96IHgDzKAMozfOxWN9Rci4YD71ox/mZGMRSY+20itxvPRqlHxH2dhOEeHflgZm2DOwh7HZZuv8RKPnA73saPI78Jqalx+B21TU/NaLYRpsPlBOXsyyCQZ4eB3Azg0kyoHKwSQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Oy6IZunU68fORXYW3XIM8LEc/gIHf3FZp2gYslDKxYs=;
+ b=oARKS3DmQzWpRruboxvqL0aUvb7xuiGs/nSazVgcEILMrfRU0ueii59mbYOrEn7kcVTmJVLTCNx2ZALcQD8dNtlsb3suGqi5sTMXTRaMvwnPp9HUwdUna1C9zcutnozz+elDdIT/slm/WfOa7xMEXxVd57yVpp5XOmd6APcxL7fgdXGxJUd7TALwXgibJsDy2zKHfTV22jyYYnC3IOFFctApfRZfzUGgGXLPLCjgGpgH9xcsJ1hNpUsxHdKTG91/TgxMIOoyin8LUY4eE1bdQYKQL7SrH5ZMLH54INozYhRBPmaCqeADJ9OuPkBreX6f+ybqiqQTKA4vUZhJbMbAXA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MW3PR11MB4538.namprd11.prod.outlook.com (2603:10b6:303:57::12)
+ by CH3PR11MB8706.namprd11.prod.outlook.com (2603:10b6:610:1d1::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.27; Tue, 11 Mar
+ 2025 04:42:31 +0000
+Received: from MW3PR11MB4538.namprd11.prod.outlook.com
+ ([fe80::e117:2595:337:e067]) by MW3PR11MB4538.namprd11.prod.outlook.com
+ ([fe80::e117:2595:337:e067%4]) with mapi id 15.20.8511.026; Tue, 11 Mar 2025
+ 04:42:31 +0000
+Message-ID: <9d84cc79-2990-49dd-a528-3d6d182ea2e9@intel.com>
+Date: Mon, 10 Mar 2025 21:42:28 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net] idpf: fix adapter NULL pointer
+ dereference on reboot
+To: Simon Horman <horms@kernel.org>
+CC: <willemb@google.com>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<yuma@redhat.com>, <Aleksandr.Loktionov@intel.com>, <edumazet@google.com>,
+	<madhu.chittim@intel.com>, <anthony.l.nguyen@intel.com>, <kuba@kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>, <decot@google.com>,
+	<davem@davemloft.net>, Michal Swiatkowski
+	<michal.swiatkowski@linux.intel.com>
+References: <20250307003956.22018-1-emil.s.tantilov@intel.com>
+ <20250310062229.GD4159220@kernel.org>
+Content-Language: en-US
+From: "Tantilov, Emil S" <emil.s.tantilov@intel.com>
+In-Reply-To: <20250310062229.GD4159220@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR04CA0171.namprd04.prod.outlook.com
+ (2603:10b6:303:85::26) To MW3PR11MB4538.namprd11.prod.outlook.com
+ (2603:10b6:303:57::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <96a959ec-c6a6-4740-a560-34134b2af7f7@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: RrOflTFapXc75UGxugEjNKdeRMx0mkUY
-X-Proofpoint-ORIG-GUID: ruWdKrsRvtewFmhtIVZw3sPmfHZ_XvBl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-11_01,2025-03-07_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
- impostorscore=0 clxscore=1015 mlxscore=0 priorityscore=1501 spamscore=0
- adultscore=0 phishscore=0 malwarescore=0 lowpriorityscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2502100000
- definitions=main-2503110028
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW3PR11MB4538:EE_|CH3PR11MB8706:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0596aabb-97b2-46c2-5b87-08dd60572234
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?UjZ3ZjJrNVJkU1hsZHFsOUpIVTlVQ1dLTWw4T3BFRVZHdnV3RTBmRmw4ZEpC?=
+ =?utf-8?B?cEYzWXh3NUJFUytCWnNJeEcyeHROditkNnM5c2Q4d09qTEZUdGJqODIybEhw?=
+ =?utf-8?B?YUtaWTRkK3ZrYlJMMUtQbC80VTk5ZDd4eGZOSE96S2FtK1JNWjBaU0xoY2tU?=
+ =?utf-8?B?N3dDOTY1MGZYcFdoSFBxbENvdDUyV0Rsc0psZ2taa3psZVVNeWt3Rk9tYUxP?=
+ =?utf-8?B?S21VZnZtOGF6T0VJc0FScGVsV0x5L0hiZE9EbXk1T1d6SmgyRVErMnBzdTl3?=
+ =?utf-8?B?MVdMdTgwd3NpVGhmME9ZVm9RZU43ZmFRM1owSVpUTVBra1ZiaXlFV0diejlQ?=
+ =?utf-8?B?NWh5OHo2QXBRSkd1U3o5RHRHMmxxM0Y5NlBEdUhLdFlveDlhdUVacElQVEIw?=
+ =?utf-8?B?akNpaDJKdGhSdHM5b2RXS2IzK1RoUzU0TEdENFUvTVdLTm56Y0lOSWpLNERx?=
+ =?utf-8?B?QVVpbXRlb3h5V0FqN1NZNVE0aDdZUVNMUiswSG02TXJvSFJZQVV6SUNhNTht?=
+ =?utf-8?B?TWlLNjFUSFU4T2xiMGcrK0pqemUwVnNhajMvYmswaFlndGdDSDEzdkZ0ZW9O?=
+ =?utf-8?B?d1ZQd1pnMmpqYkUwOTZLOUUyTWYwRXdUcmFXZ3BmODNObCs5WVUydC9MT2Za?=
+ =?utf-8?B?V21JamErb3hpVHI2bnlBRi9nWWU3V0pjT3pLZGF1Z1NMTmxvd2o4MzEya2xm?=
+ =?utf-8?B?L0NVdmFFampoZFgrSGtMdlVPeUpwdDREYm1NTkRtVzJ5Tm1qR09FTUhKd2JH?=
+ =?utf-8?B?S2xmTE4xSW5qRExvTzRPdjMxcXNlRjlpdThmaWJCUVRFUXdGM1pKdmJXNGJx?=
+ =?utf-8?B?VnFTZ3J1OWdwRUgzTDZTTmo3L1dYVGtPdjBUaHNPaWJvUi9ZbVlZZmVPeEtv?=
+ =?utf-8?B?VklldnJQNnYxa0VGOE50WjdUZkI0ZjVQTEdDTzJyZGhwcFhWMm1haHcxUC80?=
+ =?utf-8?B?RFpDei9PbEs0ajdEOUZPWk5pelAzRzJudEkxNUhsOXpsQWJuSFVFSEc1Y1lM?=
+ =?utf-8?B?TU9UVFRqaE9kMHUzNzErbEd3b3RiU2Q5OXp1Zkswb0hwUFZKMU9XS0FmN0xH?=
+ =?utf-8?B?cGNSQWNFOWJRemxQWVZyaWZ2WmNEUDRNcFYrczkrSUs0M0krbGdZcTdFZ1RJ?=
+ =?utf-8?B?NjVIOXpVaXNudjZ3MjNjYXg4REJhU3hRS0pUbVpPQWNWUHhKalBZRFF2bXZJ?=
+ =?utf-8?B?aVpCYS95QnlqTEUwSnFvU2RtU0RlL2txTjZpZWhyS1Y1SEFsc0tTM2Z6VzB5?=
+ =?utf-8?B?WE0zMWR5VGdUNUZDWTZua3JRWFB3WFNKb2lOU0dZb0VqL0ovNjdCWmxKdE9z?=
+ =?utf-8?B?Q0xSRlBXQ2o0T1dqbFVjdC9oWHEzN0JnTTU0SitQYUY4RVFQRDVFYzdMWWw0?=
+ =?utf-8?B?YThZQmpEKzl2aVlYTlprcTczUzhpSXUxcHhGYVJ0WjFJcWdET1ZmWVVUeS94?=
+ =?utf-8?B?azAxeCtzc3J2R3FvbGw4aHhVZ3FxNXp2dmcwMkF6NFEzRFE5a1NkTTFVTzFG?=
+ =?utf-8?B?VStneDBQVW55cHcvQWVyQ3BJaE51YjluQnQ5S3l4Q0xxbmc1VkxwMTVZMk9L?=
+ =?utf-8?B?Yk9FRG5mNlFUYjJFaFk0VDFNZXlDWnJDTHNaNmR6WmxrTDBSbVpYMTFlR0hp?=
+ =?utf-8?B?RUE5MkVPd0tWRkRlYmVIMUt6K1RtTEt0UW9wT1o0WTl1Wk1NeWtDL2t1MFFJ?=
+ =?utf-8?B?aGk2UDBuTUtmS2s5QlBXQzRSSjRKUDZhb3ZuRlJzL0pCcDU4a3dwc3JOeWp2?=
+ =?utf-8?B?cVB5SWNXYVZwMHFJVHhGRzJsd1huQ0NBeUhKNVVscU5McTZpMjFQME1vN0pu?=
+ =?utf-8?B?Vi9abFpQcEpLOVUyNFdvTWpkMmpxd3hMOHlJdlYwZEI5dGtKN2tWYktHanVR?=
+ =?utf-8?Q?0dD1vHRsRU4YD?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR11MB4538.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QmJsZ3BjYm9NS3J3TDF6eGloS0ZabXlGQlVFWGdqbFl4YnN2ZkZzdXQ4REMy?=
+ =?utf-8?B?KzNVZHE4UktGcnV1RlRLVDBCelNNRFA3MzBwekt3UEFqdU10YmV5NGpWcElK?=
+ =?utf-8?B?TmNsajQ3cVd3aVh2dE5LcGs1aFRTdGwvdmMvQWEydXZRVWVjL1k2ZmZxamhz?=
+ =?utf-8?B?RTY2R1dhS3ZqOWJkUXJ1L2hKRjQ2a1JQRzQ5SlpQaXlRUjJGRnlVak9pS00v?=
+ =?utf-8?B?Q2hweWhkaWRpcVNVM080SGE2TC9VQ0lPT21RbS9UdFU0NEFHdkR6emQwNjcx?=
+ =?utf-8?B?YkJqeFlEU3kvNEtmbkE3ZkZycUNkbTVKUWZzbXdSclJ2Zm1zM0lGWEdIZGhj?=
+ =?utf-8?B?Mk1EUTM3c1dGUlRra1UzU0F0dTFwN3BPa1Bva2J2THUrRnozWGcyckNaSVoz?=
+ =?utf-8?B?WWxuZlNrVCtKRURFL3dyaWFhV0lsN2V4c1hJZGl5dU9QeTF2TENQRU96dGtF?=
+ =?utf-8?B?dXNhaFhoRDREQTJQMUJHZlI3M1VZRXY1NlQrbnd5M3BtbmtuWFZjYUN3aU5S?=
+ =?utf-8?B?cTVaZXBMVllxeW03Sk0rSFZNejNTdmNUSHhrQmJSR0ZJa1VTTWpZYnRVRHJS?=
+ =?utf-8?B?bGp6K0lFako1SVBZUDV6eWE2WnhtbzB6dnpDNE9GVnVRL0w1VnZpWnNQWWp2?=
+ =?utf-8?B?ZytyTEFRbW8zUVZpdzMxZnNKd3JwbURXT0ZqaFBFeElvcTVOc3R3Z010OVRC?=
+ =?utf-8?B?ZkdBWTNobUVwS05SVVh0bTMxNUozK0F4TUhKM25XVDJ0bXZEK1Q0Si9MdDlR?=
+ =?utf-8?B?dGNYOG43bWxkSW9mclZyNkJ4ZjM4ck9KMWpleURuMUN1RWRiSjBhMHdXTzkz?=
+ =?utf-8?B?RE9XWDRWZzJ2WWYyTldWc0tGTlIrSW5RTWF0TkxWT2g0RWN2U3JMZUsxNjg2?=
+ =?utf-8?B?dWxoVi9lY3FpaFdzM3cxWFExazE4S1dDVjJVdjU5ZXJiK3pRenFWb0JEM1pV?=
+ =?utf-8?B?NHNoUXZZQ3NqMWJwbFZoQy80akpNOUlYM2lmYktkL04wbnRIZU9zRDJ3QS9J?=
+ =?utf-8?B?ZlVrOG41Q0hJVldhYVVybTMvcmlDcmNXMXpHVGlTRy9XQmFBL1U4Y1NsNmNo?=
+ =?utf-8?B?eEg4L21tTHB3eE55WDNWZHJwTWpoRUlHejBLUDZiaTlLYjFiMTRGOUhyVVFw?=
+ =?utf-8?B?QWhmNTFaR1d2M3dtWmFYL1FlY2pSRlNGRDdtNnpTZUI1WDc3Y0lyS0xDR3Fv?=
+ =?utf-8?B?R2JpdUVJM085MFhRS2c3dHAwMldMUFFzL1ZoS2RHSFg5czYycDlxVFA5allU?=
+ =?utf-8?B?a0RsV21rZkR3RTFJR1A3M1RrbFErTnc2ZTRHRUJCSHVPMWVoYStSK3BnYWNw?=
+ =?utf-8?B?MU5WOGFueWhsdDhobms5d3ZncVQxRVM2NE0vakplTEVtNmFvN3VsUzRTbUIy?=
+ =?utf-8?B?MThXU0xxTEh5TXRzR2NwdXVBaVJQQ0VuUzBRK2ZBQU13N0FNcXVPMnltRDM4?=
+ =?utf-8?B?WWJ2THdQbWpXVmNseWhVVzFINGMvZTJHc1NPUm9PWkxNZFJHTkJZOTlBd0h3?=
+ =?utf-8?B?YTFXdmdFQkhScjRsemd1Ylk3aTNHZG5xelJNSHVPSE5UdHEyNWdVcCtPRDFZ?=
+ =?utf-8?B?cktDd2VjYVk1bk5JN28zM2J3aHlCcXdXcmM3YVBzS2s1dUp2L04rM0pxQW1R?=
+ =?utf-8?B?TlRyMVhwcFNUYVEyTTVlbDVQZDBFOEFWOW0rWlFKTGN0STROVmpBby9ESXBn?=
+ =?utf-8?B?MlMrNWN5MllkZko3aTNUWkwzb0Z0WkhKRGxuczR6OFRlM204VGZLSnU3Q3dE?=
+ =?utf-8?B?cllORjdEdlc0cmFxUXhpRUVTRmNjNTBTUWlyQmZXeGN0aEVmQnhTUmFFYlNZ?=
+ =?utf-8?B?K2lQemxRTWZpRHplenk4MCtBSGNueTcySkxTUVFkOElxanFxLzZBVW9qSHl4?=
+ =?utf-8?B?QVdNbi9uNG9zbkdvNml2ZndJdDQrYnBWb0ptK0x5VHo1NE9rRTI3bHhrSkR4?=
+ =?utf-8?B?eXhHaDlsVDZrazFMSFhoZXd3Rk8rRlUvc21JRytZY050OWFVbVpPczc4MmNa?=
+ =?utf-8?B?VXU2ME0xRkYrZE9Bb1ExWjlaZXdkd1ZZRWIzc2t6U0VGSm1BSlZzQitrY1d6?=
+ =?utf-8?B?OU4yZXRaYzRaQnRBcTdpcDRUaDJlS0RnblFxUG5DckI1Q2hUcUd4OWZBQ0Zr?=
+ =?utf-8?B?S1FnODZxVllIQTlnUXVxNFdDbVlGUWs2T2dPNWJ0U25KZGZMby8xNXYyc1dW?=
+ =?utf-8?B?Qnc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0596aabb-97b2-46c2-5b87-08dd60572234
+X-MS-Exchange-CrossTenant-AuthSource: MW3PR11MB4538.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2025 04:42:31.0513
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: WNXe/BwbTAzuJRlJU+LlMg7F+dTLIrtjY0qmZLq1mx9IdOwU7lIXavyBpsedjLJn+hfgOVywN0inTxjWHc4mPw+Vr3o+ZIR44yEZGTs/Nak=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8706
+X-OriginatorOrg: intel.com
 
-On Fri, Mar 07, 2025 at 08:54:00PM +0530, Venkat Rao Bagalkote wrote:
+On 3/9/2025 11:22 PM, Simon Horman wrote:
+> On Thu, Mar 06, 2025 at 04:39:56PM -0800, Emil Tantilov wrote:
+>> Driver calls idpf_remove() from idpf_shutdown(), which can end up
+>> calling idpf_remove() again when disabling SRIOV.
+>>
+>> echo 1 > /sys/class/net/<netif>/device/sriov_numvfs
+>> reboot
+>>
+>> BUG: kernel NULL pointer dereference, address: 0000000000000020
+>> ...
+>> RIP: 0010:idpf_remove+0x22/0x1f0 [idpf]
+>> ...
+>> ? idpf_remove+0x22/0x1f0 [idpf]
+>> ? idpf_remove+0x1e4/0x1f0 [idpf]
+>> pci_device_remove+0x3f/0xb0
+>> device_release_driver_internal+0x19f/0x200
+>> pci_stop_bus_device+0x6d/0x90
+>> pci_stop_and_remove_bus_device+0x12/0x20
+>> pci_iov_remove_virtfn+0xbe/0x120
+>> sriov_disable+0x34/0xe0
+>> idpf_sriov_configure+0x58/0x140 [idpf]
+>> idpf_remove+0x1b9/0x1f0 [idpf]
+>> idpf_shutdown+0x12/0x30 [idpf]
+>> pci_device_shutdown+0x35/0x60
+>> device_shutdown+0x156/0x200
+>> ...
+>>
+>> Replace the direct idpf_remove() call in idpf_shutdown() with
+>> idpf_vc_core_deinit() and idpf_deinit_dflt_mbx(), which perform
+>> the bulk of the cleanup, such as stopping the init task, freeing IRQs,
+>> destroying the vports and freeing the mailbox.
 > 
-> On 05/03/25 10:43 pm, Saket Kumar Bhaskar wrote:
-> > For platforms on powerpc architecture with a default page size greater
-> > than 4096, there was an inconsistency in fragment size calculation.
-> > This caused the BPF selftest xdp_adjust_tail/xdp_adjust_frags_tail_grow
-> > to fail on powerpc.
-> > 
-> > The issue occurred because the fragment buffer size in
-> > bpf_prog_test_run_xdp() was set to 4096, while the actual data size in
-> > the fragment within the shared skb was checked against PAGE_SIZE
-> > (65536 on powerpc) in min_t, causing it to exceed 4096 and be set
-> > accordingly. This discrepancy led to an overflow when
-> > bpf_xdp_frags_increase_tail() checked for tailroom, as skb_frag_size(frag)
-> > could be greater than rxq->frag_size (when PAGE_SIZE > 4096).
-> > 
-> > This change fixes:
-> > 
-> > 1. test_run by getting the correct arch dependent PAGE_SIZE.
-> > 2. selftest by caculating tailroom and getting correct PAGE_SIZE.
-> > 
-> > Changes:
-> > v1 -> v2:
-> >     * Address comments from Alexander
-> >        * Use dynamic page size, cacheline size and size of
-> >          struct skb_shared_info to calculate parameters.
-> >        * Fixed both test_run and selftest.
-> > 
-> > v1: https://lore.kernel.org/all/20250122183720.1411176-1-skb99@linux.ibm.com/
-> > 
-> > Saket Kumar Bhaskar (2):
-> >    bpf, test_run: Replace hardcoded page size with dynamic PAGE_SIZE in
-> >      test_run
-> >    selftests/bpf: Refactor xdp_adjust_tail selftest with dynamic sizing
-> > 
-> >   .../bpf/prog_tests/xdp_adjust_tail.c          | 160 +++++++++++++-----
-> >   .../bpf/progs/test_xdp_adjust_tail_grow.c     |  41 +++--
-> >   2 files changed, 149 insertions(+), 52 deletions(-)
-> > 
-> Applied the patch series on the bpf-next and patch works as expected.
+> Hi Emil,
 > 
-> 
-> With Out the Patch:
-> 
-> test_xdp_adjust_frags_tail_grow:PASS:9Kb+10b 0 nsec
-> test_xdp_adjust_frags_tail_grow:FAIL:9Kb+10b retval unexpected 9Kb+10b
-> retval: actual 3 != expected 1
-> test_xdp_adjust_frags_tail_grow:FAIL:9Kb+10b size unexpected 9Kb+10b size:
-> actual 13097 != expected 9001
-> #583/5   xdp_adjust_tail/xdp_adjust_frags_tail_grow:FAIL
-> #583     xdp_adjust_tail:FAIL
-> Summary: 0/4 PASSED, 0 SKIPPED, 1 FAILED
-> 
-> 
-> With Patch:
-> 
-> # ./test_progs -t xdp_adjust_tail
-> #583/1   xdp_adjust_tail/xdp_adjust_tail_shrink:OK
-> #583/2   xdp_adjust_tail/xdp_adjust_tail_grow:OK
-> #583/3   xdp_adjust_tail/xdp_adjust_tail_grow2:OK
-> #583/4   xdp_adjust_tail/xdp_adjust_frags_tail_shrink:OK
-> #583/5   xdp_adjust_tail/xdp_adjust_frags_tail_grow:OK
-> #583     xdp_adjust_tail:OK
-> Summary: 1/5 PASSED, 0 SKIPPED, 0 FAILED
-> 
-> 
-> Please add below tag to all the patches in series.
-> 
-> Tested-by: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
-> 
-> 
-> Regards,
-> 
-> Venkat.
-> 
-Thanks for testing this Venkat.
+> I think it would be worth adding some commentary on the rest of
+> the clean-up performed by idpf_remove() and why it is correct
+The main reason behind the change is to avoid calling sriov_disable(), 
+which ends up calling idpf_remove() again via pci_device_remove(). The 
+idpf_remove() will crash in that situation as it attempts to access 
+adapter pointer, which was already freed.
 
-Regards,
-Saket
+> to no longer do so directly from a call to idpf_remove() from
+> idpf_shutdown() (IOW, it isn't clear to me :).
+I assume you are asking what portion of the idpf_remove() will not be 
+present in idpf_shutdown() as result? Aside from not calling 
+sriov_disable(), there is a small cleanup of stale netdevs and the 
+destruction of WQs, which did not seem like would be needed on shutdown. 
+Then again, I was not able to find documentation on what steps are 
+required for shutdown and mostly checked on how other drivers handle it 
+(where there is no 1:1 overlap between shutdown and remove), and applied 
+similar steps to idpf. Ideally I do not wish to do more than is needed 
+for that flow.
+
+> 
+> ...
+
 
