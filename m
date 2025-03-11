@@ -1,148 +1,267 @@
-Return-Path: <netdev+bounces-174005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC592A5D04E
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 21:03:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 91EA4A5D058
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 21:05:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 997DF18995EE
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 20:03:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27DD61888027
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 20:05:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4295F2512D1;
-	Tue, 11 Mar 2025 20:03:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE95422F169;
+	Tue, 11 Mar 2025 20:05:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L6V/0LO5"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="P+mZlUZ2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2086.outbound.protection.outlook.com [40.107.94.86])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ACE71EDA20;
-	Tue, 11 Mar 2025 20:03:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741723408; cv=none; b=gXe/6LbN17GJzGe+JPyc25NbNDk4R5ekiig9KIDamqkc+xaVpwTB97Css86zqb6gU7rM1vKC7evHEC4sDBoCHXDxLxy9PbkE5ChfrfHL2VYn1tpgtD9iHMOInwW0v7bwHvNYFfoHtLk5vEkIiVcEwCCtyGNZq17tJub/NiSN9B0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741723408; c=relaxed/simple;
-	bh=DazzTJjUvICAz5WuwmaUGkDLCwMSypZsjO2sz2VA/TY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MyVLOycWHGJByXr5PBMyted2A1K0KupS+gLHyylnNBgllX3JIGV9E1vAg5SlAckyUb/Cd9spQSPrQpwccnrTkdB7nszcbo1z9XxrCRm74Z8C3JeDkeVKYCPL9m6+YGzCEVY2hPGQ7Shz9KAfWZSIk2FKUR4OkJjT4nMPX9QrQxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L6V/0LO5; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-22337bc9ac3so114255265ad.1;
-        Tue, 11 Mar 2025 13:03:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741723405; x=1742328205; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Uhyx+ltpmDyiYsWozRzuwZLHrw4eKDZY65wSemvBkBA=;
-        b=L6V/0LO5mYo9SxYa6dUg12tN0GPP4Aq1VyrqwCwW6AQptn6oK6/uehG4/8YI3uOGsk
-         89QaLffbe04lpdHjAFt0wa0wkyNCjIxzTAeib9Mek9VxS4eRIiYpZeVL4n2ZJsgh43l0
-         TnjsFqDCVuVEgIrpd79+LzcOt6Qjqa/7eof/2mVqsG2txdENfkpGmQX4utlCSxsrCfM1
-         9EUSiUF3Rfe19Y6tTZ82XaKhzp18qYIMTmOnTLHTMUIJYyaPEoqM6rz82eJn6WYHzalg
-         4gNQ8At051mahFEay/gUDZPw/hsU8shxI2wH/AbL5FOhafkCzP6NcIGO/zAmsZDBie7g
-         LIlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741723405; x=1742328205;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Uhyx+ltpmDyiYsWozRzuwZLHrw4eKDZY65wSemvBkBA=;
-        b=Pn6/ih28T1+nAo1r0kCM6jDD3sOwe8/640AefZwlA2IFVmyHoYflSBlDg74YTBDYC1
-         RMN5i5jfy5osbEujB20ZM7Tqig3Fbgr5/61/XCJiApwL1zfpMJb6rHQpcK9NfRnOZ+q7
-         E8miETbaygAkwpK/Hi//wn+lxfVQ4LbwYGMHxUvrstaXzCVXwqmihPKU/s3gpsDXXibc
-         V2cwjhEuSCYTGpYxXK4MahKPPRqjtL5I7HOw6JnNT76D9Z3Q7chdhn/+qqBrPeljX5Yc
-         YSB0lyKi4g5hkSrks2y81LGYOsFvxHR5lOv7RxYnvLJQ9UyTTFBU0uAg+fwJ/p66VAbO
-         5TqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUboAfVI6pe6ruub6qwdlytirGtZNzk2cjrELrkXuNyDQR9bUUpWM2Zax8L/pgryEyy8OmPpRMR@vger.kernel.org, AJvYcCVIEbPr/izy14JzRyAt8LJQv1jW0IpUEubNXLV8FG2aOhPTk6QnqTyeoPMvgTaVYz3JnkOahnjeKTFE2eg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqzfK28whqCWG4XlJAs0B3dAdLCvQruCY9rEZLc8WlM+zm/Vgr
-	wqo4rO90fcbWrUr3ArCUjZl8HouzxoHlVfPW6Bh2tpkOWesQjD4=
-X-Gm-Gg: ASbGnctbqRGBCcGBdRmHifH6orYaSrfcYbe3cUxn7aejSNljdiSYupDH3D5ub22/6HS
-	3AyWe9i4hLNZ70Xizu5k2SNTj81G+s+DaE3ZVmOpTNqLcdNiohrhgKMknMlhcBPW9dBvwScPRVu
-	K0+wX3+Y7sapp9mqq5/Bcb8STCj9eEdCIqvNrkMHOtI3Af7OhaLVBeIjMtOYSHuQgisqFbtrzAC
-	FlmlOZlIw0jLl7f4nOKdWeWDMTd3iYZG+oN91IOvbd5N9ulK9Fz/azutDA69ewXyL0xhL0Pyk31
-	yxt44kZbGTJzaqrR3h69J5i+vErhZqXL7fPTS+4GJNo9
-X-Google-Smtp-Source: AGHT+IGUx2QQWAc7kIhaj5mfYBdyIReDilwsimkaa88Ci5UkrlWngIFZVxm9VPzlZ6J/y5lC2Pj1wg==
-X-Received: by 2002:a17:902:f54f:b0:223:58ff:c722 with SMTP id d9443c01a7336-22592e44a1fmr83727885ad.28.1741723405542;
-        Tue, 11 Mar 2025 13:03:25 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-224109e816csm102053775ad.54.2025.03.11.13.03.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Mar 2025 13:03:25 -0700 (PDT)
-Date: Tue, 11 Mar 2025 13:03:24 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	donald.hunter@gmail.com, horms@kernel.org,
-	michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
-	andrew+netdev@lunn.ch, jdamato@fastly.com,
-	xuanzhuo@linux.alibaba.com, asml.silence@gmail.com, dw@davidwei.uk
-Subject: Re: [PATCH net-next v2 2/3] net: add granular lock for the netdev
- netlink socket
-Message-ID: <Z9CXDDrruPmTjdW5@mini-arch>
-References: <20250311144026.4154277-1-sdf@fomichev.me>
- <20250311144026.4154277-3-sdf@fomichev.me>
- <CAHS8izNVZ0RqccDKGiL2h+MesCrvza_kwck0RmsrTNAcTkcmjA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5018F1EDA20;
+	Tue, 11 Mar 2025 20:05:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.86
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741723516; cv=fail; b=qLgSedvMvLcH8ffKkksy0Kpf/a7aUofWXvqfWWQJdS9WEbScPlJqUTnkkNU8tihVjCj/zKBO0p7NThJg3bviG5jnTQRPnZW3HxMUtaCJw6Zw6V8dz76Gb+ehMJvRdQiFP0brGbc8Pcy5NPKXpZeO3PSZGIKkJeJoUJ0SjqzBcJ0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741723516; c=relaxed/simple;
+	bh=zzQLXJnp+2zJf9j1GW2pi6WsbvVJ97FOwHx4D03rel4=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
+	 In-Reply-To:Content-Type; b=HYWkEvUn/gy6LXL07XCLhxype81wpZynknXA+c1vKHwUXsz3NnJza9dNPGmFBjQeN/sYarZOpheOn1FB4KJk5H8Loq56e3zCfCVqo/uD9Vv+woB6niZi9WXbNX9bBj2JZW32mM5sUCDb+oKvsq3GeqwtXRXviyDWbjwRE856QjY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=P+mZlUZ2; arc=fail smtp.client-ip=40.107.94.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JW3BLX1J6cVvTpG/Ae6DJq2yAVtMMBmWuuycbsqLii5z50dWN+F8lylWjct0aKFBjoNobdTCJZ8DRTqlRuIBX8GaAlkIbqKLipJlUtu7zI7VNa2wqwbimW6bNfRiAxcOdooDesiLMCQpr1kqurIF37U3R+Ibp7aEHa9wG7v6y154OkZHA+igAWa0Pjczpcwlz07imyYGcFgBpPaDQVKqi0OKYul2d4hs2AJcA4Q9Xrs1Lisy07ggAafTCSZplgm/UtM/yj/Ybwayswq5agYGFOcxwd3VX0Vc0fjAHfoZnUuZkWhooN1SW/gm4J5SeSZiMQn7ttjAsvFt4lwyRN+OIw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=je75xAV1ZL6wEL9aPWDLWa/sTAP1b7By+imt8+gomBA=;
+ b=hSr05sfa1gkfzJ+z2gSte2TGQAScnpYUapP//CgEWKAahlrZkL3L9GcIp6qj7/JWvm8jaaAZmpIGp+T+tzhp7rNSPZIH3eFXUOsSv+A/DUvxn0eaZ2NJTcIavu4G+uLFSsAZ9G7qbjj7+CF1DCRnrL+c4/TNVKoFoI/lSLa99krkH5JBL8cDsiesU5uGF/x7Igoh0pUMr9UEd9nd30XuJ8+8s5Qd4MeyG98KOjoL7caF264R8z8ulMPQ6BtusUscMd2rlNiGDIl2ttR/gMlHC3k81HWIOCjem4jhFph/KJolBh3HBLOJN1KG3PrAae9RKsduGb0kKx6e7nkNch7NGg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=je75xAV1ZL6wEL9aPWDLWa/sTAP1b7By+imt8+gomBA=;
+ b=P+mZlUZ2poMOJuvwyP+UG7yjY3CLw6srk1XaJuN4C03HPRQXw8bpssKX5RnxY9SAiKOozPNPgSoUhzR3JhpUNCn1SDIpX6RTRhUhuj5ibMRZdbWJmpTlJs6rMFpgxRBG9+OF0bybIMZWq/NwKLjGKEroAYfy+zfSDKA/nTJUmnU=
+Received: from MN0P222CA0028.NAMP222.PROD.OUTLOOK.COM (2603:10b6:208:531::30)
+ by MW4PR12MB6828.namprd12.prod.outlook.com (2603:10b6:303:209::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.27; Tue, 11 Mar
+ 2025 20:05:07 +0000
+Received: from BL02EPF0001A102.namprd05.prod.outlook.com
+ (2603:10b6:208:531:cafe::5) by MN0P222CA0028.outlook.office365.com
+ (2603:10b6:208:531::30) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8534.21 via Frontend Transport; Tue,
+ 11 Mar 2025 20:05:06 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BL02EPF0001A102.mail.protection.outlook.com (10.167.241.134) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8534.20 via Frontend Transport; Tue, 11 Mar 2025 20:05:06 +0000
+Received: from [10.236.184.9] (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 11 Mar
+ 2025 15:05:05 -0500
+Message-ID: <bf26b669-860c-493e-8126-733615f47b13@amd.com>
+Date: Tue, 11 Mar 2025 15:05:04 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHS8izNVZ0RqccDKGiL2h+MesCrvza_kwck0RmsrTNAcTkcmjA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+From: Ben Cheatham <benjamin.cheatham@amd.com>
+Subject: Re: [PATCH v11 01/23] cxl: add type2 device basic support
+To: <alejandro.lucero-palau@amd.com>
+CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<dave.jiang@intel.com>, "Cheatham, Benjamin" <benjamin.cheatham@amd.com>
+References: <20250310210340.3234884-1-alejandro.lucero-palau@amd.com>
+ <20250310210340.3234884-2-alejandro.lucero-palau@amd.com>
+Content-Language: en-US
+In-Reply-To: <20250310210340.3234884-2-alejandro.lucero-palau@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF0001A102:EE_|MW4PR12MB6828:EE_
+X-MS-Office365-Filtering-Correlation-Id: 883f18a5-7631-418d-44d1-08dd60d80503
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?SzBlSW1weHJQNldLUkR4MzF1UkMxTHd6d1RMTVlvOHpFRWc0dy8xVGQ1aHVx?=
+ =?utf-8?B?V3NRcjNXblc2Y2JRZGpSeG9OOVVyaitwVHpVM0NHWDRzMFJ2ZW90OWFqK3BK?=
+ =?utf-8?B?QmFPQW1FNGM0bWJsNmhDMklDb2pQVDJocTl3ZDduTk9CeXhkaDRlWmJxMUhF?=
+ =?utf-8?B?blNBaGFGYzVmaTlES01INHpSMnVDUDc3SWxXTzRnOCtRVXpndTBza1E0L0JE?=
+ =?utf-8?B?SEVPTUNjQWYrUXo4S1V0WVVUTTZBSWRScTU0UmRhVHBYWmJwcndTdElhZkM0?=
+ =?utf-8?B?ZGlXLzNER3lIaXNaY1ZKYXV5WkswbUthS3ROL2w4c21HUVBYMXJMVlRaalZM?=
+ =?utf-8?B?emZDNjQ3MENyZElwUlVyMG92dzlldmV0ZDJRL2xobjRncGNuNHNzT0laVzBS?=
+ =?utf-8?B?VUk3WkZsY2xGVkoxRmpiTTFGb2lwLysvUitpdzZrelZsaDNWOUU1aWFDZHQz?=
+ =?utf-8?B?U05CQnlURllFWFk4Wk43K2tJMXAxOVB2M2hNYTlubmQyQWZpNU5qWWVQWVhn?=
+ =?utf-8?B?WGlKVU1BeWZQZitjQ1RrMVd1aExrNmlWUlNlZnduT3VxZmVzMXdXRmJXMDg1?=
+ =?utf-8?B?RWx5eXVuZ2oyOWRvNm80TWNBTVpBMkoyRzc2Z2E4VjFncFlGRGZNM3lwa0xt?=
+ =?utf-8?B?N3hGeUJFQklaOTR6eVFWOFUwSEc2ZHo2Mm9JdlZBL3RpVlZHK2phM1dBMm8v?=
+ =?utf-8?B?Z3IzMkZ3N2kxY2xnOTcyU0RKdGw2UXJIOHI0Nk4wMEFHanBwZU1vM1VkMGdP?=
+ =?utf-8?B?NzdXWGJPMzlhNFJlY2NGdENLL3dRbnNJZkFDVDZ1ZlJuYmdWWFhuMTdDWDNE?=
+ =?utf-8?B?dmE3dW5aMitqSFFqSXJic21GUHpZUzVsQ0VQbGlMQnVPdG5zMW1UL3hEMGwy?=
+ =?utf-8?B?MDN2MXlGWTVDRHQzZWRpaDJCVDdjaVE3RGRjWHkyb3FtUXplN1NXMFhnNEF3?=
+ =?utf-8?B?dnhBdTFhc2FYWFNwbXJZRWhBY1NjU2pIc3ZZN2x1NlVnRnBoVUNNenpCRjJ5?=
+ =?utf-8?B?Mkk1cnNWQTFWQ0RlQkFnbk5GZXB5c2lHWlpBUHMwSXdwT0xqa3krSW1ZUXRL?=
+ =?utf-8?B?UmxOTHhYNFJuN0E5U2U3ekVybnhYdDJmS1RzR09uWUpqY2J5SlBLTUR5b09N?=
+ =?utf-8?B?VnRyQklzeTJKd1BhNk4xVzJZb3ZuL3lLYWdTODl2ZVZPVVRIODFUZ2h3Qll5?=
+ =?utf-8?B?VkE0SXJ6TmlRS3VEaWlDWWMzalMxd1NsL0NOVU52UVB3QjY1Y1dreTY0YmZy?=
+ =?utf-8?B?eU5vYU5iakpwUURNMDdiUGVzWTN2QmZMZGpvajlMemM3YmRaOWZSNzNBdmJK?=
+ =?utf-8?B?d2VFK0NiTU1XZC9ON3dHYWN3SDVBQzR5YlhwK096alFWRStLcGlLeEtpaHdI?=
+ =?utf-8?B?amhqV3hBS1dkS1ExWUVZQWg5TzFZUXpMVlorcW81eFhSQ05VY05tV0R4SWF1?=
+ =?utf-8?B?VkR2M0kzMHdlM0VaeW04N1prenAzcjdZdzVmZDkzUnlNZXpxdEphVWRRNWQy?=
+ =?utf-8?B?UG5wNld2dWgveERnOTRDcjlzTGVQQUQ2SVpudWxWYmFxR0NUamVRUnpmTjRL?=
+ =?utf-8?B?eGJ6NlVTY3ZZc3NOK29PWUtYYUozazVTNHdJSWttcHo1c2g5dTJyNTV4RlBo?=
+ =?utf-8?B?djFCZlJQTm9YYnN5KzJKUzFpODhUTEdMLzRGMkl2L0Z3V0p6Ym85YjU5ZFFH?=
+ =?utf-8?B?TnRaL2taZGxKYW9kN1Q5WG50dWV3VDRtUVpUS3JYTlpRWXJZRGdEWU9CanF0?=
+ =?utf-8?B?YWN5TDR2b0kzcS9RWWVVMzF6MGpVbWM0Y2FiMkZIYlF1YjdBeTNBazNXM3lE?=
+ =?utf-8?B?YnpqTlVGUGZJQnZPdTV5OTF4QjhJSmw0a2I5aEU0SUl0b3NMemtqRlJOcVFM?=
+ =?utf-8?B?L3dtSVV1VGlITkpiVGFwUlMwanptSFpxYVlUekxuSk5oenFydit6bVdmOFdy?=
+ =?utf-8?B?QVJoWU50ZGtGcVFNWWl6aG9mQnBCQ3VMQnB2RFBwN2RSelVZVytMNWdLYXNt?=
+ =?utf-8?Q?eE7NTUT8sz30g88XOw7OeKB2/Wttxw=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2025 20:05:06.9312
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 883f18a5-7631-418d-44d1-08dd60d80503
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL02EPF0001A102.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6828
 
-On 03/11, Mina Almasry wrote:
-> On Tue, Mar 11, 2025 at 7:40 AM Stanislav Fomichev <sdf@fomichev.me> wrote:
-> >
-> > As we move away from rtnl_lock for queue ops, introduce
-> > per-netdev_nl_sock lock.
-> >
-> > Cc: Mina Almasry <almasrymina@google.com>
-> > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-> > ---
-> >  include/net/netdev_netlink.h | 1 +
-> >  net/core/netdev-genl.c       | 6 ++++++
-> >  2 files changed, 7 insertions(+)
-> >
-> > diff --git a/include/net/netdev_netlink.h b/include/net/netdev_netlink.h
-> > index 1599573d35c9..075962dbe743 100644
-> > --- a/include/net/netdev_netlink.h
-> > +++ b/include/net/netdev_netlink.h
-> > @@ -5,6 +5,7 @@
-> >  #include <linux/list.h>
-> >
-> >  struct netdev_nl_sock {
-> > +       struct mutex lock;
-> >         struct list_head bindings;
-> >  };
-> >
-> > diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-> > index a219be90c739..63e10717efc5 100644
-> > --- a/net/core/netdev-genl.c
-> > +++ b/net/core/netdev-genl.c
-> > @@ -859,6 +859,7 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
-> >                 goto err_genlmsg_free;
-> >         }
-> >
-> > +       mutex_lock(&priv->lock);
+On 3/10/25 4:03 PM, alejandro.lucero-palau@amd.com wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
 > 
-> You do not need to acquire this lock so early, no? AFAICT you only
-> need to lock around:
+> Differentiate CXL memory expanders (type 3) from CXL device accelerators
+> (type 2) with a new function for initializing cxl_dev_state and a macro
+> for helping accel drivers to embed cxl_dev_state inside a private
+> struct.
 > 
-> list_add(&binding->list, sock_binding_list);
+> Move structs to include/cxl as the size of the accel driver private
+> struct embedding cxl_dev_state needs to know the size of this struct.
 > 
-> Or is this to establish a locking order (sock_binding_list lock before
-> the netdev lock)?
+> Use same new initialization with the type3 pci driver.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> ---
+>  drivers/cxl/core/mbox.c   |  12 +--
+>  drivers/cxl/core/memdev.c |  32 ++++++
+>  drivers/cxl/core/pci.c    |   1 +
+>  drivers/cxl/core/regs.c   |   1 +
+>  drivers/cxl/cxl.h         |  97 +-----------------
+>  drivers/cxl/cxlmem.h      |  88 ++--------------
+>  drivers/cxl/cxlpci.h      |  21 ----
+>  drivers/cxl/pci.c         |  17 ++--
+>  include/cxl/cxl.h         | 206 ++++++++++++++++++++++++++++++++++++++
+>  include/cxl/pci.h         |  23 +++++
+>  10 files changed, 285 insertions(+), 213 deletions(-)
+>  create mode 100644 include/cxl/cxl.h
+>  create mode 100644 include/cxl/pci.h
+> 
+> diff --git a/drivers/cxl/core/mbox.c b/drivers/cxl/core/mbox.c
+> index d72764056ce6..20df6f78f148 100644
+> --- a/drivers/cxl/core/mbox.c
+> +++ b/drivers/cxl/core/mbox.c
+> @@ -1484,23 +1484,21 @@ int cxl_mailbox_init(struct cxl_mailbox *cxl_mbox, struct device *host)
+>  }
+>  EXPORT_SYMBOL_NS_GPL(cxl_mailbox_init, "CXL");
+>  
+> -struct cxl_memdev_state *cxl_memdev_state_create(struct device *dev)
+> +struct cxl_memdev_state *cxl_memdev_state_create(struct device *dev, u64 serial,
+> +						 u16 dvsec)
+>  {
+>  	struct cxl_memdev_state *mds;
+>  	int rc;
+>  
+> -	mds = devm_kzalloc(dev, sizeof(*mds), GFP_KERNEL);
+> +	mds = (struct cxl_memdev_state *)
+> +		_cxl_dev_state_create(dev, CXL_DEVTYPE_CLASSMEM, serial, dvsec,
+> +				      sizeof(struct cxl_memdev_state), true);
 
-Right, if I acquire it later, I'd have to do the same order
-in netdev_nl_sock_priv_destroy and it seems to be a bit more complicated
-to do (since we go over the list of bindings over there).
+I would use sizeof(*mds) instead of sizeof(struct cxl_memdev_state) above.
+
+What's the reason to not use the cxl_dev_state_create() macro here instead? Based on the commit
+message I'm assuming it's because it's meant for accelerator drivers and this is a type 3 driver,
+but I'm going to suggest using it here anyway (and maybe amending the commit message).
+
+>  	if (!mds) {
+>  		dev_err(dev, "No memory available\n");
+>  		return ERR_PTR(-ENOMEM);
+>  	}
+>  
+>  	mutex_init(&mds->event.log_lock);
+> -	mds->cxlds.dev = dev;
+> -	mds->cxlds.reg_map.host = dev;
+> -	mds->cxlds.cxl_mbox.host = dev;
+> -	mds->cxlds.reg_map.resource = CXL_RESOURCE_NONE;
+> -	mds->cxlds.type = CXL_DEVTYPE_CLASSMEM;
+>  
+
+[snip]
+
+> +/**
+> + * struct cxl_dev_state - The driver device state
+> + *
+> + * cxl_dev_state represents the CXL driver/device state.  It provides an
+> + * interface to mailbox commands as well as some cached data about the device.
+> + * Currently only memory devices are represented.
+> + *
+> + * @dev: The device associated with this CXL state
+> + * @cxlmd: The device representing the CXL.mem capabilities of @dev
+> + * @reg_map: component and ras register mapping parameters
+> + * @regs: Parsed register blocks
+> + * @cxl_dvsec: Offset to the PCIe device DVSEC
+> + * @rcd: operating in RCD mode (CXL 3.0 9.11.8 CXL Devices Attached to an RCH)
+> + * @media_ready: Indicate whether the device media is usable
+> + * @dpa_res: Overall DPA resource tree for the device
+> + * @part: DPA partition array
+> + * @nr_partitions: Number of DPA partitions
+> + * @serial: PCIe Device Serial Number
+> + * @type: Generic Memory Class device or Vendor Specific Memory device
+> + * @cxl_mbox: CXL mailbox context
+> + * @cxlfs: CXL features context
+> + */
+> +struct cxl_dev_state {
+> +	struct device *dev;
+> +	struct cxl_memdev *cxlmd;
+> +	struct cxl_register_map reg_map;
+> +	struct cxl_regs regs;
+> +	int cxl_dvsec;
+> +	bool rcd;
+> +	bool media_ready;
+> +	struct resource dpa_res;
+> +	struct cxl_dpa_partition part[CXL_NR_PARTITIONS_MAX];
+> +	unsigned int nr_partitions;
+> +	u64 serial;
+> +	enum cxl_devtype type;
+> +	struct cxl_mailbox cxl_mbox;
+> +#ifdef CONFIG_CXL_FEATURES
+> +	struct cxl_features_state *cxlfs;
+> +#endif
+> +};
+
+What happened to the comments for private/public fields for this struct that Dan suggested in
+your RFC? If you don't think they're needed that's fine, I'm just curious!
 
