@@ -1,196 +1,196 @@
-Return-Path: <netdev+bounces-173789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 387ACA5BB1E
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 09:51:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 516A9A5BB27
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 09:51:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D124B3AC30E
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 08:50:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D683B1896481
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 08:51:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B5FB226541;
-	Tue, 11 Mar 2025 08:51:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A55D226D0B;
+	Tue, 11 Mar 2025 08:51:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XHGK8/Ee"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="P+gpc8Bz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDF201EB184;
-	Tue, 11 Mar 2025 08:51:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31FA2226865;
+	Tue, 11 Mar 2025 08:51:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741683063; cv=none; b=lHVHMvH5rXaWlGyeiXlKsLHCDLtmHh+hn+J8AI2Kbf3WUck2wBP6+0vNdnhZ8W9oOWIfkA8lywG63SYDJeJDZQufZTULLiIaUHWAK9XAeVgPwJtXuFCT9mlpTDLm+v3KZxaH3dClv71eFoh0iHMDwA432+zNKi/orKLnA7fBmUc=
+	t=1741683096; cv=none; b=ghg4T8Q+5JxBxH9R4Zd4ezO5T8XMz3OIasy1LBumqOc8w7m8ZiWiY2wDCasRzTtukmkIcAeXRBrHnexz8OuQmNBCjUWHOklFtNOQaWYw9b+7CzSfGYQMUgOTOPnKKg6qr5g6QR+pezVCDGPKnzrVXQGzC7Pvmlws4WL8j7sV8QA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741683063; c=relaxed/simple;
-	bh=HB3Zy1gU28m4kK/S0bB95ApFHZ/cYoMFfJxnYvIe3NY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UtUuXa/5VbJOLNgy/kzMHqZAesLF7lgG2t0oQI3U/GWvyjDIx/r29wkKecE3K3KzZ9dGgOsAfanH1f3dJLNEYchz4tYmtGtlnHMQDR3NlStr0yOpp9Hp3DdH8kqnPb4A1tedZa3Tg9D9E7idVK3o/c/T9Q2JN0ia18n/JnLBOlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XHGK8/Ee; arc=none smtp.client-ip=209.85.221.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-523f670ca99so1193538e0c.1;
-        Tue, 11 Mar 2025 01:51:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741683061; x=1742287861; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YwlKUmCIxRBb8ELz2q2Z4eNbzAimAiIA1z1E81e3a6E=;
-        b=XHGK8/EeIvETJAIb6KP/+65N83+IAaSakmKL4AeeKLZGYA1sLmwL2cqOFNb8DwZFAP
-         tazwIE3Xybn02xCH+Abvzb/LU45seiH3v4SxOkTW0PU5y8rT7VFx4S3p1HG/B1Ydnm5k
-         WGktHu9fzWBeVED7mIdOUcoEJXX3roZZBM1PP4crZuJeVPW+qrGbPsC5L0BtYbGo1ypZ
-         cosjSXUhNjvxMfpaNWjie6qdaw+eLKjTkMuqccZHx+Cuv2mAvGMErry1hCyJJTcc9mEg
-         FRXu77KoUJ6QKKGuQPisclvF+tldvXqWcuzVmo5+phVbWZILGfpw8y9hnVb0FOCaxlpo
-         Wx+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741683061; x=1742287861;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YwlKUmCIxRBb8ELz2q2Z4eNbzAimAiIA1z1E81e3a6E=;
-        b=sF+El0iuCbWW+oULypla+UVfkRrHYaRGKBqHRcjT+gsbYnCfLbD+I2zVOZwpwUzDgQ
-         MoZSXEv7Z5yG0eSgoQ5ckBu3Eqp1B1RTtQ3+LpjkdcoMyBWcBazXv8j8avwG6+7+W1UO
-         zT5ZYEjzyM0JXYtwbNLdFWQV09WZn8emTtI8IARy3gu1wWjYyPXaXvWjO/AogiBKJPA7
-         gJhqNoySqNUiaBvYpTfW3FV0/d95y1hwMHmu9gmI2Y8JA6Qlv4LrVQ5BbIdZ5Lsz5MrU
-         gRxU640Zu/oilPw409ySCZql32seeRILcMj+35llrLCOMf2bWU7+/RwRdO3HYjxaGWZ9
-         /gxA==
-X-Forwarded-Encrypted: i=1; AJvYcCVB6libishqZbcCXLjT2U/ZBg9lLFRKBXCgK+EPDgVq7yYWGUYb/NluYPC97ikTqISYTrAeEaZE@vger.kernel.org, AJvYcCVmY4ZiuAkrB4DrG7V7y47ACHDawoP9JplwbnJDn1Ek5n4y7t5xVZLM6UFFffiOT4foBI+gUqW/J5EyLM0D@vger.kernel.org, AJvYcCWDmF/vcQRTiPGhxatiRPDKxsLa/s8nyHSyONDLllFfh9btmgfcjRVLxkvIPTVz+2XAeJ1zzQV4Z++e@vger.kernel.org, AJvYcCX2etKFNJQsPfrweNC24mx26y9Ekg+PM5olexlDHC29r12ipGGWHNtIB2b43znuyJlE+jtWSFmyJbyR6f0fCYO8V5U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQVQb/V6ZQNaWKvIMUvwu0NqRJ7N0TxtsJDAYLs3onRPvxaMYv
-	oQw7TSkISb5sQnndqYyUsrSvfeicKTvyZoJ/ZFdId+AVWbdnl8IHeN1mVRE3VTSkqSg8+/umfSB
-	QuH9M+ovQLiNGHltmdaqR+//HWU0=
-X-Gm-Gg: ASbGncuU5uouqjNf1/j1jV0KcAInyv/ViQI9DGnCFbAikkRjVdY6aEEwv8JjxXx9rs1
-	04el+B3FnuxCYfONJJYS1hf7BIIh8JIPAwykxEEFx0LbLKWgPLMgLV/vnbgvNkwgXFvy6tYAvd0
-	GW55IOCFgToqzvho4KIXT3GH2N/XRQ5b8QMHTf
-X-Google-Smtp-Source: AGHT+IFGrKexk2feh/g4AfZm+74DwDdS0TYifRv6+ZHmhZYsDPNrr70+NaB9JFJj6JVsuEewgbKE9y58HXVcfK0UqmU=
-X-Received: by 2002:a05:6122:319b:b0:520:9b05:4cb6 with SMTP id
- 71dfb90a1353d-524195c60cbmr1473579e0c.0.1741683060635; Tue, 11 Mar 2025
- 01:51:00 -0700 (PDT)
+	s=arc-20240116; t=1741683096; c=relaxed/simple;
+	bh=YXP2RJ5SkqHF9QZZ7hHh/BRLjgxVNLw2DUDbJCVXiu8=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qyxfLc92fYfI9nP0yzKyrV8ZNww1L4UuoDvKngLsH/0oRxitKdC2vSExqqGiP5bmO49Wa2EkPB/bipTOMwsi8CgmNpfUbxsFUEisuVtq9QIekhiFsyWOgyg30Vo8VAKsotqtK/CjH3hszCEzxg3XMdl1z/tFUy7r0/P3++aYXsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=P+gpc8Bz; arc=none smtp.client-ip=198.47.19.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 52B8pBYU1141179
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 11 Mar 2025 03:51:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1741683071;
+	bh=iwZ54kNHfdvvEjAMZoUWlnIMHfpRhgOK0x0eAv0wDF4=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To;
+	b=P+gpc8Bz7K5gbQRu1Pxwy5gYtqq4zjK1NDWvr6fF4Sa0MNI5Ua/tB+AHdxPQRfOq7
+	 iZebJU0EC5ColbKOZrBUAymAVhVm9xwMyD225HSNsVQXVXoD16cl5qwYXNTU7dD9V9
+	 1nBRIrlnczfUAxbWF99TuV0srKdrNT8/n+w6bFF0=
+Received: from DFLE108.ent.ti.com (dfle108.ent.ti.com [10.64.6.29])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 52B8pBwd023379
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 11 Mar 2025 03:51:11 -0500
+Received: from DFLE107.ent.ti.com (10.64.6.28) by DFLE108.ent.ti.com
+ (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 11
+ Mar 2025 03:51:10 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE107.ent.ti.com
+ (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Tue, 11 Mar 2025 03:51:10 -0500
+Received: from localhost (uda0492258.dhcp.ti.com [10.24.72.113])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 52B8p9dr037656;
+	Tue, 11 Mar 2025 03:51:10 -0500
+Date: Tue, 11 Mar 2025 14:21:09 +0530
+From: "s-vadapalli@ti.com" <s-vadapalli@ti.com>
+To: "Sverdlin, Alexander" <alexander.sverdlin@siemens.com>
+CC: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+        "s-vadapalli@ti.com"
+	<s-vadapalli@ti.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "dan.carpenter@linaro.org" <dan.carpenter@linaro.org>,
+        "jpanis@baylibre.com"
+	<jpanis@baylibre.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "horms@kernel.org" <horms@kernel.org>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "rogerq@kernel.org" <rogerq@kernel.org>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+        "vigneshr@ti.com" <vigneshr@ti.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "srk@ti.com"
+	<srk@ti.com>
+Subject: Re: [PATCH net] net: ethernet: ti: am65-cpsw: Fix NAPI registration
+ sequence
+Message-ID: <20250311085109.q3g32v3ycoskhsko@uda0492258>
+References: <20250311061214.4111634-1-s-vadapalli@ti.com>
+ <421a4c67865215927897e16866814bd6eb68a89d.camel@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250308200921.1089980-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250308200921.1089980-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250310213056.GA904881-robh@kernel.org> <CA+V-a8uinTxr8FheR5-Pbv37j9wFR1cfrFDX6gExA5dW8WWPSA@mail.gmail.com>
-In-Reply-To: <CA+V-a8uinTxr8FheR5-Pbv37j9wFR1cfrFDX6gExA5dW8WWPSA@mail.gmail.com>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Tue, 11 Mar 2025 08:50:34 +0000
-X-Gm-Features: AQ5f1JqlUV-XTA6x64ZwVgrVHcqYL_lO68H10alDV6JE3jPjNjWM6p7bkmkYfY0
-Message-ID: <CA+V-a8v=q1aN_+4jQz3=StAXYP1-==OX5xZDrGXe8WWR4XbCKQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 1/3] dt-bindings: net: dwmac: Increase
- 'maxItems' for 'interrupts' and 'interrupt-names'
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Philipp Zabel <p.zabel@pengutronix.de>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <421a4c67865215927897e16866814bd6eb68a89d.camel@siemens.com>
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Hi Russell,
+On Tue, Mar 11, 2025 at 07:09:56AM +0000, Sverdlin, Alexander wrote:
+> Hi Siddharth!
 
-On Tue, Mar 11, 2025 at 7:16=E2=80=AFAM Lad, Prabhakar
-<prabhakar.csengg@gmail.com> wrote:
->
-> Hi Rob,
->
-> Thank you for the review.
->
-> On Mon, Mar 10, 2025 at 9:30=E2=80=AFPM Rob Herring <robh@kernel.org> wro=
-te:
-> >
-> > On Sat, Mar 08, 2025 at 08:09:19PM +0000, Prabhakar wrote:
-> > > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> > >
-> > > Increase the `maxItems` value for the `interrupts` and `interrupt-nam=
-es`
-> > > properties to accommodate the Renesas RZ/V2H(P) SoC, which features t=
-he
-> > > `snps,dwmac-5.20` IP with 11 interrupts.
-> > >
-> > > Also add `additionalItems: true` to allow specifying extra interrupts
-> > > beyond the predefined ones. Update the `interrupt-names` property to
-> > > allow specifying extra `interrupt-names`.
-> > >
-> > > Also refactor the optional `interrupt-names` property by consolidatin=
-g
-> > > repeated enums into a single enum list.
-> > >
-> > > Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com=
->
-> > > ---
-> > > Note, for this change I will be sending a sperate patch for vendor
-> > > bindings to add constraints.
-> > >
-> > > v1->v2
-> > > - No change
-> > > ---
-> > >  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 6 ++++--
-> > >  1 file changed, 4 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/=
-Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> > > index 3f0aa46d798e..fad0d611a75c 100644
-> > > --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> > > +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> > > @@ -114,6 +114,8 @@ properties:
-> > >
-> > >    interrupts:
-> > >      minItems: 1
-> > > +    maxItems: 11
-> > > +    additionalItems: true
-> > >      items:
-> > >        - description: Combined signal for various interrupt events
-> > >        - description: The interrupt to manage the remote wake-up pack=
-et detection
-> > > @@ -122,11 +124,11 @@ properties:
-> > >
-> > >    interrupt-names:
-> > >      minItems: 1
-> > > +    maxItems: 11
-> > > +    additionalItems: true
-> > >      items:
-> > >        - const: macirq
-> > >        - enum: [eth_wake_irq, eth_lpi, sfty]
-> > > -      - enum: [eth_wake_irq, eth_lpi, sfty]
-> > > -      - enum: [eth_wake_irq, eth_lpi, sfty]
-> >
-> > I think this should be structured similar to the DWC PCIe binding where
-> > we define all possible names, but not the order:
-> >
-> > minItems: 1
-> > maxItems: 11
-> > items:
-> >   oneOf:
-> >     - const: macirq
-> >       description: ...
-> >     - const: eth_wake_irq
-> >       description: ...
-> >     - pattern: '^rx-queue-[0-3]$'
-> >       description: ...
-> >     - pattern: '^tx-queue-[0-3]$'
-> >       description: ...
-> >
-> > And so on. Move the descriptions from 'interrupts' and drop 'items' and
-> > 'additionalItems' from it.
-> >
-> Thanks for the pointer, I'll do as suggested above.
->
-> @Russel, are you OK from me to add rx-queue/tx-queue in this binding
-Apologies for the typo in your name.
+Hello Alexander,
 
-Cheers,
-Prabhakar
+> 
+> On Tue, 2025-03-11 at 11:42 +0530, Siddharth Vadapalli wrote:
+> > From: Vignesh Raghavendra <vigneshr@ti.com>
+> > 
+> > Registering the interrupts for TX or RX DMA Channels prior to registering
+> > their respective NAPI callbacks can result in a NULL pointer dereference.
+> > This is seen in practice as a random occurrence since it depends on the
+> > randomness associated with the generation of traffic by Linux and the
+> > reception of traffic from the wire.
+> > 
+> > Fixes: 681eb2beb3ef ("net: ethernet: ti: am65-cpsw: ensure proper channel cleanup in error path")
+> 
+> The patch Vignesh mentions here...
+> 
+> > Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
+> > Co-developed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
+> > Signed-off-by: Siddharth Vadapalli <s-vadapalli@ti.com>
+> > ---
+> > 
+> > Hello,
+> > 
+> > This patch is based on commit
+> > 4d872d51bc9d Merge tag 'x86-urgent-2025-03-10' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+> > of Mainline Linux.
+> > 
+> > Regards,
+> > Siddharth.
+> > 
+> >  drivers/net/ethernet/ti/am65-cpsw-nuss.c | 12 ++++++------
+> >  1 file changed, 6 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> > index 2806238629f8..d5291281c781 100644
+> > --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> > +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> > @@ -2314,6 +2314,9 @@ static int am65_cpsw_nuss_ndev_add_tx_napi(struct am65_cpsw_common *common)
+> >  		hrtimer_init(&tx_chn->tx_hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_REL_PINNED);
+> >  		tx_chn->tx_hrtimer.function = &am65_cpsw_nuss_tx_timer_callback;
+> >  
+> > +		netif_napi_add_tx(common->dma_ndev, &tx_chn->napi_tx,
+> > +				  am65_cpsw_nuss_tx_poll);
+> > +
+> >  		ret = devm_request_irq(dev, tx_chn->irq,
+> >  				       am65_cpsw_nuss_tx_irq,
+> >  				       IRQF_TRIGGER_HIGH,
+> > @@ -2323,9 +2326,6 @@ static int am65_cpsw_nuss_ndev_add_tx_napi(struct am65_cpsw_common *common)
+> >  				tx_chn->id, tx_chn->irq, ret);
+> >  			goto err;
+> >  		}
+> > -
+> > -		netif_napi_add_tx(common->dma_ndev, &tx_chn->napi_tx,
+> > -				  am65_cpsw_nuss_tx_poll);
+> 
+> ... has accounted for the fact ..._napi_add_... happens after [possibly unsuccessful] request_irq,
+> please grep for "for (--i ;". Is it necessary to adjust both loops, in the below case too?
+
+Yes! The order within the cleanup path has to be reversed too i.e.
+release IRQ first followed by deleting the NAPI callback. I assume that
+you are referring to the same. Please let me know otherwise. The diff
+corresponding to it is:
+---------------------------------------------------------------------------------------------------
+diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+index d5291281c781..32c844816501 100644
+--- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
++++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+@@ -2334,8 +2334,8 @@ static int am65_cpsw_nuss_ndev_add_tx_napi(struct am65_cpsw_common *common)
+        for (--i ; i >= 0 ; i--) {
+                struct am65_cpsw_tx_chn *tx_chn = &common->tx_chns[i];
+
+-               netif_napi_del(&tx_chn->napi_tx);
+                devm_free_irq(dev, tx_chn->irq, tx_chn);
++               netif_napi_del(&tx_chn->napi_tx);
+        }
+
+        return ret;
+@@ -2592,8 +2592,8 @@ static int am65_cpsw_nuss_init_rx_chns(struct am65_cpsw_common *common)
+ err_flow:
+        for (--i; i >= 0 ; i--) {
+                flow = &rx_chn->flows[i];
+-               netif_napi_del(&flow->napi_rx);
+                devm_free_irq(dev, flow->irq, flow);
++               netif_napi_del(&flow->napi_rx);
+        }
+
+ err:
+---------------------------------------------------------------------------------------------------
+Based on your confirmation, I will implement the above and post the v2
+patch. Thank you for reviewing this patch and providing feedback.
+
+Regards,
+Siddharth.
 
