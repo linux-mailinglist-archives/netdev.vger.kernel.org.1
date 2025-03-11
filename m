@@ -1,139 +1,118 @@
-Return-Path: <netdev+bounces-173989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0585A5CCDC
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 18:55:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FDDEA5CD2F
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 19:06:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E639189DFE1
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 17:55:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E5BB189CB2B
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 18:06:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 058EF221DAB;
-	Tue, 11 Mar 2025 17:55:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9108B262D16;
+	Tue, 11 Mar 2025 18:06:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ItqY+H4V"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3D8qMqzI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 767A11C3C07
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 17:55:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3B982620C3;
+	Tue, 11 Mar 2025 18:06:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741715709; cv=none; b=LRd4ZBmGydS2niP+KmV9Brg2V7dVHaOKEHlX6QS+V50G++FgojleV75l9/0BQhj6lkDP1WYNQIRqVkICVaDwjIEblJRT8lzFldA0QW5QKKrQgdOCEA19PEuR9NcJlyTRasd3gp1s9i6FCYUW3q4qGzGudEDxywOhBTIRwI8uswU=
+	t=1741716389; cv=none; b=uIVO5mY407xFIUjMN3Hn4jb1WjH5f9IWsTUoWkRo+/rkGB+cTng69Tq1tbK5V8rGOrnBoNQvhhXhP3Xus60t7BVxIJnG0sSJj1bVzWVYkgq0xiX5DDVjlQblpsZi6jBQ0i/AB/msFJ9TaH4P/NewnCPT+Tiow8N8nXG79Si/SMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741715709; c=relaxed/simple;
-	bh=hEXLh46BYRw0lHzBYVFTBCaxb/vhdVOLpv2q6rV+EgE=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=XGuN9z6ir08g1JnVuhTeJKiCL2ulX601ju2IGGDzZg2C49PeySvTRlUk3tXFdgAAcMrtQICnRGa3Akfke3Fsjq+Ec3KUZebAdjPRecpk/ndyODc1rvlGsgMLU2LDnlwE8D9FgTboeq10iXmVfVk03u8ZNijUZnB8WaZy2M5/e1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ItqY+H4V; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7c08b14baa9so531901485a.3
-        for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 10:55:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741715707; x=1742320507; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SsactOZoCaj5pXhtF+fVXuVEuJMzuGe7ZOvBIniq9lU=;
-        b=ItqY+H4V7lM+M7evrxMsUcggVR7aold4dYpZQyxyfbIs7esRag0uw+QbwrQv3XDpr9
-         GEpTB3M1yeArKO7IY3lG5NsQQt3QLbq4FpLwK12wW1OiBGOAHObHpTyMrrgwy992BP6i
-         UMhI6SvMP0NrtD68FWB+QeUhfa4yxjbMgAkgLBV0m1Graq6Kb2P0/7vODW2XxrYSscBy
-         kcTkcyIgoWBacwiWgqTttiU0ygnbutfgwAH4LxMi3RjWuVxRRfrXfSMxMGFrMBThigHl
-         tPqS3QD7NLc2rJbt8reCG7yIoc9gZ8BRckFXTK8xcejPDQWsEBsqYCrVi9JE9JH6MurJ
-         jMVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741715707; x=1742320507;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=SsactOZoCaj5pXhtF+fVXuVEuJMzuGe7ZOvBIniq9lU=;
-        b=MNGAkMImXAamVasNGyNSPXV1LtxPrvu0JeUBIJOO59nLB6jAKnOnPusRTaJQqK8c7m
-         qH6RPgD/Aw4rIytpqimZ5R8lRWKgdVul3xZokcpYhrFZZ58bZwoKn4rhD9u27UwsIngH
-         ZK2JKwHwEqEaEMIN0m44EdqPy6bEhIfyEMOpjcmVSacGU77N4KLtzxvNTcdOLUve/fGp
-         J+wX/DpbTAmWfVOMVDvY/sTD6oQJ54oRAwKqpL/vRpHdtpt3/8SoXUEVlS0gomnZ7p0S
-         ddTSFuFYs+OUuRhiaYDBYaxSsIWyWOkaKf0Sx3O1L/fbykh0F2kUKIMhdHYaRCi32c94
-         DZ+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX0ctPcOlNmczv/dvy8kSPDvo4Bm6JXa3CMJ2i6C0MK+YdwpDulr8STQ9sKGNvmCmZcKsyivBY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxE+rEVB2AF4cC0u/Fpz4gPY97Gt7UCzrdBpTceImwPAGMuin+F
-	E90Mch+ZLC+yXSqPx9kkdsffGhjf9k0XdjHrsHUeSf4zmx5Oe/Yp
-X-Gm-Gg: ASbGncvUi42KOed7KUSxKY5rt6E5rcT5hGL2YtkpCKl2Md0EkUb+eiZ9q3G0IFgSkkU
-	Udz12G+8MsorVYLYF5nqBcFNe7G/abkeeW1D8D0OxIKlrgN6R3vvZGZGl77Dj4Rw6cFzsiBE3yF
-	fZaZ2JRmFLguQ+23e5sz+LR/mfuNJojDhGJ8wt+2E5lYMxKYRe+/3QnVsncVxfDd8EeI8Ta8liQ
-	XXyGa2yFUzLL6EYzwxiHzhWXuDlQJ05f+0rONwGhMSX1VvYlsQYtF5P+iFWbcLV1t6ifL+OaFCQ
-	kbabRiE8yDHPsOAwCgynYcynfI9SviV1UbU2AQMbPNctS+UKUNgcH0R3bqY9J9s0og3kgR14zeC
-	8yYRSs+vb4XHKVY0krd38gA==
-X-Google-Smtp-Source: AGHT+IEu1a3L+eIW2V6dbi1GFJKWblZQNT1FXX6UGkAJfSE3JDcQ7enYUJuIxNw/3ulowYH3PMY/EQ==
-X-Received: by 2002:ad4:5d49:0:b0:6e8:fbb7:6760 with SMTP id 6a1803df08f44-6e900604389mr269497186d6.1.1741715707247;
-        Tue, 11 Mar 2025 10:55:07 -0700 (PDT)
-Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e8f7090c41sm74428716d6.43.2025.03.11.10.55.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Mar 2025 10:55:06 -0700 (PDT)
-Date: Tue, 11 Mar 2025 13:55:06 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Simon Horman <horms@kernel.org>, 
- David Ahern <dsahern@kernel.org>, 
- kuniyu@amazon.com
-Message-ID: <67d078fa5b11e_2fc2f8294ed@willemb.c.googlers.com.notmuch>
-In-Reply-To: <44a45278-8ebf-4d79-b64d-f1ad557c8948@redhat.com>
-References: <cover.1741632298.git.pabeni@redhat.com>
- <fe46117f2eaf14cf4e89a767d04170a900390fe0.1741632298.git.pabeni@redhat.com>
- <67cfa0c7382ef_28a0b3294dd@willemb.c.googlers.com.notmuch>
- <7a4c78fa-1eeb-4fa9-9360-269821ff5fdb@redhat.com>
- <67d0730b8bee7_2fa72c29418@willemb.c.googlers.com.notmuch>
- <44a45278-8ebf-4d79-b64d-f1ad557c8948@redhat.com>
-Subject: Re: [PATCH v3 net-next 1/2] udp_tunnel: create a fastpath GRO lookup.
+	s=arc-20240116; t=1741716389; c=relaxed/simple;
+	bh=DippBqC0BBU0qH1E5vSEMORAFTY5N4fiUMqRFBzB8mQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C+kEAc1lA3DDFhRSC2stkZHm7/p/V32oIibUZDZ2bTmzw4j1eGxCGKUGlCZOWv9Ce51lh3J+/5vESWivRV9PMyv8TYITPDEDyqCgBuuFxycFCZFLDBJYRLjqc2uEuIyXmCa6n9RQDj/9J8pbtBroXx806+HwlyEXix2ETRbkNjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3D8qMqzI; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=3OLyNSn1WdzXXSydJk+U4Xqnh9AkjR3NtHdm4uHlg2I=; b=3D8qMqzI2hLyJ4OmXTqaru27Sj
+	yuWdbwj4lnjwq0ZZyrOZmsml2cahvtrLvdfCwPVJf+fO//6p/cWAEJwc+Mm80x2NsDSdInA99QL6b
+	HEydjaVzn9+FbbYMbYCpHs6cAC2QFKgEF6jtqplLpjylWi09wQVpS/aSaQSpH2BkjSd0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ts3zV-004Ppo-Ho; Tue, 11 Mar 2025 19:06:09 +0100
+Date: Tue, 11 Mar 2025 19:06:09 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Rob Herring <robh@kernel.org>
+Cc: Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Dimitri Fedrau <dima.fedrau@gmail.com>
+Subject: Re: [PATCH net-next 1/3] dt-bindings: net: ethernet-phy: add
+ property mac-series-termination-ohms
+Message-ID: <de68ea7e-1ca5-4983-9824-3fb432b00e82@lunn.ch>
+References: <20250307-dp83822-mac-impedance-v1-0-bdd85a759b45@liebherr.com>
+ <20250307-dp83822-mac-impedance-v1-1-bdd85a759b45@liebherr.com>
+ <20250311173344.GA3802548-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250311173344.GA3802548-robh@kernel.org>
 
-Paolo Abeni wrote:
-> On 3/11/25 6:29 PM, Willem de Bruijn wrote:
-> > Paolo Abeni wrote:
-> >> On 3/11/25 3:32 AM, Willem de Bruijn wrote:
-> >>> What about packets with a non-local daddr (e.g., forwarding)?
-> >>
-> >> I'm unsure if I understand the question. Such incoming packets at the
-> >> GRO stage will match the given tunnel socket, either by full socket
-> >> lookup or by dport only selection.
-> >>
-> >> If the GSO packet will be forwarded, it will segmented an xmit time.
-> >>
-> >> Possibly you mean something entirely different?!?
+On Tue, Mar 11, 2025 at 12:33:44PM -0500, Rob Herring wrote:
+> On Fri, Mar 07, 2025 at 11:30:01AM +0100, Dimitri Fedrau wrote:
+> > Add property mac-series-termination-ohms in the device tree bindings for
+> > selecting the resistance value of the builtin series termination resistors
+> > of the PHY. Changing the resistance to an appropriate value can reduce
+> > signal reflections and therefore improve signal quality.
 > > 
-> > Thanks, no that is exactly what I meant:
+> > Signed-off-by: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+> > ---
+> >  Documentation/devicetree/bindings/net/ethernet-phy.yaml | 5 +++++
+> >  1 file changed, 5 insertions(+)
 > > 
-> > Is a false positive possible? So answer is yes.
-> > 
-> > Is it safe. So, yes again, as further down the stack it just handles
-> > the GSO packet correctly.
-> > 
-> > Would you mind adding that to commit message explicitly, since you're
-> > respinning anyway?
+> > diff --git a/Documentation/devicetree/bindings/net/ethernet-phy.yaml b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+> > index 824bbe4333b7ed95cc39737d3c334a20aa890f01..4a710315a83ccf15bfc210ae432ae988cf31e04c 100644
+> > --- a/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+> > +++ b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+> > @@ -238,6 +238,11 @@ properties:
+> >        peak-to-peak specified in ANSI X3.263. When omitted, the PHYs default
+> >        will be left as is.
+> >  
+> > +  mac-series-termination-ohms:
 > 
-> I was confused because this patch does not change the current behaviour.
+> A property of the MAC (or associated with it) should be in the MAC's 
+> node.
 
-Oh right, this is also true of the existing __udp6_lib_lookup path.
- 
-> I'll add a note in v4.
+But it is the PHY which uses the property, and the PHY which is
+implementing the resistor.
 
-Thanks
+Also, a PHY has two sides, one towards the MAC and a second media side
+to the network peer via the Ethernet cable. Both sides need
+termination resistors. So we need something in the name to make it
+clear which side of the PHY we are talking about. So we might end up
+with something like mac-termination-ohms and media-termination-ohms,
+in the PHY node.
 
+> Also, sounds like either either end could have a property.
 
+True, the MAC could also need a similar property, since the outputs
+from the MAC to the PHY needs termination resistors.  For the MAC,
+termination-ohms is probably sufficient, or phy-termination-ohms to
+indicate it is towards the PHY?
+
+	Andrew
 
