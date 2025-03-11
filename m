@@ -1,133 +1,163 @@
-Return-Path: <netdev+bounces-173934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22BACA5C444
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 15:55:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5767BA5C448
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 15:56:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A20511895DD2
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:55:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8DBCD189606B
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:56:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C96F25D8E8;
-	Tue, 11 Mar 2025 14:55:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D41BB25D8F8;
+	Tue, 11 Mar 2025 14:56:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DcxKHpPm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lZk9g+6D"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AE9D1E3787
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 14:55:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD54625C6FE;
+	Tue, 11 Mar 2025 14:56:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741704927; cv=none; b=LhjnkFq7fhxAYtojpOL4L4Fco6PX0JwomMzU2/T4bYhScKj2AaeIDt/tnRxBEYocoFSyU40dv2u8/8A4pMTE08+qgCHB6v2gjmkGMGMXmSVHzaqoYq5sB93COe/1y7icXXY5LROK2GPioCoicncLZsa50BXjViBWc+owPUQ7c2o=
+	t=1741704963; cv=none; b=NQVgSZyCZwj4mNGkTGzWki3BHQT7ewL6TNziJnRUrqMaG2QQQlV7Zt7MYgnSkGrz380Geg7oHBiP1ZzhtmmNmh/E/JDkyLu7UFNc0pKJuYMrG4ckMkqJlWjNmIxTarpHY+xBqFkFiDJ8qgKJt7StK659Ar1X3iq7KMNDA1MDDFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741704927; c=relaxed/simple;
-	bh=LxjUDv/UM5tflyb5Wwci2kxKo+KfDqi/Ic90JGTEVGE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iwogY+8WbJcn46zCpl+KACHDUoKbGZo7ADE8pjRchQFtGVxrSVy3dwz13kyNQAgGn3TiGT91D/WddhikcEGy9mrSj2QvgbNw13K/qNynPcW2L/R8O9V8CfpNaDZGaoUXJ5RiJkilWvnigwEvtAnXOYwlKXC/esA1lJjBFRFtvQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DcxKHpPm; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741704925;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sPy3t2hyYp12g+bGKcjhtrCXAuWyoMvrseXBSI8ksqM=;
-	b=DcxKHpPmmrV2oKOH3tOkyhQSr/tEsSVUx1HXJ09OQd6bp5N+0a2/DN5crefC6HBDsJRYdb
-	eG5K+exn1XXc4cveeyzrylC6cfZ/SS7yuM8erJZxh11SS3ZnWAIciD94VqgCS660dQsEUp
-	nDJuhyl/jVroxYPBec88uhOWI1+wzt8=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-76-_FxgTry3Mi2JKl0kpAtKSQ-1; Tue, 11 Mar 2025 10:55:24 -0400
-X-MC-Unique: _FxgTry3Mi2JKl0kpAtKSQ-1
-X-Mimecast-MFC-AGG-ID: _FxgTry3Mi2JKl0kpAtKSQ_1741704923
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43947a0919aso47653835e9.0
-        for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 07:55:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741704923; x=1742309723;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sPy3t2hyYp12g+bGKcjhtrCXAuWyoMvrseXBSI8ksqM=;
-        b=H5vpc0dQZQzXbh1D0nTDe3uFI8CKzzZ1HuWKxKbSgEg1DsYnctfQmQ+GrIqr52SskZ
-         t17PxYebBbLjo6v17YT1IhCEuSxSqWcsJacdm32bH5vRf5rn784Ijx44FY5JWjxTD5uJ
-         asnoZghLy2E4MZEij77ySUCfKDQKXbBUofNZiNuOHjVKy53JXg/V1fniKmpLaKUWg3zb
-         CfFhoj0IqJFIe4Kb7MVKO6LOYSQWKiZPU4DXpm/EZtVybhURG83qcQfzbKm9T95sFUBz
-         Vvk0DNq6VU5jkfQ3IrAT7b4TAzDPujdd0PEcG0O9izOjxfzXL+Ox6VPaSn7hddwHRat6
-         ga3A==
-X-Forwarded-Encrypted: i=1; AJvYcCVH4Elqrao1MNHqgcEyRzQuRU24quBFjafMpPRQIzJaDg2VeS8So+IXLlxQcp3a1aqt51hns04=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkHOx3v64YZNmYW5DYTsO/mi5fh6v770uaeXLuQsy0cMVPJmR5
-	cO2aeiMFKPGbzzSzFpYfe5boTkRw7OUkHV0pT12ratZyFCW/SwNw1hCqQzV8rtjUsLhwtg6TVyJ
-	zpUCvSx87hAjlmdc6ffQD/K5i4mGAT+Bx0PK7eA7SKWO1BhQ1qLWDtA==
-X-Gm-Gg: ASbGncu0qYK2nFgdJQZa15dLQjQYuTR/q1WL3g103XvgO6UiN3026PHSQIeiiegW9F5
-	lV4rZyEjJSbkAWpHjaZtwHl82AF6JQvAk6yl4WG0gN/tkYwHwC+68xhAqBmiH9j+DFFy+F62QSZ
-	uUReFzfrbjra16cpkzjZMa0h40n8NcGa5R19idpmmZeN1cMqXY0Z7tHHjV9kEgmG+iP2/FqH8zB
-	RceM9m4NQ2TGXqeanz4/CMLsIGyXbLUPXn9FBxLvREy3TJX7aSK9R7ceyH3uvgSNBdapaYSE1iG
-	jvCdn6mUHnn3gmX9YBSgadtv/3Nh7IHoad4p5F2D78M9Pg==
-X-Received: by 2002:a5d:59a8:0:b0:391:2d76:baaa with SMTP id ffacd0b85a97d-39132db1be7mr17487083f8f.46.1741704922804;
-        Tue, 11 Mar 2025 07:55:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFFfQ3FEGmyoS07jVk0z3pCPYaEtuw1AmA8TfNJieHbK/iCm4OuD5njJ7PAsd/RHkO9FkLycQ==
-X-Received: by 2002:a5d:59a8:0:b0:391:2d76:baaa with SMTP id ffacd0b85a97d-39132db1be7mr17487033f8f.46.1741704922456;
-        Tue, 11 Mar 2025 07:55:22 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-12-146.dyn.eolo.it. [146.241.12.146])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912bee262esm18264152f8f.0.2025.03.11.07.55.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Mar 2025 07:55:21 -0700 (PDT)
-Message-ID: <a5366506-2083-4957-b269-71e0a343be10@redhat.com>
-Date: Tue, 11 Mar 2025 15:55:20 +0100
+	s=arc-20240116; t=1741704963; c=relaxed/simple;
+	bh=SC3CQyPzKXglN8Xig/IH7CP07I5r155f+JqiCZcqvTY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N7emdP4ngCA6VmPtJWedlGyYCOQrF/Ozg58OvkSkIJ6s7W1Ea9JCgLCmG+/NzbXfP/0WaSXZz9V69UuEg9sihw+h7ab5AayAJFfXGL3XwlFCrTBBujQCUpU4sXxoXkO2y0KKHX2lcUFyPXc/12UXpoWENOC4l36nII2jpNF0Jfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lZk9g+6D; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4256DC4CEEA;
+	Tue, 11 Mar 2025 14:56:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741704963;
+	bh=SC3CQyPzKXglN8Xig/IH7CP07I5r155f+JqiCZcqvTY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lZk9g+6D2d830IJFgWRtIkCtZJP+YN6QaBDZKqlIcgP0oF+HYNcXY0TAHg9vIE4lz
+	 u3Aa9thhyew8orECzx4oz/Ee4hKpOUeoHgyKrC2acmS+6Sx0gTfHPbvc5RIcD5Fg+k
+	 os2tAj2Abt95cNeey7AJmil59GDz/JKbue8b9+7N7vVV2YSqSVLJTsNmphLajStHnQ
+	 CVKFOUOymM8EWDRBPNcKqIgUndexiPydlPCOGPml36W86Xee/RRQM8tyLW2oERoJXk
+	 WKasM6WwRhHw6eXt5cfvMiObM8uSJ0sz2UUmim+OoxubHkl6s0hIsQFy3qSmJ5FEp5
+	 Y3I8nO8CR1bsw==
+Date: Tue, 11 Mar 2025 16:55:57 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Bernard Metzler <BMT@zurich.ibm.com>
+Cc: Parav Pandit <parav@nvidia.com>,
+	Nikolay Aleksandrov <nikolay@enfabrica.net>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"shrijeet@enfabrica.net" <shrijeet@enfabrica.net>,
+	"alex.badea@keysight.com" <alex.badea@keysight.com>,
+	"eric.davis@broadcom.com" <eric.davis@broadcom.com>,
+	"rip.sohan@amd.com" <rip.sohan@amd.com>,
+	"dsahern@kernel.org" <dsahern@kernel.org>,
+	"roland@enfabrica.net" <roland@enfabrica.net>,
+	"winston.liu@keysight.com" <winston.liu@keysight.com>,
+	"dan.mihailescu@keysight.com" <dan.mihailescu@keysight.com>,
+	Kamal Heib <kheib@redhat.com>,
+	"parth.v.parikh@keysight.com" <parth.v.parikh@keysight.com>,
+	Dave Miller <davem@redhat.com>,
+	"ian.ziemba@hpe.com" <ian.ziemba@hpe.com>,
+	"andrew.tauferner@cornelisnetworks.com" <andrew.tauferner@cornelisnetworks.com>,
+	"welch@hpe.com" <welch@hpe.com>,
+	"rakhahari.bhunia@keysight.com" <rakhahari.bhunia@keysight.com>,
+	"kingshuk.mandal@keysight.com" <kingshuk.mandal@keysight.com>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [RFC PATCH 00/13] Ultra Ethernet driver introduction
+Message-ID: <20250311145557.GG7027@unreal>
+References: <20250306230203.1550314-1-nikolay@enfabrica.net>
+ <20250308184650.GV1955273@unreal>
+ <CY8PR12MB7195F4D67BE6D9A970044572DCD72@CY8PR12MB7195.namprd12.prod.outlook.com>
+ <BN8PR15MB25136EC9F3DE1FBEF9B2429199D12@BN8PR15MB2513.namprd15.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 02/14] xsc: Enable command queue
-To: Xin Tian <tianx@yunsilicon.com>, netdev@vger.kernel.org
-Cc: leon@kernel.org, andrew+netdev@lunn.ch, kuba@kernel.org,
- edumazet@google.com, davem@davemloft.net, jeff.johnson@oss.qualcomm.com,
- przemyslaw.kitszel@intel.com, weihg@yunsilicon.com, wanry@yunsilicon.com,
- jacky@yunsilicon.com, horms@kernel.org, parthiban.veerasooran@microchip.com,
- masahiroy@kernel.org, kalesh-anakkur.purayil@broadcom.com,
- geert+renesas@glider.be
-References: <20250307100824.555320-1-tianx@yunsilicon.com>
- <20250307100827.555320-3-tianx@yunsilicon.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250307100827.555320-3-tianx@yunsilicon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <BN8PR15MB25136EC9F3DE1FBEF9B2429199D12@BN8PR15MB2513.namprd15.prod.outlook.com>
 
-On 3/7/25 11:08 AM, Xin Tian wrote:
-> +void xsc_cmd_use_events(struct xsc_core_device *xdev)
-> +{
-> +	struct xsc_cmd *cmd = &xdev->cmd;
-> +	int i;
-> +
-> +	for (i = 0; i < cmd->max_reg_cmds; i++)
-> +		down(&cmd->sem);
-> +
-> +	flush_workqueue(cmd->wq);
-> +
-> +	cmd->mode = XSC_CMD_MODE_EVENTS;
-> +
-> +	while (cmd->cmd_pid != cmd->cq_cid)
+On Tue, Mar 11, 2025 at 02:20:07PM +0000, Bernard Metzler wrote:
+>=20
+>=20
+> > -----Original Message-----
+> > From: Parav Pandit <parav@nvidia.com>
+> > Sent: Sunday, March 9, 2025 4:22 AM
+> > To: Leon Romanovsky <leon@kernel.org>; Nikolay Aleksandrov
+> > <nikolay@enfabrica.net>
+> > Cc: netdev@vger.kernel.org; shrijeet@enfabrica.net;
+> > alex.badea@keysight.com; eric.davis@broadcom.com; rip.sohan@amd.com;
+> > dsahern@kernel.org; Bernard Metzler <BMT@zurich.ibm.com>;
+> > roland@enfabrica.net; winston.liu@keysight.com;
+> > dan.mihailescu@keysight.com; Kamal Heib <kheib@redhat.com>;
+> > parth.v.parikh@keysight.com; Dave Miller <davem@redhat.com>;
+> > ian.ziemba@hpe.com; andrew.tauferner@cornelisnetworks.com;
+> > welch@hpe.com; rakhahari.bhunia@keysight.com;
+> > kingshuk.mandal@keysight.com; linux-rdma@vger.kernel.org;
+> > kuba@kernel.org; Paolo Abeni <pabeni@redhat.com>; Jason Gunthorpe
+> > <jgg@nvidia.com>
+> > Subject: [EXTERNAL] RE: [RFC PATCH 00/13] Ultra Ethernet driver
+> > introduction
+> >=20
+> >=20
+> >=20
+> > > From: Leon Romanovsky <leon@kernel.org>
+> > > Sent: Sunday, March 9, 2025 12:17 AM
+> > >
+> > > On Fri, Mar 07, 2025 at 01:01:50AM +0200, Nikolay Aleksandrov wrote:
+> > > > Hi all,
+> > >
+> > > <...>
+> > >
+> > > > Ultra Ethernet is a new RDMA transport.
+> > >
+> > > Awesome, and now please explain why new subsystem is needed when
+> > > drivers/infiniband already supports at least 5 different RDMA
+> > transports
+> > > (OmniPath, iWARP, Infiniband, RoCE v1 and RoCE v2).
+> > >
+> > 6th transport is drivers/infiniband/hw/efa (srd).
+> >=20
+> > > Maybe after this discussion it will be very clear that new subsystem
+> > is needed,
+> > > but at least it needs to be stated clearly.
+>=20
+> I am not sure if a new subsystem is what this RFC calls
+> for, but rather a discussion about the proper integration of
+> a new RDMA transport into the Linux kernel.
 
-If I read correctly, `cq_cid` can be concurrently and locklessy modfied
-by xsc_cmd_resp_handler() and/or xsc_cmd_cq_polling().
+<...>
 
-If so you need at least READ/WRITE_ONCE() annotations and possibly some
-explicit mutual exclusion between xsc_cmd_resp_handler and
-xsc_cmd_cq_polling.
+> The different API semantics of UET may further call
+> for either extending verbs to cover it as well, or exposing a
+> new non-verbs API (libfabrics), or both.
 
-Thanks,
+So you should start from there (UAPI) by presenting the device model and
+how the verbs API needs to be extended, so it will be possible to evaluate
+how to fit that model into existing Linux kernel codebase.
 
-Paolo
+RDNA subsystem provides multiple type of QPs and operational models, some o=
+f them
+are indeed follow IB style, but not all of them (SRD, DC e.t.c).
 
+Thanks
+
+>=20
+> Thanks,
+> Bernard.
+>=20
+>=20
+> > >
+> > > An please CC RDMA maintainers to any Ultra Ethernet related
+> > discussions as it
+> > > is more RDMA than Ethernet.
+> > >
+> > > Thanks
+>=20
 
