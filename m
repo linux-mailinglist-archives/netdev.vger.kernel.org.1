@@ -1,231 +1,130 @@
-Return-Path: <netdev+bounces-173928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DCB7A5C3FA
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 15:37:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8369AA5C40C
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 15:40:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2653C7AAADF
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:36:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F87D188C628
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:40:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6AD25CC95;
-	Tue, 11 Mar 2025 14:36:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=fiona.klute@gmx.de header.b="TfMw8114"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8B8F25BAC3;
+	Tue, 11 Mar 2025 14:40:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C90B325CC77;
-	Tue, 11 Mar 2025 14:36:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F07B79EA;
+	Tue, 11 Mar 2025 14:40:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741703810; cv=none; b=J3uRkzOF5AKtQ03oUsczUy4KrYNiwSRYszL+J+AD2C9HcXeA9VXBr1MfNdyhxfw/ubq/spJmyDGvc8SoOymhQU0FiaG8FnYqLQ+3N6Im/u4imvJ+8tRX9+vahRlfrXa5BdQZR72HYpMngxUBbmyp2rbLIOeT0yiy2amkGtLe4KI=
+	t=1741704030; cv=none; b=mQMlCkp1+2bm8ssnquaTXLWmuJx9Ld9CJMpCHzhAyGqaGw5u2l1pj3xvQ1lwz0HCdRE4W8PMZe/s+21/1rUhPtHO1P/1dDoh6zbuEYBh7X0WQEK7H84kw+tmcA6AJXHKjXoY4gmo2FEChu18pPYZzmE+XfGPnZjxiQuQBL2wwxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741703810; c=relaxed/simple;
-	bh=mC/5J7Ya9VRj3TG8oIfCpNT8VWsPU/gApt0oe4jH43U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G0QMryTEnQVNWCIcdwizf7j8V7r7j2J/GBrsBofY5VqibCgERLsw8whlJLvPLSbRYXuYwWiFX5bf9IIzc2usa5XiR1tNH+LzVsdXEahMzOpN+XMElPm30V9dvybK0oZ3/IfcL9/7iu3c1ORs9FOuW10Y9EuCmMigVEqM/vF/yBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=fiona.klute@gmx.de header.b=TfMw8114; arc=none smtp.client-ip=212.227.17.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1741703804; x=1742308604; i=fiona.klute@gmx.de;
-	bh=7T2Eg25mErZe40rj8TyAYOGzmsWuKdrSGJHWaZx+Q8s=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=TfMw8114RB24F7ztJ9T4OQOly1wRMxWyq43c7beDx7XhJLqkqR13dIp5Qazg/ASI
-	 DO1i3BbiSQgusdjd0SJhG1f9yluj4soUjDogyW1hkmqwUeiG4cH9inxZy3AY7hiKJ
-	 PinTJx15VCMn1bKipKxV5DzxlQzngrJP8tIQaSlkbNZtUcGe0YW735sRMgZ2IaDF0
-	 Z+e9DMms+XNiXtFARUl/U6iA7JMSHLEJW7BM/0Qni7RyNVkBoJVKU9XxB5/gpiVIN
-	 UXBWVwh8fJK07mH1XJd0gCQckDsBNhUAxgSGSlCIRgyIwJZ+GVnbpAJNvLqCfeNfg
-	 rlQusdTj207pjLDuzA==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [192.168.7.2] ([85.22.124.191]) by mail.gmx.net (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1N5G9t-1tBUsL2SQv-00weus; Tue, 11
- Mar 2025 15:36:44 +0100
-Message-ID: <83b8ec69-0f7b-4ede-bf4f-f35b5d4fa4b2@gmx.de>
-Date: Tue, 11 Mar 2025 15:36:42 +0100
+	s=arc-20240116; t=1741704030; c=relaxed/simple;
+	bh=bdpQuWOogWUPU+LgodjEDpZ3ZW4UKjg9rQLjtDiWfkE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bd4mXzxfZsG/bt1+ZNggnlPPnAIbN+Ajr5KBp1evG/Y59oM4APhfAIebVT7LBuSlcfECYkTt/JZF0QXlWgGTzqQNsRjKahx1dTc50XadCH2BAFE51J0s1gE2BdeDtFburtUbap+sJyFWWM64+6FH9Ti74a/AhipLrNsMuIOlogQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2ff797f8f1bso7589256a91.3;
+        Tue, 11 Mar 2025 07:40:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741704028; x=1742308828;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RGNuY196QhTC5kCQhQIas1dZxtdWGaoWAup+oKiawFo=;
+        b=k3d8QUaayKh/CWCsSoEMbz7Y+vwx4baiq3Ok44EkuOqbsLiZ7ZZn+ZgzaC/St4VJ+s
+         IGrYxcQTv1gGZiheBOfEIBwnN+XFFhIXUZDu8nkIcgJBJFsZDDhQ3UP7fxEKMNJZ9KfO
+         WKm6XMynX4LLZ5XIoK6zVgjlWUG1wPdZ06RhGfW1bTfKes19cAgSnCkqHLOx/I7prHcy
+         bNEATcvcBj9ki/XkE1N6RP2OYmMkuhIWeW/2xca7/jfU4PGSRC3czMl5Lc738Jj8lDyD
+         CJxhT+3wP0K3O00ki/sEDe8l6xdStrw/H0C1vJ/PXEqA+mPjt+GjIjcJ3wxzpWxj19pp
+         wd/g==
+X-Forwarded-Encrypted: i=1; AJvYcCUSyvgJmTzU0PLTD1UPdcsgFXe+m1Hb3GUYyc11+K68xRXJEVVxbke80x/YBvkaNuDIy10FmrL0SZTMTO8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMYNm5TzpKDfs7jQ9ijK7Dwt82pc1f1Ln0hqJ5fyN3NpqromDR
+	epkXABYLS1OTdF/nbcB92kr9UGjxAIY089AhLHIwzZHRgIzG5nnhwbV34u7WZg==
+X-Gm-Gg: ASbGnct70ZyzTJZjB58144LtQcAF1U3JeZPNXlmVJoCfq3Amf7r1zIJv/K24veNMk/M
+	oBS0wmzNAkpiyvaxM91h1Hp1ybYkoi8+4mDsz6lmMPVBUXhldVNcoUDc3S9hNTL7X8H8WnabDBL
+	l928mUYapmPchUz7HIk5EeshW8F1wXyCLkLawF3kq/wyFqtBDRAo1iYFR3H31GphOjr6+21DlFc
+	if7hKxLvbtlbh99ZZVO9/+Qt2RbcO3oagkUkRY+x9pbNouLGKSBDoIRm6PbtS9Lp3n4xCIJK/R+
+	JBLXuhDRDZDkjzkIx8ce84k0zwuPs0sv35eTwpSg/hnGDr0hXQZktjU=
+X-Google-Smtp-Source: AGHT+IFvn53gcTq8I5rCxoVqGBE6hkhvplWlGFZ1Wl5BqiIXMH147v8lMAX+V93uwTwHnl2v8LsWew==
+X-Received: by 2002:a05:6a21:7308:b0:1f5:6a1a:329b with SMTP id adf61e73a8af0-1f58cbc548fmr7756611637.32.1741704028036;
+        Tue, 11 Mar 2025 07:40:28 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-736a6e5c13asm9270443b3a.157.2025.03.11.07.40.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Mar 2025 07:40:27 -0700 (PDT)
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	donald.hunter@gmail.com,
+	horms@kernel.org,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	andrew+netdev@lunn.ch,
+	jdamato@fastly.com,
+	xuanzhuo@linux.alibaba.com,
+	sdf@fomichev.me,
+	almasrymina@google.com,
+	asml.silence@gmail.com,
+	dw@davidwei.uk
+Subject: [PATCH net-next v2 0/3] net: remove rtnl_lock from the callers of queue APIs
+Date: Tue, 11 Mar 2025 07:40:23 -0700
+Message-ID: <20250311144026.4154277-1-sdf@fomichev.me>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: usb: lan78xx: Enforce a minimum interrupt polling
- period
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Thangaraj Samynathan <Thangaraj.S@microchip.com>,
- Rengarajan Sundararajan <Rengarajan.S@microchip.com>,
- UNGLinuxDriver@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, linux-usb@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-list@raspberrypi.com,
- stable@vger.kernel.org
-References: <20250310165932.1201702-1-fiona.klute@gmx.de>
- <11f5be1d-9250-4aba-8f51-f231b09d3992@lunn.ch>
- <4577e7d7-cadc-41c6-b93f-eca7d5a8eb46@gmx.de>
- <42b5d49b-caf8-492d-8dba-b5292279478a@lunn.ch>
-Content-Language: en-US, de-DE-1901, de-DE
-From: Fiona Klute <fiona.klute@gmx.de>
-Autocrypt: addr=fiona.klute@gmx.de; keydata=
- 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
-In-Reply-To: <42b5d49b-caf8-492d-8dba-b5292279478a@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:Y5lSVKyec42DqzTu9KXl+1p64Hiv3BOm5Ij4FQIqfJDN830PoOc
- aNDa0PpzlmCobpwFKVktXCS6NuQB4JhiCHo5NnoNBOIOFJ8lfIWa9dxYVQ7t4TtMYdHc0yQ
- NesTdvAPVIgTcp4fHcGUH/glod4PUdN9hYBy+i7POLxjm45GGl6Rvk0Dq8mArX6rvQwceEb
- 3csNvPn4W/Ebj5YaNybcg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:0cL0Ug/OdVc=;H5g+wwiR5FzkTIk5YpgDcnh2XVh
- ukpI9WmiAL3aT24CojMXwYdK/qaeFbvLdrG82eyOGELUJxUqZOCrEP4GYuJ5+WQkiFalwBSSW
- ccyVe0veSaID+LRcbGUi39O+Ac7SQI5sKu4A0WNFawJPSZ8OQRwEaZwbQ17Nl4uk7TGPriKVV
- 1P+bK5mwcghETEvMWxqm+pGJFiRZ5gFC59mCkF9+6+Mx8bCl08JXnKwrWF3J57D2QLLMTrS8K
- 42WcNonj5jr8USsqJlEgbnm7LPu5oN4qZQQ0XwnJ6ZEMhouo4rfI/ea6qsTbrMGLjl5Me7fiu
- DDew1moYjAJvlPT3gH46UUmTO71BarNhh2zN3I7/YByPzAMaiWLFxN/00HgicHXh7yBIWKpWD
- G3ZWxrTP+QbGxPfRJw7ddx/oIod37HX8+z/7WItP5Dw0uysq40Rewl7RQraLV2rISVYCsx5F6
- cqXpXvHZDOFIUH0SNyS1Q7LFgMwoGK5zLq3wa8wPWj5HqOSPpZgdFikYkvSNuz9nStwIBT2Sq
- OjrZA+vigMWSpUSe1IYYdQZtOxu80PDzxuyXLjSJm067bMMilTzVIwFScMayclc3yb5F9MOqB
- AXmTSTw9hDsEunqnYZT40KXQDLOjnmiWU19veYYhLYcgjqLXEOOCKX98s3wdiXy2EB6m6ACcO
- 4EYhJY8c71H5D3rXbt7ADxd4s8QbzGfo+OEU78IRZhavy7WD4tcXMIe7CslRTkNASxUhwBo7P
- N6MHPXwtOYZmr1ZEBBIBTnnFBJIRgNQODYJ4mOHCl2c+R+Kc5tFsc/ky2nbcQ++A5lDSqdDO1
- juQyuOIYxOhwN+H+stbpe4RWse8JzeXWYUimfyFmr/R86NNJ7nlAycZKE/UzJ9YC1HE3E4txm
- OpKYwHjGDBUPoKuj/X128jDnjiBJzQGCidFq9pRw4oD82MVf+xrWyw91BHXzDmoyluMaVqZxD
- fMzwo/7jeJmTlbERsBn4dTAp2EYGHNmDp1JTf32FKo0AeEHhUoKhlOomk99mSmqaHaXdatFRX
- RjAJK5zmUuw7BAeQ4TFizoA2MPehYqBcHJdh444e9CnbsE11lcHQoCSaA8OhAFtJhuk0W7GFo
- GRbs5CFgkhoo9wEUd/R5GIlGcZvHa0osBvZqjXuho1a3eEAUxVZmGQHWQZS/at2boOwI9PPal
- +fCI5Bzi4FcuL7I4HvqHiuGZSrOUbfsL33SLo1lXRWUyNH/1N5KeafdvC3EUGVHfrtUtK93zT
- 8+mRmVVUCifElqC61IBuA89VV1dzJyD/dkDMq/rqbJ5TprNkZwDiEkc1xfsU1hFxnKqXFMTQH
- Je+D3xp7gEfemy/40MxNEUFSzXFO7c9G+L14wDQJkR11trDAoIhzDKwUWiDPxhxG9Fc75PjHQ
- 9WZqTVKdpqRcznrJQkiTd2T7q/Aw+E8i3ncFZ6cZpmTTl4XTyv3t59UWuheTOnRT7pUfcj8ro
- 7SLMQcg==
+Content-Transfer-Encoding: 8bit
 
-Am 11.03.25 um 14:22 schrieb Andrew Lunn:
-> On Tue, Mar 11, 2025 at 01:30:54PM +0100, Fiona Klute wrote:
->> Am 10.03.25 um 22:27 schrieb Andrew Lunn:
->>> On Mon, Mar 10, 2025 at 05:59:31PM +0100, Fiona Klute wrote:
->>>> If a new reset event appears before the previous one has been
->>>> processed, the device can get stuck into a reset loop. This happens
->>>> rarely, but blocks the device when it does, and floods the log with
->>>> messages like the following:
->>>>
->>>>     lan78xx 2-3:1.0 enp1s0u3: kevent 4 may have been dropped
->>>>
->>>> The only bit that the driver pays attention to in the interrupt data
->>>> is "link was reset". If there's a flapping status bit in that endpoin=
-t
->>>> data (such as if PHY negotiation needs a few tries to get a stable
->>>> link), polling at a slower rate allows the state to settle.
->>>
->>> Could you expand on this a little bit more. What is the issue you are
->>> seeing?
->>
->> What happens is that *sometimes* when the interface is activated (up, i=
-m
->> my case via NetworkManager) during boot, the "kevent 4 may have been
->> dropped" message starts to be emitted about every 6 or 7 ms.
->
-> This sounding a bit like an interrupt storm. The PHY interrupt is not
-> being cleared correctly. PHY interrupts are level interrupts, so if
-> you don't clear the interrupt at the source, it will fire again as
-> soon as you re-enable it.
->
-> So which PHY driver is being used? If you look for the first kernel
-> message about the lan78xx it probably tells you.
->
->> [   27.918335] Call trace:
->> [   27.918338]  console_flush_all+0x2b0/0x4f8 (P)
->> [   27.918346]  console_unlock+0x8c/0x170
->> [   27.918352]  vprintk_emit+0x238/0x3b8
->> [   27.918357]  dev_vprintk_emit+0xe4/0x1b8
->> [   27.918364]  dev_printk_emit+0x64/0x98
->> [   27.918368]  __netdev_printk+0xc8/0x228
->> [   27.918376]  netdev_info+0x70/0xa8
->> [   27.918382]  phy_print_status+0xcc/0x138
->> [   27.918386]  lan78xx_link_status_change+0x78/0xb0
->> [   27.918392]  phy_link_change+0x38/0x70
->> [   27.918398]  phy_check_link_status+0xa8/0x110
->> [   27.918405]  _phy_start_aneg+0x5c/0xb8
->> [   27.918409]  lan88xx_link_change_notify+0x5c/0x128
->> [   27.918416]  _phy_state_machine+0x12c/0x2b0
->> [   27.918420]  phy_state_machine+0x34/0x80
->> [   27.918425]  process_one_work+0x150/0x3b8
->> [   27.918432]  worker_thread+0x2a4/0x4b8
->> [   27.918438]  kthread+0xec/0xf8
->> [   27.918442]  ret_from_fork+0x10/0x20
->> [   27.918534] lan78xx 2-3:1.0 enp1s0u3: kevent 4 may have been dropped
->> [   27.924985] lan78xx 2-3:1.0 enp1s0u3: kevent 4 may have been dropped
->
-> Ah, O.K. This tells me the PHY is a lan88xx. And there is a workaround
-> involved for an issue in this PHY. Often PHYs are driven by polling
-> for status changes once per second. Not all PHYs/boards support
-> interrupts. It could be this workaround has only been tested with
-> polling, not interrupts, and so is broken when interrupts are used.
->
-> As a quick hack test, in lan78xx_phy_init()
->
-> 	/* if phyirq is not set, use polling mode in phylib */
-> 	if (dev->domain_data.phyirq > 0)
-> 		phydev->irq =3D dev->domain_data.phyirq;
-> 	else
-> 		phydev->irq =3D PHY_POLL;
->
-> Hard code phydev->irq to PHY_POLL, so interrupts are not used.
->
-> See if you can reproduce the issue when interrupts are not used.
-Thank you, I'll test that. Given the issue appears rarely it'll
-unfortunately take a while to be (mostly) sure.
+All drivers that use queue management APIs already depend on the netdev
+lock. Ultimately, we want to have most of the paths that work with
+specific netdev to be rtnl_lock-free (ethtool mostly in particular).
+Queue API currently has a much smaller API surface, so start with
+rtnl_lock from it:
 
-Best regards,
-Fiona
+- add mutex to each dmabuf binding (to replace rtnl_lock)
+- move netdev lock management to the callers of netdev_rx_queue_restart
+  and drop rtnl_lock
+
+v2:
+- drop "net: protect net_devmem_dmabuf_bindings by new
+  net_devmem_bindings_mutex" (Jakub)
+- add missing mutex_unlock (Jakub)
+- undo rtnl_lock removal from netdev_nl_queue_get_doit and
+  netdev_nl_queue_get_dumpit, needs more care to grab
+  either or but no both rtnl_lock/ops_lock (Jakub)
+
+Cc: Mina Almasry <almasrymina@google.com>
+
+Stanislav Fomichev (3):
+  net: create netdev_nl_sock to wrap bindings list
+  net: add granular lock for the netdev netlink socket
+  net: drop rtnl_lock for queue_mgmt operations
+
+ Documentation/netlink/specs/netdev.yaml   |  4 +--
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c |  4 +--
+ drivers/net/netdevsim/netdev.c            |  4 +--
+ include/net/netdev_netlink.h              | 12 +++++++
+ net/core/devmem.c                         |  4 +--
+ net/core/netdev-genl-gen.c                |  4 +--
+ net/core/netdev-genl-gen.h                |  6 ++--
+ net/core/netdev-genl.c                    | 38 +++++++++++++----------
+ net/core/netdev_rx_queue.c                | 16 ++++------
+ 9 files changed, 52 insertions(+), 40 deletions(-)
+ create mode 100644 include/net/netdev_netlink.h
+
+-- 
+2.48.1
 
 
