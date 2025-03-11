@@ -1,190 +1,155 @@
-Return-Path: <netdev+bounces-174052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6A99A5D2C6
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 23:55:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CCFAA5D2EB
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 00:04:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EB8C17AA32
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 22:55:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C190A18937E3
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 23:04:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C5EA22B8B2;
-	Tue, 11 Mar 2025 22:55:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 520151F09B4;
+	Tue, 11 Mar 2025 23:04:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="jYtoE6uI";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jR9e7HS/";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="jYtoE6uI";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jR9e7HS/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bpjThCiG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78B162253F8
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 22:55:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666AE1E832A
+	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 23:04:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741733732; cv=none; b=f5jnwVrKMu2UbODvkMX9F7DGSwQ8tdb7eJYtHJurt3g2ueeFs+c/I7/p6PDynmMqN8IDL7sKUSKyHPp64iQFlgadYpHYuEG9B75QUQfj582Pp2t65SoRgyHVvGNetYcVuV6fvUmhpNS/wdNDDJ6bgoOAV/UjOrn4/mTWG43Q2yU=
+	t=1741734284; cv=none; b=OCnrdb2LNulqvNGkJcv5fOsswue4i5okLJqaqVgUjiooD2cNSO38Wu3bNIOS3+/Y8/NYcm5Gg+lCbbjPY40KlG2773YuMxfVgeiddMP13aZk07Ztw4XkvC73Vcgp4UdjznJi2hw0dLCETGXbEsxJN1psBKOMCMEW8WR6jy87klQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741733732; c=relaxed/simple;
-	bh=xEcI83u0PhS5nHJHrflERHHZF3yAAWOjkPzYpwfzNeE=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=POYOh2ePhd6I02DR8P9X7SDxlPDl6B0SpCVZjSoeRmPe5rEQlygODU/zRx9FdmgK0SWnV480EsyZv+h2GfP1XOxxj/OuphHdd9BNvF96fIRDvZbO1prOuDSpGSJYMn6rc7wR/A64zUXv3hagWjSwUb/TiWpcCq5Xufb8QNPAf0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=jYtoE6uI; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=jR9e7HS/; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=jYtoE6uI; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=jR9e7HS/; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 225FA1F388;
-	Tue, 11 Mar 2025 22:55:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1741733728; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ab13EvIK2DPk+TBDxxWWO5yYyOOgqUiN0tHfZ4wqv0g=;
-	b=jYtoE6uIP2QmHhlIevBJBy94LG/dhVBif5XAHK02z7vMO1n1PR7yXi+ccMMo1XZ3ZPUQ0G
-	hMSYEN7fZzB1vqcZbeZdivDAZmrB06jnJFlEM9HeDbQYBny9TG1I5PfYZWQvNUAjeUmjhi
-	coztQJYmMIrhjK+Edi1yDiuULs3R618=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1741733728;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ab13EvIK2DPk+TBDxxWWO5yYyOOgqUiN0tHfZ4wqv0g=;
-	b=jR9e7HS/sosD5H1RhhkjMoj2AuTPAQpY8bmxSIybhptRMzYQt3Fpxhu8Q9h1mc63D+eBky
-	sIuBv7xJik9Rq6DQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=jYtoE6uI;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="jR9e7HS/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1741733728; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ab13EvIK2DPk+TBDxxWWO5yYyOOgqUiN0tHfZ4wqv0g=;
-	b=jYtoE6uIP2QmHhlIevBJBy94LG/dhVBif5XAHK02z7vMO1n1PR7yXi+ccMMo1XZ3ZPUQ0G
-	hMSYEN7fZzB1vqcZbeZdivDAZmrB06jnJFlEM9HeDbQYBny9TG1I5PfYZWQvNUAjeUmjhi
-	coztQJYmMIrhjK+Edi1yDiuULs3R618=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1741733728;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ab13EvIK2DPk+TBDxxWWO5yYyOOgqUiN0tHfZ4wqv0g=;
-	b=jR9e7HS/sosD5H1RhhkjMoj2AuTPAQpY8bmxSIybhptRMzYQt3Fpxhu8Q9h1mc63D+eBky
-	sIuBv7xJik9Rq6DQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 15FD9132CB;
-	Tue, 11 Mar 2025 22:55:13 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id ADdaLlG/0GevaQAAD6G6ig
-	(envelope-from <neilb@suse.de>); Tue, 11 Mar 2025 22:55:13 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+	s=arc-20240116; t=1741734284; c=relaxed/simple;
+	bh=COk0MdfHW6RlRh6RZLXeO1qkIUN7/KaupGrEVi/7eoo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cepEJC9GVt6tyavTl8vTdb2MfE8pvCtNYyGyi8wSINSv2DbCD2KGA6e41TBKBiPulASlMUvEI/toFvO+5fhcW2OrG9EM/N070gCDSsbJS4eR/xfxCadyb+Lj1idUGxJgJotdXHriyNKNoV1DoQuPTZHxxnUXpbpqWHPUZGxnh9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bpjThCiG; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-ac28e66c0e1so474423066b.0
+        for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 16:04:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741734281; x=1742339081; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+DoyGMSDjtwoW9bneNJ6irZbWj3vs1n/EVCtg3b03ss=;
+        b=bpjThCiGI609q+aZeUrZ009YjAvqny+Zf0t1LPQloMyNNzDsSs4GaOgLi8CBhsU0ZN
+         AmENz9l5fZcgigAkZCaI+wKLiOr7oMocIZiImo1Qg1bgApYGGczRTl53BuzXr1365YNh
+         LSC+7ILvXhePHgLb+6kp9kH/CCmerxkr3VDTuj3zSNXUmk5QO7JLEeqWRXMPPRubFOVX
+         kInASBszxh7HH4xTX/8dLeWivarpB+Y0SczMjQOfNRIbPSNNKzJT5DYJiivgvX06PiMI
+         JqzQofUKWxC15eWUdKK4ILtHrO+NoZTUYIiNg7pjdqnqFCuty2Y/8zZ+kDsd63zao8ed
+         Iu5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741734281; x=1742339081;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+DoyGMSDjtwoW9bneNJ6irZbWj3vs1n/EVCtg3b03ss=;
+        b=nItEO4AXeBicFEc2O1dQ1P3rumFKaf4X5i3z+jJbmCvi0au6QD35ivb0kRmHAcukGh
+         rJdMzI1v7lPUx/CQ8NuClbBpV4iCcwy8CEAL84bHcNN7DxFnegeVmKoq9X35d91O56fo
+         u7tkNy+acqWFjJvM0TtzKcRxiML9rrcXlcqIoQZsq5CbZIt3T0ULnRp1+Rx9I/q8SIKy
+         rOgfxAPv306i8D5vSfy7K+ArdCVSF/rwPOsHP+Lt/E+JOUV6X1m0qgpCGYn4U9WWkW3/
+         0RQsMy8PuGTcKBCfFmcJmNpO+bdCRTVvAzq+Xh80U/D1Vwr8Mo3a4DcaoaTSb+5Yc8N+
+         8D1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXlfci9wfY4taDFv+CiqgMgZJPJ5ZIXL7bKcfxqGwhAjYn3OuYz0sJm5catA0JZaRSfH+whr7Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVZQDdDs/obEcJdZLWzfi4S/tQUK5shH8mbL0b1ow5TNvycAIO
+	cg3vT1lREYW5u67TNrWrypQHWpk1MDu6Gsz6e3z+a2kPATUc0448tD6ndKWFszlg3bIRdcxEXWZ
+	iFXTtO9JrTHpVzC9kiPonArvlz6B5f27rP7M=
+X-Gm-Gg: ASbGncuaLEOovxfUd5D2x6UIoErdMIjTqADry8I2k2Z9aL5PkWhSezOZ6YpJStcWwrg
+	Y+i9cKyqS2STKO6yznY0+b37ysbiEIi42iJRxAPhUMNtfzsrAKGqJ9Poz3CYkFknpX8vMezEJzh
+	hb0Quc7SfhHfTXYbM550j0MAo=
+X-Google-Smtp-Source: AGHT+IEEErcM9pJk/8Vm0zIXdAghB0zs19W7Ia23xbCKyYZq80ALNxWU3yKq/7e6z2NCSnIIVbvMwR4EbtkAF6VyDR4=
+X-Received: by 2002:a17:907:1b2a:b0:ac1:ad15:4a8a with SMTP id
+ a640c23a62f3a-ac25274a090mr2868341366b.10.1741734280505; Tue, 11 Mar 2025
+ 16:04:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "NeilBrown" <neilb@suse.de>
-To: "Gao Xiang" <hsiangkao@linux.alibaba.com>
-Cc: "Yunsheng Lin" <linyunsheng@huawei.com>,
- "Yunsheng Lin" <yunshenglin0825@gmail.com>,
- "Dave Chinner" <david@fromorbit.com>, "Yishai Hadas" <yishaih@nvidia.com>,
- "Jason Gunthorpe" <jgg@ziepe.ca>,
- "Shameer Kolothum" <shameerali.kolothum.thodi@huawei.com>,
- "Kevin Tian" <kevin.tian@intel.com>,
- "Alex Williamson" <alex.williamson@redhat.com>, "Chris Mason" <clm@fb.com>,
- "Josef Bacik" <josef@toxicpanda.com>, "David Sterba" <dsterba@suse.com>,
- "Gao Xiang" <xiang@kernel.org>, "Chao Yu" <chao@kernel.org>,
- "Yue Hu" <zbestahu@gmail.com>, "Jeffle Xu" <jefflexu@linux.alibaba.com>,
- "Sandeep Dhavale" <dhavale@google.com>, "Carlos Maiolino" <cem@kernel.org>,
- "Darrick J. Wong" <djwong@kernel.org>,
- "Andrew Morton" <akpm@linux-foundation.org>,
- "Jesper Dangaard Brouer" <hawk@kernel.org>,
- "Ilias Apalodimas" <ilias.apalodimas@linaro.org>,
- "David S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Simon Horman" <horms@kernel.org>, "Trond Myklebust" <trondmy@kernel.org>,
- "Anna Schumaker" <anna@kernel.org>, "Chuck Lever" <chuck.lever@oracle.com>,
- "Jeff Layton" <jlayton@kernel.org>, "Olga Kornievskaia" <okorniev@redhat.com>,
- "Dai Ngo" <Dai.Ngo@oracle.com>, "Tom Talpey" <tom@talpey.com>,
- "Luiz Capitulino" <luizcap@redhat.com>,
- "Mel Gorman" <mgorman@techsingularity.net>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
- linux-btrfs@vger.kernel.org, linux-erofs@lists.ozlabs.org,
- linux-xfs@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org,
- linux-nfs@vger.kernel.org
-Subject: Re: [PATCH v2] mm: alloc_pages_bulk: remove assumption of populating
- only NULL elements
-In-reply-to: <316d62c1-0e56-4b11-aacf-86235fba808d@linux.alibaba.com>
-References: <>, <316d62c1-0e56-4b11-aacf-86235fba808d@linux.alibaba.com>
-Date: Wed, 12 Mar 2025 09:55:10 +1100
-Message-id: <174173371062.33508.12685894810362310394@noble.neil.brown.name>
-X-Rspamd-Queue-Id: 225FA1F388
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[45];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RCVD_TLS_ALL(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[huawei.com,gmail.com,fromorbit.com,nvidia.com,ziepe.ca,intel.com,redhat.com,fb.com,toxicpanda.com,suse.com,kernel.org,linux.alibaba.com,google.com,linux-foundation.org,linaro.org,davemloft.net,oracle.com,talpey.com,techsingularity.net,vger.kernel.org,lists.linux.dev,lists.ozlabs.org,kvack.org];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
-	DKIM_TRACE(0.00)[suse.de:+];
-	R_RATELIMIT(0.00)[from(RLewrxuus8mos16izbn),to_ip_from(RLodizb9et8yqpuyyezexhwnjp)];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim]
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -4.51
-X-Spam-Flag: NO
+References: <20250311224412.it.153-kees@kernel.org>
+In-Reply-To: <20250311224412.it.153-kees@kernel.org>
+From: Bill Wendling <morbo@google.com>
+Date: Tue, 11 Mar 2025 16:04:24 -0700
+X-Gm-Features: AQ5f1JrfM-joKuFJFF8VvgPkeBvNEFKE_wMOY97xBob5wcZPk8JkS9B0dZxzBdw
+Message-ID: <CAGG=3QUJ4NztStM3GDxLqMyT4_O+8WuhaYCiK4rin-i40qwCcA@mail.gmail.com>
+Subject: Re: [PATCH v2] net: macb: Add __nonstring annotations for
+ unterminated strings
+To: Kees Cook <kees@kernel.org>
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-hardening@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 10 Mar 2025, Gao Xiang wrote:
-> 
->   - Your new api covers narrow cases compared to the existing
->     api, although all in-tree callers may be converted
->     properly, but it increases mental burden of all users.
->     And maybe complicate future potential users again which
->     really have to "check NULL elements in the middle of page
->     bulk allocating" again.
+On Tue, Mar 11, 2025 at 3:44=E2=80=AFPM Kees Cook <kees@kernel.org> wrote:
+>
+> When a character array without a terminating NUL character has a static
+> initializer, GCC 15's -Wunterminated-string-initialization will only
+> warn if the array lacks the "nonstring" attribute[1]. Mark the arrays
+> with __nonstring to and correctly identify the char array as "not a C
 
-I think that the current API adds a mental burden for most users.  For
-most users, their code would be much cleaner if the interface accepted
-an uninitialised array with length, and were told how many pages had
-been stored in that array.
+s/__nonstring to and correctly/__nonstring to correctly/ ?
 
-A (very) few users benefit from the complexity.  So having two
-interfaces, one simple and one full-featured, makes sense.
+> string" and thereby eliminate the warning.
+>
+> Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=3D117178 [1]
+> Signed-off-by: Kees Cook <kees@kernel.org>
+> ---
+>  v1: https://lore.kernel.org/lkml/20250310222415.work.815-kees@kernel.org=
+/
+>  v2: switch to __nonstring annotation
+> Cc: Nicolas Ferre <nicolas.ferre@microchip.com>
+> Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: netdev@vger.kernel.org
+> ---
+>  drivers/net/ethernet/cadence/macb.h | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/c=
+adence/macb.h
+> index 2847278d9cd4..003483073223 100644
+> --- a/drivers/net/ethernet/cadence/macb.h
+> +++ b/drivers/net/ethernet/cadence/macb.h
+> @@ -1027,7 +1027,7 @@ struct gem_stats {
+>   * this register should contribute to.
+>   */
+>  struct gem_statistic {
+> -       char stat_string[ETH_GSTRING_LEN];
+> +       char stat_string[ETH_GSTRING_LEN] __nonstring;
+>         int offset;
+>         u32 stat_bits;
+>  };
+> @@ -1068,6 +1068,7 @@ static const struct gem_statistic gem_statistics[] =
+=3D {
+>         GEM_STAT_TITLE(TX512CNT, "tx_512_1023_byte_frames"),
+>         GEM_STAT_TITLE(TX1024CNT, "tx_1024_1518_byte_frames"),
+>         GEM_STAT_TITLE(TX1519CNT, "tx_greater_than_1518_byte_frames"),
+> +
 
-Thanks,
-NeilBrown
+Is this an errant inclusion? :-)
+
+Reviewed-by: Bill Wendling <morbo@google.com>
+
+>         GEM_STAT_TITLE_BITS(TXURUNCNT, "tx_underrun",
+>                             GEM_BIT(NDS_TXERR)|GEM_BIT(NDS_TXFIFOERR)),
+>         GEM_STAT_TITLE_BITS(SNGLCOLLCNT, "tx_single_collision_frames",
+> --
+> 2.34.1
+>
+>
 
