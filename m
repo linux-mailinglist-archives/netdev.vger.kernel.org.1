@@ -1,84 +1,122 @@
-Return-Path: <netdev+bounces-173911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31452A5C35C
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 15:12:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2808AA5C36C
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 15:13:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB7083ABECD
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:12:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B13463B120B
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:13:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7191B25B681;
-	Tue, 11 Mar 2025 14:12:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EBF025B69D;
+	Tue, 11 Mar 2025 14:13:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tW4RHJRG"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="XqaWMu8p"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD3D425B679;
-	Tue, 11 Mar 2025 14:12:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2C4225B679
+	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 14:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741702337; cv=none; b=k7YfrDHI4FJWz5X5mkCmJOR8P7Q+OacguAfmCdhXB2ugUOSj5ztZj1x7beEZAUSF+JenpoTIt23Qz5MWU4ie1pK/OEdSRloTlVfobXRIFryOqH3bLw+rRtCPUfdBLyyDvOxwAZkIFwLFdhyRP1KVZI40580R6f/dVh+kSBDkyxI=
+	t=1741702393; cv=none; b=m9YX1XhGgIJx/slQR+vqA7O1lGlTn5qtrTfwxLBv6KDc0H519EDSmhg9tRcSB/CldWwmOnSfdPJMyAx25017js7ZAWlsjtG71KcEfiDW9DnwjQdVFLJ3e1faNlNG1NVaWg4n2AKV2xH3bwLc3DRGLeD6u+qn8RcVmZik8bSKFJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741702337; c=relaxed/simple;
-	bh=w8eR9t+kSNi0wzfPkM+g87zPzeK34aCk0R53MpiDORo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oipbk/2ydicIfqVh6YA7A00uIFgW2mZkIt117dQTwJTbG5RSoiusnu0y/BzgcSUwyY+XqRE1UGMVmW4BIb/vIjkxsi4x6M17Zc4vS4dlvflLaWquBBonVKrGeUfTnscBUBLtzAFgXoXmU8QWsATZAYnO60zwoeDQV4GBAqMJZyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=tW4RHJRG; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=bTVp47p9x6xQNo8f20rVU5kY/vHk3lO23GWi0pFWokg=; b=tW4RHJRGmdMpbWOAq8bq2d78g+
-	emyH0KDghYWssmZ9MOCU+RHqbHK+bFRueppF1fj0l/h55BaWQN74sN2NX3CQK6FdRKQvzZ6g55MlT
-	89n867iSqWCbLVVks7JxxVLaEdS8Tt/8sC8IbwayaLeX9Mudidvd493m0GImmjI60nVg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ts0Ku-004MOH-Rs; Tue, 11 Mar 2025 15:12:00 +0100
-Date: Tue, 11 Mar 2025 15:12:00 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Kees Cook <kees@kernel.org>
-Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] net: macb: Truncate TX1519CNT for trailing NUL
-Message-ID: <64b35f60-2ed4-4ab0-8f4e-0dba042b4d4d@lunn.ch>
-References: <20250310222415.work.815-kees@kernel.org>
+	s=arc-20240116; t=1741702393; c=relaxed/simple;
+	bh=QOpsUjqDGF2gMRhCl/pcmdgDv0beCn9yyCa5DHDdDRE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nzCWh9azVPY0hXQJ/14xHX1PJYT6tJeURDskrGz4TSMJ44PvTq2W0C10bnmbOrVDg0//MCfYoYUwIDlOI0BRAF91ulTpYSX1IUdSKj+eImgOVyg0Ikm/yl5JXrEQ7R8apW66dq4VRu/5VBxY8gNUswowMHX/m6m3Yw/bf8iVg5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=XqaWMu8p; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from localhost.localdomain (unknown [195.29.54.243])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id C4174200E1C2;
+	Tue, 11 Mar 2025 15:13:00 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be C4174200E1C2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1741702383;
+	bh=1RLi/PZH36dlPYVUF6V2wz4qlMB5zHEEXzkKpKqAF+U=;
+	h=From:To:Cc:Subject:Date:From;
+	b=XqaWMu8pXY/3570nEmSC1wn6ZIAdZzVubYkHSp/KF2MGOjNI7uj4ZjrHJvf6o3tM7
+	 5pv86RjyHwbvuYvREf+GF5/lQZQ43jP5OQoICPNUMRMCIcW1ZGrjxz3zc0pflW8fVD
+	 Ud4AiZD6Qm9lVDRy3NkSLLS+un4LklWf2l0gGlyhtFSOL5W4aG4oVNu62XrznI9HvX
+	 AcqQNPtVxhSwzx7vU1+jRth5oYH3Q2tOZJBFe0NsGbNzYpHTyUhrx6NBd74HSHHRHS
+	 nW46iobk7c7GjpzPmg9oTau8b6mY/oeIP0qdVa6wo9fFBSLSOw8BtV7zQu8MvC1GZd
+	 h5O22HgaEJSSQ==
+From: Justin Iurman <justin.iurman@uliege.be>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	justin.iurman@uliege.be
+Subject: [PATCH net 0/7] net: fix lwtunnel reentry loops
+Date: Tue, 11 Mar 2025 15:12:31 +0100
+Message-Id: <20250311141238.19862-1-justin.iurman@uliege.be>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250310222415.work.815-kees@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 10, 2025 at 03:24:16PM -0700, Kees Cook wrote:
-> GCC 15's -Wunterminated-string-initialization saw that this string was
-> being truncated. Adjust the initializer so that the needed final NUL
-> character will be present.
+When the destination is the same after the transformation, we enter a
+lwtunnel loop. This is true for most of lwt users: ioam6, rpl, seg6,
+seg6_local, ila_lwt, and lwt_bpf. It can happen in their input() and
+output() handlers respectively, where either dst_input() or dst_output()
+is called at the end. It can also happen in xmit() handlers. This patch
+prevents that kind of reentry loop by redirecting to the origin input()
+or output() when the destination is the same after the transformation.
 
-This is where we get into the ugliness of the ethtool API for strings.
-It is not actually NUL terminated. The code uses memcpy(), see:
+Here is an example for rpl_input():
 
-https://elixir.bootlin.com/linux/v6.13.6/source/drivers/net/ethernet/cadence/macb_main.c#L3193
+dump_stack_lvl+0x60/0x80
+rpl_input+0x9d/0x320
+lwtunnel_input+0x64/0xa0
+lwtunnel_input+0x64/0xa0
+lwtunnel_input+0x64/0xa0
+lwtunnel_input+0x64/0xa0
+lwtunnel_input+0x64/0xa0
+[...]
+lwtunnel_input+0x64/0xa0
+lwtunnel_input+0x64/0xa0
+lwtunnel_input+0x64/0xa0
+lwtunnel_input+0x64/0xa0
+lwtunnel_input+0x64/0xa0
+ip6_sublist_rcv_finish+0x85/0x90
+ip6_sublist_rcv+0x236/0x2f0
 
-The kAPI is that userspace provides a big buffer, and the kernel then
-copies these strings into the buffer at 32 byte offsets. There is no
-requirement for a NUL between them since they are all 32 bytes long.
+... until rpl_do_srh() fails, which means skb_cow_head() failed.
 
-	Andrew
+Justin Iurman (7):
+  net: ipv6: ioam6: fix lwtunnel_output() loop
+  net: ipv6: rpl: fix lwtunnel_input/output loop
+  net: ipv6: seg6: fix lwtunnel_input/output loop
+  net: ipv6: seg6_local: fix lwtunnel_input() loop
+  net: ipv6: ila: fix lwtunnel_output() loop
+  net: core: bpf: fix lwtunnel_input/xmit loop
+  selftests: net: test for lwtunnel dst ref loops
+
+ net/core/lwt_bpf.c                            |  21 ++
+ net/ipv6/ila/ila_lwt.c                        |   8 +
+ net/ipv6/ioam6_iptunnel.c                     |   8 +-
+ net/ipv6/rpl_iptunnel.c                       |  14 +
+ net/ipv6/seg6_iptunnel.c                      |  37 ++-
+ net/ipv6/seg6_local.c                         |  85 +++++-
+ tools/testing/selftests/net/Makefile          |   1 +
+ tools/testing/selftests/net/config            |   2 +
+ .../selftests/net/lwt_dst_cache_ref_loop.sh   | 250 ++++++++++++++++++
+ 9 files changed, 412 insertions(+), 14 deletions(-)
+ create mode 100755 tools/testing/selftests/net/lwt_dst_cache_ref_loop.sh
+
+-- 
+2.34.1
+
 
