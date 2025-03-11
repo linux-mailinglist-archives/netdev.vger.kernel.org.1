@@ -1,103 +1,105 @@
-Return-Path: <netdev+bounces-173955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8952FA5C8C3
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 16:49:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D431EA5C8D6
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 16:51:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 255AC1881E4A
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 15:48:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61EBF3A4AF0
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 15:49:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71DC01E1A32;
-	Tue, 11 Mar 2025 15:48:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1A9D25BAB2;
+	Tue, 11 Mar 2025 15:49:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z7pc926f"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O7dpkxKA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB78F23C9
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 15:48:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26BF71CAA87
+	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 15:49:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741708122; cv=none; b=ZTsLO8IEtgDPhuMQWL9fWgCY1Va2kVOnCm4cFOxf2zcLNruNFiR6akBoTXXo6Tj3eTcozDsJqzyBNcEObpChYv2UxJILInXKREuGtZAxKucQFtq2Gx8UJYGCm3YwEy15k4z4C8QUy1cYbWRqjs75qEM5wVeOQ5E0iFHy/HkMlX4=
+	t=1741708184; cv=none; b=AYZ+Lj4XFWWVQEgrGf9WE7PzEJ11cNV4waVzK36bWMmQ6C6odQkPEbYDhBBeIRiAae+QfmaQf9C/M0BRJaruxxZL5dfsd5dP2lVuQBEAplb4UmBU93e1IzteQOvloGugoot0AsLMS6ulFJLzfRvbmZEWkuyYpQihC8Ewiu9nL0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741708122; c=relaxed/simple;
-	bh=TI3zCJ9NRFviJcoIbIJXFFpl1vVQozYvxr0hiItBHWg=;
+	s=arc-20240116; t=1741708184; c=relaxed/simple;
+	bh=foYqW9OK04J8Q2NqOBLUhmyFOU1zRNIIXOs5q7iC+q8=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=AY7RJL43+aOgTovc1IXi43v3S4R1iJ2zvHFpzqW9UsYvfD1EBBX6X0ObIzISGHih5BubAe7I/Zi8r4ZZGNTLZD/fo6tpoUS14fES0/zzaAWJ9D/JL9/fuUfRrJs0TW2dJQlRdxzq8wPYo2s/g743itQqM0LCWx9UIKWbp9vauek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z7pc926f; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version:Content-Type; b=EU5bT2uO0mJhEtFzS1xaa/ciudha9xX2l0sOAWNF7wI+gngMqGp7fRkqc3QKiCfOfhkjtl7p/X1oxRlCTVLVbSrpoCjvjy+/LNQNygMWzc6OF6sHZPtmuop21oHWvk9vTtIeg4jcqF/9tdwFpHUsJLFuplQK5Y6MvOOmovOKa9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O7dpkxKA; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741708119;
+	s=mimecast20190719; t=1741708181;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=TI3zCJ9NRFviJcoIbIJXFFpl1vVQozYvxr0hiItBHWg=;
-	b=Z7pc926fBtnlA1n+iHoTjW5I+9xy6dgkn9WmmHz0PIOaxBvgl2chjPNsbNx5an7+duUgE7
-	B8VsCSjrkOHrhHRwFJMk9TAKEceWoC3G6O9s5Aw7aT/gHT8ozw+VVCsc1Edo28mVxHin7P
-	N+rsjNLOzgsPkjjXIpO9DJfL1r+JUWw=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=foYqW9OK04J8Q2NqOBLUhmyFOU1zRNIIXOs5q7iC+q8=;
+	b=O7dpkxKAw0dBCokvlNOkBNi7zV68QM3qCdVOLW/mhvCeGVmXYa35mulqtYTCsSN0ZUKEKd
+	E7pJ/J56rmrogUllaqGCObkkM3NoI4kBj33OtHF4lAzRd0Wnuy+FWNL1iw5LLuJLDCErxm
+	at7OIb8ETqJjVSF47Pi1qsFYaeuVMa0=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-340-hAtJV632NqijE2rYk9HE_g-1; Tue, 11 Mar 2025 11:48:38 -0400
-X-MC-Unique: hAtJV632NqijE2rYk9HE_g-1
-X-Mimecast-MFC-AGG-ID: hAtJV632NqijE2rYk9HE_g_1741708117
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-ac297c79dabso245657766b.0
-        for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 08:48:38 -0700 (PDT)
+ us-mta-513-8rHXCv00POqDG2Uv6EUIsw-1; Tue, 11 Mar 2025 11:49:40 -0400
+X-MC-Unique: 8rHXCv00POqDG2Uv6EUIsw-1
+X-Mimecast-MFC-AGG-ID: 8rHXCv00POqDG2Uv6EUIsw_1741708179
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5e5c76fd898so5690844a12.1
+        for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 08:49:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741708117; x=1742312917;
+        d=1e100.net; s=20230601; t=1741708179; x=1742312979;
         h=content-transfer-encoding:mime-version:message-id:date:references
          :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=TI3zCJ9NRFviJcoIbIJXFFpl1vVQozYvxr0hiItBHWg=;
-        b=FLnQ1YCgEVOX2wvuAXgXqMho+IpykqVQwWDAsXHL9CRbFwkiFyxHkti+pivoOMIiYx
-         3ZZj3xEDT1ryFt+DEnkYKlBkzUp4rk+JgCmzgIXPujPK4AG/B/D4TaDEx22GMk4L7+UR
-         EUMm9q+XD7yTbZ8CAYHTGUwpcbmx8r1p7mf+gmhIfWU3CfM6HOE3vZjW1nay1R1XGxKr
-         9uGGpn0I4YCb7+4iKD8nUAA/5o69JcDhl4fkBCTpwO7Q2q4oPWGfQfmSbLv/O+OW/z6T
-         qCdGZ+ujOR2yYsMz6KYaPv0Cs9zWwISsxxTL7a6q6zeH/6Aiz4lCoBnKiuY5PxYpS2mP
-         rYfg==
-X-Forwarded-Encrypted: i=1; AJvYcCXKCMvMZ9SunUwX272n9ZRgIaIsYm38oQ23fzKTKH8+PY4PUXmvRQPuJ0m4K7dU69MHTtrI7vY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4UM0Y+H7G08T56Fbntfbjc5E9YDBybUTwPfT9SKK2T/YQnniL
-	XxgVyq4kMVOjZpaeruHxnI73FRlZheENV4gTHqOatvsi9/QkWtmY9k8N/q38RkTgL0B2hWmI68A
-	2PViQvsb0YMVAIj947O6iswTN7KFShtA+IgFAVhOF2lSbfMf8dedFIQ==
-X-Gm-Gg: ASbGnctO5NZYeh0dQecKMx9I9xFu155MS5LxzXOg7KM/U04nob3M8YKIucSdUqao94O
-	0Cwi6ueuRB2gdaxs0CmNZvuFkqzHJiJwyAbZ+4Hhj8dj0Eq6uQ8LqLZcMt5Xm7KHWfONtCSjkXU
-	xMybhY7ESlIWN89noWyzLax/ir+Ub5vCw+wbp7Z1g8gzfMUvt6ZZGcFVRKXXAvIrA/DNM9lmAJ1
-	VTg32Bxb+hc2ai2/xIdMVdvp502XFQFHZQBV34qiv/OvoI+ctTNpaKW4XPE00bVzj1zPnKJqB6L
-	v/RP4OHKZItGqwrkgdWGQVrBLw9vQyV8dgvfpW0Z
-X-Received: by 2002:a17:907:9691:b0:ac2:166f:42eb with SMTP id a640c23a62f3a-ac25259836dmr2319326466b.2.1741708117201;
-        Tue, 11 Mar 2025 08:48:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHs46zu0NfmV4YgBYokcezaQrfRf8yzsXDxqxrzuVomrpkzeJiCbp8qTIOtJWLPLilraSMmoQ==
-X-Received: by 2002:a17:907:9691:b0:ac2:166f:42eb with SMTP id a640c23a62f3a-ac25259836dmr2319321266b.2.1741708116787;
-        Tue, 11 Mar 2025 08:48:36 -0700 (PDT)
+        bh=foYqW9OK04J8Q2NqOBLUhmyFOU1zRNIIXOs5q7iC+q8=;
+        b=PBHl2+ljQ8fpab9hoS38231ZuDoxwih9sVvb+6M/X0VaaAtLNKkNAe4Ss/UCQavATa
+         RpCWF1SrTqUrHBUORMmkitNUIpsGulwke+81Noz4I1th02xNYTItV7wBH6ubcGWNLUmp
+         8LSjEtOgjfafLO+tE97d+jqzjknMGN+ds5o0XGEIA1SrJj2k7KqvPyE6YCrWA8ajn5g6
+         rP46hJdnj3m0quzYpVrvqQnzmF7gb8MA/HVWodkfK2uTOu0ncyz5IJBPpUMH/P420Jfl
+         tSGKSFwBSqJP5/dv5P6+FFVET4I1/r71sDjTo+b3miV6/zKOb9sevVOzLtszmNoaMtWE
+         ENNA==
+X-Forwarded-Encrypted: i=1; AJvYcCV8hP5UHfYtpavyKeWoZ1KnKZDH1g0J4yNe4ekjjmwUtAbUo4OSBi8en82JSRoAv6e6B3nSawI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVQCmDYTuPHzBtejb3a/mWtLt+QANk355E5osuegr2Xh+7p3NS
+	fGwx9sp7ZkVdbqOCffZU4lHsAHvSCwGB/XWiY9C2BwlJn78C9Tb/Aua9o9lxxlHXkJFvvIXNvuC
+	6dczGgt0vtmhYP2QumUEAVnstJSdaqWE5/ylhS8WPRsq337sJMkipJQ==
+X-Gm-Gg: ASbGncv0uaOdQTP/1F5WP/NfYZelXec1720RUG5Ir+IrQhQAcVwEjnHidz2DZDKcCdN
+	kvc7W1kx+HfYOMf//VmU1OIwWmJJ0G+ty0EGF0mKJt8wiKhKXLJElvnrC0wjOb83uDVn5SRm2Xr
+	lcNdL9MhkyVeL29jy0pCUkpXL7S9JDOcRQZaquNYEoHlkfN9a08CYdBVgInXmCoxI4pE0gJOL/m
+	EFFjYtUFL06ckWMFKsXrlu70C5M4ZjJagri+CnyxNOthNh/tO+mfB0IXNESY1a5GEKlJ90ZbTar
+	ZNC7dnWJHPqJQejbpEGlZIe2NhbkvcEdyV2/8+XI
+X-Received: by 2002:a05:6402:2793:b0:5e7:73ad:60a2 with SMTP id 4fb4d7f45d1cf-5e773ad622fmr4182356a12.30.1741708179143;
+        Tue, 11 Mar 2025 08:49:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGzPIS3wp5ldLk9V7Xnw3rloWKV7sf8sHgpPlBshZma0PeF9lhF6/zpff8hxTefvLpwbyhYNA==
+X-Received: by 2002:a05:6402:2793:b0:5e7:73ad:60a2 with SMTP id 4fb4d7f45d1cf-5e773ad622fmr4182318a12.30.1741708178728;
+        Tue, 11 Mar 2025 08:49:38 -0700 (PDT)
 Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac29363d604sm430663766b.76.2025.03.11.08.48.36
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e5c733fd48sm8459938a12.9.2025.03.11.08.49.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Mar 2025 08:48:36 -0700 (PDT)
+        Tue, 11 Mar 2025 08:49:38 -0700 (PDT)
 Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 238AD18FA5DF; Tue, 11 Mar 2025 16:48:35 +0100 (CET)
+	id 4FAF518FA5E1; Tue, 11 Mar 2025 16:49:37 +0100 (CET)
 From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
- <ilias.apalodimas@linaro.org>, Andrew Morton <akpm@linux-foundation.org>,
- "David S. Miller" <davem@davemloft.net>, Yunsheng Lin
- <linyunsheng@huawei.com>, Yonglong Liu <liuyonglong@huawei.com>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [RFC PATCH net-next v2] page_pool: Track DMA-mapped pages and
+To: Pavel Begunkov <asml.silence@gmail.com>, Mina Almasry
+ <almasrymina@google.com>, David Wei <dw@davidwei.uk>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, "David
+ S. Miller" <davem@davemloft.net>, Yunsheng Lin <linyunsheng@huawei.com>,
+ Yonglong Liu <liuyonglong@huawei.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, linux-mm@kvack.org, netdev@vger.kernel.org
+Subject: Re: [RFC PATCH net-next] page_pool: Track DMA-mapped pages and
  unmap them when destroying the pool
-In-Reply-To: <CAHS8izNY73aJ+_JHX0mWWG-ZFfgUvAeYxjQTN2fCyx-3ynD5Hw@mail.gmail.com>
-References: <20250309124719.21285-1-toke@redhat.com>
- <CAHS8izNY73aJ+_JHX0mWWG-ZFfgUvAeYxjQTN2fCyx-3ynD5Hw@mail.gmail.com>
+In-Reply-To: <2cb9c1fd-db44-4f66-9c5b-03155c6187d6@gmail.com>
+References: <20250308145500.14046-1-toke@redhat.com>
+ <CAHS8izPLDaF8tdDrXgUp4zLCQ4M+3rz-ncpi8ACxtcAbCNSGrg@mail.gmail.com>
+ <87cyeqml3d.fsf@toke.dk> <edc407d1-bd76-4c6b-a2b1-0f1313ca3be7@gmail.com>
+ <87tt7ziswg.fsf@toke.dk> <2cb9c1fd-db44-4f66-9c5b-03155c6187d6@gmail.com>
 X-Clacks-Overhead: GNU Terry Pratchett
-Date: Tue, 11 Mar 2025 16:48:35 +0100
-Message-ID: <87ikofin58.fsf@toke.dk>
+Date: Tue, 11 Mar 2025 16:49:37 +0100
+Message-ID: <87frjjin3i.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -107,66 +109,50 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Mina Almasry <almasrymina@google.com> writes:
+Pavel Begunkov <asml.silence@gmail.com> writes:
 
-> On Sun, Mar 9, 2025 at 5:50=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen <=
-toke@redhat.com> wrote:
->>
->> When enabling DMA mapping in page_pool, pages are kept DMA mapped until
->> they are released from the pool, to avoid the overhead of re-mapping the
->> pages every time they are used. This causes problems when a device is
->> torn down, because the page pool can't unmap the pages until they are
->> returned to the pool. This causes resource leaks and/or crashes when
->> there are pages still outstanding while the device is torn down, because
->> page_pool will attempt an unmap of a non-existent DMA device on the
->> subsequent page return.
->>
->> To fix this, implement a simple tracking of outstanding dma-mapped pages
->> in page pool using an xarray. This was first suggested by Mina[0], and
->> turns out to be fairly straight forward: We simply store pointers to
->> pages directly in the xarray with xa_alloc() when they are first DMA
->> mapped, and remove them from the array on unmap. Then, when a page pool
->> is torn down, it can simply walk the xarray and unmap all pages still
->> present there before returning, which also allows us to get rid of the
->> get/put_device() calls in page_pool. Using xa_cmpxchg(), no additional
->> synchronisation is needed, as a page will only ever be unmapped once.
->>
->> To avoid having to walk the entire xarray on unmap to find the page
->> reference, we stash the ID assigned by xa_alloc() into the page
->> structure itself, using the upper bits of the pp_magic field. This
->> requires a couple of defines to avoid conflicting with the
->> POINTER_POISON_DELTA define, but this is all evaluated at compile-time,
->> so should not affect run-time performance.
->>
->> Since all the tracking is performed on DMA map/unmap, no additional code
->> is needed in the fast path, meaning the performance overhead of this
->> tracking is negligible. The extra memory needed to track the pages is
->> neatly encapsulated inside xarray, which uses the 'struct xa_node'
->> structure to track items. This structure is 576 bytes long, with slots
->> for 64 items, meaning that a full node occurs only 9 bytes of overhead
->> per slot it tracks (in practice, it probably won't be this efficient,
->> but in any case it should be an acceptable overhead).
->>
->> [0] https://lore.kernel.org/all/CAHS8izPg7B5DwKfSuzz-iOop_YRbk3Sd6Y4rX7K=
-BG9DcVJcyWg@mail.gmail.com/
->>
->> Fixes: ff7d6b27f894 ("page_pool: refurbish version of page_pool code")
->> Reported-by: Yonglong Liu <liuyonglong@huawei.com>
->> Suggested-by: Mina Almasry <almasrymina@google.com>
->> Reviewed-by: Jesper Dangaard Brouer <hawk@kernel.org>
->> Tested-by: Jesper Dangaard Brouer <hawk@kernel.org>
->> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> On 3/11/25 13:44, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>> Pavel Begunkov <asml.silence@gmail.com> writes:
+>>=20
+>>> On 3/9/25 12:42, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>>>> Mina Almasry <almasrymina@google.com> writes:
+> ...
+>>>> No, pp_magic was also my backup plan (see the other thread). Tried
+>>>> actually doing that now, and while there's a bit of complication due to
+>>>> the varying definitions of POISON_POINTER_DELTA across architectures,
+>>>> but it seems that this can be defined at compile time. I'll send a v2
+>>>> RFC with this change.
+>>>
+>>> FWIW, personally I like this one much more than an extra indirection
+>>> to pp.
+>>>
+>>> If we're out of space in the page, why can't we use struct page *
+>>> as indices into the xarray? Ala
+>>>
+>>> struct page *p =3D ...;
+>>> xa_store(xarray, index=3D(unsigned long)p, p);
+>>>
+>>> Indices wouldn't be nicely packed, but it's still a map. Is there
+>>> a problem with that I didn't consider?
+>>=20
+>> Huh. As I just replied to Yunsheng, I was under the impression that this
+>> was not supported. But since you're now the second person to suggest
+>> this, I looked again, and it looks like I was wrong. There does indeed
+>> seem to be other places in the kernel that does this.
 >
-> I only have nits and suggestions for improvement. With and without those:
+> And I just noticed there is an entire discussion my email
+> client didn't pull :)
 >
-> Reviewed-by: Mina Almasry <almasrymina@google.com>
+> At least that's likely the easiest solution. Depends on how
+> complicated it is to fit the index in, but there is an option
+> to just go with it and continue the discussion on how to
+> improve it on top.
 
-Thanks! Fixed your nits and a couple of others and pushed here:
+Didn't seem to be too complicated, assuming no problems appear with
+using the middle bits of the pp_magic field. See v2 of the RFC, or here
+for the latest version:
 
 https://git.kernel.org/toke/c/df6248a71f85
-
-I'll subject it to some testing and submit a non-RFC version once I've
-verified that it works and doesn't introduce any new problems :)
 
 -Toke
 
