@@ -1,69 +1,73 @@
-Return-Path: <netdev+bounces-173920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3593A5C38B
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 15:15:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D13FA5C3A1
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 15:18:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D3A53B02AC
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:14:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C24EF16C291
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:18:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6E8D25D8E1;
-	Tue, 11 Mar 2025 14:13:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71FFA1C5D61;
+	Tue, 11 Mar 2025 14:18:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="mbmcEf27"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="Zbut6KV9"
 X-Original-To: netdev@vger.kernel.org
-Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B2C25A653;
-	Tue, 11 Mar 2025 14:13:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C30E65258;
+	Tue, 11 Mar 2025 14:18:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.243.244.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741702423; cv=none; b=Zj5ugI9sbMyolhzvVZbduYoTx+X/MpZMMTawgXyHrK97SodIgZsGCnpI1WHjqC5bfySVRZdldMRdpWCxSFov5B46nSelKZ8iAhCNhh6AiztBtrsooo89ZLk2CQZJiq8/y7ZO9AOGZKBskczg8MZPjIh+0dQHvSouvEdPZuVh+kM=
+	t=1741702709; cv=none; b=TGVufuNOtxLh7UggNzT59tZIl2redCLG8oJDwASMB3PE8dpkprlfbeJPdld6enaeckt0tyset/SplctR2lQf1MOHzy4D3cvZrzRe/LxHrAPC7VvWrX7eXvDONX6+FSOM7Iz/Vd1Hi9S5s0tTnBZ8eLC1X4MrJRIiNkjKv0A2J3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741702423; c=relaxed/simple;
-	bh=YHwJy3GtrtpHb4FhhNowxshdtoJ0AgzqhgiJVohKkoY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Ix/clOAv4e14EQYKN/zsCRHmGra4xCY8yu/VpaU0kng2GdavHwfxvAp4NTME6W5PlC/iNhqbMdELkl8CTj6C8jmaNIcNIkQqDHURXdE9DkemxrWlnMg6cQ998IL99vfX7fKGXoNuzXPaLEa7ZSNlHIwxNh+v7QIILtxYQ8F2LNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=mbmcEf27; arc=none smtp.client-ip=139.165.32.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
-Received: from localhost.localdomain (unknown [195.29.54.243])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 585AC200E1C5;
-	Tue, 11 Mar 2025 15:13:38 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 585AC200E1C5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1741702420;
-	bh=jc91zC3P1TijT48kt8gt6oERnK6HY8Csn1YKPi7e9zQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mbmcEf27HSDvY74w6IewZsBALexjdY/gJMSpqG2/KATzB1QsVhP7x//ahKsp/Xtda
-	 uzCgUbrAQQHXFLOl6dmrzWnSgEd/K7Fl28S1uoIKAroJS9XMBm+SdsZjxNST1JJKlC
-	 7nA4lrVdrEBNsAu/r6dcUKSTwuGwf2LW/Gh/2bm4whVHjdWenlUZdBmaINmgGiQPDJ
-	 fH1Vxx9o0GV/Mw9hr3L/TxfseWG+JPgl8k+Epwq1U2J0frPv0r951bYsw5B3xXbYtw
-	 QdMSPPKFup8RlVJLoa63U6ZJGK+L5ELP7/838+B2Apc0uXHZ4f2GDswVdeL9XJz1uk
-	 sqJFrBUnWVkrw==
-From: Justin Iurman <justin.iurman@uliege.be>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
+	s=arc-20240116; t=1741702709; c=relaxed/simple;
+	bh=sq1bzv7wPMKFZV9txTevSdGdaM1ayfGv5n8e3oxFAMQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=I+BI8nTVe9gADD/JkyP7Tlo7IQYtMf72/1l92ic6+4c3OsZdSOXh0Qsj2t8UUxI2SwNxl0w1g3yKQ+dxBKhHuC2tvscIa7CDhHOttuyZXL1+qSUSobuQ2A7PDQBhmrRUj6Hua0Mm4RdYltwnGjvsr0ARaHbTzVJjTGL9ZwsO4PM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=Zbut6KV9; arc=none smtp.client-ip=54.243.244.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1741702643;
+	bh=RVYNAhuMeknyi72a5SIFCHR/+FWG+XwIYawU2rgg6Qg=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=Zbut6KV9tkNncU0/II87cbel9+bARKtWC387gC+P923mTqUHG2EJnGL++sAwmVLJg
+	 ZKZ8AxF/aXaDoLWrpdRGx9qV5LYNGuYGiqXT4i3ydbffkMkr5dT1iSf85wRWDuoW6p
+	 xu4G6qaaKrygzDSM3SbFkbGwlwKIfa7Xqd5LPJ90=
+X-QQ-mid: bizesmtpip3t1741702628typoi2l
+X-QQ-Originating-IP: jOgGdtEt8JdK4n+h4lZGMYtkrIpM8o0HEbG+Ct52zcw=
+Received: from localhost.localdomain ( [localhost])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 11 Mar 2025 22:17:06 +0800 (CST)
+X-QQ-SSF: 0002000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 5424768636451710206
+From: WangYuli <wangyuli@uniontech.com>
+To: wangyuli@uniontech.com
+Cc: andrew+netdev@lunn.ch,
+	chenlinxuan@uniontech.com,
+	czj2441@163.com,
+	davem@davemloft.net,
 	edumazet@google.com,
+	guanwentao@uniontech.com,
+	idosch@nvidia.com,
 	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	niecheng1@uniontech.com,
 	pabeni@redhat.com,
-	horms@kernel.org,
-	justin.iurman@uliege.be,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net 7/7] selftests: net: test for lwtunnel dst ref loops
-Date: Tue, 11 Mar 2025 15:12:38 +0100
-Message-Id: <20250311141238.19862-8-justin.iurman@uliege.be>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250311141238.19862-1-justin.iurman@uliege.be>
-References: <20250311141238.19862-1-justin.iurman@uliege.be>
+	petrm@nvidia.com,
+	zhanjun@uniontech.com
+Subject: [PATCH net 1/2] mlxsw: spectrum_acl_bloom_filter: Expand chunk_key_offsets[chunk_index]
+Date: Tue, 11 Mar 2025 22:17:00 +0800
+Message-ID: <78951564F9FEA017+20250311141701.1626533-1-wangyuli@uniontech.com>
+X-Mailer: git-send-email 2.47.2
+In-Reply-To: <484364B641C901CD+20250311141025.1624528-1-wangyuli@uniontech.com>
+References: <484364B641C901CD+20250311141025.1624528-1-wangyuli@uniontech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,313 +75,125 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: OGZxhFXqN7PJ/F3hupnujxi4HZ5kkAX2m7GIaCt0HUvRbvtcuQPisXCW
+	cJJnopEoS878cKF5d0G74KKnt+UOsWuLujZrNvn9KtcTJIlNYSn7lsg8oeAKSLPelrZbvyF
+	jhPiCADz4l3IJVLL+6k8ChdyWW8mRn0e67TjRy2qw8HJudWldiTbUxLtQ1+QiOXBFiXqXaj
+	lKqLMuABlEnCSbeumDYsrj+UqDTy/WXAUhXFD4xZQe19cAqOqhnFAHOnqPIIeINbcjZEzob
+	fDgMza89yVBm7VGitXiRGxcPQ3cn4k6461tJ4n4CLKAVo91hAVj0X4RqM3q67vOJdZtKoN6
+	xKVyNZ0c47Ab6YUQrrlOyx/SEI8hAMB1/VYK27apE4PWrnmmsKTPj5zA16cY5Bsii/F7gtF
+	zqkMmftkGqk0UAtAFsfd3J6+sApZ5+ZXrab0dm8Cad8/mKZTgfENAo9RvenWWr3DwQ4HkOY
+	kQ9Gb8Xs711AYPmDwgNcZzOX0Tv96eNQdQOEhb0SU9In/UoFgaqir9huF/fOUVWg6oWAL+X
+	DbGABervaMAJZlamBNvBSFO+WvpYj+4zpSfxGW5OMfHYmV5rI/lWchi7kPrIki1wlB25Pz4
+	JO3lAp/2BoijUPNuINN35b1r3bh0hYTkqZ7kU4H/S0N0i7YTAc2lAJUmn/3mIeWwqqsLYJ/
+	Y/NFVY1RcOKoNAZ8uqiN/U8b5ARJDKjqKvEciR2paFa+iAQnMC3YyVS++8HCt1fRcrdJzQp
+	ML3Ax6C82usy5+2K6DVioshDUVvBDX/NwSXl46qS+UWb692SXElrTWtVJ7qPNy8V3ytAHPC
+	kGv6/5DWlKcALeVBa3XYCqW33gEaaAaeUrpHybIm4GqOJJjjD6ZgJNo+EKv3u+tLuQYmGk4
+	260wGVnCaVHpZitsoXT12RWRCW9x1st5Ee0mcCBz+1wYMrbC0MV/Gojsvz2Zolg11cZH8e/
+	hDo21RFL2N2Dn0ox+gVuFxwfR9mcOlXJis6z7NTdRB3O9OelGtupHiSkKeypTXSxp/6pyvp
+	jQ2Q8d+oIJgU33+LZ9st93jsgiKKofw8RhlOIXs3uNZH4nA5JOI0k94S2HjowlbGX4gVWGO
+	Q==
+X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
+X-QQ-RECHKSPAM: 0
 
-As recently specified by commit 0ea09cbf8350 ("docs: netdev: add a note
-on selftest posting") in net-next, the selftest is therefore shipped in
-this series. However, this selftest does not really test this series. It
-needs this series to avoid crashing the kernel. What it really tests,
-thanks to kmemleak, is what was fixed by the following commits:
-- commit c71a192976de ("net: ipv6: fix dst refleaks in rpl, seg6 and
-ioam6 lwtunnels")
-- commit 92191dd10730 ("net: ipv6: fix dst ref loops in rpl, seg6 and
-ioam6 lwtunnels")
-- commit c64a0727f9b1 ("net: ipv6: fix dst ref loop on input in seg6
-lwt")
-- commit 13e55fbaec17 ("net: ipv6: fix dst ref loop on input in rpl
-lwt")
-- commit 0e7633d7b95b ("net: ipv6: fix dst ref loop in ila lwtunnel")
-- commit 5da15a9c11c1 ("net: ipv6: fix missing dst ref drop in ila
-lwtunnel")
+This is a workaround to mitigate a compiler anomaly.
 
-Cc: Shuah Khan <shuah@kernel.org>
-Cc: linux-kselftest@vger.kernel.org
-Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
+During LLVM toolchain compilation of this driver on s390x architecture, an
+unreasonable __write_overflow_field warning occurs.
+
+Contextually, chunk_index is restricted to 0, 1 or 2. By expanding these
+possibilities, the compile warning is suppressed.
+
+Fix follow error with clang-19 when -Werror:
+  In file included from drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_bloom_filter.c:5:
+  In file included from ./include/linux/gfp.h:7:
+  In file included from ./include/linux/mmzone.h:8:
+  In file included from ./include/linux/spinlock.h:63:
+  In file included from ./include/linux/lockdep.h:14:
+  In file included from ./include/linux/smp.h:13:
+  In file included from ./include/linux/cpumask.h:12:
+  In file included from ./include/linux/bitmap.h:13:
+  In file included from ./include/linux/string.h:392:
+  ./include/linux/fortify-string.h:571:4: error: call to '__write_overflow_field' declared with 'warning' attribute: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror,-Wattribute-warning]
+    571 |                         __write_overflow_field(p_size_field, size);
+        |                         ^
+  1 error generated.
+
+Co-developed-by: Zijian Chen <czj2441@163.com>
+Signed-off-by: Zijian Chen <czj2441@163.com>
+Co-developed-by: Wentao Guan <guanwentao@uniontech.com>
+Signed-off-by: Wentao Guan <guanwentao@uniontech.com>
+Signed-off-by: WangYuli <wangyuli@uniontech.com>
 ---
- tools/testing/selftests/net/Makefile          |   1 +
- tools/testing/selftests/net/config            |   2 +
- .../selftests/net/lwt_dst_cache_ref_loop.sh   | 250 ++++++++++++++++++
- 3 files changed, 253 insertions(+)
- create mode 100755 tools/testing/selftests/net/lwt_dst_cache_ref_loop.sh
+ .../mlxsw/spectrum_acl_bloom_filter.c         | 39 ++++++++++++-------
+ 1 file changed, 25 insertions(+), 14 deletions(-)
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 73ee88d6b043..8f32b4f01aee 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -100,6 +100,7 @@ TEST_PROGS += vlan_bridge_binding.sh
- TEST_PROGS += bpf_offload.py
- TEST_PROGS += ipv6_route_update_soft_lockup.sh
- TEST_PROGS += busy_poll_test.sh
-+TEST_PROGS += lwt_dst_cache_ref_loop.sh
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_bloom_filter.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_bloom_filter.c
+index a54eedb69a3f..96105bab680b 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_bloom_filter.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_bloom_filter.c
+@@ -203,17 +203,6 @@ static const u8 mlxsw_sp4_acl_bf_crc6_tab[256] = {
+ 0x2f, 0x02, 0x18, 0x35, 0x2c, 0x01, 0x1b, 0x36,
+ };
  
- # YNL files, must be before "include ..lib.mk"
- YNL_GEN_FILES := busy_poller netlink-dumps
-diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
-index 5b9baf708950..61e5116987f3 100644
---- a/tools/testing/selftests/net/config
-+++ b/tools/testing/selftests/net/config
-@@ -107,3 +107,5 @@ CONFIG_XFRM_INTERFACE=m
- CONFIG_XFRM_USER=m
- CONFIG_IP_NF_MATCH_RPFILTER=m
- CONFIG_IP6_NF_MATCH_RPFILTER=m
-+CONFIG_IPV6_ILA=m
-+CONFIG_IPV6_RPL_LWTUNNEL=y
-diff --git a/tools/testing/selftests/net/lwt_dst_cache_ref_loop.sh b/tools/testing/selftests/net/lwt_dst_cache_ref_loop.sh
-new file mode 100755
-index 000000000000..9161f16154a5
---- /dev/null
-+++ b/tools/testing/selftests/net/lwt_dst_cache_ref_loop.sh
-@@ -0,0 +1,250 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0+
-+#
-+# Author: Justin Iurman <justin.iurman@uliege.be>
-+#
-+# WARNING
-+# -------
-+# This is just a dummy script that triggers encap cases with possible dst cache
-+# reference loops in affected lwt users (see list below). Some cases are
-+# pathological configurations for simplicity, others are valid. Overall, we
-+# don't want this issue to happen, no matter what. In order to catch any
-+# reference loops, kmemleak MUST be used. The results alone are always blindly
-+# successful, don't rely on them. Note that the following tests may crash the
-+# kernel if the fix to prevent lwtunnel_{input|output|xmit}() reentry loops is
-+# not present.
-+#
-+# Affected lwt users so far (please update accordingly if needed):
-+#  - ila_lwt (output only)
-+#  - ioam6_iptunnel (output only)
-+#  - rpl_iptunnel (both input and output)
-+#  - seg6_iptunnel (both input and output)
-+
-+source lib.sh
-+
-+check_compatibility()
-+{
-+  setup_ns tmp_node &>/dev/null
-+  if [ $? != 0 ]
-+  then
-+    echo "SKIP: Cannot create netns."
-+    exit $ksft_skip
-+  fi
-+
-+  ip link add name veth0 netns $tmp_node type veth \
-+    peer name veth1 netns $tmp_node &>/dev/null
-+  local ret=$?
-+
-+  ip -netns $tmp_node link set veth0 up &>/dev/null
-+  ret=$((ret + $?))
-+
-+  ip -netns $tmp_node link set veth1 up &>/dev/null
-+  ret=$((ret + $?))
-+
-+  if [ $ret != 0 ]
-+  then
-+    echo "SKIP: Cannot configure links."
-+    cleanup_ns $tmp_node
-+    exit $ksft_skip
-+  fi
-+
-+  lsmod 2>/dev/null | grep -q "ila"
-+  ila_lsmod=$?
-+  [ $ila_lsmod != 0 ] && modprobe ila &>/dev/null
-+
-+  ip -netns $tmp_node route add 2001:db8:1::/64 \
-+    encap ila 1:2:3:4 csum-mode no-action ident-type luid hook-type output \
-+    dev veth0 &>/dev/null
-+
-+  ip -netns $tmp_node route add 2001:db8:2::/64 \
-+    encap ioam6 trace prealloc type 0x800000 ns 0 size 4 dev veth0 &>/dev/null
-+
-+  ip -netns $tmp_node route add 2001:db8:3::/64 \
-+    encap rpl segs 2001:db8:3::1 dev veth0 &>/dev/null
-+
-+  ip -netns $tmp_node route add 2001:db8:4::/64 \
-+    encap seg6 mode inline segs 2001:db8:4::1 dev veth0 &>/dev/null
-+
-+  ip -netns $tmp_node -6 route 2>/dev/null | grep -q "encap ila"
-+  skip_ila=$?
-+
-+  ip -netns $tmp_node -6 route 2>/dev/null | grep -q "encap ioam6"
-+  skip_ioam6=$?
-+
-+  ip -netns $tmp_node -6 route 2>/dev/null | grep -q "encap rpl"
-+  skip_rpl=$?
-+
-+  ip -netns $tmp_node -6 route 2>/dev/null | grep -q "encap seg6"
-+  skip_seg6=$?
-+
-+  cleanup_ns $tmp_node
-+}
-+
-+setup()
-+{
-+  setup_ns alpha beta gamma &>/dev/null
-+
-+  ip link add name veth-alpha netns $alpha type veth \
-+    peer name veth-betaL netns $beta &>/dev/null
-+  ip link add name veth-betaR netns $beta type veth \
-+    peer name veth-gamma netns $gamma &>/dev/null
-+
-+  ip -netns $alpha link set veth-alpha name veth0 &>/dev/null
-+  ip -netns $beta link set veth-betaL name veth0 &>/dev/null
-+  ip -netns $beta link set veth-betaR name veth1 &>/dev/null
-+  ip -netns $gamma link set veth-gamma name veth0 &>/dev/null
-+
-+  ip -netns $alpha addr add 2001:db8:1::2/64 dev veth0 &>/dev/null
-+  ip -netns $alpha link set veth0 up &>/dev/null
-+  ip -netns $alpha link set lo up &>/dev/null
-+  ip -netns $alpha route add 2001:db8:2::/64 \
-+    via 2001:db8:1::1 dev veth0 &>/dev/null
-+
-+  ip -netns $beta addr add 2001:db8:1::1/64 dev veth0 &>/dev/null
-+  ip -netns $beta addr add 2001:db8:2::1/64 dev veth1 &>/dev/null
-+  ip -netns $beta link set veth0 up &>/dev/null
-+  ip -netns $beta link set veth1 up &>/dev/null
-+  ip -netns $beta link set lo up &>/dev/null
-+  ip -netns $beta route del 2001:db8:2::/64
-+  ip -netns $beta route add 2001:db8:2::/64 dev veth1
-+  ip netns exec $beta sysctl -wq net.ipv6.conf.all.forwarding=1 &>/dev/null
-+
-+  ip -netns $gamma addr add 2001:db8:2::2/64 dev veth0 &>/dev/null
-+  ip -netns $gamma link set veth0 up &>/dev/null
-+  ip -netns $gamma link set lo up &>/dev/null
-+  ip -netns $gamma route add 2001:db8:1::/64 \
-+    via 2001:db8:2::1 dev veth0 &>/dev/null
-+
-+  sleep 1
-+
-+  ip netns exec $alpha ping6 -c 5 -W 1 2001:db8:2::2 &>/dev/null
-+  if [ $? != 0 ]
-+  then
-+    echo "SKIP: Setup failed."
-+    cleanup
-+    exit $ksft_skip
-+  fi
-+
-+  sleep 1
-+}
-+
-+cleanup()
-+{
-+  cleanup_ns $alpha $beta $gamma
-+  [ $ila_lsmod != 0 ] && modprobe -r ila &>/dev/null
-+}
-+
-+run_ila()
-+{
-+  if [ $skip_ila != 0 ]
-+  then
-+    echo "SKIP: ila (output)"
-+    return
-+  fi
-+
-+  ip -netns $beta route del 2001:db8:2::/64
-+
-+  ip -netns $beta route add 2001:db8:2:0:0:0:0:2/128 \
-+    encap ila 2001:db8:2:0 csum-mode no-action ident-type luid hook-type output \
-+    dev veth1 &>/dev/null
-+  sleep 1
-+
-+  echo "TEST: ila (output)"
-+  ip netns exec $beta ping6 -c 2 -W 1 2001:db8:2::2 &>/dev/null
-+  sleep 1
-+
-+  ip -netns $beta route del 2001:db8:2:0:0:0:0:2/128
-+  ip -netns $beta route add 2001:db8:2::/64 dev veth1
-+  sleep 1
-+}
-+
-+run_ioam6()
-+{
-+  if [ $skip_ioam6 != 0 ]
-+  then
-+    echo "SKIP: ioam6 (output)"
-+    return
-+  fi
-+
-+  ip -netns $beta route change 2001:db8:2::/64 \
-+    encap ioam6 trace prealloc type 0x800000 ns 1 size 4 \
-+    dev veth1 &>/dev/null
-+  sleep 1
-+
-+  echo "TEST: ioam6 (output)"
-+  ip netns exec $beta ping6 -c 2 -W 1 2001:db8:2::2 &>/dev/null
-+  sleep 1
-+}
-+
-+run_rpl()
-+{
-+  if [ $skip_rpl != 0 ]
-+  then
-+    echo "SKIP: rpl (input)"
-+    echo "SKIP: rpl (output)"
-+    return
-+  fi
-+
-+  ip -netns $beta route change 2001:db8:2::/64 \
-+    encap rpl segs 2001:db8:2::2 \
-+    dev veth1 &>/dev/null
-+  sleep 1
-+
-+  echo "TEST: rpl (input)"
-+  ip netns exec $alpha ping6 -c 2 -W 1 2001:db8:2::2 &>/dev/null
-+  sleep 1
-+
-+  echo "TEST: rpl (output)"
-+  ip netns exec $beta ping6 -c 2 -W 1 2001:db8:2::2 &>/dev/null
-+  sleep 1
-+}
-+
-+run_seg6()
-+{
-+  if [ $skip_seg6 != 0 ]
-+  then
-+    echo "SKIP: seg6 (input)"
-+    echo "SKIP: seg6 (output)"
-+    return
-+  fi
-+
-+  ip -netns $beta route change 2001:db8:2::/64 \
-+    encap seg6 mode inline segs 2001:db8:2::2 \
-+    dev veth1 &>/dev/null
-+  sleep 1
-+
-+  echo "TEST: seg6 (input)"
-+  ip netns exec $alpha ping6 -c 2 -W 1 2001:db8:2::2 &>/dev/null
-+  sleep 1
-+
-+  echo "TEST: seg6 (output)"
-+  ip netns exec $beta ping6 -c 2 -W 1 2001:db8:2::2 &>/dev/null
-+  sleep 1
-+}
-+
-+run()
-+{
-+  run_ila
-+  run_ioam6
-+  run_rpl
-+  run_seg6
-+}
-+
-+if [ "$(id -u)" -ne 0 ]
-+then
-+  echo "SKIP: Need root privileges."
-+  exit $ksft_skip
-+fi
-+
-+if [ ! -x "$(command -v ip)" ]
-+then
-+  echo "SKIP: Could not run test without ip tool."
-+  exit $ksft_skip
-+fi
-+
-+check_compatibility
-+setup
-+run
-+cleanup
-+
-+exit $ksft_pass
+-/* Each chunk contains 4 key blocks. Chunk 2 uses key blocks 11-8,
+- * and we need to populate it with 4 key blocks copied from the entry encoded
+- * key. The original keys layout is same for Spectrum-{2,3,4}.
+- * Since the encoded key contains a 2 bytes padding, key block 11 starts at
+- * offset 2. block 7 that is used in chunk 1 starts at offset 20 as 4 key blocks
+- * take 18 bytes. See 'MLXSW_SP2_AFK_BLOCK_LAYOUT' for more details.
+- * This array defines key offsets for easy access when copying key blocks from
+- * entry key to Bloom filter chunk.
+- */
+-static const u8 chunk_key_offsets[MLXSW_BLOOM_KEY_CHUNKS] = {2, 20, 38};
+-
+ static u16 mlxsw_sp2_acl_bf_crc16_byte(u16 crc, u8 c)
+ {
+ 	return (crc << 8) ^ mlxsw_sp2_acl_bf_crc16_tab[(crc >> 8) ^ c];
+@@ -237,6 +226,7 @@ __mlxsw_sp_acl_bf_key_encode(struct mlxsw_sp_acl_atcam_region *aregion,
+ 	struct mlxsw_afk_key_info *key_info = aregion->region->key_info;
+ 	u8 chunk_index, chunk_count, block_count;
+ 	char *chunk = output;
++	char *enc_key_src_ptr;
+ 	__be16 erp_region_id;
+ 
+ 	block_count = mlxsw_afk_key_info_blocks_count_get(key_info);
+@@ -248,9 +238,30 @@ __mlxsw_sp_acl_bf_key_encode(struct mlxsw_sp_acl_atcam_region *aregion,
+ 		memset(chunk, 0, pad_bytes);
+ 		memcpy(chunk + pad_bytes, &erp_region_id,
+ 		       sizeof(erp_region_id));
+-		memcpy(chunk + key_offset,
+-		       &aentry->ht_key.enc_key[chunk_key_offsets[chunk_index]],
+-		       chunk_key_len);
++/* Each chunk contains 4 key blocks. Chunk 2 uses key blocks 11-8,
++ * and we need to populate it with 4 key blocks copied from the entry encoded
++ * key. The original keys layout is same for Spectrum-{2,3,4}.
++ * Since the encoded key contains a 2 bytes padding, key block 11 starts at
++ * offset 2. block 7 that is used in chunk 1 starts at offset 20 as 4 key blocks
++ * take 18 bytes. See 'MLXSW_SP2_AFK_BLOCK_LAYOUT' for more details.
++ * This array defines key offsets for easy access when copying key blocks from
++ * entry key to Bloom filter chunk.
++ *
++ * Define the acceptable values for chunk_index to prevent LLVM from failing
++ * compilation in certain circumstances.
++ */
++		switch (chunk_index) {
++		case 0:
++			enc_key_src_ptr = &aentry->ht_key.enc_key[2];
++			break;
++		case 1:
++			enc_key_src_ptr = &aentry->ht_key.enc_key[20];
++			break;
++		case 2:
++			enc_key_src_ptr = &aentry->ht_key.enc_key[38];
++			break;
++		}
++		memcpy(chunk + key_offset, enc_key_src_ptr, chunk_key_len);
+ 		chunk += chunk_len;
+ 	}
+ 	*len = chunk_count * chunk_len;
 -- 
-2.34.1
+2.47.2
 
 
