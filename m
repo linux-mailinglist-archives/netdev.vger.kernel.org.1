@@ -1,223 +1,175 @@
-Return-Path: <netdev+bounces-173718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55935A5B57E
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 01:55:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B747A5B584
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 01:58:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D276A1886CA7
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 00:55:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC156188A3BA
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 00:58:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 312251DE3B1;
-	Tue, 11 Mar 2025 00:55:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74DF81DE4C5;
+	Tue, 11 Mar 2025 00:58:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TzH0Z1Eb"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="mh+hyh4D"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B397191
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 00:55:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B952B9CD;
+	Tue, 11 Mar 2025 00:58:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741654513; cv=none; b=u6pyE/ZOQtvzsQd3NqgzsAnGmmElnhWZ4/THwjhUwDY9GITUgWLbL3FeyrCi01rZpWqs1j8lrk9cHMWc2e1o6LNj5ErtlJ0lD1VkXRzxvCESXaw7kVfEY7otOrRJmKunB/+qQXGSd3xTHM6hzFYjIHrDbeFt69QbHcx8eMaBHJk=
+	t=1741654688; cv=none; b=q3LLr2yXNGb53wGiMbPYN+k038cptQCVIPwpHj2XE4+PXOWCDO3CXeGvIDIzFxdlZvrsTa0Qq9906PBgamr23Iz3ywYNlMULQGiS6z/2CVrtT5kbm9o5bVQ7K18hawaqyCJ43UCEFWaKIaY0YTZkKXxBXaJUgIdgkPGpIFY6Hco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741654513; c=relaxed/simple;
-	bh=3fsAIf5wHFxnMvfeS5Vh1clVxlVj7KXR0xGOyiLkYaM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aITVwvn90M2QBI9lM9ggzXnU+d/sQHFQ37iYbZS7hCLCBUr/j/4rX8NfZ1IsHJks7rCaPWhhl9K3OYyDpVOrmCO757ZOg0TpuxRLSMsiFdvhtGCxu0v7NvCIqld1vHhe+hMTp7fA6M3q/A3oCQ54YlfVHcxjAmrsFIXx1N5N5XM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TzH0Z1Eb; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741654510;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O2Py8G36+UkX5eKsf40xMemSQMNbOrMlyvipkmsMT5g=;
-	b=TzH0Z1EbIU+CS/jzg7YROkRVEqgqZ0Cb9GozwEjEp9fKjhzFT9TP92Yz285hBclx6WTWhx
-	d7gQrTUxLOeWwav5Pkp32SMRKZDG8cDgOjePYoJIwmIUEedoSKzGHL7DJ+nPbtUYPeW9NN
-	Aosono+ZmBxdlYfZ40l1HC4r6X3njw8=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-73-lrSNJlVhNUGwuCFs_fV-Fg-1; Mon, 10 Mar 2025 20:55:08 -0400
-X-MC-Unique: lrSNJlVhNUGwuCFs_fV-Fg-1
-X-Mimecast-MFC-AGG-ID: lrSNJlVhNUGwuCFs_fV-Fg_1741654508
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2feded265deso8341715a91.2
-        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 17:55:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741654508; x=1742259308;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=O2Py8G36+UkX5eKsf40xMemSQMNbOrMlyvipkmsMT5g=;
-        b=ClxsOTs0mBn7znOYRL+7AMo1YuD7Z+oNqybQ7H4U+MWp/peIB9XV8xgkR611I0AWk7
-         WttBIeqoaYBsbtaWYzeWdAtp9tLjTOMhRDbFUPr8LY85Hb2v+cGUf0Dv8ZIGu3/+G/dE
-         uFR4V1/XEWTk1bW4O3MDpwJ3nrgpQXq7098qi4+3L1jhFmG0zvSJY/eZEtu1IN4WJ5i6
-         Utgx8aEBcF2+weZ5nZJdHAXS45RdBT7fJzlY2x5tVY4mY29ENcjw/nxp4QJty/5oJUdZ
-         9j2e6CEnrbGXscAw3tsMhiVL59OTKxHj3Jdb+v11FZ623Oi0dGBQ+o1OZ3qhDSivHGRz
-         YRqw==
-X-Forwarded-Encrypted: i=1; AJvYcCVlJuT9VDJrQfjRG8Tggys9K5fzPzL8x77gYVvjdyHFT1FNgKLRNUx1u591JRAflFY7KfOXmbU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDn4chjOgprhXhwSgGY+g+7egQyVMpxwPoAp80ABH61hgj+R/E
-	pCXFZX4hiDjDc78rp/ao8H20+fZrDQKL95jCY1D3YTysmHi2lP7QQ4UQUkJFz4Scgs29yjKlbnu
-	YSrufcZ8D2CSg8oH+GizZ6yV3vjuT7JoQ3DAONBe9DY+Kv3McLvM7Pb8QdCOLP8ZL9VTnhDQjBU
-	NbklB9YlNPU1l4ux8HCoXr+hgjawZx
-X-Gm-Gg: ASbGncvTgndV7kpg3BEUq6B1Vlf8dL92vZXNL5XWyHBamUD/UyrZmPmGTpbbxBLoGNj
-	RMNbTdTFQyU5F4VJoa4uU7NSH7tSnhj7mFRyGHcTeAv0/CDSoGVCOJsX+rsQm8vqVi2I99Q==
-X-Received: by 2002:a17:90b:4c4a:b0:2f1:3355:4a8f with SMTP id 98e67ed59e1d1-2ff7ce4fe20mr22950044a91.4.1741654507749;
-        Mon, 10 Mar 2025 17:55:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE6jfDj1tigsvwvzON4S5anyxLKOZz2BPa8XVtCqvLFOGsgfWbc5iRyHMwx3t03SpVWwyRAyxThSlPN83EQHbE=
-X-Received: by 2002:a17:90b:4c4a:b0:2f1:3355:4a8f with SMTP id
- 98e67ed59e1d1-2ff7ce4fe20mr22950006a91.4.1741654507280; Mon, 10 Mar 2025
- 17:55:07 -0700 (PDT)
+	s=arc-20240116; t=1741654688; c=relaxed/simple;
+	bh=yrwlOhq+ZRcjiXGImE8uhCgFDpxCiuS1JASxcgvaR/w=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=DQKmYMlFDgWh0sUUzQ7GwXxatoQ0gjvKGgHqGNriob3cUzRZBmihPQ0YIYGac85HBBX3sbIyFL0qslfiVcSgUru0Ea9lTQRh3Qf0KqUc3RA5NvnfOiu9Ex9GdjHEDnpqCQr+fgN4nXqciH+SQq4A1bez2u5fbNFlU5vUSmd7Q6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=mh+hyh4D; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1741654680;
+	bh=Tr8Re72/EpoDmlqgqK+IWGfFqUbG5OiC/9Y0ptmLfX4=;
+	h=Date:From:To:Cc:Subject:From;
+	b=mh+hyh4DA1FK3VIMRM3Eit2rGw93paimh2wvfKs3vv90GqPDH9X1gvrk5XYdNQ6SM
+	 os7GV/GJgv172g2UYvr36Awlutyrxdbn4YYiJ5npgN3ZTCIcfNToYMJLwx5M1a+CFA
+	 RbcUqGKfRqlWXogH+FVMjFn3L2HgIgi90Cny1rsha7GIll+oDDKBpuDHXnt/ZmEeeY
+	 qBdF9T8kW9aUlO0bcjXb+wKHO1pJjIg+vweTycL5/jQ/PeXjDkioRp9dQSlIh5N6ll
+	 2T+2GYup4VxTWPkoQmze2f7+KNrKbHry91Mo8NEaIDVVm7SvzPwkKWwndScZY0F5rx
+	 nkmwHGOlnq/kQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4ZBb3D3V47z4x3p;
+	Tue, 11 Mar 2025 11:57:59 +1100 (AEDT)
+Date: Tue, 11 Mar 2025 11:57:58 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Taehee Yoo <ap420073@gmail.com>
+Subject: linux-next: manual merge of the net-next tree with the net tree
+Message-ID: <20250311115758.17a1d414@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20200116172428.311437-1-sgarzare@redhat.com> <20200427142518.uwssa6dtasrp3bfc@steredhat>
- <224cdc10-1532-7ddc-f113-676d43d8f322@redhat.com> <20200428160052.o3ihui4262xogyg4@steredhat>
- <Z8edJjqAqAaV3Vkt@devvm6277.cco0.facebook.com> <20250305022248-mutt-send-email-mst@kernel.org>
- <v5c32aounjit7gxtwl4yxo2q2q6yikpb5yv3huxrxgfprxs2gk@b6r3jljvm6mt>
- <CACGkMEvms=i5z9gVRpnrXXpBnt3KGwM4bfRc46EztzDi4pqOsw@mail.gmail.com> <CAGxU2F7SWG0m0KwODbKsbQipz6WzrRSuE1cUe6mYxZskqkbneQ@mail.gmail.com>
-In-Reply-To: <CAGxU2F7SWG0m0KwODbKsbQipz6WzrRSuE1cUe6mYxZskqkbneQ@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 11 Mar 2025 08:54:55 +0800
-X-Gm-Features: AQ5f1JqbKGL09EDs4AANVPKPpJR8e6B1lwdfdgUaMoGqSW4HxLXa24nFHlRYtEo
-Message-ID: <CACGkMEtptFWx_v-14e1LM31XH+fOh4U-VO7gZKyqb1J1KM4uag@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/3] vsock: support network namespace
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Bobby Eshleman <bobbyeshleman@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, 
-	Stefan Hajnoczi <stefanha@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, linux-hyperv@vger.kernel.org, 
-	Dexuan Cui <decui@microsoft.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/Xh.a4=HiB=xr7=J45lWXPTJ";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/Xh.a4=HiB=xr7=J45lWXPTJ
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 10, 2025 at 10:15=E2=80=AFPM Stefano Garzarella <sgarzare@redha=
-t.com> wrote:
->
-> On Thu, 6 Mar 2025 at 01:17, Jason Wang <jasowang@redhat.com> wrote:
-> >
-> > On Wed, Mar 5, 2025 at 5:30=E2=80=AFPM Stefano Garzarella <sgarzare@red=
-hat.com> wrote:
-> > >
-> > > On Wed, Mar 05, 2025 at 02:27:12AM -0500, Michael S. Tsirkin wrote:
-> > > >On Tue, Mar 04, 2025 at 04:39:02PM -0800, Bobby Eshleman wrote:
-> > > >> I think it might be a lot of complexity to bring into the picture =
-from
-> > > >> netdev, and I'm not sure there is a big win since the vsock device=
- could
-> > > >> also have a vsock->net itself? I think the complexity will come fr=
-om the
-> > > >> address translation, which I don't think netdev buys us because th=
-ere
-> > > >> would still be all of the work work to support vsock in netfilter?
-> > > >
-> > > >Ugh.
-> > > >
-> > > >Guys, let's remember what vsock is.
-> > > >
-> > > >It's a replacement for the serial device with an interface
-> > > >that's easier for userspace to consume, as you get
-> > > >the demultiplexing by the port number.
-> >
-> > Interesting, but at least VSOCKETS said:
-> >
-> > """
-> > config VSOCKETS
-> >         tristate "Virtual Socket protocol"
-> >         help
-> >          Virtual Socket Protocol is a socket protocol similar to TCP/IP
-> >           allowing communication between Virtual Machines and hyperviso=
-r
-> >           or host.
-> >
-> >           You should also select one or more hypervisor-specific transp=
-orts
-> >           below.
-> >
-> >           To compile this driver as a module, choose M here: the module
-> >           will be called vsock. If unsure, say N.
-> > """
-> >
-> > This sounds exactly like networking stuff and spec also said something =
-similar
-> >
-> > """
-> > The virtio socket device is a zero-configuration socket communications
-> > device. It facilitates data transfer between the guest and device
-> > without using the Ethernet or IP protocols.
-> > """
-> >
-> > > >
-> > > >The whole point of vsock is that people do not want
-> > > >any firewalling, filtering, or management on it.
-> >
-> > We won't get this, these are for ethernet and TCP/IP mostly.
-> >
-> > > >
-> > > >It needs to work with no configuration even if networking is
-> > > >misconfigured or blocked.
-> >
-> > I don't see any blockers that prevent us from zero configuration, or I
-> > miss something?
-> >
-> > >
-> > > I agree with Michael here.
-> > >
-> > > It's been 5 years and my memory is bad, but using netdev seemed like =
-a
-> > > mess, especially because in vsock we don't have anything related to
-> > > IP/Ethernet/ARP, etc.
-> >
-> > We don't need to bother with that, kernel support protocols other than =
-TCP/IP.
->
-> Do we have an example of any other non-Ethernet device that uses
-> netdev? Just to see what we should do.
+Hi all,
 
-Yes, I think can device is one example and it should have others.
+Today's linux-next merge of the net-next tree got a conflict in:
 
->
-> I'm not completely against the idea, but from what I remember when I
-> looked at it five years ago, it wasn't that easy and straightforward
-> to use.
+  tools/testing/selftests/drivers/net/ping.py
 
-Can just hook the packets into its own stack, maybe vsock can do the same.
+between commit:
 
->
-> >
-> > >
-> > > I see vsock more as AF_UNIX than netdev.
-> >
-> > But you have a device in guest that differs from the AF_UNIX.
->
-> Yes, but the device is simply for carrying messages.
-> Another thing that makes me think of AF_UNIX is the hybrid-vsock
-> developed by Firecracker [1] that we also reused in vhost-user-vsock
-> [2], where the mapping between AF_VSOCK and AF_UNIX is really
-> implemented.
+  75cc19c8ff89 ("selftests: drv-net: add xdp cases for ping.py")
 
-I see. But the main difference is that vsock can work across the
-boundary of guest and host. This makes it hard to be a 100% socket
-implementation in the guest.
+from the net tree and commit:
 
-Thanks
+  de94e8697405 ("selftests: drv-net: store addresses in dict indexed by ipv=
+er")
 
->
-> Thanks,
-> Stefano
->
-> [1] https://github.com/firecracker-microvm/firecracker/blob/main/docs/vso=
-ck.md#firecracker-virtio-vsock-design
-> [2] https://github.com/rust-vmm/vhost-device/tree/main/vhost-device-vsock
->
+from the net-next tree.
 
+I fixed it up (I think - see below) and can carry the fix as necessary.
+This is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc tools/testing/selftests/drivers/net/ping.py
+index 93f4b411b378,17dc11e9b6dd..000000000000
+--- a/tools/testing/selftests/drivers/net/ping.py
++++ b/tools/testing/selftests/drivers/net/ping.py
+@@@ -1,34 -1,27 +1,34 @@@
+  #!/usr/bin/env python3
+  # SPDX-License-Identifier: GPL-2.0
+ =20
+ +import os
+ +import random, string, time
+  from lib.py import ksft_run, ksft_exit
+ -from lib.py import ksft_eq
+ -from lib.py import NetDrvEpEnv
+ +from lib.py import ksft_eq, KsftSkipEx, KsftFailEx
+ +from lib.py import EthtoolFamily, NetDrvEpEnv
+  from lib.py import bkg, cmd, wait_port_listen, rand_port
+ +from lib.py import ethtool, ip
+ =20
+ +remote_ifname=3D""
+ +no_sleep=3DFalse
+ =20
+ -def test_v4(cfg) -> None:
+ +def _test_v4(cfg) -> None:
+-     cfg.require_v4()
++     cfg.require_ipver("4")
+ =20
+-     cmd(f"ping -c 1 -W0.5 {cfg.remote_v4}")
+-     cmd(f"ping -c 1 -W0.5 {cfg.v4}", host=3Dcfg.remote)
+-     cmd(f"ping -s 65000 -c 1 -W0.5 {cfg.remote_v4}")
+-     cmd(f"ping -s 65000 -c 1 -W0.5 {cfg.v4}", host=3Dcfg.remote)
++     cmd("ping -c 1 -W0.5 " + cfg.remote_addr_v["4"])
++     cmd("ping -c 1 -W0.5 " + cfg.addr_v["4"], host=3Dcfg.remote)
+++    cmd("ping -s 65000 -c 1 -W0.5 " + cfg.remote_addr_v["4"])
+++    cmd("ping -s 65000 -c 1 -W0.5 " + cfg.addr_v["4"], host=3Dcfg.remote)
+ =20
+ -
+ -def test_v6(cfg) -> None:
+ +def _test_v6(cfg) -> None:
+-     cfg.require_v6()
++     cfg.require_ipver("6")
+ =20
+-     cmd(f"ping -c 1 -W5 {cfg.remote_v6}")
+-     cmd(f"ping -c 1 -W5 {cfg.v6}", host=3Dcfg.remote)
+-     cmd(f"ping -s 65000 -c 1 -W0.5 {cfg.remote_v6}")
+-     cmd(f"ping -s 65000 -c 1 -W0.5 {cfg.v6}", host=3Dcfg.remote)
+ -    cmd("ping -c 1 -W0.5 " + cfg.remote_addr_v["6"])
+ -    cmd("ping -c 1 -W0.5 " + cfg.addr_v["6"], host=3Dcfg.remote)
+++    cmd("ping -c 1 -W5 " + cfg.remote_addr_v["6"])
+++    cmd("ping -c 1 -W5 " + cfg.addr_v["6"], host=3Dcfg.remote)
+++    cmd("ping -s 65000 -c 1 -W0.5 " + cfg.remote_addr_v["6"])
+++    cmd("ping -s 65000 -c 1 -W0.5 " + cfg.addr_v["6"], host=3Dcfg.remote)
+ =20
+ -
+ -def test_tcp(cfg) -> None:
+ +def _test_tcp(cfg) -> None:
+      cfg.require_cmd("socat", remote=3DTrue)
+ =20
+      port =3D rand_port()
+
+--Sig_/Xh.a4=HiB=xr7=J45lWXPTJ
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmfPipYACgkQAVBC80lX
+0GzWDggAgM42FnvaOpoJ/dMw/49iAJyBuTmdXODYwnTgLOX7sjE9/4Gja8wozXH9
+ZpapqpQSzMi+9vb8ga/femxMuHxjXLF4yDnjqVsZrOInVL+PpjfWr8XiIYrIITHC
+POTYopCU8SMLLrmHMwceH8mjbkZv7yfaqAhtsoI4uo+YRfcZivgtIEse4KF9xHpl
+eGtsVxdBv1T3fGVnIemjSVd9M6LrtKexX+x8PF9RIk+JUSnWgt2BeiJbaDiSNM0T
+057k1akAFXYrM2JN5O8AvwwANUfV1Bte2kKmH/O8Lb48DWEu7c/Jz2rDBeIPaIhD
+GNwuT7QaFeqpnL0HZwr4yEY03rNRKA==
+=WhCx
+-----END PGP SIGNATURE-----
+
+--Sig_/Xh.a4=HiB=xr7=J45lWXPTJ--
 
