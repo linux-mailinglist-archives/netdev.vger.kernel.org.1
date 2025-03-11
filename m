@@ -1,92 +1,104 @@
-Return-Path: <netdev+bounces-173882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F279A5C183
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 13:40:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C24BCA5C189
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 13:41:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EED223AA8A7
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 12:40:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0ED22164D12
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 12:41:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1666255E37;
-	Tue, 11 Mar 2025 12:39:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29FE0241682;
+	Tue, 11 Mar 2025 12:41:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kGTUr/Db"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="n2YIAZm0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 955A523645F;
-	Tue, 11 Mar 2025 12:39:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C417224244
+	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 12:41:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741696798; cv=none; b=VvyOaRI1aVxmgBOCFPdv8yc+sOQ+LSXM1fRYJCpRTyU0IHu+w5C02K6dgvm5TPSFfkf2Mq6EQWJBn6SmmVqjRGVu/zuAkHE+osDXUPDlX7kNBGS5rS16yTvCqmyIGb3jEtTRIfWDRCYQ01mCDiALDHuBuYp9ifD53TDtU3B44Kg=
+	t=1741696885; cv=none; b=H9OmkSezATVyoquWOsSa7kMbAvZ/G8r3LZqknElgC7UAz0lMff+936ehW9oXUMGYtuyG9HlhW9bp8e8xVu4C7iv2LARmoo/ExbMyWV9wdu0+W1CThtDzPRFkacYM0mHEewRfsXcptH/WU3ysIuQ/p0+XN34+RNZ7sDBqlFLVVDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741696798; c=relaxed/simple;
-	bh=QHwchZdS8Fx6znfWcSG9A9XrRlYiMGvm1z1sG2KpEiM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MOMDiKpGa0Bp6Gke8N6GXkOjMn5xjtgoYKfX7ZZ2XXqs4dzh3R1HiUjPCNLh2ZIoNlnqS+p9UkVCAWjBbiuBKH2o07gTLevKuqupKm3EgeY1EDZJ0yyhUxmkDm3ngnzDAyp6RNMKS8gA56tRNhaZwa2BYhtYocIGCBQ9OTYgVBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kGTUr/Db; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F68BC4CEE9;
-	Tue, 11 Mar 2025 12:39:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741696798;
-	bh=QHwchZdS8Fx6znfWcSG9A9XrRlYiMGvm1z1sG2KpEiM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kGTUr/DbcleBYh4tuDbd/C/hNPcEiqmJLOkHn/e4McdGGWq4d5YbmU1y5lAusd+Zv
-	 SwL8BdIDv0NFO0Zrm8P27Jek0fgsjm2fdDSwXyD+VQjae4sBbl6KxQXfi20HlqkN06
-	 BxFgpF4tNrrQxDJxtVm3CR0z9Xsm5+VyShpUbP3/je7X7G7BhN4JnHVPF1Kd1SoIiJ
-	 0MNRAnDOp3+WdT3VZVjR79wqvkWOmSJC96Kf+z+Vsym4dw/eQispSDCu2UPo57gvDU
-	 PKyoheE4podced/ZbvaYOIDtrLjQsFHV09NP9tVbNliJLC2hupd18L1DtCY0iUGPV3
-	 QUYQFXh5a1bwA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70B46380AC1C;
-	Tue, 11 Mar 2025 12:40:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1741696885; c=relaxed/simple;
+	bh=kzNL7/sWPm4xJ7Yg50W9iGwX7NcAmjRwn86H4JADAko=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Annnl84k620tbkFmnWwIWhAc/Ue6lpmPy65Q6H4V7ypKZZo/pmlonPzDhuufvQzOyleBuPnPhfpfDC3MzwLoQDBIUds3HmYQjyEqK8YDPpIFdkStKRbcM8Ntj0IJVu0T2Pe1pbCxpus6c5m+hSImkufsbiyMBWOvVkm+VtKgFQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=n2YIAZm0; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=eK+uaxL1EO5NoIRU6WfNZp5osnmxjXhTl3BO6u2xOKI=; b=n2YIAZm0PpplayVVoSjdbYa3VY
+	Wwb2a0zaBWlPOwZxD9dSBCkU2L1d7qlAc084trTfkd4tWMkGxcyJt4D4bg6mXxcukVYa/dxoWRMbh
+	1HH5lNRJdmuM6IVd7PNQVsU490/xrQnXXpfIDtMnS0bb1EMHxxqwcKagWd/1VqvHRqw8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tryv2-004L32-1Z; Tue, 11 Mar 2025 13:41:12 +0100
+Date: Tue, 11 Mar 2025 13:41:12 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: dsa: b53: use genphy_c45_eee_is_active
+ directly, instead of phy_init_eee
+Message-ID: <ec50da60-dde3-45ca-aa6c-eebf59fc5ec5@lunn.ch>
+References: <1c1a5c49-8c9c-42a7-b087-4a84d3585e0d@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] docs: netdev: add a note on selftest posting
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174169683226.69619.6026876663171562977.git-patchwork-notify@kernel.org>
-Date: Tue, 11 Mar 2025 12:40:32 +0000
-References: <20250306180533.1864075-1-kuba@kernel.org>
-In-Reply-To: <20250306180533.1864075-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- linux-doc@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1c1a5c49-8c9c-42a7-b087-4a84d3585e0d@gmail.com>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Thu,  6 Mar 2025 10:05:33 -0800 you wrote:
-> We haven't had much discussion on the list about this, but
-> a handful of people have been confused about rules on
-> posting selftests for fixes, lately. I tend to post fixes
-> with their respective selftests in the same series.
-> There are tradeoffs around size of the net tree and conflicts
-> but so far it hasn't been a major issue.
+On Tue, Mar 11, 2025 at 07:39:33AM +0100, Heiner Kallweit wrote:
+> Use genphy_c45_eee_is_active directly instead of phy_init_eee,
+> this prepares for removing phy_init_eee. With the second
+> argument being Null, phy_init_eee doesn't initialize anything.
 > 
-> [...]
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> ---
+>  drivers/net/dsa/b53/b53_common.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
+> index 61d164ffb..17e3ead16 100644
+> --- a/drivers/net/dsa/b53/b53_common.c
+> +++ b/drivers/net/dsa/b53/b53_common.c
+> @@ -2212,10 +2212,7 @@ EXPORT_SYMBOL(b53_mirror_del);
+>   */
+>  int b53_eee_init(struct dsa_switch *ds, int port, struct phy_device *phy)
+>  {
+> -	int ret;
+> -
+> -	ret = phy_init_eee(phy, false);
+> -	if (ret)
+> +	if (!phy->drv || genphy_c45_eee_is_active(phy, NULL) <= 0)
+>  		return 0;
 
-Here is the summary with links:
-  - [net-next] docs: netdev: add a note on selftest posting
-    https://git.kernel.org/netdev/net-next/c/0ea09cbf8350
+genphy_c45_eee_is_active() is a function which could be considered
+phylib internal. At least, it currently has no users outside of the
+phylib core.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+b53 uses phylink not phylib, so i actually think it would be better to
+convert it to the phylink way to do EEE, rather than make use of a
+phylib helper.
 
+	Andrew
 
+	
 
