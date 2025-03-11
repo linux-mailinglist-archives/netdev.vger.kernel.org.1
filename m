@@ -1,135 +1,136 @@
-Return-Path: <netdev+bounces-173803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90D24A5BBD6
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 10:16:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 99DFDA5BBEA
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 10:20:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 722EF188EF2C
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 09:16:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51C73188B02D
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 09:21:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D6731EDA38;
-	Tue, 11 Mar 2025 09:16:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7083A1EBFED;
+	Tue, 11 Mar 2025 09:20:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X6sCkBC3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X8jLv+lx"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9906F17AE11
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 09:16:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A25DF1E32D6
+	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 09:20:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741684582; cv=none; b=umpjfqXxM+syMp4z6c4XLKDMjhGMQPoiN4md6ssOcNhLm2zKlVoUdAdJtk8RAzV1NpJlouVvxbpOUdOHYRiftyi9dnXXBFsyyxozbYQ+uMtmumArYTDQVSgX0nIHKRKWUU/hWnVaM0ZnQTNwEF4HrRzK2AtkungfsINaQWiTgjA=
+	t=1741684851; cv=none; b=TrKJNlZit/oxYsOpowRXQruZ/Lyzr9ROFBi0wIhwTOWxdUGOW+aEJxYIHwRvnntAQOuNMUlkimvGoGy5lK4xLCTOw7f/2ieSJNXQcvkOVcI2MjqzX1OnoKQK5VV9PzgcCfhR93u9xW0lByjBa78c++V62NWYQl9874pR0F0ekKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741684582; c=relaxed/simple;
-	bh=2Klz6USrV+JF4Fvg8UFTE+btW8UthvvuzGbaFIb9dBY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Twe1700y/eGKeIjYH16vgE0L1jDoEL+ySJ7qL9r0i2Zvlnxm99jhmaQthQnXLte3gfAmGPL+RjxGcwxESK/WDzRjo8C4JLcbKyARuKAH12A5ZiY2/mT5JPl8ufFG1Tz/Fe3bCGqFvtHW6D9aBagjl7fx6/5r8skCOc5qnXd4zk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X6sCkBC3; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741684579;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DKGgQaKGX89LUHwZkiGUWXhgNXxI+p2/HEwJnREQX9c=;
-	b=X6sCkBC39gJoT0dvQbnH4veBFXzfwBxYHGwP1fzD5z4loHpYNw0tv/pTEu2E4QwXI6sWVz
-	Fw3zeO8112xJBcAyXr/mlVTEbvw07GJrwmqRNhNAC3oniFDOOUvGhrx6os/ZQ5pzmMqArZ
-	MZ0YzE/ONSrZn9neS088IHnzlSzrmC4=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-616-VqkrfjiGNMq3TuT5KKg0OQ-1; Tue, 11 Mar 2025 05:16:17 -0400
-X-MC-Unique: VqkrfjiGNMq3TuT5KKg0OQ-1
-X-Mimecast-MFC-AGG-ID: VqkrfjiGNMq3TuT5KKg0OQ_1741684577
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-ac254e4b515so451926766b.0
-        for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 02:16:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741684577; x=1742289377;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DKGgQaKGX89LUHwZkiGUWXhgNXxI+p2/HEwJnREQX9c=;
-        b=TfK1Q7oxjFi/iGyfTB0OlT+FOWZjAwWetObbzv7GfLE9CY5k/l6MeB8Gm6DrsWGvlz
-         7FxQzYaTsXg/OAvq4IPPmCUW/StI6VaLFIR3zkitBd2+goHWjiGwYWu/OnjRRvfH3ieQ
-         /8nUjTL3PPJzNJqHaq0CqFSYB2U+Is9bfmtD0JYulKq/dlMmMgT8NB42EbrijhqSQ5QS
-         5RcZrtQdbbbqNs1zaGkVSP3591yV77Wwu0NluOh51Jywf0uspPlQNoetKqX85f/OBvKe
-         6y+6/lihJoRtNpn1TmPyB+lB1722pVZbu2mgE9u6KJcyAjk1KqkP4iFyXCggam9GYptz
-         gSig==
-X-Forwarded-Encrypted: i=1; AJvYcCXix9Qo/4TjrUyi25YN1AfnishEUQ6uw9VCF6PzpuisKUMYOSh9rvrI8Aq9wDuexCfUjnv1l/o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyMMWlvyuQh1PfMrYraYSbIrrvApvu82wbut5DPPI3i1/N58d7L
-	04CP8kfGFqwFAUqY3/yzCjQ/ECyL1BZ7OK0P7JnCbAGB498WDcWLMomPwUeKSbrjHhCXsuJNmcj
-	Hfp6QVWfVp5hfGO3juy9EtXWkWTr0pzh4rE+HCyrxJpo/Fzzzaz2xrQ==
-X-Gm-Gg: ASbGncvLpFuBo+BBENWo5aX3Xjus6/ibWlwQ2Mn2255zmAhMoDlcpIGAeKuIyCYPn9i
-	oFA65yIoHlKlArn+6B4JccDMEaQ5cAeqgNi5QK6+QyOS0t9cMlTY7CkixxH/pcbSAap4Z2ibRky
-	bnbzXSYaJKp9eymkjv41WNjYWKM54dUC4IZAwGE9B8NLqwoAqYvlwDKKu3vQiaDbccgzOtypq7C
-	trYIsXFbxeXpFIiLDAbnYU2NIsvEtBUzpKwXyatLZ1x9RD3hWsZJm6TNzpwxj0SHU5S4Fe/B/Y7
-	1VwjgCfyboknRXJg0ZX8sQKweTIukm9/4pV8JtM4QEiQsg==
-X-Received: by 2002:a17:906:6a21:b0:ac1:791c:153a with SMTP id a640c23a62f3a-ac2ba53cff7mr222236266b.27.1741684576686;
-        Tue, 11 Mar 2025 02:16:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFnJH8UUUIVi208YGcVRuSkURFnR5lgAhQbJQsu9wvxRcbXehmVwy3UmwTSfGIMq32HzFNZyg==
-X-Received: by 2002:a17:906:6a21:b0:ac1:791c:153a with SMTP id a640c23a62f3a-ac2ba53cff7mr222234266b.27.1741684576292;
-        Tue, 11 Mar 2025 02:16:16 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-12-146.dyn.eolo.it. [146.241.12.146])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac2a89f381fsm242567466b.169.2025.03.11.02.16.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Mar 2025 02:16:15 -0700 (PDT)
-Message-ID: <952d6b81-6ca9-428c-8d43-1eb28dc04d59@redhat.com>
-Date: Tue, 11 Mar 2025 10:16:14 +0100
+	s=arc-20240116; t=1741684851; c=relaxed/simple;
+	bh=Eitzj/kDcL0rzS7h1KOU4+wpLzl1Qpg7WKR2rHgnWdE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dfI4XUvqK1JXxyUyzYnK1Z31IJlzOx9cpqGgdp263WqdrBgRnRFoZ88oBUE5hVZMuyenJvh0q5wlCDq/iZWAk38w7yW2dl5U7KEbDc0wEhCh/g4UPEEznnjLaebFwdWkVT5KtQAChzql6hkPH49872rK32WLALjfN2GsbjDfOsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X8jLv+lx; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741684849; x=1773220849;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Eitzj/kDcL0rzS7h1KOU4+wpLzl1Qpg7WKR2rHgnWdE=;
+  b=X8jLv+lx/WdXZRtlR3AjT1Rxl/VXKvYfE+0Pq6Q9UZYRw9ml5Fbv264N
+   vcS99jf5C5ONjVLANgyjZWSWoJI9xgLnR4th/FLhX69vU27ibrRnCpQN6
+   GNeloObff45t2J28GnnjFslDzpYDNa15UDxkjtGQh7TQnFLcyo03wfp9r
+   Z6M+Bh/LrPntLYNgt+FL5ZRFY6gRMXJjoP0/bkYU5UgX6mbxKhM9jgKGh
+   RLzdG3nH2q9hNijv8yZGI2aTA7R5vnZZd/DxJz76wK+jF6cJ0sZTcoLAm
+   BW6oKgYpnI3/BcjxmKcvMynJkVNFy6QVjWNYw6cLMrFMchC+RWxLa6zhL
+   A==;
+X-CSE-ConnectionGUID: cMKspIUVQT240PslZOPo+w==
+X-CSE-MsgGUID: We/j8mS4Q9yY5XJo4jED9A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11369"; a="46360869"
+X-IronPort-AV: E=Sophos;i="6.14,238,1736841600"; 
+   d="scan'208";a="46360869"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2025 02:20:49 -0700
+X-CSE-ConnectionGUID: Lk4bLG3sQ4+JDLrx7MzvGg==
+X-CSE-MsgGUID: Yb4aYY9CQB+XmigzkorN1g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,238,1736841600"; 
+   d="scan'208";a="120187881"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2025 02:20:47 -0700
+Date: Tue, 11 Mar 2025 10:16:55 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Pierre Riteau <pierre@stackhpc.com>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, horms@kernel.org,
+	Dan Carpenter <error27@gmail.com>
+Subject: Re: [net v1] devlink: fix xa_alloc_cyclic error handling
+Message-ID: <Z8//h7IT3cf01bxB@mev-dev.igk.intel.com>
+References: <20250214132453.4108-1-michal.swiatkowski@linux.intel.com>
+ <2fcd3d16-c259-4356-82b7-2f1a3ad45dfa@lunn.ch>
+ <Z69MESaQ4cUvIy4z@mev-dev.igk.intel.com>
+ <c22f5a47-7fe0-4e83-8a0c-6da78143ceb3@redhat.com>
+ <CA+ny2sxC2Y7bxhkO7HqX+6E_Myf24_trmCUrroKFkyoce7QC9A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] tc-tests: Update tc police action tests for tc
- buffer size rounding fixes.
-To: Jonathan Lennox <jonathan.lennox42@gmail.com>,
- Jonathan Lennox <jonathan.lennox@8x8.com>, David Ahern <dsahern@kernel.org>,
- netdev@vger.kernel.org, Stephen Hemminger <stephen@networkplumber.org>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>, Pedro Tammela <pctammela@mojatatu.com>
-References: <2d8adcbe-c379-45c3-9ca9-4f50dbe6a6da@mojatatu.com>
- <20250304193813.3225343-1-jonathan.lennox@8x8.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250304193813.3225343-1-jonathan.lennox@8x8.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+ny2sxC2Y7bxhkO7HqX+6E_Myf24_trmCUrroKFkyoce7QC9A@mail.gmail.com>
 
-Adding the relevant maintainers and Pedro.
-
-On 3/4/25 8:38 PM, Jonathan Lennox wrote:
-> Before tc's recent change to fix rounding errors, several tests which
-> specified a burst size of "1m" would translate back to being 1048574
-> bytes (2b less than 1Mb).  sprint_size prints this as "1024Kb".
+On Mon, Mar 10, 2025 at 12:42:13PM +0100, Pierre Riteau wrote:
+> On Tue, 18 Feb 2025 at 12:56, Paolo Abeni <pabeni@redhat.com> wrote:
+> >
+> >
+> >
+> > On 2/14/25 2:58 PM, Michal Swiatkowski wrote:
+> > > On Fri, Feb 14, 2025 at 02:44:49PM +0100, Andrew Lunn wrote:
+> > >> On Fri, Feb 14, 2025 at 02:24:53PM +0100, Michal Swiatkowski wrote:
+> > >>> Pierre Riteau <pierre@stackhpc.com> found suspicious handling an error
+> > >>> from xa_alloc_cyclic() in scheduler code [1]. The same is done in
+> > >>> devlink_rel_alloc().
+> > >>
+> > >> If the same bug exists twice it might exist more times. Did you find
+> > >> this instance by searching the whole tree? Or just networking?
+> > >>
+> > >> This is also something which would be good to have the static
+> > >> analysers check for. I wounder if smatch can check this?
+> > >>
+> > >>      Andrew
+> > >>
+> > >
+> > > You are right, I checked only net folder and there are two usage like
+> > > that in drivers. I will send v2 with wider fixing, thanks.
+> >
+> > While at that, please add the suitable fixes tag(s).
+> >
+> > Thanks,
+> >
+> > Paolo
 > 
-> With the tc fix, the burst size is instead correctly reported as
-> 1048576 bytes (precisely 1Mb), which sprint_size prints as "1Mb".
+> Hello,
 > 
-> This updates the expected output in the tests' matchPattern values
-> accordingly.
+> I haven't seen a v2 patch from Michal Swiatkowski. Would it be okay to
+> at least merge this net/devlink/core.c fix for inclusion in 6.14? I
+> can send a revised patch adding the Fixes tag. Driver fixes could be
+> addressed separately.
 > 
-> Signed-off-by: Jonathan Lennox <jonathan.lennox@8x8.com>
 
-This is MIME multipart message, please send plaintext message instead
-(PW surprisingly digest it, but not my tools).
+Sorry that I didn't send v2, but I have seen that Dan wrote to Jiri
+about this code and also found more places to fix. I assumed that he
+will send a fix for all cases that he found.
 
-AFAICS this fix will break the tests when running all version of
-iproute2 except the upcoming one. I think this is not good enough; you
-should detect the tc tool version and update expected output accordingly.
-
-If that is not possible, I think it would be better to simply revert the
-TC commit.
+Dan, do you plan to send it or I should send v2?
 
 Thanks,
+Michal
 
-Paolo
-
+> Thanks,
+> Pierre
 
