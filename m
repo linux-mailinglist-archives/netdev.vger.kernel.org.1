@@ -1,170 +1,329 @@
-Return-Path: <netdev+bounces-173709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12124A5B197
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 01:11:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B052A5B207
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 01:15:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6AEB188596A
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 00:11:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6851417186B
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 00:15:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 622F91367;
-	Tue, 11 Mar 2025 00:11:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF25879CD;
+	Tue, 11 Mar 2025 00:15:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T1blr+xo"
+	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="l93PiZfq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2059.outbound.protection.outlook.com [40.107.22.59])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FDD0360
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 00:11:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741651872; cv=none; b=UjUg1NT7F77zQhAffipq6uOXmOcmKRE4MbeqZe0pZGg/900BD1yZ/OnaszTMjKZVKFxP9EubIpwS7zeH9bvDXxm3QkLitaS8xsm59rQ0r0br3dxNsH9RjGtsvKW1lUFXhdMO3u41jZ8/0YEwCZ6KRu9xpdLFir6eUxpolCTugi8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741651872; c=relaxed/simple;
-	bh=tzUPOTXJVGIqNBs4ia+98gXJk+eyexsO5HP8Ihqkirs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M8Vz8vkc3hYNwvpb+uDdW9rSCtHOuqaRkMRWeyrgU7Tf/ekesqctrYokUs8qJIcDBWBXjf85kQNiC0ALh0Twz4TqUips2DVV8qbSAfQwAtN5pDE/TmNyxihHbRqwv8JbOAhY7zW2N2bK0WcRWLS254eEQ23GjnHzVFu/oQCm1qg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T1blr+xo; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-43cf825f46bso1068615e9.3
-        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 17:11:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741651869; x=1742256669; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8vTAu2ZrXjYY5UOjPWFtno+1TQDLwD4B6iJCMlsyFqY=;
-        b=T1blr+xoy/D8hEUyD83fbYsaPxbIwz2I4hS8Gpds8uUp7sAxL5hYbdTb6+kc0u1J1O
-         dzE7aS0WDd0czBl/ebBRA0ACL4/X+Kfa1N+YmlWodsuNO/oYtZs4CJF31FYPhtVeS7nO
-         nj3JgsTbA+r+YRUVjXVE9eDdkbYto6mzXDZ0FMZkUzqDTyuJB88iCux/9EwwcjdUQHyQ
-         5PlNQNOi/gMTiN1k8fSSbo4fTb3K/rdMJu5f6K4mfKFHkS9haEKJ59hY3FUzmQuOYj0T
-         PCYW3A4vGVLsxZiJ8PMC0jzexCIvhOvXKMNRBHafbTUqOod/UQaSWLdRIPjCT52gPt4s
-         MFjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741651869; x=1742256669;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8vTAu2ZrXjYY5UOjPWFtno+1TQDLwD4B6iJCMlsyFqY=;
-        b=L0Era8Y7sr45GPeTQ/RexygD2Jzw5J1u4UkIQrPJ81jZ/jbYA0ekgb75jPoiedfbK7
-         uPruQf/fMbgAroluzdLtywM4n/2XdeK116WE7ig7XXvdfldX64ORIfwPOCM8FNBGij+6
-         gBr6mK5GUkwYwKwjxpUCFxWFra4GRLeMTK7BPYC5W+gFCyIv2MCulbhFYmvQGH7iKZPL
-         oTrtL4vARL7BkHvOTipCKgCRhDK06zuGe5TSSVfkA7fRqFzDvY+Uv2eog1Fzh1+v3PNh
-         MQXPBxbQxHbp500MKxcT0uSeSWZBkUXzjah5bIZGMiTEBgl0pIdXKuUq18NOoCgonXvg
-         n3sQ==
-X-Gm-Message-State: AOJu0Yylhj72tRA5vUCOK0gXOIX48tiXqWKHbeLonuInjikP6KDD1+5K
-	lgIyU7LSEnP/8o7zW0v2FZO/IWn6/9ILDvq36Qp3MmhuxW9rAgtv
-X-Gm-Gg: ASbGncuGP5lhrHcutAx1drUWFrMDeKZ3BgR6BPQYOZCZa8W/4m28FMbWecSDpdjB9VJ
-	oVU0EZOZEfUvqJgCfrA8Ngj4QE9VDY/kNhbjUl2Hfi440B5ig6FD6LUaOiah8L9eBESIQlTOyef
-	6GgOaE1+f5QWxSSHcEtmQXLJGNz2zlKnQcpSzoc/h6onbRiHqDAFzfOTk5uN2gx7T3iZ6169zqe
-	aJm6PbrPaw2pRDLFSGsFbrZ4IXlPj44vQ3TRT9Rtrp9GmItPYbDZC7GPrf75VI+tYsLRHkL2QrD
-	hRPA/9kZgwsGMZE5YwVl54whJVf9Z5Yknhqs9W6MgYA=
-X-Google-Smtp-Source: AGHT+IHA5Ml2DHT5LOBX5yRoB0ovInHUzYZyq+8yiTUbg7tKpQo7bezfxyLtaFcP0srVrzAlb3LUUg==
-X-Received: by 2002:a05:600c:5107:b0:43b:c0fa:f9e5 with SMTP id 5b1f17b1804b1-43d01c1246fmr8319305e9.4.1741651868473;
-        Mon, 10 Mar 2025 17:11:08 -0700 (PDT)
-Received: from skbuf ([86.127.124.81])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c01d81csm16609476f8f.58.2025.03.10.17.11.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Mar 2025 17:11:06 -0700 (PDT)
-Date: Tue, 11 Mar 2025 02:11:03 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Amit Cohen <amcohen@nvidia.com>, Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: netdev@vger.kernel.org, idosch@nvidia.com, petrm@nvidia.com,
-	jiri@resnulli.us, ivecera@redhat.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, tobias@waldekranz.com
-Subject: Re: [PATCH net] net: switchdev: Convert blocking notification chain
- to a raw one
-Message-ID: <20250311001103.wkbk6y3b736kcf2k@skbuf>
-References: <20250305121509.631207-1-amcohen@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 835085680;
+	Tue, 11 Mar 2025 00:15:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.59
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741652143; cv=fail; b=f5O/8+aabgSHDBPVCPDsuUx9L8WtVGtFCKdp0g0wW16+4kU1OjJYnt6I9awlKfSstXKEOCQHJRcAf6ezzlOJyEZuhbLcTvcZrwcZyV+FjaK064rUUJJZFpQ/kAYNGd/pKAhjw9EMZ1wDmKPBo4ItCfa0XXOnaY+0ue2zD4suyew=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741652143; c=relaxed/simple;
+	bh=q1l4v4tLZ44jjFcxhVSN+LvN4QtK47z/5t4mMQ/L+Mw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=PN9LmAvGwczZdcWQojCy5A4d3Y6V7jS/gofWsdFb7PR9pmdVlYgIBSVrh8u6cTSO2eZfOyKx+M0jzH+P61JLxx8ZblKr8FjuB8ene1PYPIQGbsOMxjv02nHZ7AI2den/we/5mzcgAp+VTqkstN9kYry3Ry8jUQ9Coe/SpRb7CcU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=l93PiZfq; arc=fail smtp.client-ip=40.107.22.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wM+VzFXXrR0cofVKyudnGLpIBXXRKA2HzAk/IFo8Av3ZEruIfRQtqI8nmpq9CaUWikduaZEc+FKDajMZ/QesYvLk9ljH+IEF2sKmdTcgbyo9d4n15L95taUJDRB0jGKYMlYXKuav9YJwNVoRbeBBYs+lUn8F4AmOX8HNMUWw+/6YuNCz6uovXWRBBleMDA50Hhmiq94ZY7+eCqbZc5wLmdv4X0s79Ca20/Mb4yQ80Fob2kPH3cxCfC9r3DmINnzME8r754UaymVso5cDYc0ujT+pusV+4WkrCJUDDS+N5Dhsmbr8/7wwDknO04DPvNSv7vRe41BU1LpDxgg6c8WPLg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QGU8rWoq76AaHPDzW9UmRY3h8h9HDaoeD+KHP1/yTI0=;
+ b=KEq7BqWTkIadPtAcyr2NGXCWk+dDBIffSmRUClPp6CAeeP4YMluqBWvatt8R8FHPhTGFBIRrcUmCOC2l3ak8mBK4uSzAEHWWc0PVa4A13fOI0mr04ZSIr5fzZHN4d5QLk4n4KOzTrXA2Bx2njUUB8LEDHyXvVeG0og9S4sq3xFr4/lsRA2FgbtEBqAiYM24F2W/7bZoaSd8LcYXAWkuErOpHczQ1dDofR6iXI1XCe1nou+yggezlDQyzajKQR27RfpV895WchAsq47kEaZ4c293GpRCXBBOCo/7MiTaHIek/W0fP7bqLsYwiUOr8wejS0m1q/tVAoC5uCMESGBSWMQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=temperror (sender ip
+ is 131.228.6.100) smtp.rcpttodomain=nokia-bell-labs.com
+ smtp.mailfrom=nokia-bell-labs.com; dmarc=temperror action=none
+ header.from=nokia-bell-labs.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QGU8rWoq76AaHPDzW9UmRY3h8h9HDaoeD+KHP1/yTI0=;
+ b=l93PiZfqby9IBE9s31Z66jrewfaUvxYe97bvwPb6BBYcr4fXOH3ZPef/wn+MuaAzsEIZvAE4CiRyBksx32GZ4be/xy82nuNy1cABziW8tNjoKukNpbZkJskgPErYt87TNIcMP6ItF7PqmfBKPB8SbkGKcFHHhPSPmzug5xbxYSaxq7fK6bWTkLK7kRGp/sJl0/TQl0vFOajKfgMkAZrYRs2p8rmspXA9i7/bSOxkxWrplYoXiyfevYZu43lilsev9eMEukeVcugPdXIGqV7T9/4LRFMEhq1fwssLXKBUCKtfkL15GUB1gtyUolOr9hKYOsTB4UpF66wvs7LreE9zXA==
+Received: from FR2P281CA0117.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:9d::7) by
+ PAXPR07MB8603.eurprd07.prod.outlook.com (2603:10a6:102:23d::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.27; Tue, 11 Mar
+ 2025 00:15:35 +0000
+Received: from AM4PEPF00027A63.eurprd04.prod.outlook.com
+ (2603:10a6:d10:9d:cafe::1f) by FR2P281CA0117.outlook.office365.com
+ (2603:10a6:d10:9d::7) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8534.20 via Frontend Transport; Tue,
+ 11 Mar 2025 00:15:35 +0000
+X-MS-Exchange-Authentication-Results: spf=temperror (sender IP is
+ 131.228.6.100) smtp.mailfrom=nokia-bell-labs.com; dkim=none (message not
+ signed) header.d=none;dmarc=temperror action=none
+ header.from=nokia-bell-labs.com;
+Received-SPF: TempError (protection.outlook.com: error in processing during
+ lookup of nokia-bell-labs.com: DNS Timeout)
+Received: from fr711usmtp2.zeu.alcatel-lucent.com (131.228.6.100) by
+ AM4PEPF00027A63.mail.protection.outlook.com (10.167.16.73) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8534.20 via Frontend Transport; Tue, 11 Mar 2025 00:15:35 +0000
+Received: from sarah.nbl.nsn-rdnet.net (sarah.nbl.nsn-rdnet.net [10.0.73.150])
+	by fr711usmtp2.zeu.alcatel-lucent.com (GMO) with ESMTP id 52B0F9Go007427;
+	Tue, 11 Mar 2025 00:15:10 GMT
+From: chia-yu.chang@nokia-bell-labs.com
+To: netdev@vger.kernel.org, dave.taht@gmail.com, pabeni@redhat.com,
+        jhs@mojatatu.com, kuba@kernel.org, stephen@networkplumber.org,
+        xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
+        edumazet@google.com, horms@kernel.org, andrew+netdev@lunn.ch,
+        donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
+        shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
+        ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
+        g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
+        mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
+        Jason_Livingood@comcast.com, vidhi_goel@apple.com
+Cc: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+Subject: [PATCH v8 net-next 0/3] DUALPI2 patch
+Date: Tue, 11 Mar 2025 01:14:44 +0100
+Message-Id: <20250311001447.114579-1-chia-yu.chang@nokia-bell-labs.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250305121509.631207-1-amcohen@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM4PEPF00027A63:EE_|PAXPR07MB8603:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1e9823d8-bb6a-4f9e-ff70-08dd6031d81d
+X-LD-Processed: 5d471751-9675-428d-917b-70f44f9630b0,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+ BCL:0;ARA:13230040|82310400026|7416014|376014|36860700013|1800799024|921020|13003099007;
+X-Microsoft-Antispam-Message-Info:
+ =?utf-8?B?QWRBaUVoQ2l3RnR4ZnFFZGVjcmlMWlFBRmF4QnBBSlNZL3ZZcjRpQmgweEpN?=
+ =?utf-8?B?UStqdVJrc0FVSEtOblFFMFdZMmRpSWNYa2lPeFVlQXNDSXZQc1d6dGNTeGlR?=
+ =?utf-8?B?SG1BT3o2OVZwdVdyNmpvbnEvSEpNMWVEK0l6dlI2Y0hySlcvK0pGZFNPbTNl?=
+ =?utf-8?B?eDJ5ZDYvc3BLVG1qSUFhalZsTm5uYnNvWmpOaTBuenpTNFJ5ZVBzeldKdmtV?=
+ =?utf-8?B?TDcvNmUwVmtyU01WT3FpbVl1UldBNWpaSlp1UjlUeDV1NTBIVWxGcDd0U2Mx?=
+ =?utf-8?B?clBucklnRllHL1JGYlpkekdWNzR5K2xXcENPODRnR1Z3T0dpK2FBYWlLYUFI?=
+ =?utf-8?B?Y09MbGRoYnh5OHVFSnBuL2E3NXN3NGhpMGRrVmh1RmY1djNKSGlSdnRIVFFP?=
+ =?utf-8?B?SDIxa0F6ZFh6ZmdYcUtSTlFZSTlZTkZhUVhBNTVDa2hCN3c0cDdSTytTWFVx?=
+ =?utf-8?B?eTllWWx1Ym5KNTc3dUEyWFFLbGxjalMreHVrVkc2MS9LTUE0Q3F6QTlVRnVM?=
+ =?utf-8?B?NXVxSHJ5VmR3WGRrTnByYWZUMk1LMlZoUW1Za3FERHBlaU15cFhVYkQzVmRP?=
+ =?utf-8?B?bUY3dUVZMDE4OW8zN3Y0WGROL2cyNnFwbTA3VWM5djdOTjhwNlpQNnE2aUhx?=
+ =?utf-8?B?TWx1K1dMcTlhR3BzUTJEdlplUXovcU5WV3JoMlJEYVZ6dG5UcGNJL1lYTVp0?=
+ =?utf-8?B?eTdaRTk5YUxhZGtVVVRQNXh5UmR3TXZyejFJYXpodDl6b0ZiOGFMbVovMTlN?=
+ =?utf-8?B?cCtKUmlCV0tXTFgwK21YbDQycTdPQ3VHV1ZsbUczZG5HKzFKSHNTT2crV01X?=
+ =?utf-8?B?by9mNzFuM0JDS3ZMdUt3SHZBUFZoYWxzZHRJMnNYN3d5a1psbGdjRHB6TytI?=
+ =?utf-8?B?QWsrVjQ2RzFBajRERGpoci84UTNSWmdxWXg4blJmdTdFa0ExcHRON3kwZlNK?=
+ =?utf-8?B?amRHQWxycHlUejRXYmNHZEdPUlhYNlFNL1M0bDQyTTdRUTE3R2ozYVNRZVRF?=
+ =?utf-8?B?QkJNQm0yNUs5KytzMWpGMlkxek9td3dtMlExUDIwS2pUSktjQnR0ZERnQTUv?=
+ =?utf-8?B?R1djUVlQcXUyUG9LRmJ4aTNmc2NnMHJMdFJaakQrenczVlFhbjNlQW5zQjZ6?=
+ =?utf-8?B?TnhnL1pnWVl5V1BhS2R5TWJpZHRSOWFKQWR3U1AwSUh3Q0VPMHVsRW9vcXF0?=
+ =?utf-8?B?a3N0VXVEYUczSG1sM2J6OFVrVlFvQTJHbmQyaGxXcHhOZkZ5MDNEaXYyMWQ3?=
+ =?utf-8?B?cyt3WWs0bXdJaXpFV09sR0RSOE94bmVkNGFhODlVUE5RZ0FGQ056aGxSZlNt?=
+ =?utf-8?B?ZmJNRlJBdUNXelQzZVBHSkNKbzJ1Y1gxUlNGVXhzQ2s3bHkxR0dLdXpEK2Fy?=
+ =?utf-8?B?dExmdW5MdERnc2R0V3N2RndGK0g1cUhEbzU3dW5yRUk3b2xkNmpmWEZjcEhM?=
+ =?utf-8?B?T1EyQzJOL1c1cGU0QkhncUFVczZ0b053eDBsRFNyUSt4bzZsVm1tc2RDREl5?=
+ =?utf-8?B?NC9qSkpNd3orUlJUUC9HeHgvbFJDTEZqVEYvcEZrR1Y0UG45SGRHUkZuRnJ0?=
+ =?utf-8?B?bGJoYWJoQXZyL1dLR0lZT0w4UEk5VDFySDdNVWs2a3Fpa0NPcDl0anBUZEZW?=
+ =?utf-8?B?NTdYN2ZpNTZIaitGcnVuYWs5YnJnZWxQODFkTG1sSi9wWmxCd0pvYkZ4eExM?=
+ =?utf-8?B?c25leCtRZnlDZkNPakhnZkxEelFCdVZaSGNlbmJDdFA5MVowdTJaVkV6K1lX?=
+ =?utf-8?B?Rmc4TUpoQ2U2MDN5NXNPWEYxb2w4NTFYSVpOUnhSNlV2dGZCdEVPazFuWFRm?=
+ =?utf-8?B?TzBvZ20vRlMwdE1QTTlhYWFGT2IwSm4yVE9CZjZ2YTZYWGE5UWp0ZmpieDVE?=
+ =?utf-8?B?WlFSeHFuUGlpQ0NVSEdYeGZycmN2SVA2bXNkNk5IaGkzM0w3UXJoMEpYa0oy?=
+ =?utf-8?Q?mTQJ85CK7GmOCfOMLd9rwq6brKzId69X?=
+X-Forefront-Antispam-Report:
+ CIP:131.228.6.100;CTRY:FI;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:fr711usmtp2.zeu.alcatel-lucent.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(7416014)(376014)(36860700013)(1800799024)(921020)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: nokia-bell-labs.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2025 00:15:35.1205
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1e9823d8-bb6a-4f9e-ff70-08dd6031d81d
+X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5d471751-9675-428d-917b-70f44f9630b0;Ip=[131.228.6.100];Helo=[fr711usmtp2.zeu.alcatel-lucent.com]
+X-MS-Exchange-CrossTenant-AuthSource: AM4PEPF00027A63.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR07MB8603
 
-Hi Amit,
+From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
 
-On Wed, Mar 05, 2025 at 02:15:09PM +0200, Amit Cohen wrote:
-> A blocking notification chain uses a read-write semaphore to protect the
-> integrity of the chain. The semaphore is acquired for writing when
-> adding / removing notifiers to / from the chain and acquired for reading
-> when traversing the chain and informing notifiers about an event.
-> 
-> In case of the blocking switchdev notification chain, recursive
-> notifications are possible which leads to the semaphore being acquired
-> twice for reading and to lockdep warnings being generated [1].
-> 
-> Specifically, this can happen when the bridge driver processes a
-> SWITCHDEV_BRPORT_UNOFFLOADED event which causes it to emit notifications
-> about deferred events when calling switchdev_deferred_process().
-> 
-> Fix this by converting the notification chain to a raw notification
-> chain in a similar fashion to the netdev notification chain. Protect
-> the chain using the RTNL mutex by acquiring it when modifying the chain.
-> Events are always informed under the RTNL mutex, but add an assertion in
-> call_switchdev_blocking_notifiers() to make sure this is not violated in
-> the future.
-> 
-> Maintain the "blocking" prefix as events are always emitted from process
-> context and listeners are allowed to block.
-> 
-> [1]:
-> WARNING: possible recursive locking detected
-> 6.14.0-rc4-custom-g079270089484 #1 Not tainted
-> --------------------------------------------
-> ip/52731 is trying to acquire lock:
-> ffffffff850918d8 ((switchdev_blocking_notif_chain).rwsem){++++}-{4:4}, at: blocking_notifier_call_chain+0x58/0xa0
-> 
-> but task is already holding lock:
-> ffffffff850918d8 ((switchdev_blocking_notif_chain).rwsem){++++}-{4:4}, at: blocking_notifier_call_chain+0x58/0xa0
-> 
-> other info that might help us debug this:
-> Possible unsafe locking scenario:
-> CPU0
-> ----
-> lock((switchdev_blocking_notif_chain).rwsem);
-> lock((switchdev_blocking_notif_chain).rwsem);
-> 
-> *** DEADLOCK ***
-> May be due to missing lock nesting notation
-> 3 locks held by ip/52731:
->  #0: ffffffff84f795b0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0x727/0x1dc0
->  #1: ffffffff8731f628 (&net->rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0x790/0x1dc0
->  #2: ffffffff850918d8 ((switchdev_blocking_notif_chain).rwsem){++++}-{4:4}, at: blocking_notifier_call_chain+0x58/0xa0
-> 
-> stack backtrace:
-> ...
-> ? __pfx_down_read+0x10/0x10
-> ? __pfx_mark_lock+0x10/0x10
-> ? __pfx_switchdev_port_attr_set_deferred+0x10/0x10
-> blocking_notifier_call_chain+0x58/0xa0
-> switchdev_port_attr_notify.constprop.0+0xb3/0x1b0
-> ? __pfx_switchdev_port_attr_notify.constprop.0+0x10/0x10
-> ? mark_held_locks+0x94/0xe0
-> ? switchdev_deferred_process+0x11a/0x340
-> switchdev_port_attr_set_deferred+0x27/0xd0
-> switchdev_deferred_process+0x164/0x340
-> br_switchdev_port_unoffload+0xc8/0x100 [bridge]
-> br_switchdev_blocking_event+0x29f/0x580 [bridge]
-> notifier_call_chain+0xa2/0x440
-> blocking_notifier_call_chain+0x6e/0xa0
-> switchdev_bridge_port_unoffload+0xde/0x1a0
-> ...
-> 
-> Fixes: f7a70d650b0b6 ("net: bridge: switchdev: Ensure deferred event delivery on unoffload")
-> Signed-off-by: Amit Cohen <amcohen@nvidia.com>
-> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-> ---
+Hello,
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
-Tested-by: Vladimir Oltean <olteanv@gmail.com>
+  Please find DUALPI2 patch v8.
+
+v8
+- Fix warning messages in v7
+
+v7
+- Separate into 3 patches to avoid mixing changes of documentation, selftest, and code. (Cong Wang <xiyou.wangcong@gmail.com>)
+
+v6
+- Add modprobe for dulapi2 in tc-testing script tc-testing/tdc.sh (Jakub Kicinski <kuba@kernel.org>)
+- Update test cases in dualpi2.json
+- Update commit message
+
+v5
+- A comparison was done between MQ + DUALPI2, MQ + FQ_PIE, MQ + FQ_CODEL:
+  Unshaped 1gigE with 4 download streams test:
+   - Summary of tcp_4down run 'MQ + FQ_CODEL':
+                             avg       median       # data pts
+      Ping (ms) ICMP :       1.19     1.34 ms          349
+      TCP download avg :   235.42      N/A Mbits/s     349
+      TCP download sum :   941.68      N/A Mbits/s     349
+      TCP download::1  :   235.19   235.39 Mbits/s     349
+      TCP download::2  :   235.03   235.35 Mbits/s     349
+      TCP download::3  :   236.89   235.44 Mbits/s     349
+      TCP download::4  :   234.57   235.19 Mbits/s     349
+  
+   - Summary of tcp_4down run 'MQ + FQ_PIE'
+                             avg       median        # data pts
+      Ping (ms) ICMP :       1.21     1.37 ms          350
+      TCP download avg :   235.42      N/A Mbits/s     350
+      TCP download sum :   941.61     N/A Mbits/s      350
+      TCP download::1  :   232.54  233.13 Mbits/s      350
+      TCP download::2  :   232.52  232.80 Mbits/s      350
+      TCP download::3  :   233.14  233.78 Mbits/s      350
+      TCP download::4  :   243.41  241.48 Mbits/s      350
+  
+   - Summary of tcp_4down run 'MQ + DUALPI2'
+                             avg       median        # data pts
+      Ping (ms) ICMP :       1.19     1.34 ms          349
+      TCP download avg :   235.42      N/A Mbits/s     349
+      TCP download sum :   941.68      N/A Mbits/s     349
+      TCP download::1  :   235.19   235.39 Mbits/s     349
+      TCP download::2  :   235.03   235.35 Mbits/s     349
+      TCP download::3  :   236.89   235.44 Mbits/s     349
+      TCP download::4  :   234.57   235.19 Mbits/s     349
+  
+  
+  Unshaped 1gigE with 128 download streams test:
+   - Summary of tcp_128down run 'MQ + FQ_CODEL':
+                             avg       median       # data pts
+      Ping (ms) ICMP   :     1.88     1.86 ms          350
+      TCP download avg :     7.39      N/A Mbits/s     350
+      TCP download sum :   946.47      N/A Mbits/s     350
+  
+   - Summary of tcp_128down run 'MQ + FQ_PIE':
+                             avg       median       # data pts
+      Ping (ms) ICMP   :     1.88     1.86 ms          350
+      TCP download avg :     7.39      N/A Mbits/s     350
+      TCP download sum :   946.47      N/A Mbits/s     350
+  
+   - Summary of tcp_128down run 'MQ + DUALPI2':
+                             avg       median       # data pts
+      Ping (ms) ICMP   :     1.88     1.86 ms          350
+      TCP download avg :     7.39      N/A Mbits/s     350
+      TCP download sum :   946.47      N/A Mbits/s     350
+  
+  
+  Unshaped 10gigE with 4 download streams test:
+   - Summary of tcp_4down run 'MQ + FQ_CODEL':
+                             avg       median       # data pts
+      Ping (ms) ICMP :       0.22     0.23 ms          350
+      TCP download avg :  2354.08      N/A Mbits/s     350
+      TCP download sum :  9416.31      N/A Mbits/s     350
+      TCP download::1  :  2353.65  2352.81 Mbits/s     350
+      TCP download::2  :  2354.54  2354.21 Mbits/s     350
+      TCP download::3  :  2353.56  2353.78 Mbits/s     350
+      TCP download::4  :  2354.56  2354.45 Mbits/s     350
+  
+  - Summary of tcp_4down run 'MQ + FQ_PIE':
+                             avg       median      # data pts
+      Ping (ms) ICMP :       0.20     0.19 ms          350
+      TCP download avg :  2354.76      N/A Mbits/s     350
+      TCP download sum :  9419.04      N/A Mbits/s     350
+      TCP download::1  :  2354.77  2353.89 Mbits/s     350
+      TCP download::2  :  2353.41  2354.29 Mbits/s     350
+      TCP download::3  :  2356.18  2354.19 Mbits/s     350
+      TCP download::4  :  2354.68  2353.15 Mbits/s     350
+  
+   - Summary of tcp_4down run 'MQ + DUALPI2':
+                             avg       median      # data pts
+      Ping (ms) ICMP :       0.24     0.24 ms          350
+      TCP download avg :  2354.11      N/A Mbits/s     350
+      TCP download sum :  9416.43      N/A Mbits/s     350
+      TCP download::1  :  2354.75  2353.93 Mbits/s     350
+      TCP download::2  :  2353.15  2353.75 Mbits/s     350
+      TCP download::3  :  2353.49  2353.72 Mbits/s     350
+      TCP download::4  :  2355.04  2353.73 Mbits/s     350
+  
+  
+  Unshaped 10gigE with 128 download streams test:
+   - Summary of tcp_128down run 'MQ + FQ_CODEL':
+                             avg       median       # data pts
+      Ping (ms) ICMP   :     7.57     8.69 ms          350
+      TCP download avg :    73.97      N/A Mbits/s     350
+      TCP download sum :  9467.82      N/A Mbits/s     350
+  
+   - Summary of tcp_128down run 'MQ + FQ_PIE':
+                             avg       median       # data pts
+      Ping (ms) ICMP   :     7.82     8.91 ms          350
+      TCP download avg :    73.97      N/A Mbits/s     350
+      TCP download sum :  9468.42      N/A Mbits/s     350
+  
+   - Summary of tcp_128down run 'MQ + DUALPI2':
+                             avg       median       # data pts
+      Ping (ms) ICMP   :     6.87     7.93 ms          350
+      TCP download avg :    73.95      N/A Mbits/s     350
+      TCP download sum :  9465.87      N/A Mbits/s     350
+  
+   From the results shown above, we see small differences between combinations.
+- Update commit message to include results of no_split_gso and split_gso (Dave Taht <dave.taht@gmail.com> and Paolo Abeni <pabeni@redhat.com>)
+- Add memlimit in dualpi2 attribute, and add memory_used, max_memory_used, memory_limit in dualpi2 stats (Dave Taht <dave.taht@gmail.com>)
+- Update note in sch_dualpi2.c related to BBRv3 status (Dave Taht <dave.taht@gmail.com>)
+- Update license identifier (Dave Taht <dave.taht@gmail.com>)
+- Add selftest in tools/testing/selftests/tc-testing (Cong Wang <xiyou.wangcong@gmail.com>)
+- Use netlink policies for parameter checks (Jamal Hadi Salim <jhs@mojatatu.com>)
+- Modify texts & fix typos in Documentation/netlink/specs/tc.yaml (Dave Taht <dave.taht@gmail.com>)
+- Add dscsriptions of packet counter statistics and reset function of sch_dualpi2.c
+- Fix step_thresh in packets
+- Update code comments in sch_dualpi2.c
+
+v4
+- Update statement in Kconfig for DualPI2 (Stephen Hemminger <stephen@networkplumber.org>)
+- Put a blank line after #define in sch_dualpi2.c (Stephen Hemminger <stephen@networkplumber.org>)
+- Fix line length warning
+
+v3
+- Fix compilaiton error
+- Update Documentation/netlink/specs/tc.yaml (Jakub Kicinski <kuba@kernel.org>)
+
+v2
+- Add Documentation/netlink/specs/tc.yaml (Jakub Kicinski <kuba@kernel.org>)
+- Use dualpi2 instead of skb prefix (Jamal Hadi Salim <jhs@mojatatu.com>)
+- Replace nla_parse_nested_deprecated with nla_parse_nested (Jamal Hadi Salim <jhs@mojatatu.com>)
+- Fix line length warning
+
+For more details of DualPI2, plesae refer IETF RFC9332 (https://datatracker.ietf.org/doc/html/rfc9332).
+
+Best regards,
+Chia-Yu
+
+Chia-Yu Chang (2):
+  Documentation: netlink: specs: tc: Add DualPI2 specification
+  selftests/tc-testing: Add selftests for qdisc DualPI2
+
+Koen De Schepper (1):
+  sched: Add dualpi2 qdisc
+
+ Documentation/netlink/specs/tc.yaml           |  140 +++
+ include/linux/netdevice.h                     |    1 +
+ include/uapi/linux/pkt_sched.h                |   38 +
+ net/sched/Kconfig                             |   12 +
+ net/sched/Makefile                            |    1 +
+ net/sched/sch_dualpi2.c                       | 1082 +++++++++++++++++
+ tools/testing/selftests/tc-testing/config     |    1 +
+ .../tc-testing/tc-tests/qdiscs/dualpi2.json   |  149 +++
+ tools/testing/selftests/tc-testing/tdc.sh     |    1 +
+ 9 files changed, 1425 insertions(+)
+ create mode 100644 net/sched/sch_dualpi2.c
+ create mode 100644 tools/testing/selftests/tc-testing/tc-tests/qdiscs/dualpi2.json
+
+-- 
+2.34.1
+
 
