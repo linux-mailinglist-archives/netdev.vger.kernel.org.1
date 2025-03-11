@@ -1,121 +1,165 @@
-Return-Path: <netdev+bounces-173741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB258A5B8AA
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 06:50:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3584CA5B904
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 07:07:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE07F3AF12D
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 05:50:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70F3E1670C1
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 06:07:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D751EF087;
-	Tue, 11 Mar 2025 05:50:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01A301E500C;
+	Tue, 11 Mar 2025 06:07:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ArRODxbJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iOEFys4u"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5B81E7C2F
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 05:50:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 241BF1DEFE1;
+	Tue, 11 Mar 2025 06:07:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741672219; cv=none; b=qdrdMCi6nPM8Ds14Q2IB6QoY/t5cKdKu4loTx0VXG12LsrrtrK2VkV+ywkgyEA/FvuBiWTAgKFOG0M3XG7Ns/Wdqvwh8LBGQ9+Xzgs+GPW8HYgvmSEIEVSQO7HO1jk7A8WDs0SyUSai64RAGP3ODjRfsWTdmm8vChHtgdDa/6No=
+	t=1741673264; cv=none; b=TCqQUPWTsPfiTumX/hN0Dems6Nwd8a6hys+3YqjKidhVQrdJI8anFEvk8Pt+Wo+V1qj5e3523nUR990nl//+fi9aojW9Sdhd5SXDiftVyF4O2Vn3nCruZt4kvlAzdUKYmcOvGtFW2ibN7M2INLvLpDdI1vwFcG42n0sTIouzxA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741672219; c=relaxed/simple;
-	bh=P+4C5FSaKRDpQHmjAg5rSVWOc0yjYnW7e4MbeYT5rb0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IoO+AIYM81FRrejuws1GiYpxDqAMpnEAi/ztOO39TfgZXEyOFWcrHUs4rupixvuSkaalOpAIXHCgmlWqWbBS/haulCiaYIV+DZEz123MK3C6HUBCYCLJud+4FoRvKCog2Ws870IXrRqPTtpr9xQsu4huFHTA/cMW/ag+m7ERaX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ArRODxbJ; arc=none smtp.client-ip=52.119.213.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1741672217; x=1773208217;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=LbmomUF0fspPQk4vDbBJj//YBKQZdGu3rL16GwUh1Ik=;
-  b=ArRODxbJZkXOBjgYgRWe3DF0hBAiUpVWQ64xs/3UUUhiwSPBcxluskBO
-   N8x2F6s7TwyYIEm1Cvuyv/QPFETyLhXkLDfTSihCsD9jDWZZDJ+1OiY8W
-   Ng7yX5eLFSWY+kCKPQKIHUk6iQCJ3NMvElL0KKB5vTp7A7LGJYTIDTdCR
-   4=;
-X-IronPort-AV: E=Sophos;i="6.14,238,1736812800"; 
-   d="scan'208";a="703966445"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2025 05:50:13 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:50259]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.58.39:2525] with esmtp (Farcaster)
- id 87b05a20-2865-43a8-bd6e-e8a21ee3b8e5; Tue, 11 Mar 2025 05:50:12 +0000 (UTC)
-X-Farcaster-Flow-ID: 87b05a20-2865-43a8-bd6e-e8a21ee3b8e5
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 11 Mar 2025 05:50:07 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.88.128.133) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 11 Mar 2025 05:50:05 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <pabeni@redhat.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<horms@kernel.org>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-	<netdev@vger.kernel.org>, <willemdebruijn.kernel@gmail.com>
-Subject: Re: [PATCH v3 net-next 2/2] udp_tunnel: use static call for GRO hooks when possible
-Date: Mon, 10 Mar 2025 22:49:41 -0700
-Message-ID: <20250311054957.81048-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <b65c13770225f4a655657373f5ad90bcef3f57c9.1741632298.git.pabeni@redhat.com>
-References: <b65c13770225f4a655657373f5ad90bcef3f57c9.1741632298.git.pabeni@redhat.com>
+	s=arc-20240116; t=1741673264; c=relaxed/simple;
+	bh=yRWn1iovWNrsqhtod6iHzgPsTsCfgH/d+xaja/frc2k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OIRHoseFijucNeYXR+aeq3nEw+UtV1AfIQ4WdV+eiKF/U0teBpD7t1oqe++oDMbzvOTmf9WHzENvGnpS50yEUzsWLx6qez1dkjbfw3K0YoiM8CBx4E8lLvtIqpkZGpRMmxX9tumH/4ZlB1Fajuu1pOdCYvQxN6j4WCEPEIsukHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iOEFys4u; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741673263; x=1773209263;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=yRWn1iovWNrsqhtod6iHzgPsTsCfgH/d+xaja/frc2k=;
+  b=iOEFys4uqOB9TQDgZMqNXS3CPPAv+wPJpgkqlWRXt0bjXYuF35CiQWIv
+   lCIbA+36lHWbuVBHKB87ABy1Hog4FHYz32CW1gfyz/CKlArXPAOjCJDFb
+   3yvWMwX2zccI3gQfkEcD5518GhN23khwbFZJlkSRk5q2E40awgbSIChpY
+   JtHoqfshrRnjn96SVPfHQaQZ1OP8zotCtvt6m+BHhY0tEpYiYFeL4u4ig
+   RNYgyCFgf/n1mi4M0sZK2j/d9bJZin/FjDhce/Y0vGs6Z2kJ7uOeQAvWw
+   OlHHNwW3hGhbSc5ad+TKCV266crsyRydq4yWFlp8rsJaHL/nRrewVfDaY
+   Q==;
+X-CSE-ConnectionGUID: hlrzdoE0RcO9wH6yMZbSKw==
+X-CSE-MsgGUID: x39jv4sJT2Wox62Y49WGnA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11369"; a="42911528"
+X-IronPort-AV: E=Sophos;i="6.14,238,1736841600"; 
+   d="scan'208";a="42911528"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 23:07:42 -0700
+X-CSE-ConnectionGUID: EwCur8gjQcyW+W0/DVtgRg==
+X-CSE-MsgGUID: nkwfcOvITySxVkOXKzp2aQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,238,1736841600"; 
+   d="scan'208";a="120919332"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 23:07:37 -0700
+Date: Tue, 11 Mar 2025 07:03:45 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Ruud Bos <kernel.hbk@gmail.com>,
+	Paul Barker <paul.barker.ct@bp.renesas.com>,
+	Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund@ragnatech.se>,
+	Bryan Whitehead <bryan.whitehead@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Raju Lakkaraju <Raju.Lakkaraju@microchip.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Lasse Johnsen <l@ssejohnsen.me>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH net 1/5] igb: reject invalid external timestamp requests
+ for 82580-based HW
+Message-ID: <Z8/SQRskrrvSofW7@mev-dev.igk.intel.com>
+References: <20250310-jk-net-fixes-supported-extts-flags-v1-0-854ffb5f3a96@intel.com>
+ <20250310-jk-net-fixes-supported-extts-flags-v1-1-854ffb5f3a96@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWC003.ant.amazon.com (10.13.139.214) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250310-jk-net-fixes-supported-extts-flags-v1-1-854ffb5f3a96@intel.com>
 
-From: Paolo Abeni <pabeni@redhat.com>
-Date: Mon, 10 Mar 2025 20:09:49 +0100
-> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-> index 054d4d4a8927f..500b2a20053cd 100644
-> --- a/net/ipv4/udp_offload.c
-> +++ b/net/ipv4/udp_offload.c
-> @@ -15,6 +15,39 @@
->  #include <net/udp_tunnel.h>
+On Mon, Mar 10, 2025 at 03:16:36PM -0700, Jacob Keller wrote:
+> The igb_ptp_feature_enable_82580 function correctly checks that unknown
+> flags are not passed to the function. However, it does not actually check
+> PTP_RISING_EDGE or PTP_FALLING_EDGE when configuring the external timestamp
+> function.
+> 
+> The data sheet for the 82580 product says:
+> 
+>   Upon a change in the input level of one of the SDP pins that was
+>   configured to detect Time stamp events using the TSSDP register, a time
+>   stamp of the system time is captured into one of the two auxiliary time
+>   stamp registers (AUXSTMPL/H0 or AUXSTMPL/H1).
+> 
+>   For example to define timestamping of events in the AUXSTMPL0 and
+>   AUXSTMPH0 registers, Software should:
+> 
+>   1. Set the TSSDP.AUX0_SDP_SEL field to select the SDP pin that detects
+>      the level change and set the TSSDP.AUX0_TS_SDP_EN bit to 1.
+> 
+>   2. Set the TSAUXC.EN_TS0 bit to 1 to enable timestamping
+> 
+> The same paragraph is in the i350 and i354 data sheets.
+> 
+> The wording implies that the time stamps are captured at any level change.
+> There does not appear to be any way to only timestamp one edge of the
+> signal.
+> 
+> Reject requests which do not set both PTP_RISING_EDGE and PTP_FALLING_EDGE
+> when operating under PTP_STRICT_FLAGS mode via PTP_EXTTS_REQUEST2.
+> 
+> Fixes: 38970eac41db ("igb: support EXTTS on 82580/i354/i350")
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> ---
+>  drivers/net/ethernet/intel/igb/igb_ptp.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/igb/igb_ptp.c b/drivers/net/ethernet/intel/igb/igb_ptp.c
+> index f9457055612004c10f74379122063e8136fe7d76..b89ef4538a18d7ca11325ddc15944a878f4d807e 100644
+> --- a/drivers/net/ethernet/intel/igb/igb_ptp.c
+> +++ b/drivers/net/ethernet/intel/igb/igb_ptp.c
+> @@ -509,6 +509,11 @@ static int igb_ptp_feature_enable_82580(struct ptp_clock_info *ptp,
+>  					PTP_STRICT_FLAGS))
+>  			return -EOPNOTSUPP;
 >  
->  #if IS_ENABLED(CONFIG_NET_UDP_TUNNEL)
+> +		/* Both the rising and falling edge are timstamped */
+> +		if (rq->extts.flags & PTP_STRICT_FLAGS &&
+> +		    (rq->extts.flags & PTP_EXTTS_EDGES) != PTP_EXTTS_EDGES)
+> +			return -EOPNOTSUPP;
 > +
-> +/*
-> + * Dummy GRO tunnel callback; should never be invoked, exists
-> + * mainly to avoid dangling/NULL values for the udp tunnel
-> + * static call.
-> + */
-> +static struct sk_buff *dummy_gro_rcv(struct sock *sk,
-> +				     struct list_head *head,
-> +				     struct sk_buff *skb)
-> +{
-> +	WARN_ON_ONCE(1);
-> +	NAPI_GRO_CB(skb)->flush = 1;
-> +	return NULL;
-> +}
-> +
-> +typedef struct sk_buff *(*udp_tunnel_gro_rcv_t)(struct sock *sk,
-> +						struct list_head *head,
-> +						struct sk_buff *skb);
-> +
-> +struct udp_tunnel_type_entry {
-> +	udp_tunnel_gro_rcv_t gro_receive;
-> +	refcount_t count;
-> +};
-> +
-> +#define UDP_MAX_TUNNEL_TYPES (IS_ENABLED(CONFIG_GENEVE) + \
-> +			      IS_ENABLED(CONFIG_VXLAN) * 2 + \
-> +			      IS_ENABLED(CONFIG_FOE) * 2)
+>  		if (on) {
+>  			pin = ptp_find_pin(igb->ptp_clock, PTP_PF_EXTTS,
+>  					   rq->extts.index);
 
-I guess this is CONFIG_NET_FOU ?
+Thanks for fixing
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+
+In igb_ptp_feature_enable_i210() there is the same check for both edges
+but also PTP_ENABLE_FEATURE is tested. There is no need for it here, or
+it is redundant even in i210?
+
+> 
+> -- 
+> 2.48.1.397.gec9d649cc640
 
