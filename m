@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-173762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01BA8A5B930
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 07:24:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DB04A5B953
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 07:39:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 340D8170279
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 06:24:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C7AC1892C69
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 06:39:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE84B21421F;
-	Tue, 11 Mar 2025 06:24:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A591F03F2;
+	Tue, 11 Mar 2025 06:39:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="FPoHkQ99"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X321t56B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 151981E5B6D
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 06:24:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9CB1E9B1F
+	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 06:39:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741674255; cv=none; b=oCSdObpVcC8WLMM5D2HFXGgL23FcmIH9oGpGnI8rdF43LY7X1Q/WaEQrHZ3NNat+HniM8Z8M7RpnlWaSRypHUJc62TfwNqr/srJ3ltPcj3TIdlupqvOwu5/+PZE8zTPo8c64XLu5qwuEHqspFXXEmZmsTDhyCVZ6M4w4eYkvDvM=
+	t=1741675174; cv=none; b=NFc/OE85PuLmnQvzEHqM7NcOyk7YuGzoJalosa7FdrUGqTKthZ6JDG4/jexcanxcojmDC98kqNY+GFK0MUTVPjRp91GEszZtx8TUZFsV3iXnxyVxRRbo9SN95ywEYffpHVxi3oCICwoQgCOBfdNL2h/EiSBpKSFSVoS821s05LM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741674255; c=relaxed/simple;
-	bh=DsqDEHlBUwS8fyV8/WMCNPW7k1Q8GQhlh9GKPXRNGBY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Pm5aQTUy3kSB7V8XUbpsT9YVEAo54vZ/xb6mnoKLgjO2IjikBXHS8L0bq033ENmA0C/SPXRoV7XFsNcPRgYwimgCZY6LSJLHvy6uNitNUxciFiZoIOufhK0P4MCojaNA99dDyohbVqFLb8wjHg9Y2lg6qBcWrhuM3BqOtp6/ugI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=FPoHkQ99; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-224191d92e4so87657145ad.3
-        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 23:24:12 -0700 (PDT)
+	s=arc-20240116; t=1741675174; c=relaxed/simple;
+	bh=x84y1YiYxzvQFpxbeSWw8i2AnBhaKu5wQsBUBQdOc9o=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=DktzXxSJ2Gfe7VXKX9lZvG+UWjHxeMFvZ0SphsTF8BDwh21JbVIXn+LOc022zkLHHHdGL1UW0woqdW/a7OuHXGmRSRaUY6rx54YL9vgEITOiT5pElidgGTjMYdrHzGResoLk4N5uLEprOKmjF9HZtgFeiuvcpuPT9oeuXv9Oyhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X321t56B; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-aaee2c5ee6eso694349766b.1
+        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 23:39:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1741674252; x=1742279052; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hcOWo3MpfkZwJWARJhxBJx9ftvSTMuCRJKTKMNfQ2T0=;
-        b=FPoHkQ9991pPxzcc1wNC8ql57JSLUfNSGlxHUt/djJvzy6tttksaE1tmYgZn/MSq6x
-         lheb9UNZRvv0CS3g7cAZbIkWUi0QW94/r3W7YPyowTp8j1CVIsojnZzWdIfE5IHMgxox
-         xpMbh0USTe0mijm9J/kWE+nUQDGnb3RAGZvbVQ3206vnggOSGs/Qmhauaf3cIILDwelF
-         EnQfIxlrnuULyyF9yAympiFuc98OYBkyvNvLiHskPcr8sTxahCxq1eYLSb/8H9ie7Pg+
-         SCLC4/3BzU04zYQZYRSDg4clysyhLsn6BYahOjjzCdzEjTXvADo3uLgEBD8fikXhi4m1
-         vvHw==
+        d=gmail.com; s=20230601; t=1741675171; x=1742279971; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Y+tm/rgNfkmaK4aaHuAz++rkiT9ipjAMgSoCm+0FoPU=;
+        b=X321t56Be8HOZ3f5qJXIHaz7eTGV6EY8xWAUCfst0MwWqd0kAhPK9cB4AdA/o1raOY
+         TiRQM4HpEbv990z/VhkOLYDjj1hmMgJADToDiKD33gP2f86u9l3yCHIt1lePOpMfVT+4
+         SVGFUgM8meOfR7aObU0NJ9PDXFZPKpPZ7rC/oBJvBC4JCrwJPAkiLBO6U27UonrSjGio
+         96hrD+digAMDUpyd4RNlPz4KHcD2wTdrBKpn22QSzLHmb39nIAdktXa9gBZRmhvmRsAZ
+         IEqm3wEETXM4LG6eYxvVT6XvIYz5dsbRBlyf8iwo1SUjkTau+3nN589iduyyJFuO6pcD
+         +q8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741674252; x=1742279052;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1741675171; x=1742279971;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hcOWo3MpfkZwJWARJhxBJx9ftvSTMuCRJKTKMNfQ2T0=;
-        b=Gw0uHo3A5hw7+o6qzbvab19llupOpNPK1yBzEuUMXsC/14HjamR6dOUUI6j2I2VkX6
-         LfbrbnuFuJQ9in09cv0XSyKT9IpHWn6sfE3ykSlP45QXJ4Iw8WGETSxNkygwA9TBnlBE
-         EyP2uWN+/gQ1xwBDchrjZVVr/jQyDyIPdrANRc+ZzyrLttU9nDdJS0/tsWmQ2EP5nTaj
-         eCJdiRF9yB6VlNyX8s8lbngiXVlKOGzP0YIaWzSkzKBtGSXD7yP/BpyqBtzeTjmPN/sD
-         ARGz4gsjm4og27OA6MUy8ySXVTL+HsTDDsXAX8+jSB2iL0kXYpm0cz4OM7lg/jDLkuHj
-         /b3w==
-X-Forwarded-Encrypted: i=1; AJvYcCXCJLQD/2iT8YEY6xuMMR9/W+vDd/M84frYZxN3NseHcKEuU/YI64iCqfCI4O7H2/IvequLihU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIA358b5vYTzNPK3C+ok7C5EqfgC3PVBro8n4njrS1HMZ+skvw
-	bEZ8o1Miydwpo1DHt5U7HCC/mQ5qpiLTTj2Eyb+DtVRjgt4K+2VVFBFbovoUBpU=
-X-Gm-Gg: ASbGnctA/4Ojymz7ENCC/qEMMoRKvcgr0bzDmv37EkehnF86S+V0r1wXkfrp6LtWkNR
-	HFvDo49AP/19ASQHBovU4LEv7r/jyzQ81H40EaGqdgVxcdeKEMP/ta5hy8aUBCIszvAXu54qNp/
-	k3DS5gEEqvAvZ5ZjOMsKvlLsGdu+RzHjz8z4758bonl2eU1TnBYdTeo/9ObtaTxjsnUIAv9DUpX
-	gErcZaHoiAfdcQ+4fU1MKeyBk+Z6leIQnVxgieZyOKmXg9FeUuHVZG7r7zJyEqPso6mtnKmDEsy
-	5ubablbjOjLJypmuwcRJM8/lmgR6uzV0+uT1EpuIfHnurrEIz5Jl7J6Ylw==
-X-Google-Smtp-Source: AGHT+IGn18ZSOeDi0OtiFl4e+mdyHaJbBZUtxUxoxSL45HZJeEfhcKnA+r8VKFVTyGuyQbzX9uCMeA==
-X-Received: by 2002:a05:6a00:1a92:b0:730:d5ca:aee with SMTP id d2e1a72fcca58-736aaae81e6mr21317990b3a.23.1741674252333;
-        Mon, 10 Mar 2025 23:24:12 -0700 (PDT)
-Received: from [157.82.205.237] ([157.82.205.237])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-736a336010dsm9010979b3a.59.2025.03.10.23.24.08
+        bh=Y+tm/rgNfkmaK4aaHuAz++rkiT9ipjAMgSoCm+0FoPU=;
+        b=L+VI+WvgPpC6LuP3qRyPJvNiGhD4fvrPKMclx5Wyy3kVMYEVgWGaIuALqxS8G0Qe3N
+         EBJP8NehpDAEWxUjg3n/5y9Yny4TuNLGF6DSoYx2Gl1/yJCHSlXNzK+OXW3Nutr9U/6e
+         FguR3KZKL6zS0xvRpsR5q41FCPBPgducAyG2meFDxSzL/eL1K0ciwCbY+MQADDzF5OEp
+         BAzSKZCvNivTACLvSrdEbZJvtaPItZ8P6yKpZb7ZiQYyKlupGI6JC7i4Tr+ITSXxMBTE
+         txUSn8WBrdtBZuC/o2O/E2gIuHt2svt+cmdSiQrcVvMcZwRkXKx1aCWHFd6CpYat2myH
+         +zQw==
+X-Gm-Message-State: AOJu0YxzSL0+6djRX6DwJomSLew6ueex6YYaap6l7u7JtS/gcRcKWUWc
+	Ol51h4+i6LqjYCXHXm2KMyDjKxJoWhfVli7pkr7K8/y6ehRa1j7mYzBfBQ==
+X-Gm-Gg: ASbGncvtw1dZ4Y7FCVQycHSPBTHHngvdKtcrlJvjVea2MH3uHagvK3z8ogt8gQHFC9u
+	0klDQvVPhJHUNKtcf4R9OCc39CgXffANgaM3iCEbFIuu9r82Lptv6RkTA3/ns6JuTzkB/pEFpk2
+	AmG0xsbjHZvud1DiFOAU+bvuxOBhu5OP2ngd2hERsrJQQozasW6tC4vut86UT20fcL36mtsdF3r
+	w4OMZ7JIzb0uW7Sstso6myR8wJwqAEQpuoSZsk63GYfH09Fs251fzDIR2tOCL43AT0cSFoMGMrA
+	gHLOAd96BtNygu0I6XdGBEIwm7HeMwPTpwj5NgxzHzcyWhsBaFXPNLHL4kKbphT48AtFi6m1FBI
+	vQ3jJvOA88kvTnCWv8X1G3VGHeRWWFxIFUL/7WulW1homNetDZS5RnkKOQm9C+HdnZpKt1Ad6ko
+	KT8P3YWJZHe7gkxpbHNCC8TRaWq88EWWhp7DtJ
+X-Google-Smtp-Source: AGHT+IFWUw58Ix/3G/kolIJ5bxvwbvCPyg6/nJ3YQ/JDVORkm3u81J8C5/p3U7NBrcsuBgxfda7Oiw==
+X-Received: by 2002:a17:907:1b02:b0:abf:75d7:72a2 with SMTP id a640c23a62f3a-ac252f5b3b4mr2160150966b.38.1741675170981;
+        Mon, 10 Mar 2025 23:39:30 -0700 (PDT)
+Received: from ?IPV6:2a02:3100:ad09:4d00:f159:4498:19a5:6163? (dynamic-2a02-3100-ad09-4d00-f159-4498-19a5-6163.310.pool.telefonica.de. [2a02:3100:ad09:4d00:f159:4498:19a5:6163])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-ac23973af6fsm876269966b.100.2025.03.10.23.39.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Mar 2025 23:24:12 -0700 (PDT)
-Message-ID: <1dd2417a-3246-44b0-b4ba-feadfd6f794e@daynix.com>
-Date: Tue, 11 Mar 2025 15:24:06 +0900
+        Mon, 10 Mar 2025 23:39:30 -0700 (PDT)
+Message-ID: <1c1a5c49-8c9c-42a7-b087-4a84d3585e0d@gmail.com>
+Date: Tue, 11 Mar 2025 07:39:33 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,155 +81,87 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 6/6] vhost/net: Support
- VIRTIO_NET_F_HASH_REPORT
-To: Jason Wang <jasowang@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>,
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
- Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>
-References: <20250307-rss-v9-0-df76624025eb@daynix.com>
- <20250307-rss-v9-6-df76624025eb@daynix.com>
- <CACGkMEuccQ6ah-aZ3tcW1VRuetEoPA_NaLxLT+9fb0uAab8Agg@mail.gmail.com>
- <2e550452-a716-4c3f-9d5a-3882d2c9912a@daynix.com>
- <CACGkMEu9tynRgTh__3p_vSqOekSirbVgS90rd5dUiJru9oV1eg@mail.gmail.com>
 Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <CACGkMEu9tynRgTh__3p_vSqOekSirbVgS90rd5dUiJru9oV1eg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+To: Florian Fainelli <florian.fainelli@broadcom.com>,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next] net: dsa: b53: use genphy_c45_eee_is_active
+ directly, instead of phy_init_eee
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 2025/03/11 9:42, Jason Wang wrote:
-> On Mon, Mar 10, 2025 at 3:04 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>
->> On 2025/03/10 13:43, Jason Wang wrote:
->>> On Fri, Mar 7, 2025 at 7:02 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>>
->>>> VIRTIO_NET_F_HASH_REPORT allows to report hash values calculated on the
->>>> host. When VHOST_NET_F_VIRTIO_NET_HDR is employed, it will report no
->>>> hash values (i.e., the hash_report member is always set to
->>>> VIRTIO_NET_HASH_REPORT_NONE). Otherwise, the values reported by the
->>>> underlying socket will be reported.
->>>>
->>>> VIRTIO_NET_F_HASH_REPORT requires VIRTIO_F_VERSION_1.
->>>>
->>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
->>>> Tested-by: Lei Yang <leiyang@redhat.com>
->>>> ---
->>>>    drivers/vhost/net.c | 49 +++++++++++++++++++++++++++++--------------------
->>>>    1 file changed, 29 insertions(+), 20 deletions(-)
->>>>
->>>> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
->>>> index b9b9e9d40951856d881d77ac74331d914473cd56..16b241b44f89820a42c302f3586ea6bb5e0d4289 100644
->>>> --- a/drivers/vhost/net.c
->>>> +++ b/drivers/vhost/net.c
->>>> @@ -73,6 +73,7 @@ enum {
->>>>           VHOST_NET_FEATURES = VHOST_FEATURES |
->>>>                            (1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
->>>>                            (1ULL << VIRTIO_NET_F_MRG_RXBUF) |
->>>> +                        (1ULL << VIRTIO_NET_F_HASH_REPORT) |
->>>>                            (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
->>>>                            (1ULL << VIRTIO_F_RING_RESET)
->>>>    };
->>>> @@ -1097,9 +1098,11 @@ static void handle_rx(struct vhost_net *net)
->>>>                   .msg_controllen = 0,
->>>>                   .msg_flags = MSG_DONTWAIT,
->>>>           };
->>>> -       struct virtio_net_hdr hdr = {
->>>> -               .flags = 0,
->>>> -               .gso_type = VIRTIO_NET_HDR_GSO_NONE
->>>> +       struct virtio_net_hdr_v1_hash hdr = {
->>>> +               .hdr = {
->>>> +                       .flags = 0,
->>>> +                       .gso_type = VIRTIO_NET_HDR_GSO_NONE
->>>> +               }
->>>>           };
->>>>           size_t total_len = 0;
->>>>           int err, mergeable;
->>>> @@ -1110,7 +1113,6 @@ static void handle_rx(struct vhost_net *net)
->>>>           bool set_num_buffers;
->>>>           struct socket *sock;
->>>>           struct iov_iter fixup;
->>>> -       __virtio16 num_buffers;
->>>>           int recv_pkts = 0;
->>>>
->>>>           mutex_lock_nested(&vq->mutex, VHOST_NET_VQ_RX);
->>>> @@ -1191,30 +1193,30 @@ static void handle_rx(struct vhost_net *net)
->>>>                           vhost_discard_vq_desc(vq, headcount);
->>>>                           continue;
->>>>                   }
->>>> +               hdr.hdr.num_buffers = cpu_to_vhost16(vq, headcount);
->>>>                   /* Supply virtio_net_hdr if VHOST_NET_F_VIRTIO_NET_HDR */
->>>>                   if (unlikely(vhost_hlen)) {
->>>> -                       if (copy_to_iter(&hdr, sizeof(hdr),
->>>> -                                        &fixup) != sizeof(hdr)) {
->>>> +                       if (copy_to_iter(&hdr, vhost_hlen,
->>>> +                                        &fixup) != vhost_hlen) {
->>>>                                   vq_err(vq, "Unable to write vnet_hdr "
->>>>                                          "at addr %p\n", vq->iov->iov_base);
->>>>                                   goto out;
->>>
->>> Is this an "issue" specific to RSS/HASH? If it's not, we need a separate patch.
->>>
->>> Honestly, I'm not sure if it's too late to fix this.
->>
->> There is nothing wrong with the current implementation.
-> 
-> Note that I meant the vhost_hlen part, and the current code is tricky.
-> 
-> The comment said:
-> 
-> """
-> /* Supply virtio_net_hdr if VHOST_NET_F_VIRTIO_NET_HDR */
-> """
-> 
-> So it tries to only offer virtio_net_hdr even if vhost_hlen is the set
-> to mrg_rxbuf len.
-> 
-> And this patch changes this behaviour.
+Use genphy_c45_eee_is_active directly instead of phy_init_eee,
+this prepares for removing phy_init_eee. With the second
+argument being Null, phy_init_eee doesn't initialize anything.
 
-mrg_rxbuf only adds the num_buffers field, which is always set for 
-mrg_rxbuf.
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ drivers/net/dsa/b53/b53_common.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-The num_buffers was not set for VIRTIO_F_VERSION_1 in the past, but this 
-was also fixed with commit a3b9c053d82a ("vhost/net: Set num_buffers for 
-virtio 1.0")
-
-So there is no behavioral change for existing features with this patch.
-
-Regards,
-Akihiko Odaki
-
-> 
-> Thanks
-> 
->> The current
->> implementation fills the header with zero except num_buffers, which it
->> fills some real value. This functionality is working fine with
->> VIRTIO_NET_F_MRG_RXBUF and VIRTIO_F_VERSION_1, which change the header size.
->>
->> Now I'm adding VIRTIO_NET_F_HASH_REPORT and it adds the hash_report
->> field, which also needs to be initialized with zero, so I'm making sure
->> vhost_net will also initialize it.
->>
->> Regards,
->> Akihiko Odaki
->>
->>>
->>> Others look fine.
->>>
->>> Thanks
->>>
->>
-> 
+diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
+index 61d164ffb..17e3ead16 100644
+--- a/drivers/net/dsa/b53/b53_common.c
++++ b/drivers/net/dsa/b53/b53_common.c
+@@ -2212,10 +2212,7 @@ EXPORT_SYMBOL(b53_mirror_del);
+  */
+ int b53_eee_init(struct dsa_switch *ds, int port, struct phy_device *phy)
+ {
+-	int ret;
+-
+-	ret = phy_init_eee(phy, false);
+-	if (ret)
++	if (!phy->drv || genphy_c45_eee_is_active(phy, NULL) <= 0)
+ 		return 0;
+ 
+ 	b53_eee_enable_set(ds, port, true);
+-- 
+2.48.1
 
 
