@@ -1,187 +1,126 @@
-Return-Path: <netdev+bounces-173769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C56FA5B9A0
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 08:17:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C352A5B9D2
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 08:31:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E75A171493
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 07:17:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF5E318945E7
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 07:31:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB8322156F;
-	Tue, 11 Mar 2025 07:17:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BEDB221733;
+	Tue, 11 Mar 2025 07:31:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jmuQ2Nsy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eARvd6Ww"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3475821421F;
-	Tue, 11 Mar 2025 07:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA231EB195;
+	Tue, 11 Mar 2025 07:31:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741677441; cv=none; b=UtW1Wy5Pczig930BSrR4VeujIoqnX/5AMdzageiFkERxDmkxGHUOc34J49XgDXteQA8Bf9uBpWKrgjQ5kSQfOHedspfvEOnPBjqpefgu4ymtLK84/rX8KVf8BwfJElf4z2zDjh4uhwFMkTNYBmUrjT+vgUzd7oCRP0Wh+7Xca7Y=
+	t=1741678301; cv=none; b=ECUhzEl1RxotJYT1tMQrqAPibaPNtFA/1cXI4iUn/HRAbTMa8SRxBc31JojU4HL6MqeAHmqk97Xsdfqf0Of1Ox0bs9i7QQ5DAyLJoTp3WXZldsctdiXxQ57B2C/j9PzsojTHpRbEFoTlqN+SWybqedBNPI60WpgJ5eNDJaWP2MI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741677441; c=relaxed/simple;
-	bh=lMQHpotAZT+or9bRBn1RXMX/D7xRB6YRlUt12c1LBPE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WVehsAxCDfj2ttAhnvhNxZXdEB5ASvAHl7XcDBpqAsLsx3CarOnOSHs3qHX4GdqeN7hf4ha0q3snDBeHcy5NaIMfXoZuGeKWjMvkYUQ7cfwH0F3h2RVF0bAFAs/wHz6PUgBGo05P63KjHRie+xD08s20z+CwbphRjeZaNTU8iH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jmuQ2Nsy; arc=none smtp.client-ip=209.85.221.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-523dc366e42so1980696e0c.2;
-        Tue, 11 Mar 2025 00:17:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741677438; x=1742282238; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QgXuDCwAmQulDTtjzIIH53l6D34oij/uowJ4XpgRVJo=;
-        b=jmuQ2NsyE8noLdtxc+TREY9oLrDvx9VBoTXoUmPe9JDF63vBIRCMzoMPoPOF0CTgE0
-         A3uZa3Mv565E6ZCX4A9H9yP0TKV1mjAdX80osSGcXYxoIwftBkSogxlnMwh6PQ8QmYWt
-         terLKAh7bVkCeKM9tZkP5Ytt1cMP3PGT+d8AwXQJ8M2Ze8DBY3eGVMX4eHj5bzFLAz+D
-         hS3Y0POn6viCl2NHNxIqoKdXJx/xlA8YQHeJuHsaQ/g6ZaOo2nV3f98vZMHgGkJSCQIW
-         uGF6yepsce4ILOnK6Y4pexCRHgJPhHUYewhAIOKK8hnWcmVN/KeGAd3iQAeW43JNwMMN
-         D1Og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741677438; x=1742282238;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QgXuDCwAmQulDTtjzIIH53l6D34oij/uowJ4XpgRVJo=;
-        b=XgmqXqB4z9p/xl14qHBgQfetvxid479XV/o557fQiG8kjN6KrIi8nmOyzWKHKwHCHH
-         9K3zUGjgJMHNlrIX8l247YVp3KoIxyPoGVFQ22klkhSUwLMWZqHSkFB837z1d7+7Lv/z
-         rFb7srbA5K6oOH7m7N//mA+x5xhwb2cGxvZb8iLnaICq2mk5S0TtweYMiIAvTCQrSKvV
-         SCnNmufpDu9dwDrfSkdhdU41Pq74em1PVbQNZtaXNaVWEYqbEXmQclNb7RNt7hSot7wN
-         YaXYgJw7glOsp/weNYkoP2tVBKcxNKHL+a0fjjP5jSCPyChpIVrLdB/xa6Kf8QTXmv30
-         thkg==
-X-Forwarded-Encrypted: i=1; AJvYcCUFB7Y5aCYNAcWIkl+rv1zOX0id+NgNaSMVOyxG8bKUNVlinfhEjinE9TEtMHAlYhHBa/ciHzYwzGxk@vger.kernel.org, AJvYcCUY9dIax7uzn0ry0xAUH4zcOB1mjzhB3XAXwdbeP2wS1CMEa4DUYLXDIQTfdEW4UxH7eLOnKap7nq8XrQRC@vger.kernel.org, AJvYcCW2k4Q5awaEo87UM/6ISLLinjjKWNT8o6HDviAU/aOK29+JFAM0LXNuPhyJdL4wUntITr6kp82A@vger.kernel.org, AJvYcCX05hZFok/Ridsh6EYYSeNlzMwmHg0HrF5/HUd5McdacZj+plwfRDddJp5HZcCFF/omN8lvhlxVaTkZ2X4aygRsnm8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZuunyrTNG+TEJXYMwYajY3d3agXJ/PLxNMUy5kLv4pD+SG/sk
-	tER1pUV2a++zoxzpngSOlttUUN+SCSAstWK7E1yy4+aEIQAPLx7ER3iSaCCqGxhq9B8Ktw8I8g2
-	fDQykB7tXYFTpv7gObticqICFASw=
-X-Gm-Gg: ASbGncsLH8nr631j45bwGhMt1XsY2c2LGSHibwGKXL7ThyeRU32/XpdcqR5m6cfIupF
-	ZcvTuMTR5vmy6MFwCCTVVXU6Crp6813GdCdoKmrykyeJvEvRpnEHlQr7YTtcuYByHx1Yd5yIoUa
-	jPoekfsaYC4SCBrlsOihdlCt6fAA==
-X-Google-Smtp-Source: AGHT+IHL9bGh1peMKIZaQk5HkCRcMvybeFANZeZSC4bWbrbEOygDwgyxh5TwDNL6xNH9/SVkNxI01E1JJlfqV10gxoE=
-X-Received: by 2002:a05:6122:1809:b0:520:60c2:3f1 with SMTP id
- 71dfb90a1353d-523e3fd2c81mr9612329e0c.0.1741677437848; Tue, 11 Mar 2025
- 00:17:17 -0700 (PDT)
+	s=arc-20240116; t=1741678301; c=relaxed/simple;
+	bh=Hq9oj7wLpWMy8mr3CBZv+PzeXcEG672QxLovOqz+Mco=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z6t3iwyPgrJSRe6Q005I3nuRdEHPx2wbjH5MCTSBKns3dIpNmHCdnpY4IibQC2sDWXy9dTqgvNN0OXbg+rAhDQik+vKyriCluBzjTUSeeKNi2JMFjJAe2cXRY1rYjMww3S1zXhp43QLooNHX+DNWyz/YOIo4sjZUnEPknfV9c2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eARvd6Ww; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741678300; x=1773214300;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Hq9oj7wLpWMy8mr3CBZv+PzeXcEG672QxLovOqz+Mco=;
+  b=eARvd6WwoBHVoDyX97WM0ZB1H6QPqhqOnIoWBJyUIjvOgIvByXZH/rUF
+   fmmBcol8C+lLnzX2kZXJ5OcgLFpgdz/7umy81TZStjWd1RIUXXbwE+enK
+   /dztaOLso6XgxKQMtSLwOmMaSfd/co5k2HY+k2wkowgy2DGMd7M+wXAZz
+   /FgIPBBdjuqcxfDq/lYCef2CQoB6sPSHzPDBsIOUWoSt+DVNd9FE1bDMH
+   0EuFh1Hl7O28lacpnQHb9fpF6+KJw+/yf6U0aAi04yXup+qS6RG665A5G
+   A2mhF0YwPyRDParhy3dzXVfu/1OHx7XNi/TcSOFFlwIAKKFxD15s2+EE0
+   Q==;
+X-CSE-ConnectionGUID: 6ss0DhYZTMeXfqIIaaiouQ==
+X-CSE-MsgGUID: FiDQXVD7QoaM/VBP+XhlbA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11369"; a="46350713"
+X-IronPort-AV: E=Sophos;i="6.14,238,1736841600"; 
+   d="scan'208";a="46350713"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2025 00:31:40 -0700
+X-CSE-ConnectionGUID: NTagemLOSlibh4jwNKS8ng==
+X-CSE-MsgGUID: u9trQ7IgS0q9Htl59JSXvg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,238,1736841600"; 
+   d="scan'208";a="125283253"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2025 00:31:37 -0700
+Date: Tue, 11 Mar 2025 08:27:45 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Kees Cook <kees@kernel.org>
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] net: macb: Truncate TX1519CNT for trailing NUL
+Message-ID: <Z8/l8eM5u7QeUROt@mev-dev.igk.intel.com>
+References: <20250310222415.work.815-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250308200921.1089980-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250308200921.1089980-2-prabhakar.mahadev-lad.rj@bp.renesas.com> <20250310213056.GA904881-robh@kernel.org>
-In-Reply-To: <20250310213056.GA904881-robh@kernel.org>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Tue, 11 Mar 2025 07:16:52 +0000
-X-Gm-Features: AQ5f1Jo8YORcwnFwKCITHCfJ8Sp8085yTfEpHt0PYoBNnCKqikUJMGmDGgK5HdU
-Message-ID: <CA+V-a8uinTxr8FheR5-Pbv37j9wFR1cfrFDX6gExA5dW8WWPSA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 1/3] dt-bindings: net: dwmac: Increase
- 'maxItems' for 'interrupts' and 'interrupt-names'
-To: Rob Herring <robh@kernel.org>, "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Philipp Zabel <p.zabel@pengutronix.de>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250310222415.work.815-kees@kernel.org>
 
-Hi Rob,
+On Mon, Mar 10, 2025 at 03:24:16PM -0700, Kees Cook wrote:
+> GCC 15's -Wunterminated-string-initialization saw that this string was
+> being truncated. Adjust the initializer so that the needed final NUL
+> character will be present.
+> 
+> Cc: Nicolas Ferre <nicolas.ferre@microchip.com>
+> Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: netdev@vger.kernel.org
+> Signed-off-by: Kees Cook <kees@kernel.org>
+> ---
+>  drivers/net/ethernet/cadence/macb.h | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
+> index 2847278d9cd4..9a6acb97c82d 100644
+> --- a/drivers/net/ethernet/cadence/macb.h
+> +++ b/drivers/net/ethernet/cadence/macb.h
+> @@ -1067,7 +1067,8 @@ static const struct gem_statistic gem_statistics[] = {
+>  	GEM_STAT_TITLE(TX256CNT, "tx_256_511_byte_frames"),
+>  	GEM_STAT_TITLE(TX512CNT, "tx_512_1023_byte_frames"),
+>  	GEM_STAT_TITLE(TX1024CNT, "tx_1024_1518_byte_frames"),
+> -	GEM_STAT_TITLE(TX1519CNT, "tx_greater_than_1518_byte_frames"),
+> +	GEM_STAT_TITLE(TX1519CNT, "tx_greater_than_1518_byte_frame"),
+> +
+>  	GEM_STAT_TITLE_BITS(TXURUNCNT, "tx_underrun",
+>  			    GEM_BIT(NDS_TXERR)|GEM_BIT(NDS_TXFIFOERR)),
+>  	GEM_STAT_TITLE_BITS(SNGLCOLLCNT, "tx_single_collision_frames",
 
-Thank you for the review.
+"rx_greater_than_1518_byte_frames" is also 32, probably you should fix
+that too.
 
-On Mon, Mar 10, 2025 at 9:30=E2=80=AFPM Rob Herring <robh@kernel.org> wrote=
-:
->
-> On Sat, Mar 08, 2025 at 08:09:19PM +0000, Prabhakar wrote:
-> > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> >
-> > Increase the `maxItems` value for the `interrupts` and `interrupt-names=
-`
-> > properties to accommodate the Renesas RZ/V2H(P) SoC, which features the
-> > `snps,dwmac-5.20` IP with 11 interrupts.
-> >
-> > Also add `additionalItems: true` to allow specifying extra interrupts
-> > beyond the predefined ones. Update the `interrupt-names` property to
-> > allow specifying extra `interrupt-names`.
-> >
-> > Also refactor the optional `interrupt-names` property by consolidating
-> > repeated enums into a single enum list.
-> >
-> > Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> > ---
-> > Note, for this change I will be sending a sperate patch for vendor
-> > bindings to add constraints.
-> >
-> > v1->v2
-> > - No change
-> > ---
-> >  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 6 ++++--
-> >  1 file changed, 4 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Do=
-cumentation/devicetree/bindings/net/snps,dwmac.yaml
-> > index 3f0aa46d798e..fad0d611a75c 100644
-> > --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> > +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> > @@ -114,6 +114,8 @@ properties:
-> >
-> >    interrupts:
-> >      minItems: 1
-> > +    maxItems: 11
-> > +    additionalItems: true
-> >      items:
-> >        - description: Combined signal for various interrupt events
-> >        - description: The interrupt to manage the remote wake-up packet=
- detection
-> > @@ -122,11 +124,11 @@ properties:
-> >
-> >    interrupt-names:
-> >      minItems: 1
-> > +    maxItems: 11
-> > +    additionalItems: true
-> >      items:
-> >        - const: macirq
-> >        - enum: [eth_wake_irq, eth_lpi, sfty]
-> > -      - enum: [eth_wake_irq, eth_lpi, sfty]
-> > -      - enum: [eth_wake_irq, eth_lpi, sfty]
->
-> I think this should be structured similar to the DWC PCIe binding where
-> we define all possible names, but not the order:
->
-> minItems: 1
-> maxItems: 11
-> items:
->   oneOf:
->     - const: macirq
->       description: ...
->     - const: eth_wake_irq
->       description: ...
->     - pattern: '^rx-queue-[0-3]$'
->       description: ...
->     - pattern: '^tx-queue-[0-3]$'
->       description: ...
->
-> And so on. Move the descriptions from 'interrupts' and drop 'items' and
-> 'additionalItems' from it.
->
-Thanks for the pointer, I'll do as suggested above.
+Thanks
 
-@Russel, are you OK from me to add rx-queue/tx-queue in this binding
-file or would you suggest different names for it. Please share your
-thoughts.
-
-Cheers,
-Prabhakar
+> -- 
+> 2.34.1
+> 
 
