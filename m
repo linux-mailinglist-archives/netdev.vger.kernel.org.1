@@ -1,240 +1,143 @@
-Return-Path: <netdev+bounces-173721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E3A5A5B58F
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 02:01:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D367FA5B596
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 02:04:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F4B116912B
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 01:01:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 038B816D8FD
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 01:04:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2B9C1DEFC6;
-	Tue, 11 Mar 2025 01:01:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88D4B1DE2DF;
+	Tue, 11 Mar 2025 01:04:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pw3Gaog0"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="e+QjfMHc"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45927134A8
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 01:01:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC6B8821;
+	Tue, 11 Mar 2025 01:04:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741654904; cv=none; b=I7NqOFr9gUJX2sYVwjxL2ft/CV446MM2IkyfUir7FJ+m6l0upFlP3Lms+dDhfQvcchxezUwX7OJHQo6wdZWOVf8ESVtSQsdas8bofrYkcHNToy1f+rWwoXRRq6lIUfPsHZfn4r8UhAOIPYgAhH1YSwRsqFjnXB4bptOb9qyAvnI=
+	t=1741655068; cv=none; b=LLqKMhCVYsmX54kqANqifO3UQnWgO+uJnrR5GDKy046+SJrwL8+wvE0Sz1yn5NrO52PwMNmToVAAk8LKieKGTkT6ib9vfTG13WkHNcXOT/ppl/NbmgQLIfu/S90Xb2XuAKXBPOfgG/qelaAQ8mo86MgspY5Xu+iUMYeWCYgrHY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741654904; c=relaxed/simple;
-	bh=54oJMjM8shiRn1OnZ1JipCpRhpImJA6xO8ic278ve44=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WjXKvAF+tRBGXNOmEbdD5QWx2AeWotYKoLisa0yMfq0ZFi88MISpYpJdaUDBVl+5L7vhMCySambWk7sALh/sz8wqIloWtWV355dsK2iesDHkkUhN5l6C/bF+K3j1ufXpABEpG33+j2b1iFZB8TVVmjEK+DQbKoMiiVDERw+LxP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pw3Gaog0; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741654902;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=otxChvBJUIl3nIMsETvBBdmY0LiFzMWWzPwOK3dbDlk=;
-	b=Pw3Gaog0h9t641YOL3BVWl/+yez3PZHumeMQXNSspKbln6XeXxztqSuNczytuZ0qsqRPbT
-	CwxT40FMNNq8xaD8sU1utcwumx2pE3qAH8I47+cRRk0p9J7m+QNLtbkjoc28svkzgki2u7
-	XpHVJAJpSPcNCxkJ3bW3N9NR/jZEtEU=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-529-uyQFUgEKNPirfH3McFTyJg-1; Mon, 10 Mar 2025 21:01:40 -0400
-X-MC-Unique: uyQFUgEKNPirfH3McFTyJg-1
-X-Mimecast-MFC-AGG-ID: uyQFUgEKNPirfH3McFTyJg_1741654900
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2ff4b130bb2so8079380a91.0
-        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 18:01:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741654899; x=1742259699;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=otxChvBJUIl3nIMsETvBBdmY0LiFzMWWzPwOK3dbDlk=;
-        b=u4FWasOtPVvy2Wur8Afo/qmwp+FWRjW54aIoQnFEAgvqe91tvzscU0Sfu2t8BzExpf
-         6Rsl9zimUD3NZ3qPQNSG7SDcftPYaPJMxda8DBZ2CVjotk7UUraXA+xhVYlGEvSeq7od
-         NSo9yhD4QLrCOW6Rj0RQIeZ0Wl7+7lIJ5grBGURUmKOCR2UKmfgLvthwr4bSqBWuUdOn
-         LuXrwzzD0QWGjUkuKocXmwzRmoljwqu+3EpXxaq1bfdJtBNLMi3zuXRBMDRoDNhRFx1d
-         AWN13i0O+1UCY9Z+yQbvvlsuF/QKKGeFuh//jJ/NRd5HSUOTzuXEu8ajfUV0hYvmE9ee
-         hz3A==
-X-Forwarded-Encrypted: i=1; AJvYcCWbvGvX6CpOojwUT/K4hMbGBUU4J6UddZad7hmUxtPy/tzp4+JfoN0Ck8dsA5tDQjFbQ6jYYnQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQiyPm6fcOIEBfDS24V6yeYIvHaS03uYO24xAW74WHMD35Gvec
-	3Cgk57dIwQURWuQ643MP12GqbYpjCegrs8fIuALdpDgdfdnBipj8aM+3az9dGWUccMJpPpyGa5u
-	1cufRDhRnKie6poJVHrB+WWXXgIbUYd67c/t2TSTWtFFuhduWx/zobIytJYH9FGiVplrXHVbGW6
-	ebMg8LS8hPkZmKciPQaEcdurz3ZlUv
-X-Gm-Gg: ASbGncvL0KZ6vFJUc+uPupF70aHpy41WytKl1ICRSGrlcR4L/cbSA6cBwQYsHR7rSv0
-	txhn1WL5E4u4Mk4zdW5w7sgwe2BQUq1OyqeRiOeY0hOpcKKAHZXWE+QRc+qmuT0RfZrF1zg==
-X-Received: by 2002:a17:90b:4ad2:b0:2fa:137f:5c5c with SMTP id 98e67ed59e1d1-2ff7ce59712mr22326092a91.1.1741654899123;
-        Mon, 10 Mar 2025 18:01:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFB3szA9e+qiTUX8D32Hw8wb313r3j65QyUK27BPoTVTn9q4ojSxaDQDQ9rIzvrEtlrS+WS7n5EOVmcp56KXhk=
-X-Received: by 2002:a17:90b:4ad2:b0:2fa:137f:5c5c with SMTP id
- 98e67ed59e1d1-2ff7ce59712mr22326069a91.1.1741654898757; Mon, 10 Mar 2025
- 18:01:38 -0700 (PDT)
+	s=arc-20240116; t=1741655068; c=relaxed/simple;
+	bh=WN5aRO51rgkoecwp/I5S3MO/oSkd8e+OEIbfwtXNJvI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=KK9GGpSUTe/nheNpOExZPQMz+4sNcwVf3gD5/8fjLlU11UzjykmLD8zmdG4NPkwZTTtA1k2wSU3v/1OIVuBn0tz4liHojf/G66QgTQD90EZch0Lnlgiu+fJILnDLDv1R3+HRw9lCRH7H5qTrNjeI1iCxflV5MXFsm5w3bm49+gs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=e+QjfMHc; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1741655063;
+	bh=0D/euKKF0UPH3RqK0kJcXY+4ZkJS4h6U/TzArE7xHZc=;
+	h=Date:From:To:Cc:Subject:From;
+	b=e+QjfMHckv1dwYrvqAbgpCVlev7dSi5H3uCSy76pnOoCtGe+UsMO1LVHo01mKMy47
+	 DLLtnsd3VWT52fPb/r9N5ocb24XioH3RfhOBD4uo4LFIIcR5GyJIMVD/0jZjbZEBa4
+	 VNO5Vd+g0wz1GCsBIeWuEBxVYKt8F9gRVj9ICAj5Hvl7VBkFdmsn39TdWWdTiDoh+X
+	 RcPbES1S2ipTYF6JQD6fPMyMP9wwPMsOi269nG3b230hhaJwBwDl/9+t7bVIUDm7aA
+	 6k1gmjjhki8cM7U0AzTegLu+Z6l9kL2CfNBSRtIjZFMTLPMv7JCalnKC+U9j/b/W/H
+	 Aoq/TcmLToiYg==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4ZBbBb0RgBz4wcw;
+	Tue, 11 Mar 2025 12:04:22 +1100 (AEDT)
+Date: Tue, 11 Mar 2025 12:04:22 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
+ <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>
+Cc: bpf <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>, Linux
+ Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Luiz Capitulino <luizcap@redhat.com>
+Subject: linux-next: manual merge of the bpf-next tree with the mm tree
+Message-ID: <20250311120422.1d9a8f80@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20200116172428.311437-1-sgarzare@redhat.com> <20200427142518.uwssa6dtasrp3bfc@steredhat>
- <224cdc10-1532-7ddc-f113-676d43d8f322@redhat.com> <20200428160052.o3ihui4262xogyg4@steredhat>
- <Z8edJjqAqAaV3Vkt@devvm6277.cco0.facebook.com> <20250305022248-mutt-send-email-mst@kernel.org>
- <v5c32aounjit7gxtwl4yxo2q2q6yikpb5yv3huxrxgfprxs2gk@b6r3jljvm6mt>
- <CACGkMEvms=i5z9gVRpnrXXpBnt3KGwM4bfRc46EztzDi4pqOsw@mail.gmail.com>
- <CAGxU2F7SWG0m0KwODbKsbQipz6WzrRSuE1cUe6mYxZskqkbneQ@mail.gmail.com> <CACGkMEtptFWx_v-14e1LM31XH+fOh4U-VO7gZKyqb1J1KM4uag@mail.gmail.com>
-In-Reply-To: <CACGkMEtptFWx_v-14e1LM31XH+fOh4U-VO7gZKyqb1J1KM4uag@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 11 Mar 2025 09:01:23 +0800
-X-Gm-Features: AQ5f1JryFKyYz4Qy5Qu0hBDkTUXYULGfbK0w_lAdgtos8tIuW3BVNWh2Ym_c4Mw
-Message-ID: <CACGkMEsgRZr=FZLrMkkyDbEzDvUHNHsEK8y7_cGL16gLZh1+Nw@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/3] vsock: support network namespace
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Bobby Eshleman <bobbyeshleman@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, 
-	Stefan Hajnoczi <stefanha@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, linux-hyperv@vger.kernel.org, 
-	Dexuan Cui <decui@microsoft.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/TfXnkI6bo6dF_yfrL+Kgukd";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/TfXnkI6bo6dF_yfrL+Kgukd
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 11, 2025 at 8:54=E2=80=AFAM Jason Wang <jasowang@redhat.com> wr=
-ote:
->
-> On Mon, Mar 10, 2025 at 10:15=E2=80=AFPM Stefano Garzarella <sgarzare@red=
-hat.com> wrote:
-> >
-> > On Thu, 6 Mar 2025 at 01:17, Jason Wang <jasowang@redhat.com> wrote:
-> > >
-> > > On Wed, Mar 5, 2025 at 5:30=E2=80=AFPM Stefano Garzarella <sgarzare@r=
-edhat.com> wrote:
-> > > >
-> > > > On Wed, Mar 05, 2025 at 02:27:12AM -0500, Michael S. Tsirkin wrote:
-> > > > >On Tue, Mar 04, 2025 at 04:39:02PM -0800, Bobby Eshleman wrote:
-> > > > >> I think it might be a lot of complexity to bring into the pictur=
-e from
-> > > > >> netdev, and I'm not sure there is a big win since the vsock devi=
-ce could
-> > > > >> also have a vsock->net itself? I think the complexity will come =
-from the
-> > > > >> address translation, which I don't think netdev buys us because =
-there
-> > > > >> would still be all of the work work to support vsock in netfilte=
-r?
-> > > > >
-> > > > >Ugh.
-> > > > >
-> > > > >Guys, let's remember what vsock is.
-> > > > >
-> > > > >It's a replacement for the serial device with an interface
-> > > > >that's easier for userspace to consume, as you get
-> > > > >the demultiplexing by the port number.
-> > >
-> > > Interesting, but at least VSOCKETS said:
-> > >
-> > > """
-> > > config VSOCKETS
-> > >         tristate "Virtual Socket protocol"
-> > >         help
-> > >          Virtual Socket Protocol is a socket protocol similar to TCP/=
-IP
-> > >           allowing communication between Virtual Machines and hypervi=
-sor
-> > >           or host.
-> > >
-> > >           You should also select one or more hypervisor-specific tran=
-sports
-> > >           below.
-> > >
-> > >           To compile this driver as a module, choose M here: the modu=
-le
-> > >           will be called vsock. If unsure, say N.
-> > > """
-> > >
-> > > This sounds exactly like networking stuff and spec also said somethin=
-g similar
-> > >
-> > > """
-> > > The virtio socket device is a zero-configuration socket communication=
-s
-> > > device. It facilitates data transfer between the guest and device
-> > > without using the Ethernet or IP protocols.
-> > > """
-> > >
-> > > > >
-> > > > >The whole point of vsock is that people do not want
-> > > > >any firewalling, filtering, or management on it.
-> > >
-> > > We won't get this, these are for ethernet and TCP/IP mostly.
-> > >
-> > > > >
-> > > > >It needs to work with no configuration even if networking is
-> > > > >misconfigured or blocked.
-> > >
-> > > I don't see any blockers that prevent us from zero configuration, or =
-I
-> > > miss something?
-> > >
-> > > >
-> > > > I agree with Michael here.
-> > > >
-> > > > It's been 5 years and my memory is bad, but using netdev seemed lik=
-e a
-> > > > mess, especially because in vsock we don't have anything related to
-> > > > IP/Ethernet/ARP, etc.
-> > >
-> > > We don't need to bother with that, kernel support protocols other tha=
-n TCP/IP.
-> >
-> > Do we have an example of any other non-Ethernet device that uses
-> > netdev? Just to see what we should do.
->
-> Yes, I think can device is one example and it should have others.
->
-> >
-> > I'm not completely against the idea, but from what I remember when I
-> > looked at it five years ago, it wasn't that easy and straightforward
-> > to use.
->
-> Can just hook the packets into its own stack, maybe vsock can do the same=
-.
->
-> >
-> > >
-> > > >
-> > > > I see vsock more as AF_UNIX than netdev.
-> > >
-> > > But you have a device in guest that differs from the AF_UNIX.
-> >
-> > Yes, but the device is simply for carrying messages.
-> > Another thing that makes me think of AF_UNIX is the hybrid-vsock
-> > developed by Firecracker [1] that we also reused in vhost-user-vsock
-> > [2], where the mapping between AF_VSOCK and AF_UNIX is really
-> > implemented.
->
-> I see. But the main difference is that vsock can work across the
-> boundary of guest and host. This makes it hard to be a 100% socket
-> implementation in the guest.
+Hi all,
 
-Or inventing a protocol to make vsosk can be transported via ethernet
-(not sure this is possible then).
+Today's linux-next merge of the bpf-next tree got a conflict in:
 
-Thanks
+  mm/page_owner.c
 
->
-> Thanks
->
-> >
-> > Thanks,
-> > Stefano
-> >
-> > [1] https://github.com/firecracker-microvm/firecracker/blob/main/docs/v=
-sock.md#firecracker-virtio-vsock-design
-> > [2] https://github.com/rust-vmm/vhost-device/tree/main/vhost-device-vso=
-ck
-> >
+between commit:
 
+  a5bc091881fd ("mm: page_owner: use new iteration API")
+
+from the mm-unstable branch of the mm tree and commit:
+
+  8c57b687e833 ("mm, bpf: Introduce free_pages_nolock()")
+
+from the bpf-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc mm/page_owner.c
+index 849d4a471b6c,90e31d0e3ed7..000000000000
+--- a/mm/page_owner.c
++++ b/mm/page_owner.c
+@@@ -297,11 -293,17 +297,17 @@@ void __reset_page_owner(struct page *pa
+ =20
+  	page_owner =3D get_page_owner(page_ext);
+  	alloc_handle =3D page_owner->handle;
+ +	page_ext_put(page_ext);
+ =20
+- 	handle =3D save_stack(GFP_NOWAIT | __GFP_NOWARN);
++ 	/*
++ 	 * Do not specify GFP_NOWAIT to make gfpflags_allow_spinning() =3D=3D fa=
+lse
++ 	 * to prevent issues in stack_depot_save().
++ 	 * This is similar to try_alloc_pages() gfp flags, but only used
++ 	 * to signal stack_depot to avoid spin_locks.
++ 	 */
++ 	handle =3D save_stack(__GFP_NOWARN);
+ -	__update_page_owner_free_handle(page_ext, handle, order, current->pid,
+ +	__update_page_owner_free_handle(page, handle, order, current->pid,
+  					current->tgid, free_ts_nsec);
+ -	page_ext_put(page_ext);
+ =20
+  	if (alloc_handle !=3D early_handle)
+  		/*
+
+--Sig_/TfXnkI6bo6dF_yfrL+Kgukd
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmfPjBYACgkQAVBC80lX
+0GwKYgf/RkW3S+s1DhIZXp7EFYkH3UMltg2+hR6K6ZopeQ9SrV+mdwCMY506EWNP
+CYCxbiIKdxvkpfi26Kqo+/rkywGN124asToRlz6n3qv+QPGoE5sTzAE+P7ynMn+x
+s4JgIOdxXNoSGKXhghED4XkzDXtUxgS5sTTx0zaoH3DVc0mkkU5zlqfzjr1dUU71
+1GupL9Xv01ftuwIVJt1Upiid00rMxDaIQjynGEGeBqkI0s0eM3pxC1PuF3bbJvj0
+NdxGzlLUZbIVJEqx22O+wrY1q1U1soPKyhgClBPgFRI9Le5FSwfPjwQVVlnMpIIB
+4ljCCuVHgvaZq/lxkNXb+8FtlIzP/w==
+=dCv+
+-----END PGP SIGNATURE-----
+
+--Sig_/TfXnkI6bo6dF_yfrL+Kgukd--
 
