@@ -1,253 +1,196 @@
-Return-Path: <netdev+bounces-173788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A284A5BB01
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 09:45:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 387ACA5BB1E
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 09:51:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50B773AF1E8
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 08:45:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D124B3AC30E
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 08:50:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0364922A7EB;
-	Tue, 11 Mar 2025 08:45:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B5FB226541;
+	Tue, 11 Mar 2025 08:51:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XHGK8/Ee"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7115122758F;
-	Tue, 11 Mar 2025 08:45:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDF201EB184;
+	Tue, 11 Mar 2025 08:51:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741682713; cv=none; b=EgsrcFgWuuRXz1uRgnzHz+CYBS6/yBimdvik/DDKJqli1DeOYCyLsWPrMIx9I9+O9NXVPmciBTuFW89hFCbJW9mz7OPhyafY4oGmakwYAL5o0LKBoeS3Fcccz8ZS8cVJotFq4Z6T5R+CEd7fE0/2PN3HmMmSQ9N1pEZHGaeRv1A=
+	t=1741683063; cv=none; b=lHVHMvH5rXaWlGyeiXlKsLHCDLtmHh+hn+J8AI2Kbf3WUck2wBP6+0vNdnhZ8W9oOWIfkA8lywG63SYDJeJDZQufZTULLiIaUHWAK9XAeVgPwJtXuFCT9mlpTDLm+v3KZxaH3dClv71eFoh0iHMDwA432+zNKi/orKLnA7fBmUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741682713; c=relaxed/simple;
-	bh=1sanh8jjie80IrgFZO+EJzAeXhkykptI5pFrdV00Qp8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IBA7YmYslryYBRI3P1etzOSybBHxhq+GCZ/YyDZPifuEMw9EMEz/tjHhjMvABOlRuv4tACpoUJopGpGhGY5288DoYTB7f0i2m4ukMm9Dv22fBdPFsg/+KKHZoevMyCplUPasQwt/ayybM4ShZ5TKdUVJuf5bjGxiP7RYbOMQyDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+	s=arc-20240116; t=1741683063; c=relaxed/simple;
+	bh=HB3Zy1gU28m4kK/S0bB95ApFHZ/cYoMFfJxnYvIe3NY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UtUuXa/5VbJOLNgy/kzMHqZAesLF7lgG2t0oQI3U/GWvyjDIx/r29wkKecE3K3KzZ9dGgOsAfanH1f3dJLNEYchz4tYmtGtlnHMQDR3NlStr0yOpp9Hp3DdH8kqnPb4A1tedZa3Tg9D9E7idVK3o/c/T9Q2JN0ia18n/JnLBOlM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XHGK8/Ee; arc=none smtp.client-ip=209.85.221.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2254e0b4b79so5002675ad.2;
-        Tue, 11 Mar 2025 01:45:12 -0700 (PDT)
+Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-523f670ca99so1193538e0c.1;
+        Tue, 11 Mar 2025 01:51:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741683061; x=1742287861; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YwlKUmCIxRBb8ELz2q2Z4eNbzAimAiIA1z1E81e3a6E=;
+        b=XHGK8/EeIvETJAIb6KP/+65N83+IAaSakmKL4AeeKLZGYA1sLmwL2cqOFNb8DwZFAP
+         tazwIE3Xybn02xCH+Abvzb/LU45seiH3v4SxOkTW0PU5y8rT7VFx4S3p1HG/B1Ydnm5k
+         WGktHu9fzWBeVED7mIdOUcoEJXX3roZZBM1PP4crZuJeVPW+qrGbPsC5L0BtYbGo1ypZ
+         cosjSXUhNjvxMfpaNWjie6qdaw+eLKjTkMuqccZHx+Cuv2mAvGMErry1hCyJJTcc9mEg
+         FRXu77KoUJ6QKKGuQPisclvF+tldvXqWcuzVmo5+phVbWZILGfpw8y9hnVb0FOCaxlpo
+         Wx+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741682711; x=1742287511;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1741683061; x=1742287861;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=k7uvH3SPe95immrywDPKZqa349k0bb6EQFc55cQu2l4=;
-        b=EjS+UJWjlnmuQBLOOfPE18elEQvai+kchGxfBMvu8fZ3RjwRku0hS5Ux5TEHAaSJWd
-         mIan0aeqjF0IdcJ2p2cY1DTlNYFUG2qrc2L5M6g5BHZAA8MEOhulZS7W/u3QuMsaza8N
-         hxy0NL8riM90CuOLQyEKaTFhnlEXYDTc4Uk7rN3i1T091BmsJ0jcPZYrZNQ667mvIlHv
-         0x6lj7coYgCv23kVRLp9QDUyKswwvpQ/8pDGGIhUTD0/NC4Pt94ECEZwJWT/a5bIxc6s
-         FJo3JV+X2zh3uffvH1jkpBeKIHHnLOkJ1CsBVsBkQluAew9+pg5j01GKHahb1Z4jBBhx
-         aGrw==
-X-Forwarded-Encrypted: i=1; AJvYcCWZitYOYq7W1g0drmEt698phc/pwYul73r4AwvEr8Hxsn+alHnZEfe4ZzMJ9w7lMPcwDRrzAbw9QgG+Ne8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnUHLbzzuciWbHHzHdY2tDkNwXe9ppXx39IsNzGq5oaEcV+gop
-	mulYyXknNa6pKDSiPz5eg4V2Uspt+XN2kXXuEgv4ZuM7JgsP1VaBcsuHkiaFbw==
-X-Gm-Gg: ASbGncs/E9dUm7nNrNnmL062fOZ+yofa5xGZhFVF5M37IM3TmnleYuyvF7S2zHZoJ7g
-	oVV/+MN+qsEfgSvefFX+Gl5RspvvGKvJvuB1j9c85eaAS7BzXc1mcsCnqBDXYgdUlfMo2dPdYfb
-	H6vjGs/u3hK2XXPKknV+uANLUrD7QpgvUq6vIb7T9P1/VbQVI7uZ/m+8woQdErD/ITi4ZaQNn5P
-	nMyFmc0zJXLYamM1f9DQKOq5+tOUtxIahDwnK5/m4dfVZYgDuE5iwsg2/25CV2Yro0o6IDp+3oK
-	VHY5lwo+b1aFWoeIzuI8v9CoEVX3io7uDdsnMGpvAXg3L9qSqL7Bbxc=
-X-Google-Smtp-Source: AGHT+IGYVOejIe92B6YTXwjCro6IbySS112X9WIKoG+Qkd4liqUwCruzsFXVoNMfpMFW/0Vl+rjVGQ==
-X-Received: by 2002:a05:6a21:7a4b:b0:1f5:931d:ca6d with SMTP id adf61e73a8af0-1f5931dd37bmr1333965637.1.1741682711438;
-        Tue, 11 Mar 2025 01:45:11 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-736ac461fddsm8049562b3a.70.2025.03.11.01.45.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Mar 2025 01:45:11 -0700 (PDT)
-From: Stanislav Fomichev <sdf@fomichev.me>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org,
-	willemdebruijn.kernel@gmail.com,
-	jasowang@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	sdf@fomichev.me,
-	jdamato@fastly.com,
-	kory.maincent@bootlin.com,
-	atenart@kernel.org,
-	kuniyu@amazon.com,
-	Kohei Enju <enjuk@amazon.com>
-Subject: [PATCH net-next 2/2] net: reorder dev_addr_sem lock
-Date: Tue, 11 Mar 2025 01:45:07 -0700
-Message-ID: <20250311084507.3978048-3-sdf@fomichev.me>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250311084507.3978048-1-sdf@fomichev.me>
-References: <20250311084507.3978048-1-sdf@fomichev.me>
+        bh=YwlKUmCIxRBb8ELz2q2Z4eNbzAimAiIA1z1E81e3a6E=;
+        b=sF+El0iuCbWW+oULypla+UVfkRrHYaRGKBqHRcjT+gsbYnCfLbD+I2zVOZwpwUzDgQ
+         MoZSXEv7Z5yG0eSgoQ5ckBu3Eqp1B1RTtQ3+LpjkdcoMyBWcBazXv8j8avwG6+7+W1UO
+         zT5ZYEjzyM0JXYtwbNLdFWQV09WZn8emTtI8IARy3gu1wWjYyPXaXvWjO/AogiBKJPA7
+         gJhqNoySqNUiaBvYpTfW3FV0/d95y1hwMHmu9gmI2Y8JA6Qlv4LrVQ5BbIdZ5Lsz5MrU
+         gRxU640Zu/oilPw409ySCZql32seeRILcMj+35llrLCOMf2bWU7+/RwRdO3HYjxaGWZ9
+         /gxA==
+X-Forwarded-Encrypted: i=1; AJvYcCVB6libishqZbcCXLjT2U/ZBg9lLFRKBXCgK+EPDgVq7yYWGUYb/NluYPC97ikTqISYTrAeEaZE@vger.kernel.org, AJvYcCVmY4ZiuAkrB4DrG7V7y47ACHDawoP9JplwbnJDn1Ek5n4y7t5xVZLM6UFFffiOT4foBI+gUqW/J5EyLM0D@vger.kernel.org, AJvYcCWDmF/vcQRTiPGhxatiRPDKxsLa/s8nyHSyONDLllFfh9btmgfcjRVLxkvIPTVz+2XAeJ1zzQV4Z++e@vger.kernel.org, AJvYcCX2etKFNJQsPfrweNC24mx26y9Ekg+PM5olexlDHC29r12ipGGWHNtIB2b43znuyJlE+jtWSFmyJbyR6f0fCYO8V5U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQVQb/V6ZQNaWKvIMUvwu0NqRJ7N0TxtsJDAYLs3onRPvxaMYv
+	oQw7TSkISb5sQnndqYyUsrSvfeicKTvyZoJ/ZFdId+AVWbdnl8IHeN1mVRE3VTSkqSg8+/umfSB
+	QuH9M+ovQLiNGHltmdaqR+//HWU0=
+X-Gm-Gg: ASbGncuU5uouqjNf1/j1jV0KcAInyv/ViQI9DGnCFbAikkRjVdY6aEEwv8JjxXx9rs1
+	04el+B3FnuxCYfONJJYS1hf7BIIh8JIPAwykxEEFx0LbLKWgPLMgLV/vnbgvNkwgXFvy6tYAvd0
+	GW55IOCFgToqzvho4KIXT3GH2N/XRQ5b8QMHTf
+X-Google-Smtp-Source: AGHT+IFGrKexk2feh/g4AfZm+74DwDdS0TYifRv6+ZHmhZYsDPNrr70+NaB9JFJj6JVsuEewgbKE9y58HXVcfK0UqmU=
+X-Received: by 2002:a05:6122:319b:b0:520:9b05:4cb6 with SMTP id
+ 71dfb90a1353d-524195c60cbmr1473579e0c.0.1741683060635; Tue, 11 Mar 2025
+ 01:51:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250308200921.1089980-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250308200921.1089980-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250310213056.GA904881-robh@kernel.org> <CA+V-a8uinTxr8FheR5-Pbv37j9wFR1cfrFDX6gExA5dW8WWPSA@mail.gmail.com>
+In-Reply-To: <CA+V-a8uinTxr8FheR5-Pbv37j9wFR1cfrFDX6gExA5dW8WWPSA@mail.gmail.com>
+From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Date: Tue, 11 Mar 2025 08:50:34 +0000
+X-Gm-Features: AQ5f1JqlUV-XTA6x64ZwVgrVHcqYL_lO68H10alDV6JE3jPjNjWM6p7bkmkYfY0
+Message-ID: <CA+V-a8v=q1aN_+4jQz3=StAXYP1-==OX5xZDrGXe8WWR4XbCKQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 1/3] dt-bindings: net: dwmac: Increase
+ 'maxItems' for 'interrupts' and 'interrupt-names'
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Philipp Zabel <p.zabel@pengutronix.de>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Lockdep complains about circular lock in 1 -> 2 -> 3 (see below).
+Hi Russell,
 
-Change the lock ordering to be:
-- rtnl_lock
-- dev_addr_sem
-- netdev_ops (only for lower devices!)
-- team_lock (or other per-upper device lock)
+On Tue, Mar 11, 2025 at 7:16=E2=80=AFAM Lad, Prabhakar
+<prabhakar.csengg@gmail.com> wrote:
+>
+> Hi Rob,
+>
+> Thank you for the review.
+>
+> On Mon, Mar 10, 2025 at 9:30=E2=80=AFPM Rob Herring <robh@kernel.org> wro=
+te:
+> >
+> > On Sat, Mar 08, 2025 at 08:09:19PM +0000, Prabhakar wrote:
+> > > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> > >
+> > > Increase the `maxItems` value for the `interrupts` and `interrupt-nam=
+es`
+> > > properties to accommodate the Renesas RZ/V2H(P) SoC, which features t=
+he
+> > > `snps,dwmac-5.20` IP with 11 interrupts.
+> > >
+> > > Also add `additionalItems: true` to allow specifying extra interrupts
+> > > beyond the predefined ones. Update the `interrupt-names` property to
+> > > allow specifying extra `interrupt-names`.
+> > >
+> > > Also refactor the optional `interrupt-names` property by consolidatin=
+g
+> > > repeated enums into a single enum list.
+> > >
+> > > Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com=
+>
+> > > ---
+> > > Note, for this change I will be sending a sperate patch for vendor
+> > > bindings to add constraints.
+> > >
+> > > v1->v2
+> > > - No change
+> > > ---
+> > >  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 6 ++++--
+> > >  1 file changed, 4 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/=
+Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> > > index 3f0aa46d798e..fad0d611a75c 100644
+> > > --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> > > +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> > > @@ -114,6 +114,8 @@ properties:
+> > >
+> > >    interrupts:
+> > >      minItems: 1
+> > > +    maxItems: 11
+> > > +    additionalItems: true
+> > >      items:
+> > >        - description: Combined signal for various interrupt events
+> > >        - description: The interrupt to manage the remote wake-up pack=
+et detection
+> > > @@ -122,11 +124,11 @@ properties:
+> > >
+> > >    interrupt-names:
+> > >      minItems: 1
+> > > +    maxItems: 11
+> > > +    additionalItems: true
+> > >      items:
+> > >        - const: macirq
+> > >        - enum: [eth_wake_irq, eth_lpi, sfty]
+> > > -      - enum: [eth_wake_irq, eth_lpi, sfty]
+> > > -      - enum: [eth_wake_irq, eth_lpi, sfty]
+> >
+> > I think this should be structured similar to the DWC PCIe binding where
+> > we define all possible names, but not the order:
+> >
+> > minItems: 1
+> > maxItems: 11
+> > items:
+> >   oneOf:
+> >     - const: macirq
+> >       description: ...
+> >     - const: eth_wake_irq
+> >       description: ...
+> >     - pattern: '^rx-queue-[0-3]$'
+> >       description: ...
+> >     - pattern: '^tx-queue-[0-3]$'
+> >       description: ...
+> >
+> > And so on. Move the descriptions from 'interrupts' and drop 'items' and
+> > 'additionalItems' from it.
+> >
+> Thanks for the pointer, I'll do as suggested above.
+>
+> @Russel, are you OK from me to add rx-queue/tx-queue in this binding
+Apologies for the typo in your name.
 
-1. rtnl_lock -> netdev_ops -> dev_addr_sem
-
-rtnl_setlink
-  rtnl_lock
-    do_setlink IFLA_ADDRESS on lower
-      netdev_ops
-        dev_addr_sem
-
-2. rtnl_lock -> team_lock -> netdev_ops
-
-rtnl_newlink
-  rtnl_lock
-    do_setlink IFLA_MASTER on lower
-      do_set_master
-        team_add_slave
-          team_lock
-            team_port_add
-	      dev_set_mtu
-	        netdev_ops
-
-3. rtnl_lock -> dev_addr_sem -> team_lock
-
-rtnl_newlink
-  rtnl_lock
-    do_setlink IFLA_ADDRESS on upper
-      dev_addr_sem
-        netif_set_mac_address
-          team_set_mac_address
-            team_lock
-
-4. rtnl_lock -> netdev_ops -> dev_addr_sem
-
-rtnl_lock
-  dev_ifsioc
-    dev_set_mac_address_user
-
-__tun_chr_ioctl
-  rtnl_lock
-    dev_set_mac_address_user
-
-tap_ioctl
-  rtnl_lock
-    dev_set_mac_address_user
-
-dev_set_mac_address_user
-  netdev_lock_ops
-    netif_set_mac_address_user
-      dev_addr_sem
-
-Cc: Kohei Enju <enjuk@amazon.com>
-Fixes: df43d8bf1031 ("net: replace dev_addr_sem with netdev instance lock")
-Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
----
- include/linux/netdevice.h |  2 --
- net/core/dev.c            | 11 -----------
- net/core/dev_api.c        |  4 +++-
- net/core/rtnetlink.c      | 15 +++++++++++++--
- 4 files changed, 16 insertions(+), 16 deletions(-)
-
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 42c75cb028e7..2bf1f914f61a 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -4198,8 +4198,6 @@ int netif_set_mac_address(struct net_device *dev, struct sockaddr *sa,
- 			  struct netlink_ext_ack *extack);
- int dev_set_mac_address(struct net_device *dev, struct sockaddr *sa,
- 			struct netlink_ext_ack *extack);
--int netif_set_mac_address_user(struct net_device *dev, struct sockaddr *sa,
--			       struct netlink_ext_ack *extack);
- int dev_set_mac_address_user(struct net_device *dev, struct sockaddr *sa,
- 			     struct netlink_ext_ack *extack);
- int dev_get_mac_address(struct sockaddr *sa, struct net *net, char *dev_name);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 5a64389461e2..66290c159ad8 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -9592,17 +9592,6 @@ int netif_set_mac_address(struct net_device *dev, struct sockaddr *sa,
- 
- DECLARE_RWSEM(dev_addr_sem);
- 
--int netif_set_mac_address_user(struct net_device *dev, struct sockaddr *sa,
--			       struct netlink_ext_ack *extack)
--{
--	int ret;
--
--	down_write(&dev_addr_sem);
--	ret = netif_set_mac_address(dev, sa, extack);
--	up_write(&dev_addr_sem);
--	return ret;
--}
--
- int dev_get_mac_address(struct sockaddr *sa, struct net *net, char *dev_name)
- {
- 	size_t size = sizeof(sa->sa_data_min);
-diff --git a/net/core/dev_api.c b/net/core/dev_api.c
-index 2e17548af685..8dbc60612100 100644
---- a/net/core/dev_api.c
-+++ b/net/core/dev_api.c
-@@ -89,9 +89,11 @@ int dev_set_mac_address_user(struct net_device *dev, struct sockaddr *sa,
- {
- 	int ret;
- 
-+	down_write(&dev_addr_sem);
- 	netdev_lock_ops(dev);
--	ret = netif_set_mac_address_user(dev, sa, extack);
-+	ret = netif_set_mac_address(dev, sa, extack);
- 	netdev_unlock_ops(dev);
-+	up_write(&dev_addr_sem);
- 
- 	return ret;
- }
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index 9355058bf996..c9d44dad203d 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -3080,21 +3080,32 @@ static int do_setlink(const struct sk_buff *skb, struct net_device *dev,
- 		struct sockaddr *sa;
- 		int len;
- 
-+		netdev_unlock_ops(dev);
-+
-+		/* dev_addr_sem is an outer lock, enforce proper ordering */
-+		down_write(&dev_addr_sem);
-+		netdev_lock_ops(dev);
-+
- 		len = sizeof(sa_family_t) + max_t(size_t, dev->addr_len,
- 						  sizeof(*sa));
- 		sa = kmalloc(len, GFP_KERNEL);
- 		if (!sa) {
-+			up_write(&dev_addr_sem);
- 			err = -ENOMEM;
- 			goto errout;
- 		}
- 		sa->sa_family = dev->type;
- 		memcpy(sa->sa_data, nla_data(tb[IFLA_ADDRESS]),
- 		       dev->addr_len);
--		err = netif_set_mac_address_user(dev, sa, extack);
-+		err = netif_set_mac_address(dev, sa, extack);
- 		kfree(sa);
--		if (err)
-+		if (err) {
-+			up_write(&dev_addr_sem);
- 			goto errout;
-+		}
- 		status |= DO_SETLINK_MODIFIED;
-+
-+		up_write(&dev_addr_sem);
- 	}
- 
- 	if (tb[IFLA_MTU]) {
--- 
-2.48.1
-
+Cheers,
+Prabhakar
 
