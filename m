@@ -1,125 +1,151 @@
-Return-Path: <netdev+bounces-173834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D37CFA5BED7
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 12:23:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C60EA5BFBB
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 12:49:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9824718984FE
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 11:23:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AB6B1899029
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 11:50:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5E25251790;
-	Tue, 11 Mar 2025 11:23:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34020241673;
+	Tue, 11 Mar 2025 11:49:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fegP+FAF"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sbEeA9k1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90442512C9;
-	Tue, 11 Mar 2025 11:23:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61EF914F6C
+	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 11:49:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741692207; cv=none; b=NWpjXPHoaOE8UnxvACL6mpg25NAu2R3kIvaUhUs+oF7XAf4pH0tNWuKrW3BTlO/Bcihtu0Qo2KWkCb2XNSYz7uZ+1mljMXECjMzohAvw5lSOEq0/Mav6iLoKCWSB3pYGVTjTOJDMvwJb85d2eWIjnXCdmBfCSq+VFhgwCP76Y6M=
+	t=1741693791; cv=none; b=ETkEX7mnfHmTjgQfVq7Em/9MUAztTYJdrAlqPRXBljaS/sGmeVr9jawIVJh3MhClrKW12XELa0qNgu3oyVhr+x4A6y+3ElWS5QeqpD+heA1RHQsj8PQ72y0genwZWPLS7LhbwpFIseyV5OOzHCUdukoWtxWwKwagQeIB8+BYLJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741692207; c=relaxed/simple;
-	bh=j3dY8JEj49BUDjlILsGdzU2dMHu1fR7oCnu9tJ5XMew=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=b/YO5aK/mx0POctuZB8qVmJm0B70rgMrpdcswlCpdSbERSi/gqgQS/IuO89wQr/CDN3o/jNxag+vmGuR/trzaLG+Idb2V0PmZITN+7JUaeUejlC6wdIIqaT+Pd853cnjQXURJV4icforKNCTku2MUHM9Fo36vCuLWfv7w6KXGKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fegP+FAF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE689C4CEEB;
-	Tue, 11 Mar 2025 11:23:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741692207;
-	bh=j3dY8JEj49BUDjlILsGdzU2dMHu1fR7oCnu9tJ5XMew=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=fegP+FAF9d3QJy/e2qB1EOF1A9Dan7OuagnmCb9ppnF3e328TM/DojAWy0gd8okW2
-	 fJGWzGBWT8AQj/HDE9U6YnSXdexDIeDURqESTnBzxsso45wTYjyxRMVCs3PzloSfnL
-	 GDnUc94IU7SBx3JYqjis+Hc4a2BNTXvlK7lT1Mlrgi7JPx3pHSXhEb3XbMRUZKbwMb
-	 kJfWuAxNSa0XNHF1vGeGI8vj/nzbpDxv7WSU2xkO8KUK1j/Sdnjv2enCyZmiN2VBzi
-	 aCGnvuSFmZCUb/NSAYjwE07KXByUhjRqIHDAHOzNajmMnT4jiajxzhVVv1T4HsfUh1
-	 JkZGI+iCnRaTA==
-Message-ID: <6af1429e-c36a-459c-9b35-6a9f55c3b2ac@kernel.org>
-Date: Tue, 11 Mar 2025 12:23:19 +0100
+	s=arc-20240116; t=1741693791; c=relaxed/simple;
+	bh=fgbasj5hwRehXvV9ikNUT53Ivwa9GzNojNgx3dkoU7E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UAdv2CLcb5/a5r31Lx+oVzHablXAHklAMjAFtzaUTKXQcw0rEu9/+8bjIPIbTWlaGSOJ5vlMnY2D+wvHRmjCyRJEnSf6e8NE3XyBZOxkzQ2TiUXwmXDKuTzOo/5qBLwONhPNd1zBUv7eQAA1foMANv68SSsGYacreBOM4LodvHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=sbEeA9k1; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43cf3192f3bso21826955e9.1
+        for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 04:49:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1741693787; x=1742298587; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3mYgyjyVt39e++noTUvi57inBqbP9SFAjQ4trkmDKvY=;
+        b=sbEeA9k1TAbz1OyEx9MHSJ9XFJpMQElse+8xXCwxJSXHr0BN8SLDuaf/yHcak44G8B
+         YGzE57RcJmB+p6Jnh8ZxwXZ9E+SsLWb1icrHrPIokY4/P+OEO/9q3SEKNtXCMY7D54Ep
+         rUPunoN9LIg+xjPwTKmfvpd+KKR+rtRwXQ/qaeAGE5lOQ5iJlTiyCGEcDZ38wEJw7Y0R
+         VlO2pqyHdjl3DC8uKpqFQIeHGdE9XjIGQWokR+1zgPAMumWECgkW4J5UQal0ZExkFO31
+         vkkiDQXeWN1MCQd77B9Wj4U5Ns1lR/EM0O3XJZON/2FpGBL+cpnzN5EWbg3X47VfEbVk
+         fiMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741693787; x=1742298587;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3mYgyjyVt39e++noTUvi57inBqbP9SFAjQ4trkmDKvY=;
+        b=jDaXDTC3AoRld8bx/rvG+X1dj8/AqSGTxA+Kk/yOEIMxGG6pZzMYHEaBFdyeC5tX2E
+         VALM3LCXJ2XjsJn2y5IvpPgI1xNdoSCdRwoGYgzmSmXn0J8aYcPSUg4sTxmEdeOtfLNI
+         OVzi+RE62FScmmXb/VpygGdGE/ZZxsrbhBRKHHURDGMKyshtVOfbHawup5LefQ/EEBvN
+         jiYa0GGfT9PFbELk4SdyZtw47zqeDilhNfShObmFIBjfVsant+satXaUjK8rFKBlSBSm
+         KVIWDXxFljcAuvqiEX9eczEFvflbb1rxfUpaOeQyWMyvjUnsb3tarsAC9B85uBExDER7
+         ITXA==
+X-Forwarded-Encrypted: i=1; AJvYcCVCepyIlLzuO5kx0HbVQDAiutUTSeMqxiaFi5NuUK16ETp+Qu7HCt8cxBo1Zlv4nZZi8XSG5vk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzifE+2QK23OUKk9OTw48VkrEMMImDVm46o7wC/I+32Ua5TCY6T
+	w6b9+Hzn0S/Dm72iA3IrcknbX7e7Vxg+WdEcs8bI1sctfqR8puBO4MPJ+Qs1F0M=
+X-Gm-Gg: ASbGncv2rtEP7FL6xwiDJCowMZVVNOzsaFGrGf66KOtSj2GIIFv4lM7HUqARn8/BlN2
+	iPTsuAwfqXg8KXeEQAbFPcEvtveukD+CLTOqRPpt0xIgWSfmBwqLKHTAuw3/Bx8Lhuh1hbx9cAA
+	YJKJzM7QkUkiYuYBz0UbHiuqze5Xd8hIAYjlNVmIQcTTWpbd0a8SpShPs8vKT9PvEKPJeK8LHQh
+	5V6D0zkpiG0WsKqkye0guqlabIHcF6NrB0G6epFYzPPc5uTNKwJkXrGE2DRZntZ/3nJoZQMuwJ6
+	ijYjnrSgsrDs2MwqGa4NDf+IHYRYlnBiH/GzwzItkSZO/jALtZ2jwaIAVjRD
+X-Google-Smtp-Source: AGHT+IFLutZShbEEA0xdtKZHonhd9EodwZw8GsnnqFvQtNzl6sYtDlZevMaqn3qT4K7I9XDIISMkqg==
+X-Received: by 2002:a05:6000:1a87:b0:391:1923:5a91 with SMTP id ffacd0b85a97d-39132dc4395mr11386484f8f.55.1741693787529;
+        Tue, 11 Mar 2025 04:49:47 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-3912c102d76sm17651934f8f.86.2025.03.11.04.49.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Mar 2025 04:49:47 -0700 (PDT)
+Date: Tue, 11 Mar 2025 14:49:43 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: Pierre Riteau <pierre@stackhpc.com>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, horms@kernel.org,
+	Dan Carpenter <error27@gmail.com>
+Subject: Re: [net v1] devlink: fix xa_alloc_cyclic error handling
+Message-ID: <3ff973e5-5474-4112-81ad-46b745edd6a9@stanley.mountain>
+References: <20250214132453.4108-1-michal.swiatkowski@linux.intel.com>
+ <2fcd3d16-c259-4356-82b7-2f1a3ad45dfa@lunn.ch>
+ <Z69MESaQ4cUvIy4z@mev-dev.igk.intel.com>
+ <c22f5a47-7fe0-4e83-8a0c-6da78143ceb3@redhat.com>
+ <CA+ny2sxC2Y7bxhkO7HqX+6E_Myf24_trmCUrroKFkyoce7QC9A@mail.gmail.com>
+ <Z8//h7IT3cf01bxB@mev-dev.igk.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 0/8] Introduce fwctl subystem
-Content-Language: en-US
-To: Jason Gunthorpe <jgg@nvidia.com>, Saeed Mahameed <saeed@kernel.org>
-Cc: Leon Romanovsky <leon@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
- Jakub Kicinski <kuba@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>,
- Aron Silverton <aron.silverton@oracle.com>,
- Dan Williams <dan.j.williams@intel.com>,
- Daniel Vetter <daniel.vetter@ffwll.ch>, Dave Jiang <dave.jiang@intel.com>,
- Christoph Hellwig <hch@infradead.org>, Itay Avraham <itayavr@nvidia.com>,
- Jiri Pirko <jiri@nvidia.com>, Jonathan Cameron
- <Jonathan.Cameron@huawei.com>, Leonid Bloch <lbloch@nvidia.com>,
- linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
- "Nelson, Shannon" <shannon.nelson@amd.com>
-References: <0-v5-642aa0c94070+4447f-fwctl_jgg@nvidia.com>
- <20250303175358.4e9e0f78@kernel.org> <20250304140036.GK133783@nvidia.com>
- <20250304164203.38418211@kernel.org> <20250305133254.GV133783@nvidia.com>
- <mxw4ngjokr3vumdy5fp2wzxpocjkitputelmpaqo7ungxnhnxp@j4yn5tdz3ief>
- <bcafcf60-47a8-4faf-bea3-19cf0cbc4e08@kernel.org>
- <20250305182853.GO1955273@unreal> <Z8i2_9G86z14KbpB@x130>
- <20250305232154.GB354511@nvidia.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20250305232154.GB354511@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z8//h7IT3cf01bxB@mev-dev.igk.intel.com>
 
-On 3/6/25 12:21 AM, Jason Gunthorpe wrote:
-> On Wed, Mar 05, 2025 at 12:41:35PM -0800, Saeed Mahameed wrote:
+On Tue, Mar 11, 2025 at 10:16:55AM +0100, Michal Swiatkowski wrote:
+> On Mon, Mar 10, 2025 at 12:42:13PM +0100, Pierre Riteau wrote:
+> > On Tue, 18 Feb 2025 at 12:56, Paolo Abeni <pabeni@redhat.com> wrote:
+> > >
+> > >
+> > >
+> > > On 2/14/25 2:58 PM, Michal Swiatkowski wrote:
+> > > > On Fri, Feb 14, 2025 at 02:44:49PM +0100, Andrew Lunn wrote:
+> > > >> On Fri, Feb 14, 2025 at 02:24:53PM +0100, Michal Swiatkowski wrote:
+> > > >>> Pierre Riteau <pierre@stackhpc.com> found suspicious handling an error
+> > > >>> from xa_alloc_cyclic() in scheduler code [1]. The same is done in
+> > > >>> devlink_rel_alloc().
+> > > >>
+> > > >> If the same bug exists twice it might exist more times. Did you find
+> > > >> this instance by searching the whole tree? Or just networking?
+> > > >>
+> > > >> This is also something which would be good to have the static
+> > > >> analysers check for. I wounder if smatch can check this?
+> > > >>
+> > > >>      Andrew
+> > > >>
+> > > >
+> > > > You are right, I checked only net folder and there are two usage like
+> > > > that in drivers. I will send v2 with wider fixing, thanks.
+> > >
+> > > While at that, please add the suitable fixes tag(s).
+> > >
+> > > Thanks,
+> > >
+> > > Paolo
+> > 
+> > Hello,
+> > 
+> > I haven't seen a v2 patch from Michal Swiatkowski. Would it be okay to
+> > at least merge this net/devlink/core.c fix for inclusion in 6.14? I
+> > can send a revised patch adding the Fixes tag. Driver fixes could be
+> > addressed separately.
+> > 
 > 
->> How do you imagine this driver/core structure should look like? Who
->> will be the top dir maintainer?
+> Sorry that I didn't send v2, but I have seen that Dan wrote to Jiri
+> about this code and also found more places to fix. I assumed that he
+> will send a fix for all cases that he found.
 > 
-> I would set something like this up more like DRM. Every driver
-> maintainer gets commit rights, some rules about no uAPIs, or at least
-> other acks before merging uAPI. Use the tree for staging shared
-> branches.
+> Dan, do you plan to send it or I should send v2?
 
-why no uapi? Core driver can have knowledge of h/w resources across all
-use cases. For example, our core driver supports a generid netlink based
-dump (no set operations; get and dump only so maybe that should be the
-restriction?) of all objects regardless of how created -- netdev, ib,
-etc. -- and with much more detail.
+Sorry, no I didn't realize anyone was waiting for me on this.  Could
+you send it?
 
-> 
-> Driver maintainers with the most commits per cycle does the PR or
-> something like that.
-> 
-> There is no subsystem or cross-driver entanglement so there is no real
-> need for gatekeeping.
-> 
-> It would be a good opportunity to help more people engage with the
-> kernel process and learn the full maintainer flow.
-> 
->> It should be something that is tightly coupled with aux, currently
->> aux is under drivers/base/auxiliary.c I think it should move to
->> drivers/aux/auxiliary.c and device drivers should implement their
->> own aux buses, WH access APIs and probing/init logic under that
->> directory e.g: drivers/aux/mlx5/..
-> 
-> That makes sense to me. I would expect everything in this collection
-> to be PCI drivers spawing aux devices.
-> 
-> drivers/aux_core/ or something like that, perhaps?
-> 
-
-drivers/aux_core works for me; removes the 'pci' assumption and makes it
-clear the real attribute here is use of the aux bus with subsystem
-specific devices. I am still not clear on how such a branch will work -
-e.g. We will want multi-vendor review, not just merge the PR and go.
+regards,
+dan carpenter
 
 
