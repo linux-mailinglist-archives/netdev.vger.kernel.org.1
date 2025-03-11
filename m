@@ -1,208 +1,117 @@
-Return-Path: <netdev+bounces-174046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6271EA5D28C
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 23:29:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D87C8A5D292
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 23:30:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90FDD17A086
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 22:29:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1ACB97A79EB
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 22:29:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CC2926563A;
-	Tue, 11 Mar 2025 22:28:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D24B525F981;
+	Tue, 11 Mar 2025 22:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="QWEZWp44"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BiHPJ+nw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38C9C26560E;
-	Tue, 11 Mar 2025 22:28:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A37211E7C2B;
+	Tue, 11 Mar 2025 22:30:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741732133; cv=none; b=lVLq9HWqcv8SXjoHP50X6hqabz9X8JBo+MWwTDQEL2SzexkfO4zXK4AfS/JPo+ECvtInPh+RZc0PHVCgFpNBqqOGsfT2mvuxdzD6XaXqscyc85d9XpJ9/mn4Ck+r9arluMnjQ2u8uS8b3n/TVsB1+FMz+1CyPygAIf4TSk9sqtE=
+	t=1741732211; cv=none; b=t0lteMztZZ1w6liDouJ/Arlm9Z2X9ClBBVP+zTUsHUJPLSImv33FwFptIb1Nqkaf4T5n9dg4k8sYU4GNd0dx6rRr1Dx7L0n+8NEbKVuJ/zGDPRVDBDd89EJCxz2aEzyfqmTrVhw5FWJ/b29kcToCh5GPSv7LnQtMP9TZrvjFwps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741732133; c=relaxed/simple;
-	bh=c1EJT745wp+iQYTsgV/aSwRcGMBCnAjhwzzcywlBgcs=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=Oe7GI+FuqovgygwKtFZXYGePcym7xyvh7uz8eZdQhEuSYAOoSiPFNQcLkKRzgQIWpDzGlEGxXx36NkE6Czs9OwsMI64i5wraysP83MtJU8TwaTqYQKe2hpwwE2g+9sn4m4PR7NnbCqjCyueZ7493dGDpXZkPy/eCKQNW+ZEbjwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=QWEZWp44; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [127.0.0.1] ([76.133.66.138])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 52BMOF3B2275039
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Tue, 11 Mar 2025 15:24:15 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 52BMOF3B2275039
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025021701; t=1741731862;
-	bh=GFDhiFKvtRD+W2XGLJDNjRiea0qe1W3j0iK0xY8JZL8=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=QWEZWp44Cu/zN1UIDmdWXY6QcwrSH2LoTB7gxC/oODFA2E5hnyx87scqetv/EJqaq
-	 W3NGSD2lutyv9Jcq8m20s075mr19ouosvjSfuoByKOZE3mQ3jwMuLYAfFD7NHXFjMu
-	 PSNQMtgdMv8Ylzz6iTK9sKEdCddWc+fBTUdrnEKWu4ZtGPAVnloe7NrgEcViX9/54l
-	 wN7/sR5ozYXyi5j6Ocpn7dIVIj/aVN6iIt0U8c7AYlRPFAXzs4Zww/v+elJgd/PqhB
-	 MqAlIlffCnFmITyc2l4ZgqDCwWd5yt6Lw5IBPI6hlmBqX3gG06MBm8zXyyFfILZebk
-	 u/gMoXml+mBPw==
-Date: Tue, 11 Mar 2025 15:24:14 -0700
-From: "H. Peter Anvin" <hpa@zytor.com>
-To: Yury Norov <yury.norov@gmail.com>, Kuan-Wei Chiu <visitorckw@gmail.com>
-CC: David Laight <david.laight.linux@gmail.com>,
-        Andrew Cooper <andrew.cooper3@citrix.com>,
-        Laurent.pinchart@ideasonboard.com, airlied@gmail.com,
-        akpm@linux-foundation.org, alistair@popple.id.au,
-        andrew+netdev@lunn.ch, andrzej.hajda@intel.com,
-        arend.vanspriel@broadcom.com, awalls@md.metrocast.net, bp@alien8.de,
-        bpf@vger.kernel.org, brcm80211-dev-list.pdl@broadcom.com,
-        brcm80211@lists.linux.dev, dave.hansen@linux.intel.com,
-        davem@davemloft.net, dmitry.torokhov@gmail.com,
-        dri-devel@lists.freedesktop.org, eajames@linux.ibm.com,
-        edumazet@google.com, eleanor15x@gmail.com, gregkh@linuxfoundation.org,
-        hverkuil@xs4all.nl, jernej.skrabec@gmail.com, jirislaby@kernel.org,
-        jk@ozlabs.org, joel@jms.id.au, johannes@sipsolutions.net,
-        jonas@kwiboo.se, jserv@ccns.ncku.edu.tw, kuba@kernel.org,
-        linux-fsi@lists.ozlabs.org, linux-input@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-serial@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux@rasmusvillemoes.dk,
-        louis.peens@corigine.com, maarten.lankhorst@linux.intel.com,
-        mchehab@kernel.org, mingo@redhat.com, miquel.raynal@bootlin.com,
-        mripard@kernel.org, neil.armstrong@linaro.org, netdev@vger.kernel.org,
-        oss-drivers@corigine.com, pabeni@redhat.com,
-        parthiban.veerasooran@microchip.com, rfoss@kernel.org, richard@nod.at,
-        simona@ffwll.ch, tglx@linutronix.de, tzimmermann@suse.de,
-        vigneshr@ti.com, x86@kernel.org
-Subject: Re: [PATCH v3 00/16] Introduce and use generic parity16/32/64 helper
-User-Agent: K-9 Mail for Android
-In-Reply-To: <Z9CyuowYsZyez36c@thinkpad>
-References: <4732F6F6-1D41-4E3F-BE24-E54489BC699C@zytor.com> <efc2ee9d-5382-457f-b471-f3c44b81a190@citrix.com> <5A790652-1B22-4D13-AAC5-5D9931E90903@zytor.com> <20250307195310.58abff8c@pumpkin> <EB85C3C1-8A0D-4CB9-B501-BFEABDF3E977@zytor.com> <Z824SgB9Dt5zdWYc@visitorckw-System-Product-Name> <Z9CyuowYsZyez36c@thinkpad>
-Message-ID: <80771542-476C-493E-858A-D2AF6A355CC1@zytor.com>
+	s=arc-20240116; t=1741732211; c=relaxed/simple;
+	bh=D/ejxuliKp47/6IzAc6WRsye4a+L+qynFv35lbKIaLc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EWKNRcc7hKd3x9zqr8LqaTkiKj4pm3WDFSjTgTLI2dGlSwRT3blE/2rkNdr6iZ2Kc/MHsuGluYtY1n0xayePh7nNb0ogr3eu9jkMdCKmiPkmZZSMJpKUlSyM2rGhoAkim088vn7vc/IlvohChaHqOjCdHx0WcadiYfyr2BKe3Uc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BiHPJ+nw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 184DEC4CEE9;
+	Tue, 11 Mar 2025 22:30:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741732211;
+	bh=D/ejxuliKp47/6IzAc6WRsye4a+L+qynFv35lbKIaLc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BiHPJ+nwPHlDdP4oXGhcORfHsgcM4ttc+mb2rBRh9CEOhFHvfUmTjedK8SwgymQYZ
+	 VXr1mo/6dJmpfC/SS0yu8oGrfspuKU2JoWJtf7EyjQlIJO0/rx6ZfoZNpDtVRoIfB+
+	 oa0dmgJsTxfJppmd3CrGnagsijeotxf2wVZkocApISLbvIrdmWPf9O7PogNI8EXBlc
+	 CSFaokKeoGkJTff4kus1apfzx+ay5JfinNkLd/VtICfuf64gg+Nyx69btjpKMHWniM
+	 u8JDqy50+SPaO7hv6QqeI6gRzALAuH5PJTdjtTJd+Hj/13RNAaxCCJO72eZ+BeJ/0r
+	 jluTKlrfvKbtQ==
+Date: Tue, 11 Mar 2025 15:30:07 -0700
+From: Kees Cook <kees@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	wireguard@lists.zx2c4.com, netdev@vger.kernel.org,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Jack Wang <jinpu.wang@cloud.ionos.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] wireguard: noise: Add __nonstring annotations for
+ unterminated strings
+Message-ID: <202503111520.CF7527A@keescook>
+References: <20250310222249.work.154-kees@kernel.org>
+ <20250311111927.06120773@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250311111927.06120773@kernel.org>
 
-On March 11, 2025 3:01:30 PM PDT, Yury Norov <yury=2Enorov@gmail=2Ecom> wro=
-te:
->On Sun, Mar 09, 2025 at 11:48:26PM +0800, Kuan-Wei Chiu wrote:
->> On Fri, Mar 07, 2025 at 12:07:02PM -0800, H=2E Peter Anvin wrote:
->> > On March 7, 2025 11:53:10 AM PST, David Laight <david=2Elaight=2Elinu=
-x@gmail=2Ecom> wrote:
->> > >On Fri, 07 Mar 2025 11:30:35 -0800
->> > >"H=2E Peter Anvin" <hpa@zytor=2Ecom> wrote:
->> > >
->> > >> On March 7, 2025 10:49:56 AM PST, Andrew Cooper <andrew=2Ecooper3@=
-citrix=2Ecom> wrote:
->> > >> >> (int)true most definitely is guaranteed to be 1=2E =20
->> > >> >
->> > >> >That's not technically correct any more=2E
->> > >> >
->> > >> >GCC has introduced hardened bools that intentionally have bit pat=
-terns
->> > >> >other than 0 and 1=2E
->> > >> >
->> > >> >https://gcc=2Egnu=2Eorg/gcc-14/changes=2Ehtml
->> > >> >
->> > >> >~Andrew =20
->> > >>=20
->> > >> Bit patterns in memory maybe (not that I can see the Linux kernel =
-using them) but
->> > >> for compiler-generated conversations that's still a given, or the =
-manager isn't C
->> > >> or anything even remotely like it=2E
->> > >>=20
->> > >
->> > >The whole idea of 'bool' is pretty much broken by design=2E
->> > >The underlying problem is that values other than 'true' and 'false' =
-can
->> > >always get into 'bool' variables=2E
->> > >
->> > >Once that has happened it is all fubar=2E
->> > >
->> > >Trying to sanitise a value with (say):
->> > >int f(bool v)
->> > >{
->> > >	return (int)v & 1;
->> > >}   =20
->> > >just doesn't work (see https://www=2Egodbolt=2Eorg/z/MEndP3q9j)
->> > >
->> > >I really don't see how using (say) 0xaa and 0x55 helps=2E
->> > >What happens if the value is wrong? a trap or exception?, good luck =
-recovering
->> > >from that=2E
->> > >
->> > >	David
->> >=20
->> > Did you just discover GIGO?
->>=20
->> Thanks for all the suggestions=2E
->>=20
->> I don't have a strong opinion on the naming or return type=2E I'm still=
- a
->> bit confused about whether I can assume that casting bool to int always
->> results in 0 or 1=2E
->>=20
->> If that's the case, since most people prefer bool over int as the
->> return type and some are against introducing u1, my current plan is to
->> use the following in the next version:
->>=20
->> bool parity_odd(u64 val);
->>=20
->> This keeps the bool return type, renames the function for better
->> clarity, and avoids extra maintenance burden by having just one
->> function=2E
->>=20
->> If I can't assume that casting bool to int always results in 0 or 1,
->> would it be acceptable to keep the return type as int?
->>=20
->> Would this work for everyone?
->
->Alright, it's clearly a split opinion=2E So what I would do myself in
->such case is to look at existing code and see what people who really
->need parity invent in their drivers:
->
->                                     bool      parity_odd
->static inline int parity8(u8 val)       -               -
->static u8 calc_parity(u8 val)           -               -
->static int odd_parity(u8 c)             -               +
->static int saa711x_odd_parity           -               +
->static int max3100_do_parity            -               -
->static inline int parity(unsigned x)    -               -
->static int bit_parity(u32 pkt)          -               -
->static int oa_tc6_get_parity(u32 p)     -               -
->static u32 parity32(__le32 data)        -               -
->static u32 parity(u32 sample)           -               -
->static int get_parity(int number,       -               -
->                      int size)
->static bool i2cr_check_parity32(u32 v,  +               -
->                        bool parity)
->static bool i2cr_check_parity64(u64 v)  +               -
->static int sw_parity(__u64 t)           -               -
->static bool parity(u64 value)           +               -
->
->Now you can refer to that table say that int parity(uXX) is what
->people want to see in their drivers=2E
->
->Whichever interface you choose, please discuss it's pros and cons=2E
->What bloat-o-meter says for each option? What's maintenance burden?
->Perf test? Look at generated code?
->
->I personally for a macro returning boolean, something like I
->proposed at the very beginning=2E
->
->Thanks,
->Yury
+On Tue, Mar 11, 2025 at 11:19:27AM +0100, Jakub Kicinski wrote:
+> On Mon, 10 Mar 2025 15:22:50 -0700 Kees Cook wrote:
+> > When a character array without a terminating NUL character has a static
+> > initializer, GCC 15's -Wunterminated-string-initialization will only
+> > warn if the array lacks the "nonstring" attribute[1]. Mark the arrays
+> > with __nonstring to and correctly identify the char array as "not a C
+> > string" and thereby eliminate the warning.
+> 
+> Hi! Would marking all of u8 as non-string not be an option? How many 
+> of such warnings do we have in the tree? Feel free to point me to a
+> previous conversation.
 
-Also, please at least provide a way for an arch to opt in to using the bui=
-ltins, which seem to produce as good results or better at least on some arc=
-hitectures like x86 and probably with CPU options that imply fast popcnt is=
- available=2E
+*thread merge*
+
+On Mon, Mar 10, 2025 at 06:38:01PM -0400, James Bottomley wrote[1]:
+> This looks a bit suboptimal ... is there anywhere in the kernel u8[] is
+> actually used for real strings?  In which case it would seem the better
+> place to put the annotation is in the typedef for u8 arrays.
+
+So both of you asked basically same question, and I think the simple answer
+is "no we can't mark u8 as nonstring". The use of u8 has become
+synonymous with "char" for a long while now, and it's gotten even more
+common after we made char unsigned by default.
+
+The number of warning sources is pretty small. I think I have identified
+and proposed fixes most of them already[2]. ACPICA needs an upstream
+change, which I've submitted[3]. And ACPI needed multidimensional
+nonstring annotation support, which had the last needed bit added to GCC
+today[4], and I've proposed support for it in the kernel[5]. With 4 and 5
+ready, I can send the final patch, which is basically just this (and
+actually accounts for the vast majority of warnings emitted):
+
+-static const char table_sigs[][ACPI_NAMESEG_SIZE] __initconst = {
++static const char table_sigs[][ACPI_NAMESEG_SIZE] __nonstring_array __initconst = {
+
+-Kees
+
+[1] https://lore.kernel.org/lkml/98ca3727d65a418e403b03f6b17341dbcb192764.camel@HansenPartnership.com/
+[2] https://lore.kernel.org/lkml/?q=f%3AKees+%22-Wunterminated-string-initialization%22
+[3] https://github.com/acpica/acpica/pull/1006
+[4] https://github.com/gcc-mirror/gcc/commit/afb46540d3921e96c4cd7ba8fa2c8b0901759455
+[5] https://lore.kernel.org/lkml/20250310214244.work.194-kees@kernel.org/
+
+-- 
+Kees Cook
 
