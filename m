@@ -1,80 +1,177 @@
-Return-Path: <netdev+bounces-173962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74797A5CA38
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 17:05:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3A02A5CA48
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 17:07:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBF5018967D2
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 16:05:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0BA607AE3F7
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 16:05:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C6B125E805;
-	Tue, 11 Mar 2025 16:05:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABC6225FA32;
+	Tue, 11 Mar 2025 16:06:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sT/G00r9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hN6FhU9e"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA48410E5
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 16:05:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18CB725E825;
+	Tue, 11 Mar 2025 16:06:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741709113; cv=none; b=pZFVyX36ZijJWIYa4fVd1IBs7jgZ3jhKp7yjNoFsF6yc8MiyPPz3BZ7HKQMSokB282FEb3fB3R05K+iQ29Xd7yZucEU4g1EXpNRawRBlpVGeR8RAABtB10CPIG6Sgqiz00wi84p6jffzI6NvH6A8KTkJRFvQK7Hsa8NoPlIkxNE=
+	t=1741709203; cv=none; b=tRdkfYfyaQc/o+yxb35ug0m9eLRM+SU951sw/YXT33o7aWYuhB/pdhfJ5ORsj4g36LVx8HiRqn1xDR/7m62+SOaG/4YOfGF2dXNZiMa4ER+Emu3RHFmaVgakUwx11E5oZdlWD8l6oLf4Tsf8MAY/kdVQl8vhZyKLytYUntTzz1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741709113; c=relaxed/simple;
-	bh=ZVoVSy1oTCxFOfAYb+1oiETcC0Nkz0FK5s0B24sq29s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gB6/irE+uazcq4c6uKoPKWu6o6oX2xbYCr/vbrU0HbK/xVMe4XhNqWOUsUIos4DLJJoBq3vRC1zUnSk5Qq7QoEICPoZt/cH1T/f6ZtGMW5G7SptBrKPexOsYSSm/C7ljhicgVFa6IzaAXwzsNiSkZwz1p2LlDhTrdA+DDN+4dio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sT/G00r9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDBF9C4CEE9;
-	Tue, 11 Mar 2025 16:05:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741709112;
-	bh=ZVoVSy1oTCxFOfAYb+1oiETcC0Nkz0FK5s0B24sq29s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sT/G00r9ioSNzB6T7JOx1gjzYQhNWlNOlJ2FAZ1rIn8tKJ5unNmfazqDSjs9/vIHE
-	 1Fq9psL515XnsLHjpkoSbasty5fUOrDsSXklJumJ8QzkIXL7AA5lZAEVS3oapljIka
-	 dQykZiQzCi0Suk2gT76D7ZPpHQyZKHGg+QIQ5Hb2rDcR4wQktw6ENxfiP1J1SjwWtX
-	 UrLeBXj7m5dRm7lb5SOdpdXEGDDxBhaMTl++5idxmxWhekyg4mgKfV+UMY3yPQ4RAd
-	 wEt2FSKDeTKG4tNqDuHCs8lRS+6r6AjWP5k/Q/9tty6t2K9lQB0Qod2orlcmy/o67G
-	 iTv90no6V+8TA==
-Date: Tue, 11 Mar 2025 17:05:07 +0100
-From: Simon Horman <horms@kernel.org>
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
-	mincho@theori.io
-Subject: Re: [Patch net 2/2] selftests/tc-testing: Add a test case for DRR
- class with TC_H_ROOT
-Message-ID: <20250311160507.GQ4159220@kernel.org>
-References: <20250306232355.93864-1-xiyou.wangcong@gmail.com>
- <20250306232355.93864-3-xiyou.wangcong@gmail.com>
+	s=arc-20240116; t=1741709203; c=relaxed/simple;
+	bh=PycIzShDrvW+MYh47pwMsDglZXLkEXX+gYjlWlgOuo4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bsn5KUjuDOxmTdP8C4M8dOOClDCzTxPpem2oHaVTwVsWFSA8GzYeCbTTjdvO+QeEtnAE4Uqh8Ebst+6da2Zp1whs3+LegtS0IZ6nyDf09UFpwDVK7oUKdHy0uRuLHr4M/O8+XRO/2hdU5y71ZhClRxyNruWXhzx4cfNKgKxBCmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hN6FhU9e; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-22580c9ee0aso34986595ad.2;
+        Tue, 11 Mar 2025 09:06:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741709200; x=1742314000; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=r1TiB2cIwExQKHJgSUFiCJuhIYPtkSlVWWhMfWxdcps=;
+        b=hN6FhU9eKBkI1WjtDhXOVPk9RuaBa5U8aEHvGQdwg66zGT6uONfrZPHLhojG8P+eaw
+         SOmmh9ciSMhcb2aiGwZHOSK2weWEdhtKFewwvuELGAvzq2wNfOeq0kNnWb9JewkzcTvX
+         HXxisF2bOjw0yqfTBE2hLEsMDQLDy5IEbY3gUBcscj9cBFU1DSowA0fvj5KKZ05610TR
+         9bDroGWf0qQcWMdeDjv9OjPJ1PB8IjrQq/QIcKGWxAb1Q2nC37RQWCKwwz4HtNKfWuB2
+         12wbgpKOOCKCsZuhgnL1ckiwLPJZEDghPPzlA6w/g7md7VefyudjOhlbkJOZ3XqRhEqB
+         OvtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741709200; x=1742314000;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=r1TiB2cIwExQKHJgSUFiCJuhIYPtkSlVWWhMfWxdcps=;
+        b=Ld1+r5ebQOLV67vR/tB+04Rx58YMcW0x9llHOQml9jVVAyjW9Ts67+lSHfjmtq2QOH
+         6sc+UZYKzhUWhz0v+ZPhcTB0pIq2zPtYVithPZUFKAYFCxYnWy6vvjXk+3mThUCj+5Pm
+         V/gbajOduHeC2Fd65kMpSsOg3UMgn3l0Tc5NCRCDGlQGMaw/Y715NEGBQdLz7MqRnhmb
+         XQBZuLstJhTjwONFjvTf+P68OZysb+cGQdFvV7RVKIffhLuGQBKetTp80PtB8LFcntND
+         vmNP4b+5gSGgNcUuwEQc9SU/vFwJjlR6DV8CqEtNftyOwC/htSvqelFC9yVeWBg7HF/r
+         q+fw==
+X-Forwarded-Encrypted: i=1; AJvYcCU/4u4yKf3XzYI5HG54yr8/Z0ml3xhgTuzP+7Gz8M88sLAVv5sIvVqwv6M5A37PiucYl8p95BAJ@vger.kernel.org, AJvYcCVYsDwJ4q4U+JFETwCWSGnKYCfGdcEOGajJRbq/Yw8ViD39iglv06OLNdkZaVFbUW9vmjAO4RuEuG4AFQE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRlYjn4UZezSlPsuglMILc5s+ZbiH2n+Ib+CJOAEK3iK2eMfH+
+	ayTNNG9AMzrBei4D9VdsPTjwUCcRFusN5Dx+6hH4AhAlbVS52OCa
+X-Gm-Gg: ASbGncsIzuth9FrBGT1AQUYPZE619ha7XRLFAIIOm9fKkPZeIeMd/NxKHt5Z8q4GCn8
+	0eKibDv7UERE/Mwe5VdWAbRnNtydE+wbSplIqjUo+UQk0k7lHGFuLqGck6h2TmUXXW0ntpCv4fO
+	bx0TcxS0vB1cA5I1gPa4kVmmnHnxfMnxjoaQh6rgQYuFkBvSKk6jcie28/XjOBwHNVM+wewNq07
+	JgwRSxndFxtpvLhB3S/O+m5GAk2jhw9qd4NZZozSHqZotRuRwNRPUTdRcVzyb/SRDJbg0iUbj8P
+	vMm0F/WFksFZ4htTTTtQkB7bvYzqo+R9ta6jTdewdq1td79SLb9j9xlI8DGaFaM0q2JMje6sZAh
+	zhgV+ZRGnsAlYjltT66VflkFy5eiNb8xLmuxXD6Txk/BDXkS/
+X-Google-Smtp-Source: AGHT+IE7eWEl/nFpwgH7cC9oR0R3GFfUz4SxYZLPLO2vfKj7RKiBeOmYW6JKFORYzfuBteGpfPQKbA==
+X-Received: by 2002:a17:902:d488:b0:215:b9a6:5cb9 with SMTP id d9443c01a7336-2242887eb5cmr292364525ad.5.1741709200356;
+        Tue, 11 Mar 2025 09:06:40 -0700 (PDT)
+Received: from test-suraj.qjz2hk5f2gku1a3adsvczrat5c.xx.internal.cloudapp.net ([20.9.134.79])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73698243ef6sm10936197b3a.61.2025.03.11.09.06.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Mar 2025 09:06:40 -0700 (PDT)
+From: Suraj Patil <surajpatil522@gmail.com>
+To: isdn@linux-pingi.de
+Cc: kuba@kernel.org,
+	quic_jjohnson@quicinc.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Suraj Patil <surajpatil522@gmail.com>
+Subject: [PATCH 2/2] isdn: mISDN: Fix typo 'intervall' to 'interval' in hfcsusb.c
+Date: Tue, 11 Mar 2025 16:06:37 +0000
+Message-ID: <20250311160637.467759-1-surajpatil522@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250306232355.93864-3-xiyou.wangcong@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Mar 06, 2025 at 03:23:55PM -0800, Cong Wang wrote:
-> Integrate the reproduer from Mingi to TDC.
-> 
-> All test results:
-> 
-> 1..4
-> ok 1 0385 - Create DRR with default setting
-> ok 2 2375 - Delete DRR with handle
-> ok 3 3092 - Show DRR class
-> ok 4 4009 - Reject creation of DRR class with classid TC_H_ROOT
-> 
-> Cc: Mingi Cho <mincho@theori.io>
-> Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
+Signed-off-by: Suraj Patil <surajpatil522@gmail.com>
+---
+ drivers/isdn/hardware/mISDN/hfcsusb.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+diff --git a/drivers/isdn/hardware/mISDN/hfcsusb.c b/drivers/isdn/hardware/mISDN/hfcsusb.c
+index e54419a4e731..ebe57c190476 100644
+--- a/drivers/isdn/hardware/mISDN/hfcsusb.c
++++ b/drivers/isdn/hardware/mISDN/hfcsusb.c
+@@ -1063,7 +1063,7 @@ rx_iso_complete(struct urb *urb)
+ 
+ 		fill_isoc_urb(urb, fifo->hw->dev, fifo->pipe,
+ 			      context_iso_urb->buffer, num_isoc_packets,
+-			      fifo->usb_packet_maxlen, fifo->intervall,
++			      fifo->usb_packet_maxlen, fifo->interval,
+ 			      (usb_complete_t)rx_iso_complete, urb->context);
+ 		errcode = usb_submit_urb(urb, GFP_ATOMIC);
+ 		if (errcode < 0) {
+@@ -1225,7 +1225,7 @@ tx_iso_complete(struct urb *urb)
+ 			sink = (threshbit) ? SINK_MIN : SINK_MAX;
+ 		fill_isoc_urb(urb, fifo->hw->dev, fifo->pipe,
+ 			      context_iso_urb->buffer, num_isoc_packets,
+-			      fifo->usb_packet_maxlen, fifo->intervall,
++			      fifo->usb_packet_maxlen, fifo->interval,
+ 			      (usb_complete_t)tx_iso_complete, urb->context);
+ 		memset(context_iso_urb->buffer, 0,
+ 		       sizeof(context_iso_urb->buffer));
+@@ -1355,7 +1355,7 @@ tx_iso_complete(struct urb *urb)
+ 		/*
+ 		 * abuse DChannel tx iso completion to trigger NT mode state
+ 		 * changes tx_iso_complete is assumed to be called every
+-		 * fifo->intervall (ms)
++		 * fifo->interval (ms)
+ 		 */
+ 		if ((fifon == HFCUSB_D_TX) && (hw->protocol == ISDN_P_NT_S0)
+ 		    && (hw->timers & NT_ACTIVATION_TIMER)) {
+@@ -1411,7 +1411,7 @@ start_isoc_chain(struct usb_fifo *fifo, int num_packets_per_urb,
+ 					      fifo->iso[i].buffer,
+ 					      num_packets_per_urb,
+ 					      fifo->usb_packet_maxlen,
+-					      fifo->intervall, complete,
++					      fifo->interval, complete,
+ 					      &fifo->iso[i]);
+ 				memset(fifo->iso[i].buffer, 0,
+ 				       sizeof(fifo->iso[i].buffer));
+@@ -1510,7 +1510,7 @@ start_int_fifo(struct usb_fifo *fifo)
+ 	}
+ 	usb_fill_int_urb(fifo->urb, fifo->hw->dev, fifo->pipe,
+ 			 fifo->buffer, fifo->usb_packet_maxlen,
+-			 (usb_complete_t)rx_int_complete, fifo, fifo->intervall);
++			 (usb_complete_t)rx_int_complete, fifo, fifo->interval);
+ 	fifo->active = 1;
+ 	fifo->stop_gracefull = 0;
+ 	errcode = usb_submit_urb(fifo->urb, GFP_KERNEL);
+@@ -1596,7 +1596,7 @@ reset_hfcsusb(struct hfcsusb *hw)
+ 	handle_led(hw, LED_POWER_ON);
+ }
+ 
+-/* start USB data pipes dependand on device's endpoint configuration */
++/* start USB data pipes dependent on device's endpoint configuration */
+ static void
+ hfcsusb_start_endpoint(struct hfcsusb *hw, int channel)
+ {
+@@ -1664,7 +1664,7 @@ hfcsusb_start_endpoint(struct hfcsusb *hw, int channel)
+ 	}
+ }
+ 
+-/* stop USB data pipes dependand on device's endpoint configuration */
++/* stop USB data pipes dependent on device's endpoint configuration */
+ static void
+ hfcsusb_stop_endpoint(struct hfcsusb *hw, int channel)
+ {
+@@ -2077,7 +2077,7 @@ hfcsusb_probe(struct usb_interface *intf, const struct usb_device_id *id)
+ 			f->hw = hw;
+ 			f->usb_packet_maxlen =
+ 				le16_to_cpu(ep->desc.wMaxPacketSize);
+-			f->intervall = ep->desc.bInterval;
++			f->interval = ep->desc.bInterval;
+ 		}
+ 		ep++;
+ 	}
+-- 
+2.43.0
 
 
