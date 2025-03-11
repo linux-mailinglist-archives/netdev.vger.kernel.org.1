@@ -1,196 +1,144 @@
-Return-Path: <netdev+bounces-173790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 516A9A5BB27
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 09:51:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F141A5BB3B
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 09:56:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D683B1896481
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 08:51:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB9A43A4B3B
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 08:56:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A55D226D0B;
-	Tue, 11 Mar 2025 08:51:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F43D227E8A;
+	Tue, 11 Mar 2025 08:56:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="P+gpc8Bz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xs/aN5X6"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31FA2226865;
-	Tue, 11 Mar 2025 08:51:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94DD61DED63;
+	Tue, 11 Mar 2025 08:56:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741683096; cv=none; b=ghg4T8Q+5JxBxH9R4Zd4ezO5T8XMz3OIasy1LBumqOc8w7m8ZiWiY2wDCasRzTtukmkIcAeXRBrHnexz8OuQmNBCjUWHOklFtNOQaWYw9b+7CzSfGYQMUgOTOPnKKg6qr5g6QR+pezVCDGPKnzrVXQGzC7Pvmlws4WL8j7sV8QA=
+	t=1741683393; cv=none; b=OO2oRK4RkyyoK/oKm8/fGnLR8+hHFZf6ZzhB1cjLKn6O0ThrQxA2rwLnYIbWt0HfOy6plupW25V4rq763pE/uF938h/ELJaQyyb9NCt1StG7xKzVbrIVGbF/UCwDTuNIDpsd5ow9eJS60rJxJbQLCLWZnd6/z+cmjwDn1zMK0pE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741683096; c=relaxed/simple;
-	bh=YXP2RJ5SkqHF9QZZ7hHh/BRLjgxVNLw2DUDbJCVXiu8=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qyxfLc92fYfI9nP0yzKyrV8ZNww1L4UuoDvKngLsH/0oRxitKdC2vSExqqGiP5bmO49Wa2EkPB/bipTOMwsi8CgmNpfUbxsFUEisuVtq9QIekhiFsyWOgyg30Vo8VAKsotqtK/CjH3hszCEzxg3XMdl1z/tFUy7r0/P3++aYXsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=P+gpc8Bz; arc=none smtp.client-ip=198.47.19.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 52B8pBYU1141179
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 11 Mar 2025 03:51:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1741683071;
-	bh=iwZ54kNHfdvvEjAMZoUWlnIMHfpRhgOK0x0eAv0wDF4=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To;
-	b=P+gpc8Bz7K5gbQRu1Pxwy5gYtqq4zjK1NDWvr6fF4Sa0MNI5Ua/tB+AHdxPQRfOq7
-	 iZebJU0EC5ColbKOZrBUAymAVhVm9xwMyD225HSNsVQXVXoD16cl5qwYXNTU7dD9V9
-	 1nBRIrlnczfUAxbWF99TuV0srKdrNT8/n+w6bFF0=
-Received: from DFLE108.ent.ti.com (dfle108.ent.ti.com [10.64.6.29])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 52B8pBwd023379
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 11 Mar 2025 03:51:11 -0500
-Received: from DFLE107.ent.ti.com (10.64.6.28) by DFLE108.ent.ti.com
- (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 11
- Mar 2025 03:51:10 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE107.ent.ti.com
- (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 11 Mar 2025 03:51:10 -0500
-Received: from localhost (uda0492258.dhcp.ti.com [10.24.72.113])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 52B8p9dr037656;
-	Tue, 11 Mar 2025 03:51:10 -0500
-Date: Tue, 11 Mar 2025 14:21:09 +0530
-From: "s-vadapalli@ti.com" <s-vadapalli@ti.com>
-To: "Sverdlin, Alexander" <alexander.sverdlin@siemens.com>
-CC: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-        "s-vadapalli@ti.com"
-	<s-vadapalli@ti.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "dan.carpenter@linaro.org" <dan.carpenter@linaro.org>,
-        "jpanis@baylibre.com"
-	<jpanis@baylibre.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "horms@kernel.org" <horms@kernel.org>,
-        "edumazet@google.com"
-	<edumazet@google.com>,
-        "rogerq@kernel.org" <rogerq@kernel.org>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-        "vigneshr@ti.com" <vigneshr@ti.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "srk@ti.com"
-	<srk@ti.com>
-Subject: Re: [PATCH net] net: ethernet: ti: am65-cpsw: Fix NAPI registration
- sequence
-Message-ID: <20250311085109.q3g32v3ycoskhsko@uda0492258>
-References: <20250311061214.4111634-1-s-vadapalli@ti.com>
- <421a4c67865215927897e16866814bd6eb68a89d.camel@siemens.com>
+	s=arc-20240116; t=1741683393; c=relaxed/simple;
+	bh=KHJ61QWzKw7QJXechSjHFjdLPVCALVWUIQuh5jW09Sc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=g44zzZIeAbpCOO8zjBzjJoNaQrXj3M/eBrACTsXqNvY6WnsppKu6kEMRmXWWGM9LhNJFH3P0A1Im+suwI3oKutC32Mg+oTbQ77JsMUASST+jyI+QWKxJLmhbbRxJwrqqY1f+jFYsHW5Uv8rX/PWUGzoXyXY8n8g9kP8ne1yADbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xs/aN5X6; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5e5b6f3025dso7319276a12.1;
+        Tue, 11 Mar 2025 01:56:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741683390; x=1742288190; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bixHXxIG1NNufeoV7lBfe8WWM+Lb7vo/7BEU455qMWo=;
+        b=Xs/aN5X6SBO2Nvo6jm4Byr5Au3eRSXnSdcGbmal/gWvjMZNqFaaETaulMmBg3rzT6i
+         0mDldpQQm3zCrW02D/Q3Qphixv124TQLkPegMJB9UtVNI+Hwelfongs10Oh7jMJ3iQIJ
+         7h1IxX9cnr3pkrsxP/rWrzSfjWD2sKbkgFybIODU01uqwgDcX3cmVaC7wV/18NXq0qu4
+         9H37m6vsJS5ueP6CbomyENajlpO7ZzrE3w4S1dofvsv4GbsWt1go0EEshYNKCf+kMVT0
+         gVgNGNwVUFyt5SoPWFh9hw8VfFSZo1BnrpeHMHFHCCnYIjWYBImjJ3M3o+dxJ7X97xYr
+         47tA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741683390; x=1742288190;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bixHXxIG1NNufeoV7lBfe8WWM+Lb7vo/7BEU455qMWo=;
+        b=uBAQ20Ss8Ti2LvLxCfilHWvMT4E94w0q+OBXfDycdl/UtWvYVig1FFlIk7oXihaaIT
+         XoUnECjtxzwJAT/c4z7nTcHQ0sWpCRm6Wy+1xolNcfjntvo1K+DvZ0gJDhbX9OkJLwf5
+         OekD4UtCkl1pY9SH2AFhPinkaykvolPIQDt2di7UCTVjF4TXqPmWOhFmoQWO7FNFkBSk
+         G6oN9gpjnsKAAsC8d3OgwEPKT6UUggHmAoca6zPatsB03YxQ7/gYsiIOOPXUCEw6oU7/
+         KIXPjCippw5FSZ+0PJ4zx0Xokh/4CPl9UHiH1P5+7XE4x9yloQHNrfQHBHl7m/XVTTDN
+         rPdg==
+X-Forwarded-Encrypted: i=1; AJvYcCW8B0qtzIPGWJUfaZCBR0FsSVdJSbvjI7/LDj3nzpPGtFkH2Jr8hzOLd1LesVivLLP9LhBevZY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKshN1ez2+HCSPWvX4oCNp287CM8KsH4bhYgrRuMfw4xIaJrY7
+	tB6DP8KluN4bVs4uHiwCUP468tPk/J5qkL12cMy4QPdzKcHtgjkY
+X-Gm-Gg: ASbGncsQsv6xp6nv0VTdM3k1B9tnt6wcLU0cYFQoPCQN0sUdnCgfFnR3pMNBbNdZIsv
+	gZVMU+41wsYRxPZC9YdREpaCIa7eSiOQrJUDsfPCiU9DbX7lrtG6d8Nw8GJh/umMbaZMbJV0Hox
+	7KTBcazhtL57wtXI4d+Q2qsWzHMKW8CRCzC9WE4PGyjJnnaOHgNcf5YA4kx/YL2GkfCb/uGb7p7
+	G8v0hobvKl/2Areh0tpB9VDlzdMMVdAV072nh35fp7vJ6zHyqtS6wwqw5J0tgOXMIe/N2kulQLP
+	r77tI5YHfVVryczzlbUDoKQ9tsieI5YXfVL+ygTKIh3TVD5UqM2e/6K2SLJ1tTTjS9XgDw4VMKA
+	FuV5dHA==
+X-Google-Smtp-Source: AGHT+IEL2OeAb7DVAh3NStAHVBy6aewMB47TDlExcq8zZu2Ybvy73qpbhyInDvvqsQnC1fAWZ3wuMQ==
+X-Received: by 2002:a05:6402:1ed6:b0:5e5:bfab:51e with SMTP id 4fb4d7f45d1cf-5e75d7a4980mr3373330a12.0.1741683389592;
+        Tue, 11 Mar 2025 01:56:29 -0700 (PDT)
+Received: from KERNELXING-MC1.tencent.com ([213.147.98.98])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e5c766a16esm7965571a12.60.2025.03.11.01.56.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Mar 2025 01:56:29 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	eddyz87@gmail.com,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@fomichev.me,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	horms@kernel.org,
+	kuniyu@amazon.com,
+	ncardwell@google.com
+Cc: bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Jason Xing <kerneljasonxing@gmail.com>
+Subject: [PATCH bpf-next v2 0/6] tcp: add some RTO MIN and DELACK MAX {bpf_}set/getsockopt supports
+Date: Tue, 11 Mar 2025 09:54:31 +0100
+Message-Id: <20250311085437.14703-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <421a4c67865215927897e16866814bd6eb68a89d.camel@siemens.com>
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On Tue, Mar 11, 2025 at 07:09:56AM +0000, Sverdlin, Alexander wrote:
-> Hi Siddharth!
+Introduce bpf_sol_tcp_getsockopt() helper.
 
-Hello Alexander,
+Add bpf_getsockopt for RTO MIN and DELACK MAX.
 
-> 
-> On Tue, 2025-03-11 at 11:42 +0530, Siddharth Vadapalli wrote:
-> > From: Vignesh Raghavendra <vigneshr@ti.com>
-> > 
-> > Registering the interrupts for TX or RX DMA Channels prior to registering
-> > their respective NAPI callbacks can result in a NULL pointer dereference.
-> > This is seen in practice as a random occurrence since it depends on the
-> > randomness associated with the generation of traffic by Linux and the
-> > reception of traffic from the wire.
-> > 
-> > Fixes: 681eb2beb3ef ("net: ethernet: ti: am65-cpsw: ensure proper channel cleanup in error path")
-> 
-> The patch Vignesh mentions here...
-> 
-> > Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
-> > Co-developed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
-> > Signed-off-by: Siddharth Vadapalli <s-vadapalli@ti.com>
-> > ---
-> > 
-> > Hello,
-> > 
-> > This patch is based on commit
-> > 4d872d51bc9d Merge tag 'x86-urgent-2025-03-10' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
-> > of Mainline Linux.
-> > 
-> > Regards,
-> > Siddharth.
-> > 
-> >  drivers/net/ethernet/ti/am65-cpsw-nuss.c | 12 ++++++------
-> >  1 file changed, 6 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> > index 2806238629f8..d5291281c781 100644
-> > --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> > +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> > @@ -2314,6 +2314,9 @@ static int am65_cpsw_nuss_ndev_add_tx_napi(struct am65_cpsw_common *common)
-> >  		hrtimer_init(&tx_chn->tx_hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_REL_PINNED);
-> >  		tx_chn->tx_hrtimer.function = &am65_cpsw_nuss_tx_timer_callback;
-> >  
-> > +		netif_napi_add_tx(common->dma_ndev, &tx_chn->napi_tx,
-> > +				  am65_cpsw_nuss_tx_poll);
-> > +
-> >  		ret = devm_request_irq(dev, tx_chn->irq,
-> >  				       am65_cpsw_nuss_tx_irq,
-> >  				       IRQF_TRIGGER_HIGH,
-> > @@ -2323,9 +2326,6 @@ static int am65_cpsw_nuss_ndev_add_tx_napi(struct am65_cpsw_common *common)
-> >  				tx_chn->id, tx_chn->irq, ret);
-> >  			goto err;
-> >  		}
-> > -
-> > -		netif_napi_add_tx(common->dma_ndev, &tx_chn->napi_tx,
-> > -				  am65_cpsw_nuss_tx_poll);
-> 
-> ... has accounted for the fact ..._napi_add_... happens after [possibly unsuccessful] request_irq,
-> please grep for "for (--i ;". Is it necessary to adjust both loops, in the below case too?
+Add setsockopt/getsockopt for RTO MIN and DELACK MAX.
 
-Yes! The order within the cleanup path has to be reversed too i.e.
-release IRQ first followed by deleting the NAPI callback. I assume that
-you are referring to the same. Please let me know otherwise. The diff
-corresponding to it is:
----------------------------------------------------------------------------------------------------
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index d5291281c781..32c844816501 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -2334,8 +2334,8 @@ static int am65_cpsw_nuss_ndev_add_tx_napi(struct am65_cpsw_common *common)
-        for (--i ; i >= 0 ; i--) {
-                struct am65_cpsw_tx_chn *tx_chn = &common->tx_chns[i];
+Add corresponding selftests for bpf.
 
--               netif_napi_del(&tx_chn->napi_tx);
-                devm_free_irq(dev, tx_chn->irq, tx_chn);
-+               netif_napi_del(&tx_chn->napi_tx);
-        }
+v2
+Link: https://lore.kernel.org/all/20250309123004.85612-1-kerneljasonxing@gmail.com/
+1. add bpf getsockopt common helper
+2. target bpf-next net branch
 
-        return ret;
-@@ -2592,8 +2592,8 @@ static int am65_cpsw_nuss_init_rx_chns(struct am65_cpsw_common *common)
- err_flow:
-        for (--i; i >= 0 ; i--) {
-                flow = &rx_chn->flows[i];
--               netif_napi_del(&flow->napi_rx);
-                devm_free_irq(dev, flow->irq, flow);
-+               netif_napi_del(&flow->napi_rx);
-        }
+Jason Xing (6):
+  bpf: introduce bpf_sol_tcp_getsockopt to support TCP_BPF flags
+  tcp: bpf: support bpf_getsockopt for TCP_BPF_RTO_MIN
+  tcp: bpf: support bpf_getsockopt for TCP_BPF_DELACK_MAX
+  tcp: support TCP_RTO_MIN_US for set/getsockopt use
+  tcp: support TCP_DELACK_MAX_US for set/getsockopt use
+  selftests: add bpf_set/getsockopt() for TCP_BPF_DELACK_MAX and
+    TCP_BPF_RTO_MIN
 
- err:
----------------------------------------------------------------------------------------------------
-Based on your confirmation, I will implement the above and post the v2
-patch. Thank you for reviewing this patch and providing feedback.
+ Documentation/networking/ip-sysctl.rst        |  4 +-
+ include/net/tcp.h                             |  2 +-
+ include/uapi/linux/tcp.h                      |  2 +
+ net/core/filter.c                             | 45 ++++++++++++++-----
+ net/ipv4/tcp.c                                | 32 ++++++++++++-
+ net/ipv4/tcp_output.c                         |  2 +-
+ .../selftests/bpf/progs/setget_sockopt.c      |  2 +
+ 7 files changed, 71 insertions(+), 18 deletions(-)
 
-Regards,
-Siddharth.
+-- 
+2.43.5
+
 
