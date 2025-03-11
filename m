@@ -1,96 +1,92 @@
-Return-Path: <netdev+bounces-173830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB0DAA5BE8B
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 12:10:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 60EC9A5BE94
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 12:13:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81C513A6341
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 11:09:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 087863B0C68
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 11:13:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A42362505CA;
-	Tue, 11 Mar 2025 11:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B7CD253B5D;
+	Tue, 11 Mar 2025 11:13:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A2DGIGW2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tqFu/7Ip"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F93823F295
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 11:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A342253B5C;
+	Tue, 11 Mar 2025 11:13:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741691399; cv=none; b=RS6oyAnvBTj5Jif0rTWvN7avjwFzllQc6ZPN+ZpDVNi9p66QVwiu42zdvNPj3/VHmwa0C1E0HqAyuARV7nEuNEqhqevgKXLyW+SWYt9qO+JmNtFAZAKexTFGoyqV5GF/XrvQzNc21keihdhTbVVpw5j7JTlT4neONVyL3c52rE8=
+	t=1741691588; cv=none; b=a1Vf0iNpr0EvtrcNPgORkfPBGTqpmQaYua3rx4IWgpalYv7fHVfZzn7+O+d0BKIVOio04dQ+Q5NVhOu9WiSlqZmheqLV+ltAhW1J8sBH1RG4ag6fjEDjirjX9YnbAJ4QXCMmA5cVd0PukCg75l44qZstdxg8h13YDzDBR7xqIow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741691399; c=relaxed/simple;
-	bh=Q8RGcdbo3x42RT43XpScecgNtUP9GiyOHuQvy7codmM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ixdFpe56QuXy4ALVjVkbkr8QptW4gjaRoWf16tqRnD3KBgAaXzyMt+MsndreMCAujxlwk2K9vjYMPnoLyAEEO2/JlB+bKlCj+lL9sxkY238FnFWl6oV95+kEiEbBgRNFQnRJGMexhe7f7fNS3+XZAQKPzsfhvsLIX0iO/gd5VIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A2DGIGW2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E651C4CEE9;
-	Tue, 11 Mar 2025 11:09:59 +0000 (UTC)
+	s=arc-20240116; t=1741691588; c=relaxed/simple;
+	bh=MCSFipezs08azWSv6XDg9ZURoBjjcv5P3dlnKmvdUpM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lLbcbFhADMua3waEo2nuG21AgnlGFrRqJHM8076JVggKdMrjQSJqwJwORsAmBAMypH9m/UZMSHnE5/UcAe1zqKjTcIW+wie1SQ8DW/9SlAKM9CH/EFpAep8zMhT4Nv9o99YVLug58K1hC6nNW/aA94mXX/7lXM/rhlnJt52KTrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tqFu/7Ip; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3AE7C4CEE9;
+	Tue, 11 Mar 2025 11:13:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741691399;
-	bh=Q8RGcdbo3x42RT43XpScecgNtUP9GiyOHuQvy7codmM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=A2DGIGW2Y0kKGIvhCZLBaI2rSyIc3wFtd1uOZR3hbOVme6P2bANe8ibzIfJb+QvPt
-	 5OY8tIW5wE7ymUdjXiU0e/gY/tMy/0nwSTG6o89Jcd11zq6lpDieXnhV1+tVEtPGkV
-	 XG6q/UwfBGvUeyfwFN3UQ4ukbOosESveWqWjYbF5G86p6dIYUVMARWTEA7ksQ23rBZ
-	 o1qaraJKvKvFJRYRp254nbD126IplrzuzZ5bucL5xKYuTz6OgDfZy3fPeICJo8IfmU
-	 oxirTKi+ZhCfZXlkv6DR4H3E2LtXzj422hcmmJgJXR+matn/Om835SApuLwaB8ZsBy
-	 tnQGFT2FNTL1g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE1DA380AC1D;
-	Tue, 11 Mar 2025 11:10:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1741691587;
+	bh=MCSFipezs08azWSv6XDg9ZURoBjjcv5P3dlnKmvdUpM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tqFu/7IpDtcBQ4/PT1umuRXF95PiBTRqR2DxX54smhTGURBCEYbsgHjeyK3ofIZ4t
+	 JefS59LspRXUHhJcnRhulCNd1qrXR0VQTUCnvulwPmXOtVGM1kGGpiXG9WAcqcY2w8
+	 tqsRgt8+U9FvSzzf73QDrtxLl38LExA4FgpB3hxiW29WTYqXE9PZljIkPv1vmlJMW9
+	 Ookgy7IBhKoUHIm5dEepNUfI9BJUkpmfbkAL4OwN/QRMFXFEOLJ0BdOafrHIMiYOId
+	 Jck67SEeFPW2X9O1kk1HGJ7gxyWhGeWfLJiboDRCLDa+orLhmBLNYwWUN9QqI9Hkg8
+	 T7lhsXP1xncdg==
+Date: Tue, 11 Mar 2025 12:13:01 +0100
+From: Simon Horman <horms@kernel.org>
+To: Uday Shankar <ushankar@purestorage.com>
+Cc: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next v5 2/2] netconsole: allow selection of egress
+ interface via MAC address
+Message-ID: <20250311111301.GL4159220@kernel.org>
+References: <20250220-netconsole-v5-0-4aeafa71debf@purestorage.com>
+ <20250220-netconsole-v5-2-4aeafa71debf@purestorage.com>
+ <20250225144035.GY1615191@kernel.org>
+ <Z8tS5t+warQdwFTs@dev-ushankar.dev.purestorage.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: switchdev: Convert blocking notification chain to a
- raw one
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174169143350.3900781.4902273065149639967.git-patchwork-notify@kernel.org>
-Date: Tue, 11 Mar 2025 11:10:33 +0000
-References: <20250305121509.631207-1-amcohen@nvidia.com>
-In-Reply-To: <20250305121509.631207-1-amcohen@nvidia.com>
-To: Amit Cohen <amcohen@nvidia.com>
-Cc: netdev@vger.kernel.org, idosch@nvidia.com, petrm@nvidia.com,
- jiri@resnulli.us, ivecera@redhat.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- olteanv@gmail.com, tobias@waldekranz.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z8tS5t+warQdwFTs@dev-ushankar.dev.purestorage.com>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Wed, 5 Mar 2025 14:15:09 +0200 you wrote:
-> A blocking notification chain uses a read-write semaphore to protect the
-> integrity of the chain. The semaphore is acquired for writing when
-> adding / removing notifiers to / from the chain and acquired for reading
-> when traversing the chain and informing notifiers about an event.
+On Fri, Mar 07, 2025 at 01:11:18PM -0700, Uday Shankar wrote:
+> On Tue, Feb 25, 2025 at 02:40:35PM +0000, Simon Horman wrote:
+> > Reviewed-by: Simon Horman <horms@kernel.org>
 > 
-> In case of the blocking switchdev notification chain, recursive
-> notifications are possible which leads to the semaphore being acquired
-> twice for reading and to lockdep warnings being generated [1].
-> 
-> [...]
+> Hey, since this has gotten quiet for a while, just wanted to confirm
+> that there's no action needed from my end? Is this in the queue for
+> net-next?
 
-Here is the summary with links:
-  - [net] net: switchdev: Convert blocking notification chain to a raw one
-    https://git.kernel.org/netdev/net/c/62531a1effa8
+Hi Uday,
 
-You are awesome, thank you!
+It seems that this series has been marked as Changes Requested in
+patchwork, which may explain the lack of progress. But that designation
+doesn't seem correct to me. So let's see if this can move this series
+back into the queue for the maintainers.
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: under-review
 
