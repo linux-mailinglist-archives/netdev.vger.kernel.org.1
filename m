@@ -1,107 +1,100 @@
-Return-Path: <netdev+bounces-173908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CE93A5C323
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:59:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 676A7A5C339
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 15:05:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4ADE188BE12
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 13:59:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B81B168D62
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:05:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B107D256C67;
-	Tue, 11 Mar 2025 13:59:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Odxrt06O"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DC5025BAA7;
+	Tue, 11 Mar 2025 14:05:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A63425524D;
-	Tue, 11 Mar 2025 13:59:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A570C25B690
+	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 14:05:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741701567; cv=none; b=OsG6lTR7G3XYbG42YmTOgfeGCPj1fkdB8cAq36TXUbMATIyS9xqxJ3aLLLjCTMxQyiqwRTDs8nlp9tAgH3hQaa8sCWLvF4qJct5e85X/gQ4nXa6z86qVr2tNKp492mOqi95rXnfOShUWVt8eP/tY0o8QluMt6lHpEprx3vwn95o=
+	t=1741701931; cv=none; b=VV5nVPHwVssNy1Abn0VliQ2R4bMdJOgEYas4aRHE0CjafJi7dM+738EK1mgWjms8dS9J1XqvHh2/Dq3NwSFFxEm9DovR+nqryCOCgCTPohF0xK7e954XWxwW47UOFEnM9ubpqvLfhPTCAOx4jCnkoRHTUdGKjbTR73PSC/LS9t4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741701567; c=relaxed/simple;
-	bh=5MhmNTWMGNzvKLDkWq38qbEpyg7A+zhP0shutNQJMpw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kCWfkBT+WN2sMh9vHLUiU0UxjWRXs65rHnkH9ZqOe+d2BuoVhSpf8a3BkvADupiAGp1jSNQyJU7UFEtoxi7qmtn720RLfhS7vpP75Ap8MX+GR0VflU3IYZSaT+6k9RrFXdd2kd1kyMMoxj1nVMU1eqdBSp/JvIYejz1+7j/F9/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Odxrt06O; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB3C7C4CEE9;
-	Tue, 11 Mar 2025 13:59:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741701566;
-	bh=5MhmNTWMGNzvKLDkWq38qbEpyg7A+zhP0shutNQJMpw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Odxrt06OG/LR3t2QdbTKiPibxyn1ezxxomjuLdwrTqHuSIusglpwrTR4VzCiAB40O
-	 KupSFCyID5UpxIZlQEaG+A1yYJOkc4D8bP0Oa+XOu08g5zMM98NPJBGOnxGO9aO8Hq
-	 jnSvB3ADFy2PJoI52mWgM6gRedMD06KJxLrhOegPa91a6HNDmzKnVlgGknJl4KXTbf
-	 UqsTFSCpwf9aRcQWvAnabp2zgvJR0bmpbXu3fyy+fkjG8sdpIpC7AtZZgZlIN4rw0X
-	 tafJStLqtDR94UgUBo+6TrjHz4pawsFgdS+GLtetJge/Z/cP3UcQkx5J6rrL1bxoPx
-	 lDWZQleRTaiYA==
-Date: Tue, 11 Mar 2025 15:59:21 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: David Ahern <dsahern@kernel.org>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Saeed Mahameed <saeed@kernel.org>,
-	Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kuba@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Daniel Vetter <daniel.vetter@ffwll.ch>,
-	Dave Jiang <dave.jiang@intel.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Itay Avraham <itayavr@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Leonid Bloch <lbloch@nvidia.com>, linux-cxl@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	"Nelson, Shannon" <shannon.nelson@amd.com>
-Subject: Re: [PATCH v5 0/8] Introduce fwctl subystem
-Message-ID: <20250311135921.GF7027@unreal>
-References: <20250303175358.4e9e0f78@kernel.org>
- <20250304140036.GK133783@nvidia.com>
- <20250304164203.38418211@kernel.org>
- <20250305133254.GV133783@nvidia.com>
- <mxw4ngjokr3vumdy5fp2wzxpocjkitputelmpaqo7ungxnhnxp@j4yn5tdz3ief>
- <bcafcf60-47a8-4faf-bea3-19cf0cbc4e08@kernel.org>
- <20250305182853.GO1955273@unreal>
- <Z8i2_9G86z14KbpB@x130>
- <20250305232154.GB354511@nvidia.com>
- <6af1429e-c36a-459c-9b35-6a9f55c3b2ac@kernel.org>
+	s=arc-20240116; t=1741701931; c=relaxed/simple;
+	bh=4ViwEQjiuyztLc4xhBTeEvbuR6KNrlXDlWzGWmWXpOI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=iGesO9XRLqsPqq0/BTbUvbpyLUowHZZbye407L0VnE2G5Bc1gSkvODcf9hfdFwtE3xUnuNj6t/daRUqusNKm6Wk+36XYo/lbbajKRtwWviuRZgbCVVZExgNCZYRov6VRCBZyeGF62S9PQXTL4lFAqZnQD/cX8t2vxd1t6z4IC6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3d44b221f0dso68967045ab.1
+        for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 07:05:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741701929; x=1742306729;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7pIE7LzGKssZD6z8FJmkqvR5uOSKHU0Z3BJr6I6MvtE=;
+        b=YpeaecRsfhMBMIhXWSmklRrhF46nPfvvy7Zepx32L4h9w4BwvyAgdWvLRiYdTxNHQ6
+         Vjvm+s/q/dTPSqZ0FQTydw+BM/P/D3dT9Qh1rJstFlARQ9hzUqNrm1fF4DDxA9EacZkF
+         AmtoHpATNldhOnUwp+EwCHBOq/HQN8aEXs7Fwlj1yv+yeM+4ivavNZrpzeVdvI2QqCfj
+         T0WYSUSZmAxjMPQtDIZQY+fbSmYPuwhD83cBRVISM5RF9H1cutJ5CBV6isOh2SnVc4hr
+         eR6cw9rmXU8w5Qdm7xzMjzYpVfMZK3Snf9MEQVkn/ZvcbGGqzP8/nYwJggPglOoI0vjU
+         ksMw==
+X-Forwarded-Encrypted: i=1; AJvYcCXa64skxavwd9Z+wlOfI6Cck8UF2IwxxGKY+/eCCw87FWOZR5NTnxd8oegekhdvbdz6dkEWVeg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4bGHQPk4JeL4by1ANwnOVFML4yx8Z1EhxvOOgCLXI1z4SccQF
+	4nHjdxBP0WA6Y5H3koVGrPQGS55dkHkyqbFfSOnv0zTNuJo+zM16W6KPwswMwLxJEnFxGb2TLyS
+	/RPz+mD7D9dIaqy+yNAh1GEMaQTHifaRCRywyClzcgha4HW+0ODdgnSk=
+X-Google-Smtp-Source: AGHT+IEY6nTprIKbASEGzFSSX2oWyr7YAC7wQPFUhD39nHl/U2n/UW5PK31hujLGXmJFF+bTCyr9hb7Vrj7L3wHwWWl1rVVEIDEK
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <6af1429e-c36a-459c-9b35-6a9f55c3b2ac@kernel.org>
+X-Received: by 2002:a05:6e02:188b:b0:3d0:4e0c:2c96 with SMTP id
+ e9e14a558f8ab-3d44187c11bmr214664045ab.2.1741701928626; Tue, 11 Mar 2025
+ 07:05:28 -0700 (PDT)
+Date: Tue, 11 Mar 2025 07:05:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67d04328.050a0220.14e108.0005.GAE@google.com>
+Subject: [syzbot] Monthly wpan report (Mar 2025)
+From: syzbot <syzbot+listc762ae8193f4e230b47e@syzkaller.appspotmail.com>
+To: alex.aring@gmail.com, linux-kernel@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
+	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Mar 11, 2025 at 12:23:19PM +0100, David Ahern wrote:
-> On 3/6/25 12:21 AM, Jason Gunthorpe wrote:
-> > On Wed, Mar 05, 2025 at 12:41:35PM -0800, Saeed Mahameed wrote:
-> >=20
-> >> How do you imagine this driver/core structure should look like? Who
-> >> will be the top dir maintainer?
-> >=20
-> > I would set something like this up more like DRM. Every driver
-> > maintainer gets commit rights, some rules about no uAPIs, or at least
-> > other acks before merging uAPI. Use the tree for staging shared
-> > branches.
->=20
-> why no uapi? Core driver can have knowledge of h/w resources across all
-> use cases. For example, our core driver supports a generid netlink based
-> dump (no set operations; get and dump only so maybe that should be the
-> restriction?) of all objects regardless of how created -- netdev, ib,
-> etc. -- and with much more detail.
+Hello wpan maintainers/developers,
 
-Because, we want to make sure that UAPI will be aligned with relevant
-subsystems without any way to bypass them.
+This is a 31-day syzbot report for the wpan subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wpan
 
-Thanks
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 5 issues are still open and 26 have already been fixed.
+
+Some of the still happening issues:
+
+Ref Crashes Repro Title
+<1> 204     Yes   KMSAN: uninit-value in ieee802154_hdr_push (2)
+                  https://syzkaller.appspot.com/bug?extid=60a66d44892b66b56545
+<2> 30      No    KASAN: global-out-of-bounds Read in mac802154_header_create (2)
+                  https://syzkaller.appspot.com/bug?extid=844d670c418e0353c6a8
+<3> 11      Yes   WARNING in cfg802154_switch_netns (3)
+                  https://syzkaller.appspot.com/bug?extid=bd5829ba3619f08e2341
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
