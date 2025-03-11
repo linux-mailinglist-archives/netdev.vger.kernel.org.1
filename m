@@ -1,106 +1,124 @@
-Return-Path: <netdev+bounces-173723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2EEFA5B5D5
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 02:23:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D691BA5B5D7
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 02:27:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17F2D3AF3AE
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 01:22:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8744B1890DBE
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 01:27:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FE861E2848;
-	Tue, 11 Mar 2025 01:21:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFE0D1DF252;
+	Tue, 11 Mar 2025 01:27:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BpdnCQpA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KjQiePPY"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3237E1E2307
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 01:21:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B37DA923;
+	Tue, 11 Mar 2025 01:27:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741656119; cv=none; b=dikxPv1i1922RBZ/AmqRFyIn40y0onTNABgNz5G00qGRh0HVsDtLgECoVbLSIco95uiLXutz+TCe0nWR474FRyD/Pud7csRt/xW/WVapum9IdMFdv3SSzZ1I8sWz3m2+CWGHaWcoE/OyGknPlqIdTIqCIDFzrl53j+X+0DVe9Pw=
+	t=1741656441; cv=none; b=mfkg6vlEi8Ak7tC9r8HkDfQZTavBRp7a8IECbhHQlmuWb/Jf1ZCY1UE8rGXBcw9D4Iciyjj3zkyNiKQXgzVpaNAoLtC61H0hBkPvt6RmOOFalU/MZtuZ3EShcjy3x3CF/QBbCEfa6zo+sjIjNVpRJDnMB0hTKyho9vQXFalX3+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741656119; c=relaxed/simple;
-	bh=EUGqV0G491GWJeCOTd0RFHA4weNlDWPwrkIQc4cKo3w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jxwTLIxExW1ycmAE22KGiNZk0SPWOBvXMQh0rCwzHbmUJFq1Ol19rAbllhLbJfuYtJW9a6WrPUMmIZuJRvTXHdTtAUNcAJJagWi+3OrliTSptJl11kKCeZ41vaSdr63/2n0az633zyYYAyp2q1ODn0WErazZ4rFsCp6nTp0mTE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BpdnCQpA; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <4c5e97c4-2311-4a4f-9340-5e4a1c7d0e2b@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1741656114;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N/oKuWS1FmY1E5I2+b2wmmKxZQHFp68NZ3i/2VIRw+Y=;
-	b=BpdnCQpA4tk0CL7LSsulB9048RbjcgNLdQ7nuQMyJvwQMlR/I5K6+L7xnqQM4Nm3NUJT6Y
-	GIyyfqNbOKvR1ubEEGI/BpGuhmxF8XOvrkt5i/h9yMx2IYOj2XlevmtfL1wQYpjwVeHEGk
-	Iw1zNcKDqPPKMWevU87ttfxASgEcNMA=
-Date: Mon, 10 Mar 2025 18:21:45 -0700
+	s=arc-20240116; t=1741656441; c=relaxed/simple;
+	bh=ht9scaUwYIWY/isuqrXAqzg0A5wR6NjSNdeQzdpWLP4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aHHJ/2c6V5pncq7tuvOTMjQCroGPM+mvwMNgfwpN5EGmscTfjvaGt8c7/lRGWkRq8GKj22ysUaEKT/qO4hFHHZePKqIscVs6DPA7BHhwE0KQvzSB70qNxL1+eNyrD/Zs6lLH0NTX4sBi9yNudnpOVfeBVQ0wmrG7ZdsDOBYNOpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KjQiePPY; arc=none smtp.client-ip=209.85.222.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7c0ca5e6d45so60938085a.3;
+        Mon, 10 Mar 2025 18:27:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741656439; x=1742261239; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=mYu4oax/thewz4e+p/abSxr+bcjcos4iMdBqH/7SF5g=;
+        b=KjQiePPYX4PrudbXPwGHsevGCJQ0cDci9pldlxpbs2NL2TRYoQ1spxbZ1LhZJ6LOP6
+         OtQnONB0J/1gHJLywaF/IIMkJ4xVlE8obS6Fxu7pf2BThuLcS0yrbih8hMlL8a6r0glu
+         VPFrOekY6nfSsgD6jBfacUVrYs4PIpOMB4WxKejrm+4NSbAIiTEwGDdDMZq49BZRV+/1
+         Jd2FrFRREbGkdBTHaPJhjX1aHFYpKdwwB+RMqdwD7jBGNZMVVxKPrJNjGlv7M33RycLR
+         TsGsb3eqGgb8E4gKf6IOnPvFvhQj74seTj8m2y5yoZubRdt9uQlZY4u+Ntaq80JKFQ9x
+         mmbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741656439; x=1742261239;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mYu4oax/thewz4e+p/abSxr+bcjcos4iMdBqH/7SF5g=;
+        b=jddfyyCPH08XC98xFNVgEBag+rEIrGmxh7EshkFh0lIhb/AZp1q2k0BRDcjAEHulHf
+         YUZ53lwRRt/LQzyqDk5l/0+6U9Xyjs7d81wEY32Hc47gEAfUOFNE3dV08Wkmi4TcX6Ib
+         7KuipRsAy0Jr01DfJL9IzYncndjmRyxszNjIWpCMuAAf794PwCyRe1Q4vxKBdRoQp5Rn
+         V16jrDY2VDXbOUNY0wwmXEYPpFCSiSiZ+itvX2/yhpp8fWn1jSofSATQrJGzMRbfC5z3
+         rgfoPOLzCifFFfhggBZ+pTjP96pcxjXPVAsmhjj3IUCXAFzcrfJnhsNury6j6EL03Llj
+         Mo6g==
+X-Forwarded-Encrypted: i=1; AJvYcCV1zlstLYQIArZHYFkG6CsHhoW1SRccUFDjwbg74VX9zvetXfmXXp35OPsH3DS7SP0m+jQH0TiGv6UEz3Q=@vger.kernel.org, AJvYcCW6ZNO5mfvnbbBgykNq4nxG60clieU35rCQZDrKWmbOU60d+t380bOznU/81aaMo0JRBZgL+ckQ@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/3ehcXXkbHyo2/M5QWE097EKugZCXFQPGVvtCTWoiCLb04qBm
+	6wQSTJ4gSLCs2JIVRkquhS+6cyVefAiFEmMtHvJcAE8j59Zz3zw=
+X-Gm-Gg: ASbGncuwB5uECbwMqdpt6OxBdBCM1pmFcmsJZIq9ySYB0nQybrZC7IE/BpdZRAgzaj0
+	Ub2PC3OM4EllRUHxO7Op39hz3EmlomwUbQhHjeyicSY0ReMedVrJ9sdYuejmR3J7tnS8K+Si5eF
+	gC7C9qLeD+KG37ZvcuM5VqbpRS4QtyWlmZbmIYP1BBG57cqDpxSEVjY2JXPThHmykOYJ2Qk52vb
+	eaPBQysnlYIWUDdKbDDFPyrbkfSr/EWeO7HudV22NwI1G2+UtqwP9CTf30Wi90YBOrXJ48mDRZu
+	GzD18d+6OjKZkMqGFoBkMj4d0Zu/FpDMz4AaMxsyNQ==
+X-Google-Smtp-Source: AGHT+IG1lIg0zhgXXdip9xAmm17KRNm/AUw5DrBkAQ32s9Cq80PSZ7xrsQWtT87xxvnN7LcqufT+vA==
+X-Received: by 2002:a05:6214:d06:b0:6e8:f645:2639 with SMTP id 6a1803df08f44-6ea2dd1e540mr10215056d6.5.1741656438961;
+        Mon, 10 Mar 2025 18:27:18 -0700 (PDT)
+Received: from ise-alpha.. ([2620:0:e00:550a:642:1aff:fee8:511b])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e8f70a2dd6sm65178346d6.61.2025.03.10.18.27.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Mar 2025 18:27:17 -0700 (PDT)
+From: Chenyuan Yang <chenyuan0y@gmail.com>
+To: gregkh@linuxfoundation.org,
+	joel@jms.id.au,
+	andrew@codeconstruct.com.au
+Cc: linux-usb@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-aspeed@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Chenyuan Yang <chenyuan0y@gmail.com>
+Subject: [PATCH] usb: gadget: aspeed: Add NULL pointer check in ast_vhub_init_dev()
+Date: Mon, 10 Mar 2025 20:27:05 -0500
+Message-Id: <20250311012705.1233829-1-chenyuan0y@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 2/5] tcp: bpf: support bpf_getsockopt for
- TCP_BPF_DELACK_MAX
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, horms@kernel.org,
- kuniyu@amazon.com, ncardwell@google.com, bpf@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20250309123004.85612-1-kerneljasonxing@gmail.com>
- <20250309123004.85612-3-kerneljasonxing@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20250309123004.85612-3-kerneljasonxing@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 3/9/25 5:30 AM, Jason Xing wrote:
-> Support bpf_getsockopt if application tries to know what the delayed ack
-> max time is.
-> 
-> Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
-> ---
->   net/core/filter.c | 11 +++++++++++
->   1 file changed, 11 insertions(+)
-> 
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 31aef259e104..5564917e0c6d 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -5415,6 +5415,17 @@ static int sol_tcp_sockopt(struct sock *sk, int optname,
->   		if (*optlen < 1)
->   			return -EINVAL;
->   		break;
-> +	case TCP_BPF_DELACK_MAX:
-> +		if (*optlen != sizeof(int))
-> +			return -EINVAL;
-> +		if (getopt) {
-> +			int delack_max = inet_csk(sk)->icsk_delack_max;
-> +			int delack_max_us = jiffies_to_usecs(delack_max);
-> +
-> +			memcpy(optval, &delack_max_us, *optlen);
-> +			return 0;
-> +		}
-> +		return bpf_sol_tcp_setsockopt(sk, optname, optval, *optlen);
+The variable d->name, returned by devm_kasprintf(), could be NULL.
+A pointer check is added to prevent potential NULL pointer dereference.
+This is similar to the fix in commit 3027e7b15b02
+("ice: Fix some null pointer dereference issues in ice_ptp.c").
 
-There are three TCP_BPF_* specific optnames supported by bpf_getsockopt now.
-Please take this chance to create a bpf_sol_tcp_getsockopt and refactor the 
-existing bpf_getsockopt(TCP_BPF_SOCK_OPS_CB_FLAGS) support into it also. The new 
-bpf_sol_tcp_getsockopt can reject the TCP_BPF_IW and TCP_BPF_SNDCWND_CLAMP.
+This issue is found by our static analysis tool
+
+Signed-off-by: Chenyuan Yang <chenyuan0y@gmail.com>
+---
+ drivers/usb/gadget/udc/aspeed-vhub/dev.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/usb/gadget/udc/aspeed-vhub/dev.c b/drivers/usb/gadget/udc/aspeed-vhub/dev.c
+index 573109ca5b79..a09f72772e6e 100644
+--- a/drivers/usb/gadget/udc/aspeed-vhub/dev.c
++++ b/drivers/usb/gadget/udc/aspeed-vhub/dev.c
+@@ -548,6 +548,9 @@ int ast_vhub_init_dev(struct ast_vhub *vhub, unsigned int idx)
+ 	d->vhub = vhub;
+ 	d->index = idx;
+ 	d->name = devm_kasprintf(parent, GFP_KERNEL, "port%d", idx+1);
++	if (!d->name)
++		return -ENOMEM;
++
+ 	d->regs = vhub->regs + 0x100 + 0x10 * idx;
+ 
+ 	ast_vhub_init_ep0(vhub, &d->ep0, d);
+-- 
+2.34.1
 
 
