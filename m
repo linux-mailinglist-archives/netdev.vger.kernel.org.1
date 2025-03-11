@@ -1,166 +1,108 @@
-Return-Path: <netdev+bounces-173859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37449A5C049
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 13:11:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3529EA5BFF2
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 13:02:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4DA627A9F68
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 12:09:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E48AA18973D7
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 12:02:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEAD825E462;
-	Tue, 11 Mar 2025 12:03:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B410221F28;
+	Tue, 11 Mar 2025 12:02:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="WrCpLdFW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Crb7G0MX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CD4425DB1D
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 12:03:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD96198E8C;
+	Tue, 11 Mar 2025 12:02:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741694619; cv=none; b=ToScG3unwf8Gnf3ikTdEVWjBeJUkBhKXEmlo6GByoWGDt+BVyuF10WDtVw+LDHHNk8X5vGcz2UvrznVmvrhZK+drO6a0EHQUnhf9k5MEKMz7ez4iZx+mMqwj/SLom15onJdEcuzBfGZqkhnBZxpJIkYpWOAkgIo/TcEI/kBawiE=
+	t=1741694550; cv=none; b=D7theizJAmWb2MbFwQQCh3IbJDvNhAMgCwPdWPhGm4E6T7KJbl8tWYBL/x+AOlW8vqgGOhS7PETt+dcX1cIaWteHzA3L/2DxMO2Nsxc9gSY+lrZXq3XE95zO+2Kbl+c54NeqYZmGA+n9lASDKOVI2Nq55X8AfZKYjPpNgUxiHPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741694619; c=relaxed/simple;
-	bh=Dpo86dcLuQHi+/ffLApLvGiDvMqBLBDHjZmNUI8Fgv8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=V7ZriGfv8ZfptlaemaDqa72Kk1tggMRPRoDT5Mpt/hB6SHJ7zlEISaE48+xtF7aCUytvgBCuBfFWzgVmzgDJTDFYzL3vsNgrtMr10fsfWpsBTKvZE8G3sL0Ykc0VZ2py2dVm48fJrFrCmoriRUpu1PUFkXLH4LCWsbyMwcl79S4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=WrCpLdFW; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43ce71582e9so18857195e9.1
-        for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 05:03:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1741694615; x=1742299415; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7513MgPTWzlFUV4A94AszGTBKoC1WXOdZLnItud/+rw=;
-        b=WrCpLdFWBB9YB2n55gPleyWijfvLWomlEGhlOom4kVCz2CgSajLelpV+fu8WgmZXEY
-         r2tPF23bEBaohTPdy6JNUWnDnEDDtwm5UCrk5sRogrMkx7Ni69XwtGGMy9EkNcBHnwry
-         eHC8mUVY2tuZmMKoJvIc10r4xS6Ra9Sd/CH0y9WfiN/+/WFGBN7dP9tviBBDA+AZGJU6
-         MbLj23x5dgO5GGu7yQH2QlMMOTKZquZfvaKrnNOFHtXR6zeUxmENKXKLuebC8Zgrhu6U
-         aFt7MBqGmx1uA1RZGQx9D+LMoxAEdS+pI3/54jjnuLS2WW7fiDAmhLf8eDCznhWCaVbH
-         Np/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741694615; x=1742299415;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7513MgPTWzlFUV4A94AszGTBKoC1WXOdZLnItud/+rw=;
-        b=rtjo1fFr+BkiJwkHnEEkl3RAaDlf1gtL8dewz4tS9xvUw2/Qf00jer4UdGHsuYYalT
-         ZGwSVZxNejraIOZwZyW4CnaPjOF32M9t9YJmWxz6tWNGPnOcFhF3aFu9dF5/RUM+246J
-         e2h/stMuwGtHR5Sji5f9wse+Nkc8a/wXB19n/EPabQd4ji4dlZVQsQYt3OXxD9oPkHEk
-         q65olIbFouShQpFdH9a4/P6G8TKiqlOQVugid2L4diFGwCGgCOenHQ8RmDDepM6fjzW3
-         o9pefnTmtSE7xIKKbfIp4rt4KmN6cTQTKK7orb7S+JM7aaVUvBRFNiOFZlQUQ14GCfC2
-         0Nlw==
-X-Gm-Message-State: AOJu0YzDNzANPD2xUsLBgutZFXAkU+34/KBSWH4DX2kO9VkmrydoHF6r
-	0A7iVOHtZ+p3OjpeLA9CATTOFdos0C60OHqB0T5Oa4zkB41edK7wepW4FQqB6ec=
-X-Gm-Gg: ASbGncsNZu6y/GIWatwIG4y/wzcJCnI1y8cWgsbWoNJkOqvdpdKJOenswAcfNo7Gcft
-	UP75rb2y0PgDHRNaggyGPbfSo6t42PC+t9cQyNdcq8ygWV1jYGadUwWF5ujekOBvLBzENaSKGQy
-	6DQxoMp274cMqibu41t2zGIhgugGDjhGnI+lBht+iULgMhin2HDrLYptsK3IPN46Ivtx8Gx8wR6
-	+J5v3YYwkVNCOE/vmdw40/YZu1u8CoVglQiD+Qb2QtUlFrlxUsr17jo3cAp+lmLf1sAgL7QPbAa
-	YrwS65b3qgeFva0ovyJWmQI5T8Ds1d3TNxMOEDPr7g==
-X-Google-Smtp-Source: AGHT+IGREqbuyoImnYbgFjJhW/d0v9jo08ssGpVpZNRtricqNFqqL69IN1VockK0XBdDiOURgseunQ==
-X-Received: by 2002:a05:600c:4316:b0:43d:35b:9a74 with SMTP id 5b1f17b1804b1-43d035b9d3fmr29016675e9.6.1741694615460;
-        Tue, 11 Mar 2025 05:03:35 -0700 (PDT)
-Received: from [127.0.0.1] ([2001:67c:2fbc:1:52de:66e8:f2da:9714])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ceafc09d5sm110537605e9.31.2025.03.11.05.03.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Mar 2025 05:03:35 -0700 (PDT)
-From: Antonio Quartulli <antonio@openvpn.net>
+	s=arc-20240116; t=1741694550; c=relaxed/simple;
+	bh=lF2Al/HhVZMMOdAFVKzZwkJyoEOGmdDcbfJux9rsQCk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tUvN8gVHzb6i6aI9F2p1zgMrxwiW6pEjKlVQtOBOZRKYd+pMvnbEjQ8yEPnU70RBnOmgnNCyAJ1GejNRmmXQhNXEC5XmD0lZ8Tdy1T7oEhBAEh5hsoJe50ywaXFDUdilGy7YKBJlBjRQoq2VoU3QmCR8ywv8g8Vk30I88TGL/Bw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Crb7G0MX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52811C4CEED;
+	Tue, 11 Mar 2025 12:02:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741694549;
+	bh=lF2Al/HhVZMMOdAFVKzZwkJyoEOGmdDcbfJux9rsQCk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Crb7G0MXmKUm//SXigG4v9fCtT7UyDKxx5eKXCz3+PUP9fP2lwdmGuflFRKbsTIgF
+	 gBJO6gBsheMFMOWqeJUwjStb4uZDdEGWSl/Seei005VQKnTotz540s/FgU3v7F69sk
+	 JEU563B+mExRiiN9bPueOsp3Lckphu9YVg0ss0+0Yh/Tq5eX/gwYOpmHRchwG6R8Ac
+	 /D+b8Q7QOJVSBON2vxhl5/mdo+5Umu41MM/pMsmYz/mqE3XocSAdynNloNBFQkNmkS
+	 PMgCLBO+TZnT0UIZNK/4etC6q4UX9ajCLZHz83Gi3MZq3f728ZMBkH15IAh7PigPaG
+	 0IeBK8156kAMQ==
 Date: Tue, 11 Mar 2025 13:02:23 +0100
-Subject: [PATCH net-next v22 22/23] ovpn: add basic ethtool support
+From: Christian Brauner <brauner@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: aleksandr.mikhalitsyn@canonical.com, arnd@arndb.de, bluca@debian.org, 
+	cgroups@vger.kernel.org, davem@davemloft.net, edumazet@google.com, hannes@cmpxchg.org, 
+	kuba@kernel.org, leon@kernel.org, linux-kernel@vger.kernel.org, mkoutny@suse.com, 
+	mzxreary@0pointer.de, netdev@vger.kernel.org, pabeni@redhat.com, shuah@kernel.org, 
+	tj@kernel.org, willemb@google.com
+Subject: Re: [PATCH net-next 0/4] Add getsockopt(SO_PEERCGROUPID) and fdinfo
+ API to retreive socket's peer cgroup id
+Message-ID: <20250311-umkreisen-versorgen-6388fdf4024e@brauner>
+References: <20250309132821.103046-1-aleksandr.mikhalitsyn@canonical.com>
+ <20250311073411.4565-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250311-b4-ovpn-v22-22-2b7b02155412@openvpn.net>
-References: <20250311-b4-ovpn-v22-0-2b7b02155412@openvpn.net>
-In-Reply-To: <20250311-b4-ovpn-v22-0-2b7b02155412@openvpn.net>
-To: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Donald Hunter <donald.hunter@gmail.com>, 
- Antonio Quartulli <antonio@openvpn.net>, Shuah Khan <shuah@kernel.org>, 
- sd@queasysnail.net, ryazanov.s.a@gmail.com, 
- Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>, 
- Andrew Lunn <andrew@lunn.ch>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1701; i=antonio@openvpn.net;
- h=from:subject:message-id; bh=Dpo86dcLuQHi+/ffLApLvGiDvMqBLBDHjZmNUI8Fgv8=;
- b=kA0DAAgBC3DlOqA41YcByyZiAGfQJnGgkRGfCkARtacCijCtX2FKUpqIfOp3qofnFhiZT/zJL
- IkBMwQAAQgAHRYhBJmr3Gz41BLk3l/A/Atw5TqgONWHBQJn0CZxAAoJEAtw5TqgONWHiNoH/3Pc
- rT7PvhT7gULcb6mztxX7KGJ0SDYr1EO+n20tCgscmoo4f2ltEo/vx9OJhEI/VAZuFL7qiP8Mhz8
- hQO3l0KfkHEEIeK7WCWUwl1psJpjfl0hqyZvX8TVconxgqNg44H9KMpo7fGKmI6CPsjhZESm/BL
- +sTxNW2zXF10+VxmIsh/2+kGsgbCiSRJUGwz+Eed/2Tk2NaHXWUGfpip+rTfZYeJ841hrUKoHMJ
- /XsnWJ8JrWV183PK03P1OPYVgKbTKEEDmIDaz5Mz/LmvQaooB7HVVKHb4a9oLDFOxwbF9+FquAI
- HTo7vmab5rF8md0C3a6fYNQna0Bb7yfaU86boBE=
-X-Developer-Key: i=antonio@openvpn.net; a=openpgp;
- fpr=CABDA1282017C267219885C748F0CCB68F59D14C
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250311073411.4565-1-kuniyu@amazon.com>
 
-Implement support for basic ethtool functionality.
+On Tue, Mar 11, 2025 at 12:33:48AM -0700, Kuniyuki Iwashima wrote:
+> From: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+> Date: Sun,  9 Mar 2025 14:28:11 +0100
+> > 1. Add socket cgroup id and socket's peer cgroup id in socket's fdinfo
+> 
+> Why do you want to add yet another racy interface ?
+> 
+> 
+> > 2. Add SO_PEERCGROUPID which allows to retrieve socket's peer cgroup id
+> > 3. Add SO_PEERCGROUPID kselftest
+> > 
+> > Generally speaking, this API allows race-free resolution of socket's peer cgroup id.
+> > Currently, to do that SCM_CREDENTIALS/SCM_PIDFD -> pid -> /proc/<pid>/cgroup sequence
+> > is used which is racy.
+> 
+> Few more words about the race (recycling pid ?) would be appreciated.
+> 
+> I somewhat assumed pid is not recycled until all of its pidfd are
+> close()d, but sounds like no ?
 
-Note that ovpn is a virtual device driver, therefore
-various ethtool APIs are just not meaningful and thus
-not implemented.
+No, that would allow starving the kernel of pid numbers.
+pidfds don't pin struct task_struct for a multitude of reasons similar
+to how cred->peer or scm->pid don't stash a task_struct but a struct pid.
 
-Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
----
- drivers/net/ovpn/main.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
-
-diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
-index dd05d0fe7a2d139bda55ebd68b9e1d78f5c00af9..886601ddaf7bdee4761691d293274a61da204f2b 100644
---- a/drivers/net/ovpn/main.c
-+++ b/drivers/net/ovpn/main.c
-@@ -7,6 +7,7 @@
-  *		James Yonan <james@openvpn.net>
-  */
- 
-+#include <linux/ethtool.h>
- #include <linux/genetlink.h>
- #include <linux/module.h>
- #include <linux/netdevice.h>
-@@ -143,6 +144,19 @@ bool ovpn_dev_is_valid(const struct net_device *dev)
- 	return dev->netdev_ops == &ovpn_netdev_ops;
- }
- 
-+static void ovpn_get_drvinfo(struct net_device *dev,
-+			     struct ethtool_drvinfo *info)
-+{
-+	strscpy(info->driver, "ovpn", sizeof(info->driver));
-+	strscpy(info->bus_info, "ovpn", sizeof(info->bus_info));
-+}
-+
-+static const struct ethtool_ops ovpn_ethtool_ops = {
-+	.get_drvinfo		= ovpn_get_drvinfo,
-+	.get_link		= ethtool_op_get_link,
-+	.get_ts_info		= ethtool_op_get_ts_info,
-+};
-+
- static void ovpn_setup(struct net_device *dev)
- {
- 	netdev_features_t feat = NETIF_F_SG | NETIF_F_HW_CSUM | NETIF_F_RXCSUM |
-@@ -153,6 +167,7 @@ static void ovpn_setup(struct net_device *dev)
- 
- 	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
- 
-+	dev->ethtool_ops = &ovpn_ethtool_ops;
- 	dev->netdev_ops = &ovpn_netdev_ops;
- 
- 	dev->priv_destructor = ovpn_priv_free;
-
--- 
-2.48.1
-
+> 
+> 
+> > 
+> > As we don't add any new state to the socket itself there is no potential locking issues
+> > or performance problems. We use already existing sk->sk_cgrp_data.
+> > 
+> > We already have analogical interfaces to retrieve this
+> > information:
+> > - inet_diag: INET_DIAG_CGROUP_ID
+> > - eBPF: bpf_sk_cgroup_id
+> > 
+> > Having getsockopt() interface makes sense for many applications, because using eBPF is
+> > not always an option, while inet_diag has obvious complexety and performance drawbacks
+> > if we only want to get this specific info for one specific socket.
+> 
+> If it's limited to the connect()ed peer, I'd add UNIX_DIAG_CGROUP_ID
+> and UNIX_DIAG_PEER_CGROUP_ID instead.  Then also ss can use that easily.
 
