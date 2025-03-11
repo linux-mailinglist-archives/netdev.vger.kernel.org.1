@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-173876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A72DBA5C13B
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 13:32:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04553A5C149
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 13:34:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0528E3AA100
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 12:30:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5DE418823EC
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 12:30:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9C662566DF;
-	Tue, 11 Mar 2025 12:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B360257429;
+	Tue, 11 Mar 2025 12:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VHlviE+2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zzem8BBi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99B2225487A;
-	Tue, 11 Mar 2025 12:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39B13256C9F;
+	Tue, 11 Mar 2025 12:29:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741696198; cv=none; b=Ctwgge7iz+cyCC2e4wI+1xvn/LJLyelHmnIDvp1RTLThtZWz0ZDO24fnVu5KwZ+xC6cFFumIHNRejyt5wq33RTvQsXQhpym1EU0Crx+G1FiZRajfYEiix66cFc8v4FoD3tsBw10if49oG2O+MMLm5z6AQpUKpu43+J5CaSOQ/0o=
+	t=1741696200; cv=none; b=pFA7E1xz7YTXKW6bpxkQsFNaxppC6xGH1q8KulYuZGYBP29kM7bKVjPeltkQvz42hqR1Zv9C2mmLUfkA7EGD30TpJErqDNzUIEVIae+dIpVd7xf6sOMXvK3fxDt+nFpybjXEE11KRlw5hCoPDGXCC2aG5kmY0mNiCf5f/4Pgjag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741696198; c=relaxed/simple;
-	bh=QtZXEnAsq+kpo0B3XWYCNv9iskcf8SuO6bT85S2GaiA=;
+	s=arc-20240116; t=1741696200; c=relaxed/simple;
+	bh=Ee7hHWfkm+xKwxzJg+z202o5UCLFsa7BvdJMo8G5fJM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PVbK9WAVu9JfQ+P41Y58ktaHrQTAz1YA7sBHhVe7r2QE2CR14fhuGgP3Hjhumbr8L5VLgVU8Jlkj2XvMj49dBu9l3ZBxU+aQETb4y3Tt2MuZINPvKngDvbXl5d4Fbo8YkK4ksdFr2Gt1q5we+Vu7drc/SJDbjdCshjpbuwVuKLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VHlviE+2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 112C7C4CEE9;
-	Tue, 11 Mar 2025 12:29:58 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Qd2YEDBaKguq7HwAXdxHxXK8qffcOBKWrHD+oZY+78ve8TTEIOPrMGE1Qp7jjl1sqg07PR5n+foZSvSMj5z9Ncvl4kunwQi6MKn4NsWg03FM3wCZz7FvtayeLv6qMGwIsIe7xOdR9xjg72xZePUsCWkeX67i0/BPTlWDbA6+ypk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zzem8BBi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96EB9C4CEE9;
+	Tue, 11 Mar 2025 12:29:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741696198;
-	bh=QtZXEnAsq+kpo0B3XWYCNv9iskcf8SuO6bT85S2GaiA=;
+	s=k20201202; t=1741696199;
+	bh=Ee7hHWfkm+xKwxzJg+z202o5UCLFsa7BvdJMo8G5fJM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VHlviE+2/1h3kZo6MwoozbySOwHSmNTBqo9W6wPc9xI93K7Hlh1G56SpYUa1VJmdu
-	 U5PtWGkAOdMyUX6Ma81gm+vn3Sb8Bbny0zjVHwDOKGP7W5qk1okmgar+YP/Ysx7QLk
-	 u5GXz2t05m9rUzWKhuvckLDx84YroqLQTvXSfNovjNFXN4LesY1gbya98enSy6QGex
-	 AvHY3cCWOBgjtwsIO1DXHpRf60I4AvtZismEj3I4X4qsC2CGth0/2VMJw8YZQrvBOL
-	 2MDCcPW1JUW8Tdvr/DM9fLT3spewWApZo4x5oOs89n5G6OXpP7Dh8kjEGhrJE8bz5t
-	 VwXAk2Dgf+2vQ==
+	b=Zzem8BBiqi0M+lknQama8DJfeiQ1bsN2ZoyOsNJEAhP2O2lEIUTXs71fmju0mkzQD
+	 zvGaSjtOhi3kWkKm6sdzgp8RQXQKTQF0uKWGk1fGr51qtqwI7fb4EOWItU3PlIPKEP
+	 h1IgM8u5pKVeWpCWelzs+gUibctKf8pHNs/MajWzXUrsUfCVp/+dyvBhgfC4p3H4To
+	 8O3AX2jxN+z+TVMuZVO+5DgC2N+KmQH16bMokNHgHtV/8LwndLAbFgT9Y7bLdzh9Mo
+	 XyHGcoOHZKimeTyREN3iWbhnlaORP50frnooMxtYe8G3TTUKnoprZEBefXHkDx7B6m
+	 Zbroc6uluPy5Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7123C380AC1C;
-	Tue, 11 Mar 2025 12:30:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADF1380AC1C;
+	Tue, 11 Mar 2025 12:30:34 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCHv4 net 0/2] bonding: fix incorrect mac address setting
+Subject: Re: [PATCH net] rtase: Fix improper release of ring list entries in
+ rtase_sw_reset
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174169623226.66274.17244628271427546125.git-patchwork-notify@kernel.org>
-Date: Tue, 11 Mar 2025 12:30:32 +0000
-References: <20250306023923.38777-1-liuhangbin@gmail.com>
-In-Reply-To: <20250306023923.38777-1-liuhangbin@gmail.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, jv@jvosburgh.net, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- razor@blackwall.org, horms@kernel.org, shuah@kernel.org, cratiu@nvidia.com,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+ <174169623350.66274.14221491464491416712.git-patchwork-notify@kernel.org>
+Date: Tue, 11 Mar 2025 12:30:33 +0000
+References: <20250306070510.18129-1-justinlai0215@realtek.com>
+In-Reply-To: <20250306070510.18129-1-justinlai0215@realtek.com>
+To: Justin Lai <justinlai0215@realtek.com>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, horms@kernel.org, pkshih@realtek.com,
+ larry.chiu@realtek.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Thu,  6 Mar 2025 02:39:21 +0000 you wrote:
-> The mac address on backup slave should be convert from Solicited-Node
-> Multicast address, not from bonding unicast target address.
-> 
-> v4: no change, just repost.
-> v3: also fix the mac setting for slave_set_ns_maddr. (Jay)
->     Add function description for slave_set_ns_maddr/slave_set_ns_maddrs (Jay)
-> v2: fix patch 01's subject
+On Thu, 6 Mar 2025 15:05:10 +0800 you wrote:
+> Since rtase_init_ring, which is called within rtase_sw_reset, adds ring
+> entries already present in the ring list back into the list, it causes
+> the ring list to form a cycle. This results in list_for_each_entry_safe
+> failing to find an endpoint during traversal, leading to an error.
+> Therefore, it is necessary to remove the previously added ring_list nodes
+> before calling rtase_init_ring.
 > 
 > [...]
 
 Here is the summary with links:
-  - [PATCHv4,net,1/2] bonding: fix incorrect MAC address setting to receive NS messages
-    https://git.kernel.org/netdev/net/c/0c5e145a350d
-  - [PATCHv4,net,2/2] selftests: bonding: fix incorrect mac address
-    https://git.kernel.org/netdev/net/c/9318dc2357b6
+  - [net] rtase: Fix improper release of ring list entries in rtase_sw_reset
+    https://git.kernel.org/netdev/net/c/415f135ace7f
 
 You are awesome, thank you!
 -- 
