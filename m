@@ -1,144 +1,146 @@
-Return-Path: <netdev+bounces-173897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FE9EA5C2B0
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:30:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02A3AA5C2B6
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:30:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80268171984
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 13:30:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCAAA1894DB2
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 13:30:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39BF22940F;
-	Tue, 11 Mar 2025 13:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EA4C1BEF77;
+	Tue, 11 Mar 2025 13:30:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W5f0ZTof"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zjy+XG8H"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E28733E1
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 13:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8601833E1;
+	Tue, 11 Mar 2025 13:30:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741699829; cv=none; b=p5f4BXJa1v5Lf/teQC5sl+j6d+m2hqqHtFdirP1oFtKIozDK9iiWWWEskIS95oYRDnwIq+jruPalnyel/7sGn/hC4U1CvZ6AYxtgqKWsCSmVgdxrdRJai2Ajp4qSZ5gb05eTBudK8OhjGK1bUb/WoG8CVSd2HMpPItLg6IBLS28=
+	t=1741699842; cv=none; b=NS6XLoD0qXWfXBHjDtMMMBbGpNB7IiNMo8g4akDOpOHX7yrPJzAhjj7SVNbyglKxSwKfZ3XRQgmtH4vjhFKcJ0tS/Nr2R6QwrCKVCUdjyGcIriWyF+ceek+oYLnu1zjGwf/GIe1KqMbjR4Fpao/uDr9p/wWu0/4YpVSZgouRIBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741699829; c=relaxed/simple;
-	bh=l6zR6XGtKJ5X0OhwmHL3+OfRxrFGdi1TkJcer1hdk8Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lsoFxIfAoT0gPUQHPO+QRcM4ppsJfav9kQfbo01HzBp7EcwPt/OiEPt4TjZ/2z2cTzawf/77JA0DQIstxpav372v3BPcPBggY0H5FQYsxcqrz7wnbgHZDye1zaWzz/SvWeKjUc7uMMxDll6feiul9pzKzjOzaHDdrFR44btmpgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W5f0ZTof; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741699826;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/pEztC+tYEqmw4n/BkTKddXXttPyUOtkMeTZTPuQrQU=;
-	b=W5f0ZTofHbh+KdeMBRINVFTxZ7i1StaMIBvxCU59JdB+jMwFsDIF6nZZ8EywwWTIhmAZ17
-	NFMjwaBTjm5vOwJ7l1affWW8qiGh+1mkG8BXBsoqEqRbTETg3w9hZGWPuV4lI2zpdOP6ts
-	5YkLImlohm117sjmwOMYwHkkSTKXdxg=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-25-kqLrgj9lMQ6k8PpG0HaASg-1; Tue,
- 11 Mar 2025 09:30:21 -0400
-X-MC-Unique: kqLrgj9lMQ6k8PpG0HaASg-1
-X-Mimecast-MFC-AGG-ID: kqLrgj9lMQ6k8PpG0HaASg_1741699818
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D90E91808869;
-	Tue, 11 Mar 2025 13:30:16 +0000 (UTC)
-Received: from fedora (unknown [10.22.88.194])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B40EF1955BCB;
-	Tue, 11 Mar 2025 13:30:13 +0000 (UTC)
-Date: Tue, 11 Mar 2025 09:30:11 -0400
-From: Luiz Capitulino <luizcap@redhat.com>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
- <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, bpf <bpf@vger.kernel.org>, Networking
- <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: Re: linux-next: manual merge of the bpf-next tree with the mm tree
-Message-ID: <20250311093011.48fa9d08@fedora>
-In-Reply-To: <20250311120422.1d9a8f80@canb.auug.org.au>
-References: <20250311120422.1d9a8f80@canb.auug.org.au>
+	s=arc-20240116; t=1741699842; c=relaxed/simple;
+	bh=DSIaqEYMgkyYCBJZ5KNBTAo4Vk3cJBXJ88bu6yBkm2U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qKkuQEAVjQ7rLccbGOLATsvL26ioj6FvRmuY2KsRKrlChChq6H0sTlzTJVlD7/iXJKU6sEyyRnsdSIsCpPilJnEeSbqpC6VLEpDe9mMhJU+Gi0CwimkNNW3Q2glNs4GHQm39iGBsrmsiyZ2+S+W9xhwjfSGvtOO8+bvFatRkW3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zjy+XG8H; arc=none smtp.client-ip=209.85.221.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-51eb1a6ca1bso2243373e0c.1;
+        Tue, 11 Mar 2025 06:30:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741699839; x=1742304639; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OS+kx1EYJx8zGVZAVZxDQft66T1VTJ/fMWqkBxUi750=;
+        b=Zjy+XG8HgQmUhiQ3CY7P/s/MGHR3AYob+n5mWBjJ2iMkuzRGfZ2Q9tif7UE6rI4B9K
+         vt8lX7xTGKgk8x3v5Dzj38PyWtgPR73s0IX2o4w7QUP+4zzl+AFgzogP+A7NJDaJCrzl
+         X9LqaZhAsMyH4ITpGAObm281k9pzT7cBrQrlB1efblOUh8wCxr6wrebzo9cJsc6DvVy+
+         kW2heRsa4xJ7DMc56RVD0DQbM9ENN07EXxLfHzQi6l3qBKZ41BG8hl4E+lKhMb5I3DFO
+         BYwGtekbe8A7VQDii7G+6jd9+YV0btZeMVwyG14lFnGrgbY904mNdSM+zVc2L/jHKi56
+         KurQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741699839; x=1742304639;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OS+kx1EYJx8zGVZAVZxDQft66T1VTJ/fMWqkBxUi750=;
+        b=s58Tpkf3H6NOVkE2iHLqzWSzkFEjxDGGl5vVHhv73/V7FhO8LJYwL1p+drYAOYudKb
+         QrAFQAc7Ytrd37qhKY8qJZF6eT8cfEz0P8baaE+beZX+j3pq/VhpWVMRO0mY75CjND26
+         YaesTkMaXNiWhLca1gAfm5bB6s9hf/JcRjRhmH6Ykr2gfOhkHaggdovk24Kl0TMGi93N
+         8d3GkquwbjlOSxg5bTBEOMrHwyuL6qxVciQAnTHrmiieE/CwHUvhb3NbCh7W/fcY6XqI
+         TqMloUOuRL0Zeeue+8MXFzewqc2U9zjtvdkhTxdIN2WLU6pg3p6pSyLbo/DayGlGoAAv
+         7icA==
+X-Forwarded-Encrypted: i=1; AJvYcCV+eKHxgCz/mXnoj2LoJ8NiVRMyztnxgqnogvST9Q6SSj8Jwr7uKQ+j7LEGKi8bZKgcwnTpR7u3@vger.kernel.org, AJvYcCWefNikSYHS467zrzzUM+Qxmy/+9nGuHYabRRv5H7j0GoQpSNEggfUSNISWJvVZxzotmKop7ifNeB8T@vger.kernel.org
+X-Gm-Message-State: AOJu0YxN4rHQDG7L/b7IAPgoaTDMWKgOzRKRbRebuJE68QLV6V7mpR1w
+	LcLBvpYlEHoOWo4Glck5ueUFamjrRW0F4yZNbuIpAhM0u1NxVmwGPLzRqWN0m171mWHPNg7bRWr
+	AfHalfkxdBMs/kFxVkVqvH30YeZc=
+X-Gm-Gg: ASbGnctbZynmjyR+CVJTnD/Yhkw91xl6N7UViCnkKanjfR0rZe/BMT3MVx6FcNk2hws
+	3zy8NiIDUDaj0kYzKFi/lR4cMaBSLQRF2/a2QdC7HMnZOzTI7SDK7sDqQWE58LGLUeFdVRgYqKM
+	22ZpNEaUAJcntJVlCbJR4bxHyRyg==
+X-Google-Smtp-Source: AGHT+IFy2Sl8rkBIl4+/ZfojG+Lp511BkNoNkiebfxbXz25a/xXmKtCtJuK/D9U65TOMGgOaav+c8ESCttCkqV6X1J8=
+X-Received: by 2002:a05:6122:2011:b0:520:42d3:91aa with SMTP id
+ 71dfb90a1353d-523e3ff118fmr11782712e0c.2.1741699839299; Tue, 11 Mar 2025
+ 06:30:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+References: <Z82tWYZulV12Pjir@shell.armlinux.org.uk> <E1trIAQ-005nto-3w@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1trIAQ-005nto-3w@rmk-PC.armlinux.org.uk>
+From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Date: Tue, 11 Mar 2025 13:30:13 +0000
+X-Gm-Features: AQ5f1Jp3UtuRRhR-96fKi5aM9eNN6ctPoGEYrjWhhbpHpPNGlFs33K9fIDMWwbw
+Message-ID: <CA+V-a8u34cKgccW=qEw=FC34HH+Q6pVmRqeMq7Q_btxqkqNtnQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 6/7] dt-bindings: deprecate "snps,en-tx-lpi-clockgating"
+ property
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Conor Dooley <conor+dt@kernel.org>, Conor Dooley <conor@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, devicetree@vger.kernel.org, 
+	Emil Renner Berthing <kernel@esmil.dk>, Eric Dumazet <edumazet@google.com>, 
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Jose Abreu <joabreu@synopsys.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Minda Chen <minda.chen@starfivetech.com>, 
+	netdev@vger.kernel.org, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Rob Herring <robh@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 11 Mar 2025 12:04:22 +1100
-Stephen Rothwell <sfr@canb.auug.org.au> wrote:
-
-> Hi all,
-> 
-> Today's linux-next merge of the bpf-next tree got a conflict in:
-> 
->   mm/page_owner.c
-> 
-> between commit:
-> 
->   a5bc091881fd ("mm: page_owner: use new iteration API")
-> 
-> from the mm-unstable branch of the mm tree and commit:
-> 
->   8c57b687e833 ("mm, bpf: Introduce free_pages_nolock()")
-> 
-> from the bpf-next tree.
-> 
-> I fixed it up (see below) and can carry the fix as necessary. This
-> is now fixed as far as linux-next is concerned, but any non trivial
-> conflicts should be mentioned to your upstream maintainer when your tree
-> is submitted for merging.  You may also want to consider cooperating
-> with the maintainer of the conflicting tree to minimise any particularly
-> complex conflicts.
-> 
-
-This looks good to me:
-
-Reviewed-by: Luiz Capitulino <luizcap@redhat.com>
-
-> -- 
-> Cheers,
-> Stephen Rothwell
+On Sun, Mar 9, 2025 at 3:13=E2=80=AFPM Russell King (Oracle)
+<rmk+kernel@armlinux.org.uk> wrote:
 >
-> diff --cc mm/page_owner.c
-> index 849d4a471b6c,90e31d0e3ed7..000000000000
-> --- a/mm/page_owner.c
-> +++ b/mm/page_owner.c
-> @@@ -297,11 -293,17 +297,17 @@@ void __reset_page_owner(struct page *pa
->  
->  	page_owner = get_page_owner(page_ext);
->  	alloc_handle = page_owner->handle;
-> +	page_ext_put(page_ext);
->  
-> - 	handle = save_stack(GFP_NOWAIT | __GFP_NOWARN);
-> + 	/*
-> + 	 * Do not specify GFP_NOWAIT to make gfpflags_allow_spinning() == false
-> + 	 * to prevent issues in stack_depot_save().
-> + 	 * This is similar to try_alloc_pages() gfp flags, but only used
-> + 	 * to signal stack_depot to avoid spin_locks.
-> + 	 */
-> + 	handle = save_stack(__GFP_NOWARN);
->  -	__update_page_owner_free_handle(page_ext, handle, order, current->pid,
->  +	__update_page_owner_free_handle(page, handle, order, current->pid,
->   					current->tgid, free_ts_nsec);
->  -	page_ext_put(page_ext);
->   
->   	if (alloc_handle != early_handle)
->   		/*
+> Whether the MII transmit clock can be stopped is primarily a property
+> of the PHY (there is a capability bit that should be checked first.)
+> Whether the MAC is capable of stopping the transmit clock is a separate
+> issue, but this is already handled by the core DesignWare MAC code.
+>
+> Therefore, snps,en-tx-lpi-clockgating is technically incorrect, so this
+> commit deprecates the property in the binding.
+>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+>  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 1 +
+>  1 file changed, 1 insertion(+)
+>
 
+Reviewed-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+
+Cheers,
+Prabhakar
+
+> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Docu=
+mentation/devicetree/bindings/net/snps,dwmac.yaml
+> index 3f0aa46d798e..78b3030dc56d 100644
+> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> @@ -494,6 +494,7 @@ title: Synopsys DesignWare MAC
+>
+>    snps,en-tx-lpi-clockgating:
+>      $ref: /schemas/types.yaml#/definitions/flag
+> +    deprecated: true
+>      description:
+>        Enable gating of the MAC TX clock during TX low-power mode
+>
+> --
+> 2.30.2
+>
+>
+> _______________________________________________
+> linux-riscv mailing list
+> linux-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-riscv
 
