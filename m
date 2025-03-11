@@ -1,144 +1,170 @@
-Return-Path: <netdev+bounces-173862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4272DA5C091
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 13:19:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB0C2A5C06E
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 13:16:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 072123B4A33
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 12:17:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 301D07A77CA
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 12:15:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43217221F17;
-	Tue, 11 Mar 2025 12:12:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1925925C6E0;
+	Tue, 11 Mar 2025 12:10:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lwQotIIg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ELuV462F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96764221F3C
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 12:12:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A607256C6C
+	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 12:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741695173; cv=none; b=YtZytmw4wsDvlUlCEyeERT6XUETnZwHVkKDrX1ePX90uBKmtt0LaBp/GLThM2bDWNuYIG+Iggj5MsMqZz3RDbLMVKo+oJmz5X7tKlGYuxfQv9kzyrCxSwA8rf2m4dTA7K8HhI5E+SeAPbpToJmU4qaeS8pEJ2lc4SzzL9Nwb8To=
+	t=1741695006; cv=none; b=BuvmShIUJC84wmoi+mkBkabwl0Z/jLMUUBjUMRRFt0WStcblu7G6qOVwxsHvM5ta7OX7L8NuSmJmICVTQ3lnllhCiOzlWxQki1piV0nGI5kC7PqbWJPYhM7bLb1jc7uxjCd5VvmRWmOkBRmBN399Xpq0oZrqyq++ZamNZ5pFO1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741695173; c=relaxed/simple;
-	bh=8Akx9xfIHaoFx+B9BGpXvkvAx6ZL7g/6u8CiSjKDhhA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tBb8NkIpE5K2rQbMZofho4H6JH732SjNV5v+sv+ZP85+xtey5TvpV7ezfkxZaij3zTSuKiZ/UEK+AGMBqRRlQKZPhNiFbIasYKb5QNMaLZBS3qpSHFytq7szrq4dMZ/IAGvTPHsWwyrxULKnpi4C7QSLDPqK4n8f4q2EmbevXTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lwQotIIg; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741695171; x=1773231171;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=8Akx9xfIHaoFx+B9BGpXvkvAx6ZL7g/6u8CiSjKDhhA=;
-  b=lwQotIIg2tQ6ufiDSL+aflH/xwZ4JBfmfa+LRCUpcpSddh8ElPc7/93I
-   5QuFFemuN1ncmHjckrO3MmVMhdnQLHkfGiV8BKLjJx43X/MrThfgkSdd2
-   O3NNu6wQx3L6UXP7mg2v77pfbXIBOoKxGbGPMTo8PNGzmOgqvAo6+8cWe
-   4Dl36G7WK6tTirkqZDwFZ4ay1f9Wp89D2+Xzfv9COyevcIHpV25daMn6K
-   tNmfpBJ1j79Sk/ItnN1jW/E8tXK97ip0AP785CNx6aIJva6Ycuf7wg0Vj
-   zRgYTt915xJDuwPg/elQKbfqH90Vf5rWDby6JrXhoerwkmtbHrWAhGzgv
-   g==;
-X-CSE-ConnectionGUID: EcepKxH+SK2rkBLSr2H08g==
-X-CSE-MsgGUID: 6KRB6kbJTZ6DIlx/TkGu6A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11369"; a="42606026"
-X-IronPort-AV: E=Sophos;i="6.14,239,1736841600"; 
-   d="scan'208";a="42606026"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2025 05:12:50 -0700
-X-CSE-ConnectionGUID: 45elzWrBR5mpOfr2/r+0jw==
-X-CSE-MsgGUID: uJoCNx5RR1incKUhsNIAcA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,239,1736841600"; 
-   d="scan'208";a="120792144"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2025 05:12:48 -0700
-Date: Tue, 11 Mar 2025 13:09:01 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Pierre Riteau <pierre@stackhpc.com>,
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
-	netdev@vger.kernel.org, jiri@resnulli.us, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, horms@kernel.org,
-	Dan Carpenter <error27@gmail.com>
-Subject: Re: [net v1] devlink: fix xa_alloc_cyclic error handling
-Message-ID: <Z9An3SRbPWRKVqMc@mev-dev.igk.intel.com>
-References: <20250214132453.4108-1-michal.swiatkowski@linux.intel.com>
- <2fcd3d16-c259-4356-82b7-2f1a3ad45dfa@lunn.ch>
- <Z69MESaQ4cUvIy4z@mev-dev.igk.intel.com>
- <c22f5a47-7fe0-4e83-8a0c-6da78143ceb3@redhat.com>
- <CA+ny2sxC2Y7bxhkO7HqX+6E_Myf24_trmCUrroKFkyoce7QC9A@mail.gmail.com>
- <Z8//h7IT3cf01bxB@mev-dev.igk.intel.com>
- <3ff973e5-5474-4112-81ad-46b745edd6a9@stanley.mountain>
+	s=arc-20240116; t=1741695006; c=relaxed/simple;
+	bh=ESptfUqJ8ikgFgaVLvh4qY5M7p0GdzNCQcLXBlXVRYs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=J0JgonozRXb9T7p/vkikQ2FsBe2PVNc47p8H5O9DzCdFq2JmCR535UAIeRT6GrBmJTHuXdhPBcEvVfPp6AVZSSJdDwU2hhGHQ8QDiXi438Q3HMS0Gf/uyyh+wdocw3TrGWeOgxJcxDu8l3HNfGQbI23RzV6PYJyCOK9udMYnx9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ELuV462F; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741695003;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=i5Yy7V0yOPn5gqt/RKUXcJgXRnOAYWX9pdMaDlNGSLw=;
+	b=ELuV462FYt8mbQtui+q6QLrnBph4tQsufM/VvRHQfUuHB2mYKr1y6p7Iorlvg2b3voDtQf
+	78zJI7zIdkJd/UTZwZr+9w8AZRYhlN+MIagUejox6hluL3Azxz5nWYaI1AbDXEkqEMfppY
+	VUGrxsM4x6w72T5WVFMvZhXFyzM6L5I=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-690-Vd3IFz9mNSi4bp0fvRHr9Q-1; Tue, 11 Mar 2025 08:10:01 -0400
+X-MC-Unique: Vd3IFz9mNSi4bp0fvRHr9Q-1
+X-Mimecast-MFC-AGG-ID: Vd3IFz9mNSi4bp0fvRHr9Q_1741695001
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3912fe32b08so2827858f8f.3
+        for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 05:10:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741695000; x=1742299800;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=i5Yy7V0yOPn5gqt/RKUXcJgXRnOAYWX9pdMaDlNGSLw=;
+        b=CkWRDelvDrYn6KjyMU7i8K2iJckmFyUCxoBA3G+ONDp0Cb1xu5ui02dD+N+Dc9wKgW
+         j6UVuigJgTBODuZK05RmG9JfPmpIZQ4AVGIw2VEPuGLqCJo+a+wJ9HmE4oaZrLW3teFr
+         sGVu2YmkB5mvot+TspizxYIxKnpVpg82VYEodDwY9PdG8Fn+SIgGgf1Ux6TGQseeSZS4
+         lVk7Ibc5n0Zn6htCaLDpsJ5zJaF9X8hjp/tnvG7YFIxHaGNoD69rjekk4DwVx3LQPUQX
+         DQ/feBgUiCrzdXT9KquNi1qTs0Utos7rSB28by07vRsvR6IRuxkxnh6KSD6pRUbPyQ72
+         4PJg==
+X-Forwarded-Encrypted: i=1; AJvYcCX2ggFDdc4ZWscnxeYJKWHatPa5OiyuoDeAnSkyUhwmR06+zeT1Sflte2fWB9HbRwJnKTWcNhI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+/egSVxYist77K4zRxQRYMXM1SdaqeyLo2ITRHFlt+ZjP/nXc
+	4RjgzNs1bejDZbyRE8BjvbvFpwpByBMf2eJhc3zRTYdWCEKOFWMSjViGaNN1MOL0udUmwkL0Lea
+	pLSA7LFY/zeavVyzsjCeRn5MYgzRvKEo/L//+iYnXcsos/XHLxvRRnw==
+X-Gm-Gg: ASbGncswyStRG2IR2L2iA2Whfkt7f/hd8M0IgEOh+Gez7PhDm6hgtkHgAoRqvUi3eTu
+	F5raN2fH4Zu8eHtYnG5UejVLfeLIxnVFxg0nH0hGe13VKRTjbbwo+5JjvzcNRXw+mTh4dkvWIu7
+	pvH943ieKCL+sqLx1d8IioCe5HaVGZzDRCz7wHjYcACJLsc7d/2SktFeHfNOFzVdsMy42eZBae9
+	SbDBVz2fbOzh2IjFtCRVjJavDX/L8i3peVHyaTeFvlGkTGiiZ4vtuqqJMu362VWtAEADw/SPUUm
+	NsjVsO2L7BKENVWTzmYPgQQ9xKxxC8ovOT5PF1JKiZGmLA==
+X-Received: by 2002:a05:6000:1885:b0:390:fbdd:994d with SMTP id ffacd0b85a97d-39264694d6bmr4300667f8f.27.1741695000609;
+        Tue, 11 Mar 2025 05:10:00 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFs0csUBPlTbM/Cu4XdWOhmBdgqAf3K9Ljl//kp3p3I+7B7kyXy7IBboBlPsvDHYMFJWlRy/A==
+X-Received: by 2002:a05:6000:1885:b0:390:fbdd:994d with SMTP id ffacd0b85a97d-39264694d6bmr4300622f8f.27.1741695000161;
+        Tue, 11 Mar 2025 05:10:00 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-12-146.dyn.eolo.it. [146.241.12.146])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912bfdfba9sm18248074f8f.39.2025.03.11.05.09.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Mar 2025 05:09:59 -0700 (PDT)
+Message-ID: <62ae486d-621c-4b72-b9fa-d582f80cccd4@redhat.com>
+Date: Tue, 11 Mar 2025 13:09:57 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3ff973e5-5474-4112-81ad-46b745edd6a9@stanley.mountain>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 net-next 09/12] gro: prevent ACE field corruption &
+ better AccECN handling
+To: chia-yu.chang@nokia-bell-labs.com, netdev@vger.kernel.org,
+ dsahern@gmail.com, davem@davemloft.net, edumazet@google.com,
+ dsahern@kernel.org, joel.granados@kernel.org, kuba@kernel.org,
+ andrew+netdev@lunn.ch, horms@kernel.org, pablo@netfilter.org,
+ kadlec@netfilter.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, kory.maincent@bootlin.com, bpf@vger.kernel.org,
+ kuniyu@amazon.com, andrew@lunn.ch, ij@kernel.org, ncardwell@google.com,
+ koen.de_schepper@nokia-bell-labs.com, g.white@CableLabs.com,
+ ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
+ cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
+ vidhi_goel@apple.com
+References: <20250305223852.85839-1-chia-yu.chang@nokia-bell-labs.com>
+ <20250305223852.85839-10-chia-yu.chang@nokia-bell-labs.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250305223852.85839-10-chia-yu.chang@nokia-bell-labs.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Mar 11, 2025 at 02:49:43PM +0300, Dan Carpenter wrote:
-> On Tue, Mar 11, 2025 at 10:16:55AM +0100, Michal Swiatkowski wrote:
-> > On Mon, Mar 10, 2025 at 12:42:13PM +0100, Pierre Riteau wrote:
-> > > On Tue, 18 Feb 2025 at 12:56, Paolo Abeni <pabeni@redhat.com> wrote:
-> > > >
-> > > >
-> > > >
-> > > > On 2/14/25 2:58 PM, Michal Swiatkowski wrote:
-> > > > > On Fri, Feb 14, 2025 at 02:44:49PM +0100, Andrew Lunn wrote:
-> > > > >> On Fri, Feb 14, 2025 at 02:24:53PM +0100, Michal Swiatkowski wrote:
-> > > > >>> Pierre Riteau <pierre@stackhpc.com> found suspicious handling an error
-> > > > >>> from xa_alloc_cyclic() in scheduler code [1]. The same is done in
-> > > > >>> devlink_rel_alloc().
-> > > > >>
-> > > > >> If the same bug exists twice it might exist more times. Did you find
-> > > > >> this instance by searching the whole tree? Or just networking?
-> > > > >>
-> > > > >> This is also something which would be good to have the static
-> > > > >> analysers check for. I wounder if smatch can check this?
-> > > > >>
-> > > > >>      Andrew
-> > > > >>
-> > > > >
-> > > > > You are right, I checked only net folder and there are two usage like
-> > > > > that in drivers. I will send v2 with wider fixing, thanks.
-> > > >
-> > > > While at that, please add the suitable fixes tag(s).
-> > > >
-> > > > Thanks,
-> > > >
-> > > > Paolo
-> > > 
-> > > Hello,
-> > > 
-> > > I haven't seen a v2 patch from Michal Swiatkowski. Would it be okay to
-> > > at least merge this net/devlink/core.c fix for inclusion in 6.14? I
-> > > can send a revised patch adding the Fixes tag. Driver fixes could be
-> > > addressed separately.
-> > > 
-> > 
-> > Sorry that I didn't send v2, but I have seen that Dan wrote to Jiri
-> > about this code and also found more places to fix. I assumed that he
-> > will send a fix for all cases that he found.
-> > 
-> > Dan, do you plan to send it or I should send v2?
+On 3/5/25 11:38 PM, chia-yu.chang@nokia-bell-labs.com wrote:
+> From: Ilpo Järvinen <ij@kernel.org>
 > 
-> Sorry, no I didn't realize anyone was waiting for me on this.  Could
-> you send it?
+> There are important differences in how the CWR field behaves
+> in RFC3168 and AccECN. With AccECN, CWR flag is part of the
+> ACE counter and its changes are important so adjust the flags
+> changed mask accordingly.
 > 
+> Also, if CWR is there, set the Accurate ECN GSO flag to avoid
+> corrupting CWR flag somewhere.
+> 
+> Signed-off-by: Ilpo Järvinen <ij@kernel.org>
+> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> ---
+>  net/ipv4/tcp_offload.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+> index a4cea85288ff..ef12aee5deb4 100644
+> --- a/net/ipv4/tcp_offload.c
+> +++ b/net/ipv4/tcp_offload.c
+> @@ -329,7 +329,7 @@ struct sk_buff *tcp_gro_receive(struct list_head *head, struct sk_buff *skb,
+>  	th2 = tcp_hdr(p);
+>  	flush = (__force int)(flags & TCP_FLAG_CWR);
+>  	flush |= (__force int)((flags ^ tcp_flag_word(th2)) &
+> -		  ~(TCP_FLAG_CWR | TCP_FLAG_FIN | TCP_FLAG_PSH));
+> +		  ~(TCP_FLAG_FIN | TCP_FLAG_PSH));
+>  	flush |= (__force int)(th->ack_seq ^ th2->ack_seq);
+>  	for (i = sizeof(*th); i < thlen; i += 4)
+>  		flush |= *(u32 *)((u8 *)th + i) ^
+> @@ -405,7 +405,7 @@ void tcp_gro_complete(struct sk_buff *skb)
+>  	shinfo->gso_segs = NAPI_GRO_CB(skb)->count;
+>  
+>  	if (th->cwr)
+> -		shinfo->gso_type |= SKB_GSO_TCP_ECN;
+> +		shinfo->gso_type |= SKB_GSO_TCP_ACCECN;
+>  }
+>  EXPORT_SYMBOL(tcp_gro_complete);
 
-Sure, I will do it. Thanks for clarification.
+To recap: when an host implementing the above will receive a GSO_TCP_ECN
+train transmitted by a RFC3168 endpoint, it will re-assemble it in 2
+packets: a GSO one with !th->cwr and a non GSO one with th->cwr set.
 
-> regards,
-> dan carpenter
-> 
+When receiving a GSO train with constant CWR set on all the wire
+packets, it will assemble it in a single SKB_GSO_TCP_ACCECN packet.
+
+I think should work correctly.
+
+Side note: the SKB_GSO_TCP_ACCECN flag is required: NETIF_F_TSO_ECN
+enabled driver will likely unconditionally apply RFC3168-like TSO to any
+GSO packet carrying the CWR flag, regardless of the skb gso_type.
+
+@Eric: are you ok with this change?
+
+Thanks,
+
+Paolo
+
 
