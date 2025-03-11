@@ -1,173 +1,110 @@
-Return-Path: <netdev+bounces-173872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3516CA5C112
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 13:28:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B9ACA5C0F1
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 13:25:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 110D5189B5CF
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 12:22:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C74A16CDBD
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 12:21:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D12C25B679;
-	Tue, 11 Mar 2025 12:19:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eVaZnxYr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFCC225A327;
+	Tue, 11 Mar 2025 12:19:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD1C325A337;
-	Tue, 11 Mar 2025 12:19:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61D88259C89
+	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 12:19:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741695558; cv=none; b=GaxdlodhLspRbMKuRlAbNTHUe2yQvamDHhWUP/qVkZcXuqZnJfjOiZ79OYkDnQOLng8+D8F4lqgpsS2vCF/qXvBVqzqBy5KpgVYIlmXy+NqpvtsviavfLgRvZXLukpGuJmG566gyzEbxRw2x5s8HBfteRt7t74aJjRztTk5n97A=
+	t=1741695554; cv=none; b=bzJxLvFRy4zrJe37fPK8d/LKpK48kAbI9/Q66gXNXccD3VLd7WI0o/fPOHuKeE1fdlltB4nuWUJ/DtdbGdHRwy7Sm+ZzEitNX7K0gzBSU+LEB66aUxXsOwiiAIhkSEpZTjUbsDYX7gwI+wUrJ/n/eZYU5jZ3HhLTL0VWpetrjM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741695558; c=relaxed/simple;
-	bh=MLsMpE992zK7c/rp7wDJ8MLFrQZSgP8o8puAp87Eh7g=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=qXhtuVU2L5Mr3KE9mBCCJ2/MAOvYLmbPic4j6Pkqujn9zQQyYIfiB/cw+yhvybKP7qOfN9nPVg+XAjcnAWMBYW93Q/B1j1lATlWlzCa4wEZk21zH2652XgM/J26VxmWoYrJTnZ00L6c294SXNECUj5hsw5kJc7ykT4C6NaGFovo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eVaZnxYr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7E9AC4CEE9;
-	Tue, 11 Mar 2025 12:19:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741695557;
-	bh=MLsMpE992zK7c/rp7wDJ8MLFrQZSgP8o8puAp87Eh7g=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=eVaZnxYrJmme1pRqmXuM0b7KlF/OsCyV+/1WVsamjyn0u1n98t+jSvcvDwE2PHdXo
-	 PeVg0AA7+PE2eWEIBt7YlT6EaBDzyHSwJX4/sJOX7We3veteDkIGBpYL+lfkidUtm7
-	 6yxYSzKnThSg1nLR9QIZ8A3+r1GinXUhXsRUfZW67Ro29egFW2uB04XOYrnwUHmmoJ
-	 EI5iTq4Cyuk7wnoqTohDTwPaZdCbXNPmrLirmjt+s9OZ80yiPtugXvanuD964AXVE8
-	 gutE3VOjt2KYzmtgfgaW6TgR5btcKlKKiX+MGgjailwJ855zg68zCeZI0IPtYMKiWn
-	 j8uhqOxX7IfWQ==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Tue, 11 Mar 2025 13:18:39 +0100
-Subject: [PATCH net-next 7/7] net: ti: cpsw: Add metadata support for xdp
- mode
+	s=arc-20240116; t=1741695554; c=relaxed/simple;
+	bh=cUgPGh5p1BGwvpbxV5VbyGnJnRnzWJltzLsTN6o0Go4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=HkEJO39KOWTESCfiuxbIHjVxO8cE8LsrIEan/46shCqZgBDgKYVnhXD7DDo0udfipvzql+/D7BRRYNeJD9HPceMh2j9tdXHhUBQtYH/cnWBTVt5i5fhHmWCanfWTz4je6CG4hS8cE+1041AenYEr+DR/WRN54nhh/5B3ctehPn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4ZBt963VztzyRrq;
+	Tue, 11 Mar 2025 20:19:06 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id E2738180080;
+	Tue, 11 Mar 2025 20:19:09 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 11 Mar 2025 20:19:07 +0800
+Message-ID: <136f1d94-2cdd-43f6-a195-b87c55df2110@huawei.com>
+Date: Tue, 11 Mar 2025 20:19:06 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250311-mvneta-xdp-meta-v1-7-36cf1c99790e@kernel.org>
-References: <20250311-mvneta-xdp-meta-v1-0-36cf1c99790e@kernel.org>
-In-Reply-To: <20250311-mvneta-xdp-meta-v1-0-36cf1c99790e@kernel.org>
-To: Marcin Wojtas <marcin.s.wojtas@gmail.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
- Masahisa Kojima <kojima.masahisa@socionext.com>, 
- Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, 
- Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>, 
- Bharat Bhushan <bbhushan2@marvell.com>, Felix Fietkau <nbd@nbd.name>, 
- Sean Wang <sean.wang@mediatek.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- "K. Y. Srinivasan" <kys@microsoft.com>, 
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
- Dexuan Cui <decui@microsoft.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
- Roger Quadros <rogerq@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
- linux-hyperv@vger.kernel.org, linux-omap@vger.kernel.org, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.2
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next] page_pool: Track DMA-mapped pages and unmap
+ them when destroying the pool
+To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>, Yunsheng
+ Lin <yunshenglin0825@gmail.com>, Andrew Morton <akpm@linux-foundation.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
+	<ilias.apalodimas@linaro.org>, "David S. Miller" <davem@davemloft.net>
+CC: Yonglong Liu <liuyonglong@huawei.com>, Mina Almasry
+	<almasrymina@google.com>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, <linux-mm@kvack.org>, <netdev@vger.kernel.org>
+References: <20250308145500.14046-1-toke@redhat.com>
+ <d84e19c9-be0c-4d23-908b-f5e5ab6f3f3f@gmail.com> <87cyepxn7n.fsf@toke.dk>
+ <2c363f6a-f9e4-4dd2-941d-db446c501885@huawei.com> <875xkgykmi.fsf@toke.dk>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <875xkgykmi.fsf@toke.dk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-Set metadata size building the skb from xdp_buff in cpsw/cpsw_new
-drivers
+On 2025/3/10 23:24, Toke Høiland-Jørgensen wrote:
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/ti/cpsw.c     | 6 +++++-
- drivers/net/ethernet/ti/cpsw_new.c | 6 +++++-
- 2 files changed, 10 insertions(+), 2 deletions(-)
+>>
+>> I guess that is one of the disadvantages that an advanced struct like
+>> Xarray is used:(
+> 
+> Sure, there will be some overhead from using xarray, but I think the
+> simplicity makes up for it; especially since we can limit this to the
 
-diff --git a/drivers/net/ethernet/ti/cpsw.c b/drivers/net/ethernet/ti/cpsw.c
-index 0cb6fa6e5b7d4fb9703633f0d67a7e95e6e7d8aa..a984b7d84e5e5917b83547c862924ccd30d83601 100644
---- a/drivers/net/ethernet/ti/cpsw.c
-+++ b/drivers/net/ethernet/ti/cpsw.c
-@@ -351,6 +351,7 @@ static void cpsw_rx_handler(void *token, int len, int status)
- 	int			ret = 0, port, ch = xmeta->ch;
- 	int			headroom = CPSW_HEADROOM_NA;
- 	struct net_device	*ndev = xmeta->ndev;
-+	u32			metasize = 0;
- 	struct cpsw_priv	*priv;
- 	struct page_pool	*pool;
- 	struct sk_buff		*skb;
-@@ -400,7 +401,7 @@ static void cpsw_rx_handler(void *token, int len, int status)
- 			size -= CPSW_RX_VLAN_ENCAP_HDR_SIZE;
- 		}
- 
--		xdp_prepare_buff(&xdp, pa, headroom, size, false);
-+		xdp_prepare_buff(&xdp, pa, headroom, size, true);
- 
- 		port = priv->emac_port + cpsw->data.dual_emac;
- 		ret = cpsw_run_xdp(priv, ch, &xdp, page, port, &len);
-@@ -408,6 +409,7 @@ static void cpsw_rx_handler(void *token, int len, int status)
- 			goto requeue;
- 
- 		headroom = xdp.data - xdp.data_hard_start;
-+		metasize = xdp.data - xdp.data_meta;
- 
- 		/* XDP prog can modify vlan tag, so can't use encap header */
- 		status &= ~CPDMA_RX_VLAN_ENCAP;
-@@ -423,6 +425,8 @@ static void cpsw_rx_handler(void *token, int len, int status)
- 
- 	skb_reserve(skb, headroom);
- 	skb_put(skb, len);
-+	if (metasize)
-+		skb_metadata_set(skb, metasize);
- 	skb->dev = ndev;
- 	if (status & CPDMA_RX_VLAN_ENCAP)
- 		cpsw_rx_vlan_encap(skb);
-diff --git a/drivers/net/ethernet/ti/cpsw_new.c b/drivers/net/ethernet/ti/cpsw_new.c
-index 3da1c131335df1ff79b32ce0e3ea5200a2e53f4b..5b5b52e4e7a757a14965fe6df41935aed547111f 100644
---- a/drivers/net/ethernet/ti/cpsw_new.c
-+++ b/drivers/net/ethernet/ti/cpsw_new.c
-@@ -293,6 +293,7 @@ static void cpsw_rx_handler(void *token, int len, int status)
- 	struct page_pool *pool;
- 	struct sk_buff *skb;
- 	struct xdp_buff xdp;
-+	u32 metasize = 0;
- 	int ret = 0;
- 	dma_addr_t dma;
- 
-@@ -345,13 +346,14 @@ static void cpsw_rx_handler(void *token, int len, int status)
- 			size -= CPSW_RX_VLAN_ENCAP_HDR_SIZE;
- 		}
- 
--		xdp_prepare_buff(&xdp, pa, headroom, size, false);
-+		xdp_prepare_buff(&xdp, pa, headroom, size, true);
- 
- 		ret = cpsw_run_xdp(priv, ch, &xdp, page, priv->emac_port, &len);
- 		if (ret != CPSW_XDP_PASS)
- 			goto requeue;
- 
- 		headroom = xdp.data - xdp.data_hard_start;
-+		metasize = xdp.data - xdp.data_meta;
- 
- 		/* XDP prog can modify vlan tag, so can't use encap header */
- 		status &= ~CPDMA_RX_VLAN_ENCAP;
-@@ -368,6 +370,8 @@ static void cpsw_rx_handler(void *token, int len, int status)
- 	skb->offload_fwd_mark = priv->offload_fwd_mark;
- 	skb_reserve(skb, headroom);
- 	skb_put(skb, len);
-+	if (metasize)
-+		skb_metadata_set(skb, metasize);
- 	skb->dev = ndev;
- 	if (status & CPDMA_RX_VLAN_ENCAP)
- 		cpsw_rx_vlan_encap(skb);
+As my understanding, it is more complicated, it is just that complexity
+is hidden before xarray now.
 
--- 
-2.48.1
+Even if there is no space in 'struct page' to store the id, the
+'struct page' pointer itself can be used as id if the xarray can
+use pointer as id. But it might mean the memory utilization might
+not be as efficient as it should be, and performance hurts too if
+there is more memory to be allocated and freed.
 
+It seems it is just a matter of choices between using tailor-made
+page_pool specific optimization and using some generic advanced
+struct like xarray.
+
+I chose the tailor-made one because it ensure least overhead as
+much as possibe from performance and memory utilization perspective,
+for example, the 'single producer, multiple consumer' guarantee
+offered by NAPI context can avoid some lock and atomic operation.
+
+> cases where it's absolutely needed.
+
+The above can also be done for using page_pool_item too as the
+lower 2 bits can be used to indicate the pointer in 'struct page'
+is 'page_pool_item' or 'page_pool', I just don't think it is
+necessary yet as it might add more checking in the fast path.
+
+> 
+> -Toke
+> 
+> 
 
