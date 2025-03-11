@@ -1,353 +1,284 @@
-Return-Path: <netdev+bounces-173729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCAD2A5B6F2
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 03:51:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AC4DFA5B6F6
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 03:54:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85B843AB0D8
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 02:51:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 562223AF2B7
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 02:53:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AACCD1DF25C;
-	Tue, 11 Mar 2025 02:51:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8566C1E520B;
+	Tue, 11 Mar 2025 02:54:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PwOPzOni"
+	dkim=pass (2048-bit key) header.d=toshiba.co.jp header.i=nobuhiro1.iwamatsu@toshiba.co.jp header.b="CepyYV5+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mo-csw.securemx.jp (mo-csw1802.securemx.jp [210.130.202.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2AB81E2852
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 02:51:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741661479; cv=none; b=sR7OLxeKKAYv65FpDuGmmB7RG5WqISLLddyE098XckItFb+196RnUOhsdUzrjQIQZ1cF5IxNRwQcO2TyRfpZCqv47I9/TzOI3lrTTaK3Am3DtMHT24W4kXu1whUoBHV/CTbReIJH+VPDrSYg91Y2iHlCUkzcUxjzQgt93FcHtrw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741661479; c=relaxed/simple;
-	bh=HuChv44+qS7p5GEMDRAJkr89Crrk0/yUnOuJ4wNsB94=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=t/Fun1ZVO0ZsEpW/sr6ruKAdd8zDei0Y7m4CorPF5k+AhsIjAajuPV1id9mImyOT+ywQvSGHFsXo7U4bLqZSi2gC93CUK2wkG3F368HmZ3UqwfyFU6EEMxJEOzjqMf4k53XAKzVilObeJScVwIEjljAmF7Uea6r3oJqUxQ+EI+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PwOPzOni; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-475a77bbd8cso48284521cf.3
-        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 19:51:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741661476; x=1742266276; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QWI+6olb4mBRRsRuCZ3YDJ0QJoIiUYcy9vvrFY/gGuE=;
-        b=PwOPzOni4I5MU1Gs2PZ83HiPE9x5GNs3zog96Sqe15BzDf8CDVltBHpPxEB5eMoAu0
-         ICIp9ZLMIdHVq5AHk1nN540FxSwRddxD+PevV4cWTDCmeOxdhP2CsJo8IVIz76alu5W7
-         CvMragR1W6tD2BDFWUNJIf4tqmoLmZHOpH36OMJusvgCNwmJtMZCKToRDN1JBj85/+Yb
-         afq6gzUt/qbH4mTmdOuaguI6oLnmWd1EYe+NONvQas+vxRi8kvGKoA6uxPgqAoyyxqhE
-         Aji6IMxm4hcKVAct47HY/OlprMxAlRYzVIjJ11meVAGoswlQHDrUgv8ejWxlwuAYHZWv
-         bGHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741661476; x=1742266276;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=QWI+6olb4mBRRsRuCZ3YDJ0QJoIiUYcy9vvrFY/gGuE=;
-        b=RAdX024UZzzFKuw7p1fPBuUeSgxH3BbxTSJD3gn7oNOe+hfp1qto1st5p660tCTe+w
-         yq3qzDp+PI8bLGJFeyryYabO954gM9rDveNqFqtpSjuhQyJCHPnwSW3MwiD+66dX7o6v
-         +e+RvmlXui/MMIAFPHPYNnCdOdRHyRyXsRZDvjLsWpQ+Mx7zpGTZk5JfBU0BL72fMmax
-         I0BMmxyWD7qi1loGEnDctnArSBK5RNEsJjeYhYdwk/GJW/QQl4H5XVLLTRIdpTP9Glfa
-         ejffAYK7cJQOEDdsE1CyCtq5XH7gxopwc5Nws1r97SwV+HexCZvtoljpWe/Z5Qo+5y0v
-         uArA==
-X-Forwarded-Encrypted: i=1; AJvYcCWUPitMpPapNM7G0srrXmMROCKInFglU4CKFetSy8Mpi5Jeyw69XNZVj983Vm188GWmWB/kG2A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNmfjSxs1AiC0uck5cLMh9OuERqNGlBwaqtAHZkjJ5PPm8wAEi
-	vDk5GUS7C3o16Xdrtv7e/PHYgkv+JRd5jEJlkcnaIm1Wo+eF59gifbm0Eg==
-X-Gm-Gg: ASbGncswmTrpg23kqsg3aUw1qt9sj0DjxqGYB5xzJKZKfMzQr3OlQYyBTKyP1yWwP2X
-	U7xGfyU4j8cDW+glmUpnpFBDYT1kKTMBLVeAth3sw1QU55kpLl3JlmNQI0iRvL2Id7RIeO/2+Ck
-	IfWgFpvj4jvD9S5gd8P5f1j8VhcV8CqekM6HpG0AX02kmc0ego005bBQWalSULze8ImeKZdE/eq
-	YE5shMpkBtshPS0g6/nKoRrAwD9QO8gpm4PKKtdDjaX+r/3n8pur4ml0HVCIfA3dIzQ6ZLHm0aR
-	PArrZfFzI+BhPp5+tqEZCLwUYFCtPd2YKcbMzYVmAfzjsgsNgYyS2dOXj0M4lmsaO+21mCMNE1k
-	CiUxvhWV4HAA9MeV8+wBrLw==
-X-Google-Smtp-Source: AGHT+IGBg+z0HkESzOCbLYzuhZ00ClouhB+WhQhxdLU4t9oCNGUe/0AKhQ/vyshZRB1n6CnDoiVCSQ==
-X-Received: by 2002:a05:622a:7ace:b0:471:fa92:9237 with SMTP id d75a77b69052e-47618adda5emr162483751cf.37.1741661476502;
-        Mon, 10 Mar 2025 19:51:16 -0700 (PDT)
-Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-47663e9eb4esm40834691cf.76.2025.03.10.19.51.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Mar 2025 19:51:15 -0700 (PDT)
-Date: Mon, 10 Mar 2025 22:51:15 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Simon Horman <horms@kernel.org>, 
- David Ahern <dsahern@kernel.org>, 
- kuniyu@amazon.com
-Message-ID: <67cfa5236c212_28a0b329453@willemb.c.googlers.com.notmuch>
-In-Reply-To: <b65c13770225f4a655657373f5ad90bcef3f57c9.1741632298.git.pabeni@redhat.com>
-References: <cover.1741632298.git.pabeni@redhat.com>
- <b65c13770225f4a655657373f5ad90bcef3f57c9.1741632298.git.pabeni@redhat.com>
-Subject: Re: [PATCH v3 net-next 2/2] udp_tunnel: use static call for GRO hooks
- when possible
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A0081DF27D;
+	Tue, 11 Mar 2025 02:53:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=210.130.202.152
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741661642; cv=fail; b=g05o6T2sVRsT8tVdN5Nl659GeH6Q2YYSxMGH267QtAiqDoJoMhWd3ToVq3Ieb7o22XKczef1HKjqykz2b2GfTCcnLxlkCzj54L8TsCMhKKYd6tPT8R3yX6ybDx02MrcCTtJ03+/WvqBnp+A77wJ4L6H/nO8h91T8y8fC4k5cnSo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741661642; c=relaxed/simple;
+	bh=kOyMXra9tx1tiz15mH5EirzFVKukx7gMLdH5u3dYsNE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=iqaptPG57kTXa0C+9fL9bOVBueC5jxW1ek3Cm8O7UMUOVU5C6kYaQU8Q/7LE1zIa4hXDuz0GDuLUpTHBR5w+lylsVYLXJWkJXlxqIHrdgcqIlOjV+ZlxQPflSuBrkSWkeyvH81BZaPnf3V6AmUo/VlJn7ywPrs1007OnizxII+k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=toshiba.co.jp; spf=pass smtp.mailfrom=toshiba.co.jp; dkim=pass (2048-bit key) header.d=toshiba.co.jp header.i=nobuhiro1.iwamatsu@toshiba.co.jp header.b=CepyYV5+; arc=fail smtp.client-ip=210.130.202.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=toshiba.co.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=toshiba.co.jp
+DKIM-Signature: v=1;a=rsa-sha256;c=relaxed/simple;d=toshiba.co.jp;h=From:To:CC
+	:Subject:Date:Message-ID:References:In-Reply-To:Content-Type:
+	Content-Transfer-Encoding:MIME-Version;i=nobuhiro1.iwamatsu@toshiba.co.jp;s=
+	key3.smx;t=1741661511;x=1742871111;bh=kOyMXra9tx1tiz15mH5EirzFVKukx7gMLdH5u3d
+	YsNE=;b=CepyYV5+aTHQ8hfuYC2XupdKKlftNwn5kYKg5jWfqwdBBPXHSrLViwwO1TLUp6Yox4iv2
+	+4TZtv7DBDPMi/ycEPtGChyYhk1QVGhvxSPti8KUuT9xD4ahs698RjzddLIFeA84OKCq0iujxUM2m
+	0yKM0RqV9ov/y3H9jjYKSDYWSTca7PzlrJjGDWOC1HCP/UrBSi1f/+uH4wNz2KByTlEI9PqlT7YNf
+	lqlBUqrLrqrglhiBpkenVdG7JcLaXH/B6zzwg8z2Qf0avE6lexxqECPWnuXOujb/DLeDWBHUjJbpA
+	Xm2lbVll4qqUD+75dSVT+J4tE1hJqOcME3SNvoSNIw==;
+Received: by mo-csw.securemx.jp (mx-mo-csw1802) id 52B2pmaD2906371; Tue, 11 Mar 2025 11:51:48 +0900
+X-Iguazu-Qid: 2yAbuzQy1XRZSQHHOT
+X-Iguazu-QSIG: v=2; s=0; t=1741661507; q=2yAbuzQy1XRZSQHHOT; m=nSx6m3gyVmsSceJkTgkJU4th1Rq2yCpeQUqzRA80AgI=
+Received: from imx12-a.toshiba.co.jp ([38.106.60.135])
+	by relay.securemx.jp (mx-mr1802) id 52B2pfFw1419632
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Tue, 11 Mar 2025 11:51:43 +0900
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=eE5fK+hYesmD2Ef2aPUuVw7upfU5gRF/P2qMsmxJhSGE7Bwr3w1XcF85N66SXBXhgBj++Fwe+XZYA2Vd8AXZ6kWG/uEaw5aLwT0jhKbeDkVWEGFD8Xr1klqpgGfZS+M7l0LJs1BHNb25lZRluPrZETa73oB7rchrxU2KrVzdoZzf3q+uEfu+3C4yUc+tblnmSGVg/zws68f3NCJl4jYr+30VmyJCW67/yqUFdjCM4PWY6vlQkj+ceYleak7ub9dke9UZMWH/2NnZ5GfNOt1JAAta4M5XQBEc1XHAGtL/Dug7ZmYxcyM73tdu083NjOAmpGbyQCvG0s7KYuqWL6aVhg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/ecrAQ0g+Q+kzOINfhj9FoHm6E+mIMSLrB4OWo0S6es=;
+ b=ZaKxlW0W5HH54bPyjX1EVqV+sotu2YWU6cGXl4joa3+8hSPaZy2PWgaMR953Ui2WZkRz28UO76XiMdHqYizf8clrDlLRU28OVFfydH77Z43u/AGwSdOdtzEdJpZlMLEbVKwW7cwJzpDSXFHikt1RkB7Wi2/qWxXLiVMhu96Ib+tQSdWAe/nk1Z1DmPlHuR5PwAKiMK482Cu7FavRhiZ84btQ1ibJY9BTfC7T4VsCg72X4U3gkMp0F91hqzahKTqvcXzIJmgt9cMfX/k+TZILNtTItU8p/IArk01bb7mvkLIHn3jA3ureYPOAWBRZQUZ+C+SR4qdXAr1tMkCqWhOTiw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=toshiba.co.jp; dmarc=pass action=none
+ header.from=toshiba.co.jp; dkim=pass header.d=toshiba.co.jp; arc=none
+From: <nobuhiro1.iwamatsu@toshiba.co.jp>
+To: <prabhakar.csengg@gmail.com>, <andrew+netdev@lunn.ch>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <robh@kernel.org>, <krzk+dt@kernel.org>,
+        <conor+dt@kernel.org>, <neil.armstrong@linaro.org>,
+        <khilman@baylibre.com>, <jbrunet@baylibre.com>,
+        <martin.blumenstingl@googlemail.com>, <shawnguo@kernel.org>,
+        <s.hauer@pengutronix.de>, <kernel@pengutronix.de>,
+        <festevam@gmail.com>, <heiko@sntech.de>, <mcoquelin.stm32@gmail.com>,
+        <alexandre.torgue@foss.st.com>, <matthias.bgg@gmail.com>,
+        <angelogioacchino.delregno@collabora.com>,
+        <vineetha.g.jaya.kumaran@intel.com>, <biao.huang@mediatek.com>,
+        <xiaoning.wang@nxp.com>, <linux-imx@nxp.com>,
+        <david.wu@rock-chips.com>, <christophe.roullier@foss.st.com>,
+        <rmk+kernel@armlinux.org.uk>, <netdev@vger.kernel.org>
+CC: <devicetree@vger.kernel.org>, <linux-amlogic@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <imx@lists.linux.dev>,
+        <linux-rockchip@lists.infradead.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-mediatek@lists.infradead.org>,
+        <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: RE: [PATCH net-next] dt-bindings: net: Define interrupt constraints
+ for DWMAC vendor bindings
+Thread-Topic: [PATCH net-next] dt-bindings: net: Define interrupt constraints
+ for DWMAC vendor bindings
+Thread-Index: AQHbkIrfy9b5BBS/D0ihD4P7fHbQtbNtPxyg
+Date: Tue, 11 Mar 2025 02:51:37 +0000
+X-TSB-HOP2: ON
+Message-ID: 
+ <TY7PR01MB148181E9FA1336D0D3CE9275A92D12@TY7PR01MB14818.jpnprd01.prod.outlook.com>
+References: <20250309003301.1152228-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+In-Reply-To: 
+ <20250309003301.1152228-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+Accept-Language: ja-JP, en-US
+Content-Language: ja-JP
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=toshiba.co.jp;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: TY7PR01MB14818:EE_|TY3PR01MB11931:EE_
+x-ms-office365-filtering-correlation-id: 301f50ff-8626-44e8-ccfa-08dd6047a45f
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: 
+ BCL:0;ARA:13230040|1800799024|366016|376014|7416014|38070700018|921020|95630200002;
+x-microsoft-antispam-message-info: 
+ =?iso-2022-jp?B?Mkt5WjdHa2dPa0tLNTZYdThxNzJvVjhlQ1MzQ1dTek00ajU3aHI5d0V3?=
+ =?iso-2022-jp?B?ZHFNakxuK2l1bzJ3blVrV2pCTmU5Z1NHZHJlSFlNV0Q2a21lK3QxZ0s3?=
+ =?iso-2022-jp?B?OE54cWFiTmtmYklIc0FFSWVOK1cwWWhrWkFwcHNzT1NKQnJwa08wcVRy?=
+ =?iso-2022-jp?B?bHZuT2hXbEFFb3FGK2FBT0YxQkQ1dmFNWlZ2N0FYVmptWGVZdHN2S0hO?=
+ =?iso-2022-jp?B?aEI4UXNvaWQ4ejZnRndIV0F2OUt0S1hHTlB0ZWx4SVIxZVR4NzNiTExE?=
+ =?iso-2022-jp?B?RzErRUhzVU1UQmNXKzRxMlZBeTNZQlUzU3psWWo1NElCY0IwTGZMWGxs?=
+ =?iso-2022-jp?B?VUcxRWN4NnRMV1pxQ283cVE5N3dWS2dKa1NuYVlnU2JUZFNJUTBCRVN1?=
+ =?iso-2022-jp?B?VzVQSzhjUmhydEVkcXNQU2NaUk9Hb0ZMVTZVUUlGa2UrcUt6MTNZTHJ6?=
+ =?iso-2022-jp?B?ZFBxZHF6bnVLbSt0TkhDR0lVd3lGSTk3Rll2dTNkZlFlekRWbkxVUU1X?=
+ =?iso-2022-jp?B?VlZNeWZsTDBsRWFqMmtXM0NwY0huYVFEL2NJTmxXWkc1SXMzbVViMExO?=
+ =?iso-2022-jp?B?bHQ5UTQwRkNZQlpOZTFaOVpGM3IwV2txVGRUYWJEVm95Z3oxMUlReENj?=
+ =?iso-2022-jp?B?Y3V1QXN2cnB4aGYvYVAxdFBPVkxITUxZQjJOZDRtU25YZzAvWVJiR2xD?=
+ =?iso-2022-jp?B?QnRZMzBRWTVma3JFVFZFcXdoWkJqSzRjNmkvaU5DSFFTN1Z3S3Q1N080?=
+ =?iso-2022-jp?B?Zm85SCtZdXo1Rk1wc1hhbmpPcEFtdVdBVXBNREtQMGdWTWJxeXdwVndL?=
+ =?iso-2022-jp?B?SEltbG9vaU9DSGVlN2lSTVo3RmlBTklOWnFGRFlWRXVtS0JhSU5kUnpN?=
+ =?iso-2022-jp?B?ejc0MUh6NVBmSHdMUEZleUw5bTBNeVkrbFRudGgzVnBrZEZZbWhBVzFs?=
+ =?iso-2022-jp?B?YnBkbHptbmp1ZEpVVDI4RjgyQzQ5K0U4N0ZnWjJyS2haWUpJYTRXN0Uy?=
+ =?iso-2022-jp?B?MjlEZ1A5Q1I1c3VJU3oxQWlLYnFjQUVjcHBlZER4ZFNZSkd0cTE1Q1FK?=
+ =?iso-2022-jp?B?ajF4elNSYWlBYmNwa29ieEdoNjVFU2FwNUlUeDhuejZRa2hiTzdkbkVX?=
+ =?iso-2022-jp?B?bUxDeS9XUFlURytGSWM1Uis3dXhsTzV6TE9BNEdSRmJiWFh0cTZkekx1?=
+ =?iso-2022-jp?B?dlNPbUVEZU9ibTFKU1FBeWViVEZlMStnSHNqNkRjRVRiYVpteEhWcGMr?=
+ =?iso-2022-jp?B?VmpTWTdaU2RFbGN4dTFuNFcyM2lwQ2pLYVJmd2NPL0oxd2FLVWlERUhC?=
+ =?iso-2022-jp?B?YmxiUEIrUlM2OWpJN2lTV2MzUGY1dHhPVVd4VFFReTNYc2Q1ak8xdjg3?=
+ =?iso-2022-jp?B?SWdwNlZlVVhnZFpMVzNaNTFKc2ZUYkVrdWlHUmFRKzlsK3U3bkxwRWdy?=
+ =?iso-2022-jp?B?emFyV3Z5cEY2a25wQ2lKSGF3MjhpaEhBbVpPUncrT3RKYU1WWlBObzZl?=
+ =?iso-2022-jp?B?S1dYVUgrcVdMbGVKUW9WcDlzUm9RekdyWStia1doUVNhNTR6VnZRYmx3?=
+ =?iso-2022-jp?B?UmE1aXhqd3NOOWo4Z0pnRjN2bTNRNmsrZUFOY0hjU0lsbEN6MHM0SVUx?=
+ =?iso-2022-jp?B?byt3R0FHdmxIRzE3U1g1dVBzOStzYUVVUVVmaUVRa0VPd3RRK1loZXVa?=
+ =?iso-2022-jp?B?L2QvMmlZejBXcUx2OXJnODZvS1hSeklYVy93eUpYTldxS2NxcVl2bFFy?=
+ =?iso-2022-jp?B?emJjRDNMeEEvTVdBc3pjT1dlRm8rS3FubHdROG9PUDFWVnkrWGpNMWc4?=
+ =?iso-2022-jp?B?OGdOWHIxVk8zV29Fa2xuKzk0OFp4QVIwMGZnSldJNm44dDhOS2dHcW1E?=
+ =?iso-2022-jp?B?SHl6NkI1NzNySkx2dzliRVdtblVydTNtbnpmRzZNU2FKTDJVb3AyaXFz?=
+ =?iso-2022-jp?B?RUM1ai91OUk3dUZUL290TnYzV2pEbGZOaUh3d1pHUkJ2bTNta2hWMllp?=
+ =?iso-2022-jp?B?M1Bzb1J1Sy9EREFnRWFaaEhHblpRZFZuUzdlc1lMb3ZseCtPc3l5cEJx?=
+ =?iso-2022-jp?B?bnlSRlFVcVNWblNvRG45RXl5T1p5V1A2cWw5MW96dlZlSnFZNHF0WkYx?=
+ =?iso-2022-jp?B?RzlJWTNEMWZobDBFRlFLNG5DV3lOL1VmcURIeTlGOU96bVpUWXlSd1N3?=
+ =?iso-2022-jp?B?RHJJPQ==?=
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:ja;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY7PR01MB14818.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(38070700018)(921020)(95630200002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?iso-2022-jp?B?NmthQTJyT003Y3ZFS1BIckwwTVJJRWtYZXovVytBUXU1N1FnVDRlZWow?=
+ =?iso-2022-jp?B?enUyTHRkSFppeVFORkE2blBLWUNNUTlkNWRSM1I2TFMxajZiVXFTc0hl?=
+ =?iso-2022-jp?B?N3htYnMzTEduRmdpQ21VQkQvUzFHV3Y1TS9aQ1ZuVld6Z1U0WVRadTcr?=
+ =?iso-2022-jp?B?QTZhVS8wOFc5bStTY2NXb0ZQQjJZSXJkNW9MaGs3RXBiOUtBU2pnd01z?=
+ =?iso-2022-jp?B?NzJFMndJcXpTTlBRWnUrbHRweG5IN0dCR3Q2VS9jOVhDU0lhSUNIamVv?=
+ =?iso-2022-jp?B?R3dGWVE3UllPMTR4U05aK2FUS3E3MVVqKzdTWlp0V1ZsbTNOR0pVZWZ4?=
+ =?iso-2022-jp?B?UGl4d0RNS0tqdDdwakRCMXdtZERrbDBIOXpvNDBKTTVsaDc0cG9Jam1h?=
+ =?iso-2022-jp?B?UlhVMzBRVmFmcnU2aXhnMktIVkVvNjc3WGtyUGFZaG5zLzNIakhYUHZt?=
+ =?iso-2022-jp?B?SkZQN3ZUYnNMWEU0LzV1WExkcjMySEtjRUpOUTZWcjZxRzJsK0dtZFRO?=
+ =?iso-2022-jp?B?enFVblZHVjlqTmJteGFLeDYyZzkzMkY2RjcrK3N4SnJoRVhjUkk1bUIv?=
+ =?iso-2022-jp?B?bU0zMXRVS2VpUHdlalE2ZWw5TGlESVJiQktoY2JIRkNlRXIzWFBJemQz?=
+ =?iso-2022-jp?B?T2Q1SDBDZDEwemkrcmgvaHVPSXhFOUxuZGJzM3luTjVGZTZaMzhQS1oy?=
+ =?iso-2022-jp?B?YlZOL2p3UVI1VHhiV2J4U05Ja2Q5YXd5V1lMVUxhMktrK0hscjJWNity?=
+ =?iso-2022-jp?B?S3dCY0RtT2FuVzlEWFpXL1cvazFCelV5QW8rWXREMlUrUm1YT0ZsbmFR?=
+ =?iso-2022-jp?B?Y2EyZlJGNGVySTA2dyt4ZDd6QlA0STZIVi9LNUdTekZ6VVQ4b2pXRnZN?=
+ =?iso-2022-jp?B?NHdFeVF2YkZaWW1sVjFlWE92ZjVaVkpVdERhVWpUS0NHdGg3Q1JGaXBH?=
+ =?iso-2022-jp?B?dy9HUWFKeHQxY1dQYmpwczNYVmZuZitJODJ2UjFnU0JNVTJDdjd6N1ZS?=
+ =?iso-2022-jp?B?QzhqQVNiM2ZaUGZlUVF3MVZBeWQ4YTNKWFVJY001Wmt3WnhGMm8zemlt?=
+ =?iso-2022-jp?B?K1VkakdGWWx3cVZtYzNzTWxjaHhaOHdXL2JnOTF1U3JJRklpMDBCRVh0?=
+ =?iso-2022-jp?B?WDZuN09EMzc2YnJ0S2U0WEtHeXJsNk95V1NrTVlRa2Q0aXp5WVZ4TjNh?=
+ =?iso-2022-jp?B?QjVGL0tudGdoUldscVRCV1dtSEVyay9NbUY1RjBiaW5GWVBMdW1adXFU?=
+ =?iso-2022-jp?B?Nml4UTJyQlFKQ2NLUzljOThrUW0wRzJJb1djNDBoUWFGb3BqQ2pUNGV3?=
+ =?iso-2022-jp?B?UG9aMXI0eXl6TVpUUjJkcy9DQWw0V0Y2TXV4VXZ3azZkaVoyL3lwTEp3?=
+ =?iso-2022-jp?B?SVNlODR5R2FYNG9RQ2xPL1VlcG8zb05xSjFNWjcxcmg4RUlBL3BqR2Ju?=
+ =?iso-2022-jp?B?cXhrcDNmUWZDWU9vZEpJOWtsTHJTV2Zrd2ZjUjg3UzhxTmNpZW5HMGxE?=
+ =?iso-2022-jp?B?ZGozYnJJcXJCWGpiQldYVWVqeWRSK2tJT2psMDFvSUpaSG9teDZqS3pE?=
+ =?iso-2022-jp?B?WVhiYmJUWG5ZZGNrcDlSanl2NjdiMVNpSXV1VlR1aEZqbmRaWGowcVBI?=
+ =?iso-2022-jp?B?OU5wQ2htbUZtdWJPekdvNlUvcTBELzJTNGZzUUEzUW1VZmJ2SVV3RXU1?=
+ =?iso-2022-jp?B?UGVPVi91QzdROUU2ZVc1MlhUZDhLdDE5N1RzZTJqRzJVbG9Ba3MvSjZn?=
+ =?iso-2022-jp?B?Vm1reGd5TmlVcmVreW5JYW55NEU0Y1FRRHhoQ25JVXlYUzV1emRKNEFT?=
+ =?iso-2022-jp?B?OVpSUmJaeWo1bmUyblRqTjRscFovRnJVVStZTm5kc3ErZ04xTEhJL3Jh?=
+ =?iso-2022-jp?B?Q0g5bEU5WUdVc3hpb0dmdExMdVYxMCtsTk1XYXFJcVFidmkzbnN6MzBH?=
+ =?iso-2022-jp?B?MjhaT1F4OTZpWkY2emY5MHZLMDEzOThtU0JhQ1RqL1paN2tOTUJ6NEw3?=
+ =?iso-2022-jp?B?eUVCVzRLUEhwTWJGQ1I1clVWMjR6T0NlSTdJTmkzT1IwbVNPaFBUM2cz?=
+ =?iso-2022-jp?B?OWJtdVhzcGZjbys0NzJSM1RGdVpVUXNKeWN1eWM4SlJHblVEZXViVDk0?=
+ =?iso-2022-jp?B?VzZRZWhTeUtrRkFtZ2JTdHl5YmJIbU5aN3pWRmRvQWRhVjd0aXpubGU0?=
+ =?iso-2022-jp?B?L242OUMvWVhPWGlwTGVudkNpVWREUDg5ZFJxazNqeWZKaVRJckN1VzlQ?=
+ =?iso-2022-jp?B?SzN5UlNEK2NBTVh5Y3ltSS9abUhZMDQyYmZ0REhTS284TWFML09uUkZV?=
+ =?iso-2022-jp?B?aWtOdFgwd1ZoZmljWDFNYkJST0lGRHArMUE9PQ==?=
+Content-Type: text/plain; charset="iso-2022-jp"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+X-OriginatorOrg: toshiba.co.jp
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: TY7PR01MB14818.jpnprd01.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 301f50ff-8626-44e8-ccfa-08dd6047a45f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Mar 2025 02:51:37.2972
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: f109924e-fb71-4ba0-b2cc-65dcdf6fbe4f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: LJkWU0SXAJ01J31i0RVe49Fed6AkGM9zbgO1L1qUvXxW3KzKbnYQDJhBuoLtounV8zRx5hvnGNf3wSG7lFypCehKjCiTG9mxh4wa23DhFQkjIu9bdqnKnJYzLRy3v+xT
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TY3PR01MB11931
 
-Paolo Abeni wrote:
-> It's quite common to have a single UDP tunnel type active in the
-> whole system. In such a case we can replace the indirect call for
-> the UDP tunnel GRO callback with a static call.
-> 
-> Add the related accounting in the control path and switch to static
-> call when possible. To keep the code simple use a static array for
-> the registered tunnel types, and size such array based on the kernel
-> config.
-> 
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Hi,
+
+> -----Original Message-----
+> From: Prabhakar <prabhakar.csengg@gmail.com>
+> Sent: Sunday, March 9, 2025 9:33 AM
+> To: Andrew Lunn <andrew+netdev@lunn.ch>; David S. Miller
+> <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
+> Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Rob Herring
+> <robh@kernel.org>; Krzysztof Kozlowski <krzk+dt@kernel.org>; Conor Dooley
+> <conor+dt@kernel.org>; Neil Armstrong <neil.armstrong@linaro.org>; Kevin
+> Hilman <khilman@baylibre.com>; Jerome Brunet <jbrunet@baylibre.com>;
+> Martin Blumenstingl <martin.blumenstingl@googlemail.com>; Shawn Guo
+> <shawnguo@kernel.org>; Sascha Hauer <s.hauer@pengutronix.de>;
+> Pengutronix Kernel Team <kernel@pengutronix.de>; Fabio Estevam
+> <festevam@gmail.com>; Heiko Stuebner <heiko@sntech.de>; Maxime
+> Coquelin <mcoquelin.stm32@gmail.com>; Alexandre Torgue
+> <alexandre.torgue@foss.st.com>; iwamatsu nobuhiro(=1B$B4d>>=1B(B =1B$B?.M=
+N=1B(B =1B$B!{#D#I#T#C=1B(B
+> =1B$B""#D#I#T!{#O#S#T=1B(B) <nobuhiro1.iwamatsu@toshiba.co.jp>; Matthias =
+Brugger
+> <matthias.bgg@gmail.com>; AngeloGioacchino Del Regno
+> <angelogioacchino.delregno@collabora.com>; G. Jaya Kumaran
+> <vineetha.g.jaya.kumaran@intel.com>; Biao Huang
+> <biao.huang@mediatek.com>; Clark Wang <xiaoning.wang@nxp.com>; Linux
+> Team <linux-imx@nxp.com>; David Wu <david.wu@rock-chips.com>;
+> Christophe Roullier <christophe.roullier@foss.st.com>; Russell King (Orac=
+le)
+> <rmk+kernel@armlinux.org.uk>; netdev@vger.kernel.org
+> Cc: devicetree@vger.kernel.org; linux-amlogic@lists.infradead.org;
+> linux-kernel@vger.kernel.org; imx@lists.linux.dev;
+> linux-rockchip@lists.infradead.org;
+> linux-stm32@st-md-mailman.stormreply.com;
+> linux-mediatek@lists.infradead.org; Prabhakar
+> <prabhakar.csengg@gmail.com>; Lad Prabhakar
+> <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> Subject: [PATCH net-next] dt-bindings: net: Define interrupt constraints =
+for
+> DWMAC vendor bindings
+>=20
+> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+>=20
+> The `snps,dwmac.yaml` binding currently sets `maxItems: 3` for the
+> `interrupts` and `interrupt-names` properties, but vendor bindings select=
+ing
+> `snps,dwmac.yaml` do not impose these limits.
+>=20
+> Define constraints for `interrupts` and `interrupt-names` properties in
+> various DWMAC vendor bindings to ensure proper validation and consistency=
+.
+>=20
+> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 > ---
-> v2 -> v3:
->  - avoid unneeded checks in udp_tunnel_update_gro_rcv()
-> 
-> v1 -> v2:
->  - fix UDP_TUNNEL=n build
+> Hi All,
+>=20
+> Based on recent patch [0] which increases the interrupts to 11 and adds
+> `additionalItems: true` its good to have constraints to validate the sche=
+ma. Ive
+> made the changes based on the DT binding doc and the users. Ive ran dt
+> binding checks to ensure the constraints are valid. Please let me know if=
+ you'd
+> like me to split this patch or if any of the constraints are incorrect, a=
+s I don't
+> have documentation for all of these platforms.
+>=20
+> https://lore.kernel.org/all/20250308200921.1089980-2-prabhakar.mahadev-la
+> d.rj@bp.renesas.com/
+>=20
+> Cheers, Prabhakar
 > ---
->  include/net/udp_tunnel.h   |   4 ++
->  net/ipv4/udp_offload.c     | 137 ++++++++++++++++++++++++++++++++++++-
->  net/ipv4/udp_tunnel_core.c |   2 +
->  3 files changed, 142 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/net/udp_tunnel.h b/include/net/udp_tunnel.h
-> index eda0f3e2f65fa..a7b230867eb14 100644
-> --- a/include/net/udp_tunnel.h
-> +++ b/include/net/udp_tunnel.h
-> @@ -205,9 +205,11 @@ static inline void udp_tunnel_encap_enable(struct sock *sk)
->  
->  #if IS_ENABLED(CONFIG_NET_UDP_TUNNEL)
->  void udp_tunnel_update_gro_lookup(struct net *net, struct sock *sk, bool add);
-> +void udp_tunnel_update_gro_rcv(struct sock *sk, bool add);
->  #else
->  static inline void udp_tunnel_update_gro_lookup(struct net *net,
->  						struct sock *sk, bool add) {}
-> +static inline void udp_tunnel_update_gro_rcv(struct sock *sk, bool add) {}
->  #endif
->  
->  static inline void udp_tunnel_cleanup_gro(struct sock *sk)
-> @@ -215,6 +217,8 @@ static inline void udp_tunnel_cleanup_gro(struct sock *sk)
->  	struct udp_sock *up = udp_sk(sk);
->  	struct net *net = sock_net(sk);
->  
-> +	udp_tunnel_update_gro_rcv(sk, false);
-> +
->  	if (!up->tunnel_list.pprev)
->  		return;
->  
-> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-> index 054d4d4a8927f..500b2a20053cd 100644
-> --- a/net/ipv4/udp_offload.c
-> +++ b/net/ipv4/udp_offload.c
-> @@ -15,6 +15,39 @@
->  #include <net/udp_tunnel.h>
->  
->  #if IS_ENABLED(CONFIG_NET_UDP_TUNNEL)
-> +
-> +/*
-> + * Dummy GRO tunnel callback; should never be invoked, exists
-> + * mainly to avoid dangling/NULL values for the udp tunnel
-> + * static call.
-> + */
-> +static struct sk_buff *dummy_gro_rcv(struct sock *sk,
-> +				     struct list_head *head,
-> +				     struct sk_buff *skb)
-> +{
-> +	WARN_ON_ONCE(1);
-> +	NAPI_GRO_CB(skb)->flush = 1;
-> +	return NULL;
-> +}
-> +
-> +typedef struct sk_buff *(*udp_tunnel_gro_rcv_t)(struct sock *sk,
-> +						struct list_head *head,
-> +						struct sk_buff *skb);
-> +
-> +struct udp_tunnel_type_entry {
-> +	udp_tunnel_gro_rcv_t gro_receive;
-> +	refcount_t count;
-> +};
-> +
-> +#define UDP_MAX_TUNNEL_TYPES (IS_ENABLED(CONFIG_GENEVE) + \
-> +			      IS_ENABLED(CONFIG_VXLAN) * 2 + \
-> +			      IS_ENABLED(CONFIG_FOE) * 2)
-> +
-> +DEFINE_STATIC_CALL(udp_tunnel_gro_rcv, dummy_gro_rcv);
-> +static DEFINE_STATIC_KEY_FALSE(udp_tunnel_static_call);
-> +static struct mutex udp_tunnel_gro_type_lock;
-> +static struct udp_tunnel_type_entry udp_tunnel_gro_types[UDP_MAX_TUNNEL_TYPES];
-> +static unsigned int udp_tunnel_gro_type_nr;
->  static DEFINE_SPINLOCK(udp_tunnel_gro_lock);
->  
->  void udp_tunnel_update_gro_lookup(struct net *net, struct sock *sk, bool add)
-> @@ -43,6 +76,106 @@ void udp_tunnel_update_gro_lookup(struct net *net, struct sock *sk, bool add)
->  	spin_unlock(&udp_tunnel_gro_lock);
->  }
->  EXPORT_SYMBOL_GPL(udp_tunnel_update_gro_lookup);
-> +
-> +void udp_tunnel_update_gro_rcv(struct sock *sk, bool add)
-> +{
-> +	struct udp_tunnel_type_entry *cur = NULL, *avail = NULL;
-> +	struct udp_sock *up = udp_sk(sk);
-> +	int i, old_gro_type_nr;
-> +
-> +	if (!up->gro_receive)
-> +		return;
-> +
-> +	mutex_lock(&udp_tunnel_gro_type_lock);
-> +	for (i = 0; i < UDP_MAX_TUNNEL_TYPES; i++) {
-> +		if (!refcount_read(&udp_tunnel_gro_types[i].count))
 
-Optionally: && !avail, to fill the list from the front. And on delete
-avoid gaps. For instance, like __fanout_link/__fanout_unlink.
+>  .../bindings/net/toshiba,visconti-dwmac.yaml           |  6 ++++++
 
-Can stop sooner then. And list length is then implicit as i once found
-the first [i].count == zero.
+Acked-by: Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>
 
-Then again, this list is always short. I can imagine you prefer to
-leave as is.
-
-> +			avail = &udp_tunnel_gro_types[i];
-> +		else if (udp_tunnel_gro_types[i].gro_receive == up->gro_receive)
-> +			cur = &udp_tunnel_gro_types[i];
-> +	}
-> +	old_gro_type_nr = udp_tunnel_gro_type_nr;
-> +	if (add) {
-> +		/*
-> +		 * Update the matching entry, if found, or add a new one
-> +		 * if needed
-> +		 */
-> +		if (cur) {
-> +			refcount_inc(&cur->count);
-> +			goto out;
-> +		}
-> +
-> +		if (unlikely(!avail)) {
-> +			pr_err_once("Too many UDP tunnel types, please increase UDP_MAX_TUNNEL_TYPES\n");
-> +			/* Ensure static call will never be enabled */
-> +			udp_tunnel_gro_type_nr = UDP_MAX_TUNNEL_TYPES + 2;
-> +			goto out;
-> +		}
-> +
-> +		refcount_set(&avail->count, 1);
-> +		avail->gro_receive = up->gro_receive;
-> +		udp_tunnel_gro_type_nr++;
-> +	} else {
-> +		/*
-> +		 * The stack cleanups only successfully added tunnel, the
-> +		 * lookup on removal should never fail.
-> +		 */
-> +		if (WARN_ON_ONCE(!cur))
-> +			goto out;
-> +
-> +		if (!refcount_dec_and_test(&cur->count))
-> +			goto out;
-> +		udp_tunnel_gro_type_nr--;
-> +	}
-> +
-> +	if (udp_tunnel_gro_type_nr == 1) {
-> +		for (i = 0; i < UDP_MAX_TUNNEL_TYPES; i++) {
-> +			cur = &udp_tunnel_gro_types[i];
-> +			if (refcount_read(&cur->count)) {
-> +				static_call_update(udp_tunnel_gro_rcv,
-> +						   cur->gro_receive);
-> +				static_branch_enable(&udp_tunnel_static_call);
-> +			}
-> +		}
-> +	} else if (old_gro_type_nr == 1) {
-> +		static_branch_disable(&udp_tunnel_static_call);
-> +		static_call_update(udp_tunnel_gro_rcv, dummy_gro_rcv);
-
-These operations must not be reorderd, or dummy_gro_rcv might get hit.
-
-If static calls are not configured, the last call is just a
-WRITE_ONCE. Similar for static_branch_disable if !CONFIG_JUMP_LABEL.
-
-> +	}
-> +
-> +out:
-> +	mutex_unlock(&udp_tunnel_gro_type_lock);
-> +}
-> +EXPORT_SYMBOL_GPL(udp_tunnel_update_gro_rcv);
-> +
-> +static void udp_tunnel_gro_init(void)
-> +{
-> +	mutex_init(&udp_tunnel_gro_type_lock);
-> +}
-> +
-> +static struct sk_buff *udp_tunnel_gro_rcv(struct sock *sk,
-> +					  struct list_head *head,
-> +					  struct sk_buff *skb)
-> +{
-> +	if (static_branch_likely(&udp_tunnel_static_call)) {
-> +		if (unlikely(gro_recursion_inc_test(skb))) {
-> +			NAPI_GRO_CB(skb)->flush |= 1;
-> +			return NULL;
-> +		}
-> +		return static_call(udp_tunnel_gro_rcv)(sk, head, skb);
-> +	}
-> +	return call_gro_receive_sk(udp_sk(sk)->gro_receive, sk, head, skb);
-> +}
-> +
-> +#else
-> +
-> +static void udp_tunnel_gro_init(void) {}
-> +
-> +static struct sk_buff *udp_tunnel_gro_rcv(struct sock *sk,
-> +					  struct list_head *head,
-> +					  struct sk_buff *skb)
-> +{
-> +	return call_gro_receive_sk(udp_sk(sk)->gro_receive, sk, head, skb);
-> +}
-> +
->  #endif
->  
->  static struct sk_buff *__skb_udp_tunnel_segment(struct sk_buff *skb,
-> @@ -654,7 +787,7 @@ struct sk_buff *udp_gro_receive(struct list_head *head, struct sk_buff *skb,
->  
->  	skb_gro_pull(skb, sizeof(struct udphdr)); /* pull encapsulating udp header */
->  	skb_gro_postpull_rcsum(skb, uh, sizeof(struct udphdr));
-> -	pp = call_gro_receive_sk(udp_sk(sk)->gro_receive, sk, head, skb);
-> +	pp = udp_tunnel_gro_rcv(sk, head, skb);
->  
->  out:
->  	skb_gro_flush_final(skb, pp, flush);
-> @@ -804,5 +937,7 @@ int __init udpv4_offload_init(void)
->  			.gro_complete =	udp4_gro_complete,
->  		},
->  	};
-> +
-> +	udp_tunnel_gro_init();
->  	return inet_add_offload(&net_hotdata.udpv4_offload, IPPROTO_UDP);
->  }
-> diff --git a/net/ipv4/udp_tunnel_core.c b/net/ipv4/udp_tunnel_core.c
-> index b5695826e57ad..c49fceea83139 100644
-> --- a/net/ipv4/udp_tunnel_core.c
-> +++ b/net/ipv4/udp_tunnel_core.c
-> @@ -90,6 +90,8 @@ void setup_udp_tunnel_sock(struct net *net, struct socket *sock,
->  
->  	udp_tunnel_encap_enable(sk);
->  
-> +	udp_tunnel_update_gro_rcv(sock->sk, true);
-> +
->  	if (!sk->sk_dport && !sk->sk_bound_dev_if && sk_saddr_any(sock->sk))
->  		udp_tunnel_update_gro_lookup(net, sock->sk, true);
->  }
-> -- 
-> 2.48.1
-> 
-
+Best regards,
+  Nobuhiro
 
 
