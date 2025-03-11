@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-173930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8369AA5C40C
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 15:40:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D8DDA5C40E
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 15:40:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F87D188C628
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:40:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD0FC3A5170
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8B8F25BAC3;
-	Tue, 11 Mar 2025 14:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 107C825CC6C;
+	Tue, 11 Mar 2025 14:40:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F07B79EA;
-	Tue, 11 Mar 2025 14:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 630BD25BABA;
+	Tue, 11 Mar 2025 14:40:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741704030; cv=none; b=mQMlCkp1+2bm8ssnquaTXLWmuJx9Ld9CJMpCHzhAyGqaGw5u2l1pj3xvQ1lwz0HCdRE4W8PMZe/s+21/1rUhPtHO1P/1dDoh6zbuEYBh7X0WQEK7H84kw+tmcA6AJXHKjXoY4gmo2FEChu18pPYZzmE+XfGPnZjxiQuQBL2wwxo=
+	t=1741704032; cv=none; b=ZteE25YgyxB2V0HHs1pOOY6+vxXk2nOn4a6BmxQJy7hRwgfs4cIAbjrfz5/7qvkMFB5qy5JhjBAgJSOZx0CT5IJ9sAc77K3ATw8jMFMzOSKS7F0eIwELa2Fr3g1rgd7d75CXpFiZ3b8YT/KLclf+jyb3UCAC0Aqvo2acLfSEdek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741704030; c=relaxed/simple;
-	bh=bdpQuWOogWUPU+LgodjEDpZ3ZW4UKjg9rQLjtDiWfkE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bd4mXzxfZsG/bt1+ZNggnlPPnAIbN+Ajr5KBp1evG/Y59oM4APhfAIebVT7LBuSlcfECYkTt/JZF0QXlWgGTzqQNsRjKahx1dTc50XadCH2BAFE51J0s1gE2BdeDtFburtUbap+sJyFWWM64+6FH9Ti74a/AhipLrNsMuIOlogQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.52
+	s=arc-20240116; t=1741704032; c=relaxed/simple;
+	bh=qju+Hmli1ujUwi/eHfGIMx2HJZ38f7cehV6nsoGzrPo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Gp7nSBsaLBdPxST51rzdSM5b5igghT1GjDfO2RVw0V6lH3mTP8llI/G/i0gNT7sbYzasl+A+qt6XZcJaceGe1J6MyQKlATUVYJcrj/qse6lJMJPKymszUfHSrkic4HGiHWmLXiox6jDCmLjXIveUJcxPyNZUGCn78RJ12ZnO4fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2ff797f8f1bso7589256a91.3;
-        Tue, 11 Mar 2025 07:40:28 -0700 (PDT)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-225477548e1so57045525ad.0;
+        Tue, 11 Mar 2025 07:40:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741704028; x=1742308828;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RGNuY196QhTC5kCQhQIas1dZxtdWGaoWAup+oKiawFo=;
-        b=k3d8QUaayKh/CWCsSoEMbz7Y+vwx4baiq3Ok44EkuOqbsLiZ7ZZn+ZgzaC/St4VJ+s
-         IGrYxcQTv1gGZiheBOfEIBwnN+XFFhIXUZDu8nkIcgJBJFsZDDhQ3UP7fxEKMNJZ9KfO
-         WKm6XMynX4LLZ5XIoK6zVgjlWUG1wPdZ06RhGfW1bTfKes19cAgSnCkqHLOx/I7prHcy
-         bNEATcvcBj9ki/XkE1N6RP2OYmMkuhIWeW/2xca7/jfU4PGSRC3czMl5Lc738Jj8lDyD
-         CJxhT+3wP0K3O00ki/sEDe8l6xdStrw/H0C1vJ/PXEqA+mPjt+GjIjcJ3wxzpWxj19pp
-         wd/g==
-X-Forwarded-Encrypted: i=1; AJvYcCUSyvgJmTzU0PLTD1UPdcsgFXe+m1Hb3GUYyc11+K68xRXJEVVxbke80x/YBvkaNuDIy10FmrL0SZTMTO8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyMYNm5TzpKDfs7jQ9ijK7Dwt82pc1f1Ln0hqJ5fyN3NpqromDR
-	epkXABYLS1OTdF/nbcB92kr9UGjxAIY089AhLHIwzZHRgIzG5nnhwbV34u7WZg==
-X-Gm-Gg: ASbGnct70ZyzTJZjB58144LtQcAF1U3JeZPNXlmVJoCfq3Amf7r1zIJv/K24veNMk/M
-	oBS0wmzNAkpiyvaxM91h1Hp1ybYkoi8+4mDsz6lmMPVBUXhldVNcoUDc3S9hNTL7X8H8WnabDBL
-	l928mUYapmPchUz7HIk5EeshW8F1wXyCLkLawF3kq/wyFqtBDRAo1iYFR3H31GphOjr6+21DlFc
-	if7hKxLvbtlbh99ZZVO9/+Qt2RbcO3oagkUkRY+x9pbNouLGKSBDoIRm6PbtS9Lp3n4xCIJK/R+
-	JBLXuhDRDZDkjzkIx8ce84k0zwuPs0sv35eTwpSg/hnGDr0hXQZktjU=
-X-Google-Smtp-Source: AGHT+IFvn53gcTq8I5rCxoVqGBE6hkhvplWlGFZ1Wl5BqiIXMH147v8lMAX+V93uwTwHnl2v8LsWew==
-X-Received: by 2002:a05:6a21:7308:b0:1f5:6a1a:329b with SMTP id adf61e73a8af0-1f58cbc548fmr7756611637.32.1741704028036;
-        Tue, 11 Mar 2025 07:40:28 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1741704029; x=1742308829;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wVxQV/o7jQOh5fqVSpMsD4HSovMAgVf5MADEYdzA/sg=;
+        b=QZKpZI0HzBGXSNxxcfDqRMz7JpEhKj3++EpPFF5kGb7/goMAZH2tE5MXp0gh5vqXku
+         D2fDgNYJl++12kSiwZk65b+0ZDAPWPcXyloTkH33vj3M8x+jAfPa2PO3Ad0L2bZTP+UA
+         Z9/lw2WUCI+5zfbDaOXeqc+sVRqBDqdw9T55NaK+a/YQlburGpdml9GAj0MtqowanwKt
+         3ausujlnt6hUuICetqwbKQnDHpuU8xiuYcXQ0ve85OAoAsEFp1ImrRLWunji9S8l/3e6
+         GInW7FRlW1jlb+s9p7gqYydWPdLNcXwh8JxnwjRFqKKPioUFCV5ukaw3UQ75VnQhhA+H
+         OnaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV/ZbxqqgHhIGexqYiMHiSEvvDiK9sSkw57wqFNORpreh6QaMSoUKeuQzmczTiTf0EiSp3GJvH1bxsqhXQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxV9OQPBe3GY41C+Wb5TrIDF+5iRMkY+rR+E/TxQkh+MkspuR5Z
+	CinitQNjJ0cQf4XtlapKmzOXdTOE8iA2vdXGKjKK+sZmHqiyS5niFPnUjBq8AQ==
+X-Gm-Gg: ASbGncv+MebMRLeBr/+gs1qE8SXBzxucmslIw+QYg6yfNSJnrxhQupAHr8OQW4KBhkg
+	gX8UBGsqD0MxiMJwPW2ayJBtIVSzObE4DqHjDZrq0UFn7QtXtR745sOw/xLL+a1ndFvT5EW6Iu0
+	gW8dh4GZ8fhA6/C0eeY9p2R9uTIFEJ6BZxi2FaGJUFuzZhviP0YcAXxu6M8IE1jHGMIQPsdJoAH
+	SYZuyE48Zb1r9RnrgP4/dh597bIhiFVcpbRnWLF3Q8ysVfiovAmTQc8zztQHt17FhZKT51SMFFu
+	EcQtvOVTZPbX0t12BteMoabBY3Y37aUjKFTrboWwI7hA
+X-Google-Smtp-Source: AGHT+IHaX2qbjIYUcszsoL1Qc/4/MkKcnuQcIMzCiKWztuO4F1U3trDrX/2LGOUFG0REstFQON234A==
+X-Received: by 2002:a17:902:ef4e:b0:223:5c33:56a2 with SMTP id d9443c01a7336-22428aa2fdemr334764975ad.28.1741704029395;
+        Tue, 11 Mar 2025 07:40:29 -0700 (PDT)
 Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-736a6e5c13asm9270443b3a.157.2025.03.11.07.40.27
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-224109e99dfsm98585225ad.91.2025.03.11.07.40.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Mar 2025 07:40:27 -0700 (PDT)
+        Tue, 11 Mar 2025 07:40:28 -0700 (PDT)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -75,10 +76,12 @@ Cc: davem@davemloft.net,
 	almasrymina@google.com,
 	asml.silence@gmail.com,
 	dw@davidwei.uk
-Subject: [PATCH net-next v2 0/3] net: remove rtnl_lock from the callers of queue APIs
-Date: Tue, 11 Mar 2025 07:40:23 -0700
-Message-ID: <20250311144026.4154277-1-sdf@fomichev.me>
+Subject: [PATCH net-next v2 1/3] net: create netdev_nl_sock to wrap bindings list
+Date: Tue, 11 Mar 2025 07:40:24 -0700
+Message-ID: <20250311144026.4154277-2-sdf@fomichev.me>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250311144026.4154277-1-sdf@fomichev.me>
+References: <20250311144026.4154277-1-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,43 +90,156 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-All drivers that use queue management APIs already depend on the netdev
-lock. Ultimately, we want to have most of the paths that work with
-specific netdev to be rtnl_lock-free (ethtool mostly in particular).
-Queue API currently has a much smaller API surface, so start with
-rtnl_lock from it:
-
-- add mutex to each dmabuf binding (to replace rtnl_lock)
-- move netdev lock management to the callers of netdev_rx_queue_restart
-  and drop rtnl_lock
-
-v2:
-- drop "net: protect net_devmem_dmabuf_bindings by new
-  net_devmem_bindings_mutex" (Jakub)
-- add missing mutex_unlock (Jakub)
-- undo rtnl_lock removal from netdev_nl_queue_get_doit and
-  netdev_nl_queue_get_dumpit, needs more care to grab
-  either or but no both rtnl_lock/ops_lock (Jakub)
+No functional changes. Next patches will add more granular locking
+to netdev_nl_sock.
 
 Cc: Mina Almasry <almasrymina@google.com>
-
-Stanislav Fomichev (3):
-  net: create netdev_nl_sock to wrap bindings list
-  net: add granular lock for the netdev netlink socket
-  net: drop rtnl_lock for queue_mgmt operations
-
- Documentation/netlink/specs/netdev.yaml   |  4 +--
- drivers/net/ethernet/broadcom/bnxt/bnxt.c |  4 +--
- drivers/net/netdevsim/netdev.c            |  4 +--
- include/net/netdev_netlink.h              | 12 +++++++
- net/core/devmem.c                         |  4 +--
- net/core/netdev-genl-gen.c                |  4 +--
- net/core/netdev-genl-gen.h                |  6 ++--
- net/core/netdev-genl.c                    | 38 +++++++++++++----------
- net/core/netdev_rx_queue.c                | 16 ++++------
- 9 files changed, 52 insertions(+), 40 deletions(-)
+Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+---
+ Documentation/netlink/specs/netdev.yaml |  4 ++--
+ include/net/netdev_netlink.h            | 11 +++++++++++
+ net/core/netdev-genl-gen.c              |  4 ++--
+ net/core/netdev-genl-gen.h              |  6 +++---
+ net/core/netdev-genl.c                  | 19 +++++++++----------
+ 5 files changed, 27 insertions(+), 17 deletions(-)
  create mode 100644 include/net/netdev_netlink.h
 
+diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
+index 36f1152bfac3..f5e0750ab71d 100644
+--- a/Documentation/netlink/specs/netdev.yaml
++++ b/Documentation/netlink/specs/netdev.yaml
+@@ -745,8 +745,8 @@ name: netdev
+             - irq-suspend-timeout
+ 
+ kernel-family:
+-  headers: [ "linux/list.h"]
+-  sock-priv: struct list_head
++  headers: [ "net/netdev_netlink.h"]
++  sock-priv: struct netdev_nl_sock
+ 
+ mcast-groups:
+   list:
+diff --git a/include/net/netdev_netlink.h b/include/net/netdev_netlink.h
+new file mode 100644
+index 000000000000..1599573d35c9
+--- /dev/null
++++ b/include/net/netdev_netlink.h
+@@ -0,0 +1,11 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef __NET_NETDEV_NETLINK_H
++#define __NET_NETDEV_NETLINK_H
++
++#include <linux/list.h>
++
++struct netdev_nl_sock {
++	struct list_head bindings;
++};
++
++#endif	/* __NET_NETDEV_NETLINK_H */
+diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
+index 996ac6a449eb..739f7b6506a6 100644
+--- a/net/core/netdev-genl-gen.c
++++ b/net/core/netdev-genl-gen.c
+@@ -9,7 +9,7 @@
+ #include "netdev-genl-gen.h"
+ 
+ #include <uapi/linux/netdev.h>
+-#include <linux/list.h>
++#include <net/netdev_netlink.h>
+ 
+ /* Integer value ranges */
+ static const struct netlink_range_validation netdev_a_page_pool_id_range = {
+@@ -217,7 +217,7 @@ struct genl_family netdev_nl_family __ro_after_init = {
+ 	.n_split_ops	= ARRAY_SIZE(netdev_nl_ops),
+ 	.mcgrps		= netdev_nl_mcgrps,
+ 	.n_mcgrps	= ARRAY_SIZE(netdev_nl_mcgrps),
+-	.sock_priv_size	= sizeof(struct list_head),
++	.sock_priv_size	= sizeof(struct netdev_nl_sock),
+ 	.sock_priv_init	= __netdev_nl_sock_priv_init,
+ 	.sock_priv_destroy = __netdev_nl_sock_priv_destroy,
+ };
+diff --git a/net/core/netdev-genl-gen.h b/net/core/netdev-genl-gen.h
+index e09dd7539ff2..17d39fd64c94 100644
+--- a/net/core/netdev-genl-gen.h
++++ b/net/core/netdev-genl-gen.h
+@@ -10,7 +10,7 @@
+ #include <net/genetlink.h>
+ 
+ #include <uapi/linux/netdev.h>
+-#include <linux/list.h>
++#include <net/netdev_netlink.h>
+ 
+ /* Common nested types */
+ extern const struct nla_policy netdev_page_pool_info_nl_policy[NETDEV_A_PAGE_POOL_IFINDEX + 1];
+@@ -42,7 +42,7 @@ enum {
+ 
+ extern struct genl_family netdev_nl_family;
+ 
+-void netdev_nl_sock_priv_init(struct list_head *priv);
+-void netdev_nl_sock_priv_destroy(struct list_head *priv);
++void netdev_nl_sock_priv_init(struct netdev_nl_sock *priv);
++void netdev_nl_sock_priv_destroy(struct netdev_nl_sock *priv);
+ 
+ #endif /* _LINUX_NETDEV_GEN_H */
+diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+index 2b774183d31c..a219be90c739 100644
+--- a/net/core/netdev-genl.c
++++ b/net/core/netdev-genl.c
+@@ -829,8 +829,8 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
+ {
+ 	struct nlattr *tb[ARRAY_SIZE(netdev_queue_id_nl_policy)];
+ 	struct net_devmem_dmabuf_binding *binding;
+-	struct list_head *sock_binding_list;
+ 	u32 ifindex, dmabuf_fd, rxq_idx;
++	struct netdev_nl_sock *priv;
+ 	struct net_device *netdev;
+ 	struct sk_buff *rsp;
+ 	struct nlattr *attr;
+@@ -845,10 +845,9 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
+ 	ifindex = nla_get_u32(info->attrs[NETDEV_A_DEV_IFINDEX]);
+ 	dmabuf_fd = nla_get_u32(info->attrs[NETDEV_A_DMABUF_FD]);
+ 
+-	sock_binding_list = genl_sk_priv_get(&netdev_nl_family,
+-					     NETLINK_CB(skb).sk);
+-	if (IS_ERR(sock_binding_list))
+-		return PTR_ERR(sock_binding_list);
++	priv = genl_sk_priv_get(&netdev_nl_family, NETLINK_CB(skb).sk);
++	if (IS_ERR(priv))
++		return PTR_ERR(priv);
+ 
+ 	rsp = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
+ 	if (!rsp)
+@@ -909,7 +908,7 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
+ 			goto err_unbind;
+ 	}
+ 
+-	list_add(&binding->list, sock_binding_list);
++	list_add(&binding->list, &priv->bindings);
+ 
+ 	nla_put_u32(rsp, NETDEV_A_DMABUF_ID, binding->id);
+ 	genlmsg_end(rsp, hdr);
+@@ -931,17 +930,17 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
+ 	return err;
+ }
+ 
+-void netdev_nl_sock_priv_init(struct list_head *priv)
++void netdev_nl_sock_priv_init(struct netdev_nl_sock *priv)
+ {
+-	INIT_LIST_HEAD(priv);
++	INIT_LIST_HEAD(&priv->bindings);
+ }
+ 
+-void netdev_nl_sock_priv_destroy(struct list_head *priv)
++void netdev_nl_sock_priv_destroy(struct netdev_nl_sock *priv)
+ {
+ 	struct net_devmem_dmabuf_binding *binding;
+ 	struct net_devmem_dmabuf_binding *temp;
+ 
+-	list_for_each_entry_safe(binding, temp, priv, list) {
++	list_for_each_entry_safe(binding, temp, &priv->bindings, list) {
+ 		rtnl_lock();
+ 		net_devmem_unbind_dmabuf(binding);
+ 		rtnl_unlock();
 -- 
 2.48.1
 
