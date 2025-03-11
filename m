@@ -1,91 +1,106 @@
-Return-Path: <netdev+bounces-173807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05EA4A5BC0F
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 10:25:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD3F6A5BC45
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 10:29:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46240172B9E
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 09:25:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A77B1887F74
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 09:29:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 795A922B8AB;
-	Tue, 11 Mar 2025 09:25:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CF8D22DFB0;
+	Tue, 11 Mar 2025 09:28:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="Kx1LbNKc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HPwjP8ac"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67A3226177;
-	Tue, 11 Mar 2025 09:25:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0582E22D7A5
+	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 09:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741685144; cv=none; b=iuzP3edgLt9+cyPvQxioepQ045SSC0zOrWHoifx1r/rUFl3mZ5wKQq15+cMAhU4iDOFM+cjCwHLo2mb17u/bXVB+sRAOheykc+kT+UfN3/z/VtTVh/tmbs26CVqEkt9VhOUd+FWfel0kHmJDR1RPLZ8tEequ8AEiOA9u0iP8/R0=
+	t=1741685308; cv=none; b=kyP1jghTqBEHSC7QaK2MgzPk1nL4+nMQZGINxqu6gm6jhqBkNq++13XF4Lb0NAFdlOt3+UX8f7mzbcf7JMMHYsng+zGt76sUcWONO8MAOI4KamWQbWbqWjQWbjWBgZAExY8pmYvK1loxXSdkipsL/U0F56X/PgVCoP/nuWZtAnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741685144; c=relaxed/simple;
-	bh=jVA0botF/7UpaHDHr2fUbl6zp4iOX2aREWoTuBm1Q34=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=sKWveViwo1Krh8VSqEV4MoPXxp3hFjlqeMM96EPhF0fS1yrAPmaOODFARWtsDVR7ReUZMDz/Kz1NlWuH482ReEGpe2wFenIPtgtzCwK63ZBNKguiW0JFaUao60ed+CJhaTJF4/z5uClOSVI6Jvs5Yo5mS8ze9HHXVQwDgt+B69o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=Kx1LbNKc; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=38XthFMU8LX6ecctMEDvh0zBZBH4c/+JYLRIrlgjMLo=;
-	t=1741685142; x=1742894742; b=Kx1LbNKcCmt4Rjb1S4OqFL7SEMRDdqurfDNz6Pue5GUELpB
-	pgAN8SPiKegWDIbASptbzSChgB9hYGEbJktWN9IRzivsCHnEKO6+OTmwXgJUymAnDmbDgqlGFfS78
-	beY9TS5Fnk+W0oipXdp5G+Eb2pOe5ql/UoPZ1r3gksDbExPw6O/CV4gokMABHoQrGDecWiVFiZ9M+
-	mURTbXvObHiBA7NKp+/8p5RxNIetWsSqp+uVsrw7x9D0m6MY1u/yvuqNTXOEKBWGIi0RyDfxuCaZe
-	mqtNPmnLG1HrpXkARM4brPOONLZUtMLkJqY0T12vkPSX/uHxsphGLoFCtTnnFnTg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1trvrN-00000007lXx-3rWn;
-	Tue, 11 Mar 2025 10:25:14 +0100
-Message-ID: <12b44f58b339aa92f1b17fb7b33e30a920aad86c.camel@sipsolutions.net>
-Subject: Re: [PATCH] wifi: mac80211: Add __nonstring annotations for
- unterminated strings
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Kees Cook <kees@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski	 <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Kalle Valo <kvalo@kernel.org>,  Julia Lawall
- <Julia.Lawall@inria.fr>, En-Wei Wu <en-wei.wu@canonical.com>, Shaul
- Triebitz	 <shaul.triebitz@intel.com>, Alexander Wetzel
- <alexander@wetzel-home.de>,  Emmanuel Grumbach
- <emmanuel.grumbach@intel.com>, linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org, kernel test robot <lkp@intel.com>, Miri Korenblit
- <miriam.rachel.korenblit@intel.com>, 	linux-kernel@vger.kernel.org, 
-	syzbot+d6eb9cee2885ec06f5e3@syzkaller.appspotmail.com, 
-	linux-hardening@vger.kernel.org
-Date: Tue, 11 Mar 2025 10:25:10 +0100
-In-Reply-To: <20250310222318.work.395-kees@kernel.org>
-References: <20250310222318.work.395-kees@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+	s=arc-20240116; t=1741685308; c=relaxed/simple;
+	bh=RIkrKUlWy2PrJZ9KBDCozoglQTjUmUryVfRJcopyYsM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rzSuhxcnw6MI8CPq6RSuqN45EpbhNvO8qUSuWfasrXEwT7F/Uar6v9WtsLp10PQ59U8HHRHlHMiKZuLnNSCxUj/2+hJ22UbY87FZxBShFHKiv0wwQWxDYX9+Y0OliOwdQALU7/hxGtaBTSsgA71Bqn+xogbqtM8kyN5j/DGGojI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HPwjP8ac; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47B79C4CEE9;
+	Tue, 11 Mar 2025 09:28:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741685307;
+	bh=RIkrKUlWy2PrJZ9KBDCozoglQTjUmUryVfRJcopyYsM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=HPwjP8acPOeKdngydmJDQLo7xm//EgjxXCcMhiki1Kgqr4lAuoG21azV0/fV7bkTG
+	 CvDWkX9hDU+lToWCCGs9jHyOF9E+LxrYv32etVhkNeAsza/ylnYfGbIk+p8Y+DTw6M
+	 HBwwD1vp1cSHhTew0tkaE263szDmnuUHaTvcTfIWmd2dE9e7L8hZCWs0ryKbpqRVFT
+	 MZf5wWZFOa069ryd9jc3Cbih0jg7uhKsAKbVJuMJGXpNqkcRfAroTNAylb7xO5vDWn
+	 ON1ekFeIhz4ne6r4UnoSbGSa43uOhgKiNnLUlNjQ1TvX5sW5Uhd/4c2kuBonusy1Cn
+	 nI5rksZgFkPsw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	sdf@fomichev.me,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next] netdevsim: 'support' multi-buf XDP
+Date: Tue, 11 Mar 2025 10:28:20 +0100
+Message-ID: <20250311092820.542148-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Transfer-Encoding: 8bit
 
-On Mon, 2025-03-10 at 15:23 -0700, Kees Cook wrote:
->=20
->  drivers/net/wireless/virtual/virt_wifi.c     | 2 +-
->  drivers/net/wireless/zydas/zd1211rw/zd_mac.c | 2 +-
->=20
+Don't error out on large MTU if XDP is multi-buf.
+The ping test now tests ping with XDP and high MTU.
+netdevsim doesn't actually run the prog (yet?) so
+it doesn't matter if the prog was multi-buf..
 
-That's not mac80211?
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ drivers/net/netdevsim/bpf.c    | 3 ++-
+ drivers/net/netdevsim/netdev.c | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-Also, I have no idea how you came up with the CC list but it seems
-excessive. :)
+diff --git a/drivers/net/netdevsim/bpf.c b/drivers/net/netdevsim/bpf.c
+index 608953d4f98d..49537d3c4120 100644
+--- a/drivers/net/netdevsim/bpf.c
++++ b/drivers/net/netdevsim/bpf.c
+@@ -296,7 +296,8 @@ static int nsim_setup_prog_checks(struct netdevsim *ns, struct netdev_bpf *bpf)
+ 		NSIM_EA(bpf->extack, "attempt to load offloaded prog to drv");
+ 		return -EINVAL;
+ 	}
+-	if (ns->netdev->mtu > NSIM_XDP_MAX_MTU) {
++	if (bpf->prog && !bpf->prog->aux->xdp_has_frags &&
++	    ns->netdev->mtu > NSIM_XDP_MAX_MTU) {
+ 		NSIM_EA(bpf->extack, "MTU too large w/ XDP enabled");
+ 		return -EINVAL;
+ 	}
+diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+index d71fd2907cc8..a5e5e064927d 100644
+--- a/drivers/net/netdevsim/netdev.c
++++ b/drivers/net/netdevsim/netdev.c
+@@ -116,7 +116,8 @@ static int nsim_change_mtu(struct net_device *dev, int new_mtu)
+ {
+ 	struct netdevsim *ns = netdev_priv(dev);
+ 
+-	if (ns->xdp.prog && new_mtu > NSIM_XDP_MAX_MTU)
++	if (ns->xdp.prog && !ns->xdp.prog->aux->xdp_has_frags &&
++	    new_mtu > NSIM_XDP_MAX_MTU)
+ 		return -EBUSY;
+ 
+ 	WRITE_ONCE(dev->mtu, new_mtu);
+-- 
+2.48.1
 
-johannes
 
