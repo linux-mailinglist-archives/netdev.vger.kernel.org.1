@@ -1,80 +1,82 @@
-Return-Path: <netdev+bounces-173810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC9CCA5BC68
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 10:36:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E622A5BCB1
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 10:49:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E5BC3A9CA7
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 09:35:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37D441884128
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 09:50:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA0CE225A50;
-	Tue, 11 Mar 2025 09:35:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9466721D59F;
+	Tue, 11 Mar 2025 09:49:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kYOSkmcV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oPr7H1b1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F8121B9F4;
-	Tue, 11 Mar 2025 09:35:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FD081E2606
+	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 09:49:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741685758; cv=none; b=OiXY6VCiI0uzwMZe1jPxCF4kTAVWsLGK9liw6/Hp1nI1asTe9WU1UUSpAjgUgOoF8PC4enx+lgb59Dcc012hCcA3DtvbjBp8NPiIXP++udEZ7rshYcg1133dqMAj9QAqgvz78jJye4EMdA2O16OFgr3qf8Z6KeBavEDew1KKRB4=
+	t=1741686595; cv=none; b=KtzyArjzBdvIa5H+wRSbWn2Om7S6NZzq8wi6Jnsv7tn3ZOezeMXrMEmoru068jedXdJN5VmO6tyH+GjcD0GLi5jFiJYZ0jBA52RIpYFw4KfNBOesFdQo1mywLwr1r5wzBEtqEpBabktXJ4BA1yxodx60AFidpbxDBhgDw9WxN/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741685758; c=relaxed/simple;
-	bh=mtHEipNNrmWCIuZqaAZNIfMKcPAdFiy3JIQXqY3AJt4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ujWI9eiFDNG6z/86rEw4KGtoT+hwyxmQifCO/9r/1iXyC7lI4URnRT0FW0ERgybUz5DSAP0iUCiYlP350/npCELD62MYQn0sZiz5AKgKsplYNR3iaALssPZwJhBmrpjKxO5vU5tu0DFMzfLjU2yJZUxl64+cupFfmhzXfTgVKlg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kYOSkmcV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 842E1C4CEE9;
-	Tue, 11 Mar 2025 09:35:54 +0000 (UTC)
+	s=arc-20240116; t=1741686595; c=relaxed/simple;
+	bh=GqmEfGqxDUrAu7liYoJCYOj2Iq26VSGJlZ7NXce8qmA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XQ2YBXrMIfGnIRIlgHBXD13FI5OzzgOSaHtMSpBfTHftgE1duc48KMa0BSSpEOOyYf9RDIyDWjokCmJuNkkZTekyB7VjkoY3t+z6zO0fN701259bHPhv82XLlEngQGUpWgoqm7xeQ8au4nAYDlZrVTKH6vtWUGeb3PEI84p+EpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oPr7H1b1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2F49C4CEE9;
+	Tue, 11 Mar 2025 09:49:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741685758;
-	bh=mtHEipNNrmWCIuZqaAZNIfMKcPAdFiy3JIQXqY3AJt4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kYOSkmcVQczG8/oGer4vsAblsSRWQmzLndTYtkqv/0h0Eyzor6Mkhi0XR1sOBejQF
-	 I3dlJ4j7GymW5Yjps7O+gn8PuU6DCf9SG2qXrbOpT3zC3IF6P75mcSkSmg49yhiduZ
-	 mMcOuNgoKO2jWmF/v9TkdUP9vNybZ6uHXEv0HeQ9Nz4CFXdYpX5q1Zq9d/LGG8TMUO
-	 nmuRyaA79I1qi7Ac7wMO6rceFRO/DeKssHiWTR+7ftEyzs82LM7plj2kKYavouhNIz
-	 xwBi6l+8S67ZXn/6U/tnzlgiOHhevzlxhlYEAzwh6U0mjtWHy7mtuua7XDOVNiPwmm
-	 e7JDISrga7F+g==
-Date: Tue, 11 Mar 2025 10:35:51 +0100
-From: Simon Horman <horms@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Shuah Khan <shuah@kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCHv4 net 2/2] selftests: bonding: fix incorrect mac address
-Message-ID: <20250311093551.GI4159220@kernel.org>
-References: <20250306023923.38777-1-liuhangbin@gmail.com>
- <20250306023923.38777-3-liuhangbin@gmail.com>
+	s=k20201202; t=1741686594;
+	bh=GqmEfGqxDUrAu7liYoJCYOj2Iq26VSGJlZ7NXce8qmA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=oPr7H1b1IZ0QYs/rM5esZuQmefoNbf0Qzpuqa6A7WARb+IxiYNDiOCyCRRzPnQk47
+	 GBG93b1JTOhqpAZ3m3uTaPQCoeYN+Ah9X7uWiIqbl9ncGL1tKHOi8TuVy0b6dM+G1Y
+	 DmIfJIKHydXfqV8Wk9LBX3B5Kp2Ht0iQfcd90nSH+ftSpOS7Ifo18R/JsQ+prxefSr
+	 xQ2y3cYS3hCwZb1syzH5yLq4VUqkKGHpwUdp3MoUpCWujEU/tOlq2x2Gku/hdg5GK4
+	 YwF18ojYTEFEYqs+K7MkvJklrYkChifo767Im+vmXz5lFek7EBUEYaKC2GQjNp7Zdv
+	 GGTHcwIN/DC6g==
+Date: Tue, 11 Mar 2025 10:49:48 +0100
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jonathan Lennox <jonathan.lennox42@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Jonathan Lennox
+ <jonathan.lennox@8x8.com>, David Ahern <dsahern@kernel.org>,
+ netdev@vger.kernel.org, Stephen Hemminger <stephen@networkplumber.org>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jiri Pirko <jiri@resnulli.us>, Pedro Tammela <pctammela@mojatatu.com>
+Subject: Re: [PATCH net-next] tc-tests: Update tc police action tests for tc
+ buffer size rounding fixes.
+Message-ID: <20250311104948.7481a995@kernel.org>
+In-Reply-To: <952d6b81-6ca9-428c-8d43-1eb28dc04d59@redhat.com>
+References: <2d8adcbe-c379-45c3-9ca9-4f50dbe6a6da@mojatatu.com>
+	<20250304193813.3225343-1-jonathan.lennox@8x8.com>
+	<952d6b81-6ca9-428c-8d43-1eb28dc04d59@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250306023923.38777-3-liuhangbin@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 06, 2025 at 02:39:23AM +0000, Hangbin Liu wrote:
-> The correct mac address for NS target 2001:db8::254 is 33:33:ff:00:02:54,
-> not 33:33:00:00:02:54. The same with client maddress.
+On Tue, 11 Mar 2025 10:16:14 +0100 Paolo Abeni wrote:
+> AFAICS this fix will break the tests when running all version of
+> iproute2 except the upcoming one. I think this is not good enough; you
+> should detect the tc tool version and update expected output accordingly.
 > 
-> Fixes: 86fb6173d11e ("selftests: bonding: add ns multicast group testing")
-> Acked-by: Jay Vosburgh <jv@jvosburgh.net>
-> Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> If that is not possible, I think it would be better to simply revert the
+> TC commit.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Alternatively since it's a regex match, maybe we could accept both?
 
+-        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst 1024Kb mtu 2Kb action reclassify",
++        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst (1Mb|1024Kb) mtu 2Kb action reclassify",
+
+? Not sure which option is most "correct" from TDC's perspective..
 
