@@ -1,215 +1,84 @@
-Return-Path: <netdev+bounces-173826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C0BFA5BE2A
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 11:45:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02DD9A5BE34
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 11:48:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3ED483AA4BB
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 10:45:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42E30163D5B
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 10:48:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 804EF1F4CB7;
-	Tue, 11 Mar 2025 10:45:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF572500CD;
+	Tue, 11 Mar 2025 10:48:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="P7hPtugr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lzXO8gJb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B66661DE2BB;
-	Tue, 11 Mar 2025 10:45:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 268B324F5A8
+	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 10:48:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741689910; cv=none; b=tuxVwO809KjhvM8ccaDqoweH2byMFflsgNztUavxltmHdoBFpglmQGD8hA0eNBCJDzpFgmLK6A3RmqaEA4GRvn3iNKT1k2c5/jRfmZArDgPmY2ynnjEzP2WWqB5mkvmNejEwAmBEB6ZQBBH7TqTfauyASLHHrjpLhPAl9VTiI9o=
+	t=1741690120; cv=none; b=kPZN5ej9V1Os4/iyAka39cugs1U3IjepIKeTdZL5eLwHY/lCNKGk+ScnGvyU/Z5KNcJMYNfwJ07rU6J6jNo3ubgspMO6or1SzGWD/4Wfvm4l3RztTsXnUe+A1vgwRMPw9tJPqHgk45KJSqP6/sOm3fa2BWWQMtUnODoOp1ljk0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741689910; c=relaxed/simple;
-	bh=2qtZx71hOP7XTKnjKVCGoxZv4RprBeHFFlw7SOTHDCM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=UYiuBSefdq202vHzVbMphTxrihmHxupU2jsAZLWYDTa16tcil0kEXjVPZTlDIOyQxexeMsr7ZujXjDioHFdoPw6cR3tfz7g/umSLx7utyptCcasNasXa3ool/oyBuNRwhXgOtclwbNWp0WxdHjOGjWaJgXXXRUMZNmUmaY/GGOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=P7hPtugr; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52BA4P1Z015125;
-	Tue, 11 Mar 2025 10:44:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	S2i6mRK0jajy0u0bUB2Z9AQTcwRxDHV/B/HG8iEiju8=; b=P7hPtugr6omYfGnF
-	DqAmVqW5Ec8QzF4iWGD/4Og9HQB5DAx/IavD+obS5gb5CdS5ikvpibXWZIF2RUVg
-	ezwUl16GdE9am/hNnwpU02HFbxGistvoPJNuov/DqWMw3eZM6cZo+Yv+IUTCH7fh
-	K3NO0eaoFqkNAhglRxQZSMooooPlLCQjOZYqZqnscMHrpCpDYANy1uzMm1zHrM0i
-	CmBM42HYPXIvxe3u7vfSo871QPqEs2QnTlI9OVAhc8pE97Wefe8ZZJ7cgDtRuATQ
-	C+0xq7slbdU6VCbxS3qpzrMXpkrGIt0jaeLMutPVO9UizqYf+9Pi6pJacA5lms1G
-	Dlk5uQ==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 45ab8m1hhm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Mar 2025 10:44:50 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 52BAinNJ018053
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Mar 2025 10:44:49 GMT
-Received: from [10.253.38.132] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 11 Mar
- 2025 03:44:42 -0700
-Message-ID: <4c24723a-1773-4034-95fb-47748f6e8982@quicinc.com>
-Date: Tue, 11 Mar 2025 18:44:40 +0800
+	s=arc-20240116; t=1741690120; c=relaxed/simple;
+	bh=vuIP2BxMldHeDrLEfAfJTipnUP74tlV3FUYVhzpsg1w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=icV1kmckn+rOP7iSJ85O2+2P8kkiG4c4s5XzI2thgBF0pFUp5iffGf80aU4jnmwZPliOb9taJn3EjAHzE+t2ke/WMP3Ow35Z7AAGQYcFTak+2i5j1sWH2VNH2mKHlD2BZ0d1nn+4Da1gqj3c8Jik7SPy+JmzRZNYFdTk2e02t3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lzXO8gJb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20593C4CEE9;
+	Tue, 11 Mar 2025 10:48:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741690119;
+	bh=vuIP2BxMldHeDrLEfAfJTipnUP74tlV3FUYVhzpsg1w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lzXO8gJbD2ruOk+ivFMX/w3isZgkSau2SzXpgB3QDz046f3y3TO8WdAIwjX7QnoBP
+	 GCbvRFVXPL2+DHPsY/QCUoavv9+t89JQg0OijMbySshTotIw8j+OfOKv5WGXCyRuNU
+	 bkFA6e95rW/dMSqvYiHrJ0nWG1RCim+0fopfEaewCN8zuz/QuKsavKPdEsJKWdYEDh
+	 txa6K5FYpdC0Dy0Xvu1YdjU0SGvqYtbb/JRZNhDBKaK9l4TrXcVbRXu0mZlHQGkCUw
+	 +6jTWZ7lwxSt0EV6qNzbVTxUubTBEMkWX8jv6jF1KBmZfRP7M13q5gtrAkMYOR2c7p
+	 coTA28N8mMQ9g==
+Date: Tue, 11 Mar 2025 11:48:35 +0100
+From: Simon Horman <horms@kernel.org>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
+	mincho@theori.io
+Subject: Re: [Patch net 1/2] net_sched: Prevent creation of classes with
+ TC_H_ROOT
+Message-ID: <20250311104835.GJ4159220@kernel.org>
+References: <20250306232355.93864-1-xiyou.wangcong@gmail.com>
+ <20250306232355.93864-2-xiyou.wangcong@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 04/14] net: ethernet: qualcomm: Initialize PPE
- buffer management for IPQ9574
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>, Lei Wei <quic_leiwei@quicinc.com>,
-        Suruchi Agarwal
-	<quic_suruchia@quicinc.com>,
-        Pavithra R <quic_pavir@quicinc.com>,
-        "Simon
- Horman" <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-        Kees Cook
-	<kees@kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        "Philipp
- Zabel" <p.zabel@pengutronix.de>,
-        <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-hardening@vger.kernel.org>,
-        <quic_kkumarcs@quicinc.com>, <quic_linchen@quicinc.com>,
-        <srinivas.kandagatla@linaro.org>, <bartosz.golaszewski@linaro.org>,
-        <john@phrozen.org>
-References: <20250209-qcom_ipq_ppe-v3-0-453ea18d3271@quicinc.com>
- <20250209-qcom_ipq_ppe-v3-4-453ea18d3271@quicinc.com>
- <a79027ed-012c-4771-982c-b80b55ab0c8a@lunn.ch>
- <c592c262-5928-476f-ac2a-615c44d67277@quicinc.com>
- <33529292-00cd-4a0f-87e4-b8127ca722a4@lunn.ch>
- <cffdd8e8-76bc-4424-8cdb-d48f5010686d@quicinc.com>
- <74f89e1e-c440-42cb-9d8e-be213a3d83a4@lunn.ch>
-Content-Language: en-US
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <74f89e1e-c440-42cb-9d8e-be213a3d83a4@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: txnyqolXEKgHcYx5KUazcWu3fq0FVdnZ
-X-Authority-Analysis: v=2.4 cv=K9nYHzWI c=1 sm=1 tr=0 ts=67d01422 cx=c_pps a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17 a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=Vs1iUdzkB0EA:10 a=IKtIH902HmA1w457l2kA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: txnyqolXEKgHcYx5KUazcWu3fq0FVdnZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-11_01,2025-03-11_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- impostorscore=0 spamscore=0 mlxlogscore=999 clxscore=1015
- priorityscore=1501 mlxscore=0 bulkscore=0 malwarescore=0 suspectscore=0
- adultscore=0 phishscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2502100000
- definitions=main-2503110070
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250306232355.93864-2-xiyou.wangcong@gmail.com>
 
-
-
-On 3/6/2025 11:29 PM, Andrew Lunn wrote:
->> Thanks for the suggestion. Just to clarify, we preferred
->> u32p_replace_bits() over FIELD_PREP() because the former does
->> a clear-and-set operation against a given mask, where as with
->> FIELD_PREP(), we need to clear the bits first before we use the
->> macro and then set it. Due to this, we preferred using
->> u32_replace_bits() since it made the macro definitions to modify
->> the registers simpler. Given this, would it be acceptable to
->> document u32p_replace_bits() better, as it is already being used
->> by other drivers as well?
+On Thu, Mar 06, 2025 at 03:23:54PM -0800, Cong Wang wrote:
+> The function qdisc_tree_reduce_backlog() uses TC_H_ROOT as a termination
+> condition when traversing up the qdisc tree to update parent backlog
+> counters. However, if a class is created with classid TC_H_ROOT, the
+> traversal terminates prematurely at this class instead of reaching the
+> actual root qdisc, causing parent statistics to be incorrectly maintained.
+> In case of DRR, this could lead to a crash as reported by Mingi Cho.
 > 
-> I suggest you submit a patch to those who maintain that file and see
-> what they say.
+> Prevent the creation of any Qdisc class with classid TC_H_ROOT
+> (0xFFFFFFFF) across all qdisc types, as suggested by Jamal.
 > 
-> But maybe also look at how others are using u32p_replace_bits() and
-> should it be wrapped up in a macro? FIELD_MOD()? These macros do a lot
-> of build time checking that you are not overflowing the type. It would
-> be good to have that to catch bugs at build time, rather than years
-> later at runtime.
-> 
->        Andrew
+> Reported-by: Mingi Cho <mincho@theori.io>
+> Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
 
-OK, understand. I will submit the patch by adding the FIELD_MODIFY()
-with required build time checking included.
+Hi Cong,
 
-Below is a draft of the macro, please take a look if possible before
-it is posted to maintainers. I will update the driver to use this macro
-if it can be accepted. Thanks.
+This change looks good to me.
+But could we get a fixes tag?`
 
-/** 
-  
-  
-
-  * FIELD_MODIFY() - modify a bitfield element 
-  
-  
-
-  * @_mask: shifted mask defining the field's length and position 
-  
-  
-
-  * @_reg_p: point to the memory that should be updated 
-  
-  
-
-  * @_val: value to store in the bitfield 
-  
-  
-
-  * 
-  
-  
-
-  * FIELD_MODIFY() modifies the set of bits in @_reg_p specified
-  * by @_mask, by replacing them with the bitfield value passed
-  * in as @_val. 
-  
-  
-  
-  
-
-  */ 
-  
-  
-
-#define FIELD_MODIFY(_mask, _reg_p, _val)              		      \ 
-  
-  
-
-         ({                                  			      \ 
-  
-  
-
-                 __BF_FIELD_CHECK(_mask, *_reg_p, _val, "FIELD_MODIFY: 
-"); \ 
-  
-
-                 *_reg_p &= ~(_mask);                                  \ 
-  
-  
-
-                 *_reg_p |= (_val) << __bf_shf(_mask) & (_mask);       \ 
-  
-  
-
-         })
-
+...
 
