@@ -1,332 +1,163 @@
-Return-Path: <netdev+bounces-173967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 281B3A5CAFC
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 17:36:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 099B2A5CAFE
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 17:38:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C38C3B84E9
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 16:36:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49C1A168A73
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 16:38:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED69B260A29;
-	Tue, 11 Mar 2025 16:36:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C021A260391;
+	Tue, 11 Mar 2025 16:38:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="CcS3x7I1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63BFE25E836
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 16:36:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C201125E818
+	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 16:38:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741710991; cv=none; b=FnuHjMvILCyjpVcu6yUf64CzSxWnmtF9BAWBWx5783DLeX/9smrAAm1CAZ/3Ca7NVOdBAQ3yn3Lfskjc3b0aS3zoXhQcxs6Ht5W4++eyVegyCU+jV25pHDH7T0Ui3zP1LD6xxnUWwHjrrrE4eWx657leUEfjLrnCLbJ6Y0iA/xY=
+	t=1741711093; cv=none; b=eFl30rDYtu5U8YpLXGjhVYJgABjV4Wz9l7P1ZLLoh7d162VVbqJ2Kz0J/mUgV3nrZ9lHPArNlPZGeNYZLiVtRd/0s4R9iDapfkQaD2ALxXj87rXyaAOQMtg/EVDVNuY4Yp8lt9u5yUaCy3c6fCxPoBzfEP66hIQ7uPGAdtR9t/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741710991; c=relaxed/simple;
-	bh=kzsNf4Zh01vd/TyJCB4EywREqHBCieiYgS6TZhj0xjk=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=MCbCBMXjHSt+DAskoQd65SGqohcd75iGzfXwJo6s5/FPIG5rrgQ/xcB1htowh90fou5CcrcZcj8fssu3u1KftnSGdft450N90YqDUUVjQ49zBCAkiD04GBmfin8xS8wLgp0EFSGrJV/OlaDCB/SICKtIaMz02gaFToKQJlk7foU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-85b3f480d86so277727139f.3
-        for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 09:36:27 -0700 (PDT)
+	s=arc-20240116; t=1741711093; c=relaxed/simple;
+	bh=k/qqYE18dumnTrExg52yxnDgHqbEw22SqqHqyAXOR34=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GbyqtCaJuF910bgiV+m3j/qAlxLFaqKxRPfgQVsFtvhbhE1m/68LhDNwyxSpPiTRDTePO2Fbr5SlfJE+vXPSjQmaKYIDZkw2KB1UJRQd7TrJ1mS5w/aWh/RhvZNZR9ZWeV8Xaj1TPUhXa0KCe4vQDIfak83jYf6fZQbRpCkzR4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=CcS3x7I1; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-30761be8fcfso63531661fa.0
+        for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 09:38:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1741711090; x=1742315890; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O2J/hC01hBS+/+SHi16lHvEsy7aFLaWqMUUObIUNbiY=;
+        b=CcS3x7I1Def8YQPhV2sP4D3Jaw73ir+Hqb2lRf8CvdOJs1E/ruu7l1w0x5BUpNd33x
+         pnwTtsQQnnfAwAzfNiYVtiamjBPaE8N/N2OwTyRYsPDwJie3vdd6MOU6ZOjN5WnQUD8L
+         NmGhhDt3lMKlpQYGGYJraQoCgcTYy3tvWD/lY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741710986; x=1742315786;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XvDG1mCBdvd+lGzYgqi++Uw9Xu55XL3uw7OiqAbhe0A=;
-        b=isg+JOFMan8s/sFp7agsWwdn5OSuNNHPkRIOGWpDpDgXWhTFJOT9IDVFYuTzlKbb0c
-         c3sh0q6bfjHNM3GrM4JUHiDLRtXWvqtDKoCjY0Fh/QJJyHuaIRNoeAwkN/70xk+WmA50
-         g0uHBGEBiiE0WGflwrOdy1KBXot5ZsyOwTnKRl87LXdlhMCQAfSIPUigE/u0aGzKkC6P
-         CKJhKtUfabgUldQARyfiU6r9FYEJ4xFLfCllhIEjYKsoBN1ZqsDVxCpDOfOJHu13kclW
-         OOSxw/ASk8GY8eLRyfHEAFvaGWyNG3IbWl5VFnYvwo4pyrcbSrPdfFL10uzKUj37Li67
-         f76Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVFDuuPY+46puuXT85ayqdM4CeSjxBEAslnPAcriwXZez9ZYQv8z6+Xcc49us9I3j6UM951Kkc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzF1TfFzcFOMMg+mz+tXdAK/zN9q1kG+N9amyS74qISnNuh5lZb
-	8i+Y5+Y5Tv/sTI1XelrearZB8gnSdy8U7wxmoFMXskUArT/JGnNebk48cXYcMjWEhQOCzIk+f4H
-	MXij8gksL4ULbguLhMc77vYo/9Ifc+A6iZe/dLygKnkM0Yhw4RK3pCz4=
-X-Google-Smtp-Source: AGHT+IEfX9x+iBRZb3hHXs/UHwzEA12kSN+kgazwubNySu1w6G9xMW49KjcbBSj+faWTOuavJczGxHPIBuyutzMaxuwkCucnNL+w
+        d=1e100.net; s=20230601; t=1741711090; x=1742315890;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=O2J/hC01hBS+/+SHi16lHvEsy7aFLaWqMUUObIUNbiY=;
+        b=M5ZscIweTyLNd5+YeA8B5bIkgytvMGEte+NOefmf/FMN/L1TV8MGQZ05l/cB8XVi00
+         bXpGIroXj0qWLY+qEW2qtCJzHzDcFeET/oKTiu5zR+My0mivnEhaGts3EAZ+eh0hn2Hb
+         CW63eGGi8ZR9saxiQBFikuDEEKXFs8wtuSB4vidwvFGtQAfeoY5Bjk9uNkooKQ45ML93
+         abSUnxHF4xwGhxwmpqPgz7ERF+9edejKIj2gW2dwumuLKhgbdPX7FuZfHjyyncxO3XtT
+         fvF/EiR272tGTUItg4y/lvHLVkoJvVYDSkAnq03X+kbnEbXPBvEvlgC3k4Uy/k3Wa5at
+         w7Eg==
+X-Forwarded-Encrypted: i=1; AJvYcCWiO+wtmuiuqB4OVB4kvG3APvLVzyBEu+CkVgmobc7pweempudWYCIDJIMWFvCA7X6wG9hSmDQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNeyXVM5mfunAphCLZBnSSppU1hsmORB+VHQ87GWK5k7DAa6pO
+	XxSBbjFvdVd7XLgCihC88FI2Zie8puwj2HLmXSaG59kUBd9fjtg0x33R7JecqwIDtpz41w+RZxH
+	uLHXy/KtjJRp+RpkHfe6oOaIIZWOu3HmvTMmX
+X-Gm-Gg: ASbGncufMmEMzxzOe7uAmxipA59g3Q9tgV5OxASCuSrMQzX1NxjiE/78XZs4uCbAy1a
+	tWZEEGj8yWwEtuRcYAeCweXMddEv1n9+A3Oc9YhPhU/ZsTzQ0UMlPUHOC1y0f9TzA44Dhy6Vv/b
+	BJu5GrdqrlRe2PjBdv4Vsm506s6dUGHOgfOjnm
+X-Google-Smtp-Source: AGHT+IE17lMcS87AcZdY9lwHljntIGFjrdX/tIws8/mMJWqlvfj4BKIje8AtAeZJAoP34LDD7scalOwGJSBgf3KZaUc=
+X-Received: by 2002:a05:6512:118a:b0:549:4a13:3a82 with SMTP id
+ 2adb3069b0e04-54990e5db47mr6045073e87.21.1741711089888; Tue, 11 Mar 2025
+ 09:38:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1749:b0:3d1:968a:6d46 with SMTP id
- e9e14a558f8ab-3d44196905fmr172740425ab.6.1741710986471; Tue, 11 Mar 2025
- 09:36:26 -0700 (PDT)
-Date: Tue, 11 Mar 2025 09:36:26 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67d0668a.050a0220.1939a6.0028.GAE@google.com>
-Subject: [syzbot] [net?] BUG: sleeping function called from invalid context in dev_set_allmulti
-From: syzbot <syzbot+368054937a6a7ead5f35@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+References: <20250303200212.3294679-1-dualli@chromium.org> <20250303200212.3294679-2-dualli@chromium.org>
+ <CAHC9VhRiZS2Dh+0-GqHE+um7T05p4_=EXG7tOtC5pciWMteDDw@mail.gmail.com>
+In-Reply-To: <CAHC9VhRiZS2Dh+0-GqHE+um7T05p4_=EXG7tOtC5pciWMteDDw@mail.gmail.com>
+From: Li Li <dualli@chromium.org>
+Date: Tue, 11 Mar 2025 09:37:59 -0700
+X-Gm-Features: AQ5f1Jq-kymgLHVS7YmwSl159Xa7tY4tbyEsovgee_yrgxg5Hu6qlOytWyioff4
+Message-ID: <CANBPYPhkYPYGSxhBWbJ2pMqf_iYqNE6H9=ND9ONuTxoPviW=3g@mail.gmail.com>
+Subject: Re: [PATCH v16 1/3] lsm, selinux: Add setup_report permission to binder
+To: Paul Moore <paul@paul-moore.com>
+Cc: dualli@google.com, corbet@lwn.net, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	donald.hunter@gmail.com, gregkh@linuxfoundation.org, arve@android.com, 
+	tkjos@android.com, maco@android.com, joel@joelfernandes.org, 
+	brauner@kernel.org, cmllamas@google.com, surenb@google.com, 
+	omosnace@redhat.com, shuah@kernel.org, arnd@arndb.de, masahiroy@kernel.org, 
+	bagasdotme@gmail.com, horms@kernel.org, tweek@google.com, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	netdev@vger.kernel.org, selinux@vger.kernel.org, hridya@google.com, 
+	smoreland@google.com, ynaffit@google.com, kernel-team@android.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Fri, Mar 7, 2025 at 1:47=E2=80=AFPM Paul Moore <paul@paul-moore.com> wro=
+te:
+>
+> On Mon, Mar 3, 2025 at 3:02=E2=80=AFPM Li Li <dualli@chromium.org> wrote:
+> >
+> > From: Thi=C3=A9baud Weksteen <tweek@google.com>
+> >
+> > Introduce a new permission "setup_report" to the "binder" class.
+> > This persmission controls the ability to set up the binder generic
+> > netlink driver to report certain binder transactions.
+> >
+> > Signed-off-by: Thi=C3=A9baud Weksteen <tweek@google.com>
+> > Signed-off-by: Li Li <dualli@google.com>
+> > ---
+> >  include/linux/lsm_hook_defs.h       |  1 +
+> >  include/linux/security.h            |  6 ++++++
+> >  security/security.c                 | 13 +++++++++++++
+> >  security/selinux/hooks.c            |  7 +++++++
+> >  security/selinux/include/classmap.h |  3 ++-
+> >  5 files changed, 29 insertions(+), 1 deletion(-)
+>
+> ...
+>
+> > diff --git a/security/security.c b/security/security.c
+> > index 8aa839232c73..382e3bbab215 100644
+> > --- a/security/security.c
+> > +++ b/security/security.c
+> > @@ -1043,6 +1043,19 @@ int security_binder_transfer_file(const struct c=
+red *from,
+> >         return call_int_hook(binder_transfer_file, from, to, file);
+> >  }
+> >
+> > +/**
+> > + * security_binder_setup_report() - Check if process allowed to set up=
+ binder reports.
+>
+> Please keep the line length in the LSM and SELinux code to 80
+> characters or less.
+>
+> > diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
+> > index 0d958f38ff9f..2fafa8feafdf 100644
+> > --- a/security/selinux/hooks.c
+> > +++ b/security/selinux/hooks.c
+> > @@ -2092,6 +2092,12 @@ static int selinux_binder_transfer_file(const st=
+ruct cred *from,
+> >                             &ad);
+> >  }
+> >
+> > +static int selinux_binder_setup_report(const struct cred *to)
+> > +{
+> > +       return avc_has_perm(current_sid(), cred_sid(to), SECCLASS_BINDE=
+R,
+> > +                           BINDER__SETUP_REPORT, NULL);
+> > +}
+>
+> There should also be an associated patch{set} against the
+> selinux-testsuite to add tests for the binder/setup_report permission
+> introduced here.  My apologies if you've already posted one, but I'm
+> looking now and I don't see anything either on the lists or on GH.
+>
+> * https://github.com/SELinuxProject/selinux-testsuite
+>
+> --
+> paul-moore.com
 
-syzbot found the following issue on:
-
-HEAD commit:    40587f749df2 Merge branch 'enic-enable-32-64-byte-cqes-and..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=16b35478580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ca99d9d1f4a8ecfa
-dashboard link: https://syzkaller.appspot.com/bug?extid=368054937a6a7ead5f35
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/6d02993a9211/disk-40587f74.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/2c8b300bf362/vmlinux-40587f74.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/2d5be21882cf/bzImage-40587f74.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+368054937a6a7ead5f35@syzkaller.appspotmail.com
-
-vlan2: entered allmulticast mode
-bond0: entered allmulticast mode
-bond_slave_0: entered allmulticast mode
-bond_slave_1: entered allmulticast mode
-team0: entered allmulticast mode
-team_slave_0: entered allmulticast mode
-team_slave_1: entered allmulticast mode
-batadv0: entered allmulticast mode
-BUG: sleeping function called from invalid context at kernel/locking/mutex.c:562
-in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 23629, name: syz.4.5165
-preempt_count: 0, expected: 0
-RCU nest depth: 1, expected: 0
-3 locks held by syz.4.5165/23629:
- #0: ffffffff903f0bd0 (&ops->srcu#2){.+.+}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
- #0: ffffffff903f0bd0 (&ops->srcu#2){.+.+}-{0:0}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
- #0: ffffffff903f0bd0 (&ops->srcu#2){.+.+}-{0:0}, at: rtnl_link_ops_get+0x22/0x250 net/core/rtnetlink.c:570
- #1: ffffffff8fed6908 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
- #1: ffffffff8fed6908 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock net/core/rtnetlink.c:341 [inline]
- #1: ffffffff8fed6908 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0xc4c/0x1d90 net/core/rtnetlink.c:4054
- #2: ffffffff8eb392e0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
- #2: ffffffff8eb392e0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
- #2: ffffffff8eb392e0 (rcu_read_lock){....}-{1:3}, at: team_change_rx_flags+0x29/0x330 drivers/net/team/team_core.c:1781
-CPU: 1 UID: 0 PID: 23629 Comm: syz.4.5165 Not tainted 6.14.0-rc5-syzkaller-01183-g40587f749df2 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- __might_resched+0x5d4/0x780 kernel/sched/core.c:8767
- __mutex_lock_common kernel/locking/mutex.c:562 [inline]
- __mutex_lock+0x126/0x1010 kernel/locking/mutex.c:730
- netdev_lock include/linux/netdevice.h:2731 [inline]
- netdev_lock_ops include/net/netdev_lock.h:40 [inline]
- dev_set_allmulti+0x11c/0x270 net/core/dev_api.c:279
- team_change_rx_flags+0x1a8/0x330 drivers/net/team/team_core.c:1789
- dev_change_rx_flags net/core/dev.c:9154 [inline]
- netif_set_allmulti+0x20e/0x380 net/core/dev.c:9256
- dev_set_allmulti+0x143/0x270 net/core/dev_api.c:280
- bond_set_allmulti drivers/net/bonding/bond_main.c:946 [inline]
- bond_change_rx_flags+0x4e1/0x6b0 drivers/net/bonding/bond_main.c:4737
- dev_change_rx_flags net/core/dev.c:9154 [inline]
- netif_set_allmulti+0x20e/0x380 net/core/dev.c:9256
- dev_set_allmulti+0x143/0x270 net/core/dev_api.c:280
- vlan_dev_open+0x2be/0x8a0 net/8021q/vlan_dev.c:278
- __dev_open+0x45a/0x8a0 net/core/dev.c:1644
- netif_open+0xae/0x1b0 net/core/dev.c:1667
- dev_open+0x13e/0x260 net/core/dev_api.c:191
- bond_enslave+0x103c/0x3910 drivers/net/bonding/bond_main.c:2135
- do_set_master+0x579/0x730 net/core/rtnetlink.c:2943
- rtnl_newlink_create+0x6e6/0xbd0 net/core/rtnetlink.c:3837
- __rtnl_newlink net/core/rtnetlink.c:3940 [inline]
- rtnl_newlink+0x167a/0x1d90 net/core/rtnetlink.c:4055
- rtnetlink_rcv_msg+0x791/0xcf0 net/core/rtnetlink.c:6945
- netlink_rcv_skb+0x206/0x480 net/netlink/af_netlink.c:2534
- netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
- netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1339
- netlink_sendmsg+0x8de/0xcb0 net/netlink/af_netlink.c:1883
- sock_sendmsg_nosec net/socket.c:709 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:724
- ____sys_sendmsg+0x53a/0x860 net/socket.c:2564
- ___sys_sendmsg net/socket.c:2618 [inline]
- __sys_sendmsg+0x269/0x350 net/socket.c:2650
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fe00998d169
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fe00a843038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fe009ba5fa0 RCX: 00007fe00998d169
-RDX: 0000000000000000 RSI: 0000400000000280 RDI: 0000000000000003
-RBP: 00007fe009a0e2a0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007fe009ba5fa0 R15: 00007ffdc9be6f48
- </TASK>
-
-=============================
-[ BUG: Invalid wait context ]
-6.14.0-rc5-syzkaller-01183-g40587f749df2 #0 Tainted: G        W         
------------------------------
-syz.4.5165/23629 is trying to lock:
-ffff88807bce0d28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2731 [inline]
-ffff88807bce0d28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock_ops include/net/netdev_lock.h:40 [inline]
-ffff88807bce0d28 (&dev->lock){+.+.}-{4:4}, at: dev_set_allmulti+0x11c/0x270 net/core/dev_api.c:279
-other info that might help us debug this:
-context-{5:5}
-3 locks held by syz.4.5165/23629:
- #0: ffffffff903f0bd0 (&ops->srcu#2){.+.+}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
- #0: ffffffff903f0bd0 (&ops->srcu#2){.+.+}-{0:0}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
- #0: ffffffff903f0bd0 (&ops->srcu#2){.+.+}-{0:0}, at: rtnl_link_ops_get+0x22/0x250 net/core/rtnetlink.c:570
- #1: ffffffff8fed6908 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
- #1: ffffffff8fed6908 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock net/core/rtnetlink.c:341 [inline]
- #1: ffffffff8fed6908 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0xc4c/0x1d90 net/core/rtnetlink.c:4054
- #2: ffffffff8eb392e0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
- #2: ffffffff8eb392e0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
- #2: ffffffff8eb392e0 (rcu_read_lock){....}-{1:3}, at: team_change_rx_flags+0x29/0x330 drivers/net/team/team_core.c:1781
-stack backtrace:
-CPU: 1 UID: 0 PID: 23629 Comm: syz.4.5165 Tainted: G        W          6.14.0-rc5-syzkaller-01183-g40587f749df2 #0
-Tainted: [W]=WARN
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- print_lock_invalid_wait_context kernel/locking/lockdep.c:4828 [inline]
- check_wait_context kernel/locking/lockdep.c:4900 [inline]
- __lock_acquire+0x15a8/0x2100 kernel/locking/lockdep.c:5178
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5851
- __mutex_lock_common kernel/locking/mutex.c:585 [inline]
- __mutex_lock+0x19c/0x1010 kernel/locking/mutex.c:730
- netdev_lock include/linux/netdevice.h:2731 [inline]
- netdev_lock_ops include/net/netdev_lock.h:40 [inline]
- dev_set_allmulti+0x11c/0x270 net/core/dev_api.c:279
- team_change_rx_flags+0x1a8/0x330 drivers/net/team/team_core.c:1789
- dev_change_rx_flags net/core/dev.c:9154 [inline]
- netif_set_allmulti+0x20e/0x380 net/core/dev.c:9256
- dev_set_allmulti+0x143/0x270 net/core/dev_api.c:280
- bond_set_allmulti drivers/net/bonding/bond_main.c:946 [inline]
- bond_change_rx_flags+0x4e1/0x6b0 drivers/net/bonding/bond_main.c:4737
- dev_change_rx_flags net/core/dev.c:9154 [inline]
- netif_set_allmulti+0x20e/0x380 net/core/dev.c:9256
- dev_set_allmulti+0x143/0x270 net/core/dev_api.c:280
- vlan_dev_open+0x2be/0x8a0 net/8021q/vlan_dev.c:278
- __dev_open+0x45a/0x8a0 net/core/dev.c:1644
- netif_open+0xae/0x1b0 net/core/dev.c:1667
- dev_open+0x13e/0x260 net/core/dev_api.c:191
- bond_enslave+0x103c/0x3910 drivers/net/bonding/bond_main.c:2135
- do_set_master+0x579/0x730 net/core/rtnetlink.c:2943
- rtnl_newlink_create+0x6e6/0xbd0 net/core/rtnetlink.c:3837
- __rtnl_newlink net/core/rtnetlink.c:3940 [inline]
- rtnl_newlink+0x167a/0x1d90 net/core/rtnetlink.c:4055
- rtnetlink_rcv_msg+0x791/0xcf0 net/core/rtnetlink.c:6945
- netlink_rcv_skb+0x206/0x480 net/netlink/af_netlink.c:2534
- netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
- netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1339
- netlink_sendmsg+0x8de/0xcb0 net/netlink/af_netlink.c:1883
- sock_sendmsg_nosec net/socket.c:709 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:724
- ____sys_sendmsg+0x53a/0x860 net/socket.c:2564
- ___sys_sendmsg net/socket.c:2618 [inline]
- __sys_sendmsg+0x269/0x350 net/socket.c:2650
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fe00998d169
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fe00a843038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fe009ba5fa0 RCX: 00007fe00998d169
-RDX: 0000000000000000 RSI: 0000400000000280 RDI: 0000000000000003
-RBP: 00007fe009a0e2a0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007fe009ba5fa0 R15: 00007ffdc9be6f48
- </TASK>
-netdevsim netdevsim4 netdevsim0: entered allmulticast mode
-bond0: left allmulticast mode
-bond_slave_0: left allmulticast mode
-bond_slave_1: left allmulticast mode
-team0: left allmulticast mode
-team_slave_0: left allmulticast mode
-team_slave_1: left allmulticast mode
-batadv0: left allmulticast mode
-BUG: sleeping function called from invalid context at kernel/locking/mutex.c:562
-in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 23629, name: syz.4.5165
-preempt_count: 0, expected: 0
-RCU nest depth: 1, expected: 0
-INFO: lockdep is turned off.
-CPU: 0 UID: 0 PID: 23629 Comm: syz.4.5165 Tainted: G        W          6.14.0-rc5-syzkaller-01183-g40587f749df2 #0
-Tainted: [W]=WARN
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- __might_resched+0x5d4/0x780 kernel/sched/core.c:8767
- __mutex_lock_common kernel/locking/mutex.c:562 [inline]
- __mutex_lock+0x126/0x1010 kernel/locking/mutex.c:730
- netdev_lock include/linux/netdevice.h:2731 [inline]
- netdev_lock_ops include/net/netdev_lock.h:40 [inline]
- dev_set_allmulti+0x11c/0x270 net/core/dev_api.c:279
- team_change_rx_flags+0x1a8/0x330 drivers/net/team/team_core.c:1789
- dev_change_rx_flags net/core/dev.c:9154 [inline]
- netif_set_allmulti+0x20e/0x380 net/core/dev.c:9256
- dev_set_allmulti+0x143/0x270 net/core/dev_api.c:280
- bond_set_allmulti drivers/net/bonding/bond_main.c:946 [inline]
- bond_change_rx_flags+0x4e1/0x6b0 drivers/net/bonding/bond_main.c:4737
- dev_change_rx_flags net/core/dev.c:9154 [inline]
- netif_set_allmulti+0x20e/0x380 net/core/dev.c:9256
- dev_set_allmulti+0x143/0x270 net/core/dev_api.c:280
- vlan_dev_stop+0xb0/0x330 net/8021q/vlan_dev.c:320
- __dev_close_many+0x3a6/0x700 net/core/dev.c:1717
- dev_close_many+0x24e/0x4c0 net/core/dev.c:1742
- netif_close+0x1c0/0x2c0 net/core/dev.c:1759
- dev_close+0x137/0x280 net/core/dev_api.c:210
- bond_enslave+0x26ca/0x3910 drivers/net/bonding/bond_main.c:2438
- do_set_master+0x579/0x730 net/core/rtnetlink.c:2943
- rtnl_newlink_create+0x6e6/0xbd0 net/core/rtnetlink.c:3837
- __rtnl_newlink net/core/rtnetlink.c:3940 [inline]
- rtnl_newlink+0x167a/0x1d90 net/core/rtnetlink.c:4055
- rtnetlink_rcv_msg+0x791/0xcf0 net/core/rtnetlink.c:6945
- netlink_rcv_skb+0x206/0x480 net/netlink/af_netlink.c:2534
- netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
- netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1339
- netlink_sendmsg+0x8de/0xcb0 net/netlink/af_netlink.c:1883
- sock_sendmsg_nosec net/socket.c:709 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:724
- ____sys_sendmsg+0x53a/0x860 net/socket.c:2564
- ___sys_sendmsg net/socket.c:2618 [inline]
- __sys_sendmsg+0x269/0x350 net/socket.c:2650
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fe00998d169
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fe00a843038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fe009ba5fa0 RCX: 00007fe00998d169
-RDX: 0000000000000000 RSI: 0000400000000280 RDI: 0000000000000003
-RBP: 00007fe009a0e2a0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007fe009ba5fa0 R15: 00007ffdc9be6f48
- </TASK>
-netdevsim netdevsim4 netdevsim0: left allmulticast mode
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Thank you very much! I'll add such a test, along with other binder
+fixes mentioned by Carlos.
 
