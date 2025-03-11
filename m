@@ -1,105 +1,125 @@
-Return-Path: <netdev+bounces-173832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19BAAA5BEA7
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 12:15:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D37CFA5BED7
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 12:23:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2FE33B194A
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 11:15:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9824718984FE
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 11:23:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49296224AF3;
-	Tue, 11 Mar 2025 11:15:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5E25251790;
+	Tue, 11 Mar 2025 11:23:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g8lSvO2r"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fegP+FAF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FE9F1DEFFC;
-	Tue, 11 Mar 2025 11:15:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90442512C9;
+	Tue, 11 Mar 2025 11:23:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741691736; cv=none; b=ip2BVF2bjCmEbHf/hITGvHaBMOUxXaVZhpEGw/FqNoFXnz5mmC37tyI+tCqWfE0oOYwxwTd6keqbC+V9/1LWXNm6a4/GRN69NnZZrtRGvY99zfPBpRpRbccF9cB0rIWEukPivuiFOIuGpaFC49z7zbrUttwv/hYHfdD+rHUl++o=
+	t=1741692207; cv=none; b=NWpjXPHoaOE8UnxvACL6mpg25NAu2R3kIvaUhUs+oF7XAf4pH0tNWuKrW3BTlO/Bcihtu0Qo2KWkCb2XNSYz7uZ+1mljMXECjMzohAvw5lSOEq0/Mav6iLoKCWSB3pYGVTjTOJDMvwJb85d2eWIjnXCdmBfCSq+VFhgwCP76Y6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741691736; c=relaxed/simple;
-	bh=va1by/3p8+ybPKxwukKtBv1gAiHFNUyh60yOFGE+flY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aJsavit5Q9a4G8M/kyU2DdP3WhOl+hubtAwzxzQQk4GeQmYb4u1c8QcUuMtamDMy8AHb3AkHPM+kKuVD560ibkKnGx22nuJYBRuaJbPywKtAByezOhrXbdna7i/2SVZXaHSWtmpKmimBpIw0upYybHqbVTgAC/0AYdDJnlawuO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g8lSvO2r; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CCD4C4CEE9;
-	Tue, 11 Mar 2025 11:15:31 +0000 (UTC)
+	s=arc-20240116; t=1741692207; c=relaxed/simple;
+	bh=j3dY8JEj49BUDjlILsGdzU2dMHu1fR7oCnu9tJ5XMew=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=b/YO5aK/mx0POctuZB8qVmJm0B70rgMrpdcswlCpdSbERSi/gqgQS/IuO89wQr/CDN3o/jNxag+vmGuR/trzaLG+Idb2V0PmZITN+7JUaeUejlC6wdIIqaT+Pd853cnjQXURJV4icforKNCTku2MUHM9Fo36vCuLWfv7w6KXGKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fegP+FAF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE689C4CEEB;
+	Tue, 11 Mar 2025 11:23:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741691735;
-	bh=va1by/3p8+ybPKxwukKtBv1gAiHFNUyh60yOFGE+flY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=g8lSvO2rGMe+Nzq6zhEaimTDOAUiBeWNsBX5H3YkPa2UfUr4fHtvfqyLnELvotVFi
-	 icnIRV1M31GceJQYoovc5tF0e1vkawKd89jNj6L3tfLx5imnYQOeVP9UiSQUAgCTo6
-	 qELVS4uuxKK+pH9v2xZLvGtT66hJlaYSXkL2eoYNBUlgfIoHtDyGkxkhJSjRRaiyJp
-	 1WWDiz/tlD6N2CvTZSHg9QYoN0IfFY3TrALefCTT9TQVABfhGXG5AHpRFKO174lhlB
-	 +72+giQyK4eZFUP4JzajufVfqTuJIOBot9Ut1HqeF5BymKsrxqL4AagHSADv4WmXTB
-	 V5gABTBzrrZvw==
-Date: Tue, 11 Mar 2025 12:15:29 +0100
-From: Simon Horman <horms@kernel.org>
-To: Yu-Chun Lin <eleanor15x@gmail.com>
-Cc: shshaikh@marvell.com, manishc@marvell.com, GR-Linux-NIC-Dev@marvell.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, jserv@ccns.ncku.edu.tw,
-	visitorckw@gmail.com
-Subject: Re: [PATCH net-next] qlcnic: Optimize performance by replacing
- rw_lock with spinlock
-Message-ID: <20250311111529.GM4159220@kernel.org>
-References: <20250306163124.127473-1-eleanor15x@gmail.com>
- <20250307132929.GI3666230@kernel.org>
- <Z8xx0aN4vA7d-73i@eleanor-wkdl>
+	s=k20201202; t=1741692207;
+	bh=j3dY8JEj49BUDjlILsGdzU2dMHu1fR7oCnu9tJ5XMew=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=fegP+FAF9d3QJy/e2qB1EOF1A9Dan7OuagnmCb9ppnF3e328TM/DojAWy0gd8okW2
+	 fJGWzGBWT8AQj/HDE9U6YnSXdexDIeDURqESTnBzxsso45wTYjyxRMVCs3PzloSfnL
+	 GDnUc94IU7SBx3JYqjis+Hc4a2BNTXvlK7lT1Mlrgi7JPx3pHSXhEb3XbMRUZKbwMb
+	 kJfWuAxNSa0XNHF1vGeGI8vj/nzbpDxv7WSU2xkO8KUK1j/Sdnjv2enCyZmiN2VBzi
+	 aCGnvuSFmZCUb/NSAYjwE07KXByUhjRqIHDAHOzNajmMnT4jiajxzhVVv1T4HsfUh1
+	 JkZGI+iCnRaTA==
+Message-ID: <6af1429e-c36a-459c-9b35-6a9f55c3b2ac@kernel.org>
+Date: Tue, 11 Mar 2025 12:23:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z8xx0aN4vA7d-73i@eleanor-wkdl>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 0/8] Introduce fwctl subystem
+Content-Language: en-US
+To: Jason Gunthorpe <jgg@nvidia.com>, Saeed Mahameed <saeed@kernel.org>
+Cc: Leon Romanovsky <leon@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+ Aron Silverton <aron.silverton@oracle.com>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Daniel Vetter <daniel.vetter@ffwll.ch>, Dave Jiang <dave.jiang@intel.com>,
+ Christoph Hellwig <hch@infradead.org>, Itay Avraham <itayavr@nvidia.com>,
+ Jiri Pirko <jiri@nvidia.com>, Jonathan Cameron
+ <Jonathan.Cameron@huawei.com>, Leonid Bloch <lbloch@nvidia.com>,
+ linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
+ "Nelson, Shannon" <shannon.nelson@amd.com>
+References: <0-v5-642aa0c94070+4447f-fwctl_jgg@nvidia.com>
+ <20250303175358.4e9e0f78@kernel.org> <20250304140036.GK133783@nvidia.com>
+ <20250304164203.38418211@kernel.org> <20250305133254.GV133783@nvidia.com>
+ <mxw4ngjokr3vumdy5fp2wzxpocjkitputelmpaqo7ungxnhnxp@j4yn5tdz3ief>
+ <bcafcf60-47a8-4faf-bea3-19cf0cbc4e08@kernel.org>
+ <20250305182853.GO1955273@unreal> <Z8i2_9G86z14KbpB@x130>
+ <20250305232154.GB354511@nvidia.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20250305232154.GB354511@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Mar 09, 2025 at 12:35:29AM +0800, Yu-Chun Lin wrote:
-> On Fri, Mar 07, 2025 at 01:29:29PM +0000, Simon Horman wrote:
-> > On Fri, Mar 07, 2025 at 12:31:24AM +0800, Yu-Chun Lin wrote:
-> > > The 'crb_lock', an rwlock, is only used by writers, making it functionally
-> > > equivalent to a spinlock.
-> > > 
-> > > According to Documentation/locking/spinlocks.rst:
-> > > 
-> > > "Reader-writer locks require more atomic memory operations than simple
-> > > spinlocks. Unless the reader critical section is long, you are better
-> > > off just using spinlocks."
-> > > 
-> > > Since read_lock() is never called, switching to a spinlock reduces
-> > > overhead and improves efficiency.
-> > > 
-> > > Signed-off-by: Yu-Chun Lin <eleanor15x@gmail.com>
-> > 
-> > Hi Yu-Chun Lin,
-> > 
-> > Thanks for your patch.
-> > 
-> > My main question is if you have hardware to test this?
-> > And if so, was a benefit observed?
-> > 
-> > If not, my feeling is that although your change looks
-> > correct, we'd be better off taking the lower risk option
-> > of leaving things be.
+On 3/6/25 12:21 AM, Jason Gunthorpe wrote:
+> On Wed, Mar 05, 2025 at 12:41:35PM -0800, Saeed Mahameed wrote:
 > 
-> Hi Simon
+>> How do you imagine this driver/core structure should look like? Who
+>> will be the top dir maintainer?
 > 
-> I perform a compile test to ensure correctness. But I don't have the
-> hardware to run a full test.
+> I would set something like this up more like DRM. Every driver
+> maintainer gets commit rights, some rules about no uAPIs, or at least
+> other acks before merging uAPI. Use the tree for staging shared
+> branches.
 
-Thanks Yu-Chun Lin,
+why no uapi? Core driver can have knowledge of h/w resources across all
+use cases. For example, our core driver supports a generid netlink based
+dump (no set operations; get and dump only so maybe that should be the
+restriction?) of all objects regardless of how created -- netdev, ib,
+etc. -- and with much more detail.
 
-Unfortunately I think we need hardware testing to accept this
-kind of change.
+> 
+> Driver maintainers with the most commits per cycle does the PR or
+> something like that.
+> 
+> There is no subsystem or cross-driver entanglement so there is no real
+> need for gatekeeping.
+> 
+> It would be a good opportunity to help more people engage with the
+> kernel process and learn the full maintainer flow.
+> 
+>> It should be something that is tightly coupled with aux, currently
+>> aux is under drivers/base/auxiliary.c I think it should move to
+>> drivers/aux/auxiliary.c and device drivers should implement their
+>> own aux buses, WH access APIs and probing/init logic under that
+>> directory e.g: drivers/aux/mlx5/..
+> 
+> That makes sense to me. I would expect everything in this collection
+> to be PCI drivers spawing aux devices.
+> 
+> drivers/aux_core/ or something like that, perhaps?
+> 
+
+drivers/aux_core works for me; removes the 'pci' assumption and makes it
+clear the real attribute here is use of the aux bus with subsystem
+specific devices. I am still not clear on how such a branch will work -
+e.g. We will want multi-vendor review, not just merge the PR and go.
+
 
