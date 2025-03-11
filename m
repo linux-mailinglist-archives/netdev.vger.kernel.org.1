@@ -1,82 +1,56 @@
-Return-Path: <netdev+bounces-173927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECE2EA5C3F4
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 15:36:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DCB7A5C3FA
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 15:37:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 779861890AB2
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:36:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2653C7AAADF
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:36:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFF9B25CC86;
-	Tue, 11 Mar 2025 14:36:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6AD25CC95;
+	Tue, 11 Mar 2025 14:36:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="V0o+I1cU"
+	dkim=pass (2048-bit key) header.d=gmx.de header.i=fiona.klute@gmx.de header.b="TfMw8114"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26CD825C717;
-	Tue, 11 Mar 2025 14:36:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C90B325CC77;
+	Tue, 11 Mar 2025 14:36:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741703779; cv=none; b=GhjytBTvXPb26Xy7A+q39tvP7yryxWHRd7o0Swn5LQPcSldIlNUGlCesmO48WQbOdlb9nf4p0IEMTMJ5y+jnVkqm5B203E+QvWz+lO/mii/B2j/3pMSaHLtHh4ahzmntS4riL15v3/M3cxjywUBgDijZikuBy0xB4D3dyeczpE0=
+	t=1741703810; cv=none; b=J3uRkzOF5AKtQ03oUsczUy4KrYNiwSRYszL+J+AD2C9HcXeA9VXBr1MfNdyhxfw/ubq/spJmyDGvc8SoOymhQU0FiaG8FnYqLQ+3N6Im/u4imvJ+8tRX9+vahRlfrXa5BdQZR72HYpMngxUBbmyp2rbLIOeT0yiy2amkGtLe4KI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741703779; c=relaxed/simple;
-	bh=QpK53emxzundB3boPQwv2DDoyNFHOdeOqIuWMFSBX84=;
+	s=arc-20240116; t=1741703810; c=relaxed/simple;
+	bh=mC/5J7Ya9VRj3TG8oIfCpNT8VWsPU/gApt0oe4jH43U=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UfjZKuw5V3hB87I3qKZa51+7YCosYAmEnW9Gp7xj76CbO+equUrcb7a8yXCK8jSm+PvGFZbMyWW+nzOg2LuXzeK2E0T1d48EiwTuEDgWilTQTtSsQ0slZVlf4Iw4XamdS0opTnhz5dWk2SsMfgXR+XkA00uxRY8xioRnmkPdSg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=V0o+I1cU; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52BA09M0004515;
-	Tue, 11 Mar 2025 14:36:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=+gJJGx
-	RnLVbsWoeczP6FG8yWHlZQ5ofOXHgWg+4VQzQ=; b=V0o+I1cUSA2jJpM51uVhWP
-	1UTmlgDvrstXM+Nwh3Prk0PKsmCcAa5pVHTOPheQkrSQhd/Ihb3pZpUCAh2qnrLQ
-	FfhHAEeuoTCE7zSQ9OmFT4C8wGIZ/bNv+sU9I2OZRSz3YmpZn+2YvmHfaKk30Xha
-	kzuOtL29hBtEheeFGjb8khDb+Et9z+9jxY1b/U/+paMXPQsnpnKwPc8gwzGErSgk
-	jiT6NC7Ap0xW4ol2cT2rfhPrFigCGcSotXHbf3n3zryPDyRPK4cLCdbTBi3jd+rI
-	AE+mrPSreS7o/Xw2jdqCOFVUqdIoTnDAiAey+jT7CdPOS19Pag63NVJm0nD17sfA
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45a78qvghk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Mar 2025 14:36:11 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 52BEKG21003836;
-	Tue, 11 Mar 2025 14:36:11 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45a78qvghh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Mar 2025 14:36:11 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52BBVjMM014003;
-	Tue, 11 Mar 2025 14:36:10 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4592x1v7re-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Mar 2025 14:36:10 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52BEa9P014025446
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 11 Mar 2025 14:36:09 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 42D6C58054;
-	Tue, 11 Mar 2025 14:36:09 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4663458050;
-	Tue, 11 Mar 2025 14:36:06 +0000 (GMT)
-Received: from [9.152.224.242] (unknown [9.152.224.242])
-	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 11 Mar 2025 14:36:06 +0000 (GMT)
-Message-ID: <77e4653d-6ad2-4b97-9952-99d506276b1a@linux.ibm.com>
-Date: Tue, 11 Mar 2025 15:36:05 +0100
+	 In-Reply-To:Content-Type; b=G0QMryTEnQVNWCIcdwizf7j8V7r7j2J/GBrsBofY5VqibCgERLsw8whlJLvPLSbRYXuYwWiFX5bf9IIzc2usa5XiR1tNH+LzVsdXEahMzOpN+XMElPm30V9dvybK0oZ3/IfcL9/7iu3c1ORs9FOuW10Y9EuCmMigVEqM/vF/yBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=fiona.klute@gmx.de header.b=TfMw8114; arc=none smtp.client-ip=212.227.17.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
+	s=s31663417; t=1741703804; x=1742308604; i=fiona.klute@gmx.de;
+	bh=7T2Eg25mErZe40rj8TyAYOGzmsWuKdrSGJHWaZx+Q8s=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=TfMw8114RB24F7ztJ9T4OQOly1wRMxWyq43c7beDx7XhJLqkqR13dIp5Qazg/ASI
+	 DO1i3BbiSQgusdjd0SJhG1f9yluj4soUjDogyW1hkmqwUeiG4cH9inxZy3AY7hiKJ
+	 PinTJx15VCMn1bKipKxV5DzxlQzngrJP8tIQaSlkbNZtUcGe0YW735sRMgZ2IaDF0
+	 Z+e9DMms+XNiXtFARUl/U6iA7JMSHLEJW7BM/0Qni7RyNVkBoJVKU9XxB5/gpiVIN
+	 UXBWVwh8fJK07mH1XJd0gCQckDsBNhUAxgSGSlCIRgyIwJZ+GVnbpAJNvLqCfeNfg
+	 rlQusdTj207pjLDuzA==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [192.168.7.2] ([85.22.124.191]) by mail.gmx.net (mrgmx105
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1N5G9t-1tBUsL2SQv-00weus; Tue, 11
+ Mar 2025 15:36:44 +0100
+Message-ID: <83b8ec69-0f7b-4ede-bf4f-f35b5d4fa4b2@gmx.de>
+Date: Tue, 11 Mar 2025 15:36:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,170 +58,174 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net/smc: use the correct ndev to find pnetid
- by pnetid table
-To: Paolo Abeni <pabeni@redhat.com>,
-        Guangguan Wang <guangguan.wang@linux.alibaba.com>, pasic@linux.ibm.com,
-        jaka@linux.ibm.com, alibuda@linux.alibaba.com,
-        tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
-        mjambigi@linux.ibm.com, sidraya@linux.ibm.com
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        horms@kernel.org, linux-rdma@vger.kernel.org,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20250304124304.13732-1-guangguan.wang@linux.alibaba.com>
- <2c9accbd-fd6f-421c-9d00-1f36a6152b8d@redhat.com>
-Content-Language: en-US
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-In-Reply-To: <2c9accbd-fd6f-421c-9d00-1f36a6152b8d@redhat.com>
+Subject: Re: [PATCH] net: usb: lan78xx: Enforce a minimum interrupt polling
+ period
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, Thangaraj Samynathan <Thangaraj.S@microchip.com>,
+ Rengarajan Sundararajan <Rengarajan.S@microchip.com>,
+ UNGLinuxDriver@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-usb@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-list@raspberrypi.com,
+ stable@vger.kernel.org
+References: <20250310165932.1201702-1-fiona.klute@gmx.de>
+ <11f5be1d-9250-4aba-8f51-f231b09d3992@lunn.ch>
+ <4577e7d7-cadc-41c6-b93f-eca7d5a8eb46@gmx.de>
+ <42b5d49b-caf8-492d-8dba-b5292279478a@lunn.ch>
+Content-Language: en-US, de-DE-1901, de-DE
+From: Fiona Klute <fiona.klute@gmx.de>
+Autocrypt: addr=fiona.klute@gmx.de; keydata=
+ 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
+In-Reply-To: <42b5d49b-caf8-492d-8dba-b5292279478a@lunn.ch>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 8JyPt17XETZmYuWNC-l4JQSMMxY5YMh1
-X-Proofpoint-ORIG-GUID: w2dWjNPE_sJVQ19EQ9OjxDoJDdrL6PGb
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-11_03,2025-03-11_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- spamscore=0 adultscore=0 mlxlogscore=999 phishscore=0 priorityscore=1501
- lowpriorityscore=0 malwarescore=0 bulkscore=0 suspectscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2502100000
- definitions=main-2503110091
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:Y5lSVKyec42DqzTu9KXl+1p64Hiv3BOm5Ij4FQIqfJDN830PoOc
+ aNDa0PpzlmCobpwFKVktXCS6NuQB4JhiCHo5NnoNBOIOFJ8lfIWa9dxYVQ7t4TtMYdHc0yQ
+ NesTdvAPVIgTcp4fHcGUH/glod4PUdN9hYBy+i7POLxjm45GGl6Rvk0Dq8mArX6rvQwceEb
+ 3csNvPn4W/Ebj5YaNybcg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:0cL0Ug/OdVc=;H5g+wwiR5FzkTIk5YpgDcnh2XVh
+ ukpI9WmiAL3aT24CojMXwYdK/qaeFbvLdrG82eyOGELUJxUqZOCrEP4GYuJ5+WQkiFalwBSSW
+ ccyVe0veSaID+LRcbGUi39O+Ac7SQI5sKu4A0WNFawJPSZ8OQRwEaZwbQ17Nl4uk7TGPriKVV
+ 1P+bK5mwcghETEvMWxqm+pGJFiRZ5gFC59mCkF9+6+Mx8bCl08JXnKwrWF3J57D2QLLMTrS8K
+ 42WcNonj5jr8USsqJlEgbnm7LPu5oN4qZQQ0XwnJ6ZEMhouo4rfI/ea6qsTbrMGLjl5Me7fiu
+ DDew1moYjAJvlPT3gH46UUmTO71BarNhh2zN3I7/YByPzAMaiWLFxN/00HgicHXh7yBIWKpWD
+ G3ZWxrTP+QbGxPfRJw7ddx/oIod37HX8+z/7WItP5Dw0uysq40Rewl7RQraLV2rISVYCsx5F6
+ cqXpXvHZDOFIUH0SNyS1Q7LFgMwoGK5zLq3wa8wPWj5HqOSPpZgdFikYkvSNuz9nStwIBT2Sq
+ OjrZA+vigMWSpUSe1IYYdQZtOxu80PDzxuyXLjSJm067bMMilTzVIwFScMayclc3yb5F9MOqB
+ AXmTSTw9hDsEunqnYZT40KXQDLOjnmiWU19veYYhLYcgjqLXEOOCKX98s3wdiXy2EB6m6ACcO
+ 4EYhJY8c71H5D3rXbt7ADxd4s8QbzGfo+OEU78IRZhavy7WD4tcXMIe7CslRTkNASxUhwBo7P
+ N6MHPXwtOYZmr1ZEBBIBTnnFBJIRgNQODYJ4mOHCl2c+R+Kc5tFsc/ky2nbcQ++A5lDSqdDO1
+ juQyuOIYxOhwN+H+stbpe4RWse8JzeXWYUimfyFmr/R86NNJ7nlAycZKE/UzJ9YC1HE3E4txm
+ OpKYwHjGDBUPoKuj/X128jDnjiBJzQGCidFq9pRw4oD82MVf+xrWyw91BHXzDmoyluMaVqZxD
+ fMzwo/7jeJmTlbERsBn4dTAp2EYGHNmDp1JTf32FKo0AeEHhUoKhlOomk99mSmqaHaXdatFRX
+ RjAJK5zmUuw7BAeQ4TFizoA2MPehYqBcHJdh444e9CnbsE11lcHQoCSaA8OhAFtJhuk0W7GFo
+ GRbs5CFgkhoo9wEUd/R5GIlGcZvHa0osBvZqjXuho1a3eEAUxVZmGQHWQZS/at2boOwI9PPal
+ +fCI5Bzi4FcuL7I4HvqHiuGZSrOUbfsL33SLo1lXRWUyNH/1N5KeafdvC3EUGVHfrtUtK93zT
+ 8+mRmVVUCifElqC61IBuA89VV1dzJyD/dkDMq/rqbJ5TprNkZwDiEkc1xfsU1hFxnKqXFMTQH
+ Je+D3xp7gEfemy/40MxNEUFSzXFO7c9G+L14wDQJkR11trDAoIhzDKwUWiDPxhxG9Fc75PjHQ
+ 9WZqTVKdpqRcznrJQkiTd2T7q/Aw+E8i3ncFZ6cZpmTTl4XTyv3t59UWuheTOnRT7pUfcj8ro
+ 7SLMQcg==
 
-
-
-On 11.03.25 09:59, Paolo Abeni wrote:
-> On 3/4/25 1:43 PM, Guangguan Wang wrote:
->> When using smc_pnet in SMC, it will only search the pnetid in the
->> base_ndev of the netdev hierarchy(both HW PNETID and User-defined
->> sw pnetid). This may not work for some scenarios when using SMC in
->> container on cloud environment.
->> In container, there have choices of different container network,
->> such as directly using host network, virtual network IPVLAN, veth,
->> etc. Different choices of container network have different netdev
->> hierarchy. Examples of netdev hierarchy show below. (eth0 and eth1
->> in host below is the netdev directly related to the physical device).
->>              _______________________________
->>             |   _________________           |
->>             |  |POD              |          |
->>             |  |                 |          |
->>             |  | eth0_________   |          |
->>             |  |____|         |__|          |
->>             |       |         |             |
->>             |       |         |             |
->>             |   eth1|base_ndev| eth0_______ |
->>             |       |         |    | RDMA  ||
->>             | host  |_________|    |_______||
->>             ---------------------------------
->>       netdev hierarchy if directly using host network
->>             ________________________________
->>             |   _________________           |
->>             |  |POD  __________  |          |
->>             |  |    |upper_ndev| |          |
->>             |  |eth0|__________| |          |
->>             |  |_______|_________|          |
->>             |          |lower netdev        |
->>             |        __|______              |
->>             |   eth1|         | eth0_______ |
->>             |       |base_ndev|    | RDMA  ||
->>             | host  |_________|    |_______||
->>             ---------------------------------
->>              netdev hierarchy if using IPVLAN
->>              _______________________________
->>             |   _____________________       |
->>             |  |POD        _________ |      |
->>             |  |          |base_ndev||      |
->>             |  |eth0(veth)|_________||      |
->>             |  |____________|________|      |
->>             |               |pairs          |
->>             |        _______|_              |
->>             |       |         | eth0_______ |
->>             |   veth|base_ndev|    | RDMA  ||
->>             |       |_________|    |_______||
->>             |        _________              |
->>             |   eth1|base_ndev|             |
->>             | host  |_________|             |
->>             ---------------------------------
->>               netdev hierarchy if using veth
->> Due to some reasons, the eth1 in host is not RDMA attached netdevice,
->> pnetid is needed to map the eth1(in host) with RDMA device so that POD
->> can do SMC-R. Because the eth1(in host) is managed by CNI plugin(such
->> as Terway, network management plugin in container environment), and in
->> cloud environment the eth(in host) can dynamically be inserted by CNI
->> when POD create and dynamically be removed by CNI when POD destroy and
->> no POD related to the eth(in host) anymore. It is hard to config the
->> pnetid to the eth1(in host). But it is easy to config the pnetid to the
->> netdevice which can be seen in POD. When do SMC-R, both the container
->> directly using host network and the container using veth network can
->> successfully match the RDMA device, because the configured pnetid netdev
->> is a base_ndev. But the container using IPVLAN can not successfully
->> match the RDMA device and 0x03030000 fallback happens, because the
->> configured pnetid netdev is not a base_ndev. Additionally, if config
->> pnetid to the eth1(in host) also can not work for matching RDMA device
->> when using veth network and doing SMC-R in POD.
+Am 11.03.25 um 14:22 schrieb Andrew Lunn:
+> On Tue, Mar 11, 2025 at 01:30:54PM +0100, Fiona Klute wrote:
+>> Am 10.03.25 um 22:27 schrieb Andrew Lunn:
+>>> On Mon, Mar 10, 2025 at 05:59:31PM +0100, Fiona Klute wrote:
+>>>> If a new reset event appears before the previous one has been
+>>>> processed, the device can get stuck into a reset loop. This happens
+>>>> rarely, but blocks the device when it does, and floods the log with
+>>>> messages like the following:
+>>>>
+>>>>     lan78xx 2-3:1.0 enp1s0u3: kevent 4 may have been dropped
+>>>>
+>>>> The only bit that the driver pays attention to in the interrupt data
+>>>> is "link was reset". If there's a flapping status bit in that endpoin=
+t
+>>>> data (such as if PHY negotiation needs a few tries to get a stable
+>>>> link), polling at a slower rate allows the state to settle.
+>>>
+>>> Could you expand on this a little bit more. What is the issue you are
+>>> seeing?
 >>
->> To resolve the problems list above, this patch extends to search user
->> -defined sw pnetid in the clc handshake ndev when no pnetid can be found
->> in the base_ndev, and the base_ndev take precedence over ndev for backward
->> compatibility. This patch also can unify the pnetid setup of different
->> network choices list above in container(Config user-defined sw pnetid in
->> the netdevice can be seen in POD).
->>
->> Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
->> ---
->>   net/smc/smc_pnet.c | 8 +++++---
->>   1 file changed, 5 insertions(+), 3 deletions(-)
->>
->> diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
->> index 716808f374a8..b391c2ef463f 100644
->> --- a/net/smc/smc_pnet.c
->> +++ b/net/smc/smc_pnet.c
->> @@ -1079,14 +1079,16 @@ static void smc_pnet_find_roce_by_pnetid(struct net_device *ndev,
->>   					 struct smc_init_info *ini)
->>   {
->>   	u8 ndev_pnetid[SMC_MAX_PNETID_LEN];
->> +	struct net_device *base_ndev;
->>   	struct net *net;
->>   
->> -	ndev = pnet_find_base_ndev(ndev);
->> +	base_ndev = pnet_find_base_ndev(ndev);
->>   	net = dev_net(ndev);
->> -	if (smc_pnetid_by_dev_port(ndev->dev.parent, ndev->dev_port,
->> +	if (smc_pnetid_by_dev_port(base_ndev->dev.parent, base_ndev->dev_port,
->>   				   ndev_pnetid) &&
->> +	    smc_pnet_find_ndev_pnetid_by_table(base_ndev, ndev_pnetid) &&
->>   	    smc_pnet_find_ndev_pnetid_by_table(ndev, ndev_pnetid)) {
->> -		smc_pnet_find_rdma_dev(ndev, ini);
->> +		smc_pnet_find_rdma_dev(base_ndev, ini);
->>   		return; /* pnetid could not be determined */
->>   	}
->>   	_smc_pnet_find_roce_by_pnetid(ndev_pnetid, ini, NULL, net);
-> 
-> I understand Wenjia opposed to this solution as it may create invalid
-> topologies ?!?
-> 
-> https://lore.kernel.org/netdev/08cd6e15-3f8c-47a0-8490-103d59abf910@linux.ibm.com/#t
-> 
-> Wenjia, could you please confirm?
-> 
-> Thanks,
-> 
-> Paolo
-> 
+>> What happens is that *sometimes* when the interface is activated (up, i=
+m
+>> my case via NetworkManager) during boot, the "kevent 4 may have been
+>> dropped" message starts to be emitted about every 6 or 7 ms.
+>
+> This sounding a bit like an interrupt storm. The PHY interrupt is not
+> being cleared correctly. PHY interrupts are level interrupts, so if
+> you don't clear the interrupt at the source, it will fire again as
+> soon as you re-enable it.
+>
+> So which PHY driver is being used? If you look for the first kernel
+> message about the lan78xx it probably tells you.
+>
+>> [   27.918335] Call trace:
+>> [   27.918338]  console_flush_all+0x2b0/0x4f8 (P)
+>> [   27.918346]  console_unlock+0x8c/0x170
+>> [   27.918352]  vprintk_emit+0x238/0x3b8
+>> [   27.918357]  dev_vprintk_emit+0xe4/0x1b8
+>> [   27.918364]  dev_printk_emit+0x64/0x98
+>> [   27.918368]  __netdev_printk+0xc8/0x228
+>> [   27.918376]  netdev_info+0x70/0xa8
+>> [   27.918382]  phy_print_status+0xcc/0x138
+>> [   27.918386]  lan78xx_link_status_change+0x78/0xb0
+>> [   27.918392]  phy_link_change+0x38/0x70
+>> [   27.918398]  phy_check_link_status+0xa8/0x110
+>> [   27.918405]  _phy_start_aneg+0x5c/0xb8
+>> [   27.918409]  lan88xx_link_change_notify+0x5c/0x128
+>> [   27.918416]  _phy_state_machine+0x12c/0x2b0
+>> [   27.918420]  phy_state_machine+0x34/0x80
+>> [   27.918425]  process_one_work+0x150/0x3b8
+>> [   27.918432]  worker_thread+0x2a4/0x4b8
+>> [   27.918438]  kthread+0xec/0xf8
+>> [   27.918442]  ret_from_fork+0x10/0x20
+>> [   27.918534] lan78xx 2-3:1.0 enp1s0u3: kevent 4 may have been dropped
+>> [   27.924985] lan78xx 2-3:1.0 enp1s0u3: kevent 4 may have been dropped
+>
+> Ah, O.K. This tells me the PHY is a lan88xx. And there is a workaround
+> involved for an issue in this PHY. Often PHYs are driven by polling
+> for status changes once per second. Not all PHYs/boards support
+> interrupts. It could be this workaround has only been tested with
+> polling, not interrupts, and so is broken when interrupts are used.
+>
+> As a quick hack test, in lan78xx_phy_init()
+>
+> 	/* if phyirq is not set, use polling mode in phylib */
+> 	if (dev->domain_data.phyirq > 0)
+> 		phydev->irq =3D dev->domain_data.phyirq;
+> 	else
+> 		phydev->irq =3D PHY_POLL;
+>
+> Hard code phydev->irq to PHY_POLL, so interrupts are not used.
+>
+> See if you can reproduce the issue when interrupts are not used.
+Thank you, I'll test that. Given the issue appears rarely it'll
+unfortunately take a while to be (mostly) sure.
 
-Hi Paolo,
+Best regards,
+Fiona
 
-Thanks for asking! I really appreciate it.
-
-I was initially opposed, but after discussing with Halil, I agreed that 
-my concerns might be not necessary. Halil and I reached an agreement 
-that he responded to the emails (v1) to ask for the version as he 
-already did, and we will double-check version 2 to ensure it works 
-correctly.
-
-In any case, I still need to review it carefully and will provide my 
-answer as soon as possible.
-
-Thanks,
-Wenjia
 
