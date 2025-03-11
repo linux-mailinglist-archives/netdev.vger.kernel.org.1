@@ -1,312 +1,128 @@
-Return-Path: <netdev+bounces-174030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54AC6A5D0E3
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 21:43:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F903A5D117
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 21:50:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 810387A870F
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 20:42:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F128D3B7322
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 20:50:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B333F264A87;
-	Tue, 11 Mar 2025 20:42:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 322B1264A63;
+	Tue, 11 Mar 2025 20:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XIC7Sl8P"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jVNO6MgX"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9229264A81
-	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 20:42:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D38C1C07F6;
+	Tue, 11 Mar 2025 20:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741725775; cv=none; b=im/cP8xPHLNuNafQKxKdYrfIJUHunyD/QqYmdwPZ2l7wg0f6/ClAA27ZvQ9CUAUAeN0/XH1MSbf4BxDnD5AoX1VvRl7dmY2V3st7zEjpnx1qyqyHisjdgR6R7guU+8/Y3ClYa/c7aFtPZ8ZiIXZT0B8adUUA9fMVucbCprk5LDw=
+	t=1741726231; cv=none; b=Jz9pIxnxIUt5z7PCT/AuLBF6JyxlrG0pULf8MSuADHKsk5PtB8w8uqKJDLJuGDf9SKk+AY+z9fqsMDUIHkMx5kmwztQLR8sGb4qxs/VNlYBHvhmd6xV61+Inz0OujLMRIIirp7DBOzzBUUOYKqI0YsJfOvCFjxWzs1LLodx7v5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741725775; c=relaxed/simple;
-	bh=WdnB12w/bbag1OOo0C84Xb5+mhBBWkBKJnVTUCz7Gp8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UP/pwNZR9f8lacD37aVmY70LJXx/tZ+PiO63qA3qvSCPAKc6rjHpigXre4Fkj2HvqK1n2Af43uULBAm5Gq2Lx5ocGh74HawVrQml+I7xdTu9WQaMQM2/ACfUqY9WwfdBjxvlDyROE3sMWti1FSZcvuoyvHVid9RutfLY9GQV4yE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XIC7Sl8P; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741725772;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JD9YD3F4uTBTL2GOHAuiqCecLYNeKJ7N6ymXn7HPB0Y=;
-	b=XIC7Sl8PXCeS1P9gkzcq+tg/4IFdhZGrI4p0rwnEWeBfTWfMp7pbj6sxoeaKoYdHVD7sVx
-	AoH+tkTqmOxzEKObJhOqpktFvLj27VhKFIIzt0wYmAxRM0L6ZG37KirfTdvWHHjvEWXUaC
-	3BFioQ4WuacmkOF/ClvY2/n2+M2q3G8=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-70-6yWEU9zfNF-zm9uBLiaSvg-1; Tue,
- 11 Mar 2025 16:42:51 -0400
-X-MC-Unique: 6yWEU9zfNF-zm9uBLiaSvg-1
-X-Mimecast-MFC-AGG-ID: 6yWEU9zfNF-zm9uBLiaSvg_1741725769
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A458119560B3;
-	Tue, 11 Mar 2025 20:42:49 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.66])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 439D618001F6;
-	Tue, 11 Mar 2025 20:42:45 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	kuniyu@amazon.com
-Subject: [PATCH v4 net-next 2/2] udp_tunnel: use static call for GRO hooks when possible
-Date: Tue, 11 Mar 2025 21:42:29 +0100
-Message-ID: <6fd1f9c7651151493ecab174e7b8386a1534170d.1741718157.git.pabeni@redhat.com>
-In-Reply-To: <cover.1741718157.git.pabeni@redhat.com>
-References: <cover.1741718157.git.pabeni@redhat.com>
+	s=arc-20240116; t=1741726231; c=relaxed/simple;
+	bh=oVKq5TbENWHyPMyjXS5YAxHWzJmVViDoKuMy7xMuJl4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qR2vYjUtWqJOhI2CxSY+00CGAlHoME6XPeyRSwZTaArj8LbAiDO3wJI0rtBbwAWm7QNYur8ayFZIIcJUCzjGEg60NUijaJsSo3nKfUiEkfaR1x4GTPpkfKAwOKhQCtS2l1CsK8HnU9DVSx6XXKZF3RvMCLWjXNUdV93obkEsOPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jVNO6MgX; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-ac25d2b2354so758815166b.1;
+        Tue, 11 Mar 2025 13:50:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741726228; x=1742331028; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/l+hci5LxmrsX7kXt4haDLTY6mALyMMCg0pgcAEwgTc=;
+        b=jVNO6MgXZbVbzt7YWVifbf1s1xX8CDQTAu8eNJI1n+dfZYjihP3p8+LezMDtNIDswB
+         CwsWYJOi88+YrWm+BgKIpOU2neItkh1LIFiowydSxcxtuz7IB4e0V5HzVjKG1kD4g+w7
+         0wKWU8dH5p4TgFKRKramL1ctbVFRsQiXd9obNLJECBBNU+znxrDZkADgMdIm/AJRmAqh
+         RR+59S5jytHgjbSo3JwongQ36/ZLhj7SoStoTP1WRIL5T9DwxMjrsSEXQos1nDGp1UsI
+         xLXnxGe2x4nNXG9D5dqO6sPBMEzbEkn2GraURLDnibKAm7AlPRbGy+2Y51Fp0PICngW1
+         r39Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741726228; x=1742331028;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/l+hci5LxmrsX7kXt4haDLTY6mALyMMCg0pgcAEwgTc=;
+        b=ZqrBsM+tNF6jVQquzF8BYMFOzQfNDUa0XK74tE+egWK12nW/ve3TVWji6N28ArbyfH
+         /7G3xTpgWGkN6Ghj/UCK0HIXPWRAxSiLO9Kp1lJXGDOKRJHJq7kmM1oQCtk/0U6/Ut2g
+         iCbjys/OlmsYCxcWonrRdvCda63+Cnrqisoh+5tS7gG66TrtRw2wS4Uva0UOqbJFphYq
+         A5DVhrVRUwjdRWPG6OW4p5WhqYyQQeLzgawLvGWBTeGCJLFQ2eyHNcvV/dcv3Yj9Zz04
+         ghqAGh6qjV2myCR6378Hzng5FhdMdzNvISJuuMKO9pAocKfmbbj7dffuC/57vIFAx2ap
+         NnNg==
+X-Forwarded-Encrypted: i=1; AJvYcCUIU/mg9x7XmwGHIs+NkxmeujckZY8c+FygbcRrL7dOXiN5nN1KMVxy+qkjawjrM98ewQwAu4RRJQTCb+Q=@vger.kernel.org, AJvYcCVzXLZ752p2JhRJRf2JkTZi+adGdJxsaEQPw75TtB4MGa5PMh4vZbEn9Kqgv5SsMrpxThdCMHL7@vger.kernel.org, AJvYcCWJlrZVX1MJjvbZt3b7nbTUA+cR16FdwILBmAZKqdsmNm8j1Feu2QHCUCo7BOgJGbT7PJYCt6gu6Ohe3Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3R1hu9w2iXm02ZHRD7+RgZIhrgBHRjFmCcyH6wjn+gqeb5xDX
+	3HfogseHMup+wVCcFeP6bdc+8vMbf6GKtL9mQdsS0520Jnl5KhCF
+X-Gm-Gg: ASbGncvZYPqF7lq6+khtzpmR7i7Q1fY2TM1JoQn/u65wzIJHKyl5bvsfBMgyvjCQ+hY
+	VI2z0lHB1Uzkog1FWv4dciuMWIX6rr6U1LwSnGj62pLQIzGwhJPukbn1CWGyTKGuqEVUi1un063
+	0AKMcTjFDtVgp06vzaHVwSEj0+Fz3pTuAKSELJ5ircn4hlqzkQaiqTCDPjIPGv9nbonmBIvBO0p
+	6+mcRndEOQCQ7BBqhpGLdMaAyBpy1wfnCTEnh+/oF+9tpG3PsRmsoDz0WPgcoupkQBT/twhvT18
+	6UcXG0cx4RKRzADs2bPNOziLxyt2lHw3CgcMY1TN0f8eh45jCCwozlWUhRliJjnz
+X-Google-Smtp-Source: AGHT+IGiAdrC0XMxxtZh8QiPtM1d+V4mARMfjlRF1592uT00GQfzYvmUE5WVe0dDQcSS8tqykimrWw==
+X-Received: by 2002:a17:907:2d8d:b0:abf:6db5:c9a9 with SMTP id a640c23a62f3a-ac252f9f653mr2726299466b.39.1741726227378;
+        Tue, 11 Mar 2025 13:50:27 -0700 (PDT)
+Received: from [172.27.51.89] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac28cf931d0sm505636866b.95.2025.03.11.13.50.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Mar 2025 13:50:27 -0700 (PDT)
+Message-ID: <9960fce1-991e-4aa3-b2a9-b3b212a03631@gmail.com>
+Date: Tue, 11 Mar 2025 22:50:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+User-Agent: Mozilla Thunderbird
+Subject: Re: [pull-request] mlx5-next updates 2025-03-10
+To: patchwork-bot+netdevbpf@kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, leon@kernel.org,
+ saeedm@nvidia.com, gal@nvidia.com, mbloch@nvidia.com, moshe@nvidia.com,
+ linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, leonro@nvidia.com, ychemla@nvidia.com,
+ Tariq Toukan <tariqt@nvidia.com>
+References: <1741608293-41436-1-git-send-email-tariqt@nvidia.com>
+ <174168972325.3890771.16087738431627229920.git-patchwork-notify@kernel.org>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <174168972325.3890771.16087738431627229920.git-patchwork-notify@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-It's quite common to have a single UDP tunnel type active in the
-whole system. In such a case we can replace the indirect call for
-the UDP tunnel GRO callback with a static call.
 
-Add the related accounting in the control path and switch to static
-call when possible. To keep the code simple use a static array for
-the registered tunnel types, and size such array based on the kernel
-config.
 
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
-v3 -> v4:
- - fix CONFIG_FOE typo
- - avoid gaps in gro types array
- - drop WARN_ON in dummy_gro_rcv()
+On 11/03/2025 12:42, patchwork-bot+netdevbpf@kernel.org wrote:
+> Hello:
+> 
+> This pull request was applied to bpf/bpf-next.git (net)
 
-v2 -> v3:
- - avoid unneeded checks in udp_tunnel_update_gro_rcv()
+Seems to be mistakenly applied to bpf-next instead of net-next.
 
-v1 -> v2:
- - fix UDP_TUNNEL=n build
----
- include/net/udp_tunnel.h   |   4 ++
- net/ipv4/udp_offload.c     | 130 ++++++++++++++++++++++++++++++++++++-
- net/ipv4/udp_tunnel_core.c |   2 +
- 3 files changed, 135 insertions(+), 1 deletion(-)
-
-diff --git a/include/net/udp_tunnel.h b/include/net/udp_tunnel.h
-index eda0f3e2f65fa..a7b230867eb14 100644
---- a/include/net/udp_tunnel.h
-+++ b/include/net/udp_tunnel.h
-@@ -205,9 +205,11 @@ static inline void udp_tunnel_encap_enable(struct sock *sk)
- 
- #if IS_ENABLED(CONFIG_NET_UDP_TUNNEL)
- void udp_tunnel_update_gro_lookup(struct net *net, struct sock *sk, bool add);
-+void udp_tunnel_update_gro_rcv(struct sock *sk, bool add);
- #else
- static inline void udp_tunnel_update_gro_lookup(struct net *net,
- 						struct sock *sk, bool add) {}
-+static inline void udp_tunnel_update_gro_rcv(struct sock *sk, bool add) {}
- #endif
- 
- static inline void udp_tunnel_cleanup_gro(struct sock *sk)
-@@ -215,6 +217,8 @@ static inline void udp_tunnel_cleanup_gro(struct sock *sk)
- 	struct udp_sock *up = udp_sk(sk);
- 	struct net *net = sock_net(sk);
- 
-+	udp_tunnel_update_gro_rcv(sk, false);
-+
- 	if (!up->tunnel_list.pprev)
- 		return;
- 
-diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index e36d8a234848f..088aa8cb8ac0c 100644
---- a/net/ipv4/udp_offload.c
-+++ b/net/ipv4/udp_offload.c
-@@ -15,6 +15,37 @@
- #include <net/udp_tunnel.h>
- 
- #if IS_ENABLED(CONFIG_NET_UDP_TUNNEL)
-+
-+/*
-+ * Dummy GRO tunnel callback, exists mainly to avoid dangling/NULL
-+ * values for the udp tunnel static call.
-+ */
-+static struct sk_buff *dummy_gro_rcv(struct sock *sk,
-+				     struct list_head *head,
-+				     struct sk_buff *skb)
-+{
-+	NAPI_GRO_CB(skb)->flush = 1;
-+	return NULL;
-+}
-+
-+typedef struct sk_buff *(*udp_tunnel_gro_rcv_t)(struct sock *sk,
-+						struct list_head *head,
-+						struct sk_buff *skb);
-+
-+struct udp_tunnel_type_entry {
-+	udp_tunnel_gro_rcv_t gro_receive;
-+	refcount_t count;
-+};
-+
-+#define UDP_MAX_TUNNEL_TYPES (IS_ENABLED(CONFIG_GENEVE) + \
-+			      IS_ENABLED(CONFIG_VXLAN) * 2 + \
-+			      IS_ENABLED(CONFIG_NET_FOU) * 2)
-+
-+DEFINE_STATIC_CALL(udp_tunnel_gro_rcv, dummy_gro_rcv);
-+static DEFINE_STATIC_KEY_FALSE(udp_tunnel_static_call);
-+static struct mutex udp_tunnel_gro_type_lock;
-+static struct udp_tunnel_type_entry udp_tunnel_gro_types[UDP_MAX_TUNNEL_TYPES];
-+static unsigned int udp_tunnel_gro_type_nr;
- static DEFINE_SPINLOCK(udp_tunnel_gro_lock);
- 
- void udp_tunnel_update_gro_lookup(struct net *net, struct sock *sk, bool add)
-@@ -43,6 +74,101 @@ void udp_tunnel_update_gro_lookup(struct net *net, struct sock *sk, bool add)
- 	spin_unlock(&udp_tunnel_gro_lock);
- }
- EXPORT_SYMBOL_GPL(udp_tunnel_update_gro_lookup);
-+
-+void udp_tunnel_update_gro_rcv(struct sock *sk, bool add)
-+{
-+	struct udp_tunnel_type_entry *cur = NULL;
-+	struct udp_sock *up = udp_sk(sk);
-+	int i, old_gro_type_nr;
-+
-+	if (!up->gro_receive)
-+		return;
-+
-+	mutex_lock(&udp_tunnel_gro_type_lock);
-+	for (i = 0; i < udp_tunnel_gro_type_nr; i++)
-+		if (udp_tunnel_gro_types[i].gro_receive == up->gro_receive)
-+			cur = &udp_tunnel_gro_types[i];
-+
-+	old_gro_type_nr = udp_tunnel_gro_type_nr;
-+	if (add) {
-+		/*
-+		 * Update the matching entry, if found, or add a new one
-+		 * if needed
-+		 */
-+		if (cur) {
-+			refcount_inc(&cur->count);
-+			goto out;
-+		}
-+
-+		if (unlikely(udp_tunnel_gro_type_nr == UDP_MAX_TUNNEL_TYPES)) {
-+			pr_err_once("Too many UDP tunnel types, please increase UDP_MAX_TUNNEL_TYPES\n");
-+			/* Ensure static call will never be enabled */
-+			udp_tunnel_gro_type_nr = UDP_MAX_TUNNEL_TYPES + 2;
-+			goto out;
-+		}
-+
-+		cur = &udp_tunnel_gro_types[udp_tunnel_gro_type_nr++];
-+		refcount_set(&cur->count, 1);
-+		cur->gro_receive = up->gro_receive;
-+	} else {
-+		/*
-+		 * The stack cleanups only successfully added tunnel, the
-+		 * lookup on removal should never fail.
-+		 */
-+		if (WARN_ON_ONCE(!cur))
-+			goto out;
-+
-+		if (!refcount_dec_and_test(&cur->count))
-+			goto out;
-+
-+		/* avoid gaps, so that the enable tunnel has always id 0 */
-+		*cur = udp_tunnel_gro_types[--udp_tunnel_gro_type_nr];
-+	}
-+
-+	if (udp_tunnel_gro_type_nr == 1) {
-+		static_call_update(udp_tunnel_gro_rcv,
-+				   udp_tunnel_gro_types[0].gro_receive);
-+		static_branch_enable(&udp_tunnel_static_call);
-+	} else if (old_gro_type_nr == 1) {
-+		static_branch_disable(&udp_tunnel_static_call);
-+		static_call_update(udp_tunnel_gro_rcv, dummy_gro_rcv);
-+	}
-+
-+out:
-+	mutex_unlock(&udp_tunnel_gro_type_lock);
-+}
-+EXPORT_SYMBOL_GPL(udp_tunnel_update_gro_rcv);
-+
-+static void udp_tunnel_gro_init(void)
-+{
-+	mutex_init(&udp_tunnel_gro_type_lock);
-+}
-+
-+static struct sk_buff *udp_tunnel_gro_rcv(struct sock *sk,
-+					  struct list_head *head,
-+					  struct sk_buff *skb)
-+{
-+	if (static_branch_likely(&udp_tunnel_static_call)) {
-+		if (unlikely(gro_recursion_inc_test(skb))) {
-+			NAPI_GRO_CB(skb)->flush |= 1;
-+			return NULL;
-+		}
-+		return static_call(udp_tunnel_gro_rcv)(sk, head, skb);
-+	}
-+	return call_gro_receive_sk(udp_sk(sk)->gro_receive, sk, head, skb);
-+}
-+
-+#else
-+
-+static void udp_tunnel_gro_init(void) {}
-+
-+static struct sk_buff *udp_tunnel_gro_rcv(struct sock *sk,
-+					  struct list_head *head,
-+					  struct sk_buff *skb)
-+{
-+	return call_gro_receive_sk(udp_sk(sk)->gro_receive, sk, head, skb);
-+}
-+
- #endif
- 
- static struct sk_buff *__skb_udp_tunnel_segment(struct sk_buff *skb,
-@@ -654,7 +780,7 @@ struct sk_buff *udp_gro_receive(struct list_head *head, struct sk_buff *skb,
- 
- 	skb_gro_pull(skb, sizeof(struct udphdr)); /* pull encapsulating udp header */
- 	skb_gro_postpull_rcsum(skb, uh, sizeof(struct udphdr));
--	pp = call_gro_receive_sk(udp_sk(sk)->gro_receive, sk, head, skb);
-+	pp = udp_tunnel_gro_rcv(sk, head, skb);
- 
- out:
- 	skb_gro_flush_final(skb, pp, flush);
-@@ -804,5 +930,7 @@ int __init udpv4_offload_init(void)
- 			.gro_complete =	udp4_gro_complete,
- 		},
- 	};
-+
-+	udp_tunnel_gro_init();
- 	return inet_add_offload(&net_hotdata.udpv4_offload, IPPROTO_UDP);
- }
-diff --git a/net/ipv4/udp_tunnel_core.c b/net/ipv4/udp_tunnel_core.c
-index b5695826e57ad..c49fceea83139 100644
---- a/net/ipv4/udp_tunnel_core.c
-+++ b/net/ipv4/udp_tunnel_core.c
-@@ -90,6 +90,8 @@ void setup_udp_tunnel_sock(struct net *net, struct socket *sock,
- 
- 	udp_tunnel_encap_enable(sk);
- 
-+	udp_tunnel_update_gro_rcv(sock->sk, true);
-+
- 	if (!sk->sk_dport && !sk->sk_bound_dev_if && sk_saddr_any(sock->sk))
- 		udp_tunnel_update_gro_lookup(net, sock->sk, true);
- }
--- 
-2.48.1
+> by Jakub Kicinski <kuba@kernel.org>:
+> 
+> On Mon, 10 Mar 2025 14:04:53 +0200 you wrote:
+>> Hi,
+>>
+>> The following pull-request contains common mlx5 updates for your *net-next* tree.
+>> Please pull and let me know of any problem.
+>>
+>> Regards,
+>> Tariq
+>>
+>> [...]
+> 
+> Here is the summary with links:
+>    - [pull-request] mlx5-next updates 2025-03-10
+>      https://git.kernel.org/bpf/bpf-next/c/ef4a47a8abb3
+> 
+> You are awesome, thank you!
 
 
