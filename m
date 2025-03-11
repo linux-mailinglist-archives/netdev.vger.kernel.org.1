@@ -1,120 +1,119 @@
-Return-Path: <netdev+bounces-173771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8D2CA5B9DE
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 08:34:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48855A5BA18
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 08:43:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D60B18934EB
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 07:34:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 002C61894DEB
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 07:43:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1C0222173C;
-	Tue, 11 Mar 2025 07:34:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59218222586;
+	Tue, 11 Mar 2025 07:42:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="o4BOwYmF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Sy+AHpPv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED53B1E9B34;
-	Tue, 11 Mar 2025 07:34:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A94422257B;
+	Tue, 11 Mar 2025 07:42:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741678469; cv=none; b=h3ykOAaCWt0GASasYcxlXH1LHz4LGEXR56bbWDoxbmFi57X0rmdp3YRwEoBuwOyE+YFMuSiblxQoBwJWLdhIvI5CM+kW6JP6kYm6oiiCQ3KIM+wZVJw++Sq4uWM9kRkpmDz507bT88lzppEMDsnQ0RjRH2qBmFzbnfpm3loZQwM=
+	t=1741678967; cv=none; b=mk1oasbkoJut2v9S2N24WCGyij60HygToT05Xudy8lKan0Z6tXHq6+9IzJXz8P+vhtV2WnbLF05M/DJ3ukuLfuNNBhUC/RpZnGhAub05IAyXAa1Kfi8PBtDxRHVPmzwnJnMcHtiVMi/qCh5ydUwZn6FB3v+HaLwsQMOAfmLXuus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741678469; c=relaxed/simple;
-	bh=kVvrxY3JMeDPMJgRP7JSEynJw9qfMzi7iYOaRLKRS9c=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XXSDG4lmU4/E69pBwQnEP364gEcioEyGMMQdv9I7PQlzYohDptCcqXaph15oU3a1LyFJ0sTXax4ih1HQuKcP9jNIvCTeBtQYIMIikpH08jhW9f4/SaE74IvoABMraW9rEg21oYWOSIVfSa2yYsJSwljszvrQl/vC7SwiqYcbEL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=o4BOwYmF; arc=none smtp.client-ip=52.95.49.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1741678468; x=1773214468;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=xlDClWHGShGxGM1y8gAW/SPX2EQ0Tt7MSneEYb8X5I0=;
-  b=o4BOwYmFWzyQ1qYeBsx/1mRT08P69MBGOnYNuA96JJJCTdUXk2cCzHSZ
-   RH1ZHGiuOMUaIQ1P60yJqefSn0QW600sL3EVuN9sBeqEAD+iwNoBZYYQg
-   FMnmwZ2tIzBvjILTh9Nxq2GUMGwzvzurN7U7xoWdfxqAFDFgA7ZRblgYf
-   g=;
-X-IronPort-AV: E=Sophos;i="6.14,238,1736812800"; 
-   d="scan'208";a="479315209"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2025 07:34:24 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:21378]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.41.90:2525] with esmtp (Farcaster)
- id 5162b928-32f7-4afa-b373-73148ef83c87; Tue, 11 Mar 2025 07:34:23 +0000 (UTC)
-X-Farcaster-Flow-ID: 5162b928-32f7-4afa-b373-73148ef83c87
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 11 Mar 2025 07:34:23 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.88.128.133) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 11 Mar 2025 07:34:19 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <aleksandr.mikhalitsyn@canonical.com>
-CC: <arnd@arndb.de>, <bluca@debian.org>, <brauner@kernel.org>,
-	<cgroups@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<hannes@cmpxchg.org>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-	<leon@kernel.org>, <linux-kernel@vger.kernel.org>, <mkoutny@suse.com>,
-	<mzxreary@0pointer.de>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<shuah@kernel.org>, <tj@kernel.org>, <willemb@google.com>
-Subject: Re: [PATCH net-next 0/4] Add getsockopt(SO_PEERCGROUPID) and fdinfo API to retreive socket's peer cgroup id
-Date: Tue, 11 Mar 2025 00:33:48 -0700
-Message-ID: <20250311073411.4565-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250309132821.103046-1-aleksandr.mikhalitsyn@canonical.com>
-References: <20250309132821.103046-1-aleksandr.mikhalitsyn@canonical.com>
+	s=arc-20240116; t=1741678967; c=relaxed/simple;
+	bh=SEVKryVmw9EdI0nGbBI78wK4YjhFT5TtzcIWAsyinnE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=badzu5RfW+Q/KHeUeCybdES2wxVqnkRSidoTNVpYrfF7YuvGlpTKQ0S+sWa4ah4+2THnQ2nu+d17i/mDuKWQgFNq6gruTNPrIf/M6qkYWfV7wpAoxD8Y/pfnD13paMgfzo755WhjrzqhVloc8uMvmwWv6kUyiD2C7O5u6WaXA4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Sy+AHpPv; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741678965; x=1773214965;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=SEVKryVmw9EdI0nGbBI78wK4YjhFT5TtzcIWAsyinnE=;
+  b=Sy+AHpPv7XKq0XLGUEld20vsLm+LMAA+FmBuqzZzSwkYAQA3EUIK4Ajm
+   OJd0blVwzEOwHxVw9acs3qDLPZHfg62OBiCvnMZKFYP7O0rxLZaWcir9s
+   C067h8XT8eUCmYNWcahPXTEL4QKNp3MQ50IkeQwICiLI3l4be6tshRw4q
+   PJhEpe24n2lSvEkYDxU+b1iBgcPvaOAZY6I6qO3lyY4/eVzzi8SNGRily
+   OrkM2EHQ52nZVxSvnxvLKpkRThjjAcYHgF4cZIDnshIdiAj069SIxWsXG
+   J10dSveUNtNQf0e5Ibe7qRfGCGoWdCI9e4I0P++1EnGHNH5isO0Ayf11n
+   Q==;
+X-CSE-ConnectionGUID: hiiznS35Qbm5U+PSnRjItQ==
+X-CSE-MsgGUID: sV9BoiNBSqyMOPIz9shSYg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11369"; a="42554464"
+X-IronPort-AV: E=Sophos;i="6.14,238,1736841600"; 
+   d="scan'208";a="42554464"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2025 00:42:44 -0700
+X-CSE-ConnectionGUID: 8Xd3d6ptR5aeRVwVhOuHAQ==
+X-CSE-MsgGUID: BI1CVhApRNCY8ANLDLsc9A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,238,1736841600"; 
+   d="scan'208";a="124839811"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2025 00:42:41 -0700
+Date: Tue, 11 Mar 2025 08:38:50 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, Gal Pressman <gal@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Shay Drory <shayd@nvidia.com>
+Subject: Re: [PATCH net 3/6] net/mlx5: Fix incorrect IRQ pool usage when
+ releasing IRQs
+Message-ID: <Z8/oigZe964EbsHh@mev-dev.igk.intel.com>
+References: <1741644104-97767-1-git-send-email-tariqt@nvidia.com>
+ <1741644104-97767-4-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWC003.ant.amazon.com (10.13.139.214) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1741644104-97767-4-git-send-email-tariqt@nvidia.com>
 
-From: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-Date: Sun,  9 Mar 2025 14:28:11 +0100
-> 1. Add socket cgroup id and socket's peer cgroup id in socket's fdinfo
-
-Why do you want to add yet another racy interface ?
-
-
-> 2. Add SO_PEERCGROUPID which allows to retrieve socket's peer cgroup id
-> 3. Add SO_PEERCGROUPID kselftest
+On Tue, Mar 11, 2025 at 12:01:41AM +0200, Tariq Toukan wrote:
+> From: Shay Drory <shayd@nvidia.com>
 > 
-> Generally speaking, this API allows race-free resolution of socket's peer cgroup id.
-> Currently, to do that SCM_CREDENTIALS/SCM_PIDFD -> pid -> /proc/<pid>/cgroup sequence
-> is used which is racy.
-
-Few more words about the race (recycling pid ?) would be appreciated.
-
-I somewhat assumed pid is not recycled until all of its pidfd are
-close()d, but sounds like no ?
-
-
+> mlx5_irq_pool_get() is a getter for completion IRQ pool only.
+> However, after the cited commit, mlx5_irq_pool_get() is called during
+> ctrl IRQ release flow to retrieve the pool, resulting in the use of an
+> incorrect IRQ pool.
 > 
-> As we don't add any new state to the socket itself there is no potential locking issues
-> or performance problems. We use already existing sk->sk_cgrp_data.
+> Hence, use the newly introduced mlx5_irq_get_pool() getter to retrieve
+> the correct IRQ pool based on the IRQ itself. While at it, rename
+> mlx5_irq_pool_get() to mlx5_irq_table_get_comp_irq_pool() which
+> accurately reflects its purpose and improves code readability.
 > 
-> We already have analogical interfaces to retrieve this
-> information:
-> - inet_diag: INET_DIAG_CGROUP_ID
-> - eBPF: bpf_sk_cgroup_id
+> Fixes: 0477d5168bbb ("net/mlx5: Expose SFs IRQs")
+> Signed-off-by: Shay Drory <shayd@nvidia.com>
+> Reviewed-by: Maher Sanalla <msanalla@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> ---
+>  drivers/net/ethernet/mellanox/mlx5/core/eq.c        |  2 +-
+>  .../net/ethernet/mellanox/mlx5/core/irq_affinity.c  |  2 +-
+>  drivers/net/ethernet/mellanox/mlx5/core/mlx5_irq.h  |  4 +++-
+>  drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c   | 13 ++++++++++---
+>  drivers/net/ethernet/mellanox/mlx5/core/pci_irq.h   |  2 +-
+>  5 files changed, 16 insertions(+), 7 deletions(-)
 > 
-> Having getsockopt() interface makes sense for many applications, because using eBPF is
-> not always an option, while inet_diag has obvious complexety and performance drawbacks
-> if we only want to get this specific info for one specific socket.
+[...]
 
-If it's limited to the connect()ed peer, I'd add UNIX_DIAG_CGROUP_ID
-and UNIX_DIAG_PEER_CGROUP_ID instead.  Then also ss can use that easily.
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+
+> -- 
+> 2.31.1
 
