@@ -1,202 +1,189 @@
-Return-Path: <netdev+bounces-173887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07C0CA5C1C6
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:01:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C81CEA5C1D9
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 14:05:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AAFB3AE47B
-	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 13:01:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A459188DA9A
+	for <lists+netdev@lfdr.de>; Tue, 11 Mar 2025 13:05:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8049EEC0;
-	Tue, 11 Mar 2025 13:01:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 440C4288BA;
+	Tue, 11 Mar 2025 13:05:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="lAEBg8pp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nCQzw66k"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC3B279C2;
-	Tue, 11 Mar 2025 13:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89403282F5
+	for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 13:04:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741698092; cv=none; b=MjmOB+C/G7m9ai4kcfUdCkrj29ikxR6oce4kROeyFcQ6ldGM+ICHxUuB5ypM1wCSxPH93vVoazF9gQFEh+lbn95sI4F/h7rSuWpKH4BKFrcss0nn3+Q+8SfMH5mijKeV1cyTcF5meWY8P4EZsNOVHkubr5p6CYRmSgFjc4DoKS8=
+	t=1741698301; cv=none; b=LEnp9UDeYK//b0GkFr4qCZc5GqFouQTPipS74KDG+G8O76lZyj69lYP+Nw9qNhXwZNAJ046GFCyhZPt97r6nuwUyJM1vWLbWwpOCAxrijQ6pXQ3ukunclx7bskiu60v1gcuctJZCgR4DgDV/ijeJrq3IrwtYiFN4r1BBeconUgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741698092; c=relaxed/simple;
-	bh=aRNJqNnEYA9kV9uGJrXyC91rR2ZSKkOrRlh4M0WPKBY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ue0Je2HtFnq5BEZ38esn+Kn0wg5spvk+OKW8k45oglaT2wWpBYCjST+74Hi61/g+R9ZOU20eo0JX/5C+TNIZ7U8V/dBi3VogMEHLISZN3OEhdFQxka2NN7an0XK6JlM4+xvOEfFZatige1hGhOyXpnwBBKpMY3CQIF0Uy+k1lPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=lAEBg8pp; arc=none smtp.client-ip=198.47.19.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 52BD19rl709386
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Tue, 11 Mar 2025 08:01:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1741698069;
-	bh=yVflShp+Qrm9WBJxQRs9hAkbpogZWdsryN8xD+f/PYk=;
-	h=From:To:CC:Subject:Date;
-	b=lAEBg8pp3bqap/14acOXVb09mEcxpERgUo+4wNaxI2qH/WgKqq0Tvif2ZXeLo+RrG
-	 PWHfLWlBKg8oHL7/Tojk8/zOKyexISRRbCZkwVuAIjeRenocxMOYL7x3+tlGAYYb5/
-	 65il3PeSfVRm2DFj90etxJUwwDqomGr9VXeVmA4o=
-Received: from DFLE115.ent.ti.com (dfle115.ent.ti.com [10.64.6.36])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 52BD19Sp044036;
-	Tue, 11 Mar 2025 08:01:09 -0500
-Received: from DFLE104.ent.ti.com (10.64.6.25) by DFLE115.ent.ti.com
- (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 11
- Mar 2025 08:01:08 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE104.ent.ti.com
- (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 11 Mar 2025 08:01:08 -0500
-Received: from uda0492258.dhcp.ti.com (uda0492258.dhcp.ti.com [10.24.72.113])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 52BD14sa041825;
-	Tue, 11 Mar 2025 08:01:04 -0500
-From: Siddharth Vadapalli <s-vadapalli@ti.com>
-To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <rogerq@kernel.org>,
-        <horms@kernel.org>, <alexander.sverdlin@siemens.com>,
-        <dan.carpenter@linaro.org>, <c-vankar@ti.com>, <jpanis@baylibre.com>
-CC: <vigneshr@ti.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <srk@ti.com>, <s-vadapalli@ti.com>
-Subject: [PATCH net v2] net: ethernet: ti: am65-cpsw: Fix NAPI registration sequence
-Date: Tue, 11 Mar 2025 18:31:03 +0530
-Message-ID: <20250311130103.68971-1-s-vadapalli@ti.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1741698301; c=relaxed/simple;
+	bh=SQtpUGR2YY772K6jsEs2beCALnKeL6NLt6JDYsi9pSc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XMwL24mJDMA6cVgoY2V8CwTeF5Np6z5Pm2JefCuo1bQ6pwgNk/ZcWD9TR2CqAe/Zw2wHe9AHv12y1vGnhEiwNqaT5p9hUKmuPOXdAlY2ipzojDY+l3SMk0pSr1R7PDum8LFIid/jCnqjZYQWnBCDHVtFbPYlvlgJrCJxj1iZaCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nCQzw66k; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5e6ff035e9aso981224a12.0
+        for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 06:04:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741698298; x=1742303098; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=OpLgqxBZgt5CChPOHVwYhVGZH04vodWSLjcoFJfhNTc=;
+        b=nCQzw66k3bX9LjQjGlX0rIksahskLfAMdExwThBQc0TCT93B1RIT5qFAv/79JV5tCP
+         NuxrCT6b0mrKv5b3MaBVx4sQhH8V1ipwguPp+OBSPucwiDt4VbKfFVrP1mrKCjNhs0dw
+         5Pf1Fr1iW7IH+ugmO8Qem5IlmSvPRalUWoiLgR6XYb8Q9IKlbcfo67TNHfc27GYdENdF
+         dNYDpGRLPAERtisKe5dHU+7cy4YRa4a6xFPtgAcCJwtDY5ajHpuEhzUHjXgSNaMqBwD/
+         JjDfhbi1G8kBJoe7JqEPjssRW6mpuFv5BcCRZhDx2oaej9748a3x1IT7KMA8NA3i1e0o
+         XnIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741698298; x=1742303098;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OpLgqxBZgt5CChPOHVwYhVGZH04vodWSLjcoFJfhNTc=;
+        b=q4wg/5Eucp7TLWz3nLMs5uqpopyC9BUDkA5yMCuDWaqVjsbFWaErQV/UGq894Iq1OW
+         erbr3lc1kdP7XHY8FX1OSRqqG9e65OOJsJXonDS56nccubdKktFCO/vUHGvT0w3df1KY
+         EIK57K90Khtn9QJs3UAj0RjbhleZlXWYx3NxX6vpKn2v+047aMLDrU4kIEc0YSXXrt7t
+         lLVjtY6oTrGlrd/75Mzm3E90pGPTD+HQFaY1zZLVZbXwK/zJz3XeYI+IfnaArMaaC+BJ
+         MHsPReDSHdqENBSACnFiJeiCg5Kn8+tWkR7sa6nNHs5l3NdQ2Ie9c+yxXspw9nsPqiDv
+         UG3w==
+X-Forwarded-Encrypted: i=1; AJvYcCWlXrE5Elagpip9dYp+8ug/7fjwnzXDFzfrUkHwnreiLaNsgyBkd8LwOfkbj5tWoKo7XG+fQ+k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3iLsdf0R/kWXyQU9NQdv6pGhKi+Fy6b3iF6KFw0HignOCg3fm
+	wwAEVcNC6WbE+amWosu1GomkM/PeUnpo8fJJQLAhWnnpqyTPSqK7
+X-Gm-Gg: ASbGncvviyAltq/+KHsZgU1WTCR5SkJRG8De2T5/DNBcFAfV0aeAxDBU7DESyQ+nqI4
+	bEXHFwssOfNMwn33oJg7MufeS+BJvw2vetNoGbef477d7y8vMAY/pORPjelyONpKvGR3gXLYF+B
+	bovEbqzpTl5Tbo7uQnvQCgdrt5J8zm5wXPKd4W0OUViLR4g+QfuO6kqUhLiV6Ex5Ei3TzuZv8dm
+	nrVNeVcyyNO+S5Whn4cnMymwcihfA0iIMVx6faEWvUFe4v8PqhQ4uiqdyLes7cQzRj1IVVNXCBS
+	dbsQXXxpyLNa4yem5EomM227q8TCtpSpWrls2q9V5xPBxrET72N6dlMa6fl/En94TwCH+u5qLYG
+	0cxqm3K6yQDGRwfTUwttgWX0Dhl2lR2AmbiYOR2TU2pG8xzecwg3CK0yWVdnCz632FLK+A4TlIg
+	R++IStWizvpImmt2F7y+5OY6jA3pWDk7X8FiQt
+X-Google-Smtp-Source: AGHT+IGZY4T1eH0Vzwrd1ctUsHHvc0VOzvOysDPGX6m3m9vEMDVwDDx/GkbCUo/mk9BNUj6q0aTSLA==
+X-Received: by 2002:a17:907:7b99:b0:ac2:9210:d966 with SMTP id a640c23a62f3a-ac2b9ee629amr440248266b.48.1741698297287;
+        Tue, 11 Mar 2025 06:04:57 -0700 (PDT)
+Received: from ?IPV6:2a02:3100:ad09:4d00:9cde:ee76:4d76:9c3c? (dynamic-2a02-3100-ad09-4d00-9cde-ee76-4d76-9c3c.310.pool.telefonica.de. [2a02:3100:ad09:4d00:9cde:ee76:4d76:9c3c])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-ac29f5d2638sm343631066b.160.2025.03.11.06.04.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Mar 2025 06:04:56 -0700 (PDT)
+Message-ID: <7e976ad4-9eec-46ff-947a-dbc3ddd1532d@gmail.com>
+Date: Tue, 11 Mar 2025 14:05:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: dsa: b53: use genphy_c45_eee_is_active
+ directly, instead of phy_init_eee
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+ Vladimir Oltean <olteanv@gmail.com>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <1c1a5c49-8c9c-42a7-b087-4a84d3585e0d@gmail.com>
+ <ec50da60-dde3-45ca-aa6c-eebf59fc5ec5@lunn.ch>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <ec50da60-dde3-45ca-aa6c-eebf59fc5ec5@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Vignesh Raghavendra <vigneshr@ti.com>
+On 11.03.2025 13:41, Andrew Lunn wrote:
+> On Tue, Mar 11, 2025 at 07:39:33AM +0100, Heiner Kallweit wrote:
+>> Use genphy_c45_eee_is_active directly instead of phy_init_eee,
+>> this prepares for removing phy_init_eee. With the second
+>> argument being Null, phy_init_eee doesn't initialize anything.
+>>
+>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+>> ---
+>>  drivers/net/dsa/b53/b53_common.c | 5 +----
+>>  1 file changed, 1 insertion(+), 4 deletions(-)
+>>
+>> diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
+>> index 61d164ffb..17e3ead16 100644
+>> --- a/drivers/net/dsa/b53/b53_common.c
+>> +++ b/drivers/net/dsa/b53/b53_common.c
+>> @@ -2212,10 +2212,7 @@ EXPORT_SYMBOL(b53_mirror_del);
+>>   */
+>>  int b53_eee_init(struct dsa_switch *ds, int port, struct phy_device *phy)
+>>  {
+>> -	int ret;
+>> -
+>> -	ret = phy_init_eee(phy, false);
+>> -	if (ret)
+>> +	if (!phy->drv || genphy_c45_eee_is_active(phy, NULL) <= 0)
+>>  		return 0;
+> 
+> genphy_c45_eee_is_active() is a function which could be considered
+> phylib internal. At least, it currently has no users outside of the
+> phylib core.
+> 
+> b53 uses phylink not phylib, so i actually think it would be better to
+> convert it to the phylink way to do EEE, rather than make use of a
+> phylib helper.
+> 
+Right, this would be a more comprehensive approach.
 
-Registering the interrupts for TX or RX DMA Channels prior to registering
-their respective NAPI callbacks can result in a NULL pointer dereference.
-This is seen in practice as a random occurrence since it depends on the
-randomness associated with the generation of traffic by Linux and the
-reception of traffic from the wire.
+> 	Andrew
+> 
+> 	
 
-Fixes: 681eb2beb3ef ("net: ethernet: ti: am65-cpsw: ensure proper channel cleanup in error path")
-Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
-Co-developed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
-Signed-off-by: Siddharth Vadapalli <s-vadapalli@ti.com>
----
-
-Hello,
-
-This patch is based on commit
-4d872d51bc9d Merge tag 'x86-urgent-2025-03-10' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
-of Mainline Linux.
-
-v1 of this patch is at:
-https://lore.kernel.org/all/20250311061214.4111634-1-s-vadapalli@ti.com/
-Changes since v1:
-- Based on the feedback provided by Alexander Sverdlin <alexander.sverdlin@siemens.com>
-  the patch has been updated to account for the cleanup path in terms of an imbalance
-  between the number of successful netif_napi_add_tx/netif_napi_add calls and the
-  number of successful devm_request_irq() calls. In the event of an error, we will
-  always have one extra successful netif_napi_add_tx/netif_napi_add that needs to be
-  cleaned up before we clean an equal number of netif_napi_add_tx/netif_napi_add and
-  devm_request_irq.
-
-Regards,
-Siddharth.
-
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 28 +++++++++++++-----------
- 1 file changed, 15 insertions(+), 13 deletions(-)
-
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index 2806238629f8..b88edf2dd8f4 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -2306,14 +2306,18 @@ static void am65_cpsw_nuss_remove_tx_chns(struct am65_cpsw_common *common)
- static int am65_cpsw_nuss_ndev_add_tx_napi(struct am65_cpsw_common *common)
- {
- 	struct device *dev = common->dev;
-+	struct am65_cpsw_tx_chn *tx_chn;
- 	int i, ret = 0;
- 
- 	for (i = 0; i < common->tx_ch_num; i++) {
--		struct am65_cpsw_tx_chn *tx_chn = &common->tx_chns[i];
-+		tx_chn = &common->tx_chns[i];
- 
- 		hrtimer_init(&tx_chn->tx_hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_REL_PINNED);
- 		tx_chn->tx_hrtimer.function = &am65_cpsw_nuss_tx_timer_callback;
- 
-+		netif_napi_add_tx(common->dma_ndev, &tx_chn->napi_tx,
-+				  am65_cpsw_nuss_tx_poll);
-+
- 		ret = devm_request_irq(dev, tx_chn->irq,
- 				       am65_cpsw_nuss_tx_irq,
- 				       IRQF_TRIGGER_HIGH,
-@@ -2323,19 +2327,16 @@ static int am65_cpsw_nuss_ndev_add_tx_napi(struct am65_cpsw_common *common)
- 				tx_chn->id, tx_chn->irq, ret);
- 			goto err;
- 		}
--
--		netif_napi_add_tx(common->dma_ndev, &tx_chn->napi_tx,
--				  am65_cpsw_nuss_tx_poll);
- 	}
- 
- 	return 0;
- 
- err:
--	for (--i ; i >= 0 ; i--) {
--		struct am65_cpsw_tx_chn *tx_chn = &common->tx_chns[i];
--
--		netif_napi_del(&tx_chn->napi_tx);
-+	netif_napi_del(&tx_chn->napi_tx);
-+	for (--i; i >= 0; i--) {
-+		tx_chn = &common->tx_chns[i];
- 		devm_free_irq(dev, tx_chn->irq, tx_chn);
-+		netif_napi_del(&tx_chn->napi_tx);
- 	}
- 
- 	return ret;
-@@ -2569,6 +2570,9 @@ static int am65_cpsw_nuss_init_rx_chns(struct am65_cpsw_common *common)
- 			     HRTIMER_MODE_REL_PINNED);
- 		flow->rx_hrtimer.function = &am65_cpsw_nuss_rx_timer_callback;
- 
-+		netif_napi_add(common->dma_ndev, &flow->napi_rx,
-+			       am65_cpsw_nuss_rx_poll);
-+
- 		ret = devm_request_irq(dev, flow->irq,
- 				       am65_cpsw_nuss_rx_irq,
- 				       IRQF_TRIGGER_HIGH,
-@@ -2579,9 +2583,6 @@ static int am65_cpsw_nuss_init_rx_chns(struct am65_cpsw_common *common)
- 			flow->irq = -EINVAL;
- 			goto err_flow;
- 		}
--
--		netif_napi_add(common->dma_ndev, &flow->napi_rx,
--			       am65_cpsw_nuss_rx_poll);
- 	}
- 
- 	/* setup classifier to route priorities to flows */
-@@ -2590,10 +2591,11 @@ static int am65_cpsw_nuss_init_rx_chns(struct am65_cpsw_common *common)
- 	return 0;
- 
- err_flow:
--	for (--i; i >= 0 ; i--) {
-+	netif_napi_del(&flow->napi_rx);
-+	for (--i; i >= 0; i--) {
- 		flow = &rx_chn->flows[i];
--		netif_napi_del(&flow->napi_rx);
- 		devm_free_irq(dev, flow->irq, flow);
-+		netif_napi_del(&flow->napi_rx);
- 	}
- 
- err:
--- 
-2.34.1
+--
+pw-bot: cr
 
 
