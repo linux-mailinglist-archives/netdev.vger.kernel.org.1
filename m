@@ -1,165 +1,151 @@
-Return-Path: <netdev+bounces-174249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA7DDA5DFDA
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 16:11:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC83DA5E05E
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 16:31:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 529501891B62
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 15:11:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F70F3A828D
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 15:30:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5916C2505D0;
-	Wed, 12 Mar 2025 15:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70D0615A868;
+	Wed, 12 Mar 2025 15:31:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cHRcZPLN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LFjXIm20"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A88B424E00B
-	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 15:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9EA722318;
+	Wed, 12 Mar 2025 15:31:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741792287; cv=none; b=hrQUOiHLp1Rf8Qr48Ck33DbKKlKm6e0kSYb/6TXIquIkUA1zQbZVjt40HACR7UyPQmno5WUhzZjhU0mQkzH9w7RweA7d57p9oaMEKp2YLtBU/qPNGEizIJ+vtQB9IlxYv2pDrYGHOe6RxQtz37zprHIpHVZRXEaOm2j54AIbXIQ=
+	t=1741793467; cv=none; b=sXa8zYnQvxNVQVNRQaxGwExcGhdwNwiD88RdCXFwB9Yl7kXRx7EpeR4TAYDcQFKABp3i18JLC30FsYOtZe+X7sou/Uaqjs9t/8pvLBKB2dGF32gnL62v4bg7UbbwqX8pHze2+cL8D3nQL9Tir4cZugQWZI63Fx0UZ2ZwPenqbhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741792287; c=relaxed/simple;
-	bh=ztlmegBzBKs8vJ1Sj3J75o5jqxXX3n3n98UKsP0n/bU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mN2zLcjMYSTT8dy3uX1nLCci0kEah6yyULlmGqayr7QQplL7EVlozXFluLNuh381x4aTCpAynvbH92jCzfv+2rX7n+HVLn9tCNyy7lzsgVxF7/x67LmDcQg2pnSJkMYBorqO04RKqMdy8c8Kr8d8juzj+YeoCcnFqBqewAnHUIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cHRcZPLN; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741792284;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=s3wvkUF9pbg03+vUjzzWddDimlNCCehc9tv57CFp/bk=;
-	b=cHRcZPLNtv9E3ou3E/M/UVZ5jfawT54zag5dQZ3d1flStogsf3w4BbhuTJQSsMmEegVPF5
-	0IJ00g4MhsWrtnTqK7uVy57UWBXOxU8qbzJ6CaGojOTzbmd46qSdqg4Eabk58o/OOR9Idq
-	ACv/CLV/uzo2f0bQpO2kh+4Gm38hqNI=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-612--_-OP6m4OVy3wwiOT-wXMA-1; Wed, 12 Mar 2025 11:11:23 -0400
-X-MC-Unique: -_-OP6m4OVy3wwiOT-wXMA-1
-X-Mimecast-MFC-AGG-ID: -_-OP6m4OVy3wwiOT-wXMA_1741792282
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-438da39bb69so48311895e9.0
-        for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 08:11:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741792282; x=1742397082;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1741793467; c=relaxed/simple;
+	bh=C119CQDqhlIZjEkrI1QNxjzCi8Vs5dPxeF4pdolefqA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OEWXHLryYGLZndvvu/f42v8schsEvuwbY4nwBQ1omqXOhwbmh7dCLMLxxROj5fTI34YdDO4MDd9LGuKU6E/QiufZiIwTbCDhIoKIgTIwjl0JsmheFYx18ZzG+Vy+ADjYDA/q2IFxa3dA7PhAfAV3yFrogM9iK5Ct48sOV7iNL1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LFjXIm20; arc=none smtp.client-ip=209.85.166.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-85b4277d0fbso109546939f.0;
+        Wed, 12 Mar 2025 08:31:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741793465; x=1742398265; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=s3wvkUF9pbg03+vUjzzWddDimlNCCehc9tv57CFp/bk=;
-        b=ADJXXNawMYXrB1B/+2BkWEyxzAoqJYjPjs7eoClhdkKBvJqRhqLGF7Kz/fi9FD25Ef
-         CNfGVujznyfyhBEoX2ebojTbcDrtrewbgBKE0Mfk4WJnnJfzJwuzovtJcfcGqIvOxZLf
-         pwxcmo4AWmxo4XF3xjEIv/RgHljweaFUOy+nJ2HCJX3C6Z704dra7YQBsoXugWR+bh6V
-         KRdmpIDQ1mnlHuT4iTGcMWwsPj8eJGUmol2NgXvjyQRIYbGo2skeIQ/0w530ibt7hDUB
-         FhhYg8K6f84nzUOYAeQ+TB+hE4BSDdBhJKkzlDCBKKZ0jZoVbJU8sgqHWuYHwdhlhk3r
-         dMkA==
-X-Forwarded-Encrypted: i=1; AJvYcCX2jjFmz9uzWgjpebch8eGVm9CezCAj78km62XrPJsBQgth7/Jbj3ob4s0iSzYVjHV+GWfAvl4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzM9lbNzwTdYA1tgX76fFcXR0nznj28ho701GqnIO3QZ2rg90rS
-	30Kw1aWe/ESMgCTnsMGlZaL9wGsJhpymC7ybhBVYLolPicWY0VgOtEeM6ctR89f8OTtDO05VOzo
-	i7GWVjh6DTig9ajTZZ7nfnjaOoL6Zw1sVA/s32j+s5gqwypc3SPbwbw==
-X-Gm-Gg: ASbGnctdxFmTmP0DpZyFqT+4XWGuRjqwWOwjZdy3r1BKxmMZU2unDpNC4N5x5felRcH
-	Ta7UB62ytS+oYOAQx1zUN8eJf3K4toyTERrnZETsXe+2ufT1kI7deJmGbmms1lotcy45UA5CsO+
-	pBMAJLGYVt5cB3BSKXg33lciGjrdBBYhceqlTO5JE43SOYRDaJ56sDpF6mGisVCCmussSnA4dx9
-	mOCi6wSe1crxg3xw6So4IwezWvr/rkSfTTjNhkXyKY5CRInWIOvHlr8VSf9a45lMTj7L+WYOLyB
-	jBivhB/1Mw==
-X-Received: by 2002:a05:600c:1c0f:b0:43d:ac5:11e8 with SMTP id 5b1f17b1804b1-43d0ac51609mr16259715e9.21.1741792282002;
-        Wed, 12 Mar 2025 08:11:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG5W/D3ES/M6kJRPjyEgSuPr9XA1jcGO11zxvnqEpd0Ho/mZnkNgRao4/TRivG1z/At8axlrA==
-X-Received: by 2002:a05:600c:1c0f:b0:43d:ac5:11e8 with SMTP id 5b1f17b1804b1-43d0ac51609mr16259465e9.21.1741792281627;
-        Wed, 12 Mar 2025 08:11:21 -0700 (PDT)
-Received: from fedora ([2a01:e0a:257:8c60:80f1:cdf8:48d0:b0a1])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912bfba686sm21749973f8f.19.2025.03.12.08.11.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Mar 2025 08:11:21 -0700 (PDT)
-Date: Wed, 12 Mar 2025 16:11:19 +0100
-From: Matias Ezequiel Vara Larsen <mvaralar@redhat.com>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: Harald Mommer <harald.mommer@opensynergy.com>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Mikhail Golubev-Ciuchea <Mikhail.Golubev-Ciuchea@opensynergy.com>,
-	Wolfgang Grandegger <wg@grandegger.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Damir Shaikhutdinov <Damir.Shaikhutdinov@opensynergy.com>,
-	linux-kernel@vger.kernel.org, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, virtualization@lists.linux.dev
-Subject: Re: [PATCH v5] can: virtio: Initial virtio CAN driver.
-Message-ID: <Z9GkFxPQ54Jzn45f@fedora>
-References: <20240108131039.2234044-1-Mikhail.Golubev-Ciuchea@opensynergy.com>
- <a366f529-c901-4cd1-a1a6-c3958562cace@wanadoo.fr>
- <0878aedf-35c2-4901-8662-2688574dd06f@opensynergy.com>
- <Z9FicA7bHAYZWJAb@fedora>
- <20250312-conscious-sloppy-pegasus-b5099d-mkl@pengutronix.de>
- <Z9GL6o01fuhTbHWO@fedora>
- <20250312-able-refreshing-hog-ed14e7-mkl@pengutronix.de>
+        bh=Dgr4+5cGFZYrVuh3qsM5dC0EureuWz9Kwi+t1hlD0DA=;
+        b=LFjXIm20blIgrEP21vOGaK9OMMW2cMaufNmDUkJ4Vw2GVL7QEbNoEUw7DE8o6cW8A4
+         cYaPhLKQfPG18UzC7HYg/0e0LmzVQyMSzBpiRnSWkixhIcTvtLzFBD7k/463L2usmKEH
+         IkRDjn6Q3QXpoJVWrEYf0kiKZ2qWSyHqVnCJQyDKfwVyXZNhmpDqSXIVGJjCgfzl8sCF
+         HVCvjPa85D4CNrSHEiYTg43ByCSuL5G9iSx3YjIFox6gsqQLBbwK4CSpm2rxBNHXn8xz
+         gRJIOqNWxK0kDUDhxOxqEXxOHQp8gqBDvDvcDUN9fyns2OgXWm+D/rnuowjFtl5vNr+1
+         lahg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741793465; x=1742398265;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Dgr4+5cGFZYrVuh3qsM5dC0EureuWz9Kwi+t1hlD0DA=;
+        b=YETV9mcUXw2TRLkpfKukywyoSDwWngtcqQ+2Q/c7ziU630iG0tUmvMo6EPhs9sgHwm
+         f1yhQX2HDS2mRqeDRaYiPOXFzQRR1RShDfluoeo/X274VUKmrhl+GBckeV/ey+qn8a99
+         0R/qYawSRGNJutEfzMPpX17fLFQKfIe2pfSqWNd8npHRUENBeoiwQtVyXFFT18xbps4V
+         EtRzT8q2WzQsU4WylSyG4zgdAZ1mRPdkwIWu1B4zZ8JQMn7PXE78eg2SD1Ni7v9+eNkv
+         4zPKivP9EH7342pGX8tj+Skbg6BTpdalrKT4SV/4VSj/gTiKp97QNn1h+//wLBsOuCZP
+         fZNw==
+X-Forwarded-Encrypted: i=1; AJvYcCU1gGhXbDuL7ctXur0wxOfImjKaGqbmQPGEXOQKm/4YY7dF86S/HAIsMHz5Gq54H8qNh6LfADiw@vger.kernel.org, AJvYcCW+PW793UXrEug/SC7gTCIZoGT5jK4ZGVd3lEbsf8l4QB2Z0rH6BYI7UdNjdGENKD65ch7luxsnuetcUr4=@vger.kernel.org, AJvYcCXbQSBJwF1o3uJ1hyRlVQ2qCGtUDFnpT1+pEjEx18BYOS2RUQbFyqhNSNY7qvMianrfdOoItDGRwmlM7A==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSBg/YwsKSQksL6mnjR6VwnRnzfhPOLfXRxNJOn/AspILMbgcY
+	EyGhOFKvFDCVhbX2oQb7Fm8v3cB0KNEAW3pne1BgPX+Xi+Eozj9kvK/AoWFMP+cS0eCRyDYkvlo
+	rLRAv13PXSSr8HBNj/+vmYNI0c0c=
+X-Gm-Gg: ASbGnctLeJPGAOD/QJppZhINpwWQaqk9/k6+cpIecIqRHYGhzJ5QdZV4pvqrbx1NZ49
+	fzNNe/wO2R6KE18qoaOJAjxWwnuhc3RWo5W82Vb80U8K1FeVHBfK+W/ZGlHNfuzaeXV0L118ss0
+	Cgwl7/CGTVLfJpnH2N8JcjsAmO
+X-Google-Smtp-Source: AGHT+IH05VdG9uhB5qzxGMUOauQ8zCZYTwMLftZ7hCszIsRPrUJXx5u+KoUicgoN1yMuIKF5PRc3EGcPfJSwaVhGtZQ=
+X-Received: by 2002:a92:cd8a:0:b0:3d3:e2a1:1f23 with SMTP id
+ e9e14a558f8ab-3d441a46fa4mr213019825ab.20.1741793464622; Wed, 12 Mar 2025
+ 08:31:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250312-able-refreshing-hog-ed14e7-mkl@pengutronix.de>
+References: <20250312032146.674-1-vulab@iscas.ac.cn>
+In-Reply-To: <20250312032146.674-1-vulab@iscas.ac.cn>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Wed, 12 Mar 2025 11:30:53 -0400
+X-Gm-Features: AQ5f1JqQDRy6IqWhTw6URh4LI4G4sVueGzVZbB0J1rjje3tObaYQ_VAvs5dHbcg
+Message-ID: <CADvbK_dZVJktQexS+4y7XNJy8s3FPXz5w1duUe3R1OMwrkXp6g@mail.gmail.com>
+Subject: Re: [PATCH] sctp: handle error of sctp_sf_heartbeat() in sctp_sf_do_asconf()
+To: Wentao Liang <vulab@iscas.ac.cn>
+Cc: marcelo.leitner@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	linux-sctp@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 12, 2025 at 02:36:05PM +0100, Marc Kleine-Budde wrote:
-> On 12.03.2025 14:28:10, Matias Ezequiel Vara Larsen wrote:
-> > On Wed, Mar 12, 2025 at 11:41:26AM +0100, Marc Kleine-Budde wrote:
-> > > On 12.03.2025 11:31:12, Matias Ezequiel Vara Larsen wrote:
-> > > > On Thu, Feb 01, 2024 at 07:57:45PM +0100, Harald Mommer wrote:
-> > > > > Hello,
-> > > > > 
-> > > > > I thought there would be some more comments coming and I could address
-> > > > > everything in one chunk. Not the case, besides your comments silence.
-> > > > > 
-> > > > > On 08.01.24 20:34, Christophe JAILLET wrote:
-> > > > > > 
-> > > > > > Hi,
-> > > > > > a few nits below, should there be a v6.
-> > > > > > 
-> > > > > 
-> > > > > I'm sure there will be but not so soon. Probably after acceptance of the
-> > > > > virtio CAN specification or after change requests to the specification are
-> > > > > received and the driver has to be adapted to an updated draft.
-> > > > > 
-> > > > What is the status of this series?
-> > > 
-> > > There has been no movement from the Linux side. The patch series is
-> > > quite extensive. To get this mainline, we need not only a proper Linux
-> > > CAN driver, but also a proper VirtIO specification. 
-> > 
-> > Thanks for your answer. AFAIK the spec has been merged (see
-> > https://github.com/oasis-tcs/virtio-spec/tree/virtio-1.4). 
-> 
-> Yes, the spec was merged. I think it was written with a specific
-> use-case (IIRC: automotive, Linux on-top of a specific hypervisor) in
-> mind, in Linux we have other use cases that might not be covered.
+On Tue, Mar 11, 2025 at 11:22=E2=80=AFPM Wentao Liang <vulab@iscas.ac.cn> w=
+rote:
+>
+> In sctp_sf_do_asconf(), SCTP_DISPOSITION_NOMEM error code returned
+> from sctp_sf_heartbeat() represent a failure of sent HEARTBEAT. The
+> return value of sctp_sf_heartbeat() needs to be checked and propagates
+> to caller function.
 
-What use-case you have in Linux?
+Returning this error to the caller will only result in the packet
+being discarded, without reverting any changes already made in
+sctp_sf_do_asconf().
 
-> 
-> > > This whole project is too big for me to do it as a collaborative
-> > > effort.
-> > 
-> > What do you mean?
-> 
-> I mean the driver is too big to review on a non-paid community based
-> effort.
-> 
-I think I can help reviewing it. I will try to spend some time in the next
-weeks.
+Moreover, this error is not fatal. Instead, it serves as an
+optimization to confirm the new destination as quickly as possible,
+as introduced in:
 
-Matias
+commit 6af29ccc223b0feb6fc6112281c3fa3cdb1afddf
+Author: Michio Honda <micchie@sfc.wide.ad.jp>
+Date:   Thu Jun 16 17:14:34 2011 +0900
 
+    sctp: Bundle HEAERTBEAT into ASCONF_ACK
+
+Ignoring this error is entirely reasonable, especially considering
+that running out of memory (nomem) is an unlikely scenario.
+
+Thanks.
+
+>
+> Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+> ---
+>  net/sctp/sm_statefuns.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/sctp/sm_statefuns.c b/net/sctp/sm_statefuns.c
+> index a0524ba8d787..89100546670a 100644
+> --- a/net/sctp/sm_statefuns.c
+> +++ b/net/sctp/sm_statefuns.c
+> @@ -3973,8 +3973,10 @@ enum sctp_disposition sctp_sf_do_asconf(struct net=
+ *net,
+>         asconf_ack->dest =3D chunk->source;
+>         sctp_add_cmd_sf(commands, SCTP_CMD_REPLY, SCTP_CHUNK(asconf_ack))=
+;
+>         if (asoc->new_transport) {
+> -               sctp_sf_heartbeat(ep, asoc, type, asoc->new_transport, co=
+mmands);
+> -               ((struct sctp_association *)asoc)->new_transport =3D NULL=
+;
+> +               if (SCTP_DISPOSITION_NOMEM =3D=3D sctp_sf_heartbeat(ep, a=
+soc, type, asoc->new_transport, commands)) {
+> +                       ((struct sctp_association *)asoc)->new_transport =
+=3D NULL;
+> +                       return SCTP_DISPOSITION_NOMEM;
+> +               }
+>         }
+>
+>         return SCTP_DISPOSITION_CONSUME;
+> --
+> 2.42.0.windows.2
+>
 
