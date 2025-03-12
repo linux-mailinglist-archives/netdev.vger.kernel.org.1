@@ -1,95 +1,92 @@
-Return-Path: <netdev+bounces-174147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 109B2A5D9A8
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 10:37:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E8F5A5D9AD
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 10:38:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 946383B46A0
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 09:36:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 470F5189BFE9
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 09:38:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F9EB23A9B7;
-	Wed, 12 Mar 2025 09:37:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13FD723A9B9;
+	Wed, 12 Mar 2025 09:38:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m0AXphbx"
+	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="I31qYX3K"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from va-1-14.ptr.blmpb.com (va-1-14.ptr.blmpb.com [209.127.230.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A8DC23A9AE
-	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 09:37:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B92E234988
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 09:38:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.230.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741772222; cv=none; b=jRMd5GSxmxRc+yrHnF9FBymwoDJPbA8ni9g4Rwov2lRa1ozwEV4Qg2CgDgvRNxPD7C/CqzzLpw3lVN3xrYRi79lMAtdTgyRGkgzKfZt3bdkOrZzo/u7GLsjcL1sXk1XLTYVczG4N6LiFSxKAW8qJmLxaTndVUYEL59WU5cgVVN0=
+	t=1741772288; cv=none; b=HFt7okqnNtBvKdr4FRIMfTVeP6ySOXJGRwC/8cyW8EZECsRnuFITUOOqDu8P8ozRo4jqnvk3SCIwtjE2PhrOyMFHHUUpCv13+xP6eyhoOMbc6002JzTUlaCJdbGoac6b7TDR9PhfEQvGMhrDxJJavGk8XRrVL81vjzqhYpHcKjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741772222; c=relaxed/simple;
-	bh=73lsR/tyS+QRbbffVcBxNPxPcqJay8bXvq9rxpso3zo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ozWxA+SGEpx8cGgQ5tKTmdmsouygzoh87MeCYDd4fuR+0rsyADMatqiHxN4jKFvkJyYdNCdDVvhLW97AARZM87FuMvEHi4Kt9bT9GzuC+modBeBX54G2UamzkqkcFq4lauknkfgNegqfGu8Fp9ilyuKHjiEuRipB/ymA5jfcc2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m0AXphbx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCC2EC4CEE3;
-	Wed, 12 Mar 2025 09:36:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741772221;
-	bh=73lsR/tyS+QRbbffVcBxNPxPcqJay8bXvq9rxpso3zo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=m0AXphbxwdcWfItJOXX1DY9CiFwlvFUa2P0DPfjin2TEvVNsEW/O3R2qYpBf+ytZy
-	 osyp1gR34tvPt1rpfyhEpYKhXzff1djKimoBCgB2d0HatOXB4JyeVWOxV5IIR4148T
-	 tdAmz4fT8gshB0hoLF8mA1D4cXZo9bz/dpNq4JXjDaXaPr+YLeGw+eF+Xke7UnzNvX
-	 iJI+uzdggVW1GzIFNIKInXoTs/Fpnof4cVi0IC/hAE2AWzT7QqbykXdgVuJ6omDndD
-	 L6TfQE708Tex6fCVJBTqBgbfhXVDRe8rWlcUjfeYJm0SL5XiOfRfaW56i1Qj45iMUd
-	 Wmj7J7XWLV8UQ==
-Message-ID: <69218ae8-f10e-4d9b-9f60-dae863da11f0@kernel.org>
-Date: Wed, 12 Mar 2025 10:36:57 +0100
+	s=arc-20240116; t=1741772288; c=relaxed/simple;
+	bh=It8wPEbTfuXLg+xqXYSKZ+iOCxL7h/LiHMKzqHxJdG8=;
+	h=To:Cc:Date:Mime-Version:Content-Type:Message-Id:From:Subject:
+	 References:In-Reply-To; b=UpjVLPGjNgdcPIiIEZoHexWxvlLJ4gl9qSbEDne8Ny5sRTq0aMyF1YmnfbpH6eZgMwsjVOe01XvhdXyeHItbPmv5vm28ZDJTEKKOv76AC1Y4S9LkfcspQVUf6zFuIe+X2HB99HgUWc2EWpNkeZDIOOCvHehX2FV71WTai/KOsNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=I31qYX3K; arc=none smtp.client-ip=209.127.230.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=feishu2403070942; d=yunsilicon.com; t=1741772268; h=from:subject:
+ mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
+ mime-version:in-reply-to:message-id;
+ bh=p4U95rgvzzB0lugv/TkDi8GY6kPVotLB9+bBFiziDjw=;
+ b=I31qYX3KiYSfk5Vq31wIqaaexfmp8EOZ/y03d0KJ5VJHSatE76/H3Mm8mm9KygL7unQxYv
+ ffOArXBACWxNXwLExxXPPPhxMdvfSIqKtk/C8+gWp2vRjVgerxYjnoBqsGmG0mgNpJMDCG
+ e+3iGgJUxdbBRhQZpZFR7MlnNy7cHCraRjNmWHZXWt95MLEbVb8LIefCQ/IWhRBC9FZ89r
+ x1kXeiQpQb01aAoAr/WxlI3CA6w++GDY/nSad4alReIP4MaAwxwQK1X+z7gSdRJIkzcZ6b
+ qfrCXj3EQWLa9ahCZOB3NJgQoD+2MRcrLuzqeVPgb4fIAPZ8y51f5rx3EINzXg==
+To: "Paolo Abeni" <pabeni@redhat.com>, <netdev@vger.kernel.org>
+Cc: <leon@kernel.org>, <andrew+netdev@lunn.ch>, <kuba@kernel.org>, 
+	<edumazet@google.com>, <davem@davemloft.net>, 
+	<jeff.johnson@oss.qualcomm.com>, <przemyslaw.kitszel@intel.com>, 
+	<weihg@yunsilicon.com>, <wanry@yunsilicon.com>, <jacky@yunsilicon.com>, 
+	<horms@kernel.org>, <parthiban.veerasooran@microchip.com>, 
+	<masahiroy@kernel.org>, <kalesh-anakkur.purayil@broadcom.com>, 
+	<geert+renesas@glider.be>
+Date: Wed, 12 Mar 2025 17:37:43 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 net] ipv6: Set errno after ip_fib_metrics_init() in
- ip6_route_info_create().
-Content-Language: en-US
-To: Kuniyuki Iwashima <kuniyu@amazon.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>
-Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-References: <20250312013854.61125-1-kuniyu@amazon.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20250312013854.61125-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
+X-Original-From: Xin Tian <tianx@yunsilicon.com>
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <45010804-3eec-4517-98de-a7c87fa5b07c@yunsilicon.com>
+X-Lms-Return-Path: <lba+267d155ea+8af514+vger.kernel.org+tianx@yunsilicon.com>
+Received: from [127.0.0.1] ([218.1.186.193]) by smtp.feishu.cn with ESMTPS; Wed, 12 Mar 2025 17:37:45 +0800
+From: "Xin Tian" <tianx@yunsilicon.com>
+Subject: Re: [PATCH net-next v8 14/14] xsc: add ndo_get_stats64
+References: <20250307100824.555320-1-tianx@yunsilicon.com> <20250307100858.555320-15-tianx@yunsilicon.com> <c6d1c981-7a5a-4d63-baeb-1d81c388f526@redhat.com>
+In-Reply-To: <c6d1c981-7a5a-4d63-baeb-1d81c388f526@redhat.com>
+User-Agent: Mozilla Thunderbird
 
-On 3/12/25 2:38 AM, Kuniyuki Iwashima wrote:
-> While creating a new IPv6, we could get a weird -ENOMEM when
-> RTA_NH_ID is set and either of the conditions below is true:
-> 
->   1) CONFIG_IPV6_SUBTREES is enabled and rtm_src_len is specified
->   2) nexthop_get() fails
-> 
-> e.g.)
-> 
->   # strace ip -6 route add fe80::dead:beef:dead:beef nhid 1 from ::
->   recvmsg(3, {msg_iov=[{iov_base=[...[
->     {error=-ENOMEM, msg=[... [...]]},
->     [{nla_len=49, nla_type=NLMSGERR_ATTR_MSG}, "Nexthops can not be used with so"...]
->   ]], iov_len=32768}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, 0) = 148
-> 
-> Let's set err explicitly after ip_fib_metrics_init() in
-> ip6_route_info_create().
-> 
-> Fixes: f88d8ea67fbd ("ipv6: Plumb support for nexthop object in a fib6_info")
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
->  net/ipv6/route.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-
-Reviewed-by: David Ahern <dsahern@kernel.org>
-
-
+On 2025/3/11 23:28, Paolo Abeni wrote:
+> On 3/7/25 11:08 AM, Xin Tian wrote:
+>> +void xsc_eth_fold_sw_stats64(struct xsc_adapter *adapter,
+>> +			     struct rtnl_link_stats64 *s)
+>> +{
+>> +	int i, j;
+>> +
+>> +	for (i = 0; i < xsc_get_netdev_max_channels(adapter); i++) {
+>> +		struct xsc_channel_stats *channel_stats;
+>> +		struct xsc_rq_stats *rq_stats;
+>> +
+>> +		channel_stats = &adapter->stats->channel_stats[i];
+>> +		rq_stats = &channel_stats->rq;
+>> +
+>> +		s->rx_packets   += rq_stats->packets;
+>> +		s->rx_bytes     += rq_stats->bytes;
+> This likely needs a u64_stats_fetch_begin/u64_stats_fetch_retry() pair,
+> and u64_stats_update_begin()/end() on the write side.
+>
+> /P
+Good suggestion, I will change it.
 
