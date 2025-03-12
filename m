@@ -1,101 +1,77 @@
-Return-Path: <netdev+bounces-174334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42305A5E538
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 21:20:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9118AA5E551
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 21:29:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85452177C4E
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 20:20:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 664CA189732E
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 20:30:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E044F1EDA01;
-	Wed, 12 Mar 2025 20:19:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC0021EDA12;
+	Wed, 12 Mar 2025 20:29:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GRopA5nT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ln6Jkbr/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4711EB191;
-	Wed, 12 Mar 2025 20:19:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F1BC1BD9DD;
+	Wed, 12 Mar 2025 20:29:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741810796; cv=none; b=Xwnq9H+ScFaLl/96fgEU6n/7JI1JjSlEIbszygnWDbEu8FznbRC2ItRU+W/aWHA+rfoRjCqtxshUFRYiwryWdRKpT6eCdS5yLgqgBPZMqU9hxqkUXn/M6QuJlCv9jMcgT8vt0t/GhIJskrctuykb34X0qvmQvwACIDaPVsKF888=
+	t=1741811390; cv=none; b=rVLaiyfagx2qRiJBpRMdHcNmH0ofalHyNf4iDTM+Q9Ea46C4LjQfDe396Vqc6hjZqDFb68sDlLk73UZXaiZJVd0oCvZEBTNf8LsGqjHGWcA4+W6Bl4y3OEo4txis6+5H0guorQMO9UFOi8NYYkczJ8cz5AbvKHxQ113GJPk75jA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741810796; c=relaxed/simple;
-	bh=eUPDWDjxdEdOfOSl6gOwd5Lk7nckPxgTXNP4nYLK3/g=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Hm3Esr+CQzu8dyhRdTfwgev7Pjn71XLrl2TjOXXsv6J3lHouzM2LEyPbd1PzPayHaTHsVOQRqC568FA6tKnFqFAUrzs2AlXJA0AOLNTB8HRWgwAo+5HRbnZ2Vsgzk67BfUMCw2LOgcG+Xek6BuZ+GN/4JHbnAetnpjoWUhe9AwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GRopA5nT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 896CAC4CEDD;
-	Wed, 12 Mar 2025 20:19:56 +0000 (UTC)
+	s=arc-20240116; t=1741811390; c=relaxed/simple;
+	bh=onXuN2LGH83bYRtcbmLC5glTTauAdzMOlEZg3+qCzbQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=o9G+KCPZ4wGCVSLOwTx7RS5cBALCBqTSYGbc2R7kVySTWT3EpyMVh8KN3MLpmMwhXVO5Ym3j+oJ0dz4ijxcWhs9F1IYD2kZDNeKHPF+DViQ5iH8ofR3s24TPKPwyk+2TBVGle6garz4e8m8iX07iZ2f02OcrYRkncXs7b8IMG/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ln6Jkbr/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F30BEC4CEDD;
+	Wed, 12 Mar 2025 20:29:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741810796;
-	bh=eUPDWDjxdEdOfOSl6gOwd5Lk7nckPxgTXNP4nYLK3/g=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GRopA5nTl1UI8BIj/22q0D3CqVF1tD1x54XFYeQh3RA8o7+Okj90wto+YNjVCehC2
-	 GXCGD8mOa7T5w25BoAHP2YpoWVLv/iV5V+b4jWzsDhfHISkB7DwmjopJ14px3LwvD5
-	 2h0awpU+20q5NufImWzu7PQBiPfqUFYdZ/H8VPCKEXWpLEy3Fmd/EM3xj5yrSB1f4s
-	 NYLS3IiBW3QcAuVnqYXvCYsGJuTvDnJOyH1QYnTduwJ2yP+tU39gd3tpS+8BuQU8N8
-	 IIUJm+R3FlOhZc6W1FU21jpt+X4oGkIPx4Z8PFZxxcAH1XjN4UWY6YMKHSsN/Zp05z
-	 RQQujsm+j69BA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DD8380DBDF;
-	Wed, 12 Mar 2025 20:20:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1741811390;
+	bh=onXuN2LGH83bYRtcbmLC5glTTauAdzMOlEZg3+qCzbQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ln6Jkbr/J2TFMaMxmBw30DE+/ElwjX/AqnW0iFyzeHNmPb2XQx/WyHn40iYQUAHEM
+	 ZnuzgDXL3BdXl7wlh2QROJDK6o8cpGi6syZ0cORySPeYR41RHu3uUviRevCp8XcUJF
+	 YG+FbZT7Wl3JDbxfw1R5oLHFdUPkczlvw1BcAtZjsE/CqfDP8tC9kdhhneQLIPmWig
+	 ko4MPt5qYrNuocuPOLZ/NBvUGuNCIxKiHXWCZw1JCpUxdwnlH0bL59fvQ7yzqGtoZ4
+	 0VDOlbCSf0z9ScS9huzv/ZHbp4WmjW4xnwP7hXLslXEoPJaNk5wW0sc+oYRAHWvbiw
+	 yOeHfmJjjscfg==
+Date: Wed, 12 Mar 2025 21:29:42 +0100
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: patchwork-bot+netdevbpf@kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
+ leon@kernel.org, saeedm@nvidia.com, gal@nvidia.com, mbloch@nvidia.com,
+ moshe@nvidia.com, linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, leonro@nvidia.com, ychemla@nvidia.com, Tariq
+ Toukan <tariqt@nvidia.com>
+Subject: Re: [pull-request] mlx5-next updates 2025-03-10
+Message-ID: <20250312212942.56d778e7@kernel.org>
+In-Reply-To: <9960fce1-991e-4aa3-b2a9-b3b212a03631@gmail.com>
+References: <1741608293-41436-1-git-send-email-tariqt@nvidia.com>
+	<174168972325.3890771.16087738431627229920.git-patchwork-notify@kernel.org>
+	<9960fce1-991e-4aa3-b2a9-b3b212a03631@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: revert to lockless TC_SETUP_BLOCK and
- TC_SETUP_FT
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174181083101.918963.13075833361323469787.git-patchwork-notify@kernel.org>
-Date: Wed, 12 Mar 2025 20:20:31 +0000
-References: <20250308044726.1193222-1-sdf@fomichev.me>
-In-Reply-To: <20250308044726.1193222-1-sdf@fomichev.me>
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, horms@kernel.org, corbet@lwn.net,
- andrew+netdev@lunn.ch, pablo@netfilter.org, kadlec@netfilter.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri,  7 Mar 2025 20:47:26 -0800 you wrote:
-> There is a couple of places from which we can arrive to ndo_setup_tc
-> with TC_SETUP_BLOCK/TC_SETUP_FT:
-> - netlink
-> - netlink notifier
-> - netdev notifier
+On Tue, 11 Mar 2025 22:50:24 +0200 Tariq Toukan wrote:
+> > This pull request was applied to bpf/bpf-next.git (net)  
 > 
-> Locking netdev too deep in this call chain seems to be problematic
-> (especially assuming some/all of the call_netdevice_notifiers
-> NETDEV_UNREGISTER) might soon be running with the instance lock).
-> Revert to lockless ndo_setup_tc for TC_SETUP_BLOCK/TC_SETUP_FT. NFT
-> framework already takes care of most of the locking. Document
-> the assumptions.
-> 
-> [...]
+> Seems to be mistakenly applied to bpf-next instead of net-next.
 
-Here is the summary with links:
-  - [net-next] net: revert to lockless TC_SETUP_BLOCK and TC_SETUP_FT
-    https://git.kernel.org/netdev/net-next/c/0a13c1e0a449
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+The bot gets confused. You should probably throw the date into the tag
+to make its job a little easier. In any case, the tag pulls 6 commits
+for me now.. (I may have missed repost, I'm quite behind on the ML
+traffic)
 
