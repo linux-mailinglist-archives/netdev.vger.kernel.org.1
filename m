@@ -1,151 +1,118 @@
-Return-Path: <netdev+bounces-174239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BEEFA5DF36
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 15:41:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2DB8A5DF64
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 15:48:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D62B27ADC51
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 14:40:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6ACE63AD239
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 14:48:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3F2F24DFE5;
-	Wed, 12 Mar 2025 14:39:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FD8B2441A6;
+	Wed, 12 Mar 2025 14:48:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LON/BQBA"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="pKwSiXFL";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="haaOsYYi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE4B92033A
-	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 14:39:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6344614601C;
+	Wed, 12 Mar 2025 14:48:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741790379; cv=none; b=hwqApL1+pEu6Gvq5l4Tj6RXqhW19nKIELheJHjHiKTAVDsKHSpyE7Y9ZjSxgpCTVrbyBmyZoyOB350q5djZUYKBp+4ZpsZraiNwki9JW+nIBL3OBYV2i06XpoOoHFKQbXvd4gVeHKa5c4tIC/sDuqUxkH4TMinPjxJsVV7kICpQ=
+	t=1741790933; cv=none; b=r++8pnKVd2UhzBv8ae0koYWCPjYJw77u858//pU9b1WrhKV7LaCF6k0nzlknMSoPZAFwY0OplTf/OYSxAs9UHa1T6txJNl8jTSRtfth8mGVrYxERMD0jh4FRbXxW3duyaRsHxFw7hcy/RCxWYNkfJrGaMhgVle70PSVRJlZq788=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741790379; c=relaxed/simple;
-	bh=wzOyZ1WbUkIIxejE/IiAmBfdyz501e4aCYCg2nwhqwM=;
+	s=arc-20240116; t=1741790933; c=relaxed/simple;
+	bh=rhkReZw7ouylU250M0RZbXomCucOdddV3/DWLIwvQV8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MkWn/uGfIRcwFNI83fpocsv0oR8qtp9jRYGSq7s9U7bzCgtWjZg9qAZJE/Dt3JEKTCmvM+a8ieRInWXFpNX3eVWKoohq8t3t07Rvu6N9tMLrQJlmgzwEznKumnfdelPDLXhxCtY7UrUrnRE71oNI4hAy71bdydBfJHwp6nt2snM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LON/BQBA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69C8BC4CEDD;
-	Wed, 12 Mar 2025 14:39:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741790379;
-	bh=wzOyZ1WbUkIIxejE/IiAmBfdyz501e4aCYCg2nwhqwM=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jc48fyOIJvrwESw+MdFuNdbZcy1wZ5e7LM1MgRPn5jjf0TCxNZRiEslgx0bSLFZr7U+JKOKW3b9vh815vk/IQscU8PtO8cq5gaj2ZsmybnOuwgEklShK76MHPBbryUrmf2oT/boxqGodi5Df++blY0c2nmq1YVcJ2Hyfeo+lg5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=pKwSiXFL; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=haaOsYYi; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id 9EC3D60288; Wed, 12 Mar 2025 15:48:49 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1741790929;
+	bh=y+PELDLVlWxQuQQQUIVwHopabwrUkoFrP7Uybc+xikk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LON/BQBAzj45lcsfCwMIGEgvC1u5Dsx1E7nSWFqQdX4peLPf8XlYqnigAKfOm0vYh
-	 6zOcxZjTL2a2CCfbs5edinus5jQoHp3/o+4opwHqTmvSuGABKor7uMDqOYbpwz2Yqb
-	 iO6OpNpyiMeShnfy7I/5Qsv7ihPc8mwgv9E3IJeBEi1EnBjkzMatet0aqU5bCrjYb7
-	 enbnMY72mmRmlfGDICQpw8tK4VbZa26EtXH328B1Y1Gb/aUwmsfoPPGj8o3nH9QPJH
-	 QQ6yiXiPfaTQou2yIe4ZiHSnLSeujd1FpSHyDX+O3O4QJLWYbUoBNehJRCXGB4xXE/
-	 SAYPm1afwYtjQ==
-Date: Wed, 12 Mar 2025 15:39:29 +0100
-From: Simon Horman <horms@kernel.org>
-To: David Arinzon <darinzon@amazon.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org, Ahmed Zaki <ahmed.zaki@intel.com>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	"Woodhouse, David" <dwmw@amazon.com>,
-	"Machulsky, Zorik" <zorik@amazon.com>,
-	"Matushevsky, Alexander" <matua@amazon.com>,
-	Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>,
-	"Liguori, Anthony" <aliguori@amazon.com>,
-	"Bshara, Nafea" <nafea@amazon.com>,
-	"Schmeilin, Evgeny" <evgenys@amazon.com>,
-	"Belgazal, Netanel" <netanel@amazon.com>,
-	"Saidi, Ali" <alisaidi@amazon.com>,
-	"Herrenschmidt, Benjamin" <benh@amazon.com>,
-	"Kiyanovski, Arthur" <akiyano@amazon.com>,
-	"Dagan, Noam" <ndagan@amazon.com>,
-	"Bernstein, Amit" <amitbern@amazon.com>,
-	"Agroskin, Shay" <shayagr@amazon.com>,
-	"Ostrovsky, Evgeny" <evostrov@amazon.com>,
-	"Tabachnik, Ofir" <ofirt@amazon.com>
-Subject: Re: [PATCH net-next] net: ena: resolve WARN_ON when freeing IRQs
-Message-ID: <20250312143929.GT4159220@kernel.org>
-References: <20250310080149.757-1-darinzon@amazon.com>
+	b=pKwSiXFL1FVAnJDcDjsqs+JFmGuEpOVTtrfXgXpuNVGKGJ56rUQdkfNyx/DUHeuuC
+	 Hp3UIuYh5QETVves9ZkRrSKPQVuqbAwHqKuHBJf8dKQOSzUQfajFwwJrDqDPlZeHGg
+	 UXu8GUIFEYmw824qmcFA1X6BY+1SmShMX3GgDwtxBDR74AYjaGKzMX9KFVlt1s9+nE
+	 3fT6NLGFnRHcODTkZ7NKu1rKr875AxrDx5PnpVNoRYYQlF5d3tsljlR637i5Gyc7Pu
+	 u+ETn35swNxmOhaWzOtIQWa4tGm4tJAAjEOTE55fd8C9I92iwLNqgTVISvCUAuY5eD
+	 GpP1vuTyKPZgA==
+X-Spam-Level: 
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id 32FA96026B;
+	Wed, 12 Mar 2025 15:48:47 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1741790927;
+	bh=y+PELDLVlWxQuQQQUIVwHopabwrUkoFrP7Uybc+xikk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=haaOsYYiszm5BNqkrBwcNDYbVafIv5yGwG9uJEQTPQ5yOWKwmNqMS4qzYYMlO3xuW
+	 mrlBgS4dU+m7nLYmFdJaMZPzfNH+YjgrKT22ilJn5atLlF+BS/uTVZKfYXNbKtwJhC
+	 9OP3O28FEq2+TSXOa25a50XgPQ96FZ06o/JUkOlCt323I30VzVDyE59z6mMDdZmQsr
+	 RnMOI/IsubIFC4oseJd9zbWkGLoNoVlsoG1c18WxAod6+zDbvvAhcZplXOpVWiI4it
+	 knpukeWvTHY0VX+AG5v3jkORntuCkQRUpH85UQP7dFgmwbEGIl5Q0p4jX0Jt7+3iFP
+	 gS1pwrGKCE/WA==
+Date: Wed, 12 Mar 2025 15:48:44 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Julian Anastasov <ja@ssi.bg>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>,
+	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+	Simon Horman <horms@verge.net.au>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH v2 net] ipvs: prevent integer overflow in
+ do_ip_vs_get_ctl()
+Message-ID: <Z9GezONZJ_sDuwFy@calendula>
+References: <1304e396-7249-4fb3-8337-0c2f88472693@stanley.mountain>
+ <262d87d6-9620-eef4-3d36-93d9e0dc478c@ssi.bg>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250310080149.757-1-darinzon@amazon.com>
+In-Reply-To: <262d87d6-9620-eef4-3d36-93d9e0dc478c@ssi.bg>
 
-On Mon, Mar 10, 2025 at 10:01:48AM +0200, David Arinzon wrote:
-> When IRQs are freed, a WARN_ON is triggered as the
-> affinity notifier is not released.
-> This results in the below stack trace:
+On Tue, Mar 11, 2025 at 07:50:44PM +0200, Julian Anastasov wrote:
 > 
-> [  484.544586]  ? __warn+0x84/0x130
-> [  484.544843]  ? free_irq+0x5c/0x70
-> [  484.545105]  ? report_bug+0x18a/0x1a0
-> [  484.545390]  ? handle_bug+0x53/0x90
-> [  484.545664]  ? exc_invalid_op+0x14/0x70
-> [  484.545959]  ? asm_exc_invalid_op+0x16/0x20
-> [  484.546279]  ? free_irq+0x5c/0x70
-> [  484.546545]  ? free_irq+0x10/0x70
-> [  484.546807]  ena_free_io_irq+0x5f/0x70 [ena]
-> [  484.547138]  ena_down+0x250/0x3e0 [ena]
-> [  484.547435]  ena_destroy_device+0x118/0x150 [ena]
-> [  484.547796]  __ena_shutoff+0x5a/0xe0 [ena]
-> [  484.548110]  pci_device_remove+0x3b/0xb0
-> [  484.548412]  device_release_driver_internal+0x193/0x200
-> [  484.548804]  driver_detach+0x44/0x90
-> [  484.549084]  bus_remove_driver+0x69/0xf0
-> [  484.549386]  pci_unregister_driver+0x2a/0xb0
-> [  484.549717]  ena_cleanup+0xc/0x130 [ena]
-> [  484.550021]  __do_sys_delete_module.constprop.0+0x176/0x310
-> [  484.550438]  ? syscall_trace_enter+0xfb/0x1c0
-> [  484.550782]  do_syscall_64+0x5b/0x170
-> [  484.551067]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> 	Hello,
 > 
-> Adding a call to `netif_napi_set_irq` with -1 as the IRQ index,
-> which frees the notifier.
+> On Mon, 10 Mar 2025, Dan Carpenter wrote:
 > 
-> Fixes: de340d8206bf ("net: ena: use napi's aRFS rmap notifers")
-> Signed-off-by: David Arinzon <darinzon@amazon.com>
-
-Thanks David,
-
-I agree that having a notifier set should result in a WARN_ON,
-and that your patch addresses this problem.
-
-So, the nit below not withstanding this looks good to me.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
-
-> ---
->  drivers/net/ethernet/amazon/ena/ena_netdev.c | 4 ++++
->  1 file changed, 4 insertions(+)
+> > The get->num_services variable is an unsigned int which is controlled by
+> > the user.  The struct_size() function ensures that the size calculation
+> > does not overflow an unsigned long, however, we are saving the result to
+> > an int so the calculation can overflow.
+> > 
+> > Both "len" and "get->num_services" come from the user.  This check is
+> > just a sanity check to help the user and ensure they are using the API
+> > correctly.  An integer overflow here is not a big deal.  This has no
+> > security impact.
+> > 
+> > Save the result from struct_size() type size_t to fix this integer
+> > overflow bug.
+> > 
+> > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> > Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 > 
-> diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-> index 6aab85a7..9e007c60 100644
-> --- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
-> +++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-> @@ -1716,8 +1716,12 @@ static void ena_free_io_irq(struct ena_adapter *adapter)
->  	int i;
->  
->  	for (i = ENA_IO_IRQ_FIRST_IDX; i < ENA_MAX_MSIX_VEC(io_queue_count); i++) {
-> +		struct ena_napi *ena_napi;
-> +
->  		irq = &adapter->irq_tbl[i];
->  		irq_set_affinity_hint(irq->vector, NULL);
-> +		ena_napi = (struct ena_napi *)irq->data;
-
-nit: I don't think it is necessary to explicitly cast irq->data
-     to the pointer type of ena_napi because irq->data is a void *.
-
-> +		netif_napi_set_irq(&ena_napi->napi, -1);
->  		free_irq(irq->vector, irq->data);
->  	}
->  }
-> -- 
-> 2.47.1
+> 	Looks good to me, thanks!
 > 
+> Acked-by: Julian Anastasov <ja@ssi.bg>
+> 
+> 	Pablo, you can apply it to the nf tree.
+
+Done, thanks Julian.
 
