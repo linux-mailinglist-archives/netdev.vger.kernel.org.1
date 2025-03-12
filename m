@@ -1,151 +1,130 @@
-Return-Path: <netdev+bounces-174250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC83DA5E05E
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 16:31:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A1EE2A5E06A
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 16:33:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F70F3A828D
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 15:30:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2150D3B8922
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 15:33:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70D0615A868;
-	Wed, 12 Mar 2025 15:31:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C0312512DC;
+	Wed, 12 Mar 2025 15:33:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LFjXIm20"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ArIpD8Pk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9EA722318;
-	Wed, 12 Mar 2025 15:31:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D8B2156237;
+	Wed, 12 Mar 2025 15:33:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741793467; cv=none; b=sXa8zYnQvxNVQVNRQaxGwExcGhdwNwiD88RdCXFwB9Yl7kXRx7EpeR4TAYDcQFKABp3i18JLC30FsYOtZe+X7sou/Uaqjs9t/8pvLBKB2dGF32gnL62v4bg7UbbwqX8pHze2+cL8D3nQL9Tir4cZugQWZI63Fx0UZ2ZwPenqbhY=
+	t=1741793592; cv=none; b=T4/glvNm1eP2p7oikZJM7Sa6S+E/Y37D1vrA+gI5ysklmlGfNm9pNAwRJr5G2Kmr3N4z9FkYcym/imTWiEzM2ZpmUuUYFwkZpuKAjCngHJGcR95R/c7tCKRMucSCQEUpGx8+TkENOWjzf7KVcNZWsCehoFXcSsZnP6PuzCC4jxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741793467; c=relaxed/simple;
-	bh=C119CQDqhlIZjEkrI1QNxjzCi8Vs5dPxeF4pdolefqA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OEWXHLryYGLZndvvu/f42v8schsEvuwbY4nwBQ1omqXOhwbmh7dCLMLxxROj5fTI34YdDO4MDd9LGuKU6E/QiufZiIwTbCDhIoKIgTIwjl0JsmheFYx18ZzG+Vy+ADjYDA/q2IFxa3dA7PhAfAV3yFrogM9iK5Ct48sOV7iNL1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LFjXIm20; arc=none smtp.client-ip=209.85.166.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-85b4277d0fbso109546939f.0;
-        Wed, 12 Mar 2025 08:31:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741793465; x=1742398265; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Dgr4+5cGFZYrVuh3qsM5dC0EureuWz9Kwi+t1hlD0DA=;
-        b=LFjXIm20blIgrEP21vOGaK9OMMW2cMaufNmDUkJ4Vw2GVL7QEbNoEUw7DE8o6cW8A4
-         cYaPhLKQfPG18UzC7HYg/0e0LmzVQyMSzBpiRnSWkixhIcTvtLzFBD7k/463L2usmKEH
-         IkRDjn6Q3QXpoJVWrEYf0kiKZ2qWSyHqVnCJQyDKfwVyXZNhmpDqSXIVGJjCgfzl8sCF
-         HVCvjPa85D4CNrSHEiYTg43ByCSuL5G9iSx3YjIFox6gsqQLBbwK4CSpm2rxBNHXn8xz
-         gRJIOqNWxK0kDUDhxOxqEXxOHQp8gqBDvDvcDUN9fyns2OgXWm+D/rnuowjFtl5vNr+1
-         lahg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741793465; x=1742398265;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Dgr4+5cGFZYrVuh3qsM5dC0EureuWz9Kwi+t1hlD0DA=;
-        b=YETV9mcUXw2TRLkpfKukywyoSDwWngtcqQ+2Q/c7ziU630iG0tUmvMo6EPhs9sgHwm
-         f1yhQX2HDS2mRqeDRaYiPOXFzQRR1RShDfluoeo/X274VUKmrhl+GBckeV/ey+qn8a99
-         0R/qYawSRGNJutEfzMPpX17fLFQKfIe2pfSqWNd8npHRUENBeoiwQtVyXFFT18xbps4V
-         EtRzT8q2WzQsU4WylSyG4zgdAZ1mRPdkwIWu1B4zZ8JQMn7PXE78eg2SD1Ni7v9+eNkv
-         4zPKivP9EH7342pGX8tj+Skbg6BTpdalrKT4SV/4VSj/gTiKp97QNn1h+//wLBsOuCZP
-         fZNw==
-X-Forwarded-Encrypted: i=1; AJvYcCU1gGhXbDuL7ctXur0wxOfImjKaGqbmQPGEXOQKm/4YY7dF86S/HAIsMHz5Gq54H8qNh6LfADiw@vger.kernel.org, AJvYcCW+PW793UXrEug/SC7gTCIZoGT5jK4ZGVd3lEbsf8l4QB2Z0rH6BYI7UdNjdGENKD65ch7luxsnuetcUr4=@vger.kernel.org, AJvYcCXbQSBJwF1o3uJ1hyRlVQ2qCGtUDFnpT1+pEjEx18BYOS2RUQbFyqhNSNY7qvMianrfdOoItDGRwmlM7A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSBg/YwsKSQksL6mnjR6VwnRnzfhPOLfXRxNJOn/AspILMbgcY
-	EyGhOFKvFDCVhbX2oQb7Fm8v3cB0KNEAW3pne1BgPX+Xi+Eozj9kvK/AoWFMP+cS0eCRyDYkvlo
-	rLRAv13PXSSr8HBNj/+vmYNI0c0c=
-X-Gm-Gg: ASbGnctLeJPGAOD/QJppZhINpwWQaqk9/k6+cpIecIqRHYGhzJ5QdZV4pvqrbx1NZ49
-	fzNNe/wO2R6KE18qoaOJAjxWwnuhc3RWo5W82Vb80U8K1FeVHBfK+W/ZGlHNfuzaeXV0L118ss0
-	Cgwl7/CGTVLfJpnH2N8JcjsAmO
-X-Google-Smtp-Source: AGHT+IH05VdG9uhB5qzxGMUOauQ8zCZYTwMLftZ7hCszIsRPrUJXx5u+KoUicgoN1yMuIKF5PRc3EGcPfJSwaVhGtZQ=
-X-Received: by 2002:a92:cd8a:0:b0:3d3:e2a1:1f23 with SMTP id
- e9e14a558f8ab-3d441a46fa4mr213019825ab.20.1741793464622; Wed, 12 Mar 2025
- 08:31:04 -0700 (PDT)
+	s=arc-20240116; t=1741793592; c=relaxed/simple;
+	bh=wvjZs6Ho1imdevToYORMmFUS+fOEcLE9ZMd7vfDXyMc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B2S8dkIMOo2obG9SDVeWwyWS7f3d66YvoGB4r4rI68PFxx9hkNp5no0H/rpIHRE5WzXpBeErhyMVJ/kk6J8XtORkqDXI/CD0Kz1AOSDlL0s9qp6Uzz2Wol5qzVViw5FkFHCihHaMImbFSrDwaMf7qvyN7LJCdu4V/iVuhrCm6xA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ArIpD8Pk; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=iH9GHclLADxHaK7lGmwG60TMy/tMBW1Zzi6F7hap/Yg=; b=ArIpD8PkcXyPglBLUs0D4cNd6j
+	5eeOs7YBGX8A63fnnpdRkt8C1TR29b8uSR7GDvR1N4MR11R+lDJMYhOvoz9ZjHJeXgLdl/AW5N982
+	qtaO8XKx3nkPfNng4WAUcTWZGPK76teiIDpbBuyEMHSvas6vUIzYwsBBzqTSowVgSqkE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tsO4q-004hkE-KU; Wed, 12 Mar 2025 16:33:00 +0100
+Date: Wed, 12 Mar 2025 16:33:00 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Gupta, Suraj" <Suraj.Gupta2@amd.com>
+Cc: Russell King <linux@armlinux.org.uk>,
+	"Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"robh@kernel.org" <robh@kernel.org>,
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"Simek, Michal" <michal.simek@amd.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"git (AMD-Xilinx)" <git@amd.com>,
+	"Katakam, Harini" <harini.katakam@amd.com>
+Subject: Re: [PATCH net-next V2 2/2] net: axienet: Add support for 2500base-X
+ only configuration.
+Message-ID: <fd686050-e794-4b2f-bfb8-3a0769abb506@lunn.ch>
+References: <20250312095411.1392379-1-suraj.gupta2@amd.com>
+ <20250312095411.1392379-3-suraj.gupta2@amd.com>
+ <ad1e81b5-1596-4d94-a0fa-1828d667b7a2@lunn.ch>
+ <Z9GWokRDzEYwJmBz@shell.armlinux.org.uk>
+ <BL3PR12MB6571795DA783FD05189AD74BC9D02@BL3PR12MB6571.namprd12.prod.outlook.com>
+ <34ed11e7-b287-45c6-8ff4-4a5506b79d17@lunn.ch>
+ <BL3PR12MB6571540090EE54AC9743E17EC9D02@BL3PR12MB6571.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250312032146.674-1-vulab@iscas.ac.cn>
-In-Reply-To: <20250312032146.674-1-vulab@iscas.ac.cn>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Wed, 12 Mar 2025 11:30:53 -0400
-X-Gm-Features: AQ5f1JqQDRy6IqWhTw6URh4LI4G4sVueGzVZbB0J1rjje3tObaYQ_VAvs5dHbcg
-Message-ID: <CADvbK_dZVJktQexS+4y7XNJy8s3FPXz5w1duUe3R1OMwrkXp6g@mail.gmail.com>
-Subject: Re: [PATCH] sctp: handle error of sctp_sf_heartbeat() in sctp_sf_do_asconf()
-To: Wentao Liang <vulab@iscas.ac.cn>
-Cc: marcelo.leitner@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	linux-sctp@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BL3PR12MB6571540090EE54AC9743E17EC9D02@BL3PR12MB6571.namprd12.prod.outlook.com>
 
-On Tue, Mar 11, 2025 at 11:22=E2=80=AFPM Wentao Liang <vulab@iscas.ac.cn> w=
-rote:
->
-> In sctp_sf_do_asconf(), SCTP_DISPOSITION_NOMEM error code returned
-> from sctp_sf_heartbeat() represent a failure of sent HEARTBEAT. The
-> return value of sctp_sf_heartbeat() needs to be checked and propagates
-> to caller function.
+On Wed, Mar 12, 2025 at 03:06:32PM +0000, Gupta, Suraj wrote:
+> [AMD Official Use Only - AMD Internal Distribution Only]
+> 
+> > -----Original Message-----
+> > From: Andrew Lunn <andrew@lunn.ch>
+> > Sent: Wednesday, March 12, 2025 8:29 PM
+> > To: Gupta, Suraj <Suraj.Gupta2@amd.com>
+> > Cc: Russell King <linux@armlinux.org.uk>; Pandey, Radhey Shyam
+> > <radhey.shyam.pandey@amd.com>; andrew+netdev@lunn.ch;
+> > davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+> > pabeni@redhat.com; robh@kernel.org; krzk+dt@kernel.org; conor+dt@kernel.org;
+> > Simek, Michal <michal.simek@amd.com>; netdev@vger.kernel.org;
+> > devicetree@vger.kernel.org; linux-kernel@vger.kernel.org; linux-arm-
+> > kernel@lists.infradead.org; git (AMD-Xilinx) <git@amd.com>; Katakam, Harini
+> > <harini.katakam@amd.com>
+> > Subject: Re: [PATCH net-next V2 2/2] net: axienet: Add support for 2500base-X only
+> > configuration.
+> >
+> > Caution: This message originated from an External Source. Use proper caution
+> > when opening attachments, clicking links, or responding.
+> >
+> >
+> > > > On Wed, Mar 12, 2025 at 02:25:27PM +0100, Andrew Lunn wrote:
+> > > > > > +   /* AXI 1G/2.5G ethernet IP has following synthesis options:
+> > > > > > +    * 1) SGMII/1000base-X only.
+> > > > > > +    * 2) 2500base-X only.
+> > > > > > +    * 3) Dynamically switching between (1) and (2), and is not
+> > > > > > +    * implemented in driver.
+> > > > > > +    */
+> >
+> > > - Keeping previous discussion short, identification of (3) depends on
+> > > how user implements switching logic in FPGA (external GT or RTL
+> > > logic). AXI 1G/2.5G IP provides only static speed selections and there
+> > > is no standard register to communicate that to software.
+> >
+> > So if anybody has synthesised it as 3) this change will break their system?
+> >
+> >         Andrew
+> 
+> It will just restrict their system to (2)
 
-Returning this error to the caller will only result in the packet
-being discarded, without reverting any changes already made in
-sctp_sf_do_asconf().
+Where as before, it was doing SGMII/1000base-X only. So such systems
+break?
 
-Moreover, this error is not fatal. Instead, it serves as an
-optimization to confirm the new destination as quickly as possible,
-as introduced in:
-
-commit 6af29ccc223b0feb6fc6112281c3fa3cdb1afddf
-Author: Michio Honda <micchie@sfc.wide.ad.jp>
-Date:   Thu Jun 16 17:14:34 2011 +0900
-
-    sctp: Bundle HEAERTBEAT into ASCONF_ACK
-
-Ignoring this error is entirely reasonable, especially considering
-that running out of memory (nomem) is an unlikely scenario.
-
-Thanks.
-
->
-> Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
-> ---
->  net/sctp/sm_statefuns.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/net/sctp/sm_statefuns.c b/net/sctp/sm_statefuns.c
-> index a0524ba8d787..89100546670a 100644
-> --- a/net/sctp/sm_statefuns.c
-> +++ b/net/sctp/sm_statefuns.c
-> @@ -3973,8 +3973,10 @@ enum sctp_disposition sctp_sf_do_asconf(struct net=
- *net,
->         asconf_ack->dest =3D chunk->source;
->         sctp_add_cmd_sf(commands, SCTP_CMD_REPLY, SCTP_CHUNK(asconf_ack))=
-;
->         if (asoc->new_transport) {
-> -               sctp_sf_heartbeat(ep, asoc, type, asoc->new_transport, co=
-mmands);
-> -               ((struct sctp_association *)asoc)->new_transport =3D NULL=
-;
-> +               if (SCTP_DISPOSITION_NOMEM =3D=3D sctp_sf_heartbeat(ep, a=
-soc, type, asoc->new_transport, commands)) {
-> +                       ((struct sctp_association *)asoc)->new_transport =
-=3D NULL;
-> +                       return SCTP_DISPOSITION_NOMEM;
-> +               }
->         }
->
->         return SCTP_DISPOSITION_CONSUME;
-> --
-> 2.42.0.windows.2
->
+	Andrew
 
