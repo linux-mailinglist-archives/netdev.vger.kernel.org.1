@@ -1,209 +1,113 @@
-Return-Path: <netdev+bounces-174323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EF8AA5E4A1
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 20:41:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5198A5E4AF
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 20:43:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3E22177EE7
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 19:41:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF7DA1886C60
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 19:44:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3C642586E2;
-	Wed, 12 Mar 2025 19:40:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 026D6258CD2;
+	Wed, 12 Mar 2025 19:43:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="KtN+MmIK"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0vw3r5Mr"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95C51BD9DD;
-	Wed, 12 Mar 2025 19:40:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A37257458
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 19:43:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741808459; cv=none; b=PFeklE6elcICiRMDpLMOfEgTDdlQ7VGg123a/I4GgN0LsTBaiumyr/jRCVN0fmqyEnRkwV66YOAB6eq/VeTA2vpYWxuhCCstlQTgefMuSx6ohHnJHywKdRrW4H8iwfQyy1rN7ECrfrCE05v7AfK3CGtFZA60b0oejmsq5iYmwnE=
+	t=1741808620; cv=none; b=t7TcZ7Eb6pYUNQ3lbIe5HhblVTAT2523gyQLEJaqdBCHolnAOYjz+451E8tL4DZ6KbfoWq3xfGCaa4DGzoYo36mGTfHl1zJfOxTOzzxXSYOrT6BfUjKb36MI9YAPSxWnhyfhgD68Cz8TDr5aZVhI78ldDN/BRuTdV+PIdWCIYVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741808459; c=relaxed/simple;
-	bh=ln3H3jQdCuiVM92t2vEUQn4yuJC8lu3CZ5HIpkqTiC8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fBaBPN0QF6Jh5qnZqXQvHghfCyiTdmXOTbCyOHCoQfKiUR2woSmZZdFjWDLRneX2QKg8Nbg2Av4tPMKJR663UnhRFfdoeqjMX95/SBLr9Naw30cO7aV6PFwdQALkAvU1Xa1Agnttp6G3y/PlbyJwxroceXBZ6m2mGm7a3HqLKiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=KtN+MmIK; arc=none smtp.client-ip=78.32.30.218
+	s=arc-20240116; t=1741808620; c=relaxed/simple;
+	bh=PIP3ddYPAey6JiO0z7MwDt2G2nT2St7b2zoYdFWfdxc=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=no7fZRjTyX+fejEALa2331/qcGRJdw3dp602EaCUvm3MHDCDUjPYKKtJWxvQ3UsFu/eri71382zLd6dOTZMq8ABxpfRdxpUIgfYaqMNIo96qOV48VHM9OPYOzRC+zMbsoF7lPXgJlxz+42VYkHZokxIHyOpzmnDsosAcP5hVP9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0vw3r5Mr; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=F33ePOWArlXRReOL+ROoU2zMPCNTE1WroPgaIoYuTZ4=; b=KtN+MmIK5oqH/DVENgXBtOHXPl
-	ltCNMiJ+zxb5qPcZ1udz+U4sLwA3Oa1S+wAb8vS1PLc4CdiW4lAJLqTkoszXIcYbi/eT/rS+uBM9a
-	fs0gCOztnapuKDeAejq8miFq3rReKS8hF9Wn2VWBHhes7gY+UUf5BhVsiXVgZ9HS9tjXnNpax3vht
-	QjlaqYF9CpL6Bl3HrJrkfRvIYz1/V6MM7c6pDuMVINuSjkDfawXFkE+uggePUgoIvQ1GDMQcyVx8L
-	coaQO3hQfyil1uyfkvotzqTmuyxtEPRXppQGvfBx0e0BaW1FENu06qrqUR4TlF/c0oFMDTIlL0rhF
-	RB3ba9Vg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40360)
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=hNZU7Eufd1JegykKvVAxyzlCRzhTF9+s3bvb0sxIJX0=; b=0vw3r5MrcHlD21PyA7dl1mK4Kg
+	ufSmqwKJDBV7slfX+xao+ZepvMw1mX1QA4f88351Me+OPN4sePXP4CmjSE6b6psd60uCnu/kTLe1Y
+	xNgFMCUgcHk8oLevRFWtxMTLDJkg18Nq3oOOk/QefBWwuDV46iJCBWgFDuHy+u1Q7KiOEWNogwLfY
+	j4dXk8xqzHPdYnVOhTryc6CmsIN+atWh/8TykZ3g+kA3bakaWXEGdsW6VrXO8+o6ZgtMVmRdePNvA
+	tBdCG1wWJv/T0o7DOFJz0BruOt/VpMNJzRGGunRBw5f6oxthrbCSOPULsXrILs0iqxa0Y3v+lRjsg
+	2aGRjHVw==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:42086 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tsRwZ-00063Y-1c;
-	Wed, 12 Mar 2025 19:40:43 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tsRwW-0004oj-3A;
-	Wed, 12 Mar 2025 19:40:41 +0000
-Date: Wed, 12 Mar 2025 19:40:40 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: "Gupta, Suraj" <Suraj.Gupta2@amd.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	"Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"robh@kernel.org" <robh@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"Simek, Michal" <michal.simek@amd.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"git (AMD-Xilinx)" <git@amd.com>,
-	"Katakam, Harini" <harini.katakam@amd.com>
-Subject: Re: [PATCH net-next V2 2/2] net: axienet: Add support for 2500base-X
- only configuration.
-Message-ID: <Z9HjOAnpNkmZcoeo@shell.armlinux.org.uk>
-References: <20250312095411.1392379-1-suraj.gupta2@amd.com>
- <20250312095411.1392379-3-suraj.gupta2@amd.com>
- <ad1e81b5-1596-4d94-a0fa-1828d667b7a2@lunn.ch>
- <Z9GWokRDzEYwJmBz@shell.armlinux.org.uk>
- <BL3PR12MB6571795DA783FD05189AD74BC9D02@BL3PR12MB6571.namprd12.prod.outlook.com>
- <34ed11e7-b287-45c6-8ff4-4a5506b79d17@lunn.ch>
- <BL3PR12MB6571540090EE54AC9743E17EC9D02@BL3PR12MB6571.namprd12.prod.outlook.com>
- <fd686050-e794-4b2f-bfb8-3a0769abb506@lunn.ch>
- <BL3PR12MB6571959081FC8DDC5D509560C9D02@BL3PR12MB6571.namprd12.prod.outlook.com>
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1tsRzG-000647-0E;
+	Wed, 12 Mar 2025 19:43:30 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1tsRyv-0064nU-O9; Wed, 12 Mar 2025 19:43:09 +0000
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Joao Pinto <jpinto@synopsys.com>,
+	Lars Persson <larper@axis.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net] net: stmmac: dwc-qos-eth: use devm_kzalloc() for AXI data
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BL3PR12MB6571959081FC8DDC5D509560C9D02@BL3PR12MB6571.namprd12.prod.outlook.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1tsRyv-0064nU-O9@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Wed, 12 Mar 2025 19:43:09 +0000
 
-On Wed, Mar 12, 2025 at 04:08:02PM +0000, Gupta, Suraj wrote:
-> [AMD Official Use Only - AMD Internal Distribution Only]
-> 
-> > -----Original Message-----
-> > From: Andrew Lunn <andrew@lunn.ch>
-> > Sent: Wednesday, March 12, 2025 9:03 PM
-> > To: Gupta, Suraj <Suraj.Gupta2@amd.com>
-> > Cc: Russell King <linux@armlinux.org.uk>; Pandey, Radhey Shyam
-> > <radhey.shyam.pandey@amd.com>; andrew+netdev@lunn.ch;
-> > davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
-> > pabeni@redhat.com; robh@kernel.org; krzk+dt@kernel.org; conor+dt@kernel.org;
-> > Simek, Michal <michal.simek@amd.com>; netdev@vger.kernel.org;
-> > devicetree@vger.kernel.org; linux-kernel@vger.kernel.org; linux-arm-
-> > kernel@lists.infradead.org; git (AMD-Xilinx) <git@amd.com>; Katakam, Harini
-> > <harini.katakam@amd.com>
-> > Subject: Re: [PATCH net-next V2 2/2] net: axienet: Add support for 2500base-X only
-> > configuration.
-> >
-> > Caution: This message originated from an External Source. Use proper caution
-> > when opening attachments, clicking links, or responding.
-> >
-> >
-> > On Wed, Mar 12, 2025 at 03:06:32PM +0000, Gupta, Suraj wrote:
-> > > [AMD Official Use Only - AMD Internal Distribution Only]
-> > >
-> > > > -----Original Message-----
-> > > > From: Andrew Lunn <andrew@lunn.ch>
-> > > > Sent: Wednesday, March 12, 2025 8:29 PM
-> > > > To: Gupta, Suraj <Suraj.Gupta2@amd.com>
-> > > > Cc: Russell King <linux@armlinux.org.uk>; Pandey, Radhey Shyam
-> > > > <radhey.shyam.pandey@amd.com>; andrew+netdev@lunn.ch;
-> > > > davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
-> > > > pabeni@redhat.com; robh@kernel.org; krzk+dt@kernel.org;
-> > > > conor+dt@kernel.org; Simek, Michal <michal.simek@amd.com>;
-> > > > netdev@vger.kernel.org; devicetree@vger.kernel.org;
-> > > > linux-kernel@vger.kernel.org; linux-arm- kernel@lists.infradead.org;
-> > > > git (AMD-Xilinx) <git@amd.com>; Katakam, Harini
-> > > > <harini.katakam@amd.com>
-> > > > Subject: Re: [PATCH net-next V2 2/2] net: axienet: Add support for
-> > > > 2500base-X only configuration.
-> > > >
-> > > > Caution: This message originated from an External Source. Use proper
-> > > > caution when opening attachments, clicking links, or responding.
-> > > >
-> > > >
-> > > > > > On Wed, Mar 12, 2025 at 02:25:27PM +0100, Andrew Lunn wrote:
-> > > > > > > > +   /* AXI 1G/2.5G ethernet IP has following synthesis options:
-> > > > > > > > +    * 1) SGMII/1000base-X only.
-> > > > > > > > +    * 2) 2500base-X only.
-> > > > > > > > +    * 3) Dynamically switching between (1) and (2), and is not
-> > > > > > > > +    * implemented in driver.
-> > > > > > > > +    */
-> > > >
-> > > > > - Keeping previous discussion short, identification of (3) depends
-> > > > > on how user implements switching logic in FPGA (external GT or RTL
-> > > > > logic). AXI 1G/2.5G IP provides only static speed selections and
-> > > > > there is no standard register to communicate that to software.
-> > > >
-> > > > So if anybody has synthesised it as 3) this change will break their system?
-> > > >
-> > > >         Andrew
-> > >
-> > > It will just restrict their system to (2)
-> >
-> > Where as before, it was doing SGMII/1000base-X only. So such systems break?
-> >
-> >         Andrew
-> 
-> If the user wants (3), they need to add their custom FPGA logic which anyway will require additional driver changes. (3) was not completely supported by existing driver.
+Everywhere else in the driver uses devm_kzalloc() when allocating the
+AXI data, so there is no kfree() of this structure. However,
+dwc-qos-eth uses kzalloc(), which leads to this memory being leaked.
+Switch to use devm_kzalloc().
 
-This is not an approach that works with the Linux kernel, sorry.
+Fixes: d8256121a91a ("stmmac: adding new glue driver dwmac-dwc-qos-eth")
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-What we have today is a driver that works for people's hardware - and
-we don't know what the capabilities of that hardware is.
-
-If there's hardware out there today which has XAE_ABILITY_2_5G set, but
-defaults to <=1G mode, this will work with the current driver. However,
-with your patch applied, it stops working because instead of the driver
-indicating MAC_10FD | MAC_100FD | MAC_1000FD, it only indicates
-MAC_2500FD. If this happens, it will regress users setups, and that is
-something we try not to do.
-
-Saying "someone else needs to add the code for their FPGA logic" misses
-the point - there may not be "someone else" to do that, which means
-the only option is to revert your change if it were merged. That in
-itself can cause its own user regressions because obviously stuff that
-works with this patch stops working.
-
-This is why we're being cautious, and given your responses, it's not
-making Andrew or myself feel that there's a reasonable approach being
-taken here.
-
-From everything you have said, I am getting the feeling that using
-XAE_ABILITY_2_5G to decide which of (1) or (2) is supported is just
-wrong. Given that we're talking about an implementation that has been
-synthesized at 2.5G and can't operate slower, maybe there's some way
-that could be created to specify that in DT?
-
-e.g. (and I'm sure the DT folk aren't going to like it)...
-
-	xlnx,axi-ethernet-X.YY.Z-2.5G
-
-(where X.YY.Z is the version) for implementations that can _only_ do
-2.5G, and leave all other implementations only doing 1G and below.
-
-Or maybe some DT property. Or something else.
-
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+index bd4eb187f8c6..b5a7e05ab7a7 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+@@ -46,7 +46,9 @@ static int dwc_eth_dwmac_config_dt(struct platform_device *pdev,
+ 	u32 a_index = 0;
+ 
+ 	if (!plat_dat->axi) {
+-		plat_dat->axi = kzalloc(sizeof(struct stmmac_axi), GFP_KERNEL);
++		plat_dat->axi = devm_kzalloc(&pdev->dev,
++					     sizeof(struct stmmac_axi),
++					     GFP_KERNEL);
+ 
+ 		if (!plat_dat->axi)
+ 			return -ENOMEM;
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.30.2
+
 
