@@ -1,86 +1,87 @@
-Return-Path: <netdev+bounces-174326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8863BA5E4C2
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 20:52:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22ABAA5E4C5
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 20:52:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 324E8189F801
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 19:52:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C72C117C512
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 19:52:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC6B120C47F;
-	Wed, 12 Mar 2025 19:52:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A94D7259489;
+	Wed, 12 Mar 2025 19:52:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="XKBh4GFt"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="FtyPwsMV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f225.google.com (mail-pl1-f225.google.com [209.85.214.225])
+Received: from mail-qv1-f99.google.com (mail-qv1-f99.google.com [209.85.219.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E220E1E8346
-	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 19:51:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0441F0996
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 19:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741809120; cv=none; b=FZpiiPQsMme9+RocqN0/6tFfIINp0PwisHEJJW4gHO5zALYFqC3x8CGUOnso2SLupv4In78U7+nBZN/11XVd2mD7Gbh+YWagRBPWjJjOXQb4g99E4TMEOw1f/l88pj0VyNepBmVWBXSZc2whw/rX74BvYwn7n5B6d7b7EqeCmqw=
+	t=1741809121; cv=none; b=e6vZecL2kZ5/J36NN7/bA8pz4XCwUzOdzLUxYt3/r2/a7x5v6UPbpKgVtd4XOLflx2Hc6t9swUYr++XKrJsNuBiPG8f5CdJ/DoMa51r4DxKT0aRjacsEa0kEi5X9dyekMcZXakh7za7j39ESGJgXmbaC30MuwNU2z9JgbiCJWm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741809120; c=relaxed/simple;
-	bh=Q2k9GPayWeUHQsXcs/86RclA5d1uasfKBhsFAaw3N6I=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=L8PSV2dDzArl1226gs4E0anFNyDosEJ3z7B28dPe5MS2GL+j7q2su0wOvsXWDXznfnhe4W4flLZyUSc/Jgz9WB3xbmGYuJSwOfLoILi88lHXlPtgw4MrGWjOFMtaLmG0os6m0j+snPoMesrHlbfSlbnTTTE/3D2NHit6Zkh9LyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=XKBh4GFt; arc=none smtp.client-ip=209.85.214.225
+	s=arc-20240116; t=1741809121; c=relaxed/simple;
+	bh=DCiRCv2YP+zAqkYxz2M9tKKS8ND4+qlaQKA6qe1QI1U=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=LNJjV8gXDqH8dXJkij2klBpSxwFPC4Ze3svKTRakfU9IoxW1ksB0PSXms6WQWLvuwVhYG2OdJ1sOyDAnX6znEC6r+lbhM/gO4b+1x80iAOiosPqw6E4wk7G6gIYlIBUC4WGdMbnPx54oOgXDRn3YRPCNSqUDVsXSLDNbeVWFRA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=FtyPwsMV; arc=none smtp.client-ip=209.85.219.99
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-pl1-f225.google.com with SMTP id d9443c01a7336-2232aead377so4969135ad.0
-        for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 12:51:58 -0700 (PDT)
+Received: by mail-qv1-f99.google.com with SMTP id 6a1803df08f44-6e8fca43972so2495526d6.1
+        for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 12:51:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=purestorage.com; s=google2022; t=1741809118; x=1742413918; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=TUXQmTabTFlJQTznKZdaGRe9l01Y+yauh4zh2Ba8guo=;
-        b=XKBh4GFtQCYph1TcPaoHMx/aS0kPOPGy2bz3gEQfe7/Am5jsZSqu2HIx3lm3sN8Qbt
-         BYRTRqeMBEPJhg7bbdHL2mmOfojYsV05s56KcpqY3N/MvjMKvVs4DxzALnDYb3wPOZiF
-         /hO3Bpn0YmPt0Svnob5N9iwjmB23DFfA8Sqf0AkOhvS6weuCK8DyRDm4PG/5cPs0loMu
-         CExrPDjVbwwbtJ+jAF1FDm5aMzQQRpGvIKNv1jMji6zdVC7eqXQbDdCjBlKT9fgVWrng
-         tIiNshqy5NTKtRLmcb9WpqyryGmzqhFBMmu1CYgdyUkiZmSP6K6YaPVUSPy49ewEfoln
-         NYeQ==
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PYRtGetn5eI0U7XLCVsTKGE5sj4vx1TXbmWxNemKl/g=;
+        b=FtyPwsMVxUtJKMg0Bbkw7FsO7KhCpAuW9XDc2+HIu/BIqjXpkfoH8B/oR9IoYRi8pO
+         e7NPIA/lzNRNnezRHwFqIUZqD7bcMa9PLq2Itl2NjVT+qUSv3FFVYw7RL9vsx7nly1l8
+         U3j36hgHhn7b/hcPSmgOfaIuA/rHnn77haXtW+zOS8C195TqutXlvZqG8RWv12WxwrxX
+         TxICz/Ver9d1Ru3WWBfuxhku91huMNvA4fsCiv2uSbs919Un2VDlRayz6MKK2lbYVd39
+         TnS7qWUvq39odP8u1WymUKtZmGohwHcDt7ULU5TJIHk+HUmPSXl5gc/cadZz+SeecXpj
+         qVkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1741809118; x=1742413918;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TUXQmTabTFlJQTznKZdaGRe9l01Y+yauh4zh2Ba8guo=;
-        b=jlrgQMlXa0Z0m5AgOO8s12R5onXDgNyhO1VqrNBRmhSu3tFmdU2BP+2nk8UdkhfNCD
-         g4cxJxuFHyijFYqJmIXeZjpMgJM+kxHKyRCKOyWKK2S6S3Ln5SrXQMyTJtYHNSmuKqjf
-         rkVx+7KLD2Cy0kzOQROGZqSA1RRbdI0MuBjBb6s26k0Awcck/sVW1oIVF+tV8jBch4gK
-         L1J/eD8ny+FVqhkEhyNxxuUuFAb0WZeOHJTwWwvPLRufSbNaSM4Excaji2bVZc+fhBr9
-         ixThjwRzP5COVStM55zoY6zK1zjPz4Og0OO3AmWcK+oRkrmCuB1aDvmIXnS+JKr1dOEa
-         5P9w==
-X-Gm-Message-State: AOJu0YwZUKz+Io2J9RgAaEhtMwWGZoFMYkEfRz7nzALe3B+urit8GF8R
-	vU8JXmf216gwUcD1+XDrG1kN6tqWp+Fw0lftTH9FYYjclXkc9ovsKD+bdnxCwMqMQIJE0RlT4gw
-	rnN47ZMZ7EkjRmiTWWbAWORqiQAXKbateToakXl8uvdd7gNHw
-X-Gm-Gg: ASbGnct8TGliX5ZpvMbHzTtzXkWzrmknH4TT/E4743ud2H90R49bYx/z7OZ0crL01MT
-	2x/pRmopUkQggwXK9xMrWqfSHPfzQewm+0/wICcs0WKEa2G/62Up781jcR2uOd+7cMvbC6OsmYH
-	yZ7z2Kuq0Cp7lu1sHeXb6gk0UBp4H4pR9/zBKL9iHZvF16wPF923YsOKABAERMVtwNQQSc00kfl
-	VL1G6IowLQlW2ruudOIt4FHt3n5J9bI2idnqu48nFAV1eV5JBaWdCkln7185MysuairnxB65zQj
-	h/7FnlZUW2UQOq/Vv/AB53hfLz4bufRW+Nk=
-X-Google-Smtp-Source: AGHT+IFzTFpDmJydmC2PtlCdpNTNUDU0mgSO+UfsIg00y4eEivOM8oFExNu431q+A3hE23lAesqPTs6l6uBP
-X-Received: by 2002:a17:903:283:b0:224:194c:6942 with SMTP id d9443c01a7336-22428bded4amr373642295ad.34.1741809118152;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PYRtGetn5eI0U7XLCVsTKGE5sj4vx1TXbmWxNemKl/g=;
+        b=i3UgEtbuiaPkCG5VcOyNlEHe0vv9JJ4SJcZA3EGbcQgGMydPTL2lxgvo88QgllVI8k
+         2H8XPV5e9zitRXIRstZV2DzYqCg4qr/Q0HMW0gOkwD3Ys1CQVO1ZfeEyXB2SFpdIYcZO
+         R4MYmuLiGiIkjl3yVsanUtiWSya5CKgZZnzI47KgG1S1vDFhV1BCujxdiyOuAnQ9bY0h
+         l9AMtf6fD00fyIDXTzoHSRm26lU1L5pEnIMKdcbC22CwvmH2Zhi4JBE5XsvmZfLoVF04
+         UqqWnnaHogtqRPnUnquPeZaf4+kk4w3rN3tYt1sV8ZgOz4S1BrUz3T70I0l9eBvGU5W0
+         6gLA==
+X-Gm-Message-State: AOJu0Yy+tNdZR0JzPkbENPWezeS1eyDi0VgHVm1IzkhrhBMFvyTSOMuD
+	cLC6gkdVhqACEXCurNNbzXgsC72Ro9KBmN3BqH54gieNXlKR4VYwonF7CgmMk1v9V7wE809wiUN
+	UbVrtbQoP3eGaa42s7Mw5Zt2IDr81r7HJnOm5ojzgmxD6Voa9
+X-Gm-Gg: ASbGnctLrfecMSaIOMwX5FNmZ9f2Ivfhad4Sb3najtPGlN8VrWL1ANfE1AaIKoJlQQp
+	pB6QrCPvZMFQPCjShxd3bZ5g/i06OQxG7Jr7983JsPHy7VREUyxIjqlteyKSTn70kMcVPiJC9/h
+	hROMeyT+KBN+zRkvDgrTG4/1o72h+QoZDTgAv/Iu8fbe09qgiNP7jLD9lueJZx+kM3wcZS7fapZ
+	rKnbLrweiRQcwYj2ewkc+jgprQhosBSHUpimzsFWDJtkf4wrsBRCjAzPDQL4+bdTPgYoeNusxNy
+	7j8qdXC4+IrtxG28L6lii+peomP0ugyHB30=
+X-Google-Smtp-Source: AGHT+IEpd1n+zzrnYjXjt4Wcq2+V1OtkThON8chLUhDq12vQ6C1Wi7nzCRD/w3CyyorQpZG20KFdLxUKaqOq
+X-Received: by 2002:a05:6214:212b:b0:6e8:ff23:66d6 with SMTP id 6a1803df08f44-6e9005aef8emr294464566d6.9.1741809118314;
         Wed, 12 Mar 2025 12:51:58 -0700 (PDT)
 Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id d2e1a72fcca58-736c8d701absm632789b3a.12.2025.03.12.12.51.57
+        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-6e8f70a4f7esm5309096d6.33.2025.03.12.12.51.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 12 Mar 2025 12:51:58 -0700 (PDT)
 X-Relaying-Domain: purestorage.com
 Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 3CF97340328;
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 3EF593403C7;
 	Wed, 12 Mar 2025 13:51:57 -0600 (MDT)
 Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id 2C718E4044C; Wed, 12 Mar 2025 13:51:57 -0600 (MDT)
+	id 32A87E400CB; Wed, 12 Mar 2025 13:51:57 -0600 (MDT)
 From: Uday Shankar <ushankar@purestorage.com>
-Subject: [PATCH net-next v6 0/2] netconsole: allow selection of egress
- interface via MAC address
-Date: Wed, 12 Mar 2025 13:51:45 -0600
-Message-Id: <20250312-netconsole-v6-0-3437933e79b8@purestorage.com>
+Date: Wed, 12 Mar 2025 13:51:46 -0600
+Subject: [PATCH net-next v6 1/2] net, treewide: define and use
+ MAC_ADDR_STR_LEN
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,12 +90,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIANHl0WcC/23NTQ6CMBAF4KuYrq3plP6oK+9hXJQy1SZKSYtEY
- 7i7IyuILF/evG8+rGCOWNhx82EZh1hiaimY7Yb5m2uvyGNDmUkhtZBC8RZ7n9qS7siVNyBQhr0
- Fz2jQZQzxNWFnRnd0++rZhZpbLH3K7+nLIKd+DRwkF1xj0FjrYIQ2p+6Z8Td1V9z59JiwoZoDe
- gFUBEAlXQUBLBwO64CaAWAXgCJAeLMHj8ESsg7oGSDFAtAEKIcuOAsN1uEfGMfxCzHJLj93AQA
- A
-X-Change-ID: 20250204-netconsole-4c610e2f871c
+Message-Id: <20250312-netconsole-v6-1-3437933e79b8@purestorage.com>
+References: <20250312-netconsole-v6-0-3437933e79b8@purestorage.com>
+In-Reply-To: <20250312-netconsole-v6-0-3437933e79b8@purestorage.com>
 To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -109,54 +107,125 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  Simon Horman <horms@verge.net.au>
 X-Mailer: b4 0.14.2
 
-This series adds support for selecting a netconsole egress interface by
-specifying the MAC address (in place of the interface name) in the
-boot/module parameter.
+There are a few places in the tree which compute the length of the
+string representation of a MAC address as 3 * ETH_ALEN - 1. Define a
+constant for this and use it where relevant. No functionality changes
+are expected.
 
 Signed-off-by: Uday Shankar <ushankar@purestorage.com>
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Acked-by: Johannes Berg <johannes@sipsolutions.net>
+Reviewed-by: Breno Leitao <leitao@debian.org>
+Reviewed-by: Simon Horman <horms@verge.net.au>
 ---
-Changes in v6:
-- No changes, just rebase on net-next/main and repost for patchwork
-  automation
-- Link to v5: https://lore.kernel.org/r/20250220-netconsole-v5-0-4aeafa71debf@purestorage.com
+ drivers/net/netconsole.c           | 2 +-
+ drivers/nvmem/brcm_nvram.c         | 2 +-
+ drivers/nvmem/layouts/u-boot-env.c | 2 +-
+ include/linux/if_ether.h           | 3 +++
+ lib/net_utils.c                    | 4 +---
+ net/mac80211/debugfs_sta.c         | 7 ++++---
+ 6 files changed, 11 insertions(+), 9 deletions(-)
 
-Changes in v5:
-- Drop Breno Leitao's patch to add (non-RCU) dev_getbyhwaddr from this
-  set since it has landed on net-next (Jakub Kicinski)
-- Link to v4: https://lore.kernel.org/r/20250217-netconsole-v4-0-0c681cef71f1@purestorage.com
+diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+index 098ea9eb02373d8bb6c8b9fd6e75a89cc4743dbc..43757b5c021698977040ad1cb0f355d59cd8ae3f 100644
+--- a/drivers/net/netconsole.c
++++ b/drivers/net/netconsole.c
+@@ -739,7 +739,7 @@ static ssize_t remote_mac_store(struct config_item *item, const char *buf,
+ 
+ 	if (!mac_pton(buf, remote_mac))
+ 		goto out_unlock;
+-	if (buf[3 * ETH_ALEN - 1] && buf[3 * ETH_ALEN - 1] != '\n')
++	if (buf[MAC_ADDR_STR_LEN] && buf[MAC_ADDR_STR_LEN] != '\n')
+ 		goto out_unlock;
+ 	memcpy(nt->np.remote_mac, remote_mac, ETH_ALEN);
+ 
+diff --git a/drivers/nvmem/brcm_nvram.c b/drivers/nvmem/brcm_nvram.c
+index b810df727b446b1762a1851750f743e0de6e8788..b4cf245fb2467d281111001bb7ed8db5993a09b2 100644
+--- a/drivers/nvmem/brcm_nvram.c
++++ b/drivers/nvmem/brcm_nvram.c
+@@ -100,7 +100,7 @@ static int brcm_nvram_read_post_process_macaddr(void *context, const char *id, i
+ {
+ 	u8 mac[ETH_ALEN];
+ 
+-	if (bytes != 3 * ETH_ALEN - 1)
++	if (bytes != MAC_ADDR_STR_LEN)
+ 		return -EINVAL;
+ 
+ 	if (!mac_pton(buf, mac))
+diff --git a/drivers/nvmem/layouts/u-boot-env.c b/drivers/nvmem/layouts/u-boot-env.c
+index 731e6f4f12b2bf28e4547d128954a095545ad461..436426d4e8f910b51b92f88acddfbb40d374587a 100644
+--- a/drivers/nvmem/layouts/u-boot-env.c
++++ b/drivers/nvmem/layouts/u-boot-env.c
+@@ -37,7 +37,7 @@ static int u_boot_env_read_post_process_ethaddr(void *context, const char *id, i
+ {
+ 	u8 mac[ETH_ALEN];
+ 
+-	if (bytes != 3 * ETH_ALEN - 1)
++	if (bytes != MAC_ADDR_STR_LEN)
+ 		return -EINVAL;
+ 
+ 	if (!mac_pton(buf, mac))
+diff --git a/include/linux/if_ether.h b/include/linux/if_ether.h
+index 8a9792a6427ad9cf58b50c79cbfe185615800dcb..61b7335aa037c7232a0caa45572043057c02dde3 100644
+--- a/include/linux/if_ether.h
++++ b/include/linux/if_ether.h
+@@ -19,6 +19,9 @@
+ #include <linux/skbuff.h>
+ #include <uapi/linux/if_ether.h>
+ 
++/* XX:XX:XX:XX:XX:XX */
++#define MAC_ADDR_STR_LEN (3 * ETH_ALEN - 1)
++
+ static inline struct ethhdr *eth_hdr(const struct sk_buff *skb)
+ {
+ 	return (struct ethhdr *)skb_mac_header(skb);
+diff --git a/lib/net_utils.c b/lib/net_utils.c
+index 42bb0473fb22f977409f7a6792bb1340f4e911c3..215cda672fee1b5a029c2b61529c6813c0edab11 100644
+--- a/lib/net_utils.c
++++ b/lib/net_utils.c
+@@ -7,11 +7,9 @@
+ 
+ bool mac_pton(const char *s, u8 *mac)
+ {
+-	size_t maxlen = 3 * ETH_ALEN - 1;
+ 	int i;
+ 
+-	/* XX:XX:XX:XX:XX:XX */
+-	if (strnlen(s, maxlen) < maxlen)
++	if (strnlen(s, MAC_ADDR_STR_LEN) < MAC_ADDR_STR_LEN)
+ 		return false;
+ 
+ 	/* Don't dirty result unless string is valid MAC. */
+diff --git a/net/mac80211/debugfs_sta.c b/net/mac80211/debugfs_sta.c
+index a67a9d3160086ac492d77092a0c8a74d2384b28c..a8948f4d983e5edee45d90ad267582657ed38e38 100644
+--- a/net/mac80211/debugfs_sta.c
++++ b/net/mac80211/debugfs_sta.c
+@@ -457,11 +457,12 @@ static ssize_t link_sta_addr_read(struct file *file, char __user *userbuf,
+ 				  size_t count, loff_t *ppos)
+ {
+ 	struct link_sta_info *link_sta = file->private_data;
+-	u8 mac[3 * ETH_ALEN + 1];
++	u8 mac[MAC_ADDR_STR_LEN + 2];
+ 
+ 	snprintf(mac, sizeof(mac), "%pM\n", link_sta->pub->addr);
+ 
+-	return simple_read_from_buffer(userbuf, count, ppos, mac, 3 * ETH_ALEN);
++	return simple_read_from_buffer(userbuf, count, ppos, mac,
++				       MAC_ADDR_STR_LEN + 1);
+ }
+ 
+ LINK_STA_OPS(addr);
+@@ -1240,7 +1241,7 @@ void ieee80211_sta_debugfs_add(struct sta_info *sta)
+ 	struct ieee80211_local *local = sta->local;
+ 	struct ieee80211_sub_if_data *sdata = sta->sdata;
+ 	struct dentry *stations_dir = sta->sdata->debugfs.subdir_stations;
+-	u8 mac[3*ETH_ALEN];
++	u8 mac[MAC_ADDR_STR_LEN + 1];
+ 
+ 	if (!stations_dir)
+ 		return;
 
-Changes in v4:
-- Incorporate Breno Leitao's patch to add (non-RCU) dev_getbyhwaddr and
-  use it (Jakub Kicinski)
-- Use MAC_ADDR_STR_LEN in ieee80211_sta_debugfs_add as well (Michal
-  Swiatkowski)
-- Link to v3: https://lore.kernel.org/r/20250205-netconsole-v3-0-132a31f17199@purestorage.com
-
-Changes in v3:
-- Rename MAC_ADDR_LEN to MAC_ADDR_STR_LEN (Johannes Berg)
-- Link to v2: https://lore.kernel.org/r/20250204-netconsole-v2-0-5ef5eb5f6056@purestorage.com
-
----
-Uday Shankar (2):
-      net, treewide: define and use MAC_ADDR_STR_LEN
-      netconsole: allow selection of egress interface via MAC address
-
- Documentation/networking/netconsole.rst |  6 +++-
- drivers/net/netconsole.c                |  2 +-
- drivers/nvmem/brcm_nvram.c              |  2 +-
- drivers/nvmem/layouts/u-boot-env.c      |  2 +-
- include/linux/if_ether.h                |  3 ++
- include/linux/netpoll.h                 |  6 ++++
- lib/net_utils.c                         |  4 +--
- net/core/netpoll.c                      | 51 +++++++++++++++++++++++++--------
- net/mac80211/debugfs_sta.c              |  7 +++--
- 9 files changed, 61 insertions(+), 22 deletions(-)
----
-base-commit: 0ea09cbf8350b70ad44d67a1dcb379008a356034
-change-id: 20250204-netconsole-4c610e2f871c
-
-Best regards,
 -- 
-Uday Shankar <ushankar@purestorage.com>
+2.34.1
 
 
