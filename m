@@ -1,138 +1,170 @@
-Return-Path: <netdev+bounces-174383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A682A5E707
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 23:11:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 638E0A5E716
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 23:16:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9AEF87AC746
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 22:10:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D25FE3A8463
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 22:16:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0C781EF0A3;
-	Wed, 12 Mar 2025 22:11:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7701C1E230E;
+	Wed, 12 Mar 2025 22:16:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CUJjtxBi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ms9320zr"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56EB31D5CD4;
-	Wed, 12 Mar 2025 22:11:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEA6D1D86F2;
+	Wed, 12 Mar 2025 22:16:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741817469; cv=none; b=J77B48AAfpIcEZogHJpvgY4ezUaNTPeuaLpv0ECtqfBN3w5TDBKMw1mPAk65MYS+ezhpAWXb0LZLIHwxrdmgzdU69ekTMNe7j8/WhlO2GEP9jcf0zxol3Q8tmsylxFqVz2mK9kgbcv6asF48FpmZRE9UZiaNferHDhi3e+vxuUg=
+	t=1741817769; cv=none; b=JmKs94LAcSHbH84mJFQCfou40G09JLSmSsP65wco2Zjxc1VfTt5dyApwoa9R0nFruZGPLb8Ac5yObNDCqkyYxKMj3+sNOEG8jNb1nEb9YX15qz5s+WN1y3HrDJQPjVFr0YfywuZp6OXRUETilm8krq5OahaMBLcay/RWIRMBIp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741817469; c=relaxed/simple;
-	bh=/1XozE0/vIquYjFMnDWf+X78e+cGMvn6tYV+FrUbuaM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Avq8cTF0VdjddMq0dG1hS0M6/klgQzDlgLDYqFNbEs4tPMWdB9rfPy85S1WNdp9rF+0zi2TFKkx48lhk+cbxVOvd7JkhO0PsYh15sPASq59NpVU4M/8v+mK6k4Ni1S5sEHWi9EyZvKSYSbZClhSSZMRcgR2dRZi3t7FE55laVXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CUJjtxBi; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=IlkU+vvOpVkWxTXBaPN8dTl7vOj74Nbxp/MBIBuSI/E=; b=CUJjtxBinEu+HCHR0pkQ66sNLG
-	zBCFxcd/c9xGd/TtgT9ArE8qGMycLVSOHNcBlApCiYDnKvkOQCsVIkMBdTGwlOf/C2zRO2x2s9IxY
-	K9O+45c1LO++pQ1hBQB8N9fAAV2RJU0DjPuaz7idRlb5OVKyF8QUy8aJoXjocSFtX8YU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tsUHx-004nYU-QD; Wed, 12 Mar 2025 23:10:57 +0100
-Date: Wed, 12 Mar 2025 23:10:57 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: "Gupta, Suraj" <Suraj.Gupta2@amd.com>,
-	"Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"robh@kernel.org" <robh@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"Simek, Michal" <michal.simek@amd.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"git (AMD-Xilinx)" <git@amd.com>,
-	"Katakam, Harini" <harini.katakam@amd.com>
-Subject: Re: [PATCH net-next V2 2/2] net: axienet: Add support for 2500base-X
- only configuration.
-Message-ID: <186bf47a-04af-4bfb-a6d3-118b844c9ba8@lunn.ch>
-References: <20250312095411.1392379-1-suraj.gupta2@amd.com>
- <20250312095411.1392379-3-suraj.gupta2@amd.com>
- <ad1e81b5-1596-4d94-a0fa-1828d667b7a2@lunn.ch>
- <Z9GWokRDzEYwJmBz@shell.armlinux.org.uk>
- <BL3PR12MB6571795DA783FD05189AD74BC9D02@BL3PR12MB6571.namprd12.prod.outlook.com>
- <34ed11e7-b287-45c6-8ff4-4a5506b79d17@lunn.ch>
- <BL3PR12MB6571540090EE54AC9743E17EC9D02@BL3PR12MB6571.namprd12.prod.outlook.com>
- <fd686050-e794-4b2f-bfb8-3a0769abb506@lunn.ch>
- <BL3PR12MB6571959081FC8DDC5D509560C9D02@BL3PR12MB6571.namprd12.prod.outlook.com>
- <Z9HjOAnpNkmZcoeo@shell.armlinux.org.uk>
+	s=arc-20240116; t=1741817769; c=relaxed/simple;
+	bh=1KwTPESjoV4wGw74MHx2lBmKX2wLUahDheHKien59S8=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Xu8LMQQGg9jSuIr1IL3VnICkiXBCNZOkYaARlDX5jqaxRwnk74sDu5f4snx//gtHey0ex0cMESmD/pDn876qIbnPDU6/4zICjjIfAPwZ9TBcl9OXBd5KrQKg0mWNotPmju3zfcwDOZUbDJqvqRVcVoRP6oDx9D/vRF/fWbqpxk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ms9320zr; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741817768; x=1773353768;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=1KwTPESjoV4wGw74MHx2lBmKX2wLUahDheHKien59S8=;
+  b=Ms9320zrm9UzMv8LrJmhs/FV2F0aRVqP0F//7TJEdK3KldPri403PCDd
+   rAgiL93wA7epLxdDqwl6GX+vUqS9gQtJMsCXZ/vAW9DuM82YJeyPABSZM
+   ToZ7f2clXPpeCKxuPVbDp8Rcxwc6NHLpHYFzUI5bVj4/kJntV0hFEloSE
+   PNeMVM7WpwGpycmWn+0AfehgDA1W47rSADg0xsI4K5epzmLGeFeMg7rsO
+   K+y6PvCOV8q9RoywQbRjrKNq7DQogDwEjR257XXIOC7HdCyV9s+tD2a4H
+   Sf0lYvsxGBnVylfqpwlR++ICs/V/QkrBl5+oLnSMtimiGfwIlXmBJ7Hxf
+   w==;
+X-CSE-ConnectionGUID: K2mu5F8SSUOvp5wJa5/9XA==
+X-CSE-MsgGUID: MJo2/cg8Q6meIdyQ6zXpDQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11371"; a="54288360"
+X-IronPort-AV: E=Sophos;i="6.14,242,1736841600"; 
+   d="scan'208";a="54288360"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2025 15:16:07 -0700
+X-CSE-ConnectionGUID: 7ZptAuQLTnauwVB7uWUibw==
+X-CSE-MsgGUID: VsKtbhuZR+WBzzCjQvWRCA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,242,1736841600"; 
+   d="scan'208";a="125950236"
+Received: from jekeller-desk.jf.intel.com ([10.166.241.15])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2025 15:16:06 -0700
+From: Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH net v2 0/5] net: ptp: fix egregious supported flag checks
+Date: Wed, 12 Mar 2025 15:15:49 -0700
+Message-Id: <20250312-jk-net-fixes-supported-extts-flags-v2-0-ea930ba82459@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z9HjOAnpNkmZcoeo@shell.armlinux.org.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJUH0mcC/5WNTQ6CMBCFr0Jm7ZhSqEFX3MOwQJjCKLakUwmGc
+ HcbbuDy/X1vA6HAJHDLNgi0sLB3SehTBt3YuoGQ+6RBK21UkSt8vtBRRMsrCcpnnn2I1COtMQr
+ aqR0EqSqLsq9IG6MhgeZARz1x7pDG0CRzZIk+fI/jJT+ifz6WHBVWprT2YWzRXi81u0jTufNva
+ PZ9/wGZ3E3/2QAAAA==
+X-Change-ID: 20250310-jk-net-fixes-supported-extts-flags-e8434d8e2552
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Richard Cochran <richardcochran@gmail.com>, Ruud Bos <kernel.hbk@gmail.com>, 
+ Paul Barker <paul.barker.ct@bp.renesas.com>, 
+ =?utf-8?q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>, 
+ Bryan Whitehead <bryan.whitehead@microchip.com>, 
+ UNGLinuxDriver@microchip.com, 
+ Florian Fainelli <florian.fainelli@broadcom.com>, 
+ Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ Jonathan Lemon <jonathan.lemon@gmail.com>, Lasse Johnsen <l@ssejohnsen.me>, 
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+ Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+ linux-renesas-soc@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>
+X-Mailer: b4 0.14.2
 
-> This is not an approach that works with the Linux kernel, sorry.
-> 
-> What we have today is a driver that works for people's hardware - and
-> we don't know what the capabilities of that hardware is.
-> 
-> If there's hardware out there today which has XAE_ABILITY_2_5G set, but
-> defaults to <=1G mode, this will work with the current driver. However,
-> with your patch applied, it stops working because instead of the driver
-> indicating MAC_10FD | MAC_100FD | MAC_1000FD, it only indicates
-> MAC_2500FD. If this happens, it will regress users setups, and that is
-> something we try not to do.
-> 
-> Saying "someone else needs to add the code for their FPGA logic" misses
-> the point - there may not be "someone else" to do that, which means
-> the only option is to revert your change if it were merged. That in
-> itself can cause its own user regressions because obviously stuff that
-> works with this patch stops working.
-> 
-> This is why we're being cautious, and given your responses, it's not
-> making Andrew or myself feel that there's a reasonable approach being
-> taken here.
-> 
-> >From everything you have said, I am getting the feeling that using
-> XAE_ABILITY_2_5G to decide which of (1) or (2) is supported is just
-> wrong. Given that we're talking about an implementation that has been
-> synthesized at 2.5G and can't operate slower, maybe there's some way
-> that could be created to specify that in DT?
-> 
-> e.g. (and I'm sure the DT folk aren't going to like it)...
-> 
-> 	xlnx,axi-ethernet-X.YY.Z-2.5G
-> 
-> (where X.YY.Z is the version) for implementations that can _only_ do
-> 2.5G, and leave all other implementations only doing 1G and below.
-> 
-> Or maybe some DT property. Or something else.
+In preparation for adding .supported_extts_flags and
+.supported_perout_flags to the ptp_clock_info structure, fix a couple of
+places where drivers get existing flag gets grossly incorrect.
 
-Given that AMD has been talking about an FPGA, not silicon, i actually
-think it would be best to change the IP to explicitly enumerate how it
-has been synthesised. Make use of some register bits which currently
-read as 0. Current IP would then remain as 1000BaseX/SGMII,
-independent of how they have been synthesised. Newer versions of the
-IP will then set the bits if they have been synthesised as 2) or 3),
-and the driver can then enable that capability, without breaking
-current generation systems. Plus there needs to be big fat warning for
-anybody upgrading to the latest version of the IP for bug fixes to
-ensure they correctly set the synthesis options because it now
-actually matters.
+The igb driver claims 82580 supports strictly validating PTP_RISING_EDGE
+and PTP_FALLING_EDGE, but doesn't actually check the flags. Fix the driver
+to require that the request match both edges, as this is implied by the
+datasheet description.
 
-	 Andrew
+The renesas driver also claims to support strict flag checking, but does
+not actually check the flags either. I do not have the data sheet for this
+device, so I do not know what edge it timestamps. For simplicity, just
+reject all requests with PTP_STRICT_FLAGS. This essentially prevents the
+PTP_EXTTS_REQUEST2 ioctl from working. Updating to correctly validate the
+flags will require someone who has the hardware to confirm the behavior.
+
+The lan743x driver supports (and strictly validates) that the request is
+either PTP_RISING_EDGE or PTP_FALLING_EDGE but not both. However, it does
+not check the flags are one of the known valid flags. Thus, requests for
+PTP_EXT_OFF (and any future flag) will be accepted and misinterpreted. Add
+the appropriate check to reject unsupported PTP_EXT_OFF requests and future
+proof against new flags.
+
+The broadcom PHY driver checks that PTP_PEROUT_PHASE is not set. This
+appears to be an attempt at rejecting unsupported flags. It is not robust
+against flag additions such as the PTP_PEROUT_ONE_SHOT, or anything added
+in the future. Fix this by instead checking against the negation of the
+supported PTP_PEROUT_DUTY_CYCLE instead.
+
+The ptp_ocp driver supports PTP_PEROUT_PHASE and PTP_PEROUT_DUTY_CYCLE, but
+does not check unsupported flags. Add the appropriate check to ensure
+PTP_PEROUT_ONE_SHOT and any future flags are rejected as unsupported.
+
+These are changes compile-tested, but I do not have hardware to validate the
+behavior.
+
+There are a number of other drivers which enable periodic output or
+external timestamp requests, but which do not check flags at all. We could
+go through each of these drivers one-by-one and meticulously add a flag
+check. Instead, these drivers will be covered only by the upcoming
+.supported_extts_flags and .supported_perout_flags checks in a net-next
+series.
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+---
+Changes in v2:
+- Drop Raju Lakkaraju from Cc since his email appears to no longer deliver.
+- Fix the igb 82580 check to allow disabling the pin without flags set.
+- Link to v1: https://lore.kernel.org/r/20250310-jk-net-fixes-supported-extts-flags-v1-0-854ffb5f3a96@intel.com
+
+---
+Jacob Keller (5):
+      igb: reject invalid external timestamp requests for 82580-based HW
+      renesas: reject PTP_STRICT_FLAGS as unsupported
+      net: lan743x: reject unsupported external timestamp requests
+      broadcom: fix supported flag check in periodic output function
+      ptp: ocp: reject unsupported periodic output flags
+
+ drivers/net/ethernet/intel/igb/igb_ptp.c     | 6 ++++++
+ drivers/net/ethernet/microchip/lan743x_ptp.c | 6 ++++++
+ drivers/net/ethernet/renesas/ravb_ptp.c      | 3 +--
+ drivers/net/phy/bcm-phy-ptp.c                | 3 ++-
+ drivers/ptp/ptp_ocp.c                        | 4 ++++
+ 5 files changed, 19 insertions(+), 3 deletions(-)
+---
+base-commit: 992ee3ed6e9fdd0be83a7daa5ff738e3cf86047f
+change-id: 20250310-jk-net-fixes-supported-extts-flags-e8434d8e2552
+
+Best regards,
+-- 
+Jacob Keller <jacob.e.keller@intel.com>
+
 
