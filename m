@@ -1,125 +1,83 @@
-Return-Path: <netdev+bounces-174215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BAC7A5DDBF
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 14:17:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AB59BA5DDC2
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 14:18:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F30C1189F5DB
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 13:16:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21679189DEB3
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 13:16:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B85324A07E;
-	Wed, 12 Mar 2025 13:14:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D632D2459C1;
+	Wed, 12 Mar 2025 13:15:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZC9seZdX"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="oYTulVup"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA4B2459C3;
-	Wed, 12 Mar 2025 13:14:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6E68226CF8
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 13:15:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741785288; cv=none; b=Cs624WjwQexP9JxTjN9r3JSX2C5nZgnHkpFFg4A62sz1O6tHG31DPDdilwucWCUiKZjmh3YKRYV9kC2rys8rkpBJ6HHgnqyAVyH36BIiv2bjjZqRBxNKoftPPMLJs5KqlagD4AprJLNudL4pta2NsgNKpUylSx+wePrcbFBixLA=
+	t=1741785336; cv=none; b=F7vyoTERQsgm21D8658RDqwJCX4r/r9GB8CLlrZNJtoGeMcLEajsfEgC3s+QQdJlVbYTD/wmmoJAjoQaBKYja69h/+66P0ZSluIgnE2L36nejMT+2DZDHOWWegvfZwR/oV/2Q+Vg7ygJL7kiF83S9ywVLy20Mzi1uVlszTPzjgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741785288; c=relaxed/simple;
-	bh=bj4Hh4tMMBh20XLZFjrHDGSBRCbHwQeMRZSmr4V2M6E=;
+	s=arc-20240116; t=1741785336; c=relaxed/simple;
+	bh=CTbJ2lPautz/t2+WGPJ5lPK7SYw1Mu/lFSUHNkzgFno=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uXqivqgnGNtfhJ36QkuopaZZfcB23ENqpmQ0T9Wmu4yD7H2uvFg9MEnrNSPpEkNxgh9hbrnOXBABIvbVPuMg4kB/A7Zo78WXYWbgs8Qy5VgPeevUujpzoIlYj31yFWR0oLJ4l1AjjmvYbCCkJQT3N80GV0mng4/ylApr9JUUNPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZC9seZdX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6448C4CEE3;
-	Wed, 12 Mar 2025 13:14:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741785287;
-	bh=bj4Hh4tMMBh20XLZFjrHDGSBRCbHwQeMRZSmr4V2M6E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZC9seZdX4OCdQxwTPmM+9rJ8TxwNF+iDKBzAFMSTDAa1LGaUCL2+aHIkuCPTLb50P
-	 dfFC8dsmnGHWObghyn9QNLopPGsr8GFSYNt562ha4WIH0KZuBbcS2fIgV0AWVgZNtJ
-	 nj79NTYu2dN/N2UDRdXrTPC1+PNi1JhbAgXsDaujw0sDzWwX/wo8KGgelA63rYWWv4
-	 Pje25+0MmpBoz/BEs3HKNMNlcZww6AibXJCE8ns5eOlIF65YdEyccN00XPuPXaXpGU
-	 48W4e534yJPkt7d/pvKM57P0abGYcZ+Vj+Cwp3oMZ0wFz2MDP27Xm2k2tQ6ZfFzBJb
-	 GNLS6cU5ncEGg==
-Date: Wed, 12 Mar 2025 14:14:33 +0100
-From: Simon Horman <horms@kernel.org>
-To: deller@kernel.org
-Cc: netdev@vger.kernel.org, linux-parisc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Helge Deller <deller@gmx.de>
-Subject: Re: [PATCH] net: tulip: avoid unused variable warning
-Message-ID: <20250312131433.GS4159220@kernel.org>
-References: <20250309214238.66155-1-deller@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=OuBuJ3x6gZ5cGROvha6xaI/IEZWSm9UfzR1WlO0fmjNZcwYcBWhc5VyJeER/NIzwi2NCR+PUw/sl6BZRi/x8C0pY4uV4zHhv99SXIwnsIZTVEpt39Aep0S7c5dV6k4SSKLcK0kTf/l1ZjVSuKE0Bt64i5m7VKJhqWuhhzn1F1Ao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=oYTulVup; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=w3R1Y7PnTOsubVQr+4DQ3udIBBSdZmKtjKtieh361Zs=; b=oYTulVupZS1nLdLvVWI8g5wkKW
+	PkL7S+jUES7rwk4vsh6TFtm7PA8NgwuW0eq6Df3DdEdCesihXhaC7uDED4/bFEvSLSB60zXTgjLeI
+	5DM++QUPOqZKFCk1TLz+qlId3xz3+rZ5a0o8c4ooWq7AtsA0kCZgPgAei3d6qU9Wv7DM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tsLvk-004ffO-NN; Wed, 12 Mar 2025 14:15:28 +0100
+Date: Wed, 12 Mar 2025 14:15:28 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: netdev@vger.kernel.org, jiri@resnulli.us, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, pierre@stackhpc.com, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, maxime.chevallier@bootlin.com,
+	christophe.leroy@csgroup.eu, arkadiusz.kubalewski@intel.com,
+	vadim.fedorenko@linux.dev
+Subject: Re: [PATCH net v2 1/3] devlink: fix xa_alloc_cyclic() error handling
+Message-ID: <e22659e9-e612-4053-adc9-742e564a8e3c@lunn.ch>
+References: <20250312095251.2554708-1-michal.swiatkowski@linux.intel.com>
+ <20250312095251.2554708-2-michal.swiatkowski@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250309214238.66155-1-deller@kernel.org>
+In-Reply-To: <20250312095251.2554708-2-michal.swiatkowski@linux.intel.com>
 
-On Sun, Mar 09, 2025 at 10:42:38PM +0100, deller@kernel.org wrote:
-> From: Helge Deller <deller@gmx.de>
+On Wed, Mar 12, 2025 at 10:52:49AM +0100, Michal Swiatkowski wrote:
+> In case of returning 1 from xa_alloc_cyclic() (wrapping) ERR_PTR(1) will
+> be returned, which will cause IS_ERR() to be false. Which can lead to
+> dereference not allocated pointer (rel).
 > 
-> When compiling with W=1 and CONFIG_TULIP_MWI=n one gets this warning:
->  drivers/net/ethernet/dec/tulip/tulip_core.c: In function ‘tulip_init_one’:
->  drivers/net/ethernet/dec/tulip/tulip_core.c:1309:22: warning: variable ‘force_csr0’ set but not used
+> Fix it by checking if err is lower than zero.
 > 
-> Avoid it by annotating the variable __maybe_unused, which seems to be
-> the easiest solution.
+> This wasn't found in real usecase, only noticed. Credit to Pierre.
 > 
-> Signed-off-by: Helge Deller <deller@gmx.de>
+> Fixes: c137743bce02 ("devlink: introduce object and nested devlink relationship infra")
+> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-Hi Helge,
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-A few thoughts on this:
-
-Firstly, thanks for your patch, which I agree addresses the problem you
-have described.
-
-However, AFAIK, this is a rather old driver and I'm not sure that
-addressing somewhat cosmetic problems are worth the churn they cause:
-maybe it's best to leave it be.
-
-But if we do want to fix this problem, I do wonder if the following
-solution, which leverages IS_ENABLED, is somehow nicer as
-it slightly reduces the amount of conditionally compiled code,
-thus increasing compile test coverage.
-
-diff --git a/drivers/net/ethernet/dec/tulip/tulip_core.c b/drivers/net/ethernet/dec/tulip/tulip_core.c
-index 27e01d780cd0..75eac18ff246 100644
---- a/drivers/net/ethernet/dec/tulip/tulip_core.c
-+++ b/drivers/net/ethernet/dec/tulip/tulip_core.c
-@@ -1177,7 +1177,6 @@ static void set_rx_mode(struct net_device *dev)
- 	iowrite32(csr6, ioaddr + CSR6);
- }
- 
--#ifdef CONFIG_TULIP_MWI
- static void tulip_mwi_config(struct pci_dev *pdev, struct net_device *dev)
- {
- 	struct tulip_private *tp = netdev_priv(dev);
-@@ -1251,7 +1250,6 @@ static void tulip_mwi_config(struct pci_dev *pdev, struct net_device *dev)
- 		netdev_dbg(dev, "MWI config cacheline=%d, csr0=%08x\n",
- 			   cache, csr0);
- }
--#endif
- 
- /*
-  *	Chips that have the MRM/reserved bit quirk and the burst quirk. That
-@@ -1463,10 +1461,9 @@ static int tulip_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 
- 	INIT_WORK(&tp->media_work, tulip_tbl[tp->chip_id].media_task);
- 
--#ifdef CONFIG_TULIP_MWI
--	if (!force_csr0 && (tp->flags & HAS_PCI_MWI))
-+	if (IS_ENABLED(CONFIG_TULIP_MWI) && !force_csr0 &&
-+	    (tp->flags & HAS_PCI_MWI))
- 		tulip_mwi_config (pdev, dev);
--#endif
- 
- 	/* Stop the chip's Tx and Rx processes. */
- 	tulip_stop_rxtx(tp);
-
+    Andrew
 
