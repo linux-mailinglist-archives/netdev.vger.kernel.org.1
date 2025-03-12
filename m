@@ -1,259 +1,172 @@
-Return-Path: <netdev+bounces-174082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8EC7A5D5CB
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 06:59:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCFEDA5D60C
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 07:24:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0622179229
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 05:59:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52695189CB48
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 06:24:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 483511E2614;
-	Wed, 12 Mar 2025 05:59:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7E301E4929;
+	Wed, 12 Mar 2025 06:24:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="o5OuM1a7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jWfAKPik"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 701DE1DFD86
-	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 05:59:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E651E3DED
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 06:24:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741759186; cv=none; b=de41LeBbkMJuIJDRHF5ipjEUkXfjiZttwunGIUy8jq/1v29yg64aI6aRWgmc0BzyVkIZZBAWbkSLLjwhPTfw/7RRRlU5FJti01xJofMr5XmRN3OUg48yK+I8cVY+y3FRq3fuPIR8jBCqTICuHCS7uFjFqyOdtYvE5bxH2BMuD9A=
+	t=1741760671; cv=none; b=CFVtsDleUMIBXpKCTUJoGDg3JXrInLZ5lj2WEj3YiSqC+axSJMqzGzOC3++pQc51BxmdCDvpVirsahyXzdPMeLiGhUc4OAU9bdztwe6FAIJkileAzCTGVdmitW+pyf+relb1DdmIyN+KIJ4E2yOYFa6stPB4H6sBnriHeBDHqYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741759186; c=relaxed/simple;
-	bh=R7tuHjNoroVMo9h2O5mHayl7xY5IH0gYVy1+W3i+UMM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q+Enhw+Xab3iOHS21c023ZgT8FEiog7E3UpxFFosZiUwhQ2S5xmfyd7FfQDEW6ZFtvareCd/xQ2QNKIh0/ID9flMotOj44WBX0pu3ovrm2ANCCrSvtdJAbF47KlGextqaV4g1ewIf5bAdRgWxs1iqWGEBUlWjdIgaqyx16gmzoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=o5OuM1a7; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2243803b776so116840085ad.0
-        for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 22:59:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1741759183; x=1742363983; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CZESZje65E8gcTEnwSqTnH4kGbDuL6yGOWt5IOmRc30=;
-        b=o5OuM1a7MsxUaa/+Kj3bg6yjWWmMRwpGf06ilI1R46thRszBmt0NH1WmBS3yVYkhLe
-         XANaURsDOkS48zqsILYuEDQws7yeZqC7JwEofk5b7EIgJOt8LCIJ8zCQ7dUzFJikFjpC
-         O+gKcpr8zJCsjyOKdJ00ikdaF210BQvkF2UkVLjsnL7T0WwZvF5+9KeQ4Ck4iGr9W9lT
-         AYZ2XLYqShATzJ093rXavMpyWmjYKx723dxqk/pGVVY+80P4fX++jQPLWQPujw6oShPk
-         17bfIC3TvTLE47SgrKVWBsunUc5p9CNL3JQiigZtSWLFFyjX12gspYRn/mZxz7PokQ91
-         g7Tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741759183; x=1742363983;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CZESZje65E8gcTEnwSqTnH4kGbDuL6yGOWt5IOmRc30=;
-        b=a+vao/SP9IZKxBWsfjrmGItMDWYyc8XJ6+8xKaEReCFLxY6nSbL5Z3sXwxW2TlvaLR
-         MUkywL2GDq/W221d42A/XBqdESbPzmlBqekNIIEFcB+5rAvaeW4n6COtCRA+cwwWeA71
-         wAfjaSsuNVEG+kkbffxf9c+suQVvieSOicDGdy8BcjaJy82TRzoZmQaUS2vFe2+BBBDg
-         38jCdYMjtQiyDlRRESTmVWahJsA2sayaDUYgNRuQl7sFiW1i35i91+RHwf+KGP3EiaNw
-         fcnhLBRpWgd/OUPZeX1jBGJzd89E/3hW6QH4ZwYHr+CiWlJNQEL25UBFM7uwtTryLp8D
-         DiIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXzCQ3+OBuP0eRDGiiAZ0KTXBDceeORuajWTepI6++MoCsAWrZGd75w+kjdF1ASEtH/38J1nC0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNjia8TSisCUHt1P9Z+vAyXRDV4f7BJobwi/nlJShN1ksDjHu9
-	jCwo92EUdh9ULO0fJkTMSq+PCP496BbZwVWEo3wjjQImvkBGtA2DrGTZQ3ij3Ys=
-X-Gm-Gg: ASbGncvOwvdoQcTVDa3bn8t7wb14DPTBUBWHtG4+A8DviK1z3g4qSMkisinmctqm0wC
-	pHdak2P4Q+tR37CDVk2NbURC2bVBFjGxpqSJMZOdacM0XHc8869gRi1xYR+EHpCtaWHZmqRNBag
-	gIq7/w//OLF1DTjykqnvaKJBJlAvloki4s6/rIAh8cp3C/jIWIVZHZPStQuNXGkKrU7Zgm61kpH
-	22FZ0i0YUdyq8Ms5wMPzpBBvv8WVB3r6/JWzUSMAgw5jOfi/ulTfdaOXoO2swoXngOgKWj7q7lK
-	GCRMpWmZGTh1dueVaLYVIPXKgUX8P5aMze6BsMYfre5CskstSh32uDg7Hw==
-X-Google-Smtp-Source: AGHT+IHNxn8E8ipTo8o+6AGn7pM/bGpbwkMrzPK64AMoQJ3BPQiT3yi57XUpV2Dk7/oIOt6/kYhYhQ==
-X-Received: by 2002:a17:902:f541:b0:224:c76:5e57 with SMTP id d9443c01a7336-22428ab7665mr257241305ad.39.1741759183662;
-        Tue, 11 Mar 2025 22:59:43 -0700 (PDT)
-Received: from [157.82.205.237] ([157.82.205.237])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-224109e848csm107914775ad.63.2025.03.11.22.59.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Mar 2025 22:59:43 -0700 (PDT)
-Message-ID: <77c21953-b850-4962-8673-6effb593d819@daynix.com>
-Date: Wed, 12 Mar 2025 14:59:36 +0900
+	s=arc-20240116; t=1741760671; c=relaxed/simple;
+	bh=YJkTHWF93HF5H/UtYfuCsyxZwj3cgBwPqIwMndptGa4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bTF7etXKpWyBvka3ivY3kqCyMQzKPjpvuw8FE5DYwfVFqc9EYKB6l5HU1IWl2EBI8SBs7sSDUz8tWZmqSVhTb9GVyQwMkeQImPHXjP9Oi0+HX99OEOrJqC5kqItQ3/xp5cqDmY2nDbRq3tDJ9UqQ1Z05xzjfGB+0DE6m1yDD0Mg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jWfAKPik; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741760670; x=1773296670;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=YJkTHWF93HF5H/UtYfuCsyxZwj3cgBwPqIwMndptGa4=;
+  b=jWfAKPikYMvet29zasJIlNL5jSzrW/j7PbTBEAWK6T7SD05LqXJnJO+F
+   iN6bbONTYPevZO8ItQjPhCxCmOkjFlRDRmJtY1m5wRggVyeuMY5ypGxTS
+   2II1m430EP2DjsBnR1xWGUDRlVn2tc7NhZgADAt1uRA1EKdo4W/pISFIX
+   fj6CcdWmIAAxoVmFUzUuU9QbmleA3Z7CIO6XlbPxLnbmHTVfk77i845ee
+   QfRTRqcbvU0qias+PkFSlfdjBeCD8/YKE9vSBlG9ZjT02U1EZs9qplI5n
+   078l9kMgHBTQXrg2unu2W5FcCB3L3zKevjfk1X2WDyIlXhX1/0UGs8dYN
+   g==;
+X-CSE-ConnectionGUID: /Cpx8j42R1a9GXA4M6qJnQ==
+X-CSE-MsgGUID: LwdB9re4TPOuOIlTa+Rztg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11370"; a="43005538"
+X-IronPort-AV: E=Sophos;i="6.14,240,1736841600"; 
+   d="scan'208";a="43005538"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2025 23:24:30 -0700
+X-CSE-ConnectionGUID: royPC8NbTtqI2mbHIzrDbg==
+X-CSE-MsgGUID: 7kJMwHZ9SCSTpg7oRO6fTw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,240,1736841600"; 
+   d="scan'208";a="120569466"
+Received: from gk3153-dr2-r750-36946.igk.intel.com ([10.102.20.192])
+  by fmviesa007.fm.intel.com with ESMTP; 11 Mar 2025 23:24:27 -0700
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	aleksander.lobakin@intel.com,
+	przemyslaw.kitszel@intel.com,
+	piotr.kwapulinski@intel.com,
+	aleksandr.loktionov@intel.com,
+	jedrzej.jagielski@intel.com,
+	larysa.zaremba@intel.com
+Subject: [iwl-next v1 0/8] libie: commonize adminq structure
+Date: Wed, 12 Mar 2025 07:24:18 +0100
+Message-ID: <20250312062426.2544608-1-michal.swiatkowski@linux.intel.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 6/6] vhost/net: Support
- VIRTIO_NET_F_HASH_REPORT
-To: Jason Wang <jasowang@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>,
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
- Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>
-References: <20250307-rss-v9-0-df76624025eb@daynix.com>
- <20250307-rss-v9-6-df76624025eb@daynix.com>
- <CACGkMEuccQ6ah-aZ3tcW1VRuetEoPA_NaLxLT+9fb0uAab8Agg@mail.gmail.com>
- <2e550452-a716-4c3f-9d5a-3882d2c9912a@daynix.com>
- <CACGkMEu9tynRgTh__3p_vSqOekSirbVgS90rd5dUiJru9oV1eg@mail.gmail.com>
- <1dd2417a-3246-44b0-b4ba-feadfd6f794e@daynix.com>
- <CACGkMEthfj0KJvOHhnc_ww7iqtmhHUy9f9EGOoR-n0OwHOBrvQ@mail.gmail.com>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <CACGkMEthfj0KJvOHhnc_ww7iqtmhHUy9f9EGOoR-n0OwHOBrvQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 2025/03/12 12:36, Jason Wang wrote:
-> On Tue, Mar 11, 2025 at 2:24 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>
->> On 2025/03/11 9:42, Jason Wang wrote:
->>> On Mon, Mar 10, 2025 at 3:04 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>>
->>>> On 2025/03/10 13:43, Jason Wang wrote:
->>>>> On Fri, Mar 7, 2025 at 7:02 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>>>>
->>>>>> VIRTIO_NET_F_HASH_REPORT allows to report hash values calculated on the
->>>>>> host. When VHOST_NET_F_VIRTIO_NET_HDR is employed, it will report no
->>>>>> hash values (i.e., the hash_report member is always set to
->>>>>> VIRTIO_NET_HASH_REPORT_NONE). Otherwise, the values reported by the
->>>>>> underlying socket will be reported.
->>>>>>
->>>>>> VIRTIO_NET_F_HASH_REPORT requires VIRTIO_F_VERSION_1.
->>>>>>
->>>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
->>>>>> Tested-by: Lei Yang <leiyang@redhat.com>
->>>>>> ---
->>>>>>     drivers/vhost/net.c | 49 +++++++++++++++++++++++++++++--------------------
->>>>>>     1 file changed, 29 insertions(+), 20 deletions(-)
->>>>>>
->>>>>> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
->>>>>> index b9b9e9d40951856d881d77ac74331d914473cd56..16b241b44f89820a42c302f3586ea6bb5e0d4289 100644
->>>>>> --- a/drivers/vhost/net.c
->>>>>> +++ b/drivers/vhost/net.c
->>>>>> @@ -73,6 +73,7 @@ enum {
->>>>>>            VHOST_NET_FEATURES = VHOST_FEATURES |
->>>>>>                             (1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
->>>>>>                             (1ULL << VIRTIO_NET_F_MRG_RXBUF) |
->>>>>> +                        (1ULL << VIRTIO_NET_F_HASH_REPORT) |
->>>>>>                             (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
->>>>>>                             (1ULL << VIRTIO_F_RING_RESET)
->>>>>>     };
->>>>>> @@ -1097,9 +1098,11 @@ static void handle_rx(struct vhost_net *net)
->>>>>>                    .msg_controllen = 0,
->>>>>>                    .msg_flags = MSG_DONTWAIT,
->>>>>>            };
->>>>>> -       struct virtio_net_hdr hdr = {
->>>>>> -               .flags = 0,
->>>>>> -               .gso_type = VIRTIO_NET_HDR_GSO_NONE
->>>>>> +       struct virtio_net_hdr_v1_hash hdr = {
->>>>>> +               .hdr = {
->>>>>> +                       .flags = 0,
->>>>>> +                       .gso_type = VIRTIO_NET_HDR_GSO_NONE
->>>>>> +               }
->>>>>>            };
->>>>>>            size_t total_len = 0;
->>>>>>            int err, mergeable;
->>>>>> @@ -1110,7 +1113,6 @@ static void handle_rx(struct vhost_net *net)
->>>>>>            bool set_num_buffers;
->>>>>>            struct socket *sock;
->>>>>>            struct iov_iter fixup;
->>>>>> -       __virtio16 num_buffers;
->>>>>>            int recv_pkts = 0;
->>>>>>
->>>>>>            mutex_lock_nested(&vq->mutex, VHOST_NET_VQ_RX);
->>>>>> @@ -1191,30 +1193,30 @@ static void handle_rx(struct vhost_net *net)
->>>>>>                            vhost_discard_vq_desc(vq, headcount);
->>>>>>                            continue;
->>>>>>                    }
->>>>>> +               hdr.hdr.num_buffers = cpu_to_vhost16(vq, headcount);
->>>>>>                    /* Supply virtio_net_hdr if VHOST_NET_F_VIRTIO_NET_HDR */
->>>>>>                    if (unlikely(vhost_hlen)) {
->>>>>> -                       if (copy_to_iter(&hdr, sizeof(hdr),
->>>>>> -                                        &fixup) != sizeof(hdr)) {
->>>>>> +                       if (copy_to_iter(&hdr, vhost_hlen,
->>>>>> +                                        &fixup) != vhost_hlen) {
->>>>>>                                    vq_err(vq, "Unable to write vnet_hdr "
->>>>>>                                           "at addr %p\n", vq->iov->iov_base);
->>>>>>                                    goto out;
->>>>>
->>>>> Is this an "issue" specific to RSS/HASH? If it's not, we need a separate patch.
->>>>>
->>>>> Honestly, I'm not sure if it's too late to fix this.
->>>>
->>>> There is nothing wrong with the current implementation.
->>>
->>> Note that I meant the vhost_hlen part, and the current code is tricky.
->>>
->>> The comment said:
->>>
->>> """
->>> /* Supply virtio_net_hdr if VHOST_NET_F_VIRTIO_NET_HDR */
->>> """
->>>
->>> So it tries to only offer virtio_net_hdr even if vhost_hlen is the set
->>> to mrg_rxbuf len.
->>>
->>> And this patch changes this behaviour.
->>
->> mrg_rxbuf only adds the num_buffers field, which is always set for
->> mrg_rxbuf.
->>
->> The num_buffers was not set for VIRTIO_F_VERSION_1 in the past, but this
->> was also fixed with commit a3b9c053d82a ("vhost/net: Set num_buffers for
->> virtio 1.0")
->>
->> So there is no behavioral change for existing features with this patch.
-> 
-> I meant this part.
-> 
->>>>> +                       if (copy_to_iter(&hdr, vhost_hlen,
->>>>> +                                        &fixup) != vhost_hlen) {
-> 
-> We should copy only sizeof(hdr) instead of vhost_hlen.> > Anything I miss?
+Hi,
 
-sizeof(hdr) will be greater than vhost_hlen when neither 
-VIRTIO_NET_F_MRG_RXBUF or VIRTIO_F_VERSION_1 is negotiated.
+It is a prework to allow reusing some specific Intel code (eq. fwlog).
 
-Regards,
-Akihiko Odaki
+Move common *_aq_desc structure to libie header and changing
+it in ice, ixgbe, i40e and iavf.
 
-> 
-> Thanks
-> 
->>
->> Regards,
->> Akihiko Odaki
->>
->>>
->>> Thanks
->>>
->>>> The current
->>>> implementation fills the header with zero except num_buffers, which it
->>>> fills some real value. This functionality is working fine with
->>>> VIRTIO_NET_F_MRG_RXBUF and VIRTIO_F_VERSION_1, which change the header size.
->>>>
->>>> Now I'm adding VIRTIO_NET_F_HASH_REPORT and it adds the hash_report
->>>> field, which also needs to be initialized with zero, so I'm making sure
->>>> vhost_net will also initialize it.
->>>>
->>>> Regards,
->>>> Akihiko Odaki
->>>>
->>>>>
->>>>> Others look fine.
->>>>>
->>>>> Thanks
->>>>>
->>>>
->>>
->>
-> 
+Only generic adminq commands can be easily moved to common header, as
+rest is slightly different. Format remains the same. It will be better
+to correctly move it when it will be needed to commonize other part of
+the code.
+
+Move *_aq_str() to new libie module (libie_adminq) and use it across
+drivers. The functions are exactly the same in each driver. Some more
+adminq helpers/functions can be moved to libie_adminq when needed.
+
+Michal Swiatkowski (8):
+  ice, libie: move generic adminq descriptors to lib
+  ixgbe: use libie adminq descriptors
+  i40e: use libie adminq descriptors
+  iavf: use libie adminq descriptors
+  libie: add adminq helper for converting err to str
+  ice: use libie_aq_str
+  iavf: use libie_aq_str
+  i40e: use libie_aq_str
+
+ drivers/net/ethernet/intel/Kconfig            |   3 +
+ drivers/net/ethernet/intel/libie/Kconfig      |   6 +
+ drivers/net/ethernet/intel/libie/Makefile     |   4 +
+ drivers/net/ethernet/intel/i40e/i40e_adminq.h |  12 +-
+ .../net/ethernet/intel/i40e/i40e_adminq_cmd.h | 155 +---
+ .../net/ethernet/intel/i40e/i40e_prototype.h  |  15 +-
+ drivers/net/ethernet/intel/i40e/i40e_type.h   |   6 +-
+ drivers/net/ethernet/intel/iavf/iavf_adminq.h |  12 +-
+ .../net/ethernet/intel/iavf/iavf_adminq_cmd.h |  83 +-
+ .../net/ethernet/intel/iavf/iavf_prototype.h  |   3 +-
+ drivers/net/ethernet/intel/iavf/iavf_type.h   |   2 +-
+ drivers/net/ethernet/intel/ice/ice.h          |   1 -
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   | 267 +------
+ drivers/net/ethernet/intel/ice/ice_common.h   |   6 +-
+ drivers/net/ethernet/intel/ice/ice_controlq.h |   8 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |  12 +-
+ .../ethernet/intel/ixgbe/ixgbe_type_e610.h    | 226 +-----
+ include/linux/net/intel/libie/adminq.h        | 309 ++++++++
+ drivers/net/ethernet/intel/i40e/i40e_adminq.c |  68 +-
+ drivers/net/ethernet/intel/i40e/i40e_client.c |   7 +-
+ drivers/net/ethernet/intel/i40e/i40e_common.c | 730 ++++++++----------
+ drivers/net/ethernet/intel/i40e/i40e_dcb.c    |  10 +-
+ drivers/net/ethernet/intel/i40e/i40e_dcb_nl.c |   8 +-
+ .../net/ethernet/intel/i40e/i40e_debugfs.c    |  46 +-
+ .../net/ethernet/intel/i40e/i40e_ethtool.c    |  36 +-
+ drivers/net/ethernet/intel/i40e/i40e_main.c   | 240 +++---
+ drivers/net/ethernet/intel/i40e/i40e_nvm.c    |  18 +-
+ .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |  27 +-
+ drivers/net/ethernet/intel/iavf/iavf_adminq.c |  62 +-
+ drivers/net/ethernet/intel/iavf/iavf_common.c | 110 +--
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |   5 +-
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   |   2 +-
+ .../net/ethernet/intel/ice/devlink/devlink.c  |  10 +-
+ .../net/ethernet/intel/ice/devlink/health.c   |   6 +-
+ drivers/net/ethernet/intel/ice/ice_common.c   | 376 ++++-----
+ drivers/net/ethernet/intel/ice/ice_controlq.c |  53 +-
+ drivers/net/ethernet/intel/ice/ice_dcb.c      |  36 +-
+ drivers/net/ethernet/intel/ice/ice_dcb_lib.c  |   2 +-
+ drivers/net/ethernet/intel/ice/ice_ddp.c      |  47 +-
+ drivers/net/ethernet/intel/ice/ice_dpll.c     |  20 +-
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  |  12 +-
+ .../net/ethernet/intel/ice/ice_fw_update.c    |  38 +-
+ drivers/net/ethernet/intel/ice/ice_fwlog.c    |  16 +-
+ drivers/net/ethernet/intel/ice/ice_lag.c      |   4 +-
+ drivers/net/ethernet/intel/ice/ice_lib.c      |  10 +-
+ drivers/net/ethernet/intel/ice/ice_main.c     |  63 +-
+ drivers/net/ethernet/intel/ice/ice_nvm.c      |  38 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c   |  20 +-
+ drivers/net/ethernet/intel/ice/ice_sched.c    |  18 +-
+ drivers/net/ethernet/intel/ice/ice_sriov.c    |   4 +-
+ drivers/net/ethernet/intel/ice/ice_switch.c   |  55 +-
+ drivers/net/ethernet/intel/ice/ice_vf_mbx.c   |   6 +-
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c |   6 +-
+ .../net/ethernet/intel/ice/ice_vlan_mode.c    |   6 +-
+ .../net/ethernet/intel/ice/ice_vsi_vlan_lib.c |  24 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 272 +++----
+ .../ethernet/intel/ixgbe/ixgbe_fw_update.c    |   4 +-
+ drivers/net/ethernet/intel/libie/adminq.c     |  50 ++
+ 58 files changed, 1567 insertions(+), 2128 deletions(-)
+ create mode 100644 include/linux/net/intel/libie/adminq.h
+ create mode 100644 drivers/net/ethernet/intel/libie/adminq.c
+
+-- 
+2.42.0
 
 
