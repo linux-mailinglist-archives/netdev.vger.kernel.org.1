@@ -1,71 +1,61 @@
-Return-Path: <netdev+bounces-174217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3F2FA5DDBE
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 14:17:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32299A5DDC8
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 14:19:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B26D17C8E8
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 13:16:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60408189688C
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 13:17:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11EE52475C7;
-	Wed, 12 Mar 2025 13:16:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E83523A563;
+	Wed, 12 Mar 2025 13:17:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ecI2m8LU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OR5xSFxe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C550E2405FD;
-	Wed, 12 Mar 2025 13:16:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E80272EAF7;
+	Wed, 12 Mar 2025 13:17:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741785384; cv=none; b=Y19TpH8eOvNqFy+2Qn2bUYeA1doi4XQGX1APUpP+Q7e+FAufCtbTXSzUNJhy/VawgwrcZBUFpii8DABUGhYI1AReUolHyNPVwqL+rnDnzeYTEP3lJul4jobKOCSfUqHjEp8CEMfBBnX1pSqUyZqSM4jynupuBiH/bPRTkAkLu5Y=
+	t=1741785456; cv=none; b=CgH9ShVeVu2oyMoVjMbxo1QNgeIsIJ9PPqZhOpfI4gUP9AcvCNVwABzMR8YQKVaoAMtiXAEoTBvCSSeX54/SzLRkn5RdIalz6+YNPbRG2vtnJS/f6lN2hZcJhLGoxfpfj9YlnLdMG4ug1Bs+gtYhYawR7uYUvlz8p48YyfMoseY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741785384; c=relaxed/simple;
-	bh=MhxEnjdAm4dk8eMX5PMe1gYm0TCJYLy21bFBF2bTcK8=;
+	s=arc-20240116; t=1741785456; c=relaxed/simple;
+	bh=q6dHWY/sgNPDiH0VHzYcttxpIZaPa92meReul5KP29Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mYTwzIsFx6qhGdirouprNLO5q2aNWbPynZrBto5InPVO2lDpBNjoKlWqy3+ON9Xi8NNrlf05IzahMtJ2MpHVoYpcgqwXFNPWZigIeMpOo48SG3s20it/gK1uHS8rOJdpnb75eQNISZEyGLLQYeuWxV/gWtSzQWsaHykUyEKyW+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ecI2m8LU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01FF2C4CEE3;
-	Wed, 12 Mar 2025 13:16:23 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=EDLGJ5z7Zt0A/nCt9HAC9oGfI09zR6LcMI09yi9bn/N40zulPFS6O5ZQ3/E5QOdQMExRKLld3GrxzRsu9AwClcg9QGxt9VVXScMZU96RqvaplwjnJYkgqAo9bkzJB0EcJt2QySMLqgZJ7oF86owWZxax65VNzoWS3G7z5sz2gI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OR5xSFxe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BE87C4CEE3;
+	Wed, 12 Mar 2025 13:17:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741785384;
-	bh=MhxEnjdAm4dk8eMX5PMe1gYm0TCJYLy21bFBF2bTcK8=;
+	s=k20201202; t=1741785455;
+	bh=q6dHWY/sgNPDiH0VHzYcttxpIZaPa92meReul5KP29Y=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ecI2m8LUtOeISoz79LApWF1n7b7x2jrl/Y8tbGEWJn//ZD9Bi8KZLLv0rO5OPQ3b6
-	 G/4/bLYRahlhrOKlmsyMF7/s1oCwOPGf12/esHve1H0hNE5WxvqWv57gFVn/YtFOjY
-	 HPt4r020u/e1vCoZnZdG0ZebBnsAj+wswPiTeVVL52NUCinFPpcK8Q2VaqCx919A2Y
-	 HX9AOpoeF9EIjU8Ivn1n+JRwcFm//c/IvHU7N0j9+ENEx4NU1v8xxUzqaChDtjWBJo
-	 bLHJT0HN4R4qTr8Hr8pB/OtRtHwEmgiH/L0EBmOmnkSlUdJ2zlASHEg7qfP0w8rgiM
-	 BsdmUimU4RRMQ==
-Date: Wed, 12 Mar 2025 08:16:23 -0500
+	b=OR5xSFxe1jq7JdfBvNZY3RH4RT2Rpt0GBysRIAKWCcgWDO/T0M9nGomYJsyKliHXf
+	 zwYE2ek7UIs6azTnHoHuXIFXe5qcuNrX/4b3pId3eG7LH4hpAI0zETkDBPaBHmZiV8
+	 6jlQ2lmmnqQ90aOnqy45rHUwE6yeTmVUSj8zDIXXfkzyK9FF0YKt1XIrizGjptW4VZ
+	 YzbSWg995YF6M9BFPaCILQPrHoMdZEXr3qsNekjIlhRSrreKvGM/Vwr1neJYnamf8c
+	 HeXzGOpZoUUaUWme2UmGz/s1f9HwxO/pemGX6mzhI8gFtbu9cC8PX9kWoFDLzKHkb9
+	 GmqxPe2zq7lOw==
+Date: Wed, 12 Mar 2025 08:17:34 -0500
 From: Rob Herring <robh@kernel.org>
-To: Prabhakar <prabhakar.csengg@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+To: Suraj Gupta <suraj.gupta2@amd.com>
+Cc: radhey.shyam.pandey@amd.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	krzk+dt@kernel.org, conor+dt@kernel.org, michal.simek@amd.com,
 	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH net-next v3 1/3] dt-bindings: net: dwmac: Increase
- 'maxItems' for 'interrupts' and 'interrupt-names'
-Message-ID: <20250312131623.GA489176-robh@kernel.org>
-References: <20250311221730.40720-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250311221730.40720-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	git@amd.com, harini.katakam@amd.com
+Subject: Re: [PATCH net-next V2 1/2] dt-bindings: net: xlnx,axi-ethernet:
+ Modify descriptions and phy-mode value to support 2500base-X only
+ configuration
+Message-ID: <20250312131734.GA505165-robh@kernel.org>
+References: <20250312095411.1392379-1-suraj.gupta2@amd.com>
+ <20250312095411.1392379-2-suraj.gupta2@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,83 +64,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250311221730.40720-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
+In-Reply-To: <20250312095411.1392379-2-suraj.gupta2@amd.com>
 
-On Tue, Mar 11, 2025 at 10:17:28PM +0000, Prabhakar wrote:
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+On Wed, Mar 12, 2025 at 03:24:10PM +0530, Suraj Gupta wrote:
+> AXI 1G/2.5G Ethernet subsystem supports 1G and 2.5G speeds. Modify
+> existing binding description, pcs-handle description and add
+> 2500base-x in phy-mode for 2500base-X only configuration.
 > 
-> Increase the `maxItems` value for the `interrupts` and `interrupt-names`
-> properties to 11 to support additional per-channel Tx/Rx completion
-> interrupts on the Renesas RZ/V2H(P) SoC, which features the
-> `snps,dwmac-5.20` IP.
-> 
-> Refactor the `interrupt-names` property by replacing repeated `enum`
-> entries with a `oneOf` list. Add support for per-channel receive and
-> transmit completion interrupts using regex patterns.
-> 
-> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
 > ---
-> Note, for adding constraints to vendor bindings patch [0] has been sent
-> out seprately.
+>  .../devicetree/bindings/net/xlnx,axi-ethernet.yaml       | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
 > 
-> [0] https://lore.kernel.org/all/20250309003301.1152228-1-prabhakar.mahadev-lad.rj@bp.renesas.com/
-> 
-> v2->v3
-> - Dropped adding `additionalItems`
-> - Moved interrupts description into interrupt-names
-> - Replaced enum with a oneOf and added Rx/Tx regex patterns
-> 
-> v1->v2
-> - No change
-> ---
->  .../devicetree/bindings/net/snps,dwmac.yaml   | 24 ++++++++++++-------
->  1 file changed, 15 insertions(+), 9 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> index 78b3030dc56d..bacec6e6514b 100644
-> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> @@ -114,19 +114,25 @@ properties:
->  
->    interrupts:
->      minItems: 1
-> -    items:
-> -      - description: Combined signal for various interrupt events
-> -      - description: The interrupt to manage the remote wake-up packet detection
-> -      - description: The interrupt that occurs when Rx exits the LPI state
-> -      - description: The interrupt that occurs when HW safety error triggered
-> +    maxItems: 11
->  
->    interrupt-names:
->      minItems: 1
-> +    maxItems: 26
+> diff --git a/Documentation/devicetree/bindings/net/xlnx,axi-ethernet.yaml b/Documentation/devicetree/bindings/net/xlnx,axi-ethernet.yaml
+> index fb02e579463c..977f55b98f31 100644
+> --- a/Documentation/devicetree/bindings/net/xlnx,axi-ethernet.yaml
+> +++ b/Documentation/devicetree/bindings/net/xlnx,axi-ethernet.yaml
+> @@ -9,10 +9,12 @@ title: AXI 1G/2.5G Ethernet Subsystem
+>  description: |
+>    Also called  AXI 1G/2.5G Ethernet Subsystem, the xilinx axi ethernet IP core
+>    provides connectivity to an external ethernet PHY supporting different
+> -  interfaces: MII, GMII, RGMII, SGMII, 1000BaseX. It also includes two
+> +  interfaces: MII, GMII, RGMII, SGMII, 1000BaseX and 2500BaseX. It also includes two
 
-Oops! I assume you meant 11. With that fixed:
+Please re-wrap at 80.
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
-
->      items:
-> -      - const: macirq
-> -      - enum: [eth_wake_irq, eth_lpi, sfty]
-> -      - enum: [eth_wake_irq, eth_lpi, sfty]
-> -      - enum: [eth_wake_irq, eth_lpi, sfty]
-> +      oneOf:
-> +        - description: Combined signal for various interrupt events
-> +          const: macirq
-> +        - description: The interrupt to manage the remote wake-up packet detection
-> +          const: eth_wake_irq
-> +        - description: The interrupt that occurs when Rx exits the LPI state
-> +          const: eth_lpi
-> +        - description: The interrupt that occurs when HW safety error triggered
-> +          const: sfty
-> +        - description: Per channel receive completion interrupt
-> +          pattern: '^rx-queue-[0-3]$'
-> +        - description: Per channel transmit completion interrupt
-> +          pattern: '^tx-queue-[0-3]$'
+>    segments of memory for buffering TX and RX, as well as the capability of
+>    offloading TX/RX checksum calculation off the processor.
 >  
->    clocks:
->      minItems: 1
+> +  AXI 2.5G MAC is incremental speed upgrade of AXI 1G and supports 2.5G speed.
+> +
+>    Management configuration is done through the AXI interface, while payload is
+>    sent and received through means of an AXI DMA controller. This driver
+>    includes the DMA driver code, so this driver is incompatible with AXI DMA
+> @@ -62,6 +64,7 @@ properties:
+>        - rgmii
+>        - sgmii
+>        - 1000base-x
+> +      - 2500base-x
+>  
+>    xlnx,phy-type:
+>      description:
+> @@ -118,8 +121,8 @@ properties:
+>      type: object
+>  
+>    pcs-handle:
+> -    description: Phandle to the internal PCS/PMA PHY in SGMII or 1000Base-X
+> -      modes, where "pcs-handle" should be used to point to the PCS/PMA PHY,
+> +    description: Phandle to the internal PCS/PMA PHY in SGMII or 1000base-x/
+> +      2500base-x modes, where "pcs-handle" should be used to point to the PCS/PMA PHY,
+
+And here.
+
+>        and "phy-handle" should point to an external PHY if exists.
+>      maxItems: 1
+>  
 > -- 
-> 2.43.0
+> 2.25.1
 > 
 
