@@ -1,145 +1,99 @@
-Return-Path: <netdev+bounces-174149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52FD5A5D9B4
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 10:40:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BC6AA5D9C5
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 10:43:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 671697A595B
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 09:39:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDF1A3B157B
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 09:43:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D091223BD14;
-	Wed, 12 Mar 2025 09:40:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7D6023BF88;
+	Wed, 12 Mar 2025 09:43:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enfabrica.net header.i=@enfabrica.net header.b="dQzQJwpY"
+	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="fJH8tXUP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+Received: from va-1-14.ptr.blmpb.com (va-1-14.ptr.blmpb.com [209.127.230.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21CC623BCF6
-	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 09:40:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D156C23BD14
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 09:43:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.230.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741772410; cv=none; b=lUVJINfLRRpJZqQRvUI+hH94yMxj/JwYSiITMDvVr7FbbfYB0G88Jn1tnzjgaELBTOdQigBK9QCdpePd5M7YUjV7PBW1uWxR1eVVQvpZh8iItU64lhfbCAQZsFkQtk1GIPElOUWI4iZMv9nMEOJszpq65Nvo5egmGiIEgt/7n64=
+	t=1741772610; cv=none; b=IpPTfsYgzp43tWBP+c3paIwZT74cmNDQVq5UXOhwS+h2rxLxhvUSEGiqgq2l73nsycbRSdaE0nt6iEPm6e1uZsJoimtRsLGMJC2KdUS8W5wD7weprZAhatWA/h5ZhzxzOD0EJ0yM8IJr8ieVAfTBlJfFcBOcRuFCz9qRMuYpLPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741772410; c=relaxed/simple;
-	bh=2dfhfOYEZya2F/+8TXgINOUG/sPDfgWSkt185LIIP64=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JDaudRhGdJEUyuj3p3WuIWXTlaKIWo35s3ob0PvFdzMsFx9yasMFUSmnlcX7QlRWUgcL8evWOLqfpt5797IOoTOjdkpY4XZ9CLMYEHTP56k5aPsAkXj29bHp5ocIvQeTVCj5Au/Y7BM784TCQNLxeYsVy3s/tc7PZfDu1f65p6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=enfabrica.net; spf=pass smtp.mailfrom=enfabrica.net; dkim=pass (2048-bit key) header.d=enfabrica.net header.i=@enfabrica.net header.b=dQzQJwpY; arc=none smtp.client-ip=209.85.219.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=enfabrica.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enfabrica.net
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6dd1962a75bso41061396d6.3
-        for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 02:40:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=enfabrica.net; s=google; t=1741772408; x=1742377208; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=udjj9fCl9LBtiIbmOdyvcIwBX67qERUexr1e4MBTcnM=;
-        b=dQzQJwpY3EeKT8Empz3/22mps+rvNL4hSkdtlY7Mm4m/aO1MU60Fl/2NQByT14owj/
-         7PZvim3p8xqwk74L+rMQNvIiHYNpsrq9wLLES/yhBPVJQ4nh2VaWYmtHZjiKEEsN5G82
-         qK9MPxfSTI9Efi5ezknpKPnvfSAFtQKqbcoNw9TETVH6BbKPT6ESL3Q3WZ0rj9QCXE8M
-         cDPobMnleWLRaIf1e9KptZYXIHwAKYrXunvzWYTEWkudchaJgAhXC1Nz0ijgFYs2WwyQ
-         ipXaf4vSwmTzJCzUv2JSCrq3KG6+lPCC5I+EX3e8gXKaTdgjSAWSgja1lT8UZd42N0rA
-         Hnzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741772408; x=1742377208;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=udjj9fCl9LBtiIbmOdyvcIwBX67qERUexr1e4MBTcnM=;
-        b=ZPratKv26YotJFe/HbXLpJ4A/z7+yQLMeG1rnZNocirq1g9oOB3NIKwtHX2lG+6EJs
-         4sminXbuOeSBaM31OMSYJQOL9VSh1NIFgCYD2QLqMP1rE1vuxIKTFL5aZrw6TMPFQq31
-         RJtpmhvc3hwg8or+PbkZR7SBbCr1cQpP5JwgF9GPwBrG6EsNLiPV5Rj9+gW1yqroiavR
-         rZfVf7cQLTZR1m7mKBt40DRqBJjcYvPnJPEF+5CW+CmGk3l2gfytGt3VvqGvTbW8jp/9
-         dFwNqg1r2QrUrUjzPtFxaEqbY/SvKcxlMmQzKunXCqKXMwLApbhNgE5hLbzPwux/l/j8
-         s5RQ==
-X-Gm-Message-State: AOJu0YyqzQbEZn/L0hVTa5r4yegiFZ9tD0kX3DosSfi6wYy8+EXwVyA1
-	m+pH75GSkFyp7Wctkvh0FmbIDzi8Rj6EaGWJXjjLCEY4N+JD2xD+xC+5bLHpHz4=
-X-Gm-Gg: ASbGncsildd0vBwP/kxY0gmA8w7A8Dj8g0Gjik1gTB4hyK47jvqxslqYHk8oQ6cljMB
-	9t7ccw9atQxEaS32kSIP+aUWr5P6qaiMYycIWhcSNZRs+t+YUDgHMI+SMhmDzG8Hx7v5UJAUF4m
-	uXR+sCwg2YLcReU/llb2XYRvtc7VJtOFdtl8x8yWMB3WUr2Sk4GHrXtc0bfLcxBbLVROmLJV2ED
-	FDlGasWaCD8MuhyJSnibT4rPm8ttwIVdIIMRTLSZ/ULCfAd2EWSgtshfOYPDkWkojL7EAQTIgph
-	HPVaQpQY5ix+v3giILexOB5/H/hEYeoFDAn12sTv6hZbRi9dWwUm
-X-Google-Smtp-Source: AGHT+IFZF4mdG/bEmIMD8dAADQJR8NHoCAL3S+neVFwZEscYnba7g81wnhrW7ciHRjjCuTX7gr/vOw==
-X-Received: by 2002:a05:6214:226f:b0:6e4:4331:aae0 with SMTP id 6a1803df08f44-6e9005b6680mr265863526d6.1.1741772407942;
-        Wed, 12 Mar 2025 02:40:07 -0700 (PDT)
-Received: from [172.19.251.166] ([195.29.54.243])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e5c733f8aasm9486244a12.5.2025.03.12.02.40.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Mar 2025 02:40:07 -0700 (PDT)
-Message-ID: <2f06a40d-2f14-439a-9c95-0231dce5772d@enfabrica.net>
-Date: Wed, 12 Mar 2025 11:40:05 +0200
+	s=arc-20240116; t=1741772610; c=relaxed/simple;
+	bh=l8lJrRLQryu3Kp15FAj4PmZ5BaUk7ZBQJvr3ZE2o0JE=;
+	h=To:Date:References:Message-Id:Mime-Version:Subject:Content-Type:
+	 In-Reply-To:Cc:From; b=BRtKjkCkmgDvSRwjxz16G4uh2mX/e6QaGj2/F3I6FUyBxRdu5IxJ/Y4kP8eT5u9c2lODm5Hsd2hlYZq0+IcKwJ4KXhEzZwDSaUagrJdr3OIj6GeTk0h080esTG9tzm6LoHT758hyrPOK39+56WdQa3Oz21xhXY2fMw5c4OIBD/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=fJH8tXUP; arc=none smtp.client-ip=209.127.230.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=feishu2403070942; d=yunsilicon.com; t=1741772601; h=from:subject:
+ mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
+ mime-version:in-reply-to:message-id;
+ bh=9cWO0O52USMisNA7y21qTu4m43///YkcscYh8nS0vNY=;
+ b=fJH8tXUPJsRyi4QuPeFYgwCyETMT92e8Za1jYzLlCESc4YtBSs1ZtvE7Bui9rmMOmwGwZo
+ RgHJX+S23dEMeuoWbe5/M/IbEc4CmUNoXT3wEwpCjcHr+6IYPsTgrCl6Q57e3RMMOzSTjJ
+ LPorAnSBVeik6YmBebkhpNCfr5JoUgmOkGx30RKhxAH2OwRhRIniZe234M6NPtf7dbAIDk
+ 6a8DY3tVUIvWUq7Sf9aV0s3EFKK8FwHxZFB5AlnSt25OwtEEiixf0SRhTHvBiK+8pXjfkk
+ 3a7DtueH1h0thkfgjuiy9B+t/lszQ3e/kqt7JipvPgAL1SG+Doz0jI9e120aNg==
+X-Lms-Return-Path: <lba+267d15737+9401c4+vger.kernel.org+tianx@yunsilicon.com>
+Content-Transfer-Encoding: 7bit
+To: "Paolo Abeni" <pabeni@redhat.com>, <netdev@vger.kernel.org>
+Date: Wed, 12 Mar 2025 17:43:17 +0800
+X-Original-From: Xin Tian <tianx@yunsilicon.com>
+Received: from [127.0.0.1] ([218.1.186.193]) by smtp.feishu.cn with ESMTPS; Wed, 12 Mar 2025 17:43:19 +0800
+References: <20250307100824.555320-1-tianx@yunsilicon.com> <20250307100853.555320-13-tianx@yunsilicon.com> <2d5a6210-1565-4158-ad0c-432953f9268e@redhat.com>
+User-Agent: Mozilla Thunderbird
+Message-Id: <3ba8daec-0e7d-48a8-baf7-837161f9b8bc@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 00/13] Ultra Ethernet driver introduction
-To: Leon Romanovsky <leon@kernel.org>
-Cc: netdev@vger.kernel.org, shrijeet@enfabrica.net, alex.badea@keysight.com,
- eric.davis@broadcom.com, rip.sohan@amd.com, dsahern@kernel.org,
- bmt@zurich.ibm.com, roland@enfabrica.net, winston.liu@keysight.com,
- dan.mihailescu@keysight.com, kheib@redhat.com, parth.v.parikh@keysight.com,
- davem@redhat.com, ian.ziemba@hpe.com, andrew.tauferner@cornelisnetworks.com,
- welch@hpe.com, rakhahari.bhunia@keysight.com, kingshuk.mandal@keysight.com,
- linux-rdma@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- Jason Gunthorpe <jgg@nvidia.com>
-References: <20250306230203.1550314-1-nikolay@enfabrica.net>
- <20250308184650.GV1955273@unreal>
-Content-Language: en-US
-From: Nikolay Aleksandrov <nikolay@enfabrica.net>
-In-Reply-To: <20250308184650.GV1955273@unreal>
+Mime-Version: 1.0
+Subject: Re: [PATCH net-next v8 12/14] xsc: Add ndo_start_xmit
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <2d5a6210-1565-4158-ad0c-432953f9268e@redhat.com>
+Cc: <leon@kernel.org>, <andrew+netdev@lunn.ch>, <kuba@kernel.org>, 
+	<edumazet@google.com>, <davem@davemloft.net>, 
+	<jeff.johnson@oss.qualcomm.com>, <przemyslaw.kitszel@intel.com>, 
+	<weihg@yunsilicon.com>, <wanry@yunsilicon.com>, <jacky@yunsilicon.com>, 
+	<horms@kernel.org>, <parthiban.veerasooran@microchip.com>, 
+	<masahiroy@kernel.org>, <kalesh-anakkur.purayil@broadcom.com>, 
+	<geert+renesas@glider.be>
+From: "Xin Tian" <tianx@yunsilicon.com>
 
-On 3/8/25 8:46 PM, Leon Romanovsky wrote:
-> On Fri, Mar 07, 2025 at 01:01:50AM +0200, Nikolay Aleksandrov wrote:
->> Hi all,
-> 
-> <...>
-> 
->> Ultra Ethernet is a new RDMA transport.
-> > Awesome, and now please explain why new subsystem is needed when
-> drivers/infiniband already supports at least 5 different RDMA
-> transports (OmniPath, iWARP, Infiniband, RoCE v1 and RoCE v2).
-> 
+On 2025/3/11 23:18, Paolo Abeni wrote:
+> On 3/7/25 11:08 AM, Xin Tian wrote:
+>> +static u16 xsc_tx_get_gso_ihs(struct xsc_sq *sq, struct sk_buff *skb)
+>> +{
+>> +	u16 ihs;
+>> +
+>> +	if (skb->encapsulation) {
+>> +		ihs = skb_inner_transport_offset(skb) + inner_tcp_hdrlen(skb);
+>> +	} else {
+>> +		if (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4)
+>> +			ihs = skb_transport_offset(skb) + sizeof(struct udphdr);
+> You have quite a bit of code dealing with features that the driver
+> currently does not support (tunnels, SKB_GSO_UDP_L4).
+>
+> It would be better either enabling such features or not including the
+> unused code.
+>
+> Thanks,
+>
+> Paolo
 
-As Bernard commented, we're not trying to add a new subsystem, but
-start a discussion on where UEC should live because it has multiple
-objects and semantics that don't map well to the  current
-infrastructure. For example from this set - managing contexts, jobs and
-fabric endpoints. Also we have the ephemeral PDC connections
-that come and go as needed. There more such objects coming with more
-state, configuration and lifecycle management. That is why we added a
-separate netlink family to cleanly manage them without trying to fit
-a square peg in a round hole so to speak. In the next version I'll make
-sure to expand much more on this topic. By the way I believe Sean is
-working on the verbs mapping for parts of UEC, he can probably also
-share more details.
-We definitely want to re-use as much as possible from the current
-infrastructure, noone is trying to reinvent the wheel.
+Apologies for my oversight. I will thoroughly review and del those code 
+in next version
 
-> Maybe after this discussion it will be very clear that new subsystem
-> is needed, but at least it needs to be stated clearly.
-> 
-> An please CC RDMA maintainers to any Ultra Ethernet related discussions
-> as it is more RDMA than Ethernet.
-> 
+Thanks,
 
-Of course it's RDMA, that's stated in the first few sentences, I made a
-mistake with the "To", but I did add linux-rdma@ to the recipient list.
-I'll make sure to also add the rdma maintainers personally for the next
-version and change the "to".
-
-> Thanks
-
-Cheers,
- Nik
+Xin
 
 
