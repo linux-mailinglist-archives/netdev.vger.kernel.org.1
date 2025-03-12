@@ -1,125 +1,180 @@
-Return-Path: <netdev+bounces-174416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B9B3A5E821
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 00:14:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1E95A5E823
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 00:15:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 521AE7AB634
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 23:13:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F2583A9CF8
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 23:15:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FFB21F1302;
-	Wed, 12 Mar 2025 23:14:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B99D91EEA30;
+	Wed, 12 Mar 2025 23:15:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eAfLgmNJ"
+	dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b="gxq9KOPy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59CCF4685;
-	Wed, 12 Mar 2025 23:14:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DEE818A93C;
+	Wed, 12 Mar 2025 23:15:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741821280; cv=none; b=fGlRsSwEZGwfLCL4bKsA5mYgXdyEPwqrNkK2G/YP/AwKB/qz0gOzkPjORK5hnV8i0RwKz+XiCQBCzywTYUo4NEUyoCkuYX/LyT3PxUA+BDdqr/ngkgxJJhRAPO8Zaeqy8FAUzHKzDH6UmYrYS9d0GqM15vtPFPlb04sNkMZYJDA=
+	t=1741821346; cv=none; b=FRupw14exdMJaP5D0j839jWCFIDI8z5pROZmUE1jl0ktm4ydGJAQwVePYHrDsabahcwIKuBRZ1q5IMuLj5SLoDWeR0a3wFRuwziwMwK4Ib3E/ar/DIYhIl3bqY26aa+QGa71cYRXdT+22GYEs7NGgthvhcsFzaE/q6ucqJumKi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741821280; c=relaxed/simple;
-	bh=TKgowIo1WaTZUviCcRMak32azD2cFfVNTUXSGH8c1O0=;
-	h=Message-ID:Content-Type:MIME-Version:In-Reply-To:References:
-	 Subject:From:Cc:To:Date; b=syAnCL/iz5wvSZZFV6mtoXpmr7L1Nz/mtTWsRxJkE4C3ckwR3ew7KuOPmppu845lLu73UDBdTyxizsc/56OGhrNvDfl2P2V6h0V/QzZkYEFzEPbyawmGvLMgCU5vjrirhFn2shZfiID8cnrM74qgMIADGZFB5p3xNR12EcfWfgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eAfLgmNJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F59DC4CEDD;
-	Wed, 12 Mar 2025 23:14:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741821280;
-	bh=TKgowIo1WaTZUviCcRMak32azD2cFfVNTUXSGH8c1O0=;
-	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
-	b=eAfLgmNJBIhrzfTbBz15W2qXyisRuA+s0m0sbZ0DR4p5Yn/gYR7lffHji1Pi6aEKz
-	 iEYjHrI0Tt4Cjp8pteJK78+OVFmkwbGZq6yWcr6QMo8exhqx3K9GefpIMExXacDNRh
-	 KURQmUBu26eABgR5+fE6nmnvffrHsyK4SWEmBdjwmGVFmfDO2zE06KJnS0vqNXK2YH
-	 VrGqoDKtTRm4MkgZrY7LhY7SgtxAK9qMGNNgHvHYQJcDqrUXQJjf9Ce2rJDiEEY4+j
-	 ZNY/I0f84t/Yi407KIEBS2V77DWKo7zqJ8QXMrTL5tL3NSHZlSvQSL0tFB8WF2pqeO
-	 KNWFA5iJpPFMQ==
-Message-ID: <f1d5dc9b8f59b00fa21e8f9f2ac3794b.sboyd@kernel.org>
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1741821346; c=relaxed/simple;
+	bh=FSoMB+rP9Brn8rbfRSWqyO/Hlr4VYRRieXZmXSZTOYI=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=Q/GtIyv/XohkR+qYjUfv5PCfYHN1iYlRTI3Iwfin9N/44l1SENG6eSQcaXIYj2Sctj03cu4dBCQaH8YMrGMH2DYxLqxHEQnWd8qcFiSH/eqj4fkQpf4JnAViaDavuUmlWha8PSwJ2sP6WcPRnFrEk6Qe7ieqSoIJ8Eoabl9Ys5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxonhyperv.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b=gxq9KOPy; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxonhyperv.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1202)
+	id 93B3D210B15B; Wed, 12 Mar 2025 16:15:44 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 93B3D210B15B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
+	s=default; t=1741821344;
+	bh=DJla9Iq0AsTzhODsit36dfQMKIH8hxfpvo2EOnMD5Gk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=gxq9KOPyz5cjC8GNYAi01cmu2V0HGACjTe/Uy7xpZ961ayDxt4kga/dOIWSiwcQUA
+	 vb8vDOb/ByC1lNqN03ZUPc56i0sE8LwY8qTlH6ywv6mqz56b+8oboJkvCbSS53lFcV
+	 MF/qi5VYOKFn+N5GVi6IfOjFYQ1QAgxPTfATqo9g=
+From: longli@linuxonhyperv.com
+To: Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	Long Li <longli@microsoft.com>
+Subject: [patch rdma-next v6 1/2] net: mana: Change the function signature of mana_get_primary_netdev_rcu
+Date: Wed, 12 Mar 2025 16:15:31 -0700
+Message-Id: <1741821332-9392-1-git-send-email-longli@linuxonhyperv.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <epnv7fp3s3osyxbqa6tpgbuxdcowahda6wwvflnip65tjysjig@3at3yqp2o3vp>
-References: <20250226232320.93791-1-inochiama@gmail.com> <20250226232320.93791-2-inochiama@gmail.com> <2c00c1fba1cd8115205efe265b7f1926.sboyd@kernel.org> <epnv7fp3s3osyxbqa6tpgbuxdcowahda6wwvflnip65tjysjig@3at3yqp2o3vp>
-Subject: Re: [PATCH v3 1/2] dt-bindings: clock: sophgo: add clock controller for SG2044
-From: Stephen Boyd <sboyd@kernel.org>
-Cc: linux-clk@vger.kernel.org, devicetree@vger.kernel.org, sophgo@lists.linux.dev, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To: Chen Wang <unicorn_wang@outlook.com>, Conor Dooley <conor+dt@kernel.org>, Inochi Amaoto <inochiama@gmail.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Michael Turquette <mturquette@baylibre.com>, Richard Cochran <richardcochran@gmail.com>, Rob Herring <robh@kernel.org>
-Date: Wed, 12 Mar 2025 16:14:37 -0700
-User-Agent: alot/0.12.dev8+g17a99a841c4b
 
-Quoting Inochi Amaoto (2025-03-11 16:31:29)
-> On Tue, Mar 11, 2025 at 12:26:21PM -0700, Stephen Boyd wrote:
-> > Quoting Inochi Amaoto (2025-02-26 15:23:18)
-> > > diff --git a/Documentation/devicetree/bindings/clock/sophgo,sg2044-cl=
-k.yaml b/Documentation/devicetree/bindings/clock/sophgo,sg2044-clk.yaml
-> > > new file mode 100644
-> > > index 000000000000..d55c5d32e206
-> > > --- /dev/null
-> > > +++ b/Documentation/devicetree/bindings/clock/sophgo,sg2044-clk.yaml
-> > > @@ -0,0 +1,40 @@
-> > > +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> > > +%YAML 1.2
-> > > +---
-> > > +$id: http://devicetree.org/schemas/clock/sophgo,sg2044-clk.yaml#
-> > > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > > +
-> > > +title: Sophgo SG2044 Clock Controller
-> > > +
-> > > +maintainers:
-> > > +  - Inochi Amaoto <inochiama@gmail.com>
-> >=20
-> > No description?
-> >=20
->=20
-> I am not sure the things to be described. Maybe just tell the
-> clock required and providing?
+From: Long Li <longli@microsoft.com>
 
-Sure and point to the header file with the binding numbers?
+Change mana_get_primary_netdev_rcu() to mana_get_primary_netdev(), and
+return the ndev with refcount held. The caller is responsible for dropping
+the refcount.
 
-> > > +  - |
-> > > +    clock-controller@50002000 {
-> > > +      compatible =3D "sophgo,sg2044-clk";
-> > > +      reg =3D <0x50002000 0x1000>;
-> > > +      #clock-cells =3D <1>;
-> > > +      clocks =3D <&osc>;
-> >=20
-> > I think you want the syscon phandle here as another property. Doing that
-> > will cause the DT parsing logic to wait for the syscon to be probed
-> > before trying to probe this driver. It's also useful so we can see if
-> > the clock controller is overlapping withe whatever the syscon node is,
->=20
-> It sounds like a good idea. At now, it does not seem like a good idea
-> to hidden the device dependency detail. I will add a syscon property
-> like "sophgo,pll-syscon" to identify its pll needs a syscon handle.
+Also drop the check for IFF_SLAVE as it is not necessary if the upper
+device is present.
 
-Cool.
+Signed-off-by: Long Li <longli@microsoft.com>
+---
+Changes
+v4: use netdev_hold()/netdev_put() and remove the check for IFF_SLAVE
+v5: use netdevice_tracker in mana_ib_dev for netdev_hold()/netdev_put()
+v6: rebase to latest rdma-next
 
->=20
-> > or if that syscon node should just have the #clock-cells property as
-> > part of the node instead.
->=20
-> This is not match the hardware I think. The pll area is on the middle
-> of the syscon and is hard to be separated as a subdevice of the syscon
-> or just add  "#clock-cells" to the syscon device. It is better to handle
-> them in one device/driver. So let the clock device reference it.
+ drivers/infiniband/hw/mana/device.c           |  7 +++---
+ drivers/infiniband/hw/mana/mana_ib.h          |  1 +
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 22 ++++++++++++-------
+ include/net/mana/mana.h                       |  4 +++-
+ 4 files changed, 21 insertions(+), 13 deletions(-)
 
-This happens all the time. We don't need a syscon for that unless the
-registers for the pll are both inside the syscon and in the register
-space 0x50002000. Is that the case? This looks like you want there to be
-one node for clks on the system because logically that is clean, when
-the reality is that there is a PLL block exposed in the syscon (someone
-forgot to put it in the clk controller?) and a non-PLL block for the
-other clks.
+diff --git a/drivers/infiniband/hw/mana/device.c b/drivers/infiniband/hw/mana/device.c
+index d1a02c54a236..9357a9845c2c 100644
+--- a/drivers/infiniband/hw/mana/device.c
++++ b/drivers/infiniband/hw/mana/device.c
+@@ -98,10 +98,8 @@ static int mana_ib_probe(struct auxiliary_device *adev,
+ 	dev->ib_dev.num_comp_vectors = mdev->gdma_context->max_num_queues;
+ 	dev->ib_dev.dev.parent = mdev->gdma_context->dev;
+ 
+-	rcu_read_lock(); /* required to get primary netdev */
+-	ndev = mana_get_primary_netdev_rcu(mc, 0);
++	ndev = mana_get_primary_netdev(mc, 0, &dev->dev_tracker);
+ 	if (!ndev) {
+-		rcu_read_unlock();
+ 		ret = -ENODEV;
+ 		ibdev_err(&dev->ib_dev, "Failed to get netdev for IB port 1");
+ 		goto free_ib_device;
+@@ -109,7 +107,8 @@ static int mana_ib_probe(struct auxiliary_device *adev,
+ 	ether_addr_copy(mac_addr, ndev->dev_addr);
+ 	addrconf_addr_eui48((u8 *)&dev->ib_dev.node_guid, ndev->dev_addr);
+ 	ret = ib_device_set_netdev(&dev->ib_dev, ndev, 1);
+-	rcu_read_unlock();
++	/* mana_get_primary_netdev() returns ndev with refcount held */
++	netdev_put(ndev, &dev->dev_tracker);
+ 	if (ret) {
+ 		ibdev_err(&dev->ib_dev, "Failed to set ib netdev, ret %d", ret);
+ 		goto free_ib_device;
+diff --git a/drivers/infiniband/hw/mana/mana_ib.h b/drivers/infiniband/hw/mana/mana_ib.h
+index 77fc1032eda8..81a7e7474462 100644
+--- a/drivers/infiniband/hw/mana/mana_ib.h
++++ b/drivers/infiniband/hw/mana/mana_ib.h
+@@ -78,6 +78,7 @@ struct mana_ib_dev {
+ 	struct xarray qp_table_wq;
+ 	struct mana_ib_adapter_caps adapter_caps;
+ 	struct dma_pool *av_pool;
++	netdevice_tracker dev_tracker;
+ };
+ 
+ struct mana_ib_wq {
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index aa1e47233fe5..4e870b11f946 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -3131,21 +3131,27 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+ 	kfree(ac);
+ }
+ 
+-struct net_device *mana_get_primary_netdev_rcu(struct mana_context *ac, u32 port_index)
++struct net_device *mana_get_primary_netdev(struct mana_context *ac,
++					   u32 port_index,
++					   netdevice_tracker *tracker)
+ {
+ 	struct net_device *ndev;
+ 
+-	RCU_LOCKDEP_WARN(!rcu_read_lock_held(),
+-			 "Taking primary netdev without holding the RCU read lock");
+ 	if (port_index >= ac->num_ports)
+ 		return NULL;
+ 
+-	/* When mana is used in netvsc, the upper netdevice should be returned. */
+-	if (ac->ports[port_index]->flags & IFF_SLAVE)
+-		ndev = netdev_master_upper_dev_get_rcu(ac->ports[port_index]);
+-	else
++	rcu_read_lock();
++
++	/* If mana is used in netvsc, the upper netdevice should be returned. */
++	ndev = netdev_master_upper_dev_get_rcu(ac->ports[port_index]);
++
++	/* If there is no upper device, use the parent Ethernet device */
++	if (!ndev)
+ 		ndev = ac->ports[port_index];
+ 
++	netdev_hold(ndev, tracker, GFP_ATOMIC);
++	rcu_read_unlock();
++
+ 	return ndev;
+ }
+-EXPORT_SYMBOL_NS(mana_get_primary_netdev_rcu, "NET_MANA");
++EXPORT_SYMBOL_NS(mana_get_primary_netdev, "NET_MANA");
+diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+index 0d00b24eacaf..0f78065de8fe 100644
+--- a/include/net/mana/mana.h
++++ b/include/net/mana/mana.h
+@@ -827,5 +827,7 @@ int mana_cfg_vport(struct mana_port_context *apc, u32 protection_dom_id,
+ 		   u32 doorbell_pg_id);
+ void mana_uncfg_vport(struct mana_port_context *apc);
+ 
+-struct net_device *mana_get_primary_netdev_rcu(struct mana_context *ac, u32 port_index);
++struct net_device *mana_get_primary_netdev(struct mana_context *ac,
++					   u32 port_index,
++					   netdevice_tracker *tracker);
+ #endif /* _MANA_H */
+-- 
+2.34.1
+
 
