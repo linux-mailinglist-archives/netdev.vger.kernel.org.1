@@ -1,175 +1,114 @@
-Return-Path: <netdev+bounces-174314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FDC3A5E40F
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 20:02:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15795A5E415
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 20:05:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6E4F57A29CC
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 19:01:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45C2D177AA1
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 19:05:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24E1D1E5B9B;
-	Wed, 12 Mar 2025 19:02:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="nOolVWXO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBC3A2586EC;
+	Wed, 12 Mar 2025 19:05:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 007D61E5B76;
-	Wed, 12 Mar 2025 19:02:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A53B23CF12;
+	Wed, 12 Mar 2025 19:05:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741806154; cv=none; b=fB60eWGA0Jj3ZI7QZfwOClpRBbf4HyjrtdGOxdcXNnpey/ljt3vou/OXRcc32FaH1JefGMWnucVgOydmN/yWM55XrQ7EyHDEvMsxgqxKnsNBHmIKJdg770h/mXodzBOTdxd1O9/lESN1bThWijIRwzygnHNkDDiaJgSON9OsS+Y=
+	t=1741806320; cv=none; b=ZBa8c6+/gyXtv1oIB4U99azR+qK6vqrZdTxLpAFxkjMrEedFILYsVI7+jb2xv+1dNSlR2T0GGEd4FpZdZwYtFMPoj8LlYD5M/kUKapeJ2H6P7avTIPfiy62Jyvydc4Z9IY0fKzbWHnEjGTUWZXXqE6BUapv2kfIcCYSkmr4zT/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741806154; c=relaxed/simple;
-	bh=idOmWFvNR/hkrHv8K6P5ExxPfuEgX7xMqzYEmJvI81Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GKgOtOrkrEtlxbfG4z/AJQSQ0h4ZwtJ5FkW4s4U1u/iDXa5gfe8HL6AAJwe1rsnRVVk7+FqvjmmKiQYn72/EGWeee1qzIpaIrZohgmtkYNSn0lfrFwnYxmWK1IVprelbpWEn2k8FAQ2O8NoKPjV9Fn3x+adtuk6w435rJLF+NsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=nOolVWXO; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=6yolepTUWycUYSP0NNLMuaVmz6Sw1ofQLTuAXR+lN7k=; b=nOolVWXOwrwm+h38j0+1o0NTme
-	Vm2e2oT75glTXLaSsbcjFtGNrDxqQd/zSwatCVx1BTRKCZEehp2GexcuwjMiFozWB2Phvev30ThWa
-	qeIXkDD0+XN90q+HCVz3qKY2rarAsVjPHaMz1eNHCu1EJlCqatHjd+S3nJFn4BYrUbz4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tsRLL-004kgf-JU; Wed, 12 Mar 2025 20:02:15 +0100
-Date: Wed, 12 Mar 2025 20:02:15 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Gupta, Suraj" <Suraj.Gupta2@amd.com>
-Cc: Russell King <linux@armlinux.org.uk>,
-	"Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"robh@kernel.org" <robh@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"Simek, Michal" <michal.simek@amd.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"git (AMD-Xilinx)" <git@amd.com>,
-	"Katakam, Harini" <harini.katakam@amd.com>
-Subject: Re: [PATCH net-next V2 2/2] net: axienet: Add support for 2500base-X
- only configuration.
-Message-ID: <ce0796f4-cf2e-4a3d-ae79-1f9b9966773e@lunn.ch>
-References: <20250312095411.1392379-1-suraj.gupta2@amd.com>
- <20250312095411.1392379-3-suraj.gupta2@amd.com>
- <ad1e81b5-1596-4d94-a0fa-1828d667b7a2@lunn.ch>
- <Z9GWokRDzEYwJmBz@shell.armlinux.org.uk>
- <BL3PR12MB6571795DA783FD05189AD74BC9D02@BL3PR12MB6571.namprd12.prod.outlook.com>
- <34ed11e7-b287-45c6-8ff4-4a5506b79d17@lunn.ch>
- <BL3PR12MB6571540090EE54AC9743E17EC9D02@BL3PR12MB6571.namprd12.prod.outlook.com>
- <fd686050-e794-4b2f-bfb8-3a0769abb506@lunn.ch>
- <BL3PR12MB6571959081FC8DDC5D509560C9D02@BL3PR12MB6571.namprd12.prod.outlook.com>
+	s=arc-20240116; t=1741806320; c=relaxed/simple;
+	bh=0VEaS/ukPPi9Zli5QKPTJYgAzUeL2GTOi+lMq6UJ8/c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=U3K1onXFgnL6G6NBdvxNo2aEZ+pDT6F6LAjUki0s+SwKaisunt9MMUlK4J6/sbnGR7VSpBcGHI+ukKXj3pa4hrPBZP1wtlRFjK0ewCzXCSNk4xW5rcpWSFRQvMau/X3EJl/TVW9wwaf4v0V99L3D5Fp7cgoCH7Up/crrr0Snw90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2ff80290debso488829a91.3;
+        Wed, 12 Mar 2025 12:05:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741806315; x=1742411115;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0u0DffRqw5p0axRipakAJNl1YOnA9nhsVlI+YwH2wZ8=;
+        b=MBwAg5gaZASOLUofNAXOU9QDAJ+o7DJJKpCFBA/w8+LyhcQbdHbA3QDSfUIu0K9xgL
+         wgRpNZT/zf8JCPRLuUKdYoP0XQrsYHmAoWX0RBgHVEsn10G36O3bCg51D3m8ddWe769E
+         QRYh8v2bnZ784lERjyEsEpUxxrRrd4O5qqvPREDIIJLXz5iSJCGc5kPCQ6TLjNN1YLmA
+         uUsf+8qohRFTJxHCGluXyOeXNbaRuSpwOfQvR6e5Q/IXWkVzqToX8roXoD94FtnuAIcW
+         RK/e52vI/KPI3wvTTJYtRhyl6EHugnHdSA+Sbx9Se1bjrTc+XWPYLOsrl1a3pkl3LZ4R
+         F6JA==
+X-Forwarded-Encrypted: i=1; AJvYcCVsn9AVgKnmpVAW2O+6XsGiTEEqzcJSIg7GIcHCM6q/Ws7cKMxypnqBUEm44ouICD9snqHrv/J1oYWKog0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxjybghXWo8h3saELoZ2PR4dr7koSoRS89L+aRoAGyAKezfJthl
+	uVkTLtBq8BxTVJRpW8AH/dNWwIRn9CqmAWl6NBadegiboTKXhtl1UGLNLZyAGw==
+X-Gm-Gg: ASbGncsRn4FG0eyXYO92of7z8sjAWLvgQZ6J1eld/lwEjp+gYG6ZoEDtNFxV2p6RqfM
+	v/NszGJHI3SnZ6I0UDoe+itnUf34qbm3JmhEQBFaBTkeqdORVUsMDopktFrAgeEg5sHPrzby0Q8
+	EbMEokQp+n3va3HEdOlRJXJEqcV9d9K8t/4qgQryXxBKrnVHKAqZkO0chvrj3fJWOCr9nfriBYE
+	MljRapx7W7bvqzFz8KsMKuYFWV0t06i7rX4rd6qxhqVXYxPmklWTw3I/mD1trYbyzFv3fkid6f4
+	JeoygGlvEprrWEEWMnjvS9B076TwCxsf/gJiITFJxBXUkZbM6Shv9n8=
+X-Google-Smtp-Source: AGHT+IE5UPbhhTrmzcCrSNJ9kZYj5Rs1fLGRFUGdrAj1RFh95UijYoL3tesCtiLy38eoCGdOVsHL9A==
+X-Received: by 2002:a17:90b:3b52:b0:2f8:49ad:4079 with SMTP id 98e67ed59e1d1-2ff7ce451e3mr32133940a91.6.1741806314693;
+        Wed, 12 Mar 2025 12:05:14 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-224109e974fsm119947365ad.78.2025.03.12.12.05.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Mar 2025 12:05:14 -0700 (PDT)
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	willemdebruijn.kernel@gmail.com,
+	jasowang@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	sdf@fomichev.me,
+	jdamato@fastly.com,
+	kory.maincent@bootlin.com,
+	kuniyu@amazon.com,
+	atenart@kernel.org
+Subject: [PATCH net-next v2 0/2] net: bring back dev_addr_sem
+Date: Wed, 12 Mar 2025 12:05:11 -0700
+Message-ID: <20250312190513.1252045-1-sdf@fomichev.me>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BL3PR12MB6571959081FC8DDC5D509560C9D02@BL3PR12MB6571.namprd12.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Mar 12, 2025 at 04:08:02PM +0000, Gupta, Suraj wrote:
-> [AMD Official Use Only - AMD Internal Distribution Only]
-> 
-> > -----Original Message-----
-> > From: Andrew Lunn <andrew@lunn.ch>
-> > Sent: Wednesday, March 12, 2025 9:03 PM
-> > To: Gupta, Suraj <Suraj.Gupta2@amd.com>
-> > Cc: Russell King <linux@armlinux.org.uk>; Pandey, Radhey Shyam
-> > <radhey.shyam.pandey@amd.com>; andrew+netdev@lunn.ch;
-> > davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
-> > pabeni@redhat.com; robh@kernel.org; krzk+dt@kernel.org; conor+dt@kernel.org;
-> > Simek, Michal <michal.simek@amd.com>; netdev@vger.kernel.org;
-> > devicetree@vger.kernel.org; linux-kernel@vger.kernel.org; linux-arm-
-> > kernel@lists.infradead.org; git (AMD-Xilinx) <git@amd.com>; Katakam, Harini
-> > <harini.katakam@amd.com>
-> > Subject: Re: [PATCH net-next V2 2/2] net: axienet: Add support for 2500base-X only
-> > configuration.
-> >
-> > Caution: This message originated from an External Source. Use proper caution
-> > when opening attachments, clicking links, or responding.
-> >
-> >
-> > On Wed, Mar 12, 2025 at 03:06:32PM +0000, Gupta, Suraj wrote:
-> > > [AMD Official Use Only - AMD Internal Distribution Only]
-> > >
-> > > > -----Original Message-----
-> > > > From: Andrew Lunn <andrew@lunn.ch>
-> > > > Sent: Wednesday, March 12, 2025 8:29 PM
-> > > > To: Gupta, Suraj <Suraj.Gupta2@amd.com>
-> > > > Cc: Russell King <linux@armlinux.org.uk>; Pandey, Radhey Shyam
-> > > > <radhey.shyam.pandey@amd.com>; andrew+netdev@lunn.ch;
-> > > > davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
-> > > > pabeni@redhat.com; robh@kernel.org; krzk+dt@kernel.org;
-> > > > conor+dt@kernel.org; Simek, Michal <michal.simek@amd.com>;
-> > > > netdev@vger.kernel.org; devicetree@vger.kernel.org;
-> > > > linux-kernel@vger.kernel.org; linux-arm- kernel@lists.infradead.org;
-> > > > git (AMD-Xilinx) <git@amd.com>; Katakam, Harini
-> > > > <harini.katakam@amd.com>
-> > > > Subject: Re: [PATCH net-next V2 2/2] net: axienet: Add support for
-> > > > 2500base-X only configuration.
-> > > >
-> > > > Caution: This message originated from an External Source. Use proper
-> > > > caution when opening attachments, clicking links, or responding.
-> > > >
-> > > >
-> > > > > > On Wed, Mar 12, 2025 at 02:25:27PM +0100, Andrew Lunn wrote:
-> > > > > > > > +   /* AXI 1G/2.5G ethernet IP has following synthesis options:
-> > > > > > > > +    * 1) SGMII/1000base-X only.
-> > > > > > > > +    * 2) 2500base-X only.
-> > > > > > > > +    * 3) Dynamically switching between (1) and (2), and is not
-> > > > > > > > +    * implemented in driver.
-> > > > > > > > +    */
-> > > >
-> > > > > - Keeping previous discussion short, identification of (3) depends
-> > > > > on how user implements switching logic in FPGA (external GT or RTL
-> > > > > logic). AXI 1G/2.5G IP provides only static speed selections and
-> > > > > there is no standard register to communicate that to software.
-> > > >
-> > > > So if anybody has synthesised it as 3) this change will break their system?
-> > > >
-> > > >         Andrew
-> > >
-> > > It will just restrict their system to (2)
-> >
-> > Where as before, it was doing SGMII/1000base-X only. So such systems break?
-> >
-> >         Andrew
-> 
+Kohei reports an issue with dev_addr_sem conversion to netdev instance
+lock in [0]. Based on the discussion, switching to netdev instance
+lock to protect the address might not work for the devices that
+are not using netdev ops lock.
+Bring dev_addr_sem instance lock back but fix the ordering.
 
-> If the user wants (3), they need to add their custom FPGA logic
-> which anyway will require additional driver changes. (3) was not
-> completely supported by existing driver.
+0: https://lore.kernel.org/netdev/20250308203835.60633-2-enjuk@amazon.com
 
-You say 3) is a synthesis option. Say somebody synthesised it that
-way, and found it works for what they need with SGMII/1000base-X.
-Because the driver took no notice of the capability bit, that is what
-it would do. Since it worked for them, they might not of gone back and
-optimised the options. "If it is not broken, don't fix it". So we
-could have systems out in the wild, synthesised as 3) happily doing 
-SGMII/1000base-X ?
+Stanislav Fomichev (2):
+  Revert "net: replace dev_addr_sem with netdev instance lock"
+  net: reorder dev_addr_sem lock
 
-With this change, won't you break those systems?
+ drivers/net/tap.c         |  2 +-
+ drivers/net/tun.c         |  2 +-
+ include/linux/netdevice.h |  4 +++-
+ net/core/dev.c            | 41 +++++++++++++--------------------------
+ net/core/dev.h            |  3 ++-
+ net/core/dev_api.c        | 19 ++++++++++++++++--
+ net/core/dev_ioctl.c      |  2 +-
+ net/core/net-sysfs.c      |  7 +++++--
+ net/core/rtnetlink.c      | 17 +++++++++++-----
+ 9 files changed, 56 insertions(+), 41 deletions(-)
 
-I'm just trying to get to a definitive answer, is this change actually
-safe to all todays possible systems?
-
-	Andrew
+-- 
+2.48.1
 
 
