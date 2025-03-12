@@ -1,97 +1,117 @@
-Return-Path: <netdev+bounces-174137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C271A5D947
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 10:22:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CE3BA5D97C
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 10:32:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A27A7173CD5
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 09:22:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A31F51786BF
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 09:32:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0505C23A98C;
-	Wed, 12 Mar 2025 09:22:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B7352343B6;
+	Wed, 12 Mar 2025 09:31:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d1d7/Ie4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fcQTqom4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D40EB2222DB
-	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 09:22:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E06BA17BB6;
+	Wed, 12 Mar 2025 09:31:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741771338; cv=none; b=Do6MVTi+/3se0dKRwGCs9qFnm5R4SEKdmMmeA1f9hGkgqnvATj1CZqVBsMayWOat/gIRLlp2L/50jjjtkhLkEhvEhTcfyLHdG7FWBPqR7qJICo4SV+rUZ3RIeKzf3GKbNhm1DcQcE+BSUK44YbgmfzPjREj66LhUUfSwEc/v+Rw=
+	t=1741771919; cv=none; b=NgbenV7+L/XWCAgtWKGBiQkbhSRcmt30qGgm5yoUT/rU88zMnSXZv6dIv28EQOihTD2Qlrpxkl8b+5U3bLzLPEtZkbTaECI2twR9gBYfdy1hVnY5PiFXKb8mJyDVyeb54+tndFTpSKGfib4cudH+soPU2sJvDiOTYg4M6+KXa6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741771338; c=relaxed/simple;
-	bh=/r9PKLYe0+WoOlDJzTRqb1IN3+/nRPCexBrBGKAqtQw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AfoqH6J/yFVORluDBx0UVuP/X5zqYOybIqquh0TOzuG0B5CCt6ZeV1C5IfMI71C/cNQohCXaGRrC1KLNjqntjN0xPn4TxUBkz4X3UDSQ/h69HKl1T//eFymN3JS6zJ/zxNU4QfwJDd6ZhYGGyitzyf1ctLcKwdPZU9Z+0gmRF24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d1d7/Ie4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26D9CC4CEE3;
-	Wed, 12 Mar 2025 09:22:16 +0000 (UTC)
+	s=arc-20240116; t=1741771919; c=relaxed/simple;
+	bh=a8la2ZObEdG8OdZGXYDKwin8N4HvmajFwbUHnUuC4ds=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gWZuFsj4MUDf4p7b/5rEC7zFOxOcLaonG/bzlo72+vgR0vrOYQNBODCAb1IHB1hnjdgX0R6HFFtatIfQVeOORSqjh3ifknzxKrRZRqAjM43jmkgldXzoROIec4M5e6oj9QVizOU/4Ot2epFOpmbW6KAsYtUo9qRazz6iA4kKzUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fcQTqom4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD6DFC4CEED;
+	Wed, 12 Mar 2025 09:31:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741771338;
-	bh=/r9PKLYe0+WoOlDJzTRqb1IN3+/nRPCexBrBGKAqtQw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=d1d7/Ie4ZVkbppiaTDwyb2S5ne4qEZiuGYhMPfvrJHrkuoo0ylAKalhplKMJgCt+k
-	 cRTSG7c71zsUmr6rcjEzDTCbCSPa3WZK11Rz+wGA5flW8CUJVNETSf9aAKj4hFfC90
-	 isVSG+M0me0D6Uw0tjZ4hjpCoUVcq/aj8WcUpk39iLYWIJK6KrclRMKOzm9eExm69A
-	 p8radKqj4RDdJXjvTLcYlg2dhgpYtO+pRCqtSksrGxATrwT8/GZuuPplwHp+Nvsg/b
-	 Ykl0YSsbvKJUsgyTvgMw6kFXGokpHoU9G+eAqpe65Y0a5WwTpRo4yAupgqlBzwlzsO
-	 smaQaw6gQ96Og==
-From: David Ahern <dsahern@kernel.org>
-To: netdev@vger.kernel.org
-Cc: andrea.mayer@uniroma2.it,
-	David Ahern <dsahern@kernel.org>
-Subject: [PATCH v2 net-next] MAINTAINERS: Add Andrea Mayer as a maintainer of SRv6
-Date: Wed, 12 Mar 2025 10:22:12 +0100
-Message-Id: <20250312092212.46299-1-dsahern@kernel.org>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=k20201202; t=1741771918;
+	bh=a8la2ZObEdG8OdZGXYDKwin8N4HvmajFwbUHnUuC4ds=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=fcQTqom47KIERjVZAwkC7vNZuA57ejpLyDrP/gzthj3C0Ruk3ux1Q81fFkjp7fp1d
+	 1cfez12QBRYhJbR7ajeVDcsW7ZEc0hzP5kGS0iSSm2PaEzo5T2CA53+OpFQ/k2dcqs
+	 +8HTOs43DxVD3dEEpeEFGbvhRuj4g7ziRRtSXm8iT7uSmJN6vNa+TDjOr8lY2wa5ei
+	 ArTf1F1TsH3gTvJnFeTgWwmN6i5ofmoqz3dPhvKpW3cvyZmTMbFoGc/dBm359C5Y4u
+	 hIDNgLJOYfHCMk3REJ3thgNBgjdxbmoQlxbRGdBXPF7EbuQn3Gf2ZmL8iwOUJi8RGV
+	 cEUAUKJ06kBmw==
+Message-ID: <4c55e1ae-8cc1-463e-b81f-2bbae4ae4eed@kernel.org>
+Date: Wed, 12 Mar 2025 10:31:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 0/8] Introduce fwctl subystem
+Content-Language: en-US
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Saeed Mahameed <saeed@kernel.org>,
+ Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kuba@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+ Aron Silverton <aron.silverton@oracle.com>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Daniel Vetter <daniel.vetter@ffwll.ch>, Dave Jiang <dave.jiang@intel.com>,
+ Christoph Hellwig <hch@infradead.org>, Itay Avraham <itayavr@nvidia.com>,
+ Jiri Pirko <jiri@nvidia.com>, Jonathan Cameron
+ <Jonathan.Cameron@huawei.com>, Leonid Bloch <lbloch@nvidia.com>,
+ linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
+ "Nelson, Shannon" <shannon.nelson@amd.com>
+References: <20250303175358.4e9e0f78@kernel.org>
+ <20250304140036.GK133783@nvidia.com> <20250304164203.38418211@kernel.org>
+ <20250305133254.GV133783@nvidia.com>
+ <mxw4ngjokr3vumdy5fp2wzxpocjkitputelmpaqo7ungxnhnxp@j4yn5tdz3ief>
+ <bcafcf60-47a8-4faf-bea3-19cf0cbc4e08@kernel.org>
+ <20250305182853.GO1955273@unreal> <Z8i2_9G86z14KbpB@x130>
+ <20250305232154.GB354511@nvidia.com>
+ <6af1429e-c36a-459c-9b35-6a9f55c3b2ac@kernel.org>
+ <20250311135921.GF7027@unreal>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20250311135921.GF7027@unreal>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Andrea has made significant contributions to SRv6 support in Linux.
-Acknowledge the work and on-going interest in Srv6 support with a
-maintainers entry for these files so hopefully he is included
-on patches going forward.
+On 3/11/25 2:59 PM, Leon Romanovsky wrote:
+> On Tue, Mar 11, 2025 at 12:23:19PM +0100, David Ahern wrote:
+>> On 3/6/25 12:21 AM, Jason Gunthorpe wrote:
+>>> On Wed, Mar 05, 2025 at 12:41:35PM -0800, Saeed Mahameed wrote:
+>>>
+>>>> How do you imagine this driver/core structure should look like? Who
+>>>> will be the top dir maintainer?
+>>>
+>>> I would set something like this up more like DRM. Every driver
+>>> maintainer gets commit rights, some rules about no uAPIs, or at least
+>>> other acks before merging uAPI. Use the tree for staging shared
+>>> branches.
+>>
+>> why no uapi? Core driver can have knowledge of h/w resources across all
+>> use cases. For example, our core driver supports a generid netlink based
+>> dump (no set operations; get and dump only so maybe that should be the
+>> restriction?) of all objects regardless of how created -- netdev, ib,
+>> etc. -- and with much more detail.
+> 
+> Because, we want to make sure that UAPI will be aligned with relevant
+> subsystems without any way to bypass them.
+> 
+> Thanks
 
-v2
-- add non-uapi header files
+I hope there will be an open mind on get / dump style introspection apis
+here. Devices can work support and work within limited subsystem APIs
+and also allow the dumping of full essential and relevant contexts for a
+device.
 
-Signed-off-by: David Ahern <dsahern@kernel.org>
----
- MAINTAINERS | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ffbcd072fb14..e512dab77f1f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -16649,6 +16649,17 @@ F:	net/mptcp/
- F:	tools/testing/selftests/bpf/*/*mptcp*.[ch]
- F:	tools/testing/selftests/net/mptcp/
- 
-+NETWORKING [SRv6]
-+M:	Andrea Mayer <andrea.mayer@uniroma2.it>
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+T:	git git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git
-+F:	include/linux/seg6*
-+F:	include/net/seg6*
-+F:	include/uapi/linux/seg6*
-+F:	net/ipv6/seg6*
-+F:	tools/testing/selftests/net/srv6*
-+
- NETWORKING [TCP]
- M:	Eric Dumazet <edumazet@google.com>
- M:	Neal Cardwell <ncardwell@google.com>
--- 
-2.39.5 (Apple Git-154)
-
+More specifically, I do not see netdev APIs ever recognizing RDMA
+concepts like domains and memory regions. For us, everything is relative
+to a domain and a region - e.g., whether a queue is created for a netdev
+device or an IB QP both use the same common internal APIs.  I would
+prefer not to use fwctl for something so basic.
 
