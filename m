@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-174068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27568A5D49A
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 04:06:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC752A5D4AD
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 04:17:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 550FB178532
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 03:06:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 400F53B8837
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 03:16:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72EA118FC75;
-	Wed, 12 Mar 2025 03:06:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08F348632E;
+	Wed, 12 Mar 2025 03:16:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IPcgTuFf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hWCQme7Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE4A318DF6E
-	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 03:06:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1034A4C85
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 03:16:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741748770; cv=none; b=Tn6d2v/KezYqzxWjJwWerfiWIGLcnBaEQQCE3tvjmcNx5tWwQawSywi1mzI3xrp4HXZo2uvc/r4Uv9XC9Jt6ZmGU3DX8nOgF85XkkET8w4qH1+v0mvq6rs5ZmrOlEnQFPj+ZmGxBsqEK08F5CfYoMwS+juSiBll3DYvJ7INVMaE=
+	t=1741749416; cv=none; b=Ttt/8AlN7zZLfABsqLApk0JsDned88pMoJKx3kw7RXSYfI6w8HWeBz7Vez6fiH3+6XiXVFEkNybw33Q6o8hfvbgBFTqNV9H+c6phJs8yumra3nrMt6TCJuPpxCQBl5k3/zHKs+OB7zyVZVRuszCF1ExZf2/xW4DKfthxe/9ybUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741748770; c=relaxed/simple;
-	bh=5+YX71dkXNDCghpWAPAado6XW1FmrkmtNlC6GtLHbcA=;
+	s=arc-20240116; t=1741749416; c=relaxed/simple;
+	bh=ko7Tc3C+mirQDYlajagDRqIRlUKa9AwTZ8pNLxpRF1g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S0juWHHcBKDjyCk85gBPQxSUHCZSMomh3fCynGvoswIeu2xlQIZrloMnWdvBcI6GdjZrbrCTt3rzdW1WnweIFbKDEceryujGwt7Y7/Zlves2T/YuzC4NpwnxleZMUwSVFQA6wI/IEWLvOB1oTS3Jfywt6cW4sUF1ZeUO5838rgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IPcgTuFf; arc=none smtp.client-ip=192.198.163.9
+	 Content-Type:Content-Disposition:In-Reply-To; b=WplwWcaKjAzXyWG0x74W3HLrKbH3J1L8FdqBL4FWByF+0hmMQpbk9xi6yov9SgoRMfmdsVve5rRyxbub+PnK/Fp9BCaqTcuU+BM/ozCxxd0DH0Ctq3N+YHXelt9IU8aRQf6NA++er32nPsp4km5a+UtWaoVtvRuiff6xZvyjcxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hWCQme7Q; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741748768; x=1773284768;
+  t=1741749415; x=1773285415;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=5+YX71dkXNDCghpWAPAado6XW1FmrkmtNlC6GtLHbcA=;
-  b=IPcgTuFfgCJixGgyEjQeHSFLy/E0yc4IKJu7QX3wiFMvQrKvvL5dEbqc
-   J0ZGSyqxOLv6tmCWKLbCELYTf9bap6kpIid/mT1+DGbfDf7Bp8cfztQaf
-   rxRDaBKVg2KI2vyH9dPrA/FZfybRyU4guXevXUjgO78rtJUSwC1KSeUgk
-   kCgMxnaJoqNy4I6MHwETYRWmMTUlFj5I5El4/9dk4CdSjqJ5Lix8IXteW
-   Q29dtwJt2EsZ84ly6gOa4N0cYO0Ay6W9z3Sfeg+SBeFiuJ0EYJtcRbqGm
-   h/X/iIO/7HLCBzhAGS2tR8ZVOHYEeuU+WBGlyeHhusoTnIoQz6EChUvKy
-   A==;
-X-CSE-ConnectionGUID: +8a+e0VYSh+YLYVPcXU91Q==
-X-CSE-MsgGUID: lH6ar+TZQIeewEJd6ObVnw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11370"; a="53437685"
+  bh=ko7Tc3C+mirQDYlajagDRqIRlUKa9AwTZ8pNLxpRF1g=;
+  b=hWCQme7QI50wGsmlkXJUZEO6hGzHgfopp3/jyhhMxbe6ShXavqdGLVQh
+   yWf5KAIQyvyy8o1kvsWOqJhsPkT/yKG3wT8aBGdeGE0pnBDKYoK3hnzba
+   AkvoH8+/zvlmMpRe7aaGumCrQRDBA+geIme15bX/7GbB61AjDemwfgnVF
+   aGd4xm1Y82B1fbdjJp/q650pg0rZ4RSfb+F9p3IYQHhqSWNbFIGm7UWg9
+   hRVDxZIJH/nInXd18qo7gAyLbcbnYarespd/WlrOn6RXEKvV8EBhCUab1
+   sCv7ddw6YFHy4vMv9VbXQPs4klISJe+HlbHJ3hLyOCkJqG5F2DzMwjmTh
+   w==;
+X-CSE-ConnectionGUID: Yt9iCV1vRvCVXcIN3hxkiw==
+X-CSE-MsgGUID: cSwjkmcFQgqWscCdxNfkKQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11370"; a="42850348"
 X-IronPort-AV: E=Sophos;i="6.14,240,1736841600"; 
-   d="scan'208";a="53437685"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2025 20:06:07 -0700
-X-CSE-ConnectionGUID: H5O2YCCkRFK7Xh0Zv2MPmw==
-X-CSE-MsgGUID: qFOVIYd/RcyovUyuWKbBiw==
+   d="scan'208";a="42850348"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2025 20:16:55 -0700
+X-CSE-ConnectionGUID: HmaKDxfPQF2c5jS54m/ILA==
+X-CSE-MsgGUID: Hch2/FQCQfyXOa4SBQfMlg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.14,240,1736841600"; 
-   d="scan'208";a="125694866"
+   d="scan'208";a="125401029"
 Received: from lkp-server02.sh.intel.com (HELO a4747d147074) ([10.239.97.151])
-  by orviesa005.jf.intel.com with ESMTP; 11 Mar 2025 20:06:04 -0700
+  by orviesa003.jf.intel.com with ESMTP; 11 Mar 2025 20:16:52 -0700
 Received: from kbuild by a4747d147074 with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1tsCPu-00084S-0U;
-	Wed, 12 Mar 2025 03:05:59 +0000
-Date: Wed, 12 Mar 2025 11:05:43 +0800
+	id 1tsCaP-00085A-33;
+	Wed, 12 Mar 2025 03:16:49 +0000
+Date: Wed, 12 Mar 2025 11:16:12 +0800
 From: kernel test robot <lkp@intel.com>
 To: Paul Greenwalt <paul.greenwalt@intel.com>,
 	intel-wired-lan@lists.osuosl.org
@@ -73,7 +73,7 @@ Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
 	Alice Michael <alice.michael@intel.com>
 Subject: Re: [PATCH iwl-next v2] ice: add E830 Earliest TxTime First Offload
  support
-Message-ID: <202503121018.CUGx8uFd-lkp@intel.com>
+Message-ID: <202503121005.iGEV5eau-lkp@intel.com>
 References: <20250311132327.76804-1-paul.greenwalt@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -87,32 +87,32 @@ In-Reply-To: <20250311132327.76804-1-paul.greenwalt@intel.com>
 
 Hi Paul,
 
-kernel test robot noticed the following build errors:
+kernel test robot noticed the following build warnings:
 
-[auto build test ERROR on tnguy-next-queue/dev-queue]
+[auto build test WARNING on tnguy-next-queue/dev-queue]
 
 url:    https://github.com/intel-lab-lkp/linux/commits/Paul-Greenwalt/ice-add-E830-Earliest-TxTime-First-Offload-support/20250312-051400
 base:   https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue.git dev-queue
 patch link:    https://lore.kernel.org/r/20250311132327.76804-1-paul.greenwalt%40intel.com
 patch subject: [PATCH iwl-next v2] ice: add E830 Earliest TxTime First Offload support
-config: arm-randconfig-003-20250312 (https://download.01.org/0day-ci/archive/20250312/202503121018.CUGx8uFd-lkp@intel.com/config)
-compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250312/202503121018.CUGx8uFd-lkp@intel.com/reproduce)
+config: s390-allyesconfig (https://download.01.org/0day-ci/archive/20250312/202503121005.iGEV5eau-lkp@intel.com/config)
+compiler: s390-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250312/202503121005.iGEV5eau-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202503121018.CUGx8uFd-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202503121005.iGEV5eau-lkp@intel.com/
 
-All errors (new ones prefixed by >>):
+All warnings (new ones prefixed by >>):
 
->> drivers/net/ethernet/intel/ice/ice_base.c:1023:39: error: passing 'const struct ice_vsi *' to parameter of type 'struct ice_vsi *' discards qualifiers [-Werror,-Wincompatible-pointer-types-discards-qualifiers]
+   drivers/net/ethernet/intel/ice/ice_base.c: In function 'ice_vsi_cfg_txq':
+>> drivers/net/ethernet/intel/ice/ice_base.c:1023:46: warning: passing argument 1 of 'ice_calc_txq_handle' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
     1023 |         ring->q_handle = ice_calc_txq_handle(vsi, ring, tc);
          |                                              ^~~
-   drivers/net/ethernet/intel/ice/ice_base.c:245:48: note: passing argument to parameter 'vsi' here
+   drivers/net/ethernet/intel/ice/ice_base.c:245:48: note: expected 'struct ice_vsi *' but argument is of type 'const struct ice_vsi *'
      245 | static u16 ice_calc_txq_handle(struct ice_vsi *vsi, struct ice_tx_ring *ring, u8 tc)
-         |                                                ^
-   1 error generated.
+         |                                ~~~~~~~~~~~~~~~~^~~
 
 
 vim +1023 drivers/net/ethernet/intel/ice/ice_base.c
