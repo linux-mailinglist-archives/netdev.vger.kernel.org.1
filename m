@@ -1,92 +1,126 @@
-Return-Path: <netdev+bounces-174308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5002DA5E3AB
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 19:30:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A444A5E3B7
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 19:35:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9343F17A37D
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 18:30:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1CC43BBE68
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 18:35:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3E8425742D;
-	Wed, 12 Mar 2025 18:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28E031DE3AF;
+	Wed, 12 Mar 2025 18:35:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OAiW5GkT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J67Y7RRV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFEA52571C4
-	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 18:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 030D51CD20D
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 18:35:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741804199; cv=none; b=LXsMXTIr9d43MoezrLIVDcf+UWwHXy0SZxQXdJhYYk6pfIomMby8bPNV8BrV8EcVxDnCKRWxe04qWm88N1vq1iEQUKcRUQwjcw0tLi9JpWqoVtrgs7Um4HEdohU4CvduKpj/yJJ+LhjTqprny5za45hFnAnrVUCRd1ic3QQTtSM=
+	t=1741804549; cv=none; b=TGQf+EZ4vdWPRYMC9ol+/yrexGK/NQajIkKsKndMCyqTs3T941K9HlGITfdZjN3jNAZ2St9Oj6NyLUVc5562Cp13s7aBxTJ6x+QsDtBtX3HBL0DfYvqH9OUBqqhiMNSWoKCXi+hESjNhyHoVp2TdblIK4zWtQXfowcBapYHRSvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741804199; c=relaxed/simple;
-	bh=7qxBbYyOQugkREWjgcod15eXhNtBtWpwB/iwHb2nyns=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=uYsI0478BaGWhH5WfmxQV20/qXG4SESyQyWo4LGfR2PpgMmhIdyYKcXOmedfvStI32RNxNPAkbM8m0cXGisdx5jVcl3Si66+UW4bJZAEc0ADy3SnwroupmZgckVVwCsBrhtUMsG1/uWTVGNOnfHjrxynnElcJdUQttDQufAOwU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OAiW5GkT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E914C4CEEA;
-	Wed, 12 Mar 2025 18:29:59 +0000 (UTC)
+	s=arc-20240116; t=1741804549; c=relaxed/simple;
+	bh=ow1KigtljFBQ1vcnh+0FfWEOUCuNEjBV9gvac4wWkPs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bABBMfu2jA9pvg0y9NyyLOMWQoBau04LNUVej9zyvRD2T3xvFhq1YfatwPgrxbAZFwSISLNA4+ny+iKtCEoNQRdvAj7qQ5ZkZhnGEEeIT+Lk4rBuLh1LrN3xnuECz5Bemiutrq8GX29gwfWH9VO6wVqKPm3F0kyIL0Py2uVK/wM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J67Y7RRV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 510EBC4CEDD;
+	Wed, 12 Mar 2025 18:35:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741804199;
-	bh=7qxBbYyOQugkREWjgcod15eXhNtBtWpwB/iwHb2nyns=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=OAiW5GkTkDBEG2sIQuj+zwqdX6VgMBKTm5nbmH5haLeH3djfBUcMEw5MGWRbXbkvg
-	 FTFX6OoSb50LvXZf4EI64u5OCiXbNecQPGbiLpA1/qFR4HGc5qbOZ/IOBZXddB3wAt
-	 qlWTiMF3igQqXwsPyjKtm8e81Qfwkris/NkhKmaHXnbF3VhsVGHq/gpGJ7YgS9D0ze
-	 XzDglFNaxXAXHrovMoju2nG10UOnV5YHIXtkTA6EwnNNN29ImddyeEg6/D4yDZdSUi
-	 pOz+N40jbApSXvIUg1AJdNBq2c6Fs6HCsR3Y9iL88FQoueQZE+6uf/WpjBO0vXQgL0
-	 jQQ23vSVmnLVw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE4F380DBDF;
-	Wed, 12 Mar 2025 18:30:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1741804548;
+	bh=ow1KigtljFBQ1vcnh+0FfWEOUCuNEjBV9gvac4wWkPs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=J67Y7RRVNOO/MNJ2sZvbGFF15qYvBYL9Kk3a+/71H45yV8ixTNsst4gTVS0DLtl5Q
+	 XUYFhI6/9LwE/hX0FAKOqdUREL+XYaOlBphiABiW395wVSheVKciUCTHlhEU2x5ZVj
+	 m9/JfvbNGFHEoZpwMl67yRbOBP0dtTJYPqgqc83geg/37Vf7vo4ffo1bTojpwDaocD
+	 LBPS+auizg3T7VRkBM4U+ooOszhm54Fi6iW19/pz3EFMlQish+p8P8jonh1IoPKQfK
+	 Rk2Q+Ysib/VTprpwu2hI3Gl9PvLGxTwsvPGI6ecJXZxL2Uh2IZn1GDO3Bt3IcAKWhT
+	 uXzaOpsPBU3eA==
+Message-ID: <52f4e8b1-527a-42fb-9297-2689ba7c7516@kernel.org>
+Date: Wed, 12 Mar 2025 12:35:03 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2-next] tc: nat: ffs should operation on host byte
- ordered data
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174180423373.890466.587957696271695930.git-patchwork-notify@kernel.org>
-Date: Wed, 12 Mar 2025 18:30:33 +0000
-References: <20250306112520.188728-2-torben.nielsen@prevas.dk>
-In-Reply-To: <20250306112520.188728-2-torben.nielsen@prevas.dk>
-To: Torben Nielsen <t8927095@gmail.com>
-Cc: netdev@vger.kernel.org, torben.nielsen@prevas.dk
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next] page_pool: Track DMA-mapped pages and unmap
+ them when destroying the pool
+To: Yunsheng Lin <linyunsheng@huawei.com>,
+ Matthew Wilcox <willy@infradead.org>
+Cc: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ Yunsheng Lin <yunshenglin0825@gmail.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ "David S. Miller" <davem@davemloft.net>,
+ Yonglong Liu <liuyonglong@huawei.com>, Mina Almasry
+ <almasrymina@google.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, linux-mm@kvack.org, netdev@vger.kernel.org,
+ conduct@kernel.org
+References: <20250308145500.14046-1-toke@redhat.com>
+ <d84e19c9-be0c-4d23-908b-f5e5ab6f3f3f@gmail.com> <87cyepxn7n.fsf@toke.dk>
+ <Z88IYPp_yVLEBFKx@casper.infradead.org>
+ <c6ef4594-2d87-4fff-bee2-a09556d33274@huawei.com>
+ <Z9BSlzpbNRL2MzPj@casper.infradead.org>
+ <8fa8f430-5740-42e8-b720-618811fabb22@huawei.com>
+Content-Language: en-US
+From: Shuah <shuah@kernel.org>
+In-Reply-To: <8fa8f430-5740-42e8-b720-618811fabb22@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On 3/12/25 06:05, Yunsheng Lin wrote:
+> On 2025/3/11 23:11, Matthew Wilcox wrote:
+>> On Tue, Mar 11, 2025 at 08:25:25PM +0800, Yunsheng Lin wrote:
+>>>> struct page {
+>>>> 	unsigned long flags;
+>>>> 	unsigned long memdesc;
+>>>
+>>> It seems there may be memory behind the above 'memdesc' with different size
+>>> and layout for different subsystem?
+>>
+>> Yes.
+>>
+>>> I am not sure if I understand the case of the same page might be handle in
+>>> two subsystems concurrently or a page is allocated in one subsystem and
+>>> then passed to be handled in other subsystem, for examlpe:
+>>> page_pool owned page is mmap'ed into user space through tcp zero copy,
+>>> see tcp_zerocopy_vm_insert_batch(), it seems the same page is handled in
+>>> both networking/page_pool and vm subsystem?
+>>
+>> It's not that arbitrary.  I mean, you could read all the documentation
+>> I've written about this concept, listen to the talks I've given.
 
-This patch was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
+You can't point to talk given on the concept - people don't have to go
+find your talks to understand the concept. You are expected to answer
+the question and explain it to us here in this thread.
 
-On Thu,  6 Mar 2025 12:25:20 +0100 you wrote:
-> In print_nat the mask length is calculated as
+But
+>> sure, you're a special fucking snowflake and deserve your own unique
+>> explanation.
+
+Yunsheng Lin, This message is a rude personal attack. This isn't the
+way to treat your peers in the community. Apology is warranted.
+
 > 
-> 	len = ffs(sel->mask);
-> 	len = len ? 33 - len : 0;
+> If you don't like responding to the above question/comment, I would rather
+> you strip out them like the other question/comment or just ignore it:(
 > 
-> The mask is stored in network byte order, it should be converted
-> to host byte order before calculating first bit set.
+> I am not sure how to interpret the comment, but I am sure it is not a kind
+> one, so CC 'Code of Conduct Committee' in case there is more coming.
 > 
-> [...]
 
-Here is the summary with links:
-  - [iproute2-next] tc: nat: ffs should operation on host byte ordered data
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=afbfd2f2b0a6
+Thank you Mathew for letting us know about this.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+thanks,
+-- Shuah ((on behalf of the CoC committee)
 
 
