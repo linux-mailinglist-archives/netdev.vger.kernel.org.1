@@ -1,161 +1,115 @@
-Return-Path: <netdev+bounces-174183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51F3AA5DCA5
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 13:30:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62D63A5DCB7
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 13:32:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E19A16B31C
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 12:29:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D5F018955F2
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 12:32:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F29C1E8325;
-	Wed, 12 Mar 2025 12:29:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79C27241678;
+	Wed, 12 Mar 2025 12:32:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c6vUk5Mk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IRks0Wav"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D354C1E6DC5
-	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 12:29:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5C4B1E4A9;
+	Wed, 12 Mar 2025 12:32:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741782596; cv=none; b=i1pAgJvoYjpE8fdPwtUojB1wH2Zgq0rfnbhDGt/1WOELMwyYJ2Vgmy7VjmHj5Afhy9FkmJZA3WElRi+QtXvd+12f/+H0EfaT4h2Sz6s1VNqp2hAJTy0X0fq+QaolIJmcgriLkAZB131cr1/G+k1eWTsbn0WLi3wgBf4+LF/KfIA=
+	t=1741782737; cv=none; b=UeX+c5AvhcEedYUO/9riwcb2d/F1kKjqw9MrybSbsutGq8yuT5j7GyEo0pNOFs8dR3d+R6Lw8DTryVlu9/Ew5eUoOq6kbllMnaPDyxRMkpobxJZiA/DgGC5XpdLRMYtLHWDeKTQ+i/KuHqrelUVAxhlLQjk1SJT5abbcpN2S9AM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741782596; c=relaxed/simple;
-	bh=9VVmIGcxidyJs88e/+KkoxUvyXMLvuHyHCKg19YPZkk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=SF66UavXD+w2gxls94GscHyFSDCfd+T/AhMM/+CkkyMBgSXUbrMFOI5mZVGCDzs6qzijE5CQCLv4BegZgHTv58C9kFHAPY5UoP2GF+1/7Krgzi+IeqWTdxz8j/w4smY5meKNCtDp5blv+aREebz7fSgRLyTuqPgjNRgw/xHJmTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c6vUk5Mk; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741782593;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=T7pk+LbgOlAquJC2Wn9rV0NyBPPZimR6XHaNxWQ/xtc=;
-	b=c6vUk5Mk1mZkXBgLCFGVpdx7b3WQnnc+ytzstqJQzxT6fmd2lr0zYipHhs3KZdU3kn44g7
-	jVZpVfT55e3SzrfbMoqADfWAxQbzKLHk7uygVn3jlgIT3ipSTClTvi5CQNWcdc1gqnStps
-	lIKVFtvH1ByV608RUtNZt4XyGXYa3gE=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-606-3qa-4zdbN3i0A4j9kf6tuA-1; Wed, 12 Mar 2025 08:29:52 -0400
-X-MC-Unique: 3qa-4zdbN3i0A4j9kf6tuA-1
-X-Mimecast-MFC-AGG-ID: 3qa-4zdbN3i0A4j9kf6tuA_1741782591
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-54995da5b1bso450846e87.1
-        for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 05:29:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741782591; x=1742387391;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=T7pk+LbgOlAquJC2Wn9rV0NyBPPZimR6XHaNxWQ/xtc=;
-        b=KO6vuAd3o5wb+gySnAcOSeaB/GDZz5QT8xgmp/YEazKe5R3LGXELHoW1FlBh+LJiqH
-         LrnsKzkCzLmD0w2Y1DuL+9FZkVJGQwgWdc8UUqhotNTxD0O8ENlHim7s0r0bxUiJAeyv
-         W/3qaUmvxvK7KximTxYA5I5SZKDMKmGxxYS634p1TD2sWQlr9eQ5gwcgMcgFzKdqS87x
-         etUhdaVqgEIn66IQNPUapPpEue2VlJ4dF9LASUVHKZwAqLUCZCA+gaeuZfaDx+zA1Bm6
-         j7/h/vK88IscI72frTwImZcRWSG2j65Kp/Z8mV2GY7o4TDGe8mIrZ6GeU9XPYevKRga1
-         CZSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW4cQCI2UId3y8ufKoebkUxSRmj1wUyO9sw6TQuJWfK9YAQux0hbRPK/iNdMar/mnn2EYgeEUc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLg8aEaJy33J5HLjdTA6J+ZkLdRQ3qbWwFdrpt4xOy7jFwUMfs
-	y8SsfQ265Oo7mylecVv5z8BDkgJm5gdPiq5b0ff/G1nVJRdzQUXMQdvodaVFDowADi/QP/XR6Th
-	a4T7QiloKMAVSt+MtLKDWRkZiOdVTkC8hX6BPyUpQOsi+WFA22I5K2Q==
-X-Gm-Gg: ASbGncsBmAaXYIfTKkOFvkHsDLgE2xB9iBlldt/0jHwY2YzBdkTVXGACN77F5Ml+lY2
-	2NmImtbfz5/1Vsr76rpslDUzhRa8HQ0rkw6K5/LCT98B/9ez1/bhBVEB+fXqke5xAPI1KiMWBlQ
-	txQxjsB8HV56xPyqbq7HPcq6gj2EIViUYIZjUzmfoP4fXtn9x0JtJfUmeW29CIrUDsq046oBYWS
-	bSG37POjIT6Xg+BdCp7bCeUYCH63XvP6WxlVxBDHQ3jsu1XMDZyCVsejswT/vn9eoh0zIXPxTZ/
-	MozdWRQi9Ksp
-X-Received: by 2002:a05:6512:e99:b0:549:5dcf:a5b with SMTP id 2adb3069b0e04-549abd08731mr2644446e87.4.1741782590725;
-        Wed, 12 Mar 2025 05:29:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGjJrzor8jtnebcwTkuyeyRjFD8cyh7O4lj1779PdhFVKzSD6QGqr8mlsRAu1eMIL6/2mEJnQ==
-X-Received: by 2002:a05:6512:e99:b0:549:5dcf:a5b with SMTP id 2adb3069b0e04-549abd08731mr2644431e87.4.1741782590224;
-        Wed, 12 Mar 2025 05:29:50 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5498b1c29adsm2098172e87.215.2025.03.12.05.29.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Mar 2025 05:29:48 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 8C8B118FA68C; Wed, 12 Mar 2025 13:29:46 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Justin Iurman <justin.iurman@uliege.be>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, Roopa Prabhu <roopa@nvidia.com>,
- Andrea Mayer <andrea.mayer@uniroma2.it>, Stefano Salsano
- <stefano.salsano@uniroma2.it>, Ahmed Abdelsalam <ahabdels.dev@gmail.com>,
- Ido Schimmel <idosch@nvidia.com>
-Subject: Re: [PATCH net] net: lwtunnel: fix recursion loops
-In-Reply-To: <fb9aec0e-0d95-4ca3-8174-32174551ece3@uliege.be>
-References: <20250312103246.16206-1-justin.iurman@uliege.be>
- <fb9aec0e-0d95-4ca3-8174-32174551ece3@uliege.be>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Wed, 12 Mar 2025 13:29:46 +0100
-Message-ID: <87y0xah1ol.fsf@toke.dk>
+	s=arc-20240116; t=1741782737; c=relaxed/simple;
+	bh=6PfBLti2GCLyhb5+n+egYTKW5V8tKOVfCwhp5cNmf/8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MMYiDB6FH1XDUr0ROJo63Ez8Z9Vb+aj85SseP46HK6Xu46viP9o/JyPocqy3F8nq+bHDvnMMi3p5NH9O3Wz22EJSG8hev9ijZGCeUbwxQEHifh4f29AnypXLAEHDL/L3oU0go+EF/9Vx9BjXWeSug/7jmIV4afwxQLIebV1V9ao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IRks0Wav; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741782736; x=1773318736;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=6PfBLti2GCLyhb5+n+egYTKW5V8tKOVfCwhp5cNmf/8=;
+  b=IRks0WavRT05K58iiqVo9bPcLoPNOv57Kqc7btp9miCtZhfvlO0CAN3N
+   wbnm16FGmjTLwVuE52lH1adEgGkGk2bRj37ybTNSBJ33dYqKLg50te/OR
+   355UPlTpoWJRhD4hna3ZQUYTEiAUbRFNER5rwquEOgQwAtG+oYU5O+vTI
+   IDmwA+q2Da/XgNmFBQVP/34TUQnATRGX8D0ieUQrpwSslZgDwh1Yh5x0A
+   84Yrd6uHIwszYWl674fyyYMQvGlhQpBgAlQOHXmpumLoFf0QCfmLTAWOH
+   BIvO6lkZbp2Sb5RNRzRtR4sBzuA/ca01vKhwJjkVN1eHUjts+b4ihS41e
+   g==;
+X-CSE-ConnectionGUID: 49yItcRcRbOuAgIC2VTfjQ==
+X-CSE-MsgGUID: Yf8kgAuPQsG7HBiW2ZHrAA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11370"; a="43038352"
+X-IronPort-AV: E=Sophos;i="6.14,241,1736841600"; 
+   d="scan'208";a="43038352"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2025 05:32:15 -0700
+X-CSE-ConnectionGUID: wKwWVNBrTja/NwUNPTtyEg==
+X-CSE-MsgGUID: Lv2rZVgETySZXTKDLNe8kQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,241,1736841600"; 
+   d="scan'208";a="120325899"
+Received: from soc-5cg4396xfb.clients.intel.com (HELO [172.28.180.56]) ([172.28.180.56])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2025 05:32:11 -0700
+Message-ID: <7d4ee477-f7e9-41b3-ab22-3af71054c60a@linux.intel.com>
+Date: Wed, 12 Mar 2025 13:32:07 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/3] net/mlx5: HW Steering cleanups
+To: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Gal Pressman <gal@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+ Moshe Shemesh <moshe@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1741780194-137519-1-git-send-email-tariqt@nvidia.com>
+Content-Language: pl, en-US
+From: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+In-Reply-To: <1741780194-137519-1-git-send-email-tariqt@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Justin Iurman <justin.iurman@uliege.be> writes:
+On 2025-03-12 12:49 PM, Tariq Toukan wrote:
+> This short series by Yevgeny contains several small HW Steering cleanups:
+> 
+> - Patch 1: removing unused FW commands
+> - Patch 2: using list_move() instead of list_del/add
+> - Patch 3: printing the unsupported combination of match fields
+> 
+> Regards,
+> Tariq
+> 
+> Yevgeny Kliteynik (3):
+>    net/mlx5: HWS, remove unused code for alias flow tables
+>    net/mlx5: HWS, use list_move() instead of del/add
+>    net/mlx5: HWS, log the unsupported mask in definer
+> 
+>   drivers/net/ethernet/mellanox/mlx5/core/steering/hws/cmd.c  | 6 ------
+>   drivers/net/ethernet/mellanox/mlx5/core/steering/hws/cmd.h  | 3 ---
+>   .../net/ethernet/mellanox/mlx5/core/steering/hws/definer.c  | 6 +++---
+>   .../net/ethernet/mellanox/mlx5/core/steering/hws/pat_arg.c  | 3 +--
+>   4 files changed, 4 insertions(+), 14 deletions(-)
+> 
+> 
+> base-commit: 0ea09cbf8350b70ad44d67a1dcb379008a356034
 
->> --- /dev/null
->> +++ b/net/core/lwtunnel.h
->> @@ -0,0 +1,42 @@
->> +/* SPDX-License-Identifier: GPL-2.0+ */
->> +#ifndef _NET_CORE_LWTUNNEL_H
->> +#define _NET_CORE_LWTUNNEL_H
->> +
->> +#include <linux/netdevice.h>
->> +
->> +#define LWTUNNEL_RECURSION_LIMIT 8
->> +
->> +#ifndef CONFIG_PREEMPT_RT
->> +static inline bool lwtunnel_recursion(void)
->> +{
->> +	return unlikely(__this_cpu_read(softnet_data.xmit.recursion) >
->> +			LWTUNNEL_RECURSION_LIMIT);
->> +}
->> +
->> +static inline void lwtunnel_recursion_inc(void)
->> +{
->> +	__this_cpu_inc(softnet_data.xmit.recursion);
->> +}
->> +
->> +static inline void lwtunnel_recursion_dec(void)
->> +{
->> +	__this_cpu_dec(softnet_data.xmit.recursion);
->> +}
->> +#else
->> +static inline bool lwtunnel_recursion(void)
->> +{
->> +	return unlikely(current->net_xmit.recursion > LWTUNNEL_RECURSION_LIMIT);
->> +}
->> +
->> +static inline void lwtunnel_recursion_inc(void)
->> +{
->> +	current->net_xmit.recursion++;
->> +}
->> +
->> +static inline void lwtunnel_recursion_dec(void)
->> +{
->> +	current->net_xmit.recursion--;
->> +}
->> +#endif
->> +
->> +#endif /* _NET_CORE_LWTUNNEL_H */
->
-> Wondering what folks think about the above idea to reuse fields that 
-> dev_xmit_recursion() currently uses. IMO, it seems OK considering the 
-> use case and context. If not, I guess we'd need to add a new field to 
-> both softnet_data and task_struct.
+Hi, thanks for the submission!
 
-Why not just reuse the dev_xmit_recursion*() helpers directly?
-
--Toke
+Reviewed-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+for the whole series
 
 
