@@ -1,89 +1,94 @@
-Return-Path: <netdev+bounces-174306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91619A5E3A7
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 19:29:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 657B2A5E3AA
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 19:30:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 173083AD580
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 18:29:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A910F1769F7
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 18:30:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 338DE2505A5;
-	Wed, 12 Mar 2025 18:29:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF4BC1D5143;
+	Wed, 12 Mar 2025 18:29:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bP5CN1K6"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25AF81C3BE9;
-	Wed, 12 Mar 2025 18:29:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABBC51386DA
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 18:29:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741804182; cv=none; b=jd41s8ijLhGlxrYsmj5paqMSN7Q94nvmGN6yVyjzAt+jeEK1RSC+USVL0ZSYVjmbi4RrCb9TQpOcIGwvwfm0vHipjPPc9r+owpAhwK4LGUMn2RBr/lhPLEY3UJOZ4n+j+XLdngQ00n5AZW+NXVHSAt6VYwj7DzMneKTUldVC2cU=
+	t=1741804198; cv=none; b=kOKBlidk1A5LgWxmfOMIq13u3ktMseK4Esty2p2BrK4kwiaYf2nUDXmuP9cUYJesIKsDSeFfNJXuBnevDUbpaitylnb3hTruIB1O/UIAFPs5K+Wg8TskIg5MlOY4Cz3KkNJ63uWFp6iTg6YWe5zh/FV/WzE1XJFc1YGvoR8vNI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741804182; c=relaxed/simple;
-	bh=PYlpPJU0rTAjzg14cckvJhKxsxB9tVoWv24PR0KgHko=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C6tmTLRwlQKnyV6naiklE3dpi5OFranSPXfAADXMLo3quTMUAf07cfAMJEXciOSL7hzamhFS4WWU3nWAtHIO+b6QZIqQhMQd6qbF3lbiLC3wgiA5bObty41OVuGe0vEO4KCEtphVpPKH9uWAIRB0AGr7DBN+Gu3Mhq3IZ+ukNTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ZCfH96Q1lz6J9vP;
-	Thu, 13 Mar 2025 02:27:01 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id BCEF7140736;
-	Thu, 13 Mar 2025 02:29:37 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 12 Mar
- 2025 19:29:36 +0100
-Date: Wed, 12 Mar 2025 18:29:35 +0000
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: Shannon Nelson <shannon.nelson@amd.com>
-CC: <jgg@nvidia.com>, <andrew.gospodarek@broadcom.com>,
-	<aron.silverton@oracle.com>, <dan.j.williams@intel.com>,
-	<daniel.vetter@ffwll.ch>, <dave.jiang@intel.com>, <dsahern@kernel.org>,
-	<gregkh@linuxfoundation.org>, <hch@infradead.org>, <itayavr@nvidia.com>,
-	<jiri@nvidia.com>, <kuba@kernel.org>, <lbloch@nvidia.com>,
-	<leonro@nvidia.com>, <linux-cxl@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>, <saeedm@nvidia.com>,
-	<brett.creeley@amd.com>
-Subject: Re: [PATCH v3 5/6] pds_fwctl: add rpc and query support
-Message-ID: <20250312182935.00002f49@huawei.com>
-In-Reply-To: <20250307185329.35034-6-shannon.nelson@amd.com>
-References: <20250307185329.35034-1-shannon.nelson@amd.com>
-	<20250307185329.35034-6-shannon.nelson@amd.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1741804198; c=relaxed/simple;
+	bh=uBRcUn+6XZvUrFDb6tSSoWkTZiy6+JE1P9dcmLw76c0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=LdFtfIS4v0clVrlABZ3msQuae838iH9QBHHWRj02JeMIOu/WzeOtVOhm68If+bfx3vo9ZCEWY4/NKuKR4zaq6DCiaI4r5u29QSHLUC4E5OzTPe5yn7fwTpY8RSrvK9lLaBehQr6WumKBlUWEk+8QREGFVBVS/SCQdFiEkJ1TnoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bP5CN1K6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A2BAC4CEDD;
+	Wed, 12 Mar 2025 18:29:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741804198;
+	bh=uBRcUn+6XZvUrFDb6tSSoWkTZiy6+JE1P9dcmLw76c0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=bP5CN1K6KcY32o/naSVuHAsU9YzLyh/lRT6CdElHE/Ci6vRcArbafBZGrPLd7gmiY
+	 hq3V3spkV3vaY6p6pl2I9ZkrUWUPOork18RiUCrFTWaYucFkVKu6DkkjA/2I+pt3zA
+	 E1eavT6nzkvU0m+GMBJqp/lKjAkyZTnNL2UncRGG9qXaT5g03zRykrHpramt3mI64p
+	 aI7BNkIYJzNQwvW5+fzzfId2R6LIRCh0R0wcfEunZap6xZ+3d+n6Rl2eztzhCQUwR5
+	 kFOi/uP+WFfZxbgCZP4G4xNAe0DK4OkWlJxPpgCYGcDYJtJczgONTs4SjAjVvpCJnZ
+	 xKbpPB1kqs4hg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD3A380DBDF;
+	Wed, 12 Mar 2025 18:30:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100011.china.huawei.com (7.191.174.247) To
- frapeml500008.china.huawei.com (7.182.85.71)
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH iproute2-next] tc: nat: Fix mask calculation
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174180423251.890466.11023139141419811729.git-patchwork-notify@kernel.org>
+Date: Wed, 12 Mar 2025 18:30:32 +0000
+References: <20250306112520.188728-1-torben.nielsen@prevas.dk>
+In-Reply-To: <20250306112520.188728-1-torben.nielsen@prevas.dk>
+To: Torben Nielsen <t8927095@gmail.com>
+Cc: netdev@vger.kernel.org, torben.nielsen@prevas.dk
 
-On Fri, 7 Mar 2025 10:53:28 -0800
-Shannon Nelson <shannon.nelson@amd.com> wrote:
+Hello:
 
-> From: Brett Creeley <brett.creeley@amd.com>
+This patch was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
+
+On Thu,  6 Mar 2025 12:25:19 +0100 you wrote:
+> In parse_nat_args the network mask is calculated as
 > 
-> The pds_fwctl driver doesn't know what RPC operations are available
-> in the firmware, so also doesn't know what scope they might have.  The
-> userland utility supplies the firmware "endpoint" and "operation" id values
-> and this driver queries the firmware for endpoints and their available
-> operations.  The operation descriptions include the scope information
-> which the driver uses for scope testing.
+>         sel->mask = htonl(~0u << (32 - addr.bitlen));
 > 
-> Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
-> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
-> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+> According to  ISO/IEC 9899:TC3 6.5.7 Bitwise shift operators:
+> The integer promotions are performed on each of the operands.
+> The type of the result is that of the promoted left operand.
+> If the value of the right operand is negative or is greater
+> than or equal to the width of the promoted left operand,
+> the behavior is undefined
+> 
+> [...]
 
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-(obviously with bitfield.h!)
+Here is the summary with links:
+  - [iproute2-next] tc: nat: Fix mask calculation
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=667817b4c349
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
