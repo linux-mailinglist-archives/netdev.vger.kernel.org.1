@@ -1,309 +1,162 @@
-Return-Path: <netdev+bounces-174225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 133ADA5DE01
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 14:30:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CA852A5DE24
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 14:36:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AAC601896DCE
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 13:30:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96E21188F966
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 13:37:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74BF85474C;
-	Wed, 12 Mar 2025 13:30:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="xjNCMxKe"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52CE224A063;
+	Wed, 12 Mar 2025 13:36:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 996A72AD21;
-	Wed, 12 Mar 2025 13:30:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8983B248861
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 13:36:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741786230; cv=none; b=nZoO2OZVVi1XIjTTxZJ5OxfQxE5Bdb5P4uefFXEOqnrJYMcLaQTg+avZmmYp1trLEvQjcifbLrixX0Md8B7O/NTEw/tcWwdwnMbtzHta/WdKludmdyKc9H9oe5y1q9huDqMEBxWuwykPPLrp5BrYQkZUb/qR10aKQt9ghhiyc0E=
+	t=1741786603; cv=none; b=STVMggaCq7fH68sWg51qC3iaXk53ULMQNIF715VgBDVleDZde0/N4Ts7yLWbOebJsTmxDy67YECYBsaHMX1hXI4qO9klp27JOZF8rwJ2wRLvTuR69viwv7O3rFMqk3EBSF0ceiWP6p4Es81p+eX88Z5Dq1nco/svEx/yQ45NMTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741786230; c=relaxed/simple;
-	bh=4KZAmteVCiPQZKXa6RixXdbPA2A1lVG6qAGUPw9jYGY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J8l5mX1/xKFtJtba+apDelSNEQKA5drvA+qZwiQZvnXexUyH9vYTeS7ceYjaWG0ihDeLLbXF3fPq/DxW3HuZoWiuggFnArWL6Icr3VYKDxXUm1WiYNNC0DAv8LbCeGYOHnzv+VV1PIbj2YXJz1o5UTfIbjca+XlDVtjOeomnjoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=xjNCMxKe; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1741786220; h=From:To:Subject:Date:Message-ID:MIME-Version;
-	bh=snu8++Ueu+hpkYG+qKz0qWfUxpdd8LRIN9HJR73fE80=;
-	b=xjNCMxKecAjZ+9Hs47+vPxdqOZmmu52PbLse0zFDFckZpSCjYOdtptTf7BgJTTUGduHJqoIFBN00ZhxSYfudR5BfPS83I8v7hlos7I28xmc10KJPJkRXfLpkF2v3WlqJipL5sddwbHbQ3GgOY2Sdzdcu4sIhxg+1bwIXazrd6Yw=
-Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WRD.2t6_1741786214 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 12 Mar 2025 21:30:20 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-To: kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	wintera@linux.ibm.com,
-	guwen@linux.alibaba.com
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	tonylu@linux.alibaba.com,
-	pabeni@redhat.com,
-	edumazet@google.com
-Subject: [RFC PATCH net-next] net/smc: avoid conflict with sockmap after fallback
-Date: Wed, 12 Mar 2025 21:30:14 +0800
-Message-ID: <20250312133014.35775-1-alibuda@linux.alibaba.com>
-X-Mailer: git-send-email 2.45.0
+	s=arc-20240116; t=1741786603; c=relaxed/simple;
+	bh=zD5ceLjbuXPe6+5fOTicgv3WUEXkziJ/7+hhKU7mWaQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Cd+sRKuE83o6Jb8kG5gHxrHNhuspMncAF6Ln8d138Jj31CzvaoVxS7eWjUhuMdCd2A7vmQr7aphWT+vWDQkuiX0dKGUJ3CEOjbMZwCQ0b9Vrx+1LzaIePm1IdH+w2+Bmj+FCDnLlZZ6BG4p/JHDDzc27PzhVFBK/D9hQUgTGp4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tsMFk-0006Gj-GU; Wed, 12 Mar 2025 14:36:08 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tsMFi-005Mqb-0w;
+	Wed, 12 Mar 2025 14:36:06 +0100
+Received: from pengutronix.de (p5b1645f7.dip0.t-ipconnect.de [91.22.69.247])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id DFFB73D8DBF;
+	Wed, 12 Mar 2025 13:36:05 +0000 (UTC)
+Date: Wed, 12 Mar 2025 14:36:05 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Matias Ezequiel Vara Larsen <mvaralar@redhat.com>
+Cc: Harald Mommer <harald.mommer@opensynergy.com>, 
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
+	Mikhail Golubev-Ciuchea <Mikhail.Golubev-Ciuchea@opensynergy.com>, Wolfgang Grandegger <wg@grandegger.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Damir Shaikhutdinov <Damir.Shaikhutdinov@opensynergy.com>, 
+	linux-kernel@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH v5] can: virtio: Initial virtio CAN driver.
+Message-ID: <20250312-able-refreshing-hog-ed14e7-mkl@pengutronix.de>
+References: <20240108131039.2234044-1-Mikhail.Golubev-Ciuchea@opensynergy.com>
+ <a366f529-c901-4cd1-a1a6-c3958562cace@wanadoo.fr>
+ <0878aedf-35c2-4901-8662-2688574dd06f@opensynergy.com>
+ <Z9FicA7bHAYZWJAb@fedora>
+ <20250312-conscious-sloppy-pegasus-b5099d-mkl@pengutronix.de>
+ <Z9GL6o01fuhTbHWO@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="vs4q5lbuhwsinm4l"
+Content-Disposition: inline
+In-Reply-To: <Z9GL6o01fuhTbHWO@fedora>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Currently, after fallback, SMC will occupy the sk_user_data of the TCP sock(clcsk) to
-forward events. As a result, we cannot use sockmap after that, since sockmap also
-requires the use of the sk_user_data. Even more, in some cases, this may result in
-abnormal panic.
 
-To enable sockmap after SMC fallback , we need to avoid using sk_user_data and
-instead introduce an additional smc_ctx in tcp_sock to index from TCP sock to SMC sock.
+--vs4q5lbuhwsinm4l
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v5] can: virtio: Initial virtio CAN driver.
+MIME-Version: 1.0
 
-Additionally, we bind the lifecycle of the SMC sock to that of the TCP sock, ensuring
-that the indexing to the SMC sock remains valid throughout the lifetime of the TCP sock.
+On 12.03.2025 14:28:10, Matias Ezequiel Vara Larsen wrote:
+> On Wed, Mar 12, 2025 at 11:41:26AM +0100, Marc Kleine-Budde wrote:
+> > On 12.03.2025 11:31:12, Matias Ezequiel Vara Larsen wrote:
+> > > On Thu, Feb 01, 2024 at 07:57:45PM +0100, Harald Mommer wrote:
+> > > > Hello,
+> > > >=20
+> > > > I thought there would be some more comments coming and I could addr=
+ess
+> > > > everything in one chunk. Not the case, besides your comments silenc=
+e.
+> > > >=20
+> > > > On 08.01.24 20:34, Christophe JAILLET wrote:
+> > > > >=20
+> > > > > Hi,
+> > > > > a few nits below, should there be a v6.
+> > > > >=20
+> > > >=20
+> > > > I'm sure there will be but not so soon. Probably after acceptance o=
+f the
+> > > > virtio CAN specification or after change requests to the specificat=
+ion are
+> > > > received and the driver has to be adapted to an updated draft.
+> > > >=20
+> > > What is the status of this series?
+> >=20
+> > There has been no movement from the Linux side. The patch series is
+> > quite extensive. To get this mainline, we need not only a proper Linux
+> > CAN driver, but also a proper VirtIO specification.=20
+>=20
+> Thanks for your answer. AFAIK the spec has been merged (see
+> https://github.com/oasis-tcs/virtio-spec/tree/virtio-1.4).=20
 
-One key reason is that SMC overrides inet_connection_sock_af_ops, which introduces
-potential dependencies. We must ensure that the af_ops remain visible throughout the
-lifecycle of the TCP socket. In addition, this also resolves potential issues in some
-scenarios where the SMC sock might be invalid.
+Yes, the spec was merged. I think it was written with a specific
+use-case (IIRC: automotive, Linux on-top of a specific hypervisor) in
+mind, in Linux we have other use cases that might not be covered.
 
-Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
----
- include/linux/tcp.h |  1 +
- net/smc/af_smc.c    | 53 ++++++++++++++++++++++-----------------------
- net/smc/smc.h       |  8 +++----
- net/smc/smc_close.c |  1 -
- 4 files changed, 30 insertions(+), 33 deletions(-)
+> > This whole project is too big for me to do it as a collaborative
+> > effort.
+>=20
+> What do you mean?
 
-diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-index f88daaa76d83..f2223b1cc0d0 100644
---- a/include/linux/tcp.h
-+++ b/include/linux/tcp.h
-@@ -478,6 +478,7 @@ struct tcp_sock {
- #if IS_ENABLED(CONFIG_SMC)
- 	bool	syn_smc;	/* SYN includes SMC */
- 	bool	(*smc_hs_congested)(const struct sock *sk);
-+	void	*smc_ctx;
- #endif
- 
- #if defined(CONFIG_TCP_MD5SIG) || defined(CONFIG_TCP_AO)
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index bc356f77ff1d..d434105639c1 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -127,7 +127,7 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
- 	struct smc_sock *smc;
- 	struct sock *child;
- 
--	smc = smc_clcsock_user_data(sk);
-+	smc = smc_sk_from_clcsk(sk);
- 
- 	if (READ_ONCE(sk->sk_ack_backlog) + atomic_read(&smc->queued_smc_hs) >
- 				sk->sk_max_ack_backlog)
-@@ -143,8 +143,6 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
- 					       own_req);
- 	/* child must not inherit smc or its ops */
- 	if (child) {
--		rcu_assign_sk_user_data(child, NULL);
--
- 		/* v4-mapped sockets don't inherit parent ops. Don't restore. */
- 		if (inet_csk(child)->icsk_af_ops == inet_csk(sk)->icsk_af_ops)
- 			inet_csk(child)->icsk_af_ops = smc->ori_af_ops;
-@@ -161,10 +159,7 @@ static bool smc_hs_congested(const struct sock *sk)
- {
- 	const struct smc_sock *smc;
- 
--	smc = smc_clcsock_user_data(sk);
--
--	if (!smc)
--		return true;
-+	smc = smc_sk_from_clcsk(sk);
- 
- 	if (workqueue_congested(WORK_CPU_UNBOUND, smc_hs_wq))
- 		return true;
-@@ -250,7 +245,6 @@ static void smc_fback_restore_callbacks(struct smc_sock *smc)
- 	struct sock *clcsk = smc->clcsock->sk;
- 
- 	write_lock_bh(&clcsk->sk_callback_lock);
--	clcsk->sk_user_data = NULL;
- 
- 	smc_clcsock_restore_cb(&clcsk->sk_state_change, &smc->clcsk_state_change);
- 	smc_clcsock_restore_cb(&clcsk->sk_data_ready, &smc->clcsk_data_ready);
-@@ -832,11 +826,10 @@ static void smc_fback_forward_wakeup(struct smc_sock *smc, struct sock *clcsk,
- 
- static void smc_fback_state_change(struct sock *clcsk)
- {
--	struct smc_sock *smc;
-+	struct smc_sock *smc = smc_sk_from_clcsk(clcsk);
- 
- 	read_lock_bh(&clcsk->sk_callback_lock);
--	smc = smc_clcsock_user_data(clcsk);
--	if (smc)
-+	if (smc->clcsk_state_change)
- 		smc_fback_forward_wakeup(smc, clcsk,
- 					 smc->clcsk_state_change);
- 	read_unlock_bh(&clcsk->sk_callback_lock);
-@@ -844,11 +837,10 @@ static void smc_fback_state_change(struct sock *clcsk)
- 
- static void smc_fback_data_ready(struct sock *clcsk)
- {
--	struct smc_sock *smc;
-+	struct smc_sock *smc = smc_sk_from_clcsk(clcsk);
- 
- 	read_lock_bh(&clcsk->sk_callback_lock);
--	smc = smc_clcsock_user_data(clcsk);
--	if (smc)
-+	if (smc->clcsk_data_ready)
- 		smc_fback_forward_wakeup(smc, clcsk,
- 					 smc->clcsk_data_ready);
- 	read_unlock_bh(&clcsk->sk_callback_lock);
-@@ -856,11 +848,10 @@ static void smc_fback_data_ready(struct sock *clcsk)
- 
- static void smc_fback_write_space(struct sock *clcsk)
- {
--	struct smc_sock *smc;
-+	struct smc_sock *smc = smc_sk_from_clcsk(clcsk);
- 
- 	read_lock_bh(&clcsk->sk_callback_lock);
--	smc = smc_clcsock_user_data(clcsk);
--	if (smc)
-+	if (smc->clcsk_write_space)
- 		smc_fback_forward_wakeup(smc, clcsk,
- 					 smc->clcsk_write_space);
- 	read_unlock_bh(&clcsk->sk_callback_lock);
-@@ -868,11 +859,10 @@ static void smc_fback_write_space(struct sock *clcsk)
- 
- static void smc_fback_error_report(struct sock *clcsk)
- {
--	struct smc_sock *smc;
-+	struct smc_sock *smc = smc_sk_from_clcsk(clcsk);
- 
- 	read_lock_bh(&clcsk->sk_callback_lock);
--	smc = smc_clcsock_user_data(clcsk);
--	if (smc)
-+	if (smc->clcsk_error_report)
- 		smc_fback_forward_wakeup(smc, clcsk,
- 					 smc->clcsk_error_report);
- 	read_unlock_bh(&clcsk->sk_callback_lock);
-@@ -883,7 +873,6 @@ static void smc_fback_replace_callbacks(struct smc_sock *smc)
- 	struct sock *clcsk = smc->clcsock->sk;
- 
- 	write_lock_bh(&clcsk->sk_callback_lock);
--	clcsk->sk_user_data = (void *)((uintptr_t)smc | SK_USER_DATA_NOCOPY);
- 
- 	smc_clcsock_replace_cb(&clcsk->sk_state_change, smc_fback_state_change,
- 			       &smc->clcsk_state_change);
-@@ -2602,11 +2591,10 @@ static void smc_tcp_listen_work(struct work_struct *work)
- 
- static void smc_clcsock_data_ready(struct sock *listen_clcsock)
- {
--	struct smc_sock *lsmc;
-+	struct smc_sock *lsmc = smc_sk_from_clcsk(listen_clcsock);
- 
- 	read_lock_bh(&listen_clcsock->sk_callback_lock);
--	lsmc = smc_clcsock_user_data(listen_clcsock);
--	if (!lsmc)
-+	if (!lsmc->clcsk_data_ready)
- 		goto out;
- 	lsmc->clcsk_data_ready(listen_clcsock);
- 	if (lsmc->sk.sk_state == SMC_LISTEN) {
-@@ -2648,8 +2636,6 @@ int smc_listen(struct socket *sock, int backlog)
- 	 * smc-specific sk_data_ready function
- 	 */
- 	write_lock_bh(&smc->clcsock->sk->sk_callback_lock);
--	smc->clcsock->sk->sk_user_data =
--		(void *)((uintptr_t)smc | SK_USER_DATA_NOCOPY);
- 	smc_clcsock_replace_cb(&smc->clcsock->sk->sk_data_ready,
- 			       smc_clcsock_data_ready, &smc->clcsk_data_ready);
- 	write_unlock_bh(&smc->clcsock->sk->sk_callback_lock);
-@@ -2670,7 +2656,6 @@ int smc_listen(struct socket *sock, int backlog)
- 		write_lock_bh(&smc->clcsock->sk->sk_callback_lock);
- 		smc_clcsock_restore_cb(&smc->clcsock->sk->sk_data_ready,
- 				       &smc->clcsk_data_ready);
--		smc->clcsock->sk->sk_user_data = NULL;
- 		write_unlock_bh(&smc->clcsock->sk->sk_callback_lock);
- 		goto out;
- 	}
-@@ -3323,6 +3308,15 @@ static const struct proto_ops smc_sock_ops = {
- 	.splice_read	= smc_splice_read,
- };
- 
-+static void smc_clcsk_destruct(struct sock *clcsk)
-+{
-+	struct smc_sock *smc = smc_sk_from_clcsk(clcsk);
-+
-+	clcsk->sk_destruct = smc->clcsk_destruct;
-+	clcsk->sk_destruct(clcsk);
-+	sock_put(&smc->sk); /* hold in smc_create_clcsk() */
-+}
-+
- int smc_create_clcsk(struct net *net, struct sock *sk, int family)
- {
- 	struct smc_sock *smc = smc_sk(sk);
-@@ -3343,6 +3337,11 @@ int smc_create_clcsk(struct net *net, struct sock *sk, int family)
- 	sk->sk_net_refcnt = 1;
- 	get_net_track(net, &sk->ns_tracker, GFP_KERNEL);
- 	sock_inuse_add(net, 1);
-+
-+	tcp_sk(sk)->smc_ctx = &smc->sk;
-+	sock_hold(&smc->sk); /* put in smc_clcsk_destruct() */
-+	smc->clcsk_destruct = sk->sk_destruct;
-+	sk->sk_destruct = smc_clcsk_destruct;
- 	return 0;
- }
- 
-diff --git a/net/smc/smc.h b/net/smc/smc.h
-index 78ae10d06ed2..940b040ee9e8 100644
---- a/net/smc/smc.h
-+++ b/net/smc/smc.h
-@@ -296,6 +296,8 @@ struct smc_sock {				/* smc sock container */
- 						/* original write_space fct. */
- 	void			(*clcsk_error_report)(struct sock *sk);
- 						/* original error_report fct. */
-+	void			(*clcsk_destruct)(struct sock *sk);
-+						/* original destruct fct. */
- 	struct smc_connection	conn;		/* smc connection */
- 	struct smc_sock		*listen_smc;	/* listen parent */
- 	struct work_struct	connect_work;	/* handle non-blocking connect*/
-@@ -340,11 +342,7 @@ static inline void smc_init_saved_callbacks(struct smc_sock *smc)
- 	smc->clcsk_error_report	= NULL;
- }
- 
--static inline struct smc_sock *smc_clcsock_user_data(const struct sock *clcsk)
--{
--	return (struct smc_sock *)
--	       ((uintptr_t)clcsk->sk_user_data & ~SK_USER_DATA_NOCOPY);
--}
-+#define smc_sk_from_clcsk(sk)	(tcp_sk(sk)->smc_ctx)
- 
- /* save target_cb in saved_cb, and replace target_cb with new_cb */
- static inline void smc_clcsock_replace_cb(void (**target_cb)(struct sock *),
-diff --git a/net/smc/smc_close.c b/net/smc/smc_close.c
-index 10219f55aad1..a6aa0f8a99e2 100644
---- a/net/smc/smc_close.c
-+++ b/net/smc/smc_close.c
-@@ -218,7 +218,6 @@ int smc_close_active(struct smc_sock *smc)
- 			write_lock_bh(&smc->clcsock->sk->sk_callback_lock);
- 			smc_clcsock_restore_cb(&smc->clcsock->sk->sk_data_ready,
- 					       &smc->clcsk_data_ready);
--			smc->clcsock->sk->sk_user_data = NULL;
- 			write_unlock_bh(&smc->clcsock->sk->sk_callback_lock);
- 			rc = kernel_sock_shutdown(smc->clcsock, SHUT_RDWR);
- 		}
--- 
-2.45.0
+I mean the driver is too big to review on a non-paid community based
+effort.
 
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--vs4q5lbuhwsinm4l
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmfRjcIACgkQDHRl3/mQ
+kZzDpAf/X6+oHnjKGYwW4I9Lv9kcQu6D2ENfhcQKgS/Mb01KLJgVym9THvjrXq2p
+gsxtzzjHc6kiPBwgrx0CRcqL4lOMmaJOCciAzmeCU+3WYPB8GxJceCk09gw4tJJj
+0maj4PsCePgTekqu/hD0Oe5K8rImw2wKn+5xbFBf5fKrgLGyWNLwkoIO2CMj0E89
+a1w7czCUBG5F8tpS/ryzfs/kNbXMgCAB0od26HgHOKggYPvL9hqkSMejiVfBsRlu
+mM0w7H2GyJHXLnuBQqS7YPNDSPH0/NJSEwo2+AbX30ALhQDK5md3FSgQZ9MaxYj7
+OAK+ES+660rBsbPscWDNlk6Q94CdIA==
+=hEiz
+-----END PGP SIGNATURE-----
+
+--vs4q5lbuhwsinm4l--
 
