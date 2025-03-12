@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-174085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A988A5D60E
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 07:24:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DAD9A5D611
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 07:24:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE434175CC7
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 06:24:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24EAA179702
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 06:24:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8C2D1E501C;
-	Wed, 12 Mar 2025 06:24:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C5D21E5701;
+	Wed, 12 Mar 2025 06:24:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QahoktNA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Y24MT1Bq"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FD9C1E5018
-	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 06:24:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C4821E3DED
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 06:24:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741760677; cv=none; b=e+vMa8wF0CxIcDTJpVQRKohbzu4U4HpmEGmSgMS2kwtw1flckSyHy2R9dWWFxwC+DNmcU1dnTJXSKf6i6G/+Aw4LI/paXletXcyLy4Sfk8cV6FtLnw6Zuz9/tlzu3DmQJGUsoBw+lWn8hMN2b3GHPKx02rj85VGVIp5tnAVzyog=
+	t=1741760678; cv=none; b=UHP2ZJbMQG+bj1qwzPuV4Y4rK05CoNiqm1uBhhji+gr53ItxBV+k2EzcyyocareEC4Ik9moB72E0TLw5Tl8gQCkfcpWdKAVttHzIBpNdxNz02+l8tVJq6e+YPg8BA6fcwNeXCz7E32lpT50OoilliCCBn0p2+ba+quzp9fA7eNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741760677; c=relaxed/simple;
-	bh=52KWLMNDnC2bO1o3Dn04dfvx/1r5V1bL7sOW+Y4zhkE=;
+	s=arc-20240116; t=1741760678; c=relaxed/simple;
+	bh=pAJhwx/vbd+eEc3f8vaPYZ88D46Dr5bfyZW6vR4tT0c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J19Z1Bt+JH/8cfCj63KqPn7SDC8tC6hNg3YjnYX7tUgCBshhxhYcMSQ/kg3nOw1wx/UAYdYCnJPJNO3j040wev0n/iCIO9Z4rpPVBkvBftXkO5rfBMX9XnSkA/XO76M/cL+8PmOfI5pCnOA1Cw3BuQzSDsfQyUsYTXr1ilG7SVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QahoktNA; arc=none smtp.client-ip=198.175.65.18
+	 MIME-Version; b=i0mUj2CFg2Pp7o9Jf2uIp/u9gb+Ip4oJegPUSMkV/l9LJqbThm6UYzwVMvt3O6eY0iSZYoyZQXGh4dxMHhxoQrif+Q173hI65iS+GSCWm8q9CGTHc5zAPL+cEGmTs27kr7Li/hHMnKxxTfp//ermkG6aSwf/6woVcYLCTUOgS3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Y24MT1Bq; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741760673; x=1773296673;
+  t=1741760676; x=1773296676;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=52KWLMNDnC2bO1o3Dn04dfvx/1r5V1bL7sOW+Y4zhkE=;
-  b=QahoktNAHMEnlpmCeKd7Vpr2obxJwgqCqXjKTsabOUTzG8PGEczoryFL
-   9N7D6jaJimrFuVQZNRRQ1pM1eSs0KjpyCc0k2CiSnYy8DyAn81m9uHKRL
-   Nf/D+NE1r8kI675lt+yBCPpJVBnYxwgPEpMw/t5bAcHgfLDvycPrxymaU
-   ptdo5C4bWRTgafT+6A2B7ny+/fpMGQlVZ4MbG0fHrJvnZhivSYIJrevTp
-   MKPUdC+bIe36bVs3gEVd1Nrb48cfBJmMERsDLomGuGL/DSvjuun2WHZp7
-   FdjEuKVVgNZHs0gpNccZTICCkRGz1rVKPuHw6QscKq3yP3bGp7s4GDrWQ
-   g==;
-X-CSE-ConnectionGUID: tkUILb9LR3iat0zc6yDYOQ==
-X-CSE-MsgGUID: WZX/h8ybRkebHooPUnsC8g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11370"; a="43005546"
+  bh=pAJhwx/vbd+eEc3f8vaPYZ88D46Dr5bfyZW6vR4tT0c=;
+  b=Y24MT1BqFNmmXZhY+wh+9gxAvVfvJ0W3A1wJVVcsO8sslSFXN17V5COO
+   rtOX3QXjNex+MjoG3Gp5QS+Kk+Si2PwnekU1hJvKojg6XwTBrNz6mqISa
+   7Oht5pBQ7Dpw/V4HP2N42EwaSgExGQ/O5w1yMZttk+FEkEgG+vvANm4pG
+   B470U2bjg+wDIULVeqiWQoWG9ZI4Md6blQKzMNgzco85GACpXaK2Bk5wa
+   npQqGHQfa1ITobtHkU61VBAhqyDKIn8/D7d/tw+8zFPByV+JTnp+M2rbl
+   CjbRJ8lo3szgMxcTWiux34qenjZcW3gN/oUlkkIq3h82ktBYfjodnhGJn
+   w==;
+X-CSE-ConnectionGUID: sg7JluPsQMuZQCziPy/D+Q==
+X-CSE-MsgGUID: IQqwMkILQXyNa83Ksj2r/w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11370"; a="43005554"
 X-IronPort-AV: E=Sophos;i="6.14,240,1736841600"; 
-   d="scan'208";a="43005546"
+   d="scan'208";a="43005554"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2025 23:24:33 -0700
-X-CSE-ConnectionGUID: AV1pEg4mTrqm/Uvan+MLLw==
-X-CSE-MsgGUID: Zb3SoBj1SbqIrRuo8N0/6w==
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2025 23:24:35 -0700
+X-CSE-ConnectionGUID: PWWhLVafTLK4EV6Yiy5Ytg==
+X-CSE-MsgGUID: QiNBMJm7QYeUvEuQ8+gW3A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.14,240,1736841600"; 
-   d="scan'208";a="120569473"
+   d="scan'208";a="120569488"
 Received: from gk3153-dr2-r750-36946.igk.intel.com ([10.102.20.192])
-  by fmviesa007.fm.intel.com with ESMTP; 11 Mar 2025 23:24:29 -0700
+  by fmviesa007.fm.intel.com with ESMTP; 11 Mar 2025 23:24:32 -0700
 From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
@@ -67,9 +67,9 @@ Cc: netdev@vger.kernel.org,
 	aleksandr.loktionov@intel.com,
 	jedrzej.jagielski@intel.com,
 	larysa.zaremba@intel.com
-Subject: [iwl-next v1 1/8] ice, libie: move generic adminq descriptors to lib
-Date: Wed, 12 Mar 2025 07:24:19 +0100
-Message-ID: <20250312062426.2544608-2-michal.swiatkowski@linux.intel.com>
+Subject: [iwl-next v1 2/8] ixgbe: use libie adminq descriptors
+Date: Wed, 12 Mar 2025 07:24:20 +0100
+Message-ID: <20250312062426.2544608-3-michal.swiatkowski@linux.intel.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20250312062426.2544608-1-michal.swiatkowski@linux.intel.com>
 References: <20250312062426.2544608-1-michal.swiatkowski@linux.intel.com>
@@ -81,98 +81,136 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The descriptor structure is the same in ice, ixgbe and i40e. Move it to
-common libie header to use it across different driver.
+Use libie_aq_desc instead of ixgbe_aci_desc. Do needed changes to allow
+clean build.
 
-Leave device specific adminq commands in separate folders. This lead to
-a change that need to be done in filling/getting descriptor:
-- previous: struct specific_desc *cmd;
-	    cmd = &desc.params.specific_desc;
-- now: struct specific_desc *cmd;
-       cmd = libie_aq_raw(&desc);
+Move additional caps used in ixgbe to libie.
 
-Do this changes across the driver to allow clean build. The casting only
-have to be done in case of specific descriptors, for generic one union
-can still be used.
-
-Changes beside code moving:
-- change ICE_ prefix to LIBIE_ prefix (ice_ and libie_ too)
-- remove shift variables not otherwise needed (in libie_aq_flags)
-- fill/get descriptor data based on desc.params.raw whenever the
-  descriptor isn't defined in libie
-- move defines from the libie_aq_sth structure outside
-- add libie_aq_raw helper and use it instead of explicit casting
-
-Reviewed by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice.h          |   2 +-
- .../net/ethernet/intel/ice/ice_adminq_cmd.h   | 267 +------------
- drivers/net/ethernet/intel/ice/ice_common.h   |   6 +-
- drivers/net/ethernet/intel/ice/ice_controlq.h |   8 +-
- include/linux/net/intel/libie/adminq.h        | 272 +++++++++++++
- .../net/ethernet/intel/ice/devlink/health.c   |   4 +-
- drivers/net/ethernet/intel/ice/ice_common.c   | 376 +++++++++---------
- drivers/net/ethernet/intel/ice/ice_controlq.c |  53 +--
- drivers/net/ethernet/intel/ice/ice_dcb.c      |  36 +-
- drivers/net/ethernet/intel/ice/ice_dcb_lib.c  |   2 +-
- drivers/net/ethernet/intel/ice/ice_ddp.c      |  47 +--
- .../net/ethernet/intel/ice/ice_fw_update.c    |  24 +-
- drivers/net/ethernet/intel/ice/ice_fwlog.c    |  16 +-
- drivers/net/ethernet/intel/ice/ice_lag.c      |   4 +-
- drivers/net/ethernet/intel/ice/ice_lib.c      |   6 +-
- drivers/net/ethernet/intel/ice/ice_main.c     |  34 +-
- drivers/net/ethernet/intel/ice/ice_nvm.c      |  38 +-
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c   |  20 +-
- drivers/net/ethernet/intel/ice/ice_sched.c    |  18 +-
- drivers/net/ethernet/intel/ice/ice_sriov.c    |   4 +-
- drivers/net/ethernet/intel/ice/ice_switch.c   |  55 +--
- drivers/net/ethernet/intel/ice/ice_vf_mbx.c   |   6 +-
- drivers/net/ethernet/intel/ice/ice_virtchnl.c |   2 +-
- .../net/ethernet/intel/ice/ice_vlan_mode.c    |   6 +-
- 24 files changed, 666 insertions(+), 640 deletions(-)
- create mode 100644 include/linux/net/intel/libie/adminq.h
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |  12 +-
+ .../ethernet/intel/ixgbe/ixgbe_type_e610.h    | 226 +--------------
+ include/linux/net/intel/libie/adminq.h        |  16 ++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 272 +++++++++---------
+ .../ethernet/intel/ixgbe/ixgbe_fw_update.c    |   4 +-
+ 5 files changed, 165 insertions(+), 365 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-index 2694951a0b1d..be4587893850 100644
---- a/drivers/net/ethernet/intel/ice/ice.h
-+++ b/drivers/net/ethernet/intel/ice/ice.h
-@@ -964,7 +964,7 @@ int ice_plug_aux_dev(struct ice_pf *pf);
- void ice_unplug_aux_dev(struct ice_pf *pf);
- int ice_init_rdma(struct ice_pf *pf);
- void ice_deinit_rdma(struct ice_pf *pf);
--const char *ice_aq_str(enum ice_aq_err aq_err);
-+const char *ice_aq_str(enum libie_aq_err aq_err);
- bool ice_is_wol_supported(struct ice_hw *hw);
- void ice_fdir_del_all_fltrs(struct ice_vsi *vsi);
- int
-diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-index bdee499f991a..4115493533e1 100644
---- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
+index c97623fb10ac..20185346c357 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
+@@ -6,15 +6,15 @@
+ 
+ #include "ixgbe_type.h"
+ 
+-int ixgbe_aci_send_cmd(struct ixgbe_hw *hw, struct ixgbe_aci_desc *desc,
++int ixgbe_aci_send_cmd(struct ixgbe_hw *hw, struct libie_aq_desc *desc,
+ 		       void *buf, u16 buf_size);
+ bool ixgbe_aci_check_event_pending(struct ixgbe_hw *hw);
+ int ixgbe_aci_get_event(struct ixgbe_hw *hw, struct ixgbe_aci_event *e,
+ 			bool *pending);
+-void ixgbe_fill_dflt_direct_cmd_desc(struct ixgbe_aci_desc *desc, u16 opcode);
+-int ixgbe_acquire_res(struct ixgbe_hw *hw, enum ixgbe_aci_res_ids res,
+-		      enum ixgbe_aci_res_access_type access, u32 timeout);
+-void ixgbe_release_res(struct ixgbe_hw *hw, enum ixgbe_aci_res_ids res);
++void ixgbe_fill_dflt_direct_cmd_desc(struct libie_aq_desc *desc, u16 opcode);
++int ixgbe_acquire_res(struct ixgbe_hw *hw, enum libie_aq_res_id res,
++		      enum libie_aq_res_access_type access, u32 timeout);
++void ixgbe_release_res(struct ixgbe_hw *hw, enum libie_aq_res_id res);
+ int ixgbe_aci_list_caps(struct ixgbe_hw *hw, void *buf, u16 buf_size,
+ 			u32 *cap_count, enum ixgbe_aci_opc opc);
+ int ixgbe_discover_dev_caps(struct ixgbe_hw *hw,
+@@ -62,7 +62,7 @@ int ixgbe_aci_get_netlist_node(struct ixgbe_hw *hw,
+ 			       struct ixgbe_aci_cmd_get_link_topo *cmd,
+ 			       u8 *node_part_number, u16 *node_handle);
+ int ixgbe_acquire_nvm(struct ixgbe_hw *hw,
+-		      enum ixgbe_aci_res_access_type access);
++		      enum libie_aq_res_access_type access);
+ void ixgbe_release_nvm(struct ixgbe_hw *hw);
+ int ixgbe_aci_read_nvm(struct ixgbe_hw *hw, u16 module_typeid, u32 offset,
+ 		       u16 length, void *data, bool last_command,
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
+index 09df67f03cf4..d2f22d8558f8 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
 @@ -4,6 +4,8 @@
- #ifndef _ICE_ADMINQ_CMD_H_
- #define _ICE_ADMINQ_CMD_H_
+ #ifndef _IXGBE_TYPE_E610_H_
+ #define _IXGBE_TYPE_E610_H_
  
 +#include <linux/net/intel/libie/adminq.h>
 +
- /* This header file defines the Admin Queue commands, error codes and
-  * descriptor format. It is shared between Firmware and Software.
-  */
-@@ -19,38 +21,6 @@
- typedef struct __packed { u8 buf[ICE_RXQ_CTX_SZ]; } ice_rxq_ctx_buf_t;
- typedef struct __packed { u8 buf[ICE_TXQ_CTX_SZ]; } ice_txq_ctx_buf_t;
+ #define BYTES_PER_DWORD	4
  
--struct ice_aqc_generic {
--	__le32 param0;
--	__le32 param1;
--	__le32 addr_high;
--	__le32 addr_low;
+ /* General E610 defines */
+@@ -135,60 +137,6 @@
+ /* [ms] timeout of waiting for resource release */
+ #define IXGBE_ACI_RELEASE_RES_TIMEOUT		10000
+ 
+-/* FW defined boundary for a large buffer, 4k >= Large buffer > 512 bytes */
+-#define IXGBE_ACI_LG_BUF		512
+-
+-/* Flags sub-structure
+- * |0  |1  |2  |3  |4  |5  |6  |7  |8  |9  |10 |11 |12 |13 |14 |15 |
+- * |DD |CMP|ERR|VFE| * *  RESERVED * * |LB |RD |VFC|BUF|SI |EI |FE |
+- */
+-
+-#define IXGBE_ACI_FLAG_DD	BIT(0) /* 0x1 */
+-#define IXGBE_ACI_FLAG_CMP	BIT(1) /* 0x2 */
+-#define IXGBE_ACI_FLAG_ERR	BIT(2) /* 0x4 */
+-#define IXGBE_ACI_FLAG_VFE	BIT(3) /* 0x8 */
+-#define IXGBE_ACI_FLAG_LB	BIT(9) /* 0x200 */
+-#define IXGBE_ACI_FLAG_RD	BIT(10) /* 0x400 */
+-#define IXGBE_ACI_FLAG_VFC	BIT(11) /* 0x800 */
+-#define IXGBE_ACI_FLAG_BUF	BIT(12) /* 0x1000 */
+-#define IXGBE_ACI_FLAG_SI	BIT(13) /* 0x2000 */
+-#define IXGBE_ACI_FLAG_EI	BIT(14) /* 0x4000 */
+-#define IXGBE_ACI_FLAG_FE	BIT(15) /* 0x8000 */
+-
+-/* Admin Command Interface (ACI) error codes */
+-enum ixgbe_aci_err {
+-	IXGBE_ACI_RC_OK		= 0,  /* Success */
+-	IXGBE_ACI_RC_EPERM	= 1,  /* Operation not permitted */
+-	IXGBE_ACI_RC_ENOENT	= 2,  /* No such element */
+-	IXGBE_ACI_RC_ESRCH	= 3,  /* Bad opcode */
+-	IXGBE_ACI_RC_EINTR	= 4,  /* Operation interrupted */
+-	IXGBE_ACI_RC_EIO	= 5,  /* I/O error */
+-	IXGBE_ACI_RC_ENXIO	= 6,  /* No such resource */
+-	IXGBE_ACI_RC_E2BIG	= 7,  /* Arg too long */
+-	IXGBE_ACI_RC_EAGAIN	= 8,  /* Try again */
+-	IXGBE_ACI_RC_ENOMEM	= 9,  /* Out of memory */
+-	IXGBE_ACI_RC_EACCES	= 10, /* Permission denied */
+-	IXGBE_ACI_RC_EFAULT	= 11, /* Bad address */
+-	IXGBE_ACI_RC_EBUSY	= 12, /* Device or resource busy */
+-	IXGBE_ACI_RC_EEXIST	= 13, /* Object already exists */
+-	IXGBE_ACI_RC_EINVAL	= 14, /* Invalid argument */
+-	IXGBE_ACI_RC_ENOTTY	= 15, /* Not a typewriter */
+-	IXGBE_ACI_RC_ENOSPC	= 16, /* No space left or alloc failure */
+-	IXGBE_ACI_RC_ENOSYS	= 17, /* Function not implemented */
+-	IXGBE_ACI_RC_ERANGE	= 18, /* Parameter out of range */
+-	IXGBE_ACI_RC_EFLUSHED	= 19, /* Cmd flushed due to prev cmd error */
+-	IXGBE_ACI_RC_BAD_ADDR	= 20, /* Descriptor contains a bad pointer */
+-	IXGBE_ACI_RC_EMODE	= 21, /* Op not allowed in current dev mode */
+-	IXGBE_ACI_RC_EFBIG	= 22, /* File too big */
+-	IXGBE_ACI_RC_ESBCOMP	= 23, /* SB-IOSF completion unsuccessful */
+-	IXGBE_ACI_RC_ENOSEC	= 24, /* Missing security manifest */
+-	IXGBE_ACI_RC_EBADSIG	= 25, /* Bad RSA signature */
+-	IXGBE_ACI_RC_ESVN	= 26, /* SVN number prohibits this package */
+-	IXGBE_ACI_RC_EBADMAN	= 27, /* Manifest hash mismatch */
+-	IXGBE_ACI_RC_EBADBUF	= 28, /* Buffer hash mismatches manifest */
+-	IXGBE_ACI_RC_EACCES_BMCU	= 29, /* BMC Update in progress */
 -};
 -
+ /* Admin Command Interface (ACI) opcodes */
+ enum ixgbe_aci_opc {
+ 	ixgbe_aci_opc_get_ver				= 0x0001,
+@@ -265,33 +213,8 @@ enum ixgbe_aci_opc {
+ 	ixgbe_aci_opc_clear_health_status		= 0xFF23,
+ };
+ 
 -/* Get version (direct 0x0001) */
--struct ice_aqc_get_ver {
+-struct ixgbe_aci_cmd_get_ver {
 -	__le32 rom_ver;
 -	__le32 fw_build;
 -	u8 fw_branch;
@@ -185,8 +223,10 @@ index bdee499f991a..4115493533e1 100644
 -	u8 api_patch;
 -};
 -
+ #define IXGBE_DRV_VER_STR_LEN_E610	32
+ 
 -/* Send driver version (indirect 0x0002) */
--struct ice_aqc_driver_ver {
+-struct ixgbe_aci_cmd_driver_ver {
 -	u8 major_ver;
 -	u8 minor_ver;
 -	u8 build_ver;
@@ -196,49 +236,54 @@ index bdee499f991a..4115493533e1 100644
 -	__le32 addr_low;
 -};
 -
- /* Queue Shutdown (direct 0x0003) */
- struct ice_aqc_q_shutdown {
- 	u8 driver_unloading;
-@@ -58,94 +28,6 @@ struct ice_aqc_q_shutdown {
- 	u8 reserved[15];
- };
+ /* Get Expanded Error Code (0x0005, direct) */
+ struct ixgbe_aci_cmd_get_exp_err {
+ 	__le32 reason;
+@@ -303,98 +226,6 @@ struct ixgbe_aci_cmd_get_exp_err {
+ /* FW update timeout definitions are in milliseconds */
+ #define IXGBE_NVM_TIMEOUT		180000
  
+-enum ixgbe_aci_res_access_type {
+-	IXGBE_RES_READ = 1,
+-	IXGBE_RES_WRITE
+-};
+-
+-enum ixgbe_aci_res_ids {
+-	IXGBE_NVM_RES_ID = 1,
+-	IXGBE_SPD_RES_ID,
+-	IXGBE_CHANGE_LOCK_RES_ID,
+-	IXGBE_GLOBAL_CFG_LOCK_RES_ID
+-};
+-
 -/* Request resource ownership (direct 0x0008)
 - * Release resource ownership (direct 0x0009)
 - */
--struct ice_aqc_req_res {
+-struct ixgbe_aci_cmd_req_res {
 -	__le16 res_id;
--#define ICE_AQC_RES_ID_NVM		1
--#define ICE_AQC_RES_ID_SDP		2
--#define ICE_AQC_RES_ID_CHNG_LOCK	3
--#define ICE_AQC_RES_ID_GLBL_LOCK	4
 -	__le16 access_type;
--#define ICE_AQC_RES_ACCESS_READ		1
--#define ICE_AQC_RES_ACCESS_WRITE	2
 -
 -	/* Upon successful completion, FW writes this value and driver is
 -	 * expected to release resource before timeout. This value is provided
 -	 * in milliseconds.
 -	 */
 -	__le32 timeout;
--#define ICE_AQ_RES_NVM_READ_DFLT_TIMEOUT_MS	3000
--#define ICE_AQ_RES_NVM_WRITE_DFLT_TIMEOUT_MS	180000
--#define ICE_AQ_RES_CHNG_LOCK_DFLT_TIMEOUT_MS	1000
--#define ICE_AQ_RES_GLBL_LOCK_DFLT_TIMEOUT_MS	3000
+-#define IXGBE_ACI_RES_NVM_READ_DFLT_TIMEOUT_MS	3000
+-#define IXGBE_ACI_RES_NVM_WRITE_DFLT_TIMEOUT_MS	180000
+-#define IXGBE_ACI_RES_CHNG_LOCK_DFLT_TIMEOUT_MS	1000
+-#define IXGBE_ACI_RES_GLBL_LOCK_DFLT_TIMEOUT_MS	3000
 -	/* For SDP: pin ID of the SDP */
 -	__le32 res_number;
--	/* Status is only used for ICE_AQC_RES_ID_GLBL_LOCK */
 -	__le16 status;
--#define ICE_AQ_RES_GLBL_SUCCESS		0
--#define ICE_AQ_RES_GLBL_IN_PROG		1
--#define ICE_AQ_RES_GLBL_DONE		2
+-#define IXGBE_ACI_RES_GLBL_SUCCESS		0
+-#define IXGBE_ACI_RES_GLBL_IN_PROG		1
+-#define IXGBE_ACI_RES_GLBL_DONE			2
 -	u8 reserved[2];
 -};
 -
 -/* Get function capabilities (indirect 0x000A)
 - * Get device capabilities (indirect 0x000B)
 - */
--struct ice_aqc_list_caps {
+-struct ixgbe_aci_cmd_list_caps {
 -	u8 cmd_flags;
 -	u8 pf_index;
 -	u8 reserved[2];
@@ -248,37 +293,36 @@ index bdee499f991a..4115493533e1 100644
 -};
 -
 -/* Device/Function buffer entry, repeated per reported capability */
--struct ice_aqc_list_caps_elem {
+-struct ixgbe_aci_cmd_list_caps_elem {
 -	__le16 cap;
--#define ICE_AQC_CAPS_VALID_FUNCTIONS			0x0005
--#define ICE_AQC_CAPS_SRIOV				0x0012
--#define ICE_AQC_CAPS_VF					0x0013
--#define ICE_AQC_CAPS_VSI				0x0017
--#define ICE_AQC_CAPS_DCB				0x0018
--#define ICE_AQC_CAPS_RSS				0x0040
--#define ICE_AQC_CAPS_RXQS				0x0041
--#define ICE_AQC_CAPS_TXQS				0x0042
--#define ICE_AQC_CAPS_MSIX				0x0043
--#define ICE_AQC_CAPS_FD					0x0045
--#define ICE_AQC_CAPS_1588				0x0046
--#define ICE_AQC_CAPS_MAX_MTU				0x0047
--#define ICE_AQC_CAPS_NVM_VER				0x0048
--#define ICE_AQC_CAPS_PENDING_NVM_VER			0x0049
--#define ICE_AQC_CAPS_OROM_VER				0x004A
--#define ICE_AQC_CAPS_PENDING_OROM_VER			0x004B
--#define ICE_AQC_CAPS_NET_VER				0x004C
--#define ICE_AQC_CAPS_PENDING_NET_VER			0x004D
--#define ICE_AQC_CAPS_RDMA				0x0051
--#define ICE_AQC_CAPS_SENSOR_READING			0x0067
--#define ICE_AQC_CAPS_PCIE_RESET_AVOIDANCE		0x0076
--#define ICE_AQC_CAPS_POST_UPDATE_RESET_RESTRICT		0x0077
--#define ICE_AQC_CAPS_NVM_MGMT				0x0080
--#define ICE_AQC_CAPS_TX_SCHED_TOPO_COMP_MODE		0x0085
--#define ICE_AQC_CAPS_NAC_TOPOLOGY			0x0087
--#define ICE_AQC_CAPS_FW_LAG_SUPPORT			0x0092
--#define ICE_AQC_BIT_ROCEV2_LAG				0x01
--#define ICE_AQC_BIT_SRIOV_LAG				0x02
--
+-#define IXGBE_ACI_CAPS_VALID_FUNCTIONS			0x0005
+-#define IXGBE_ACI_MAX_VALID_FUNCTIONS			0x8
+-#define IXGBE_ACI_CAPS_SRIOV				0x0012
+-#define IXGBE_ACI_CAPS_VF				0x0013
+-#define IXGBE_ACI_CAPS_VMDQ				0x0014
+-#define IXGBE_ACI_CAPS_VSI				0x0017
+-#define IXGBE_ACI_CAPS_DCB				0x0018
+-#define IXGBE_ACI_CAPS_RSS				0x0040
+-#define IXGBE_ACI_CAPS_RXQS				0x0041
+-#define IXGBE_ACI_CAPS_TXQS				0x0042
+-#define IXGBE_ACI_CAPS_MSIX				0x0043
+-#define IXGBE_ACI_CAPS_FD				0x0045
+-#define IXGBE_ACI_CAPS_1588				0x0046
+-#define IXGBE_ACI_CAPS_MAX_MTU				0x0047
+-#define IXGBE_ACI_CAPS_NVM_VER				0x0048
+-#define IXGBE_ACI_CAPS_PENDING_NVM_VER			0x0049
+-#define IXGBE_ACI_CAPS_OROM_VER				0x004A
+-#define IXGBE_ACI_CAPS_PENDING_OROM_VER			0x004B
+-#define IXGBE_ACI_CAPS_PENDING_NET_VER			0x004D
+-#define IXGBE_ACI_CAPS_INLINE_IPSEC			0x0070
+-#define IXGBE_ACI_CAPS_NUM_ENABLED_PORTS		0x0072
+-#define IXGBE_ACI_CAPS_PCIE_RESET_AVOIDANCE		0x0076
+-#define IXGBE_ACI_CAPS_POST_UPDATE_RESET_RESTRICT	0x0077
+-#define IXGBE_ACI_CAPS_NVM_MGMT				0x0080
+-#define IXGBE_ACI_CAPS_EXT_TOPO_DEV_IMG0		0x0081
+-#define IXGBE_ACI_CAPS_EXT_TOPO_DEV_IMG1		0x0082
+-#define IXGBE_ACI_CAPS_EXT_TOPO_DEV_IMG2		0x0083
+-#define IXGBE_ACI_CAPS_EXT_TOPO_DEV_IMG3		0x0084
 -	u8 major_ver;
 -	u8 minor_ver;
 -	/* Number of resources described by this capability */
@@ -291,31 +335,32 @@ index bdee499f991a..4115493533e1 100644
 -	__le64 rsvd2;
 -};
 -
- /* Manage MAC address, read command - indirect (0x0107)
-  * This struct is also used for the response
-  */
-@@ -2641,151 +2523,6 @@ struct ice_aqc_fw_log_cfg_resp {
- 	u8 rsvd0;
- };
+ /* Disable RXEN (direct 0x000C) */
+ struct ixgbe_aci_cmd_disable_rxen {
+ 	u8 lport_num;
+@@ -960,55 +791,6 @@ struct ixgbe_aci_cmd_nvm_comp_tbl {
+ 	u8 cvs[]; /* Component Version String */
+ } __packed;
  
 -/**
-- * struct ice_aq_desc - Admin Queue (AQ) descriptor
-- * @flags: ICE_AQ_FLAG_* flags
-- * @opcode: AQ command opcode
+- * struct ixgbe_aci_desc - Admin Command (AC) descriptor
+- * @flags: IXGBE_ACI_FLAG_* flags
+- * @opcode: Admin command opcode
 - * @datalen: length in bytes of indirect/external data buffer
 - * @retval: return value from firmware
 - * @cookie_high: opaque data high-half
 - * @cookie_low: opaque data low-half
 - * @params: command-specific parameters
 - *
-- * Descriptor format for commands the driver posts on the Admin Transmit Queue
-- * (ATQ). The firmware writes back onto the command descriptor and returns
+- * Descriptor format for commands the driver posts via the
+- * Admin Command Interface (ACI).
+- * The firmware writes back onto the command descriptor and returns
 - * the result of the command. Asynchronous events that are not an immediate
-- * result of the command are written to the Admin Receive Queue (ARQ) using
+- * result of the command are written to the Admin Command Interface (ACI) using
 - * the same descriptor format. Descriptors are in little-endian notation with
 - * 32-bit words.
 - */
--struct ice_aq_desc {
+-struct ixgbe_aci_desc {
 -	__le16 flags;
 -	__le16 opcode;
 -	__le16 datalen;
@@ -324,561 +369,725 @@ index bdee499f991a..4115493533e1 100644
 -	__le32 cookie_low;
 -	union {
 -		u8 raw[16];
--		struct ice_aqc_generic generic;
--		struct ice_aqc_get_ver get_ver;
--		struct ice_aqc_driver_ver driver_ver;
--		struct ice_aqc_q_shutdown q_shutdown;
--		struct ice_aqc_req_res res_owner;
--		struct ice_aqc_manage_mac_read mac_read;
--		struct ice_aqc_manage_mac_write mac_write;
--		struct ice_aqc_clear_pxe clear_pxe;
--		struct ice_aqc_list_caps get_cap;
--		struct ice_aqc_get_phy_caps get_phy;
--		struct ice_aqc_set_phy_cfg set_phy;
--		struct ice_aqc_restart_an restart_an;
--		struct ice_aqc_set_phy_rec_clk_out set_phy_rec_clk_out;
--		struct ice_aqc_get_phy_rec_clk_out get_phy_rec_clk_out;
--		struct ice_aqc_get_sensor_reading get_sensor_reading;
--		struct ice_aqc_get_sensor_reading_resp get_sensor_reading_resp;
--		struct ice_aqc_gpio read_write_gpio;
--		struct ice_aqc_sff_eeprom read_write_sff_param;
--		struct ice_aqc_set_port_id_led set_port_id_led;
--		struct ice_aqc_get_port_options get_port_options;
--		struct ice_aqc_set_port_option set_port_option;
--		struct ice_aqc_get_sw_cfg get_sw_conf;
--		struct ice_aqc_set_port_params set_port_params;
--		struct ice_aqc_sw_rules sw_rules;
--		struct ice_aqc_add_get_recipe add_get_recipe;
--		struct ice_aqc_recipe_to_profile recipe_to_profile;
--		struct ice_aqc_get_topo get_topo;
--		struct ice_aqc_sched_elem_cmd sched_elem_cmd;
--		struct ice_aqc_query_txsched_res query_sched_res;
--		struct ice_aqc_query_port_ets port_ets;
--		struct ice_aqc_rl_profile rl_profile;
--		struct ice_aqc_nvm nvm;
--		struct ice_aqc_nvm_checksum nvm_checksum;
--		struct ice_aqc_nvm_pkg_data pkg_data;
--		struct ice_aqc_nvm_pass_comp_tbl pass_comp_tbl;
--		struct ice_aqc_pf_vf_msg virt;
--		struct ice_aqc_set_query_pfc_mode set_query_pfc_mode;
--		struct ice_aqc_lldp_get_mib lldp_get_mib;
--		struct ice_aqc_lldp_set_mib_change lldp_set_event;
--		struct ice_aqc_lldp_stop lldp_stop;
--		struct ice_aqc_lldp_start lldp_start;
--		struct ice_aqc_lldp_set_local_mib lldp_set_mib;
--		struct ice_aqc_lldp_stop_start_specific_agent lldp_agent_ctrl;
--		struct ice_aqc_lldp_filter_ctrl lldp_filter_ctrl;
--		struct ice_aqc_get_set_rss_lut get_set_rss_lut;
--		struct ice_aqc_get_set_rss_key get_set_rss_key;
--		struct ice_aqc_neigh_dev_req neigh_dev;
--		struct ice_aqc_add_txqs add_txqs;
--		struct ice_aqc_dis_txqs dis_txqs;
--		struct ice_aqc_cfg_txqs cfg_txqs;
--		struct ice_aqc_add_rdma_qset add_rdma_qset;
--		struct ice_aqc_add_get_update_free_vsi vsi_cmd;
--		struct ice_aqc_add_update_free_vsi_resp add_update_free_vsi_res;
--		struct ice_aqc_download_pkg download_pkg;
--		struct ice_aqc_set_cgu_input_config set_cgu_input_config;
--		struct ice_aqc_get_cgu_input_config get_cgu_input_config;
--		struct ice_aqc_set_cgu_output_config set_cgu_output_config;
--		struct ice_aqc_get_cgu_output_config get_cgu_output_config;
--		struct ice_aqc_get_cgu_dpll_status get_cgu_dpll_status;
--		struct ice_aqc_set_cgu_dpll_config set_cgu_dpll_config;
--		struct ice_aqc_set_cgu_ref_prio set_cgu_ref_prio;
--		struct ice_aqc_get_cgu_ref_prio get_cgu_ref_prio;
--		struct ice_aqc_get_cgu_info get_cgu_info;
--		struct ice_aqc_driver_shared_params drv_shared_params;
--		struct ice_aqc_fw_log fw_log;
--		struct ice_aqc_set_mac_lb set_mac_lb;
--		struct ice_aqc_alloc_free_res_cmd sw_res_ctrl;
--		struct ice_aqc_set_mac_cfg set_mac_cfg;
--		struct ice_aqc_set_event_mask set_event_mask;
--		struct ice_aqc_get_link_status get_link_status;
--		struct ice_aqc_event_lan_overflow lan_overflow;
--		struct ice_aqc_get_link_topo get_link_topo;
--		struct ice_aqc_set_health_status_cfg set_health_status_cfg;
--		struct ice_aqc_get_health_status get_health_status;
--		struct ice_aqc_dnl_call_command dnl_call;
--		struct ice_aqc_i2c read_write_i2c;
--		struct ice_aqc_read_i2c_resp read_i2c_resp;
--		struct ice_aqc_get_set_tx_topo get_set_tx_topo;
+-		struct ixgbe_aci_cmd_get_ver get_ver;
+-		struct ixgbe_aci_cmd_driver_ver driver_ver;
+-		struct ixgbe_aci_cmd_get_exp_err exp_err;
+-		struct ixgbe_aci_cmd_req_res res_owner;
+-		struct ixgbe_aci_cmd_list_caps get_cap;
+-		struct ixgbe_aci_cmd_disable_rxen disable_rxen;
+-		struct ixgbe_aci_cmd_get_phy_caps get_phy;
+-		struct ixgbe_aci_cmd_set_phy_cfg set_phy;
+-		struct ixgbe_aci_cmd_restart_an restart_an;
+-		struct ixgbe_aci_cmd_get_link_status get_link_status;
+-		struct ixgbe_aci_cmd_set_event_mask set_event_mask;
+-		struct ixgbe_aci_cmd_set_port_id_led set_port_id_led;
+-		struct ixgbe_aci_cmd_get_link_topo get_link_topo;
+-		struct ixgbe_aci_cmd_get_link_topo_pin get_link_topo_pin;
+-		struct ixgbe_aci_cmd_sff_eeprom read_write_sff_param;
+-		struct ixgbe_aci_cmd_nvm nvm;
+-		struct ixgbe_aci_cmd_nvm_checksum nvm_checksum;
+-		struct ixgbe_aci_cmd_nvm_pkg_data pkg_data;
+-		struct ixgbe_aci_cmd_nvm_pass_comp_tbl pass_comp_tbl;
 -	} params;
 -};
 -
--/* FW defined boundary for a large buffer, 4k >= Large buffer > 512 bytes */
--#define ICE_AQ_LG_BUF	512
--
--#define ICE_AQ_FLAG_DD_S	0
--#define ICE_AQ_FLAG_CMP_S	1
--#define ICE_AQ_FLAG_ERR_S	2
--#define ICE_AQ_FLAG_LB_S	9
--#define ICE_AQ_FLAG_RD_S	10
--#define ICE_AQ_FLAG_BUF_S	12
--#define ICE_AQ_FLAG_SI_S	13
--
--#define ICE_AQ_FLAG_DD		BIT(ICE_AQ_FLAG_DD_S)  /* 0x1    */
--#define ICE_AQ_FLAG_CMP		BIT(ICE_AQ_FLAG_CMP_S) /* 0x2    */
--#define ICE_AQ_FLAG_ERR		BIT(ICE_AQ_FLAG_ERR_S) /* 0x4    */
--#define ICE_AQ_FLAG_LB		BIT(ICE_AQ_FLAG_LB_S)  /* 0x200  */
--#define ICE_AQ_FLAG_RD		BIT(ICE_AQ_FLAG_RD_S)  /* 0x400  */
--#define ICE_AQ_FLAG_BUF		BIT(ICE_AQ_FLAG_BUF_S) /* 0x1000 */
--#define ICE_AQ_FLAG_SI		BIT(ICE_AQ_FLAG_SI_S)  /* 0x2000 */
--
--/* error codes */
--enum ice_aq_err {
--	ICE_AQ_RC_OK		= 0,  /* Success */
--	ICE_AQ_RC_EPERM		= 1,  /* Operation not permitted */
--	ICE_AQ_RC_ENOENT	= 2,  /* No such element */
--	ICE_AQ_RC_ENOMEM	= 9,  /* Out of memory */
--	ICE_AQ_RC_EBUSY		= 12, /* Device or resource busy */
--	ICE_AQ_RC_EEXIST	= 13, /* Object already exists */
--	ICE_AQ_RC_EINVAL	= 14, /* Invalid argument */
--	ICE_AQ_RC_ENOSPC	= 16, /* No space left or allocation failure */
--	ICE_AQ_RC_ENOSYS	= 17, /* Function not implemented */
--	ICE_AQ_RC_EMODE		= 21, /* Op not allowed in current dev mode */
--	ICE_AQ_RC_ENOSEC	= 24, /* Missing security manifest */
--	ICE_AQ_RC_EBADSIG	= 25, /* Bad RSA signature */
--	ICE_AQ_RC_ESVN		= 26, /* SVN number prohibits this package */
--	ICE_AQ_RC_EBADMAN	= 27, /* Manifest hash mismatch */
--	ICE_AQ_RC_EBADBUF	= 28, /* Buffer hash mismatches manifest */
--};
--
- /* Admin Queue command opcodes */
- enum ice_adminq_opc {
- 	/* AQ commands */
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
-index 64c530b39191..da5b27242abf 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.h
-+++ b/drivers/net/ethernet/intel/ice/ice_common.h
-@@ -68,7 +68,7 @@ bool ice_is_sbq_supported(struct ice_hw *hw);
- struct ice_ctl_q_info *ice_get_sbq(struct ice_hw *hw);
- int
- ice_sq_send_cmd(struct ice_hw *hw, struct ice_ctl_q_info *cq,
--		struct ice_aq_desc *desc, void *buf, u16 buf_size,
-+		struct libie_aq_desc *desc, void *buf, u16 buf_size,
- 		struct ice_sq_cd *cd);
- void ice_clear_pxe_mode(struct ice_hw *hw);
- int ice_get_caps(struct ice_hw *hw);
-@@ -91,14 +91,14 @@ ice_aq_set_rss_key(struct ice_hw *hw, u16 vsi_handle,
+ /* E610-specific adapter context structures */
  
- bool ice_check_sq_alive(struct ice_hw *hw, struct ice_ctl_q_info *cq);
- int ice_aq_q_shutdown(struct ice_hw *hw, bool unloading);
--void ice_fill_dflt_direct_cmd_desc(struct ice_aq_desc *desc, u16 opcode);
-+void ice_fill_dflt_direct_cmd_desc(struct libie_aq_desc *desc, u16 opcode);
+ struct ixgbe_link_status {
+@@ -1172,7 +954,7 @@ struct ixgbe_hw_dev_caps {
  
- void ice_pack_txq_ctx(const struct ice_tlan_ctx *ctx, ice_txq_ctx_buf_t *buf);
- 
- extern struct mutex ice_global_cfg_lock_sw;
- 
- int
--ice_aq_send_cmd(struct ice_hw *hw, struct ice_aq_desc *desc,
-+ice_aq_send_cmd(struct ice_hw *hw, struct libie_aq_desc *desc,
- 		void *buf, u16 buf_size, struct ice_sq_cd *cd);
- int ice_aq_get_fw_ver(struct ice_hw *hw, struct ice_sq_cd *cd);
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_controlq.h b/drivers/net/ethernet/intel/ice/ice_controlq.h
-index ca97b7365a1b..788040dd662e 100644
---- a/drivers/net/ethernet/intel/ice/ice_controlq.h
-+++ b/drivers/net/ethernet/intel/ice/ice_controlq.h
-@@ -12,7 +12,7 @@
- #define ICE_SBQ_MAX_BUF_LEN 512
- 
- #define ICE_CTL_Q_DESC(R, i) \
--	(&(((struct ice_aq_desc *)((R).desc_buf.va))[i]))
-+	(&(((struct libie_aq_desc *)((R).desc_buf.va))[i]))
- 
- #define ICE_CTL_Q_DESC_UNUSED(R) \
- 	((u16)((((R)->next_to_clean > (R)->next_to_use) ? 0 : (R)->count) + \
-@@ -76,12 +76,12 @@ struct ice_ctl_q_ring {
- 
- /* sq transaction details */
- struct ice_sq_cd {
--	struct ice_aq_desc *wb_desc;
-+	struct libie_aq_desc *wb_desc;
- };
- 
- /* rq event information */
- struct ice_rq_event_info {
--	struct ice_aq_desc desc;
+ /* ACI event information */
+ struct ixgbe_aci_event {
+-	struct ixgbe_aci_desc desc;
 +	struct libie_aq_desc desc;
+ 	u8 *msg_buf;
  	u16 msg_len;
  	u16 buf_len;
- 	u8 *msg_buf;
-@@ -96,7 +96,7 @@ struct ice_ctl_q_info {
- 	u16 num_sq_entries;		/* send queue depth */
- 	u16 rq_buf_size;		/* receive queue buffer size */
- 	u16 sq_buf_size;		/* send queue buffer size */
--	enum ice_aq_err sq_last_status;	/* last status on send queue */
-+	enum libie_aq_err sq_last_status;	/* last status on send queue */
- 	struct mutex sq_lock;		/* Send queue lock */
- 	struct mutex rq_lock;		/* Receive queue lock */
+@@ -1180,7 +962,7 @@ struct ixgbe_aci_event {
+ 
+ struct ixgbe_aci_info {
+ 	struct mutex lock;		/* admin command interface lock */
+-	enum ixgbe_aci_err last_status;	/* last status of sent admin command */
++	enum libie_aq_err last_status;	/* last status of sent admin command */
  };
+ 
+ enum ixgbe_bank_select {
 diff --git a/include/linux/net/intel/libie/adminq.h b/include/linux/net/intel/libie/adminq.h
-new file mode 100644
-index 000000000000..9bc7e99e399b
---- /dev/null
+index 9bc7e99e399b..5963cd3e268f 100644
+--- a/include/linux/net/intel/libie/adminq.h
 +++ b/include/linux/net/intel/libie/adminq.h
-@@ -0,0 +1,272 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/* Copyright (C) 2025 Intel Corporation */
-+
-+#ifndef __LIBIE_ADMINQ_H
-+#define __LIBIE_ADMINQ_H
-+
-+#include <linux/build_bug.h>
-+#include <linux/types.h>
-+
-+#define LIBIE_CHECK_STRUCT_LEN(n, X)	\
-+	static_assert((n) == sizeof(struct X))
-+
-+/**
-+ * struct libie_aqc_generic
-+ * @param: generic parameter
-+ * @addr: generic address
-+ */
-+struct libie_aqc_generic {
-+	__le32 param0;
-+	__le32 param1;
-+	__le32 addr_high;
-+	__le32 addr_low;
-+};
-+LIBIE_CHECK_STRUCT_LEN(16, libie_aqc_generic);
-+
-+/**
-+ * struct libie_aqc_get_ver
-+ * @rom_ver: rom version
-+ * @fw_build: number coressponding to firmware build
-+ * @fw_branch: branch identifier of firmware version
-+ * @fw_major: major number of firmware version
-+ * @fw_minor: minor number of firmware version
-+ * @fw_patch: patch of firmware version
-+ * @api_branch: brancch identifier of API version
-+ * @api_major: major number of API version
-+ * @api_minor: minor number of API version
-+ * @api_patch: patch of API version
-+ *
-+ * Used in command get version (direct 0x0001)
-+ */
-+struct libie_aqc_get_ver {
-+	__le32	rom_ver;
-+	__le32	fw_build;
-+	u8	fw_branch;
-+	u8	fw_major;
-+	u8	fw_minor;
-+	u8	fw_patch;
-+	u8	api_branch;
-+	u8	api_major;
-+	u8	api_minor;
-+	u8	api_patch;
-+};
-+LIBIE_CHECK_STRUCT_LEN(16, libie_aqc_get_ver);
-+
-+/**
-+ * struct libie_aqc_driver_ver
-+ * @major_ver: driver major version
-+ * @minor_ver: driver minor version
-+ * @build_ver: driver build version
-+ * @subbuild_ver: driver subbuild version
-+ * @reserved: for feature use
-+ * @addr_high: high part of response address buff
-+ * @addr_low: low part of response address buff
-+ *
-+ * Used in command send driver version (indirect 0x0002)
-+ */
-+struct libie_aqc_driver_ver {
-+	u8	major_ver;
-+	u8	minor_ver;
-+	u8	build_ver;
-+	u8	subbuild_ver;
-+	u8	reserved[4];
-+	__le32	addr_high;
-+	__le32	addr_low;
-+};
-+LIBIE_CHECK_STRUCT_LEN(16, libie_aqc_driver_ver);
-+
-+enum libie_aq_res_id {
-+	LIBIE_AQC_RES_ID_NVM				= 1,
-+	LIBIE_AQC_RES_ID_SDP				= 2,
-+	LIBIE_AQC_RES_ID_CHNG_LOCK			= 3,
-+	LIBIE_AQC_RES_ID_GLBL_LOCK			= 4,
-+};
-+
-+enum libie_aq_res_access_type {
-+	LIBIE_AQC_RES_ACCESS_READ			= 1,
-+	LIBIE_AQC_RES_ACCESS_WRITE			= 2,
-+};
-+
-+#define LIBIE_AQ_RES_NVM_READ_DFLT_TIMEOUT_MS		3000
-+#define LIBIE_AQ_RES_NVM_WRITE_DFLT_TIMEOUT_MS		180000
-+#define LIBIE_AQ_RES_CHNG_LOCK_DFLT_TIMEOUT_MS		1000
-+#define LIBIE_AQ_RES_GLBL_LOCK_DFLT_TIMEOUT_MS		3000
-+
-+#define LIBIE_AQ_RES_GLBL_SUCCESS			0
-+#define LIBIE_AQ_RES_GLBL_IN_PROG			1
-+#define LIBIE_AQ_RES_GLBL_DONE				2
-+
-+/**
-+ * struct libie_aqc_req_res
-+ * @res_id: resource ID (look at enum definition above)
-+ * @access_type: read or write (enum definition above)
-+ * @timeout: Upon successful completion, FW writes this value and driver is
-+ * expected to release resource before timeout. This value is provided in
-+ * milliseconds.
-+ * @res_number: for SDP, this is the pin ID of the SDP
-+ * @status: status only used for LIBIE_AQC_RES_ID_GLBL_LOCK, for others reserved
-+ * @reserved: reserved for future use
-+ *
-+ * Used in commands:
-+ * request resource ownership (direct 0x0008)
-+ * request resource ownership (direct 0x0009)
-+ */
-+struct libie_aqc_req_res {
-+	__le16	res_id;
-+	__le16	access_type;
-+
-+	__le32	timeout;
-+	__le32	res_number;
-+	__le16	status;
-+	u8	reserved[2];
-+};
-+LIBIE_CHECK_STRUCT_LEN(16, libie_aqc_req_res);
-+
-+/**
-+ * struct libie_aqc_list_caps
-+ * @cmd_flags: command flags
-+ * @pf_index: index of PF to get caps from
-+ * @reserved: reserved for future use
-+ * @count: number of capabilities records
-+ * @addr_high: high part of response address buff
-+ * @addr_low: low part of response address buff
-+ *
-+ * Used in commands:
-+ * get function capabilities (indirect 0x000A)
-+ * get device capabilities (indirect 0x000B)
-+ */
-+struct libie_aqc_list_caps {
-+	u8	cmd_flags;
-+	u8	pf_index;
-+	u8	reserved[2];
-+	__le32	count;
-+	__le32	addr_high;
-+	__le32	addr_low;
-+};
-+LIBIE_CHECK_STRUCT_LEN(16, libie_aqc_list_caps);
-+
-+/* Device/Function buffer entry, repeated per reported capability */
-+#define LIBIE_AQC_CAPS_VALID_FUNCTIONS			0x0005
-+#define LIBIE_AQC_CAPS_SRIOV				0x0012
-+#define LIBIE_AQC_CAPS_VF				0x0013
-+#define LIBIE_AQC_CAPS_VSI				0x0017
-+#define LIBIE_AQC_CAPS_DCB				0x0018
-+#define LIBIE_AQC_CAPS_RSS				0x0040
-+#define LIBIE_AQC_CAPS_RXQS				0x0041
-+#define LIBIE_AQC_CAPS_TXQS				0x0042
-+#define LIBIE_AQC_CAPS_MSIX				0x0043
-+#define LIBIE_AQC_CAPS_FD				0x0045
-+#define LIBIE_AQC_CAPS_1588				0x0046
-+#define LIBIE_AQC_CAPS_MAX_MTU				0x0047
-+#define LIBIE_AQC_CAPS_NVM_VER				0x0048
-+#define LIBIE_AQC_CAPS_PENDING_NVM_VER			0x0049
-+#define LIBIE_AQC_CAPS_OROM_VER				0x004A
-+#define LIBIE_AQC_CAPS_PENDING_OROM_VER			0x004B
-+#define LIBIE_AQC_CAPS_NET_VER				0x004C
-+#define LIBIE_AQC_CAPS_PENDING_NET_VER			0x004D
-+#define LIBIE_AQC_CAPS_RDMA				0x0051
-+#define LIBIE_AQC_CAPS_SENSOR_READING			0x0067
-+#define LIBIE_AQC_CAPS_PCIE_RESET_AVOIDANCE		0x0076
-+#define LIBIE_AQC_CAPS_POST_UPDATE_RESET_RESTRICT	0x0077
-+#define LIBIE_AQC_CAPS_NVM_MGMT				0x0080
-+#define LIBIE_AQC_CAPS_TX_SCHED_TOPO_COMP_MODE		0x0085
-+#define LIBIE_AQC_CAPS_NAC_TOPOLOGY			0x0087
-+#define LIBIE_AQC_CAPS_FW_LAG_SUPPORT			0x0092
-+#define LIBIE_AQC_BIT_ROCEV2_LAG			0x01
-+#define LIBIE_AQC_BIT_SRIOV_LAG				0x02
-+
-+/**
-+ * struct libie_aqc_list_caps_elem
-+ * @cap: one from the defines list above
-+ * @major_ver: major version
-+ * @minor_ver: minor version
-+ * @number: number of resources described by this capability
-+ * @logical_id: logical ID, only meaningful for some types of resources
-+ * @phys_id: physical ID, only meaningful for some types of resources
-+ * @rsvd1: reserved for future use
-+ * @rsvd2: reserved for future use
-+ */
-+struct libie_aqc_list_caps_elem {
-+	__le16	cap;
-+
-+	u8	major_ver;
-+	u8	minor_ver;
-+	__le32	number;
-+	__le32	logical_id;
-+	__le32	phys_id;
-+	__le64	rsvd1;
-+	__le64	rsvd2;
-+};
-+LIBIE_CHECK_STRUCT_LEN(32, libie_aqc_list_caps_elem);
-+
-+/**
-+ * struct libie_aq_desc - Admin Queue (AQ) descriptor
-+ * @flags: LIBIE_AQ_FLAG_* flags
-+ * @opcode: AQ command opcode
-+ * @datalen: length in bytes of indirect/external data buffer
-+ * @retval: return value from firmware
-+ * @cookie_high: opaque data high-half
-+ * @cookie_low: opaque data low-half
-+ * @params: command-specific parameters
-+ *
-+ * Descriptor format for commands the driver posts on the Admin Transmit Queue
-+ * (ATQ). The firmware writes back onto the command descriptor and returns
-+ * the result of the command. Asynchronous events that are not an immediate
-+ * result of the command are written to the Admin Receive Queue (ARQ) using
-+ * the same descriptor format. Descriptors are in little-endian notation with
-+ * 32-bit words.
-+ */
-+struct libie_aq_desc {
-+	__le16	flags;
-+	__le16	opcode;
-+	__le16	datalen;
-+	__le16	retval;
-+	__le32	cookie_high;
-+	__le32	cookie_low;
-+	union {
-+		u8	raw[16];
-+		struct	libie_aqc_generic generic;
-+		struct	libie_aqc_get_ver get_ver;
-+		struct	libie_aqc_driver_ver driver_ver;
-+		struct	libie_aqc_req_res res_owner;
-+		struct	libie_aqc_list_caps get_cap;
-+	} params;
-+};
-+LIBIE_CHECK_STRUCT_LEN(32, libie_aq_desc);
-+
-+/* FW defined boundary for a large buffer, 4k >= Large buffer > 512 bytes */
-+#define LIBIE_AQ_LG_BUF				512
-+
-+#define LIBIE_AQ_FLAG_DD			BIT(0)	/* 0x1    */
-+#define LIBIE_AQ_FLAG_CMP			BIT(1)	/* 0x2    */
-+#define LIBIE_AQ_FLAG_ERR			BIT(2)	/* 0x4    */
-+#define LIBIE_AQ_FLAG_LB			BIT(9)	/* 0x200  */
-+#define LIBIE_AQ_FLAG_RD			BIT(10)	/* 0x400  */
-+#define LIBIE_AQ_FLAG_BUF			BIT(12)	/* 0x1000 */
-+#define LIBIE_AQ_FLAG_SI			BIT(13)	/* 0x2000 */
-+
-+/* error codes */
-+enum libie_aq_err {
-+	LIBIE_AQ_RC_OK		= 0,  /* Success */
-+	LIBIE_AQ_RC_EPERM	= 1,  /* Operation not permitted */
-+	LIBIE_AQ_RC_ENOENT	= 2,  /* No such element */
-+	LIBIE_AQ_RC_ENOMEM	= 9,  /* Out of memory */
-+	LIBIE_AQ_RC_EBUSY	= 12, /* Device or resource busy */
-+	LIBIE_AQ_RC_EEXIST	= 13, /* Object already exists */
-+	LIBIE_AQ_RC_EINVAL	= 14, /* Invalid argument */
-+	LIBIE_AQ_RC_ENOSPC	= 16, /* No space left or allocation failure */
-+	LIBIE_AQ_RC_ENOSYS	= 17, /* Function not implemented */
-+	LIBIE_AQ_RC_EMODE	= 21, /* Op not allowed in current dev mode */
-+	LIBIE_AQ_RC_ENOSEC	= 24, /* Missing security manifest */
-+	LIBIE_AQ_RC_EBADSIG	= 25, /* Bad RSA signature */
-+	LIBIE_AQ_RC_ESVN	= 26, /* SVN number prohibits this package */
-+	LIBIE_AQ_RC_EBADMAN	= 27, /* Manifest hash mismatch */
-+	LIBIE_AQ_RC_EBADBUF	= 28, /* Buffer hash mismatches manifest */
-+};
-+
-+static inline void *libie_aq_raw(struct libie_aq_desc *desc)
-+{
-+	return &desc->params.raw;
-+}
-+
-+#endif /* __LIBIE_ADMINQ_H */
-diff --git a/drivers/net/ethernet/intel/ice/devlink/health.c b/drivers/net/ethernet/intel/ice/devlink/health.c
-index 19c3d37aa768..b149b8185449 100644
---- a/drivers/net/ethernet/intel/ice/devlink/health.c
-+++ b/drivers/net/ethernet/intel/ice/devlink/health.c
-@@ -217,10 +217,12 @@ static void ice_config_health_events(struct ice_pf *pf, bool enable)
- void ice_process_health_status_event(struct ice_pf *pf, struct ice_rq_event_info *event)
- {
- 	const struct ice_aqc_health_status_elem *health_info;
-+	const struct ice_aqc_get_health_status *cmd;
- 	u16 count;
+@@ -147,8 +147,10 @@ LIBIE_CHECK_STRUCT_LEN(16, libie_aqc_list_caps);
  
- 	health_info = (struct ice_aqc_health_status_elem *)event->msg_buf;
--	count = le16_to_cpu(event->desc.params.get_health_status.health_status_count);
-+	cmd = libie_aq_raw(&event->desc);
-+	count = le16_to_cpu(cmd->health_status_count);
+ /* Device/Function buffer entry, repeated per reported capability */
+ #define LIBIE_AQC_CAPS_VALID_FUNCTIONS			0x0005
++#define LIBIE_AQC_MAX_VALID_FUNCTIONS			0x8
+ #define LIBIE_AQC_CAPS_SRIOV				0x0012
+ #define LIBIE_AQC_CAPS_VF				0x0013
++#define LIBIE_AQC_CAPS_VMDQ				0x0014
+ #define LIBIE_AQC_CAPS_VSI				0x0017
+ #define LIBIE_AQC_CAPS_DCB				0x0018
+ #define LIBIE_AQC_CAPS_RSS				0x0040
+@@ -166,9 +168,15 @@ LIBIE_CHECK_STRUCT_LEN(16, libie_aqc_list_caps);
+ #define LIBIE_AQC_CAPS_PENDING_NET_VER			0x004D
+ #define LIBIE_AQC_CAPS_RDMA				0x0051
+ #define LIBIE_AQC_CAPS_SENSOR_READING			0x0067
++#define LIBIE_AQC_INLINE_IPSEC				0x0070
++#define LIBIE_AQC_CAPS_NUM_ENABLED_PORTS		0x0072
+ #define LIBIE_AQC_CAPS_PCIE_RESET_AVOIDANCE		0x0076
+ #define LIBIE_AQC_CAPS_POST_UPDATE_RESET_RESTRICT	0x0077
+ #define LIBIE_AQC_CAPS_NVM_MGMT				0x0080
++#define LIBIE_AQC_CAPS_EXT_TOPO_DEV_IMG0		0x0081
++#define LIBIE_AQC_CAPS_EXT_TOPO_DEV_IMG1		0x0082
++#define LIBIE_AQC_CAPS_EXT_TOPO_DEV_IMG2		0x0083
++#define LIBIE_AQC_CAPS_EXT_TOPO_DEV_IMG3		0x0084
+ #define LIBIE_AQC_CAPS_TX_SCHED_TOPO_COMP_MODE		0x0085
+ #define LIBIE_AQC_CAPS_NAC_TOPOLOGY			0x0087
+ #define LIBIE_AQC_CAPS_FW_LAG_SUPPORT			0x0092
+@@ -237,13 +245,21 @@ LIBIE_CHECK_STRUCT_LEN(32, libie_aq_desc);
+ /* FW defined boundary for a large buffer, 4k >= Large buffer > 512 bytes */
+ #define LIBIE_AQ_LG_BUF				512
  
- 	if (count > (event->buf_len / sizeof(*health_info))) {
- 		dev_err(ice_pf_to_dev(pf), "Received a health status event with invalid element count\n");
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index edb1d0f7e187..df2931f4473f 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -239,7 +239,7 @@ static bool ice_is_pf_c827(struct ice_hw *hw)
++/* Flags sub-structure
++ * |0  |1  |2  |3  |4  |5  |6  |7  |8  |9  |10 |11 |12 |13 |14 |15 |
++ * |DD |CMP|ERR|VFE| * *  RESERVED * * |LB |RD |VFC|BUF|SI |EI |FE |
++ */
+ #define LIBIE_AQ_FLAG_DD			BIT(0)	/* 0x1    */
+ #define LIBIE_AQ_FLAG_CMP			BIT(1)	/* 0x2    */
+ #define LIBIE_AQ_FLAG_ERR			BIT(2)	/* 0x4    */
++#define LIBIE_AQ_FLAG_VFE			BIT(3)	/* 0x8    */
+ #define LIBIE_AQ_FLAG_LB			BIT(9)	/* 0x200  */
+ #define LIBIE_AQ_FLAG_RD			BIT(10)	/* 0x400  */
++#define LIBIE_AQ_FLAG_VFC			BIT(11) /* 0x800  */
+ #define LIBIE_AQ_FLAG_BUF			BIT(12)	/* 0x1000 */
+ #define LIBIE_AQ_FLAG_SI			BIT(13)	/* 0x2000 */
++#define LIBIE_AQ_FLAG_EI			BIT(14)	/* 0x4000 */
++#define LIBIE_AQ_FLAG_FE			BIT(15)	/* 0x8000 */
+ 
+ /* error codes */
+ enum libie_aq_err {
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+index f11cd13c18f4..53f8032b1466 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+@@ -56,7 +56,7 @@ static bool ixgbe_should_retry_aci_send_cmd_execute(u16 opcode)
+  * Admin Command failed with error Y.
   */
- int ice_clear_pf_cfg(struct ice_hw *hw)
+ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+-				      struct ixgbe_aci_desc *desc,
++				      struct libie_aq_desc *desc,
+ 				      void *buf, u16 buf_size)
  {
--	struct ice_aq_desc desc;
+ 	u16 opcode, buf_tail_size = buf_size % 4;
+@@ -64,7 +64,7 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+ 	u32 hicr, i, buf_tail = 0;
+ 	bool valid_buf = false;
+ 
+-	hw->aci.last_status = IXGBE_ACI_RC_OK;
++	hw->aci.last_status = LIBIE_AQ_RC_OK;
+ 
+ 	/* It's necessary to check if mechanism is enabled */
+ 	hicr = IXGBE_READ_REG(hw, IXGBE_PF_HICR);
+@@ -73,7 +73,7 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+ 		return -EIO;
+ 
+ 	if (hicr & IXGBE_PF_HICR_C) {
+-		hw->aci.last_status = IXGBE_ACI_RC_EBUSY;
++		hw->aci.last_status = LIBIE_AQ_RC_EBUSY;
+ 		return -EBUSY;
+ 	}
+ 
+@@ -83,9 +83,9 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+ 		return -EINVAL;
+ 
+ 	if (buf)
+-		desc->flags |= cpu_to_le16(IXGBE_ACI_FLAG_BUF);
++		desc->flags |= cpu_to_le16(LIBIE_AQ_FLAG_BUF);
+ 
+-	if (desc->flags & cpu_to_le16(IXGBE_ACI_FLAG_BUF)) {
++	if (desc->flags & cpu_to_le16(LIBIE_AQ_FLAG_BUF)) {
+ 		if ((buf && !buf_size) ||
+ 		    (!buf && buf_size))
+ 			return -EINVAL;
+@@ -98,12 +98,12 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+ 			memcpy(&buf_tail, buf + buf_size - buf_tail_size,
+ 			       buf_tail_size);
+ 
+-		if (((buf_size + 3) & ~0x3) > IXGBE_ACI_LG_BUF)
+-			desc->flags |= cpu_to_le16(IXGBE_ACI_FLAG_LB);
++		if (((buf_size + 3) & ~0x3) > LIBIE_AQ_LG_BUF)
++			desc->flags |= cpu_to_le16(LIBIE_AQ_FLAG_LB);
+ 
+ 		desc->datalen = cpu_to_le16(buf_size);
+ 
+-		if (desc->flags & cpu_to_le16(IXGBE_ACI_FLAG_RD)) {
++		if (desc->flags & cpu_to_le16(LIBIE_AQ_FLAG_RD)) {
+ 			for (i = 0; i < buf_size / 4; i++)
+ 				IXGBE_WRITE_REG(hw, IXGBE_PF_HIBA(i), ((u32 *)buf)[i]);
+ 			if (buf_tail_size)
+@@ -174,7 +174,7 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+ 		return -EIO;
+ 
+ 	if (desc->retval) {
+-		hw->aci.last_status = (enum ixgbe_aci_err)
++		hw->aci.last_status = (enum libie_aq_err)
+ 			le16_to_cpu(desc->retval);
+ 		return -EIO;
+ 	}
+@@ -207,12 +207,12 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+  *
+  * Return: the exit code of the operation.
+  */
+-int ixgbe_aci_send_cmd(struct ixgbe_hw *hw, struct ixgbe_aci_desc *desc,
++int ixgbe_aci_send_cmd(struct ixgbe_hw *hw, struct libie_aq_desc *desc,
+ 		       void *buf, u16 buf_size)
+ {
+ 	u16 opcode = le16_to_cpu(desc->opcode);
+-	struct ixgbe_aci_desc desc_cpy;
+-	enum ixgbe_aci_err last_status;
++	struct libie_aq_desc desc_cpy;
++	enum libie_aq_err last_status;
+ 	u8 idx = 0, *buf_cpy = NULL;
+ 	bool is_cmd_for_retry;
+ 	unsigned long timeout;
+@@ -237,7 +237,7 @@ int ixgbe_aci_send_cmd(struct ixgbe_hw *hw, struct ixgbe_aci_desc *desc,
+ 		mutex_unlock(&hw->aci.lock);
+ 
+ 		if (!is_cmd_for_retry || !err ||
+-		    last_status != IXGBE_ACI_RC_EBUSY)
++		    last_status != LIBIE_AQ_RC_EBUSY)
+ 			break;
+ 
+ 		if (buf)
+@@ -286,7 +286,7 @@ bool ixgbe_aci_check_event_pending(struct ixgbe_hw *hw)
+ int ixgbe_aci_get_event(struct ixgbe_hw *hw, struct ixgbe_aci_event *e,
+ 			bool *pending)
+ {
+-	struct ixgbe_aci_desc desc;
++	struct libie_aq_desc desc;
+ 	int err;
+ 
+ 	if (!e || (!e->msg_buf && e->buf_len))
+@@ -335,12 +335,12 @@ int ixgbe_aci_get_event(struct ixgbe_hw *hw, struct ixgbe_aci_event *e,
+  * Helper function to fill the descriptor desc with default values
+  * and the provided opcode.
+  */
+-void ixgbe_fill_dflt_direct_cmd_desc(struct ixgbe_aci_desc *desc, u16 opcode)
++void ixgbe_fill_dflt_direct_cmd_desc(struct libie_aq_desc *desc, u16 opcode)
+ {
+ 	/* Zero out the desc. */
+ 	memset(desc, 0, sizeof(*desc));
+ 	desc->opcode = cpu_to_le16(opcode);
+-	desc->flags = cpu_to_le16(IXGBE_ACI_FLAG_SI);
++	desc->flags = cpu_to_le16(LIBIE_AQ_FLAG_SI);
+ }
+ 
+ /**
+@@ -353,8 +353,8 @@ void ixgbe_fill_dflt_direct_cmd_desc(struct ixgbe_aci_desc *desc, u16 opcode)
+  */
+ static int ixgbe_aci_get_fw_ver(struct ixgbe_hw *hw)
+ {
+-	struct ixgbe_aci_cmd_get_ver *resp;
+-	struct ixgbe_aci_desc desc;
++	struct libie_aqc_get_ver *resp;
++	struct libie_aq_desc desc;
+ 	int err;
+ 
+ 	resp = &desc.params.get_ver;
+@@ -394,12 +394,12 @@ static int ixgbe_aci_get_fw_ver(struct ixgbe_hw *hw)
+  *
+  * Return: the exit code of the operation.
+  */
+-static int ixgbe_aci_req_res(struct ixgbe_hw *hw, enum ixgbe_aci_res_ids res,
+-			     enum ixgbe_aci_res_access_type access,
++static int ixgbe_aci_req_res(struct ixgbe_hw *hw, enum libie_aq_res_id res,
++			     enum libie_aq_res_access_type access,
+ 			     u8 sdp_number, u32 *timeout)
+ {
+-	struct ixgbe_aci_cmd_req_res *cmd_resp;
+-	struct ixgbe_aci_desc desc;
++	struct libie_aqc_req_res *cmd_resp;
++	struct libie_aq_desc desc;
+ 	int err;
+ 
+ 	cmd_resp = &desc.params.res_owner;
+@@ -418,7 +418,7 @@ static int ixgbe_aci_req_res(struct ixgbe_hw *hw, enum ixgbe_aci_res_ids res,
+ 	 * with a busy return value and the timeout field indicates the maximum
+ 	 * time the current owner of the resource has to free it.
+ 	 */
+-	if (!err || hw->aci.last_status == IXGBE_ACI_RC_EBUSY)
++	if (!err || hw->aci.last_status == LIBIE_AQ_RC_EBUSY)
+ 		*timeout = le32_to_cpu(cmd_resp->timeout);
+ 
+ 	return err;
+@@ -434,11 +434,11 @@ static int ixgbe_aci_req_res(struct ixgbe_hw *hw, enum ixgbe_aci_res_ids res,
+  *
+  * Return: the exit code of the operation.
+  */
+-static int ixgbe_aci_release_res(struct ixgbe_hw *hw,
+-				 enum ixgbe_aci_res_ids res, u8 sdp_number)
++static int ixgbe_aci_release_res(struct ixgbe_hw *hw, enum libie_aq_res_id res,
++				 u8 sdp_number)
+ {
+-	struct ixgbe_aci_cmd_req_res *cmd;
+-	struct ixgbe_aci_desc desc;
++	struct libie_aqc_req_res *cmd;
 +	struct libie_aq_desc desc;
  
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_clear_pf_cfg);
+ 	cmd = &desc.params.res_owner;
  
-@@ -267,12 +267,12 @@ ice_aq_manage_mac_read(struct ice_hw *hw, void *buf, u16 buf_size,
+@@ -466,8 +466,8 @@ static int ixgbe_aci_release_res(struct ixgbe_hw *hw,
+  *
+  * Return: the exit code of the operation.
+  */
+-int ixgbe_acquire_res(struct ixgbe_hw *hw, enum ixgbe_aci_res_ids res,
+-		      enum ixgbe_aci_res_access_type access, u32 timeout)
++int ixgbe_acquire_res(struct ixgbe_hw *hw, enum libie_aq_res_id res,
++		      enum libie_aq_res_access_type access, u32 timeout)
  {
- 	struct ice_aqc_manage_mac_read_resp *resp;
- 	struct ice_aqc_manage_mac_read *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int status;
- 	u16 flags;
- 	u8 i;
+ #define IXGBE_RES_POLLING_DELAY_MS	10
+ 	u32 delay = IXGBE_RES_POLLING_DELAY_MS;
+@@ -515,7 +515,7 @@ int ixgbe_acquire_res(struct ixgbe_hw *hw, enum ixgbe_aci_res_ids res,
+  *
+  * Release a common resource using ixgbe_aci_release_res.
+  */
+-void ixgbe_release_res(struct ixgbe_hw *hw, enum ixgbe_aci_res_ids res)
++void ixgbe_release_res(struct ixgbe_hw *hw, enum libie_aq_res_id res)
+ {
+ 	u32 total_delay = 0;
+ 	int err;
+@@ -548,7 +548,7 @@ void ixgbe_release_res(struct ixgbe_hw *hw, enum ixgbe_aci_res_ids res)
+  */
+ static bool ixgbe_parse_e610_caps(struct ixgbe_hw *hw,
+ 				  struct ixgbe_hw_caps *caps,
+-				  struct ixgbe_aci_cmd_list_caps_elem *elem,
++				  struct libie_aqc_list_caps_elem *elem,
+ 				  const char *prefix)
+ {
+ 	u32 logical_id = le32_to_cpu(elem->logical_id);
+@@ -557,67 +557,67 @@ static bool ixgbe_parse_e610_caps(struct ixgbe_hw *hw,
+ 	u16 cap = le16_to_cpu(elem->cap);
  
--	cmd = &desc.params.mac_read;
+ 	switch (cap) {
+-	case IXGBE_ACI_CAPS_VALID_FUNCTIONS:
++	case LIBIE_AQC_CAPS_VALID_FUNCTIONS:
+ 		caps->valid_functions = number;
+ 		break;
+-	case IXGBE_ACI_CAPS_SRIOV:
++	case LIBIE_AQC_CAPS_SRIOV:
+ 		caps->sr_iov_1_1 = (number == 1);
+ 		break;
+-	case IXGBE_ACI_CAPS_VMDQ:
++	case LIBIE_AQC_CAPS_VMDQ:
+ 		caps->vmdq = (number == 1);
+ 		break;
+-	case IXGBE_ACI_CAPS_DCB:
++	case LIBIE_AQC_CAPS_DCB:
+ 		caps->dcb = (number == 1);
+ 		caps->active_tc_bitmap = logical_id;
+ 		caps->maxtc = phys_id;
+ 		break;
+-	case IXGBE_ACI_CAPS_RSS:
++	case LIBIE_AQC_CAPS_RSS:
+ 		caps->rss_table_size = number;
+ 		caps->rss_table_entry_width = logical_id;
+ 		break;
+-	case IXGBE_ACI_CAPS_RXQS:
++	case LIBIE_AQC_CAPS_RXQS:
+ 		caps->num_rxq = number;
+ 		caps->rxq_first_id = phys_id;
+ 		break;
+-	case IXGBE_ACI_CAPS_TXQS:
++	case LIBIE_AQC_CAPS_TXQS:
+ 		caps->num_txq = number;
+ 		caps->txq_first_id = phys_id;
+ 		break;
+-	case IXGBE_ACI_CAPS_MSIX:
++	case LIBIE_AQC_CAPS_MSIX:
+ 		caps->num_msix_vectors = number;
+ 		caps->msix_vector_first_id = phys_id;
+ 		break;
+-	case IXGBE_ACI_CAPS_NVM_VER:
++	case LIBIE_AQC_CAPS_NVM_VER:
+ 		break;
+-	case IXGBE_ACI_CAPS_PENDING_NVM_VER:
++	case LIBIE_AQC_CAPS_PENDING_NVM_VER:
+ 		caps->nvm_update_pending_nvm = true;
+ 		break;
+-	case IXGBE_ACI_CAPS_PENDING_OROM_VER:
++	case LIBIE_AQC_CAPS_PENDING_OROM_VER:
+ 		caps->nvm_update_pending_orom = true;
+ 		break;
+-	case IXGBE_ACI_CAPS_PENDING_NET_VER:
++	case LIBIE_AQC_CAPS_PENDING_NET_VER:
+ 		caps->nvm_update_pending_netlist = true;
+ 		break;
+-	case IXGBE_ACI_CAPS_NVM_MGMT:
++	case LIBIE_AQC_CAPS_NVM_MGMT:
+ 		caps->nvm_unified_update =
+ 			(number & IXGBE_NVM_MGMT_UNIFIED_UPD_SUPPORT) ?
+ 			true : false;
+ 		break;
+-	case IXGBE_ACI_CAPS_MAX_MTU:
++	case LIBIE_AQC_CAPS_MAX_MTU:
+ 		caps->max_mtu = number;
+ 		break;
+-	case IXGBE_ACI_CAPS_PCIE_RESET_AVOIDANCE:
++	case LIBIE_AQC_CAPS_PCIE_RESET_AVOIDANCE:
+ 		caps->pcie_reset_avoidance = (number > 0);
+ 		break;
+-	case IXGBE_ACI_CAPS_POST_UPDATE_RESET_RESTRICT:
++	case LIBIE_AQC_CAPS_POST_UPDATE_RESET_RESTRICT:
+ 		caps->reset_restrict_support = (number == 1);
+ 		break;
+-	case IXGBE_ACI_CAPS_EXT_TOPO_DEV_IMG0:
+-	case IXGBE_ACI_CAPS_EXT_TOPO_DEV_IMG1:
+-	case IXGBE_ACI_CAPS_EXT_TOPO_DEV_IMG2:
+-	case IXGBE_ACI_CAPS_EXT_TOPO_DEV_IMG3:
++	case LIBIE_AQC_CAPS_EXT_TOPO_DEV_IMG0:
++	case LIBIE_AQC_CAPS_EXT_TOPO_DEV_IMG1:
++	case LIBIE_AQC_CAPS_EXT_TOPO_DEV_IMG2:
++	case LIBIE_AQC_CAPS_EXT_TOPO_DEV_IMG3:
+ 	{
+-		u8 index = cap - IXGBE_ACI_CAPS_EXT_TOPO_DEV_IMG0;
++		u8 index = cap - LIBIE_AQC_CAPS_EXT_TOPO_DEV_IMG0;
+ 
+ 		caps->ext_topo_dev_img_ver_high[index] = number;
+ 		caps->ext_topo_dev_img_ver_low[index] = logical_id;
+@@ -638,62 +638,62 @@ static bool ixgbe_parse_e610_caps(struct ixgbe_hw *hw,
+ }
+ 
+ /**
+- * ixgbe_parse_valid_functions_cap - Parse IXGBE_ACI_CAPS_VALID_FUNCTIONS caps
++ * ixgbe_parse_valid_functions_cap - Parse LIBIE_AQC_CAPS_VALID_FUNCTIONS caps
+  * @hw: pointer to the HW struct
+  * @dev_p: pointer to device capabilities structure
+  * @cap: capability element to parse
+  *
+- * Parse IXGBE_ACI_CAPS_VALID_FUNCTIONS for device capabilities.
++ * Parse LIBIE_AQC_CAPS_VALID_FUNCTIONS for device capabilities.
+  */
+ static void
+ ixgbe_parse_valid_functions_cap(struct ixgbe_hw *hw,
+ 				struct ixgbe_hw_dev_caps *dev_p,
+-				struct ixgbe_aci_cmd_list_caps_elem *cap)
++				struct libie_aqc_list_caps_elem *cap)
+ {
+ 	dev_p->num_funcs = hweight32(le32_to_cpu(cap->number));
+ }
+ 
+ /**
+- * ixgbe_parse_vf_dev_caps - Parse IXGBE_ACI_CAPS_VF device caps
++ * ixgbe_parse_vf_dev_caps - Parse LIBIE_AQC_CAPS_VF device caps
+  * @hw: pointer to the HW struct
+  * @dev_p: pointer to device capabilities structure
+  * @cap: capability element to parse
+  *
+- * Parse IXGBE_ACI_CAPS_VF for device capabilities.
++ * Parse LIBIE_AQC_CAPS_VF for device capabilities.
+  */
+ static void ixgbe_parse_vf_dev_caps(struct ixgbe_hw *hw,
+ 				    struct ixgbe_hw_dev_caps *dev_p,
+-				    struct ixgbe_aci_cmd_list_caps_elem *cap)
++				    struct libie_aqc_list_caps_elem *cap)
+ {
+ 	dev_p->num_vfs_exposed = le32_to_cpu(cap->number);
+ }
+ 
+ /**
+- * ixgbe_parse_vsi_dev_caps - Parse IXGBE_ACI_CAPS_VSI device caps
++ * ixgbe_parse_vsi_dev_caps - Parse LIBIE_AQC_CAPS_VSI device caps
+  * @hw: pointer to the HW struct
+  * @dev_p: pointer to device capabilities structure
+  * @cap: capability element to parse
+  *
+- * Parse IXGBE_ACI_CAPS_VSI for device capabilities.
++ * Parse LIBIE_AQC_CAPS_VSI for device capabilities.
+  */
+ static void ixgbe_parse_vsi_dev_caps(struct ixgbe_hw *hw,
+ 				     struct ixgbe_hw_dev_caps *dev_p,
+-				     struct ixgbe_aci_cmd_list_caps_elem *cap)
++				     struct libie_aqc_list_caps_elem *cap)
+ {
+ 	dev_p->num_vsi_allocd_to_host = le32_to_cpu(cap->number);
+ }
+ 
+ /**
+- * ixgbe_parse_fdir_dev_caps - Parse IXGBE_ACI_CAPS_FD device caps
++ * ixgbe_parse_fdir_dev_caps - Parse LIBIE_AQC_CAPS_FD device caps
+  * @hw: pointer to the HW struct
+  * @dev_p: pointer to device capabilities structure
+  * @cap: capability element to parse
+  *
+- * Parse IXGBE_ACI_CAPS_FD for device capabilities.
++ * Parse LIBIE_AQC_CAPS_FD for device capabilities.
+  */
+ static void ixgbe_parse_fdir_dev_caps(struct ixgbe_hw *hw,
+ 				      struct ixgbe_hw_dev_caps *dev_p,
+-				      struct ixgbe_aci_cmd_list_caps_elem *cap)
++				      struct libie_aqc_list_caps_elem *cap)
+ {
+ 	dev_p->num_flow_director_fltr = le32_to_cpu(cap->number);
+ }
+@@ -716,10 +716,10 @@ static void ixgbe_parse_dev_caps(struct ixgbe_hw *hw,
+ 				 struct ixgbe_hw_dev_caps *dev_p,
+ 				 void *buf, u32 cap_count)
+ {
+-	struct ixgbe_aci_cmd_list_caps_elem *cap_resp;
++	struct libie_aqc_list_caps_elem *cap_resp;
+ 	u32 i;
+ 
+-	cap_resp = (struct ixgbe_aci_cmd_list_caps_elem *)buf;
++	cap_resp = (struct libie_aqc_list_caps_elem *)buf;
+ 
+ 	memset(dev_p, 0, sizeof(*dev_p));
+ 
+@@ -730,17 +730,17 @@ static void ixgbe_parse_dev_caps(struct ixgbe_hw *hw,
+ 				      "dev caps");
+ 
+ 		switch (cap) {
+-		case IXGBE_ACI_CAPS_VALID_FUNCTIONS:
++		case LIBIE_AQC_CAPS_VALID_FUNCTIONS:
+ 			ixgbe_parse_valid_functions_cap(hw, dev_p,
+ 							&cap_resp[i]);
+ 			break;
+-		case IXGBE_ACI_CAPS_VF:
++		case LIBIE_AQC_CAPS_VF:
+ 			ixgbe_parse_vf_dev_caps(hw, dev_p, &cap_resp[i]);
+ 			break;
+-		case IXGBE_ACI_CAPS_VSI:
++		case LIBIE_AQC_CAPS_VSI:
+ 			ixgbe_parse_vsi_dev_caps(hw, dev_p, &cap_resp[i]);
+ 			break;
+-		case  IXGBE_ACI_CAPS_FD:
++		case  LIBIE_AQC_CAPS_FD:
+ 			ixgbe_parse_fdir_dev_caps(hw, dev_p, &cap_resp[i]);
+ 			break;
+ 		default:
+@@ -751,16 +751,16 @@ static void ixgbe_parse_dev_caps(struct ixgbe_hw *hw,
+ }
+ 
+ /**
+- * ixgbe_parse_vf_func_caps - Parse IXGBE_ACI_CAPS_VF function caps
++ * ixgbe_parse_vf_func_caps - Parse LIBIE_AQC_CAPS_VF function caps
+  * @hw: pointer to the HW struct
+  * @func_p: pointer to function capabilities structure
+  * @cap: pointer to the capability element to parse
+  *
+- * Extract function capabilities for IXGBE_ACI_CAPS_VF.
++ * Extract function capabilities for LIBIE_AQC_CAPS_VF.
+  */
+ static void ixgbe_parse_vf_func_caps(struct ixgbe_hw *hw,
+ 				     struct ixgbe_hw_func_caps *func_p,
+-				     struct ixgbe_aci_cmd_list_caps_elem *cap)
++				     struct libie_aqc_list_caps_elem *cap)
+ {
+ 	func_p->num_allocd_vfs = le32_to_cpu(cap->number);
+ 	func_p->vf_base_id = le32_to_cpu(cap->logical_id);
+@@ -787,16 +787,16 @@ static u32 ixgbe_get_num_per_func(struct ixgbe_hw *hw, u32 max)
+ }
+ 
+ /**
+- * ixgbe_parse_vsi_func_caps - Parse IXGBE_ACI_CAPS_VSI function caps
++ * ixgbe_parse_vsi_func_caps - Parse LIBIE_AQC_CAPS_VSI function caps
+  * @hw: pointer to the HW struct
+  * @func_p: pointer to function capabilities structure
+  * @cap: pointer to the capability element to parse
+  *
+- * Extract function capabilities for IXGBE_ACI_CAPS_VSI.
++ * Extract function capabilities for LIBIE_AQC_CAPS_VSI.
+  */
+ static void ixgbe_parse_vsi_func_caps(struct ixgbe_hw *hw,
+ 				      struct ixgbe_hw_func_caps *func_p,
+-				      struct ixgbe_aci_cmd_list_caps_elem *cap)
++				      struct libie_aqc_list_caps_elem *cap)
+ {
+ 	func_p->guar_num_vsi = ixgbe_get_num_per_func(hw, IXGBE_MAX_VSI);
+ }
+@@ -819,10 +819,10 @@ static void ixgbe_parse_func_caps(struct ixgbe_hw *hw,
+ 				  struct ixgbe_hw_func_caps *func_p,
+ 				  void *buf, u32 cap_count)
+ {
+-	struct ixgbe_aci_cmd_list_caps_elem *cap_resp;
++	struct libie_aqc_list_caps_elem *cap_resp;
+ 	u32 i;
+ 
+-	cap_resp = (struct ixgbe_aci_cmd_list_caps_elem *)buf;
++	cap_resp = (struct libie_aqc_list_caps_elem *)buf;
+ 
+ 	memset(func_p, 0, sizeof(*func_p));
+ 
+@@ -833,10 +833,10 @@ static void ixgbe_parse_func_caps(struct ixgbe_hw *hw,
+ 				      &cap_resp[i], "func caps");
+ 
+ 		switch (cap) {
+-		case IXGBE_ACI_CAPS_VF:
++		case LIBIE_AQC_CAPS_VF:
+ 			ixgbe_parse_vf_func_caps(hw, func_p, &cap_resp[i]);
+ 			break;
+-		case IXGBE_ACI_CAPS_VSI:
++		case LIBIE_AQC_CAPS_VSI:
+ 			ixgbe_parse_vsi_func_caps(hw, func_p, &cap_resp[i]);
+ 			break;
+ 		default:
+@@ -870,8 +870,8 @@ static void ixgbe_parse_func_caps(struct ixgbe_hw *hw,
+ int ixgbe_aci_list_caps(struct ixgbe_hw *hw, void *buf, u16 buf_size,
+ 			u32 *cap_count, enum ixgbe_aci_opc opc)
+ {
+-	struct ixgbe_aci_cmd_list_caps *cmd;
+-	struct ixgbe_aci_desc desc;
++	struct libie_aqc_list_caps *cmd;
++	struct libie_aq_desc desc;
+ 	int err;
+ 
+ 	cmd = &desc.params.get_cap;
+@@ -915,7 +915,7 @@ int ixgbe_discover_dev_caps(struct ixgbe_hw *hw,
+ 	 * possible size that firmware can return.
+ 	 */
+ 	cap_count = IXGBE_ACI_MAX_BUFFER_SIZE /
+-		    sizeof(struct ixgbe_aci_cmd_list_caps_elem);
++		    sizeof(struct libie_aqc_list_caps_elem);
+ 
+ 	err = ixgbe_aci_list_caps(hw, cbuf, IXGBE_ACI_MAX_BUFFER_SIZE,
+ 				  &cap_count,
+@@ -954,7 +954,7 @@ int ixgbe_discover_func_caps(struct ixgbe_hw *hw,
+ 	 * possible size that firmware can return.
+ 	 */
+ 	cap_count = IXGBE_ACI_MAX_BUFFER_SIZE /
+-		    sizeof(struct ixgbe_aci_cmd_list_caps_elem);
++		    sizeof(struct libie_aqc_list_caps_elem);
+ 
+ 	err = ixgbe_aci_list_caps(hw, cbuf, IXGBE_ACI_MAX_BUFFER_SIZE,
+ 				  &cap_count,
+@@ -997,9 +997,9 @@ int ixgbe_get_caps(struct ixgbe_hw *hw)
+ int ixgbe_aci_disable_rxen(struct ixgbe_hw *hw)
+ {
+ 	struct ixgbe_aci_cmd_disable_rxen *cmd;
+-	struct ixgbe_aci_desc desc;
++	struct libie_aq_desc desc;
+ 
+-	cmd = &desc.params.disable_rxen;
 +	cmd = libie_aq_raw(&desc);
  
- 	if (buf_size < sizeof(*resp))
- 		return -EINVAL;
-@@ -321,12 +321,12 @@ ice_aq_get_phy_caps(struct ice_port_info *pi, bool qual_mods, u8 report_mode,
+ 	ixgbe_fill_dflt_direct_cmd_desc(&desc, ixgbe_aci_opc_disable_rxen);
+ 
+@@ -1025,10 +1025,10 @@ int ixgbe_aci_get_phy_caps(struct ixgbe_hw *hw, bool qual_mods, u8 report_mode,
  {
- 	struct ice_aqc_get_phy_caps *cmd;
+ 	struct ixgbe_aci_cmd_get_phy_caps *cmd;
  	u16 pcaps_size = sizeof(*pcaps);
--	struct ice_aq_desc desc;
+-	struct ixgbe_aci_desc desc;
 +	struct libie_aq_desc desc;
- 	const char *prefix;
- 	struct ice_hw *hw;
- 	int status;
+ 	int err;
  
 -	cmd = &desc.params.get_phy;
 +	cmd = libie_aq_raw(&desc);
  
- 	if (!pcaps || (report_mode & ~ICE_AQC_REPORT_MODE_M) || !pi)
+ 	if (!pcaps || (report_mode & ~IXGBE_ACI_REPORT_MODE_M))
  		return -EINVAL;
-@@ -415,9 +415,9 @@ ice_aq_get_link_topo_handle(struct ice_port_info *pi, u8 node_type,
- 			    struct ice_sq_cd *cd)
+@@ -1092,18 +1092,20 @@ void ixgbe_copy_phy_caps_to_cfg(struct ixgbe_aci_cmd_get_phy_caps_data *caps,
+ int ixgbe_aci_set_phy_cfg(struct ixgbe_hw *hw,
+ 			  struct ixgbe_aci_cmd_set_phy_cfg_data *cfg)
  {
- 	struct ice_aqc_get_link_topo *cmd;
--	struct ice_aq_desc desc;
+-	struct ixgbe_aci_desc desc;
++	struct ixgbe_aci_cmd_set_phy_cfg *cmd;
++	struct libie_aq_desc desc;
+ 	int err;
+ 
+ 	if (!cfg)
+ 		return -EINVAL;
+ 
++	cmd = libie_aq_raw(&desc);
+ 	/* Ensure that only valid bits of cfg->caps can be turned on. */
+ 	cfg->caps &= IXGBE_ACI_PHY_ENA_VALID_MASK;
+ 
+ 	ixgbe_fill_dflt_direct_cmd_desc(&desc, ixgbe_aci_opc_set_phy_cfg);
+-	desc.params.set_phy.lport_num = hw->bus.func;
+-	desc.flags |= cpu_to_le16(IXGBE_ACI_FLAG_RD);
++	cmd->lport_num = hw->bus.func;
++	desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
+ 
+ 	err = ixgbe_aci_send_cmd(hw, &desc, cfg, sizeof(*cfg));
+ 	if (!err)
+@@ -1124,9 +1126,9 @@ int ixgbe_aci_set_phy_cfg(struct ixgbe_hw *hw,
+ int ixgbe_aci_set_link_restart_an(struct ixgbe_hw *hw, bool ena_link)
+ {
+ 	struct ixgbe_aci_cmd_restart_an *cmd;
+-	struct ixgbe_aci_desc desc;
++	struct libie_aq_desc desc;
+ 
+-	cmd = &desc.params.restart_an;
++	cmd = libie_aq_raw(&desc);
+ 
+ 	ixgbe_fill_dflt_direct_cmd_desc(&desc, ixgbe_aci_opc_restart_an);
+ 
+@@ -1152,9 +1154,9 @@ int ixgbe_aci_set_link_restart_an(struct ixgbe_hw *hw, bool ena_link)
+ static bool ixgbe_is_media_cage_present(struct ixgbe_hw *hw)
+ {
+ 	struct ixgbe_aci_cmd_get_link_topo *cmd;
+-	struct ixgbe_aci_desc desc;
 +	struct libie_aq_desc desc;
  
 -	cmd = &desc.params.get_link_topo;
 +	cmd = libie_aq_raw(&desc);
  
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_link_topo);
+ 	ixgbe_fill_dflt_direct_cmd_desc(&desc, ixgbe_aci_opc_get_link_topo);
  
-@@ -445,19 +445,20 @@ int
- ice_aq_get_netlist_node(struct ice_hw *hw, struct ice_aqc_get_link_topo *cmd,
- 			u8 *node_part_number, u16 *node_handle)
+@@ -1347,7 +1349,7 @@ int ixgbe_aci_get_link_info(struct ixgbe_hw *hw, bool ena_lse,
+ 	struct ixgbe_aci_cmd_get_link_status *resp;
+ 	struct ixgbe_link_status *li_old, *li;
+ 	struct ixgbe_fc_info *hw_fc_info;
+-	struct ixgbe_aci_desc desc;
++	struct libie_aq_desc desc;
+ 	bool tx_pause, rx_pause;
+ 	u8 cmd_flags;
+ 	int err;
+@@ -1361,7 +1363,7 @@ int ixgbe_aci_get_link_info(struct ixgbe_hw *hw, bool ena_lse,
+ 
+ 	ixgbe_fill_dflt_direct_cmd_desc(&desc, ixgbe_aci_opc_get_link_status);
+ 	cmd_flags = (ena_lse) ? IXGBE_ACI_LSE_ENA : IXGBE_ACI_LSE_DIS;
+-	resp = &desc.params.get_link_status;
++	resp = libie_aq_raw(&desc);
+ 	resp->cmd_flags = cpu_to_le16(cmd_flags);
+ 	resp->lport_num = hw->bus.func;
+ 
+@@ -1424,9 +1426,9 @@ int ixgbe_aci_get_link_info(struct ixgbe_hw *hw, bool ena_lse,
+ int ixgbe_aci_set_event_mask(struct ixgbe_hw *hw, u8 port_num, u16 mask)
  {
--	struct ice_aq_desc desc;
-+	struct ice_aqc_get_link_topo *resp;
+ 	struct ixgbe_aci_cmd_set_event_mask *cmd;
+-	struct ixgbe_aci_desc desc;
 +	struct libie_aq_desc desc;
  
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_link_topo);
+-	cmd = &desc.params.set_event_mask;
++	cmd = libie_aq_raw(&desc);
+ 
+ 	ixgbe_fill_dflt_direct_cmd_desc(&desc, ixgbe_aci_opc_set_event_mask);
+ 
+@@ -1497,9 +1499,9 @@ static int ixgbe_start_hw_e610(struct ixgbe_hw *hw)
+ int ixgbe_aci_set_port_id_led(struct ixgbe_hw *hw, bool orig_mode)
+ {
+ 	struct ixgbe_aci_cmd_set_port_id_led *cmd;
+-	struct ixgbe_aci_desc desc;
++	struct libie_aq_desc desc;
+ 
+-	cmd = &desc.params.set_port_id_led;
++	cmd = libie_aq_raw(&desc);
+ 
+ 	ixgbe_fill_dflt_direct_cmd_desc(&desc, ixgbe_aci_opc_set_port_id_led);
+ 
+@@ -2261,19 +2263,20 @@ int ixgbe_aci_get_netlist_node(struct ixgbe_hw *hw,
+ 			       struct ixgbe_aci_cmd_get_link_topo *cmd,
+ 			       u8 *node_part_number, u16 *node_handle)
+ {
+-	struct ixgbe_aci_desc desc;
++	struct ixgbe_aci_cmd_get_link_topo *resp;
++	struct libie_aq_desc desc;
+ 
+ 	ixgbe_fill_dflt_direct_cmd_desc(&desc, ixgbe_aci_opc_get_link_topo);
 -	desc.params.get_link_topo = *cmd;
 +	resp = libie_aq_raw(&desc);
 +	*resp = *cmd;
  
- 	if (ice_aq_send_cmd(hw, &desc, NULL, 0, NULL))
- 		return -EINTR;
+ 	if (ixgbe_aci_send_cmd(hw, &desc, NULL, 0))
+ 		return -EOPNOTSUPP;
  
  	if (node_handle)
 -		*node_handle =
@@ -890,2044 +1099,160 @@ index edb1d0f7e187..df2931f4473f 100644
  
  	return 0;
  }
-@@ -680,8 +681,8 @@ ice_aq_get_link_info(struct ice_port_info *pi, bool ena_lse,
- 	struct ice_link_status *li_old, *li;
- 	enum ice_media_type *hw_media_type;
- 	struct ice_fc_info *hw_fc_info;
-+	struct libie_aq_desc desc;
- 	bool tx_pause, rx_pause;
--	struct ice_aq_desc desc;
- 	struct ice_hw *hw;
- 	u16 cmd_flags;
- 	int status;
-@@ -696,7 +697,7 @@ ice_aq_get_link_info(struct ice_port_info *pi, bool ena_lse,
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_link_status);
- 	cmd_flags = (ena_lse) ? ICE_AQ_LSE_ENA : ICE_AQ_LSE_DIS;
--	resp = &desc.params.get_link_status;
-+	resp = libie_aq_raw(&desc);
- 	resp->cmd_flags = cpu_to_le16(cmd_flags);
- 	resp->lport_num = pi->lport;
- 
-@@ -825,9 +826,9 @@ int
- ice_aq_set_mac_cfg(struct ice_hw *hw, u16 max_frame_size, struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_set_mac_cfg *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
--	cmd = &desc.params.set_mac_cfg;
-+	cmd = libie_aq_raw(&desc);
- 
- 	if (max_frame_size == 0)
- 		return -EINVAL;
-@@ -1469,7 +1470,7 @@ ice_sbq_send_cmd(struct ice_hw *hw, struct ice_sbq_cmd_desc *desc,
- 		 void *buf, u16 buf_size, struct ice_sq_cd *cd)
- {
- 	return ice_sq_send_cmd(hw, ice_get_sbq(hw),
--			       (struct ice_aq_desc *)desc, buf, buf_size, cd);
-+			       (struct libie_aq_desc *)desc, buf, buf_size, cd);
- }
- 
- /**
-@@ -1554,10 +1555,10 @@ static bool ice_should_retry_sq_send_cmd(u16 opcode)
-  */
- static int
- ice_sq_send_cmd_retry(struct ice_hw *hw, struct ice_ctl_q_info *cq,
--		      struct ice_aq_desc *desc, void *buf, u16 buf_size,
-+		      struct libie_aq_desc *desc, void *buf, u16 buf_size,
- 		      struct ice_sq_cd *cd)
- {
--	struct ice_aq_desc desc_cpy;
-+	struct libie_aq_desc desc_cpy;
- 	bool is_cmd_for_retry;
- 	u8 idx = 0;
- 	u16 opcode;
-@@ -1578,7 +1579,7 @@ ice_sq_send_cmd_retry(struct ice_hw *hw, struct ice_ctl_q_info *cq,
- 		status = ice_sq_send_cmd(hw, cq, desc, buf, buf_size, cd);
- 
- 		if (!is_cmd_for_retry || !status ||
--		    hw->adminq.sq_last_status != ICE_AQ_RC_EBUSY)
-+		    hw->adminq.sq_last_status != LIBIE_AQ_RC_EBUSY)
- 			break;
- 
- 		memcpy(desc, &desc_cpy, sizeof(desc_cpy));
-@@ -1601,10 +1602,10 @@ ice_sq_send_cmd_retry(struct ice_hw *hw, struct ice_ctl_q_info *cq,
-  * Helper function to send FW Admin Queue commands to the FW Admin Queue.
-  */
- int
--ice_aq_send_cmd(struct ice_hw *hw, struct ice_aq_desc *desc, void *buf,
-+ice_aq_send_cmd(struct ice_hw *hw, struct libie_aq_desc *desc, void *buf,
- 		u16 buf_size, struct ice_sq_cd *cd)
- {
--	struct ice_aqc_req_res *cmd = &desc->params.res_owner;
-+	struct libie_aqc_req_res *cmd = libie_aq_raw(desc);
- 	bool lock_acquired = false;
- 	int status;
- 
-@@ -1635,7 +1636,7 @@ ice_aq_send_cmd(struct ice_hw *hw, struct ice_aq_desc *desc, void *buf,
- 	case ice_aqc_opc_get_recipe_to_profile:
- 		break;
- 	case ice_aqc_opc_release_res:
--		if (le16_to_cpu(cmd->res_id) == ICE_AQC_RES_ID_GLBL_LOCK)
-+		if (le16_to_cpu(cmd->res_id) == LIBIE_AQC_RES_ID_GLBL_LOCK)
- 			break;
- 		fallthrough;
- 	default:
-@@ -1660,8 +1661,8 @@ ice_aq_send_cmd(struct ice_hw *hw, struct ice_aq_desc *desc, void *buf,
-  */
- int ice_aq_get_fw_ver(struct ice_hw *hw, struct ice_sq_cd *cd)
- {
--	struct ice_aqc_get_ver *resp;
--	struct ice_aq_desc desc;
-+	struct libie_aqc_get_ver *resp;
-+	struct libie_aq_desc desc;
- 	int status;
- 
- 	resp = &desc.params.get_ver;
-@@ -1697,8 +1698,8 @@ int
- ice_aq_send_driver_ver(struct ice_hw *hw, struct ice_driver_ver *dv,
- 		       struct ice_sq_cd *cd)
- {
--	struct ice_aqc_driver_ver *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aqc_driver_ver *cmd;
-+	struct libie_aq_desc desc;
- 	u16 len;
- 
- 	cmd = &desc.params.driver_ver;
-@@ -1708,7 +1709,7 @@ ice_aq_send_driver_ver(struct ice_hw *hw, struct ice_driver_ver *dv,
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_driver_ver);
- 
--	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-+	desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
- 	cmd->major_ver = dv->major_ver;
- 	cmd->minor_ver = dv->minor_ver;
- 	cmd->build_ver = dv->build_ver;
-@@ -1733,9 +1734,9 @@ ice_aq_send_driver_ver(struct ice_hw *hw, struct ice_driver_ver *dv,
- int ice_aq_q_shutdown(struct ice_hw *hw, bool unloading)
- {
- 	struct ice_aqc_q_shutdown *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
--	cmd = &desc.params.q_shutdown;
-+	cmd = libie_aq_raw(&desc);
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_q_shutdown);
- 
-@@ -1776,8 +1777,8 @@ ice_aq_req_res(struct ice_hw *hw, enum ice_aq_res_ids res,
- 	       enum ice_aq_res_access_type access, u8 sdp_number, u32 *timeout,
- 	       struct ice_sq_cd *cd)
- {
--	struct ice_aqc_req_res *cmd_resp;
--	struct ice_aq_desc desc;
-+	struct libie_aqc_req_res *cmd_resp;
-+	struct libie_aq_desc desc;
- 	int status;
- 
- 	cmd_resp = &desc.params.res_owner;
-@@ -1799,20 +1800,20 @@ ice_aq_req_res(struct ice_hw *hw, enum ice_aq_res_ids res,
- 	/* Global config lock response utilizes an additional status field.
- 	 *
- 	 * If the Global config lock resource is held by some other driver, the
--	 * command completes with ICE_AQ_RES_GLBL_IN_PROG in the status field
-+	 * command completes with LIBIE_AQ_RES_GLBL_IN_PROG in the status field
- 	 * and the timeout field indicates the maximum time the current owner
- 	 * of the resource has to free it.
- 	 */
- 	if (res == ICE_GLOBAL_CFG_LOCK_RES_ID) {
--		if (le16_to_cpu(cmd_resp->status) == ICE_AQ_RES_GLBL_SUCCESS) {
-+		if (le16_to_cpu(cmd_resp->status) == LIBIE_AQ_RES_GLBL_SUCCESS) {
- 			*timeout = le32_to_cpu(cmd_resp->timeout);
- 			return 0;
- 		} else if (le16_to_cpu(cmd_resp->status) ==
--			   ICE_AQ_RES_GLBL_IN_PROG) {
-+			   LIBIE_AQ_RES_GLBL_IN_PROG) {
- 			*timeout = le32_to_cpu(cmd_resp->timeout);
- 			return -EIO;
- 		} else if (le16_to_cpu(cmd_resp->status) ==
--			   ICE_AQ_RES_GLBL_DONE) {
-+			   LIBIE_AQ_RES_GLBL_DONE) {
- 			return -EALREADY;
- 		}
- 
-@@ -1825,7 +1826,7 @@ ice_aq_req_res(struct ice_hw *hw, enum ice_aq_res_ids res,
- 	 * with a busy return value and the timeout field indicates the maximum
- 	 * time the current owner of the resource has to free it.
- 	 */
--	if (!status || hw->adminq.sq_last_status == ICE_AQ_RC_EBUSY)
-+	if (!status || hw->adminq.sq_last_status == LIBIE_AQ_RC_EBUSY)
- 		*timeout = le32_to_cpu(cmd_resp->timeout);
- 
- 	return status;
-@@ -1844,8 +1845,8 @@ static int
- ice_aq_release_res(struct ice_hw *hw, enum ice_aq_res_ids res, u8 sdp_number,
- 		   struct ice_sq_cd *cd)
- {
--	struct ice_aqc_req_res *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aqc_req_res *cmd;
-+	struct libie_aq_desc desc;
- 
- 	cmd = &desc.params.res_owner;
- 
-@@ -1954,16 +1955,16 @@ int ice_aq_alloc_free_res(struct ice_hw *hw,
- 			  enum ice_adminq_opc opc)
- {
- 	struct ice_aqc_alloc_free_res_cmd *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
--	cmd = &desc.params.sw_res_ctrl;
-+	cmd = libie_aq_raw(&desc);
- 
- 	if (!buf || buf_size < flex_array_size(buf, elem, 1))
- 		return -EINVAL;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, opc);
- 
--	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-+	desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
- 
- 	cmd->num_entries = cpu_to_le16(1);
- 
-@@ -2077,7 +2078,7 @@ static u32 ice_get_num_per_func(struct ice_hw *hw, u32 max)
-  */
- static bool
- ice_parse_common_caps(struct ice_hw *hw, struct ice_hw_common_caps *caps,
--		      struct ice_aqc_list_caps_elem *elem, const char *prefix)
-+		      struct libie_aqc_list_caps_elem *elem, const char *prefix)
- {
- 	u32 logical_id = le32_to_cpu(elem->logical_id);
- 	u32 phys_id = le32_to_cpu(elem->phys_id);
-@@ -2086,17 +2087,17 @@ ice_parse_common_caps(struct ice_hw *hw, struct ice_hw_common_caps *caps,
- 	bool found = true;
- 
- 	switch (cap) {
--	case ICE_AQC_CAPS_VALID_FUNCTIONS:
-+	case LIBIE_AQC_CAPS_VALID_FUNCTIONS:
- 		caps->valid_functions = number;
- 		ice_debug(hw, ICE_DBG_INIT, "%s: valid_functions (bitmap) = %d\n", prefix,
- 			  caps->valid_functions);
- 		break;
--	case ICE_AQC_CAPS_SRIOV:
-+	case LIBIE_AQC_CAPS_SRIOV:
- 		caps->sr_iov_1_1 = (number == 1);
- 		ice_debug(hw, ICE_DBG_INIT, "%s: sr_iov_1_1 = %d\n", prefix,
- 			  caps->sr_iov_1_1);
- 		break;
--	case ICE_AQC_CAPS_DCB:
-+	case LIBIE_AQC_CAPS_DCB:
- 		caps->dcb = (number == 1);
- 		caps->active_tc_bitmap = logical_id;
- 		caps->maxtc = phys_id;
-@@ -2105,7 +2106,7 @@ ice_parse_common_caps(struct ice_hw *hw, struct ice_hw_common_caps *caps,
- 			  caps->active_tc_bitmap);
- 		ice_debug(hw, ICE_DBG_INIT, "%s: maxtc = %d\n", prefix, caps->maxtc);
- 		break;
--	case ICE_AQC_CAPS_RSS:
-+	case LIBIE_AQC_CAPS_RSS:
- 		caps->rss_table_size = number;
- 		caps->rss_table_entry_width = logical_id;
- 		ice_debug(hw, ICE_DBG_INIT, "%s: rss_table_size = %d\n", prefix,
-@@ -2113,7 +2114,7 @@ ice_parse_common_caps(struct ice_hw *hw, struct ice_hw_common_caps *caps,
- 		ice_debug(hw, ICE_DBG_INIT, "%s: rss_table_entry_width = %d\n", prefix,
- 			  caps->rss_table_entry_width);
- 		break;
--	case ICE_AQC_CAPS_RXQS:
-+	case LIBIE_AQC_CAPS_RXQS:
- 		caps->num_rxq = number;
- 		caps->rxq_first_id = phys_id;
- 		ice_debug(hw, ICE_DBG_INIT, "%s: num_rxq = %d\n", prefix,
-@@ -2121,7 +2122,7 @@ ice_parse_common_caps(struct ice_hw *hw, struct ice_hw_common_caps *caps,
- 		ice_debug(hw, ICE_DBG_INIT, "%s: rxq_first_id = %d\n", prefix,
- 			  caps->rxq_first_id);
- 		break;
--	case ICE_AQC_CAPS_TXQS:
-+	case LIBIE_AQC_CAPS_TXQS:
- 		caps->num_txq = number;
- 		caps->txq_first_id = phys_id;
- 		ice_debug(hw, ICE_DBG_INIT, "%s: num_txq = %d\n", prefix,
-@@ -2129,7 +2130,7 @@ ice_parse_common_caps(struct ice_hw *hw, struct ice_hw_common_caps *caps,
- 		ice_debug(hw, ICE_DBG_INIT, "%s: txq_first_id = %d\n", prefix,
- 			  caps->txq_first_id);
- 		break;
--	case ICE_AQC_CAPS_MSIX:
-+	case LIBIE_AQC_CAPS_MSIX:
- 		caps->num_msix_vectors = number;
- 		caps->msix_vector_first_id = phys_id;
- 		ice_debug(hw, ICE_DBG_INIT, "%s: num_msix_vectors = %d\n", prefix,
-@@ -2137,55 +2138,55 @@ ice_parse_common_caps(struct ice_hw *hw, struct ice_hw_common_caps *caps,
- 		ice_debug(hw, ICE_DBG_INIT, "%s: msix_vector_first_id = %d\n", prefix,
- 			  caps->msix_vector_first_id);
- 		break;
--	case ICE_AQC_CAPS_PENDING_NVM_VER:
-+	case LIBIE_AQC_CAPS_PENDING_NVM_VER:
- 		caps->nvm_update_pending_nvm = true;
- 		ice_debug(hw, ICE_DBG_INIT, "%s: update_pending_nvm\n", prefix);
- 		break;
--	case ICE_AQC_CAPS_PENDING_OROM_VER:
-+	case LIBIE_AQC_CAPS_PENDING_OROM_VER:
- 		caps->nvm_update_pending_orom = true;
- 		ice_debug(hw, ICE_DBG_INIT, "%s: update_pending_orom\n", prefix);
- 		break;
--	case ICE_AQC_CAPS_PENDING_NET_VER:
-+	case LIBIE_AQC_CAPS_PENDING_NET_VER:
- 		caps->nvm_update_pending_netlist = true;
- 		ice_debug(hw, ICE_DBG_INIT, "%s: update_pending_netlist\n", prefix);
- 		break;
--	case ICE_AQC_CAPS_NVM_MGMT:
-+	case LIBIE_AQC_CAPS_NVM_MGMT:
- 		caps->nvm_unified_update =
- 			(number & ICE_NVM_MGMT_UNIFIED_UPD_SUPPORT) ?
- 			true : false;
- 		ice_debug(hw, ICE_DBG_INIT, "%s: nvm_unified_update = %d\n", prefix,
- 			  caps->nvm_unified_update);
- 		break;
--	case ICE_AQC_CAPS_RDMA:
-+	case LIBIE_AQC_CAPS_RDMA:
- 		caps->rdma = (number == 1);
- 		ice_debug(hw, ICE_DBG_INIT, "%s: rdma = %d\n", prefix, caps->rdma);
- 		break;
--	case ICE_AQC_CAPS_MAX_MTU:
-+	case LIBIE_AQC_CAPS_MAX_MTU:
- 		caps->max_mtu = number;
- 		ice_debug(hw, ICE_DBG_INIT, "%s: max_mtu = %d\n",
- 			  prefix, caps->max_mtu);
- 		break;
--	case ICE_AQC_CAPS_PCIE_RESET_AVOIDANCE:
-+	case LIBIE_AQC_CAPS_PCIE_RESET_AVOIDANCE:
- 		caps->pcie_reset_avoidance = (number > 0);
- 		ice_debug(hw, ICE_DBG_INIT,
- 			  "%s: pcie_reset_avoidance = %d\n", prefix,
- 			  caps->pcie_reset_avoidance);
- 		break;
--	case ICE_AQC_CAPS_POST_UPDATE_RESET_RESTRICT:
-+	case LIBIE_AQC_CAPS_POST_UPDATE_RESET_RESTRICT:
- 		caps->reset_restrict_support = (number == 1);
- 		ice_debug(hw, ICE_DBG_INIT,
- 			  "%s: reset_restrict_support = %d\n", prefix,
- 			  caps->reset_restrict_support);
- 		break;
--	case ICE_AQC_CAPS_FW_LAG_SUPPORT:
--		caps->roce_lag = !!(number & ICE_AQC_BIT_ROCEV2_LAG);
-+	case LIBIE_AQC_CAPS_FW_LAG_SUPPORT:
-+		caps->roce_lag = !!(number & LIBIE_AQC_BIT_ROCEV2_LAG);
- 		ice_debug(hw, ICE_DBG_INIT, "%s: roce_lag = %u\n",
- 			  prefix, caps->roce_lag);
--		caps->sriov_lag = !!(number & ICE_AQC_BIT_SRIOV_LAG);
-+		caps->sriov_lag = !!(number & LIBIE_AQC_BIT_SRIOV_LAG);
- 		ice_debug(hw, ICE_DBG_INIT, "%s: sriov_lag = %u\n",
- 			  prefix, caps->sriov_lag);
- 		break;
--	case ICE_AQC_CAPS_TX_SCHED_TOPO_COMP_MODE:
-+	case LIBIE_AQC_CAPS_TX_SCHED_TOPO_COMP_MODE:
- 		caps->tx_sched_topo_comp_mode_en = (number == 1);
- 		break;
- 	default:
-@@ -2239,7 +2240,7 @@ ice_recalc_port_limited_caps(struct ice_hw *hw, struct ice_hw_common_caps *caps)
-  */
- static void
- ice_parse_vf_func_caps(struct ice_hw *hw, struct ice_hw_func_caps *func_p,
--		       struct ice_aqc_list_caps_elem *cap)
-+		       struct libie_aqc_list_caps_elem *cap)
- {
- 	u32 logical_id = le32_to_cpu(cap->logical_id);
- 	u32 number = le32_to_cpu(cap->number);
-@@ -2262,7 +2263,7 @@ ice_parse_vf_func_caps(struct ice_hw *hw, struct ice_hw_func_caps *func_p,
-  */
- static void
- ice_parse_vsi_func_caps(struct ice_hw *hw, struct ice_hw_func_caps *func_p,
--			struct ice_aqc_list_caps_elem *cap)
-+			struct libie_aqc_list_caps_elem *cap)
- {
- 	func_p->guar_num_vsi = ice_get_num_per_func(hw, ICE_MAX_VSI);
- 	ice_debug(hw, ICE_DBG_INIT, "func caps: guar_num_vsi (fw) = %d\n",
-@@ -2281,7 +2282,7 @@ ice_parse_vsi_func_caps(struct ice_hw *hw, struct ice_hw_func_caps *func_p,
-  */
- static void
- ice_parse_1588_func_caps(struct ice_hw *hw, struct ice_hw_func_caps *func_p,
--			 struct ice_aqc_list_caps_elem *cap)
-+			 struct libie_aqc_list_caps_elem *cap)
- {
- 	struct ice_ts_func_info *info = &func_p->ts_func_info;
- 	u32 number = le32_to_cpu(cap->number);
-@@ -2380,7 +2381,7 @@ static void
- ice_parse_func_caps(struct ice_hw *hw, struct ice_hw_func_caps *func_p,
- 		    void *buf, u32 cap_count)
- {
--	struct ice_aqc_list_caps_elem *cap_resp;
-+	struct libie_aqc_list_caps_elem *cap_resp;
- 	u32 i;
- 
- 	cap_resp = buf;
-@@ -2395,16 +2396,16 @@ ice_parse_func_caps(struct ice_hw *hw, struct ice_hw_func_caps *func_p,
- 					      &cap_resp[i], "func caps");
- 
- 		switch (cap) {
--		case ICE_AQC_CAPS_VF:
-+		case LIBIE_AQC_CAPS_VF:
- 			ice_parse_vf_func_caps(hw, func_p, &cap_resp[i]);
- 			break;
--		case ICE_AQC_CAPS_VSI:
-+		case LIBIE_AQC_CAPS_VSI:
- 			ice_parse_vsi_func_caps(hw, func_p, &cap_resp[i]);
- 			break;
--		case ICE_AQC_CAPS_1588:
-+		case LIBIE_AQC_CAPS_1588:
- 			ice_parse_1588_func_caps(hw, func_p, &cap_resp[i]);
- 			break;
--		case ICE_AQC_CAPS_FD:
-+		case LIBIE_AQC_CAPS_FD:
- 			ice_parse_fdir_func_caps(hw, func_p);
- 			break;
- 		default:
-@@ -2448,7 +2449,7 @@ static int ice_func_id_to_logical_id(u32 active_function_bitmap, u8 pf_id)
-  */
- static void
- ice_parse_valid_functions_cap(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
--			      struct ice_aqc_list_caps_elem *cap)
-+			      struct libie_aqc_list_caps_elem *cap)
- {
- 	u32 number = le32_to_cpu(cap->number);
- 
-@@ -2469,7 +2470,7 @@ ice_parse_valid_functions_cap(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
-  */
- static void
- ice_parse_vf_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
--		      struct ice_aqc_list_caps_elem *cap)
-+		      struct libie_aqc_list_caps_elem *cap)
- {
- 	u32 number = le32_to_cpu(cap->number);
- 
-@@ -2488,7 +2489,7 @@ ice_parse_vf_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
-  */
- static void
- ice_parse_vsi_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
--		       struct ice_aqc_list_caps_elem *cap)
-+		       struct libie_aqc_list_caps_elem *cap)
- {
- 	u32 number = le32_to_cpu(cap->number);
- 
-@@ -2507,7 +2508,7 @@ ice_parse_vsi_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
-  */
- static void
- ice_parse_1588_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
--			struct ice_aqc_list_caps_elem *cap)
-+			struct libie_aqc_list_caps_elem *cap)
- {
- 	struct ice_ts_dev_info *info = &dev_p->ts_dev_info;
- 	u32 logical_id = le32_to_cpu(cap->logical_id);
-@@ -2568,7 +2569,7 @@ ice_parse_1588_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
-  */
- static void
- ice_parse_fdir_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
--			struct ice_aqc_list_caps_elem *cap)
-+			struct libie_aqc_list_caps_elem *cap)
- {
- 	u32 number = le32_to_cpu(cap->number);
- 
-@@ -2588,7 +2589,7 @@ ice_parse_fdir_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
-  */
- static void
- ice_parse_sensor_reading_cap(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
--			     struct ice_aqc_list_caps_elem *cap)
-+			     struct libie_aqc_list_caps_elem *cap)
- {
- 	dev_p->supported_sensors = le32_to_cpu(cap->number);
- 
-@@ -2607,7 +2608,7 @@ ice_parse_sensor_reading_cap(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
-  */
- static void ice_parse_nac_topo_dev_caps(struct ice_hw *hw,
- 					struct ice_hw_dev_caps *dev_p,
--					struct ice_aqc_list_caps_elem *cap)
-+					struct libie_aqc_list_caps_elem *cap)
- {
- 	dev_p->nac_topo.mode = le32_to_cpu(cap->number);
- 	dev_p->nac_topo.id = le32_to_cpu(cap->phys_id) & ICE_NAC_TOPO_ID_M;
-@@ -2643,7 +2644,7 @@ static void
- ice_parse_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
- 		   void *buf, u32 cap_count)
- {
--	struct ice_aqc_list_caps_elem *cap_resp;
-+	struct libie_aqc_list_caps_elem *cap_resp;
- 	u32 i;
- 
- 	cap_resp = buf;
-@@ -2658,25 +2659,25 @@ ice_parse_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
- 					      &cap_resp[i], "dev caps");
- 
- 		switch (cap) {
--		case ICE_AQC_CAPS_VALID_FUNCTIONS:
-+		case LIBIE_AQC_CAPS_VALID_FUNCTIONS:
- 			ice_parse_valid_functions_cap(hw, dev_p, &cap_resp[i]);
- 			break;
--		case ICE_AQC_CAPS_VF:
-+		case LIBIE_AQC_CAPS_VF:
- 			ice_parse_vf_dev_caps(hw, dev_p, &cap_resp[i]);
- 			break;
--		case ICE_AQC_CAPS_VSI:
-+		case LIBIE_AQC_CAPS_VSI:
- 			ice_parse_vsi_dev_caps(hw, dev_p, &cap_resp[i]);
- 			break;
--		case ICE_AQC_CAPS_1588:
-+		case LIBIE_AQC_CAPS_1588:
- 			ice_parse_1588_dev_caps(hw, dev_p, &cap_resp[i]);
- 			break;
--		case ICE_AQC_CAPS_FD:
-+		case LIBIE_AQC_CAPS_FD:
- 			ice_parse_fdir_dev_caps(hw, dev_p, &cap_resp[i]);
- 			break;
--		case ICE_AQC_CAPS_SENSOR_READING:
-+		case LIBIE_AQC_CAPS_SENSOR_READING:
- 			ice_parse_sensor_reading_cap(hw, dev_p, &cap_resp[i]);
- 			break;
--		case ICE_AQC_CAPS_NAC_TOPOLOGY:
-+		case LIBIE_AQC_CAPS_NAC_TOPOLOGY:
- 			ice_parse_nac_topo_dev_caps(hw, dev_p, &cap_resp[i]);
- 			break;
- 		default:
-@@ -2796,8 +2797,8 @@ int
- ice_aq_list_caps(struct ice_hw *hw, void *buf, u16 buf_size, u32 *cap_count,
- 		 enum ice_adminq_opc opc, struct ice_sq_cd *cd)
- {
--	struct ice_aqc_list_caps *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aqc_list_caps *cmd;
-+	struct libie_aq_desc desc;
- 	int status;
- 
- 	cmd = &desc.params.get_cap;
-@@ -2838,7 +2839,7 @@ ice_discover_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_caps)
- 	 * device will return, we can simply send a 4KB buffer, the maximum
- 	 * possible size that firmware can return.
- 	 */
--	cap_count = ICE_AQ_MAX_BUF_LEN / sizeof(struct ice_aqc_list_caps_elem);
-+	cap_count = ICE_AQ_MAX_BUF_LEN / sizeof(struct libie_aqc_list_caps_elem);
- 
- 	status = ice_aq_list_caps(hw, cbuf, ICE_AQ_MAX_BUF_LEN, &cap_count,
- 				  ice_aqc_opc_list_dev_caps, NULL);
-@@ -2872,7 +2873,7 @@ ice_discover_func_caps(struct ice_hw *hw, struct ice_hw_func_caps *func_caps)
- 	 * device will return, we can simply send a 4KB buffer, the maximum
- 	 * possible size that firmware can return.
- 	 */
--	cap_count = ICE_AQ_MAX_BUF_LEN / sizeof(struct ice_aqc_list_caps_elem);
-+	cap_count = ICE_AQ_MAX_BUF_LEN / sizeof(struct libie_aqc_list_caps_elem);
- 
- 	status = ice_aq_list_caps(hw, cbuf, ICE_AQ_MAX_BUF_LEN, &cap_count,
- 				  ice_aqc_opc_list_func_caps, NULL);
-@@ -2981,9 +2982,9 @@ ice_aq_manage_mac_write(struct ice_hw *hw, const u8 *mac_addr, u8 flags,
- 			struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_manage_mac_write *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
--	cmd = &desc.params.mac_write;
-+	cmd = libie_aq_raw(&desc);
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_manage_mac_write);
- 
- 	cmd->flags = flags;
-@@ -3000,10 +3001,12 @@ ice_aq_manage_mac_write(struct ice_hw *hw, const u8 *mac_addr, u8 flags,
-  */
- static int ice_aq_clear_pxe_mode(struct ice_hw *hw)
- {
--	struct ice_aq_desc desc;
-+	struct ice_aqc_clear_pxe *cmd;
-+	struct libie_aq_desc desc;
- 
-+	cmd = libie_aq_raw(&desc);
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_clear_pxe_mode);
--	desc.params.clear_pxe.rx_cnt = ICE_AQC_CLEAR_PXE_RX_CNT;
-+	cmd->rx_cnt = ICE_AQC_CLEAR_PXE_RX_CNT;
- 
- 	return ice_aq_send_cmd(hw, &desc, NULL, 0, NULL);
- }
-@@ -3036,10 +3039,10 @@ ice_aq_set_port_params(struct ice_port_info *pi, bool double_vlan,
- {
- 	struct ice_aqc_set_port_params *cmd;
- 	struct ice_hw *hw = pi->hw;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	u16 cmd_flags = 0;
- 
--	cmd = &desc.params.set_port_params;
-+	cmd = libie_aq_raw(&desc);
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_port_params);
- 	if (double_vlan)
-@@ -3277,7 +3280,8 @@ int
- ice_aq_set_phy_cfg(struct ice_hw *hw, struct ice_port_info *pi,
- 		   struct ice_aqc_set_phy_cfg_data *cfg, struct ice_sq_cd *cd)
- {
--	struct ice_aq_desc desc;
-+	struct ice_aqc_set_phy_cfg *cmd;
-+	struct libie_aq_desc desc;
- 	int status;
- 
- 	if (!cfg)
-@@ -3292,8 +3296,9 @@ ice_aq_set_phy_cfg(struct ice_hw *hw, struct ice_port_info *pi,
- 	}
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_phy_cfg);
--	desc.params.set_phy.lport_num = pi->lport;
--	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-+	cmd = libie_aq_raw(&desc);
-+	cmd->lport_num = pi->lport;
-+	desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
- 
- 	ice_debug(hw, ICE_DBG_LINK, "set phy cfg\n");
- 	ice_debug(hw, ICE_DBG_LINK, "	phy_type_low = 0x%llx\n",
-@@ -3309,7 +3314,7 @@ ice_aq_set_phy_cfg(struct ice_hw *hw, struct ice_port_info *pi,
- 		  cfg->link_fec_opt);
- 
- 	status = ice_aq_send_cmd(hw, &desc, cfg, sizeof(*cfg), cd);
--	if (hw->adminq.sq_last_status == ICE_AQ_RC_EMODE)
-+	if (hw->adminq.sq_last_status == LIBIE_AQ_RC_EMODE)
- 		status = 0;
- 
- 	if (!status)
-@@ -3366,17 +3371,17 @@ int ice_aq_get_phy_equalization(struct ice_hw *hw, u16 data_in, u16 op_code,
- {
- 	struct ice_aqc_dnl_call_command *cmd;
- 	struct ice_aqc_dnl_call buf = {};
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int err;
- 
- 	buf.sto.txrx_equa_reqs.data_in = cpu_to_le16(data_in);
- 	buf.sto.txrx_equa_reqs.op_code_serdes_sel =
- 		cpu_to_le16(op_code | (serdes_num & 0xF));
--	cmd = &desc.params.dnl_call;
-+	cmd = libie_aq_raw(&desc);
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_dnl_call);
--	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_BUF |
--				  ICE_AQ_FLAG_RD |
--				  ICE_AQ_FLAG_SI);
-+	desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_BUF |
-+				  LIBIE_AQ_FLAG_RD |
-+				  LIBIE_AQ_FLAG_SI);
- 	desc.datalen = cpu_to_le16(sizeof(struct ice_aqc_dnl_call));
- 	cmd->activity_id = cpu_to_le16(ICE_AQC_ACT_ID_DNL);
- 
-@@ -3414,7 +3419,7 @@ static const u32 fec_reg[][ICE_FEC_MAX] = {
- int ice_aq_get_fec_stats(struct ice_hw *hw, u16 pcs_quad, u16 pcs_port,
- 			 enum ice_fec_stats_types fec_type, u32 *output)
- {
--	u16 flag = (ICE_AQ_FLAG_RD | ICE_AQ_FLAG_BUF | ICE_AQ_FLAG_SI);
-+	u16 flag = (LIBIE_AQ_FLAG_RD | LIBIE_AQ_FLAG_BUF | LIBIE_AQ_FLAG_SI);
- 	struct ice_sbq_msg_input msg = {};
- 	u32 receiver_id, reg_offset;
- 	int err;
-@@ -3837,9 +3842,9 @@ ice_aq_set_link_restart_an(struct ice_port_info *pi, bool ena_link,
- 			   struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_restart_an *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
--	cmd = &desc.params.restart_an;
-+	cmd = libie_aq_raw(&desc);
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_restart_an);
- 
-@@ -3867,9 +3872,9 @@ ice_aq_set_event_mask(struct ice_hw *hw, u8 port_num, u16 mask,
- 		      struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_set_event_mask *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
--	cmd = &desc.params.set_event_mask;
-+	cmd = libie_aq_raw(&desc);
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_event_mask);
- 
-@@ -3891,9 +3896,9 @@ int
- ice_aq_set_mac_loopback(struct ice_hw *hw, bool ena_lpbk, struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_set_mac_lb *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
--	cmd = &desc.params.set_mac_lb;
-+	cmd = libie_aq_raw(&desc);
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_mac_lb);
- 	if (ena_lpbk)
-@@ -3916,9 +3921,9 @@ ice_aq_set_port_id_led(struct ice_port_info *pi, bool is_orig_mode,
- {
- 	struct ice_aqc_set_port_id_led *cmd;
- 	struct ice_hw *hw = pi->hw;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
--	cmd = &desc.params.set_port_id_led;
-+	cmd = libie_aq_raw(&desc);
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_port_id_led);
- 
-@@ -3954,7 +3959,7 @@ ice_aq_get_port_options(struct ice_hw *hw,
- 			u8 *pending_option_idx, bool *pending_option_valid)
- {
- 	struct ice_aqc_get_port_options *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int status;
- 	u8 i;
- 
-@@ -3962,7 +3967,7 @@ ice_aq_get_port_options(struct ice_hw *hw,
- 	if (*option_count < ICE_AQC_PORT_OPT_COUNT_M)
- 		return -EINVAL;
- 
--	cmd = &desc.params.get_port_options;
-+	cmd = libie_aq_raw(&desc);
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_port_options);
- 
- 	if (lport_valid)
-@@ -4028,12 +4033,12 @@ ice_aq_set_port_option(struct ice_hw *hw, u8 lport, u8 lport_valid,
- 		       u8 new_option)
- {
- 	struct ice_aqc_set_port_option *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
- 	if (new_option > ICE_AQC_PORT_OPT_COUNT_M)
- 		return -EINVAL;
- 
--	cmd = &desc.params.set_port_option;
-+	cmd = libie_aq_raw(&desc);
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_port_option);
- 
- 	if (lport_valid)
-@@ -4126,7 +4131,7 @@ ice_aq_sff_eeprom(struct ice_hw *hw, u16 lport, u8 bus_addr,
- 		  bool write, struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_sff_eeprom *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	u16 i2c_bus_addr;
- 	int status;
- 
-@@ -4134,8 +4139,8 @@ ice_aq_sff_eeprom(struct ice_hw *hw, u16 lport, u8 bus_addr,
- 		return -EINVAL;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_sff_eeprom);
--	cmd = &desc.params.read_write_sff_param;
--	desc.flags = cpu_to_le16(ICE_AQ_FLAG_RD);
-+	cmd = libie_aq_raw(&desc);
-+	desc.flags = cpu_to_le16(LIBIE_AQ_FLAG_RD);
- 	cmd->lport_num = (u8)(lport & 0xff);
- 	cmd->lport_num_valid = (u8)((lport >> 8) & 0x01);
- 	i2c_bus_addr = FIELD_PREP(ICE_AQC_SFF_I2CBUS_7BIT_M, bus_addr >> 1) |
-@@ -4195,7 +4200,7 @@ __ice_aq_get_set_rss_lut(struct ice_hw *hw,
- 	struct ice_aqc_get_set_rss_lut *desc_params;
- 	enum ice_aqc_lut_flags flags;
- 	enum ice_lut_size lut_size;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	u8 *lut = params->lut;
- 
- 
-@@ -4211,9 +4216,9 @@ __ice_aq_get_set_rss_lut(struct ice_hw *hw,
- 	opcode = set ? ice_aqc_opc_set_rss_lut : ice_aqc_opc_get_rss_lut;
- 	ice_fill_dflt_direct_cmd_desc(&desc, opcode);
- 	if (set)
--		desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-+		desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
- 
--	desc_params = &desc.params.get_set_rss_lut;
-+	desc_params = libie_aq_raw(&desc);
- 	vsi_id = ice_get_hw_vsi_num(hw, vsi_handle);
- 	desc_params->vsi_id = cpu_to_le16(vsi_id | ICE_AQC_RSS_VSI_VALID);
- 
-@@ -4268,16 +4273,16 @@ __ice_aq_get_set_rss_key(struct ice_hw *hw, u16 vsi_id,
- {
- 	struct ice_aqc_get_set_rss_key *desc_params;
- 	u16 key_size = sizeof(*key);
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
- 	if (set) {
- 		ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_rss_key);
--		desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-+		desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
- 	} else {
- 		ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_rss_key);
- 	}
- 
--	desc_params = &desc.params.get_set_rss_key;
-+	desc_params = libie_aq_raw(&desc);
- 	desc_params->vsi_id = cpu_to_le16(vsi_id | ICE_AQC_RSS_VSI_VALID);
- 
- 	return ice_aq_send_cmd(hw, &desc, key, key_size, NULL);
-@@ -4349,10 +4354,10 @@ ice_aq_add_lan_txq(struct ice_hw *hw, u8 num_qgrps,
- {
- 	struct ice_aqc_add_tx_qgrp *list;
- 	struct ice_aqc_add_txqs *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	u16 i, sum_size = 0;
- 
--	cmd = &desc.params.add_txqs;
-+	cmd = libie_aq_raw(&desc);
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_add_txqs);
- 
-@@ -4371,7 +4376,7 @@ ice_aq_add_lan_txq(struct ice_hw *hw, u8 num_qgrps,
- 	if (buf_size != sum_size)
- 		return -EINVAL;
- 
--	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-+	desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
- 
- 	cmd->num_qgrps = num_qgrps;
- 
-@@ -4398,12 +4403,12 @@ ice_aq_dis_lan_txq(struct ice_hw *hw, u8 num_qgrps,
- {
- 	struct ice_aqc_dis_txq_item *item;
- 	struct ice_aqc_dis_txqs *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	u16 vmvf_and_timeout;
- 	u16 i, sz = 0;
- 	int status;
- 
--	cmd = &desc.params.dis_txqs;
-+	cmd = libie_aq_raw(&desc);
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_dis_txqs);
- 
- 	/* qg_list can be NULL only in VM/VF reset flow */
-@@ -4444,7 +4449,7 @@ ice_aq_dis_lan_txq(struct ice_hw *hw, u8 num_qgrps,
- 	/* set RD bit to indicate that command buffer is provided by the driver
- 	 * and it needs to be read by the firmware
- 	 */
--	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-+	desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
- 
- 	for (i = 0, item = qg_list; i < num_qgrps; i++) {
- 		u16 item_size = struct_size(item, q_id, item->num_qs);
-@@ -4496,12 +4501,12 @@ ice_aq_cfg_lan_txq(struct ice_hw *hw, struct ice_aqc_cfg_txqs_buf *buf,
- 		   struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_cfg_txqs *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int status;
- 
--	cmd = &desc.params.cfg_txqs;
-+	cmd = libie_aq_raw(&desc);
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_cfg_txqs);
--	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-+	desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
- 
- 	if (!buf)
- 		return -EINVAL;
-@@ -4537,10 +4542,10 @@ ice_aq_add_rdma_qsets(struct ice_hw *hw, u8 num_qset_grps,
- {
- 	struct ice_aqc_add_rdma_qset_data *list;
- 	struct ice_aqc_add_rdma_qset *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	u16 i, sum_size = 0;
- 
--	cmd = &desc.params.add_rdma_qset;
-+	cmd = libie_aq_raw(&desc);
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_add_rdma_qset);
- 
-@@ -4558,7 +4563,7 @@ ice_aq_add_rdma_qsets(struct ice_hw *hw, u8 num_qset_grps,
- 	if (buf_size != sum_size)
- 		return -EINVAL;
- 
--	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-+	desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
- 
- 	cmd->num_qset_grps = num_qset_grps;
- 
-@@ -4987,7 +4992,7 @@ int
- ice_aq_get_cgu_abilities(struct ice_hw *hw,
- 			 struct ice_aqc_get_cgu_abilities *abilities)
- {
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_cgu_abilities);
- 	return ice_aq_send_cmd(hw, &desc, abilities, sizeof(*abilities), NULL);
-@@ -5010,10 +5015,10 @@ ice_aq_set_input_pin_cfg(struct ice_hw *hw, u8 input_idx, u8 flags1, u8 flags2,
- 			 u32 freq, s32 phase_delay)
- {
- 	struct ice_aqc_set_cgu_input_config *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_cgu_input_config);
--	cmd = &desc.params.set_cgu_input_config;
-+	cmd = libie_aq_raw(&desc);
- 	cmd->input_idx = input_idx;
- 	cmd->flags1 = flags1;
- 	cmd->flags2 = flags2;
-@@ -5042,11 +5047,11 @@ ice_aq_get_input_pin_cfg(struct ice_hw *hw, u8 input_idx, u8 *status, u8 *type,
- 			 u8 *flags1, u8 *flags2, u32 *freq, s32 *phase_delay)
- {
- 	struct ice_aqc_get_cgu_input_config *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int ret;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_cgu_input_config);
--	cmd = &desc.params.get_cgu_input_config;
-+	cmd = libie_aq_raw(&desc);
- 	cmd->input_idx = input_idx;
- 
- 	ret = ice_aq_send_cmd(hw, &desc, NULL, 0, NULL);
-@@ -5085,10 +5090,10 @@ ice_aq_set_output_pin_cfg(struct ice_hw *hw, u8 output_idx, u8 flags,
- 			  u8 src_sel, u32 freq, s32 phase_delay)
- {
- 	struct ice_aqc_set_cgu_output_config *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_cgu_output_config);
--	cmd = &desc.params.set_cgu_output_config;
-+	cmd = libie_aq_raw(&desc);
- 	cmd->output_idx = output_idx;
- 	cmd->flags = flags;
- 	cmd->src_sel = src_sel;
-@@ -5115,11 +5120,11 @@ ice_aq_get_output_pin_cfg(struct ice_hw *hw, u8 output_idx, u8 *flags,
- 			  u8 *src_sel, u32 *freq, u32 *src_freq)
- {
- 	struct ice_aqc_get_cgu_output_config *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int ret;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_cgu_output_config);
--	cmd = &desc.params.get_cgu_output_config;
-+	cmd = libie_aq_raw(&desc);
- 	cmd->output_idx = output_idx;
- 
- 	ret = ice_aq_send_cmd(hw, &desc, NULL, 0, NULL);
-@@ -5156,11 +5161,11 @@ ice_aq_get_cgu_dpll_status(struct ice_hw *hw, u8 dpll_num, u8 *ref_state,
- 			   u8 *eec_mode)
- {
- 	struct ice_aqc_get_cgu_dpll_status *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int status;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_cgu_dpll_status);
--	cmd = &desc.params.get_cgu_dpll_status;
-+	cmd = libie_aq_raw(&desc);
- 	cmd->dpll_num = dpll_num;
- 
- 	status = ice_aq_send_cmd(hw, &desc, NULL, 0, NULL);
-@@ -5194,10 +5199,10 @@ ice_aq_set_cgu_dpll_config(struct ice_hw *hw, u8 dpll_num, u8 ref_state,
- 			   u8 config, u8 eec_mode)
- {
- 	struct ice_aqc_set_cgu_dpll_config *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_cgu_dpll_config);
--	cmd = &desc.params.set_cgu_dpll_config;
-+	cmd = libie_aq_raw(&desc);
- 	cmd->dpll_num = dpll_num;
- 	cmd->ref_state = ref_state;
- 	cmd->config = config;
-@@ -5221,10 +5226,10 @@ ice_aq_set_cgu_ref_prio(struct ice_hw *hw, u8 dpll_num, u8 ref_idx,
- 			u8 ref_priority)
- {
- 	struct ice_aqc_set_cgu_ref_prio *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_cgu_ref_prio);
--	cmd = &desc.params.set_cgu_ref_prio;
-+	cmd = libie_aq_raw(&desc);
- 	cmd->dpll_num = dpll_num;
- 	cmd->ref_idx = ref_idx;
- 	cmd->ref_priority = ref_priority;
-@@ -5247,11 +5252,11 @@ ice_aq_get_cgu_ref_prio(struct ice_hw *hw, u8 dpll_num, u8 ref_idx,
- 			u8 *ref_prio)
- {
- 	struct ice_aqc_get_cgu_ref_prio *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int status;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_cgu_ref_prio);
--	cmd = &desc.params.get_cgu_ref_prio;
-+	cmd = libie_aq_raw(&desc);
- 	cmd->dpll_num = dpll_num;
- 	cmd->ref_idx = ref_idx;
- 
-@@ -5277,11 +5282,11 @@ ice_aq_get_cgu_info(struct ice_hw *hw, u32 *cgu_id, u32 *cgu_cfg_ver,
- 		    u32 *cgu_fw_ver)
- {
- 	struct ice_aqc_get_cgu_info *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int status;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_cgu_info);
--	cmd = &desc.params.get_cgu_info;
-+	cmd = libie_aq_raw(&desc);
- 
- 	status = ice_aq_send_cmd(hw, &desc, NULL, 0, NULL);
- 	if (!status) {
-@@ -5308,11 +5313,11 @@ ice_aq_set_phy_rec_clk_out(struct ice_hw *hw, u8 phy_output, bool enable,
- 			   u32 *freq)
- {
- 	struct ice_aqc_set_phy_rec_clk_out *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int status;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_phy_rec_clk_out);
--	cmd = &desc.params.set_phy_rec_clk_out;
-+	cmd = libie_aq_raw(&desc);
- 	cmd->phy_output = phy_output;
- 	cmd->port_num = ICE_AQC_SET_PHY_REC_CLK_OUT_CURR_PORT;
- 	cmd->flags = enable & ICE_AQC_SET_PHY_REC_CLK_OUT_OUT_EN;
-@@ -5341,11 +5346,11 @@ ice_aq_get_phy_rec_clk_out(struct ice_hw *hw, u8 *phy_output, u8 *port_num,
- 			   u8 *flags, u16 *node_handle)
- {
- 	struct ice_aqc_get_phy_rec_clk_out *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int status;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_phy_rec_clk_out);
--	cmd = &desc.params.get_phy_rec_clk_out;
-+	cmd = libie_aq_raw(&desc);
- 	cmd->phy_output = *phy_output;
- 
- 	status = ice_aq_send_cmd(hw, &desc, NULL, 0, NULL);
-@@ -5373,11 +5378,11 @@ int ice_aq_get_sensor_reading(struct ice_hw *hw,
- 			      struct ice_aqc_get_sensor_reading_resp *data)
- {
- 	struct ice_aqc_get_sensor_reading *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int status;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_sensor_reading);
--	cmd = &desc.params.get_sensor_reading;
-+	cmd = libie_aq_raw(&desc);
- #define ICE_INTERNAL_TEMP_SENSOR_FORMAT	0
- #define ICE_INTERNAL_TEMP_SENSOR	0
- 	cmd->sensor = ICE_INTERNAL_TEMP_SENSOR;
-@@ -5385,7 +5390,7 @@ int ice_aq_get_sensor_reading(struct ice_hw *hw,
- 
- 	status = ice_aq_send_cmd(hw, &desc, NULL, 0, NULL);
- 	if (!status)
--		memcpy(data, &desc.params.get_sensor_reading_resp,
-+		memcpy(data, &desc.params.raw,
- 		       sizeof(*data));
- 
- 	return status;
-@@ -5582,13 +5587,13 @@ ice_aq_read_i2c(struct ice_hw *hw, struct ice_aqc_link_topo_addr topo_addr,
- 		u16 bus_addr, __le16 addr, u8 params, u8 *data,
- 		struct ice_sq_cd *cd)
- {
--	struct ice_aq_desc desc = { 0 };
-+	struct libie_aq_desc desc = { 0 };
- 	struct ice_aqc_i2c *cmd;
- 	u8 data_size;
- 	int status;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_read_i2c);
--	cmd = &desc.params.read_write_i2c;
-+	cmd = libie_aq_raw(&desc);
- 
- 	if (!data)
- 		return -EINVAL;
-@@ -5605,7 +5610,7 @@ ice_aq_read_i2c(struct ice_hw *hw, struct ice_aqc_link_topo_addr topo_addr,
- 		struct ice_aqc_read_i2c_resp *resp;
- 		u8 i;
- 
--		resp = &desc.params.read_i2c_resp;
-+		resp = libie_aq_raw(&desc);
- 		for (i = 0; i < data_size; i++) {
- 			*data = resp->i2c_data[i];
- 			data++;
-@@ -5637,12 +5642,12 @@ ice_aq_write_i2c(struct ice_hw *hw, struct ice_aqc_link_topo_addr topo_addr,
- 		 u16 bus_addr, __le16 addr, u8 params, const u8 *data,
- 		 struct ice_sq_cd *cd)
- {
--	struct ice_aq_desc desc = { 0 };
-+	struct libie_aq_desc desc = { 0 };
- 	struct ice_aqc_i2c *cmd;
- 	u8 data_size;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_write_i2c);
--	cmd = &desc.params.read_write_i2c;
-+	cmd = libie_aq_raw(&desc);
- 
- 	data_size = FIELD_GET(ICE_AQC_I2C_DATA_SIZE_M, params);
- 
-@@ -5674,7 +5679,7 @@ ice_aq_write_i2c(struct ice_hw *hw, struct ice_aqc_link_topo_addr topo_addr,
- int ice_get_pca9575_handle(struct ice_hw *hw, u16 *pca9575_handle)
- {
- 	struct ice_aqc_get_link_topo *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int err;
- 	u8 idx;
- 
-@@ -5697,7 +5702,7 @@ int ice_get_pca9575_handle(struct ice_hw *hw, u16 *pca9575_handle)
- 
- 	/* If handle was not detected read it from the netlist */
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_link_topo);
--	cmd = &desc.params.get_link_topo;
-+	cmd = libie_aq_raw(&desc);
- 	cmd->addr.topo_params.node_type_ctx =
- 		ICE_AQC_LINK_TOPO_NODE_TYPE_GPIO_CTRL;
- 	cmd->addr.topo_params.index = idx;
-@@ -5707,13 +5712,12 @@ int ice_get_pca9575_handle(struct ice_hw *hw, u16 *pca9575_handle)
- 		return -ENXIO;
- 
- 	/* Verify if we found the right IO expander type */
--	if (desc.params.get_link_topo.node_part_num !=
--	    ICE_AQC_GET_LINK_TOPO_NODE_NR_PCA9575)
-+	if (cmd->node_part_num != ICE_AQC_GET_LINK_TOPO_NODE_NR_PCA9575)
- 		return -ENXIO;
- 
- 	/* If present save the handle and return it */
- 	hw->io_expander_handle =
--		le16_to_cpu(desc.params.get_link_topo.addr.handle);
-+		le16_to_cpu(cmd->addr.handle);
- 	*pca9575_handle = hw->io_expander_handle;
- 
- 	return 0;
-@@ -5764,11 +5768,11 @@ int
- ice_aq_set_gpio(struct ice_hw *hw, u16 gpio_ctrl_handle, u8 pin_idx, bool value,
- 		struct ice_sq_cd *cd)
- {
-+	struct libie_aq_desc desc;
- 	struct ice_aqc_gpio *cmd;
--	struct ice_aq_desc desc;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_gpio);
--	cmd = &desc.params.read_write_gpio;
-+	cmd = libie_aq_raw(&desc);
- 	cmd->gpio_ctrl_handle = cpu_to_le16(gpio_ctrl_handle);
- 	cmd->gpio_num = pin_idx;
- 	cmd->gpio_val = value ? 1 : 0;
-@@ -5791,12 +5795,12 @@ int
- ice_aq_get_gpio(struct ice_hw *hw, u16 gpio_ctrl_handle, u8 pin_idx,
- 		bool *value, struct ice_sq_cd *cd)
- {
-+	struct libie_aq_desc desc;
- 	struct ice_aqc_gpio *cmd;
--	struct ice_aq_desc desc;
- 	int status;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_gpio);
--	cmd = &desc.params.read_write_gpio;
-+	cmd = libie_aq_raw(&desc);
- 	cmd->gpio_ctrl_handle = cpu_to_le16(gpio_ctrl_handle);
- 	cmd->gpio_num = pin_idx;
- 
-@@ -5959,9 +5963,9 @@ bool ice_is_fw_health_report_supported(struct ice_hw *hw)
- int ice_aq_set_health_status_cfg(struct ice_hw *hw, u8 event_source)
- {
- 	struct ice_aqc_set_health_status_cfg *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
--	cmd = &desc.params.set_health_status_cfg;
-+	cmd = libie_aq_raw(&desc);
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_health_status_cfg);
- 
-@@ -5985,16 +5989,16 @@ ice_aq_set_lldp_mib(struct ice_hw *hw, u8 mib_type, void *buf, u16 buf_size,
- 		    struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_lldp_set_local_mib *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
--	cmd = &desc.params.lldp_set_mib;
-+	cmd = libie_aq_raw(&desc);
- 
- 	if (buf_size == 0 || !buf)
- 		return -EINVAL;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_lldp_set_local_mib);
- 
--	desc.flags |= cpu_to_le16((u16)ICE_AQ_FLAG_RD);
-+	desc.flags |= cpu_to_le16((u16)LIBIE_AQ_FLAG_RD);
- 	desc.datalen = cpu_to_le16(buf_size);
- 
- 	cmd->type = mib_type;
-@@ -6030,12 +6034,12 @@ bool ice_fw_supports_lldp_fltr_ctrl(struct ice_hw *hw)
- int ice_lldp_fltr_add_remove(struct ice_hw *hw, struct ice_vsi *vsi, bool add)
- {
- 	struct ice_aqc_lldp_filter_ctrl *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
- 	if (vsi->type != ICE_VSI_PF || !ice_fw_supports_lldp_fltr_ctrl(hw))
- 		return -EOPNOTSUPP;
- 
--	cmd = &desc.params.lldp_filter_ctrl;
-+	cmd = libie_aq_raw(&desc);
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_lldp_filter_ctrl);
- 
-@@ -6055,7 +6059,7 @@ int ice_lldp_fltr_add_remove(struct ice_hw *hw, struct ice_vsi *vsi, bool add)
-  */
- int ice_lldp_execute_pending_mib(struct ice_hw *hw)
- {
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_lldp_execute_pending_mib);
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_controlq.c b/drivers/net/ethernet/intel/ice/ice_controlq.c
-index e3959ad442a2..dcb837cadd18 100644
---- a/drivers/net/ethernet/intel/ice/ice_controlq.c
-+++ b/drivers/net/ethernet/intel/ice/ice_controlq.c
-@@ -90,7 +90,7 @@ bool ice_check_sq_alive(struct ice_hw *hw, struct ice_ctl_q_info *cq)
- static int
- ice_alloc_ctrlq_sq_ring(struct ice_hw *hw, struct ice_ctl_q_info *cq)
- {
--	size_t size = cq->num_sq_entries * sizeof(struct ice_aq_desc);
-+	size_t size = cq->num_sq_entries * sizeof(struct libie_aq_desc);
- 
- 	cq->sq.desc_buf.va = dmam_alloc_coherent(ice_hw_to_dev(hw), size,
- 						 &cq->sq.desc_buf.pa,
-@@ -110,7 +110,7 @@ ice_alloc_ctrlq_sq_ring(struct ice_hw *hw, struct ice_ctl_q_info *cq)
- static int
- ice_alloc_ctrlq_rq_ring(struct ice_hw *hw, struct ice_ctl_q_info *cq)
- {
--	size_t size = cq->num_rq_entries * sizeof(struct ice_aq_desc);
-+	size_t size = cq->num_rq_entries * sizeof(struct libie_aq_desc);
- 
- 	cq->rq.desc_buf.va = dmam_alloc_coherent(ice_hw_to_dev(hw), size,
- 						 &cq->rq.desc_buf.pa,
-@@ -159,7 +159,7 @@ ice_alloc_rq_bufs(struct ice_hw *hw, struct ice_ctl_q_info *cq)
- 
- 	/* allocate the mapped buffers */
- 	for (i = 0; i < cq->num_rq_entries; i++) {
--		struct ice_aq_desc *desc;
-+		struct libie_aq_desc *desc;
- 		struct ice_dma_mem *bi;
- 
- 		bi = &cq->rq.r.rq_bi[i];
-@@ -173,9 +173,9 @@ ice_alloc_rq_bufs(struct ice_hw *hw, struct ice_ctl_q_info *cq)
- 		/* now configure the descriptors for use */
- 		desc = ICE_CTL_Q_DESC(cq->rq, i);
- 
--		desc->flags = cpu_to_le16(ICE_AQ_FLAG_BUF);
--		if (cq->rq_buf_size > ICE_AQ_LG_BUF)
--			desc->flags |= cpu_to_le16(ICE_AQ_FLAG_LB);
-+		desc->flags = cpu_to_le16(LIBIE_AQ_FLAG_BUF);
-+		if (cq->rq_buf_size > LIBIE_AQ_LG_BUF)
-+			desc->flags |= cpu_to_le16(LIBIE_AQ_FLAG_LB);
- 		desc->opcode = 0;
- 		/* This is in accordance with control queue design, there is no
- 		 * register for buffer size configuration
-@@ -858,7 +858,7 @@ static u16 ice_clean_sq(struct ice_hw *hw, struct ice_ctl_q_info *cq)
- {
- 	struct ice_ctl_q_ring *sq = &cq->sq;
- 	u16 ntc = sq->next_to_clean;
--	struct ice_aq_desc *desc;
-+	struct libie_aq_desc *desc;
- 
- 	desc = ICE_CTL_Q_DESC(*sq, ntc);
- 
-@@ -912,7 +912,7 @@ static const char *ice_ctl_q_str(enum ice_ctl_q qtype)
- static void ice_debug_cq(struct ice_hw *hw, struct ice_ctl_q_info *cq,
- 			 void *desc, void *buf, u16 buf_len, bool response)
- {
--	struct ice_aq_desc *cq_desc = desc;
-+	struct libie_aq_desc *cq_desc = desc;
- 	u16 datalen, flags;
- 
- 	if (!IS_ENABLED(CONFIG_DYNAMIC_DEBUG) &&
-@@ -939,7 +939,8 @@ static void ice_debug_cq(struct ice_hw *hw, struct ice_ctl_q_info *cq,
- 	 * by the DD and/or CMP flag set or a command with the RD flag set.
- 	 */
- 	if (buf && cq_desc->datalen &&
--	    (flags & (ICE_AQ_FLAG_DD | ICE_AQ_FLAG_CMP | ICE_AQ_FLAG_RD))) {
-+	    (flags & (LIBIE_AQ_FLAG_DD | LIBIE_AQ_FLAG_CMP |
-+		      LIBIE_AQ_FLAG_RD))) {
- 		char prefix[] = KBUILD_MODNAME " 0x12341234 0x12341234 ";
- 
- 		sprintf(prefix, KBUILD_MODNAME " 0x%08X 0x%08X ",
-@@ -992,11 +993,11 @@ static bool ice_sq_done(struct ice_hw *hw, struct ice_ctl_q_info *cq)
-  */
- int
- ice_sq_send_cmd(struct ice_hw *hw, struct ice_ctl_q_info *cq,
--		struct ice_aq_desc *desc, void *buf, u16 buf_size,
-+		struct libie_aq_desc *desc, void *buf, u16 buf_size,
- 		struct ice_sq_cd *cd)
- {
- 	struct ice_dma_mem *dma_buf = NULL;
--	struct ice_aq_desc *desc_on_ring;
-+	struct libie_aq_desc *desc_on_ring;
- 	bool cmd_completed = false;
- 	int status = 0;
- 	u16 retval = 0;
-@@ -1007,7 +1008,7 @@ ice_sq_send_cmd(struct ice_hw *hw, struct ice_ctl_q_info *cq,
- 		return -EBUSY;
- 	mutex_lock(&cq->sq_lock);
- 
--	cq->sq_last_status = ICE_AQ_RC_OK;
-+	cq->sq_last_status = LIBIE_AQ_RC_OK;
- 
- 	if (!cq->sq.count) {
- 		ice_debug(hw, ICE_DBG_AQ_MSG, "Control Send queue not initialized.\n");
-@@ -1028,9 +1029,9 @@ ice_sq_send_cmd(struct ice_hw *hw, struct ice_ctl_q_info *cq,
- 			goto sq_send_command_error;
- 		}
- 
--		desc->flags |= cpu_to_le16(ICE_AQ_FLAG_BUF);
--		if (buf_size > ICE_AQ_LG_BUF)
--			desc->flags |= cpu_to_le16(ICE_AQ_FLAG_LB);
-+		desc->flags |= cpu_to_le16(LIBIE_AQ_FLAG_BUF);
-+		if (buf_size > LIBIE_AQ_LG_BUF)
-+			desc->flags |= cpu_to_le16(LIBIE_AQ_FLAG_LB);
- 	}
- 
- 	val = rd32(hw, cq->sq.head);
-@@ -1112,9 +1113,9 @@ ice_sq_send_cmd(struct ice_hw *hw, struct ice_ctl_q_info *cq,
- 			retval &= 0xff;
- 		}
- 		cmd_completed = true;
--		if (!status && retval != ICE_AQ_RC_OK)
-+		if (!status && retval != LIBIE_AQ_RC_OK)
- 			status = -EIO;
--		cq->sq_last_status = (enum ice_aq_err)retval;
-+		cq->sq_last_status = (enum libie_aq_err)retval;
- 	}
- 
- 	ice_debug(hw, ICE_DBG_AQ_MSG, "ATQ: desc and buffer writeback:\n");
-@@ -1149,12 +1150,12 @@ ice_sq_send_cmd(struct ice_hw *hw, struct ice_ctl_q_info *cq,
+@@ -2287,8 +2290,7 @@ int ixgbe_aci_get_netlist_node(struct ixgbe_hw *hw,
   *
-  * Fill the desc with default values
+  * Return: the exit code of the operation.
   */
--void ice_fill_dflt_direct_cmd_desc(struct ice_aq_desc *desc, u16 opcode)
-+void ice_fill_dflt_direct_cmd_desc(struct libie_aq_desc *desc, u16 opcode)
+-int ixgbe_acquire_nvm(struct ixgbe_hw *hw,
+-		      enum ixgbe_aci_res_access_type access)
++int ixgbe_acquire_nvm(struct ixgbe_hw *hw, enum libie_aq_res_access_type access)
  {
- 	/* zero out the desc */
- 	memset(desc, 0, sizeof(*desc));
- 	desc->opcode = cpu_to_le16(opcode);
--	desc->flags = cpu_to_le16(ICE_AQ_FLAG_SI);
-+	desc->flags = cpu_to_le16(LIBIE_AQ_FLAG_SI);
+ 	u32 fla;
+ 
+@@ -2297,7 +2299,7 @@ int ixgbe_acquire_nvm(struct ixgbe_hw *hw,
+ 	if ((fla & IXGBE_GLNVM_FLA_LOCKED_M) == 0)
+ 		return 0;
+ 
+-	return ixgbe_acquire_res(hw, IXGBE_NVM_RES_ID, access,
++	return ixgbe_acquire_res(hw, LIBIE_AQC_RES_ID_NVM, access,
+ 				 IXGBE_NVM_TIMEOUT);
+ }
+ 
+@@ -2316,7 +2318,7 @@ void ixgbe_release_nvm(struct ixgbe_hw *hw)
+ 	if ((fla & IXGBE_GLNVM_FLA_LOCKED_M) == 0)
+ 		return;
+ 
+-	ixgbe_release_res(hw, IXGBE_NVM_RES_ID);
++	ixgbe_release_res(hw, LIBIE_AQC_RES_ID_NVM);
  }
  
  /**
-@@ -1172,9 +1173,9 @@ int
- ice_clean_rq_elem(struct ice_hw *hw, struct ice_ctl_q_info *cq,
- 		  struct ice_rq_event_info *e, u16 *pending)
+@@ -2338,12 +2340,12 @@ int ixgbe_aci_read_nvm(struct ixgbe_hw *hw, u16 module_typeid, u32 offset,
+ 		       bool read_shadow_ram)
  {
-+	enum libie_aq_err rq_last_status;
- 	u16 ntc = cq->rq.next_to_clean;
--	enum ice_aq_err rq_last_status;
--	struct ice_aq_desc *desc;
-+	struct libie_aq_desc *desc;
- 	struct ice_dma_mem *bi;
- 	int ret_code = 0;
- 	u16 desc_idx;
-@@ -1207,9 +1208,9 @@ ice_clean_rq_elem(struct ice_hw *hw, struct ice_ctl_q_info *cq,
- 	desc = ICE_CTL_Q_DESC(cq->rq, ntc);
- 	desc_idx = ntc;
- 
--	rq_last_status = (enum ice_aq_err)le16_to_cpu(desc->retval);
-+	rq_last_status = (enum libie_aq_err)le16_to_cpu(desc->retval);
- 	flags = le16_to_cpu(desc->flags);
--	if (flags & ICE_AQ_FLAG_ERR) {
-+	if (flags & LIBIE_AQ_FLAG_ERR) {
- 		ret_code = -EIO;
- 		ice_debug(hw, ICE_DBG_AQ_MSG, "Control Receive Queue Event 0x%04X received with error 0x%X\n",
- 			  le16_to_cpu(desc->opcode), rq_last_status);
-@@ -1230,9 +1231,9 @@ ice_clean_rq_elem(struct ice_hw *hw, struct ice_ctl_q_info *cq,
- 	bi = &cq->rq.r.rq_bi[ntc];
- 	memset(desc, 0, sizeof(*desc));
- 
--	desc->flags = cpu_to_le16(ICE_AQ_FLAG_BUF);
--	if (cq->rq_buf_size > ICE_AQ_LG_BUF)
--		desc->flags |= cpu_to_le16(ICE_AQ_FLAG_LB);
-+	desc->flags = cpu_to_le16(LIBIE_AQ_FLAG_BUF);
-+	if (cq->rq_buf_size > LIBIE_AQ_LG_BUF)
-+		desc->flags |= cpu_to_le16(LIBIE_AQ_FLAG_LB);
- 	desc->datalen = cpu_to_le16(bi->size);
- 	desc->params.generic.addr_high = cpu_to_le32(upper_32_bits(bi->pa));
- 	desc->params.generic.addr_low = cpu_to_le32(lower_32_bits(bi->pa));
-diff --git a/drivers/net/ethernet/intel/ice/ice_dcb.c b/drivers/net/ethernet/intel/ice/ice_dcb.c
-index 74418c445cc4..a41bc56c3911 100644
---- a/drivers/net/ethernet/intel/ice/ice_dcb.c
-+++ b/drivers/net/ethernet/intel/ice/ice_dcb.c
-@@ -24,10 +24,10 @@ ice_aq_get_lldp_mib(struct ice_hw *hw, u8 bridge_type, u8 mib_type, void *buf,
- 		    struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_lldp_get_mib *cmd;
--	struct ice_aq_desc desc;
+ 	struct ixgbe_aci_cmd_nvm *cmd;
+-	struct ixgbe_aci_desc desc;
 +	struct libie_aq_desc desc;
- 	int status;
  
--	cmd = &desc.params.lldp_get_mib;
-+	cmd = libie_aq_raw(&desc);
- 
- 	if (buf_size == 0 || !buf)
+ 	if (offset > IXGBE_ACI_NVM_MAX_OFFSET)
  		return -EINVAL;
-@@ -64,9 +64,9 @@ ice_aq_cfg_lldp_mib_change(struct ice_hw *hw, bool ena_update,
- 			   struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_lldp_set_mib_change *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
--	cmd = &desc.params.lldp_set_event;
-+	cmd = libie_aq_raw(&desc);
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_lldp_set_mib_change);
- 
-@@ -95,9 +95,9 @@ ice_aq_stop_lldp(struct ice_hw *hw, bool shutdown_lldp_agent, bool persist,
- 		 struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_lldp_stop *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
--	cmd = &desc.params.lldp_stop;
-+	cmd = libie_aq_raw(&desc);
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_lldp_stop);
- 
-@@ -121,9 +121,9 @@ ice_aq_stop_lldp(struct ice_hw *hw, bool shutdown_lldp_agent, bool persist,
- int ice_aq_start_lldp(struct ice_hw *hw, bool persist, struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_lldp_start *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
--	cmd = &desc.params.lldp_start;
-+	cmd = libie_aq_raw(&desc);
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_lldp_start);
- 
-@@ -677,11 +677,11 @@ ice_aq_start_stop_dcbx(struct ice_hw *hw, bool start_dcbx_agent,
- 		       bool *dcbx_agent_status, struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_lldp_stop_start_specific_agent *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	u16 opcode;
- 	int status;
- 
--	cmd = &desc.params.lldp_agent_ctrl;
-+	cmd = libie_aq_raw(&desc);
- 
- 	opcode = ice_aqc_opc_lldp_stop_start_specific_agent;
- 
-@@ -714,7 +714,7 @@ ice_aq_get_cee_dcb_cfg(struct ice_hw *hw,
- 		       struct ice_aqc_get_cee_dcb_cfg_resp *buff,
- 		       struct ice_sq_cd *cd)
- {
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_cee_dcb_cfg);
- 
-@@ -733,13 +733,13 @@ ice_aq_get_cee_dcb_cfg(struct ice_hw *hw,
- int ice_aq_set_pfc_mode(struct ice_hw *hw, u8 pfc_mode, struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_set_query_pfc_mode *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int status;
- 
- 	if (pfc_mode > ICE_AQC_PFC_DSCP_BASED_PFC)
- 		return -EINVAL;
- 
--	cmd = &desc.params.set_query_pfc_mode;
-+	cmd = libie_aq_raw(&desc);
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_pfc_mode);
- 
-@@ -914,7 +914,7 @@ static int ice_get_ieee_or_cee_dcb_cfg(struct ice_port_info *pi, u8 dcbx_mode)
- 	ret = ice_aq_get_dcb_cfg(pi->hw, ICE_AQ_LLDP_MIB_REMOTE,
- 				 ICE_AQ_LLDP_BRID_TYPE_NEAREST_BRID, dcbx_cfg);
- 	/* Don't treat ENOENT as an error for Remote MIBs */
--	if (pi->hw->adminq.sq_last_status == ICE_AQ_RC_ENOENT)
-+	if (pi->hw->adminq.sq_last_status == LIBIE_AQ_RC_ENOENT)
- 		ret = 0;
- 
- out:
-@@ -941,7 +941,7 @@ int ice_get_dcb_cfg(struct ice_port_info *pi)
- 		/* CEE mode */
- 		ret = ice_get_ieee_or_cee_dcb_cfg(pi, ICE_DCBX_MODE_CEE);
- 		ice_cee_to_dcb_cfg(&cee_cfg, pi);
--	} else if (pi->hw->adminq.sq_last_status == ICE_AQ_RC_ENOENT) {
-+	} else if (pi->hw->adminq.sq_last_status == LIBIE_AQ_RC_ENOENT) {
- 		/* CEE mode not enabled try querying IEEE data */
- 		dcbx_cfg = &pi->qos_cfg.local_dcbx_cfg;
- 		dcbx_cfg->dcbx_mode = ICE_DCBX_MODE_IEEE;
-@@ -965,7 +965,7 @@ void ice_get_dcb_cfg_from_mib_change(struct ice_port_info *pi,
- 	struct ice_aqc_lldp_get_mib *mib;
- 	u8 change_type, dcbx_mode;
- 
--	mib = (struct ice_aqc_lldp_get_mib *)&event->desc.params.raw;
-+	mib = libie_aq_raw(&event->desc);
- 
- 	change_type = FIELD_GET(ICE_AQ_LLDP_MIB_TYPE_M, mib->type);
- 	if (change_type == ICE_AQ_LLDP_MIB_REMOTE)
-@@ -1537,12 +1537,12 @@ ice_aq_query_port_ets(struct ice_port_info *pi,
- 		      struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_query_port_ets *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int status;
- 
- 	if (!pi)
- 		return -EINVAL;
--	cmd = &desc.params.port_ets;
-+	cmd = libie_aq_raw(&desc);
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_query_port_ets);
- 	cmd->port_teid = pi->root->info.node_teid;
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_dcb_lib.c b/drivers/net/ethernet/intel/ice/ice_dcb_lib.c
-index 67988c7ab08e..db27ad1be90d 100644
---- a/drivers/net/ethernet/intel/ice/ice_dcb_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_dcb_lib.c
-@@ -983,7 +983,7 @@ ice_dcb_process_lldp_set_mib_change(struct ice_pf *pf,
- 	}
- 
- 	pi = pf->hw.port_info;
--	mib = (struct ice_aqc_lldp_get_mib *)&event->desc.params.raw;
-+	mib = libie_aq_raw(&event->desc);
- 
- 	/* Ignore if event is not for Nearest Bridge */
- 	mib_type = FIELD_GET(ICE_AQ_LLDP_BRID_TYPE_M, mib->type);
-diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.c b/drivers/net/ethernet/intel/ice/ice_ddp.c
-index 59323c019544..e7ae220158b5 100644
---- a/drivers/net/ethernet/intel/ice/ice_ddp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ddp.c
-@@ -1101,16 +1101,16 @@ struct ice_buf *ice_pkg_buf(struct ice_buf_build *bld)
- 	return &bld->buf;
- }
- 
--static enum ice_ddp_state ice_map_aq_err_to_ddp_state(enum ice_aq_err aq_err)
-+static enum ice_ddp_state ice_map_aq_err_to_ddp_state(enum libie_aq_err aq_err)
- {
- 	switch (aq_err) {
--	case ICE_AQ_RC_ENOSEC:
--	case ICE_AQ_RC_EBADSIG:
-+	case LIBIE_AQ_RC_ENOSEC:
-+	case LIBIE_AQ_RC_EBADSIG:
- 		return ICE_DDP_PKG_FILE_SIGNATURE_INVALID;
--	case ICE_AQ_RC_ESVN:
-+	case LIBIE_AQ_RC_ESVN:
- 		return ICE_DDP_PKG_FILE_REVISION_TOO_LOW;
--	case ICE_AQ_RC_EBADMAN:
--	case ICE_AQ_RC_EBADBUF:
-+	case LIBIE_AQ_RC_EBADMAN:
-+	case LIBIE_AQ_RC_EBADBUF:
- 		return ICE_DDP_PKG_LOAD_ERROR;
- 	default:
- 		return ICE_DDP_PKG_ERR;
-@@ -1180,7 +1180,7 @@ ice_aq_download_pkg(struct ice_hw *hw, struct ice_buf_hdr *pkg_buf,
- 		    u32 *error_info, struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_download_pkg *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int status;
- 
- 	if (error_offset)
-@@ -1188,9 +1188,9 @@ ice_aq_download_pkg(struct ice_hw *hw, struct ice_buf_hdr *pkg_buf,
- 	if (error_info)
- 		*error_info = 0;
- 
--	cmd = &desc.params.download_pkg;
-+	cmd = libie_aq_raw(&desc);
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_download_pkg);
--	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-+	desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
- 
- 	if (last_buf)
- 		cmd->flags |= ICE_AQC_DOWNLOAD_PKG_LAST_BUF;
-@@ -1259,7 +1259,7 @@ static enum ice_ddp_state ice_ddp_send_hunk(struct ice_ddp_send_ctx *ctx,
- 	struct ice_buf_hdr *prev_hunk = ctx->hdr;
- 	struct ice_hw *hw = ctx->hw;
- 	bool prev_was_last = !hunk;
--	enum ice_aq_err aq_err;
-+	enum libie_aq_err aq_err;
- 	u32 offset, info;
- 	int attempt, err;
- 
-@@ -1278,7 +1278,8 @@ static enum ice_ddp_state ice_ddp_send_hunk(struct ice_ddp_send_ctx *ctx,
- 					  prev_was_last, &offset, &info, NULL);
- 
- 		aq_err = hw->adminq.sq_last_status;
--		if (aq_err != ICE_AQ_RC_ENOSEC && aq_err != ICE_AQ_RC_EBADSIG)
-+		if (aq_err != LIBIE_AQ_RC_ENOSEC &&
-+		    aq_err != LIBIE_AQ_RC_EBADSIG)
- 			break;
- 	}
- 
-@@ -1537,7 +1538,7 @@ ice_post_dwnld_pkg_actions(struct ice_hw *hw)
- static enum ice_ddp_state
- ice_download_pkg_with_sig_seg(struct ice_hw *hw, struct ice_pkg_hdr *pkg_hdr)
- {
--	enum ice_aq_err aq_err = hw->adminq.sq_last_status;
-+	enum libie_aq_err aq_err = hw->adminq.sq_last_status;
- 	enum ice_ddp_state state = ICE_DDP_PKG_ERR;
- 	struct ice_ddp_send_ctx ctx = { .hw = hw };
- 	int status;
-@@ -1687,7 +1688,7 @@ static int ice_aq_get_pkg_info_list(struct ice_hw *hw,
- 				    struct ice_aqc_get_pkg_info_resp *pkg_info,
- 				    u16 buf_size, struct ice_sq_cd *cd)
- {
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_pkg_info_list);
- 
-@@ -1711,7 +1712,7 @@ static int ice_aq_update_pkg(struct ice_hw *hw, struct ice_buf_hdr *pkg_buf,
- 			     u32 *error_info, struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_download_pkg *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int status;
- 
- 	if (error_offset)
-@@ -1719,9 +1720,9 @@ static int ice_aq_update_pkg(struct ice_hw *hw, struct ice_buf_hdr *pkg_buf,
- 	if (error_info)
- 		*error_info = 0;
- 
--	cmd = &desc.params.download_pkg;
-+	cmd = libie_aq_raw(&desc);
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_update_pkg);
--	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-+	desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
- 
- 	if (last_buf)
- 		cmd->flags |= ICE_AQC_DOWNLOAD_PKG_LAST_BUF;
-@@ -1753,10 +1754,10 @@ static int ice_aq_update_pkg(struct ice_hw *hw, struct ice_buf_hdr *pkg_buf,
- int ice_aq_upload_section(struct ice_hw *hw, struct ice_buf_hdr *pkg_buf,
- 			  u16 buf_size, struct ice_sq_cd *cd)
- {
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_upload_section);
--	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-+	desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
- 
- 	return ice_aq_send_cmd(hw, &desc, pkg_buf, buf_size, cd);
- }
-@@ -2333,10 +2334,10 @@ ice_get_set_tx_topo(struct ice_hw *hw, u8 *buf, u16 buf_size,
- 		    struct ice_sq_cd *cd, u8 *flags, bool set)
- {
- 	struct ice_aqc_get_set_tx_topo *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int status;
- 
--	cmd = &desc.params.get_set_tx_topo;
-+	cmd = libie_aq_raw(&desc);
- 	if (set) {
- 		ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_tx_topo);
- 		cmd->set_flags = ICE_AQC_TX_TOPO_FLAGS_ISSUED;
-@@ -2345,14 +2346,14 @@ ice_get_set_tx_topo(struct ice_hw *hw, u8 *buf, u16 buf_size,
- 			cmd->set_flags |= ICE_AQC_TX_TOPO_FLAGS_SRC_RAM |
- 					  ICE_AQC_TX_TOPO_FLAGS_LOAD_NEW;
- 
--		desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-+		desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
- 	} else {
- 		ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_tx_topo);
- 		cmd->get_flags = ICE_AQC_TX_TOPO_GET_RAM;
- 
- 		if (hw->mac_type == ICE_MAC_E810 ||
- 		    hw->mac_type == ICE_MAC_GENERIC)
--			desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-+			desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
- 	}
- 
- 	status = ice_aq_send_cmd(hw, &desc, buf, buf_size, cd);
-@@ -2360,7 +2361,7 @@ ice_get_set_tx_topo(struct ice_hw *hw, u8 *buf, u16 buf_size,
- 		return status;
- 	/* read the return flag values (first byte) for get operation */
- 	if (!set && flags)
--		*flags = desc.params.get_set_tx_topo.set_flags;
-+		*flags = cmd->set_flags;
- 
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/intel/ice/ice_fw_update.c b/drivers/net/ethernet/intel/ice/ice_fw_update.c
-index 70c201f569ce..4d9ad92a44fe 100644
---- a/drivers/net/ethernet/intel/ice/ice_fw_update.c
-+++ b/drivers/net/ethernet/intel/ice/ice_fw_update.c
-@@ -299,7 +299,8 @@ int ice_write_one_nvm_block(struct ice_pf *pf, u16 module, u32 offset,
- 	struct device *dev = ice_pf_to_dev(pf);
- 	struct ice_aq_task task = {};
- 	struct ice_hw *hw = &pf->hw;
--	struct ice_aq_desc *desc;
-+	struct libie_aq_desc *desc;
-+	struct ice_aqc_nvm *cmd;
- 	u32 completion_offset;
- 	int err;
- 
-@@ -333,11 +334,12 @@ int ice_write_one_nvm_block(struct ice_pf *pf, u16 module, u32 offset,
- 	}
- 
- 	desc = &task.event.desc;
--	completion_module = le16_to_cpu(desc->params.nvm.module_typeid);
-+	cmd = libie_aq_raw(desc);
-+	completion_module = le16_to_cpu(cmd->module_typeid);
- 	completion_retval = le16_to_cpu(desc->retval);
- 
--	completion_offset = le16_to_cpu(desc->params.nvm.offset_low);
--	completion_offset |= desc->params.nvm.offset_high << 16;
-+	completion_offset = le16_to_cpu(cmd->offset_low);
-+	completion_offset |= cmd->offset_high << 16;
- 
- 	if (completion_module != module) {
- 		dev_err(dev, "Unexpected module_typeid in write completion: got 0x%x, expected 0x%x\n",
-@@ -356,7 +358,7 @@ int ice_write_one_nvm_block(struct ice_pf *pf, u16 module, u32 offset,
- 	if (completion_retval) {
- 		dev_err(dev, "Firmware failed to flash module 0x%02x with block of size %u at offset %u, err %s\n",
- 			module, block_size, offset,
--			ice_aq_str((enum ice_aq_err)completion_retval));
-+			ice_aq_str((enum libie_aq_err)completion_retval));
- 		NL_SET_ERR_MSG_MOD(extack, "Firmware failed to program flash module");
- 		return -EIO;
- 	}
-@@ -369,7 +371,7 @@ int ice_write_one_nvm_block(struct ice_pf *pf, u16 module, u32 offset,
- 	 */
- 	if (reset_level && last_cmd && module == ICE_SR_1ST_NVM_BANK_PTR) {
- 		if (hw->dev_caps.common_cap.pcie_reset_avoidance) {
--			*reset_level = desc->params.nvm.cmd_flags &
-+			*reset_level = cmd->cmd_flags &
- 				       ICE_AQC_NVM_RESET_LVL_M;
- 			dev_dbg(dev, "Firmware reported required reset level as %u\n",
- 				*reset_level);
-@@ -487,7 +489,8 @@ ice_erase_nvm_module(struct ice_pf *pf, u16 module, const char *component,
- 	struct device *dev = ice_pf_to_dev(pf);
- 	struct ice_aq_task task = {};
- 	struct ice_hw *hw = &pf->hw;
--	struct ice_aq_desc *desc;
-+	struct libie_aq_desc *desc;
-+	struct ice_aqc_nvm *cmd;
- 	struct devlink *devlink;
- 	int err;
- 
-@@ -518,7 +521,8 @@ ice_erase_nvm_module(struct ice_pf *pf, u16 module, const char *component,
- 	}
- 
- 	desc = &task.event.desc;
--	completion_module = le16_to_cpu(desc->params.nvm.module_typeid);
-+	cmd = libie_aq_raw(desc);
-+	completion_module = le16_to_cpu(cmd->module_typeid);
- 	completion_retval = le16_to_cpu(desc->retval);
- 
- 	if (completion_module != module) {
-@@ -532,7 +536,7 @@ ice_erase_nvm_module(struct ice_pf *pf, u16 module, const char *component,
- 	if (completion_retval) {
- 		dev_err(dev, "Firmware failed to erase %s (module 0x02%x), aq_err %s\n",
- 			component, module,
--			ice_aq_str((enum ice_aq_err)completion_retval));
-+			ice_aq_str((enum libie_aq_err)completion_retval));
- 		NL_SET_ERR_MSG_MOD(extack, "Firmware failed to erase flash");
- 		err = -EIO;
- 		goto out_notify_devlink;
-@@ -611,7 +615,7 @@ ice_switch_flash_banks(struct ice_pf *pf, u8 activate_flags,
- 	completion_retval = le16_to_cpu(task.event.desc.retval);
- 	if (completion_retval) {
- 		dev_err(dev, "Firmware failed to switch active flash banks aq_err %s\n",
--			ice_aq_str((enum ice_aq_err)completion_retval));
-+			ice_aq_str((enum libie_aq_err)completion_retval));
- 		NL_SET_ERR_MSG_MOD(extack, "Firmware failed to switch active flash banks");
- 		return -EIO;
- 	}
-diff --git a/drivers/net/ethernet/intel/ice/ice_fwlog.c b/drivers/net/ethernet/intel/ice/ice_fwlog.c
-index 4fd15387a7e5..a31bb026ad34 100644
---- a/drivers/net/ethernet/intel/ice/ice_fwlog.c
-+++ b/drivers/net/ethernet/intel/ice/ice_fwlog.c
-@@ -240,7 +240,7 @@ ice_aq_fwlog_set(struct ice_hw *hw, struct ice_fwlog_module_entry *entries,
- {
- 	struct ice_aqc_fw_log_cfg_resp *fw_modules;
- 	struct ice_aqc_fw_log *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int status;
- 	int i;
- 
-@@ -255,9 +255,9 @@ ice_aq_fwlog_set(struct ice_hw *hw, struct ice_fwlog_module_entry *entries,
- 	}
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_fw_logs_config);
--	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-+	desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
- 
--	cmd = &desc.params.fw_log;
-+	cmd = libie_aq_raw(&desc);
- 
- 	cmd->cmd_flags = ICE_AQC_FW_LOG_CONF_SET_VALID;
- 	cmd->ops.cfg.log_resolution = cpu_to_le16(log_resolution);
-@@ -309,7 +309,7 @@ static int ice_aq_fwlog_get(struct ice_hw *hw, struct ice_fwlog_cfg *cfg)
- {
- 	struct ice_aqc_fw_log_cfg_resp *fw_modules;
- 	struct ice_aqc_fw_log *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	u16 module_id_cnt;
- 	int status;
- 	void *buf;
-@@ -322,7 +322,7 @@ static int ice_aq_fwlog_get(struct ice_hw *hw, struct ice_fwlog_cfg *cfg)
- 		return -ENOMEM;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_fw_logs_query);
--	cmd = &desc.params.fw_log;
-+	cmd = libie_aq_raw(&desc);
- 
- 	cmd->cmd_flags = ICE_AQC_FW_LOG_AQ_QUERY;
- 
-@@ -384,12 +384,14 @@ int ice_fwlog_get(struct ice_hw *hw, struct ice_fwlog_cfg *cfg)
-  */
- static int ice_aq_fwlog_register(struct ice_hw *hw, bool reg)
- {
--	struct ice_aq_desc desc;
-+	struct ice_aqc_fw_log *cmd;
-+	struct libie_aq_desc desc;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_fw_logs_register);
-+	cmd = libie_aq_raw(&desc);
- 
- 	if (reg)
--		desc.params.fw_log.cmd_flags = ICE_AQC_FW_LOG_AQ_REGISTER;
-+		cmd->cmd_flags = ICE_AQC_FW_LOG_AQ_REGISTER;
- 
- 	return ice_aq_send_cmd(hw, &desc, NULL, 0, NULL);
- }
-diff --git a/drivers/net/ethernet/intel/ice/ice_lag.c b/drivers/net/ethernet/intel/ice/ice_lag.c
-index 22371011c249..9bd52f1fbf73 100644
---- a/drivers/net/ethernet/intel/ice/ice_lag.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lag.c
-@@ -1102,7 +1102,7 @@ ice_lag_set_swid(u16 primary_swid, struct ice_lag *local_lag,
- {
- 	struct ice_aqc_alloc_free_res_elem *buf;
- 	struct ice_aqc_set_port_params *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	u16 buf_len, swid;
- 	int status, i;
- 
-@@ -1150,7 +1150,7 @@ ice_lag_set_swid(u16 primary_swid, struct ice_lag *local_lag,
- 	else
- 		swid = local_lag->pf->hw.port_info->sw_id;
- 
--	cmd = &desc.params.set_port_params;
-+	cmd = libie_aq_raw(&desc);
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_port_params);
- 
- 	cmd->swid = cpu_to_le16(ICE_AQC_PORT_SWID_VALID | swid);
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index 03bb16191237..530846a97a9d 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -3737,13 +3737,13 @@ int ice_set_link(struct ice_vsi *vsi, bool ena)
- 
- 	status = ice_aq_set_link_restart_an(pi, ena, NULL);
- 
--	/* if link is owned by manageability, FW will return ICE_AQ_RC_EMODE.
-+	/* if link is owned by manageability, FW will return LIBIE_AQ_RC_EMODE.
- 	 * this is not a fatal error, so print a warning message and return
- 	 * a success code. Return an error if FW returns an error code other
--	 * than ICE_AQ_RC_EMODE
-+	 * than LIBIE_AQ_RC_EMODE
- 	 */
- 	if (status == -EIO) {
--		if (hw->adminq.sq_last_status == ICE_AQ_RC_EMODE)
-+		if (hw->adminq.sq_last_status == LIBIE_AQ_RC_EMODE)
- 			dev_dbg(dev, "can't set link to %s, err %d aq_err %s. not fatal, continuing\n",
- 				(ena ? "ON" : "OFF"), status,
- 				ice_aq_str(hw->adminq.sq_last_status));
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 3b2233a84f2e..6e675aca8aae 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -379,7 +379,7 @@ static int ice_vsi_sync_fltr(struct ice_vsi *vsi)
- 		 * should go into promiscuous mode. There should be some
- 		 * space reserved for promiscuous filters.
- 		 */
--		if (hw->adminq.sq_last_status == ICE_AQ_RC_ENOSPC &&
-+		if (hw->adminq.sq_last_status == LIBIE_AQ_RC_ENOSPC &&
- 		    !test_and_set_bit(ICE_FLTR_OVERFLOW_PROMISC,
- 				      vsi->state)) {
- 			promisc_forced_on = true;
-@@ -7919,38 +7919,38 @@ static int ice_eth_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd)
-  * ice_aq_str - convert AQ err code to a string
-  * @aq_err: the AQ error code to convert
-  */
--const char *ice_aq_str(enum ice_aq_err aq_err)
-+const char *ice_aq_str(enum libie_aq_err aq_err)
- {
- 	switch (aq_err) {
--	case ICE_AQ_RC_OK:
-+	case LIBIE_AQ_RC_OK:
- 		return "OK";
--	case ICE_AQ_RC_EPERM:
-+	case LIBIE_AQ_RC_EPERM:
- 		return "ICE_AQ_RC_EPERM";
--	case ICE_AQ_RC_ENOENT:
-+	case LIBIE_AQ_RC_ENOENT:
- 		return "ICE_AQ_RC_ENOENT";
--	case ICE_AQ_RC_ENOMEM:
-+	case LIBIE_AQ_RC_ENOMEM:
- 		return "ICE_AQ_RC_ENOMEM";
--	case ICE_AQ_RC_EBUSY:
-+	case LIBIE_AQ_RC_EBUSY:
- 		return "ICE_AQ_RC_EBUSY";
--	case ICE_AQ_RC_EEXIST:
-+	case LIBIE_AQ_RC_EEXIST:
- 		return "ICE_AQ_RC_EEXIST";
--	case ICE_AQ_RC_EINVAL:
-+	case LIBIE_AQ_RC_EINVAL:
- 		return "ICE_AQ_RC_EINVAL";
--	case ICE_AQ_RC_ENOSPC:
-+	case LIBIE_AQ_RC_ENOSPC:
- 		return "ICE_AQ_RC_ENOSPC";
--	case ICE_AQ_RC_ENOSYS:
-+	case LIBIE_AQ_RC_ENOSYS:
- 		return "ICE_AQ_RC_ENOSYS";
--	case ICE_AQ_RC_EMODE:
-+	case LIBIE_AQ_RC_EMODE:
- 		return "ICE_AQ_RC_EMODE";
--	case ICE_AQ_RC_ENOSEC:
-+	case LIBIE_AQ_RC_ENOSEC:
- 		return "ICE_AQ_RC_ENOSEC";
--	case ICE_AQ_RC_EBADSIG:
-+	case LIBIE_AQ_RC_EBADSIG:
- 		return "ICE_AQ_RC_EBADSIG";
--	case ICE_AQ_RC_ESVN:
-+	case LIBIE_AQ_RC_ESVN:
- 		return "ICE_AQ_RC_ESVN";
--	case ICE_AQ_RC_EBADMAN:
-+	case LIBIE_AQ_RC_EBADMAN:
- 		return "ICE_AQ_RC_EBADMAN";
--	case ICE_AQ_RC_EBADBUF:
-+	case LIBIE_AQ_RC_EBADBUF:
- 		return "ICE_AQ_RC_EBADBUF";
- 	}
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_nvm.c b/drivers/net/ethernet/intel/ice/ice_nvm.c
-index 59e8879ac059..7e187a804dfa 100644
---- a/drivers/net/ethernet/intel/ice/ice_nvm.c
-+++ b/drivers/net/ethernet/intel/ice/ice_nvm.c
-@@ -22,10 +22,10 @@ int ice_aq_read_nvm(struct ice_hw *hw, u16 module_typeid, u32 offset,
- 		    u16 length, void *data, bool last_command,
- 		    bool read_shadow_ram, struct ice_sq_cd *cd)
- {
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	struct ice_aqc_nvm *cmd;
  
 -	cmd = &desc.params.nvm;
 +	cmd = libie_aq_raw(&desc);
  
- 	if (offset > ICE_AQC_NVM_MAX_OFFSET)
- 		return -EINVAL;
-@@ -125,10 +125,10 @@ ice_aq_update_nvm(struct ice_hw *hw, u16 module_typeid, u32 offset,
- 		  u16 length, void *data, bool last_command, u8 command_flags,
- 		  struct ice_sq_cd *cd)
+ 	ixgbe_fill_dflt_direct_cmd_desc(&desc, ixgbe_aci_opc_nvm_read);
+ 
+@@ -2373,7 +2375,7 @@ int ixgbe_aci_read_nvm(struct ixgbe_hw *hw, u16 module_typeid, u32 offset,
+ int ixgbe_aci_erase_nvm(struct ixgbe_hw *hw, u16 module_typeid)
  {
--	struct ice_aq_desc desc;
+ 	struct ixgbe_aci_cmd_nvm *cmd;
+-	struct ixgbe_aci_desc desc;
 +	struct libie_aq_desc desc;
- 	struct ice_aqc_nvm *cmd;
+ 	__le16 len;
+ 	int err;
+ 
+@@ -2386,7 +2388,7 @@ int ixgbe_aci_erase_nvm(struct ixgbe_hw *hw, u16 module_typeid)
+ 	if (err)
+ 		return err;
+ 
+-	cmd = &desc.params.nvm;
++	cmd = libie_aq_raw(&desc);
+ 
+ 	ixgbe_fill_dflt_direct_cmd_desc(&desc, ixgbe_aci_opc_nvm_erase);
+ 
+@@ -2417,9 +2419,9 @@ int ixgbe_aci_update_nvm(struct ixgbe_hw *hw, u16 module_typeid,
+ 			 bool last_command, u8 command_flags)
+ {
+ 	struct ixgbe_aci_cmd_nvm *cmd;
+-	struct ixgbe_aci_desc desc;
++	struct libie_aq_desc desc;
  
 -	cmd = &desc.params.nvm;
 +	cmd = libie_aq_raw(&desc);
  
  	/* In offset the highest byte must be zeroed. */
  	if (offset & 0xFF000000)
-@@ -146,7 +146,7 @@ ice_aq_update_nvm(struct ice_hw *hw, u16 module_typeid, u32 offset,
- 	cmd->offset_high = (offset >> 16) & 0xFF;
+@@ -2437,7 +2439,7 @@ int ixgbe_aci_update_nvm(struct ixgbe_hw *hw, u16 module_typeid,
+ 	cmd->offset_high = FIELD_GET(IXGBE_ACI_NVM_OFFSET_HI_U_MASK, offset);
  	cmd->length = cpu_to_le16(length);
  
--	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
+-	desc.flags |= cpu_to_le16(IXGBE_ACI_FLAG_RD);
 +	desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
  
- 	return ice_aq_send_cmd(hw, &desc, data, length, cd);
+ 	return ixgbe_aci_send_cmd(hw, &desc, data, length);
  }
-@@ -161,10 +161,10 @@ ice_aq_update_nvm(struct ice_hw *hw, u16 module_typeid, u32 offset,
-  */
- int ice_aq_erase_nvm(struct ice_hw *hw, u16 module_typeid, struct ice_sq_cd *cd)
+@@ -2468,10 +2470,10 @@ int ixgbe_nvm_write_activate(struct ixgbe_hw *hw, u16 cmd_flags,
+ 			     u8 *response_flags)
  {
--	struct ice_aq_desc desc;
+ 	struct ixgbe_aci_cmd_nvm *cmd;
+-	struct ixgbe_aci_desc desc;
 +	struct libie_aq_desc desc;
- 	struct ice_aqc_nvm *cmd;
+ 	s32 err;
  
 -	cmd = &desc.params.nvm;
 +	cmd = libie_aq_raw(&desc);
+ 	ixgbe_fill_dflt_direct_cmd_desc(&desc,
+ 					ixgbe_aci_opc_nvm_write_activate);
  
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_nvm_erase);
- 
-@@ -869,7 +869,7 @@ static int ice_discover_flash_size(struct ice_hw *hw)
- 
- 		status = ice_read_flat_nvm(hw, offset, &len, &data, false);
- 		if (status == -EIO &&
--		    hw->adminq.sq_last_status == ICE_AQ_RC_EINVAL) {
-+		    hw->adminq.sq_last_status == LIBIE_AQ_RC_EINVAL) {
- 			ice_debug(hw, ICE_DBG_NVM, "%s: New upper bound of %u bytes\n",
- 				  __func__, offset);
- 			status = 0;
-@@ -1182,14 +1182,14 @@ int ice_init_nvm(struct ice_hw *hw)
- int ice_nvm_validate_checksum(struct ice_hw *hw)
+@@ -2499,14 +2501,14 @@ int ixgbe_nvm_write_activate(struct ixgbe_hw *hw, u16 cmd_flags,
+ int ixgbe_nvm_validate_checksum(struct ixgbe_hw *hw)
  {
- 	struct ice_aqc_nvm_checksum *cmd;
--	struct ice_aq_desc desc;
+ 	struct ixgbe_aci_cmd_nvm_checksum *cmd;
+-	struct ixgbe_aci_desc desc;
 +	struct libie_aq_desc desc;
- 	int status;
+ 	int err;
  
- 	status = ice_acquire_nvm(hw, ICE_RES_READ);
- 	if (status)
- 		return status;
+-	err = ixgbe_acquire_nvm(hw, IXGBE_RES_READ);
++	err = ixgbe_acquire_nvm(hw, LIBIE_AQC_RES_ACCESS_READ);
+ 	if (err)
+ 		return err;
  
 -	cmd = &desc.params.nvm_checksum;
 +	cmd = libie_aq_raw(&desc);
  
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_nvm_checksum);
- 	cmd->flags = ICE_AQC_NVM_CHECKSUM_VERIFY;
-@@ -1226,11 +1226,11 @@ int ice_nvm_validate_checksum(struct ice_hw *hw)
-  */
- int ice_nvm_write_activate(struct ice_hw *hw, u16 cmd_flags, u8 *response_flags)
- {
-+	struct libie_aq_desc desc;
- 	struct ice_aqc_nvm *cmd;
--	struct ice_aq_desc desc;
+ 	ixgbe_fill_dflt_direct_cmd_desc(&desc, ixgbe_aci_opc_nvm_checksum);
+ 	cmd->flags = IXGBE_ACI_NVM_CHECKSUM_VERIFY;
+@@ -2542,7 +2544,7 @@ static int ixgbe_discover_flash_size(struct ixgbe_hw *hw)
+ 	u32 min_size = 0, max_size = IXGBE_ACI_NVM_MAX_OFFSET + 1;
  	int err;
  
--	cmd = &desc.params.nvm;
-+	cmd = libie_aq_raw(&desc);
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_nvm_write_activate);
+-	err = ixgbe_acquire_nvm(hw, IXGBE_RES_READ);
++	err = ixgbe_acquire_nvm(hw, LIBIE_AQC_RES_ACCESS_READ);
+ 	if (err)
+ 		return err;
  
- 	cmd->cmd_flags = (u8)(cmd_flags & 0xFF);
-@@ -1252,7 +1252,7 @@ int ice_nvm_write_activate(struct ice_hw *hw, u16 cmd_flags, u8 *response_flags)
+@@ -2553,7 +2555,7 @@ static int ixgbe_discover_flash_size(struct ixgbe_hw *hw)
+ 
+ 		err = ixgbe_read_flat_nvm(hw, offset, &len, &data, false);
+ 		if (err == -EIO &&
+-		    hw->aci.last_status == IXGBE_ACI_RC_EINVAL) {
++		    hw->aci.last_status == LIBIE_AQ_RC_EINVAL) {
+ 			err = 0;
+ 			max_size = offset;
+ 		} else if (!err) {
+@@ -2805,7 +2807,7 @@ static int ixgbe_read_flash_module(struct ixgbe_hw *hw,
+ 	if (!start)
+ 		return -EINVAL;
+ 
+-	err = ixgbe_acquire_nvm(hw, IXGBE_RES_READ);
++	err = ixgbe_acquire_nvm(hw, LIBIE_AQC_RES_ACCESS_READ);
+ 	if (err)
+ 		return err;
+ 
+@@ -3394,7 +3396,7 @@ int ixgbe_get_flash_data(struct ixgbe_hw *hw)
   */
- int ice_aq_nvm_update_empr(struct ice_hw *hw)
+ int ixgbe_aci_nvm_update_empr(struct ixgbe_hw *hw)
  {
--	struct ice_aq_desc desc;
+-	struct ixgbe_aci_desc desc;
 +	struct libie_aq_desc desc;
  
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_nvm_update_empr);
+ 	ixgbe_fill_dflt_direct_cmd_desc(&desc, ixgbe_aci_opc_nvm_update_empr);
  
-@@ -1278,15 +1278,15 @@ ice_nvm_set_pkg_data(struct ice_hw *hw, bool del_pkg_data_flag, u8 *data,
- 		     u16 length, struct ice_sq_cd *cd)
+@@ -3420,15 +3422,15 @@ int ixgbe_nvm_set_pkg_data(struct ixgbe_hw *hw, bool del_pkg_data_flag,
+ 			   u8 *data, u16 length)
  {
- 	struct ice_aqc_nvm_pkg_data *cmd;
--	struct ice_aq_desc desc;
+ 	struct ixgbe_aci_cmd_nvm_pkg_data *cmd;
+-	struct ixgbe_aci_desc desc;
 +	struct libie_aq_desc desc;
  
  	if (length != 0 && !data)
@@ -2936,19 +1261,19 @@ index 59e8879ac059..7e187a804dfa 100644
 -	cmd = &desc.params.pkg_data;
 +	cmd = libie_aq_raw(&desc);
  
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_nvm_pkg_data);
--	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
+ 	ixgbe_fill_dflt_direct_cmd_desc(&desc, ixgbe_aci_opc_nvm_pkg_data);
+-	desc.flags |= cpu_to_le16(IXGBE_ACI_FLAG_RD);
 +	desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
  
  	if (del_pkg_data_flag)
- 		cmd->cmd_flags |= ICE_AQC_NVM_PKG_DELETE;
-@@ -1316,17 +1316,17 @@ ice_nvm_pass_component_tbl(struct ice_hw *hw, u8 *data, u16 length,
- 			   u8 *comp_response_code, struct ice_sq_cd *cd)
+ 		cmd->cmd_flags |= IXGBE_ACI_NVM_PKG_DELETE;
+@@ -3458,17 +3460,17 @@ int ixgbe_nvm_pass_component_tbl(struct ixgbe_hw *hw, u8 *data, u16 length,
+ 				 u8 *comp_response_code)
  {
- 	struct ice_aqc_nvm_pass_comp_tbl *cmd;
--	struct ice_aq_desc desc;
+ 	struct ixgbe_aci_cmd_nvm_pass_comp_tbl *cmd;
+-	struct ixgbe_aci_desc desc;
 +	struct libie_aq_desc desc;
- 	int status;
+ 	int err;
  
  	if (!data || !comp_response || !comp_response_code)
  		return -EINVAL;
@@ -2956,422 +1281,62 @@ index 59e8879ac059..7e187a804dfa 100644
 -	cmd = &desc.params.pass_comp_tbl;
 +	cmd = libie_aq_raw(&desc);
  
- 	ice_fill_dflt_direct_cmd_desc(&desc,
- 				      ice_aqc_opc_nvm_pass_component_tbl);
--	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
+ 	ixgbe_fill_dflt_direct_cmd_desc(&desc,
+ 					ixgbe_aci_opc_nvm_pass_component_tbl);
+-	desc.flags |= cpu_to_le16(IXGBE_ACI_FLAG_RD);
 +	desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
  
  	cmd->transfer_flag = transfer_flag;
- 	status = ice_aq_send_cmd(hw, &desc, data, length, cd);
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 89bb8461284a..13facf30295a 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -245,7 +245,7 @@ static int ice_read_cgu_reg_e82x(struct ice_hw *hw, u32 addr, u32 *val)
- 	};
- 	int err;
+ 	err = ixgbe_aci_send_cmd(hw, &desc, data, length);
+@@ -3623,7 +3625,7 @@ int ixgbe_read_ee_aci_e610(struct ixgbe_hw *hw, u16 offset, u16 *data)
+ 			return err;
+ 	}
  
--	err = ice_sbq_rw_reg(hw, &cgu_msg, ICE_AQ_FLAG_RD);
-+	err = ice_sbq_rw_reg(hw, &cgu_msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to read CGU register 0x%04x, err %d\n",
- 			  addr, err);
-@@ -278,7 +278,7 @@ static int ice_write_cgu_reg_e82x(struct ice_hw *hw, u32 addr, u32 val)
- 	};
- 	int err;
- 
--	err = ice_sbq_rw_reg(hw, &cgu_msg, ICE_AQ_FLAG_RD);
-+	err = ice_sbq_rw_reg(hw, &cgu_msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to write CGU register 0x%04x, err %d\n",
- 			  addr, err);
-@@ -951,7 +951,7 @@ static int ice_write_phy_eth56g(struct ice_hw *hw, u8 port, u32 addr, u32 val)
- 	};
- 	int err;
- 
--	err = ice_sbq_rw_reg(hw, &msg, ICE_AQ_FLAG_RD);
-+	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
+-	err = ixgbe_acquire_nvm(hw, IXGBE_RES_READ);
++	err = ixgbe_acquire_nvm(hw, LIBIE_AQC_RES_ACCESS_READ);
  	if (err)
- 		ice_debug(hw, ICE_DBG_PTP, "PTP failed to send msg to phy %d\n",
- 			  err);
-@@ -978,7 +978,7 @@ static int ice_read_phy_eth56g(struct ice_hw *hw, u8 port, u32 addr, u32 *val)
- 	};
- 	int err;
+ 		return err;
  
--	err = ice_sbq_rw_reg(hw, &msg, ICE_AQ_FLAG_RD);
-+	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
+@@ -3656,7 +3658,7 @@ int ixgbe_read_ee_aci_buffer_e610(struct ixgbe_hw *hw, u16 offset,
+ 			return err;
+ 	}
+ 
+-	err = ixgbe_acquire_nvm(hw, IXGBE_RES_READ);
++	err = ixgbe_acquire_nvm(hw, LIBIE_AQC_RES_ACCESS_READ);
  	if (err)
- 		ice_debug(hw, ICE_DBG_PTP, "PTP failed to send msg to phy %d\n",
- 			  err);
-@@ -2900,7 +2900,7 @@ ice_read_phy_reg_e82x(struct ice_hw *hw, u8 port, u16 offset, u32 *val)
- 	ice_fill_phy_msg_e82x(hw, &msg, port, offset);
- 	msg.opcode = ice_sbq_msg_rd;
+ 		return err;
  
--	err = ice_sbq_rw_reg(hw, &msg, ICE_AQ_FLAG_RD);
-+	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
+@@ -3696,7 +3698,7 @@ int ixgbe_validate_eeprom_checksum_e610(struct ixgbe_hw *hw, u16 *checksum_val)
+ 	if (checksum_val) {
+ 		u16 tmp_checksum;
+ 
+-		err = ixgbe_acquire_nvm(hw, IXGBE_RES_READ);
++		err = ixgbe_acquire_nvm(hw, LIBIE_AQC_RES_ACCESS_READ);
+ 		if (err)
+ 			return err;
+ 
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_fw_update.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_fw_update.c
+index c74f397cebb7..c3c8ccfcacfc 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_fw_update.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_fw_update.c
+@@ -593,7 +593,7 @@ static int ixgbe_cancel_pending_update(struct ixgbe_adapter *adapter,
+ 					   "Canceling previous pending update",
+ 					   component, 0, 0);
+ 
+-	err = ixgbe_acquire_nvm(hw, IXGBE_RES_WRITE);
++	err = ixgbe_acquire_nvm(hw, LIBIE_AQC_RES_ACCESS_WRITE);
  	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
- 			  err);
-@@ -2978,7 +2978,7 @@ ice_write_phy_reg_e82x(struct ice_hw *hw, u8 port, u16 offset, u32 val)
- 	msg.opcode = ice_sbq_msg_wr;
- 	msg.data = val;
+ 		NL_SET_ERR_MSG_MOD(extack,
+ 				   "Failed to acquire device flash lock");
+@@ -687,7 +687,7 @@ int ixgbe_flash_pldm_image(struct devlink *devlink,
+ 	if (err)
+ 		return err;
  
--	err = ice_sbq_rw_reg(hw, &msg, ICE_AQ_FLAG_RD);
-+	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
+-	err = ixgbe_acquire_nvm(hw, IXGBE_RES_WRITE);
++	err = ixgbe_acquire_nvm(hw, LIBIE_AQC_RES_ACCESS_WRITE);
  	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
- 			  err);
-@@ -3139,7 +3139,7 @@ ice_read_quad_reg_e82x(struct ice_hw *hw, u8 quad, u16 offset, u32 *val)
- 
- 	msg.opcode = ice_sbq_msg_rd;
- 
--	err = ice_sbq_rw_reg(hw, &msg, ICE_AQ_FLAG_RD);
-+	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
- 			  err);
-@@ -3174,7 +3174,7 @@ ice_write_quad_reg_e82x(struct ice_hw *hw, u8 quad, u16 offset, u32 val)
- 	msg.opcode = ice_sbq_msg_wr;
- 	msg.data = val;
- 
--	err = ice_sbq_rw_reg(hw, &msg, ICE_AQ_FLAG_RD);
-+	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
- 			  err);
-@@ -4825,7 +4825,7 @@ static int ice_read_phy_reg_e810(struct ice_hw *hw, u32 addr, u32 *val)
- 	msg.opcode = ice_sbq_msg_rd;
- 	msg.dest_dev = rmn_0;
- 
--	err = ice_sbq_rw_reg(hw, &msg, ICE_AQ_FLAG_RD);
-+	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
- 			  err);
-@@ -4856,7 +4856,7 @@ static int ice_write_phy_reg_e810(struct ice_hw *hw, u32 addr, u32 val)
- 	msg.dest_dev = rmn_0;
- 	msg.data = val;
- 
--	err = ice_sbq_rw_reg(hw, &msg, ICE_AQ_FLAG_RD);
-+	err = ice_sbq_rw_reg(hw, &msg, LIBIE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
- 			  err);
-diff --git a/drivers/net/ethernet/intel/ice/ice_sched.c b/drivers/net/ethernet/intel/ice/ice_sched.c
-index 6ca13c5dcb14..f4ec593f19e6 100644
---- a/drivers/net/ethernet/intel/ice/ice_sched.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sched.c
-@@ -102,13 +102,13 @@ ice_aqc_send_sched_elem_cmd(struct ice_hw *hw, enum ice_adminq_opc cmd_opc,
- 			    u16 *elems_resp, struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_sched_elem_cmd *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int status;
- 
--	cmd = &desc.params.sched_elem_cmd;
-+	cmd = libie_aq_raw(&desc);
- 	ice_fill_dflt_direct_cmd_desc(&desc, cmd_opc);
- 	cmd->num_elem_req = cpu_to_le16(elems_req);
--	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-+	desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
- 	status = ice_aq_send_cmd(hw, &desc, buf, buf_size, cd);
- 	if (!status && elems_resp)
- 		*elems_resp = le16_to_cpu(cmd->num_elem_resp);
-@@ -371,10 +371,10 @@ ice_aq_get_dflt_topo(struct ice_hw *hw, u8 lport,
- 		     u8 *num_branches, struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_get_topo *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int status;
- 
--	cmd = &desc.params.get_topo;
-+	cmd = libie_aq_raw(&desc);
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_dflt_topo);
- 	cmd->port_num = lport;
- 	status = ice_aq_send_cmd(hw, &desc, buf, buf_size, cd);
-@@ -497,7 +497,7 @@ ice_aq_query_sched_res(struct ice_hw *hw, u16 buf_size,
- 		       struct ice_aqc_query_txsched_res_resp *buf,
- 		       struct ice_sq_cd *cd)
- {
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_query_sched_res);
- 	return ice_aq_send_cmd(hw, &desc, buf, buf_size, cd);
-@@ -662,13 +662,13 @@ ice_aq_rl_profile(struct ice_hw *hw, enum ice_adminq_opc opcode,
- 		  u16 buf_size, u16 *num_processed, struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_rl_profile *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int status;
- 
--	cmd = &desc.params.rl_profile;
-+	cmd = libie_aq_raw(&desc);
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, opcode);
--	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-+	desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
- 	cmd->num_profiles = cpu_to_le16(num_profiles);
- 	status = ice_aq_send_cmd(hw, &desc, buf, buf_size, cd);
- 	if (!status && num_processed)
-diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
-index 0e4dc1a5cff0..8d77c387357b 100644
---- a/drivers/net/ethernet/intel/ice/ice_sriov.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
-@@ -1166,10 +1166,12 @@ static u32 ice_globalq_to_pfq(struct ice_pf *pf, u32 globalq)
- void
- ice_vf_lan_overflow_event(struct ice_pf *pf, struct ice_rq_event_info *event)
- {
-+	struct ice_aqc_event_lan_overflow *cmd;
- 	u32 gldcb_rtctq, queue;
- 	struct ice_vf *vf;
- 
--	gldcb_rtctq = le32_to_cpu(event->desc.params.lan_overflow.prtdcb_ruptq);
-+	cmd = libie_aq_raw(&event->desc);
-+	gldcb_rtctq = le32_to_cpu(cmd->prtdcb_ruptq);
- 	dev_dbg(ice_pf_to_dev(pf), "GLDCB_RTCTQ: 0x%08x\n", gldcb_rtctq);
- 
- 	/* event returns device global Rx queue number */
-diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
-index 9d9a7edd3618..84848f0123e7 100644
---- a/drivers/net/ethernet/intel/ice/ice_switch.c
-+++ b/drivers/net/ethernet/intel/ice/ice_switch.c
-@@ -1511,11 +1511,11 @@ ice_aq_get_sw_cfg(struct ice_hw *hw, struct ice_aqc_get_sw_cfg_resp_elem *buf,
- 		  struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_get_sw_cfg *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int status;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_sw_cfg);
--	cmd = &desc.params.get_sw_conf;
-+	cmd = libie_aq_raw(&desc);
- 	cmd->element = cpu_to_le16(*req_desc);
- 
- 	status = ice_aq_send_cmd(hw, &desc, buf, buf_size, cd);
-@@ -1541,11 +1541,11 @@ ice_aq_add_vsi(struct ice_hw *hw, struct ice_vsi_ctx *vsi_ctx,
- {
- 	struct ice_aqc_add_update_free_vsi_resp *res;
- 	struct ice_aqc_add_get_update_free_vsi *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int status;
- 
--	cmd = &desc.params.vsi_cmd;
--	res = &desc.params.add_update_free_vsi_res;
-+	cmd = libie_aq_raw(&desc);
-+	res = libie_aq_raw(&desc);
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_add_vsi);
- 
-@@ -1556,7 +1556,7 @@ ice_aq_add_vsi(struct ice_hw *hw, struct ice_vsi_ctx *vsi_ctx,
- 
- 	cmd->vsi_flags = cpu_to_le16(vsi_ctx->flags);
- 
--	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-+	desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
- 
- 	status = ice_aq_send_cmd(hw, &desc, &vsi_ctx->info,
- 				 sizeof(vsi_ctx->info), cd);
-@@ -1585,11 +1585,11 @@ ice_aq_free_vsi(struct ice_hw *hw, struct ice_vsi_ctx *vsi_ctx,
- {
- 	struct ice_aqc_add_update_free_vsi_resp *resp;
- 	struct ice_aqc_add_get_update_free_vsi *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int status;
- 
--	cmd = &desc.params.vsi_cmd;
--	resp = &desc.params.add_update_free_vsi_res;
-+	cmd = libie_aq_raw(&desc);
-+	resp = libie_aq_raw(&desc);
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_free_vsi);
- 
-@@ -1620,17 +1620,17 @@ ice_aq_update_vsi(struct ice_hw *hw, struct ice_vsi_ctx *vsi_ctx,
- {
- 	struct ice_aqc_add_update_free_vsi_resp *resp;
- 	struct ice_aqc_add_get_update_free_vsi *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int status;
- 
--	cmd = &desc.params.vsi_cmd;
--	resp = &desc.params.add_update_free_vsi_res;
-+	cmd = libie_aq_raw(&desc);
-+	resp = libie_aq_raw(&desc);
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_update_vsi);
- 
- 	cmd->vsi_num = cpu_to_le16(vsi_ctx->vsi_num | ICE_AQ_VSI_IS_VALID);
- 
--	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-+	desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
- 
- 	status = ice_aq_send_cmd(hw, &desc, &vsi_ctx->info,
- 				 sizeof(vsi_ctx->info), cd);
-@@ -1944,7 +1944,8 @@ int
- ice_aq_sw_rules(struct ice_hw *hw, void *rule_list, u16 rule_list_sz,
- 		u8 num_rules, enum ice_adminq_opc opc, struct ice_sq_cd *cd)
- {
--	struct ice_aq_desc desc;
-+	struct ice_aqc_sw_rules *cmd;
-+	struct libie_aq_desc desc;
- 	int status;
- 
- 	if (opc != ice_aqc_opc_add_sw_rules &&
-@@ -1953,13 +1954,13 @@ ice_aq_sw_rules(struct ice_hw *hw, void *rule_list, u16 rule_list_sz,
- 		return -EINVAL;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, opc);
-+	cmd = libie_aq_raw(&desc);
- 
--	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
--	desc.params.sw_rules.num_rules_fltr_entry_index =
--		cpu_to_le16(num_rules);
-+	desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
-+	cmd->num_rules_fltr_entry_index = cpu_to_le16(num_rules);
- 	status = ice_aq_send_cmd(hw, &desc, rule_list, rule_list_sz, cd);
- 	if (opc != ice_aqc_opc_add_sw_rules &&
--	    hw->adminq.sq_last_status == ICE_AQ_RC_ENOENT)
-+	    hw->adminq.sq_last_status == LIBIE_AQ_RC_ENOENT)
- 		status = -ENOENT;
- 
- 	if (!status) {
-@@ -1989,14 +1990,14 @@ ice_aq_add_recipe(struct ice_hw *hw,
- 		  u16 num_recipes, struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_add_get_recipe *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	u16 buf_size;
- 
--	cmd = &desc.params.add_get_recipe;
-+	cmd = libie_aq_raw(&desc);
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_add_recipe);
- 
- 	cmd->num_sub_recipes = cpu_to_le16(num_recipes);
--	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-+	desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
- 
- 	buf_size = num_recipes * sizeof(*s_recipe_list);
- 
-@@ -2026,14 +2027,14 @@ ice_aq_get_recipe(struct ice_hw *hw,
- 		  u16 *num_recipes, u16 recipe_root, struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_add_get_recipe *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	u16 buf_size;
- 	int status;
- 
- 	if (*num_recipes != ICE_MAX_NUM_RECIPES)
- 		return -EINVAL;
- 
--	cmd = &desc.params.add_get_recipe;
-+	cmd = libie_aq_raw(&desc);
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_recipe);
- 
- 	cmd->return_index = cpu_to_le16(recipe_root);
-@@ -2118,9 +2119,9 @@ ice_aq_map_recipe_to_profile(struct ice_hw *hw, u32 profile_id, u64 r_assoc,
- 			     struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_recipe_to_profile *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
--	cmd = &desc.params.recipe_to_profile;
-+	cmd = libie_aq_raw(&desc);
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_recipe_to_profile);
- 	cmd->profile_id = cpu_to_le16(profile_id);
- 	/* Set the recipe ID bit in the bitmask to let the device know which
-@@ -2144,10 +2145,10 @@ ice_aq_get_recipe_to_profile(struct ice_hw *hw, u32 profile_id, u64 *r_assoc,
- 			     struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_recipe_to_profile *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 	int status;
- 
--	cmd = &desc.params.recipe_to_profile;
-+	cmd = libie_aq_raw(&desc);
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_recipe_to_profile);
- 	cmd->profile_id = cpu_to_le16(profile_id);
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_vf_mbx.c b/drivers/net/ethernet/intel/ice/ice_vf_mbx.c
-index 75c8113e58ee..7798a5d4bc9d 100644
---- a/drivers/net/ethernet/intel/ice/ice_vf_mbx.c
-+++ b/drivers/net/ethernet/intel/ice/ice_vf_mbx.c
-@@ -23,18 +23,18 @@ ice_aq_send_msg_to_vf(struct ice_hw *hw, u16 vfid, u32 v_opcode, u32 v_retval,
- 		      u8 *msg, u16 msglen, struct ice_sq_cd *cd)
- {
- 	struct ice_aqc_pf_vf_msg *cmd;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc, ice_mbx_opc_send_msg_to_vf);
- 
--	cmd = &desc.params.virt;
-+	cmd = libie_aq_raw(&desc);
- 	cmd->id = cpu_to_le32(vfid);
- 
- 	desc.cookie_high = cpu_to_le32(v_opcode);
- 	desc.cookie_low = cpu_to_le32(v_retval);
- 
- 	if (msglen)
--		desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-+		desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
- 
- 	return ice_sq_send_cmd(hw, &hw->mailboxq, &desc, msg, msglen, cd);
- }
-diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-index b147f6cf2615..7b12491f1337 100644
---- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-+++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-@@ -304,7 +304,7 @@ ice_vc_send_msg_to_vf(struct ice_vf *vf, u32 v_opcode,
- 
- 	aq_ret = ice_aq_send_msg_to_vf(&pf->hw, vf->vf_id, v_opcode, v_retval,
- 				       msg, msglen, NULL);
--	if (aq_ret && pf->hw.mailboxq.sq_last_status != ICE_AQ_RC_ENOSYS) {
-+	if (aq_ret && pf->hw.mailboxq.sq_last_status != LIBIE_AQ_RC_ENOSYS) {
- 		dev_info(dev, "Unable to send the message to VF %d ret %d aq_err %s\n",
- 			 vf->vf_id, aq_ret,
- 			 ice_aq_str(pf->hw.mailboxq.sq_last_status));
-diff --git a/drivers/net/ethernet/intel/ice/ice_vlan_mode.c b/drivers/net/ethernet/intel/ice/ice_vlan_mode.c
-index 1279c1ffe31c..fb526cb84776 100644
---- a/drivers/net/ethernet/intel/ice/ice_vlan_mode.c
-+++ b/drivers/net/ethernet/intel/ice/ice_vlan_mode.c
-@@ -63,7 +63,7 @@ static int
- ice_aq_get_vlan_mode(struct ice_hw *hw,
- 		     struct ice_aqc_get_vlan_mode *get_params)
- {
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
- 	if (!get_params)
- 		return -EINVAL;
-@@ -275,7 +275,7 @@ ice_aq_set_vlan_mode(struct ice_hw *hw,
- 		     struct ice_aqc_set_vlan_mode *set_params)
- {
- 	u8 rdma_packet, mng_vlan_prot_id;
--	struct ice_aq_desc desc;
-+	struct libie_aq_desc desc;
- 
- 	if (!set_params)
- 		return -EINVAL;
-@@ -295,7 +295,7 @@ ice_aq_set_vlan_mode(struct ice_hw *hw,
- 
- 	ice_fill_dflt_direct_cmd_desc(&desc,
- 				      ice_aqc_opc_set_vlan_mode_parameters);
--	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
-+	desc.flags |= cpu_to_le16(LIBIE_AQ_FLAG_RD);
- 
- 	return ice_aq_send_cmd(hw, &desc, set_params, sizeof(*set_params),
- 			       NULL);
+ 		NL_SET_ERR_MSG_MOD(extack,
+ 				   "Failed to acquire device flash lock");
 -- 
 2.42.0
 
