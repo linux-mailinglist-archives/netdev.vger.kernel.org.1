@@ -1,131 +1,97 @@
-Return-Path: <netdev+bounces-174136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA3FCA5D945
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 10:22:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C271A5D947
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 10:22:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A415189F6CE
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 09:22:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A27A7173CD5
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 09:22:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68DA023A9A5;
-	Wed, 12 Mar 2025 09:21:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0505C23A98C;
+	Wed, 12 Mar 2025 09:22:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="vWxf44WB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d1d7/Ie4"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8809E23A99D;
-	Wed, 12 Mar 2025 09:21:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D40EB2222DB
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 09:22:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741771311; cv=none; b=Wf9BC3fFdyfFUGg+k9jW0U41+MwMFMzPUffUdJL8pxDWAjzKn9KbjQdxK/yEgU33MdyHwqnhiIfjntdLrRL1rdlXBgtCrUWo4AC2+kZjUkkoGFPX/C1Ggf7WjPDolLJPoJB21z306OKTXgh5oL0VARTj00wiuP31EyF+fMTP8jI=
+	t=1741771338; cv=none; b=Do6MVTi+/3se0dKRwGCs9qFnm5R4SEKdmMmeA1f9hGkgqnvATj1CZqVBsMayWOat/gIRLlp2L/50jjjtkhLkEhvEhTcfyLHdG7FWBPqR7qJICo4SV+rUZ3RIeKzf3GKbNhm1DcQcE+BSUK44YbgmfzPjREj66LhUUfSwEc/v+Rw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741771311; c=relaxed/simple;
-	bh=wf7JeHUNBuGU5O5jRDn326z18fD5sasltjH3UUy39xY=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=QnVUN9MXrcz/OHmxVEK64CMshxZtiN1PuHg81OBqsq1aaTIDwSn5LqjmxtEP5qa0WrS1R2glekuPe1qrngedyXyYe4+2wBT3DeSex0g8UrxG8YEvGZ+t57ehAVW2fxjjtfkKwY9tCeUxckrlaEo4qXlIK8WyEgezQWQXX6gdPb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=vWxf44WB; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=fOQAGaXhyO7ZB/UZi9ueA8JjP2xLmkVdgsalxBQMQE8=; b=vWxf44WBHDpHwXKyucX8M4LdB9
-	Iae3nKYghul7aPxEzR3SqSzO7Gogl9o/vpB6wPrp5iKMOMTwSlvyfYPVIlybNYczxWxka7K5YNg+R
-	K80g40Fn1FO9B0NObXXZIuO7D8P5B5R2YkFsTrjC19ULemWS/r/f/vbQV3G8srMvDNhX9sphp6MHn
-	RM81z3bDsC7mkAsSoc389sHpg9F+CAOzhV4EnsuvKVTQsI1Iq/1LyWS7mb/Ez+j5At2PqD0XB4JZl
-	H/ZHl/LD4FBHz4ME6T6f/23S3bn0ksd5dEW8g/VPjn85pL0j7mejaLMhDJX5TykSERbF6MojXBWHI
-	lvgiw1KA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:35456 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tsIHL-0005Dd-0f;
-	Wed, 12 Mar 2025 09:21:31 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tsIGx-005v0F-Ev; Wed, 12 Mar 2025 09:21:07 +0000
-In-Reply-To: <Z9FQjQZb0IMaQJ9H@shell.armlinux.org.uk>
-References: <Z9FQjQZb0IMaQJ9H@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Chen-Yu Tsai <wens@csie.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Kevin Hilman <khilman@baylibre.com>,
-	linux-amlogic@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-sunxi@lists.linux.dev,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Vinod Koul <vkoul@kernel.org>
-Subject: [PATCH net-next v2 9/9] net: stmmac: sunxi: remove of_get_phy_mode()
+	s=arc-20240116; t=1741771338; c=relaxed/simple;
+	bh=/r9PKLYe0+WoOlDJzTRqb1IN3+/nRPCexBrBGKAqtQw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AfoqH6J/yFVORluDBx0UVuP/X5zqYOybIqquh0TOzuG0B5CCt6ZeV1C5IfMI71C/cNQohCXaGRrC1KLNjqntjN0xPn4TxUBkz4X3UDSQ/h69HKl1T//eFymN3JS6zJ/zxNU4QfwJDd6ZhYGGyitzyf1ctLcKwdPZU9Z+0gmRF24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d1d7/Ie4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26D9CC4CEE3;
+	Wed, 12 Mar 2025 09:22:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741771338;
+	bh=/r9PKLYe0+WoOlDJzTRqb1IN3+/nRPCexBrBGKAqtQw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=d1d7/Ie4ZVkbppiaTDwyb2S5ne4qEZiuGYhMPfvrJHrkuoo0ylAKalhplKMJgCt+k
+	 cRTSG7c71zsUmr6rcjEzDTCbCSPa3WZK11Rz+wGA5flW8CUJVNETSf9aAKj4hFfC90
+	 isVSG+M0me0D6Uw0tjZ4hjpCoUVcq/aj8WcUpk39iLYWIJK6KrclRMKOzm9eExm69A
+	 p8radKqj4RDdJXjvTLcYlg2dhgpYtO+pRCqtSksrGxATrwT8/GZuuPplwHp+Nvsg/b
+	 Ykl0YSsbvKJUsgyTvgMw6kFXGokpHoU9G+eAqpe65Y0a5WwTpRo4yAupgqlBzwlzsO
+	 smaQaw6gQ96Og==
+From: David Ahern <dsahern@kernel.org>
+To: netdev@vger.kernel.org
+Cc: andrea.mayer@uniroma2.it,
+	David Ahern <dsahern@kernel.org>
+Subject: [PATCH v2 net-next] MAINTAINERS: Add Andrea Mayer as a maintainer of SRv6
+Date: Wed, 12 Mar 2025 10:22:12 +0100
+Message-Id: <20250312092212.46299-1-dsahern@kernel.org>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tsIGx-005v0F-Ev@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 12 Mar 2025 09:21:07 +0000
 
-devm_stmmac_probe_config_dt() already gets the PHY mode from firmware,
-which is stored in plat_dat->phy_interface. Therefore, we don't need to
-get it in platform code.
+Andrea has made significant contributions to SRv6 support in Linux.
+Acknowledge the work and on-going interest in Srv6 support with a
+maintainers entry for these files so hopefully he is included
+on patches going forward.
 
-Set gmac->interface from plat_dat->phy_interface.
+v2
+- add non-uapi header files
 
-Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
-Acked-by: Jernej Skrabec <jernej.skrabec@gmail.com>
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Signed-off-by: David Ahern <dsahern@kernel.org>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+ MAINTAINERS | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c
-index 1b1ce2888b2e..9f098ff0ff05 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c
-@@ -116,11 +116,7 @@ static int sun7i_gmac_probe(struct platform_device *pdev)
- 	if (!gmac)
- 		return -ENOMEM;
+diff --git a/MAINTAINERS b/MAINTAINERS
+index ffbcd072fb14..e512dab77f1f 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -16649,6 +16649,17 @@ F:	net/mptcp/
+ F:	tools/testing/selftests/bpf/*/*mptcp*.[ch]
+ F:	tools/testing/selftests/net/mptcp/
  
--	ret = of_get_phy_mode(dev->of_node, &gmac->interface);
--	if (ret && ret != -ENODEV) {
--		dev_err(dev, "Can't get phy-mode\n");
--		return ret;
--	}
-+	gmac->interface = plat_dat->phy_interface;
- 
- 	gmac->tx_clk = devm_clk_get(dev, "allwinner_gmac_tx");
- 	if (IS_ERR(gmac->tx_clk)) {
++NETWORKING [SRv6]
++M:	Andrea Mayer <andrea.mayer@uniroma2.it>
++L:	netdev@vger.kernel.org
++S:	Maintained
++T:	git git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git
++F:	include/linux/seg6*
++F:	include/net/seg6*
++F:	include/uapi/linux/seg6*
++F:	net/ipv6/seg6*
++F:	tools/testing/selftests/net/srv6*
++
+ NETWORKING [TCP]
+ M:	Eric Dumazet <edumazet@google.com>
+ M:	Neal Cardwell <ncardwell@google.com>
 -- 
-2.30.2
+2.39.5 (Apple Git-154)
 
 
