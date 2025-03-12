@@ -1,137 +1,224 @@
-Return-Path: <netdev+bounces-174235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ECD1A5DEC1
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 15:20:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE65EA5DEEC
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 15:26:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58A7517A460
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 14:20:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7E8447AD0FB
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 14:25:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B84B624DFEF;
-	Wed, 12 Mar 2025 14:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8251F24C668;
+	Wed, 12 Mar 2025 14:26:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enfabrica.net header.i=@enfabrica.net header.b="OvoGhgcA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bOwC0GFP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB702033A
-	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 14:20:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86A5A24DFFD
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 14:26:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741789212; cv=none; b=pYMKkKb8OdokHU4i5vXIepHAp8eFPDsh+zn28skym3EejAjiT1xqQG1d3YNQ5IUEKfHXafyCjTXVJRPmfMtNWdU+v5X22ldbvI5y82PO6MxayEFk1tfBIO/LUnMuCipAcYn+DTt9xHFAxDrjn9pY5Win6VWYGQP0Wi9gCPV/Nis=
+	t=1741789566; cv=none; b=nYYKP3GaU7looAnqrDq5ZOysjY8DKENj/ySlRUdmGQ9aDnppNk2mNqR2O78QfBQw4DOKyHRukKI78Gibd3El8foNZ2fOe9j0aSnfqdA9DOmrPfIyrnJYZiDorq3/i2Ecq0om1yr1DrWEWR3bL1++uWFyaWH48TYkdrRz9Ao4Y0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741789212; c=relaxed/simple;
-	bh=d36XfEjHsb/LASvwjZhgKztn+JaRVGnRgzRhjuVi9n0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=j/dO73ml2Uf6eKCb+3NO854uBy+MpSMj9yLhlkvtN4tvbmBFHRuyseEPuizEokqrcF/G71a55cMlFtemaOFRan7cjRWJcm+GsS71n4avkK0CMca5Wmt90kY0X1wbkFloO1jutl5/0KER/mntS68UpoIGf+3hduyyEyaEYFPdX94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=enfabrica.net; spf=pass smtp.mailfrom=enfabrica.net; dkim=pass (2048-bit key) header.d=enfabrica.net header.i=@enfabrica.net header.b=OvoGhgcA; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=enfabrica.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enfabrica.net
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7c0892e4b19so686817285a.3
-        for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 07:20:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=enfabrica.net; s=google; t=1741789210; x=1742394010; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NxjEW2IK1lZmdC3Aka9pG0G7KKs2I3DMM01JAI0Qo+M=;
-        b=OvoGhgcAh7P0ADiuB1b6XPjEexSmI7Hxr6KuyHS7LkZ4h2NpQSJ60vypNLLfk5j665
-         MVhRV+5Qi71E5H1op3C40uWhdTp1Kj0NeoMifX05vIXyCsmYe7UCU472LWcTKwX5zvFz
-         dlEW8ii6xlPDxPDOMRs5iGheCZMYL0/Sr3lf21qSGyicJteRM4GbKuQpTav+YJz9fnOa
-         afPBJcu0zcR30rdJX66svwNseg+F1dsZcDKPvcamHy1rCGGGusbfsGOyWrhgP5RF+nL6
-         BT6tcFqPcwj67tbO4zcMUXSOzDq1IRmDk8s37hWTrsqopG0AS83Kol7coXgQYuMJpnYS
-         Xmfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741789210; x=1742394010;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NxjEW2IK1lZmdC3Aka9pG0G7KKs2I3DMM01JAI0Qo+M=;
-        b=akmLJ6/Eo52cn5KdggToQf7rSuyZNTLzVTRploTnGDGAJIqNhNoO/Sz7lgh/mGyTmG
-         gx/XrPdN9N8vNfmztJl/eskR7HF0yudZOA8ni6I0iVKkeWBL4DBqRnvWrGR0pjpvarcY
-         wQYaH9CIalhu6K/0HSu86Xcm248pyM+uHGZd0Y3QXPPSZljzqQiwq5B8ZCzhC+4lP7TO
-         nYTxJL1JhDNkdlfky1s9DR3f2zd7nO/yYL3ctWEY11k5PeX1BPdNmgA6cTg8KkOPTimh
-         xGp3nYG251Ofk2VMhOdczbFDQ1T46e/3hFBkoC+3cOfEDFeSzjt0ilt7CUNdcXgZ9/sM
-         il0Q==
-X-Gm-Message-State: AOJu0YzQT8UD5Zjx0fjNmlPMYGcmgYByj5bQ4yUUmQvfFUBnwUbMQDt8
-	z3+NB1bXhtJbn6+SleVGws99kGF682oMKUT60DU0+qB9y1i2XuVXDNBHvOlzFVM=
-X-Gm-Gg: ASbGncv2AVjTRhZaYld7i4xMocF95J9urNlFK+DQejQK/wcBIsy/fi/uKs23fcXpDSw
-	B3mca1USgpHfPalZ6MghjXhRXfdWIhuXKS2ador/kYwgYftLqBZbalpwI1yJEWiVGLOIm4oluAb
-	Eyx3wANuWIhPUvQZHWOTEraI50kp6JfREyr3ejcz+KXG7KHSCBC6atn644O8zyW4EZ0plNX+/qR
-	sEY/Dy5T4g84um6flmVENc6Epc9SZNdJ/+vdvxAA+lM9aVsZw0NPSA35DcSDycCMYHsvX1jQ6GD
-	aSmBzcfECceTBu6fgYyAYiCOAqM0kXPmGuDiq5FLsTbo8OWSmEnI
-X-Google-Smtp-Source: AGHT+IE9rBvVo4fWQGgmfzUj48CSmR8hVtF8QFZrxBGYAeYwyU2dpXL8gA/GGMkix24jg6jxPXvkxQ==
-X-Received: by 2002:a05:620a:6410:b0:7c5:6e5d:301d with SMTP id af79cd13be357-7c56e5d30a8mr268787385a.1.1741789210067;
-        Wed, 12 Mar 2025 07:20:10 -0700 (PDT)
-Received: from [172.19.251.166] ([195.29.54.243])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e5c766a028sm9659269a12.50.2025.03.12.07.20.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Mar 2025 07:20:09 -0700 (PDT)
-Message-ID: <86af1a4b-e988-4402-aed2-60609c319dc1@enfabrica.net>
-Date: Wed, 12 Mar 2025 16:20:08 +0200
+	s=arc-20240116; t=1741789566; c=relaxed/simple;
+	bh=x5yBdybcVQvGwM608pIjXqOjtnhzFuRtgN4KG0mnw1I=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=DQyHbwHlLmqT8PO9vi0oMLk1kLymFYWdnYIgXhswKBpX+JUkB2WOZUEno1a7LMVo03QRTRdC+7zSZHqHb9DbQyQjqrxLYZ6O9+fJqg70gV4ZM3PQ1bT2yMY8Laigy793cOYKLpBlF7XaUcjT+xYIYrTA61usW43LQP7yk69xR3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bOwC0GFP; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741789563;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=368AMI5AhK7lFz4Mrz0Jc27Xh/nF3FwCami4rTVwz/k=;
+	b=bOwC0GFPD8hKCWp4yrGBFcVVm5Ml1DzqTe6cCsS3Z6CNrGzQiTLUZERZb3lSUia6pOsjpv
+	YNPy+tZk0ogtUz/Yf4s9FcCRl+fbOHFts1nBGP9m73/L+FrXLAd6VTRNr9pjv3NA8jq9W1
+	z1gK5gEdzVcY7EMNbBvA45BQPf1Qt8U=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-314-nHmoc7D7O8ONKLmJzmNtMQ-1; Wed,
+ 12 Mar 2025 10:25:58 -0400
+X-MC-Unique: nHmoc7D7O8ONKLmJzmNtMQ-1
+X-Mimecast-MFC-AGG-ID: nHmoc7D7O8ONKLmJzmNtMQ_1741789556
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9226118001F6;
+	Wed, 12 Mar 2025 14:25:56 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.90.92])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9DB441801752;
+	Wed, 12 Mar 2025 14:25:53 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: network dev <netdev@vger.kernel.org>,  dev@openvswitch.org,
+  ovs-dev@openvswitch.org,  Marcelo Ricardo Leitner
+ <marcelo.leitner@gmail.com>,  Jianbo Liu <jianbol@nvidia.com>,  Florian
+ Westphal <fw@strlen.de>,  Ilya Maximets <i.maximets@ovn.org>,  Eric
+ Dumazet <edumazet@google.com>,  kuba@kernel.org,  Paolo Abeni
+ <pabeni@redhat.com>,  davem@davemloft.net
+Subject: Re: [ovs-dev] [PATCH net] Revert "openvswitch: switch to per-action
+ label counting in conntrack"
+In-Reply-To: <1bdeb2f3a812bca016a225d3de714427b2cd4772.1741457143.git.lucien.xin@gmail.com>
+	(Xin Long's message of "Sat, 8 Mar 2025 13:05:43 -0500")
+References: <1bdeb2f3a812bca016a225d3de714427b2cd4772.1741457143.git.lucien.xin@gmail.com>
+Date: Wed, 12 Mar 2025 10:25:51 -0400
+Message-ID: <f7tjz8uz5ow.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 00/13] Ultra Ethernet driver introduction
-To: Leon Romanovsky <leon@kernel.org>
-Cc: netdev@vger.kernel.org, shrijeet@enfabrica.net, alex.badea@keysight.com,
- eric.davis@broadcom.com, rip.sohan@amd.com, dsahern@kernel.org,
- bmt@zurich.ibm.com, roland@enfabrica.net, winston.liu@keysight.com,
- dan.mihailescu@keysight.com, kheib@redhat.com, parth.v.parikh@keysight.com,
- davem@redhat.com, ian.ziemba@hpe.com, andrew.tauferner@cornelisnetworks.com,
- welch@hpe.com, rakhahari.bhunia@keysight.com, kingshuk.mandal@keysight.com,
- linux-rdma@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- Jason Gunthorpe <jgg@nvidia.com>
-References: <20250306230203.1550314-1-nikolay@enfabrica.net>
- <20250308184650.GV1955273@unreal>
- <2f06a40d-2f14-439a-9c95-0231dce5772d@enfabrica.net>
- <20250312112921.GA1322339@unreal>
-Content-Language: en-US
-From: Nikolay Aleksandrov <nikolay@enfabrica.net>
-In-Reply-To: <20250312112921.GA1322339@unreal>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On 3/12/25 1:29 PM, Leon Romanovsky wrote:
-> On Wed, Mar 12, 2025 at 11:40:05AM +0200, Nikolay Aleksandrov wrote:
->> On 3/8/25 8:46 PM, Leon Romanovsky wrote:
->>> On Fri, Mar 07, 2025 at 01:01:50AM +0200, Nikolay Aleksandrov wrote:
-[snip]
->> Also we have the ephemeral PDC connections>> that come and go as
-needed. There more such objects coming with more
->> state, configuration and lifecycle management. That is why we added a
->> separate netlink family to cleanly manage them without trying to fit
->> a square peg in a round hole so to speak.
-> 
-> Yeah, I saw that you are planning to use netlink to manage objects,
-> which is very questionable. It is slow, unreliable, requires sockets,
-> needs more parsing logic e.t.c
-> 
-> To avoid all this overhead, RDMA uses netlink-like ioctl calls, which
-> fits better for object configurations.
-> 
-> Thanks
+Xin Long <lucien.xin@gmail.com> writes:
 
-We'd definitely like to keep using netlink for control path object
-management. Also please note we're talking about genetlink family. It is
-fast and reliable enough for us, very easily extensible,
-has a nice precise object definition with policies to enforce various
-limitations, has extensive tooling (e.g. ynl), communication can be
-monitored in realtime for debugging (e.g. nlmon), has a nice human
-readable error reporting, gives the ability to easily dump large object
-groups with filters applied, YAML family definitions and so on.
-Having sockets or parsing are not issues.
+> Currently, ovs_ct_set_labels() is only called for confirmed conntrack
+> entries (ct) within ovs_ct_commit(). However, if the conntrack entry
+> does not have the labels_ext extension, attempting to allocate it in
+> ovs_ct_get_conn_labels() for a confirmed entry triggers a warning in
+> nf_ct_ext_add():
+>
+>   WARN_ON(nf_ct_is_confirmed(ct));
+>
+> This happens when the conntrack entry is created externally before OVS
+> increments net->ct.labels_used. The issue has become more likely since
+> commit fcb1aa5163b1 ("openvswitch: switch to per-action label counting
+> in conntrack"), which changed to use per-action label counting and
+> increment net->ct.labels_used when a flow with ct action is added.
+>
+> Since there=E2=80=99s no straightforward way to fully resolve this issue =
+at the
+> moment, this reverts the commit to avoid breaking existing use cases.
+>
+> Fixes: fcb1aa5163b1 ("openvswitch: switch to per-action label counting in=
+ conntrack")
+> Reported-by: Jianbo Liu <jianbol@nvidia.com>
+> Signed-off-by: Xin Long <lucien.xin@gmail.com>
+> ---
 
-Cheers,
- Nik
+I did a quick test using the case provided by Jianbo and I wasn't able
+to generate the warning.  If possible, I'd like Jianbo to confirm that
+it works as well.
 
+Acked-by: Aaron Conole <aconole@redhat.com>
+
+>  net/openvswitch/conntrack.c | 30 ++++++++++++++++++------------
+>  net/openvswitch/datapath.h  |  3 +++
+>  2 files changed, 21 insertions(+), 12 deletions(-)
+>
+> diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntrack.c
+> index 3bb4810234aa..e573e9221302 100644
+> --- a/net/openvswitch/conntrack.c
+> +++ b/net/openvswitch/conntrack.c
+> @@ -1368,8 +1368,11 @@ bool ovs_ct_verify(struct net *net, enum ovs_key_a=
+ttr attr)
+>  	    attr =3D=3D OVS_KEY_ATTR_CT_MARK)
+>  		return true;
+>  	if (IS_ENABLED(CONFIG_NF_CONNTRACK_LABELS) &&
+> -	    attr =3D=3D OVS_KEY_ATTR_CT_LABELS)
+> -		return true;
+> +	    attr =3D=3D OVS_KEY_ATTR_CT_LABELS) {
+> +		struct ovs_net *ovs_net =3D net_generic(net, ovs_net_id);
+> +
+> +		return ovs_net->xt_label;
+> +	}
+>=20=20
+>  	return false;
+>  }
+> @@ -1378,7 +1381,6 @@ int ovs_ct_copy_action(struct net *net, const struc=
+t nlattr *attr,
+>  		       const struct sw_flow_key *key,
+>  		       struct sw_flow_actions **sfa,  bool log)
+>  {
+> -	unsigned int n_bits =3D sizeof(struct ovs_key_ct_labels) * BITS_PER_BYT=
+E;
+>  	struct ovs_conntrack_info ct_info;
+>  	const char *helper =3D NULL;
+>  	u16 family;
+> @@ -1407,12 +1409,6 @@ int ovs_ct_copy_action(struct net *net, const stru=
+ct nlattr *attr,
+>  		return -ENOMEM;
+>  	}
+>=20=20
+> -	if (nf_connlabels_get(net, n_bits - 1)) {
+> -		nf_ct_tmpl_free(ct_info.ct);
+> -		OVS_NLERR(log, "Failed to set connlabel length");
+> -		return -EOPNOTSUPP;
+> -	}
+> -
+>  	if (ct_info.timeout[0]) {
+>  		if (nf_ct_set_timeout(net, ct_info.ct, family, key->ip.proto,
+>  				      ct_info.timeout))
+> @@ -1581,7 +1577,6 @@ static void __ovs_ct_free_action(struct ovs_conntra=
+ck_info *ct_info)
+>  	if (ct_info->ct) {
+>  		if (ct_info->timeout[0])
+>  			nf_ct_destroy_timeout(ct_info->ct);
+> -		nf_connlabels_put(nf_ct_net(ct_info->ct));
+>  		nf_ct_tmpl_free(ct_info->ct);
+>  	}
+>  }
+> @@ -2006,9 +2001,17 @@ struct genl_family dp_ct_limit_genl_family __ro_af=
+ter_init =3D {
+>=20=20
+>  int ovs_ct_init(struct net *net)
+>  {
+> -#if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+> +	unsigned int n_bits =3D sizeof(struct ovs_key_ct_labels) * BITS_PER_BYT=
+E;
+>  	struct ovs_net *ovs_net =3D net_generic(net, ovs_net_id);
+>=20=20
+> +	if (nf_connlabels_get(net, n_bits - 1)) {
+> +		ovs_net->xt_label =3D false;
+> +		OVS_NLERR(true, "Failed to set connlabel length");
+> +	} else {
+> +		ovs_net->xt_label =3D true;
+> +	}
+> +
+> +#if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+>  	return ovs_ct_limit_init(net, ovs_net);
+>  #else
+>  	return 0;
+> @@ -2017,9 +2020,12 @@ int ovs_ct_init(struct net *net)
+>=20=20
+>  void ovs_ct_exit(struct net *net)
+>  {
+> -#if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+>  	struct ovs_net *ovs_net =3D net_generic(net, ovs_net_id);
+>=20=20
+> +#if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+>  	ovs_ct_limit_exit(net, ovs_net);
+>  #endif
+> +
+> +	if (ovs_net->xt_label)
+> +		nf_connlabels_put(net);
+>  }
+> diff --git a/net/openvswitch/datapath.h b/net/openvswitch/datapath.h
+> index 365b9bb7f546..9ca6231ea647 100644
+> --- a/net/openvswitch/datapath.h
+> +++ b/net/openvswitch/datapath.h
+> @@ -160,6 +160,9 @@ struct ovs_net {
+>  #if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+>  	struct ovs_ct_limit_info *ct_limit_info;
+>  #endif
+> +
+> +	/* Module reference for configuring conntrack. */
+> +	bool xt_label;
+>  };
+>=20=20
+>  /**
 
 
