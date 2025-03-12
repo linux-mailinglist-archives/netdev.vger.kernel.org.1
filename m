@@ -1,137 +1,182 @@
-Return-Path: <netdev+bounces-174279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01007A5E1E1
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 17:37:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 416FAA5E1FD
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 17:47:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F3943A5925
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 16:37:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5CE93B3045
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 16:47:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC3221D5CCC;
-	Wed, 12 Mar 2025 16:37:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4A0D23C8A1;
+	Wed, 12 Mar 2025 16:47:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="HIfLriYb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hvUT/0dt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88B51D5176
-	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 16:37:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67D8418D643
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 16:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741797444; cv=none; b=c7FDu3C8GMlTSpmW6zOorPR82XoG8OipkOIpFsKlbt86kgsQk/YI16qGMkAjK2nq7bm5dUfuw0Azp3hTePt6gVaMn0CQGZoTJAwOQoKFO30sGe0zgwoPwFz9lebo+V/+Mfwg5RUKGy7m1L6+xyYO06sYL/zw6NbSki8fcsAQPnU=
+	t=1741798066; cv=none; b=cK9ppxcxz7Tm9WDj42fP8rfqOccMDv8Iyea285ut4yJpZywaSToglucYy2qmLQXCmHFYSxVWHZUd58ZryTuyerIy41Ndi+lEiE38xEcMjsO5ll6wNYDpL2uEy1zYGA6luyaaQE0dSy07qIBYb/sdWF2N96L3FT7d83Nj8OevPdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741797444; c=relaxed/simple;
-	bh=rxN3Cc4wxvpQIqhjZrJks7Nx/9hBcB5mPu2JMBFeq0U=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q0I/RkZFHevv+LOJmnoO5y2d5vDkburM1weywlqEswSHSL92mJDey0TkwPtsekCm0HI5x3ud3VKTw5prIBu45oWo2tneFAuNjqJZgJjfCteMv0qRIczouMqjYXOQLivpbvgCkEee7/KbbxVf87X8PXeyyMtAbCrrvqLJ0fLaa9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=HIfLriYb; arc=none smtp.client-ip=52.119.213.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1741798066; c=relaxed/simple;
+	bh=0c5S/g/owxivC5AbAwMxgOim8yD64j3DTrj6skoi5io=;
+	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RNM9Ieoy9zCl0KVGh9Z7lRxuBsAhMHPSLnCUa8fvoVagGTw2VqnSeY/epRP+wUlRkN0JoybGwUGDssye/C0Wi24C8m4RDftIpj1Sh+IbF5T5a7u9iiM4RJxzuM+Y6ROi3cIV9Oi26ePB55Eu32QJaXT5VTdSeuhRzkEzHFiT7e4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hvUT/0dt; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-22401f4d35aso1153315ad.2
+        for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 09:47:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1741797443; x=1773333443;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=vYYqiHxAm5zED5GN7fCXLz94FuRDNESO047SLJFc6Ak=;
-  b=HIfLriYbVcV/KjsxK5r2LTG0u6mMgnTsu9dYy0lc+T/RRTGXHJ6LyHqA
-   hecSVQ6DSK+79Ea9aTR4v5fu0vmdcI28HnBE9JOz68P6LArIWK44fK0RG
-   2D8+alBmyyF2Vp2D9tf5/NiPhPEMUz5Dy4N5uTQY+3uoYT8ArSy/xyYvB
-   w=;
-X-IronPort-AV: E=Sophos;i="6.14,242,1736812800"; 
-   d="scan'208";a="704488143"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2025 16:37:18 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:65505]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.22.127:2525] with esmtp (Farcaster)
- id fd56a6ab-abb2-4278-8b5e-d7d105877d91; Wed, 12 Mar 2025 16:37:18 +0000 (UTC)
-X-Farcaster-Flow-ID: fd56a6ab-abb2-4278-8b5e-d7d105877d91
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 12 Mar 2025 16:37:09 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.94.160.2) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 12 Mar 2025 16:37:05 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <nicolas.morey@suse.com>
-CC: <edumazet@google.com>, <netdev@vger.kernel.org>, <kuniyu@amazon.com>
-Subject: Re: [RFC PATCH] net: enable SO_REUSEPORT for AF_TIPC sockets
-Date: Wed, 12 Mar 2025 09:35:16 -0700
-Message-ID: <20250312163652.83267-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <dec1f621-a770-4c9a-89e9-e0f26ab470e2@suse.com>
-References: <dec1f621-a770-4c9a-89e9-e0f26ab470e2@suse.com>
+        d=gmail.com; s=20230601; t=1741798064; x=1742402864; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dSjWjORF+JX9QV84SOCtC+CRH6HYQinA7zfQCTmRJL8=;
+        b=hvUT/0dt4QkfvPJOGvwXy1u3HgLhx+QOJcXSAapWDtfWAigppDaW/nc0aY/+au5y49
+         AmGDksQSzMUBxGpeosm3haWCc4h1eoAttBP1qOkfsv9WOzve3ok33rMrtcGt1ntoke6K
+         4iKVtS0eujtJeLqO3+0f4YqaU0kD1p/XTxl/m9BEtaHIKpdkhgNy4E1z2WngQv97JFBH
+         vzlovQ1pMVoaewqto3p5X5FTCfQiL+HHBpMoUsdDWGilmpcRre7F/S7H/l6gL5O2KqGB
+         rNTI9LvrkI0m5Wp8q3LeLi40Rf9wQdZBbNxniVIaOcKtQBaBSF+vWHfajt/83T7pc9UB
+         13zQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741798064; x=1742402864;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dSjWjORF+JX9QV84SOCtC+CRH6HYQinA7zfQCTmRJL8=;
+        b=w6GO+L2OAK+shdo1cMwqjN2QjDO3hDzHgPzxe2JRKBAX1G8/ObW4h7kBJrSr1O5CrF
+         BSDiAKiLov61Cc7rcwotSqgyuX5eIpg4oHGw0f9hV2Hzz0bqlrmC5L+MrqUD25iP4cAb
+         +SgA4YizXOj9IwRkbxJd1JNmne6qCttPm48nMwc8PGzJmMRFb+BcTNWBVRQ2Ca28Emou
+         H/mcOQ1RkMaZqCabOvOU8G25YHUZGVzd8kWXr7XDC2YjDOB/tqz9k88RBWqBQsh6ClkL
+         g3uHgFq8y2xbEYRKI/CvPjQ98E+XyQfZjnLGabWKwf5qI1G3w4EA3gjbiUrCmR3nyolX
+         rHew==
+X-Forwarded-Encrypted: i=1; AJvYcCVQtBi/eSU0gFMPecOu2nY7/MO/J3xRcLOKp7y7jEF85SlD/wyFKpnh8J2ehF+fBGQ4TqCF96M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy8WlLig8E+qOnnzkSWE4F7au4jkFR0nI1ZIxVww4TBW0c5dsBr
+	SIEOU5/GMkBYfJpY0vBDmd1FCT/I5cMr6bryneSbk+HNvId2AAMW
+X-Gm-Gg: ASbGncsucRMOEJV/s/ZBc7N0WQb0zEUmNtWUUWppANDwnagl1yVIbIf6XOIYFqigj0y
+	vy4bsTw10NK+Q46eMcLiu95MBzayMsMVIYV+jOezBlfIaPyBrmswYzBf24fzq3gtuHkPxl/b9xh
+	XkAcApOfk9msR7D3tXan9qeBYFa75b/DhKn3jT2T3/Mlm9iy1ur7IfISPJlPyB1vZBd4yMUHsOc
+	lqdbaVMc2uEhEek6oNGxZp2exRCSdsxA4LmepELn2Y/JAO/XAXnZYAca73jjGGpn+ux8exXwbyC
+	9r7lrEqYQvTogPrKSGm0aMZPgdhjZJrFh5V8+1GPurE0x8d/4XImFqkRikos4uY7iy5bR3g=
+X-Google-Smtp-Source: AGHT+IGdRDlsAKlppeUQzxW9eXFsBluDKuWjTl5cbIHiYi1ZgoHZy4gmQOgN7kmz+PhPNZbNVlzeEw==
+X-Received: by 2002:a17:903:41c2:b0:224:1ec0:8a0c with SMTP id d9443c01a7336-22592e4494emr115665415ad.29.1741798064476;
+        Wed, 12 Mar 2025 09:47:44 -0700 (PDT)
+Received: from jlennox2.jitsi.com ([129.146.236.57])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22410aa5c36sm118498105ad.235.2025.03.12.09.47.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Mar 2025 09:47:43 -0700 (PDT)
+From: Jonathan Lennox <jonathan.lennox42@gmail.com>
+X-Google-Original-From: Jonathan Lennox <jonathan.lennox@8x8.com>
+To: Jakub Kicinski <kuba@kernel.org>,
+	Jonathan Lennox <jonathan.lennox42@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Lennox <jonathan.lennox@8x8.com>,
+	David Ahern <dsahern@kernel.org>,
+	netdev@vger.kernel.org,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Pedro Tammela <pctammela@mojatatu.com>
+Subject: [PATCH net-next v2] tc-tests: Update tc police action tests for tc buffer size rounding fixes.
+Date: Wed, 12 Mar 2025 16:47:20 +0000
+Message-Id: <20250312164720.283689-1-jonathan.lennox@8x8.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <2d8adcbe-c379-45c3-9ca9-4f50dbe6a6da@mojatatu.com>
+References: <2d8adcbe-c379-45c3-9ca9-4f50dbe6a6da@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="------------2.34.1"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D043UWA003.ant.amazon.com (10.13.139.31) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Nicolas Morey <nicolas.morey@suse.com>
-Date: Wed, 12 Mar 2025 14:48:01 +0100
-> Commit 5b0af621c3f6 ("net: restrict SO_REUSEPORT to inet sockets") disabled
-> SO_REUSEPORT for all non inet sockets, including AF_TIPC sockets which broke
-> one of our customer applications.
-> Re-enable SO_REUSEPORT for AF_TIPC to restore the original behaviour.
-
-AFAIU, AF_TIPC does not actually implement SO_REUSEPORT logic, no ?
-If so, please tell your customer not to set it on AF_TIPC sockets.
-
-There were similar reports about AF_VSOCK and AF_UNIX, and we told
-that the userspace should not set SO_REUSEPORT for such sockets
-that do not support the option.
-
-https://lore.kernel.org/stable/CAGxU2F57EgVGbPifRuCvrUVjx06mrOXNdLcPdqhV9bdM0VqGvg@mail.gmail.com/
-https://github.com/amazonlinux/amazon-linux-2023/issues/901
+This is a multi-part message in MIME format.
+--------------2.34.1
+Content-Type: text/plain; charset=UTF-8; format=fixed
+Content-Transfer-Encoding: 8bit
 
 
-> 
-> Fixes: 5b0af621c3f6 ("net: restrict SO_REUSEPORT to inet sockets")
-> Signed-off-by: Nicolas Morey <nmorey@suse.com>
-> ---
->  include/net/sock.h | 5 +++++
->  net/core/sock.c    | 2 +-
->  2 files changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/net/sock.h b/include/net/sock.h
-> index 7ef728324e4e..d14f6ffedcd5 100644
-> --- a/include/net/sock.h
-> +++ b/include/net/sock.h
-> @@ -2755,6 +2755,11 @@ static inline bool sk_is_vsock(const struct sock *sk)
->  	return sk->sk_family == AF_VSOCK;
->  }
->  
-> +static inline bool sk_is_tipc(const struct sock *sk)
-> +{
-> +	return sk->sk_family == AF_TIPC;
-> +}
-> +
->  /**
->   * sk_eat_skb - Release a skb if it is no longer needed
->   * @sk: socket to eat this skb from
-> diff --git a/net/core/sock.c b/net/core/sock.c
-> index 6c0e87f97fa4..d4ad4cdff997 100644
-> --- a/net/core/sock.c
-> +++ b/net/core/sock.c
-> @@ -1300,7 +1300,7 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
->  		sk->sk_reuse = (valbool ? SK_CAN_REUSE : SK_NO_REUSE);
->  		break;
->  	case SO_REUSEPORT:
-> -		if (valbool && !sk_is_inet(sk))
-> +		if (valbool && !sk_is_inet(sk) && !sk_is_tipc(sk))
->  			ret = -EOPNOTSUPP;
->  		else
->  			sk->sk_reuseport = valbool;
-> -- 
-> 2.45.2
+Before tc's recent change to fix rounding errors, several tests which
+specified a burst size of "1m" would translate back to being 1048574
+bytes (2b less than 1Mb).  sprint_size prints this as "1024Kb".
+
+With the tc fix, the burst size is instead correctly reported as
+1048576 bytes (precisely 1Mb), which sprint_size prints as "1Mb".
+
+This updates the expected output in the tests' matchPattern values
+to accept either the old or the new output.
+
+Signed-off-by: Jonathan Lennox <jonathan.lennox@8x8.com>
+---
+ .../selftests/tc-testing/tc-tests/actions/police.json  | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+
+--------------2.34.1
+Content-Type: text/x-patch; name="0001-tc-tests-Update-tc-police-action-tests-for-tc-buffer.patch"
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline; filename="0001-tc-tests-Update-tc-police-action-tests-for-tc-buffer.patch"
+
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/actions/police.json b/tools/testing/selftests/tc-testing/tc-tests/actions/police.json
+index dd8109768f8f..5596f4df0e9f 100644
+--- a/tools/testing/selftests/tc-testing/tc-tests/actions/police.json
++++ b/tools/testing/selftests/tc-testing/tc-tests/actions/police.json
+@@ -689,7 +689,7 @@
+         "cmdUnderTest": "$TC actions add action police rate 7mbit burst 1m continue index 1",
+         "expExitCode": "0",
+         "verifyCmd": "$TC actions get action police index 1",
+-        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst 1024Kb mtu 2Kb action continue",
++        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst (1024Kb|1Mb) mtu 2Kb action continue",
+         "matchCount": "1",
+         "teardown": [
+             "$TC actions flush action police"
+@@ -716,7 +716,7 @@
+         "cmdUnderTest": "$TC actions add action police rate 7mbit burst 1m drop index 1",
+         "expExitCode": "0",
+         "verifyCmd": "$TC actions ls action police",
+-        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst 1024Kb mtu 2Kb action drop",
++        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst (1024Kb|1Mb) mtu 2Kb action drop",
+         "matchCount": "1",
+         "teardown": [
+             "$TC actions flush action police"
+@@ -743,7 +743,7 @@
+         "cmdUnderTest": "$TC actions add action police rate 7mbit burst 1m ok index 1",
+         "expExitCode": "0",
+         "verifyCmd": "$TC actions ls action police",
+-        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst 1024Kb mtu 2Kb action pass",
++        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst (1024Kb|1Mb) mtu 2Kb action pass",
+         "matchCount": "1",
+         "teardown": [
+             "$TC actions flush action police"
+@@ -770,7 +770,7 @@
+         "cmdUnderTest": "$TC actions add action police rate 7mbit burst 1m reclassify index 1",
+         "expExitCode": "0",
+         "verifyCmd": "$TC actions get action police index 1",
+-        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst 1024Kb mtu 2Kb action reclassify",
++        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst (1024Kb|1Mb) mtu 2Kb action reclassify",
+         "matchCount": "1",
+         "teardown": [
+             "$TC actions flush action police"
+@@ -797,7 +797,7 @@
+         "cmdUnderTest": "$TC actions add action police rate 7mbit burst 1m pipe index 1",
+         "expExitCode": "0",
+         "verifyCmd": "$TC actions ls action police",
+-        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst 1024Kb mtu 2Kb action pipe",
++        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst (1024Kb|1Mb) mtu 2Kb action pipe",
+         "matchCount": "1",
+         "teardown": [
+             "$TC actions flush action police"
+
+--------------2.34.1--
+
+
 
