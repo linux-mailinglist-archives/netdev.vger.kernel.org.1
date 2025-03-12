@@ -1,95 +1,77 @@
-Return-Path: <netdev+bounces-174344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB48BA5E581
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 21:40:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04205A5E58A
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 21:42:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3637189BB3B
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 20:40:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4DF63B4159
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 20:42:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CFBB1EE032;
-	Wed, 12 Mar 2025 20:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F41DA1EE00D;
+	Wed, 12 Mar 2025 20:42:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jQUuts4c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VSi0zR4T"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 406311EE00D;
-	Wed, 12 Mar 2025 20:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF932136A
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 20:42:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741812002; cv=none; b=P4umwhnrcBkxlsVbDm/41eO5PpJ4fBYBDE/xAEdrUbw+Wyd4pWcqhBAtISMcnXKrZBw+kNPG+3tzmeMwKms9vD1aP85XEI01lNiaXyiVQLeDMrXEC8CgUQXOFthKPI9RzWPyMQAMpzWQQsmhkVA795QLm4hWZbeUSN7ucVRe12o=
+	t=1741812148; cv=none; b=nlMXmUhoZJ9iKa5XzCBzgu4LaEnhCdFLolXzhvgmqU4CTYVBD24FhnVLy+8YG4bGUBTLH4jf/ZSGoykYrugzBqE6V/ie6Vf7XMAzCHlc2OUXclJ38xRZS+Myz2BM7ABE2V4YKl/uQtzEbOOMeK+PC52rQZowJvF0AtoDmVRY76Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741812002; c=relaxed/simple;
-	bh=UY+qjs9BhcwwDvow0Ain3NjALs1ERFIyXDfybEyb1TE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YlTklcfvSrfHC53CymqdMFd6rHKUhLVHM6XViDALLjKV6ssTTymNKUbLtvxzfAXxjJ1WulN4XZmfEV2rtLm/7nBTdtv+ukUuAgB5zjs65gMvCD6azw+8igD3q+ZL/9b2+TOcR9aycRpPWmlxYRFLwofaDeWRogT3+JtzPc8CZzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jQUuts4c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14A5BC4CEDD;
-	Wed, 12 Mar 2025 20:40:02 +0000 (UTC)
+	s=arc-20240116; t=1741812148; c=relaxed/simple;
+	bh=O/H1A6Kcv0oy2d6d42mJsjBE8c6sMN1FEH53WedKkdE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=C5Xqlkdx8YQvtzHMiKUgvsjqznqY+9cmmqsGU1PcG2BdamhSh3eEkYphb8gFA62UcS3cXBOSeaZtZngqCGx8SeQ4u+EfBAwa30DrCIQIWDWakvZqh62CAYr2IV4e2YAcyE8zUpM86iwOeOczFakWQ1dZs0aazhAjnqQWxf9FGVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VSi0zR4T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31E6DC4CEDD;
+	Wed, 12 Mar 2025 20:42:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741812002;
-	bh=UY+qjs9BhcwwDvow0Ain3NjALs1ERFIyXDfybEyb1TE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jQUuts4c5wPOKmECXgc+AlXtK6xntdNehzrWxtyZW3SQ9cmi1cas1kYxurghVwtrJ
-	 F9rt0paNVmbMnvpKa7q6zOreNlAxw2cIygjFGtLp0Ad9lYSH7Sf/Taeo910NRgr9KF
-	 i1IFG1VdL/tt8WsxMftjVEl4nklLg4/XTDxwP19a+/+RIIdM4tCaSYbOx55kpJL9Xt
-	 e4Fh6z8s3wiBCpmd8DFjx91oML1jNe/oSpyU+3YlosqlDtqoHBrmJZloB5T6gljCfD
-	 SoTYWy310Xoh4lWHAaKE1OMpOzBZY20stNjU05d9IVRnnHD7UV01q13G4Z28a27lp+
-	 qbfEKBsq/Q4AQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE6FC380DBDF;
-	Wed, 12 Mar 2025 20:40:37 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1741812148;
+	bh=O/H1A6Kcv0oy2d6d42mJsjBE8c6sMN1FEH53WedKkdE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VSi0zR4T8ngUQClByrPoHVy15hn4KH/MV2zKAXamBeHTxeaZkowJMPRGqk54PW9K4
+	 iHf8YYnpPY7E9vEdyf77pq0mCt1gWL/bcMhUSSaNbZhp1GWGgLTLlHFCNXTFM2STQA
+	 NTJLlj7+o9CB9iWk2ngE7JZDApCW8kOblXCb5iND/GDCZaxzUMWn8IIrotMWXJuxv7
+	 gx7tDpC4xvTzI/ffQe9PjOYdWsq/dbRtNkiBhTr1mgkYLUQgJVbX/1GjA9Agg6ulb2
+	 e+HOf46HGWQvFDfCkEueAZKA4mbzfPgSyu3I9i4IKXIRf8YVtdCI1XOu7MpRTgYmA+
+	 u/4c38sOQG0ow==
+Date: Wed, 12 Mar 2025 21:42:22 +0100
+From: Jakub Kicinski <kuba@kernel.org>
+To: Michal Kubiak <michal.kubiak@intel.com>
+Cc: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+ <pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
+ <sdf@fomichev.me>
+Subject: Re: [PATCH net-next] netdevsim: 'support' multi-buf XDP
+Message-ID: <20250312214222.0feb96ec@kernel.org>
+In-Reply-To: <Z9AVs2laMDqYPp6S@localhost.localdomain>
+References: <20250311092820.542148-1-kuba@kernel.org>
+	<Z9AVs2laMDqYPp6S@localhost.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net/mlx5: Avoid unnecessary use of comma operator
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174181203625.925252.18369584221189427923.git-patchwork-notify@kernel.org>
-Date: Wed, 12 Mar 2025 20:40:36 +0000
-References: <20250307-mlx5-comma-v1-1-934deb6927bb@kernel.org>
-In-Reply-To: <20250307-mlx5-comma-v1-1-934deb6927bb@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, nathan@kernel.org,
- nick.desaulniers+lkml@gmail.com, morbo@google.com, justinstitt@google.com,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri, 07 Mar 2025 12:39:33 +0000 you wrote:
-> Although it does not seem to have any untoward side-effects,
-> the use of ';' to separate to assignments seems more appropriate than ','.
+On Tue, 11 Mar 2025 11:51:31 +0100 Michal Kubiak wrote:
+> > -	if (ns->netdev->mtu > NSIM_XDP_MAX_MTU) {
+> > +	if (bpf->prog && !bpf->prog->aux->xdp_has_frags &&
+> > +	    ns->netdev->mtu > NSIM_XDP_MAX_MTU) {
+> >  		NSIM_EA(bpf->extack, "MTU too large w/ XDP enabled");  
 > 
-> Flagged by clang-19 -Wcomma
-> 
-> No functional change intended.
-> Compile tested only.
-> 
-> [...]
+> Would it make sense to extend this error message to indicate that single-buf
+> XDP is being used? For example: "MTU too large w/ single-buf XDP enabled"?
+> (Please consider this as a suggestion only.)
 
-Here is the summary with links:
-  - [net-next] net/mlx5: Avoid unnecessary use of comma operator
-    https://git.kernel.org/netdev/net-next/c/17fef2042338
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Fair point, tho I'd rather push as is. It fixes the CI and some other
+tests match on this exact error message so I'd need to fully retest 
+the respin..
 
