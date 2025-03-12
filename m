@@ -1,144 +1,138 @@
-Return-Path: <netdev+bounces-174274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C237A5E1A5
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 17:20:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60EB5A5E1AA
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 17:21:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85819175D95
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 16:20:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 50C927A4129
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 16:20:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8228B1D514E;
-	Wed, 12 Mar 2025 16:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5AFD1D5166;
+	Wed, 12 Mar 2025 16:21:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nlkuphmq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SikGBZGs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37431C5F1E;
-	Wed, 12 Mar 2025 16:20:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ACB31C5D7A;
+	Wed, 12 Mar 2025 16:21:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741796425; cv=none; b=BWKG4UakTH66ZDrMxm0UAyGk3qIZMWXZOXvgYStQ19oBbtYWQD4kfD4d6vrr0x6L+OMo7dOEeeTrmMNjHVssHXHRNVZz7Wq8UtIpWBDGydv8SttFfzS+saGOmatXx1t5jzbOFJuJUuHAMB8NkZIToV3Jiem5Acp99eJ4Fz+XnwM=
+	t=1741796495; cv=none; b=rQoJxBw0K7ZtyWehQ3gRnNlnJDlXtUhm77xFYO+PRy4W5e4hl7Npb7GkY8Uq7a4gdbv9ktTP1ooKtML2EpOvM+KbX+bxX63dQKnKRNpWagQgHSsTUdDMxmihJ6UE2GA3ytzbB16TjhVf/FptxJ2A+vj35rzvnTGI0/ywZnawrXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741796425; c=relaxed/simple;
-	bh=dVocHVpBW+LBL15aYGRyDXL1g4TfZ+fwRCHVkR5W5Cs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pqmVQOYG6yxzk7OYdgf4hvgjJHtxoN84NWpKm6DYC17S7RmUDl7NxMiRyG3/3G0dV7UfByxbvwWuIkeJ8IPL1OWHZ2CxKS42ihjH7ztqJs+os2olqnyrosPfYuV4CxEMrmo2eQcZu+dYpxsipbYdbPgae2cyNlufAidJj0OjORk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nlkuphmq; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741796424; x=1773332424;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=dVocHVpBW+LBL15aYGRyDXL1g4TfZ+fwRCHVkR5W5Cs=;
-  b=NlkuphmqN7NbcRLf9tXL1Zws0qO+L4Xj+ZKovwyMgpf2ADfu5WFWnrFy
-   sJ9GPNVbZSZBuALqwUUluLlZZX+MHTELM8kSVfWyJnpl+hBIcWafZdHFo
-   cHTT9mXKYWD7H/fGVAXtkk2aC7HmLBgSDpML88wmmubhHQEWrHKQOh2+F
-   f9BxbGCoHAMIAsjhPUlwhqCYYPaRVzDCnJjHxBMHc768qIpXeQUZClTAP
-   LL6mmoj77rPC17YCz9LFVhiMIdZY+ckjwejO5nHXsrUe0viQvp3kFSRk3
-   bJC/N2Cq7Y75a8CpmvayeMAKCRI4QFCu45Q2RijmypD7ncfllPVFq/8sa
-   Q==;
-X-CSE-ConnectionGUID: 68YgSO+PSV6z5OWjZ9wauQ==
-X-CSE-MsgGUID: SnbgzMV3T+a+csiU+NBo9Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11371"; a="46668505"
-X-IronPort-AV: E=Sophos;i="6.14,242,1736841600"; 
-   d="scan'208";a="46668505"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2025 09:20:23 -0700
-X-CSE-ConnectionGUID: 38r3MANaTLOfTmQWKjlcow==
-X-CSE-MsgGUID: 7jO2IG3CSCiylrUpIxtlJw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,242,1736841600"; 
-   d="scan'208";a="120706886"
-Received: from smile.fi.intel.com ([10.237.72.58])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2025 09:20:20 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1tsOob-00000001uod-47GW;
-	Wed, 12 Mar 2025 18:20:17 +0200
-Date: Wed, 12 Mar 2025 18:20:17 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Marek Szyprowski <m.szyprowski@samsung.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Christoph Hellwig <hch@lst.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Rasesh Mody <rmody@marvell.com>,
-	GR-Linux-NIC-Dev@marvell.com, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net v1 1/1] bnx2: Fix unused data compilation warning
-Message-ID: <Z9G0QU5Ew3FusrJH@smile.fi.intel.com>
-References: <20250228100538.32029-1-andriy.shevchenko@linux.intel.com>
- <20250303172114.6004ef32@kernel.org>
- <Z8bcaR9MS7dk8Q0p@smile.fi.intel.com>
- <5ec0a2cc-e5f6-42dd-992c-79b1a0c1b9f5@redhat.com>
- <Z8bq6XJGJNbycmJ9@smile.fi.intel.com>
- <Z8cC_xMScZ9rq47q@smile.fi.intel.com>
- <20250304083524.3fe2ced4@kernel.org>
- <CGME20250305100010eucas1p1986206542bc353300aee7ac8d421807f@eucas1p1.samsung.com>
- <Z8ggoUoKpSPPcs5S@smile.fi.intel.com>
- <067bd072-eb3f-451a-b1c4-59eae777cf00@samsung.com>
+	s=arc-20240116; t=1741796495; c=relaxed/simple;
+	bh=AA0MJOsn9jCYm6rQxqAqvA15NsJHoc5M1iB3UxZTL80=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UWE+rfQ/xajbWE83aBPog+LL+4f2rztVTMykh6Bq1xorRDA29H/V/EaFLp0KfDkIsYSPM8G99WDPTblKdaV2gmiwEcmcTwn7xVC5cGA5PY3MPzpaNYRbbelTqQfT+EDouCxiHUkpzRstuBPq638R+V5BZdVHCK+a5Ex6FZM37wM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SikGBZGs; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5e6c18e2c7dso7455159a12.3;
+        Wed, 12 Mar 2025 09:21:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741796492; x=1742401292; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=g+vFr6C40IK/QoHRZZXYgKsZ4IfXSOBUm8PFsyPbVxQ=;
+        b=SikGBZGsJTyCQ/bohuS/YB9oL5R1dIS2E3CoMcmo8z7DnvoSveRq5bAI/3VhXDWVvy
+         lyBKoX9hY5Y9kscHXteN21lTdMzQKMk08Vxqga2A6iclUoXFMvHEpNxlQxP/+68Sdq+U
+         kJ186cRPEJEuXhFeW3//D/UQBR1iNNpq3u99ILwlRpHPebMBG+eTlHho73ADmwH3Fva/
+         eIPoUBsBz6o2tly0n5ghKuE7csmIJOH/WhiHs1yy8/feciMMhs+3Y4fICyn/vNAzCRoT
+         5hOLTXmeLXgTiUCIAuFN7x48N2kPzMqXicdJGoVCaKSh/ORIkQlVkz0yBoPP9sb8OuSh
+         XM7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741796492; x=1742401292;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=g+vFr6C40IK/QoHRZZXYgKsZ4IfXSOBUm8PFsyPbVxQ=;
+        b=R+RcGwncLiY3lJQ3lpEA3Qg8pTy/PX1qfWCLza3XRxurVSdGE2eCp51u5ihdRH7Mc2
+         OtO87wzLSdwVW/n30r04qQA0ykYGEhQV1LP0KEc5/Hi+4QuMvqsbA8ogk23ciJ6S+Ip/
+         wM7l/5YNHOap4FZExVVovhgnBIDyvYWUL5KpWNnQoQw0wbkVnCUamwBNAb6/xi2nBShk
+         Q22NnTtyVe/+vFDItsd5QOJX9RztRB0HVznTL1ft1PcvyEP70nFUO9eDQxt93b9DAp8J
+         04VD+kNCBSQA5e2iRU2D5i8wwRgPXYaGDHw/q9wovN2v2G+ZwLxeQGrhD9iSf6uMZSb0
+         2WZw==
+X-Forwarded-Encrypted: i=1; AJvYcCV7JV9HBlE2Yxt/QEbcGm/l0WyxkbABvfT8f5bNopu8y+Gob4M1+WmT87ZTZxjFrn3L6NCQ4suh@vger.kernel.org, AJvYcCV8MIBn6C+Z3T/ivCAEGee9zT6zfRJFI36NC1Z7BlSh20IXiL3LJOXeTlScOVZ7RjrGBllffb/njsdl9N1/zDAR@vger.kernel.org, AJvYcCWVYgiLxpap4dFXxOZ9XMU2zztNJvT/5wxaEjJ0G/LWMWK1jaixyxGky6FEP+6xisP1hdIHGAgr2f96QbN6yVw=@vger.kernel.org, AJvYcCWdLt77Kc+JMoqu2/TOSCsq4ofEj889Ev/Ky6uSYBUHU9Uj+fGGAVb0J3pNGcGQWxbH1q/c4oGcGKVQoBoj@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCDaPSFSEgFWudtbkk00OLAR+VKefqfa/wD2W3VF/9Zv6/dKNi
+	BJrQXn9MHqGmILNjFv889HP69DkTKqYL8sNJSJdXdQFh7ehwzVq4
+X-Gm-Gg: ASbGncvTxHFfrJDX+0eL3dbyKzs+CjqdptRPHW4maUQkcd5ZiHpnXN01sDzld5onoaU
+	2waFRrJvZAl7/QLWqLtSrUs+AewaONncWjXcdq0lg0qUuEf0aFRU7KMq63LeXmd3dcZhqcTCd28
+	ty9PH+y+nJpNKs4/CzY49Ob1YnfNj9dkmtwMaSaFF8P431o6ZPZ0eD2MnJtafmcW4JFX/qDGhkZ
+	8Eyi4fpJ5it2mF7X4/rrvK1I7pTQDqpvcSZxAWRYAf0DN0olr0ce3Mc9bMRrXf+DzahuazMPKDh
+	UAmPq33jmhf9tK4yFmNodcOVLSV/SOMd0YX4SoXoUFd8AHGCD1cVQbwiQbyHAqbvNMzoyKZadtj
+	lq8OPOBgpq1ZXAYAmoF4du//akk7KpXO9g5kX1P2aB3e7Opdq7Jrc/ga9bFu5E5/js9uIVdj0Pa
+	eiMUlVkVKbN6nVkkqYkTDqzTwkU1Vy9A==
+X-Google-Smtp-Source: AGHT+IEaEC38X6pFHkhcOdl/BcwH+TXUrXY3YHVZyCJc94P4HbdEGDzPYfpH7BevKXGOFc1f9RUFvg==
+X-Received: by 2002:a17:907:1b16:b0:abf:607b:d0d with SMTP id a640c23a62f3a-ac252a884cfmr2996838866b.16.1741796492007;
+        Wed, 12 Mar 2025 09:21:32 -0700 (PDT)
+Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac23943945asm1081554266b.22.2025.03.12.09.21.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Mar 2025 09:21:31 -0700 (PDT)
+Message-ID: <58cbe875-80e7-4a44-950b-b836b97f3259@gmail.com>
+Date: Wed, 12 Mar 2025 17:21:29 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <067bd072-eb3f-451a-b1c4-59eae777cf00@samsung.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 nf 00/15] bridge-fastpath and related improvements
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ Nikolay Aleksandrov <razor@blackwall.org>, Roopa Prabhu <roopa@nvidia.com>,
+ Ivan Vecera <ivecera@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Simon Horman <horms@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, bridge@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ linux-hardening@vger.kernel.org, Kees Cook <kees@kernel.org>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Ahmed Zaki <ahmed.zaki@intel.com>, Vladimir Oltean <olteanv@gmail.com>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Daniel Golle <daniel@makrotopia.org>
+References: <20250305102949.16370-1-ericwouds@gmail.com>
+ <897ade0e-a4d0-47d0-8bf7-e5888ef45a61@gmail.com> <Z9DKxOnxr1fSv0On@calendula>
+From: Eric Woudstra <ericwouds@gmail.com>
+Content-Language: en-US
+In-Reply-To: <Z9DKxOnxr1fSv0On@calendula>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 11, 2025 at 01:51:21PM +0100, Marek Szyprowski wrote:
-> On 05.03.2025 11:00, Andy Shevchenko wrote:
-> > On Tue, Mar 04, 2025 at 08:35:24AM -0800, Jakub Kicinski wrote:
-> >> On Tue, 4 Mar 2025 15:41:19 +0200 Andy Shevchenko wrote:
 
-...
 
-> >> I meant something more like (untested):
-> > We are starving for the comment from the DMA mapping people.
-> 
-> I'm really sorry for this delay. Just got back to the everyday stuff 
-> after spending a week in bed recovering from flu...
+On 3/12/25 12:44 AM, Pablo Neira Ayuso wrote:
+> Therefore, I suggest you start with a much smaller series with a
+> carefully selected subset including preparatory patches. I suggest you
+> start with the software enhancements only. Please, add datapath tests.
 
-Oh, I hope you feel much better now!
+Then I will split it in:
+1. Separate preparatory patches and small patch-sets that apply
+     to the forward-fastpath already.
+2. One patch-set that brings the bridge-fastpath with datapath tests.
 
-...
+> P.S: You work is important, very important, but maybe there is no need
+> to Cc so many mailing lists and people, maybe netdev@,
+> netfilter-devel@ and bridge@ is sufficient.
 
-> >>   #define DEFINE_DMA_UNMAP_ADDR(ADDR_NAME)
-> >>   #define DEFINE_DMA_UNMAP_LEN(LEN_NAME)
-> >> -#define dma_unmap_addr(PTR, ADDR_NAME)           (0)
-> >> -#define dma_unmap_addr_set(PTR, ADDR_NAME, VAL)  do { } while (0)
-> >> -#define dma_unmap_len(PTR, LEN_NAME)             (0)
-> >> -#define dma_unmap_len_set(PTR, LEN_NAME, VAL)    do { } while (0)
-> >> +#define dma_unmap_addr(PTR, ADDR_NAME)           ({ typeof(PTR) __p __maybe_unused = PTR; 0; )}
-> >> +#define dma_unmap_addr_set(PTR, ADDR_NAME, VAL)  do { typeof(PTR) __p __maybe_unused = PTR; } while (0)
-> >> +#define dma_unmap_len(PTR, LEN_NAME)             ({ typeof(PTR) __p __maybe_unused = PTR; 0; )}
-> >> +#define dma_unmap_len_set(PTR, LEN_NAME, VAL)    do { typeof(PTR) __p __maybe_unused = PTR; } while (0)
+Ok, but my main question then is which tree should I work in, and
+therefore which tag should I give my patches, [nf] or [net-next].
+I think it will get more complicated if I split my patch-set and half of
+the patches go to [nf] and another half to [net-next].
 
-> >> I just don't know how much code out there depends on PTR not
-> >> existing if !CONFIG_NEED_DMA_MAP_STATE
-> > Brief checking shows that only drivers/net/ethernet/chelsio/* comes
-> > with ifdeffery, the rest most likely will fail in the same way
-> > (note, overwhelming majority of the users is under the network realm):
-> 
-> Frankly speaking I wasn't aware of this API till now.
-> 
-> If got it right the above proposal should work fine. The addr/len names 
-> can be optimized out, but the pointer to the container should exist.
-
-Thanks for the reply, would you or Jakub will to send a formal patch?
-I can test it on my configuration and build.
-
--- 
-With Best Regards,
-Andy Shevchenko
-
+What do you suggest?
 
 
