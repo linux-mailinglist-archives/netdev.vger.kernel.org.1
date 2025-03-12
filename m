@@ -1,169 +1,258 @@
-Return-Path: <netdev+bounces-174301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D3FEA5E334
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 18:57:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FF33A5E38D
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 19:20:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 017983A7FC5
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 17:57:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E331B3BB318
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 18:20:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 239C1254B02;
-	Wed, 12 Mar 2025 17:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8448205ADB;
+	Wed, 12 Mar 2025 18:20:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h5vqUHuD"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="aMUEVgNc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E136253B73;
-	Wed, 12 Mar 2025 17:57:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7286B1BD01F
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 18:20:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741802232; cv=none; b=JTWzaIlpbxHUKrektYb1i5K/xU046Cv0nVGteQ6c/5YhoiW+TiA1JKadHMpwfbrq0rcZ6G/DW2o5w/BIrI7aIz1BUyAqPfROetbXmVN+2D3rbDF5VJPCfpzOTiZ2EsKihu4sojSL8jo76Tro9T+Nmt/H8RJuLNztLoNi30YfP+k=
+	t=1741803610; cv=none; b=nFQgorp435prBV5Gvpjtm+LmwcNi+YkrWOD8sOXJltmBlBZXiQC1N1/9wSPTjYq/TSITXaBvURhXCsYbOBtqubiehtUVfuwqyaQVHUcl6hfbp5d/Lqim8Mm/DkQVpmRt/0bRpDDQ0V3hPn/w5bZM8MaewNjDULH2is3HGBnFBYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741802232; c=relaxed/simple;
-	bh=0qqmqiQl6CtULMpWjUKoBa0oLGQY8gOzK/oEwfkFhDo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nrjv4AHsuN7dFdHycVHLglMuLgpMKoZEmIA3RDkzHwoulBntFfPZnB4XNzyTHjhqfXYbGaPSswOT6TBsTNluP9YcugfryTx/SVGY9toA+GtagYOZnzqvq4U7r83SLIiKJkivP65EamnEV8/7GN6npu83F7pcKKnloBfb7p0HqUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h5vqUHuD; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741802232; x=1773338232;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=0qqmqiQl6CtULMpWjUKoBa0oLGQY8gOzK/oEwfkFhDo=;
-  b=h5vqUHuDnpf4sG7dP0AnBoAtWS/KdDbfjB9G4YvirHJ99YiS6IoVzHzu
-   QIgrNZogJZXAnmiSIaZS4u9TLnee14SXNNZmFxfH9xlxRbtAFhyeOthfd
-   xyGzAQvIpXaj5mkwTkOm8kXjND6mEy7WN1Nn2+IyT+W6XSRm5PcTpa3jv
-   7UNEMGu+P0PtXIZZHCAyX/Y9GFs10DQ89xxOI8fB78aCJdwpt4p3HWftI
-   YtfJNTK6f4kgZmrW2brTNTY3JU8UV3ywqrwFc2pCFiBoEGv4g+huEu9X1
-   NTvARIyQCG/mGA9gGpCFx349bEgROxTW+WRGRckIt1HbTqmavYfNPUMHR
-   Q==;
-X-CSE-ConnectionGUID: VZfTg2PyRC6wUbY2LBn9hw==
-X-CSE-MsgGUID: d49nW1BnS4Ow3XLKoEO6qQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11371"; a="46679226"
-X-IronPort-AV: E=Sophos;i="6.14,242,1736841600"; 
-   d="scan'208";a="46679226"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2025 10:57:11 -0700
-X-CSE-ConnectionGUID: EcsYRIZ4QsWPYCxNSVqRjA==
-X-CSE-MsgGUID: +uRh/LPgS7ifX7R+8KfM3g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,242,1736841600"; 
-   d="scan'208";a="151527782"
-Received: from aschofie-mobl2.amr.corp.intel.com (HELO aschofie-mobl2.lan) ([10.125.108.10])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2025 10:57:10 -0700
-Date: Wed, 12 Mar 2025 10:57:08 -0700
-From: Alison Schofield <alison.schofield@intel.com>
-To: alejandro.lucero-palau@amd.com
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
-	dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	dave.jiang@intel.com, Alejandro Lucero <alucerop@amd.com>
-Subject: Re: [PATCH v11 00/23] add type2 device basic support
-Message-ID: <Z9HK9A6Dh3h4Ui1q@aschofie-mobl2.lan>
-References: <20250310210340.3234884-1-alejandro.lucero-palau@amd.com>
+	s=arc-20240116; t=1741803610; c=relaxed/simple;
+	bh=rVUmbO8wiVYpIIu+TAjlB1KoeGAG/thfpfVBxacDC3s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HqgdLkmV841QXWRL8sGfTX5lHP5/kjYAxhWPkpwDRrWCIh3UAIiyAdEy3y/BPRFJ6RBrT/8O6PLGxuXnBTE4ZiNJ7tEb/zqafTtNOj0vzVF1wITwLIB1vhlSKMJXNHlK43KUirXwxZyQbI+rDCtYnGWNfI0yoyoFgslL4RZTWU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=aMUEVgNc; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-47688ae873fso976551cf.0
+        for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 11:20:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1741803606; x=1742408406; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/JwrN6uiLsrlYFwVv4j7Y1nmGn+uYAElg71voRA6Tt8=;
+        b=aMUEVgNcjpW2wh5DN54ySRLLfz9jqZfYZ8r+yiaBkZGmhiqSLAa3bJZPAIg6MxLDwF
+         Yg45UuMiIN9FzYKoUvt5n9Hd+rsGfP3EgCFEXyFhvVKBQYuGmBg694sdt9dgN2b+chr/
+         par7InLm7biuNsTHQOfxH5bzBY8CUWHiq+oT4Ko890d2fI6iEkyjW5RChWGOpCkJCfH5
+         wIrE1DIDi8DhOmr2mFVFzo6XwLC8hElewBhfxDbdZ0u9wegWIJr4oYSq2lub56TCW7Yu
+         4bi8xaFr/rLfS6muHcZ2vRHQY1zXw4rRlyS4VjJK6lWbQErnRMFHortK9w5IYJpidpBm
+         H1Pg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741803606; x=1742408406;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/JwrN6uiLsrlYFwVv4j7Y1nmGn+uYAElg71voRA6Tt8=;
+        b=vT/xmlaU7W3PYHKvBqrTKqcrG2wRef840336dXWXfh4hKJSka9RHksjIjaXKhIXjpf
+         6grOb1K+V2CZ4IQIrpsW7UilS5onQX06nrAEvQgWArsDRI/rNeTN86+eNEJrMYTz8juk
+         XdVWHrfWp3tpLMACRujKdnt1cqOolmnY6NDoBhXQO4WtPAncQVArRK9tGAOzY3/jcPLf
+         88Vr2YsI3hPqzvafOwleecWIYKqli9/xVZEOOjIK98W7l9G8VfbvPVbToJIzaOkrQhDZ
+         t1eL7ljnxtE29fw3qj0PAHD6t8vjvMBETPHUjwVprT3eRJTkbuqc656xhtv3SZk4LFRN
+         udYw==
+X-Gm-Message-State: AOJu0Yy3B5eS5RdMcth92DqurXp/vVk+oaEfy+pMT5fa4wxLjKqxw9jK
+	eovriBU6vo0fZ80eY/tKo3/iNaXSQRegBRO2agWSXnYM4QKKNcYU1d+d/pLoX2Y=
+X-Gm-Gg: ASbGncvFsBZVw/GoKUYkfKxX02qY0jK17R23kTlrxKW/6Dph2G+Xdc87J+LbYiBFqR0
+	R/M9etA6MQrJHYz1mx6kfy6sVD0FsCdat1YuuEe+tKlOmprQGql/w/9HN5LFLDtb3QHO7wsrCTB
+	2G1283KRJsHRIS3IuLgczOQNXrJESikKZXmyd5ICqgZwBHxKfjBPRNvuiluIS7h1IUpjdMZkw7/
+	wgDG5jr1jA53RV8o96ARoSyU6DQNMpFjN3cGhnT3tW7RKC7s7634PYUmtzqe8M6x80VfVVwWBQc
+	NL48F8ARaomq14wms7ERJypjJ9qE1yJOCPvIqUkuJ7hErEYudhEyzzuteYEkPFRmN9nUOw==
+X-Google-Smtp-Source: AGHT+IEmL1ZCGCLBq4/ccG5tQuyBD78RHYaCGzXZEzlXPe74r3o7UyCro4raW+D1b13M4Wt/YQDAlQ==
+X-Received: by 2002:a05:6214:c83:b0:6e4:7307:51c6 with SMTP id 6a1803df08f44-6e90066b6famr409431866d6.34.1741803604661;
+        Wed, 12 Mar 2025 11:20:04 -0700 (PDT)
+Received: from [10.73.223.214] ([208.184.112.130])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e8f715b809sm87107766d6.79.2025.03.12.11.20.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Mar 2025 11:20:04 -0700 (PDT)
+Message-ID: <dffb3057-40cf-463b-a114-9c9c3770f09c@bytedance.com>
+Date: Wed, 12 Mar 2025 11:20:01 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250310210340.3234884-1-alejandro.lucero-palau@amd.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Patch bpf-next v2 4/4] tcp_bpf: improve ingress redirection
+ performance with message corking
+To: John Fastabend <john.fastabend@gmail.com>,
+ Cong Wang <xiyou.wangcong@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, jakub@cloudflare.com,
+ zhoufeng.zf@bytedance.com, Amery Hung <amery.hung@bytedance.com>,
+ Cong Wang <cong.wang@bytedance.com>
+References: <20250306220205.53753-1-xiyou.wangcong@gmail.com>
+ <20250306220205.53753-5-xiyou.wangcong@gmail.com>
+ <20250311205426.h3rvfakthoa6usgr@gmail.com>
+Content-Language: en-US
+From: Zijian Zhang <zijianzhang@bytedance.com>
+In-Reply-To: <20250311205426.h3rvfakthoa6usgr@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 10, 2025 at 09:03:17PM +0000, alejandro.lucero-palau@amd.com wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
+On 3/11/25 1:54 PM, John Fastabend wrote:
+> On 2025-03-06 14:02:05, Cong Wang wrote:
+>> From: Zijian Zhang <zijianzhang@bytedance.com>
+[...]
+>> +static int tcp_bpf_ingress_backlog(struct sock *sk, struct sock *sk_redir,
+>> +				   struct sk_msg *msg, u32 apply_bytes)
+>> +{
+>> +	bool ingress_msg_empty = false;
+>> +	bool apply = apply_bytes;
+>> +	struct sk_psock *psock;
+>> +	struct sk_msg *tmp;
+>> +	u32 tot_size = 0;
+>> +	int ret = 0;
+>> +	u8 nonagle;
+>> +
+>> +	psock = sk_psock_get(sk_redir);
+>> +	if (unlikely(!psock))
+>> +		return -EPIPE;
+>> +
+>> +	spin_lock(&psock->backlog_msg_lock);
+>> +	/* If possible, coalesce the curr sk_msg to the last sk_msg from the
+>> +	 * psock->backlog_msg.
+>> +	 */
+>> +	if (!list_empty(&psock->backlog_msg)) {
+>> +		struct sk_msg *last;
+>> +
+>> +		last = list_last_entry(&psock->backlog_msg, struct sk_msg, list);
+>> +		if (last->sk == sk) {
+>> +			int i = tcp_bpf_coalesce_msg(last, msg, &apply_bytes,
+>> +						     &tot_size);
+>> +
+>> +			if (i == msg->sg.end || (apply && !apply_bytes))
+>> +				goto out_unlock;
+>> +		}
+>> +	}
+>> +
+>> +	/* Otherwise, allocate a new sk_msg and transfer the data from the
+>> +	 * passed in msg to it.
+>> +	 */
+>> +	tmp = sk_msg_alloc(GFP_ATOMIC);
+>> +	if (!tmp) {
+>> +		ret = -ENOMEM;
+>> +		spin_unlock(&psock->backlog_msg_lock);
+>> +		goto error;
+>> +	}
+>> +
+>> +	tmp->sk = sk;
+>> +	sock_hold(tmp->sk);
+>> +	tmp->sg.start = msg->sg.start;
+>> +	tcp_bpf_xfer_msg(tmp, msg, &apply_bytes, &tot_size);
+>> +
+>> +	ingress_msg_empty = list_empty(&psock->ingress_msg);
+>> +	list_add_tail(&tmp->list, &psock->backlog_msg);
+>> +
+>> +out_unlock:
+>> +	spin_unlock(&psock->backlog_msg_lock);
+>> +	sk_wmem_queued_add(sk, tot_size);
+>> +
+>> +	/* At this point, the data has been handled well. If one of the
+>> +	 * following conditions is met, we can notify the peer socket in
+>> +	 * the context of this system call immediately.
+>> +	 * 1. If the write buffer has been used up;
+>> +	 * 2. Or, the message size is larger than TCP_BPF_GSO_SIZE;
+>> +	 * 3. Or, the ingress queue was empty;
+>> +	 * 4. Or, the tcp socket is set to no_delay.
+>> +	 * Otherwise, kick off the backlog work so that we can have some
+>> +	 * time to wait for any incoming messages before sending a
+>> +	 * notification to the peer socket.
+>> +	 */
+> 
+> I think this could also be used to get the bpf_msg_cork_bytes working
+> directly in receive path. This also means we can avoid using
+> strparser in the receive path. The strparser case has noticable
+> overhead for us that is significant enough we don't use it.
+> Not that we need to do it all in one patch set.
+> 
 
-Hi Alejandro,
+Sounds promising!
 
-Can you restore a cover letter here? 
-I'm particularly looking for more context around kernel driven region
-creation.
+>> +	nonagle = tcp_sk(sk)->nonagle;
+>> +	if (!sk_stream_memory_free(sk) ||
+>> +	    tot_size >= TCP_BPF_GSO_SIZE || ingress_msg_empty ||
+>> +	    (!(nonagle & TCP_NAGLE_CORK) && (nonagle & TCP_NAGLE_OFF))) {
+>> +		release_sock(sk);
+>> +		psock->backlog_work_delayed = false;
+>> +		sk_psock_backlog_msg(psock);
+>> +		lock_sock(sk);
+>> +	} else {
+>> +		sk_psock_run_backlog_work(psock, false);
+>> +	}
+>> +
+>> +error:
+>> +	sk_psock_put(sk_redir, psock);
+>> +	return ret;
+>> +}
+>> +
+>>   static int tcp_bpf_send_verdict(struct sock *sk, struct sk_psock *psock,
+>>   				struct sk_msg *msg, int *copied, int flags)
+>>   {
+>> @@ -442,18 +619,24 @@ static int tcp_bpf_send_verdict(struct sock *sk, struct sk_psock *psock,
+>>   			cork = true;
+>>   			psock->cork = NULL;
+>>   		}
+>> -		release_sock(sk);
+>>   
+>> -		origsize = msg->sg.size;
+>> -		ret = tcp_bpf_sendmsg_redir(sk_redir, redir_ingress,
+>> -					    msg, tosend, flags);
+> 
+> The only sticky bit here that is blocking folding this entire tcp_bpf_sendmsg_redir
+> logic out is tls user right?
+> 
 
---Alison
+Right, tls also uses tcp_bpf_sendmsg_redir.
 
+>> -		sent = origsize - msg->sg.size;
+>> +		if (redir_ingress) {
+>> +			ret = tcp_bpf_ingress_backlog(sk, sk_redir, msg, tosend);
+>> +		} else {
+>> +			release_sock(sk);
+>> +
+>> +			origsize = msg->sg.size;
+>> +			ret = tcp_bpf_sendmsg_redir(sk_redir, redir_ingress,
+>> +						    msg, tosend, flags);
 > 
-> v11 changes:
->  - Dropping the use of cxl_memdev_state and going back to using
->    cxl_dev_state.
->  - Using a helper for an accel driver to allocate its own cxl-related
->    struct embedding cxl_dev_state.
->  - Exporting the required structs in include/cxl/cxl.h for an accel
->    driver being able to know the cxl_dev_state size required in the
->    previously mentioned helper for allocation.
->  - Avoid using any struct for dpa initialization by the accel driver
->    adding a specific function for creating dpa partitions by accel
->    drivers without a mailbox.
+> now sendmsg redir is really only for egress here so we can skip handling
+> the ingress here. And the entire existing sk_psock_backlog work queue because
+> its handled by tcp_bpf_ingress_backlog?
 > 
-> Alejandro Lucero (23):
->   cxl: add type2 device basic support
->   sfc: add cxl support
->   cxl: move pci generic code
->   cxl: move register/capability check to driver
->   cxl: add function for type2 cxl regs setup
->   sfc: make regs setup with checking and set media ready
->   cxl: support dpa initialization without a mailbox
->   sfc: initialize dpa
->   cxl: prepare memdev creation for type2
->   sfc: create type2 cxl memdev
->   cxl: define a driver interface for HPA free space enumeration
->   fc: obtain root decoder with enough HPA free space
->   cxl: define a driver interface for DPA allocation
->   sfc: get endpoint decoder
->   cxl: make region type based on endpoint type
->   cxl/region: factor out interleave ways setup
->   cxl/region: factor out interleave granularity setup
->   cxl: allow region creation by type2 drivers
->   cxl: add region flag for precluding a device memory to be used for dax
->   sfc: create cxl region
->   cxl: add function for obtaining region range
->   sfc: update MCDI protocol headers
->   sfc: support pio mapping based on cxl
+
+Agreed, tcp_bpf_sendmsg_redir here is only for egress.
+
+ From my understanding,
+as for sk_psock_backlog, it handles the ingress skb in psock-
+ >ingress_skb.
+[skb RX->Redirect->sk_msg(skb backed-up) RX]
+
+On the other hand, tcp_bpf_ingress_backlog mainly focus on moving the
+corked sk_msg from sender socket queue "backlog_msg" to receiver socket
+psock->ingress_msg. These sk_msgs are redirected using __SK_REDIRECT
+by tcp_bpf_sendmsg, in other words, these sk_msg->skb should be NULL.
+[sk_msg TX->Redirect->sk_msg(skb is NULL) RX]
+
+IMHO, they are mostly mutually independent.
+
+>> +			sent = origsize - msg->sg.size;
+>> +
+>> +			lock_sock(sk);
+>> +			sk_mem_uncharge(sk, sent);
+>> +		}
 > 
->  drivers/cxl/core/core.h               |     2 +
->  drivers/cxl/core/hdm.c                |    83 +
->  drivers/cxl/core/mbox.c               |    30 +-
->  drivers/cxl/core/memdev.c             |    47 +-
->  drivers/cxl/core/pci.c                |   115 +
->  drivers/cxl/core/port.c               |     8 +-
->  drivers/cxl/core/region.c             |   411 +-
->  drivers/cxl/core/regs.c               |    39 +-
->  drivers/cxl/cxl.h                     |   112 +-
->  drivers/cxl/cxlmem.h                  |   103 +-
->  drivers/cxl/cxlpci.h                  |    23 +-
->  drivers/cxl/mem.c                     |    26 +-
->  drivers/cxl/pci.c                     |   118 +-
->  drivers/cxl/port.c                    |     5 +-
->  drivers/net/ethernet/sfc/Kconfig      |     9 +
->  drivers/net/ethernet/sfc/Makefile     |     1 +
->  drivers/net/ethernet/sfc/ef10.c       |    50 +-
->  drivers/net/ethernet/sfc/efx.c        |    15 +-
->  drivers/net/ethernet/sfc/efx_cxl.c    |   162 +
->  drivers/net/ethernet/sfc/efx_cxl.h    |    40 +
->  drivers/net/ethernet/sfc/mcdi_pcol.h  | 13645 +++++++++---------------
->  drivers/net/ethernet/sfc/net_driver.h |    12 +
->  drivers/net/ethernet/sfc/nic.h        |     3 +
->  include/cxl/cxl.h                     |   269 +
->  include/cxl/pci.h                     |    36 +
->  tools/testing/cxl/Kbuild              |     1 -
->  tools/testing/cxl/test/mock.c         |    17 -
->  27 files changed, 6186 insertions(+), 9196 deletions(-)
->  create mode 100644 drivers/net/ethernet/sfc/efx_cxl.c
->  create mode 100644 drivers/net/ethernet/sfc/efx_cxl.h
->  create mode 100644 include/cxl/cxl.h
->  create mode 100644 include/cxl/pci.h
-> 
-> 
-> base-commit: 0a14566be090ca51a32ebdd8a8e21678062dac08
-> -- 
-> 2.34.1
-> 
-> 
+> I like the direction but any blockers to just get this out of TLS as
+> well? I'm happy to do it if needed I would prefer not to try and
+> support both styles at the same time.
+
+I haven't looked into TLS mainly because I'm not very familiar with it. 
+If you're interested, it would be great if you could take a look in the
+future :)
+
 
