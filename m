@@ -1,138 +1,157 @@
-Return-Path: <netdev+bounces-174195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DBD9A5DD3B
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 14:01:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5EA1A5DD9F
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 14:14:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAAA516A904
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 13:01:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6167A18963B6
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 13:14:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BD8326AF6;
-	Wed, 12 Mar 2025 13:00:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8FE52459F6;
+	Wed, 12 Mar 2025 13:12:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XRhyv2oY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TJwq7tfP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4737D12E7F
-	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 13:00:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC7E624338F
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 13:12:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741784459; cv=none; b=YPdOlRn2m3mV78pdw4twbgU5ZhH3Q5+6iNfDl7uBx4Orr8sPEuPiHrlMiVlSCwPTgjZ8hJkrMStYDFawVHqhzynW4mG6YzDrdKDKH9B/oskOfiPq6sCPMbV7Ncqgca8BSA4wPaZJFvVvjMRaJFb35Acc89iVYV0ZUuanYib3q2Y=
+	t=1741785177; cv=none; b=ime6ELd0Zv2VgiAfaeO6m7i8NRVt5jhTU8WRP4syt5tb8A5jpugHXgovO+dI5/6gBu8T2MT5pg5kg5O6itUcllWzlaFLJHZkS52d0ZEfT6Y+Kzd+Z1RvbblGnQIi/hYKb5TvHhiS1R0/4SgsUG56VzYYTr1zFmbsTq3uFLg54Dc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741784459; c=relaxed/simple;
-	bh=heQsNfi5fLSg2rB4S+vidsMFpvqMeIZOSFEPaCAMKoQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=niZW7W28ce4yNzcJHJDHIN+l7m17pD6A4HeWNC8ptfYBO/FaBR9PhXaDnoTeJGds20K/QjohnIG+268sbW588/w0AyStNvZRdBqzcJL068lyyZwsQL0RSSFtYAHREr6HaIAwEjA0Z5X8tSiJ/bUp3gbi5lOn9A8gL86PRmSX5w8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XRhyv2oY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53DF0C4CEEC;
-	Wed, 12 Mar 2025 13:00:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741784458;
-	bh=heQsNfi5fLSg2rB4S+vidsMFpvqMeIZOSFEPaCAMKoQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XRhyv2oYzKy9nK0bTipjW+gWaH2qYly2RFaRQE6ESrkdUB7UQlhXKG6q46/+mteT1
-	 ksNpwDmfzE1BU4UiMxFRN0CTGR5duEE9QFaf94GyNRMZ+REmWP/sStRIvCEr7I1Zku
-	 DtdQYi6RYy9Z7gJdZVt24vktIIVzuHmKcxyt6do1zzTIzFlOoobjs2Dsv71OiVQdW4
-	 y/5aKmijnFG0aAMQ2HBEtl4VtlyUUZSl0SZl0AhVq0zEbcjc7NXmiGCXb2FGuVtb2g
-	 AMXfhX4a7AxvTanzf0LkwUDq1xjcO67AJ+mrth+un2FBNNaR8Mi2aDeMlV2v9JrV2G
-	 jS3tjq7/6mrYA==
-Date: Wed, 12 Mar 2025 15:00:54 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Chiachang Wang <chiachangwang@google.com>
-Cc: netdev@vger.kernel.org, steffen.klassert@secunet.com,
-	stanleyjhu@google.com, yumike@google.com
-Subject: Re: [PATCH ipsec-next v4 2/2] xfrm: Refactor migration setup during
- the cloning process
-Message-ID: <20250312130054.GB1322339@unreal>
-References: <20250310091620.2706700-1-chiachangwang@google.com>
- <20250310091620.2706700-3-chiachangwang@google.com>
- <20250310115226.GD7027@unreal>
- <CAOb+sWFi+8df32zdAL5AmkfCpFBMG6hU=_+S3U-X_Zd6386r6g@mail.gmail.com>
+	s=arc-20240116; t=1741785177; c=relaxed/simple;
+	bh=ebtUdL7x+P1BZSl0p+b3iP4EYbjPvBEbMyFX9UN5+Fc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ePddmBg8dMcrsqZkNeuGcTvFe4sT0sUXbrkuWxhC+8ierMpOqv7jkuRgO1nmP0NN0WhKWF6I34LkFI4RDbIRk5HMKvHriQVVrmZ6eJYEhaMqJmf+0xul2IHmjLINDBIVerdjo/kQA5kPNcUJqjUoxUxt5sf2CukwMQ5yQvh6jYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TJwq7tfP; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741785176; x=1773321176;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ebtUdL7x+P1BZSl0p+b3iP4EYbjPvBEbMyFX9UN5+Fc=;
+  b=TJwq7tfPMEexcHlDRonV1SpUTEzjAQDfDDQDvoVG3jgQz0CVuEi6v2pV
+   z+Zfd3mPfmZyZjeHeNruujVp7tSyM6Gaeh+wzYN3ux/QWREKIL3NawXfC
+   bA65pkyfKedn+tENuEO/TAi5GEnn/ymGAr2+bd1GzYIBrZH1jVuRHIABU
+   ckrO21LQYEQGFqMUoR3PFD+TYmpssibnP08OJzuRzyoKceW4zy1yYKSU7
+   T0asMh1mcULc46NWsPTkJlnIbfmzZ3JvVpWwwuNIeUdAI+7sl3B1JxcwZ
+   4vaB65jJ7JqIYS0Is1iE1Pxx4aoFg8Ve/xTseuTVp/X+HxFZPmabHLSlp
+   Q==;
+X-CSE-ConnectionGUID: MVQPr301TwGpaSnSNNe9sQ==
+X-CSE-MsgGUID: gUtxFgPcTQKrGG6wQfZ4sQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11370"; a="53510657"
+X-IronPort-AV: E=Sophos;i="6.14,241,1736841600"; 
+   d="scan'208";a="53510657"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2025 06:12:54 -0700
+X-CSE-ConnectionGUID: PQSk0ZcrSSmVLr9EZwWaWw==
+X-CSE-MsgGUID: FFx2ZXN2TtiTLfFc/j1ZCg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,241,1736841600"; 
+   d="scan'208";a="121542042"
+Received: from os-delivery.igk.intel.com ([10.102.18.218])
+  by orviesa008.jf.intel.com with ESMTP; 12 Mar 2025 06:12:52 -0700
+From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org,
+	horms@kernel.org,
+	przemyslaw.kitszel@intel.com,
+	Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Subject: [PATCH iwl-next v7 00/15] ixgbe: Add basic devlink support
+Date: Wed, 12 Mar 2025 13:58:28 +0100
+Message-Id: <20250312125843.347191-1-jedrzej.jagielski@intel.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOb+sWFi+8df32zdAL5AmkfCpFBMG6hU=_+S3U-X_Zd6386r6g@mail.gmail.com>
 
-On Mon, Mar 10, 2025 at 08:20:39PM +0800, Chiachang Wang wrote:
-> While the xfrm_state_migrate() is the only caller for this method
-> currently, this check can be removed indeed.
-> I add this for the feasibility of other callers without performing the
-> validation. If you have a strong opinion on this. I can update to
-> remove this.
-> Please let me know if you prefer to do so.
+Create devlink specific directory for more convenient future feature
+development.
 
-Sure, please remove. We are adding code when it is actually needed.
+Flashing and reloading are supported only by E610 devices.
 
-Thanks
+Introduce basic FW/NVM validation since devlink reload introduces
+possibility of runtime NVM update. Check FW API version, FW recovery mode
+and FW rollback mode. Introduce minimal recovery probe to let user to
+reload the faulty FW when recovery mode is detected.
 
-> 
-> Thank you!
-> 
-> Leon Romanovsky <leon@kernel.org> 於 2025年3月10日 週一 下午7:52寫道：
-> >
-> > On Mon, Mar 10, 2025 at 09:16:20AM +0000, Chiachang Wang wrote:
-> > > Previously, migration related setup, such as updating family,
-> > > destination address, and source address, was performed after
-> > > the clone was created in `xfrm_state_migrate`. This change
-> > > moves this setup into the cloning function itself, improving
-> > > code locality and reducing redundancy.
-> > >
-> > > The `xfrm_state_clone_and_setup` function now conditionally
-> > > applies the migration parameters from struct xfrm_migrate
-> > > if it is provided. This allows the function to be used both
-> > > for simple cloning and for cloning with migration setup.
-> > >
-> > > Test: Tested with kernel test in the Android tree located
-> > >       in https://android.googlesource.com/kernel/tests/
-> > >       The xfrm_tunnel_test.py under the tests folder in
-> > >       particular.
-> > > Signed-off-by: Chiachang Wang <chiachangwang@google.com>
-> > > ---
-> > >  net/xfrm/xfrm_state.c | 18 ++++++++++--------
-> > >  1 file changed, 10 insertions(+), 8 deletions(-)
-> > >
-> > > diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-> > > index 9cd707362767..0365daedea32 100644
-> > > --- a/net/xfrm/xfrm_state.c
-> > > +++ b/net/xfrm/xfrm_state.c
-> > > @@ -1958,8 +1958,9 @@ static inline int clone_security(struct xfrm_state *x, struct xfrm_sec_ctx *secu
-> > >       return 0;
-> > >  }
-> > >
-> > > -static struct xfrm_state *xfrm_state_clone(struct xfrm_state *orig,
-> > > -                                        struct xfrm_encap_tmpl *encap)
-> > > +static struct xfrm_state *xfrm_state_clone_and_setup(struct xfrm_state *orig,
-> > > +                                        struct xfrm_encap_tmpl *encap,
-> > > +                                        struct xfrm_migrate *m)
-> > >  {
-> > >       struct net *net = xs_net(orig);
-> > >       struct xfrm_state *x = xfrm_state_alloc(net);
-> > > @@ -2058,6 +2059,12 @@ static struct xfrm_state *xfrm_state_clone(struct xfrm_state *orig,
-> > >                       goto error;
-> > >       }
-> > >
-> > > +     if (m) {
-> >
-> > Why do you need this "if (m)"? "m" should be valid at this stage.
-> >
-> > Thanks
-> >
-> > > +             x->props.family = m->new_family;
-> > > +             memcpy(&x->id.daddr, &m->new_daddr, sizeof(x->id.daddr));
-> > > +             memcpy(&x->props.saddr, &m->new_saddr, sizeof(x->props.saddr));
-> > > +     }
-> > > +
-> > >       return x;
-> 
+This series is based on the series introducing initial E610 device
+support:
+https://lore.kernel.org/intel-wired-lan/20241205084450.4651-1-piotr.kwapulinski@intel.com/
+---
+v3: introduce to the series additional patch touching devlink/dev.c
+v4: introduce to the series additional patch changing netdev allocation
+---
+Andrii Staikov (1):
+  ixgbe: add support for FW rollback mode
+
+Jedrzej Jagielski (10):
+  devlink: add value check to devlink_info_version_put()
+  ixgbe: add initial devlink support
+  ixgbe: add handler for devlink .info_get()
+  ixgbe: add .info_get extension specific for E610 devices
+  ixgbe: add E610 functions getting PBA and FW ver info
+  ixgbe: extend .info_get with() stored versions
+  ixgbe: add device flash update via devlink
+  ixgbe: add support for devlink reload
+  ixgbe: add FW API version check
+  ixgbe: add E610 implementation of FW recovery mode
+
+Przemek Kitszel (1):
+  ixgbe: wrap netdev_priv() usage
+
+Slawomir Mrozowicz (3):
+  ixgbe: add E610 functions for acquiring flash data
+  ixgbe: read the OROM version information
+  ixgbe: read the netlist version information
+
+ Documentation/networking/devlink/index.rst    |    1 +
+ Documentation/networking/devlink/ixgbe.rst    |  107 ++
+ drivers/net/ethernet/intel/Kconfig            |    2 +
+ drivers/net/ethernet/intel/ixgbe/Makefile     |    3 +-
+ .../ethernet/intel/ixgbe/devlink/devlink.c    |  585 +++++++
+ .../ethernet/intel/ixgbe/devlink/devlink.h    |   10 +
+ drivers/net/ethernet/intel/ixgbe/ixgbe.h      |   21 +
+ .../net/ethernet/intel/ixgbe/ixgbe_82598.c    |    1 +
+ .../net/ethernet/intel/ixgbe/ixgbe_82599.c    |    1 +
+ .../net/ethernet/intel/ixgbe/ixgbe_common.c   |    1 +
+ .../net/ethernet/intel/ixgbe/ixgbe_dcb_nl.c   |   56 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 1515 +++++++++++++++--
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |   16 +
+ .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  |   86 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_fcoe.c |   12 +-
+ .../ethernet/intel/ixgbe/ixgbe_fw_update.c    |  707 ++++++++
+ .../ethernet/intel/ixgbe/ixgbe_fw_update.h    |   12 +
+ .../net/ethernet/intel/ixgbe/ixgbe_ipsec.c    |   10 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  269 ++-
+ .../net/ethernet/intel/ixgbe/ixgbe_sriov.c    |   16 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |    5 +
+ .../ethernet/intel/ixgbe/ixgbe_type_e610.h    |  161 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c |    1 +
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c |    1 +
+ drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c  |    2 +-
+ net/devlink/dev.c                             |    2 +-
+ 26 files changed, 3361 insertions(+), 242 deletions(-)
+ create mode 100644 Documentation/networking/devlink/ixgbe.rst
+ create mode 100644 drivers/net/ethernet/intel/ixgbe/devlink/devlink.c
+ create mode 100644 drivers/net/ethernet/intel/ixgbe/devlink/devlink.h
+ create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_fw_update.c
+ create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_fw_update.h
+
+
+base-commit: 0a5f2afff8673e66160725b8ec8310f47c74f8b9
+-- 
+2.31.1
+
 
