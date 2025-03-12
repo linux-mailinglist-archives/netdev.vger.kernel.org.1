@@ -1,65 +1,54 @@
-Return-Path: <netdev+bounces-174184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62D63A5DCB7
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 13:32:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E55DA5DCBB
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 13:33:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D5F018955F2
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 12:32:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEB273AC94A
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 12:32:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79C27241678;
-	Wed, 12 Mar 2025 12:32:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E0B243969;
+	Wed, 12 Mar 2025 12:32:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IRks0Wav"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="zp4yLI8x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5C4B1E4A9;
-	Wed, 12 Mar 2025 12:32:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0880C1F949
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 12:32:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741782737; cv=none; b=UeX+c5AvhcEedYUO/9riwcb2d/F1kKjqw9MrybSbsutGq8yuT5j7GyEo0pNOFs8dR3d+R6Lw8DTryVlu9/Ew5eUoOq6kbllMnaPDyxRMkpobxJZiA/DgGC5XpdLRMYtLHWDeKTQ+i/KuHqrelUVAxhlLQjk1SJT5abbcpN2S9AM=
+	t=1741782739; cv=none; b=fHx3Y3Vz/DZHfL8LqduJhD5kxy8qPxeY9CIDasmOsoApFPdcaCCGHEr9aPSMrn9RFZ8fvrjsT6e5m1u3NRv7Z0u16oQMeTW0YOZuavGfGbqpmz6nUVf1eqZZwuFCOjD87hjsarrQTTIYPw1N6GZX5MM1RJn/XbmW0HQ7goweCTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741782737; c=relaxed/simple;
-	bh=6PfBLti2GCLyhb5+n+egYTKW5V8tKOVfCwhp5cNmf/8=;
+	s=arc-20240116; t=1741782739; c=relaxed/simple;
+	bh=bsBprs+QrXYXvTFYFNv5PjeUFkEKtlBdy5crmEJcD8Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MMYiDB6FH1XDUr0ROJo63Ez8Z9Vb+aj85SseP46HK6Xu46viP9o/JyPocqy3F8nq+bHDvnMMi3p5NH9O3Wz22EJSG8hev9ijZGCeUbwxQEHifh4f29AnypXLAEHDL/L3oU0go+EF/9Vx9BjXWeSug/7jmIV4afwxQLIebV1V9ao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IRks0Wav; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741782736; x=1773318736;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=6PfBLti2GCLyhb5+n+egYTKW5V8tKOVfCwhp5cNmf/8=;
-  b=IRks0WavRT05K58iiqVo9bPcLoPNOv57Kqc7btp9miCtZhfvlO0CAN3N
-   wbnm16FGmjTLwVuE52lH1adEgGkGk2bRj37ybTNSBJ33dYqKLg50te/OR
-   355UPlTpoWJRhD4hna3ZQUYTEiAUbRFNER5rwquEOgQwAtG+oYU5O+vTI
-   IDmwA+q2Da/XgNmFBQVP/34TUQnATRGX8D0ieUQrpwSslZgDwh1Yh5x0A
-   84Yrd6uHIwszYWl674fyyYMQvGlhQpBgAlQOHXmpumLoFf0QCfmLTAWOH
-   BIvO6lkZbp2Sb5RNRzRtR4sBzuA/ca01vKhwJjkVN1eHUjts+b4ihS41e
-   g==;
-X-CSE-ConnectionGUID: 49yItcRcRbOuAgIC2VTfjQ==
-X-CSE-MsgGUID: Yf8kgAuPQsG7HBiW2ZHrAA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11370"; a="43038352"
-X-IronPort-AV: E=Sophos;i="6.14,241,1736841600"; 
-   d="scan'208";a="43038352"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2025 05:32:15 -0700
-X-CSE-ConnectionGUID: wKwWVNBrTja/NwUNPTtyEg==
-X-CSE-MsgGUID: Lv2rZVgETySZXTKDLNe8kQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,241,1736841600"; 
-   d="scan'208";a="120325899"
-Received: from soc-5cg4396xfb.clients.intel.com (HELO [172.28.180.56]) ([172.28.180.56])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2025 05:32:11 -0700
-Message-ID: <7d4ee477-f7e9-41b3-ab22-3af71054c60a@linux.intel.com>
-Date: Wed, 12 Mar 2025 13:32:07 +0100
+	 In-Reply-To:Content-Type; b=M3nlHo3KL+5JO4P4lL5IdegJU3/izToUj7ExX8ZhoUp/mQ5ENesFP5t1U4Lr+6DtxfhRNMOiKSZMMgYNlZio3DSEazLTwsfmv2Imj5gHxH8J1APnoxg44h9oqecUu/p3qfBN2BLwBoYwMBbLH+y8IvyoXlwvAwd4Xs2dQLJdies=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=zp4yLI8x; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from [192.168.0.223] (unknown [195.29.54.243])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 89F65200EEC2;
+	Wed, 12 Mar 2025 13:32:13 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 89F65200EEC2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1741782734;
+	bh=c2wryMfWs+1n980iE4u39zUMY1TL4q1m1nHgV+n7FaI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=zp4yLI8xqnmIV//V6KlM/tf4xPenghfkDo0GwuYG9W5vGciefZhsN5dnNv9bxtGOx
+	 JUa9FwUKjgIJdcKg4DWU3aroqfcZPftxp8CyorD16LV2nFCXIPMLTWfGs3Qe+JuSZ/
+	 frBK4JXM2bHeBCiDzICSdtKaedZFwRDL2UUP0OqAbbxjDBe5mueso29o4s9f5swGlG
+	 Z/ZJk+0bltiFe0lM6gBrekAkSsuVyDHdWoJCHvmsTkWM0v6+XIHp2JPoUGfb2ZSf6y
+	 52BpCT0iHnZSXtdOqO8Fgj/Og/j/a38Kgd+Cv2QkEdZHXz/biP0nl+pgGnpt9wqKyi
+	 emTmzunknh1oQ==
+Message-ID: <1c585bdf-ebcc-40db-bd36-81d008cf6827@uliege.be>
+Date: Wed, 12 Mar 2025 13:32:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,49 +56,81 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/3] net/mlx5: HW Steering cleanups
-To: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Gal Pressman <gal@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
- Moshe Shemesh <moshe@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1741780194-137519-1-git-send-email-tariqt@nvidia.com>
-Content-Language: pl, en-US
-From: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-In-Reply-To: <1741780194-137519-1-git-send-email-tariqt@nvidia.com>
+Subject: Re: [PATCH net] net: lwtunnel: fix recursion loops
+To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, Roopa Prabhu <roopa@nvidia.com>,
+ Andrea Mayer <andrea.mayer@uniroma2.it>,
+ Stefano Salsano <stefano.salsano@uniroma2.it>,
+ Ahmed Abdelsalam <ahabdels.dev@gmail.com>, Ido Schimmel <idosch@nvidia.com>
+References: <20250312103246.16206-1-justin.iurman@uliege.be>
+ <fb9aec0e-0d95-4ca3-8174-32174551ece3@uliege.be> <87y0xah1ol.fsf@toke.dk>
+Content-Language: en-US
+From: Justin Iurman <justin.iurman@uliege.be>
+In-Reply-To: <87y0xah1ol.fsf@toke.dk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 2025-03-12 12:49 PM, Tariq Toukan wrote:
-> This short series by Yevgeny contains several small HW Steering cleanups:
+On 3/12/25 13:29, Toke Høiland-Jørgensen wrote:
+> Justin Iurman <justin.iurman@uliege.be> writes:
 > 
-> - Patch 1: removing unused FW commands
-> - Patch 2: using list_move() instead of list_del/add
-> - Patch 3: printing the unsupported combination of match fields
+>>> --- /dev/null
+>>> +++ b/net/core/lwtunnel.h
+>>> @@ -0,0 +1,42 @@
+>>> +/* SPDX-License-Identifier: GPL-2.0+ */
+>>> +#ifndef _NET_CORE_LWTUNNEL_H
+>>> +#define _NET_CORE_LWTUNNEL_H
+>>> +
+>>> +#include <linux/netdevice.h>
+>>> +
+>>> +#define LWTUNNEL_RECURSION_LIMIT 8
+>>> +
+>>> +#ifndef CONFIG_PREEMPT_RT
+>>> +static inline bool lwtunnel_recursion(void)
+>>> +{
+>>> +	return unlikely(__this_cpu_read(softnet_data.xmit.recursion) >
+>>> +			LWTUNNEL_RECURSION_LIMIT);
+>>> +}
+>>> +
+>>> +static inline void lwtunnel_recursion_inc(void)
+>>> +{
+>>> +	__this_cpu_inc(softnet_data.xmit.recursion);
+>>> +}
+>>> +
+>>> +static inline void lwtunnel_recursion_dec(void)
+>>> +{
+>>> +	__this_cpu_dec(softnet_data.xmit.recursion);
+>>> +}
+>>> +#else
+>>> +static inline bool lwtunnel_recursion(void)
+>>> +{
+>>> +	return unlikely(current->net_xmit.recursion > LWTUNNEL_RECURSION_LIMIT);
+>>> +}
+>>> +
+>>> +static inline void lwtunnel_recursion_inc(void)
+>>> +{
+>>> +	current->net_xmit.recursion++;
+>>> +}
+>>> +
+>>> +static inline void lwtunnel_recursion_dec(void)
+>>> +{
+>>> +	current->net_xmit.recursion--;
+>>> +}
+>>> +#endif
+>>> +
+>>> +#endif /* _NET_CORE_LWTUNNEL_H */
+>>
+>> Wondering what folks think about the above idea to reuse fields that
+>> dev_xmit_recursion() currently uses. IMO, it seems OK considering the
+>> use case and context. If not, I guess we'd need to add a new field to
+>> both softnet_data and task_struct.
 > 
-> Regards,
-> Tariq
+> Why not just reuse the dev_xmit_recursion*() helpers directly?
 > 
-> Yevgeny Kliteynik (3):
->    net/mlx5: HWS, remove unused code for alias flow tables
->    net/mlx5: HWS, use list_move() instead of del/add
->    net/mlx5: HWS, log the unsupported mask in definer
+> -Toke
 > 
->   drivers/net/ethernet/mellanox/mlx5/core/steering/hws/cmd.c  | 6 ------
->   drivers/net/ethernet/mellanox/mlx5/core/steering/hws/cmd.h  | 3 ---
->   .../net/ethernet/mellanox/mlx5/core/steering/hws/definer.c  | 6 +++---
->   .../net/ethernet/mellanox/mlx5/core/steering/hws/pat_arg.c  | 3 +--
->   4 files changed, 4 insertions(+), 14 deletions(-)
-> 
-> 
-> base-commit: 0ea09cbf8350b70ad44d67a1dcb379008a356034
 
-Hi, thanks for the submission!
-
-Reviewed-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-for the whole series
-
+It was my initial idea, but I'm not sure I can. Looks like they're not 
+exposed (it's a local .h in net/core/).
 
