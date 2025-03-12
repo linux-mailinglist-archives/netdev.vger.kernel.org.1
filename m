@@ -1,258 +1,105 @@
-Return-Path: <netdev+bounces-174302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FF33A5E38D
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 19:20:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D0B9A5E392
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 19:21:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E331B3BB318
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 18:20:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5DE9A189AA93
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 18:21:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8448205ADB;
-	Wed, 12 Mar 2025 18:20:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA97522E402;
+	Wed, 12 Mar 2025 18:21:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="aMUEVgNc"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="B17v0o5/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7286B1BD01F
-	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 18:20:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14F044D599
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 18:21:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741803610; cv=none; b=nFQgorp435prBV5Gvpjtm+LmwcNi+YkrWOD8sOXJltmBlBZXiQC1N1/9wSPTjYq/TSITXaBvURhXCsYbOBtqubiehtUVfuwqyaQVHUcl6hfbp5d/Lqim8Mm/DkQVpmRt/0bRpDDQ0V3hPn/w5bZM8MaewNjDULH2is3HGBnFBYE=
+	t=1741803678; cv=none; b=Fx26EhsJd5SOO/L34p9+g0MQsE28qabMdcBU2BPxPmCOxzcgEljQP5yDBgbBUfU09vOmj4hWbGm4TOJskJBlMUG4Z/03shgiftjSTihFPaSXBn6KaPIzsbAf+y8FwEovhfnHtt9ndCWCwfRojWH0tvf9XW/nSGzxU/CAxyCi+Vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741803610; c=relaxed/simple;
-	bh=rVUmbO8wiVYpIIu+TAjlB1KoeGAG/thfpfVBxacDC3s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HqgdLkmV841QXWRL8sGfTX5lHP5/kjYAxhWPkpwDRrWCIh3UAIiyAdEy3y/BPRFJ6RBrT/8O6PLGxuXnBTE4ZiNJ7tEb/zqafTtNOj0vzVF1wITwLIB1vhlSKMJXNHlK43KUirXwxZyQbI+rDCtYnGWNfI0yoyoFgslL4RZTWU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=aMUEVgNc; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-47688ae873fso976551cf.0
-        for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 11:20:07 -0700 (PDT)
+	s=arc-20240116; t=1741803678; c=relaxed/simple;
+	bh=P5BQVlGmLWmtC1A2cg5skQZt5+uAetF0oU2CFb1g8cI=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VZ7qPBjIGfMfJrcQoskhqAxsm0sS/6nu4/8p2CDReKPekB6A6/M7Mv98VbPvQ3Vi85jdO63pR1LyjiT+hLQ8xEofOYukq2AOGMt42048jbG4iJtZjFF1+lJ8fadhCWM2jnp+MDVy0Ty9d/KeDXxflp5qiEb/5wuZoqJIKg9n1aI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=B17v0o5/; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1741803606; x=1742408406; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/JwrN6uiLsrlYFwVv4j7Y1nmGn+uYAElg71voRA6Tt8=;
-        b=aMUEVgNcjpW2wh5DN54ySRLLfz9jqZfYZ8r+yiaBkZGmhiqSLAa3bJZPAIg6MxLDwF
-         Yg45UuMiIN9FzYKoUvt5n9Hd+rsGfP3EgCFEXyFhvVKBQYuGmBg694sdt9dgN2b+chr/
-         par7InLm7biuNsTHQOfxH5bzBY8CUWHiq+oT4Ko890d2fI6iEkyjW5RChWGOpCkJCfH5
-         wIrE1DIDi8DhOmr2mFVFzo6XwLC8hElewBhfxDbdZ0u9wegWIJr4oYSq2lub56TCW7Yu
-         4bi8xaFr/rLfS6muHcZ2vRHQY1zXw4rRlyS4VjJK6lWbQErnRMFHortK9w5IYJpidpBm
-         H1Pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741803606; x=1742408406;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/JwrN6uiLsrlYFwVv4j7Y1nmGn+uYAElg71voRA6Tt8=;
-        b=vT/xmlaU7W3PYHKvBqrTKqcrG2wRef840336dXWXfh4hKJSka9RHksjIjaXKhIXjpf
-         6grOb1K+V2CZ4IQIrpsW7UilS5onQX06nrAEvQgWArsDRI/rNeTN86+eNEJrMYTz8juk
-         XdVWHrfWp3tpLMACRujKdnt1cqOolmnY6NDoBhXQO4WtPAncQVArRK9tGAOzY3/jcPLf
-         88Vr2YsI3hPqzvafOwleecWIYKqli9/xVZEOOjIK98W7l9G8VfbvPVbToJIzaOkrQhDZ
-         t1eL7ljnxtE29fw3qj0PAHD6t8vjvMBETPHUjwVprT3eRJTkbuqc656xhtv3SZk4LFRN
-         udYw==
-X-Gm-Message-State: AOJu0Yy3B5eS5RdMcth92DqurXp/vVk+oaEfy+pMT5fa4wxLjKqxw9jK
-	eovriBU6vo0fZ80eY/tKo3/iNaXSQRegBRO2agWSXnYM4QKKNcYU1d+d/pLoX2Y=
-X-Gm-Gg: ASbGncvFsBZVw/GoKUYkfKxX02qY0jK17R23kTlrxKW/6Dph2G+Xdc87J+LbYiBFqR0
-	R/M9etA6MQrJHYz1mx6kfy6sVD0FsCdat1YuuEe+tKlOmprQGql/w/9HN5LFLDtb3QHO7wsrCTB
-	2G1283KRJsHRIS3IuLgczOQNXrJESikKZXmyd5ICqgZwBHxKfjBPRNvuiluIS7h1IUpjdMZkw7/
-	wgDG5jr1jA53RV8o96ARoSyU6DQNMpFjN3cGhnT3tW7RKC7s7634PYUmtzqe8M6x80VfVVwWBQc
-	NL48F8ARaomq14wms7ERJypjJ9qE1yJOCPvIqUkuJ7hErEYudhEyzzuteYEkPFRmN9nUOw==
-X-Google-Smtp-Source: AGHT+IEmL1ZCGCLBq4/ccG5tQuyBD78RHYaCGzXZEzlXPe74r3o7UyCro4raW+D1b13M4Wt/YQDAlQ==
-X-Received: by 2002:a05:6214:c83:b0:6e4:7307:51c6 with SMTP id 6a1803df08f44-6e90066b6famr409431866d6.34.1741803604661;
-        Wed, 12 Mar 2025 11:20:04 -0700 (PDT)
-Received: from [10.73.223.214] ([208.184.112.130])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e8f715b809sm87107766d6.79.2025.03.12.11.20.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Mar 2025 11:20:04 -0700 (PDT)
-Message-ID: <dffb3057-40cf-463b-a114-9c9c3770f09c@bytedance.com>
-Date: Wed, 12 Mar 2025 11:20:01 -0700
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1741803677; x=1773339677;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=vdCwRhtiTvZZRfWEFq2pyiUSM/YOkNeQ/O2v+7YfXt8=;
+  b=B17v0o5/T1Zl0EcS8Hby4MIZBNcthUNQLKuL6BmWeJG1Mpy+XB0k7yhM
+   V7DRbVKd2k+npjz3PwnkmChYWJ77BxxQthQdozz2FUPBQ7I3y0on1q00G
+   2FeoQG9CONrzITsGNwQtOUi0lYxCjObwyNvh5iuGEvg/rdAWGBNMV3ksX
+   E=;
+X-IronPort-AV: E=Sophos;i="6.14,242,1736812800"; 
+   d="scan'208";a="178080516"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2025 18:21:14 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:37964]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.40.101:2525] with esmtp (Farcaster)
+ id cd4112c6-2059-4396-92d2-3ecc54a0857a; Wed, 12 Mar 2025 18:21:14 +0000 (UTC)
+X-Farcaster-Flow-ID: cd4112c6-2059-4396-92d2-3ecc54a0857a
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 12 Mar 2025 18:21:05 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.94.160.2) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 12 Mar 2025 18:21:01 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <nicolas.morey@suse.com>
+CC: <edumazet@google.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>
+Subject: Re: [RFC PATCH] net: enable SO_REUSEPORT for AF_TIPC sockets
+Date: Wed, 12 Mar 2025 11:20:02 -0700
+Message-ID: <20250312182048.96800-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <318ad96d-99ba-4c53-a08d-7f257dbc3d6a@suse.com>
+References: <318ad96d-99ba-4c53-a08d-7f257dbc3d6a@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Patch bpf-next v2 4/4] tcp_bpf: improve ingress redirection
- performance with message corking
-To: John Fastabend <john.fastabend@gmail.com>,
- Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, jakub@cloudflare.com,
- zhoufeng.zf@bytedance.com, Amery Hung <amery.hung@bytedance.com>,
- Cong Wang <cong.wang@bytedance.com>
-References: <20250306220205.53753-1-xiyou.wangcong@gmail.com>
- <20250306220205.53753-5-xiyou.wangcong@gmail.com>
- <20250311205426.h3rvfakthoa6usgr@gmail.com>
-Content-Language: en-US
-From: Zijian Zhang <zijianzhang@bytedance.com>
-In-Reply-To: <20250311205426.h3rvfakthoa6usgr@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D041UWA001.ant.amazon.com (10.13.139.124) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 3/11/25 1:54 PM, John Fastabend wrote:
-> On 2025-03-06 14:02:05, Cong Wang wrote:
->> From: Zijian Zhang <zijianzhang@bytedance.com>
-[...]
->> +static int tcp_bpf_ingress_backlog(struct sock *sk, struct sock *sk_redir,
->> +				   struct sk_msg *msg, u32 apply_bytes)
->> +{
->> +	bool ingress_msg_empty = false;
->> +	bool apply = apply_bytes;
->> +	struct sk_psock *psock;
->> +	struct sk_msg *tmp;
->> +	u32 tot_size = 0;
->> +	int ret = 0;
->> +	u8 nonagle;
->> +
->> +	psock = sk_psock_get(sk_redir);
->> +	if (unlikely(!psock))
->> +		return -EPIPE;
->> +
->> +	spin_lock(&psock->backlog_msg_lock);
->> +	/* If possible, coalesce the curr sk_msg to the last sk_msg from the
->> +	 * psock->backlog_msg.
->> +	 */
->> +	if (!list_empty(&psock->backlog_msg)) {
->> +		struct sk_msg *last;
->> +
->> +		last = list_last_entry(&psock->backlog_msg, struct sk_msg, list);
->> +		if (last->sk == sk) {
->> +			int i = tcp_bpf_coalesce_msg(last, msg, &apply_bytes,
->> +						     &tot_size);
->> +
->> +			if (i == msg->sg.end || (apply && !apply_bytes))
->> +				goto out_unlock;
->> +		}
->> +	}
->> +
->> +	/* Otherwise, allocate a new sk_msg and transfer the data from the
->> +	 * passed in msg to it.
->> +	 */
->> +	tmp = sk_msg_alloc(GFP_ATOMIC);
->> +	if (!tmp) {
->> +		ret = -ENOMEM;
->> +		spin_unlock(&psock->backlog_msg_lock);
->> +		goto error;
->> +	}
->> +
->> +	tmp->sk = sk;
->> +	sock_hold(tmp->sk);
->> +	tmp->sg.start = msg->sg.start;
->> +	tcp_bpf_xfer_msg(tmp, msg, &apply_bytes, &tot_size);
->> +
->> +	ingress_msg_empty = list_empty(&psock->ingress_msg);
->> +	list_add_tail(&tmp->list, &psock->backlog_msg);
->> +
->> +out_unlock:
->> +	spin_unlock(&psock->backlog_msg_lock);
->> +	sk_wmem_queued_add(sk, tot_size);
->> +
->> +	/* At this point, the data has been handled well. If one of the
->> +	 * following conditions is met, we can notify the peer socket in
->> +	 * the context of this system call immediately.
->> +	 * 1. If the write buffer has been used up;
->> +	 * 2. Or, the message size is larger than TCP_BPF_GSO_SIZE;
->> +	 * 3. Or, the ingress queue was empty;
->> +	 * 4. Or, the tcp socket is set to no_delay.
->> +	 * Otherwise, kick off the backlog work so that we can have some
->> +	 * time to wait for any incoming messages before sending a
->> +	 * notification to the peer socket.
->> +	 */
-> 
-> I think this could also be used to get the bpf_msg_cork_bytes working
-> directly in receive path. This also means we can avoid using
-> strparser in the receive path. The strparser case has noticable
-> overhead for us that is significant enough we don't use it.
-> Not that we need to do it all in one patch set.
-> 
+From: Nicolas Morey <nicolas.morey@suse.com>
+Date: Wed, 12 Mar 2025 18:44:10 +0100
+> On 2025-03-12 17:35, Kuniyuki Iwashima wrote:
+> > From: Nicolas Morey <nicolas.morey@suse.com>
+> > Date: Wed, 12 Mar 2025 14:48:01 +0100
+> >> Commit 5b0af621c3f6 ("net: restrict SO_REUSEPORT to inet sockets") disabled
+> >> SO_REUSEPORT for all non inet sockets, including AF_TIPC sockets which broke
+> >> one of our customer applications.
+> >> Re-enable SO_REUSEPORT for AF_TIPC to restore the original behaviour.
+> > 
+> > AFAIU, AF_TIPC does not actually implement SO_REUSEPORT logic, no ?
+> > If so, please tell your customer not to set it on AF_TIPC sockets.
+> > 
+> > There were similar reports about AF_VSOCK and AF_UNIX, and we told
+> > that the userspace should not set SO_REUSEPORT for such sockets
+> > that do not support the option.
+> > 
+> > https://lore.kernel.org/stable/CAGxU2F57EgVGbPifRuCvrUVjx06mrOXNdLcPdqhV9bdM0VqGvg@mail.gmail.com/
+> > https://github.com/amazonlinux/amazon-linux-2023/issues/901
+> > 
+> > 
+> Isn't the sk_reuseport inherited/used by the underlying UDP socket ?
 
-Sounds promising!
-
->> +	nonagle = tcp_sk(sk)->nonagle;
->> +	if (!sk_stream_memory_free(sk) ||
->> +	    tot_size >= TCP_BPF_GSO_SIZE || ingress_msg_empty ||
->> +	    (!(nonagle & TCP_NAGLE_CORK) && (nonagle & TCP_NAGLE_OFF))) {
->> +		release_sock(sk);
->> +		psock->backlog_work_delayed = false;
->> +		sk_psock_backlog_msg(psock);
->> +		lock_sock(sk);
->> +	} else {
->> +		sk_psock_run_backlog_work(psock, false);
->> +	}
->> +
->> +error:
->> +	sk_psock_put(sk_redir, psock);
->> +	return ret;
->> +}
->> +
->>   static int tcp_bpf_send_verdict(struct sock *sk, struct sk_psock *psock,
->>   				struct sk_msg *msg, int *copied, int flags)
->>   {
->> @@ -442,18 +619,24 @@ static int tcp_bpf_send_verdict(struct sock *sk, struct sk_psock *psock,
->>   			cork = true;
->>   			psock->cork = NULL;
->>   		}
->> -		release_sock(sk);
->>   
->> -		origsize = msg->sg.size;
->> -		ret = tcp_bpf_sendmsg_redir(sk_redir, redir_ingress,
->> -					    msg, tosend, flags);
-> 
-> The only sticky bit here that is blocking folding this entire tcp_bpf_sendmsg_redir
-> logic out is tls user right?
-> 
-
-Right, tls also uses tcp_bpf_sendmsg_redir.
-
->> -		sent = origsize - msg->sg.size;
->> +		if (redir_ingress) {
->> +			ret = tcp_bpf_ingress_backlog(sk, sk_redir, msg, tosend);
->> +		} else {
->> +			release_sock(sk);
->> +
->> +			origsize = msg->sg.size;
->> +			ret = tcp_bpf_sendmsg_redir(sk_redir, redir_ingress,
->> +						    msg, tosend, flags);
-> 
-> now sendmsg redir is really only for egress here so we can skip handling
-> the ingress here. And the entire existing sk_psock_backlog work queue because
-> its handled by tcp_bpf_ingress_backlog?
-> 
-
-Agreed, tcp_bpf_sendmsg_redir here is only for egress.
-
- From my understanding,
-as for sk_psock_backlog, it handles the ingress skb in psock-
- >ingress_skb.
-[skb RX->Redirect->sk_msg(skb backed-up) RX]
-
-On the other hand, tcp_bpf_ingress_backlog mainly focus on moving the
-corked sk_msg from sender socket queue "backlog_msg" to receiver socket
-psock->ingress_msg. These sk_msgs are redirected using __SK_REDIRECT
-by tcp_bpf_sendmsg, in other words, these sk_msg->skb should be NULL.
-[sk_msg TX->Redirect->sk_msg(skb is NULL) RX]
-
-IMHO, they are mostly mutually independent.
-
->> +			sent = origsize - msg->sg.size;
->> +
->> +			lock_sock(sk);
->> +			sk_mem_uncharge(sk, sent);
->> +		}
-> 
-> I like the direction but any blockers to just get this out of TLS as
-> well? I'm happy to do it if needed I would prefer not to try and
-> support both styles at the same time.
-
-I haven't looked into TLS mainly because I'm not very familiar with it. 
-If you're interested, it would be great if you could take a look in the
-future :)
-
+tipc_udp_enable() calls udp_sock_create() and udp_sock_create[46]()
+creates a new UDP socket and bind()s without setting SO_REUSEPORT.
 
