@@ -1,142 +1,101 @@
-Return-Path: <netdev+bounces-174333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDA9CA5E51C
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 21:15:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42305A5E538
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 21:20:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F49C3BCB22
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 20:14:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85452177C4E
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 20:20:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFFE71EBA0C;
-	Wed, 12 Mar 2025 20:14:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E044F1EDA01;
+	Wed, 12 Mar 2025 20:19:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OFn15q3V"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GRopA5nT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A22CA70809;
-	Wed, 12 Mar 2025 20:14:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4711EB191;
+	Wed, 12 Mar 2025 20:19:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741810496; cv=none; b=esF364nyyFdhnmlrN9opqHue+l4+YrJ9puk0ALQ/KKBO+Fvyl4WSBxfvyaX4is2r540CUNJhYmeqC+5LZSKyishfmOjOfmg7PvBAF5mOziM63Pl5z+er8uRQeO0TqSVMEBI+9JGqzETCm+o/f7DuCralWAOvUFDj5yvDKb1dsrI=
+	t=1741810796; cv=none; b=Xwnq9H+ScFaLl/96fgEU6n/7JI1JjSlEIbszygnWDbEu8FznbRC2ItRU+W/aWHA+rfoRjCqtxshUFRYiwryWdRKpT6eCdS5yLgqgBPZMqU9hxqkUXn/M6QuJlCv9jMcgT8vt0t/GhIJskrctuykb34X0qvmQvwACIDaPVsKF888=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741810496; c=relaxed/simple;
-	bh=g1sFQOH1vPx9lrAH9SnoezGldeEVl4lvcdztzHQTJQM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hMsMKQfo4+WxAKhgeK2ZlvEtmS/aY26NpoFGf399GkZxzpiXm/AByI69obEHnBKJ/Ei7VaUtBct9H5jM+eMVtcuqolPa3XD8xDA2A+5EHpRkxn+e22Pdjx9uV5xRgBu14g5AnUEU0lfd0Pd7rXHlPLLwfz0DLW6MZbFFjt66QO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OFn15q3V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21ECFC4CEDD;
-	Wed, 12 Mar 2025 20:14:56 +0000 (UTC)
+	s=arc-20240116; t=1741810796; c=relaxed/simple;
+	bh=eUPDWDjxdEdOfOSl6gOwd5Lk7nckPxgTXNP4nYLK3/g=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Hm3Esr+CQzu8dyhRdTfwgev7Pjn71XLrl2TjOXXsv6J3lHouzM2LEyPbd1PzPayHaTHsVOQRqC568FA6tKnFqFAUrzs2AlXJA0AOLNTB8HRWgwAo+5HRbnZ2Vsgzk67BfUMCw2LOgcG+Xek6BuZ+GN/4JHbnAetnpjoWUhe9AwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GRopA5nT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 896CAC4CEDD;
+	Wed, 12 Mar 2025 20:19:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741810496;
-	bh=g1sFQOH1vPx9lrAH9SnoezGldeEVl4lvcdztzHQTJQM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=OFn15q3V51I45tB11gIJbA7lTjNOXPMlMTcbf2BddQlXzu75hspiWs8j4ox33V1Hg
-	 9tA8oi9VKsliX9W0YM7TsNgOhxnqojnncAhKzjIwHK8gqUDKiowtX7BEgTUOFli7J/
-	 ej31iIfZ4kA5r0hSr22Q6M7O3fscKcFgdMeNmLztdWqzoj0wC4WT8xxGxPATXQ3pn4
-	 +hAaBk0JNBTmBKXxrRvawYiDQZaUVeZDacHz9KOgZnIe4u/iUVwkFgzd+Ifw2/0Fss
-	 pqjybBn3mMtxE6X9x6GduGbIL3zRpBZ1ixqvDQGrLDySVAb/UGQNsvdLC2ZbDb1wW7
-	 cWMgqnKONaDWw==
-From: Kees Cook <kees@kernel.org>
-To: "Jason A . Donenfeld" <Jason@zx2c4.com>
-Cc: Kees Cook <kees@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	wireguard@lists.zx2c4.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH v2] wireguard: Add __nonstring annotations for unterminated strings
-Date: Wed, 12 Mar 2025 13:14:51 -0700
-Message-Id: <20250312201447.it.157-kees@kernel.org>
-X-Mailer: git-send-email 2.34.1
+	s=k20201202; t=1741810796;
+	bh=eUPDWDjxdEdOfOSl6gOwd5Lk7nckPxgTXNP4nYLK3/g=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=GRopA5nTl1UI8BIj/22q0D3CqVF1tD1x54XFYeQh3RA8o7+Okj90wto+YNjVCehC2
+	 GXCGD8mOa7T5w25BoAHP2YpoWVLv/iV5V+b4jWzsDhfHISkB7DwmjopJ14px3LwvD5
+	 2h0awpU+20q5NufImWzu7PQBiPfqUFYdZ/H8VPCKEXWpLEy3Fmd/EM3xj5yrSB1f4s
+	 NYLS3IiBW3QcAuVnqYXvCYsGJuTvDnJOyH1QYnTduwJ2yP+tU39gd3tpS+8BuQU8N8
+	 IIUJm+R3FlOhZc6W1FU21jpt+X4oGkIPx4Z8PFZxxcAH1XjN4UWY6YMKHSsN/Zp05z
+	 RQQujsm+j69BA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DD8380DBDF;
+	Wed, 12 Mar 2025 20:20:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4243; i=kees@kernel.org; h=from:subject:message-id; bh=g1sFQOH1vPx9lrAH9SnoezGldeEVl4lvcdztzHQTJQM=; b=owGbwMvMwCVmps19z/KJym7G02pJDOkXX1tPD95lfe6z11TDfzl7S1V6uT2N3ORrNnoKc+7fW mXgmB7VUcrCIMbFICumyBJk5x7n4vG2Pdx9riLMHFYmkCEMXJwCMBHvaYwM0+Z+anhwaO87nSqx BfJhqxcz3pi2w+bhZyGB5uClp206djAyLPv04EfStB6JU3OOcE5hdfwqyFWTtSdk2Q/1y0xrwzJ Z+QA=
-X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: revert to lockless TC_SETUP_BLOCK and
+ TC_SETUP_FT
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174181083101.918963.13075833361323469787.git-patchwork-notify@kernel.org>
+Date: Wed, 12 Mar 2025 20:20:31 +0000
+References: <20250308044726.1193222-1-sdf@fomichev.me>
+In-Reply-To: <20250308044726.1193222-1-sdf@fomichev.me>
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, horms@kernel.org, corbet@lwn.net,
+ andrew+netdev@lunn.ch, pablo@netfilter.org, kadlec@netfilter.org
 
-When a character array without a terminating NUL character has a static
-initializer, GCC 15's -Wunterminated-string-initialization will only
-warn if the array lacks the "nonstring" attribute[1]. Mark the arrays
-with __nonstring to correctly identify the char array as "not a C string"
-and thereby eliminate the warning:
+Hello:
 
-../drivers/net/wireguard/cookie.c:29:56: warning: initializer-string for array of 'unsigned char' truncates NUL terminator but destination lacks 'nonstring' attribute (9 chars into 8 available) [-Wunterminated-string-initialization]
-   29 | static const u8 mac1_key_label[COOKIE_KEY_LABEL_LEN] = "mac1----";
-      |                                                        ^~~~~~~~~~
-../drivers/net/wireguard/cookie.c:30:58: warning: initializer-string for array of 'unsigned char' truncates NUL terminator but destination lacks 'nonstring' attribute (9 chars into 8 available) [-Wunterminated-string-initialization]
-   30 | static const u8 cookie_key_label[COOKIE_KEY_LABEL_LEN] = "cookie--";
-      |                                                          ^~~~~~~~~~
-../drivers/net/wireguard/noise.c:28:38: warning: initializer-string for array of 'unsigned char' truncates NUL terminator but destination lacks 'nonstring' attribute (38 chars into 37 available) [-Wunterminated-string-initialization]
-   28 | static const u8 handshake_name[37] = "Noise_IKpsk2_25519_ChaChaPoly_BLAKE2s";
-      |                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-../drivers/net/wireguard/noise.c:29:39: warning: initializer-string for array of 'unsigned char' truncates NUL terminator but destination lacks 'nonstring' attribute (35 chars into 34 available) [-Wunterminated-string-initialization]
-   29 | static const u8 identifier_name[34] = "WireGuard v1 zx2c4 Jason@zx2c4.com";
-      |                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-The arrays are always used with their fixed size, so use __nonstring.
+On Fri,  7 Mar 2025 20:47:26 -0800 you wrote:
+> There is a couple of places from which we can arrive to ndo_setup_tc
+> with TC_SETUP_BLOCK/TC_SETUP_FT:
+> - netlink
+> - netlink notifier
+> - netdev notifier
+> 
+> Locking netdev too deep in this call chain seems to be problematic
+> (especially assuming some/all of the call_netdevice_notifiers
+> NETDEV_UNREGISTER) might soon be running with the instance lock).
+> Revert to lockless ndo_setup_tc for TC_SETUP_BLOCK/TC_SETUP_FT. NFT
+> framework already takes care of most of the locking. Document
+> the assumptions.
+> 
+> [...]
 
-Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=117178 [1]
-Signed-off-by: Kees Cook <kees@kernel.org>
----
- v2: Improve commit log, add cookie nonstrings too
- v1: https://lore.kernel.org/lkml/20250310222249.work.154-kees@kernel.org/
-Cc: Jason A. Donenfeld <Jason@zx2c4.com>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: wireguard@lists.zx2c4.com
-Cc: netdev@vger.kernel.org
----
- drivers/net/wireguard/cookie.c | 4 ++--
- drivers/net/wireguard/noise.c  | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+Here is the summary with links:
+  - [net-next] net: revert to lockless TC_SETUP_BLOCK and TC_SETUP_FT
+    https://git.kernel.org/netdev/net-next/c/0a13c1e0a449
 
-diff --git a/drivers/net/wireguard/cookie.c b/drivers/net/wireguard/cookie.c
-index f89581b5e8cb..94d0a7206084 100644
---- a/drivers/net/wireguard/cookie.c
-+++ b/drivers/net/wireguard/cookie.c
-@@ -26,8 +26,8 @@ void wg_cookie_checker_init(struct cookie_checker *checker,
- }
- 
- enum { COOKIE_KEY_LABEL_LEN = 8 };
--static const u8 mac1_key_label[COOKIE_KEY_LABEL_LEN] = "mac1----";
--static const u8 cookie_key_label[COOKIE_KEY_LABEL_LEN] = "cookie--";
-+static const u8 mac1_key_label[COOKIE_KEY_LABEL_LEN] __nonstring = "mac1----";
-+static const u8 cookie_key_label[COOKIE_KEY_LABEL_LEN] __nonstring = "cookie--";
- 
- static void precompute_key(u8 key[NOISE_SYMMETRIC_KEY_LEN],
- 			   const u8 pubkey[NOISE_PUBLIC_KEY_LEN],
-diff --git a/drivers/net/wireguard/noise.c b/drivers/net/wireguard/noise.c
-index 202a33af5a72..7eb9a23a3d4d 100644
---- a/drivers/net/wireguard/noise.c
-+++ b/drivers/net/wireguard/noise.c
-@@ -25,8 +25,8 @@
-  * <- e, ee, se, psk, {}
-  */
- 
--static const u8 handshake_name[37] = "Noise_IKpsk2_25519_ChaChaPoly_BLAKE2s";
--static const u8 identifier_name[34] = "WireGuard v1 zx2c4 Jason@zx2c4.com";
-+static const u8 handshake_name[37] __nonstring = "Noise_IKpsk2_25519_ChaChaPoly_BLAKE2s";
-+static const u8 identifier_name[34] __nonstring = "WireGuard v1 zx2c4 Jason@zx2c4.com";
- static u8 handshake_init_hash[NOISE_HASH_LEN] __ro_after_init;
- static u8 handshake_init_chaining_key[NOISE_HASH_LEN] __ro_after_init;
- static atomic64_t keypair_counter = ATOMIC64_INIT(0);
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
