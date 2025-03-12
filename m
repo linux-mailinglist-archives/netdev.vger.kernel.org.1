@@ -1,92 +1,189 @@
-Return-Path: <netdev+bounces-174197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB952A5DD65
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 14:08:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F43BA5DD79
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 14:11:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DEA597ACC65
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 13:05:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A42E3BAC3E
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 13:10:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FE382459C1;
-	Wed, 12 Mar 2025 13:06:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B9B7244EA0;
+	Wed, 12 Mar 2025 13:10:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sPrSTwdv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p4HcCxiF"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6387D24634F
-	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 13:06:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B3523F376;
+	Wed, 12 Mar 2025 13:10:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741784771; cv=none; b=OxTozYB1MUAUidI23JTqkvWCEs57cxqi5ZfsQVJs0i+5GCywtRxV6EmVecjxD0YVEC9dsYY1rYNRPOGkfQFQ8yI+Oae0TXHuGYqBak/urAq+6Cf9hR3CfZZCCuoqyKnuanNN8Qz0u9onUv7mWgUiYBnKoOvhh0hBdHJmuAZTPmc=
+	t=1741785051; cv=none; b=TVrGADGldOo0Z0iBG++zlvWIdwjQ0fezd1RuCph90Jm7sfA5IhJOqqsRz/0szs+ZeFcZmyZsPh2amO9+Tla66VLcAEwD/FI2M+vYbhmBeIr804pEZYcGuQ/o0AUCElStKcwRp4xkZF00UEjZ0/JnEJ3h129gaRfgaZEVxEz35eA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741784771; c=relaxed/simple;
-	bh=m6Fbrxm4R2/LCjXv3kXKUmWdKhjaxGM3CoDE+tpZZwQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=li9aAH46ufJqdlHtQURfod5wfMYESeODv+g6gHq12SJluYqyOA7t4rplP2HtjWpClCJk6kFfFnxmJ998E314OR0L4eAwR1wluO5nKwcqiJlXfT/eL3S9Cy3umuGptGoEbXxNbsn3w4qGkLlFpXEax0KvvGMgEWdDczJFtQnM22A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=sPrSTwdv; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=KO4VVVT/RtKl517J0cn8cyrIOvSu1StRHJFRtRyxnEE=; b=sPrSTwdvJh0NGBdXclgJRY+ZEz
-	LfRKtu4lMUIMPS3uY+4wLpZ6ldyFO7mFjaIKpFQS4XiQCQFENe+s8UkeGV73FTQ6LYHRWUW3kcoqi
-	qM/UStunnWoenvQv4eknDiXEk8QriN0HWo4T1aa8h4o8APKSfuIwOHqZoOwI7K8/BBp8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tsLmW-004fSw-IR; Wed, 12 Mar 2025 14:05:56 +0100
-Date: Wed, 12 Mar 2025 14:05:56 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Hamish Martin <hamish.martin@alliedtelesis.co.nz>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net] igb: Prevent IPCFGN write resetting autoneg
- advertisement register
-Message-ID: <eae8e09c-f571-4016-b11d-88611a2b368f@lunn.ch>
-References: <20250312032251.2259794-1-hamish.martin@alliedtelesis.co.nz>
+	s=arc-20240116; t=1741785051; c=relaxed/simple;
+	bh=YxQy9RhnsEnCW0He+QcRzfmTEud041311PAgh672cVA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EUN1piLnIX6a7wXwZA8yFsTstQEiPKH15gFWPbNweoGzOvEuIFQtduWVrOvWDTg6gN10jN+uoDJDc6r2FVjlnjcNlNgrY3ZUcBnk29EB5dfq7O/49FrmFACNFvejtkJ/RCPT1wAB98ury9+FbDSriHpGYlk0CXGkgRW2q9dgNo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p4HcCxiF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C44BAC4CEE3;
+	Wed, 12 Mar 2025 13:10:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741785050;
+	bh=YxQy9RhnsEnCW0He+QcRzfmTEud041311PAgh672cVA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=p4HcCxiFBWmpauxxm8J+cPbbtoikXoBLGSXUlTT4nSsTCkbhJaStYP1Pj359dDopB
+	 M/llB79dsdIjfh3IU2OznoPlZpKoI/jiRD034op4kzjZytT4wUla6xxn31XWUz0bn/
+	 UGSh9GaHADSMCX1d6wKmZdXR1lbLStXvbagtx9WbR03Xos4zBj2iYmLRwSJuI+7cBh
+	 bv7oGr5qCIDdR2BmfpPMm2wUFYZs2rl+aVmuvHEVuB4agKDDqySL8k8hSajtuZbN2f
+	 CeOTZO3RjN3uwfMfdF5AkvXWfeQwPYgJc7lVNeFWLfX98dL2unIlngujfbO1RrOhFs
+	 eRzbVz8pSyJZQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	shuah@kernel.org,
+	ap420073@gmail.com,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net] selftests: drv-net: use defer in the ping test
+Date: Wed, 12 Mar 2025 14:10:40 +0100
+Message-ID: <20250312131040.660386-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250312032251.2259794-1-hamish.martin@alliedtelesis.co.nz>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Mar 12, 2025 at 04:22:50PM +1300, Hamish Martin wrote:
-> An issue is observed on the i210 when autonegotiation advertisement is set
-> to a specific subset of the supported speeds but the requested settings
-> are not correctly set in the Copper Auto-Negotiation Advertisement Register
-> (Page 0, Register 4).
-> Initially, the advertisement register is correctly set by the driver code
-> (in igb_phy_setup_autoneg()) but this register's contents are modified as a
-> result of a later write to the IPCNFG register in igb_set_eee_i350(). It is
-> unclear what the mechanism is for the write of the IPCNFG register to lead
-> to the change in the autoneg advertisement register.
-> The issue can be observed by, for example, restricting the advertised speed
-> to just 10MFull. The expected result would be that the link would come up
-> at 10MFull, but actually the phy ends up advertising a full suite of speeds
-> and the link will come up at 100MFull.
-> 
-> The problem is avoided by ensuring that the write to the IPCNFG register
-> occurs before the write to the autoneg advertisement register.
+Make sure the test cleans up after itself. The XDP off statements
+at the end of the test may not be reached.
 
-When you set the advertisement for only 10BaseT Full, what EEE
-settings are applied? It could be that calling igb_set_eee_i350() to
-advertise EEE for 100BaseT Full and 1000BaseT Full, while only
-advertising link mode 10BaseT causes the change to the autoneg
-register.
+Fixes: 75cc19c8ff89 ("selftests: drv-net: add xdp cases for ping.py")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: shuah@kernel.org
+CC: ap420073@gmail.com
+CC: linux-kselftest@vger.kernel.org
+---
+ tools/testing/selftests/drivers/net/ping.py | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-Please try only advertising EEE modes which fit with the basic link
-mode advertising.
+diff --git a/tools/testing/selftests/drivers/net/ping.py b/tools/testing/selftests/drivers/net/ping.py
+index 93f4b411b378..fc69bfcc37c4 100755
+--- a/tools/testing/selftests/drivers/net/ping.py
++++ b/tools/testing/selftests/drivers/net/ping.py
+@@ -7,7 +7,7 @@ from lib.py import ksft_run, ksft_exit
+ from lib.py import ksft_eq, KsftSkipEx, KsftFailEx
+ from lib.py import EthtoolFamily, NetDrvEpEnv
+ from lib.py import bkg, cmd, wait_port_listen, rand_port
+-from lib.py import ethtool, ip
++from lib.py import defer, ethtool, ip
+ 
+ remote_ifname=""
+ no_sleep=False
+@@ -60,6 +60,7 @@ no_sleep=False
+     prog = test_dir + "/../../net/lib/xdp_dummy.bpf.o"
+     cmd(f"ip link set dev {remote_ifname} mtu 1500", shell=True, host=cfg.remote)
+     cmd(f"ip link set dev {cfg.ifname} mtu 1500 xdpgeneric obj {prog} sec xdp", shell=True)
++    defer(cmd, f"ip link set dev {cfg.ifname} xdpgeneric off")
+ 
+     if no_sleep != True:
+         time.sleep(10)
+@@ -68,7 +69,9 @@ no_sleep=False
+     test_dir = os.path.dirname(os.path.realpath(__file__))
+     prog = test_dir + "/../../net/lib/xdp_dummy.bpf.o"
+     cmd(f"ip link set dev {remote_ifname} mtu 9000", shell=True, host=cfg.remote)
++    defer(ip, f"link set dev {remote_ifname} mtu 1500", host=cfg.remote)
+     ip("link set dev %s mtu 9000 xdpgeneric obj %s sec xdp.frags" % (cfg.ifname, prog))
++    defer(ip, f"link set dev {cfg.ifname} mtu 1500 xdpgeneric off")
+ 
+     if no_sleep != True:
+         time.sleep(10)
+@@ -78,6 +81,7 @@ no_sleep=False
+     prog = test_dir + "/../../net/lib/xdp_dummy.bpf.o"
+     cmd(f"ip link set dev {remote_ifname} mtu 1500", shell=True, host=cfg.remote)
+     cmd(f"ip -j link set dev {cfg.ifname} mtu 1500 xdp obj {prog} sec xdp", shell=True)
++    defer(ip, f"link set dev {cfg.ifname} mtu 1500 xdp off")
+     xdp_info = ip("-d link show %s" % (cfg.ifname), json=True)[0]
+     if xdp_info['xdp']['mode'] != 1:
+         """
+@@ -94,10 +98,11 @@ no_sleep=False
+     test_dir = os.path.dirname(os.path.realpath(__file__))
+     prog = test_dir + "/../../net/lib/xdp_dummy.bpf.o"
+     cmd(f"ip link set dev {remote_ifname} mtu 9000", shell=True, host=cfg.remote)
++    defer(ip, f"link set dev {remote_ifname} mtu 1500", host=cfg.remote)
+     try:
+         cmd(f"ip link set dev {cfg.ifname} mtu 9000 xdp obj {prog} sec xdp.frags", shell=True)
++        defer(ip, f"link set dev {cfg.ifname} mtu 1500 xdp off")
+     except Exception as e:
+-        cmd(f"ip link set dev {remote_ifname} mtu 1500", shell=True, host=cfg.remote)
+         raise KsftSkipEx('device does not support native-multi-buffer XDP')
+ 
+     if no_sleep != True:
+@@ -111,6 +116,7 @@ no_sleep=False
+         cmd(f"ip link set dev {cfg.ifname} xdpoffload obj {prog} sec xdp", shell=True)
+     except Exception as e:
+         raise KsftSkipEx('device does not support offloaded XDP')
++    defer(ip, f"link set dev {cfg.ifname} xdpoffload off")
+     cmd(f"ip link set dev {remote_ifname} mtu 1500", shell=True, host=cfg.remote)
+ 
+     if no_sleep != True:
+@@ -157,7 +163,6 @@ no_sleep=False
+     _test_v4(cfg)
+     _test_v6(cfg)
+     _test_tcp(cfg)
+-    ip("link set dev %s xdpgeneric off" % cfg.ifname)
+ 
+ def test_xdp_generic_mb(cfg, netnl) -> None:
+     _set_xdp_generic_mb_on(cfg)
+@@ -169,7 +174,6 @@ no_sleep=False
+     _test_v4(cfg)
+     _test_v6(cfg)
+     _test_tcp(cfg)
+-    ip("link set dev %s xdpgeneric off" % cfg.ifname)
+ 
+ def test_xdp_native_sb(cfg, netnl) -> None:
+     _set_xdp_native_sb_on(cfg)
+@@ -181,7 +185,6 @@ no_sleep=False
+     _test_v4(cfg)
+     _test_v6(cfg)
+     _test_tcp(cfg)
+-    ip("link set dev %s xdp off" % cfg.ifname)
+ 
+ def test_xdp_native_mb(cfg, netnl) -> None:
+     _set_xdp_native_mb_on(cfg)
+@@ -193,14 +196,12 @@ no_sleep=False
+     _test_v4(cfg)
+     _test_v6(cfg)
+     _test_tcp(cfg)
+-    ip("link set dev %s xdp off" % cfg.ifname)
+ 
+ def test_xdp_offload(cfg, netnl) -> None:
+     _set_xdp_offload_on(cfg)
+     _test_v4(cfg)
+     _test_v6(cfg)
+     _test_tcp(cfg)
+-    ip("link set dev %s xdpoffload off" % cfg.ifname)
+ 
+ def main() -> None:
+     with NetDrvEpEnv(__file__) as cfg:
+@@ -213,7 +214,6 @@ no_sleep=False
+                   test_xdp_native_mb,
+                   test_xdp_offload],
+                  args=(cfg, EthtoolFamily()))
+-        set_interface_init(cfg)
+     ksft_exit()
+ 
+ 
+-- 
+2.48.1
 
-     Andrew
 
