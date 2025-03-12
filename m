@@ -1,117 +1,146 @@
-Return-Path: <netdev+bounces-174060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BD07A5D3CF
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 02:04:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B8C7CA5D3D1
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 02:04:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E881E3A44E4
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 01:04:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42B8A3A44E3
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 01:04:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C888F8632C;
-	Wed, 12 Mar 2025 01:04:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FA3C80034;
+	Wed, 12 Mar 2025 01:04:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="WiD50KkK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SVr2wYhm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F35518489
-	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 01:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F902F24;
+	Wed, 12 Mar 2025 01:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741741451; cv=none; b=XzsSxx2ZlzwdQfLeMeiooG+x/yhtK305qW5IL24dYRJTtBAIBCnmZaPfuGk4BiXpnx8L+khD570+taeLYPF4Z59o9p0qVvW489usF7Y35N6LlnzyL4TPKW4lTVLjoDdA0PLLoWRVLJAH4MDBnNGUzVTcMM38ig3u8tRvIiLNbeQ=
+	t=1741741467; cv=none; b=u3aZ6TZf4OIsCqhRhktXkCmmHMvt5ivXRd4lWUejjSpS62FR0dZLdy8NgNFdPQe9DFP9ftKV7V22FkbOck09X3dP3zd2l7G4cqBPXWHJU+pj5Kjp/arn805EApfBUbhcyXJcR2JCHKyITVrjb7NcBVeeJtRmLJbh4UO78IfmOFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741741451; c=relaxed/simple;
-	bh=0DemGm/GRp20nBQIJW5eZyJqYT/ZCXelIbc4URK3eeo=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OKz/JdZB6DkW+gmvwIXFZs4HYIsN+JPAj9NdN4/Thrl84dt3PNelQ0k3TcU7WLocESJX2z4fsa2CQLMYKL0rVSilrJPr9Kgfvux7s8V1GepYSrKjAoFwhFCHrKNoXf+bKPElXZphd6TI97vRUgnFDZFUO1CYVao2R9bfhtgXFUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=WiD50KkK; arc=none smtp.client-ip=52.119.213.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1741741467; c=relaxed/simple;
+	bh=1kKnkGREHcj/YlzyO4TXZambyMWYhbOKL8BgFZPHe20=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=akBM2MmMmQEZAFtsfM/bUQ9WaWYTGB5u3+ta4PHhaY92F89/j8YoQIpBkrrC4G28aaPrH/pYIjnz4DfzWfYH0W2tTfo31/P0DWu+/VWbnmVZm6Nv0OiueHmyrVu/cWvp+WNx4Xh/2iuDVPSBi7H/TzPslypCGW7g7EflJ4+3XvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SVr2wYhm; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-223f4c06e9fso6056305ad.1;
+        Tue, 11 Mar 2025 18:04:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1741741450; x=1773277450;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=B0Ui0wlWCBovpErHd9Be/SbR9FmP5/5nPkref8SycdA=;
-  b=WiD50KkKkNaV1TcRoyDssSN4a5gCjPvOqZUpz5p0V5Y3G0LA3H3urVXW
-   1Q79Ihbvwtj7LAyw+VfUt+KIcRAgFB6iOgbLDQCUxXXE83x9+Jm4TsKpc
-   20o5Sn81DjsavssGhzTFgpZ0a4xwH518ZvPMLMVTF4+WpDqBsBpa+Yk5J
-   0=;
-X-IronPort-AV: E=Sophos;i="6.14,240,1736812800"; 
-   d="scan'208";a="704278589"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2025 01:03:46 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:53765]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.22.127:2525] with esmtp (Farcaster)
- id 523e9f49-9597-462f-ab90-eb1c905c1155; Wed, 12 Mar 2025 01:03:44 +0000 (UTC)
-X-Farcaster-Flow-ID: 523e9f49-9597-462f-ab90-eb1c905c1155
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 12 Mar 2025 01:03:44 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.88.128.133) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 12 Mar 2025 01:03:42 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net] ipv6: Fix memleak of nhc_pcpu_rth_output in fib_check_nh_v6_gw().
-Date: Tue, 11 Mar 2025 18:03:25 -0700
-Message-ID: <20250312010333.56001-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.48.1
+        d=gmail.com; s=20230601; t=1741741465; x=1742346265; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bzfocc3RPo7bjnq9D/qpKgbdz16XHJa3U+9D/ia1Ywo=;
+        b=SVr2wYhmaRbVRyxPmnkWahGbu/JtEL+nI94CYQ500GpyFHTb3GrZcLINkOznoBT6kV
+         tnC4CkpvZs+aMS1zNkQr6uPnwjsGE85GEOS2JLwH/J1f2hipjew8QfoE4JRmsCrjlpmD
+         pDWPhHW2durpDc6VFdewEo5JWEuQxQN3lcW6sg09a66N3ABvlVIn+nVu9XckP/jXAC9H
+         0VAN9+KVhd3odoxgCiK35vkEq4pe9Ep6cpQZgDTGd3M9IuuKPhzURXRoJhAirGQdZKQg
+         UlHk+clyJrSvI+7wFkHdpwgrS/MTBeCVcrJARXERzTUldgtMSwsgM1aBRzC6+tkV1nvx
+         Wk1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741741465; x=1742346265;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bzfocc3RPo7bjnq9D/qpKgbdz16XHJa3U+9D/ia1Ywo=;
+        b=gGGPchKEdfj95pPoQE86caKpEFxICVmR3pLCsnGAtiEq46Z56OPnalBsdfW+UsXmWm
+         pmmHWGt/eHM0UjnbI9ReqBOfoX/aITmA0+dh2c6KXWnGLfU88vGgp0BljZNUyN7RLaLK
+         j8AA02mtlrWMNIqInvPoRpEzNeHKDlEIhp2lmFBbgECSsbuUyokereakra8R7Bml/Uqj
+         FxeAlKT0EJwoEPQG/Uj/3DOXGF8zg8nPamQCAYsQzYxQPOue57DiPsz+ylqbmQsK4aQQ
+         nrxNjswzSKIHQLGZargyj9+3jf/8x9Gr+Xc9tVVK2YMBspIdS5jTn9t26rDLktdyI7tq
+         qArA==
+X-Forwarded-Encrypted: i=1; AJvYcCUCLkP+l0HhB81+mQJjiuFEt/MHgpSTEHz5Y4GNSqntbyU85KXCVdy54zDZux/i7Lv0zUa9wJsChABg+bFyJcCB@vger.kernel.org, AJvYcCUrhkpA3yD31huqwT3gOgIJlSErapBoCOxukAD4mrXX9U2owy0VVxTlY2aIeO6ERYYda3mLnrjP46+Zwhg=@vger.kernel.org, AJvYcCUw3D0D90D4eOGSBA3szzbt+P5d2D6ZFGsdjjOe7RjWXMbD4PKwnVBd0KNW7wvqd3D14DlSecT2@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+q8YBFMLqjX7fzfDj2WIUsvHkJThrLAoZ4oEZrIH65ABK3z7m
+	013yuP+yZyr4gOTjebBrcHbiVaHS2pvqkd+gH5uS0ezSPXKSCbk8
+X-Gm-Gg: ASbGncvnSTNzDKVFZ2NdBouXx182X+/AgwiSqVCob0eF2FBHJGeYaLrOX0vdzBI2CqA
+	YrXIaS3JSpqL4JduKawXpD2PG5xBmTcUQIC10okCh1ze9II1CqQBP/AWwch67DJDjF1ogbp0AjZ
+	TkNqjXVKrgi+tzBUfWkBIkKmBU649+bKfu94JJ71r0VTFse7czs6kBQrFNqhOtDuiQkTwBYRBgt
+	BvwU2IEsB1jWsMdkA1HvofLcUFEyTuVw6GtuLJIaatPleJ76W7DFeb5NyRVZw68+Oi5g8u4C1iJ
+	wmHP16NzESF3aT1Xj1oGtdxneo5VYlbjVZdlG1TM5C+JuS7tpSYigEvRm12p
+X-Google-Smtp-Source: AGHT+IFmbvXOyKZxvGVWBUvMerzCbdiytV10bYYgq4q50QFZJONo5YaTltevwglQioZNDUWeKGKeOA==
+X-Received: by 2002:a17:902:ced1:b0:223:4d5e:7592 with SMTP id d9443c01a7336-22593dde38bmr74884605ad.21.1741741464747;
+        Tue, 11 Mar 2025 18:04:24 -0700 (PDT)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22410a7f700sm104965995ad.144.2025.03.11.18.04.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Mar 2025 18:04:23 -0700 (PDT)
+Date: Wed, 12 Mar 2025 01:04:14 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: "kuba@kernel.org" <kuba@kernel.org>,
+	"razor@blackwall.org" <razor@blackwall.org>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"jarod@redhat.com" <jarod@redhat.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	Tariq Toukan <tariqt@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"shuah@kernel.org" <shuah@kernel.org>,
+	"steffen.klassert@secunet.com" <steffen.klassert@secunet.com>,
+	"jv@jvosburgh.net" <jv@jvosburgh.net>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	Jianbo Liu <jianbol@nvidia.com>
+Subject: Re: [PATCHv5 net 1/3] bonding: fix calling sleeping function in spin
+ lock and some race conditions
+Message-ID: <Z9Ddjgrxv5wQM-wV@fedora>
+References: <20250307031903.223973-1-liuhangbin@gmail.com>
+ <20250307031903.223973-2-liuhangbin@gmail.com>
+ <6dd52efd-3367-4a77-8e7b-7f73096bcb3f@blackwall.org>
+ <20250307090332.5b556ebb@kernel.org>
+ <f9b85a06113e2c9a7a91f3486efc06edbce4e461.camel@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWC002.ant.amazon.com (10.13.139.250) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f9b85a06113e2c9a7a91f3486efc06edbce4e461.camel@nvidia.com>
 
-fib_check_nh_v6_gw() expects that fib6_nh_init() cleans up everything
-when it fails.
+On Tue, Mar 11, 2025 at 09:08:49PM +0000, Cosmin Ratiu wrote:
+> On Fri, 2025-03-07 at 09:03 -0800, Jakub Kicinski wrote:
+> > On Fri, 7 Mar 2025 09:42:49 +0200 Nikolay Aleksandrov wrote:
+> > > TBH, keeping buggy code with a comment doesn't sound good to me.
+> > > I'd rather remove this
+> > > support than tell people "good luck, it might crash". It's better
+> > > to be safe until a
+> > > correct design is in place which takes care of these issues.
+> > 
+> > That's my feeling too, FWIW. I think we knew about this issue
+> > for a while now, the longer we wait the more users we may disrupt
+> > with the revert.
+> 
+> These are preexisting races between the bond link failover and the user
+> removing the xfrm states. Unless the user wants to intentionally
+> trigger these bugs, chances are nobody has ever encountered them in the
+> wild in normal operation. In steady state, bond link failover works,
+> and adding/removing states works. It's the combination of the two
+> control plane events that may have a chance to double free or leak
+> states.
+> 
+> I would not pull everything out just yet.
+> 
+> Today, I managed to find a solution for these races (I think), based on
+> a patch series I am preparing against ipsec-next with other changes
+> related to real_dev.
+> 
+> Hangbin, do you mind if I take over fixing the locking issue as part of
+> my series? I plan to send it upstream the following days.
 
-Commit 7dd73168e273 ("ipv6: Always allocate pcpu memory in a fib6_nh")
-moved fib_nh_common_init() before alloc_percpu_gfp() within fib6_nh_init()
-but forgot to add cleanup for fib6_nh->nh_common.nhc_pcpu_rth_output in
-case it fails to allocate fib6_nh->rt6i_pcpu, resulting in memleak.
+No, I don't mind. Please go ahead to fixing the locking issue. And thanks
+a lot for your reviewing.
 
-Let's call fib_nh_common_release() and clear nhc_pcpu_rth_output in the
-error path.
-
-Note that we can remove the fib6_nh_release() call in nh_create_ipv6()
-later in net-next.git.
-
-Fixes: 7dd73168e273 ("ipv6: Always allocate pcpu memory in a fib6_nh")
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/ipv6/route.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index ef2d23a1e3d5..bc6bcf5d7133 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -3644,7 +3644,8 @@ int fib6_nh_init(struct net *net, struct fib6_nh *fib6_nh,
- 		in6_dev_put(idev);
- 
- 	if (err) {
--		lwtstate_put(fib6_nh->fib_nh_lws);
-+		fib_nh_common_release(&fib6_nh->nh_common);
-+		fib6_nh->nh_common.nhc_pcpu_rth_output = NULL;
- 		fib6_nh->fib_nh_lws = NULL;
- 		netdev_put(dev, dev_tracker);
- 	}
--- 
-2.48.1
-
+Regards
+Hangbin
 
