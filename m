@@ -1,189 +1,125 @@
-Return-Path: <netdev+bounces-174198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F43BA5DD79
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 14:11:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BAC7A5DDBF
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 14:17:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A42E3BAC3E
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 13:10:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F30C1189F5DB
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 13:16:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B9B7244EA0;
-	Wed, 12 Mar 2025 13:10:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B85324A07E;
+	Wed, 12 Mar 2025 13:14:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p4HcCxiF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZC9seZdX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B3523F376;
-	Wed, 12 Mar 2025 13:10:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA4B2459C3;
+	Wed, 12 Mar 2025 13:14:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741785051; cv=none; b=TVrGADGldOo0Z0iBG++zlvWIdwjQ0fezd1RuCph90Jm7sfA5IhJOqqsRz/0szs+ZeFcZmyZsPh2amO9+Tla66VLcAEwD/FI2M+vYbhmBeIr804pEZYcGuQ/o0AUCElStKcwRp4xkZF00UEjZ0/JnEJ3h129gaRfgaZEVxEz35eA=
+	t=1741785288; cv=none; b=Cs624WjwQexP9JxTjN9r3JSX2C5nZgnHkpFFg4A62sz1O6tHG31DPDdilwucWCUiKZjmh3YKRYV9kC2rys8rkpBJ6HHgnqyAVyH36BIiv2bjjZqRBxNKoftPPMLJs5KqlagD4AprJLNudL4pta2NsgNKpUylSx+wePrcbFBixLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741785051; c=relaxed/simple;
-	bh=YxQy9RhnsEnCW0He+QcRzfmTEud041311PAgh672cVA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EUN1piLnIX6a7wXwZA8yFsTstQEiPKH15gFWPbNweoGzOvEuIFQtduWVrOvWDTg6gN10jN+uoDJDc6r2FVjlnjcNlNgrY3ZUcBnk29EB5dfq7O/49FrmFACNFvejtkJ/RCPT1wAB98ury9+FbDSriHpGYlk0CXGkgRW2q9dgNo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p4HcCxiF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C44BAC4CEE3;
-	Wed, 12 Mar 2025 13:10:45 +0000 (UTC)
+	s=arc-20240116; t=1741785288; c=relaxed/simple;
+	bh=bj4Hh4tMMBh20XLZFjrHDGSBRCbHwQeMRZSmr4V2M6E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uXqivqgnGNtfhJ36QkuopaZZfcB23ENqpmQ0T9Wmu4yD7H2uvFg9MEnrNSPpEkNxgh9hbrnOXBABIvbVPuMg4kB/A7Zo78WXYWbgs8Qy5VgPeevUujpzoIlYj31yFWR0oLJ4l1AjjmvYbCCkJQT3N80GV0mng4/ylApr9JUUNPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZC9seZdX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6448C4CEE3;
+	Wed, 12 Mar 2025 13:14:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741785050;
-	bh=YxQy9RhnsEnCW0He+QcRzfmTEud041311PAgh672cVA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=p4HcCxiFBWmpauxxm8J+cPbbtoikXoBLGSXUlTT4nSsTCkbhJaStYP1Pj359dDopB
-	 M/llB79dsdIjfh3IU2OznoPlZpKoI/jiRD034op4kzjZytT4wUla6xxn31XWUz0bn/
-	 UGSh9GaHADSMCX1d6wKmZdXR1lbLStXvbagtx9WbR03Xos4zBj2iYmLRwSJuI+7cBh
-	 bv7oGr5qCIDdR2BmfpPMm2wUFYZs2rl+aVmuvHEVuB4agKDDqySL8k8hSajtuZbN2f
-	 CeOTZO3RjN3uwfMfdF5AkvXWfeQwPYgJc7lVNeFWLfX98dL2unIlngujfbO1RrOhFs
-	 eRzbVz8pSyJZQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
-	ap420073@gmail.com,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net] selftests: drv-net: use defer in the ping test
-Date: Wed, 12 Mar 2025 14:10:40 +0100
-Message-ID: <20250312131040.660386-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.48.1
+	s=k20201202; t=1741785287;
+	bh=bj4Hh4tMMBh20XLZFjrHDGSBRCbHwQeMRZSmr4V2M6E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZC9seZdX4OCdQxwTPmM+9rJ8TxwNF+iDKBzAFMSTDAa1LGaUCL2+aHIkuCPTLb50P
+	 dfFC8dsmnGHWObghyn9QNLopPGsr8GFSYNt562ha4WIH0KZuBbcS2fIgV0AWVgZNtJ
+	 nj79NTYu2dN/N2UDRdXrTPC1+PNi1JhbAgXsDaujw0sDzWwX/wo8KGgelA63rYWWv4
+	 Pje25+0MmpBoz/BEs3HKNMNlcZww6AibXJCE8ns5eOlIF65YdEyccN00XPuPXaXpGU
+	 48W4e534yJPkt7d/pvKM57P0abGYcZ+Vj+Cwp3oMZ0wFz2MDP27Xm2k2tQ6ZfFzBJb
+	 GNLS6cU5ncEGg==
+Date: Wed, 12 Mar 2025 14:14:33 +0100
+From: Simon Horman <horms@kernel.org>
+To: deller@kernel.org
+Cc: netdev@vger.kernel.org, linux-parisc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Helge Deller <deller@gmx.de>
+Subject: Re: [PATCH] net: tulip: avoid unused variable warning
+Message-ID: <20250312131433.GS4159220@kernel.org>
+References: <20250309214238.66155-1-deller@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250309214238.66155-1-deller@kernel.org>
 
-Make sure the test cleans up after itself. The XDP off statements
-at the end of the test may not be reached.
+On Sun, Mar 09, 2025 at 10:42:38PM +0100, deller@kernel.org wrote:
+> From: Helge Deller <deller@gmx.de>
+> 
+> When compiling with W=1 and CONFIG_TULIP_MWI=n one gets this warning:
+>  drivers/net/ethernet/dec/tulip/tulip_core.c: In function ‘tulip_init_one’:
+>  drivers/net/ethernet/dec/tulip/tulip_core.c:1309:22: warning: variable ‘force_csr0’ set but not used
+> 
+> Avoid it by annotating the variable __maybe_unused, which seems to be
+> the easiest solution.
+> 
+> Signed-off-by: Helge Deller <deller@gmx.de>
 
-Fixes: 75cc19c8ff89 ("selftests: drv-net: add xdp cases for ping.py")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: shuah@kernel.org
-CC: ap420073@gmail.com
-CC: linux-kselftest@vger.kernel.org
----
- tools/testing/selftests/drivers/net/ping.py | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+Hi Helge,
 
-diff --git a/tools/testing/selftests/drivers/net/ping.py b/tools/testing/selftests/drivers/net/ping.py
-index 93f4b411b378..fc69bfcc37c4 100755
---- a/tools/testing/selftests/drivers/net/ping.py
-+++ b/tools/testing/selftests/drivers/net/ping.py
-@@ -7,7 +7,7 @@ from lib.py import ksft_run, ksft_exit
- from lib.py import ksft_eq, KsftSkipEx, KsftFailEx
- from lib.py import EthtoolFamily, NetDrvEpEnv
- from lib.py import bkg, cmd, wait_port_listen, rand_port
--from lib.py import ethtool, ip
-+from lib.py import defer, ethtool, ip
+A few thoughts on this:
+
+Firstly, thanks for your patch, which I agree addresses the problem you
+have described.
+
+However, AFAIK, this is a rather old driver and I'm not sure that
+addressing somewhat cosmetic problems are worth the churn they cause:
+maybe it's best to leave it be.
+
+But if we do want to fix this problem, I do wonder if the following
+solution, which leverages IS_ENABLED, is somehow nicer as
+it slightly reduces the amount of conditionally compiled code,
+thus increasing compile test coverage.
+
+diff --git a/drivers/net/ethernet/dec/tulip/tulip_core.c b/drivers/net/ethernet/dec/tulip/tulip_core.c
+index 27e01d780cd0..75eac18ff246 100644
+--- a/drivers/net/ethernet/dec/tulip/tulip_core.c
++++ b/drivers/net/ethernet/dec/tulip/tulip_core.c
+@@ -1177,7 +1177,6 @@ static void set_rx_mode(struct net_device *dev)
+ 	iowrite32(csr6, ioaddr + CSR6);
+ }
  
- remote_ifname=""
- no_sleep=False
-@@ -60,6 +60,7 @@ no_sleep=False
-     prog = test_dir + "/../../net/lib/xdp_dummy.bpf.o"
-     cmd(f"ip link set dev {remote_ifname} mtu 1500", shell=True, host=cfg.remote)
-     cmd(f"ip link set dev {cfg.ifname} mtu 1500 xdpgeneric obj {prog} sec xdp", shell=True)
-+    defer(cmd, f"ip link set dev {cfg.ifname} xdpgeneric off")
+-#ifdef CONFIG_TULIP_MWI
+ static void tulip_mwi_config(struct pci_dev *pdev, struct net_device *dev)
+ {
+ 	struct tulip_private *tp = netdev_priv(dev);
+@@ -1251,7 +1250,6 @@ static void tulip_mwi_config(struct pci_dev *pdev, struct net_device *dev)
+ 		netdev_dbg(dev, "MWI config cacheline=%d, csr0=%08x\n",
+ 			   cache, csr0);
+ }
+-#endif
  
-     if no_sleep != True:
-         time.sleep(10)
-@@ -68,7 +69,9 @@ no_sleep=False
-     test_dir = os.path.dirname(os.path.realpath(__file__))
-     prog = test_dir + "/../../net/lib/xdp_dummy.bpf.o"
-     cmd(f"ip link set dev {remote_ifname} mtu 9000", shell=True, host=cfg.remote)
-+    defer(ip, f"link set dev {remote_ifname} mtu 1500", host=cfg.remote)
-     ip("link set dev %s mtu 9000 xdpgeneric obj %s sec xdp.frags" % (cfg.ifname, prog))
-+    defer(ip, f"link set dev {cfg.ifname} mtu 1500 xdpgeneric off")
+ /*
+  *	Chips that have the MRM/reserved bit quirk and the burst quirk. That
+@@ -1463,10 +1461,9 @@ static int tulip_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
  
-     if no_sleep != True:
-         time.sleep(10)
-@@ -78,6 +81,7 @@ no_sleep=False
-     prog = test_dir + "/../../net/lib/xdp_dummy.bpf.o"
-     cmd(f"ip link set dev {remote_ifname} mtu 1500", shell=True, host=cfg.remote)
-     cmd(f"ip -j link set dev {cfg.ifname} mtu 1500 xdp obj {prog} sec xdp", shell=True)
-+    defer(ip, f"link set dev {cfg.ifname} mtu 1500 xdp off")
-     xdp_info = ip("-d link show %s" % (cfg.ifname), json=True)[0]
-     if xdp_info['xdp']['mode'] != 1:
-         """
-@@ -94,10 +98,11 @@ no_sleep=False
-     test_dir = os.path.dirname(os.path.realpath(__file__))
-     prog = test_dir + "/../../net/lib/xdp_dummy.bpf.o"
-     cmd(f"ip link set dev {remote_ifname} mtu 9000", shell=True, host=cfg.remote)
-+    defer(ip, f"link set dev {remote_ifname} mtu 1500", host=cfg.remote)
-     try:
-         cmd(f"ip link set dev {cfg.ifname} mtu 9000 xdp obj {prog} sec xdp.frags", shell=True)
-+        defer(ip, f"link set dev {cfg.ifname} mtu 1500 xdp off")
-     except Exception as e:
--        cmd(f"ip link set dev {remote_ifname} mtu 1500", shell=True, host=cfg.remote)
-         raise KsftSkipEx('device does not support native-multi-buffer XDP')
+ 	INIT_WORK(&tp->media_work, tulip_tbl[tp->chip_id].media_task);
  
-     if no_sleep != True:
-@@ -111,6 +116,7 @@ no_sleep=False
-         cmd(f"ip link set dev {cfg.ifname} xdpoffload obj {prog} sec xdp", shell=True)
-     except Exception as e:
-         raise KsftSkipEx('device does not support offloaded XDP')
-+    defer(ip, f"link set dev {cfg.ifname} xdpoffload off")
-     cmd(f"ip link set dev {remote_ifname} mtu 1500", shell=True, host=cfg.remote)
+-#ifdef CONFIG_TULIP_MWI
+-	if (!force_csr0 && (tp->flags & HAS_PCI_MWI))
++	if (IS_ENABLED(CONFIG_TULIP_MWI) && !force_csr0 &&
++	    (tp->flags & HAS_PCI_MWI))
+ 		tulip_mwi_config (pdev, dev);
+-#endif
  
-     if no_sleep != True:
-@@ -157,7 +163,6 @@ no_sleep=False
-     _test_v4(cfg)
-     _test_v6(cfg)
-     _test_tcp(cfg)
--    ip("link set dev %s xdpgeneric off" % cfg.ifname)
- 
- def test_xdp_generic_mb(cfg, netnl) -> None:
-     _set_xdp_generic_mb_on(cfg)
-@@ -169,7 +174,6 @@ no_sleep=False
-     _test_v4(cfg)
-     _test_v6(cfg)
-     _test_tcp(cfg)
--    ip("link set dev %s xdpgeneric off" % cfg.ifname)
- 
- def test_xdp_native_sb(cfg, netnl) -> None:
-     _set_xdp_native_sb_on(cfg)
-@@ -181,7 +185,6 @@ no_sleep=False
-     _test_v4(cfg)
-     _test_v6(cfg)
-     _test_tcp(cfg)
--    ip("link set dev %s xdp off" % cfg.ifname)
- 
- def test_xdp_native_mb(cfg, netnl) -> None:
-     _set_xdp_native_mb_on(cfg)
-@@ -193,14 +196,12 @@ no_sleep=False
-     _test_v4(cfg)
-     _test_v6(cfg)
-     _test_tcp(cfg)
--    ip("link set dev %s xdp off" % cfg.ifname)
- 
- def test_xdp_offload(cfg, netnl) -> None:
-     _set_xdp_offload_on(cfg)
-     _test_v4(cfg)
-     _test_v6(cfg)
-     _test_tcp(cfg)
--    ip("link set dev %s xdpoffload off" % cfg.ifname)
- 
- def main() -> None:
-     with NetDrvEpEnv(__file__) as cfg:
-@@ -213,7 +214,6 @@ no_sleep=False
-                   test_xdp_native_mb,
-                   test_xdp_offload],
-                  args=(cfg, EthtoolFamily()))
--        set_interface_init(cfg)
-     ksft_exit()
- 
- 
--- 
-2.48.1
+ 	/* Stop the chip's Tx and Rx processes. */
+ 	tulip_stop_rxtx(tp);
 
 
