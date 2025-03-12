@@ -1,118 +1,131 @@
-Return-Path: <netdev+bounces-174294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E065A5E2ED
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 18:44:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9F21A5E300
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 18:46:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48DE67A7FE8
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 17:43:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 197EB16E275
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 17:46:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDE621E8327;
-	Wed, 12 Mar 2025 17:44:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF956155A4E;
+	Wed, 12 Mar 2025 17:46:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="PjNjRf+z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QkbtMX8g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f66.google.com (mail-ed1-f66.google.com [209.85.208.66])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 984191D5165
-	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 17:44:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A2FF200CB
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 17:46:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741801455; cv=none; b=O5QWwzENUkpHhD7x2cNfWNrOUHOoMiTQlU0YqDl6/FDdwFsz7Rsfasy4x9HsSh1wCPPr3tghGDjJKe64T8DSsvp8In0st0cEOmWoqCLdjdJpA6pz3JSMtpANoS9uXZgMZqgidaAw0JUKvJa7bOAZpHQgmdOtH56teuYspPT7Sww=
+	t=1741801603; cv=none; b=Ryb7ZyTra/6BYJl7KHcoHo9xoMRcWFULJSJki9mR1Gr+vAI4N00z7E3u5oeHiPHQO4PTSN68A+tlSsvISQzSznS6apNM2hNfOuLXTJFVikddw7RRKHEaHE8CFXWpp1e6TD+6xGyr9gFHS+phMqptxYQmcubZAn4xPQnbw69RJQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741801455; c=relaxed/simple;
-	bh=O06yWwsLTuIDqpF0jLnSB9l1QccuJgStDsf6D4XXw58=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fHgc4f2oLgKhiCtBA9OvCXvVw4rFm6FWTmCXEvqLWM/NxGDXJbx7MprOEu8VUBdCvPlNmf5pH7QDw+KHuVFefAfF9wXBynzQ0m8IyQMPIWr9PmIg+nVk1NrhB8AgF7XPmcSPIhEGcvNnHhnYpXkjoIW7JPcxBwb1mbJdZMMR6TI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=PjNjRf+z; arc=none smtp.client-ip=209.85.208.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ed1-f66.google.com with SMTP id 4fb4d7f45d1cf-5ded500589aso6665a12.0
-        for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 10:44:13 -0700 (PDT)
+	s=arc-20240116; t=1741801603; c=relaxed/simple;
+	bh=mO0TeuHXYHIY/u094B9NyOQzbS4Jn23AsmtovLcbC20=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=dMc6pzfxAnVdHhD7MMwBy8DHf1KuogAY3/tkoiYEWyMrvzyiDs8upHdQuUf5Vp/GKGIoSKfrKB6UyIqcYAVyM0qOVeFNXFFKTjOI/bWZ3t1QnQuXfZOsM9gJOnbiTwERou6EHfVVMppKUFIf6IT0bpfYo4bNql8VomsPbqM1jTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QkbtMX8g; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7c55b53a459so1934885a.3
+        for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 10:46:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1741801452; x=1742406252; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1Me1d7jsgcXR/Dothc/0XiINADL8YMQoy8O6gl8JEjM=;
-        b=PjNjRf+zjg+f/bkhqfRvbDAMJt1j48N0qNPvpXbKmq4y6lvWGerteyxIIthU+WCNOl
-         p8ebryJu8Ym5SCSGpa0Cj99crLHJRMUJXRv0dvDeBVcO6Iv+lvV5bgwh08R8EPNWDVPQ
-         JZU8BUedHVt0g6DeWPsRdAjTq7nbGuc1EPbIIOaMLKuSEQdt1Qm1fCmZ7lbdlaSfjXp9
-         8PaF0WAITC2zlCTPa/xggXqy+xhdTqXeg5+bpetLUkS1bbqpzjbgYL2KW864FDJTnSD1
-         gKzMPDsf3F7lSvDAYTrRyxrBRb/ERqN4EaTvETsp7FDN6IU9qWee9SmREeWWC/tjdE/1
-         oYLw==
+        d=gmail.com; s=20230601; t=1741801601; x=1742406401; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ls/PGYhkhYVjJiF6D8Ypi7RCb/Qg3sfk+aATfYNdAYc=;
+        b=QkbtMX8gryVVU0YTfFVD9t7bmt9t2CGSs8X0Ow+1RcZP9E/1NviAUBtIZ2vGpvCGUU
+         39b5QmNQzcDs+UggAKWOwtNcaE9GPc70O/gIoSFIC9K1MRyy2O7Lul4LR8t6sPxJT9VS
+         czyYx+hbi6CP2/9ZXwhr/Z9eW7qR/dLHV1tBwCJWKpDC9ZYNaxD5x80ArBwnpxesVg2s
+         sjlXww2+11J0QmZ/ksODVxq8fCE7nhys1VPobngdHYlf43UaMex4PcBu3GFmzLJzQUHe
+         b+VY8r6t9e6Wvp4FVr+CEthVW7W2JqpYScKOGwSGhyK3kiPU24hAmEa1gPz46cVX0BXI
+         WbxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741801452; x=1742406252;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Me1d7jsgcXR/Dothc/0XiINADL8YMQoy8O6gl8JEjM=;
-        b=t4dhE2ANjL31gl60vfwVTwHu2GX+1xW0HJLTFQ3rmK+yog5/6wPU4RRQn7YyvET1ck
-         OLEG8z073HiARvbj6mzziI2V2luPD8yiSYd3mu5eStPRGZcWihFQtufc74tYFd+AVbu6
-         qls3A67QuTMuU8r+fWZntN8d11+759Z22tv27T3G/SrFkcDxs/vC12t8VEMfSdAACIAz
-         w5wJUBi5bRPLrufw/gqebcI8NpCLQ545M8v8vOSQ54i0KJYIcpXVIzBpxC28EW9m2dAD
-         pkQ2D9nObHxtkxiuc3Od89r2dU8JgQw12aMG0ur2JK/yOKohv9npXKd9dpOjWpiZh3WZ
-         PH4g==
-X-Forwarded-Encrypted: i=1; AJvYcCUU0FGC+Ue5g3murnB5RtIBCn8WzL+YsZ/XtMMYAc6+fKjXqFULA+41nBqmEdbEq947NE2nz5U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2Ecpzz5LG8L+lff+J7cjKRJVa9quH3A5+sQsY1wvGuzQBj3v0
-	P1G8jWwY1G9qm9hNwZpsYOcWAl063nrhK3/a9/MaWUf5/LjIGjWVFxIFqCDo55A=
-X-Gm-Gg: ASbGncttTNIUf7heEyjP/NN6krO97tJovMJp+SebxyUVOkchxkqqWeey4tONn7NZrqX
-	LWo2Yp/41/gwf/6VeQpN0t0sR8XY65p6R+fUR9Pk0FJbNcCChzz27rD92icpkT5S6tm++Yb7eWV
-	JbSfiAFzgt5yk4FAqY/W9VpFfAYb8tkgB4uL2KaKcA9rT+lzmrk5jSC7gWBPGFLgb56z4LlD+Zc
-	raNddK13Y+i0hS6G+lTSfb/5enL3F7SHEFKyzwikRU6xBhwLxT7Bvk/w0nTHYX3Oi1tSzXiVzVZ
-	DOEYUf/H3L9LNQJG3oy1p/doIEFzlfvSYWBDIEZxO4G+/u6YHO0fBIxQz9lhUtj7LtTpaXiH6ch
-	SIB2yz/VUQyqXsU3FeD8=
-X-Google-Smtp-Source: AGHT+IHlyFWbL5gDujKGJhqntuqOOZoA5EhDToaXEPWUGaGZy5NNDq6/XTq3A9PjlZscDdnDMKDcRw==
-X-Received: by 2002:a17:907:360c:b0:ac0:b71e:44e1 with SMTP id a640c23a62f3a-ac27137e457mr851991366b.6.1741801451824;
-        Wed, 12 Mar 2025 10:44:11 -0700 (PDT)
-Received: from [192.168.0.185] (77-59-158-88.dclient.hispeed.ch. [77.59.158.88])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e5c74a8e0asm9866140a12.39.2025.03.12.10.44.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Mar 2025 10:44:11 -0700 (PDT)
-Message-ID: <318ad96d-99ba-4c53-a08d-7f257dbc3d6a@suse.com>
-Date: Wed, 12 Mar 2025 18:44:10 +0100
+        d=1e100.net; s=20230601; t=1741801601; x=1742406401;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Ls/PGYhkhYVjJiF6D8Ypi7RCb/Qg3sfk+aATfYNdAYc=;
+        b=bW5TwdTovIAxb1G0eeOjjtgMXAKV1QDVjhEMmUF4bg4U9P/+WF5ul1LyLkBqWqMuH9
+         gsn7bF1OA6lPbEpU6wzzAe6vOOJCzywATmTgx9+WEsRQUu4aZgOOASee/3A1WMlMu0OR
+         pKvarQlbMg4Gt4Rm5eTmIu0nql41qtC6gJrSh5HZzkRzkPWvBYi7shbWraRVTd2tkiLV
+         h3Qf37Hp0Si1SgWYCn2dbw+qqH+Gt8RaCoKZ0a27zrKwDkFQCPRd4v3BMRVeVZ52WRu2
+         hVMZPopUq9BpGWsf0I03vMkeZIOfRR6EYh949Ci4zraG1Du+CtECZqIdZOJOZ+AbWoJp
+         dL5A==
+X-Forwarded-Encrypted: i=1; AJvYcCVw+bXw1efa4eOBPuJiq/SlGcqfUb2UT4IYcfyYO/eNktTcJIZkXMvRHg1nhIPzCFbebGIfThU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy34+ADfgSk2IQgK2IuumxkNEUWY8/7QYB8nhsYKKMxvbGjZViD
+	yKsdrixApe6BeiQ0syE4U0Yf4uxyFpgB+jB8bjA5jzhliHuDvHhI63JFPQ==
+X-Gm-Gg: ASbGncvgVyPUj+wec/n6ymEhr0sb/06zJomSBtlU6Awq6MAdyI0x/eB7RBnHC8G1p/U
+	BLDexgTF0jgDX//A/kZ6edDj425SudoKASfAXHq+4LHUL5dtkCJuPptuY2Cf8ddN42LGy/PARqu
+	bNx2qtouTPfGM8yVa5zOHY2ytk9ARNyPoSmOblOEjQDYpbb4QzWiAKZSkz4P3kpNziThMix+qI/
+	3BCdNZPUXWiEuPluns0pQ0w2z2T8Lkh3UlHmk/BewYJvv0LwW5hojhoY+aqLTQuhN9roTfSj4Du
+	yLnopsSgsa8prNcfkP07OjkXD6BXGjgj8lKZC7suuLxAgUqM4IUpjptWUvxe37KCOdWsVal65lT
+	rx6oYZYIlUVPeVYn3O22h4A==
+X-Google-Smtp-Source: AGHT+IHNaO/9voibYylvBoRrrAymSK7gUYjvfNVOvMaIMhlf1WRmCk/j0mfeQJSCEhX7r/yqtWrwhQ==
+X-Received: by 2002:a05:620a:600d:b0:7c5:4949:23e9 with SMTP id af79cd13be357-7c54949255cmr2447849985a.6.1741801600942;
+        Wed, 12 Mar 2025 10:46:40 -0700 (PDT)
+Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-476ae289d35sm10991681cf.17.2025.03.12.10.46.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Mar 2025 10:46:40 -0700 (PDT)
+Date: Wed, 12 Mar 2025 13:46:39 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Simon Horman <horms@kernel.org>, 
+ David Ahern <dsahern@kernel.org>, 
+ kuniyu@amazon.com
+Message-ID: <67d1c87fa3783_38d99f29416@willemb.c.googlers.com.notmuch>
+In-Reply-To: <4d5c319c4471161829f50cb8436841de81a5edae.1741718157.git.pabeni@redhat.com>
+References: <cover.1741718157.git.pabeni@redhat.com>
+ <4d5c319c4471161829f50cb8436841de81a5edae.1741718157.git.pabeni@redhat.com>
+Subject: Re: [PATCH v4 net-next 1/2] udp_tunnel: create a fastpath GRO lookup.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH] net: enable SO_REUSEPORT for AF_TIPC sockets
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: edumazet@google.com, netdev@vger.kernel.org
-References: <dec1f621-a770-4c9a-89e9-e0f26ab470e2@suse.com>
- <20250312163652.83267-1-kuniyu@amazon.com>
-Content-Language: fr
-From: Nicolas Morey <nicolas.morey@suse.com>
-In-Reply-To: <20250312163652.83267-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-On 2025-03-12 17:35, Kuniyuki Iwashima wrote:
-> From: Nicolas Morey <nicolas.morey@suse.com>
-> Date: Wed, 12 Mar 2025 14:48:01 +0100
->> Commit 5b0af621c3f6 ("net: restrict SO_REUSEPORT to inet sockets") disabled
->> SO_REUSEPORT for all non inet sockets, including AF_TIPC sockets which broke
->> one of our customer applications.
->> Re-enable SO_REUSEPORT for AF_TIPC to restore the original behaviour.
+Paolo Abeni wrote:
+> Most UDP tunnels bind a socket to a local port, with ANY address, no
+> peer and no interface index specified.
+> Additionally it's quite common to have a single tunnel device per
+> namespace.
 > 
-> AFAIU, AF_TIPC does not actually implement SO_REUSEPORT logic, no ?
-> If so, please tell your customer not to set it on AF_TIPC sockets.
+> Track in each namespace the UDP tunnel socket respecting the above.
+> When only a single one is present, store a reference in the netns.
 > 
-> There were similar reports about AF_VSOCK and AF_UNIX, and we told
-> that the userspace should not set SO_REUSEPORT for such sockets
-> that do not support the option.
+> When such reference is not NULL, UDP tunnel GRO lookup just need to
+> match the incoming packet destination port vs the socket local port.
 > 
-> https://lore.kernel.org/stable/CAGxU2F57EgVGbPifRuCvrUVjx06mrOXNdLcPdqhV9bdM0VqGvg@mail.gmail.com/
-> https://github.com/amazonlinux/amazon-linux-2023/issues/901
+> The tunnel socket never sets the reuse[port] flag[s]. When bound to no
+> address and interface, no other socket can exist in the same netns
+> matching the specified local port.
 > 
+> Matching packets with non-local destination addresses will be
+> aggregated, and eventually segmented as needed - no behavior changes
+> intended.
 > 
-Isn't the sk_reuseport inherited/used by the underlying UDP socket ?
+> Note that the UDP tunnel socket reference is stored into struct
+> netns_ipv4 for both IPv4 and IPv6 tunnels. That is intentional to keep
+> all the fastpath-related netns fields in the same struct and allow
+> cacheline-based optimization. Currently both the IPv4 and IPv6 socket
+> pointer share the same cacheline as the `udp_table` field.
+> 
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 
-Nicolas
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
