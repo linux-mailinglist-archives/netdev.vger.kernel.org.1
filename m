@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-174143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75E1EA5D99B
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 10:35:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E491A5D99E
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 10:35:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7A5D3B6342
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 09:35:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 344A1189BEC8
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 09:35:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0308C23BCF4;
-	Wed, 12 Mar 2025 09:35:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 317CE23A9B7;
+	Wed, 12 Mar 2025 09:35:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="X7IJpKnr"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="GlEk33Gr"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 142E517BB6;
-	Wed, 12 Mar 2025 09:35:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24385236A62;
+	Wed, 12 Mar 2025 09:35:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741772117; cv=none; b=ljf11FizNSdZlu/Z12dRB0KBJwE/JnT0X+umbqveLAYnw9dfuw5gnNrg4Ks4OCKYGaVeNF7ExGBGqQj+SPdrtw5/CnknSCBhj5yAFKSK0XqI5uLNbKzq+CyiOnAo8U7N4sT4b2d+yp/836mYqGAHTHF6khIPpMJUVY2cRdnV6p0=
+	t=1741772125; cv=none; b=QM0jRw7q7/6Ld9gnTMDNvXlo0TSrKohVIJOxFtmMr2kcHPtQz1FAZ/kzqPK14+tbuSt1hYqsBgM+i0VBmqYLa4059bE/+d7UVTONKaClOUU5ZD4MTfQs+RyvCuW79J7OObtKh3xTS1hlIuSqzBh2XLsv+vF6JS1j5O/qDjTzlgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741772117; c=relaxed/simple;
-	bh=EbqFigB/rACpiBc5IEuy5oZksTCmTjC+erFhm6xiNGQ=;
+	s=arc-20240116; t=1741772125; c=relaxed/simple;
+	bh=NogcCfyGdnhLsMDsQcJh0+yqnTJWn735ukbYkD2w19o=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=guaRdph42HoE5z/dEtwlvwHsAD2raWBbwyaQnIB1OGXc1jIxBZKsfFwKrbQGhUpeYJodOOyBDGa3RzwRLPmkRNybYHRO8DTqs3PDFLdFxMigCCBVinDLi1gph0KRl+5AxImU/ibQWDd9DlvE6NSpqL6CU5s478el/xUUxKz0pnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=X7IJpKnr; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=nhPvSQXo8HSMS9J86Jkk1vM5uVjE8gabY8qrdrDoikbXaFjgB6RYGbondiOOMkq+/QyVkIZqKNzOMegBEZXaz1yUBXfRSy8kE8doEhiLLMbfiY3KJiG6BAZ/XFNpxbe1VKxbiBAjmiwmf0Ol4fUn5WPeX5D10phYwi2+9vGz8SQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=GlEk33Gr; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=WlnjW2BpfjiM63UcojgauSdWRDJorCLGfJ2ZQigHONw=; b=X7IJpKnrsZz4mMD/Y0Imd0BscY
-	ScXYdYmGGHGxceZABGH59dKp6Op9aD6N+QknONUFwhjdzmLrB1JoE+PsYvugL8vWxnuFbfKUx7XAi
-	VEDp3Oc4nYVDL+5TQHgU0c7U6wQHIPi/qVz5A/1YrKHwhemAqcu9zAFG3SGbdPFS5aa15Vy366BfO
-	UTmmU1lHl/mLEjniFwD3m95kk4T8lhPNCKvVHZrwttWqEeGkI6wl87mQHSzC85vsZ6i3VTH1dK8gH
-	B6/yYn4HNBY771Peqn7tumWy1Hpmw1YBOpmcgSdAkcaWU4TmmMiXHEDJDOgr2DM5haKaqBE4GBjzs
-	mpTA2naw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:38170 helo=rmk-PC.armlinux.org.uk)
+	bh=DHaJAgb84V8aMUutZwPQWCAxCUaidjZX4yslhRdqYrw=; b=GlEk33Gr20vSQ1U/WmZQrUvuv4
+	0wDgnVjVs5p2U4+9QqvOdo29ivNfG8tpPmwqAJ3TlwxDkf6CKj8ozDOszGu/VW+v5KJ1UFEqPRzhf
+	nvxvTMqC1x046wdSql8UQ9fO6HdNLVb6zvBujE6N+gqYIUcitejlCclEmnzk1oFn+EdRIJP2em33O
+	NmeEKc+J8NovkCCW7t+BL6hFGG926PWwkmr3GQNiAe/8MShwmEMDK554o5bebfA+HCLSj2Jy/crSU
+	6jZq/Kw8oEAR6icqV41hrhcy7vuzVLYQq5BlQR1CgqxxONYlmr0ZiwRwXBFk4q+HGfK6qnEaTyNX6
+	a0pobD+Q==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:38172 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tsIUS-0005Hh-0g;
-	Wed, 12 Mar 2025 09:35:04 +0000
+	id 1tsIUY-0005I1-0p;
+	Wed, 12 Mar 2025 09:35:10 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tsIU5-005vGR-4c; Wed, 12 Mar 2025 09:34:41 +0000
+	id 1tsIUA-005vGX-8A; Wed, 12 Mar 2025 09:34:46 +0000
 In-Reply-To: <Z9FVHEf3uUqtKzyt@shell.armlinux.org.uk>
 References: <Z9FVHEf3uUqtKzyt@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -83,7 +83,7 @@ Cc: Albert Ou <aou@eecs.berkeley.edu>,
 	Paul Walmsley <paul.walmsley@sifive.com>,
 	Rob Herring <robh@kernel.org>,
 	Samin Guo <samin.guo@starfivetech.com>
-Subject: [PATCH net-next v2 4/7] riscv: dts: starfive: remove
+Subject: [PATCH net-next v2 5/7] ARM: dts: stm32: remove
  "snps,en-tx-lpi-clockgating" property
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -94,46 +94,37 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tsIU5-005vGR-4c@rmk-PC.armlinux.org.uk>
+Message-Id: <E1tsIUA-005vGX-8A@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 12 Mar 2025 09:34:41 +0000
+Date: Wed, 12 Mar 2025 09:34:46 +0000
 
 Whether the MII transmit clock can be stopped is primarily a property
 of the PHY (there is a capability bit that should be checked first.)
 Whether the MAC is capable of stopping the transmit clock is a separate
 issue, but this is already handled by the core DesignWare MAC code.
 
-As commit "net: stmmac: starfive: use PHY capability for TX clock stop"
+As commit "net: stmmac: stm32: use PHY capability for TX clock stop"
 adds the flag to use the PHY capability, remove the DT property that is
 now unecessary.
 
 Cc: Samin Guo <samin.guo@starfivetech.com>
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- arch/riscv/boot/dts/starfive/jh7110.dtsi | 2 --
- 1 file changed, 2 deletions(-)
+ arch/arm/boot/dts/st/stm32mp151.dtsi | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/arch/riscv/boot/dts/starfive/jh7110.dtsi b/arch/riscv/boot/dts/starfive/jh7110.dtsi
-index 0d8339357bad..a7aed4a21b65 100644
---- a/arch/riscv/boot/dts/starfive/jh7110.dtsi
-+++ b/arch/riscv/boot/dts/starfive/jh7110.dtsi
-@@ -1022,7 +1022,6 @@ gmac0: ethernet@16030000 {
- 			snps,force_thresh_dma_mode;
- 			snps,axi-config = <&stmmac_axi_setup>;
- 			snps,tso;
--			snps,en-tx-lpi-clockgating;
- 			snps,txpbl = <16>;
- 			snps,rxpbl = <16>;
- 			starfive,syscon = <&aon_syscon 0xc 0x12>;
-@@ -1053,7 +1052,6 @@ gmac1: ethernet@16040000 {
- 			snps,force_thresh_dma_mode;
- 			snps,axi-config = <&stmmac_axi_setup>;
- 			snps,tso;
--			snps,en-tx-lpi-clockgating;
- 			snps,txpbl = <16>;
- 			snps,rxpbl = <16>;
- 			starfive,syscon = <&sys_syscon 0x90 0x2>;
+diff --git a/arch/arm/boot/dts/st/stm32mp151.dtsi b/arch/arm/boot/dts/st/stm32mp151.dtsi
+index b9a87fbe971d..0daa8ffe2ff5 100644
+--- a/arch/arm/boot/dts/st/stm32mp151.dtsi
++++ b/arch/arm/boot/dts/st/stm32mp151.dtsi
+@@ -1781,7 +1781,6 @@ ethernet0: ethernet@5800a000 {
+ 				st,syscon = <&syscfg 0x4>;
+ 				snps,mixed-burst;
+ 				snps,pbl = <2>;
+-				snps,en-tx-lpi-clockgating;
+ 				snps,axi-config = <&stmmac_axi_config_0>;
+ 				snps,tso;
+ 				access-controllers = <&etzpc 94>;
 -- 
 2.30.2
 
