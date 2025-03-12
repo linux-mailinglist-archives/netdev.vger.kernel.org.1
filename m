@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-174397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 122CAA5E785
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 23:35:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 257CEA5E786
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 23:35:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AAF591899DBE
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 22:35:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1978D189B2D2
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 22:35:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 879511F0E2C;
-	Wed, 12 Mar 2025 22:35:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B80B1EF08D;
+	Wed, 12 Mar 2025 22:35:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="beB8sxUb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SnWYRd/8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 640201F0E26
-	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 22:35:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBAAE1EFFBA
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 22:35:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741818928; cv=none; b=ZXDlh4axUq5VJY6ogZesUpULwnP+HwFoSAYTRrspAmEqe1vfuNbhb5AQWAsLr/e9yVPAfPUIFAjualnS0GCupjz3979N+O1s+Z7oifNU2LESKKgKbRsrbS0noxamp0RZRUvcH3CbUs+/SAXerk+ylyKAkhc9F64w7UaCPdwUJLM=
+	t=1741818931; cv=none; b=kNDPWr4bfMDKbtp3VezvpRXVSQ/GrjtrFtPN7IiL5ZuVH0Ljq0G9dgEuqtQClkvcIZpPA9ws800vDejcE0VKXw0Wpk8LaM68b8t5olVw7h671292KJffd1lMG23bIPkGYM17zahWbiaNw70l107cwYeSzQYHBE3Zoh6PEdoIj6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741818928; c=relaxed/simple;
-	bh=ju48Qgbreq1JnAKm3gumpOguqdUyJKjT2HnadJSjg1w=;
+	s=arc-20240116; t=1741818931; c=relaxed/simple;
+	bh=IwfCs1DnF0SiqPf/BkI1aSOJGuYCy0ETeAjtkyZv1FY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RnqY3Iv3j4R8gm03WbvGe/Utw1eFb4q3+bcRXsynwx9IySUIoaYOnZV40sk9fZ1ILQDTZjT6uSLDuxH1vhs1785psGuILMKCuadvN86F63uCRubx8bAJuJWk3Oua3fSOHCYus+uaRap7VhQtzoR+jx6ytZBilr0LFj/pNOgS1fc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=beB8sxUb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEFA7C4CEDD;
-	Wed, 12 Mar 2025 22:35:25 +0000 (UTC)
+	 MIME-Version; b=IurryJuLmn8lmJUqjJsW3q6/yBvWMNg1Ri3VMXGpfTGBQqjYnwxdLD8gbteEFOcRdc7htvC6aK2IvDlOvwHOZcQkroecVcFEpKMJuJWgo6huCfSOjS/SVJb0qOwDHRmto+Yg1kEkgyatgGIbqaGSadDQflWbEvAZKE1vdT+f0hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SnWYRd/8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F609C4CEED;
+	Wed, 12 Mar 2025 22:35:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741818927;
-	bh=ju48Qgbreq1JnAKm3gumpOguqdUyJKjT2HnadJSjg1w=;
+	s=k20201202; t=1741818930;
+	bh=IwfCs1DnF0SiqPf/BkI1aSOJGuYCy0ETeAjtkyZv1FY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=beB8sxUb2FIV7+41YPGZvMRvOtG7pFxX/MFxoen2BHVFK4CpdAVhG7mJz7LxAMHWL
-	 tpca0q0vLrMp2clw46NFBLtOIs8d0nC1JvgUrsHaVNSJjIpXninmRPiq4TtrtuWmlz
-	 lDL8TmPbWTcaXjj/i/gph0YMoK+JruTWHYln8Fmx+KAuj+R5V4Rwco3crE3kew9LFS
-	 ZPXeqvNdRRrwRAlNg4taiBUaCkvtvrDWVcw4FaWUk+/5lpdeWJEhadm5+kjaq25R1s
-	 8f1SASVrXMQQmMsGXjrqPubR/OuEDjuCofvCAvidtg1Eidg28kkZegg3FUAb7wNsOW
-	 rnElBjiNawLVQ==
+	b=SnWYRd/8LyaK4CwyTCy0OUuI+dguEvj2ARtZgoo/QNTNx/XzDJLNjdCs83jZ7e+xr
+	 P7YZIacBNU+gHYSMUe+x8oa1W1S9VkaKi4ncZhqdBD9PjOVvklsN5mmRdilsvtgrP+
+	 67lLew208Hij2d72xLWr9aUASgvryDlr3NOKbNIkq6AKOpezsREmSmHYDUKqdXwtbh
+	 +tMxmygOsgj9iMeAPE89rI2zUnVN7a6qqePlkDOQsoNFU2XwcTPPqtG2jrBd1FaDc4
+	 zwlb9MguNpijvLS/JXzGDYCCGEbETkJp21jh/FFObUaeVrvUcReCuTGNrCQgR5+5AG
+	 hWBtb1BYo+ImQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -50,9 +50,9 @@ Cc: netdev@vger.kernel.org,
 	horms@kernel.org,
 	sdf@fomichev.me,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 04/11] net: explain "protection types" for the instance lock
-Date: Wed, 12 Mar 2025 23:35:00 +0100
-Message-ID: <20250312223507.805719-5-kuba@kernel.org>
+Subject: [PATCH net-next 05/11] net: designate queue counts as "double ops protected" by instance lock
+Date: Wed, 12 Mar 2025 23:35:01 +0100
+Message-ID: <20250312223507.805719-6-kuba@kernel.org>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250312223507.805719-1-kuba@kernel.org>
 References: <20250312223507.805719-1-kuba@kernel.org>
@@ -64,88 +64,109 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Try to define some terminology for which fields are protected
-by which lock and how. Some fields are protected by both rtnl_lock
-and instance lock which is hard to talk about without having
-a "key phrase" to refer to a particular protection scheme.
+Drivers which opt into instance lock protection of ops should
+only call set_real_num_*_queues() under the instance lock.
+This means that queue counts are double protected (writes
+are under both rtnl_lock and instance lock, readers under
+either).
 
-"ops protected" fields are defined later in the series, one by one.
+Some readers may still be under the rtnl_lock, however, so for
+now we need double protection of writers.
 
-Add ASSERT_RTNL() to netdev_ops_assert_locked() for drivers
-not other instance protection of ops. Hopefully it's not too
-confusion that netdev_lock_ops() does not match the lock which
-netdev_ops_assert_locked() will assert, exactly. The noun "ops"
-is in a different place in the name, so I think it's acceptable...
+OTOH queue API paths are only under the protection of the instance
+lock, so we need to validate that the instance is actually locking
+ops, otherwise the input checks we do against queue count are racy.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- include/linux/netdevice.h | 24 ++++++++++++++++++------
- include/net/netdev_lock.h |  3 +++
- 2 files changed, 21 insertions(+), 6 deletions(-)
+ include/linux/netdevice.h  | 3 +++
+ net/core/dev.c             | 2 ++
+ net/core/net-sysfs.c       | 2 ++
+ net/core/netdev-genl.c     | 7 +++++++
+ net/core/netdev_rx_queue.c | 3 +++
+ 5 files changed, 17 insertions(+)
 
 diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 2f344d5ad953..e8e4e6fbcef4 100644
+index e8e4e6fbcef4..0e2fa80a556d 100644
 --- a/include/linux/netdevice.h
 +++ b/include/linux/netdevice.h
-@@ -2496,19 +2496,31 @@ struct net_device {
- 	 * Should always be taken using netdev_lock() / netdev_unlock() helpers.
- 	 * Drivers are free to use it for other protection.
- 	 *
--	 * Protects:
-+	 * For the drivers that implement shaper or queue API, the scope
-+	 * of this lock is expanded to cover most ndo/queue/ethtool/sysfs
-+	 * operations. Drivers may opt-in to this behavior by setting
-+	 * @request_ops_lock.
-+	 *
-+	 * @lock protection mixes with rtnl_lock in multiple ways, fields are
-+	 * either:
-+	 * - simply protected by the instance @lock;
-+	 * - double protected - writers hold both locks, readers hold either;
-+	 * - ops protected - protected by the lock held around the NDOs
-+	 *   and other callbacks, that is the instance lock on devices for
-+	 *   which netdev_need_ops_lock() returns true, otherwise by rtnl_lock;
-+	 * - double ops protected - always protected by rtnl_lock but for
-+	 *   devices for which netdev_need_ops_lock() returns true - also
-+	 *   the instance lock.
-+	 *
-+	 * Simply protects:
- 	 *	@gro_flush_timeout, @napi_defer_hard_irqs, @napi_list,
- 	 *	@net_shaper_hierarchy, @reg_state, @threaded, @dev_addr
- 	 *
--	 * Partially protects (writers must hold both @lock and rtnl_lock):
-+	 * Double protects:
+@@ -2519,6 +2519,9 @@ struct net_device {
+ 	 * Double protects:
  	 *	@up
  	 *
++	 * Double ops protects:
++	 *	@real_num_rx_queues, @real_num_tx_queues
++	 *
  	 * Also protects some fields in struct napi_struct.
  	 *
--	 * For the drivers that implement shaper or queue API, the scope
--	 * of this lock is expanded to cover most ndo/queue/ethtool/sysfs
--	 * operations.
--	 *
  	 * Ordering: take after rtnl_lock.
- 	 */
- 	struct mutex		lock;
-diff --git a/include/net/netdev_lock.h b/include/net/netdev_lock.h
-index 689ffdfae50d..efd302375ef2 100644
---- a/include/net/netdev_lock.h
-+++ b/include/net/netdev_lock.h
-@@ -5,6 +5,7 @@
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 3f35f3f8b2f1..8ae4f56169fe 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -3132,6 +3132,7 @@ int netif_set_real_num_tx_queues(struct net_device *dev, unsigned int txq)
+ 	if (dev->reg_state == NETREG_REGISTERED ||
+ 	    dev->reg_state == NETREG_UNREGISTERING) {
+ 		ASSERT_RTNL();
++		netdev_ops_assert_locked(dev);
  
- #include <linux/lockdep.h>
- #include <linux/netdevice.h>
-+#include <linux/rtnetlink.h>
+ 		rc = netdev_queue_update_kobjects(dev, dev->real_num_tx_queues,
+ 						  txq);
+@@ -3181,6 +3182,7 @@ int netif_set_real_num_rx_queues(struct net_device *dev, unsigned int rxq)
  
- static inline bool netdev_trylock(struct net_device *dev)
- {
-@@ -51,6 +52,8 @@ static inline void netdev_ops_assert_locked(const struct net_device *dev)
- {
- 	if (netdev_need_ops_lock(dev))
- 		lockdep_assert_held(&dev->lock);
-+	else
-+		ASSERT_RTNL();
- }
+ 	if (dev->reg_state == NETREG_REGISTERED) {
+ 		ASSERT_RTNL();
++		netdev_ops_assert_locked(dev);
  
- static inline int netdev_lock_cmp_fn(const struct lockdep_map *a,
+ 		rc = net_rx_queue_update_kobjects(dev, dev->real_num_rx_queues,
+ 						  rxq);
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index 529a0f721268..6776b1080864 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -2145,8 +2145,10 @@ static void remove_queue_kobjects(struct net_device *dev)
+ 	net_rx_queue_update_kobjects(dev, real_rx, 0);
+ 	netdev_queue_update_kobjects(dev, real_tx, 0);
+ 
++	netdev_lock_ops(dev);
+ 	dev->real_num_rx_queues = 0;
+ 	dev->real_num_tx_queues = 0;
++	netdev_unlock_ops(dev);
+ #ifdef CONFIG_SYSFS
+ 	kset_unregister(dev->queues_kset);
+ #endif
+diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+index 9e4882a22407..fd1cfa9707dc 100644
+--- a/net/core/netdev-genl.c
++++ b/net/core/netdev-genl.c
+@@ -867,6 +867,13 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
+ 		goto err_unlock_sock;
+ 	}
+ 
++	if (!netdev_need_ops_lock(netdev)) {
++		err = -EOPNOTSUPP;
++		NL_SET_BAD_ATTR(info->extack,
++				info->attrs[NETDEV_A_DEV_IFINDEX]);
++		goto err_unlock;
++	}
++
+ 	if (dev_xdp_prog_count(netdev)) {
+ 		NL_SET_ERR_MSG(info->extack, "unable to bind dmabuf to device with XDP program attached");
+ 		err = -EEXIST;
+diff --git a/net/core/netdev_rx_queue.c b/net/core/netdev_rx_queue.c
+index a5b234b33cd5..3af716f77a13 100644
+--- a/net/core/netdev_rx_queue.c
++++ b/net/core/netdev_rx_queue.c
+@@ -92,6 +92,9 @@ static int __net_mp_open_rxq(struct net_device *dev, unsigned ifq_idx,
+ 	struct netdev_rx_queue *rxq;
+ 	int ret;
+ 
++	if (!netdev_need_ops_lock(dev))
++		return -EOPNOTSUPP;
++
+ 	if (ifq_idx >= dev->real_num_rx_queues)
+ 		return -EINVAL;
+ 	ifq_idx = array_index_nospec(ifq_idx, dev->real_num_rx_queues);
 -- 
 2.48.1
 
