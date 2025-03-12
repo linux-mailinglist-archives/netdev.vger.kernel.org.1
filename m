@@ -1,54 +1,55 @@
-Return-Path: <netdev+bounces-174185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E55DA5DCBB
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 13:33:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 106FAA5DCBE
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 13:33:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEB273AC94A
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 12:32:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C40E177640
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 12:33:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E0B243969;
-	Wed, 12 Mar 2025 12:32:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05AE4242908;
+	Wed, 12 Mar 2025 12:33:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="zp4yLI8x"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="oWTp6Zv1"
 X-Original-To: netdev@vger.kernel.org
-Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+Received: from mout.web.de (mout.web.de [212.227.15.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0880C1F949
-	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 12:32:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C1EF1E489;
+	Wed, 12 Mar 2025 12:33:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741782739; cv=none; b=fHx3Y3Vz/DZHfL8LqduJhD5kxy8qPxeY9CIDasmOsoApFPdcaCCGHEr9aPSMrn9RFZ8fvrjsT6e5m1u3NRv7Z0u16oQMeTW0YOZuavGfGbqpmz6nUVf1eqZZwuFCOjD87hjsarrQTTIYPw1N6GZX5MM1RJn/XbmW0HQ7goweCTw=
+	t=1741782811; cv=none; b=cjBDX6EdWDiyCiV74DFFIAQVOOooGyVm7HtXDYQRUshSX4a97fQC0eUaBsBb3lBlqDHprZhn9rtcXHZHsDyhZ4TtNJPMfuyxIQMyEUy+l5pTuA1t82b49s11nbF+trjJmAKH46IMxb7wWJOTeRVLfaPPNqPIkqQnfjfIoYYfoCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741782739; c=relaxed/simple;
-	bh=bsBprs+QrXYXvTFYFNv5PjeUFkEKtlBdy5crmEJcD8Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=M3nlHo3KL+5JO4P4lL5IdegJU3/izToUj7ExX8ZhoUp/mQ5ENesFP5t1U4Lr+6DtxfhRNMOiKSZMMgYNlZio3DSEazLTwsfmv2Imj5gHxH8J1APnoxg44h9oqecUu/p3qfBN2BLwBoYwMBbLH+y8IvyoXlwvAwd4Xs2dQLJdies=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=zp4yLI8x; arc=none smtp.client-ip=139.165.32.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
-Received: from [192.168.0.223] (unknown [195.29.54.243])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 89F65200EEC2;
-	Wed, 12 Mar 2025 13:32:13 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 89F65200EEC2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1741782734;
-	bh=c2wryMfWs+1n980iE4u39zUMY1TL4q1m1nHgV+n7FaI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=zp4yLI8xqnmIV//V6KlM/tf4xPenghfkDo0GwuYG9W5vGciefZhsN5dnNv9bxtGOx
-	 JUa9FwUKjgIJdcKg4DWU3aroqfcZPftxp8CyorD16LV2nFCXIPMLTWfGs3Qe+JuSZ/
-	 frBK4JXM2bHeBCiDzICSdtKaedZFwRDL2UUP0OqAbbxjDBe5mueso29o4s9f5swGlG
-	 Z/ZJk+0bltiFe0lM6gBrekAkSsuVyDHdWoJCHvmsTkWM0v6+XIHp2JPoUGfb2ZSf6y
-	 52BpCT0iHnZSXtdOqO8Fgj/Og/j/a38Kgd+Cv2QkEdZHXz/biP0nl+pgGnpt9wqKyi
-	 emTmzunknh1oQ==
-Message-ID: <1c585bdf-ebcc-40db-bd36-81d008cf6827@uliege.be>
-Date: Wed, 12 Mar 2025 13:32:11 +0100
+	s=arc-20240116; t=1741782811; c=relaxed/simple;
+	bh=YRkj4sqSqQQgNr59IaP83gwr/KbDIvv0V3DJyw6R3qw=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=Ymc0GpizyXxBKaEqlbyNtXouYSXOjun/jyYFmrHOZBlmE/lxRS3rYpq0UlqK1aVdnoh8OKpKUxgFHtJqOpFzHCfAuwvvD6qoeAHmv6hQokppXk4N6HW0zXm2qkhkDYIt26rijPE8k7g7sjJ73MDhNVo3fTWRJn7JocjTCAO5qlM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=oWTp6Zv1; arc=none smtp.client-ip=212.227.15.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1741782805; x=1742387605; i=markus.elfring@web.de;
+	bh=hh5c+Zd/kuAhAL/TqLeBv/5gR6i+du8FtsJSY8grQxo=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=oWTp6Zv1VJUeIQsrL85La3RFRFzx9BQg+RwFBAoGGdziUzn69ak1M9IDngQIlez3
+	 AyFRYIXY7021i2jz/9WUurtj8+0aXgVEz38tkMf1qAH1tHBXEbMT1eTTzYODKnTLG
+	 HHt6ZHll0IpT+MQTDMd7LDz9IPVJq4FTgHHWchyW1A48gELkKctz37kaToArMaVKo
+	 Sy2Rli5vmzOLJFQnq2EPhQQAULok5vLuw5z1NcnPWFTW3Wne2IdgM8CpCJ+TWt+2o
+	 eXs/OT6ObTPy+WziW30mvKmvfrpSegZymbafrHQtje45fLqU5+kgReSpV+mBj2Lqx
+	 89p5bZuotyNQM8yoHg==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.93.19]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MsaWF-1t44uF3V9v-00siwh; Wed, 12
+ Mar 2025 13:33:24 +0100
+Message-ID: <b7821109-e0b6-441d-a15a-580bd7bd4c50@web.de>
+Date: Wed, 12 Mar 2025 13:33:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,81 +57,67 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: lwtunnel: fix recursion loops
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, Roopa Prabhu <roopa@nvidia.com>,
- Andrea Mayer <andrea.mayer@uniroma2.it>,
- Stefano Salsano <stefano.salsano@uniroma2.it>,
- Ahmed Abdelsalam <ahabdels.dev@gmail.com>, Ido Schimmel <idosch@nvidia.com>
-References: <20250312103246.16206-1-justin.iurman@uliege.be>
- <fb9aec0e-0d95-4ca3-8174-32174551ece3@uliege.be> <87y0xah1ol.fsf@toke.dk>
-Content-Language: en-US
-From: Justin Iurman <justin.iurman@uliege.be>
-In-Reply-To: <87y0xah1ol.fsf@toke.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+To: vulab@iscas.ac.cn, linux-sctp@vger.kernel.org, netdev@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Xin Long <lucien.xin@gmail.com>
+References: <20250312032146.674-1-vulab@iscas.ac.cn>
+Subject: Re: [PATCH] sctp: handle error of sctp_sf_heartbeat() in
+ sctp_sf_do_asconf()
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20250312032146.674-1-vulab@iscas.ac.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:mWcFtUCxvmz9Gb74Yp8WaL/ErrzkTk2RefOaUE0nkbRlU8XpM0+
+ LTdl9LUhZx6mnPtK2eQKMG6qwgSItnYQx+12XVUUuCsHI9G2ysBHXMcfHTb42P0yLo4p00M
+ jmQYFvZvLdUYLlmAaSi6eoXOWckJgpGzJJ5WS0Uw5NTTWwykK5E8ImeZ7HDpdynh0ikrkKn
+ ylFKlwX2rkZYZ27hnXu9g==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:Hkz3EDrPPW0=;nTgY/D+sLpMHv6vElkVQvVfcrTg
+ d2+uzk43jo1EEjsMXcli6jBXwe1MYwlraSxEFmJ/NAPL3cKNVGd7FS46/faUTsJMKcMf6aE2H
+ eR6PUTw4O+S/3KxTgDPCm4qseuD0mYTEY5sfuf3LrjC8LginXoEY1UX6YJM4Mv3WJFGISbyjs
+ AUBMyBJQVif1nkcYIYBH7mvC2f+Evkla+kQ/aGm0ujV6LGbp2vqxC094AwsFsZsEP0MCmDDu4
+ p1oR6i7+LtFB5Up+a4TqZ+N35cv7PxnxlX32xRwrlG0/m/WRF83TlpvGFa14k2slRA8gQfLOq
+ 5nLwUo1oWkqKRa0mHR+y+dHZ7ho0w1q/Rmj5TgvkC6UjtZMzSR7XaxdzFiTBStyWUbOwxxc6t
+ r30qwQPWxUbYdxqUAzE2sIQ9duUYOBHR5f9H0Cs9eEyYBOwPmChXzRW3sJnhVK9iwgUwMaj98
+ aFrKoU6OLoUGQz7kh12CWTkQgshoGSS1HGbkhJXNnjymJ45nq243FF7YCCqxp3rl0y++ibPAR
+ MqMw91z0mu04Nl1OeLGecXa+olWg2mknkMXEFDZPF2gd+ngORFjfPjziIiMqNlZOWUML3EzPE
+ 9xXbKBykPPIsnsnPn6YNB0t9o0Wy5s5+ZX9+NriEaZH7+Zp5d4OQD1CpaMqRaN3XaNLtouYq6
+ KPzpf8lsrPrCknyO2utj8ikfQcvltIfIronxQPVYxHmx6Uh+vY4PVuuq/Yyoe0p1H9yInuqHZ
+ UxpTTTTyzydjdOGdpH2tdeqA4UAcbwYEkk1EyA8ynDl/8fHOHqjnFXOrnOiYrRXqtPZJftuXp
+ 52U/sg21cJyIGPQoz0qtqJXvZF18qlFMb0de3O3LLFOe6oBQ4P015JzqMraTnOdK8BGKFkD40
+ O4tDCxxmm6nJSVY1u/4WpG8ykOY0kKYqFin26NJdLGp4EzRoQ797rBhGyvouBqkNZq4rxTjZ6
+ z6pZhaBaj90E+lYMV7m8dqZoY3vE2ICHl0ua+gGZf2FCQLl37Efj4mSCnHNltczWOrBayKv8g
+ 5wZHpvM+IwVW8/2dNKPGaZ92MqTnq29GRdWvZnh3w8M/EctfIZW+r9+Ocr3mgQ8Lflm9vw5vX
+ 8xLUTmmEDbvPTeJ+lh6tyCwHEnGQF/XuCZ4XEUMwuSI3Z9mpAoThrgwOio8XxsqhZPqUScDFR
+ FpxumDCQmnUjoomPIFnLTupxw1y+mk5r10HdXNXTKLoRCLwHSryDhRihtuAOBW0KjHye+eoRL
+ 8MS/wyKdDt89OoQ/naPLvuXezjV0AfFItzRHotEp4pTIVr5ou+4BO2Ur22w6OKiYyHEEejwmT
+ /aY93/eox2M1uA2UoyEvkkVcjp8Oo6rpg6ltPD2b/onFtP4JMHDbw1s57nhFyqzujSK5omRSW
+ r0/kBrOJVSSTqMgwuVLsTvyGKpBRu138M9AiRSyybPaoOS9eTjipqxeOhIRtSqC5AKVw+AY6Z
+ EtO+F9fFJuASs7VTkUuc//8Mugq/f0jX45w8jhc1UKuQ8iY0t
 
-On 3/12/25 13:29, Toke Høiland-Jørgensen wrote:
-> Justin Iurman <justin.iurman@uliege.be> writes:
-> 
->>> --- /dev/null
->>> +++ b/net/core/lwtunnel.h
->>> @@ -0,0 +1,42 @@
->>> +/* SPDX-License-Identifier: GPL-2.0+ */
->>> +#ifndef _NET_CORE_LWTUNNEL_H
->>> +#define _NET_CORE_LWTUNNEL_H
->>> +
->>> +#include <linux/netdevice.h>
->>> +
->>> +#define LWTUNNEL_RECURSION_LIMIT 8
->>> +
->>> +#ifndef CONFIG_PREEMPT_RT
->>> +static inline bool lwtunnel_recursion(void)
->>> +{
->>> +	return unlikely(__this_cpu_read(softnet_data.xmit.recursion) >
->>> +			LWTUNNEL_RECURSION_LIMIT);
->>> +}
->>> +
->>> +static inline void lwtunnel_recursion_inc(void)
->>> +{
->>> +	__this_cpu_inc(softnet_data.xmit.recursion);
->>> +}
->>> +
->>> +static inline void lwtunnel_recursion_dec(void)
->>> +{
->>> +	__this_cpu_dec(softnet_data.xmit.recursion);
->>> +}
->>> +#else
->>> +static inline bool lwtunnel_recursion(void)
->>> +{
->>> +	return unlikely(current->net_xmit.recursion > LWTUNNEL_RECURSION_LIMIT);
->>> +}
->>> +
->>> +static inline void lwtunnel_recursion_inc(void)
->>> +{
->>> +	current->net_xmit.recursion++;
->>> +}
->>> +
->>> +static inline void lwtunnel_recursion_dec(void)
->>> +{
->>> +	current->net_xmit.recursion--;
->>> +}
->>> +#endif
->>> +
->>> +#endif /* _NET_CORE_LWTUNNEL_H */
->>
->> Wondering what folks think about the above idea to reuse fields that
->> dev_xmit_recursion() currently uses. IMO, it seems OK considering the
->> use case and context. If not, I guess we'd need to add a new field to
->> both softnet_data and task_struct.
-> 
-> Why not just reuse the dev_xmit_recursion*() helpers directly?
-> 
-> -Toke
-> 
+> In sctp_sf_do_asconf(), SCTP_DISPOSITION_NOMEM error code returned
+> from sctp_sf_heartbeat() represent a failure of sent HEARTBEAT. The
 
-It was my initial idea, but I'm not sure I can. Looks like they're not 
-exposed (it's a local .h in net/core/).
+                                                       heartbeat?
+
+Would the error predicate =E2=80=9Creturn value !=3D SCTP_DISPOSITION_CONS=
+UME=E2=80=9D be safer?
+https://elixir.bootlin.com/linux/v6.14-rc6/source/include/net/sctp/sm.h#L4=
+3
+
+
+> return value of sctp_sf_heartbeat() needs to be checked and propagates
+> to caller function.
+
+Will imperative wordings be more desirable for such a change description?
+https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tre=
+e/Documentation/process/submitting-patches.rst?h=3Dv6.14-rc6#n94
+
+Regards,
+Markus
 
