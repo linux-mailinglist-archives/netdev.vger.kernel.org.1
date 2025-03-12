@@ -1,156 +1,288 @@
-Return-Path: <netdev+bounces-174162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0797DA5DA80
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 11:34:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8E56A5DA8F
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 11:40:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE22E7A27AB
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 10:33:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D85B2167540
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 10:40:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC71A23C8AC;
-	Wed, 12 Mar 2025 10:34:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B98AF23BD0F;
+	Wed, 12 Mar 2025 10:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TIt+VKhV"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="cJs5ssOJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FE971DB124
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 10:40:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741776013; cv=none; b=Mx7QxjzUc4uN5BOsiJVZgGQYV2C9ExS2s34cvBK3GQb6tAfcpwUBN/BzL8QZh9/0Jyw0Piel8iH85nS8xZW7a3GECh9YKe0ReQ/sFRVuiyWQL3IyIMCWww43S6YD12zrwdUTMy5V3ZlP7BDo1/gkfW/03cszVKgbamJc2qIvyPM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741776013; c=relaxed/simple;
+	bh=QFmMhLOu5lKLeogDNvJKfIjaAb5qDWz4drPOmMc8io8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JaSRSLWqq4QsUsuH12A1NmcCdpb3RH7Sr3pd97pgTsMkkdMUjtfIcR3uncGCY++hlcqWX06t+5mpgySqAcxhsJ0MiZyhlKbpmt1in8AhyYMR495gq5ElvP7qp5VpHeVh39POUN0sELHQ33yXDiGTsbGY3FWEYE9ApMSeRXR9N30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=cJs5ssOJ; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from [192.168.0.223] (unknown [195.29.54.243])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4EF1DF735;
-	Wed, 12 Mar 2025 10:34:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741775655; cv=none; b=Cw7MUsCGBEtvaAI50t7W7vmkvoasBjNt10t84yQBCWute7RO/k7VOhkM0nuBTh/vTcY89Tjib0X4nEpQFakNs5EeCvvc33+8gJ4CIICQfUGTXVqAsPQlh3nnJntPLdfhSDZHimLVWIN9Li4I4KWpGoYBAYiCSW1Z4/wkzqoZ08E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741775655; c=relaxed/simple;
-	bh=JWuqx9ev09zMCgB43NM3mJXWzgwwNwCrolV+la2DxIU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=etFHaZFHNEML5jebHi4vX/Qxx2YNU0Tvxu9MOZ3aurLwK1ehQywa8FM9tdbn+8EXYX9m4K2tVqPEVj2kSr8Yhahtc5TyVksFV+cHH0QEKbb2ZY8gsk/Mp5aGh8mbt/EYoa88jujw17eyQEpnAb2Fxjf8/4AY09HyENbqkH15lnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TIt+VKhV; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-223959039f4so130318805ad.3;
-        Wed, 12 Mar 2025 03:34:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741775653; x=1742380453; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JAqpNybORepsGV2E//3k14JpOrJ0zrUql1ugOGN353k=;
-        b=TIt+VKhVy2r2gguYAA5MLNWbBAhCGKAu+jalU/mc9LsO4/660fI9ofuv3lw3iVGUfh
-         rWQjllubwBLMsKGE+mJ4x/9CJStr8HaTouzOGmm0SSKz/ZSSQWENuaLbZYYZuM0XnIgX
-         /tbx2WRBYBZ5KaqOUrMq9EaKlO4CCcF5LaaPQcIKI8P/B9aji2iSD2CzqyAZL8LSOhga
-         vCGVSbUZKDVdyGDJiSFIKYuA4RV7laOyVBxoqVPqrFng0/h3EiFEgz/2QL+mi9YS9GhH
-         8tmopoRqaR9TESjHmPZVp/dEwB1Xuryt5Lwwp+186ugz5uCnvRiVWSjEldkhPxwOAkiR
-         whLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741775653; x=1742380453;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JAqpNybORepsGV2E//3k14JpOrJ0zrUql1ugOGN353k=;
-        b=quNdjqzd5+jej8mnpyJq4Yc2Wvh8Q6/8dJ5EC8frsxmTEjsCtfCE7DXEegfWvGD3jT
-         XrS5aesdd3ZiXHkFrqetr/sDqLqevvjt793RGOsl2vviSmJm3wi7lzjWyWPwOtO8GFGI
-         c7CqIpoToxY9pGGxXaknXybYtSrOQz3c56ocVrjibD1c1yT1zfGGfRg/8eO6iorC615r
-         p/TDTQdPqtVlWduLreQyZ2ZKfG2VpzNgTC3eSd/AYBNK79fJsj5ORw7srwIIBcEslMyb
-         1o6EIvrSIaburfjLo9146CoCKUb7GGhlYeMOmDrhsH0mxQIOihNkLzzcSU5NokL2KpdB
-         gSiw==
-X-Forwarded-Encrypted: i=1; AJvYcCUTNsIXo6h31grij+plonpW91CbJe6qRxOoOh9hocPtH2ut3WtnNakGsvivIM3sRFaNRDXX874Z@vger.kernel.org, AJvYcCWUUV0zmED5LEYhyuyyAuuuiUznaYoaFpBViEmTkEaM0dewNKTSd4K00OTECXGZXLPnRXjjE5nDcMIeMw==@vger.kernel.org, AJvYcCXj+md6u675LDhlOftlUdY74ZLWbjiXURv5IRY8Yc9I6ObrIai+it8b2QIr+iwiAidl1R3UsbGVjQU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhAUMZt/J8ltQEsC9QCa8hSdD4mTU76tHWul/gbJNfTs6U0i5+
-	O65TFOzxCqLkEYuNDNKTo2j0tQU5HgrvrxTGnOlf4rB2DoFjzYQ=
-X-Gm-Gg: ASbGncucEdASovsXOaEQuX5PTlPQ3zYPDao6V5HVIzoyR7Zo4uU50o3cj0Wi1GoE1U8
-	wsS1SMpepDeDCc59kexlYhbKMVPujXLOsSM+4E+hQT4CwweSIShS3IjoJSAb9OElILUZ/RGpSDX
-	WLVONcP7PHrvu53phBD7RVNDCops3AC7NVfY2akR8+I1QnOh4bxoc5k70W1oFpJT9UGHXYVFC4O
-	EpJxGhW3ziWMoTqVWZu165a95iccNfBSdGNmyp+E7v1BSw/7kqgV60rlZb8z0S7+OYxRSd0wYC/
-	zKtfbgWehQ5QP6sODNrV1vJ8V39bL8JDuus884lmW5Lw
-X-Google-Smtp-Source: AGHT+IElKLAxUVE+TL78ng9X/ZK1bRtG0Gsflu/ybImAKXGjmr+DEeCiOpXeMjpBBqP9r8z/OL6LdQ==
-X-Received: by 2002:a17:903:283:b0:216:2bd7:1c2f with SMTP id d9443c01a7336-2242888d06amr274426335ad.18.1741775653473;
-        Wed, 12 Mar 2025 03:34:13 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-736c14cc7b9sm8363641b3a.140.2025.03.12.03.34.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Mar 2025 03:34:13 -0700 (PDT)
-Date: Wed, 12 Mar 2025 03:34:12 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: David Ahern <dsahern@kernel.org>
-Cc: Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>,
-	Saeed Mahameed <saeed@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Daniel Vetter <daniel.vetter@ffwll.ch>,
-	Dave Jiang <dave.jiang@intel.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Itay Avraham <itayavr@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Leonid Bloch <lbloch@nvidia.com>, linux-cxl@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	"Nelson, Shannon" <shannon.nelson@amd.com>
-Subject: Re: [PATCH v5 0/8] Introduce fwctl subystem
-Message-ID: <Z9FjJAgdmWcepxkg@mini-arch>
-References: <20250304164203.38418211@kernel.org>
- <20250305133254.GV133783@nvidia.com>
- <mxw4ngjokr3vumdy5fp2wzxpocjkitputelmpaqo7ungxnhnxp@j4yn5tdz3ief>
- <bcafcf60-47a8-4faf-bea3-19cf0cbc4e08@kernel.org>
- <20250305182853.GO1955273@unreal>
- <Z8i2_9G86z14KbpB@x130>
- <20250305232154.GB354511@nvidia.com>
- <6af1429e-c36a-459c-9b35-6a9f55c3b2ac@kernel.org>
- <20250311135921.GF7027@unreal>
- <4c55e1ae-8cc1-463e-b81f-2bbae4ae4eed@kernel.org>
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 1C080200E2A2;
+	Wed, 12 Mar 2025 11:40:09 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 1C080200E2A2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1741776009;
+	bh=e6Gj+m9nc9CLfjCqrqcCyEOHx98IvQCnCpG7BQOEFyE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=cJs5ssOJ2kQ/Lqen3D+nHIxqiDzDSywikfqWrbFAMK5h6liVYtoBXqd1rEnpf+qG3
+	 MNt7kN8S9lsGaAoqDiaYUhyphTmyJCenazSrVKOZq27h7sUartbtD1qROxrGj+9KqV
+	 GjRgu7udm8ZuG+d1dNnaHW3sBchcT8xszNnwBWKZT1LZnIADOFYRFLNE9Qv8TWcr0y
+	 Lz4m/ozh05WSGgmqvddMpIawdU+tbWfTnmGFHusW7u1F3xXwz3q0AGJvI1stDmjOdW
+	 n92zXcoCsTxP3iaZJHCPIREk+xzY/cSw4FY05MT9Yq2jmDFktsnhf9CekkbqtUG2GX
+	 LILgSBJ+/AWlg==
+Message-ID: <fb9aec0e-0d95-4ca3-8174-32174551ece3@uliege.be>
+Date: Wed, 12 Mar 2025 11:40:06 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4c55e1ae-8cc1-463e-b81f-2bbae4ae4eed@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: lwtunnel: fix recursion loops
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, Roopa Prabhu <roopa@nvidia.com>,
+ Andrea Mayer <andrea.mayer@uniroma2.it>,
+ Stefano Salsano <stefano.salsano@uniroma2.it>,
+ Ahmed Abdelsalam <ahabdels.dev@gmail.com>, Ido Schimmel <idosch@nvidia.com>
+References: <20250312103246.16206-1-justin.iurman@uliege.be>
+Content-Language: en-US
+From: Justin Iurman <justin.iurman@uliege.be>
+In-Reply-To: <20250312103246.16206-1-justin.iurman@uliege.be>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 03/12, David Ahern wrote:
-> On 3/11/25 2:59 PM, Leon Romanovsky wrote:
-> > On Tue, Mar 11, 2025 at 12:23:19PM +0100, David Ahern wrote:
-> >> On 3/6/25 12:21 AM, Jason Gunthorpe wrote:
-> >>> On Wed, Mar 05, 2025 at 12:41:35PM -0800, Saeed Mahameed wrote:
-> >>>
-> >>>> How do you imagine this driver/core structure should look like? Who
-> >>>> will be the top dir maintainer?
-> >>>
-> >>> I would set something like this up more like DRM. Every driver
-> >>> maintainer gets commit rights, some rules about no uAPIs, or at least
-> >>> other acks before merging uAPI. Use the tree for staging shared
-> >>> branches.
-> >>
-> >> why no uapi? Core driver can have knowledge of h/w resources across all
-> >> use cases. For example, our core driver supports a generid netlink based
-> >> dump (no set operations; get and dump only so maybe that should be the
-> >> restriction?) of all objects regardless of how created -- netdev, ib,
-> >> etc. -- and with much more detail.
-> > 
-> > Because, we want to make sure that UAPI will be aligned with relevant
-> > subsystems without any way to bypass them.
-> > 
-> > Thanks
+On 3/12/25 11:32, Justin Iurman wrote:
+> Different kind of loops in most of lwtunnel users were fixed by some
+> recent patches. This patch acts as a parachute, catch all solution, by
+> detecting any use cases with recursion and taking care of them (e.g., a
+> loop between routes). This is applied to lwtunnel_input(),
+> lwtunnel_output(), and lwtunnel_xmit().
 > 
-> I hope there will be an open mind on get / dump style introspection apis
-> here. Devices can work support and work within limited subsystem APIs
-> and also allow the dumping of full essential and relevant contexts for a
-> device.
+> Fixes: ffce41962ef6 ("lwtunnel: support dst output redirect function")
+> Fixes: 2536862311d2 ("lwt: Add support to redirect dst.input")
+> Fixes: 14972cbd34ff ("net: lwtunnel: Handle fragmentation")
+> Closes: https://lore.kernel.org/netdev/2bc9e2079e864a9290561894d2a602d6@akamai.com/
+> Cc: Roopa Prabhu <roopa@nvidia.com>
+> Cc: Andrea Mayer <andrea.mayer@uniroma2.it>
+> Cc: Stefano Salsano <stefano.salsano@uniroma2.it>
+> Cc: Ahmed Abdelsalam <ahabdels.dev@gmail.com>
+> Cc: Ido Schimmel <idosch@nvidia.com>
+> Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
+> ---
+>   net/core/lwtunnel.c | 65 ++++++++++++++++++++++++++++++++++++---------
+>   net/core/lwtunnel.h | 42 +++++++++++++++++++++++++++++
+>   2 files changed, 95 insertions(+), 12 deletions(-)
+>   create mode 100644 net/core/lwtunnel.h
+> 
+> diff --git a/net/core/lwtunnel.c b/net/core/lwtunnel.c
+> index 711cd3b4347a..0954783e36ce 100644
+> --- a/net/core/lwtunnel.c
+> +++ b/net/core/lwtunnel.c
+> @@ -23,6 +23,8 @@
+>   #include <net/ip6_fib.h>
+>   #include <net/rtnh.h>
+>   
+> +#include "lwtunnel.h"
+> +
+>   DEFINE_STATIC_KEY_FALSE(nf_hooks_lwtunnel_enabled);
+>   EXPORT_SYMBOL_GPL(nf_hooks_lwtunnel_enabled);
+>   
+> @@ -325,13 +327,23 @@ EXPORT_SYMBOL_GPL(lwtunnel_cmp_encap);
+>   
+>   int lwtunnel_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+>   {
+> -	struct dst_entry *dst = skb_dst(skb);
+>   	const struct lwtunnel_encap_ops *ops;
+>   	struct lwtunnel_state *lwtstate;
+> -	int ret = -EINVAL;
+> +	struct dst_entry *dst;
+> +	int ret;
+> +
+> +	if (lwtunnel_recursion()) {
+> +		net_crit_ratelimited("%s(): recursion limit reached on datapath\n",
+> +				     __func__);
+> +		ret = -ENETDOWN;
+> +		goto drop;
+> +	}
+>   
+> -	if (!dst)
+> +	dst = skb_dst(skb);
+> +	if (!dst) {
+> +		ret = -EINVAL;
+>   		goto drop;
+> +	}
+>   	lwtstate = dst->lwtstate;
+>   
+>   	if (lwtstate->type == LWTUNNEL_ENCAP_NONE ||
+> @@ -341,8 +353,11 @@ int lwtunnel_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+>   	ret = -EOPNOTSUPP;
+>   	rcu_read_lock();
+>   	ops = rcu_dereference(lwtun_encaps[lwtstate->type]);
+> -	if (likely(ops && ops->output))
+> +	if (likely(ops && ops->output)) {
+> +		lwtunnel_recursion_inc();
+>   		ret = ops->output(net, sk, skb);
+> +		lwtunnel_recursion_dec();
+> +	}
+>   	rcu_read_unlock();
+>   
+>   	if (ret == -EOPNOTSUPP)
+> @@ -359,13 +374,23 @@ EXPORT_SYMBOL_GPL(lwtunnel_output);
+>   
+>   int lwtunnel_xmit(struct sk_buff *skb)
+>   {
+> -	struct dst_entry *dst = skb_dst(skb);
+>   	const struct lwtunnel_encap_ops *ops;
+>   	struct lwtunnel_state *lwtstate;
+> -	int ret = -EINVAL;
+> +	struct dst_entry *dst;
+> +	int ret;
+> +
+> +	if (lwtunnel_recursion()) {
+> +		net_crit_ratelimited("%s(): recursion limit reached on datapath\n",
+> +				     __func__);
+> +		ret = -ENETDOWN;
+> +		goto drop;
+> +	}
+>   
+> -	if (!dst)
+> +	dst = skb_dst(skb);
+> +	if (!dst) {
+> +		ret = -EINVAL;
+>   		goto drop;
+> +	}
+>   
+>   	lwtstate = dst->lwtstate;
+>   
+> @@ -376,8 +401,11 @@ int lwtunnel_xmit(struct sk_buff *skb)
+>   	ret = -EOPNOTSUPP;
+>   	rcu_read_lock();
+>   	ops = rcu_dereference(lwtun_encaps[lwtstate->type]);
+> -	if (likely(ops && ops->xmit))
+> +	if (likely(ops && ops->xmit)) {
+> +		lwtunnel_recursion_inc();
+>   		ret = ops->xmit(skb);
+> +		lwtunnel_recursion_dec();
+> +	}
+>   	rcu_read_unlock();
+>   
+>   	if (ret == -EOPNOTSUPP)
+> @@ -394,13 +422,23 @@ EXPORT_SYMBOL_GPL(lwtunnel_xmit);
+>   
+>   int lwtunnel_input(struct sk_buff *skb)
+>   {
+> -	struct dst_entry *dst = skb_dst(skb);
+>   	const struct lwtunnel_encap_ops *ops;
+>   	struct lwtunnel_state *lwtstate;
+> -	int ret = -EINVAL;
+> +	struct dst_entry *dst;
+> +	int ret;
+>   
+> -	if (!dst)
+> +	if (lwtunnel_recursion()) {
+> +		net_crit_ratelimited("%s(): recursion limit reached on datapath\n",
+> +				     __func__);
+> +		ret = -ENETDOWN;
+>   		goto drop;
+> +	}
+> +
+> +	dst = skb_dst(skb);
+> +	if (!dst) {
+> +		ret = -EINVAL;
+> +		goto drop;
+> +	}
+>   	lwtstate = dst->lwtstate;
+>   
+>   	if (lwtstate->type == LWTUNNEL_ENCAP_NONE ||
+> @@ -410,8 +448,11 @@ int lwtunnel_input(struct sk_buff *skb)
+>   	ret = -EOPNOTSUPP;
+>   	rcu_read_lock();
+>   	ops = rcu_dereference(lwtun_encaps[lwtstate->type]);
+> -	if (likely(ops && ops->input))
+> +	if (likely(ops && ops->input)) {
+> +		lwtunnel_recursion_inc();
+>   		ret = ops->input(skb);
+> +		lwtunnel_recursion_dec();
+> +	}
+>   	rcu_read_unlock();
+>   
+>   	if (ret == -EOPNOTSUPP)
+> diff --git a/net/core/lwtunnel.h b/net/core/lwtunnel.h
+> new file mode 100644
+> index 000000000000..32880ecdd8bb
+> --- /dev/null
+> +++ b/net/core/lwtunnel.h
+> @@ -0,0 +1,42 @@
+> +/* SPDX-License-Identifier: GPL-2.0+ */
+> +#ifndef _NET_CORE_LWTUNNEL_H
+> +#define _NET_CORE_LWTUNNEL_H
+> +
+> +#include <linux/netdevice.h>
+> +
+> +#define LWTUNNEL_RECURSION_LIMIT 8
+> +
+> +#ifndef CONFIG_PREEMPT_RT
+> +static inline bool lwtunnel_recursion(void)
+> +{
+> +	return unlikely(__this_cpu_read(softnet_data.xmit.recursion) >
+> +			LWTUNNEL_RECURSION_LIMIT);
+> +}
+> +
+> +static inline void lwtunnel_recursion_inc(void)
+> +{
+> +	__this_cpu_inc(softnet_data.xmit.recursion);
+> +}
+> +
+> +static inline void lwtunnel_recursion_dec(void)
+> +{
+> +	__this_cpu_dec(softnet_data.xmit.recursion);
+> +}
+> +#else
+> +static inline bool lwtunnel_recursion(void)
+> +{
+> +	return unlikely(current->net_xmit.recursion > LWTUNNEL_RECURSION_LIMIT);
+> +}
+> +
+> +static inline void lwtunnel_recursion_inc(void)
+> +{
+> +	current->net_xmit.recursion++;
+> +}
+> +
+> +static inline void lwtunnel_recursion_dec(void)
+> +{
+> +	current->net_xmit.recursion--;
+> +}
+> +#endif
+> +
+> +#endif /* _NET_CORE_LWTUNNEL_H */
 
-[..]
+Wondering what folks think about the above idea to reuse fields that 
+dev_xmit_recursion() currently uses. IMO, it seems OK considering the 
+use case and context. If not, I guess we'd need to add a new field to 
+both softnet_data and task_struct.
 
-> More specifically, I do not see netdev APIs ever recognizing RDMA
-> concepts like domains and memory regions. For us, everything is relative
-> to a domain and a region - e.g., whether a queue is created for a netdev
-> device or an IB QP both use the same common internal APIs.  I would
-> prefer not to use fwctl for something so basic.
-
-What specifically do you mean here by 'memory regions'? Netdev does
-recognize (as of recently, devmem) the concept of memory regions in
-the form of dmabufs.
+Also, with Andrea, we discussed the choice to either keep and send 
+packets, or drop them, in case of pathological configurations. If we 
+were to drop them, then only this patch would suffice, making my series 
+"net: fix lwtunnel reentry loops" not needed anymore (at least for most 
+of lwtunnel users, not for ioam for example where it is needed anyway).
 
