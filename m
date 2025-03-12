@@ -1,130 +1,119 @@
-Return-Path: <netdev+bounces-174116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3AF9A5D8BF
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 10:00:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05C76A5D8EB
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 10:11:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 509713A44E0
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 08:59:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E8F1177B30
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 09:11:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6796323644E;
-	Wed, 12 Mar 2025 08:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33746238D5A;
+	Wed, 12 Mar 2025 09:11:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MQn5UuUv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TboSritL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6537E235C16;
-	Wed, 12 Mar 2025 08:59:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02F97238D33;
+	Wed, 12 Mar 2025 09:11:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741769997; cv=none; b=hxXXenX4hftSD+2QPXk/p/cOC8kK2LOB5l9AUarlD1wlatOUmQL5GSLQKSl5zK1W0I0EHC37oKv/ocv85lUc5+8m/2r7DdCEP5nT9qDGzrH2+kl3o2zrwJjichMOsdQcU9HWKCaVaHVJ6lVfobGe1Hcwea7IkhN+uRGrkyIzJ/w=
+	t=1741770688; cv=none; b=kb7AXju/H5iGq9JD4l47ZcRek1iFXAfLS7qWIjoqgiJpZH9w1cVvrT5OD7ciFj4XVIND8pQt+H8Pgcb9QpedXMmCKAl4eq0h0MkMj177WcxaZqRQ3DjNKaYu6G8cM2sFSJGT308hllfI0vnqeHU5M1JsSwoxXDNJrMoQjzbaoTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741769997; c=relaxed/simple;
-	bh=C5BIodldeesg1NguClT2B3nnv0J2dFaCy3HVWztM/EA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UwUUX+iDk4cUKLjtdV1PQLZlQVj97MO1zegKa9xLy+29+XuY0eJ83pvlyOSDXUuVmnHLcELNGAqiSzPPdnVCUrE7h0h+JEsNhWH++T49UrV3KiXf5t39kh3L3Hx8twcjjsmhqx06fjCaOwLM1ezNL80XGLSpAtlPgDdsjlfHrw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MQn5UuUv; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-22349bb8605so120068445ad.0;
-        Wed, 12 Mar 2025 01:59:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741769994; x=1742374794; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YLjvAC9VadvURn5Ux6ZjZ6iTF/ZbVpdU4qEAD+HtQq0=;
-        b=MQn5UuUvErSqPYtNbZAxc6Qy3mOyeLvbRZfLnKmFettiALNyf7SvgXRkHdKoPzbrJr
-         089PtMJ/VQ76R2GXuyFcEaXicTcsDIVLej7TZ7yL0NZXVWEvzjHuOKIMkmnyso/YYBxg
-         ix8NNZy2etKw7KuA4dEOb3dGo6Viu3uWx5l+/jKEprPk8n/ER4zsULAB31oVhW99wBFN
-         lg6sQWWFYKFfbb430MvoKrIx9VEpawFZg9pJfEPDNO2Os6LKiDsjaF8UAs26rO5QJ72B
-         caU8bw98APfs0bizTQ0sexwhMsXKMbmPtzAfw/vi5wRrblmsr60YJMYlCiHIZmuPDRXZ
-         YNzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741769994; x=1742374794;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YLjvAC9VadvURn5Ux6ZjZ6iTF/ZbVpdU4qEAD+HtQq0=;
-        b=QvPRd85Wfowd0DYz3YCY3M43tCiarKES7d/a0gu4Z7HCrPFWS2udjgaBFiKGMUp1FB
-         V4Izb1XK7MqEFhQBBp8k4BcUVfcn96TvZdcr0YdpKNEkZsFLd3peaXn6IWlkJH/dbbQZ
-         3UsmcFgvbw7nQ1JHJxz8rgini1JJZiNfY9h0dQ3/dNzBk3cbhY7Rud0DxWix7U/2J/ge
-         2WyDx1p6rBTAWrxUj/ai8UB4wRcYVURFfDSlTB2LqJJ/9jKYLuao4vFCu78BNjP05DyD
-         aE/DaGrGlnAVVm7GmNnG+dZOinFZyZCgdlagY/3E9JbsihNaIutBhI6C9rOonApQkcZg
-         4u9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCV+vFUqX6FuwYP7w1JXIZnmvzCsDQ8CSbLQFbi+Tigj3JRwlM91RM0XoLmsw3wp/kAjmDmyAqaV@vger.kernel.org, AJvYcCV/4UsuaKYRnSiNs9gYZtPJWWU6zSP9WkShZBE7WdsBd7fOAZ8mTksoqsOjOTTiDA5rgA7WNQnQ4drSJD0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzIGldrK681+jJ/j2+p4XQgArZhBxiapsmk33P/lYbybhFnnmSF
-	90HsHorizhnL4XAbB9nMTa+0+yhOYA4OSvAvMvJwk5fi4D+Weww=
-X-Gm-Gg: ASbGncs7lAYb+VJgtj7GjQPRxjQSv97vzP6LsN8RjvwXs1/2vOpRdxZeAUfAEYERhqD
-	cNGTLWNOv/ZiLXh7yIQ4qLu3GqCzkdp0I9fTaW7VmfCNZwMWcDgFNGT115bxKQ4CSrsdnXooaEK
-	7AGfDGJygSA4K3eg+igqbgwyJth+fkk3cxAwZucJAF66wHzYl1RlLQAZFqpuF+LOwigA29MHS+t
-	t+ZYkUvmG3+rzaqnGLYWNdZcpqJnS/vIVuKcmM1hjWmR97mpzYjAPRjRmULlBcZa+PC8q897K6M
-	KoQ2Md9iY4f8lr8hcs5rCj2qRvy4Q6pxStAHjvVlFInN
-X-Google-Smtp-Source: AGHT+IFCWnFcsw9a3Z1Y4ByIia/oIl1baOMWJlJ6pclruk4c3FJa4krYzBdeJWhSQ97nq8PSDFwQfQ==
-X-Received: by 2002:a17:902:cec7:b0:225:ac99:ae0d with SMTP id d9443c01a7336-225ac99c10cmr19869965ad.10.1741769994450;
-        Wed, 12 Mar 2025 01:59:54 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22410ab9b7fsm111010025ad.253.2025.03.12.01.59.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Mar 2025 01:59:53 -0700 (PDT)
-Date: Wed, 12 Mar 2025 01:59:52 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: sdf@fomichev.me, andrew+netdev@lunn.ch, atenart@kernel.org,
-	davem@davemloft.net, edumazet@google.com, enjuk@amazon.com,
-	horms@kernel.org, jasowang@redhat.com, jdamato@fastly.com,
-	kory.maincent@bootlin.com, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, willemdebruijn.kernel@gmail.com
-Subject: Re: [PATCH net-next 2/2] net: reorder dev_addr_sem lock
-Message-ID: <Z9FNCH5_skuEBYGl@mini-arch>
-References: <20250311084507.3978048-3-sdf@fomichev.me>
- <20250312022757.69200-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1741770688; c=relaxed/simple;
+	bh=hPSTfb9hK5artlzSLHGsH/c3sy2ku9iSlzjEcPKrk+Y=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Sy3DhHr4qL+rICoKy0e0yDmXEZzeqNybikf88BJIYvr8gdcoKVik/YC8azRlj7ONSuoJ01Cwx/fRWOWiBBnPe8InBGOpVIn1WUWsveBZK+S00J7eHbO1oMlJ+2/6TdEn1Vt1JrgeLu54iyfXTBYXVIznyYlxQXUsvSLulqeHTRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TboSritL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7B56FC4CEE3;
+	Wed, 12 Mar 2025 09:11:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741770687;
+	bh=hPSTfb9hK5artlzSLHGsH/c3sy2ku9iSlzjEcPKrk+Y=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=TboSritLTtkdH6BhWQ1xaiZO2JE/Rb3rLrxsq4EevnPv3Etg+/niyK2gNIkjstfcj
+	 PFReCprT2IhUf59vzR9uRWt5/Lx8/6gezfnfmDIT0wUvai85D1/v2TqSbvE5dfLjzP
+	 rz9glKSnJwstLywWnLLu8LBdL3hMIKDw26ZCHByli7jMRiSnTNKrQr96/rGp3YTwUV
+	 QCN01IMut+cDILnIMfPMHkaNTakYvP4YWkghMbdCG+L0U2uGFjjdGo3cvNz1hfCtg5
+	 7XsqDqTOGi++9dUjF+hNftyLfU0xMYcpAkxMBcBG019osRCi55bc/pPzKj1fte9cuc
+	 77OtBJgUo84pQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61DBAC28B28;
+	Wed, 12 Mar 2025 09:11:27 +0000 (UTC)
+From: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
+Subject: [PATCH net 0/7] selftests/net: Mixed select()+polling mode for
+ TCP-AO tests
+Date: Wed, 12 Mar 2025 09:10:54 +0000
+Message-Id: <20250312-tcp-ao-selftests-polling-v1-0-72a642b855d5@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250312022757.69200-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJ5P0WcC/x2MQQrDIBAAvxL23IVoaQL9SunBNWuyYFVcKYWQv
+ 9fkOAMzOyhXYYXnsEPlr6jk1MHcBvCbSyujLJ3BjvYx3o3F5gu6jMoxNNamWHKMkla0hiaiJcw
+ zTdDzUjnI71q/IHGDd5fklJGqS347rx+njSscxx8JUWgHiAAAAA==
+X-Change-ID: 20250312-tcp-ao-selftests-polling-21b6bbdf77b6
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1741770685; l=1696;
+ i=0x7f454c46@gmail.com; s=20240410; h=from:subject:message-id;
+ bh=hPSTfb9hK5artlzSLHGsH/c3sy2ku9iSlzjEcPKrk+Y=;
+ b=goNN8v5fCXHA4SzoupYXXme+VIQSH5K1KWQaq37LtGpwmpDDksGy/vCmDRxAh+jCypEWNBzOs
+ u+9v/IIbeWcBZXIuqGSjYII8dZOkTLIfBt7CrZQEuIePtMj+AJrRiaw
+X-Developer-Key: i=0x7f454c46@gmail.com; a=ed25519;
+ pk=cFSWovqtkx0HrT5O9jFCEC/Cef4DY8a2FPeqP4THeZQ=
+X-Endpoint-Received: by B4 Relay for 0x7f454c46@gmail.com/20240410 with
+ auth_id=152
+X-Original-From: Dmitry Safonov <0x7f454c46@gmail.com>
+Reply-To: 0x7f454c46@gmail.com
 
-On 03/11, Kuniyuki Iwashima wrote:
-> From: Stanislav Fomichev <sdf@fomichev.me>
-> Date: Tue, 11 Mar 2025 01:45:07 -0700
-> > diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-> > index 9355058bf996..c9d44dad203d 100644
-> > --- a/net/core/rtnetlink.c
-> > +++ b/net/core/rtnetlink.c
-> > @@ -3080,21 +3080,32 @@ static int do_setlink(const struct sk_buff *skb, struct net_device *dev,
-> >  		struct sockaddr *sa;
-> >  		int len;
-> >  
-> > +		netdev_unlock_ops(dev);
-> > +
-> > +		/* dev_addr_sem is an outer lock, enforce proper ordering */
-> > +		down_write(&dev_addr_sem);
-> > +		netdev_lock_ops(dev);
-> > +
-> >  		len = sizeof(sa_family_t) + max_t(size_t, dev->addr_len,
-> >  						  sizeof(*sa));
-> >  		sa = kmalloc(len, GFP_KERNEL);
-> >  		if (!sa) {
-> > +			up_write(&dev_addr_sem);
-> >  			err = -ENOMEM;
-> >  			goto errout;
-> >  		}
-> >  		sa->sa_family = dev->type;
-> >  		memcpy(sa->sa_data, nla_data(tb[IFLA_ADDRESS]),
-> >  		       dev->addr_len);
-> 
-> Can we move down_write() and netdev_lock_ops() here ?
+Should fix flaky tcp-ao/connect-deny-ipv6 test.
+Begging pardon for the delay since the report and for sending it this
+late in the release cycle.
 
-Should be doable, yes, will also remove that up_write from the !sa
-error condition. Will do, thanks for the review!
+Signed-off-by: Dmitry Safonov <0x7f454c46@gmail.com>
+---
+Dmitry Safonov (7):
+      selftests/net: Print TCP flags in more common format
+      selftests/net: Provide tcp-ao counters comparison helper
+      selftests/net: Fetch and check TCP-MD5 counters
+      selftests/net: Add mixed select()+polling mode to TCP-AO tests
+      selftests/net: Print the testing side in unsigned-md5
+      selftests/net: Delete timeout from test_connect_socket()
+      selftests/net: Drop timeout argument from test_client_verify()
+
+ tools/testing/selftests/net/tcp_ao/connect-deny.c  |  58 ++--
+ tools/testing/selftests/net/tcp_ao/connect.c       |  22 +-
+ tools/testing/selftests/net/tcp_ao/icmps-discard.c |  17 +-
+ .../testing/selftests/net/tcp_ao/key-management.c  |  76 ++---
+ tools/testing/selftests/net/tcp_ao/lib/aolib.h     | 114 ++++++--
+ .../testing/selftests/net/tcp_ao/lib/ftrace-tcp.c  |   7 +-
+ tools/testing/selftests/net/tcp_ao/lib/sock.c      | 315 +++++++++++++++------
+ tools/testing/selftests/net/tcp_ao/restore.c       |  75 +++--
+ tools/testing/selftests/net/tcp_ao/rst.c           |  47 ++-
+ tools/testing/selftests/net/tcp_ao/self-connect.c  |  18 +-
+ tools/testing/selftests/net/tcp_ao/seq-ext.c       |  30 +-
+ tools/testing/selftests/net/tcp_ao/unsigned-md5.c  | 118 ++++----
+ 12 files changed, 552 insertions(+), 345 deletions(-)
+---
+base-commit: 0fed89a961ea851945d23cc35beb59d6e56c0964
+change-id: 20250312-tcp-ao-selftests-polling-21b6bbdf77b6
+
+Best regards,
+-- 
+Dmitry Safonov <0x7f454c46@gmail.com>
+
+
 
