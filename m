@@ -1,212 +1,221 @@
-Return-Path: <netdev+bounces-174067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7889A5D48D
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 04:00:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27568A5D49A
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 04:06:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8AFB7A74FC
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 02:59:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 550FB178532
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 03:06:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B649F1662F1;
-	Wed, 12 Mar 2025 03:00:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72EA118FC75;
+	Wed, 12 Mar 2025 03:06:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mp4Fz3tb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IPcgTuFf"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A614502F
-	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 03:00:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE4A318DF6E
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 03:06:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741748412; cv=none; b=ejmZd9kv8lgi0UE17bgu6zHUzmpog+V3WxE4FDc1H91o74V2B+eyhMQJWYuOBZ2IrNnyInnQJlJ3ZK2pc0ATnTzxNhua3Zy99oRnQgFdeH2GTTSjCg6YmacKA46nkAdIKkpqs2SAd4Uu3xDvPTMnyvs8a3xVLOClYmsL5LxlQzg=
+	t=1741748770; cv=none; b=Tn6d2v/KezYqzxWjJwWerfiWIGLcnBaEQQCE3tvjmcNx5tWwQawSywi1mzI3xrp4HXZo2uvc/r4Uv9XC9Jt6ZmGU3DX8nOgF85XkkET8w4qH1+v0mvq6rs5ZmrOlEnQFPj+ZmGxBsqEK08F5CfYoMwS+juSiBll3DYvJ7INVMaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741748412; c=relaxed/simple;
-	bh=uh729120lBrgt14eq8/qws4JD1PfEtETFf5h4dUiehI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BHeQp344m1q0rpNC/WlYo9S173hbFAvegnuI6H0TLK4+S0Ettj28sG/2R3Uarbhp8MnIGEW3j1S/5COzVlsXiHNiOCVT2aesK08xo6u7u6udnx5/r3ObvWwUKz7PJ6Hjx0YA25zyklJK/oYvYVTKLLjxx3GbPsG40K7LZ+erUHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Mp4Fz3tb; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741748409;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FPO7R0eIW5tnFxhT73UA9jvPdIiqGpsDvnFvTsNRiiU=;
-	b=Mp4Fz3tbxJiZMvsD6hfvpeFdwo03iVMThCe0yJP/vcVlrLwFNIN98Qu4OGgENceB6CjewT
-	nesvGG4rg58Rx4kUh8gDN7Y0lEUgmhDEzwGkbnG9semiqNCfiEcf5sUyqtQ7ezvqfAuujJ
-	j+X1sSZAAIzBvsITJ/nABwjTKXd7xSA=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-230-V53Zen6dOC67QdtQnZhzJA-1; Tue, 11 Mar 2025 23:00:08 -0400
-X-MC-Unique: V53Zen6dOC67QdtQnZhzJA-1
-X-Mimecast-MFC-AGG-ID: V53Zen6dOC67QdtQnZhzJA_1741748407
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2feb47c6757so9881286a91.3
-        for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 20:00:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741748407; x=1742353207;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FPO7R0eIW5tnFxhT73UA9jvPdIiqGpsDvnFvTsNRiiU=;
-        b=IwwzOfedbmLSCkwjOstqjIJ/J0riQqvycVtvCH7Z6DZdNA+wFMii0C5hEcbvhOLHJ+
-         B3QNNJ4mtu2eef7VBgsOJ6LKwTXTf3/v1trv6eo9JM09YwTOSVeQolGkog5oyXlWa44P
-         1TkjdLV1XCicndc5EQfVbOR5Abx1rYoyqHHQk4BnfLW0Y0JDzQUIr0OtaG5XW+lN0Ho3
-         oB+GxOik+DC9fhuOeavbyzbozVdWweskzvJvjnGDWGyTT0PNlNSnoY44t7IOVfMYYBF5
-         UcHuGBL92Cr+AZo2bPxxYgEXdJiVE7Z3ac8VgXMpr4N37n93Lz5uFoirwREdwRzAAybR
-         BY1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUGKgrnar2K5tu/DglN53/zNT3DwxCuRdni9ZzoTUjevei29ejIuIXXy1uGWoxHtsuclF6sRfg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1Gha5sDu91FfXlNNNITNW3b2e7umpT74iGJfhlcXfhHO5lFz5
-	L23aaPiNn5v9gzPefVor92ByW8C1utLZC3Krd9IVFmydNwkGcOyruOxrl37BwFkkFd8pU6SxmmI
-	Crzs/SD4W/Y70bBHLwYMuWP9XEDOX2OdAp1Ob2HR6PuL5rSrP+nwlvtL1+H4IogeygKXl39GGtQ
-	0X0JtvEs1wTSyXDeSiKqE9naPxUi9N
-X-Gm-Gg: ASbGncseLCoKfs4H3h4vmpbXTCbdn72XBwsMnBOGhgMg97dItVAVLygIaqG5I90nr/1
-	F6BeD+xlmOp2TC0VFRa3HxO+Z8XUBocKB146bPXJBF2wjBqyTUEanYkl/G2cm1FbdHelIHg==
-X-Received: by 2002:a17:90b:35c6:b0:2ff:4bac:6fa2 with SMTP id 98e67ed59e1d1-300ff100782mr8803707a91.16.1741748407254;
-        Tue, 11 Mar 2025 20:00:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IET6lsV/yTA4z+MP1noXOIunYsp3qN8L1Z8eiyVimjBwI0oZIPPsINtQsWF9heOMDn6TbEv142XFxBfq24rdok=
-X-Received: by 2002:a17:90b:35c6:b0:2ff:4bac:6fa2 with SMTP id
- 98e67ed59e1d1-300ff100782mr8803670a91.16.1741748406897; Tue, 11 Mar 2025
- 20:00:06 -0700 (PDT)
+	s=arc-20240116; t=1741748770; c=relaxed/simple;
+	bh=5+YX71dkXNDCghpWAPAado6XW1FmrkmtNlC6GtLHbcA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S0juWHHcBKDjyCk85gBPQxSUHCZSMomh3fCynGvoswIeu2xlQIZrloMnWdvBcI6GdjZrbrCTt3rzdW1WnweIFbKDEceryujGwt7Y7/Zlves2T/YuzC4NpwnxleZMUwSVFQA6wI/IEWLvOB1oTS3Jfywt6cW4sUF1ZeUO5838rgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IPcgTuFf; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741748768; x=1773284768;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=5+YX71dkXNDCghpWAPAado6XW1FmrkmtNlC6GtLHbcA=;
+  b=IPcgTuFfgCJixGgyEjQeHSFLy/E0yc4IKJu7QX3wiFMvQrKvvL5dEbqc
+   J0ZGSyqxOLv6tmCWKLbCELYTf9bap6kpIid/mT1+DGbfDf7Bp8cfztQaf
+   rxRDaBKVg2KI2vyH9dPrA/FZfybRyU4guXevXUjgO78rtJUSwC1KSeUgk
+   kCgMxnaJoqNy4I6MHwETYRWmMTUlFj5I5El4/9dk4CdSjqJ5Lix8IXteW
+   Q29dtwJt2EsZ84ly6gOa4N0cYO0Ay6W9z3Sfeg+SBeFiuJ0EYJtcRbqGm
+   h/X/iIO/7HLCBzhAGS2tR8ZVOHYEeuU+WBGlyeHhusoTnIoQz6EChUvKy
+   A==;
+X-CSE-ConnectionGUID: +8a+e0VYSh+YLYVPcXU91Q==
+X-CSE-MsgGUID: lH6ar+TZQIeewEJd6ObVnw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11370"; a="53437685"
+X-IronPort-AV: E=Sophos;i="6.14,240,1736841600"; 
+   d="scan'208";a="53437685"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2025 20:06:07 -0700
+X-CSE-ConnectionGUID: H5O2YCCkRFK7Xh0Zv2MPmw==
+X-CSE-MsgGUID: qFOVIYd/RcyovUyuWKbBiw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,240,1736841600"; 
+   d="scan'208";a="125694866"
+Received: from lkp-server02.sh.intel.com (HELO a4747d147074) ([10.239.97.151])
+  by orviesa005.jf.intel.com with ESMTP; 11 Mar 2025 20:06:04 -0700
+Received: from kbuild by a4747d147074 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tsCPu-00084S-0U;
+	Wed, 12 Mar 2025 03:05:59 +0000
+Date: Wed, 12 Mar 2025 11:05:43 +0800
+From: kernel test robot <lkp@intel.com>
+To: Paul Greenwalt <paul.greenwalt@intel.com>,
+	intel-wired-lan@lists.osuosl.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, anthony.l.nguyen@intel.com,
+	Paul Greenwalt <paul.greenwalt@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Alice Michael <alice.michael@intel.com>
+Subject: Re: [PATCH iwl-next v2] ice: add E830 Earliest TxTime First Offload
+ support
+Message-ID: <202503121018.CUGx8uFd-lkp@intel.com>
+References: <20250311132327.76804-1-paul.greenwalt@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250307-rss-v9-0-df76624025eb@daynix.com> <20250307-rss-v9-3-df76624025eb@daynix.com>
- <CACGkMEsNHba=PY5UQoH1zdGQRiHC8FugMG1nkXqOj1TBdOQrww@mail.gmail.com>
- <7978dfd5-8499-44f3-9c30-e53a01449281@daynix.com> <CACGkMEsR4_RreDbYQSEk5Cr29_26WNUYheWCQBjyMNUn=1eS2Q@mail.gmail.com>
- <5e67a0a6-f613-4b0a-b64e-67f649e45c3e@daynix.com>
-In-Reply-To: <5e67a0a6-f613-4b0a-b64e-67f649e45c3e@daynix.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 12 Mar 2025 10:59:51 +0800
-X-Gm-Features: AQ5f1JqQKEMLpBM7U-YYsZ15IkMLY-FYatkHcqLxAc5jqhv4juthUfs4s77Xshk
-Message-ID: <CACGkMEv83iR0vU00XGOGonL1fkd=K1b-shCcNb1K8yJ9O+0BDQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v9 3/6] tun: Introduce virtio-net hash feature
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
-	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
-	Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
-	Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250311132327.76804-1-paul.greenwalt@intel.com>
 
-On Tue, Mar 11, 2025 at 2:17=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix=
-.com> wrote:
->
-> On 2025/03/11 9:38, Jason Wang wrote:
-> > On Mon, Mar 10, 2025 at 3:45=E2=80=AFPM Akihiko Odaki <akihiko.odaki@da=
-ynix.com> wrote:
-> >>
-> >> On 2025/03/10 12:55, Jason Wang wrote:
-> >>> On Fri, Mar 7, 2025 at 7:01=E2=80=AFPM Akihiko Odaki <akihiko.odaki@d=
-aynix.com> wrote:
-> >>>>
-> >>>> Hash reporting
-> >>>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >>>>
-> >>>> Allow the guest to reuse the hash value to make receive steering
-> >>>> consistent between the host and guest, and to save hash computation.
-> >>>>
-> >>>> RSS
-> >>>> =3D=3D=3D
-> >>>>
-> >>>> RSS is a receive steering algorithm that can be negotiated to use wi=
-th
-> >>>> virtio_net. Conventionally the hash calculation was done by the VMM.
-> >>>> However, computing the hash after the queue was chosen defeats the
-> >>>> purpose of RSS.
-> >>>>
-> >>>> Another approach is to use eBPF steering program. This approach has
-> >>>> another downside: it cannot report the calculated hash due to the
-> >>>> restrictive nature of eBPF steering program.
-> >>>>
-> >>>> Introduce the code to perform RSS to the kernel in order to overcome
-> >>>> thse challenges. An alternative solution is to extend the eBPF steer=
-ing
-> >>>> program so that it will be able to report to the userspace, but I di=
-dn't
-> >>>> opt for it because extending the current mechanism of eBPF steering
-> >>>> program as is because it relies on legacy context rewriting, and
-> >>>> introducing kfunc-based eBPF will result in non-UAPI dependency whil=
-e
-> >>>> the other relevant virtualization APIs such as KVM and vhost_net are
-> >>>> UAPIs.
-> >>>>
-> >>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> >>>> Tested-by: Lei Yang <leiyang@redhat.com>
-> >>>> ---
-> >>>>    Documentation/networking/tuntap.rst |   7 ++
-> >>>>    drivers/net/Kconfig                 |   1 +
-> >>>>    drivers/net/tap.c                   |  68 ++++++++++++++-
-> >>>>    drivers/net/tun.c                   |  98 +++++++++++++++++-----
-> >>>>    drivers/net/tun_vnet.h              | 159 +++++++++++++++++++++++=
-+++++++++++--
-> >>>>    include/linux/if_tap.h              |   2 +
-> >>>>    include/linux/skbuff.h              |   3 +
-> >>>>    include/uapi/linux/if_tun.h         |  75 +++++++++++++++++
-> >>>>    net/core/skbuff.c                   |   4 +
-> >>>>    9 files changed, 386 insertions(+), 31 deletions(-)
-> >>>>
+Hi Paul,
 
-[...]
+kernel test robot noticed the following build errors:
 
-> >>> Let's has a consistent name for this and the uapi to be consistent
-> >>> with TUNSETIFF/TUNGETIFF. Probably TUNSETVNETHASH and
-> >>> tun_vnet_ioctl_gethash().
-> >>
-> >> They have different semantics so they should have different names.
-> >> TUNGETIFF reports the value currently set while TUNGETVNETHASHCAP
-> >> reports the value that can be set later.
-> >
-> > I'm not sure I will get here. I meant a symmetric name
-> >
-> > TUNSETVNETHASH and TUNVETVNETHASH.
->
-> TUNGETVNETHASHCAP does not correspond to TUNGETIFF. The correspondence
-> of ioctl names is as follows:
-> TUNGETFEATURES - TUNGETVNETHASHCAP
+[auto build test ERROR on tnguy-next-queue/dev-queue]
 
-TUNGETFEATURES returns the value set from TUNSETIFF. This differs from
-TUNGETVNETHASHCAP semantic which just return the capabilities.
+url:    https://github.com/intel-lab-lkp/linux/commits/Paul-Greenwalt/ice-add-E830-Earliest-TxTime-First-Offload-support/20250312-051400
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue.git dev-queue
+patch link:    https://lore.kernel.org/r/20250311132327.76804-1-paul.greenwalt%40intel.com
+patch subject: [PATCH iwl-next v2] ice: add E830 Earliest TxTime First Offload support
+config: arm-randconfig-003-20250312 (https://download.01.org/0day-ci/archive/20250312/202503121018.CUGx8uFd-lkp@intel.com/config)
+compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250312/202503121018.CUGx8uFd-lkp@intel.com/reproduce)
 
-+static inline long tun_vnet_ioctl_gethashcap(void __user *argp)
-+{
-+       static const struct tun_vnet_hash cap =3D {
-+               .flags =3D TUN_VNET_HASH_REPORT | TUN_VNET_HASH_RSS,
-+               .types =3D VIRTIO_NET_SUPPORTED_HASH_TYPES
-+       };
-+
-+       return copy_to_user(argp, &cap, sizeof(cap)) ? -EFAULT : 0;
-+}
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202503121018.CUGx8uFd-lkp@intel.com/
 
-TUNGETFEATURES doesn't' help too much for non-persist TAP as userspace
-knows what value it set before.
+All errors (new ones prefixed by >>):
 
-> TUNSETIFF - TUNSETVNETHASH
-> TUNGETIFF - no corresponding ioctl for the virtio-net hash features
+>> drivers/net/ethernet/intel/ice/ice_base.c:1023:39: error: passing 'const struct ice_vsi *' to parameter of type 'struct ice_vsi *' discards qualifiers [-Werror,-Wincompatible-pointer-types-discards-qualifiers]
+    1023 |         ring->q_handle = ice_calc_txq_handle(vsi, ring, tc);
+         |                                              ^~~
+   drivers/net/ethernet/intel/ice/ice_base.c:245:48: note: passing argument to parameter 'vsi' here
+     245 | static u16 ice_calc_txq_handle(struct ice_vsi *vsi, struct ice_tx_ring *ring, u8 tc)
+         |                                                ^
+   1 error generated.
 
-And this sounds odd and a hint for a incomplete uAPI as userspace
-needs to know knowing what can set before doing TUNSETVNETHASH.
 
->
-> Regards,
-> Akihiko Odaki
->
+vim +1023 drivers/net/ethernet/intel/ice/ice_base.c
 
-Thanks
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24   974  
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24   975  /**
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24   976   * ice_vsi_cfg_txq - Configure single Tx queue
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24   977   * @vsi: the VSI that queue belongs to
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24   978   * @ring: Tx ring to be configured
+51900dfcf194b39 Paul Greenwalt         2025-03-11   979   * @tstamp_ring: time stamp ring to be configured
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24   980   * @qg_buf: queue group buffer
+51900dfcf194b39 Paul Greenwalt         2025-03-11   981   * @txtime_qg_buf: Tx Time queue group buffer
+51900dfcf194b39 Paul Greenwalt         2025-03-11   982   *
+51900dfcf194b39 Paul Greenwalt         2025-03-11   983   * Return: 0 on success and a negative value on error.
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24   984   */
+a292ba981324ec7 Maciej Fijalkowski     2024-01-23   985  static int
+51900dfcf194b39 Paul Greenwalt         2025-03-11   986  ice_vsi_cfg_txq(const struct ice_vsi *vsi, struct ice_tx_ring *ring,
+51900dfcf194b39 Paul Greenwalt         2025-03-11   987  		struct ice_tx_ring *tstamp_ring,
+51900dfcf194b39 Paul Greenwalt         2025-03-11   988  		struct ice_aqc_add_tx_qgrp *qg_buf,
+51900dfcf194b39 Paul Greenwalt         2025-03-11   989  		struct ice_aqc_set_txtime_qgrp *txtime_qg_buf)
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24   990  {
+66486d8943bac36 Bruce Allan            2020-06-29   991  	u8 buf_len = struct_size(qg_buf, txqs, 1);
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24   992  	struct ice_tlan_ctx tlan_ctx = { 0 };
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24   993  	struct ice_aqc_add_txqs_perq *txq;
+0754d65bd4be5bb Kiran Patil            2021-10-15   994  	struct ice_channel *ch = ring->ch;
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24   995  	struct ice_pf *pf = vsi->back;
+7e34786a74e1403 Bruce Allan            2020-05-15   996  	struct ice_hw *hw = &pf->hw;
+5e24d5984c805c6 Tony Nguyen            2021-10-07   997  	int status;
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24   998  	u16 pf_q;
+e75d1b2c3731999 Maciej Fijalkowski     2019-10-24   999  	u8 tc;
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1000  
+634da4c118434cf Benita Bose            2021-03-02  1001  	/* Configure XPS */
+634da4c118434cf Benita Bose            2021-03-02  1002  	ice_cfg_xps_tx_ring(ring);
+634da4c118434cf Benita Bose            2021-03-02  1003  
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1004  	pf_q = ring->reg_idx;
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1005  	ice_setup_tx_ctx(ring, &tlan_ctx, pf_q);
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1006  	/* copy context contents into the qg_buf */
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1007  	qg_buf->txqs[0].txq_id = cpu_to_le16(pf_q);
+dc4305be467a6f8 Jacob Keller           2024-12-10  1008  	ice_pack_txq_ctx(&tlan_ctx, &qg_buf->txqs[0].txq_ctx);
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1009  
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1010  	/* init queue specific tail reg. It is referred as
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1011  	 * transmit comm scheduler queue doorbell.
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1012  	 */
+7e34786a74e1403 Bruce Allan            2020-05-15  1013  	ring->tail = hw->hw_addr + QTX_COMM_DBELL(pf_q);
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1014  
+e75d1b2c3731999 Maciej Fijalkowski     2019-10-24  1015  	if (IS_ENABLED(CONFIG_DCB))
+e75d1b2c3731999 Maciej Fijalkowski     2019-10-24  1016  		tc = ring->dcb_tc;
+e75d1b2c3731999 Maciej Fijalkowski     2019-10-24  1017  	else
+e75d1b2c3731999 Maciej Fijalkowski     2019-10-24  1018  		tc = 0;
+e75d1b2c3731999 Maciej Fijalkowski     2019-10-24  1019  
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1020  	/* Add unique software queue handle of the Tx queue per
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1021  	 * TC into the VSI Tx ring
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1022  	 */
+e72bba21355dbb6 Maciej Fijalkowski     2021-08-19 @1023  	ring->q_handle = ice_calc_txq_handle(vsi, ring, tc);
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1024  
+0754d65bd4be5bb Kiran Patil            2021-10-15  1025  	if (ch)
+0754d65bd4be5bb Kiran Patil            2021-10-15  1026  		status = ice_ena_vsi_txq(vsi->port_info, ch->ch_vsi->idx, 0,
+0754d65bd4be5bb Kiran Patil            2021-10-15  1027  					 ring->q_handle, 1, qg_buf, buf_len,
+0754d65bd4be5bb Kiran Patil            2021-10-15  1028  					 NULL);
+0754d65bd4be5bb Kiran Patil            2021-10-15  1029  	else
+0754d65bd4be5bb Kiran Patil            2021-10-15  1030  		status = ice_ena_vsi_txq(vsi->port_info, vsi->idx, tc,
+0754d65bd4be5bb Kiran Patil            2021-10-15  1031  					 ring->q_handle, 1, qg_buf, buf_len,
+0754d65bd4be5bb Kiran Patil            2021-10-15  1032  					 NULL);
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1033  	if (status) {
+5f87ec4861aa1b8 Tony Nguyen            2021-10-07  1034  		dev_err(ice_pf_to_dev(pf), "Failed to set LAN Tx queue context, error: %d\n",
+5f87ec4861aa1b8 Tony Nguyen            2021-10-07  1035  			status);
+c14846914ed6b57 Tony Nguyen            2021-10-07  1036  		return status;
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1037  	}
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1038  
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1039  	/* Add Tx Queue TEID into the VSI Tx ring from the
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1040  	 * response. This will complete configuring and
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1041  	 * enabling the queue.
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1042  	 */
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1043  	txq = &qg_buf->txqs[0];
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1044  	if (pf_q == le16_to_cpu(txq->txq_id))
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1045  		ring->txq_teid = le32_to_cpu(txq->q_teid);
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1046  
+51900dfcf194b39 Paul Greenwalt         2025-03-11  1047  	if (tstamp_ring) {
+51900dfcf194b39 Paul Greenwalt         2025-03-11  1048  		u8 txtime_buf_len = struct_size(txtime_qg_buf, txtimeqs, 1);
+51900dfcf194b39 Paul Greenwalt         2025-03-11  1049  		struct ice_txtime_ctx txtime_ctx = {};
+51900dfcf194b39 Paul Greenwalt         2025-03-11  1050  
+51900dfcf194b39 Paul Greenwalt         2025-03-11  1051  		ice_setup_txtime_ctx(tstamp_ring, &txtime_ctx,
+51900dfcf194b39 Paul Greenwalt         2025-03-11  1052  				     !!(ring->flags & ICE_TX_FLAGS_TXTIME));
+51900dfcf194b39 Paul Greenwalt         2025-03-11  1053  		ice_pack_txtime_ctx(&txtime_ctx,
+51900dfcf194b39 Paul Greenwalt         2025-03-11  1054  				    &txtime_qg_buf->txtimeqs[0].txtime_ctx);
+51900dfcf194b39 Paul Greenwalt         2025-03-11  1055  
+51900dfcf194b39 Paul Greenwalt         2025-03-11  1056  		tstamp_ring->tail =
+51900dfcf194b39 Paul Greenwalt         2025-03-11  1057  			 hw->hw_addr + E830_GLQTX_TXTIME_DBELL_LSB(pf_q);
+51900dfcf194b39 Paul Greenwalt         2025-03-11  1058  
+51900dfcf194b39 Paul Greenwalt         2025-03-11  1059  		status = ice_aq_set_txtimeq(hw, pf_q, 1, txtime_qg_buf,
+51900dfcf194b39 Paul Greenwalt         2025-03-11  1060  					    txtime_buf_len, NULL);
+51900dfcf194b39 Paul Greenwalt         2025-03-11  1061  		if (status) {
+51900dfcf194b39 Paul Greenwalt         2025-03-11  1062  			dev_err(ice_pf_to_dev(pf), "Failed to set Tx Time queue context, error: %d\n",
+51900dfcf194b39 Paul Greenwalt         2025-03-11  1063  				status);
+51900dfcf194b39 Paul Greenwalt         2025-03-11  1064  			return status;
+51900dfcf194b39 Paul Greenwalt         2025-03-11  1065  		}
+51900dfcf194b39 Paul Greenwalt         2025-03-11  1066  	}
+51900dfcf194b39 Paul Greenwalt         2025-03-11  1067  
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1068  	return 0;
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1069  }
+eff380aaffedb27 Anirudh Venkataramanan 2019-10-24  1070  
 
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
