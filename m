@@ -1,235 +1,122 @@
-Return-Path: <netdev+bounces-174073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174074-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03C3BA5D4DE
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 04:53:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03537A5D52B
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 05:57:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E7A33B4FEA
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 03:52:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC505189452C
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 04:57:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12FC51D63D0;
-	Wed, 12 Mar 2025 03:52:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F09871DBB38;
+	Wed, 12 Mar 2025 04:57:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="AxHIzS5J"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ctsKdy/D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D74534685;
-	Wed, 12 Mar 2025 03:52:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6330A1CD215
+	for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 04:57:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741751578; cv=none; b=rG3mVsGXuPG+2swhAwDHwpaUZh5OGx6XLVcuoAhZ4R1xiBWT0y8B/+jfwh0wdxyFhi9/2dJ+9wT4vdfy1D9p8/uzma25Nvt8383a1d1/cdyilkx34VCh95NTyvlZH9hdyAX31yVrYR12kXK/K9sRpvne6cP4WF20qhuToQA0jJU=
+	t=1741755458; cv=none; b=GcI+SCV/N0xvHga0bZwNbAhktCaLGs0WAEfTeLt2GH1AINOrwQLBQRLRHf8snUpCpLbVoSf72BeL+JK8mM9ZaTt7b5ZPFt1idi+1KfTWLGnas/ym+nx85RHeX+TjFZQbQF9WkCJaH6k5a6is95iwWogdw/KpJ3zUvMsr+iijuEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741751578; c=relaxed/simple;
-	bh=sLKqKjYLtwBaRwxi4pI2AP0lZkLdOBbifFarCNv34ug=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=JyX8cLOsb4wgutVjEwmnMAzTIxNYXzZiZY11F7GOAJEuhbhU1JvjfKRXa025iqAD3Tbmh/MTg6I/E/eLlppxSM88LG5eOodP/Ed93/iTe0EaaDUK66miAzfXCEib0Cklg0otBKYXWKrA3dy24Ue4sYdP0yp7Bb8+yWRYwXjF0QY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=AxHIzS5J; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1741751571;
-	bh=csLI6VHnfoRTbr9Hhw1hlQTjIqbLO4KYY8VWFZt9+8w=;
-	h=Date:From:To:Cc:Subject:From;
-	b=AxHIzS5J2+9Jp8BHuQmJ852mWt5T25ssDBoOpK2hnU5Dry6iHvJI7WEUu1tESqRdg
-	 J6Um/4FPtb9OXbJ0Sc9FPdVv06BJfR2RJNSB3I/gX8aQudFCUFEf69j3Ee4KrnEEPN
-	 tNtGC5FL8hH67953uZ/S3ehEpxpKAVMiaUnYtxx1sS+Flqkn3XQXKbj7QJ6tyRmcPa
-	 K7yTUPvNDGTe8tGi6ZTzCEpijCUBIJOaJbCkiXEbeqsJkl6Xnk8MEuI0nb249hyfDB
-	 sYBrzWqefi35hyvRCXdC7QExcaQgvIGjLipfATuFGsUbFf2HvDL8Yq6DUbiPh7qU5+
-	 1vxCsMEArvekg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4ZCGtV19Hfz4xCW;
-	Wed, 12 Mar 2025 14:52:49 +1100 (AEDT)
-Date: Wed, 12 Mar 2025 14:52:47 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
- <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>
-Cc: Shakeel Butt <shakeel.butt@linux.dev>, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>, Vlastimil Babka <vbabka@suse.cz>, bpf
- <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>, Linux Kernel
- Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: build failure after merge of the bpf-next tree
-Message-ID: <20250312145247.380c2aa5@canb.auug.org.au>
+	s=arc-20240116; t=1741755458; c=relaxed/simple;
+	bh=gKZ9bkQ9GnEPgrv2Cxvqzv+ZQ4ARoHdoKdw/H8KfwDY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qa4HcerzC7VtPIwmCRhMgMBwsTaMZdqEL0mrUu751XVtpAkjrm45qqkslI2LtxyEIejuBJVs+GfUYO8mVTgQRMyZhKlG/xEBPwkZxSRBKFRZRKQJPoDEqX7/JsMl2LQMiUdp8y2AfHkYLAhtPAQb436xBKYKRPHiawDLxEmPMB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ctsKdy/D; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-47686580529so27370181cf.2
+        for <netdev@vger.kernel.org>; Tue, 11 Mar 2025 21:57:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741755455; x=1742360255; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gKZ9bkQ9GnEPgrv2Cxvqzv+ZQ4ARoHdoKdw/H8KfwDY=;
+        b=ctsKdy/DWOEwgbsiWECXHBg5L1Tq9MBpbBU4Q3QLMiVxAN9Od4HPwpXIjpJMYdqa2T
+         3lfMBg7D2hm1dyY5HYEElOnbSZIPZAQj/Ijz++4fizBaGX6KRT7N5w/bQ3859amruz36
+         +sw8TI3pAUQsHOja/ZS69is8UAqW4VdO5tPn+JgzGYp7bo9hVEq/C71GSi8e0tX4b5VK
+         Sn8ebo0sTLTt4fKavQPZ8MYbdJCvxbSDG0HufcGamGwiJ6O4cwCmLdBAShZn1J/vD+yd
+         vl23OYtSZtzeE4aRd031ucgYttZkl7lE7J9esHDvT7V2Jmp6eLFgN6mptbm+IhSrL2c5
+         FsPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741755455; x=1742360255;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gKZ9bkQ9GnEPgrv2Cxvqzv+ZQ4ARoHdoKdw/H8KfwDY=;
+        b=D1QPk4i7zkU0IcorWxiMTyWS7ONcjAdJ0nKlq4YsIIV3uN5ToonYecilXIATwOUGej
+         pLfk25BmaoJXejQ6PhZtzmJEy7BZu9ta1ckyHQxBz9/rtoHhNXQo/rC1lvAwKhLqGgmC
+         /FreM+GckoVqRzvtd5Gp94tWomoui7IhLSKAsAR7eGlmKMqjkTXskCNgiZYOnBGYhb7T
+         Kjwdse/72pj/Ij7k0DAQ2UsxWaLN71iL19EG2GkT6B+4AuNXyvKZ+eKHKNsSXGIvRZhU
+         IKAt3FKOCvjHXnKSb2WVJR5dyacZ+qMvbRrs9NxJ0AfKUaVsdA/q/WlFjwpUoJ20Tvcv
+         IetQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXMhTjgReP1Xr4W09h//LIGIT0R+QuN76FKU7BA3/gSNysKmueBOwGcPkzqxuIYYpTbK+8fSpQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWXFpOSfiHkgzjJLLNU1qVxJLKSq+ZmHu/QUCMjdZM7yqK+f6M
+	O4lY7A/PE6VKZOoHILDzKDNyWtOuKGotE/9dFHLPVuIjPtucKsiOe7BVZD6jE6u7l/keMB5/2AZ
+	q/4F+tnEwxfAt848UtKGPGDCJy4zzYKdZbvFC
+X-Gm-Gg: ASbGncuLH3etqgC4PMsLM+CY4h4ZHUFl//jXUiqVDTIF1oLdecQjqsn7qGS7pMgNFEF
+	Y2KIVBubXNgQ45hevAXg/aWZMFmcavpTccTCD33IaboayOHb+piqmoU4oADKxFGVJkXQ6yaW0e/
+	Am6t80QqtHsvk6ALTTw/Q3sh/G7Q==
+X-Google-Smtp-Source: AGHT+IFxweTRrmyxD0z2rXDtguA8C4PbQGiHdjMhGYB/p9zTnHYNhw4HqtiRWGPvHWSJ+BUltYwvAME1i+Lvl+uSHyY=
+X-Received: by 2002:ac8:7f52:0:b0:476:8825:99ba with SMTP id
+ d75a77b69052e-47688259f29mr130462051cf.12.1741755455060; Tue, 11 Mar 2025
+ 21:57:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/Agm1aDa=ntrjh5CZDTyBZLk";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-
---Sig_/Agm1aDa=ntrjh5CZDTyBZLk
-Content-Type: text/plain; charset=US-ASCII
+References: <20250311085437.14703-1-kerneljasonxing@gmail.com>
+In-Reply-To: <20250311085437.14703-1-kerneljasonxing@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 12 Mar 2025 05:57:24 +0100
+X-Gm-Features: AQ5f1JqyplD4RAYNNkjIn99u4w0CrvAAPBXcoao54iBAd_wBxygJhoFMLLEVJQo
+Message-ID: <CANn89iJQ3D=Zad1UsqgL=GhfxF8TxiwHgWvT=xchm4scatgbWg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2 0/6] tcp: add some RTO MIN and DELACK MAX
+ {bpf_}set/getsockopt supports
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	dsahern@kernel.org, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org, 
+	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, horms@kernel.org, 
+	kuniyu@amazon.com, ncardwell@google.com, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+On Tue, Mar 11, 2025 at 9:56=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+>
+> Introduce bpf_sol_tcp_getsockopt() helper.
+>
+> Add bpf_getsockopt for RTO MIN and DELACK MAX.
+>
+> Add setsockopt/getsockopt for RTO MIN and DELACK MAX.
+>
+> Add corresponding selftests for bpf.
+>
+> v2
+> Link: https://lore.kernel.org/all/20250309123004.85612-1-kerneljasonxing@=
+gmail.com/
+> 1. add bpf getsockopt common helper
+> 2. target bpf-next net branch
 
-After merging the bpf-next tree, today's linux-next build (powerpc
-ppc64_defconfig) failed like this:
+Some of us are busy attending netdev conference.
 
-In file included from include/asm-generic/percpu.h:7,
-                 from arch/powerpc/include/asm/percpu.h:28,
-                 from arch/powerpc/include/asm/smp.h:26,
-                 from include/linux/smp.h:119,
-                 from include/linux/lockdep.h:14,
-                 from include/linux/radix-tree.h:14,
-                 from include/linux/idr.h:15,
-                 from include/linux/cgroup-defs.h:13,
-                 from mm/memcontrol.c:28:
-mm/memcontrol.c: In function 'memcg_hotplug_cpu_dead':
-include/linux/percpu-defs.h:242:2: error: passing argument 1 of 'local_lock=
-_acquire' from incompatible pointer type [-Wincompatible-pointer-types]
-  242 | ({                                                                 =
-     \
-      | ~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~
-      |  |
-      |  localtry_lock_t *
-  243 |         __verify_pcpu_ptr(ptr);                                    =
-     \
-      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~
-  244 |         arch_raw_cpu_ptr(ptr);                                     =
-     \
-      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~
-  245 | })
-      | ~~
-include/linux/percpu-defs.h:254:27: note: in expansion of macro 'raw_cpu_pt=
-r'
-  254 | #define this_cpu_ptr(ptr) raw_cpu_ptr(ptr)
-      |                           ^~~~~~~~~~~
-include/linux/local_lock_internal.h:105:36: note: in expansion of macro 'th=
-is_cpu_ptr'
-  105 |                 local_lock_acquire(this_cpu_ptr(lock));         \
-      |                                    ^~~~~~~~~~~~
-include/linux/local_lock.h:31:9: note: in expansion of macro '__local_lock_=
-irqsave'
-   31 |         __local_lock_irqsave(lock, flags)
-      |         ^~~~~~~~~~~~~~~~~~~~
-mm/memcontrol.c:1960:9: note: in expansion of macro 'local_lock_irqsave'
- 1960 |         local_lock_irqsave(&memcg_stock.stock_lock, flags);
-      |         ^~~~~~~~~~~~~~~~~~
-In file included from include/linux/local_lock.h:5,
-                 from include/linux/mmzone.h:24,
-                 from include/linux/gfp.h:7,
-                 from include/linux/xarray.h:16,
-                 from include/linux/radix-tree.h:21:
-include/linux/local_lock_internal.h:59:53: note: expected 'local_lock_t *' =
-but argument is of type 'localtry_lock_t *'
-   59 | static inline void local_lock_acquire(local_lock_t *l) { }
-      |                                       ~~~~~~~~~~~~~~^
-include/linux/percpu-defs.h:242:2: error: passing argument 1 of 'local_lock=
-_release' from incompatible pointer type [-Wincompatible-pointer-types]
-  242 | ({                                                                 =
-     \
-      | ~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~
-      |  |
-      |  localtry_lock_t *
-  243 |         __verify_pcpu_ptr(ptr);                                    =
-     \
-      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~
-  244 |         arch_raw_cpu_ptr(ptr);                                     =
-     \
-      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~
-  245 | })
-      | ~~
-include/linux/percpu-defs.h:254:27: note: in expansion of macro 'raw_cpu_pt=
-r'
-  254 | #define this_cpu_ptr(ptr) raw_cpu_ptr(ptr)
-      |                           ^~~~~~~~~~~
-include/linux/local_lock_internal.h:122:36: note: in expansion of macro 'th=
-is_cpu_ptr'
-  122 |                 local_lock_release(this_cpu_ptr(lock));         \
-      |                                    ^~~~~~~~~~~~
-include/linux/local_lock.h:52:9: note: in expansion of macro '__local_unloc=
-k_irqrestore'
-   52 |         __local_unlock_irqrestore(lock, flags)
-      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
-mm/memcontrol.c:1962:9: note: in expansion of macro 'local_unlock_irqrestor=
-e'
- 1962 |         local_unlock_irqrestore(&memcg_stock.stock_lock, flags);
-      |         ^~~~~~~~~~~~~~~~~~~~~~~
-include/linux/local_lock_internal.h:61:53: note: expected 'local_lock_t *' =
-but argument is of type 'localtry_lock_t *'
-   61 | static inline void local_lock_release(local_lock_t *l) { }
-      |                                       ~~~~~~~~~~~~~~^
+Please split this series in two, one for pure TCP changes and one
+other for BPF, and send it after the netdev conference ends.
 
-Caused by commits
+It is not because BPF stuff is added that suddenly a series can escape
+TCP maintainers attention.
 
-  0aaddfb06882 ("locking/local_lock: Introduce localtry_lock_t")
-  01d37228d331 ("memcg: Use trylock to access memcg stock_lock.")
-
-interacting with commit
-
-  885aa5fe7b1d ("memcg: drain obj stock on cpu hotplug teardown")
-
-from the mm-hotfixes tree.
-
-I applied the following merge fix patch.
-
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Date: Wed, 12 Mar 2025 14:18:03 +1100
-Subject: [PATCH] fix up for "memcg: Use trylock to access memcg stock_lock"
-
-interacting with "memcg: drain obj stock on cpu hotplug teardown" from
-the mm-hotfixes tree.
-
-Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
----
- mm/memcontrol.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-index 8f88b8dd8097..87544df4c3b8 100644
---- a/mm/memcontrol.c
-+++ b/mm/memcontrol.c
-@@ -1957,9 +1957,9 @@ static int memcg_hotplug_cpu_dead(unsigned int cpu)
- 	stock =3D &per_cpu(memcg_stock, cpu);
-=20
- 	/* drain_obj_stock requires stock_lock */
--	local_lock_irqsave(&memcg_stock.stock_lock, flags);
-+	localtry_lock_irqsave(&memcg_stock.stock_lock, flags);
- 	old =3D drain_obj_stock(stock);
--	local_unlock_irqrestore(&memcg_stock.stock_lock, flags);
-+	localtry_unlock_irqrestore(&memcg_stock.stock_lock, flags);
-=20
- 	drain_stock(stock);
- 	obj_cgroup_put(old);
---=20
-2.45.2
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/Agm1aDa=ntrjh5CZDTyBZLk
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmfRBQ8ACgkQAVBC80lX
-0Gwhjgf/SY1L6EY7sBqFhnP+flnrFZsbc+TyMvDrzfsz2JbnfFgufgdHuzR8+jcA
-aE/25UdSpp2x6Qfbe3AWyt5mn/XeMoEermZsV2axGhViqfGhQ8MKOMzD5UYVRUIX
-c2I4cY/mhJwdpDwy3SwLHuvvsKH61GRwxd7LIGgQGH8EdYbdhcfuInCu/owZgfGS
-dcTfqXg93FuwUEOWJAUEq/sJKbPUZxPA1EUUsz8GM9v7CGeAYY9X1X45ejfvO9nA
-pOq7ihS02sh/QbXbkatGZZF5b4s1VpxiV3LTCmqJqzYqRh1RPEdjOxodmXV58R2j
-3/8LfPHpQzkSoWaeL+kZIvEGRSwjwA==
-=KxSD
------END PGP SIGNATURE-----
-
---Sig_/Agm1aDa=ntrjh5CZDTyBZLk--
+Thank you
 
