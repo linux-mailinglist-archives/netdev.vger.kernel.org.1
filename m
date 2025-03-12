@@ -1,140 +1,125 @@
-Return-Path: <netdev+bounces-174415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F04AA5E815
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 00:11:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B9B3A5E821
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 00:14:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF23E3B6857
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 23:11:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 521AE7AB634
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 23:13:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B29041F1501;
-	Wed, 12 Mar 2025 23:11:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FFB21F1302;
+	Wed, 12 Mar 2025 23:14:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="t0qJL/2b";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="qbeolRdz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eAfLgmNJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2511F12F2;
-	Wed, 12 Mar 2025 23:11:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59CCF4685;
+	Wed, 12 Mar 2025 23:14:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741821111; cv=none; b=LuUhJaOlSwNUUbGATgWg/gv+ISDxS9HxK33L4wQpm0DyhYH38icTWmaiqjRrH42D+D3siSMpcyQgzhnWjhnLHkFJMpdeDbAluDOFf9W0MQr2TUZoD228yGq167b70+q1Kztg08fyMNNMeDcIMMV2HpE026nOREJtiE3XtK0OQ48=
+	t=1741821280; cv=none; b=fGlRsSwEZGwfLCL4bKsA5mYgXdyEPwqrNkK2G/YP/AwKB/qz0gOzkPjORK5hnV8i0RwKz+XiCQBCzywTYUo4NEUyoCkuYX/LyT3PxUA+BDdqr/ngkgxJJhRAPO8Zaeqy8FAUzHKzDH6UmYrYS9d0GqM15vtPFPlb04sNkMZYJDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741821111; c=relaxed/simple;
-	bh=2W3aVFmGwvClwVTmM7aCRx2KgO4A4R1U0tJDkBzH+nk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WyUcKwlaqXv7zMtQADwTmZmLwCo+AjDdPFl7/K/LDa2gFn38Dq5Zva412OIT2DztPDa0NQ3d/Y1C0pUMWJb0biIcn8hMlKUNdK3Wp03o+T4O/Onnhm86pLP56JjjhhtG44JO4OAqh3EepHR2kwZon+XKYqKRCg284l+yMygib2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=t0qJL/2b; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=qbeolRdz; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id EC09C602BB; Thu, 13 Mar 2025 00:11:47 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1741821107;
-	bh=PQSKrOlMPfzl9nwDmSr8qh4iamX82LLyOlMFMg/9c7E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=t0qJL/2bU8GPh32cdA69JdoMZVh7TSHGCLtgmOuIXAHN5T4eCT+YGrfUtcdLc6w+H
-	 wBBFOYHJGgv4OwC9drZb/SBxoeodBTIhuHSuKLTgwzxJP1oKP+FkzrL4MghCg4YOP9
-	 /oT591oO5UG7EmDyYrM22yxzBY4bgwlvZLjRZkYGRWS61A52Yyp0C1TPy5uZ1ntRqz
-	 pjqhRrBlNu9dCHr4EiGmpfrW5KjQLI9BSXXrfrqvle9U6Ua/ut73znipRs/3NmHf4P
-	 Y1kr3PP1yTEQ0T2sj/JmgDVGyL71KEnhVue+A8agztNv6lH/wDkMfRSrUjBBnzjue4
-	 p2eP3mU7YW7OQ==
-X-Spam-Level: 
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id 49BB3602A4;
-	Thu, 13 Mar 2025 00:11:42 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1741821102;
-	bh=PQSKrOlMPfzl9nwDmSr8qh4iamX82LLyOlMFMg/9c7E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qbeolRdzmWfAU19cU0ccSVcMVP9Fk4SSQN9BVqHZ8FLRhk39ZK03WcEJ+WQOmOxZF
-	 cy23JB5bF5+aVpudZJXvgQrTaeLjetLivZIvhEEDf9Re9Itl0VnGNk2tB0s4w2+kXT
-	 talIeV1XAVKL25ykSMxM5fUeXwDlOLPo7r2V1/53tyLuKpyHDKpWW+c4oRWWG6CHax
-	 4zIHURnVcKBNHgV75Bd3agsDnngcIvT3lvGyOfj2Ddp/CejMNpCEnvtz+qkgNMldVY
-	 o5hT/rRHam+N+4/Lhradu4N5nlIXFhpj14jDpnuYxuEfASgXrzhghIOpCK4MXyAr4O
-	 CBArB71yfg7xQ==
-Date: Thu, 13 Mar 2025 00:11:40 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Eric Woudstra <ericwouds@gmail.com>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Roopa Prabhu <roopa@nvidia.com>, Ivan Vecera <ivecera@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Simon Horman <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, bridge@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-hardening@vger.kernel.org,
-	Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Daniel Golle <daniel@makrotopia.org>
-Subject: Re: [PATCH v9 nf 00/15] bridge-fastpath and related improvements
-Message-ID: <Z9IUrL0IHTKQMUvC@calendula>
-References: <20250305102949.16370-1-ericwouds@gmail.com>
- <897ade0e-a4d0-47d0-8bf7-e5888ef45a61@gmail.com>
- <Z9DKxOnxr1fSv0On@calendula>
- <58cbe875-80e7-4a44-950b-b836b97f3259@gmail.com>
+	s=arc-20240116; t=1741821280; c=relaxed/simple;
+	bh=TKgowIo1WaTZUviCcRMak32azD2cFfVNTUXSGH8c1O0=;
+	h=Message-ID:Content-Type:MIME-Version:In-Reply-To:References:
+	 Subject:From:Cc:To:Date; b=syAnCL/iz5wvSZZFV6mtoXpmr7L1Nz/mtTWsRxJkE4C3ckwR3ew7KuOPmppu845lLu73UDBdTyxizsc/56OGhrNvDfl2P2V6h0V/QzZkYEFzEPbyawmGvLMgCU5vjrirhFn2shZfiID8cnrM74qgMIADGZFB5p3xNR12EcfWfgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eAfLgmNJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F59DC4CEDD;
+	Wed, 12 Mar 2025 23:14:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741821280;
+	bh=TKgowIo1WaTZUviCcRMak32azD2cFfVNTUXSGH8c1O0=;
+	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
+	b=eAfLgmNJBIhrzfTbBz15W2qXyisRuA+s0m0sbZ0DR4p5Yn/gYR7lffHji1Pi6aEKz
+	 iEYjHrI0Tt4Cjp8pteJK78+OVFmkwbGZq6yWcr6QMo8exhqx3K9GefpIMExXacDNRh
+	 KURQmUBu26eABgR5+fE6nmnvffrHsyK4SWEmBdjwmGVFmfDO2zE06KJnS0vqNXK2YH
+	 VrGqoDKtTRm4MkgZrY7LhY7SgtxAK9qMGNNgHvHYQJcDqrUXQJjf9Ce2rJDiEEY4+j
+	 ZNY/I0f84t/Yi407KIEBS2V77DWKo7zqJ8QXMrTL5tL3NSHZlSvQSL0tFB8WF2pqeO
+	 KNWFA5iJpPFMQ==
+Message-ID: <f1d5dc9b8f59b00fa21e8f9f2ac3794b.sboyd@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <58cbe875-80e7-4a44-950b-b836b97f3259@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <epnv7fp3s3osyxbqa6tpgbuxdcowahda6wwvflnip65tjysjig@3at3yqp2o3vp>
+References: <20250226232320.93791-1-inochiama@gmail.com> <20250226232320.93791-2-inochiama@gmail.com> <2c00c1fba1cd8115205efe265b7f1926.sboyd@kernel.org> <epnv7fp3s3osyxbqa6tpgbuxdcowahda6wwvflnip65tjysjig@3at3yqp2o3vp>
+Subject: Re: [PATCH v3 1/2] dt-bindings: clock: sophgo: add clock controller for SG2044
+From: Stephen Boyd <sboyd@kernel.org>
+Cc: linux-clk@vger.kernel.org, devicetree@vger.kernel.org, sophgo@lists.linux.dev, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To: Chen Wang <unicorn_wang@outlook.com>, Conor Dooley <conor+dt@kernel.org>, Inochi Amaoto <inochiama@gmail.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Michael Turquette <mturquette@baylibre.com>, Richard Cochran <richardcochran@gmail.com>, Rob Herring <robh@kernel.org>
+Date: Wed, 12 Mar 2025 16:14:37 -0700
+User-Agent: alot/0.12.dev8+g17a99a841c4b
 
-On Wed, Mar 12, 2025 at 05:21:29PM +0100, Eric Woudstra wrote:
-> 
-> 
-> On 3/12/25 12:44 AM, Pablo Neira Ayuso wrote:
-> > Therefore, I suggest you start with a much smaller series with a
-> > carefully selected subset including preparatory patches. I suggest you
-> > start with the software enhancements only. Please, add datapath tests.
-> 
-> Then I will split it in:
-> 1. Separate preparatory patches and small patch-sets that apply
->      to the forward-fastpath already.
-> 2. One patch-set that brings the bridge-fastpath with datapath tests.
-> 
-> > P.S: You work is important, very important, but maybe there is no need
-> > to Cc so many mailing lists and people, maybe netdev@,
-> > netfilter-devel@ and bridge@ is sufficient.
-> 
-> Ok, but my main question then is which tree should I work in, and
-> therefore which tag should I give my patches, [nf] or [net-next].
-> I think it will get more complicated if I split my patch-set and half of
-> the patches go to [nf] and another half to [net-next].
+Quoting Inochi Amaoto (2025-03-11 16:31:29)
+> On Tue, Mar 11, 2025 at 12:26:21PM -0700, Stephen Boyd wrote:
+> > Quoting Inochi Amaoto (2025-02-26 15:23:18)
+> > > diff --git a/Documentation/devicetree/bindings/clock/sophgo,sg2044-cl=
+k.yaml b/Documentation/devicetree/bindings/clock/sophgo,sg2044-clk.yaml
+> > > new file mode 100644
+> > > index 000000000000..d55c5d32e206
+> > > --- /dev/null
+> > > +++ b/Documentation/devicetree/bindings/clock/sophgo,sg2044-clk.yaml
+> > > @@ -0,0 +1,40 @@
+> > > +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> > > +%YAML 1.2
+> > > +---
+> > > +$id: http://devicetree.org/schemas/clock/sophgo,sg2044-clk.yaml#
+> > > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > > +
+> > > +title: Sophgo SG2044 Clock Controller
+> > > +
+> > > +maintainers:
+> > > +  - Inochi Amaoto <inochiama@gmail.com>
+> >=20
+> > No description?
+> >=20
+>=20
+> I am not sure the things to be described. Maybe just tell the
+> clock required and providing?
 
-Use [nf-next].
+Sure and point to the header file with the binding numbers?
 
-> What do you suggest?
+> > > +  - |
+> > > +    clock-controller@50002000 {
+> > > +      compatible =3D "sophgo,sg2044-clk";
+> > > +      reg =3D <0x50002000 0x1000>;
+> > > +      #clock-cells =3D <1>;
+> > > +      clocks =3D <&osc>;
+> >=20
+> > I think you want the syscon phandle here as another property. Doing that
+> > will cause the DT parsing logic to wait for the syscon to be probed
+> > before trying to probe this driver. It's also useful so we can see if
+> > the clock controller is overlapping withe whatever the syscon node is,
+>=20
+> It sounds like a good idea. At now, it does not seem like a good idea
+> to hidden the device dependency detail. I will add a syscon property
+> like "sophgo,pll-syscon" to identify its pll needs a syscon handle.
 
-Probably I can collect 4/15 and 5/15 from this series to be included
-in the next pull request, let me take a look. But it would be good to
-have tests for these two patches.
+Cool.
 
-I would suggest you continue by making a series to add bridge support
-for the flowtable, software only, including tests.
+>=20
+> > or if that syscon node should just have the #clock-cells property as
+> > part of the node instead.
+>=20
+> This is not match the hardware I think. The pll area is on the middle
+> of the syscon and is hard to be separated as a subdevice of the syscon
+> or just add  "#clock-cells" to the syscon device. It is better to handle
+> them in one device/driver. So let the clock device reference it.
 
-Once this gets merged, then follow up with the hardware offload code.
-
-Thanks.
+This happens all the time. We don't need a syscon for that unless the
+registers for the pll are both inside the syscon and in the register
+space 0x50002000. Is that the case? This looks like you want there to be
+one node for clks on the system because logically that is clean, when
+the reality is that there is a PLL block exposed in the syscon (someone
+forgot to put it in the clk controller?) and a non-PLL block for the
+other clks.
 
