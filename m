@@ -1,117 +1,138 @@
-Return-Path: <netdev+bounces-174138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CE3BA5D97C
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 10:32:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0908BA5D988
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 10:34:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A31F51786BF
-	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 09:32:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 895DD3B467E
+	for <lists+netdev@lfdr.de>; Wed, 12 Mar 2025 09:34:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B7352343B6;
-	Wed, 12 Mar 2025 09:31:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DBCE23278D;
+	Wed, 12 Mar 2025 09:34:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fcQTqom4"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="tQy/MXDA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E06BA17BB6;
-	Wed, 12 Mar 2025 09:31:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92AEA38384;
+	Wed, 12 Mar 2025 09:34:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741771919; cv=none; b=NgbenV7+L/XWCAgtWKGBiQkbhSRcmt30qGgm5yoUT/rU88zMnSXZv6dIv28EQOihTD2Qlrpxkl8b+5U3bLzLPEtZkbTaECI2twR9gBYfdy1hVnY5PiFXKb8mJyDVyeb54+tndFTpSKGfib4cudH+soPU2sJvDiOTYg4M6+KXa6o=
+	t=1741772085; cv=none; b=HdS+sbj16JI1ib7DJ8nNY9mXkkNmc2bOW6aVP2cuWmncVUMn1fbic/tstf/8IJHnrVyPWy7QSbCEycvyWWiXzsPHonPDWRE6RfQxDiW+NHyXzxXV/MsF915iEiof/v16iv21mAWffRtZiGSbsHnu9J1CmMZOxyzpEZnjbmag3gE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741771919; c=relaxed/simple;
-	bh=a8la2ZObEdG8OdZGXYDKwin8N4HvmajFwbUHnUuC4ds=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gWZuFsj4MUDf4p7b/5rEC7zFOxOcLaonG/bzlo72+vgR0vrOYQNBODCAb1IHB1hnjdgX0R6HFFtatIfQVeOORSqjh3ifknzxKrRZRqAjM43jmkgldXzoROIec4M5e6oj9QVizOU/4Ot2epFOpmbW6KAsYtUo9qRazz6iA4kKzUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fcQTqom4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD6DFC4CEED;
-	Wed, 12 Mar 2025 09:31:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741771918;
-	bh=a8la2ZObEdG8OdZGXYDKwin8N4HvmajFwbUHnUuC4ds=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=fcQTqom47KIERjVZAwkC7vNZuA57ejpLyDrP/gzthj3C0Ruk3ux1Q81fFkjp7fp1d
-	 1cfez12QBRYhJbR7ajeVDcsW7ZEc0hzP5kGS0iSSm2PaEzo5T2CA53+OpFQ/k2dcqs
-	 +8HTOs43DxVD3dEEpeEFGbvhRuj4g7ziRRtSXm8iT7uSmJN6vNa+TDjOr8lY2wa5ei
-	 ArTf1F1TsH3gTvJnFeTgWwmN6i5ofmoqz3dPhvKpW3cvyZmTMbFoGc/dBm359C5Y4u
-	 hIDNgLJOYfHCMk3REJ3thgNBgjdxbmoQlxbRGdBXPF7EbuQn3Gf2ZmL8iwOUJi8RGV
-	 cEUAUKJ06kBmw==
-Message-ID: <4c55e1ae-8cc1-463e-b81f-2bbae4ae4eed@kernel.org>
-Date: Wed, 12 Mar 2025 10:31:51 +0100
+	s=arc-20240116; t=1741772085; c=relaxed/simple;
+	bh=5SCu5ezk2Jh7TxbuKcyIpiUleZMJsHGmRtBgPjVeWAo=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=lJSOyUC1uXIBAqn89hmiwrvr5zxD3nXvchsuyCzy0CHFn17lvMpTbykO1n2CFjBKQ/YrSHqWRq4uShiKhn7gZymnJWw0rJ7gFJn0xOmmufQNPcm+FZzXpppKaw200z30DvguSfd5Wn0Lbm8TlW1tZ0L1nBzFF/ya0j8/VP7li4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=tQy/MXDA; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=wl6zOR+xtNbThqwqizqyBwsRBu7DaTBch3G1Ngsw9UI=; b=tQy/MXDASRxCbhwMAs0WOjYgC1
+	m/A3j6oE1GprwCfkaAzfI5IgKGdHLWDbpQMN9g95HskKLxAUqXz1PwSKfIx+pSxAem9iS3UikdIkw
+	65tdgBJZVWX6OxdzbExLxS5xmKk5xBW+dfolr3dfMMjNfSWJyFkU+hphBwtCvTMVJyvaDLqfpfwEz
+	FlIxCeOnJSn1Qv09csh21n4tyDvf5ZAX2/pHiNT+YsOQpGRtTYxLzCTUg3iO9MJp1WuKm+f2U1aKM
+	Xd8nkGmVayKRDZcv630OeLqrsEgQ42HLC44CN/DFPaedQvI/lIl1PRu0BCIwopVvmVI+YTLq8DlEk
+	l4SzR1Ew==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52664)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tsITu-0005GN-0y;
+	Wed, 12 Mar 2025 09:34:30 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tsITk-0004R4-1o;
+	Wed, 12 Mar 2025 09:34:20 +0000
+Date: Wed, 12 Mar 2025 09:34:20 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Christophe Roullier <christophe.roullier@st.com>,
+	Conor Dooley <conor+dt@kernel.org>, Conor Dooley <conor@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>, devicetree@vger.kernel.org,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Eric Dumazet <edumazet@google.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Minda Chen <minda.chen@starfivetech.com>, netdev@vger.kernel.org,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Rob Herring <robh@kernel.org>,
+	Samin Guo <samin.guo@starfivetech.com>
+Subject: [PATCH net-next v2 0/7] net: stmmac: deprecate
+ "snps,en-tx-lpi-clockgating" property
+Message-ID: <Z9FVHEf3uUqtKzyt@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 0/8] Introduce fwctl subystem
-Content-Language: en-US
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Saeed Mahameed <saeed@kernel.org>,
- Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kuba@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>,
- Aron Silverton <aron.silverton@oracle.com>,
- Dan Williams <dan.j.williams@intel.com>,
- Daniel Vetter <daniel.vetter@ffwll.ch>, Dave Jiang <dave.jiang@intel.com>,
- Christoph Hellwig <hch@infradead.org>, Itay Avraham <itayavr@nvidia.com>,
- Jiri Pirko <jiri@nvidia.com>, Jonathan Cameron
- <Jonathan.Cameron@huawei.com>, Leonid Bloch <lbloch@nvidia.com>,
- linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
- "Nelson, Shannon" <shannon.nelson@amd.com>
-References: <20250303175358.4e9e0f78@kernel.org>
- <20250304140036.GK133783@nvidia.com> <20250304164203.38418211@kernel.org>
- <20250305133254.GV133783@nvidia.com>
- <mxw4ngjokr3vumdy5fp2wzxpocjkitputelmpaqo7ungxnhnxp@j4yn5tdz3ief>
- <bcafcf60-47a8-4faf-bea3-19cf0cbc4e08@kernel.org>
- <20250305182853.GO1955273@unreal> <Z8i2_9G86z14KbpB@x130>
- <20250305232154.GB354511@nvidia.com>
- <6af1429e-c36a-459c-9b35-6a9f55c3b2ac@kernel.org>
- <20250311135921.GF7027@unreal>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20250311135921.GF7027@unreal>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 3/11/25 2:59 PM, Leon Romanovsky wrote:
-> On Tue, Mar 11, 2025 at 12:23:19PM +0100, David Ahern wrote:
->> On 3/6/25 12:21 AM, Jason Gunthorpe wrote:
->>> On Wed, Mar 05, 2025 at 12:41:35PM -0800, Saeed Mahameed wrote:
->>>
->>>> How do you imagine this driver/core structure should look like? Who
->>>> will be the top dir maintainer?
->>>
->>> I would set something like this up more like DRM. Every driver
->>> maintainer gets commit rights, some rules about no uAPIs, or at least
->>> other acks before merging uAPI. Use the tree for staging shared
->>> branches.
->>
->> why no uapi? Core driver can have knowledge of h/w resources across all
->> use cases. For example, our core driver supports a generid netlink based
->> dump (no set operations; get and dump only so maybe that should be the
->> restriction?) of all objects regardless of how created -- netdev, ib,
->> etc. -- and with much more detail.
-> 
-> Because, we want to make sure that UAPI will be aligned with relevant
-> subsystems without any way to bypass them.
-> 
-> Thanks
+On Sun, Mar 09, 2025 at 03:01:45PM +0000, Russell King (Oracle) wrote:
+Hi,
 
-I hope there will be an open mind on get / dump style introspection apis
-here. Devices can work support and work within limited subsystem APIs
-and also allow the dumping of full essential and relevant contexts for a
-device.
+This series deprecates the "snps,en-tx-lpi-clockgating" property for
+stmmac.
 
-More specifically, I do not see netdev APIs ever recognizing RDMA
-concepts like domains and memory regions. For us, everything is relative
-to a domain and a region - e.g., whether a queue is created for a netdev
-device or an IB QP both use the same common internal APIs.  I would
-prefer not to use fwctl for something so basic.
+MII Transmit clock gating, where the MAC hardware supports gating this
+clock, is a function of the connected PHY capabilities, which it
+reports through its status register.
+
+GMAC versions that support transmit clock gating twiddle the LPITCSE
+bit accordingly in the LPI control/status register, which is handled
+by the GMAC core specific code.
+
+So, "snps,en-tx-lpi-clockgating" not something that is a GMAC property,
+but is a work-around for phylib not providing an interface to determine
+whether the PHY allows the transmit clock to be disabled.
+
+This series converts the two SoCs that make use of this property (which,
+I hasten to add, is set in the SoC code) to use the PHY capability bit
+instead of a DT property, then removes the DT property from the .dtsi,
+deprecates it in the snps,dwmac binding, and finally in the stmmac code.
+
+I am expecting some discussion on how to merge this, as I think the
+order in which these changes is made is important - we don't want to
+deprecate the old way until the new code has landed.
+
+Changes in v2:
+- Correct Cc list
+
+ Documentation/devicetree/bindings/net/snps,dwmac.yaml |  1 +
+ arch/arm/boot/dts/st/stm32mp151.dtsi                  |  1 -
+ arch/riscv/boot/dts/starfive/jh7110.dtsi              |  2 --
+ drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c  |  1 +
+ drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c     |  1 +
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h          |  1 +
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c     | 16 ++++++++++++----
+ drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c |  5 ++++-
+ include/linux/stmmac.h                                |  3 ++-
+ 9 files changed, 22 insertions(+), 9 deletions(-)
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
