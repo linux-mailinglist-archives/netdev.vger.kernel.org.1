@@ -1,124 +1,173 @@
-Return-Path: <netdev+bounces-174536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C7A4A5F19F
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 11:57:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0E99A5F13B
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 11:48:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36D667AACBD
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 10:53:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1225117E0CB
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 10:48:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C28C26658F;
-	Thu, 13 Mar 2025 10:48:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B2222571BF;
+	Thu, 13 Mar 2025 10:47:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dr6aDT4q"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J82pn6a9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23141266579;
-	Thu, 13 Mar 2025 10:48:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73B381F03E6
+	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 10:47:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741862934; cv=none; b=Fj8MibGGw3fepyBq7oOLOtHtCOAC5i5f2KV/VF8K5gzFs4rEulfmPLbnACvOeWHYmFfWD13gWpkdkOiLwHeqgNWY5A1ukita93tSkXovcHlR2XFc6eRudlqH3AdAcdlBEQXnDrKPKJHNgvV3T5srlFZ2kW8mEy7DfJbM2KkzuPk=
+	t=1741862873; cv=none; b=IMAYg4VpX6zbO6eDUsHMWz3gFMgKYVALp1ESeUyXwAMA1NuZVpNx0hiHtAs4fPAymgKRIKS+8BDIipIFG5plhR61GhRUFrtDnBQWOvdg+Dx3nhTZdag4pFooTr0/JaIinT6VwGb0DVr52zOAjs7nWOgvVQ9ogDOikFa7DLjuNDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741862934; c=relaxed/simple;
-	bh=p/2oxcn9w8UvQgYDHfdz0zRfqYQy++OiE7NPBwM/3uA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=GfDNrMy9VSTdtQpdMTeay4gfez9o9hg8ALpF5RJ/7NkGgLpbm7xHX0BfmL+W5OaC5L7F7unut0T3nqSjfki8k/3LyJ1ELIcPxYAaKPPZJDx+1fY7ZvAJuxXksnkBSXmaYZqTGrVYIZzUllmyZHdDwMRFnLVrsKFszxpvU6jgKuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dr6aDT4q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEEA3C4CEDD;
-	Thu, 13 Mar 2025 10:48:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741862933;
-	bh=p/2oxcn9w8UvQgYDHfdz0zRfqYQy++OiE7NPBwM/3uA=;
-	h=From:Date:Subject:To:Cc:From;
-	b=Dr6aDT4q6+J87VIfN3e7SDIVS8LIVOFISSDMl/jpXQWbruDpv87PJgAxdyxmp49Ws
-	 MpIlUSLukHsDP2PS7JeU0Z0iDVY/OuUURBiNI563LPfQ3IRPmF1EN4tyt8yP7EOQy1
-	 QPc9Xy8MM18PHy69K3wbIejMpaJHP1t0ARpK7i8JkQVy3+bvZt3IKt7LIexxD5OuHd
-	 IYpnSReCf2ylbU34aHR0WFZspK0AL08REmPkL+yBZkmzTwvRRYAwkkNOT2cOeHbPs4
-	 opOCeDAZG/UjGM0KNaEKDucEIaXpA78zdRwDLvG3fKa/c9Z67q3VkBqLIC88wzTSzZ
-	 gGx+qgs6/myPw==
-From: Simon Horman <horms@kernel.org>
-Date: Thu, 13 Mar 2025 11:47:42 +0100
-Subject: [PATCH net-next v2] net: tulip: avoid unused variable warning
+	s=arc-20240116; t=1741862873; c=relaxed/simple;
+	bh=flFI4F9iJbigAdLeH1msK0WPNSRRKGt+NPtx2Z0lY7g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PlIrFjfWnLkz+8s8wf759x+Lh7yjGQylNUDLbvwHYH6K8KksJt+HMJrArbgNfa+fOf/VpEDro/dq/chF2nbM/gead1eY/nJQuz396zpDXXhoAIG75udCvUBMFdOJu6vcBXzJCeyj2gsOR5kyLqpUtkp9XunFIRLr/fThavbfwUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J82pn6a9; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741862870;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mKlH8svYGZq8nS9wIHoOZaP2tIWMcEGLEEAOkrVCTz8=;
+	b=J82pn6a9BqLAFjIB07wt6XutQpavmvmdhT1GYoD1EsY6/V2YBy054F2CC35+Fpp9sFQhAP
+	YjcW7mJUeGbeCNUs2nqLInIJbfgq5U9+c/itscgRhfpsa7StOn5g+DEkT9zrbGLs/Y0OyV
+	onGN+fMkBqI9gsHWi+9yBPM55yr+Ipw=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-657-zjlVWBi0NfCNdMGUdKeEnQ-1; Thu, 13 Mar 2025 06:47:49 -0400
+X-MC-Unique: zjlVWBi0NfCNdMGUdKeEnQ-1
+X-Mimecast-MFC-AGG-ID: zjlVWBi0NfCNdMGUdKeEnQ_1741862868
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43d0a037f97so4036505e9.2
+        for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 03:47:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741862868; x=1742467668;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mKlH8svYGZq8nS9wIHoOZaP2tIWMcEGLEEAOkrVCTz8=;
+        b=AaPV6lnQ2HYEgsPGVP0Jw2ymuCkBuDvF1FT6SnORGaAMky1JXOAVQGLwKgGNprzh14
+         /0qPLsX3v9SyLC/h+fT8RFyfzGo+VGxFI4toZl4MFkHB/Kw3PhjkB5knyTdou7eFqjzW
+         h2B3CilUn1lhU0ZH7IV8S98uF3G/xf/7V+gUz8uun7G6s1m39ezpNrsWc02eCphP4XyX
+         Skn7FJ0jHQ5Q3RI+Xetjeqyyc2xOYkCOCi8Vx1N3hfYAqnwe6R9JY1o2H/8taPWPUCTn
+         EW9dR9VGs0t7k6KiqNjH0brwJlOYqMoPQBvtm97L0MNADsjMoZYhRHnskUKq1CpnFvju
+         KTcA==
+X-Forwarded-Encrypted: i=1; AJvYcCUw+fKlHNnPMSyjf+SkrKB7NTnCmqKKVY4UA6yM9n/XQHZdXYvduooWuCUuBp60vJVXpkIhNz0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzdhdU1n2sd9yXMKCgGaztTUlABxAwAFKsc8omXdmqEVMjEtut6
+	QlcZChofrenI/pEsrEkFVStAPYJAnl+D1omTvPiJpxFM1u21bOvtah9hc9RY2Mro2u5EeSNhALs
+	bK0Zcrl0p/3bogAfp3sIBhrUjbQin5/7YqGQHBH8u1dEedGLBQeyJkA==
+X-Gm-Gg: ASbGncvbg36267CiKgytjWHrVq+i8Zp4dw1TwYjrPVyH/MddIJeojV2nOY17XGgGMSh
+	jXiqvN5dbB9DWqo9IZdnRlHme1urRsw9wGUzqVXwIyb+x0h7tBobPLGag63huaj4R3aE+6El3OE
+	J/kclG9wUudgk8ZkSV4bA9l2EC4ZYJfKt7BSP/IrEpK+atqeorTAzx/Kk3XlzuCwOxIQ9UFtSya
+	ezFGUZip6G3HYtkwTVj+koSG6USO04BkAkrS1/K4qfiO/EA05NTK5kDhx7i3D6raNjY6p6DN2M9
+	DQbqIZ1MSOLYZg/LdIu2G7hKOdXUMXVMPrI8LfiS
+X-Received: by 2002:a05:600c:524c:b0:43d:563:6fef with SMTP id 5b1f17b1804b1-43d05637140mr66351135e9.21.1741862868055;
+        Thu, 13 Mar 2025 03:47:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFuof90DCs7eJ3JwItRCIRpwATmH/3XNmF4IhoW7PyjbpLbTIbp4p7z1rZXGN+i2daYNGVW0g==
+X-Received: by 2002:a05:600c:524c:b0:43d:563:6fef with SMTP id 5b1f17b1804b1-43d05637140mr66350925e9.21.1741862867674;
+        Thu, 13 Mar 2025 03:47:47 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-6-87.dyn.eolo.it. [146.241.6.87])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d04004240sm38333535e9.3.2025.03.13.03.47.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Mar 2025 03:47:47 -0700 (PDT)
+Message-ID: <87e8bde7-b05e-4a1b-bcef-f6bb3a12315a@redhat.com>
+Date: Thu, 13 Mar 2025 11:47:44 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20250313-tulip-w1-v2-1-2ac0d3d909f9@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAM230mcC/x3MTQqAIBBA4avErBtQS4OuEi2kxhoIE7UfiO6et
- Pzg8R5IFJkS9NUDkU5OvPsCVVcwrdYvhDwXgxJKi0Y2mI+NA14SqXNWt3Y2ppug5CGS4/tfDeA
- po6c7w/i+HzOcnqpkAAAA
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Helge Deller <deller@gmx.de>, netdev@vger.kernel.org, 
- linux-parisc@vger.kernel.org
-X-Mailer: b4 0.14.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 2/9] net: add get_netmem/put_netmem support
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ kvm@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-kselftest@vger.kernel.org
+Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Jeroen de Borst <jeroendb@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn
+ <willemb@google.com>, David Ahern <dsahern@kernel.org>,
+ Neal Cardwell <ncardwell@google.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin"
+ <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Shuah Khan <shuah@kernel.org>, sdf@fomichev.me,
+ asml.silence@gmail.com, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
+ <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
+References: <20250308214045.1160445-1-almasrymina@google.com>
+ <20250308214045.1160445-3-almasrymina@google.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250308214045.1160445-3-almasrymina@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-There is an effort to achieve W=1 kernel builds without warnings.
-As part of that effort Helge Deller highlighted the following warnings
-in the tulip driver when compiling with W=1 and CONFIG_TULIP_MWI=n:
+On 3/8/25 10:40 PM, Mina Almasry wrote:
+> Currently net_iovs support only pp ref counts, and do not support a
+> page ref equivalent.
+> 
+> This is fine for the RX path as net_iovs are used exclusively with the
+> pp and only pp refcounting is needed there. The TX path however does not
+> use pp ref counts, thus, support for get_page/put_page equivalent is
+> needed for netmem.
+> 
+> Support get_netmem/put_netmem. Check the type of the netmem before
+> passing it to page or net_iov specific code to obtain a page ref
+> equivalent.
+> 
+> For dmabuf net_iovs, we obtain a ref on the underlying binding. This
+> ensures the entire binding doesn't disappear until all the net_iovs have
+> been put_netmem'ed. We do not need to track the refcount of individual
+> dmabuf net_iovs as we don't allocate/free them from a pool similar to
+> what the buddy allocator does for pages.
+> 
+> This code is written to be extensible by other net_iov implementers.
+> get_netmem/put_netmem will check the type of the netmem and route it to
+> the correct helper:
+> 
+> pages -> [get|put]_page()
+> dmabuf net_iovs -> net_devmem_[get|put]_net_iov()
+> new net_iovs ->	new helpers
+> 
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+> 
+> ---
+> 
+> v5: https://lore.kernel.org/netdev/20250227041209.2031104-2-almasrymina@google.com/
+> 
+> - Updated to check that the net_iov is devmem before calling
+>   net_devmem_put_net_iov().
+> 
+> - Jakub requested that callers of __skb_frag_ref()/skb_page_unref be
+>   inspected to make sure that they generate / anticipate skbs with the
+>   correct pp_recycle and unreadable setting:
+> 
+> skb_page_unref
+> ==============
+> 
+> - callers that are unreachable for unreadable skbs:
+> 
+> gro_pull_from_frag0, skb_copy_ubufs, __pskb_pull_tail
 
-  .../tulip_core.c: In function ‘tulip_init_one’:
-  .../tulip_core.c:1309:22: warning: variable ‘force_csr0’ set but not used
+Why `__pskb_pull_tail` is not reachable? it's called by __pskb_trim(),
+via skb_condense().
 
-This patch addresses that problem using IS_ENABLED(). This approach has
-the added benefit of reducing conditionally compiled code. And thus
-increasing compile coverage. E.g. for allmodconfig builds which enable
-CONFIG_TULIP_MWI.
-
-Compile tested only.
-No run-time effect intended.
-
---
-
-Acked-by: Helge Deller <deller@gmx.de>
-Signed-off-by: Simon Horman <horms@kernel.org>
-v2: Use IS_ENABLED rather than __maybe_unused [Simon Horman]
-v1: Initial patch [Helge Deller]
----
- drivers/net/ethernet/dec/tulip/tulip_core.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/dec/tulip/tulip_core.c b/drivers/net/ethernet/dec/tulip/tulip_core.c
-index 27e01d780cd0..75eac18ff246 100644
---- a/drivers/net/ethernet/dec/tulip/tulip_core.c
-+++ b/drivers/net/ethernet/dec/tulip/tulip_core.c
-@@ -1177,7 +1177,6 @@ static void set_rx_mode(struct net_device *dev)
- 	iowrite32(csr6, ioaddr + CSR6);
- }
- 
--#ifdef CONFIG_TULIP_MWI
- static void tulip_mwi_config(struct pci_dev *pdev, struct net_device *dev)
- {
- 	struct tulip_private *tp = netdev_priv(dev);
-@@ -1251,7 +1250,6 @@ static void tulip_mwi_config(struct pci_dev *pdev, struct net_device *dev)
- 		netdev_dbg(dev, "MWI config cacheline=%d, csr0=%08x\n",
- 			   cache, csr0);
- }
--#endif
- 
- /*
-  *	Chips that have the MRM/reserved bit quirk and the burst quirk. That
-@@ -1463,10 +1461,9 @@ static int tulip_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 
- 	INIT_WORK(&tp->media_work, tulip_tbl[tp->chip_id].media_task);
- 
--#ifdef CONFIG_TULIP_MWI
--	if (!force_csr0 && (tp->flags & HAS_PCI_MWI))
-+	if (IS_ENABLED(CONFIG_TULIP_MWI) && !force_csr0 &&
-+	    (tp->flags & HAS_PCI_MWI))
- 		tulip_mwi_config (pdev, dev);
--#endif
- 
- 	/* Stop the chip's Tx and Rx processes. */
- 	tulip_stop_rxtx(tp);
+/P
 
 
