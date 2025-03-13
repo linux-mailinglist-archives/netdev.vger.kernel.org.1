@@ -1,119 +1,113 @@
-Return-Path: <netdev+bounces-174618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEB37A5F8D7
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 15:46:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB9F5A5F8D3
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 15:46:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B58B67A5696
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 14:45:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 426643A7B20
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 14:45:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3B6A266F03;
-	Thu, 13 Mar 2025 14:46:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E46B786337;
+	Thu, 13 Mar 2025 14:46:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=wizmail.org header.i=@wizmail.org header.b="BM1Mm/Y3";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wizmail.org header.i=@wizmail.org header.b="IUP/1JAD"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="tnO8Jh4T"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.wizmail.org (smtp.wizmail.org [85.158.153.28])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C50623BD13
-	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 14:46:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.158.153.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060DB267731
+	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 14:46:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741877200; cv=none; b=FOjTOQueIRJNufWSFp3m3KNjYEkCRwD2NZNjxv4Ns1LAUIxfOXNrUySI5Y0qTyykm/71n0yCGl5JpwR6u7tymQ27IE7etGLXXKH0wKDAw5MoYDfG1YdX4gyiTOolz4c6kQF5JlH4MM96EGuYsYIUVNeNN/cqGmB0Wf3DvPdjmEY=
+	t=1741877167; cv=none; b=BwHS3Ozm5aUw8aniNrnPAyQNMWW+YCnc13mt9L8hdMDPm/B2h/m9GtfPI6D32IXGRlShgf6MSla8km0fGzV/RyzuApoS4+Lsc9lc/aejMHEoa3mx1fY1Mj/L5OPJw2LqIKpzmSHVk7QgTazmaVhgqIlxCeopG7wCs1SIKVyyhxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741877200; c=relaxed/simple;
-	bh=I1IeQ3eOXuWo1Koz+4tC5CMTNtvDWBowb/FldwOpw5Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qEyh2SZSNybN+adJm5DyPruTM3LwuIi0tqu9EQ7m4fzZ7mPKdtiR7Qo9XurlkN3SB5f3jLgeRkuYvwdF2Xl9LbdaExlf7eWHJouIAFTOzuL3NTneAtkwd1EYxcGLBaNFkfm4KBsYSLlCggX5K/6lJuSbwSFYGL6QFfYa0VJ0yVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exim.org; spf=fail smtp.mailfrom=exim.org; dkim=permerror (0-bit key) header.d=wizmail.org header.i=@wizmail.org header.b=BM1Mm/Y3; dkim=pass (2048-bit key) header.d=wizmail.org header.i=@wizmail.org header.b=IUP/1JAD; arc=none smtp.client-ip=85.158.153.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exim.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=exim.org
-DKIM-Signature: v=1; a=ed25519-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=wizmail.org; s=e202001; h=Content-Transfer-Encoding:MIME-Version:References
-	:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive:
-	Autocrypt; bh=tPvGIJIyPV9aObwYTmTs464VPbIIZSjvl5woqjoKk4w=; b=BM1Mm/Y3lpDG2un
-	313hi3KkxH0BYFEaXXQp53laVSc0vJ7mS7eP2W+MIWQriX+JfJiq0UE9UeU52xlf1hFWGBw==;
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=wizmail.org
-	; s=r202001; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
-	Message-ID:Date:Subject:Cc:To:From:From:Sender:Reply-To:Subject:Date:
-	Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive:
-	Autocrypt; bh=tPvGIJIyPV9aObwYTmTs464VPbIIZSjvl5woqjoKk4w=; b=IUP/1JADWrul2sI
-	RCIuxdYlJv3zfS7Qi/XG7FdSMkm9TDtXVIDNbPO7L+V23N4GDYc0VJZHEQ1O771rcoKsvctqJ+5ak
-	nXtRzo/WGIDTlswsXn8Ic1+vUMYECD7h/wXMvsHXYoT4dWXNO8vy1GRVSkMAlrNZC2t7zE+Weu6aY
-	uAPEt0jbUTgf0DyMucanMD6PubRDesu7C8Xn19IGmhsJuirb2mCGAk25QLsO07tn8XWHETYZkci7z
-	CwGpHPWouEXA4n6jYMIn6mpEmiyxPpiL1lU2KZnsglPR2gnw4rx9l86QSquBitvBnTGbUmQ+jLAEJ
-	HDRXYGUTDI9yD99Bnbg==;
-Authentication-Results: wizmail.org;
-	iprev=pass (hellmouth.gulag.org.uk) smtp.remote-ip=85.158.153.62;
-	auth=pass (PLAIN) smtp.auth=jgh@wizmail.org
-Received: from hellmouth.gulag.org.uk ([85.158.153.62] helo=macbook.dom.ain)
-	by www.wizmail.org (Exim 4.98.114)
-	(TLS1.3) tls TLS_AES_256_GCM_SHA384
-	with esmtpsa
-	id 1tsjpU-00000002LY6-2HXc
-	(return-path <jgh@exim.org>);
-	Thu, 13 Mar 2025 14:46:36 +0000
-From: Jeremy Harris <jgh@exim.org>
-To: netdev@vger.kernel.org
-Cc: Jeremy Harris <jgh@exim.org>
-Subject: [RFC PATCH net-next 2/2] TCP: pass accepted-TFO indication through getsockopt
-Date: Thu, 13 Mar 2025 14:45:51 +0000
-Message-ID: <3e9b638ad6846aff954a590dd87f764684a4ec8f.1741877016.git.jgh@exim.org>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <cover.1741877016.git.jgh@exim.org>
-References: <cover.1741877016.git.jgh@exim.org>
+	s=arc-20240116; t=1741877167; c=relaxed/simple;
+	bh=Ab8e9jCFXUDUEDUY9Yrgqt3TKhGiRMskSWxrrP/1gmw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ldYApGtEXuS5ZlD7E4SA7NnTkGakBXVNjzthSkXfhH0PN/h1SYb3ZNoL/dxqJFBqH8L8YYgBOBGK6QLCbueLwLUnqv1p16mzWBxLOKzWSidSIc0EUlXTR835fENpD/gS/kfg4DaLtQlUNMpRB2H+JiTTXbdrObU5vluB9wMUh/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=tnO8Jh4T; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from [10.206.8.177] (unknown [89.164.90.215])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id ACBD5200EED5;
+	Thu, 13 Mar 2025 15:45:55 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be ACBD5200EED5
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1741877156;
+	bh=CaYCmvjcHBso8F5nUxZ8PSHUAb0OaIyVEaxOdhAdHoY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=tnO8Jh4TQ94EwB/q6LoSi+8M+lok4Waxl/0dFaoord2Zn6gziQ97xyY0UMF7J4Lc3
+	 CZFLZ1XnN7lmVENYGfYZo6CoW21Wy5MLw9lAPa1vP/GAVgG5NwTsTx4itGsNEAMZIF
+	 ZMeoJsgsWb87B/q2hQMFZQva9Pvkl/zHq9TPR+/1tbJKYa6mfpdkY22Kt2CeuiNYsk
+	 6bSlxQqfnEmXvLqpItuMKksHz7RIdMouGfCOkbw/oVUm0H7vSX04jBch5sBWy7nQNX
+	 7jy1PFgzfl3u9ao7OPgRauPuINQuK3skwGNqGrxCYGEx+VYO8rsdD/CW3IIOP0XYu+
+	 PtmIF511/qbNA==
+Message-ID: <641c2376-8e58-42d5-a934-acad5782b9f0@uliege.be>
+Date: Thu, 13 Mar 2025 15:45:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Pcms-Received-Sender: hellmouth.gulag.org.uk ([85.158.153.62] helo=macbook.dom.ain) with esmtpsa
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 4/7] net: ipv6: seg6_local: fix lwtunnel_input() loop
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, horms@kernel.org, David Lebrun <dlebrun@google.com>,
+ Andrea Mayer <andrea.mayer@uniroma2.it>,
+ Stefano Salsano <stefano.salsano@uniroma2.it>,
+ Ahmed Abdelsalam <ahabdels.dev@gmail.com>,
+ Mathieu Xhonneux <m.xhonneux@gmail.com>, Ido Schimmel <idosch@nvidia.com>
+References: <20250311141238.19862-1-justin.iurman@uliege.be>
+ <20250311141238.19862-5-justin.iurman@uliege.be>
+ <183561ba-a6e1-4036-9555-d773c14d14bb@redhat.com>
+Content-Language: en-US
+From: Justin Iurman <justin.iurman@uliege.be>
+In-Reply-To: <183561ba-a6e1-4036-9555-d773c14d14bb@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Jeremy Harris <jgh@exim.org>
----
- include/uapi/linux/tcp.h | 1 +
- net/ipv4/tcp.c           | 2 ++
- 2 files changed, 3 insertions(+)
+On 3/13/25 13:40, Paolo Abeni wrote:
+> On 3/11/25 3:12 PM, Justin Iurman wrote:
+>> ---
+>>   net/ipv6/seg6_local.c | 85 +++++++++++++++++++++++++++++++++++++++++--
+>>   1 file changed, 81 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/net/ipv6/seg6_local.c b/net/ipv6/seg6_local.c
+>> index ac1dbd492c22..15485010cdfb 100644
+>> --- a/net/ipv6/seg6_local.c
+>> +++ b/net/ipv6/seg6_local.c
+>> @@ -378,8 +378,16 @@ static void seg6_next_csid_advance_arg(struct in6_addr *addr,
+>>   static int input_action_end_finish(struct sk_buff *skb,
+>>   				   struct seg6_local_lwt *slwt)
+>>   {
+>> +	struct lwtunnel_state *lwtst = skb_dst(skb)->lwtstate;
+>> +
+>>   	seg6_lookup_nexthop(skb, NULL, 0);
+>>   
+>> +	/* avoid lwtunnel_input() reentry loop when destination is the same
+>> +	 * after transformation
+>> +	 */
+>> +	if (lwtst == skb_dst(skb)->lwtstate)
+>> +		return lwtst->orig_input(skb);
+>> +
+>>   	return dst_input(skb);
+> 
+> The above few lines are repeted a lot of times below. Please factor them
+> out in an helper and re-use it.
 
-diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
-index 32a27b4a5..e958a145d 100644
---- a/include/uapi/linux/tcp.h
-+++ b/include/uapi/linux/tcp.h
-@@ -179,6 +179,7 @@ enum tcp_fastopen_client_fail {
- #define TCPI_OPT_ECN_SEEN	16 /* we received at least one packet with ECT */
- #define TCPI_OPT_SYN_DATA	32 /* SYN-ACK acked data in SYN sent or rcvd */
- #define TCPI_OPT_USEC_TS	64 /* usec timestamps */
-+#define TCPI_OPT_TFO_SEEN	128 /* we accepted a Fast Open option on SYN */
- 
- /*
-  * Sender's congestion state indicating normal or abnormal situations
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 46951e749..407bdfb12 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -4146,6 +4146,8 @@ void tcp_get_info(struct sock *sk, struct tcp_info *info)
- 		info->tcpi_options |= TCPI_OPT_SYN_DATA;
- 	if (tp->tcp_usec_ts)
- 		info->tcpi_options |= TCPI_OPT_USEC_TS;
-+	if (tp->syn_fastopen_in)
-+		info->tcpi_options |= TCPI_OPT_TFO_SEEN;
- 
- 	info->tcpi_rto = jiffies_to_usecs(icsk->icsk_rto);
- 	info->tcpi_ato = jiffies_to_usecs(min_t(u32, icsk->icsk_ack.ato,
--- 
-2.48.1
++1, although this patch (and some others) will be removed from the 
+series in -v2. That said, Paolo's remark may be applied to Andrea's 
+seg6-related patches that will follow.
 
+> Thanks,
+> 
+> Paolo
+> 
 
