@@ -1,228 +1,178 @@
-Return-Path: <netdev+bounces-174471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF57DA5EE7A
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 09:52:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D771A5EE7F
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 09:52:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3051617D0F3
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 08:52:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 981FB3AC921
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 08:52:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F52C26158A;
-	Thu, 13 Mar 2025 08:51:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD96F2620C9;
+	Thu, 13 Mar 2025 08:52:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kw1J9EUK"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vDwo1wH5";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="sIxVTYRF";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vDwo1wH5";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="sIxVTYRF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 495D92620E4
-	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 08:51:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D32C81EFF98
+	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 08:52:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741855919; cv=none; b=gZOo3+BzKkjqHPaJ3dn1CW1AqKRheRp9cZxt7ITA6gzFi55U/XCClWks4wRIpjeNxuJZ+d+du7rJjtuG32mI9uwyOtpn/Gi/EHes1fUVNB/DV5Q38KgGO5+srS2iNR8TVepvy0erQDwf6oTMIqPtE6A2LSQ+9GX555ciFa233C8=
+	t=1741855943; cv=none; b=I10c/UjgfhEo+JTt3ikj8qisi4mVRN8oJIBxNbEdmRDTPwt6xDXAi/2R1kUa4ngNjcsZt8LUzJcALGOuA+sF+yue/dSGH1foZsvA9PjaAUWbxm7/4XSUQj1m9FhDtPD4BuO12ejyTs2sRyJSunx6cBkukTG14KODsvugaOraNFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741855919; c=relaxed/simple;
-	bh=pPSlP/flZ1//ElBtEMUdU/Jl89L1Zf5afNhaHq1C4Sc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NptUfT+32ctPlqPtpYc7LcZa9QFQehCBbjpLlwFYle4RJ3csXpxduNhPOYLa76uMoDrIwZB6s9gULKaYR1riCAl9N2nXVaoq0gzBBxIAtpVFRSbCCGronJRjOHakQ8aLghu2uS+my/c/aTeC6yuvRKyOi1DFuhh0DqfaauOuofk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kw1J9EUK; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-476b89782c3so8570861cf.1
-        for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 01:51:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741855916; x=1742460716; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bCNuzuQCrC9fQ/wUHtGFFCguDdSldzIFixPSb3ebiNQ=;
-        b=kw1J9EUKIR3u0ZFHGJNxWWtI4wQH8zXjgrpshrJqzroooJui2y7ugBcqLFBFSqnBi5
-         MmWDobZyUM0p4fWm/FvRTX7ZdwbSOlzsjez/RuFPC1txCwpNrFRKM2f4RXFZTrMResSK
-         zZdUq6tARb9XyfsLODzH2p83OuZx9X3/omko/zCgt14ydXjpvx/baXggTU8JygYALsMq
-         cNof9F1Pm4+EjtXx4ZsgWpaqivjk1Upx6UNOfJwBiJYwC6uCpHC0zJLSNjtxm4C6DPVE
-         y03pBLl728T/c7IJmlCzH4lOzRjETdHkrNnSRxn3I1UwOvgqfR9VSqW0JPML99uze6wp
-         4OlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741855916; x=1742460716;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bCNuzuQCrC9fQ/wUHtGFFCguDdSldzIFixPSb3ebiNQ=;
-        b=LTGnITMy4zpqFbQQu2vAhkkNKxkGjld/X35FwGgWC4Nu4LWwr4NwR+d2jLEwLQwLvb
-         X89i5VTEmQTNzmbLQlR32sZbhcCvSAB52akEHd+KdcTdI0IaSl6PZx6DKy9QEfXlWe3g
-         foepJ3qR4TV15o2VLZHTK5oCE1gr8NR6n/3s/y7QZ7K8C8h4dhEx7q4pB0VKMww5XESd
-         +QgfDBvUo1kax0JdcGxBq5UnxiC0L90tb6XfKgqMrYQ/YdW0mUhitlm7qSagfBR6tgHC
-         pr/uahIxNgeKgjN+WUuKTh7zAsdMK0/LUY6RvfJU0OfQtSkZXCvUaaqtyGhIhDXWxG/S
-         3ZMQ==
-X-Gm-Message-State: AOJu0YwL7TM424cafnRmTUQjMqJ8lFXNDN/HoDDlgCU1wSinegPiFOA+
-	6+S7URmmE9CYxb9ZUbqhDQHT5HxkTDPhOL3rs3tZZZMr2ihIwYTspx8aO0eeXz6ZFmJoxOmXfmo
-	dwZf0A/cElSRTb408ttieCCWEKnGrkfIAb1TElUt8QA7s9sg2ZAU1vAWSYA==
-X-Gm-Gg: ASbGncuUx7QEwk9bsNp7icCxiUjuqfUhSZ1DlLu0lUzWrulmbeAi2TfA2dB0DThcYBC
-	qRlH9ZABlRKM1UokjTbFJsE8pfOdpz9d5zkv9+cEtGrZe08y2IIipT/uVPCzhkUO+25rDJXNReW
-	20hYVYi3ujF8CXxaWxB3CA8/cyheDlL0/sgiRN
-X-Google-Smtp-Source: AGHT+IGHOIgz97FIKMRxwZ9CzwecVJYGzQmr6f63g86khWv4/HSiaqbFjdfAZlAR9bn7svVfCTnt8LREdMJRGX7zqE8=
-X-Received: by 2002:ac8:5902:0:b0:472:1225:bd98 with SMTP id
- d75a77b69052e-4769965cf1cmr179597501cf.50.1741855915782; Thu, 13 Mar 2025
- 01:51:55 -0700 (PDT)
+	s=arc-20240116; t=1741855943; c=relaxed/simple;
+	bh=95b3AuP6DHoqGU9is0p0FCM6kAicBFZnMJh5DY7ZkhY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YhDXVzp9fIFBH4KeuoY5qOtbEOoZ9k+Howy0tNZIpYhyN0f5feF5xtR3epIveIwtbNKT8utuHmC99ZjMuyCg45GPV2PFxIEIY1O0NCr2mz2eDoOW5n2fntgKdznAd8jGOFCKgW2OlrWR94vvssD7arJSWOItOmXan6UYMhAXfaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vDwo1wH5; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=sIxVTYRF; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vDwo1wH5; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=sIxVTYRF; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id BCF4221192;
+	Thu, 13 Mar 2025 08:52:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1741855939; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Zy5BLDWhW5tuLfn5o9uPMUppzn8JjYggSaYxs0/2H10=;
+	b=vDwo1wH5sNx2LEe91tHBU7tx3tj7gx4jeCwXWal7Ga+SOqtw1Ph92bYT9m1n1J8GBL7dVw
+	Q2IEvfCensqEtxU1PZ0mg/JHLQ9IYpSbDgICzPzlXx1SIhjjsn/Mz92PbCy8mv5crAgOBW
+	5aoGDwTAPRiY2zmLhJW9IU+uWO0b4DY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1741855939;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Zy5BLDWhW5tuLfn5o9uPMUppzn8JjYggSaYxs0/2H10=;
+	b=sIxVTYRFgVIu7DkLYzXwvPJaVdCyD5Z98Q87Q1E4AomzIXpZD+xiDNaUMl9QjNuylqv9NM
+	1sg/DCaWRFoGz7CQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1741855939; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Zy5BLDWhW5tuLfn5o9uPMUppzn8JjYggSaYxs0/2H10=;
+	b=vDwo1wH5sNx2LEe91tHBU7tx3tj7gx4jeCwXWal7Ga+SOqtw1Ph92bYT9m1n1J8GBL7dVw
+	Q2IEvfCensqEtxU1PZ0mg/JHLQ9IYpSbDgICzPzlXx1SIhjjsn/Mz92PbCy8mv5crAgOBW
+	5aoGDwTAPRiY2zmLhJW9IU+uWO0b4DY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1741855939;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Zy5BLDWhW5tuLfn5o9uPMUppzn8JjYggSaYxs0/2H10=;
+	b=sIxVTYRFgVIu7DkLYzXwvPJaVdCyD5Z98Q87Q1E4AomzIXpZD+xiDNaUMl9QjNuylqv9NM
+	1sg/DCaWRFoGz7CQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6B9FC13797;
+	Thu, 13 Mar 2025 08:52:19 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 44qlF8Oc0mdlLQAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 13 Mar 2025 08:52:19 +0000
+Message-ID: <5075cd03-0a4a-46d3-abac-3eda27b9ddcc@suse.de>
+Date: Thu, 13 Mar 2025 09:52:18 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250305163732.2766420-1-sdf@fomichev.me> <20250305163732.2766420-5-sdf@fomichev.me>
-In-Reply-To: <20250305163732.2766420-5-sdf@fomichev.me>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 13 Mar 2025 09:51:23 +0100
-X-Gm-Features: AQ5f1JqlO2YBC00bvYq4fxHwcbBER8TCUQ2gQEFcHPoBrR4Uvs3sMXBIIC_nln4
-Message-ID: <CANn89i+4F1f2FSUxmxP=qqir0z_3ZDNpQoqkE3X7bwp81U3sCw@mail.gmail.com>
-Subject: Re: [PATCH net-next v10 04/14] net: hold netdev instance lock during
- qdisc ndo_setup_tc
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Saeed Mahameed <saeed@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] mm: Decline to manipulate the refcount on a slab page
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Matthew Wilcox <willy@infradead.org>, Jakub Kicinski <kuba@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>, netdev@vger.kernel.org,
+ Vlastimil Babka <vbabka@suse.cz>, linux-mm@kvack.org
+References: <20250310143544.1216127-1-willy@infradead.org>
+ <20250311111511.2531b260@kernel.org>
+ <4fc21641-e258-474b-9409-4949fe2fda2d@suse.de>
+ <Z9BsCZ_aOozA5Al9@casper.infradead.org> <Z9EgGzPxjOFTKoLj@infradead.org>
+ <9af6dff3-adce-40f8-8649-282212acad9e@suse.de>
+ <Z9KK-n_JxOQ85Vgp@infradead.org>
+ <17f4795a-f6c8-4e6c-ba31-c65eab18efd1@suse.de>
+ <Z9Ka8-aGagGH0rd5@infradead.org>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <Z9Ka8-aGagGH0rd5@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	ARC_NA(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	RCVD_TLS_ALL(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid]
+X-Spam-Score: -4.30
+X-Spam-Flag: NO
 
-On Wed, Mar 5, 2025 at 5:37=E2=80=AFPM Stanislav Fomichev <sdf@fomichev.me>=
- wrote:
->
-> Qdisc operations that can lead to ndo_setup_tc might need
-> to have an instance lock. Add netdev_lock_ops/netdev_unlock_ops
-> invocations for all psched_rtnl_msg_handlers operations.
->
-> Cc: Jamal Hadi Salim <jhs@mojatatu.com>
-> Cc: Cong Wang <xiyou.wangcong@gmail.com>
-> Cc: Jiri Pirko <jiri@resnulli.us>
-> Cc: Saeed Mahameed <saeed@kernel.org>
-> Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-> ---
->  net/sched/sch_api.c | 28 ++++++++++++++++++++++++----
->  1 file changed, 24 insertions(+), 4 deletions(-)
->
-> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-> index 21940f3ae66f..f5101c2ffc66 100644
-> --- a/net/sched/sch_api.c
-> +++ b/net/sched/sch_api.c
-> @@ -1279,9 +1279,11 @@ static struct Qdisc *qdisc_create(struct net_devic=
-e *dev,
->                          * We replay the request because the device may
->                          * go away in the mean time.
->                          */
-> +                       netdev_unlock_ops(dev);
->                         rtnl_unlock();
->                         request_module(NET_SCH_ALIAS_PREFIX "%s", name);
->                         rtnl_lock();
+On 3/13/25 09:44, Christoph Hellwig wrote:
+> On Thu, Mar 13, 2025 at 09:34:39AM +0100, Hannes Reinecke wrote:
+>> nvmf_connect_command_prep() returns a kmalloced buffer.
+> 
+> Yes.
+> 
+>> That is stored in a bvec in _nvme_submit_sync_cmd() via
+>> blk_mq_rq_map_kern()->bio_map_kern().
+>> And from that point on we are dealing with bvecs (iterators
+>> and all), and losing the information that the page referenced
+>> is a slab page.
+> 
+> Yes. But so does every other consomer of the block layer that passes
+> slab memory, of which there are quite a few.  Various internal scsi
+> and nvme command come to mind, as does the XFS buffer cache.
+> 
+>> The argument is that the network layer expected a kvec iterator
+>> when slab pages are referred to, not a bvec iterator.
+> 
+> It doesn't.  It just doesn't want you to use ->sendpage.
+> 
+But we don't; we call 'sendpage_ok()' and disabling the MSG_SPLICE_PAGES
+flag. Actual issue is that tls_sw() is calling iov_iter_alloc_pages(),
+which is taking a page reference.
+It probably should be calling iov_iter_extract_pages() (which does not
+take a reference), but then one would need to review the entire network
+stack as taking and releasing page references are littered throughout
+the stack.
 
-Oops, dev might have disappeared.
+Cheers,
 
-As explained a few lines above in the comment :
-
-/* We dropped the RTNL semaphore in order to
-* perform the module load.  So, even if we
-* succeeded in loading the module we have to
-* tell the caller to replay the request.  We
-* indicate this using -EAGAIN.
-* We replay the request because the device may
-* go away in the mean time.
-*/
-
-
-
-> +                       netdev_lock_ops(dev);
-
-So this might trigger an UAF.
-
->                         ops =3D qdisc_lookup_ops(kind);
->                         if (ops !=3D NULL) {
->                                 /* We will try again qdisc_lookup_ops,
-> @@ -1591,7 +1593,11 @@ static int tc_get_qdisc(struct sk_buff *skb, struc=
-t nlmsghdr *n,
->         if (!dev)
->                 return -ENODEV;
->
-> -       return __tc_get_qdisc(skb, n, extack, dev, tca, tcm);
-> +       netdev_lock_ops(dev);
-> +       err =3D __tc_get_qdisc(skb, n, extack, dev, tca, tcm);
-> +       netdev_unlock_ops(dev);
-> +
-> +       return err;
->  }
->
->  static bool req_create_or_replace(struct nlmsghdr *n)
-> @@ -1828,7 +1834,9 @@ static int tc_modify_qdisc(struct sk_buff *skb, str=
-uct nlmsghdr *n,
->                 return -ENODEV;
->
->         replay =3D false;
-> +       netdev_lock_ops(dev);
->         err =3D __tc_modify_qdisc(skb, n, extack, dev, tca, tcm, &replay)=
-;
-> +       netdev_unlock_ops(dev);
->         if (replay)
->                 goto replay;
->
-> @@ -1919,17 +1927,23 @@ static int tc_dump_qdisc(struct sk_buff *skb, str=
-uct netlink_callback *cb)
->                         s_q_idx =3D 0;
->                 q_idx =3D 0;
->
-> +               netdev_lock_ops(dev);
->                 if (tc_dump_qdisc_root(rtnl_dereference(dev->qdisc),
->                                        skb, cb, &q_idx, s_q_idx,
-> -                                      true, tca[TCA_DUMP_INVISIBLE]) < 0=
-)
-> +                                      true, tca[TCA_DUMP_INVISIBLE]) < 0=
-) {
-> +                       netdev_unlock_ops(dev);
->                         goto done;
-> +               }
->
->                 dev_queue =3D dev_ingress_queue(dev);
->                 if (dev_queue &&
->                     tc_dump_qdisc_root(rtnl_dereference(dev_queue->qdisc_=
-sleeping),
->                                        skb, cb, &q_idx, s_q_idx, false,
-> -                                      tca[TCA_DUMP_INVISIBLE]) < 0)
-> +                                      tca[TCA_DUMP_INVISIBLE]) < 0) {
-> +                       netdev_unlock_ops(dev);
->                         goto done;
-> +               }
-> +               netdev_unlock_ops(dev);
->
->  cont:
->                 idx++;
-> @@ -2308,7 +2322,11 @@ static int tc_ctl_tclass(struct sk_buff *skb, stru=
-ct nlmsghdr *n,
->         if (!dev)
->                 return -ENODEV;
->
-> -       return __tc_ctl_tclass(skb, n, extack, dev, tca, tcm);
-> +       netdev_lock_ops(dev);
-> +       err =3D __tc_ctl_tclass(skb, n, extack, dev, tca, tcm);
-> +       netdev_unlock_ops(dev);
-> +
-> +       return err;
->  }
->
->  struct qdisc_dump_args {
-> @@ -2426,7 +2444,9 @@ static int tc_dump_tclass(struct sk_buff *skb, stru=
-ct netlink_callback *cb)
->         if (!dev)
->                 return 0;
->
-> +       netdev_lock_ops(dev);
->         err =3D __tc_dump_tclass(skb, cb, tcm, dev);
-> +       netdev_unlock_ops(dev);
->
->         dev_put(dev);
->
-> --
-> 2.48.1
->
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
