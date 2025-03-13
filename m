@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-174739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4A57A6017A
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 20:44:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EAA1A6017C
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 20:45:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FD4C3A71E1
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 19:44:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 793DC421792
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 19:45:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B13DD1F30BB;
-	Thu, 13 Mar 2025 19:44:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73AEC1F2B88;
+	Thu, 13 Mar 2025 19:45:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PwKMzrJ5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZOXmK0kd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90C11B87F3;
-	Thu, 13 Mar 2025 19:44:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4A35464E;
+	Thu, 13 Mar 2025 19:45:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741895061; cv=none; b=a4pcZmu9WU7J5yQO9+sPn8XrpcuZkriGl8Kl07wS2QOrMawrDiHw9NtVfmhc93dX6IHdV7yzeteakZQPoU7Mub+iJbM4KLgapN/ugwIWNIyV/X7ztvwgH+b29ccgcuZqB9N3CYY9QH5+Iy773PzlI+E5uA2lxgPmCbjRWgpp9Bw=
+	t=1741895102; cv=none; b=CEBBMu+S/a9iqlvb/6FPjjdRU/0fG5wik3/Lwm1JsLY+s4VEZd/bJyFioILKy5QvX8zT+5henaEvRWZ1M6xdrFKZ245KTCMd9+/LOfhCQF+aWrRZJkktnwjD9cv6QUIBXhFjHNJueIKkivn/LJzfjGM5mBeIqpvW4v3hD+XL+4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741895061; c=relaxed/simple;
-	bh=fcUs4J6HnyEQCz3pNZr/xrPsSdjRkmB7msrVYJIg15o=;
+	s=arc-20240116; t=1741895102; c=relaxed/simple;
+	bh=rXadxYnx1JHiPKCAmphu/6/9te+gnBm/cXBgV9Ntc6U=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=UwYgXromKijNn6179LO5VKmaLL7yUcXXhsKkSQbgO0CNeI10E+q9yukbl9L8zFI6RAwnnKKQhQ/hHB4LhUJLl7n86RuQuJ1FGZBUjqtBxtO4c8xUuhUgrlfD0UadgyW09h7xcJcAvunGbLhrAUYDe7D7LLCn0TK2BO9nWarbexI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PwKMzrJ5; arc=none smtp.client-ip=209.85.128.52
+	 In-Reply-To:Content-Type; b=V1vxr2Rz6DDZzDmMB01XArn0wJ67nMoNeNCdjlmeIAu8BHoK+VdV7/6yRbV3aZwCaicgqAyscajCXSuFVSTempV5Xr+hjd8JC1n4Z/segdIM2K5wFnDZR2zZwegglDRzS/+rKQWHkreO/loaBfHX8Sm/pRq+vZq7thcPnOwB7P4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZOXmK0kd; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43cf848528aso12718185e9.2;
-        Thu, 13 Mar 2025 12:44:19 -0700 (PDT)
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43cfe63c592so12635135e9.2;
+        Thu, 13 Mar 2025 12:45:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741895058; x=1742499858; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1741895099; x=1742499899; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=cPISoPsQNoKlH4kVSY2gW6oUddXOC3HherLwg6HNHo0=;
-        b=PwKMzrJ50t7BIzwramCoAImwANc4383rVztut4SjpuOQXBLgcRkr3j0+hrjhKoanTp
-         Njpw0VQmkIBSMX03lOROTVAKfINvjry+ba5QKe/1BDpGAuKjnt8/LqHUU2NdcTmJRDZn
-         tKX/VbgZzcykUHNVrWS/VALW7OhX2KRVvC6ShbtOOp/D4HGASChdt60YWO1vR1LAnFdS
-         lrLKWYMbc0Kc4cGKrBcFeg/CNbCktZJbc/5MisY80kSqlynUKH18kofnSQSCRr8LJsVE
-         C1zPMBC5UHQZh61pQ71QDr3by4k8ZzIkIXVZhc6HUwLNwdhSzfgiF0F7CKMbCHot8AVW
-         Izbg==
+        bh=p3nTlrTSNrSOmCviCsGNRPrYQNCklH0N0/MSobM/BoE=;
+        b=ZOXmK0kdUOC7kd8fXdkVprCVRkTElufxHIFh90j03psWdMqUv+imzTAZfjnwY/r1xN
+         yBxEHs+OH/GnMUw9ltg/JsVcxouIcBYzjem4VguG32s7IuHdyXMx0+DyKo+jQe2eH5r+
+         7JH9P4MAdzFHaB8GkYQVn1D57Q4Lhq3xRRsdZfUdM4fe4QcRnogEAjRa81mW97OPLrIG
+         c8zDjCEe997na8Yw0Egfh6cMy12ZBRrdXy+/KKytJn47KxpF3yGqaYJk+qv15XKXTSjN
+         r9rsL19x98Q0PoiSI0gDnnNzPCxuYtY0mGiL+V446TA5yS7NDuLVMk0nKl6Ib6kaCMO0
+         iaIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741895058; x=1742499858;
+        d=1e100.net; s=20230601; t=1741895099; x=1742499899;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=cPISoPsQNoKlH4kVSY2gW6oUddXOC3HherLwg6HNHo0=;
-        b=ls8+7yUw7i0lFxMkLbGqau9TG23UsRIpskNCTE5jif3us6P9+rlj5kTEfKiG8eiKx7
-         YWLPO+Pt8mrqNjg3Drt1/SONYwK3Y+2lqmEKPejxfQBU35fHP6iQ6xSno6u2ryfY4y1P
-         ee/L5jilREiTjVUMMBTRXsJzbf0yDUfmSYgODO+Uv2rJ2sIEzqFvqohf3M06M/inw7FE
-         NoLmL/tDzc0l6M7Uz0QCF26NUANB7cqRRIEdxZIL+5FskvmBo04N6pYcarhaHhAIEhmY
-         UvwzuGuc6oG28zsC5grHb50ASdrGVt6PTwMfH854Yc6Rl1BImOYF3DWjV63YALVL/n8A
-         V0nQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUnDiPs7mnrx3+e8k3nzm1xOdcEG5xHNo79L8dhPMp2bmzZFhwYqQ1qZK+bsrTumd58Lxj5j8sCzA6mwQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YySK82DhgPRwvXEGrPsVK1r+V6AX9iQhT8FUWFIOGa9/alwvZt4
-	VmXVfagEL4Ra7EqGGhqTPB4dntTrPKRCG3QOgG7FyjIKoaMRIBfI
-X-Gm-Gg: ASbGncsVqPp8o0gsLhWgtgwL6Rkg0zoQHBB5ByLZ/u9uEAQb3a9BD8OvttFB+5Bk3bC
-	bR+lo5GVPjMy82H6BRPthqwadWH6UFjuPAAdEIQpvRRbqtxnsXofsU4oqb0LXppMsN9FgVlL9J6
-	lQgveHwYfPOUy2GNh1pLleyDh2h0auWroCRMyUN+M/SFbBcCVz+zqm9kR0lx7zoGQyL1UzKT8ml
-	daK6h+NXuOWEnIImeUYjDimBAFWsBQoIhVgffJbtd1GnJQqr72lO6zx/cS9pFspwca30JCfqqyf
-	VMSMlaCZdaarSp72l9Dtb2NPF83mmAaIvixO4pr1pkRGTZcohIy7ZB7/IA4cOMkyd5aRXkNIupR
-	iqmfaMGMpONsfkRX96TmrN7qSM8Y7SzwZ5uYPmz3lRlRH6b6G0gq9+q1h+9LGWrj8PMGYVluelv
-	24H4hEFvXIxw6iZOolb+IuN220z3tXi9Ju+oxy
-X-Google-Smtp-Source: AGHT+IHJlroWGyDz5iqUSMUEAdP42obCSu7Xwd8gD+XAU/rLEejrJMenpJJFXiIwUb0oxVbEUDrMnw==
-X-Received: by 2002:a05:600c:3b1e:b0:43c:f969:13c2 with SMTP id 5b1f17b1804b1-43d01c22a0amr116625765e9.28.1741895057796;
-        Thu, 13 Mar 2025 12:44:17 -0700 (PDT)
+        bh=p3nTlrTSNrSOmCviCsGNRPrYQNCklH0N0/MSobM/BoE=;
+        b=oJPiTonkZpfwCgW6YwAoB8fmfp4hspcw+rhSvJknAPjIr+ScJfMgtxfxbXrn5uI9AK
+         am+DLBkDrfnvoLp+UU2tbxtQk23usWKKoyHv9P6L9i+aGz0Um+ka0IEikwB5BV1eeHxp
+         JMy4YersMswVELdy3F3YTB0m5pYnmCetJ1zmAIWbyS5OaF99r8DSIHNwuQddLD/+JAET
+         i12d1AoAHHrh99WWgOh29tL0BeNqdu4bxxHFMSEga0c1zrseYU9zD5GbDKDe0LukvtJq
+         Vcieew5TWK0V6JXlqo7vREjs23YRXtCK+5Ig/sFjbysZ4PinPtWThHCt2rJHl3gQGDOB
+         2L3g==
+X-Forwarded-Encrypted: i=1; AJvYcCU1353vKAWVXsEob/6PmHkwvSt+JIkg5cBTqwmRyzwvieW5JuQdCGmZdHgE0nfJnCj0Afkbphr/gR2TLw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+U11jyFg0tIa3Uyqv8MWu8eTaskcUoqa19fX0DewF3sAkyjAF
+	Ol8Uqw0KgsFwG3TMgvoAhl5gxK8DpBYAVTD4KdNGSZaeMI64G8Cg
+X-Gm-Gg: ASbGnctNRAx5E+KoYXt8vKuEZidEkF1yAeBy6nN5cRJ5rJnWTEr5UkWBbil1712Y/tX
+	Rr/gEoAfbssRQj/I3TmuVrH69zAcE+Ck4revgboRXgfLJVnuPxfBrOaGUCi36IBKmyM8ULs7Qrn
+	FBV3Jar3MncCIR8+zKdAQmaHQSCaBWNtyF2OEcy+jzRSNJIXaJ5DU1iG8O/32wdo8yGQAOKU/LF
+	IoxJWVfmFkdsMlNjoX93rajJAxPFhqeH9z+sd39/LYLilLUUYuU0Ycb7IkeUAuK2uRqfr6ylDwa
+	TYMB4I2RDjIoZks79i5ilRb2z84P7nu9lMgC13c7xByNyGeOwr7XJ+3InjdZSBWhkVtkQ7cJ6d5
+	5Je0WQEe66qT6UsHBvhuWjAJun2C8Tsww+EldsBhJXfFfv2f/EDot+m+HtHsSdtD3JGf6tpecAJ
+	9bgMTmGMUZDQz9RVYLtYFj1KiJOXPSBrWGuGdw
+X-Google-Smtp-Source: AGHT+IHZxksT4w9y53s2eW009DqaNpa4P9eBDChhK+sn71nK85oL1SpWWzzyBTI8xhfef2XQ9mggoQ==
+X-Received: by 2002:a05:6000:1fa4:b0:391:466f:314e with SMTP id ffacd0b85a97d-396c1c26442mr1043062f8f.16.1741895098918;
+        Thu, 13 Mar 2025 12:44:58 -0700 (PDT)
 Received: from ?IPV6:2a02:3100:9d92:6200:9d62:fd9a:43ed:7e78? (dynamic-2a02-3100-9d92-6200-9d62-fd9a-43ed-7e78.310.pool.telefonica.de. [2a02:3100:9d92:6200:9d62:fd9a:43ed:7e78])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-43d0a8c5ccasm62791535e9.26.2025.03.13.12.44.16
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-395c7df3506sm3229821f8f.11.2025.03.13.12.44.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Mar 2025 12:44:17 -0700 (PDT)
-Message-ID: <6e8d26f4-8d0a-4c83-aec3-378847a377eb@gmail.com>
-Date: Thu, 13 Mar 2025 20:44:25 +0100
+        Thu, 13 Mar 2025 12:44:58 -0700 (PDT)
+Message-ID: <4452cb7e-1a2f-4213-b49f-9de196be9204@gmail.com>
+Date: Thu, 13 Mar 2025 20:45:06 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,7 +84,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 1/4] net: phy: realtek: remove call to
+Subject: [PATCH net-next 2/4] net: phy: tja11xx: remove call to
  devm_hwmon_sanitize_name
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>,
@@ -148,33 +148,52 @@ Since c909e68f8127 ("hwmon: (core) Use device name as a fallback in
 devm_hwmon_device_register_with_info") we can simply provide NULL
 as name argument.
 
+Note that neither priv->hwmon_name nor priv->hwmon_dev are used
+outside tja11xx_hwmon_register.
+
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/phy/realtek/realtek_hwmon.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+ drivers/net/phy/nxp-tja11xx.c | 19 +++++--------------
+ 1 file changed, 5 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/net/phy/realtek/realtek_hwmon.c b/drivers/net/phy/realtek/realtek_hwmon.c
-index 1ecb410bb..ac96e2d1e 100644
---- a/drivers/net/phy/realtek/realtek_hwmon.c
-+++ b/drivers/net/phy/realtek/realtek_hwmon.c
-@@ -63,16 +63,11 @@ static const struct hwmon_chip_info rtl822x_hwmon_chip_info = {
- int rtl822x_hwmon_init(struct phy_device *phydev)
+diff --git a/drivers/net/phy/nxp-tja11xx.c b/drivers/net/phy/nxp-tja11xx.c
+index 601094fe2..07e94a247 100644
+--- a/drivers/net/phy/nxp-tja11xx.c
++++ b/drivers/net/phy/nxp-tja11xx.c
+@@ -87,8 +87,6 @@
+ #define TJA110X_RMII_MODE_REFCLK_IN       BIT(0)
+ 
+ struct tja11xx_priv {
+-	char		*hwmon_name;
+-	struct device	*hwmon_dev;
+ 	struct phy_device *phydev;
+ 	struct work_struct phy_register_work;
+ 	u32 flags;
+@@ -508,19 +506,12 @@ static const struct hwmon_chip_info tja11xx_hwmon_chip_info = {
+ static int tja11xx_hwmon_register(struct phy_device *phydev,
+ 				  struct tja11xx_priv *priv)
  {
- 	struct device *hwdev, *dev = &phydev->mdio.dev;
--	const char *name;
- 
- 	/* Ensure over-temp alarm is reset. */
- 	phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2, RTL822X_VND2_TSALRM, 3);
- 
--	name = devm_hwmon_sanitize_name(dev, dev_name(dev));
--	if (IS_ERR(name))
--		return PTR_ERR(name);
+-	struct device *dev = &phydev->mdio.dev;
 -
--	hwdev = devm_hwmon_device_register_with_info(dev, name, phydev,
-+	hwdev = devm_hwmon_device_register_with_info(dev, NULL, phydev,
- 						     &rtl822x_hwmon_chip_info,
- 						     NULL);
- 	return PTR_ERR_OR_ZERO(hwdev);
+-	priv->hwmon_name = devm_hwmon_sanitize_name(dev, dev_name(dev));
+-	if (IS_ERR(priv->hwmon_name))
+-		return PTR_ERR(priv->hwmon_name);
+-
+-	priv->hwmon_dev =
+-		devm_hwmon_device_register_with_info(dev, priv->hwmon_name,
+-						     phydev,
+-						     &tja11xx_hwmon_chip_info,
+-						     NULL);
++	struct device *hdev, *dev = &phydev->mdio.dev;
+ 
+-	return PTR_ERR_OR_ZERO(priv->hwmon_dev);
++	hdev = devm_hwmon_device_register_with_info(dev, NULL, phydev,
++						    &tja11xx_hwmon_chip_info,
++						    NULL);
++	return PTR_ERR_OR_ZERO(hdev);
+ }
+ 
+ static int tja11xx_parse_dt(struct phy_device *phydev)
 -- 
 2.48.1
 
