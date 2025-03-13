@@ -1,95 +1,133 @@
-Return-Path: <netdev+bounces-174499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47944A5F013
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 10:58:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00751A5F02F
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 11:04:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C401D3BE0AB
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 09:58:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0D7A1887A94
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 10:04:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CAED265624;
-	Thu, 13 Mar 2025 09:58:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ruhIPBuu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEC2C2641DE;
+	Thu, 13 Mar 2025 10:04:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD2A5263C8A;
-	Thu, 13 Mar 2025 09:58:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABE4E13B5A0;
+	Thu, 13 Mar 2025 10:04:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741859900; cv=none; b=nabc7EAT0JPHXhNiiSzkX3tfshPPBhg71DEbwhI16bN3CtpVzGILet3JH7DYidVh9Cp/QvPaCkNempCay1zDeVBJdTD/JiHp4c0nK6Rv7Zg1Uf0UYE6pVpPcA8i2qFcHRt04uH3rMrSZxsJyVzjhTIt7ND/Wj5KpBtpH3obS2uQ=
+	t=1741860251; cv=none; b=ezJq4GVqy/ICSdQn2NEqQOhH6Ri/IbsSiB91UtxlvL2Ek1t/NFK/opKhl4wiGkwbyxNqNGnNBTC3KrYOrpqZ9y6L3xffqPD4kYu7iyGYxUOz/jo4EF5mxG5hEC5yRAWgFUrPcmwGtVvyZKqvJBPmQPIacQMBZMxaWLhi+SXqzLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741859900; c=relaxed/simple;
-	bh=cuy3wdeUkqjYr5LUbKSKDKjMf1F2kQtjs1UZvwSxQts=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bNu6+rk5nl5Xb46Prc3EC3hwmA5Yngmn5ayV+mfQnrrRbcU+jIIVPvdhZ7TGmfaCilW2Zi5N7cbaWwoFEYxDvGQqbPTnJqDL/wCJFEcw+PeY1jhUGAiOEGovrLmGDyNrA5XSQNLqgq60jw39Lz6gumAbMQt/H84QqC8O1yP5lmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ruhIPBuu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8690BC4CEFA;
-	Thu, 13 Mar 2025 09:58:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1741859900;
-	bh=cuy3wdeUkqjYr5LUbKSKDKjMf1F2kQtjs1UZvwSxQts=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ruhIPBuuhy04aY+GzopKjQXlQkBEg/msZwU2IW8670KDT3HZ6PgJrNEQy2y3rcU8G
-	 o52jFa8GcXBC1JZyYUuA8fV0bYliGko9220RiDftkvB6FCllOfGExY6hDf2j1xhEry
-	 +d4KBW+Id+UyEtaXdPwRUeCQT82yHAFQti4gfbWQ=
-Date: Thu, 13 Mar 2025 10:58:17 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Ma Ke <make24@iscas.ac.cn>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, jdamato@fastly.com,
-	aleksander.lobakin@intel.com, quic_zijuhu@quicinc.com,
-	andriy.shevchenko@linux.intel.com, wanghai26@huawei.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] net-sysfs: fix error handling in
- netdev_register_kobject()
-Message-ID: <2025031355-legend-liftoff-63bc@gregkh>
-References: <20250313075528.306019-1-make24@iscas.ac.cn>
+	s=arc-20240116; t=1741860251; c=relaxed/simple;
+	bh=1d9rwvR5saCp0EdhYztcjIdDfwg5pjT3HmajtsxKKTc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Z7Qy3CrjMjspzipFpJ2j4OOCzowzaza24ucmCqSBU6x1KiQWMCDdBmU/usEMZAKAIZG8xXXWtaoIMRKUJXE0jtiVx+4jnDWsAOEJN8uV1p0aQ5aOqaM7cR2cLbzRxBeUGksYJqypEbyLezxi9glrRDojDd1sgdc+PguXUNTWUbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-223959039f4so13765045ad.3;
+        Thu, 13 Mar 2025 03:04:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741860248; x=1742465048;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZTpDb7E7Kgg1mQRDqCTRFcTgplYc3DjbNW4+KhK/wVU=;
+        b=QLLQJyvwr2VRQJ/gcLojzFICuB0zuaawowtTEaD6cza03dF5X4z1ZvpoCts4OxaAtv
+         qKg1JPwnLCGQyPL2Sgxpm5tmCqoOafdAchqHbogzyzrslgkwKJnU9rYgXQQzHaMoypdP
+         GCSr694lST5WOrN7CxyCEn2BSBIi6lIy299dKCvsNJ0dMnt59ATsC0IPHMtfkglrFzDO
+         UWTw7ErScVlddP2pNioKlgYJ2SAGhUVyt+GmD18i9HNSsAKHdMu6qwHZezcDw/bPCKZc
+         AtacE+vr/MNbqWIzpcmejJ9wh1DVA6EfiRNNOELVmeAmtXcqU37zAJwUwXXSacKwvXA5
+         9jyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXEZudVDA+gr/BHrnynkdczaN5kQE2PvONfvmNPChsgU/givzY/QlQd8BDssxnJscJgJ4nq276qlbFYo44=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwzK4sJopXzE/GcbdeEDOUycIw2krR5mjP4+uZoCeT2wIDi3WS9
+	pbiwwRmAnbVYZYzPeaZ+cBAQOclVvGeqYXdHjXbPNXVXbK6lGZzfD151duFrXQ==
+X-Gm-Gg: ASbGncvzBay2D7hSqeIAeAR6vnLxiuqFTQjlaJ2TrKz4FrSC3a2T2aXcq4FvIgjzhk4
+	Q2VxdpwiX2/C6aKOme9KOzYhojg43MmRi9IhCnJ29DSfuo+pY9NNtFDRckRybaNdRp9yOtkhBFR
+	Y0PDwrwD8yzCsK1r/m43YSlCNkTKAZWMU8l1BJylAbAqdxF8W5ar8MAm4hFQaLXHRuNBZ5ROPxR
+	IXqrRzfDWVxJ9Sz6uj8XisYvc2ebMSvXAd90SAWJsVKvFAijDhrd/g7lbll56tE4qTKCOcJzvDn
+	6XK1dxJTvAJkqKpFZxfhrTeN8rjIGKEaX7wVIMsaV0Tt
+X-Google-Smtp-Source: AGHT+IFX6/pa4VhGBivbCC3CtJNwH1YfTlzwX4CCD5m8Y0Zl+Ld8fkpWuWGDaqr+P+mpvgxyketlVQ==
+X-Received: by 2002:a05:6a00:3981:b0:736:a7e3:d4ab with SMTP id d2e1a72fcca58-736aa9d32bemr30744617b3a.5.1741860248431;
+        Thu, 13 Mar 2025 03:04:08 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-73711694b72sm983524b3a.133.2025.03.13.03.04.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Mar 2025 03:04:07 -0700 (PDT)
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	horms@kernel.org,
+	sdf@fomichev.me
+Subject: [PATCH net-next] net: don't relock netdev when on qdisc_create replay
+Date: Thu, 13 Mar 2025 03:04:07 -0700
+Message-ID: <20250313100407.2285897-1-sdf@fomichev.me>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250313075528.306019-1-make24@iscas.ac.cn>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Mar 13, 2025 at 03:55:28PM +0800, Ma Ke wrote:
-> Once device_add() failed, we should call put_device() to decrement
-> reference count for cleanup. Or it could cause memory leak.
-> 
-> As comment of device_add() says, 'if device_add() succeeds, you should
-> call device_del() when you want to get rid of it. If device_add() has
-> not succeeded, use only put_device() to drop the reference count'.
-> 
-> Found by code review.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 8ed633b9baf9 ("Revert "net-sysfs: Fix memory leak in netdev_register_kobject"")
-> Signed-off-by: Ma Ke <make24@iscas.ac.cn>
-> ---
->  net/core/net-sysfs.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-> index 07cb99b114bd..f443eacc9237 100644
-> --- a/net/core/net-sysfs.c
-> +++ b/net/core/net-sysfs.c
-> @@ -2169,6 +2169,7 @@ int netdev_register_kobject(struct net_device *ndev)
->  
->  	error = device_add(dev);
->  	if (error)
-> +		put_device(dev);
->  		return error;
+Eric reports that by the time we call netdev_lock_ops after
+rtnl_unlock/rtnl_lock, the dev might point to an invalid device.
+Don't relock the device after request_module and don't try
+to unlock it in the caller (tc_modify_qdisc) in case of replay.
 
-You obviously did not test this :(
+Fixes: a0527ee2df3f ("net: hold netdev instance lock during qdisc ndo_setup_tc")
+Reported-by: Eric Dumazet <edumazet@google.com>
+Link: https://lore.kernel.org/netdev/20250305163732.2766420-1-sdf@fomichev.me/T/#me8dfd778ea4c4463acab55644e3f9836bc608771
+Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+---
+ net/sched/sch_api.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-Please be more careful in the future.
+diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+index abace7665cfe..f1ec6ec0cf05 100644
+--- a/net/sched/sch_api.c
++++ b/net/sched/sch_api.c
+@@ -1278,13 +1278,14 @@ static struct Qdisc *qdisc_create(struct net_device *dev,
+ 			 * tell the caller to replay the request.  We
+ 			 * indicate this using -EAGAIN.
+ 			 * We replay the request because the device may
+-			 * go away in the mean time.
++			 * go away in the mean time. Note that we also
++			 * don't relock the device because it might
++			 * be gone at this point.
+ 			 */
+ 			netdev_unlock_ops(dev);
+ 			rtnl_unlock();
+ 			request_module(NET_SCH_ALIAS_PREFIX "%s", name);
+ 			rtnl_lock();
+-			netdev_lock_ops(dev);
+ 			ops = qdisc_lookup_ops(kind);
+ 			if (ops != NULL) {
+ 				/* We will try again qdisc_lookup_ops,
+@@ -1837,9 +1838,10 @@ static int tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
+ 	replay = false;
+ 	netdev_lock_ops(dev);
+ 	err = __tc_modify_qdisc(skb, n, extack, dev, tca, tcm, &replay);
+-	netdev_unlock_ops(dev);
++	/* __tc_modify_qdisc returns with unlocked dev in case of replay */
+ 	if (replay)
+ 		goto replay;
++	netdev_unlock_ops(dev);
+ 
+ 	return err;
+ }
+-- 
+2.48.1
+
 
