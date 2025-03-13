@@ -1,176 +1,173 @@
-Return-Path: <netdev+bounces-174540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05382A5F1AD
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 11:59:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69136A5F1E9
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 12:06:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C87D18937EA
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 10:59:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BDF847A51BC
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 11:03:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B18265CAF;
-	Thu, 13 Mar 2025 10:59:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9A90265CCA;
+	Thu, 13 Mar 2025 11:04:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iVLZfptD"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="OZBmUtyI"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95B842571BF
-	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 10:59:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED321EE028;
+	Thu, 13 Mar 2025 11:04:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741863544; cv=none; b=NNcKq5zWKD8EnC6os4JtDkuImyvxJ7rYnHqIyz7mdBEqY1rkX6k7tHc5IEwnTqUO1f28p0lwyoLGl8L9GB2hUNFII/2EVbLUTHpv2ypOxJQUw3xSqT7iFS0FLQlLDBqapdydR9XXTSR+MiV2cVnaePjDbhRXkD+xotVXvU4JCjA=
+	t=1741863892; cv=none; b=NU/OemVb8XVMRNNgBLhTY04Ipyd+kA8y4cmJg1eMoLjJkBc+F6ZUaa6hDQKyU+et0Pc9bLvIMPmWarLD7SXrEwuz/8GLakFzdNKggwK6rHJLTbC0EnjsbppLdlwrYcS8dnQl2GZg6spBoLy9ZC5CI8y10CLL2zHjHD1mkjqYu6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741863544; c=relaxed/simple;
-	bh=37LJNif6aGyyhlJh5h8ixFPgluvePWafJrCynYtE1IE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DU+jtQuPRhTCZ17YDXaRrkh1c2UiEp5ML2XFXeiGiH+KUzb8KtGLzygPHcq6WvaVgtaSLjNm0Yt0zT1sfeBxXd4Ijej71Y3jEj8unYCp++AGyYopDKyysARQQrYNjyVntahoXtVcAsQHKuufYDnl6Fj7D5B/NT1hNH3ofq8yV3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iVLZfptD; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741863541;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=I8+KGKdJ4EK24n18Z2V3Wf8YYaN68pwFttwmHD5FeXs=;
-	b=iVLZfptD+pn64iyDSyI9HvKJqVIM7VARZHxcm78tK7bXK16d5pvAEVqfSAZ+i/8WL45NFP
-	aPWFUwTjTeAcgfyqPAK6tfAFSlncRiHt6fnRxCRDA0tfz23QQmF7w305BVYFt5RPOx90Nj
-	Aay6tMPBv48kV7h3ux+IRm/SmWV6868=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-246-MGM7vPTgNy23zCfj-1H1DQ-1; Thu, 13 Mar 2025 06:59:00 -0400
-X-MC-Unique: MGM7vPTgNy23zCfj-1H1DQ-1
-X-Mimecast-MFC-AGG-ID: MGM7vPTgNy23zCfj-1H1DQ_1741863539
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43cf5196c25so4103025e9.0
-        for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 03:58:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741863539; x=1742468339;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=I8+KGKdJ4EK24n18Z2V3Wf8YYaN68pwFttwmHD5FeXs=;
-        b=bnxyA1TworrTtwyJ8BlLqgP4RjtIB8aK5oj7uXNrPjbqJgxjc8ZUf45uClPZdhbqeV
-         d6cmkXZIFw0CQ1zFLKpE+pjrbp6rf9zt1RNVlQ9p++ShNEVae/t2gpT1y4iBXif4IJQn
-         CPMKdsYvuDd6pQTDszjaklPslAQN+AIWE4KExlBpNasXbvZJpIPUR9gH0bVnOqczZB0h
-         G+JEIcq42Vu8qk85T/4tPgTvfWud3TJ7JjD80qEC0CMBakLr5MhM7oURbDFbk7dJHyr3
-         l6gehEym0tW1zcdzdTvA+wgk5+965h1MY0XD2n0PmpWqi0b/ura2vvxBQC/pFId0KTLC
-         vpkA==
-X-Forwarded-Encrypted: i=1; AJvYcCVPA5dzfbVDbpzoNm12IhCkCRAikJmekDucVSlxT5XQ5prrs5VPr8IsBbJYXHb+4dpvuVP9qhs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzzIeEo2qB1PIcUzwFtT0dfIF5keMVLQvXiPBMY7omEBfIrVbqY
-	tdvvbYY+jGqNR4aDAIwNTrgFqKQtkF+erXZvoozR6CwD3TU3cW444/soWwOHgRiCc2KLFBrNsLF
-	WxqrZk/Eos9tv0sZgs1KRgvBvLoxsnD37iAwI2Jh0FZI63G8076hJGQ==
-X-Gm-Gg: ASbGncsxJVV3xfbkqERsL91xqe3LEl+soMugDEHaSwAGJPAQDrtAPu465xzTWrFk1mC
-	IqBEcne+yJsay+Y1IsbbTzkiscdgvikNvE80BdzE3GayljnGVR0nqTjBFOuloGnFxy94NpCaEJ6
-	b6DCUxQrPCIFTu4mbi1FR/JrP88LgaQ1ARGddCm0RSD06rqOa3U/z1tCVtqT7IOFuj1PNzRurfu
-	/dW95JvUS/bdsHkhuT6MJBWR4/benJNj2vrbbaIxW0izm5JfX/Q23QiXU9kn2NVk1z4UHPRG6MK
-	gdxFXtjtNrN+3WeC3ZrfD1duvpOgRv59wrVfEoEJ
-X-Received: by 2002:a05:6000:1aca:b0:390:f738:246b with SMTP id ffacd0b85a97d-39132d1cc3fmr19536583f8f.15.1741863538692;
-        Thu, 13 Mar 2025 03:58:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFl5a/zzB4j/bQzrh0zOYukq0rCxpL/1iN9vmTUtNgl3blwOPgCRfDtKqTKHkVbblM4clhX9A==
-X-Received: by 2002:a05:6000:1aca:b0:390:f738:246b with SMTP id ffacd0b85a97d-39132d1cc3fmr19536568f8f.15.1741863538262;
-        Thu, 13 Mar 2025 03:58:58 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-6-87.dyn.eolo.it. [146.241.6.87])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d0a7582absm49566905e9.17.2025.03.13.03.58.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Mar 2025 03:58:57 -0700 (PDT)
-Message-ID: <b62ea2ac-aff3-4a00-bc3a-960c28bc5522@redhat.com>
-Date: Thu, 13 Mar 2025 11:58:54 +0100
+	s=arc-20240116; t=1741863892; c=relaxed/simple;
+	bh=1NUbU754X//+cjS7K+VoyzyBOWzjRqfL7OprdlF9hVk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Cu9Tg4h0Vej9Q6HKH7JhXb8XyH7XlLoxhChW61K823q7KvSJbFQYmysXVPqgghYDwwVlS3iAH1xXZ+kcmYuThYNH1KmBL4gj5hiEs1jWf7Apelu85C6kQ8Z31uchiskBstmYiuTIVcfcs+ArYtrvuLD94UlHXJCii055fLho4+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=OZBmUtyI; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52D9591Z028516;
+	Thu, 13 Mar 2025 11:04:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=+93ZydzSe4pbz4Se8FBVU9
+	D4Tf1Anr1jH1qcF2iFcQg=; b=OZBmUtyIOrjNdgh1BN1bKSmYO41UQJeaaRdXp+
+	5if60KsPmycOWIB8Dio6yB3+oU3MExsntGLAfgHBjX6mzrKWbz9MORUsahFgbUlV
+	9wvV/PyviVsSrgXsivNqLZdxjvq4kXYNohviX+msW2d2C8hk3h3LvhF9GsJ9RkEG
+	iCL0rBHN6DPo0goEiFk3auRSzWoNVhqAhgWJWgozxWT0cQQZa569BdD9Y6ezkQTO
+	0wwdpfvm69ISF7gD/clocikRYjr8J7r2oH7C+GoAkq5O6x9HydWAq2hc95no5kxR
+	FXkgRA8klfrdr1vMbPsNQ6/RP7VjcfVKBKcPPSGdI3d1ZsRw==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 45au2pwkbd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 13 Mar 2025 11:04:18 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 52DB4HMO009116
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 13 Mar 2025 11:04:17 GMT
+Received: from hu-mmanikan-blr.qualcomm.com (10.80.80.8) by
+ nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Thu, 13 Mar 2025 04:04:08 -0700
+From: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
+To: <andersson@kernel.org>, <mturquette@baylibre.com>, <sboyd@kernel.org>,
+        <robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
+        <konradybcio@kernel.org>, <catalin.marinas@arm.com>, <will@kernel.org>,
+        <p.zabel@pengutronix.de>, <richardcochran@gmail.com>,
+        <geert+renesas@glider.be>, <lumag@kernel.org>, <heiko@sntech.de>,
+        <biju.das.jz@bp.renesas.com>, <quic_tdas@quicinc.com>,
+        <nfraprado@collabora.com>, <elinor.montmasson@savoirfairelinux.com>,
+        <ross.burton@arm.com>, <javier.carrasco@wolfvision.net>,
+        <ebiggers@google.com>, <quic_anusha@quicinc.com>,
+        <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>
+CC: <quic_varada@quicinc.com>, <quic_srichara@quicinc.com>
+Subject: [PATCH v12 0/6] Add NSS clock controller support for IPQ9574
+Date: Thu, 13 Mar 2025 16:33:53 +0530
+Message-ID: <20250313110359.242491-1-quic_mmanikan@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 8/9] net: check for driver support in netmem
- TX
-To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- kvm@vger.kernel.org, virtualization@lists.linux.dev,
- linux-kselftest@vger.kernel.org
-Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Jeroen de Borst <jeroendb@google.com>,
- Harshitha Ramamurthy <hramamurthy@google.com>,
- Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn
- <willemb@google.com>, David Ahern <dsahern@kernel.org>,
- Neal Cardwell <ncardwell@google.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin"
- <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Shuah Khan <shuah@kernel.org>, sdf@fomichev.me,
- asml.silence@gmail.com, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>,
- Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
- <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
-References: <20250308214045.1160445-1-almasrymina@google.com>
- <20250308214045.1160445-9-almasrymina@google.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250308214045.1160445-9-almasrymina@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Authority-Analysis: v=2.4 cv=P506hjAu c=1 sm=1 tr=0 ts=67d2bbb2 cx=c_pps a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17 a=GEpy-HfZoHoA:10 a=Vs1iUdzkB0EA:10 a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8 a=3uq4IZcbrjxfy09u4asA:9
+ a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-GUID: 2EC1nRsHT1cgsw1FUgsX3ig_-SKTz7s7
+X-Proofpoint-ORIG-GUID: 2EC1nRsHT1cgsw1FUgsX3ig_-SKTz7s7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-13_05,2025-03-11_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 phishscore=0
+ mlxscore=0 spamscore=0 bulkscore=0 priorityscore=1501 impostorscore=0
+ suspectscore=0 malwarescore=0 mlxlogscore=838 lowpriorityscore=0
+ adultscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
+ definitions=main-2503130087
 
-On 3/8/25 10:40 PM, Mina Almasry wrote:
-> We should not enable netmem TX for drivers that don't declare support.
-> 
-> Check for driver netmem TX support during devmem TX binding and fail if
-> the driver does not have the functionality.
-> 
-> Check for driver support in validate_xmit_skb as well.
-> 
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
-> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-> 
-> ---
-> 
-> v5: https://lore.kernel.org/netdev/20250227041209.2031104-8-almasrymina@google.com/
-> - Check that the dmabuf mappings belongs to the specific device the TX
->   is being sent from (Jakub)
-> 
-> v4:
-> - New patch
-> 
-> ---
->  net/core/dev.c         | 33 +++++++++++++++++++++++++++++++++
->  net/core/devmem.h      |  6 ++++++
->  net/core/netdev-genl.c |  7 +++++++
->  3 files changed, 46 insertions(+)
-> 
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 1cb134ff7327..5553947123a0 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -3868,10 +3868,43 @@ int skb_csum_hwoffload_help(struct sk_buff *skb,
->  }
->  EXPORT_SYMBOL(skb_csum_hwoffload_help);
->  
-> +static struct sk_buff *validate_xmit_unreadable_skb(struct sk_buff *skb,
-> +						    struct net_device *dev)
-> +{
-> +	struct skb_shared_info *shinfo;
-> +	struct net_iov *niov;
-> +
-> +	if (likely(skb_frags_readable(skb)))
-> +		goto out;
-> +
-> +	if (likely(!dev->netmem_tx))
+Add bindings, driver and devicetree node for networking sub system clock
+controller on IPQ9574. Also add support for gpll0_out_aux clock
+which serves as the parent for some nss clocks.
 
-Minor nit: I think the above is actually unlikely. The skb is
-unreadable: is supposed to be transmitted on a device supporting
-netmem_tx, otherwise we are in exceptional/error path.
+Changes in V12:
+	- nsscc driver
+		- Pick up R-b tag.
+	- dtsi
+		- Pick up R-b tag.
+	- defconfig
+		- Pick up R-b tag.
+	- Rebased on linux-next tip.
 
-No need to repost just for this.
+V11 can be found at:
+https://lore.kernel.org/linux-arm-msm/20250226075449.136544-1-quic_mmanikan@quicinc.com/
 
-Thanks,
+V10 can be found at:
+https://lore.kernel.org/linux-arm-msm/20250221101426.776377-1-quic_mmanikan@quicinc.com/
 
-Paolo
+V9 can be found at:
+https://lore.kernel.org/linux-arm-msm/20250207073926.2735129-1-quic_mmanikan@quicinc.com/
+
+V8 can be found at:
+https://lore.kernel.org/linux-arm-msm/20241025035520.1841792-1-quic_mmanikan@quicinc.com/
+
+V7 can be found at:
+https://lore.kernel.org/linux-arm-msm/20241009074125.794997-1-quic_mmanikan@quicinc.com/
+
+V6 can be found at:
+https://lore.kernel.org/linux-arm-msm/20241004080332.853503-1-quic_mmanikan@quicinc.com/
+
+V5 can be found at:
+https://lore.kernel.org/linux-arm-msm/20240626143302.810632-1-quic_devipriy@quicinc.com/
+
+V4 can be found at:
+https://lore.kernel.org/linux-arm-msm/20240625070536.3043630-1-quic_devipriy@quicinc.com/
+
+V3 can be found at:
+https://lore.kernel.org/linux-arm-msm/20240129051104.1855487-1-quic_devipriy@quicinc.com/
+
+V2 can be found at:
+https://lore.kernel.org/linux-arm-msm/20230825091234.32713-1-quic_devipriy@quicinc.com/
+
+Devi Priya (6):
+  dt-bindings: clock: gcc-ipq9574: Add definition for GPLL0_OUT_AUX
+  clk: qcom: gcc-ipq9574: Add support for gpll0_out_aux clock
+  dt-bindings: clock: Add ipq9574 NSSCC clock and reset definitions
+  clk: qcom: Add NSS clock Controller driver for IPQ9574
+  arm64: dts: qcom: ipq9574: Add nsscc node
+  arm64: defconfig: Build NSS Clock Controller driver for IPQ9574
+
+ .../bindings/clock/qcom,ipq9574-nsscc.yaml    |   98 +
+ arch/arm64/boot/dts/qcom/ipq9574.dtsi         |   29 +
+ arch/arm64/configs/defconfig                  |    1 +
+ drivers/clk/qcom/Kconfig                      |    7 +
+ drivers/clk/qcom/Makefile                     |    1 +
+ drivers/clk/qcom/gcc-ipq9574.c                |   15 +
+ drivers/clk/qcom/nsscc-ipq9574.c              | 3110 +++++++++++++++++
+ include/dt-bindings/clock/qcom,ipq9574-gcc.h  |    1 +
+ .../dt-bindings/clock/qcom,ipq9574-nsscc.h    |  152 +
+ .../dt-bindings/reset/qcom,ipq9574-nsscc.h    |  134 +
+ 10 files changed, 3548 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml
+ create mode 100644 drivers/clk/qcom/nsscc-ipq9574.c
+ create mode 100644 include/dt-bindings/clock/qcom,ipq9574-nsscc.h
+ create mode 100644 include/dt-bindings/reset/qcom,ipq9574-nsscc.h
+
+
+base-commit: 9fbcd7b32bf7c0a5bda0f22c25df29d00a872017
+-- 
+2.34.1
 
 
