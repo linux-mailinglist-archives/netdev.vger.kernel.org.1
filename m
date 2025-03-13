@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-174489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AC28A5EFBC
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 10:40:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45C79A5EFBF
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 10:40:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E335616810E
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 09:40:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2028818916C6
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 09:40:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5FE7263F4F;
-	Thu, 13 Mar 2025 09:39:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7161B264FA1;
+	Thu, 13 Mar 2025 09:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vIHLWzd/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mx6mGNN6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD210263C8A;
-	Thu, 13 Mar 2025 09:39:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 489D8264F99
+	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 09:39:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741858798; cv=none; b=WtTRaAXrhSJ6g7jQnK/VnXA0fMyP0fABe1dUHTcmrCI0uoSiDcEa/XXWM1vS2qdqEQa3qnR8a0o5V+LeRIHoMWQdEqwxFMNoWB5F+fEhFq0GiVLks1GBkwphutQA2CyXZxH9VF8RC6+Rr4tSNLvEcRhVRBkofOco8DpVmAhUIKQ=
+	t=1741858800; cv=none; b=KaCsMxXiM6+4nF2JbcXedTo1ZOJRoIC14b1sXC+mHgbFQGKc+z6ch80AR/lB549coRqfIrHJQJgCXx6kAt3vxFWvoBi/FRq9fpTogyGcE100bgIXHZv8uMTc5p8GmipB8rH/DALbqEAvQzMPvO9WJ5weNaTR9ITp/KW5j29MTkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741858798; c=relaxed/simple;
-	bh=wOKA0ViPd1tRb4DDfB58xCk3Khk/1XVLmcQRSsHoceM=;
+	s=arc-20240116; t=1741858800; c=relaxed/simple;
+	bh=UhMzxZbTo9QnZ047rGT6v8BCZdle3/5iZTve+2A6IBQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FOFmgNGulPoag1fOw+PDhkEWV7rdY47ylc7s5qNl02V6zD+HHLmkCQXQWp4Hwa6ymnYgYb2ZetbOcbLgAI6Zmg0YSo6fgeuH0R3Wsu/BUKqDi8H/8bHZJ8A5ymoT2EB5fX5yMLJ4l+yjn1scluu0FtZiLSAeNMKJfnafnDR5s3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vIHLWzd/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36619C4CEDD;
-	Thu, 13 Mar 2025 09:39:58 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=hhKQyNiSCplUE/tJJW6LwpM4D9rUqKNzLogB7cepGyjJeqaXPjF+MMNxvMTWCr4MRrGQ8zCoG17uufsL/W7dkI+C4qxUKrRifMzeBUU0wKTx/wE6xcbcBXQhqgvak8osEl8Lyi6CgXQnuEqJ+gBcK+3t0h7nd4t/8gNWzbSqzjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mx6mGNN6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA1D1C4CEDD;
+	Thu, 13 Mar 2025 09:39:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741858798;
-	bh=wOKA0ViPd1tRb4DDfB58xCk3Khk/1XVLmcQRSsHoceM=;
+	s=k20201202; t=1741858799;
+	bh=UhMzxZbTo9QnZ047rGT6v8BCZdle3/5iZTve+2A6IBQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=vIHLWzd/R/J2uFk9hPFqVqeD7IMvVYZc0Gx+lpB2/5ttR+1NkSdd/03kPKb0u/IKm
-	 2giDmaQe1RLpizc3gafQpL4fzL+28X6tsjosM1+K+X6ZWSF2BXjyrxK8kcTGKf4k8i
-	 Q2TdZAEbi4q2UujQYysybo5KOnjy3yA76umDwxw7jWTJx5DhCToG/KrKKtmDxnQ8e+
-	 3gfBZraMAn3xhnF+EKc/dlC6VEygOevCcsTCxG9YfenKwRyKHToqrYP4PK2AX6FpZo
-	 rWq932bPoH3Gb9T7pzTheqLjG+BtjzoapMy/DYNATTylgUaIy2sZeAX+xcnSvxUUnT
-	 wUV+pnzZyFBzA==
+	b=mx6mGNN6RbyKTeb37uQhpERBj2WVgyrj5VuzNy83lMpFAatO/msTdkP0FeVf/vVSF
+	 ycYgD8EXycKsBWGpxQU/kCujESlcUvZCQUV9ACS3WDO6mPcrySKrqeWgp0raXKro/E
+	 R7rleHaRgvpSW2sjKXjTmsHaWeDvNoH0EARlM4ZAMv8TEsjYWXbICwCgfEfH9zz26E
+	 VuUm2bJ7KoXIyM880coM3OAgE95EMVt3gaa6+TVKmQP9Nt4jdrvKOU2qaQo3tGio3g
+	 ujPlBy2W3q/UtMHjUHrl03Ncm6ht7UeF5I4wIS/H7I0evAPqb5HWk7lKeuPVXwGLYW
+	 zhoIqlUuASjkw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB0053806651;
-	Thu, 13 Mar 2025 09:40:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DD63806651;
+	Thu, 13 Mar 2025 09:40:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: openvswitch: remove misbehaving actions length check
+Subject: Re: [PATCH net] Revert "openvswitch: switch to per-action label counting
+ in conntrack"
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174185883275.1437903.4351335237770431725.git-patchwork-notify@kernel.org>
-Date: Thu, 13 Mar 2025 09:40:32 +0000
-References: <20250308004609.2881861-1-i.maximets@ovn.org>
-In-Reply-To: <20250308004609.2881861-1-i.maximets@ovn.org>
-To: Ilya Maximets <i.maximets@ovn.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, dev@openvswitch.org,
- linux-kernel@vger.kernel.org, pshelar@ovn.org, echaudro@redhat.com,
- aconole@redhat.com
+ <174185883400.1437903.1315270734410746330.git-patchwork-notify@kernel.org>
+Date: Thu, 13 Mar 2025 09:40:34 +0000
+References: <1bdeb2f3a812bca016a225d3de714427b2cd4772.1741457143.git.lucien.xin@gmail.com>
+In-Reply-To: <1bdeb2f3a812bca016a225d3de714427b2cd4772.1741457143.git.lucien.xin@gmail.com>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: netdev@vger.kernel.org, dev@openvswitch.org, ovs-dev@openvswitch.org,
+ davem@davemloft.net, kuba@kernel.org, edumazet@google.com, pabeni@redhat.com,
+ pshelar@ovn.org, i.maximets@ovn.org, aconole@redhat.com,
+ marcelo.leitner@gmail.com, jianbol@nvidia.com, fw@strlen.de
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Sat,  8 Mar 2025 01:45:59 +0100 you wrote:
-> The actions length check is unreliable and produces different results
-> depending on the initial length of the provided netlink attribute and
-> the composition of the actual actions inside of it.  For example, a
-> user can add 4088 empty clone() actions without triggering -EMSGSIZE,
-> on attempt to add 4089 such actions the operation will fail with the
-> -EMSGSIZE verdict.  However, if another 16 KB of other actions will
-> be *appended* to the previous 4089 clone() actions, the check passes
-> and the flow is successfully installed into the openvswitch datapath.
+On Sat,  8 Mar 2025 13:05:43 -0500 you wrote:
+> Currently, ovs_ct_set_labels() is only called for confirmed conntrack
+> entries (ct) within ovs_ct_commit(). However, if the conntrack entry
+> does not have the labels_ext extension, attempting to allocate it in
+> ovs_ct_get_conn_labels() for a confirmed entry triggers a warning in
+> nf_ct_ext_add():
+> 
+>   WARN_ON(nf_ct_is_confirmed(ct));
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: openvswitch: remove misbehaving actions length check
-    https://git.kernel.org/netdev/net/c/a1e64addf3ff
+  - [net] Revert "openvswitch: switch to per-action label counting in conntrack"
+    https://git.kernel.org/netdev/net/c/1063ae07383c
 
 You are awesome, thank you!
 -- 
