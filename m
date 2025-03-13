@@ -1,127 +1,81 @@
-Return-Path: <netdev+bounces-174611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA6F3A5F888
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 15:37:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B3E8A5F88E
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 15:37:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43297421119
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 14:37:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2F9317FD9A
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 14:37:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57D54268FF0;
-	Thu, 13 Mar 2025 14:34:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0B7C267F76;
+	Thu, 13 Mar 2025 14:35:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hL4uX9eB"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cUsGaxx+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C48F6267B1D;
-	Thu, 13 Mar 2025 14:34:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 489D4267396
+	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 14:35:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741876499; cv=none; b=M9T4aEfRrhRjLUEHDi+v3gAYcYyvQTDQ3j+mVLkVxPw4L9xmbUJCXH7m6hnE5WlW1CQWmsck3797NcrQgolhoyqg4svJWoExfZDujvwlg0gotuwcw0mc2B+cihT0eGDXZkk/MhHZjc6v8j1oy3vGtECO0MNB7NkwI1q6tm9gyRE=
+	t=1741876545; cv=none; b=iawTp1tvXCVN4/02hcfwAj+iC6mf5STIzzY9Ma1xyvhWOVEtVkQUlLbvg4TM3bKqnZ3FIjkfu1Emgn2A0rOv/VAVg3y8cCrRRNlCR2+7kyqAMgK17QnSTYsLrscRYIs9RYphoHdl7JlNuFIYLbswqmT/4Tbnw7SnvSrQDo/5Boc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741876499; c=relaxed/simple;
-	bh=VnBsh24BaoeppzNWMgOUOfdRq51sCTPpk8XCqt9eJjw=;
+	s=arc-20240116; t=1741876545; c=relaxed/simple;
+	bh=1jqFFeO9lgFj24ofuGKpEuvKwRsULatosF91dVtfF5o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nzeMTkHwAFYnHu4FUbQB86E9yiGzG4cES8cvXJjoEaPv4j6i8C6weXiurww9RAlFpeOqRv6ce2TqJjLk5mONQvddCvjsICKR6mp7v4XMhiXZHDmxJ7u/StEwIWovbaWAZZfhhBf/Qp5WKjE8+IIhylUC+6B5Y1AqN5FSnt2UowQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hL4uX9eB; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741876498; x=1773412498;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=VnBsh24BaoeppzNWMgOUOfdRq51sCTPpk8XCqt9eJjw=;
-  b=hL4uX9eBapwa2a4ZDJ/3peQNpKj+FWa44eDAHVyKf/o8H39Ufeju/E32
-   sPdc2TqjkNh+fmP0YezuSUbBM+ul4zzqhcnh/hyQj6tie/kUGuGY3lXHR
-   dluNB4dbOhIo6FNXy2jUOgPGNZ/E1FuZA462/O2Q27x1YW6CKKlfzbq+g
-   cInEWsOzZ8kRGMC3bdBMqUV4C6iicHa3oy2AmusxWRdVxmkxKp2R+SR5J
-   KQbEyar+dHpGfh9tHotjBfJ6XIH3yDzy7Dd60A7UTIFao61fsjBO0Z7Ol
-   etekC6DpEVz4sSi9GfggMK0lVC/uct1McKUvsm1139zZZCprCh+LLXCXY
-   A==;
-X-CSE-ConnectionGUID: CuAmh4soTDC+88NrYwpi4w==
-X-CSE-MsgGUID: ioWQBl7yQNWaecdcM/hDVg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11372"; a="42245889"
-X-IronPort-AV: E=Sophos;i="6.14,244,1736841600"; 
-   d="scan'208";a="42245889"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 07:34:57 -0700
-X-CSE-ConnectionGUID: LtS4bOCgTp6/xbBa6O03Yw==
-X-CSE-MsgGUID: i5Rt2qekTFGP13lu5AdJJA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,245,1736841600"; 
-   d="scan'208";a="158123773"
-Received: from smile.fi.intel.com ([10.237.72.58])
-  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 07:34:38 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1tsjdr-00000002Cia-1Ihl;
-	Thu, 13 Mar 2025 16:34:35 +0200
-Date: Thu, 13 Mar 2025 16:34:35 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: linux-spi@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH v1 1/1] spi: Use inclusive language
-Message-ID: <Z9Ls-zhryd7mJv-b@smile.fi.intel.com>
-References: <20250313111442.322850-1-andriy.shevchenko@linux.intel.com>
- <1c49edb2-2ffc-419e-be5e-7e15669a7839@sirena.org.uk>
- <Z9LlTflb1HQMyEv2@smile.fi.intel.com>
- <e329812d-90a5-456e-9a00-abb5c2c8d25d@sirena.org.uk>
- <Z9LqyWr4GH4RX6Nj@smile.fi.intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pBlZJYc+i0ZWWRtuemLqpbLJJ6vtt/olmlHk/f4NYXFC9PIbFb8m4I15NlG9iC9LLYSMQlnqmbJmLA2WSNqWy22CcsSfUdF4yRKQSLajIuQfhu4X9LNqp/sOK+guSgh1qwBvn46MH+eS+EVsVj5madw1HmZbc/FUmMOSCK1YIOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cUsGaxx+; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=9yw6oLAqDZ9sojnviBf/3pRmuoojClDvJOSVbVetjj0=; b=cU
+	sGaxx+mjNJerCLRH/fwqQgsUU4Qw0bAhsf+1w7vQu76Ly2xisPl7qz45lEdZYdeEXto8j9C3ADgIK
+	ykne03NcAOh87WQeNq16AEZiPb/YTVTk4Y5dmLmColVrz8KB8AbqzgzWbAIzJwOOZii5eopmN4t7d
+	c9c7Gqs5qePUN1c=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tsjes-00513d-UF; Thu, 13 Mar 2025 15:35:38 +0100
+Date: Thu, 13 Mar 2025 15:35:38 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
+Cc: Vladimir Oltean <olteanv@gmail.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Vivien Didelot <vivien.didelot@gmail.com>,
+	Tobias Waldekranz <tobias@waldekranz.com>, netdev@vger.kernel.org,
+	Lev Olshvang <lev_o@rad.com>
+Subject: Re: [PATCH net 04/13] net: dsa: mv88e6xxx: allow SPEED_200 for 6320
+ family on supported ports
+Message-ID: <1d24b3cb-e7c4-4378-a71d-c2adc02eeffc@lunn.ch>
+References: <20250313134146.27087-1-kabel@kernel.org>
+ <20250313134146.27087-5-kabel@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <Z9LqyWr4GH4RX6Nj@smile.fi.intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250313134146.27087-5-kabel@kernel.org>
 
-On Thu, Mar 13, 2025 at 04:25:13PM +0200, Andy Shevchenko wrote:
-> On Thu, Mar 13, 2025 at 02:12:29PM +0000, Mark Brown wrote:
-> > On Thu, Mar 13, 2025 at 04:01:49PM +0200, Andy Shevchenko wrote:
-> > > On Thu, Mar 13, 2025 at 12:47:32PM +0000, Mark Brown wrote:
-> > 
-> > > > This doesn't apply against current code, please check and resend.
-> > 
-> > > Hmm... It's based on the spi/for-next. Should I use another branch?
-> > 
-> > I did try to apply it against that in case there were fixes that needed
-> > merging up, it didn't apply.  Are you sure you're using an up to date
-> > copy?  I have ebd50ac3cd97ecae231f92b2d64b68d3c66b3474.
+On Thu, Mar 13, 2025 at 02:41:37PM +0100, Marek Behún wrote:
+> The 6320 family supports the ALT_SPEED bit on ports 2, 5 and 6. Allow
+> this speed by implementing 6320 family specific .port_set_speed_duplex()
+> method.
 > 
-> 87a228960033 spi: Use inclusive language
-> 0d9a21198453 defconfig: enable SERIAL_MULTI_INSTANTIATE
-> 90485ebfb4b3 defconfig: enable SPI_TOPCLIFF_PCH
-> 6d91e1fce386 defconfig: enable EEPROM_AT24 and EEPROM_AT25
-> 331ffc354c53 defconfig: enable GPIO_PCH
-> d519315d6bed Merge remote-tracking branch 'spi/for-next' into HEAD
-> ebd50ac3cd97 (spi/for-next) Merge remote-tracking branch 'spi/for-6.15' into spi-next
-> 
-> Yes, the base where it was merged to is eds-acpi branch of my public GH [1],
-> which has no SPI stuff in there.
+> Fixes: 96a2b40c7bd3 ("net: dsa: mv88e6xxx: add port's MAC speed setter")
 
-> [1]: https://github.com/andy-shev/linux/commits/eds-acpi/
+net-next please, unless you have a system which really requires this,
+is broken otherwise.
 
-$ git checkout -b test-spi-mrg spi/for-next
-$ git cherry-pick -1 87a228960033
-[test-spi-mrg 8a11d1063109] spi: Use inclusive language
-Date: Fri Dec 8 19:02:54 2023 +0200
-2 files changed, 64 insertions(+), 66 deletions(-)
-
-In any case there is a v2, please try that one.
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+	Andrew
 
