@@ -1,219 +1,107 @@
-Return-Path: <netdev+bounces-174571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6141A5F4EE
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 13:51:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 764BFA5F4FB
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 13:55:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1C0A18868AD
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 12:50:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7C3A1669A0
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 12:55:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7880D266F06;
-	Thu, 13 Mar 2025 12:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFD4D2673A1;
+	Thu, 13 Mar 2025 12:55:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="kjelFqp4"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gK+NIxjH"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F417266590;
-	Thu, 13 Mar 2025 12:50:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E8C264FBC;
+	Thu, 13 Mar 2025 12:55:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741870227; cv=none; b=k3ZI1MH575w6F/5Gu/gyeOWKgAXNB2zIqe/u3Hd7I+3GkI4sb2arVWKGywhBpVe2EABOyXkLosbYDKtRTrE1XlZu2irlcXxSCv33DIiC5CYS1XhMkM5E5akCge4kFSY/fYvL5LS0IRvMbrFIH8WdZ8b+YnfijH39jxUKmV0Pdiw=
+	t=1741870508; cv=none; b=LtTkTUQcQGGTg7TIUJo2m4Afk2WKAyMou+4BtsW9oWKytN6lrTReSXElChBRyh6/Q9uPCh9S/fOkX3hmITnJfH6XpAe5/TMEZExwmYmscxiuqNctloLwsX6v7M8PFjMpzwlIbdxtmhH4u2DmaGfO0+5jI39y+o9NLAHliZGwHEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741870227; c=relaxed/simple;
-	bh=oR/FOTGpD7ULVyHXL30j9v0bs5KEW/bAEWpuMNpwgs0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s+uwXC11n/rkUwfMw0D/8OiHeHNTTZczX3wUSXx4bHHxbPYiAH/y79GWYIukLwu6ehE3dJvQzNF3CrVaWEPe7tJ0aDxmK2JRiwwSR+AV1ahesh351OYhpKuErvDZlmrbzcrrZ6pdo2KVTG2KhEB2ired0QcAndDHbuvCmi3g0Lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=kjelFqp4; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-	Resent-Message-ID:In-Reply-To:References;
-	bh=+kuVs+5VOg64wjtKDeqaYWPBfW7mwU/NExIX/melAfM=; t=1741870225; x=1743079825; 
-	b=kjelFqp461uaEZ680JjzvLzNV6QPnExhlYQTK1SmBh27y4ExrLemnm72pEWdHyatYLGFMnutMD8
-	x4s74Tg8RbJpZE/GDlp8iadvTy6wD1S2xc6A+FRISkkgSqc6+TnQgI2ibhZTW4De4EXiLBGUJihnd
-	O5jSMrBN5AgccKGFApPEDeb8YHeEsMjHyAAJgSMTlPzPnCvV5qL0wQ1rEB1rD2NdyZO5jL+kxUH+W
-	gUS8NCaDWAwvWYPqvdA7MC9I/mxqASuAKWwIux4y7/k96sMSfWIe2ZsRZ3ZggtC2pzY/5bFpSnCKF
-	mVQJQlEg8IDeP83RFCqJN4ps1bekNlMsGHJQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1tsi0u-00000009zlb-2Hzs;
-	Thu, 13 Mar 2025 13:50:16 +0100
-From: Johannes Berg <johannes@sipsolutions.net>
-To: linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Johannes Berg <johannes.berg@intel.com>
-Subject: [RFC PATCH] wifi: free SKBTX_WIFI_STATUS skb tx_flags flag
-Date: Thu, 13 Mar 2025 13:49:39 +0100
-Message-ID: <20250313134942.52ff54a140ec.If390bbdc46904cf451256ba989d7a056c457af6e@changeid>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1741870508; c=relaxed/simple;
+	bh=CCEtVfnsZrC2J46tRuWCShcdrEwGwGkKg9nBPiglXjA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k0siEfsSF5WvSBiW1NFK5I7zbesiy+F96rZlABrZNxUmOpnghgmyUZ39GcaW8CmdfejRhl1yiURYOp5tNOUJEC1WAS+4yZ2U/rJWEbNm235hOz48wJofE7lpK4jFAVQZyKz3LFGchop/FTN1pmgj9fMxW5ppvOhi132tNoUk9IU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gK+NIxjH; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=JAmSBShQ4Oo+DzVgXCfJRH9EvtD5cdq+eGj0LwrBrMM=; b=gK+NIxjHhbJg9QA80guaisWjV1
+	fhUZPcPh+lhz0p7UJTieeyzosK7n9tQkzGdJk2ay7IGt3CC+SZZpGCTEa4UmM9ulRFkHDQxhmeAVD
+	eIA3rR10nj78pdnZ89dyF5tZi00KtN/v81EUUJvn2GYYnPDCbHzVk7m2zpP1XD7SGWJo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tsi5R-004zY7-Lz; Thu, 13 Mar 2025 13:54:57 +0100
+Date: Thu, 13 Mar 2025 13:54:57 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Gupta, Suraj" <Suraj.Gupta2@amd.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	"Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"robh@kernel.org" <robh@kernel.org>,
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"Simek, Michal" <michal.simek@amd.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"git (AMD-Xilinx)" <git@amd.com>,
+	"Katakam, Harini" <harini.katakam@amd.com>
+Subject: Re: [PATCH net-next V2 2/2] net: axienet: Add support for 2500base-X
+ only configuration.
+Message-ID: <468deb47-1837-4709-84e5-b14bf0e8c2a5@lunn.ch>
+References: <ad1e81b5-1596-4d94-a0fa-1828d667b7a2@lunn.ch>
+ <Z9GWokRDzEYwJmBz@shell.armlinux.org.uk>
+ <BL3PR12MB6571795DA783FD05189AD74BC9D02@BL3PR12MB6571.namprd12.prod.outlook.com>
+ <34ed11e7-b287-45c6-8ff4-4a5506b79d17@lunn.ch>
+ <BL3PR12MB6571540090EE54AC9743E17EC9D02@BL3PR12MB6571.namprd12.prod.outlook.com>
+ <fd686050-e794-4b2f-bfb8-3a0769abb506@lunn.ch>
+ <BL3PR12MB6571959081FC8DDC5D509560C9D02@BL3PR12MB6571.namprd12.prod.outlook.com>
+ <Z9HjOAnpNkmZcoeo@shell.armlinux.org.uk>
+ <186bf47a-04af-4bfb-a6d3-118b844c9ba8@lunn.ch>
+ <BL3PR12MB6571E707DC09A31A553CB1BCC9D32@BL3PR12MB6571.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BL3PR12MB6571E707DC09A31A553CB1BCC9D32@BL3PR12MB6571.namprd12.prod.outlook.com>
 
-From: Johannes Berg <johannes.berg@intel.com>
+> Synthesis options I mentioned in comment might sound confusing, let me clear it up.
+> Actual synthesis options (as seen from configuration UI) IP provides are (1) and (2). When a user selects (2), IP comes with default 2.5G but also contains 1G capabilities which can be enabled and work with by adding switching FPGA logic (that makes it (3)).
+> 
+> So, in short  if a user selects (1): It's <=1G only.
+> If it selects (2): It's 2.5G only but can be made (3) by FPGA logic changes. So whatever existing systems for (3) would be working at default (2).
+> 
+> This is the reason we didn't described (3) in V1 series as that is not provided by IP but can be synthesized after FPGA changes.
 
-Someone mentioned today at netdevconf that we've run out of
-tx_flags in the skb_shinfo(). Gain one bit back by removing
-the wifi bit. We should be able to do that because the only
-userspace application for it (hostapd) doesn't change the
-setting on the socket, it just uses different sockets, and
-normally doesn't even use this any more, sending the frames
-over nl80211 instead.
+This whole discussion would of been much easier and wasted a lot less
+time if you had given us accurate information right from the start....
 
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+So 3) does not exist at the moment, because if it did, the customer
+doing it would need to make proprietary changes, both to the licensed
+IP and the driver. We have not seen such driver patch submissions...
+
+    Andrew
+
 ---
- drivers/net/wireless/ath/wil6210/txrx.h     | 3 ++-
- drivers/net/wireless/marvell/mwifiex/main.c | 3 ++-
- include/linux/skbuff.h                      | 3 ---
- include/net/sock.h                          | 2 --
- net/mac80211/mesh.c                         | 3 ++-
- net/mac80211/tx.c                           | 9 ++++-----
- 6 files changed, 10 insertions(+), 13 deletions(-)
-
-diff --git a/drivers/net/wireless/ath/wil6210/txrx.h b/drivers/net/wireless/ath/wil6210/txrx.h
-index 689f68d89a44..33ccd0b248d4 100644
---- a/drivers/net/wireless/ath/wil6210/txrx.h
-+++ b/drivers/net/wireless/ath/wil6210/txrx.h
-@@ -7,6 +7,7 @@
- #ifndef WIL6210_TXRX_H
- #define WIL6210_TXRX_H
- 
-+#include <net/sock.h>
- #include "wil6210.h"
- #include "txrx_edma.h"
- 
-@@ -617,7 +618,7 @@ static inline bool wil_need_txstat(struct sk_buff *skb)
- 	const u8 *da = wil_skb_get_da(skb);
- 
- 	return is_unicast_ether_addr(da) && skb->sk &&
--	       (skb_shinfo(skb)->tx_flags & SKBTX_WIFI_STATUS);
-+	       sock_flag(skb->sk, SOCK_WIFI_STATUS);
- }
- 
- static inline void wil_consume_skb(struct sk_buff *skb, bool acked)
-diff --git a/drivers/net/wireless/marvell/mwifiex/main.c b/drivers/net/wireless/marvell/mwifiex/main.c
-index 45eecb5f643b..058687793a10 100644
---- a/drivers/net/wireless/marvell/mwifiex/main.c
-+++ b/drivers/net/wireless/marvell/mwifiex/main.c
-@@ -6,6 +6,7 @@
-  */
- 
- #include <linux/suspend.h>
-+#include <net/sock.h>
- 
- #include "main.h"
- #include "wmm.h"
-@@ -943,7 +944,7 @@ mwifiex_hard_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 	multicast = is_multicast_ether_addr(skb->data);
- 
- 	if (unlikely(!multicast && skb->sk &&
--		     skb_shinfo(skb)->tx_flags & SKBTX_WIFI_STATUS &&
-+		     sock_flag(skb->sk, SOCK_WIFI_STATUS) &&
- 		     priv->adapter->fw_api_ver == MWIFIEX_FW_V15))
- 		skb = mwifiex_clone_skb_for_tx_status(priv,
- 						      skb,
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 14517e95a46c..a8638c8a53b4 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -481,9 +481,6 @@ enum {
- 	/* reserved */
- 	SKBTX_RESERVED = 1 << 3,
- 
--	/* generate wifi status information (where possible) */
--	SKBTX_WIFI_STATUS = 1 << 4,
--
- 	/* determine hardware time stamp based on time or cycles */
- 	SKBTX_HW_TSTAMP_NETDEV = 1 << 5,
- 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 8daf1b3b12c6..2668c3ed45ef 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -2700,8 +2700,6 @@ static inline void _sock_tx_timestamp(struct sock *sk,
- 				*tskey = atomic_inc_return(&sk->sk_tskey) - 1;
- 		}
- 	}
--	if (unlikely(sock_flag(sk, SOCK_WIFI_STATUS)))
--		*tx_flags |= SKBTX_WIFI_STATUS;
- }
- 
- static inline void sock_tx_timestamp(struct sock *sk,
-diff --git a/net/mac80211/mesh.c b/net/mac80211/mesh.c
-index 974081324aa4..e77e623c8b77 100644
---- a/net/mac80211/mesh.c
-+++ b/net/mac80211/mesh.c
-@@ -8,6 +8,7 @@
- 
- #include <linux/slab.h>
- #include <linux/unaligned.h>
-+#include <net/sock.h>
- #include "ieee80211_i.h"
- #include "mesh.h"
- #include "wme.h"
-@@ -776,7 +777,7 @@ bool ieee80211_mesh_xmit_fast(struct ieee80211_sub_if_data *sdata,
- 	if (ethertype < ETH_P_802_3_MIN)
- 		return false;
- 
--	if (skb->sk && skb_shinfo(skb)->tx_flags & SKBTX_WIFI_STATUS)
-+	if (skb->sk && sock_flag(skb->sk, SOCK_WIFI_STATUS))
- 		return false;
- 
- 	if (skb->ip_summed == CHECKSUM_PARTIAL) {
-diff --git a/net/mac80211/tx.c b/net/mac80211/tx.c
-index 20179db88c4a..b75f72fbefd9 100644
---- a/net/mac80211/tx.c
-+++ b/net/mac80211/tx.c
-@@ -26,6 +26,7 @@
- #include <net/codel_impl.h>
- #include <linux/unaligned.h>
- #include <net/fq_impl.h>
-+#include <net/sock.h>
- #include <net/gso.h>
- 
- #include "ieee80211_i.h"
-@@ -2876,8 +2877,7 @@ static struct sk_buff *ieee80211_build_hdr(struct ieee80211_sub_if_data *sdata,
- 	}
- 
- 	if (unlikely(!multicast &&
--		     ((skb->sk &&
--		       skb_shinfo(skb)->tx_flags & SKBTX_WIFI_STATUS) ||
-+		     ((skb->sk && sock_flag(skb->sk, SOCK_WIFI_STATUS)) ||
- 		      ctrl_flags & IEEE80211_TX_CTL_REQ_TX_STATUS)))
- 		info_id = ieee80211_store_ack_skb(local, skb, &info_flags,
- 						  cookie);
-@@ -3774,7 +3774,7 @@ static bool ieee80211_xmit_fast(struct ieee80211_sub_if_data *sdata,
- 		return false;
- 
- 	/* don't handle TX status request here either */
--	if (skb->sk && skb_shinfo(skb)->tx_flags & SKBTX_WIFI_STATUS)
-+	if (skb->sk && sock_flag(skb->sk, SOCK_WIFI_STATUS))
- 		return false;
- 
- 	if (hdr->frame_control & cpu_to_le16(IEEE80211_STYPE_QOS_DATA)) {
-@@ -4664,8 +4664,7 @@ static void ieee80211_8023_xmit(struct ieee80211_sub_if_data *sdata,
- 			memcpy(IEEE80211_SKB_CB(seg), info, sizeof(*info));
- 	}
- 
--	if (unlikely(skb->sk &&
--		     skb_shinfo(skb)->tx_flags & SKBTX_WIFI_STATUS)) {
-+	if (unlikely(skb->sk && sock_flag(skb->sk, SOCK_WIFI_STATUS))) {
- 		info->status_data = ieee80211_store_ack_skb(local, skb,
- 							    &info->flags, NULL);
- 		if (info->status_data)
--- 
-2.48.1
-
+pw-bot: cr
 
