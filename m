@@ -1,169 +1,189 @@
-Return-Path: <netdev+bounces-174552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 400BFA5F2EA
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 12:47:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36A40A5F36C
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 12:53:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3240189507C
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 11:47:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 265EB17E9EB
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 11:53:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EED4266596;
-	Thu, 13 Mar 2025 11:42:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56054266B69;
+	Thu, 13 Mar 2025 11:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hWj6LXWI"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="U4XlGdFc";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="E17I1zcd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D1A12676F3
-	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 11:42:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000EB266B73
+	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 11:50:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741866154; cv=none; b=axzWFMMtFsf69R3XK8xbQaMC5V8BUZa166mkW/AyhEGKu9gc4mkbhg+L+rbuEA2kcsZ9P7NNVuwqrGve7qxfaMrGRSzN+eUZX9HpyIV8N8+iTyE1gJMBQO1dIUXa3GdWhRr5rNlQ1xQAxSWN6dkIvJkAVNNm2hggfS5Rd2vrjy0=
+	t=1741866625; cv=none; b=AdFKgyC5AlncSVSOFBf7KUhoyWPYh0AvaWjIQEjSMlQsJe4S/GLrpWVJSUmbnAQUpWsxVmQj1YktaIToTtHjxGpywqa96+kBDHN4x6t8cjUJqusG3VDHbYGpyvoFuBKaZdwTPmQIlIhH3+l1AEnWHX6JNVg+b0/w+WjBuCyjxs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741866154; c=relaxed/simple;
-	bh=2kmGRY+DddzBBJBrhPssm2cF/u1dCoQCbxJ8tNj4958=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=jIpoB6kvqK6UIoA9GQOp3YnbpzB86Xvu92r8Np1iSw0lEP4+YtX3loNao7cnmdPWKeZXe+8dAO7J1ZxW0tSLmnMqfJZmW9HDKNdnuyDKT/fBPtZ8LEUUrm17OO0zAiXw2MX1VDOKfLbsyumttJvB440DxF8WNcQ18/OzBOiKgos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hWj6LXWI; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-ac2a089fbbdso168260566b.1
-        for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 04:42:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741866151; x=1742470951; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MvllTM5aTmowvoz4REUB0nJcZ5ArizShXuylF3X4FNo=;
-        b=hWj6LXWIvvXATpW1I6xBreN8oCgdlzDDZIyLnd7DU/3PxdI86cYNL7H/kNtqjCzXTJ
-         meVR//4hBuRJtPYHOPkoZUxp8GE1DHiMhBwodIQZxwf3lxJ52Cq5wAgcYc9dhjZDHx36
-         omSMHVn6lDJpEBTQ+ssjSr24BugIVhIN3SHCpnlGiJn+DNTrBgmZomQ0+3E1skTKEnvU
-         xHf6gaxCC00+GF06+Um0f+MrzbpEGyrKNxWofBIerh0KG6pghD3KGebl0xS6UhMPu+M9
-         kJZk83rAMvue6PmzFDXR2K+lsqBNeVsyKzvnhB4LwZ8B4wANMJGd0MMmYtc8cqGUolNV
-         pJ0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741866151; x=1742470951;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MvllTM5aTmowvoz4REUB0nJcZ5ArizShXuylF3X4FNo=;
-        b=PokWOuoZNrpgPYnPsHRwL26//fQ81Yp2Zi2FKhR+Satt0swbr+JJtwg2uKUV7WCGj5
-         wENDcmOkw/MxKK8MlV7YzRzt0WtNVegxu+iOsKoq4aOprfztE8D6mRIR8T1U06MH2n/M
-         J+gmc58KCA5nPocOWf5KDghMqGbQCHQtp/KzEpcBFVpqz+MUhZqaeDNVVgI2HFq5Tzuw
-         jmnNJSGs/qE1P2pMgSRI2THH2pUC1zcH84recsMHAEtkB4vMwJ3/C0/8B48yQ78OgTKV
-         9gv9BgC5v+0uwPDLmscEKi3yn1oAhTo0dQ2jLkbw5Zejfd+xmn1jne9+k4/4+RD8eZX3
-         d/Ug==
-X-Forwarded-Encrypted: i=1; AJvYcCV2DTBiU9Fi1c0cX8pC5IqiJ3ZLTgyIT8qR/yubcH9OzjUhfZU6txkteUgWt50whL6GL35G3fU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUvsUKgMRXoNOsIrw5xdpGIWVNJJ8X3mH/noWJqPvRIacKcoMP
-	0+5dftxoQS6cu3MKzJ3EgOEd8puc3fQ+Emdw09lEi29zjHnl3fSErXsJY/QD88L+KdXsCAu0+Wb
-	4zIyvCF7MPwQoqASxGVthAhxlycE=
-X-Gm-Gg: ASbGnctqacmHUVsHArK+j2XRwWLYZ4Pa8kHTr/B9ACrmCibDE+SILjBTPMf5dQGfypn
-	SR4trXgRdK0DeXD+NRbwhAu/TqbKB9tgC0/CfxFyULhyuOaP3Cny08dLW+ywFStWXoFkgCFG8zu
-	v+aXPJmQPZL/Z1xjceJbrErte62Q==
-X-Google-Smtp-Source: AGHT+IH5PJQagiQlgIuVx6hTVSeafKVcifZgbr7pihGNuziCmGSf2FTfVY9196O2zetpv52iSq0EiHFDg5H/EcroGfM=
-X-Received: by 2002:a17:907:3594:b0:ac3:1fbd:a94b with SMTP id
- a640c23a62f3a-ac31fbda97fmr60591566b.7.1741866150517; Thu, 13 Mar 2025
- 04:42:30 -0700 (PDT)
+	s=arc-20240116; t=1741866625; c=relaxed/simple;
+	bh=U0gsi+E+k3dwn/YEhXBoNvUugd/LyG9kvHBZ45yX0aE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FQGilmZuoxgcdgnXTAeWTJvZCGDKWr0iu2XTTSBQg8hBBt74Wn5lbjtZsx9n7BMQU8uE8v46lr+obeOHztWn8TZCczNYisFp2tHxoAN5UkvS7fMSvctZi6C7bWVQ0x+oUu1SAPxSO6Djwmd3ivY4xP7QuYfRVQZPQwwqs4PjP7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=U4XlGdFc; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=E17I1zcd; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Thu, 13 Mar 2025 12:50:18 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1741866620;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=W6UZLQU31/SVLLnCBXmHpww0TaJSbYXeNPsEYKH8Ub4=;
+	b=U4XlGdFcm4bxwB+EtvzyubiNM5hrwfb/Fw6fjHgMMaaLxhgs7hdt9MlXtfeCdpZerMKDxj
+	Mc9I5MmP21G08sTYmtpxHrJTR1iJseagwxx9Gb8L1EJIKwJuX1aCIajidpaFnZbkj9FzUY
+	kx82UsitjXKLb75oAJH9zroYdkn58PA/roGiHGgBmvd3kxFdtsjSJetEwHQTJD13vKM3ua
+	mImGqGsUJMEK1+kmnOw+eK8zxre1Y/ee5Ws4jZM2oFZ8AUY31KjrZgisENk8XRc3SEh48t
+	SuMZFNiUNJVzNlFG3lWcnc9qNJfU7KBqv1VjMSJKcYUckA/QdkI0clXAH8/y2Q==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1741866620;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=W6UZLQU31/SVLLnCBXmHpww0TaJSbYXeNPsEYKH8Ub4=;
+	b=E17I1zcdJR80NEjHZUbiC1RoJ8tRGS0KtdwwatG5Mwzzvuop6YwwmXxIwoi1gPSgSDAk+5
+	sJR4ww5pMNBB0UAg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Ilya Maximets <i.maximets@ovn.org>
+Cc: netdev@vger.kernel.org, linux-rt-devel@lists.linux.dev,
+	dev@openvswitch.org, Eric Dumazet <edumazet@google.com>,
+	Simon Horman <horms@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: Re: [ovs-dev] [PATCH net-next 11/18] openvswitch: Use nested-BH
+ locking for ovs_actions.
+Message-ID: <20250313115018.7xe77nJ-@linutronix.de>
+References: <20250309144653.825351-1-bigeasy@linutronix.de>
+ <20250309144653.825351-12-bigeasy@linutronix.de>
+ <9a1ededa-8b1f-4118-94b4-d69df766c61e@ovn.org>
+ <20250310144459.wjPdPtUo@linutronix.de>
+ <fd4c8167-0c2d-4f5f-bf70-1efcdf3de2fb@ovn.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250310203609.4341-1-technoboy85@gmail.com> <20250310141216.5cdfd133@hermes.local>
- <Z9LBZsdh3PsjuB28@orbyte.nwl.cc>
-In-Reply-To: <Z9LBZsdh3PsjuB28@orbyte.nwl.cc>
-From: Matteo Croce <technoboy85@gmail.com>
-Date: Thu, 13 Mar 2025 12:41:54 +0100
-X-Gm-Features: AQ5f1JqmoyE6bFkavkJCip-8JWr3LDuRF2h4JTs8bVPI1Hks-iXxeXcl2GTubhM
-Message-ID: <CAFnufp0e-GNCsjXw-KUjnTx+A4TP_gQTW4-HK2T8kYxH-PMxkg@mail.gmail.com>
-Subject: Re: [PATCH iproute2-next v2] color: default to dark color theme
-To: Phil Sutter <phil@nwl.cc>, Stephen Hemminger <stephen@networkplumber.org>, 
-	Matteo Croce <technoboy85@gmail.com>, netdev@vger.kernel.org, 
-	Matteo Croce <teknoraver@meta.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <fd4c8167-0c2d-4f5f-bf70-1efcdf3de2fb@ovn.org>
 
-Il giorno gio 13 mar 2025 alle ore 12:28 Phil Sutter <phil@nwl.cc> ha scritto:
->
-> On Mon, Mar 10, 2025 at 02:12:16PM -0700, Stephen Hemminger wrote:
-> > On Mon, 10 Mar 2025 21:36:09 +0100
-> > Matteo Croce <technoboy85@gmail.com> wrote:
-> >
-> > > From: Matteo Croce <teknoraver@meta.com>
-> > >
-> > > The majority of Linux terminals are using a dark background.
-> > > iproute2 tries to detect the color theme via the `COLORFGBG` environment
-> > > variable, and defaults to light background if not set.
-> > >
-> >
-> > This is not true. The default gnome terminal color palette is not dark.
->
-> ACK. Ever since that famous movie I stick to the real(TM) programmer
-> colors of green on black[1], but about half of all the blue pill takers
-> probably don't.
->
-> > > Change the default behaviour to dark background, and while at it change
-> > > the current logic which assumes that the color code is a single digit.
-> > >
-> > > Signed-off-by: Matteo Croce <teknoraver@meta.com>
-> >
-> > The code was added to follow the conventions of other Linux packages.
-> > Probably best to do something smarter (like util-linux) or more exactly
-> > follow what systemd or vim are doing.
->
-> I can't recall a single system on which I didn't have to 'set bg=dark'
-> in .vimrc explicitly, so this makes me curious: Could you name a
-> concrete example of working auto color adjustment to given terminal
-> background?
->
-> Looking at vim-9.1.0794 source code, I see:
->
-> |     char_u *
-> | term_bg_default(void)
-> | {
-> | #if defined(MSWIN)
-> |     // DOS console is nearly always black
-> |     return (char_u *)"dark";
-> | #else
-> |     char_u      *p;
-> |
-> |     if (STRCMP(T_NAME, "linux") == 0
-> |             || STRCMP(T_NAME, "screen.linux") == 0
-> |             || STRNCMP(T_NAME, "cygwin", 6) == 0
-> |             || STRNCMP(T_NAME, "putty", 5) == 0
-> |             || ((p = mch_getenv((char_u *)"COLORFGBG")) != NULL
-> |                 && (p = vim_strrchr(p, ';')) != NULL
-> |                 && ((p[1] >= '0' && p[1] <= '6') || p[1] == '8')
-> |                 && p[2] == NUL))
-> |         return (char_u *)"dark";
-> |     return (char_u *)"light";
-> | #endif
-> | }
->
-> So apart from a little guesswork based on terminal names, this does the
-> same as iproute currently (in his commit 54eab4c79a608 implementing
-> set_color_palette(), Petr Vorel even admitted where he had copied the
-> code from). No hidden gems to be found in vim sources, at least!
->
-> Cheers, Phil
->
-> [1] And have the screen rotated 90 degrees to make it more realistic,
->     but that's off topic.
+On 2025-03-10 17:56:09 [+0100], Ilya Maximets wrote:
+> >>> +		local_lock_nested_bh(&ovs_actions.bh_lock);
+> >>
+> >> Wouldn't this cause a warning when we're in a syscall/process context?
+> > 
+> > My understanding is that is only invoked in softirq context. Did I
+> > misunderstood it?
+> 
+> It can be called from the syscall/process context while processing
+> OVS_PACKET_CMD_EXECUTE request.
+> 
+> > Otherwise that this_cpu_ptr() above should complain
+> > that preemption is not disabled and if preemption is indeed not disabled
+> > how do you ensure that you don't get preempted after the
+> > __this_cpu_inc_return() in several tasks (at the same time) leading to
+> > exceeding the OVS_RECURSION_LIMIT?
+> 
+> We disable BH in this case, so it should be safe (on non-RT).  See the
+> ovs_packet_cmd_execute() for more details.
 
-I think that we could use the OSC command 11 to query the color:
+Yes, exactly. So if BH is disabled then local_lock_nested_bh() can
+safely acquire a per-CPU spinlock on PREEMPT_RT here. This basically
+mimics the local_bh_disable() behaviour in terms of exclusive data
+structures on a smaller scope.
 
-# black background
-$ echo -ne '\e]11;?\a'
-11;rgb:0000/0000/0000
+> >>> +		ovs_act->owner = current;
+> >>> +	}
+> >>> +
+> >>>  	level = __this_cpu_inc_return(ovs_actions.exec_level);
+> >>>  	if (unlikely(level > OVS_RECURSION_LIMIT)) {
+> >>>  		net_crit_ratelimited("ovs: recursion limit reached on datapath %s, probable configuration error\n",
+> >>> @@ -1710,5 +1718,10 @@ int ovs_execute_actions(struct datapath *dp, struct sk_buff *skb,
+> >>>  
+> >>>  out:
+> >>>  	__this_cpu_dec(ovs_actions.exec_level);
+> >>> +
+> >>> +	if (level == 1) {
+> >>> +		ovs_act->owner = NULL;
+> >>> +		local_unlock_nested_bh(&ovs_actions.bh_lock);
+> >>> +	}
+> >>
+> >> Seems dangerous to lock every time the owner changes but unlock only
+> >> once on level 1.  Even if this works fine, it seems unnecessarily
+> >> complicated.  Maybe it's better to just lock once before calling
+> >> ovs_execute_actions() instead?
+> > 
+> > My understanding is this can be invoked recursively. That means on first
+> > invocation owner == NULL and then you acquire the lock at which point
+> > exec_level goes 0->1. On the recursive invocation owner == current and
+> > you skip the lock but exec_level goes 1 -> 2.
+> > On your return path once level becomes 1, then it means that dec made it
+> > go 1 -> 0, you unlock the lock.
+> 
+> My point is: why locking here with some extra non-obvious logic of owner
+> tracking if we can lock (unconditionally?) in ovs_packet_cmd_execute() and
+> ovs_dp_process_packet() instead?  We already disable BH in one of those
+> and take appropriate RCU locks in both.  So, feels like a better place
+> for the extra locking if necessary.  We will also not need to move around
+> any code in actions.c if the code there is guaranteed to be safe by holding
+> locks outside of it.
 
-# white background
-$ echo -ne '\e]11;?\a'
-11;rgb:ffff/ffff/ffff
+I think I was considering it but dropped it because it looks like one
+can call the other.
+ovs_packet_cmd_execute() is an unique entry to ovs_execute_actions().
+This could the lock unconditionally.
+Then we have ovs_dp_process_packet() as the second entry point towards
+ovs_execute_actions() and is the tricky one. One originates from
+netdev_frame_hook() which the "normal" packet receiving.
+Then within ovs_execute_actions() there is ovs_vport_send() which could
+use internal_dev_recv() for forwarding. This one throws the packet into
+the networking stack so it could come back via netdev_frame_hook().
+Then there is this internal forwarding via internal_dev_xmit() which
+also ends up in ovs_execute_actions(). Here I don't know if this can
+originate from within the recursion.
 
--- 
-Matteo Croce
+After looking at this and seeing the internal_dev_recv() I decided to
+move it to within ovs_execute_actions() where the recursion check itself
+is.
 
-perl -e 'for($t=0;;$t++){print chr($t*($t>>8|$t>>13)&255)}' |aplay
+> > The locking part happens only on PREEMPT_RT because !PREEMPT_RT has
+> > softirqs disabled which guarantee that there will be no preemption.
+> > 
+> > tools/testing/selftests/net/openvswitch should cover this?
+> 
+> It's not a comprehensive test suite, it covers some cases, but it
+> doesn't test anything related to preemptions specifically.
+
+From looking at the traces, everything originates from
+netdev_frame_hook() and there is sometimes one recursion from within
+ovs_execute_actions(). I haven't seen anything else.
+
+> >> Also, the name of the struct ovs_action doesn't make a lot of sense,
+> >> I'd suggest to call it pcpu_storage or something like that instead.
+> >> I.e. have a more generic name as the fields inside are not directly
+> >> related to each other.
+> > 
+> > Understood. ovs_pcpu_storage maybe?
+> 
+> It's OK, I guess, but see also a point about locking inside datapath.c
+> instead and probably not needing to change anything in actions.c.
+
+If you say that adding a lock to ovs_dp_process_packet() and another to
+ovs_packet_cmd_execute() then I can certainly update. However based on
+what I wrote above, I am not sure.
+
+> >> Best regards, Ilya Maximets.
+
+Sebastian
 
