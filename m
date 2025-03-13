@@ -1,113 +1,152 @@
-Return-Path: <netdev+bounces-174666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82D8BA5FC66
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 17:45:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3422AA5FC69
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 17:45:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6333170CF1
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 16:45:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 618461888127
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 16:45:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1264614D29B;
-	Thu, 13 Mar 2025 16:45:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="texTlXAJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00EA51FBEA8;
+	Thu, 13 Mar 2025 16:45:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C9BE2E3390;
-	Thu, 13 Mar 2025 16:45:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDA00149C7D
+	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 16:45:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.38.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741884320; cv=none; b=k/wHzVmZMhl2HTcHnFCjEkJ1rRhk/yWTHywLN/Q3YIjr+KRg+qnrIJtQhnM1QfQND5wi/v/xWzIHsdH65Oyb2bFKR+X8f2Rig8h7FztKeUc7Pl+WdgtXwCCRZvJWhuj+Jw+7OhCugST4Zzytf+SZ4Lh897K7TgByPaUi4jsiB+A=
+	t=1741884326; cv=none; b=Tm0k6UPD0EZ6mwTywe1bd6rVOTAMKHqqXhv4DsQsI/+dw6w/nlGgntBMhsWqFsFBIRjREht5+csTGzIYUVBcgXnZVNhT16UlWKHw9pQx97U6aAgJwTkTJIELrowgOUEsp8Ort6q0WtxwPxop4nPHAH5h+7GFoIK7v/1m7E50xyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741884320; c=relaxed/simple;
-	bh=yXFfDtMWoUYUT3rVGeMfA0Hqrwa2RdSN4+ar6+obYrg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G55XbOyRagYtnq//85xHNObFZKxJEHGmrrTXjrPfeUaxmsDrTIBle5qhkt31wRn9itS2pvpCCxLlkwzTE5FlLcYUwlB3GnW2vQphWQzqSn436VKw+21m8bTIBkZCkBdQo/MxiQ+uY1SLmataRxyWDPy7qGF4W02R5OOQYByhHug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=texTlXAJ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=pUaSCl3nFYcy99ntWez+f1XirECJo6Y3EAASNBcW508=; b=texTlXAJn8X+d7N+m+hSLXLLzg
-	k5COVHPdihiLw0PO5iIp7gruWR24db/2JiiBmCqIT6p4rZyaVv2pwWDsKE9qBNjMm9BYEOiHbVuqc
-	PB5qghhq+UFe1CymupUHCHrKP61q/Kf1F2fHUpAnOj6c5d+waCVOxV0DXv5NV03SIk6U=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tslg9-0052uA-NV; Thu, 13 Mar 2025 17:45:05 +0100
-Date: Thu, 13 Mar 2025 17:45:05 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Michael Klein <michael@fossekall.de>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] net: phy: realtek: Add support for PHY LEDs on
- RTL8211E
-Message-ID: <e62af3a7-c228-4523-a1fb-330f4f96f28c@lunn.ch>
-References: <20250312193629.85417-1-michael@fossekall.de>
+	s=arc-20240116; t=1741884326; c=relaxed/simple;
+	bh=kYTuXnwCwrvKv+G9nZ1fm7UxX2IqgXqp11z+SCkDJYg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CteGeyh9PtSGI2CT3lm0EMK5eqKEv598j6zRB6Ycr/YTVunP9KKL92xo1fvTlj8jnkbBjK4cDxIsr/151VBt4OS2rjsgB7Yf5QgzKcOSbO6XjkdN1hDcDl+kuFa5F+aLDpQliwJIHC+aPxW2D9qjBwRKbJbdzkExaIqW/ximAsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; arc=none smtp.client-ip=23.88.38.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simonwunderlich.de
+Received: from kero.packetmixer.de (p200300Fa272413901A38A4BC9c0De305.dip0.t-ipconnect.de [IPv6:2003:fa:2724:1390:1a38:a4bc:9c0d:e305])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.simonwunderlich.de (Postfix) with ESMTPSA id C6D42FA131;
+	Thu, 13 Mar 2025 17:45:22 +0100 (CET)
+From: Simon Wunderlich <sw@simonwunderlich.de>
+To: kuba@kernel.org,
+	davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	b.a.t.m.a.n@lists.open-mesh.org,
+	Simon Wunderlich <sw@simonwunderlich.de>
+Subject: [PATCH 00/10] pull request for net-next: batman-adv 2025-03-13
+Date: Thu, 13 Mar 2025 17:45:09 +0100
+Message-Id: <20250313164519.72808-1-sw@simonwunderlich.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250312193629.85417-1-michael@fossekall.de>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Mar 12, 2025 at 08:36:27PM +0100, Michael Klein wrote:
-> Like the RTL8211F, the RTL8211E PHY supports up to three LEDs.
-> Add netdev trigger support for them, too.
-> 
-> Signed-off-by: Michael Klein <michael@fossekall.de>
-> ---
->  drivers/net/phy/realtek.c | 120 ++++++++++++++++++++++++++++++++++++--
+Hi Jakub, hi David,
 
-What tree is this based on?
+here is a feature/cleanup pull request of batman-adv to go into net-next.
 
-ommit 1416a9b2ba710d31954131c06d46f298e340aa2c
-Author: Heiner Kallweit <hkallweit1@gmail.com>
-Date:   Sat Jan 11 21:50:19 2025 +0100
+Please pull or let me know of any problem!
 
-    net: phy: move realtek PHY driver to its own subdirectory
-    
-    In preparation of adding a source file with hwmon support, move the
-    Realtek PHY driver to its own subdirectory and rename realtek.c to
-    realtek_main.c.
+Thank you,
+      Simon
 
+The following changes since commit b66e19dcf684b21b6d3a1844807bd1df97ad197a:
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+  Merge branch 'mctp-add-mctp-over-usb-hardware-transport-binding' (2025-02-21 16:45:26 -0800)
 
-> +static int rtl8211e_led_hw_control_get(struct phy_device *phydev, u8 index,
-> +				       unsigned long *rules)
-> +{
-> +	int oldpage, ret;
-> +	u16 cr1, cr2;
-> +
-> +	if (index >= RTL8211x_LED_COUNT)
-> +		return -EINVAL;
-> +
-> +	oldpage = phy_select_page(phydev, 0x7);
-> +	if (oldpage < 0)
-> +		goto err_restore_page;
-> +
-> +	ret = __phy_write(phydev, RTL821x_EXT_PAGE_SELECT, 0x2c);
-> +	if (ret)
-> +		goto err_restore_page;
+are available in the Git repository at:
 
-What is happening here? You select page 0x7, and then use
-RTL821x_EXT_PAGE_SELECT to select 0x2c? Does this hardware have pages
-within pages?
+  git://git.open-mesh.org/linux-merge.git tags/batadv-next-pullrequest-20250313
 
-       Andrew
+for you to fetch changes up to 7cfb32456ed82cd548114234ec275d57d4f7554e:
+
+  batman-adv: add missing newlines for log macros (2025-02-23 11:18:36 +0100)
+
+----------------------------------------------------------------
+This feature/cleanup patchset includes the following patches:
+
+ - bump version strings, by Simon Wunderlich
+
+ - drop batadv_priv_debug_log struct, by Sven Eckelmann
+
+ - adopt netdev_hold() / netdev_put(), by Eric Dumazet
+
+ - add support for jumbo frames, by Sven Eckelmann
+
+ - use consistent name for mesh interface, by Sven Eckelmann
+
+ - cleanup B.A.T.M.A.N. IV OGM aggregation handling,
+   by Sven Eckelmann (4 patches)
+
+ - add missing newlines for log macros, by Sven Eckelmann
+
+----------------------------------------------------------------
+Eric Dumazet (1):
+      batman-adv: adopt netdev_hold() / netdev_put()
+
+Simon Wunderlich (1):
+      batman-adv: Start new development cycle
+
+Sven Eckelmann (8):
+      batman-adv: Drop batadv_priv_debug_log struct
+      batman-adv: Add support for jumbo frames
+      batman-adv: Use consistent name for mesh interface
+      batman-adv: Limit number of aggregated packets directly
+      batman-adv: Switch to bitmap helper for aggregation handling
+      batman-adv: Use actual packet count for aggregated packets
+      batman-adv: Limit aggregation size to outgoing MTU
+      batman-adv: add missing newlines for log macros
+
+ Documentation/networking/batman-adv.rst            |   2 +-
+ include/uapi/linux/batman_adv.h                    |  18 +-
+ net/batman-adv/Makefile                            |   2 +-
+ net/batman-adv/bat_algo.c                          |   8 +-
+ net/batman-adv/bat_iv_ogm.c                        | 105 ++++++-----
+ net/batman-adv/bat_v.c                             |  28 +--
+ net/batman-adv/bat_v_elp.c                         |  16 +-
+ net/batman-adv/bat_v_ogm.c                         |  42 ++---
+ net/batman-adv/bitarray.c                          |   2 +-
+ net/batman-adv/bridge_loop_avoidance.c             | 106 +++++------
+ net/batman-adv/distributed-arp-table.c             |  68 +++----
+ net/batman-adv/distributed-arp-table.h             |   4 +-
+ net/batman-adv/fragmentation.c                     |   2 +-
+ net/batman-adv/gateway_client.c                    |  38 ++--
+ net/batman-adv/gateway_common.c                    |   8 +-
+ net/batman-adv/hard-interface.c                    | 158 ++++++++--------
+ net/batman-adv/hard-interface.h                    |  12 +-
+ net/batman-adv/log.c                               |   2 +-
+ net/batman-adv/log.h                               |  10 +-
+ net/batman-adv/main.c                              |  42 ++---
+ net/batman-adv/main.h                              |  24 +--
+ .../{soft-interface.c => mesh-interface.c}         | 197 ++++++++++----------
+ .../{soft-interface.h => mesh-interface.h}         |  22 +--
+ net/batman-adv/multicast.c                         | 182 +++++++++----------
+ net/batman-adv/multicast_forw.c                    |  30 ++--
+ net/batman-adv/netlink.c                           | 180 +++++++++----------
+ net/batman-adv/netlink.h                           |   2 +-
+ net/batman-adv/network-coding.c                    |  64 +++----
+ net/batman-adv/originator.c                        |  58 +++---
+ net/batman-adv/routing.c                           |  42 ++---
+ net/batman-adv/send.c                              |  36 ++--
+ net/batman-adv/send.h                              |   4 +-
+ net/batman-adv/tp_meter.c                          |  30 ++--
+ net/batman-adv/trace.h                             |   2 +-
+ net/batman-adv/translation-table.c                 | 198 ++++++++++-----------
+ net/batman-adv/translation-table.h                 |   4 +-
+ net/batman-adv/tvlv.c                              |  26 +--
+ net/batman-adv/types.h                             |  78 +++-----
+ 38 files changed, 917 insertions(+), 935 deletions(-)
+ rename net/batman-adv/{soft-interface.c => mesh-interface.c} (84%)
+ rename net/batman-adv/{soft-interface.h => mesh-interface.h} (50%)
 
