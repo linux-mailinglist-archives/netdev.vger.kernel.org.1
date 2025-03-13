@@ -1,166 +1,104 @@
-Return-Path: <netdev+bounces-174750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9815EA602B1
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 21:32:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2FCAA602B4
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 21:35:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C5757A62A9
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 20:31:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF84C17E998
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 20:35:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D81C1F3B92;
-	Thu, 13 Mar 2025 20:32:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EFA41F4160;
+	Thu, 13 Mar 2025 20:35:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="hBcXu/3B";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="bGOfkoZE"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hPXDeoEm"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2375A126C1E;
-	Thu, 13 Mar 2025 20:32:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDB516B3A1;
+	Thu, 13 Mar 2025 20:35:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741897952; cv=none; b=rEXer3RGNlja6ARZzNYpfOEgJJ9Hv1RajJvUb8Wt484ZqeELkCkCBwfRnP/cYrdrSmdjP8AYD3F3SGEtzjdOiLiyS92Ixwk9PhE6bre/N1+1pz900MjnyCIBQg/YrefaJRjSOusohv2p/OqaQhr6rz63OVQ/O+Q9EBTW0Klj8ZY=
+	t=1741898131; cv=none; b=DiVR4RRbHqhPq3yjP2KVBF15KhcDdZMhgaKMyhtfEapRBsJEzEnGoiFX6ro1NqbIx+oj+UzDDCC9Hbu4PdJsyi7ZTkzHo0W1WeSIr/jbL2GzJa1WaLG8ezVZsfZyyOh7G32/+fiAv2FgqvA1wiyDJz+NU/ZJlbFdwwoK2ouZDoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741897952; c=relaxed/simple;
-	bh=tGFxbAWHCzT3GO8fUjsbGi94iRLOi13UnMzaKDpP8fg=;
+	s=arc-20240116; t=1741898131; c=relaxed/simple;
+	bh=vG1/GTZTztaKTlFbvjaWpZ7BP6jdv4Vi801Ajq1rZxw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NY1id/DRjL42L+YyKOA1xuwRWfsEqxgGcm8CB4dbDGreROsTa/anDOjYOT/2Dp9gDkfSoIg82+nK9FZyUtwhCZMwA5TMz3pJ9ZfT2nORj5qDy8P8sj2oYRVR2WzeU/lz78yg+N9MUaSjOkk1If31tAFOu29RlT5h+dIFPE8qWTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=hBcXu/3B; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=bGOfkoZE; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Thu, 13 Mar 2025 21:32:26 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1741897948;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vk0S1hvnttnqNY5mzHQOJ/TqbFo4zrQpanr0L6iSdXM=;
-	b=hBcXu/3BTR48oApNQ9rEj93OEa9TSLZ9duQkXYtiHD1b/jK4llolbtNjvV7+j9S7MCOllI
-	s6jPj6SI6aEua848KzRKGfNb41ZfLFRdoLUcA2MzKm9SMSV4eRj4+3sT6U4OSZlLNVwnGQ
-	XSiuXDx5wWdvm1ZL6V28r3RPpICnvRM1F942LadVqTnrmb5pfENcyiK+pxAcdwxPSTgKoc
-	mGujJ5kbmSt/dry2Sz5b2Dk8bBIZVHODYI+A2FU14rh6zCNJZFD2ot488N2i2XTXNpXFt+
-	sXtsQ2Gxyevc90B4GDucAm+au1sTTpXTBQpAYDz9CJWfV3kVEvqTH/ikVbiOFw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1741897948;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vk0S1hvnttnqNY5mzHQOJ/TqbFo4zrQpanr0L6iSdXM=;
-	b=bGOfkoZECdAeLD6OU0Ub+lb3KoMwDVZjQ7eWnFUIll71GBpGFaJNsWDximdiBgbb4lueIs
-	OBhSO33+I2cvuqCw==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
-	Ricardo =?utf-8?Q?Ca=C3=B1uelo?= Navarro <rcn@igalia.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [RFC] Use after free in BPF/ XDP during XDP_REDIRECT
-Message-ID: <20250313203226.47_0q7b6@linutronix.de>
-References: <20250313183911.SPAmGLyw@linutronix.de>
- <87ecz0u3w9.fsf@toke.dk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=dhmdZP9VcbbxYDeuu6RHSS+SNrqMeV22kkLGhqEJo2IW9GiJ0ORqwFnQrPqrbXLuXNbjl2ind07CpRRM+Ehe9bWsj/uIlbtDNvELsq8Sjw7VOFWyi7yOM2Q+DJh5DwAw4+VRsaupJdd2CUVAzX59X+dgi53c1Byiq25z3EYy+pI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hPXDeoEm; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=47pVUFdvv/TqY2u3zdaa6j0HG9FLVWfVN2aBELxBuiE=; b=hPXDeoEmQp90e5m6r6DEysatbO
+	a5RBxQjmlA+6jQBUOcyA3g2CG47an3uhOzVB21iFiUJCBEJm77HxomiNhjCq+esOnT5XjXbPvzMwd
+	sSjRcTSnBM3eu/d03my6FROS8urAsi5lfzWqlXIS1KH6P/uCPLkUe5bzLZQ33jrKGJZY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tspGj-0056DQ-Tk; Thu, 13 Mar 2025 21:35:05 +0100
+Date: Thu, 13 Mar 2025 21:35:05 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Chris Packham <Chris.Packham@alliedtelesis.co.nz>
+Cc: "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"daniel@makrotopia.org" <daniel@makrotopia.org>,
+	"markus.stockhausen@gmx.de" <markus.stockhausen@gmx.de>,
+	"sander@svanheule.net" <sander@svanheule.net>,
+	netdev <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v10] net: mdio: Add RTL9300 MDIO driver
+Message-ID: <be39bb63-446e-4c6a-9bb9-a823f0a482be@lunn.ch>
+References: <20250313010726.2181302-1-chris.packham@alliedtelesis.co.nz>
+ <f7c7f28b-f2b0-464a-a621-d4b2f815d206@lunn.ch>
+ <5ea333ec-c2e4-4715-8a44-0fd2c77a4f3c@alliedtelesis.co.nz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <87ecz0u3w9.fsf@toke.dk>
+In-Reply-To: <5ea333ec-c2e4-4715-8a44-0fd2c77a4f3c@alliedtelesis.co.nz>
 
-On 2025-03-13 20:28:06 [+0100], Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> Sebastian Andrzej Siewior <bigeasy@linutronix.de> writes:
->=20
-> > Hi,
-> >
-> > Ricardo reported a KASAN related use after free
-> > 	https://lore.kernel.org/all/20250226-20250204-kasan-slab-use-after-fre=
-e-read-in-dev_map_enqueue__submit-v3-0-360efec441ba@igalia.com/
-> >
-> > in v6.6 stable and suggest a backport of commits
-> > 	401cb7dae8130 ("net: Reference bpf_redirect_info via task_struct on PR=
-EEMPT_RT.")
-> > 	fecef4cd42c68 ("tun: Assign missing bpf_net_context.")
-> > 	9da49aa80d686 ("tun: Add missing bpf_net_ctx_clear() in do_xdp_generic=
-()")
-> >
-> > as a fix. In the meantime I have the syz reproducer+config and was able
-> > to investigate.
-> > It looks as if the syzbot starts a BPF program via xdp_test_run_batch()
-> > which assigns ri->tgt_value via dev_hash_map_redirect() and the return =
-code
-> > isn't XDP_REDIRECT it looks like nonsense. So the print in
-> > bpf_warn_invalid_xdp_action() appears once. Everything goes as planned.
-> > Then the TUN driver runs another BPF program which returns XDP_REDIRECT
-> > without setting ri->tgt_value. This appears to be a trick because it
-> > invoked bpf_trace_printk() which printed four characters. Anyway, this
-> > is enough to get xdp_do_redirect() going.
-> >
-> > The commits in questions do fix it because the bpf_redirect_info becomes
-> > not only per-task but gets invalidated after the XDP context is left.
-> >
-> > Now that I understand it I would suggest something smaller instead as a
-> > stable fix, (instead the proposed patches). Any objections to the
-> > following:
-> >
-> > diff --git a/net/core/filter.c b/net/core/filter.c
-> > index be313928d272..1d906b7a541d 100644
-> > --- a/net/core/filter.c
-> > +++ b/net/core/filter.c
-> > @@ -9000,8 +9000,12 @@ static bool xdp_is_valid_access(int off, int siz=
-e,
-> > =20
-> >  void bpf_warn_invalid_xdp_action(struct net_device *dev, struct bpf_pr=
-og *prog, u32 act)
-> >  {
-> > +	struct bpf_redirect_info *ri =3D this_cpu_ptr(&bpf_redirect_info);
-> >  	const u32 act_max =3D XDP_REDIRECT;
-> > =20
-> > +	ri->map_id =3D INT_MAX;
-> > +	ri->map_type =3D BPF_MAP_TYPE_UNSPEC;
-> > +
-> >  	pr_warn_once("%s XDP return value %u on prog %s (id %d) dev %s, expec=
-t packet loss!\n",
-> >  		     act > act_max ? "Illegal" : "Driver unsupported",
-> >  		     act, prog->aux->name, prog->aux->id, dev ? dev->name : "N/A");
->=20
-> From your description above, this will fix the particular error
-> encountered, but what happens if the initial return code is not in fact
-> nonsense (so the warn_invalid_action) is not triggered?
->=20
-> I.e.,
->=20
-> bpf_redirect_map(...);
-> return XDP_DROP;
->=20
-> would still leave ri->map_id and ri->map_type set for the later tun
-> driver invocation, no?
+On Thu, Mar 13, 2025 at 07:54:39PM +0000, Chris Packham wrote:
+> +cc netdev, lkml
+> 
+> On 14/03/2025 01:34, Andrew Lunn wrote:
+> >> +	/* Put the interfaces into C45 mode if required */
+> >> +	glb_ctrl_mask = GENMASK(19, 16);
+> >> +	for (i = 0; i < MAX_SMI_BUSSES; i++)
+> >> +		if (priv->smi_bus_is_c45[i])
+> >> +			glb_ctrl_val |= GLB_CTRL_INTF_SEL(i);
+> >> +
+> >> +	fwnode_for_each_child_node(node, child)
+> >> +		if (fwnode_device_is_compatible(child, "ethernet-phy-ieee802.3-c45"))
+> >> +			priv->smi_bus_is_c45[mdio_bus] = true;
+> >> +
+> > This needs more explanation. Some PHYs mix C22 and C45, e.g. the > 1G
+> > speed support registers are in the C45 address space, but <= 1G is in
+> > the C22 space. And 1G PHYs which support EEE need access to C45 space
+> > for the EEE registers.
+> 
+> Ah good point. The MDIO interfaces are either in GPHY (i.e. clause 22) 
+> or 10GPHY mode (i.e. clause 45). This does mean we can't support support 
+> both c45 and c22 on the same MDIO bus (whether that's one PHY that 
+> supports both or two different PHYs). I'll add a comment to that effect 
+> and I should probably only provide bus->read/write or 
+> bus->read_c45/write_c45 depending on the mode.
 
-Right. So if it returns XDP_PASS or XDP_DROP instead of nonsense then
-the buffer remains set. And another driver could use it.
-But this would mean we would have to tackle each bpf_prog_run_xdp()
-invocation and reset it afterwards=E2=80=A6 So maybe the backport instead? =
-We
-have
-| $ git grep bpf_prog_run_xdp | wc -l
-| 55
+Is there more to it than this? Because why not just set the mode per
+bus transaction?
 
-call sites.
-
-> -Toke
-
-Sebastian
+	Andrew
 
