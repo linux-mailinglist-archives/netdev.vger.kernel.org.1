@@ -1,723 +1,349 @@
-Return-Path: <netdev+bounces-174786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5950A60615
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 00:47:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A61CDA60619
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 00:47:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E99B518861BE
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 23:47:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2066A422DF1
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 23:47:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B7D91FF1C9;
-	Thu, 13 Mar 2025 23:38:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9F721F8EF7;
+	Thu, 13 Mar 2025 23:39:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="dCIk4QpW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nWz6ADGy"
 X-Original-To: netdev@vger.kernel.org
-Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0BAA1FBEA7
-	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 23:38:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741909102; cv=none; b=slzkgc+x/0FERATpIytoNekyBHHfyz7yioj8abwr7C1iCeoVJgx0rpusbiOLu1/EXfgzLbhBBzGYdIiogKkSW/bfhAAyg4PRpd2A+6JK8K6C/Et7RniH8JuCIYy+qUNHQiyDfaKOj/4wf87v/5EgmS4QQn0EZbm+p7R6ZcO6Uq4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741909102; c=relaxed/simple;
-	bh=0AcXGh0kC0v8DeiHW1WW5p/P0XsR8DjXRjaLcoTBZgk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fgaiGY/+OQSdGbS2bLBWjwXJNfVd89oKwsCGst0u2ZjpOWKu5mVBvR9W7/PCKokGnF5cAq3UVSIqCwu6nyq7DcDbz3Ixe0YS7YDl05P8bR++KbHq6ZZ4ZVpcVtOBJcH8aV51MuWxYFd3JVb7W0400bVE/+ks2IHUhT02PIqLAfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=dCIk4QpW; arc=none smtp.client-ip=202.36.163.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
-Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 6A4342C04F5;
-	Fri, 14 Mar 2025 12:38:16 +1300 (NZDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
-	s=mail181024; t=1741909096;
-	bh=BLSl+2qWA1apdTj279et8BFrU4OAygmbVPTZVczn7AE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=dCIk4QpWHqNCFlLVrwnOdGqvjnIdjae1lGcvBPcI9vNoOHl5IziYT0X1/nWDnHgV4
-	 +Rb9lBmh5FImFBIY48ndysiR2x0f8hztt2sljgfG1+UHnc5vNyCD/aP7o+wXSIFAbG
-	 mB8HzTOgIZ6QbqjGwgwo2D6P8D7uFV07Q5sxfK8sD9ZKrRbyDJjtkrEXx/DhreB/B8
-	 cDGcoqiXwF9gpVbUInSLOIQYmfaoLVuZ9DD8QsMOdAn+1ZjaS6PejdVExRiO6tddKT
-	 ZsL7YKSW4A0O/9rnoLdpY5DiaOPzCMlnFDpOQ8SHebLpf0QwcqkuUq7x8C2O8LapKq
-	 T93/M88HzfdRw==
-Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B67d36c680000>; Fri, 14 Mar 2025 12:38:16 +1300
-Received: from chrisp-dl.ws.atlnz.lc (chrisp-dl.ws.atlnz.lc [10.33.22.30])
-	by pat.atlnz.lc (Postfix) with ESMTP id 238C013ED8D;
-	Fri, 14 Mar 2025 12:38:16 +1300 (NZDT)
-Received: by chrisp-dl.ws.atlnz.lc (Postfix, from userid 1030)
-	id 1F2C32804B6; Fri, 14 Mar 2025 12:38:16 +1300 (NZDT)
-From: Chris Packham <chris.packham@alliedtelesis.co.nz>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	sander@svanheule.net,
-	markus.stockhausen@gmx.de,
-	daniel@makrotopia.org
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Chris Packham <chris.packham@alliedtelesis.co.nz>
-Subject: [PATCH net-next v11] net: mdio: Add RTL9300 MDIO driver
-Date: Fri, 14 Mar 2025 12:38:11 +1300
-Message-ID: <20250313233811.3280255-1-chris.packham@alliedtelesis.co.nz>
-X-Mailer: git-send-email 2.48.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66C061F8EFC;
+	Thu, 13 Mar 2025 23:39:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741909143; cv=fail; b=Z53nkD8Y3WBdZ/qhGaGuMP/pXiZpBLxs3IcUFCRNyjgO+APZN3ov5aUPgt3bDLK+rgsy0zhkgvH136r9nXZ3MzkV0JG7BS+iyRf1wRv+02FLljNAfIcZltXXJduyKAe6mGBSJst3bA6QSsw2baSUGqevFZkwE0OGpV+LsqmPe/8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741909143; c=relaxed/simple;
+	bh=0d7W2wyQELGveJVFxDKCkEE9IaRIG/vCLUeIEnjHG3w=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=h1Te2A7rKCCBOY5BHBUCPh+5srfbxL+YtUcQfeLJqXZfZIP+Jlsh+M6leImvHLbRBcBC6l3anV4lep04P5MBVW/rphSXfLVoW7SRRSH0Oj/8BAoORkl0aXwLTywDok1iPIQ601Nl1V60w86S+/RFOwaT3LxMF7d1WLkIisc+QRo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nWz6ADGy; arc=fail smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741909141; x=1773445141;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=0d7W2wyQELGveJVFxDKCkEE9IaRIG/vCLUeIEnjHG3w=;
+  b=nWz6ADGyP9aEJrZfuS8x9ttrgcHVB6/hhh0ba4IhWQi+piFO1IPVq7EM
+   cR9aoBf+Qt31CJKXJviQmll9H0hajJySLiEcCPgFm1WB1JQi4muXvLJCz
+   dhQ0QFeu7/VDdpcoc1V7M3oE5hXi6EcIUb5j0dMtFFkKBz4L10oy3BwWM
+   GjTXLSI6vjlehVKBA9C9UMx0b+U2Dx3R9kGjrxBdf9cEb9bD2FWizyNGS
+   ZTWPZweGaz32qwyrTzeldsUYieUrIYV0Q6mAAUutR449qVO0BUWQBL+cP
+   Nev7UXvIdDVXHv1SgWmDmUhmDuDNvX06UyJ7PF5/Mpc+wOepPLp7xFdV/
+   A==;
+X-CSE-ConnectionGUID: YHZv0tqiRDGY2YixMbUkcw==
+X-CSE-MsgGUID: /5GoPAufRRqXcK8S5oeyOg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11372"; a="46949435"
+X-IronPort-AV: E=Sophos;i="6.14,246,1736841600"; 
+   d="scan'208";a="46949435"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 16:38:52 -0700
+X-CSE-ConnectionGUID: oVnNrnSzQ9iTExPnquCzEg==
+X-CSE-MsgGUID: 0Uu7tgd/S92Lzd8NEtHyXA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,245,1736841600"; 
+   d="scan'208";a="121057433"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Mar 2025 16:38:51 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Thu, 13 Mar 2025 16:38:50 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Thu, 13 Mar 2025 16:38:50 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.44) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Thu, 13 Mar 2025 16:38:50 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=GOgE+KH3h6R8h0g4sdCYcMV7G2+OGT227vnXNdmLfHvWxmYINpBFKt+J4KPocj8iA+dD+2UwTaq6kjqCnla6dbzPb0IRZMKFrom+WtC5x3bRfm8FXserVGLabVKbzZ6oK9UoELjzxHaeG8R4CCeeMrPftaDB1nUcq1CioOn1vfDopSR2wjXbHc524QHs8xPEZcK1Lh33bsmIwBxwluTZtHgBhaR0ovn1Tzayb+nk7b3vpSEXeu/FyElz7nHVPZbi/5K/JvKZzbEzUlgz7xx4aklJ3+KY/VMJEJiST0WZCCPpFRu4eJq6wqUBhzaktYYhuyeOa2vc9c8fTxvmicr6Bw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DjhCXPF9cTmeO7lM0zhuhowoW/5x+pMA833HSqs/3jM=;
+ b=hF+UxO/To7y51SOfHtm6m2qfS2bj6VMAsapqHeGCY9gzaptmFnT4C2ja1e+lqopQjX92ua1jOhMybeH/LKt5El8dT5aTnkh4PkpA+hhSBRaygO7bPV4Sy7cclh9hgtCvAHSEXxEXnTVQ9SFDo09Tfzfjrl28B+rH/HPdvLJxJWE1jI5j24XRAVqDOkI0XfEwCq4GDuGNQv/m7pxeWWXCPEtZt4ubk/tJswZdkSzPwkJxDS96xdGq1Pz98vxNxojNEwi4VLw1PvnSbwITJwVxLNgqu6dUZHuT0fKQbVw87F0LARaGU6yhUAd3epGNL0Ns70UxQGuTU7UtSIiagYZdvQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB4886.namprd11.prod.outlook.com (2603:10b6:510:33::22)
+ by PH8PR11MB6707.namprd11.prod.outlook.com (2603:10b6:510:1c6::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.27; Thu, 13 Mar
+ 2025 23:38:43 +0000
+Received: from PH0PR11MB4886.namprd11.prod.outlook.com
+ ([fe80::9251:427c:2735:9fd3]) by PH0PR11MB4886.namprd11.prod.outlook.com
+ ([fe80::9251:427c:2735:9fd3%3]) with mapi id 15.20.8511.026; Thu, 13 Mar 2025
+ 23:38:43 +0000
+Message-ID: <07e75573-9fd0-4de1-ac44-1f6a5461a6b8@intel.com>
+Date: Thu, 13 Mar 2025 16:38:39 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [iwl-next v4 1/1] iidc/ice/irdma: Update IDC to
+ support multiple consumers
+To: Leon Romanovsky <leon@kernel.org>, "Ertman, David M"
+	<david.m.ertman@intel.com>, Jakub Kicinski <kuba@kernel.org>
+CC: "Nikolova, Tatyana E" <tatyana.e.nikolova@intel.com>, "jgg@nvidia.com"
+	<jgg@nvidia.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+References: <20250225050428.2166-1-tatyana.e.nikolova@intel.com>
+ <20250225050428.2166-2-tatyana.e.nikolova@intel.com>
+ <20250225075530.GD53094@unreal>
+ <IA1PR11MB61944C74491DECA111E84021DDC22@IA1PR11MB6194.namprd11.prod.outlook.com>
+ <20250226185022.GM53094@unreal>
+ <IA1PR11MB6194C8F265D13FE65EA006C2DDC22@IA1PR11MB6194.namprd11.prod.outlook.com>
+ <20250302082623.GN53094@unreal>
+Content-Language: en-US
+From: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>
+In-Reply-To: <20250302082623.GN53094@unreal>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR04CA0140.namprd04.prod.outlook.com
+ (2603:10b6:303:84::25) To PH0PR11MB4886.namprd11.prod.outlook.com
+ (2603:10b6:510:33::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=Ko7u2nWN c=1 sm=1 tr=0 ts=67d36c68 a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=Vs1iUdzkB0EA:10 a=9Gwt-9lJYL7y1dJVOWsA:9 a=3ZKOabzyN94A:10
-X-SEG-SpamProfiler-Score: 0
-x-atlnz-ls: pat
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB4886:EE_|PH8PR11MB6707:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1093d170-471f-4842-5c48-08dd628830a4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?c3o0cnJ6bUNkdzFoR1R0ZUtXL3NLSThsK0pvQk9hdmhnbXBTSVNVcndtQjgx?=
+ =?utf-8?B?SFpQOGZEejJubUJnUFFrbmhEUUFGSzJyNS9VcWNoeklSQUZ4eW03TGxTRUpB?=
+ =?utf-8?B?S0kvc0l5VUEwdmN0ZWJHLzVSZU1ZSEl1WXdYZ3o0WDc3VGlvRkd3YXBaQjJq?=
+ =?utf-8?B?THVRUmFtL1I5TFBsQkV6QzBSOCtSbDlPYzJEVXR5eE42ZEZVbnlpWHcrblJ5?=
+ =?utf-8?B?dmhKU3BnOElXM2xFSUxCRXB1S1JVMkNqWGlPODIzbWtHc2hhMXR2ZURWVEVG?=
+ =?utf-8?B?dmxyWFU0MTJzcXplU2ZqaGk1eE0zQzhuUE9UUklHNXJSU21HZmtGN0M1dEdz?=
+ =?utf-8?B?aUNhV1QrdDg0RUFaeElyeWp4R2FYQklLZmV3SENRMkRNMmc2VXNyR3V2UmZB?=
+ =?utf-8?B?Wk84Z1BvM1NETmVkNUVpdFhmU1k3R0QyeC84MjFRZU8zL3JUclVGYXk0WHNJ?=
+ =?utf-8?B?bWxRa3k1aThxb3Nld01qRnMwVnVqRUNwcmZXQm11UTVqMStVYXdWMFg4ZGho?=
+ =?utf-8?B?UldtaTFHaW54MVhLSi9IRkZzb1ZqL2NrZWt4MTltV3RUdnJTbGRQNWRsT0FF?=
+ =?utf-8?B?SmdPZ2Jud3I4TEpPdkxiSGdRZ2tKN28zSDBSM0t2L3JNdUdrbHZ6b3hYekNQ?=
+ =?utf-8?B?NVBBbE91L25BejJoRk1GV3pCT0prbHlzUEcvTldja0ZTTUdqTWxvS05ZUy8v?=
+ =?utf-8?B?U2RRNGFqbnFQZWpMTjRJQ1ZSRHJ5R0NpamRhRG1RVFZWV0ovbm9kd1JNT2hk?=
+ =?utf-8?B?QTZ5WEs0U0lSWDdLL2FRODN1Ym1ibFdUNUhFUzdmWGdmQ2RDMnIvbWtTZzcz?=
+ =?utf-8?B?NWhibkNRUU15UG1YOUZ0V3ZsdVlVZ2svRWoyQkhXam02c1M1R3NQeEJJMXR4?=
+ =?utf-8?B?NzU1K25zWEUyZ3VjOFJjK0ZtSHdXcS9OMzd6d1dWYjdFRkVpRXRUTDV4TTJO?=
+ =?utf-8?B?d2hGYlRZUVE0Y1V0WUxQbTRzUUsxdk9EZEdLeE5xTjR2TS9TN3dXc0xSYnBy?=
+ =?utf-8?B?Q3MxZ0FxN04vV0NlQVVUckV0cVgrQTNjNzZNNVcwK21IRFU4bDRmbWUrNzEy?=
+ =?utf-8?B?VE03MG1URTFRSlRhWkxFL1hVdlBaNzM5T2lpRHB1SVRBZklMdEorWkJWYnFU?=
+ =?utf-8?B?ZStKWjJabWxaNm11SjVHMDd3TmJqMm1manRmTFlwUXVBdmlCbFZJdjlxaEZD?=
+ =?utf-8?B?ZzQrcUNXb20yMzRTWlJRRktzak1WSzNoUmVZY2ZXdDZtRXUydWQrOTZRa1ZD?=
+ =?utf-8?B?cUl6Tzl6emNxMVAzNC9Oam9TdXhTUUpxNEFVeHVleEcvN0x1TnBHZ1VzVVlL?=
+ =?utf-8?B?Vkh1UlB0UzZJR1ZQdHhWQjB0WVZ4SFhLUVNCU01POGQxVVJQQVBpSXhPZHZM?=
+ =?utf-8?B?QW8zcVY2eU5QM3JOSWh0dkJxR0hwVm1NQTUwYWErRXZQWnVxVy9BSzVJN0xj?=
+ =?utf-8?B?eTNPR2xKc3h6ZGVkVGdMZ0Z1eFpkRjVSZk43MHpQU0c3NENnN1FUcG9hcWQ5?=
+ =?utf-8?B?SThFM1hnZ3JqdTRrK0V1cTFNK3pPTlZhUmFtR281eUdXOUxxdGxCNCtuazlv?=
+ =?utf-8?B?UWt6c3RtZFBIN3lMVDI0V295OEs4d0NYbTM4L3E2Q2R4WU0zQ2FtVkNma2VJ?=
+ =?utf-8?B?VStjbnAyMSt0ZGx2TUFzRFFLK3hxZUVzTklUcGVLYm94VTJhR1ZvSkpzK2J4?=
+ =?utf-8?B?RjN4NWFDK09nYnYyOFB5bG5tWkJrekE4cGVJLzAwMmJQSC8rNXVwZm9UU3k5?=
+ =?utf-8?B?VHlsVENpWXRoczd6aWR3aEhQRnJLTjVvempvYWhub0M1eDBDOW1NOFhqajZH?=
+ =?utf-8?B?ZUY0L0RXdW5xNGh1UHA4OHM0cEE4aVhEaXVoVzJuZ2xOYnloQUdLYW9BVmpl?=
+ =?utf-8?Q?gCCLAqcyw19Qp?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4886.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YmNwemZRckhmR3ZLclRSaWdzYXdtMGxMcWxPNjgwTEF2TjdSdkIzaXpHVXhl?=
+ =?utf-8?B?cWxZWXJHWnFQNTBxNmF1QjFRNldHV0JOTjgwdXBVblp5TjhkMFBYaDhMWVJI?=
+ =?utf-8?B?UklQdHlMRWd3K2VvYnlBVkorVmpZWXBYUXJGRWJqYkZaTm5IVHo4TGJaUTVJ?=
+ =?utf-8?B?SGZGVlRGRDFnbk9KOU8raENBcExSSGw1ZHBXZlovQ1M5cFNrVFhwUlFGRTVn?=
+ =?utf-8?B?TlZNc0FnVUVKSUtpQ0VKRk00bjFXbGV6YVF1clltUmxiaElRaFkwUmpWOU9U?=
+ =?utf-8?B?OG9zN3dwViswajNZTWxscWJnaFRLeitFcnBLVUJRa3cwbElpM1JmakVERk4z?=
+ =?utf-8?B?ZGx4eGNkSGdyYzNUV3pldm0xb0FLV1JVbjNUWmQ3KzdiTCtvTXRhMVlyYzd6?=
+ =?utf-8?B?MVJacFlZT2ZHSEFlTDdXMVJHZWR6dlJmMkxzaDJNYlU0Tm9VaXlGbC9HRmww?=
+ =?utf-8?B?bVJ6MEU3bzFiU1ZhMk5McVNSRDlUWUpqR1NLaHkvNHNMMDdobENrK29mU0Rz?=
+ =?utf-8?B?dkRneWZaWkFGYlBiODdCVmo0NWI1VjFZazRTUUtHVXBhSjdWN0ZpZjBnTlJ2?=
+ =?utf-8?B?Y0hnRkswMVc0cFVNWUpCU1VJUllwZHRaL3phWGV5WDU5blNEQ0I5bU9wODcz?=
+ =?utf-8?B?bmQyMmh5STRXTUV2QTVDSWFPa2hoNElFcGx6ZXFNY0E4ZERmcjdMbW4wT1JB?=
+ =?utf-8?B?N01TQlBtMnpGOUZTU01mRHExd0xNWXc1YldiYUFhUXpKdCtkTWdZWmVSakVN?=
+ =?utf-8?B?WVFPd1ZYcHFqYTVVQ2xzQ3FVcURucXBJdXcraE4vUHpzTFo1SlgxQU9mVXh2?=
+ =?utf-8?B?U05lMjB2RU5iMzdRaUdTS0FJTXhPb3o3UnVWYWRFSXlMRGFOUEZWdlVDd1pO?=
+ =?utf-8?B?UEdqUUl4MnNjalZVK1Y0NzEyMXgzNG5pWFYxWmdiWTV0V29VbTJyQjJEQWFG?=
+ =?utf-8?B?UzhNU0x6aEVrSG9yRVNRbkpkR0RYTVE2MkdMaEE5WHRhN293WmVwTmJ3T2hq?=
+ =?utf-8?B?djFIdTlPd25rSHh4RUJOOEVYSDFuY3I1OXF2bVlVVUx1OWdwVjlqY1ZMSWox?=
+ =?utf-8?B?ZWY4WTNrQXpqWTBvZERNb1cxNlhwUHF6L0FXMTdZRDRsR0x6NzVpNmpJVnJE?=
+ =?utf-8?B?QXVEM0h0cTQ4ZHhXcXo0UG9tNWJJVllqVFpXeE5CUisxL0VQUlZuOHRlOHoz?=
+ =?utf-8?B?VkMwQ0dKVDhKZGV6MnZtQlc1dVFxR1krNXY0UmhwZzF2OXpGVFB2VVdoQUFH?=
+ =?utf-8?B?YVdaZVkza1AwM0NkZklJcFNnRXRWOWtwU0MwTHl6ZzRiU2FQdUs3ek9XeUVw?=
+ =?utf-8?B?UzdvUXdhR3NzUEFJcFhSTDJiVjQxZUF2OXRMOHM4TmgzcEwxd05VZExvNlVE?=
+ =?utf-8?B?NkxqV1hJYnVPd05reXdJbXpwVkl4WE52dXlDVXdKUGZWNC9zSERBVVFNRWsy?=
+ =?utf-8?B?L0tmRXdNNWU4SDNOeXZEZVkvRVpXTGlYaEhaOU5vekFQUDJrYnY5VjI4U0Nw?=
+ =?utf-8?B?bFpQUWxhYnlVd3hrY3ptU2FJUy9iQUdwdUsxTkhRK0NPMHBnMnJqejdhWVpE?=
+ =?utf-8?B?NXBHVjVGNUtPdmlGaVFLemxXYWQwYzFpREdEZVZMT0N1NkJ6YWFWZUtuWTFs?=
+ =?utf-8?B?Q3FBQXFYR0dDL3VTVno0T2lZckZ1QXd2ejlOVXZTdEpLWDUxZWt6c2JpMmJD?=
+ =?utf-8?B?QTA1SVkycUt1MHVYdDI4VjBTeDZlcEFKdGdiK2VjUVdteTdJdEdWbkVhVWhq?=
+ =?utf-8?B?UGRTOHV1QkZzL1Bta2pmdHVWMGpHUzE3Mk1NZzRBNTVrT3RUR1d1cmhCaUV5?=
+ =?utf-8?B?eUtRYkJ1R1plOVNuOEVEWHdXajl5Mk1aNkVWVVhUd1R1QzcybWV4NUdzOXFo?=
+ =?utf-8?B?cENYb2pPRlpFWnFhNjNrc05nNTdLa05pTjU0cEttZFlOY3pRSk5PVnJZV2Qz?=
+ =?utf-8?B?eWVjNENPSkFoQjkxWEV5WnlpZnJCQkwwUzNvZFRjN0ZWb2xscStMUVkyYVVR?=
+ =?utf-8?B?dE44WnByeU9NTEFZZGlZdHE4K3dUbFBoKzB1MkQyMmZxcDBHa2Q0K1BDL2xG?=
+ =?utf-8?B?ZEVDUVc2WElYbzdrMml6UlVuaUNodGhHbUtVSWg1WjJuUWhiUUJDZEFRYlJO?=
+ =?utf-8?B?T1hlSElJVTVXbjhhNGtOaVhYMDI0dTBXUlUwQzREUENqeDE0NzgvZXUzcUp3?=
+ =?utf-8?B?WUE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1093d170-471f-4842-5c48-08dd628830a4
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4886.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2025 23:38:42.9850
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ga0yeQ8XPwLsu80ClQveUvaT3+RZzxNv2OQSePFTl38jiOAt+dp1HcBA40wcx+wpOXFEyxZLdboerkbmeeRFty8Rm6oGpI8RZOWUYoLQabw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6707
+X-OriginatorOrg: intel.com
 
-Add a driver for the MDIO controller on the RTL9300 family of Ethernet
-switches with integrated SoC. There are 4 physical SMI interfaces on the
-RTL9300 however access is done using the switch ports. The driver takes
-the MDIO bus hierarchy from the DTS and uses this to configure the
-switch ports so they are associated with the correct PHY. This mapping
-is also used when dealing with software requests from phylib.
 
-Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
----
 
-Notes:
-    As requested I've split this out to a single patch for net-next.
-   =20
-    Changes in v11:
-    - Add comment about clause 45 support
-    - Note I managed to mess up sending v10 so it didn't go to the netdev
-      mailing list.
-    Changes in v10:
-    - Check for duplicate ports when parsing device tree
-    - Use __set_bit() instead of bitmap_set()
-    - I haven't looked into the request from the openWRT folks about deal=
-ing
-      with the paged clause 22 phys. That will need to be done on top of
-      this.
-    Changes in v9:
-    - More reverse Christmas tree
-    - Use manual mutex_lock/unlock instead of guard
-    Changes in v8:
-    - Fix typo in user visible string
-    Changes in v7:
-    - Update out of date comment
-    - Use for_each_set_bit() instead of open-coded iteration
-    - Use FIELD_PREP() in a few more places
-    - Add #defines for register field masks
-    Changes in v6:
-    - Parse port->phy mapping from devicetree removing the need for the
-      realtek,port property
-    - Remove erroneous code dealing with SMI_POLL_CTRL. When actually
-      implemented this stops the LED unit from updating correctly.
-    Changes in v5:
-    - Reword out of date comment
-    - Use GENMASK/FIELD_PREP where appropriate
-    - Introduce port validity bitmap.
-    - Use more obvious names for PHY_CTRL_READ/WRITE and
-      PHY_CTRL_TYPE_C45/C22
-    Changes in v4:
-    - rename to realtek-rtl9300
-    - s/realtek_/rtl9300_/
-    - add locking to support concurrent access
-    - The dtbinding now represents the MDIO bus hierarchy so we consume t=
-his
-      information and use it to configure the switch port to MDIO bus+add=
-r.
-    Changes in v3:
-    - Fix (another) off-by-one error
-    Changes in v2:
-    - Add clause 22 support
-    - Remove commented out code
-    - Formatting cleanup
-    - Set MAX_PORTS correctly for MDIO interface
-    - Fix off-by-one error in pn check
+On 3/2/2025 12:26 AM, Leon Romanovsky wrote:
+> On Wed, Feb 26, 2025 at 11:01:52PM +0000, Ertman, David M wrote:
+>>
+>>
+>>> -----Original Message-----
+>>> From: Leon Romanovsky <leon@kernel.org>
+>>> Sent: Wednesday, February 26, 2025 10:50 AM
+>>> To: Ertman, David M <david.m.ertman@intel.com>
+>>> Cc: Nikolova, Tatyana E <tatyana.e.nikolova@intel.com>; jgg@nvidia.com;
+>>> intel-wired-lan@lists.osuosl.org; linux-rdma@vger.kernel.org;
+>>> netdev@vger.kernel.org
+>>> Subject: Re: [iwl-next v4 1/1] iidc/ice/irdma: Update IDC to support multiple
+>>> consumers
+>>>
+>>> On Wed, Feb 26, 2025 at 05:36:44PM +0000, Ertman, David M wrote:
+>>>>> -----Original Message-----
+>>>>> From: Leon Romanovsky <leon@kernel.org>
+>>>>> Sent: Monday, February 24, 2025 11:56 PM
+>>>>> To: Nikolova, Tatyana E <tatyana.e.nikolova@intel.com>
+>>>>> Cc: jgg@nvidia.com; intel-wired-lan@lists.osuosl.org; linux-
+>>>>> rdma@vger.kernel.org; netdev@vger.kernel.org; Ertman, David M
+>>>>> <david.m.ertman@intel.com>
+>>>>> Subject: Re: [iwl-next v4 1/1] iidc/ice/irdma: Update IDC to support
+>>> multiple
+>>>>> consumers
+>>>>>
+>>>>> On Mon, Feb 24, 2025 at 11:04:28PM -0600, Tatyana Nikolova wrote:
+>>>>>> From: Dave Ertman <david.m.ertman@intel.com>
+>>>>>>
+>>>>>> To support RDMA for E2000 product, the idpf driver will use the IDC
+>>>>>> interface with the irdma auxiliary driver, thus becoming a second
+>>>>>> consumer of it. This requires the IDC be updated to support multiple
+>>>>>> consumers. The use of exported symbols no longer makes sense
+>>> because it
+>>>>>> will require all core drivers (ice/idpf) that can interface with irdma
+>>>>>> auxiliary driver to be loaded even if hardware is not present for those
+>>>>>> drivers.
+>>>>>
+>>>>> In auxiliary bus world, the code drivers (ice/idpf) need to created
+>>>>> auxiliary devices only if specific device present. That auxiliary device
+>>>>> will trigger the load of specific module (irdma in our case).
+>>>>>
+>>>>> EXPORT_SYMBOL won't trigger load of irdma driver, but the opposite is
+>>>>> true, load of irdma will trigger load of ice/idpf drivers (depends on
+>>>>> their exported symbol).
+>>>>>
+>>>>>>
+>>>>>> To address this, implement an ops struct that will be universal set of
+>>>>>> naked function pointers that will be populated by each core driver for
+>>>>>> the irdma auxiliary driver to call.
+>>>>>
+>>>>> No, we worked very hard to make proper HW discovery and driver
+>>> autoload,
+>>>>> let's not return back. For now, it is no-go.
+>>>>
+>>>> Hi Leon,
+>>>>
+>>>> I am a little confused about what the problem here is.  The main issue I pull
+>>>> from your response is: Removing exported symbols will stop ice/idpf from
+>>>> autoloading when irdma loads.  Is this correct or did I miss your point?
+>>>
+>>> It is one of the main points.
+>>>
+>>>>
+>>>> But, if there is an ice or idpf supported device present in the system, the
+>>>> appropriate driver will have already been loaded anyway (and gone
+>>> through its
+>>>> probe flow to create auxiliary devices).  If it is not loaded, then the system
+>>> owner
+>>>> has either unloaded it manually or blacklisted it.  This would not cause an
+>>> issue
+>>>> anyway, since irdma and ice/idpf can load in any order.
+>>>
+>>> There are two assumptions above, which both not true.
+>>> 1. Users never issue "modprobe irdma" command alone and always will call
+>>> to whole chain "modprobe ice ..." before.
+>>> 2. You open-code module subsystem properly with reference counters,
+>>> ownership and locks to protect from function pointers to be set/clear
+>>> dynamically.
+>>
+>> Ah, I see your reasoning now.  Our goal was to make the two modules independent,
+>> with no prescribed load order mandated, and utilize the auxiliary bus and device subsystem
+>> to handle load order and unload of one or the other module.  The auxiliary device only has
+>> the lifespan of the core PCI driver, so if the core driver unloads, then the auxiliary device gets
+>> destroyed, and the associated link based off it will be gone.  We wanted to be able to unload
+>> and reload either of the modules (core or irdma) and have the interaction be able to restart with a
+>> new probe.  All our inter-driver function calls are protected by device lock on the auxiliary
+>> device for the duration of the call.
+> 
+> Yes, you are trying to return to pre-aux era.
 
- drivers/net/mdio/Kconfig                |   7 +
- drivers/net/mdio/Makefile               |   1 +
- drivers/net/mdio/mdio-realtek-rtl9300.c | 516 ++++++++++++++++++++++++
- 3 files changed, 524 insertions(+)
- create mode 100644 drivers/net/mdio/mdio-realtek-rtl9300.c
 
-diff --git a/drivers/net/mdio/Kconfig b/drivers/net/mdio/Kconfig
-index 4a7a303be2f7..058fcdaf6c18 100644
---- a/drivers/net/mdio/Kconfig
-+++ b/drivers/net/mdio/Kconfig
-@@ -185,6 +185,13 @@ config MDIO_IPQ8064
- 	  This driver supports the MDIO interface found in the network
- 	  interface units of the IPQ8064 SoC
-=20
-+config MDIO_REALTEK_RTL9300
-+	tristate "Realtek RTL9300 MDIO interface support"
-+	depends on MACH_REALTEK_RTL || COMPILE_TEST
-+	help
-+	  This driver supports the MDIO interface found in the Realtek
-+	  RTL9300 family of Ethernet switches with integrated SoC.
-+
- config MDIO_REGMAP
- 	tristate
- 	help
-diff --git a/drivers/net/mdio/Makefile b/drivers/net/mdio/Makefile
-index 1015f0db4531..c23778e73890 100644
---- a/drivers/net/mdio/Makefile
-+++ b/drivers/net/mdio/Makefile
-@@ -19,6 +19,7 @@ obj-$(CONFIG_MDIO_MOXART)		+=3D mdio-moxart.o
- obj-$(CONFIG_MDIO_MSCC_MIIM)		+=3D mdio-mscc-miim.o
- obj-$(CONFIG_MDIO_MVUSB)		+=3D mdio-mvusb.o
- obj-$(CONFIG_MDIO_OCTEON)		+=3D mdio-octeon.o
-+obj-$(CONFIG_MDIO_REALTEK_RTL9300)	+=3D mdio-realtek-rtl9300.o
- obj-$(CONFIG_MDIO_REGMAP)		+=3D mdio-regmap.o
- obj-$(CONFIG_MDIO_SUN4I)		+=3D mdio-sun4i.o
- obj-$(CONFIG_MDIO_THUNDER)		+=3D mdio-thunder.o
-diff --git a/drivers/net/mdio/mdio-realtek-rtl9300.c b/drivers/net/mdio/m=
-dio-realtek-rtl9300.c
-new file mode 100644
-index 000000000000..176fce8b944b
---- /dev/null
-+++ b/drivers/net/mdio/mdio-realtek-rtl9300.c
-@@ -0,0 +1,516 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * MDIO controller for RTL9300 switches with integrated SoC.
-+ *
-+ * The MDIO communication is abstracted by the switch. At the software l=
-evel
-+ * communication uses the switch port to address the PHY. We work out th=
-e
-+ * mapping based on the MDIO bus described in device tree and phandles o=
-n the
-+ * ethernet-ports property.
-+ */
-+
-+#include <linux/bitfield.h>
-+#include <linux/bitmap.h>
-+#include <linux/bits.h>
-+#include <linux/find.h>
-+#include <linux/mdio.h>
-+#include <linux/mfd/syscon.h>
-+#include <linux/mod_devicetable.h>
-+#include <linux/mutex.h>
-+#include <linux/of_mdio.h>
-+#include <linux/phy.h>
-+#include <linux/platform_device.h>
-+#include <linux/property.h>
-+#include <linux/regmap.h>
-+
-+#define SMI_GLB_CTRL			0xca00
-+#define   GLB_CTRL_INTF_SEL(intf)	BIT(16 + (intf))
-+#define SMI_PORT0_15_POLLING_SEL	0xca08
-+#define SMI_ACCESS_PHY_CTRL_0		0xcb70
-+#define SMI_ACCESS_PHY_CTRL_1		0xcb74
-+#define   PHY_CTRL_REG_ADDR		GENMASK(24, 20)
-+#define   PHY_CTRL_PARK_PAGE		GENMASK(19, 15)
-+#define   PHY_CTRL_MAIN_PAGE		GENMASK(14, 3)
-+#define   PHY_CTRL_WRITE		BIT(2)
-+#define   PHY_CTRL_READ			0
-+#define   PHY_CTRL_TYPE_C45		BIT(1)
-+#define   PHY_CTRL_TYPE_C22		0
-+#define   PHY_CTRL_CMD			BIT(0)
-+#define   PHY_CTRL_FAIL			BIT(25)
-+#define SMI_ACCESS_PHY_CTRL_2		0xcb78
-+#define   PHY_CTRL_INDATA		GENMASK(31, 16)
-+#define   PHY_CTRL_DATA			GENMASK(15, 0)
-+#define SMI_ACCESS_PHY_CTRL_3		0xcb7c
-+#define   PHY_CTRL_MMD_DEVAD		GENMASK(20, 16)
-+#define   PHY_CTRL_MMD_REG		GENMASK(15, 0)
-+#define SMI_PORT0_5_ADDR_CTRL		0xcb80
-+
-+#define MAX_PORTS       28
-+#define MAX_SMI_BUSSES  4
-+#define MAX_SMI_ADDR	0x1f
-+
-+struct rtl9300_mdio_priv {
-+	struct regmap *regmap;
-+	struct mutex lock; /* protect HW access */
-+	DECLARE_BITMAP(valid_ports, MAX_PORTS);
-+	u8 smi_bus[MAX_PORTS];
-+	u8 smi_addr[MAX_PORTS];
-+	bool smi_bus_is_c45[MAX_SMI_BUSSES];
-+	struct mii_bus *bus[MAX_SMI_BUSSES];
-+};
-+
-+struct rtl9300_mdio_chan {
-+	struct rtl9300_mdio_priv *priv;
-+	u8 mdio_bus;
-+};
-+
-+static int rtl9300_mdio_phy_to_port(struct mii_bus *bus, int phy_id)
-+{
-+	struct rtl9300_mdio_chan *chan =3D bus->priv;
-+	struct rtl9300_mdio_priv *priv;
-+	int i;
-+
-+	priv =3D chan->priv;
-+
-+	for_each_set_bit(i, priv->valid_ports, MAX_PORTS)
-+		if (priv->smi_bus[i] =3D=3D chan->mdio_bus &&
-+		    priv->smi_addr[i] =3D=3D phy_id)
-+			return i;
-+
-+	return -ENOENT;
-+}
-+
-+static int rtl9300_mdio_wait_ready(struct rtl9300_mdio_priv *priv)
-+{
-+	struct regmap *regmap =3D priv->regmap;
-+	u32 val;
-+
-+	lockdep_assert_held(&priv->lock);
-+
-+	return regmap_read_poll_timeout(regmap, SMI_ACCESS_PHY_CTRL_1,
-+					val, !(val & PHY_CTRL_CMD), 10, 1000);
-+}
-+
-+static int rtl9300_mdio_read_c22(struct mii_bus *bus, int phy_id, int re=
-gnum)
-+{
-+	struct rtl9300_mdio_chan *chan =3D bus->priv;
-+	struct rtl9300_mdio_priv *priv;
-+	struct regmap *regmap;
-+	int port;
-+	u32 val;
-+	int err;
-+
-+	priv =3D chan->priv;
-+	regmap =3D priv->regmap;
-+
-+	port =3D rtl9300_mdio_phy_to_port(bus, phy_id);
-+	if (port < 0)
-+		return port;
-+
-+	mutex_lock(&priv->lock);
-+	err =3D rtl9300_mdio_wait_ready(priv);
-+	if (err)
-+		goto out_err;
-+
-+	err =3D regmap_write(regmap, SMI_ACCESS_PHY_CTRL_2, FIELD_PREP(PHY_CTRL=
-_INDATA, port));
-+	if (err)
-+		goto out_err;
-+
-+	val =3D FIELD_PREP(PHY_CTRL_REG_ADDR, regnum) |
-+	      FIELD_PREP(PHY_CTRL_PARK_PAGE, 0x1f) |
-+	      FIELD_PREP(PHY_CTRL_MAIN_PAGE, 0xfff) |
-+	      PHY_CTRL_READ | PHY_CTRL_TYPE_C22 | PHY_CTRL_CMD;
-+	err =3D regmap_write(regmap, SMI_ACCESS_PHY_CTRL_1, val);
-+	if (err)
-+		goto out_err;
-+
-+	err =3D rtl9300_mdio_wait_ready(priv);
-+	if (err)
-+		goto out_err;
-+
-+	err =3D regmap_read(regmap, SMI_ACCESS_PHY_CTRL_2, &val);
-+	if (err)
-+		goto out_err;
-+
-+	mutex_unlock(&priv->lock);
-+	return FIELD_GET(PHY_CTRL_DATA, val);
-+
-+out_err:
-+	mutex_unlock(&priv->lock);
-+	return err;
-+}
-+
-+static int rtl9300_mdio_write_c22(struct mii_bus *bus, int phy_id, int r=
-egnum, u16 value)
-+{
-+	struct rtl9300_mdio_chan *chan =3D bus->priv;
-+	struct rtl9300_mdio_priv *priv;
-+	struct regmap *regmap;
-+	int port;
-+	u32 val;
-+	int err;
-+
-+	priv =3D chan->priv;
-+	regmap =3D priv->regmap;
-+
-+	port =3D rtl9300_mdio_phy_to_port(bus, phy_id);
-+	if (port < 0)
-+		return port;
-+
-+	mutex_lock(&priv->lock);
-+	err =3D rtl9300_mdio_wait_ready(priv);
-+	if (err)
-+		goto out_err;
-+
-+	err =3D regmap_write(regmap, SMI_ACCESS_PHY_CTRL_0, BIT(port));
-+	if (err)
-+		goto out_err;
-+
-+	err =3D regmap_write(regmap, SMI_ACCESS_PHY_CTRL_2, FIELD_PREP(PHY_CTRL=
-_INDATA, value));
-+	if (err)
-+		goto out_err;
-+
-+	val =3D FIELD_PREP(PHY_CTRL_REG_ADDR, regnum) |
-+	      FIELD_PREP(PHY_CTRL_PARK_PAGE, 0x1f) |
-+	      FIELD_PREP(PHY_CTRL_MAIN_PAGE, 0xfff) |
-+	      PHY_CTRL_WRITE | PHY_CTRL_TYPE_C22 | PHY_CTRL_CMD;
-+	err =3D regmap_write(regmap, SMI_ACCESS_PHY_CTRL_1, val);
-+	if (err)
-+		goto out_err;
-+
-+	err =3D regmap_read_poll_timeout(regmap, SMI_ACCESS_PHY_CTRL_1,
-+				       val, !(val & PHY_CTRL_CMD), 10, 100);
-+	if (err)
-+		goto out_err;
-+
-+	if (val & PHY_CTRL_FAIL) {
-+		err =3D -ENXIO;
-+		goto out_err;
-+	}
-+
-+	mutex_unlock(&priv->lock);
-+	return 0;
-+
-+out_err:
-+	mutex_unlock(&priv->lock);
-+	return err;
-+}
-+
-+static int rtl9300_mdio_read_c45(struct mii_bus *bus, int phy_id, int de=
-v_addr, int regnum)
-+{
-+	struct rtl9300_mdio_chan *chan =3D bus->priv;
-+	struct rtl9300_mdio_priv *priv;
-+	struct regmap *regmap;
-+	int port;
-+	u32 val;
-+	int err;
-+
-+	priv =3D chan->priv;
-+	regmap =3D priv->regmap;
-+
-+	port =3D rtl9300_mdio_phy_to_port(bus, phy_id);
-+	if (port < 0)
-+		return port;
-+
-+	mutex_lock(&priv->lock);
-+	err =3D rtl9300_mdio_wait_ready(priv);
-+	if (err)
-+		goto out_err;
-+
-+	val =3D FIELD_PREP(PHY_CTRL_INDATA, port);
-+	err =3D regmap_write(regmap, SMI_ACCESS_PHY_CTRL_2, val);
-+	if (err)
-+		goto out_err;
-+
-+	val =3D FIELD_PREP(PHY_CTRL_MMD_DEVAD, dev_addr) |
-+	      FIELD_PREP(PHY_CTRL_MMD_REG, regnum);
-+	err =3D regmap_write(regmap, SMI_ACCESS_PHY_CTRL_3, val);
-+	if (err)
-+		goto out_err;
-+
-+	err =3D regmap_write(regmap, SMI_ACCESS_PHY_CTRL_1,
-+			   PHY_CTRL_READ | PHY_CTRL_TYPE_C45 | PHY_CTRL_CMD);
-+	if (err)
-+		goto out_err;
-+
-+	err =3D rtl9300_mdio_wait_ready(priv);
-+	if (err)
-+		goto out_err;
-+
-+	err =3D regmap_read(regmap, SMI_ACCESS_PHY_CTRL_2, &val);
-+	if (err)
-+		goto out_err;
-+
-+	mutex_unlock(&priv->lock);
-+	return FIELD_GET(PHY_CTRL_DATA, val);
-+
-+out_err:
-+	mutex_unlock(&priv->lock);
-+	return err;
-+}
-+
-+static int rtl9300_mdio_write_c45(struct mii_bus *bus, int phy_id, int d=
-ev_addr,
-+				  int regnum, u16 value)
-+{
-+	struct rtl9300_mdio_chan *chan =3D bus->priv;
-+	struct rtl9300_mdio_priv *priv;
-+	struct regmap *regmap;
-+	int port;
-+	u32 val;
-+	int err;
-+
-+	priv =3D chan->priv;
-+	regmap =3D priv->regmap;
-+
-+	port =3D rtl9300_mdio_phy_to_port(bus, phy_id);
-+	if (port < 0)
-+		return port;
-+
-+	mutex_lock(&priv->lock);
-+	err =3D rtl9300_mdio_wait_ready(priv);
-+	if (err)
-+		goto out_err;
-+
-+	err =3D regmap_write(regmap, SMI_ACCESS_PHY_CTRL_0, BIT(port));
-+	if (err)
-+		goto out_err;
-+
-+	val =3D FIELD_PREP(PHY_CTRL_INDATA, value);
-+	err =3D regmap_write(regmap, SMI_ACCESS_PHY_CTRL_2, val);
-+	if (err)
-+		goto out_err;
-+
-+	val =3D FIELD_PREP(PHY_CTRL_MMD_DEVAD, dev_addr) |
-+	      FIELD_PREP(PHY_CTRL_MMD_REG, regnum);
-+	err =3D regmap_write(regmap, SMI_ACCESS_PHY_CTRL_3, val);
-+	if (err)
-+		goto out_err;
-+
-+	err =3D regmap_write(regmap, SMI_ACCESS_PHY_CTRL_1,
-+			   PHY_CTRL_TYPE_C45 | PHY_CTRL_WRITE | PHY_CTRL_CMD);
-+	if (err)
-+		goto out_err;
-+
-+	err =3D regmap_read_poll_timeout(regmap, SMI_ACCESS_PHY_CTRL_1,
-+				       val, !(val & PHY_CTRL_CMD), 10, 100);
-+	if (err)
-+		goto out_err;
-+
-+	if (val & PHY_CTRL_FAIL) {
-+		err =3D -ENXIO;
-+		goto out_err;
-+	}
-+
-+	mutex_unlock(&priv->lock);
-+	return 0;
-+
-+out_err:
-+	mutex_unlock(&priv->lock);
-+	return err;
-+}
-+
-+static int rtl9300_mdiobus_init(struct rtl9300_mdio_priv *priv)
-+{
-+	u32 glb_ctrl_mask =3D 0, glb_ctrl_val =3D 0;
-+	struct regmap *regmap =3D priv->regmap;
-+	u32 port_addr[5] =3D { 0 };
-+	u32 poll_sel[2] =3D { 0 };
-+	int i, err;
-+
-+	/* Associate the port with the SMI interface and PHY */
-+	for_each_set_bit(i, priv->valid_ports, MAX_PORTS) {
-+		int pos;
-+
-+		pos =3D (i % 6) * 5;
-+		port_addr[i / 6] |=3D (priv->smi_addr[i] & 0x1f) << pos;
-+
-+		pos =3D (i % 16) * 2;
-+		poll_sel[i / 16] |=3D (priv->smi_bus[i] & 0x3) << pos;
-+	}
-+
-+	/* Put the interfaces into C45 mode if required */
-+	glb_ctrl_mask =3D GENMASK(19, 16);
-+	for (i =3D 0; i < MAX_SMI_BUSSES; i++)
-+		if (priv->smi_bus_is_c45[i])
-+			glb_ctrl_val |=3D GLB_CTRL_INTF_SEL(i);
-+
-+	err =3D regmap_bulk_write(regmap, SMI_PORT0_5_ADDR_CTRL,
-+				port_addr, 5);
-+	if (err)
-+		return err;
-+
-+	err =3D regmap_bulk_write(regmap, SMI_PORT0_15_POLLING_SEL,
-+				poll_sel, 2);
-+	if (err)
-+		return err;
-+
-+	err =3D regmap_update_bits(regmap, SMI_GLB_CTRL,
-+				 glb_ctrl_mask, glb_ctrl_val);
-+	if (err)
-+		return err;
-+
-+	return 0;
-+}
-+
-+static int rtl9300_mdiobus_probe_one(struct device *dev, struct rtl9300_=
-mdio_priv *priv,
-+				     struct fwnode_handle *node)
-+{
-+	struct rtl9300_mdio_chan *chan;
-+	struct fwnode_handle *child;
-+	struct mii_bus *bus;
-+	u32 mdio_bus;
-+	int err;
-+
-+	err =3D fwnode_property_read_u32(node, "reg", &mdio_bus);
-+	if (err)
-+		return err;
-+
-+	/* The MDIO interfaces are either in GPHY (i.e. clause 22) or 10GPHY
-+	 * mode (i.e. clause 45). We select 10GPHY mode if there is a PHY that
-+	 * declares compatible =3D "ethernet-phy-ieee802.3-c45". This does mean
-+	 * we can't support both c45 and c22 on the same MDIO bus.
-+	 */
-+	fwnode_for_each_child_node(node, child)
-+		if (fwnode_device_is_compatible(child, "ethernet-phy-ieee802.3-c45"))
-+			priv->smi_bus_is_c45[mdio_bus] =3D true;
-+
-+	bus =3D devm_mdiobus_alloc_size(dev, sizeof(*chan));
-+	if (!bus)
-+		return -ENOMEM;
-+
-+	bus->name =3D "Realtek Switch MDIO Bus";
-+	bus->read =3D rtl9300_mdio_read_c22;
-+	bus->write =3D rtl9300_mdio_write_c22;
-+	bus->read_c45 =3D rtl9300_mdio_read_c45;
-+	bus->write_c45 =3D  rtl9300_mdio_write_c45;
-+	bus->parent =3D dev;
-+	chan =3D bus->priv;
-+	chan->mdio_bus =3D mdio_bus;
-+	chan->priv =3D priv;
-+
-+	snprintf(bus->id, MII_BUS_ID_SIZE, "%s-%d", dev_name(dev), mdio_bus);
-+
-+	err =3D devm_of_mdiobus_register(dev, bus, to_of_node(node));
-+	if (err)
-+		return dev_err_probe(dev, err, "cannot register MDIO bus\n");
-+
-+	return 0;
-+}
-+
-+/* The mdio-controller is part of a switch block so we parse the sibling
-+ * ethernet-ports node and build a mapping of the switch port to MDIO bu=
-s/addr
-+ * based on the phy-handle.
-+ */
-+static int rtl9300_mdiobus_map_ports(struct device *dev)
-+{
-+	struct rtl9300_mdio_priv *priv =3D dev_get_drvdata(dev);
-+	struct device *parent =3D dev->parent;
-+	struct fwnode_handle *port;
-+	int err;
-+
-+	struct fwnode_handle *ports __free(fwnode_handle) =3D
-+		device_get_named_child_node(parent, "ethernet-ports");
-+	if (!ports)
-+		return dev_err_probe(dev, -EINVAL, "%pfwP missing ethernet-ports\n",
-+				     dev_fwnode(parent));
-+
-+	fwnode_for_each_child_node(ports, port) {
-+		struct device_node *mdio_dn;
-+		u32 addr;
-+		u32 bus;
-+		u32 pn;
-+
-+		struct device_node *phy_dn __free(device_node) =3D
-+			of_parse_phandle(to_of_node(port), "phy-handle", 0);
-+		/* skip ports without phys */
-+		if (!phy_dn)
-+			continue;
-+
-+		mdio_dn =3D phy_dn->parent;
-+		/* only map ports that are connected to this mdio-controller */
-+		if (mdio_dn->parent !=3D dev->of_node)
-+			continue;
-+
-+		err =3D fwnode_property_read_u32(port, "reg", &pn);
-+		if (err)
-+			return err;
-+
-+		if (pn >=3D MAX_PORTS)
-+			return dev_err_probe(dev, -EINVAL, "illegal port number %d\n", pn);
-+
-+		if (test_bit(pn, priv->valid_ports))
-+			return dev_err_probe(dev, -EINVAL, "duplicated port number %d\n", pn)=
-;
-+
-+		err =3D of_property_read_u32(mdio_dn, "reg", &bus);
-+		if (err)
-+			return err;
-+
-+		if (bus >=3D MAX_SMI_BUSSES)
-+			return dev_err_probe(dev, -EINVAL, "illegal smi bus number %d\n", bus=
-);
-+
-+		err =3D of_property_read_u32(phy_dn, "reg", &addr);
-+		if (err)
-+			return err;
-+
-+		__set_bit(pn, priv->valid_ports);
-+		priv->smi_bus[pn] =3D bus;
-+		priv->smi_addr[pn] =3D addr;
-+	}
-+
-+	return 0;
-+}
-+
-+static int rtl9300_mdiobus_probe(struct platform_device *pdev)
-+{
-+	struct device *dev =3D &pdev->dev;
-+	struct rtl9300_mdio_priv *priv;
-+	struct fwnode_handle *child;
-+	int err;
-+
-+	priv =3D devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-+	if (!priv)
-+		return -ENOMEM;
-+
-+	err =3D devm_mutex_init(dev, &priv->lock);
-+	if (err)
-+		return err;
-+
-+	priv->regmap =3D syscon_node_to_regmap(dev->parent->of_node);
-+	if (IS_ERR(priv->regmap))
-+		return PTR_ERR(priv->regmap);
-+
-+	platform_set_drvdata(pdev, priv);
-+
-+	err =3D rtl9300_mdiobus_map_ports(dev);
-+	if (err)
-+		return err;
-+
-+	device_for_each_child_node(dev, child) {
-+		err =3D rtl9300_mdiobus_probe_one(dev, priv, child);
-+		if (err)
-+			return err;
-+	}
-+
-+	err =3D rtl9300_mdiobus_init(priv);
-+	if (err)
-+		return dev_err_probe(dev, err, "failed to initialise MDIO bus controll=
-er\n");
-+
-+	return 0;
-+}
-+
-+static const struct of_device_id rtl9300_mdio_ids[] =3D {
-+	{ .compatible =3D "realtek,rtl9301-mdio" },
-+	{}
-+};
-+MODULE_DEVICE_TABLE(of, rtl9300_mdio_ids);
-+
-+static struct platform_driver rtl9300_mdio_driver =3D {
-+	.probe =3D rtl9300_mdiobus_probe,
-+	.driver =3D {
-+		.name =3D "mdio-rtl9300",
-+		.of_match_table =3D rtl9300_mdio_ids,
-+	},
-+};
-+
-+module_platform_driver(rtl9300_mdio_driver);
-+
-+MODULE_DESCRIPTION("RTL9300 MDIO driver");
-+MODULE_LICENSE("GPL");
---=20
-2.48.1
+The main motivation to go with callbacks to the parent driver instead of 
+using exported symbols is to allow loading only the parent driver 
+required for a particular deployment. irdma is a common rdma auxilary 
+driver that supports multiple parent pci drivers(ice, idpf, i40e, iavf). 
+If we use exported symbols, all these modules will get loaded even on a 
+system with only idpf device.
+
+The documentation for auxiliary bus
+	https://docs.kernel.org/driver-api/auxiliary_bus.html
+shows an example on how shared data/callbacks can be used to establish 
+connection with the parent.
+
+Auxiliary devices are created and registered by a subsystem-level core 
+device that needs to break up its functionality into smaller fragments. 
+One way to extend the scope of an auxiliary_device is to encapsulate it 
+within a domain-specific structure defined by the parent device. This 
+structure contains the auxiliary_device and any associated shared 
+data/callbacks needed to establish the connection with the parent.
+
+An example is:
+
+  struct foo {
+       struct auxiliary_device auxdev;
+       void (*connect)(struct auxiliary_device *auxdev);
+       void (*disconnect)(struct auxiliary_device *auxdev);
+       void *data;
+};
+
+This example clearly shows that it is OK to use callbacks from the aux 
+driver. The aux driver is dependent on the parent driver and the parent 
+driver will guarantee that it will not get unloaded until all the 
+auxiliary devices are destroyed.
+
+Hopefully you will understand our motivation of going with this design 
+and not force us to go with a solution that is not optimal.
+
+Thanks
+Sridhar
 
 
