@@ -1,190 +1,162 @@
-Return-Path: <netdev+bounces-174508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08078A5F099
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 11:23:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8BD2A5F0EB
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 11:31:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E95223BCE04
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 10:22:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20E8A173E1B
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 10:31:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB735266580;
-	Thu, 13 Mar 2025 10:22:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE91226037A;
+	Thu, 13 Mar 2025 10:31:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b="L4siQE+R"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="QWMuSpED"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.avm.de (mail.avm.de [212.42.244.94])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com [209.85.221.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C59624EF69;
-	Thu, 13 Mar 2025 10:22:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.94
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B871FBC87
+	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 10:31:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741861328; cv=none; b=U30zVosxQd75ew3KaOdK/Y5f322FBEsBlEgp1NgcUpQ6IIeXfdaQMD+3wIV0+SXw+ebEvMTs7ciL2xy6+GNo0rPJoYeKYjQ/EHkXrVusoHbK8zhdLHNTqTyEfyP13VQlpJ6/llzDKEsePqWpU0Rw542WEPhHh2mM4QxKNctDAyQ=
+	t=1741861876; cv=none; b=BnCLc8oOyBhfwK9WdGTeJeaaSrKsSPFfYBq6nVWpSkYINrkJf+Pl4c8pY+pYTMOI33PrCkYi/U5eDUz+NT38440We7DfiKmVJ9VrxXwKktn/JTtgv8x+N4cYZ3tahF7S67rXrsYAKO9KPBMkaGCIxgNkA1fTL+N1P+rpH2atP9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741861328; c=relaxed/simple;
-	bh=zjrVRltHZymqX24ps5h+266z2VbwHonEl5iwYUVv+IA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iH7k2etr/Imsw7PjOMc/O3zXQIhbGt1Df58IxKzPgWBwROdEYMjDoiVkF80vww8GpVzxrimFbKgQZXVhC8IRTEhDgdkcM9+ruLw4wA6xp03zRL7jxYfOiZhgKtawI1XtgJfHfyg/b95N29uykCLR1UyS+xzNzQ5AP7yt1V8k5Tg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de; spf=pass smtp.mailfrom=avm.de; dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b=L4siQE+R; arc=none smtp.client-ip=212.42.244.94
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=avm.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=avm.de; s=mail;
-	t=1741861316; bh=zjrVRltHZymqX24ps5h+266z2VbwHonEl5iwYUVv+IA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=L4siQE+RvEVW+RzLBl/er7124JbN2fwagNQXux2is1UGclr84mw295IyaCrT2B5kx
-	 7wazt18+TJFDyvI69Sj4KiCgk89hsq0Ou0fOYjw1PiXwZQzWBXE6VLVDEBAlGmp4pi
-	 BiDQdWcoJT+J295tlq53tyOxbG7XeoNDxS9hMAvY=
-Received: from [2001:bf0:244:244::71] (helo=mail.avm.de)
-	by mail.avm.de with ESMTP (eXpurgate 4.52.1)
-	(envelope-from <phahn-oss@avm.de>)
-	id 67d2b1c4-94fe-7f0000032729-7f000001cad4-1
-	for <multiple-recipients>; Thu, 13 Mar 2025 11:21:56 +0100
-Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [IPv6:2001:bf0:244:244::71])
-	by mail.avm.de (Postfix) with ESMTPS;
-	Thu, 13 Mar 2025 11:21:56 +0100 (CET)
-From: Philipp Hahn <phahn-oss@avm.de>
-To: netdev@vger.kernel.org
-Cc: Philipp Hahn <phahn-oss@avm.de>,
-	Oliver Neukum <oliver@neukum.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-usb@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Leon Schuermann <leon@is.currently.online>,
-	Kory Maincent <kory.maincent@bootlin.com>
-Subject: [PATCH net-next v3]: cdc_ether|r8152: ThinkPad Hybrid USB-C/A Dock quirk
-Date: Thu, 13 Mar 2025 11:21:46 +0100
-Message-Id: <f736f5bd20e465656ebe2cc2e7be69c0ada852e3.1741627632.git.p.hahn@avm.de>
+	s=arc-20240116; t=1741861876; c=relaxed/simple;
+	bh=+Qc1/rhEavEwxsG3hKdFM0w5lhAAqdDttjw6g+YQ8mg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aGSDNHN/GIgvJJZLkg4cUFtFMIB+PW1G6or8IW/8NQKnRSX5ogxwSVpN3cKiubX9ihxgex0Q1HrEaM6s0G3yDZP3f1R6rOH+NXKLozbIJP37zz2RnmtCEPnsIErMkq16XLjde1fuyaUyO6e1mZAbDkK5747Sd2z+4nn695SVq8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=QWMuSpED; arc=none smtp.client-ip=209.85.221.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wr1-f66.google.com with SMTP id ffacd0b85a97d-391342fc148so504648f8f.2
+        for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 03:31:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1741861873; x=1742466673; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+Qc1/rhEavEwxsG3hKdFM0w5lhAAqdDttjw6g+YQ8mg=;
+        b=QWMuSpEDetsgtiuuFcbZJ2jMMxP3+kX5OgKgbwxmQW6sUGE8IjDwWuD/ep184RU4XP
+         BD2F9eMCwAnSns+1NQAs4b4H/nomuwTywijY2xjJybA6xPRGPTyQl4o+ef3fyYpAtbts
+         bwqG7XxKhlj2xXx9IvMYD1VKjQGVud02yvfi5eAR/VzUWU8ABMEfOkh2ftp7Pzt39LLJ
+         0wwhiFwh5oOh26mNNWvNJvHlYr/Iqk02Tic0tdSZtuvjGbyvzIbl3bXgAu6u/qXmAN0+
+         Bdd9rJU+2e9ANA/yJ21A4K+a0871DFhkdUDc1hVhXSlxtFVbnnqL2h1kIMIvSpEVWWWe
+         zDgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741861873; x=1742466673;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+Qc1/rhEavEwxsG3hKdFM0w5lhAAqdDttjw6g+YQ8mg=;
+        b=eq4O/RLwc7DD15LB2nceVDtxaera3CkPWIFQVH9ENchdjab4f7Vkcm9Z5LlgxYdeOp
+         kPLXcax2Hy/Em8XOPuXKnoIxo5J7IIiUzpAAjuKXhCB6W5jfZee7zLSFeIoJptlGZVtK
+         7QCCK7A6XrP6NN6BSFqB/2ZhVCUJpKF+QBGdIOm+4hjAxNI3L3HT9/2mHCEJUIO1E7tL
+         sCqHRRzyra4it+gEiTAzJ3DvtmTLcTPx1eCwqpQkdrqQ1n8IeiHx9dgR/OS16s3lJsXk
+         vDTSCPT55BCu1PwL/GWk7KvPHEVvAcqCNrS71viNSIm+OM9aT/xlJKPMmuoYPG5cMh8x
+         deIA==
+X-Forwarded-Encrypted: i=1; AJvYcCW7uEhBC6eGKKfgQi0F64ZNMKvY0A4uNVjUFrujNHwfnscUIzQYIavqERCRMc54F1Q4M3fpEGg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyort4nhEDMn5ZrMjT9zLIPqRLa+G0mvOgRxh/qt9iLkq1QUU5K
+	qGyC7u+lSo9tfGH5HP9K+1JlK6LdvVXaKvJQ0hFV32VsAleLU9gfOh2F7Q4CC9s=
+X-Gm-Gg: ASbGnctVULz2D/7ijdzeITSO0CCxrmTP8yj2Jiz08j19q9WaGNosEI/N+UfjVeEdc35
+	mx68/u53T1nehWU8nTCP1v/ALhMEzBHEHhFHPRqPlW1COpF0V3YmpA+Sj5qECqxbXkConPnrVPN
+	lmpMXqrEAi9EnRw9tnXGt6z3D53vWulm+4diXwwt9FuwuY7+Etr/Ud32Oavh48NczjJeA8MhIr9
+	+LtZGCSv3WybiFAu4Yk98PpiYQbJD0YdRoS3mySLlPXbFUF1uyKSKSuHSGw4JGf9Oesw8gib/J4
+	wuI30266BjSLePSAmxcTzWiZ6UpfxnwxX8+ZniQF2gY/wos=
+X-Google-Smtp-Source: AGHT+IGutrF+qhtpUeJyR+v5dxXEJQUHmE/j1jQ80iIR/51IL4Oi+Mu0pGNz5DfWd0qOs62NuhFHZQ==
+X-Received: by 2002:a5d:6dad:0:b0:390:de66:cc0c with SMTP id ffacd0b85a97d-3926c69b260mr11326833f8f.46.1741861872973;
+        Thu, 13 Mar 2025 03:31:12 -0700 (PDT)
+Received: from blackdock.suse.cz ([193.86.92.181])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395c7df31f6sm1651918f8f.6.2025.03.13.03.31.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Mar 2025 03:31:12 -0700 (PDT)
+Date: Thu, 13 Mar 2025 11:31:10 +0100
+From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+To: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Cc: kuniyu@amazon.com, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, cgroups@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
+	Leon Romanovsky <leon@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Christian Brauner <brauner@kernel.org>, Lennart Poettering <mzxreary@0pointer.de>, 
+	Luca Boccassi <bluca@debian.org>, Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Shuah Khan <shuah@kernel.org>
+Subject: Re: [PATCH net-next 0/4] Add getsockopt(SO_PEERCGROUPID) and fdinfo
+ API to retreive socket's peer cgroup id
+Message-ID: <m73uknqti2uvh2sdak6fs75ms7ud6yken6cgaotbq3hllg7wmt@hgqewykjxkfn>
+References: <20250309132821.103046-1-aleksandr.mikhalitsyn@canonical.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: AVM GmbH, Berlin, Germany
-Content-Transfer-Encoding: 8bit
-X-purgate-ID: 149429::1741861316-A1DA0945-62C14C62/0/0
-X-purgate-type: clean
-X-purgate-size: 4605
-X-purgate-Ad: Categorized by eleven eXpurgate (R) https://www.eleven.de
-X-purgate: This mail is considered clean (visit https://www.eleven.de for further information)
-X-purgate: clean
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="gn5un3rlxk2imiai"
+Content-Disposition: inline
+In-Reply-To: <20250309132821.103046-1-aleksandr.mikhalitsyn@canonical.com>
 
-Lenovo ThinkPad Hybrid USB-C with USB-A Dock (17ef:a359) is affected by
-the same problem as the Lenovo Powered USB-C Travel Hub (17ef:721e):
-Both are based on the Realtek RTL8153B chip used to use the cdc_ether
-driver. However, using this driver, with the system suspended the device
-constantly sends pause-frames as soon as the receive buffer fills up.
-This causes issues with other devices, where some Ethernet switches stop
-forwarding packets altogether.
 
-Using the Realtek driver (r8152) fixes this issue. Pause frames are no
-longer sent while the host system is suspended.
+--gn5un3rlxk2imiai
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next 0/4] Add getsockopt(SO_PEERCGROUPID) and fdinfo
+ API to retreive socket's peer cgroup id
+MIME-Version: 1.0
 
-Cc: Oliver Neukum <oliver@neukum.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: linux-usb@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: Leon Schuermann <leon@is.currently.online>
-Link: https://git.kernel.org/netdev/net/c/cb82a54904a9
-Link: https://git.kernel.org/netdev/net/c/2284bbd0cf39
-Link: https://www.lenovo.com/de/de/p/accessories-and-software/docking/docking-usb-docks/40af0135eu
-Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
-Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
----
-V2 -> V3: Move `net-next` in subject
-V1 -> V2: Prefix subject with `net-next:`
-V1 -> V2: Add additional Cc:s
- drivers/net/usb/cdc_ether.c | 7 +++++++
- drivers/net/usb/r8152.c     | 6 ++++++
- drivers/net/usb/r8153_ecm.c | 6 ++++++
- 3 files changed, 19 insertions(+)
+Hello.
 
-diff --git a/drivers/net/usb/cdc_ether.c b/drivers/net/usb/cdc_ether.c
-index a6469235d904..a032c1ded406 100644
---- a/drivers/net/usb/cdc_ether.c
-+++ b/drivers/net/usb/cdc_ether.c
-@@ -783,6 +783,13 @@ static const struct usb_device_id	products[] = {
- 	.driver_info = 0,
- },
- 
-+/* Lenovo ThinkPad Hybrid USB-C with USB-A Dock (40af0135eu, based on Realtek RTL8153) */
-+{
-+	USB_DEVICE_AND_INTERFACE_INFO(LENOVO_VENDOR_ID, 0xa359, USB_CLASS_COMM,
-+			USB_CDC_SUBCLASS_ETHERNET, USB_CDC_PROTO_NONE),
-+	.driver_info = 0,
-+},
-+
- /* Aquantia AQtion USB to 5GbE Controller (based on AQC111U) */
- {
- 	USB_DEVICE_AND_INTERFACE_INFO(AQUANTIA_VENDOR_ID, 0xc101,
-diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-index 468c73974046..96fa3857d8e2 100644
---- a/drivers/net/usb/r8152.c
-+++ b/drivers/net/usb/r8152.c
-@@ -785,6 +785,7 @@ enum rtl8152_flags {
- #define DEVICE_ID_THINKPAD_USB_C_DONGLE			0x720c
- #define DEVICE_ID_THINKPAD_USB_C_DOCK_GEN2		0xa387
- #define DEVICE_ID_THINKPAD_USB_C_DOCK_GEN3		0x3062
-+#define DEVICE_ID_THINKPAD_HYBRID_USB_C_DOCK		0xa359
- 
- struct tally_counter {
- 	__le64	tx_packets;
-@@ -9787,6 +9788,7 @@ static bool rtl8152_supports_lenovo_macpassthru(struct usb_device *udev)
- 		case DEVICE_ID_THINKPAD_USB_C_DOCK_GEN2:
- 		case DEVICE_ID_THINKPAD_USB_C_DOCK_GEN3:
- 		case DEVICE_ID_THINKPAD_USB_C_DONGLE:
-+		case DEVICE_ID_THINKPAD_HYBRID_USB_C_DOCK:
- 			return 1;
- 		}
- 	} else if (vendor_id == VENDOR_ID_REALTEK && parent_vendor_id == VENDOR_ID_LENOVO) {
-@@ -10064,6 +10066,8 @@ static const struct usb_device_id rtl8152_table[] = {
- 	{ USB_DEVICE(VENDOR_ID_MICROSOFT, 0x0927) },
- 	{ USB_DEVICE(VENDOR_ID_MICROSOFT, 0x0c5e) },
- 	{ USB_DEVICE(VENDOR_ID_SAMSUNG, 0xa101) },
-+
-+	/* Lenovo */
- 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x304f) },
- 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x3054) },
- 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x3062) },
-@@ -10074,7 +10078,9 @@ static const struct usb_device_id rtl8152_table[] = {
- 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x720c) },
- 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x7214) },
- 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x721e) },
-+	{ USB_DEVICE(VENDOR_ID_LENOVO,  0xa359) },
- 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0xa387) },
-+
- 	{ USB_DEVICE(VENDOR_ID_LINKSYS, 0x0041) },
- 	{ USB_DEVICE(VENDOR_ID_NVIDIA,  0x09ff) },
- 	{ USB_DEVICE(VENDOR_ID_TPLINK,  0x0601) },
-diff --git a/drivers/net/usb/r8153_ecm.c b/drivers/net/usb/r8153_ecm.c
-index 20b2df8d74ae..8d860dacdf49 100644
---- a/drivers/net/usb/r8153_ecm.c
-+++ b/drivers/net/usb/r8153_ecm.c
-@@ -135,6 +135,12 @@ static const struct usb_device_id products[] = {
- 				      USB_CDC_SUBCLASS_ETHERNET, USB_CDC_PROTO_NONE),
- 	.driver_info = (unsigned long)&r8153_info,
- },
-+/* Lenovo ThinkPad Hybrid USB-C with USB-A Dock (40af0135eu, based on Realtek RTL8153) */
-+{
-+	USB_DEVICE_AND_INTERFACE_INFO(VENDOR_ID_LENOVO, 0xa359, USB_CLASS_COMM,
-+				      USB_CDC_SUBCLASS_ETHERNET, USB_CDC_PROTO_NONE),
-+	.driver_info = (unsigned long)&r8153_info,
-+},
- 
- 	{ },		/* END */
- };
--- 
-2.34.1
+On Sun, Mar 09, 2025 at 02:28:11PM +0100, Alexander Mikhalitsyn <aleksandr.=
+mikhalitsyn@canonical.com> wrote:
+> As we don't add any new state to the socket itself there is no potential =
+locking issues
+> or performance problems. We use already existing sk->sk_cgrp_data.
 
+This is the cgroup where the socket was created in. If such a socket is
+fd-passed to another cgroup, SO_PEERCGROUPID may not be what's expected.
+
+> We already have analogical interfaces to retrieve this
+> information:
+> - inet_diag: INET_DIAG_CGROUP_ID
+> - eBPF: bpf_sk_cgroup_id
+>=20
+> Having getsockopt() interface makes sense for many applications, because =
+using eBPF is
+> not always an option, while inet_diag has obvious complexety and performa=
+nce drawbacks
+> if we only want to get this specific info for one specific socket.
+
+I'm not that familiar with INET_DIAG_CGROUP_ID but that one sounds like
+fit for the purpose of obtaining socket creator's cgroup whereas what is
+desired here is slightly different thing -- cgroup of actual sender
+through the socket.
+
+> Idea comes from UAPI kernel group:
+> https://uapi-group.org/kernel-features/
+
+In theory shortlived (sending) program may reside in shortlived cgroup
+and the consumer of SO_PEERCGROUPID (even if it is real sender) would
+only have that number to work with.
+It doesn't guarantee existence of original cgroup or stable translation
+to cgroup path. I think having something like this could be useful but
+consumers must still be aware of limitations (and possible switch from
+path-oriented to id-oriented work with cgroups).
+
+Thanks,
+Michal
+
+--gn5un3rlxk2imiai
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTd6mfF2PbEZnpdoAkt3Wney77BSQUCZ9Kz2gAKCRAt3Wney77B
+Sbf6AP9fsNpqSW9pup+OWVUAqnwAa4Rv5tCANUaEBtzokfTACwD7BDGhFEavKmvp
+9jS3uaw95+lDb7W2z0WEmZBKQ0regAs=
+=CHE+
+-----END PGP SIGNATURE-----
+
+--gn5un3rlxk2imiai--
 
