@@ -1,117 +1,109 @@
-Return-Path: <netdev+bounces-174608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4EB6A5F7F2
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 15:25:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E8DCA5F88F
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 15:37:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 095F6420404
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 14:25:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25187188ABFE
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 14:36:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EB39267F4F;
-	Thu, 13 Mar 2025 14:25:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C572686B1;
+	Thu, 13 Mar 2025 14:33:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nScF/ei3"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VJhsOptS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F3C4267F45;
-	Thu, 13 Mar 2025 14:25:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AF9A2686B7
+	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 14:33:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741875919; cv=none; b=DWJWjmjcYxCAbxiveqoEdutrt/c/IXzAONpuTQQ/hNoB5Wca8UCFIe37K4IEsoGXWRgii+bkEi1c5Wn+7LAsTarGhFiXH6tpt/N/YERf80dlqvmAoBBXwHe28aVuqGu+r9QHZyOwMrsFKnjfZl6piq8CRkb6FZNe0rNjigN/r3s=
+	t=1741876387; cv=none; b=jxRCEO6fW6VQlSJbsnH5Ksh3jTI0sER0eMuKn+vkubTAeLg6+hdaN4s44Hewxmir+pQTEoGPxyyrXqp9eHG6BAhZb+PTgzwakZ6g1WZa7FKGL8FKG/LGG8pUuqC93b9gg7BZOhKLnN0fNhD57CNQLDE9SGYNBxR7TSpPH8cDCtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741875919; c=relaxed/simple;
-	bh=KGmJrceDamjRYmfBqz65BHjaNIf+vVNxlgv1SUPYziw=;
+	s=arc-20240116; t=1741876387; c=relaxed/simple;
+	bh=m1v2kHB2wFWddLHMLNcTG9WMN9c2m8mKZm//8DFw+as=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VCQs+h526PpAJm2SZuuMxvNAwYX0G0MO9ezpH2RdCSVPMbmtop0MX1HTOFsn7/+T9mCHqIwuKqmZ/pyBfANUwoiIshI4ZAItAfoe463HuhTNCAkPs3x+9fw3imCGsfLMgSCJHVvnv4ftn9XAbBJpj1F/E63CHVTv5mjvgUog+rk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nScF/ei3; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741875918; x=1773411918;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=KGmJrceDamjRYmfBqz65BHjaNIf+vVNxlgv1SUPYziw=;
-  b=nScF/ei3BVzw8q1KQ96U3PyfgKia1Ruuoo7g37RjrKD8RhsNXMLYM0S4
-   FJoU5rdOTGLcxnKb9dY1t60CISoMZt8rlafGnvnKv8mdnU/GchDGoYfyU
-   TDSlsUUKdLQeJiOF9XjE0yAN6TtABfttYP4fD+FNk/sPJo2vXNNR54RkR
-   aiGB6/A412TSDfr38jSybEGdn9Ou7y0IY03CudN6efy+smgC4J7EEi2RG
-   XvBf+cyNLalI9cgy9GmsFAkMXbHpamjomhvhjV0b3AmaCeS5kT3UUGksq
-   7YqqymUanfXG6zZucSXVAqLeRBHyiAk5T0Iev2WT5mcFJJSoTtR9e5GFd
-   g==;
-X-CSE-ConnectionGUID: 9TRemX/tSlWl53iByr9Vhw==
-X-CSE-MsgGUID: 1/Mt6bV9R2K1OURd71dcHA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11372"; a="43173763"
-X-IronPort-AV: E=Sophos;i="6.14,244,1736841600"; 
-   d="scan'208";a="43173763"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 07:25:18 -0700
-X-CSE-ConnectionGUID: KmOb6IzoQve4rBYyMtpT7Q==
-X-CSE-MsgGUID: xwpBqq35QGqpHdkmv4DpIg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,244,1736841600"; 
-   d="scan'208";a="121470355"
-Received: from smile.fi.intel.com ([10.237.72.58])
-  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 07:25:16 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1tsjUn-00000002CZB-1ykw;
-	Thu, 13 Mar 2025 16:25:13 +0200
-Date: Thu, 13 Mar 2025 16:25:13 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: linux-spi@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH v1 1/1] spi: Use inclusive language
-Message-ID: <Z9LqyWr4GH4RX6Nj@smile.fi.intel.com>
-References: <20250313111442.322850-1-andriy.shevchenko@linux.intel.com>
- <1c49edb2-2ffc-419e-be5e-7e15669a7839@sirena.org.uk>
- <Z9LlTflb1HQMyEv2@smile.fi.intel.com>
- <e329812d-90a5-456e-9a00-abb5c2c8d25d@sirena.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=smpPYoDGlXlkcCgsPQNhYpM68N3QFnxmSWsT9VEMbyRPnORznFVk9gpqvRNV+2mzcN1UDU12KVXWZddBpFFH8+Oy/tLoNCV3844CgHlMC0Xr69IF55hxbBqLD86i37t7ypROfbUZJ6lUBBGeNzSB4O6rG3iYUZ0m4mV4MxCTbno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=VJhsOptS; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=uh+jy4czPz6D5F5Elw3j8kYQDRNK4LSsV2VFuC4YdMQ=; b=VJ
+	hsOptS0PYXZ655nIqmgJOe33NTS4TTEQUwONvErMaHPPaPHoTwiaHf2TpcpCnkCW/5XzYk128Nmx3
+	OzMTqALHg9UlJfJS9nxc1SEaO9tohqJ8RetNYKiFW1GOIoT0gUU4BYjARQQJ6DHkNjNuXVu5tonj4
+	22MTLEDSiGobJkM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tsjcK-00511Y-KB; Thu, 13 Mar 2025 15:33:00 +0100
+Date: Thu, 13 Mar 2025 15:33:00 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
+Cc: Vladimir Oltean <olteanv@gmail.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Vivien Didelot <vivien.didelot@gmail.com>,
+	Tobias Waldekranz <tobias@waldekranz.com>, netdev@vger.kernel.org,
+	Lev Olshvang <lev_o@rad.com>
+Subject: Re: [PATCH net 02/13] net: dsa: mv88e6xxx: fix VTU methods for 6320
+ family
+Message-ID: <2e88876c-0d08-464a-89e9-75e2fd597022@lunn.ch>
+References: <20250313134146.27087-1-kabel@kernel.org>
+ <20250313134146.27087-3-kabel@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <e329812d-90a5-456e-9a00-abb5c2c8d25d@sirena.org.uk>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250313134146.27087-3-kabel@kernel.org>
 
-On Thu, Mar 13, 2025 at 02:12:29PM +0000, Mark Brown wrote:
-> On Thu, Mar 13, 2025 at 04:01:49PM +0200, Andy Shevchenko wrote:
-> > On Thu, Mar 13, 2025 at 12:47:32PM +0000, Mark Brown wrote:
+On Thu, Mar 13, 2025 at 02:41:35PM +0100, Marek Behún wrote:
+> The VTU registers of the 6320 family use the 6352 semantics, not 6185.
+> Fix it.
 > 
-> > > This doesn't apply against current code, please check and resend.
+> Fixes: b8fee9571063 ("net: dsa: mv88e6xxx: add VLAN Get Next support")
+> Signed-off-by: Marek Behún <kabel@kernel.org>
+> ---
+> This bug goes way back to 2015 to commit b8fee9571063 ("net: dsa:
+> mv88e6xxx: add VLAN Get Next support") where mv88e6xxx_vtu_getnext() was
+> first implemented: the check for whether the switch has STU did not
+> contain the 6320 family.
 > 
-> > Hmm... It's based on the spi/for-next. Should I use another branch?
+> Therefore I put that commit into the Fixes tag.
 > 
-> I did try to apply it against that in case there were fixes that needed
-> merging up, it didn't apply.  Are you sure you're using an up to date
-> copy?  I have ebd50ac3cd97ecae231f92b2d64b68d3c66b3474.
+> But the driver was heavily refactored since then, and the actual commits
+> that this patch depends on are
+>   f1394b78a602 ("net: dsa: mv88e6xxx: add VTU GetNext operation")
+>   0ad5daf6ba80 ("net: dsa: mv88e6xxx: add VTU Load/Purge operation")
+> But I don't know how to declare it properly.
+> Using the "Cc: stable" method with these commits tagged would mean they
+> should be cherry-picked, but these commits in turn depend on other
+> changes in the driver.
 
-87a228960033 spi: Use inclusive language
-0d9a21198453 defconfig: enable SERIAL_MULTI_INSTANTIATE
-90485ebfb4b3 defconfig: enable SPI_TOPCLIFF_PCH
-6d91e1fce386 defconfig: enable EEPROM_AT24 and EEPROM_AT25
-331ffc354c53 defconfig: enable GPIO_PCH
-d519315d6bed Merge remote-tracking branch 'spi/for-next' into HEAD
-ebd50ac3cd97 (spi/for-next) Merge remote-tracking branch 'spi/for-6.15' into spi-next
+What happens when you try to cherry-pick this patch back to
+b8fee9571063. If it explodes with all sorts of conflicts, whoever is
+doing the backport will quickly give up and report the backport
+failed. You can then step in and provide a backported version for a
+particular stable kernel.
 
-Yes, the base where it was merged to is eds-acpi branch of my public GH [1],
-which has no SPI stuff in there.
+Or you can extend the Cc: stable:
 
-[1]: https://github.com/andy-shev/linux/commits/eds-acpi/
+Cc: <stable@vger.kernel.org> # 3.3.x
 
--- 
-With Best Regards,
-Andy Shevchenko
+Anybody backporting the patch should not go further back than 3.3.x,
+but the Fixes tag indicates older versions are broken, which is useful
+knowledge to hit people over the head with when they refuse to update
+to the latest LTS.
 
-
+	Andrew
 
