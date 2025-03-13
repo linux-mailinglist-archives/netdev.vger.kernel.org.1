@@ -1,163 +1,137 @@
-Return-Path: <netdev+bounces-174688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8937AA5FEAD
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 18:56:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F917A5FEBA
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 19:01:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 66EB719C449F
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 17:56:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 999933ABFCB
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 18:01:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D0CC1E51EE;
-	Thu, 13 Mar 2025 17:56:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A7A3185E7F;
+	Thu, 13 Mar 2025 18:01:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="eI9yPqdT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EwI3hJMZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7668F15DBC1;
-	Thu, 13 Mar 2025 17:56:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D65B63E47B;
+	Thu, 13 Mar 2025 18:01:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741888582; cv=none; b=QSlkbepSohYXPLVWUf8td/i8cf7n8v/NO8ib83v/BhQTva/goIZ+qlzpospAPbzCBEO/7LIQXEAk8O6R95byeNbnvNsXqY/+5rj3UrWI5ijpHheNqQJEd1rKurm3qRlWTbP7rVe9y/vanBz/wR04vA5CWLZESdHiV+gVngzZCsg=
+	t=1741888906; cv=none; b=BwrtvY7YHcYX3NVKOTmGMznnLjTGtgqGQQnZtbMLUHn7R9PyIPmT67mox1SOSNa3K7EM/LGqbkrOODpVbtkGInWSfDIWPRwFdXTbhYEh0tKrJiA9YQGysFb3wa2Afi4Uel0Hup9HWoOcjuYe8xgpO5DLdLeFN4QlTkMdGg2O67A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741888582; c=relaxed/simple;
-	bh=eKGeJ/7PkvBa4gfMByuavEkwT81cYgPP5CC5AR6prxc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Su9ynNtZm75rqRSiA+3IVkn7JFwFy0XpIuNxlCCHcHBTQmS3COxJ/I+ugDs6TS3bZQE64IpRcm0kkNdz2OVPhbpyKkQbbIEZ+c/6tVLBkMNARLHHon0/hMVTXitUHtbHlGLzw1HeW7pUDaFIQ2uSA4gmDGwKDgEYiOqaMzDKo90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=eI9yPqdT; arc=none smtp.client-ip=52.95.48.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1741888906; c=relaxed/simple;
+	bh=6jV0radH4S2lzjjNkKAxQaEnlVGn3SNEWffq1tdiwe8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TgONvomoTo1Qv3Zew5q+fV3ybBHjANS+fIFCASAUrkuDHYjOM1TWcDzncGip3niJsYvf1fFiWfiIRpKPwOR78DynPP9v/A1qLWAJ3HqU2UFZsXMCzljLfWUaOxLZD4t4oVi96nBmHnWqvyn58Mf3Nx6p2lXC06nJR9eH/Y45zZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EwI3hJMZ; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5dccaaca646so2316336a12.0;
+        Thu, 13 Mar 2025 11:01:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1741888581; x=1773424581;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=H7PC9O0Oe+JtOuUKRMpYKPaCohfXryNIVIN9579z+1U=;
-  b=eI9yPqdTOaw45c7llHzzvA3vd5shN2nhlZqmr+eMLTA0gpOGB7lHzMVR
-   VkRN7sJmAxgTWd/VnaUbasJ19rxI0xJ2+uTLRebhB+5UWeDl76plg2aT+
-   NYEAJ/OFHDf4UPEcGEjlj74R8HqHsgQRMDcCgdCyh8KyJzdsAKbQ3NVJu
-   o=;
-X-IronPort-AV: E=Sophos;i="6.14,245,1736812800"; 
-   d="scan'208";a="470861813"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 17:56:17 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:45090]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.5.243:2525] with esmtp (Farcaster)
- id 4e61084a-f171-486c-b205-4f509d0bffc1; Thu, 13 Mar 2025 17:56:16 +0000 (UTC)
-X-Farcaster-Flow-ID: 4e61084a-f171-486c-b205-4f509d0bffc1
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 13 Mar 2025 17:56:15 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.142.242.222) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 13 Mar 2025 17:56:12 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <sdf@fomichev.me>
-CC: <andrew+netdev@lunn.ch>, <atenart@kernel.org>, <davem@davemloft.net>,
-	<edumazet@google.com>, <enjuk@amazon.com>, <horms@kernel.org>,
-	<jasowang@redhat.com>, <jdamato@fastly.com>, <kory.maincent@bootlin.com>,
-	<kuba@kernel.org>, <kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<willemdebruijn.kernel@gmail.com>
-Subject: Re: [PATCH net-next v2 2/2] net: reorder dev_addr_sem lock
-Date: Thu, 13 Mar 2025 10:56:00 -0700
-Message-ID: <20250313175603.17045-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250312190513.1252045-3-sdf@fomichev.me>
-References: <20250312190513.1252045-3-sdf@fomichev.me>
+        d=gmail.com; s=20230601; t=1741888903; x=1742493703; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=W/aqvoIKuR6wHeO9Dw3liQGVZV24Y7M6R/uaPC7XW8g=;
+        b=EwI3hJMZfiWy0F3PRXMymRU4/wA0hwI92ctwSimkBEOUi6S5/zltisCWfaGOAz8h2r
+         YSYHBDh2XyXQVU/K6y6JQ3vbHgF60udb8F/rldTjQJpGkW/zybn1VyrtwuR4ZORJd6/J
+         jHA+WZRZ47jNFf4N+X5lslnkCNesVNNpb6lWCq/Gg3R9nhjM9DjB6BHPeKHjwxQJHAVQ
+         6RcKb409zS+inC3oKthmfsAFgvrffGRY9RH9CgxqJ77Eui7Ew0f7I7ruk8qZhruuEaC0
+         BUoqhL57+pO8MCiPidob7LAQKPYyHREA2OzpGtm3kh91eYi3urVg8Lob+lsCHRgaCjWd
+         ucqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741888903; x=1742493703;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=W/aqvoIKuR6wHeO9Dw3liQGVZV24Y7M6R/uaPC7XW8g=;
+        b=p1D4Qx97QgQb34YlrBoX2B5+NO69oAe/ZYKS6qg9uRzR2fGJaXRJHryKS75TvkgSL5
+         Es6ZlYyp+ZC+m8Ti9L1awjZKuAbxfi0ecJTS6wf4oKERMaxYv+KQWV1S6nde5yo4zI+r
+         zoPxBI3ufWnkXEr3yO/CoTXsB6gWth5+lhm0LJ+IoWAfaFRp8enAOdbUXvaGYqFtvBzy
+         MC/h2KoqdgdUD8/4XbRC3db+4sYWcL03F8XikOJe1QQz6Z8i4Ip8Q1LCpeVCx+TtnUcB
+         a99VeXnRqSVOUV90L5gbDOQWl/l30F6JRrD8cVm8W3jRg8wYnMbwjYpnwcKYy4N/gvvS
+         dw3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUUTikTIKxwD6ddPg+Z4KOHTBaJCR6btXAYtoCVhAh0umMYYAkkzooMMzWUJS+/UGSIAdbyPR6oPPJVyuxnKUo=@vger.kernel.org, AJvYcCUbKo4ncz0oYwJ/vUj48B+QfdTxWBeGn2dZX5M/YgovYzKPYUrIO4pZuBa0hIfRaK9qHzwf68ZfqZS+S2vQ@vger.kernel.org, AJvYcCVOS4C+QKiJ6q69MoyG5BHF1u4pKRGFlvmwGSZ9bM05aIc6G6mK/vP/21mk8kxEPxadR+eHfXPn/e4sMEJOuS+i@vger.kernel.org, AJvYcCXq8PJ9axCecW30opIXfw2Xdgx+i6alcllm9/EBJb7A7RALNHLVFjaejYbuXCPqrcNEmLJ/atgM@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRICr+Yk0wFhy4uu5VMLKlgCT0Sk5H8c8GqhAMRWjnnc2GIhCJ
+	/PS9w3PYmJ6LLI/ZFZ3i+9Y35LlD0H6lsblXQWlgVikKJbDRN9l7
+X-Gm-Gg: ASbGncsWsto95ZKRIh9H/fmxD+gqP+BXAsJcNlyLzQ/b+tOTv62AP0hVskrsS0cDqNV
+	WlBH4tXul3pSPqszIM72Ydb8004wdC3ufBAIzGucH1g4w/vtJde1cxPM7epN3TC455bXtdT2plZ
+	ZLDbpoYkH7xNYr6ruSiPDXcn0cM5yiXfVsL6bZENeMtCUHm2lTmMaR2uWXHFqwSD9WXhoaimI44
+	J15WAMRL8uECv8vOC9Ahhkil9lmlYpTtOBAVSmb0pVzetjz3NvKZNYyDgLAzmoc967x7vRYNidR
+	NJb/AKv5rwux1CTsAwep1pWRp9plMw3KYvraooNoXFgYvePNZSpWbOxPlbGS7S6eeyS8Jnoqmrk
+	TBfU6FVIhOtiFnDAHYX4whoDg+3YxAEAr8FfUbKa2T3sIpkjo6Y3icq0g4O5wVketb/x6RyZpEQ
+	sTP1AKSKyqV4LC2w+E88k=
+X-Google-Smtp-Source: AGHT+IFuZtAhl/EeTwlESgZEmFiH1TMtmKl7RGfRolizt1DBUCNDPnPwoWBarCBAea1UlBVhaKlHyA==
+X-Received: by 2002:a05:6402:2550:b0:5e5:9c04:777 with SMTP id 4fb4d7f45d1cf-5e814d805b7mr3320106a12.6.1741888902566;
+        Thu, 13 Mar 2025 11:01:42 -0700 (PDT)
+Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e81692e6d4sm945413a12.9.2025.03.13.11.01.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Mar 2025 11:01:41 -0700 (PDT)
+Message-ID: <02b97708-1214-4fa4-a011-70388cff8f79@gmail.com>
+Date: Thu, 13 Mar 2025 19:01:38 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D040UWA004.ant.amazon.com (10.13.139.93) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 nf 00/15] bridge-fastpath and related improvements
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ Nikolay Aleksandrov <razor@blackwall.org>, Roopa Prabhu <roopa@nvidia.com>,
+ Ivan Vecera <ivecera@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Simon Horman <horms@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, bridge@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ linux-hardening@vger.kernel.org, Kees Cook <kees@kernel.org>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Ahmed Zaki <ahmed.zaki@intel.com>, Vladimir Oltean <olteanv@gmail.com>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Daniel Golle <daniel@makrotopia.org>
+References: <20250305102949.16370-1-ericwouds@gmail.com>
+ <897ade0e-a4d0-47d0-8bf7-e5888ef45a61@gmail.com> <Z9DKxOnxr1fSv0On@calendula>
+ <58cbe875-80e7-4a44-950b-b836b97f3259@gmail.com> <Z9IUrL0IHTKQMUvC@calendula>
+From: Eric Woudstra <ericwouds@gmail.com>
+Content-Language: en-US
+In-Reply-To: <Z9IUrL0IHTKQMUvC@calendula>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Stanislav Fomichev <sdf@fomichev.me>
-Date: Wed, 12 Mar 2025 12:05:13 -0700
-> Lockdep complains about circular lock in 1 -> 2 -> 3 (see below).
-> 
-> Change the lock ordering to be:
-> - rtnl_lock
-> - dev_addr_sem
-> - netdev_ops (only for lower devices!)
-> - team_lock (or other per-upper device lock)
-> 
-> 1. rtnl_lock -> netdev_ops -> dev_addr_sem
-> 
-> rtnl_setlink
->   rtnl_lock
->     do_setlink IFLA_ADDRESS on lower
->       netdev_ops
->         dev_addr_sem
-> 
-> 2. rtnl_lock -> team_lock -> netdev_ops
-> 
-> rtnl_newlink
->   rtnl_lock
->     do_setlink IFLA_MASTER on lower
->       do_set_master
->         team_add_slave
->           team_lock
->             team_port_add
-> 	      dev_set_mtu
-> 	        netdev_ops
-> 
-> 3. rtnl_lock -> dev_addr_sem -> team_lock
-> 
-> rtnl_newlink
->   rtnl_lock
->     do_setlink IFLA_ADDRESS on upper
->       dev_addr_sem
->         netif_set_mac_address
->           team_set_mac_address
->             team_lock
-> 
-> 4. rtnl_lock -> netdev_ops -> dev_addr_sem
-> 
-> rtnl_lock
->   dev_ifsioc
->     dev_set_mac_address_user
-> 
-> __tun_chr_ioctl
->   rtnl_lock
->     dev_set_mac_address_user
-> 
-> tap_ioctl
->   rtnl_lock
->     dev_set_mac_address_user
-> 
-> dev_set_mac_address_user
->   netdev_lock_ops
->     netif_set_mac_address_user
->       dev_addr_sem
-> 
-> v2:
-> - move lock reorder to happen after kmalloc (Kuniyuki)
 
-My intention was move kmalloc() and memcpy() out of both
-netdev_lock and dev_addr_sem like
 
-  netdev_ops_unlock()
-  kmalloc()
-  memcpy()
-  down_write()
+On 3/13/25 12:11 AM, Pablo Neira Ayuso wrote:
 
-, but not a big deal :)
-
+>> What do you suggest?
 > 
-> Cc: Kohei Enju <enjuk@amazon.com>
-> Fixes: df43d8bf1031 ("net: replace dev_addr_sem with netdev instance lock")
-> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> Probably I can collect 4/15 and 5/15 from this series to be included
+> in the next pull request, let me take a look. But it would be good to
+> have tests for these two patches.
+> 
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+These are not most important to bridge-fastpath, but it gives extra
+possibilities. How about concentrating first on patch 2/15 (with 1/15
+removing a warning and 3/15 cleaning up), adding nf_flow_encap_push()
+for xmit direct? It is a vital patch for the bridge-fastpath.
+
+Anyway, I will look into writing selftests for conntrack-bridge setup,
+including various vlan setups. This will take me some time, which I
+do not have in abundance, so for that I do not know if I get it done
+before the merge window.
+
 
