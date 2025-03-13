@@ -1,131 +1,222 @@
-Return-Path: <netdev+bounces-174736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDC7DA6016C
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 20:40:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BEFDA60173
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 20:42:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1048188D065
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 19:40:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D85A3BE540
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 19:42:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F06C1F1305;
-	Thu, 13 Mar 2025 19:40:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DE371F30BB;
+	Thu, 13 Mar 2025 19:42:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vckNOv8+"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="SiGp1dL2"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2049.outbound.protection.outlook.com [40.107.94.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFCF417E;
-	Thu, 13 Mar 2025 19:40:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741894816; cv=none; b=gPB6acOhtiWee2R6Ny8pmFa/vkFwK1VEldAHnN2LT5cAsVsV0XrgpyimSfOhK1nDaoIJ68ckXyjSzomA+nAnrlxUBqsgH58/MvauRxCP+gsXqtZ71Pext76w6yNulAOkRdz+XwKufZ/WDwA+w8l19Jc2pb3aXXwdzqVgEGcFMhg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741894816; c=relaxed/simple;
-	bh=MxnMpBHlU5qSu1Hw5ANyvJ4rrYrWYTVkrc5mFvbVK6A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AQS7f/1mzbnKR39+1ptsJu5VzUfOp8MdSEzMFZWCjJqGV1F9cIlshrm/kDAmn2SrHJL4poKaoUUshSkI4J71wSQ3iRmz/XHuludMc5dHBdpJsMrnjk0Wcbe1lxPlqQIiTTXWNCvhnQJNhTHtlMsZd0UaXVwV2CvquIn5bsAX4vs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vckNOv8+; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=9naFZnNjfAr4VFxA6DXzomBgdIv+Y9yUqhztcRXhoo4=; b=vckNOv8+pcWjuTykQnmDcnPQZS
-	mzzt1MGc6Q6W8aKmz9/rdPsKq/DBGGBbXIVYG0Nm0Cu47iVGjsSx555zxXW2jtJeIEjMMx0SsYS0t
-	yDQnoH89NmjldiJPse3NtUw4EsntwDXICAX2cgUdckkAJ9b4ZampTrTK0rFZfuq4UmgM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tsoPM-0055Vu-Ck; Thu, 13 Mar 2025 20:39:56 +0100
-Date: Thu, 13 Mar 2025 20:39:56 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Michael Klein <michael@fossekall.de>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] net: phy: realtek: Add support for PHY LEDs on
- RTL8211E
-Message-ID: <e3a36d27-5f7b-4c86-a6b9-2b37d3d16ee8@lunn.ch>
-References: <20250312193629.85417-1-michael@fossekall.de>
- <e62af3a7-c228-4523-a1fb-330f4f96f28c@lunn.ch>
- <Z9Mp86eWYw3hgt0x@a98shuttle.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAA6B1F2BAD;
+	Thu, 13 Mar 2025 19:42:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741894936; cv=fail; b=hJrUxuSwlCX8FpMpEUVU2tbi3SRlUOnInD3oFH4SzdwhPBT0oq04EkzlwnCIq0TyG0iOVoBoHx23BQQtL5TZfeuKnoqWYL3Ow9WB+eCO7VXxHB36nx5gMenCDJdCNUnb5mDPeR06rmmDFSXzWVpbNusunoLINeoo2zGDwjNHrYo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741894936; c=relaxed/simple;
+	bh=8YXwIblioDcyz0pQoNmaJ9lZk0qZNkNZD2A+zj3qgRY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=U9sc0eIRT8id+z4/Bg0B6TRi9OvQyh5hgjJyipziQzBBf+G7T3q+GIO1q4l0ZjrabnC0g72llQv19tHOF4tzPG4JpsT/QwJiCk49ay/Ce/ELFxkQd1GCSptVros5L6+EQvjxiX3EYxYoVtcGUK1xZpGxqjVGap+v/ehGlBxEZS0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=SiGp1dL2; arc=fail smtp.client-ip=40.107.94.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hUJsdG7R/nbzt8MTjMByQr3P4Dpb9xJ3YaU8cr0OPOCAT21r1iEufYtr6CuAE2friXoSOLE02GLY/5cIPmmaTP/Lg55G2o1Mu2bMlDgrw49T8SiiUK7glpj2pUX+rXdeIST356kx2l+aq+C6+mWDk2OxI3HDKXkkf0evxJuLGGc5dX/MwqTfaywpIHHSUDpUbggLcyPQa3TEl+8Z45Cyvkz7Tm3yjusdNfJ+tD4p93mW5FEfYvCVQvSd5IJORXtzsQZVg5ZWHkJl6At6864BUNyLqoEMphETVggPiBttSRnnVQax8QRBha+51EDF2BGMVR1qMCNgElVV60AMMxtaKw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4tuN1UCCe6yex95yZh8aJW5ZLDJ6olgu1n3aHES3Vnk=;
+ b=RfKNhthOiz1PxFakYR3YNfSAqmiG+O263FMa4mBLNRwP/tOYpw183beq1AkOo3gTN+02C8QkfMIAeiRBWFSYJHbRm/+hafPeYV96X9MbdqQrTRN5oMu4vLu7IAKV4dNQ0fbsPBXyNtn51+pUN6i+2W9WHOONcPwvCGzk4qCeBziWccYJlVgNd+Tup9Mtdk8J/Ppni1WzsAt2/vm1jGJW9J12UxOPFPwrKHwsm7w9hIdLIAAUK/1BHZXYMV2BuRhgNqGAK3A8iwKW7LVHm0KUimYZlURc5J11RSWRIiF1C4luocpW1y1w8qKFctsp+YDDXI91zQvcmor11iHcOQFf3w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4tuN1UCCe6yex95yZh8aJW5ZLDJ6olgu1n3aHES3Vnk=;
+ b=SiGp1dL2glepxhuTN+v4I4wjrf/0IIOQPhh01zwytcKHm7+iaAHMzWW88cTEXxHVhU+ogCNW7bF237xLd3VIfIn6LrCtvHCNr4ySdR3cvv4drCrnZD+H0GBvmoedKWoH0frQUuHpl6uWasEDcQPd3zNQtEpb94DE7RtW0F2GnLTOiChuqaQnrLPvsdlZq/x+Oe4f5pzXBU6PWtC/MDh7YDcRwK92Mr/UAHfql7DryhUy6Ssw6z+uFUqitTeb9RlfMyhqYfDZ2MCfI8+Ee00bPOsY3Vr6WYXhBE/OjAIu1mPJTvCrJGBPnSZhhQMW/FDMhf1HlMI9m8EHPxVBXphWgg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by MN6PR12MB8516.namprd12.prod.outlook.com (2603:10b6:208:46f::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.27; Thu, 13 Mar
+ 2025 19:42:08 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::66fc:f8a2:1bfb:6de8]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::66fc:f8a2:1bfb:6de8%7]) with mapi id 15.20.8534.027; Thu, 13 Mar 2025
+ 19:42:06 +0000
+Date: Thu, 13 Mar 2025 21:41:55 +0200
+From: Ido Schimmel <idosch@nvidia.com>
+To: WangYuli <wangyuli@uniontech.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, andrew+netdev@lunn.ch,
+	chenlinxuan@uniontech.com, czj2441@163.com, davem@davemloft.net,
+	edumazet@google.com, guanwentao@uniontech.com, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	niecheng1@uniontech.com, petrm@nvidia.com, zhanjun@uniontech.com
+Subject: Re: [PATCH net 1/2] mlxsw: spectrum_acl_bloom_filter: Expand
+ chunk_key_offsets[chunk_index]
+Message-ID: <Z9M1A8lOuXE4UkyR@shredder>
+References: <484364B641C901CD+20250311141025.1624528-1-wangyuli@uniontech.com>
+ <78951564F9FEA017+20250311141701.1626533-1-wangyuli@uniontech.com>
+ <Z9GKE-mP3qbmK9cL@shredder>
+ <70a2fa44-c0cf-4dd4-8c17-8cc7abf1fbce@redhat.com>
+ <Z9L43xpibqHZ07vW@shredder>
+ <8563032ED2B6B840+7af17f62-992a-4275-80c7-ac7ef5276ae7@uniontech.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8563032ED2B6B840+7af17f62-992a-4275-80c7-ac7ef5276ae7@uniontech.com>
+X-ClientProxiedBy: LO4P265CA0182.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:311::12) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z9Mp86eWYw3hgt0x@a98shuttle.de>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|MN6PR12MB8516:EE_
+X-MS-Office365-Filtering-Correlation-Id: 766c3df7-227d-48a8-b5d6-08dd62672311
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?M7tgLZSQ/+Fv4bJzyZgSujkg6w3dV+HyWHkDfR+uEa6XgQeYeZKGcTKMSExT?=
+ =?us-ascii?Q?kJXCBgCZBlikevwA34shui6CyiZBFKAeEtZlVG+bEP5YENYs2gFcsX/JP7q3?=
+ =?us-ascii?Q?L4uqwGo8nQLTKI12pb+Lo0ONLJWC53uhZzq2hDpExb/HRRzkzfO48fDdidn+?=
+ =?us-ascii?Q?iesByco2izeNuQS5rBjNXLjtSUAkZQl7EY3pL9r4L3rO/DSek8FZb5J1OvtL?=
+ =?us-ascii?Q?vR0KAV+T2/3Z545nKHMaHG3jFkBwmK+saZpLo27ZoXjH4X7FIlWPNG0YPjo0?=
+ =?us-ascii?Q?gCIlkjnfVLgSLpVwanalmFFhJy18KYaQfScIm/4fGrHe+11dF4DbCJYLr8KB?=
+ =?us-ascii?Q?Nzqi5OvBhs0fGLUqKnorfj30kYgiYhF1ZmTeQax/xL91PJfEvEdmmI41kl4l?=
+ =?us-ascii?Q?bxIRr7+1O7INnHxzN1HRbNuG4CR+LhodaCMsKNEL9SVqHrfWyPTXiquGfqY3?=
+ =?us-ascii?Q?pz3btm6sUi/HLcU8Dx2/zpobw6SeSB7pk308Mb9n2rql4qePFLwFuoqNgznI?=
+ =?us-ascii?Q?Z0TON7l/l7CAyK+L5HThsiEU3MaKYq885NY2H+j/0hf+s4g7YfLUhJxcqQ53?=
+ =?us-ascii?Q?u1Aei0i0RSlxYInIFG6rx1300CAOPtAoPUWYnDagItKCdLiKaXW+dwuKhPWU?=
+ =?us-ascii?Q?uWdAC+bZEbII+YBO4KHsWYAwO8udtMt4fBns3clNfQL5Z5zY59nFG99b+Ee9?=
+ =?us-ascii?Q?s991LnwMXSSNOXyVsT9cVdZO5/m05YB5TnwA9KoeiKktpQ4GVoli4zLxPGou?=
+ =?us-ascii?Q?SRR5Zs0sq6+7FqQId8yZ/bpw5drFx6vseUHZx0EvHQQkEhkrlYGpkL2XUSWK?=
+ =?us-ascii?Q?I+xd2E+qOL2VqxCFCSt2pqi+9ohsjdqhKNeH8oaruLDfRo8RjR6uKxQnF9s7?=
+ =?us-ascii?Q?aJLwMlU0AUOtYsbZuD0AgwF+eHxIVbGrIGgVNBKJlj3aK4BH6KGiAf4qvK8o?=
+ =?us-ascii?Q?gaxNeb4/UifYavnFaAHUwhKCwrEiiceWGxK/wLZa1uFqlsn8O7IBVDvfPzaU?=
+ =?us-ascii?Q?oh74HjWJLCgVKgLUKHgH96OSo+2atLlIbk8V6JY1wzx/19Qqivp12XKswXBr?=
+ =?us-ascii?Q?Fz3lZl0ODv6YgGyk64wPtl/k3kjWKpOkq2xyZPIzs1wq9XHkv8dTQcD51ZA/?=
+ =?us-ascii?Q?uOLPVZvTNVxdHIN8ctX0RMTx6KNO2RUeYfxaLXOhwRmsfsif9Hj4c4ABdW1r?=
+ =?us-ascii?Q?Eu5GTFfHQpNQ305Ex7Kku9Gn+c7gpKZ7yO/vKWF7JqenWHAniS6hw5C1iQg5?=
+ =?us-ascii?Q?DHu4ywSy9mboU0SIK6SQegvwnJ7DJ+L6HN5bbENFL/3NRAXU4umMZnoh8CF5?=
+ =?us-ascii?Q?Xdbid7rWvRTFITZdyayJlXe22anxtRGgKFKXFZiJjjIkOoPSmmMiBGaE6MwR?=
+ =?us-ascii?Q?O6aj/OAnwkdDoHNNKOXcQK8EsrDs?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?ZTDQTMHktyK7f4Ui57/AW6J1IV19KiXr1upKGIA0hDiZxwageyXTkYfLDDPK?=
+ =?us-ascii?Q?z0wl9W2y9V4+oT837d4wAi4g3Uax1y2xInSFnXTqTIQDav+dtEnrYM0NwjLB?=
+ =?us-ascii?Q?QydJ9ZN3S4foWl1HZgYExK7HWDwwIYQHSoi0/rzxD1YuGEz+2oIzXf/Yswiw?=
+ =?us-ascii?Q?ttjCApX6ogzZk+HQFWATt6uDZrGW5geffUCa68Xn/LZpdXglW7jmnP+Lg4GH?=
+ =?us-ascii?Q?Wol2KE5UCHxO3WuOLYT36V3Ka3M5DTdmZwuVR2fejpL3Pcb0KFBC0auXMCOb?=
+ =?us-ascii?Q?ak3eKMcaa9pCxSbrshyYndDCj5eI7sF7kLB29vBk7Ztvmc57U3vSxR2IiJPr?=
+ =?us-ascii?Q?sJaId+um7Aq7fUTyKQljQ/MiQY8LPyHGSbqqIJ3BDjPrQUDRfwbRUm8j3Y1f?=
+ =?us-ascii?Q?oJCK/sIb8cWvNOyaeaZccb3PaEqXV8M2Am486F0aYckJzpkxB8TpKDac9QAa?=
+ =?us-ascii?Q?6eE+eRDWbOXRWh4Fcsge/XX76EPrmYDU5cdyaQOLXvZ5pKRfswNuHRIQsvfp?=
+ =?us-ascii?Q?+kgWhv5bz1lRiu+1vjqRlGPG958XUrCHDt8BiXxqpyJF0Dt7ITM9loTwZ4F/?=
+ =?us-ascii?Q?UzkdfsdCDgYlvWITrUQMPpSiyP9oz/ZL8FHaJJDqb4SaOzLb9RHilWqiueaz?=
+ =?us-ascii?Q?gpkaESVIBdG8UgvLmg8Y/dtIEmZZplIQ8WCJLqnS1dox6goqetmhIdx+EWrM?=
+ =?us-ascii?Q?mQreCGS5j1013Pl7zX9L9/W/CzI1yyfaeaSFIUDB6w8qwGMfmCHNvIRz8s18?=
+ =?us-ascii?Q?Y1Si1kEBsovhnX28PNNHO54TWabWWiEW2eAuKM0hk+ipeBicSt9TZAzHZHA+?=
+ =?us-ascii?Q?4bvTLKNOwtx2BcoptD+K6ACdCTAGJ+BvLA+iIA6GBSBqzbACjp4ww2Yd3r7V?=
+ =?us-ascii?Q?fiA3AU8c1XTWPJYl+AIb1vcg8T8eyQ2aulnR3gOeRllI4jJiViuX1vBF6DJd?=
+ =?us-ascii?Q?eD6EY42GsMgxPdnR5Yz4rqma0AaOdYU6b8zFDj+kOKOadyY5uBKtGzOQLXTz?=
+ =?us-ascii?Q?kxJF9oiR2kYeGMwW1KmvKwlB6tjQdFmvopvyGZ/zpIX8aDNYm+BA/JetyFH+?=
+ =?us-ascii?Q?zgFBViDlBZbj/MV6K7K5hM6pD/yuN0uEBSpvpG2/LZkWo4DzuB5kKx7ly91s?=
+ =?us-ascii?Q?fdBXWAXTDHM/XySPuGegLpxbeegYThfL14LZuNCT0D70QlHxEdhWX950UIRs?=
+ =?us-ascii?Q?atW1oS5zNzwQDGqvGg6Gi1lmr4mNro7x+y+nP6lxft2/rUtxF41tGJa4Fhpq?=
+ =?us-ascii?Q?bsLnkgr16JgRdbRbRak6XUSJ0LPVcnvZ+6BlAoFQO57G5cEdf6PM0b0ywfil?=
+ =?us-ascii?Q?u/BuHBK/4MTKPuSD9EQDjv2d8A7AuuttcWrxSf8LsrwTE9JE4sv5nziICqc2?=
+ =?us-ascii?Q?INv2Pn2T6aQRGsehAIHTfHefYHuEdtgYNEJcRgkXHO4ieTNPq9HpKBkTivRg?=
+ =?us-ascii?Q?WA1XYT3dwTOWZ4qevqJQ3VJSNe/gtjplfqF2utB2AVMJ583yL8ItmivZuJvn?=
+ =?us-ascii?Q?SUJXhS3OL9rKv1hD62LOI50kFqT5uhdRkdXU1OU37eiCA+I3185mqNYSpW3M?=
+ =?us-ascii?Q?vBaK/mDalOC7GwAW/It2B8WSTHb4Kw7pSQSL4UPE?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 766c3df7-227d-48a8-b5d6-08dd62672311
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2025 19:42:06.8109
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TZ+b0LYJlEHM4sGsvubt5Rbl3++ePv1fit3Nw7rGUecwTBXoS/AYL8acaSdkPRNynmf0qyLT+dsjMm75bMNzww==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR12MB8516
 
-> > > +static int rtl8211e_led_hw_control_get(struct phy_device *phydev, u8 index,
-> > > +				       unsigned long *rules)
-> > > +{
-> > > +	int oldpage, ret;
-> > > +	u16 cr1, cr2;
-> > > +
-> > > +	if (index >= RTL8211x_LED_COUNT)
-> > > +		return -EINVAL;
-> > > +
-> > > +	oldpage = phy_select_page(phydev, 0x7);
-> > > +	if (oldpage < 0)
-> > > +		goto err_restore_page;
-> > > +
-> > > +	ret = __phy_write(phydev, RTL821x_EXT_PAGE_SELECT, 0x2c);
-> > > +	if (ret)
-> > > +		goto err_restore_page;
-> > 
-> > What is happening here? You select page 0x7, and then use
-> > RTL821x_EXT_PAGE_SELECT to select 0x2c? Does this hardware have pages
-> > within pages?
-> 
-> Kind of; this is from the datasheet:
-> 
-> 	6.9.5.  Access to Extension Page (ExtPage)
-> 	
-> 	Set MDIO commands as shown below to switch to the Extension Page (ExtPage) 0xXY (in Hex).
-> 	1. Set Register 31 Data=0x0007 (set to Extension Page)
-> 	2. Set Register 30 Data=0x00XY (Extension Page XY)
-> 	3. Set the target Register Data
-> 	4. Set Register 31 Data=0x0000 (switch to Page 0)
-> 
-> Register 30 is RTL821x_EXT_PAGE_SELECT, LED config registers are on
-> extension page 0x2c
+Please use plain text emails.
 
-O.K. So it would be good to turn this into a patch series doing some
-cleanup and then add LED support at the end.
+On Fri, Mar 14, 2025 at 12:10:42AM +0800, WangYuli wrote:
+> My tests still show the same compilation failing.
 
-Please add a #define for 0x07 page number. It is used in a few places,
-and it would be good to replace the magic number with some sort of
-name taken from the datasheet. Add other #defines as you need them, if
-the datasheet gives them a name.
+It passed with clang 18 on Fedora 40, but now I tested with clang 19 on
+Fedora 41 and it's indeed failing.
 
-Add a helper something like:
+How about [1]? It's similar to yours and passes with both clang
+versions.
 
-rtl8211e_modify_ext_page(struct phy_device *phydev, u16 ext_page, u32 regnum,
-                         u16 mask, u16 set)
+Thanks
 
-and use it in rtl8211e_config_init()
-
-Add helpers
-
-rtl8211e_read_ext_page(struct phy_device *phydev, u16 ext_page, u32 regnum)
-rtl8211e_write_ext_page(struct phy_device *phydev, u16 ext_page, u32 regnum, u16 val)
-
-and then add LED support using these helpers. That should help
-separate the LED code itself from this odd page in page code.
-
-    Andrew
-
----
-pw-bot: cr
+[1]
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_bloom_filter.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_bloom_filter.c
+index a54eedb69a3f..9c54dba5ad12 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_bloom_filter.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_bloom_filter.c
+@@ -212,7 +212,22 @@ static const u8 mlxsw_sp4_acl_bf_crc6_tab[256] = {
+  * This array defines key offsets for easy access when copying key blocks from
+  * entry key to Bloom filter chunk.
+  */
+-static const u8 chunk_key_offsets[MLXSW_BLOOM_KEY_CHUNKS] = {2, 20, 38};
++static char *
++mlxsw_sp_acl_bf_enc_key_get(struct mlxsw_sp_acl_atcam_entry *aentry,
++                           u8 chunk_index)
++{
++       switch (chunk_index) {
++       case 0:
++               return &aentry->ht_key.enc_key[2];
++       case 1:
++               return &aentry->ht_key.enc_key[20];
++       case 2:
++               return &aentry->ht_key.enc_key[38];
++       default:
++               WARN_ON_ONCE(1);
++               return &aentry->ht_key.enc_key[0];
++       }
++}
+ 
+ static u16 mlxsw_sp2_acl_bf_crc16_byte(u16 crc, u8 c)
+ {
+@@ -245,12 +260,13 @@ __mlxsw_sp_acl_bf_key_encode(struct mlxsw_sp_acl_atcam_region *aregion,
+                                   (aregion->region->id << 4));
+        for (chunk_index = max_chunks - chunk_count; chunk_index < max_chunks;
+             chunk_index++) {
++               char *enc_key;
++
+                memset(chunk, 0, pad_bytes);
+                memcpy(chunk + pad_bytes, &erp_region_id,
+                       sizeof(erp_region_id));
+-               memcpy(chunk + key_offset,
+-                      &aentry->ht_key.enc_key[chunk_key_offsets[chunk_index]],
+-                      chunk_key_len);
++               enc_key = mlxsw_sp_acl_bf_enc_key_get(aentry, chunk_index);
++               memcpy(chunk + key_offset, enc_key, chunk_key_len);
+                chunk += chunk_len;
+        }
+        *len = chunk_count * chunk_len;
 
