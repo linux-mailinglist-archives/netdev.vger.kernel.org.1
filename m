@@ -1,191 +1,160 @@
-Return-Path: <netdev+bounces-174431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BAD9A5E92E
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 02:04:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EC1AA5E933
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 02:08:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A73A11775FA
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 01:04:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B54C3175BD8
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 01:08:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5B6213AF2;
-	Thu, 13 Mar 2025 01:04:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77D0415E97;
+	Thu, 13 Mar 2025 01:08:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="BpBQVdQV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CEkj/tol"
 X-Original-To: netdev@vger.kernel.org
-Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D12DD2B9AA
-	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 01:04:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0756610C;
+	Thu, 13 Mar 2025 01:08:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741827889; cv=none; b=VMxRAXxXWOuVrUbYDcpk8gbtLEnAkgIEOs5m7+b28Q11iyHe10H1oHSQ+MXBtc+rcd74h6+omcD5q9CHKeXRRd3e93ocdGUp6vVb/+HavXNnDoYvQAt3JdVH1lrhrKTrn3B7D4/oqsVk8Rtp3bPA9h3bIUqK3Zh4hOF/+7Oy/mU=
+	t=1741828105; cv=none; b=kCQdHZL7i4uglo9rhvZj+Z/ttRnCjIXdIIirWK2dFB/jD7t7AbiwVuD1f0hODlWmSarhMXQh6gY/EONZm/OqkSJswNO8UI29+5G2FZEUq1hOy+9ulbii6m5SYCuvH6Ar5imAkCPSeb+2TK52U3pEwUFBtrkmRmdP57EeUY6fpCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741827889; c=relaxed/simple;
-	bh=NDwgGr8Uos52IXABhUsf8fEHtmfy49OOE1FSCA+lAvw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=dzch5JF9tW0QFSQn6Y4OcvtnV2B4O2WUPl6qnkfC+BnwCC3h7ajJA9/I2llou9NHqeVMFKa9RQtO+IM80c73YcjQFQkZgbgOXxc6jnKSVw1E6QY0SxE6p4kZNFiPKw/ChtSeKiyq4d0Wwpyi4btRulryvBPILAb7gq/9TXFaksM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=BpBQVdQV; arc=none smtp.client-ip=202.36.163.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
-Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 49E1A2C012B;
-	Thu, 13 Mar 2025 14:04:43 +1300 (NZDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
-	s=mail181024; t=1741827883;
-	bh=NDwgGr8Uos52IXABhUsf8fEHtmfy49OOE1FSCA+lAvw=;
-	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
-	b=BpBQVdQVzeQDS6hRArzf9sDMEm43bXv65imSVwUEeE0Cid5QxseZZLkvGY8r1hgfl
-	 V+OrQhHETL802THbYpswFKI05swwW8Vd2LoQvarzZY2T0DcbmHrfWTUXfg2BlKaV0C
-	 QcfPLUOVjTeSl4/BHVKdsvGZCMTfTvn4xZ3CPhFG9YjX5fJ7YwAkjYDd/Zacrvz1TQ
-	 0NExQW5DUy9M/hxLJiMXw4BWxcfyWVoUvkWhpUzqbCIzidC25GGcyYwHNL7dZqEI52
-	 U3afC3+lb9Dt6EzOqtq0vsXXGUTT+tmlXkE6ferSqmxkxNEYe/YBQdvbYOsVSe+ZLt
-	 pC5CnaXxLAfOw==
-Received: from svr-chch-ex2.atlnz.lc (Not Verified[2001:df5:b000:bc8::76]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B67d22f2b0001>; Thu, 13 Mar 2025 14:04:43 +1300
-Received: from svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8::76) by
- svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8::76) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Thu, 13 Mar 2025 14:04:42 +1300
-Received: from svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567]) by
- svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567%15]) with mapi id
- 15.02.1544.014; Thu, 13 Mar 2025 14:04:42 +1300
-From: Chris Packham <Chris.Packham@alliedtelesis.co.nz>
-To: Daniel Golle <daniel@makrotopia.org>
-CC: "andrew@lunn.ch" <andrew@lunn.ch>, "hkallweit1@gmail.com"
-	<hkallweit1@gmail.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "sander@svanheule.net"
-	<sander@svanheule.net>, "markus.stockhausen@gmx.de"
-	<markus.stockhausen@gmx.de>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next v9] net: mdio: Add RTL9300 MDIO driver
-Thread-Topic: [PATCH net-next v9] net: mdio: Add RTL9300 MDIO driver
-Thread-Index: AQHbkUqaaEyrxv0UqkuL40qCyNEej7Nqu8+AgAAKA4CAAN+0gIADxcQA
-Date: Thu, 13 Mar 2025 01:04:42 +0000
-Message-ID: <7269cf0f-21c6-45e1-a1f3-5463bdd9fd5c@alliedtelesis.co.nz>
-References: <20250309232536.19141-1-chris.packham@alliedtelesis.co.nz>
- <Z85A9_Li_4n9vcEG@pidgin.makrotopia.org>
- <b506b6e9-d5c3-4927-ab2d-e3a241513082@alliedtelesis.co.nz>
- <Z88FBR7m1olkTXxR@pidgin.makrotopia.org>
-In-Reply-To: <Z88FBR7m1olkTXxR@pidgin.makrotopia.org>
-Accept-Language: en-NZ, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <4191EB1E68CFAE41BB0D6C75763B127C@alliedtelesis.co.nz>
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1741828105; c=relaxed/simple;
+	bh=L1B1sJ7YjsET1pMUISc3uxnEi8mM0HBOJ1+5dS36kws=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ewA6ch/bDaWzgzdUGmU/Gq9rsmgibik6JXqmaJbAi6Y508BLyLleqUSwYkOBl8XmXIy9JcZ9lWRtvW7nN8yfEVUqENdrfYy1uSuK9iYkrXKE8nHrA9YHGLMf8GLpm1PdQ6Sn7APcPIe6XJFOLFEn/sTZIyKAPyWzOICl3wwpv24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CEkj/tol; arc=none smtp.client-ip=209.85.219.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6e8f06e13a4so13941826d6.0;
+        Wed, 12 Mar 2025 18:08:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741828102; x=1742432902; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yB3aa4DZXOqG8FkpT/yFPtGsJ00G9GKgyRtQ/0BrqTg=;
+        b=CEkj/tolOH87SB9A6lBvONehnZ2RdeghXNP2ndY2+Xpwl4wySkcyvST2LBuv1/UXsJ
+         GvFjmXIre6aB0E3boblxCbAazgHFigQhdrS08AO7xlF0vQ0tV7jfm6HKJeRpODNFRaoE
+         F+ioCv3Xj2lzek4h60W5QzA27KHHimZxulZ6y4eeiQw3xcGB+doEAV9wvJkmRcjUXbAp
+         TUyz6CnHgFtCmsBqqQ2+q7KaOK/HRDMBcVQ+/HEgn+F6zYlFD8xC3c8d3AsXC7jdcq5a
+         oWPDh7v/44lyTK6Rv/ISHGCzrxdLg6eXLSby7eavnEslyuwz8mYHMAyk0Bd9BUVEIDdV
+         G+Yg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741828102; x=1742432902;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yB3aa4DZXOqG8FkpT/yFPtGsJ00G9GKgyRtQ/0BrqTg=;
+        b=u3BIqDO5vyt7oPHCTwTZcNiAL5zS+0E71cAV35Sy5uTuBNT910jKum1/D+Ee8Dnx4X
+         bAn/WJPbrpLgmIH5wzUym8uv+FeUqpuLwI1KpaCeGdm+jW6f1W41FO5yAbwvXg9tf+zL
+         wu+o+c+ScEhsfIWYtmKqMsEjjgb+58Egc6U6DwMLztuLMspLbMW1zyWcfb/mcjhvOzOT
+         /CmPhufgFmoAy92Wkgf4jvMBIa3kk03LoZFdMO1xOIetMzffBp/ndUsG4Nx3/WZ56pai
+         ATZ+PSCNXTkKJF842whj3t/PUUJgGG+CxipH9l51y63toh5iBxOerffdzoqlaZI7Rexd
+         zBvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU0fO28+5PDfyWwkmUJaCDDR+2no4K6/LVsWIabigNlZDhY6X/C/wLoue9djhv7xWbkX4xMiR+8t2d9TC4M@vger.kernel.org, AJvYcCVW5y0fs7m7d0CultXhraa2d65ZH9gr5uNE2GjOyI2gXHKByEESAsNFWpmGYLAw4u609L96xvUL9FUg@vger.kernel.org, AJvYcCWvbyWJ/CTv4ktZT/SGb/11w00k+xT+e5lJIPRZLrgeZ8TyY5dFiZigVV+3Y07mPwpNXLKayIsQ@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXsJ1nvbqTvjmjdFiHEL1i4rj6axomFveFn3U0FrtdWsxpwVFM
+	vJMjseYfwrwBZch6sCM3vgeBlH89u+KY4ea1X46SvEaxRs2glezJ
+X-Gm-Gg: ASbGncs/v+x9PE6FxEbYYDNQ0dit5hSyLTfXifjMfqT12GEMnGLCijEi8vkW5jOAsJ/
+	+dO1pG6uAbDNpxqHRV/PfMHlhue4xVhbM3O4GzeU+Se6erYLDyAZym70o/OMFr8aFi4JX3myrit
+	hF2OPtj5DzyTKtfnRDd2cgtrCoP1rku315eCTqRcstgflwP+UI7IPf7ris1rwZYUGYAbJyis7ba
+	KfIGMYhDcsd3+KXhnHm33TZDOVfwwzltk1dXzBTLZWMDDXfPsFFIc0RIdqGBZ6HcFGXG81waEs5
+	g2CuupFidNcqJvQa7mKtus8MWGPJ0y4=
+X-Google-Smtp-Source: AGHT+IErHgyMMC0gxpFbF0+ltzHlALBkq84d33gqNkyZ9Lj204hZXdZSKp7DGFvJyo8iPJlxvm7WCw==
+X-Received: by 2002:a05:6214:5c47:b0:6e6:5c26:afe3 with SMTP id 6a1803df08f44-6eaddfbb91cmr8764046d6.17.1741828102495;
+        Wed, 12 Mar 2025 18:08:22 -0700 (PDT)
+Received: from localhost ([2001:da8:7001:11::cb])
+        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6eade34beb0sm2540506d6.105.2025.03.12.18.08.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Mar 2025 18:08:21 -0700 (PDT)
+Date: Thu, 13 Mar 2025 09:08:11 +0800
+From: Inochi Amaoto <inochiama@gmail.com>
+To: Stephen Boyd <sboyd@kernel.org>, Chen Wang <unicorn_wang@outlook.com>, 
+	Conor Dooley <conor+dt@kernel.org>, Inochi Amaoto <inochiama@gmail.com>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Michael Turquette <mturquette@baylibre.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Rob Herring <robh@kernel.org>
+Cc: linux-clk@vger.kernel.org, devicetree@vger.kernel.org, 
+	sophgo@lists.linux.dev, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH v3 1/2] dt-bindings: clock: sophgo: add clock controller
+ for SG2044
+Message-ID: <nxvuxo7lsljsir24brvghblk2xlssxkb3mfgx6lbjahmgr4kep@fvpmciimfikg>
+References: <20250226232320.93791-1-inochiama@gmail.com>
+ <20250226232320.93791-2-inochiama@gmail.com>
+ <2c00c1fba1cd8115205efe265b7f1926.sboyd@kernel.org>
+ <epnv7fp3s3osyxbqa6tpgbuxdcowahda6wwvflnip65tjysjig@3at3yqp2o3vp>
+ <f1d5dc9b8f59b00fa21e8f9f2ac3794b.sboyd@kernel.org>
+ <x43v3wn5rp2mkhmmmyjvdo7aov4l7hnus34wjw7snd2zbtzrbh@r5wrvn3kxxwv>
+ <b816b3d1f11b4cc2ac3fa563fe5f4784.sboyd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=ccpxrWDM c=1 sm=1 tr=0 ts=67d22f2b a=Xf/6aR1Nyvzi7BryhOrcLQ==:117 a=xqWC_Br6kY4A:10 a=75chYTbOgJ0A:10 a=IkcTkHD0fZMA:10 a=Vs1iUdzkB0EA:10 a=jdP34snFAAAA:8 a=0kGZVefVDAKX5x3kvTsA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=jlphF6vWLdwq7oh3TaWq:22
-X-SEG-SpamProfiler-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b816b3d1f11b4cc2ac3fa563fe5f4784.sboyd@kernel.org>
 
-SGkgRGFuaWVsLA0KDQpPbiAxMS8wMy8yMDI1IDA0OjI4LCBEYW5pZWwgR29sbGUgd3JvdGU6DQo+
-IE9uIE1vbiwgTWFyIDEwLCAyMDI1IGF0IDAyOjA3OjI2QU0gKzAwMDAsIENocmlzIFBhY2toYW0g
-d3JvdGU6DQo+PiBIaSBEYW5pZWwsDQo+Pg0KPj4gT24gMTAvMDMvMjAyNSAxNDozMSwgRGFuaWVs
-IEdvbGxlIHdyb3RlOg0KPj4+IEhpIENocmlzLA0KPj4+DQo+Pj4gT24gTW9uLCBNYXIgMTAsIDIw
-MjUgYXQgMTI6MjU6MzZQTSArMTMwMCwgQ2hyaXMgUGFja2hhbSB3cm90ZToNCj4+Pj4gQWRkIGEg
-ZHJpdmVyIGZvciB0aGUgTURJTyBjb250cm9sbGVyIG9uIHRoZSBSVEw5MzAwIGZhbWlseSBvZiBF
-dGhlcm5ldA0KPj4+PiBzd2l0Y2hlcyB3aXRoIGludGVncmF0ZWQgU29DLiBUaGVyZSBhcmUgNCBw
-aHlzaWNhbCBTTUkgaW50ZXJmYWNlcyBvbiB0aGUNCj4+Pj4gUlRMOTMwMCBob3dldmVyIGFjY2Vz
-cyBpcyBkb25lIHVzaW5nIHRoZSBzd2l0Y2ggcG9ydHMuIFRoZSBkcml2ZXIgdGFrZXMNCj4+Pj4g
-dGhlIE1ESU8gYnVzIGhpZXJhcmNoeSBmcm9tIHRoZSBEVFMgYW5kIHVzZXMgdGhpcyB0byBjb25m
-aWd1cmUgdGhlDQo+Pj4+IHN3aXRjaCBwb3J0cyBzbyB0aGV5IGFyZSBhc3NvY2lhdGVkIHdpdGgg
-dGhlIGNvcnJlY3QgUEhZLiBUaGlzIG1hcHBpbmcNCj4+Pj4gaXMgYWxzbyB1c2VkIHdoZW4gZGVh
-bGluZyB3aXRoIHNvZnR3YXJlIHJlcXVlc3RzIGZyb20gcGh5bGliLg0KPj4+Pg0KPj4+PiBTaWdu
-ZWQtb2ZmLWJ5OiBDaHJpcyBQYWNraGFtIDxjaHJpcy5wYWNraGFtQGFsbGllZHRlbGVzaXMuY28u
-bno+DQo+Pj4+IC0tLQ0KPj4+PiAuLi4NCj4+Pj4gK3N0YXRpYyBpbnQgcnRsOTMwMF9tZGlvX3Jl
-YWRfYzIyKHN0cnVjdCBtaWlfYnVzICpidXMsIGludCBwaHlfaWQsIGludCByZWdudW0pDQo+Pj4+
-ICt7DQo+Pj4+ICsJc3RydWN0IHJ0bDkzMDBfbWRpb19jaGFuICpjaGFuID0gYnVzLT5wcml2Ow0K
-Pj4+PiArCXN0cnVjdCBydGw5MzAwX21kaW9fcHJpdiAqcHJpdjsNCj4+Pj4gKwlzdHJ1Y3QgcmVn
-bWFwICpyZWdtYXA7DQo+Pj4+ICsJaW50IHBvcnQ7DQo+Pj4+ICsJdTMyIHZhbDsNCj4+Pj4gKwlp
-bnQgZXJyOw0KPj4+PiArDQo+Pj4+ICsJcHJpdiA9IGNoYW4tPnByaXY7DQo+Pj4+ICsJcmVnbWFw
-ID0gcHJpdi0+cmVnbWFwOw0KPj4+PiArDQo+Pj4+ICsJcG9ydCA9IHJ0bDkzMDBfbWRpb19waHlf
-dG9fcG9ydChidXMsIHBoeV9pZCk7DQo+Pj4+ICsJaWYgKHBvcnQgPCAwKQ0KPj4+PiArCQlyZXR1
-cm4gcG9ydDsNCj4+Pj4gKw0KPj4+PiArCW11dGV4X2xvY2soJnByaXYtPmxvY2spOw0KPj4+PiAr
-CWVyciA9IHJ0bDkzMDBfbWRpb193YWl0X3JlYWR5KHByaXYpOw0KPj4+PiArCWlmIChlcnIpDQo+
-Pj4+ICsJCWdvdG8gb3V0X2VycjsNCj4+Pj4gKw0KPj4+PiArCWVyciA9IHJlZ21hcF93cml0ZShy
-ZWdtYXAsIFNNSV9BQ0NFU1NfUEhZX0NUUkxfMiwgRklFTERfUFJFUChQSFlfQ1RSTF9JTkRBVEEs
-IHBvcnQpKTsNCj4+Pj4gKwlpZiAoZXJyKQ0KPj4+PiArCQlnb3RvIG91dF9lcnI7DQo+Pj4+ICsN
-Cj4+Pj4gKwl2YWwgPSBGSUVMRF9QUkVQKFBIWV9DVFJMX1JFR19BRERSLCByZWdudW0pIHwNCj4+
-Pj4gKwkgICAgICBGSUVMRF9QUkVQKFBIWV9DVFJMX1BBUktfUEFHRSwgMHgxZikgfA0KPj4+PiAr
-CSAgICAgIEZJRUxEX1BSRVAoUEhZX0NUUkxfTUFJTl9QQUdFLCAweGZmZikgfA0KPj4+PiArCSAg
-ICAgIFBIWV9DVFJMX1JFQUQgfCBQSFlfQ1RSTF9UWVBFX0MyMiB8IFBIWV9DVFJMX0NNRDsNCj4+
-PiBVc2luZyAicmF3IiBhY2Nlc3MgdG8gdGhlIFBIWSBhbmQgdGhlcmVieSBieXBhc3NpbmcgdGhl
-IE1ESU8NCj4+PiBjb250cm9sbGVyJ3Mgc3VwcG9ydCBmb3IgaGFyZHdhcmUtYXNzaXN0ZWQgcGFn
-ZSBhY2Nlc3MgaXMgcHJvYmxlbWF0aWMuDQo+Pj4gVGhlIE1ESU8gY29udHJvbGxlciBhbHNvIHBv
-bGxzIGFsbCBQSFlzIHN0YXR1cyBpbiBoYXJkd2FyZSBhbmQgaGVuY2UNCj4+PiBiZSBhd2FyZSBv
-ZiB0aGUgY3VycmVudGx5IHNlbGVjdGVkIHBhZ2UuIFVzaW5nIHJhdyBhY2Nlc3MgdG8gc3dpdGNo
-DQo+Pj4gdGhlIHBhZ2Ugb2YgYSBQSFkgImJlaGluZCB0aGUgYmFjayIgb2YgdGhlIGhhcmR3YXJl
-IHBvbGxpbmcgbWVjaGFuaXNtDQo+Pj4gcmVzdWx0cyBpbiBpbiBvY2Nhc3Npb25hbCBoYXZvYyBv
-biBsaW5rIHN0YXR1cyBjaGFuZ2VzIGluIGNhc2UgTGludXgnDQo+Pj4gcmVhZGluZyB0aGUgcGh5
-IHN0YXR1cyBvdmVybGFwcyB3aXRoIHRoZSBoYXJkd2FyZSBwb2xsaW5nLg0KPj4+IFRoaXMgaXMg
-ZXNwLiB3aGVuIHVzaW5nIFJlYWxUZWsncyAyLjVHQml0L3MgUEhZcyB3aGljaCByZXF1aXJlIHVz
-aW5nDQo+Pj4gcGFnZWQgYWNjZXNzIGluIHRoZWlyIHJlYWRfc3RhdHVzKCkgZnVuY3Rpb24uDQo+
-Pj4NCj4+PiBNYXJrdXMgU3RvY2toYXVzZW4gKGFscmVhZHkgaW4gQ2MpIGhhcyBpbXBsZW1lbnRl
-ZCBhIG5pY2Ugc29sdXRpb24gdG8NCj4+PiB0aGlzIHByb2JsZW0sIGluY2x1ZGluZyBkb2N1bWVu
-dGF0aW9uLCBzZWUNCj4+PiBodHRwczovL2dpdC5vcGVud3J0Lm9yZy8/cD1vcGVud3J0L29wZW53
-cnQuZ2l0O2E9YmxvYjtmPXRhcmdldC9saW51eC9yZWFsdGVrL2ZpbGVzLTYuNi9kcml2ZXJzL25l
-dC9ldGhlcm5ldC9ydGw4Mzh4X2V0aC5jO2g9NGI3OTA5MDY5NmUzNDFlZDFlNDMyYTdlYzVjMGY3
-ZjkyNzc2ZjBlMTtoYj1IRUFEI2wxNjMxDQo+PiBJIHJlYWQgdGhhdCBjb2RlL2NvbW1lbnQgYSBm
-ZXcgdGltZXMgYW5kIEkgbXVzdCBhZG1pdCBJIHN0aWxsIGRvbid0DQo+PiBxdWl0ZSBnZXQgaXQu
-IFBhcnQgb2YgdGhlIHByb2JsZW0gbWlnaHQgYmUgdGhhdCBteSBoYXJkd2FyZSBwbGF0Zm9ybSBp
-cw0KPj4gdXNpbmcgQzQ1IFBIWXMgYW5kIHRoYXQncyB3aGF0IEkndmUgYmVlbiB0ZXN0aW5nIHdp
-dGguIFRoZSBDMjINCj4+IHN1cHBvcnQNCj4+IGlzIGJhc2VkIG9uIG15IHJlYWRpbmcgb2YgdGhl
-IGRhdGFzaGVldCBhbmQgc29tZSBvZiB3aGF0IEkgY2FuIGdsZWFuDQo+PiBmcm9tIG9wZW53cnQg
-KGFsdGhvdWdoIEkgY29tcGxldGVseSBtaXNzZWQgdGhhdCBjb21tZW50IHdoZW4gSSByZWFkDQo+
-PiB0aHJvdWdoIHRoZSBkcml2ZXIgdGhlIGZpcnN0IHRpbWUpLg0KPiBZZXMsIHRoaXMgaXNzdWUg
-ZXhpc3RzIG9ubHkgd2l0aCBDbGF1c2UtMjIgYWNjZXNzLCBDbGF1c2UtNDUgZG9lc24ndA0KPiBy
-ZXF1aXJlIGFueSBvZiB0aGF0LiBBbHNvIG5vdGUgdGhhdCBPcGVuV3J0IGhhcyByZWNlbnRseSBz
-d2l0Y2hlZA0KPiBpbXBsZW1lbnRhdGlvbiBmcm9tIGEgKG5vdCB2ZXJ5IHVwc3RyZWFtIGZyaWVu
-ZGx5KSBhcHByb2FjaCByZXF1aXJpbmcNCj4gZGVkaWNhdGVkIHN1cHBvcnQgZm9yIHBhZ2VkIGFj
-Y2VzcyB0byBNYXJrdXMnIG5ldyBpbXBsZW1lbnRhdGlvbiB3aGljaA0KPiBhbHNvIGFkZGVkIHRo
-ZSBjb21tZW50Lg0KPg0KPj4+IEluY2x1ZGluZyBhIHNpbWlsYXIgbWVjaGFuaXNtIGluIHRoaXMg
-ZHJpdmVyIGZvciBDMjIgcmVhZCBhbmQgd3JpdGUNCj4+PiBvcGVyYXRpb25zIHdvdWxkIGJlIG15
-IGFkdmlzZSwgc28gaGFyZHdhcmUtYXNzaXN0ZWQgYWNjZXNzIHRvIHRoZSBQSFkNCj4+PiBwYWdl
-cyBpcyBhbHdheXMgdXNlZCwgYW5kIGhlbmNlIHRoZSBoYXJkd2FyZSBwb2xsaW5nIG1lY2hhbmlz
-bSBpcyBhd2FyZQ0KPj4+IG9mIHRoZSBjdXJyZW50bHkgc2VsZWN0ZWQgcGFnZS4NCj4+IFNvIGZh
-ciB1cHN0cmVhbSBMaW51eCBkb2Vzbid0IGhhdmUgZ2VuZXJpYyBwYWdlZCBQSFkgcmVnaXN0ZXIg
-ZnVuY3Rpb25zLg0KPj4gSXQgc291bmRzIGxpa2UgdGhhdCdkIGJlIGEgcHJlcmVxdWlzaXRlIGZv
-ciB0aGlzLg0KPiBObywgdGhhdCdzIGV4YWN0bHkgd2hhdCBNYXJrdXMgaGFzIGltcHJvdmVkIGFi
-b3V0IHRoZSBpbXBsZW1lbnRhdGlvbg0KPiBjb21wYXJlZCB0byB0aGUgcHJldmlvdXMgYXBwcm9h
-Y2g6DQo+IFdlIHNpbXBseSBpbnRlcmNlcHQgYWNjZXNzIHRvIEMyMiByZWdpc3RlciAweDFmLiBG
-b3Igd3JpdGUgYWNjZXNzIHRoZQ0KPiB0by1iZS1zZWxlY3RlZCBwYWdlIGlzIHN0b3JlZCBpbiB0
-aGUgcHJpdiBzdHJ1Y3Qgb2YgdGhlIE1ESU8gYnVzLCBpbiBhDQo+IDAtaW5pdGlhbGl6ZWQgYXJy
-YXkgZm9yIGVhY2ggTURJTyBidXMgYWRkcmVzcy4gQzIyIHJlYWQgYWNjZXNzIHRvDQo+IHJlZ2lz
-dGVyIDB4MWYgY2FuIHJlYWQgYmFjayB0aGF0IHZhbHVlLCBhbGwgd2l0aG91dCBhY3R1YWxseSBh
-Y2Vzc2luZyB0aGUNCj4gaGFyZHdhcmUuDQo+IEFueSBzdWJzZXF1ZW50IEMyMiByZWFkIG9yIHdy
-aXRlIG9wZXJhdGlvbiB3aWxsIHRoZW4gdXNlIHRoZSBzZWxlY3RlZA0KPiBwYWdlIHN0b3JlZCBm
-b3IgdGhhdCBQSFkgaW4gdGhlIG1lbW9yeSBhc3NvY2lhdGVkIHdpdGggdGhlIE1ESU8gYnVzLg0K
-Pg0KPiBJbiB0aGlzIHdheSBwYWdlIHNlbGVjdGlvbiBpcyBsZWZ0IHRvIHRoZSBNRElPIGNvbnRy
-b2xsZXIgd2hpY2ggYWxzbw0KPiBjYXJyaWVzIG91dCBwb2xsaW5nIGluIGJhY2tncm91bmQgKHNl
-ZSBTTUlfUE9MTF9DVFJMKSwgYW5kIGNsYXNoZXMgZHVlDQo+IHRvIGNvbmdydWVudCBhY2Nlc3Mg
-YnkgTGludXggYW5kIGhhcmR3YXJlIHBvbGxpbmcgZG9uJ3Qgb2NjdXIuDQoNCkFoIEkgZ2V0IGl0
-LiBJdCdzIGFib3V0IHRyYWNraW5nIHRoZSBjdXJyZW50IHBhZ2UgZm9yIGEgcGFydGljdWxhciAN
-CmRldmljZSBhZGRyZXNzIGFuZCB1c2luZyB0aGF0IGluc3RlYWQgb2YgMHhmZmYgaW4gDQpGSUVM
-RF9QUkVQKFBIWV9DVFJMX01BSU5fUEFHRSwgMHhmZmYpLiBJJ20gbm90IHN1cmUgaXQncyBnb2lu
-ZyB0byB3b3JrIA0KZ2VuZXJpY2FsbHkuIFJlYWx0ZWsgc3dpdGNoZXMga25vdyBhYm91dCBSZWFs
-dGVrIFBIWXMgYnV0IEkndmUgc2VlbiANCnBsZW50eSBvZiBvdGhlciBQSFlzIHRoYXQgZG8gcGFn
-aW5nIHZpYSBhZGRyZXNzZXMgb3RoZXIgdGhhbiAweDFmIA0KKE1hcnZlbGwgODhFMTExMSBmb3Ig
-ZXhhbXBsZSB1c2VzIDB4MWQgZm9yIGl0cyBleHRhZGRyLCBzb21lIEJyb2FkY29tIA0KUEhZcyBz
-ZWVtIHRvIHVzZSAweDFjKS4gSSdtIG5vdCBzdXJlIGhvdyBtYW55IHN5c3RlbXMgYXJlIG1peGlu
-ZyB2ZW5kb3JzIA0KZm9yIEMyMiBQSFlzICh0aGUgWnl4ZWwgYm9hcmRzIHNlZW0gdG8gaGF2ZSBN
-YXJ2ZWxsIEFRUiAxMEcgUEhZcyBidXQgDQp0aGF0J3MgQzQ1KS4NCg0KSSdtIGdvaW5nIHRvIHNl
-bmQgdjEwIG91dCBzaG9ydGx5IHdpdGggdGhlIG1pbm9yIGFkZGl0aW9ucyBzdWdnZXN0ZWQgYnkg
-DQpDaHJpc3RvcGhlLiBJZiB3ZSBjYW4gY29tZSB1cCB3aXRoIHNvbWV0aGluZyBzdWl0YWJsZSBm
-b3IgdGhlIEMyMiBwYWdpbmcgDQppdCdzIHByb2JhYmx5IGJlc3QgZG9uZSBhcyBuZXcgY29kZSBv
-biB0b3Agb2YgdGhhdC4NCg0K
+On Wed, Mar 12, 2025 at 04:43:51PM -0700, Stephen Boyd wrote:
+> Quoting Inochi Amaoto (2025-03-12 16:29:43)
+> > On Wed, Mar 12, 2025 at 04:14:37PM -0700, Stephen Boyd wrote:
+> > > Quoting Inochi Amaoto (2025-03-11 16:31:29)
+> > > > 
+> > > > > or if that syscon node should just have the #clock-cells property as
+> > > > > part of the node instead.
+> > > > 
+> > > > This is not match the hardware I think. The pll area is on the middle
+> > > > of the syscon and is hard to be separated as a subdevice of the syscon
+> > > > or just add  "#clock-cells" to the syscon device. It is better to handle
+> > > > them in one device/driver. So let the clock device reference it.
+> > > 
+> > > This happens all the time. We don't need a syscon for that unless the
+> > > registers for the pll are both inside the syscon and in the register
+> > > space 0x50002000. Is that the case? 
+> > 
+> > Yes, the clock has two areas, one in the clk controller and one in
+> > the syscon, the vendor said this design is a heritage from other SoC.
+> 
+> My question is more if the PLL clk_ops need to access both the syscon
+> register range and the clk controller register range. What part of the
+> PLL clk_ops needs to access the clk controller at 0x50002000?
+> 
+
+The PLL clk_ops does nothing, but there is an implicit dependency:
+When the PLL change rate, the mux attached to it must switch to 
+another source to keep the output clock stable. This is the only
+thing it needed.
+
+> > 
+> > > This looks like you want there to be  one node for clks on the system
+> > > because logically that is clean, when the reality is that there is a
+> > > PLL block exposed in the syscon (someone forgot to put it in the clk
+> > > controller?) and a non-PLL block for the other clks.
+> > 
+> > That is true, I prefer to keep clean and make less mistakes. Although
+> > the PLL is exposed in the syscon, the pll need to be tight with other
+> > clocks in the space 0x50002000 (especially between the PLL and mux).
+> > In this view, it is more like a mistake made by the hardware design.
+> > And I prefer not to add a subnode for the syscon.
+> 
+> Ok. You wouldn't add a subnode for the syscon. You would just have
+> #clock-cells in that syscon node and register an auxiliary device to
+> provide the PLL(s) from there. Then in drivers/clk we would have an
+> auxiliary driver that uses a regmap or gets an iomem pointer from the
+> parent device somehow so that we can logically put the PLL code in
+> drivers/clk while having one node in DT for the "miscellaneous register
+> area" where the hardware engineer had to expose the PLL control to
+> software.
+
+Cool, I understand what you mean. It is a good idea,
+I will have a try.
+
+Regards,
+Inochi
 
