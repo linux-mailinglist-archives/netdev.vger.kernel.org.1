@@ -1,556 +1,262 @@
-Return-Path: <netdev+bounces-174550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4058A5F223
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 12:15:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04DAEA5F23C
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 12:21:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3790E19C1D20
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 11:15:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39E3117E51D
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 11:21:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6175E266582;
-	Thu, 13 Mar 2025 11:14:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A1F26659C;
+	Thu, 13 Mar 2025 11:20:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OB4jeFYg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bIdRDqys"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 271BD26657C;
-	Thu, 13 Mar 2025 11:14:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741864489; cv=none; b=iMnvxcEy0746Kbm/kQmSykMJYVEzIl15DsktTDFYN6EPqGUxkBr2LWfrDkRqD1Rv0ysOiarHV3ASDMgzCY9OEdt79g5G/mkZWf/8q+tEjU36AOsr4/SsYKwB9PQAlLkxk5ipriSy89oyj+oCiKPGeMUzdWDt9ihhKWSee2HqVgs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741864489; c=relaxed/simple;
-	bh=dlDkx+mPCZivo5gYY65qcyMk8QnTyaoiJ8QBzsOVVGA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H/ddI6FUXc/7Epy+Yu/E4XcVtdkYTWNOxrzp9B32QRVZ9rHiaFqORZ1473szAibC6h0UorgoYd4p53CIV1ozlXXq88BjJy+r/kJ5bHqJ5iRgO4ZW1ODXtD5xKLrZS0V/MGeG9Cm0Km6ceG8Qp2qZgngj6ra993zDyybByFWW5Tg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OB4jeFYg; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DF40266593
+	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 11:20:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741864855; cv=fail; b=Aoup6plJY86Qv9h4o1U43iqlT4EYxZcAhw7Gkv94tx7EdLXGFoTh+bfvxUT47y+gOxAixtGkCseLKTQBtrCaPzDrBWHr/WQF6LII3+mJJ3Nf0BsRJeIKtEPILwf+B0dPfmeCPtHDzbHmN33sAU7NUOTYZfgX8LV6Rq6hQ4r8C0k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741864855; c=relaxed/simple;
+	bh=sn6z7wgXi8csXwD1KHBaxt9h5qocV5bHB0CIC+wI2bo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=fXL+pz2x+CHEeQkwv5OSWeEZx2DYQh292RxrUfbpX4r8jUvA5gf+DoFJwdnAzd6h85LGoBVUYHNn6Ew2ZRfoOh3JiD5hYL5Mf3lFXFTjmQsRXM8KHBUy1TwMu3NNrwdA73hIaH4ASjv98d98SjOvn6CrfODqp7RuN3zt/dukN8s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bIdRDqys; arc=fail smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741864487; x=1773400487;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=dlDkx+mPCZivo5gYY65qcyMk8QnTyaoiJ8QBzsOVVGA=;
-  b=OB4jeFYgWbIzw7IYEJEL6B9KDleWRd3CLf7ORw6fwqxL17IQalPx3E85
-   iJ7VAYNNMV7vdUYs4qpGWZKjvjWcgU/Vklh2L4HvTYIZJQI5Hd2S1LcHh
-   WlJ63u2zf58SzqeDjMKi/gAztw+1WIsNP1MqG/tAgZ/zpRzO+GCuD7nRM
-   mqnMRH6RIOMHe9A0AqI3MgXIzT8HeI29XDa2WPqG6hXXtIbfynHibSigZ
-   Jdbp0ipGpl222ztTheK9byrN7yTnFKkrK2PaF+hUCCvJP7pH3ArnQl0fn
-   E53Gz5xZCG/XL3VT4sb+Lq2mOIdBpwa6Ceb3un+0fz4ij85Up1ntCG+L1
-   Q==;
-X-CSE-ConnectionGUID: EoqktvDeScm20c4L51N4Dw==
-X-CSE-MsgGUID: yriwrbg2QpiQmIDY8jKzjQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11371"; a="68329357"
+  t=1741864853; x=1773400853;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=sn6z7wgXi8csXwD1KHBaxt9h5qocV5bHB0CIC+wI2bo=;
+  b=bIdRDqysj3w5WFY7ALfeJHlNM9LH2gKK/JLITkSacsq7isRCwUvMLnKv
+   nVY3MAv2epimRkAcIPCGIl4O0/hjkRlkX5vyVKAqTPWRDkfQ6QVQBq3ZY
+   KRe1G0WGMt35vBLoWPIfLfigFIYEK9PpKwdc+dp0qy+vS2Fyxb6CtoHnf
+   joE59sRhO2ogvgjKuPcvO/SU7NduCBQhgQ7rQPVOc559PXT+FvJpqhQNP
+   XoEtIFhTFlLCltPRR7cVZQQcTAAoRiDPfhYu0JMruuAa0oRJL6kXTHsz8
+   QYc4zG12ALqcVfpN76hL95dEDiwF711ocysJvAT62DSrX2Hkynk0bxo9y
+   A==;
+X-CSE-ConnectionGUID: Uz+JYafKS4OWmV3fCMY4CQ==
+X-CSE-MsgGUID: iVs9bjy7SNWb1GQmUFLR1w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11371"; a="42837829"
 X-IronPort-AV: E=Sophos;i="6.14,244,1736841600"; 
-   d="scan'208";a="68329357"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 04:14:46 -0700
-X-CSE-ConnectionGUID: zTHF6EZaQ3ey8sTqABBp5A==
-X-CSE-MsgGUID: wddYvlqFRxKJ5Y7SO1zX2w==
+   d="scan'208";a="42837829"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 04:20:53 -0700
+X-CSE-ConnectionGUID: BIzdCyC4SBCL7kUZoZCwKw==
+X-CSE-MsgGUID: 8Av6PamsTOeTCfGuMq8PQw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.14,244,1736841600"; 
-   d="scan'208";a="158081717"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by orviesa001.jf.intel.com with ESMTP; 13 Mar 2025 04:14:45 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id 4CDCE1FC; Thu, 13 Mar 2025 13:14:43 +0200 (EET)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Mark Brown <broonie@kernel.org>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	linux-spi@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Richard Cochran <richardcochran@gmail.com>
-Subject: [PATCH v1 1/1] spi: Use inclusive language
-Date: Thu, 13 Mar 2025 13:14:42 +0200
-Message-ID: <20250313111442.322850-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.47.2
+   d="scan'208";a="125998761"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Mar 2025 04:20:52 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Thu, 13 Mar 2025 04:20:52 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Thu, 13 Mar 2025 04:20:52 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.174)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Thu, 13 Mar 2025 04:20:51 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=MKlu5jiQMQg4NOUv/3u3H2SBxpkq7AwoaglU9RXsA86LEJ1XkaTOlSFsW0LaXTErqIgDPqX6mG5KbbpS5Yhya8wzGjKNiW7ReeVNhL6tKjibq4vEbSdz59NyjtQHzYcBjFN3Lo9ZpkuVUcxJPpX5GE6k8m5NnLiOMytCoM9uuQ7V1xextwg5X3RLVFRhpqAyIVgqI9PskGtWvfHAW75XSKbVW3IRSprBYTUTgkd92r3f8GuQsVPmRLjlPVHo9nm52NMbvO/ochKadGzHTJV0HBbF1UwG3kYoP5FhYHINv1Y6ZriNo/IoCosLO20F248LqEJFDR84DAeqLjC0US6a4w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aVOCqOKKgTu8Tvg+6AotFIYaKpBM/54BlzUdxwP+LRI=;
+ b=gWyplpKw6UC/WwU/YQ9WsQf3Ba+x4T8JVyl4I02VLKcBYr7hQMUC6Gt5/LvGPHufzC38RauUWGNGUwY1WG0SaQZdNgo/MkrP1z7CDA8p19ooAskug9HzD5Iegrxv1Upa/lytvzvXaRN5HKUx7rNrr+IzSlNXBL4g1FZdfRzh1pFjlCeOm5tBVkMy0xoqyquTwhqelhaIMpNrnvhiuU3HVST3UjRpmT1HuLGdMWTGzDoTohMkfn1OV9rD5aYMF0IOI1I4W3/521S9o1DmX/J3LA3pU27hKAq4D/h466MAnZwgFuJbShySrZO3mG3LUZgusbw8F4jpeg5GTuEUi/YlVQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS0PR11MB7785.namprd11.prod.outlook.com (2603:10b6:8:f1::8) by
+ MW6PR11MB8440.namprd11.prod.outlook.com (2603:10b6:303:242::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.28; Thu, 13 Mar
+ 2025 11:20:35 +0000
+Received: from DS0PR11MB7785.namprd11.prod.outlook.com
+ ([fe80::7a4d:ceff:b32a:ed18]) by DS0PR11MB7785.namprd11.prod.outlook.com
+ ([fe80::7a4d:ceff:b32a:ed18%6]) with mapi id 15.20.8534.027; Thu, 13 Mar 2025
+ 11:20:35 +0000
+From: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>
+To: Simon Horman <horms@kernel.org>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "Keller, Jacob E" <jacob.e.keller@intel.com>,
+	"R, Bharath" <bharath.r@intel.com>, "Mrozowicz, SlawomirX"
+	<slawomirx.mrozowicz@intel.com>, "Kwapulinski, Piotr"
+	<piotr.kwapulinski@intel.com>, "Wegrzyn, Stefan" <stefan.wegrzyn@intel.com>
+Subject: RE: [PATCH iwl-next v7 11/15] ixgbe: add device flash update via
+ devlink
+Thread-Topic: [PATCH iwl-next v7 11/15] ixgbe: add device flash update via
+ devlink
+Thread-Index: AQHbk1CQRKQJSyhTKUitpDaK+mHQLrNvlvcAgAFVKIA=
+Date: Thu, 13 Mar 2025 11:20:35 +0000
+Message-ID: <DS0PR11MB77858E6458594CB34A19B0D2F0D32@DS0PR11MB7785.namprd11.prod.outlook.com>
+References: <20250312125843.347191-1-jedrzej.jagielski@intel.com>
+ <20250312125843.347191-12-jedrzej.jagielski@intel.com>
+ <20250312145530.GU4159220@kernel.org>
+In-Reply-To: <20250312145530.GU4159220@kernel.org>
+Accept-Language: pl-PL, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR11MB7785:EE_|MW6PR11MB8440:EE_
+x-ms-office365-filtering-correlation-id: 5394b381-4466-4714-193d-08dd62211376
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?BCMdvjLxhKmisuro9j/F6C8AlC2JUpd8w4MLaPE7F9bxk4BGb0J7g1hqzt42?=
+ =?us-ascii?Q?lp3cJ8tOBhJaFGP+J0v9uDv0qKD0nHbffkpz20FL5DgKu6g4pDQ/KkeNw2us?=
+ =?us-ascii?Q?8jzev+p0FRHHb1V/nKiS4MxnzYwNOpoFX54eVxNn0LZzLYXwJpQEA1KR1SNn?=
+ =?us-ascii?Q?muoBsz67GoRDTvIYMPvPkNHQkl306HkJUXDJgeJdMXS6DobZgKNMyktnfuOd?=
+ =?us-ascii?Q?hvdmTnF3doqLydyy2L4VDmuqbq0zPI5T4L+hjwevHktD46elZYIYe9HmybDt?=
+ =?us-ascii?Q?gP/dUkrwB05f4xO88UWzzcYSS7c6ilgymMT54UxBQ+W2zBunXTzM6ABWUvl7?=
+ =?us-ascii?Q?1AO7ZOe3sKxrfZoyRu9xAmeOZd1jiiauBR74ejKAND046mrDfIs0czz6DcrA?=
+ =?us-ascii?Q?ROG5u2aOUQTwDd0YcRK1emYhEIsIZcjcqLDoH0272+cKCF54YrfxtpAIWQgP?=
+ =?us-ascii?Q?+/0q2Z94n9LeBq2FLYPuO+y4gnl7UQww+4ipxi3i5dti2EnT59V02K2RjU2P?=
+ =?us-ascii?Q?JiavZETyybBUQlWvyflpeN8L9VYL2bhCvT6VFvKXYbe0rb5Rg7Sz8K6pCO0A?=
+ =?us-ascii?Q?atoOwRN80ZWCtEFAYez0kAEfHN3hqiBJl2kM16xr47wK8xR9+1boX14LTPGr?=
+ =?us-ascii?Q?nvpeNGH1FXAaCyUFxdCqZSH4IUyczsBKL8vFZxNZEA3M8/7CfvUHwreLIe4S?=
+ =?us-ascii?Q?+YX/Xc4uRdVlYJPw/AbiNvwkHNxK/HZVOttBVSoOKfOZL4N/al+YR80QzVzj?=
+ =?us-ascii?Q?a9JXFW7L8ZVjLhUTQYjrPT9IHdJkf6aNahb7czA2pDwP2F6Z9t386TCEGFNh?=
+ =?us-ascii?Q?luPyTQmUpIDXrH7MkuWh2Xm71OcAKQMfBk7+fXFqJypNKbS03Re8UcSoqA15?=
+ =?us-ascii?Q?A3GSm4lkyrOokg06MB4g+AmNFTjlp/wk/JYXnXWj0k8TBu5MHo5ElbI1Lt7K?=
+ =?us-ascii?Q?T23b8JlrrtTXrm5WF+H3hYoWSQGkYKE/BbU7PvECEoEUHYlP/mF98/mUz0qi?=
+ =?us-ascii?Q?cQMzDx9jcvs0cf2CPEz+B/lvdUMYHy5IQ04rIaLWKxy69yI1wvkn07FkTm70?=
+ =?us-ascii?Q?tLq82y5lPIWckOXTkn8ECcWRLHD+F72illL6i9SYAVk8t0368ipdclZ3zydo?=
+ =?us-ascii?Q?zSx+dKeYz7AjcNZ/Y6RygZ3cHvpgdotCSyfnftbm4tGbiYhKFX2zA7JMgnYr?=
+ =?us-ascii?Q?dH2tjl8nJQtNLlA+cH/tC+G09PVCL18P+H4ClsO0XJx3uEhL20xDAuwFqeDX?=
+ =?us-ascii?Q?YwZi3W9PPjJpA6inwUfUiRgqN/MTuxU0iadKDI6FyPGSC8hm7iV3ek3y4p46?=
+ =?us-ascii?Q?5ZylXYarBALj90OfGmHrtpJJ5HNscL7i+C2tJrEx6ZmpolVYyWGsSirlVhMb?=
+ =?us-ascii?Q?mevnacogCizO5K8fK5vF0od1ZQTe9MxdIdAarGjE9hQfjWgAQL3B3YzlzCbZ?=
+ =?us-ascii?Q?MhroAtbH4AcEsalxbmAw4wGm9OSKi1eB?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7785.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?MLIBwJi24n+aM7ms1doUGno/HQ1ruhYg3LSBigOJeR7hWxxqiNDMNzemN8Fl?=
+ =?us-ascii?Q?TjrcSZ87v03YjjgiwhkTiGZYSCqnxGaBGHC9B9eJC+EC0BI7r5HZNqi+lpi4?=
+ =?us-ascii?Q?Jqiepn4ChdUHkjnVe0D0H5mIlClH3JXv7Y5yQcq89VncH6uUXcGoKtTNO2Ut?=
+ =?us-ascii?Q?x3TvbD1QyX6sZeI5UY0uZk0iN6ZsKA8Oh27ji5bcaw45ykD5OTyLkmYDIFMg?=
+ =?us-ascii?Q?Tv6fRGwp7sQk1uwZ1VJzvhoIOqunnfOXJ/JJB0QQvASghQ/8LtKHmFhStUbd?=
+ =?us-ascii?Q?DTFG2DecbuqObPuw/K+ztg4JYMqSNsQGoZPn4lH5ZR75PddRVjpk7KpQQwfz?=
+ =?us-ascii?Q?V+TiJrHzo2/D+800u5PEuW1bIbdWqi77CzmpOucWPfiEL16UCAY8Di1dFHMA?=
+ =?us-ascii?Q?RCLTsH7d593C9dmROkPNZqk5UAm9HWgeEK4kprVef/KJ/L9CiAILsfhX8gM0?=
+ =?us-ascii?Q?PbbA4gE5yQCF/o81MX7ekks+SUzOho74geFMNnFQy8AIFRrpCkk1eDQXU52J?=
+ =?us-ascii?Q?zQ3qODnohJHBDkkwAdrjQv0e+qi5QXZ7F6OsghDMm09n3kBWxI4MXZBG6mdJ?=
+ =?us-ascii?Q?M3HQLo7RODOl0yF66qG/SzQfCHVl008WEkaAhUiqGNB3/0e5hXWp/9Exsmxl?=
+ =?us-ascii?Q?866DLbsTbbogbSltNiCyYuTNCxlrae6iFsbeeCoYdBAMSkDRRG4kRWKvKUkM?=
+ =?us-ascii?Q?TKyRxvhSMiEJXh+32yEWO5DURnS0QtJiLAZzZg+ZzNraNW9tebYeAdptIN7k?=
+ =?us-ascii?Q?zV9FFHaSeHuNxPrbFWWgvPp9Ro3RDYZ2t/USJzfd4cw9YswhwaE8Ov7U6inq?=
+ =?us-ascii?Q?kPRQ5kU6fNbLA1BMGgjVoEE1oCxTQ/qSmYzFaXoUHV3hdpaqNNa+ZqX4phaJ?=
+ =?us-ascii?Q?Hr1T5QH4GDu0rOAz4BqPgJO7NPBWxacKu53aaBYD13uFH8YEa/T6c/BdsPDF?=
+ =?us-ascii?Q?JqXwDjIuhYEGAdgkLTZV7Su1g6LglLpuIvDR2wPSgpMH7Nf0INcDHJNVCytK?=
+ =?us-ascii?Q?2kvygNwBPL5vGK7gdwqrgWhfYAfWkxQikNUSiEZtqxZAYzutqBAD/rEBH2mT?=
+ =?us-ascii?Q?ZYfvmpCaqwlBzIlI/Ep1NWzrtuh4gCsm8N9JiJj1VREaldcBNVyt3ctE2WNO?=
+ =?us-ascii?Q?D9WYMX6Rdxe0lR75IrgCCR0l73jZ7IFkI4wyAjqg3Y7lWHxl2Zwz3XPSF+vT?=
+ =?us-ascii?Q?uTsWkKLbfjQuUmJRrsl/mdCyM/MfBa9eaLdqXdeI8K+UFWmBQeiihHokP31k?=
+ =?us-ascii?Q?KkvjHu2gU9I71bej0KU61QTmixW3Gxmv9G7VvG3FGg9wWTPXsy9OPIGN1HF/?=
+ =?us-ascii?Q?FtwPWNlqFxMI/NKiKgXPymuXQq+k1Antvt2GREWUoooReNgO9ludbFPpEEXY?=
+ =?us-ascii?Q?RTQgroNofEtAx4q7gNV46E5hKg/UOffRUY2JnDlmTxpYVXu/QCZDW4l9QszG?=
+ =?us-ascii?Q?T5g/46TFXsTPW7mvxRBRWWi6asyAe2zDEmRh6YGXHnFkT7QvTHkbJv//uSrF?=
+ =?us-ascii?Q?iKXYsAXLRb0IgFhwQZjzKnlRoj5bQ8r1MGbRzEQdFbBC5T4rDGHYxMaijf2o?=
+ =?us-ascii?Q?6e4+FdaiSeozLbVJl1ZSCsPeGPmo0/o3rGkzjz5o?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7785.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5394b381-4466-4714-193d-08dd62211376
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Mar 2025 11:20:35.5989
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: KgIUJb+VqmVydWJXVnfGbRLWXW4SDaeO38zon7Gg0FF1zOrZOosturoMyTdB88WX+xKT5UNlbYM6JGF6WXn/0xpOr41bzfdCKHC8KFDMCFs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR11MB8440
+X-OriginatorOrg: intel.com
 
-Replace "master" by "[host] controller" in the SPI core code and comments.
-All the similar to the "slave" by "target [device]" changes.
+From: Simon Horman <horms@kernel.org>=20
+Sent: Wednesday, March 12, 2025 3:56 PM
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- drivers/spi/spi.c       | 96 ++++++++++++++++++++---------------------
- include/linux/spi/spi.h | 34 +++++++--------
- 2 files changed, 64 insertions(+), 66 deletions(-)
+>On Wed, Mar 12, 2025 at 01:58:39PM +0100, Jedrzej Jagielski wrote:
+>
+>...
+>
+>> diff --git a/Documentation/networking/devlink/ixgbe.rst b/Documentation/=
+networking/devlink/ixgbe.rst
+>> index a41073a62776..41aedf4b8017 100644
+>> --- a/Documentation/networking/devlink/ixgbe.rst
+>> +++ b/Documentation/networking/devlink/ixgbe.rst
+>> @@ -64,3 +64,27 @@ The ``ixgbe`` driver reports the following versions
+>>        - running
+>>        - 0xee16ced7
+>>        - The first 4 bytes of the hash of the netlist module contents.
+>> +
+>> +Flash Update
+>> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>> +The ``ixgbe`` driver implements support for flash update using the
+>> +``devlink-flash`` interface. It supports updating the device flash usin=
+g a
+>> +combined flash image that contains the ``fw.mgmt``, ``fw.undi``, and
+>> +``fw.netlist`` components.
+>> +.. list-table:: List of supported overwrite modes
+>> +   :widths: 5 95
+>
+>Hi Jedrzej,
+>
+>make htmldocs flags two warnings, which I believe can be resolved by
+>adding a blank line here.
+>
+>  .../ixgbe.rst:75: ERROR: Unexpected indentation.
+>  .../ixgbe.rst:76: WARNING: Field list ends without a blank line; unexpec=
+ted unindent.
 
-diff --git a/drivers/spi/spi.c b/drivers/spi/spi.c
-index 1f7e2551f5d4..78003cf30244 100644
---- a/drivers/spi/spi.c
-+++ b/drivers/spi/spi.c
-@@ -43,7 +43,7 @@ EXPORT_TRACEPOINT_SYMBOL(spi_transfer_stop);
- 
- #include "internals.h"
- 
--static DEFINE_IDR(spi_master_idr);
-+static DEFINE_IDR(spi_controller_idr);
- 
- static void spidev_release(struct device *dev)
- {
-@@ -306,7 +306,7 @@ static const struct attribute_group spi_controller_statistics_group = {
- 	.attrs  = spi_controller_statistics_attrs,
- };
- 
--static const struct attribute_group *spi_master_groups[] = {
-+static const struct attribute_group *spi_controller_groups[] = {
- 	&spi_controller_statistics_group,
- 	NULL,
- };
-@@ -1107,7 +1107,7 @@ static void spi_set_cs(struct spi_device *spi, bool enable, bool force)
- 					spi_toggle_csgpiod(spi, idx, enable, activate);
- 			}
- 		}
--		/* Some SPI masters need both GPIO CS & slave_select */
-+		/* Some SPI controllers need both GPIO CS & ->set_cs() */
- 		if ((spi->controller->flags & SPI_CONTROLLER_GPIO_SS) &&
- 		    spi->controller->set_cs)
- 			spi->controller->set_cs(spi, !enable);
-@@ -2511,7 +2511,7 @@ of_register_spi_device(struct spi_controller *ctlr, struct device_node *nc)
-  * @ctlr:	Pointer to spi_controller device
-  *
-  * Registers an spi_device for each child node of controller node which
-- * represents a valid SPI slave.
-+ * represents a valid SPI target device.
-  */
- static void of_register_spi_devices(struct spi_controller *ctlr)
- {
-@@ -2796,7 +2796,7 @@ struct spi_device *acpi_spi_device_alloc(struct spi_controller *ctlr,
- 	if (!lookup.max_speed_hz &&
- 	    ACPI_SUCCESS(acpi_get_parent(adev->handle, &parent_handle)) &&
- 	    device_match_acpi_handle(lookup.ctlr->dev.parent, parent_handle)) {
--		/* Apple does not use _CRS but nested devices for SPI slaves */
-+		/* Apple does not use _CRS but nested devices for SPI target devices */
- 		acpi_spi_parse_apple_properties(adev, &lookup);
- 	}
- 
-@@ -2888,7 +2888,7 @@ static void acpi_register_spi_devices(struct spi_controller *ctlr)
- 				     SPI_ACPI_ENUMERATE_MAX_DEPTH,
- 				     acpi_spi_add_device, NULL, ctlr, NULL);
- 	if (ACPI_FAILURE(status))
--		dev_warn(&ctlr->dev, "failed to enumerate SPI slaves\n");
-+		dev_warn(&ctlr->dev, "failed to enumerate SPI target devices\n");
- }
- #else
- static inline void acpi_register_spi_devices(struct spi_controller *ctlr) {}
-@@ -2902,16 +2902,15 @@ static void spi_controller_release(struct device *dev)
- 	kfree(ctlr);
- }
- 
--static const struct class spi_master_class = {
-+static const struct class spi_controller_class = {
- 	.name		= "spi_master",
- 	.dev_release	= spi_controller_release,
--	.dev_groups	= spi_master_groups,
-+	.dev_groups	= spi_controller_groups,
- };
- 
- #ifdef CONFIG_SPI_SLAVE
- /**
-- * spi_target_abort - abort the ongoing transfer request on an SPI slave
-- *		     controller
-+ * spi_target_abort - abort the ongoing transfer request on an SPI target controller
-  * @spi: device used for the current transfer
-  */
- int spi_target_abort(struct spi_device *spi)
-@@ -2952,13 +2951,13 @@ static ssize_t slave_store(struct device *dev, struct device_attribute *attr,
- 
- 	child = device_find_any_child(&ctlr->dev);
- 	if (child) {
--		/* Remove registered slave */
-+		/* Remove registered target device */
- 		device_unregister(child);
- 		put_device(child);
- 	}
- 
- 	if (strcmp(name, "(null)")) {
--		/* Register new slave */
-+		/* Register new target device */
- 		spi = spi_alloc_device(ctlr);
- 		if (!spi)
- 			return -ENOMEM;
-@@ -2977,40 +2976,40 @@ static ssize_t slave_store(struct device *dev, struct device_attribute *attr,
- 
- static DEVICE_ATTR_RW(slave);
- 
--static struct attribute *spi_slave_attrs[] = {
-+static struct attribute *spi_target_attrs[] = {
- 	&dev_attr_slave.attr,
- 	NULL,
- };
- 
--static const struct attribute_group spi_slave_group = {
--	.attrs = spi_slave_attrs,
-+static const struct attribute_group spi_target_group = {
-+	.attrs = spi_target_attrs,
- };
- 
--static const struct attribute_group *spi_slave_groups[] = {
-+static const struct attribute_group *spi_target_groups[] = {
- 	&spi_controller_statistics_group,
--	&spi_slave_group,
-+	&spi_target_group,
- 	NULL,
- };
- 
--static const struct class spi_slave_class = {
-+static const struct class spi_target_class = {
- 	.name		= "spi_slave",
- 	.dev_release	= spi_controller_release,
--	.dev_groups	= spi_slave_groups,
-+	.dev_groups	= spi_target_groups,
- };
- #else
--extern struct class spi_slave_class;	/* dummy */
-+extern struct class spi_target_class;	/* dummy */
- #endif
- 
- /**
-- * __spi_alloc_controller - allocate an SPI master or slave controller
-+ * __spi_alloc_controller - allocate an SPI host or target controller
-  * @dev: the controller, possibly using the platform_bus
-  * @size: how much zeroed driver-private data to allocate; the pointer to this
-  *	memory is in the driver_data field of the returned device, accessible
-  *	with spi_controller_get_devdata(); the memory is cacheline aligned;
-  *	drivers granting DMA access to portions of their private data need to
-  *	round up @size using ALIGN(size, dma_get_cache_alignment()).
-- * @slave: flag indicating whether to allocate an SPI master (false) or SPI
-- *	slave (true) controller
-+ * @target: flag indicating whether to allocate an SPI host (false) or SPI target (true)
-+ *	controller
-  * Context: can sleep
-  *
-  * This call is used only by SPI controller drivers, which are the
-@@ -3027,7 +3026,7 @@ extern struct class spi_slave_class;	/* dummy */
-  * Return: the SPI controller structure on success, else NULL.
-  */
- struct spi_controller *__spi_alloc_controller(struct device *dev,
--					      unsigned int size, bool slave)
-+					      unsigned int size, bool target)
- {
- 	struct spi_controller	*ctlr;
- 	size_t ctlr_size = ALIGN(sizeof(*ctlr), dma_get_cache_alignment());
-@@ -3048,11 +3047,11 @@ struct spi_controller *__spi_alloc_controller(struct device *dev,
- 	mutex_init(&ctlr->add_lock);
- 	ctlr->bus_num = -1;
- 	ctlr->num_chipselect = 1;
--	ctlr->slave = slave;
--	if (IS_ENABLED(CONFIG_SPI_SLAVE) && slave)
--		ctlr->dev.class = &spi_slave_class;
-+	ctlr->target = target;
-+	if (IS_ENABLED(CONFIG_SPI_SLAVE) && target)
-+		ctlr->dev.class = &spi_target_class;
- 	else
--		ctlr->dev.class = &spi_master_class;
-+		ctlr->dev.class = &spi_controller_class;
- 	ctlr->dev.parent = dev;
- 	pm_suspend_ignore_children(&ctlr->dev, true);
- 	spi_controller_set_devdata(ctlr, (void *)ctlr + ctlr_size);
-@@ -3070,7 +3069,7 @@ static void devm_spi_release_controller(struct device *dev, void *ctlr)
-  * __devm_spi_alloc_controller - resource-managed __spi_alloc_controller()
-  * @dev: physical device of SPI controller
-  * @size: how much zeroed driver-private data to allocate
-- * @slave: whether to allocate an SPI master (false) or SPI slave (true)
-+ * @target: whether to allocate an SPI host (false) or SPI target (true) controller
-  * Context: can sleep
-  *
-  * Allocate an SPI controller and automatically release a reference on it
-@@ -3083,7 +3082,7 @@ static void devm_spi_release_controller(struct device *dev, void *ctlr)
-  */
- struct spi_controller *__devm_spi_alloc_controller(struct device *dev,
- 						   unsigned int size,
--						   bool slave)
-+						   bool target)
- {
- 	struct spi_controller **ptr, *ctlr;
- 
-@@ -3092,7 +3091,7 @@ struct spi_controller *__devm_spi_alloc_controller(struct device *dev,
- 	if (!ptr)
- 		return NULL;
- 
--	ctlr = __spi_alloc_controller(dev, size, slave);
-+	ctlr = __spi_alloc_controller(dev, size, target);
- 	if (ctlr) {
- 		ctlr->devm_allocated = true;
- 		*ptr = ctlr;
-@@ -3106,8 +3105,8 @@ struct spi_controller *__devm_spi_alloc_controller(struct device *dev,
- EXPORT_SYMBOL_GPL(__devm_spi_alloc_controller);
- 
- /**
-- * spi_get_gpio_descs() - grab chip select GPIOs for the master
-- * @ctlr: The SPI master to grab GPIO descriptors for
-+ * spi_get_gpio_descs() - grab chip select GPIOs for the controller
-+ * @ctlr: The SPI controller to grab GPIO descriptors for
-  */
- static int spi_get_gpio_descs(struct spi_controller *ctlr)
- {
-@@ -3205,7 +3204,7 @@ static int spi_controller_id_alloc(struct spi_controller *ctlr, int start, int e
- 	int id;
- 
- 	mutex_lock(&board_lock);
--	id = idr_alloc(&spi_master_idr, ctlr, start, end, GFP_KERNEL);
-+	id = idr_alloc(&spi_controller_idr, ctlr, start, end, GFP_KERNEL);
- 	mutex_unlock(&board_lock);
- 	if (WARN(id < 0, "couldn't get idr"))
- 		return id == -ENOSPC ? -EBUSY : id;
-@@ -3354,7 +3353,7 @@ int spi_register_controller(struct spi_controller *ctlr)
- 	spi_destroy_queue(ctlr);
- free_bus_id:
- 	mutex_lock(&board_lock);
--	idr_remove(&spi_master_idr, ctlr->bus_num);
-+	idr_remove(&spi_controller_idr, ctlr->bus_num);
- 	mutex_unlock(&board_lock);
- 	return status;
- }
-@@ -3366,8 +3365,7 @@ static void devm_spi_unregister(struct device *dev, void *res)
- }
- 
- /**
-- * devm_spi_register_controller - register managed SPI host or target
-- *	controller
-+ * devm_spi_register_controller - register managed SPI host or target controller
-  * @dev:    device managing SPI controller
-  * @ctlr: initialized controller, originally from spi_alloc_host() or
-  *	spi_alloc_target()
-@@ -3407,7 +3405,7 @@ static int __unregister(struct device *dev, void *null)
- }
- 
- /**
-- * spi_unregister_controller - unregister SPI master or slave controller
-+ * spi_unregister_controller - unregister SPI host or target controller
-  * @ctlr: the controller being unregistered
-  * Context: can sleep
-  *
-@@ -3431,7 +3429,7 @@ void spi_unregister_controller(struct spi_controller *ctlr)
- 
- 	/* First make sure that this controller was ever added */
- 	mutex_lock(&board_lock);
--	found = idr_find(&spi_master_idr, id);
-+	found = idr_find(&spi_controller_idr, id);
- 	mutex_unlock(&board_lock);
- 	if (ctlr->queued) {
- 		if (spi_destroy_queue(ctlr))
-@@ -3446,7 +3444,7 @@ void spi_unregister_controller(struct spi_controller *ctlr)
- 	/* Free bus id */
- 	mutex_lock(&board_lock);
- 	if (found == ctlr)
--		idr_remove(&spi_master_idr, id);
-+		idr_remove(&spi_controller_idr, id);
- 	mutex_unlock(&board_lock);
- 
- 	if (IS_ENABLED(CONFIG_SPI_DYNAMIC))
-@@ -4599,7 +4597,7 @@ EXPORT_SYMBOL_GPL(spi_sync_locked);
- 
- /**
-  * spi_bus_lock - obtain a lock for exclusive SPI bus usage
-- * @ctlr: SPI bus master that should be locked for exclusive bus access
-+ * @ctlr: SPI bus controller that should be locked for exclusive bus access
-  * Context: can sleep
-  *
-  * This call may only be used from a context that may sleep.  The sleep
-@@ -4630,7 +4628,7 @@ EXPORT_SYMBOL_GPL(spi_bus_lock);
- 
- /**
-  * spi_bus_unlock - release the lock for exclusive SPI bus usage
-- * @ctlr: SPI bus master that was locked for exclusive bus access
-+ * @ctlr: SPI bus controller that was locked for exclusive bus access
-  * Context: can sleep
-  *
-  * This call may only be used from a context that may sleep.  The sleep
-@@ -4747,9 +4745,9 @@ static struct spi_controller *of_find_spi_controller_by_node(struct device_node
- {
- 	struct device *dev;
- 
--	dev = class_find_device_by_of_node(&spi_master_class, node);
-+	dev = class_find_device_by_of_node(&spi_controller_class, node);
- 	if (!dev && IS_ENABLED(CONFIG_SPI_SLAVE))
--		dev = class_find_device_by_of_node(&spi_slave_class, node);
-+		dev = class_find_device_by_of_node(&spi_target_class, node);
- 	if (!dev)
- 		return NULL;
- 
-@@ -4829,10 +4827,10 @@ struct spi_controller *acpi_spi_find_controller_by_adev(struct acpi_device *adev
- {
- 	struct device *dev;
- 
--	dev = class_find_device(&spi_master_class, NULL, adev,
-+	dev = class_find_device(&spi_controller_class, NULL, adev,
- 				spi_acpi_controller_match);
- 	if (!dev && IS_ENABLED(CONFIG_SPI_SLAVE))
--		dev = class_find_device(&spi_slave_class, NULL, adev,
-+		dev = class_find_device(&spi_target_class, NULL, adev,
- 					spi_acpi_controller_match);
- 	if (!dev)
- 		return NULL;
-@@ -4902,12 +4900,12 @@ static int __init spi_init(void)
- 	if (status < 0)
- 		goto err1;
- 
--	status = class_register(&spi_master_class);
-+	status = class_register(&spi_controller_class);
- 	if (status < 0)
- 		goto err2;
- 
- 	if (IS_ENABLED(CONFIG_SPI_SLAVE)) {
--		status = class_register(&spi_slave_class);
-+		status = class_register(&spi_target_class);
- 		if (status < 0)
- 			goto err3;
- 	}
-@@ -4920,7 +4918,7 @@ static int __init spi_init(void)
- 	return 0;
- 
- err3:
--	class_unregister(&spi_master_class);
-+	class_unregister(&spi_controller_class);
- err2:
- 	bus_unregister(&spi_bus_type);
- err1:
-diff --git a/include/linux/spi/spi.h b/include/linux/spi/spi.h
-index 056c3834c720..a45413dee88b 100644
---- a/include/linux/spi/spi.h
-+++ b/include/linux/spi/spi.h
-@@ -49,7 +49,7 @@ struct spi_offload_config;
- struct spi_transfer;
- 
- /*
-- * INTERFACES between SPI master-side drivers and SPI slave protocol handlers,
-+ * INTERFACES between SPI controller-side drivers and SPI target protocol handlers,
-  * and SPI infrastructure.
-  */
- extern const struct bus_type spi_bus_type;
-@@ -144,7 +144,7 @@ extern void spi_transfer_cs_change_delay_exec(struct spi_message *msg,
- 						  struct spi_transfer *xfer);
- 
- /**
-- * struct spi_device - Controller side proxy for an SPI slave device
-+ * struct spi_device - Controller side proxy for an SPI target device
-  * @dev: Driver model representation of the device.
-  * @controller: SPI controller used with the device.
-  * @max_speed_hz: Maximum clock rate to be used with this chip
-@@ -188,7 +188,7 @@ extern void spi_transfer_cs_change_delay_exec(struct spi_message *msg,
-  * @pcpu_statistics: statistics for the spi_device
-  * @cs_index_mask: Bit mask of the active chipselect(s) in the chipselect array
-  *
-- * A @spi_device is used to interchange data between an SPI slave
-+ * A @spi_device is used to interchange data between an SPI target device
-  * (usually a discrete chip) and CPU memory.
-  *
-  * In @dev, the platform_data is used to hold information about this
-@@ -402,15 +402,15 @@ extern struct spi_device *spi_new_ancillary_device(struct spi_device *spi, u8 ch
- 			spi_unregister_driver)
- 
- /**
-- * struct spi_controller - interface to SPI master or slave controller
-+ * struct spi_controller - interface to SPI host or target controller
-  * @dev: device interface to this driver
-  * @list: link with the global spi_controller list
-  * @bus_num: board-specific (and often SOC-specific) identifier for a
-  *	given SPI controller.
-  * @num_chipselect: chipselects are used to distinguish individual
-- *	SPI slaves, and are numbered from zero to num_chipselects.
-- *	each slave has a chipselect signal, but it's common that not
-- *	every chipselect is connected to a slave.
-+ *	SPI targets, and are numbered from zero to num_chipselects.
-+ *	each target has a chipselect signal, but it's common that not
-+ *	every chipselect is connected to a target.
-  * @dma_alignment: SPI controller constraint on DMA buffers alignment.
-  * @mode_bits: flags understood by this controller driver
-  * @buswidth_override_bits: flags to override for this controller driver
-@@ -439,9 +439,9 @@ extern struct spi_device *spi_new_ancillary_device(struct spi_device *spi, u8 ch
-  *	must fail if an unrecognized or unsupported mode is requested.
-  *	It's always safe to call this unless transfers are pending on
-  *	the device whose settings are being modified.
-- * @set_cs_timing: optional hook for SPI devices to request SPI master
-+ * @set_cs_timing: optional hook for SPI devices to request SPI
-  * controller for configuring specific CS setup time, hold time and inactive
-- * delay interms of clock counts
-+ * delay in terms of clock counts
-  * @transfer: adds a message to the controller's transfer queue.
-  * @cleanup: frees controller-specific state
-  * @can_dma: determine whether this controller supports DMA
-@@ -561,7 +561,7 @@ extern struct spi_device *spi_new_ancillary_device(struct spi_device *spi, u8 ch
-  *
-  * The driver for an SPI controller manages access to those devices through
-  * a queue of spi_message transactions, copying data between CPU memory and
-- * an SPI slave device.  For each such message it queues, it calls the
-+ * an SPI target device.  For each such message it queues, it calls the
-  * message's completion function when the transaction completes.
-  */
- struct spi_controller {
-@@ -611,7 +611,7 @@ struct spi_controller {
- #define SPI_CONTROLLER_NO_TX		BIT(2)	/* Can't do buffer write */
- #define SPI_CONTROLLER_MUST_RX		BIT(3)	/* Requires rx */
- #define SPI_CONTROLLER_MUST_TX		BIT(4)	/* Requires tx */
--#define SPI_CONTROLLER_GPIO_SS		BIT(5)	/* GPIO CS must select slave */
-+#define SPI_CONTROLLER_GPIO_SS		BIT(5)	/* GPIO CS must select target device */
- #define SPI_CONTROLLER_SUSPENDED	BIT(6)	/* Currently suspended */
- 	/*
- 	 * The spi-controller has multi chip select capability and can
-@@ -678,7 +678,7 @@ struct spi_controller {
- 	 * + To a given spi_device, message queueing is pure FIFO
- 	 *
- 	 * + The controller's main job is to process its message queue,
--	 *   selecting a chip (for masters), then transferring data
-+	 *   selecting a chip (for controllers), then transferring data
- 	 * + If there are multiple spi_device children, the i/o queue
- 	 *   arbitration algorithm is unspecified (round robin, FIFO,
- 	 *   priority, reservations, preemption, etc)
-@@ -846,7 +846,7 @@ void spi_take_timestamp_post(struct spi_controller *ctlr,
- 
- /* The SPI driver core manages memory for the spi_controller classdev */
- extern struct spi_controller *__spi_alloc_controller(struct device *host,
--						unsigned int size, bool slave);
-+						unsigned int size, bool target);
- 
- static inline struct spi_controller *spi_alloc_host(struct device *dev,
- 						    unsigned int size)
-@@ -865,7 +865,7 @@ static inline struct spi_controller *spi_alloc_target(struct device *dev,
- 
- struct spi_controller *__devm_spi_alloc_controller(struct device *dev,
- 						   unsigned int size,
--						   bool slave);
-+						   bool target);
- 
- static inline struct spi_controller *devm_spi_alloc_host(struct device *dev,
- 							 unsigned int size)
-@@ -1003,12 +1003,12 @@ struct spi_res {
-  *	purposefully (instead of setting to spi_transfer->len - 1) to denote
-  *	that a transfer-level snapshot taken from within the driver may still
-  *	be of higher quality.
-- * @ptp_sts: Pointer to a memory location held by the SPI slave device where a
-+ * @ptp_sts: Pointer to a memory location held by the SPI target device where a
-  *	PTP system timestamp structure may lie. If drivers use PIO or their
-  *	hardware has some sort of assist for retrieving exact transfer timing,
-  *	they can (and should) assert @ptp_sts_supported and populate this
-  *	structure using the ptp_read_system_*ts helper functions.
-- *	The timestamp must represent the time at which the SPI slave device has
-+ *	The timestamp must represent the time at which the SPI target device has
-  *	processed the word, i.e. the "pre" timestamp should be taken before
-  *	transmitting the "pre" word, and the "post" timestamp after receiving
-  *	transmit confirmation from the controller for the "post" word.
-@@ -1651,7 +1651,7 @@ struct spi_board_info {
- 	 * bus_num is board specific and matches the bus_num of some
- 	 * spi_controller that will probably be registered later.
- 	 *
--	 * chip_select reflects how this chip is wired to that master;
-+	 * chip_select reflects how this chip is wired to that controller;
- 	 * it's less than num_chipselect.
- 	 */
- 	u16		bus_num;
--- 
-2.47.2
+Hello Simon
 
+thanks for finding these.
+
+I will fix it and resend it later today probably.
+
+>
+>> +   * - Bits
+>> +     - Behavior
+>> +   * - ``DEVLINK_FLASH_OVERWRITE_SETTINGS``
+>> +     - Do not preserve settings stored in the flash components being
+>> +       updated. This includes overwriting the port configuration that
+>> +       determines the number of physical functions the device will
+>> +       initialize with.
+>> +   * - ``DEVLINK_FLASH_OVERWRITE_SETTINGS`` and ``DEVLINK_FLASH_OVERWRI=
+TE_IDENTIFIERS``
+>> +     - Do not preserve either settings or identifiers. Overwrite everyt=
+hing
+>> +       in the flash with the contents from the provided image, without
+>> +       performing any preservation. This includes overwriting device
+>> +       identifying fields such as the MAC address, Vital product Data (=
+VPD) area,
+>> +       and device serial number. It is expected that this combination b=
+e used with an
+>> +       image customized for the specific device.
+>> +
+>
+>...
 
