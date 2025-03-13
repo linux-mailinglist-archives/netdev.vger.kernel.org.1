@@ -1,206 +1,113 @@
-Return-Path: <netdev+bounces-174743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2A6FA6019D
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 20:53:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 500ACA601A2
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 20:55:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B7A53AEEC5
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 19:52:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D98BD8800B9
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 19:54:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61B681F3BB3;
-	Thu, 13 Mar 2025 19:53:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 998B81F4264;
+	Thu, 13 Mar 2025 19:54:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dMHZEq3m"
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="YCFHt6Gt"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 866C11DDC3B
-	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 19:52:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5FB91F3D55
+	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 19:54:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741895581; cv=none; b=Ypirmeg8dE8Dwu9prGot7DP0bc7GC5GfqYrUyvMZkP/9RhYpQk0ekKFccBtQQHnfMym7rp2/TGD2Sym+Vyz8k/PjL30mOr8ZJ5o/CKHX3ftKR5lnQeqIaYwh5HqpZtwor6Tlfz5Q0bJ1qr4pKKfwV8VYKP2rK8ntl6BUQOBrZYk=
+	t=1741895690; cv=none; b=esBL/+I/cQw2JPFxkaST78CQUHwz8TunXX5VGPwBBQTVq8LXkLpQKf551TaJD7pEsnVPJynWDnIHV0zHcE1MmsTr/2XUWOPiqbSL7jsWP3LeXZluuCvDp4KuqwuTQAHIybouQpNJysWGlEGQOPVZpNILR3UoYT2ooe1O0gRqd5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741895581; c=relaxed/simple;
-	bh=ssrY+rvJTsOIek9mChfxY5TLNOw4wZX11HmnNeMPqsw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=N+/jlWM16Zeao7hKgwK3AWTHvYp5DUOGGbEjZU8PnErqoPvn+iw9tHdAA1DQE042S/DMPp2+yBcoo88Ki/WHw4GkFQgcE2jfcKCY+ZhqVvCPHK+QVEkTjBJ49v2kW2aKQfMeru/PFQpETlrGe69u2l6e4GD4YV9+8Ua281XWpXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dMHZEq3m; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741895578;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K5Rwgf9qGOGXudkqHlAtuBTuQYQzfN70qYMcLMsFPhA=;
-	b=dMHZEq3mSz9/v6XNkF0OJJ7iKzYhaQUbXiCLeMwc+DHgDLUcLq95GIJory+9EtJfPMF+LT
-	vv3eWgcPaz6lDhLKgrHWiNkf2VOWuyMcC4oY1+thLTux1mZgciS+6SCrpP55kr9UZOF48Y
-	rLsJLRRMfTQjA11ceU+t05EhJYAJd6Y=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-383-EXSCnH36OSS7zRy8YfqZUw-1; Thu, 13 Mar 2025 15:52:57 -0400
-X-MC-Unique: EXSCnH36OSS7zRy8YfqZUw-1
-X-Mimecast-MFC-AGG-ID: EXSCnH36OSS7zRy8YfqZUw_1741895576
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-5499c383444so745787e87.2
-        for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 12:52:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741895576; x=1742500376;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=K5Rwgf9qGOGXudkqHlAtuBTuQYQzfN70qYMcLMsFPhA=;
-        b=uO7pLV1F6Pptz0bfZ8VdzYGTOvWllE4Fe2Qu2xNZ4KC0D+3Br+NPzCtNWhh7nT7Ehz
-         HGJ8d8zBsa225KoOIJ9i/e7rFjeg9zZIJAzpkF6pgqLsdpI3q1zCFaxE1Jg2mjhh/pKF
-         vytuDHMCLSTMTAA6gEv5h1cG/LtdEKlWQOz97DLjj8a+QEC7zQUp176909sN5mF3WB9Z
-         t+XCj8VfSXb1oJcpQzDC961cjsTTKQxZtUnzgCOjslFbEATGLCGWhHJ3j05iBtgH7fpm
-         l+e0iFN8kvfzZ25dKzf7TR+iLEl6TFsbDptmnltRQHfA0wFOYmYSdWwcVAwO/Irzz9OV
-         XehA==
-X-Forwarded-Encrypted: i=1; AJvYcCVwLLpDrzoxjP9SiVID/C2sKAB4Bllx2TuERHcJ1xuUiF0tue3ooXyd8aTQx9DGnNn4vbzGDyY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoU8rY1Ks2/65eKTmHvpLP39qP9fCax4sBD0XDqHJwi5RWLCUU
-	PLIhxkwZ6c4WXNv7unPrdHpHg85b8bcfbWD9wgX06Wv89Qac5odw+e4ltM5x7mxRlmu+NSyzude
-	L8iaa3QWFWHgs2T12Zq51G3asd3AXpv8tHf/pSpab0zsMeqwRry8Ekw==
-X-Gm-Gg: ASbGncu+lYRqpIHQbUg7DcW1W2+wxaovcBGIAnNpnB5NBseQy8LivsudrigRbSbQowi
-	y4ZotLyfyoyHFU8lIySxdUu3MCD0sAg2vZLH3BPAp1Aht5NgyILghbGpo6yDiXcuZVQeu0mqZ+K
-	0NlPMV1yZxVIFz64P8DQGQqH/JDhwGBl60E3ieVYxc0QJ4ZIOfdsWLBQQuOkG1YjjPiNghzJ2Kr
-	6TgWt8PchsNol/1c0SvBuvoIQgp1dkj8DYaUMwH1edwGnpV1AuP80W6QBv+4ZGPQsMxNzcLzdgX
-	59xhDHPsTEJo
-X-Received: by 2002:a05:6512:3d0b:b0:549:7354:e4d1 with SMTP id 2adb3069b0e04-549c0a69cc9mr347163e87.38.1741895575589;
-        Thu, 13 Mar 2025 12:52:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGgazDuCvmszGomPJv4QwZuDgkCkfCLmqsdzf5Js6CYZfrk531WhEOt+lFCcA3MgDrafjMpgQ==
-X-Received: by 2002:a05:6512:3d0b:b0:549:7354:e4d1 with SMTP id 2adb3069b0e04-549c0a69cc9mr347149e87.38.1741895575138;
-        Thu, 13 Mar 2025 12:52:55 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-549ba8a79a9sm302680e87.221.2025.03.13.12.52.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Mar 2025 12:52:53 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 43E5618FA899; Thu, 13 Mar 2025 20:52:50 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Amery Hung <ameryhung@gmail.com>, netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- alexei.starovoitov@gmail.com, martin.lau@kernel.org, kuba@kernel.org,
- edumazet@google.com, xiyou.wangcong@gmail.com, jhs@mojatatu.com,
- sinquersw@gmail.com, jiri@resnulli.us, stfomichev@gmail.com,
- ekarani.silvestre@ccc.ufcg.edu.br, yangpeihao@sjtu.edu.cn,
- yepeilin.cs@gmail.com, ameryhung@gmail.com, kernel-team@meta.com
-Subject: Re: [PATCH bpf-next v5 00/13] bpf qdisc
-In-Reply-To: <20250313190309.2545711-1-ameryhung@gmail.com>
-References: <20250313190309.2545711-1-ameryhung@gmail.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Thu, 13 Mar 2025 20:52:50 +0100
-Message-ID: <87bju4u2r1.fsf@toke.dk>
+	s=arc-20240116; t=1741895690; c=relaxed/simple;
+	bh=CF1bSX3XlU4ChBISB+cYOWk0F+bA3NnjnVnuf/kjyh4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=cz8Nvp9HBxsQUBnZ9PE9v0YwCj9W+pZpbvfXPeGDpGGIoRQGbno9x1viS6TlQ7r6/9Bk3Sqk70tt5F/TtkanYhrG1zcy+fnLwFlH5rbqaSWYC+w0kyCroHAxvoCnFuK99PP+if8yYh96lV+CRsXo7zMvkAnRYMWNcg0RlCMAOww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=YCFHt6Gt; arc=none smtp.client-ip=202.36.163.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
+Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id B2FA92C0375;
+	Fri, 14 Mar 2025 08:54:39 +1300 (NZDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
+	s=mail181024; t=1741895679;
+	bh=CF1bSX3XlU4ChBISB+cYOWk0F+bA3NnjnVnuf/kjyh4=;
+	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
+	b=YCFHt6GtSuNsI9AVXX815U+BW8iQ5enkD/fTCNkfOEQJr6yttPSX/NMajdu27utke
+	 i+XqgUB/L/xf38ac45wLpkh2IwR458EnBcO3VfKgK3gZz1uVTPjc4oCiE8gnQb6BUD
+	 GbOwRG9NRP7X4Xfv0yhTvhRJHQljjaTlaq71rsoxfW1h4PX0ZOEOXcZIy4Gas1uP2K
+	 T43YABQ8zVtbB+/1wng5YHzCtDygpUnW7x3fxIP4y5+qFsJd+14dJQh7T+Pv/R7xXO
+	 YRlU0T5xaFX9hm7ZzR1k/w1zipgO731oYg91Z6pGeDMtbh5XC7/PKj3GJKZB1Hksvz
+	 2Oj01o0B38t9w==
+Received: from svr-chch-ex2.atlnz.lc (Not Verified[2001:df5:b000:bc8::76]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
+	id <B67d337ff0001>; Fri, 14 Mar 2025 08:54:39 +1300
+Received: from svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8:f753:6de:11c0:a008) by
+ svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8:f753:6de:11c0:a008) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Fri, 14 Mar 2025 08:54:39 +1300
+Received: from svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567]) by
+ svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567%15]) with mapi id
+ 15.02.1544.014; Fri, 14 Mar 2025 08:54:39 +1300
+From: Chris Packham <Chris.Packham@alliedtelesis.co.nz>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "hkallweit1@gmail.com" <hkallweit1@gmail.com>, "linux@armlinux.org.uk"
+	<linux@armlinux.org.uk>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"daniel@makrotopia.org" <daniel@makrotopia.org>, "markus.stockhausen@gmx.de"
+	<markus.stockhausen@gmx.de>, "sander@svanheule.net" <sander@svanheule.net>,
+	netdev <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v10] net: mdio: Add RTL9300 MDIO driver
+Thread-Topic: [PATCH v10] net: mdio: Add RTL9300 MDIO driver
+Thread-Index: AQHbk7RQMlEBwbSVuE+Te7ZjHwH5gbNwJygAgAB7A4A=
+Date: Thu, 13 Mar 2025 19:54:39 +0000
+Message-ID: <5ea333ec-c2e4-4715-8a44-0fd2c77a4f3c@alliedtelesis.co.nz>
+References: <20250313010726.2181302-1-chris.packham@alliedtelesis.co.nz>
+ <f7c7f28b-f2b0-464a-a621-d4b2f815d206@lunn.ch>
+In-Reply-To: <f7c7f28b-f2b0-464a-a621-d4b2f815d206@lunn.ch>
+Accept-Language: en-NZ, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D6111809622E754CB108E822046D02FD@alliedtelesis.co.nz>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=Ko7u2nWN c=1 sm=1 tr=0 ts=67d337ff a=Xf/6aR1Nyvzi7BryhOrcLQ==:117 a=xqWC_Br6kY4A:10 a=75chYTbOgJ0A:10 a=IkcTkHD0fZMA:10 a=Vs1iUdzkB0EA:10 a=GmB-G2GEk0dDs4bVDSMA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-SEG-SpamProfiler-Score: 0
 
-Amery Hung <ameryhung@gmail.com> writes:
-
-> Hi all,
->
-> This patchset aims to support implementing qdisc using bpf struct_ops.
-> This version takes a step back and only implements the minimum support
-> for bpf qdisc. 1) support of adding skb to bpf_list and bpf_rbtree
-> directly and 2) classful qdisc are deferred to future patchsets. In
-> addition, we only allow attaching bpf qdisc to root or mq for now.
-> This is to prevent accidentally breaking exisiting classful qdiscs
-> that rely on data in a child qdisc. This limit may be lifted in the
-> future after careful inspection.
->
-> * Overview *
->
-> This series supports implementing qdisc using bpf struct_ops. bpf qdisc
-> aims to be a flexible and easy-to-use infrastructure that allows users to
-> quickly experiment with different scheduling algorithms/policies. It only
-> requires users to implement core qdisc logic using bpf and implements the
-> mundane part for them. In addition, the ability to easily communicate
-> between qdisc and other components will also bring new opportunities for
-> new applications and optimizations.
->
-> * struct_ops changes *
->
-> To make struct_ops works better with bpf qdisc, two new changes are
-> introduced to bpf specifically for struct_ops programs. Frist, we
-> introduce "__ref" postfix for arguments in stub functions in patch 1-2.
-> It allows Qdisc_ops->enqueue to acquire an unique referenced kptr to the
-> skb argument. Through the reference object tracking mechanism in
-> the verifier, we can make sure that the acquired skb will be either
-> enqueued or dropped. Besides, no duplicate references can be acquired.
-> Then, we allow a referenced kptr to be returned from struct_ops programs
-> so that we can return an skb naturally. This is done and tested in patch 3
-> and 4.
->
-> * Performance of bpf qdisc *
->
-> This patchset includes two qdisc examples, bpf_fifo and bpf_fq, for
-> __testing__ purposes. For performance test, we compare selftests and their
-> kernel counterparts to give you a sense of the performance of qdisc
-> implemented in bpf.
->
-> The implementation of bpf_fq is fairly complex and slightly different from
-> fq so later we only compare the two fifo qdiscs. bpf_fq implements a=20
-> scheduling algorithm similar to fq before commit 29f834aa326e ("net_sched:
-> sch_fq: add 3 bands and WRR scheduling") was introduced. bpf_fifo uses a
-> single bpf_list as a queue instead of three queues for different
-> priorities in pfifo_fast. The time complexity of fifo however should be
-> similar since the queue selection time is negligible.
->
-> Test setup:
->
->     client -> qdisc ------------->  server
->     ~~~~~~~~~~~~~~~                 ~~~~~~
->     nested VM1 @ DC1               VM2 @ DC2
->
-> Throghput: iperf3 -t 600, 5 times
->
->       Qdisc        Average (GBits/sec)
->     ----------     -------------------
->     pfifo_fast       12.52 =C2=B1 0.26
->     bpf_fifo         11.72 =C2=B1 0.32=20
->     fq               10.24 =C2=B1 0.13
->     bpf_fq           11.92 =C2=B1 0.64=20
->
-> Latency: sockperf pp --tcp -t 600, 5 times
->
->       Qdisc        Average (usec)
->     ----------     --------------
->     pfifo_fast      244.58 =C2=B1 7.93
->     bpf_fifo        244.92 =C2=B1 15.22
->     fq              234.30 =C2=B1 19.25
->     bpf_fq          221.34 =C2=B1 10.76
->
-> Looking at the two fifo qdiscs, the 6.4% drop in throughput in the bpf
-> implementatioin is consistent with previous observation (v8 throughput
-> test on a loopback device). This should be able to be mitigated by
-> supporting adding skb to bpf_list or bpf_rbtree directly in the future.
->
-> * Clean up skb in bpf qdisc during reset *
->
-> The current implementation relies on bpf qdisc implementors to correctly
-> release skbs in queues (bpf graphs or maps) in .reset, which might not be
-> a safe thing to do. The solution as Martin has suggested would be
-> supporting private data in struct_ops. This can also help simplifying
-> implementation of qdisc that works with mq. For examples, qdiscs in the
-> selftest mostly use global data. Therefore, even if user add multiple
-> qdisc instances under mq, they would still share the same queue.=20
-
-Very cool to see this progress!
-
-Are you aware that the series has a mix of commit author email addresses
-(mixing your bytedance.com and gmail addresses)?
-
-Otherwise, for the series:
-
-Acked-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-
+K2NjIG5ldGRldiwgbGttbA0KDQpPbiAxNC8wMy8yMDI1IDAxOjM0LCBBbmRyZXcgTHVubiB3cm90
+ZToNCj4+ICsJLyogUHV0IHRoZSBpbnRlcmZhY2VzIGludG8gQzQ1IG1vZGUgaWYgcmVxdWlyZWQg
+Ki8NCj4+ICsJZ2xiX2N0cmxfbWFzayA9IEdFTk1BU0soMTksIDE2KTsNCj4+ICsJZm9yIChpID0g
+MDsgaSA8IE1BWF9TTUlfQlVTU0VTOyBpKyspDQo+PiArCQlpZiAocHJpdi0+c21pX2J1c19pc19j
+NDVbaV0pDQo+PiArCQkJZ2xiX2N0cmxfdmFsIHw9IEdMQl9DVFJMX0lOVEZfU0VMKGkpOw0KPj4g
+Kw0KPj4gKwlmd25vZGVfZm9yX2VhY2hfY2hpbGRfbm9kZShub2RlLCBjaGlsZCkNCj4+ICsJCWlm
+IChmd25vZGVfZGV2aWNlX2lzX2NvbXBhdGlibGUoY2hpbGQsICJldGhlcm5ldC1waHktaWVlZTgw
+Mi4zLWM0NSIpKQ0KPj4gKwkJCXByaXYtPnNtaV9idXNfaXNfYzQ1W21kaW9fYnVzXSA9IHRydWU7
+DQo+PiArDQo+IFRoaXMgbmVlZHMgbW9yZSBleHBsYW5hdGlvbi4gU29tZSBQSFlzIG1peCBDMjIg
+YW5kIEM0NSwgZS5nLiB0aGUgPiAxRw0KPiBzcGVlZCBzdXBwb3J0IHJlZ2lzdGVycyBhcmUgaW4g
+dGhlIEM0NSBhZGRyZXNzIHNwYWNlLCBidXQgPD0gMUcgaXMgaW4NCj4gdGhlIEMyMiBzcGFjZS4g
+QW5kIDFHIFBIWXMgd2hpY2ggc3VwcG9ydCBFRUUgbmVlZCBhY2Nlc3MgdG8gQzQ1IHNwYWNlDQo+
+IGZvciB0aGUgRUVFIHJlZ2lzdGVycy4NCg0KQWggZ29vZCBwb2ludC4gVGhlIE1ESU8gaW50ZXJm
+YWNlcyBhcmUgZWl0aGVyIGluIEdQSFkgKGkuZS4gY2xhdXNlIDIyKSANCm9yIDEwR1BIWSBtb2Rl
+IChpLmUuIGNsYXVzZSA0NSkuIFRoaXMgZG9lcyBtZWFuIHdlIGNhbid0IHN1cHBvcnQgc3VwcG9y
+dCANCmJvdGggYzQ1IGFuZCBjMjIgb24gdGhlIHNhbWUgTURJTyBidXMgKHdoZXRoZXIgdGhhdCdz
+IG9uZSBQSFkgdGhhdCANCnN1cHBvcnRzIGJvdGggb3IgdHdvIGRpZmZlcmVudCBQSFlzKS4gSSds
+bCBhZGQgYSBjb21tZW50IHRvIHRoYXQgZWZmZWN0IA0KYW5kIEkgc2hvdWxkIHByb2JhYmx5IG9u
+bHkgcHJvdmlkZSBidXMtPnJlYWQvd3JpdGUgb3IgDQpidXMtPnJlYWRfYzQ1L3dyaXRlX2M0NSBk
+ZXBlbmRpbmcgb24gdGhlIG1vZGUuDQo=
 
