@@ -1,238 +1,125 @@
-Return-Path: <netdev+bounces-174435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF5DFA5E9F1
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 03:28:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11439A5E9F8
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 03:36:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 546A83BB752
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 02:28:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 515D7179103
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 02:36:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14F5A86337;
-	Thu, 13 Mar 2025 02:28:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 625621C695;
+	Thu, 13 Mar 2025 02:36:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bh+3iKV1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C3F1/vbl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62613179BD;
-	Thu, 13 Mar 2025 02:28:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFDD32E3395
+	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 02:36:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741832919; cv=none; b=pAldwIKmikz4pVpmfhl6eTKtjJ4BIaKH2NETOlr5EAkNLDc6ouLf2+FuRbS7yoAI+PJkqRnVoqhqDvbtTLQFrlxJs8jHiq696N+Vg8brt44dYsFbShikGzZb6ygYZ6qkoJ5NInSChFKgScnpq38M6xlXdYlUskPS/B0sdMAHxAc=
+	t=1741833409; cv=none; b=cOr2HSahDwAcd0zBpOG/TtCRftl1JtePR5F6tUBIt+8lffhqmZu8I7gGcaAMSKOBljPoE37ArS82cZnEKd0JMKKOvwn8hrTXcrfsM+saCxHzNJpUYt7gC75lVAI4PtD0ZF1s6hmCk/AIs/0vNjefMTM09gOmanadN0VlJUtcuUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741832919; c=relaxed/simple;
-	bh=VovwtesJv9Sb1xbTUhCBIIiCY95KkpZxe6VkXX0igs0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TSjH+TO4+w+3ymAv5mQ/eS4Fljqjcud8sUXneZ6M1HrcF0jZcc8gsND523lraCQ+LgpXaaMHXDqYgBOJy0bbjq/d154DaXsSOrc0pUlKskSf8/PS+Gwn2H2r2ZDUGQIR74zIcGhOuW87gVyzYNcUOT7+z5K++CVStuykwXsWDy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bh+3iKV1; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-22548a28d0cso12912075ad.3;
-        Wed, 12 Mar 2025 19:28:37 -0700 (PDT)
+	s=arc-20240116; t=1741833409; c=relaxed/simple;
+	bh=1Fzz/vnENn6Rnc+gdFpduaGjce7G7nZfmQdWZvATJeQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=nulR2MYkwCONsXdE9GajQ3HkwbONolYK5NwwyiJm8c0JoNR9f0PchEwXQnUuKa0A2b/A5b2Gt0gWmHgAv3yv4juARvv1OidTrErvCiAVBtycnpZEt7WaEsiMQI9zWB7CoCvrYLV5j2DduTCysITFSPiCE8cpHOKgtuUZru4nOC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chiachangwang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C3F1/vbl; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chiachangwang.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-223a2770b75so9887665ad.1
+        for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 19:36:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741832916; x=1742437716; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KoDUTDm8Gdk20+Tf3509gImhzxirBKWUcOSksBRe5Oc=;
-        b=bh+3iKV1AJKuyOKCb8D3pLOXaELEl9hyaOCsGVv4YCvE0eU6GBYjqV5ASt+P1sYMTw
-         Wolm8335WOKrqmcqrzv907kkPVMQKOrcyANlPxboF2SPFaFV5mHNWzUS2/aOK3jp+xM9
-         DTF2tsTo0gel29zq1Pu0NWMGpix909LyhcW1+CRGHAwfqd8ognv2BUrIjY4hM2nh6gZS
-         pIahxRWeC39yUtCmMpx2ydUajbJR4pYqa4LtfX82oFZHrKLziuf0lCUQgRohQCKVrkpg
-         wHwSEnwPLdJq+Xc57zObSCubmBkFaYKz5oTkV72isXg6EJ3PtQVYv6Q2vmV79imjOCdO
-         TiIA==
+        d=google.com; s=20230601; t=1741833407; x=1742438207; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XC1r5eElmQgLxs9sRr0XwO491Cg6pKVsFB0X+CnU5h8=;
+        b=C3F1/vblcFgDvvFLBPGNiR1I8KZt5bKraG7WdYGPAptgxBe0Zq2y4i7baV9mBKLMTT
+         ScM643OLNPFyAsI0hfZ1OizF5lqCqbRWTjC6CbOspnvVDRozjY0IWiMOEwL5jSOCxSlH
+         ZCTvdMuhr6S0FZKJxgehqEJXVLWbmeFwIz6dYnXoaTI9ORL2p84g2WVtRc8GIpFJfcij
+         BqJmHmbk0K9CIPSnU0QXY4aJCcJCl6tmWjYORnQYs2J2t6IsHOkOQJgF9JpZJuRUqF8o
+         lpbmE2tAUGS+y5I0iD1Nwn6pEsxZ25jGz25bb4XckGNpB9PmSjsXWN9sAWG6TesrWo3A
+         tVMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741832916; x=1742437716;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KoDUTDm8Gdk20+Tf3509gImhzxirBKWUcOSksBRe5Oc=;
-        b=aYBUWrRfVMUg637xT1sEj5OTLE1JUc+iDVzaEIYL2Uhylr0uD0PA6WkdcFRv2qUVbr
-         3ez/3AuciFxJwsvPq9jHkIz1RAi57MIe0T79472LhYlZAnKwnzGx1s+XTGTnbnf5atp7
-         lJopj+OKxGbJV7I+gGIUKS+NW7Xt2+YUaDq3qYnHqdViIa4UKnokyYaadqjTBQQIvX1l
-         P493/uQg6DB8BAjwvr6j8895xcHxeEsMnPZ61tzJ5JLFmgMDTCtBicW49wM/HRpBS1Bx
-         6MLdZDc/ZjP0UAM1KEVPvVClDw6BmQYJVWExc47PhDJ/9FGF2qOcYIu/TSTsRZSCUy6Q
-         gLBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUbDtNpMB7BzvntKs8Lg8H9miCV3+Y9sWh0lbXYAqOmsR3LjhE+X3F3idAomZemVeC/sDQ=@vger.kernel.org, AJvYcCVsucn/zUbbBflbXBfiQc5YhwCkyS98W9dyuSCm4HXKtEIRcxXIW+0Rf3FzHWRjrrtcopt8ONN8f7NGsUWP@vger.kernel.org, AJvYcCVyvRVSfHnrKQdpjX/34y7f4HRcJlQu4ABVYEIZPM42P35Q5g5m/54vh/mLdP90Q5OXEX9ZShus@vger.kernel.org, AJvYcCWCCdfOIAIjqP5EvGtVo4VmFAV7tBOD2SH5RwXSyliQ6ke7rheiD4oHlDSsQAd5ev8EPM+xhioyaafA+/AN@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyjjs3tedIOrrCusRxr46ZatBy2KjNKDap2a3Ddgcove1ayxLL3
-	hnwAY9i/8YfSQFILbEGsIOw+RExwZMwNFL8Jma+uA3r+F7L4tuNQ
-X-Gm-Gg: ASbGncvgzgk4DkE7o2i3gRhEbgwAd8XoJe3fG4KYKlK7nn91e8u06BSNCDPPcpd81FP
-	a2U0JxcRRNnfkKRsjeaauBEE/QXNpjgbsKF7Fiso421fAYfGjB/v43x9zMaguMikkCga8gSDFdv
-	AsLFIBvJEtePAgVTSDx7YoQR/4LSZNyEXCLIGWUvC/iTKIOb7jk3FkhyHwkZe8DszJpC8Ob7A94
-	Qr6NmusVZPdYO0xJ7cnBmlw8UFb1ZuJULnszwZg64rjMYLuKcYHhPlQczofW518/Nos8lY7lDA7
-	YFIVuTezr9MIlxT6W9Yk6XKrhr5eto5jxa18HdPCM+2F0ZQLWCm8YAOr8KnW8MhOcdO1J6PsXqW
-	MTg==
-X-Google-Smtp-Source: AGHT+IElXCWU2ZTEBcj7ESTCH4hLQqV9BYJSYITdjZw2xjnf7NpJNUxUzR1Spw/U1Dc6tCNyB628Iw==
-X-Received: by 2002:a17:903:2405:b0:21f:6bda:e492 with SMTP id d9443c01a7336-22428bdee0emr427968615ad.35.1741832916397;
-        Wed, 12 Mar 2025 19:28:36 -0700 (PDT)
-Received: from devvm6277.cco0.facebook.com ([2a03:2880:2ff:74::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-225c68884ccsm2791885ad.27.2025.03.12.19.28.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Mar 2025 19:28:35 -0700 (PDT)
-Date: Wed, 12 Mar 2025 19:28:33 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
-Cc: "David S. Miller" <davem@davemloft.net>, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hyperv@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v2 0/3] vsock: add namespace support to vhost-vsock
-Message-ID: <Z9JC0VoMwAHKjqEX@devvm6277.cco0.facebook.com>
-References: <20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com>
+        d=1e100.net; s=20230601; t=1741833407; x=1742438207;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XC1r5eElmQgLxs9sRr0XwO491Cg6pKVsFB0X+CnU5h8=;
+        b=U4oeVhZmV/cYf/PUkLnTbNwiwG0Sfvb/39YZoICsM4yqAYx+IlwHZKSmpmHyyxrKvi
+         Hs2y68xW3schmUfhuV5NaWbH9ubAHI5p93queF+7UMYaJ1xhsJ0pzUxxj7S8QrV7DCKs
+         iDPtMvYcLbTKIKmET20gooTeItOYnbSVvZ+ds8EGotZ06j9PYnRrxcOEDFhRnKZUYe4/
+         JVRmh8ZD51zd0HST5ffzyOiMyQ9Tlvqv/2ssnvBYTEVk1zMSfVEa+m/rCVlx9rQZ0wYT
+         AwWPaOUjEaazyzqB3fh81UsyU+jcqDTDxh5YSUcSA3NVA/C8KujbLrctlZEwOOhB3qtd
+         CeVQ==
+X-Gm-Message-State: AOJu0YxVUY/BEySuM3S7BD68tskZah3pdgfArFH7BZ8jp5JcD/hSLXoY
+	y9DREm1ivRUhtpCxG1yf9vxHtzGyPevYFLvER6O2qC3SDcD8GV10mW8RHfK2bS2v2ZPdITaLK2+
+	IWS0hGhZlrsyfaP0YD2kTE0VWyCbspaC8wmM06pfkfu7ohjrNtcpzN+F7F8kUbz4i/5iZKrDqWY
+	noH4XcVDa/UxxvHBUNPawDtp9K7yqC7ppzzIDUdqqkX1O0WcDdMw60YxQ4QaS3s9OF4vPrdA==
+X-Google-Smtp-Source: AGHT+IGq1/goM0WQxlVnPa03z8Zvj7fjzw57nhoPc/ywSpvHISK1YNSWAmB2yeieAnx39v3LlqVXoek2U8PE3/5xbeGb
+X-Received: from pfbhc23.prod.google.com ([2002:a05:6a00:6517:b0:736:3cd5:ba36])
+ (user=chiachangwang job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:928b:b0:730:75b1:7219 with SMTP id d2e1a72fcca58-736aaa22109mr34897291b3a.12.1741833406955;
+ Wed, 12 Mar 2025 19:36:46 -0700 (PDT)
+Date: Thu, 13 Mar 2025 02:36:39 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.rc1.451.g8f38331e32-goog
+Message-ID: <20250313023641.1007052-1-chiachangwang@google.com>
+Subject: [PATCH ipsec-next v5 0/2] Update offload configuration with SA
+From: Chiachang Wang <chiachangwang@google.com>
+To: netdev@vger.kernel.org, steffen.klassert@secunet.com, leonro@nvidia.com
+Cc: chiachangwang@google.com, stanleyjhu@google.com, yumike@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hey all,
+The current Security Association (SA) offload setting
+cannot be modified without removing and re-adding the
+SA with the new configuration. Although existing netlink
+messages allow SA migration, the offload setting will
+be removed after migration.
 
-Apologies for forgetting the 'net-next' prefix on this one. Should I
-resend or no?
+This patchset enhances SA migration to include updating
+the offload setting. This is beneficial for devices that
+support IPsec session management.
 
-Best,
-Bobby
+Chiachang Wang (2):
+  xfrm: Migrate offload configuration
+  xfrm: Refactor migration setup during the cloning process
 
-On Wed, Mar 12, 2025 at 01:59:34PM -0700, Bobby Eshleman wrote:
-> Picking up Stefano's v1 [1], this series adds netns support to
-> vhost-vsock. Unlike v1, this series does not address guest-to-host (g2h)
-> namespaces, defering that for future implementation and discussion.
-> 
-> Any vsock created with /dev/vhost-vsock is a global vsock, accessible
-> from any namespace. Any vsock created with /dev/vhost-vsock-netns is a
-> "scoped" vsock, accessible only to sockets in its namespace. If a global
-> vsock or scoped vsock share the same CID, the scoped vsock takes
-> precedence.
-> 
-> If a socket in a namespace connects with a global vsock, the CID becomes
-> unavailable to any VMM in that namespace when creating new vsocks. If
-> disconnected, the CID becomes available again.
-> 
-> Testing
-> 
-> QEMU with /dev/vhost-vsock-netns support:
-> 	https://github.com/beshleman/qemu/tree/vsock-netns
-> 
-> Test: Scoped vsocks isolated by namespace
-> 
->   host# ip netns add ns1
->   host# ip netns add ns2
->   host# ip netns exec ns1 \
-> 				  qemu-system-x86_64 \
-> 					  -m 8G -smp 4 -cpu host -enable-kvm \
-> 					  -serial mon:stdio \
-> 					  -drive if=virtio,file=${IMAGE1} \
-> 					  -device vhost-vsock-pci,netns=on,guest-cid=15
->   host# ip netns exec ns2 \
-> 				  qemu-system-x86_64 \
-> 					  -m 8G -smp 4 -cpu host -enable-kvm \
-> 					  -serial mon:stdio \
-> 					  -drive if=virtio,file=${IMAGE2} \
-> 					  -device vhost-vsock-pci,netns=on,guest-cid=15
-> 
->   host# socat - VSOCK-CONNECT:15:1234
->   2025/03/10 17:09:40 socat[255741] E connect(5, AF=40 cid:15 port:1234, 16): No such device
-> 
->   host# echo foobar1 | sudo ip netns exec ns1 socat - VSOCK-CONNECT:15:1234
->   host# echo foobar2 | sudo ip netns exec ns2 socat - VSOCK-CONNECT:15:1234
-> 
->   vm1# socat - VSOCK-LISTEN:1234
->   foobar1
->   vm2# socat - VSOCK-LISTEN:1234
->   foobar2
-> 
-> Test: Global vsocks accessible to any namespace
-> 
->   host# qemu-system-x86_64 \
-> 	  -m 8G -smp 4 -cpu host -enable-kvm \
-> 	  -serial mon:stdio \
-> 	  -drive if=virtio,file=${IMAGE2} \
-> 	  -device vhost-vsock-pci,guest-cid=15,netns=off
-> 
->   host# echo foobar | sudo ip netns exec ns1 socat - VSOCK-CONNECT:15:1234
-> 
->   vm# socat - VSOCK-LISTEN:1234
->   foobar
-> 
-> Test: Connecting to global vsock makes CID unavailble to namespace
-> 
->   host# qemu-system-x86_64 \
-> 	  -m 8G -smp 4 -cpu host -enable-kvm \
-> 	  -serial mon:stdio \
-> 	  -drive if=virtio,file=${IMAGE2} \
-> 	  -device vhost-vsock-pci,guest-cid=15,netns=off
-> 
->   vm# socat - VSOCK-LISTEN:1234
-> 
->   host# sudo ip netns exec ns1 socat - VSOCK-CONNECT:15:1234
->   host# ip netns exec ns1 \
-> 				  qemu-system-x86_64 \
-> 					  -m 8G -smp 4 -cpu host -enable-kvm \
-> 					  -serial mon:stdio \
-> 					  -drive if=virtio,file=${IMAGE1} \
-> 					  -device vhost-vsock-pci,netns=on,guest-cid=15
-> 
->   qemu-system-x86_64: -device vhost-vsock-pci,netns=on,guest-cid=15: vhost-vsock: unable to set guest cid: Address already in use
-> 
-> Signed-off-by: Bobby Eshleman <bobbyeshleman@gmail.com>
-> ---
-> Changes in v2:
-> - only support vhost-vsock namespaces
-> - all g2h namespaces retain old behavior, only common API changes
->   impacted by vhost-vsock changes
-> - add /dev/vhost-vsock-netns for "opt-in"
-> - leave /dev/vhost-vsock to old behavior
-> - removed netns module param
-> - Link to v1: https://lore.kernel.org/r/20200116172428.311437-1-sgarzare@redhat.com
-> 
-> Changes in v1:
-> - added 'netns' module param to vsock.ko to enable the
->   network namespace support (disabled by default)
-> - added 'vsock_net_eq()' to check the "net" assigned to a socket
->   only when 'netns' support is enabled
-> - Link to RFC: https://patchwork.ozlabs.org/cover/1202235/
-> 
-> ---
-> Stefano Garzarella (3):
->       vsock: add network namespace support
->       vsock/virtio_transport_common: handle netns of received packets
->       vhost/vsock: use netns of process that opens the vhost-vsock-netns device
-> 
->  drivers/vhost/vsock.c                   | 96 +++++++++++++++++++++++++++------
->  include/linux/miscdevice.h              |  1 +
->  include/linux/virtio_vsock.h            |  2 +
->  include/net/af_vsock.h                  | 10 ++--
->  net/vmw_vsock/af_vsock.c                | 85 +++++++++++++++++++++++------
->  net/vmw_vsock/hyperv_transport.c        |  2 +-
->  net/vmw_vsock/virtio_transport.c        |  5 +-
->  net/vmw_vsock/virtio_transport_common.c | 14 ++++-
->  net/vmw_vsock/vmci_transport.c          |  4 +-
->  net/vmw_vsock/vsock_loopback.c          |  4 +-
->  10 files changed, 180 insertions(+), 43 deletions(-)
-> ---
-> base-commit: 0ea09cbf8350b70ad44d67a1dcb379008a356034
-> change-id: 20250312-vsock-netns-45da9424f726
-> 
-> Best regards,
-> -- 
-> Bobby Eshleman <bobbyeshleman@gmail.com>
-> 
+ include/net/xfrm.h     |  8 ++++++--
+ net/key/af_key.c       |  2 +-
+ net/xfrm/xfrm_policy.c |  4 ++--
+ net/xfrm/xfrm_state.c  | 24 ++++++++++++++++--------
+ net/xfrm/xfrm_user.c   | 15 ++++++++++++---
+ 5 files changed, 37 insertions(+), 16 deletions(-)
+
+---
+v4 -> v5:
+ - Remove redundant xfrm_migrate pointer validation in the
+   xfrm_state_clone_and_setup() method
+v3 -> v4:
+ - Change the target tree to ipsec-next
+ - Rebase commit to adopt updated xfrm_init_state()
+ - Remove redundant variable to rely on validiaty of pointer
+ - Refactor xfrm_migrate copy into xfrm_state_clone and rename the
+   method
+v2 -> v3:
+ - Update af_key.c to address kbuild error
+v1 -> v2:
+ - Revert "xfrm: Update offload configuration during SA update"
+   change as the patch can be protentially handled in the
+   hardware without the change.
+ - Address review feedback to correct the logic in the
+   xfrm_state_migrate in the migration offload configuration
+   change.
+ - Revise the commit message for "xfrm: Migrate offload configuration"
+--
+2.49.0.rc1.451.g8f38331e32-goog
+
 
