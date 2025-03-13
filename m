@@ -1,108 +1,138 @@
-Return-Path: <netdev+bounces-174548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 312DCA5F20B
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 12:10:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA5B4A5F214
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 12:13:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 976953A6CD5
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 11:09:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AFD187A23D9
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 11:12:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10DB0265CD5;
-	Thu, 13 Mar 2025 11:09:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OFpakx8q"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D61B266183;
+	Thu, 13 Mar 2025 11:13:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E971E8325;
-	Thu, 13 Mar 2025 11:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A0665FB95;
+	Thu, 13 Mar 2025 11:13:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741864197; cv=none; b=Fup8I/DzyoszZH7U8rN5qTp4orubCwV3I5h2a4nj8gWLC+hH4LoQC+pICBGq/63cVgDQdXVmAF3x3n6DXO24y+vHSHC9g2i7CEXZjAEuJGlX/QGgC6uaJfv0TezMXS0haF9emUoxsviZBd00isblx3i3LN5byVH5rPLzNK6HZjU=
+	t=1741864430; cv=none; b=HTVsYmQ/nMez6P8kVHFEHYE9frl86fyOn0Dtgoq6FLPVgGqwvNLYx93maRg1BZZKQgtmUNDbStUCwz0dEBu9fJy7fSEltOifQjrh2js8G9FcxMY2vzJoWYYrl4KEpkE7J41R+9ZnAxql9RJkcaa+Kmk+0HiQSzCH0frjGf50rjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741864197; c=relaxed/simple;
-	bh=y5Rt/A3I0puk2tWJqwdD+VS9AYs8xTcIZQZ75uLi/aQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ak3AvlsujpbijMrwkx+O0KoHYJufdLd7x4RCTmpJlurlFyLclg3H3KzjFOil0vputju417HmDXnO9Vdh8OLKbNj2SZhDFgi9CBp+ivLKJUhEC3XArFPwB1kNbEJS5xes7IuRZa7TFxKpNDBJ0mMUviPrTYST2yo/nGPRwRustrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OFpakx8q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38B53C4CEDD;
-	Thu, 13 Mar 2025 11:09:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741864196;
-	bh=y5Rt/A3I0puk2tWJqwdD+VS9AYs8xTcIZQZ75uLi/aQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=OFpakx8qWuEP5hs9WCekvz25n4fnw63dd3zf1Hsha7Gk7+1cmshaz6E6oE8d6Ieh+
-	 tBzkhdDKSaYH1OgAoNK+7jfD0fdJN4xQ1W2eZZQZ9HelvNaxoDzMiG4MttBJXWwp8t
-	 OYQ48FdLg1Aw9IqOqJEj0BBUa8qX6V/9YjFqw9jvVKWW22JNwRMHhG8JnhrlhbaW6S
-	 29uLDOm+zyzCye6P/FtsnHmuM8tJKNGUgYdVxO1sAeEi7yoQhyS/YRufPMcwDeeXtg
-	 ax/RpzUJ7Toj8NLazkxeVIel3BUqwjK+RCDn16ltaxBF+hnLwAAfRjkh+iPS9k7Pz+
-	 SWDFtToOpr/aQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB6693806651;
-	Thu, 13 Mar 2025 11:10:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1741864430; c=relaxed/simple;
+	bh=HRqlj3f451EuGpE4aN6v6KzfunskA5WFsS38RpEwOSg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tiALX9EYvWHZMdIEzC3WuHisI4TRWJtBNZGyds2yxnehtiAHmasrXTKyN4GmwU88GpG7fHwZbDU/5W0AZKrt8gDQ0IvVVV3m3AzjTRhdGWj6xAelgMx0nsg6e3MI2IE1e0FFEBOmFCzngSlgKdpJdKtlsUTn9Lkj/EbVIKRO+JE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-86718c2c3b9so385944241.2;
+        Thu, 13 Mar 2025 04:13:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741864425; x=1742469225;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=f+aTfeoVSIyB0YffFidlDzeB2TUKfGBiv94evK8t4xc=;
+        b=ObZV/au5jmBMZXY75luoojHUbmvGogTAqreJmA+IIH/ExLs3TtWUzxlNXc4LehyoBA
+         jG5nT4Z/B+h7CRbpGXDYWnuJHPqE1+AEpqraKOwn/KEhujPxoPVaNHa0OhCRrxfrkOqJ
+         b/sMp3LCsaFIAxwqRllDF3RzDcZj/QOi7zF0bSBPFdslcVSWpemGdC3iLEZ2KU0NnN+s
+         SRZBmZZ0rYAQwYdlxiWWHudbHyU7WbyC5HVl706awYzTxnAaBTuFs3iC1Unrqex+oVu1
+         s5qrkPAgBpID9pepnppbnu+rsKrwMGvsG4Fz9Z3IQ1i4Lswc9jRyV3gKYXYw6zMl1ayQ
+         O7xA==
+X-Forwarded-Encrypted: i=1; AJvYcCVQ3kcz1VLhnBmzMqwtS9id8ygMag3N7wscuTdA6nKN681uS0y0x4cgHi5SBeTLw6/ilZJz51B2+itI@vger.kernel.org, AJvYcCX6IofZiIbOgDWh/uA8Yy6HY8x6vrjSxA7RwAUMwFjQ9FeheMF0nwi/CpNM8nI1AWxQ1iQzmvSuoOGYZAV/cA==@vger.kernel.org, AJvYcCXfdHN0fcH9yidS9GLSwiQxf2uKt10vdTLVotv2dNSGKf4pr94IhjmygV9BZEBgosnO+hyvSaVAee7FUFp7@vger.kernel.org, AJvYcCXj4eWwUuOhdlelgWo31Gpa7FuwEoc3+LTbtYA3qy2LzFb6ZoLEhi00mdRvTBAqH5azRaLfRPH4@vger.kernel.org, AJvYcCXvkzItTigmD/MmcNn+pFc6XhColgKDB0LbblQaJXGADRfSURrqG+NsNgyM8KhMLt7R5blWiQ2tSCXA@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEwNxT7HfcyFKdlOlyDfNzwdRupno6BNWVQ0rhsbt2vQodCgCm
+	awZZNCBkSIuu+z1LiE8vv9PVSQK2zPK/wiRaHBhHpF9iDBziuEPZIUgDe29n
+X-Gm-Gg: ASbGncsXk+fBkIz5tZHgdVl2btXsW2cq3066jJV5p1eFD6wmTTyZri5NjeyR6gC1kxt
+	LZMv6+QKOnn7f6XEwhFAlSREzczGWGz0nlx8fLJo4Y3cC3cusfM6WU2D/f7nk3l+MzsK67VgplH
+	oKH1I2FI/4PJQElcTAnoVQaCSvA14J9Y3w5bR873hLTsh6hV5RK0xtSRdfG2H+blvUu4zljuRPV
+	O2vtyPBKxKvphu1MyIDN1Hxn9U+7PfHAJhLQO2WBI1bm1PnBZ4sxAm/R26yj8JFmNwBQ3yRonvw
+	N6j6t24RHCbOe5mlq7gmGI7a4azaSMr8TdGVtEgxJwM5gFmAAZwuwGqEzLbwy8LqF/2gf/8J0TI
+	x4pz4gqE=
+X-Google-Smtp-Source: AGHT+IFx3ko6Ysd7DNw6CJ37Ci5grYHyEPZJGZ2nrkXEINIv8uNUpv8Briaa/BVOKoToXTfJCTMibA==
+X-Received: by 2002:a05:6102:5491:b0:4ba:eb24:fb28 with SMTP id ada2fe7eead31-4c34d20cd1fmr12077830137.3.1741864425520;
+        Thu, 13 Mar 2025 04:13:45 -0700 (PDT)
+Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com. [209.85.222.47])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4c374f646cbsm127309137.16.2025.03.13.04.13.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Mar 2025 04:13:44 -0700 (PDT)
+Received: by mail-ua1-f47.google.com with SMTP id a1e0cc1a2514c-86c29c0acdfso416372241.3;
+        Thu, 13 Mar 2025 04:13:44 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCV6jX0Lh/nN97+/kIExraptGYK/UWcbcPdxKmwa6HtOzZxaVk4IoXeSNSMP4o9w3TivPypKaO0A@vger.kernel.org, AJvYcCWwWtc2XMdSlaT2SHIkXds/a4aWMhnORLFgBhSkErQBzX0uX8G556yFFMKEfGhgiiuDaraZUQQY235Pr977@vger.kernel.org, AJvYcCXDRUWLevKcBpq7M4ShFvimI6G06pAmDOI1743m2CD+I6a5oURCahOJMM6bYoDWg+aX6ZAz3tW/+f7e@vger.kernel.org, AJvYcCXTK20WBzr518AQ354hvJmkM9wBXWrTjvSZXp9PRsvj/VNTm9qCmyThG4WA8fvzuKDaRYgszRZTeCzi@vger.kernel.org, AJvYcCXZMTk/YlsjjYEwglfdDmVdv0DEh0LYxJ6vdiWyvt2LTBE2zCEkCDIKvbIelIlyUeP/qJGCY8EFRrTKTj+sMg==@vger.kernel.org
+X-Received: by 2002:a05:6102:6058:b0:4c3:64bc:7d16 with SMTP id
+ ada2fe7eead31-4c364bc826emr6410107137.16.1741864424462; Thu, 13 Mar 2025
+ 04:13:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] dt-bindings: net: Define interrupt constraints for
- DWMAC vendor bindings
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174186423076.1466791.15724461347771862891.git-patchwork-notify@kernel.org>
-Date: Thu, 13 Mar 2025 11:10:30 +0000
-References: <20250309003301.1152228-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-In-Reply-To: <20250309003301.1152228-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-To: Prabhakar <prabhakar.csengg@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, neil.armstrong@linaro.org, khilman@baylibre.com,
- jbrunet@baylibre.com, martin.blumenstingl@googlemail.com,
- shawnguo@kernel.org, s.hauer@pengutronix.de, kernel@pengutronix.de,
- festevam@gmail.com, heiko@sntech.de, mcoquelin.stm32@gmail.com,
- alexandre.torgue@foss.st.com, nobuhiro1.iwamatsu@toshiba.co.jp,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- vineetha.g.jaya.kumaran@intel.com, biao.huang@mediatek.com,
- xiaoning.wang@nxp.com, linux-imx@nxp.com, david.wu@rock-chips.com,
- christophe.roullier@foss.st.com, rmk+kernel@armlinux.org.uk,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-rockchip@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, linux-mediatek@lists.infradead.org,
- prabhakar.mahadev-lad.rj@bp.renesas.com
+References: <20250313110359.242491-1-quic_mmanikan@quicinc.com>
+In-Reply-To: <20250313110359.242491-1-quic_mmanikan@quicinc.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 13 Mar 2025 12:13:32 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdV_YE2pf+SxXR5sWG1+aG8wv5MtRWk+0+ZF_n8ao7seRg@mail.gmail.com>
+X-Gm-Features: AQ5f1JqRTMYro5mN9behN-6IiqjAuHgeViZHARDgbLMt0YG5Pc6vqgxhUbgQtPQ
+Message-ID: <CAMuHMdV_YE2pf+SxXR5sWG1+aG8wv5MtRWk+0+ZF_n8ao7seRg@mail.gmail.com>
+Subject: Re: [PATCH v12 0/6] Add NSS clock controller support for IPQ9574
+To: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
+Cc: andersson@kernel.org, mturquette@baylibre.com, sboyd@kernel.org, 
+	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
+	konradybcio@kernel.org, catalin.marinas@arm.com, will@kernel.org, 
+	p.zabel@pengutronix.de, richardcochran@gmail.com, geert+renesas@glider.be, 
+	lumag@kernel.org, heiko@sntech.de, biju.das.jz@bp.renesas.com, 
+	quic_tdas@quicinc.com, nfraprado@collabora.com, 
+	elinor.montmasson@savoirfairelinux.com, ross.burton@arm.com, 
+	javier.carrasco@wolfvision.net, ebiggers@google.com, quic_anusha@quicinc.com, 
+	linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
+	quic_varada@quicinc.com, quic_srichara@quicinc.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hello:
+Hi Manikanta,
 
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+On Thu, 13 Mar 2025 at 12:04, Manikanta Mylavarapu
+<quic_mmanikan@quicinc.com> wrote:
+> Add bindings, driver and devicetree node for networking sub system clock
+> controller on IPQ9574. Also add support for gpll0_out_aux clock
+> which serves as the parent for some nss clocks.
+>
+> Changes in V12:
 
-On Sun,  9 Mar 2025 00:33:01 +0000 you wrote:
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> 
-> The `snps,dwmac.yaml` binding currently sets `maxItems: 3` for the
-> `interrupts` and `interrupt-names` properties, but vendor bindings
-> selecting `snps,dwmac.yaml` do not impose these limits.
-> 
-> Define constraints for `interrupts` and `interrupt-names` properties in
-> various DWMAC vendor bindings to ensure proper validation and consistency.
-> 
-> [...]
+Thanks for your series!
 
-Here is the summary with links:
-  - [net-next] dt-bindings: net: Define interrupt constraints for DWMAC vendor bindings
-    https://git.kernel.org/netdev/net-next/c/5a1dddd29444
+>  .../bindings/clock/qcom,ipq9574-nsscc.yaml    |   98 +
+>  arch/arm64/boot/dts/qcom/ipq9574.dtsi         |   29 +
+>  arch/arm64/configs/defconfig                  |    1 +
+>  drivers/clk/qcom/Kconfig                      |    7 +
+>  drivers/clk/qcom/Makefile                     |    1 +
+>  drivers/clk/qcom/gcc-ipq9574.c                |   15 +
+>  drivers/clk/qcom/nsscc-ipq9574.c              | 3110 +++++++++++++++++
+>  include/dt-bindings/clock/qcom,ipq9574-gcc.h  |    1 +
+>  .../dt-bindings/clock/qcom,ipq9574-nsscc.h    |  152 +
+>  .../dt-bindings/reset/qcom,ipq9574-nsscc.h    |  134 +
 
-You are awesome, thank you!
+I don't think you need to CC people who just modified the arm64
+defconfig before, but never touched qcom clock drivers.  The list of
+maintainers and reviewers reported by scripts/get_maintainer.pl is
+already quite large.
+
+So please drop me from future submissions.
+Thanks!
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
