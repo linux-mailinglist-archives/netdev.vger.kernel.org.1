@@ -1,154 +1,95 @@
-Return-Path: <netdev+bounces-174498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3983A5F00B
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 10:57:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47944A5F013
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 10:58:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F22819C135A
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 09:57:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C401D3BE0AB
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 09:58:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6110E26561F;
-	Thu, 13 Mar 2025 09:56:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CAED265624;
+	Thu, 13 Mar 2025 09:58:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="gsqMEpn3";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="XIm0qxY1"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ruhIPBuu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FA04264F9E;
-	Thu, 13 Mar 2025 09:56:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD2A5263C8A;
+	Thu, 13 Mar 2025 09:58:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741859813; cv=none; b=ZF+X9CNb9SiawRp8CkUFqyuT03wXe6mEPUDhu26xW80C9jJsajGQECosHDlLGCmNj1CLL2khAtRU/fvFx87X6UXT7lHSnmkRJc4TBj6xHRifbxUTneKRzOrs9EIu5ajM8mu+7KYVZsJIsS6LaN80bvTbxXf/LxUWUaoKsOuMdok=
+	t=1741859900; cv=none; b=nabc7EAT0JPHXhNiiSzkX3tfshPPBhg71DEbwhI16bN3CtpVzGILet3JH7DYidVh9Cp/QvPaCkNempCay1zDeVBJdTD/JiHp4c0nK6Rv7Zg1Uf0UYE6pVpPcA8i2qFcHRt04uH3rMrSZxsJyVzjhTIt7ND/Wj5KpBtpH3obS2uQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741859813; c=relaxed/simple;
-	bh=ID8InYM6vInNB3QiqZQq/uhymPx24SuVTTv+JMZ++3k=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=s/eUbkeNhqw/GcXx2HV2n5ZJKZb6/PB2npUzTJz0HmH47JJlxtE3K5LWH2UuYc7qoRcFVMGRcS3ezgCayCp2GjTyYaDG4Z2z4isCiic7a5ztfmky9AhqVne62mkM89bQbQC4t9kPfFZsIyZVxG6lu2tX4sunjy0mNIOjlE4136A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=gsqMEpn3; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=XIm0qxY1; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id 15962602B6; Thu, 13 Mar 2025 10:56:50 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1741859810;
-	bh=87NRBYzNEbBX3v/RgvJXkxtoky5J9/I1wYHH6QMAE5Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gsqMEpn3Yijvw99Fzr+kodsjbxuFP5E+rHN0M/q0kIuWhZ/kejmVOH/Ye536al4oF
-	 Fl0kQFXsUNUhaFLHlfsx4erfqV7KH2oAA5lMn1q/zIpBEtjFbpuwEwauiIpHn9DNGA
-	 HLRgKfxlRf2kkKoYjGkuN7yEzte5k2gOX1xYyA5MK670Ajf+qBECx0HySaOU6CDol2
-	 f/ygEKpuNwDmixDsfeXQAlnRtRwd5lyPQ1dNYCWWlSl+DfXoOOhksx8MjIwybmMz+M
-	 Jphdcu/B3S1g52ZWgiP2UqiqNcZRtghVeXafjpfmg079h2ptxr1JkXg0Ix+uthlPog
-	 gUoWwQqRBbVAQ==
-X-Spam-Level: 
-Received: from localhost.localdomain (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id B5400602B4;
-	Thu, 13 Mar 2025 10:56:44 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1741859805;
-	bh=87NRBYzNEbBX3v/RgvJXkxtoky5J9/I1wYHH6QMAE5Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XIm0qxY1MIm8Alqse4Lt1qHcK34Eie6M/O9qDQOwu2jPCXNh3rJopGb+K1nW5vR8Y
-	 P2F+ZVT6gwe/968ForR4o9MoXQ2qCBuyiHMWkfXZpWBSqbSCw3K4UJiMnvuZcBmWZe
-	 z0sAbgblkP0Rvo2ftE4nMbYxchEbgu0hpp//TDtGg9h5S8IEHfkLZjoA06ImL/Dwbi
-	 wTVmK5U375AYxLRpSXhdGcCL7uwkm21yL18aAsCllAzfJ7M9evLduHY8q91MSUvcRQ
-	 qKElMm+QYjnn5T/SISSAnXB0+YnXfztdw9HFyPvxTxTSJlDfG83J1qerbJfAQRmQv0
-	 fTEGkLir1slkA==
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de,
-	horms@kernel.org
-Subject: [PATCH net 4/4] netfilter: nft_exthdr: fix offset with ipv4_find_option()
-Date: Thu, 13 Mar 2025 10:56:36 +0100
-Message-Id: <20250313095636.2186-5-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20250313095636.2186-1-pablo@netfilter.org>
-References: <20250313095636.2186-1-pablo@netfilter.org>
+	s=arc-20240116; t=1741859900; c=relaxed/simple;
+	bh=cuy3wdeUkqjYr5LUbKSKDKjMf1F2kQtjs1UZvwSxQts=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bNu6+rk5nl5Xb46Prc3EC3hwmA5Yngmn5ayV+mfQnrrRbcU+jIIVPvdhZ7TGmfaCilW2Zi5N7cbaWwoFEYxDvGQqbPTnJqDL/wCJFEcw+PeY1jhUGAiOEGovrLmGDyNrA5XSQNLqgq60jw39Lz6gumAbMQt/H84QqC8O1yP5lmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ruhIPBuu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8690BC4CEFA;
+	Thu, 13 Mar 2025 09:58:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1741859900;
+	bh=cuy3wdeUkqjYr5LUbKSKDKjMf1F2kQtjs1UZvwSxQts=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ruhIPBuuhy04aY+GzopKjQXlQkBEg/msZwU2IW8670KDT3HZ6PgJrNEQy2y3rcU8G
+	 o52jFa8GcXBC1JZyYUuA8fV0bYliGko9220RiDftkvB6FCllOfGExY6hDf2j1xhEry
+	 +d4KBW+Id+UyEtaXdPwRUeCQT82yHAFQti4gfbWQ=
+Date: Thu, 13 Mar 2025 10:58:17 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Ma Ke <make24@iscas.ac.cn>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, jdamato@fastly.com,
+	aleksander.lobakin@intel.com, quic_zijuhu@quicinc.com,
+	andriy.shevchenko@linux.intel.com, wanghai26@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] net-sysfs: fix error handling in
+ netdev_register_kobject()
+Message-ID: <2025031355-legend-liftoff-63bc@gregkh>
+References: <20250313075528.306019-1-make24@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250313075528.306019-1-make24@iscas.ac.cn>
 
-From: Alexey Kashavkin <akashavkin@gmail.com>
+On Thu, Mar 13, 2025 at 03:55:28PM +0800, Ma Ke wrote:
+> Once device_add() failed, we should call put_device() to decrement
+> reference count for cleanup. Or it could cause memory leak.
+> 
+> As comment of device_add() says, 'if device_add() succeeds, you should
+> call device_del() when you want to get rid of it. If device_add() has
+> not succeeded, use only put_device() to drop the reference count'.
+> 
+> Found by code review.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: 8ed633b9baf9 ("Revert "net-sysfs: Fix memory leak in netdev_register_kobject"")
+> Signed-off-by: Ma Ke <make24@iscas.ac.cn>
+> ---
+>  net/core/net-sysfs.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+> index 07cb99b114bd..f443eacc9237 100644
+> --- a/net/core/net-sysfs.c
+> +++ b/net/core/net-sysfs.c
+> @@ -2169,6 +2169,7 @@ int netdev_register_kobject(struct net_device *ndev)
+>  
+>  	error = device_add(dev);
+>  	if (error)
+> +		put_device(dev);
+>  		return error;
 
-There is an incorrect calculation in the offset variable which causes
-the nft_skb_copy_to_reg() function to always return -EFAULT. Adding the
-start variable is redundant. In the __ip_options_compile() function the
-correct offset is specified when finding the function. There is no need
-to add the size of the iphdr structure to the offset.
+You obviously did not test this :(
 
-Fixes: dbb5281a1f84 ("netfilter: nf_tables: add support for matching IPv4 options")
-Signed-off-by: Alexey Kashavkin <akashavkin@gmail.com>
-Reviewed-by: Florian Westphal <fw@strlen.de>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- net/netfilter/nft_exthdr.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
-
-diff --git a/net/netfilter/nft_exthdr.c b/net/netfilter/nft_exthdr.c
-index b8d03364566c..c74012c99125 100644
---- a/net/netfilter/nft_exthdr.c
-+++ b/net/netfilter/nft_exthdr.c
-@@ -85,7 +85,6 @@ static int ipv4_find_option(struct net *net, struct sk_buff *skb,
- 	unsigned char optbuf[sizeof(struct ip_options) + 40];
- 	struct ip_options *opt = (struct ip_options *)optbuf;
- 	struct iphdr *iph, _iph;
--	unsigned int start;
- 	bool found = false;
- 	__be32 info;
- 	int optlen;
-@@ -93,7 +92,6 @@ static int ipv4_find_option(struct net *net, struct sk_buff *skb,
- 	iph = skb_header_pointer(skb, 0, sizeof(_iph), &_iph);
- 	if (!iph)
- 		return -EBADMSG;
--	start = sizeof(struct iphdr);
- 
- 	optlen = iph->ihl * 4 - (int)sizeof(struct iphdr);
- 	if (optlen <= 0)
-@@ -103,7 +101,7 @@ static int ipv4_find_option(struct net *net, struct sk_buff *skb,
- 	/* Copy the options since __ip_options_compile() modifies
- 	 * the options.
- 	 */
--	if (skb_copy_bits(skb, start, opt->__data, optlen))
-+	if (skb_copy_bits(skb, sizeof(struct iphdr), opt->__data, optlen))
- 		return -EBADMSG;
- 	opt->optlen = optlen;
- 
-@@ -118,18 +116,18 @@ static int ipv4_find_option(struct net *net, struct sk_buff *skb,
- 		found = target == IPOPT_SSRR ? opt->is_strictroute :
- 					       !opt->is_strictroute;
- 		if (found)
--			*offset = opt->srr + start;
-+			*offset = opt->srr;
- 		break;
- 	case IPOPT_RR:
- 		if (!opt->rr)
- 			break;
--		*offset = opt->rr + start;
-+		*offset = opt->rr;
- 		found = true;
- 		break;
- 	case IPOPT_RA:
- 		if (!opt->router_alert)
- 			break;
--		*offset = opt->router_alert + start;
-+		*offset = opt->router_alert;
- 		found = true;
- 		break;
- 	default:
--- 
-2.30.2
-
+Please be more careful in the future.
 
