@@ -1,196 +1,94 @@
-Return-Path: <netdev+bounces-174464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C814AA5EDA6
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 09:09:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14BFFA5EDB5
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 09:11:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 090341767EA
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 08:09:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5A9D189DEF4
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 08:11:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F44E260363;
-	Thu, 13 Mar 2025 08:09:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6AA41FC7DF;
+	Thu, 13 Mar 2025 08:11:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Jnrwk2jV"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Kyt6mnhc"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD691DF26F;
-	Thu, 13 Mar 2025 08:09:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11E86260370
+	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 08:11:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741853365; cv=none; b=IzI2JVtedTfKl/pP8vAB8VaYRnV6ItK648apfaJcIQZvIWR3oYJ7RfIq/Mc6V5kCf3dZP1djbvNdcI4FNCu5nJwPCo5FVBimTFYstmU5OrQyqs1iJ07dnJz75gFr3k0cdJbsqYqtw/hDZJlYr4FPDdbEjROB1i4UIWM7zWy5pms=
+	t=1741853482; cv=none; b=Kt1XCkFXLzPZkEqr8kkdsSWegKNUlciDlX6cNr8zpf5i0PrUNh5+14+y6nd/bdWnsUjEn/rpKm95Ii1YYOv8CpLaJaFL86X7Oca/bvP2qxUKCqWWSfrQYlLMvqiaJuwvzaTioONWjmkn6vlzaRR5/I+wR85qVEPwQlB5Ft1/sDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741853365; c=relaxed/simple;
-	bh=5VlJyHScTjibeMz0sBT6ncPP2fJQN7NEPSfxw+Fd4rk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NwT2Bdq6WBVnQz8IucCPFOrBOiUrmj8D2gDbsTCBd8Q+5td0BaIGYt6cJqU4igHzAFDU1JHdXoTmhA4QdyfL9gbArC8n3+0iZdsYNSFRtujhJJjrrZ6XnL5duyINY2awZS4+1AY/aj80Tt703OWM58C/B9nLIU3HknXLWjsE6oA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Jnrwk2jV; arc=none smtp.client-ip=115.124.30.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1741853352; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=yp6Ine+XuVgYfgjHCWfVvyg97RJxN6sq0wiTCHzQ4go=;
-	b=Jnrwk2jVhgkSy2Sij6enCkd0dkh9Go7TUtttiUSTzG1F1GMMPXbSVntBwJSpcmDuUy7lnpkTQ8JQ8P/jAiSYDzaDv8wj48h/ylvowMlJ/hVoaKOLdq1dHNj71f891gbfeFir9doPfnUdHLmAfagMpe7R92/BjOtSh0V59/upcNY=
-Received: from 30.221.98.116(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0WRG4IDE_1741853350 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 13 Mar 2025 16:09:11 +0800
-Message-ID: <0720fd9f-e5b4-4706-8483-ace1ecb22c8b@linux.alibaba.com>
-Date: Thu, 13 Mar 2025 16:09:01 +0800
+	s=arc-20240116; t=1741853482; c=relaxed/simple;
+	bh=ZC19aoU0J1V2KEDdu69vSLcxl186Gf5C7aeK+LWEmcA=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=dWDLZFQaXUchtNPjWTkHP1j8rafi2reP3sVbtkg1T2/9vB92r4XA42PF3KygTwnD/yPgErgb/Mlc/S6j277i0T/W6N/PP6Rh/M0BugBn195yaCTCtNuc0W9aHDFimD1XFff4GoxhFFIp0d3ivjTYiF53WMj2RpsXaHgF4WEgM9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Kyt6mnhc; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
+	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=dqXcrVtJR1aMKddV8xr+/ZVzFDp+B3KiJDfpbRIGgx0=; b=Kyt6mnhc/Xex/C53l/rBHqpVKm
+	57kCGrP8qmTheryHARsX6ARbMnNt0O5LcnbxmkesEd5nQV1QP0mh9hwZVzOza1wzB8Y+W3+Nco2gx
+	vtPPEUAnVf5SnJjGlntRTQrdb4leLLDwDX0J55Dd95i1yZrJ2jnerRVR/zAEljq+iTG+xRtRRNTPL
+	3wOe4afqiyyyM6v+SdXPhr01VTIEmaViBipZGgaS+h7sze6+pEZdzJ35zwkGw92pZZqOofshUYO1W
+	c8sJU7ZW7DoJl7/AjDSzrSAxxhi3DLq7qJ4R12XjnaMgLt1oFcTRZ6xv9IJ12vFRfIvhgHJDEyZdn
+	pEtzhv5g==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tsder-006AHh-2A;
+	Thu, 13 Mar 2025 16:11:14 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 13 Mar 2025 16:11:13 +0800
+Date: Thu, 13 Mar 2025 16:11:13 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Steffen Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org
+Subject: [PATCH] xfrm: ipcomp: Call pskb_may_pull in ipcomp_input
+Message-ID: <Z9KTIYVFwEIYXgd7@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net/smc: use the correct ndev to find pnetid
- by pnetid table
-To: Wenjia Zhang <wenjia@linux.ibm.com>, pasic@linux.ibm.com,
- jaka@linux.ibm.com, alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- guwen@linux.alibaba.com, mjambigi@linux.ibm.com, sidraya@linux.ibm.com
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, linux-rdma@vger.kernel.org,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250304124304.13732-1-guangguan.wang@linux.alibaba.com>
- <80afe99b-ca14-4b21-a200-1d695ed6ae63@linux.ibm.com>
-Content-Language: en-US
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-In-Reply-To: <80afe99b-ca14-4b21-a200-1d695ed6ae63@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
+If a malformed packet is received there may not be enough data
+to pull.
 
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ net/xfrm/xfrm_ipcomp.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-On 2025/3/13 15:46, Wenjia Zhang wrote:
-> 
-> 
-> On 04.03.25 13:43, Guangguan Wang wrote:
->> When using smc_pnet in SMC, it will only search the pnetid in the
->> base_ndev of the netdev hierarchy(both HW PNETID and User-defined
->> sw pnetid). This may not work for some scenarios when using SMC in
->> container on cloud environment.
->> In container, there have choices of different container network,
->> such as directly using host network, virtual network IPVLAN, veth,
->> etc. Different choices of container network have different netdev
->> hierarchy. Examples of netdev hierarchy show below. (eth0 and eth1
->> in host below is the netdev directly related to the physical device).
->>              _______________________________
->>             |   _________________           |
->>             |  |POD              |          |
->>             |  |                 |          |
->>             |  | eth0_________   |          |
->>             |  |____|         |__|          |
->>             |       |         |             |
->>             |       |         |             |
->>             |   eth1|base_ndev| eth0_______ |
->>             |       |         |    | RDMA  ||
->>             | host  |_________|    |_______||
->>             ---------------------------------
->>       netdev hierarchy if directly using host network
->>             ________________________________
->>             |   _________________           |
->>             |  |POD  __________  |          |
->>             |  |    |upper_ndev| |          |
->>             |  |eth0|__________| |          |
->>             |  |_______|_________|          |
->>             |          |lower netdev        |
->>             |        __|______              |
->>             |   eth1|         | eth0_______ |
->>             |       |base_ndev|    | RDMA  ||
->>             | host  |_________|    |_______||
->>             ---------------------------------
->>              netdev hierarchy if using IPVLAN
->>              _______________________________
->>             |   _____________________       |
->>             |  |POD        _________ |      |
->>             |  |          |base_ndev||      |
->>             |  |eth0(veth)|_________||      |
->>             |  |____________|________|      |
->>             |               |pairs          |
->>             |        _______|_              |
->>             |       |         | eth0_______ |
->>             |   veth|base_ndev|    | RDMA  ||
->>             |       |_________|    |_______||
->>             |        _________              |
->>             |   eth1|base_ndev|             |
->>             | host  |_________|             |
->>             ---------------------------------
->>               netdev hierarchy if using veth
->> Due to some reasons, the eth1 in host is not RDMA attached netdevice,
->> pnetid is needed to map the eth1(in host) with RDMA device so that POD
->> can do SMC-R. Because the eth1(in host) is managed by CNI plugin(such
->> as Terway, network management plugin in container environment), and in
->> cloud environment the eth(in host) can dynamically be inserted by CNI
->> when POD create and dynamically be removed by CNI when POD destroy and
->> no POD related to the eth(in host) anymore. It is hard to config the
->> pnetid to the eth1(in host). But it is easy to config the pnetid to the
->> netdevice which can be seen in POD. When do SMC-R, both the container
->> directly using host network and the container using veth network can
->> successfully match the RDMA device, because the configured pnetid netdev
->> is a base_ndev. But the container using IPVLAN can not successfully
->> match the RDMA device and 0x03030000 fallback happens, because the
->> configured pnetid netdev is not a base_ndev. Additionally, if config
->> pnetid to the eth1(in host) also can not work for matching RDMA device
->> when using veth network and doing SMC-R in POD.
->>
->> To resolve the problems list above, this patch extends to search user
->> -defined sw pnetid in the clc handshake ndev when no pnetid can be found
->> in the base_ndev, and the base_ndev take precedence over ndev for backward
->> compatibility. This patch also can unify the pnetid setup of different
->> network choices list above in container(Config user-defined sw pnetid in
->> the netdevice can be seen in POD).
->>
->> Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
->> ---
->>   net/smc/smc_pnet.c | 8 +++++---
->>   1 file changed, 5 insertions(+), 3 deletions(-)
->>
->> diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
->> index 716808f374a8..b391c2ef463f 100644
->> --- a/net/smc/smc_pnet.c
->> +++ b/net/smc/smc_pnet.c
->> @@ -1079,14 +1079,16 @@ static void smc_pnet_find_roce_by_pnetid(struct net_device *ndev,
->>                        struct smc_init_info *ini)
->>   {
->>       u8 ndev_pnetid[SMC_MAX_PNETID_LEN];
->> +    struct net_device *base_ndev;
->>       struct net *net;
->>   -    ndev = pnet_find_base_ndev(ndev);
->> +    base_ndev = pnet_find_base_ndev(ndev);
->>       net = dev_net(ndev);
->> -    if (smc_pnetid_by_dev_port(ndev->dev.parent, ndev->dev_port,
->> +    if (smc_pnetid_by_dev_port(base_ndev->dev.parent, base_ndev->dev_port,
->>                      ndev_pnetid) &&
->> +        smc_pnet_find_ndev_pnetid_by_table(base_ndev, ndev_pnetid) &&
->>           smc_pnet_find_ndev_pnetid_by_table(ndev, ndev_pnetid)) {
->> -        smc_pnet_find_rdma_dev(ndev, ini);
->> +        smc_pnet_find_rdma_dev(base_ndev, ini);
->>           return; /* pnetid could not be determined */
->>       }
->>       _smc_pnet_find_roce_by_pnetid(ndev_pnetid, ini, NULL, net);
-> 
-> Hi Guangguan,
-> 
-> sorry for the late answer! It looks good to me. Here is my R-b:
-> 
-> Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
-> 
-Thanks, Wenjia.
+diff --git a/net/xfrm/xfrm_ipcomp.c b/net/xfrm/xfrm_ipcomp.c
+index 9c0fa0e1786a..43eae94e4b0e 100644
+--- a/net/xfrm/xfrm_ipcomp.c
++++ b/net/xfrm/xfrm_ipcomp.c
+@@ -97,6 +97,9 @@ int ipcomp_input(struct xfrm_state *x, struct sk_buff *skb)
+ 	int err = -ENOMEM;
+ 	struct ip_comp_hdr *ipch;
+ 
++	if (!pskb_may_pull(skb, sizeof(*ipch)))
++		return -EINVAL;
++
+ 	if (skb_linearize_cow(skb))
+ 		goto out;
+ 
+-- 
+2.39.5
 
-> Btw. could you give Halil some time for the review? He also wants to have a look.
-It is OK.
-
-Regards,
-Guangguan Wang
-> 
-> Thanks,
-> Wenjia
-> 
-
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
