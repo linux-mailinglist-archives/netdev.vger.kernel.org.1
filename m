@@ -1,65 +1,103 @@
-Return-Path: <netdev+bounces-174491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9838A5EFCA
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 10:41:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E6E3A5EFD2
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 10:44:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 913CA188C00B
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 09:42:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A05C18876F3
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 09:44:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEE28264617;
-	Thu, 13 Mar 2025 09:41:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CC941EFF98;
+	Thu, 13 Mar 2025 09:44:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="IV/6Tanm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FOSrjDr7"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 872D6265605
-	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 09:41:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 931472641D4;
+	Thu, 13 Mar 2025 09:44:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741858895; cv=none; b=U1qYFR5af5pD46tAAOSOgISrLgI5F2TW124b1LwLicHG4TSzpd70Wuu5Swupfq3g8oqcmEexhc8aCf1LlB2kN7GKnR64EnifD+osOmZmidcWiDIebFzBCAt0vMrQl+43Ux0/gpsT5Np2gFstMW6cYZfNEkOz2QEzsxA+FWIm5rk=
+	t=1741859045; cv=none; b=e0ug+dH8baS367HiXmCFScM4jMzTiHNgQwCzgxsjaxuI+y0sbtm4RAqDWr7SQAtbfzYQ9uoMlORt595FlbioskfabVPZ0dpPplFOd7QF8TAGmSV+9NBMSIqn5cILNN0c5vBxRGtVYeWhcX7MPtkJEAdfZXGOgi0CfQy/XhhTE7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741858895; c=relaxed/simple;
-	bh=Tge9KDQJ6sWkc909LZwc/aDNaWXcEMDpAR4YNP8RDGQ=;
+	s=arc-20240116; t=1741859045; c=relaxed/simple;
+	bh=EQzdggXH4wkl4AhZbwxv9KJH+Qe+YvgwV8nYRRuD+xw=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BIIlg2LdPP7VDq+ABNVAmswqb/5yqBtMSVD5UCoYhgOsZn8jOq+QgS9+P0T57/pirJ77ntEm25dH5ld2pKNOmYC/QA/NyeOny3Uj62NNemykqex3m1eebG2OeaGA59HKCM8yvPe6KORe1UV5gG1cWkDZMJhD1QGFN2FZORNBVwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=IV/6Tanm; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 0782243400;
-	Thu, 13 Mar 2025 09:41:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1741858891;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vfu4t2FsVFjXF46lMfDJwja8O/f0SZHFctlQOfPnScI=;
-	b=IV/6Tanm1dWQ1eeP0Bgz4SKnfR4vprBiiDVvtEiYehRKFXml1Wj+sVekjChWDuO15sHQBp
-	R1E6X3CD3MiSkqWJNa1GOsgSerhnx4c9llf0E1fwWe9Xju12aAKSm1mUsUj5Hkf8d8+iwD
-	0LpCiuzgcpEn1couPLnIOTEVHWvNDJwfkISOJR2y6CiolyAEV8P7pqhufg5vJyDUbUriKx
-	1CyvfxWXW4umflgFTPIxjmO/Um6b7E4IneLDvX/yeKt3So8NfSRht9M/3cCD4VL6jiSjGC
-	X7J6dcl/SZHiW3sRm9DS3xZz5TGmlWoPDFy0rrQDzMrHsYORECjm8JHYWbkvQw==
-Date: Thu, 13 Mar 2025 10:41:28 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Gerhard Engleder <gerhard@engleder-embedded.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v10 3/5] net: phy: micrel: Add loopback support
-Message-ID: <20250313104128.3f6cb9e3@fedora-2.home>
-In-Reply-To: <9b61088921bafd7da5739c786274c083@engleder-embedded.com>
-References: <20250312203010.47429-1-gerhard@engleder-embedded.com>
-	<20250312203010.47429-4-gerhard@engleder-embedded.com>
-	<20250313095729.53a621e0@fedora-2.home>
-	<9b61088921bafd7da5739c786274c083@engleder-embedded.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	 MIME-Version:Content-Type; b=dQBj4mbEO0Tk+1cdZAVn6uVZ980pYLiK8DAVc0ca6ofl9Z2pIXgB64e9cVXSmuovRN51JOx4BSDJeN5q5uGGaoEIR1W+16IYI/uMROfh7IAr1lstfap9a56SVfQqV4aap2jeJiDNsVc5S5+nYsbIGqc8C8wER0K/8KxwWakE/e8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FOSrjDr7; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43cfecdd8b2so5940375e9.2;
+        Thu, 13 Mar 2025 02:44:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741859042; x=1742463842; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XUJmmUk/07zvVDebbkY7gqZx1aQN0BEIXNKF8zNXE08=;
+        b=FOSrjDr7RuVvlCZbBUsNhQlwl4H+6LzHJgP9n87f5xLZdyK4sa9nhYrA7yfmv0P0Vw
+         V2CzQZ2Md7GCYNw+6rSd56Cq7OndWu/bfDDTZrLDflKSJBRrS0A2E1b2ARNR1PlEpw90
+         JLCEePyZs2WhLyoiOBKfyG9+Ke5Qcvt7CIitYhFdmDC1eq3+8OH5eOgqon+NPQAulbOR
+         6jnza32Dz3EIUPZfoclwDMkWa1wn7KFg+9kJhinZvpejw0Jw40JLEbEj4mAIot3uUHk6
+         +pYjfFIPTP8T/Li7zs6jJ8hIxvdPa0dsAfuXiTDUGVk50MOfZw/OenoYKM9MsTWHYLrB
+         VbUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741859042; x=1742463842;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XUJmmUk/07zvVDebbkY7gqZx1aQN0BEIXNKF8zNXE08=;
+        b=sTxAH1UjhJ1XzbJabhO3HUl22YtzVpf5M91shSDQY4BPbbUOHtrvxOn5xu6hM/qQyK
+         ESY9SK7FwhMmVmCUJm6LlIft9v5sKRwufiGyK/QeJnmc/skCiQGqpWVkczlZQOIvTTVP
+         1mxIVfFs8dmVWYYOhHl58tWAmXtaaubAALyhllYv8ZdHiiuRcoK9elURJ/69XNJ8G3M5
+         tE8ciLodGn6mTD8BR6rWEE1w817cx7M+hXr5NOpBiLCLXRmh8LyFKsSgKvxh2fO/xMDW
+         iGacrgau6vJbpt8WefYFx2YqLI4cf2pKn59YwkL0GFhUBLn5hdyAR8Ic1vQu7E4sM1wu
+         jTRg==
+X-Forwarded-Encrypted: i=1; AJvYcCUYA6+0W546ExHSX9H+lwV7bBTaMColpywA6LX7RkbO6RZvl+u4oplfhpjx624iGXwmRmCrj14dk+lt3w==@vger.kernel.org, AJvYcCVeSv8LLBxKoaRHrdnJjuHMlgVUyVKvkr5LC0EXukLE75g9qmCMjlrNUQA5A2Eu44TlNnJ0SFDH@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/KWW7AROrggYLF3EM8EbIjHJ0bsaB9N3D1OsiNYiAQDjXTVj/
+	b9pOs291OFJPtQQDpYh97hikgok1cSQAik20+kJz/AlhNSOLCUCF
+X-Gm-Gg: ASbGncsp5zc0saa+Xpo5KTqJOKF+tqBWzjTofzopRtKuIum7rbVCDKxIwk2izKytnVP
+	jd9HXqyVemNJA06BLLalnLu7llVHFuEW03jgeSb9zNQTtaxslBAoYMeRimSprQnWykdUad4wAgh
+	pr6nvr3L3fYvcSf4W6P4MehLvyU7l7SHM14mb2O/EXnVit21zCltrTW0xa8Pb7M4QwG1MSO8HZo
+	KQtL+u4r0YY55XJx2Qe0B3X/QkumwpkSbSWKFU2L1Vw7m3ZFSnYsFS9p0gHyEjt6KrznMTxywjL
+	GxGaohDOsQWI+I01wl7aDlsRA4OdfqVuUwyk5zA2lFEIQ+FLLpRzohWnRZSBIBC65VQ5OyCR0qe
+	0OYsMKVU=
+X-Google-Smtp-Source: AGHT+IEmmbcF0ODRKe4fmMsHDHsI7+wnGoFRrNeO5xpay+Qmm0MBcWmeFOZRVaD+g3RmvyNJTm7SgQ==
+X-Received: by 2002:a05:600c:3791:b0:43c:ec28:d303 with SMTP id 5b1f17b1804b1-43cec28d49fmr174424815e9.5.1741859041417;
+        Thu, 13 Mar 2025 02:44:01 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395c4f9d59dsm1547427f8f.0.2025.03.13.02.44.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Mar 2025 02:44:00 -0700 (PDT)
+Date: Thu, 13 Mar 2025 09:43:59 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Hannes Reinecke <hare@suse.de>, Vlastimil Babka <vbabka@suse.cz>, Hannes
+ Reinecke <hare@suse.com>, Boris Pismenny <borisp@nvidia.com>, John
+ Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>, "linux-nvme@lists.infradead.org"
+ <linux-nvme@lists.infradead.org>, "linux-block@vger.kernel.org"
+ <linux-block@vger.kernel.org>, linux-mm@kvack.org, Harry Yoo
+ <harry.yoo@oracle.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: Networking people smell funny and make poor life choices
+Message-ID: <20250313094359.20756456@pumpkin>
+In-Reply-To: <Z8iTzPRieLB7Ee-9@casper.infradead.org>
+References: <db1a4681-1882-4e0a-b96f-a793e8fffb56@suse.cz>
+	<Z8cm5bVJsbskj4kC@casper.infradead.org>
+	<a4bbf5a7-c931-4e22-bb47-3783e4adcd23@suse.com>
+	<Z8cv9VKka2KBnBKV@casper.infradead.org>
+	<Z8dA8l1NR-xmFWyq@casper.infradead.org>
+	<d9f4b78e-01d7-4d1d-8302-ed18d22754e4@suse.de>
+	<27111897-0b36-4d8c-8be9-4f8bdbae88b7@suse.cz>
+	<f53b1403-3afd-43ff-a784-bdd22e3d24f8@suse.com>
+	<d6e65c4c-a575-4389-a801-2ba40e1d25e1@suse.cz>
+	<7439cb2f-6a97-494b-aa10-e9bebb218b58@suse.de>
+	<Z8iTzPRieLB7Ee-9@casper.infradead.org>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,85 +106,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduvdejiedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdqvddrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepledprhgtphhtthhopehgvghrhhgrrhgusegvnhhglhgvuggvrhdqvghmsggvugguvggurdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgri
- hhlrdgtohhmpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
-X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hi,
+On Wed, 5 Mar 2025 18:11:24 +0000
+Matthew Wilcox <willy@infradead.org> wrote:
 
-On Thu, 13 Mar 2025 10:35:47 +0100
-Gerhard Engleder <gerhard@engleder-embedded.com> wrote:
 
-> Am 13.03.2025 09:57, schrieb Maxime Chevallier:
-> > Hello Gerhard,
-> > 
-> > On Wed, 12 Mar 2025 21:30:08 +0100
-> > Gerhard Engleder <gerhard@engleder-embedded.com> wrote:
-> >   
-> >> The KSZ9031 PHYs requires full duplex for loopback mode. Add PHY
-> >> specific set_loopback() to ensure this.
-> >> 
-> >> Signed-off-by: Gerhard Engleder <gerhard@engleder-embedded.com>
-> >> ---
-> >>  drivers/net/phy/micrel.c | 24 ++++++++++++++++++++++++
-> >>  1 file changed, 24 insertions(+)
-> >> 
-> >> diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-> >> index 289e1d56aa65..24882d30f685 100644
-> >> --- a/drivers/net/phy/micrel.c
-> >> +++ b/drivers/net/phy/micrel.c
-> >> @@ -1032,6 +1032,29 @@ static int ksz9021_config_init(struct 
-> >> phy_device *phydev)
-> >>  #define MII_KSZ9031RN_EDPD		0x23
-> >>  #define MII_KSZ9031RN_EDPD_ENABLE	BIT(0)
-> >> 
-> >> +static int ksz9031_set_loopback(struct phy_device *phydev, bool 
-> >> enable,
-> >> +				int speed)
-> >> +{
-> >> +	u16 ctl = BMCR_LOOPBACK;
-> >> +	int val;
-> >> +
-> >> +	if (!enable)
-> >> +		return genphy_loopback(phydev, enable, 0);
-> >> +
-> >> +	if (speed == SPEED_10 || speed == SPEED_100 || speed == SPEED_1000)
-> >> +		phydev->speed = speed;
-> >> +	else if (speed)
-> >> +		return -EINVAL;
-> >> +	phydev->duplex = DUPLEX_FULL;
-> >> +
-> >> +	ctl |= mii_bmcr_encode_fixed(phydev->speed, phydev->duplex);
-> >> +
-> >> +	phy_write(phydev, MII_BMCR, ctl);
-> >> +
-> >> +	return phy_read_poll_timeout(phydev, MII_BMSR, val, val & 
-> >> BMSR_LSTATUS,
-> >> +				     5000, 500000, true);  
-> > 
-> > Maybe I don't fully get it, but it looks to me that you poll, waiting
-> > for the link to become up. As you are in local loopback mode, how does
-> > that work ? Do you need connection to an active LP for loopback to
-> > work, or does the BMSR_LSTATUS bit behave differently under local
-> > loopback ?  
+> What worries me is that nobody in networking has replied to this thread
+> yet.  Do they not care?  Let's see if a subject line change will help
+> with that.
 > 
-> Yes I'm polling for link to come up. This is identical to 
-> genphy_loopback().
-> There is no need for a link partner to get a link up in loopback mode.
-> BMSR_LSTATUS reflects the loopback as link in this case.
-> 
-> This series allows to configure a loopback with defined speed without 
-> any
-> link partner. Currently for PHY loopback a link partner is needed in 
-> some
-> cases (starting with 1 Gbps loopback).
 
-Ok thanks a lot for the clarification ! It looks good to me in that
-case :)
-
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-Maxime
+I like being smelly :-(
 
