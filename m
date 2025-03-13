@@ -1,89 +1,103 @@
-Return-Path: <netdev+bounces-174774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E6A7A6048D
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 23:42:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19961A603FB
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 23:10:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BFE619C469E
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 22:42:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D478919C49AB
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 22:10:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38D291F5821;
-	Thu, 13 Mar 2025 22:41:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CBE51F6699;
+	Thu, 13 Mar 2025 22:10:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wXb11wbo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ciXF3L4h"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED0618B48B;
-	Thu, 13 Mar 2025 22:41:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 732811F4706;
+	Thu, 13 Mar 2025 22:10:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741905715; cv=none; b=HF6ahW+VMUSyniWyBLPOUXJBExV22p56KQOtqIGFvN7ICeI8qrBYSAIKqcGu9A/RJUh9dNfHjBuxJhAR7JW0+Gbb3WJIX331AMwP+8QvxS58EQqLPQKqjDbySjhQjjoi64GcvB3Mv1Wy7q51YlGT7uyDeCYVtONfmzkTrXcnImM=
+	t=1741903800; cv=none; b=jZ6L8YZVmktbVnvhtAzmQPC3WP/DJJjroPRu4+JN2pjfFSffztOcjfeX8Y+oIF4oYfGCemdGcfTvKNY0k6R2HMwL+NkqsrJNVf6sbrTHOUEN3PkhtbT56D6rHVTZhFTqOicmd6n85VrRzhW11KQ17V/4EsLaZnqPraDHv6Ap2F4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741905715; c=relaxed/simple;
-	bh=kmQLpP1H/8R9Re5ysO3RWYCNcQwK9I9FBWIQICank4o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fZLLLN6PMpGDKaajB5Cb2LxB7L+G/XGynUM0zwUaSMoeEcRjkim5TRZFerXlHwaNh1OU8hI8ZlwhvkzNnlmuBv6LxQU7ZhKKxS/T8m9+PM+VcNYBbkh3N9vs7SB7x2/vaduLRJjv+dSOHBG96ns4v806CmeIBbbrTqq09GsSbeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wXb11wbo; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=o/1Mh0o88Dsb3LEqDeTz/KouVD4jeGs3U4MDb1Mlz1A=; b=wXb11wboAunMU07oXJuhWFbgd5
-	aJpj/k9vObm1zqZS3szTeZFJROQeX+GijsnYf3MJ7cNndJ+PplW9sF9Uedl/Os4phaLpsR2zUhc0I
-	JKHIBOFvidUdzs1JU1E/lRadZjY1ACecfk+uHw5IitYJRWy5G5mS/DTXg4ajGIUFhUhA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tsqiZ-0057P3-LD; Thu, 13 Mar 2025 23:07:55 +0100
-Date: Thu, 13 Mar 2025 23:07:55 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Chris Packham <Chris.Packham@alliedtelesis.co.nz>
-Cc: "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"daniel@makrotopia.org" <daniel@makrotopia.org>,
-	"markus.stockhausen@gmx.de" <markus.stockhausen@gmx.de>,
-	"sander@svanheule.net" <sander@svanheule.net>,
-	netdev <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v10] net: mdio: Add RTL9300 MDIO driver
-Message-ID: <f6165df5-eedb-4a11-add0-2ae4d4052d6a@lunn.ch>
-References: <20250313010726.2181302-1-chris.packham@alliedtelesis.co.nz>
- <f7c7f28b-f2b0-464a-a621-d4b2f815d206@lunn.ch>
- <5ea333ec-c2e4-4715-8a44-0fd2c77a4f3c@alliedtelesis.co.nz>
- <be39bb63-446e-4c6a-9bb9-a823f0a482be@lunn.ch>
- <539762a3-b17d-415c-9316-66527bfc6219@alliedtelesis.co.nz>
- <6a98ba41-34ee-4493-b0ea-0c24d7e979b1@lunn.ch>
- <6ae8b7c6-8e75-4bfc-9ea3-302269a26951@alliedtelesis.co.nz>
+	s=arc-20240116; t=1741903800; c=relaxed/simple;
+	bh=BsI/hiQQI+LLlIfr0e6ujEsRqcfk2Qh9lglbhDA8zMw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=iznz8H1dHJ5r/+Ke84zQrHcbBLXBfexkfAzEsVZlPXNIHgq74pooEI9NoawfaF5qcHjKJg84JwCJ1R54rkyPnYqtftJHLT531Zi3/2qJw+B/RR8bSMBClmeYsAjFhKaxPLUIxUwBWdHHywk5gCSw50pZO+YNa4ZlXYpG8Eqg82Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ciXF3L4h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AA8CC4CEDD;
+	Thu, 13 Mar 2025 22:10:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741903800;
+	bh=BsI/hiQQI+LLlIfr0e6ujEsRqcfk2Qh9lglbhDA8zMw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ciXF3L4hiqFoxX6/YYMt4h4dn+aYSsiGso7RaKl5E5nxn4le3Ik2DwwKo94kt5Fjc
+	 gFVDLJXRR3xjbzfOlNH8iWbttjVl3uXXyyGWoTvB0GnMh64bEfM+4q5Vq5gfR6oj3C
+	 C8BFvEmJBgh6SDB1b0ArYNnl8jtGdEBiHvNs/n7JOyFnp9cOMPo25UtDMFrqKCaq/U
+	 s2UmmPDIzmezTa4hx52ze+F/NpUWa/9fxbpLwRBYFSHhwqbVFWtH3BwtjHnFBFd3QH
+	 5tyisXNbWncNA08Oy/X9B8PVawwYq0gB6grxlAMWnG0+xN4D0H/Vzwgt5IKosbmtHc
+	 5QhDYRIEuxO7Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB1A23806651;
+	Thu, 13 Mar 2025 22:10:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6ae8b7c6-8e75-4bfc-9ea3-302269a26951@alliedtelesis.co.nz>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next v3 0/4] tcp: add some RTO MIN and DELACK MAX
+ {bpf_}set/getsockopt supports
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174190383475.1677603.6052935547894772421.git-patchwork-notify@kernel.org>
+Date: Thu, 13 Mar 2025 22:10:34 +0000
+References: <20250312153523.9860-1-kerneljasonxing@gmail.com>
+In-Reply-To: <20250312153523.9860-1-kerneljasonxing@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, horms@kernel.org,
+ kuniyu@amazon.com, ncardwell@google.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org
 
-> I'm pretty sure it would upset the hardware polling mechanism which 
-> unfortunately we can't disable (earlier I thought we could but there are 
-> various switch features that rely on it).
+Hello:
 
-So we need to get a better understanding of that polling. How are you
-telling it about the aquantia PHY features? How does it know it needs
-to get the current link rate from MDIO_MMD_AN, MDIO_AN_TX_VEND_STATUS1
-which is a vendor register, not a standard C45 register? How do you
-teach it to decode bits in that register?
+This series was applied to bpf/bpf-next.git (net)
+by Martin KaFai Lau <martin.lau@kernel.org>:
 
-	Andrew
+On Wed, 12 Mar 2025 16:35:19 +0100 you wrote:
+> Introduce bpf_sol_tcp_getsockopt() helper.
+> 
+> Add bpf_getsockopt for RTO MIN and DELACK MAX.
+> 
+> Add corresponding selftests for bpf.
+> 
+> 
+> [...]
+
+Here is the summary with links:
+  - [bpf-next,v3,1/4] tcp: bpf: introduce bpf_sol_tcp_getsockopt to support TCP_BPF flags
+    https://git.kernel.org/bpf/bpf-next/c/49f6713cb691
+  - [bpf-next,v3,2/4] tcp: bpf: support bpf_getsockopt for TCP_BPF_RTO_MIN
+    https://git.kernel.org/bpf/bpf-next/c/5584cd7e0ddd
+  - [bpf-next,v3,3/4] tcp: bpf: support bpf_getsockopt for TCP_BPF_DELACK_MAX
+    https://git.kernel.org/bpf/bpf-next/c/d22b8b04b88e
+  - [bpf-next,v3,4/4] selftests: add bpf_set/getsockopt() for TCP_BPF_DELACK_MAX and TCP_BPF_RTO_MIN
+    https://git.kernel.org/bpf/bpf-next/c/a1e0783e1036
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
