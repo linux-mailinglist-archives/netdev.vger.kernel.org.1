@@ -1,120 +1,191 @@
-Return-Path: <netdev+bounces-174492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E6E3A5EFD2
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 10:44:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33C0AA5EFD9
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 10:45:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A05C18876F3
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 09:44:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9710C3B1B5C
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 09:45:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CC941EFF98;
-	Thu, 13 Mar 2025 09:44:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1BA2264635;
+	Thu, 13 Mar 2025 09:45:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FOSrjDr7"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="OT3UW2Dw";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="oFAGKRxJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a6-smtp.messagingengine.com (fout-a6-smtp.messagingengine.com [103.168.172.149])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 931472641D4;
-	Thu, 13 Mar 2025 09:44:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E54714AD20;
+	Thu, 13 Mar 2025 09:45:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741859045; cv=none; b=e0ug+dH8baS367HiXmCFScM4jMzTiHNgQwCzgxsjaxuI+y0sbtm4RAqDWr7SQAtbfzYQ9uoMlORt595FlbioskfabVPZ0dpPplFOd7QF8TAGmSV+9NBMSIqn5cILNN0c5vBxRGtVYeWhcX7MPtkJEAdfZXGOgi0CfQy/XhhTE7k=
+	t=1741859148; cv=none; b=WPQX7obW8LZmPXNXJTHYPK7wXmoAxxXpBL+kWRQrbkoI7gZX1p3Kkyxax448w2YpQoAZ0aXIpjGdmLgR/ziEFwT82y+4MInB/GPcx6iaFnMPi3fS7QOj3Eko4VhBtzKYjm7SJdoE/fuCFB5v89vvCQDsaN0Tqn5WNxktPkOBrws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741859045; c=relaxed/simple;
-	bh=EQzdggXH4wkl4AhZbwxv9KJH+Qe+YvgwV8nYRRuD+xw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dQBj4mbEO0Tk+1cdZAVn6uVZ980pYLiK8DAVc0ca6ofl9Z2pIXgB64e9cVXSmuovRN51JOx4BSDJeN5q5uGGaoEIR1W+16IYI/uMROfh7IAr1lstfap9a56SVfQqV4aap2jeJiDNsVc5S5+nYsbIGqc8C8wER0K/8KxwWakE/e8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FOSrjDr7; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43cfecdd8b2so5940375e9.2;
-        Thu, 13 Mar 2025 02:44:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741859042; x=1742463842; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XUJmmUk/07zvVDebbkY7gqZx1aQN0BEIXNKF8zNXE08=;
-        b=FOSrjDr7RuVvlCZbBUsNhQlwl4H+6LzHJgP9n87f5xLZdyK4sa9nhYrA7yfmv0P0Vw
-         V2CzQZ2Md7GCYNw+6rSd56Cq7OndWu/bfDDTZrLDflKSJBRrS0A2E1b2ARNR1PlEpw90
-         JLCEePyZs2WhLyoiOBKfyG9+Ke5Qcvt7CIitYhFdmDC1eq3+8OH5eOgqon+NPQAulbOR
-         6jnza32Dz3EIUPZfoclwDMkWa1wn7KFg+9kJhinZvpejw0Jw40JLEbEj4mAIot3uUHk6
-         +pYjfFIPTP8T/Li7zs6jJ8hIxvdPa0dsAfuXiTDUGVk50MOfZw/OenoYKM9MsTWHYLrB
-         VbUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741859042; x=1742463842;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XUJmmUk/07zvVDebbkY7gqZx1aQN0BEIXNKF8zNXE08=;
-        b=sTxAH1UjhJ1XzbJabhO3HUl22YtzVpf5M91shSDQY4BPbbUOHtrvxOn5xu6hM/qQyK
-         ESY9SK7FwhMmVmCUJm6LlIft9v5sKRwufiGyK/QeJnmc/skCiQGqpWVkczlZQOIvTTVP
-         1mxIVfFs8dmVWYYOhHl58tWAmXtaaubAALyhllYv8ZdHiiuRcoK9elURJ/69XNJ8G3M5
-         tE8ciLodGn6mTD8BR6rWEE1w817cx7M+hXr5NOpBiLCLXRmh8LyFKsSgKvxh2fO/xMDW
-         iGacrgau6vJbpt8WefYFx2YqLI4cf2pKn59YwkL0GFhUBLn5hdyAR8Ic1vQu7E4sM1wu
-         jTRg==
-X-Forwarded-Encrypted: i=1; AJvYcCUYA6+0W546ExHSX9H+lwV7bBTaMColpywA6LX7RkbO6RZvl+u4oplfhpjx624iGXwmRmCrj14dk+lt3w==@vger.kernel.org, AJvYcCVeSv8LLBxKoaRHrdnJjuHMlgVUyVKvkr5LC0EXukLE75g9qmCMjlrNUQA5A2Eu44TlNnJ0SFDH@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/KWW7AROrggYLF3EM8EbIjHJ0bsaB9N3D1OsiNYiAQDjXTVj/
-	b9pOs291OFJPtQQDpYh97hikgok1cSQAik20+kJz/AlhNSOLCUCF
-X-Gm-Gg: ASbGncsp5zc0saa+Xpo5KTqJOKF+tqBWzjTofzopRtKuIum7rbVCDKxIwk2izKytnVP
-	jd9HXqyVemNJA06BLLalnLu7llVHFuEW03jgeSb9zNQTtaxslBAoYMeRimSprQnWykdUad4wAgh
-	pr6nvr3L3fYvcSf4W6P4MehLvyU7l7SHM14mb2O/EXnVit21zCltrTW0xa8Pb7M4QwG1MSO8HZo
-	KQtL+u4r0YY55XJx2Qe0B3X/QkumwpkSbSWKFU2L1Vw7m3ZFSnYsFS9p0gHyEjt6KrznMTxywjL
-	GxGaohDOsQWI+I01wl7aDlsRA4OdfqVuUwyk5zA2lFEIQ+FLLpRzohWnRZSBIBC65VQ5OyCR0qe
-	0OYsMKVU=
-X-Google-Smtp-Source: AGHT+IEmmbcF0ODRKe4fmMsHDHsI7+wnGoFRrNeO5xpay+Qmm0MBcWmeFOZRVaD+g3RmvyNJTm7SgQ==
-X-Received: by 2002:a05:600c:3791:b0:43c:ec28:d303 with SMTP id 5b1f17b1804b1-43cec28d49fmr174424815e9.5.1741859041417;
-        Thu, 13 Mar 2025 02:44:01 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395c4f9d59dsm1547427f8f.0.2025.03.13.02.44.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Mar 2025 02:44:00 -0700 (PDT)
-Date: Thu, 13 Mar 2025 09:43:59 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Hannes Reinecke <hare@suse.de>, Vlastimil Babka <vbabka@suse.cz>, Hannes
- Reinecke <hare@suse.com>, Boris Pismenny <borisp@nvidia.com>, John
- Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- Sagi Grimberg <sagi@grimberg.me>, "linux-nvme@lists.infradead.org"
- <linux-nvme@lists.infradead.org>, "linux-block@vger.kernel.org"
- <linux-block@vger.kernel.org>, linux-mm@kvack.org, Harry Yoo
- <harry.yoo@oracle.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: Networking people smell funny and make poor life choices
-Message-ID: <20250313094359.20756456@pumpkin>
-In-Reply-To: <Z8iTzPRieLB7Ee-9@casper.infradead.org>
-References: <db1a4681-1882-4e0a-b96f-a793e8fffb56@suse.cz>
-	<Z8cm5bVJsbskj4kC@casper.infradead.org>
-	<a4bbf5a7-c931-4e22-bb47-3783e4adcd23@suse.com>
-	<Z8cv9VKka2KBnBKV@casper.infradead.org>
-	<Z8dA8l1NR-xmFWyq@casper.infradead.org>
-	<d9f4b78e-01d7-4d1d-8302-ed18d22754e4@suse.de>
-	<27111897-0b36-4d8c-8be9-4f8bdbae88b7@suse.cz>
-	<f53b1403-3afd-43ff-a784-bdd22e3d24f8@suse.com>
-	<d6e65c4c-a575-4389-a801-2ba40e1d25e1@suse.cz>
-	<7439cb2f-6a97-494b-aa10-e9bebb218b58@suse.de>
-	<Z8iTzPRieLB7Ee-9@casper.infradead.org>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1741859148; c=relaxed/simple;
+	bh=SMeqDuXOCBOmPtBDsJuBDmIB4QVJ9u4U/A35IwO549Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rBnCAKk34PDrDAEBcsPz0QQkt65RZV0BwnV0sTTSN5DTzudDyPVOELV1DjRK0T/cxfw8djv3SkvRjBjFnqhD8KPr91WkH8OYa3ftT/zJkYFc+fiO5wKXhkDWCOqqrrCGPV7z5/DC8mJHGQQL0z/fxGelO4+N0guTRvsuNbqEPMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=OT3UW2Dw; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=oFAGKRxJ; arc=none smtp.client-ip=103.168.172.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
+	by mailfout.phl.internal (Postfix) with ESMTP id 6401D1382D10;
+	Thu, 13 Mar 2025 05:45:45 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-12.internal (MEProxy); Thu, 13 Mar 2025 05:45:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1741859145;
+	 x=1741945545; bh=cMzoJNPec5zYQJsS7IO+/BXZwtWt/8pbBTF9FIoCxXo=; b=
+	OT3UW2DwHfWVRnCZqrvfvSOrtylgSiRHQj8LFcE8t77faoNuXVEBO9MP7Q920yGD
+	cT05MrlsIHKMW050wJlxCtYH1nOYrDY0q+B0e1loDwh23CHV7SMkXx3xK50Ni4eW
+	7o76/LOLG7BMT2qPU9Nh4Z5teKENVKDkr0gWYsT2roeDfgSS6IkVi57groKs77r+
+	jP7XVH0bBXjAPo1e9GZjXStKPmaV5qasWRtzQxBlZ09j3ckxWE1b+mTNEUmpwRi2
+	th5n8+67aV4YEGULXuLTpzUeJBd8RhrYBjZp8afFucVzKWE4tGIodNCaT5LMVPjO
+	gtdbfgLlQ60ZmZXK48SdhQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1741859145; x=
+	1741945545; bh=cMzoJNPec5zYQJsS7IO+/BXZwtWt/8pbBTF9FIoCxXo=; b=o
+	FAGKRxJqiLiqwsZbjZyJs6cRMqqW5B4EtpN/sikyEliDylnTxY0SvmGxQPLwSxu8
+	HDbT2J3tRfHJeUycsBqKJ9pLicFTJg+v8DKlDVJbe7GdL/NC+AN05SfdM9EcjUaF
+	6THNtWPT4QMFC9mVTBNeYZDBLFNwrl6x1pt4tVr6nMDBgu8RT197FI7zcYja4bJZ
+	RtEklvjy0Q51QWjAvFu+CUW/mjouG1NJ8t++UlkAft9glzeJNjhIgxSJXCQr+jLg
+	tfUUbYwWbh3sSSI3UO2e2wcN6mYmHwZ6GVQMo53gYffULP1dHgEAb1jkyhAjmo9R
+	QR9hfKvnqGtwx9VQ5Zhyw==
+X-ME-Sender: <xms:R6nSZ7BYizDkCVtPv3d8U8j5ZaxlMRnAaBqY9SrISk9jd3ItSVMZBA>
+    <xme:R6nSZxj_OIfRuojtwSVohChIpxbxq8Z4BRNM78Yhs7i1eo01FvpA23IJaBeWI35FV
+    J3tdw8HkSj1zrgJDAg>
+X-ME-Received: <xmr:R6nSZ2mF9LmVKITOk_2DvPTaLRU7CIC-1eUUpgPNC0TOvqLnVDM21CLMxAekcDfsi3KL7G7t9TspbD_kYwQwetSdwC6IJFnUkw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduvdejiedvucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddt
+    tdejnecuhfhrohhmpefpihhklhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrsh
+    houggvrhhluhhnugesrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpeev
+    teegtddvvdfhtdekgefhfeefheetheekkeegfeejudeiudeuleegtdehkeekteenucevlh
+    hushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhklhgrshdr
+    shhouggvrhhluhhnugesrhgrghhnrghtvggthhdrshgvpdhnsggprhgtphhtthhopedvhe
+    dpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepjhgrtghosgdrvgdrkhgvlhhlvghr
+    sehinhhtvghlrdgtohhmpdhrtghpthhtoheprghnthhhohhnhidrlhdrnhhguhihvghnse
+    hinhhtvghlrdgtohhmpdhrtghpthhtohepphhriigvmhihshhlrgifrdhkihhtshiivghl
+    sehinhhtvghlrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunh
+    hnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghp
+    thhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrg
+    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtgho
+    mhdprhgtphhtthhopehrihgthhgrrhgutghotghhrhgrnhesghhmrghilhdrtghomh
+X-ME-Proxy: <xmx:R6nSZ9yPqCzTtNl3km04nvPV1x48jlasmuN7F4XVtPc92xJ0wAiODw>
+    <xmx:R6nSZwStGBiwRW7L5wVvji_oB1VMqHufY3eQaCULyKCxj_4_7rUBHA>
+    <xmx:R6nSZwbfiebDtA3_0Jgxy7eulsB8BA8mRcRxWXkfFNM8C7AvE9qulw>
+    <xmx:R6nSZxTrOEd1TZDxeVb-9v-5wpT44cCZO85bWIFlT9MPJqC1IgmngA>
+    <xmx:SanSZ8ozOaHMN4JC7kaeLPTMR_AhuNYaL4nTTbU_FnSBDNZRGto9DElr>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 13 Mar 2025 05:45:43 -0400 (EDT)
+Date: Thu, 13 Mar 2025 10:45:40 +0100
+From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,	Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Ruud Bos <kernel.hbk@gmail.com>,
+	Paul Barker <paul.barker.ct@bp.renesas.com>,
+	Bryan Whitehead <bryan.whitehead@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>,	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Lasse Johnsen <l@ssejohnsen.me>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH net v2 2/5] renesas: reject PTP_STRICT_FLAGS as
+ unsupported
+Message-ID: <20250313094540.GC3061046@ragnatech.se>
+References: <20250312-jk-net-fixes-supported-extts-flags-v2-0-ea930ba82459@intel.com>
+ <20250312-jk-net-fixes-supported-extts-flags-v2-2-ea930ba82459@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250312-jk-net-fixes-supported-extts-flags-v2-2-ea930ba82459@intel.com>
 
-On Wed, 5 Mar 2025 18:11:24 +0000
-Matthew Wilcox <willy@infradead.org> wrote:
+Hi Jacob,
 
+Thanks for your work.
 
-> What worries me is that nobody in networking has replied to this thread
-> yet.  Do they not care?  Let's see if a subject line change will help
-> with that.
+On 2025-03-12 15:15:51 -0700, Jacob Keller wrote:
+> The ravb_ptp_extts() function checks the flags coming from the
+> PTP_EXTTS_REQUEST ioctl, to ensure that future flags are not accepted on
+> accident.
+> 
+> This was updated to 'honor' the PTP_STRICT_FLAGS in commit 6138e687c7b6
+> ("ptp: Introduce strict checking of external time stamp options.").
+> However, the driver does not *actually* validate the flags.
+> 
+> I originally fixed this driver to reject future flags in commit
+> 592025a03b34 ("renesas: reject unsupported external timestamp flags"). It
+> is still unclear whether this hardware timestamps the rising, falling, or
+> both edges of the input signal.
+> 
+> Accepting requests with PTP_STRICT_FLAGS is a bug, as this could lead to
+> users mistakenly assuming a request with PTP_RISING_EDGE actually
+> timestamps the rising edge only.
+> 
+> Reject requests with PTP_STRICT_FLAGS (and hence all PTP_EXTTS_REQUEST2
+> requests) until someone with access to the datasheet or hardware knowledge
+> can confirm the timestamping behavior and update this driver.
+> 
+> Fixes: 6138e687c7b6 ("ptp: Introduce strict checking of external time stamp options.")
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+
+Reviewed-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+
+> ---
+>  drivers/net/ethernet/renesas/ravb_ptp.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/renesas/ravb_ptp.c b/drivers/net/ethernet/renesas/ravb_ptp.c
+> index 6e4ef7af27bf31ab2aad8e06a65e0ede6046e3c0..b4365906669f3bd40953813e263aeaafd2e1eb70 100644
+> --- a/drivers/net/ethernet/renesas/ravb_ptp.c
+> +++ b/drivers/net/ethernet/renesas/ravb_ptp.c
+> @@ -179,8 +179,7 @@ static int ravb_ptp_extts(struct ptp_clock_info *ptp,
+>  	/* Reject requests with unsupported flags */
+>  	if (req->flags & ~(PTP_ENABLE_FEATURE |
+>  			   PTP_RISING_EDGE |
+> -			   PTP_FALLING_EDGE |
+> -			   PTP_STRICT_FLAGS))
+> +			   PTP_FALLING_EDGE))
+>  		return -EOPNOTSUPP;
+>  
+>  	if (req->index)
+> 
+> -- 
+> 2.48.1.397.gec9d649cc640
 > 
 
-I like being smelly :-(
+-- 
+Kind Regards,
+Niklas Söderlund
 
