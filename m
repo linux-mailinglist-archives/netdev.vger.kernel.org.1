@@ -1,94 +1,176 @@
-Return-Path: <netdev+bounces-174539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 937C6A5F1A1
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 11:57:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05382A5F1AD
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 11:59:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBC203B3FE2
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 10:57:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C87D18937EA
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 10:59:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDCDF266B42;
-	Thu, 13 Mar 2025 10:55:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B18265CAF;
+	Thu, 13 Mar 2025 10:59:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZOGM+hd7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iVLZfptD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B54192661AF;
-	Thu, 13 Mar 2025 10:55:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95B842571BF
+	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 10:59:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741863316; cv=none; b=u5zItSoTopIVnSYhB/RVYNSqXq0IaYM23JpoN7kWgXwVWuDKz9KBcuO93I9f7nFA00IhqawKipdv/HCPNlaw+O1y7/la2LfAQM5QjLvvW8yDasSpBBgn7nVnUSy7PNgyum4PXtfMBWnR+3X9q36+PdQJTesKDuzgCFzHzP158zE=
+	t=1741863544; cv=none; b=NNcKq5zWKD8EnC6os4JtDkuImyvxJ7rYnHqIyz7mdBEqY1rkX6k7tHc5IEwnTqUO1f28p0lwyoLGl8L9GB2hUNFII/2EVbLUTHpv2ypOxJQUw3xSqT7iFS0FLQlLDBqapdydR9XXTSR+MiV2cVnaePjDbhRXkD+xotVXvU4JCjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741863316; c=relaxed/simple;
-	bh=pPQxLR7mUcDTayuaXMsqxeXTPk/LH1LGtp5G+bcGp7A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CI1GUE0VJD6joDSCcKp/o0PSsWz1/rhfTtfkrFc5a4/gjafQegqLcimIAShHTaMBeeWw2JavAo0822QXH+Hp7shHrdP6M3xS4jgeKr+2z3eNlByXAfMVUfFpjDp3nuTGbyu5lIwhnyPY/8YeSsCyATJF2br/Jwf+wgyf0/tsU8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZOGM+hd7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C1C8C4CEDD;
-	Thu, 13 Mar 2025 10:55:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741863314;
-	bh=pPQxLR7mUcDTayuaXMsqxeXTPk/LH1LGtp5G+bcGp7A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZOGM+hd7QteUZ3Vg3ekGj7c0wB3cCj0wrm+jN78gO23WJq+hFnocJ3wnYKJFTFUo3
-	 XJmXknxs045WaPvQDGfyUxvOxpyY4vQ1pUKD4TCt7GHtFx7nxUU7HhCNqp6+9/+DPX
-	 WtHvDmXiWx5WJNtMbHfYzHgr8eNWzplHSS4sAgw3oKPypyFXDqzz4vpGiZ34brGgGx
-	 Hd14CjV2FBztSrE4Yjk++4ePKwiFZ183U2LmLcsGyRtK6xL7aqmgFNRkJXP5PjZwpM
-	 1nhFa1J0SWDhir3hnxMbSeAy+b6f0qGFXI8VCHa7KsbjARLn8meOC9uxarfQFmjCXu
-	 m4qXAe6UMQ4uA==
-Date: Thu, 13 Mar 2025 11:54:53 +0100
-From: Simon Horman <horms@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Helge Deller <deller@gmx.de>, netdev@vger.kernel.org,
-	linux-parisc@vger.kernel.org
-Subject: Re: [PATCH net-next v2] net: tulip: avoid unused variable warning
-Message-ID: <20250313105453.GA125266@kernel.org>
-References: <20250313-tulip-w1-v2-1-2ac0d3d909f9@kernel.org>
+	s=arc-20240116; t=1741863544; c=relaxed/simple;
+	bh=37LJNif6aGyyhlJh5h8ixFPgluvePWafJrCynYtE1IE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DU+jtQuPRhTCZ17YDXaRrkh1c2UiEp5ML2XFXeiGiH+KUzb8KtGLzygPHcq6WvaVgtaSLjNm0Yt0zT1sfeBxXd4Ijej71Y3jEj8unYCp++AGyYopDKyysARQQrYNjyVntahoXtVcAsQHKuufYDnl6Fj7D5B/NT1hNH3ofq8yV3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iVLZfptD; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741863541;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=I8+KGKdJ4EK24n18Z2V3Wf8YYaN68pwFttwmHD5FeXs=;
+	b=iVLZfptD+pn64iyDSyI9HvKJqVIM7VARZHxcm78tK7bXK16d5pvAEVqfSAZ+i/8WL45NFP
+	aPWFUwTjTeAcgfyqPAK6tfAFSlncRiHt6fnRxCRDA0tfz23QQmF7w305BVYFt5RPOx90Nj
+	Aay6tMPBv48kV7h3ux+IRm/SmWV6868=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-246-MGM7vPTgNy23zCfj-1H1DQ-1; Thu, 13 Mar 2025 06:59:00 -0400
+X-MC-Unique: MGM7vPTgNy23zCfj-1H1DQ-1
+X-Mimecast-MFC-AGG-ID: MGM7vPTgNy23zCfj-1H1DQ_1741863539
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43cf5196c25so4103025e9.0
+        for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 03:58:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741863539; x=1742468339;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=I8+KGKdJ4EK24n18Z2V3Wf8YYaN68pwFttwmHD5FeXs=;
+        b=bnxyA1TworrTtwyJ8BlLqgP4RjtIB8aK5oj7uXNrPjbqJgxjc8ZUf45uClPZdhbqeV
+         d6cmkXZIFw0CQ1zFLKpE+pjrbp6rf9zt1RNVlQ9p++ShNEVae/t2gpT1y4iBXif4IJQn
+         CPMKdsYvuDd6pQTDszjaklPslAQN+AIWE4KExlBpNasXbvZJpIPUR9gH0bVnOqczZB0h
+         G+JEIcq42Vu8qk85T/4tPgTvfWud3TJ7JjD80qEC0CMBakLr5MhM7oURbDFbk7dJHyr3
+         l6gehEym0tW1zcdzdTvA+wgk5+965h1MY0XD2n0PmpWqi0b/ura2vvxBQC/pFId0KTLC
+         vpkA==
+X-Forwarded-Encrypted: i=1; AJvYcCVPA5dzfbVDbpzoNm12IhCkCRAikJmekDucVSlxT5XQ5prrs5VPr8IsBbJYXHb+4dpvuVP9qhs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzzIeEo2qB1PIcUzwFtT0dfIF5keMVLQvXiPBMY7omEBfIrVbqY
+	tdvvbYY+jGqNR4aDAIwNTrgFqKQtkF+erXZvoozR6CwD3TU3cW444/soWwOHgRiCc2KLFBrNsLF
+	WxqrZk/Eos9tv0sZgs1KRgvBvLoxsnD37iAwI2Jh0FZI63G8076hJGQ==
+X-Gm-Gg: ASbGncsxJVV3xfbkqERsL91xqe3LEl+soMugDEHaSwAGJPAQDrtAPu465xzTWrFk1mC
+	IqBEcne+yJsay+Y1IsbbTzkiscdgvikNvE80BdzE3GayljnGVR0nqTjBFOuloGnFxy94NpCaEJ6
+	b6DCUxQrPCIFTu4mbi1FR/JrP88LgaQ1ARGddCm0RSD06rqOa3U/z1tCVtqT7IOFuj1PNzRurfu
+	/dW95JvUS/bdsHkhuT6MJBWR4/benJNj2vrbbaIxW0izm5JfX/Q23QiXU9kn2NVk1z4UHPRG6MK
+	gdxFXtjtNrN+3WeC3ZrfD1duvpOgRv59wrVfEoEJ
+X-Received: by 2002:a05:6000:1aca:b0:390:f738:246b with SMTP id ffacd0b85a97d-39132d1cc3fmr19536583f8f.15.1741863538692;
+        Thu, 13 Mar 2025 03:58:58 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFl5a/zzB4j/bQzrh0zOYukq0rCxpL/1iN9vmTUtNgl3blwOPgCRfDtKqTKHkVbblM4clhX9A==
+X-Received: by 2002:a05:6000:1aca:b0:390:f738:246b with SMTP id ffacd0b85a97d-39132d1cc3fmr19536568f8f.15.1741863538262;
+        Thu, 13 Mar 2025 03:58:58 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-6-87.dyn.eolo.it. [146.241.6.87])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d0a7582absm49566905e9.17.2025.03.13.03.58.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Mar 2025 03:58:57 -0700 (PDT)
+Message-ID: <b62ea2ac-aff3-4a00-bc3a-960c28bc5522@redhat.com>
+Date: Thu, 13 Mar 2025 11:58:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250313-tulip-w1-v2-1-2ac0d3d909f9@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 8/9] net: check for driver support in netmem
+ TX
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ kvm@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-kselftest@vger.kernel.org
+Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Jeroen de Borst <jeroendb@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn
+ <willemb@google.com>, David Ahern <dsahern@kernel.org>,
+ Neal Cardwell <ncardwell@google.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin"
+ <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Shuah Khan <shuah@kernel.org>, sdf@fomichev.me,
+ asml.silence@gmail.com, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
+ <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
+References: <20250308214045.1160445-1-almasrymina@google.com>
+ <20250308214045.1160445-9-almasrymina@google.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250308214045.1160445-9-almasrymina@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 13, 2025 at 11:47:42AM +0100, Simon Horman wrote:
-> There is an effort to achieve W=1 kernel builds without warnings.
-> As part of that effort Helge Deller highlighted the following warnings
-> in the tulip driver when compiling with W=1 and CONFIG_TULIP_MWI=n:
+On 3/8/25 10:40 PM, Mina Almasry wrote:
+> We should not enable netmem TX for drivers that don't declare support.
 > 
->   .../tulip_core.c: In function ‘tulip_init_one’:
->   .../tulip_core.c:1309:22: warning: variable ‘force_csr0’ set but not used
+> Check for driver netmem TX support during devmem TX binding and fail if
+> the driver does not have the functionality.
 > 
-> This patch addresses that problem using IS_ENABLED(). This approach has
-> the added benefit of reducing conditionally compiled code. And thus
-> increasing compile coverage. E.g. for allmodconfig builds which enable
-> CONFIG_TULIP_MWI.
+> Check for driver support in validate_xmit_skb as well.
 > 
-> Compile tested only.
-> No run-time effect intended.
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 > 
-> --
+> ---
 > 
-> Acked-by: Helge Deller <deller@gmx.de>
-> Signed-off-by: Simon Horman <horms@kernel.org>
-> v2: Use IS_ENABLED rather than __maybe_unused [Simon Horman]
-> v1: Initial patch [Helge Deller]
+> v5: https://lore.kernel.org/netdev/20250227041209.2031104-8-almasrymina@google.com/
+> - Check that the dmabuf mappings belongs to the specific device the TX
+>   is being sent from (Jakub)
+> 
+> v4:
+> - New patch
+> 
+> ---
+>  net/core/dev.c         | 33 +++++++++++++++++++++++++++++++++
+>  net/core/devmem.h      |  6 ++++++
+>  net/core/netdev-genl.c |  7 +++++++
+>  3 files changed, 46 insertions(+)
+> 
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 1cb134ff7327..5553947123a0 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -3868,10 +3868,43 @@ int skb_csum_hwoffload_help(struct sk_buff *skb,
+>  }
+>  EXPORT_SYMBOL(skb_csum_hwoffload_help);
+>  
+> +static struct sk_buff *validate_xmit_unreadable_skb(struct sk_buff *skb,
+> +						    struct net_device *dev)
+> +{
+> +	struct skb_shared_info *shinfo;
+> +	struct net_iov *niov;
+> +
+> +	if (likely(skb_frags_readable(skb)))
+> +		goto out;
+> +
+> +	if (likely(!dev->netmem_tx))
 
-Sorry, the tail of the commit message got a bit mangled.
-I'll post a v3 after waiting for other feedback.
+Minor nit: I think the above is actually unlikely. The skb is
+unreadable: is supposed to be transmitted on a device supporting
+netmem_tx, otherwise we are in exceptional/error path.
 
--- 
-pw-bot: changes-requested
+No need to repost just for this.
+
+Thanks,
+
+Paolo
+
 
