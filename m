@@ -1,115 +1,110 @@
-Return-Path: <netdev+bounces-174617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00A7FA5F8D4
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 15:46:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 853DEA5F8EC
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 15:48:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 653503A5327
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 14:46:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E71E53B0622
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 14:48:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86F2A22F150;
-	Thu, 13 Mar 2025 14:46:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28337267AF6;
+	Thu, 13 Mar 2025 14:48:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J59mzNUm"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="QJcqiFKa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC7586337;
-	Thu, 13 Mar 2025 14:46:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21C031F130F
+	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 14:48:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741877183; cv=none; b=frX/astY/jWRhXpQ4yBrwby0cb9KAtmeUsz1oCMBwnsK+FOwY0vY/e462RBwgfj2oeIRe4eXu9BAsGPjnqld8tpno7i+OpDFNsEkMXZXLYCXtHaFB7Jutm2eWrpZO6lqhoqZ8KkR4SKbE0EBvvl2kXfnWZmX/Yal1qDjg+JDfg8=
+	t=1741877305; cv=none; b=mgNtGlN5wELE1hA7/FNaHZOt438771D6yonJgRvgv/bJVUKjnjRnb7B5byYXRA8cI3DdZV4vqAXu8WBQnMJlhVBkBd5KWT4aUgui/sL+R+f9pPmRrkjZ3diZ3xe6IB7+6tE1lAlM/W9aL8YBQZHu12EFoXK7mLHDSB3iRFpHC2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741877183; c=relaxed/simple;
-	bh=tshyggDOde6rCy5WxES5KRnyBHK98eY57xGucW/T14k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T7u9XQHGZIgbu/VOmNJqCohdfEaLUHxIxnHII3qLwu5WieSlnrx+IYiozuUCHjQB7KFjiDewb01DyAs9JDA8s3qSXXWMaL9yQzBuRg+KWFRpT/ZVLr/IpmdfvCj+ICgg4/IYMqdUta3YIlwOUgeikGWNJKIZuMpG1x65hEmTF0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J59mzNUm; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741877182; x=1773413182;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=tshyggDOde6rCy5WxES5KRnyBHK98eY57xGucW/T14k=;
-  b=J59mzNUmu6aKO0B5e7jSChd9bf+dEKKGz27YyzeoJXM9zuoq/z/Mc9y8
-   Hk7tIVcdr/veSrXBiXqgkbBsJEPK97Aox+W4OEdZfl/s5M6hbMcvwUeV4
-   9Ta3Omi3NNqCoJwG7VKIKC9XOL9/ceapaW95JauAEizHjWChz3voJj+J3
-   CvhgvXPWTaiweSu0+wlX1iPlIlXfvMYOfrc4Dn6QRU5k46FszfW8dGD+I
-   QH9a4l6wuztv0ttNCKyHL8WU+afu6AX6aPYqsm1mbzNxvC0xIyCJ5agTt
-   4w0YF5NXREYzkCrcbTteNf2a+l/Hc1Y2a1BGtnWIAB4WpN2zlfJ6tpi/s
-   Q==;
-X-CSE-ConnectionGUID: EuPbakHSSZ2dHqkDasi3bw==
-X-CSE-MsgGUID: yoVLTT5eTX+SR8NIbF5aMw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11372"; a="43128154"
-X-IronPort-AV: E=Sophos;i="6.14,245,1736841600"; 
-   d="scan'208";a="43128154"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 07:46:21 -0700
-X-CSE-ConnectionGUID: 6aH8UiBVQRWTl1zZCHlr5w==
-X-CSE-MsgGUID: kkf6NXANQpCg4GIsyiprtw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,245,1736841600"; 
-   d="scan'208";a="120763387"
-Received: from smile.fi.intel.com ([10.237.72.58])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 07:46:20 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1tsjpB-00000002Cuo-2dqq;
-	Thu, 13 Mar 2025 16:46:17 +0200
-Date: Thu, 13 Mar 2025 16:46:17 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: linux-spi@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH v1 1/1] spi: Use inclusive language
-Message-ID: <Z9LvueoWc1o7ayUS@smile.fi.intel.com>
-References: <20250313111442.322850-1-andriy.shevchenko@linux.intel.com>
- <1c49edb2-2ffc-419e-be5e-7e15669a7839@sirena.org.uk>
- <Z9LlTflb1HQMyEv2@smile.fi.intel.com>
- <e329812d-90a5-456e-9a00-abb5c2c8d25d@sirena.org.uk>
- <Z9LqyWr4GH4RX6Nj@smile.fi.intel.com>
- <Z9Ls-zhryd7mJv-b@smile.fi.intel.com>
- <dc17b87b-29c1-4b66-9353-c934a68b929a@sirena.org.uk>
+	s=arc-20240116; t=1741877305; c=relaxed/simple;
+	bh=PFpj0fvRfpH7WYvbktlQJLTawiFbOaORNFQp94uQFcw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LUYDYon/dCxTKH4seZBirgC/zIEHzPJmvqnNsBuYgMNmfs5tvWg+q18rT9/x6AgLQckgIx4DnhYdy7pb6cw24khx9T5qwYHqf85eJSAd52JaAkTmw2f6jlGFnjxVpW+TqArxe3dmdktvJaIM9R5nVXXqQMTgC57GOtMHJc59SOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=QJcqiFKa; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from [10.206.8.177] (unknown [89.164.90.215])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id EEF2E200EED2;
+	Thu, 13 Mar 2025 15:48:20 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be EEF2E200EED2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1741877301;
+	bh=bbp1xUvyocW4KzwXVBbqrxeWwx5lrA6wSiqRAQYTHKs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=QJcqiFKa1TKNnQ2duCxyxjnkNOpR4N+JA+r+yk/8pgU+1o3CE+NOi5vMAO8rxLXZh
+	 HqbcBXGaNalP0y7vcKH2Z5GYoPCEttRzohSZzb8PP6tz+mBvJiVZsS6730VDoy6XtP
+	 Yqz6mYxBPRB4lhnCQhKlttYZx52zo8TsNppHSwbctsGvKvt0PnxqXOfPHeX/kqwU1n
+	 iHrixpjcXN0xiBhFVZQ38QfcNGH6RnIdnoqkyqh8bz2syBBf3DMu2fpNv2ljamzDH1
+	 ykock00iAgJFzywGcQoyWlPrve2OQwuNE1U7PKFMi70Ir3VZlMhvA09stR9jsdnVuY
+	 AdPhF5bkJWWyA==
+Message-ID: <62a962f7-a91d-4338-9b18-d4073e83f814@uliege.be>
+Date: Thu, 13 Mar 2025 15:48:20 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dc17b87b-29c1-4b66-9353-c934a68b929a@sirena.org.uk>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 5/7] net: ipv6: ila: fix lwtunnel_output() loop
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, horms@kernel.org, Tom Herbert <tom@herbertland.com>,
+ Ido Schimmel <idosch@nvidia.com>
+References: <20250311141238.19862-1-justin.iurman@uliege.be>
+ <20250311141238.19862-6-justin.iurman@uliege.be>
+ <de0104f3-2a2c-44ee-a3e9-8acc927cbfc6@redhat.com>
+Content-Language: en-US
+From: Justin Iurman <justin.iurman@uliege.be>
+In-Reply-To: <de0104f3-2a2c-44ee-a3e9-8acc927cbfc6@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 13, 2025 at 02:39:27PM +0000, Mark Brown wrote:
-> On Thu, Mar 13, 2025 at 04:34:35PM +0200, Andy Shevchenko wrote:
-> > On Thu, Mar 13, 2025 at 04:25:13PM +0200, Andy Shevchenko wrote:
+On 3/13/25 13:46, Paolo Abeni wrote:
+> On 3/11/25 3:12 PM, Justin Iurman wrote:
+>> diff --git a/net/ipv6/ila/ila_lwt.c b/net/ipv6/ila/ila_lwt.c
+>> index 7d574f5132e2..67f7c7015693 100644
+>> --- a/net/ipv6/ila/ila_lwt.c
+>> +++ b/net/ipv6/ila/ila_lwt.c
+>> @@ -96,6 +96,14 @@ static int ila_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+>>   		}
+>>   	}
+>>   
+>> +	/* avoid lwtunnel_output() reentry loop when destination is the same
+>> +	 * after transformation
+>> +	 */
+>> +	if (orig_dst->lwtstate == dst->lwtstate) {
+>> +		dst_release(dst);
+>> +		return orig_dst->lwtstate->orig_output(net, sk, skb);
+>> +	}
+>> +
+>>   	skb_dst_drop(skb);
+>>   	skb_dst_set(skb, dst);
+>>   	return dst_output(net, sk, skb);
 > 
-> > > Yes, the base where it was merged to is eds-acpi branch of my public GH [1],
-> > > which has no SPI stuff in there.
+> Even this pattern is repeated verbatim in patch 3, and I think it should
+> deserve a shared helper. Also a bit of a pity there are a few variations
+
++1 as well. However, same remark applies here: this patch (and some 
+others) will be removed from this series in -v2.
+
+> that do not fit cleanly a common helper, but I guess there is little to
+> do about that for 'net'.
+
+Indeed...
+
+> Thanks,
 > 
-> > $ git checkout -b test-spi-mrg spi/for-next
-> > $ git cherry-pick -1 87a228960033
-> > [test-spi-mrg 8a11d1063109] spi: Use inclusive language
-> > Date: Fri Dec 8 19:02:54 2023 +0200
-> > 2 files changed, 64 insertions(+), 66 deletions(-)
+> Paolo
 > 
-> > In any case there is a v2, please try that one.
-> 
-> That one does apply.
-
-Okay, It might be that I send the previous version by a mistake or it was based
-on an old spi/for-next. Now I don't know as it's gone.
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
 
