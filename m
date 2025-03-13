@@ -1,92 +1,89 @@
-Return-Path: <netdev+bounces-174765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88AA8A603CC
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 23:00:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E6A7A6048D
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 23:42:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC0373AE988
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 22:00:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BFE619C469E
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 22:42:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 899951F4634;
-	Thu, 13 Mar 2025 22:00:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38D291F5821;
+	Thu, 13 Mar 2025 22:41:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iHHXZDvc"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wXb11wbo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618CC7FBAC;
-	Thu, 13 Mar 2025 22:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED0618B48B;
+	Thu, 13 Mar 2025 22:41:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741903222; cv=none; b=uJTHB75aUelr/aWVnFYth0lahX/NLuD623cHMHdgsXTP5uidlZ84qM4YIkfgngKlgp3r4C3PoP7lowCRRigucaNwUA9ZPrup4YBVXeKq07/18pKoknkVfqjp+kxb0eUGeC6en1AT6z0s/If+LNwFo8nf/c3D2YFRb+8ygunag6s=
+	t=1741905715; cv=none; b=HF6ahW+VMUSyniWyBLPOUXJBExV22p56KQOtqIGFvN7ICeI8qrBYSAIKqcGu9A/RJUh9dNfHjBuxJhAR7JW0+Gbb3WJIX331AMwP+8QvxS58EQqLPQKqjDbySjhQjjoi64GcvB3Mv1Wy7q51YlGT7uyDeCYVtONfmzkTrXcnImM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741903222; c=relaxed/simple;
-	bh=UQYKNY0RG7DHAmX7JHu16iMKRFHg2Xbo77zTHiWsMfo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CQS12c+fzJXaWNlVn/UJcNdrWxQ/lSjx4TkzhHUQcMmbOHQbMQq9VDwKfOpR999rWBCdGAU6c8pqjz458ZfMfKjzMPaBlE9v7BuaPjhskwepU1xeOauxcKG3qbRSfgoZO6YWeBFczMAbtsiPyG1ZPtFKX3tfCr6S2chaJj1DxmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iHHXZDvc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF8C6C4CEDD;
-	Thu, 13 Mar 2025 22:00:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741903221;
-	bh=UQYKNY0RG7DHAmX7JHu16iMKRFHg2Xbo77zTHiWsMfo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=iHHXZDvcRX8N4WH7548F6sMk9IBybblce0Bdv9PHAojHppBQ/DiSVam6is6fI0jRn
-	 rZQ/CNjzvjTR0bwaryYqsMxSxUn+Pi6mxSHUN055jsbGJhsyWMJ123h5Z2GV4V2zlS
-	 5Z4LjEqY92bvG8TjoV6vzM3+r54rxPoz47mYaJwlXAo4m63UDiXP/m01ZIfQ+OuzdG
-	 FXsfNUSrvU6S6KPblSFpANylwpu0iEGC4AXR7Byrtb5/xY5tbzz6O/Yp9+X13DxrU6
-	 4o0nwuIQPw9ZH+Nc8U8QxCjZ7eR+16zlWdZ9VW4rcOzA70xvBgpa5BeckUeDSm49p3
-	 1us9nxJetozWg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD5D3806651;
-	Thu, 13 Mar 2025 22:00:57 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1741905715; c=relaxed/simple;
+	bh=kmQLpP1H/8R9Re5ysO3RWYCNcQwK9I9FBWIQICank4o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fZLLLN6PMpGDKaajB5Cb2LxB7L+G/XGynUM0zwUaSMoeEcRjkim5TRZFerXlHwaNh1OU8hI8ZlwhvkzNnlmuBv6LxQU7ZhKKxS/T8m9+PM+VcNYBbkh3N9vs7SB7x2/vaduLRJjv+dSOHBG96ns4v806CmeIBbbrTqq09GsSbeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wXb11wbo; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=o/1Mh0o88Dsb3LEqDeTz/KouVD4jeGs3U4MDb1Mlz1A=; b=wXb11wboAunMU07oXJuhWFbgd5
+	aJpj/k9vObm1zqZS3szTeZFJROQeX+GijsnYf3MJ7cNndJ+PplW9sF9Uedl/Os4phaLpsR2zUhc0I
+	JKHIBOFvidUdzs1JU1E/lRadZjY1ACecfk+uHw5IitYJRWy5G5mS/DTXg4ajGIUFhUhA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tsqiZ-0057P3-LD; Thu, 13 Mar 2025 23:07:55 +0100
+Date: Thu, 13 Mar 2025 23:07:55 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Chris Packham <Chris.Packham@alliedtelesis.co.nz>
+Cc: "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"daniel@makrotopia.org" <daniel@makrotopia.org>,
+	"markus.stockhausen@gmx.de" <markus.stockhausen@gmx.de>,
+	"sander@svanheule.net" <sander@svanheule.net>,
+	netdev <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v10] net: mdio: Add RTL9300 MDIO driver
+Message-ID: <f6165df5-eedb-4a11-add0-2ae4d4052d6a@lunn.ch>
+References: <20250313010726.2181302-1-chris.packham@alliedtelesis.co.nz>
+ <f7c7f28b-f2b0-464a-a621-d4b2f815d206@lunn.ch>
+ <5ea333ec-c2e4-4715-8a44-0fd2c77a4f3c@alliedtelesis.co.nz>
+ <be39bb63-446e-4c6a-9bb9-a823f0a482be@lunn.ch>
+ <539762a3-b17d-415c-9316-66527bfc6219@alliedtelesis.co.nz>
+ <6a98ba41-34ee-4493-b0ea-0c24d7e979b1@lunn.ch>
+ <6ae8b7c6-8e75-4bfc-9ea3-302269a26951@alliedtelesis.co.nz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] Networking for v6.14-rc7
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174190325650.1674705.7511836623566236671.git-patchwork-notify@kernel.org>
-Date: Thu, 13 Mar 2025 22:00:56 +0000
-References: <20250313154206.43726-1-pabeni@redhat.com>
-In-Reply-To: <20250313154206.43726-1-pabeni@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6ae8b7c6-8e75-4bfc-9ea3-302269a26951@alliedtelesis.co.nz>
 
-Hello:
+> I'm pretty sure it would upset the hardware polling mechanism which 
+> unfortunately we can't disable (earlier I thought we could but there are 
+> various switch features that rely on it).
 
-This pull request was applied to netdev/net.git (main)
-by Linus Torvalds <torvalds@linux-foundation.org>:
+So we need to get a better understanding of that polling. How are you
+telling it about the aquantia PHY features? How does it know it needs
+to get the current link rate from MDIO_MMD_AN, MDIO_AN_TX_VEND_STATUS1
+which is a vendor register, not a standard C45 register? How do you
+teach it to decode bits in that register?
 
-On Thu, 13 Mar 2025 16:42:06 +0100 you wrote:
-> Hi Linus!
-> 
-> If you have CONFIG_CHROME_PLATFORMS enabled, your config will get
-> a new knob, too: BT_HCIBTUSB_AUTO_ISOC_ALT. I hope that would not
-> be a problem.
-> 
-> The following changes since commit f315296c92fd4b7716bdea17f727ab431891dc3b:
-> 
-> [...]
-
-Here is the summary with links:
-  - [GIT,PULL] Networking for v6.14-rc7
-    https://git.kernel.org/netdev/net/c/4003c9e78778
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+	Andrew
 
