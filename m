@@ -1,118 +1,95 @@
-Return-Path: <netdev+bounces-174475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9F45A5EEA8
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 09:57:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9EF5A5EE67
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 09:50:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B86CB3AEFE8
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 08:57:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FBE23B8640
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 08:49:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C55AC2638BF;
-	Thu, 13 Mar 2025 08:57:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E451262D08;
+	Thu, 13 Mar 2025 08:49:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b="MblLZ3Qk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G+9tQIfj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0.infotecs.ru (mx0.infotecs.ru [91.244.183.115])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FBA5262814;
-	Thu, 13 Mar 2025 08:57:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.244.183.115
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E59526281A;
+	Thu, 13 Mar 2025 08:49:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741856241; cv=none; b=IyFZvafVi2NAuQd6TanJ/C2j2Mggi36Y8WqoTRIXiSOS7o5mO+PZ4D1gebtmHncTXy33KdRaJxflbW8FrY9mWLoVHK9EkWWtDC7eX9t5HGxeo+zVRw9dVA6UfBqIV5TWc6BfYEAO+KE2IAuSPJXohSUTJUebAy299fLAuXgjHNE=
+	t=1741855798; cv=none; b=PiBjl6dtaqfFyZ4slAFfbcb8YouApku61gNLKKLvK+r6pXPsmKkowtpS9JirL+LQZ4iYDdXK9A5N0QHm6xMhDRmO4gujkabmtiTkZPtrQJAo5YbtwShKjTgPovVWeTseMGkjwSG73IfesxsjvUmL3b7C6gkJIQ1htASQXz92TnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741856241; c=relaxed/simple;
-	bh=tpmeGUgGhllwUBBAGOlrE9cU2ApLt6CWcDTd6RNOAGo=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=mVGb+9HMt/24IdDUp6fwNL1pcmdOwpQtOqtO/5iZbFSn0war9B2H/eGQkASqPcHvrXT52x/DNPYb3B0yTgKptfSoIhuFhOilizyRZC8mGs5sNOPZMUxLxP2e3MoKMI86w7IvDge9vKIpwlYjGxoWQ+JeIib63hhH8Ee5bS1rsAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru; spf=pass smtp.mailfrom=infotecs.ru; dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b=MblLZ3Qk; arc=none smtp.client-ip=91.244.183.115
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infotecs.ru
-Received: from mx0.infotecs-nt (localhost [127.0.0.1])
-	by mx0.infotecs.ru (Postfix) with ESMTP id 8495410B9393;
-	Thu, 13 Mar 2025 11:50:08 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx0.infotecs.ru 8495410B9393
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=infotecs.ru; s=mx;
-	t=1741855808; bh=g0YsrEhjGz8lcic6OJN5Xenjkp1uFzhGdMlrY9qTx3c=;
-	h=From:To:CC:Subject:Date:From;
-	b=MblLZ3QkaC4Odm+VZcIN/XFNg2xu85pnqEzg4rJY8oA55qjLvuRkrS5crfkD4l8yV
-	 JUgBFJcsnVPTIvAMG2YiTujbooZ0Wmp5USpDYsUg3tgchiOKVz98iOZvt1VokcI3qF
-	 aBksXzRouly01wgzIg8J2Y3s7NEBziOa4lT264R4=
-Received: from msk-exch-01.infotecs-nt (msk-exch-01.infotecs-nt [10.0.7.191])
-	by mx0.infotecs-nt (Postfix) with ESMTP id 80C4230375F8;
-	Thu, 13 Mar 2025 11:50:08 +0300 (MSK)
-From: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
-To: "bjorn@kernel.org" <bjorn@kernel.org>
-CC: Magnus Karlsson <magnus.karlsson@intel.com>, Maciej Fijalkowski
-	<maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Simon
- Horman" <horms@kernel.org>, Alexei Starovoitov <ast@kernel.org>, "Daniel
- Borkmann" <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: [PATCH net] xsk: fix an integer overflow in
- xp_create_and_assign_umem()
-Thread-Topic: [PATCH net] xsk: fix an integer overflow in
- xp_create_and_assign_umem()
-Thread-Index: AQHbk/Tsm9QMCOUZtk69szSJlOz3iQ==
-Date: Thu, 13 Mar 2025 08:50:08 +0000
-Message-ID: <20250313085007.3116044-1-Ilia.Gavrilov@infotecs.ru>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-exclaimer-md-config: 208ac3cd-1ed4-4982-a353-bdefac89ac0a
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1741855798; c=relaxed/simple;
+	bh=Z9bhnmQuVTK3KlaOUmQ71atR3CCNcpznsgNzTr7cStk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bCSCD66Cboxv+HmDYY3XFec5gjKhKnPxcgj8GD6E5sXF3MI+Sq4ECHr9Sc96rd5npcuXHMkknxn+tJEjhcj9j5HdMmZqVEwcLREX8JfcKyq9vsDjd3vNu7XDBysAWQwdZwXE6gFTFyMl6PCJRPMWY+HvoqGqLnT0bRCM+P67j8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G+9tQIfj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92595C4CEDD;
+	Thu, 13 Mar 2025 08:49:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741855797;
+	bh=Z9bhnmQuVTK3KlaOUmQ71atR3CCNcpznsgNzTr7cStk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=G+9tQIfjeJErLON2J/nToFA2RBUmgwbQxm+0CYZjQjXaYAz1xuuwv0oBNxKwzXQjz
+	 cEKVukEuVIWDw8azuwTDidseHqEU/I4c5hbrK0bxqYIwwFg8ZRBHeQyUz8BB590FMA
+	 99O3TeIzuMcZ5c5gj0A9iCgI/1eIupk4OvlsLChq5RkBZT/8wqGcT9CpmLKYVbNVV7
+	 b9cOTqT7gcayjn03OseokgQivAx8Y6ZqSpaw/e1e93HjqEiS+cJ/fI39LoprugcUM8
+	 a0F5g1CSpOiX+nhCdwjlGKs5yA/BIfY/ePEaUu/hd8vi2WrU1WNvYJvpuwW5fozQ4M
+	 3CE1CdBnudnwA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D8D3806651;
+	Thu, 13 Mar 2025 08:50:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KLMS-Rule-ID: 5
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2025/03/13 07:05:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2025/03/13 07:03:00 #27752837
-X-KLMS-AntiVirus-Status: Clean, skipped
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: hns3: use string choices helper
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174185583203.1420926.338411681169004091.git-patchwork-notify@kernel.org>
+Date: Thu, 13 Mar 2025 08:50:32 +0000
+References: <20250307113733.819448-1-shaojijie@huawei.com>
+In-Reply-To: <20250307113733.819448-1-shaojijie@huawei.com>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ shenjian15@huawei.com, wangpeiyang1@huawei.com, liuyonglong@huawei.com,
+ chenhao418@huawei.com, jonathan.cameron@huawei.com,
+ shameerali.kolothum.thodi@huawei.com, salil.mehta@huawei.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Since the i and pool->chunk_size variables are of type 'u32',
-their product can wrap around and then be cast to 'u64'.
-This can lead to two different XDP buffers pointing to the same
-memory area.
+Hello:
 
-Found by InfoTeCS on behalf of Linux Verification Center
-(linuxtesting.org) with SVACE.
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Fixes: 94033cd8e73b ("xsk: Optimize for aligned case")
-Cc: stable@vger.kernel.org
-Signed-off-by: Ilia Gavrilov <Ilia.Gavrilov@infotecs.ru>
----
- net/xdp/xsk_buff_pool.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Fri, 7 Mar 2025 19:37:33 +0800 you wrote:
+> From: Jian Shen <shenjian15@huawei.com>
+> 
+> Use string choices helper for better readability.
+> 
+> Signed-off-by: Jian Shen <shenjian15@huawei.com>
+> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> 
+> [...]
 
-diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
-index 1f7975b49657..d158cb6dd391 100644
---- a/net/xdp/xsk_buff_pool.c
-+++ b/net/xdp/xsk_buff_pool.c
-@@ -105,7 +105,7 @@ struct xsk_buff_pool *xp_create_and_assign_umem(struct =
-xdp_sock *xs,
- 		if (pool->unaligned)
- 			pool->free_heads[i] =3D xskb;
- 		else
--			xp_init_xskb_addr(xskb, pool, i * pool->chunk_size);
-+			xp_init_xskb_addr(xskb, pool, (u64)i * pool->chunk_size);
- 	}
-=20
- 	return pool;
---=20
-2.39.5
+Here is the summary with links:
+  - [net-next] net: hns3: use string choices helper
+    https://git.kernel.org/netdev/net-next/c/9e3285040514
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
