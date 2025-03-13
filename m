@@ -1,113 +1,129 @@
-Return-Path: <netdev+bounces-174745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 500ACA601A2
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 20:55:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F4B6A6019F
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 20:54:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D98BD8800B9
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 19:54:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE70519C0EDD
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 19:54:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 998B81F4264;
-	Thu, 13 Mar 2025 19:54:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B01891F3D3E;
+	Thu, 13 Mar 2025 19:54:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="YCFHt6Gt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BNMKGuhu"
 X-Original-To: netdev@vger.kernel.org
-Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5FB91F3D55
-	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 19:54:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A6AEEADA;
+	Thu, 13 Mar 2025 19:54:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741895690; cv=none; b=esBL/+I/cQw2JPFxkaST78CQUHwz8TunXX5VGPwBBQTVq8LXkLpQKf551TaJD7pEsnVPJynWDnIHV0zHcE1MmsTr/2XUWOPiqbSL7jsWP3LeXZluuCvDp4KuqwuTQAHIybouQpNJysWGlEGQOPVZpNILR3UoYT2ooe1O0gRqd5I=
+	t=1741895687; cv=none; b=PbBmBZ9riAOXeGWhbk9fSeb0MZnpl8jgCLtyRf9EX0MRdK+7RjDxGCxXHh+UpLVYN4GzIZXRy1Cd6cvWwksOaVVzIvZj87QMKRqFdc0yQwPhrduNiyRbkVWgpzkE4vaCM8FT964VLadmchCKAzi5kYD1SWOwdSjHbb+3UEeQ4aA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741895690; c=relaxed/simple;
-	bh=CF1bSX3XlU4ChBISB+cYOWk0F+bA3NnjnVnuf/kjyh4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=cz8Nvp9HBxsQUBnZ9PE9v0YwCj9W+pZpbvfXPeGDpGGIoRQGbno9x1viS6TlQ7r6/9Bk3Sqk70tt5F/TtkanYhrG1zcy+fnLwFlH5rbqaSWYC+w0kyCroHAxvoCnFuK99PP+if8yYh96lV+CRsXo7zMvkAnRYMWNcg0RlCMAOww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=YCFHt6Gt; arc=none smtp.client-ip=202.36.163.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
-Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id B2FA92C0375;
-	Fri, 14 Mar 2025 08:54:39 +1300 (NZDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
-	s=mail181024; t=1741895679;
-	bh=CF1bSX3XlU4ChBISB+cYOWk0F+bA3NnjnVnuf/kjyh4=;
-	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
-	b=YCFHt6GtSuNsI9AVXX815U+BW8iQ5enkD/fTCNkfOEQJr6yttPSX/NMajdu27utke
-	 i+XqgUB/L/xf38ac45wLpkh2IwR458EnBcO3VfKgK3gZz1uVTPjc4oCiE8gnQb6BUD
-	 GbOwRG9NRP7X4Xfv0yhTvhRJHQljjaTlaq71rsoxfW1h4PX0ZOEOXcZIy4Gas1uP2K
-	 T43YABQ8zVtbB+/1wng5YHzCtDygpUnW7x3fxIP4y5+qFsJd+14dJQh7T+Pv/R7xXO
-	 YRlU0T5xaFX9hm7ZzR1k/w1zipgO731oYg91Z6pGeDMtbh5XC7/PKj3GJKZB1Hksvz
-	 2Oj01o0B38t9w==
-Received: from svr-chch-ex2.atlnz.lc (Not Verified[2001:df5:b000:bc8::76]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B67d337ff0001>; Fri, 14 Mar 2025 08:54:39 +1300
-Received: from svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8:f753:6de:11c0:a008) by
- svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8:f753:6de:11c0:a008) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Fri, 14 Mar 2025 08:54:39 +1300
-Received: from svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567]) by
- svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567%15]) with mapi id
- 15.02.1544.014; Fri, 14 Mar 2025 08:54:39 +1300
-From: Chris Packham <Chris.Packham@alliedtelesis.co.nz>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "hkallweit1@gmail.com" <hkallweit1@gmail.com>, "linux@armlinux.org.uk"
-	<linux@armlinux.org.uk>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"daniel@makrotopia.org" <daniel@makrotopia.org>, "markus.stockhausen@gmx.de"
-	<markus.stockhausen@gmx.de>, "sander@svanheule.net" <sander@svanheule.net>,
-	netdev <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v10] net: mdio: Add RTL9300 MDIO driver
-Thread-Topic: [PATCH v10] net: mdio: Add RTL9300 MDIO driver
-Thread-Index: AQHbk7RQMlEBwbSVuE+Te7ZjHwH5gbNwJygAgAB7A4A=
-Date: Thu, 13 Mar 2025 19:54:39 +0000
-Message-ID: <5ea333ec-c2e4-4715-8a44-0fd2c77a4f3c@alliedtelesis.co.nz>
-References: <20250313010726.2181302-1-chris.packham@alliedtelesis.co.nz>
- <f7c7f28b-f2b0-464a-a621-d4b2f815d206@lunn.ch>
-In-Reply-To: <f7c7f28b-f2b0-464a-a621-d4b2f815d206@lunn.ch>
-Accept-Language: en-NZ, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D6111809622E754CB108E822046D02FD@alliedtelesis.co.nz>
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1741895687; c=relaxed/simple;
+	bh=n+WE2e1+CornPIYCL0FJAGHEjkt3BbG8jB/zF/vKQlc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jM7QJV3JjM3i1olB6h6sKqqm7Jf1rIrnEKc5OcT54f6FYS7j2e43r7WUsq8pjeT8J03h101QcMIQi54/g8qgUai0lJvd2AQce8wzriek2CrD+8yXQxcfRPdh7BBEVrnzxm7QKgpP10z9mx2AqCieaCUTk+T3+Uy2QlIH8kvYseU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BNMKGuhu; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-472368b50d6so338121cf.2;
+        Thu, 13 Mar 2025 12:54:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741895685; x=1742500485; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XGLO2paAdzUxnzkAjPVsZKGAI+FEFQuCi8XTZqvAoxs=;
+        b=BNMKGuhusWl2r4N8SId9Lq6hdj28mqgOTn//zHExL8OR/FElvdcasDWY5ji1O10mXB
+         BymOp6wtG47PbgQ4P6L6X9q6ofL7WsHSBdDqaK3Rgr1MjO9dLYKkjL9o9cMzObstMU2Q
+         xa+26xB1/L/vDoJt3POmI+JWFZXB8lXaiBMn62X+Al8AM1WdxgohZ0DAGyZGSi+L99eP
+         uI3g4jm+7H1D72bXoNmZwVkRe79W+9vfN+PzjeN6P7fbTJrPXbh/a01QXxgkgT3nOaRl
+         0CKzcd/OV/Al0h6yGCsdasXYiiQZNfbPiU5whwnvo62gb79m40npKVP6dmiuVlQmG5bt
+         n4kw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741895685; x=1742500485;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XGLO2paAdzUxnzkAjPVsZKGAI+FEFQuCi8XTZqvAoxs=;
+        b=AWg1yF0M5uOT7Ylf8yzEYGJ+KYXOqJZ8aIj1C7Y97zD5h4pVSvat1QY4l1R6IVBz3A
+         zX8h+NsMbWzz9kEBycdE8AVgDV2kkRGvMDH/K0Bie8enwNTmOwKN02eaXrUbL9duRKPJ
+         ErNA81cG0DJo60e7ro0uhQ2Vw5gjCEDrv0tXuhv4H9kq2jHiLymjnAdykYLr5GCIhUgb
+         SWZmTTCPEpbwJPWvhZyaN9erKQ0yLUpxs07yceITpVhFlwYCu8qXPc2P2MOxRG3c9Sbz
+         4ts6+DM33pAH1cXnYMsir4fwODs6ZjBoMlusTN4ZFyFEQXx/0+RRiCa9o2WMrFzTThOx
+         IjVA==
+X-Forwarded-Encrypted: i=1; AJvYcCWKx9M6nXod/FjmpddpGYAMA1sYXLYKgaC4AJ9/qZzzRNpglFPI263W9U6JZH5J5e2i2lLUygGF@vger.kernel.org, AJvYcCXUR4w8zEw8trJUwOAlH9HuZAblpaBkJVUExueNVs6sQelm87mD1G0y6miIjbm7WMPCnflmawA7Yc7LXyM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfGd/EygNJQbiUTJJ4RsFerZm4ZL2G+/1kewBeXwgQ+cahdIi9
+	vTyc1gZ8AAHvhsFmnrwCbjW+bhuSuqveYFRBX/NjjQVZLPCK4Hfc8KCEdLQ=
+X-Gm-Gg: ASbGncv0jC7CVZ77R89Ut1mkQGs3AaUUMdvN2fpCGBR4r5dfEgjjHFzPCmyh8XtcF4u
+	tEWUg0YuTUflKHaegBFjtvSHUa9B3Asxo3jXcpaot5VfN2RCnS2LVY4J4ElAx8RDzZF4L7wixRC
+	AjPRd0ipKAVqrKOEZppckHsuypSPy2Ba6n9+4jrpU5QighZrUsfjhUfgMvt6JkEJU3GA957Fe29
+	uAy8QBQbVG/6nh8Gy2T6mVnKOKZvf1SipVHCjAt3P52I3zilPQfZkCClMsrNAMqpdj39x9KzUBB
+	EmVf4YmiN1heeHCIQzT6VvKS9wqm7iEiou0MpLswlQ==
+X-Google-Smtp-Source: AGHT+IG+sFRc0BbtzznoFbw3LS6WnCpgI30gRX6xy1ivIdThQI9VEpo1hDVok8W6MQRhqUayCtE8kQ==
+X-Received: by 2002:a05:622a:5e8a:b0:472:2122:5a43 with SMTP id d75a77b69052e-476665885eamr116028291cf.1.1741895684780;
+        Thu, 13 Mar 2025 12:54:44 -0700 (PDT)
+Received: from ise-alpha.. ([2620:0:e00:550a:642:1aff:fee8:511b])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c573c9be96sm136377985a.61.2025.03.13.12.54.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Mar 2025 12:54:44 -0700 (PDT)
+From: Chenyuan Yang <chenyuan0y@gmail.com>
+To: pablo@netfilter.org,
+	kadlec@netfilter.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Chenyuan Yang <chenyuan0y@gmail.com>
+Subject: [PATCH] net: Initialize ctx to avoid memory allocation error
+Date: Thu, 13 Mar 2025 14:54:41 -0500
+Message-Id: <20250313195441.515267-1-chenyuan0y@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=Ko7u2nWN c=1 sm=1 tr=0 ts=67d337ff a=Xf/6aR1Nyvzi7BryhOrcLQ==:117 a=xqWC_Br6kY4A:10 a=75chYTbOgJ0A:10 a=IkcTkHD0fZMA:10 a=Vs1iUdzkB0EA:10 a=GmB-G2GEk0dDs4bVDSMA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-SEG-SpamProfiler-Score: 0
+Content-Transfer-Encoding: 8bit
 
-K2NjIG5ldGRldiwgbGttbA0KDQpPbiAxNC8wMy8yMDI1IDAxOjM0LCBBbmRyZXcgTHVubiB3cm90
-ZToNCj4+ICsJLyogUHV0IHRoZSBpbnRlcmZhY2VzIGludG8gQzQ1IG1vZGUgaWYgcmVxdWlyZWQg
-Ki8NCj4+ICsJZ2xiX2N0cmxfbWFzayA9IEdFTk1BU0soMTksIDE2KTsNCj4+ICsJZm9yIChpID0g
-MDsgaSA8IE1BWF9TTUlfQlVTU0VTOyBpKyspDQo+PiArCQlpZiAocHJpdi0+c21pX2J1c19pc19j
-NDVbaV0pDQo+PiArCQkJZ2xiX2N0cmxfdmFsIHw9IEdMQl9DVFJMX0lOVEZfU0VMKGkpOw0KPj4g
-Kw0KPj4gKwlmd25vZGVfZm9yX2VhY2hfY2hpbGRfbm9kZShub2RlLCBjaGlsZCkNCj4+ICsJCWlm
-IChmd25vZGVfZGV2aWNlX2lzX2NvbXBhdGlibGUoY2hpbGQsICJldGhlcm5ldC1waHktaWVlZTgw
-Mi4zLWM0NSIpKQ0KPj4gKwkJCXByaXYtPnNtaV9idXNfaXNfYzQ1W21kaW9fYnVzXSA9IHRydWU7
-DQo+PiArDQo+IFRoaXMgbmVlZHMgbW9yZSBleHBsYW5hdGlvbi4gU29tZSBQSFlzIG1peCBDMjIg
-YW5kIEM0NSwgZS5nLiB0aGUgPiAxRw0KPiBzcGVlZCBzdXBwb3J0IHJlZ2lzdGVycyBhcmUgaW4g
-dGhlIEM0NSBhZGRyZXNzIHNwYWNlLCBidXQgPD0gMUcgaXMgaW4NCj4gdGhlIEMyMiBzcGFjZS4g
-QW5kIDFHIFBIWXMgd2hpY2ggc3VwcG9ydCBFRUUgbmVlZCBhY2Nlc3MgdG8gQzQ1IHNwYWNlDQo+
-IGZvciB0aGUgRUVFIHJlZ2lzdGVycy4NCg0KQWggZ29vZCBwb2ludC4gVGhlIE1ESU8gaW50ZXJm
-YWNlcyBhcmUgZWl0aGVyIGluIEdQSFkgKGkuZS4gY2xhdXNlIDIyKSANCm9yIDEwR1BIWSBtb2Rl
-IChpLmUuIGNsYXVzZSA0NSkuIFRoaXMgZG9lcyBtZWFuIHdlIGNhbid0IHN1cHBvcnQgc3VwcG9y
-dCANCmJvdGggYzQ1IGFuZCBjMjIgb24gdGhlIHNhbWUgTURJTyBidXMgKHdoZXRoZXIgdGhhdCdz
-IG9uZSBQSFkgdGhhdCANCnN1cHBvcnRzIGJvdGggb3IgdHdvIGRpZmZlcmVudCBQSFlzKS4gSSds
-bCBhZGQgYSBjb21tZW50IHRvIHRoYXQgZWZmZWN0IA0KYW5kIEkgc2hvdWxkIHByb2JhYmx5IG9u
-bHkgcHJvdmlkZSBidXMtPnJlYWQvd3JpdGUgb3IgDQpidXMtPnJlYWRfYzQ1L3dyaXRlX2M0NSBk
-ZXBlbmRpbmcgb24gdGhlIG1vZGUuDQo=
+It is possible that ctx in nfqnl_build_packet_message() could be used
+before it is properly initialize, which is only initialized
+by nfqnl_get_sk_secctx().
+
+This patch corrects this problem by initializing the lsmctx to a safe
+value when it is declared.
+
+This is similar to the commit 35fcac7a7c25
+("audit: Initialize lsmctx to avoid memory allocation error").
+
+Signed-off-by: Chenyuan Yang <chenyuan0y@gmail.com>
+---
+ net/netfilter/nfnetlink_queue.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/netfilter/nfnetlink_queue.c b/net/netfilter/nfnetlink_queue.c
+index 5c913987901a..8b7b39d8a109 100644
+--- a/net/netfilter/nfnetlink_queue.c
++++ b/net/netfilter/nfnetlink_queue.c
+@@ -567,7 +567,7 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
+ 	enum ip_conntrack_info ctinfo = 0;
+ 	const struct nfnl_ct_hook *nfnl_ct;
+ 	bool csum_verify;
+-	struct lsm_context ctx;
++	struct lsm_context ctx = { NULL, 0, 0 };
+ 	int seclen = 0;
+ 	ktime_t tstamp;
+ 
+-- 
+2.34.1
+
 
