@@ -1,176 +1,169 @@
-Return-Path: <netdev+bounces-174428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DFCEA5E8ED
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 01:13:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE6DEA5E8FB
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 01:26:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3D0A3B7F5D
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 00:13:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 180ED178B9E
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 00:26:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0950529A9;
-	Thu, 13 Mar 2025 00:13:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCB574A3C;
+	Thu, 13 Mar 2025 00:26:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="JP9c4+NI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JX7z5Lhb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02BC217E;
-	Thu, 13 Mar 2025 00:13:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C40122E3399
+	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 00:26:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741824817; cv=none; b=P46VO8yBf1qfzUZC/XKCoZehmFiTnoEAHvdNEA74FUE6/kD2MhLWucVzXhbaTIXVbEga//3jAP4maPNgxba7dKvRn4upQpnBdM1AE63dThZUg3YhNtihUWydVpcnccUi+XsDw1zkDg8F5V2+PVJJlrrJbN5tcfNikkc7stM2tBY=
+	t=1741825602; cv=none; b=Pv3fjWEpI23PcXpGc9hJv74KG7fspy6O4DR3f/lZIRlqE/kP16Av65tftn3x16OnlCh6MkS8jyHdTaGp9Cz8FftFb2UsSmxZzNTxPhvStmRKzUei767w7jeW2nsikdmibVnHtgeyw5DGqrUGxFnWaCJqEdJxNHpAdBxlABibuQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741824817; c=relaxed/simple;
-	bh=8dEfo6LCVjShHE42wf1ejHBUNUNXIYH6qPYnJMKcwbs=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=e+Z9mNW2E+fjkzEZatNWaCuhXNrgU27+PcKSN5Q0zdE/Nv20yul0jHxfUvkAdQNwZCNu9a/WaE3hM+iwwsJ9fxa3dUZXLG2CT0mYr+Y3MvYq2ErQj3GDqRMZclzt+ZD4o4+BNNtTFTBssKRbBlHB7u7kglEqyehze6zu49LFAg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=JP9c4+NI; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [127.0.0.1] ([76.133.66.138])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 52D09Gjf2730497
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Wed, 12 Mar 2025 17:09:16 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 52D09Gjf2730497
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025021701; t=1741824561;
-	bh=pOuTjU0DLlw9muSdV/bvRsUk/zEVswSeTDmcSBtrmzk=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=JP9c4+NI9BKncKU+1PsEB9cZeQpNxCxpJ0LmRuYoHNmwWD/IZKSycv5sN9IICpIEz
-	 fR/hn+rQhnfZM1uUiHFsG6gUoBL9neiS+JGil7wI30UkDhHcG1QRaLCxVEOb8Avej8
-	 KQCseXzhw1xoqlckAoMQLS0jGXtjlqSg5eaOuTyA+VT8jx0ImUcERkYzUzACSp2jWz
-	 iveP8ZtK+pI4qfkTCfKTJm+BI905HMMN61AY3/MbPJkw2r62IkxWg6XH1CtdvGTrlr
-	 6CALlw7rm8dk1ZxjmoEuThEn4j6+yLh7OqapigzBfq/66ixFRWdc3P5KvqHGfpwwnf
-	 wFX8jsnXRMF2A==
-Date: Wed, 12 Mar 2025 17:09:16 -0700
-From: "H. Peter Anvin" <hpa@zytor.com>
-To: Jacob Keller <jacob.e.keller@intel.com>,
-        David Laight <david.laight.linux@gmail.com>,
-        Jiri Slaby <jirislaby@kernel.org>
-CC: Ingo Molnar <mingo@kernel.org>, Kuan-Wei Chiu <visitorckw@gmail.com>,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, jk@ozlabs.org,
-        joel@jms.id.au, eajames@linux.ibm.com, andrzej.hajda@intel.com,
-        neil.armstrong@linaro.org, rfoss@kernel.org,
-        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-        tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
-        dmitry.torokhov@gmail.com, mchehab@kernel.org, awalls@md.metrocast.net,
-        hverkuil@xs4all.nl, miquel.raynal@bootlin.com, richard@nod.at,
-        vigneshr@ti.com, louis.peens@corigine.com, andrew+netdev@lunn.ch,
-        davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-        parthiban.veerasooran@microchip.com, arend.vanspriel@broadcom.com,
-        johannes@sipsolutions.net, gregkh@linuxfoundation.org,
-        yury.norov@gmail.com, akpm@linux-foundation.org, alistair@popple.id.au,
-        linux@rasmusvillemoes.dk, Laurent.pinchart@ideasonboard.com,
-        jonas@kwiboo.se, jernej.skrabec@gmail.com, kuba@kernel.org,
-        linux-kernel@vger.kernel.org, linux-fsi@lists.ozlabs.org,
-        dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
-        oss-drivers@corigine.com, netdev@vger.kernel.org,
-        linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev,
-        brcm80211-dev-list.pdl@broadcom.com, linux-serial@vger.kernel.org,
-        bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw,
-        Yu-Chun Lin <eleanor15x@gmail.com>
-Subject: Re: [PATCH v3 01/16] bitops: Change parity8() return type to bool
-User-Agent: K-9 Mail for Android
-In-Reply-To: <cbb26a91-807b-4227-be81-8114e9ea72cb@intel.com>
-References: <20250306162541.2633025-1-visitorckw@gmail.com> <20250306162541.2633025-2-visitorckw@gmail.com> <9d4b77da-18c5-4551-ae94-a2b9fe78489a@kernel.org> <Z8ra0s9uRoS35brb@gmail.com> <a4040c78-8765-425e-a44e-c374dfc02a9c@kernel.org> <20250307193643.28065d2d@pumpkin> <cbb26a91-807b-4227-be81-8114e9ea72cb@intel.com>
-Message-ID: <0F794C6F-32A9-4F34-9516-CEE24EA4BC49@zytor.com>
+	s=arc-20240116; t=1741825602; c=relaxed/simple;
+	bh=6Rc6J3Ph6dfxqwkjoMVz7ABCl1ew9fnFyyH4KQ9IHWc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=B5B+NxKG69b+D8Zvyj4cF8B56ZwRHVmSfuQVi9tkGoadgU9WMKWVAiVCpHpVswRw7uigxmTLNpICsyD8X/wR3yTlQcYZFd1T/6xb+AawIcfpWY24MY8AD5qeMo7iEbC3/9SpXkQA9uwIjg/hOQ8du0RWieJzUvDbAC+P0H/Abug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JX7z5Lhb; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741825599;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2xc6FM+mqWnW8B2obbyayW6a16PfjrreKGG+xe06AIA=;
+	b=JX7z5LhbYkuCYcKZ316/UPPHr7cZ1TAM29cn5pTmA6YOP5w4FnsNEGUq3w0OKJ12AFt4ph
+	c0MwdSrJkYvLmsuF4yjcdgeDsgDj18n6emsRga7eeW8wmeZ+v8f2fsesUDVp8bi81d6CpF
+	J9z4E5RWyr7n4pPuUdEPNDPdKyPSRkY=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-572-c1ZAoxmyMk29ZujxGbOVBA-1; Wed, 12 Mar 2025 20:26:38 -0400
+X-MC-Unique: c1ZAoxmyMk29ZujxGbOVBA-1
+X-Mimecast-MFC-AGG-ID: c1ZAoxmyMk29ZujxGbOVBA_1741825597
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-3010db05acfso660749a91.3
+        for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 17:26:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741825593; x=1742430393;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2xc6FM+mqWnW8B2obbyayW6a16PfjrreKGG+xe06AIA=;
+        b=LjPYQcU0wMStQcbUa8op/OOkWPofBgavdcYMOJVf1ME2U1UQTFHZdduNMIdjZSwFKP
+         050KZBpYqaEIG2HD9X7K7l/nmR9KyKZ92Ak82//7um+Hm1XWeuvKHh9M7S5Pt97J1VEn
+         XHoYFNe/TY6LiGEWDD/iS/HZKCczr32b4EsSXXGADKc3uzIF+Er+LyM8w/YnTK+/gIVL
+         jG212FKRc0xfIhs9XuTCFtFnBUOI1ryXfvGYk7tThb+T0v5YFOAtr4BT5yELe1Cm1PtL
+         afBokjr3FAa1s+N6Kw9AsRN6LUKFrUDV4pwttxck3Xj4d0LzUT8LVXNbQyj1DG2nJfsV
+         b2+A==
+X-Forwarded-Encrypted: i=1; AJvYcCWnBAS4O/Dwye3hTQ8tBsgU7RjZhXbN5JQH8E0KNZ0wJwFdKEvP1xkC5vsbUeYqxtlta5/wGMo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzExCeR00ATPQxP8z2+QojGDsf6adZBz57He4yniGsPAjGAWsA0
+	x8Uxpu84BGfx427l+8CRS+4lw45wf3U5xxy2InhY/i87PjyxYMXU+ElpumDeLReo+xl4ZEhUIHX
+	qgvh6Ucr5qf11vJrIXcaAsllx7HwkjYXR/5okTpX64zQwocPEo3wBHrYQnp/oESpW9DsO8w2tFO
+	TwiJf0xCA4HiuxnPrZd0rncl4WNk2I
+X-Gm-Gg: ASbGnctT3PwLDJADYljUdXXTby6o8AwmTJogE3k/Ct2K6KmPCDBVbeFVim/8cPukhDx
+	Xm7P5OdXUhpjdaOIz6EOHgmmrK4L8n95aaj12OcQzf2K1Vhqo6/oxEiRqAAgaJVNyQE00Ew==
+X-Received: by 2002:a17:90a:d2c6:b0:2ff:4f04:4266 with SMTP id 98e67ed59e1d1-2ff7cef5c11mr28261647a91.23.1741825593461;
+        Wed, 12 Mar 2025 17:26:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE3dWZ4QwsfIUvoSozMvh5gYtrSDcXVdnTP4UK28eIoOYkpHPAKxIFpR9h9De/pEc9Z+J0NEctSIkQBCBJ5tuk=
+X-Received: by 2002:a17:90a:d2c6:b0:2ff:4f04:4266 with SMTP id
+ 98e67ed59e1d1-2ff7cef5c11mr28261612a91.23.1741825592977; Wed, 12 Mar 2025
+ 17:26:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+References: <20240108131039.2234044-1-Mikhail.Golubev-Ciuchea@opensynergy.com>
+ <a366f529-c901-4cd1-a1a6-c3958562cace@wanadoo.fr> <0878aedf-35c2-4901-8662-2688574dd06f@opensynergy.com>
+ <Z9FicA7bHAYZWJAb@fedora> <20250312-conscious-sloppy-pegasus-b5099d-mkl@pengutronix.de>
+ <Z9GL6o01fuhTbHWO@fedora> <20250312-able-refreshing-hog-ed14e7-mkl@pengutronix.de>
+In-Reply-To: <20250312-able-refreshing-hog-ed14e7-mkl@pengutronix.de>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 13 Mar 2025 08:26:21 +0800
+X-Gm-Features: AQ5f1Jotgxkur0pCBX2T6-2ZHfB5Ly_E8Asn7gts-0i5WF5UC5k-dBCU_8yc-ak
+Message-ID: <CACGkMEtHZB8bLMqepRxd3qvtXWA8g_5pofNBw1=XvxF4ANr6Cg@mail.gmail.com>
+Subject: Re: [PATCH v5] can: virtio: Initial virtio CAN driver.
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: Matias Ezequiel Vara Larsen <mvaralar@redhat.com>, Harald Mommer <harald.mommer@opensynergy.com>, 
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
+	Mikhail Golubev-Ciuchea <Mikhail.Golubev-Ciuchea@opensynergy.com>, 
+	Wolfgang Grandegger <wg@grandegger.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Damir Shaikhutdinov <Damir.Shaikhutdinov@opensynergy.com>, linux-kernel@vger.kernel.org, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	virtualization@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On March 12, 2025 4:56:31 PM PDT, Jacob Keller <jacob=2Ee=2Ekeller@intel=2E=
-com> wrote:
+On Wed, Mar 12, 2025 at 9:36=E2=80=AFPM Marc Kleine-Budde <mkl@pengutronix.=
+de> wrote:
 >
+> On 12.03.2025 14:28:10, Matias Ezequiel Vara Larsen wrote:
+> > On Wed, Mar 12, 2025 at 11:41:26AM +0100, Marc Kleine-Budde wrote:
+> > > On 12.03.2025 11:31:12, Matias Ezequiel Vara Larsen wrote:
+> > > > On Thu, Feb 01, 2024 at 07:57:45PM +0100, Harald Mommer wrote:
+> > > > > Hello,
+> > > > >
+> > > > > I thought there would be some more comments coming and I could ad=
+dress
+> > > > > everything in one chunk. Not the case, besides your comments sile=
+nce.
+> > > > >
+> > > > > On 08.01.24 20:34, Christophe JAILLET wrote:
+> > > > > >
+> > > > > > Hi,
+> > > > > > a few nits below, should there be a v6.
+> > > > > >
+> > > > >
+> > > > > I'm sure there will be but not so soon. Probably after acceptance=
+ of the
+> > > > > virtio CAN specification or after change requests to the specific=
+ation are
+> > > > > received and the driver has to be adapted to an updated draft.
+> > > > >
+> > > > What is the status of this series?
+> > >
+> > > There has been no movement from the Linux side. The patch series is
+> > > quite extensive. To get this mainline, we need not only a proper Linu=
+x
+> > > CAN driver, but also a proper VirtIO specification.
+> >
+> > Thanks for your answer. AFAIK the spec has been merged (see
+> > https://github.com/oasis-tcs/virtio-spec/tree/virtio-1.4).
 >
->On 3/7/2025 11:36 AM, David Laight wrote:
->> On Fri, 7 Mar 2025 12:42:41 +0100
->> Jiri Slaby <jirislaby@kernel=2Eorg> wrote:
->>=20
->>> On 07=2E 03=2E 25, 12:38, Ingo Molnar wrote:
->>>>
->>>> * Jiri Slaby <jirislaby@kernel=2Eorg> wrote:
->>>>  =20
->>>>> On 06=2E 03=2E 25, 17:25, Kuan-Wei Chiu wrote: =20
->>>>>> Change return type to bool for better clarity=2E Update the kernel =
-doc
->>>>>> comment accordingly, including fixing "@value" to "@val" and adjust=
-ing
->>>>>> examples=2E Also mark the function with __attribute_const__ to allo=
-w
->>>>>> potential compiler optimizations=2E
->>>>>>
->>>>>> Co-developed-by: Yu-Chun Lin <eleanor15x@gmail=2Ecom>
->>>>>> Signed-off-by: Yu-Chun Lin <eleanor15x@gmail=2Ecom>
->>>>>> Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail=2Ecom>
->>>>>> ---
->>>>>>    include/linux/bitops=2Eh | 10 +++++-----
->>>>>>    1 file changed, 5 insertions(+), 5 deletions(-)
->>>>>>
->>>>>> diff --git a/include/linux/bitops=2Eh b/include/linux/bitops=2Eh
->>>>>> index c1cb53cf2f0f=2E=2E44e5765b8bec 100644
->>>>>> --- a/include/linux/bitops=2Eh
->>>>>> +++ b/include/linux/bitops=2Eh
->>>>>> @@ -231,26 +231,26 @@ static inline int get_count_order_long(unsign=
-ed long l)
->>>>>>    /**
->>>>>>     * parity8 - get the parity of an u8 value
->>>>>> - * @value: the value to be examined
->>>>>> + * @val: the value to be examined
->>>>>>     *
->>>>>>     * Determine the parity of the u8 argument=2E
->>>>>>     *
->>>>>>     * Returns:
->>>>>> - * 0 for even parity, 1 for odd parity
->>>>>> + * false for even parity, true for odd parity =20
->>>>>
->>>>> This occurs somehow inverted to me=2E When something is in parity me=
-ans that
->>>>> it has equal number of 1s and 0s=2E I=2Ee=2E return true for even di=
-stribution=2E
->>>>> Dunno what others think? Or perhaps this should be dubbed odd_parity=
-() when
->>>>> bool is returned? Then you'd return true for odd=2E =20
->>>>
->>>> OTOH:
->>>>
->>>>   - '0' is an even number and is returned for even parity,
->>>>   - '1' is an odd  number and is returned for odd  parity=2E =20
->>>
->>> Yes, that used to make sense for me=2E For bool/true/false, it no long=
-er=20
->>> does=2E But as I wrote, it might be only me=2E=2E=2E
->>=20
->> No me as well, I've made the same comment before=2E
->> When reading code I don't want to have to look up a function definition=
-=2E
->> There is even scope for having parity_odd() and parity_even()=2E
->> And, with the version that shifts a constant right you want to invert
->> the constant!
->>=20
->> 	David
+> Yes, the spec was merged. I think it was written with a specific
+> use-case (IIRC: automotive, Linux on-top of a specific hypervisor) in
+> mind, in Linux we have other use cases that might not be covered.
 >
->This is really a question of whether you expect odd or even parity as
->the "true" value=2E I think that would depend on context, and we may not
->reach a good consensus=2E
+> > > This whole project is too big for me to do it as a collaborative
+> > > effort.
+> >
+> > What do you mean?
 >
->I do agree that my brain would jump to "true is even, false is odd"=2E
->However, I also agree returning the value as 0 for even and 1 for odd
->kind of made sense before, and updating this to be a bool and then
->requiring to switch all the callers is a bit obnoxious=2E=2E=2E
+> I mean the driver is too big to review on a non-paid community based
+> effort.
 
-Odd =3D 1 =3D true is the only same definition=2E It is a bitwise XOR, or =
-sum mod 1=2E
+If you can split the path into smaller ones, I'm happy to review.
+
+Thanks
+
+
+>
+> regards,
+> Marc
+>
+> --
+> Pengutronix e.K.                 | Marc Kleine-Budde          |
+> Embedded Linux                   | https://www.pengutronix.de |
+> Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+> Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
 
