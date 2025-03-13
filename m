@@ -1,110 +1,125 @@
-Return-Path: <netdev+bounces-174462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6254A5ED67
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 08:56:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08E24A5EDA0
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 09:08:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D08E3AB3E6
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 07:55:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E42AA3AF47B
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 08:07:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 585AF25FA29;
-	Thu, 13 Mar 2025 07:55:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 287B225FA2F;
+	Thu, 13 Mar 2025 08:07:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oy9Ydscb"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B81325F992;
-	Thu, 13 Mar 2025 07:55:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD9F1FBE89;
+	Thu, 13 Mar 2025 08:07:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741852558; cv=none; b=J23rJAwYa4qe5rMqyFE4xCYMVSxy1G0voSkm16RB3LYI6NprTiEUl8B2+dRS4PFiMk+Ph9w5aDLJo3p6uwu7qqzHNbZr1cKQLB30b2fP99hoFgEaIX+Ni9pRN4vLBCf9UcjH+fHnAVXNMUFnVdepAaJZvI5g4M7A8904iEZTeSY=
+	t=1741853240; cv=none; b=bSwIm2MO92l9r84DNFU/5kqaKksxcj6iFppdq+l88k0QI+xtZfecR0Gh2J1RGrl+4/BqhgZOxx1Fnu5iZqsmaIpocR0xu/ChUrz1gpA/StiJnmn4GYST0Lmk+BRDhV7sAUWKw9r7rgYNL10qg2KOpD2xQ75p/6RfkFRDMmMcgjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741852558; c=relaxed/simple;
-	bh=Y3qveP2BwZANo6YXOBo9JwpsWcPy0YeXkf1x0BfzsF8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=D+O3LhDsqkHTpGYQYVSQDdvtPPMjkH0tOsEA+jx5jdkJWuezvRF8DHdee23CwPebtOTRbN3sbTMJ4j02Igii4lJlmcsJZ2V7GZD3XH79Gul47S/f+iS+/mr9U0aJh8Zrd2gc7KvOI3wHbNo7b3lkYsh8EkzMwc3RhWaA4btXViQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from icess-ProLiant-DL380-Gen10.. (unknown [183.174.60.14])
-	by APP-03 (Coremail) with SMTP id rQCowACnrg5xj9JnokbUFA--.3019S2;
-	Thu, 13 Mar 2025 15:55:36 +0800 (CST)
-From: Ma Ke <make24@iscas.ac.cn>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	jdamato@fastly.com,
-	aleksander.lobakin@intel.com,
-	make24@iscas.ac.cn,
-	quic_zijuhu@quicinc.com,
-	andriy.shevchenko@linux.intel.com,
-	wanghai26@huawei.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH] net-sysfs: fix error handling in netdev_register_kobject()
-Date: Thu, 13 Mar 2025 15:55:28 +0800
-Message-Id: <20250313075528.306019-1-make24@iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1741853240; c=relaxed/simple;
+	bh=AnQdXNSMT7o7yQZ2TjQSBLykcghF2OWM1Qj32bi/UQ4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JD31pfPDBmtgN2h0Xq5sBhWAC3nUnH9WC8NnMvirIafIFgFLAKQOYf+CZaNf2LnivxtQxYZYjWJfkpuEJ2uoI5V4iFkMQ2gePNdyjgd7E1Es1OwIK5WsFFU36F6jm6jokUR02/gH6TIPnE7S4PYX9c5ID93YWuSWH55nYmL+3A0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Oy9Ydscb; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-ac29af3382dso111815966b.2;
+        Thu, 13 Mar 2025 01:07:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741853235; x=1742458035; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=a0fTcyiiClZN7GKZcM5x5s8tHses1BA754IzjfcZUfw=;
+        b=Oy9YdscbkgKtxLbYEZD0m8PX59cnoeGET4B1UT0rlRq5bgP8OvRhiiJJGeTVxZg2Vr
+         XjPxrvVCuCFtjPp03BV+VA7tbrJ+CxU7lQ5zJO0d0JR+FDWviNKQYNUq5oWfS2DyJBf9
+         oM9r0FzyemrkjnMbaejNy7lvFxDbsKYhmmEvDUYa5ZdqrPTw6jeI3OeH4WblCLEOBeCq
+         ZFTvLKOb9JbbQ1czCu0Ru5xExbp+9NbJbC+haFtsbB477LYKPT/jT2rDVQEDwj1wA7Gk
+         TUI8fqGr0TuTj/O7hzws2lgpYY9CJA/pb00sntHPM+huxd7qXKN23tSdrdJRaoHXgd/v
+         RAHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741853235; x=1742458035;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=a0fTcyiiClZN7GKZcM5x5s8tHses1BA754IzjfcZUfw=;
+        b=gFAiqwEwe1BzWJB7D4dcKxt2Dyrd6qfggQMLlsK+TJnxD9ojB5Dc18xFsgeZkVSRpH
+         LK25/kRYD0Cd4ZDP/jNPl/bim8TlBZutFhlqjLNOXVl0mS5qTSmSdxl0s60qTU4IjaqY
+         5PngrPzWR0A7CjozQPSdbobWR+9GlgSWqlCBefjawuW7DCaiatM2N8espMGsiaGLJtr6
+         1spZkGFQo61LqW4Og4KZrHm8fG+UdosWshT9B7kpzRabNCJpaD9QTuWQyYLOQvfMel7x
+         Aa0UZ8D3CheuFLmeV3TUMa2Z4ChNtMyZSbtxGfyLWBCIgN7bQewhhnygnVFgt3pRY/7C
+         8ltQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUjg4tbWco+oqmLipuaQQWUIl/90lU3kaYzybRbp8T4uIYr7+oWC+isCUinhcltT3CWoCzwfskbPLiGGlA=@vger.kernel.org, AJvYcCW/ckbtovTwxO9DceIW7lBtbDNXy3hL3tjCN3hHdO80NYvw9hS6kG5yLv7p89xLmNewnFjVhtpQ@vger.kernel.org, AJvYcCXL1jqolIdngZ0BGATUA85p2uIoYlguinSxRM9F1D5PldfGJvFZwZGzHGyKLZUMXwOBGsG+suZ+GSmnkw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0J19yl6FRoxCrk/uthAqmESIzv6XowQ3HfsO6+6OUMd7YZL7N
+	as2PcKA82P9MiBgjMun3j9FDJCnlVDE5ByCLtIJY1Hz3nMGVbaIg03CmzA==
+X-Gm-Gg: ASbGncsxeMfvphJ+nEZgVeIjS5p6YaeBCVZIMnDFVcdUsCldYJcGs6TeLeiM38282dY
+	yzngiiW4m7c5nMQTJU+VHip9bUr3zLuR6E/eNMTelsPZFZ49hwlGF/w55xpErYMwVFgsFzZFBWc
+	f3zxrPmM825VZCNUZMMwv5TFoHcA5S7M0qmStwspddWzFAn0YOSJhf06KifBCGjXLjYLZRWWcUj
+	zDLUdA/LtHpKDZQw6Jqud33wg/imdThC9LtnCir6VkbEuTJUHOv8Lo2nSNo65zEBqA1CCYS2C2v
+	FxMKIfyeYbfbP3KdBUI1P9Rijs10SttQTZhJJI/cJDw/z8aeHlKXQ5m3EAlRT4X9Fg==
+X-Google-Smtp-Source: AGHT+IHfoEtyTJ+DcJm71sMd6fkWRqhkLPldXyAkyawyzTHA/K58PyuAovR5fwdqPSDWFgqqccSneg==
+X-Received: by 2002:a17:907:34d5:b0:ac2:cdcb:6a85 with SMTP id a640c23a62f3a-ac2cdcb7301mr749578266b.22.1741853234675;
+        Thu, 13 Mar 2025 01:07:14 -0700 (PDT)
+Received: from [172.27.56.126] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3147e7f11sm50762766b.42.2025.03.13.01.07.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Mar 2025 01:07:14 -0700 (PDT)
+Message-ID: <f30ee793-6538-4ec8-b90d-90e7513a5b3c@gmail.com>
+Date: Thu, 13 Mar 2025 10:07:09 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowACnrg5xj9JnokbUFA--.3019S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7GF13GrWUGF4kuFW8CF1xZrb_yoWDJFc_Gr
-	10va4Uuw1kJanakw43AanYvr1kJrnrJrWfGrW7tF4kJ345XFZ2qrs5WrWFyr17Ca9ruF1D
-	AF17J3yUGw4fWjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbSkFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
-	Gr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr
-	1j6rxdM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVAC
-	Y4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJV
-	W8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI2
-	0VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28Icx
-	kI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2Iq
-	xVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42
-	IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY
-	6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aV
-	CY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VU122NtUUUUU==
-X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
+User-Agent: Mozilla Thunderbird
+Subject: Re: [pull-request] mlx5-next updates 2025-03-10
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: patchwork-bot+netdevbpf@kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
+ leon@kernel.org, saeedm@nvidia.com, gal@nvidia.com, mbloch@nvidia.com,
+ moshe@nvidia.com, linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, leonro@nvidia.com, ychemla@nvidia.com,
+ Tariq Toukan <tariqt@nvidia.com>
+References: <1741608293-41436-1-git-send-email-tariqt@nvidia.com>
+ <174168972325.3890771.16087738431627229920.git-patchwork-notify@kernel.org>
+ <9960fce1-991e-4aa3-b2a9-b3b212a03631@gmail.com>
+ <20250312212942.56d778e7@kernel.org>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20250312212942.56d778e7@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Once device_add() failed, we should call put_device() to decrement
-reference count for cleanup. Or it could cause memory leak.
 
-As comment of device_add() says, 'if device_add() succeeds, you should
-call device_del() when you want to get rid of it. If device_add() has
-not succeeded, use only put_device() to drop the reference count'.
 
-Found by code review.
+On 12/03/2025 22:29, Jakub Kicinski wrote:
+> On Tue, 11 Mar 2025 22:50:24 +0200 Tariq Toukan wrote:
+>>> This pull request was applied to bpf/bpf-next.git (net)
+>>
+>> Seems to be mistakenly applied to bpf-next instead of net-next.
+> 
+> The bot gets confused. You should probably throw the date into the tag
+> to make its job a little easier.
 
-Cc: stable@vger.kernel.org
-Fixes: 8ed633b9baf9 ("Revert "net-sysfs: Fix memory leak in netdev_register_kobject"")
-Signed-off-by: Ma Ke <make24@iscas.ac.cn>
----
- net/core/net-sysfs.c | 1 +
- 1 file changed, 1 insertion(+)
+It did not pull the intended patch in this PR:
+f550694e88b7 net/mlx5: Add IFC bits for PPCNT recovery counters group
 
-diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index 07cb99b114bd..f443eacc9237 100644
---- a/net/core/net-sysfs.c
-+++ b/net/core/net-sysfs.c
-@@ -2169,6 +2169,7 @@ int netdev_register_kobject(struct net_device *ndev)
- 
- 	error = device_add(dev);
- 	if (error)
-+		put_device(dev);
- 		return error;
- 
- 	error = register_queue_kobjects(ndev);
--- 
-2.25.1
+Anything wrong with the PR itself?
+Or it is bot issue?
 
+> In any case, the tag pulls 6 commits
+> for me now.. (I may have missed repost, I'm quite behind on the ML
+> traffic)
+
+How do we get the patch pulled?
+It's necessary for my next feature in queue...
 
