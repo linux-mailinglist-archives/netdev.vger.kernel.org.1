@@ -1,116 +1,150 @@
-Return-Path: <netdev+bounces-174538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96E46A5F194
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 11:55:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69533A5F190
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 11:55:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7406D188CD5A
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 10:55:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C43163B2FEE
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 10:54:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2D20266EFC;
-	Thu, 13 Mar 2025 10:50:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D45F266B68;
+	Thu, 13 Mar 2025 10:50:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kMjB843X"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HvyPucYT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7639266EF5;
-	Thu, 13 Mar 2025 10:50:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD53E266195;
+	Thu, 13 Mar 2025 10:50:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741863054; cv=none; b=DP5AcudKA0NoArOZUQJ29AjwjBUb8XsJT2+JFbHLdnifJ80atZ9iMSAvX6h0OhcK0C4OZleApyA30H6eT1emhLtKzNeiEv5tcJTuKkT001qNpeMElGaKPnJrv65Nbj5f/cuOvl2mxXsTW/Zf3E83rP7vvXKzS7/0eeJ3ZERk8NQ=
+	t=1741863052; cv=none; b=mxpsD/4BF9Wt1d3+0bvbZoEgn5AyjIgric4Si/en1Iyr3mEe64D/2QVlZwQA3ToReIeoT4N6K2dG+Cvr0nIQudC8zcZ8aV8VTSDcGCVmiNPywyzi6rYgumxMK/6TCJUONVgVCk+sl1wZc7daZ5ozfMWXf6/coN7RtnQyLXlSsSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741863054; c=relaxed/simple;
-	bh=nODtJT29CKvmOEI9QAsNYVKYtKfqusCBX1PfkBziy7w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hPju+gl+r0NlUBCSuw2bTWfZTY4BwD+U4gB6MhuTb33nmCqVAuIa1/4SIgpJ/fj38427mf4UIha0AL/96s/q5O5npJ7LceyWZbJLnhCHahaRgRXBCqxq3YYtl8GcpkpIOyAorN5Y4woewDR3u3s8jyfN6JpuGzlmrN5t+zkfNUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kMjB843X; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D7FCC4CEE3;
-	Thu, 13 Mar 2025 10:50:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741863054;
-	bh=nODtJT29CKvmOEI9QAsNYVKYtKfqusCBX1PfkBziy7w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kMjB843X1w5QW6oeULyneZwnbTPkTzCJirm2kk7nqBtoehRz903zN0tIfvaKQKNzc
-	 hJ0KoH0s7t+XB96Yv/QzrmbB796ZiD+3X2eeq70GS7dN5V0o/p19Jezwby39OlBPeA
-	 nbavVPgHW3V9JLtCsTqDYt9LlYFaY+DjGoYzt46LTT1xD2qrq1XmWljgIb/zDGGjUy
-	 7K+1vjrXUNKj7mhWv4jsHuUjOEEUsKdHR3wgUV/ViCzwzU1TxpUzh42SPGu4Vm8+GT
-	 mEDbsigilGcfGC19FNvk4nU+03Bafdlpc9/oi6e2GXRWugSEqFvCZVxUwt1BY4Rgpu
-	 fJPJjujonI/9w==
-Date: Thu, 13 Mar 2025 11:50:43 +0100
-From: Simon Horman <horms@kernel.org>
-To: Helge Deller <deller@gmx.de>
-Cc: deller@kernel.org, netdev@vger.kernel.org, linux-parisc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: tulip: avoid unused variable warning
-Message-ID: <20250313105043.GX4159220@kernel.org>
-References: <20250309214238.66155-1-deller@kernel.org>
- <20250312131433.GS4159220@kernel.org>
- <d863db0a-1740-45d5-b8de-746fa9d44fcb@gmx.de>
+	s=arc-20240116; t=1741863052; c=relaxed/simple;
+	bh=oVy0cVKR3jnRQR9b9LzES7dRLuOGWGub+pL1XJgxRbs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NKA5nlaRA23TXI8uBD6l17IGPceUg3LC9r4r2v4scL83hTNDynPJBOzYFwmO0wFSwFpTk0vY7hTeKv6TqhTM+4F9Bu0nJRXcpdKP+kM5fMRrTvuHdggpR2EKLJ/fI+/YvEBjztiBqhF6diLPwO0xImlXNABmv5IpnGDGaaMRqRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=HvyPucYT; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 82D6B20580;
+	Thu, 13 Mar 2025 10:50:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1741863048;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uOITDFtnC2am2jE/8iAJD13cqPTCzjCXOB1nvGVtI4A=;
+	b=HvyPucYT83b6tgQG02b7bNj2fOg0O2TSp+HByuTY/T8NsCw8gXsCz/Bd96NpnpIQAY8i3H
+	mtb86/ccunJmwMuWwixE40oNzOGzoZnxnORyLrRlQgapDpETNo4ZQhE1PYYm2vs6T2fi0M
+	5ihWS/fc7THU+3HPs9jgG8FD+XRbGvjzOFCAxY6IjLKtToduxCvmvmZ31+Aun2KISAe1h2
+	wc0h/yZVxJaAwqk+xE4sra8ERUD3BYIGCDytAQpDKjea+NBUymI1wLatMP2EPkm2u6Iy72
+	QHs79baxwFpdbpUmA0BBvCF/Kj4qzRE3mdTxMvm1bb70BiT0boEFvPWXEpoS/g==
+Message-ID: <b763537b-669e-4027-98fc-64ba39314949@bootlin.com>
+Date: Thu, 13 Mar 2025 11:50:45 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d863db0a-1740-45d5-b8de-746fa9d44fcb@gmx.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/13] selftests/bpf: Integrate test_xsk.c to test_progs
+ framework
+To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+ Magnus Karlsson <magnus.karlsson@intel.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Jonathan Lemon <jonathan.lemon@gmail.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ Alexis Lothore <alexis.lothore@bootlin.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250313-xsk-v1-0-7374729a93b9@bootlin.com>
+Content-Language: en-US
+From: Bastien Curutchet <bastien.curutchet@bootlin.com>
+In-Reply-To: <20250313-xsk-v1-0-7374729a93b9@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduvdejjeeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkffggfgfuvfevfhfhjggtgfesthejredttddvjeenucfhrhhomhepuegrshhtihgvnhcuvehurhhuthgthhgvthcuoegsrghsthhivghnrdgtuhhruhhttghhvghtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefhheeggfetffekheevuedvkedvvdeufeegjeevgfelveevveetffevfefgheeijeenucfkphepvdgrtddumegtsgduleemkedvheefmeguuddttdemfhelvgdumeeftgejudemjeeitdgtmedutggsrgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekvdehfeemugdutddtmehflegvudemfegtjedumeejiedttgemudgtsggrpdhhvghloheplgfkrfggieemvdgrtddumegtsgduleemkedvheefmeguuddttdemfhelvgdumeeftgejudemjeeitdgtmedutggsrggnpdhmrghilhhfrhhomhepsggrshhtihgvnhdrtghurhhuthgthhgvthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdejpdhrtghpthhtohepsghjohhrnheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepmhgrghhnuhhsrdhkrghrlhhsshhonhesi
+ hhnthgvlhdrtghomhdprhgtphhtthhopehmrggtihgvjhdrfhhijhgrlhhkohifshhkihesihhnthgvlhdrtghomhdprhgtphhtthhopehjohhnrghthhgrnhdrlhgvmhhonhesghhmrghilhdrtghomhdprhgtphhtthhopegrshhtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghnihgvlhesihhoghgvrghrsghogidrnhgvthdprhgtphhtthhopegrnhgurhhiiheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepmhgrrhhtihhnrdhlrghusehlihhnuhigrdguvghv
+X-GND-Sasl: bastien.curutchet@bootlin.com
 
-On Wed, Mar 12, 2025 at 03:08:35PM +0100, Helge Deller wrote:
-> On 3/12/25 14:14, Simon Horman wrote:
-> > On Sun, Mar 09, 2025 at 10:42:38PM +0100, deller@kernel.org wrote:
-> > > From: Helge Deller <deller@gmx.de>
-> > > 
-> > > When compiling with W=1 and CONFIG_TULIP_MWI=n one gets this warning:
-> > >   drivers/net/ethernet/dec/tulip/tulip_core.c: In function ‘tulip_init_one’:
-> > >   drivers/net/ethernet/dec/tulip/tulip_core.c:1309:22: warning: variable ‘force_csr0’ set but not used
-> > > 
-> > > Avoid it by annotating the variable __maybe_unused, which seems to be
-> > > the easiest solution.
-> > > 
-> > > Signed-off-by: Helge Deller <deller@gmx.de>
-> > 
-> > Hi Helge,
-> > 
-> > A few thoughts on this:
-> 
-> Hi Simon,
-> 
-> Thanks for following up on this!
-> 
-> > Firstly, thanks for your patch, which I agree addresses the problem you
-> > have described.
-> > 
-> > However, AFAIK, this is a rather old driver and I'm not sure that
-> > addressing somewhat cosmetic problems are worth the churn they cause:
-> > maybe it's best to leave it be.
-> 
-> Well, the only reason why I sent this patch is, because some people
-> are interested to get a Linux kernel build without any warnings when "W=1"
-> option is enabled.
-> This code in the tulip driver is one of the last 10 places in the kernel where
-> I see a warning at all, so I think it's worth fixing it, although it's just
-> cosmetic.
-> 
-> 
-> > But if we do want to fix this problem, I do wonder if the following
-> > solution, which leverages IS_ENABLED, is somehow nicer as
-> > it slightly reduces the amount of conditionally compiled code,
-> > thus increasing compile test coverage.
-> 
-> Full Ack from my side!
-> I wanted to keep my patch small, but your proposed patch is the better one.
-> 
-> I did not compile-test it, but if it builds you may add my:
-> Acked-by: Helge Deller <deller@gmx.de>
+Hi all,
 
-Thanks, I posted v2 here:
+On 3/13/25 11:47 AM, Bastien Curutchet (eBPF Foundation) wrote:
+> Hi all,
+> 
+> This patch series continues the work to migrate the script tests into
+> prog_tests.
+> 
+> The test_xsk.sh script tests lots of AF_XDP use cases. The tests it uses
+> are defined in xksxceiver.c. As this script is used to test real
+> hardware, the goal here is to keep it as is and only integrate the
+> tests on veth peers into the test_progs framework.
+> Three tests are flaky on s390 so they won't be integrated to test_progs
+> yet (I'm currently trying to make them more robust).
+> 
+> PATCH 1 & 2 fix some small issues xskxceiver.c
+> PATCH 3 to 9 rework the xskxceiver to ease the integration in the
+> test_progs framework. Two main points are addressed in them :
+>   - wrap kselftest calls behind macros to ease their replacement later
+>   - handle all errors to release resources instead of calling exit() when
+>     any error occurs.
+> PATCH 10 extracts test_xsk[.c/.h] from xskxceiver[.c/.h] to make the
+> tests available to test_progs
+> PATCH 11 enables kselftest de-activation
+> PATCH 12 isolates the flaky tests
+> PATCH 13 integrate the non-flaky tests to the test_progs framework
+> 
+> Signed-off-by: Bastien Curutchet (eBPF Foundation) <bastien.curutchet@bootlin.com>
+> ---
+> Bastien Curutchet (eBPF Foundation) (13):
+>        selftests/bpf: test_xsk: Initialize bitmap before use
+>        selftests/bpf: test_xsk: Fix memory leaks
+>        selftests/bpf: test_xsk: Wrap ksft_*() behind macros
+>        selftests/bpf: test_xsk: Add return value to init_iface()
+>        selftests/bpf: test_xsk: Don't exit immediately when xsk_attach fails
+>        selftests/bpf: test_xsk: Don't exit immediately when gettimeofday fails
+>        selftests/bpf: test_xsk: Don't exit immediately when workers fail
+>        selftests/bpf: test_xsk: Don't exit immediately if validate_traffic fails
+>        selftests/bpf: test_xsk: Don't exit immediately on allocation failures
+>        selftests/bpf: test_xsk: Split xskxceiver
+>        selftests/bpf: test_xsk: Make kselftest dependency optional
+>        selftests/bpf: test_xsk: Isolate flaky tests
+>        selftests/bpf: test_xsk: Integrate test_xsk.c to test_progs framework
+> 
+>   tools/testing/selftests/bpf/Makefile              |   13 +-
+>   tools/testing/selftests/bpf/prog_tests/test_xsk.c | 2416 ++++++++++++++++++++
+>   tools/testing/selftests/bpf/prog_tests/test_xsk.h |  299 +++
+>   tools/testing/selftests/bpf/prog_tests/xsk.c      |  178 ++
+>   tools/testing/selftests/bpf/xskxceiver.c          | 2543 +--------------------
+>   tools/testing/selftests/bpf/xskxceiver.h          |  153 --
+>   6 files changed, 3021 insertions(+), 2581 deletions(-)
+> ---
+> base-commit: 720c696b16a1b1680f64cac9b3bb9e312a23ac47
+> change-id: 20250218-xsk-0cf90e975d14
 
-https://lore.kernel.org/netdev/20250313-tulip-w1-v2-1-2ac0d3d909f9@kernel.org/T/#u
+I realize that I forgot to mention 'bpf-next', sorry about that.
+This work is based on the bpf-next_base branch.
+
+Best regards,
+Bastien
+
+
 
