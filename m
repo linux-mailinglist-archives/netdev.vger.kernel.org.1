@@ -1,160 +1,272 @@
-Return-Path: <netdev+bounces-174432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EC1AA5E933
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 02:08:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 830ECA5E94B
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 02:17:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B54C3175BD8
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 01:08:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 130571899FD6
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 01:17:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77D0415E97;
-	Thu, 13 Mar 2025 01:08:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9463155382;
+	Thu, 13 Mar 2025 01:16:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CEkj/tol"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZUC4/EsM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0756610C;
-	Thu, 13 Mar 2025 01:08:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 253B6481A3
+	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 01:16:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741828105; cv=none; b=kCQdHZL7i4uglo9rhvZj+Z/ttRnCjIXdIIirWK2dFB/jD7t7AbiwVuD1f0hODlWmSarhMXQh6gY/EONZm/OqkSJswNO8UI29+5G2FZEUq1hOy+9ulbii6m5SYCuvH6Ar5imAkCPSeb+2TK52U3pEwUFBtrkmRmdP57EeUY6fpCg=
+	t=1741828582; cv=none; b=BAELPXS+II4AX3/1VlqsZ35EDiZ5zh6YmFvLVehMusi7YQ2cZcp+hctPHQZIGvtbjZgoQsraST6SnlG1M60r+/JVcRLaRzCr0TmtbwIFsOGAnSm6tma9IyDF0hGXTy8xN29nFqb8GbjhWPrp6hI4l98xtMbcWAAUwVw/e+ES4dk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741828105; c=relaxed/simple;
-	bh=L1B1sJ7YjsET1pMUISc3uxnEi8mM0HBOJ1+5dS36kws=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ewA6ch/bDaWzgzdUGmU/Gq9rsmgibik6JXqmaJbAi6Y508BLyLleqUSwYkOBl8XmXIy9JcZ9lWRtvW7nN8yfEVUqENdrfYy1uSuK9iYkrXKE8nHrA9YHGLMf8GLpm1PdQ6Sn7APcPIe6XJFOLFEn/sTZIyKAPyWzOICl3wwpv24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CEkj/tol; arc=none smtp.client-ip=209.85.219.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6e8f06e13a4so13941826d6.0;
-        Wed, 12 Mar 2025 18:08:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741828102; x=1742432902; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yB3aa4DZXOqG8FkpT/yFPtGsJ00G9GKgyRtQ/0BrqTg=;
-        b=CEkj/tolOH87SB9A6lBvONehnZ2RdeghXNP2ndY2+Xpwl4wySkcyvST2LBuv1/UXsJ
-         GvFjmXIre6aB0E3boblxCbAazgHFigQhdrS08AO7xlF0vQ0tV7jfm6HKJeRpODNFRaoE
-         F+ioCv3Xj2lzek4h60W5QzA27KHHimZxulZ6y4eeiQw3xcGB+doEAV9wvJkmRcjUXbAp
-         TUyz6CnHgFtCmsBqqQ2+q7KaOK/HRDMBcVQ+/HEgn+F6zYlFD8xC3c8d3AsXC7jdcq5a
-         oWPDh7v/44lyTK6Rv/ISHGCzrxdLg6eXLSby7eavnEslyuwz8mYHMAyk0Bd9BUVEIDdV
-         G+Yg==
+	s=arc-20240116; t=1741828582; c=relaxed/simple;
+	bh=721uMLq5LFnuXA+9nIjHO+clfJHeej0JcN7/Aa5K9B4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=II/1ipXJPqXLLcEROwn7YvlJhchF/sEm5E3oQIVVgQg1KCQbHzfY79iytS0/AOhz4fuqUr7J92E+nf+riMP4xPU260Ymz657cZyHC4/4at98zc6z/cMJHc0cGhn3c1hozbAOQx4eWrZt2cPSM2O84HXKlIwNAioHSL0CEvgqpXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZUC4/EsM; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741828577;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AogDjbH4EuWFnB9nW79HasahXRM+mCBIQhmErtsSbO8=;
+	b=ZUC4/EsMOV9pbZcnvGpgRff8GDWv6lZVkDSUbFh+OIUuVY3KKdhTHdr7G1Xe7PHDc0X+QW
+	x8ackElRR24uku95Omos7YcQL58diCQywr+i6I0JmrTrJ+NmNSW/aR6M5PsAVFV+67qQTS
+	9ysPoTkiBzB0h9pJMQ6EelT99nUlM1s=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-455-c24cWr7hM_GyDKc3C1CFsg-1; Wed, 12 Mar 2025 21:16:15 -0400
+X-MC-Unique: c24cWr7hM_GyDKc3C1CFsg-1
+X-Mimecast-MFC-AGG-ID: c24cWr7hM_GyDKc3C1CFsg_1741828574
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-5e5edf8a509so316986a12.1
+        for <netdev@vger.kernel.org>; Wed, 12 Mar 2025 18:16:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741828102; x=1742432902;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yB3aa4DZXOqG8FkpT/yFPtGsJ00G9GKgyRtQ/0BrqTg=;
-        b=u3BIqDO5vyt7oPHCTwTZcNiAL5zS+0E71cAV35Sy5uTuBNT910jKum1/D+Ee8Dnx4X
-         bAn/WJPbrpLgmIH5wzUym8uv+FeUqpuLwI1KpaCeGdm+jW6f1W41FO5yAbwvXg9tf+zL
-         wu+o+c+ScEhsfIWYtmKqMsEjjgb+58Egc6U6DwMLztuLMspLbMW1zyWcfb/mcjhvOzOT
-         /CmPhufgFmoAy92Wkgf4jvMBIa3kk03LoZFdMO1xOIetMzffBp/ndUsG4Nx3/WZ56pai
-         ATZ+PSCNXTkKJF842whj3t/PUUJgGG+CxipH9l51y63toh5iBxOerffdzoqlaZI7Rexd
-         zBvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU0fO28+5PDfyWwkmUJaCDDR+2no4K6/LVsWIabigNlZDhY6X/C/wLoue9djhv7xWbkX4xMiR+8t2d9TC4M@vger.kernel.org, AJvYcCVW5y0fs7m7d0CultXhraa2d65ZH9gr5uNE2GjOyI2gXHKByEESAsNFWpmGYLAw4u609L96xvUL9FUg@vger.kernel.org, AJvYcCWvbyWJ/CTv4ktZT/SGb/11w00k+xT+e5lJIPRZLrgeZ8TyY5dFiZigVV+3Y07mPwpNXLKayIsQ@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXsJ1nvbqTvjmjdFiHEL1i4rj6axomFveFn3U0FrtdWsxpwVFM
-	vJMjseYfwrwBZch6sCM3vgeBlH89u+KY4ea1X46SvEaxRs2glezJ
-X-Gm-Gg: ASbGncs/v+x9PE6FxEbYYDNQ0dit5hSyLTfXifjMfqT12GEMnGLCijEi8vkW5jOAsJ/
-	+dO1pG6uAbDNpxqHRV/PfMHlhue4xVhbM3O4GzeU+Se6erYLDyAZym70o/OMFr8aFi4JX3myrit
-	hF2OPtj5DzyTKtfnRDd2cgtrCoP1rku315eCTqRcstgflwP+UI7IPf7ris1rwZYUGYAbJyis7ba
-	KfIGMYhDcsd3+KXhnHm33TZDOVfwwzltk1dXzBTLZWMDDXfPsFFIc0RIdqGBZ6HcFGXG81waEs5
-	g2CuupFidNcqJvQa7mKtus8MWGPJ0y4=
-X-Google-Smtp-Source: AGHT+IErHgyMMC0gxpFbF0+ltzHlALBkq84d33gqNkyZ9Lj204hZXdZSKp7DGFvJyo8iPJlxvm7WCw==
-X-Received: by 2002:a05:6214:5c47:b0:6e6:5c26:afe3 with SMTP id 6a1803df08f44-6eaddfbb91cmr8764046d6.17.1741828102495;
-        Wed, 12 Mar 2025 18:08:22 -0700 (PDT)
-Received: from localhost ([2001:da8:7001:11::cb])
-        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-6eade34beb0sm2540506d6.105.2025.03.12.18.08.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Mar 2025 18:08:21 -0700 (PDT)
-Date: Thu, 13 Mar 2025 09:08:11 +0800
-From: Inochi Amaoto <inochiama@gmail.com>
-To: Stephen Boyd <sboyd@kernel.org>, Chen Wang <unicorn_wang@outlook.com>, 
-	Conor Dooley <conor+dt@kernel.org>, Inochi Amaoto <inochiama@gmail.com>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Michael Turquette <mturquette@baylibre.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Rob Herring <robh@kernel.org>
-Cc: linux-clk@vger.kernel.org, devicetree@vger.kernel.org, 
-	sophgo@lists.linux.dev, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: Re: [PATCH v3 1/2] dt-bindings: clock: sophgo: add clock controller
- for SG2044
-Message-ID: <nxvuxo7lsljsir24brvghblk2xlssxkb3mfgx6lbjahmgr4kep@fvpmciimfikg>
-References: <20250226232320.93791-1-inochiama@gmail.com>
- <20250226232320.93791-2-inochiama@gmail.com>
- <2c00c1fba1cd8115205efe265b7f1926.sboyd@kernel.org>
- <epnv7fp3s3osyxbqa6tpgbuxdcowahda6wwvflnip65tjysjig@3at3yqp2o3vp>
- <f1d5dc9b8f59b00fa21e8f9f2ac3794b.sboyd@kernel.org>
- <x43v3wn5rp2mkhmmmyjvdo7aov4l7hnus34wjw7snd2zbtzrbh@r5wrvn3kxxwv>
- <b816b3d1f11b4cc2ac3fa563fe5f4784.sboyd@kernel.org>
+        d=1e100.net; s=20230601; t=1741828573; x=1742433373;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AogDjbH4EuWFnB9nW79HasahXRM+mCBIQhmErtsSbO8=;
+        b=MGrFh22wrKwhUOR06lzGlBbl+zBnsTIF7cGSRQAJkJnA7vcHiH/BGOP9YsXImNrwD+
+         brUT1dAme+aa/wgHT2VXcz6NeXm0ShcU3BKW2C2Nv9IYI20DGTQFqUGosFT+aR/MxeMc
+         T2+FUzvEfhMDpaFtYg8iEkwPThq47RDY9UQTS0L3mzg0gUj/u9A9xcgcdIvRmyBUIzrW
+         6x1ucDJidwIbPIGTEwDpV9RFZ/EU66COeN68c4/YuFJTc0pO2DDSrQVencueRAJgnXBb
+         yxQAfNoHDXFziVlYA+gCDh5fb2orbuwluWvQg9mIPH/syM2kDVuYz6FiaaZZ2YhTt1MG
+         J9gQ==
+X-Forwarded-Encrypted: i=1; AJvYcCViSRg/oBWpWOhLqq/clR4skex2Tt3BedZyZTqistYVgeDhlpFo7kFM7JDaxUNxj2Ucqw0JCRQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZBoZFZ/W5Bq9WVWxdnFchhPKYctKPw/KX22YimKMB9FBtGPqC
+	SMWVCyUPgmXT7ze/Mf9zW8wFUM1rDQzlFGP9UGkaPpKExqAQtFzblr0YNLPxVCvFHZwMcGCN+JF
+	EiFDEdy6T7j0gR02CBKpnpKCL7ioI3Ucb//h5gu9NOEYWzDtR8Ue8e/pVACTRt7R93VfmGkOvbc
+	8QDGbsMNblcQ4sz89/dofa7ZZPW+YfW9ngKGJyuLs=
+X-Gm-Gg: ASbGnct9Is5rn/tklWjJ62SsBU2fuxNMoRLf4mAeO67UZG2U+2p2TemtQhZLEWUZiH6
+	q5InnUQHuzaBEie6XG29Hkn3NVuLngn9UqKHTyq8u9RaPz/4y50V6goeJ3tmSujUydCDiOGioZQ
+	==
+X-Received: by 2002:a05:6402:26d2:b0:5e7:c408:7b02 with SMTP id 4fb4d7f45d1cf-5e7c4087bb4mr4445089a12.24.1741828573073;
+        Wed, 12 Mar 2025 18:16:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFsqrjx1jU33odwiOgIHpXyVpWnebktUx1CiaLawfB32JjJhcFs07A39GAWg4iQJxP627Dr4vKNGHjojQEG5uo=
+X-Received: by 2002:a05:6402:26d2:b0:5e7:c408:7b02 with SMTP id
+ 4fb4d7f45d1cf-5e7c4087bb4mr4445075a12.24.1741828572706; Wed, 12 Mar 2025
+ 18:16:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b816b3d1f11b4cc2ac3fa563fe5f4784.sboyd@kernel.org>
+References: <20250307-rss-v9-0-df76624025eb@daynix.com>
+In-Reply-To: <20250307-rss-v9-0-df76624025eb@daynix.com>
+From: Lei Yang <leiyang@redhat.com>
+Date: Thu, 13 Mar 2025 09:15:36 +0800
+X-Gm-Features: AQ5f1JplCJM-om_OaGqMtL3AEdit82ixIY48vsrcWfisxBqhfRPtd2ySurX_Fnw
+Message-ID: <CAPpAL=yQAqo=8xC2-HwnSK0MhmBiDoAKUYYKieQYjpAV=DLpng@mail.gmail.com>
+Subject: Re: [PATCH net-next v9 0/6] tun: Introduce virtio-net hashing feature
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
+	Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
+	Simon Horman <horms@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 12, 2025 at 04:43:51PM -0700, Stephen Boyd wrote:
-> Quoting Inochi Amaoto (2025-03-12 16:29:43)
-> > On Wed, Mar 12, 2025 at 04:14:37PM -0700, Stephen Boyd wrote:
-> > > Quoting Inochi Amaoto (2025-03-11 16:31:29)
-> > > > 
-> > > > > or if that syscon node should just have the #clock-cells property as
-> > > > > part of the node instead.
-> > > > 
-> > > > This is not match the hardware I think. The pll area is on the middle
-> > > > of the syscon and is hard to be separated as a subdevice of the syscon
-> > > > or just add  "#clock-cells" to the syscon device. It is better to handle
-> > > > them in one device/driver. So let the clock device reference it.
-> > > 
-> > > This happens all the time. We don't need a syscon for that unless the
-> > > registers for the pll are both inside the syscon and in the register
-> > > space 0x50002000. Is that the case? 
-> > 
-> > Yes, the clock has two areas, one in the clk controller and one in
-> > the syscon, the vendor said this design is a heritage from other SoC.
-> 
-> My question is more if the PLL clk_ops need to access both the syscon
-> register range and the clk controller register range. What part of the
-> PLL clk_ops needs to access the clk controller at 0x50002000?
-> 
+QE tested this series of patches's v9 with virtio-net regression
+tests, everything works fine.
 
-The PLL clk_ops does nothing, but there is an implicit dependency:
-When the PLL change rate, the mux attached to it must switch to 
-another source to keep the output clock stable. This is the only
-thing it needed.
+Tested-by: Lei Yang <leiyang@redhat.com>
 
-> > 
-> > > This looks like you want there to be  one node for clks on the system
-> > > because logically that is clean, when the reality is that there is a
-> > > PLL block exposed in the syscon (someone forgot to put it in the clk
-> > > controller?) and a non-PLL block for the other clks.
-> > 
-> > That is true, I prefer to keep clean and make less mistakes. Although
-> > the PLL is exposed in the syscon, the pll need to be tight with other
-> > clocks in the space 0x50002000 (especially between the PLL and mux).
-> > In this view, it is more like a mistake made by the hardware design.
-> > And I prefer not to add a subnode for the syscon.
-> 
-> Ok. You wouldn't add a subnode for the syscon. You would just have
-> #clock-cells in that syscon node and register an auxiliary device to
-> provide the PLL(s) from there. Then in drivers/clk we would have an
-> auxiliary driver that uses a regmap or gets an iomem pointer from the
-> parent device somehow so that we can logically put the PLL code in
-> drivers/clk while having one node in DT for the "miscellaneous register
-> area" where the hardware engineer had to expose the PLL control to
-> software.
+On Fri, Mar 7, 2025 at 7:01=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix.=
+com> wrote:
+>
+> virtio-net have two usage of hashes: one is RSS and another is hash
+> reporting. Conventionally the hash calculation was done by the VMM.
+> However, computing the hash after the queue was chosen defeats the
+> purpose of RSS.
+>
+> Another approach is to use eBPF steering program. This approach has
+> another downside: it cannot report the calculated hash due to the
+> restrictive nature of eBPF.
+>
+> Introduce the code to compute hashes to the kernel in order to overcome
+> thse challenges.
+>
+> An alternative solution is to extend the eBPF steering program so that it
+> will be able to report to the userspace, but it is based on context
+> rewrites, which is in feature freeze. We can adopt kfuncs, but they will
+> not be UAPIs. We opt to ioctl to align with other relevant UAPIs (KVM
+> and vhost_net).
+>
+> The patches for QEMU to use this new feature was submitted as RFC and
+> is available at:
+> https://patchew.org/QEMU/20240915-hash-v3-0-79cb08d28647@daynix.com/
+>
+> This work was presented at LPC 2024:
+> https://lpc.events/event/18/contributions/1963/
+>
+> V1 -> V2:
+>   Changed to introduce a new BPF program type.
+>
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> ---
+> Changes in v9:
+> - Added a missing return statement in patch
+>   "tun: Introduce virtio-net hash feature".
+> - Link to v8: https://lore.kernel.org/r/20250306-rss-v8-0-7ab4f56ff423@da=
+ynix.com
+>
+> Changes in v8:
+> - Disabled IPv6 to eliminate noises in tests.
+> - Added a branch in tap to avoid unnecessary dissection when hash
+>   reporting is disabled.
+> - Removed unnecessary rtnl_lock().
+> - Extracted code to handle new ioctls into separate functions to avoid
+>   adding extra NULL checks to the code handling other ioctls.
+> - Introduced variable named "fd" to __tun_chr_ioctl().
+> - s/-/=3D/g in a patch message to avoid confusing Git.
+> - Link to v7: https://lore.kernel.org/r/20250228-rss-v7-0-844205cbbdd6@da=
+ynix.com
+>
+> Changes in v7:
+> - Ensured to set hash_report to VIRTIO_NET_HASH_REPORT_NONE for
+>   VHOST_NET_F_VIRTIO_NET_HDR.
+> - s/4/sizeof(u32)/ in patch "virtio_net: Add functions for hashing".
+> - Added tap_skb_cb type.
+> - Rebased.
+> - Link to v6: https://lore.kernel.org/r/20250109-rss-v6-0-b1c90ad708f6@da=
+ynix.com
+>
+> Changes in v6:
+> - Extracted changes to fill vnet header holes into another series.
+> - Squashed patches "skbuff: Introduce SKB_EXT_TUN_VNET_HASH", "tun:
+>   Introduce virtio-net hash reporting feature", and "tun: Introduce
+>   virtio-net RSS" into patch "tun: Introduce virtio-net hash feature".
+> - Dropped the RFC tag.
+> - Link to v5: https://lore.kernel.org/r/20241008-rss-v5-0-f3cf68df005d@da=
+ynix.com
+>
+> Changes in v5:
+> - Fixed a compilation error with CONFIG_TUN_VNET_CROSS_LE.
+> - Optimized the calculation of the hash value according to:
+>   https://git.dpdk.org/dpdk/commit/?id=3D3fb1ea032bd6ff8317af5dac9af901f1=
+f324cab4
+> - Added patch "tun: Unify vnet implementation".
+> - Dropped patch "tap: Pad virtio header with zero".
+> - Added patch "selftest: tun: Test vnet ioctls without device".
+> - Reworked selftests to skip for older kernels.
+> - Documented the case when the underlying device is deleted and packets
+>   have queue_mapping set by TC.
+> - Reordered test harness arguments.
+> - Added code to handle fragmented packets.
+> - Link to v4: https://lore.kernel.org/r/20240924-rss-v4-0-84e932ec0e6c@da=
+ynix.com
+>
+> Changes in v4:
+> - Moved tun_vnet_hash_ext to if_tun.h.
+> - Renamed virtio_net_toeplitz() to virtio_net_toeplitz_calc().
+> - Replaced htons() with cpu_to_be16().
+> - Changed virtio_net_hash_rss() to return void.
+> - Reordered variable declarations in virtio_net_hash_rss().
+> - Removed virtio_net_hdr_v1_hash_from_skb().
+> - Updated messages of "tap: Pad virtio header with zero" and
+>   "tun: Pad virtio header with zero".
+> - Fixed vnet_hash allocation size.
+> - Ensured to free vnet_hash when destructing tun_struct.
+> - Link to v3: https://lore.kernel.org/r/20240915-rss-v3-0-c630015db082@da=
+ynix.com
+>
+> Changes in v3:
+> - Reverted back to add ioctl.
+> - Split patch "tun: Introduce virtio-net hashing feature" into
+>   "tun: Introduce virtio-net hash reporting feature" and
+>   "tun: Introduce virtio-net RSS".
+> - Changed to reuse hash values computed for automq instead of performing
+>   RSS hashing when hash reporting is requested but RSS is not.
+> - Extracted relevant data from struct tun_struct to keep it minimal.
+> - Added kernel-doc.
+> - Changed to allow calling TUNGETVNETHASHCAP before TUNSETIFF.
+> - Initialized num_buffers with 1.
+> - Added a test case for unclassified packets.
+> - Fixed error handling in tests.
+> - Changed tests to verify that the queue index will not overflow.
+> - Rebased.
+> - Link to v2: https://lore.kernel.org/r/20231015141644.260646-1-akihiko.o=
+daki@daynix.com
+>
+> ---
+> Akihiko Odaki (6):
+>       virtio_net: Add functions for hashing
+>       net: flow_dissector: Export flow_keys_dissector_symmetric
+>       tun: Introduce virtio-net hash feature
+>       selftest: tun: Test vnet ioctls without device
+>       selftest: tun: Add tests for virtio-net hashing
+>       vhost/net: Support VIRTIO_NET_F_HASH_REPORT
+>
+>  Documentation/networking/tuntap.rst  |   7 +
+>  drivers/net/Kconfig                  |   1 +
+>  drivers/net/tap.c                    |  68 +++-
+>  drivers/net/tun.c                    |  98 +++++-
+>  drivers/net/tun_vnet.h               | 159 ++++++++-
+>  drivers/vhost/net.c                  |  49 +--
+>  include/linux/if_tap.h               |   2 +
+>  include/linux/skbuff.h               |   3 +
+>  include/linux/virtio_net.h           | 188 ++++++++++
+>  include/net/flow_dissector.h         |   1 +
+>  include/uapi/linux/if_tun.h          |  75 ++++
+>  net/core/flow_dissector.c            |   3 +-
+>  net/core/skbuff.c                    |   4 +
+>  tools/testing/selftests/net/Makefile |   2 +-
+>  tools/testing/selftests/net/tun.c    | 656 +++++++++++++++++++++++++++++=
++++++-
+>  15 files changed, 1255 insertions(+), 61 deletions(-)
+> ---
+> base-commit: dd83757f6e686a2188997cb58b5975f744bb7786
+> change-id: 20240403-rss-e737d89efa77
+> prerequisite-change-id: 20241230-tun-66e10a49b0c7:v6
+> prerequisite-patch-id: 871dc5f146fb6b0e3ec8612971a8e8190472c0fb
+> prerequisite-patch-id: 2797ed249d32590321f088373d4055ff3f430a0e
+> prerequisite-patch-id: ea3370c72d4904e2f0536ec76ba5d26784c0cede
+> prerequisite-patch-id: 837e4cf5d6b451424f9b1639455e83a260c4440d
+> prerequisite-patch-id: ea701076f57819e844f5a35efe5cbc5712d3080d
+> prerequisite-patch-id: 701646fb43ad04cc64dd2bf13c150ccbe6f828ce
+> prerequisite-patch-id: 53176dae0c003f5b6c114d43f936cf7140d31bb5
+> prerequisite-change-id: 20250116-buffers-96e14bf023fc:v2
+> prerequisite-patch-id: 25fd4f99d4236a05a5ef16ab79f3e85ee57e21cc
+>
+> Best regards,
+> --
+> Akihiko Odaki <akihiko.odaki@daynix.com>
+>
 
-Cool, I understand what you mean. It is a good idea,
-I will have a try.
-
-Regards,
-Inochi
 
