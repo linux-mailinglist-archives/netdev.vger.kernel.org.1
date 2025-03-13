@@ -1,134 +1,163 @@
-Return-Path: <netdev+bounces-174710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C2BEA5FFED
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 19:49:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2168DA60011
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 19:54:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3C173A6A05
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 18:49:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 634B1421BC0
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 18:54:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEF0F1F03C2;
-	Thu, 13 Mar 2025 18:49:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE5BE1EEA4A;
+	Thu, 13 Mar 2025 18:54:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OsR2FsKb"
+	dkim=pass (2048-bit key) header.d=fossekall.de header.i=@fossekall.de header.b="Jb58RZLs";
+	dkim=permerror (0-bit key) header.d=fossekall.de header.i=@fossekall.de header.b="2ggEdGat"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2070F1531C5
-	for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 18:49:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741891750; cv=none; b=UN/zIKyPjPhOTCeQGeuNKaqyIWaV/kWEPmj+a0ZunqXuKMZQY6SH5c74cm3mEE070CgqMiZjqfBcJ9PgvCQYx26UNRn6HfApAB9a1qRpHkeu9FyY1EQ4Qds7uHck9Zc+c+1Zt7Zg4rYjdnVtgHwFrKKDqczUMR/9JFj9cvwHXRY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741891750; c=relaxed/simple;
-	bh=vGaveTKeKgCxAmnC9EQ4sn2CMv/qBrgjuvuYfa1RVkY=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF3351CAA6E;
+	Thu, 13 Mar 2025 18:54:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741892092; cv=pass; b=P08/mESzAGIdXCGQCZrMVNOFyHYJAXienSM+MVf4dFuzyEqF8Fj8CtkYiJOFw8jrBxJJbZ2HT+AxwqWoW7H68/SdQE5czOwMQqB6/4eN0IH81HNB51wC0AquiFSBwyFbLBHIa6NcMR/GguuPEAwCaKJkF2yJKFcvA8zhDtyVODs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741892092; c=relaxed/simple;
+	bh=CaZpgSYtCH4wIyDEkb0dXSqO4VQYc8DrmJcMXYFTx9I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jg086jadta+51sb/1I4FWneQFcMyB94ATODwU/c4H7dKrRrKNcLTnjk1U/GCtW9L0P+GQIjFDmVyCElwqYKWCNawR25pGriu614SumYdBE7KhY4+xiYUifj4Xfaj0mEz3jMvoZhI2l46tpQEUtohMWkYP2J6wR4hHovJp7zKZ2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OsR2FsKb; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741891748;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=D9aZe+iaudDpMDo0mPe7/sxlSIcMfnUdZ2EM2OaZ1sk=;
-	b=OsR2FsKbcKOIQ2NO4ex2AUaP5RsapStbiaazWEwSaJI3x0ur/4z7BSVRJy4rBGzCH0efS8
-	1snKELsbtOIENb1Y8N+LZNabBmNlKE/rr1rAK4CKRTF3UpzOGvTeApt9FD5H+OTL1WSEqJ
-	qRjLccObvjzXHRfrobdaIctnzZokzug=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-326-if5mwhhENNWG6gjMhdzWBA-1; Thu, 13 Mar 2025 14:49:04 -0400
-X-MC-Unique: if5mwhhENNWG6gjMhdzWBA-1
-X-Mimecast-MFC-AGG-ID: if5mwhhENNWG6gjMhdzWBA_1741891738
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-39130f02631so650919f8f.2
-        for <netdev@vger.kernel.org>; Thu, 13 Mar 2025 11:49:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741891738; x=1742496538;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D9aZe+iaudDpMDo0mPe7/sxlSIcMfnUdZ2EM2OaZ1sk=;
-        b=KuviCuAPP3QEVB7DOZQiLh8CljTbCGAxmAMPOCOmoyIBy7942+pBz3a4F6yID9j30y
-         IFimIR1Zaiy5UQTlD3eXO1VXCkMO+E4NBhC0VALa7DwuEb5pljIoPRePu52p6Z4k1uwF
-         iGn+8c8yKSQw3CfWNLdN5QBq6prFPrXPyrOr+7ElvfaO6PGoyqafXdd5Y2yZER/N2je4
-         2491m7zWbvn6RBA0rt2yq3H6tuvL2d9wOEr89XVsvyRk3GlXhMXCeohvPG2CeXWDGQ/V
-         5gCjSiKdvh/LhpRgrRdlUpU14aydOz+G1xa5OJHAkQjhiv620R+VuR8578dTTvWOdR/N
-         uVSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXfa9Gf4dZvmwKnPlPEPqD7fYV4eNCn1Q6lsUKnETO+s6zK9yRemP5goa6hudQZjBsKkbjiDho=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypCt7GeNmchQ4pG5MLCfcgYRToyFy2lcGGrD4I8RZ3BQvNiwKf
-	j/gNHbH1nqUl79kbAIMkQ9oLvQNMkK5nydYxnyVNQ6oVvOeEQ2WGYqNpr2PgcyNJfSk+mPNOlzf
-	Wha5HbBjxZY+4/8rbv6C4894xb2WLVBrODdYT2nIPwiPu+tw+IAdjmA==
-X-Gm-Gg: ASbGncu2YaqsR43QeIeJ2FE3/ilUBDVzYftgLxm4juVsbrt4RQ2DFMjqXB6unuSevzx
-	0IfJ6z5wQyLflxpEvHihXomD8KE7fQSqO/ZxHXzJLXeACqunGUD2sYy7pvL0NUd+4YB/iKkqW88
-	KudveZIeg4Mh4TCNLIm6OLRo7JpOA00B8LuhLPEKRKTA/SedNrohDsh6mJO70qGRFqxYkuAn8kL
-	WygoGVrGzQzkIySuEQZGmo28S49Nd2MGB6Ok34GquwGMpB/z5DTfQkdlG0oqtgiVE7M4h/GIZ9k
-	1Q+WovvPaQ==
-X-Received: by 2002:a05:6000:178b:b0:391:c78:8895 with SMTP id ffacd0b85a97d-396eb8c4c24mr52378f8f.50.1741891738537;
-        Thu, 13 Mar 2025 11:48:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEFiTFy8KH7Dv3eYYsTrcbBbEoTNapIuB3vn5zSLGQGf/vt0sASshS9p0fTfDPLfBsj9yQoDA==
-X-Received: by 2002:a05:6000:178b:b0:391:c78:8895 with SMTP id ffacd0b85a97d-396eb8c4c24mr52362f8f.50.1741891738209;
-        Thu, 13 Mar 2025 11:48:58 -0700 (PDT)
-Received: from fedora ([2a01:e0a:257:8c60:80f1:cdf8:48d0:b0a1])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395c7df3506sm3076694f8f.11.2025.03.13.11.48.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Mar 2025 11:48:57 -0700 (PDT)
-Date: Thu, 13 Mar 2025 19:48:55 +0100
-From: Matias Ezequiel Vara Larsen <mvaralar@redhat.com>
-To: Harald Mommer <harald.mommer@opensynergy.com>
-Cc: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Mikhail Golubev-Ciuchea <Mikhail.Golubev-Ciuchea@opensynergy.com>,
-	Wolfgang Grandegger <wg@grandegger.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=UcfDhupkqQFZ6gyNAi/VYOtpoQfjntl0q/MAmMAKTNSv7LgwQbuldhIBxuHN7U9cjmiPUVgBM9OuKr8JMJeXjcrm+9KxSACTehrt7pL91iwzNapNSraZeco8HX+F+XYJpL5r915UecM817JqKU+69sF0K7MZYQ8Vdq05aEJdF6k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fossekall.de; spf=pass smtp.mailfrom=fossekall.de; dkim=pass (2048-bit key) header.d=fossekall.de header.i=@fossekall.de header.b=Jb58RZLs; dkim=permerror (0-bit key) header.d=fossekall.de header.i=@fossekall.de header.b=2ggEdGat; arc=pass smtp.client-ip=85.215.255.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fossekall.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fossekall.de
+ARC-Seal: i=1; a=rsa-sha256; t=1741892086; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=GcAsiLlvCXj8PHDT+MgcN8oUjG6QswLD7idPFQg3P3EG3vdbTX2qYrPHk+9BFW6COe
+    B5Ju0/lReHYtWSy+MRb2zK0aJtCWlsiiPB+QsuWmoc5BXlJnFhD6g7qXBuxTfmcQHbEw
+    LOhEgOCGNrd/D6C+fS3dMA3Ow3AiyUaZRxfduSjOy14YdBsHX4O94K3g2So1A5iPFyAT
+    Pqr+djnfzpC4ZhjdeDTlM2MNXx6x3329ZGFKr29/A4iJNc1fi4c0WGvBCDJfFwbnXJtd
+    4xD/hgzWqZyhdk4WdmgbvnI7fku/rNfZLBuhOrAO6/R3bSkWIgTkGOMUS0n1QX1WmVW9
+    az5A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1741892086;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:References:Message-ID:Subject:Cc:To:From:Date:Cc:Date:
+    From:Subject:Sender;
+    bh=SgCrvoN6Qoq9w0OBDlTcNPxcHVbNiRs3HNs+Dd44VXU=;
+    b=NvpkExZiK7u9eNzB1i1l0d/wDWd59UssFxjMo4zf8m7I0vb1SCTRBA0Frhp/ZXW95b
+    WvqrgonmrIR3c870+KAjXhn7OgbETAMPGTwb52kf1er5W9Q418N5mqE6GYa43WfbsHa6
+    BSDFxG5oxO9c2MvK6RslNeK3gd2e9NZ8ce/Pe9f3Ht865RXFFIknBuNr8cIldF9wGoio
+    gy4wBGIpkbXMrLcuuBqFeSmDqo+XfiSx9P/g2sxYSbqcfQcqhdWHv0FgU8/LlZ48Bo2D
+    QAJlfvk6JEzl3tLaYmzZ27JNHIhI6GX/pJUJLdVLwLB9btyqHxvi3KcG2V8Ubr480/m7
+    pXRg==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1741892086;
+    s=strato-dkim-0002; d=fossekall.de;
+    h=In-Reply-To:References:Message-ID:Subject:Cc:To:From:Date:Cc:Date:
+    From:Subject:Sender;
+    bh=SgCrvoN6Qoq9w0OBDlTcNPxcHVbNiRs3HNs+Dd44VXU=;
+    b=Jb58RZLsAZHrogGI7vZdiA0B5mur18q7n0UlIwf56hz26vu3Iq6FKI2Shf4yI9CnnR
+    JQ1vc68oC0byb7zZfWEccQ0MXGDKb2Ix4/jHFi4Yo84SB1UJuAX3YonafIWnDgNdSr79
+    IAOtfDDlkSRE965T3m6SDbbpG+gsB9/oO47+Ao8h2Qt2fk52Oebxdz2K5dXaSp3BDzNN
+    PrXen3hovBg9ZtQcBYYIg5ZChVqJYS0jRzgnlAXSuY/kmfUJP4PPkvOcHfYqoeeoTRlt
+    iwvoexhlW4F22ddXcs6QLnz9vzled2sA24ZUsFSmXydIdmvGsdI8iLJaesi+SfeD7kfz
+    aXQw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1741892086;
+    s=strato-dkim-0003; d=fossekall.de;
+    h=In-Reply-To:References:Message-ID:Subject:Cc:To:From:Date:Cc:Date:
+    From:Subject:Sender;
+    bh=SgCrvoN6Qoq9w0OBDlTcNPxcHVbNiRs3HNs+Dd44VXU=;
+    b=2ggEdGatQ1dzUrOq9fDJwBRyAvYALEmFi9mYllcqYFMfGkar1/lLF7IsdIP3+O/086
+    wj8nE11rF0iMw1zHxgBw==
+X-RZG-AUTH: ":O2kGeEG7b/pS1EzgE2y7nF0STYsSLflpbjNKxx7cGrBdao6FTL4AJcMdm+lap4JEHkzok9eyEg=="
+Received: from aerfugl
+    by smtp.strato.de (RZmta 51.3.0 AUTH)
+    with ESMTPSA id f28b3512DIsjqNf
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Thu, 13 Mar 2025 19:54:45 +0100 (CET)
+Received: from koltrast.home ([192.168.1.27] helo=a98shuttle.de)
+	by aerfugl with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <michael@fossekall.de>)
+	id 1tsnhc-0001xg-2p;
+	Thu, 13 Mar 2025 19:54:44 +0100
+Date: Thu, 13 Mar 2025 19:54:43 +0100
+From: Michael Klein <michael@fossekall.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Damir Shaikhutdinov <Damir.Shaikhutdinov@opensynergy.com>,
-	linux-kernel@vger.kernel.org, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, virtualization@lists.linux.dev
-Subject: Re: [PATCH v5] can: virtio: Initial virtio CAN driver.
-Message-ID: <Z9Molw9U+1MYCtFh@fedora>
-References: <20240108131039.2234044-1-Mikhail.Golubev-Ciuchea@opensynergy.com>
- <a366f529-c901-4cd1-a1a6-c3958562cace@wanadoo.fr>
- <0878aedf-35c2-4901-8662-2688574dd06f@opensynergy.com>
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] net: phy: realtek: Add support for PHY LEDs on
+ RTL8211E
+Message-ID: <Z9Mp86eWYw3hgt0x@a98shuttle.de>
+References: <20250312193629.85417-1-michael@fossekall.de>
+ <e62af3a7-c228-4523-a1fb-330f4f96f28c@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <0878aedf-35c2-4901-8662-2688574dd06f@opensynergy.com>
+In-Reply-To: <e62af3a7-c228-4523-a1fb-330f4f96f28c@lunn.ch>
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 01, 2024 at 07:57:45PM +0100, Harald Mommer wrote:
-> Hello,
-> 
-> I thought there would be some more comments coming and I could address
-> everything in one chunk. Not the case, besides your comments silence.
-> 
-> On 08.01.24 20:34, Christophe JAILLET wrote:
-> > 
-> > Hi,
-> > a few nits below, should there be a v6.
-> > 
-> 
-> I'm sure there will be but not so soon. Probably after acceptance of the
-> virtio CAN specification or after change requests to the specification are
-> received and the driver has to be adapted to an updated draft.
-> 
+On Thu, Mar 13, 2025 at 05:45:05PM +0100, Andrew Lunn wrote:
+>On Wed, Mar 12, 2025 at 08:36:27PM +0100, Michael Klein wrote:
+>> Like the RTL8211F, the RTL8211E PHY supports up to three LEDs.
+>> Add netdev trigger support for them, too.
+>>
+>> Signed-off-by: Michael Klein <michael@fossekall.de>
+>> ---
+>>  drivers/net/phy/realtek.c | 120 ++++++++++++++++++++++++++++++++++++--
+>
+>What tree is this based on?
 
-What are the changes in the specification that should be taken into
-account for the next series?
+This was based on mainline, will be addressed in the next version.
 
-Thanks, Matias.
+>> +static int rtl8211e_led_hw_control_get(struct phy_device *phydev, u8 index,
+>> +				       unsigned long *rules)
+>> +{
+>> +	int oldpage, ret;
+>> +	u16 cr1, cr2;
+>> +
+>> +	if (index >= RTL8211x_LED_COUNT)
+>> +		return -EINVAL;
+>> +
+>> +	oldpage = phy_select_page(phydev, 0x7);
+>> +	if (oldpage < 0)
+>> +		goto err_restore_page;
+>> +
+>> +	ret = __phy_write(phydev, RTL821x_EXT_PAGE_SELECT, 0x2c);
+>> +	if (ret)
+>> +		goto err_restore_page;
+>
+>What is happening here? You select page 0x7, and then use
+>RTL821x_EXT_PAGE_SELECT to select 0x2c? Does this hardware have pages
+>within pages?
 
+Kind of; this is from the datasheet:
+
+	6.9.5.  Access to Extension Page (ExtPage)
+	
+	Set MDIO commands as shown below to switch to the Extension Page (ExtPage) 0xXY (in Hex).
+	1. Set Register 31 Data=0x0007 (set to Extension Page)
+	2. Set Register 30 Data=0x00XY (Extension Page XY)
+	3. Set the target Register Data
+	4. Set Register 31 Data=0x0000 (switch to Page 0)
+
+Register 30 is RTL821x_EXT_PAGE_SELECT, LED config registers are on 
+extension page 0x2c
+
+-- 
+Michael
 
