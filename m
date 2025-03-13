@@ -1,130 +1,88 @@
-Return-Path: <netdev+bounces-174734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70CE0A60127
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 20:28:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AB61A6015E
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 20:38:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9F2516FBB8
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 19:28:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEB97421B02
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 19:38:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF9261F180F;
-	Thu, 13 Mar 2025 19:28:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB26A1F37C3;
+	Thu, 13 Mar 2025 19:38:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iUtSe4my"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BgePn02L"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5D711EBFE4;
-	Thu, 13 Mar 2025 19:28:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0E2A5464E;
+	Thu, 13 Mar 2025 19:38:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741894101; cv=none; b=WywuQ2V99GPmhQNb6wW38u8cs6zIo6mG4wn146Y8xinIqI16l4J/UJe96Ow9JciVpOenjwIJPLkverR+M28ebgVTZoIeENOGoJtam2QvRWIFZ1c2K6t0SkWz20UVleaUEKe5ba7BMxbOrE4Z942/QRgAu/xnicKan0VMpYhzbJA=
+	t=1741894716; cv=none; b=KOGM3A4X474Qpdhvul1uz3y5Rn6EL05cRgmZw2KtTDbIIW5qxa/pOCymPAs47Frmydz3U9v++YlPFcuH4XOAcEDBs0ZIYJMavDHfnv46UJtBKZAs0yqNnJAU6WYUsugXR6l2cAVdyUYWgbCcCk4x6QogClOHNBCMG5hfBsSIjMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741894101; c=relaxed/simple;
-	bh=wzIoQJtHCqxE4qs11KQvAnWfL5PmdENT7fo1OQLfH4A=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=tuOqP6ZjKw+hW7PSq69mNNGsjUR0/kDA0aJ67Uskl0OFFebgF+507sZTlAmWBHJglTBIslGG6uNdkxoiqoHqJbK+3anlIhZvaK7aNSyzAA71GcrHVD60dj244BJqWdjxtAE6d1ylLXM4Q6s9+4IcMG+wRehkZ8iR0r75BzLziOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iUtSe4my; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E98A9C4CEDD;
-	Thu, 13 Mar 2025 19:28:19 +0000 (UTC)
+	s=arc-20240116; t=1741894716; c=relaxed/simple;
+	bh=PJN9kuJafuaBlwl0mjM0aRG/llBd01Ca0mxiWYCJ1xE=;
+	h=Message-ID:Content-Type:MIME-Version:In-Reply-To:References:
+	 Subject:From:Cc:To:Date; b=XMsCyITj6OEzBAMboM1eVHrGrnQjFqAG2MiGVFQ4DTUKsGPzUPoBHfclLNyl7cXOJxGZortzU6d3A9dZ83evU6MMWN6cfVyiL80XVkdSQM82mEKubsYeHsz3klG8DilGWddevAQ5BVucKGE7GuqVT4wlq4wm92rE0WWmqy/ad30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BgePn02L; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08813C4CEDD;
+	Thu, 13 Mar 2025 19:38:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741894100;
-	bh=wzIoQJtHCqxE4qs11KQvAnWfL5PmdENT7fo1OQLfH4A=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=iUtSe4my3gvYGNNc+KrebP1DPw+7ew2PB5ujx0hqNkyD2606hnFc5JVqsHNpJZB2F
-	 ve/yj7r9fJoZdb/99nuuirii1Vzi1a+w4erTRj0X1CS6pQ4gt3zRekx52VWKfZ2AzI
-	 bHRPJB82KU6f8H4C9713Q5x60qB7Lxc0/WMK9jXvNiL4b+K/C0pWckwXokqlm31aLp
-	 Ly3RqYr9Zwb0nYnXcVqy5ST2/35fTlI/YIVUHjrqjlu8fPQcO9E3QMMxzqdQaEDXEd
-	 fgYbirpA+9FUt4StdAOmqu9cPip/zNtGgpUfW7sWzad8srqEH6ofS7IlT3KDb0QXQm
-	 0oupul/R4DNVQ==
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id A093E18FA889; Thu, 13 Mar 2025 20:28:06 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- netdev@vger.kernel.org, bpf@vger.kernel.org
-Cc: Ricardo =?utf-8?Q?Ca=C3=B1uelo?= Navarro <rcn@igalia.com>, Alexei
- Starovoitov
- <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, John
- Fastabend <john.fastabend@gmail.com>, Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [RFC] Use after free in BPF/ XDP during XDP_REDIRECT
-In-Reply-To: <20250313183911.SPAmGLyw@linutronix.de>
-References: <20250313183911.SPAmGLyw@linutronix.de>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Thu, 13 Mar 2025 20:28:06 +0100
-Message-ID: <87ecz0u3w9.fsf@toke.dk>
+	s=k20201202; t=1741894716;
+	bh=PJN9kuJafuaBlwl0mjM0aRG/llBd01Ca0mxiWYCJ1xE=;
+	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
+	b=BgePn02L7ieIWEOaT7+/eexPFW7pLTaLtdJF3ZTkBUzL2vwOwFJvLR9ARKMyfaoZS
+	 IfaOCBDlEM7pRKTB4t0kzLU/Yv1jP8MimRiq413dQIavNlrQbqQ/MjGqL9d+ouVBpi
+	 xl+ZKqfSMK6NyeZfb9Z5fpsI9pKmdqT+unXOdileCflox+Y93kiP2hCXK34kZTGxs9
+	 9u5ZyOK63DEIa0uEuyWp68kfiIQ4akwd9iZ1ekEwgl/5kZUzcmTKLHjJwIB6GozQeS
+	 T0gnGDXOj+s1fvdTcIx0WVsOCXPUFtbaS/sALs/CMm2kmHk8ZyTN6FgS7P/aruJ3mx
+	 3uW+VL+fR8oiQ==
+Message-ID: <be795c50ef61765784426b4b0fafd17b.sboyd@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <ih7hu6nyn3n4bntwljzo4suby5klxxj4vs76e57qmw65vujctw@khgo3qbgllio>
+References: <20250226232320.93791-1-inochiama@gmail.com> <20250226232320.93791-3-inochiama@gmail.com> <aab786e8c168a6cb22886e28c5805e7d.sboyd@kernel.org> <ih7hu6nyn3n4bntwljzo4suby5klxxj4vs76e57qmw65vujctw@khgo3qbgllio>
+Subject: Re: [PATCH v3 2/2] clk: sophgo: Add clock controller support for SG2044 SoC
+From: Stephen Boyd <sboyd@kernel.org>
+Cc: linux-clk@vger.kernel.org, devicetree@vger.kernel.org, sophgo@lists.linux.dev, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>
+To: Chen Wang <unicorn_wang@outlook.com>, Conor Dooley <conor+dt@kernel.org>, Inochi Amaoto <inochiama@gmail.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Michael Turquette <mturquette@baylibre.com>, Richard Cochran <richardcochran@gmail.com>, Rob Herring <robh@kernel.org>
+Date: Thu, 13 Mar 2025 12:38:33 -0700
+User-Agent: alot/0.12.dev8+g17a99a841c4b
 
-Sebastian Andrzej Siewior <bigeasy@linutronix.de> writes:
+Quoting Inochi Amaoto (2025-03-11 18:01:54)
+> On Tue, Mar 11, 2025 at 12:23:35PM -0700, Stephen Boyd wrote:
+> > Quoting Inochi Amaoto (2025-02-26 15:23:19)
+> > > diff --git a/drivers/clk/sophgo/clk-sg2044.c b/drivers/clk/sophgo/clk=
+-sg2044.c
+> > > new file mode 100644
+> > > index 000000000000..b4c15746de77
+> > > --- /dev/null
+> > > @@ -0,0 +1,2271 @@
+> > > +// SPDX-License-Identifier: GPL-2.0
+> > > +/*
+> > > + * Sophgo SG2042 clock controller Driver
+[...]
+> > > +};
+> > > +
+> > > +static struct sg2044_clk_common *sg2044_gate_commons[] =3D {
+> >=20
+> > Can these arrays be const?
+> >=20
+>=20
+> It can not be, we need a non const clk_hw to register. It is=20
+> defined in this structure. Although these array can be set as
+> "struct sg2044_clk_common * const", but I think this is kind
+> of meaningless.
 
-> Hi,
->
-> Ricardo reported a KASAN related use after free
-> 	https://lore.kernel.org/all/20250226-20250204-kasan-slab-use-after-free-read-in-dev_map_enqueue__submit-v3-0-360efec441ba@igalia.com/
->
-> in v6.6 stable and suggest a backport of commits
-> 	401cb7dae8130 ("net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.")
-> 	fecef4cd42c68 ("tun: Assign missing bpf_net_context.")
-> 	9da49aa80d686 ("tun: Add missing bpf_net_ctx_clear() in do_xdp_generic()")
->
-> as a fix. In the meantime I have the syz reproducer+config and was able
-> to investigate.
-> It looks as if the syzbot starts a BPF program via xdp_test_run_batch()
-> which assigns ri->tgt_value via dev_hash_map_redirect() and the return code
-> isn't XDP_REDIRECT it looks like nonsense. So the print in
-> bpf_warn_invalid_xdp_action() appears once. Everything goes as planned.
-> Then the TUN driver runs another BPF program which returns XDP_REDIRECT
-> without setting ri->tgt_value. This appears to be a trick because it
-> invoked bpf_trace_printk() which printed four characters. Anyway, this
-> is enough to get xdp_do_redirect() going.
->
-> The commits in questions do fix it because the bpf_redirect_info becomes
-> not only per-task but gets invalidated after the XDP context is left.
->
-> Now that I understand it I would suggest something smaller instead as a
-> stable fix, (instead the proposed patches). Any objections to the
-> following:
->
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index be313928d272..1d906b7a541d 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -9000,8 +9000,12 @@ static bool xdp_is_valid_access(int off, int size,
->  
->  void bpf_warn_invalid_xdp_action(struct net_device *dev, struct bpf_prog *prog, u32 act)
->  {
-> +	struct bpf_redirect_info *ri = this_cpu_ptr(&bpf_redirect_info);
->  	const u32 act_max = XDP_REDIRECT;
->  
-> +	ri->map_id = INT_MAX;
-> +	ri->map_type = BPF_MAP_TYPE_UNSPEC;
-> +
->  	pr_warn_once("%s XDP return value %u on prog %s (id %d) dev %s, expect packet loss!\n",
->  		     act > act_max ? "Illegal" : "Driver unsupported",
->  		     act, prog->aux->name, prog->aux->id, dev ? dev->name : "N/A");
-
-From your description above, this will fix the particular error
-encountered, but what happens if the initial return code is not in fact
-nonsense (so the warn_invalid_action) is not triggered?
-
-I.e.,
-
-bpf_redirect_map(...);
-return XDP_DROP;
-
-would still leave ri->map_id and ri->map_type set for the later tun
-driver invocation, no?
-
--Toke
+Can't the array of pointers can be const so that it lives in RO memory?
 
