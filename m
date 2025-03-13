@@ -1,133 +1,131 @@
-Return-Path: <netdev+bounces-174773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5876A6048A
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 23:40:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 275E8A60499
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 23:44:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 331203BB73F
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 22:40:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 660E3179C41
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 22:44:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 698371F866A;
-	Thu, 13 Mar 2025 22:40:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E791F790F;
+	Thu, 13 Mar 2025 22:44:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XBYJJp8C"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="bxouhzuz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4811F790F;
-	Thu, 13 Mar 2025 22:40:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D62B21F426F;
+	Thu, 13 Mar 2025 22:44:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741905610; cv=none; b=lec+axKACEiFJL0xbR6as9Z4qdaScitiQsGlC0KvyVyrqJPinGZFoDGNdESHIQpmMv3Ykn41NA2x+ftZDFD7bAn6E//jyXYmkhPxpo0RXVi08WmxrUm3IloRgVUL9Q8vHtQmGJW2EZtEnzH3EPmrHwN1pr07pcpW1kY3PSIiTY8=
+	t=1741905873; cv=none; b=RNo4syAp04moNjYheSXAT+XVcqza4c6BkGPVDAvyya3Nu8hYHeyeo9/3ZxY+5l6zm8SaWdV2bqlzh5HG/ZMrb+RnDVe4T9yr13zV6a0e6FTiPs5Cyx15qbqLESBxl2+uhEaTRxOdYjwy2hKB4ZHCRd3SFPUr/1s1ykJb/22slK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741905610; c=relaxed/simple;
-	bh=bS4CPM4fAMakSodjoDheMW0OvhLE7InEn2vXq7j2aQ4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tqQHg3qXhclec9IofIyQJjeMIAyHwNOXP2r0LshCY2KpvmFTRld4zZT+lB9nyvxwunh5wc1assNubZVHfO0TI7Cfs82pZ5cPrWYm8jwr+ZTieJbQcvVy84s8NsAz6zs9IvvzpkSTOYgxSfTQ+92L1IXC522kOX1G0xy4qfV964M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XBYJJp8C; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7c554d7dc2aso227631285a.3;
-        Thu, 13 Mar 2025 15:40:07 -0700 (PDT)
+	s=arc-20240116; t=1741905873; c=relaxed/simple;
+	bh=MxRtD3K0VYD0WwkRDlCQHlSfNJ6Mekz5X2R3NT5flNg=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=d7Xq80Pa4jnFbN87G0YLZaoB7wWeQEZ9JsMGi97YwTQgkZ6aSirqRhV0OByWq4UcIUTQYVtd6m7uBOCaaQGbTmqL9gkJqxWmOAAnMtwMAafgdjzzmMupRq7XBrcd0zET+yv27uAPFPixRl6GhxZDYkNW3H+d/mh4uLIvSo+KVyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=bxouhzuz; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741905607; x=1742510407; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5MrpFY5DFdMA1Rw40JG71PEizmZhwbVE0ADaSH1zQRU=;
-        b=XBYJJp8CVmaonQZAl6f9CxUnQWi2DTUvNXTiXfMf483jRkxUuTyHEiJEDmmZ6jdOuU
-         vvcOmaXuPGjCtw6B9Zbb8JGcwyENsmbOX/34xc6GHHSfcIAyS6e7PHH4D2BqNyy1CTue
-         O8XVl0fvYrRltvZDnkjZ8maDkNjB5b3lMfwCz1Yn/Y5XOAwosAuyvz7oOrgCJb435l6e
-         5xboCG4ME+7zEzgHwj0wPkY+0OIBs5njw0j0bLEkgFCvhPqaqsatyENtdMR534qDZEct
-         UufbFJ+cXKJOSCkcmL7gPog/pFuoXjTduKNt5ImMM/onjAL2LeKszHdiw5OchZ51Dcsx
-         Qnbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741905607; x=1742510407;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5MrpFY5DFdMA1Rw40JG71PEizmZhwbVE0ADaSH1zQRU=;
-        b=Aq8YTehjWEXZ8b7FzFgJfIVPzea1zgpJB0lqIH4w8XxpH313vvYuFyDGAxkh5Iclhv
-         WKcbnK9xW39kZLIJkZcXQCCBl9IVPSlQk0g7frYEXp8JvCHY9I3fsz2HY630PL6fSz0s
-         VcUQC2/tV2yEnI9y7k2oMkEUHDeQmcdyZHgnohR30NQTc/BKewV6eGGsyfDkGfqKaYdb
-         4dA3jFm7DxXGC2G9YyAT+qsFFv+p1sYNauAGd+PkOrmCbmOxcqG7G+HxWRnWUJQqxVo/
-         f0T+quAud/CvY8DnuspmsJAjNu5S9MR9zDre9aU14NF9kxJ5g7k69hgJ5wUpDzzTx3Yo
-         lxZg==
-X-Forwarded-Encrypted: i=1; AJvYcCVmJGcIm1zLy8C3T55an6as1AQYYcSqea917wsnx0K0i4GBO5C02nWpC6cKAGQvHMHbbRShRDWQ@vger.kernel.org, AJvYcCX8QVyjihjwkqye+O8GpbLgLvzJommOUzOomUenICLWHyaJGzwZTNvCGiYx6XdqsYyyOIpwox7nj4Ch@vger.kernel.org, AJvYcCXaGl9qB9LqYMBaI+lhQgMyIZjG4mTgQb2ITXwXBKadkbWOXlkpITDaTPxUqINoApbEsm+1dIyLGf8yxjjK@vger.kernel.org
-X-Gm-Message-State: AOJu0YyaLVBJu8K9mOBCgzu/lxANSu5FebY4Sw5geEex+LRhqve5TX6I
-	/lFF8Uz38VnM+SoC+AQt5fI2qEac/AeSu6zGRhf9N5ujf4JLWcng
-X-Gm-Gg: ASbGncuNqhTWxCtS7fsROtAsPVZdBRIfJLjOJzBQeb7rAfao8N9ZpsOYfZsSdDMgz+X
-	I7GArzHWJakelaZeqHvYwyNgybaSm5qsH7jXPnJDGvb+Q9kSswgoB2i3Cw1qf//R8sDgSkatiQY
-	zSpQ1/o4V6HG2R9vpyqN9IeJbSmfKEwrJnym0ttrhn6MxkGRvuva+X9m6Ae77a0Bx9gOxoTMZqM
-	M4I4c/Ob/yUPzAnuBsarJ+zD/TacSJoGGLQ5jZZb5QT+6nskn5WD2F45azfCmro3c0yhuVPbm8o
-	+pS26DSElvJCgjNYFfbZ
-X-Google-Smtp-Source: AGHT+IFRhA2NQTGrZIFmt7j5wHuvu1fLNd//sE55p9iAYnjLfff55St6JmFducqntDUIBkITMbvCLw==
-X-Received: by 2002:a05:620a:2727:b0:7c5:4de8:bf65 with SMTP id af79cd13be357-7c57c8f8fadmr13878585a.36.1741905607080;
-        Thu, 13 Mar 2025 15:40:07 -0700 (PDT)
-Received: from localhost ([2001:da8:7001:11::cb])
-        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7c573d6fb8fsm154595985a.72.2025.03.13.15.40.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Mar 2025 15:40:06 -0700 (PDT)
-Date: Fri, 14 Mar 2025 06:39:56 +0800
-From: Inochi Amaoto <inochiama@gmail.com>
-To: Stephen Boyd <sboyd@kernel.org>, Chen Wang <unicorn_wang@outlook.com>, 
-	Conor Dooley <conor+dt@kernel.org>, Inochi Amaoto <inochiama@gmail.com>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Michael Turquette <mturquette@baylibre.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Rob Herring <robh@kernel.org>
-Cc: linux-clk@vger.kernel.org, devicetree@vger.kernel.org, 
-	sophgo@lists.linux.dev, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>
-Subject: Re: [PATCH v3 2/2] clk: sophgo: Add clock controller support for
- SG2044 SoC
-Message-ID: <3pgh622n6mnh63ih2olzmmcmqgxewpaumrqh6eeq3w6uobuiwy@cm7jxdkmle5u>
-References: <20250226232320.93791-1-inochiama@gmail.com>
- <20250226232320.93791-3-inochiama@gmail.com>
- <aab786e8c168a6cb22886e28c5805e7d.sboyd@kernel.org>
- <ih7hu6nyn3n4bntwljzo4suby5klxxj4vs76e57qmw65vujctw@khgo3qbgllio>
- <be795c50ef61765784426b4b0fafd17b.sboyd@kernel.org>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1741905872; x=1773441872;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=u0qX6UC7IOIJfm7M210IpWYiJIykCaspPvAT0hqf9Vs=;
+  b=bxouhzuzcFIbW8B5753FtckYSfDm/tRyzJQMtD6Uu48o1s0NBjR+fpGR
+   K4gXggBcNhPLkLW7DeVmYRheN0LX0LLxATnYhB3iiNrlPgRwk5it50Gcl
+   K9DIeSUQjqYpuAP7LacDjUNdPwyNG+9Qv5hPgcBCWifHZ9Z/fwTpo9wwo
+   E=;
+X-IronPort-AV: E=Sophos;i="6.14,245,1736812800"; 
+   d="scan'208";a="480264924"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 22:44:27 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:2568]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.18.34:2525] with esmtp (Farcaster)
+ id c2f65031-ac34-44fe-9948-982f3bb7760f; Thu, 13 Mar 2025 22:44:26 +0000 (UTC)
+X-Farcaster-Flow-ID: c2f65031-ac34-44fe-9948-982f3bb7760f
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 13 Mar 2025 22:44:26 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.142.242.222) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 13 Mar 2025 22:44:23 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kangyan91@outlook.com>
+CC: <aleksander.lobakin@intel.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <florian.fainelli@broadcom.com>, <horms@kernel.org>,
+	<kory.maincent@bootlin.com>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <syzkaller@googlegroups.com>
+Subject: Re: unregister_netdevice: waiting for DEV to become free [unbalanced refcount bug in dev_ifsioc]
+Date: Thu, 13 Mar 2025 15:44:06 -0700
+Message-ID: <20250313224415.60894-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <SY8P300MB0421225D54EB92762AE8F0F2A1D32@SY8P300MB0421.AUSP300.PROD.OUTLOOK.COM>
+References: <SY8P300MB0421225D54EB92762AE8F0F2A1D32@SY8P300MB0421.AUSP300.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <be795c50ef61765784426b4b0fafd17b.sboyd@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D038UWC003.ant.amazon.com (10.13.139.209) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, Mar 13, 2025 at 12:38:33PM -0700, Stephen Boyd wrote:
-> Quoting Inochi Amaoto (2025-03-11 18:01:54)
-> > On Tue, Mar 11, 2025 at 12:23:35PM -0700, Stephen Boyd wrote:
-> > > Quoting Inochi Amaoto (2025-02-26 15:23:19)
-> > > > diff --git a/drivers/clk/sophgo/clk-sg2044.c b/drivers/clk/sophgo/clk-sg2044.c
-> > > > new file mode 100644
-> > > > index 000000000000..b4c15746de77
-> > > > --- /dev/null
-> > > > @@ -0,0 +1,2271 @@
-> > > > +// SPDX-License-Identifier: GPL-2.0
-> > > > +/*
-> > > > + * Sophgo SG2042 clock controller Driver
-> [...]
-> > > > +};
-> > > > +
-> > > > +static struct sg2044_clk_common *sg2044_gate_commons[] = {
-> > > 
-> > > Can these arrays be const?
-> > > 
-> > 
-> > It can not be, we need a non const clk_hw to register. It is 
-> > defined in this structure. Although these array can be set as
-> > "struct sg2044_clk_common * const", but I think this is kind
-> > of meaningless.
-> 
-> Can't the array of pointers can be const so that it lives in RO memory?
+From: YAN KANG <kangyan91@outlook.com>
+Date: Thu, 13 Mar 2025 16:18:22 +0000
+> I have repro to trigger it.
 
-Yeah, it can. I forgot this can also be set as RO. It is OK for me
-to fix that.
+FTR, I think the attached prog is not a repro by itself.
 
-Regards,
-Inochi
+> ...
+>
+> Syzkaller reproducer:
+> # {Threaded:false Repeat:true RepeatTimes:0 Procs:4 Slowdown:1 Sandbox: SandboxArg:0 Leak:false NetInjection:false NetDevices:false NetReset:false
+
+This syz prog does not unshare() nor create necessary devices.
+Someone must create a bridge and another device.
+
+
+> r0 = syz_init_net_socket$nl_generic(0x10, 0x3, 0x10)
+> ioctl$sock_SIOCGIFINDEX_802154(r0, 0x89a2, &(0x7f0000000a80)={'wpan3\x00'})
+> r1 = syz_init_net_socket$nl_generic(0x10, 0x3, 0x10)
+> ioctl$sock_SIOCGIFINDEX_802154(r1, 0x89a0, &(0x7f0000000a80)={'wpan3\x00'})
+> r2 = syz_init_net_socket$nl_generic(0x10, 0x3, 0x10)
+> ioctl$sock_SIOCGIFINDEX_802154(r2, 0x89a1, &(0x7f0000000a80)={'wpan3\x00'})
+
+0x89a1 is SIOCBRDELBR, and wpan3 is the name of the bridge dev, which
+looks correct from this line.
+
+> unregister_netdevice: waiting for wpan3 to become free. Usage count = 2
+
+But apparently SIOCBRDELIF (0x89a3) is missing in the repro, so
+there must be another prog running that adds and removes a dev
+to wpan3.
+
+When you share a repro, please make sure it's standalone.
+
+
+> I GET backtrace for panic by gdb
+> (gdb) bt
+> #0  netdev_wait_allrefs_any (list=0xffffc9001bfa7bc8) at net/core/dev.c:11151
+
+Also, this should not panic.
+
+Under RTNL pressure, the SIOCBRDELIF's thread may not be able to acquire
+RTNL and complete SIOCBRDELIF, then netdev_wait_allrefs_any() will log the
+message but it's not under RTNL.  Once the SIOCBRDELIF's thread acquire
+RTNL, the refcnt will be released soon and __rtnl_unlock() will be
+unblocked.
+
+Thanks
 
