@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-174705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74926A5FF2D
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 19:27:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05403A5FF32
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 19:28:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B34EC19C2344
-	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 18:27:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37C9219C3279
+	for <lists+netdev@lfdr.de>; Thu, 13 Mar 2025 18:28:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 435741F239B;
-	Thu, 13 Mar 2025 18:26:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB9201F3BA2;
+	Thu, 13 Mar 2025 18:27:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="QCp0Kh97"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="KLd7yoic"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F4C81F03D1;
-	Thu, 13 Mar 2025 18:26:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E10B1F1507;
+	Thu, 13 Mar 2025 18:26:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741890419; cv=none; b=dL18VK2YXEb/cd0uV99gIq+yo8qN9lDu9ZE/QxZ4RfSvT4yUg8hhqXcdI2sAE70JuM8aOl260G4/BBcfKrg/68tWMSmYQhjBv0tBgYxWXEGvgizyD1S//I59l2T+GpDhr0TgpHuvWNjNBAIcQ39z0IVVOtSrwo1unhW1R/IRIqA=
+	t=1741890420; cv=none; b=fimIDppiafO/4Rse7J8otjI1BsBJhh8G0j3GNRxVSpuZxXVD5fP57o4TvtWEGxlbFTmYPrzLOVi/QDWP2LqRpY6ZrwhPuGLoS9Zi7ucpQIzqIJMD5qZMUsTjCAWRROm6C77HCRme81vVjo1sg4NKJqgGbVS0KY0Yv47ZxKEZKm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741890419; c=relaxed/simple;
-	bh=zSHp2s2RWp1zc36h9jicWQ3maZMsIrIz4IOdHFbX0WI=;
+	s=arc-20240116; t=1741890420; c=relaxed/simple;
+	bh=LYYlIPx9W/fvbTLHpZYnQz/huW6I0b376Hacl6g0WFY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K8pHlLfPESkUKt3axYazNERMHL2xyC658/xO2B2geNPAQ4gQUwqtQo7326wmZT0gq9wB9RvWk27X9eqB3Bkb/VY4WkW/4GpqaRvUa1H8WSNiHCU5ABNZlpO0ON/AZGKTH5hx9Nckowl35IPuJplB0yh3JclgiSefmZ80YyqnwYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=QCp0Kh97; arc=none smtp.client-ip=217.70.183.195
+	 MIME-Version; b=F9c+dTreuMFTbyNtRwa1WGMSaeSqyMtn/x6+da52r7I6japw1HAz6OBav8JKQhKwbb6irE3yKy99KhXk7lJ7Uwt980MIuYHfJS6gCi4gWfZXGatdVyl4Jd3FB7gVW/dWs9jDZ3qPgnML/0OMYMfoXJPRTYUGP3zxzOh2b5Of/YQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=KLd7yoic; arc=none smtp.client-ip=217.70.183.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 5BB0A20482;
-	Thu, 13 Mar 2025 18:26:54 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 83267204D0;
+	Thu, 13 Mar 2025 18:26:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1741890415;
+	t=1741890416;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CeG3Jdmr+lZNVf40XxjCsp44vRCTlz+2wyIgPkpcb8A=;
-	b=QCp0Kh97l8IN/TqgwgOH7y+UeEGIayoPRelNpLSikR5xk/XHd4EMHL+OrSdJ4HkxU/c7Te
-	1wYRL8MnxNgyhZ0zlTVkkzHbrDqSDSYOvAXqC/viDfTkkOQ+YkiDJJeYNRBLetxj0zakom
-	xNcly4kLokIlAUpWG3iw9SU2zqsa+P4c9TyuGaM+wXgIJHvaBz8FdrE3qgjeJsoYrAHF21
-	DH6YFLluIc4FhKvytxfCETi3fRfnwdRMEi0Od4dyfI9Tt309VzOJhwidDSE4LSlp2b/89f
-	GnLCWBkBXLIgRXgWe2GZGAYZ5RdPZyp9ZTpFfCz8kHDwW/VVHC1BzSlkNNoufw==
+	bh=tAZ5cL1SfrjA7Y0umyPN+UK00JHcs/16+CpAWe19s+o=;
+	b=KLd7yoic/Vzc8ypq4AeHKcb2zBeiokXqDYF58ByZtSNH0nrJNSizZKq+zsbBtBTJW/K2ta
+	l2k0mhSNscBhiS572vDspuiHAVoJE9Y1KOBiqdIj3kcx1A6EOJ8d2UyURV+03lG0pJsQF6
+	NNQ0YMIeRyEpX96LU6AXI0fjF40SOdgNOakyHADv/ic5KYkkxroblSfp1NBdLzYTlmTWHK
+	MBuANmSP4tsSfIShIgpKjqsptzkN50kL/lwTwoOCayQFNidcYJgSx27vYAmIlssjgjHIJL
+	qyv62j6su38LhdAYm8UtqJqGtXxXWWoj/iMfKfiPMG1x/LEAZitva36e8z+uPw==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -67,9 +67,9 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Simon Horman <horms@kernel.org>,
 	Romain Gantois <romain.gantois@bootlin.com>,
 	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>
-Subject: [PATCH net-next v3 4/7] net: ethtool: netlink: Introduce per-phy DUMP helpers
-Date: Thu, 13 Mar 2025 19:26:43 +0100
-Message-ID: <20250313182647.250007-5-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next v3 5/7] net: ethtool: phy: Convert the PHY_GET command to generic phy dump
+Date: Thu, 13 Mar 2025 19:26:44 +0100
+Message-ID: <20250313182647.250007-6-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250313182647.250007-1-maxime.chevallier@bootlin.com>
 References: <20250313182647.250007-1-maxime.chevallier@bootlin.com>
@@ -82,133 +82,474 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-State: clean
 X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduvdekieejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepveegtdffleffleevueellefgjeefvedvjefhheegfefgffdvfeetgeevudetffdtnecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgepvdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdqvddrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvddupdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguu
- hhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduvdekieejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepvddtueefvdfhiefgieelfeeggeefiedvueevkedttddvffekleeujedtjeeuteehnecuffhomhgrihhnpegsrghsvgdruggvvhenucfkphepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejpdhhvghlohepfhgvughorhgrqddvrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvuddprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrn
+ hgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
 X-GND-Sasl: maxime.chevallier@bootlin.com
 
-As there are multiple ethnl commands that report messages based on
-phy_device information, let's introduce a set of ethnl generic dump
-helpers to allow DUMP support for each PHY on a given netdev.
+Now that we have an infrastructure in ethnl for perphy DUMPs, we can get
+rid of the custom ->doit and ->dumpit to deal with PHY listing commands.
 
-This logic iterates over the phy_link_topology of each netdev (or a
-single netdev for filtered DUMP), and call ethnl_default_dump_one() with
-the req_info populated with ifindex + phyindex.
-
-This allows re-using all the existing infra for phy-targetting commands
-that already use ethnl generic helpers.
+As most of the code was custom, this basically means re-writing how we
+deal with PHY listing.
 
 Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
- net/ethtool/netlink.c | 78 +++++++++++++++++++++++++++++++++++++++++++
- net/ethtool/netlink.h |  6 ++++
- 2 files changed, 84 insertions(+)
+ net/ethtool/netlink.c |   9 +-
+ net/ethtool/netlink.h |   4 -
+ net/ethtool/phy.c     | 344 ++++++++++++------------------------------
+ 3 files changed, 105 insertions(+), 252 deletions(-)
 
 diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
-index 2dc6086e1ab5..821bc8b99306 100644
+index 821bc8b99306..b32ddfe7cf88 100644
 --- a/net/ethtool/netlink.c
 +++ b/net/ethtool/netlink.c
-@@ -560,6 +560,84 @@ static int ethnl_default_dump_one(struct sk_buff *skb,
- 	return ret;
- }
- 
-+/* Specific context for phy-targeting command DUMP operatins. We keep in context
-+ * the latest phy_index we dumped, in case of an interrupted DUMP.
-+ */
-+struct ethnl_dump_ctx_perphy {
-+	unsigned long phy_index;
-+};
-+
-+/**
-+ * ethnl_dump_start_perphy() - Initialise a dump for PHY cmds
-+ * @ctx: Generic ethnl dump context whose cmd_ctx will be initialized
-+ *
-+ * Initializes a dump context for ethnl commands that may return
-+ * one message per PHY on a single netdev.
-+ *
-+ * Returns: 0 for success, a negative value for errors.
-+ */
-+int ethnl_dump_start_perphy(struct ethnl_dump_ctx *ctx)
-+{
-+	struct ethnl_dump_ctx_perphy *dump_ctx;
-+
-+	dump_ctx = kzalloc(sizeof(*dump_ctx), GFP_KERNEL);
-+	if (!dump_ctx)
-+		return -ENOMEM;
-+
-+	ctx->cmd_ctx = dump_ctx;
-+
-+	return 0;
-+}
-+
-+/**
-+ * ethnl_dump_done_perphy() - Releases the per-phy dump context
-+ * @ctx: Generic ethnl dump context whose cmd_ctx will be released
-+ */
-+void ethnl_dump_done_perphy(struct ethnl_dump_ctx *ctx)
-+{
-+	kfree(ctx->cmd_ctx);
-+}
-+
-+/**
-+ * ethnl_dump_one_dev_perphy() - Dump all PHY-related messages for one netdev
-+ * @skb: skb containing the DUMP result
-+ * @ctx: Dump context. Will be kept across the DUMP operation.
-+ * @info: Genl receive info
-+ *
-+ * Some commands are related to PHY devices attached to netdevs. As there may be
-+ * multiple PHYs, this DUMP handler will populate the reply with one message per
-+ * PHY on a single netdev.
-+ *
-+ * Returns: 0 for success or when nothing to do, a negative value otherwise.
-+ */
-+int ethnl_dump_one_dev_perphy(struct sk_buff *skb,
-+			      struct ethnl_dump_ctx *ctx,
-+			      const struct genl_info *info)
-+{
-+	struct ethnl_dump_ctx_perphy *dump_ctx = ctx->cmd_ctx;
-+	struct net_device *dev = ctx->reply_data->dev;
-+	struct phy_device_node *pdn;
-+	int ret = 0;
-+
-+	if (!dev->link_topo)
-+		return 0;
-+
-+	xa_for_each_start(&dev->link_topo->phys, dump_ctx->phy_index,
-+			  pdn, dump_ctx->phy_index) {
-+		ctx->req_info->phy_index = dump_ctx->phy_index;
-+
-+		/* We can re-use the original dump_one as ->prepare_data in
-+		 * commands use ethnl_req_get_phydev(), which gets the PHY from
-+		 * what's in req_info
-+		 */
-+		ret = ethnl_default_dump_one(skb, ctx, info);
-+		if (ret)
-+			break;
-+	}
-+
-+	return ret;
-+}
-+
- static int ethnl_default_dump_one_dev(struct sk_buff *skb, struct net_device *dev,
- 				      struct ethnl_dump_ctx *ctx,
- 				      const struct genl_info *info)
-diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
-index 79fe98190c64..530a9b5c8b39 100644
---- a/net/ethtool/netlink.h
-+++ b/net/ethtool/netlink.h
-@@ -327,6 +327,12 @@ struct ethnl_dump_ctx {
- 	void				*cmd_ctx;
+@@ -382,6 +382,7 @@ ethnl_default_requests[__ETHTOOL_MSG_USER_CNT] = {
+ 	[ETHTOOL_MSG_MM_SET]		= &ethnl_mm_request_ops,
+ 	[ETHTOOL_MSG_TSCONFIG_GET]	= &ethnl_tsconfig_request_ops,
+ 	[ETHTOOL_MSG_TSCONFIG_SET]	= &ethnl_tsconfig_request_ops,
++	[ETHTOOL_MSG_PHY_GET]		= &ethnl_phy_request_ops,
  };
  
-+/* Generic callbacks to be used by PHY targeting commands */
-+int ethnl_dump_start_perphy(struct ethnl_dump_ctx *ctx);
-+int ethnl_dump_one_dev_perphy(struct sk_buff *skb, struct ethnl_dump_ctx *ctx,
-+			      const struct genl_info *info);
-+void ethnl_dump_done_perphy(struct ethnl_dump_ctx *ctx);
-+
- int ethnl_ops_begin(struct net_device *dev);
- void ethnl_ops_complete(struct net_device *dev);
+ static struct ethnl_dump_ctx *ethnl_dump_context(struct netlink_callback *cb)
+@@ -1374,10 +1375,10 @@ static const struct genl_ops ethtool_genl_ops[] = {
+ 	},
+ 	{
+ 		.cmd	= ETHTOOL_MSG_PHY_GET,
+-		.doit	= ethnl_phy_doit,
+-		.start	= ethnl_phy_start,
+-		.dumpit	= ethnl_phy_dumpit,
+-		.done	= ethnl_phy_done,
++		.doit	= ethnl_default_doit,
++		.start	= ethnl_default_start,
++		.dumpit	= ethnl_default_dumpit,
++		.done	= ethnl_default_done,
+ 		.policy = ethnl_phy_get_policy,
+ 		.maxattr = ARRAY_SIZE(ethnl_phy_get_policy) - 1,
+ 	},
+diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
+index 530a9b5c8b39..60f16090640f 100644
+--- a/net/ethtool/netlink.h
++++ b/net/ethtool/netlink.h
+@@ -542,10 +542,6 @@ int ethnl_tunnel_info_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
+ int ethnl_act_module_fw_flash(struct sk_buff *skb, struct genl_info *info);
+ int ethnl_rss_dump_start(struct netlink_callback *cb);
+ int ethnl_rss_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
+-int ethnl_phy_start(struct netlink_callback *cb);
+-int ethnl_phy_doit(struct sk_buff *skb, struct genl_info *info);
+-int ethnl_phy_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
+-int ethnl_phy_done(struct netlink_callback *cb);
+ int ethnl_tsinfo_start(struct netlink_callback *cb);
+ int ethnl_tsinfo_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
+ int ethnl_tsinfo_done(struct netlink_callback *cb);
+diff --git a/net/ethtool/phy.c b/net/ethtool/phy.c
+index 1f590e8d75ed..88343fed7366 100644
+--- a/net/ethtool/phy.c
++++ b/net/ethtool/phy.c
+@@ -12,304 +12,160 @@
+ #include <net/netdev_lock.h>
  
+ struct phy_req_info {
+-	struct ethnl_req_info		base;
+-	struct phy_device_node		*pdn;
++	struct ethnl_req_info base;
+ };
+ 
+-#define PHY_REQINFO(__req_base) \
+-	container_of(__req_base, struct phy_req_info, base)
++struct phy_reply_data {
++	struct ethnl_reply_data	base;
++	u32 phyindex;
++	char *drvname;
++	char *name;
++	unsigned int upstream_type;
++	char *upstream_sfp_name;
++	unsigned int upstream_index;
++	char *downstream_sfp_name;
++};
++
++#define PHY_REPDATA(__reply_base) \
++	container_of(__reply_base, struct phy_reply_data, base)
+ 
+ const struct nla_policy ethnl_phy_get_policy[ETHTOOL_A_PHY_HEADER + 1] = {
+ 	[ETHTOOL_A_PHY_HEADER] = NLA_POLICY_NESTED(ethnl_header_policy),
+ };
+ 
+-/* Caller holds rtnl */
+-static ssize_t
+-ethnl_phy_reply_size(const struct ethnl_req_info *req_base,
+-		     struct netlink_ext_ack *extack)
++static int phy_reply_size(const struct ethnl_req_info *req_info,
++			  const struct ethnl_reply_data *reply_data)
+ {
+-	struct phy_req_info *req_info = PHY_REQINFO(req_base);
+-	struct phy_device_node *pdn = req_info->pdn;
+-	struct phy_device *phydev = pdn->phy;
++	struct phy_reply_data *rep_data = PHY_REPDATA(reply_data);
+ 	size_t size = 0;
+ 
+-	ASSERT_RTNL();
+-
+ 	/* ETHTOOL_A_PHY_INDEX */
+ 	size += nla_total_size(sizeof(u32));
+ 
+ 	/* ETHTOOL_A_DRVNAME */
+-	if (phydev->drv)
+-		size += nla_total_size(strlen(phydev->drv->name) + 1);
++	if (rep_data->drvname)
++		size += nla_total_size(strlen(rep_data->drvname) + 1);
+ 
+ 	/* ETHTOOL_A_NAME */
+-	size += nla_total_size(strlen(dev_name(&phydev->mdio.dev)) + 1);
++	size += nla_total_size(strlen(rep_data->name) + 1);
+ 
+ 	/* ETHTOOL_A_PHY_UPSTREAM_TYPE */
+ 	size += nla_total_size(sizeof(u32));
+ 
+-	if (phy_on_sfp(phydev)) {
+-		const char *upstream_sfp_name = sfp_get_name(pdn->parent_sfp_bus);
+-
+-		/* ETHTOOL_A_PHY_UPSTREAM_SFP_NAME */
+-		if (upstream_sfp_name)
+-			size += nla_total_size(strlen(upstream_sfp_name) + 1);
++	/* ETHTOOL_A_PHY_UPSTREAM_SFP_NAME */
++	if (rep_data->upstream_sfp_name)
++		size += nla_total_size(strlen(rep_data->upstream_sfp_name) + 1);
+ 
+-		/* ETHTOOL_A_PHY_UPSTREAM_INDEX */
++	/* ETHTOOL_A_PHY_UPSTREAM_INDEX */
++	if (rep_data->upstream_index)
+ 		size += nla_total_size(sizeof(u32));
+-	}
+ 
+ 	/* ETHTOOL_A_PHY_DOWNSTREAM_SFP_NAME */
+-	if (phydev->sfp_bus) {
+-		const char *sfp_name = sfp_get_name(phydev->sfp_bus);
+-
+-		if (sfp_name)
+-			size += nla_total_size(strlen(sfp_name) + 1);
+-	}
++	if (rep_data->downstream_sfp_name)
++		size += nla_total_size(strlen(rep_data->downstream_sfp_name) + 1);
+ 
+ 	return size;
+ }
+ 
+-static int
+-ethnl_phy_fill_reply(const struct ethnl_req_info *req_base, struct sk_buff *skb)
++static int phy_prepare_data(const struct ethnl_req_info *req_info,
++			    struct ethnl_reply_data *reply_data,
++			    const struct genl_info *info)
+ {
+-	struct phy_req_info *req_info = PHY_REQINFO(req_base);
+-	struct phy_device_node *pdn = req_info->pdn;
+-	struct phy_device *phydev = pdn->phy;
+-	enum phy_upstream ptype;
++	struct phy_link_topology *topo = reply_data->dev->link_topo;
++	struct phy_reply_data *rep_data = PHY_REPDATA(reply_data);
++	struct nlattr **tb = info->attrs;
++	struct phy_device_node *pdn;
++	struct phy_device *phydev;
+ 
+-	ptype = pdn->upstream_type;
++	/* RTNL is held by the caller */
++	phydev = ethnl_req_get_phydev(req_info, tb, ETHTOOL_A_PHY_HEADER,
++				      info->extack);
++	if (IS_ERR_OR_NULL(phydev))
++		return -EOPNOTSUPP;
+ 
+-	if (nla_put_u32(skb, ETHTOOL_A_PHY_INDEX, phydev->phyindex) ||
+-	    nla_put_string(skb, ETHTOOL_A_PHY_NAME, dev_name(&phydev->mdio.dev)) ||
+-	    nla_put_u32(skb, ETHTOOL_A_PHY_UPSTREAM_TYPE, ptype))
+-		return -EMSGSIZE;
++	pdn = xa_load(&topo->phys, phydev->phyindex);
++	if (!pdn)
++		return -EOPNOTSUPP;
+ 
+-	if (phydev->drv &&
+-	    nla_put_string(skb, ETHTOOL_A_PHY_DRVNAME, phydev->drv->name))
+-		return -EMSGSIZE;
++	rep_data->phyindex = phydev->phyindex;
++	rep_data->name = kstrdup(dev_name(&phydev->mdio.dev), GFP_KERNEL);
++	rep_data->drvname = kstrdup(phydev->drv->name, GFP_KERNEL);
++	rep_data->upstream_type = pdn->upstream_type;
+ 
+-	if (ptype == PHY_UPSTREAM_PHY) {
++	if (pdn->upstream_type == PHY_UPSTREAM_PHY) {
+ 		struct phy_device *upstream = pdn->upstream.phydev;
+-		const char *sfp_upstream_name;
+-
+-		/* Parent index */
+-		if (nla_put_u32(skb, ETHTOOL_A_PHY_UPSTREAM_INDEX, upstream->phyindex))
+-			return -EMSGSIZE;
+-
+-		if (pdn->parent_sfp_bus) {
+-			sfp_upstream_name = sfp_get_name(pdn->parent_sfp_bus);
+-			if (sfp_upstream_name &&
+-			    nla_put_string(skb, ETHTOOL_A_PHY_UPSTREAM_SFP_NAME,
+-					   sfp_upstream_name))
+-				return -EMSGSIZE;
+-		}
++		rep_data->upstream_index = upstream->phyindex;
+ 	}
+ 
+-	if (phydev->sfp_bus) {
+-		const char *sfp_name = sfp_get_name(phydev->sfp_bus);
++	if (pdn->parent_sfp_bus)
++		rep_data->upstream_sfp_name = kstrdup(sfp_get_name(pdn->parent_sfp_bus),
++						      GFP_KERNEL);
+ 
+-		if (sfp_name &&
+-		    nla_put_string(skb, ETHTOOL_A_PHY_DOWNSTREAM_SFP_NAME,
+-				   sfp_name))
+-			return -EMSGSIZE;
+-	}
++	if (phydev->sfp_bus)
++		rep_data->downstream_sfp_name = kstrdup(sfp_get_name(phydev->sfp_bus),
++							GFP_KERNEL);
+ 
+ 	return 0;
+ }
+ 
+-static int ethnl_phy_parse_request(struct ethnl_req_info *req_base,
+-				   struct nlattr **tb,
+-				   struct netlink_ext_ack *extack)
++static int phy_fill_reply(struct sk_buff *skb,
++			  const struct ethnl_req_info *req_info,
++			  const struct ethnl_reply_data *reply_data)
+ {
+-	struct phy_link_topology *topo = req_base->dev->link_topo;
+-	struct phy_req_info *req_info = PHY_REQINFO(req_base);
+-	struct phy_device *phydev;
+-
+-	phydev = ethnl_req_get_phydev(req_base, tb, ETHTOOL_A_PHY_HEADER,
+-				      extack);
+-	if (!phydev)
+-		return 0;
+-
+-	if (IS_ERR(phydev))
+-		return PTR_ERR(phydev);
+-
+-	if (!topo)
+-		return 0;
+-
+-	req_info->pdn = xa_load(&topo->phys, phydev->phyindex);
+-
+-	return 0;
+-}
+-
+-int ethnl_phy_doit(struct sk_buff *skb, struct genl_info *info)
+-{
+-	struct phy_req_info req_info = {};
+-	struct nlattr **tb = info->attrs;
+-	struct sk_buff *rskb;
+-	void *reply_payload;
+-	int reply_len;
+-	int ret;
+-
+-	ret = ethnl_parse_header_dev_get(&req_info.base,
+-					 tb[ETHTOOL_A_PHY_HEADER],
+-					 genl_info_net(info), info->extack,
+-					 true);
+-	if (ret < 0)
+-		return ret;
+-
+-	rtnl_lock();
+-	netdev_lock_ops(req_info.base.dev);
+-
+-	ret = ethnl_phy_parse_request(&req_info.base, tb, info->extack);
+-	if (ret < 0)
+-		goto err_unlock;
+-
+-	/* No PHY, return early */
+-	if (!req_info.pdn)
+-		goto err_unlock;
+-
+-	ret = ethnl_phy_reply_size(&req_info.base, info->extack);
+-	if (ret < 0)
+-		goto err_unlock;
+-	reply_len = ret + ethnl_reply_header_size();
+-
+-	rskb = ethnl_reply_init(reply_len, req_info.base.dev,
+-				ETHTOOL_MSG_PHY_GET_REPLY,
+-				ETHTOOL_A_PHY_HEADER,
+-				info, &reply_payload);
+-	if (!rskb) {
+-		ret = -ENOMEM;
+-		goto err_unlock;
+-	}
++	struct phy_reply_data *rep_data = PHY_REPDATA(reply_data);
+ 
+-	ret = ethnl_phy_fill_reply(&req_info.base, rskb);
+-	if (ret)
+-		goto err_free_msg;
+-
+-	netdev_unlock_ops(req_info.base.dev);
+-	rtnl_unlock();
+-	ethnl_parse_header_dev_put(&req_info.base);
+-	genlmsg_end(rskb, reply_payload);
+-
+-	return genlmsg_reply(rskb, info);
+-
+-err_free_msg:
+-	nlmsg_free(rskb);
+-err_unlock:
+-	netdev_unlock_ops(req_info.base.dev);
+-	rtnl_unlock();
+-	ethnl_parse_header_dev_put(&req_info.base);
+-	return ret;
+-}
+-
+-struct ethnl_phy_dump_ctx {
+-	struct phy_req_info	*phy_req_info;
+-	unsigned long ifindex;
+-	unsigned long phy_index;
+-};
+-
+-int ethnl_phy_start(struct netlink_callback *cb)
+-{
+-	const struct genl_info *info = genl_info_dump(cb);
+-	struct ethnl_phy_dump_ctx *ctx = (void *)cb->ctx;
+-	int ret;
++	if (nla_put_u32(skb, ETHTOOL_A_PHY_INDEX, rep_data->phyindex) ||
++	    nla_put_string(skb, ETHTOOL_A_PHY_NAME, rep_data->name) ||
++	    nla_put_u32(skb, ETHTOOL_A_PHY_UPSTREAM_TYPE, rep_data->upstream_type))
++		return -EMSGSIZE;
+ 
+-	BUILD_BUG_ON(sizeof(*ctx) > sizeof(cb->ctx));
++	if (rep_data->drvname &&
++	    nla_put_string(skb, ETHTOOL_A_PHY_DRVNAME, rep_data->drvname))
++		return -EMSGSIZE;
+ 
+-	ctx->phy_req_info = kzalloc(sizeof(*ctx->phy_req_info), GFP_KERNEL);
+-	if (!ctx->phy_req_info)
+-		return -ENOMEM;
++	if (rep_data->upstream_index &&
++	    nla_put_u32(skb, ETHTOOL_A_PHY_UPSTREAM_INDEX,
++			rep_data->upstream_index))
++		return -EMSGSIZE;
+ 
+-	ret = ethnl_parse_header_dev_get(&ctx->phy_req_info->base,
+-					 info->attrs[ETHTOOL_A_PHY_HEADER],
+-					 sock_net(cb->skb->sk), cb->extack,
+-					 false);
+-	ctx->ifindex = 0;
+-	ctx->phy_index = 0;
++	if (rep_data->upstream_sfp_name &&
++	    nla_put_string(skb, ETHTOOL_A_PHY_UPSTREAM_SFP_NAME,
++			   rep_data->upstream_sfp_name))
++		return -EMSGSIZE;
+ 
+-	if (ret)
+-		kfree(ctx->phy_req_info);
++	if (rep_data->downstream_sfp_name &&
++	    nla_put_string(skb, ETHTOOL_A_PHY_DOWNSTREAM_SFP_NAME,
++			   rep_data->downstream_sfp_name))
++		return -EMSGSIZE;
+ 
+-	return ret;
++	return 0;
+ }
+ 
+-int ethnl_phy_done(struct netlink_callback *cb)
++static void phy_cleanup_data(struct ethnl_reply_data *reply_data)
+ {
+-	struct ethnl_phy_dump_ctx *ctx = (void *)cb->ctx;
+-
+-	if (ctx->phy_req_info->base.dev)
+-		ethnl_parse_header_dev_put(&ctx->phy_req_info->base);
+-
+-	kfree(ctx->phy_req_info);
++	struct phy_reply_data *rep_data = PHY_REPDATA(reply_data);
+ 
+-	return 0;
++	kfree(rep_data->drvname);
++	kfree(rep_data->name);
++	kfree(rep_data->upstream_sfp_name);
++	kfree(rep_data->downstream_sfp_name);
+ }
+ 
+-static int ethnl_phy_dump_one_dev(struct sk_buff *skb, struct net_device *dev,
+-				  struct netlink_callback *cb)
+-{
+-	struct ethnl_phy_dump_ctx *ctx = (void *)cb->ctx;
+-	struct phy_req_info *pri = ctx->phy_req_info;
+-	struct phy_device_node *pdn;
+-	int ret = 0;
+-	void *ehdr;
+-
+-	if (!dev->link_topo)
+-		return 0;
+-
+-	xa_for_each_start(&dev->link_topo->phys, ctx->phy_index, pdn, ctx->phy_index) {
+-		ehdr = ethnl_dump_put(skb, cb, ETHTOOL_MSG_PHY_GET_REPLY);
+-		if (!ehdr) {
+-			ret = -EMSGSIZE;
+-			break;
+-		}
+-
+-		ret = ethnl_fill_reply_header(skb, dev, ETHTOOL_A_PHY_HEADER);
+-		if (ret < 0) {
+-			genlmsg_cancel(skb, ehdr);
+-			break;
+-		}
+-
+-		pri->pdn = pdn;
+-		ret = ethnl_phy_fill_reply(&pri->base, skb);
+-		if (ret < 0) {
+-			genlmsg_cancel(skb, ehdr);
+-			break;
+-		}
+-
+-		genlmsg_end(skb, ehdr);
+-	}
++const struct ethnl_request_ops ethnl_phy_request_ops = {
++	.request_cmd		= ETHTOOL_MSG_PHY_GET,
++	.reply_cmd		= ETHTOOL_MSG_PHY_GET_REPLY,
++	.hdr_attr		= ETHTOOL_A_PHY_HEADER,
++	.req_info_size		= sizeof(struct phy_req_info),
++	.reply_data_size	= sizeof(struct phy_reply_data),
+ 
+-	return ret;
+-}
++	.prepare_data		= phy_prepare_data,
++	.reply_size		= phy_reply_size,
++	.fill_reply		= phy_fill_reply,
++	.cleanup_data		= phy_cleanup_data,
+ 
+-int ethnl_phy_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+-{
+-	struct ethnl_phy_dump_ctx *ctx = (void *)cb->ctx;
+-	struct net *net = sock_net(skb->sk);
+-	struct net_device *dev;
+-	int ret = 0;
+-
+-	rtnl_lock();
+-
+-	if (ctx->phy_req_info->base.dev) {
+-		dev = ctx->phy_req_info->base.dev;
+-		netdev_lock_ops(dev);
+-		ret = ethnl_phy_dump_one_dev(skb, dev, cb);
+-		netdev_unlock_ops(dev);
+-	} else {
+-		for_each_netdev_dump(net, dev, ctx->ifindex) {
+-			netdev_lock_ops(dev);
+-			ret = ethnl_phy_dump_one_dev(skb, dev, cb);
+-			netdev_unlock_ops(dev);
+-			if (ret)
+-				break;
+-
+-			ctx->phy_index = 0;
+-		}
+-	}
+-	rtnl_unlock();
++	.dump_start		= ethnl_dump_start_perphy,
++	.dump_one_dev		= ethnl_dump_one_dev_perphy,
++	.dump_done		= ethnl_dump_done_perphy,
+ 
+-	return ret;
+-}
++	.allow_pernetdev_dump	= true,
++};
 -- 
 2.48.1
 
