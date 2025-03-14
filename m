@@ -1,118 +1,171 @@
-Return-Path: <netdev+bounces-174939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B33EA6178A
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 18:26:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17837A6179C
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 18:29:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E4FA4204DA
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 17:26:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98C21884E8C
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 17:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B58622045A5;
-	Fri, 14 Mar 2025 17:26:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FE67204693;
+	Fri, 14 Mar 2025 17:27:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="s7n+eUb7"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="pAJgzl9J";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="CgrjTBeh"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic308-15.consmr.mail.ne1.yahoo.com (sonic308-15.consmr.mail.ne1.yahoo.com [66.163.187.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01F7B202C55
-	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 17:26:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.187.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD285204680;
+	Fri, 14 Mar 2025 17:27:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741973202; cv=none; b=OJ15i/U9UvUyRSagl8EI80FYKNtQOgUNCplSQRKJFWwZU7IlV2r7Lk8xyeWYuYL5YYOkOjWVYZnttWK1jq6Qn2B82EXT4+MEXIXEImGJCmjIKznutlH8GYqRAjvGkJi1C7EK224IFV3N+OqIUqIFWsLljiQjRYHO6Fz5Os2ca3A=
+	t=1741973274; cv=none; b=g1v0hRNwsn5xFpygi7gvdoeLKkdy75MpxAdxg+xxvlRGjZ4Xl1RdDyKJc8KY8PmSxb69Qdazx/C7ETMyLZpuDIZJNOCbaUVDkWmZoaG7Qfgto5YIPSmAuO4PMgHrhezIGietE/wTtIOKPk3sEh450vFfyCb0FLGWIhF7k/+rx6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741973202; c=relaxed/simple;
-	bh=qlcHt9ccEX6EUZm5kQqQFq5nis8rKlirP81I0xyK2pY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NtKAwNAijNkSMgCaAYDPOsIzbAlSe2XbrdC1XHpMWOc0XHb6Pza0ewlUGFR6bHkmEu4gXN0iYCbQeCZkJ4SRuoruF1HQSvH4HVs4FeXse9KTZjyfn5DqkpdRaBYNthyo07zT9K0XoXcdYZvzvakIAspixyrVMTsBDvBGSAp5qMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com; spf=none smtp.mailfrom=schaufler-ca.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=s7n+eUb7; arc=none smtp.client-ip=66.163.187.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=schaufler-ca.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1741973200; bh=CxM5t3Z2CzIRZvhTF8IpgcECByr9NPqDa7yqoSHEXII=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=s7n+eUb75LMn9V74l8EMn+I7rt6KZCaDozwiCPuUWtCSKt22SUEaxkXNNXTqbKHnDe82G+GQbJ7BbNcMFycrrtPyl3UFZpofKjO8Epxu1FpQiHSTcKEI+yrQJQC2R5F7ptYqn4ad300cpr+nr0AtQlU0TApCeNQBpZXn9ZaV1ug/5jwdk3X5baZlOiCaH2dHDHoSRo0c5jSr2YaLEJTDvuIlM0ezk2oBkW+w39u9qaWp2lOxObxDSZ52zB7WCljd4lBVdcYkqv7aDGON15Wa4FyrAPhCUAlyEJuB/Hpjz2KjiFtPjTKufeZHaqY1C+9sP7KCW2kySuq6QR4Oo5jqOw==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1741973200; bh=LqJ/4V3CaRHZfvwAfFYUH/SXzMHaj5FGSwBN/98tvQs=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=qpVsLPEbBLCjTKOCDFnC9DA5EYun9ViH/SKy5By0MinySM/hXwSSs0zeh7fMTbv0eN01nHXEiJ+sQk+twZLswHKa+bO+0/OWuzjsND6xc/mp2rTd17W68C5529fC6VNBVedgIUqw73bN7mTiYm8GEPbQ8DAO+18LXzfNeoAiEixAc2CqD6tw3wF5IHGv+tl8VwBAIUNHI3UxFoRnoq11N/+tZkddto/BCyfm4vu/Pr4zD4LrEDiuaRVHD+9Czone0GZMJ+FgJr1d5Yt1jTTpg0uHexQuyGkolGE5NO/dc3jeBu+k3mynW/VYoVWv36cBujv9gxTHITmn6beSadoS6Q==
-X-YMail-OSG: yj8zhOgVM1kOvmoxK2O2_D6uuYJfUJjzOWUsf_NpX_QiwVCutd7FQLCL6UBIsZn
- qs4BicKzukOYo67.TKQzJ8cZAoIbkMNe_ONE2XPuMlPTSaDUW2h1SktOdqrMe3yIrSvgDZPTuLHT
- KAANvDk6jatWEyKwP7bEXA.ePCvivvgnh5U8RL_Ktz63pXJ6ugvGHwI3qzES5kn4QVHiDh3x1X8E
- G_g9bm4nBYa8yq0nU9PA91x_soG2LbLI8ZUDjXAu.zz27ybc13FLk9u5teJG01_pb0y8IKHviye9
- MAkiZH2._PkaOZpgk0HGROvjh2kzLOir84956GYllxiCF2Gj7Ph.7kXy9ax8gLx.t09YEnhAO8nn
- XTCTBVLGmJr1zZUkUOU.dROkwDe_Wuidos2wm1cRL6wmQ3jjwK4egyASdhxgwoyYR8NdbLY1zmM7
- ulqII3VsbX8zLx929p0dNpM8xxGEQmEeSlDtW5QMErs0fmAOnicruFDzGCLoxgB20xaezvM.AREG
- F3Bm5Kfu_b0J9Vdmj8QuAMxdm7XLbL_p8h3W3BifK44km9aAVGAZr5ebxDIuLVW_0OLy.iUNKELE
- kdSAIUmgaSNVgU4sRGMMpewvPXNxlrP_YWLAd4i0KZyqea7KEX9Je5LT_HTKSlaGR_gdOwGZBQiJ
- 3XEDiSFyjcNcT_mc8PdwUaSui78fufvVR8C97N.iU5ojeariTFmx1a4kFpfklmj3GgkxTpvRnIJy
- Ms.RSei0ldkOq2O8dkv5u.OKaq3iBFrdHOr.jgSMKW6LBVC49WzbKroYoR2BM4CnlL646bw94cC7
- 0zoEVGt0UPQSQ_1NkmuEVvfIo0y2ob9WK9yxyE4n2NlqKh_Uwe8QFaeUXzBbWgp9.yY3bQ1Z8YAy
- Ae8Jac4c7NcIW9xP0yMylTwJ8y780z5MltXZOvnf6v6_9MH5iMsFmsYIyyMgIafdBfXkD8_LNRTw
- 8vqrs5GbzMChxLGZsNBmnoKy27KMudYKrKerzDfTv6BI42F77YF3p6P49ngdBYPpWt7PambK55eA
- vSizhH8kvNFL8FCad94xD.jDRxHDYGz.YR0Q_S5KuND49COYfds0UbmmHvIURoRjBkp6H__X9KDZ
- 9h1KQ_GqsHtnSJ.8oI2UTAYjWTs5.QFuqK5a_2GbdSSVZMYYLLbcxZioeeWQoRaTZvX7CIt_2rty
- MnwaIFVy.Hf231fcQlyTRr.E206AOLYYOAWCqx4lmmTnl85_jtSZC.JwmzRcAHe2X9xwt0Io6gxx
- 7VPzrk98HxjhlVseorFa7wOt6b77p9T2b.K9a7J3L.SqyFKJehVHwJUOmfAZB8cI4yvh2KE2L_BN
- XtyN8BC_H8a2JJQsK_68as.iJDHj22HdA6XetfdeiTVokWqiomAJs8tJtnyxtUuI94UFKP3EZ9hu
- Vtf3C2AeQ0JvI87VHmG4nyJFPY8J0nSnvHgZjwjHg4YFbHCP68ZOMEotbtkB2WdUxFDp387Mi_y8
- .m.a8hbIJq4KYW0KwBUVHraTAahC1OB_13myev0mUnsCuFgcOxGcOyzkO0fvO5awmWvpaXaYaslq
- y8O12h4mIxO_gFbXFMpwKr7ESGCX6.AEBXjWTymB6NRCHHy8emdfrVXbCdys1CgUTplw2G4IT2GL
- vdNEADhLCUWHMrn4Tou0ru6Elsn5Vaygqi5n0G3xObSlSOXGD2G4EcnvB47dUEdhuYPp2uSIPgAb
- k.svFJmbIfaVE1_Y1W67vOPtLPemCK0mpPof583DsUVO2eBUNmGwV5d0oO.aPpBszm0BB6_lfJrB
- ALAyjugKqsSM.6uBSYgb4Xu2LPXwQULGLm_mFo.yypPKePUkZ48Jp480ch7XUKe9js5xVvSzYqAn
- m.MDdlDzqaLRTL_137VwMs8Ad8Y6SAVSatW2MZ_c8bYm9ScU3U36LiMnd_Mqi_0FJ2dIMzEx4cEj
- xTOmLNzhaoXMj5nx9MkwXbaxd6O0rYUAb582tr2rl053ChHkugTagiunmjOp3Zw8OwaGPz4ZlPho
- 8Xi9TfWp81EJPCXyUTDzPow0B5Q05.0XmM6B4QSJX4NIfy8PPB7HY15PIPp8I9Jz0hVnEvbCdotY
- odvd6GuQ42mqHJwmnPFw_A0JSeXacwgqRPT6Lqy0mI8pEBV8rDquoMZ00eFMK7YxTQC1RC6CEv2b
- BJt7nxCrntiYkfvT5UKfvTTUN7bCSix_OrLppDanevoFGbLrYl3k2ZUZsArLTDX0s6Fr69jsyYLL
- H.hZSetk5xpPO_2WDe9rzopk6RwyzCMtrViKdrW5PTfkcRCwPJey7TX5lpn8DaHcCd9Liovr5hvb
- 0qdO6zGjp8fY-
-X-Sonic-MF: <casey@schaufler-ca.com>
-X-Sonic-ID: d560284d-a513-437e-bc8d-88cbba6cec32
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic308.consmr.mail.ne1.yahoo.com with HTTP; Fri, 14 Mar 2025 17:26:40 +0000
-Received: by hermes--production-gq1-7d5f4447dd-ffpct (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 85f935b17729ab72ea53b7b1fade8a98;
-          Fri, 14 Mar 2025 17:26:36 +0000 (UTC)
-Message-ID: <d2019823-4500-499a-8368-76c50a582f47@schaufler-ca.com>
-Date: Fri, 14 Mar 2025 10:26:34 -0700
+	s=arc-20240116; t=1741973274; c=relaxed/simple;
+	bh=yGxgdF+OHwBPS6fl+QKaxNcmsUSJgirsc4Ag+DtLmcg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t1r6ghF3Icwf13vRTFKDqZqbiFHIcMydFNJHjS3keTHP/R8kuwwZOlFG8ZRWvy5LKwViYew345/hVu8jmk0X8LPprIuTq8uxZg36a5JFALOrKk0JttYwjGyfgfYONhHAT5Agf7ZK8vod4WUYZh5F07o6LsWdHcMyGZD8GvDrlkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=pAJgzl9J; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=CgrjTBeh; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Fri, 14 Mar 2025 18:27:49 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1741973270;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wcRCFIBiAQNI1L/e3qYxgTree8WI127fpfM7PwFeH8k=;
+	b=pAJgzl9JA7bq+lH2EEHM2+Sq9VQrAel6kyYkh18y+6OlAeOZgdy+4aaW5X5E8hL67dTC/W
+	nq98URRZw8U7o+eKg72Gv1gbBm5GOqi+mA0JrTzWyaRN7+ZIViSM4lJZVe2gEn4U0xhFzZ
+	ry3nqUZ3RQLGZQQ1BXXq7GT4trV81n2SMj4+ztdbZrjZ3uYmIllPHA3pvRjRZ7QRzJ3M1Y
+	CECA7OpfW9c2Tm5FSF8zfbXLcGRNbZJ4kVT+RDSIuZSLS1c2hz7pmk1KhrSFljifn2LNYK
+	pWYDBgUTr152UlSsXL3c0hfhyj0Zb6MpZD+H806O1VVSRrrdJ6BCONiwcpScqQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1741973270;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wcRCFIBiAQNI1L/e3qYxgTree8WI127fpfM7PwFeH8k=;
+	b=CgrjTBehA7t1aEFnDlXacuc37fxZk2+ByxJyRvUSaxNaXJhgjPjHw+Gr0RQ5Zz25ynF/Dn
+	1IoHt7Hn5atxMHBg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+	Ricardo =?utf-8?Q?Ca=C3=B1uelo?= Navarro <rcn@igalia.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [RFC] Use after free in BPF/ XDP during XDP_REDIRECT
+Message-ID: <20250314172749.hsmtyM3N@linutronix.de>
+References: <20250313183911.SPAmGLyw@linutronix.de>
+ <87ecz0u3w9.fsf@toke.dk>
+ <20250313203226.47_0q7b6@linutronix.de>
+ <871pv0rmr8.fsf@toke.dk>
+ <20250314153041.9BKexZXH@linutronix.de>
+ <875xkbha5k.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: Initialize ctx to avoid memory allocation error
-To: Florian Westphal <fw@strlen.de>
-Cc: Chenyuan Yang <chenyuan0y@gmail.com>, netfilter-devel@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Casey Schaufler <casey@schaufler-ca.com>
-References: <20250313195441.515267-1-chenyuan0y@gmail.com>
- <20250313201007.GA26103@breakpoint.cc>
- <42e5bb33-1826-43df-940d-ec80774fc65b@schaufler-ca.com>
- <20250314164708.GA1542@breakpoint.cc>
-Content-Language: en-US
-From: Casey Schaufler <casey@schaufler-ca.com>
-In-Reply-To: <20250314164708.GA1542@breakpoint.cc>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: WebService/1.1.23435 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <875xkbha5k.fsf@toke.dk>
 
+On 2025-03-14 17:03:35 [+0100], Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+> > While at it, is there anything that ensures that only bpf_prog_run_xdp()
+> > can invoke the map_redirect callback? Mainline only assigns the task
+> > pointer in NAPI callback so any usage outside of bpf_prog_run_xdp() will
+> > lead to a segfault and I haven't seen a report yet so=E2=80=A6
+>=20
+> Yes, the verifier restricts which program types can call the
+> map_redirect helper.
 
-On 3/14/2025 9:47 AM, Florian Westphal wrote:
-> Casey Schaufler <casey@schaufler-ca.com> wrote:
->> If seclen is 0 it implies that there is no security context and that
->> the secctx is NULL. How that is handled in the release function is up
->> to the LSM. SELinux allocates secctx data, while Smack points to an
->> entry in a persistent table.
->>
->>> seclen needs to be > 0 or no secinfo is passed to userland,
->>> yet the secctx release function is called anyway.
->> That is correct. The security module is responsible for handling
->> the release of secctx correctly.
->>
->>> Should seclen be initialised to -1?  Or we need the change below too?
->> No. The security modules handle secctx their own way.
-> Well, as-is security_release_secctx() can be called with garbage ctx;
-> seclen is inited to 0, but ctx is not initialized unconditionally.
+Okay. So checks for the BPF_PROG_TYPE_XDP type for the map_redirect and
+that is the only one setting it. Okay. Now I remember Alexei mentioning
+something=E2=80=A6
 
-Which isn't an issue for any existing security module.
+> > --- a/include/net/xdp.h
+> > +++ b/include/net/xdp.h
+> > @@ -486,7 +486,12 @@ static __always_inline u32 bpf_prog_run_xdp(const =
+struct bpf_prog *prog,
+> >  	 * under local_bh_disable(), which provides the needed RCU protection
+> >  	 * for accessing map entries.
+> >  	 */
+> > -	u32 act =3D __bpf_prog_run(prog, xdp, BPF_DISPATCHER_FUNC(xdp));
+> > +	struct bpf_redirect_info *ri =3D this_cpu_ptr(&bpf_redirect_info);
+> > +	u32 act;
+> > +
+>=20
+> Add an if here like
+>=20
+> if (ri->map_id | ri->map_type) { /* single | to make it a single branch */
+>=20
+> > +	ri->map_id =3D INT_MAX;
+> > +	ri->map_type =3D BPF_MAP_TYPE_UNSPEC;
+>=20
+> }
+>=20
+> Also, ri->map_id should be set to 0, not INT_MAX.
 
+The or variant does
+
+|         add %gs:this_cpu_off(%rip), %rax        # this_cpu_off, tcp_ptr__
+|         movl    32(%rax), %edx  # _51->map_id, _51->map_id
+|         orl     36(%rax), %edx  # _51->map_type, tmp311
+|         je      .L1546  #,
+|         movq    $0, 32(%rax)    #, MEM <vector(2) unsigned int> [(unsigne=
+d int *)_51 + 32B]
+| .L1546:
+
+while the || does
+
+|         add %gs:this_cpu_off(%rip), %rax        # this_cpu_off, tcp_ptr__
+|         cmpq    $0, 32(%rax)    #, *_51
+|         je      .L1546  #,
+|         movq    $0, 32(%rax)    #, MEM <vector(2) unsigned int> [(unsigne=
+d int *)_51 + 32B]
+| .L1546:
+
+gcc isn't bad at optimizing here ;)
+
+This is the or version as asked for. I don't mind doing any of the both.
+I everyone agrees then I would send it to Greg.
+
+--- a/include/net/xdp.h
++++ b/include/net/xdp.h
+@@ -486,7 +486,14 @@ static __always_inline u32 bpf_prog_run_xdp(const stru=
+ct bpf_prog *prog,
+ 	 * under local_bh_disable(), which provides the needed RCU protection
+ 	 * for accessing map entries.
+ 	 */
+-	u32 act =3D __bpf_prog_run(prog, xdp, BPF_DISPATCHER_FUNC(xdp));
++	struct bpf_redirect_info *ri =3D this_cpu_ptr(&bpf_redirect_info);
++	u32 act;
++
++	if (ri->map_id | ri->map_type) {
++		ri->map_id =3D 0;
++		ri->map_type =3D BPF_MAP_TYPE_UNSPEC;
++	}
++	act =3D __bpf_prog_run(prog, xdp, BPF_DISPATCHER_FUNC(xdp));
+=20
+ 	if (static_branch_unlikely(&bpf_master_redirect_enabled_key)) {
+ 		if (act =3D=3D XDP_TX && netif_is_bond_slave(xdp->rxq->dev))
+
+> -Toke
+
+Sebastian
 
