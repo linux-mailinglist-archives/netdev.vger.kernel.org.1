@@ -1,380 +1,123 @@
-Return-Path: <netdev+bounces-174855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF1F5A6108E
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 13:02:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEF3BA610AD
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 13:12:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F4063B3AD6
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 12:01:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 139AD3ACC15
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 12:12:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D818F1FF1A3;
-	Fri, 14 Mar 2025 12:01:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC5781FDA76;
+	Fri, 14 Mar 2025 12:12:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="o96fyVHg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FAGTiHsp"
 X-Original-To: netdev@vger.kernel.org
-Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48FB01FECC7;
-	Fri, 14 Mar 2025 12:01:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60E1642AA6
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 12:12:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741953674; cv=none; b=qfhq7UzV5lewfWA7do6thaWQT+sV7geenbit+A0SzNDfmKeJq6ODAv2dezJyzn7CYMD9U09x2g0TLz1p0+yRPZP5+wsJCjlJy/kJo+kNe6BFJHDxGKJ2WpxBc8Jvdc+0e9oMPguxOb7I/SWFhCZGY9QDb5qPGQZvdSaTHd+wc5M=
+	t=1741954355; cv=none; b=sCrtR+WDgdcL/AJpxGw4dBo/RK+1CMMV1yr5rVOE16rP/NlK0+3ybe8oEhx7Q2876UzykbE3HTDIkbFloGimsJ+2ixO0YjtMan/wWnGHJ3QWxNqSXgsNfFpH7MZiVA3vRHuc9m4hxblcImbACqGDtpnLByJ3wRlzYWuZ3V8Cel8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741953674; c=relaxed/simple;
-	bh=EcdpGU5FxlaWS6d9iI7cWLgWYWu4/QCymNmb+Yx4WP0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=iz+Uf16CFBgfLloyZiMJQutB6ECWmoCCKT4Pvg5+xdUkSWvOIf9AR8zwENZsA5bBpqv1VifAVpdQpaxtKk59nan+gxOjxmlxA4RRHkogdso0n3g5O94RS9LXnTX+yhxbvi09/kWQRzgGGjCZ5y5nkod5Ur3taMjB73ityK6+I04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=o96fyVHg; arc=none smtp.client-ip=139.165.32.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
-Received: from localhost.localdomain (rtr-guestwired.meeting.ietf.org [31.133.144.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 2643C200DB90;
-	Fri, 14 Mar 2025 13:01:07 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 2643C200DB90
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1741953670;
-	bh=/B/95IoqLt9izs3y4P7LuUMjIPSoaMDnGELMDZlxTZA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=o96fyVHgOCKNn0gExnABwcsCXIqc7YRmg8o8kYFkZU4DC+vE4kS6GMtzmkcAS6oE4
-	 l+umqGyg6Oj5siFwJpX3u8zc2idGZKqNy8yWHMU+PwQ2Us6wT20p5MMMiuKmsnIUGc
-	 feFAbg5XXujUCrTzFwxCFyCiAvVPWyj7b1lK+/YJ4cXDGuJr41NKgI8Wlqa5v1yvU6
-	 hOUlHxbDciqFGi0dm4b+u9wk0ngawBShHnD/nJwe9hDULhLzVwwnKJ4TSIMx++ViWz
-	 OL0kRUcobxm3b2SiIFPwvSPGr4/qwnxMj//kaFuPSvmNhDBxWcKM1VmeGsLplj74Cc
-	 7LbnR+itzf1jg==
-From: Justin Iurman <justin.iurman@uliege.be>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	justin.iurman@uliege.be,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net v2 3/3] selftests: net: test for lwtunnel dst ref loops
-Date: Fri, 14 Mar 2025 13:00:48 +0100
-Message-Id: <20250314120048.12569-4-justin.iurman@uliege.be>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250314120048.12569-1-justin.iurman@uliege.be>
-References: <20250314120048.12569-1-justin.iurman@uliege.be>
+	s=arc-20240116; t=1741954355; c=relaxed/simple;
+	bh=oyXLZj54LtlQ4MGhnb2WIDH2KSeJ1AZFFTQTKY/k6Z4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TDpJ+hnxEMpodGOXBXMFkig6kGqTLtwqMKKANP3Kfu2u3NgvfvnCgq/CYBFMpKLVtG+S2ZsDIvu+PvFVGd2uOkAWzeqrYktaOS5fmLyXP6aumJdzgRYKUKRWupfGq9S0UhBm5awhOlgHNfPhN/lbyj48c9FLHSP8AcuLZw+874M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FAGTiHsp; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741954353;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TTDZeaw56VIBY+bEWJ8m5Ut0VG1D9nOF2jWYVpTaHVM=;
+	b=FAGTiHspwyFmpeg3kr9Eo3XvijITw3WW8Y0HYeZi+iWpu/qG20qW9WWxsg89kWhbyuKgES
+	boRsUK5rFbq+fjTVrsYI5K991JvysTvOEbwoLZTLLXTKFiaXbhMqtjMKQ1iVJGGforwP1f
+	kqzCKMTPmBfQ4+AYnyLTHditlwYhcsY=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-107-Esr3GM2QP1aJWAda2H9YOQ-1; Fri, 14 Mar 2025 08:12:32 -0400
+X-MC-Unique: Esr3GM2QP1aJWAda2H9YOQ-1
+X-Mimecast-MFC-AGG-ID: Esr3GM2QP1aJWAda2H9YOQ_1741954351
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2ff8119b436so3592904a91.0
+        for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 05:12:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741954351; x=1742559151;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TTDZeaw56VIBY+bEWJ8m5Ut0VG1D9nOF2jWYVpTaHVM=;
+        b=JVqeo8YH+XypfqrbUj3KNqEoB+ffbRKwTk75T0yFJFh/dY4OlgLpLXnzowOU+juh97
+         AvzoyRv+G+zn7hDUA7fle7dSBosYibcd/IFvhcO/yR2UsERahn2FbeSeqqonuhL8L2OT
+         8k2NpWozKFkt4SyLktiklRxi4tygH6dPuOzLg4Sc1tet6RYDTqAF2D30SkrACB8KrfCv
+         IBpCMaKBrf4QqYPvyyp0cdrDOveyqkBj3Hq+hOTtHKjDAntKl/SGxSk2hn+ki7bfVraY
+         hOCrN8+mR3YH69ez2rJPdL1eEyvmjImwhAKo5dY8P/eh+/JWeT0KPNuNqLU5Q5b7avTK
+         /gzg==
+X-Forwarded-Encrypted: i=1; AJvYcCW862KEjdB1MtU036ok3INO1ZLCxU5Rivl2eKOKycMDSgDMfBtvhSSrYXxWZXf1vDgIKqG9CN4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhR3GjK43hdy66ER63gwXU6oWX42ATtpk8qnlob4tXZNysW2Dw
+	Nruqe3TA6rOJloMQlqaKH2UanYuMYf1ys34+8URrwrDRL2/rWy19ZGwGqsyBTHLs3DWnapGuo7u
+	9MAWyZWdWjGGDjigka8I1E+1uOhw9hofdJLskF1/n7EWOzne2cJg/ZoeAQK/SQF4to/CsMEQnDd
+	2CC3aS1DUIq6kC1czSZLVkWNLKjAUm
+X-Gm-Gg: ASbGncsYAcKEqHjc6trAXLmGr+xcKWgMUsY1QjzzKhylL5VnOb+n9+wPxIBH0wEdaCd
+	iV1t1/o9RdCcK/93rncklNxrFDNDI21ujr87K99gV7hUB/bJtWlzTIQDc6eOHWjaaFcNnCZ3R
+X-Received: by 2002:a17:90b:1f8d:b0:2ee:d63f:d8f with SMTP id 98e67ed59e1d1-30151c7a361mr3127185a91.13.1741954351248;
+        Fri, 14 Mar 2025 05:12:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFSnl0DK330+iYxumrpeH9uLx3TdPoT2bdl13R1/PQEAjWq9XZqWeit0LjaMAZw3sh9KdYE58oYwshB2exonS4=
+X-Received: by 2002:a17:90b:1f8d:b0:2ee:d63f:d8f with SMTP id
+ 98e67ed59e1d1-30151c7a361mr3127166a91.13.1741954350985; Fri, 14 Mar 2025
+ 05:12:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250205094818.I-Jl44AK@linutronix.de> <mrw3tpwsravsaibkcpptdkko3ff6qtk6w6ernqvjisk4l7owok@q6hmxkzcdkey>
+ <20250206115914.VfzGTwD8@linutronix.de> <zy3irjybyc32hnow3ckhkfsrtfm5nev44aeovinlkkfc6tyyjv@gcblibp5ng3o>
+ <20250212151108.jI8qODdD@linutronix.de> <CAAq0SU=aU=xpw0bDwaanFh_-r5tts0QNCtSmoteP3dM8-K6BFA@mail.gmail.com>
+ <20250212152925.M7otWPiV@linutronix.de> <mtmm2bwn3lrsmsx3evzemzjvaddmzfvnk6g37yr3fmzb77bpyu@ffto5sq7nvfw>
+ <20250219163554.Ov685_ZQ@linutronix.de> <kwmabr7bujzxkr425do5mtxwulpsnj3iaj7ek2knv4hfyoxev5@zhzqitfu4qo4>
+ <20250220113857.ZGo_j1eC@linutronix.de>
+In-Reply-To: <20250220113857.ZGo_j1eC@linutronix.de>
+From: Wander Lairson Costa <wander@redhat.com>
+Date: Fri, 14 Mar 2025 09:12:20 -0300
+X-Gm-Features: AQ5f1JoYrKjuf-swh1L4bBwmMxYWoNIB57J4PFNL4X9qlWDh80egegT4FKA54Hc
+Message-ID: <CAAq0SUkMXDaSvDRELYQn9+Pk-kBjx2BWc7ucme54XPXD97_kkg@mail.gmail.com>
+Subject: Re: [PATCH net 0/4][pull request] igb: fix igb_msix_other() handling
+ for PREEMPT_RT
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, edumazet@google.com, andrew+netdev@lunn.ch, 
+	netdev@vger.kernel.org, rostedt@goodmis.org, clrkwllms@kernel.org, 
+	jgarzik@redhat.com, yuma@redhat.com, linux-rt-devel@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-As recently specified by commit 0ea09cbf8350 ("docs: netdev: add a note
-on selftest posting") in net-next, the selftest is therefore shipped in
-this series. However, this selftest does not really test this series. It
-needs this series to avoid crashing the kernel. What it really tests,
-thanks to kmemleak, is what was fixed by the following commits:
-- commit c71a192976de ("net: ipv6: fix dst refleaks in rpl, seg6 and
-ioam6 lwtunnels")
-- commit 92191dd10730 ("net: ipv6: fix dst ref loops in rpl, seg6 and
-ioam6 lwtunnels")
-- commit c64a0727f9b1 ("net: ipv6: fix dst ref loop on input in seg6
-lwt")
-- commit 13e55fbaec17 ("net: ipv6: fix dst ref loop on input in rpl
-lwt")
-- commit 0e7633d7b95b ("net: ipv6: fix dst ref loop in ila lwtunnel")
-- commit 5da15a9c11c1 ("net: ipv6: fix missing dst ref drop in ila
-lwtunnel")
+On Thu, Feb 20, 2025 at 8:39=E2=80=AFAM Sebastian Andrzej Siewior
+<bigeasy@linutronix.de> wrote:
+>
+> On 2025-02-20 08:35:17 [-0300], Wander Lairson Costa wrote:
+> > > You confirmed that it works, right?
+> > >
+> >
+> > Do you mean that earlier test removing IRQF_COND_ONESHOT? If so, yes.
+>
+> I mean just request_threaded_irq() as suggested in
+>         https://lore.kernel.org/all/20250206115914.VfzGTwD8@linutronix.de=
+/
+>
 
-Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
----
-Cc: Shuah Khan <shuah@kernel.org>
-Cc: linux-kselftest@vger.kernel.org
----
- tools/testing/selftests/net/Makefile          |   1 +
- tools/testing/selftests/net/config            |   2 +
- .../selftests/net/lwt_dst_cache_ref_loop.sh   | 246 ++++++++++++++++++
- 3 files changed, 249 insertions(+)
- create mode 100755 tools/testing/selftests/net/lwt_dst_cache_ref_loop.sh
+I forgot to answer, sorry. The answer is yes.
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 5916f3b81c39..843ab747645d 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -101,6 +101,7 @@ TEST_PROGS += vlan_bridge_binding.sh
- TEST_PROGS += bpf_offload.py
- TEST_PROGS += ipv6_route_update_soft_lockup.sh
- TEST_PROGS += busy_poll_test.sh
-+TEST_PROGS += lwt_dst_cache_ref_loop.sh
- 
- # YNL files, must be before "include ..lib.mk"
- YNL_GEN_FILES := busy_poller netlink-dumps
-diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
-index 5b9baf708950..61e5116987f3 100644
---- a/tools/testing/selftests/net/config
-+++ b/tools/testing/selftests/net/config
-@@ -107,3 +107,5 @@ CONFIG_XFRM_INTERFACE=m
- CONFIG_XFRM_USER=m
- CONFIG_IP_NF_MATCH_RPFILTER=m
- CONFIG_IP6_NF_MATCH_RPFILTER=m
-+CONFIG_IPV6_ILA=m
-+CONFIG_IPV6_RPL_LWTUNNEL=y
-diff --git a/tools/testing/selftests/net/lwt_dst_cache_ref_loop.sh b/tools/testing/selftests/net/lwt_dst_cache_ref_loop.sh
-new file mode 100755
-index 000000000000..881eb399798f
---- /dev/null
-+++ b/tools/testing/selftests/net/lwt_dst_cache_ref_loop.sh
-@@ -0,0 +1,246 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0+
-+#
-+# Author: Justin Iurman <justin.iurman@uliege.be>
-+#
-+# WARNING
-+# -------
-+# This is just a dummy script that triggers encap cases with possible dst cache
-+# reference loops in affected lwt users (see list below). Some cases are
-+# pathological configurations for simplicity, others are valid. Overall, we
-+# don't want this issue to happen, no matter what. In order to catch any
-+# reference loops, kmemleak MUST be used. The results alone are always blindly
-+# successful, don't rely on them. Note that the following tests may crash the
-+# kernel if the fix to prevent lwtunnel_{input|output|xmit}() reentry loops is
-+# not present.
-+#
-+# Affected lwt users so far (please update accordingly if needed):
-+#  - ila_lwt (output only)
-+#  - ioam6_iptunnel (output only)
-+#  - rpl_iptunnel (both input and output)
-+#  - seg6_iptunnel (both input and output)
-+
-+source lib.sh
-+
-+check_compatibility()
-+{
-+	setup_ns tmp_node &>/dev/null
-+	if [ $? != 0 ]; then
-+		echo "SKIP: Cannot create netns."
-+		exit $ksft_skip
-+	fi
-+
-+	ip link add name veth0 netns $tmp_node type veth \
-+		peer name veth1 netns $tmp_node &>/dev/null
-+	local ret=$?
-+
-+	ip -netns $tmp_node link set veth0 up &>/dev/null
-+	ret=$((ret + $?))
-+
-+	ip -netns $tmp_node link set veth1 up &>/dev/null
-+	ret=$((ret + $?))
-+
-+	if [ $ret != 0 ]; then
-+		echo "SKIP: Cannot configure links."
-+		cleanup_ns $tmp_node
-+		exit $ksft_skip
-+	fi
-+
-+	lsmod 2>/dev/null | grep -q "ila"
-+	ila_lsmod=$?
-+	[ $ila_lsmod != 0 ] && modprobe ila &>/dev/null
-+
-+	ip -netns $tmp_node route add 2001:db8:1::/64 \
-+		encap ila 1:2:3:4 csum-mode no-action ident-type luid \
-+			hook-type output \
-+		dev veth0 &>/dev/null
-+
-+	ip -netns $tmp_node route add 2001:db8:2::/64 \
-+		encap ioam6 trace prealloc type 0x800000 ns 0 size 4 \
-+		dev veth0 &>/dev/null
-+
-+	ip -netns $tmp_node route add 2001:db8:3::/64 \
-+		encap rpl segs 2001:db8:3::1 dev veth0 &>/dev/null
-+
-+	ip -netns $tmp_node route add 2001:db8:4::/64 \
-+		encap seg6 mode inline segs 2001:db8:4::1 dev veth0 &>/dev/null
-+
-+	ip -netns $tmp_node -6 route 2>/dev/null | grep -q "encap ila"
-+	skip_ila=$?
-+
-+	ip -netns $tmp_node -6 route 2>/dev/null | grep -q "encap ioam6"
-+	skip_ioam6=$?
-+
-+	ip -netns $tmp_node -6 route 2>/dev/null | grep -q "encap rpl"
-+	skip_rpl=$?
-+
-+	ip -netns $tmp_node -6 route 2>/dev/null | grep -q "encap seg6"
-+	skip_seg6=$?
-+
-+	cleanup_ns $tmp_node
-+}
-+
-+setup()
-+{
-+	setup_ns alpha beta gamma &>/dev/null
-+
-+	ip link add name veth-alpha netns $alpha type veth \
-+		peer name veth-betaL netns $beta &>/dev/null
-+
-+	ip link add name veth-betaR netns $beta type veth \
-+		peer name veth-gamma netns $gamma &>/dev/null
-+
-+	ip -netns $alpha link set veth-alpha name veth0 &>/dev/null
-+	ip -netns $beta link set veth-betaL name veth0 &>/dev/null
-+	ip -netns $beta link set veth-betaR name veth1 &>/dev/null
-+	ip -netns $gamma link set veth-gamma name veth0 &>/dev/null
-+
-+	ip -netns $alpha addr add 2001:db8:1::2/64 dev veth0 &>/dev/null
-+	ip -netns $alpha link set veth0 up &>/dev/null
-+	ip -netns $alpha link set lo up &>/dev/null
-+	ip -netns $alpha route add 2001:db8:2::/64 \
-+		via 2001:db8:1::1 dev veth0 &>/dev/null
-+
-+	ip -netns $beta addr add 2001:db8:1::1/64 dev veth0 &>/dev/null
-+	ip -netns $beta addr add 2001:db8:2::1/64 dev veth1 &>/dev/null
-+	ip -netns $beta link set veth0 up &>/dev/null
-+	ip -netns $beta link set veth1 up &>/dev/null
-+	ip -netns $beta link set lo up &>/dev/null
-+	ip -netns $beta route del 2001:db8:2::/64
-+	ip -netns $beta route add 2001:db8:2::/64 dev veth1
-+	ip netns exec $beta \
-+		sysctl -wq net.ipv6.conf.all.forwarding=1 &>/dev/null
-+
-+	ip -netns $gamma addr add 2001:db8:2::2/64 dev veth0 &>/dev/null
-+	ip -netns $gamma link set veth0 up &>/dev/null
-+	ip -netns $gamma link set lo up &>/dev/null
-+	ip -netns $gamma route add 2001:db8:1::/64 \
-+		via 2001:db8:2::1 dev veth0 &>/dev/null
-+
-+	sleep 1
-+
-+	ip netns exec $alpha ping6 -c 5 -W 1 2001:db8:2::2 &>/dev/null
-+	if [ $? != 0 ]; then
-+		echo "SKIP: Setup failed."
-+		exit $ksft_skip
-+	fi
-+
-+	sleep 1
-+}
-+
-+cleanup()
-+{
-+	cleanup_ns $alpha $beta $gamma
-+	[ $ila_lsmod != 0 ] && modprobe -r ila &>/dev/null
-+}
-+
-+run_ila()
-+{
-+	if [ $skip_ila != 0 ]; then
-+		echo "SKIP: ila (output)"
-+		return
-+	fi
-+
-+	ip -netns $beta route del 2001:db8:2::/64
-+	ip -netns $beta route add 2001:db8:2:0:0:0:0:2/128 \
-+		encap ila 2001:db8:2:0 csum-mode no-action ident-type luid \
-+			hook-type output \
-+		dev veth1 &>/dev/null
-+	sleep 1
-+
-+	echo "TEST: ila (output)"
-+	ip netns exec $beta ping6 -c 2 -W 1 2001:db8:2::2 &>/dev/null
-+	sleep 1
-+
-+	ip -netns $beta route del 2001:db8:2:0:0:0:0:2/128
-+	ip -netns $beta route add 2001:db8:2::/64 dev veth1
-+	sleep 1
-+}
-+
-+run_ioam6()
-+{
-+	if [ $skip_ioam6 != 0 ]; then
-+		echo "SKIP: ioam6 (output)"
-+		return
-+	fi
-+
-+	ip -netns $beta route change 2001:db8:2::/64 \
-+		encap ioam6 trace prealloc type 0x800000 ns 1 size 4 \
-+		dev veth1 &>/dev/null
-+	sleep 1
-+
-+	echo "TEST: ioam6 (output)"
-+	ip netns exec $beta ping6 -c 2 -W 1 2001:db8:2::2 &>/dev/null
-+	sleep 1
-+}
-+
-+run_rpl()
-+{
-+	if [ $skip_rpl != 0 ]; then
-+		echo "SKIP: rpl (input)"
-+		echo "SKIP: rpl (output)"
-+		return
-+	fi
-+
-+	ip -netns $beta route change 2001:db8:2::/64 \
-+		encap rpl segs 2001:db8:2::2 \
-+		dev veth1 &>/dev/null
-+	sleep 1
-+
-+	echo "TEST: rpl (input)"
-+	ip netns exec $alpha ping6 -c 2 -W 1 2001:db8:2::2 &>/dev/null
-+	sleep 1
-+
-+	echo "TEST: rpl (output)"
-+	ip netns exec $beta ping6 -c 2 -W 1 2001:db8:2::2 &>/dev/null
-+	sleep 1
-+}
-+
-+run_seg6()
-+{
-+	if [ $skip_seg6 != 0 ]; then
-+		echo "SKIP: seg6 (input)"
-+		echo "SKIP: seg6 (output)"
-+		return
-+	fi
-+
-+	ip -netns $beta route change 2001:db8:2::/64 \
-+		encap seg6 mode inline segs 2001:db8:2::2 \
-+		dev veth1 &>/dev/null
-+	sleep 1
-+
-+	echo "TEST: seg6 (input)"
-+	ip netns exec $alpha ping6 -c 2 -W 1 2001:db8:2::2 &>/dev/null
-+	sleep 1
-+
-+	echo "TEST: seg6 (output)"
-+	ip netns exec $beta ping6 -c 2 -W 1 2001:db8:2::2 &>/dev/null
-+	sleep 1
-+}
-+
-+run()
-+{
-+	run_ila
-+	run_ioam6
-+	run_rpl
-+	run_seg6
-+}
-+
-+if [ "$(id -u)" -ne 0 ]; then
-+	echo "SKIP: Need root privileges."
-+	exit $ksft_skip
-+fi
-+
-+if [ ! -x "$(command -v ip)" ]; then
-+	echo "SKIP: Could not run test without ip tool."
-+	exit $ksft_skip
-+fi
-+
-+check_compatibility
-+
-+trap cleanup EXIT
-+
-+setup
-+run
-+
-+exit $ksft_pass
--- 
-2.34.1
+> Sebastian
+>
 
 
