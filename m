@@ -1,195 +1,126 @@
-Return-Path: <netdev+bounces-174838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD5BFA60EA6
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 11:22:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01D96A60EAD
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 11:23:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 268EE3ADB1E
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 10:22:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF88B170273
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 10:23:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 536FD1EF09A;
-	Fri, 14 Mar 2025 10:22:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A101D1F4168;
+	Fri, 14 Mar 2025 10:23:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="XhotPjCt"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J4j2XU+m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f68.google.com (mail-ej1-f68.google.com [209.85.218.68])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824341D5AB5
-	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 10:22:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C91401EB5D4
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 10:23:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741947773; cv=none; b=AOgsH6LB0L8vfvsHBe4VKd0r0OsEF2a4U1D/xhRr4DCSxTmmFLmPv6xLLrt8Bv6j1pY2js0lmU1WNXH8e9ajys7u4MdluyYlexodwV8w5TiJXg92uAevR+i7gqGnhaKpKNJMNrV/GOQ+EjPImjPbt6pKjasA/V6VVAq/027aL8I=
+	t=1741947791; cv=none; b=X9VwjotozKMLLkQJMP7xIYLVFz95RaNL9j/BTBfnH4YpIbAbZBbbqpvo7KWDiEbTYKAy991WMKtVrmnUNojv3fK0B/tdpZ89+MMlKYMqCB7JcKWYZxf+NIh2WC0qVMpFxlX1kV2kWittsb9jNG5O8ohJsMmnqZvHbhQavDgF1n8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741947773; c=relaxed/simple;
-	bh=MbdRv+iM89FnZKw451+VGkit0JczZSSrCCsWB6ggDHU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aZ+gLlCosoCZi/EGhuJ63QP4b9UQHuNWqerOvo6RwzG9Po/29NCNaPDe2WvvRJ6Ep82ZipEQItpzLrMAF6knZcnFrSBoxtAKe8lwvdFW0N+waX7CxNUCdXDpUOGtNaQsG87DPX2CcX1EJ1zr37EFuowhYeR0DuZVnogQWCr84JA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=XhotPjCt; arc=none smtp.client-ip=209.85.218.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f68.google.com with SMTP id a640c23a62f3a-ac2ab99e16eso401084166b.0
-        for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 03:22:51 -0700 (PDT)
+	s=arc-20240116; t=1741947791; c=relaxed/simple;
+	bh=WBU+CqR3yz92iSXDvmq3Q+OgZZFN5BVnmf7h0Py7uNk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g1ySl2Fs1uqpcpa6Tt4TOgsIj4k2eVPIlsvBbbyBckr2S0OnTZnqqDDxjEekpAu2eGBkbR1r0bPu5Po858QvGxjU2rEOf7eylN9mFY7UbReO0aINxW2oXl3ca5nTvwMPKlq30EFXeUtZdYkX7bdq0G5m40Pjiy/DX/fftR3xSSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=J4j2XU+m; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4393dc02b78so12086265e9.3
+        for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 03:23:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1741947770; x=1742552570; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WLC14bT7l5qVe9L1a3up7gLBRmwJJU5Zq8l66jxt7TQ=;
-        b=XhotPjCtFrrkvpxaJbXNGbFVj2zrV24A5/UMXkO+qCweMi6RqSJTI3nTz9E3pkpxkL
-         sQG3oMV8xV61qP3oL6uXPtfsatrt0Hn62gRWFcZaWpGY6eDzhs35swUJVES7W2To6DvB
-         ovWaS/GAjHmMGx5OYRr5WL7gZgsza8nh2w61FT2WTViUdN3nFOpFzDXftlmLV44C0I1Y
-         ku4049pvwKlTRtQUDBBgvi7um3k8i32r6v3RqkCEin72Z6o9bO/PvMo4wnDWItOfH6nU
-         kLEZBzpwthjfdxrqHXL3PrIWwXeHUaZopxJ12bDPTzP3psN1/ICsWv66AxuORESaNTSs
-         OqZA==
+        d=linaro.org; s=google; t=1741947788; x=1742552588; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=A9qhYFO2Mz5BK+5cb8bKbZyFz3Gd+W4DhIesU6ilFo8=;
+        b=J4j2XU+mmEj6MWR1QhuF3a2pw6PeqgtXilwO6TplPZdWGgS5xtvxFVwVxzAg7GO8Tw
+         BZIAGpLd92QosdnX+DVw8HYtlpurYFquyTVeBckfp2+UCm6aYHvGJ/TL0ywl+fIl5Avr
+         TnsKVaDiGx03qp1crmX2dOwVI2HovbPp1EnoJtCoH9Vv1gG+nPibSaCJAOlHwkyredlo
+         GnyO+GWJZQ8bYlNpwtlsJDNR+Jo6BA4xf3COrjk2fGVh1XVqIhTDF2koGDSFUu8SxAGY
+         B7KRnaO4ntMwHmRI6LDfr3e5kB+I/GEpBkW0nSsnvp92cjOgK4EFK9rC6aJdogAVejgi
+         Y9AQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741947770; x=1742552570;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WLC14bT7l5qVe9L1a3up7gLBRmwJJU5Zq8l66jxt7TQ=;
-        b=ZZf/rdrazzJ9LmixHW/v1nXMgXtQ0TGrbK2t9zs0gonZelcHn3PiVzTlkfl4UbnPL6
-         g2C5+E8V0/GJUrY9DVlUIUpvErMziR19xyYP7ugvUlhgP5zI8g9V5p87PcnlVqyFb9qV
-         8gHiF2V9QAD6d04uIzGecjTOoDwBTPA+2eaGC3kAjVb7YH1Bw70vtq6hmNo+NZLHPrmO
-         ya5+6FL0shCQzdZK/Re9KPtK0jcK0QN2aGtCX0m+6RozXsG6+9mfHnr8MmfpR4kztLOg
-         wWdO+g8Q7I76dDhso0P44wLw7wlPc2RjrreHoHv8dMxn6c1bJs73F9AbUoRGVhAPp0oa
-         fYhg==
-X-Forwarded-Encrypted: i=1; AJvYcCVnHjnrAFpp1aW61dqC3sDlrurGrz157+3pUTW0Uh41jxa1rYBZXeSgDWajiTU79lyWsiRjhgs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDwFw+Yqrx/sMI1tiuXm0C+DaWJlop1zF52PAqRxJ7xhHBkJ6y
-	Wfbyhtmfs3eESbtKQCvfiqdQjKB7mgh7nCYj+zBnl/sSW9dfX4zcymuuOcoj/3Y=
-X-Gm-Gg: ASbGncvdVCV8bKmmgQIYktDub6Hi2DdEPX1d+yTxS7i3F56BPpVG5nEX9ax3jSoQKne
-	d63rxw9G9bBmIYNDg7vQsTDPGo6Fja0ggRTd4+IDpjwEXYAJ/M3HNjNWQcAleqMsFUR/Xhv2mCd
-	Syq6G7XR/vlIvNtSi6Mg7c+VQvNsg/r5iwvRPAsqC7TC7LhCWsZmsyWwydHZ61+uoZ/HDr7WjpI
-	8Nj8qEpANcqV1infKD9gaq+0livUCL7MPuD/2XW4hUkMNq7JOYX8Qx5KdJbSp6Q+LCgT6kYty9C
-	JsDVLWzqcgPY+LKk55RabAqEXMQGNinkP9JTUFq17yXwRVZGh11cMBVK
-X-Google-Smtp-Source: AGHT+IEtf+5uMhZHeMpuNHp44VDObLkwKhS755JgMPyzBh3Tkne5oU6MDvaxu9uSs1lL4nigwL2EYA==
-X-Received: by 2002:a17:906:c10d:b0:ac2:9210:d96e with SMTP id a640c23a62f3a-ac3304412b9mr190659866b.43.1741947769542;
-        Fri, 14 Mar 2025 03:22:49 -0700 (PDT)
-Received: from [10.20.7.108] ([195.29.209.28])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac314a9db94sm209442666b.171.2025.03.14.03.22.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Mar 2025 03:22:49 -0700 (PDT)
-Message-ID: <21d52659-622a-4b2a-b091-787bf0f5d67f@blackwall.org>
-Date: Fri, 14 Mar 2025 12:22:47 +0200
+        d=1e100.net; s=20230601; t=1741947788; x=1742552588;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A9qhYFO2Mz5BK+5cb8bKbZyFz3Gd+W4DhIesU6ilFo8=;
+        b=ZANFm3gcZmPscrG2qqAtNDkkafwzrpCybOxbwcXjroVj6SVi1B6ZpenbIQfgQZo275
+         GrT8vwwoeRhIRxgaRvjQW6UHxqK6oT7jqBsRLoQmk6Lk/rX3rfd6/+2AeRKcszjC0FKQ
+         q3BYVCY7qsfnpIWSwWwBWG5R0FfRI4qNk+pT49MmXEyFj69j7ZNPqjUv+/mhS+HZgtCS
+         6kxPl6e+LwzFruiXZhakfHDe8PRetespmj1Bf75+clzR5jELXCnHl2qU02XIiUvXbx7i
+         k9vb3PHYKDHaUJOkk43VaRX0DxTL6/5DZwwsauEfCqA34s0t3jpjkqlMfZ+Wx8Sa7X9C
+         ZJzQ==
+X-Gm-Message-State: AOJu0YymuJMMUxn1mBGsezMHBvk6YGqKJbTRgUgzjVOKSfL3xNeGi57m
+	E25oKQaYeQANvVSFjppJSxGy7smBzGg9GfX2XeQ8yJSCDRk0avn/ZFKm/DoHIg0=
+X-Gm-Gg: ASbGncvaMFcOxS4kuwSR8qpvolXTWzMzr5SYhSMn7JOLiZEFPnUEHajCPnT+576zDV1
+	DyhgI1LtCjCooML0DqK1HMO+rIb+GQdPI9HxERTJiAaCsJjrKoAlFTkaOW7kJrWZl6LmQ9gMd5r
+	za2U4u4ubG4muqfNScMlxfZpCfZpDwi1zlYjdwhmm/NoVPmi6SDwWVztzIRNwTDYlmlEou49wRU
+	JhBH78A4vRcYk/i129QiIyMKhfc84E26Y35Y3UZkkvyFOPVQWJGpwHEvXBC6EzyrxgnInH4ciot
+	SuE+NGR5TcoQXUfMr2w3aygvcOLuDh2BbTfvQ8NwOt/CPn5pWA==
+X-Google-Smtp-Source: AGHT+IEPf4tx/8o7szBqHf8eAYY/FeTSSO0PREgglbEkbzyNp/0GBJrTe1d2hM3HG47ZIFBOIaTS8g==
+X-Received: by 2002:a05:600c:3b10:b0:43b:c95f:fd9 with SMTP id 5b1f17b1804b1-43d1ec66f29mr26789495e9.5.1741947788051;
+        Fri, 14 Mar 2025 03:23:08 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-43d1ffb629dsm12728145e9.3.2025.03.14.03.23.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Mar 2025 03:23:07 -0700 (PDT)
+Date: Fri, 14 Mar 2025 13:23:04 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Matthew Wilcox <willy@infradead.org>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: netdev@vger.kernel.org, jiri@resnulli.us, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, pierre@stackhpc.com, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, maxime.chevallier@bootlin.com,
+	christophe.leroy@csgroup.eu, arkadiusz.kubalewski@intel.com,
+	vadim.fedorenko@linux.dev
+Subject: Re: [PATCH net v2 0/3] fix xa_alloc_cyclic() return checks
+Message-ID: <c2d160cd-b128-47ea-be0c-9775aa6ea0cc@stanley.mountain>
+References: <20250312095251.2554708-1-michal.swiatkowski@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] bonding: check xdp prog when set bond mode
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- Wang Liang <wangliang74@huawei.com>, jv@jvosburgh.net,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, john.fastabend@gmail.com, joamaki@gmail.com
-Cc: yuehaibing@huawei.com, zhangchangzhong@huawei.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-References: <20250314073549.1030998-1-wangliang74@huawei.com>
- <87y0x7rkck.fsf@toke.dk>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <87y0x7rkck.fsf@toke.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250312095251.2554708-1-michal.swiatkowski@linux.intel.com>
 
-On 3/14/25 12:13 PM, Toke Høiland-Jørgensen wrote:
-> Wang Liang <wangliang74@huawei.com> writes:
+On Wed, Mar 12, 2025 at 10:52:48AM +0100, Michal Swiatkowski wrote:
+> Pierre Riteau <pierre@stackhpc.com> found suspicious handling an error
+> from xa_alloc_cyclic() in scheduler code [1]. The same is done in few
+> other places.
 > 
->> Following operations can trigger a warning[1]:
->>
->>     ip netns add ns1
->>     ip netns exec ns1 ip link add bond0 type bond mode balance-rr
->>     ip netns exec ns1 ip link set dev bond0 xdp obj af_xdp_kern.o sec xdp
->>     ip netns exec ns1 ip link set bond0 type bond mode broadcast
->>     ip netns del ns1
->>
->> When delete the namespace, dev_xdp_uninstall() is called to remove xdp
->> program on bond dev, and bond_xdp_set() will check the bond mode. If bond
->> mode is changed after attaching xdp program, the warning may occur.
->>
->> Some bond modes (broadcast, etc.) do not support native xdp. Set bond mode
->> with xdp program attached is not good. Add check for xdp program when set
->> bond mode.
->>
->>     [1]
->>     ------------[ cut here ]------------
->>     WARNING: CPU: 0 PID: 11 at net/core/dev.c:9912 unregister_netdevice_many_notify+0x8d9/0x930
->>     Modules linked in:
->>     CPU: 0 UID: 0 PID: 11 Comm: kworker/u4:0 Not tainted 6.14.0-rc4 #107
->>     Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.15.0-0-g2dd4b9b3f840-prebuilt.qemu.org 04/01/2014
->>     Workqueue: netns cleanup_net
->>     RIP: 0010:unregister_netdevice_many_notify+0x8d9/0x930
->>     Code: 00 00 48 c7 c6 6f e3 a2 82 48 c7 c7 d0 b3 96 82 e8 9c 10 3e ...
->>     RSP: 0018:ffffc90000063d80 EFLAGS: 00000282
->>     RAX: 00000000ffffffa1 RBX: ffff888004959000 RCX: 00000000ffffdfff
->>     RDX: 0000000000000000 RSI: 00000000ffffffea RDI: ffffc90000063b48
->>     RBP: ffffc90000063e28 R08: ffffffff82d39b28 R09: 0000000000009ffb
->>     R10: 0000000000000175 R11: ffffffff82d09b40 R12: ffff8880049598e8
->>     R13: 0000000000000001 R14: dead000000000100 R15: ffffc90000045000
->>     FS:  0000000000000000(0000) GS:ffff888007a00000(0000) knlGS:0000000000000000
->>     CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>     CR2: 000000000d406b60 CR3: 000000000483e000 CR4: 00000000000006f0
->>     Call Trace:
->>      <TASK>
->>      ? __warn+0x83/0x130
->>      ? unregister_netdevice_many_notify+0x8d9/0x930
->>      ? report_bug+0x18e/0x1a0
->>      ? handle_bug+0x54/0x90
->>      ? exc_invalid_op+0x18/0x70
->>      ? asm_exc_invalid_op+0x1a/0x20
->>      ? unregister_netdevice_many_notify+0x8d9/0x930
->>      ? bond_net_exit_batch_rtnl+0x5c/0x90
->>      cleanup_net+0x237/0x3d0
->>      process_one_work+0x163/0x390
->>      worker_thread+0x293/0x3b0
->>      ? __pfx_worker_thread+0x10/0x10
->>      kthread+0xec/0x1e0
->>      ? __pfx_kthread+0x10/0x10
->>      ? __pfx_kthread+0x10/0x10
->>      ret_from_fork+0x2f/0x50
->>      ? __pfx_kthread+0x10/0x10
->>      ret_from_fork_asm+0x1a/0x30
->>      </TASK>
->>     ---[ end trace 0000000000000000 ]---
->>
->> Fixes: 9e2ee5c7e7c3 ("net, bonding: Add XDP support to the bonding driver")
->> Signed-off-by: Wang Liang <wangliang74@huawei.com>
->> ---
->>  drivers/net/bonding/bond_options.c | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
->> index 327b6ecdc77e..127181866829 100644
->> --- a/drivers/net/bonding/bond_options.c
->> +++ b/drivers/net/bonding/bond_options.c
->> @@ -868,6 +868,9 @@ static bool bond_set_xfrm_features(struct bonding *bond)
->>  static int bond_option_mode_set(struct bonding *bond,
->>  				const struct bond_opt_value *newval)
->>  {
->> +	if (bond->xdp_prog)
->> +		return -EOPNOTSUPP;
->> +
+> v1 --> v2: [2]
+>  * add fixes tags
+>  * fix also the same usage in dpll and phy
 > 
-> Should we allow changing as long as the new mode also supports XDP?
+> [1] https://lore.kernel.org/netdev/20250213223610.320278-1-pierre@stackhpc.com/
+> [2] https://lore.kernel.org/netdev/20250214132453.4108-1-michal.swiatkowski@linux.intel.com/
 > 
-> -Toke
-> 
-> 
+> Michal Swiatkowski (3):
+>   devlink: fix xa_alloc_cyclic() error handling
+>   dpll: fix xa_alloc_cyclic() error handling
+>   phy: fix xa_alloc_cyclic() error handling
 
-+1
-I think we should allow it, the best way probably is to add a new
-BOND_VALFLAG_XDP_UNSUPP (for example) as a bond option flag and to set
-it in bond_options.c for each mode that doesn't support XDP, then you
-can do the check in a generic way (for any option) in
-bond_opt_check_deps. Any bond option that can't be changed with XDP prog
-should have that flag set.
+Maybe there should be a wrapper around xa_alloc_cyclic() for people who
+don't care about the 1 return?
 
-Cheers,
- Nik
+int wrapper()
+{
+        ret = xa_alloc_cyclic();
+        if (ret < 0)
+                return ret;
+        rerturn 0;
+}
 
+regards,
+dan carpenter
 
