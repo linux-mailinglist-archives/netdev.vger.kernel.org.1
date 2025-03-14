@@ -1,112 +1,90 @@
-Return-Path: <netdev+bounces-174950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D36D6A618F1
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 19:03:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64F6BA61912
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 19:09:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36B9A7A6712
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 18:02:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5696C19C4AF8
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 18:09:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CFE91FF615;
-	Fri, 14 Mar 2025 18:03:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86171201006;
+	Fri, 14 Mar 2025 18:09:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="tgCW5XDH"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="HOzTY4ZN"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 163F415ADB4
-	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 18:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85262E3389
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 18:09:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741975398; cv=none; b=O6yiGCYg00ED/upWTHgmhbCC67E8yH9ZJwCJnPSp/tnmgo8LfxcxP60nCdhmaHrkD/5WbzDSXoL+GENYx4NOodEBvXj1SGDn19mcRbnL1bjWULF86sUReUGiL270dDC3xOwsZAPnGihuvecKeC5rRwdHGEd1zJ51BOdKXDULPwY=
+	t=1741975786; cv=none; b=DKnX4w/BlibccuysSFe8qIS0JxnQTtiDNHw6AI3qqUd+pgoavG5mGYLx97V8mAj4uJuKbuvXnrIwNAbybsqz1D68bMvCquG2LlBo3NgQsarAxngFJ2G6J18OLNUEbqmOFhhEmFrXSP9bXnnY5aULc1CRsjn4lOZuGI2DS9svohA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741975398; c=relaxed/simple;
-	bh=/PBlYoYoPiVBkIVh1GooR9no0jFcOokQ0sr6aAVm1FE=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=X9mAxzVJ8HACNA+QNHV511v+WSbpIKoX9qBzfuc6g5w1SZ52guBxIT22r98XADhPLUaMDbwzMgbkxxX5vgmGd89ON/BAmVxylxXq0v9/Dlv7+K+41p6cP1eZyGQMb3ziPd6RY2eGqmJ9dvod/iCaiL8CJRv8VZVSW/izK85Hzbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=tgCW5XDH; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+	s=arc-20240116; t=1741975786; c=relaxed/simple;
+	bh=svtYVowsPXZ0W25ampgxRVUb9Tlp4lTaOg3zrZmUxoc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=om7j+k0IqIsvRKMqFxGXrKMBzB2m13FXv1/Mm+sCBk4xb4SGYfl8y2FCnEPN5/jW1SXnANGecKVc6BeVotiWWXFGGoxRg81xiCsDaVidTvtThqm/fyScmvO08Kq7vbTJ7PWG71yVZYCaeUynX6/OuLbWQBXlgX59go/19UE18vM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=HOzTY4ZN; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=TgHfgZdfHwr3VmPVenW/lrNRZErmyNxPVMe0JcfQ1QY=; b=tgCW5XDH3faGlWtg3QVF6uope3
-	kDyVymeZhDdoTIRHMZm2ZgbkIU3NSKYuUdk4dcFb1gdTeIeCAHhoI68mJR9N9srnLZlxPKIkeDRf/
-	icp1oXrp+44SVSIPnvYGsFkAzsJURuJda1WDOAl5u+QbvabMLf5dKv7/oArVqgAAq2/e2Hpd3cKde
-	23nvDnH82EE0MjxWWQy2zABD3BR2piwFeBBeUZr+COkpIuBWKcuiEuOai1DJQipwx3T0PFgbefuc6
-	9AWmgACO78bc+n0mei+87fAIvLZhSPK34nLqFpu11R/0JO7qZYdF32P7MIguKZRYS3JlyssvtRgVp
-	TD+zshhw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:59374 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tt9NB-0000fU-28;
-	Fri, 14 Mar 2025 18:03:05 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tt9Mq-006xIG-IC; Fri, 14 Mar 2025 18:02:44 +0000
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=svtYVowsPXZ0W25ampgxRVUb9Tlp4lTaOg3zrZmUxoc=; b=HOzTY4ZNRSwLMgojXRn0uSxI0Z
+	l1NmwI86+ro0wBFfsyv49L2Y3SgxnPEXZ/cq+uCgJAfXI8WcC+xZCmYUnseK3LxXwc7W4pKQoXpAX
+	oe1DFr4EnSTZyvWvdptEs+1/3MUD3Bw6MnHAIumsXHjcoXSO0QU6DzKu1KeWzJs8nJxC9svCEoUeC
+	AhGOSvSAlbszMCxbbOHoAVfaswmr0XwtkHNSMNc9YbD7QcouUjDlX8dgignbvEgitsLlPUWdUJd6b
+	c1Du+z0SIaV0kP+gLEvwZai3WYSHcA6ixGm1pGms7QPk1xfnefCWkiGDuKIVO156/jBsW7rUqPic3
+	264SeGZg==;
+Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tt9TB-00000004DDN-2IlR;
+	Fri, 14 Mar 2025 18:09:17 +0000
+Date: Fri, 14 Mar 2025 18:09:16 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: shuah <shuah@kernel.org>
+Cc: Yunsheng Lin <linyunsheng@huawei.com>,
+	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+	Yunsheng Lin <yunshenglin0825@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
 	"David S. Miller" <davem@davemloft.net>,
+	Yonglong Liu <liuyonglong@huawei.com>,
+	Mina Almasry <almasrymina@google.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next] net: stmmac: remove unnecessary stmmac_mac_set() in
- stmmac_release()
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, linux-mm@kvack.org,
+	netdev@vger.kernel.org, conduct@kernel.org
+Subject: Re: [RFC PATCH net-next] page_pool: Track DMA-mapped pages and unmap
+ them when destroying the pool
+Message-ID: <Z9RwzMGadbRWnuqo@casper.infradead.org>
+References: <20250308145500.14046-1-toke@redhat.com>
+ <d84e19c9-be0c-4d23-908b-f5e5ab6f3f3f@gmail.com>
+ <87cyepxn7n.fsf@toke.dk>
+ <Z88IYPp_yVLEBFKx@casper.infradead.org>
+ <c6ef4594-2d87-4fff-bee2-a09556d33274@huawei.com>
+ <Z9BSlzpbNRL2MzPj@casper.infradead.org>
+ <8fa8f430-5740-42e8-b720-618811fabb22@huawei.com>
+ <52f4e8b1-527a-42fb-9297-2689ba7c7516@kernel.org>
+ <d143b16a-feda-4307-9e06-6232ecd08a88@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tt9Mq-006xIG-IC@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Fri, 14 Mar 2025 18:02:44 +0000
+In-Reply-To: <d143b16a-feda-4307-9e06-6232ecd08a88@kernel.org>
 
-stmmac_release() calls phylink_stop() and then goes on to call
-stmmac_mac_set(, false). However, phylink_stop() will call
-stmmac_mac_link_down() before returning, which will do this work.
-Remove this unnecessary call.
+On Wed, Mar 12, 2025 at 12:48:56PM -0600, shuah wrote:
+> This message is a rude personal attack. This isn't the way to treat your
+> peers in the community. Apology is warranted.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Tested-by: Furong Xu <0x1207@gmail.com>
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 ---
- 1 file changed, 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index c2ee6c0af3fd..839ecebf5f5f 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -4129,9 +4129,6 @@ static int stmmac_release(struct net_device *dev)
- 	/* Release and free the Rx/Tx resources */
- 	free_dma_desc_resources(priv, &priv->dma_conf);
- 
--	/* Disable the MAC Rx/Tx */
--	stmmac_mac_set(priv, priv->ioaddr, false);
--
- 	/* Powerdown Serdes if there is */
- 	if (priv->plat->serdes_powerdown)
- 		priv->plat->serdes_powerdown(dev, priv->plat->bsp_priv);
--- 
-2.30.2
-
+I apologise for the insult; that was unnecessary.
 
