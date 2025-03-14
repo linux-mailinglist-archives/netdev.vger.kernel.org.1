@@ -1,183 +1,231 @@
-Return-Path: <netdev+bounces-174843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E5F8A60F4D
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 11:50:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60880A60FAF
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 12:16:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7503117FDFC
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 10:50:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96D6517E24E
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 11:16:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE3791FCF53;
-	Fri, 14 Mar 2025 10:50:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9C931FCFEF;
+	Fri, 14 Mar 2025 11:16:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bWjvKezF"
+	dkim=pass (2048-bit key) header.d=fossekall.de header.i=@fossekall.de header.b="XUdn0MCw";
+	dkim=permerror (0-bit key) header.d=fossekall.de header.i=@fossekall.de header.b="DnafzTJg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.166])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 147931779AE
-	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 10:50:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741949432; cv=none; b=Da62lUKxvcjtCTetm1ExsjAhn1+An4uAyaFEdTkCYs4orWvjkKydvPJg0QaNUCm7q6m8mIFG0RWEXe2XGR3YlcQ8I623zHMLRw5eGNKccbYD3GfrWVSG5vhxQvg7F/Sl7HJ8aj0VuER7h2OCbrR3A/TNd4TPsqD7ORmXx2wOPnc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741949432; c=relaxed/simple;
-	bh=pV/i3PKyujs2F6/TFFWtpucAn/XpLc5VI6KGba6GnYM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=f5bL06MHc6wgorb+QHhSqau5p/XItLiAtvde4ds5wlW80/Z7huII80KC6F26Xl5Juq2voEpBPlubdzi9e3TOx8cBuLBaag0RJI8GztIFLwB0qQi8maEEeOYoSx/vY/MDhE3pjqDw91yPPalataz11jTJ1jqNYGTTn27TjyiLCZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=bWjvKezF; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43cfb6e9031so18602065e9.0
-        for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 03:50:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741949429; x=1742554229; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=od5SDVzRsqJnhKtT9u8lJ7jltmdYkNALPPyMQCmEgnE=;
-        b=bWjvKezFVyg/dTjqrHRKL3mHCD94ErMdVk26I1uPy9of4AJk/NQzz6M4uKHAKHTcZe
-         sW0/bX1ptaBk8pS8QLa+PI3Fuq1gK2yluv5qeylGfvTFfRWM/HNjr2iiKFnaTpYFP1UY
-         WoNspOvEDTPGMTP7FVzrI9JuYAWyqLdPTo461+P0lzekCSsKH3o4RW+czdvyY44w8BDq
-         mQDV9UmCmJMJjWtw/TzpQtBUK3qBrclhAbSp/gWOmiIHXDXyUDksttNTWoDVnyKzk6ga
-         VkNivDiPwTkcifgM6UsgufQx94vfsrpMJN1AER5wwfKKFtvI5s/dXF5Im1fCLk50q5jN
-         GTqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741949429; x=1742554229;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=od5SDVzRsqJnhKtT9u8lJ7jltmdYkNALPPyMQCmEgnE=;
-        b=K7fwmiiVcbi/qZm1PU5AT63m646PYKr6vtyq509kaD7Jy5pu1V9B5uDgHsouzUlW2W
-         8EwPwtIoM1vKTr+XZkrMDZK0saPT4tXewPq8/579hKPwaeWQIkSEnJ3midHmefGKcMlN
-         1irnuNUk/OyU4fDAOYPxw0FONIgmt1ngQJbtcXxr4GYzkm6aT1Dy20klifo8OvyjqSp3
-         jF0+6Ygp0zmvGELDaj/U+xx3OQDLjujMUNDDq/007HyNltfkWTJ+fZsjXtQk31mK5kvk
-         e5teKR0IiivyzmybXomMN9o6qN52+f0Nb5QgLSgqdtI4Ce/BSZTTWtGajfJUrP2P0sCg
-         dVwQ==
-X-Gm-Message-State: AOJu0Yyc78qxwnmSoGRorMnQeqD0zo+o+EZx238bF4BHl+viEkxnSyLa
-	YIpXcnX2aaWhJ+YBpg8VeICt+7YEFhQL13i/sg3Mp/MqTcA1iCArGmkP07cabu2+RGFa9IqDJ0E
-	U
-X-Gm-Gg: ASbGncs4OUd4IqSP7txzfAB1A/3emOpq/7g8W2mIvdy5OkMfeqUGlUV3z6gVnl2/Ytp
-	/z82xkY/cMxmlstgCNdk+2fcNp7mglzkN3QKTtbzyhqISiUDC0ZNZwesEPKRzI0ogdQNNYtfhD4
-	VC19rxScGqQp92pkpZDTlYIwe2vpRl4QIrk8j9gMRnIBa9+V13DgG2xjeG0sdonzjHSOogM3fcM
-	GFnpODTrNjaEecOVAYFdwnifnb2v5ghuN6971srczSTG2LmuV//+5L74Ok+vlg76hVJHKu4rzU9
-	DFjrOEnRVPseNVjC6DIiKeqlreqgtMFBm/GeDPUFCjCb0relYR5F5mqRHn+A
-X-Google-Smtp-Source: AGHT+IHvBotvaSh2qWNqxyJfZlOzdoLexgIaj5jk8svfw+NdgPNIfM+Z0q5WgikQ9jzY6egbCNl3iA==
-X-Received: by 2002:a05:600c:4f8a:b0:43c:fbe2:df3c with SMTP id 5b1f17b1804b1-43d1ecee010mr22546485e9.26.1741949429283;
-        Fri, 14 Mar 2025 03:50:29 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-43d1fdbc4cesm9813735e9.0.2025.03.14.03.50.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Mar 2025 03:50:28 -0700 (PDT)
-Date: Fri, 14 Mar 2025 13:50:24 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: netdev@vger.kernel.org
-Subject: [bug report] net: ti: icssg-prueth: Add XDP support
-Message-ID: <70d8dd76-0c76-42fc-8611-9884937c82f5@stanley.mountain>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 771D0145A11;
+	Fri, 14 Mar 2025 11:16:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.166
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741951008; cv=pass; b=RWqfZMDJLcoPQ0NskJfp81oqVtn3ufSvCFPS0Nxwj8WWaCpTYkzL1zhSYJN+SC8AddvzvbcRYTR5BcTQR9WhZz6Fmg07I1MMiZYGbP+bCHZN98f6v74VB9dJgbF9j2uJ5VFyGU+HSbPuLnwBuSjwsW+8tXDXB6GRGkk2Hn+Q3Ho=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741951008; c=relaxed/simple;
+	bh=+PYcjoktx+DO0SoHiLHxaPx4ZqFF55Gbww8pYaq+hjM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lM04zTBqy9JOXVAyJFDil7oilwaq30/thhAkY3JdOa8GelJxOHYjOgxVUApEIikhlzCEAfnFlBbBGTqBcvUNPqrVZYjZPODYjQPzRowFLIhNPAqFRx9UAQfQVWRLaixeKLoscxdlPws28ueuz96f8e4aVOHLHf7V3XdDFGjoF1w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fossekall.de; spf=pass smtp.mailfrom=a98shuttle.de; dkim=pass (2048-bit key) header.d=fossekall.de header.i=@fossekall.de header.b=XUdn0MCw; dkim=permerror (0-bit key) header.d=fossekall.de header.i=@fossekall.de header.b=DnafzTJg; arc=pass smtp.client-ip=81.169.146.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fossekall.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=a98shuttle.de
+ARC-Seal: i=1; a=rsa-sha256; t=1741950995; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=eXHGtXE/ff+F805gvtKsj9CXfYfMen9brdT0hPg8heG+sMyq4pOLCl8sjZLhuJa8P2
+    LaqKassDTL0iSzYOLAWeKpsyt74eEwtmzOJbeQ9jhjcL8Uw1L/bWseS6n7+o0aDw+08G
+    lWMqXUw0R6nlIxyo+XRanD/1S7iBAklHmEpExP+zGAyIrLfZnXziqPvWgE4Ju2WhcK9C
+    qN02BMxP5LASd80W7c0qIjdayy6WwpNKX/HQCQL1Oh1iB97qBp/keNZnPU1mkE/U7WOT
+    PypZmvtblCMAb8V7045eAlRjmvufzZEJ0pIiwV2SJV8FvaONy7MPRqPCI+P8QZmfuViO
+    efPA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1741950995;
+    s=strato-dkim-0002; d=strato.com;
+    h=References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=F6M2eNNuf6vg09XfgE6JMubfeiWpsxsqRMl05u87rSw=;
+    b=bW0zpu3hEvA7weLr3r60RPZutwa6MSwRuw+GUsLCCAPUQnswBz1v3AviAvGntkSnv5
+    Kgv3kQ5AFhDrRG3cfU4eDPswfNoFMWz7p980ZPVL15QUu88zZpqU/yk1qac73o+7u6dv
+    vQd23grq4DWhNqg0z5odEBajU2UpEdP1hphXncNXZBpshJQDvrtfLQN7N0bhmhoKquCS
+    k0Xy/+IV20Ogqt5MTpy/H0vsRrDlgFcuHAHH6GTMv2gTHhcrX5aPlaO2yVIdPlLvkVvS
+    v2gQ6Z4P/4cm4QcKmvLpvPr8MraZKKYGtlJz8ae/8jfktzNmmfXdJXDMAuVj8FeELwfa
+    6gIg==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1741950995;
+    s=strato-dkim-0002; d=fossekall.de;
+    h=References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=F6M2eNNuf6vg09XfgE6JMubfeiWpsxsqRMl05u87rSw=;
+    b=XUdn0MCwGZn4sGm0jzvSHg042uYr6jlbmvLROAtkYPy4IunxTfZ5ZQp7fRo/P6N/Ch
+    1KXLLvv70wJXFU+t3HDMZtfmsa/hwDh8C3f8ajPc7K9sH1NTuMpIJs/CSqCmccATTF3j
+    b91ZA3g3T4YuNTknG5wYMS8s9LaAyX0pEF4Cs0VpGhgYVCAw8sQcoYhczVLSWYl88Fjw
+    uC1uIYpdJqpze917QTiylfrjbFpYDPzlGOBSA7XR7Bkp+wwv9WkEC5o9ahFTkstSTPeQ
+    xtZUjltlPU4X3Saevfjo2jcjd0HT61IC4WtdKpOee5jCzVr1eWCRA2sWKOJA5s8d8sLw
+    uIng==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1741950995;
+    s=strato-dkim-0003; d=fossekall.de;
+    h=References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=F6M2eNNuf6vg09XfgE6JMubfeiWpsxsqRMl05u87rSw=;
+    b=DnafzTJgZC0CBL3XSSAxk6diwTF9tGPQAlQ68WdNJXtqSqaJf2DpNNCRDPz6KuUpx8
+    uNEJajldD4VdefU3L+CQ==
+X-RZG-AUTH: ":O2kGeEG7b/pS1EzgE2y7nF0STYsSLflpbjNKxx7cGrBdao6FTL4AJcMdm+lap4JEHkzok9eyEg=="
+Received: from aerfugl
+    by smtp.strato.de (RZmta 51.3.0 AUTH)
+    with ESMTPSA id f28b3512EBGZts4
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Fri, 14 Mar 2025 12:16:35 +0100 (CET)
+Received: from koltrast.home ([192.168.1.27] helo=a98shuttle.de)
+	by aerfugl with smtp (Exim 4.96)
+	(envelope-from <michael@a98shuttle.de>)
+	id 1tt31m-0000Id-00;
+	Fri, 14 Mar 2025 12:16:34 +0100
+Received: (nullmailer pid 84461 invoked by uid 502);
+	Fri, 14 Mar 2025 11:16:33 -0000
+From: Michael Klein <michael@fossekall.de>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Michael Klein <michael@fossekall.de>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [net-next,v2,1/2] net: phy: realtek: Clean up RTL8211E ExtPage access
+Date: Fri, 14 Mar 2025 12:15:44 +0100
+Message-Id: <20250314111545.84350-2-michael@fossekall.de>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250314111545.84350-1-michael@fossekall.de>
+References: <20250314111545.84350-1-michael@fossekall.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
 
-Hello Roger Quadros,
+- Factor out RTL8211E extension page access code to
+  rtl8211e_modify_ext_page()/rtl8211e_read_ext_page() and add some
+  related #define:s
+- Group RTL8211E_* and RTL8211F_* #define:s
+- Clean up rtl8211e_config_init()
 
-Commit 62aa3246f462 ("net: ti: icssg-prueth: Add XDP support") from
-Mar 5, 2025 (linux-next), leads to the following Smatch static
-checker warning:
+Signed-off-by: Michael Klein <michael@fossekall.de>
+---
+ drivers/net/phy/realtek/realtek_main.c | 64 +++++++++++++++++---------
+ 1 file changed, 42 insertions(+), 22 deletions(-)
 
-	drivers/net/ethernet/ti/icssg/icssg_common.c:635 emac_xmit_xdp_frame()
-	error: we previously assumed 'first_desc' could be null (see line 584)
+diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
+index 7a0b19d66aca..abea2291b0f4 100644
+--- a/drivers/net/phy/realtek/realtek_main.c
++++ b/drivers/net/phy/realtek/realtek_main.c
+@@ -28,13 +28,21 @@
+ 
+ #define RTL821x_INSR				0x13
+ 
+-#define RTL821x_EXT_PAGE_SELECT			0x1e
++#define RTL8211E_EXT_PAGE_SELECT		0x1e
+ #define RTL821x_PAGE_SELECT			0x1f
+ 
++#define RTL8211E_SET_EXT_PAGE			0x07
++
++#define RTL8211E_CTRL_DELAY			BIT(13)
++#define RTL8211E_TX_DELAY			BIT(12)
++#define RTL8211E_RX_DELAY			BIT(11)
++
+ #define RTL8211F_PHYCR1				0x18
+ #define RTL8211F_PHYCR2				0x19
+ #define RTL8211F_INSR				0x1d
+ 
++#define RTL8211F_CLKOUT_EN			BIT(0)
++
+ #define RTL8211F_LEDCR				0x10
+ #define RTL8211F_LEDCR_MODE			BIT(15)
+ #define RTL8211F_LEDCR_ACT_TXRX			BIT(4)
+@@ -51,12 +59,6 @@
+ #define RTL8211F_ALDPS_ENABLE			BIT(2)
+ #define RTL8211F_ALDPS_XTAL_OFF			BIT(12)
+ 
+-#define RTL8211E_CTRL_DELAY			BIT(13)
+-#define RTL8211E_TX_DELAY			BIT(12)
+-#define RTL8211E_RX_DELAY			BIT(11)
+-
+-#define RTL8211F_CLKOUT_EN			BIT(0)
+-
+ #define RTL8201F_ISR				0x1e
+ #define RTL8201F_ISR_ANERR			BIT(15)
+ #define RTL8201F_ISR_DUPLEX			BIT(13)
+@@ -134,6 +136,36 @@ static int rtl821x_write_page(struct phy_device *phydev, int page)
+ 	return __phy_write(phydev, RTL821x_PAGE_SELECT, page);
+ }
+ 
++static int rtl8211e_read_ext_page(struct phy_device *phydev, u16 ext_page,
++				  u32 regnum)
++{
++	int oldpage, ret = 0;
++
++	oldpage = phy_select_page(phydev, RTL8211E_SET_EXT_PAGE);
++	if (oldpage >= 0) {
++		ret = __phy_write(phydev, RTL8211E_EXT_PAGE_SELECT, ext_page);
++		if (!ret)
++			ret = __phy_read(phydev, regnum);
++	}
++
++	return phy_restore_page(phydev, oldpage, ret);
++}
++
++static int rtl8211e_modify_ext_page(struct phy_device *phydev, u16 ext_page,
++				    u32 regnum, u16 mask, u16 set)
++{
++	int oldpage, ret = 0;
++
++	oldpage = phy_select_page(phydev, RTL8211E_SET_EXT_PAGE);
++	if (oldpage >= 0) {
++		ret = __phy_write(phydev, RTL8211E_EXT_PAGE_SELECT, ext_page);
++		if (!ret)
++			ret = __phy_modify(phydev, regnum, mask, set);
++	}
++
++	return phy_restore_page(phydev, oldpage, ret);
++}
++
+ static int rtl821x_probe(struct phy_device *phydev)
+ {
+ 	struct device *dev = &phydev->mdio.dev;
+@@ -600,7 +632,8 @@ static int rtl8211f_led_hw_control_set(struct phy_device *phydev, u8 index,
+ 
+ static int rtl8211e_config_init(struct phy_device *phydev)
+ {
+-	int ret = 0, oldpage;
++	const u16 delay_mask = RTL8211E_CTRL_DELAY |
++		RTL8211E_TX_DELAY | RTL8211E_RX_DELAY;
+ 	u16 val;
+ 
+ 	/* enable TX/RX delay for rgmii-* modes, and disable them for rgmii. */
+@@ -630,20 +663,7 @@ static int rtl8211e_config_init(struct phy_device *phydev)
+ 	 * 12 = RX Delay, 11 = TX Delay
+ 	 * 10:0 = Test && debug settings reserved by realtek
+ 	 */
+-	oldpage = phy_select_page(phydev, 0x7);
+-	if (oldpage < 0)
+-		goto err_restore_page;
+-
+-	ret = __phy_write(phydev, RTL821x_EXT_PAGE_SELECT, 0xa4);
+-	if (ret)
+-		goto err_restore_page;
+-
+-	ret = __phy_modify(phydev, 0x1c, RTL8211E_CTRL_DELAY
+-			   | RTL8211E_TX_DELAY | RTL8211E_RX_DELAY,
+-			   val);
+-
+-err_restore_page:
+-	return phy_restore_page(phydev, oldpage, ret);
++	return rtl8211e_modify_ext_page(phydev, 0xa4, 0x1c, delay_mask, val);
+ }
+ 
+ static int rtl8211b_suspend(struct phy_device *phydev)
+-- 
+2.39.5
 
-drivers/net/ethernet/ti/icssg/icssg_common.c
-   563  u32 emac_xmit_xdp_frame(struct prueth_emac *emac,
-   564                          struct xdp_frame *xdpf,
-   565                          struct page *page,
-   566                          unsigned int q_idx)
-   567  {
-   568          struct cppi5_host_desc_t *first_desc;
-   569          struct net_device *ndev = emac->ndev;
-   570          struct prueth_tx_chn *tx_chn;
-   571          dma_addr_t desc_dma, buf_dma;
-   572          struct prueth_swdata *swdata;
-   573          u32 *epib;
-   574          int ret;
-   575  
-   576          if (q_idx >= PRUETH_MAX_TX_QUEUES) {
-   577                  netdev_err(ndev, "xdp tx: invalid q_id %d\n", q_idx);
-   578                  return ICSSG_XDP_CONSUMED;      /* drop */
-
-Do we need to free something on this path?
-
-   579          }
-   580  
-   581          tx_chn = &emac->tx_chns[q_idx];
-   582  
-   583          first_desc = k3_cppi_desc_pool_alloc(tx_chn->desc_pool);
-   584          if (!first_desc) {
-   585                  netdev_dbg(ndev, "xdp tx: failed to allocate descriptor\n");
-   586                  goto drop_free_descs;   /* drop */
-                        ^^^^^^^^^^^^^^^^^^^^
-This will dereference first_desc and crash.
-
-   587          }
-   588  
-   589          if (page) { /* already DMA mapped by page_pool */
-   590                  buf_dma = page_pool_get_dma_addr(page);
-   591                  buf_dma += xdpf->headroom + sizeof(struct xdp_frame);
-   592          } else { /* Map the linear buffer */
-   593                  buf_dma = dma_map_single(tx_chn->dma_dev, xdpf->data, xdpf->len, DMA_TO_DEVICE);
-   594                  if (dma_mapping_error(tx_chn->dma_dev, buf_dma)) {
-   595                          netdev_err(ndev, "xdp tx: failed to map data buffer\n");
-   596                          goto drop_free_descs;   /* drop */
-   597                  }
-   598          }
-   599  
-   600          cppi5_hdesc_init(first_desc, CPPI5_INFO0_HDESC_EPIB_PRESENT,
-   601                           PRUETH_NAV_PS_DATA_SIZE);
-   602          cppi5_hdesc_set_pkttype(first_desc, 0);
-   603          epib = first_desc->epib;
-   604          epib[0] = 0;
-   605          epib[1] = 0;
-   606  
-   607          /* set dst tag to indicate internal qid at the firmware which is at
-   608           * bit8..bit15. bit0..bit7 indicates port num for directed
-   609           * packets in case of switch mode operation
-   610           */
-   611          cppi5_desc_set_tags_ids(&first_desc->hdr, 0, (emac->port_id | (q_idx << 8)));
-   612          k3_udma_glue_tx_dma_to_cppi5_addr(tx_chn->tx_chn, &buf_dma);
-   613          cppi5_hdesc_attach_buf(first_desc, buf_dma, xdpf->len, buf_dma, xdpf->len);
-   614          swdata = cppi5_hdesc_get_swdata(first_desc);
-   615          if (page) {
-   616                  swdata->type = PRUETH_SWDATA_PAGE;
-   617                  swdata->data.page = page;
-   618          } else {
-   619                  swdata->type = PRUETH_SWDATA_XDPF;
-   620                  swdata->data.xdpf = xdpf;
-   621          }
-   622  
-   623          cppi5_hdesc_set_pktlen(first_desc, xdpf->len);
-   624          desc_dma = k3_cppi_desc_pool_virt2dma(tx_chn->desc_pool, first_desc);
-   625  
-   626          ret = k3_udma_glue_push_tx_chn(tx_chn->tx_chn, first_desc, desc_dma);
-   627          if (ret) {
-   628                  netdev_err(ndev, "xdp tx: push failed: %d\n", ret);
-   629                  goto drop_free_descs;
-   630          }
-   631  
-   632          return ICSSG_XDP_TX;
-   633  
-   634  drop_free_descs:
-   635          prueth_xmit_free(tx_chn, first_desc);
-   636          return ICSSG_XDP_CONSUMED;
-   637  }
-
-
-regards,
-dan carpenter
 
