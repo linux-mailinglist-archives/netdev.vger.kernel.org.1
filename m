@@ -1,121 +1,106 @@
-Return-Path: <netdev+bounces-174988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6D7EA61CD1
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 21:35:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF08BA61CE0
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 21:37:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02D2A3BDF69
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 20:35:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C23D3AA228
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 20:37:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C353204099;
-	Fri, 14 Mar 2025 20:35:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64A061A2872;
+	Fri, 14 Mar 2025 20:37:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eVCH7tNT"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="PBVGTM3+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx18lb.world4you.com (mx18lb.world4you.com [81.19.149.128])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B60191A2872;
-	Fri, 14 Mar 2025 20:35:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5272054FC;
+	Fri, 14 Mar 2025 20:37:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.128
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741984531; cv=none; b=X1J71xMoTg9cMUlev0SgCqFXJI+eEw8pYmkVwLXUCn02WaefqY8666TOEAifP0wwe/U47UYX2q1DJivSUwJDeIQU+8Ozr24XxuyiWpKMdDIzv1ocnZrQm5neW0Sjc0nh40NJO2WGII8HXLaKAYKBdcjK9DkIZFefgnYJ5Xayq+g=
+	t=1741984640; cv=none; b=dzBQX9LyqV9wAPjiUwu1A6MAAJBV52SYufyrK6hCGDEVSYni7SkpuS1BxPe+7768zySEyPM8Np39U7HJwhXKnfJxtwuSysB/doWeZmgbRl70LAy1ivU8APT8Fwn5wpYBgE6CGftX+hXboQwH0e8AtoRUGCrP6LdIF/Xt/rdnjRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741984531; c=relaxed/simple;
-	bh=y35moCP3XItPdmW0djksyvaUKSgqVbG7BR2LexXdQm0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LHYZhm85fv8yk92igNtSQoK1XsyqhHHeUTJQUjwMeVRzK1DpdgWpa45WAXy3P4sddGYW4efsg431t7+EPXsMHIQJg3XEhHN7wbU/5UfY4YO6VnrE5D9HyRgyvj/Gs20j39mwu+MCIt3JdyFwTA/mfAWg2Gj7/NnHu4N5BzVJSDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eVCH7tNT; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3913d45a148so2073896f8f.3;
-        Fri, 14 Mar 2025 13:35:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741984528; x=1742589328; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xj8OXU2bswQnQmpSnQJFG1oDI/cU7j7n5fn2QP89/kU=;
-        b=eVCH7tNTjlK3AGA1YNbVcvLZwtk7nyrg/ayo2kGelgdlRncWVI8w4xZtsg05wXMDAV
-         9vkepS+0FdWpUKVZDDcoE61Xzt97WX9TADUTkegiR1R5dN6VqwznAUfgBKnzeO9Gm7LP
-         fx/lNsISdPk8ECowRbD3MoFNIpddfK6fud3lVwiPcJvf4NjNtYBdChd7f3eynf7peDOv
-         bn5xXW1YJVkfQQ/3ey/jUKlTN56EQU36NxWo574LNLvC9jdhQrXemiZGqgDle4LdbC/q
-         zXlOG/crh8TaXwB2lkKQoL8UmW4bWVs6ZrlvgR62Idt4Td5VFGWBu0/4gUi1O/OQvCwz
-         3xhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741984528; x=1742589328;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xj8OXU2bswQnQmpSnQJFG1oDI/cU7j7n5fn2QP89/kU=;
-        b=qbWUXPVKpl/HuNjFRK6m/j4BTMgiRj27BuPcasIZUZ5UgjennHBRkir4b+Xj6K0P6r
-         K3JlHhsRljLFeFZYoY3Ar8LxmAsOzjzevGGrhEyThVGYAe4Rkdhru63dh6sHRqYkvhHf
-         Gs3HYt7VHZ09e7HPxglCLljXzbQtbfYjnZXLS5c8OVTqlfUZyIfHKd6nv0EtQtZiKEK9
-         tJBfSTaRu3gu/wTjz70ZqvTPaMTKqIcuWR7XJp9hG2razMkNaR9YJ4SaUTYtFw1vNJj6
-         CqhVUw04YPAd5b5XDqozcL4YdLh6SYndkCDIMG6NOdivQZQabDlmDMC0GrU0Ju6LpGsy
-         urcA==
-X-Forwarded-Encrypted: i=1; AJvYcCVKb5IKGUTqwZ3KVEhRUSvU5TJgkXPtSaAM3gaXY+Yu12Db2gVwUmE+QLBRELP7PJeiyZo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVqdX6fKZ7/V0zmFBSUGlOiiBfnfmJrzsnPFhdwQ36BhXjqFij
-	bLD2DT46iCyA1A3lZ3KznEAWhS/ZLLVk7ewQOpr8eQrF++vkE4jqqiDCRADAHXX4rfyvKYNw+NE
-	Y3xZQJ4/QQJjA1M8D2ZwcODDe1Xw=
-X-Gm-Gg: ASbGncvRneU0uf7Tbd0PiN5aFfCbofSu7Oz3+oOyUxjmCm6WQAU4NmYEZ8Bo6cZ6+3k
-	uGE0nKoNrvpaOZxQs3gSoJLsNx/496OeL5hRCkLGWGOg4/OBKn+zkBWWJIT82u+vomVj1UzCli3
-	08m0dzI/1Yx8Mp3hmetn//JlvNSZ/ndeEAZIg8YaI7Bg==
-X-Google-Smtp-Source: AGHT+IGH0ch1bpRz5RWqHDMS4g9AffQUWD+9A2kHZvynf07UyLhMFxGsDWEp9wG5QFc+R955GPU7Z696xKK+gW68c4I=
-X-Received: by 2002:a5d:47c9:0:b0:390:e311:a8c7 with SMTP id
- ffacd0b85a97d-3971cd57eb0mr4909674f8f.5.1741984527781; Fri, 14 Mar 2025
- 13:35:27 -0700 (PDT)
+	s=arc-20240116; t=1741984640; c=relaxed/simple;
+	bh=KabjsIbP8v1YZwE6BURVO+TQJ3+JP+XqmY0a/eOV2Wc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mNACWKFuYczObpY7pE992sGubRUrmePEGqbLJ2FkIq7Qd1Vy4iYPP7uxgVwYkK3z8jpjcSG5uqp7v9NZXuVERsL1jrxydCaJ+fC3SRQZ+XrRsYNoROGP8b/EUQZ2Rt0asKGSJRbZ4N7JE6gCbNwMu8u6zlxAaNel8X/pj5WN+ic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=PBVGTM3+; arc=none smtp.client-ip=81.19.149.128
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=nBdrFtqWTipZkEC62GCjdyqRKr/ukOzwzEe19sVot/k=; b=PBVGTM3+7gWcKIKD+ZStBBfNrs
+	p/5+op1wpt30ZhKuvFO5N0kwLKxXb+brjHw4X9QuRSaqQJ1yX5bVSZ0gHGwdHmypLe2U7Kx/B1H38
+	zwqJK547yN9VXigAVrtLy09NX2HgKAJTfmNiQ9XdUFs57HIOJNWP9x83AC5Ysavu5Dko=;
+Received: from [80.121.79.4] (helo=[10.0.0.160])
+	by mx18lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1ttBmD-000000008Ge-22Dc;
+	Fri, 14 Mar 2025 21:37:05 +0100
+Message-ID: <806eed8e-0695-450f-a16b-66b602db01dd@engleder-embedded.com>
+Date: Fri, 14 Mar 2025 21:37:03 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250313190309.2545711-1-ameryhung@gmail.com> <20250313190309.2545711-13-ameryhung@gmail.com>
-In-Reply-To: <20250313190309.2545711-13-ameryhung@gmail.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Fri, 14 Mar 2025 13:35:16 -0700
-X-Gm-Features: AQ5f1JrxdaJ9NE3HKEoE5DW_GIwb70mVam9Srpg9jgTi_uEL8Ox4ots74az0sEw
-Message-ID: <CAADnVQKrndZ25SuRj-Ofv8tA50XjTwVVyQWmasN94LT9zeV7JQ@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v5 12/13] selftests/bpf: Add a bpf fq qdisc to selftest
-To: Amery Hung <ameryhung@gmail.com>
-Cc: Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Kui-Feng Lee <sinquersw@gmail.com>, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Stanislav Fomichev <stfomichev@gmail.com>, 
-	ekarani.silvestre@ccc.ufcg.edu.br, yangpeihao@sjtu.edu.cn, 
-	Peilin Ye <yepeilin.cs@gmail.com>, Kernel Team <kernel-team@meta.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: ethernet: microchip: lan743x: Fix memory
+ allocation failure
+To: Thangaraj Samynathan <thangaraj.s@microchip.com>
+Cc: bryan.whitehead@microchip.com, UNGLinuxDriver@microchip.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20250314070227.24423-1-thangaraj.s@microchip.com>
+Content-Language: en-US
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+In-Reply-To: <20250314070227.24423-1-thangaraj.s@microchip.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AV-Do-Run: Yes
 
-On Thu, Mar 13, 2025 at 12:03=E2=80=AFPM Amery Hung <ameryhung@gmail.com> w=
-rote:
->
-> From: Amery Hung <amery.hung@bytedance.com>
->
-> This test implements a more sophisticated qdisc using bpf. The bpf fair-
-> queueing (fq) qdisc gives each flow an equal chance to transmit data. It
-> also respects the timestamp of skb for rate limiting.
->
-> Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+On 14.03.25 08:02, Thangaraj Samynathan wrote:
+> The driver allocates ring elements using GFP_ATOMIC and GFP_DMA
+> flags. The allocation is not done in atomic context and there is
+> no dependency from LAN743x hardware on memory allocation should be
+> in DMA_ZONE. Hence modifying the flags to use only GFP_KERNEL.
+> 
+> Signed-off-by: Thangaraj Samynathan <thangaraj.s@microchip.com>
 > ---
->  .../selftests/bpf/prog_tests/bpf_qdisc.c      |  24 +
->  .../selftests/bpf/progs/bpf_qdisc_fq.c        | 718 ++++++++++++++++++
+>   drivers/net/ethernet/microchip/lan743x_main.c | 3 +--
+>   1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
+> index 23760b613d3e..c10b0131d5fb 100644
+> --- a/drivers/net/ethernet/microchip/lan743x_main.c
+> +++ b/drivers/net/ethernet/microchip/lan743x_main.c
+> @@ -2495,8 +2495,7 @@ static int lan743x_rx_process_buffer(struct lan743x_rx *rx)
+>   
+>   	/* save existing skb, allocate new skb and map to dma */
+>   	skb = buffer_info->skb;
+> -	if (lan743x_rx_init_ring_element(rx, rx->last_head,
+> -					 GFP_ATOMIC | GFP_DMA)) {
+> +	if (lan743x_rx_init_ring_element(rx, rx->last_head, GFP_KERNEL)) {
 
-On the look of it, it's a pretty functional qdisc.
-Since bpftool supports loading st_ops,
-please list commands bpftool and tc the one can enter
-to use this qdisc without running selftests.
+I agree with removing GFP_DMA. If it would be needed, then everywhere
+and not only here in NAPI context as it is intended for hardware
+limitations.
 
-Probably at the comment section at the top of bpf_qdisc_fq.c
+I'm not sure if GFP_ATOMIC can be removed. Isn't NAPI an atomic context?
+For example napi_alloc_skb() and page_pool_dev_alloc_pages() use
+GFP_ATOMIC.
 
-It also needs SPDX and copyright.
+Gerhard
 
-pw-bot: cr
 
