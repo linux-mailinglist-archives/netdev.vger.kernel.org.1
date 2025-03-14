@@ -1,144 +1,147 @@
-Return-Path: <netdev+bounces-174831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A1EFA60E36
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 11:07:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CF17A60E7E
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 11:13:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA1AE1B608E6
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 10:07:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBBD8883006
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 10:12:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 146141F2B8E;
-	Fri, 14 Mar 2025 10:07:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FAB31F3BBC;
+	Fri, 14 Mar 2025 10:12:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="tWGlkfz+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VpVCqqfF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f66.google.com (mail-ed1-f66.google.com [209.85.208.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E6F21F2BB8
-	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 10:07:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1A081F3BB2
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 10:12:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741946866; cv=none; b=sm77xqGLJqrBvL19yhYrrCuXuh7+McKlIDq8toHC4p79o7Me6w86dlAiUP1WK05BVyWUv1A0UlGgNsChuZUQ4de2OhuvioNBjTHAaNdIuwDI1Hd9Pm2I+SiNLo7hzAkPuX+jBy1y7L5SgsyTIXcQZJk2Vn4FC0rxjrXOQMiAnBk=
+	t=1741947147; cv=none; b=Xrn4S6P+qfC5csPdWmMdSd7F1L2b1b93ZvL5URnySL0FYV4t2s0mQdBlJSBou8zU7wYcHQE2dKb9ujttj5hfaXk734zvaYQUhFTANT6JwnnSyp5WjE1e77R88Kn8JtqWbCusljFN313WNdc35fauroCjNg57fuIMdgGs81yAfaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741946866; c=relaxed/simple;
-	bh=8HKls/vyB5Nb7yFTUbMYOUr3j4jvqnSvKpBCWy4txP4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=d0mIIN6VIssWIbWoVcqKbhwtBZHj7f2YnD3c073GC+caOMdY3Rap1ldV1fx3c4j3GWzAQr07qY8JKxcCqMkx5Y4vf2XLP/B3CLrt9WQLO89C9BkkbPaBt7+gioamPGiqfXB228sCWXPhgX/5Qp33GRQzeRnmwztMOEjFbE/Nq3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=tWGlkfz+; arc=none smtp.client-ip=209.85.208.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ed1-f66.google.com with SMTP id 4fb4d7f45d1cf-5e56b229d60so5585232a12.0
-        for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 03:07:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1741946861; x=1742551661; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cfffNHYI49Xl5zPC144OdkSFN9wBx2U8lL7yj9iYGbU=;
-        b=tWGlkfz+aKHcGrOBwYwQh76H2PcpjJhP/ObQ3hq6L4MWncxEJYXtMMEeAgnDXpRo/C
-         t3oFhCdhFHrnSHsIjzxt2JibUJy76l+6x5RnOl0uGNcgjFKj26d+1QkLbipeOCsIez21
-         V4kTFUabxYawT0MdFcYgYL3mTVBOMIhSKwAIJtJs1zNL++MEMhyjW80nlIyet3+261ru
-         8Mb8RiNLWWEqkvCy6emCYeVEe3f3pL3dqisvABKSymIdvyZ33hTiv7LZO6Rw3ryDgfnD
-         trBH5EhR1seGJb69tCeDwW9JmuBo7LS3XrpAWkQJAlgUEYTg1zX/ZG4x67dJtg6l8NkL
-         cQlw==
+	s=arc-20240116; t=1741947147; c=relaxed/simple;
+	bh=ZwQLt7Z4tHTJcWoA9ARFUEED+hl5/cCffTRlgZa7WQU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=cyCEi+wMJgbX4oKAdmMc3e4ohj/GjMUc3e/m8MH2BDyr1gBeKMOv75UcQEkvBuA0zD6GCSVnfOUrmANei1Q8bh3uhBnV03dxaCFqYgxYT4DCteKqCNtdhhkVFeRY7ofv70IC2kg9l5yqlCbYcyW8g7XOJohPHTQYNATclbJGBo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VpVCqqfF; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741947141;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=9gm2z62YPqNWN8yJwphL0g3OWPmFyfl9EtTC0QPQVIU=;
+	b=VpVCqqfF73ZZSaIQJV5kFGtTMqdIhI+6uYvUmcMR+ergrLx4spkUJq2U12toySmInyr3pa
+	/79e8MlIbpNVLy6t2ZXhEvEUfEPx3oRGDmXZWdQb9Xd3DY4e6MjFlg3P05kAqlKc2uwvlB
+	3ifkaJ6g2l7jiM2iV0ejN+Yu1bpr6WA=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-518-iOl9LxcWNCGo8FMvuFDO7w-1; Fri, 14 Mar 2025 06:12:19 -0400
+X-MC-Unique: iOl9LxcWNCGo8FMvuFDO7w-1
+X-Mimecast-MFC-AGG-ID: iOl9LxcWNCGo8FMvuFDO7w_1741947138
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-549979903c8so1029036e87.1
+        for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 03:12:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741946861; x=1742551661;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1741947138; x=1742551938;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=cfffNHYI49Xl5zPC144OdkSFN9wBx2U8lL7yj9iYGbU=;
-        b=s07E+aHEeN7wnBFowbf63ilb9CrTVmdHmolAWmU+8kKlabpEVVmERihZpaEsmQkLlQ
-         VuBNGATGqIUtozA3fFQ9E5MWkL1zk1YZofpv389nSoVAlWMGVCFcnleWp3pjofJWXGeW
-         r+bpSjZrwOnMED/YY2ehLGveRZE1zKTLvuHrVpQtNnTxVup7aPn1VYY8mujCC3zjS2ry
-         HkMPdR8z30hxAmBlqBuhVPZHtvqGDYH9G9QKy1lckcHzAk++FHy7uCXbQeMgPa8m5yTp
-         y1RMniyAqx1xlOXJV5geBfPnL1oeUQUO6sNqIqEuZXqXM0wpF681z8yZIQICfvgkQfoM
-         5P4Q==
-X-Gm-Message-State: AOJu0YyGyw3+edlB6CFGxEQRp/4Q4WArIFiORR6Z5FPsc8xFnFIZnkJw
-	IChYn97XRAVFi3MlbiVmLe1NVdmuA5rj8oPKSxXf38/qaQhr1vqC1IMC7/Hw+o8sU0Nh+6XCQzo
-	1ob8AKziv
-X-Gm-Gg: ASbGncuc10FoG8xYj1aTCy9BdjTjh5DH11zwqR71nspAq2jjxJLpMJTHKthupO0719L
-	KM5qTAYIHxF9Zj4Djp2XtISdcS8FgcJJuAcrq8vqQBdjmEWZRBCrlkkEWUUVhKFXWOwt7eGIczc
-	Ct8zsIGQrEM8LsBkKW/IFB2sdkcc8HHsprRduXbJiR9mLZfITYiWrysl8+RIyt3G4jqCehlbfkO
-	sqKFD1LpJ0XmqHi6v53xVr6LYncGc0YmC+i2RLa3ioQVjWT24WzER3A+NHcH1rcOzX7HoAdBYKR
-	uUI2yrP78B1UBdhA6pDQcyZoBtTt9qBVD6Q=
-X-Google-Smtp-Source: AGHT+IGwUZoSMFSvs6YN2fIDJa6ZdB6rTlqmRL2w5zcN20nZYYMiUFmpXajVLtXPMDz24Mri2X0QDw==
-X-Received: by 2002:a05:6402:1ecc:b0:5e0:6e6c:e2b5 with SMTP id 4fb4d7f45d1cf-5e814dedc7dmr6711949a12.9.1741946860969;
-        Fri, 14 Mar 2025 03:07:40 -0700 (PDT)
-Received: from dev.. ([195.29.209.28])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e816afe26bsm1770804a12.72.2025.03.14.03.07.40
+        bh=9gm2z62YPqNWN8yJwphL0g3OWPmFyfl9EtTC0QPQVIU=;
+        b=jaBUBGzSVri/lJRUEZ2lUHdLOnTeT3QpR1w7OqhPd1Q1cpSY4Caboe/Sq/1Ah9M5sx
+         //aialcT5crPXTWy3jbNTdfPUF7R3fTp0t88oZs5Pj3/R6YNM0arc8TrOmUqYzMnVcol
+         JJcPiDI4Bs4/Xs84FINVKP8/9amvvjjw3xEvtfR6VzWX4eFpZXtW5SGGy/fTHXRyA0yJ
+         cFDZM/K/avlp2h7bZzT0ar20yngkaWPusAgo5H7/BMvg8THWX3yCBG9NYYCkfesC6Whf
+         n/jhpQmdwEA7qpQCN+EerlOS44U5E7N7hUsnK7WCRzAdQmt8nd0U/dptneQDtdLiQwJA
+         rAVw==
+X-Gm-Message-State: AOJu0YwF2KJnMh71BEG/g8zSccIW8ICsPukbOybOqaG0b+N4isN2RU3/
+	Z3FQyUfzlZBJhm+QYZWNVU7dbEWU8u1XHxFeCrOz52QvmNWPrNJBJ+TzYNae+p47wOit9wnF0BV
+	hQmZgL/Buns0VpqFLv5nZhG3vI95qFAvRjeilfdPRKmkuwoRancUong==
+X-Gm-Gg: ASbGnctfeOsMmQ7+FhMmvB2un624jXM8PeQW3R+RjYvM0rVeDVGxY8JGg0zu4YRTbMI
+	ym60Pt4ZRJ/voLNrqyoVMLzUL+0FjD1nUyKNcB0tIo1NlhusBBeuuVpHcAayOWyxbCszRs9tD2E
+	CB4AHlq2K7V4SJBUQw9cuAh2tlkt66Jfx68vxQxQzWdoolgzmkC8WBJIAH9aomw77trexJBO3tH
+	BLLy/74wv7mWMykeCi0QcHjUuIHh5e6hVLMbBQ4yqdTfIvj6vu06+/L70YnJrV+Yeihb2VyV4+Q
+	3MV/d8fQ/U0a
+X-Received: by 2002:a05:6512:3ba4:b0:544:ca1:da41 with SMTP id 2adb3069b0e04-549c39897ddmr668063e87.44.1741947138256;
+        Fri, 14 Mar 2025 03:12:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFQUWKDrZlzJOt8qlYePG63LB20pTY5b0FHQCM+E2JqpqZhwzuf+fAjF8sgxJkwHe+V2bVHLw==
+X-Received: by 2002:a05:6512:3ba4:b0:544:ca1:da41 with SMTP id 2adb3069b0e04-549c39897ddmr668037e87.44.1741947137761;
+        Fri, 14 Mar 2025 03:12:17 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-549ba7c11f7sm477629e87.84.2025.03.14.03.12.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Mar 2025 03:07:40 -0700 (PDT)
-From: Nikolay Aleksandrov <razor@blackwall.org>
-To: netdev@vger.kernel.org
-Cc: idosch@nvidia.com,
-	idosch@idosch.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	bridge@lists.linux.dev,
-	davem@davemloft.net,
-	Nikolay Aleksandrov <razor@blackwall.org>
-Subject: [PATCH net-next] MAINTAINERS: update bridge entry
-Date: Fri, 14 Mar 2025 12:06:31 +0200
-Message-ID: <20250314100631.40999-1-razor@blackwall.org>
-X-Mailer: git-send-email 2.48.1
+        Fri, 14 Mar 2025 03:12:15 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 0737418FA92C; Fri, 14 Mar 2025 11:12:12 +0100 (CET)
+From: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Subject: [PATCH net-next 0/3] Fix late DMA unmap crash for page pool
+Date: Fri, 14 Mar 2025 11:10:18 +0100
+Message-Id: <20250314-page-pool-track-dma-v1-0-c212e57a74c2@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAIoA1GcC/x2MQQqDMBAAvyJ77sKa1R78ivSw6KpL2yQkQQLi3
+ xt6nIGZC7Im0wxTd0HS07IF36B/dLAc4ndFWxuDIzcS94RRmoshfLAkWd64fgWJ2fHAMjxJoZU
+ x6Wb1f53Ba0GvtcDrvn+tpLJRbwAAAA==
+X-Change-ID: 20250310-page-pool-track-dma-0332343a460e
+To: "David S. Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+ Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+ Simon Horman <horms@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+ Mina Almasry <almasrymina@google.com>, 
+ Yonglong Liu <liuyonglong@huawei.com>, 
+ Yunsheng Lin <linyunsheng@huawei.com>, 
+ Pavel Begunkov <asml.silence@gmail.com>, 
+ Matthew Wilcox <willy@infradead.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, linux-rdma@vger.kernel.org, 
+ linux-mm@kvack.org, 
+ =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>, 
+ Qiuling Ren <qren@redhat.com>, Yuying Ma <yuma@redhat.com>
+X-Mailer: b4 0.14.2
 
-Roopa has decided to withdraw as a bridge maintainer and Ido has agreed to
-step up and co-maintain the bridge with me. He has been very helpful in
-bridge patch reviews and has contributed a lot to the bridge over the
-years. Add an entry for Roopa to CREDITS and also add bridge's headers
-to its MAINTAINERS entry.
+This series fixes the late dma_unmap crash for page pool first reported
+by Yonglong Liu in [0]. It is an alternative approach to the one
+submitted by Yunsheng Lin, most recently in [1]. The first two commits
+are small refactors of the page pool code, in preparation of the main
+change in patch 3. See the commit message of patch 3 for the details.
 
-Signed-off-by: Nikolay Aleksandrov <razor@blackwall.org>
+-Toke
+
+[0] https://lore.kernel.org/lkml/8067f204-1380-4d37-8ffd-007fc6f26738@kernel.org/T/
+[1] https://lore.kernel.org/r/20250307092356.638242-1-linyunsheng@huawei.com
+
+Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
 ---
- CREDITS     | 4 ++++
- MAINTAINERS | 4 +++-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+Toke Høiland-Jørgensen (3):
+      page_pool: Move pp_magic check into helper functions
+      page_pool: Turn dma_sync and dma_sync_cpu fields into a bitmap
+      page_pool: Track DMA-mapped pages and unmap them when destroying the pool
 
-diff --git a/CREDITS b/CREDITS
-index 53d11a46fd69..d71d42c30044 100644
---- a/CREDITS
-+++ b/CREDITS
-@@ -3233,6 +3233,10 @@ N: Rui Prior
- E: rprior@inescn.pt
- D: ATM device driver for NICStAR based cards
- 
-+N: Roopa Prabhu
-+E: roopa@nvidia.com
-+D: Bridge co-maintainer, vxlan and networking contributor
-+
- N: Stefan Probst
- E: sp@caldera.de
- D: The Linux Support Team Erlangen, 1993-97
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 241ca9e260a2..3169b1e3f006 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -8590,12 +8590,14 @@ F:	Documentation/networking/devlink/etas_es58x.rst
- F:	drivers/net/can/usb/etas_es58x/
- 
- ETHERNET BRIDGE
--M:	Roopa Prabhu <roopa@nvidia.com>
- M:	Nikolay Aleksandrov <razor@blackwall.org>
-+M:	Ido Schimmel <idosch@nvidia.com>
- L:	bridge@lists.linux.dev
- L:	netdev@vger.kernel.org
- S:	Maintained
- W:	http://www.linuxfoundation.org/en/Net:Bridge
-+F:	include/linux/if_bridge.h
-+F:	include/uapi/linux/if_bridge.h
- F:	include/linux/netfilter_bridge/
- F:	net/bridge/
- 
--- 
-2.48.1
+ drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c |  4 +-
+ include/net/page_pool/helpers.h                  |  6 +-
+ include/net/page_pool/types.h                    | 54 +++++++++++++++-
+ mm/page_alloc.c                                  |  9 +--
+ net/core/devmem.c                                |  3 +-
+ net/core/netmem_priv.h                           | 33 +++++++++-
+ net/core/page_pool.c                             | 81 ++++++++++++++++++++----
+ net/core/skbuff.c                                | 16 +----
+ net/core/xdp.c                                   |  4 +-
+ 9 files changed, 164 insertions(+), 46 deletions(-)
+---
+base-commit: 8ef890df4031121a94407c84659125cbccd3fdbe
+change-id: 20250310-page-pool-track-dma-0332343a460e
 
 
