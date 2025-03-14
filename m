@@ -1,127 +1,121 @@
-Return-Path: <netdev+bounces-174956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F079CA61947
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 19:19:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D4652A619A5
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 19:39:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1676189DAC8
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 18:19:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FC811B60360
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 18:39:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 278C4204596;
-	Fri, 14 Mar 2025 18:19:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CEED2045B5;
+	Fri, 14 Mar 2025 18:39:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ol8hJbbh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IbgS9NGq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9836C2A8D0;
-	Fri, 14 Mar 2025 18:19:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6554B1519BB;
+	Fri, 14 Mar 2025 18:39:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741976384; cv=none; b=hihD9PlZer4gXfeGDPPV5kmLVqd5/E2L6mMmE4MFjT/3BM+L6MaTRodZC4kGovivEAlocd4wuwIpr7RW1B0lvAa+R/2iN5eHMAXMUul+NStsvK2BLw/gHicHvy9zXY9j2Ds29WBlqZ8Ol5iJ8C9u63txXQOhOIDWkGowDBaitUY=
+	t=1741977583; cv=none; b=C2vqYdXV0gNfW0d47SQXxts3pgaTe3jlsMeOpedELV2nfGsq5AaB05R+VuvTpddcBN5C99lB7tPMpqP2kk3yRgliwW6G7fybwzIG+l7w/LE0qEHVK+hFPaP8VdeRMEepq5tetnSQ+KDbJYbGM8+Rb9mRa88VgnS6GiNv38YtsS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741976384; c=relaxed/simple;
-	bh=AOYfO4ZZb0Tcg03UebkhFJQ4VfghZe4t2bFK6GitxSo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b3UFBXLwUJsN0/Jw5HxFJJ6hY/Zpvg0iv/D/rDCdAjvV49HI13pSXiy/bMQ2RIrsVG5KimFV4wfGpqqVJEXpp7NDD/r/oSSDERm5OGOrIIf+ujcO4u59ThIpkYTDz6HNyRBu863YG8AEoFuzPxlLsCg2CbRQ1DmakRhX9nfel0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ol8hJbbh; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1741976383; x=1773512383;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ydZtQRvTydeU4Abeyx8VyHan8eAipND3FLIzwSP4EMs=;
-  b=ol8hJbbhQYdMHYaGOdkwxj4o0pfW1Vh0cFE7EHJbJhgBtrGCWc+8nynD
-   bhLHdJ0VvubiP4lhhVr0Fmj+crYi6djPiEarfsppN7rYvy3silOBcMonI
-   v7g7d1g2AqtEyFrEkQ0HW3iFNbNu6lLWDASHBCZmgMA9pl7M2z4Izr6YD
-   g=;
-X-IronPort-AV: E=Sophos;i="6.14,246,1736812800"; 
-   d="scan'208";a="386789117"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2025 18:19:41 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:31107]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.62.245:2525] with esmtp (Farcaster)
- id ddda351e-1bdf-4c43-80a6-1c4b19950bed; Fri, 14 Mar 2025 18:19:40 +0000 (UTC)
-X-Farcaster-Flow-ID: ddda351e-1bdf-4c43-80a6-1c4b19950bed
-Received: from EX19D003ANC003.ant.amazon.com (10.37.240.197) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 14 Mar 2025 18:19:39 +0000
-Received: from b0be8375a521.amazon.com (10.119.2.177) by
- EX19D003ANC003.ant.amazon.com (10.37.240.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 14 Mar 2025 18:19:34 +0000
-From: Kohei Enju <enjuk@amazon.com>
-To: <syzbot+a5964227adc0f904549c@syzkaller.appspotmail.com>
-CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
-	<daniel@iogearbox.net>, <eddyz87@gmail.com>, <haoluo@google.com>,
-	<iii@linux.ibm.com>, <john.fastabend@gmail.com>, <jolsa@kernel.org>,
-	<kpsingh@kernel.org>, <linux-kernel@vger.kernel.org>, <martin.lau@linux.dev>,
-	<netdev@vger.kernel.org>, <sdf@fomichev.me>, <song@kernel.org>,
-	<syzkaller-bugs@googlegroups.com>, <yepeilin@google.com>,
-	<yonghong.song@linux.dev>
-Subject: Re: [syzbot] [bpf?] KASAN: slab-out-of-bounds Read in atomic_ptr_type_ok
-Date: Sat, 15 Mar 2025 03:19:25 +0900
-Message-ID: <20250314181925.69459-1-enjuk@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <67d30ef2.050a0220.14e108.0039.GAE@google.com>
-References: <67d30ef2.050a0220.14e108.0039.GAE@google.com>
+	s=arc-20240116; t=1741977583; c=relaxed/simple;
+	bh=7zgCguAftdxNdNej2Op3CC4ec5C8VrxqTWVT3fgVgIc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lanJMvb4ZSPa+vt+Kyb4qaIvBthwnFu5sN/pDTYx8ATxUdxjqMsF+D7pkvYCbmgNNsBufrEyuAykNmSsf/G8iMTUSiW+abjM0Ap7ERH5m34MKgAWki+fvMNbqH54z4KZBFboftCxwZz7qu4MIKFOd2JfxpjAg2IfTBbaQpUXWVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IbgS9NGq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5548EC4CEE3;
+	Fri, 14 Mar 2025 18:39:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741977582;
+	bh=7zgCguAftdxNdNej2Op3CC4ec5C8VrxqTWVT3fgVgIc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IbgS9NGqN1xC7ev8qTLYsOBm/63Fb2yxIZ5wBeaQKsxS4X3du6COqd1Uro0XgRoyE
+	 yDQHxrVL+RW9exEI8hYxtoD/oQbh8Trne23aNws7MV9L+7JhreEU5PTTZPhLa4WTp7
+	 erugyyHCOgwXzMZtJOWKEEwe3FZ3iKZ3jxmXkOOeNkw8tJ9LFZO+/jA1frQdiyiTNw
+	 SFuI+OhYZwrLeDe+24+D4zyc/OQUy9/datHtDZQxpvANyI3UWIWrR0S+M/Ou4Zd5Cl
+	 7Y51K8xSkrNCskSVc9d0rhQZV4H1IHWzKTIX6+MwXnd1Lnu1mvELYP2VGjRM90+2yk
+	 H2JcOh1ls0tKA==
+Date: Fri, 14 Mar 2025 20:39:38 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: "Nelson, Shannon" <shannon.nelson@amd.com>,
+	David Ahern <dsahern@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+	Jason Gunthorpe <jgg@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Daniel Vetter <daniel.vetter@ffwll.ch>,
+	Dave Jiang <dave.jiang@intel.com>,
+	Christoph Hellwig <hch@infradead.org>,
+	Itay Avraham <itayavr@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Leonid Bloch <lbloch@nvidia.com>, linux-cxl@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	"Sinyuk, Konstantin" <konstantin.sinyuk@intel.com>
+Subject: Re: [PATCH v5 0/8] Introduce fwctl subystem
+Message-ID: <20250314183938.GQ1322339@unreal>
+References: <20250304140036.GK133783@nvidia.com>
+ <20250304164203.38418211@kernel.org>
+ <20250305133254.GV133783@nvidia.com>
+ <mxw4ngjokr3vumdy5fp2wzxpocjkitputelmpaqo7ungxnhnxp@j4yn5tdz3ief>
+ <bcafcf60-47a8-4faf-bea3-19cf0cbc4e08@kernel.org>
+ <20250305182853.GO1955273@unreal>
+ <dc72c6fe-4998-4dba-9442-73ded86470f5@kernel.org>
+ <20250313124847.GM1322339@unreal>
+ <54781c0c-a1e7-4e97-acf1-1fc5a2ee548c@amd.com>
+ <2025031408-frequency-oxidant-287f@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWA003.ant.amazon.com (10.13.139.105) To
- EX19D003ANC003.ant.amazon.com (10.37.240.197)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2025031408-frequency-oxidant-287f@gregkh>
 
-> syzbot found the following issue on:
+On Fri, Mar 14, 2025 at 06:37:11AM +0100, Greg Kroah-Hartman wrote:
+> On Thu, Mar 13, 2025 at 12:59:16PM -0700, Nelson, Shannon wrote:
+> > On 3/13/2025 5:48 AM, Leon Romanovsky wrote:
+> > > On Thu, Mar 13, 2025 at 01:30:52PM +0100, David Ahern wrote:
+> > 
+> > 
+> > > > So that means 3 different vendors and 3 different devices looking for a
+> > > > similar auxbus based hierarchy with a core driver not buried within one
+> > > > of the subsystems.
+> > > > 
+> > > > I guess at this point we just need to move forward with the proposal and
+> > > > start sending patches.
+> > > > 
+> > > > Seems like drivers/core is the consensus for the core driver?
+> > > 
+> > > Yes, anything that is not aux_core is fine by me.
+> > > 
+> > > drivers/core or drivers/aux.
+> > 
+> > Between the two of these I prefer drivers/core - I don't want to see this
+> > tied to aux for the same reasons we don't want it tied to pci or net.
 > 
-> HEAD commit:    f28214603dc6 Merge branch 'selftests-bpf-move-test_lwt_seg..
-> git tree:       bpf-next
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=15f84664580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=b7bde34acd8f53b1
-> dashboard link: https://syzkaller.appspot.com/bug?extid=a5964227adc0f904549c
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16450ba8580000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11f5fa54580000
+> Decades ago we tried to add drivers/core/ but I think tools really
+> didn't like to see "core" as a directory name.  Hopefully you all don't
+> run into that issue here as well :)
+> 
+> Anyway, if you all want me to run that tree as a "neutral" third-party,
+> I'll be glad to do so.
 
-#syz test
+Thanks for readiness, we will definitely be glad to see you on board.
 
---- a/kernel/bpf/verifier.c
-+++ b/kernel/bpf/verifier.c
-@@ -7788,6 +7788,12 @@ static int check_atomic_rmw(struct bpf_verifier_env *env,
- static int check_atomic_load(struct bpf_verifier_env *env,
- 			     struct bpf_insn *insn)
- {
-+	int err;
-+
-+	err = check_reg_arg(env, insn->src_reg, SRC_OP);
-+	if (err)
-+		return err;
-+
- 	if (!atomic_ptr_type_ok(env, insn->src_reg, insn)) {
- 		verbose(env, "BPF_ATOMIC loads from R%d %s is not allowed\n",
- 			insn->src_reg,
-@@ -7801,6 +7807,12 @@ static int check_atomic_load(struct bpf_verifier_env *env,
- static int check_atomic_store(struct bpf_verifier_env *env,
- 			      struct bpf_insn *insn)
- {
-+	int err;
-+
-+	err = check_reg_arg(env, insn->dst_reg, SRC_OP);
-+	if (err)
-+		return err;
-+
- 	if (!atomic_ptr_type_ok(env, insn->dst_reg, insn)) {
- 		verbose(env, "BPF_ATOMIC stores into R%d %s is not allowed\n",
- 			insn->dst_reg,
+Thanks
+
+> 
+> thanks,
+> 
+> greg k-h
 
