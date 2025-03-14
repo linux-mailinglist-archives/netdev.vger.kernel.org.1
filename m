@@ -1,75 +1,71 @@
-Return-Path: <netdev+bounces-174890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8981AA61214
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 14:10:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A2E6A61203
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 14:06:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FB84462B27
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 13:09:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 798B4882611
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 13:06:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B45271FFC6E;
-	Fri, 14 Mar 2025 13:09:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 541221F4169;
+	Fri, 14 Mar 2025 13:06:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g8w6BQma"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ACE01FF605
-	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 13:09:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F69018A6D7
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 13:06:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741957762; cv=none; b=B/ntOFNb88vfwsmsMCjLxDUz62atflhb+DLQ3IO6SncDNdQTr9EES6CUaQ4r6EHP/DMf1jVPzHzL5FvwLMgzoPksAVGgu5gSoT0d5lL2NpQZppLFP8rGFjW5R4iu2rv/3hmM+RbCs/RRB/VuiHDBpMVSLbX3YsN1hc2B8jjooc0=
+	t=1741957604; cv=none; b=g07bzfGlJYgmmz9cBICcz/cch43aK0R0g3npQX8+n8brCWw8tv5WEEzaNvAPjsEGUj1Lbbr4k/D3cBwFpZo6QzRo1LWgw9QadNalmlW12a2RdP/HQ7HrHjaLJTzTO6vC0Q8cQcQId5zisinj4/zz+JlxdGlVJu16cJ0hjpiIx+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741957762; c=relaxed/simple;
-	bh=X+Tsk+cMiQc/zjxrJyKzIem1K2mtdzD/3IKHKdoQj7k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KakSblAz2pCcKgKoDGSKn+rhxxsSevNFBbxdUmflRwJEKzzIP9LG+linbN/ImPsB15wqsSJ9UUx/9TFKU0Zr/ZOwR14omBPtcI2qou5bv6QfY47akm7Xu+mmUd1EQMKjaj9QOKOpZmwfc0wQCvPLmZCondqMdukKiaMtk4h5l18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tt4ms-0007Nq-I0
-	for netdev@vger.kernel.org; Fri, 14 Mar 2025 14:09:18 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tt4mr-005hpp-2R
-	for netdev@vger.kernel.org;
-	Fri, 14 Mar 2025 14:09:17 +0100
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id 6E5063DBB8A
-	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 13:09:17 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	s=arc-20240116; t=1741957604; c=relaxed/simple;
+	bh=3YGKCK+ewOYcd/DScHQdu/MEE/0P9F2IvrvmwgaLrQg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WUb7Wu5Aw0LrETgNlODLd2RXWX+6a1uH6khOvW1bG1kZgJejcMZtHZGvCJqWq7rZq0QEQuQfHeed2ER1+rLw44uhFJdGiIR4Nf7eU0JdYJoVDnGeRQKsKe7IfTo9UymK7WO87J83/RDmhKzDmbJPbd9Uv4CwTxAhiw3joxINM2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g8w6BQma; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741957601;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=H4utzkKvWoAtqOsB4M52os8tk1UzkUsgQBxuoUVE5SM=;
+	b=g8w6BQma8Hcac+yKUkbjc60jkBEzNGSHMLoe0pL1ZrCEB3RysHeNl85hGTsubBnLLWdr1G
+	vsHQ9o1q+/WxXHSuTKUR1zCtT3ucrJA6bm7+r6NYjduC/EbUXuQFRUfpvSmiblbgWVKZKb
+	5Sn3EE82PBb/xJJRNr1q8HMBpkhepvg=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-536-ky7eswvTN0W-PXuNjzT77A-1; Fri,
+ 14 Mar 2025 09:06:38 -0400
+X-MC-Unique: ky7eswvTN0W-PXuNjzT77A-1
+X-Mimecast-MFC-AGG-ID: ky7eswvTN0W-PXuNjzT77A_1741957596
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 7A9123DBB54;
-	Fri, 14 Mar 2025 13:09:14 +0000 (UTC)
-Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id a8f6cb66;
-	Fri, 14 Mar 2025 13:09:13 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4B8EA180025B;
+	Fri, 14 Mar 2025 13:06:36 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.44.33.12])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4193F1955BCB;
+	Fri, 14 Mar 2025 13:06:32 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
 To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	linux-can@vger.kernel.org,
-	kernel@pengutronix.de,
-	Haibo Chen <haibo.chen@nxp.com>,
-	stable@vger.kernel.org,
-	Frank Li <frank.li@nxp.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net 6/6] can: flexcan: disable transceiver during system PM
-Date: Fri, 14 Mar 2025 14:04:05 +0100
-Message-ID: <20250314130909.2890541-7-mkl@pengutronix.de>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250314130909.2890541-1-mkl@pengutronix.de>
-References: <20250314130909.2890541-1-mkl@pengutronix.de>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>
+Subject: [RFC PATCH 0/2] net: introduce per netns packet type chains
+Date: Fri, 14 Mar 2025 14:04:59 +0100
+Message-ID: <cover.1741957452.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,62 +73,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-From: Haibo Chen <haibo.chen@nxp.com>
+The stack uses shared lists between all the network namespace to store
+all the packet taps not bound to any device.
 
-During system PM, if no wakeup requirement, disable transceiver to
-save power.
+As a consequence, creating such taps in any namespace affects the
+performances in all the network namespaces.
 
-Fixes: 4de349e786a3 ("can: flexcan: fix resume function")
-Cc: stable@vger.kernel.org
-Reviewed-by: Frank Li <frank.li@nxp.com>
-Signed-off-by: Haibo Chen <haibo.chen@nxp.com>
-Link: https://patch.msgid.link/20250314110145.899179-2-haibo.chen@nxp.com
-[mkl: add newlines]
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- drivers/net/can/flexcan/flexcan-core.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+Patch 1 addresses the issue introducing new per network namespace packet
+type chains, while patch 2 try to minimize the impact of such addition.
 
-diff --git a/drivers/net/can/flexcan/flexcan-core.c b/drivers/net/can/flexcan/flexcan-core.c
-index 3a71fd235722..b080740bcb10 100644
---- a/drivers/net/can/flexcan/flexcan-core.c
-+++ b/drivers/net/can/flexcan/flexcan-core.c
-@@ -2260,6 +2260,10 @@ static int __maybe_unused flexcan_suspend(struct device *device)
- 
- 			flexcan_chip_interrupts_disable(dev);
- 
-+			err = flexcan_transceiver_disable(priv);
-+			if (err)
-+				return err;
-+
- 			err = pinctrl_pm_select_sleep_state(device);
- 			if (err)
- 				return err;
-@@ -2292,10 +2296,16 @@ static int __maybe_unused flexcan_resume(struct device *device)
- 			if (err)
- 				return err;
- 
--			err = flexcan_chip_start(dev);
-+			err = flexcan_transceiver_enable(priv);
- 			if (err)
- 				return err;
- 
-+			err = flexcan_chip_start(dev);
-+			if (err) {
-+				flexcan_transceiver_disable(priv);
-+				return err;
-+			}
-+
- 			flexcan_chip_interrupts_enable(dev);
- 		}
- 
+The hotdata implications are IMHO not trivial ence the RFC tag; I
+suspect patch 2 being the most controversial. As such a possible
+alternative is also presented.
+
+Any feedback welcome!
+
+Paolo Abeni (2):
+  net: introduce per netns packet chains
+  net: hotdata optimization for netns ptypes
+
+ .../networking/net_cachelines/net_device.rst  |  2 +
+ include/linux/netdevice.h                     |  9 +-
+ include/net/hotdata.h                         |  1 -
+ include/net/net_namespace.h                   |  3 +
+ net/core/dev.c                                | 82 +++++++++++++++----
+ net/core/hotdata.c                            |  1 -
+ net/core/net-procfs.c                         | 16 ++--
+ net/core/net_namespace.c                      |  2 +
+ 8 files changed, 86 insertions(+), 30 deletions(-)
+
 -- 
-2.47.2
-
+2.48.1
 
 
