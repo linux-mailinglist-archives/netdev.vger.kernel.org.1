@@ -1,79 +1,70 @@
-Return-Path: <netdev+bounces-174940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17837A6179C
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 18:29:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4811A6182E
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 18:39:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98C21884E8C
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 17:28:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84C3B3BC9E6
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 17:38:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FE67204693;
-	Fri, 14 Mar 2025 17:27:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55DA0204F79;
+	Fri, 14 Mar 2025 17:37:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="pAJgzl9J";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="CgrjTBeh"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b="M62usRcE"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from orbyte.nwl.cc (orbyte.nwl.cc [151.80.46.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD285204680;
-	Fri, 14 Mar 2025 17:27:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53CE204F78
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 17:37:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=151.80.46.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741973274; cv=none; b=g1v0hRNwsn5xFpygi7gvdoeLKkdy75MpxAdxg+xxvlRGjZ4Xl1RdDyKJc8KY8PmSxb69Qdazx/C7ETMyLZpuDIZJNOCbaUVDkWmZoaG7Qfgto5YIPSmAuO4PMgHrhezIGietE/wTtIOKPk3sEh450vFfyCb0FLGWIhF7k/+rx6E=
+	t=1741973835; cv=none; b=uoV9DEkh0x7QKVbBH2ooWBzD+ldjqA/mrzmKGE3heI0Tl7/H0TVVOm1k0Bkj4QZnQWy4haktlLs0PCeEJFqRnTr5IFsOW0DMlyjAppYOh3DtZJwFSTpFTq2KKvkqLuediM/GppdPDshShtptGIOGxPEITDJ5o6QZoYmxxjEj1pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741973274; c=relaxed/simple;
-	bh=yGxgdF+OHwBPS6fl+QKaxNcmsUSJgirsc4Ag+DtLmcg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t1r6ghF3Icwf13vRTFKDqZqbiFHIcMydFNJHjS3keTHP/R8kuwwZOlFG8ZRWvy5LKwViYew345/hVu8jmk0X8LPprIuTq8uxZg36a5JFALOrKk0JttYwjGyfgfYONhHAT5Agf7ZK8vod4WUYZh5F07o6LsWdHcMyGZD8GvDrlkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=pAJgzl9J; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=CgrjTBeh; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Fri, 14 Mar 2025 18:27:49 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1741973270;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wcRCFIBiAQNI1L/e3qYxgTree8WI127fpfM7PwFeH8k=;
-	b=pAJgzl9JA7bq+lH2EEHM2+Sq9VQrAel6kyYkh18y+6OlAeOZgdy+4aaW5X5E8hL67dTC/W
-	nq98URRZw8U7o+eKg72Gv1gbBm5GOqi+mA0JrTzWyaRN7+ZIViSM4lJZVe2gEn4U0xhFzZ
-	ry3nqUZ3RQLGZQQ1BXXq7GT4trV81n2SMj4+ztdbZrjZ3uYmIllPHA3pvRjRZ7QRzJ3M1Y
-	CECA7OpfW9c2Tm5FSF8zfbXLcGRNbZJ4kVT+RDSIuZSLS1c2hz7pmk1KhrSFljifn2LNYK
-	pWYDBgUTr152UlSsXL3c0hfhyj0Zb6MpZD+H806O1VVSRrrdJ6BCONiwcpScqQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1741973270;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wcRCFIBiAQNI1L/e3qYxgTree8WI127fpfM7PwFeH8k=;
-	b=CgrjTBehA7t1aEFnDlXacuc37fxZk2+ByxJyRvUSaxNaXJhgjPjHw+Gr0RQ5Zz25ynF/Dn
-	1IoHt7Hn5atxMHBg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
-	Ricardo =?utf-8?Q?Ca=C3=B1uelo?= Navarro <rcn@igalia.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [RFC] Use after free in BPF/ XDP during XDP_REDIRECT
-Message-ID: <20250314172749.hsmtyM3N@linutronix.de>
-References: <20250313183911.SPAmGLyw@linutronix.de>
- <87ecz0u3w9.fsf@toke.dk>
- <20250313203226.47_0q7b6@linutronix.de>
- <871pv0rmr8.fsf@toke.dk>
- <20250314153041.9BKexZXH@linutronix.de>
- <875xkbha5k.fsf@toke.dk>
+	s=arc-20240116; t=1741973835; c=relaxed/simple;
+	bh=cPo7gKIiw2yLiDBgZAoCaAsR5xiwAUzc42LB1f9bLEk=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hMo2TTf5MPbkEY1NzVE6vXwS2qY2fPh6oEF0KyeVAV1rtrJvVWLdb9viVWtvBIaWvFkJhYUcsCajZ1KbEi7A4Cio1TmqDOFxH0X1pwJSXIuOosJszXiRo55N9twHw9NQt4v7cWYP7m6EOxeZ2VXEeuVOaSPBb3SEzYCzHRwmp4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc; spf=pass smtp.mailfrom=nwl.cc; dkim=pass (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b=M62usRcE; arc=none smtp.client-ip=151.80.46.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nwl.cc
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nwl.cc;
+	s=mail2022; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:MIME-Version
+	:References:Message-ID:Subject:To:From:Date:Sender:Reply-To:Cc:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=Bckm38x3pxowzPDACBbHX4XOpMk2EJRBTNec1gnUCGc=; b=M62usRcEWGc/jp6YMufQXZHBfa
+	AFri9xFcPd6jbfkj01z+sWJnwpnFDqn+yXWi535c9HuOwOqqIfd3amr3U/ec6vUzWVR61pru0lkma
+	gZvqLWTcsVipMTwh82E7p5W8maYxvAtETtL0ccQQZpc2qV3/TgBISWd8MdDFe1p28bMPjFbtc2SF9
+	prddBe46sDgbt8UK9qlfNfQA9C2fFo3fLs44O4LOmEDFiEfW0eebp2WKTA/13srpKSUqZ8KlOD/yd
+	APMVFHwOCcR9Dt0NUlqKXShjIM28MJMVeVHY5AjYBr3S0lMSUOdFUvwgHXpTcfO6TuNrZCuNy9+Gl
+	kjZDvkxA==;
+Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.97.1)
+	(envelope-from <phil@nwl.cc>)
+	id 1tt8y5-0000000031a-1piL;
+	Fri, 14 Mar 2025 18:37:09 +0100
+Date: Fri, 14 Mar 2025 18:37:09 +0100
+From: Phil Sutter <phil@nwl.cc>
+To: Stephen Hemminger <stephen@networkplumber.org>,
+	Matteo Croce <technoboy85@gmail.com>, netdev@vger.kernel.org,
+	Matteo Croce <teknoraver@meta.com>
+Subject: Re: [PATCH iproute2-next v2] color: default to dark color theme
+Message-ID: <Z9RpRYZcAfJMDwjc@orbyte.nwl.cc>
+Mail-Followup-To: Phil Sutter <phil@nwl.cc>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	Matteo Croce <technoboy85@gmail.com>, netdev@vger.kernel.org,
+	Matteo Croce <teknoraver@meta.com>
+References: <20250310203609.4341-1-technoboy85@gmail.com>
+ <20250310141216.5cdfd133@hermes.local>
+ <Z9LBZsdh3PsjuB28@orbyte.nwl.cc>
+ <CAFnufp0e-GNCsjXw-KUjnTx+A4TP_gQTW4-HK2T8kYxH-PMxkg@mail.gmail.com>
+ <Z9LJ_zDqy8iKpX7y@orbyte.nwl.cc>
+ <20250313093035.18848cf0@hermes.local>
+ <Z9RjhTfXi86Jo7SL@orbyte.nwl.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,90 +73,127 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <875xkbha5k.fsf@toke.dk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z9RjhTfXi86Jo7SL@orbyte.nwl.cc>
 
-On 2025-03-14 17:03:35 [+0100], Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> > While at it, is there anything that ensures that only bpf_prog_run_xdp()
-> > can invoke the map_redirect callback? Mainline only assigns the task
-> > pointer in NAPI callback so any usage outside of bpf_prog_run_xdp() will
-> > lead to a segfault and I haven't seen a report yet so=E2=80=A6
->=20
-> Yes, the verifier restricts which program types can call the
-> map_redirect helper.
+On Fri, Mar 14, 2025 at 06:12:37PM +0100, Phil Sutter wrote:
+> On Thu, Mar 13, 2025 at 09:30:35AM -0700, Stephen Hemminger wrote:
+> > On Thu, 13 Mar 2025 13:05:19 +0100
+> > Phil Sutter <phil@nwl.cc> wrote:
+> > 
+> > > On Thu, Mar 13, 2025 at 12:41:54PM +0100, Matteo Croce wrote:
+> > > > Il giorno gio 13 mar 2025 alle ore 12:28 Phil Sutter <phil@nwl.cc> ha scritto:  
+> > > > >
+> > > > > On Mon, Mar 10, 2025 at 02:12:16PM -0700, Stephen Hemminger wrote:  
+> > > > > > On Mon, 10 Mar 2025 21:36:09 +0100
+> > > > > > Matteo Croce <technoboy85@gmail.com> wrote:
+> > > > > >  
+> > > > > > > From: Matteo Croce <teknoraver@meta.com>
+> > > > > > >
+> > > > > > > The majority of Linux terminals are using a dark background.
+> > > > > > > iproute2 tries to detect the color theme via the `COLORFGBG` environment
+> > > > > > > variable, and defaults to light background if not set.
+> > > > > > >  
+> > > > > >
+> > > > > > This is not true. The default gnome terminal color palette is not dark.  
+> > > > >
+> > > > > ACK. Ever since that famous movie I stick to the real(TM) programmer
+> > > > > colors of green on black[1], but about half of all the blue pill takers
+> > > > > probably don't.
+> > > > >  
+> > > > > > > Change the default behaviour to dark background, and while at it change
+> > > > > > > the current logic which assumes that the color code is a single digit.
+> > > > > > >
+> > > > > > > Signed-off-by: Matteo Croce <teknoraver@meta.com>  
+> > > > > >
+> > > > > > The code was added to follow the conventions of other Linux packages.
+> > > > > > Probably best to do something smarter (like util-linux) or more exactly
+> > > > > > follow what systemd or vim are doing.  
+> > > > >
+> > > > > I can't recall a single system on which I didn't have to 'set bg=dark'
+> > > > > in .vimrc explicitly, so this makes me curious: Could you name a
+> > > > > concrete example of working auto color adjustment to given terminal
+> > > > > background?
+> > > > >
+> > > > > Looking at vim-9.1.0794 source code, I see:
+> > > > >
+> > > > > |     char_u *
+> > > > > | term_bg_default(void)
+> > > > > | {
+> > > > > | #if defined(MSWIN)
+> > > > > |     // DOS console is nearly always black
+> > > > > |     return (char_u *)"dark";
+> > > > > | #else
+> > > > > |     char_u      *p;
+> > > > > |
+> > > > > |     if (STRCMP(T_NAME, "linux") == 0
+> > > > > |             || STRCMP(T_NAME, "screen.linux") == 0
+> > > > > |             || STRNCMP(T_NAME, "cygwin", 6) == 0
+> > > > > |             || STRNCMP(T_NAME, "putty", 5) == 0
+> > > > > |             || ((p = mch_getenv((char_u *)"COLORFGBG")) != NULL
+> > > > > |                 && (p = vim_strrchr(p, ';')) != NULL
+> > > > > |                 && ((p[1] >= '0' && p[1] <= '6') || p[1] == '8')
+> > > > > |                 && p[2] == NUL))
+> > > > > |         return (char_u *)"dark";
+> > > > > |     return (char_u *)"light";
+> > > > > | #endif
+> > > > > | }
+> > > > >
+> > > > > So apart from a little guesswork based on terminal names, this does the
+> > > > > same as iproute currently (in his commit 54eab4c79a608 implementing
+> > > > > set_color_palette(), Petr Vorel even admitted where he had copied the
+> > > > > code from). No hidden gems to be found in vim sources, at least!
+> > > > >
+> > > > > Cheers, Phil
+> > > > >
+> > > > > [1] And have the screen rotated 90 degrees to make it more realistic,
+> > > > >     but that's off topic.  
+> > > > 
+> > > > I think that we could use the OSC command 11 to query the color:
+> > > > 
+> > > > # black background
+> > > > $ echo -ne '\e]11;?\a'
+> > > > 11;rgb:0000/0000/0000
+> > > > 
+> > > > # white background
+> > > > $ echo -ne '\e]11;?\a'
+> > > > 11;rgb:ffff/ffff/ffff  
+> > > 
+> > > Maybe a better technique than checking $COLORFGBG. Note that:
+> > > 
+> > > - This may return rgba and a transparency value
+> > > - In 'xterm -bg green', it returns '11;rgb:0000/ffff/0000'
+> > > 
+> > > So the value may not be as clear as in the above cases.
+> > > 
+> > > Cheers, Phil
+> > 
+> > Rather than hard coding color palettes it would be better to use some
+> > form of environment or config file to allow user to choose.
+> 
+> I think we have that already. Quoting from ip(8):
+> 
+>  -c[color][={always|auto|never}
+>     [...]
+>     Used color palette can be influenced by COLORFGBG environment
+>     variable (see ENVIRONMENT).
+>  [...]
+>  ENVIRONMENT
+>     COLORFGBG
+>       If set, it’s value is used for detection whether background is
+>       dark or light and use contrast colors for it.
+> 
+>       COLORFGBG  environment  variable  usually contains either two or
+>       three values separated by semicolons; we want the last value in
+>       either case. If this value is 0-6 or 8, chose colors suitable for
+>       dark background:
+> 
+>       COLORFGBG=";0" ip -c a
 
-Okay. So checks for the BPF_PROG_TYPE_XDP type for the map_redirect and
-that is the only one setting it. Okay. Now I remember Alexei mentioning
-something=E2=80=A6
+Assuming not every terminal sets $COLORFGBG, I guess what Matteo
+suggests should aid as a fallback for those cases. This would retain the
+existing behaviour wrt. COLORFGBG but improve the situation when
+user/terminal don't provide this hint.
 
-> > --- a/include/net/xdp.h
-> > +++ b/include/net/xdp.h
-> > @@ -486,7 +486,12 @@ static __always_inline u32 bpf_prog_run_xdp(const =
-struct bpf_prog *prog,
-> >  	 * under local_bh_disable(), which provides the needed RCU protection
-> >  	 * for accessing map entries.
-> >  	 */
-> > -	u32 act =3D __bpf_prog_run(prog, xdp, BPF_DISPATCHER_FUNC(xdp));
-> > +	struct bpf_redirect_info *ri =3D this_cpu_ptr(&bpf_redirect_info);
-> > +	u32 act;
-> > +
->=20
-> Add an if here like
->=20
-> if (ri->map_id | ri->map_type) { /* single | to make it a single branch */
->=20
-> > +	ri->map_id =3D INT_MAX;
-> > +	ri->map_type =3D BPF_MAP_TYPE_UNSPEC;
->=20
-> }
->=20
-> Also, ri->map_id should be set to 0, not INT_MAX.
-
-The or variant does
-
-|         add %gs:this_cpu_off(%rip), %rax        # this_cpu_off, tcp_ptr__
-|         movl    32(%rax), %edx  # _51->map_id, _51->map_id
-|         orl     36(%rax), %edx  # _51->map_type, tmp311
-|         je      .L1546  #,
-|         movq    $0, 32(%rax)    #, MEM <vector(2) unsigned int> [(unsigne=
-d int *)_51 + 32B]
-| .L1546:
-
-while the || does
-
-|         add %gs:this_cpu_off(%rip), %rax        # this_cpu_off, tcp_ptr__
-|         cmpq    $0, 32(%rax)    #, *_51
-|         je      .L1546  #,
-|         movq    $0, 32(%rax)    #, MEM <vector(2) unsigned int> [(unsigne=
-d int *)_51 + 32B]
-| .L1546:
-
-gcc isn't bad at optimizing here ;)
-
-This is the or version as asked for. I don't mind doing any of the both.
-I everyone agrees then I would send it to Greg.
-
---- a/include/net/xdp.h
-+++ b/include/net/xdp.h
-@@ -486,7 +486,14 @@ static __always_inline u32 bpf_prog_run_xdp(const stru=
-ct bpf_prog *prog,
- 	 * under local_bh_disable(), which provides the needed RCU protection
- 	 * for accessing map entries.
- 	 */
--	u32 act =3D __bpf_prog_run(prog, xdp, BPF_DISPATCHER_FUNC(xdp));
-+	struct bpf_redirect_info *ri =3D this_cpu_ptr(&bpf_redirect_info);
-+	u32 act;
-+
-+	if (ri->map_id | ri->map_type) {
-+		ri->map_id =3D 0;
-+		ri->map_type =3D BPF_MAP_TYPE_UNSPEC;
-+	}
-+	act =3D __bpf_prog_run(prog, xdp, BPF_DISPATCHER_FUNC(xdp));
-=20
- 	if (static_branch_unlikely(&bpf_master_redirect_enabled_key)) {
- 		if (act =3D=3D XDP_TX && netif_is_bond_slave(xdp->rxq->dev))
-
-> -Toke
-
-Sebastian
+Cheers, Phil
 
