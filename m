@@ -1,116 +1,125 @@
-Return-Path: <netdev+bounces-174949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F3A6A618E7
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 19:02:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F1C9A618F2
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 19:03:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A23B1B641DD
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 18:02:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CC171B63FFF
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 18:03:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E30F20371A;
-	Fri, 14 Mar 2025 18:01:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F02B20459A;
+	Fri, 14 Mar 2025 18:03:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="cNRVlHh7"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="JAZJLt2B"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC47214375C;
-	Fri, 14 Mar 2025 18:01:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 163B4132111
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 18:03:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741975268; cv=none; b=JmXCFhIDf4UMeG5wrFaEHOA+EGosZszbmuQV0HxEma7hQKbIqMwZ8hRQU8DljdXcETb1PxAiX4tceJiQIeYp5Enu8GPJKwTw4TfXtDYneC8HtVXyZm1NmRGVcUoElC4FxLhrW4OHpQGtps1Yrs9TuG1vNCcYQWk7YZKuKHx4N6E=
+	t=1741975399; cv=none; b=GFS/lwoUM7qG7e81TftuvV3Ied3A/P+D6vEmr4083MNCjnFRYjSY/DtgOLYtBnae8eEW9RcBHFwc1FUesQ5aIYBuJ7u5oKofKWOvcmISr0AT/05ST0TL9hM3F8bdRDhk8Uey2o2FxA6hl7zWfzfjGbuIMC+UR2/q7G/XjG6fGOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741975268; c=relaxed/simple;
-	bh=yUhwWZz6MweKJmEseaeBVYn0fSUBWQP1mSHj+8asVSQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R9y3mbJ2tz9isYI/0ngHH9Zkxi5k1ATEgUuBbW6/9yZU/gyqoqyTlLWWwphlS02minBnf0G/7lCdAO/kyZnEjXxfUzzLTDwr30oMNMoBZgqafSGaikPpEv/6Nt1UysLte+0UN2gYTHgSy2lxdDnQwGWjl4a7AS/2ngYIItt02bY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=cNRVlHh7; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 3D51A432FB;
-	Fri, 14 Mar 2025 18:00:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1741975258;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YMFlSCHDb0j/OxbmG9FdYf4jzMVqwOiBPWCVBhtDuSM=;
-	b=cNRVlHh7Bm1+GWYYC8JaAJYUn+9RWi9AMU/ib93vpTjziAcShYvfvqwrfB6GDXVCU+iDQc
-	BTfLisKLOKhLzzmw/2s1SIOHD5YsNI2KaSKKUdtysOARkdQj6acDiGV3+CiLB/xjKE3DYb
-	inMSsOFc+N15hncfmFFgCdpF0y1CvMKbg68pXfdq/bzu0Hu6sW2rSxXPjGWPXna1OcDZyj
-	d2Js4tjGg3+6mvyyaHyI11k2MoRuVLIAF6eHJKQXUii9fNO/QXRyPI3hL/fj91PlJCLcnv
-	z6vcROHpHohxRfKDnA/5kKTYJgw6wJAK65bkpWcBTZQf+DsM1Wj+w/0oYsNcCQ==
-Date: Fri, 14 Mar 2025 19:00:56 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Michael Klein <michael@fossekall.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [net-next,v2,1/2] net: phy: realtek: Clean up RTL8211E ExtPage
- access
-Message-ID: <20250314190056.739f4d81@fedora-2.home>
-In-Reply-To: <20250314111545.84350-2-michael@fossekall.de>
-References: <20250314111545.84350-1-michael@fossekall.de>
-	<20250314111545.84350-2-michael@fossekall.de>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1741975399; c=relaxed/simple;
+	bh=1sP3XHwIQIDGMOM69P7DN2twEdFUfgOy2yKQoif4qBY=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=PgY0X8VDj4RyLI2QAOK45Jz5uPfu0EhFzbAuPcK7eglTrBKUNGAWmgo806qdNPecfZpaJ/dAskO6nnD4E2JcGp7p3Fj+0RPvTaIJnkVFyYyeFQyE2YSSNkso+Iwzv3ggFKS7jbofejZyyZ1bM096Y0lTNn24zEsLDb/niTmcZ/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=JAZJLt2B; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=UDOJjloH2trDjnCVarjV86T+ZpZnVfpEtrSMCzlD+kA=; b=JAZJLt2Bk+mCE5pzgJhw/WLTXD
+	CKl31JUUTk9vXSOy6ZSf7piVnoSGcjCKdoxRk1cqt2y1DgjIHIv09YaYhFinNO4NmkswZa5D3eN2N
+	n/Nt+j10MZA2jy3m2ReoFGESyXhh/D6aDttdwWa//k4ydrZt9jZRrR1+AJogjy7AboqU+ZC4Y4FpH
+	bL7UsyotmH2rBVSpzamtF4b1D6yBFfuflj28SKNEr+7gTxyiP/oFXPtNMu6i8kxGxcbwhZNJ8Q+t1
+	SVlLSoEOPUgzYF+iPvC9hd9hXyGpPMvSlcoq5wux0aG53l3tLOF091XUWDalkGqpUmPW7b4hKjFAU
+	Nf+4vGcA==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:40120 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1tt9N5-0000fN-2v;
+	Fri, 14 Mar 2025 18:02:59 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1tt9Ml-006xIA-EF; Fri, 14 Mar 2025 18:02:39 +0000
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next] net: stmmac: remove redundant racy tear-down in
+ stmmac_dvr_remove()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddufeduhedtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdqvddrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepuddtpdhrtghpthhtohepmhhitghhrggvlhesfhhoshhsvghkrghllhdruggvpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrt
- ghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1tt9Ml-006xIA-EF@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Fri, 14 Mar 2025 18:02:39 +0000
 
-Hi Michael,
+While the network device is registered, it is published to userspace,
+and thus userspace can change its state. This means calling
+functions such as stmmac_stop_all_dma() and stmmac_mac_set() are
+racy.
 
-On Fri, 14 Mar 2025 12:15:44 +0100
-Michael Klein <michael@fossekall.de> wrote:
+Moreover, unregister_netdev() will unpublish the network device, and
+then if appropriate call the .ndo_stop() method, which is
+stmmac_release(). This will first call phylink_stop() which will
+synchronously take the link down, resulting in stmmac_mac_link_down()
+and stmmac_mac_set(, false) being called.
 
-> - Factor out RTL8211E extension page access code to
->   rtl8211e_modify_ext_page()/rtl8211e_read_ext_page() and add some
->   related #define:s
-> - Group RTL8211E_* and RTL8211F_* #define:s
-> - Clean up rtl8211e_config_init()
-> 
-> Signed-off-by: Michael Klein <michael@fossekall.de>
-> ---
-[...]
-> +static int rtl8211e_read_ext_page(struct phy_device *phydev, u16 ext_page,
-> +				  u32 regnum)
-> +{
-> +	int oldpage, ret = 0;
-> +
-> +	oldpage = phy_select_page(phydev, RTL8211E_SET_EXT_PAGE);
-> +	if (oldpage >= 0) {
-> +		ret = __phy_write(phydev, RTL8211E_EXT_PAGE_SELECT, ext_page);
-> +		if (!ret)
-> +			ret = __phy_read(phydev, regnum);
-> +	}
-> +
-> +	return phy_restore_page(phydev, oldpage, ret);
-> +}
+stmmac_release() will also call stmmac_stop_all_dma().
 
-You're not using that function at all in this patch, so this patch
-compiles with a warning for an unused function.
+Consequently, neither of these two functions need to called prior
+to unregister_netdev() as that will safely call paths that will
+result in this work being done if necessary.
 
-I suggest you move that to patch 2, which is the first user for 
-rtl8211e_read_ext_page()
+Remove these redundant racy calls.
 
-Thanks,
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: Furong Xu <0x1207@gmail.com>
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-Maxime
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index fa1d7d3a2f43..c2ee6c0af3fd 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -7768,8 +7768,6 @@ void stmmac_dvr_remove(struct device *dev)
+ 
+ 	pm_runtime_get_sync(dev);
+ 
+-	stmmac_stop_all_dma(priv);
+-	stmmac_mac_set(priv, priv->ioaddr, false);
+ 	unregister_netdev(ndev);
+ 
+ #ifdef CONFIG_DEBUG_FS
+-- 
+2.30.2
+
 
