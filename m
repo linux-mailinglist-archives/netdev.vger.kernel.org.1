@@ -1,119 +1,166 @@
-Return-Path: <netdev+bounces-174930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B16EA61668
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 17:38:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC08FA6167F
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 17:41:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F253419C3D8A
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 16:39:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CD7B3ACB1E
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 16:41:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10AD201027;
-	Fri, 14 Mar 2025 16:38:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 045BA203714;
+	Fri, 14 Mar 2025 16:41:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IbzXk7t9"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="LNso99M4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
+Received: from sonic308-15.consmr.mail.ne1.yahoo.com (sonic308-15.consmr.mail.ne1.yahoo.com [66.163.187.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441E318B494;
-	Fri, 14 Mar 2025 16:38:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2B8818B494
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 16:41:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.187.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741970335; cv=none; b=UoZ3rQqP4FgThJ9OpCOc2d4g2FgE+DEa3NN9XqRdKId9LV0SSCbB/WGb6uaFf3JhRWeYwE6B4+R/Ki7hMZpiQVzJ/7TXOdqrCMLdyXjSZUPsSk9Vh7XA8WV646Jn0A2fHfzeTpNBiC3fLcqbAwUsdTkYpt5MpOsD2C0UgCgfXdQ=
+	t=1741970499; cv=none; b=RmKAWMV4q6BlSBpC079Zd9P+sQLYaPaIAhSq3Qpbu6x0tIK9U+xrL4/IoNQ7O2p72Rdwgu4YnqM4KTJ6qBv3v+9g45Bw5jTa806wsyshmLOpIJepJfA9aYkRyiMxo8Wm6+++usfTdDkIxKpuFpPJGn+/EMoZiMBNHTDkGtj1bbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741970335; c=relaxed/simple;
-	bh=mUmGdDNy7CflPQgurDgMSe2jxfVMINCSiKslqK4V44Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AOvzOzB4rwMGnbmo/66O1iKIdLdndUrD+tcOfTDM8LsbShbl6Rm35qRBMRzE+4z71B/4NKgjBX6REqCcPelaFAIThkzTddMRLSJBQ8A5yz/LdOA8ITT4OXRxfuMxkhsHu8jS6QlQY0RfYgrhftIiVQuodNYvSIlhdPZJFTyv72g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IbzXk7t9; arc=none smtp.client-ip=209.85.222.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f51.google.com with SMTP id a1e0cc1a2514c-86b68e51af4so942498241.1;
-        Fri, 14 Mar 2025 09:38:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741970333; x=1742575133; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PZeAtTBWW6NSQAJkyfYhJOSxTlP/7BOudKr/+e8Hc9g=;
-        b=IbzXk7t9bjFXknQvRQ03QdU3UcZLt1C4uIXyRuqNOZTC1bDNHOZMuLKv9EvjhnEBIu
-         uKVgLlHgBEeGVOAiCwT+u3uPAdU/VvvZDbuoyMqHIUMvdBi+3GOOropdATYNvazNpTV6
-         2WtML9+Y54sFxk6emNSRV+TMGUtaLdTEjujdN/KCxfoMpBHdLPeEcaoBpAiPa5oSZSPp
-         4WI56JUdWMt48qGXHZNCyfJgdWptMWJvc8X1b72VrPR+KIGBvFv+zEOrjrQQNCNybfV4
-         8kEjyH/BBO5fz8AGUmN3dbXCiEvXybbBFrOIM7ce4+wfkH2cDuEOJGgFHihSh507h9of
-         0p8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741970333; x=1742575133;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PZeAtTBWW6NSQAJkyfYhJOSxTlP/7BOudKr/+e8Hc9g=;
-        b=stEuljYx57IgMHIjRBxxiprdFPsRwvRS10Kecn1+pgW6uyA6FAF3DVPbOyKBetJDvm
-         qAFtdekqYNyC6zgkVG8Sn1mUbkQ+EiCpddHpZ7IQ0FEPdmbPWxGfyGUZpuher5+rWKt2
-         TrVzZGn7lOLiuK85DljR0pQgFBCSJXpIjpVOJB3YhAXp1rY8OjjbDZGYNyQm4fJUFjjR
-         zaUfBkPjsRlhTqIIK3MvxS2dh/22PzUNJKT5HWAt+9vFnu192oIRs+wxhhQLN5hWqRTJ
-         3loMejAguBf3cYMpZ3/n5YdkXKC9KfSGfKPlCXjWKOZ+LGqFrGs5sbK/8U5MIpiRIoSW
-         /5Ig==
-X-Forwarded-Encrypted: i=1; AJvYcCX00aBjyzAYkBTr4aYVud6BbaZmCgFuTl4Qw3582vQGRYPkpdc1KWx09p/0OPV/mnXLdxpzVNY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwAU9r6FDmO87moSWEdJCJrhXrCn3U0i88WnQJ0W+B9Rrg5FJUI
-	W1zTQ0FCWReqIkbJogYF5UXo4sdZZb2S8pUTUc88S14ugeSv73wA
-X-Gm-Gg: ASbGncudm23FZ66yhrymrvbmRnEsy/FOSikClu+GIfKSJ5EoV7YlfRwnbKCGeY221Xo
-	GNthnQj7KykJjp+pNTWhGHiEAFRA39HCCNof9tjrXbavnm+bswwIKUc+BKJlaTg3v1nQvYin+S9
-	6qmk0iacR6EmoLICpbJ7w0cIrBg7MqyvIrJW+zdSrW1caqAiQiJ6S0+YX6AD/r8n8tiUu9SRYat
-	HCSmjqtu+QPG1vSLVuocN6/njpkJ2MtUiGfB4T4SLKwTSe4AjVtatomfx0xuKJgP4TLodeNOPi2
-	tQe7+0thEX/jaLX8lJehpoRj7SHL0/Clx8Uaj0Oo0BpQ1LX97qMoKec/PEafc65Uu3zL+FFXAXo
-	Ze0/Xk6xG4iWWSXjTYe5MuTRo
-X-Google-Smtp-Source: AGHT+IEehblAXKmi+T0Pq/D31/D3w5D4vNCyox/3GOl11p1JP0+j1HjqShy4WUtYsrzANc9fikjs8A==
-X-Received: by 2002:a05:6102:549e:b0:4c1:a448:ac7d with SMTP id ada2fe7eead31-4c383145426mr2371110137.10.1741970332843;
-        Fri, 14 Mar 2025 09:38:52 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-86d90d68c61sm616851241.3.2025.03.14.09.38.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Mar 2025 09:38:51 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] bluetooth 2025-03-14
-Date: Fri, 14 Mar 2025 12:38:47 -0400
-Message-ID: <20250314163847.110069-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1741970499; c=relaxed/simple;
+	bh=O82n78ss5+Ih+r33ZKwLEO2agcUD4VZ0XGXk5KLTdfM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TxAC4xpTvu9EeEcS6HCOVCKdjk//QpTBYDam8lQcrKwwbw03rZ3BTIoiUc/Uqw+klN6F0FLF7J77S/Rq4idCh4DzLLGl0nzeR2PlkBKanb9IToLlHsb+91IQ9xOGrDhPJdstLj0dCeqBzlPAG+4GKZkFc1BpbYCGQUg0yuUGYac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com; spf=none smtp.mailfrom=schaufler-ca.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=LNso99M4; arc=none smtp.client-ip=66.163.187.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=schaufler-ca.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1741970490; bh=LSPWeeDc4kfnTy6XAQkhnXeL0TiR4naRLFabBLo1bMs=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=LNso99M4BYH1kVbCXtvSjy5XJIwAFVQ/tOmiZhx5zPKt0+f6KcGXN2Cun8EPk4/CSNawsj3/da69jGs2owL8o5u1W29X6m/5Km+hgAL+GnqBxaWYpZQaoMymufF52JJ2feSQYASWHqXle6k/heamH8KB40UXrbCDFpws/0GWATPXgoDwxSbBCDJfuc8Dhv9IvLMdea0dSC1NP8skohfKzZ8GS+3zazFvJRvZv274K49Uzj3QlT5x1EKlBgrczGmE7m8YbJKW+YlMP3eo2nHCFpaXXMFsfdOx0KbB/mr14VagTNB/Myelt9lyB4s53SLsiVfEES7+KOsefXcZ6L7yrQ==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1741970490; bh=6jjAwDm2pxXtJK8wOstbrf3Oxp5hYC01T9bBVHhzKM7=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=M+vtayvJBDLYYN2Z/ub+Afh22JFWT8VarfPE9GaQ9//eKxa31XVEDhgDvOiSt2/AiJRG4yg45X0Lo+m28zv4Z+XFe1WI4r4Dr3hjJqz7Dr2Caox8iEbisnzTMAMRrgfXsPGPWw1eNEQ8jR39l2A1WqsuORU4GAvktLoVIVoqg1RJGX04CdleYawapmYVkVNI3I8vVAYbPVLpBM8pnSg/eOqfaxqH239knjYIgyMIufl8YeTnrVBRdhiU1j8pIQ/vb81AwN2rJK7QlcUz11re5e1cFgGoe2dgPKMDBLdxLWpPTd+ypB9/njGVw8WaaPWMAcrJkz9878VZkCWQRUF2jw==
+X-YMail-OSG: YOJJeNAVM1nD2IKlVSMjlgST4etRQIf0.CmdGrSFZNQCmezWvojqo0m5PJLr4Zs
+ IP0SAiA.xSSjs8eUYg1dqqwVb.WAJ6w2Rjetu15aL6eM71maI7mFtMRJEM2yyYOZJwqVHo7P8b20
+ jIpRkkcOtYjTQpL79bPk5mX6L7Xp4s9B5IGIdB83n2N5BEoUH8b7FSHvfFBlf7yhTuW7rdEvpI6H
+ F4L110vX6vzAojYCSA50OmSlIDPkJrbAwnBtHDsLEAZlx13QlgFVS1Yaf6qz60LvTUtSrG3KqyF3
+ m41DtMbjiMFvUcibFHFaHByUzWDBWg5lqO7pYjMW34AopOigaqyaJFje6PdvXiq6OhuzOiCfMbLE
+ Ioqjt2wfkpzznAJVK8Sn8fF5m5KkBfT3qTGClIMbQ7Q6jNUbO1a8mTpPFn_batbgFlX7vGPC_IBK
+ rTTntHM8yAVJVz64E5SsJ5VRw7fyH_jhjaFcta_4p9KzULSqPXWQDNJby9RooRt3W0w2sfHunyC5
+ o1wayG0pxT7FXXYaiUH0byCYr5ZWnpWhooAsfJnIIqApPkbdyXPoloOSOi0QopMJLO9U2ybbva_7
+ rVm5FDorQzn32DpN1X1XC0Hj_2b2XpX21CK7rlQ17sL2zu5BeSqj2kDgHmbP9w6wYFP9kBad_x3a
+ Nolh5Xq1BXBgLUQ60X07kO.Dfci_FMZVhp7u7G1CEffc_L5FkTPmhOSICeUHDOBwYQCUU7itN_QU
+ PXUn3caV3sPl6uguVANFkHkj4iVBMAJLzEALzGebML1rcEroeXjF7txslCk6D_ftyQlvEc7sKMqM
+ m0RwbX0Wca1V8WoZQS0FmLpicZmRkrV.nRZJa7orBGpENQF24S.ppiunW8u00TP_I2BSERzOg_H.
+ exdknPjAGSWUtbhXhgLbhu5JTSLeuHLJ9abiKctv0yZNRn0Aypynan0wjn_Rz7.rybHYFYFJPEwI
+ LiJ_apxgDSqPVk_zEKlJ0lzeNmuwelg0heJ_5o1lNVxPWRaI6sSMQ_kRtdZeMraz.rEWrPhG9D8L
+ aSUQgPb3V0WI5dqmNbD.z8VN1Y66bzgKlRBHbNGf3Z4Ad3WaMhtMd2qBiry9ae5dXKYiF7UXnD7u
+ w7svDtEfOXmpu2LgZx0EAdGbGcc8NsM361e8LlQQQDlJu9zE.xxxy5SMqCMnzwHeGIDlOABnqy09
+ javx98fTTyF5K81iJSiyEuGos9A6gstr9F0yhv6R1Jr83xL7NBYYTSxHULK4kt6h0clT2XwbIdLv
+ e64Rhd9Ovs7FZIVYxLI3xI6oNCv0yn3_1B2qwXir8ssLa6WKUI9MCSx2SOuQ47unytNz6jEacgO.
+ 87ofhYx4wdhzfUvUXGKmsTRh_cbZTH7PaQ84pBQXGntspanC0278Sc7v1ERvz.s0aLJr44HiIrRn
+ Lq.Pb5FfTu6vefHd2NgXJaF9ePh5Og9tSevAzAjHVlM.i3LBvJWQpptxLf2B9txIu3Yhz_tUTLnb
+ L0xCRtTFK6uWhRwoHtxr0u3RVoTZlWwaAz4oEKbwrb17dNWhTukEgVeOOw1EiOhX_hO5fqNK7kYI
+ a6uWOYPZ.hcBRd_ZCHpEUVjzQNVFz.8aRMOmZJdqCO5C2wUGfC_8nf1h5dUEmeVLmLcRtKuSuYBd
+ 4LFX2BAg0l5QOdjpZ2e3TECOzY1dlJz6We7ZchXorDX0g9vdERwea.Rw2WDVKh_9wfx6IiHE7HHf
+ dJT_foepbv08LUzJ0BgFRlpcRo._OAzQEHSmEB8R5WG_X7qlzzOS2euvsOQwn3Za0N6PlzL5Mami
+ 6s2GVZzEQgZ6hhum0.kM1JestrnsoXCxH6lFWlxOBgoAZeT1ysmGy.FyFLHcyn9tnAdqfByUtBYY
+ z92LO.MOmCSX0_yGCUUIZTts1GbCUMuErn1cNqB63tBhkjFFvxoXCgXwaNzvMuVivM71Kpegh3pp
+ 9lxGxt34zzLbb4TIMJJm4PXeol5oKa3vWN47D8TTNx9jWdpfu2ChtwBvyR7xnMUNs.Ptup0FoLks
+ stsTtDMxbl042_GVZTaRBXTdDWxqZTk_H_fGPwOC5POXFRP19wv4r3YVerHxPF4m4ZF3wfhBniuX
+ kkiQEcd64yN_yj1aJpQc1e02GaM6lv2cXYhGCP7F28lSDAt2J0V_SzMKRrEaClATYUNwP3ILRpEd
+ FLyjK6XM5osASD9uK1C0rpq1lknhgxgvE5eO0.61eLp5oYYXSDQOIJfO8Vs2IkHZaSjulCp1_lZX
+ CtZa.0vLTZvXjOKsVuIAF4n2W3I4pHevyln3pItBvEphyw78JXGjFHgoNQv4htgsvJwsnt9lCp7e
+ 3BUSAL1DU_cfwcjjTxuMc
+X-Sonic-MF: <casey@schaufler-ca.com>
+X-Sonic-ID: 853f45af-6bfd-42c6-8a39-b9fab4ed7dfe
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic308.consmr.mail.ne1.yahoo.com with HTTP; Fri, 14 Mar 2025 16:41:30 +0000
+Received: by hermes--production-gq1-7d5f4447dd-9qjv2 (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 6c9efc90c0421e9334029701ef688062;
+          Fri, 14 Mar 2025 16:41:27 +0000 (UTC)
+Message-ID: <42e5bb33-1826-43df-940d-ec80774fc65b@schaufler-ca.com>
+Date: Fri, 14 Mar 2025 09:41:24 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: Initialize ctx to avoid memory allocation error
+To: Florian Westphal <fw@strlen.de>, Chenyuan Yang <chenyuan0y@gmail.com>
+Cc: netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Casey Schaufler <casey@schaufler-ca.com>
+References: <20250313195441.515267-1-chenyuan0y@gmail.com>
+ <20250313201007.GA26103@breakpoint.cc>
+Content-Language: en-US
+From: Casey Schaufler <casey@schaufler-ca.com>
+In-Reply-To: <20250313201007.GA26103@breakpoint.cc>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: WebService/1.1.23435 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 
-The following changes since commit 2409fa66e29a2c09f26ad320735fbdfbb74420da:
+On 3/13/2025 1:10 PM, Florian Westphal wrote:
+> [ trim CCs, CC Casey ]
+>
+> Chenyuan Yang <chenyuan0y@gmail.com> wrote:
+>> It is possible that ctx in nfqnl_build_packet_message() could be used
+>> before it is properly initialize, which is only initialized
+>> by nfqnl_get_sk_secctx().
+>>
+>> This patch corrects this problem by initializing the lsmctx to a safe
+>> value when it is declared.
+>>
+>> This is similar to the commit 35fcac7a7c25
+>> ("audit: Initialize lsmctx to avoid memory allocation error").
+> Fixes: 2d470c778120 ("lsm: replace context+len with lsm_context")
+>
+>> Signed-off-by: Chenyuan Yang <chenyuan0y@gmail.com>
+>> ---
+>>  net/netfilter/nfnetlink_queue.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/net/netfilter/nfnetlink_queue.c b/net/netfilter/nfnetlink_queue.c
+>> index 5c913987901a..8b7b39d8a109 100644
+>> --- a/net/netfilter/nfnetlink_queue.c
+>> +++ b/net/netfilter/nfnetlink_queue.c
+>> @@ -567,7 +567,7 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
+>>  	enum ip_conntrack_info ctinfo = 0;
+>>  	const struct nfnl_ct_hook *nfnl_ct;
+>>  	bool csum_verify;
+>> -	struct lsm_context ctx;
+>> +	struct lsm_context ctx = { NULL, 0, 0 };
+>>  	int seclen = 0;
+>>  	ktime_t tstamp;
+> Someone that understands LSM should clarify what seclen == 0 means.
 
-  Merge tag 'nf-25-03-13' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf (2025-03-13 15:07:39 +0100)
+If seclen is 0 it implies that there is no security context and that
+the secctx is NULL. How that is handled in the release function is up
+to the LSM. SELinux allocates secctx data, while Smack points to an
+entry in a persistent table.
 
-are available in the Git repository at:
+> seclen needs to be > 0 or no secinfo is passed to userland,
+> yet the secctx release function is called anyway.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-03-14
+That is correct. The security module is responsible for handling
+the release of secctx correctly.
 
-for you to fetch changes up to f6685a96c8c8a07e260e39bac86d4163cfb38a4d:
+> Should seclen be initialised to -1?  Or we need the change below too?
 
-  Bluetooth: hci_event: Fix connection regression between LE and non-LE adapters (2025-03-13 16:43:39 -0400)
+No. The security modules handle secctx their own way.
 
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - hci_event: Fix connection regression between LE and non-LE adapters
- - Fix error code in chan_alloc_skb_cb()
-
-----------------------------------------------------------------
-Arkadiusz Bokowy (1):
-      Bluetooth: hci_event: Fix connection regression between LE and non-LE adapters
-
-Dan Carpenter (1):
-      Bluetooth: Fix error code in chan_alloc_skb_cb()
-
- include/net/bluetooth/hci.h | 2 +-
- net/bluetooth/6lowpan.c     | 7 ++++++-
- 2 files changed, 7 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/netfilter/nfnetlink_queue.c b/net/netfilter/nfnetlink_queue.c
+> --- a/net/netfilter/nfnetlink_queue.c
+> +++ b/net/netfilter/nfnetlink_queue.c
+> @@ -812,7 +812,7 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
+>         }
+>
+>         nlh->nlmsg_len = skb->len;
+> -       if (seclen >= 0)
+> +       if (seclen > 0)
+>                 security_release_secctx(&ctx);
+>         return skb;
+>
+> @@ -821,7 +821,7 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
+>         kfree_skb(skb);
+>         net_err_ratelimited("nf_queue: error creating packet message\n");
+>  nlmsg_failure:
+> -       if (seclen >= 0)
+> +       if (seclen > 0)
+>                 security_release_secctx(&ctx);
+>         return NULL;
+>  }
 
