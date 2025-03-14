@@ -1,167 +1,121 @@
-Return-Path: <netdev+bounces-174986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A577A61CBD
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 21:31:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6D7EA61CD1
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 21:35:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D776319C21F0
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 20:32:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02D2A3BDF69
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 20:35:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 579D61A23B7;
-	Fri, 14 Mar 2025 20:31:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C353204099;
+	Fri, 14 Mar 2025 20:35:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o338TSpD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eVCH7tNT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3431819F436
-	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 20:31:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B60191A2872;
+	Fri, 14 Mar 2025 20:35:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741984311; cv=none; b=ivm3yaWczOI3ODEoUF9m36G3VheE1xeEhXT5nDiQWqpWo5Ag1Szo8EQhiLaDn/Ipizof/zrWyXn93+Sg53PKy5ufZtsqOSTUcER40CFgMMuMepr9FXxuztngxHNhE1aC9ACHvHoIRilZ+q3BxR4TkNAnW3wCtkxjH0y2aAKDVMg=
+	t=1741984531; cv=none; b=X1J71xMoTg9cMUlev0SgCqFXJI+eEw8pYmkVwLXUCn02WaefqY8666TOEAifP0wwe/U47UYX2q1DJivSUwJDeIQU+8Ozr24XxuyiWpKMdDIzv1ocnZrQm5neW0Sjc0nh40NJO2WGII8HXLaKAYKBdcjK9DkIZFefgnYJ5Xayq+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741984311; c=relaxed/simple;
-	bh=2QK4E9ynapxckPwxo8W/JTy4OvOXsGI29ZK/3e/YNY8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PEzGDzyfa10whgRHuKb52rKdsuqm8lrBJhBLFDRqCNxAVQgUEeESqIkhAsj8KGhAaNh4AEFehiSf+GGLh87Z9nYj0KhxmBZRO0iN+QNyfG6GfFSAasClMUk21EoKCj12n8S2Lj41nH/gbAfQbDjf9MCS0oi6famY4K/cyBTB03Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o338TSpD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3274C4CEE3;
-	Fri, 14 Mar 2025 20:31:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741984310;
-	bh=2QK4E9ynapxckPwxo8W/JTy4OvOXsGI29ZK/3e/YNY8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=o338TSpDAE5T9ccL/O2z4CMfuNtvnI2cvj4YLYVX2XiSAPSoNXgwjMwUFBLR7SN+n
-	 TZmar8vWeGE9pEhYQj9Hi0Q88hJZysWC93CBoE75YjmRraee+IdjzHkRfwJpXdIQTW
-	 a7prJDPFDR2fs2ZxegP0TctSW04RXCd8xS964GiAGx2t7z6SQW50cvAXn3Psm0k6Yj
-	 3JBEpKWDOsKo9cHawEaduQ0DOQUnDwdjdC78HosFC8JbeNIQwKUpGJpJ2KTwx1Unct
-	 eXn+sXbuYl+hZX/uQeeIn6PIV9ih25h9xAitoA7UoF2BUV0ivO4DN6vUNY6j6MtvKn
-	 L8qJKEmEelP9g==
-Message-ID: <a497632b-3754-42f2-9b7b-1821fee0c136@kernel.org>
-Date: Fri, 14 Mar 2025 22:31:47 +0200
+	s=arc-20240116; t=1741984531; c=relaxed/simple;
+	bh=y35moCP3XItPdmW0djksyvaUKSgqVbG7BR2LexXdQm0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LHYZhm85fv8yk92igNtSQoK1XsyqhHHeUTJQUjwMeVRzK1DpdgWpa45WAXy3P4sddGYW4efsg431t7+EPXsMHIQJg3XEhHN7wbU/5UfY4YO6VnrE5D9HyRgyvj/Gs20j39mwu+MCIt3JdyFwTA/mfAWg2Gj7/NnHu4N5BzVJSDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eVCH7tNT; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3913d45a148so2073896f8f.3;
+        Fri, 14 Mar 2025 13:35:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741984528; x=1742589328; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xj8OXU2bswQnQmpSnQJFG1oDI/cU7j7n5fn2QP89/kU=;
+        b=eVCH7tNTjlK3AGA1YNbVcvLZwtk7nyrg/ayo2kGelgdlRncWVI8w4xZtsg05wXMDAV
+         9vkepS+0FdWpUKVZDDcoE61Xzt97WX9TADUTkegiR1R5dN6VqwznAUfgBKnzeO9Gm7LP
+         fx/lNsISdPk8ECowRbD3MoFNIpddfK6fud3lVwiPcJvf4NjNtYBdChd7f3eynf7peDOv
+         bn5xXW1YJVkfQQ/3ey/jUKlTN56EQU36NxWo574LNLvC9jdhQrXemiZGqgDle4LdbC/q
+         zXlOG/crh8TaXwB2lkKQoL8UmW4bWVs6ZrlvgR62Idt4Td5VFGWBu0/4gUi1O/OQvCwz
+         3xhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741984528; x=1742589328;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xj8OXU2bswQnQmpSnQJFG1oDI/cU7j7n5fn2QP89/kU=;
+        b=qbWUXPVKpl/HuNjFRK6m/j4BTMgiRj27BuPcasIZUZ5UgjennHBRkir4b+Xj6K0P6r
+         K3JlHhsRljLFeFZYoY3Ar8LxmAsOzjzevGGrhEyThVGYAe4Rkdhru63dh6sHRqYkvhHf
+         Gs3HYt7VHZ09e7HPxglCLljXzbQtbfYjnZXLS5c8OVTqlfUZyIfHKd6nv0EtQtZiKEK9
+         tJBfSTaRu3gu/wTjz70ZqvTPaMTKqIcuWR7XJp9hG2razMkNaR9YJ4SaUTYtFw1vNJj6
+         CqhVUw04YPAd5b5XDqozcL4YdLh6SYndkCDIMG6NOdivQZQabDlmDMC0GrU0Ju6LpGsy
+         urcA==
+X-Forwarded-Encrypted: i=1; AJvYcCVKb5IKGUTqwZ3KVEhRUSvU5TJgkXPtSaAM3gaXY+Yu12Db2gVwUmE+QLBRELP7PJeiyZo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVqdX6fKZ7/V0zmFBSUGlOiiBfnfmJrzsnPFhdwQ36BhXjqFij
+	bLD2DT46iCyA1A3lZ3KznEAWhS/ZLLVk7ewQOpr8eQrF++vkE4jqqiDCRADAHXX4rfyvKYNw+NE
+	Y3xZQJ4/QQJjA1M8D2ZwcODDe1Xw=
+X-Gm-Gg: ASbGncvRneU0uf7Tbd0PiN5aFfCbofSu7Oz3+oOyUxjmCm6WQAU4NmYEZ8Bo6cZ6+3k
+	uGE0nKoNrvpaOZxQs3gSoJLsNx/496OeL5hRCkLGWGOg4/OBKn+zkBWWJIT82u+vomVj1UzCli3
+	08m0dzI/1Yx8Mp3hmetn//JlvNSZ/ndeEAZIg8YaI7Bg==
+X-Google-Smtp-Source: AGHT+IGH0ch1bpRz5RWqHDMS4g9AffQUWD+9A2kHZvynf07UyLhMFxGsDWEp9wG5QFc+R955GPU7Z696xKK+gW68c4I=
+X-Received: by 2002:a5d:47c9:0:b0:390:e311:a8c7 with SMTP id
+ ffacd0b85a97d-3971cd57eb0mr4909674f8f.5.1741984527781; Fri, 14 Mar 2025
+ 13:35:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [bug report] net: ti: icssg-prueth: Add XDP support
-To: Dan Carpenter <dan.carpenter@linaro.org>,
- "Malladi, Meghana" <m-malladi@ti.com>
-Cc: netdev@vger.kernel.org
-References: <70d8dd76-0c76-42fc-8611-9884937c82f5@stanley.mountain>
-Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <70d8dd76-0c76-42fc-8611-9884937c82f5@stanley.mountain>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250313190309.2545711-1-ameryhung@gmail.com> <20250313190309.2545711-13-ameryhung@gmail.com>
+In-Reply-To: <20250313190309.2545711-13-ameryhung@gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Fri, 14 Mar 2025 13:35:16 -0700
+X-Gm-Features: AQ5f1JrxdaJ9NE3HKEoE5DW_GIwb70mVam9Srpg9jgTi_uEL8Ox4ots74az0sEw
+Message-ID: <CAADnVQKrndZ25SuRj-Ofv8tA50XjTwVVyQWmasN94LT9zeV7JQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v5 12/13] selftests/bpf: Add a bpf fq qdisc to selftest
+To: Amery Hung <ameryhung@gmail.com>
+Cc: Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Kui-Feng Lee <sinquersw@gmail.com>, 
+	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	Jiri Pirko <jiri@resnulli.us>, Stanislav Fomichev <stfomichev@gmail.com>, 
+	ekarani.silvestre@ccc.ufcg.edu.br, yangpeihao@sjtu.edu.cn, 
+	Peilin Ye <yepeilin.cs@gmail.com>, Kernel Team <kernel-team@meta.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-+Meghana,
+On Thu, Mar 13, 2025 at 12:03=E2=80=AFPM Amery Hung <ameryhung@gmail.com> w=
+rote:
+>
+> From: Amery Hung <amery.hung@bytedance.com>
+>
+> This test implements a more sophisticated qdisc using bpf. The bpf fair-
+> queueing (fq) qdisc gives each flow an equal chance to transmit data. It
+> also respects the timestamp of skb for rate limiting.
+>
+> Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+> ---
+>  .../selftests/bpf/prog_tests/bpf_qdisc.c      |  24 +
+>  .../selftests/bpf/progs/bpf_qdisc_fq.c        | 718 ++++++++++++++++++
 
-On 14/03/2025 12:50, Dan Carpenter wrote:
-> Hello Roger Quadros,
-> 
-> Commit 62aa3246f462 ("net: ti: icssg-prueth: Add XDP support") from
-> Mar 5, 2025 (linux-next), leads to the following Smatch static
-> checker warning:
-> 
-> 	drivers/net/ethernet/ti/icssg/icssg_common.c:635 emac_xmit_xdp_frame()
-> 	error: we previously assumed 'first_desc' could be null (see line 584)
-> 
-> drivers/net/ethernet/ti/icssg/icssg_common.c
->    563  u32 emac_xmit_xdp_frame(struct prueth_emac *emac,
->    564                          struct xdp_frame *xdpf,
->    565                          struct page *page,
->    566                          unsigned int q_idx)
->    567  {
->    568          struct cppi5_host_desc_t *first_desc;
->    569          struct net_device *ndev = emac->ndev;
->    570          struct prueth_tx_chn *tx_chn;
->    571          dma_addr_t desc_dma, buf_dma;
->    572          struct prueth_swdata *swdata;
->    573          u32 *epib;
->    574          int ret;
->    575  
->    576          if (q_idx >= PRUETH_MAX_TX_QUEUES) {
->    577                  netdev_err(ndev, "xdp tx: invalid q_id %d\n", q_idx);
->    578                  return ICSSG_XDP_CONSUMED;      /* drop */
-> 
-> Do we need to free something on this path?
-> 
->    579          }
->    580  
->    581          tx_chn = &emac->tx_chns[q_idx];
->    582  
->    583          first_desc = k3_cppi_desc_pool_alloc(tx_chn->desc_pool);
->    584          if (!first_desc) {
->    585                  netdev_dbg(ndev, "xdp tx: failed to allocate descriptor\n");
->    586                  goto drop_free_descs;   /* drop */
->                         ^^^^^^^^^^^^^^^^^^^^
-> This will dereference first_desc and crash.
-> 
->    587          }
->    588  
->    589          if (page) { /* already DMA mapped by page_pool */
->    590                  buf_dma = page_pool_get_dma_addr(page);
->    591                  buf_dma += xdpf->headroom + sizeof(struct xdp_frame);
->    592          } else { /* Map the linear buffer */
->    593                  buf_dma = dma_map_single(tx_chn->dma_dev, xdpf->data, xdpf->len, DMA_TO_DEVICE);
->    594                  if (dma_mapping_error(tx_chn->dma_dev, buf_dma)) {
->    595                          netdev_err(ndev, "xdp tx: failed to map data buffer\n");
->    596                          goto drop_free_descs;   /* drop */
->    597                  }
->    598          }
->    599  
->    600          cppi5_hdesc_init(first_desc, CPPI5_INFO0_HDESC_EPIB_PRESENT,
->    601                           PRUETH_NAV_PS_DATA_SIZE);
->    602          cppi5_hdesc_set_pkttype(first_desc, 0);
->    603          epib = first_desc->epib;
->    604          epib[0] = 0;
->    605          epib[1] = 0;
->    606  
->    607          /* set dst tag to indicate internal qid at the firmware which is at
->    608           * bit8..bit15. bit0..bit7 indicates port num for directed
->    609           * packets in case of switch mode operation
->    610           */
->    611          cppi5_desc_set_tags_ids(&first_desc->hdr, 0, (emac->port_id | (q_idx << 8)));
->    612          k3_udma_glue_tx_dma_to_cppi5_addr(tx_chn->tx_chn, &buf_dma);
->    613          cppi5_hdesc_attach_buf(first_desc, buf_dma, xdpf->len, buf_dma, xdpf->len);
->    614          swdata = cppi5_hdesc_get_swdata(first_desc);
->    615          if (page) {
->    616                  swdata->type = PRUETH_SWDATA_PAGE;
->    617                  swdata->data.page = page;
->    618          } else {
->    619                  swdata->type = PRUETH_SWDATA_XDPF;
->    620                  swdata->data.xdpf = xdpf;
->    621          }
->    622  
->    623          cppi5_hdesc_set_pktlen(first_desc, xdpf->len);
->    624          desc_dma = k3_cppi_desc_pool_virt2dma(tx_chn->desc_pool, first_desc);
->    625  
->    626          ret = k3_udma_glue_push_tx_chn(tx_chn->tx_chn, first_desc, desc_dma);
->    627          if (ret) {
->    628                  netdev_err(ndev, "xdp tx: push failed: %d\n", ret);
->    629                  goto drop_free_descs;
->    630          }
->    631  
->    632          return ICSSG_XDP_TX;
->    633  
->    634  drop_free_descs:
->    635          prueth_xmit_free(tx_chn, first_desc);
->    636          return ICSSG_XDP_CONSUMED;
->    637  }
-> 
-> 
-> regards,
-> dan carpenter
+On the look of it, it's a pretty functional qdisc.
+Since bpftool supports loading st_ops,
+please list commands bpftool and tc the one can enter
+to use this qdisc without running selftests.
 
--- 
-cheers,
--roger
+Probably at the comment section at the top of bpf_qdisc_fq.c
 
+It also needs SPDX and copyright.
+
+pw-bot: cr
 
