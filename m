@@ -1,154 +1,116 @@
-Return-Path: <netdev+bounces-174820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CAFDA60BD6
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 09:36:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B58F2A60C7E
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 10:00:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7BCF188AC70
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 08:36:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9DA427A5AFE
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 08:59:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 586FB1A3174;
-	Fri, 14 Mar 2025 08:36:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69FB61E493;
+	Fri, 14 Mar 2025 09:00:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gpscJe9q"
+	dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b="CO+I2Npd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25CBD288DA;
-	Fri, 14 Mar 2025 08:36:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAEED153800;
+	Fri, 14 Mar 2025 09:00:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741941373; cv=none; b=cqht3RQt+u+q6CEGx5ZMeIySDtai/UWVpWdHV2Klkc1FUyWy/KdweEkoJS1UeeFVGe1PuGOmvqx7hyA0V42vwtV7i2Vu2wY5x4rUzZ6H8NEtd7SznNX6ake5DYcBj6eQWqC+N/7/g9JeilPhDYuIGvC578st5toZ0HqBzpTx9nI=
+	t=1741942845; cv=none; b=WYH6wu2T88JZtSv9UI5KjRjfngF+jqWheeEamJXQ5b9bRtEn+oJ1pSBQRdOYr9gfzNWhBKmc+tNnc2dNIxTTubmanWvEQuB3BMFC7Zp1MAWHAzUfzZpiYUjrvLCL61fFIe3Loyua//z0MYwIjwf7Kpqxhq48OmgzxRrWwZtA+cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741941373; c=relaxed/simple;
-	bh=0XELGK3NlJpfm2jYvbE8iTtmJ7oQJYjOFPHBv93++5Y=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=tCS8ZVkq1YKsHRqCK0s4TyAg3gf7QuFgduaZA1dL5y2ibKPv4yhT2SxxnTkV3sAfw92hFNnuhsaXDR+cvLwKdTibUmW8rktJ7HYtNVCxC4U+KQCHrJ7T5EbyTj/ZmZpXRd/wEMKqED2OZjtBbthWa7rn+Sk3bc9jLzIsHcRUCBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gpscJe9q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9D2BC4CEE5;
-	Fri, 14 Mar 2025 08:36:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741941372;
-	bh=0XELGK3NlJpfm2jYvbE8iTtmJ7oQJYjOFPHBv93++5Y=;
-	h=From:Date:Subject:To:Cc:From;
-	b=gpscJe9qItz3bc/oGOZyAicdMAFrxZQWc5rBxTOeuv24EKCvjOTOOF+5KD11S/yGV
-	 lNdIqbtk4vsfncabF/obhHt2Dj2oz/sCFn3jsjDiZdytDfsVwKBIH2U6EJX0vBTwDM
-	 VDvCJ/U62up9CuI6vBH4g8CYqAQpBOSmTBsaqFFIoG89QmwKnzFnEQqH1JF05M0HoD
-	 a5sLs2Ugp/2mQvnpdgmmZhXJHVytfGk5f14Ad7rcTml6Wjm2M9QoJPQjcDUkfCJxUU
-	 P6DHngkJcwNB/VXX0yr4+Ms9XODY2mCs9405pTfohz/LIIruMQAn0PInANTPEvBb5Y
-	 khMV9YlJwIlKQ==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Fri, 14 Mar 2025 09:35:51 +0100
-Subject: [PATCH net-next] selftests: drv-net: fix merge conflicts
- resolution
+	s=arc-20240116; t=1741942845; c=relaxed/simple;
+	bh=Z823sMIBtSmRUwV1I+DT2YaMz3HkGJqwNiwsH3j3zsE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RiTIL/eAorWoPN8mubdBB/XfksAuwoz9lvbyteFg+JlJUfVUFXDQXKJz+jFpZSCRO4koI30eF8QskRxmLKJ5/T8HZYuxrT5Yf/I/xCc/6Qbv33XgCQ775wRwC87GMexsuoCkjPf+hLWmhSJufm1udB8127v/ehiPgyQ8JlcIP8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yoseli.org; spf=none smtp.mailfrom=yoseli.org; dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b=CO+I2Npd; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yoseli.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=yoseli.org
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 2EED42047E;
+	Fri, 14 Mar 2025 09:00:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yoseli.org; s=gm1;
+	t=1741942835;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=G2gYY1JMiXCVrx0k9285ZmdwltYFhtlXfBufrR3acPk=;
+	b=CO+I2NpdUQgmILYfKbz+eoe5Qgj08VnR31tmv/odKki2xHwmzY3uVRvvAt0tqNPmrlpzZb
+	kuYJhbmXqy+7e33RkCcUQ2CzS/+wp2D9aawJV4vJFFyHXdxXnVj6mUk+gXO5zB4TrgrEjm
+	nWLHenSMcjjrtll81Lu5CiOWJ3vMrqBpWysZwh6SUQH11o4pz5KeZXznrq+fHqFBvu52AO
+	PVNoc+x2NfE3yLh0iOju/YxMFep9pTIcdEjNjqQOFdaXA8nsA8d5/uMp94mjaxf3gHJAnW
+	SIf+JldeMI1eUZuBmZsFm0vdv+QFYhMmp65XSjAGdEqg+6Y5Oq1YOsE4SiJWFg==
+Message-ID: <757e9a32-9b35-4818-b41b-09eaac97eb8d@yoseli.org>
+Date: Fri, 14 Mar 2025 10:00:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] net: phy: dp83826: Fix TX data voltage support
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Catalin Popescu <catalin.popescu@leica-geosystems.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250303-dp83826-fixes-v1-0-6901a04f262d@yoseli.org>
+ <20250303-dp83826-fixes-v1-1-6901a04f262d@yoseli.org>
+Content-Language: en-US, fr
+From: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
+In-Reply-To: <20250303-dp83826-fixes-v1-1-6901a04f262d@yoseli.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250314-net-next-drv-net-ping-fix-merge-v1-1-0d5c19daf707@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAGbq02cC/zWNSQqAMAxFryJZG7CO4FXEhdqoWVglFSkU724ou
- PiLx58ieBImD30WQehhz6dTMHkGyz65jZCtMpRF2RSVqdHRrQo3WnkSXOw2XDngQaLxudJY262
- WTAu6cgmpmR4G+Mswvu8HA8CvyXsAAAA=
-X-Change-ID: 20250314-net-next-drv-net-ping-fix-merge-b303167fde16
-To: mptcp@lists.linux.dev, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Stephen Rothwell <sfr@canb.auug.org.au>, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3166; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=0XELGK3NlJpfm2jYvbE8iTtmJ7oQJYjOFPHBv93++5Y=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBn0+p3gxFMBZfYI6UpmoWmrPP9IfoxmGSO3gC0U
- wLb2Eki1tKJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ9PqdwAKCRD2t4JPQmmg
- c+CeD/9eFz1NROsTVTXuf1WLbGaRlr+d+pdn2adbNA6sbNnsDjAhv0WEI/cXDqUWN5tqjqESA1X
- dPoEKeUZG1wzs/TKs9k6wNTw9wCwQKlxIxxyAVhzoVuzym3HATtVU8I6E/9VUhyyoo71jCGJUPC
- 6A8qXlPAfxIgWwvmGLnCU2jXxRsvWwEpylIUze7SUxV2eF/YEzPJHxx5wjbBGhkELq6sW0Qg6rF
- zt6Z5mBSRlnlYBIzg+FGZNKdTxJKkzRQZjUPWlFvk2eVrq1EKl22N57H/W1EaNc4tpYOWJtnRuh
- B1droVB5X5IlTYqORQ6/DlAbGsPWRKIZXw0+HvoCnnO525ThYLqO8yH9itOthk0xb+HiBBha+uR
- B6IUjiGIafrESoOJRYkr91b3HAdKAyZd05J9Cm+PigDslX063P7xCufgx8c/bI9sqPbpAv4PZ38
- 5TN0zCxQbZjkDeUTNXn9ipwANBi6jupRjpgPjGb9UYnRy7+1Rpqo9xYG499C1QBUENQ5cKw00Hk
- w7yMljIidF9cN05CBe01Ur/LWpJHwxt8lFf8eN7RvETYjYN8XkjFaJUMvEFbl/q1uvdGxRFk/iK
- PZfNGUIHizQku81l1rvqLOVgaOLVgN9GsiEpKmIAQvW+QzIXEoR8CDcWjebG02z49y18TIo/ktb
- meKgneP7ZINrsjg==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddufedtgedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkffggfgfuvfevfhfhjggtgfesthejredttddvjeenucfhrhhomheplfgvrghnqdfoihgthhgvlhcujfgruhhtsghoihhsuceojhgvrghnmhhitghhvghlrdhhrghuthgsohhisheshihoshgvlhhirdhorhhgqeenucggtffrrghtthgvrhhnpeefieetgeehvdeggffgffetheehhfetkeefhefhgeeuheetueffueeikefgffffteenucfkphepudelfedrvdefledrudelvddrjeegnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepudelfedrvdefledrudelvddrjeegpdhhvghloheplgduledvrdduieekrddvuddurdehvdgnpdhmrghilhhfrhhomhepjhgvrghnmhhitghhvghlrdhhrghuthgsohhisheshihoshgvlhhirdhorhhgpdhnsggprhgtphhtthhopedutddprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesg
+ hhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheptggrthgrlhhinhdrphhophgvshgtuheslhgvihgtrgdqghgvohhshihsthgvmhhsrdgtohhm
+X-GND-Sasl: jeanmichel.hautbois@yoseli.org
 
-After the recent merge between net-next and net, I got some conflicts on
-my side because the merge resolution was different from Stephen's one
-[1] I applied on my side in the MPTCP tree.
+Hi there !
 
-It looks like the code that is now in net-next is using the old way to
-retrieve the local and remote addresses. This patch is now using the new
-way, like what was in Stephen's email [1].
+On 3/3/25 6:05 PM, Jean-Michel Hautbois wrote:
+> When CONFIG_OF_MDIO is not set, the cfg_dac_minus and cfg_dac_plus are
+> not set in dp83826_of_init(). This leads to a bad behavior in
+> dp83826_config_init: the phy initialization fails, after
+> MII_DP83826_VOD_CFG1 and MII_DP83826_VOD_CFG2 are set.
+> 
+> Fix it by setting the default value for both variables.
+> 
+> Fixes: d1d77120bc28 ("net: phy: dp83826: support TX data voltage tuning")
+> 
+> Signed-off-by: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
+> ---
+>   drivers/net/phy/dp83822.c | 4 ++++
+>   1 file changed, 4 insertions(+)
+> 
+> diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
+> index 6599feca1967d705331d6e354205a2485ea962f2..88c49e8fe13e20e97191cddcd0885a6e075ae326 100644
+> --- a/drivers/net/phy/dp83822.c
+> +++ b/drivers/net/phy/dp83822.c
+> @@ -854,6 +854,10 @@ static int dp83822_of_init(struct phy_device *phydev)
+>   
+>   static void dp83826_of_init(struct phy_device *phydev)
+>   {
+> +	struct dp83822_private *dp83822 = phydev->priv;
+> +
+> +	dp83822->cfg_dac_minus = DP83826_CFG_DAC_MINUS_DEFAULT;
+> +	dp83822->cfg_dac_plus = DP83826_CFG_DAC_PLUS_DEFAULT;
+>   }
+>   #endif /* CONFIG_OF_MDIO */
+>   
+> 
 
-Also, in get_interface_info(), there were no conflicts in this area,
-because that was new code from 'net', but a small adaptation was needed
-there as well to get the remote address.
+Gentle ping to know if this patch is ok (patch 2/2 is not) and if so, 
+should I repost a v2 maybe ?
 
-Fixes: 941defcea7e1 ("Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net")
-Link: https://lore.kernel.org/20250311115758.17a1d414@canb.auug.org.au [1]
-Suggested-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- tools/testing/selftests/drivers/net/ping.py | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
-
-diff --git a/tools/testing/selftests/drivers/net/ping.py b/tools/testing/selftests/drivers/net/ping.py
-index 7a1026a073681d159202015fc6945e91368863fe..79f07e0510ecc14d3bc2716e14f49f9381bb919f 100755
---- a/tools/testing/selftests/drivers/net/ping.py
-+++ b/tools/testing/selftests/drivers/net/ping.py
-@@ -15,18 +15,18 @@ no_sleep=False
- def _test_v4(cfg) -> None:
-     cfg.require_ipver("4")
- 
--    cmd(f"ping -c 1 -W0.5 {cfg.remote_v4}")
--    cmd(f"ping -c 1 -W0.5 {cfg.v4}", host=cfg.remote)
--    cmd(f"ping -s 65000 -c 1 -W0.5 {cfg.remote_v4}")
--    cmd(f"ping -s 65000 -c 1 -W0.5 {cfg.v4}", host=cfg.remote)
-+    cmd("ping -c 1 -W0.5 " + cfg.remote_addr_v["4"])
-+    cmd("ping -c 1 -W0.5 " + cfg.addr_v["4"], host=cfg.remote)
-+    cmd("ping -s 65000 -c 1 -W0.5 " + cfg.remote_addr_v["4"])
-+    cmd("ping -s 65000 -c 1 -W0.5 " + cfg.addr_v["4"], host=cfg.remote)
- 
- def _test_v6(cfg) -> None:
-     cfg.require_ipver("6")
- 
--    cmd(f"ping -c 1 -W5 {cfg.remote_v6}")
--    cmd(f"ping -c 1 -W5 {cfg.v6}", host=cfg.remote)
--    cmd(f"ping -s 65000 -c 1 -W0.5 {cfg.remote_v6}")
--    cmd(f"ping -s 65000 -c 1 -W0.5 {cfg.v6}", host=cfg.remote)
-+    cmd("ping -c 1 -W5 " + cfg.remote_addr_v["6"])
-+    cmd("ping -c 1 -W5 " + cfg.addr_v["6"], host=cfg.remote)
-+    cmd("ping -s 65000 -c 1 -W0.5 " + cfg.remote_addr_v["6"])
-+    cmd("ping -s 65000 -c 1 -W0.5 " + cfg.addr_v["6"], host=cfg.remote)
- 
- def _test_tcp(cfg) -> None:
-     cfg.require_cmd("socat", remote=True)
-@@ -120,7 +120,7 @@ def get_interface_info(cfg) -> None:
-     global remote_ifname
-     global no_sleep
- 
--    remote_info = cmd(f"ip -4 -o addr show to {cfg.remote_v4} | awk '{{print $2}}'", shell=True, host=cfg.remote).stdout
-+    remote_info = cmd(f"ip -4 -o addr show to {cfg.remote_addr_v['4']} | awk '{{print $2}}'", shell=True, host=cfg.remote).stdout
-     remote_ifname = remote_info.rstrip('\n')
-     if remote_ifname == "":
-         raise KsftFailEx('Can not get remote interface')
-
----
-base-commit: 941defcea7e11ad7ff8f0d4856716dd637d757dd
-change-id: 20250314-net-next-drv-net-ping-fix-merge-b303167fde16
-
-Best regards,
--- 
-Matthieu Baerts (NGI0) <matttbe@kernel.org>
-
+Thanks !
+JM
 
