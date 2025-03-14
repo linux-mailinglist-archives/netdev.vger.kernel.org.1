@@ -1,230 +1,254 @@
-Return-Path: <netdev+bounces-174936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4547CA61730
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 18:14:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1213AA61756
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 18:19:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A2F916A3A0
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 17:14:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47F413BF37C
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 17:19:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 911951FF617;
-	Fri, 14 Mar 2025 17:13:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a/8rpJph"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C428D2045BF;
+	Fri, 14 Mar 2025 17:19:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD52F1C862D
-	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 17:13:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741972437; cv=fail; b=iAfdb3xhdCgcRuYyOEhq1bmeejgv/l/1ptcvM7XhIhxrT/ntJQhiMKuxBF/PeMuX2DJaVxHlB2Lyxkgs8ZNaaD96M6O/g5rBhAS68EeA7RxPauNMQsWjCsiwddoh+WuRX8XNrXDpHepyoFbOF+zREhqppBW+0ogyF+n+VBJj390=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741972437; c=relaxed/simple;
-	bh=pXcXbieCzW2ZLJANIv9aGrXLZVaMkINtBoysdExnT7w=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=XkCveFu3ACQThDNUG3CLWgqrRBlWslLrv19cc8ELXaQUho+pag0DCEe5WhTDXtqohjLKpe/mfFR7CaTfrX7j+ft+OfsYtFm8h+V6GYn3OvLkvjSu59eJTudyJz7NsGgwPy3yekbBxHFPvRqrDB8zbbfnuBObD7rZ47/VMeOycCA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=a/8rpJph; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741972436; x=1773508436;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=pXcXbieCzW2ZLJANIv9aGrXLZVaMkINtBoysdExnT7w=;
-  b=a/8rpJphUaCdaZV95irRbK3F2vvYMi0+uw7wW8qoFVrvCJih216E8PwU
-   knd2Q23XVJHoduO8VR3jfFyU+BHBH7kYQoIedMmsiWli4PoNwZblBnher
-   piFbweolWwbH0PN9ayDjXw7GZ+oaZuuPRl67f9mKz4XwVNOipTTG2NXLi
-   1UAdUhreN9rUvtjmNXqlw6V/9PwCvNqbG5Qd1A886ScveNM/QA2b7rQjC
-   cUFfOOxLDtqe3A6izAbhIKkXDLn6jGp1AxiZaf78keCIHRbWznAtjivz7
-   37+3wvunE0DbUgQLHxc1elbnEI9eNJbGoIioYi0/QByopro7ZpZ5uXEY6
-   Q==;
-X-CSE-ConnectionGUID: 9EALcBD1SZegkvQvQ4qhvg==
-X-CSE-MsgGUID: mTZHw7LaSs+gAFlCaI7AgA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11373"; a="60676600"
-X-IronPort-AV: E=Sophos;i="6.14,246,1736841600"; 
-   d="scan'208";a="60676600"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2025 10:13:55 -0700
-X-CSE-ConnectionGUID: cOjTbBsCS4iwb1VULXL/qw==
-X-CSE-MsgGUID: rjb490gJTaGE9WMN+Aoi3w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,246,1736841600"; 
-   d="scan'208";a="152229534"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2025 10:13:55 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Fri, 14 Mar 2025 10:13:54 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Fri, 14 Mar 2025 10:13:54 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.46) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Fri, 14 Mar 2025 10:13:54 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GG8j+GViJXbcfwwRsyqioiAFGDQWqcPrBBOrruUuDTE3wW59KlhjtNkeCiq3gwjkHg2ZFwfvfqeKus84DlIzwALcWxZiLssSFpC9x5S3l/Cj/Z1FdBz3m/p5xG3YijK1i2i9RwY9kLB2l6FYn6XSQsSpWH/1Qp+4KSPWJ8lf6t0yL1raI2lf0izo0sWWdrcMsFHxLxtySvZbF2q2L2ib5VzNMfRbHb2E941/YK6mH/dZBuQUu9G8bDyHXXjgODCCo9ycpjFgBmwUWyGhaalsMX3V01KQ/Z+5uogKhz9pSH5Puaq0aPN5q6C5u6B8v5Fd3d60NsC73ZkfHeSNwluWSQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pXcXbieCzW2ZLJANIv9aGrXLZVaMkINtBoysdExnT7w=;
- b=nyedKEf7wvAAvwVYxdqQ4u6N6yibX7h0ERG5aN6DcZmqwfjYrTpzktySlCW58S0rR/2OePW9u7ygbRO8RbYMWLx+jXf6zrPpuaU7sAj2aNtL+3r4e+J9vvQwi7O57Q1IwmK9v1hgFwzd+aId8Bs1kwZENSOszIXWS/UxVmPI+KGuXg5HMZV4ZcP+l1cw2haBQno5Id/9RRrIC1HFKc2pk86oSJo+MwCaU9ouyV5E7PGGHRqapCN9SBTWP1Ikv1P2NWZHKQjL7KU+aGnc/mf8mZnCbopPxVzLHOAqb2IbhSgNWvpWYI8sFt3CcoAyj2biRJUiGpagGJdAtcuTDVRBgQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SJ1PR11MB6297.namprd11.prod.outlook.com (2603:10b6:a03:458::8)
- by DS0PR11MB7441.namprd11.prod.outlook.com (2603:10b6:8:141::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.28; Fri, 14 Mar
- 2025 17:13:51 +0000
-Received: from SJ1PR11MB6297.namprd11.prod.outlook.com
- ([fe80::dc50:edbf:3882:abf7]) by SJ1PR11MB6297.namprd11.prod.outlook.com
- ([fe80::dc50:edbf:3882:abf7%4]) with mapi id 15.20.8511.026; Fri, 14 Mar 2025
- 17:13:51 +0000
-From: "Salin, Samuel" <samuel.salin@intel.com>
-To: "Polchlopek, Mateusz" <mateusz.polchlopek@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Polchlopek, Mateusz"
-	<mateusz.polchlopek@intel.com>, "Lobakin, Aleksander"
-	<aleksander.lobakin@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v2] idpf: assign extracted
- ptype to struct libeth_rqe_info field
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v2] idpf: assign extracted
- ptype to struct libeth_rqe_info field
-Thread-Index: AQHbiuZBNA9UxxQ20EGbplAXGvCFvLNy8i+Q
-Date: Fri, 14 Mar 2025 17:13:51 +0000
-Message-ID: <SJ1PR11MB6297DD4EE685C85E77762C229BD22@SJ1PR11MB6297.namprd11.prod.outlook.com>
-References: <20250301190423.613493-1-mateusz.polchlopek@intel.com>
-In-Reply-To: <20250301190423.613493-1-mateusz.polchlopek@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ1PR11MB6297:EE_|DS0PR11MB7441:EE_
-x-ms-office365-filtering-correlation-id: 49ba3d4c-8605-4d9d-256f-08dd631b9771
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7053199007|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?LEzsAXoWO8aErfVVFT3xwLY4yLohfn0FTEDOwy3Nvj//t+AxF+SNyV1zW8Y5?=
- =?us-ascii?Q?M28SsrgHvTqbr2yQ5WA3FiYqAYA2aFIHYlt7/M7AlmFrXX6LIBPnW9IeTXsI?=
- =?us-ascii?Q?xcNDEmYikUpOyxtRO+9pa9vcZtjZm/e6AgmUgy0qw58fXdkwoFIlwdSWWeN7?=
- =?us-ascii?Q?jyalaRUZvVu8CsiPudSWZ72ZmKvb3VvY1Me3GHehEkoTO869spxkOj6+8FGK?=
- =?us-ascii?Q?+ZnXV0xRo8jnkbxINzK8kaHDMEdcDzt4QgSn/0q+HgRi/7cXByculgLBaFdY?=
- =?us-ascii?Q?X/1Sn9pOUmTEo0vDdanJ32tYshha5zGVTEq3ke2HyBrlR0SrtPHyTkOsTwyI?=
- =?us-ascii?Q?MBgQ1vxYn5gWQue99TTHSnoCabJYGtRYHeRFrG1XiLRp4Ej2bzgd0RC5LO9j?=
- =?us-ascii?Q?juu/tta1kjhUG/gcuf7DsOq3RTH6vFYM8FGDn0/6UAwD2aKTlupF8KHUTD7P?=
- =?us-ascii?Q?Zhw2fJqhXCYtBFz7ISzg0nhkQAYZOcL9bTUnYE65Avcc9SBCbHZWVofXH4RA?=
- =?us-ascii?Q?9ix9QDM5DlbxqJjbSR8krJMIfWE5HQUejlHEv57iqECNUYqSvSbxqusmNhP9?=
- =?us-ascii?Q?rSyO0dqx6GgzMGasiPMaidSJcKWUUD5HvdTLrSMxCwYUFnBZ98TEnH3pa9KF?=
- =?us-ascii?Q?/7UN0Z893khlTB2PlF+TZ0riRIshXCEkIoIAqkADdfNBZZeXYlkR+wRZHAgg?=
- =?us-ascii?Q?uXVdCG6CLkL0qKp4OJay3cv1K7WtRWb2Ie7fE0nyd+8zwqepuTkLcrJrvCsC?=
- =?us-ascii?Q?chtmuqfEep3cHs00LXJcgLpyZVf/8Z7XUkGIPIwdAzaR+J8m9tBOYPc/pevb?=
- =?us-ascii?Q?fAKVvlmTXpFphqgGmldfjfqXGZoYvlqXVJ+vfIkTIfgfwbn8xHkHuZUCQTP4?=
- =?us-ascii?Q?WCL/U70FfZnBURj9PbM5NHnu6Qr6PdyO56cH8eN6kmvYhG9rMI9WaPtdUMqv?=
- =?us-ascii?Q?hWFsdKZyhRrhnK9/NYmTTHrJqA7lK3zJ/58gBsdMKL7FFKypxIiQeybzid15?=
- =?us-ascii?Q?JOm00GiwF32xb9Vm0QGzEViqFK3eQ6P+36CwVY5kMdpsFIw8DIjo/YkPc4eu?=
- =?us-ascii?Q?WGl9TYbVqGyf8evrs7vDrexsuZaGqNYJMbn63He/fx3Szo+HlAk228UayV2r?=
- =?us-ascii?Q?oufpt6rSCmgC9zDf9u14Lwj3vTq6u4UoOJltFzviw4iWww+MLEMwUazZ+89Y?=
- =?us-ascii?Q?NUVWPMJ/nTfuz2ZNC4qjonm1FEC0le+H8MtO8Qi4NRFjvht+Lkl+THZSkosj?=
- =?us-ascii?Q?F9mYJ46c+qgHNDkrcmcRSw3A7dn3KHRCEm2ufrd1ukwVEiQIAt9/WOuBsmHV?=
- =?us-ascii?Q?GWmx1sM06JpOBrB4cq9OGVk2PwY1X/ptyWAzpbAMMqlkw4Q5YLuwWk4oRmpM?=
- =?us-ascii?Q?JWUIwF90AOjezjg/hTmnSPTQw1sbZKGbGBeeiN/N7KrSBt0pDgpy8aPuHy2D?=
- =?us-ascii?Q?pHDksvL0zaMeuDI+vBOV7fFSaXLLKl5F?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR11MB6297.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7053199007)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Kgl61u9u5EXMEqmgpLFFOIuAJKc9ISL8Kx8P6M7pF4UZdfFnBVq6ihf7o1l6?=
- =?us-ascii?Q?TYyOZkKK8bSH1jzB9cekc2vS7qc/YNjaVIQjpdN818ivsIieT0NQXYqCz30p?=
- =?us-ascii?Q?q4sAZ4hAoViwBx38/Wr97JBkr0GipFMb4V+1ZEpLvD1Nu4c7Kjtl8QGnRlOR?=
- =?us-ascii?Q?5opHa0MwaPfICtds+plvmpNsHlr5XSrZenXBtRAAcP4j3jvPrZwVPf8yJce5?=
- =?us-ascii?Q?QJgPRhe1XB2/cmseNpBQEWJhkw9+TWIK4ANC4LJ5SJUdMWys9Wdorx9Io5dn?=
- =?us-ascii?Q?CQybf1nB+YpWUQTXLXD2gLoKTed4fRqRzTbpr7NgtdFuRuqA2BmiAqp2wut5?=
- =?us-ascii?Q?EKjcM/LWjZSDMh8wv2WmTKq9catpluYCpHm4dg/7kF4+XvU5NFYYhJzF+h5O?=
- =?us-ascii?Q?iej5MO0M7VA7fpYrK51HIiuciA1fUvXsWjS1lo+Pa8rIknaRaxrhVt7BiXMM?=
- =?us-ascii?Q?xoAba+4BRa7jvmKcYaeTvGc+C/6q5udSnF58ODE7q63bd5fstzg7BG3loGlz?=
- =?us-ascii?Q?31Z2m9//r5q2vJo96/wp9CmlRyzvSdt/Ds//N2eK9DTh/hhF4qAc3TRF5nJy?=
- =?us-ascii?Q?ZNUyCqlbGXn/ZdRP4nn6AmE5SrDnOSZu56KBjy/0ILlX/lDdnlR/mOR+9rTI?=
- =?us-ascii?Q?8+Xg2EhqxeCI9Gk8QXcJYXxyLlXyE5yE5g1WVM0D87ZGqce6lun/7BFDWvmX?=
- =?us-ascii?Q?GT8AEq6/TKl79SXnm7X7ngrcBf7V3XX0jBzdJC8m83U4RBt5PaY2dv1bP2LI?=
- =?us-ascii?Q?WsGecTmD9DYlwX5Mlp5uDLSp+PVI7RcDJuRXh5u2jbifl0Wvyfsrc8j6mkqe?=
- =?us-ascii?Q?JKjDPER2UtzpiJ4xe5vogf6mkrPbEdcne6V6x5l13PRHbdxY0u4ZdXL9tSCR?=
- =?us-ascii?Q?hTSkiTCdX7Wygyqo2/1QTdFYiL7Bnf740smm936kT434zo83WmAH4Esc3Zh8?=
- =?us-ascii?Q?fBZxnWUtPW+yGbaxJmMsQISK2+Ez+UXaWLIac9uUClhQetfQBvOYDNAMVCEy?=
- =?us-ascii?Q?tgGEp5NnQbXx/yrTl0VY3fiJaDPyFl/fjklNLwLi2rYlv3SZVLK8tDRA6SNN?=
- =?us-ascii?Q?H/K4LzQ6tapDhxw6zkT4yX2NPtBoWeYlrBAhzBhsx0ik4pHgeimEraasjBT+?=
- =?us-ascii?Q?wVqOrOx+q1ArqpoE5vb7ctkI2gxu07DRrpUQxCMRTKdyKJdlrNfXlNdQG2Iv?=
- =?us-ascii?Q?gchZQTBTxtZacQpj7m/QMCTTMpMAJt5mwjWlnYGU4k83ypbPIFn1Nur8AzHl?=
- =?us-ascii?Q?0jJdrQOy8Qvwbei8xX2GaHrKENg0tmFOv9Uigt9jmUfSh7jghe0gNiEMqvtA?=
- =?us-ascii?Q?kFN4XFGkYsnuMeLTgJNPjx4AYue9mNmCtwv9qSwOhrJE7zquLRJBSh4oKFTk?=
- =?us-ascii?Q?ya4IIgQbgkhoyPD5dqt/7jqTceO3r8plARvTpDBEwlN5aq1VU/zttPRrXTzi?=
- =?us-ascii?Q?KzezyTxtWK8CeH6k0+bysyS54isPjgrM5y0SIrvVujJUp0X5Cd1kcTvT7n8I?=
- =?us-ascii?Q?62Vm3d65Y50usW43NDDjR0nCnXEGhB9FS2vD5uXRqJfheRulWTiVHtMgZhL8?=
- =?us-ascii?Q?W7BAJMz6SJ7jTTQ4GYJESKMYAtG/4pffRkALpHMF?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDC472045A2
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 17:19:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741972769; cv=none; b=am9kgbBQ7kt+s6TQgAcYHjdjFO+WdbsmECbCquY1Itc4dUaHsNzGpmy1jt63fEG+gJrlqvM12/wIcMDVI3YlkdJnfTLldis3Lv65WMrpnnm8wSscFQwex2HNauBe9NZI/I41w1+SZBrlNanFdId2IBGCkYmapYMYlm0qBiXhEfg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741972769; c=relaxed/simple;
+	bh=Du9RJGbb9psIVNeI+yAeDVtzDtNrzqDrEl0W/9ZCin0=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=BFTyVmWP3RQ4dB1MG5o9FrT9ff9wYz+B0gHBPLTOFYAKR9kD3m4IQ4pnWmm+G+dzWyfnayUkNdsBfsUWvlEBFUBfCwQxEA2jI5Rw/nY/m6yUkX+NQzoBL6WilBHE8Tdb0rt3iUX/5E0aAsKeZtjIcn0xRSsS4x9vVyUMW6Em5AQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3ce8dadfb67so26704565ab.1
+        for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 10:19:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741972767; x=1742577567;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6ppgVzZRvU97l1+hVwJtVxXfVprkA8dzBpDh9Oges2c=;
+        b=rPYGJiDXpaue+KOfwiNpCVV6GLtEtD+88bET6CRljcGmW380+dlfxkCCAkuucRKxT4
+         R3wRh/9R2ks/2i9o1KY/69BSQQ8fAJdWa7U8C4Nt2aFBSZ7Jnby9nB+BEk8r5Casqh5Z
+         MawyVeiK56v1f81nXnhN5tQItaHZpzIRFLdTeWUM6UqL9ZFhmFAoTqINGI9s7u8Vy4nN
+         EfUpLryCtJdZm2Ty40bLs2y3207DjdNcPQNetSIVCYLAGC/kR3MNUo4est/387NMBKMi
+         JbIEx830FFsBIWDoasTKL4mARFc+DNgiG2pxn+isEM92iKoYWP+rlt1fJXKeTkuPPUwA
+         uhow==
+X-Forwarded-Encrypted: i=1; AJvYcCXuu/vFyDy8yXSUjZ0FH047cj11tvQOJy7y/1A35YsTmVb6F81maE7+S94U+R3PTm8sQtSh6sQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+zFGyFpK28hKVNVxraT1+qpqkGc9dPJ2Da2Ap9rf3DF9DLFAm
+	GZgle+hCfGMKLChV+x56UAlwX4Q/fZN2cwc30m79gNtp7XBb4z/5f7kNi2FyeAjZmEm9Ew1HWXl
+	nd2HFB48ojgUp8QdPLiDWupZ4AjHRJ3f/X/Bf56NX14ZxLD/hQF/G3zM=
+X-Google-Smtp-Source: AGHT+IFOiPs3MtkoF63Pl0vbvLWOrvLIX9jwZ+pNkZJVYt+DpVfRZbpCPjjffCobhQyUoQInPy5oY30N4bYc6VDIIZS4SXAkhb90
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ1PR11MB6297.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 49ba3d4c-8605-4d9d-256f-08dd631b9771
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Mar 2025 17:13:51.2165
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: DuwIQ0E/gnHlOpMU+f4hP6nu7x7h57P8K6EfKHZurWgnwdoLcx/iZwvoRFYRhdLte314BTpqmKCcdgM6DdVmBw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7441
-X-OriginatorOrg: intel.com
+X-Received: by 2002:a05:6e02:3a0d:b0:3d0:21aa:a752 with SMTP id
+ e9e14a558f8ab-3d4839f442amr32566345ab.2.1741972766860; Fri, 14 Mar 2025
+ 10:19:26 -0700 (PDT)
+Date: Fri, 14 Mar 2025 10:19:26 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67d4651e.050a0220.14e108.0048.GAE@google.com>
+Subject: [syzbot] [wireless?] possible deadlock in ieee80211_change_mac (3)
+From: syzbot <syzbot+30de9d963fdd95d745f8@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    89d75c4c67ac Merge branch 'mlx5-next' of git://git.kernel...
+git tree:       net-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=15941698580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ca99d9d1f4a8ecfa
+dashboard link: https://syzkaller.appspot.com/bug?extid=30de9d963fdd95d745f8
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12ebddb0580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=115beff8580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/42d0e44c785b/disk-89d75c4c.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/a15a82bda0f1/vmlinux-89d75c4c.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/51341d6e7b24/bzImage-89d75c4c.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+30de9d963fdd95d745f8@syzkaller.appspotmail.com
+
+netlink: 'syz-executor330': attribute type 10 has an invalid length.
+======================================================
+WARNING: possible circular locking dependency detected
+6.14.0-rc5-syzkaller-01215-g89d75c4c67ac #0 Not tainted
+------------------------------------------------------
+syz-executor330/5838 is trying to acquire lock:
+ffff888021b08768 (&rdev->wiphy.mtx){+.+.}-{4:4}, at: class_wiphy_constructor include/net/cfg80211.h:6063 [inline]
+ffff888021b08768 (&rdev->wiphy.mtx){+.+.}-{4:4}, at: ieee80211_change_mac+0xc6/0x1160 net/mac80211/iface.c:307
+
+but task is already holding lock:
+ffff88807a458d28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2731 [inline]
+ffff88807a458d28 (&dev->lock){+.+.}-{4:4}, at: dev_set_mac_address+0x2a/0x50 net/core/dev_api.c:302
+
+which lock already depends on the new lock.
 
 
+the existing dependency chain (in reverse order) is:
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Mateusz Polchlopek
-> Sent: Saturday, March 1, 2025 11:03 AM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: netdev@vger.kernel.org; Polchlopek, Mateusz
-> <mateusz.polchlopek@intel.com>; Lobakin, Aleksander
-> <aleksander.lobakin@intel.com>; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-next v2] idpf: assign extracted pty=
-pe to
-> struct libeth_rqe_info field
->=20
-> Assign the ptype extracted from qword to the ptype field of struct
-> libeth_rqe_info.
-> Remove the now excess ptype param of idpf_rx_singleq_extract_fields(),
-> idpf_rx_singleq_extract_base_fields() and
-> idpf_rx_singleq_extract_flex_fields().
->=20
-> Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-> ---
-> v2: removed excess function parameter 'ptype' description in
-> idpf_rx_singleq_extract_fields() - reported by kernel bot. No code or
-> functional changes.
->=20
-> v1: initial patch
-> https://lore.kernel.org/netdev/20250227123837.547053-1-
-> mateusz.polchlopek@intel.com/
-> ---
+-> #1 (&dev->lock){+.+.}-{4:4}:
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5851
+       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
+       __mutex_lock+0x19c/0x1010 kernel/locking/mutex.c:730
+       netdev_lock include/linux/netdevice.h:2731 [inline]
+       register_netdevice+0x12d8/0x1b70 net/core/dev.c:10991
+       cfg80211_register_netdevice+0x149/0x2f0 net/wireless/core.c:1482
+       ieee80211_if_add+0x119d/0x1780 net/mac80211/iface.c:2225
+       ieee80211_register_hw+0x3708/0x42e0 net/mac80211/main.c:1604
+       mac80211_hwsim_new_radio+0x2a89/0x49f0 drivers/net/wireless/virtual/mac80211_hwsim.c:5559
+       init_mac80211_hwsim+0x87a/0xb00 drivers/net/wireless/virtual/mac80211_hwsim.c:6911
+       do_one_initcall+0x248/0x930 init/main.c:1257
+       do_initcall_level+0x157/0x210 init/main.c:1319
+       do_initcalls+0x71/0xd0 init/main.c:1335
+       kernel_init_freeable+0x435/0x5d0 init/main.c:1568
+       kernel_init+0x1d/0x2b0 init/main.c:1457
+       ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:148
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
 
-Tested-by: Samuel Salin <Samuel.salin@intel.com>
+-> #0 (&rdev->wiphy.mtx){+.+.}-{4:4}:
+       check_prev_add kernel/locking/lockdep.c:3163 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3282 [inline]
+       validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3906
+       __lock_acquire+0x1397/0x2100 kernel/locking/lockdep.c:5228
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5851
+       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
+       __mutex_lock+0x19c/0x1010 kernel/locking/mutex.c:730
+       class_wiphy_constructor include/net/cfg80211.h:6063 [inline]
+       ieee80211_change_mac+0xc6/0x1160 net/mac80211/iface.c:307
+       netif_set_mac_address+0x327/0x510 net/core/dev.c:9587
+       dev_set_mac_address+0x38/0x50 net/core/dev_api.c:303
+       bond_enslave+0xff3/0x3910 drivers/net/bonding/bond_main.c:2123
+       do_set_master+0x579/0x730 net/core/rtnetlink.c:2943
+       do_setlink+0xfee/0x40f0 net/core/rtnetlink.c:3149
+       rtnl_changelink net/core/rtnetlink.c:3759 [inline]
+       __rtnl_newlink net/core/rtnetlink.c:3918 [inline]
+       rtnl_newlink+0x15a6/0x1d90 net/core/rtnetlink.c:4055
+       rtnetlink_rcv_msg+0x791/0xcf0 net/core/rtnetlink.c:6945
+       netlink_rcv_skb+0x206/0x480 net/netlink/af_netlink.c:2534
+       netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
+       netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1339
+       netlink_sendmsg+0x8de/0xcb0 net/netlink/af_netlink.c:1883
+       sock_sendmsg_nosec net/socket.c:709 [inline]
+       __sock_sendmsg+0x221/0x270 net/socket.c:724
+       ____sys_sendmsg+0x53a/0x860 net/socket.c:2564
+       ___sys_sendmsg net/socket.c:2618 [inline]
+       __sys_sendmsg+0x269/0x350 net/socket.c:2650
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&dev->lock);
+                               lock(&rdev->wiphy.mtx);
+                               lock(&dev->lock);
+  lock(&rdev->wiphy.mtx);
+
+ *** DEADLOCK ***
+
+2 locks held by syz-executor330/5838:
+ #0: ffffffff8fed6908 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
+ #0: ffffffff8fed6908 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock net/core/rtnetlink.c:341 [inline]
+ #0: ffffffff8fed6908 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0xc4c/0x1d90 net/core/rtnetlink.c:4054
+ #1: ffff88807a458d28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2731 [inline]
+ #1: ffff88807a458d28 (&dev->lock){+.+.}-{4:4}, at: dev_set_mac_address+0x2a/0x50 net/core/dev_api.c:302
+
+stack backtrace:
+CPU: 1 UID: 0 PID: 5838 Comm: syz-executor330 Not tainted 6.14.0-rc5-syzkaller-01215-g89d75c4c67ac #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ print_circular_bug+0x13a/0x1b0 kernel/locking/lockdep.c:2076
+ check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2208
+ check_prev_add kernel/locking/lockdep.c:3163 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3282 [inline]
+ validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3906
+ __lock_acquire+0x1397/0x2100 kernel/locking/lockdep.c:5228
+ lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5851
+ __mutex_lock_common kernel/locking/mutex.c:585 [inline]
+ __mutex_lock+0x19c/0x1010 kernel/locking/mutex.c:730
+ class_wiphy_constructor include/net/cfg80211.h:6063 [inline]
+ ieee80211_change_mac+0xc6/0x1160 net/mac80211/iface.c:307
+ netif_set_mac_address+0x327/0x510 net/core/dev.c:9587
+ dev_set_mac_address+0x38/0x50 net/core/dev_api.c:303
+ bond_enslave+0xff3/0x3910 drivers/net/bonding/bond_main.c:2123
+ do_set_master+0x579/0x730 net/core/rtnetlink.c:2943
+ do_setlink+0xfee/0x40f0 net/core/rtnetlink.c:3149
+ rtnl_changelink net/core/rtnetlink.c:3759 [inline]
+ __rtnl_newlink net/core/rtnetlink.c:3918 [inline]
+ rtnl_newlink+0x15a6/0x1d90 net/core/rtnetlink.c:4055
+ rtnetlink_rcv_msg+0x791/0xcf0 net/core/rtnetlink.c:6945
+ netlink_rcv_skb+0x206/0x480 net/netlink/af_netlink.c:2534
+ netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
+ netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1339
+ netlink_sendmsg+0x8de/0xcb0 net/netlink/af_netlink.c:1883
+ sock_sendmsg_nosec net/socket.c:709 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:724
+ ____sys_sendmsg+0x53a/0x860 net/socket.c:2564
+ ___sys_sendmsg net/socket.c:2618 [inline]
+ __sys_sendmsg+0x269/0x350 net/socket.c:2650
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f76fec11329
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 01 1a 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fff4bb2f358 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f76fec5e513 RCX: 00007f76fec11329
+RDX: 0000000000000000 RSI: 0000400000000600 RDI: 0000000000000003
+RBP: 00007f76fec5e4e3 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007f76fec5e44b
+R13: 0000000000000048 R14: 0000000000050012 R15: 0000000000000003
+ </TASK>
+bond0: (slave wlan1): Enslaving as an active interface with an up link
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
