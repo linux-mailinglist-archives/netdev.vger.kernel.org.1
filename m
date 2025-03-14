@@ -1,134 +1,79 @@
-Return-Path: <netdev+bounces-174877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE85FA61186
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 13:38:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2ECA9A611C2
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 13:51:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62D1C19C2915
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 12:38:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 780873BDB65
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 12:51:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DE321FECAA;
-	Fri, 14 Mar 2025 12:38:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A3041FE44E;
+	Fri, 14 Mar 2025 12:51:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="KOe75BT5";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="GSRWPm72"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="a2HHrqmX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B6561FF613;
-	Fri, 14 Mar 2025 12:38:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E4CB1C878E
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 12:51:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741955886; cv=none; b=SBhIWwR/oJNhDIvwcWh/LkpbqEiGrUENxe5P9Ntw00hr9a+4Ppl4oU7qax25mWoBVhaq6lKIEVfCfOTMD1kxdeo9PQRD5gxvk4YwKC2namDFkLTXk45UOE1HJa6B1HL9Oe50Ny7Aj1TH0kKSnhUL8jEU4CxlKXUDveq4nqK+2Uw=
+	t=1741956682; cv=none; b=luN7nxtWXMwA0XhrrDH8xhjvx4cHDAGk7Ggxcr1N4RIQnrw1wWtWyPTvrHdAOrMn5ZyJjBBRdXHAaddLyts8n+EL1EzJzZBlZ9QkwjhUhhLzOBz9ZPJDijgA/2J8cD6MR/PqTrDXHjMvXg87Llr3UXwYLkJlQKjjXvRI5djZEs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741955886; c=relaxed/simple;
-	bh=p9mM05uTuuSxp/itWQ1aYr7D/Kek2qjOInkizONDbWo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QxIVw0mOjzlndXMK6hNiB5WuueZ2lIsdmInqjKIh9Bq3Tt7wn7zjJLim7AYDc4iQdr6R+ruN3JQUyS2RgOKNKvQ35xJFb3mvNyY/hBfyWUNcZePZ4VB5NoJtpDak7imQfLwVHlG8U6cHkjYsqCS6ahcPPOtnSznz/HfqxkRB7Do=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=KOe75BT5; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=GSRWPm72; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id 30568603C7; Fri, 14 Mar 2025 13:37:52 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1741955872;
-	bh=rPmJhpBheVqSUhPhE5IrqXg0aOCdmG4JQWmir+xGcw0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KOe75BT5fdnVHqcLuHnE+/zbg0SqDkpt1vfmqUe9yn1VV6HS8oANUox2ECks/ogIY
-	 EeLVs1iaZfaFreMKCYahqzFQX6UgjLAZf2QfbWhtfEDUXQBt8hE3ir6e3Xh6BHGjIw
-	 ChuJ1sV/aHOMZvjZvfmxgfW53YS1rPIdOZOnF5YVPpsvOlVZR5xyFVZh4Olt2gNTKF
-	 gE09asYyfShSEwkMudB9qoX4KPV7wsRRTxn/QPiBDLlG1uXVAAeZEjr+2VO9u+rmP3
-	 QpuagjteSJVQj35cv33ria3JWbJbntOyQKoF+sDIr1CXVS0dN8PBmF26uGX05XoQ5P
-	 xqgrOCHGtAykg==
-X-Spam-Level: 
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id 94C35603BE;
-	Fri, 14 Mar 2025 13:37:46 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1741955866;
-	bh=rPmJhpBheVqSUhPhE5IrqXg0aOCdmG4JQWmir+xGcw0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GSRWPm72uFyqXTyUIJzzcpsMAUkh40VOnAyEcDD7VyG9eADghYPABLGJQdrSQUmwp
-	 ADzLKsqM/OgNyItHC69MGJkQMY9vFkOIUWclF/hPBeKglTj3RXqIqewOnLmq+PRo5T
-	 wjdPi1wutXLVs+jy6NHGkOQEk4SHS/ftJBZporkZBy527X5e0XMXYM6LO/tD+9fKvu
-	 F8vQ+5giSRhYXullElHg/Tqy98titObJDDwX9UcKwlJBqw8xzb4xomAVpVz7rskQ7K
-	 C+YlaTlzzdrM+cysMJNyirwtjrLw3dDIGKi0pAraMhKV0pHJ70SUuYzFCESM0rIWNj
-	 MBwY2wueKzqNQ==
-Date: Fri, 14 Mar 2025 13:37:43 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Eric Woudstra <ericwouds@gmail.com>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Roopa Prabhu <roopa@nvidia.com>, Ivan Vecera <ivecera@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Simon Horman <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, bridge@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-hardening@vger.kernel.org,
-	Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Daniel Golle <daniel@makrotopia.org>
-Subject: Re: [PATCH v9 nf 00/15] bridge-fastpath and related improvements
-Message-ID: <Z9QjF5LhavodVA4Y@calendula>
-References: <20250305102949.16370-1-ericwouds@gmail.com>
- <897ade0e-a4d0-47d0-8bf7-e5888ef45a61@gmail.com>
- <Z9DKxOnxr1fSv0On@calendula>
- <58cbe875-80e7-4a44-950b-b836b97f3259@gmail.com>
- <Z9IUrL0IHTKQMUvC@calendula>
- <02b97708-1214-4fa4-a011-70388cff8f79@gmail.com>
+	s=arc-20240116; t=1741956682; c=relaxed/simple;
+	bh=CTn54sAh9B+sBGi+h+DHLKJSH4WfH9yAl61uwCEzPNI=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=rXN/mRtArPxFMpNHSXSKQwAu4pOhTBA3tL98W6U2CMF3SIyUtGCGONMEmzV6xXuVzISEUITC6/bmQZ4TvkrT9NQypKlrbU25bN43H1P/Kiacqn8Vvs4hVg5+cSB/O5ZxMuR+DDS2K4YEpXr/IiryY63ANKTZsSbKO+Y/V/LqF8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=a2HHrqmX; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1741956672;
+	bh=CTn54sAh9B+sBGi+h+DHLKJSH4WfH9yAl61uwCEzPNI=;
+	h=Subject:From:To:Date:In-Reply-To:References;
+	b=a2HHrqmXPzkVB3lTm3wyCuIsBK36szC2eIA8zwUJgdmnJRxdtGVtXaY3VbK5mdo14
+	 kTiVr3C8tI7qvvOEwKopwKNIuF1yXjLVy/Tglpawd0sxjNgX+OWBsZHLeV+w45/6K2
+	 g3JWeyNf7WqDn1hYWDifTMnEwrEgi8+9VpHD7LrkwmFjl6uK/n6Zvw83B7Yi/tiB0d
+	 RgDjlAcYLTRAuctyp++M5EYfA246WxIPlKlDLf+2ba7iy9Q+jZbA3E4jmK+A2yiNMJ
+	 vFRhdTItbjqLC1eqntc0s88e3QEJn8Hwrda2wblQCHPnW4iTh9TzJCgSERPdhFki0x
+	 KhmAlWVuji1KA==
+Received: from [10.103.165.192] (unknown [1.145.50.11])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 1134A7941C;
+	Fri, 14 Mar 2025 20:51:09 +0800 (AWST)
+Message-ID: <47993ccfe45deac346e9243bb35e7aac0ab704fc.camel@codeconstruct.com.au>
+Subject: Re: [PATCH] net: mctp: Remove unnecessary cast in mctp_cb
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: Herbert Xu <herbert@gondor.apana.org.au>, Matt Johnston
+	 <matt@codeconstruct.com.au>, netdev@vger.kernel.org
+Date: Fri, 14 Mar 2025 13:51:05 +0100
+In-Reply-To: <Z9PwOQeBSYlgZlHq@gondor.apana.org.au>
+References: <Z9PwOQeBSYlgZlHq@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <02b97708-1214-4fa4-a011-70388cff8f79@gmail.com>
 
-On Thu, Mar 13, 2025 at 07:01:38PM +0100, Eric Woudstra wrote:
-> 
-> 
-> On 3/13/25 12:11 AM, Pablo Neira Ayuso wrote:
-> 
-> >> What do you suggest?
-> > 
-> > Probably I can collect 4/15 and 5/15 from this series to be included
-> > in the next pull request, let me take a look. But it would be good to
-> > have tests for these two patches.
-> > 
-> 
-> These are not most important to bridge-fastpath, but it gives extra
-> possibilities. How about concentrating first on patch 2/15 (with 1/15
-> removing a warning and 3/15 cleaning up), adding nf_flow_encap_push()
-> for xmit direct? It is a vital patch for the bridge-fastpath.
+Hi Herbert,
 
-I see cleanup patch 3/15 is a consequence of 2/15, let me take a look.
+> The void * cast in mctp_cb is unnecessary as it's already been done
+> at the start of the function.
 
-> Anyway, I will look into writing selftests for conntrack-bridge setup,
-> including various vlan setups. This will take me some time, which I
-> do not have in abundance, so for that I do not know if I get it done
-> before the merge window.
+Thanks for the change, all looks good to me, and now we're consistent
+with __mctp_cb() above.
 
-There is tools/testing/selftests/net/netfilter/nft_flowtable.sh that
-can possibly be extended to improve coverage.
+Acked-by: Jeremy Kerr <jk@codeconstruct.com.au>
 
-Thanks.
+Cheers,
+
+
+Jeremy
 
