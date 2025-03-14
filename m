@@ -1,173 +1,206 @@
-Return-Path: <netdev+bounces-174995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 240FEA6204C
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 23:25:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6911FA62077
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 23:34:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6485A463E9E
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 22:25:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 450141B6186B
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 22:34:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F35141DA61D;
-	Fri, 14 Mar 2025 22:25:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5AF01FA856;
+	Fri, 14 Mar 2025 22:34:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0305XuJA"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="nhz/RpS8";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="gKlgQKVo"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from fhigh-a7-smtp.messagingengine.com (fhigh-a7-smtp.messagingengine.com [103.168.172.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0291B1953A9;
-	Fri, 14 Mar 2025 22:25:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FEEFA32
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 22:34:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741991149; cv=none; b=AnD/sUKq88AijqqAJbWoeMIcx3KKW/bUxQUwSjn09yXcNyQynq9Yv6qA1+fG1I8H6sPj8ZMYfguZ2tXFpAyCbx44Qx5hjpoVfzzNrBlShraBMYrlR7GlnBL8SjeXsEp6sgeac7yKhIwDVCEt2BGcQNTjc3MnU3WUx4BQ6ORhqkc=
+	t=1741991655; cv=none; b=BubST9gxVQpJBwWDZ6BXK4tJiHfUan/05VGWU7LoYGLSxvMV7VsgtORcdkuUlgUhRT6yO9NOvcMrYWQdMzQyFRI8d3+VyCKSos9iLk3NT9QvLkUmcY23vkfOSN0ACta0HyP2XdTADrvbbomlSZAfzmaUZmqUuQW3MHuyXsIB9DU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741991149; c=relaxed/simple;
-	bh=ZVLdK11Lq3hOJ2AwZ/4yIqrekAVtkjZF3tElAiA+gIc=;
+	s=arc-20240116; t=1741991655; c=relaxed/simple;
+	bh=KSoNqwiYVq/VohgT1XEcXsukqyUDBYp62guyb1RZ7Tk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ka2+6SU9QbpdQVJQVNkl4Udon3uCCiOaqH+Z1iALNvnJiILFBZ9ZXG8tXsqrzNtl0JpGtlUTfKnZ4kxrPVmkfjfQ3xbtDZpIBNhQE0nSaKHF30L4UE43U6JJDkr86R0vX5IaG3wNwf7R3vGI87sDnQaKBGUmu5G5U0UetPHXPDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0305XuJA; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=lPaccfJ0sEBvFjPYyS8PLhimTq5kEa5pqJCwOZtsTeE=; b=0305XuJAFlMgsafcUGGQRfctCU
-	JdAoUkijrDOjSzQwqYtd9RcxWlj5Y9YLXBkmtaDZ1l3s/RQ64+yA3wQX4f+Zq5iBPQqb8ZdSG8xO+
-	WWmljz5V6MrKGxY7vHEI9iQO9bsYiy2f2amyKmrZAurAeIzyaCgVv2RLe7ly1hTyizB62imBvfLKD
-	BEWNlBDS6qyVnlY7GKB4eLnF7DtGuDWd/rC9TAd8dZkhGn3oxbsYkTncbLIT3jPpUec8j5/Ew3wUo
-	kZ8jAKbm+tqiptaY41cVEf9FS28l4G3rFBwGNOFRZewEfCVRJJySpiptptcwEwYVSoiVwZUiGy+9h
-	2WQQ5baw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41742)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1ttDT7-0000vY-0X;
-	Fri, 14 Mar 2025 22:25:29 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1ttDT0-0006x5-2r;
-	Fri, 14 Mar 2025 22:25:22 +0000
-Date: Fri, 14 Mar 2025 22:25:22 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Lee Jones <lee@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=G3rqXyJYbef4OmM8PXc1US+nwrqIT0tlFM6NtFbq/uh8gx3ySUHSOgkBvKbBC48FafeURIWEaebHJE2HAYShATaA5QnAvn3DYH+t1I/FgK/ofEiuXcMKy5lmXOCcXm0KtUbGZAgr6ZXBCfx5E+MC6oSbSCMWbshhf2KkB+mKHb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=nhz/RpS8; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=gKlgQKVo; arc=none smtp.client-ip=103.168.172.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 50D72114017B;
+	Fri, 14 Mar 2025 18:34:02 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-08.internal (MEProxy); Fri, 14 Mar 2025 18:34:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1741991642; x=
+	1742078042; bh=hZ4RMoibPO0Y6oALSw1Z920muGbtqBVZ071PmuLepp4=; b=n
+	hz/RpS8MFG/fpaM7ySZumTMLEg4fdqHEfowB1/cIBmEAMreZ1BQYxtdTdPsPvrL9
+	1C4aNDb/u5gKzKv1ln7G0P1uV3+oHjn6EMp6Q7hWP4UV/qowB5kPJwwcX8m51jhT
+	3dKnO1qrxW4eK+NFd1LyatCp2+AoHI59trbhfIl0Zp6j8y8EH9kO0xMgGGEj7hlS
+	YjraZmVbmmQ68YX8rI+iAOivszEPtKDoRO3F+6Ua/jFG0ighKX2FDbJRYx7BNYeV
+	QzVveanMUd5ow7IhSf58uMLbj7L+ZHgNFzXQHFNkBChZ4Jsz/oURyUTxLl1HZdRo
+	zjnGQESktUtWIWbMz8Pgw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1741991642; x=1742078042; bh=hZ4RMoibPO0Y6oALSw1Z920muGbtqBVZ071
+	PmuLepp4=; b=gKlgQKVofQSXHWsIU1YxrJ0Wfy11zHf2m1wtWRdmyOPkttaoWtR
+	LRdZRZw5DxCOiB3xQtU6tXLHlWvcDDB6qAe8JA08EEB8CJPD3GFUmAyNh0BPU8jN
+	L5K/lH6dLvBMU9vGXuKY7F++L+a0FBKGI+b+06x52vobtLaObjSoZ8j6tp814dLT
+	EEFFuvyAP+89rfm82c3VHOFG2nx4xPBB0dEDk8BczIR4YUzXcwCezJK2L9QQscgU
+	HgZO7B+QBlMe8wliwAUOsw2KmlSXa+5Gqaa6RiX900Z65OXGPFNPiply64PRih2H
+	5vLFvk6WKeq8vIWUDBNFNLeJThbZ3nxSDaA==
+X-ME-Sender: <xms:2K7UZ-saS6l1ArxZ8NJxiPn5MoUbzWaP_RFYxErXQ4FmqhlopbYg8w>
+    <xme:2K7UZze0w3HbCPFIYU4RbcXNFXyGdAQ82v08yVYzHNH5yel8zRwTLWe3x10gP7Nmv
+    uRP_oKelEJaYSf8jbQ>
+X-ME-Received: <xmr:2K7UZ5x9URCOEg1kxpYyi3XjyWxS80GaOPI7foz2ogMaou0JLEsG1PQh7_Wd>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddufedvtdegucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
+    jeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihsh
+    hnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhepiefffefguddvudekgffhvdeguddv
+    udduhfekieeutdejkeejvdeiveefiedulefgnecuffhomhgrihhnpehpthihphgvpggrlh
+    hlrdhnvgigthenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhr
+    ohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepkedpmh
+    houggvpehsmhhtphhouhhtpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtgho
+    mhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtph
+    htthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggr
+    vhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesgh
+    hoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgt
+    phhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopegtohhrsggvth
+    eslhifnhdrnhgvth
+X-ME-Proxy: <xmx:2K7UZ5MPQIJo7BAeAbcUBZiup_tbgKJa8XMEkXy8x4wPYAsON93kQg>
+    <xmx:2K7UZ-93DBUnj71f8jlCfYHxRtQjCJcOQB07Bp1zhlfyo-9UaTDxbQ>
+    <xmx:2K7UZxVnSn3qFVcqsNVyzwxw7lZS38GQSDA9fzxt6bg7ynL91xBmmg>
+    <xmx:2K7UZ3dTROF4ECK7CZR_X7amkpDTDLS-ZhgU3glpw9tASHQZG79sHA>
+    <xmx:2q7UZyQFC2r0F2Nxvt-Qygm-4LtAvdETMCgeK6CEgAY8qU9c1BEOj39N>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 14 Mar 2025 18:34:00 -0400 (EDT)
+Date: Fri, 14 Mar 2025 23:33:58 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [net-next PATCH v12 07/13] net: mdio: regmap: add support for
- multiple valid addr
-Message-ID: <Z9Ss0qrxCcEbyJY7@shell.armlinux.org.uk>
-References: <20250309172717.9067-1-ansuelsmth@gmail.com>
- <20250309172717.9067-8-ansuelsmth@gmail.com>
- <Z83RsW1_bzoEWheo@shell.armlinux.org.uk>
- <67cdd3c9.df0a0220.1c827e.b244@mx.google.com>
- <0c6cb801-5592-4449-b776-a337161b3326@lunn.ch>
- <Z9SZRDykbTwvGW6S@shell.armlinux.org.uk>
- <67d49d64.050a0220.35694d.b7ab@mx.google.com>
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [RFC PATCH 1/2] net: introduce per netns packet chains
+Message-ID: <Z9Su1r_EE51ErT3w@krikkit>
+References: <cover.1741957452.git.pabeni@redhat.com>
+ <19ab1d1a4e222833c407002ba5e6c64018d92b3e.1741957452.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <67d49d64.050a0220.35694d.b7ab@mx.google.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <19ab1d1a4e222833c407002ba5e6c64018d92b3e.1741957452.git.pabeni@redhat.com>
 
-On Fri, Mar 14, 2025 at 10:19:29PM +0100, Christian Marangi wrote:
-> On Fri, Mar 14, 2025 at 09:01:56PM +0000, Russell King (Oracle) wrote:
-> > I'd prefer we didn't bring that abomination back. The detail about how
-> > things are stored in regmap should be internal within regmap, and I
-> > think it would be better to have an API presented that takes sensible
-> > parameters, rather than something that's been encoded.
-> 
-> Well problem is that regmap_write and regmap_read will take max 2 value
-> at the very end (reg and value) so it's really a matter of making the
-> encoding part internal but encoding it can't be skipped.
-> 
-> You are suggesting to introduce additional API like
-> 
-> mdio_regmap_write(regmap, phy, addr, val);
-> mdio_mmd_regmap_write(regmap, phy, mmd, addr, val);
-> 
-> And the encoding is done internally?
+2025-03-14, 14:05:00 +0100, Paolo Abeni wrote:
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 6fa6ed5b57987..00bdd8316cb5e 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -572,11 +572,19 @@ static inline void netdev_set_addr_lockdep_class(struct net_device *dev)
+>  
+>  static inline struct list_head *ptype_head(const struct packet_type *pt)
+>  {
+> -	if (pt->type == htons(ETH_P_ALL))
+> -		return pt->dev ? &pt->dev->ptype_all : &net_hotdata.ptype_all;
+> -	else
+> +	if (pt->type == htons(ETH_P_ALL)) {
+> +		if (!pt->af_packet_net && !pt->dev)
+> +			return NULL;
+> +
+>  		return pt->dev ? &pt->dev->ptype_specific :
 
-Yes, because littering drivers with the details of the conversion is
-unreasonable.
+s/specific/all/ ?
+(ie ETH_P_ALL with pt->dev should go on &pt->dev->ptype_all like before)
 
-> My concern is the decoding part from the .write/read_bits regmap OPs.
-> I guess for that also some helper should be exposed (to keep the
-> decoding/encoding internal to the driver and not expose the
-> _abomination_)
+> -				 &ptype_base[ntohs(pt->type) & PTYPE_HASH_MASK];
+> +				 &pt->af_packet_net->ptype_all;
+> +	}
+> +
+> +	if (pt->dev)
+> +		return &pt->dev->ptype_specific;
+> +
+> +	return pt->af_packet_net ? &pt->af_packet_net->ptype_specific :
+> +				   &ptype_base[ntohs(pt->type) & PTYPE_HASH_MASK];
+>  }
 
-Sadly, I don't think that's something we can get away from, but we
-should make it _easy_ for people to get it right.
+[...]
+> diff --git a/net/core/net-procfs.c b/net/core/net-procfs.c
+> index fa6d3969734a6..8a5d93eb9d77a 100644
+> --- a/net/core/net-procfs.c
+> +++ b/net/core/net-procfs.c
+[...]
+> @@ -232,16 +233,15 @@ static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
+>  				goto found;
+>  			}
+>  		}
+> -
+> -		nxt = net_hotdata.ptype_all.next;
+> -		goto ptype_all;
+> +		nxt = net->ptype_all.next;
+> +		goto net_ptype_all;
+>  	}
+>  
+> -	if (pt->type == htons(ETH_P_ALL)) {
+> -ptype_all:
+> -		if (nxt != &net_hotdata.ptype_all)
+> +	if (pt->af_packet_net) {
+> +net_ptype_all:
+> +		if (nxt != &net->ptype_all)
+>  			goto found;
 
-From what I remember from the days of shoe-horning C45 into the C22
-MDIO API, encoding and/or decoding addresses was buggy because people
-would use the wrong encoders and decoders.
+This is missing similar code to find items on the new
+net->ptype_specific list.
 
-For example, we had MDIO drivers using mdio_phy_id_is_c45() to test
-whether the access being requested was C45 - mdio_phy_id_is_c45() is
-for the _userspace_ MII API encoding (struct mii_ioctl_data), not the
-kernel space. Kernel space used:
+I think something like:
 
--#define MII_ADDR_C45 (1<<30)
--#define MII_DEVADDR_C45_SHIFT  16
--#define MII_REGADDR_C45_MASK   GENMASK(15, 0)
+ 	if (pt->af_packet_net) {
+ net_ptype_all:
+-		if (nxt != &net->ptype_all)
++		if (nxt != &net->ptype_all && nxt != &net->ptype_specific)
+ 			goto found;
++		if (nxt == &net->ptype_all) {
++			/* continue with ->ptype_specific if it's not empty */
++			nxt = net->ptype_specific.next;
++			if (nxt != &net->ptype_specific)
++				goto found;
++		}
+ 
+ 		nxt = ptype_base[0].next;
+ 	} else
 
-to encode into the register number argument vs the userspace encoding
-into the phy_id member of struct mii_ioctl_data:
 
-#define MDIO_PHY_ID_C45                 0x8000
-#define MDIO_PHY_ID_PRTAD               0x03e0
-#define MDIO_PHY_ID_DEVAD               0x001f
+(and probably something in ptype_get_idx as well)
 
-which is what the mdio_phy_id_*() accessors are using. The two
-approaches are incompatible, and using the userspace one in a MDIO
-driver wasn't going to work correctly - but people did it.
 
-This is one of the reasons I hated the old MDIO API, and why we now
-have separate C22 and C45 interfaces in the driver code.
+> -		hash = 0;
 
-This is exactly why I don't like reintroducing a new set of "massage
-the package, mmd and address into some single integer representation"
-and "decode a single integer into their respective parts" - we've
-been here before, it's lead to problems because driver authors can't
-grasp what the right approach is, and it results in bugs.
+hash will now be used uninitialized in the loop a bit later in the
+function?
 
-Given the history here, my personal opinion would be... if regmap can't
-cope with MDIO devices having a three-part address without requiring
-callers to flatten it first, and then have various regmap drivers
-unflatten it, then regmap is unsuitable to be used with MDIO and ought
-not be used.
+	while (nxt == &ptype_base[hash]) {
 
-So, this encoding/decoding is a problem that should be solved entirely
-within regmap, and not spread out into users of regmap and drivers
-behind regmap. Anything else is, IMHO, insane.
+> +
+>  		nxt = ptype_base[0].next;
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Sabrina
 
