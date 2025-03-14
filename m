@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-174847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF935A60FEA
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 12:26:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F347DA60FFB
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 12:33:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 605E51B635E0
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 11:26:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3418C16F669
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 11:33:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE9B41FA243;
-	Fri, 14 Mar 2025 11:26:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AF2A1F4288;
+	Fri, 14 Mar 2025 11:33:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fyxj2TJy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DSFJFj4u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8B591F5420;
-	Fri, 14 Mar 2025 11:26:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67871F1818;
+	Fri, 14 Mar 2025 11:33:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741951587; cv=none; b=gyzZ2ZxXFO4ld7Vvq5il3a01apF9miIQriP57pOsTRgSw9mNHtFtSjGXt8MZUhXjH7DPk9rufV2vY74Oq1s8053TCFHapE8UJt+FW8Ii/tWKnz4bS8FlXFUYWt8Quy35W2h6Rs83bZNTSJ7aUkBZpdTC0MAvsjd/3xu0MtK0JSw=
+	t=1741952002; cv=none; b=EYyO5GKaQGRhQs4QNNCDU/I0GBko4mpoc/GyO76AmUAfkKLXyRjr27aTijyyZSkMNzRqtVQoNQigwty1R1GwMXv6UFk8fZ1WiCysbSgLEsOhh4lib6uBQw8lAYKrceJQXr+kZOXH7wyFAPDv47Olsb97VBXj+MP1WZEUd8LqPSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741951587; c=relaxed/simple;
-	bh=4ntD1cwFdaQcLnh2bwJuR/GuC6o+bxGys8jSPxAo8Eo=;
+	s=arc-20240116; t=1741952002; c=relaxed/simple;
+	bh=e2vbOHLt7ldmqEIZlKr3k/tQ8Ks5OMo8a0id0FE39iI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r0bdZWXhh/UK9bLNlH2l0iklkezSASvZ/gIvdLOqeZ9caOu+kfeh0kwveQNmOXBfgOeRpER/GS2OKPX45eHC4kN/ykV6q5ypPePrBkKR18+t0+RpZ0ZEft+ooGoCkK46NzgbDkBcyVWstenoUli16g/D4YnGq2FW1ywHrTtHDSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fyxj2TJy; arc=none smtp.client-ip=209.85.221.43
+	 In-Reply-To:Content-Type; b=sbkwBG4zuMnVxoqOw8aNLaHGeVllTPaR4AX/Z+k3rOVmxxMusyBdrh6iqMWYRa3t84mLdYUyNnAN4pf7r3ky6n2WKZRQE/SwgLzIWy/0WTZ3Z2Qz3ORQWyUPbc/AhdlDRkqI8xwmH/17hVtY5vskvvqDhtm0igBwciQwxojDlLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DSFJFj4u; arc=none smtp.client-ip=209.85.221.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3913cf69784so1693832f8f.1;
-        Fri, 14 Mar 2025 04:26:25 -0700 (PDT)
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3913fdd0120so1104582f8f.0;
+        Fri, 14 Mar 2025 04:33:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741951584; x=1742556384; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1741951999; x=1742556799; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=KE3xg+7mLecpB+0WFc0EAlR8lfnEYh8APc9w0z2bxJo=;
-        b=fyxj2TJyLnmV/KLgsSW/judIEfpIw+rnd8OyPCQLo8NrPXgdm5h1u+P3WiBqiHGrti
-         5Nxtl46Y/V/e8sOkVHQAqWa+vhteOh3LzrIOIHyXdmC88XDYU70k7zNCzFtZmqmUaE6j
-         SWn26wjDvkv4Y44Xk5Gp2avRbZpr+Ax+YK2RCj86vCu5WhOAkI6+/Mg988Lcbno27Nkh
-         OUDwlpA76B3aEqIVugWYR+SdyL0QJXtQQv9QhBaz2jmoi3anay0bGBheeUcE47lLpBCQ
-         D4jWrIsG9Go0l4mLdNfOM5dAGCC3C+AmJcDfDmjKglXbFVZpZjSVGjNxFBvOr/2qo0Oq
-         YFqA==
+        bh=PVxcOvygfG8CHgKMUZuovi6TFAONrrhe9j6tvCE6gI0=;
+        b=DSFJFj4upHDQO2wPca0hNySy2NRZVWIfm5fBEe4WM7Ac/NROIeOo1LX6+t1sJpOvAW
+         7YCSuUfwXT0/s5jP9RI2txgDyd7sh+P/SrdO0BzKYvOpqrlu5fHBdRjPboU4VRoisbED
+         54dvu9JzvXjqkQCSJYXLRmB9nirMQqUEyE5QsqbLozbQyZMFNwfqfvAvkQr1P1gfV1Fn
+         Ss0wwqQ7wfvVOhTEQrxJ/eUuWNebMnIXqyq0eA+LjrzflcrpLCfHGZISJMcDQfmFnhS4
+         xFZyGIkMmWboAA5XKi0kN4WhpAVD0is/uf7XquUeJS8M3Ra2Tb5jzCsuDCGRcpKHfoqy
+         S84g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741951584; x=1742556384;
+        d=1e100.net; s=20230601; t=1741951999; x=1742556799;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KE3xg+7mLecpB+0WFc0EAlR8lfnEYh8APc9w0z2bxJo=;
-        b=RwEPn6AXwpyo5ojeRpoxrq866vmsjpGpNSE5gQ65FUppf4ICKencTYT/fxKISP/KRd
-         6L0Wgsle4upfE/ci0Q2FfNMZn8MEjuVqKDwd5f9JAVV90WGqY4eJDkV1sARcoDUOBVHM
-         qUgqdKR4+b2arIyOs31VnUDifFIkn66O7CccjJeuu9Z1OZ8tweCTvu6lXpnQQbklZe0N
-         m7O1qpkRe78R+hUUzmhm0De3o5WQMtWlM6qX2dcu31XZQbiPA19w03mwfhTk43KiOMNc
-         NauVn13cdVWXiwON9283ON64uxjCgZ8yRnbKYBo+wd54OBY/ogun156DhjwVVub0kmLO
-         b9NA==
-X-Forwarded-Encrypted: i=1; AJvYcCUaRIH06ciqIQ1sXRDeiMj2MJ88KymDWWDrnye8F4QkLa83WiRWweGHoq60El+QBUba7j8YjLFMSt9geA==@vger.kernel.org, AJvYcCV4DJue4jFhty3qi3Fk55u790QiO1ZucqYGnnNnoE08U3ksrI2SoOsfdjesQn7XyYrBUb9re4MY@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOLoyi69DK1QjKx3tX07E8Mdlrt7xzyCNqn4gm7HIhO/+GOA31
-	JdzL2HmbUQp1Rr76cSZ0oTbNVhUeJHVAj6+nGa+/jrLLohWIsV5w
-X-Gm-Gg: ASbGncuTKgYEu4Tjn0gwY2VJ08R8Ojbm621oydbPtr/0gDtqucWO08wTyYlJtLxG5/E
-	TI2ZbAwoEeIPCk+gNAtl3GMzX702KuiV6rOIEaUzJo5GSgzL4mSoFdWRWWW3wurK4/jsLS9Z88C
-	wPNg4OW+goel9eq91XOL2I0/+MXC1IbqsmopJcDYdzXNdH9dUqDt6u9bvY2VZyAKMMFkkIXTYxl
-	Fk+Tm1VBeYQR4/MbeVRkwuWqbIfCVo9zns+lPdQDMDV4dmpznx5C5XYkRRan2KX8U3iBIUIA/aG
-	9IHO8iFDOu8oy1lIzsCdQTJOTfOHpgemn47GY5/2nUZ1oET2wKnC2KL0xR5pHVj3MtiQTNuBfoH
-	GxBBRZ2Yur10HBvuG6kUCHIant02wVQ0O5Da7fPEXCN1Q+6HZl/r56eRljll/auhhC+ICrdmuk3
-	PG+eD3OpZf2ZgbkQKRGEi6HPg6ziYkiYDLVw==
-X-Google-Smtp-Source: AGHT+IHOdvibFKm3jVEMp6vbeZRkccq3Vd64WZb5LCwbnOkKBkfgGB6cay2gT4t53qL+ywQr8n2UeA==
-X-Received: by 2002:a05:6000:2ad:b0:391:306f:57de with SMTP id ffacd0b85a97d-3972077867bmr2706231f8f.45.1741951583855;
-        Fri, 14 Mar 2025 04:26:23 -0700 (PDT)
+        bh=PVxcOvygfG8CHgKMUZuovi6TFAONrrhe9j6tvCE6gI0=;
+        b=bYXq/uA54pSPH1cl3Ezs5LP3OeRernfLQtu9v2b6OLBeure+GnqbdoJ8zHmKnFtPbl
+         owrqiyifjpt08nq+feW4AsUifAUozSQyYn0ypgP3VXc0O/2xNhcfQMHbXPcYk2IYI2/+
+         wKtVKh/rbfu+pOGd3+5GxxiUQQbE+nJcW3OMkK+WK9H9bDgdi7OeQB3ikwrAY0yCG3//
+         Bhx/NW54kzHxesSNHJ3IcsLSdqSMB4QmGjupOElGtmW7Gzkg7+hKaoEMP5GYqJ16OYFm
+         09gvf2CCgP871I3ARu78qLjwoXO3f1zdKEKcM767JqJM1nR6e8RMmHb/IcvvyRChYIHl
+         7H5w==
+X-Forwarded-Encrypted: i=1; AJvYcCVQ8Ssidp7mtYmB6zYd+ZuIbqjX4syaXJsCzGjULNH6KXNPJ31PcoIL8o2lJtdTSOtLvQ/CVcMgiMBKL6M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPjgTeEdRBlfQgxtuc8WZ6oGK1jfgQPVIlXeOJAyBQPEzcK4F3
+	ptL0wm7aLNc0ubhIFtjTmhJuhxs8/h/rTbUyyy4T1H4NaSSmBGc3
+X-Gm-Gg: ASbGnctSSak7pS04Zk56gPbmWxabdT3R9Hj+eU+W7HpZAMFi0y617IM4dHDGGRRzX3S
+	cSZcivJU4SSvEosSR/eCRgzbJw9qliEh7YxpTOkSlS8dhTIuWrlphRSowloiNPUzpKEdHwJAJnt
+	fnj14FBsANgeuyfna9ozNzsXC4ElL0Oiu0Jn1wiHhPpx8cO/MGaa0Cbxqw+0ZXBWWvdst341vRH
+	klJOWjpfiwOSsbUSDuYHl0vbkGc72HDg/SMl5EsLAGCjhAqmSsQrBR93EkYy3KNwL15pLZFZXrS
+	JCK78hIjdGFqjxawEuS3OKwui0ihWOZjDFT4AJo3kanQHrkV9CEW2nY/Kb8ayAsIHJ2FKw+QMUW
+	qKvU/EQPHX5OpwG+++cCBZfnzBXjoK3nnQy77L6OWfsAgxdEvTNMY2Xia+gyxt8eE2t05y6bOk9
+	fdzV2P1Diog4f/fZgBIobqBLsAFog5yFrfKg==
+X-Google-Smtp-Source: AGHT+IFinYC2sZnzhAmOU9xmOX9dgX1rwM53QDrgbGAXrShy21SKX+QnCfot+G8dIqJWvF3Ge9ukNw==
+X-Received: by 2002:a05:6000:381:b0:397:8ef9:a143 with SMTP id ffacd0b85a97d-3978ef9a95amr1143409f8f.23.1741951998898;
+        Fri, 14 Mar 2025 04:33:18 -0700 (PDT)
 Received: from ?IPV6:2a02:3100:acc2:9400:c68:8c54:c04c:f0e3? (dynamic-2a02-3100-acc2-9400-0c68-8c54-c04c-f0e3.310.pool.telefonica.de. [2a02:3100:acc2:9400:c68:8c54:c04c:f0e3])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-395cb7eb9d7sm5145012f8f.89.2025.03.14.04.26.22
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-395c8975b34sm5315454f8f.55.2025.03.14.04.33.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Mar 2025 04:26:23 -0700 (PDT)
-Message-ID: <5bb890a8-6436-4aa9-a5ea-5377c67a1d2d@gmail.com>
-Date: Fri, 14 Mar 2025 12:26:33 +0100
+        Fri, 14 Mar 2025 04:33:18 -0700 (PDT)
+Message-ID: <ecfc71d3-47b6-4f17-b081-69452e7884ac@gmail.com>
+Date: Fri, 14 Mar 2025 12:33:27 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,20 +84,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/4] net: phy: tja11xx: remove call to
- devm_hwmon_sanitize_name
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Xu Liang <lxu@maxlinear.com>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, Jean Delvare <jdelvare@suse.com>,
- Guenter Roeck <linux@roeck-us.net>,
- "linux-hwmon@vger.kernel.org" <linux-hwmon@vger.kernel.org>
-References: <198f3cd0-6c39-4783-afe7-95576a4b8539@gmail.com>
- <4452cb7e-1a2f-4213-b49f-9de196be9204@gmail.com>
- <20250314084554.322e790c@fedora-2.home>
+Subject: Re: [PATCH net-next 2/2] r8169: disable RTL8126 ZRX-DC timeout
+To: ChunHao Lin <hau@realtek.com>, nic_swsd@realtek.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250314075013.3391-1-hau@realtek.com>
+ <20250314075013.3391-3-hau@realtek.com>
 Content-Language: en-US
 From: Heiner Kallweit <hkallweit1@gmail.com>
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
@@ -143,80 +136,63 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
  H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
  lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
  OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
-In-Reply-To: <20250314084554.322e790c@fedora-2.home>
+In-Reply-To: <20250314075013.3391-3-hau@realtek.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 14.03.2025 08:45, Maxime Chevallier wrote:
-> Hello Heiner,
-> 
-> On Thu, 13 Mar 2025 20:45:06 +0100
-> Heiner Kallweit <hkallweit1@gmail.com> wrote:
-> 
->> Since c909e68f8127 ("hwmon: (core) Use device name as a fallback in
->> devm_hwmon_device_register_with_info") we can simply provide NULL
->> as name argument.
->>
->> Note that neither priv->hwmon_name nor priv->hwmon_dev are used
->> outside tja11xx_hwmon_register.
->>
->> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
->> ---
->>  drivers/net/phy/nxp-tja11xx.c | 19 +++++--------------
->>  1 file changed, 5 insertions(+), 14 deletions(-)
->>
->> diff --git a/drivers/net/phy/nxp-tja11xx.c b/drivers/net/phy/nxp-tja11xx.c
->> index 601094fe2..07e94a247 100644
->> --- a/drivers/net/phy/nxp-tja11xx.c
->> +++ b/drivers/net/phy/nxp-tja11xx.c
->> @@ -87,8 +87,6 @@
->>  #define TJA110X_RMII_MODE_REFCLK_IN       BIT(0)
->>  
->>  struct tja11xx_priv {
->> -	char		*hwmon_name;
->> -	struct device	*hwmon_dev;
->>  	struct phy_device *phydev;
->>  	struct work_struct phy_register_work;
->>  	u32 flags;
->> @@ -508,19 +506,12 @@ static const struct hwmon_chip_info tja11xx_hwmon_chip_info = {
->>  static int tja11xx_hwmon_register(struct phy_device *phydev,
->>  				  struct tja11xx_priv *priv)
->>  {
->> -	struct device *dev = &phydev->mdio.dev;
->> -
->> -	priv->hwmon_name = devm_hwmon_sanitize_name(dev, dev_name(dev));
->> -	if (IS_ERR(priv->hwmon_name))
->> -		return PTR_ERR(priv->hwmon_name);
->> -
->> -	priv->hwmon_dev =
->> -		devm_hwmon_device_register_with_info(dev, priv->hwmon_name,
->> -						     phydev,
->> -						     &tja11xx_hwmon_chip_info,
->> -						     NULL);
->> +	struct device *hdev, *dev = &phydev->mdio.dev;
->>  
->> -	return PTR_ERR_OR_ZERO(priv->hwmon_dev);
->> +	hdev = devm_hwmon_device_register_with_info(dev, NULL, phydev,
->> +						    &tja11xx_hwmon_chip_info,
->> +						    NULL);
->> +	return PTR_ERR_OR_ZERO(hdev);
->>  }
-> 
-> The change look correct to me, however I think you can go one step
-> further and remove the field tja11xx_priv.hwmon_name as well as
-> hwmon_dev.
-> 
-This is part of the patch. Or what do you mean?
+On 14.03.2025 08:50, ChunHao Lin wrote:
+> Disable it due to it dose not meet ZRX-DC specification. If it is enabled,
 
-> One could argue that we can even remove tja11xx_hwmon_register()
-> entirely
-> 
-It's called from two places, and we would have to duplicate some things
-like IS_ERR(). I think it's ok to leave this function in.
+dose -> does
 
-> Thanks,
+> device will exit L1 substate every 100ms. Disable it for saving more power
+> in L1 substate.
 > 
-> Maxime
+> Signed-off-by: ChunHao Lin <hau@realtek.com>
+> ---
+>  drivers/net/ethernet/realtek/r8169_main.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+> index 3c663fca07d3..dfc96b09b85e 100644
+> --- a/drivers/net/ethernet/realtek/r8169_main.c
+> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+> @@ -2852,6 +2852,21 @@ static u32 rtl_csi_read(struct rtl8169_private *tp, int addr)
+>  		RTL_R32(tp, CSIDR) : ~0;
+>  }
+>  
+> +static void rtl_disable_zrxdc_timeout(struct rtl8169_private *tp)
+> +{
+> +	struct pci_dev *pdev = tp->pci_dev;
+> +	u8 val;
+> +
+> +	if (pdev->cfg_size > 0x0890 &&
+> +	    pci_read_config_byte(pdev, 0x0890, &val) == PCIBIOS_SUCCESSFUL &&
+> +	    pci_write_config_byte(pdev, 0x0890, val & ~BIT(0)) == PCIBIOS_SUCCESSFUL)
+> +		return;
+> +
+> +	netdev_notice_once(tp->dev,
+> +		"No native access to PCI extended config space, falling back to CSI\n");
+> +	rtl_csi_write(tp, 0x0890, rtl_csi_read(tp, 0x0890) & ~BIT(0));
+> +}
+> +
 
-Heiner
+Does the datasheet have a name for this extended config space register and bit 0?
+This would be better than using magic numbers.
+
+I think we can factor out the extended config space access to a helper. The same code
+we have in another place already. But this can be done as a follow-up.
+
+>  static void rtl_set_aspm_entry_latency(struct rtl8169_private *tp, u8 val)
+>  {
+>  	struct pci_dev *pdev = tp->pci_dev;
+> @@ -3824,6 +3839,7 @@ static void rtl_hw_start_8125d(struct rtl8169_private *tp)
+>  
+>  static void rtl_hw_start_8126a(struct rtl8169_private *tp)
+>  {
+> +	rtl_disable_zrxdc_timeout(tp);
+>  	rtl_set_def_aspm_entry_latency(tp);
+>  	rtl_hw_start_8125_common(tp);
+>  }
+
 
