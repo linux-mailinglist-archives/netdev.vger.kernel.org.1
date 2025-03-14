@@ -1,167 +1,167 @@
-Return-Path: <netdev+bounces-174987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29692A61CBE
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 21:32:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A577A61CBD
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 21:31:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16FE219C1ED6
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 20:32:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D776319C21F0
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 20:32:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4D1C204F65;
-	Fri, 14 Mar 2025 20:31:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nd1lu+LN"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11C52204099;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 579D61A23B7;
 	Fri, 14 Mar 2025 20:31:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o338TSpD"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3431819F436
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 20:31:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741984313; cv=none; b=ZfUdOOVqdyPz4P6FLZJcnBl4GZb/01LkumJZ7nGKEK6+iUrekRLVxj1v0zAKyMYRf7j94D2s6VZJzQf++1LXX4plE7BPswMcr3C3QbfF3uXd91g9eukuIkklKwv0LiCL4HTzWBs3JoXNyYzv/hrLLdgqnPPS9IYL/MdN0vtljgs=
+	t=1741984311; cv=none; b=ivm3yaWczOI3ODEoUF9m36G3VheE1xeEhXT5nDiQWqpWo5Ag1Szo8EQhiLaDn/Ipizof/zrWyXn93+Sg53PKy5ufZtsqOSTUcER40CFgMMuMepr9FXxuztngxHNhE1aC9ACHvHoIRilZ+q3BxR4TkNAnW3wCtkxjH0y2aAKDVMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741984313; c=relaxed/simple;
-	bh=CClAWyhe+zvGkSJnvmrqiVywGtdUPjZLGum2vT+wi9A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gZvXik0C2Tgk6yR26Ul1dS4D6csQTVvQxey1qkeH48ZdJmyT5YVAEphF6hPMY9BpdiRJrxIWrhwdw8oTlx9q8yhcy0m/k1m3t6OeNk6Du8sdsiIDGZAG/toycIYUioSDnfK8yijUj7O622Ohj3ejhild2jkVqpqbTUI5ApiDlYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nd1lu+LN; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43cfb6e9031so1283675e9.0;
-        Fri, 14 Mar 2025 13:31:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741984310; x=1742589110; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y8SBW/0o/OhjS45ktfU2GD+0iJTxTsBLbOf9gBVJ9vg=;
-        b=Nd1lu+LNoFs9Om9V0cHnnQREXhJDVAwwgVCfyD3QxsT4ec5GQ9q1yka16AooeSytrP
-         T5t+uToOWe+2KsIqXjSI17JrVqu4DRgt+C9DPEGnsa8+UVhOhrY0Fl4yNEInbhcU735Q
-         X/Jxh75nn5OcOCOp1FPVqYJ4hezpchMFwQd5EvcvO3pvYDxcOQI84YyyTFOTNxBKbNB1
-         eXvDUjgJ6U7h5Fo+f9tSF6HXqYGDy1OIm+mH+blYRlV6XSiftRzJ2LvekGQSnQDsP8eD
-         qNE+pDIia6U3B7FQP+mnchhIZBU3miM+PrUpFdFVtF4ia+mVUQkbJozk0/YIr/fOD8DW
-         aRdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741984310; x=1742589110;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=y8SBW/0o/OhjS45ktfU2GD+0iJTxTsBLbOf9gBVJ9vg=;
-        b=QXXVxLd+za/vw0ItYG+BBZVFIbsMk3QKc/sSYvliw9tJqOKLb4bAC+QLnuPRQcaTqB
-         XJTLe9JvAaNKDg44XS0/+yvKhKQgv/+oGYkLv54xhButtKmKnhvrTsmoM6wr3D5wiZ1H
-         2cL0RHlCk+AWfG6QoPIfhME1a5J09nI/6YYlO985LMBaYOnwJXpamgw4LU7Nz5IkZ/OD
-         zGRlMSJp/MxTBBusldfI0MfmEPBRmSsH/BbENRHNr9ihkZGIcMzpfQtm0RUXje73yf49
-         qJ+LuyLWJ6o+JE6pzsiLL++AsuiEaKYWPrPgAikzaBOYMicr8fhhSYfO2FVRwH3bQLBQ
-         +mbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUVPXInOdCti/95hIrRxBKn131MT2TwdqIdpF4FHgubY4y9RRR6th0Yuyy7gZvERYLGKWE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrTJkRNxBqUUcxYDYBp+Sd18li/KhJEJJeF02cHtHmkbDs3Q+W
-	aczC+1Y8YLIV169dg7aQTgHcRTKlHzI72p/hS5YCtH7prcQJKDQiZnXohLol2Gye2plIWoo7a1n
-	scC95VqOOGWM5qsI9K/DiLIJMFOA=
-X-Gm-Gg: ASbGncuwt75/qIcpbVSuJH1q7C41ZC7PzQ2Q5Qn8knPkacd66TmGRH5PhpTXydDUiNK
-	VRys3cV/bqjFj8LArBo7pQeQESx+3YoFG9o0b9tIdnWW48UB1lFBAPtxceYuGRCQclNBt1JjdYI
-	ohEmsGNojlb2hZm9CPiVpO6ieOZ4M/mz5LeS9BYXJcEtNsmCV6XsmJ
-X-Google-Smtp-Source: AGHT+IF0kVri9I9eAy9szqB8xcwSwCCOtiQitSpA/3PLeJKTIqkIN+TYzg3QRHz2eVkpCkC91Y2m2ZbRiaSTO/u2nME=
-X-Received: by 2002:a05:600c:1d15:b0:43c:e481:3353 with SMTP id
- 5b1f17b1804b1-43d1ec8e42fmr53083445e9.17.1741984309749; Fri, 14 Mar 2025
- 13:31:49 -0700 (PDT)
+	s=arc-20240116; t=1741984311; c=relaxed/simple;
+	bh=2QK4E9ynapxckPwxo8W/JTy4OvOXsGI29ZK/3e/YNY8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PEzGDzyfa10whgRHuKb52rKdsuqm8lrBJhBLFDRqCNxAVQgUEeESqIkhAsj8KGhAaNh4AEFehiSf+GGLh87Z9nYj0KhxmBZRO0iN+QNyfG6GfFSAasClMUk21EoKCj12n8S2Lj41nH/gbAfQbDjf9MCS0oi6famY4K/cyBTB03Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o338TSpD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3274C4CEE3;
+	Fri, 14 Mar 2025 20:31:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741984310;
+	bh=2QK4E9ynapxckPwxo8W/JTy4OvOXsGI29ZK/3e/YNY8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=o338TSpDAE5T9ccL/O2z4CMfuNtvnI2cvj4YLYVX2XiSAPSoNXgwjMwUFBLR7SN+n
+	 TZmar8vWeGE9pEhYQj9Hi0Q88hJZysWC93CBoE75YjmRraee+IdjzHkRfwJpXdIQTW
+	 a7prJDPFDR2fs2ZxegP0TctSW04RXCd8xS964GiAGx2t7z6SQW50cvAXn3Psm0k6Yj
+	 3JBEpKWDOsKo9cHawEaduQ0DOQUnDwdjdC78HosFC8JbeNIQwKUpGJpJ2KTwx1Unct
+	 eXn+sXbuYl+hZX/uQeeIn6PIV9ih25h9xAitoA7UoF2BUV0ivO4DN6vUNY6j6MtvKn
+	 L8qJKEmEelP9g==
+Message-ID: <a497632b-3754-42f2-9b7b-1821fee0c136@kernel.org>
+Date: Fri, 14 Mar 2025 22:31:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250313190309.2545711-1-ameryhung@gmail.com> <20250313190309.2545711-10-ameryhung@gmail.com>
-In-Reply-To: <20250313190309.2545711-10-ameryhung@gmail.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Fri, 14 Mar 2025 13:31:38 -0700
-X-Gm-Features: AQ5f1JrtiIXysTvlT2R9ZfFgY2yAD-dmVTEcyc0yvh9IPoR3SVRLeXLoR9yIXR0
-Message-ID: <CAADnVQJ-kSNw4hiZ5p_fpsVAyYWDSu50OJyY_NGmaxk9+ofiiQ@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v5 09/13] bpf: net_sched: Disable attaching bpf
- qdisc to non root
-To: Amery Hung <ameryhung@gmail.com>
-Cc: Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Kui-Feng Lee <sinquersw@gmail.com>, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Stanislav Fomichev <stfomichev@gmail.com>, 
-	ekarani.silvestre@ccc.ufcg.edu.br, yangpeihao@sjtu.edu.cn, 
-	Peilin Ye <yepeilin.cs@gmail.com>, Kernel Team <kernel-team@meta.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [bug report] net: ti: icssg-prueth: Add XDP support
+To: Dan Carpenter <dan.carpenter@linaro.org>,
+ "Malladi, Meghana" <m-malladi@ti.com>
+Cc: netdev@vger.kernel.org
+References: <70d8dd76-0c76-42fc-8611-9884937c82f5@stanley.mountain>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <70d8dd76-0c76-42fc-8611-9884937c82f5@stanley.mountain>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 13, 2025 at 12:03=E2=80=AFPM Amery Hung <ameryhung@gmail.com> w=
-rote:
->
-> Do not allow users to attach bpf qdiscs to classful qdiscs. This is to
-> prevent accidentally breaking existings classful qdiscs if they rely on
-> some data in the child qdisc. This restriction can potentially be lifted
-> in the future. Note that, we still allow bpf qdisc to be attached to mq.
->
-> Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> ---
->  net/sched/bpf_qdisc.c | 20 +++++++++++++++++++-
->  1 file changed, 19 insertions(+), 1 deletion(-)
->
-> diff --git a/net/sched/bpf_qdisc.c b/net/sched/bpf_qdisc.c
-> index e4e7a5879869..c2f33cd35674 100644
-> --- a/net/sched/bpf_qdisc.c
-> +++ b/net/sched/bpf_qdisc.c
-> @@ -170,8 +170,11 @@ static int bpf_qdisc_gen_prologue(struct bpf_insn *i=
-nsn_buf, bool direct_write,
->                 return 0;
->
->         *insn++ =3D BPF_MOV64_REG(BPF_REG_6, BPF_REG_1);
-> +       *insn++ =3D BPF_LDX_MEM(BPF_DW, BPF_REG_2, BPF_REG_1, 16);
->         *insn++ =3D BPF_LDX_MEM(BPF_DW, BPF_REG_1, BPF_REG_1, 0);
++Meghana,
 
-Both loads need a comment.
-It's st_ops callback specific and not obvious what ends up in r1 and r2.
+On 14/03/2025 12:50, Dan Carpenter wrote:
+> Hello Roger Quadros,
+> 
+> Commit 62aa3246f462 ("net: ti: icssg-prueth: Add XDP support") from
+> Mar 5, 2025 (linux-next), leads to the following Smatch static
+> checker warning:
+> 
+> 	drivers/net/ethernet/ti/icssg/icssg_common.c:635 emac_xmit_xdp_frame()
+> 	error: we previously assumed 'first_desc' could be null (see line 584)
+> 
+> drivers/net/ethernet/ti/icssg/icssg_common.c
+>    563  u32 emac_xmit_xdp_frame(struct prueth_emac *emac,
+>    564                          struct xdp_frame *xdpf,
+>    565                          struct page *page,
+>    566                          unsigned int q_idx)
+>    567  {
+>    568          struct cppi5_host_desc_t *first_desc;
+>    569          struct net_device *ndev = emac->ndev;
+>    570          struct prueth_tx_chn *tx_chn;
+>    571          dma_addr_t desc_dma, buf_dma;
+>    572          struct prueth_swdata *swdata;
+>    573          u32 *epib;
+>    574          int ret;
+>    575  
+>    576          if (q_idx >= PRUETH_MAX_TX_QUEUES) {
+>    577                  netdev_err(ndev, "xdp tx: invalid q_id %d\n", q_idx);
+>    578                  return ICSSG_XDP_CONSUMED;      /* drop */
+> 
+> Do we need to free something on this path?
+> 
+>    579          }
+>    580  
+>    581          tx_chn = &emac->tx_chns[q_idx];
+>    582  
+>    583          first_desc = k3_cppi_desc_pool_alloc(tx_chn->desc_pool);
+>    584          if (!first_desc) {
+>    585                  netdev_dbg(ndev, "xdp tx: failed to allocate descriptor\n");
+>    586                  goto drop_free_descs;   /* drop */
+>                         ^^^^^^^^^^^^^^^^^^^^
+> This will dereference first_desc and crash.
+> 
+>    587          }
+>    588  
+>    589          if (page) { /* already DMA mapped by page_pool */
+>    590                  buf_dma = page_pool_get_dma_addr(page);
+>    591                  buf_dma += xdpf->headroom + sizeof(struct xdp_frame);
+>    592          } else { /* Map the linear buffer */
+>    593                  buf_dma = dma_map_single(tx_chn->dma_dev, xdpf->data, xdpf->len, DMA_TO_DEVICE);
+>    594                  if (dma_mapping_error(tx_chn->dma_dev, buf_dma)) {
+>    595                          netdev_err(ndev, "xdp tx: failed to map data buffer\n");
+>    596                          goto drop_free_descs;   /* drop */
+>    597                  }
+>    598          }
+>    599  
+>    600          cppi5_hdesc_init(first_desc, CPPI5_INFO0_HDESC_EPIB_PRESENT,
+>    601                           PRUETH_NAV_PS_DATA_SIZE);
+>    602          cppi5_hdesc_set_pkttype(first_desc, 0);
+>    603          epib = first_desc->epib;
+>    604          epib[0] = 0;
+>    605          epib[1] = 0;
+>    606  
+>    607          /* set dst tag to indicate internal qid at the firmware which is at
+>    608           * bit8..bit15. bit0..bit7 indicates port num for directed
+>    609           * packets in case of switch mode operation
+>    610           */
+>    611          cppi5_desc_set_tags_ids(&first_desc->hdr, 0, (emac->port_id | (q_idx << 8)));
+>    612          k3_udma_glue_tx_dma_to_cppi5_addr(tx_chn->tx_chn, &buf_dma);
+>    613          cppi5_hdesc_attach_buf(first_desc, buf_dma, xdpf->len, buf_dma, xdpf->len);
+>    614          swdata = cppi5_hdesc_get_swdata(first_desc);
+>    615          if (page) {
+>    616                  swdata->type = PRUETH_SWDATA_PAGE;
+>    617                  swdata->data.page = page;
+>    618          } else {
+>    619                  swdata->type = PRUETH_SWDATA_XDPF;
+>    620                  swdata->data.xdpf = xdpf;
+>    621          }
+>    622  
+>    623          cppi5_hdesc_set_pktlen(first_desc, xdpf->len);
+>    624          desc_dma = k3_cppi_desc_pool_virt2dma(tx_chn->desc_pool, first_desc);
+>    625  
+>    626          ret = k3_udma_glue_push_tx_chn(tx_chn->tx_chn, first_desc, desc_dma);
+>    627          if (ret) {
+>    628                  netdev_err(ndev, "xdp tx: push failed: %d\n", ret);
+>    629                  goto drop_free_descs;
+>    630          }
+>    631  
+>    632          return ICSSG_XDP_TX;
+>    633  
+>    634  drop_free_descs:
+>    635          prueth_xmit_free(tx_chn, first_desc);
+>    636          return ICSSG_XDP_CONSUMED;
+>    637  }
+> 
+> 
+> regards,
+> dan carpenter
 
->         *insn++ =3D BPF_CALL_KFUNC(0, bpf_qdisc_init_prologue_ids[0]);
-> +       *insn++ =3D BPF_JMP_IMM(BPF_JEQ, BPF_REG_0, 0, 1);
-> +       *insn++ =3D BPF_EXIT_INSN();
->         *insn++ =3D BPF_MOV64_REG(BPF_REG_1, BPF_REG_6);
->         *insn++ =3D prog->insnsi[0];
->
-> @@ -239,11 +242,26 @@ __bpf_kfunc void bpf_qdisc_watchdog_schedule(struct=
- Qdisc *sch, u64 expire, u64
->  }
->
->  /* bpf_qdisc_init_prologue - Hidden kfunc called in prologue of .init. *=
-/
-> -__bpf_kfunc void bpf_qdisc_init_prologue(struct Qdisc *sch)
-> +__bpf_kfunc int bpf_qdisc_init_prologue(struct Qdisc *sch,
-> +                                       struct netlink_ext_ack *extack)
->  {
->         struct bpf_sched_data *q =3D qdisc_priv(sch);
-> +       struct net_device *dev =3D qdisc_dev(sch);
-> +       struct Qdisc *p;
-> +
-> +       if (sch->parent !=3D TC_H_ROOT) {
-> +               p =3D qdisc_lookup(dev, TC_H_MAJ(sch->parent));
-> +               if (!p)
-> +                       return -ENOENT;
-> +
-> +               if (!(p->flags & TCQ_F_MQROOT)) {
-> +                       NL_SET_ERR_MSG(extack, "BPF qdisc only supported =
-on root or mq");
-> +                       return -EINVAL;
-> +               }
-> +       }
->
->         qdisc_watchdog_init(&q->watchdog, sch);
-> +       return 0;
->  }
->
->  /* bpf_qdisc_reset_destroy_epilogue - Hidden kfunc called in epilogue of=
- .reset
-> --
-> 2.47.1
->
+-- 
+cheers,
+-roger
+
 
