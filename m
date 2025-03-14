@@ -1,116 +1,88 @@
-Return-Path: <netdev+bounces-174821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B58F2A60C7E
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 10:00:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E01DEA60C81
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 10:01:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9DA427A5AFE
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 08:59:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E89FA7A5115
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 09:00:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69FB61E493;
-	Fri, 14 Mar 2025 09:00:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A50A153800;
+	Fri, 14 Mar 2025 09:00:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b="CO+I2Npd"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="LGHUEe0z"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAEED153800;
-	Fri, 14 Mar 2025 09:00:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7653CA4B
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 09:00:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741942845; cv=none; b=WYH6wu2T88JZtSv9UI5KjRjfngF+jqWheeEamJXQ5b9bRtEn+oJ1pSBQRdOYr9gfzNWhBKmc+tNnc2dNIxTTubmanWvEQuB3BMFC7Zp1MAWHAzUfzZpiYUjrvLCL61fFIe3Loyua//z0MYwIjwf7Kpqxhq48OmgzxRrWwZtA+cc=
+	t=1741942855; cv=none; b=p7v2/J8powXdJICLsIuJwe0lwuzS4ed3LDJrQzr3VnteI65PdzGOQy6tEPv5Da/EoEZOuLKYhQblcVxRKGAroE6or4Jo2Gmm0mGvG20fqTln+QtI2sZWi7qRLPv7D9QfkP+lw4+GE35OsZxq4K/kRpNwD9vfMBzGV18eY/dwLc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741942845; c=relaxed/simple;
-	bh=Z823sMIBtSmRUwV1I+DT2YaMz3HkGJqwNiwsH3j3zsE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RiTIL/eAorWoPN8mubdBB/XfksAuwoz9lvbyteFg+JlJUfVUFXDQXKJz+jFpZSCRO4koI30eF8QskRxmLKJ5/T8HZYuxrT5Yf/I/xCc/6Qbv33XgCQ775wRwC87GMexsuoCkjPf+hLWmhSJufm1udB8127v/ehiPgyQ8JlcIP8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yoseli.org; spf=none smtp.mailfrom=yoseli.org; dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b=CO+I2Npd; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yoseli.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=yoseli.org
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 2EED42047E;
-	Fri, 14 Mar 2025 09:00:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yoseli.org; s=gm1;
-	t=1741942835;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=G2gYY1JMiXCVrx0k9285ZmdwltYFhtlXfBufrR3acPk=;
-	b=CO+I2NpdUQgmILYfKbz+eoe5Qgj08VnR31tmv/odKki2xHwmzY3uVRvvAt0tqNPmrlpzZb
-	kuYJhbmXqy+7e33RkCcUQ2CzS/+wp2D9aawJV4vJFFyHXdxXnVj6mUk+gXO5zB4TrgrEjm
-	nWLHenSMcjjrtll81Lu5CiOWJ3vMrqBpWysZwh6SUQH11o4pz5KeZXznrq+fHqFBvu52AO
-	PVNoc+x2NfE3yLh0iOju/YxMFep9pTIcdEjNjqQOFdaXA8nsA8d5/uMp94mjaxf3gHJAnW
-	SIf+JldeMI1eUZuBmZsFm0vdv+QFYhMmp65XSjAGdEqg+6Y5Oq1YOsE4SiJWFg==
-Message-ID: <757e9a32-9b35-4818-b41b-09eaac97eb8d@yoseli.org>
-Date: Fri, 14 Mar 2025 10:00:31 +0100
+	s=arc-20240116; t=1741942855; c=relaxed/simple;
+	bh=jPyU3kErwnr7TtXw6/rza5V1Ow7+zDP49bFnbjOy2gg=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=EKy/wYbhFw1F4IxU+8tlHd527agvhdV0lYzlRRU5B9/vfbV1S/bv1nhf6sZxpu4RA/3Gfh4vb1dDNSM/Lgur6C/guay/GfonpwFF91s2B6EMDV40jBEjA0lebvAB29b2guzvOpJuCIUOqz3tZ2ahlQwd3cZvJBIe1bSWSWtT5DM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=LGHUEe0z; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
+	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=EEUK3Igpsz4/v+Onr8NFcR5nPg8DotBJSjcnA02plEY=; b=LGHUEe0zSDJ7L7f9Tg1Xuv48+I
+	GeouzSJHDtP9uu7rW5Y8PDYjo+zdJY0YPq+ljLq2vwlNMdqv4MghcikkvjT+FCQFR/QkGbtgicPo4
+	PFxz4og1MORyIlgwxVysyEvGYy3O6sT8lO63O0POn1ibs5rgD+iqBbdumGrJAhjIAFg42712i2ufj
+	ex6agiMqs3GCPPVC9gA5JpyUPFOmagEhpDDumSH2Ryg4EYYap+6mhcDkPoEt6qagr2cc7DRgQu8v3
+	bT5evlgioTr4at9Igfa2kP0EI5xVwvl5y1H5qYZXCY+1ta1Mr8bw+yCqcXg1YK99/WlR4y+Zwmb/i
+	nTnZxRVw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tt0uH-006Wj7-0E;
+	Fri, 14 Mar 2025 17:00:42 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Mar 2025 17:00:41 +0800
+Date: Fri, 14 Mar 2025 17:00:41 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>, netdev@vger.kernel.org
+Subject: [PATCH] net: mctp: Remove unnecessary cast in mctp_cb
+Message-ID: <Z9PwOQeBSYlgZlHq@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] net: phy: dp83826: Fix TX data voltage support
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Catalin Popescu <catalin.popescu@leica-geosystems.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250303-dp83826-fixes-v1-0-6901a04f262d@yoseli.org>
- <20250303-dp83826-fixes-v1-1-6901a04f262d@yoseli.org>
-Content-Language: en-US, fr
-From: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
-In-Reply-To: <20250303-dp83826-fixes-v1-1-6901a04f262d@yoseli.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddufedtgedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkffggfgfuvfevfhfhjggtgfesthejredttddvjeenucfhrhhomheplfgvrghnqdfoihgthhgvlhcujfgruhhtsghoihhsuceojhgvrghnmhhitghhvghlrdhhrghuthgsohhisheshihoshgvlhhirdhorhhgqeenucggtffrrghtthgvrhhnpeefieetgeehvdeggffgffetheehhfetkeefhefhgeeuheetueffueeikefgffffteenucfkphepudelfedrvdefledrudelvddrjeegnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepudelfedrvdefledrudelvddrjeegpdhhvghloheplgduledvrdduieekrddvuddurdehvdgnpdhmrghilhhfrhhomhepjhgvrghnmhhitghhvghlrdhhrghuthgsohhisheshihoshgvlhhirdhorhhgpdhnsggprhgtphhtthhopedutddprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesg
- hhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheptggrthgrlhhinhdrphhophgvshgtuheslhgvihgtrgdqghgvohhshihsthgvmhhsrdgtohhm
-X-GND-Sasl: jeanmichel.hautbois@yoseli.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hi there !
+The void * cast in mctp_cb is unnecessary as it's already been done
+at the start of the function.
 
-On 3/3/25 6:05 PM, Jean-Michel Hautbois wrote:
-> When CONFIG_OF_MDIO is not set, the cfg_dac_minus and cfg_dac_plus are
-> not set in dp83826_of_init(). This leads to a bad behavior in
-> dp83826_config_init: the phy initialization fails, after
-> MII_DP83826_VOD_CFG1 and MII_DP83826_VOD_CFG2 are set.
-> 
-> Fix it by setting the default value for both variables.
-> 
-> Fixes: d1d77120bc28 ("net: phy: dp83826: support TX data voltage tuning")
-> 
-> Signed-off-by: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
-> ---
->   drivers/net/phy/dp83822.c | 4 ++++
->   1 file changed, 4 insertions(+)
-> 
-> diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
-> index 6599feca1967d705331d6e354205a2485ea962f2..88c49e8fe13e20e97191cddcd0885a6e075ae326 100644
-> --- a/drivers/net/phy/dp83822.c
-> +++ b/drivers/net/phy/dp83822.c
-> @@ -854,6 +854,10 @@ static int dp83822_of_init(struct phy_device *phydev)
->   
->   static void dp83826_of_init(struct phy_device *phydev)
->   {
-> +	struct dp83822_private *dp83822 = phydev->priv;
-> +
-> +	dp83822->cfg_dac_minus = DP83826_CFG_DAC_MINUS_DEFAULT;
-> +	dp83822->cfg_dac_plus = DP83826_CFG_DAC_PLUS_DEFAULT;
->   }
->   #endif /* CONFIG_OF_MDIO */
->   
-> 
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Gentle ping to know if this patch is ok (patch 2/2 is not) and if so, 
-should I repost a v2 maybe ?
-
-Thanks !
-JM
+diff --git a/include/net/mctp.h b/include/net/mctp.h
+index 1ecbff7116f6..07d458990113 100644
+--- a/include/net/mctp.h
++++ b/include/net/mctp.h
+@@ -212,7 +212,7 @@ static inline struct mctp_skb_cb *mctp_cb(struct sk_buff *skb)
+ 
+ 	BUILD_BUG_ON(sizeof(struct mctp_skb_cb) > sizeof(skb->cb));
+ 	WARN_ON(cb->magic != 0x4d435450);
+-	return (void *)(skb->cb);
++	return cb;
+ }
+ 
+ /* If CONFIG_MCTP_FLOWS, we may add one of these as a SKB extension,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
