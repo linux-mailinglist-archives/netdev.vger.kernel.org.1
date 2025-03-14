@@ -1,201 +1,183 @@
-Return-Path: <netdev+bounces-174842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DDCCA60F3F
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 11:44:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E5F8A60F4D
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 11:50:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 415EC1B624F9
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 10:44:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7503117FDFC
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 10:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDC121FA26C;
-	Fri, 14 Mar 2025 10:44:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE3791FCF53;
+	Fri, 14 Mar 2025 10:50:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="erpJGrwQ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bWjvKezF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f68.google.com (mail-ej1-f68.google.com [209.85.218.68])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D6812E3364
-	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 10:44:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 147931779AE
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 10:50:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741949045; cv=none; b=tNm146oTAwSNUrdQuMUNC3dzsed4OSA5e0NgKZ8uZGum6jI6QARn8ebo7kVCI8pwCD/Zcl7+5xMuldcyKoTHtdj4vtLrBfBN2/1PC9tfOxj0HOoCcHS5iuryRSu5D1Wx2tltvF6ULjgjStW/nVRTB/ztwpzTSkljstIkxjDvSD4=
+	t=1741949432; cv=none; b=Da62lUKxvcjtCTetm1ExsjAhn1+An4uAyaFEdTkCYs4orWvjkKydvPJg0QaNUCm7q6m8mIFG0RWEXe2XGR3YlcQ8I623zHMLRw5eGNKccbYD3GfrWVSG5vhxQvg7F/Sl7HJ8aj0VuER7h2OCbrR3A/TNd4TPsqD7ORmXx2wOPnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741949045; c=relaxed/simple;
-	bh=yesTJPNbyIcSw648FltrN+NNbY8HcevtHpGeBr44k7w=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=kpSIzwCY46Ijk+HtOhYMzgsxGjV+0WUVE1goULzoKqSV7nLegRDBaNeqgxeqiVc+2nODK6XAJZXdkPrAgijJf/FhK8tvSExgMU0ikVOJhM6mhUAiv0XDKscE8cq70SfOhj/B/pt3rlXGZJL8SPpLMoKuDdQymjGj4MVcgw6UWCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=erpJGrwQ; arc=none smtp.client-ip=209.85.218.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f68.google.com with SMTP id a640c23a62f3a-aaec111762bso417509366b.2
-        for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 03:44:03 -0700 (PDT)
+	s=arc-20240116; t=1741949432; c=relaxed/simple;
+	bh=pV/i3PKyujs2F6/TFFWtpucAn/XpLc5VI6KGba6GnYM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=f5bL06MHc6wgorb+QHhSqau5p/XItLiAtvde4ds5wlW80/Z7huII80KC6F26Xl5Juq2voEpBPlubdzi9e3TOx8cBuLBaag0RJI8GztIFLwB0qQi8maEEeOYoSx/vY/MDhE3pjqDw91yPPalataz11jTJ1jqNYGTTn27TjyiLCZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=bWjvKezF; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43cfb6e9031so18602065e9.0
+        for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 03:50:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1741949042; x=1742553842; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=SbEOhoTEEu5x55+fPmrnGoGsT7RQD6j+d3DIIZHJ7QM=;
-        b=erpJGrwQZHOQAyxNmiWCMql0qfG/P2OzWHVGvaYHqFRC4k3EWrtNSoBzOkwEnXjK1T
-         a/YCjf0weFnySN1RDzhX2X1u5uDRNtYrpgOk6+OjnSWaMhlLVkECBAev4ByKOSTamr0H
-         uolwHQKFhPhfMNDUqrQeoh2FK4Le0v7ZExie73cGfBuKPlKUDJOtvqSpp+FbbKx0drGy
-         NYjy3o9TvApR2kx7Vg1CLheXuuE7YiA6VEm2h1pGydCcowDGuQbLOMsnPsAl7WRhmOKv
-         kQG+XC0i9MY/M7iSXVPiLplKNgyQGqrOXKH0bRBUrsFoJvyiq27Oy4nmElKCeHtFXd4K
-         Uwng==
+        d=linaro.org; s=google; t=1741949429; x=1742554229; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=od5SDVzRsqJnhKtT9u8lJ7jltmdYkNALPPyMQCmEgnE=;
+        b=bWjvKezFVyg/dTjqrHRKL3mHCD94ErMdVk26I1uPy9of4AJk/NQzz6M4uKHAKHTcZe
+         sW0/bX1ptaBk8pS8QLa+PI3Fuq1gK2yluv5qeylGfvTFfRWM/HNjr2iiKFnaTpYFP1UY
+         WoNspOvEDTPGMTP7FVzrI9JuYAWyqLdPTo461+P0lzekCSsKH3o4RW+czdvyY44w8BDq
+         mQDV9UmCmJMJjWtw/TzpQtBUK3qBrclhAbSp/gWOmiIHXDXyUDksttNTWoDVnyKzk6ga
+         VkNivDiPwTkcifgM6UsgufQx94vfsrpMJN1AER5wwfKKFtvI5s/dXF5Im1fCLk50q5jN
+         GTqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741949042; x=1742553842;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1741949429; x=1742554229;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SbEOhoTEEu5x55+fPmrnGoGsT7RQD6j+d3DIIZHJ7QM=;
-        b=xTaH38qMfU84rF31RiiIYrOMO5AyQowrK+1FzuEwWmezih7oMIvZb5gQ39kc8UUfID
-         itzfFxXK4i+FPcnyV1EWjLzX9KkDFddzHzMl1bLxSmb5X409mapXU8O8XjLN/rbyui1U
-         aPktKLBOun5oB6cGQcoahagXsH8Sj/otLhDCRMXp4cowSdyNLto6kzo7SeKaZpHyR5hd
-         lrYs3eYDI4vZ7N0I21/VE5r8e3SLdsVZHdLnXyKW8LFr+LK6l5UfCVgUFBlNc+VZAmaK
-         oypUpS5Yd+CIOzKxzOFOjO836ZBFZOtLT6xrFq+8Qs5IKGOKr7zGVbkQdx3y0hXAYWwq
-         CtkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXKnXz0oUek5ztoFmTlCTCgTMq/WE+/dN/ii6mb9s3d6/hFam9p3orMekL5t8+Qqe9riBIvyps=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzx9gL6qI6Z4yO63CAsuEQjOkZlqlRgxVMP1cH7KZdrDCVdOXHS
-	5P9656GKM/H4jvjIdyCMPsB/j7jiEoUitQIwz73medw6oH6J3gmYi9+qeoDQadE=
-X-Gm-Gg: ASbGncsnc5Z23jJy6UjwEAJX6/DBgoT2AgB1j20yMWFvS16WczHB8J8Is35i4fLXW7k
-	0g5rXMwZOGaSWA2np8kG+KIlbGRGrhmHioE8y0hJ+JWrZw6jB/dogx00ONGemu3E0WweoW1mKaM
-	kpqkdyoVAa+30ourkeZ8MtD1eWWZMiUDqhhayis+1SplqpfsGTWim91FedHVI7YF5BaHF3JomkU
-	0XT4w5VxFn8iy/cBC/fUmSR4OCq9IJeJXBCCGraUzgqDpVPEO2UydiXEWm2VtCHrtnMLDkhgIjE
-	s9Flk5iH/GtSln4/Xdcr3nWfrpPbHNHfmCCxGstVlBjiQg==
-X-Google-Smtp-Source: AGHT+IFSCVQoVEn7iPn/TuwJfbODuInfrvqO1582NK0pYg3MKgyFAbCeHu9p4jsr87CjNZKVjj3cpA==
-X-Received: by 2002:a17:907:3d87:b0:abf:6389:6d19 with SMTP id a640c23a62f3a-ac330258bcamr201708866b.15.1741949042421;
-        Fri, 14 Mar 2025 03:44:02 -0700 (PDT)
-Received: from [10.20.7.108] ([195.29.209.20])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3147f0bd3sm210194366b.67.2025.03.14.03.44.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Mar 2025 03:44:01 -0700 (PDT)
-Message-ID: <96a4043b-fdac-4ca1-a7b9-a6352b1d7dfe@blackwall.org>
-Date: Fri, 14 Mar 2025 12:44:00 +0200
+        bh=od5SDVzRsqJnhKtT9u8lJ7jltmdYkNALPPyMQCmEgnE=;
+        b=K7fwmiiVcbi/qZm1PU5AT63m646PYKr6vtyq509kaD7Jy5pu1V9B5uDgHsouzUlW2W
+         8EwPwtIoM1vKTr+XZkrMDZK0saPT4tXewPq8/579hKPwaeWQIkSEnJ3midHmefGKcMlN
+         1irnuNUk/OyU4fDAOYPxw0FONIgmt1ngQJbtcXxr4GYzkm6aT1Dy20klifo8OvyjqSp3
+         jF0+6Ygp0zmvGELDaj/U+xx3OQDLjujMUNDDq/007HyNltfkWTJ+fZsjXtQk31mK5kvk
+         e5teKR0IiivyzmybXomMN9o6qN52+f0Nb5QgLSgqdtI4Ce/BSZTTWtGajfJUrP2P0sCg
+         dVwQ==
+X-Gm-Message-State: AOJu0Yyc78qxwnmSoGRorMnQeqD0zo+o+EZx238bF4BHl+viEkxnSyLa
+	YIpXcnX2aaWhJ+YBpg8VeICt+7YEFhQL13i/sg3Mp/MqTcA1iCArGmkP07cabu2+RGFa9IqDJ0E
+	U
+X-Gm-Gg: ASbGncs4OUd4IqSP7txzfAB1A/3emOpq/7g8W2mIvdy5OkMfeqUGlUV3z6gVnl2/Ytp
+	/z82xkY/cMxmlstgCNdk+2fcNp7mglzkN3QKTtbzyhqISiUDC0ZNZwesEPKRzI0ogdQNNYtfhD4
+	VC19rxScGqQp92pkpZDTlYIwe2vpRl4QIrk8j9gMRnIBa9+V13DgG2xjeG0sdonzjHSOogM3fcM
+	GFnpODTrNjaEecOVAYFdwnifnb2v5ghuN6971srczSTG2LmuV//+5L74Ok+vlg76hVJHKu4rzU9
+	DFjrOEnRVPseNVjC6DIiKeqlreqgtMFBm/GeDPUFCjCb0relYR5F5mqRHn+A
+X-Google-Smtp-Source: AGHT+IHvBotvaSh2qWNqxyJfZlOzdoLexgIaj5jk8svfw+NdgPNIfM+Z0q5WgikQ9jzY6egbCNl3iA==
+X-Received: by 2002:a05:600c:4f8a:b0:43c:fbe2:df3c with SMTP id 5b1f17b1804b1-43d1ecee010mr22546485e9.26.1741949429283;
+        Fri, 14 Mar 2025 03:50:29 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-43d1fdbc4cesm9813735e9.0.2025.03.14.03.50.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Mar 2025 03:50:28 -0700 (PDT)
+Date: Fri, 14 Mar 2025 13:50:24 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: netdev@vger.kernel.org
+Subject: [bug report] net: ti: icssg-prueth: Add XDP support
+Message-ID: <70d8dd76-0c76-42fc-8611-9884937c82f5@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] bonding: check xdp prog when set bond mode
-From: Nikolay Aleksandrov <razor@blackwall.org>
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- Wang Liang <wangliang74@huawei.com>, jv@jvosburgh.net,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, john.fastabend@gmail.com, joamaki@gmail.com
-Cc: yuehaibing@huawei.com, zhangchangzhong@huawei.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-References: <20250314073549.1030998-1-wangliang74@huawei.com>
- <87y0x7rkck.fsf@toke.dk> <21d52659-622a-4b2a-b091-787bf0f5d67f@blackwall.org>
-Content-Language: en-US
-In-Reply-To: <21d52659-622a-4b2a-b091-787bf0f5d67f@blackwall.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 3/14/25 12:22 PM, Nikolay Aleksandrov wrote:
-> On 3/14/25 12:13 PM, Toke Høiland-Jørgensen wrote:
->> Wang Liang <wangliang74@huawei.com> writes:
->>
->>> Following operations can trigger a warning[1]:
->>>
->>>     ip netns add ns1
->>>     ip netns exec ns1 ip link add bond0 type bond mode balance-rr
->>>     ip netns exec ns1 ip link set dev bond0 xdp obj af_xdp_kern.o sec xdp
->>>     ip netns exec ns1 ip link set bond0 type bond mode broadcast
->>>     ip netns del ns1
->>>
->>> When delete the namespace, dev_xdp_uninstall() is called to remove xdp
->>> program on bond dev, and bond_xdp_set() will check the bond mode. If bond
->>> mode is changed after attaching xdp program, the warning may occur.
->>>
->>> Some bond modes (broadcast, etc.) do not support native xdp. Set bond mode
->>> with xdp program attached is not good. Add check for xdp program when set
->>> bond mode.
->>>
->>>     [1]
->>>     ------------[ cut here ]------------
->>>     WARNING: CPU: 0 PID: 11 at net/core/dev.c:9912 unregister_netdevice_many_notify+0x8d9/0x930
->>>     Modules linked in:
->>>     CPU: 0 UID: 0 PID: 11 Comm: kworker/u4:0 Not tainted 6.14.0-rc4 #107
->>>     Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.15.0-0-g2dd4b9b3f840-prebuilt.qemu.org 04/01/2014
->>>     Workqueue: netns cleanup_net
->>>     RIP: 0010:unregister_netdevice_many_notify+0x8d9/0x930
->>>     Code: 00 00 48 c7 c6 6f e3 a2 82 48 c7 c7 d0 b3 96 82 e8 9c 10 3e ...
->>>     RSP: 0018:ffffc90000063d80 EFLAGS: 00000282
->>>     RAX: 00000000ffffffa1 RBX: ffff888004959000 RCX: 00000000ffffdfff
->>>     RDX: 0000000000000000 RSI: 00000000ffffffea RDI: ffffc90000063b48
->>>     RBP: ffffc90000063e28 R08: ffffffff82d39b28 R09: 0000000000009ffb
->>>     R10: 0000000000000175 R11: ffffffff82d09b40 R12: ffff8880049598e8
->>>     R13: 0000000000000001 R14: dead000000000100 R15: ffffc90000045000
->>>     FS:  0000000000000000(0000) GS:ffff888007a00000(0000) knlGS:0000000000000000
->>>     CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>>     CR2: 000000000d406b60 CR3: 000000000483e000 CR4: 00000000000006f0
->>>     Call Trace:
->>>      <TASK>
->>>      ? __warn+0x83/0x130
->>>      ? unregister_netdevice_many_notify+0x8d9/0x930
->>>      ? report_bug+0x18e/0x1a0
->>>      ? handle_bug+0x54/0x90
->>>      ? exc_invalid_op+0x18/0x70
->>>      ? asm_exc_invalid_op+0x1a/0x20
->>>      ? unregister_netdevice_many_notify+0x8d9/0x930
->>>      ? bond_net_exit_batch_rtnl+0x5c/0x90
->>>      cleanup_net+0x237/0x3d0
->>>      process_one_work+0x163/0x390
->>>      worker_thread+0x293/0x3b0
->>>      ? __pfx_worker_thread+0x10/0x10
->>>      kthread+0xec/0x1e0
->>>      ? __pfx_kthread+0x10/0x10
->>>      ? __pfx_kthread+0x10/0x10
->>>      ret_from_fork+0x2f/0x50
->>>      ? __pfx_kthread+0x10/0x10
->>>      ret_from_fork_asm+0x1a/0x30
->>>      </TASK>
->>>     ---[ end trace 0000000000000000 ]---
->>>
->>> Fixes: 9e2ee5c7e7c3 ("net, bonding: Add XDP support to the bonding driver")
->>> Signed-off-by: Wang Liang <wangliang74@huawei.com>
->>> ---
->>>  drivers/net/bonding/bond_options.c | 3 +++
->>>  1 file changed, 3 insertions(+)
->>>
->>> diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
->>> index 327b6ecdc77e..127181866829 100644
->>> --- a/drivers/net/bonding/bond_options.c
->>> +++ b/drivers/net/bonding/bond_options.c
->>> @@ -868,6 +868,9 @@ static bool bond_set_xfrm_features(struct bonding *bond)
->>>  static int bond_option_mode_set(struct bonding *bond,
->>>  				const struct bond_opt_value *newval)
->>>  {
->>> +	if (bond->xdp_prog)
->>> +		return -EOPNOTSUPP;
->>> +
->>
->> Should we allow changing as long as the new mode also supports XDP?
->>
->> -Toke
->>
->>
-> 
-> +1
-> I think we should allow it, the best way probably is to add a new option 
-> BOND_VALFLAG_XDP_UNSUPP (for example) as a bond option flag and to set
-> it in bond_options.c for each mode that doesn't support XDP, then you
-> can do the check in a generic way (for any option) in
-> bond_opt_check_deps. Any bond option that can't be changed with XDP prog
+Hello Roger Quadros,
 
-err, I meant any bond option's value that isn't supported with XDP, for
-a whole option it would be a bit different
+Commit 62aa3246f462 ("net: ti: icssg-prueth: Add XDP support") from
+Mar 5, 2025 (linux-next), leads to the following Smatch static
+checker warning:
 
-> should have that flag set.
-> 
-> Cheers,
->  Nik
-> 
+	drivers/net/ethernet/ti/icssg/icssg_common.c:635 emac_xmit_xdp_frame()
+	error: we previously assumed 'first_desc' could be null (see line 584)
 
+drivers/net/ethernet/ti/icssg/icssg_common.c
+   563  u32 emac_xmit_xdp_frame(struct prueth_emac *emac,
+   564                          struct xdp_frame *xdpf,
+   565                          struct page *page,
+   566                          unsigned int q_idx)
+   567  {
+   568          struct cppi5_host_desc_t *first_desc;
+   569          struct net_device *ndev = emac->ndev;
+   570          struct prueth_tx_chn *tx_chn;
+   571          dma_addr_t desc_dma, buf_dma;
+   572          struct prueth_swdata *swdata;
+   573          u32 *epib;
+   574          int ret;
+   575  
+   576          if (q_idx >= PRUETH_MAX_TX_QUEUES) {
+   577                  netdev_err(ndev, "xdp tx: invalid q_id %d\n", q_idx);
+   578                  return ICSSG_XDP_CONSUMED;      /* drop */
+
+Do we need to free something on this path?
+
+   579          }
+   580  
+   581          tx_chn = &emac->tx_chns[q_idx];
+   582  
+   583          first_desc = k3_cppi_desc_pool_alloc(tx_chn->desc_pool);
+   584          if (!first_desc) {
+   585                  netdev_dbg(ndev, "xdp tx: failed to allocate descriptor\n");
+   586                  goto drop_free_descs;   /* drop */
+                        ^^^^^^^^^^^^^^^^^^^^
+This will dereference first_desc and crash.
+
+   587          }
+   588  
+   589          if (page) { /* already DMA mapped by page_pool */
+   590                  buf_dma = page_pool_get_dma_addr(page);
+   591                  buf_dma += xdpf->headroom + sizeof(struct xdp_frame);
+   592          } else { /* Map the linear buffer */
+   593                  buf_dma = dma_map_single(tx_chn->dma_dev, xdpf->data, xdpf->len, DMA_TO_DEVICE);
+   594                  if (dma_mapping_error(tx_chn->dma_dev, buf_dma)) {
+   595                          netdev_err(ndev, "xdp tx: failed to map data buffer\n");
+   596                          goto drop_free_descs;   /* drop */
+   597                  }
+   598          }
+   599  
+   600          cppi5_hdesc_init(first_desc, CPPI5_INFO0_HDESC_EPIB_PRESENT,
+   601                           PRUETH_NAV_PS_DATA_SIZE);
+   602          cppi5_hdesc_set_pkttype(first_desc, 0);
+   603          epib = first_desc->epib;
+   604          epib[0] = 0;
+   605          epib[1] = 0;
+   606  
+   607          /* set dst tag to indicate internal qid at the firmware which is at
+   608           * bit8..bit15. bit0..bit7 indicates port num for directed
+   609           * packets in case of switch mode operation
+   610           */
+   611          cppi5_desc_set_tags_ids(&first_desc->hdr, 0, (emac->port_id | (q_idx << 8)));
+   612          k3_udma_glue_tx_dma_to_cppi5_addr(tx_chn->tx_chn, &buf_dma);
+   613          cppi5_hdesc_attach_buf(first_desc, buf_dma, xdpf->len, buf_dma, xdpf->len);
+   614          swdata = cppi5_hdesc_get_swdata(first_desc);
+   615          if (page) {
+   616                  swdata->type = PRUETH_SWDATA_PAGE;
+   617                  swdata->data.page = page;
+   618          } else {
+   619                  swdata->type = PRUETH_SWDATA_XDPF;
+   620                  swdata->data.xdpf = xdpf;
+   621          }
+   622  
+   623          cppi5_hdesc_set_pktlen(first_desc, xdpf->len);
+   624          desc_dma = k3_cppi_desc_pool_virt2dma(tx_chn->desc_pool, first_desc);
+   625  
+   626          ret = k3_udma_glue_push_tx_chn(tx_chn->tx_chn, first_desc, desc_dma);
+   627          if (ret) {
+   628                  netdev_err(ndev, "xdp tx: push failed: %d\n", ret);
+   629                  goto drop_free_descs;
+   630          }
+   631  
+   632          return ICSSG_XDP_TX;
+   633  
+   634  drop_free_descs:
+   635          prueth_xmit_free(tx_chn, first_desc);
+   636          return ICSSG_XDP_CONSUMED;
+   637  }
+
+
+regards,
+dan carpenter
 
