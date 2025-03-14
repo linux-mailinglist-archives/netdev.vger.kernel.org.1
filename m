@@ -1,192 +1,230 @@
-Return-Path: <netdev+bounces-174935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56C02A61729
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 18:12:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4547CA61730
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 18:14:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 204151B60C83
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 17:13:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A2F916A3A0
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 17:14:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEA3120409D;
-	Fri, 14 Mar 2025 17:12:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 911951FF617;
+	Fri, 14 Mar 2025 17:13:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b="lvYwnnR2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a/8rpJph"
 X-Original-To: netdev@vger.kernel.org
-Received: from orbyte.nwl.cc (orbyte.nwl.cc [151.80.46.58])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3B3D1FDA7A
-	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 17:12:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=151.80.46.58
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741972369; cv=none; b=mAdmgA7TMw7L40l7iEZm7tXpybX/r0a9/DxnYH7b4z8p73uW3BVcEG805hbtrFK1e53wI3loLLGAJRYX46vzIGc+8F/VcTWNRmDU+8YTx3hY/gT0f/63Max5V9DB2+RBeT5//UU2qw7RkKJ5bBj2AFRk0mHhhcxMRYPJacLxwVs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741972369; c=relaxed/simple;
-	bh=+2bAPxpEgLNbLfmOzPnSbEOmjjT26GRGlcHUskm9ptU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ji1VgHGPHlI5A8BXiUVGOURz2kR1ygv4lTgLoM9kOfbGdqCW38p7WAh7ykpvPf6Vh6v4uZ4MKZ0kigx0dYNrlFbQLtAij+fw95vccB9wFxpjkmVX++h68SsrBBdglswxEI0sc9m32Va8iYyBLt8FMJfUyrVDKdRVpW/tQPMeesA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc; spf=pass smtp.mailfrom=nwl.cc; dkim=pass (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b=lvYwnnR2; arc=none smtp.client-ip=151.80.46.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nwl.cc
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nwl.cc;
-	s=mail2022; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=/NTzv4DttY45rMbVG44ASdHnEHFJkKf67vqSh/R036k=; b=lvYwnnR2corAQH/gcoLA34F6kr
-	oF96kM/vAj9EPB1eWpRvKg5p1G40gzrpYlDOFNbT8QUQXRjtqQbwJ7wSS5z9BIhBhTi5eyPdG/HtY
-	t2kw46qjUZDfBpuaR7jcbb7pJbP3Uqsx1W1ws4FX/Sefbl3XxomIl5Sd4THRP9St+cWiLBb7ncV5z
-	aobeEXGRY43rx8G6LyA3c4SqAoehhbvio75af0TMxijUPUtLG1rQMoSq34hxvyu1rmm8Fx9HFj1HP
-	eCW+FUi9aCsv+HjrY79iuRN9ygXmkkQvQ3u2FMhJhcXGT7jlXjaydbt8K/2m8BqFfAC1KvQsVOA9q
-	r4fTiggg==;
-Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.97.1)
-	(envelope-from <phil@nwl.cc>)
-	id 1tt8aL-000000002kf-2wpd;
-	Fri, 14 Mar 2025 18:12:37 +0100
-Date: Fri, 14 Mar 2025 18:12:37 +0100
-From: Phil Sutter <phil@nwl.cc>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: Matteo Croce <technoboy85@gmail.com>, netdev@vger.kernel.org,
-	Matteo Croce <teknoraver@meta.com>
-Subject: Re: [PATCH iproute2-next v2] color: default to dark color theme
-Message-ID: <Z9RjhTfXi86Jo7SL@orbyte.nwl.cc>
-Mail-Followup-To: Phil Sutter <phil@nwl.cc>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	Matteo Croce <technoboy85@gmail.com>, netdev@vger.kernel.org,
-	Matteo Croce <teknoraver@meta.com>
-References: <20250310203609.4341-1-technoboy85@gmail.com>
- <20250310141216.5cdfd133@hermes.local>
- <Z9LBZsdh3PsjuB28@orbyte.nwl.cc>
- <CAFnufp0e-GNCsjXw-KUjnTx+A4TP_gQTW4-HK2T8kYxH-PMxkg@mail.gmail.com>
- <Z9LJ_zDqy8iKpX7y@orbyte.nwl.cc>
- <20250313093035.18848cf0@hermes.local>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD52F1C862D
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 17:13:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741972437; cv=fail; b=iAfdb3xhdCgcRuYyOEhq1bmeejgv/l/1ptcvM7XhIhxrT/ntJQhiMKuxBF/PeMuX2DJaVxHlB2Lyxkgs8ZNaaD96M6O/g5rBhAS68EeA7RxPauNMQsWjCsiwddoh+WuRX8XNrXDpHepyoFbOF+zREhqppBW+0ogyF+n+VBJj390=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741972437; c=relaxed/simple;
+	bh=pXcXbieCzW2ZLJANIv9aGrXLZVaMkINtBoysdExnT7w=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=XkCveFu3ACQThDNUG3CLWgqrRBlWslLrv19cc8ELXaQUho+pag0DCEe5WhTDXtqohjLKpe/mfFR7CaTfrX7j+ft+OfsYtFm8h+V6GYn3OvLkvjSu59eJTudyJz7NsGgwPy3yekbBxHFPvRqrDB8zbbfnuBObD7rZ47/VMeOycCA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=a/8rpJph; arc=fail smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741972436; x=1773508436;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=pXcXbieCzW2ZLJANIv9aGrXLZVaMkINtBoysdExnT7w=;
+  b=a/8rpJphUaCdaZV95irRbK3F2vvYMi0+uw7wW8qoFVrvCJih216E8PwU
+   knd2Q23XVJHoduO8VR3jfFyU+BHBH7kYQoIedMmsiWli4PoNwZblBnher
+   piFbweolWwbH0PN9ayDjXw7GZ+oaZuuPRl67f9mKz4XwVNOipTTG2NXLi
+   1UAdUhreN9rUvtjmNXqlw6V/9PwCvNqbG5Qd1A886ScveNM/QA2b7rQjC
+   cUFfOOxLDtqe3A6izAbhIKkXDLn6jGp1AxiZaf78keCIHRbWznAtjivz7
+   37+3wvunE0DbUgQLHxc1elbnEI9eNJbGoIioYi0/QByopro7ZpZ5uXEY6
+   Q==;
+X-CSE-ConnectionGUID: 9EALcBD1SZegkvQvQ4qhvg==
+X-CSE-MsgGUID: mTZHw7LaSs+gAFlCaI7AgA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11373"; a="60676600"
+X-IronPort-AV: E=Sophos;i="6.14,246,1736841600"; 
+   d="scan'208";a="60676600"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2025 10:13:55 -0700
+X-CSE-ConnectionGUID: cOjTbBsCS4iwb1VULXL/qw==
+X-CSE-MsgGUID: rjb490gJTaGE9WMN+Aoi3w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,246,1736841600"; 
+   d="scan'208";a="152229534"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2025 10:13:55 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Fri, 14 Mar 2025 10:13:54 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Fri, 14 Mar 2025 10:13:54 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.46) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Fri, 14 Mar 2025 10:13:54 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=GG8j+GViJXbcfwwRsyqioiAFGDQWqcPrBBOrruUuDTE3wW59KlhjtNkeCiq3gwjkHg2ZFwfvfqeKus84DlIzwALcWxZiLssSFpC9x5S3l/Cj/Z1FdBz3m/p5xG3YijK1i2i9RwY9kLB2l6FYn6XSQsSpWH/1Qp+4KSPWJ8lf6t0yL1raI2lf0izo0sWWdrcMsFHxLxtySvZbF2q2L2ib5VzNMfRbHb2E941/YK6mH/dZBuQUu9G8bDyHXXjgODCCo9ycpjFgBmwUWyGhaalsMX3V01KQ/Z+5uogKhz9pSH5Puaq0aPN5q6C5u6B8v5Fd3d60NsC73ZkfHeSNwluWSQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pXcXbieCzW2ZLJANIv9aGrXLZVaMkINtBoysdExnT7w=;
+ b=nyedKEf7wvAAvwVYxdqQ4u6N6yibX7h0ERG5aN6DcZmqwfjYrTpzktySlCW58S0rR/2OePW9u7ygbRO8RbYMWLx+jXf6zrPpuaU7sAj2aNtL+3r4e+J9vvQwi7O57Q1IwmK9v1hgFwzd+aId8Bs1kwZENSOszIXWS/UxVmPI+KGuXg5HMZV4ZcP+l1cw2haBQno5Id/9RRrIC1HFKc2pk86oSJo+MwCaU9ouyV5E7PGGHRqapCN9SBTWP1Ikv1P2NWZHKQjL7KU+aGnc/mf8mZnCbopPxVzLHOAqb2IbhSgNWvpWYI8sFt3CcoAyj2biRJUiGpagGJdAtcuTDVRBgQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SJ1PR11MB6297.namprd11.prod.outlook.com (2603:10b6:a03:458::8)
+ by DS0PR11MB7441.namprd11.prod.outlook.com (2603:10b6:8:141::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.28; Fri, 14 Mar
+ 2025 17:13:51 +0000
+Received: from SJ1PR11MB6297.namprd11.prod.outlook.com
+ ([fe80::dc50:edbf:3882:abf7]) by SJ1PR11MB6297.namprd11.prod.outlook.com
+ ([fe80::dc50:edbf:3882:abf7%4]) with mapi id 15.20.8511.026; Fri, 14 Mar 2025
+ 17:13:51 +0000
+From: "Salin, Samuel" <samuel.salin@intel.com>
+To: "Polchlopek, Mateusz" <mateusz.polchlopek@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Polchlopek, Mateusz"
+	<mateusz.polchlopek@intel.com>, "Lobakin, Aleksander"
+	<aleksander.lobakin@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v2] idpf: assign extracted
+ ptype to struct libeth_rqe_info field
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v2] idpf: assign extracted
+ ptype to struct libeth_rqe_info field
+Thread-Index: AQHbiuZBNA9UxxQ20EGbplAXGvCFvLNy8i+Q
+Date: Fri, 14 Mar 2025 17:13:51 +0000
+Message-ID: <SJ1PR11MB6297DD4EE685C85E77762C229BD22@SJ1PR11MB6297.namprd11.prod.outlook.com>
+References: <20250301190423.613493-1-mateusz.polchlopek@intel.com>
+In-Reply-To: <20250301190423.613493-1-mateusz.polchlopek@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ1PR11MB6297:EE_|DS0PR11MB7441:EE_
+x-ms-office365-filtering-correlation-id: 49ba3d4c-8605-4d9d-256f-08dd631b9771
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7053199007|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?LEzsAXoWO8aErfVVFT3xwLY4yLohfn0FTEDOwy3Nvj//t+AxF+SNyV1zW8Y5?=
+ =?us-ascii?Q?M28SsrgHvTqbr2yQ5WA3FiYqAYA2aFIHYlt7/M7AlmFrXX6LIBPnW9IeTXsI?=
+ =?us-ascii?Q?xcNDEmYikUpOyxtRO+9pa9vcZtjZm/e6AgmUgy0qw58fXdkwoFIlwdSWWeN7?=
+ =?us-ascii?Q?jyalaRUZvVu8CsiPudSWZ72ZmKvb3VvY1Me3GHehEkoTO869spxkOj6+8FGK?=
+ =?us-ascii?Q?+ZnXV0xRo8jnkbxINzK8kaHDMEdcDzt4QgSn/0q+HgRi/7cXByculgLBaFdY?=
+ =?us-ascii?Q?X/1Sn9pOUmTEo0vDdanJ32tYshha5zGVTEq3ke2HyBrlR0SrtPHyTkOsTwyI?=
+ =?us-ascii?Q?MBgQ1vxYn5gWQue99TTHSnoCabJYGtRYHeRFrG1XiLRp4Ej2bzgd0RC5LO9j?=
+ =?us-ascii?Q?juu/tta1kjhUG/gcuf7DsOq3RTH6vFYM8FGDn0/6UAwD2aKTlupF8KHUTD7P?=
+ =?us-ascii?Q?Zhw2fJqhXCYtBFz7ISzg0nhkQAYZOcL9bTUnYE65Avcc9SBCbHZWVofXH4RA?=
+ =?us-ascii?Q?9ix9QDM5DlbxqJjbSR8krJMIfWE5HQUejlHEv57iqECNUYqSvSbxqusmNhP9?=
+ =?us-ascii?Q?rSyO0dqx6GgzMGasiPMaidSJcKWUUD5HvdTLrSMxCwYUFnBZ98TEnH3pa9KF?=
+ =?us-ascii?Q?/7UN0Z893khlTB2PlF+TZ0riRIshXCEkIoIAqkADdfNBZZeXYlkR+wRZHAgg?=
+ =?us-ascii?Q?uXVdCG6CLkL0qKp4OJay3cv1K7WtRWb2Ie7fE0nyd+8zwqepuTkLcrJrvCsC?=
+ =?us-ascii?Q?chtmuqfEep3cHs00LXJcgLpyZVf/8Z7XUkGIPIwdAzaR+J8m9tBOYPc/pevb?=
+ =?us-ascii?Q?fAKVvlmTXpFphqgGmldfjfqXGZoYvlqXVJ+vfIkTIfgfwbn8xHkHuZUCQTP4?=
+ =?us-ascii?Q?WCL/U70FfZnBURj9PbM5NHnu6Qr6PdyO56cH8eN6kmvYhG9rMI9WaPtdUMqv?=
+ =?us-ascii?Q?hWFsdKZyhRrhnK9/NYmTTHrJqA7lK3zJ/58gBsdMKL7FFKypxIiQeybzid15?=
+ =?us-ascii?Q?JOm00GiwF32xb9Vm0QGzEViqFK3eQ6P+36CwVY5kMdpsFIw8DIjo/YkPc4eu?=
+ =?us-ascii?Q?WGl9TYbVqGyf8evrs7vDrexsuZaGqNYJMbn63He/fx3Szo+HlAk228UayV2r?=
+ =?us-ascii?Q?oufpt6rSCmgC9zDf9u14Lwj3vTq6u4UoOJltFzviw4iWww+MLEMwUazZ+89Y?=
+ =?us-ascii?Q?NUVWPMJ/nTfuz2ZNC4qjonm1FEC0le+H8MtO8Qi4NRFjvht+Lkl+THZSkosj?=
+ =?us-ascii?Q?F9mYJ46c+qgHNDkrcmcRSw3A7dn3KHRCEm2ufrd1ukwVEiQIAt9/WOuBsmHV?=
+ =?us-ascii?Q?GWmx1sM06JpOBrB4cq9OGVk2PwY1X/ptyWAzpbAMMqlkw4Q5YLuwWk4oRmpM?=
+ =?us-ascii?Q?JWUIwF90AOjezjg/hTmnSPTQw1sbZKGbGBeeiN/N7KrSBt0pDgpy8aPuHy2D?=
+ =?us-ascii?Q?pHDksvL0zaMeuDI+vBOV7fFSaXLLKl5F?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR11MB6297.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7053199007)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Kgl61u9u5EXMEqmgpLFFOIuAJKc9ISL8Kx8P6M7pF4UZdfFnBVq6ihf7o1l6?=
+ =?us-ascii?Q?TYyOZkKK8bSH1jzB9cekc2vS7qc/YNjaVIQjpdN818ivsIieT0NQXYqCz30p?=
+ =?us-ascii?Q?q4sAZ4hAoViwBx38/Wr97JBkr0GipFMb4V+1ZEpLvD1Nu4c7Kjtl8QGnRlOR?=
+ =?us-ascii?Q?5opHa0MwaPfICtds+plvmpNsHlr5XSrZenXBtRAAcP4j3jvPrZwVPf8yJce5?=
+ =?us-ascii?Q?QJgPRhe1XB2/cmseNpBQEWJhkw9+TWIK4ANC4LJ5SJUdMWys9Wdorx9Io5dn?=
+ =?us-ascii?Q?CQybf1nB+YpWUQTXLXD2gLoKTed4fRqRzTbpr7NgtdFuRuqA2BmiAqp2wut5?=
+ =?us-ascii?Q?EKjcM/LWjZSDMh8wv2WmTKq9catpluYCpHm4dg/7kF4+XvU5NFYYhJzF+h5O?=
+ =?us-ascii?Q?iej5MO0M7VA7fpYrK51HIiuciA1fUvXsWjS1lo+Pa8rIknaRaxrhVt7BiXMM?=
+ =?us-ascii?Q?xoAba+4BRa7jvmKcYaeTvGc+C/6q5udSnF58ODE7q63bd5fstzg7BG3loGlz?=
+ =?us-ascii?Q?31Z2m9//r5q2vJo96/wp9CmlRyzvSdt/Ds//N2eK9DTh/hhF4qAc3TRF5nJy?=
+ =?us-ascii?Q?ZNUyCqlbGXn/ZdRP4nn6AmE5SrDnOSZu56KBjy/0ILlX/lDdnlR/mOR+9rTI?=
+ =?us-ascii?Q?8+Xg2EhqxeCI9Gk8QXcJYXxyLlXyE5yE5g1WVM0D87ZGqce6lun/7BFDWvmX?=
+ =?us-ascii?Q?GT8AEq6/TKl79SXnm7X7ngrcBf7V3XX0jBzdJC8m83U4RBt5PaY2dv1bP2LI?=
+ =?us-ascii?Q?WsGecTmD9DYlwX5Mlp5uDLSp+PVI7RcDJuRXh5u2jbifl0Wvyfsrc8j6mkqe?=
+ =?us-ascii?Q?JKjDPER2UtzpiJ4xe5vogf6mkrPbEdcne6V6x5l13PRHbdxY0u4ZdXL9tSCR?=
+ =?us-ascii?Q?hTSkiTCdX7Wygyqo2/1QTdFYiL7Bnf740smm936kT434zo83WmAH4Esc3Zh8?=
+ =?us-ascii?Q?fBZxnWUtPW+yGbaxJmMsQISK2+Ez+UXaWLIac9uUClhQetfQBvOYDNAMVCEy?=
+ =?us-ascii?Q?tgGEp5NnQbXx/yrTl0VY3fiJaDPyFl/fjklNLwLi2rYlv3SZVLK8tDRA6SNN?=
+ =?us-ascii?Q?H/K4LzQ6tapDhxw6zkT4yX2NPtBoWeYlrBAhzBhsx0ik4pHgeimEraasjBT+?=
+ =?us-ascii?Q?wVqOrOx+q1ArqpoE5vb7ctkI2gxu07DRrpUQxCMRTKdyKJdlrNfXlNdQG2Iv?=
+ =?us-ascii?Q?gchZQTBTxtZacQpj7m/QMCTTMpMAJt5mwjWlnYGU4k83ypbPIFn1Nur8AzHl?=
+ =?us-ascii?Q?0jJdrQOy8Qvwbei8xX2GaHrKENg0tmFOv9Uigt9jmUfSh7jghe0gNiEMqvtA?=
+ =?us-ascii?Q?kFN4XFGkYsnuMeLTgJNPjx4AYue9mNmCtwv9qSwOhrJE7zquLRJBSh4oKFTk?=
+ =?us-ascii?Q?ya4IIgQbgkhoyPD5dqt/7jqTceO3r8plARvTpDBEwlN5aq1VU/zttPRrXTzi?=
+ =?us-ascii?Q?KzezyTxtWK8CeH6k0+bysyS54isPjgrM5y0SIrvVujJUp0X5Cd1kcTvT7n8I?=
+ =?us-ascii?Q?62Vm3d65Y50usW43NDDjR0nCnXEGhB9FS2vD5uXRqJfheRulWTiVHtMgZhL8?=
+ =?us-ascii?Q?W7BAJMz6SJ7jTTQ4GYJESKMYAtG/4pffRkALpHMF?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250313093035.18848cf0@hermes.local>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ1PR11MB6297.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 49ba3d4c-8605-4d9d-256f-08dd631b9771
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Mar 2025 17:13:51.2165
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: DuwIQ0E/gnHlOpMU+f4hP6nu7x7h57P8K6EfKHZurWgnwdoLcx/iZwvoRFYRhdLte314BTpqmKCcdgM6DdVmBw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7441
+X-OriginatorOrg: intel.com
 
-On Thu, Mar 13, 2025 at 09:30:35AM -0700, Stephen Hemminger wrote:
-> On Thu, 13 Mar 2025 13:05:19 +0100
-> Phil Sutter <phil@nwl.cc> wrote:
-> 
-> > On Thu, Mar 13, 2025 at 12:41:54PM +0100, Matteo Croce wrote:
-> > > Il giorno gio 13 mar 2025 alle ore 12:28 Phil Sutter <phil@nwl.cc> ha scritto:  
-> > > >
-> > > > On Mon, Mar 10, 2025 at 02:12:16PM -0700, Stephen Hemminger wrote:  
-> > > > > On Mon, 10 Mar 2025 21:36:09 +0100
-> > > > > Matteo Croce <technoboy85@gmail.com> wrote:
-> > > > >  
-> > > > > > From: Matteo Croce <teknoraver@meta.com>
-> > > > > >
-> > > > > > The majority of Linux terminals are using a dark background.
-> > > > > > iproute2 tries to detect the color theme via the `COLORFGBG` environment
-> > > > > > variable, and defaults to light background if not set.
-> > > > > >  
-> > > > >
-> > > > > This is not true. The default gnome terminal color palette is not dark.  
-> > > >
-> > > > ACK. Ever since that famous movie I stick to the real(TM) programmer
-> > > > colors of green on black[1], but about half of all the blue pill takers
-> > > > probably don't.
-> > > >  
-> > > > > > Change the default behaviour to dark background, and while at it change
-> > > > > > the current logic which assumes that the color code is a single digit.
-> > > > > >
-> > > > > > Signed-off-by: Matteo Croce <teknoraver@meta.com>  
-> > > > >
-> > > > > The code was added to follow the conventions of other Linux packages.
-> > > > > Probably best to do something smarter (like util-linux) or more exactly
-> > > > > follow what systemd or vim are doing.  
-> > > >
-> > > > I can't recall a single system on which I didn't have to 'set bg=dark'
-> > > > in .vimrc explicitly, so this makes me curious: Could you name a
-> > > > concrete example of working auto color adjustment to given terminal
-> > > > background?
-> > > >
-> > > > Looking at vim-9.1.0794 source code, I see:
-> > > >
-> > > > |     char_u *
-> > > > | term_bg_default(void)
-> > > > | {
-> > > > | #if defined(MSWIN)
-> > > > |     // DOS console is nearly always black
-> > > > |     return (char_u *)"dark";
-> > > > | #else
-> > > > |     char_u      *p;
-> > > > |
-> > > > |     if (STRCMP(T_NAME, "linux") == 0
-> > > > |             || STRCMP(T_NAME, "screen.linux") == 0
-> > > > |             || STRNCMP(T_NAME, "cygwin", 6) == 0
-> > > > |             || STRNCMP(T_NAME, "putty", 5) == 0
-> > > > |             || ((p = mch_getenv((char_u *)"COLORFGBG")) != NULL
-> > > > |                 && (p = vim_strrchr(p, ';')) != NULL
-> > > > |                 && ((p[1] >= '0' && p[1] <= '6') || p[1] == '8')
-> > > > |                 && p[2] == NUL))
-> > > > |         return (char_u *)"dark";
-> > > > |     return (char_u *)"light";
-> > > > | #endif
-> > > > | }
-> > > >
-> > > > So apart from a little guesswork based on terminal names, this does the
-> > > > same as iproute currently (in his commit 54eab4c79a608 implementing
-> > > > set_color_palette(), Petr Vorel even admitted where he had copied the
-> > > > code from). No hidden gems to be found in vim sources, at least!
-> > > >
-> > > > Cheers, Phil
-> > > >
-> > > > [1] And have the screen rotated 90 degrees to make it more realistic,
-> > > >     but that's off topic.  
-> > > 
-> > > I think that we could use the OSC command 11 to query the color:
-> > > 
-> > > # black background
-> > > $ echo -ne '\e]11;?\a'
-> > > 11;rgb:0000/0000/0000
-> > > 
-> > > # white background
-> > > $ echo -ne '\e]11;?\a'
-> > > 11;rgb:ffff/ffff/ffff  
-> > 
-> > Maybe a better technique than checking $COLORFGBG. Note that:
-> > 
-> > - This may return rgba and a transparency value
-> > - In 'xterm -bg green', it returns '11;rgb:0000/ffff/0000'
-> > 
-> > So the value may not be as clear as in the above cases.
-> > 
-> > Cheers, Phil
-> 
-> Rather than hard coding color palettes it would be better to use some
-> form of environment or config file to allow user to choose.
 
-I think we have that already. Quoting from ip(8):
 
- -c[color][={always|auto|never}
-    [...]
-    Used color palette can be influenced by COLORFGBG environment
-    variable (see ENVIRONMENT).
- [...]
- ENVIRONMENT
-    COLORFGBG
-      If set, it’s value is used for detection whether background is
-      dark or light and use contrast colors for it.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Mateusz Polchlopek
+> Sent: Saturday, March 1, 2025 11:03 AM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; Polchlopek, Mateusz
+> <mateusz.polchlopek@intel.com>; Lobakin, Aleksander
+> <aleksander.lobakin@intel.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-next v2] idpf: assign extracted pty=
+pe to
+> struct libeth_rqe_info field
+>=20
+> Assign the ptype extracted from qword to the ptype field of struct
+> libeth_rqe_info.
+> Remove the now excess ptype param of idpf_rx_singleq_extract_fields(),
+> idpf_rx_singleq_extract_base_fields() and
+> idpf_rx_singleq_extract_flex_fields().
+>=20
+> Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+> ---
+> v2: removed excess function parameter 'ptype' description in
+> idpf_rx_singleq_extract_fields() - reported by kernel bot. No code or
+> functional changes.
+>=20
+> v1: initial patch
+> https://lore.kernel.org/netdev/20250227123837.547053-1-
+> mateusz.polchlopek@intel.com/
+> ---
 
-      COLORFGBG  environment  variable  usually contains either two or
-      three values separated by semicolons; we want the last value in
-      either case. If this value is 0-6 or 8, chose colors suitable for
-      dark background:
-
-      COLORFGBG=";0" ip -c a
-
-Cheers, Phil
+Tested-by: Samuel Salin <Samuel.salin@intel.com>
 
