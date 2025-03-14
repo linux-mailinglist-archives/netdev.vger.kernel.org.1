@@ -1,112 +1,122 @@
-Return-Path: <netdev+bounces-174967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7DA2A61B11
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 20:53:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BB85A61C23
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 21:14:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 808D17A65A4
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 19:52:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5C093AF060
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 20:13:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81ED02046BB;
-	Fri, 14 Mar 2025 19:53:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A78E12036EC;
+	Fri, 14 Mar 2025 20:11:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Tn9zZW5+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VXBuaULy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 065981EA7C9;
-	Fri, 14 Mar 2025 19:53:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 720851FECC5;
+	Fri, 14 Mar 2025 20:11:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741981997; cv=none; b=nHbgqT4NZfeZadbm6ibYSvwoGoh39ommBIaKnwDWHEXrujsW/sSNSvtzBT7ZskCxej1BCFBIimfa2EuV10kY8nMxb0sRaWtVs7OA8+o3A5xJugB2MVtz5IcmX1meIJWCa9D/h4FUTfU3jThksWIqFyUKi4/cUcrZ9tTAcyNfbcM=
+	t=1741983117; cv=none; b=iEbAzFo2xO1AR7XGzyBSgLUetj0G1rres9Q/IkyKXKzNaA/P9QCGQl2Y4t77uA4QdYdclyAeiKgkol+1+pbjGKGXhISPrSLZ2od9tFPXT+ly2jKk/tS4n8gK9UGD0/wkmc3MRT7Dv3UPYxmOqmFjb/cY/LcqrORRrX3S5wE74H4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741981997; c=relaxed/simple;
-	bh=gM8WfVyBII6/j2HL+ucdv6nq4ooU7ZXCHfPJvRUhjAE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UPDF4yaELg6t2njvuDmbXRt1u059TUNA4imLRp/kq3j7tCLpQFO/+fuxnOMoINGc7tXiqk6O+F1XsObx8aU+u/0G1DAagFk6qYQCFF2s1p8ALa5ZNI8Fv65Zo/u5kTsACz66Xp1IKa3DtSvFWU8kEiyZW9tjbHp4sezEW35PRh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Tn9zZW5+; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1741981992; x=1773517992;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Ct5qp0A+ZizoTLQyrd/scXocaq2Cjowfc7prgTEJsnc=;
-  b=Tn9zZW5+Yu4ECCEAztBlw+IDVKzUtvfCdtgfkHVora/xLs+mp4o9QMZ2
-   OAXp+Ap7AUL48BuTDyXORIBffMj0Q/u82J5kOjcp3uineFYM2eaNpG8dn
-   2w/PvISWpMZ5GLpkzRARIFj02CKZXl98TLL7frvVDVPdD+BBQHq3+hBmH
-   U=;
-X-IronPort-AV: E=Sophos;i="6.14,246,1736812800"; 
-   d="scan'208";a="178745445"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2025 19:53:10 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:54232]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.22.127:2525] with esmtp (Farcaster)
- id 02162e03-ab2f-4946-b016-fed5ef51015b; Fri, 14 Mar 2025 19:53:10 +0000 (UTC)
-X-Farcaster-Flow-ID: 02162e03-ab2f-4946-b016-fed5ef51015b
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 14 Mar 2025 19:53:09 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.119.227.109) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 14 Mar 2025 19:53:06 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <aleksandr.mikhalitsyn@canonical.com>
-CC: <alexander@mihalicyn.com>, <annaemesenyiri@gmail.com>,
-	<edumazet@google.com>, <kerneljasonxing@gmail.com>, <kuba@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<vadim.fedorenko@linux.dev>, <willemb@google.com>, Kuniyuki Iwashima
-	<kuniyu@amazon.com>
-Subject: Re: [PATCH net-next] tools headers: Sync uapi/asm-generic/socket.h with the kernel sources
-Date: Fri, 14 Mar 2025 12:52:40 -0700
-Message-ID: <20250314195257.34854-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250309121526.86670-1-aleksandr.mikhalitsyn@canonical.com>
-References: <20250309121526.86670-1-aleksandr.mikhalitsyn@canonical.com>
+	s=arc-20240116; t=1741983117; c=relaxed/simple;
+	bh=Na5JubRzixA4tE3kjqxYLK6Xm6TlXZSN2pUUwo9sIA8=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=mz6N6iLBlqt28cUg0YFkqFkioQntzrjwdJxPioCEfzuoG7WZz9l4BUmumIxsPNQr8rcIKitY+dWdL2q+zEAtxTAD5auDaZ4B/3mfKdJRfEo16KUvCsevdaxjqxm5sE0dsTXYFiEGKZpowe+IFAWZk5Rt6PYREq700b6tYBQ030U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VXBuaULy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CA3FC4CEE9;
+	Fri, 14 Mar 2025 20:11:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741983116;
+	bh=Na5JubRzixA4tE3kjqxYLK6Xm6TlXZSN2pUUwo9sIA8=;
+	h=From:Subject:Date:To:Cc:From;
+	b=VXBuaULy1Veut+/XtbVvG6R8squ+EqeeX5Tdi6jqdBOUQqlHZv+Pv00327gPmXCcL
+	 gRlA64gwaH24lSdfdvC2F8GfNeeMyNZZQJFu9zEeU8GQSgqFjrDFw1WrpDHyGKhGbe
+	 0/AC43bSO9Bi+OQhly/lFpBRdnc0SAwBufHCM4TGUr17R5+DwG4fjYxZR1At5kr3YU
+	 ftsYhD9Ymx3vDjxXj70c/C5vIDPDi+Xi3jmunbsiDivw4QVQdgRmOyqmngyr9GOrqA
+	 yJ9iFdv6alf660ygjt5slPQU8oFur3xYJEFf/wtyzVXqMrgCSPaxNMOSBR6sXz5yCx
+	 /Akp5P3hIZaGQ==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net 0/3] mptcp: fix data stream corruption and missing
+ sockopts
+Date: Fri, 14 Mar 2025 21:11:30 +0100
+Message-Id: <20250314-net-mptcp-fix-data-stream-corr-sockopt-v1-0-122dbb249db3@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWB003.ant.amazon.com (10.13.139.176) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHKN1GcC/x2N0QqDMAxFf0XyvIB1CrpfGXsobdyC2JYkjIH47
+ ws+Hjj33AOUhEnh0R0g9GXlWhzCrYP0ieVNyNkZhn6Y+nsYsZDh3iw1XPmHOVpENaG4Y6oiqDV
+ ttRkuM4U8+maZAnisCbl/HT3BG/A6zz8AY1EMfQAAAA==
+X-Change-ID: 20250314-net-mptcp-fix-data-stream-corr-sockopt-98e1d4250951
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ Arthur Mongodin <amongodin@randorisec.fr>, stable@vger.kernel.org
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1121; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=Na5JubRzixA4tE3kjqxYLK6Xm6TlXZSN2pUUwo9sIA8=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBn1I2HQvlU2IT2YdAlZXT1odPvELRPHUcFlf4yH
+ +dB1BspE7uJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ9SNhwAKCRD2t4JPQmmg
+ c8BNEACvP8bzTKX4genl9C7lBT5Lbi87AIITZHld3QfIAPVf0ub5uG7hwgiQJqTOKTF6t/5UZKT
+ jo+J3DN+UHXWFlR4asroLHjQHhMB1I/2B0+5dBuHPsOC6tLH5nNU4orPJSgPS/IaYwrOA8nnK8N
+ bEZi5ckpWmmiwgMxjCVl35Nn4fpoSTE4EWgXDuPfsZ1pEHJa9riIHqwDCPWUIIj+xWZxLriVpWD
+ HwAsed9eqTI8bTkfnaIPj+sJb8Ksh/JGZo3Kjj+ngNV9qaMHhfCfUtYwjYxYT3q1sFV4rYsYxiv
+ ykdq/C2ZzIikTzmbYhP4Jv1E+44hdti7teXMFyYZ6gLHR4FA++3RoEO59z1qVN6elyFbmHtOaWQ
+ a+8soRImaR8FK++d4wj5bN7KgliosMpXqOethM5S6uiJmjanvWZSyETa7aBHjCNzN7q9cOz4tlx
+ xXQHkd4rSR3MugUAEx6/mXz6P85MlQN7CbJWA9XlLhX+Q3OFxukOvH6g6uZaegPHXRpBQUeIADC
+ j8i1LDHDFElNKBpHFSydchv234UhbH4xWwA4xSaPIYL1m0uT/bYG3kne5lTC5lj43IdI8X+j7Gp
+ GxQ3DvWJXXZovOb38vii6xGaaMfsJfWMyBlwAJoqEI8MPWnxNlxmtc9GjQ7GZn35L6JjsAe8AkD
+ ugEXrJnH7Lz/vcA==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-From: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-Date: Sun,  9 Mar 2025 13:15:24 +0100
-> This also fixes a wrong definitions for SCM_TS_OPT_ID & SO_RCVPRIORITY.
-> 
-> Accidentally found while working on another patchset.
-> 
-> Cc: linux-kernel@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> Cc: Willem de Bruijn <willemb@google.com>
-> Cc: Jason Xing <kerneljasonxing@gmail.com>
-> Cc: Anna Emese Nyiri <annaemesenyiri@gmail.com>
-> Fixes: a89568e9be75 ("selftests: txtimestamp: add SCM_TS_OPT_ID test")
-> Fixes: e45469e594b2 ("sock: Introduce SO_RCVPRIORITY socket option")
-> Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Here are 3 unrelated fixes for the net tree.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+- Patch 1: fix data stream corruption when ending up not sending an
+  ADD_ADDR.
 
-It seems the patch is marked as Changes Requested on patchwork.
-Also, I think this is net.git material than net-next.
+- Patch 2: fix missing getsockopt(IPV6_V6ONLY) support -- the set part
+  is supported.
 
-So, could you repost to net.git ?
+- Patch 3: fix missing v4/v6 freebind & transparent getsockopt() -- the
+  set part is supported.
 
-Thanks!
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Notes:
+ - Patch 1 has already been sent to netdev, but it has been applied in
+   MPTCP tree first, including some small changes in the commit message.
 
+---
+Arthur Mongodin (1):
+      mptcp: Fix data stream corruption in the address announcement
+
+Matthieu Baerts (NGI0) (2):
+      mptcp: sockopt: fix getting IPV6_V6ONLY
+      mptcp: sockopt: fix getting freebind & transparent
+
+ net/mptcp/options.c |  6 ++++--
+ net/mptcp/sockopt.c | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 32 insertions(+), 2 deletions(-)
+---
+base-commit: 4003c9e78778e93188a09d6043a74f7154449d43
+change-id: 20250314-net-mptcp-fix-data-stream-corr-sockopt-98e1d4250951
+
+Best regards,
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
