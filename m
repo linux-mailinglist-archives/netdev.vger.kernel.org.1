@@ -1,173 +1,154 @@
-Return-Path: <netdev+bounces-174818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ECB0A60B1F
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 09:20:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CAFDA60BD6
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 09:36:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A245616A737
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 08:20:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7BCF188AC70
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 08:36:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ED49193436;
-	Fri, 14 Mar 2025 08:20:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 586FB1A3174;
+	Fri, 14 Mar 2025 08:36:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gpscJe9q"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9F9A1624FC;
-	Fri, 14 Mar 2025 08:20:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25CBD288DA;
+	Fri, 14 Mar 2025 08:36:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741940434; cv=none; b=ctEvf9INC2pJrPTyG916qWChU3T15CArGGjSusPtvzA32vCZ0sWQu+wVVS/RmGRY/Thym58ty7oL9uGbUe73mTx9jvRcytcCyFwUn3/+olEvNaW6QpOvqfwGOHmFiQzdrBEIEClDcWA9VY5k721BUGiA99dZHO420xpuWEmsDFs=
+	t=1741941373; cv=none; b=cqht3RQt+u+q6CEGx5ZMeIySDtai/UWVpWdHV2Klkc1FUyWy/KdweEkoJS1UeeFVGe1PuGOmvqx7hyA0V42vwtV7i2Vu2wY5x4rUzZ6H8NEtd7SznNX6ake5DYcBj6eQWqC+N/7/g9JeilPhDYuIGvC578st5toZ0HqBzpTx9nI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741940434; c=relaxed/simple;
-	bh=g29ZXf4wwqo2NDIXF+nWjjIdKxamx2faR8t8+nPRbjw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IGcDLN35O856hHkXQKByenksHD2R6pIkEg89INyGalOj+OAucmBfk9lNox5eoPciJlmgZ7ljFJRURy14fR5+Zst6lwe7ujD/LUQo6mS5tXBhDuvI32uelJVirWO/9DEGCpB9/iL/iFpjn+6153AkKkgOna/w3sjWZCyclviXBdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4ZDcdx646FzvWs7;
-	Fri, 14 Mar 2025 16:16:37 +0800 (CST)
-Received: from kwepemd100023.china.huawei.com (unknown [7.221.188.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id 459731402DB;
-	Fri, 14 Mar 2025 16:20:29 +0800 (CST)
-Received: from localhost.localdomain (10.175.104.82) by
- kwepemd100023.china.huawei.com (7.221.188.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 14 Mar 2025 16:20:27 +0800
-From: Dong Chenchen <dongchenchen2@huawei.com>
-To: <edumazet@google.com>, <kuniyu@amazon.com>, <pabeni@redhat.com>,
-	<willemb@google.com>, <john.fastabend@gmail.com>, <jakub@cloudflare.com>,
-	<davem@davemloft.net>, <kuba@kernel.org>, <horms@kernel.org>,
-	<daniel@iogearbox.net>
-CC: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>, <stfomichev@gmail.com>,
-	<mrpre@163.com>, <xiyou.wangcong@gmail.com>, <zhangchangzhong@huawei.com>,
-	<weiyongjun1@huawei.com>, Dong Chenchen <dongchenchen2@huawei.com>
-Subject: [PATCH net 2/2] selftests: bpf: Add case for sockmap_ktls set when verdict attached
-Date: Fri, 14 Mar 2025 16:20:04 +0800
-Message-ID: <20250314082004.2369712-3-dongchenchen2@huawei.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250314082004.2369712-1-dongchenchen2@huawei.com>
-References: <20250314082004.2369712-1-dongchenchen2@huawei.com>
+	s=arc-20240116; t=1741941373; c=relaxed/simple;
+	bh=0XELGK3NlJpfm2jYvbE8iTtmJ7oQJYjOFPHBv93++5Y=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=tCS8ZVkq1YKsHRqCK0s4TyAg3gf7QuFgduaZA1dL5y2ibKPv4yhT2SxxnTkV3sAfw92hFNnuhsaXDR+cvLwKdTibUmW8rktJ7HYtNVCxC4U+KQCHrJ7T5EbyTj/ZmZpXRd/wEMKqED2OZjtBbthWa7rn+Sk3bc9jLzIsHcRUCBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gpscJe9q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9D2BC4CEE5;
+	Fri, 14 Mar 2025 08:36:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741941372;
+	bh=0XELGK3NlJpfm2jYvbE8iTtmJ7oQJYjOFPHBv93++5Y=;
+	h=From:Date:Subject:To:Cc:From;
+	b=gpscJe9qItz3bc/oGOZyAicdMAFrxZQWc5rBxTOeuv24EKCvjOTOOF+5KD11S/yGV
+	 lNdIqbtk4vsfncabF/obhHt2Dj2oz/sCFn3jsjDiZdytDfsVwKBIH2U6EJX0vBTwDM
+	 VDvCJ/U62up9CuI6vBH4g8CYqAQpBOSmTBsaqFFIoG89QmwKnzFnEQqH1JF05M0HoD
+	 a5sLs2Ugp/2mQvnpdgmmZhXJHVytfGk5f14Ad7rcTml6Wjm2M9QoJPQjcDUkfCJxUU
+	 P6DHngkJcwNB/VXX0yr4+Ms9XODY2mCs9405pTfohz/LIIruMQAn0PInANTPEvBb5Y
+	 khMV9YlJwIlKQ==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Date: Fri, 14 Mar 2025 09:35:51 +0100
+Subject: [PATCH net-next] selftests: drv-net: fix merge conflicts
+ resolution
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemd100023.china.huawei.com (7.221.188.33)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250314-net-next-drv-net-ping-fix-merge-v1-1-0d5c19daf707@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAGbq02cC/zWNSQqAMAxFryJZG7CO4FXEhdqoWVglFSkU724ou
+ PiLx58ieBImD30WQehhz6dTMHkGyz65jZCtMpRF2RSVqdHRrQo3WnkSXOw2XDngQaLxudJY262
+ WTAu6cgmpmR4G+Mswvu8HA8CvyXsAAAA=
+X-Change-ID: 20250314-net-next-drv-net-ping-fix-merge-b303167fde16
+To: mptcp@lists.linux.dev, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Stephen Rothwell <sfr@canb.auug.org.au>, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3166; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=0XELGK3NlJpfm2jYvbE8iTtmJ7oQJYjOFPHBv93++5Y=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBn0+p3gxFMBZfYI6UpmoWmrPP9IfoxmGSO3gC0U
+ wLb2Eki1tKJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ9PqdwAKCRD2t4JPQmmg
+ c+CeD/9eFz1NROsTVTXuf1WLbGaRlr+d+pdn2adbNA6sbNnsDjAhv0WEI/cXDqUWN5tqjqESA1X
+ dPoEKeUZG1wzs/TKs9k6wNTw9wCwQKlxIxxyAVhzoVuzym3HATtVU8I6E/9VUhyyoo71jCGJUPC
+ 6A8qXlPAfxIgWwvmGLnCU2jXxRsvWwEpylIUze7SUxV2eF/YEzPJHxx5wjbBGhkELq6sW0Qg6rF
+ zt6Z5mBSRlnlYBIzg+FGZNKdTxJKkzRQZjUPWlFvk2eVrq1EKl22N57H/W1EaNc4tpYOWJtnRuh
+ B1droVB5X5IlTYqORQ6/DlAbGsPWRKIZXw0+HvoCnnO525ThYLqO8yH9itOthk0xb+HiBBha+uR
+ B6IUjiGIafrESoOJRYkr91b3HAdKAyZd05J9Cm+PigDslX063P7xCufgx8c/bI9sqPbpAv4PZ38
+ 5TN0zCxQbZjkDeUTNXn9ipwANBi6jupRjpgPjGb9UYnRy7+1Rpqo9xYG499C1QBUENQ5cKw00Hk
+ w7yMljIidF9cN05CBe01Ur/LWpJHwxt8lFf8eN7RvETYjYN8XkjFaJUMvEFbl/q1uvdGxRFk/iK
+ PZfNGUIHizQku81l1rvqLOVgaOLVgN9GsiEpKmIAQvW+QzIXEoR8CDcWjebG02z49y18TIo/ktb
+ meKgneP7ZINrsjg==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-Cover the scenario when close a socket after inserted into the sockmap
-(verdict attach) and set ULP. It will trigger sock_map_close warning.
+After the recent merge between net-next and net, I got some conflicts on
+my side because the merge resolution was different from Stephen's one
+[1] I applied on my side in the MPTCP tree.
 
-Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
+It looks like the code that is now in net-next is using the old way to
+retrieve the local and remote addresses. This patch is now using the new
+way, like what was in Stephen's email [1].
+
+Also, in get_interface_info(), there were no conflicts in this area,
+because that was new code from 'net', but a small adaptation was needed
+there as well to get the remote address.
+
+Fixes: 941defcea7e1 ("Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net")
+Link: https://lore.kernel.org/20250311115758.17a1d414@canb.auug.org.au [1]
+Suggested-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- .../selftests/bpf/prog_tests/sockmap_ktls.c   | 70 +++++++++++++++++++
- 1 file changed, 70 insertions(+)
+ tools/testing/selftests/drivers/net/ping.py | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c b/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c
-index 2d0796314862..d54bd5f41d4d 100644
---- a/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sockmap_ktls.c
-@@ -9,6 +9,7 @@
+diff --git a/tools/testing/selftests/drivers/net/ping.py b/tools/testing/selftests/drivers/net/ping.py
+index 7a1026a073681d159202015fc6945e91368863fe..79f07e0510ecc14d3bc2716e14f49f9381bb919f 100755
+--- a/tools/testing/selftests/drivers/net/ping.py
++++ b/tools/testing/selftests/drivers/net/ping.py
+@@ -15,18 +15,18 @@ no_sleep=False
+ def _test_v4(cfg) -> None:
+     cfg.require_ipver("4")
  
- #define MAX_TEST_NAME 80
- #define TCP_ULP 31
-+#define SOCKMAP_VERDICT_PROG "test_sockmap_skb_verdict_attach.bpf.o"
+-    cmd(f"ping -c 1 -W0.5 {cfg.remote_v4}")
+-    cmd(f"ping -c 1 -W0.5 {cfg.v4}", host=cfg.remote)
+-    cmd(f"ping -s 65000 -c 1 -W0.5 {cfg.remote_v4}")
+-    cmd(f"ping -s 65000 -c 1 -W0.5 {cfg.v4}", host=cfg.remote)
++    cmd("ping -c 1 -W0.5 " + cfg.remote_addr_v["4"])
++    cmd("ping -c 1 -W0.5 " + cfg.addr_v["4"], host=cfg.remote)
++    cmd("ping -s 65000 -c 1 -W0.5 " + cfg.remote_addr_v["4"])
++    cmd("ping -s 65000 -c 1 -W0.5 " + cfg.addr_v["4"], host=cfg.remote)
  
- static int tcp_server(int family)
- {
-@@ -132,6 +133,73 @@ static void test_sockmap_ktls_update_fails_when_sock_has_ulp(int family, int map
- 	close(s);
- }
+ def _test_v6(cfg) -> None:
+     cfg.require_ipver("6")
  
-+/* close a kTLS socket after removing it from sockmap. */
-+static void test_sockmap_ktls_close_after_delete(int family, int map)
-+{
-+	struct sockaddr_storage addr = {0};
-+	socklen_t len = sizeof(addr);
-+	int err, cli, srv, zero = 0;
-+	struct bpf_program *prog;
-+	struct bpf_object *obj;
-+	int verdict;
-+
-+	obj = bpf_object__open_file(SOCKMAP_VERDICT_PROG, NULL);
-+	if (!ASSERT_OK(libbpf_get_error(obj), "bpf_object__open_file"))
-+		return;
-+
-+	err = bpf_object__load(obj);
-+	if (!ASSERT_OK(err, "bpf_object__load"))
-+		goto close_obj;
-+
-+	prog = bpf_object__next_program(obj, NULL);
-+	verdict = bpf_program__fd(prog);
-+	if (!ASSERT_GE(verdict, 0, "bpf_program__fd"))
-+		goto close_obj;
-+
-+	err = bpf_prog_attach(verdict, map, BPF_SK_SKB_STREAM_VERDICT, 0);
-+	if (!ASSERT_OK(err, "bpf_prog_attach"))
-+		goto close_verdict;
-+
-+	srv = tcp_server(family);
-+	if (srv == -1)
-+		goto detach;
-+
-+	err = getsockname(srv, (struct sockaddr *)&addr, &len);
-+	if (!ASSERT_OK(err, "getsockopt"))
-+		goto close_srv;
-+
-+	cli = socket(family, SOCK_STREAM, 0);
-+	if (!ASSERT_GE(cli, 0, "socket"))
-+		goto close_srv;
-+
-+	err = connect(cli, (struct sockaddr *)&addr, len);
-+	if (!ASSERT_OK(err, "connect"))
-+		goto close_cli;
-+
-+	err = bpf_map_update_elem(map, &zero, &cli, 0);
-+	if (!ASSERT_OK(err, "bpf_map_update_elem"))
-+		goto close_cli;
-+
-+	err = setsockopt(cli, IPPROTO_TCP, TCP_ULP, "tls", strlen("tls"));
-+	if (!ASSERT_OK(err, "setsockopt(TCP_ULP)"))
-+		goto close_cli;
-+
-+	err = bpf_map_delete_elem(map, &zero);
-+	if (!ASSERT_OK(err, "bpf_map_delete_elem"))
-+		goto close_cli;
-+
-+close_cli:
-+	close(cli);
-+close_srv:
-+	close(srv);
-+detach:
-+	bpf_prog_detach2(verdict, map, BPF_SK_SKB_STREAM_VERDICT);
-+close_verdict:
-+	close(verdict);
-+close_obj:
-+	bpf_object__close(obj);
-+}
-+
- static const char *fmt_test_name(const char *subtest_name, int family,
- 				 enum bpf_map_type map_type)
- {
-@@ -158,6 +226,8 @@ static void run_tests(int family, enum bpf_map_type map_type)
- 		test_sockmap_ktls_disconnect_after_delete(family, map);
- 	if (test__start_subtest(fmt_test_name("update_fails_when_sock_has_ulp", family, map_type)))
- 		test_sockmap_ktls_update_fails_when_sock_has_ulp(family, map);
-+	if (test__start_subtest(fmt_test_name("close_after_delete", family, map_type)))
-+		test_sockmap_ktls_close_after_delete(family, map);
+-    cmd(f"ping -c 1 -W5 {cfg.remote_v6}")
+-    cmd(f"ping -c 1 -W5 {cfg.v6}", host=cfg.remote)
+-    cmd(f"ping -s 65000 -c 1 -W0.5 {cfg.remote_v6}")
+-    cmd(f"ping -s 65000 -c 1 -W0.5 {cfg.v6}", host=cfg.remote)
++    cmd("ping -c 1 -W5 " + cfg.remote_addr_v["6"])
++    cmd("ping -c 1 -W5 " + cfg.addr_v["6"], host=cfg.remote)
++    cmd("ping -s 65000 -c 1 -W0.5 " + cfg.remote_addr_v["6"])
++    cmd("ping -s 65000 -c 1 -W0.5 " + cfg.addr_v["6"], host=cfg.remote)
  
- 	close(map);
- }
+ def _test_tcp(cfg) -> None:
+     cfg.require_cmd("socat", remote=True)
+@@ -120,7 +120,7 @@ def get_interface_info(cfg) -> None:
+     global remote_ifname
+     global no_sleep
+ 
+-    remote_info = cmd(f"ip -4 -o addr show to {cfg.remote_v4} | awk '{{print $2}}'", shell=True, host=cfg.remote).stdout
++    remote_info = cmd(f"ip -4 -o addr show to {cfg.remote_addr_v['4']} | awk '{{print $2}}'", shell=True, host=cfg.remote).stdout
+     remote_ifname = remote_info.rstrip('\n')
+     if remote_ifname == "":
+         raise KsftFailEx('Can not get remote interface')
+
+---
+base-commit: 941defcea7e11ad7ff8f0d4856716dd637d757dd
+change-id: 20250314-net-next-drv-net-ping-fix-merge-b303167fde16
+
+Best regards,
 -- 
-2.34.1
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
