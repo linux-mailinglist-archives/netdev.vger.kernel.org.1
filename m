@@ -1,162 +1,110 @@
-Return-Path: <netdev+bounces-174840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77830A60ECD
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 11:27:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35A01A60F24
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 11:38:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6615B1890905
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 10:27:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 097D617DF05
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 10:38:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AF671F4179;
-	Fri, 14 Mar 2025 10:27:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D56801F1312;
+	Fri, 14 Mar 2025 10:38:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="skypVqA9"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="CEQmxLyc"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA8D1DF98D;
-	Fri, 14 Mar 2025 10:27:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E6EE1DC9B3
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 10:38:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741948064; cv=none; b=q0xxqvO4ApONEk+cMz2VcRprsJGiQKY3yPjlTUDIeCR5rApOBUFVvbmyibo5ffDdFjzoV4WB84wVnYlMTFyGJmNWTemPoQ17YoQ1MKLIbhkMddX7pDIy4ncYXjBJCnzTaBgOKeXggG8M2xtmGRPKmKm2koXcK5vRsRA86tveujw=
+	t=1741948714; cv=none; b=ZHvPcsE77eu5CK27M6Rr47sgq8pLgpRrU6C2xyBZgWCxPJfLzxLZNOkbtxl5fjHyiV1teNBTjvYo4OgUXsENua5VTb6PuqX2xdIBSwuzG+GOyJbjwV+7uT58JhLMcdlctpgrQkhXs+QE8wdkXeXGmnoJfN93qWoTK0IH6dEelNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741948064; c=relaxed/simple;
-	bh=AqCLx8QBF1KMM98GnBfyED4kWGNOck2ntohHUtYJDSo=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YLPRUlWm8yzSyr/VD97bkr4spdTDuC17hKslSp3T5NXY+e6JBTF2se6c53bSAB6clzuLGVPJhZ+iEEXePOi05sI5VZI1d7GgrukMnATe4gGE0t7xNWOM3jUlckiAk79dltH7OE2DgUwkc3VOoxpHbwb9pkrPrNXl2VcgN5Dsw4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=skypVqA9; arc=none smtp.client-ip=198.47.23.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 52EAROek1654743
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 14 Mar 2025 05:27:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1741948045;
-	bh=w5qzGqYNtcXVKnkJY6yYk6vm8l8FZO+5k1KrJz2DeFQ=;
-	h=From:To:CC:Subject:Date;
-	b=skypVqA9Lnak3jdekm/tYR026cOAKKMklxqsQO2Jyv/aQOmizSmFIjWsAJ5XfHvYV
-	 qE3RpsNe7Fio+1DeV3cmUji9lbDMr+TGDI34hgwKae34pGS2juB/MLtQvhEzIvlgN2
-	 f7GtZHlO18seGqlhhewsXkUkzTviGFkWrrhOzuKM=
-Received: from DFLE115.ent.ti.com (dfle115.ent.ti.com [10.64.6.36])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 52EARONO116857
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 14 Mar 2025 05:27:24 -0500
-Received: from DFLE114.ent.ti.com (10.64.6.35) by DFLE115.ent.ti.com
- (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 14
- Mar 2025 05:27:24 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE114.ent.ti.com
- (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 14 Mar 2025 05:27:24 -0500
-Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 52EAROxS081406;
-	Fri, 14 Mar 2025 05:27:24 -0500
-Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 52EARN2R024336;
-	Fri, 14 Mar 2025 05:27:24 -0500
-From: MD Danish Anwar <danishanwar@ti.com>
-To: Sai Krishna <saikrishnag@marvell.com>, Meghana Malladi <m-malladi@ti.com>,
-        Diogo Ivo <diogo.ivo@siemens.com>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub
- Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Andrew Lunn <andrew+netdev@lunn.ch>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
-Subject: [PATCH net] net: ti: icssg-prueth: Add lock to stats
-Date: Fri, 14 Mar 2025 15:57:21 +0530
-Message-ID: <20250314102721.1394366-1-danishanwar@ti.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1741948714; c=relaxed/simple;
+	bh=k/sk7VJfX+xc/DR6Xfyqsjt/6QLxyzLhgdh8tAXS6UA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OsSQnKdLWv2OXY9gYkk+YmHcxBYpHFjqSWJMrVK5TEcqFMZdQyEp5aP611alyv8KyZjflmhibLbsj1lx/xvjeklbi2Xy2DdbC2pTruYmpayTK26hI7mFOfLp6oxIDcYUh+oyEn4x1EKiNuEqLcS7AKtM/O4k1w+7D35ZKMV6aPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=CEQmxLyc; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5e6c18e2c7dso3504479a12.3
+        for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 03:38:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1741948711; x=1742553511; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xQa/B6nt3kgsdbkom5ifeTDrO/y61K0MNXroRuAN/O0=;
+        b=CEQmxLycabiOTYUqRiH2rKdGns/zC67XXrVSCZfGJWJ3rjYnN3HOs7HIpk2pJ2Pydv
+         YnBGT/9rPTgqfirDw5FXFjGG4STanvDOxwVdtiMZmlaT/u0wb9o+RBWwnU79kxEa9fuK
+         Isww0ZjtyBs8K4VX0tVYOoZg1NSyGZTcs8zG2y8DU/Nvn52AmXTFap4yZcX/zzo1/vgV
+         zD5We6oyyzxUttSFIH6bAhd/C7w7lxOAnvtlKa6Sd+sqoA6crDVxNskUb6taqMbJ4cZz
+         cvvXwLthnbhrraoYUZQSE3RqrmhWUreXpNEp9c85GYMC3JUuIqB4JZNeosdtT1nD3+dl
+         qZew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741948711; x=1742553511;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xQa/B6nt3kgsdbkom5ifeTDrO/y61K0MNXroRuAN/O0=;
+        b=h7zf3+upK5ZVAKkuS/a/BlYowu8hm87Hnbhg2faI0E2pEd5qqdGwEEaDDq9/MSqf3G
+         0Ptk5IaSd+vjTjgk5R2AmDU7Ubc4JayNuS16PN72L8QHla0bE2ZdSwgXmQgxJ/FHU5tQ
+         8ZW5N2pKwFlBwvL7MLsFz569K6KaK3eq6YvvRd2HGlGyi3jsg1wOSIhMakQ1MIhb67T9
+         TxDGsdDtFTcMP8zn+ceFDtpDMHonI8UdUQRgv+6/kGOxYEYyMg4P7vYihmTNINrUaYqt
+         xbPEpYZtPxscewmXxdUNusCQ1IjwKICzJ2IhZ2IchFbxRh/f0ol/5M3ZmbcyNFjHeaw9
+         WnWQ==
+X-Gm-Message-State: AOJu0Yz9rIWf2TJZ1Kjo80o65draIXSgq0CvRgNLxcqRft3XmyeYh3RZ
+	KCkGcGkSrNW5w3Sy4zdzwvLlYwVIj80JtjlcobNK9sMLPGmTeS9QgVZkvR1l+Oo/CmPyEadXsu3
+	uQlML3g==
+X-Gm-Gg: ASbGncu+xejYMs7fwUnT8mapXpP0P0PjIU+E8Mr7OmOy28Kf1OnWqWcqtows1S2Lvn7
+	MH3LQ+vrsodqC4DvGWLeYsXjK+ImyRUfs6yhlEzfiDMWkB6hLTstFwyByGmbkeYP8UDtdBr60k/
+	qF0PLd3hoWi+xL83N9SvvNZPJa54FkxsJey//tFrA2hEVlbkz820gcbLvoD9misUeMRPzpGhGIR
+	enzGzUCFh9EEMKnskwkHZWuvUgXgd+fU/zXR0m2OYNd2g9XBKFe+gnVtw1L1thNuAGykV9RwMS9
+	x7gSi+ieBs+hOWExkY9eFK8OJ1LiuY1mz6hYPn+L5rfgNbgxpXXiCChP
+X-Google-Smtp-Source: AGHT+IFU1yLu9tpv1nnF+kpniJQogZiPcfQZOJlEwm6IcPq3xU0Mz61gTDHjYh2+NgVH8czlWjjktQ==
+X-Received: by 2002:a05:6402:26d1:b0:5de:dfd0:9d20 with SMTP id 4fb4d7f45d1cf-5e8a0c1450fmr1961696a12.24.1741948710739;
+        Fri, 14 Mar 2025 03:38:30 -0700 (PDT)
+Received: from [10.20.7.108] ([195.29.209.20])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e816968ce3sm1818193a12.21.2025.03.14.03.38.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 14 Mar 2025 03:38:30 -0700 (PDT)
+Message-ID: <22026405-bccc-4b65-a5e1-f565b1257fa9@blackwall.org>
+Date: Fri, 14 Mar 2025 12:38:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] MAINTAINERS: update bridge entry
+To: netdev@vger.kernel.org
+Cc: idosch@nvidia.com, idosch@idosch.org, pabeni@redhat.com, kuba@kernel.org,
+ bridge@lists.linux.dev, davem@davemloft.net, Roopa Prabhu <roopa@nvidia.com>
+References: <20250314100631.40999-1-razor@blackwall.org>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20250314100631.40999-1-razor@blackwall.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Currently the API emac_update_hardware_stats() reads different ICSSG
-stats without any lock protection.
++CC Roopa (sorry, my bad)
 
-This API gets called by .ndo_get_stats64() which is only under RCU
-protection and nothing else. Add lock to this API so that the reading of
-statistics happens during lock.
-
-Fixes: c1e10d5dc7a1 ("net: ti: icssg-prueth: Add ICSSG Stats")
-Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
----
-NOTE: This was suggested by Jakub Kicinski <kuba@kernel.org> [1] to get
-this as bug fix in net during upstreaming of FW Stats for ICSSG driver
-This patch doesn't depend on [1] and can be applied cleanly on net/main
-
-[1] https://lore.kernel.org/all/20250306165513.541ff46e@kernel.org/
-
- drivers/net/ethernet/ti/icssg/icssg_prueth.c | 1 +
- drivers/net/ethernet/ti/icssg/icssg_prueth.h | 2 ++
- drivers/net/ethernet/ti/icssg/icssg_stats.c  | 4 ++++
- 3 files changed, 7 insertions(+)
-
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 00ed97860547..9a75733e3f8f 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -1679,6 +1679,7 @@ static int prueth_probe(struct platform_device *pdev)
- 	}
- 
- 	spin_lock_init(&prueth->vtbl_lock);
-+	spin_lock_init(&prueth->stats_lock);
- 	/* setup netdev interfaces */
- 	if (eth0_node) {
- 		ret = prueth_netdev_init(prueth, eth0_node);
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-index 329b46e9ee53..f41786b05741 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-@@ -305,6 +305,8 @@ struct prueth {
- 	int default_vlan;
- 	/** @vtbl_lock: Lock for vtbl in shared memory */
- 	spinlock_t vtbl_lock;
-+	/** @stats_lock: Lock for reading icssg stats */
-+	spinlock_t stats_lock;
- };
- 
- struct emac_tx_ts_response {
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_stats.c b/drivers/net/ethernet/ti/icssg/icssg_stats.c
-index 8800bd3a8d07..6f0edae38ea2 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_stats.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_stats.c
-@@ -26,6 +26,8 @@ void emac_update_hardware_stats(struct prueth_emac *emac)
- 	u32 val, reg;
- 	int i;
- 
-+	spin_lock(&prueth->stats_lock);
-+
- 	for (i = 0; i < ARRAY_SIZE(icssg_all_miig_stats); i++) {
- 		regmap_read(prueth->miig_rt,
- 			    base + icssg_all_miig_stats[i].offset,
-@@ -51,6 +53,8 @@ void emac_update_hardware_stats(struct prueth_emac *emac)
- 			emac->pa_stats[i] += val;
- 		}
- 	}
-+
-+	spin_unlock(&prueth->stats_lock);
- }
- 
- void icssg_stats_work_handler(struct work_struct *work)
-
-base-commit: 4003c9e78778e93188a09d6043a74f7154449d43
--- 
-2.34.1
-
+On 3/14/25 12:06 PM, Nikolay Aleksandrov wrote:
+> Roopa has decided to withdraw as a bridge maintainer and Ido has agreed to
+> step up and co-maintain the bridge with me. He has been very helpful in
+> bridge patch reviews and has contributed a lot to the bridge over the
+> years. Add an entry for Roopa to CREDITS and also add bridge's headers
+> to its MAINTAINERS entry.
+> 
+> Signed-off-by: Nikolay Aleksandrov <razor@blackwall.org>
+> ---
+>  CREDITS     | 4 ++++
+>  MAINTAINERS | 4 +++-
+>  2 files changed, 7 insertions(+), 1 deletion(-)
+> 
 
