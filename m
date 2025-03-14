@@ -1,99 +1,125 @@
-Return-Path: <netdev+bounces-174919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 915D7A614D4
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 16:26:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C03B6A614DA
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 16:29:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A44C17665B
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 15:26:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12E3E3AD2ED
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 15:29:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8126E202963;
-	Fri, 14 Mar 2025 15:26:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC3AE20127D;
+	Fri, 14 Mar 2025 15:29:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dxKdV02r"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="OFH+x/XU"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A5CE1C878E;
-	Fri, 14 Mar 2025 15:26:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7EF0201261
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 15:29:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741966002; cv=none; b=Je0TaCo1H+j1ouoouKohQweOUgIcts1cxoe2/XsBXe8+sQA0wSvwopZurUsYvUDVnswtMiERiHzM8EXNHcSdlsTiew4ZG2WPK1WyWRAImYq4iX7Kx3tpdWfbw6EJ/5Lvd/1Ryi3wlrLIkDhNAXg6CPbaEoT/H3opRMdvZIZMvig=
+	t=1741966172; cv=none; b=EFyDLo5KLiBxeuRNCg0NNZjONlQbnd0pkOKnJZHqZGCakqO8aOUZzEPwOGoqnAhjr4tLnt/XSJUXzLOomJxw9NWgE+E8NaYCphRIPxBNoaOuONEmLJRBemHrqhmAyVcHxl1r+LtKb0Dk2G0rJTNAxauOgTF/n6PigoLUseb/APk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741966002; c=relaxed/simple;
-	bh=n/ZX5jYth2ykBJT1A/3j+S+zp0ZH2eoj4N17f4Q1vlM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cb50t6TS0HJ2J5iS6xYEybjIOgDa8av3BGez6qJ1e8FL454DGUBRUZ4AoA7E2GT9yYiqsuoNkoqYQ2Qe6+YsGXn6E0G9YGVtIWGXXc4xVCIu4WFsUPN3GtiVxphbMbVsQSr6u0MW5Rb23OKQvayqIR7J0DOM0uBKWC4xDnb7J9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dxKdV02r; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=JLucXbicvVl54mzBcNVonvbBRXxVtH+iL2usTqSk+no=; b=dxKdV02rXHfgVSFw7R4z1vXt5E
-	qxRShK8xSLKSLnYm3xgPi1lpr+Y93UkG3VTdNNXaMmGJv1KLDhlcL9NvQzjENK/qSOGa+QIwNIAFD
-	BOPUlYdwRJImizJrjZb0ZSgRCxTUdl6BR9aoWdGJHp3+uYB/ydewEuPx7k7p1JXDMGYs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tt6vN-005KYR-62; Fri, 14 Mar 2025 16:26:13 +0100
-Date: Fri, 14 Mar 2025 16:26:13 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Chris Packham <chris.packham@alliedtelesis.co.nz>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	sander@svanheule.net, markus.stockhausen@gmx.de,
-	daniel@makrotopia.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v11] net: mdio: Add RTL9300 MDIO driver
-Message-ID: <bd1d1cb9-a72b-484b-8cfd-7e91179391d2@lunn.ch>
-References: <20250313233811.3280255-1-chris.packham@alliedtelesis.co.nz>
+	s=arc-20240116; t=1741966172; c=relaxed/simple;
+	bh=AIVfsPIsIRzyAO05tfFfzBfO6lIyoQWUnj1Eegx6UUw=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=mj799633nPmJCGBe0olYlZ3NH9chfDm70CXaz29usw1qWny3GzoOQIuoxMDtmWOGkkGgoQweFvipgiLPblKhvvHcTx3FEi+DY1cEwpBVfzgSFpQL9jXXtAPKJQpOKQooLmdF8p/wDqrlFwq1zZS/qqLbyiIQ42QoNFv2ZiYNSdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=OFH+x/XU; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tt6yT-006GWD-AP; Fri, 14 Mar 2025 16:29:25 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
+	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
+	bh=OkJKNKakgINYlhEVlves1w/VP3lzwcypnJF7eTZTI1s=; b=OFH+x/XUcfSMgxYdqLBIT8yONk
+	kWkDXL+dKaWTHbIXW62G6XiZehuQipzFy8hYUYjgh7SoyHgWgonLvarkii5E+NlTt6/xtaoNrBdOx
+	QRKDX363Mh7YvYq7zi4DceJ5/24EiuGrYXo559jjb8LgR+NcVTePuN1JOJj1J+wgHwanXDx3aZ49l
+	QwnIXWVSDN9lqyKVaq3cOA8tUKBav4afFSO+3xOMgmSTT011CEQzz3EUgj8T+L6KbaugCtmsg+Map
+	dSE1sfEOH/69KIRSHjmlSTWh7yvMV4KLtEiHc37ZcM3/jZuhUw9Y8zuAtxk4eSrR/PAR0v86UiC99
+	wmAOVKUQ==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tt6yS-00057I-AI; Fri, 14 Mar 2025 16:29:24 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tt6y8-00H2aH-Tn; Fri, 14 Mar 2025 16:29:04 +0100
+Message-ID: <24efb98c-d6ba-42c2-91b7-71b969179aff@rbox.co>
+Date: Fri, 14 Mar 2025 16:29:03 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250313233811.3280255-1-chris.packham@alliedtelesis.co.nz>
+User-Agent: Mozilla Thunderbird
+From: Michal Luczaj <mhal@rbox.co>
+Subject: Re: [PATCH net] vsock/bpf: Handle EINTR connect() racing against
+ sockmap update
+To: John Fastabend <john.fastabend@gmail.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Bobby Eshleman <bobby.eshleman@bytedance.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <20250307-vsock-trans-signal-race-v1-1-3aca3f771fbd@rbox.co>
+ <20250311162304.5xcnjeue2uwrhswg@gmail.com>
+Content-Language: pl-PL, en-GB
+In-Reply-To: <20250311162304.5xcnjeue2uwrhswg@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-> +static int rtl9300_mdiobus_probe_one(struct device *dev, struct rtl9300_mdio_priv *priv,
-> +				     struct fwnode_handle *node)
-> +{
-> +	struct rtl9300_mdio_chan *chan;
-> +	struct fwnode_handle *child;
-> +	struct mii_bus *bus;
-> +	u32 mdio_bus;
-> +	int err;
-> +
-> +	err = fwnode_property_read_u32(node, "reg", &mdio_bus);
-> +	if (err)
-> +		return err;
-> +
-> +	/* The MDIO interfaces are either in GPHY (i.e. clause 22) or 10GPHY
-> +	 * mode (i.e. clause 45).
+On 3/11/25 17:23, John Fastabend wrote:
+> On 2025-03-07 10:27:50, Michal Luczaj wrote:
+>> Signal delivered during connect() may result in a disconnect of an already
+>> TCP_ESTABLISHED socket. Problem is that such established socket might have
+>> been placed in a sockmap before the connection was closed. We end up with a
+>> SS_UNCONNECTED vsock in a sockmap. And this, combined with the ability to
+>> reassign (unconnected) vsock's transport to NULL, breaks the sockmap
+>> contract. As manifested by WARN_ON_ONCE.
+>>
+>> Ensure the socket does not stay in sockmap.
+>>
+>> WARNING: CPU: 10 PID: 1310 at net/vmw_vsock/vsock_bpf.c:90 vsock_bpf_recvmsg+0xb4b/0xdf0
+>> CPU: 10 UID: 0 PID: 1310 Comm: a.out Tainted: G        W          6.14.0-rc4+
+>>  sock_recvmsg+0x1b2/0x220
+>>  __sys_recvfrom+0x190/0x270
+>>  __x64_sys_recvfrom+0xdc/0x1b0
+>>  do_syscall_64+0x93/0x1b0
+>>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>>
+>> Fixes: 634f1a7110b4 ("vsock: support sockmap")
+>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> 
+> Hi Michal,
+> 
+> Unhashing the socket to stop any references from sockmap side if the
+> sock is being put into CLOSING state makes sense to me. Was there
+> another v2 somewhere? I didn't see it in my inbox or I missed it.
+> I think you mentioned more fixes were needed.
 
-I still need more clarification about this. Is this solely about the
-polling? Or does an interface in C22 mode go horribly wrong when asked
-to do a C45 bus transaction?
+Great, thanks for checking. I was worried I might be missing some
+subtleties of sock_map_unhash() not calling `sk_psock_stop(psock)` nor
+`cancel_delayed_work_sync(&psock->work)`. Especially since user still has
+socket descriptor open and can play with such "unhashed" socket.
 
-> +	bus->name = "Realtek Switch MDIO Bus";
-> +	bus->read = rtl9300_mdio_read_c22;
-> +	bus->write = rtl9300_mdio_write_c22;
-> +	bus->read_c45 = rtl9300_mdio_read_c45;
-> +	bus->write_c45 =  rtl9300_mdio_write_c45;
+I've just sent v2: https://lore.kernel.org/netdev/20250314-vsock-trans-signal-race-v2-0-421a41f60f42@rbox.co/
 
-You are providing C45 bus methods, independent of the interface
-mode. So when accessing EEE registers in C45 address space, C45 bus
-transactions are going to be used, even on an MDIO interface using C22
-mode. Does this work? Can you actually do both C22 and C45 bus
-transactions independent of the interface mode?
+Repro is adapted to sockmap_basic. And to answer your question from
+another thread: test triggers warning in a second. Currently timeout is 2s.
+I'm not sure how useful it may be for other families, but let me know if
+you'd rather have it somehow more generic.
 
-	Andrew
+Thanks,
+Michal
 
