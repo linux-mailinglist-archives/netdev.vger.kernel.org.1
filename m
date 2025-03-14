@@ -1,108 +1,133 @@
-Return-Path: <netdev+bounces-174891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09B40A61252
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 14:16:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7CECA6127F
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 14:23:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BAD9882040
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 13:16:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47D71168D9F
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 13:23:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D0A1EE00A;
-	Fri, 14 Mar 2025 13:16:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="JR5cM9OR";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="V7ai00Ht"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 525AE1FFC49;
+	Fri, 14 Mar 2025 13:23:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA4311EB5B
-	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 13:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3E0D51C
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 13:23:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741958210; cv=none; b=tsZIBgMwovB/oGB/AMSEkhZP17N86nbk/TwGjTUs92XHLbAh4TfJK3XPifxICDU0cwjYeEH/ives8ZFyN/jeN1osKOV7O9W5weKsTBVcGjcxRSG1MWmcktjBDGdUKc5z+uQgoT8OWbFheepX7DWhsIxqqSAc29QXliSBWeiKWn8=
+	t=1741958614; cv=none; b=Qv74T/aKR8BI8r6zO7eMm0APuf+RUYj8GAO/G+4BVMrvIIiYHkstVWbsY+T5e2+9hQK8bIPuNIgCtLTJ9osxySxBQSPgeaQI+VwrGMNaxi1KlSQte21WT/pOEuVuhwpUgdSRsazDnN9kuAB+c0UNHwJQp0XJbtGGmGM59vQM2e8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741958210; c=relaxed/simple;
-	bh=6+rz3BmT0AgacH2FmIvbRq6TlS0E35xWSPG/ltHBt6M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j7l7mUNV0DND3wbpGXyEiAPvwmaeNnlhsoSCnQHTcxY0zBEPotSyImxWPjld/zftPupQZViOEfk+2qYe5kp/sSxgTnHOwKOYCWdUvnV+9syPsPU81+Mq2DPvnq3m4wuAISsyE/M8pvmDjCZDpL+2xNMZcfiETko3Eu37+UPvLok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=JR5cM9OR; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=V7ai00Ht; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Fri, 14 Mar 2025 14:16:45 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1741958206;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oumrGbwDvXAcmZx4C7Uh/ssk/QQ4ux59KUig3E4kMMI=;
-	b=JR5cM9OR5T9K7CekeKiJhKbV9YlufOhKOGwFYTZH9O0wni7oa5bLqiPLhJI4YInkHBy0fF
-	EB0EjW4pwbN86TTN+v7iZ3QGfK5/XObse/p2J3JF9XE7YwGLT368C16Z6k9L0ISKX3e/++
-	4ZB5ZZopoYSJH1e5bGyjwfsj6vHO/FhiY97D1Yu3NgdjvIOgIejJp4RKxbn/v8nqzRUw29
-	KhE7VkmYaRT1geMy/JXN+/ffVc50jOe9QfYyQoATU6tXSEBkkU2pyHteGQ0lRA4t/mS4O2
-	TzmS3nNRJgLOGVdgKfOVauBLc+zfoKPbDz3ZRlkRNtChM+adJk9awZx/ihgARg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1741958206;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oumrGbwDvXAcmZx4C7Uh/ssk/QQ4ux59KUig3E4kMMI=;
-	b=V7ai00HtojN05Kr5qMOWTio43S7fCmJl7XKjN2I7UAvNlQtOnszQ+/1ksedLU2oIEhFVuW
-	P0GROvUxB4Fic/DQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Wander Lairson Costa <wander@redhat.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	andrew+netdev@lunn.ch, netdev@vger.kernel.org, rostedt@goodmis.org,
-	clrkwllms@kernel.org, jgarzik@redhat.com, yuma@redhat.com,
-	linux-rt-devel@lists.linux.dev
-Subject: Re: [PATCH net 0/4][pull request] igb: fix igb_msix_other() handling
- for PREEMPT_RT
-Message-ID: <20250314131645.1S4dYLPv@linutronix.de>
-References: <20250206115914.VfzGTwD8@linutronix.de>
- <zy3irjybyc32hnow3ckhkfsrtfm5nev44aeovinlkkfc6tyyjv@gcblibp5ng3o>
- <20250212151108.jI8qODdD@linutronix.de>
- <CAAq0SU=aU=xpw0bDwaanFh_-r5tts0QNCtSmoteP3dM8-K6BFA@mail.gmail.com>
- <20250212152925.M7otWPiV@linutronix.de>
- <mtmm2bwn3lrsmsx3evzemzjvaddmzfvnk6g37yr3fmzb77bpyu@ffto5sq7nvfw>
- <20250219163554.Ov685_ZQ@linutronix.de>
- <kwmabr7bujzxkr425do5mtxwulpsnj3iaj7ek2knv4hfyoxev5@zhzqitfu4qo4>
- <20250220113857.ZGo_j1eC@linutronix.de>
- <CAAq0SUkMXDaSvDRELYQn9+Pk-kBjx2BWc7ucme54XPXD97_kkg@mail.gmail.com>
+	s=arc-20240116; t=1741958614; c=relaxed/simple;
+	bh=lMCIKNZKcc02fMfv+ywfFQtyP/pXJF8iB5Pk7aJHZjo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OANzTj36dR/STKn59tC97Ya4km5cdWnjqqlAska0QRMigS9f7wD7hUbYnjov/W+T5vg2SNwdHhKfkM8zLXEEvMslK60EG5sZDQmHYzL0izqU00uQ6Oi2VIuy5AjL9avKHeAemeCHGZ/j2vLddJoA2D/NuAmqeTQsOSh1p4bVoQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tt50c-0001hS-Ui
+	for netdev@vger.kernel.org; Fri, 14 Mar 2025 14:23:30 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tt50c-005i4w-2B
+	for netdev@vger.kernel.org;
+	Fri, 14 Mar 2025 14:23:30 +0100
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id 561A53DBBFE
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 13:23:30 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 3B6C93DBBE6;
+	Fri, 14 Mar 2025 13:23:29 +0000 (UTC)
+Received: from blackshift.org (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 7e77eee0;
+	Fri, 14 Mar 2025 13:23:28 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net-next 0/4] pull-request: can-next 2025-03-14
+Date: Fri, 14 Mar 2025 14:19:14 +0100
+Message-ID: <20250314132327.2905693-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <CAAq0SUkMXDaSvDRELYQn9+Pk-kBjx2BWc7ucme54XPXD97_kkg@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 2025-03-14 09:12:20 [-0300], Wander Lairson Costa wrote:
-> On Thu, Feb 20, 2025 at 8:39=E2=80=AFAM Sebastian Andrzej Siewior
-> <bigeasy@linutronix.de> wrote:
-> >
-> > On 2025-02-20 08:35:17 [-0300], Wander Lairson Costa wrote:
-> > > > You confirmed that it works, right?
-> > > >
-> > >
-> > > Do you mean that earlier test removing IRQF_COND_ONESHOT? If so, yes.
-> >
-> > I mean just request_threaded_irq() as suggested in
-> >         https://lore.kernel.org/all/20250206115914.VfzGTwD8@linutronix.=
-de/
-> >
->=20
-> I forgot to answer, sorry. The answer is yes.
+Hello netdev-team,
 
-Are you going to post this a patch or want me doing it?
-=20
-Sebastian
+this is a pull request of 4 patches for net-next/main.
+
+In the first 2 patches by Dimitri Fedrau add CAN transceiver support
+to the flexcan driver.
+
+Frank Li's patch adds i.MX94 support to the flexcan device tree
+bindings.
+
+The last patch is by Davide Caratti and adds protocol counter for
+AF_CAN sockets.
+
+regards,
+Marc
+
+---
+The following changes since commit 941defcea7e11ad7ff8f0d4856716dd637d757dd:
+
+  Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-03-13 23:08:11 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can-next.git tags/linux-can-next-for-6.15-20250314
+
+for you to fetch changes up to 6bffe88452dbe284747442f10a7ac8249d6495d7:
+
+  can: add protocol counter for AF_CAN sockets (2025-03-14 13:27:33 +0100)
+
+----------------------------------------------------------------
+linux-can-next-for-6.15-20250314
+
+----------------------------------------------------------------
+Davide Caratti (1):
+      can: add protocol counter for AF_CAN sockets
+
+Dimitri Fedrau (2):
+      dt-bindings: can: fsl,flexcan: add transceiver capabilities
+      can: flexcan: add transceiver capabilities
+
+Frank Li (1):
+      dt-bindings: can: fsl,flexcan: add i.MX94 support
+
+Marc Kleine-Budde (1):
+      Merge patch series "can: flexcan: add transceiver capabilities"
+
+ .../devicetree/bindings/net/can/fsl,flexcan.yaml   | 13 +++++++++++
+ drivers/net/can/flexcan/flexcan-core.c             | 27 +++++++++++++++++-----
+ drivers/net/can/flexcan/flexcan.h                  |  1 +
+ net/can/af_can.c                                   |  2 ++
+ net/can/bcm.c                                      |  1 +
+ net/can/isotp.c                                    |  1 +
+ net/can/raw.c                                      |  5 +++-
+ 7 files changed, 43 insertions(+), 7 deletions(-)
+
 
