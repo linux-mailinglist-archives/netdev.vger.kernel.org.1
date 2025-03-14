@@ -1,112 +1,116 @@
-Return-Path: <netdev+bounces-174801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15184A60855
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 06:37:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63EDAA6093C
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 07:38:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3DBA7A5C7E
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 05:36:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50638189E519
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 06:38:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A56E913D26B;
-	Fri, 14 Mar 2025 05:37:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C07F13B2B8;
+	Fri, 14 Mar 2025 06:38:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="YKW52vZK"
+	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="WTE06X8N"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CFBE22339;
-	Fri, 14 Mar 2025 05:37:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60BBC13A244;
+	Fri, 14 Mar 2025 06:38:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741930636; cv=none; b=EyUY3fDnfgvF6dLJ9dA4a0m/iJu+CGSLVB4yYkgvcUtObYl+fGnDxh7XZwuIIS+Om/cH8KAFoOA3Fj0svKDWVjyeIGsVaDxn7DXb5Hde14g9cZ8E2IL4sDITdYWcDm+lTzgG6ZChMZlRxiXuclak5uFaTr6wadse0pKf/MQGoGw=
+	t=1741934290; cv=none; b=NOmjVwc5Ikt2U/h1snlwVj2nHlRef8O18xkZ+Esq0GZed2jOcLbFeMhCmZm7u+fNgxUW4bIuQ8kdxCKmXBO+pAShXYMi5voaOb6qaZsxzLjUrwbfUP/PgbBwF9u3NnCc1kD8oueATdzS5snZvKbUF7OLxTSmui4+IeV3p10kThA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741930636; c=relaxed/simple;
-	bh=joNCjCEtVPa/tnAVU/qPppuc1NRidagR8E9SICraH2o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B2SX/DYeAXcqY6WwrMTexTDJjp0L2ME53iBmRNUBwbo54u8XEGnEo2oj6id7PMz7mEHxtfO8VZuClLwWMV5U+XsvFYJd5/uLZAQ3wlydf9s77FeIVEPCxdEK8uC3tV5K/r1co1bdOj82qgv6QL8budcWI60B+nWlyHlXkjGwzVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=YKW52vZK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F29CC4CEEB;
-	Fri, 14 Mar 2025 05:37:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1741930634;
-	bh=joNCjCEtVPa/tnAVU/qPppuc1NRidagR8E9SICraH2o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YKW52vZKcNWqPMg2G0+uLZQwGe7GRFSvyrd+UwdWUXDrcauqfww++wdd5K29MYqf0
-	 BBeXfkYwpjD6LBF4zpoK0scWDh/9Ay7RpZH7ZxARod3xV2QjBlMnV7rY7NcvMF46gT
-	 CMBwVdkRdEtjFGrhRDmH55aiE77/3QfGOBN6ikeM=
-Date: Fri, 14 Mar 2025 06:37:11 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: "Nelson, Shannon" <shannon.nelson@amd.com>
-Cc: Leon Romanovsky <leon@kernel.org>, David Ahern <dsahern@kernel.org>,
-	Jiri Pirko <jiri@resnulli.us>, Jason Gunthorpe <jgg@nvidia.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Daniel Vetter <daniel.vetter@ffwll.ch>,
-	Dave Jiang <dave.jiang@intel.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Itay Avraham <itayavr@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Leonid Bloch <lbloch@nvidia.com>, linux-cxl@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	"Sinyuk, Konstantin" <konstantin.sinyuk@intel.com>
-Subject: Re: [PATCH v5 0/8] Introduce fwctl subystem
-Message-ID: <2025031408-frequency-oxidant-287f@gregkh>
-References: <20250303175358.4e9e0f78@kernel.org>
- <20250304140036.GK133783@nvidia.com>
- <20250304164203.38418211@kernel.org>
- <20250305133254.GV133783@nvidia.com>
- <mxw4ngjokr3vumdy5fp2wzxpocjkitputelmpaqo7ungxnhnxp@j4yn5tdz3ief>
- <bcafcf60-47a8-4faf-bea3-19cf0cbc4e08@kernel.org>
- <20250305182853.GO1955273@unreal>
- <dc72c6fe-4998-4dba-9442-73ded86470f5@kernel.org>
- <20250313124847.GM1322339@unreal>
- <54781c0c-a1e7-4e97-acf1-1fc5a2ee548c@amd.com>
+	s=arc-20240116; t=1741934290; c=relaxed/simple;
+	bh=z8lG/iytWZ1MDf7eUS10O5PYpdUp7OzCeJtWL/rC4jI=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=bA/MkeAGNlpPNz3XeBvTeShBnptw7aN9PnBSZfaqrhb8FbWv9caefErjkyhPfKMzO6hoIyI9aUOBZ1QtQh/whH6tPiBj2UgYvLHS28laZ7Gn82RhC7F12FU87ustHK5ZZ8mzgb8BtJX2VSRpo74DvacX9H4s7czIgIJL6zJnf9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b=WTE06X8N; arc=none smtp.client-ip=78.47.171.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
+Received: from [192.168.2.30] (unknown [45.118.184.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: stefan@datenfreihafen.org)
+	by proxima.lasnet.de (Postfix) with ESMTPSA id E7883C0183;
+	Fri, 14 Mar 2025 07:37:57 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+	s=2021; t=1741934278;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bm3q1T2t2AGrSMqbsyzCgboJjrfuzn+AT6oxv2TYz88=;
+	b=WTE06X8N/+E/zd9WOYB993TRpOwiNEGXfp9nD9H1hnSlRAaqkhgPe/R1PNJsC/ctomMWgR
+	Z1aOThRW4LpaUuYQeywWRf6ckjimtwmEV0QcfChL+VN3OZIDcojHX/PiIYmOa7jLjj3VaE
+	b4ho9axmhq80BpS1lYyRi2flxysOoLZ7NEAQMs11lJf3Y/UijjVzHBjycOkWLebHZAb61J
+	HxBw05xsdyfmrEeByUDRDeWniBl+w93wn5ig42kcvwfKOH2MhXkmPWlvbUGLFJ7u6GbGb0
+	sNySgApQo41eYp10E1pJRDwTO2Kdp8Mmbu3hKRZwqcTj5gJOnmpSpT5pjF9Lhw==
+Message-ID: <91648005-0bf9-4839-8b8f-5151056c9f9a@datenfreihafen.org>
+Date: Fri, 14 Mar 2025 07:37:57 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <54781c0c-a1e7-4e97-acf1-1fc5a2ee548c@amd.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: pull-request: ieee802154-next 2025-03-10
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+To: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
+Cc: linux-wpan@vger.kernel.org, alex.aring@gmail.com,
+ miquel.raynal@bootlin.com, netdev@vger.kernel.org
+References: <20250310185752.2683890-1-stefan@datenfreihafen.org>
+Content-Language: en-US
+In-Reply-To: <20250310185752.2683890-1-stefan@datenfreihafen.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 13, 2025 at 12:59:16PM -0700, Nelson, Shannon wrote:
-> On 3/13/2025 5:48 AM, Leon Romanovsky wrote:
-> > On Thu, Mar 13, 2025 at 01:30:52PM +0100, David Ahern wrote:
+Hello,
+
+On 10.03.25 19:57, Stefan Schmidt wrote:
+> Hello Dave, Jakub, Paolo.
 > 
+> An update from ieee802154 for your *net-next* tree:
 > 
-> > > So that means 3 different vendors and 3 different devices looking for a
-> > > similar auxbus based hierarchy with a core driver not buried within one
-> > > of the subsystems.
-> > > 
-> > > I guess at this point we just need to move forward with the proposal and
-> > > start sending patches.
-> > > 
-> > > Seems like drivers/core is the consensus for the core driver?
-> > 
-> > Yes, anything that is not aux_core is fine by me.
-> > 
-> > drivers/core or drivers/aux.
+> Andy Shevchenko reworked the ca8210 driver to use the gpiod API and fixed
+> a few problems of the driver along the way.
 > 
-> Between the two of these I prefer drivers/core - I don't want to see this
-> tied to aux for the same reasons we don't want it tied to pci or net.
+> regards
+> Stefan Schmidt
+> 
+> The following changes since commit f130a0cc1b4ff1ef28a307428d40436032e2b66e:
+> 
+>    inet: fix lwtunnel_valid_encap_type() lock imbalance (2025-03-05 19:16:56 -0800)
+> 
+> are available in the Git repository at:
+> 
+>    git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan-next.git tags/ieee802154-for-net-next-2025-03-10
+> 
+> for you to fetch changes up to a5d4d993fac4925410991eac3b427ea6b86e4872:
+> 
+>    dt-bindings: ieee802154: ca8210: Update polarity of the reset pin (2025-03-06 21:55:18 +0100)
+> 
+> ----------------------------------------------------------------
+> Andy Shevchenko (4):
+>        ieee802154: ca8210: Use proper setters and getters for bitwise types
+>        ieee802154: ca8210: Get platform data via dev_get_platdata()
+>        ieee802154: ca8210: Switch to using gpiod API
+>        dt-bindings: ieee802154: ca8210: Update polarity of the reset pin
+> 
+>   .../devicetree/bindings/net/ieee802154/ca8210.txt  |  2 +-
+>   drivers/gpio/gpiolib-of.c                          |  9 +++
+>   drivers/net/ieee802154/ca8210.c                    | 78 +++++++++-------------
+>   3 files changed, 41 insertions(+), 48 deletions(-)
+> 
 
-Decades ago we tried to add drivers/core/ but I think tools really
-didn't like to see "core" as a directory name.  Hopefully you all don't
-run into that issue here as well :)
+Friendly reminder on this pull request. If anything blocks you from 
+pulling this, please let me know.
 
-Anyway, if you all want me to run that tree as a "neutral" third-party,
-I'll be glad to do so.
-
-thanks,
-
-greg k-h
+regards
+Stefan Schmidt
 
