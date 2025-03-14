@@ -1,107 +1,207 @@
-Return-Path: <netdev+bounces-174899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8F81A612C0
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 14:34:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3959A612D7
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 14:35:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 223BF1B635E5
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 13:34:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 151B2168527
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 13:35:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A79561FFC5B;
-	Fri, 14 Mar 2025 13:33:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FAEA1FF61D;
+	Fri, 14 Mar 2025 13:35:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ku5g0O/a"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k6mRtsKZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1711FF1CF
-	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 13:33:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741959239; cv=none; b=VXqgpUk1j9Es1gnbkP7lWhVjad8tRf+N7Wov492yl6Jd/Cm+9w6C5NU/6TeskCE5DOvLOEbsVZx/Tv5aMIdLVZfZOUk8xtcaxd3n1VSE4a32F/cc8tyHKTl11pz+QEyVAZwy/6KZgRhYZlItZGe++a9NfhcYb4jP0D1pj+O+8Bc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741959239; c=relaxed/simple;
-	bh=3xh3DOvzyDAUCx/qDA5kF7cyI0VMcwnlJcCuIUwSCLo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lip+YYLtAxhFe4AH5rXML3U+08Rn2cuByYi/iTCZGfptsPV16tfQ8+NWBPB9vzE4YUbPDQJmaGV/GfASr8+VHDw/LRNAi99LjUHwBY7EMiBXW1pmoNvcmc4V6L6qmbIroSL8Vnh1rK4GnTCu7p8BEzDyi+pdtWkA9y1gq3c6P5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=ku5g0O/a; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43d0359b1fcso14237745e9.0
-        for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 06:33:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1741959236; x=1742564036; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3xh3DOvzyDAUCx/qDA5kF7cyI0VMcwnlJcCuIUwSCLo=;
-        b=ku5g0O/a1AvgjaVyIxY+u5l0IQV9dUkKdx7OWXGVzW6VLcKEYADC/O+XzbaaFtwkNK
-         2TW5BrsAvbupqmGLH79QVgxGnLbwDbjJrevsRsr8B4n7ScIIeGiOWXKa3gQhXSxLWYtv
-         w+naOL/mLkOt30ADZ60W6G4lBKJG5jrmeH4rJ1BdM1tkUKd+utpxYjM7vtlvaZ6KOwdI
-         7VbWyRjC0kkP2XJU83ajuYZNQ49q6LysgWjzDv7zZZvCfFS96CGL7bWPS7Is3mteW3+o
-         uApoTHK4DHtD2o4G/qD27YMuO2Hov8a7642GL++skC9Gu+/H7LVMuyWEqV+kiZl77uTJ
-         v6ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741959236; x=1742564036;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3xh3DOvzyDAUCx/qDA5kF7cyI0VMcwnlJcCuIUwSCLo=;
-        b=wf1t9bgWVyl35f6LAeKiEoxrqKmHC0n5tB0Camt1BgAx/IVfy1MEJA5UadVnLzQ6K9
-         U5ZxOlfSTRgGHBTQtO4sTOhhRI2bTq8qwKuz6Dgt/wMdM9XlwH4ew2qfXxoFfVHkfsND
-         1oAZKCD/+BtlriDbaXHtXIZk6HDirQzLBGa1dwZpXGF9em2NMEoQVc+i2OE/alBn30qE
-         4Xkdo8/hh1JMu/B7mKCZefJ/Ik5EeM05ORNxDgtG2OD8Cbgv1lOpv4BADKKXyrZtHFPO
-         fpRHiBuSnVrGHYmWXON9ZiGOCbhSsdTcoPJy58ItWyS4DOUJxRzZd//cpEzZ3WZEqfDC
-         lF4w==
-X-Gm-Message-State: AOJu0YycuqieUMqmkUWy2lMvhYuqtUSG1reuC7sDIUoyCXB89P6e8M+i
-	NSF8fiNmOlbwZgKz7rDDDbdBbmeCTUKAcJJvBujeKWcNaRbwxDABWOvi7/sXJG4=
-X-Gm-Gg: ASbGncugOUCI1uah4I9/6n0F79My5eYE7c/UVWxWluPWinWUXdBjTunsMz+pPSWZ7s3
-	gBpQ9/NtjD8KN87d8HMI5uxYe7OVm1Lo4H8BG2D+wGKgaztoA3wlpiyXR/qn4CJIUHG3eMyR13K
-	icILCQpdhDp64T/F8c7mf0FNNGnpsk8b4I0mYpyNKPlwStpGiYSgn6eaz0fxLL2uU/Qm6WtBH2X
-	EtiN9Akhkp5HX3de0N5iiTfehF2AJchDAfHxSnLqd5bAiWn4iACCCGMD7spAeLv77zI6PCgGERS
-	k1vXSpSq1XtT0/9okXKNAssbNTGHCUeS14SyvbmwG+oYNAdbhEG5ClpGifZ+YOMSiyOX69w=
-X-Google-Smtp-Source: AGHT+IEUYVVJisJTgwudR+GItzyMdrac+rFViwUHFROMotaVw5KsfY4bpgeBdfWcvbp+g6V5/j13kg==
-X-Received: by 2002:a05:600c:3206:b0:43b:c7f0:6173 with SMTP id 5b1f17b1804b1-43d1f84acadmr27463965e9.4.1741959235903;
-        Fri, 14 Mar 2025 06:33:55 -0700 (PDT)
-Received: from jiri-mlt.client.nvidia.com ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d200fad59sm17612565e9.26.2025.03.14.06.33.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Mar 2025 06:33:55 -0700 (PDT)
-Date: Fri, 14 Mar 2025 14:33:48 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, pierre@stackhpc.com, 
-	hkallweit1@gmail.com, linux@armlinux.org.uk, maxime.chevallier@bootlin.com, 
-	christophe.leroy@csgroup.eu, arkadiusz.kubalewski@intel.com, vadim.fedorenko@linux.dev
-Subject: Re: [PATCH net v2 2/3] dpll: fix xa_alloc_cyclic() error handling
-Message-ID: <nhvgxs7hu6oxshtj2vlowjcg7fw645xntjp75owtwbnovbacsn@3nuoo2gvxicf>
-References: <20250312095251.2554708-1-michal.swiatkowski@linux.intel.com>
- <20250312095251.2554708-3-michal.swiatkowski@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D55251FF1CF;
+	Fri, 14 Mar 2025 13:35:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741959354; cv=fail; b=LGjKRoqDxO0i2QjifWh1LgbJM8RkJ6HFi1V0k5JAsfPnJ+Fkdfbuc+H0PmYB5jMFOUKJoK6Uj9fUZNIA1TK61NfgXyoxtTWzeMD4olUYnSQfHIvCG416nGA3AcBF7a20yEgEmCw4mWGu5D8+ZX6E8J8kChVua71UMHFX9OG+CdA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741959354; c=relaxed/simple;
+	bh=i66QHY+r5vfBO3tZylxeHgWZchQOnhznzTovBHnz3JU=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=kT5Lt0BymehwlKcbRskoR8Mc/A4gCfvI3AI1Qcs9eze07YChZ3u3nRY2BfkOsterbHU3WB4Rb9I4h5+YQZPh1Nhu2an4MoS3gFBScQbcoH9MXQ+B3ymdREkcyN9VYR5JUnGZ/EbNIU7NWn7jEeSqrTeX5sA3yyUZXcppaB+POik=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=k6mRtsKZ; arc=fail smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741959353; x=1773495353;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=i66QHY+r5vfBO3tZylxeHgWZchQOnhznzTovBHnz3JU=;
+  b=k6mRtsKZoUhmXPaCTS8hHlr3I1JDJtq4uskmxmEumFuodo33W9V4rTMs
+   j3bGNX8OSGVE5aj6RKJPsx0vQDzPcBEnUEY+jNq/6lVr4MInry8x8QhBb
+   vOWY+kcM6QOPQc34DCAUmBrPgd3rFyyxKv5Euu9agWZY3WnivgPh1/X61
+   QI7httlZaKW2iYamxrFpCnCmVZKXyEHFbuwUABJWHFboQtdhnODbMoWKV
+   kOpcd+P8TqH771SggWak83mmgKvGSzKUBy4gc6ePhOkY21pa7NCoMr3P9
+   nVk/p/9SP+0kADNKkapWNJBKFvWR96GTM6DkC9E7MwPVB1zXXzci/0z0/
+   w==;
+X-CSE-ConnectionGUID: yrMZwSZaRUWWBenJKgH0nA==
+X-CSE-MsgGUID: kF55Qn/7S0ObIi87eaw09Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11373"; a="43239380"
+X-IronPort-AV: E=Sophos;i="6.14,246,1736841600"; 
+   d="scan'208";a="43239380"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2025 06:35:51 -0700
+X-CSE-ConnectionGUID: 0aIWUna4St2FWJAPquL6ug==
+X-CSE-MsgGUID: /x6pZqIQQ/CHhdzkwRLWXA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,246,1736841600"; 
+   d="scan'208";a="158435717"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2025 06:35:51 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Fri, 14 Mar 2025 06:35:51 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Fri, 14 Mar 2025 06:35:51 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Fri, 14 Mar 2025 06:35:50 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=W/YDDUhzC8FwLhgS/5dydPxXPz6QTsFXDS6HPgDagDE3Id/Cmxo88y/nnGXA7u0GTHTvf4eftbbK98S0CudXwM3W3ygONql8Grb0E5wiOQ/DmWiaIeA+TK1D3A6upn6i6x1P72US7eUxq6ZqYyhjhd/D+INowNwYoSbgLLI+mvGTyDvXmS0a0CaqZwgO/mL5F65d1/Em9RJzoyAJ6MUTpGRBmEHQzY+HXlf8W5hQ8bcJ+2NNLcvVfWcZwWlStghLiPzQFBIsp42Qrf3q5H7UxsZx992tQOezcho36X/of4kDggwbHYFFn3jHnwLxzlu6q08eiupOFVMoYVXAqh7Xfw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hUoNb12D3Kw/zeVSyWjix4HYnctaVtCFvlSgSNYsOLQ=;
+ b=D5EzL0tH2hjhB0PA/ZvegLW1nYgWMn7EbTk12Lr6Dn9Q8AU4uXe7DD6HGh+/RPUukf+sVYFizPFSR5io/HQks+wA+MujGWAcuSAW/gdmBbEpSBGxSCT1fDmpHaWbOGxpLlLBJRvQj8bDs2WU2JUNXB1+ssTa6Tc339zY/r6kY4wmoykK1Ws591cEMI6CxZIHpv+FwfgfxMe+fehjs5kWCRHE3WMChCD8+BGHBdYhkdMWrxcUP8elw7zC8gj/QIAayJE68VEGPBTTO7jTa9SPecyMqsdopiVAJJisdmz4CVOgDCVl7sUbprRFjV/8Divoz2M11B21KiYtMkym3Y+rxQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
+ by SJ0PR11MB5037.namprd11.prod.outlook.com (2603:10b6:a03:2ac::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.27; Fri, 14 Mar
+ 2025 13:35:49 +0000
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::6826:6928:9e6:d778]) by CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::6826:6928:9e6:d778%5]) with mapi id 15.20.8511.026; Fri, 14 Mar 2025
+ 13:35:49 +0000
+Date: Fri, 14 Mar 2025 13:35:41 +0000
+From: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, "Richard
+ Weinberger" <richard@nod.at>, Zhihao Cheng <chengzhihao1@huawei.com>,
+	<linux-mtd@lists.infradead.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
+	Pavel Machek <pavel@ucw.cz>, <linux-pm@vger.kernel.org>, Steffen Klassert
+	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
+Subject: Re: [v4 PATCH 03/13] crypto: iaa - Remove dst_null support
+Message-ID: <Z9QwrUqA0eaYxZaA@gcabiddu-mobl.ger.corp.intel.com>
+References: <cover.1741954320.git.herbert@gondor.apana.org.au>
+ <11128811057de7bb7e8d9ce9fe56bf9ee64ad143.1741954320.git.herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <11128811057de7bb7e8d9ce9fe56bf9ee64ad143.1741954320.git.herbert@gondor.apana.org.au>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+X-ClientProxiedBy: DB3PR06CA0021.eurprd06.prod.outlook.com (2603:10a6:8:1::34)
+ To CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250312095251.2554708-3-michal.swiatkowski@linux.intel.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|SJ0PR11MB5037:EE_
+X-MS-Office365-Filtering-Correlation-Id: 61924878-87cb-45e9-1242-08dd62fd21b9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014|7053199007;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?S45RTUJGhk0xpWyz750cBpAdjaeN1cOUTk4A+ddZ5jzkvGyJhzx/MMabucaZ?=
+ =?us-ascii?Q?hDaPRh7mYalnHiu2krxW6jEJyO7Uq1X0qfkV5i0+ms0tUNrY5Qxm/wACiRtE?=
+ =?us-ascii?Q?v2eLDTPF9Jhm2FUObnw2ErmG0mBD8bzBbI2m299ZjRKHkI1/C7OxDcmKeXOq?=
+ =?us-ascii?Q?5lZ7MhhHpficxkeJpqAL26EC03nXwAqgvXA5ROWYwPSn7ago0iDUtdVN9Wic?=
+ =?us-ascii?Q?L1w5HU1dE4IHrciGonyL/g4O9q25rxuWJaMPwGfxb08F1CLsxPfecOSCl2ss?=
+ =?us-ascii?Q?+OFiebD6nfzeGZR8vF8K5J3fhsZKNSGj4JZBitQAoxpIGUISIftRyAflcr8s?=
+ =?us-ascii?Q?ASRCo6cR0oBbktAJlk7cKNqzEqY8/rRekh8LR/5mNXynvqJoPDOp1SMf4S3n?=
+ =?us-ascii?Q?CZ9M1HBuSOUm/rO2i8p+T87ggqYoaQg8DwAas0tybN+hzzcoK32vpQAhxvp7?=
+ =?us-ascii?Q?+YRnT/BgAsxA1P2UbQHd9V/Ogtx7VrRysedmQmb6NSf7SaAyxlLyM6nT+yNp?=
+ =?us-ascii?Q?Zbxma+2CvQkwniuSPNKb4AJN4mwt3AgNF+0DpZwdtuG1eRw1FXVypymqLcRS?=
+ =?us-ascii?Q?wG75qdN78Uyhnr3ZkIh/apqe/XWJvWeyUC4uZi6LuiDoQtxDYAuLBDqzf6FC?=
+ =?us-ascii?Q?reKj/z9E1MCXetce8WVugookqhgLsqaUEVFAPw5l4pSizyMvSPk6Nia2B0cu?=
+ =?us-ascii?Q?bC+DejahPQ4TGCfBMhQ1nrleDpGHJ+6Jf9kq89uCCJkvtzUoVpcudlpxFOaA?=
+ =?us-ascii?Q?xrPKvzxPYlJh86LmrViCkKlPS3viz7X4p/xMDKQUxbl3S4Im+KEAhaE3YNFM?=
+ =?us-ascii?Q?puTrJsmw6MCIChd1K1Ucp3R1SgD1aJKsww0/81+rYvEeb1TPVzeUhJkscjYz?=
+ =?us-ascii?Q?GymTtsaFko1xhwz0upY7xWNToZgiMCxhMBSusfXA21lHC1DMi3aXXfQ6leV0?=
+ =?us-ascii?Q?TP9y45soj1bL72nr29KX3bVdf6Qw3pzct+wAc4IwiGh9wx2BrkDuFYRM2tvv?=
+ =?us-ascii?Q?EwbMrvpc8nkv6WaR3xcGCt1BYepr0ggxxHceHnwDlqkQBlFP66/ucHqZCvxF?=
+ =?us-ascii?Q?5lhAF44c8zvwCUReI14QWymOojN3SUWB3TQtTaiJGq2AIjoujyz1LLmtY+Yo?=
+ =?us-ascii?Q?qPUYzqXurmmTIFD7IavDOnJe7csQzX4WDDBfQAEsl3vN3cLZCSQHUOBOZpIA?=
+ =?us-ascii?Q?Z9O2Btbj0EfJ1iPLxLuV/PUUNWIujNs+iIcj9R65G+P/xrfj2c+5gRvCqbFg?=
+ =?us-ascii?Q?Ls4oWmtSaAFYQmtqml+TwPQ6SDM8rWmOpAT4ivF1lcLNPjVMrxVWlTfT3uOi?=
+ =?us-ascii?Q?265geLusxcz0mesrn+IBtCDGiBg90kpWAuGggzJipLF73FAlnUcrJcOkrOfL?=
+ =?us-ascii?Q?eKNsepeNyDFrQeGWqBgpSMpDuWdh?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?3GqRWJwQIdcyeQptb8N8plpaQ8/ASJBFbXT4X1XnP5RE+Y2JE6pfLSpHZt1c?=
+ =?us-ascii?Q?3YHZy2GKA/Ah0NNUB1tkuVPIAeX+e7K0yCCt8XODyflgItNT4uhYUlNqsfmN?=
+ =?us-ascii?Q?iL31u/PS6rgkJ4KUmygFv78F3XE5czEJVSHj4wnLUOujxAlWeOabvOdE+hCF?=
+ =?us-ascii?Q?210SHOqH3AL0z8f2rSqJgGAxzE27SKrwYPugXla0AGHsNMbUqyuBp03s1zS+?=
+ =?us-ascii?Q?8+JcpZQr2LOc8DbjACXskCwUY6VY/2WyZY9IKFmmXFde1xzXw7Oa3EA8HHUw?=
+ =?us-ascii?Q?GHsALaDB/Motu2Q930T9EM+Jw51UL1SczpmMtVKoUKL0NRbEXQ6hHf9hHy7e?=
+ =?us-ascii?Q?0UtxXV6YVaW+O2p3Wlhi1Bh3muxwqmHtTf1OEr1tHyZMpwgP+leB62RkrozZ?=
+ =?us-ascii?Q?W9B4QavEU8vO9WuXm2stcoV9ItSYw6fs+RssmOcg95VsxLnXs67YfN5oDlou?=
+ =?us-ascii?Q?IM9qo3XNEjg3L7hWUMNGGif53RLtgioAeOsIucdi34UVNZsbIoOXJ3ndRPv8?=
+ =?us-ascii?Q?F4iEwswCaewvk6YrLHn5wQXbue+TYnTHglJszD3Q5NOQ6WpBRkXmjGSmn7QG?=
+ =?us-ascii?Q?y9clNBKsxBl2thIvW2eMe576yAEK2pXj86ndxeEdD3R0yGSbXpIMUeUrr35y?=
+ =?us-ascii?Q?UdrxRONrS9CHzNh3hb5eWNEVlPbIukJgocLq6PebemBk/xeLFHMNTBsgD6lT?=
+ =?us-ascii?Q?761GdPxW9itQAKq63Wrpv+sJnDTgpfvTK9IaWDVFREoLWSg0FtIxsIP6j0j9?=
+ =?us-ascii?Q?dTPR/Jcp1HDEhR72QU6/ucVUZwWg2DLvAEVR05xn9jJseJFuQ2YCl56bzkIc?=
+ =?us-ascii?Q?3cerVg2wa2zRjKcq7jlySuWYfUgaQioja1UYYkp+h0J11gXHVsjlb+yOYmoq?=
+ =?us-ascii?Q?bNzbtfAE8o2/FrTPre6oRsB0bdsGLImDEz4bDM22mORlC1wGYdK3S20Tif7L?=
+ =?us-ascii?Q?2XabWuZQQMHCpeHPBzVaeZ3vEjNAEffBELenlXMmQw9QcKyGNhltSw/SkGn2?=
+ =?us-ascii?Q?XlzQJIbglNoXVPAWIaxiSq7eJPgffZuRa8e5y5QsIopCkv+iABv0laSYygaQ?=
+ =?us-ascii?Q?2QrMUOijteXgXR7SCXULhZVTeNiwdmMneWIfqLBd0BN/1AjLVPeqekixU2Jc?=
+ =?us-ascii?Q?KGX4Fx9SW+F8uO3AVnQkvfk61d+k+hYDs7ed5Ccwxjs5AJx48eLaD0Zi6VWs?=
+ =?us-ascii?Q?bs1WJh7nqbsOSZ6w7NTRwyFytcPoGbArLWOsNNTt4ky9R/gKJlZHOsa5XPcP?=
+ =?us-ascii?Q?qAK0HxW9zxqMU3TJYkfZcoA6PzDLABMNKTQm3ooQyDJKcT9pen/ij+Pli2UG?=
+ =?us-ascii?Q?Sm13PeIAL/m5Plyw8meJZl7xoHu99IN6T21JRFWBv5XCrSr6za438JZRBz+E?=
+ =?us-ascii?Q?etFE1deW1R8eMIvBvIq+KSfRRdIZkhsqju+jMhvYJ9DUKbHMONNo8OmLRmC+?=
+ =?us-ascii?Q?5ZXpRI8pZww2dwiF1gfuyiBhjVImzA2vyEWlG7p1jTCSk7rVVNQOmPIF51QH?=
+ =?us-ascii?Q?ru1UtE/bBSDPd0YIzcVahG3C18vu0P3alR5t4MkCqthCPHTnkDRbUmwumL34?=
+ =?us-ascii?Q?OttRz0+z2bFjmwuQCzuy4hjgSTPpGUM1zWBk/21eJTt5CmxpEPt4Qgu4+o3q?=
+ =?us-ascii?Q?RQ=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 61924878-87cb-45e9-1242-08dd62fd21b9
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2025 13:35:48.9534
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: hgv628r8rGxirHEH/M1JLmb/3R3tqgN/tXqbCvYNJMN7UJeFDe27C/oWjQTZpyjQEbzBJokQfNSL7WmTaw6NGtef6hfZ4HSFFW083bHhBrY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5037
+X-OriginatorOrg: intel.com
 
-Wed, Mar 12, 2025 at 10:52:50AM +0100, michal.swiatkowski@linux.intel.com wrote:
->In case of returning 1 from xa_alloc_cyclic() (wrapping) ERR_PTR(1) will
->be returned, which will cause IS_ERR() to be false. Which can lead to
->dereference not allocated pointer (pin).
->
->Fix it by checking if err is lower than zero.
->
->This wasn't found in real usecase, only noticed. Credit to Pierre.
->
->Fixes: 97f265ef7f5b ("dpll: allocate pin ids in cycle")
->Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Hi Herbert,
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+On Fri, Mar 14, 2025 at 08:22:28PM +0800, Herbert Xu wrote:
+> Remove the unused dst_null support.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+This patch is replicated in the set and does not apply. See [v4, 02/13]
+https://patchwork.kernel.org/project/linux-crypto/patch/11cc12d83023ca382492fc2b2ebf45c84e37acf9.1741954523.git.herbert@gondor.apana.org.au/
+
+It seems, instead, that the correct patch 3, crypto: scomp - Remove
+support for some non-trivial SG lists, is missing from the
+submission.
+Something weird happened when you submit the set :-).
+
+-- 
+Giovanni
 
