@@ -1,92 +1,128 @@
-Return-Path: <netdev+bounces-174958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0905A619C4
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 19:47:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECD8AA61A06
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 20:02:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3139846253D
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 18:47:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38C2B3B2952
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 19:02:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F114204C29;
-	Fri, 14 Mar 2025 18:47:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 428CF204875;
+	Fri, 14 Mar 2025 19:02:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ug4sIOBC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F23C204C1D
-	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 18:47:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A08E2AEE1;
+	Fri, 14 Mar 2025 19:02:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741978027; cv=none; b=RAzUdWlEdeCZhOeXzFGZ2GmWUeDhyb/uoV0HmRv4XQwgcMaslH+Wc7+TeED1Jw10Kp4ABXrEL1G70A9QK9IiBMk0MoqC69L0iYsMB4bKeR8vQ/h1I2huRFwBuHP8wjEuyNFBFD49TI4fQdqE+B+2uUgzAV+VJCLY8BWJC1DuyQc=
+	t=1741978938; cv=none; b=mxiQmIdZDKQVwqb0v6UOAB2/fxF1ZVFVlibvs9ZZtHa6Y+ccjdMiwEuKzCubXRFCGB3xRe6gm7kHI7WhuXwyKQasCof6OJ2gL4vXbiyF0seq3m7+rTow3Y9SFXX5bQMHqJJOWrXxqgUM1Y8zLtb5Zn2xxRwn7rp0wuUhlulix94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741978027; c=relaxed/simple;
-	bh=lP+WWwLeJcNl+xjynrFw4AUeIaxg2oLzPxAdObxBxnM=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=gGIjtaAGRV+Ai11jYTRISHcabLHrmGJG5USh5uIz5bq+plmcXLCWHr3mjIId6BhBrMgqJ6FJmph1BRlc9cftsE0Unw2UW1cljAmWNWXCwWbgR79EqbBAB2yFw8MJDXLUryPxwrDQcPDoqp+G10UFximw5rD22wijuHl/gx7sesE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3ce843b51c3so58316955ab.0
-        for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 11:47:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741978024; x=1742582824;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NxkXkYDWiW2oVyldkemU8ucECoqqgSoeCvPEsiTtUu0=;
-        b=PBhwXxyrxLnAx9ku5HYKpr+N7LkX2CX1Yxzf1HtcHs62tILBUguDR1anKtDqllt6xK
-         vsLi+2AHOZjsKL0DEf5I58eqfMy0QrDHu4bK1HWjQhngGDLFAEdFLl0JsVOBh6Xcpbxi
-         g5OP+Iwq6I5XOsiMGMOA5gczcpwaPV+zHt/reDmODFVy9q2f63HX8kyI3gWK87nxBZSG
-         sgHeJ0Lsw2yPJbvAjiVPEVMHJv/nECQ7fkwfv2Tt5ZDswe05v4xXq/9uEMH+fQ4bf0Ml
-         XW1fC2mGtRjJrxOBtuL51Kp15pSzErg835YU53p0ILAEV7wd7Oe6zIzM16l0TMRRGAdU
-         3E8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVyWcbxEHgHHYp6emmE4cqzBbAWFM9xqRGM8bpee5uGVDJFUFHVGW9hhxG7OcbzWX7kx7iDqIw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzh6wiBXEBKi/QebMMwM0yA+YsW3coM/I2WuxKpzl7sW3551dnl
-	F2msWpiWdXqAjT/ieaXefB/D3WHdDP0ayqZ85MDILVRZYYtzMzxv4i9vRHRYZ1B69Qh0B7eOFtE
-	0UDFNUjhbPfOFWRzPMM27/fhUkINOrEBWOhr8JYdKtRCEcZZOFchizd0=
-X-Google-Smtp-Source: AGHT+IF2NJDjExuIXbMXWH2xKdFFik4mQ2Cbteg2XeWs+t07tMq6LOwOI/VHD7UEdRzJmzYoxxADQlr9bGDqb7kO3gZfuHYRjCMG
+	s=arc-20240116; t=1741978938; c=relaxed/simple;
+	bh=6FXnnEH09QAZ8cazzLfIiksMA3P3FtrJqIeAvTlUtZw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qCgluKbo4MY3Zfqp0LthwmUM2q6WcpUIAF1R3LNJvA+u25lCqTWn9Mb86L5+DIaZs1z2rQ9fnwhKH7ADymUmWEXauFIGKESR85GSx/IZ+EDJSjBDPPED6Jjd8RHnnRrhtX4QnFwU/VWX+XUH2Fs2l3tjlBJTFkF+/pInXnpDfuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ug4sIOBC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 355A6C4CEE3;
+	Fri, 14 Mar 2025 19:02:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741978937;
+	bh=6FXnnEH09QAZ8cazzLfIiksMA3P3FtrJqIeAvTlUtZw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ug4sIOBCu/atbRHws0kDAWy+P5JRCWkjk10Zl3FLpFAtgKe9A5Uem7BJTId/TGUOU
+	 j7vwrcb4rZJcwex9/ELOavYmCYBdGo5p0vvWxXrM0E1G4siGrk+myBlWzNZy5umxmq
+	 PEBcZtM8OxpuaFmiPPVS10CjJFTLgFWfMofJK86xa31Ki67vsNJDHlZtIrVCx04EjD
+	 0fGaMIt3VpbtboLeO/oQzxgqVc+vf9FAsjOLzCZcdgiHpF/YYFofa1zJQhV4gU3Cn/
+	 dRqzB5ucYs9eEA2Ohfxd5/tzmh5ky4yShDRLraFXOHwAY8JSO7Hm5x8US02JVWHtEM
+	 bN+S6ZWSr8APg==
+Date: Fri, 14 Mar 2025 20:02:15 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Arnd Bergmann <arnd@arndb.de>, Simon Horman <horms@kernel.org>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: airoha: fix CONFIG_DEBUG_FS check
+Message-ID: <Z9R9NxIsMAyUZFYf@lore-desk>
+References: <20250314155009.4114308-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3b88:b0:3d4:337f:121b with SMTP id
- e9e14a558f8ab-3d483a0afbbmr35023375ab.8.1741978024613; Fri, 14 Mar 2025
- 11:47:04 -0700 (PDT)
-Date: Fri, 14 Mar 2025 11:47:04 -0700
-In-Reply-To: <20250314181925.69459-1-enjuk@amazon.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67d479a8.050a0220.1939a6.004e.GAE@google.com>
-Subject: Re: [syzbot] [bpf?] KASAN: slab-out-of-bounds Read in atomic_ptr_type_ok
-From: syzbot <syzbot+a5964227adc0f904549c@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, eddyz87@gmail.com, enjuk@amazon.com, haoluo@google.com, 
-	iii@linux.ibm.com, john.fastabend@gmail.com, jolsa@kernel.org, 
-	kpsingh@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
-	netdev@vger.kernel.org, sdf@fomichev.me, song@kernel.org, 
-	syzkaller-bugs@googlegroups.com, yepeilin@google.com, yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="FZYNFFCFDJf0hCka"
+Content-Disposition: inline
+In-Reply-To: <20250314155009.4114308-1-arnd@kernel.org>
 
-Hello,
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+--FZYNFFCFDJf0hCka
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Reported-by: syzbot+a5964227adc0f904549c@syzkaller.appspotmail.com
-Tested-by: syzbot+a5964227adc0f904549c@syzkaller.appspotmail.com
+> From: Arnd Bergmann <arnd@arndb.de>
+>=20
+> The #if check causes a build failure when CONFIG_DEBUG_FS is turned
+> off:
+>=20
+> In file included from drivers/net/ethernet/airoha/airoha_eth.c:17:
+> drivers/net/ethernet/airoha/airoha_eth.h:543:5: error: "CONFIG_DEBUG_FS" =
+is not defined, evaluates to 0 [-Werror=3Dundef]
+>   543 | #if CONFIG_DEBUG_FS
+>       |     ^~~~~~~~~~~~~~~
+>=20
+> Replace it with the correct #ifdef.
+>=20
+> Fixes: 3fe15c640f38 ("net: airoha: Introduce PPE debugfs support")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-Tested on:
+Acked-by: Lorenzo Bianconi <lorenzo@kernel.org>
 
-commit:         2d7597d6 selftests/bpf: Fix sockopt selftest failure o..
-git tree:       bpf-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=126c419b980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b7bde34acd8f53b1
-dashboard link: https://syzkaller.appspot.com/bug?extid=a5964227adc0f904549c
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=10ecb874580000
+> ---
+>  drivers/net/ethernet/airoha/airoha_eth.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ether=
+net/airoha/airoha_eth.h
+> index f66b9b736b94..60690b685710 100644
+> --- a/drivers/net/ethernet/airoha/airoha_eth.h
+> +++ b/drivers/net/ethernet/airoha/airoha_eth.h
+> @@ -540,7 +540,7 @@ void airoha_ppe_deinit(struct airoha_eth *eth);
+>  struct airoha_foe_entry *airoha_ppe_foe_get_entry(struct airoha_ppe *ppe,
+>  						  u32 hash);
+> =20
+> -#if CONFIG_DEBUG_FS
+> +#ifdef CONFIG_DEBUG_FS
+>  int airoha_ppe_debugfs_init(struct airoha_ppe *ppe);
+>  #else
+>  static inline int airoha_ppe_debugfs_init(struct airoha_ppe *ppe)
+> --=20
+> 2.39.5
+>=20
 
-Note: testing is done by a robot and is best-effort only.
+--FZYNFFCFDJf0hCka
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ9R9NgAKCRA6cBh0uS2t
+rEjOAP9PNYodICfGjmIM6RqqwfDUTqlRvi1GK0wpap1X8ufqJgEAl2iP+EBO7tAb
+SxEklWiXoPTNumH+pUYGDB1aGt621wE=
+=8zdq
+-----END PGP SIGNATURE-----
+
+--FZYNFFCFDJf0hCka--
 
