@@ -1,237 +1,302 @@
-Return-Path: <netdev+bounces-174825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5065A60D19
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 10:22:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79F60A60D45
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 10:28:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EC5A3B5644
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 09:21:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79726460FBB
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 09:28:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECD3F1F03E0;
-	Fri, 14 Mar 2025 09:21:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E24AE1EEA2A;
+	Fri, 14 Mar 2025 09:27:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="iubXgSoZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X9NNkTFS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 608591E633C
-	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 09:21:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E32AB1EDA1E
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 09:27:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741944102; cv=none; b=QmrFKqtwwSUcPoEosp4ZXdWLh7DQB5g4sLVlkaLUsYjNx0hGEXdFokhHrpZB0a3AFAZ0rIqfpi1JGsc8Zu2fjsNo1JHbP9KTiOQ7RmIoxnVExGbwmV47mojYu3FQpY6UP2L4IdkR7qKTIlDXFidCSvyWZvKq2uuNyakxl9uS2a0=
+	t=1741944467; cv=none; b=JE/7Y8zfEGiCjIFGwv6SmgVwLsMY4yZMJqzley30aJPgjUU3wSvTcoZL3ViSXWPQ7m96KIETf+z6xo74YNbzwVaeOIwcehqvD/wP/gZ0roGWYOzuSHdSeVyAIRON9ryFkyb27TMbb14Zkxh61RtkGfWQD+oHHDQ/gS+joTPkl/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741944102; c=relaxed/simple;
-	bh=BzrI+MQVbm/6jXqGUS8ON4OO4Uhb3M0vnil1W0SY4xg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=aVdq0SySlf0qgH2pkVBWqyHoumkDctupcrE5shJ3Ue+QY93sHT5bpzA5becnKORtM+arpfQYdEZeHAxnxFie/u6DN1cjHRsC+BgYXFIeLFrg0GO6keUBL7ujqnXcp6RHLzuG03fvm5nRBb9BYT6E7sSm9wcgRLOPg/Mrbflf3ZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=iubXgSoZ; arc=none smtp.client-ip=203.254.224.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from epcas2p2.samsung.com (unknown [182.195.41.54])
-	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20250314092132epoutp0407b5f4e6eb29877a61681eaf741286eb~soOxdeKan0329903299epoutp04b
-	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 09:21:32 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20250314092132epoutp0407b5f4e6eb29877a61681eaf741286eb~soOxdeKan0329903299epoutp04b
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1741944092;
-	bh=jwFybI78FScw6EFw2tJIl/DO2vG2x0q+jbEpcWUDHSE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iubXgSoZIgQcm2rgzOMy+uYqpZahF7j3HrP+WSD3Jwt2M022aTMakQLFpJpCmssJi
-	 hCLEJS89et/yzw+jA2nZCabK0wWxu9GFophp4hxWgbvHrGJdO3SL6mMRGEcIUzw0SX
-	 FLUi2dDOImBGhL042XdmioeFMO5bl5/1XQmYmt8k=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-	epcas2p1.samsung.com (KnoxPortal) with ESMTP id
-	20250314092131epcas2p13cc2885f7118460459b017cc64689920~soOwlZDa10480104801epcas2p15;
-	Fri, 14 Mar 2025 09:21:31 +0000 (GMT)
-Received: from epsmgec2p1.samsung.com (unknown [182.195.36.69]) by
-	epsnrtp3.localdomain (Postfix) with ESMTP id 4ZDf4q2TyFz4x9Pr; Fri, 14 Mar
-	2025 09:21:31 +0000 (GMT)
-Received: from epcas2p1.samsung.com ( [182.195.41.53]) by
-	epsmgec2p1.samsung.com (Symantec Messaging Gateway) with SMTP id
-	D9.AC.22938.B15F3D76; Fri, 14 Mar 2025 18:21:31 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas2p3.samsung.com (KnoxPortal) with ESMTPA id
-	20250314092130epcas2p34e60b23ff983fe03195820a38fb376c5~soOvcsHce2154821548epcas2p3W;
-	Fri, 14 Mar 2025 09:21:30 +0000 (GMT)
-Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20250314092130epsmtrp1de9057981f4c9787b7a5af45f1a110cf~soOvazgVF0533405334epsmtrp1X;
-	Fri, 14 Mar 2025 09:21:30 +0000 (GMT)
-X-AuditID: b6c32a43-0d1e67000000599a-cc-67d3f51b3aee
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	50.73.23488.A15F3D76; Fri, 14 Mar 2025 18:21:30 +0900 (KST)
-Received: from perf.dsn.sec.samsung.com (unknown [10.229.95.91]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20250314092130epsmtip1f5c58ffeaf0f71b70bea83097dc7db2a~soOvK0vle0080200802epsmtip1K;
-	Fri, 14 Mar 2025 09:21:30 +0000 (GMT)
-From: Youngmin Nam <youngmin.nam@samsung.com>
-To: stable@vger.kernel.org
-Cc: ncardwell@google.com, edumazet@google.com, kuba@kernel.org,
-	davem@davemloft.net, dsahern@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, guo88.liu@samsung.com, yiwang.cai@samsung.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	joonki.min@samsung.com, hajun.sung@samsung.com, d7271.choe@samsung.com,
-	sw.ju@samsung.com, dujeong.lee@samsung.com, ycheng@google.com,
-	yyd@google.com, kuro@kuroa.me, youngmin.nam@samsung.com,
-	cmllamas@google.com, willdeacon@google.com, maennich@google.com,
-	gregkh@google.com, Lorenzo Colitti <lorenzo@google.com>, Jason Xing
-	<kerneljasonxing@gmail.com>
-Subject: [PATCH 2/2] tcp: fix forever orphan socket caused by tcp_abort
-Date: Fri, 14 Mar 2025 18:24:46 +0900
-Message-Id: <20250314092446.852230-2-youngmin.nam@samsung.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20250314092446.852230-1-youngmin.nam@samsung.com>
+	s=arc-20240116; t=1741944467; c=relaxed/simple;
+	bh=/t0P6BIjsrspzg8W7rJyW+BbEb9bKSj4FEpCyA6N3Y4=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=KM4Uvy+t8M6BecYvd0ggetcVM9w6NHsS+dOsbMrhSZBSOHqWbenmHNqC6fCP2mf8XAfNhfPdFcfEHF3CceuKwW4qAf9fjYGD6OlVBQuEPxvOSI5L8aqUdcmf6/icV25YykYzTBGiy8+39K+wrhbHtpW2k5lJYZvIrQg1gIP8c7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X9NNkTFS; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741944463;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=8SWIpivWMiiOzlANWVvS6TOJ0c+yC3px3JHXjQpmv1s=;
+	b=X9NNkTFSCFdEKVdkNSlvyk6eB9YDoZyQ/HUuDq4fNge/OZbzfwbvkd4rZc+jevinEzYHf3
+	mOE6Xht/Sx6u+pTmKJxNVz4gdGz9ToZi1uoWmETkAtlce6U0EnoGxEH6+WpC4cRl0rptnI
+	4tCJIwaoa/u9wRRQpWPHKF5avX5O+Cw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-517-mRHa-4ytMJaxWC0St39rag-1; Fri, 14 Mar 2025 05:27:42 -0400
+X-MC-Unique: mRHa-4ytMJaxWC0St39rag-1
+X-Mimecast-MFC-AGG-ID: mRHa-4ytMJaxWC0St39rag_1741944461
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3914bc0cc4aso1113212f8f.3
+        for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 02:27:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741944461; x=1742549261;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8SWIpivWMiiOzlANWVvS6TOJ0c+yC3px3JHXjQpmv1s=;
+        b=JyeOUrkQMRVR7M+r/qTwarsbdwvza/sNFtXgh2svjwJgPe0xpDfge1wDjiITtARGU6
+         QAdHipv8m9bHNhPeMNCgKucVSAEq3p+UuLTQkvtXs6UC6uYsHuvcjv6/BkA5fgaQWTfC
+         v5FPEQUgLCvGj/ixR1/Eb+BecAO0F/McgrGuHOcd7CoYW+hdnJrr0DK/0pILbugyVs+A
+         5EK7cUc6L/HZeiA1VlitamAeVUCflkmuZnXTKvMe5p8QkBoFLcDUeU9/ENMXvzj+AqRZ
+         4+7tQ5bgAWqeU6/GWVlMZfW5hSw1oDqKNULROdHMWosli4OiBXEz+PeqHnkEhkWKFIav
+         SGiw==
+X-Forwarded-Encrypted: i=1; AJvYcCUC/McMzysbJb3wwfSWZRy2FSdFWmjG1iDuU+nRciKboI7rl1j9nT7h0dnCIRv39WK8vQTPwiY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywcn99x2pElnIy/d19GTHlFOpAzHnc7zIvkO0wGISD9TdAXqyfm
+	DT1bSg3EO1tWQFxO50Et5jBPHEw1+ytdFnjt3SaHdmBgm8MIZd7atkTQNJH/GsttD/EtHDDcR82
+	uinaOUBLc3mAwcZSc90UebYmBUFVuxXxfZgGreXdRes6UJV+q98GxmeQgJeQ6vA==
+X-Gm-Gg: ASbGncvDZE/t0l9U2NYfqlKIhSy5Pj56+z6wPB+uLXEedz+my1T/vcVJwxlAX3NaDAZ
+	q4vM6+EZ3Iia1i65PsA4oykSwZ8J0H1Q4ZplvdOZcIesiP8iar3Sksux4c2K5V+6jtmiSMQLzdU
+	alJkFBLZrxpENmC6xOmMJBvSl/09CCo6IEyul+bvwoNyFYYUP0kK2bZ98RsjySK9EkZA5DFwMdj
+	X1mN6iBlXNtA36fl62WCN30+/BrmA80NMnICe1NLe0Rg8hnzOLTf6npxr8FgkPWupa3vDe+IqUd
+	QP6oSSR6PJbCFKG/DCepwZ9EsycmJhHURkkgi2HZsp/A
+X-Received: by 2002:a5d:6c6c:0:b0:38d:e6b6:508b with SMTP id ffacd0b85a97d-3971d23508dmr2176206f8f.9.1741944460605;
+        Fri, 14 Mar 2025 02:27:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHhOnfd8xQf89hKnxHM2+ss0zqT2fuewR91h/7320v0CwhxN16kbkeKvrNPnSiljEvdGmJmwA==
+X-Received: by 2002:a5d:6c6c:0:b0:38d:e6b6:508b with SMTP id ffacd0b85a97d-3971d23508dmr2176185f8f.9.1741944460162;
+        Fri, 14 Mar 2025 02:27:40 -0700 (PDT)
+Received: from lleonard-thinkpadp16vgen1.rmtit.csb ([151.29.33.62])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395c82c255bsm4860356f8f.23.2025.03.14.02.27.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Mar 2025 02:27:39 -0700 (PDT)
+From: Luigi Leonardi <leonardi@redhat.com>
+Date: Fri, 14 Mar 2025 10:27:33 +0100
+Subject: [PATCH net-next v2] vsock/test: Add test for null ptr deref when
+ transport changes
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA01Te0xTZxT3673cW4iMu8rgGxipZeB0obRI6QcKvojUbMnY1GVTIzZw0zL6
-	Wh8G2eYIlMdQ6XCwKY/Zpfhim9SO18BOUgiwEXSjdAYcD0GBKeILEExko9xu87/f+X2/c87v
-	nC+HjXHmiSB2ukpPa1VSBY/wwRva1osigmedMoFtyA/NtPaS6A97CYkqrxtxdKk5j4XGzadw
-	dKdjlETjcwsY+rIUoJyrvRgaNXURyNUyjaGWhq9J9FtDsRdytE2QyNlcSaDa7mmA5uxTJCr8
-	046jDnMAmuueAsh8eRSgvLEnJCpYuIejmTEXgR515pDI0vqYRLnfXsK3BkvqLvazJD+VD5IS
-	s80gsdV8TkjMxaTkwc8uQlJcVwMkT2xrktn7MjbLaWkareXSqlR1WrpKFs97c3fKjhRRjEAY
-	IYxFYh5XJVXS8bzEt5IjdqYrlqbmcQ9LFYYlKlmq0/EiEzZr1QY9zZWrdfp4Hq1JU2jEGr5O
-	qtQZVDK+itbHCQWCKNGS8FCGvKa/kaXpCc7suibOBpWBRYDNhlQ0/D1XWAR82ByqCUDLcxvG
-	BI8BHM2ZZzHBHIDmiSG8CHgvZ9xrz/eo7AD2uY57glkAa3snvdwqgoqADV2LwN3DnwqCw65N
-	bhqj7uDwZm6mG6+ikuCVGyPAjXEqDC4s9rHc2JdKgDfPVuKMvRBoGYFu2pvaAstsA4CRvAx/
-	OX0bZ0qGwNz6imULkDrmDQfLzgHGaCK8X1zqxeBV8G5nHcngIPiXKd+DdTB7eMCTbATw1xuT
-	GPOwEZaPFyz7x6j1sLY5kvETCtsHPH1fgoVtz0mG9oWF+RwmMRw+K7V6HKyGLZYLnoISaJ9a
-	8GI2dRLAYZMZ+wJwy18Yp/yFccr/b2wGWA0IoDU6pYxOjdII//veVLXSBpZPYMOOJtB3ZpHv
-	ACw2cADIxnj+vsjplHF806RHsmitOkVrUNA6BxAt7boEC3olVb10Qyp9ijA6VhAdEyMUR4kE
-	Yl6g78dNRhmHkkn1dAZNa2jtv3kstndQNkt9MiSOn7535zzH7ies/0y7dW3FlXe3HBU+qPpI
-	8SNltPasORT3gaU29NjQ4HeOjW8ok8SShJQV+151HCgo3B4sOvKJYZthV7j8fkmBIsNu3W4Q
-	qsNn/Vp7BM7uKjzSxJ99e/+pzEznN8NzuxvyQtRjwwcC9zQ+2m+USKzELWvspyMV3g/Pv3O3
-	+wSRZ5kh+h8e9vdrRE8nz8ovmp4SAfkz7yWVCcP42861dlVdXxmantG9+nxfh9cJ6Hpt1jxR
-	U38LGLnHq0NYnZt00nVZK394/9qz6b/b66qN37dws26ve51zdCJ0RdjVXVnKxK9OHyyLW6zM
-	qz7oNEVf6NvrY4378PKeMzxcJ5cKN2BanfQfKG9d9IsEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Re0hTYRiH+3aO5xyHxnFafs20WBcvpXNl9XVRgyKPFGFQUFbk0sO6OB27
-	dLFC8a7BKsqa03IiBgotXLYyW8Wxi2llc62lJs1L2cUsUwdDkJwS9N/D7/m9Ly+8FCa4gwup
-	oxlqVpkhTRcRfNzcIgqJFE7YZNHnq0PR+JNOEr23XCJRZUc+jowPCnjoi0GHo8/P+0n0xeXG
-	0OUrAOU+7sRQ/4VWAtmbRzDUbL5GordmrRfiWoZIZHtQSaDb7SMAuSzDJCr+aMHRc8N85Gof
-	BsjQ0A9QwcAYiYrcP3A0PmAn0OiLXBLVPPlDorxqI745iGms6+IxTfpekjGYNIypvoRgDFqS
-	+fXITjDaxnrAjJlCkqhk/qY0Nv3oCVYpjkvhH6nvusdTvA461fpmXQ6oDCwF3hSkY+CPp4WY
-	hwV0M4Cjv/mz+ULYU2fzmmV/+Cn/6TTzpztjAFqd+TOCoCOhuXUKlAKKCqCF8JN9o6eD0QVe
-	sK8iZ2apP50AHzqcwMM4vQy6p97xPOxLx8Ge2krcMwvpRbDGCT2xNx0Py0zdYPaeOFg1pMNm
-	637wZfkg7mFsup53twK7CGj9f0r/nzIAXj1YwCpUcpk8VaKQZLAno1RSuUqTIYtKzZSbwMxf
-	I8LugxFXrpgDPApwAFKYKMAX2WwygW+a9HQWq8w8pNSksyoOBFG4KNC3TrJXJqBlUjV7nGUV
-	rPKf5VHewhxe8dZxxty2Ilg8xvpEVHHVuhNrJy5jKdutXF7gyWD1n5FjwysVzuRtU9URjQLm
-	WFTSpLFzVLHnKzF/V2z8wJbV3rFDMtYYtHqhY2lNglxcou67aosd7zPtFpBOn6uZTS2HB2N2
-	cY/DlndnPZrU+w3FZ6k7yr7f4BznSrb1gfOJjim9xsfr/fbC2p6wsxM3DmbffrVCbgTClvAa
-	ftd+E0lw8msrddbQEHveFUH2h6pbvanusgSN+EyiVoOvsiRGW9bx3c/E1pi5HbGlbeXWl6d2
-	lHdtyXfNK3rhiP55c/D0nInWijU7C75Jrg+k7Fu8PzwkYMM5v8kDDeuDl2jrdCoRrjoilURg
-	SpX0L7wOt81GAwAA
-X-CMS-MailID: 20250314092130epcas2p34e60b23ff983fe03195820a38fb376c5
-X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: AUTO_CONFIDENTIAL
-CMS-TYPE: 102P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250314092130epcas2p34e60b23ff983fe03195820a38fb376c5
-References: <20250314092446.852230-1-youngmin.nam@samsung.com>
-	<CGME20250314092130epcas2p34e60b23ff983fe03195820a38fb376c5@epcas2p3.samsung.com>
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250314-test_vsock-v2-1-3c0a1d878a6d@redhat.com>
+X-B4-Tracking: v=1; b=H4sIAIT202cC/22NwQoCIRRFf2V46wxHM5lW/UcMYc6blEjDJzIx+
+ O+J65aHwz13B8LkkeAy7JCwePIxNBCHAawz4YnML41BcKG45GeWkfK9ULQvJlFrM1ltxElBG3w
+ Srn7rsRsEzCzglmFuxnnKMX37Sxm7/xcsI+OMS8Efyli7TuKacHEmH218w1xr/QEfz40MrwAAA
+ A==
+X-Change-ID: 20250306-test_vsock-3e77a9c7a245
+To: Stefano Garzarella <sgarzare@redhat.com>, Michal Luczaj <mhal@rbox.co>
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Hyunwoo Kim <v4bel@theori.io>, 
+ Luigi Leonardi <leonardi@redhat.com>
+X-Mailer: b4 0.14.2
 
-From: Xueming Feng <kuro@kuroa.me>
+Add a new test to ensure that when the transport changes a null pointer
+dereference does not occur[1].
 
-commit bac76cf89816bff06c4ec2f3df97dc34e150a1c4 upstream.
+Note that this test does not fail, but it may hang on the client side if
+it triggers a kernel oops.
 
-We have some problem closing zero-window fin-wait-1 tcp sockets in our
-environment. This patch come from the investigation.
+This works by creating a socket, trying to connect to a server, and then
+executing a second connect operation on the same socket but to a
+different CID (0). This triggers a transport change. If the connect
+operation is interrupted by a signal, this could cause a null-ptr-deref.
 
-Previously tcp_abort only sends out reset and calls tcp_done when the
-socket is not SOCK_DEAD, aka orphan. For orphan socket, it will only
-purging the write queue, but not close the socket and left it to the
-timer.
+Since this bug is non-deterministic, we need to try several times. It
+is safe to assume that the bug will show up within the timeout period.
 
-While purging the write queue, tp->packets_out and sk->sk_write_queue
-is cleared along the way. However tcp_retransmit_timer have early
-return based on !tp->packets_out and tcp_probe_timer have early
-return based on !sk->sk_write_queue.
+If there is a G2H transport loaded in the system, the bug is not
+triggered and this test will always pass.
 
-This caused ICSK_TIME_RETRANS and ICSK_TIME_PROBE0 not being resched
-and socket not being killed by the timers, converting a zero-windowed
-orphan into a forever orphan.
+[1]https://lore.kernel.org/netdev/Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX/
 
-This patch removes the SOCK_DEAD check in tcp_abort, making it send
-reset to peer and close the socket accordingly. Preventing the
-timer-less orphan from happening.
-
-According to Lorenzo's email in the v1 thread, the check was there to
-prevent force-closing the same socket twice. That situation is handled
-by testing for TCP_CLOSE inside lock, and returning -ENOENT if it is
-already closed.
-
-The -ENOENT code comes from the associate patch Lorenzo made for
-iproute2-ss; link attached below, which also conform to RFC 9293.
-
-At the end of the patch, tcp_write_queue_purge(sk) is removed because it
-was already called in tcp_done_with_error().
-
-p.s. This is the same patch with v2. Resent due to mis-labeled "changes
-requested" on patchwork.kernel.org.
-
-Link: https://patchwork.ozlabs.org/project/netdev/patch/1450773094-7978-3-git-send-email-lorenzo@google.com/
-Fixes: c1e64e298b8c ("net: diag: Support destroying TCP sockets.")
-Signed-off-by: Xueming Feng <kuro@kuroa.me>
-Tested-by: Lorenzo Colitti <lorenzo@google.com>
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Link: https://patch.msgid.link/20240826102327.1461482-1-kuro@kuroa.me
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Cc: <stable@vger.kernel.org> # v5.10+
-Link: https://lore.kernel.org/lkml/Z9OZS%2Fhc+v5og6%2FU@perf/
-[youngmin: Resolved minor conflict in net/ipv4/tcp.c]
-Signed-off-by: Youngmin Nam <youngmin.nam@samsung.com>
+Suggested-by: Hyunwoo Kim <v4bel@theori.io>
+Suggested-by: Michal Luczaj <mhal@rbox.co>
+Signed-off-by: Luigi Leonardi <leonardi@redhat.com>
 ---
- net/ipv4/tcp.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+This series introduces a new test that checks for a null pointer 
+dereference that may happen when there is a transport change[1]. This 
+bug was fixed in [2].
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 9fe164aa185c..ff22060f9145 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -4620,6 +4620,13 @@ int tcp_abort(struct sock *sk, int err)
- 		/* Don't race with userspace socket closes such as tcp_close. */
- 		lock_sock(sk);
+Note that this test *cannot* fail, it hangs if it triggers a kernel
+oops. The intended use-case is to run it and then check if there is any 
+oops in the dmesg.
+
+This test is based on Hyunwoo Kim's[3] and Michal's python 
+reproducers[4].
+
+[1]https://lore.kernel.org/netdev/Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX/
+[2]https://lore.kernel.org/netdev/20250110083511.30419-1-sgarzare@redhat.com/
+[3]https://lore.kernel.org/netdev/Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX/#t
+[4]https://lore.kernel.org/netdev/2b3062e3-bdaa-4c94-a3c0-2930595b9670@rbox.co/
+---
+Changes in v2:
+- Addressed Stefano's comments:
+    - Timeout is now using current_nsec()
+    - Check for return values
+    - Style issues
+- Added Hyunwoo Kim to Suggested-by
+- Link to v1: https://lore.kernel.org/r/20250306-test_vsock-v1-0-0320b5accf92@redhat.com
+---
+ tools/testing/vsock/Makefile     |   1 +
+ tools/testing/vsock/vsock_test.c | 101 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 102 insertions(+)
+
+diff --git a/tools/testing/vsock/Makefile b/tools/testing/vsock/Makefile
+index 6e0b4e95e230500f99bb9c74350701a037ecd198..88211fd132d23ecdfd56ab0815580a237889e7f2 100644
+--- a/tools/testing/vsock/Makefile
++++ b/tools/testing/vsock/Makefile
+@@ -5,6 +5,7 @@ vsock_test: vsock_test.o vsock_test_zerocopy.o timeout.o control.o util.o msg_ze
+ vsock_diag_test: vsock_diag_test.o timeout.o control.o util.o
+ vsock_perf: vsock_perf.o msg_zerocopy_common.o
  
-+	/* Avoid closing the same socket twice. */
-+	if (sk->sk_state == TCP_CLOSE) {
-+		if (!has_current_bpf_ctx())
-+			release_sock(sk);
-+		return -ENOENT;
++vsock_test: LDLIBS = -lpthread
+ vsock_uring_test: LDLIBS = -luring
+ vsock_uring_test: control.o util.o vsock_uring_test.o timeout.o msg_zerocopy_common.o
+ 
+diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+index d0f6d253ac72d08a957cb81a3c38fcc72bec5a53..d2820a67403c95bc4a7e7a16113ae2f6137b4c73 100644
+--- a/tools/testing/vsock/vsock_test.c
++++ b/tools/testing/vsock/vsock_test.c
+@@ -23,6 +23,7 @@
+ #include <sys/ioctl.h>
+ #include <linux/sockios.h>
+ #include <linux/time64.h>
++#include <pthread.h>
+ 
+ #include "vsock_test_zerocopy.h"
+ #include "timeout.h"
+@@ -1788,6 +1789,101 @@ static void test_stream_connect_retry_server(const struct test_opts *opts)
+ 	close(fd);
+ }
+ 
++static void *test_stream_transport_change_thread(void *vargp)
++{
++	pid_t *pid = (pid_t *)vargp;
++
++	/* We want this thread to terminate as soon as possible */
++	if (pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL)) {
++		perror("pthread_setcanceltype");
++		exit(EXIT_FAILURE);
 +	}
 +
- 	if (sk->sk_state == TCP_LISTEN) {
- 		tcp_set_state(sk, TCP_CLOSE);
- 		inet_csk_listen_stop(sk);
-@@ -4629,15 +4636,12 @@ int tcp_abort(struct sock *sk, int err)
- 	local_bh_disable();
- 	bh_lock_sock(sk);
++	while (true) {
++		if (kill(*pid, SIGUSR1) < 0) {
++			perror("kill");
++			exit(EXIT_FAILURE);
++		}
++	}
++	return NULL;
++}
++
++static void test_transport_change_signal_handler(int signal)
++{
++	/* We need a custom handler for SIGUSR1 as the default one terminates the process. */
++}
++
++static void test_stream_transport_change_client(const struct test_opts *opts)
++{
++	__sighandler_t old_handler;
++	pid_t pid = getpid();
++	pthread_t thread_id;
++	time_t tout;
++
++	old_handler = signal(SIGUSR1, test_transport_change_signal_handler);
++	if (old_handler == SIG_ERR) {
++		perror("signal");
++		exit(EXIT_FAILURE);
++	}
++
++	if (pthread_create(&thread_id, NULL, test_stream_transport_change_thread, &pid)) {
++		perror("pthread_create");
++		exit(EXIT_FAILURE);
++	}
++
++	tout = current_nsec() + TIMEOUT * NSEC_PER_SEC;
++	do {
++		struct sockaddr_vm sa = {
++			.svm_family = AF_VSOCK,
++			.svm_cid = opts->peer_cid,
++			.svm_port = opts->peer_port,
++		};
++		int s;
++
++		s = socket(AF_VSOCK, SOCK_STREAM, 0);
++		if (s < 0) {
++			perror("socket");
++			exit(EXIT_FAILURE);
++		}
++
++		connect(s, (struct sockaddr *)&sa, sizeof(sa));
++
++		/* Set CID to 0 cause a transport change. */
++		sa.svm_cid = 0;
++		connect(s, (struct sockaddr *)&sa, sizeof(sa));
++
++		close(s);
++	} while (current_nsec() < tout);
++
++	if (pthread_cancel(thread_id)) {
++		perror("pthread_cancel");
++		exit(EXIT_FAILURE);
++	}
++
++	/* Wait for the thread to terminate */
++	if (pthread_join(thread_id, NULL)) {
++		perror("pthread_join");
++		exit(EXIT_FAILURE);
++	}
++
++	/* Restore the old handler */
++	if (signal(SIGUSR1, old_handler) == SIG_ERR) {
++		perror("signal");
++		exit(EXIT_FAILURE);
++	}
++}
++
++static void test_stream_transport_change_server(const struct test_opts *opts)
++{
++	time_t tout = current_nsec() + TIMEOUT * NSEC_PER_SEC;
++
++	do {
++		int s = vsock_stream_listen(VMADDR_CID_ANY, opts->peer_port);
++
++		close(s);
++	} while (current_nsec() < tout);
++}
++
+ static void test_stream_linger_client(const struct test_opts *opts)
+ {
+ 	struct linger optval = {
+@@ -1984,6 +2080,11 @@ static struct test_case test_cases[] = {
+ 		.run_client = test_stream_linger_client,
+ 		.run_server = test_stream_linger_server,
+ 	},
++	{
++		.name = "SOCK_STREAM transport change null-ptr-deref",
++		.run_client = test_stream_transport_change_client,
++		.run_server = test_stream_transport_change_server,
++	},
+ 	{},
+ };
  
--	if (!sock_flag(sk, SOCK_DEAD)) {
--		if (tcp_need_reset(sk->sk_state))
--			tcp_send_active_reset(sk, GFP_ATOMIC);
--		tcp_done_with_error(sk, err);
--	}
-+	if (tcp_need_reset(sk->sk_state))
-+		tcp_send_active_reset(sk, GFP_ATOMIC);
-+	tcp_done_with_error(sk, err);
- 
- 	bh_unlock_sock(sk);
- 	local_bh_enable();
--	tcp_write_queue_purge(sk);
- 	if (!has_current_bpf_ctx())
- 		release_sock(sk);
- 	return 0;
+
+---
+base-commit: 4d872d51bc9d7b899c1f61534e3dbde72613f627
+change-id: 20250306-test_vsock-3e77a9c7a245
+
+Best regards,
 -- 
-2.39.2
+Luigi Leonardi <leonardi@redhat.com>
 
 
