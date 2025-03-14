@@ -1,121 +1,92 @@
-Return-Path: <netdev+bounces-174957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4652A619A5
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 19:39:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0905A619C4
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 19:47:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FC811B60360
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 18:39:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3139846253D
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 18:47:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CEED2045B5;
-	Fri, 14 Mar 2025 18:39:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IbgS9NGq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F114204C29;
+	Fri, 14 Mar 2025 18:47:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6554B1519BB;
-	Fri, 14 Mar 2025 18:39:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F23C204C1D
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 18:47:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741977583; cv=none; b=C2vqYdXV0gNfW0d47SQXxts3pgaTe3jlsMeOpedELV2nfGsq5AaB05R+VuvTpddcBN5C99lB7tPMpqP2kk3yRgliwW6G7fybwzIG+l7w/LE0qEHVK+hFPaP8VdeRMEepq5tetnSQ+KDbJYbGM8+Rb9mRa88VgnS6GiNv38YtsS4=
+	t=1741978027; cv=none; b=RAzUdWlEdeCZhOeXzFGZ2GmWUeDhyb/uoV0HmRv4XQwgcMaslH+Wc7+TeED1Jw10Kp4ABXrEL1G70A9QK9IiBMk0MoqC69L0iYsMB4bKeR8vQ/h1I2huRFwBuHP8wjEuyNFBFD49TI4fQdqE+B+2uUgzAV+VJCLY8BWJC1DuyQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741977583; c=relaxed/simple;
-	bh=7zgCguAftdxNdNej2Op3CC4ec5C8VrxqTWVT3fgVgIc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lanJMvb4ZSPa+vt+Kyb4qaIvBthwnFu5sN/pDTYx8ATxUdxjqMsF+D7pkvYCbmgNNsBufrEyuAykNmSsf/G8iMTUSiW+abjM0Ap7ERH5m34MKgAWki+fvMNbqH54z4KZBFboftCxwZz7qu4MIKFOd2JfxpjAg2IfTBbaQpUXWVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IbgS9NGq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5548EC4CEE3;
-	Fri, 14 Mar 2025 18:39:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741977582;
-	bh=7zgCguAftdxNdNej2Op3CC4ec5C8VrxqTWVT3fgVgIc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IbgS9NGqN1xC7ev8qTLYsOBm/63Fb2yxIZ5wBeaQKsxS4X3du6COqd1Uro0XgRoyE
-	 yDQHxrVL+RW9exEI8hYxtoD/oQbh8Trne23aNws7MV9L+7JhreEU5PTTZPhLa4WTp7
-	 erugyyHCOgwXzMZtJOWKEEwe3FZ3iKZ3jxmXkOOeNkw8tJ9LFZO+/jA1frQdiyiTNw
-	 SFuI+OhYZwrLeDe+24+D4zyc/OQUy9/datHtDZQxpvANyI3UWIWrR0S+M/Ou4Zd5Cl
-	 7Y51K8xSkrNCskSVc9d0rhQZV4H1IHWzKTIX6+MwXnd1Lnu1mvELYP2VGjRM90+2yk
-	 H2JcOh1ls0tKA==
-Date: Fri, 14 Mar 2025 20:39:38 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: "Nelson, Shannon" <shannon.nelson@amd.com>,
-	David Ahern <dsahern@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
-	Jason Gunthorpe <jgg@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Daniel Vetter <daniel.vetter@ffwll.ch>,
-	Dave Jiang <dave.jiang@intel.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Itay Avraham <itayavr@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Leonid Bloch <lbloch@nvidia.com>, linux-cxl@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	"Sinyuk, Konstantin" <konstantin.sinyuk@intel.com>
-Subject: Re: [PATCH v5 0/8] Introduce fwctl subystem
-Message-ID: <20250314183938.GQ1322339@unreal>
-References: <20250304140036.GK133783@nvidia.com>
- <20250304164203.38418211@kernel.org>
- <20250305133254.GV133783@nvidia.com>
- <mxw4ngjokr3vumdy5fp2wzxpocjkitputelmpaqo7ungxnhnxp@j4yn5tdz3ief>
- <bcafcf60-47a8-4faf-bea3-19cf0cbc4e08@kernel.org>
- <20250305182853.GO1955273@unreal>
- <dc72c6fe-4998-4dba-9442-73ded86470f5@kernel.org>
- <20250313124847.GM1322339@unreal>
- <54781c0c-a1e7-4e97-acf1-1fc5a2ee548c@amd.com>
- <2025031408-frequency-oxidant-287f@gregkh>
+	s=arc-20240116; t=1741978027; c=relaxed/simple;
+	bh=lP+WWwLeJcNl+xjynrFw4AUeIaxg2oLzPxAdObxBxnM=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=gGIjtaAGRV+Ai11jYTRISHcabLHrmGJG5USh5uIz5bq+plmcXLCWHr3mjIId6BhBrMgqJ6FJmph1BRlc9cftsE0Unw2UW1cljAmWNWXCwWbgR79EqbBAB2yFw8MJDXLUryPxwrDQcPDoqp+G10UFximw5rD22wijuHl/gx7sesE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3ce843b51c3so58316955ab.0
+        for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 11:47:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741978024; x=1742582824;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NxkXkYDWiW2oVyldkemU8ucECoqqgSoeCvPEsiTtUu0=;
+        b=PBhwXxyrxLnAx9ku5HYKpr+N7LkX2CX1Yxzf1HtcHs62tILBUguDR1anKtDqllt6xK
+         vsLi+2AHOZjsKL0DEf5I58eqfMy0QrDHu4bK1HWjQhngGDLFAEdFLl0JsVOBh6Xcpbxi
+         g5OP+Iwq6I5XOsiMGMOA5gczcpwaPV+zHt/reDmODFVy9q2f63HX8kyI3gWK87nxBZSG
+         sgHeJ0Lsw2yPJbvAjiVPEVMHJv/nECQ7fkwfv2Tt5ZDswe05v4xXq/9uEMH+fQ4bf0Ml
+         XW1fC2mGtRjJrxOBtuL51Kp15pSzErg835YU53p0ILAEV7wd7Oe6zIzM16l0TMRRGAdU
+         3E8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVyWcbxEHgHHYp6emmE4cqzBbAWFM9xqRGM8bpee5uGVDJFUFHVGW9hhxG7OcbzWX7kx7iDqIw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzh6wiBXEBKi/QebMMwM0yA+YsW3coM/I2WuxKpzl7sW3551dnl
+	F2msWpiWdXqAjT/ieaXefB/D3WHdDP0ayqZ85MDILVRZYYtzMzxv4i9vRHRYZ1B69Qh0B7eOFtE
+	0UDFNUjhbPfOFWRzPMM27/fhUkINOrEBWOhr8JYdKtRCEcZZOFchizd0=
+X-Google-Smtp-Source: AGHT+IF2NJDjExuIXbMXWH2xKdFFik4mQ2Cbteg2XeWs+t07tMq6LOwOI/VHD7UEdRzJmzYoxxADQlr9bGDqb7kO3gZfuHYRjCMG
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2025031408-frequency-oxidant-287f@gregkh>
+X-Received: by 2002:a05:6e02:3b88:b0:3d4:337f:121b with SMTP id
+ e9e14a558f8ab-3d483a0afbbmr35023375ab.8.1741978024613; Fri, 14 Mar 2025
+ 11:47:04 -0700 (PDT)
+Date: Fri, 14 Mar 2025 11:47:04 -0700
+In-Reply-To: <20250314181925.69459-1-enjuk@amazon.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67d479a8.050a0220.1939a6.004e.GAE@google.com>
+Subject: Re: [syzbot] [bpf?] KASAN: slab-out-of-bounds Read in atomic_ptr_type_ok
+From: syzbot <syzbot+a5964227adc0f904549c@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, eddyz87@gmail.com, enjuk@amazon.com, haoluo@google.com, 
+	iii@linux.ibm.com, john.fastabend@gmail.com, jolsa@kernel.org, 
+	kpsingh@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
+	netdev@vger.kernel.org, sdf@fomichev.me, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, yepeilin@google.com, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Mar 14, 2025 at 06:37:11AM +0100, Greg Kroah-Hartman wrote:
-> On Thu, Mar 13, 2025 at 12:59:16PM -0700, Nelson, Shannon wrote:
-> > On 3/13/2025 5:48 AM, Leon Romanovsky wrote:
-> > > On Thu, Mar 13, 2025 at 01:30:52PM +0100, David Ahern wrote:
-> > 
-> > 
-> > > > So that means 3 different vendors and 3 different devices looking for a
-> > > > similar auxbus based hierarchy with a core driver not buried within one
-> > > > of the subsystems.
-> > > > 
-> > > > I guess at this point we just need to move forward with the proposal and
-> > > > start sending patches.
-> > > > 
-> > > > Seems like drivers/core is the consensus for the core driver?
-> > > 
-> > > Yes, anything that is not aux_core is fine by me.
-> > > 
-> > > drivers/core or drivers/aux.
-> > 
-> > Between the two of these I prefer drivers/core - I don't want to see this
-> > tied to aux for the same reasons we don't want it tied to pci or net.
-> 
-> Decades ago we tried to add drivers/core/ but I think tools really
-> didn't like to see "core" as a directory name.  Hopefully you all don't
-> run into that issue here as well :)
-> 
-> Anyway, if you all want me to run that tree as a "neutral" third-party,
-> I'll be glad to do so.
+Hello,
 
-Thanks for readiness, we will definitely be glad to see you on board.
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-Thanks
+Reported-by: syzbot+a5964227adc0f904549c@syzkaller.appspotmail.com
+Tested-by: syzbot+a5964227adc0f904549c@syzkaller.appspotmail.com
 
-> 
-> thanks,
-> 
-> greg k-h
+Tested on:
+
+commit:         2d7597d6 selftests/bpf: Fix sockopt selftest failure o..
+git tree:       bpf-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=126c419b980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b7bde34acd8f53b1
+dashboard link: https://syzkaller.appspot.com/bug?extid=a5964227adc0f904549c
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=10ecb874580000
+
+Note: testing is done by a robot and is best-effort only.
 
