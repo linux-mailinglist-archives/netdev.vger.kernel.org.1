@@ -1,109 +1,118 @@
-Return-Path: <netdev+bounces-174938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3163CA61779
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 18:24:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B33EA6178A
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 18:26:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87B26189780F
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 17:24:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E4FA4204DA
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 17:26:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86AF920409D;
-	Fri, 14 Mar 2025 17:23:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B58622045A5;
+	Fri, 14 Mar 2025 17:26:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="IehLKEgP"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="s7n+eUb7"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sonic308-15.consmr.mail.ne1.yahoo.com (sonic308-15.consmr.mail.ne1.yahoo.com [66.163.187.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139C1202C55;
-	Fri, 14 Mar 2025 17:23:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01F7B202C55
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 17:26:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.187.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741973035; cv=none; b=OJfY8Bye/IjPXWnmEx1/YgDHrbN5G4tL70DIkOPrwTD7o4i9qTpaaRJs4uR2aonpbQpSEk9taGS0C2RkLGJE9J4FT6hw0b4Sy4NFmD0ng6lCV9VssQLhcfAPsp7I5VUOiADdT7frBETol6oVkVYFswhV9RxW00VFJ0L8peBYQ2Q=
+	t=1741973202; cv=none; b=OJ15i/U9UvUyRSagl8EI80FYKNtQOgUNCplSQRKJFWwZU7IlV2r7Lk8xyeWYuYL5YYOkOjWVYZnttWK1jq6Qn2B82EXT4+MEXIXEImGJCmjIKznutlH8GYqRAjvGkJi1C7EK224IFV3N+OqIUqIFWsLljiQjRYHO6Fz5Os2ca3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741973035; c=relaxed/simple;
-	bh=c0RX0AaARKJLEtEO4yes04DrfYApXHGs9mq3oWu46O8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I/Uq6xALTthluUZqukLX5yyO4l9kM8DpfC3Yx/McvnAcODA3Joe8Rv8IEmyzcoJo4+39Yb6zTa8E6cUW4vM24aQNvzFf6SHFcDR2XNHPZvpsgBvVeAbgWGaPdzoD2V30gj6CR4GaBHbxrB/2uIIIltzoIkZahQn+Qj1mbHyKy90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=IehLKEgP; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 21ECF2047D;
-	Fri, 14 Mar 2025 17:23:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1741973031;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BamU1n5OM23qSRXD+9aLXMCCgUdpw3Az64GLE9soEkA=;
-	b=IehLKEgPhGSJ16XfZtEE+102UTYiBW7EDn6ybxNmUi40s2+n7O2SmGMp8Mtlb7WAsoAkqr
-	WbcwYfc8VnwTQcJR/aP0yB9YzylW/bKfSZBcapxueDH/aNaLb5y6PZkS648rZ+5binHowo
-	ZibggDs2iOA6OdvGDl3pYd7Pt0SqL2KrQ+qEldy38UBhaPwMgk/tAa/YZckVEQpR0YCsm0
-	MWMiVNMw6P7EEVXuGh7fxgdpyGqL97BjQyDUHCEZmq6gfae321ob6vPqA46lk/C+JD4Rlt
-	S1cWZwTieVPjmmsVPMRASYMtAAcqII1cE1hXd4puC2wqbjD9nvN8lY3uj346Gw==
-Date: Fri, 14 Mar 2025 18:23:48 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Russell King - ARM Linux
- <linux@armlinux.org.uk>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, David Miller
- <davem@davemloft.net>, Xu Liang <lxu@maxlinear.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Jean Delvare
- <jdelvare@suse.com>, Guenter Roeck <linux@roeck-us.net>,
- "linux-hwmon@vger.kernel.org" <linux-hwmon@vger.kernel.org>
-Subject: Re: [PATCH net-next 0/4] net: phy: remove calls to
- devm_hwmon_sanitize_name
-Message-ID: <20250314182348.21ac024e@fedora-2.home>
-In-Reply-To: <198f3cd0-6c39-4783-afe7-95576a4b8539@gmail.com>
-References: <198f3cd0-6c39-4783-afe7-95576a4b8539@gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1741973202; c=relaxed/simple;
+	bh=qlcHt9ccEX6EUZm5kQqQFq5nis8rKlirP81I0xyK2pY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NtKAwNAijNkSMgCaAYDPOsIzbAlSe2XbrdC1XHpMWOc0XHb6Pza0ewlUGFR6bHkmEu4gXN0iYCbQeCZkJ4SRuoruF1HQSvH4HVs4FeXse9KTZjyfn5DqkpdRaBYNthyo07zT9K0XoXcdYZvzvakIAspixyrVMTsBDvBGSAp5qMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com; spf=none smtp.mailfrom=schaufler-ca.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=s7n+eUb7; arc=none smtp.client-ip=66.163.187.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=schaufler-ca.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1741973200; bh=CxM5t3Z2CzIRZvhTF8IpgcECByr9NPqDa7yqoSHEXII=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=s7n+eUb75LMn9V74l8EMn+I7rt6KZCaDozwiCPuUWtCSKt22SUEaxkXNNXTqbKHnDe82G+GQbJ7BbNcMFycrrtPyl3UFZpofKjO8Epxu1FpQiHSTcKEI+yrQJQC2R5F7ptYqn4ad300cpr+nr0AtQlU0TApCeNQBpZXn9ZaV1ug/5jwdk3X5baZlOiCaH2dHDHoSRo0c5jSr2YaLEJTDvuIlM0ezk2oBkW+w39u9qaWp2lOxObxDSZ52zB7WCljd4lBVdcYkqv7aDGON15Wa4FyrAPhCUAlyEJuB/Hpjz2KjiFtPjTKufeZHaqY1C+9sP7KCW2kySuq6QR4Oo5jqOw==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1741973200; bh=LqJ/4V3CaRHZfvwAfFYUH/SXzMHaj5FGSwBN/98tvQs=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=qpVsLPEbBLCjTKOCDFnC9DA5EYun9ViH/SKy5By0MinySM/hXwSSs0zeh7fMTbv0eN01nHXEiJ+sQk+twZLswHKa+bO+0/OWuzjsND6xc/mp2rTd17W68C5529fC6VNBVedgIUqw73bN7mTiYm8GEPbQ8DAO+18LXzfNeoAiEixAc2CqD6tw3wF5IHGv+tl8VwBAIUNHI3UxFoRnoq11N/+tZkddto/BCyfm4vu/Pr4zD4LrEDiuaRVHD+9Czone0GZMJ+FgJr1d5Yt1jTTpg0uHexQuyGkolGE5NO/dc3jeBu+k3mynW/VYoVWv36cBujv9gxTHITmn6beSadoS6Q==
+X-YMail-OSG: yj8zhOgVM1kOvmoxK2O2_D6uuYJfUJjzOWUsf_NpX_QiwVCutd7FQLCL6UBIsZn
+ qs4BicKzukOYo67.TKQzJ8cZAoIbkMNe_ONE2XPuMlPTSaDUW2h1SktOdqrMe3yIrSvgDZPTuLHT
+ KAANvDk6jatWEyKwP7bEXA.ePCvivvgnh5U8RL_Ktz63pXJ6ugvGHwI3qzES5kn4QVHiDh3x1X8E
+ G_g9bm4nBYa8yq0nU9PA91x_soG2LbLI8ZUDjXAu.zz27ybc13FLk9u5teJG01_pb0y8IKHviye9
+ MAkiZH2._PkaOZpgk0HGROvjh2kzLOir84956GYllxiCF2Gj7Ph.7kXy9ax8gLx.t09YEnhAO8nn
+ XTCTBVLGmJr1zZUkUOU.dROkwDe_Wuidos2wm1cRL6wmQ3jjwK4egyASdhxgwoyYR8NdbLY1zmM7
+ ulqII3VsbX8zLx929p0dNpM8xxGEQmEeSlDtW5QMErs0fmAOnicruFDzGCLoxgB20xaezvM.AREG
+ F3Bm5Kfu_b0J9Vdmj8QuAMxdm7XLbL_p8h3W3BifK44km9aAVGAZr5ebxDIuLVW_0OLy.iUNKELE
+ kdSAIUmgaSNVgU4sRGMMpewvPXNxlrP_YWLAd4i0KZyqea7KEX9Je5LT_HTKSlaGR_gdOwGZBQiJ
+ 3XEDiSFyjcNcT_mc8PdwUaSui78fufvVR8C97N.iU5ojeariTFmx1a4kFpfklmj3GgkxTpvRnIJy
+ Ms.RSei0ldkOq2O8dkv5u.OKaq3iBFrdHOr.jgSMKW6LBVC49WzbKroYoR2BM4CnlL646bw94cC7
+ 0zoEVGt0UPQSQ_1NkmuEVvfIo0y2ob9WK9yxyE4n2NlqKh_Uwe8QFaeUXzBbWgp9.yY3bQ1Z8YAy
+ Ae8Jac4c7NcIW9xP0yMylTwJ8y780z5MltXZOvnf6v6_9MH5iMsFmsYIyyMgIafdBfXkD8_LNRTw
+ 8vqrs5GbzMChxLGZsNBmnoKy27KMudYKrKerzDfTv6BI42F77YF3p6P49ngdBYPpWt7PambK55eA
+ vSizhH8kvNFL8FCad94xD.jDRxHDYGz.YR0Q_S5KuND49COYfds0UbmmHvIURoRjBkp6H__X9KDZ
+ 9h1KQ_GqsHtnSJ.8oI2UTAYjWTs5.QFuqK5a_2GbdSSVZMYYLLbcxZioeeWQoRaTZvX7CIt_2rty
+ MnwaIFVy.Hf231fcQlyTRr.E206AOLYYOAWCqx4lmmTnl85_jtSZC.JwmzRcAHe2X9xwt0Io6gxx
+ 7VPzrk98HxjhlVseorFa7wOt6b77p9T2b.K9a7J3L.SqyFKJehVHwJUOmfAZB8cI4yvh2KE2L_BN
+ XtyN8BC_H8a2JJQsK_68as.iJDHj22HdA6XetfdeiTVokWqiomAJs8tJtnyxtUuI94UFKP3EZ9hu
+ Vtf3C2AeQ0JvI87VHmG4nyJFPY8J0nSnvHgZjwjHg4YFbHCP68ZOMEotbtkB2WdUxFDp387Mi_y8
+ .m.a8hbIJq4KYW0KwBUVHraTAahC1OB_13myev0mUnsCuFgcOxGcOyzkO0fvO5awmWvpaXaYaslq
+ y8O12h4mIxO_gFbXFMpwKr7ESGCX6.AEBXjWTymB6NRCHHy8emdfrVXbCdys1CgUTplw2G4IT2GL
+ vdNEADhLCUWHMrn4Tou0ru6Elsn5Vaygqi5n0G3xObSlSOXGD2G4EcnvB47dUEdhuYPp2uSIPgAb
+ k.svFJmbIfaVE1_Y1W67vOPtLPemCK0mpPof583DsUVO2eBUNmGwV5d0oO.aPpBszm0BB6_lfJrB
+ ALAyjugKqsSM.6uBSYgb4Xu2LPXwQULGLm_mFo.yypPKePUkZ48Jp480ch7XUKe9js5xVvSzYqAn
+ m.MDdlDzqaLRTL_137VwMs8Ad8Y6SAVSatW2MZ_c8bYm9ScU3U36LiMnd_Mqi_0FJ2dIMzEx4cEj
+ xTOmLNzhaoXMj5nx9MkwXbaxd6O0rYUAb582tr2rl053ChHkugTagiunmjOp3Zw8OwaGPz4ZlPho
+ 8Xi9TfWp81EJPCXyUTDzPow0B5Q05.0XmM6B4QSJX4NIfy8PPB7HY15PIPp8I9Jz0hVnEvbCdotY
+ odvd6GuQ42mqHJwmnPFw_A0JSeXacwgqRPT6Lqy0mI8pEBV8rDquoMZ00eFMK7YxTQC1RC6CEv2b
+ BJt7nxCrntiYkfvT5UKfvTTUN7bCSix_OrLppDanevoFGbLrYl3k2ZUZsArLTDX0s6Fr69jsyYLL
+ H.hZSetk5xpPO_2WDe9rzopk6RwyzCMtrViKdrW5PTfkcRCwPJey7TX5lpn8DaHcCd9Liovr5hvb
+ 0qdO6zGjp8fY-
+X-Sonic-MF: <casey@schaufler-ca.com>
+X-Sonic-ID: d560284d-a513-437e-bc8d-88cbba6cec32
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic308.consmr.mail.ne1.yahoo.com with HTTP; Fri, 14 Mar 2025 17:26:40 +0000
+Received: by hermes--production-gq1-7d5f4447dd-ffpct (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 85f935b17729ab72ea53b7b1fade8a98;
+          Fri, 14 Mar 2025 17:26:36 +0000 (UTC)
+Message-ID: <d2019823-4500-499a-8368-76c50a582f47@schaufler-ca.com>
+Date: Fri, 14 Mar 2025 10:26:34 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: Initialize ctx to avoid memory allocation error
+To: Florian Westphal <fw@strlen.de>
+Cc: Chenyuan Yang <chenyuan0y@gmail.com>, netfilter-devel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Casey Schaufler <casey@schaufler-ca.com>
+References: <20250313195441.515267-1-chenyuan0y@gmail.com>
+ <20250313201007.GA26103@breakpoint.cc>
+ <42e5bb33-1826-43df-940d-ec80774fc65b@schaufler-ca.com>
+ <20250314164708.GA1542@breakpoint.cc>
+Content-Language: en-US
+From: Casey Schaufler <casey@schaufler-ca.com>
+In-Reply-To: <20250314164708.GA1542@breakpoint.cc>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddufedugedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmegrjeekieemfhgvfhemkegtleelmehfgedvvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegheemgeeltddtmegrjeekieemfhgvfhemkegtleelmehfgedvvgdphhgvlhhopehfvgguohhrrgdqvddrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepuddvpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtp
- hhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehlgihusehmrgiglhhinhgvrghrrdgtohhm
-X-GND-Sasl: maxime.chevallier@bootlin.com
+X-Mailer: WebService/1.1.23435 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 
-Hi Heiner,
 
-On Thu, 13 Mar 2025 20:43:44 +0100
-Heiner Kallweit <hkallweit1@gmail.com> wrote:
+On 3/14/2025 9:47 AM, Florian Westphal wrote:
+> Casey Schaufler <casey@schaufler-ca.com> wrote:
+>> If seclen is 0 it implies that there is no security context and that
+>> the secctx is NULL. How that is handled in the release function is up
+>> to the LSM. SELinux allocates secctx data, while Smack points to an
+>> entry in a persistent table.
+>>
+>>> seclen needs to be > 0 or no secinfo is passed to userland,
+>>> yet the secctx release function is called anyway.
+>> That is correct. The security module is responsible for handling
+>> the release of secctx correctly.
+>>
+>>> Should seclen be initialised to -1?  Or we need the change below too?
+>> No. The security modules handle secctx their own way.
+> Well, as-is security_release_secctx() can be called with garbage ctx;
+> seclen is inited to 0, but ctx is not initialized unconditionally.
 
-> Since c909e68f8127 ("hwmon: (core) Use device name as a fallback in
-> devm_hwmon_device_register_with_info") we can simply provide NULL
-> as name argument.
-> 
-> Heiner Kallweit (4):
->   net: phy: realtek: remove call to devm_hwmon_sanitize_name
->   net: phy: tja11xx: remove call to devm_hwmon_sanitize_name
->   net: phy: mxl-gpy: remove call to devm_hwmon_sanitize_name
->   net: phy: marvell-88q2xxx: remove call to devm_hwmon_sanitize_name
-> 
->  drivers/net/phy/marvell-88q2xxx.c       |  8 +-------
->  drivers/net/phy/mxl-gpy.c               |  8 +-------
->  drivers/net/phy/nxp-tja11xx.c           | 19 +++++--------------
->  drivers/net/phy/realtek/realtek_hwmon.c |  7 +------
->  4 files changed, 8 insertions(+), 34 deletions(-)
-> 
+Which isn't an issue for any existing security module.
 
-With more coffee in my system, I took a better look and it indeed looks
-good to me.
-
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-Sorry about the noisy comments,
-
-Maxime
 
