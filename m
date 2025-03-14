@@ -1,102 +1,144 @@
-Return-Path: <netdev+bounces-174811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CAE1A60A2C
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 08:42:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE2BCA60A48
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 08:46:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E018A17C00D
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 07:42:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B745C17DA1A
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 07:46:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91DFE18CBEC;
-	Fri, 14 Mar 2025 07:42:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BED316D9DF;
+	Fri, 14 Mar 2025 07:46:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="t+lD91q5"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="AWhOh1Hx"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCADE16BE17;
-	Fri, 14 Mar 2025 07:41:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5DDC14A09A;
+	Fri, 14 Mar 2025 07:45:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741938121; cv=none; b=YCA2atRxCJqdghmfvgnJPDMqrl/BjFpSHfnYDBlKNbKLR9OCE4zfce9PTyVAJxkEiqGRtJ9bdtDgqrJrE8nm59l9RdlqhX0+0bKMxAhDyGkhKK4qEd4F9cO1lwRCCWn4LqUK2NipFlK+CGCZGOp0holI+s7ZVt5mX5bk58fzzf0=
+	t=1741938361; cv=none; b=B7m1hcbbkMp5RZ/2MXMcn0MtkaadB6uBFyCwcg8cTP/jKB901PzS0ZFbE8qFzkyuCzkEwUqfxOa5G4rNhgsKkjDQMcmzUGT0/nlX5fk88XMQJBy8Git5X9xyS1J32EQL8ePEFTuOqWKgRM+l6DFMHFFybikBG/9pLr7MvQIuY4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741938121; c=relaxed/simple;
-	bh=+UVgE4Lc3SvK3rpMkszxSgihw9t5De4acB7r5eemDqo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VtY+nj0jHWl+4KMtqUUPRkA4uDJxK/jaNVfd7Jml7W+GIjJbxOxgc93x768n6iZxmBCDdxQNEpUyNq+53FpGgW/ulHVBalL1INOamCLoTFPB8FVhUERMxCC5lLR9F6xt8HKOg0Feyb/hhhryNhmFQTRXLORxy2Z+aKeeHkKv8+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=t+lD91q5; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 52E7ffgH72708350, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1741938101; bh=+UVgE4Lc3SvK3rpMkszxSgihw9t5De4acB7r5eemDqo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=t+lD91q51sB9JhgNoXAxSCBcAe0D1/JUhbq3DmUEA3nXlBcSouNZNfv4TW4Fhrdsh
-	 ui8JVDmxPKZdUVvObpgU0sgtqJZJFgnZ95J9b62ERvej2F22h0nBfrnu+TkULrSwJM
-	 jIpac1ZoadhsCLgufirZTZzWkjd5qmlqluvpjZ3BNz+jBpbV3cynd35haRldbNeQW3
-	 1GNd/mrZEdvigLHkgondEjvpq7IjA5HS7z0uE+pnRkMTFdBg0Hx/lKFThHwFRNCbWe
-	 /i/yrtsZPn7Pt9mVw8g5iscE1Eu0ZJPX6hV7glDCZufQ6LMJgxd4obf9jp1atjM7Yu
-	 nqZdmh6984tHQ==
-Received: from RSEXMBS03.realsil.com.cn ([172.29.17.197])
-	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 52E7ffgH72708350
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=FAIL);
-	Fri, 14 Mar 2025 15:41:41 +0800
-Received: from RSEXH36502.realsil.com.cn (172.29.17.3) by
- RSEXMBS03.realsil.com.cn (172.29.17.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 14 Mar 2025 15:41:38 +0800
-Received: from 172.29.32.27 (172.29.32.27) by RSEXH36502.realsil.com.cn
- (172.29.17.3) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Fri, 14 Mar 2025 15:41:38 +0800
-From: ChunHao Lin <hau@realtek.com>
-To: <hkallweit1@gmail.com>, <nic_swsd@realtek.com>, <andrew+netdev@lunn.ch>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        ChunHao Lin
-	<hau@realtek.com>
-Subject: [PATCH net-next 1/2] r8169: enable RTL8168H/RTL8168EP/RTL8168FP ASPM support
-Date: Fri, 14 Mar 2025 15:41:28 +0800
-Message-ID: <20250314074129.2682-2-hau@realtek.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250314074129.2682-1-hau@realtek.com>
-References: <20250314074129.2682-1-hau@realtek.com>
+	s=arc-20240116; t=1741938361; c=relaxed/simple;
+	bh=wrGkeduHJf2FRdetfM7kLNaeu4ZTC4phfwCgw5vRVSA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pLvYWEphHL18FE/zkvwXtL4xDPmBThb2+2Yf2A020+uiEtZubGOvXtrWfE2pUIqtJLhacrBkN1WzIV43vFYUzPAYpejxPNzpY08pdU+Bjexs/YGs4fW0rvES7IS+/xLHAB5V/jjoDvhXVcoEoVY2a1dX9QVLt624mfNniF3+mTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=AWhOh1Hx; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id BFA84433EC;
+	Fri, 14 Mar 2025 07:45:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1741938357;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8yRATkwAJPnxsl83BSKOjShQMMfdWMI6sf8JzOOif9w=;
+	b=AWhOh1HxnIUz7vl/wKSKO/qKsxjMwekOryuxHWaNmr8k+wVRXjyKvM/5dQ1GqJgT7uZ7aC
+	Ibco3VuXknFeFPcyIbUusAV0K12Uu8sjwMwYZjZ+Clc4g4XX+aFKKC1cl5vn8hYQVkONOH
+	an2gEB0MO5AWBXy2xfnwIA3dK7ivyKN9dHlzhk3gHr7oE9U9AoeNommDpjNFPfhdnzYoYQ
+	usCccppvwpBzfJvfADfnZPgeQjNEt4utikW3LL+CdH4IjJ43Z8fk7V0dvhksLk445RtYOn
+	7Fdf+BhT+YAra1stO/d4XwNzwgNSGj2Ol+XhIqeuCvzDZxnYlpdz87lWAQKV7w==
+Date: Fri, 14 Mar 2025 08:45:54 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Russell King - ARM Linux
+ <linux@armlinux.org.uk>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, David Miller
+ <davem@davemloft.net>, Xu Liang <lxu@maxlinear.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Jean Delvare
+ <jdelvare@suse.com>, Guenter Roeck <linux@roeck-us.net>,
+ "linux-hwmon@vger.kernel.org" <linux-hwmon@vger.kernel.org>
+Subject: Re: [PATCH net-next 2/4] net: phy: tja11xx: remove call to
+ devm_hwmon_sanitize_name
+Message-ID: <20250314084554.322e790c@fedora-2.home>
+In-Reply-To: <4452cb7e-1a2f-4213-b49f-9de196be9204@gmail.com>
+References: <198f3cd0-6c39-4783-afe7-95576a4b8539@gmail.com>
+	<4452cb7e-1a2f-4213-b49f-9de196be9204@gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddufedtvdeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdqvddrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepuddvpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdpr
+ hgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehlgihusehmrgiglhhinhgvrghrrdgtohhm
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-This patch will enable RTL8168H/RTL8168EP/RTL8168FP ASPM support on
-the platforms that have tested with ASPM enabled.
+Hello Heiner,
 
-Signed-off-by: ChunHao Lin <hau@realtek.com>
----
- drivers/net/ethernet/realtek/r8169_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Thu, 13 Mar 2025 20:45:06 +0100
+Heiner Kallweit <hkallweit1@gmail.com> wrote:
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index b18daeeda40d..3c663fca07d3 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -5398,7 +5398,7 @@ static void rtl_init_mac_address(struct rtl8169_private *tp)
- /* register is set if system vendor successfully tested ASPM 1.2 */
- static bool rtl_aspm_is_safe(struct rtl8169_private *tp)
- {
--	if (tp->mac_version >= RTL_GIGA_MAC_VER_61 &&
-+	if (tp->mac_version >= RTL_GIGA_MAC_VER_46 &&
- 	    r8168_mac_ocp_read(tp, 0xc0b2) & 0xf)
- 		return true;
- 
--- 
-2.43.0
+> Since c909e68f8127 ("hwmon: (core) Use device name as a fallback in
+> devm_hwmon_device_register_with_info") we can simply provide NULL
+> as name argument.
+> 
+> Note that neither priv->hwmon_name nor priv->hwmon_dev are used
+> outside tja11xx_hwmon_register.
+> 
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> ---
+>  drivers/net/phy/nxp-tja11xx.c | 19 +++++--------------
+>  1 file changed, 5 insertions(+), 14 deletions(-)
+> 
+> diff --git a/drivers/net/phy/nxp-tja11xx.c b/drivers/net/phy/nxp-tja11xx.c
+> index 601094fe2..07e94a247 100644
+> --- a/drivers/net/phy/nxp-tja11xx.c
+> +++ b/drivers/net/phy/nxp-tja11xx.c
+> @@ -87,8 +87,6 @@
+>  #define TJA110X_RMII_MODE_REFCLK_IN       BIT(0)
+>  
+>  struct tja11xx_priv {
+> -	char		*hwmon_name;
+> -	struct device	*hwmon_dev;
+>  	struct phy_device *phydev;
+>  	struct work_struct phy_register_work;
+>  	u32 flags;
+> @@ -508,19 +506,12 @@ static const struct hwmon_chip_info tja11xx_hwmon_chip_info = {
+>  static int tja11xx_hwmon_register(struct phy_device *phydev,
+>  				  struct tja11xx_priv *priv)
+>  {
+> -	struct device *dev = &phydev->mdio.dev;
+> -
+> -	priv->hwmon_name = devm_hwmon_sanitize_name(dev, dev_name(dev));
+> -	if (IS_ERR(priv->hwmon_name))
+> -		return PTR_ERR(priv->hwmon_name);
+> -
+> -	priv->hwmon_dev =
+> -		devm_hwmon_device_register_with_info(dev, priv->hwmon_name,
+> -						     phydev,
+> -						     &tja11xx_hwmon_chip_info,
+> -						     NULL);
+> +	struct device *hdev, *dev = &phydev->mdio.dev;
+>  
+> -	return PTR_ERR_OR_ZERO(priv->hwmon_dev);
+> +	hdev = devm_hwmon_device_register_with_info(dev, NULL, phydev,
+> +						    &tja11xx_hwmon_chip_info,
+> +						    NULL);
+> +	return PTR_ERR_OR_ZERO(hdev);
+>  }
 
+The change look correct to me, however I think you can go one step
+further and remove the field tja11xx_priv.hwmon_name as well as
+hwmon_dev.
+
+One could argue that we can even remove tja11xx_hwmon_register()
+entirely
+
+Thanks,
+
+Maxime
 
