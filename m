@@ -1,50 +1,68 @@
-Return-Path: <netdev+bounces-174880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-174884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85961A611DC
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 14:00:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64867A61206
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 14:09:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9E744624B4
-	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 13:00:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84415880A8F
+	for <lists+netdev@lfdr.de>; Fri, 14 Mar 2025 13:09:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01B291FF1C9;
-	Fri, 14 Mar 2025 13:00:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c6lEetIp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D2E21FF1B3;
+	Fri, 14 Mar 2025 13:09:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F431DD0F6;
-	Fri, 14 Mar 2025 12:59:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E55C71FCFF6
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 13:09:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741957199; cv=none; b=jq5MGILspW875c+q3O+X0VjZJdipQ7sgp81S8N+1Txiy0zu7TlZwB9iS/CNCaJi684/BkDvYY8gmYN625OQQXMrvBuX/3WqujszhKLmDPJ9V8yTRAMCy2Bh8EaplFvxR8Luod0tNmR21xmr1BAmPSG22PYi9K46theMKi5OgLAs=
+	t=1741957759; cv=none; b=CAJbMVnzFGVTsSg97Tx4t2dx8wdcjPfqneVvibcX5/AMZKEQYwYIXQ5NSuX8WrBRgtUEkgrXmYDg9zMZ70UR7YMb2W5THpTv9zDsJc0InRFfOPfXamMWQFJ9iK3cMCzzvsGSHFgCnFE39RcLzZmA6ULpatWvAyWEF9/w/UGAqSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741957199; c=relaxed/simple;
-	bh=S0HqySVuO5WiYhgCIb/zMBQSPibu+lJKpZPHlZpJH4Q=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WW4IoQf3CfStxUP1ZNRbcwAAEBkFaxtd+gXR+mkIymXkSChmA3q6mxxoYNdIJAh2sUJOJ03uuUOFfe+hPZFpnySHLjzb5tNQTBRlzRNQZTKIPmgIczEsQC/xVhRe6XF0RY/Najc6cPI8TfXYlCpNWKTKQvzlC08LLJ51ciB1+GE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c6lEetIp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A075C4CEEB;
-	Fri, 14 Mar 2025 12:59:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741957199;
-	bh=S0HqySVuO5WiYhgCIb/zMBQSPibu+lJKpZPHlZpJH4Q=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=c6lEetIpMA8eTmxrerCnwktVrU/72fW9+g8ebVhJMRj44/rdzJY0xGw3BfrkzCUp9
-	 mLh3lbd3p8f+f9ic3FZ4JsRGElug0gRXGDuG+pCSKG/YQCpIqnr9nFGg4p1AVoMs2A
-	 CytBeLuHsUCfVt5h7qEeN8K6TH5mmO1YEc0nXy6NPt9cglsj1nF+1bUc6bJk3QxOiT
-	 RMuGNg/Zf6KOWdzE4Un0OzSdG80TUQ+nEgDT/rnbxj1yRZJQKa24FnDFZC3IssensX
-	 NyKBgGrvOQ/GH6d3CWS1bkHlRfgxOi4hRdhMQfMUV4mHMpUdifQMeyVez45lyCOpTu
-	 vEe3frLUcncwA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 347D6380CEE2;
-	Fri, 14 Mar 2025 13:00:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1741957759; c=relaxed/simple;
+	bh=UdlBpjCL0yOdV5RNuEd50EerxPApVUtnjwjZrYiOxm0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jsKrCh6FRP9U06BpIaO2V9iiYhCvgCWSD4JF3xn6kl/O68+1Jl/JQUxxBA+ugaIFSrD/O4hISrYAfKvPZRfaiqxNfGx8vL3j6mr/18CL1KPboFqMkgKOqJFWqM97Rf1cXujTKpUcFS4u5E92zBCqd4pQYdudfdZXebCDyJQyqCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tt4mq-0007Js-8S
+	for netdev@vger.kernel.org; Fri, 14 Mar 2025 14:09:16 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tt4mp-005hne-2v
+	for netdev@vger.kernel.org;
+	Fri, 14 Mar 2025 14:09:15 +0100
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id 796F53DBB67
+	for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 13:09:15 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id DC7313DBB4B;
+	Fri, 14 Mar 2025 13:09:13 +0000 (UTC)
+Received: from blackshift.org (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 69402960;
+	Fri, 14 Mar 2025 13:09:12 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net 0/6] pull-request: can 2025-03-14
+Date: Fri, 14 Mar 2025 14:03:59 +0100
+Message-ID: <20250314130909.2890541-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,58 +70,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net/smc: use the correct ndev to find pnetid by
- pnetid table
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174195723401.2241450.4794096109279890304.git-patchwork-notify@kernel.org>
-Date: Fri, 14 Mar 2025 13:00:34 +0000
-References: <20250304124304.13732-1-guangguan.wang@linux.alibaba.com>
-In-Reply-To: <20250304124304.13732-1-guangguan.wang@linux.alibaba.com>
-To: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-Cc: wenjia@linux.ibm.com, pasic@linux.ibm.com, jaka@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hello:
+Hello netdev-team,
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+this is a pull request of 6 patches for net/main.
 
-On Tue,  4 Mar 2025 20:43:04 +0800 you wrote:
-> When using smc_pnet in SMC, it will only search the pnetid in the
-> base_ndev of the netdev hierarchy(both HW PNETID and User-defined
-> sw pnetid). This may not work for some scenarios when using SMC in
-> container on cloud environment.
-> In container, there have choices of different container network,
-> such as directly using host network, virtual network IPVLAN, veth,
-> etc. Different choices of container network have different netdev
-> hierarchy. Examples of netdev hierarchy show below. (eth0 and eth1
-> in host below is the netdev directly related to the physical device).
->             _______________________________
->            |   _________________           |
->            |  |POD              |          |
->            |  |                 |          |
->            |  | eth0_________   |          |
->            |  |____|         |__|          |
->            |       |         |             |
->            |       |         |             |
->            |   eth1|base_ndev| eth0_______ |
->            |       |         |    | RDMA  ||
->            | host  |_________|    |_______||
-> 
-> [...]
+The first patch is by Vincent Mailhol and fixes an out of bound read
+in strscpy() in the ucan driver.
 
-Here is the summary with links:
-  - [net-next,v2] net/smc: use the correct ndev to find pnetid by pnetid table
-    https://git.kernel.org/netdev/net-next/c/bfc6c67ec2d6
+Oliver Hartkopp contributes a patch for the af_can statistics to use
+atomic access in the hot path.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+The next 2 patches are by Biju Das, target the rcar_canfd driver and
+fix the page entries in the AFL list.
 
+The 2 patches by Haibo Chen for the flexcan driver fix the suspend and
+resume functions.
+
+regards,
+Marc
+
+---
+
+The following changes since commit 4003c9e78778e93188a09d6043a74f7154449d43:
+
+  Merge tag 'net-6.14-rc7' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-03-13 07:58:48 -1000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can.git tags/linux-can-fixes-for-6.14-20250314
+
+for you to fetch changes up to 52d48a3d67e9288c6c51589e3a05040f57ccaa89:
+
+  Merge patch series "can: flexcan: only change CAN state when link up in system PM" (2025-03-14 13:26:04 +0100)
+
+----------------------------------------------------------------
+linux-can-fixes-for-6.14-20250314
+
+----------------------------------------------------------------
+Biju Das (2):
+      dt-bindings: can: renesas,rcar-canfd: Fix typo in pattern properties for R-Car V4M
+      can: rcar_canfd: Fix page entries in the AFL list
+
+Haibo Chen (2):
+      can: flexcan: only change CAN state when link up in system PM
+      can: flexcan: disable transceiver during system PM
+
+Marc Kleine-Budde (2):
+      Merge patch series "R-Car CANFD fixes"
+      Merge patch series "can: flexcan: only change CAN state when link up in system PM"
+
+Oliver Hartkopp (1):
+      can: statistics: use atomic access in hot path
+
+Vincent Mailhol (1):
+      can: ucan: fix out of bound read in strscpy() source
+
+ .../bindings/net/can/renesas,rcar-canfd.yaml       |  2 +-
+ drivers/net/can/flexcan/flexcan-core.c             | 18 +++++++--
+ drivers/net/can/rcar/rcar_canfd.c                  | 28 ++++++-------
+ drivers/net/can/usb/ucan.c                         | 43 +++++++++-----------
+ net/can/af_can.c                                   | 12 +++---
+ net/can/af_can.h                                   | 12 +++---
+ net/can/proc.c                                     | 46 +++++++++++++---------
+ 7 files changed, 84 insertions(+), 77 deletions(-)
 
 
