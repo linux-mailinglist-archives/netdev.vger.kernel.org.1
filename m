@@ -1,137 +1,69 @@
-Return-Path: <netdev+bounces-175002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A11FA6230D
-	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 01:24:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83708A62329
+	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 01:32:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9FEB7A9028
-	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 00:22:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFB9D4212F9
+	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 00:32:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BBE153A7;
-	Sat, 15 Mar 2025 00:23:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDC8E2E3386;
+	Sat, 15 Mar 2025 00:32:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VqdMJYfg"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="VymMNzgT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAA4BC8E0;
-	Sat, 15 Mar 2025 00:23:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4F842E3377;
+	Sat, 15 Mar 2025 00:31:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741998220; cv=none; b=uP2k8+kPHdOnyaOUpTuLSs6TUHgr3CciN9T+TcO8QEGqmJw2xQEcR9tzBMUYL3gZKlpVIiyI7JuZMg8WU1m4L/yag0X+z2A79PBspDYZBQT+Tbc1wNuW+U1vtQRS+2t3w9bIccJJ4uHBWW8tVsobC0V7Me2CFG5LZux/6snyigw=
+	t=1741998722; cv=none; b=YP8lTucDicdJdPn3KYVPBi8ME2q098OnsHUiFdKr/tpj78HMbIArzcx51ldzKe2JUmIpuXE1Fjvs9fG62hWSe3GR7aNNHNyU4WwQIGn12fj98zk2lP8lywrcpuFoGBbfEDAMFLssi6ZJq1VOOS1uTeaYF/PUECKzfrcLjKhQ6ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741998220; c=relaxed/simple;
-	bh=4ikv9eyptdMwfYJR5gqj/ftAkhzmPPbyPxILpYgCsx8=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aaoBkEDB7xWTnT6iYlvw1H9mH4/p27/LWRaei1iunvfkj1t3E2mUu5q4dTg0UaUgdMEEZwO/EIWz2RXGTUWwio1TCBmXstFDqpKJo0LSdJxLK0k7KjCya4N16V483ES75RjI3RKD77Mg03xyHrmdjNo9H/44uZQuGp5T2IqJFvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VqdMJYfg; arc=none smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-7c2303a56d6so295392485a.3;
-        Fri, 14 Mar 2025 17:23:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741998217; x=1742603017; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:feedback-id:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KtGUbifaWdCRrexkDNtRNiLhnpL1kbPY2Ei7szaObU8=;
-        b=VqdMJYfgyoNWlaAptxKhuZaU1dzYmL0M5mPgJ0IhPEiTVCqLno/qu/PUaTgVf8ch/c
-         I0lehjQ2/pDhRISVCoKUen05uH7naDN5700IRsszLkfgdxdzp0rw4u3DTDSDcawTCkvm
-         OiblGuCBssmppJ1PJd3w3GnVEEOvQxA31AJMJTh6SF3L3MHMvzLnmvnk6fSWey/7rcut
-         lhUBKtpJYgRZu+9GslxpjZ7hdBsuV2PmVYvJv9oPhqBz4TRO8O/a8q+H7Hv6ANCdmzgn
-         vv6FI2hrcGzzVkLSgjGndvJNagXQdWec0w6RiJH2UPY7h6e4oQC0M2Qk3i7/YMz2Mjug
-         AP9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741998217; x=1742603017;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:feedback-id:message-id:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KtGUbifaWdCRrexkDNtRNiLhnpL1kbPY2Ei7szaObU8=;
-        b=wU+3Iy77RORf0seBnMkZ3OHeK8RCBxF60za2D9hCpAhqF6oX/QYRdeDhx99yEaagWQ
-         bQosbxcy0VEm1VxbhNKqtBnpp5P1RsWSqUTX1WX4qm95U6AaaAE96xh/tSOF0B8/NdNf
-         7BSdMq9rRU6yQV1ATbDb6b2YyZb7zOIcFeD9MfhV3/LbGBtfbLvozEFpWTYtoiGN2B0k
-         MUX/HDGAnBXaV8fIO4Tm+ZKZ5rNnZopFhpRmDwXBXqBkqUS0DNuWhY/GSXlNT3t7Py0D
-         CgbAESajRUT0odpRZYW1stAUZcWnziK87SOlHhdYnzVYMQRuMJARTPzDYNUQX3JQ7GXP
-         M2cA==
-X-Forwarded-Encrypted: i=1; AJvYcCVc2cJf2/zG09BqdGDY+AIG8el4D8doi2HBHWY4yKGDWc63PAXZ6B6gUreRqWHRenIDQGZrY+psvwAIu+Yj1erl@vger.kernel.org, AJvYcCVdxXIuIpiSxw/Rp5xD61JhvykSQH2tqxeMQPVEmmP7yJMa/K2eluvZEysuiYlhEB4eS5cn7O0P@vger.kernel.org, AJvYcCWBpPCu8zbwZVVh9sFRyXA1CQfku82JB+UNKroXW4MjTero92k7Il3qeY3YDuNEY+jzX4ma7y3IU0W0mu7fS/0=@vger.kernel.org, AJvYcCWg0TiIPz2p7SWnMZIRR7AIcPADRG+ZzQj4S446h3V1dhmA1W13x3Bhj+crQbvUS/O1HPauBeqs70D2@vger.kernel.org, AJvYcCX/WrpPfPTEC/gi1cs9K7+K8xweMJjy/FbztkyUF/dCi+lexV334zWkhUooRZ1lfZvVa/sXbqP+1ANDIX0n@vger.kernel.org, AJvYcCXjVoR+VZMhSu5kkI/qsrU8b27pQCu/q5Xnpmt2IoXgnVJYuvnBqbSdnl2KV0aZFmOvQ25aIXPnGy4Ulw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyz+Uki2BKgOwkxs6PXx2WsQk7Cj48Tu5lUlj3r1i07mNAGI/me
-	eVQw0XRKvByQ/YeaONmg7EDANYypxanEvro5Olqay8Z0hTpmGfWv
-X-Gm-Gg: ASbGncsKK7ZSA8xlEoyPDq9ObnnjykfSU+PRGLFWTI5pbImtH+gpXGPKM52XlraxIxP
-	bWbF6Nvd/SAIlj/jDhWmsMQWXlA+jjEaEypDTwq4p8WcNn4cS8c1z4o/HaJtaNVSHpA+1ST707R
-	Q/Lp4Q8RjrRqDMIZ0JFgC7UWK+p9Qv2LmjGtXTxtQmF6bSoG1YJ21x6mZzPvVthruv3c85HK7PA
-	wz1+bfcELV18TcbnQnP4XIe6YljBSwp6c5GySVb8cH9vjP0KtbUBLGE/pTIza3omE+JAA1aLTdb
-	MDiZJnC/ymd3R6TvKouw968fXiR9EFAiPESL2eVrz5X0Zb/1yBZPYYzqNLBGSAcrSHNX1Kfp2Q5
-	FXNcFfIu9fGG4TgImvlmXmheZKDmbhujXzI7ns0QXhbkcJw==
-X-Google-Smtp-Source: AGHT+IHMpER/JnbkGNCfSySjFX3UEHCHjaZZWgeAljh7oBmyDf8g26BQmTLLo5enSqswp/8nMLGTfg==
-X-Received: by 2002:a05:620a:2b96:b0:7c5:6299:3f4 with SMTP id af79cd13be357-7c57c8f03c6mr831634085a.49.1741998217413;
-        Fri, 14 Mar 2025 17:23:37 -0700 (PDT)
-Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c573c4dd9fsm321259185a.4.2025.03.14.17.23.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Mar 2025 17:23:37 -0700 (PDT)
-Message-ID: <67d4c889.050a0220.35d7ce.b4b0@mx.google.com>
-X-Google-Original-Message-ID: <Z9TIhZlMyLe4eFUJ@winterfell.>
-Received: from phl-compute-07.internal (phl-compute-07.phl.internal [10.202.2.47])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 664981200043;
-	Fri, 14 Mar 2025 20:23:36 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-07.internal (MEProxy); Fri, 14 Mar 2025 20:23:36 -0400
-X-ME-Sender: <xms:h8jUZ74e_UbzhWKyL0vR8GNjvb2XGrNAgk4_VgW40B01hoiXfJ7S3A>
-    <xme:h8jUZw7nggYlYki7_RHh6X1sPlXohGpse0pS_gMHYb534N0k0WOpJ1M4NmwnV44mS
-    NW7GqxwTS_bSV5lNw>
-X-ME-Received: <xmr:h8jUZydNm33FOpPngpMJqlp4sOQc8Bpq5AYx0H28DkOyrsYa1CAjuPPuB7U>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddufedvvdeiucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
-    vdenucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrih
-    hlrdgtohhmqeenucggtffrrghtthgvrhhnpeehudfgudffffetuedtvdehueevledvhfel
-    leeivedtgeeuhfegueevieduffeivdenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpegsohhquhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgr
-    lhhithihqdeiledvgeehtdeigedqudejjeekheehhedvqdgsohhquhhnrdhfvghngheppe
-    hgmhgrihhlrdgtohhmsehfihigmhgvrdhnrghmvgdpnhgspghrtghpthhtohepvdehpdhm
-    ohguvgepshhmthhpohhuthdprhgtphhtthhopegtohhnthgrtghtsegrnhhtohhnihhohh
-    hitghkvgihrdgtohhmpdhrtghpthhtoheprgdrhhhinhgusghorhhgsehkvghrnhgvlhdr
-    ohhrghdprhgtphhtthhopehojhgvuggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhope
-    grlhgvgidrghgrhihnohhrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepghgrrhihsehg
-    rghrhihguhhordhnvghtpdhrtghpthhtohepsghjohhrnhefpghghhesphhrohhtohhnmh
-    grihhlrdgtohhmpdhrtghpthhtohepsggvnhhnohdrlhhoshhsihhnsehprhhothhonhdr
-    mhgvpdhrtghpthhtoheprghlihgtvghrhihhlhesghhoohhglhgvrdgtohhmpdhrtghpth
-    htohepthhmghhrohhsshesuhhmihgthhdrvgguuh
-X-ME-Proxy: <xmx:h8jUZ8JPSDkCkSkVt3RCB0Mk0E6jmS46WfWGUfUJeprU262aCCSJgw>
-    <xmx:h8jUZ_IFjlqJkRvidnGpq-HLbqiAU6cTlhXqLYie0rIDx4roP_n9yQ>
-    <xmx:h8jUZ1yQzv9jBdBC-yTOo02PuZnhEaLzwYnAKPlnZSUXkevoxOb8Nw>
-    <xmx:h8jUZ7KwE9A7UvQLx7IZJeY4skdT-pxzupkpiKa2zZZKJJw8pQCTTw>
-    <xmx:iMjUZ6b06pHFrdh8E5BfHZJQdSCferZ5En_EfIQWlF8tW8bvC1g5ZrXX>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 14 Mar 2025 20:23:34 -0400 (EDT)
-Date: Fri, 14 Mar 2025 17:23:33 -0700
-From: Boqun Feng <boqun.feng@gmail.com>
-To: Antonio Hickey <contact@antoniohickey.com>
-Cc: Andreas Hindborg <a.hindborg@kernel.org>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <benno.lossin@proton.me>,
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	s=arc-20240116; t=1741998722; c=relaxed/simple;
+	bh=Je8DBcuCNLQIuW9S+QysgJ0snPg8uIOECpzutgrWcBw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BQQkXgrlqxPqJblcy9YQ9BGJETj4XiFAMZ6aLFMTXREqYZlQ6Y9D6g5BmbgfjLOehlzvt99kHgJVpk+pnJKbS5NjFJ7YpUDVZYYP346xVBB/xrisi788n6xf2kxgYgni4eFH4mXl6WFcFj4ngB5TlLtweqNs3GxMCLiEKJz1i4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=VymMNzgT; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=t3ecUWY92S53odYjmM31lnI9pitPM2pM+xnXq3bFvsg=; b=VymMNzgTs1z8T84RIQQNiPfsqh
+	hJdYDA8EHMUIcWNmq8x1krK7oyDwo5BqKErXIYBgz2CSaGclFUAtXzw/SglY/AxHy1ZulvME7cTCl
+	bnPDFMSLw4q5kdezHuIRMQYwEiZaI6pIMQ4D5MWk6oJzNQkmuD3PHQ/Odx+A0VrZRGhhJlr3fZSRd
+	Zuj61q+lI3CiDYm8mticZaygOlDElUr/j8StYvpJ3DfKM8ECDYC+PocWHZIqsAWHGdXeG2KKQSBGs
+	wzjPHSuShtY3A5ZtW/NoQv7pAbA179WVdCuVBI/GDxS+5VOCenJqLZHc46HUsk4/aens9yLbLP7Tj
+	DoSdk3tA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1ttFR8-006kEb-0B;
+	Sat, 15 Mar 2025 08:31:35 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 15 Mar 2025 08:31:34 +0800
+Date: Sat, 15 Mar 2025 08:31:34 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Richard Weinberger <richard@nod.at>,
+	Zhihao Cheng <chengzhihao1@huawei.com>,
+	linux-mtd@lists.infradead.org,
 	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Brendan Higgins <brendan.higgins@linux.dev>,
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-block@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com,
-	netdev@vger.kernel.org, linux-pci@vger.kernel.org
-Subject: Re: [PATCH v3 2/3] rust: replace `addr_of[_mut]!` with `&raw [mut]`
-References: <20250314234148.599196-1-contact@antoniohickey.com>
- <0100019597092d67-0da59c6d-9680-413f-bbce-109ef95724cc-000000@email.amazonses.com>
+	Pavel Machek <pavel@ucw.cz>, linux-pm@vger.kernel.org,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH] crypto: qat - Remove dead code related to null dst
+Message-ID: <Z9TKZgYaVAerVVkU@gondor.apana.org.au>
+References: <cover.1741954320.git.herbert@gondor.apana.org.au>
+ <1e29b349410b0d9822c8c0b8f6e01386a3c44d66.1741954320.git.herbert@gondor.apana.org.au>
+ <Z9Q1euXeBy7x8zZI@gcabiddu-mobl.ger.corp.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -140,38 +72,250 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0100019597092d67-0da59c6d-9680-413f-bbce-109ef95724cc-000000@email.amazonses.com>
+In-Reply-To: <Z9Q1euXeBy7x8zZI@gcabiddu-mobl.ger.corp.intel.com>
 
-On Fri, Mar 14, 2025 at 11:41:55PM +0000, Antonio Hickey wrote:
-[...]
-> @@ -541,7 +541,7 @@ macro_rules! stack_try_pin_init {
->  ///
->  /// ```rust
->  /// # use kernel::{macros::{Zeroable, pin_data}, pin_init};
-> -/// # use core::{ptr::addr_of_mut, marker::PhantomPinned};
-> +/// # use core::marker::PhantomPinned;
->  /// #[pin_data]
->  /// #[derive(Zeroable)]
->  /// struct Buf {
-> @@ -554,7 +554,7 @@ macro_rules! stack_try_pin_init {
->  /// pin_init!(&this in Buf {
->  ///     buf: [0; 64],
->  ///     // SAFETY: TODO.
-> -///     ptr: unsafe { addr_of_mut!((*this.as_ptr()).buf).cast() },
-> +///     ptr: unsafe { &raw mut (*this.as_ptr()).buf.cast() },
+On Fri, Mar 14, 2025 at 01:56:10PM +0000, Cabiddu, Giovanni wrote:
+>
+> The implementation of this function in qat/qat_common/qat_bl.c
+> should be removed as well as. After this change, it is not getting
+> called.
 
-This should be:
+Thanks.  I'll fold this patch in if a rebase is needed.
 
+---8<---
+Remove dead code left behind after the dropping of null dst support.
 
-///     ptr: unsafe { &raw mut ((*this.as_ptr()).buf).cast() },
+Fix the areq->dst test so that a null dst is explicitly forbidden.
 
-, right?
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ drivers/crypto/intel/qat/qat_common/qat_bl.c  | 159 ------------------
+ drivers/crypto/intel/qat/qat_common/qat_bl.h  |   6 -
+ .../intel/qat/qat_common/qat_comp_algs.c      |   2 +-
+ .../intel/qat/qat_common/qat_comp_req.h       |  10 --
+ 4 files changed, 1 insertion(+), 176 deletions(-)
 
-Regards,
-Boqun
+diff --git a/drivers/crypto/intel/qat/qat_common/qat_bl.c b/drivers/crypto/intel/qat/qat_common/qat_bl.c
+index 338acf29c487..5e4dad4693ca 100644
+--- a/drivers/crypto/intel/qat/qat_common/qat_bl.c
++++ b/drivers/crypto/intel/qat/qat_common/qat_bl.c
+@@ -251,162 +251,3 @@ int qat_bl_sgl_to_bufl(struct adf_accel_dev *accel_dev,
+ 				    extra_dst_buff, sz_extra_dst_buff,
+ 				    sskip, dskip, flags);
+ }
+-
+-static void qat_bl_sgl_unmap(struct adf_accel_dev *accel_dev,
+-			     struct qat_alg_buf_list *bl)
+-{
+-	struct device *dev = &GET_DEV(accel_dev);
+-	int n = bl->num_bufs;
+-	int i;
+-
+-	for (i = 0; i < n; i++)
+-		if (!dma_mapping_error(dev, bl->buffers[i].addr))
+-			dma_unmap_single(dev, bl->buffers[i].addr,
+-					 bl->buffers[i].len, DMA_FROM_DEVICE);
+-}
+-
+-static int qat_bl_sgl_map(struct adf_accel_dev *accel_dev,
+-			  struct scatterlist *sgl,
+-			  struct qat_alg_buf_list **bl)
+-{
+-	struct device *dev = &GET_DEV(accel_dev);
+-	struct qat_alg_buf_list *bufl;
+-	int node = dev_to_node(dev);
+-	struct scatterlist *sg;
+-	int n, i, sg_nctr;
+-	size_t sz;
+-
+-	n = sg_nents(sgl);
+-	sz = struct_size(bufl, buffers, n);
+-	bufl = kzalloc_node(sz, GFP_KERNEL, node);
+-	if (unlikely(!bufl))
+-		return -ENOMEM;
+-
+-	for (i = 0; i < n; i++)
+-		bufl->buffers[i].addr = DMA_MAPPING_ERROR;
+-
+-	sg_nctr = 0;
+-	for_each_sg(sgl, sg, n, i) {
+-		int y = sg_nctr;
+-
+-		if (!sg->length)
+-			continue;
+-
+-		bufl->buffers[y].addr = dma_map_single(dev, sg_virt(sg),
+-						       sg->length,
+-						       DMA_FROM_DEVICE);
+-		bufl->buffers[y].len = sg->length;
+-		if (unlikely(dma_mapping_error(dev, bufl->buffers[y].addr)))
+-			goto err_map;
+-		sg_nctr++;
+-	}
+-	bufl->num_bufs = sg_nctr;
+-	bufl->num_mapped_bufs = sg_nctr;
+-
+-	*bl = bufl;
+-
+-	return 0;
+-
+-err_map:
+-	for (i = 0; i < n; i++)
+-		if (!dma_mapping_error(dev, bufl->buffers[i].addr))
+-			dma_unmap_single(dev, bufl->buffers[i].addr,
+-					 bufl->buffers[i].len,
+-					 DMA_FROM_DEVICE);
+-	kfree(bufl);
+-	*bl = NULL;
+-
+-	return -ENOMEM;
+-}
+-
+-static void qat_bl_sgl_free_unmap(struct adf_accel_dev *accel_dev,
+-				  struct scatterlist *sgl,
+-				  struct qat_alg_buf_list *bl,
+-				  bool free_bl)
+-{
+-	if (bl) {
+-		qat_bl_sgl_unmap(accel_dev, bl);
+-
+-		if (free_bl)
+-			kfree(bl);
+-	}
+-	if (sgl)
+-		sgl_free(sgl);
+-}
+-
+-static int qat_bl_sgl_alloc_map(struct adf_accel_dev *accel_dev,
+-				struct scatterlist **sgl,
+-				struct qat_alg_buf_list **bl,
+-				unsigned int dlen,
+-				gfp_t gfp)
+-{
+-	struct scatterlist *dst;
+-	int ret;
+-
+-	dst = sgl_alloc(dlen, gfp, NULL);
+-	if (!dst) {
+-		dev_err(&GET_DEV(accel_dev), "sg_alloc failed\n");
+-		return -ENOMEM;
+-	}
+-
+-	ret = qat_bl_sgl_map(accel_dev, dst, bl);
+-	if (ret)
+-		goto err;
+-
+-	*sgl = dst;
+-
+-	return 0;
+-
+-err:
+-	sgl_free(dst);
+-	*sgl = NULL;
+-	return ret;
+-}
+-
+-int qat_bl_realloc_map_new_dst(struct adf_accel_dev *accel_dev,
+-			       struct scatterlist **sg,
+-			       unsigned int dlen,
+-			       struct qat_request_buffs *qat_bufs,
+-			       gfp_t gfp)
+-{
+-	struct device *dev = &GET_DEV(accel_dev);
+-	dma_addr_t new_blp = DMA_MAPPING_ERROR;
+-	struct qat_alg_buf_list *new_bl;
+-	struct scatterlist *new_sg;
+-	size_t new_bl_size;
+-	int ret;
+-
+-	ret = qat_bl_sgl_alloc_map(accel_dev, &new_sg, &new_bl, dlen, gfp);
+-	if (ret)
+-		return ret;
+-
+-	new_bl_size = struct_size(new_bl, buffers, new_bl->num_bufs);
+-
+-	/* Map new firmware SGL descriptor */
+-	new_blp = dma_map_single(dev, new_bl, new_bl_size, DMA_TO_DEVICE);
+-	if (unlikely(dma_mapping_error(dev, new_blp)))
+-		goto err;
+-
+-	/* Unmap old firmware SGL descriptor */
+-	dma_unmap_single(dev, qat_bufs->bloutp, qat_bufs->sz_out, DMA_TO_DEVICE);
+-
+-	/* Free and unmap old scatterlist */
+-	qat_bl_sgl_free_unmap(accel_dev, *sg, qat_bufs->blout,
+-			      !qat_bufs->sgl_dst_valid);
+-
+-	qat_bufs->sgl_dst_valid = false;
+-	qat_bufs->blout = new_bl;
+-	qat_bufs->bloutp = new_blp;
+-	qat_bufs->sz_out = new_bl_size;
+-
+-	*sg = new_sg;
+-
+-	return 0;
+-err:
+-	qat_bl_sgl_free_unmap(accel_dev, new_sg, new_bl, true);
+-
+-	if (!dma_mapping_error(dev, new_blp))
+-		dma_unmap_single(dev, new_blp, new_bl_size, DMA_TO_DEVICE);
+-
+-	return -ENOMEM;
+-}
+diff --git a/drivers/crypto/intel/qat/qat_common/qat_bl.h b/drivers/crypto/intel/qat/qat_common/qat_bl.h
+index 3f5b79015400..2827d5055d3c 100644
+--- a/drivers/crypto/intel/qat/qat_common/qat_bl.h
++++ b/drivers/crypto/intel/qat/qat_common/qat_bl.h
+@@ -65,10 +65,4 @@ static inline gfp_t qat_algs_alloc_flags(struct crypto_async_request *req)
+ 	return req->flags & CRYPTO_TFM_REQ_MAY_SLEEP ? GFP_KERNEL : GFP_ATOMIC;
+ }
+ 
+-int qat_bl_realloc_map_new_dst(struct adf_accel_dev *accel_dev,
+-			       struct scatterlist **newd,
+-			       unsigned int dlen,
+-			       struct qat_request_buffs *qat_bufs,
+-			       gfp_t gfp);
+-
+ #endif
+diff --git a/drivers/crypto/intel/qat/qat_common/qat_comp_algs.c b/drivers/crypto/intel/qat/qat_common/qat_comp_algs.c
+index 9d5848e28ff8..a6e02405d402 100644
+--- a/drivers/crypto/intel/qat/qat_common/qat_comp_algs.c
++++ b/drivers/crypto/intel/qat/qat_common/qat_comp_algs.c
+@@ -183,7 +183,7 @@ static int qat_comp_alg_compress_decompress(struct acomp_req *areq, enum directi
+ 	if (!areq->src || !slen)
+ 		return -EINVAL;
+ 
+-	if (areq->dst && !dlen)
++	if (!areq->dst || !dlen)
+ 		return -EINVAL;
+ 
+ 	if (dir == COMPRESSION) {
+diff --git a/drivers/crypto/intel/qat/qat_common/qat_comp_req.h b/drivers/crypto/intel/qat/qat_common/qat_comp_req.h
+index 404e32c5e778..18a1f33a6db9 100644
+--- a/drivers/crypto/intel/qat/qat_common/qat_comp_req.h
++++ b/drivers/crypto/intel/qat/qat_common/qat_comp_req.h
+@@ -25,16 +25,6 @@ static inline void qat_comp_create_req(void *ctx, void *req, u64 src, u32 slen,
+ 	req_pars->out_buffer_sz = dlen;
+ }
+ 
+-static inline void qat_comp_override_dst(void *req, u64 dst, u32 dlen)
+-{
+-	struct icp_qat_fw_comp_req *fw_req = req;
+-	struct icp_qat_fw_comp_req_params *req_pars = &fw_req->comp_pars;
+-
+-	fw_req->comn_mid.dest_data_addr = dst;
+-	fw_req->comn_mid.dst_length = dlen;
+-	req_pars->out_buffer_sz = dlen;
+-}
+-
+ static inline void qat_comp_create_compression_req(void *ctx, void *req,
+ 						   u64 src, u32 slen,
+ 						   u64 dst, u32 dlen,
+-- 
+2.39.5
 
->  ///     pin: PhantomPinned,
->  /// });
->  /// pin_init!(Buf {
-[...]
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
