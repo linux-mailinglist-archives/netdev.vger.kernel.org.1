@@ -1,108 +1,162 @@
-Return-Path: <netdev+bounces-175024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06168A627A9
-	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 07:54:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 29D54A627F2
+	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 08:17:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 391853B82AD
-	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 06:53:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55ED73A9C17
+	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 07:17:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CC1119F127;
-	Sat, 15 Mar 2025 06:54:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 692671B4234;
+	Sat, 15 Mar 2025 07:17:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="vvDqCSO+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GeD3Jeic"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83FA418893C
-	for <netdev@vger.kernel.org>; Sat, 15 Mar 2025 06:53:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 862FF1898E9;
+	Sat, 15 Mar 2025 07:17:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742021641; cv=none; b=TfN4ktLb8aKvTF68hauRrPx2F8TEGNwVUst5UfGZpOWtCZ4sgI92iuIxYlBBY5aQkmBQaxxEF0xNR1pt52r6Ae2WXNfgZ4rG05w6u5uMmVoCwKovmcP4MiVaRHqhh6GDq09ZvHyU0yvwRQwHiA6BWY7ifMckCYkvWmJjBjfXMao=
+	t=1742023049; cv=none; b=t2naEM3phTKH4uhKJFTAHT06bcl6M9HGl4BUGm5+gXRufSdMn0kn+hu7MOSheXz9JN4BmcXkpJhLsFRLDNBi86VbKoOThezu50X2In9cKoY/XYjAqFZqU9znPGjXgxGxX8Wvt0xE4w2ZiNajHsn5dqRwHhdo2nqyxFOfbBUqHV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742021641; c=relaxed/simple;
-	bh=6U9X1JM3pG57RkKJppSrAPQc9JIp2SGUb7H50/WKzEc=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SVL8AG3MJDft7YD71YMV38xPgEWezk8nlLV8ZC1XViB1SSMMlp1lzWdYQcHvX+03J5FEGei5E1XkppSkYL1aqiKHGdxWcD+Fj0Ip1NztHp7sx0EFx5Kk6ch3TcIidEESz2XBRvRrQhP5JCBa90pLr0nDNDszh5linI34JMhn+t8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=vvDqCSO+; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 884892074F;
-	Sat, 15 Mar 2025 07:53:56 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XLEC7EquL543; Sat, 15 Mar 2025 07:53:56 +0100 (CET)
-Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 02AD82074B;
-	Sat, 15 Mar 2025 07:53:56 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 02AD82074B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1742021636;
-	bh=VBAIWlmiGTtmw6QeWmg2C8FvuMa6MzynWRVRUv/E6ow=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=vvDqCSO+S54+fxLd176tPsR3pHO7QP0u8MROgz/bQTjVT5937VtzJ1FrY3O0F/QTP
-	 G7KALHUVeilRDuEzhQNXjss83xoOuGvgSH55Y+7aDo3eybJnNGq+fYBSG+NPFQWgCi
-	 tQ/XlUUkbEPXeEeGaCBImMaT9EewWceUzzGWPZENPZjvzphSEQXsbO3VY4jkVFQeVC
-	 dkwJ3RqhwehYKaPtMi46ztJx5ZPG+iRkIOtD4gEJdM1VBQeVv1gwc633smu2ysSLJG
-	 HHKEoGSfWyb6ngUWD26vSiIM43R39GfRlh8lXtUMSg6Lktex6OHoZZWkNpDBv5uNs8
-	 KETzIsuTGFhWQ==
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Sat, 15 Mar 2025 07:53:55 +0100
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Sat, 15 Mar
- 2025 07:53:55 +0100
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 3D3003182EDE; Sat, 15 Mar 2025 07:53:55 +0100 (CET)
-Date: Sat, 15 Mar 2025 07:53:55 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: <netdev@vger.kernel.org>
-Subject: Re: [PATCH] xfrm: ipcomp: Call pskb_may_pull in ipcomp_input
-Message-ID: <Z9UkA99pbktct7qd@gauss3.secunet.de>
-References: <Z9KTIYVFwEIYXgd7@gondor.apana.org.au>
- <Z9T3V/M0hXIiHsLB@gauss3.secunet.de>
- <Z9UUxb2dclH9hrWo@gondor.apana.org.au>
- <Z9UZU6EGEF81OAYj@gondor.apana.org.au>
+	s=arc-20240116; t=1742023049; c=relaxed/simple;
+	bh=Z31rXIHeFi0vSzpLV+dAnUJCfuKbhgx17niPgsHsIP8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z4TRZCdYpUbFpqVFXU9Fss1eiIZ5DcVwFoFYHqQA/6vssFdziQXCa+lwpXhf40oxia4+7WAWVkCRjCVMPyhhCxSEHihmPRuA6mgyzydWmMXE6xMaanguYLODXpKrqb8M3A6My6pWlJv5hXRHea49pkimC5xYmTwHfzdXUP0/1Wo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GeD3Jeic; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1742023047; x=1773559047;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Z31rXIHeFi0vSzpLV+dAnUJCfuKbhgx17niPgsHsIP8=;
+  b=GeD3Jeicy9qCiOh4H420RuNvHGmb3fHI77POJBGGYOQ0Ex9ajSqHjIeF
+   WRJnBBfFDn91Yin84zk9+VKJ2wdx3eQLPItz1rU1apeSU5Ek/4RbY7e4r
+   wX9A2CzgOrqJ7RzrIStA0S0IahWghdZZ8xCR1kl9YnxHKGbnnc8bptudY
+   ELNVi4+6vAz2P28W6RtpGKYVf7dE5SNGlv8/zbQOHQ5FXdXHUntt7IVIR
+   zl0M+YXEHeEMN1XU5BJrgEyo940TP64zxa4GDkbiiUB8VSi38i3PymVxx
+   AxGIhZ5Fl5HpHtNjQCKR2/PZYMckMsPLsWktf94FftF7qAilmA09WUko0
+   A==;
+X-CSE-ConnectionGUID: ER6++RFJRlGN3jXZIx4xjw==
+X-CSE-MsgGUID: 4Hns2FpsR6uCIZM/eac0+Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11373"; a="42427577"
+X-IronPort-AV: E=Sophos;i="6.14,249,1736841600"; 
+   d="scan'208";a="42427577"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2025 00:17:26 -0700
+X-CSE-ConnectionGUID: ZmLPeHApQmO0muF4tNEDJw==
+X-CSE-MsgGUID: B5N6fwFcQ+WPCnmpJ96OIQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,249,1736841600"; 
+   d="scan'208";a="125685349"
+Received: from lkp-server02.sh.intel.com (HELO a4747d147074) ([10.239.97.151])
+  by fmviesa003.fm.intel.com with ESMTP; 15 Mar 2025 00:17:22 -0700
+Received: from kbuild by a4747d147074 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1ttLln-000B7j-1F;
+	Sat, 15 Mar 2025 07:17:19 +0000
+Date: Sat, 15 Mar 2025 15:16:19 +0800
+From: kernel test robot <lkp@intel.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Thangaraj Samynathan <Thangaraj.S@microchip.com>,
+	Rengarajan Sundararajan <Rengarajan.S@microchip.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Oleksij Rempel <o.rempel@pengutronix.de>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com,
+	Phil Elwell <phil@raspberrypi.org>
+Subject: Re: [PATCH net-next v3 5/7] net: usb: lan78xx: port link settings to
+ phylink API
+Message-ID: <202503151447.4eGbKrTa-lkp@intel.com>
+References: <20250310115737.784047-6-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z9UZU6EGEF81OAYj@gondor.apana.org.au>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+In-Reply-To: <20250310115737.784047-6-o.rempel@pengutronix.de>
 
-On Sat, Mar 15, 2025 at 02:08:19PM +0800, Herbert Xu wrote:
-> On Sat, Mar 15, 2025 at 01:48:53PM +0800, Herbert Xu wrote:
-> >
-> > Sure I can add it.  Do you mind if I push this through the crypto
-> > tree so I can base the acomp work on top of it?
-> > 
-> > I'll push this fix to Linus right away if you're OK with it.
-> 
-> Actually there is no need to push this right away because
-> xfrm_parse_spi has already done a check on the header length
-> so this should have no effect.
-> 
-> But if you're OK with this change and the xfrm_ipcomp/acomp change
-> I'd still like to push it through cryptodev.
+Hi Oleksij,
 
-Sure, go ahead.
+kernel test robot noticed the following build errors:
 
-Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Oleksij-Rempel/net-usb-lan78xx-Convert-to-PHYlink-for-improved-PHY-and-MAC-management/20250310-200116
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250310115737.784047-6-o.rempel%40pengutronix.de
+patch subject: [PATCH net-next v3 5/7] net: usb: lan78xx: port link settings to phylink API
+config: i386-randconfig-006-20250315 (https://download.01.org/0day-ci/archive/20250315/202503151447.4eGbKrTa-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250315/202503151447.4eGbKrTa-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202503151447.4eGbKrTa-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   ld: drivers/net/usb/lan78xx.o: in function `lan78xx_set_link_ksettings':
+>> drivers/net/usb/lan78xx.c:1874: undefined reference to `phylink_ethtool_ksettings_set'
+   ld: drivers/net/usb/lan78xx.o: in function `lan78xx_get_link_ksettings':
+>> drivers/net/usb/lan78xx.c:1866: undefined reference to `phylink_ethtool_ksettings_get'
+   ld: drivers/net/usb/lan78xx.o: in function `lan78xx_open':
+   drivers/net/usb/lan78xx.c:3252: undefined reference to `phylink_start'
+   ld: drivers/net/usb/lan78xx.o: in function `lan78xx_stop':
+   drivers/net/usb/lan78xx.c:3322: undefined reference to `phylink_stop'
+   ld: drivers/net/usb/lan78xx.o: in function `lan78xx_disconnect':
+   drivers/net/usb/lan78xx.c:4347: undefined reference to `phylink_stop'
+   ld: drivers/net/usb/lan78xx.c:4348: undefined reference to `phylink_disconnect_phy'
+   ld: drivers/net/usb/lan78xx.c:4359: undefined reference to `phylink_destroy'
+   ld: drivers/net/usb/lan78xx.o: in function `lan78xx_reset_resume':
+   drivers/net/usb/lan78xx.c:5145: undefined reference to `phylink_start'
+   ld: drivers/net/usb/lan78xx.o: in function `lan78xx_phy_init':
+   drivers/net/usb/lan78xx.c:2650: undefined reference to `phylink_connect_phy'
+   ld: drivers/net/usb/lan78xx.c:2618: undefined reference to `phylink_set_fixed_link'
+   ld: drivers/net/usb/lan78xx.o: in function `lan78xx_phylink_setup':
+   drivers/net/usb/lan78xx.c:2588: undefined reference to `phylink_create'
+   ld: drivers/net/usb/lan78xx.o: in function `lan78xx_probe':
+   drivers/net/usb/lan78xx.c:4581: undefined reference to `phylink_disconnect_phy'
+   ld: drivers/net/usb/lan78xx.c:4583: undefined reference to `phylink_destroy'
+
+
+vim +1874 drivers/net/usb/lan78xx.c
+
+  1860	
+  1861	static int lan78xx_get_link_ksettings(struct net_device *net,
+  1862					      struct ethtool_link_ksettings *cmd)
+  1863	{
+  1864		struct lan78xx_net *dev = netdev_priv(net);
+  1865	
+> 1866		return phylink_ethtool_ksettings_get(dev->phylink, cmd);
+  1867	}
+  1868	
+  1869	static int lan78xx_set_link_ksettings(struct net_device *net,
+  1870					      const struct ethtool_link_ksettings *cmd)
+  1871	{
+  1872		struct lan78xx_net *dev = netdev_priv(net);
+  1873	
+> 1874		return phylink_ethtool_ksettings_set(dev->phylink, cmd);
+  1875	}
+  1876	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
