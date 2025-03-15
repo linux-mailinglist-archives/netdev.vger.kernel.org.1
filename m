@@ -1,93 +1,182 @@
-Return-Path: <netdev+bounces-175015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 252BBA626A5
-	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 06:38:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBDDBA626B3
+	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 06:41:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69BCC17F66F
-	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 05:38:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D9B519C4B16
+	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 05:41:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FAC2190051;
-	Sat, 15 Mar 2025 05:38:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46DC6192B75;
+	Sat, 15 Mar 2025 05:41:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="TmjZvaJx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CF4116EB42
-	for <netdev@vger.kernel.org>; Sat, 15 Mar 2025 05:38:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F252E3387;
+	Sat, 15 Mar 2025 05:41:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742017091; cv=none; b=FQbaNObaaD8UxsckC5DB10mJB1y5Y2mc14l+vCIyL1SvYLiPXuMLcoYUdJQKiqXfWORDxDbDCGwDl+pKDT0XnutMv4Ljg4yJiC5fl/TfSoA4P3/EAmc31Jz/ofykGHfBmkcGTpL4WVbbehmNJ6kjtKuFsfDG3XMe+SLhacdcUQM=
+	t=1742017287; cv=none; b=aHnqH17s8zgR/udoVfcRqxVnae/sD6RmWhzY1gqa0JIb8BTpO2WqQ+E4lYkOZFn7RZx/3mJfQtQ0c7M6JKq4d+p3L45tk/Jl3I0id4plBGGGFSsWHJ73LuS+fcx4k3md3/m7TBXTxkohmPz/Fu7dxpOIMccgTiNmsUkYYrAiQIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742017091; c=relaxed/simple;
-	bh=ZDiXjUknHETMzrlYn1zgWu+v7UPrqES23shmZOMFSYI=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=LYki5Ch+u91AkFdkRt+9EVtfUY3n5/y9UwvQqO0x1qWWdvgstoNO2Lh4GFQRd+alNrXy+78/cKyFXOM3bovS4J49VAkN2OjnCZjrJpH/aIkr6T9xsd6810JjaMjRcK0s9h/SJ8WTCvMfFWPLTr6CPmpSRDfIgPtXYuHwvw3w2wI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3ce81a40f5cso58094905ab.1
-        for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 22:38:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742017088; x=1742621888;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jri1wgrpQV6ijagZsM9y5nNBdN2313llFI5vyTbWILA=;
-        b=xIoCdppFeGE0h/Kgepk4NITfz7LUaOYmPBd9M41v7n2xGeEHQ/nUbavkJunV+VVSj4
-         EhC2JMJT7r5SMI2NdhRNut7ZcsuOpjM5h4XBhvG3/WlECa7WWDpQK1TR4NZTjQId68zE
-         30tZcis0b1BMnzt2+qSpfbJ7vinOyKvvAhv0FLzaGiKxv7lD3crZLiUclfQ3h8bvLE24
-         eNP08OyyJ7awsIdpbJvlY1bNA/Y27MSmnQtDtO8LYQfmEco7h8aUXes3V/KypVWM8aVp
-         2vM47upUu0JzZT+r29yimBnd7Kb6oU8CoUOqrutJmw1zKlrEj9t0oF/Vqguyj9Z9xf62
-         Ft5A==
-X-Forwarded-Encrypted: i=1; AJvYcCUN+dw3PCpyzyFA0Ba1iaN9oqG+UboENllg70sdzse59vftUV0vqKsmXHJOLNvH4NLDSy1m0Oo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpkhTr7EmYH9AS5JotTq0QbqeBwD9k1slwbchPCpSk7fQxDQso
-	zdz2dwsPX7Bvodk7a7x1cJVpwSVKT5jGmnKdD5YXIeqEtRBcj4Hi4OYppxkqBiWQhmcEMOcWuty
-	sONwAp8/xqIgbx20w49q1rG8N7yugFbUbHWtvS5bgOwCwJL4y2CXKdZU=
-X-Google-Smtp-Source: AGHT+IFQ+XxRMp/jrAZMgPnZUJ5trjdXbQ0Y0KQeY63eEi4hA6eS3lbN90dOhbP8hV87Q1ta+3ekOz3dCXUnIFG3nJBSxi1Vh+6V
+	s=arc-20240116; t=1742017287; c=relaxed/simple;
+	bh=rgIC/He6gLrLCsnbiiJ2Y3rn7wOLYhxi1Bnz9gAzNBc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=esMZGNBut09zkhcA1K3HIyka9f8bhgAlNSHzik3/8vFlUs/xfokJvY3Pg7Ya0OsIbBAEMGrGABSRbOwtAbSz5vfM62VunmTS/c3vhMYzjZLf6FpU8wOBvhOPxgTDTVBmTqTkkC/UUST128aiEIInsdnBG9xa3nprenLf2eNwl/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=TmjZvaJx; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=HjjilZAPTlwOchWvZyZ1q1uWUh7zlEVWWuPECm1h8LY=; b=TmjZvaJxud5OczKDCInvffv+OJ
+	SDuAn+eeML7DIHMQ/x5/VWJsvbyfmFmC2lDJttLfA3sYnPkwQSTMaMtxzs5VRA/1zdWjsA7gGxvTe
+	OSNAkB1rb/xocNlS+OsQm/OvmFZd7qwrZBV/sFMkZ8sPiS+vBoeJEVlYIPe80o6MHD18J6WSJIgWI
+	Fx7ZODaRqT1qu8d0+N5ool4Hmr0TevIYYjKP3vQQ6mkkZbykgKrCTGJEhE25A2Ypw7nOTwigcFRSD
+	twLeW1Y2JHG8+yeyWUIb/Y78t27M2cEqR2pSDCiBk84/oHBBwsDKQqk8ABZBCu6aD1LDoFgn94LLx
+	sMcoXoMQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1ttKGU-006mFg-2z;
+	Sat, 15 Mar 2025 13:40:56 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 15 Mar 2025 13:40:54 +0800
+Date: Sat, 15 Mar 2025 13:40:54 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Zhihao Cheng <chengzhihao1@huawei.com>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Richard Weinberger <richard@nod.at>, linux-mtd@lists.infradead.org,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Pavel Machek <pavel@ucw.cz>, linux-pm@vger.kernel.org,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org
+Subject: Re: [v4 PATCH 10/13] ubifs: Use crypto_acomp interface
+Message-ID: <Z9US5rHr1Y7sCpns@gondor.apana.org.au>
+References: <cover.1741954523.git.herbert@gondor.apana.org.au>
+ <349a78bc53d3620a29cc6105b55985db51aa0a11.1741954523.git.herbert@gondor.apana.org.au>
+ <023a23b0-d9fd-6d4d-d5a2-207e47419645@huawei.com>
+ <Z9T79PKW0TFO-2xl@gondor.apana.org.au>
+ <f4a51d32-0b04-2c27-924d-f3a54d6b63a5@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3312:b0:3d4:3aba:e5ce with SMTP id
- e9e14a558f8ab-3d483a906ffmr53679835ab.20.1742017088726; Fri, 14 Mar 2025
- 22:38:08 -0700 (PDT)
-Date: Fri, 14 Mar 2025 22:38:08 -0700
-In-Reply-To: <20250315051051.1532-1-enjuk@amazon.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67d51240.050a0220.14e108.0050.GAE@google.com>
-Subject: Re: [syzbot] [bpf?] KASAN: slab-out-of-bounds Read in atomic_ptr_type_ok
-From: syzbot <syzbot+a5964227adc0f904549c@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, eddyz87@gmail.com, enjuk@amazon.com, haoluo@google.com, 
-	iii@linux.ibm.com, john.fastabend@gmail.com, jolsa@kernel.org, 
-	kpsingh@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
-	netdev@vger.kernel.org, sdf@fomichev.me, song@kernel.org, 
-	syzkaller-bugs@googlegroups.com, yepeilin@google.com, yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f4a51d32-0b04-2c27-924d-f3a54d6b63a5@huawei.com>
 
-Hello,
+On Sat, Mar 15, 2025 at 01:08:21PM +0800, Zhihao Cheng wrote:
+> 
+> The crypto_acomp_alg_name() gets name from compr->cc(the name is initialized
+> by compr->capi_name).
+> I got the following messages after verifying:
+> [  154.907048] UBIFS warning (ubi0:0 pid 110): ubifs_compress_req.isra.0
+> [ubifs]: cannot compress 4096 bytes, compressor deflate, error -12, leave
+> data uncompressed
+> 
+> The 'deflate' is zlib compressor's capi_name, but we expect it be 'zlib'
+> here.
 
-syzbot tried to test the proposed patch but the build/boot failed:
+Sorry I overlooked this difference.  I will fold the following
+patch into the series when I repost.
 
-failed to apply patch:
-checking file kernel/bpf/verifier.c
-patch: **** unexpected end of file in patch
+Thanks,
 
-
-
-Tested on:
-
-commit:         2d7597d6 selftests/bpf: Fix sockopt selftest failure o..
-git tree:       bpf-next
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b7bde34acd8f53b1
-dashboard link: https://syzkaller.appspot.com/bug?extid=a5964227adc0f904549c
-compiler:       
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=13ff2e54580000
-
+diff --git a/fs/ubifs/compress.c b/fs/ubifs/compress.c
+index 9973a2853de7..8d481c8338c3 100644
+--- a/fs/ubifs/compress.c
++++ b/fs/ubifs/compress.c
+@@ -70,7 +70,8 @@ struct ubifs_compressor *ubifs_compressors[UBIFS_COMPR_TYPES_CNT];
+ 
+ static int ubifs_compress_req(const struct ubifs_info *c,
+ 			      struct acomp_req *req,
+-			      void *out_buf, int *out_len)
++			      void *out_buf, int *out_len,
++			      const char *compr_name)
+ {
+ 	struct crypto_wait wait;
+ 	int in_len = req->slen;
+@@ -86,9 +87,7 @@ static int ubifs_compress_req(const struct ubifs_info *c,
+ 
+ 	if (unlikely(err)) {
+ 		ubifs_warn(c, "cannot compress %d bytes, compressor %s, error %d, leave data uncompressed",
+-			   in_len,
+-			   crypto_acomp_alg_name(crypto_acomp_reqtfm(req)),
+-			   err);
++			   in_len, compr_name, err);
+ 	} else if (in_len - *out_len < UBIFS_MIN_COMPRESS_DIFF) {
+ 		/*
+ 		 * If the data compressed only slightly, it is better
+@@ -138,7 +137,7 @@ void ubifs_compress(const struct ubifs_info *c, const void *in_buf,
+ 		ACOMP_REQUEST_ALLOC(req, compr->cc, GFP_NOFS | __GFP_NOWARN);
+ 
+ 		acomp_request_set_src_dma(req, in_buf, in_len);
+-		err = ubifs_compress_req(c, req, out_buf, out_len);
++		err = ubifs_compress_req(c, req, out_buf, out_len, compr->name);
+ 	}
+ 
+ 	if (err)
+@@ -190,7 +189,7 @@ void ubifs_compress_folio(const struct ubifs_info *c, struct folio *in_folio,
+ 		ACOMP_REQUEST_ALLOC(req, compr->cc, GFP_NOFS | __GFP_NOWARN);
+ 
+ 		acomp_request_set_src_folio(req, in_folio, in_offset, in_len);
+-		err = ubifs_compress_req(c, req, out_buf, out_len);
++		err = ubifs_compress_req(c, req, out_buf, out_len, compr->name);
+ 	}
+ 
+ 	if (err)
+@@ -206,7 +205,8 @@ void ubifs_compress_folio(const struct ubifs_info *c, struct folio *in_folio,
+ 
+ static int ubifs_decompress_req(const struct ubifs_info *c,
+ 				struct acomp_req *req,
+-				const void *in_buf, int in_len, int *out_len)
++				const void *in_buf, int in_len, int *out_len,
++				const char *compr_name)
+ {
+ 	struct crypto_wait wait;
+ 	int err;
+@@ -221,9 +221,7 @@ static int ubifs_decompress_req(const struct ubifs_info *c,
+ 
+ 	if (err)
+ 		ubifs_err(c, "cannot decompress %d bytes, compressor %s, error %d",
+-			  in_len,
+-			  crypto_acomp_alg_name(crypto_acomp_reqtfm(req)),
+-			  err);
++			  in_len, compr_name, err);
+ 
+ 	acomp_request_free(req);
+ 
+@@ -270,7 +268,8 @@ int ubifs_decompress(const struct ubifs_info *c, const void *in_buf,
+ 		ACOMP_REQUEST_ALLOC(req, compr->cc, GFP_NOFS | __GFP_NOWARN);
+ 
+ 		acomp_request_set_dst_dma(req, out_buf, *out_len);
+-		return ubifs_decompress_req(c, req, in_buf, in_len, out_len);
++		return ubifs_decompress_req(c, req, in_buf, in_len, out_len,
++					    compr->name);
+ 	}
+ }
+ 
+@@ -318,7 +317,8 @@ int ubifs_decompress_folio(const struct ubifs_info *c, const void *in_buf,
+ 
+ 		acomp_request_set_dst_folio(req, out_folio, out_offset,
+ 					    *out_len);
+-		return ubifs_decompress_req(c, req, in_buf, in_len, out_len);
++		return ubifs_decompress_req(c, req, in_buf, in_len, out_len,
++					    compr->name);
+ 	}
+ }
+ 
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
