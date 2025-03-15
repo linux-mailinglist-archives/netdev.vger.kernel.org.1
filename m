@@ -1,145 +1,89 @@
-Return-Path: <netdev+bounces-175019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CC4DA626D8
-	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 07:00:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0412A626F2
+	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 07:08:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40EFB17F37F
-	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 06:00:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C9073B4450
+	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 06:08:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD3F3195980;
-	Sat, 15 Mar 2025 06:00:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1D031F5FD;
+	Sat, 15 Mar 2025 06:08:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="veJqE6dH"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="WSxOlceU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37197193402;
-	Sat, 15 Mar 2025 06:00:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3E0818DB17
+	for <netdev@vger.kernel.org>; Sat, 15 Mar 2025 06:08:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742018403; cv=none; b=CRdEu/Ps2eM2/FyDtDo1RN8Ub4KWWlk3zXkaLEjqy+KNjWhM8JQFPctNZnEdM29iaHbiGzj+I1zHKnk8pwuuKlnxcTeqUeqdyoUvqsE2bUZJ/L+1URVEKQacuh4GGm/fsBbrUzo424XQrV5AdXi40rC8NYFf6ZPdkkNSm9mNdTY=
+	t=1742018906; cv=none; b=NgyYiFB74ngnzZZEUAQXF+x4iNMI5LJoHe+Y8ZlTWmAKdWo4nOmjq82FeJg0Qqe+m7H3qvoyJ0zqVI4qLogyTX9OYBNGm48O55drmzmrRaMoVmuGLPVgV0G1Rbkh1d94d29hKTVU6wf5Fa6+QUDJvwTCgQblQWh52bAd+f+n8qI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742018403; c=relaxed/simple;
-	bh=ryJGWDuUDRwXa8qdcev1UD3SLAbz7to/QUTh+YXVg98=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=V89s1nqCeIeeJv86IZ0j2VWkJonJ9cNReFfxK4p2GHdh7PteN02akZ950eTbfe1ybXioEg4h1Sl4+mVP5QCZiiUzz6MB8v3Dd2qc2w8F1AU+QOQ4vCqBxW55v1gL+uhNzj28XDcauURwlGLChEdFsyMr4amwFLNZeS7VQBFAEQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=veJqE6dH; arc=none smtp.client-ip=99.78.197.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1742018402; x=1773554402;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=vv/VRE0LYhUW8Flr0gIv0j5jFwRlGze9RKBLm6vaAlo=;
-  b=veJqE6dHKdHyZ3K31qBF69Zc2u6jF5Nuvv8e/eWj7gnHhCPG8TLCpvNU
-   b9n6uGA3e6N7tUPzuXKGRnbXlgCu5IwcJ8zz2ACVBhw7X7EsBC3HE+o/v
-   RZf02KnuJofVjpUeru8SUwiik8X404FypWkt0tou6HAi3uARY8qZmRwbs
-   A=;
-X-IronPort-AV: E=Sophos;i="6.14,249,1736812800"; 
-   d="scan'208";a="32116866"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2025 06:00:00 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:24538]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.18.34:2525] with esmtp (Farcaster)
- id 399d2c3d-ff63-4df3-9920-f5b60fd27ed1; Sat, 15 Mar 2025 06:00:00 +0000 (UTC)
-X-Farcaster-Flow-ID: 399d2c3d-ff63-4df3-9920-f5b60fd27ed1
-Received: from EX19D003ANC003.ant.amazon.com (10.37.240.197) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Sat, 15 Mar 2025 05:59:56 +0000
-Received: from b0be8375a521.amazon.com (10.118.246.93) by
- EX19D003ANC003.ant.amazon.com (10.37.240.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Sat, 15 Mar 2025 05:59:50 +0000
-From: Kohei Enju <enjuk@amazon.com>
-To: <syzbot+a5964227adc0f904549c@syzkaller.appspotmail.com>
-CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
-	<daniel@iogearbox.net>, <eddyz87@gmail.com>, <enjuk@amazon.com>,
-	<haoluo@google.com>, <iii@linux.ibm.com>, <john.fastabend@gmail.com>,
-	<jolsa@kernel.org>, <kpsingh@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<martin.lau@linux.dev>, <netdev@vger.kernel.org>, <sdf@fomichev.me>,
-	<song@kernel.org>, <syzkaller-bugs@googlegroups.com>, <yepeilin@google.com>,
-	<yonghong.song@linux.dev>
-Subject: [syzbot] [bpf?] KASAN: slab-out-of-bounds Read in atomic_ptr_type_ok
-Date: Sat, 15 Mar 2025 14:59:33 +0900
-Message-ID: <20250315055941.10487-2-enjuk@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <67d51240.050a0220.14e108.0050.GAE@google.com>
-References: <67d51240.050a0220.14e108.0050.GAE@google.com>
+	s=arc-20240116; t=1742018906; c=relaxed/simple;
+	bh=ulcrNgHy2DjG+5ry1Tea7lAyUSp1+TIl1YdAdS7obyg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JeYI13Nxit2TJdhhs31U8ML42nr9Of8rh54jZaNCkUXC7w7g/v87wjdWDK66/7IGVdAsJ9T5As0heuOqiOIky8fv2Jk/TNV4tBoNgKt2G0ER5BpuuZEj4VWRpjFV3f05CqhQd8Q/Gz6GYOoKUVzsl4wjr7eAka8NB/xUd9Wwr7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=WSxOlceU; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=8HSBN3724vROGML2qPNZlyePBo0bbjk6tPUG8IDVj28=; b=WSxOlceUbWSxDLIlAPOy3w9n37
+	uizIpASkfzGq1znClMX7eBZ2D1ncmtxrfb4onabALPaM/64v9HRnY75ygLpJgFtUJAAG5FwSOv4Px
+	DUFtzW2n0gUOuzZFAPOX/PP1p0BL7Blh1JW71WO/ggv9ThQV1iMbaWYUppfHii0wIl/7imD3L7Zo1
+	W4eEuVncLdRigUUcrVr0/yySweBloikJJz3Cy6mgTabUnBeMv+NHoKo3E/JzcBU2ggL9zre/VF40u
+	ZUaZZUq0F3S9hFiw/Yt9LRh5u79Q7+Fvc+a8JAfJjtpO61P2+idY0e22CQqdnV2ZSgFn+y7N/gNO4
+	k1KJZltQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1ttKh1-006mR3-1T;
+	Sat, 15 Mar 2025 14:08:20 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 15 Mar 2025 14:08:19 +0800
+Date: Sat, 15 Mar 2025 14:08:19 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH] xfrm: ipcomp: Call pskb_may_pull in ipcomp_input
+Message-ID: <Z9UZU6EGEF81OAYj@gondor.apana.org.au>
+References: <Z9KTIYVFwEIYXgd7@gondor.apana.org.au>
+ <Z9T3V/M0hXIiHsLB@gauss3.secunet.de>
+ <Z9UUxb2dclH9hrWo@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D043UWA004.ant.amazon.com (10.13.139.41) To
- EX19D003ANC003.ant.amazon.com (10.37.240.197)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z9UUxb2dclH9hrWo@gondor.apana.org.au>
 
-> syzbot tried to test the proposed patch but the build/boot failed:
+On Sat, Mar 15, 2025 at 01:48:53PM +0800, Herbert Xu wrote:
+>
+> Sure I can add it.  Do you mind if I push this through the crypto
+> tree so I can base the acomp work on top of it?
 > 
-> failed to apply patch:
-> checking file kernel/bpf/verifier.c
-> patch: **** unexpected end of file in patch
+> I'll push this fix to Linus right away if you're OK with it.
 
-Oh, something wrong with format, such as trailing space...?
+Actually there is no need to push this right away because
+xfrm_parse_spi has already done a check on the header length
+so this should have no effect.
 
-#syz test
+But if you're OK with this change and the xfrm_ipcomp/acomp change
+I'd still like to push it through cryptodev.
 
-diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-index 3303a3605ee8..0120cc325078 100644
---- a/kernel/bpf/verifier.c
-+++ b/kernel/bpf/verifier.c
-@@ -7788,6 +7788,12 @@ static int check_atomic_rmw(struct bpf_verifier_env *env,
- static int check_atomic_load(struct bpf_verifier_env *env,
- 			     struct bpf_insn *insn)
- {
-+	int err;
-+
-+	err = check_load_mem(env, insn, true, false, false, "atomic_load");
-+	if (err)
-+		return err;
-+
- 	if (!atomic_ptr_type_ok(env, insn->src_reg, insn)) {
- 		verbose(env, "BPF_ATOMIC loads from R%d %s is not allowed\n",
- 			insn->src_reg,
-@@ -7795,12 +7801,18 @@ static int check_atomic_load(struct bpf_verifier_env *env,
- 		return -EACCES;
- 	}
- 
--	return check_load_mem(env, insn, true, false, false, "atomic_load");
-+	return 0;
- }
- 
- static int check_atomic_store(struct bpf_verifier_env *env,
- 			      struct bpf_insn *insn)
- {
-+	int err;
-+
-+	err = check_store_reg(env, insn, true);
-+	if (err)
-+		return err;
-+
- 	if (!atomic_ptr_type_ok(env, insn->dst_reg, insn)) {
- 		verbose(env, "BPF_ATOMIC stores into R%d %s is not allowed\n",
- 			insn->dst_reg,
-@@ -7808,7 +7820,7 @@ static int check_atomic_store(struct bpf_verifier_env *env,
- 		return -EACCES;
- 	}
- 
--	return check_store_reg(env, insn, true);
-+	return 0;
- }
- 
- static int check_atomic(struct bpf_verifier_env *env, struct bpf_insn *insn)
+Thanks,
 -- 
-2.48.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
