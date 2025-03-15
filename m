@@ -1,100 +1,143 @@
-Return-Path: <netdev+bounces-175012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0807A62651
-	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 06:08:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B855A6265E
+	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 06:11:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DD913B764D
-	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 05:08:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 385DB19C3E53
+	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 05:11:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7064B18CC1C;
-	Sat, 15 Mar 2025 05:08:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C1D918DF81;
+	Sat, 15 Mar 2025 05:11:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="aswVEg7H"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7084C5228;
-	Sat, 15 Mar 2025 05:08:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6FF42E3387;
+	Sat, 15 Mar 2025 05:11:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742015310; cv=none; b=BXidaY8sQ5kakzbvpiMog0whYhLJcsHuQQzxjnlhYP/6+ZAV7bVoC8liz+6HMqCBiJB0kVenQzE7R+5Zqho9/28F04L1ZUx9Bd28eAWXtu2Y+E7EdSGWAKBuSlp45M186ZLyrf2b1juW3o1t9gIJVugeACykyoN80zh6TBH69LY=
+	t=1742015476; cv=none; b=FOHP4H+HV70au7osKRroj/55FoeF5A00SwIHLN75a3dH6lmhrHXKXh0ZzyVxL7Exk71y5rZSv9AQchCSy+/DY+RpUI4DeyEnh5Svx004Y3zAgQhicSYXcoSTNa2e+UstkMuyJiC1bh3hiArkZmUYD7Da1p4OKNV/xXrfG3uHFY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742015310; c=relaxed/simple;
-	bh=EG4cjoHOnE2X2PAW04QcW/jn7WS2xMGsBvp8UpA1+pQ=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=cvE6c5Wno2hhgJglCdO3o1u2fdWojode78NVjzWTiI1SLSeXzp2rHl/CXHNByVSlskt9tJmiQjPvA0BVP4GlUO5YEsZtNcNUkdiesQWxIAjPQ3KLqHYBm+ly3et/fWylFTsdmXSoH6muQfY1Pv8YcMbl1jEiaKI+PDYojl5X4/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4ZF8K91pNRz1f0sc;
-	Sat, 15 Mar 2025 13:03:57 +0800 (CST)
-Received: from kwepemk500005.china.huawei.com (unknown [7.202.194.90])
-	by mail.maildlp.com (Postfix) with ESMTPS id E65A61402E1;
-	Sat, 15 Mar 2025 13:08:22 +0800 (CST)
-Received: from [10.174.178.46] (10.174.178.46) by
- kwepemk500005.china.huawei.com (7.202.194.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 15 Mar 2025 13:08:22 +0800
-Subject: Re: [v4 PATCH 10/13] ubifs: Use crypto_acomp interface
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Richard
- Weinberger <richard@nod.at>, <linux-mtd@lists.infradead.org>, "Rafael J.
- Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@ucw.cz>,
-	<linux-pm@vger.kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>,
-	<netdev@vger.kernel.org>
-References: <cover.1741954523.git.herbert@gondor.apana.org.au>
- <349a78bc53d3620a29cc6105b55985db51aa0a11.1741954523.git.herbert@gondor.apana.org.au>
- <023a23b0-d9fd-6d4d-d5a2-207e47419645@huawei.com>
- <Z9T79PKW0TFO-2xl@gondor.apana.org.au>
-From: Zhihao Cheng <chengzhihao1@huawei.com>
-Message-ID: <f4a51d32-0b04-2c27-924d-f3a54d6b63a5@huawei.com>
-Date: Sat, 15 Mar 2025 13:08:21 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+	s=arc-20240116; t=1742015476; c=relaxed/simple;
+	bh=NqKwFgpKi816zRiQPxPI7LUxFYDCz/3da+AyDCXBcLs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WJ07qkNpYdfDIsR+YkLuXOwxqQ20i4zaBU5TiVNpEs0rLMo66JLJnbp4SV0lHQHsaa4f4YmbHXa+o6NmqBGSusWWp8QwhXCSY2IILE97AH+HE8DtU9dklmnTVGY7giQnCwgY2zEhU7iPe881I3lctBev8IcWv/mnTwf5np35u8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=aswVEg7H; arc=none smtp.client-ip=207.171.184.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1742015475; x=1773551475;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=JfjgqpY7tQ6WrFEhDQ4MyqDUhRzWEFQO9NC3rzmEyLY=;
+  b=aswVEg7HQ6MgV1K6R2SiC2MAUo2xnIJVchH5SPWTk26jK3kxXQIMDldY
+   GDsupGLtS6Gf3m5hTY9vAIm7JJnH8zXk+xTOLX7tBhUuG7aVSuchUgCkA
+   Oveq/n2PbH/XYaeSCWW2ed80VSl2fAPBukGFZYlNnT7rD9cKoFyXEZiDe
+   A=;
+X-IronPort-AV: E=Sophos;i="6.14,249,1736812800"; 
+   d="scan'208";a="503000956"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2025 05:11:09 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:52533]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.52.235:2525] with esmtp (Farcaster)
+ id 4fc01230-8a0c-43d5-8f2c-450cbf6d679e; Sat, 15 Mar 2025 05:11:08 +0000 (UTC)
+X-Farcaster-Flow-ID: 4fc01230-8a0c-43d5-8f2c-450cbf6d679e
+Received: from EX19D003ANC003.ant.amazon.com (10.37.240.197) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Sat, 15 Mar 2025 05:11:06 +0000
+Received: from b0be8375a521.amazon.com (10.118.246.93) by
+ EX19D003ANC003.ant.amazon.com (10.37.240.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Sat, 15 Mar 2025 05:11:00 +0000
+From: Kohei Enju <enjuk@amazon.com>
+To: <syzbot+a5964227adc0f904549c@syzkaller.appspotmail.com>
+CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
+	<daniel@iogearbox.net>, <eddyz87@gmail.com>, <enjuk@amazon.com>,
+	<haoluo@google.com>, <iii@linux.ibm.com>, <john.fastabend@gmail.com>,
+	<jolsa@kernel.org>, <kpsingh@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<martin.lau@linux.dev>, <netdev@vger.kernel.org>, <sdf@fomichev.me>,
+	<song@kernel.org>, <syzkaller-bugs@googlegroups.com>, <yepeilin@google.com>,
+	<yonghong.song@linux.dev>
+Subject: Re: [syzbot] [bpf?] KASAN: slab-out-of-bounds Read in atomic_ptr_type_ok
+Date: Sat, 15 Mar 2025 14:10:21 +0900
+Message-ID: <20250315051051.1532-1-enjuk@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <67d479a8.050a0220.1939a6.004e.GAE@google.com>
+References: <67d479a8.050a0220.1939a6.004e.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <Z9T79PKW0TFO-2xl@gondor.apana.org.au>
-Content-Type: text/plain; charset="gbk"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemk500005.china.huawei.com (7.202.194.90)
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D032UWB003.ant.amazon.com (10.13.139.165) To
+ EX19D003ANC003.ant.amazon.com (10.37.240.197)
 
-ÔÚ 2025/3/15 12:03, Herbert Xu Ð´µÀ:
-> On Sat, Mar 15, 2025 at 11:54:43AM +0800, Zhihao Cheng wrote:
->>
->> We get capi_name by 'crypto_acomp_alg_name(crypto_acomp_reqtfm(req))', not
->> compr->name.
+> syzbot found the following issue on:
 > 
-> It should return the same string.
+> HEAD commit:    f28214603dc6 Merge branch 'selftests-bpf-move-test_lwt_seg..
+> git tree:       bpf-next
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=15f84664580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=b7bde34acd8f53b1
+> dashboard link: https://syzkaller.appspot.com/bug?extid=a5964227adc0f904549c
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16450ba8580000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11f5fa54580000
 
-The crypto_acomp_alg_name() gets name from compr->cc(the name is 
-initialized by compr->capi_name).
-I got the following messages after verifying:
-[  154.907048] UBIFS warning (ubi0:0 pid 110): ubifs_compress_req.isra.0 
-[ubifs]: cannot compress 4096 bytes, compressor deflate, error -12, 
-leave data uncompressed
+#syz test
 
-The 'deflate' is zlib compressor's capi_name, but we expect it be 'zlib' 
-here.
-> 
->> There are conflicts in patch 2 on the latest mainline version, can you
->> rebase this series so I can do some tests for UBIFS.
-> 
-> Thanks for testing! I've just pushed it to
-> 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git acomp
-> 
-> So you should be able to pull that to test.
-> 
-> Cheers,
-> 
+--- a/kernel/bpf/verifier.c
++++ b/kernel/bpf/verifier.c
+@@ -7788,6 +7788,12 @@ static int check_atomic_rmw(struct bpf_verifier_env *env,
+ static int check_atomic_load(struct bpf_verifier_env *env,
+                             struct bpf_insn *insn)
+ {
++       int err;
++
++       err = check_load_mem(env, insn, true, false, false, "atomic_load");
++       if (err)
++               return err;
++
+        if (!atomic_ptr_type_ok(env, insn->src_reg, insn)) {
+                verbose(env, "BPF_ATOMIC loads from R%d %s is not allowed\n",
+                        insn->src_reg,
+@@ -7795,12 +7801,18 @@ static int check_atomic_load(struct bpf_verifier_env *env,
+                return -EACCES;
+        }
 
+-       return check_load_mem(env, insn, true, false, false, "atomic_load");
++       return 0;
+ }
+
+ static int check_atomic_store(struct bpf_verifier_env *env,
+                              struct bpf_insn *insn)
+ {
++       int err;
++
++       err = check_store_reg(env, insn, true);
++       if (err)
++               return err;
++
+        if (!atomic_ptr_type_ok(env, insn->dst_reg, insn)) {
+                verbose(env, "BPF_ATOMIC stores into R%d %s is not allowed\n",
+                        insn->dst_reg,
+@@ -7808,7 +7820,7 @@ static int check_atomic_store(struct bpf_verifier_env *env,
+                return -EACCES;
+        }
+
+-       return check_store_reg(env, insn, true);
++       return 0;
+ }
+
+ static int check_atomic(struct bpf_verifier_env *env, struct bpf_insn *insn)
 
