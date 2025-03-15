@@ -1,111 +1,123 @@
-Return-Path: <netdev+bounces-175072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E492A6304C
-	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 17:52:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 62556A63086
+	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 18:12:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14BFB189B213
-	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 16:52:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 601AB1896289
+	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 17:12:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F1DE2036E3;
-	Sat, 15 Mar 2025 16:52:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3870202F88;
+	Sat, 15 Mar 2025 17:12:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KQOVZk/f"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.237.72.81])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9FB12F3B;
-	Sat, 15 Mar 2025 16:51:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.237.72.81
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E984BA3F;
+	Sat, 15 Mar 2025 17:12:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742057522; cv=none; b=MIQvislGf+jflZjEnJZ6kVsubvNCkAAsc2ZVrsh0SElLMSHkYEdMjY1jU849+PR5VC2LrDoLj/mcFNxUcWiVntWPX79tlHwa1UOd7rCuesaYj7MuI9BsoX5qMnKPQIlq/qKkF8p/vLpzK+dnIASffCMsBO4fB9m2KSJCwX6+CuA=
+	t=1742058738; cv=none; b=IKbl2OhxB8ZeKnG8RlngcWfa7a5TcXvJZ+6pfcwJSDh5SnrJ+CI3+cZLfrKMTOScLoYfs3XDrhQlYXoGCxVWFEiC3XECfRq8+s6fzUeKXwOsSQ5YTTRFxdRJHKmArfDJO6PDC7xTg+QGOqSSjcIl/3GAjYEGvHGw/lX0vXVOvJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742057522; c=relaxed/simple;
-	bh=8T+np47owgnigutCHYOzKjuo3Ga5K1nLZb10k6JA44w=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=H2EU5SFlgdRB8m/eJ9XIZZ7NOJoAzTxgofCR70vZ3/kid76AT5K8eWWvVr/zTkeT4Pk5GWlWIitdztrfmPnZzIQGIJLapPDDhHAxU1zhBFVGq9sAV9JUiXIL2taid1o5eAKF6+qDPh301QWHTaMg9Jb/Q6Gv7eOnka1xFlC4vAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=52.237.72.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from zju.edu.cn (unknown [10.193.170.58])
-	by mtasvr (Coremail) with SMTP id _____wB3YQ8GsNVnxHspAA--.260S3;
-	Sun, 16 Mar 2025 00:51:19 +0800 (CST)
-Received: from localhost (unknown [10.193.170.58])
-	by mail-app3 (Coremail) with SMTP id zS_KCgDHA3cGsNVnwdcnAA--.23963S2;
-	Sun, 16 Mar 2025 00:51:18 +0800 (CST)
-From: Lin Ma <linma@zju.edu.cn>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	kuniyu@amazon.com,
-	gnaaman@drivenets.com,
-	joel.granados@kernel.org,
-	lizetao1@huawei.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Lin Ma <linma@zju.edu.cn>
-Subject: [PATCH net v2] net/neighbor: add missing policy for NDTPA_QUEUE_LENBYTES
-Date: Sun, 16 Mar 2025 00:51:13 +0800
-Message-Id: <20250315165113.37600-1-linma@zju.edu.cn>
-X-Mailer: git-send-email 2.39.0
+	s=arc-20240116; t=1742058738; c=relaxed/simple;
+	bh=TAGSXpXNt+/x3uk6tc75dLbGfKv+LBmzv0BZheJ4OhM=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=Y8FS5lwY/xPhIETTJWtM4h5t/TwezZzHKUUBUMAuDL++3MeErropXuWJbk/FfYxkvMLVOyeMh0qdBLthCp86atN/SlQC+CgFxwYraArkHGAjRPxUoAFTC99IlHf9ZGNFRg0WcLerV7xNnNgvNgzPc7082ie2Oubqrw3V8W1wvyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KQOVZk/f; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AD39C4CEE5;
+	Sat, 15 Mar 2025 17:12:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742058734;
+	bh=TAGSXpXNt+/x3uk6tc75dLbGfKv+LBmzv0BZheJ4OhM=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=KQOVZk/fN4mnPBUj7zObUCAOTzYH07FpvRS3NiGw9KhKmckav2nGnZhFSviF70S38
+	 ABS77iPHzZUpfeBHw/nlquL0mh46+LeVPnHYUm3hOctvdBFGn0DB/K10VXtTH8OlkF
+	 OQKk+fXxSLi4mfOyyc0ADd7BelPfMpHgGdEutvvPvnqn4UwZ0R0EZYKHVF3z9DgF8E
+	 w22GOdJjzJf63TyoynEIyfUbLz0HMcmZzgTKBK2HSLVnNJwty6ZqSAYwvdNLfbsNAw
+	 uw43pONGXMZjQTUcRH+keLJ2OUcx7GkCW1R3BiZFRdKslGCo55wZmIfzY2PLlgEZUz
+	 viaus37Bpynvw==
+Date: Sat, 15 Mar 2025 12:12:13 -0500
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zS_KCgDHA3cGsNVnwdcnAA--.23963S2
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
-X-CM-DELIVERINFO: =?B?ccMXkQXKKxbFmtjJiESix3B1w3tPqcowV1L23Bze5QtIr9Db75bEBiiEybVhThS0pI
-	APHkyPSxI2Xdeyd3ul0ToYuubMXDNQRyrdFbJY3tTDqaw5woA2x6JcZHja/9e2zpiPcgL1
-	dESBEk/L4HN0QWYZ4ES7IioAAjnOAt8rYZw12Biq
-X-Coremail-Antispam: 1Uk129KBj9xXoWrZFyftr17GF1xWFy5CF4rWFX_yoWkuwbEgw
-	13ZFnak3W5GF1I93WrZwsayFn5Xw1UKas5JFyIgF9rAa4Dtwnavr18XrZrJFZrCr4UWFn8
-	Ar1xGF1UCFs8tosvyTuYvTs0mTUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUj1kv1TuYvT
-	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
-	cSsGvfJTRUUUbTAYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20EY4v20x
-	vaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	WxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVWUJVW8JwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I
-	8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AK
-	xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7xvr2IYc2Ij64
-	vIr40E4x8a64kEw24lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I
-	3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxV
-	WUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAF
-	wI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcI
-	k0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j
-	6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU7xwIDUUUU
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Matthias Brugger <matthias.bgg@gmail.com>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, 
+ Russell King <linux@armlinux.org.uk>, Vladimir Oltean <olteanv@gmail.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org, 
+ Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
+ upstream@airoha.com, Conor Dooley <conor+dt@kernel.org>, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+ linux-mediatek@lists.infradead.org, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ Eric Dumazet <edumazet@google.com>, Lee Jones <lee@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Srinivas Kandagatla <srinivas.kandagatla@linaro.org>, 
+ Jakub Kicinski <kuba@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>
+To: Christian Marangi <ansuelsmth@gmail.com>
+In-Reply-To: <20250315154407.26304-6-ansuelsmth@gmail.com>
+References: <20250315154407.26304-1-ansuelsmth@gmail.com>
+ <20250315154407.26304-6-ansuelsmth@gmail.com>
+Message-Id: <174205873356.67148.10337205475865865960.robh@kernel.org>
+Subject: Re: [net-next PATCH v13 05/14] dt-bindings: mfd: Document support
+ for Airoha AN8855 Switch SoC
 
-Previous commit 8b5c171bb3dc ("neigh: new unresolved queue limits")
-introduces new netlink attribute NDTPA_QUEUE_LENBYTES to represent
-approximative value for deprecated QUEUE_LEN. However, it forgot to add
-the associated nla_policy in nl_ntbl_parm_policy array. Fix it with one
-simple NLA_U32 type policy.
 
-Fixes: 8b5c171bb3dc ("neigh: new unresolved queue limits")
-Signed-off-by: Lin Ma <linma@zju.edu.cn>
----
-v1 -> v2: add one extra tab as suggested by Kuniyuki <kuniyu@amazon.com>
+On Sat, 15 Mar 2025 16:43:45 +0100, Christian Marangi wrote:
+> Document support for Airoha AN8855 Switch SoC. This SoC expose various
+> peripherals like an Ethernet Switch, a NVMEM provider and Ethernet PHYs.
+> 
+> It does also support i2c and timers but those are not currently
+> supported/used.
+> 
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
+>  .../bindings/mfd/airoha,an8855.yaml           | 182 ++++++++++++++++++
+>  MAINTAINERS                                   |   1 +
+>  2 files changed, 183 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/mfd/airoha,an8855.yaml
+> 
 
- net/core/neighbour.c | 1 +
- 1 file changed, 1 insertion(+)
+My bot found errors running 'make dt_binding_check' on your patch:
 
-diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index bd0251bd74a1..b4f89fbb59df 100644
---- a/net/core/neighbour.c
-+++ b/net/core/neighbour.c
-@@ -2250,6 +2250,7 @@ static const struct nla_policy nl_neightbl_policy[NDTA_MAX+1] = {
- static const struct nla_policy nl_ntbl_parm_policy[NDTPA_MAX+1] = {
- 	[NDTPA_IFINDEX]			= { .type = NLA_U32 },
- 	[NDTPA_QUEUE_LEN]		= { .type = NLA_U32 },
-+	[NDTPA_QUEUE_LENBYTES]		= { .type = NLA_U32 },
- 	[NDTPA_PROXY_QLEN]		= { .type = NLA_U32 },
- 	[NDTPA_APP_PROBES]		= { .type = NLA_U32 },
- 	[NDTPA_UCAST_PROBES]		= { .type = NLA_U32 },
--- 
-2.39.0
+yamllint warnings/errors:
+
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/mfd/airoha,an8855.example.dtb: phy@1: $nodename:0: 'phy@1' does not match '^ethernet-phy(@[a-f0-9]+)?$'
+	from schema $id: http://devicetree.org/schemas/net/airoha,an8855-phy.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/mfd/airoha,an8855.example.dtb: phy@1: Unevaluated properties are not allowed ('compatible' was unexpected)
+	from schema $id: http://devicetree.org/schemas/net/airoha,an8855-phy.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/mfd/airoha,an8855.example.dtb: phy@2: $nodename:0: 'phy@2' does not match '^ethernet-phy(@[a-f0-9]+)?$'
+	from schema $id: http://devicetree.org/schemas/net/airoha,an8855-phy.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/mfd/airoha,an8855.example.dtb: phy@2: Unevaluated properties are not allowed ('compatible' was unexpected)
+	from schema $id: http://devicetree.org/schemas/net/airoha,an8855-phy.yaml#
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250315154407.26304-6-ansuelsmth@gmail.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
 
 
