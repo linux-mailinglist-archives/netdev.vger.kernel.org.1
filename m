@@ -1,212 +1,159 @@
-Return-Path: <netdev+bounces-175021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 267D2A62702
-	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 07:13:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 808C7A6273E
+	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 07:25:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CBC517DD3C
-	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 06:13:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E7E919C3743
+	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 06:25:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E7AE1917E7;
-	Sat, 15 Mar 2025 06:12:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C520319F121;
+	Sat, 15 Mar 2025 06:25:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="leO4yQm3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [63.216.63.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3296C1917CD;
-	Sat, 15 Mar 2025 06:12:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.216.63.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486DE19E994;
+	Sat, 15 Mar 2025 06:25:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742019177; cv=none; b=IZIkCCt2k3Hi8m7tix0CZcM3xQZ1h+XXU17gPi7QIMTpBH0SmbUDZkPw7FBBwSRlBXtWsS5xEM7/mUUzi/SKTTJW7VDhlgvo97AHFGk+PTfXnSCfzKgI2X/PXmOV/UMapW1O1KRTF8fNsu9uBbyrvwRs8AcdAJWKxBZjR1uDpd4=
+	t=1742019924; cv=none; b=Of8ca/Rii+FoeS90qtsy3Oba/z82tTzBoKapOe/AW962BFh9TYHKL6ObuAZ9wYfnc++pwKR8qsoGlz9U3483udJGlg2ZkhGMd44TU5np8QJwe3Bm2qWoISyqQ2R7M4PmTlXCltvUkC0lxlzhhS8RMD7GHGRtZe1zNnt85Ps9Osk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742019177; c=relaxed/simple;
-	bh=Q9mtuujs0t4bKLAofmt2scm+ezjUA7Mj2N7W2T8m2DQ=;
-	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=q8SM5rbYNI2JFfW0f+cygHm49QhV0p3iacmwPVVlhBWKB4qmyQa8X0lw3LokdFMP17co+HptqHzM3tqGBLawjkH2Ob+ccLcbzApuRb9vWjhyNM9sAUzAJFNnW4HbIohW5ATfUZlN5VbT5ymmlC0rApYzkqgg59eYh+Bm6G6GE0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=63.216.63.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4ZF9rd4Nqtz8QrkZ;
-	Sat, 15 Mar 2025 14:12:49 +0800 (CST)
-Received: from xaxapp04.zte.com.cn ([10.99.98.157])
-	by mse-fl2.zte.com.cn with SMTP id 52F6CleG053818;
-	Sat, 15 Mar 2025 14:12:47 +0800 (+08)
-	(envelope-from xie.ludan@zte.com.cn)
-Received: from mapi (xaxapp02[null])
-	by mapi (Zmail) with MAPI id mid32;
-	Sat, 15 Mar 2025 14:12:49 +0800 (CST)
-Date: Sat, 15 Mar 2025 14:12:49 +0800 (CST)
-X-Zmail-TransId: 2afa67d51a611c9-69fbb
-X-Mailer: Zmail v1.0
-Message-ID: <20250315141249338P9_QqSBAnqEi-DZYDTtR5@zte.com.cn>
+	s=arc-20240116; t=1742019924; c=relaxed/simple;
+	bh=nWAkIYVQP75R8U7rNTUhYN7mb1xk4mK4d5YywW0AYpA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Cjm2qM9ZneNMTF8I/nR5EN1NxNbV7406BFbaNZ05QhNKzCxw8qWtWihpoo9e6JNUd+CijrQwgBuIb+rKHLpgpVcL0EPjvloRao1dip6kLprOtgjMKjhjSXDRD1/ha76epa5yjwkDcySHk3hEcE3scQfuv+0Tnd3JV7i4Ul7KIlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=leO4yQm3; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-22435603572so46198935ad.1;
+        Fri, 14 Mar 2025 23:25:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742019922; x=1742624722; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=l8cTPPc6gqUNZEA7H8LPqEukzOiIdQFuKMBLubQ698k=;
+        b=leO4yQm3pXF7uNwxh7lg30U2Q92kGSbw0wY7wSBKC4WW3ODaCzof/mpbqd+Mu94MHs
+         qF9NW1sP3h03RrwqkQ2hRbLf88hKc0t9VRl8s65mr+kXg7dYD2F/dCmIBomRzNHK3MBk
+         h/vUthYOmX5zbFx3UP+G0bKW8ooUwIX5q5IGYGL6CpmLZOs33KLlfz+UoFkFZI0qSJaQ
+         WU2nZUc5k7prWkXSuLZOqO5m2H53RRxXDebFJDd452eigH+5VHmJXAxeGV9JR2dhrKBs
+         GSLIKKEE2qEdlxe78D186Z+0edD1o5wuEM+pIXHWzGbBRMv3YuCc3/Q9pzVmWnQdzL8F
+         7YZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742019922; x=1742624722;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=l8cTPPc6gqUNZEA7H8LPqEukzOiIdQFuKMBLubQ698k=;
+        b=h0C8JaALHwV2tO0xOk57/FSdg0ofwxX9TKkz+QVsqg/pneb3HFE6JGv7cO4eIag1Xo
+         RdqtUApOlRjUALxk6zN0zDsqW04msOqtx+QjGGcKnCe1ZQOLfKByE6Mmm1GgPVRLKHad
+         dhCE+NY9OPL3I1q0gfnHvti8+T885+Kq2wU7wuSrQszX+fBuh9PFO5AR0beJm/lwo/wC
+         Zy82aOMcM/trYfiQA78PBZYnunGnUrAdr5HSaAuc8kTyPWhIdArJhgLedqImQs5+Qnqd
+         Y59RLHN8Db6kaKm/gV2aU/oUCO8RTciuYM4eBm/Ce6D28Hmc0eqfoetYwFqqxOokCmZy
+         X7pg==
+X-Forwarded-Encrypted: i=1; AJvYcCUGIkITU0Sui+DgbBsJSHQi4csE+DcWcr9uQbu1RbP8SO6repL8amuSbIDdIYUhG71Die+cKASbCx4D8Q==@vger.kernel.org, AJvYcCVe2X5dxnf3MPmx9BXulR6gIocEVJ89a7sC4cFKW+xBcv9yVrpR/W7LhG3WFIeQr5LJF1ZIuekkXMoRFA==@vger.kernel.org, AJvYcCWoEneimSMy0nfKHPR92YRdD3V5TJal3XBMTNPfGiVrAsow4FOh47rkkREaiE/qL6k/4bPRycILztZYCns=@vger.kernel.org, AJvYcCX6mbik9e/sKTIv/l0VOYl3flOE9SwzKGnxo1wB0pfCJxea1qj/uOYRJQ9Wip38Ytg/LQOsxfTK@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyo2GSH8KeFm65tprLPKKIFP96EmUaV1ihqHLU2tI1a5jPmLe73
+	R+GMBsBzjyFW28gCuMA3sp1mhhug80J4/98sfLdTcdhnEo4dSHUb
+X-Gm-Gg: ASbGnctxOorv18YPeuGWEuOC7pHMIqpqBfwRLM2j2/m26p4w5mCQ7SbtTtKwZav90mB
+	dz4mSV43C++ehr543pMNJrcfNntpvcJts1LkME7008qfJblZTxPIdsdDbqtaA9UVM4tMeuApwgE
+	KKj4lx1/5ZC3qmbnjrkIOMu2hLCIYNOQEvjb5uNp6p2EvRXpg0dB7BN6oOhhlntjSvBF4PWH1Ij
+	/ReKw4F1ls1DRLjnEL/jLMIvlPDO9rjPjtyAFnkzHQA/lgc/OLPcjMmZCmbvL/L+GRVk7XSd/lf
+	MHBZpODmK/1kGQyQCGMlplPCrQ+tY2/wVQpBMbylnM1ntTRkWohmrV/GwE9XxMEonHE6/fk9qbB
+	8hGF5b4psnQ==
+X-Google-Smtp-Source: AGHT+IHSnWrNpbJGdm2Ep8MCHFb4xCh1XOD4X4acsZBmcQb4pGwIZKWaITWJI6UfHE15+VY0Cnw11Q==
+X-Received: by 2002:a17:902:dacc:b0:220:f140:f7be with SMTP id d9443c01a7336-225e0af5c2amr61112395ad.41.1742019922389;
+        Fri, 14 Mar 2025 23:25:22 -0700 (PDT)
+Received: from vaxr-ASUSPRO-D840MB-M840MB.. ([2001:288:7001:2703:94e9:cb4b:5e68:9bff])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-225c68884fcsm38525115ad.16.2025.03.14.23.25.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Mar 2025 23:25:21 -0700 (PDT)
+From: I Hsin Cheng <richard120310@gmail.com>
+To: alibuda@linux.alibaba.com
+Cc: wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org,
+	jserv@ccns.ncku.edu.tw,
+	linux-kernel-mentees@lists.linux.dev,
+	I Hsin Cheng <richard120310@gmail.com>
+Subject: [PATCH] net/smc: Reduce size of smc_wr_tx_tasklet_fn
+Date: Sat, 15 Mar 2025 14:25:16 +0800
+Message-ID: <20250315062516.788528-1-richard120310@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <xie.ludan@zte.com.cn>
-To: <davem@davemloft.net>
-Cc: <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <horms@kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: =?UTF-8?B?W1BBVENIIGxpbnV4LW5leHRdIG5ldDogYXRtOiB1c2Ugc3lzZnNfZW1pdCgpIGluc3RlYWQgb2Ygc2NucHJpbnRmKCku?=
-Content-Type: multipart/mixed;
-	boundary="=====_001_next====="
-X-MAIL:mse-fl2.zte.com.cn 52F6CleG053818
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 67D51A61.001/4ZF9rd4Nqtz8QrkZ
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
+The variable "polled" in smc_wr_tx_tasklet_fn is a counter to determine
+whether the loop has been executed for the first time. Refactor the type
+of "polled" from "int" to "bool" can reduce the size of generated code
+size by 12 bytes shown with the test below
 
+$ ./scripts/bloat-o-meter vmlinux_old vmlinux_new
+add/remove: 0/0 grow/shrink: 0/1 up/down: 0/-12 (-12)
+Function                                     old     new   delta
+smc_wr_tx_tasklet_fn                        1076    1064     -12
+Total: Before=24795091, After=24795079, chg -0.00%
 
---=====_001_next=====
-Content-Type: multipart/related;
-	boundary="=====_002_next====="
+In some configuration, the compiler will complain this function for
+exceeding 1024 bytes for function stack, this change can at least reduce
+the size by 12 bytes within manner.
 
+Signed-off-by: I Hsin Cheng <richard120310@gmail.com>
+---
+ net/smc/smc_wr.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
---=====_002_next=====
-Content-Type: multipart/alternative;
-	boundary="=====_003_next====="
-
-
---=====_003_next=====
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-
-RnJvbTogWGllTHVkYW4gPHhpZS5sdWRhbkB6dGUuY29tLmNuPg0KDQpGb2xsb3cgdGhlIGFkdmlj
-ZSBpbiBEb2N1bWVudGF0aW9uL2ZpbGVzeXN0ZW1zL3N5c2ZzLnJzdDoNCnNob3coKSBzaG91bGQg
-b25seSB1c2Ugc3lzZnNfZW1pdCgpIG9yIHN5c2ZzX2VtaXRfYXQoKSB3aGVuIGZvcm1hdHRpbmcN
-CnRoZSB2YWx1ZSB0byBiZSByZXR1cm5lZCB0byB1c2VyIHNwYWNlLg0KDQpTaWduZWQtb2ZmLWJ5
-OiBYaWVMdWRhbiA8eGllLmx1ZGFuQHp0ZS5jb20uY24+DQotLS0NCiBuZXQvYXRtL2F0bV9zeXNm
-cy5jIHwgMTIgKysrKysrLS0tLS0tDQogMSBmaWxlIGNoYW5nZWQsIDYgaW5zZXJ0aW9ucygrKSwg
-NiBkZWxldGlvbnMoLSkNCg0KZGlmZiAtLWdpdCBhL25ldC9hdG0vYXRtX3N5c2ZzLmMgYi9uZXQv
-YXRtL2F0bV9zeXNmcy5jDQppbmRleCA1NGU3ZmIxYTRlZTUuLjBhYWIxYzNjMDVkZSAxMDA2NDQN
-Ci0tLSBhL25ldC9hdG0vYXRtX3N5c2ZzLmMNCisrKyBiL25ldC9hdG0vYXRtX3N5c2ZzLmMNCkBA
-IC0xNiw3ICsxNiw3IEBAIHN0YXRpYyBzc2l6ZV90IHR5cGVfc2hvdyhzdHJ1Y3QgZGV2aWNlICpj
-ZGV2LA0KIHsNCiAJc3RydWN0IGF0bV9kZXYgKmFkZXYgPSB0b19hdG1fZGV2KGNkZXYpOw0KIA0K
-LQlyZXR1cm4gc2NucHJpbnRmKGJ1ZiwgUEFHRV9TSVpFLCAiJXNcbiIsIGFkZXYtPnR5cGUpOw0K
-KwlyZXR1cm4gc3lzZnNfZW1pdChidWYsICIlc1xuIiwgYWRldi0+dHlwZSk7DQogfQ0KIA0KIHN0
-YXRpYyBzc2l6ZV90IGFkZHJlc3Nfc2hvdyhzdHJ1Y3QgZGV2aWNlICpjZGV2LA0KQEAgLTI0LDcg
-KzI0LDcgQEAgc3RhdGljIHNzaXplX3QgYWRkcmVzc19zaG93KHN0cnVjdCBkZXZpY2UgKmNkZXYs
-DQogew0KIAlzdHJ1Y3QgYXRtX2RldiAqYWRldiA9IHRvX2F0bV9kZXYoY2Rldik7DQogDQotCXJl
-dHVybiBzY25wcmludGYoYnVmLCBQQUdFX1NJWkUsICIlcE1cbiIsIGFkZXYtPmVzaSk7DQorCXJl
-dHVybiBzeXNmc19lbWl0KGJ1ZiwgIiVwTVxuIiwgYWRldi0+ZXNpKTsNCiB9DQogDQogc3RhdGlj
-IHNzaXplX3QgYXRtYWRkcmVzc19zaG93KHN0cnVjdCBkZXZpY2UgKmNkZXYsDQpAQCAtMzcsNyAr
-MzcsNyBAQCBzdGF0aWMgc3NpemVfdCBhdG1hZGRyZXNzX3Nob3coc3RydWN0IGRldmljZSAqY2Rl
-diwNCiANCiAJc3Bpbl9sb2NrX2lycXNhdmUoJmFkZXYtPmxvY2ssIGZsYWdzKTsNCiAJbGlzdF9m
-b3JfZWFjaF9lbnRyeShhYWRkciwgJmFkZXYtPmxvY2FsLCBlbnRyeSkgew0KLQkJY291bnQgKz0g
-c2NucHJpbnRmKGJ1ZiArIGNvdW50LCBQQUdFX1NJWkUgLSBjb3VudCwNCisJCWNvdW50ICs9IHN5
-c2ZzX2VtaXQoYnVmICsgY291bnQsDQogCQkJCSAgICIlMXBoTi4lMnBoTi4lMTBwaE4uJTZwaE4u
-JTFwaE5cbiIsDQogCQkJCSAgICZhYWRkci0+YWRkci5zYXNfYWRkci5wcnZbMF0sDQogCQkJCSAg
-ICZhYWRkci0+YWRkci5zYXNfYWRkci5wcnZbMV0sDQpAQCAtNTUsNyArNTUsNyBAQCBzdGF0aWMg
-c3NpemVfdCBhdG1pbmRleF9zaG93KHN0cnVjdCBkZXZpY2UgKmNkZXYsDQogew0KIAlzdHJ1Y3Qg
-YXRtX2RldiAqYWRldiA9IHRvX2F0bV9kZXYoY2Rldik7DQogDQotCXJldHVybiBzY25wcmludGYo
-YnVmLCBQQUdFX1NJWkUsICIlZFxuIiwgYWRldi0+bnVtYmVyKTsNCisJcmV0dXJuIHN5c2ZzX2Vt
-aXQoYnVmLCAiJWRcbiIsIGFkZXYtPm51bWJlcik7DQogfQ0KIA0KIHN0YXRpYyBzc2l6ZV90IGNh
-cnJpZXJfc2hvdyhzdHJ1Y3QgZGV2aWNlICpjZGV2LA0KQEAgLTYzLDcgKzYzLDcgQEAgc3RhdGlj
-IHNzaXplX3QgY2Fycmllcl9zaG93KHN0cnVjdCBkZXZpY2UgKmNkZXYsDQogew0KIAlzdHJ1Y3Qg
-YXRtX2RldiAqYWRldiA9IHRvX2F0bV9kZXYoY2Rldik7DQogDQotCXJldHVybiBzY25wcmludGYo
-YnVmLCBQQUdFX1NJWkUsICIlZFxuIiwNCisJcmV0dXJuIHN5c2ZzX2VtaXQoYnVmLCAiJWRcbiIs
-DQogCQkJIGFkZXYtPnNpZ25hbCA9PSBBVE1fUEhZX1NJR19MT1NUID8gMCA6IDEpOw0KIH0NCiAN
-CkBAIC04Nyw3ICs4Nyw3IEBAIHN0YXRpYyBzc2l6ZV90IGxpbmtfcmF0ZV9zaG93KHN0cnVjdCBk
-ZXZpY2UgKmNkZXYsDQogCWRlZmF1bHQ6DQogCQlsaW5rX3JhdGUgPSBhZGV2LT5saW5rX3JhdGUg
-KiA4ICogNTM7DQogCX0NCi0JcmV0dXJuIHNjbnByaW50ZihidWYsIFBBR0VfU0laRSwgIiVkXG4i
-LCBsaW5rX3JhdGUpOw0KKwlyZXR1cm4gc3lzZnNfZW1pdChidWYsICIlZFxuIiwgbGlua19yYXRl
-KTsNCiB9DQogDQogc3RhdGljIERFVklDRV9BVFRSX1JPKGFkZHJlc3MpOw0KLS0gDQoyLjI1LjE=
-
---=====_003_next=====
-Content-Type: text/html ;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-
-PGRpdiBjbGFzcz0iemNvbnRlbnRSb3ciPjxwPjxzcGFuIHN0eWxlPSJmb250LWZhbWlseTogQXJp
-YWwsIEhlbHZldGljYSwgJnF1b3Q7TWljcm9zb2Z0IFlhaGVpJnF1b3Q7LCBzYW5zLXNlcmlmOyBi
-YWNrZ3JvdW5kLWNvbG9yOiByZ2IoMjU1LCAyNTUsIDI1NSk7Ij5Gcm9tOiBYaWVMdWRhbiAmbHQ7
-eGllLmx1ZGFuQHp0ZS5jb20uY24mZ3Q7PC9zcGFuPjwvcD48cD48YnI+PC9wPjxwPkZvbGxvdyB0
-aGUgYWR2aWNlIGluIERvY3VtZW50YXRpb24vZmlsZXN5c3RlbXMvc3lzZnMucnN0OjwvcD48cD5z
-aG93KCkgc2hvdWxkIG9ubHkgdXNlIHN5c2ZzX2VtaXQoKSBvciBzeXNmc19lbWl0X2F0KCkgd2hl
-biBmb3JtYXR0aW5nPC9wPjxwPnRoZSB2YWx1ZSB0byBiZSByZXR1cm5lZCB0byB1c2VyIHNwYWNl
-LjwvcD48cD48YnI+PC9wPjxwPlNpZ25lZC1vZmYtYnk6IFhpZUx1ZGFuICZsdDt4aWUubHVkYW5A
-enRlLmNvbS5jbiZndDs8L3A+PHA+LS0tPC9wPjxwPiZuYnNwO25ldC9hdG0vYXRtX3N5c2ZzLmMg
-fCAxMiArKysrKystLS0tLS08L3A+PHA+Jm5ic3A7MSBmaWxlIGNoYW5nZWQsIDYgaW5zZXJ0aW9u
-cygrKSwgNiBkZWxldGlvbnMoLSk8L3A+PHA+PGJyPjwvcD48cD5kaWZmIC0tZ2l0IGEvbmV0L2F0
-bS9hdG1fc3lzZnMuYyBiL25ldC9hdG0vYXRtX3N5c2ZzLmM8L3A+PHA+aW5kZXggNTRlN2ZiMWE0
-ZWU1Li4wYWFiMWMzYzA1ZGUgMTAwNjQ0PC9wPjxwPi0tLSBhL25ldC9hdG0vYXRtX3N5c2ZzLmM8
-L3A+PHA+KysrIGIvbmV0L2F0bS9hdG1fc3lzZnMuYzwvcD48cD5AQCAtMTYsNyArMTYsNyBAQCBz
-dGF0aWMgc3NpemVfdCB0eXBlX3Nob3coc3RydWN0IGRldmljZSAqY2Rldiw8L3A+PHA+Jm5ic3A7
-ezwvcD48cD4mbmJzcDs8c3BhbiBzdHlsZT0id2hpdGUtc3BhY2U6cHJlIj4JPC9zcGFuPnN0cnVj
-dCBhdG1fZGV2ICphZGV2ID0gdG9fYXRtX2RldihjZGV2KTs8L3A+PHA+Jm5ic3A7PC9wPjxwPi08
-c3BhbiBzdHlsZT0id2hpdGUtc3BhY2U6cHJlIj4JPC9zcGFuPnJldHVybiBzY25wcmludGYoYnVm
-LCBQQUdFX1NJWkUsICIlc1xuIiwgYWRldi0mZ3Q7dHlwZSk7PC9wPjxwPis8c3BhbiBzdHlsZT0i
-d2hpdGUtc3BhY2U6cHJlIj4JPC9zcGFuPnJldHVybiBzeXNmc19lbWl0KGJ1ZiwgIiVzXG4iLCBh
-ZGV2LSZndDt0eXBlKTs8L3A+PHA+Jm5ic3A7fTwvcD48cD4mbmJzcDs8L3A+PHA+Jm5ic3A7c3Rh
-dGljIHNzaXplX3QgYWRkcmVzc19zaG93KHN0cnVjdCBkZXZpY2UgKmNkZXYsPC9wPjxwPkBAIC0y
-NCw3ICsyNCw3IEBAIHN0YXRpYyBzc2l6ZV90IGFkZHJlc3Nfc2hvdyhzdHJ1Y3QgZGV2aWNlICpj
-ZGV2LDwvcD48cD4mbmJzcDt7PC9wPjxwPiZuYnNwOzxzcGFuIHN0eWxlPSJ3aGl0ZS1zcGFjZTpw
-cmUiPgk8L3NwYW4+c3RydWN0IGF0bV9kZXYgKmFkZXYgPSB0b19hdG1fZGV2KGNkZXYpOzwvcD48
-cD4mbmJzcDs8L3A+PHA+LTxzcGFuIHN0eWxlPSJ3aGl0ZS1zcGFjZTpwcmUiPgk8L3NwYW4+cmV0
-dXJuIHNjbnByaW50ZihidWYsIFBBR0VfU0laRSwgIiVwTVxuIiwgYWRldi0mZ3Q7ZXNpKTs8L3A+
-PHA+KzxzcGFuIHN0eWxlPSJ3aGl0ZS1zcGFjZTpwcmUiPgk8L3NwYW4+cmV0dXJuIHN5c2ZzX2Vt
-aXQoYnVmLCAiJXBNXG4iLCBhZGV2LSZndDtlc2kpOzwvcD48cD4mbmJzcDt9PC9wPjxwPiZuYnNw
-OzwvcD48cD4mbmJzcDtzdGF0aWMgc3NpemVfdCBhdG1hZGRyZXNzX3Nob3coc3RydWN0IGRldmlj
-ZSAqY2Rldiw8L3A+PHA+QEAgLTM3LDcgKzM3LDcgQEAgc3RhdGljIHNzaXplX3QgYXRtYWRkcmVz
-c19zaG93KHN0cnVjdCBkZXZpY2UgKmNkZXYsPC9wPjxwPiZuYnNwOzwvcD48cD4mbmJzcDs8c3Bh
-biBzdHlsZT0id2hpdGUtc3BhY2U6cHJlIj4JPC9zcGFuPnNwaW5fbG9ja19pcnFzYXZlKCZhbXA7
-YWRldi0mZ3Q7bG9jaywgZmxhZ3MpOzwvcD48cD4mbmJzcDs8c3BhbiBzdHlsZT0id2hpdGUtc3Bh
-Y2U6cHJlIj4JPC9zcGFuPmxpc3RfZm9yX2VhY2hfZW50cnkoYWFkZHIsICZhbXA7YWRldi0mZ3Q7
-bG9jYWwsIGVudHJ5KSB7PC9wPjxwPi08c3BhbiBzdHlsZT0id2hpdGUtc3BhY2U6cHJlIj4JCTwv
-c3Bhbj5jb3VudCArPSBzY25wcmludGYoYnVmICsgY291bnQsIFBBR0VfU0laRSAtIGNvdW50LDwv
-cD48cD4rPHNwYW4gc3R5bGU9IndoaXRlLXNwYWNlOnByZSI+CQk8L3NwYW4+Y291bnQgKz0gc3lz
-ZnNfZW1pdChidWYgKyBjb3VudCw8L3A+PHA+Jm5ic3A7PHNwYW4gc3R5bGU9IndoaXRlLXNwYWNl
-OnByZSI+CQkJCTwvc3Bhbj4mbmJzcDsgJm5ic3A7IiUxcGhOLiUycGhOLiUxMHBoTi4lNnBoTi4l
-MXBoTlxuIiw8L3A+PHA+Jm5ic3A7PHNwYW4gc3R5bGU9IndoaXRlLXNwYWNlOnByZSI+CQkJCTwv
-c3Bhbj4mbmJzcDsgJm5ic3A7JmFtcDthYWRkci0mZ3Q7YWRkci5zYXNfYWRkci5wcnZbMF0sPC9w
-PjxwPiZuYnNwOzxzcGFuIHN0eWxlPSJ3aGl0ZS1zcGFjZTpwcmUiPgkJCQk8L3NwYW4+Jm5ic3A7
-ICZuYnNwOyZhbXA7YWFkZHItJmd0O2FkZHIuc2FzX2FkZHIucHJ2WzFdLDwvcD48cD5AQCAtNTUs
-NyArNTUsNyBAQCBzdGF0aWMgc3NpemVfdCBhdG1pbmRleF9zaG93KHN0cnVjdCBkZXZpY2UgKmNk
-ZXYsPC9wPjxwPiZuYnNwO3s8L3A+PHA+Jm5ic3A7PHNwYW4gc3R5bGU9IndoaXRlLXNwYWNlOnBy
-ZSI+CTwvc3Bhbj5zdHJ1Y3QgYXRtX2RldiAqYWRldiA9IHRvX2F0bV9kZXYoY2Rldik7PC9wPjxw
-PiZuYnNwOzwvcD48cD4tPHNwYW4gc3R5bGU9IndoaXRlLXNwYWNlOnByZSI+CTwvc3Bhbj5yZXR1
-cm4gc2NucHJpbnRmKGJ1ZiwgUEFHRV9TSVpFLCAiJWRcbiIsIGFkZXYtJmd0O251bWJlcik7PC9w
-PjxwPis8c3BhbiBzdHlsZT0id2hpdGUtc3BhY2U6cHJlIj4JPC9zcGFuPnJldHVybiBzeXNmc19l
-bWl0KGJ1ZiwgIiVkXG4iLCBhZGV2LSZndDtudW1iZXIpOzwvcD48cD4mbmJzcDt9PC9wPjxwPiZu
-YnNwOzwvcD48cD4mbmJzcDtzdGF0aWMgc3NpemVfdCBjYXJyaWVyX3Nob3coc3RydWN0IGRldmlj
-ZSAqY2Rldiw8L3A+PHA+QEAgLTYzLDcgKzYzLDcgQEAgc3RhdGljIHNzaXplX3QgY2Fycmllcl9z
-aG93KHN0cnVjdCBkZXZpY2UgKmNkZXYsPC9wPjxwPiZuYnNwO3s8L3A+PHA+Jm5ic3A7PHNwYW4g
-c3R5bGU9IndoaXRlLXNwYWNlOnByZSI+CTwvc3Bhbj5zdHJ1Y3QgYXRtX2RldiAqYWRldiA9IHRv
-X2F0bV9kZXYoY2Rldik7PC9wPjxwPiZuYnNwOzwvcD48cD4tPHNwYW4gc3R5bGU9IndoaXRlLXNw
-YWNlOnByZSI+CTwvc3Bhbj5yZXR1cm4gc2NucHJpbnRmKGJ1ZiwgUEFHRV9TSVpFLCAiJWRcbiIs
-PC9wPjxwPis8c3BhbiBzdHlsZT0id2hpdGUtc3BhY2U6cHJlIj4JPC9zcGFuPnJldHVybiBzeXNm
-c19lbWl0KGJ1ZiwgIiVkXG4iLDwvcD48cD4mbmJzcDs8c3BhbiBzdHlsZT0id2hpdGUtc3BhY2U6
-cHJlIj4JCQk8L3NwYW4+IGFkZXYtJmd0O3NpZ25hbCA9PSBBVE1fUEhZX1NJR19MT1NUID8gMCA6
-IDEpOzwvcD48cD4mbmJzcDt9PC9wPjxwPiZuYnNwOzwvcD48cD5AQCAtODcsNyArODcsNyBAQCBz
-dGF0aWMgc3NpemVfdCBsaW5rX3JhdGVfc2hvdyhzdHJ1Y3QgZGV2aWNlICpjZGV2LDwvcD48cD4m
-bmJzcDs8c3BhbiBzdHlsZT0id2hpdGUtc3BhY2U6cHJlIj4JPC9zcGFuPmRlZmF1bHQ6PC9wPjxw
-PiZuYnNwOzxzcGFuIHN0eWxlPSJ3aGl0ZS1zcGFjZTpwcmUiPgkJPC9zcGFuPmxpbmtfcmF0ZSA9
-IGFkZXYtJmd0O2xpbmtfcmF0ZSAqIDggKiA1Mzs8L3A+PHA+Jm5ic3A7PHNwYW4gc3R5bGU9Indo
-aXRlLXNwYWNlOnByZSI+CTwvc3Bhbj59PC9wPjxwPi08c3BhbiBzdHlsZT0id2hpdGUtc3BhY2U6
-cHJlIj4JPC9zcGFuPnJldHVybiBzY25wcmludGYoYnVmLCBQQUdFX1NJWkUsICIlZFxuIiwgbGlu
-a19yYXRlKTs8L3A+PHA+KzxzcGFuIHN0eWxlPSJ3aGl0ZS1zcGFjZTpwcmUiPgk8L3NwYW4+cmV0
-dXJuIHN5c2ZzX2VtaXQoYnVmLCAiJWRcbiIsIGxpbmtfcmF0ZSk7PC9wPjxwPiZuYnNwO308L3A+
-PHA+Jm5ic3A7PC9wPjxwPiZuYnNwO3N0YXRpYyBERVZJQ0VfQVRUUl9STyhhZGRyZXNzKTs8L3A+
-PHA+LS0mbmJzcDs8L3A+PHA+Mi4yNS4xPC9wPjxwIHN0eWxlPSJmb250LXNpemU6MTRweDtmb250
-LWZhbWlseTrlvq7ova/pm4Xpu5EsTWljcm9zb2Z0IFlhSGVpOyI+PGJyPjwvcD48cCBzdHlsZT0i
-Zm9udC1zaXplOjE0cHg7Zm9udC1mYW1pbHk65b6u6L2v6ZuF6buRLE1pY3Jvc29mdCBZYUhlaTsi
-Pjxicj48L3A+PHAgc3R5bGU9ImZvbnQtc2l6ZToxNHB4O2ZvbnQtZmFtaWx5OuW+rui9r+mbhem7
-kSxNaWNyb3NvZnQgWWFIZWk7Ij48YnI+PC9wPjxwIHN0eWxlPSJmb250LXNpemU6MTRweDtmb250
-LWZhbWlseTrlvq7ova/pm4Xpu5EsTWljcm9zb2Z0IFlhSGVpOyI+PGJyPjwvcD48L2Rpdj4=
-
-
---=====_003_next=====--
-
---=====_002_next=====--
-
---=====_001_next=====--
+diff --git a/net/smc/smc_wr.c b/net/smc/smc_wr.c
+index b04a21b8c511..3cc435ed7fde 100644
+--- a/net/smc/smc_wr.c
++++ b/net/smc/smc_wr.c
+@@ -138,14 +138,14 @@ static void smc_wr_tx_tasklet_fn(struct tasklet_struct *t)
+ 	struct smc_ib_device *dev = from_tasklet(dev, t, send_tasklet);
+ 	struct ib_wc wc[SMC_WR_MAX_POLL_CQE];
+ 	int i = 0, rc;
+-	int polled = 0;
++	bool polled = false;
+ 
+ again:
+-	polled++;
++	polled = !polled;
+ 	do {
+ 		memset(&wc, 0, sizeof(wc));
+ 		rc = ib_poll_cq(dev->roce_cq_send, SMC_WR_MAX_POLL_CQE, wc);
+-		if (polled == 1) {
++		if (polled) {
+ 			ib_req_notify_cq(dev->roce_cq_send,
+ 					 IB_CQ_NEXT_COMP |
+ 					 IB_CQ_REPORT_MISSED_EVENTS);
+@@ -155,7 +155,7 @@ static void smc_wr_tx_tasklet_fn(struct tasklet_struct *t)
+ 		for (i = 0; i < rc; i++)
+ 			smc_wr_tx_process_cqe(&wc[i]);
+ 	} while (rc > 0);
+-	if (polled == 1)
++	if (polled)
+ 		goto again;
+ }
+ 
+-- 
+2.43.0
 
 
