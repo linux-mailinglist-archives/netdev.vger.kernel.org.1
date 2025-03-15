@@ -1,107 +1,93 @@
-Return-Path: <netdev+bounces-175014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5205A6266B
-	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 06:15:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 252BBA626A5
+	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 06:38:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B580619C4475
-	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 05:15:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69BCC17F66F
+	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 05:38:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EC8818C01E;
-	Sat, 15 Mar 2025 05:15:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FAC2190051;
+	Sat, 15 Mar 2025 05:38:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 383A21863E;
-	Sat, 15 Mar 2025 05:15:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CF4116EB42
+	for <netdev@vger.kernel.org>; Sat, 15 Mar 2025 05:38:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742015722; cv=none; b=NrfmaHl1Xkp82xApHJ3TBHTACtoq0/VvFRwxw1oin4Gznc6jHGOQVjMLzK0K9/nMWJyDlSbdpiD/Y7UK23w3GsmrFXP3wUDfTW2sY9EdWIig0+fvJC2o++NPdPw8XDIDeqvAZ/FLJYk+Nl1Q/xErmgfFRjzq51wz+MjGT9m02LQ=
+	t=1742017091; cv=none; b=FQbaNObaaD8UxsckC5DB10mJB1y5Y2mc14l+vCIyL1SvYLiPXuMLcoYUdJQKiqXfWORDxDbDCGwDl+pKDT0XnutMv4Ljg4yJiC5fl/TfSoA4P3/EAmc31Jz/ofykGHfBmkcGTpL4WVbbehmNJ6kjtKuFsfDG3XMe+SLhacdcUQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742015722; c=relaxed/simple;
-	bh=zU2OjNVSTqN4GDJE+zve+/677mHqsOE8uNqQIdqye7k=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=c0rjV54ZoVApK/T8te1ufrqggmw6dlDg3SxK9tGvgIGPi6uFW5pfMD2DdRTOHffZoLsBcuGsSEGCa4nblNT1AxKKe2/dRkoXKtwpzVNxRcHAxiV5oGYPXQ1NzZYubVtbbs5ddrhIqvpADdMgWTdxyaO1VJ2Qh7u2jD3ZjrDG71c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4ZF8Yz44S1z1cyxW;
-	Sat, 15 Mar 2025 13:15:03 +0800 (CST)
-Received: from kwepemk500005.china.huawei.com (unknown [7.202.194.90])
-	by mail.maildlp.com (Postfix) with ESMTPS id A12C818007F;
-	Sat, 15 Mar 2025 13:15:11 +0800 (CST)
-Received: from [10.174.178.46] (10.174.178.46) by
- kwepemk500005.china.huawei.com (7.202.194.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 15 Mar 2025 13:15:10 +0800
-Subject: Re: [v4 PATCH 10/13] ubifs: Use crypto_acomp interface
-To: Herbert Xu <herbert@gondor.apana.org.au>, Linux Crypto Mailing List
-	<linux-crypto@vger.kernel.org>
-CC: Richard Weinberger <richard@nod.at>, <linux-mtd@lists.infradead.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@ucw.cz>,
-	<linux-pm@vger.kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>,
-	<netdev@vger.kernel.org>
-References: <cover.1741954523.git.herbert@gondor.apana.org.au>
- <349a78bc53d3620a29cc6105b55985db51aa0a11.1741954523.git.herbert@gondor.apana.org.au>
-From: Zhihao Cheng <chengzhihao1@huawei.com>
-Message-ID: <02dd5000-7ced-df02-d9d0-a3c1a410d062@huawei.com>
-Date: Sat, 15 Mar 2025 13:15:09 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+	s=arc-20240116; t=1742017091; c=relaxed/simple;
+	bh=ZDiXjUknHETMzrlYn1zgWu+v7UPrqES23shmZOMFSYI=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=LYki5Ch+u91AkFdkRt+9EVtfUY3n5/y9UwvQqO0x1qWWdvgstoNO2Lh4GFQRd+alNrXy+78/cKyFXOM3bovS4J49VAkN2OjnCZjrJpH/aIkr6T9xsd6810JjaMjRcK0s9h/SJ8WTCvMfFWPLTr6CPmpSRDfIgPtXYuHwvw3w2wI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3ce81a40f5cso58094905ab.1
+        for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 22:38:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742017088; x=1742621888;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Jri1wgrpQV6ijagZsM9y5nNBdN2313llFI5vyTbWILA=;
+        b=xIoCdppFeGE0h/Kgepk4NITfz7LUaOYmPBd9M41v7n2xGeEHQ/nUbavkJunV+VVSj4
+         EhC2JMJT7r5SMI2NdhRNut7ZcsuOpjM5h4XBhvG3/WlECa7WWDpQK1TR4NZTjQId68zE
+         30tZcis0b1BMnzt2+qSpfbJ7vinOyKvvAhv0FLzaGiKxv7lD3crZLiUclfQ3h8bvLE24
+         eNP08OyyJ7awsIdpbJvlY1bNA/Y27MSmnQtDtO8LYQfmEco7h8aUXes3V/KypVWM8aVp
+         2vM47upUu0JzZT+r29yimBnd7Kb6oU8CoUOqrutJmw1zKlrEj9t0oF/Vqguyj9Z9xf62
+         Ft5A==
+X-Forwarded-Encrypted: i=1; AJvYcCUN+dw3PCpyzyFA0Ba1iaN9oqG+UboENllg70sdzse59vftUV0vqKsmXHJOLNvH4NLDSy1m0Oo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpkhTr7EmYH9AS5JotTq0QbqeBwD9k1slwbchPCpSk7fQxDQso
+	zdz2dwsPX7Bvodk7a7x1cJVpwSVKT5jGmnKdD5YXIeqEtRBcj4Hi4OYppxkqBiWQhmcEMOcWuty
+	sONwAp8/xqIgbx20w49q1rG8N7yugFbUbHWtvS5bgOwCwJL4y2CXKdZU=
+X-Google-Smtp-Source: AGHT+IFQ+XxRMp/jrAZMgPnZUJ5trjdXbQ0Y0KQeY63eEi4hA6eS3lbN90dOhbP8hV87Q1ta+3ekOz3dCXUnIFG3nJBSxi1Vh+6V
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <349a78bc53d3620a29cc6105b55985db51aa0a11.1741954523.git.herbert@gondor.apana.org.au>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemk500005.china.huawei.com (7.202.194.90)
+X-Received: by 2002:a05:6e02:3312:b0:3d4:3aba:e5ce with SMTP id
+ e9e14a558f8ab-3d483a906ffmr53679835ab.20.1742017088726; Fri, 14 Mar 2025
+ 22:38:08 -0700 (PDT)
+Date: Fri, 14 Mar 2025 22:38:08 -0700
+In-Reply-To: <20250315051051.1532-1-enjuk@amazon.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67d51240.050a0220.14e108.0050.GAE@google.com>
+Subject: Re: [syzbot] [bpf?] KASAN: slab-out-of-bounds Read in atomic_ptr_type_ok
+From: syzbot <syzbot+a5964227adc0f904549c@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, eddyz87@gmail.com, enjuk@amazon.com, haoluo@google.com, 
+	iii@linux.ibm.com, john.fastabend@gmail.com, jolsa@kernel.org, 
+	kpsingh@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
+	netdev@vger.kernel.org, sdf@fomichev.me, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, yepeilin@google.com, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-ÔÚ 2025/3/14 20:22, Herbert Xu Ð´µÀ:
-> Replace the legacy crypto compression interface with the new acomp
-> interface.
-> 
-> Remove the compression mutexes and the overallocation for memory
-> (the offender LZO has been fixed).
+Hello,
 
-Hi, Herbert. Can you show me which patch fixed the problem in LZO?
-> 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> ---
->   fs/ubifs/compress.c | 116 ++++++++++++++++++++++++++++----------------
->   fs/ubifs/journal.c  |   2 +-
->   fs/ubifs/ubifs.h    |  15 +-----
->   3 files changed, 77 insertions(+), 56 deletions(-)
-> 
+syzbot tried to test the proposed patch but the build/boot failed:
 
-[...]
-> diff --git a/fs/ubifs/ubifs.h b/fs/ubifs/ubifs.h
-> index 3375bbe0508c..7d0aaf5d2e23 100644
-> --- a/fs/ubifs/ubifs.h
-> +++ b/fs/ubifs/ubifs.h
-> @@ -124,13 +124,6 @@
->   #define OLD_ZNODE_AGE 20
->   #define YOUNG_ZNODE_AGE 5
->   
-> -/*
-> - * Some compressors, like LZO, may end up with more data then the input buffer.
-> - * So UBIFS always allocates larger output buffer, to be sure the compressor
-> - * will not corrupt memory in case of worst case compression.
-> - */
-> -#define WORST_COMPR_FACTOR 2
+failed to apply patch:
+checking file kernel/bpf/verifier.c
+patch: **** unexpected end of file in patch
 
-Does LZO guarantee the output data length smaller than input buffer 
-length? Which commit fixed the issue?
-> -
->   #ifdef CONFIG_FS_ENCRYPTION
->   #define UBIFS_CIPHER_BLOCK_SIZE FSCRYPT_CONTENTS_ALIGNMENT
->   #else
+
+
+Tested on:
+
+commit:         2d7597d6 selftests/bpf: Fix sockopt selftest failure o..
+git tree:       bpf-next
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b7bde34acd8f53b1
+dashboard link: https://syzkaller.appspot.com/bug?extid=a5964227adc0f904549c
+compiler:       
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=13ff2e54580000
+
 
