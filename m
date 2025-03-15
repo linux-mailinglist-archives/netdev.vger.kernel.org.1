@@ -1,92 +1,108 @@
-Return-Path: <netdev+bounces-175023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09F12A6274C
-	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 07:27:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06168A627A9
+	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 07:54:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FE193BB5E5
-	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 06:26:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 391853B82AD
+	for <lists+netdev@lfdr.de>; Sat, 15 Mar 2025 06:53:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97E3319F416;
-	Sat, 15 Mar 2025 06:27:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CC1119F127;
+	Sat, 15 Mar 2025 06:54:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="vvDqCSO+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83FA418893C
+	for <netdev@vger.kernel.org>; Sat, 15 Mar 2025 06:53:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742021641; cv=none; b=TfN4ktLb8aKvTF68hauRrPx2F8TEGNwVUst5UfGZpOWtCZ4sgI92iuIxYlBBY5aQkmBQaxxEF0xNR1pt52r6Ae2WXNfgZ4rG05w6u5uMmVoCwKovmcP4MiVaRHqhh6GDq09ZvHyU0yvwRQwHiA6BWY7ifMckCYkvWmJjBjfXMao=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742021641; c=relaxed/simple;
+	bh=6U9X1JM3pG57RkKJppSrAPQc9JIp2SGUb7H50/WKzEc=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SVL8AG3MJDft7YD71YMV38xPgEWezk8nlLV8ZC1XViB1SSMMlp1lzWdYQcHvX+03J5FEGei5E1XkppSkYL1aqiKHGdxWcD+Fj0Ip1NztHp7sx0EFx5Kk6ch3TcIidEESz2XBRvRrQhP5JCBa90pLr0nDNDszh5linI34JMhn+t8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=vvDqCSO+; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 884892074F;
+	Sat, 15 Mar 2025 07:53:56 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id XLEC7EquL543; Sat, 15 Mar 2025 07:53:56 +0100 (CET)
+Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F7C19F121
-	for <netdev@vger.kernel.org>; Sat, 15 Mar 2025 06:27:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742020025; cv=none; b=WjOqEQj8CU6m9NyAGDbi0GBVMU2LKZLmSyXGOTqr8zrcW78Iipjo60IU5QDil+fiSfDm15BUMzcn7MFrcrN7QBovUSO/UajYWPOQkIgknAk9TUOdQ4bo9a4hMtD3I5UkPGaqJZG/Lg79bmfLoXKnRKTTBlnoYrSkpTmgA42RYiM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742020025; c=relaxed/simple;
-	bh=8c8BP0ZMGpck2i/dkvXUZ8GUM3AehfiBO2W2XuuOlrs=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=obZCGXP7vnO4vtYwF4J4MRdGqpIZ4Gw6+nbkAfkrm56JtdjwNHU+C4287SLhkmnjeYWynbRufEBriRfMLgxmH1Wri9Co91tKV6aTMLwtwVqqjAYOOh3r6Oufhv3PxOug1LL7qUvlrmy94B0G886aiheKA/XPEpKKZikCXtUvDTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3d44dc8a9b4so33188365ab.3
-        for <netdev@vger.kernel.org>; Fri, 14 Mar 2025 23:27:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742020023; x=1742624823;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iVtpvCBBSFNWY2hi10N0rrWtsxl0Zv5MnCY1nXMRHOg=;
-        b=YOZqStvHYCu0XxjZFyNEp2aFfnX2+9/pT6V4c9N6biju631mpyeynviqEgIONElvgq
-         YqVF1bxictWooLZrJDzPnKueLl4kMCRSQ6Fh1HsngcWNy37mxNv2igTZn9DKU+ZPGRMn
-         wHiByOtoYPqCx4OcI6lGysePoeCIjfBBcQnwWI4gaXag/XIL0iG1aSvRknCC8+sczEcO
-         XtcE/Aa43srUPcCXehmbNbQyuJxvAiY4r8+OhAnSnC15F241sF4x7RWfOy9Q7CnX5v0R
-         AZESsdpZEtcXU6+X346QPCG3tO0L91EzuuqewzVLaU7GwF8OSRL69Pt7Ky7IhD8bHtgE
-         cBbA==
-X-Forwarded-Encrypted: i=1; AJvYcCVIUD4SDkc8TwUgTiB7KNc+g/p1tD3OJYssyh8a/NARAR+xleCgu5XezR9i0kf/KyP1RCdbkzE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxuYLyh0V2xQjp48cpkxdFHtmXjmqrN0Ot8X33SMPCX8cND0Gep
-	R/OGUH3VaPM/RHsCqc10cE82GsKwsEjlx0/Ng+PObX8oWTLEWRVDV4ztTiaZ3MZmQ5cIdGCQ9gm
-	ebW70QuqQoTs5RVrmQq7nzh1R16u+WCQGTVu9N9aKWtM+QvWes0YM/XE=
-X-Google-Smtp-Source: AGHT+IHc/Hlt9d/2Xcr2kHdqr9oeeMai8KZOoyvDaGLKjBOLJUUUPVjAKnMWCJKX9sd5n0l/KK74b5/g18o59nKXQM7eSaHz3zM5
+	by mx1.secunet.com (Postfix) with ESMTPS id 02AD82074B;
+	Sat, 15 Mar 2025 07:53:56 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 02AD82074B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1742021636;
+	bh=VBAIWlmiGTtmw6QeWmg2C8FvuMa6MzynWRVRUv/E6ow=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=vvDqCSO+S54+fxLd176tPsR3pHO7QP0u8MROgz/bQTjVT5937VtzJ1FrY3O0F/QTP
+	 G7KALHUVeilRDuEzhQNXjss83xoOuGvgSH55Y+7aDo3eybJnNGq+fYBSG+NPFQWgCi
+	 tQ/XlUUkbEPXeEeGaCBImMaT9EewWceUzzGWPZENPZjvzphSEQXsbO3VY4jkVFQeVC
+	 dkwJ3RqhwehYKaPtMi46ztJx5ZPG+iRkIOtD4gEJdM1VBQeVv1gwc633smu2ysSLJG
+	 HHKEoGSfWyb6ngUWD26vSiIM43R39GfRlh8lXtUMSg6Lktex6OHoZZWkNpDBv5uNs8
+	 KETzIsuTGFhWQ==
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Sat, 15 Mar 2025 07:53:55 +0100
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Sat, 15 Mar
+ 2025 07:53:55 +0100
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 3D3003182EDE; Sat, 15 Mar 2025 07:53:55 +0100 (CET)
+Date: Sat, 15 Mar 2025 07:53:55 +0100
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: <netdev@vger.kernel.org>
+Subject: Re: [PATCH] xfrm: ipcomp: Call pskb_may_pull in ipcomp_input
+Message-ID: <Z9UkA99pbktct7qd@gauss3.secunet.de>
+References: <Z9KTIYVFwEIYXgd7@gondor.apana.org.au>
+ <Z9T3V/M0hXIiHsLB@gauss3.secunet.de>
+ <Z9UUxb2dclH9hrWo@gondor.apana.org.au>
+ <Z9UZU6EGEF81OAYj@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d06:b0:3d3:fcff:edae with SMTP id
- e9e14a558f8ab-3d4839f5d33mr41770635ab.3.1742020023054; Fri, 14 Mar 2025
- 23:27:03 -0700 (PDT)
-Date: Fri, 14 Mar 2025 23:27:03 -0700
-In-Reply-To: <20250315055941.10487-2-enjuk@amazon.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67d51db7.050a0220.1dc86f.0002.GAE@google.com>
-Subject: Re: [syzbot] [bpf?] KASAN: slab-out-of-bounds Read in atomic_ptr_type_ok
-From: syzbot <syzbot+a5964227adc0f904549c@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, eddyz87@gmail.com, enjuk@amazon.com, haoluo@google.com, 
-	iii@linux.ibm.com, john.fastabend@gmail.com, jolsa@kernel.org, 
-	kpsingh@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
-	netdev@vger.kernel.org, sdf@fomichev.me, song@kernel.org, 
-	syzkaller-bugs@googlegroups.com, yepeilin@google.com, yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <Z9UZU6EGEF81OAYj@gondor.apana.org.au>
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-Hello,
+On Sat, Mar 15, 2025 at 02:08:19PM +0800, Herbert Xu wrote:
+> On Sat, Mar 15, 2025 at 01:48:53PM +0800, Herbert Xu wrote:
+> >
+> > Sure I can add it.  Do you mind if I push this through the crypto
+> > tree so I can base the acomp work on top of it?
+> > 
+> > I'll push this fix to Linus right away if you're OK with it.
+> 
+> Actually there is no need to push this right away because
+> xfrm_parse_spi has already done a check on the header length
+> so this should have no effect.
+> 
+> But if you're OK with this change and the xfrm_ipcomp/acomp change
+> I'd still like to push it through cryptodev.
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+Sure, go ahead.
 
-Reported-by: syzbot+a5964227adc0f904549c@syzkaller.appspotmail.com
-Tested-by: syzbot+a5964227adc0f904549c@syzkaller.appspotmail.com
-
-Tested on:
-
-commit:         2d7597d6 selftests/bpf: Fix sockopt selftest failure o..
-git tree:       bpf-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1397704c580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b7bde34acd8f53b1
-dashboard link: https://syzkaller.appspot.com/bug?extid=a5964227adc0f904549c
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=1188ae54580000
-
-Note: testing is done by a robot and is best-effort only.
+Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
 
