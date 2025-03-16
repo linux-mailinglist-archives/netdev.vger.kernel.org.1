@@ -1,112 +1,223 @@
-Return-Path: <netdev+bounces-175120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9A90A635C7
-	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 14:22:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAD43A635EA
+	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 14:56:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 214F616DB48
-	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 13:22:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4A011891700
+	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 13:56:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DF8419F487;
-	Sun, 16 Mar 2025 13:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D24511AA1E8;
+	Sun, 16 Mar 2025 13:56:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KziF8D4Z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cRHUBcbX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791CF1EA91
-	for <netdev@vger.kernel.org>; Sun, 16 Mar 2025 13:22:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2240419E7FA;
+	Sun, 16 Mar 2025 13:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742131329; cv=none; b=OLMGDFj4OBX1pk3g6e0xk1F2Itl6SEer7e8NTKadNICuvRtrhEr66Mtr7fLmoIOMI/X0k5BnJEKVQF59VSTrKO/L+QhKuHYhcsCus/JZh9j7VhI0LfRMpOu50rtekj8rzF7/rYkVkOdC1AZlSyCXZeRQ5WeD0f0fp2ePWjoHI4w=
+	t=1742133396; cv=none; b=OdC/5v/KcmOpGjdI9ieJZEI0xXvJnkXwCR1vnvlVl1nwU7HtCeWJfoCMScRisjzK/QNkhTnQgmJcFlzrHODjsHTIwVBo3pHrT2FKonpRIPI52CQCzRZ1FlaGSUTdoouDncFr8lKVZH2G1AgvlAZqNio6fE7u8HCvh9DqlkcOKyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742131329; c=relaxed/simple;
-	bh=dJIYi9XqIpGvu0y49VgI+SQYjC4U9xN+ivoowR95nbo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YpTUMiS92+/9Az/hX7NT1Q6tAgKTOrGuHUuhLPK+3mNZt7f8I4qIwCg0Hp9rxbJA54h1/bg5NE2aqGRCaObtD6lNsm+72yN2khsDgoMBONMUbRUO3KngG4a2yX6vp8/IahccMcQZ39Ku6CByAOuViFsXgG17cZDaMnt3IwH9uXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KziF8D4Z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79AFDC4CEDD;
-	Sun, 16 Mar 2025 13:22:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742131329;
-	bh=dJIYi9XqIpGvu0y49VgI+SQYjC4U9xN+ivoowR95nbo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KziF8D4ZRHB2JdI5UMMwTv3QOqHoaR7FyPwpM0XpS6NkM26dm/wN/mxrDy1ZzWd6/
-	 m8AbhJaKmWpnf/5YybcPq+9gra/o+UC909FHVxBk0SOk7Xxs3Q7HPCV0KAW3gm1Z/r
-	 mVbmWN1bwvE7Q56Km4Ih1a/0DNwfQIDM3ypsCbqdBgiKtODu7OzqcTtyNk5qLdWs/R
-	 1VZqnAFeEaW3qWDqIFYJ7lJ+gUfbj73FccUH31Q/pgRShfwI+8VF+vcHXZERosZr9c
-	 A+vfAjiHzcrIwVj4ngvKM3gMkfL2pblpBYhu8ylhmn5vI9wUaE1rALevOCPvsGBc+D
-	 9EOvptpKztlBA==
-Date: Sun, 16 Mar 2025 13:22:04 +0000
-From: Simon Horman <horms@kernel.org>
-To: Mengyuan Lou <mengyuanlou@net-swift.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, jiawenwu@trustnetic.com,
-	duanqiangwen@net-swift.com
-Subject: Re: [PATCH net-next v8 2/6] net: libwx: Add sriov api for wangxun
- nics
-Message-ID: <20250316132204.GB4159220@kernel.org>
-References: <20250309154252.79234-1-mengyuanlou@net-swift.com>
- <20250309154252.79234-3-mengyuanlou@net-swift.com>
+	s=arc-20240116; t=1742133396; c=relaxed/simple;
+	bh=/lGpgGo8Z+WG9+wFZwQUDcapNedzqeLEvT6E58LJ2TE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UUcVV39hJTIMBFsZWz7gbjEOH4hS/bPvFLZn+v+bXIfecGODAvu+HMw95GdNWNfJnIhjc6wqLuV0+lGnQ8iKrZ+CQCuE9Y8ZQPhOuT1OkHzMh/CjdqIVaTyOWEE/xkFTZ9QHV/SZQ9V4fSaeE3CxCFWWcc15XZEX09awCFx+Qds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cRHUBcbX; arc=none smtp.client-ip=209.85.128.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-6ff37565232so27574247b3.3;
+        Sun, 16 Mar 2025 06:56:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742133394; x=1742738194; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kchZ9rsgLEYdP4HGLCj7ua1euIaz8+Xk2/kromwai50=;
+        b=cRHUBcbXWVH7tlCIwBw2Dh7Ua8zYcOFjDmsavv5SC/flfGxUALgEB46ld6srdDlxTs
+         Z/miOGE6matra59jBsRtG4QBv4v+eci8oaRP29fSjLjuKaAchPny9qRfGHm2cZBNAi6/
+         xjwjbjeCSSuOiXzADknO4Tb+WaqgbD9YR1An5jrNXMcmBbtJFjYsg5dyY8srrlOx/7wy
+         ApD3NlXU9u4yy6AcuKHhZL/WkMsaCpI+pZ5WY9iwVfdHcN2uJh1A/6TJpFxDAb1AV8wW
+         SH6q6uvBChdd4+vGkML5Ub/9FOO9MVcIZODB0RU3+YjV+U7+VX8yMEGWiUFH0YSsXOYS
+         rChw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742133394; x=1742738194;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kchZ9rsgLEYdP4HGLCj7ua1euIaz8+Xk2/kromwai50=;
+        b=j+5PJ95H0CFiLuURq9HfN7Z1/h/yWhqkJgoXfz94YVq3BN1A5nel1DiiuwdzAiO1jT
+         j+KwC+kCjvsgcvWMpjfWaMf3d1EaajqGG6D1aDPKJrjZI24Jx2AK0E2TjIcERYvWVa1+
+         qN19CO1v6hEwdZ6fEw24Aq1Z/qLaQW09La16p/ZYYZHnhm3K/80jsnPWc7/kzxUxNT+d
+         lnYS5fWTxz6dUEXRLKrKIGu+tcqYRx2SZavRCKvzJVcoFTxuoA3ixS2t/fnvUV6nSVEG
+         o1wKrnCz2tYnphK857qdsH9OUTyDtm5iwzsga2HMNb+ssZ9mEP/dTlXuWahVe2nMOfpv
+         1j7g==
+X-Forwarded-Encrypted: i=1; AJvYcCXI6phZbJvz6DnwHBt1P4+q7BXtIVupGqwS/a193XS+S4D4YfLYrjbFx6zrXJtuPEh2I/o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKaUyg4SCrAToNE6UQDcGvcL0MCUOc4Xyxa1k8CPlvJUYVo9jb
+	V1qc8UOmnbcZQtzRHFlMGsn2XWAwKTtnGpxbHIgJtaqbPUxnYiWDuv4RR1kMV0C5Au/f3v77ijb
+	yXmTAqW84ADkS2KYaz6Qc8RaMPFQ=
+X-Gm-Gg: ASbGncvTZfF5LJpIniHk3BVy7lBF0pTZ1kbk24ixv3oLC8Pd1hhB8aexi3g+dVLp7h9
+	i3HJXtTP/4oYDsaGLbEQoKic8Jfv7gThgSXMgl+6AUIU0fKLh4Imu5iTYSvJM4TOmKayxG17HE7
+	wOdvwSotcPZAvJYJOsXGbWaPR+qg==
+X-Google-Smtp-Source: AGHT+IGOKmvfI+PIr0gYbk8ytJNZWHi+UTRo4SUDBVBphAuRu6c9gmeU9e/Pnbuyeyw/NZGtpHQGDZRHjPHO49suYt0=
+X-Received: by 2002:a05:690c:6007:b0:6f7:ac3f:d589 with SMTP id
+ 00721157ae682-6ff4605668bmr117309927b3.36.1742133393987; Sun, 16 Mar 2025
+ 06:56:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250309154252.79234-3-mengyuanlou@net-swift.com>
+References: <20250313190309.2545711-1-ameryhung@gmail.com> <20250313190309.2545711-8-ameryhung@gmail.com>
+ <CAADnVQKBe89WSjwsMaaGGmHAtGSSvCVQ+f7HstjQBzx8pu2gUQ@mail.gmail.com>
+In-Reply-To: <CAADnVQKBe89WSjwsMaaGGmHAtGSSvCVQ+f7HstjQBzx8pu2gUQ@mail.gmail.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Sun, 16 Mar 2025 21:56:22 +0800
+X-Gm-Features: AQ5f1Jqd8J8t5MWQDg4l8FLrppQPFJYtOK9dB4_r_wBc_j4yAos_mT3gPaXsTxQ
+Message-ID: <CAMB2axM-601dn0_vvprHp5qdVPb2-204ZHR8zh2pwo6GHo6UCQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v5 07/13] bpf: net_sched: Support updating qstats
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Kui-Feng Lee <sinquersw@gmail.com>, 
+	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	Jiri Pirko <jiri@resnulli.us>, Stanislav Fomichev <stfomichev@gmail.com>, 
+	ekarani.silvestre@ccc.ufcg.edu.br, yangpeihao@sjtu.edu.cn, 
+	Peilin Ye <yepeilin.cs@gmail.com>, Kernel Team <kernel-team@meta.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Mar 09, 2025 at 11:42:48PM +0800, Mengyuan Lou wrote:
-> Implement sriov_configure interface for wangxun nics in libwx.
-> Enable VT mode and initialize vf control structure, when sriov
-> is enabled. Do not be allowed to disable sriov when vfs are
-> assigned.
-> 
-> Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
+On Sat, Mar 15, 2025 at 4:24=E2=80=AFAM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
+>
+> On Thu, Mar 13, 2025 at 12:03=E2=80=AFPM Amery Hung <ameryhung@gmail.com>=
+ wrote:
+> >
+> > From: Amery Hung <amery.hung@bytedance.com>
+> >
+> > Allow bpf qdisc programs to update Qdisc qstats directly with btf struc=
+t
+> > access.
+> >
+> > Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+> > ---
+> >  net/sched/bpf_qdisc.c | 53 ++++++++++++++++++++++++++++++++++++-------
+> >  1 file changed, 45 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/net/sched/bpf_qdisc.c b/net/sched/bpf_qdisc.c
+> > index edf01f3f1c2a..6ad3050275a4 100644
+> > --- a/net/sched/bpf_qdisc.c
+> > +++ b/net/sched/bpf_qdisc.c
+> > @@ -36,6 +36,7 @@ bpf_qdisc_get_func_proto(enum bpf_func_id func_id,
+> >         }
+> >  }
+> >
+> > +BTF_ID_LIST_SINGLE(bpf_qdisc_ids, struct, Qdisc)
+> >  BTF_ID_LIST_SINGLE(bpf_sk_buff_ids, struct, sk_buff)
+> >  BTF_ID_LIST_SINGLE(bpf_sk_buff_ptr_ids, struct, bpf_sk_buff_ptr)
+> >
+> > @@ -60,20 +61,37 @@ static bool bpf_qdisc_is_valid_access(int off, int =
+size,
+> >         return bpf_tracing_btf_ctx_access(off, size, type, prog, info);
+> >  }
+> >
+> > -static int bpf_qdisc_btf_struct_access(struct bpf_verifier_log *log,
+> > -                                       const struct bpf_reg_state *reg=
+,
+> > -                                       int off, int size)
+> > +static int bpf_qdisc_qdisc_access(struct bpf_verifier_log *log,
+> > +                                 const struct bpf_reg_state *reg,
+> > +                                 int off, int size)
+>
+> Introducing this func in patch 3 and refactoring in patch 7 ?
+> pls avoid the churn.
+> squash it ?
+>
+> if (off + size > end) check wouldn't need to be duplicated.
+> Can get the name of struct from btf for bpf_log() purpose.
+>
 
-...
+I will squash this patch to patch 3 and share the check in
+bpf_qdisc_btf_struct_access() to avoid duplication.
 
-> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-> new file mode 100644
-> index 000000000000..2392df341ad1
-> --- /dev/null
-> +++ b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-> @@ -0,0 +1,201 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright (c) 2015 - 2025 Beijing WangXun Technology Co., Ltd. */
-> +
-> +#include <linux/etherdevice.h>
-> +#include <linux/pci.h>
-> +
-> +#include "wx_type.h"
-> +#include "wx_mbx.h"
-> +#include "wx_sriov.h"
-> +
-> +static void wx_vf_configuration(struct pci_dev *pdev, int event_mask)
-> +{
-> +	unsigned int vfn = (event_mask & GENMASK(5, 0));
-> +	struct wx *wx = pci_get_drvdata(pdev);
-> +
-> +	bool enable = ((event_mask & BIT(31)) != 0);
+Thanks,
+Amery
 
-Sorry to nit-pick, and I'd be happy for this to be addressed as a
-follow-up, but I think that it would be nice to:
-
-1. Both use some #defines and FIELD_GET() for the masking above.
-
-2. Use !! in place of != 0
-
-3. Arrange local variable declarations in reverse xmas tree order.
-
-> +
-> +	if (enable)
-> +		eth_zero_addr(wx->vfinfo[vfn].vf_mac_addr);
-> +}
-
-...
+> >  {
+> > -       const struct btf_type *t, *skbt;
+> >         size_t end;
+> >
+> > -       skbt =3D btf_type_by_id(reg->btf, bpf_sk_buff_ids[0]);
+> > -       t =3D btf_type_by_id(reg->btf, reg->btf_id);
+> > -       if (t !=3D skbt) {
+> > -               bpf_log(log, "only read is supported\n");
+> > +       switch (off) {
+> > +       case offsetof(struct Qdisc, qstats) ... offsetofend(struct Qdis=
+c, qstats) - 1:
+> > +               end =3D offsetofend(struct Qdisc, qstats);
+> > +               break;
+> > +       default:
+> > +               bpf_log(log, "no write support to Qdisc at off %d\n", o=
+ff);
+> > +               return -EACCES;
+> > +       }
+> > +
+> > +       if (off + size > end) {
+> > +               bpf_log(log,
+> > +                       "write access at off %d with size %d beyond the=
+ member of Qdisc ended at %zu\n",
+> > +                       off, size, end);
+> >                 return -EACCES;
+> >         }
+> >
+> > +       return 0;
+> > +}
+> > +
+> > +static int bpf_qdisc_sk_buff_access(struct bpf_verifier_log *log,
+> > +                                   const struct bpf_reg_state *reg,
+> > +                                   int off, int size)
+> > +{
+> > +       size_t end;
+> > +
+> >         switch (off) {
+> >         case offsetof(struct sk_buff, tstamp):
+> >                 end =3D offsetofend(struct sk_buff, tstamp);
+> > @@ -115,6 +133,25 @@ static int bpf_qdisc_btf_struct_access(struct bpf_=
+verifier_log *log,
+> >         return 0;
+> >  }
+> >
+> > +static int bpf_qdisc_btf_struct_access(struct bpf_verifier_log *log,
+> > +                                      const struct bpf_reg_state *reg,
+> > +                                      int off, int size)
+> > +{
+> > +       const struct btf_type *t, *skbt, *qdisct;
+> > +
+> > +       skbt =3D btf_type_by_id(reg->btf, bpf_sk_buff_ids[0]);
+> > +       qdisct =3D btf_type_by_id(reg->btf, bpf_qdisc_ids[0]);
+> > +       t =3D btf_type_by_id(reg->btf, reg->btf_id);
+> > +
+> > +       if (t =3D=3D skbt)
+> > +               return bpf_qdisc_sk_buff_access(log, reg, off, size);
+> > +       else if (t =3D=3D qdisct)
+> > +               return bpf_qdisc_qdisc_access(log, reg, off, size);
+> > +
+> > +       bpf_log(log, "only read is supported\n");
+> > +       return -EACCES;
+> > +}
+> > +
+> >  BTF_ID_LIST(bpf_qdisc_init_prologue_ids)
+> >  BTF_ID(func, bpf_qdisc_init_prologue)
+> >
+> > --
+> > 2.47.1
+> >
 
