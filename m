@@ -1,198 +1,135 @@
-Return-Path: <netdev+bounces-175141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DEF2A63753
-	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 21:09:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78D04A63754
+	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 21:11:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 861DD7A6136
-	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 20:08:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64E94188D8D7
+	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 20:11:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FCA218DB0C;
-	Sun, 16 Mar 2025 20:09:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6073E1D8A12;
+	Sun, 16 Mar 2025 20:11:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="GQohJsO1"
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="CtnrFBzY"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
+Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A13153BE8
-	for <netdev@vger.kernel.org>; Sun, 16 Mar 2025 20:09:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A1418C031
+	for <netdev@vger.kernel.org>; Sun, 16 Mar 2025 20:11:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742155753; cv=none; b=tiy1cJt0l8U8+W3/Qgkx3duyMsL7uPku93KnEpmSsVpJfwiyt9BRKJFhka9/U0nSFrwgLG0ZTVSIMtYBTou/mcU1ocM9/hqR/30sHXuMvO/XvRPwH8K0UQeNpieTiMHM0UAVG14vKOpYE8KYL3MpeJX6W9t73nn1qW+MiDAPDRM=
+	t=1742155900; cv=none; b=KK9zqS4bZy8sqfIy6/qttMvrZIZ+X1JVyyTnxI3M1LXoflbEfP78n5xPQrpLji6dYrJX8bE63qFFZMKjM4ClomWAE7+ERMjbrSViwLtkn0ujVZZizGWn6PGsrW7SsyVpxQgYD2Y0YnZGwlCeTbUFBkdMuadnpAdE9Ej7PdMlVYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742155753; c=relaxed/simple;
-	bh=QyYE8MC+awhmnBBrOcT/c8PGT67jgrnjcBFJjPby+8A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gGbJMtF42tFgiwiohvPvrDgsi6T9oqeJ57qJhMeQLKth3hd0Mt7+80fITIr/MYTzH4bETqxdOs7h/6TNB2R5Qwcqw7vkgm2EdyTzbNinjOMKctoWxBFZif724+diI5cTVItSS1Er1OplKqBIxDk7F15NP0iFkJsS4r5hfColdt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=GQohJsO1; arc=none smtp.client-ip=202.12.124.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 558BF25400B1;
-	Sun, 16 Mar 2025 16:09:10 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-12.internal (MEProxy); Sun, 16 Mar 2025 16:09:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1742155750; x=1742242150; bh=BIoNVnMM8sikv9aIRRLD96b8AYmUpy9St9o
-	KK0m5ixM=; b=GQohJsO1d03mXt9sh2Itd1ep13D4Ohoei9pwnzNtfh/RUSYEK9U
-	suskxlfSuhBHzGQdrKX9OJocQdDceMUKkHIGHAnnLO0XsGF65p8g/A5VeD2X6Wno
-	7/f1fMZn1BBbgmDYUHj8oe99ZvY7Lg/LMKEUIpLHih3BSIhduj1p7jW+uaRxflEc
-	V1qYXuy0p6pEmbhr+T51lvQLRFNEkcLMb7WHjLt5ntwALfN31tPwCLAq6CEz+Mpj
-	c9MBNjPbNO7zaLPk0QAwNnZGU3nX56dL3soKZqwuAA2/5zHNsbdxjlz7F5Gca16O
-	qIlE2kJapnhk2EyG7P1YZUvxZOeD2o60V4A==
-X-ME-Sender: <xms:5S_XZ4k7Z4koVnSkCvSsYndAzP3LdNqar80XnM-e8d-f8NDJeMWwRw>
-    <xme:5S_XZ32Lszj7HULLusuVz5meJ2P7fBEcHPZhYBOg_IHXuwpkKAaC19Z80P043F5KT
-    fzvvOLGrc0u7Pk>
-X-ME-Received: <xmr:5S_XZ2oKYWg9d6jlgg9hWoTz6fOSohxXv3haevzqugqL8CKmtaP5UtDXdTN2k6LhM4TV_NiIrsnpwLoirMozUvXwxmF4Ow>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddufeejheefucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
-    vdenucfhrhhomhepkfguohcuufgthhhimhhmvghluceoihguohhstghhsehiughoshgthh
-    drohhrgheqnecuggftrfgrthhtvghrnhephefhtdejvdeiffefudduvdffgeetieeigeeu
-    gfduffdvffdtfeehieejtdfhjeeknecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenuc
-    evlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgt
-    hhesihguohhstghhrdhorhhgpdhnsggprhgtphhtthhopedujedpmhhouggvpehsmhhtph
-    houhhtpdhrtghpthhtohepkhhunhhihihusegrmhgriihonhdrtghomhdprhgtphhtthho
-    pegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmh
-    esuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhg
-    lhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtth
-    hopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheprhhoohhprgesnhhv
-    ihguihgrrdgtohhmpdhrtghpthhtoheprhgriihorhessghlrggtkhifrghllhdrohhrgh
-    dprhgtphhtthhopeifihhllhgvmhgssehgohhoghhlvgdrtghomh
-X-ME-Proxy: <xmx:5S_XZ0kXSGt_-HdouXS-pPnD2ipExYIdTufTSa8aHrksbyELKK5LIQ>
-    <xmx:5S_XZ21ELXSOAJMaMdKk_nqk0LrH3LqW69RT84Ynlo-4lM-76pb85w>
-    <xmx:5S_XZ7usIj4Rmtu1-L41vmIncgHu8kCI5g6vIDrUSWyfwRDkGHsmzg>
-    <xmx:5S_XZyUf9XQ_56iOGUhKRXbCYdg31JSM4aGHz05tKcfQrt-h89x6ZA>
-    <xmx:5i_XZ_HHAbM112yAaHywgtfB7ZMO0u6Bo18Hfr6Muolu8dLon8KD6pGJ>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 16 Mar 2025 16:09:08 -0400 (EDT)
-Date: Sun, 16 Mar 2025 22:09:05 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Willem de Bruijn <willemb@google.com>,
-	Simon Horman <horms@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
-	bridge@lists.linux.dev, syzkaller <syzkaller@googlegroups.com>,
-	yan kang <kangyan91@outlook.com>, yue sun <samsun1006219@gmail.com>
-Subject: Re: [PATCH v2 net] net: Remove RTNL dance for SIOCBRADDIF and
- SIOCBRDELIF.
-Message-ID: <Z9cv4XXz3pzL4qrp@shredder>
-References: <20250316192851.19781-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1742155900; c=relaxed/simple;
+	bh=0mUmMxXCX1cpxTz2Mz/moHeklg4+C/Cf9N36sstH51o=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=GIQfDDibJvvJdr39RRChWOLplWn51+2LaSxHeDOWDiAOoM6Ehyvz2gPjvY/oEhXlWvjHoaImKbZKJDnAWLVmGhufLJ3/SbLR60JUYsq2oQPuGwkRKEKpX1XABtCbQgqqpW6KS8tzIb4kmQHqwcJVrHdaep98WuxM8GAXFFM0wBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=CtnrFBzY; arc=none smtp.client-ip=202.36.163.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
+Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 577972C0308;
+	Mon, 17 Mar 2025 09:11:29 +1300 (NZDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
+	s=mail181024; t=1742155889;
+	bh=0mUmMxXCX1cpxTz2Mz/moHeklg4+C/Cf9N36sstH51o=;
+	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
+	b=CtnrFBzY7nvQRscJKjC36bAmd4MtrqDTMnrLNexLtcatatVglzko9AWo5emD/MpEZ
+	 2wENMKBTgHZwFQyFgRzQrrRAuLxWa9bzX6i/xvXypIYHW3Zsg3WmksbmQ5HrxRg+vi
+	 d9CGhBoGaXI3lAZIV23R7ZdnrXX8shTAIhoRYgImwI3vFhMqBy9me2BbBLp06IBSQW
+	 T1EsZPPJ+iSHV9l5SUxgtK5LxApbD+kX4TOYpmkww0Uy0bNi84MvHvccis76NyOIgH
+	 wVg/MegkkHseqx8xbUMFg/1iYlBWViZ9Rf0is8Bh2OYmOTNfa6som2inCbOGMA7oc8
+	 LvpS2OBkb48qw==
+Received: from svr-chch-ex2.atlnz.lc (Not Verified[2001:df5:b000:bc8::76]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
+	id <B67d730710001>; Mon, 17 Mar 2025 09:11:29 +1300
+Received: from svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8:f753:6de:11c0:a008) by
+ svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8:f753:6de:11c0:a008) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Mon, 17 Mar 2025 09:11:29 +1300
+Received: from svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567]) by
+ svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567%15]) with mapi id
+ 15.02.1544.014; Mon, 17 Mar 2025 09:11:29 +1300
+From: Chris Packham <Chris.Packham@alliedtelesis.co.nz>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "hkallweit1@gmail.com" <hkallweit1@gmail.com>, "linux@armlinux.org.uk"
+	<linux@armlinux.org.uk>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"sander@svanheule.net" <sander@svanheule.net>, "markus.stockhausen@gmx.de"
+	<markus.stockhausen@gmx.de>, "daniel@makrotopia.org" <daniel@makrotopia.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next v11] net: mdio: Add RTL9300 MDIO driver
+Thread-Topic: [PATCH net-next v11] net: mdio: Add RTL9300 MDIO driver
+Thread-Index: AQHblHD+sucKWV4o3UuKUqKx7BHBP7Nx6AeAgAN0XAA=
+Date: Sun, 16 Mar 2025 20:11:29 +0000
+Message-ID: <d260e3d1-20e9-42f6-89b6-e646b8107bc0@alliedtelesis.co.nz>
+References: <20250313233811.3280255-1-chris.packham@alliedtelesis.co.nz>
+ <bd1d1cb9-a72b-484b-8cfd-7e91179391d2@lunn.ch>
+In-Reply-To: <bd1d1cb9-a72b-484b-8cfd-7e91179391d2@lunn.ch>
+Accept-Language: en-NZ, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F0A573F589DFBC45AC03290BDD6EFDCB@alliedtelesis.co.nz>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250316192851.19781-1-kuniyu@amazon.com>
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=Ko7u2nWN c=1 sm=1 tr=0 ts=67d73071 a=Xf/6aR1Nyvzi7BryhOrcLQ==:117 a=xqWC_Br6kY4A:10 a=75chYTbOgJ0A:10 a=IkcTkHD0fZMA:10 a=Vs1iUdzkB0EA:10 a=VwQbUJbxAAAA:8 a=-mZtVxzNVz2t5w4VDjUA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-SEG-SpamProfiler-Score: 0
 
-On Sun, Mar 16, 2025 at 12:28:37PM -0700, Kuniyuki Iwashima wrote:
-> SIOCBRDELIF is passed to dev_ioctl() first and later forwarded to
-> br_ioctl_call(), which causes unnecessary RTNL dance and the splat
-> below [0] under RTNL pressure.
-> 
-> Let's say Thread A is trying to detach a device from a bridge and
-> Thread B is trying to remove the bridge.
-> 
-> In dev_ioctl(), Thread A bumps the bridge device's refcnt by
-> netdev_hold() and releases RTNL because the following br_ioctl_call()
-> also re-acquires RTNL.
-> 
-> In the race window, Thread B could acquire RTNL and try to remove
-> the bridge device.  Then, rtnl_unlock() by Thread B will release RTNL
-> and wait for netdev_put() by Thread A.
-> 
-> Thread A, however, must hold RTNL after the unlock in dev_ifsioc(),
-> which may take long under RTNL pressure, resulting in the splat by
-> Thread B.
-> 
->   Thread A (SIOCBRDELIF)           Thread B (SIOCBRDELBR)
->   ----------------------           ----------------------
->   sock_ioctl                       sock_ioctl
->   `- sock_do_ioctl                 `- br_ioctl_call
->      `- dev_ioctl                     `- br_ioctl_stub
->         |- rtnl_lock                     |
->         |- dev_ifsioc                    '
->         '  |- dev = __dev_get_by_name(...)
->            |- netdev_hold(dev, ...)      .
->        /   |- rtnl_unlock  ------.       |
->        |   |- br_ioctl_call       `--->  |- rtnl_lock
->   Race |   |  `- br_ioctl_stub           |- br_del_bridge
->   Window   |     |                       |  |- dev = __dev_get_by_name(...)
->        |   |     |  May take long        |  `- br_dev_delete(dev, ...)
->        |   |     |  under RTNL pressure  |     `- unregister_netdevice_queue(dev, ...)
->        |   |     |               |       `- rtnl_unlock
->        \   |     |- rtnl_lock  <-'          `- netdev_run_todo
->            |     |- ...                        `- netdev_run_todo
->            |     `- rtnl_unlock                   |- __rtnl_unlock
->            |                                      |- netdev_wait_allrefs_any
->            |- netdev_put(dev, ...)  <----------------'
->                                                 Wait refcnt decrement
->                                                 and log splat below
-> 
-> To avoid blocking SIOCBRDELBR unnecessarily, let's not call
-> dev_ioctl() for SIOCBRADDIF and SIOCBRDELIF.
-> 
-> In the dev_ioctl() path, we do the following:
-> 
->   1. Copy struct ifreq by get_user_ifreq in sock_do_ioctl()
->   2. Check CAP_NET_ADMIN in dev_ioctl()
->   3. Call dev_load() in dev_ioctl()
->   4. Fetch the master dev from ifr.ifr_name in dev_ifsioc()
-> 
-> 3. can be done by request_module() in br_ioctl_call(), so we move
-> 1., 2., and 4. to br_ioctl_stub().
-> 
-> Note that 2. is also checked later in add_del_if(), but it's better
-> performed before RTNL.
-> 
-> SIOCBRADDIF and SIOCBRDELIF have been processed in dev_ioctl() since
-> the pre-git era, and there seems to be no specific reason to process
-> them there.
-> 
-> [0]:
-> unregister_netdevice: waiting for wpan3 to become free. Usage count = 2
-> ref_tracker: wpan3@ffff8880662d8608 has 1/1 users at
->      __netdev_tracker_alloc include/linux/netdevice.h:4282 [inline]
->      netdev_hold include/linux/netdevice.h:4311 [inline]
->      dev_ifsioc+0xc6a/0x1160 net/core/dev_ioctl.c:624
->      dev_ioctl+0x255/0x10c0 net/core/dev_ioctl.c:826
->      sock_do_ioctl+0x1ca/0x260 net/socket.c:1213
->      sock_ioctl+0x23a/0x6c0 net/socket.c:1318
->      vfs_ioctl fs/ioctl.c:51 [inline]
->      __do_sys_ioctl fs/ioctl.c:906 [inline]
->      __se_sys_ioctl fs/ioctl.c:892 [inline]
->      __x64_sys_ioctl+0x1a4/0x210 fs/ioctl.c:892
->      do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->      do_syscall_64+0xcb/0x250 arch/x86/entry/common.c:83
->      entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> Fixes: 893b19587534 ("net: bridge: fix ioctl locking")
-> Reported-by: syzkaller <syzkaller@googlegroups.com>
-> Reported-by: yan kang <kangyan91@outlook.com>
-> Reported-by: yue sun <samsun1006219@gmail.com>
-> Closes: https://lore.kernel.org/netdev/SY8P300MB0421225D54EB92762AE8F0F2A1D32@SY8P300MB0421.AUSP300.PROD.OUTLOOK.COM/
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+DQpPbiAxNS8wMy8yMDI1IDA0OjI2LCBBbmRyZXcgTHVubiB3cm90ZToNCj4+ICtzdGF0aWMgaW50
+IHJ0bDkzMDBfbWRpb2J1c19wcm9iZV9vbmUoc3RydWN0IGRldmljZSAqZGV2LCBzdHJ1Y3QgcnRs
+OTMwMF9tZGlvX3ByaXYgKnByaXYsDQo+PiArCQkJCSAgICAgc3RydWN0IGZ3bm9kZV9oYW5kbGUg
+Km5vZGUpDQo+PiArew0KPj4gKwlzdHJ1Y3QgcnRsOTMwMF9tZGlvX2NoYW4gKmNoYW47DQo+PiAr
+CXN0cnVjdCBmd25vZGVfaGFuZGxlICpjaGlsZDsNCj4+ICsJc3RydWN0IG1paV9idXMgKmJ1czsN
+Cj4+ICsJdTMyIG1kaW9fYnVzOw0KPj4gKwlpbnQgZXJyOw0KPj4gKw0KPj4gKwllcnIgPSBmd25v
+ZGVfcHJvcGVydHlfcmVhZF91MzIobm9kZSwgInJlZyIsICZtZGlvX2J1cyk7DQo+PiArCWlmIChl
+cnIpDQo+PiArCQlyZXR1cm4gZXJyOw0KPj4gKw0KPj4gKwkvKiBUaGUgTURJTyBpbnRlcmZhY2Vz
+IGFyZSBlaXRoZXIgaW4gR1BIWSAoaS5lLiBjbGF1c2UgMjIpIG9yIDEwR1BIWQ0KPj4gKwkgKiBt
+b2RlIChpLmUuIGNsYXVzZSA0NSkuDQo+IEkgc3RpbGwgbmVlZCBtb3JlIGNsYXJpZmljYXRpb24g
+YWJvdXQgdGhpcy4gSXMgdGhpcyBzb2xlbHkgYWJvdXQgdGhlDQo+IHBvbGxpbmc/IE9yIGRvZXMg
+YW4gaW50ZXJmYWNlIGluIEMyMiBtb2RlIGdvIGhvcnJpYmx5IHdyb25nIHdoZW4gYXNrZWQNCj4g
+dG8gZG8gYSBDNDUgYnVzIHRyYW5zYWN0aW9uPw0KDQpJdCdzIGp1c3QgdGhlIHBvbGxpbmcuIEkg
+aGF2ZW4ndCBzZWVuIGFueSBzaWduIG9mIHRoZSBidXMgZ2V0dGluZyBpbnRvIGEgDQpiYWQgc3Rh
+dGUgd2hlbiB1c2luZyB0aGUgd3JvbmcgdHJhbnNhY3Rpb24gdHlwZS4NCg0KPj4gKwlidXMtPm5h
+bWUgPSAiUmVhbHRlayBTd2l0Y2ggTURJTyBCdXMiOw0KPj4gKwlidXMtPnJlYWQgPSBydGw5MzAw
+X21kaW9fcmVhZF9jMjI7DQo+PiArCWJ1cy0+d3JpdGUgPSBydGw5MzAwX21kaW9fd3JpdGVfYzIy
+Ow0KPj4gKwlidXMtPnJlYWRfYzQ1ID0gcnRsOTMwMF9tZGlvX3JlYWRfYzQ1Ow0KPj4gKwlidXMt
+PndyaXRlX2M0NSA9ICBydGw5MzAwX21kaW9fd3JpdGVfYzQ1Ow0KPiBZb3UgYXJlIHByb3ZpZGlu
+ZyBDNDUgYnVzIG1ldGhvZHMsIGluZGVwZW5kZW50IG9mIHRoZSBpbnRlcmZhY2UNCj4gbW9kZS4g
+U28gd2hlbiBhY2Nlc3NpbmcgRUVFIHJlZ2lzdGVycyBpbiBDNDUgYWRkcmVzcyBzcGFjZSwgQzQ1
+IGJ1cw0KPiB0cmFuc2FjdGlvbnMgYXJlIGdvaW5nIHRvIGJlIHVzZWQsIGV2ZW4gb24gYW4gTURJ
+TyBpbnRlcmZhY2UgdXNpbmcgQzIyDQo+IG1vZGUuIERvZXMgdGhpcyB3b3JrPyBDYW4geW91IGFj
+dHVhbGx5IGRvIGJvdGggQzIyIGFuZCBDNDUgYnVzDQo+IHRyYW5zYWN0aW9ucyBpbmRlcGVuZGVu
+dCBvZiB0aGUgaW50ZXJmYWNlIG1vZGU/DQpJJ20gbm90IGFjdHVhbGx5IHN1cmUgaWYgSSBjYW4g
+bWl4IHRyYW5zYWN0aW9ucyBidXQgaXQgZG9lc24ndCBzZWVtIHRvIA0KZG8gYW55IGhhcm0uDQoN
+CkluaXRpYWxseSBJIHBsYW5uZWQgdG8gb25seSBzdXBwbHkgb25lIG9mIHRoZSBmdW5jdGlvbiBw
+YWlycyBkZXBlbmRpbmcgDQpvbiB0aGUgbW9kZSBidXQgSSBsZWZ0IHRoaXMgaW4gYmVjYXVzZSBv
+ZiB0aGlzOg0KDQpodHRwczovL3dlYi5naXQua2VybmVsLm9yZy9wdWIvc2NtL2xpbnV4L2tlcm5l
+bC9naXQvdG9ydmFsZHMvbGludXguZ2l0L3RyZWUvZHJpdmVycy9uZXQvcGh5L3BoeS5jI24zMzcN
+Cg0KSSd2ZSB3cml0dGVuIG15c2VsZiBhIGxpdHRsZSB0ZXN0IGFwcCB0aGF0IHVzZXMgU0lPQ0dN
+SUlSRUcvU0lPQ1NNSUlSRUcgDQp0byBleGVyY2lzZSB0aGUgTURJTyBhY2Nlc3Nlcy4gSXQgdXNl
+cyBTSU9DR01JSVBIWSB0byBsb29rIHVwIHRoZSBNRElPIA0KYWRkcmVzcyBvZiB0aGUgUEhZIGF0
+dGFjaGVkIHRvIHRoZSBuZXRkZXYgYnV0IGJlY2F1c2Ugb2YgdGhhdCANCmZhbGx0aHJvdWdoIGxv
+b2tpbmcgdXAgdGhlIFBIWSBhZGRyZXNzIGZvciBhIEM0NSBQSFkgd2lsbCBmYWlsIHdpdGggDQot
+RU9QTk9UU1VQUC4NCg0KSSd2ZSBzcXVpbnRlZCBhdCB0aGF0IGNvZGUgYW5kIGNhbid0IGRlY2lk
+ZSBpZiBpdCdzIGEgYnVnIG9yIGludGVuZGVkLiANCkl0IHNlZW1zIHRvIGJlIHRoZXJlIHRvIHZh
+bGlkYXRlIGlmIHRoZSBQSFkgaXMgYWN0dWFsbHkgcHJlc2VudCBhbmQgd2lsbCANCndvcmtzIGZv
+ciBDMjIgYmVjYXVzZSBtaWlfZGF0YS0+cmVnX251bSB3aWxsIGNvbWUgdGhyb3VnaCB0aGUgaW9j
+dGwgKG9yIA0KYmVjYXVzZSAwIGlzIGEgdmFsaWQgcmVnaXN0ZXIpIC4gSXQgd29uJ3Qgd29yayBm
+b3IgQzQ1IGJlY2F1c2UgDQpTSU9DR01JSVBIWSBoYXMgbm8gd2F5IG9mIHN1cHBseWluZyB0aGUg
+TU1EIGRldmljZS4NCg0KDQo+DQo+IAlBbmRyZXc=
 
