@@ -1,76 +1,78 @@
-Return-Path: <netdev+bounces-175123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DAB0A6360D
-	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 15:20:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97C63A6360F
+	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 15:20:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB5A77A7189
-	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 14:18:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DE611891852
+	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 14:20:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C97CC1A9B46;
-	Sun, 16 Mar 2025 14:19:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DD871AA795;
+	Sun, 16 Mar 2025 14:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XZd3Q3Z+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z3PVDUIX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6251F941;
-	Sun, 16 Mar 2025 14:19:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C64FA1F941;
+	Sun, 16 Mar 2025 14:20:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742134794; cv=none; b=YsaitslPwoof18h5UnAQ2PcWwYLQhFNF2ND43iM828gu+iwe+SazDp4EsWLWvK/GWODGV5tdaFqEPe+2cw10xwPSHALJgVnBCshHj/HmeMkNCB4evmrn6Gw/Bz6/k7u9JjwBtc7MlL+w2O7Jgo4LFsRAIrmP3UaUVcgbvs4mpmg=
+	t=1742134804; cv=none; b=q/BoHdLHRIlGyBoEjIhL0LFT3V/Es9df61Jxni7RDGCvAlaCCmcXo8PNN4qloF7DRVTuwNYoHvutEPM5nJQhyaz+it4jfvhuGClRKeEkCaQqp/Rlc0TXixz/cAXxI8ZfQu2r8l0LIu0kUYkWXsG3nhrZrMDWMOf1d18IvzS5ZAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742134794; c=relaxed/simple;
-	bh=ye63Bywgn9YfCCvNohfZiaNzW5kJ0zlKOT4zBINkPYg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VFuROco2SBILLs3vc9uw+/8p64cip0HTZ7abGWuK18zxobjhXNmf5g5fhl9r8tj6NQMEEr0GoP6d3SrSjbCLABLzyKidUNTh2oQjMIFJ/lCwyba/mhpRIyeRdfttg5up2aO4IvJEVZPSHAu8JE/N/vikUpv22f+JAoYtSgVwUxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XZd3Q3Z+; arc=none smtp.client-ip=209.85.214.182
+	s=arc-20240116; t=1742134804; c=relaxed/simple;
+	bh=SM9sVUEo6LLFEorZIojkx26q2P18H2FzZgNAy/r5RiA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=KLgfnfqaEVExYrGffmOgb+5GYcB/YhRbbqexZ8YMfqOL8KbyodiFwJ4eRRb8TSBx4K8oJ9W8zgMXCstiM0oeA9exoDmOJp4rjQGyigiNEmbFh/pIXgiP9HMkrR0iVEZXw8EahEyYhsuVhmC6enquSMwCE7W0PL/gqHABm7yJ9AM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z3PVDUIX; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-225df540edcso36178685ad.0;
-        Sun, 16 Mar 2025 07:19:53 -0700 (PDT)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-226185948ffso153165ad.0;
+        Sun, 16 Mar 2025 07:20:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742134792; x=1742739592; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PEZkI1Sjt2nCNeQ1kxcl7qReMGGjv6RMkaomdlrg8jg=;
-        b=XZd3Q3Z+y6JqF8Dm+RVqv/Ebu59yUTafcjWG8zUHD56YB3rKfLIa/h7U2XZjipMns4
-         RRFp9RoXlRe0NpafhNV+s7vyInz59KVLQ0vLML7bik4GLKLPDTpx8yoh4UiZUBHV5aH6
-         mVMHuxYy5GPyYyAJ7x5cugTlqtBwznul9q4yvwt+k3BsRWwCrF9FG+rT7Igo7Bj2wZxK
-         ROjBP3Oagb7u9C2buPAzT88sEpXMFuXb0MHZ98kTmaO5d8AFPXgPs8iZGhmFqDPczynt
-         iub70B7HcQ0kSV8m3ak3bWWK8rx4KQHNEqkabAgP/W/sAFllEaDAj6Zty29njvLjcsa5
-         6C0g==
+        d=gmail.com; s=20230601; t=1742134802; x=1742739602; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Osx6qrHXrN5QGo/98Mcul05sdcRwgeDonPsp/lg3Azs=;
+        b=Z3PVDUIXcEtnip+ddv1A5+mZpoMalxMrdtzNG+g9tTd2B4FdJJOZCQAZoUAF0MtzVa
+         XQbo6d7nVRf36kkv64FW9WRMZy35gmEuyJ0I19twpW+t2zZBnEhUkW6HtLZM3gmcS82O
+         VT7KDb9txaHdhMPP1jR5fdqU6evUT6LmlLvV9af2EXF3D2F/0C6lrCQwfawzDGtsd5N3
+         R2hav/WkdxKp8Tmhj6/SB6DkUfN9o46VUT/VxlrhPYNYYFfftXbaZ0ySbP9CriHEbp+m
+         mzP1uIx3EfHHQe/fpfTa2wjC0zOaezGGGlQwT+KLUtVBgGnHI9MNzE1hZA/bio90TbQo
+         z/cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742134792; x=1742739592;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PEZkI1Sjt2nCNeQ1kxcl7qReMGGjv6RMkaomdlrg8jg=;
-        b=kuafcdXpn0nOI5+N4hSi7phZGpO3aUZezRTqH5MD7ziJ1c9xCp4LehA9iyek4buMIm
-         xax2jEF4CZra72drst4a30wjFgl0fXFzAoTxB2GKhRo4YStJok2mOXXuPZSESBG9QmGL
-         +PAoR1SHaA3VhFdVdnBY6wppx6q/eDlP6K8Fu3P5DJAJ3NvBIiLWyAHW2/fAprdeVnFq
-         wXWw7IkExA4TeNt0T0A+Kd8ssQnYggr0NV/0tW0/Vx6oPrVAnZWxCpjRDJUNUjEY1OZA
-         MQcdpyeiGwivyRbQfzU8Iwm4jfNFbZTLwhX8AaDMer9smum7JgZPpsmpcCc3ecVir/Tf
-         8wWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUg8XIgg9K1OeSc17ZUF6NIN50IH7n6Jby+5ougcpvMGLufIoCwskrB7i/aRUABB3bX6lUcsiniR1isZKk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzh6vNEzw9rTlOsYhUdlpTiBeUgCl12XhGDK7r1YQ0uzaDav/Ad
-	z3c7Zv430QUkZJiGo4egQcLlPZBffynTkQoWKwTSDwb/+xpTyk0=
-X-Gm-Gg: ASbGnctDBnZedby+7fILMK1zT2jr3MPIROS+ubAMaYO8wYgTooc1/rVOUb+I1//hA7Q
-	4GWg7PNe4ZCam53qwiS96BuRWKYDy5ipUam2gEtSRC3QmLCseLhK2Vw5G6UQ+FRKXPcVPvP9jr5
-	IdNVW+u4bM1PBCc3ryX9OJeKTvU5yK0PgcErYvNv64d+fZxWx7nrN698Gv/VrsBO1qgbjpahPvN
-	L/44URkRbwja0B/SkqLjKaJAuv6QkJUcVXh3z4yIxHLvXOtNmfODzskMtC7mbn0mJpB8/zWswDE
-	3DpcO+eRBkIZLpPMk546OZ2r+pggAMiC8SNlZGx9coVHlOb8vb8p1IJ9b5r6L7vwu2KIyMu1/6A
-	P1GWMgNyJ2tuQccUUUrYfGRIxr5TUNpJ7trvZ6cddqaEpLOuD
-X-Google-Smtp-Source: AGHT+IEX3Xl2MJysxm/uZGRyuyX2HuxuiJUSyvVo/4jGaT6/3lTf9Lm2xh0lFwWFY8E48UIodUcg7Q==
-X-Received: by 2002:a05:6a00:cc6:b0:732:5875:eb95 with SMTP id d2e1a72fcca58-737106f4aaemr17977352b3a.4.1742134792413;
-        Sun, 16 Mar 2025 07:19:52 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1742134802; x=1742739602;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Osx6qrHXrN5QGo/98Mcul05sdcRwgeDonPsp/lg3Azs=;
+        b=P4jmzq4lXZq04reYuS+gGR2UZ/vQTYGhPyM3aDyDq/hUmZLbZ4yIg+d1GODV4fcTSe
+         GH2LcPRwVMFQvAg4KJqEyVSdiAMAEANou0fXjlNXzQxhzFxeSK2BLy+rVPpeNWVvio0f
+         YoPgUA7JOmZORsywn+bkVUupkiluFR4iHFuKOfSKo4Tlc+ra53jzqzw+0XB8V11sBKpI
+         5h4dWiPPzgOGFK/i+zpWVGciXbFsov+bIaCunmXP2mr+yXabsx5KdRACXlnUUhaQc0xE
+         lZJ66JIJILEzGc7bev4lCEZlO1Mm7mNdwsl9/eTOThywpCrGY0btOO5dN9qRRnQdYa7P
+         zDSg==
+X-Forwarded-Encrypted: i=1; AJvYcCXus7Jlr7Wlt49YWPqjgEl/JfdllXxLa5qONHvm6Vq79YLxPf5YZLEMpz9gk1sFbM1uaftRcVsWoUnUxb0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2Nv4DbuJH2z0BphxXebiJXdg6MdWhGo2Aht/ryF5yoBnQ4M37
+	0NMYi6Y7/X+PHZhsnYz8b7sr5gKk5gE+XrsW5RHWHgqxXLQTpfk=
+X-Gm-Gg: ASbGncv/unTqeE4QBX5Tbf/30cl9drJebOLC1Ew7kXbK/fR4MC2WrB9q4T74vFqY1Ut
+	QK91KQrSzNTvfsQgmqdycLCkj4Uw23cu+t5NHqZ2KJF72Vc16Xsg8DI6sERAbvt2u9IWf2SdthM
+	WaBHakGIKhOHRrHF+rd4NODsjWj2hDqmGX2XTQPQdPGatFWcWP5NRlnB10Xou7zMommPQGwZADK
+	yBpvfnIqS+qjKkqew03oK4bptPYcdFNgeiM2zyKEgkmdOeXHd6ZrtIKTOVb2MoUsrtjcSW1sfQN
+	+QERSM3pQpJ3nLPQyWlswbFDvYs80TQ8av+GIFUMPiXfr+86LKt2Jw35LPwVM20a84L773vcmiZ
+	H0ZOPmXn+j/DqGLBRSZtcG1z257sNt08GIaFiJw==
+X-Google-Smtp-Source: AGHT+IHBdthJFV/bk0R/+kwiTPBqhBwpwvDmqoyHB851NtSzxYA7oJyLsL1dUz0pKL+DOG9QCji5Qw==
+X-Received: by 2002:a05:6a20:9c92:b0:1f3:418c:6281 with SMTP id adf61e73a8af0-1f5c1126c3bmr12182271637.4.1742134802043;
+        Sun, 16 Mar 2025 07:20:02 -0700 (PDT)
 Received: from localhost.localdomain (124-218-201-66.cm.dynamic.apol.com.tw. [124.218.201.66])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-737116954aasm6014734b3a.135.2025.03.16.07.19.48
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-737116954aasm6014734b3a.135.2025.03.16.07.19.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Mar 2025 07:19:51 -0700 (PDT)
+        Sun, 16 Mar 2025 07:20:01 -0700 (PDT)
 From: "Lucien.Jheng" <lucienx123@gmail.com>
 X-Google-Original-From: "Lucien.Jheng" <lucienX123@gmail.com>
 To: andrew@lunn.ch,
@@ -87,10 +89,12 @@ Cc: netdev@vger.kernel.org,
 	joseph.lin@airoha.com,
 	wenshin.chung@airoha.com,
 	"Lucien.Jheng" <lucienX123@gmail.com>
-Subject: [PATCH v3 net-next 0/1 ] net: phy: air_en8811h: Add clk provider for CKO pin 
-Date: Sun, 16 Mar 2025 22:18:59 +0800
-Message-Id: <20250316141900.50991-1-lucienX123@gmail.com>
+Subject: [PATCH v3 net-next PATCH 1/1] net: phy: air_en8811h: Add clk provider for CKO pin
+Date: Sun, 16 Mar 2025 22:19:00 +0800
+Message-Id: <20250316141900.50991-2-lucienX123@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250316141900.50991-1-lucienX123@gmail.com>
+References: <20250316141900.50991-1-lucienX123@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,18 +103,153 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch adds clk provider for the CKO pin of the Airoha en8811h PHY.
+The EN8811H generates 25MHz or 50MHz clocks on its CKO pin, selected by GPIO3 hardware trap.
+Register 0xcf914, read via buckpbus API, shows the frequency with bit 12: 0 for 25MHz, 1 for 50MHz.
+CKO clock output is active from power-up through md32 firmware loading.
 
-Change in PATCH v3:
-air_en8811h.c:
- * Add clk provider for CKO pin
-
-Lucien.Jheng (1):
-  net: phy: air_en8811h: Add clk provider for CKO pin
-
+Signed-off-by: Lucien.Jheng <lucienX123@gmail.com>
+---
  drivers/net/phy/air_en8811h.c | 95 +++++++++++++++++++++++++++++++++++
  1 file changed, 95 insertions(+)
 
+diff --git a/drivers/net/phy/air_en8811h.c b/drivers/net/phy/air_en8811h.c
+index e9fd24cb7270..ed90ccefe842 100644
+--- a/drivers/net/phy/air_en8811h.c
++++ b/drivers/net/phy/air_en8811h.c
+@@ -16,6 +16,7 @@
+ #include <linux/property.h>
+ #include <linux/wordpart.h>
+ #include <linux/unaligned.h>
++#include <linux/clk-provider.h>
+ 
+ #define EN8811H_PHY_ID		0x03a2a411
+ 
+@@ -112,6 +113,11 @@
+ #define   EN8811H_POLARITY_TX_NORMAL		BIT(0)
+ #define   EN8811H_POLARITY_RX_REVERSE		BIT(1)
+ 
++#define EN8811H_CLK_CGM     0xcf958
++#define EN8811H_CLK_CGM_CKO     BIT(26)
++#define EN8811H_HWTRAP1     0xcf914
++#define EN8811H_HWTRAP1_CKO     BIT(12)
++
+ #define EN8811H_GPIO_OUTPUT		0xcf8b8
+ #define   EN8811H_GPIO_OUTPUT_345		(BIT(3) | BIT(4) | BIT(5))
+ 
+@@ -142,10 +148,15 @@ struct led {
+ 	unsigned long state;
+ };
+ 
++#define to_en8811h_priv(_hw)			\
++	container_of(_hw, struct en8811h_priv, hw)
++
+ struct en8811h_priv {
+ 	u32		firmware_version;
+ 	bool		mcu_needs_restart;
+ 	struct led	led[EN8811H_LED_COUNT];
++	struct clk_hw        hw;
++	struct phy_device *phydev;
+ };
+ 
+ enum {
+@@ -806,6 +817,84 @@ static int en8811h_led_hw_is_supported(struct phy_device *phydev, u8 index,
+ 	return 0;
+ };
+ 
++static unsigned long en8811h_recalc_rate(struct clk_hw *hw, unsigned long parent)
++{
++	struct en8811h_priv *priv = to_en8811h_priv(hw);
++	struct phy_device *phydev = priv->phydev;
++	u32 pbus_value;
++	int ret;
++
++	ret = air_buckpbus_reg_read(phydev, EN8811H_HWTRAP1, &pbus_value);
++	if (ret < 0)
++		return ret;
++
++	return (pbus_value & EN8811H_HWTRAP1_CKO) ? 50000000 : 25000000;
++}
++
++static int en8811h_enable(struct clk_hw *hw)
++{
++	struct en8811h_priv *priv = to_en8811h_priv(hw);
++	struct phy_device *phydev = priv->phydev;
++
++	return air_buckpbus_reg_modify(phydev, EN8811H_CLK_CGM,
++				EN8811H_CLK_CGM_CKO, EN8811H_CLK_CGM_CKO);
++}
++
++static void en8811h_disable(struct clk_hw *hw)
++{
++	struct en8811h_priv *priv = to_en8811h_priv(hw);
++	struct phy_device *phydev = priv->phydev;
++
++	air_buckpbus_reg_modify(phydev, EN8811H_CLK_CGM,
++				EN8811H_CLK_CGM_CKO, 0);
++}
++
++static int en8811h_is_enabled(struct clk_hw *hw)
++{
++	struct en8811h_priv *priv = to_en8811h_priv(hw);
++	struct phy_device *phydev = priv->phydev;
++	int ret = 0;
++	u32 pbus_value;
++
++	ret = air_buckpbus_reg_read(phydev, EN8811H_CLK_CGM, &pbus_value);
++	if (ret < 0)
++		return ret;
++
++	return (pbus_value & EN8811H_CLK_CGM_CKO);
++}
++
++static const struct clk_ops en8811h_clk_ops = {
++	.recalc_rate = en8811h_recalc_rate,
++	.enable = en8811h_enable,
++	.disable = en8811h_disable,
++	.is_enabled	= en8811h_is_enabled,
++};
++
++static int en8811h_clk_provider_setup(struct device *dev, struct clk_hw *hw)
++{
++	struct clk_init_data init;
++	int ret;
++
++	if (!IS_ENABLED(CONFIG_COMMON_CLK))
++		return 0;
++
++	init.name =  devm_kasprintf(dev, GFP_KERNEL, "%s-clk",
++				    fwnode_get_name(dev_fwnode(dev)));
++	if (!init.name)
++		return -ENOMEM;
++
++	init.ops = &en8811h_clk_ops;
++	init.flags = CLK_GET_RATE_NOCACHE;
++	init.num_parents = 0;
++	hw->init = &init;
++
++	ret = devm_clk_hw_register(dev, hw);
++	if (ret)
++		return ret;
++
++	return devm_of_clk_add_hw_provider(dev, of_clk_hw_simple_get, hw);
++}
++
+ static int en8811h_probe(struct phy_device *phydev)
+ {
+ 	struct en8811h_priv *priv;
+@@ -838,6 +927,12 @@ static int en8811h_probe(struct phy_device *phydev)
+ 		return ret;
+ 	}
+ 
++	priv->phydev = phydev;
++	/* Co-Clock */
++	ret = en8811h_clk_provider_setup(&phydev->mdio.dev, &priv->hw);
++	if (ret)
++		return ret;
++
+ 	/* Configure led gpio pins as output */
+ 	ret = air_buckpbus_reg_modify(phydev, EN8811H_GPIO_OUTPUT,
+ 				      EN8811H_GPIO_OUTPUT_345,
 -- 
 2.34.1
 
