@@ -1,256 +1,180 @@
-Return-Path: <netdev+bounces-175124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97C63A6360F
-	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 15:20:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D35A5A63638
+	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 16:23:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DE611891852
-	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 14:20:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FA2F7A4A09
+	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 15:22:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DD871AA795;
-	Sun, 16 Mar 2025 14:20:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B14D2AF1E;
+	Sun, 16 Mar 2025 15:23:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z3PVDUIX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hcW+Wz6m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C64FA1F941;
-	Sun, 16 Mar 2025 14:20:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C22C84430;
+	Sun, 16 Mar 2025 15:23:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742134804; cv=none; b=q/BoHdLHRIlGyBoEjIhL0LFT3V/Es9df61Jxni7RDGCvAlaCCmcXo8PNN4qloF7DRVTuwNYoHvutEPM5nJQhyaz+it4jfvhuGClRKeEkCaQqp/Rlc0TXixz/cAXxI8ZfQu2r8l0LIu0kUYkWXsG3nhrZrMDWMOf1d18IvzS5ZAI=
+	t=1742138610; cv=none; b=A1A5IVFiYasOs2z2+0+jqSFRoy/dtnrsc6drUBedVbKqRQMw+U9q7KZANQ0jh4E3K1EcMegpAbN4Vge5XOefhVwEjB+fb2gIANEuJOLsrfPoU1FrNC5fG2JlpSkJCZD97t9rfTbAEGh+ZaSzjyorDcdKUYPGIOtFEhb95x6M8MU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742134804; c=relaxed/simple;
-	bh=SM9sVUEo6LLFEorZIojkx26q2P18H2FzZgNAy/r5RiA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KLgfnfqaEVExYrGffmOgb+5GYcB/YhRbbqexZ8YMfqOL8KbyodiFwJ4eRRb8TSBx4K8oJ9W8zgMXCstiM0oeA9exoDmOJp4rjQGyigiNEmbFh/pIXgiP9HMkrR0iVEZXw8EahEyYhsuVhmC6enquSMwCE7W0PL/gqHABm7yJ9AM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z3PVDUIX; arc=none smtp.client-ip=209.85.214.175
+	s=arc-20240116; t=1742138610; c=relaxed/simple;
+	bh=u5O2hIJYLpbvuv5WUuWmiEwpTZ5Wm51O/tTwGa4eZww=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HKDe8n25cQYHuKpWWVYtxO70gtRjVnq5K/+UJ/lR0iO7/+YW9oyDyDtW+CD2Q5PDtLQhx2mkPRd/oSydYbHxWd6f550O5y0vjL4BsBwm+ZmYfjX60fvx9h8iJNA0OhIcUPVbkeF09zi+EDg7z/w6n+WILqT2S3omjmZnKNXn3IA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hcW+Wz6m; arc=none smtp.client-ip=209.85.221.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-226185948ffso153165ad.0;
-        Sun, 16 Mar 2025 07:20:02 -0700 (PDT)
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-39727fe912cso685925f8f.3;
+        Sun, 16 Mar 2025 08:23:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742134802; x=1742739602; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Osx6qrHXrN5QGo/98Mcul05sdcRwgeDonPsp/lg3Azs=;
-        b=Z3PVDUIXcEtnip+ddv1A5+mZpoMalxMrdtzNG+g9tTd2B4FdJJOZCQAZoUAF0MtzVa
-         XQbo6d7nVRf36kkv64FW9WRMZy35gmEuyJ0I19twpW+t2zZBnEhUkW6HtLZM3gmcS82O
-         VT7KDb9txaHdhMPP1jR5fdqU6evUT6LmlLvV9af2EXF3D2F/0C6lrCQwfawzDGtsd5N3
-         R2hav/WkdxKp8Tmhj6/SB6DkUfN9o46VUT/VxlrhPYNYYFfftXbaZ0ySbP9CriHEbp+m
-         mzP1uIx3EfHHQe/fpfTa2wjC0zOaezGGGlQwT+KLUtVBgGnHI9MNzE1hZA/bio90TbQo
-         z/cw==
+        d=gmail.com; s=20230601; t=1742138607; x=1742743407; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=5JLfCmTWfDl5v+BTl1A4AkzQ9L0soYHfycDaefH0XAA=;
+        b=hcW+Wz6m7A+606OzrhRCD4UaARKkh0hXnW6JqX/B4WB4+TxWfUPpBKacPV1/s2iOh/
+         NyVFRM6kyYnn5u9ZVwEwIsKp+VSZ7YyYFg5Xvjk8xR+9VWHBFZ/Apa4Vs2Tc2eYA5Eri
+         zwRfjqQZd2glV+TjvuGWgJT6r6BfVT9L36cw2sZ0QeyOrQo4AM4AbtpOzREWXl+pCDU3
+         c7MhIglN8lYfmWVcfAciCQpHSaYjYFjnORw8gInFFxwfGDlK9cx8DvIiHAEZtd0o3/Ac
+         cstic/irYgxt3TNQiX/MfjTp5X/kRtprvk0rYKxHvZlGMN7oTWjJpBs7v632k2cOk0+e
+         wjzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742134802; x=1742739602;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Osx6qrHXrN5QGo/98Mcul05sdcRwgeDonPsp/lg3Azs=;
-        b=P4jmzq4lXZq04reYuS+gGR2UZ/vQTYGhPyM3aDyDq/hUmZLbZ4yIg+d1GODV4fcTSe
-         GH2LcPRwVMFQvAg4KJqEyVSdiAMAEANou0fXjlNXzQxhzFxeSK2BLy+rVPpeNWVvio0f
-         YoPgUA7JOmZORsywn+bkVUupkiluFR4iHFuKOfSKo4Tlc+ra53jzqzw+0XB8V11sBKpI
-         5h4dWiPPzgOGFK/i+zpWVGciXbFsov+bIaCunmXP2mr+yXabsx5KdRACXlnUUhaQc0xE
-         lZJ66JIJILEzGc7bev4lCEZlO1Mm7mNdwsl9/eTOThywpCrGY0btOO5dN9qRRnQdYa7P
-         zDSg==
-X-Forwarded-Encrypted: i=1; AJvYcCXus7Jlr7Wlt49YWPqjgEl/JfdllXxLa5qONHvm6Vq79YLxPf5YZLEMpz9gk1sFbM1uaftRcVsWoUnUxb0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2Nv4DbuJH2z0BphxXebiJXdg6MdWhGo2Aht/ryF5yoBnQ4M37
-	0NMYi6Y7/X+PHZhsnYz8b7sr5gKk5gE+XrsW5RHWHgqxXLQTpfk=
-X-Gm-Gg: ASbGncv/unTqeE4QBX5Tbf/30cl9drJebOLC1Ew7kXbK/fR4MC2WrB9q4T74vFqY1Ut
-	QK91KQrSzNTvfsQgmqdycLCkj4Uw23cu+t5NHqZ2KJF72Vc16Xsg8DI6sERAbvt2u9IWf2SdthM
-	WaBHakGIKhOHRrHF+rd4NODsjWj2hDqmGX2XTQPQdPGatFWcWP5NRlnB10Xou7zMommPQGwZADK
-	yBpvfnIqS+qjKkqew03oK4bptPYcdFNgeiM2zyKEgkmdOeXHd6ZrtIKTOVb2MoUsrtjcSW1sfQN
-	+QERSM3pQpJ3nLPQyWlswbFDvYs80TQ8av+GIFUMPiXfr+86LKt2Jw35LPwVM20a84L773vcmiZ
-	H0ZOPmXn+j/DqGLBRSZtcG1z257sNt08GIaFiJw==
-X-Google-Smtp-Source: AGHT+IHBdthJFV/bk0R/+kwiTPBqhBwpwvDmqoyHB851NtSzxYA7oJyLsL1dUz0pKL+DOG9QCji5Qw==
-X-Received: by 2002:a05:6a20:9c92:b0:1f3:418c:6281 with SMTP id adf61e73a8af0-1f5c1126c3bmr12182271637.4.1742134802043;
-        Sun, 16 Mar 2025 07:20:02 -0700 (PDT)
-Received: from localhost.localdomain (124-218-201-66.cm.dynamic.apol.com.tw. [124.218.201.66])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-737116954aasm6014734b3a.135.2025.03.16.07.19.58
+        d=1e100.net; s=20230601; t=1742138607; x=1742743407;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5JLfCmTWfDl5v+BTl1A4AkzQ9L0soYHfycDaefH0XAA=;
+        b=r2JW7HR8cbUmnbzLdicH83J8VDfBZyHfmzQnkDWAyHfu3+lszd7x8IPDyFy59JWhcK
+         rkoy3jP/CeD30MXPQe/XA4V4eZKMvVKTkjE6zBBf1qaWEU/NcGbegIDb6Cg913RV7vW9
+         mGxg2T8CoAnCIfprRTaWtLYfdXGgqcwVPgQXcXhetTO8ln0SMGcRArPaFGNC+Ga4d6Jr
+         UpTqjehl296NaB4KDotdX/1w3Vu3rOrNMPHrpgZVWlwC8+Jp23ya3+JN6v8CQB/62YHf
+         ZCldu8T+Lyc77b1uiLW0M95B0bjHD8OzJmaYfgwI0XutS9CtguthyIE4HyfNvCl2u96e
+         lQ1A==
+X-Forwarded-Encrypted: i=1; AJvYcCV8Bz6d3N61RtiZXt99ACUV+ugB5zXrV0IOxP20vzZxOVP2VsQYn5M5V2zsh46p6c1uPPZj1muvnJe4wQjnwwKr4Q==@vger.kernel.org, AJvYcCX05WU9jqevBv1SMvGaq4LS6AXCIZgL4jaJJ/T0MVNGabyhdCQyvw9GJ33y9FKKLFdi/+W06zLm@vger.kernel.org
+X-Gm-Message-State: AOJu0YzD3Yykhyq5VwjJhm4guvvSaituiGbMfg4up93EPhngT/FMu2Qv
+	RUw+hjtAbJP2qD+Is0GE06xpTf4++QDZEFf+gjNgQlJCfYyySbIsRJ1vDQ==
+X-Gm-Gg: ASbGnct1eC7craQ6SaaCptIv++e5UKXmPKZv9QehHeQ0wXpE7d9sbuMI8RTeFlLy11K
+	OoVs/OyvRI9wIpIdy+vRC1zzSNxoX3P8uHybLwXSQNZ6uou3fPHPZtijfnN9lsDpemQ2sf+b0hO
+	zZMwwoesJDscAgei6ueCYZWplWoBI18VISl4D6Z4Z5vYVQbDfy48A09czxEd8Cp6SEEVlSmfWm5
+	iFyGTq9k0py6v+QfTK3ly7rQDsr7dTNr1vatbqutJISEQumswIARATO4Z2NkqfRF7/X97AbqWei
+	dy//dbm1q5E0irCvqHJ6+x4CV7Ac8KM8fklNb1dem9aqh8h2MOH+
+X-Google-Smtp-Source: AGHT+IFMprZ+lrOTonOkV8j0h3jidkgGClxGggEhlu2SpBMX7tvixbc44IbbH2Gs8iM2ZllLhhCmFw==
+X-Received: by 2002:a5d:5f85:0:b0:38d:d701:419c with SMTP id ffacd0b85a97d-3971f9e521fmr11466329f8f.41.1742138606691;
+        Sun, 16 Mar 2025 08:23:26 -0700 (PDT)
+Received: from debian ([2a00:79c0:612:2500:45fb:7d1a:5e4d:9727])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d1fd274c4sm51983375e9.0.2025.03.16.08.23.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Mar 2025 07:20:01 -0700 (PDT)
-From: "Lucien.Jheng" <lucienx123@gmail.com>
-X-Google-Original-From: "Lucien.Jheng" <lucienX123@gmail.com>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	daniel@makrotopia.org,
-	ericwouds@gmail.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	joseph.lin@airoha.com,
-	wenshin.chung@airoha.com,
-	"Lucien.Jheng" <lucienX123@gmail.com>
-Subject: [PATCH v3 net-next PATCH 1/1] net: phy: air_en8811h: Add clk provider for CKO pin
-Date: Sun, 16 Mar 2025 22:19:00 +0800
-Message-Id: <20250316141900.50991-2-lucienX123@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250316141900.50991-1-lucienX123@gmail.com>
-References: <20250316141900.50991-1-lucienX123@gmail.com>
+        Sun, 16 Mar 2025 08:23:26 -0700 (PDT)
+Date: Sun, 16 Mar 2025 16:23:24 +0100
+From: Dimitri Fedrau <dima.fedrau@gmail.com>
+To: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+Subject: Re: [net-next] net: phy: marvell-88q2xxx: Enable temperature sensor
+ for mv88q211x
+Message-ID: <20250316152324.GA12356@debian>
+References: <20250316112033.1097152-1-niklas.soderlund+renesas@ragnatech.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250316112033.1097152-1-niklas.soderlund+renesas@ragnatech.se>
 
-The EN8811H generates 25MHz or 50MHz clocks on its CKO pin, selected by GPIO3 hardware trap.
-Register 0xcf914, read via buckpbus API, shows the frequency with bit 12: 0 for 25MHz, 1 for 50MHz.
-CKO clock output is active from power-up through md32 firmware loading.
+Hi Niklas,
 
-Signed-off-by: Lucien.Jheng <lucienX123@gmail.com>
----
- drivers/net/phy/air_en8811h.c | 95 +++++++++++++++++++++++++++++++++++
- 1 file changed, 95 insertions(+)
+Am Sun, Mar 16, 2025 at 12:20:33PM +0100 schrieb Niklas Söderlund:
+> The temperature sensor enabled for mv88q222x devices also functions for
+> mv88q211x based devices. Unify the two devices probe functions to enable
+> the sensors for all devices supported by this driver.
+> 
+> The same oddity as for mv88q222x devices exists, the PHY must be up for
+> a correct temperature reading to be reported.
+> 
+>     # cat /sys/class/hwmon/hwmon9/temp1_input
+>     -75000
+> 
+>     # ifconfig end5 up
+> 
+>     # cat /sys/class/hwmon/hwmon9/temp1_input
+>     59000
+> 
+> Worth noting is that while the temperature register offsets and layout
+> are the same between mv88q211x and mv88q222x devices their names in the
+> datasheets are different. This change keeps the mv88q222x names for the
+> mv88q211x support.
+> 
+> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+> ---
+>  drivers/net/phy/marvell-88q2xxx.c | 14 ++------------
+>  1 file changed, 2 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/net/phy/marvell-88q2xxx.c b/drivers/net/phy/marvell-88q2xxx.c
+> index 15c0f8adc2f5..cdd40b613ce8 100644
+> --- a/drivers/net/phy/marvell-88q2xxx.c
+> +++ b/drivers/net/phy/marvell-88q2xxx.c
+> @@ -834,6 +834,7 @@ static int mv88q2xxx_leds_probe(struct phy_device *phydev)
+>  static int mv88q2xxx_probe(struct phy_device *phydev)
+>  {
+>  	struct mv88q2xxx_priv *priv;
+> +	int ret;
+>  
+>  	priv = devm_kzalloc(&phydev->mdio.dev, sizeof(*priv), GFP_KERNEL);
+>  	if (!priv)
+> @@ -841,17 +842,6 @@ static int mv88q2xxx_probe(struct phy_device *phydev)
+>  
+>  	phydev->priv = priv;
+>  
+> -	return 0;
+> -}
+> -
+> -static int mv88q222x_probe(struct phy_device *phydev)
+> -{
+> -	int ret;
+> -
+> -	ret = mv88q2xxx_probe(phydev);
+> -	if (ret)
+> -		return ret;
+> -
+>  	ret = mv88q2xxx_leds_probe(phydev);
+>  	if (ret)
+>  		return ret;
+> @@ -1124,7 +1114,7 @@ static struct phy_driver mv88q2xxx_driver[] = {
+>  		.phy_id_mask		= MARVELL_PHY_ID_MASK,
+>  		.name			= "mv88q2220",
+>  		.flags			= PHY_POLL_CABLE_TEST,
+> -		.probe			= mv88q222x_probe,
+> +		.probe			= mv88q2xxx_probe,
+>  		.get_features		= mv88q2xxx_get_features,
+>  		.config_aneg		= mv88q2xxx_config_aneg,
+>  		.aneg_done		= genphy_c45_aneg_done,
+> -- 
+> 2.48.1
+> 
 
-diff --git a/drivers/net/phy/air_en8811h.c b/drivers/net/phy/air_en8811h.c
-index e9fd24cb7270..ed90ccefe842 100644
---- a/drivers/net/phy/air_en8811h.c
-+++ b/drivers/net/phy/air_en8811h.c
-@@ -16,6 +16,7 @@
- #include <linux/property.h>
- #include <linux/wordpart.h>
- #include <linux/unaligned.h>
-+#include <linux/clk-provider.h>
- 
- #define EN8811H_PHY_ID		0x03a2a411
- 
-@@ -112,6 +113,11 @@
- #define   EN8811H_POLARITY_TX_NORMAL		BIT(0)
- #define   EN8811H_POLARITY_RX_REVERSE		BIT(1)
- 
-+#define EN8811H_CLK_CGM     0xcf958
-+#define EN8811H_CLK_CGM_CKO     BIT(26)
-+#define EN8811H_HWTRAP1     0xcf914
-+#define EN8811H_HWTRAP1_CKO     BIT(12)
-+
- #define EN8811H_GPIO_OUTPUT		0xcf8b8
- #define   EN8811H_GPIO_OUTPUT_345		(BIT(3) | BIT(4) | BIT(5))
- 
-@@ -142,10 +148,15 @@ struct led {
- 	unsigned long state;
- };
- 
-+#define to_en8811h_priv(_hw)			\
-+	container_of(_hw, struct en8811h_priv, hw)
-+
- struct en8811h_priv {
- 	u32		firmware_version;
- 	bool		mcu_needs_restart;
- 	struct led	led[EN8811H_LED_COUNT];
-+	struct clk_hw        hw;
-+	struct phy_device *phydev;
- };
- 
- enum {
-@@ -806,6 +817,84 @@ static int en8811h_led_hw_is_supported(struct phy_device *phydev, u8 index,
- 	return 0;
- };
- 
-+static unsigned long en8811h_recalc_rate(struct clk_hw *hw, unsigned long parent)
-+{
-+	struct en8811h_priv *priv = to_en8811h_priv(hw);
-+	struct phy_device *phydev = priv->phydev;
-+	u32 pbus_value;
-+	int ret;
-+
-+	ret = air_buckpbus_reg_read(phydev, EN8811H_HWTRAP1, &pbus_value);
-+	if (ret < 0)
-+		return ret;
-+
-+	return (pbus_value & EN8811H_HWTRAP1_CKO) ? 50000000 : 25000000;
-+}
-+
-+static int en8811h_enable(struct clk_hw *hw)
-+{
-+	struct en8811h_priv *priv = to_en8811h_priv(hw);
-+	struct phy_device *phydev = priv->phydev;
-+
-+	return air_buckpbus_reg_modify(phydev, EN8811H_CLK_CGM,
-+				EN8811H_CLK_CGM_CKO, EN8811H_CLK_CGM_CKO);
-+}
-+
-+static void en8811h_disable(struct clk_hw *hw)
-+{
-+	struct en8811h_priv *priv = to_en8811h_priv(hw);
-+	struct phy_device *phydev = priv->phydev;
-+
-+	air_buckpbus_reg_modify(phydev, EN8811H_CLK_CGM,
-+				EN8811H_CLK_CGM_CKO, 0);
-+}
-+
-+static int en8811h_is_enabled(struct clk_hw *hw)
-+{
-+	struct en8811h_priv *priv = to_en8811h_priv(hw);
-+	struct phy_device *phydev = priv->phydev;
-+	int ret = 0;
-+	u32 pbus_value;
-+
-+	ret = air_buckpbus_reg_read(phydev, EN8811H_CLK_CGM, &pbus_value);
-+	if (ret < 0)
-+		return ret;
-+
-+	return (pbus_value & EN8811H_CLK_CGM_CKO);
-+}
-+
-+static const struct clk_ops en8811h_clk_ops = {
-+	.recalc_rate = en8811h_recalc_rate,
-+	.enable = en8811h_enable,
-+	.disable = en8811h_disable,
-+	.is_enabled	= en8811h_is_enabled,
-+};
-+
-+static int en8811h_clk_provider_setup(struct device *dev, struct clk_hw *hw)
-+{
-+	struct clk_init_data init;
-+	int ret;
-+
-+	if (!IS_ENABLED(CONFIG_COMMON_CLK))
-+		return 0;
-+
-+	init.name =  devm_kasprintf(dev, GFP_KERNEL, "%s-clk",
-+				    fwnode_get_name(dev_fwnode(dev)));
-+	if (!init.name)
-+		return -ENOMEM;
-+
-+	init.ops = &en8811h_clk_ops;
-+	init.flags = CLK_GET_RATE_NOCACHE;
-+	init.num_parents = 0;
-+	hw->init = &init;
-+
-+	ret = devm_clk_hw_register(dev, hw);
-+	if (ret)
-+		return ret;
-+
-+	return devm_of_clk_add_hw_provider(dev, of_clk_hw_simple_get, hw);
-+}
-+
- static int en8811h_probe(struct phy_device *phydev)
- {
- 	struct en8811h_priv *priv;
-@@ -838,6 +927,12 @@ static int en8811h_probe(struct phy_device *phydev)
- 		return ret;
- 	}
- 
-+	priv->phydev = phydev;
-+	/* Co-Clock */
-+	ret = en8811h_clk_provider_setup(&phydev->mdio.dev, &priv->hw);
-+	if (ret)
-+		return ret;
-+
- 	/* Configure led gpio pins as output */
- 	ret = air_buckpbus_reg_modify(phydev, EN8811H_GPIO_OUTPUT,
- 				      EN8811H_GPIO_OUTPUT_345,
--- 
-2.34.1
+thanks for your patch. Looks good to me.
+Did you have the chance to test the LED support as well ? I'm asking
+because mv88q2xxx_leds_probe gets called in mv88q2xxx_probe. LED
+handling should be equal for all 88Q2XXX devices, adding the support
+should be easy. Anyway:
 
+Reviewed-by: Dimitri Fedrau <dima.fedrau@gmail.com>
+
+Best regards,
+Dimitri Fedrau
 
