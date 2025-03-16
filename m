@@ -1,176 +1,117 @@
-Return-Path: <netdev+bounces-175122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67CA4A635EC
-	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 14:58:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DAB0A6360D
+	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 15:20:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 933397A5668
-	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 13:57:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB5A77A7189
+	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 14:18:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B2F31AA7BF;
-	Sun, 16 Mar 2025 13:58:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C97CC1A9B46;
+	Sun, 16 Mar 2025 14:19:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NWqidSe0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XZd3Q3Z+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7731818B494;
-	Sun, 16 Mar 2025 13:58:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6251F941;
+	Sun, 16 Mar 2025 14:19:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742133511; cv=none; b=qyT6kQW1RcyZuBCbmmM25jt+tlaN4pla8bz9+Z6ihp211dyICkox97I64UOTFS0pmdaIAN/C8xWEhHU9SXedNxUTV5EF7CLStSI3gy/eC7C81v6IgOk2fJ1QXaDymiOlrVSV97wx4ULhmwaw2xSfiPs4n8EOBa+OM1DcRLeD4O0=
+	t=1742134794; cv=none; b=YsaitslPwoof18h5UnAQ2PcWwYLQhFNF2ND43iM828gu+iwe+SazDp4EsWLWvK/GWODGV5tdaFqEPe+2cw10xwPSHALJgVnBCshHj/HmeMkNCB4evmrn6Gw/Bz6/k7u9JjwBtc7MlL+w2O7Jgo4LFsRAIrmP3UaUVcgbvs4mpmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742133511; c=relaxed/simple;
-	bh=iyAHxdFTmJaDe07jK8USWVeZcaBnuLQhQ+AuUQmPIfU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CmYCRlM2JMA3HHkP8QXY0z0QjUp3NDQQ/iCHwzxw4LM7pshJw7sMiiIp4VkDVMIsLD27sPkhzlJx9fqaVs8qwrF9e8eGccKnVKIz32hQhm7BGsrFM4wy8aoGp/cBKwsViuDJJK1fJ6cCV206/iUwCGgMn7jsmj3brm3d0LrfRS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NWqidSe0; arc=none smtp.client-ip=209.85.128.172
+	s=arc-20240116; t=1742134794; c=relaxed/simple;
+	bh=ye63Bywgn9YfCCvNohfZiaNzW5kJ0zlKOT4zBINkPYg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VFuROco2SBILLs3vc9uw+/8p64cip0HTZ7abGWuK18zxobjhXNmf5g5fhl9r8tj6NQMEEr0GoP6d3SrSjbCLABLzyKidUNTh2oQjMIFJ/lCwyba/mhpRIyeRdfttg5up2aO4IvJEVZPSHAu8JE/N/vikUpv22f+JAoYtSgVwUxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XZd3Q3Z+; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-6ff1814102aso36794497b3.1;
-        Sun, 16 Mar 2025 06:58:29 -0700 (PDT)
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-225df540edcso36178685ad.0;
+        Sun, 16 Mar 2025 07:19:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742133508; x=1742738308; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6gevK/+oX9q3Ym7i08KIzA2+gQInl/xd9S7OSBa1COk=;
-        b=NWqidSe0QKU+22+3HmuvbXSnjxtdq5EAZzHGGGnCXtfnfevpKK7hKQxhggOqRM34OP
-         UCxLTgPa++TidHTKPvlDyam4BoQ54N0X6UYoaxQTTs4xgfCMceVucTNOhp7wGnUqdmJ8
-         yqLVhwEgtaPCJ9mUiTjE1UOtHzs810ARnBj2pxPoVAjvoIw+hioBg+jl18cvFux8k/Nw
-         HoZUxsEGJJByVXCgaoXzv5xNoRoQnVd6ewDaagGM7L3J/zifC5nkER4rAj37D1ozU6YE
-         +4uhnx+MTMHse2JLNr7A5R5CD2ca69zudYuoZXtkZ99MJtMqi4mjbE9nSmPooEuEl2yD
-         Nozg==
+        d=gmail.com; s=20230601; t=1742134792; x=1742739592; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PEZkI1Sjt2nCNeQ1kxcl7qReMGGjv6RMkaomdlrg8jg=;
+        b=XZd3Q3Z+y6JqF8Dm+RVqv/Ebu59yUTafcjWG8zUHD56YB3rKfLIa/h7U2XZjipMns4
+         RRFp9RoXlRe0NpafhNV+s7vyInz59KVLQ0vLML7bik4GLKLPDTpx8yoh4UiZUBHV5aH6
+         mVMHuxYy5GPyYyAJ7x5cugTlqtBwznul9q4yvwt+k3BsRWwCrF9FG+rT7Igo7Bj2wZxK
+         ROjBP3Oagb7u9C2buPAzT88sEpXMFuXb0MHZ98kTmaO5d8AFPXgPs8iZGhmFqDPczynt
+         iub70B7HcQ0kSV8m3ak3bWWK8rx4KQHNEqkabAgP/W/sAFllEaDAj6Zty29njvLjcsa5
+         6C0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742133508; x=1742738308;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6gevK/+oX9q3Ym7i08KIzA2+gQInl/xd9S7OSBa1COk=;
-        b=czWXXzmXbIm4PuaD/nlMAN4lAIJ4eKu1I8ursy3DxYDGKn1Wpm+qkn37UCbteUQNiE
-         7oWr0MBugyQXiH2QJY7OUqv3TwnZKX6Y2OBDdTEhHtEdmjdeIgYAOsHNbjZ/D6L2eq0P
-         bwUqsObf77S3ChAjTmvqrrfjJbSPE61mXlFdM+YBfTrkujVtSopkVHWAwn8+rj6jAqDm
-         w3qDhVu1VSW8QTaDb9TB64RuAU0nmiDKripxwI11JVGngGxvjFJJ1syZwVjziWxkxLKZ
-         kcbR6LJbaYPW7kQ78FC+d0TMtY1UN++iaPc5TZRaZahBBIMBmJVUR0bf05g/Y+8HGheu
-         tGGA==
-X-Forwarded-Encrypted: i=1; AJvYcCXIzYrBWE8XxgpEDbRdr8bowE70hTx3FgWqHXMNqlo82Nf/ELKXaj65dYQUACHfAPiis1c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YweKk0S0+Lpj51vpfmo7PvhKBDZmt5MWJAZ24LmyVqDJxCJI/LS
-	zJ6xinS6ZWnqsBKOxGO2Fg5XDAa9sMS87jlvc1zKrkHFshIsqT1wDvzQXiz1FxGpInrjx3jlZ5A
-	9UydWoISyjB2eyazoeFRsZuYELMA=
-X-Gm-Gg: ASbGncukwK6CE3mCD7T9uiWbMHBUWbBUhjYBclK70q0uSjuaTH4kKG9dDw0V3Bi6Joh
-	DXraUbfubXPsEa79UUbTj4VgmZ5uQwVJIojT2NL+zZJJzyUGaRCu4qRpMQw0lQp67Mpjr4pQWN0
-	/U7IEe/lcFy0KxujDFFd+0zx6+Yg==
-X-Google-Smtp-Source: AGHT+IFaUfg93Xnc4BKZa1vN4uq8epYipE4Oga6B0hGhhKVUPwsglgLLVIY8hKhgAJZ4OpAez5XZfRYtTZCU4wQUPmY=
-X-Received: by 2002:a05:690c:319:b0:6fd:3153:2010 with SMTP id
- 00721157ae682-6ff4624c272mr104962077b3.7.1742133508290; Sun, 16 Mar 2025
- 06:58:28 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1742134792; x=1742739592;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PEZkI1Sjt2nCNeQ1kxcl7qReMGGjv6RMkaomdlrg8jg=;
+        b=kuafcdXpn0nOI5+N4hSi7phZGpO3aUZezRTqH5MD7ziJ1c9xCp4LehA9iyek4buMIm
+         xax2jEF4CZra72drst4a30wjFgl0fXFzAoTxB2GKhRo4YStJok2mOXXuPZSESBG9QmGL
+         +PAoR1SHaA3VhFdVdnBY6wppx6q/eDlP6K8Fu3P5DJAJ3NvBIiLWyAHW2/fAprdeVnFq
+         wXWw7IkExA4TeNt0T0A+Kd8ssQnYggr0NV/0tW0/Vx6oPrVAnZWxCpjRDJUNUjEY1OZA
+         MQcdpyeiGwivyRbQfzU8Iwm4jfNFbZTLwhX8AaDMer9smum7JgZPpsmpcCc3ecVir/Tf
+         8wWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUg8XIgg9K1OeSc17ZUF6NIN50IH7n6Jby+5ougcpvMGLufIoCwskrB7i/aRUABB3bX6lUcsiniR1isZKk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzh6vNEzw9rTlOsYhUdlpTiBeUgCl12XhGDK7r1YQ0uzaDav/Ad
+	z3c7Zv430QUkZJiGo4egQcLlPZBffynTkQoWKwTSDwb/+xpTyk0=
+X-Gm-Gg: ASbGnctDBnZedby+7fILMK1zT2jr3MPIROS+ubAMaYO8wYgTooc1/rVOUb+I1//hA7Q
+	4GWg7PNe4ZCam53qwiS96BuRWKYDy5ipUam2gEtSRC3QmLCseLhK2Vw5G6UQ+FRKXPcVPvP9jr5
+	IdNVW+u4bM1PBCc3ryX9OJeKTvU5yK0PgcErYvNv64d+fZxWx7nrN698Gv/VrsBO1qgbjpahPvN
+	L/44URkRbwja0B/SkqLjKaJAuv6QkJUcVXh3z4yIxHLvXOtNmfODzskMtC7mbn0mJpB8/zWswDE
+	3DpcO+eRBkIZLpPMk546OZ2r+pggAMiC8SNlZGx9coVHlOb8vb8p1IJ9b5r6L7vwu2KIyMu1/6A
+	P1GWMgNyJ2tuQccUUUrYfGRIxr5TUNpJ7trvZ6cddqaEpLOuD
+X-Google-Smtp-Source: AGHT+IEX3Xl2MJysxm/uZGRyuyX2HuxuiJUSyvVo/4jGaT6/3lTf9Lm2xh0lFwWFY8E48UIodUcg7Q==
+X-Received: by 2002:a05:6a00:cc6:b0:732:5875:eb95 with SMTP id d2e1a72fcca58-737106f4aaemr17977352b3a.4.1742134792413;
+        Sun, 16 Mar 2025 07:19:52 -0700 (PDT)
+Received: from localhost.localdomain (124-218-201-66.cm.dynamic.apol.com.tw. [124.218.201.66])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-737116954aasm6014734b3a.135.2025.03.16.07.19.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Mar 2025 07:19:51 -0700 (PDT)
+From: "Lucien.Jheng" <lucienx123@gmail.com>
+X-Google-Original-From: "Lucien.Jheng" <lucienX123@gmail.com>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	daniel@makrotopia.org,
+	ericwouds@gmail.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	joseph.lin@airoha.com,
+	wenshin.chung@airoha.com,
+	"Lucien.Jheng" <lucienX123@gmail.com>
+Subject: [PATCH v3 net-next 0/1 ] net: phy: air_en8811h: Add clk provider for CKO pin 
+Date: Sun, 16 Mar 2025 22:18:59 +0800
+Message-Id: <20250316141900.50991-1-lucienX123@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250313190309.2545711-1-ameryhung@gmail.com> <20250313190309.2545711-10-ameryhung@gmail.com>
- <CAADnVQJ-kSNw4hiZ5p_fpsVAyYWDSu50OJyY_NGmaxk9+ofiiQ@mail.gmail.com>
-In-Reply-To: <CAADnVQJ-kSNw4hiZ5p_fpsVAyYWDSu50OJyY_NGmaxk9+ofiiQ@mail.gmail.com>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Sun, 16 Mar 2025 21:58:16 +0800
-X-Gm-Features: AQ5f1JqEBWSsrcUcAG0nkopBUPCbZHZTLh0vxTfpwzfiT38RqvpmM3ZFOxfwDb8
-Message-ID: <CAMB2axNQiayH3_UHYFFi-OZ9tK0KmQ-b-k49ep=mio5dcRTGCQ@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v5 09/13] bpf: net_sched: Disable attaching bpf
- qdisc to non root
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Kui-Feng Lee <sinquersw@gmail.com>, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Stanislav Fomichev <stfomichev@gmail.com>, 
-	ekarani.silvestre@ccc.ufcg.edu.br, yangpeihao@sjtu.edu.cn, 
-	Peilin Ye <yepeilin.cs@gmail.com>, Kernel Team <kernel-team@meta.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, Mar 15, 2025 at 4:31=E2=80=AFAM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Thu, Mar 13, 2025 at 12:03=E2=80=AFPM Amery Hung <ameryhung@gmail.com>=
- wrote:
-> >
-> > Do not allow users to attach bpf qdiscs to classful qdiscs. This is to
-> > prevent accidentally breaking existings classful qdiscs if they rely on
-> > some data in the child qdisc. This restriction can potentially be lifte=
-d
-> > in the future. Note that, we still allow bpf qdisc to be attached to mq=
-.
-> >
-> > Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> > ---
-> >  net/sched/bpf_qdisc.c | 20 +++++++++++++++++++-
-> >  1 file changed, 19 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/net/sched/bpf_qdisc.c b/net/sched/bpf_qdisc.c
-> > index e4e7a5879869..c2f33cd35674 100644
-> > --- a/net/sched/bpf_qdisc.c
-> > +++ b/net/sched/bpf_qdisc.c
-> > @@ -170,8 +170,11 @@ static int bpf_qdisc_gen_prologue(struct bpf_insn =
-*insn_buf, bool direct_write,
-> >                 return 0;
-> >
-> >         *insn++ =3D BPF_MOV64_REG(BPF_REG_6, BPF_REG_1);
-> > +       *insn++ =3D BPF_LDX_MEM(BPF_DW, BPF_REG_2, BPF_REG_1, 16);
-> >         *insn++ =3D BPF_LDX_MEM(BPF_DW, BPF_REG_1, BPF_REG_1, 0);
->
-> Both loads need a comment.
-> It's st_ops callback specific and not obvious what ends up in r1 and r2.
->
+This patch adds clk provider for the CKO pin of the Airoha en8811h PHY.
 
-Got it. I will clarify this in the comment.
+Change in PATCH v3:
+air_en8811h.c:
+ * Add clk provider for CKO pin
 
-> >         *insn++ =3D BPF_CALL_KFUNC(0, bpf_qdisc_init_prologue_ids[0]);
-> > +       *insn++ =3D BPF_JMP_IMM(BPF_JEQ, BPF_REG_0, 0, 1);
-> > +       *insn++ =3D BPF_EXIT_INSN();
-> >         *insn++ =3D BPF_MOV64_REG(BPF_REG_1, BPF_REG_6);
-> >         *insn++ =3D prog->insnsi[0];
-> >
-> > @@ -239,11 +242,26 @@ __bpf_kfunc void bpf_qdisc_watchdog_schedule(stru=
-ct Qdisc *sch, u64 expire, u64
-> >  }
-> >
-> >  /* bpf_qdisc_init_prologue - Hidden kfunc called in prologue of .init.=
- */
-> > -__bpf_kfunc void bpf_qdisc_init_prologue(struct Qdisc *sch)
-> > +__bpf_kfunc int bpf_qdisc_init_prologue(struct Qdisc *sch,
-> > +                                       struct netlink_ext_ack *extack)
-> >  {
-> >         struct bpf_sched_data *q =3D qdisc_priv(sch);
-> > +       struct net_device *dev =3D qdisc_dev(sch);
-> > +       struct Qdisc *p;
-> > +
-> > +       if (sch->parent !=3D TC_H_ROOT) {
-> > +               p =3D qdisc_lookup(dev, TC_H_MAJ(sch->parent));
-> > +               if (!p)
-> > +                       return -ENOENT;
-> > +
-> > +               if (!(p->flags & TCQ_F_MQROOT)) {
-> > +                       NL_SET_ERR_MSG(extack, "BPF qdisc only supporte=
-d on root or mq");
-> > +                       return -EINVAL;
-> > +               }
-> > +       }
-> >
-> >         qdisc_watchdog_init(&q->watchdog, sch);
-> > +       return 0;
-> >  }
-> >
-> >  /* bpf_qdisc_reset_destroy_epilogue - Hidden kfunc called in epilogue =
-of .reset
-> > --
-> > 2.47.1
-> >
+Lucien.Jheng (1):
+  net: phy: air_en8811h: Add clk provider for CKO pin
+
+ drivers/net/phy/air_en8811h.c | 95 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 95 insertions(+)
+
+-- 
+2.34.1
+
 
