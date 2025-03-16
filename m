@@ -1,206 +1,119 @@
-Return-Path: <netdev+bounces-175111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6D88A63587
-	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 13:02:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24A77A63591
+	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 13:17:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C73623A5860
-	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 12:02:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A7B816F98E
+	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 12:17:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EEDB19CD16;
-	Sun, 16 Mar 2025 12:02:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21ED319AD86;
+	Sun, 16 Mar 2025 12:17:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="qGHtt+PH";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ZzU9rmBn"
+	dkim=pass (2048-bit key) header.d=fossekall.de header.i=@fossekall.de header.b="e/sZv+ZJ";
+	dkim=permerror (0-bit key) header.d=fossekall.de header.i=@fossekall.de header.b="KG0QREhx"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.166])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CACA1A00ED;
-	Sun, 16 Mar 2025 12:02:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742126547; cv=none; b=idK4+ELHKBVGN0eastm9wTx+ox4QiST+pO2lIb7n6/JoNwGY532+0cyB8Iq+9ClYJiq9sHJXznQfV9SFIFv0O6d8BX4RG4LjghhyV7orQKsMQIOsK7uoR5ZAsRotAff7/r6/fzm/aqaSL6vJAGvRT0hCf/WzyjKs0DoyaSmb1mM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742126547; c=relaxed/simple;
-	bh=lSXp+O9DVaXUTCGjNyXSEofZO98+fskYq0zZTyMYzGE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KLD90NgxtmBQne71vpq0LRC4imCsWWWrAMvG3uPh2goO+qlM0E/2h38OHbFPYS9GYARVe7hNdh117+96zb/DZ18o/x66iBVsx37xRGm5uq56uiwFzXpSNaq99uP4GNQGhdFbx74Ke+AY4BMPX4X/EpjyIJE8TGDTziWJnIc9JiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=qGHtt+PH; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ZzU9rmBn; arc=none smtp.client-ip=103.168.172.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfout.phl.internal (Postfix) with ESMTP id 3D75A138112B;
-	Sun, 16 Mar 2025 08:02:24 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Sun, 16 Mar 2025 08:02:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1742126544;
-	 x=1742212944; bh=Py4sMxnIyeWWbqRr6YZjl8z5nwTB7JAUCvTD2qb//d0=; b=
-	qGHtt+PHUDWvsbY59dLVIPQPKno8D1xW3KFbVRgndVqPqBkZICmEbYO5oUGeO6sV
-	F2JIgd4U1Os4l+LS0zjmY3frCWe2886IZWBSlFzHonX9UQ8K2O02dLa+8gsmurUs
-	BR+xO2JgUYmXSGG8Jbs8EF898U4TIk4WnlVZ6dwDV8HzO1CT8N/iaP3KeU0Qf/QE
-	RIZKMMYtVETBpJmHou80jbEGcUO4zY+abAUN+UTcowAeqVcz28nW3jydyIR3raTr
-	iLRsvNxHogm7LUOcheHfEFTcqV0nt3o021t0xOcZNi0upc77aLqXOnwBgMFWQY8D
-	emGqqksfl5P8BmHh073fcw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1742126544; x=
-	1742212944; bh=Py4sMxnIyeWWbqRr6YZjl8z5nwTB7JAUCvTD2qb//d0=; b=Z
-	zU9rmBn1ezC8wBQLldXHYdeYbAhIXtQ4IyjbyVq2wlcmReM1ESsnVimG/S3lzVW1
-	uHdHhhJTv8zeY/YxM2Xjn19Us5YjGP5Aka5Ct+N2uYpsxtIZ4fn/RcSd/G+wvJOE
-	i0HcDkRTWIU3V/e4gcwhPlsHLOPGbkULBe+QQAE63mRx4xf2j5HxfTUfxekQA7Cs
-	YdkiTSNVVV1oDOqjryvpsWw6U1tL+irk8SY4oGlpbxJlfmecFkDVngRUuLqdexqM
-	UJlWdOn9lZqDX+Uj2S2p3KXm5zj2s02JhoiVgPNEIi0d9uvoMOBHen1Mkw9az5od
-	0uCVmz35u8FD5qB8JKkmA==
-X-ME-Sender: <xms:z73WZ-r3ftiIvhYzT0RV3d5cUUhaRGu1ZBdoGEheaRglvbyI7fL4_Q>
-    <xme:z73WZ8rmeQC52hj64X3UIbRTv51_0NnVxSaKIRaklmZCyhZaOYvZa1l0GTMEI0iyG
-    kG4qNR9RBc5l546toI>
-X-ME-Received: <xmr:z73WZzMY2Z4Ccvqo1Xqd6xzp0uffBe9pONTWpdWhBkGihv3puQar39BNW-slJRWavfqO976oBImOY6WmSPq29rVUgAg4GB5f2g>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddufeeiheegucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddt
-    tdejnecuhfhrohhmpefpihhklhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrsh
-    houggvrhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgvqeenucggtffr
-    rghtthgvrhhnpeffkefgudekgefhhfejtedviedtgeetieekffeiudfhgeevteejvedtff
-    dvkefftdenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihii
-    vgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhhikhhlrghsrdhsohguvghrlhhunh
-    guodhrvghnvghsrghssehrrghgnhgrthgvtghhrdhsvgdpnhgspghrtghpthhtohepuddt
-    pdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrg
-    hilhdrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthho
-    pehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohepuggrvhgvmh
-    esuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhg
-    lhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtth
-    hopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepughimhgrrdhfvggu
-    rhgruhesghhmrghilhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvg
-    hrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:z73WZ96LFHxe3JYdqEHZA-bxwCu6_woCnUn4ahJU5QANCKkMUKZYhA>
-    <xmx:z73WZ97FVPsGWY2JyCgu1zOr9Xz9_BIWgMM-ZJhFzDdDa3lftLPgSQ>
-    <xmx:z73WZ9hPbJoZhAWFDl1QQVbuMuHnbXZsK2Vd0fXUQ5IVgf6Cjto9RA>
-    <xmx:z73WZ36gl21O1rvczOmnFvacHVkIHLUZ75DpcdEKpscN_8pRHJfLcA>
-    <xmx:0L3WZ6yLEPPJTKyQ3t6yOqjkyUZ--mVeAA3jb3cCaE-j9o-LoZU6O_nN>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 16 Mar 2025 08:02:23 -0400 (EDT)
-Date: Sun, 16 Mar 2025 13:02:14 +0100
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Dimitri Fedrau <dima.fedrau@gmail.com>, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org
-Subject: Re: [net-next] net: phy: marvell-88q2xxx: Enable temperature sensor
- for mv88q211x
-Message-ID: <20250316120214.GA360499@ragnatech.se>
-References: <20250316112033.1097152-1-niklas.soderlund+renesas@ragnatech.se>
- <c17d4b58-9efd-4c09-8e20-e4f9e2e10100@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D7192AD02;
+	Sun, 16 Mar 2025 12:17:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.166
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742127470; cv=pass; b=hZnyG3ppONsQvHmsqcpvFAz05deywRX7REhkoOt+rGwatiz63d+sRBtDH3UEO+6ri4F/t5DWcGuG3m22rdMpAMKjgsL/aE3WuaPvv1pe5/zCWXBKioOIYI2fVSUL/smekulPWKHN1GRr8Psz7m4BgaZI+lVr3BVodRtS9IyA0zs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742127470; c=relaxed/simple;
+	bh=L7+xky7iBDJHO+ZZyfUqZJ3J5cEYq4fNqY8pyONnYA4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=pSfn8gNTybm6xb89wFY6uCIlgQL3klHzVwYgmBJ7IaI/KDJxPJvNn/CBHbGKmyJwuPRY71a3aWJKY1kL6FxbhsNxWvE8uUNoFXRo+sv/Ds3R7UNGeKwX2DwHRy/EEfs3Ei1vkMOBL5xOe/1B9mCW9u8TFdaxWmcbAgG4JlFtUJc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fossekall.de; spf=pass smtp.mailfrom=a98shuttle.de; dkim=pass (2048-bit key) header.d=fossekall.de header.i=@fossekall.de header.b=e/sZv+ZJ; dkim=permerror (0-bit key) header.d=fossekall.de header.i=@fossekall.de header.b=KG0QREhx; arc=pass smtp.client-ip=81.169.146.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fossekall.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=a98shuttle.de
+ARC-Seal: i=1; a=rsa-sha256; t=1742127277; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=r8dn29j2ps8PTqLSk0GOECvitYf5PyUkuokQEKsJlK0sZvqdawbaxfF0iVqOwWBS7L
+    By5QRklwnDCdIX7tUeqpiZookGspnZTl4azjzJVtvhrNhzrfqsuPYnPU2IQI1eHVHuPq
+    opjTz8lhJKrODYXvjPBEK/+TuK+TrwJjihTn2Zt9ypgj9er+hcJFkRyP/pZzruwZZddr
+    3KSCojp5ajq4Fm/OjjVKWRBjiy6ijJtpFgXNtw17jIr1swQGSTbtZ40k80gDfbUTYaJK
+    UBfcMaG5AL+fgkhZudVkapJ3Oga5A7QjCw7y019jXoDvjqF2c624n+A3wD4X7Cgc1QBu
+    JtpA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1742127277;
+    s=strato-dkim-0002; d=strato.com;
+    h=Message-Id:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=Q3PPnZYsYDVMqrvC+ImUKBBxiBgnLPhrJkzzrUE7oeU=;
+    b=iRRl79TJaFQio0eX5AbJ4xhVewC7qjJkc4y0/u/WVMXWUmzFB4jDtK0mADNCAnXrSY
+    c7PwKqnPWcWI036fI72QXAYUg2QsbfTYAj8IvUEXnYOSNkqhxdwmvsTYaMQPE8FZLn9q
+    m9yCxRAb7APIF96XXhUHPOHWEy5MUpugXvOLcniBkZJR+thvVVgAZnpF5ubV6BIzOhox
+    zgGxM6ASqvGdqkL3/heHynvBAegviJd7Fp3cJCy2pV1NCubJ39ym3x7juYBm8I7mTYiM
+    voL0oG8ViyE9dFieX/9UttB2BJjcsXd0WlrLrWltgH6jC0+7rNNrbO2NV0C0XPHDpuWi
+    DWRg==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1742127277;
+    s=strato-dkim-0002; d=fossekall.de;
+    h=Message-Id:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=Q3PPnZYsYDVMqrvC+ImUKBBxiBgnLPhrJkzzrUE7oeU=;
+    b=e/sZv+ZJTZYNN3VxE6FuhJUjQ2rqG8ST7pRtBIDpolKdXMYflVmJ0NOePFQTJ8fD9V
+    3zTY6ipPp40+whcggdYuc2l8L2ErkbdOMVxknqChVQYJxld+bfkLSQayNhw3I7BBpZFb
+    byjB917AEcRR5kioB5B1MuZbdeuZnSbmM3ECoNFlJenPSbNBwZ8LI6ayeoaXREQFi5pT
+    IkRGHjKGmz1JOgm737w01L4yyviF/leh1kAWv2uTrhGO9X7z6oNIFpos5VSWVUnnNRFQ
+    Kj8wKBYywgP6cX35Nc0VK+k4FPxQdRK6U56U9VrfJzEbSMDkf0QyEQ3XM5FPT5EfaZaK
+    34yg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1742127277;
+    s=strato-dkim-0003; d=fossekall.de;
+    h=Message-Id:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=Q3PPnZYsYDVMqrvC+ImUKBBxiBgnLPhrJkzzrUE7oeU=;
+    b=KG0QREhxknY/KOLMtsHf6XxNrwkqhggo0nl5YRk305yCd3pzAxlY3PRLW5BddxOIy5
+    uNPL/BL5MLomxduGhWDA==
+X-RZG-AUTH: ":O2kGeEG7b/pS1EzgE2y7nF0STYsSLflpbjNKxx7cGrBdao6FTL4AJcMdm+lap4JEHkzok9eyEg=="
+Received: from aerfugl
+    by smtp.strato.de (RZmta 51.3.0 AUTH)
+    with ESMTPSA id f28b3512GCEb8gr
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Sun, 16 Mar 2025 13:14:37 +0100 (CET)
+Received: from koltrast.home ([192.168.1.27] helo=a98shuttle.de)
+	by aerfugl with smtp (Exim 4.96)
+	(envelope-from <michael@a98shuttle.de>)
+	id 1ttmt2-00061f-0X;
+	Sun, 16 Mar 2025 13:14:36 +0100
+Received: (nullmailer pid 82540 invoked by uid 502);
+	Sun, 16 Mar 2025 12:14:36 -0000
+From: Michael Klein <michael@fossekall.de>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Michael Klein <michael@fossekall.de>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [net-next,v3,0/2] net: phy: realtek: Add support for PHY LEDs on
+Date: Sun, 16 Mar 2025 13:14:21 +0100
+Message-Id: <20250316121424.82511-1-michael@fossekall.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <c17d4b58-9efd-4c09-8e20-e4f9e2e10100@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Heiner,
+Changes in V3:
+- move definition of rtl8211e_read_ext_page() to patch 2
+- Wrap overlong lines
+Changes in V2:
+- Designate to net-next
+- Add ExtPage access cleanup patch as suggested by Andrew Lunn
 
-Thanks for your feedback.
+Michael Klein (2):
+  net: phy: realtek: Clean up RTL8211E ExtPage access
+  net: phy: realtek: Add support for PHY LEDs on RTL8211E
 
-On 2025-03-16 12:47:55 +0100, Heiner Kallweit wrote:
-> On 16.03.2025 12:20, Niklas Söderlund wrote:
-> > The temperature sensor enabled for mv88q222x devices also functions for
-> > mv88q211x based devices. Unify the two devices probe functions to enable
-> > the sensors for all devices supported by this driver.
-> > 
-> > The same oddity as for mv88q222x devices exists, the PHY must be up for
-> > a correct temperature reading to be reported.
-> > 
-> In this case, wouldn't it make sense to extend mv88q2xxx_hwmon_is_visible()
-> and hide the temp_input attribute if PHY is down? 
-> Whatever down here means in detail: Link down? In power-down mode?
-
-These are good suggestions, this issue is being worked on [1]. I just 
-wanted to highlight that this entablement behaves the same as the 
-current models that support the temperature sensor and log how this was 
-tested on mv88q211x.
-
-1.  https://lore.kernel.org/all/20250220-marvell-88q2xxx-hwmon-enable-at-probe-v2-0-78b2838a62da@gmail.com/
-
-> 
-> >     # cat /sys/class/hwmon/hwmon9/temp1_input
-> >     -75000
-> > 
-> >     # ifconfig end5 up
-> > 
-> >     # cat /sys/class/hwmon/hwmon9/temp1_input
-> >     59000
-> > 
-> > Worth noting is that while the temperature register offsets and layout
-> > are the same between mv88q211x and mv88q222x devices their names in the
-> > datasheets are different. This change keeps the mv88q222x names for the
-> > mv88q211x support.
-> > 
-> > Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-> > ---
-> >  drivers/net/phy/marvell-88q2xxx.c | 14 ++------------
-> >  1 file changed, 2 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/drivers/net/phy/marvell-88q2xxx.c b/drivers/net/phy/marvell-88q2xxx.c
-> > index 15c0f8adc2f5..cdd40b613ce8 100644
-> > --- a/drivers/net/phy/marvell-88q2xxx.c
-> > +++ b/drivers/net/phy/marvell-88q2xxx.c
-> > @@ -834,6 +834,7 @@ static int mv88q2xxx_leds_probe(struct phy_device *phydev)
-> >  static int mv88q2xxx_probe(struct phy_device *phydev)
-> >  {
-> >  	struct mv88q2xxx_priv *priv;
-> > +	int ret;
-> >  
-> >  	priv = devm_kzalloc(&phydev->mdio.dev, sizeof(*priv), GFP_KERNEL);
-> >  	if (!priv)
-> > @@ -841,17 +842,6 @@ static int mv88q2xxx_probe(struct phy_device *phydev)
-> >  
-> >  	phydev->priv = priv;
-> >  
-> > -	return 0;
-> > -}
-> > -
-> > -static int mv88q222x_probe(struct phy_device *phydev)
-> > -{
-> > -	int ret;
-> > -
-> > -	ret = mv88q2xxx_probe(phydev);
-> > -	if (ret)
-> > -		return ret;
-> > -
-> >  	ret = mv88q2xxx_leds_probe(phydev);
-> >  	if (ret)
-> >  		return ret;
-> > @@ -1124,7 +1114,7 @@ static struct phy_driver mv88q2xxx_driver[] = {
-> >  		.phy_id_mask		= MARVELL_PHY_ID_MASK,
-> >  		.name			= "mv88q2220",
-> >  		.flags			= PHY_POLL_CABLE_TEST,
-> > -		.probe			= mv88q222x_probe,
-> > +		.probe			= mv88q2xxx_probe,
-> >  		.get_features		= mv88q2xxx_get_features,
-> >  		.config_aneg		= mv88q2xxx_config_aneg,
-> >  		.aneg_done		= genphy_c45_aneg_done,
-> 
+ drivers/net/phy/realtek/realtek_main.c | 174 +++++++++++++++++++++----
+ 1 file changed, 146 insertions(+), 28 deletions(-)
 
 -- 
-Kind Regards,
-Niklas Söderlund
+2.39.5
+
 
