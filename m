@@ -1,209 +1,185 @@
-Return-Path: <netdev+bounces-175144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D176A63763
-	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 21:35:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 20A05A6378E
+	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 22:44:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B616188ED7B
-	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 20:35:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A2431883078
+	for <lists+netdev@lfdr.de>; Sun, 16 Mar 2025 21:44:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2321199931;
-	Sun, 16 Mar 2025 20:35:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 778431D7E54;
+	Sun, 16 Mar 2025 21:44:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="YWsEiors"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Av5BSeRe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19407143748
-	for <netdev@vger.kernel.org>; Sun, 16 Mar 2025 20:35:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E22DAC2E0;
+	Sun, 16 Mar 2025 21:44:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742157311; cv=none; b=VClaDzc9TLIY21gEu1zOeNAtMYlm5dkS/agVP+NTx637Q/BGsl1eelypaxUFrHxPRhMObJcsZ1UB6WQEsKtNAbXxRrc6AHex2sfdK5ZobTGPzqQKUJLgXdFF0qOddftvBNezPg1zL7tBrEsSX4pyDLo78HzLVSnttDrnogtANQE=
+	t=1742161450; cv=none; b=PeDJMBNXNyDViv3c24l8+TRAISi0GoGY5AqmiuKisQA3yzAETfal2hsjJBn2mVWXoEOYutZv4/KH966/jaQKyjfj//7dboGj0ZCraYQtBqzOQYA7lft8mZS9nqUPYOLhMc0TO6cp9HEPcvPBF0Zy9kIvyDvp9Btr03+BG0Uws8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742157311; c=relaxed/simple;
-	bh=dKC6oKfJqlJWfKuMIbGGKu7ODihXEYGoPHTMMfdAuiE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IsAGOvh2MFLJO8pg4k19OSL0vTu6/9iAtPDEfgRFPLMMarVZ18xAEaS0w4xqT19LbiMvzdbm2RKkUn7P9Ds/TYAp8aCKlMR8rzzq0cMeZVoNSF9YmGAYS/xKpz5nzVxqy7y4FmkAs5sfO5ZZE1FiUUZY8JK/yMpQERv2zYsCPkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=YWsEiors; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3913b539aabso2381833f8f.2
-        for <netdev@vger.kernel.org>; Sun, 16 Mar 2025 13:35:09 -0700 (PDT)
+	s=arc-20240116; t=1742161450; c=relaxed/simple;
+	bh=v4P/KcddWLuDTatda/HBTqKygV+7kfJ09+a2eRbRlKw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Tn25GvPr55MUD3/f+AMvfaaW/1R6cxNLfEiEPxEVoIw1Wb+QNF/qpHEndf0pOnnZCZiQcQJ3ECLMtNau/P0YWcRa4aV21to+Ewv0GpBu2hFPkQH4oUw2nOHqZnD3bfm+xYpNYbowKOJGRrVAsDq+96+5n8ktIGJQz64yp0KRSvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Av5BSeRe; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-22401f4d35aso66748345ad.2;
+        Sun, 16 Mar 2025 14:44:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1742157308; x=1742762108; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=e/qniutptUO6aG/4w6T50Q5l+k6GgQyiuG2YW9LxAFI=;
-        b=YWsEiorsTlYqF1+4tPrWKJ/lhjwAiOaOYivM3FpDRKM0AtIU89voeGwqAx2mkVo6D1
-         O2QaKSzSxpmWQrHEaSD9u/gfrioyr9W9lquBKiVkWLOPVouEJkZ+cjHtfADvAx1y+qpD
-         8+glKtU6B5FcMz0EG68JVDdEq6/JI8j1knhw+AVyvS6k9SDhjJNh85my6awvdKWIPKR0
-         nrQPYCX0PJQ+RYCXX19eGioysc0JeNSy6qmaLf7ZNSvDlnF+ND0bfBDvIDDUYZlsmGVE
-         Cx1pHAfwkS+M5izcOCFtfOeTh11hJT6p363dLV+OqsxkFAaIUe8ohGIgiCqg/PSzGUh9
-         /m5w==
+        d=gmail.com; s=20230601; t=1742161448; x=1742766248; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4mKilVKnBM4oRzcS1cLG80AavsaCOJuEZgc8LXHq/UQ=;
+        b=Av5BSeReNpTZbMpAoy6k2um4wrkL6vvvqb+NPR88d39OASCl6b3tM1DLLen/A3He73
+         0s0cpWxUwSMJThtIH6YlZ/0TbzvUvEGHuGDhIH1qu0UuYYtlRy/byia/WgOlTs5E2/jB
+         fVfFUq2f74rHFKkcOVx+OrOIxYfVfWgFxeJ6QExnaMpO+Rx9sz8wAB+mIElTGZaHpyOk
+         U0bTtwFa65BfnyzSKKZ4Beul70s1SF0mgwBugsx6fr08WBihuJUmXvHySaMBqcmto6S5
+         OxNtqJeFeGcmOAbxtMW/V3LN/0YIIjqr6nbkKZFCaCLOQDcA20e4ehd18ygRJsYUbuIC
+         j9gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742157308; x=1742762108;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=e/qniutptUO6aG/4w6T50Q5l+k6GgQyiuG2YW9LxAFI=;
-        b=aXADDflOolkNaUm7Ox6wt50pzGtK1dbKS7PTlEn0WHA7hO6A+UzUO3doPwViCZdTeS
-         cCmMqDbfD89Vk351f0uS4dus25PkITtQTi2OAbTSPsK41U+B6E43/OZ7Z52PRqessdl7
-         YvGOiEsfV7KNaBU1wi6dKTG9Xcd0LKi7BdAn6C6DIvk4GvWpTx/MVE5IUutPaQrCd6/h
-         aiel1REbxLV4wRs3zMPbWe67GD/ukh+Dvpp4D/9cWeWw+I3PN+1cbx2h5kxD1BBoRNPd
-         JggDcA1QwHkF3JcCDCP3S0M7LCZmpUy3J9BoJ9uGpZZMQ1oTsfPa7apmJFyVnVdHPh4B
-         pV9A==
-X-Forwarded-Encrypted: i=1; AJvYcCWpcNy3tv3i+ZZT2x9DIrCUns/kP7jbCnwbDnp3VGW4GaSrzdYNdwdjtmYJgV9WxYnmnebHODw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxoG0+BP37I7JdwJTiSee4T8hcEV2RRWgdafblLRizLqLbJfhZz
-	VX6EjTTFTMbz0kCoVCqXhcHoU43AqgVOGjufQgr3UIjQzOf9dDv1roqpbuNcB5E=
-X-Gm-Gg: ASbGncvWqc5qnmufZEIYsv19pXqRzrqCiciy14CP3cUyD9ZdIx/c1RoPLSCkDmOV6+5
-	svj7CCAKHgrHqmTF/ULWnDCDiGMZZiXGUBblS+q8hbgYov1ZU9avIZecAhDBWZGBrC/TyfXxBFU
-	bj49dS2jxzGzG5BM4lDDMt0sBmh6ib35ij25M8uyEMhx4wblEAkm7p3pq+iNWdceDvjBt1MEVbm
-	KP19sW+Kaow5nny8JablL3Vy2GPmVTyEI0C7aLgYwAKgYYHKM4NSZHAioeYg0I1FfAmSb+Noscn
-	TeIdIqKHj9tHKrhSMBlm67DUx5atrDr1dXNyKumyC6I8aAu/8utf9fVqMAVCnqyqTAj3JkM9AE9
-	T
-X-Google-Smtp-Source: AGHT+IEX4MsZy7CIHnz5nS7qR417zJFGnB5h/cnEE6O40fjH90DJYPmv+beoRj6eBarLH4rYx2UMvg==
-X-Received: by 2002:a05:6000:1545:b0:391:2e6a:30de with SMTP id ffacd0b85a97d-3971e971991mr13080918f8f.19.1742157307990;
-        Sun, 16 Mar 2025 13:35:07 -0700 (PDT)
-Received: from [192.168.0.160] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395c888117csm12690480f8f.44.2025.03.16.13.35.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 16 Mar 2025 13:35:07 -0700 (PDT)
-Message-ID: <d539500a-7fca-40c8-ba38-4e334a97f810@blackwall.org>
-Date: Sun, 16 Mar 2025 22:35:05 +0200
+        d=1e100.net; s=20230601; t=1742161448; x=1742766248;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4mKilVKnBM4oRzcS1cLG80AavsaCOJuEZgc8LXHq/UQ=;
+        b=fWiUwyV1CLhbPkZWplhltVHAvM1/YTYS6GQf5bdA/1TuaLlWrihIMwrkH02cztK3Ds
+         Jfnbrrau9UrTkPrGaeKRgHC9AgIg8ci1RbHGpu8G9cpkreoom31IEtZ07bNCmducvJYH
+         woev2wIWoMqieWbcDiW38qJ748xVsfUxqYw4xbKo0b+aFme1j/RqPUVJFuVDuj8xeMj9
+         DhqDvTZWi5W0dkToanmD14bXfsJ84/HtHcqdGiG6O/eofN3XVQXUZypz5QC57s+2OdaM
+         t5hio40/SqAcoUUq2b6MuL2WzZVAFAyyKAf8nnDSK4IEfLEqTXR7wiYg+tU/YgUJt0oW
+         BJyA==
+X-Forwarded-Encrypted: i=1; AJvYcCVvyH+6BA7OBbcY2K3AfR4nc02eWj+8RcuyO6Q6WfdwZa58jUFNuZRhXZfO+sYIJp+slxwQw7fdp3VN@vger.kernel.org, AJvYcCWJJ9jJZiOwNwL1NZPTOJQraPf6+1cWKMHKHPBv5yIo6BF0EWVFSJz/96QuXt+MTARlApDOMS4av5urYg==@vger.kernel.org, AJvYcCXUh9WcZTijg5tFsWzUmJgVLd80YfJwaq7b0B9GSFQmiYquljAbyDVgdRm/4Fq6BA4lGYUAA990@vger.kernel.org, AJvYcCXUrksHAFWGgjRznA60golSCLgeNdmTAZjjxATHNTG+p77m4zT60YtK5nyzBg7Ovf3uFgjb+6rdQDEqYoVW@vger.kernel.org, AJvYcCXV4oqnrC35ub3xEQ+Ld9NMaRJvszJu9RbmowvCo/RoT1GL8Y/qigaNa+YqUtL5yFZ9OYFUXf8gGlHF@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0w7sS0GLYq2IxOa17gWb+4repDhbALPpS646WsUQnQq797A3p
+	tgmo+U0LCMb39MV2GqkYnqItwGtBtMajDMKlRZ64uB78rcGKhx9F
+X-Gm-Gg: ASbGncuydSPA1/Dht+Iz0uYUXGvolnFpKiy9GSSLJnpEW6KVlhVfNcvvTGi//nwVgc5
+	Mz929IzbceOYuzfeXoIuDQ2MCBnU7nocPqg9DBDX5t8XOzBg/YDX22J6aQXmZseS8gTnIMJIV7N
+	WkaMqTYMNcZT3lXd8Xl6N2NO6cbgAPvXpLfmIS1Rw/A0K46s2sRRpU+phxi/jR1cDqzXBFdv4cZ
+	j/5GGm0h+cQcjlehgA4hvG7Tuaj3i/sfIO5T1d1/0H+G/UwsgwkWgTsSk4eR4vFIW/TDTkxMJHN
+	zyAe9Lh6ydY+rOHCIQ9y+Yk7fjKg/PU7ri2IcATOlmfB7//Lr/a3JQ==
+X-Google-Smtp-Source: AGHT+IHk3fWjPG0Lq3bYmcMnBWXcJVnNnmjKprgtboThBoy1lvBE5vc2ZBXIYdbzt5jjuHpjlPKXvA==
+X-Received: by 2002:a17:902:e74c:b0:223:3bf6:7e6a with SMTP id d9443c01a7336-225e0a40bb3mr144393215ad.12.1742161448027;
+        Sun, 16 Mar 2025 14:44:08 -0700 (PDT)
+Received: from localhost ([2804:30c:b31:2d00:277c:5cbe:7f44:752b])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-225c688858asm61634375ad.46.2025.03.16.14.44.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Mar 2025 14:44:06 -0700 (PDT)
+Date: Sun, 16 Mar 2025 18:45:03 -0300
+From: Marcelo Schmitt <marcelo.schmitt1@gmail.com>
+To: Matti Vaittinen <mazziesaccount@gmail.com>
+Cc: Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>,
+	Jonathan Cameron <jic23@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Daniel Scally <djrscally@gmail.com>,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-iio@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v7 02/10] property: Add functions to iterate named child
+Message-ID: <Z9dGX_ckIRUg6fZh@debian-BULLSEYE-live-builder-AMD64>
+References: <cover.1741849323.git.mazziesaccount@gmail.com>
+ <f613b5f120a4dde63d28b0a2e0186dcb8dbf57ae.1741849323.git.mazziesaccount@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net] net: Remove RTNL dance for SIOCBRADDIF and
- SIOCBRDELIF.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Roopa Prabhu <roopa@nvidia.com>,
- Willem de Bruijn <willemb@google.com>, Simon Horman <horms@kernel.org>
-Cc: Ido Schimmel <idosch@idosch.org>, Stanislav Fomichev <sdf@fomichev.me>,
- Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
- bridge@lists.linux.dev, syzkaller <syzkaller@googlegroups.com>,
- yan kang <kangyan91@outlook.com>, yue sun <samsun1006219@gmail.com>
-References: <20250316192851.19781-1-kuniyu@amazon.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20250316192851.19781-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f613b5f120a4dde63d28b0a2e0186dcb8dbf57ae.1741849323.git.mazziesaccount@gmail.com>
 
-On 3/16/25 9:28 PM, Kuniyuki Iwashima wrote:
-> SIOCBRDELIF is passed to dev_ioctl() first and later forwarded to
-> br_ioctl_call(), which causes unnecessary RTNL dance and the splat
-> below [0] under RTNL pressure.
+Hello,
+
+LGTM, few minor comments inline.
+With those sorted
+Reviewed-by: Marcelo Schmitt <marcelo.schmitt1@gmail.com>
+
+On 03/13, Matti Vaittinen wrote:
+> There are a few use-cases where child nodes with a specific name need to
+> be parsed. Code like:
 > 
-> Let's say Thread A is trying to detach a device from a bridge and
-> Thread B is trying to remove the bridge.
+> fwnode_for_each_child_node()
+> 	if (fwnode_name_eq())
+> 		...
 > 
-> In dev_ioctl(), Thread A bumps the bridge device's refcnt by
-> netdev_hold() and releases RTNL because the following br_ioctl_call()
-> also re-acquires RTNL.
+> can be found from a various drivers/subsystems. Adding a macro for this
+> can simplify things a bit.
 > 
-> In the race window, Thread B could acquire RTNL and try to remove
-> the bridge device.  Then, rtnl_unlock() by Thread B will release RTNL
-> and wait for netdev_put() by Thread A.
+> In a few cases the data from the found nodes is later added to an array,
+> which is allocated based on the number of found nodes. One example of
+> such use is the IIO subsystem's ADC channel nodes, where the relevant
+> nodes are named as channel[@N].
 > 
-> Thread A, however, must hold RTNL after the unlock in dev_ifsioc(),
-> which may take long under RTNL pressure, resulting in the splat by
-> Thread B.
+> Add helpers for iterating and counting device's sub-nodes with certain
+> name instead of open-coding this in every user.
 > 
->   Thread A (SIOCBRDELIF)           Thread B (SIOCBRDELBR)
->   ----------------------           ----------------------
->   sock_ioctl                       sock_ioctl
->   `- sock_do_ioctl                 `- br_ioctl_call
->      `- dev_ioctl                     `- br_ioctl_stub
->         |- rtnl_lock                     |
->         |- dev_ifsioc                    '
->         '  |- dev = __dev_get_by_name(...)
->            |- netdev_hold(dev, ...)      .
->        /   |- rtnl_unlock  ------.       |
->        |   |- br_ioctl_call       `--->  |- rtnl_lock
->   Race |   |  `- br_ioctl_stub           |- br_del_bridge
->   Window   |     |                       |  |- dev = __dev_get_by_name(...)
->        |   |     |  May take long        |  `- br_dev_delete(dev, ...)
->        |   |     |  under RTNL pressure  |     `- unregister_netdevice_queue(dev, ...)
->        |   |     |               |       `- rtnl_unlock
->        \   |     |- rtnl_lock  <-'          `- netdev_run_todo
->            |     |- ...                        `- netdev_run_todo
->            |     `- rtnl_unlock                   |- __rtnl_unlock
->            |                                      |- netdev_wait_allrefs_any
->            |- netdev_put(dev, ...)  <----------------'
->                                                 Wait refcnt decrement
->                                                 and log splat below
-> 
-> To avoid blocking SIOCBRDELBR unnecessarily, let's not call
-> dev_ioctl() for SIOCBRADDIF and SIOCBRDELIF.
-> 
-> In the dev_ioctl() path, we do the following:
-> 
->   1. Copy struct ifreq by get_user_ifreq in sock_do_ioctl()
->   2. Check CAP_NET_ADMIN in dev_ioctl()
->   3. Call dev_load() in dev_ioctl()
->   4. Fetch the master dev from ifr.ifr_name in dev_ifsioc()
-> 
-> 3. can be done by request_module() in br_ioctl_call(), so we move
-> 1., 2., and 4. to br_ioctl_stub().
-> 
-> Note that 2. is also checked later in add_del_if(), but it's better
-> performed before RTNL.
-> 
-> SIOCBRADDIF and SIOCBRDELIF have been processed in dev_ioctl() since
-> the pre-git era, and there seems to be no specific reason to process
-> them there.
-> 
-> [0]:
-> unregister_netdevice: waiting for wpan3 to become free. Usage count = 2
-> ref_tracker: wpan3@ffff8880662d8608 has 1/1 users at
->      __netdev_tracker_alloc include/linux/netdevice.h:4282 [inline]
->      netdev_hold include/linux/netdevice.h:4311 [inline]
->      dev_ifsioc+0xc6a/0x1160 net/core/dev_ioctl.c:624
->      dev_ioctl+0x255/0x10c0 net/core/dev_ioctl.c:826
->      sock_do_ioctl+0x1ca/0x260 net/socket.c:1213
->      sock_ioctl+0x23a/0x6c0 net/socket.c:1318
->      vfs_ioctl fs/ioctl.c:51 [inline]
->      __do_sys_ioctl fs/ioctl.c:906 [inline]
->      __se_sys_ioctl fs/ioctl.c:892 [inline]
->      __x64_sys_ioctl+0x1a4/0x210 fs/ioctl.c:892
->      do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->      do_syscall_64+0xcb/0x250 arch/x86/entry/common.c:83
->      entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> Fixes: 893b19587534 ("net: bridge: fix ioctl locking")
-> Reported-by: syzkaller <syzkaller@googlegroups.com>
-> Reported-by: yan kang <kangyan91@outlook.com>
-> Reported-by: yue sun <samsun1006219@gmail.com>
-> Closes: https://lore.kernel.org/netdev/SY8P300MB0421225D54EB92762AE8F0F2A1D32@SY8P300MB0421.AUSP300.PROD.OUTLOOK.COM/
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+> Suggested-by: Jonathan Cameron <jic23@kernel.org>
+> Signed-off-by: Matti Vaittinen <mazziesaccount@gmail.com>
 > ---
-> v2:
->   * Use if in br_ioctl_stub()
->   * Update diagram in commit message
-> 
-> v1: https://lore.kernel.org/netdev/20250314010501.75798-1-kuniyu@amazon.com/
-> ---
->  include/linux/if_bridge.h |  6 ++----
->  net/bridge/br_ioctl.c     | 36 +++++++++++++++++++++++++++++++++---
->  net/bridge/br_private.h   |  3 +--
->  net/core/dev_ioctl.c      | 19 -------------------
->  net/socket.c              | 19 +++++++++----------
->  5 files changed, 45 insertions(+), 38 deletions(-)
-> 
+...
+> +/**
+> + * fwnode_get_named_child_node_count - number of child nodes with given name
+> + * @fwnode: Node which child nodes are counted.
+> + * @name: String to match child node name against.
+> + *
+> + * Scan child nodes and count all the nodes with a specific name. Potential
+> + * 'number' -ending after the 'at sign' for scanned names is ignored.
+> + * E.g.::
+> + *   device_get_named_child_node_count(dev, "channel");
 
-Thanks,
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+The function being documented is fwnode_get_named_child_node_count().
+Shouldn't the example be
+   fwnode_get_named_child_node_count(fwnode, "channel");
+?
 
+> + * would match all the nodes::
+> + *   channel { }, channel@0 {}, channel@0xabba {}...
+> + *
+> + * Return: the number of child nodes with a matching name for a given device.
+> + */
+...
+> +#define device_for_each_named_child_node(dev, child, name)		\
+> +		device_for_each_child_node(dev, child)			\
+> +			if (!fwnode_name_eq(child, name)) { } else
+
+nitpicking: add only one tab for each indentation level.
+	device_for_each_child_node(dev, child)			\
+		if (!fwnode_name_eq(child, name)) { } else
+
+> +
+>  #define device_for_each_child_node_scoped(dev, child)			\
+>  	for (struct fwnode_handle *child __free(fwnode_handle) =	\
+>  		device_get_next_child_node(dev, NULL);			\
+>  	     child; child = device_get_next_child_node(dev, child))
+>  
+> +#define device_for_each_named_child_node_scoped(dev, child, name)	\
+> +		device_for_each_child_node_scoped(dev, child)		\
+> +			if (!fwnode_name_eq(child, name)) { } else
+> +
+
+nitpicking: instead of two tabs, only one tab before device_for_..._scoped().
+	device_for_each_child_node_scoped(dev, child)		\
+		if (!fwnode_name_eq(child, name)) { } else
+
+Regards,
+Marcelo
 
