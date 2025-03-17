@@ -1,110 +1,93 @@
-Return-Path: <netdev+bounces-175327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0B46A6525F
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 15:10:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DDA5A652A5
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 15:17:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1148718889FA
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 14:09:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B32FA16AFF3
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 14:17:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2550C23E35D;
-	Mon, 17 Mar 2025 14:08:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="28W/+NQd";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="FZuxdFD+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74BBF199E8D;
+	Mon, 17 Mar 2025 14:17:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B42022E41D;
-	Mon, 17 Mar 2025 14:08:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5840156236;
+	Mon, 17 Mar 2025 14:17:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742220536; cv=none; b=FwbZL5lTe1yNq18lMn2Gf3dJTKEdBZflJevoJO1PKn5r9HWkeFU6VlBz7WKAORc6WHGnj5cmHFMSv0Dg707APXeJOdGgZlmv1RiIHhMxnEdZAj0yRcCyHhBLOCcHCP9OVdYAsgyidIG47DMSBA1QkdJfl+J7O5NIqKapzyR2rBU=
+	t=1742221049; cv=none; b=k91LPyS7CKua8EeUUGKGw1isfpuwVc2eAKoC2IYB276JwuIObbJtnu0mwTzFTTMc2xc7q8fWBK4UkKOpxZXiWWSKVyCuawX7XL5hDdLzZg5lgY9zUtButzDDwMyHL302cPUJ7QJcOT1q8Ez+kw925vDaVfnWqiKRm4c6lDjjnls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742220536; c=relaxed/simple;
-	bh=LaBllksMXNcHn9jcIH65hwRzMgxWyFEhpdNoPDS8o4M=;
+	s=arc-20240116; t=1742221049; c=relaxed/simple;
+	bh=ZrCUyyoaCtGtFB4feGbsXOOJ2TmB82Yr07aXXd2sG5A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p6cBQHmxvDjSCx+Ond+ZsDbbFIEDVPEivbo/7Udmp+Qfut0S6ubdhDKnMm/CbgBqBEBPgQYw5qdV4dt11XLki+atVRvMJxfCf1jqHrLtoYSKxvFpvaRcSxSHe//1s+7YVK1yeDR4tzXdCnrEcamQ4/eWqwzVgyzWT/VlC3He/6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=28W/+NQd; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=FZuxdFD+; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Mon, 17 Mar 2025 15:08:49 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1742220532;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+VmJSsk64HA0bX+prW9/tesp5wyAHGS66/Z9Jcapr34=;
-	b=28W/+NQdCpo9WjR9RGG7NwmtBraaBCW+jXmjkTxWvOwnmGczMH/urrf/4t3o71lDB6uP0s
-	MZm4oWIh0M0lH7cphRgV+TfXMpY36hUasSUfoyCWU1goy/zhPdI2J81ZwbEWtO7F/rpo3t
-	AnctrlF+/7sIH1pSt0W2ncsrqbu66yJu09wqsVHmdUXvgUq1g7a/8cdOhH4QVHwFgqgOKO
-	BS0u+5ZlBL+DmxLvhVOQJ5uN1sk7M5dXTHJsm5MGt2nmrifWPs+VKMP7+ZT74hxStJR4RT
-	CnCfZseTTD8k0PHrS8ssLKoycGbZFl6JpSYSVGq+EqyoQTcQ+z3hnd2NSDhN4g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1742220532;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+VmJSsk64HA0bX+prW9/tesp5wyAHGS66/Z9Jcapr34=;
-	b=FZuxdFD+2Nr3gdbrCj+PMZO8cVs8PDeIgVhjzjRjn3XsN/g928yrG0t6SR/4vpEx9y1AzY
-	4qk8qNFfjN+KmeDQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: stable@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
-	Ricardo =?utf-8?Q?Ca=C3=B1uelo?= Navarro <rcn@igalia.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
-Subject: Re: [PATCH stable] xdp: Reset bpf_redirect_info before running a
- xdp's BPF prog.
-Message-ID: <20250317140849.H4eSnqFl@linutronix.de>
-References: <20250317133813.OwHVKUKe@linutronix.de>
- <2025031733-collide-dad-203a@gregkh>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FlvZTpjUcrCWJfzMEaQwzq0ev8hEVW4U2V35CXDt3gO7wRfStEfvdAmk2qc0fqW+zOmYYwy26h7mKjIsMxSe/jzLkwm79VF70BiyRW1TtclqCSuHY8ut+8ev2v28GAIs3Ujj74wv/7y7Gx9+Vry8M6exAjXR5foSLY09PgYMUIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com; spf=none smtp.mailfrom=foss.arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=foss.arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2796613D5;
+	Mon, 17 Mar 2025 07:17:36 -0700 (PDT)
+Received: from bogus (e133711.arm.com [10.1.196.55])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1E3CE3F63F;
+	Mon, 17 Mar 2025 07:17:25 -0700 (PDT)
+Date: Mon, 17 Mar 2025 14:17:23 +0000
+From: Sudeep Holla <sudeep.holla@arm.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: linux-kernel@vger.kernel.org, Sudeep Holla <sudeep.holla@arm.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org
+Subject: Re: [PATCH 7/9] net: phy: fixed_phy: transition to the faux device
+ interface
+Message-ID: <Z9gu86r9pdFPGxrb@bogus>
+References: <20250317-plat2faux_dev-v1-0-5fe67c085ad5@arm.com>
+ <20250317-plat2faux_dev-v1-7-5fe67c085ad5@arm.com>
+ <ea159cab-e09f-4afc-b0da-807d22d272c8@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2025031733-collide-dad-203a@gregkh>
+In-Reply-To: <ea159cab-e09f-4afc-b0da-807d22d272c8@lunn.ch>
 
-> > I added the commit introducing map redirects as the origin of the
-> > problem which is v4.14-rc1. The code is a bit different there it seems
-> > to work similar.
+On Mon, Mar 17, 2025 at 01:29:31PM +0100, Andrew Lunn wrote:
+> On Mon, Mar 17, 2025 at 10:13:19AM +0000, Sudeep Holla wrote:
+> > The net fixed phy driver does not require the creation of a platform
+> > device. Originally, this approach was chosen for simplicity when the
+> > driver was first implemented.
+> > 
+> > With the introduction of the lightweight faux device interface, we now
+> > have a more appropriate alternative. Migrate the driver to utilize the
+> > faux bus, given that the platform device it previously created was not
+> > a real one anyway. This will simplify the code, reducing its footprint
+> > while maintaining functionality.
+> > 
+> > Cc: Andrew Lunn <andrew@lunn.ch>
+> > Cc: "David S. Miller" <davem@davemloft.net>
+> > Cc: netdev@vger.kernel.org
+> > Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+> > ---
+> >  drivers/net/phy/fixed_phy.c | 16 ++++++++--------
+> >  1 file changed, 8 insertions(+), 8 deletions(-)
 > 
-> What stable tree(s) is this for?  Just 6.6.y?  Why not older ones?
+> 8 insertions, 8 deletions. How does this reduce its footprint?
+>
 
-I didn't say just v6.6.y. The commit introducing the problem is in
-v4.14-rc1 so I would say all the way down for the supported trees. Just
-let me know if it does not apply for some of the older kernel.
+I meant the use of struct faux_device vs struct platform_device. Yes
+it is not a big deal.
 
-> > Greg, feel free to decide if this is worth a CVE.
+> Seems like pointless churn to me. Unless there is a real advantage to
+> faux bus you are not enumerating in your commit message.
 > 
-> That's not how CVEs are assigned :)
-> 
-> If you want one, please read the in-tree documentation we have for that.
 
-I don't need one but it is tempting to go through the new process :).
-If it does not make your handling here easier (since you have two
-different patches for one issue) there is no need for it from my side.
+Greg has answered that, so will skip.
 
-Thank you.
-
-> thanks,
-> 
-> greg k-h
-
-Sebastian
+-- 
+Regards,
+Sudeep
 
