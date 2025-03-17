@@ -1,140 +1,171 @@
-Return-Path: <netdev+bounces-175169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B35E9A63D8E
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 04:51:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF53FA63DAB
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 04:57:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2F2E188EB9A
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 03:51:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAD3D188F3D4
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 03:57:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6B4D1519A3;
-	Mon, 17 Mar 2025 03:51:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4A12167DB7;
+	Mon, 17 Mar 2025 03:57:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L0WqavR9"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="eBTypSTn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4920FEEA9;
-	Mon, 17 Mar 2025 03:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5E2214A4F9;
+	Mon, 17 Mar 2025 03:57:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742183478; cv=none; b=tXDbzthLBsxBwVHF6Sb8BOmBahDgu2G0vfTwFc97ymW0T8z87vL/MHtfEnzIvTS+1MDN1uYecUexk5ktkj4u+96ED2sr9wWlHI4/pHCv4iiP3rYbmStgE+gGTqWIQvpARnsF3asAh5R75dhPV54IaXNPL3ifkxS9sDwX0h88Thk=
+	t=1742183846; cv=none; b=CmR24MDpp2VwUggHLmGl/w44NuIfRCQNKzqHCfBfClVLxhDsStScrLDptytIXQJErCxKGFwzSrigjIcu7pK4aoBrsJO2IZDzixuHrF+kILou5qaoho8oaLeMODpSzIoCAwDCt8lHv2PjBVPStxS3DNpPszPxR7dXePv8/0RrmEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742183478; c=relaxed/simple;
-	bh=qhdRLVgZypKW9sXgOcBFCl4fPWfUP61UyiBa0eLhEW0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Z1j/xxB8AfIo4gwmMxgBD+n49uzrddbU2z6MzGBkt05GxvAAjSjgmqdNo5Ekt8s3+CIOn0uQ6A+cvb0n0bjwpj7uL5E/7jEzWtk1cWqgksQcS9eauaQFDS3MxmuasjpPPuBujUJbpFq2LMZrIeiIqyLL99INcIyF9deKI+a76Bg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L0WqavR9; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2243803b776so23182435ad.0;
-        Sun, 16 Mar 2025 20:51:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742183474; x=1742788274; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bybvDh4gza3CtHXY8H6ofdczJetAOoZ7ud9S8QA+kxk=;
-        b=L0WqavR9xO0ErztoGL+Nx1mUGR/8f7TTHn8aBLUqUsl8C/91FS8LOBqBd1LKDx8HX0
-         wQO7WO3SIoRJ7637LtEPRvzAExwFbmwkg2LAoieId6xSFPsIjd8vfDCWM6hMBb2XzJ5C
-         1xB7ELMu6GekLM8KJcFzu7xfFcjLdXWEYoGa4h0Kwmdra4fH1lB3K/lpNFsdrG0G6LGe
-         i5OQctEjuTYYI4tnioLwEmPWBnVrGHx6rqxYr0EtbayjdMpdBxiiGy2yx9stXQHzz23E
-         tOGo2FwEdgTDWr8KWAcoujECpSPG0qo7cIueXK4y9ChQI5Krog5VfPuGMqWESea/h9E/
-         BqLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742183474; x=1742788274;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bybvDh4gza3CtHXY8H6ofdczJetAOoZ7ud9S8QA+kxk=;
-        b=B3E0Fi8D5QvsJeWyJoqD5XzMlC76/GIKx9Q0IK20T/mGwHMYDNu5a9i3U6SL+WKa7t
-         wzbuzK5CHYSMKQaQqAG5+lCwyOqWAcYjaR+Xn3fyiunPEYGf4gBSuB+91FJa2JZzo8Rx
-         IkU/4UKLwVVPRMx22Ph+H2TeeoyFH9/UgWvVtNXCYImxZ7W5+vWtI/tT99BR736bSE1k
-         LLP6s2HgTyvpRQ3dMfl+j6JiYR2g9uQ+vBtM7pkGR/nHrgIU6dZyC+jOCaxiAQNipqrS
-         2CAbqOZLQgXV2213MKzmbtgarkZ3tZn5sVQzXc4wZkzbxuoBy5ISGlggJWh6YyCrTfgS
-         zzVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU/ZdWnnRCf1yjkOBSojqvVcZGOpRCaPiD7+QOEXDN4ZIWsumiNekYt7wwA/jx3m3X7g4NDdxDcY/jE7VQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPmiOjlmC6LY691IhlcJ65YVYL2HqVJEAtGXJGpa1Z7XGvZlSH
-	iwpM0aOkDDws+Drm+kUhns8q7/syg1N2afpIhkXDGufhRwu5Osc+J8QXua5U
-X-Gm-Gg: ASbGncvcXqh3uVUNej9AJivy08m2imtW3C8qKpdW8OhtRoHKHqRd/2LFaWhw0I9EwfZ
-	sT1lySOgtKhAEWXeFpH5t/d62yqTHnaP3k9wAJPJi2t2hBl02MCyQcZ0ZCRO71twBEcQ8kiWsQZ
-	ksCpAQzo2vB5c3+sSt76q20uyA6sCkSN3E+z4Kf87eldAWHBmrXFY2+m/eKXinobtCEdzDYrAm2
-	eV4wPfC1EOhs1T5WigFsGT3Osey6Sm1jPJsNn7wCubpLdJaRpgiJxl+kPrHB+VntPCH5dVMmYs0
-	Led6748Cia2Yd/d3CdAcsV8LRoSmNREzgRw4Kit24grs2jAYpkDkCxAz
-X-Google-Smtp-Source: AGHT+IGAXa0nBao8DDNaoRRLowqasPCIZ2c/NdsEIrDJbFpDJNYIwxCYYvnaMUe1AaQVefIA6EuQ4Q==
-X-Received: by 2002:a17:902:cecd:b0:223:5ca8:5ecb with SMTP id d9443c01a7336-225e0aff4e1mr136031785ad.42.1742183474433;
-        Sun, 16 Mar 2025 20:51:14 -0700 (PDT)
-Received: from cs20-buildserver.lan ([2403:c300:df04:8817:2e0:4cff:fe68:863])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-225c6ba6f64sm65049985ad.127.2025.03.16.20.51.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Mar 2025 20:51:14 -0700 (PDT)
-From: Jim Liu <jim.t90615@gmail.com>
-X-Google-Original-From: Jim Liu <JJLIU0@nuvoton.com>
-To: JJLIU0@nuvoton.com,
-	jim.t90615@gmail.com,
-	florian.fainelli@broadcom.com,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	kuba@kernel.org,
-	linux@armlinux.org.uk,
-	edumazet@google.com,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v1] net: phy: broadcom: Correct BCM5221 PHY model detection failure
-Date: Mon, 17 Mar 2025 11:50:05 +0800
-Message-Id: <20250317035005.3064083-1-JJLIU0@nuvoton.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1742183846; c=relaxed/simple;
+	bh=bTXhexVaI+W5KWG7d5Svg2VmXApCu8ktNMe5tbjLp8U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DsseLdG1+zizhQLJUeVtrGgvuxev/JBYpud+Y08sOOQuWKX1fbRmbvao9t8zJ3IyfqmvLb2mjUXcu8PQ+UkJruf9Xn/XZ0UXFSUciX3NudzqUgoVmHnWnJl5OG2x2MdMJYQ2iRQz6G2vS4BQR42jkTq006Sn6ID5RYYsxGBUpOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=eBTypSTn; arc=none smtp.client-ip=115.124.30.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1742183839; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=uE6H0MBz98j5rhIzPJHfWr/CNL9ORRA0RW3EN1COpxM=;
+	b=eBTypSTnXuFlhKc+ixGvt8BjmjPdCkwmmSi5/ONZA+vVIi7u0zxY+gxtzsn90B8pP9q/X0aiSwLhM1ZA3/7dcEaMOJ4vvzp0odKHubAFLWj97FnPUabEzTd8qOa3IdjlGwerbXBxwyKzk30vTfUuwLhyFwHSnOhqSfTGHDB4BsE=
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WRYMu4H_1742183838 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 17 Mar 2025 11:57:18 +0800
+Date: Mon, 17 Mar 2025 11:57:18 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+	wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com,
+	guwen@linux.alibaba.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
+	tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
+Subject: Re: [RFC PATCH net-next] net/smc: avoid conflict with sockmap after
+ fallback
+Message-ID: <20250317035718.GD56800@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <20250312133014.35775-1-alibuda@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250312133014.35775-1-alibuda@linux.alibaba.com>
 
-Use "BRCM_PHY_MODEL" can be applied to the entire 5221 family of PHYs.
+On 2025-03-12 21:30:14, D. Wythe wrote:
+>Currently, after fallback, SMC will occupy the sk_user_data of the TCP sock(clcsk) to
+>forward events. As a result, we cannot use sockmap after that, since sockmap also
+>requires the use of the sk_user_data. Even more, in some cases, this may result in
+>abnormal panic.
 
-Fixes: 3abbd0699b67 (net: phy: broadcom: add support for BCM5221 phy)
-Signed-off-by: Jim Liu <JJLIU0@nuvoton.com>
----
- drivers/net/phy/broadcom.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Looks like this is a bugfix more then a feature.
 
-diff --git a/drivers/net/phy/broadcom.c b/drivers/net/phy/broadcom.c
-index 22edb7e4c1a1..3529289e9d13 100644
---- a/drivers/net/phy/broadcom.c
-+++ b/drivers/net/phy/broadcom.c
-@@ -859,7 +859,7 @@ static int brcm_fet_config_init(struct phy_device *phydev)
- 		return reg;
- 
- 	/* Unmask events we are interested in and mask interrupts globally. */
--	if (phydev->phy_id == PHY_ID_BCM5221)
-+	if (BRCM_PHY_MODEL(phydev) == PHY_ID_BCM5221)
- 		reg = MII_BRCM_FET_IR_ENABLE |
- 		      MII_BRCM_FET_IR_MASK;
- 	else
-@@ -888,7 +888,7 @@ static int brcm_fet_config_init(struct phy_device *phydev)
- 		return err;
- 	}
- 
--	if (phydev->phy_id != PHY_ID_BCM5221) {
-+	if (BRCM_PHY_MODEL(phydev) != PHY_ID_BCM5221) {
- 		/* Set the LED mode */
- 		reg = __phy_read(phydev, MII_BRCM_FET_SHDW_AUXMODE4);
- 		if (reg < 0) {
-@@ -1009,7 +1009,7 @@ static int brcm_fet_suspend(struct phy_device *phydev)
- 		return err;
- 	}
- 
--	if (phydev->phy_id == PHY_ID_BCM5221)
-+	if (BRCM_PHY_MODEL(phydev) == PHY_ID_BCM5221)
- 		/* Force Low Power Mode with clock enabled */
- 		reg = BCM5221_SHDW_AM4_EN_CLK_LPM | BCM5221_SHDW_AM4_FORCE_LPM;
- 	else
--- 
-2.34.1
+>
+>To enable sockmap after SMC fallback , we need to avoid using sk_user_data and
+>instead introduce an additional smc_ctx in tcp_sock to index from TCP sock to SMC sock.
+>
+>Additionally, we bind the lifecycle of the SMC sock to that of the TCP sock, ensuring
+>that the indexing to the SMC sock remains valid throughout the lifetime of the TCP sock.
+>
+>One key reason is that SMC overrides inet_connection_sock_af_ops, which introduces
+>potential dependencies. We must ensure that the af_ops remain visible throughout the
+>lifecycle of the TCP socket. In addition, this also resolves potential issues in some
+>scenarios where the SMC sock might be invalid.
+>
+>Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+>---
+> include/linux/tcp.h |  1 +
+> net/smc/af_smc.c    | 53 ++++++++++++++++++++++-----------------------
+> net/smc/smc.h       |  8 +++----
+> net/smc/smc_close.c |  1 -
+> 4 files changed, 30 insertions(+), 33 deletions(-)
+>
+>diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+>index f88daaa76d83..f2223b1cc0d0 100644
+>--- a/include/linux/tcp.h
+>+++ b/include/linux/tcp.h
+>@@ -478,6 +478,7 @@ struct tcp_sock {
+> #if IS_ENABLED(CONFIG_SMC)
+> 	bool	syn_smc;	/* SYN includes SMC */
+> 	bool	(*smc_hs_congested)(const struct sock *sk);
+>+	void	*smc_ctx;
+> #endif
+> 
+> #if defined(CONFIG_TCP_MD5SIG) || defined(CONFIG_TCP_AO)
+>diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+>index bc356f77ff1d..d434105639c1 100644
+>--- a/net/smc/af_smc.c
+>+++ b/net/smc/af_smc.c
+>@@ -127,7 +127,7 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
+> 	struct smc_sock *smc;
+> 	struct sock *child;
+> 
+>-	smc = smc_clcsock_user_data(sk);
+>+	smc = smc_sk_from_clcsk(sk);
+> 
+> 	if (READ_ONCE(sk->sk_ack_backlog) + atomic_read(&smc->queued_smc_hs) >
+> 				sk->sk_max_ack_backlog)
+>@@ -143,8 +143,6 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
+> 					       own_req);
+> 	/* child must not inherit smc or its ops */
+> 	if (child) {
+>-		rcu_assign_sk_user_data(child, NULL);
+>-
+> 		/* v4-mapped sockets don't inherit parent ops. Don't restore. */
+> 		if (inet_csk(child)->icsk_af_ops == inet_csk(sk)->icsk_af_ops)
+> 			inet_csk(child)->icsk_af_ops = smc->ori_af_ops;
+>@@ -161,10 +159,7 @@ static bool smc_hs_congested(const struct sock *sk)
+> {
+> 	const struct smc_sock *smc;
+> 
+>-	smc = smc_clcsock_user_data(sk);
+>-
+>-	if (!smc)
+>-		return true;
+>+	smc = smc_sk_from_clcsk(sk);
+
+I don't see any users of smc in this function. Seems it is redundant here.
+
+> 
+> 	if (workqueue_congested(WORK_CPU_UNBOUND, smc_hs_wq))
+> 		return true;
+>@@ -250,7 +245,6 @@ static void smc_fback_restore_callbacks(struct smc_sock *smc)
+> 	struct sock *clcsk = smc->clcsock->sk;
+> 
+> 	write_lock_bh(&clcsk->sk_callback_lock);
+>-	clcsk->sk_user_data = NULL;
+> 
+> 	smc_clcsock_restore_cb(&clcsk->sk_state_change, &smc->clcsk_state_change);
+> 	smc_clcsock_restore_cb(&clcsk->sk_data_ready, &smc->clcsk_data_ready);
+>@@ -832,11 +826,10 @@ static void smc_fback_forward_wakeup(struct smc_sock *smc, struct sock *clcsk,
+> 
+> static void smc_fback_state_change(struct sock *clcsk)
+> {
+>-	struct smc_sock *smc;
+>+	struct smc_sock *smc = smc_sk_from_clcsk(clcsk);
+> 
+> 	read_lock_bh(&clcsk->sk_callback_lock);
+>-	smc = smc_clcsock_user_data(clcsk);
+>-	if (smc)
+>+	if (smc->clcsk_state_change)
+> 		smc_fback_forward_wakeup(smc, clcsk,
+> 					 smc->clcsk_state_change);
+
+Since we checked the clcsock_callback everywhere, why not put it into
+smc_fback_forward_wakeup() ?
+
+
+Best regards,
+Dust
 
 
