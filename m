@@ -1,158 +1,208 @@
-Return-Path: <netdev+bounces-175249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47237A64929
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 11:15:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C868A6493C
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 11:16:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3883B172E1F
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 10:15:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FDF13B5485
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 10:15:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FCC723816F;
-	Mon, 17 Mar 2025 10:14:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19492376E1;
+	Mon, 17 Mar 2025 10:14:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="RWiRBNVE"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC0E3237A3B;
-	Mon, 17 Mar 2025 10:14:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF03D239586
+	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 10:14:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742206443; cv=none; b=EbO/Kf0ig35iwTDKde1rcQZ8E0rIA/aO4lEbX7VLiHS6dCkS99K+simNf8tncpq5JzOSnvqMDKwWb58ixKrpSdRjCcKKniEkUEa24g9cmVj2+Z3ou1ugX4x4v4OrUYcVU7kTGpcFLtkMaM0xo+qEyQOuh+QmZoPeLFowK17GXjQ=
+	t=1742206447; cv=none; b=dV2Sbm5hpH9jFodQhPkieGA6u4bX6YOwHIdy5ojvAD7/WJQ/6Zh5blTCRM429OblzOSayJvFmj5lHWfKsrRD7G5300KeNRgGv6G1b7GlbfR7pR6kWKHx5Hde1ye69TsgIEdP3w7k545M0EzdZULf4Y4LglZAPk7q7ARQLZbVdKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742206443; c=relaxed/simple;
-	bh=HHdZErm8BjMqpB8v6zRi2otchdcjI/bZfyLzXogt27A=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=gH2vyKzB70kRJMc26fdELk87qVOd6ZLh8aOIkKEFdDk8WAsHhP4cXWqHsGtRQp0j2J3TQDPlT5+kI596aGfhqHwaSqFPhFvIhfGkia1qHGSFuV9USpgxv5b5InBniFs0wFo14B18q0/rDmCoPzMahvP4Rk/zVMVyVI/3ofj9Xak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2C1A313D5;
-	Mon, 17 Mar 2025 03:14:10 -0700 (PDT)
-Received: from e133711.arm.com (e133711.arm.com [10.1.196.55])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 151073F673;
-	Mon, 17 Mar 2025 03:13:59 -0700 (PDT)
-From: Sudeep Holla <sudeep.holla@arm.com>
-Date: Mon, 17 Mar 2025 10:13:19 +0000
-Subject: [PATCH 7/9] net: phy: fixed_phy: transition to the faux device
- interface
+	s=arc-20240116; t=1742206447; c=relaxed/simple;
+	bh=qA2DWbWK+y+2LCjli8MLWF0xhWHk1GbzjeWkgfVbf1I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=e6hHqJW/d/e3UBI4cvowOYF8LuxLIg4JJUBRk5QGYhF4kr5Cm8xdNb9prJmZSdMDdWET4wzWeDI+WqpT6dtVQgQzDQaOyaNP1GSAnWGUxD6UmzxhlKQBiY9jVxVEMbWf18oMTYWYfrLo5MmaVgPEREor1kRSwZCpSnFoIfgiT9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=RWiRBNVE; arc=none smtp.client-ip=198.47.19.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 52HADxAB2247647
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Mon, 17 Mar 2025 05:13:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1742206439;
+	bh=x4Slj5yj6G5kRuvXXZOObsp/raaiilax7WtVv0791qQ=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=RWiRBNVEF9xBgyJH4cUTL6qKv5YHWxcrug4V9VshSq0rDeRv1SNXBcTJrhUQu/1Sf
+	 ZFPc1Dv7l2eaRaxeqzTTP+vW8pMNlRXSNlsTsjwDeMQMRHQxSwwXMmByf1N4CnGOOQ
+	 6rDeDXyFZWwa4tCBNNFFMa8jSBMKHTBIU5yiDzmI=
+Received: from DFLE102.ent.ti.com (dfle102.ent.ti.com [10.64.6.23])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 52HADxM7074977;
+	Mon, 17 Mar 2025 05:13:59 -0500
+Received: from DFLE109.ent.ti.com (10.64.6.30) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 17
+ Mar 2025 05:13:59 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE109.ent.ti.com
+ (10.64.6.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 17 Mar 2025 05:13:59 -0500
+Received: from [172.24.27.245] (lt9560gk3.dhcp.ti.com [172.24.27.245])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 52HADv4L033751;
+	Mon, 17 Mar 2025 05:13:58 -0500
+Message-ID: <0d4d2010-79e3-47d3-bcef-d6140fc68596@ti.com>
+Date: Mon, 17 Mar 2025 15:43:56 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250317-plat2faux_dev-v1-7-5fe67c085ad5@arm.com>
-References: <20250317-plat2faux_dev-v1-0-5fe67c085ad5@arm.com>
-In-Reply-To: <20250317-plat2faux_dev-v1-0-5fe67c085ad5@arm.com>
-To: linux-kernel@vger.kernel.org
-Cc: Sudeep Holla <sudeep.holla@arm.com>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
- netdev@vger.kernel.org
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2841; i=sudeep.holla@arm.com;
- h=from:subject:message-id; bh=HHdZErm8BjMqpB8v6zRi2otchdcjI/bZfyLzXogt27A=;
- b=owEBbQKS/ZANAwAIAQBBurwxfuKYAcsmYgBn1/XbYQ+ahwD2Rp/tJLJcXVQOmij9MazsBlzLX
- 3EfFytNcp+JAjMEAAEIAB0WIQS6ceUSBvMeskPdk+EAQbq8MX7imAUCZ9f12wAKCRAAQbq8MX7i
- mMkaEACN4Q898YXIMORP4uejPLi+PJpMCR63s8LYHzmcB8LM9LW17y7nWG/BZ9nXw0DaJ4Nnk0z
- FXxKz+Ago6xlZNMw9/VCg7lbfcb1z7cynB3kazM8lMuFbJCBkOM5rAMjQ90W3bnqj1hYSsnQREw
- NtqYnIi0BHrreuPiNks955noZYRz+mp2RkPNABqEwFIapBMNA++PjB6AGvKJrjywdo34To6YPSM
- RGcApKgBFBPG7IEQzxiHO50Bg45cDkemgACDe5XLul1/R1Gl67caO3SsAW7cwm//iMxzztAIUGo
- ++dIuoBBNAMkYPPNr/+xjlW5dybynxQHL1CBxK9NMKIpf6hvopSj72HGI3yz9L6hEKUSUzg0mt5
- A0oph4NyCesqnUtjHfxbk3KHf7yDHhQTiysUAntdllTKUcEmJxfjmu0CRiS1VgzQLeWPwpekTyH
- +c7xgk7q5PO2Gr7Kmb2mnKyHzK9YrpE+8wGrPsJOaUc2a/JYcEt73swswnL3A95eD7ZdE3lOwNI
- 0eMvNgQiLJpGP03YgFo3efTHcR8iIOBOU1E/we9S3HiLRBy/aSouGefa0h/zuQQq0xrOexCduSq
- WfIEy+nu3qVeccB4e1isFSHmqqRbuPHPjrs/xCmlWU9srk4bE3Mo+t1Bnv1xJR2pRW9hYiPrmR6
- Zx1x+J7STU3Wk7w==
-X-Developer-Key: i=sudeep.holla@arm.com; a=openpgp;
- fpr=7360A21742ADF5A11767C1C139CFD4755FE2D5B4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [EXTERNAL] Re: [bug report] net: ti: icssg-prueth: Add XDP
+ support
+To: Dan Carpenter <dan.carpenter@linaro.org>
+CC: <netdev@vger.kernel.org>, Roger Quadros <rogerq@kernel.org>
+References: <70d8dd76-0c76-42fc-8611-9884937c82f5@stanley.mountain>
+ <a497632b-3754-42f2-9b7b-1821fee0c136@kernel.org>
+Content-Language: en-US
+From: "Malladi, Meghana" <m-malladi@ti.com>
+In-Reply-To: <a497632b-3754-42f2-9b7b-1821fee0c136@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-The net fixed phy driver does not require the creation of a platform
-device. Originally, this approach was chosen for simplicity when the
-driver was first implemented.
+Hi Dan,
 
-With the introduction of the lightweight faux device interface, we now
-have a more appropriate alternative. Migrate the driver to utilize the
-faux bus, given that the platform device it previously created was not
-a real one anyway. This will simplify the code, reducing its footprint
-while maintaining functionality.
+On 3/15/2025 2:01 AM, Roger Quadros wrote:
+> +Meghana, On 14/03/2025 12: 50, Dan Carpenter wrote: > Hello Roger 
+> Quadros, > > Commit 62aa3246f462 ("net: ti: icssg-prueth: Add XDP 
+> support") from > Mar 5, 2025 (linux-next), leads to the following Smatch 
+> static > checker warning: 
+> ZjQcmQRYFpfptBannerStart
+> This message was sent from outside of Texas Instruments.
+> Do not click links or open attachments unless you recognize the source 
+> of this email and know the content is safe.
+> Report Suspicious
+> <https://us-phishalarm-ewt.proofpoint.com/EWT/v1/G3vK! 
+> updgPZavlq17YEXEXDMjX3l3H00pWvtYT_4pQscvyXpIdw2OveCVYQibZIdWxZw5GR1hxtmi6vr2_ObXj1T_qBc3C0dxD5U$>
+> ZjQcmQRYFpfptBannerEnd
+> 
+> +Meghana,
+> 
+> On 14/03/2025 12:50, Dan Carpenter wrote:
+>> Hello Roger Quadros,
+>> 
+>> Commit 62aa3246f462 ("net: ti: icssg-prueth: Add XDP support") from
+>> Mar 5, 2025 (linux-next), leads to the following Smatch static
+>> checker warning:
+>> 
+>> 	drivers/net/ethernet/ti/icssg/icssg_common.c:635 emac_xmit_xdp_frame()
+>> 	error: we previously assumed 'first_desc' could be null (see line 584)
+>> 
+>> drivers/net/ethernet/ti/icssg/icssg_common.c
+>>    563  u32 emac_xmit_xdp_frame(struct prueth_emac *emac,
+>>    564                          struct xdp_frame *xdpf,
+>>    565                          struct page *page,
+>>    566                          unsigned int q_idx)
+>>    567  {
+>>    568          struct cppi5_host_desc_t *first_desc;
+>>    569          struct net_device *ndev = emac->ndev;
+>>    570          struct prueth_tx_chn *tx_chn;
+>>    571          dma_addr_t desc_dma, buf_dma;
+>>    572          struct prueth_swdata *swdata;
+>>    573          u32 *epib;
+>>    574          int ret;
+>>    575  
+>>    576          if (q_idx >= PRUETH_MAX_TX_QUEUES) {
+>>    577                  netdev_err(ndev, "xdp tx: invalid q_id %d\n", q_idx);
+>>    578                  return ICSSG_XDP_CONSUMED;      /* drop */
+>> 
+>> Do we need to free something on this path?
+>> 
 
-Cc: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: netdev@vger.kernel.org
-Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
----
- drivers/net/phy/fixed_phy.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+Freeing the page is handled by the caller of this function based of the 
+return type.
 
-diff --git a/drivers/net/phy/fixed_phy.c b/drivers/net/phy/fixed_phy.c
-index aef739c20ac4d5a271465a677a85ef7c18cfce70..ee7831a9849b3728ca9c541da35d17e089985da2 100644
---- a/drivers/net/phy/fixed_phy.c
-+++ b/drivers/net/phy/fixed_phy.c
-@@ -10,7 +10,7 @@
- 
- #include <linux/kernel.h>
- #include <linux/module.h>
--#include <linux/platform_device.h>
-+#include <linux/device/faux.h>
- #include <linux/list.h>
- #include <linux/mii.h>
- #include <linux/phy.h>
-@@ -40,7 +40,7 @@ struct fixed_phy {
- 	struct gpio_desc *link_gpiod;
- };
- 
--static struct platform_device *pdev;
-+static struct faux_device *fdev;
- static struct fixed_mdio_bus platform_fmb = {
- 	.phys = LIST_HEAD_INIT(platform_fmb.phys),
- };
-@@ -337,9 +337,9 @@ static int __init fixed_mdio_bus_init(void)
- 	struct fixed_mdio_bus *fmb = &platform_fmb;
- 	int ret;
- 
--	pdev = platform_device_register_simple("Fixed MDIO bus", 0, NULL, 0);
--	if (IS_ERR(pdev))
--		return PTR_ERR(pdev);
-+	fdev = faux_device_create("Fixed MDIO bus", NULL, NULL);
-+	if (!fdev)
-+		return -ENODEV;
- 
- 	fmb->mii_bus = mdiobus_alloc();
- 	if (fmb->mii_bus == NULL) {
-@@ -350,7 +350,7 @@ static int __init fixed_mdio_bus_init(void)
- 	snprintf(fmb->mii_bus->id, MII_BUS_ID_SIZE, "fixed-0");
- 	fmb->mii_bus->name = "Fixed MDIO Bus";
- 	fmb->mii_bus->priv = fmb;
--	fmb->mii_bus->parent = &pdev->dev;
-+	fmb->mii_bus->parent = &fdev->dev;
- 	fmb->mii_bus->read = &fixed_mdio_read;
- 	fmb->mii_bus->write = &fixed_mdio_write;
- 	fmb->mii_bus->phy_mask = ~0;
-@@ -364,7 +364,7 @@ static int __init fixed_mdio_bus_init(void)
- err_mdiobus_alloc:
- 	mdiobus_free(fmb->mii_bus);
- err_mdiobus_reg:
--	platform_device_unregister(pdev);
-+	faux_device_destroy(fdev);
- 	return ret;
- }
- module_init(fixed_mdio_bus_init);
-@@ -376,7 +376,7 @@ static void __exit fixed_mdio_bus_exit(void)
- 
- 	mdiobus_unregister(fmb->mii_bus);
- 	mdiobus_free(fmb->mii_bus);
--	platform_device_unregister(pdev);
-+	faux_device_destroy(fdev);
- 
- 	list_for_each_entry_safe(fp, tmp, &fmb->phys, node) {
- 		list_del(&fp->node);
+>>    579          }
+>>    580  
+>>    581          tx_chn = &emac->tx_chns[q_idx];
+>>    582  
+>>    583          first_desc = k3_cppi_desc_pool_alloc(tx_chn->desc_pool);
+>>    584          if (!first_desc) {
+>>    585                  netdev_dbg(ndev, "xdp tx: failed to allocate descriptor\n");
+>>    586                  goto drop_free_descs;   /* drop */
+>>                         ^^^^^^^^^^^^^^^^^^^^
+>> This will dereference first_desc and crash.
+>> 
 
--- 
-2.34.1
+Thanks for catching this bug, will post fix for this shortly.
+
+>>    587          }
+>>    588  
+>>    589          if (page) { /* already DMA mapped by page_pool */
+>>    590                  buf_dma = page_pool_get_dma_addr(page);
+>>    591                  buf_dma += xdpf->headroom + sizeof(struct xdp_frame);
+>>    592          } else { /* Map the linear buffer */
+>>    593                  buf_dma = dma_map_single(tx_chn->dma_dev, xdpf->data, xdpf->len, DMA_TO_DEVICE);
+>>    594                  if (dma_mapping_error(tx_chn->dma_dev, buf_dma)) {
+>>    595                          netdev_err(ndev, "xdp tx: failed to map data buffer\n");
+>>    596                          goto drop_free_descs;   /* drop */
+>>    597                  }
+>>    598          }
+>>    599  
+>>    600          cppi5_hdesc_init(first_desc, CPPI5_INFO0_HDESC_EPIB_PRESENT,
+>>    601                           PRUETH_NAV_PS_DATA_SIZE);
+>>    602          cppi5_hdesc_set_pkttype(first_desc, 0);
+>>    603          epib = first_desc->epib;
+>>    604          epib[0] = 0;
+>>    605          epib[1] = 0;
+>>    606  
+>>    607          /* set dst tag to indicate internal qid at the firmware which is at
+>>    608           * bit8..bit15. bit0..bit7 indicates port num for directed
+>>    609           * packets in case of switch mode operation
+>>    610           */
+>>    611          cppi5_desc_set_tags_ids(&first_desc->hdr, 0, (emac->port_id | (q_idx << 8)));
+>>    612          k3_udma_glue_tx_dma_to_cppi5_addr(tx_chn->tx_chn, &buf_dma);
+>>    613          cppi5_hdesc_attach_buf(first_desc, buf_dma, xdpf->len, buf_dma, xdpf->len);
+>>    614          swdata = cppi5_hdesc_get_swdata(first_desc);
+>>    615          if (page) {
+>>    616                  swdata->type = PRUETH_SWDATA_PAGE;
+>>    617                  swdata->data.page = page;
+>>    618          } else {
+>>    619                  swdata->type = PRUETH_SWDATA_XDPF;
+>>    620                  swdata->data.xdpf = xdpf;
+>>    621          }
+>>    622  
+>>    623          cppi5_hdesc_set_pktlen(first_desc, xdpf->len);
+>>    624          desc_dma = k3_cppi_desc_pool_virt2dma(tx_chn->desc_pool, first_desc);
+>>    625  
+>>    626          ret = k3_udma_glue_push_tx_chn(tx_chn->tx_chn, first_desc, desc_dma);
+>>    627          if (ret) {
+>>    628                  netdev_err(ndev, "xdp tx: push failed: %d\n", ret);
+>>    629                  goto drop_free_descs;
+>>    630          }
+>>    631  
+>>    632          return ICSSG_XDP_TX;
+>>    633  
+>>    634  drop_free_descs:
+>>    635          prueth_xmit_free(tx_chn, first_desc);
+>>    636          return ICSSG_XDP_CONSUMED;
+>>    637  }
+>> 
+>> 
+>> regards,
+>> dan carpenter
+> 
+> -- 
+> cheers,
+> -roger
+> 
 
 
