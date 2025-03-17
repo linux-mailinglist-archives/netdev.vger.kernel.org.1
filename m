@@ -1,133 +1,93 @@
-Return-Path: <netdev+bounces-175345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95ED3A65514
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 16:08:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE79BA6551A
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 16:09:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8F62189653A
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 15:08:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E48973A59B3
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 15:09:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF106248176;
-	Mon, 17 Mar 2025 15:07:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6A8B23FC7A;
+	Mon, 17 Mar 2025 15:09:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lXVYyhb+"
 X-Original-To: netdev@vger.kernel.org
-Received: from shell.v3.sk (mail.v3.sk [167.172.186.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD082459FE;
-	Mon, 17 Mar 2025 15:07:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.172.186.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9273321CC5C
+	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 15:09:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742224079; cv=none; b=ivlMbqoJ6RrXV7amrAVB0k533JCuGa05JgNBDtizCH1ys7hfhToj6v7ATz9N4WcWnf0HlelVsvjNmWVbRFL3vOAea6M9vbQY5nshJqE8PjMQIj/8JuBigf4qfxtrPQ8/YFxN8I6lCMzvvOrbtSf7kDi0tUgLf3CtwRgX6PVWjos=
+	t=1742224156; cv=none; b=bLdNh1N5TJqYU/b1E9sr1r6OSZs4reewTvaN4tg4iXmllm2/y/dVNDzPk3mxSmWsql5+wCJeZlv9eQt/G7tvzU3Jyu+Hj9RxokJCU5hStU0lxBA3fbGdRPNSX8Uqah9/5evrhjoZTVuRcTDuavEBc0rs9mbV7295n4lDOwYF7aE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742224079; c=relaxed/simple;
-	bh=bP4LPTW0Td8wCHxT0VEifpuO44bbCtEGvCwDTu/Ad0E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CiohxCNFMxPWIQlwt1VHMlghjolZrxn0v/c34tf6ATJ/VmwZuM16wPnYstt/3gloEtISI5guhzi92JDOQ4kEyR31i84Jtx2kFK/COsy0+QARXzRii9rR4cf2MdWdI2HPJ2BdyQJ3tKn+Cgx3ZSZmfrsae1JVvtZ766OYX79jz2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v3.sk; spf=pass smtp.mailfrom=v3.sk; arc=none smtp.client-ip=167.172.186.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v3.sk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v3.sk
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by zimbra.v3.sk (Postfix) with ESMTP id 53EB2DD213;
-	Mon, 17 Mar 2025 15:01:51 +0000 (UTC)
-Received: from shell.v3.sk ([127.0.0.1])
-	by localhost (zimbra.v3.sk [127.0.0.1]) (amavisd-new, port 10032)
-	with ESMTP id tpBHPEh84aQP; Mon, 17 Mar 2025 15:01:50 +0000 (UTC)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by zimbra.v3.sk (Postfix) with ESMTP id D4ED5DFEFD;
-	Mon, 17 Mar 2025 15:01:50 +0000 (UTC)
-X-Virus-Scanned: amavisd-new at zimbra.v3.sk
-Received: from shell.v3.sk ([127.0.0.1])
-	by localhost (zimbra.v3.sk [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 6PRRIPVEMHUl; Mon, 17 Mar 2025 15:01:50 +0000 (UTC)
-Received: from localhost (unknown [109.183.109.54])
-	by zimbra.v3.sk (Postfix) with ESMTPSA id 92AD9DD213;
-	Mon, 17 Mar 2025 15:01:50 +0000 (UTC)
-From: Lubomir Rintel <lkundrak@v3.sk>
-To: linux-usb@vger.kernel.org
-Cc: Lubomir Rintel <lkundrak@v3.sk>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
+	s=arc-20240116; t=1742224156; c=relaxed/simple;
+	bh=XmZSmQt3hmnAlvicryuljMp90xcAMZcIBCJeFedXzpI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mZhMkKzk+qPeFF/Qlvuy+9uquNnkPNsKvtkc8KP8JKpdcn9vCXiLj5YyracVPiFytglfiyyLj41ETnpzwp0W6qvquQbSc2m69FxE+nVHBwU04xag63PpeskhTxFZPgyhc6DQKr8Rf+bsTIH3sWOmgJqOzjzkvGjoi2NR8E7CPwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lXVYyhb+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E9D2C4CEED;
+	Mon, 17 Mar 2025 15:09:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742224156;
+	bh=XmZSmQt3hmnAlvicryuljMp90xcAMZcIBCJeFedXzpI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lXVYyhb+JqizRf6A8vpy0Q45wbF7wV01oXaYgXd+rhIc66+yzqHnswkPxSO5B7ol4
+	 2km3pyRkhNUTPyh0bQN1T1674Dd0/tRG3JoEW4NkgR4nHouqAJq8xlxpMvF+21MFmD
+	 qfE74efWUCAADT4C5zXxFy9Yvdp9M4ofz68GCtHtQVirpHMZBDWeq3IvcCXgV9EJSA
+	 e6Bmi6lMPcJFpdNSU3Y3083yRTzR0tn6vkwXYtPs4E7ENMVSvfv6Ukcg5+RXC/JREw
+	 GZ3RjeoDfizNP3mpAuYxjF2tvO9CGipq0t805rUHJHhiHViQz4+m5TSorGe84+DOpQ
+	 +gINLAmc2uBwQ==
+Date: Mon, 17 Mar 2025 15:07:41 +0000
+From: Simon Horman <horms@kernel.org>
+To: Gal Pressman <gal@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Subject: [PATCH v2 net-next] rndis_host: Flag RNDIS modems as WWAN devices
-Date: Mon, 17 Mar 2025 16:07:37 +0100
-Message-ID: <20250317150739.2986057-1-lkundrak@v3.sk>
-X-Mailer: git-send-email 2.48.1
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>, Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH net-next] ethtool: Block setting of symmetric RSS when
+ non-symmetric rx-flow-hash is requested
+Message-ID: <20250317150741.GA688833@kernel.org>
+References: <20250310072329.222123-1-gal@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250310072329.222123-1-gal@nvidia.com>
 
-Set FLAG_WWAN instead of FLAG_ETHERNET for RNDIS interfaces on Mobile
-Broadband Modems, as opposed to regular Ethernet adapters.
+On Mon, Mar 10, 2025 at 09:23:29AM +0200, Gal Pressman wrote:
+> Symmetric RSS hash requires that:
+> * No other fields besides IP src/dst and/or L4 src/dst
 
-Otherwise NetworkManager gets confused, misjudges the device type,
-and wouldn't know it should connect a modem to get the device to work.
-What would be the result depends on ModemManager version -- older
-ModemManager would end up disconnecting a device after an unsuccessful
-probe attempt (if it connected without needing to unlock a SIM), while
-a newer one might spawn a separate PPP connection over a tty interface
-instead, resulting in a general confusion and no end of chaos.
+nit: I think it would read slightly better if the line above included a verb.
+     Likewise for the code comment with the same text.
 
-The only way to get this work reliably is to fix the device type
-and have good enough version ModemManager (or equivalent).
+> * If src is set, dst must also be set
+> 
+> This restriction was only enforced when RXNFC was configured after
+> symmetric hash was enabled. In the opposite order of operations (RXNFC
+> then symmetric enablement) the check was not performed.
+> 
+> Perform the sanity check on set_rxfh as well, by iterating over all flow
+> types hash fields and making sure they are all symmetric.
+> 
+> Introduce a function that returns whether a flow type is hashable (not
+> spec only) and needs to be iterated over. To make sure that no one
+> forgets to update the list of hashable flow types when adding new flow
+> types, a static assert is added to draw the developer's attention.
+> 
+> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+> Signed-off-by: Gal Pressman <gal@nvidia.com>
 
-Signed-off-by: Lubomir Rintel <lkundrak@v3.sk>
-Fixes: 475ddf05ce2d ("rndis_host: Flag RNDIS modems as WWAN devices")
+The nit above not withstanding - take it or leave it - this looks good to me.
 
----
-Changes since v1:
-* Added Fixes tag, as suggested by Paolo Abeni
-
- drivers/net/usb/rndis_host.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/usb/rndis_host.c b/drivers/net/usb/rndis_host.c
-index 7b3739b29c8f..bb0bf1415872 100644
---- a/drivers/net/usb/rndis_host.c
-+++ b/drivers/net/usb/rndis_host.c
-@@ -630,6 +630,16 @@ static const struct driver_info	zte_rndis_info =3D {
- 	.tx_fixup =3D	rndis_tx_fixup,
- };
-=20
-+static const struct driver_info	wwan_rndis_info =3D {
-+	.description =3D	"Mobile Broadband RNDIS device",
-+	.flags =3D	FLAG_WWAN | FLAG_POINTTOPOINT | FLAG_FRAMING_RN | FLAG_NO_SE=
-TINT,
-+	.bind =3D		rndis_bind,
-+	.unbind =3D	rndis_unbind,
-+	.status =3D	rndis_status,
-+	.rx_fixup =3D	rndis_rx_fixup,
-+	.tx_fixup =3D	rndis_tx_fixup,
-+};
-+
- /*----------------------------------------------------------------------=
----*/
-=20
- static const struct usb_device_id	products [] =3D {
-@@ -666,9 +676,11 @@ static const struct usb_device_id	products [] =3D {
- 	USB_INTERFACE_INFO(USB_CLASS_WIRELESS_CONTROLLER, 1, 3),
- 	.driver_info =3D (unsigned long) &rndis_info,
- }, {
--	/* Novatel Verizon USB730L */
-+	/* Mobile Broadband Modem, seen in Novatel Verizon USB730L and
-+	 * Telit FN990A (RNDIS)
-+	 */
- 	USB_INTERFACE_INFO(USB_CLASS_MISC, 4, 1),
--	.driver_info =3D (unsigned long) &rndis_info,
-+	.driver_info =3D (unsigned long)&wwan_rndis_info,
- },
- 	{ },		// END
- };
---=20
-2.48.1
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
