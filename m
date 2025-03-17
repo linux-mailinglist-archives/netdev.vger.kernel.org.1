@@ -1,117 +1,137 @@
-Return-Path: <netdev+bounces-175159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80447A63AF8
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 03:03:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 738F3A63B0C
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 03:08:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 813263AD4BC
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 02:02:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E59D16CA38
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 02:08:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6644513AD26;
-	Mon, 17 Mar 2025 02:03:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2013914C5AA;
+	Mon, 17 Mar 2025 02:08:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hIdItIuj"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA8118F66;
-	Mon, 17 Mar 2025 02:02:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A009199BC;
+	Mon, 17 Mar 2025 02:08:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742176982; cv=none; b=apwNk1yH1/Xf611o9iXmH0W4jF6PC+Ti/8myDmmk9PH/bKY+eRtE7SJdVz+7SVm64C98mqcUdYAMpnHAVBD0lK3vsGlnrKmFoQsIWt01Pg6rl8IYQxBoJn1Ppz5yHSeJ3xqq8iBs71f6idgNdSFo9PFpknOnrbW4scMCOEIkHeM=
+	t=1742177303; cv=none; b=gq9rjgxyEZLdXAWSJmj6RRjvt2viDnmy0xTV28MkAWENHyDlVbt/9DoCyFPVK1w0XFebT4jNt4mUv62iSwan3dWny/9iAENnB3y8ThCJp4/75RFpH6wpNXua4Akust2czo5xkVfOJha4JDGmF7wS2reIBeXTDgxUyp3jJlTchDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742176982; c=relaxed/simple;
-	bh=yYHXnIYsaqcS+6IhtWhRNwEkzZ0hyG20mSczIi+VzjI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=j7B4Gb9h8TPG334CSIqvogAF7gwFGKNhHe0oLpQg/DsP7RlmVptSPXfSjCm35LU/KKmY13DQO+LTiAYTejVrI0IKCZHT0QtXVWa4Mw5PxpYZt0fdoYJSPp7bhAI7auHFpA0DL7W4NzsB6QGVDmDJ5cA2vurRgmyZLsHKfvg69u4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4ZGJ9Y4JKwztQmx;
-	Mon, 17 Mar 2025 10:01:21 +0800 (CST)
-Received: from kwepemf200007.china.huawei.com (unknown [7.202.181.233])
-	by mail.maildlp.com (Postfix) with ESMTPS id E9F83140391;
-	Mon, 17 Mar 2025 10:02:49 +0800 (CST)
-Received: from [10.67.121.184] (10.67.121.184) by
- kwepemf200007.china.huawei.com (7.202.181.233) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 17 Mar 2025 10:02:48 +0800
-Message-ID: <80bb0e6c-99eb-4c8f-ac00-0c048ec7bbb1@huawei.com>
-Date: Mon, 17 Mar 2025 10:02:47 +0800
+	s=arc-20240116; t=1742177303; c=relaxed/simple;
+	bh=QaRY5HDn4qZdHT4CHd0qF1U0hRXV9ApWSJPYDKsV0Fg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZaijLmXadenkSVbCIhDawequg02SQ/b0xFLk25oCaI6Goaum1jAcbEnvoybRJL7+yeICuy9xO46UdB5/lyGMf5RA+7bPVV2N56BEUeiJnNBzcYETHzf35KxpEA9u/Cf5y4YG/IzDlbZw8IPO1GO77cDt26GTL/PlLc7a3V2Hsqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hIdItIuj; arc=none smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-6ef9b8b4f13so35809397b3.2;
+        Sun, 16 Mar 2025 19:08:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742177300; x=1742782100; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WerE0F29wDAv86fT8ZPWFA4+BX54BGcqnjcPvPcGEis=;
+        b=hIdItIuj3p0iDZQp2sHSvedzeKMfe+6Nz46ZAGFI2u0HawGChEx1ED4NTRcug1aa1K
+         eCZ+kewEI+QF0ZEwAiIr7mHbx4Q8S6XADSn637Lxrg0qoJMiRGY6WFwQFTkgxc6ifoU/
+         cdKARD+SCsHHdmYH2V4EOG0Ocjbz/WgmruHbrv8qdDzwqB4GkZiL5uKlY8FqKJ7N2/iG
+         kChxQ4qqTcLxiGEy3qo4VCn5vE3Ett73neYAyhHbmT70dIIsHyjHMNfeTSWiyMPFV6dM
+         EwkiVsztqUsNrh+25QDTHDqQDuGvWOxoWB+u17cXAFWikpOKECTzFed5MlZOQB5N7pxd
+         sFMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742177300; x=1742782100;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WerE0F29wDAv86fT8ZPWFA4+BX54BGcqnjcPvPcGEis=;
+        b=iV1GYvQBWLaR0doCitBpQxhBZ1bPk2Vtg3pTLcj5SV3J7ahzCyFJ4OWxbrh/zUQhZx
+         OJ0OtwsTfx2JleS75Nq9UXrozMljnjsRvToKQIwtaIgul8rr+l0ewrffnUtPKy/RIXep
+         OXZ9XkfZ2HQhLKiFaTiQYL9PVMJPSC4aNCK37QeGCRcK24E3zPIG0JLovF1t/YgWnM4E
+         wsE/gim2KHp6X9f0sw1fDVzT3zC2e5nf5edYjo62V4QVwPXRLAUOeUQhoYSQA6/sl/rT
+         KQc0epL0Z+IMkA16CGJPFP24nqFDLMsLyR5K5Eh+pAxNB7EkVcW+qR5TO8IZ/S9H1447
+         Bohg==
+X-Forwarded-Encrypted: i=1; AJvYcCUNivoByxdOFzpNifi4xuR+WG4DKsWZUE4RQwLvdDj86s2GZCTuksImOaOHpRhbNAwSMdQfqcwUCJA=@vger.kernel.org, AJvYcCUhXSU8FDXUANHZ0BZktI0+NI7lW6I0ydxLOuvVRL9wiKa3i2k19n2rx8XogeG/GCDzYsubfdTGFZUP@vger.kernel.org, AJvYcCVAaQlrX4mR3Amg2GHntxcesW/RodqgcGr9cewylgMc0BxI91cQak+UY/FaJglXWr2X2t6dLVjfbmtLmAZ2ZJY=@vger.kernel.org, AJvYcCVYig/djRBobAdy/Zuf8YOVGJa+j5Dq91C6YHUBOldje0cHDO8UqKy7UoeiGb6x19jRGAYEYGYprY/5@vger.kernel.org, AJvYcCW4QlLr9u7UGEJBmlwO/niqiaTzrbdDG/K1tBdbsh6y69IsmLmaRnSGDQq08AKfgLNjeT0KUDrX2kc+8Q==@vger.kernel.org, AJvYcCWDxGmeI4hVfgmypjCnXrd1mKEzQwEjOf9ogFDbp8TRuRd+CIp10gjX6YAALk3xwcs9SDLRsJY2pehvFl4O@vger.kernel.org, AJvYcCWVPO/pAppxYvvJw8CoCJW/iQWMqHny8pIgO28FQK5OeiVnQgFxYht/fM9UJAbU5f0R3SmjttybV9TLoOU=@vger.kernel.org, AJvYcCWvBB9pbbtPhsDK55WpeafBF7OqNUmXq5ulpL1XUATP7mk1Dd0y5XNul1c3GyBC6FhMZkn5jmfh@vger.kernel.org, AJvYcCXsrHwc7ccHBu7wwokYlO1rRILmePu8kXnkt5AqxleyCZlaF+IrOkgXfEwYN9d+2s/n7giSoCursR23@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKfopNvlvWFqDpT+KPqYmGtZC9/d0zPRSKeM/H1rMG5E20OGSm
+	m5Iw/ENz8s8ZomqarZGvxE8Gaah3MYIkJHCm/Pm/yR8y07r0ULSegYA0K3KLLHnXfoX9r0nSyTx
+	2TGh/P/kotScKQKMdwoTkd7iBK7A=
+X-Gm-Gg: ASbGnct5OkdmV3j3rlwx2Y1p2SRIaIHfwCB5ZP0EmhXQwDvqU70xZzzMx9jv3owQc9t
+	JpG1ol95EAC74hVhFYYfRqx3On1go7G10Z8cQ0wsD8LLdjwgu2CJfU6oVwr5MgK5vmtVeDOX7R4
+	qencJcIRsHFW6fjhsowhEqECDl03HZKmHOg+cwTVhHpeVsm9f4uz0EbAC6+iCW
+X-Google-Smtp-Source: AGHT+IEbNRK83jrLYbJn98E/VJiprTqBAgHhzfTQIkBb0acooaKjAt7JcBiej9fE7M2xDLsYZ0g1wrc/E0KHPTcBM7Y=
+X-Received: by 2002:a05:690c:7301:b0:6fe:b88e:4d86 with SMTP id
+ 00721157ae682-6ff45f43fe1mr136588587b3.9.1742177300126; Sun, 16 Mar 2025
+ 19:08:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/3] Fix late DMA unmap crash for page pool
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>, "David S.
- Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Jesper
- Dangaard Brouer <hawk@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Leon
- Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Simon
- Horman <horms@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Mina
- Almasry <almasrymina@google.com>, Yunsheng Lin <linyunsheng@huawei.com>,
-	Pavel Begunkov <asml.silence@gmail.com>, Matthew Wilcox <willy@infradead.org>
-CC: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <linux-mm@kvack.org>, Qiuling Ren
-	<qren@redhat.com>, Yuying Ma <yuma@redhat.com>
-References: <20250314-page-pool-track-dma-v1-0-c212e57a74c2@redhat.com>
-Content-Language: en-US
-From: Yonglong Liu <liuyonglong@huawei.com>
-In-Reply-To: <20250314-page-pool-track-dma-v1-0-c212e57a74c2@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemf200007.china.huawei.com (7.202.181.233)
+References: <20250225081644.3524915-1-a0282524688@gmail.com>
+ <20250225081644.3524915-5-a0282524688@gmail.com> <a32b4ca1-0bcf-48e4-87ab-61fbd077a3c3@wanadoo.fr>
+ <20250227-gregarious-garrulous-echidna-ca7975-mkl@pengutronix.de>
+In-Reply-To: <20250227-gregarious-garrulous-echidna-ca7975-mkl@pengutronix.de>
+From: Ming Yu <a0282524688@gmail.com>
+Date: Mon, 17 Mar 2025 10:08:09 +0800
+X-Gm-Features: AQ5f1Jrjkl7Ix93j9Sl_5v0Y4G-UoTbJZQ10uY1K0suSPPo5FMkQ-SCMR1tpC-o
+Message-ID: <CAOoeyxUgRK=Rw0XuYD0raGmv9RGxqMHXofmyytXd+bRxEaBpxQ@mail.gmail.com>
+Subject: Re: [PATCH v8 4/7] can: Add Nuvoton NCT6694 CANFD support
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org, tmyu0@nuvoton.com, 
+	lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
+	andi.shyti@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I know this solution is still under discussion, but anyway, I tested the
-scenarios I reported in:
+Dear Marc,
 
-[0]https://lore.kernel.org/lkml/8067f204-1380-4d37-8ffd-007fc6f26738@kernel.org/T/
+Thank you for reviewing,
 
-It seems the problem has been solved. Thanks!
+Marc Kleine-Budde <mkl@pengutronix.de> =E6=96=BC 2025=E5=B9=B42=E6=9C=8827=
+=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=8810:17=E5=AF=AB=E9=81=93=EF=
+=BC=9A
+>
+> On 27.02.2025 11:08:50, Vincent Mailhol wrote:
+> > > +static int nct6694_can_stop(struct net_device *ndev)
+> > > +{
+> > > +   struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+> > > +
+> > > +   priv->can.ctrlmode =3D CAN_CTRLMODE_LISTENONLY;
+> >
+> > Hmmm, when Marc asked you to put the device in listen only mode, I thin=
+k
+> > he meant that you set it on the device side (i.e. flag
+> > NCT6694_CAN_SETTING_CTRL1_MON) and not on the driver side. If you set
+> > CAN_CTRLMODE_LISTENONLY flag, that will be reported in the netlink
+> > interface. So you should not change that flag.
+>
+> ACK
+>
+> > But before that, did you check the datasheet? Don't you have a device
+> > flag to actually turn the device off (e.g. sleep mode)?
+>
+> Please test that the ifup -> ifdown -> ifup sequence works properly,
+> even on a busy bus and on a bus without with a 2nd CAN station that is
+> sending and you are the only receiver.
+>
+
+Understood.
 
 
-Tested-by: Yonglong Liu<liuyonglong@huawei.com>
-
-On 2025/3/14 18:10, Toke Høiland-Jørgensen wrote:
-> This series fixes the late dma_unmap crash for page pool first reported
-> by Yonglong Liu in [0]. It is an alternative approach to the one
-> submitted by Yunsheng Lin, most recently in [1]. The first two commits
-> are small refactors of the page pool code, in preparation of the main
-> change in patch 3. See the commit message of patch 3 for the details.
->
-> -Toke
->
-> [0] https://lore.kernel.org/lkml/8067f204-1380-4d37-8ffd-007fc6f26738@kernel.org/T/
-> [1] https://lore.kernel.org/r/20250307092356.638242-1-linyunsheng@huawei.com
->
-> Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
-> ---
-> Toke Høiland-Jørgensen (3):
->        page_pool: Move pp_magic check into helper functions
->        page_pool: Turn dma_sync and dma_sync_cpu fields into a bitmap
->        page_pool: Track DMA-mapped pages and unmap them when destroying the pool
->
->   drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c |  4 +-
->   include/net/page_pool/helpers.h                  |  6 +-
->   include/net/page_pool/types.h                    | 54 +++++++++++++++-
->   mm/page_alloc.c                                  |  9 +--
->   net/core/devmem.c                                |  3 +-
->   net/core/netmem_priv.h                           | 33 +++++++++-
->   net/core/page_pool.c                             | 81 ++++++++++++++++++++----
->   net/core/skbuff.c                                | 16 +----
->   net/core/xdp.c                                   |  4 +-
->   9 files changed, 164 insertions(+), 46 deletions(-)
-> ---
-> base-commit: 8ef890df4031121a94407c84659125cbccd3fdbe
-> change-id: 20250310-page-pool-track-dma-0332343a460e
->
->
+Best regards,
+Ming
 
