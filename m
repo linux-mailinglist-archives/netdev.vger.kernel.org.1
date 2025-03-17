@@ -1,186 +1,137 @@
-Return-Path: <netdev+bounces-175393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC066A659A1
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 18:07:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AD4FA65A15
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 18:14:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3CDB7AFEE1
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 17:06:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFFD21655CE
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 17:14:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17EA81A5BAA;
-	Mon, 17 Mar 2025 17:07:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D537206F04;
+	Mon, 17 Mar 2025 17:08:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="AwfE1nEc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SY0IIE2j"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2082.outbound.protection.outlook.com [40.107.104.82])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 246B21A2541;
-	Mon, 17 Mar 2025 17:06:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.104.82
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742231220; cv=fail; b=J2il8LlMPVs/JTtPergBIoy10XV3rsaiZjkRtN81qhw2mpT4Y1LYo6lYWWkbPc1ZY2lR+bWGXy41Y6TB6i7+jywM1d7VgpVV41B0ZJxAeziQ01FdHN1MuskZyez71heMq/Qky8KSNf4bMb7V7hWm0mYxt321uWnUOte61Z94orQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742231220; c=relaxed/simple;
-	bh=E09a4HLnSVt6q22qvmsFA+5Ov+dhRKEUiyUr5i/hpBg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=SGt9YrkzF8l2Dsq2LqpzyEH/C3fBIPZumAabcjXh+8eBa98fBI08Rg/hVDkEOU4Fp41XfI120FqtMX+6AEXehRt6q1SadN2C34ZjNa3WxQaDbScf8uXhHHKqq/bHs6F8AQfT3cqdNBLSAmqNZKG72gW0ZH0VS6+Q3o0tYMnVcks=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=AwfE1nEc; arc=fail smtp.client-ip=40.107.104.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YBQPMIGOsr/g70ww27TY2R8TOu924gqNbILkWEbBob22eP5JCHO77bA3mODKAIdHtjQH7xnfEcjLtrYMaUNDwNMWdDkxfJsl57R2bBFvNTJXSepAEzUHHRGQPBZgEUUiC2cQ/HSajsF//rTaGXP48/deCrX5MEOPZDAMLbOEvrIvZ8sM7+5nGry3LoburuJKvY5Rkm0BXZx71I5q5FJ4kl5qsRlKpJelKQFVV9MiD9sk6/QHcwT9Elbri3aXUkiG9RPmvupZRH8KYigGrbDqQqd5emcuQwgFSdP63L5wmOhRa1UiVoK8oa4j0zYwHu3qSJnPhiKKvhNyoWgy7VQoOw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zZ7JicH97IOIX0mC2Jcn43IVeloptJKXUjIGZVeDN/I=;
- b=XCebIAdYIbyeu2FkUs/iAHBH9GF42guCZvxxRq2IkdrQ/l5fBzh7chnhFj6eOsguPg6+wbLZM7RF54G4sbRoUuNRjvNStKOUx0q0hxLoPoLZQMte/I0p3XDlA3rHxCFb9I1CGiSyfbIrGKth8JfjwliHbhuV6PzaKkU7T60K0f1OMJaWP68MOR4cX32tCtmVJcC1Ux2VWjC1e8WsHnxJQ2fxksT5orkpqYqN2TWUA6n3pSFJCMZGRmaVHu/m6sGRVHdbk5RwwE57Xr4kIoks281IBzYQod9LveGvffTd5hdKTsu9zn3fREcMr/6K4yTZaeCKyqC48DWONLSPicNCag==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zZ7JicH97IOIX0mC2Jcn43IVeloptJKXUjIGZVeDN/I=;
- b=AwfE1nEcn1WGJm8hnuPv1T47934X86KKTndwy9iEYugaZHn45cC1nMu2pN5Pbr2HCoCQ/0vTsl+aslMN4/AXg+IrDeCh1lDHDbgiNaVAXBUM6txhxpv9gMhOjgTrYtqJCzDP/GuV9Qk47oWH7j3QcmQNIFOR4UGrU+aB7XnueLadO58XSbG0grYlkxkjd+adufV7+liPEfzYtD4mGMJPpBezasWe9IKyAuUV+RoMjB7XW/B32fVxIrVpLogoNGsI6qpsMYzBZoXKjcs+J3VJzPHNg5/H5BnfvHpbVFeVMWGLRLQSzneS/lduOZFdlRRk1whJ6uZYHqfZ4YeNEqq1kg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by GVXPR04MB10897.eurprd04.prod.outlook.com (2603:10a6:150:215::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.33; Mon, 17 Mar
- 2025 17:06:53 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2%6]) with mapi id 15.20.8534.031; Mon, 17 Mar 2025
- 17:06:53 +0000
-Date: Mon, 17 Mar 2025 19:06:50 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: claudiu.manoil@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, christophe.leroy@csgroup.eu,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v4 net-next 14/14] MAINTAINERS: add new file ntmp.h to
- ENETC driver
-Message-ID: <20250317170650.4oux6kxh2ng4z725@skbuf>
-References: <20250311053830.1516523-1-wei.fang@nxp.com>
- <20250311053830.1516523-15-wei.fang@nxp.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250311053830.1516523-15-wei.fang@nxp.com>
-X-ClientProxiedBy: VI1P191CA0009.EURP191.PROD.OUTLOOK.COM
- (2603:10a6:800:1ba::13) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 659C12066F6
+	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 17:08:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742231316; cv=none; b=k4t6JQhyH3/I4bKYhXEbeiJZ1nx4qvi6BwNG/r5y96o5pNik/pKBjR5CTH3EPqF+ANWSisf94V6VIr0G4v8dl8UScGMY1prAF0ukx1UmrHuP1e58H0ucNiznf7LLDzBTHUiq/pgiUS4tBdbC/jow6k1jca5ELC0SpP8CcFUek7c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742231316; c=relaxed/simple;
+	bh=oKO4tuswfnZR47mN4xY+H18wafBuPz+lVK3hmfM9zRw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XqlSJ34ggI99lV4v6Y5sc3iPlVck6dz1teK0RJc0DBX+oIuQtrbcPx9XtleFQPnIXnxpZfJVAPxwS+2iCIwkO/V3duJr80cxUbSm+29UBkSU00KYec45NSsgjoXKGL1bkPXpuDlUYJxgGJNe0D1KT5q9rnUOhLcMHNBSPe/8eNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SY0IIE2j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B142AC4CEE3;
+	Mon, 17 Mar 2025 17:08:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742231315;
+	bh=oKO4tuswfnZR47mN4xY+H18wafBuPz+lVK3hmfM9zRw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SY0IIE2jTl3jt2h2dkEZu3ykGEcUg6NcThYZhDFObY6nY3rDrKvZyKkh9Wf614T/l
+	 6zaxSHAsfTxU62IvsvbIZOvY+9AgRdwfZeK6/JZp5keRLVEbsz5nbfPl0fXbq7rbzZ
+	 JiX7gM1FnRS1bMZThzrGEfR0gOADApcEO3gDpZOTNxL7R3UNmUxzw9ztSl1mWOClhL
+	 qUrG83ubhdeaaDf/1hkjgqW7Kv3GyD9QebnAksJQYIGEe2PZBO3JcHWWuWD2GY/rrp
+	 6YqyhJIE/rFGzXghG0zKi9vCmmcBVigstytXfTnHunId6YK4pWmuRiCVSDNm13Fh+d
+	 s4BnrYBhj8Jog==
+Date: Mon, 17 Mar 2025 17:08:32 +0000
+From: Simon Horman <horms@kernel.org>
+To: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, jiawenwu@trustnetic.com,
+	duanqiangwen@net-swift.com
+Subject: Re: [PATCH net-next v8 2/6] net: libwx: Add sriov api for wangxun
+ nics
+Message-ID: <20250317170832.GG688833@kernel.org>
+References: <20250309154252.79234-1-mengyuanlou@net-swift.com>
+ <20250309154252.79234-3-mengyuanlou@net-swift.com>
+ <20250316132204.GB4159220@kernel.org>
+ <6B4E9B01-A3CF-4860-8A38-229AC8AA07B5@net-swift.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|GVXPR04MB10897:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7a332508-581a-48dd-fb96-08dd65761d8a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?9+uf3ra5q8xd4r4ixHKFHLG3CrTEFxTzvzI9aGc2Och8CUmPvPTXgj1zp8W3?=
- =?us-ascii?Q?H69P+af4unOtNJOiiv+XQp8ItJILiXgE/wGjYwkphJwyujd2o8Szjar0NsT7?=
- =?us-ascii?Q?WYvxvhQY+WczitUvS6pkkscBngj+qryLJnTqxZ4HXvPX37wMPwTfXcRDFRAM?=
- =?us-ascii?Q?LIlCZCzMHlpRQ0gLZPrGlZxf4+r8KI8OgkMv+2VIbHCT6Zs4b+yMXDgOLPdC?=
- =?us-ascii?Q?IvEDS1yVCiMM/ecbVBhmtOnV1WWHjT1JmbQNnkio2CrM5SDYjVSzMyQGTqi7?=
- =?us-ascii?Q?zYy1GdkZVDu5TFXPdCdT5HkvG2gway+rn/ztzlnLud+z08imHpp3BkdZ/uHk?=
- =?us-ascii?Q?uOZ8QlpCbi7ff48BOjqAu9W6Najvddeks8JF8TEz6yw/AcRnwzozpFtDeBEN?=
- =?us-ascii?Q?LR5XJc5FuTAQcnqJ+XYKAMZr243Z8Ysjyf6IvAcvHMwSHzvEdPf9jPM++yfg?=
- =?us-ascii?Q?A4Q0RH1du4CauB3h4QFFZjdc5NQ/HS2rewUKYhFIdK67/xrp/9y6aCwgagh3?=
- =?us-ascii?Q?UxWfNSr1OtuOWuuR2WRtg6JWZkGfQU95dLLMTR4mKJZ2Oo92JN7spnPuIuxm?=
- =?us-ascii?Q?ZeEYzcOOz/gCEpjQasgEde501g61b0v5GjEIWtypXj87bFcV93OaTPWKVw9E?=
- =?us-ascii?Q?JueNTIb4OlwdInksOEo42QLL6Pb2wyAh05FSuh6/l+JUgbvHP4PXMMLagbYK?=
- =?us-ascii?Q?bWZcHQvvBDPIUraW64Z4oVMNgcqP6EWjKcwcyRy9+vMr8HsRwxSzOXPMX6ww?=
- =?us-ascii?Q?tEwIj/Ofo20x0VJK9wIfyhYsgY/JD9/Z4pvb7SsfHWAONq7Xe0CtSvLbGjKl?=
- =?us-ascii?Q?4qhS7ivXUbCLjdCnfhCan/m85wkr4+D6lb4RdLNt85aWY7Ajz+buAqbKiYWb?=
- =?us-ascii?Q?fvX5AavdXHe+6fahUPO1lRlpwjDWQtrsurAO6i8EG7GyG8aPsplxbkBMERKA?=
- =?us-ascii?Q?+hJoOg5+hhWdQ+x/5aNOzux0QbDOMPp/LDs5uk/NCBLX+csD/msNtfh7Rlbe?=
- =?us-ascii?Q?XfKGwjI0SiYUox3EwOKp973GGycEY5u7KP7/Pu1o4a69veHYauBM0xQyOXuO?=
- =?us-ascii?Q?DJ2TlUPCLupT0ttQkBQJXpVrv+rGL9pmy2SDbPPd5pHOnoDsa0jNzj2dZ6Kv?=
- =?us-ascii?Q?hCZ2bXWZrTinwGgJEJL9F0XJFBl+fGsKV/buQtD///sYiyBqsePTnfEaTD5M?=
- =?us-ascii?Q?8QDk42s8ngpt6rl0B5COVZz/F3qt8MhcjpFrUII1WR9pF63MTBJIVS7KqQPw?=
- =?us-ascii?Q?c/wqYHlqcIjlv6O5ACaw2qJg+y/HiUkJlh4XPUhTjmjik0N21XVly8iVC8cf?=
- =?us-ascii?Q?mzwTLOSzYn6ARUleByg/97nzk4Qi1Xkr1DpgOBhp4wdnDLINBnFw3oavgup6?=
- =?us-ascii?Q?bNxO6oBqwCNtxdPNgwWLKU3/uvNx?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?vUJYqkPHD2NEPFZKdEyOBIFoMBTHhPjJ/7TqUtGUHztCE8rWkaLMwA3cdI32?=
- =?us-ascii?Q?i65C9RM2JH5P1x3kQukyLVVSGRmIpyXQdXMO2+wJci8y8Lqc8SLCazti/OCX?=
- =?us-ascii?Q?tAjduJQWctRXWGEGjNcdCG/HUpNF3RHrzNE++JVUukV7EwRna9kS7NJuBZ45?=
- =?us-ascii?Q?8HtrDuq5aRQgiG1AE2QlwMC0kHxjrxH6cLKKLsGd5PWEpABvnzsJFy29XTA7?=
- =?us-ascii?Q?/ZrPg4Y1KCWmbsp6SYJsKnD++AQ8TMpBhu/B0oqHJ/d8/YCYFjOC0Nt5APbj?=
- =?us-ascii?Q?S7rn/tlZyw7Ugh5sQivURwPIVklxwT/71dRcrxFwwfEilgP/7PdcL1fW6DJu?=
- =?us-ascii?Q?tfNMpFOMo3eefzFbA2swWgH5v4WHZky1pYkmC6QBJOQ15nCKwSwlsBlzFbLx?=
- =?us-ascii?Q?aQLNGekhkZJ22+JPlIGO5S+LXdcqnC+s/e7feuZ2GiQcT0cKemEBb/AHhnK8?=
- =?us-ascii?Q?aBpD3cAMXTQtfau2DJRTgUpDIvjFOnZofzYsfuLs28lyzLLEJg5Ge+MGZik3?=
- =?us-ascii?Q?XXuCf4lxTBqcYo0O1/faV/j8K3ug3/Smkw5fwrf+anPgunw5etmraATTqFkX?=
- =?us-ascii?Q?+R3FPoZL/R3yXu33fzq/n5XbYDHzFL9/1AO/lsGFMNZP00gGZJJfB9X/rmBr?=
- =?us-ascii?Q?T6JJR6f4rDhlNry5vOhPZcrd1UfYut07nLSgXWFGtddjrVdV7+M/lHXFAW2G?=
- =?us-ascii?Q?x4x3jDKrz4oCdNtMhgP1abIyIPTup8S5ceZlSzDSCCzT2urhfRa6ZZUv2aua?=
- =?us-ascii?Q?1R+J246uVci0iBPkZ/kQ2Xy5XkM/nX4E4UbB6K8R0YD84bnHsmycsSmUy0fJ?=
- =?us-ascii?Q?4MMzJwAwADgtau+fJfLzNBR3/wbDLAK0PAvDhkooqKYTlzLz96ETn2w5/Ivw?=
- =?us-ascii?Q?zspJ5PeMMvedLb0ub7hKqRsW50Gu71FqdnLMrTJH+2wWDGCdvQp5rMivccQQ?=
- =?us-ascii?Q?4p8LlOqdQ2ocFUpGUk2qZfnDm478VY943d0dW01ctUpXIAo5cSzx+HCPBS8h?=
- =?us-ascii?Q?9hpA3gEhQwvjMZec/AUX4ZpFUM4WBvyUBxpvoc1dWp0edV1ShFrIxGPRT6Ed?=
- =?us-ascii?Q?RNqVocI6Anvn4rxgFmee7s8DZ3mEjTUJKFT0mvaf94FWbnG7qEM1//tpl47C?=
- =?us-ascii?Q?MGKmYrR21Vjw0BmK55+H4U0hMtRt1eMJfmzWnTxiSb7y/elqN5Bzfm/7fliR?=
- =?us-ascii?Q?WZ0NnzOCrHZaIY0JGXoJTUxiMCrfqI54o9kmlvTJxFwEd3leAAec9lCfwpmF?=
- =?us-ascii?Q?iHnVzdDgpXKvVWvYkqyz8i0XHOCMlv6UXRLWUSgYiY1l3Js/+ffpzU21BBsP?=
- =?us-ascii?Q?WDjLKbhmpanrnLjJY2M9ZDahaj+oKRcksGRYbju1q4ek3U9Ngw5Ievmp1Yzz?=
- =?us-ascii?Q?gG11HUTXdY1P44x7FF0xViVUszR67GESPfxOgjlHK3ecHogBM0q/JBeC3RwS?=
- =?us-ascii?Q?LLcG5HlE+fo9pHX1FitdZXnH4CnAV1/pBI5rO903NL2p+kTHXszyVQZFirB0?=
- =?us-ascii?Q?JoAZeSQD3pf82KlRCeXA84vvf3D00ycUi+XVUeGy9m4mqy5760iMuVIx+AII?=
- =?us-ascii?Q?l/OEcp9HDx659Dup+UTtUmJ7ZzGj12nZqB3SknzIH4tZO/ljmP/yfucECoKs?=
- =?us-ascii?Q?IA=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7a332508-581a-48dd-fb96-08dd65761d8a
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2025 17:06:53.4202
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: adYNUQSY7yghbF7MGQNGQAOPNyjZWHium1L2R2P+1a534Nz70JJrOMFB0UrNYEhPC1LcgkCeuiOws2psnSH3rQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR04MB10897
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6B4E9B01-A3CF-4860-8A38-229AC8AA07B5@net-swift.com>
 
-On Tue, Mar 11, 2025 at 01:38:30PM +0800, Wei Fang wrote:
-> Add new file ntmp.h. to ENETC driver.
+On Mon, Mar 17, 2025 at 02:34:40PM +0800, mengyuanlou@net-swift.com wrote:
 > 
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
-> ---
->  MAINTAINERS | 1 +
->  1 file changed, 1 insertion(+)
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 7078199fcebf..e259b659eadb 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -9174,6 +9174,7 @@ F:	Documentation/devicetree/bindings/net/nxp,netc-blk-ctrl.yaml
->  F:	drivers/net/ethernet/freescale/enetc/
->  F:	include/linux/fsl/enetc_mdio.h
->  F:	include/linux/fsl/netc_global.h
-> +F:	include/linux/fsl/ntmp.h
->  
->  FREESCALE eTSEC ETHERNET DRIVER (GIANFAR)
->  M:	Claudiu Manoil <claudiu.manoil@nxp.com>
-> -- 
-> 2.34.1
->
+> > 2025年3月16日 21:22，Simon Horman <horms@kernel.org> 写道：
+> > 
+> > On Sun, Mar 09, 2025 at 11:42:48PM +0800, Mengyuan Lou wrote:
+> >> Implement sriov_configure interface for wangxun nics in libwx.
+> >> Enable VT mode and initialize vf control structure, when sriov
+> >> is enabled. Do not be allowed to disable sriov when vfs are
+> >> assigned.
+> >> 
+> >> Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
+> > 
+> > ...
+> > 
+> >> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
+> >> new file mode 100644
+> >> index 000000000000..2392df341ad1
+> >> --- /dev/null
+> >> +++ b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
+> >> @@ -0,0 +1,201 @@
+> >> +// SPDX-License-Identifier: GPL-2.0
+> >> +/* Copyright (c) 2015 - 2025 Beijing WangXun Technology Co., Ltd. */
+> >> +
+> >> +#include <linux/etherdevice.h>
+> >> +#include <linux/pci.h>
+> >> +
+> >> +#include "wx_type.h"
+> >> +#include "wx_mbx.h"
+> >> +#include "wx_sriov.h"
+> >> +
+> >> +static void wx_vf_configuration(struct pci_dev *pdev, int event_mask)
+> >> +{
+> >> + unsigned int vfn = (event_mask & GENMASK(5, 0));
+> >> + struct wx *wx = pci_get_drvdata(pdev);
+> >> +
+> >> + bool enable = ((event_mask & BIT(31)) != 0);
+> > 
+> > Sorry to nit-pick, and I'd be happy for this to be addressed as a
+> > follow-up, but I think that it would be nice to:
+> > 
+> > 1. Both use some #defines and FIELD_GET() for the masking above.
+> > 
+> > 2. Use !! in place of != 0
+> 
+> #define VF_ENABLE_CHECK(_m) FIELD_GET(BIT(31), (_m))
+> 
+> bool enable = !!VF_ENABLE_CHECK(event_mask);
+> 
+> Is that the way to do it?
 
-This should be squashed with the patch that adds the initial NTMP support.
-We don't split out patches to the MAINTAINERS file.
+Thanks, I think that would work.
+
+> 
+> 
+> > 
+> > 3. Arrange local variable declarations in reverse xmas tree order.
+> > 
+> 
+> 
+> 
+> >> +
+> >> + if (enable)
+> >> + eth_zero_addr(wx->vfinfo[vfn].vf_mac_addr);
+> >> +}
+> > 
+> > ...
+> > 
+> > 
+> 
 
