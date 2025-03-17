@@ -1,115 +1,114 @@
-Return-Path: <netdev+bounces-175391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE5BFA65990
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 18:06:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22BB2A659BF
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 18:09:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FDA117433A
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 17:05:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA3DB1896D7E
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 17:04:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30F881ACEDE;
-	Mon, 17 Mar 2025 17:04:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32F2A1A00F0;
+	Mon, 17 Mar 2025 17:02:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kfoKHWtw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MXWjDHjA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F18FF176FB0;
-	Mon, 17 Mar 2025 17:04:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05DBDA48;
+	Mon, 17 Mar 2025 17:02:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742231058; cv=none; b=b6b3cwUBF06S60k+Bud5LWRLR6yFLGKQPjEk5Eoc0fBaA6vSeSLefEW/kaTKuY5K+MGKMKYGNuEOT5xn+ItgbSyKYLX50B+jlHlt0PFG389+7IMF39zlaPT8qTYKpH8zsdRJN8Zr59Y6oFZpThq2bXLvnxWCCeP/vGPJ49g9l/8=
+	t=1742230921; cv=none; b=sg/JEHLYZ5a4cLjghxBvwnG3zsUNUx0SP93n1XIWNQp6unebZD48OSgGmrRAJ7yPYi7wCQYd4b70HlF184/1sUC3t7VhfxqQiVWP/1FbXG/JsMEXdgOz21GopXO3uyHvfp9r3qraKiWPKfI8rwNJXfGKAk9Rk8L4IHcSqIYMitU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742231058; c=relaxed/simple;
-	bh=+0Yok0f4BvfhWWxYAciYqdDpMnOmtFLo3n6+UuKVRgw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ui/SswNE3BMIPtnAXBI2ylKPeUsNyEO1xI/BNKNlxGZwsQHXgTmWuNPTaAY86VesWhb0Pcwj2BxhNhVqbTM6N+ymY/EFKsNtiROjM3DW+7SfWxcVKU8BjO1uJQCek13ukNXllgHClJV4rB7R60A63DBUjT2/g8TaFZb1tiWepgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kfoKHWtw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 954E4C4CEE3;
-	Mon, 17 Mar 2025 17:04:15 +0000 (UTC)
+	s=arc-20240116; t=1742230921; c=relaxed/simple;
+	bh=x/mGAkrV+8U34K+5jMdXc/eUYG9sUfn3SkW/CtmeZXA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pD6mzkpvtjn7PEHLwI6KmKLXkBDeHUU15WibuVehQbxLs1Vo6dEQjUE3sIs10U55TjJoWX+x46MQgfBD9IBUHt5LA4F/QG4Kx3xcJoBcak9IEeSM0dg0gOYaZ8E+5/+cM+fMXyK1f8uiu6xrgQ5WqNM9lxmfJ6WiratVCmqccHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MXWjDHjA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 970C2C4CEE3;
+	Mon, 17 Mar 2025 17:01:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742231057;
-	bh=+0Yok0f4BvfhWWxYAciYqdDpMnOmtFLo3n6+UuKVRgw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kfoKHWtwnkmFbMNWJlgQddRElUpFQ964Egvhgn+4DBOHbw1x1hxBwBOWIpdr+V6gN
-	 +uXysXkEPYgBcnny+7t2souzVBkzw+MFZBgzpDT5SRIJEsBQWwz+263CKI5GX5FbFi
-	 Q82LTP7hXXc+GlW+P2OVgkhvJRTih6XF99NJ1OeivS8Q5sDJMIaSwG2Xm8NYBYcxiV
-	 a2Y6T5tgWCJwrJA5yl4uznPRdi9Xt0AWMf3Dm2oqYgXTG3xBvSpV6dRV7rQK9wD80u
-	 7PpD8CCA4gxsVOFgUus5fGj6hgwq8DtZcQFoe4yNY0RdViWTHwXu/wLAzN6vX9yh/g
-	 6LJPH6HCIcDFw==
-From: Bjorn Andersson <andersson@kernel.org>
-To: mturquette@baylibre.com,
-	sboyd@kernel.org,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	konradybcio@kernel.org,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	p.zabel@pengutronix.de,
-	richardcochran@gmail.com,
-	geert+renesas@glider.be,
-	lumag@kernel.org,
-	heiko@sntech.de,
-	biju.das.jz@bp.renesas.com,
-	quic_tdas@quicinc.com,
-	nfraprado@collabora.com,
-	elinor.montmasson@savoirfairelinux.com,
-	ross.burton@arm.com,
-	javier.carrasco@wolfvision.net,
-	ebiggers@google.com,
-	quic_anusha@quicinc.com,
-	linux-arm-msm@vger.kernel.org,
-	linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org,
-	Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
-Cc: quic_varada@quicinc.com,
-	quic_srichara@quicinc.com
-Subject: Re: (subset) [PATCH v12 0/6] Add NSS clock controller support for IPQ9574
-Date: Mon, 17 Mar 2025 12:04:13 -0500
-Message-ID: <174223105141.2000272.10352611755097062716.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250313110359.242491-1-quic_mmanikan@quicinc.com>
-References: <20250313110359.242491-1-quic_mmanikan@quicinc.com>
+	s=k20201202; t=1742230920;
+	bh=x/mGAkrV+8U34K+5jMdXc/eUYG9sUfn3SkW/CtmeZXA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MXWjDHjAQFJe8AyUlboM8EDsbGsI17LHbp41AxpboHEAeN98Ipu+r2oayp08t8UtW
+	 XqG42w5KElVvK7Q+P4xrFXnbGIRvFf6BIg20Zcwty/Z+qVcQwiBvQ8YHbVP1AvqkYY
+	 E2d4w7TbmD8UVSQgMYSfiJUHx+42w8E5HxwCZHb3/CDJqmdbX8+5wMpGe+kDJHEhlw
+	 L9ijnqFj5FKc+wF09fwVT5XKhB1dNY6HSPN8dWHwxl6UOlPSgr0f3ewg3shFuSv8pL
+	 llh1wIQLTV/v8K8jtkQzphsFTQ5djNE/QKPl906ptEVZ6spMGcjtR+XA+2vVi2eW1J
+	 FDf9ctn+TtMuw==
+Date: Mon, 17 Mar 2025 17:01:54 +0000
+From: Simon Horman <horms@kernel.org>
+To: Sai Krishna Gajula <saikrishnag@marvell.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+	Geethasowjanya Akula <gakula@marvell.com>,
+	Linu Cherian <lcherian@marvell.com>,
+	Jerin Jacob <jerinj@marvell.com>,
+	Hariprasad Kelam <hkelam@marvell.com>,
+	Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	"nathan@kernel.org" <nathan@kernel.org>,
+	"ndesaulniers@google.com" <ndesaulniers@google.com>,
+	"morbo@google.com" <morbo@google.com>,
+	"justinstitt@google.com" <justinstitt@google.com>,
+	"llvm@lists.linux.dev" <llvm@lists.linux.dev>,
+	kernel test robot <lkp@intel.com>
+Subject: Re: [net-next PATCH v2] octeontx2-af: fix build warnings flagged by
+ clang, sparse ,kernel test robot
+Message-ID: <20250317170154.GF688833@kernel.org>
+References: <20250305094623.2819994-1-saikrishnag@marvell.com>
+ <20250306164322.GC3666230@kernel.org>
+ <BY3PR18MB470761F0063CA2AA4481DF7CA0D12@BY3PR18MB4707.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BY3PR18MB470761F0063CA2AA4481DF7CA0D12@BY3PR18MB4707.namprd18.prod.outlook.com>
 
+On Tue, Mar 11, 2025 at 08:57:22AM +0000, Sai Krishna Gajula wrote:
 
-On Thu, 13 Mar 2025 16:33:53 +0530, Manikanta Mylavarapu wrote:
-> Add bindings, driver and devicetree node for networking sub system clock
-> controller on IPQ9574. Also add support for gpll0_out_aux clock
-> which serves as the parent for some nss clocks.
+...
+
+> > > diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+> > > b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+> > > index cd0d7b7774f1..c850ea5d1960 100644
+> > > --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+> > > +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+> > > @@ -591,7 +591,7 @@ static void rvu_check_min_msix_vec(struct rvu
+> > > *rvu, int nvecs, int pf, int vf)
+> > >
+> > >  check_pf:
+> > >  	if (pf == 0)
+> > > -		min_vecs = RVU_AF_INT_VEC_CNT + RVU_PF_INT_VEC_CNT;
+> > > +		min_vecs = (int)RVU_AF_INT_VEC_CNT +
+> > (int)RVU_PF_INT_VEC_CNT;
+> > >  	else
+> > >  		min_vecs = RVU_PF_INT_VEC_CNT;
+> > >
+> > 
+> > I think that in the light of Linus's feedback and the subsequent patch that
+> > demoted -Wenum-enum-conversion from W=1 to W=1 this is not necessary.
 > 
-> Changes in V12:
-> 	- nsscc driver
-> 		- Pick up R-b tag.
-> 	- dtsi
-> 		- Pick up R-b tag.
-> 	- defconfig
-> 		- Pick up R-b tag.
-> 	- Rebased on linux-next tip.
-> 
-> [...]
+> Ack, will ignore these changes which are flagged by  -Wenum-enum-conversion
 
-Applied, thanks!
+Thanks,
 
-[6/6] arm64: defconfig: Build NSS Clock Controller driver for IPQ9574
-      commit: 95204a95fd9657ffbd3f3c4a726e458833e4213d
+FTR this should have read "from W=1 to W=2"
 
-Best regards,
--- 
-Bjorn Andersson <andersson@kernel.org>
+...
 
