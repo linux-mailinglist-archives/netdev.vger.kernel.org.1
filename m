@@ -1,229 +1,125 @@
-Return-Path: <netdev+bounces-175433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78A83A65EAB
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 21:04:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFA83A65EB2
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 21:06:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA1F83AA984
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 20:04:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BA2E174396
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 20:06:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E9721DE3B5;
-	Mon, 17 Mar 2025 20:04:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F0A51F4621;
+	Mon, 17 Mar 2025 20:05:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=fossekall.de header.i=@fossekall.de header.b="n5SBTKZz";
+	dkim=permerror (0-bit key) header.d=fossekall.de header.i=@fossekall.de header.b="6rWg7KFq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.166])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE19717A2EB
-	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 20:04:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742241870; cv=none; b=oggdBnwHjSvb5VUS/X6opaTBjR30PWhI4SGM0MYqwAtodKLeEoe1nu5rTEuE3UWlQLM6QhhBSX61MXz7WOgtBSCTNQh4rMphHC/HwSZtTtp52wsGRE1XL5d+Fzj5+bxda5wJ9I6Em3Tnx7WODnA5sVh7t/58ZVU6c4c+myZfwdA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742241870; c=relaxed/simple;
-	bh=zDiqGRosoV+/3ssgCGb2SGIWovWyXkTfd75EIs4R0Yo=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=NPawLPMMGcqQaerwOTtFpjFjO6fjh265ERMsptgR6phy77ujp62nxEa1Dyhxqnwtm2Eb8wcsUrx1qJMCrAd/EDrs6yUSdIlUjhTFke+Rd7SR0ivgAwkUgnIgzn0xBeQF1/x+Qq6ahIuC9MmB3Sdodoqe3FteBij6ZyqkObrEqSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-85dcaf42b61so735441139f.3
-        for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 13:04:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742241868; x=1742846668;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=StTuGp4t5HsXJ4jfpO7DyuaszrNM9Zr0lwk+MnOE5aA=;
-        b=sdP0hb65Kr04QQgz1zV2iRT9RYPtxz4QStxXDkOxfGioq+l3L0kEErnrYdaFMtQDh3
-         YaTpFOsXHVv5NzcmocXQbg1kyRkWkqiwGjcPYbcUXvPLoXpdmyoXIBKRUYqw4/baVpmw
-         uhOUbobSopzgZB7zfS7wUVZ5m8ukvzbB6Qr2+SMKKHC5d7wdgKJvfrlhiQmW+rFlfI8R
-         Rx5BtBXFjxCHyj9wi2/ZdK0FfWq6qQRyFJ63/wYYCq5kjTB+7ltchcQnTRfkWSmqbAGV
-         5mTF6UfOEPkNkrLSUdVVrK69fi4zOqxZApN5mPy4QQW1XjC9QV/jSVsasIzUZg8tVerw
-         Wzww==
-X-Forwarded-Encrypted: i=1; AJvYcCWNJpMKX1tlBPdR2XEPGr99p32FHX8p4eKgtqOou1nq1wvNkVmXEmjDrz30mn3TV3rt0dWzgo4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIiLg8CruyYeiaaNtVKb6mhQiz3inzztkIL0FIn6pT5SNXIUGS
-	kvAauCgIqD44eRt7C1h5r2QA+QvNjRu7JEXwj95aDopHMa/zDItCfzFgceKarLkk11lLhb8BYrR
-	kqXgrv7Pd1dTBnRgo4b41y4GHDSbW2Kdno2TM583x5ZIKC57PV7FoTys=
-X-Google-Smtp-Source: AGHT+IGeF15yKLNNo1r8a8INaqF6xkYgfxfTQUNCS6v3ZgwGxHAJepaofrIpUvF9xjWF8HtBe5dVBrxfEzvhODoYQitLfeZnQdYv
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6C61D5CE5;
+	Mon, 17 Mar 2025 20:05:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.166
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742241947; cv=pass; b=NfslX9whlYKxezS9dSFVbyYfkESgxiKkOhq1MkmgIRD2OEX+MGhoJvdHzIbPHRUUTwH2fAtsqGPfRi/xHCwBonSkapwTeXUgz3/dpGyG9673DvHFByUiyMrP069edaoB8n/U0KnwadKyCBja+TdZwPL68h/2Wf5j82lmvCUp4ZE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742241947; c=relaxed/simple;
+	bh=kWnsbvdBa1QiTDTl5f5tSn5Hen9rak4a8F1Es32iXKc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=EXvY+jCAncWtybOX1pkcJbRq0vrXkOnjab87jAVsgWasUkQ6QqoaB/e0+uqxh8HCUhjNLfbP6QrJKEksTKC0iBY8R0Leg6mIHiIuRYxGkL4MM84/uQM0MrQRNXSvdmHQiR2VS7i8HtriAlz1iRCWE4VJ52De0dihz4DPEsLxt/s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fossekall.de; spf=pass smtp.mailfrom=a98shuttle.de; dkim=pass (2048-bit key) header.d=fossekall.de header.i=@fossekall.de header.b=n5SBTKZz; dkim=permerror (0-bit key) header.d=fossekall.de header.i=@fossekall.de header.b=6rWg7KFq; arc=pass smtp.client-ip=81.169.146.166
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fossekall.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=a98shuttle.de
+ARC-Seal: i=1; a=rsa-sha256; t=1742241936; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=DJyNRy+Ha87P72L/+zvko/JhitZly6cMqGlYqFSeQWGc53URBXtenOYbvivV/u+1Eu
+    U4CHdrf4w8wi350+o4f9306ViKClaDzt1r6BB7O4ROrzyeyiU+7XXj9NanFT9rrqg/7B
+    bCIcR1clEa/IJzu2rDsl5nhDKJNectGFpBnjynxN2ZXOJwdTqSJFD5xYtVEWutpmFcP0
+    t4ADA8r3wrAr342nS774yqEKgRAeuBkIJPGzW85CppFER55vH+UaF9Gfgi/Hup5FH0nj
+    ssba7oyozT68gSu3WOEtv0B1E4VBFFcreN2E8l5iQ94gB9XapzqXncTLm55dY3hAC8Wk
+    iDIQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1742241936;
+    s=strato-dkim-0002; d=strato.com;
+    h=Message-Id:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=1rh8G0o8+9wQhTxg3fMPSxvHb/ZwpyMay8h4dcx3diw=;
+    b=E6MLBZAg2mxwd6E48Q/OfbU+VX6De7EXm9ThFPMKH8PuH8KDiX1WIuh25X9XsHjDpp
+    EGt78WHPoNPS3mQ8JpKQfkImCkC6oWZjQH9tMIx+3Gz2gP62G2gu5eBQnx+Ia2SKfGbx
+    BCFznX5upNR2u3bRTpZ5F7OME5MtAAW2sD46Urk7WKurOjNUfGOEkp9GLQxinkEe0Jg7
+    jDL+DGIM4FweI7SIh9PrruktVzMUYufs+tx+qiSG4UySXzgsMD1/p8UiksjJnhp2mAXO
+    m1r68rsPzC6UIDLaRFvnVhP1BWVTN2oBJpRIylFBDISolGXNXbKh/HaDQOEPkUykyOf9
+    uLNg==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1742241936;
+    s=strato-dkim-0002; d=fossekall.de;
+    h=Message-Id:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=1rh8G0o8+9wQhTxg3fMPSxvHb/ZwpyMay8h4dcx3diw=;
+    b=n5SBTKZzXtxbt+Qe8CctpfF6oCtX4GdNrPPJXo1zfAVQ4HflDUI/je+LRORGEDTcfD
+    xclUgZAbHxN8gFe5qcgWfso9BM8koQgO/t/nGjEh7knxVJZZ4SETkht/qGX7Uh48TrsM
+    K38a1BVwBf85IEYH4u4EBkvEkf3vz1WSG4uxwrIW2Rj46dM7FA7TqQVXx1JfNiFW5yjN
+    FLCGBWRFTxmgp0YQgMumJSS0ECPCYmR1fdTm+VR7GWO1U6LCzKFdY0GPAx07MT+W8KDa
+    /uy0cu2ensHVvKRflwJT1kjiEbV6LvhANH3cOh6RTYwyOpABacld0+73hCQk20I/fbQA
+    s2pA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1742241936;
+    s=strato-dkim-0003; d=fossekall.de;
+    h=Message-Id:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=1rh8G0o8+9wQhTxg3fMPSxvHb/ZwpyMay8h4dcx3diw=;
+    b=6rWg7KFqe7kyp+x+qcfH7oo0kkq2JQAGCNY//1dRQOQPq0zLSBHFieRDZx60EkXyue
+    wAD89RJBsqQRvxxAdVDw==
+X-RZG-AUTH: ":O2kGeEG7b/pS1EzgE2y7nF0STYsSLflpbjNKxx7cGrBdao6FTL4AJcMdm+lap4JEHkzok9eyEg=="
+Received: from aerfugl
+    by smtp.strato.de (RZmta 51.3.0 AUTH)
+    with ESMTPSA id f28b3512HK5ZFzy
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Mon, 17 Mar 2025 21:05:35 +0100 (CET)
+Received: from koltrast.home ([192.168.1.27] helo=a98shuttle.de)
+	by aerfugl with smtp (Exim 4.96)
+	(envelope-from <michael@a98shuttle.de>)
+	id 1tuGiM-00084z-06;
+	Mon, 17 Mar 2025 21:05:34 +0100
+Received: (nullmailer pid 93651 invoked by uid 502);
+	Mon, 17 Mar 2025 20:05:33 -0000
+From: Michael Klein <michael@fossekall.de>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Michael Klein <michael@fossekall.de>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [net-next v4 0/3] net: phy: realtek: Add support for PHY LEDs on
+Date: Mon, 17 Mar 2025 21:05:29 +0100
+Message-Id: <20250317200532.93620-1-michael@fossekall.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d8e:b0:3cf:bb6e:3065 with SMTP id
- e9e14a558f8ab-3d48397f585mr130592785ab.0.1742241867792; Mon, 17 Mar 2025
- 13:04:27 -0700 (PDT)
-Date: Mon, 17 Mar 2025 13:04:27 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67d8804b.050a0220.2ca2c6.006b.GAE@google.com>
-Subject: [syzbot] [wireless?] INFO: trying to register non-static key in cfg80211_dev_free
-From: syzbot <syzbot+aaf0488c83d1d5f4f029@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
 
-Hello,
+Changes in V4:
+- Change (!ret) to (ret == 0)
+- Replace set_bit() by __set_bit()
 
-syzbot found the following issue on:
+Changes in V3:
+- move definition of rtl8211e_read_ext_page() to patch 2
+- Wrap overlong lines
 
-HEAD commit:    4003c9e78778 Merge tag 'net-6.14-rc7' of git://git.kernel...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1763e04c580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=317038cbd53153e8
-dashboard link: https://syzkaller.appspot.com/bug?extid=aaf0488c83d1d5f4f029
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12c5ddb0580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16d2b03f980000
+Changes in V2:
+- Designate to net-next
+- Add ExtPage access cleanup patch as suggested by Andrew Lunn
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-4003c9e7.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/ce870bfb8bac/vmlinux-4003c9e7.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/195015b7ce43/bzImage-4003c9e7.xz
+Michael Klein (3):
+  net: phy: realtek: Clean up RTL8211E ExtPage access
+  net: phy: realtek: use __set_bit() in rtl8211f_led_hw_control_get()
+  net: phy: realtek: Add support for PHY LEDs on RTL8211E
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+aaf0488c83d1d5f4f029@syzkaller.appspotmail.com
+ drivers/net/phy/realtek/realtek_main.c | 184 ++++++++++++++++++++-----
+ 1 file changed, 151 insertions(+), 33 deletions(-)
 
-RBP: 0000000000000001 R08: 00007ffc330c8967 R09: 000055557c17e4c0
-R10: 0000000000000001 R11: 0000000000000246 R12: 0000000000000004
-R13: 00007fb851c063fc R14: 00007fb851bd6334 R15: 00007fb851c063e4
- </TASK>
-INFO: trying to register non-static key.
-The code is fine but needs lockdep annotation, or maybe
-you didn't initialize this object before use?
-turning off the locking correctness validator.
-CPU: 0 UID: 0 PID: 5935 Comm: syz-executor550 Not tainted 6.14.0-rc6-syzkaller-00103-g4003c9e78778 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- assign_lock_key kernel/locking/lockdep.c:983 [inline]
- register_lock_class+0xc39/0x1240 kernel/locking/lockdep.c:1297
- __lock_acquire+0x135/0x3c40 kernel/locking/lockdep.c:5103
- lock_acquire.part.0+0x11b/0x380 kernel/locking/lockdep.c:5851
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
- _raw_spin_lock_irqsave+0x3a/0x60 kernel/locking/spinlock.c:162
- cfg80211_dev_free+0x30/0x3d0 net/wireless/core.c:1196
- device_release+0xa1/0x240 drivers/base/core.c:2568
- kobject_cleanup lib/kobject.c:689 [inline]
- kobject_release lib/kobject.c:720 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1e4/0x5a0 lib/kobject.c:737
- put_device+0x1f/0x30 drivers/base/core.c:3774
- wiphy_free net/wireless/core.c:1224 [inline]
- wiphy_new_nm+0x1c1f/0x2160 net/wireless/core.c:562
- ieee80211_alloc_hw_nm+0x1b7a/0x2260 net/mac80211/main.c:835
- mac80211_hwsim_new_radio+0x1d6/0x54e0 drivers/net/wireless/virtual/mac80211_hwsim.c:5185
- hwsim_new_radio_nl+0xb42/0x12b0 drivers/net/wireless/virtual/mac80211_hwsim.c:6242
- genl_family_rcv_msg_doit+0x202/0x2f0 net/netlink/genetlink.c:1115
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0x565/0x800 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2533
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1312 [inline]
- netlink_unicast+0x53c/0x7f0 net/netlink/af_netlink.c:1338
- netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1882
- sock_sendmsg_nosec net/socket.c:718 [inline]
- __sock_sendmsg net/socket.c:733 [inline]
- ____sys_sendmsg+0xaaf/0xc90 net/socket.c:2573
- ___sys_sendmsg+0x135/0x1e0 net/socket.c:2627
- __sys_sendmsg+0x16e/0x220 net/socket.c:2659
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fb851b909e9
-Code: 48 83 c4 28 c3 e8 c7 1b 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc330c8bc8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007ffc330c8c20 RCX: 00007fb851b909e9
-RDX: 0000000020000000 RSI: 0000400000000140 RDI: 0000000000000003
-RBP: 0000000000000001 R08: 00007ffc330c8967 R09: 000055557c17e4c0
-R10: 0000000000000001 R11: 0000000000000246 R12: 0000000000000004
-R13: 00007fb851c063fc R14: 00007fb851bd6334 R15: 00007fb851c063e4
- </TASK>
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5935 at net/wireless/core.c:1197 cfg80211_dev_free+0x2e7/0x3d0 net/wireless/core.c:1197
-Modules linked in:
-CPU: 0 UID: 0 PID: 5935 Comm: syz-executor550 Not tainted 6.14.0-rc6-syzkaller-00103-g4003c9e78778 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-RIP: 0010:cfg80211_dev_free+0x2e7/0x3d0 net/wireless/core.c:1197
-Code: 00 00 49 8b bd e0 08 00 00 e8 85 7a 69 f7 4c 89 ef 48 83 c4 10 5b 5d 41 5c 41 5d 41 5e 41 5f e9 6f 7a 69 f7 e8 8a 0c 11 f7 90 <0f> 0b 90 e9 6f fd ff ff 4c 89 f7 e8 b9 2b 74 f7 e9 aa fe ff ff 4c
-RSP: 0018:ffffc90003e371b8 EFLAGS: 00010093
-RAX: 0000000000000000 RBX: 0000000000000293 RCX: ffffffff81972d2d
-RDX: ffff88802721c880 RSI: ffffffff8aa8e456 RDI: ffffc90003e37128
-RBP: ffff8880121b06a8 R08: 0000000000000001 R09: fffff520007c6e25
-R10: 0000000000000003 R11: 0000000000000001 R12: ffff8880121b06b8
-R13: ffff8880121b0000 R14: ffff8881050d1b80 R15: 0000000000000000
-FS:  000055557c17d380(0000) GS:ffff88806a600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000400000001ac0 CR3: 00000000122c0000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- device_release+0xa1/0x240 drivers/base/core.c:2568
- kobject_cleanup lib/kobject.c:689 [inline]
- kobject_release lib/kobject.c:720 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1e4/0x5a0 lib/kobject.c:737
- put_device+0x1f/0x30 drivers/base/core.c:3774
- wiphy_free net/wireless/core.c:1224 [inline]
- wiphy_new_nm+0x1c1f/0x2160 net/wireless/core.c:562
- ieee80211_alloc_hw_nm+0x1b7a/0x2260 net/mac80211/main.c:835
- mac80211_hwsim_new_radio+0x1d6/0x54e0 drivers/net/wireless/virtual/mac80211_hwsim.c:5185
- hwsim_new_radio_nl+0xb42/0x12b0 drivers/net/wireless/virtual/mac80211_hwsim.c:6242
- genl_family_rcv_msg_doit+0x202/0x2f0 net/netlink/genetlink.c:1115
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0x565/0x800 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2533
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1312 [inline]
- netlink_unicast+0x53c/0x7f0 net/netlink/af_netlink.c:1338
- netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1882
- sock_sendmsg_nosec net/socket.c:718 [inline]
- __sock_sendmsg net/socket.c:733 [inline]
- ____sys_sendmsg+0xaaf/0xc90 net/socket.c:2573
- ___sys_sendmsg+0x135/0x1e0 net/socket.c:2627
- __sys_sendmsg+0x16e/0x220 net/socket.c:2659
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fb851b909e9
-Code: 48 83 c4 28 c3 e8 c7 1b 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc330c8bc8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007ffc330c8c20 RCX: 00007fb851b909e9
-RDX: 0000000020000000 RSI: 0000400000000140 RDI: 0000000000000003
-RBP: 0000000000000001 R08: 00007ffc330c8967 R09: 000055557c17e4c0
-R10: 0000000000000001 R11: 0000000000000246 R12: 0000000000000004
-R13: 00007fb851c063fc R14: 00007fb851bd6334 R15: 00007fb851c063e4
- </TASK>
+-- 
+2.39.5
 
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
