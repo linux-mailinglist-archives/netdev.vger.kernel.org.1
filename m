@@ -1,123 +1,111 @@
-Return-Path: <netdev+bounces-175425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DF8BA65D5F
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 19:57:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E5CBA65D7C
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 20:00:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B85F916BC26
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 18:57:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 552F4189A305
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 19:00:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C696E1EB5C8;
-	Mon, 17 Mar 2025 18:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5511214A4C6;
+	Mon, 17 Mar 2025 19:00:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g49BcDQt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JeQzc7BL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CBA01E1E03;
-	Mon, 17 Mar 2025 18:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 261144A06;
+	Mon, 17 Mar 2025 19:00:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742237786; cv=none; b=N1VxvIbXIn/LQMpqU8an9bW8fSdF2c2LM3SbZA1CpYvd7OlDUTWwuvn+XC31J+FFkhFL1XpEdzW13EDBlvuRlceb9tgG/GqdQXvWde3Rq1tSdVky4PpeM/Zf/tkDjs4VEhPGxsB9f0Ws16vefUJRxL7fXBc0+Eqha1OlksAQxqE=
+	t=1742238045; cv=none; b=SAD5kw4qFNg3wpemlB7rk6TuR4pQHqMnrHXkFJS1KSgzVagguLR6cgKH3aZnt+coV/vteTxU9hxsuERt8wBRsG74dIU0BbiRgBmuajyYCPQSWbpcX9PkjamnwaBl1KZAXwW+jhdoTMODH5VaUUSO081yGS9qWqNR92OP3PdfzXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742237786; c=relaxed/simple;
-	bh=1e4w5hz4mFH34gA0uZbOVpuAdr2fk4qSjjH+ov2gFLc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ueLw3EY0bOaB0BiYblJ2QsF4OnKUarKxVV/8++cxbvwoxdyE38P+LhCh/UryyAanQoCmFkOjVgCq/ntfy7tG0sOzXJcTCwAyf7NfI3eU23+oiBjYTwQawZ3L4wZT11vRUfaQBV2CDR7BIthkvyBxdA7LFG2wXpOTF1QE+I93Cyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g49BcDQt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 032BDC4CEE3;
-	Mon, 17 Mar 2025 18:56:23 +0000 (UTC)
+	s=arc-20240116; t=1742238045; c=relaxed/simple;
+	bh=Wo2wfzfhNxnL2ZL+LVpIzigSCTl/akQguM98mUvOi+w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XETxLc3b+Kn6AoeA4/toqH4x1hIf/yHNti7CbepAK/QI6sMnSv07pzGBBaJw9Ie+DJnQksNXEJNlOQZ4OIf5t3xD6ViSWUe8Hgkv3hHvdiiSiLad5vpsCXnTnQdgwCTmaAxd6IOCfblViVd2d+u/UOxyjiry0817hRI8UYTQa0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JeQzc7BL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DEB7C4CEE3;
+	Mon, 17 Mar 2025 19:00:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742237786;
-	bh=1e4w5hz4mFH34gA0uZbOVpuAdr2fk4qSjjH+ov2gFLc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=g49BcDQtydEODtoRxCv/0Ge+wIgFimsFVv5x/AJpF/ythvIFKKS9oYn5Wxtb0BJzm
-	 /mEW9xjQyZ8X47jAFPu+Ra2biaQu7IC+TlIdOerTe1HCdu1NxIdyV8zKGyKNZM4m/k
-	 O0aQ/Ls1cmqO8npyLDm9xHwu3TigAfP9s3shzHGxydmEu177pGTcYYoUY9jk7HRy04
-	 6iJ4WORIARH2yTic/VTMJJ7Ek6GytJFI19GvNj75KvmWS43x1staKu6FjidFD0Ja2O
-	 vLnEeLYC3CXvXLmDUw6T/odZ1CC2NS/H7XIv+2hhZHNOo5SdEkHECKiNAW64RjE37N
-	 IK3SO3DDadWgg==
-Date: Mon, 17 Mar 2025 18:56:22 +0000
-From: Simon Horman <horms@kernel.org>
-To: Michal Kubiak <michal.kubiak@intel.com>
-Cc: Chen Ni <nichen@iscas.ac.cn>, manishc@marvell.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] qed: remove cast to pointers passed to kfree
-Message-ID: <20250317185622.GK688833@kernel.org>
-References: <20250311070624.1037787-1-nichen@iscas.ac.cn>
- <Z9BuCIqxg5CRzD8w@localhost.localdomain>
- <Z9Bv+cjkxlVHsKAd@localhost.localdomain>
+	s=k20201202; t=1742238045;
+	bh=Wo2wfzfhNxnL2ZL+LVpIzigSCTl/akQguM98mUvOi+w=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=JeQzc7BLWlfhPaSn+zaHHp4mLtyYzC9KuIFsri9MX1nfgbXdPM3nSzXRttXIA8032
+	 sCK6mCC9ByNS1KiQ/wKMc7quXIdPZEYCM6FBTvy9uAsnCTlhSzjHJvL7yHie8JVK/0
+	 rdKpesJMYs5F1rT7Y+Mu2sMrSQUaUPe7pRuewODruuLLAIUV37CCMp8TknbB2WGfA8
+	 87IlqnO4OeULooRQa5tYXp/TTJ5zrsi9NPs6qgyDMHA+tSqGUT/K1R4jjOWanPZfxq
+	 o9YwEtVrmJLtGhaFN6M/iALR++tYhEWfAR8hvbH9fBIrSqvgBVsxRjj6/oCrFrGI8e
+	 QSvP3OzliqCXg==
+Message-ID: <1eae139c-f678-4b28-a466-5c47967b5d13@kernel.org>
+Date: Mon, 17 Mar 2025 13:00:43 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z9Bv+cjkxlVHsKAd@localhost.localdomain>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 0/8] Introduce fwctl subystem
+Content-Language: en-US
+To: Jason Gunthorpe <jgg@nvidia.com>, Jacob Keller <jacob.e.keller@intel.com>
+Cc: "Nelson, Shannon" <shannon.nelson@amd.com>,
+ Leon Romanovsky <leon@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+ Aron Silverton <aron.silverton@oracle.com>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Daniel Vetter <daniel.vetter@ffwll.ch>, Dave Jiang <dave.jiang@intel.com>,
+ Christoph Hellwig <hch@infradead.org>, Itay Avraham <itayavr@nvidia.com>,
+ Jiri Pirko <jiri@nvidia.com>, Jonathan Cameron
+ <Jonathan.Cameron@huawei.com>, Leonid Bloch <lbloch@nvidia.com>,
+ linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
+ "Sinyuk, Konstantin" <konstantin.sinyuk@intel.com>
+References: <20250304140036.GK133783@nvidia.com>
+ <20250304164203.38418211@kernel.org> <20250305133254.GV133783@nvidia.com>
+ <mxw4ngjokr3vumdy5fp2wzxpocjkitputelmpaqo7ungxnhnxp@j4yn5tdz3ief>
+ <bcafcf60-47a8-4faf-bea3-19cf0cbc4e08@kernel.org>
+ <20250305182853.GO1955273@unreal>
+ <dc72c6fe-4998-4dba-9442-73ded86470f5@kernel.org>
+ <20250313124847.GM1322339@unreal>
+ <54781c0c-a1e7-4e97-acf1-1fc5a2ee548c@amd.com>
+ <d0e95c47-c812-4aa8-812f-f5d7f6abbbb1@intel.com>
+ <20250317123333.GB9311@nvidia.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20250317123333.GB9311@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 11, 2025 at 06:16:41PM +0100, Michal Kubiak wrote:
-> On Tue, Mar 11, 2025 at 06:08:24PM +0100, Michal Kubiak wrote:
-> > On Tue, Mar 11, 2025 at 03:06:24PM +0800, Chen Ni wrote:
-> > > Remove unnecessary casts to pointer types passed to kfree.
-> > > Issue detected by coccinelle:
-> > > @@
-> > > type t1;
-> > > expression *e;
-> > > @@
-> > > 
-> > > -kfree((t1 *)e);
-> > > +kfree(e);
-> > > 
-> > > Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
-> > > ---
-> > >  drivers/net/ethernet/qlogic/qed/qed_main.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > 
-> > > diff --git a/drivers/net/ethernet/qlogic/qed/qed_main.c b/drivers/net/ethernet/qlogic/qed/qed_main.c
-> > > index f915c423fe70..886061d7351a 100644
-> > > --- a/drivers/net/ethernet/qlogic/qed/qed_main.c
-> > > +++ b/drivers/net/ethernet/qlogic/qed/qed_main.c
-> > > @@ -454,7 +454,7 @@ int qed_fill_dev_info(struct qed_dev *cdev,
-> > >  
-> > >  static void qed_free_cdev(struct qed_dev *cdev)
-> > >  {
-> > > -	kfree((void *)cdev);
-> > > +	kfree(cdev);
-> > >  }
-> > >  
-> > >  static struct qed_dev *qed_alloc_cdev(struct pci_dev *pdev)
-> > > -- 
-> > > 2.25.1
-> > > 
-> > > 
-> > 
-> > 
-> > LGTM.
-> > 
-> > Thanks,
-> > Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
-> > 
+On 3/17/25 1:33 PM, Jason Gunthorpe wrote:
+> On Fri, Mar 14, 2025 at 11:09:47AM -0700, Jacob Keller wrote:
 > 
-> I'm sorry I missed that the patch is addressed to "net-next".
-> It rather looks like as a candidate for the "net" tree.
+>> I'd throw my hat in for drivers/core as well, I think it makes the most
+>> sense and is the most subsystem neutral name. Hopefully any issue with
+>> tooling can be solved relatively easily.
 > 
-> Please resend it to the "net" tree with an appropriate "Fixes" tag.
+> Given Greg's point about core dump files sometimes being in .gitignore
+> maybe "shared_core", or something along that path is a better name?
 > 
-> My apologies for the noise.
 
-Hi Michal,
+Not seeing the conflict on drivers/core:
 
-I'm unclear what bug this fixes.
+$ find . -name .gitignore | xargs grep core
+./tools/testing/selftests/powerpc/ptrace/.gitignore:core-pkey
+./tools/testing/selftests/cgroup/.gitignore:test_core
+./tools/testing/selftests/mincore/.gitignore:mincore_selftest
+./arch/mips/crypto/.gitignore:poly1305-core.S
+./arch/arm/crypto/.gitignore:aesbs-core.S
+./arch/arm/crypto/.gitignore:sha256-core.S
+./arch/arm/crypto/.gitignore:sha512-core.S
+./arch/arm/crypto/.gitignore:poly1305-core.S
+./arch/arm64/crypto/.gitignore:sha256-core.S
+./arch/arm64/crypto/.gitignore:sha512-core.S
+./arch/arm64/crypto/.gitignore:poly1305-core.S
 
-It seems to me that this is a clean-up.
-That as such it should only be considered in the context
-of more material changes to this driver.
 
