@@ -1,316 +1,294 @@
-Return-Path: <netdev+bounces-175263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9D97A64B17
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 11:55:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 608ADA64B78
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 12:02:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFCED16F650
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 10:55:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43BF23A3BA3
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 10:58:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A36A23534D;
-	Mon, 17 Mar 2025 10:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B047233127;
+	Mon, 17 Mar 2025 10:58:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b="p+VdAfW2"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="ZKl24BFh"
 X-Original-To: netdev@vger.kernel.org
-Received: from ksmg02.maxima.ru (ksmg02.maxima.ru [81.200.124.39])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4753A38DD8;
-	Mon, 17 Mar 2025 10:55:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.200.124.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E23021A436
+	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 10:58:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742208925; cv=none; b=l0pU0VGptVtC5QjGhZ8PXgq1ttejdFzzaW/TWY6eG90pg5+VxqyuKqrFVEy//gC3bGJN0zCLUnMeP5O+auTdF1d7k4do31ngi1ey/n+A2D0yt//KTbXBO2IuFxDFoWFC5J2S35xwX6YwjfQyYlbXU8QXPbUWilb9HDkTjuhr0yk=
+	t=1742209091; cv=none; b=DU04hRch4PS3Ak3EeXrmjcn5B1GvfzxmluBGMR+gk4m6LpupNOgvVRssIaZWgMluWMVnG68UsTaFi5We+zcP7lbNfRCJoxXc1CUv+fFHtnrtczaL+3LAGV2MqvC+lSYZuvgTy/GAEJN3uReRcqUbY88QnbO4aFTpaABZ0jq5Vog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742208925; c=relaxed/simple;
-	bh=iSJkqmvbpB3JMwQgPR0cfXGE9pxa4Is0Ta0HqVFVxTw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hSd7cx7k8Jy4BLYJoXRgJw0/bm6Ycygh3zp9+jw4XBlpRXxuaNWT2auX0XL0ycXO6ATAyJGbJ3HOZ5X0ClFwvQ+WyPTX8lJkyHbjNSaxL8inCl+r65llMxpokZDR4Vv2yB0uFMa4uS9BBdHF2TZoXITyqBbIF00Re16ohBzKlQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru; spf=pass smtp.mailfrom=mt-integration.ru; dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b=p+VdAfW2; arc=none smtp.client-ip=81.200.124.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mt-integration.ru
-Received: from ksmg02.maxima.ru (localhost [127.0.0.1])
-	by ksmg02.maxima.ru (Postfix) with ESMTP id 36FBF1E0008;
-	Mon, 17 Mar 2025 13:55:12 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ksmg02.maxima.ru 36FBF1E0008
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mt-integration.ru;
-	s=sl; t=1742208912; bh=d7t7HcGDv3eC8v3jJtrr1V6WrxNJcqQgvMQo8uuswlI=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=p+VdAfW2oK0Fgl/+ac0tLGZJeuw7L4tw/biEMfQwCn+6rtJvuygB3m4dl/zjs6Vqd
-	 w3BoT36vhFcvzvVee9FzViCPcetQpqXjWYs+BFwlm+en5bd5mYLWDUR3KI4jGnLs7O
-	 ibZrQfVJctzgfLkqp97Jtg/m8HbrkHFAaQhr1X/Y5y5cmWQLWqlwZJoMRKI+2pcDvl
-	 /id0rFUvmN2o7ANri8ktx2tRCiiSvRiRYVG/Kmjw7AjFPkrZpLatWrNvvjv6h/3YN/
-	 E8Mt2zaQHH0x48mDNMZolhfPQXC0yHTkOgSNkkWPp1JvqoL7uZ/mN4Fsxr6luwTEmZ
-	 4bT2K9IudeOpw==
-Received: from ksmg02.maxima.ru (mail.maxima.ru [81.200.124.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client CN "*.maxima.ru", Issuer "GlobalSign GCC R3 DV TLS CA 2020" (verified OK))
-	by ksmg02.maxima.ru (Postfix) with ESMTPS;
-	Mon, 17 Mar 2025 13:55:12 +0300 (MSK)
-Received: from GS-NOTE-190.mt.ru (10.0.246.183) by mmail-p-exch02.mt.ru
- (81.200.124.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1544.4; Mon, 17 Mar
- 2025 13:55:10 +0300
-From: Murad Masimov <m.masimov@mt-integration.ru>
-To: "David S. Miller" <davem@davemloft.net>
-CC: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Joerg
- Reuter <jreuter@yaina.de>, Kuniyuki Iwashima <kuniyu@amazon.com>, Murad
- Masimov <m.masimov@mt-integration.ru>, <linux-hams@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<lvc-project@linuxtesting.org>,
-	<syzbot+33841dc6aa3e1d86b78a@syzkaller.appspotmail.com>
-Subject: [PATCH] ax25: Remove broken autobind
-Date: Mon, 17 Mar 2025 13:53:52 +0300
-Message-ID: <20250317105352.412-1-m.masimov@mt-integration.ru>
-X-Mailer: git-send-email 2.46.0.windows.1
+	s=arc-20240116; t=1742209091; c=relaxed/simple;
+	bh=qsDMwGdZQLFJZ8Cpig7FzRSvbjMllkPDI2sN2I3QJ5A=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To; b=Ir795evbF1sAQi/pfmLRBGldHZNYFPGNsuxTczkXJcvzFctvRi6VKAuZ737FaeT9L0EtXnzifeoVPqh7qx2b4uFIUsw4YgbGSAWrvku+UuOphlg3nCIoF280jvd2Q0kRCX4dnWpqwgtZHcVOHvgxx9zAoWUrD3I487SqLjwCJgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=ZKl24BFh; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-22398e09e39so84997995ad.3
+        for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 03:58:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1742209089; x=1742813889; darn=vger.kernel.org;
+        h=to:content-transfer-encoding:mime-version:message-id:date:subject
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KCvgTiEawu29sH4ByokBNvEWLF1KpXJnCBPg6/tj2M0=;
+        b=ZKl24BFh7/WrPJbhaXx4SUqiPalOKmmAB95H5fV31eIpnHl0Mc3yNUihJV+/dvTvoi
+         FbocVHJpF99L5+PyDcs1AXRab+uWFDT42FWXQVFADntNAr7Wafx0i/ivTj9uyREu7NuB
+         0nGqaPRfSnXB2JR2kFX6NEpaxH8G0ZG2ymU6QCIQB5/DCmJ4T06um2dbyoSPbPzN6DQn
+         3wQLzoURd2ZPyYGoNFg/FdFGF6x79XM6r2WppQjZsyOn+EYgsH9KPqo0zElXkPtRygVt
+         jYXO26UuLxipMzMU1blkYhXLfnnzh/6FsVeOLTp2e+pYX6e8p1XbGLnKTVx8VSE4JhFg
+         HzeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742209089; x=1742813889;
+        h=to:content-transfer-encoding:mime-version:message-id:date:subject
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KCvgTiEawu29sH4ByokBNvEWLF1KpXJnCBPg6/tj2M0=;
+        b=JUNDaTRbqGbESpvk5Iyt+ALoxaW2vLAB8fA7TWkdR2pYrch4xN5zmiOneLSd9r8lU6
+         QMS/qh5EZBzbIS5tGQunbxOmXZRjoMfw+OIeljCQrcdd0LLS4K5M76C4TfxL86gZiZLv
+         R2o8zuhdv3sn/3s60PYeoZrDNtCODJhgqxBKBCsVYYsq153citEXCi2wSBtL0c5XXsy8
+         OVh4Vu/W0EJyBJVDtbwXkYdbrW3XPegcnlFeNzj6MtMByutJvUiQx3hvjD5+4EUmN94Q
+         Imlz1GOS2fKB1Y1Nw8w5Ey7o41X/HIf38qMzcrl7BlQIhxrHnuYqiBywXm0Ku0w7TlJf
+         QEhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXGF6Ga77wej9rg9J9Fu12RA2TDifzq7RSvoxaegLk9d7yOIFm1YHujdfWargl0DXz5vhMrjA4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnSnI4h/KU4nc3OzNbyozGv/UWKuHnjYfqDOK8rR5N2Ay6tu+Q
+	RzB4GzwG/9C/LQVyBEppj3t2Q3EBohbqRiboRDb9TFTyS6XxeskTdyhYmehG8BQ=
+X-Gm-Gg: ASbGnctveesMnoE0um0t/9YjiX6HxrWL0Pm7w/2vptsE76fBhfozM8SS4owh1sw968B
+	s/HwCloG8k/q9eLcvn6KStyxikMKC5IwFERIx86EVRIQ2b1Muld9gKv9CNbC5V2zNlXYrr285pu
+	PBWU6VXbYutZqJ70duxomxgurJQ6UVa3EbrYGRnQ4LCK7cnNJupCEgB/Z8qnBvw3ofKYGMYUADh
+	ZfYzbM0pCA9LFEU/sJRsPtNyH2NbgCbbo/rgJerycLkbTwhnBRAa7sUBbheDeewpa2K1azxXasX
+	hC8gua0n5LI4vMDjpCNiG+2/AeO8Ss6JG6KkYQqbs5FgrEqU
+X-Google-Smtp-Source: AGHT+IHIemQ3oAfcEA3ILoOSCg5Zh3JtO67wmQnjQ93SNsixlgSzi1nAEcGtR/i7bSKLCV3BPKLOgg==
+X-Received: by 2002:a05:6a21:394c:b0:1f5:80eb:846d with SMTP id adf61e73a8af0-1f5c117de5bmr16765553637.10.1742209089213;
+        Mon, 17 Mar 2025 03:58:09 -0700 (PDT)
+Received: from localhost ([157.82.207.107])
+        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-af56ea7c759sm5715282a12.59.2025.03.17.03.58.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Mar 2025 03:58:08 -0700 (PDT)
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+Subject: [PATCH net-next v11 00/10] tun: Introduce virtio-net hashing
+ feature
+Date: Mon, 17 Mar 2025 19:57:50 +0900
+Message-Id: <20250317-rss-v11-0-4cacca92f31f@daynix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: mt-exch-01.mt.ru (91.220.120.210) To mmail-p-exch02.mt.ru
- (81.200.124.62)
-X-KSMG-AntiPhishing: NotDetected, bases: 2025/03/17 09:30:00
-X-KSMG-AntiSpam-Auth: dmarc=none header.from=mt-integration.ru;spf=none smtp.mailfrom=mt-integration.ru;dkim=none
-X-KSMG-AntiSpam-Envelope-From: m.masimov@mt-integration.ru
-X-KSMG-AntiSpam-Info: LuaCore: 51 0.3.51 68896fb0083a027476849bf400a331a2d5d94398, {rep_avail}, {Tracking_one_url}, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, 81.200.124.62:7.1.2;mt-integration.ru:7.1.1;127.0.0.199:7.1.2;ksmg02.maxima.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;syzkaller.appspot.com:5.0.1,7.1.1, FromAlignment: s, ApMailHostAddress: 81.200.124.62
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 191835 [Mar 17 2025]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.11
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/03/17 05:57:00 #27790323
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected, bases: 2025/03/17 09:27:00
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 7
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAC4A2GcC/4XSzW7cIBAH8FdZ+VxWAwwD+NT3qHrgs4ui2KntX
+ W0U5d0zsfPhyofebJjfAKP/SzeXqZW5608v3VRubW7jwD9S/jh16RKGP0W0zAudAoWAoMU0z6J
+ YbbPzpQZrO658mkpt97XNr24oixjKfel+886lzcs4Pa/9b3Ld505aAjgwSoI8S0RUSkgRHtqlP
+ YznMfPXzxyeh3Y/p/Fx7XNTOyuNREmIZ0VASP+1+tMieGnWF9y0AJFIAzfLEZw6INwhhRtCRg6
+ L16okKJQOyHyh9xduyDCqOlVyuQKYfED0iQxI8BsiRlEmDyFbcJUOyH4jpT5Osuv1UIFJMeZ8R
+ O4baaANOUY2RKyGakWlD8jvkd2QZ5SrJeLpKFPiAUnYKbmlhheZaelMtjr4UOEf9roFaSp/rxz
+ D5SNNXyHsT+tYlQaxXAdBVCQE9BGS7XmE+7yupTxMSSJeay3TLDyXY6wcn5p6DhOXxzAXwSc/t
+ qU/5ey0NbZSIUdBSee8tykaF423plrEGK11xNd8fQNWIBGkNQMAAA==
+X-Change-ID: 20240403-rss-e737d89efa77
+To: Jonathan Corbet <corbet@lwn.net>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>, 
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, kvm@vger.kernel.org, 
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
+ Yuri Benditovich <yuri.benditovich@daynix.com>, 
+ Andrew Melnychenko <andrew@daynix.com>, 
+ Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
+ Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Akihiko Odaki <akihiko.odaki@daynix.com>
+X-Mailer: b4 0.15-dev-edae6
 
-Binding AX25 socket by using the autobind feature leads to memory leaks
-in ax25_connect() and also refcount leaks in ax25_release(). Memory
-leak was detected with kmemleak:
+virtio-net have two usage of hashes: one is RSS and another is hash
+reporting. Conventionally the hash calculation was done by the VMM.
+However, computing the hash after the queue was chosen defeats the
+purpose of RSS.
 
-================================================================
-unreferenced object 0xffff8880253cd680 (size 96):
-backtrace:
-__kmalloc_node_track_caller_noprof (./include/linux/kmemleak.h:43)
-kmemdup_noprof (mm/util.c:136)
-ax25_rt_autobind (net/ax25/ax25_route.c:428)
-ax25_connect (net/ax25/af_ax25.c:1282)
-__sys_connect_file (net/socket.c:2045)
-__sys_connect (net/socket.c:2064)
-__x64_sys_connect (net/socket.c:2067)
-do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
-entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
-================================================================
+Another approach is to use eBPF steering program. This approach has
+another downside: it cannot report the calculated hash due to the
+restrictive nature of eBPF.
 
-When socket is bound, refcounts must be incremented the way it is done
-in ax25_bind() and ax25_setsockopt() (SO_BINDTODEVICE). In case of
-autobind, the refcounts are not incremented.
+Introduce the code to compute hashes to the kernel in order to overcome
+thse challenges.
 
-This bug leads to the following issue reported by Syzkaller:
+An alternative solution is to extend the eBPF steering program so that it
+will be able to report to the userspace, but it is based on context
+rewrites, which is in feature freeze. We can adopt kfuncs, but they will
+not be UAPIs. We opt to ioctl to align with other relevant UAPIs (KVM
+and vhost_net).
 
-================================================================
-ax25_connect(): syz-executor318 uses autobind, please contact jreuter@yaina.de
-------------[ cut here ]------------
-refcount_t: decrement hit 0; leaking memory.
-WARNING: CPU: 0 PID: 5317 at lib/refcount.c:31 refcount_warn_saturate+0xfa/0x1d0 lib/refcount.c:31
-Modules linked in:
-CPU: 0 UID: 0 PID: 5317 Comm: syz-executor318 Not tainted 6.14.0-rc4-syzkaller-00278-gece144f151ac #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-RIP: 0010:refcount_warn_saturate+0xfa/0x1d0 lib/refcount.c:31
-...
-Call Trace:
- <TASK>
- __refcount_dec include/linux/refcount.h:336 [inline]
- refcount_dec include/linux/refcount.h:351 [inline]
- ref_tracker_free+0x6af/0x7e0 lib/ref_tracker.c:236
- netdev_tracker_free include/linux/netdevice.h:4302 [inline]
- netdev_put include/linux/netdevice.h:4319 [inline]
- ax25_release+0x368/0x960 net/ax25/af_ax25.c:1080
- __sock_release net/socket.c:647 [inline]
- sock_close+0xbc/0x240 net/socket.c:1398
- __fput+0x3e9/0x9f0 fs/file_table.c:464
- __do_sys_close fs/open.c:1580 [inline]
- __se_sys_close fs/open.c:1565 [inline]
- __x64_sys_close+0x7f/0x110 fs/open.c:1565
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
- ...
- </TASK>
-================================================================
+The patches for QEMU to use this new feature was submitted as RFC and
+is available at:
+https://patchew.org/QEMU/20250313-hash-v4-0-c75c494b495e@daynix.com/
 
-Considering the issues above and the comments left in the code that say:
-"check if we can remove this feature. It is broken."; "autobinding in this
-may or may not work"; - it is better to completely remove this feature than
-to fix it because it is broken and leads to various kinds of memory bugs.
+This work was presented at LPC 2024:
+https://lpc.events/event/18/contributions/1963/
 
-Now calling connect() without first binding socket will result in an
-error (-EINVAL). Userspace software that relies on the autobind feature
-might get broken. However, this feature does not seem widely used with
-this specific driver as it was not reliable at any point of time, and it
-is already broken anyway. E.g. ax25-tools and ax25-apps packages for
-popular distributions do not use the autobind feature for AF_AX25.
+V1 -> V2:
+  Changed to introduce a new BPF program type.
 
-Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: syzbot+33841dc6aa3e1d86b78a@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=33841dc6aa3e1d86b78a
-Signed-off-by: Murad Masimov <m.masimov@mt-integration.ru>
+Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 ---
- include/net/ax25.h    |  1 -
- net/ax25/af_ax25.c    | 30 ++++++------------
- net/ax25/ax25_route.c | 74 -------------------------------------------
- 3 files changed, 10 insertions(+), 95 deletions(-)
+Changes in v11:
+- Added the missing code to free vnet_hash in patch
+  "tap: Introduce virtio-net hash feature".
+- Link to v10: https://lore.kernel.org/r/20250313-rss-v10-0-3185d73a9af0@daynix.com
 
-diff --git a/include/net/ax25.h b/include/net/ax25.h
-index 4ee141aae0a2..a7bba42dde15 100644
---- a/include/net/ax25.h
-+++ b/include/net/ax25.h
-@@ -418,7 +418,6 @@ void ax25_rt_device_down(struct net_device *);
- int ax25_rt_ioctl(unsigned int, void __user *);
- extern const struct seq_operations ax25_rt_seqops;
- ax25_route *ax25_get_route(ax25_address *addr, struct net_device *dev);
--int ax25_rt_autobind(ax25_cb *, ax25_address *);
- struct sk_buff *ax25_rt_build_path(struct sk_buff *, ax25_address *,
- 				   ax25_address *, ax25_digi *);
- void ax25_rt_free(void);
-diff --git a/net/ax25/af_ax25.c b/net/ax25/af_ax25.c
-index 9f3b8b682adb..3ee7dba34310 100644
---- a/net/ax25/af_ax25.c
-+++ b/net/ax25/af_ax25.c
-@@ -1270,28 +1270,18 @@ static int __must_check ax25_connect(struct socket *sock,
- 		}
- 	}
+Changes in v10:
+- Split common code and TUN/TAP-specific code into separate patches.
+- Reverted a spurious style change in patch "tun: Introduce virtio-net
+  hash feature".
+- Added a comment explaining disable_ipv6 in tests.
+- Used AF_PACKET for patch "selftest: tun: Add tests for
+  virtio-net hashing". I also added the usage of FIXTURE_VARIANT() as
+  the testing function now needs access to more variant-specific
+  variables.
+- Corrected the message of patch "selftest: tun: Add tests for
+  virtio-net hashing"; it mentioned validation of configuration but
+  it is not scope of this patch.
+- Expanded the description of patch "selftest: tun: Add tests for
+  virtio-net hashing".
+- Added patch "tun: Allow steering eBPF program to fall back".
+- Changed to handle TUNGETVNETHASHCAP before taking the rtnl lock.
+- Removed redundant tests for tun_vnet_ioctl().
+- Added patch "selftest: tap: Add tests for virtio-net ioctls".
+- Added a design explanation of ioctls for extensibility and migration.
+- Removed a few branches in patch
+  "vhost/net: Support VIRTIO_NET_F_HASH_REPORT".
+- Link to v9: https://lore.kernel.org/r/20250307-rss-v9-0-df76624025eb@daynix.com
 
--	/*
--	 *	Must bind first - autobinding in this may or may not work. If
--	 *	the socket is already bound, check to see if the device has
--	 *	been filled in, error if it hasn't.
--	 */
-+	/* Must bind first - autobinding does not work. */
- 	if (sock_flag(sk, SOCK_ZAPPED)) {
--		/* check if we can remove this feature. It is broken. */
--		printk(KERN_WARNING "ax25_connect(): %s uses autobind, please contact jreuter@yaina.de\n",
--			current->comm);
--		if ((err = ax25_rt_autobind(ax25, &fsa->fsa_ax25.sax25_call)) < 0) {
--			kfree(digi);
--			goto out_release;
--		}
-+		kfree(digi);
-+		err = -EINVAL;
-+		goto out_release;
-+	}
+Changes in v9:
+- Added a missing return statement in patch
+  "tun: Introduce virtio-net hash feature".
+- Link to v8: https://lore.kernel.org/r/20250306-rss-v8-0-7ab4f56ff423@daynix.com
 
--		ax25_fillin_cb(ax25, ax25->ax25_dev);
--		ax25_cb_add(ax25);
--	} else {
--		if (ax25->ax25_dev == NULL) {
--			kfree(digi);
--			err = -EHOSTUNREACH;
--			goto out_release;
--		}
-+	/* Check to see if the device has been filled in, error if it hasn't. */
-+	if (ax25->ax25_dev == NULL) {
-+		kfree(digi);
-+		err = -EHOSTUNREACH;
-+		goto out_release;
- 	}
+Changes in v8:
+- Disabled IPv6 to eliminate noises in tests.
+- Added a branch in tap to avoid unnecessary dissection when hash
+  reporting is disabled.
+- Removed unnecessary rtnl_lock().
+- Extracted code to handle new ioctls into separate functions to avoid
+  adding extra NULL checks to the code handling other ioctls.
+- Introduced variable named "fd" to __tun_chr_ioctl().
+- s/-/=/g in a patch message to avoid confusing Git.
+- Link to v7: https://lore.kernel.org/r/20250228-rss-v7-0-844205cbbdd6@daynix.com
 
- 	if (sk->sk_type == SOCK_SEQPACKET &&
-diff --git a/net/ax25/ax25_route.c b/net/ax25/ax25_route.c
-index 69de75db0c9c..10577434f40b 100644
---- a/net/ax25/ax25_route.c
-+++ b/net/ax25/ax25_route.c
-@@ -373,80 +373,6 @@ ax25_route *ax25_get_route(ax25_address *addr, struct net_device *dev)
- 	return ax25_rt;
- }
+Changes in v7:
+- Ensured to set hash_report to VIRTIO_NET_HASH_REPORT_NONE for
+  VHOST_NET_F_VIRTIO_NET_HDR.
+- s/4/sizeof(u32)/ in patch "virtio_net: Add functions for hashing".
+- Added tap_skb_cb type.
+- Rebased.
+- Link to v6: https://lore.kernel.org/r/20250109-rss-v6-0-b1c90ad708f6@daynix.com
 
--/*
-- *	Adjust path: If you specify a default route and want to connect
-- *      a target on the digipeater path but w/o having a special route
-- *	set before, the path has to be truncated from your target on.
-- */
--static inline void ax25_adjust_path(ax25_address *addr, ax25_digi *digipeat)
--{
--	int k;
--
--	for (k = 0; k < digipeat->ndigi; k++) {
--		if (ax25cmp(addr, &digipeat->calls[k]) == 0)
--			break;
--	}
--
--	digipeat->ndigi = k;
--}
--
--
--/*
-- *	Find which interface to use.
-- */
--int ax25_rt_autobind(ax25_cb *ax25, ax25_address *addr)
--{
--	ax25_uid_assoc *user;
--	ax25_route *ax25_rt;
--	int err = 0;
--
--	ax25_route_lock_use();
--	ax25_rt = ax25_get_route(addr, NULL);
--	if (!ax25_rt) {
--		ax25_route_lock_unuse();
--		return -EHOSTUNREACH;
--	}
--	rcu_read_lock();
--	if ((ax25->ax25_dev = ax25_dev_ax25dev(ax25_rt->dev)) == NULL) {
--		err = -EHOSTUNREACH;
--		goto put;
--	}
--
--	user = ax25_findbyuid(current_euid());
--	if (user) {
--		ax25->source_addr = user->call;
--		ax25_uid_put(user);
--	} else {
--		if (ax25_uid_policy && !capable(CAP_NET_BIND_SERVICE)) {
--			err = -EPERM;
--			goto put;
--		}
--		ax25->source_addr = *(ax25_address *)ax25->ax25_dev->dev->dev_addr;
--	}
--
--	if (ax25_rt->digipeat != NULL) {
--		ax25->digipeat = kmemdup(ax25_rt->digipeat, sizeof(ax25_digi),
--					 GFP_ATOMIC);
--		if (ax25->digipeat == NULL) {
--			err = -ENOMEM;
--			goto put;
--		}
--		ax25_adjust_path(addr, ax25->digipeat);
--	}
--
--	if (ax25->sk != NULL) {
--		local_bh_disable();
--		bh_lock_sock(ax25->sk);
--		sock_reset_flag(ax25->sk, SOCK_ZAPPED);
--		bh_unlock_sock(ax25->sk);
--		local_bh_enable();
--	}
--
--put:
--	rcu_read_unlock();
--	ax25_route_lock_unuse();
--	return err;
--}
+Changes in v6:
+- Extracted changes to fill vnet header holes into another series.
+- Squashed patches "skbuff: Introduce SKB_EXT_TUN_VNET_HASH", "tun:
+  Introduce virtio-net hash reporting feature", and "tun: Introduce
+  virtio-net RSS" into patch "tun: Introduce virtio-net hash feature".
+- Dropped the RFC tag.
+- Link to v5: https://lore.kernel.org/r/20241008-rss-v5-0-f3cf68df005d@daynix.com
 
- struct sk_buff *ax25_rt_build_path(struct sk_buff *skb, ax25_address *src,
- 	ax25_address *dest, ax25_digi *digi)
---
-2.39.2
+Changes in v5:
+- Fixed a compilation error with CONFIG_TUN_VNET_CROSS_LE.
+- Optimized the calculation of the hash value according to:
+  https://git.dpdk.org/dpdk/commit/?id=3fb1ea032bd6ff8317af5dac9af901f1f324cab4
+- Added patch "tun: Unify vnet implementation".
+- Dropped patch "tap: Pad virtio header with zero".
+- Added patch "selftest: tun: Test vnet ioctls without device".
+- Reworked selftests to skip for older kernels.
+- Documented the case when the underlying device is deleted and packets
+  have queue_mapping set by TC.
+- Reordered test harness arguments.
+- Added code to handle fragmented packets.
+- Link to v4: https://lore.kernel.org/r/20240924-rss-v4-0-84e932ec0e6c@daynix.com
+
+Changes in v4:
+- Moved tun_vnet_hash_ext to if_tun.h.
+- Renamed virtio_net_toeplitz() to virtio_net_toeplitz_calc().
+- Replaced htons() with cpu_to_be16().
+- Changed virtio_net_hash_rss() to return void.
+- Reordered variable declarations in virtio_net_hash_rss().
+- Removed virtio_net_hdr_v1_hash_from_skb().
+- Updated messages of "tap: Pad virtio header with zero" and
+  "tun: Pad virtio header with zero".
+- Fixed vnet_hash allocation size.
+- Ensured to free vnet_hash when destructing tun_struct.
+- Link to v3: https://lore.kernel.org/r/20240915-rss-v3-0-c630015db082@daynix.com
+
+Changes in v3:
+- Reverted back to add ioctl.
+- Split patch "tun: Introduce virtio-net hashing feature" into
+  "tun: Introduce virtio-net hash reporting feature" and
+  "tun: Introduce virtio-net RSS".
+- Changed to reuse hash values computed for automq instead of performing
+  RSS hashing when hash reporting is requested but RSS is not.
+- Extracted relevant data from struct tun_struct to keep it minimal.
+- Added kernel-doc.
+- Changed to allow calling TUNGETVNETHASHCAP before TUNSETIFF.
+- Initialized num_buffers with 1.
+- Added a test case for unclassified packets.
+- Fixed error handling in tests.
+- Changed tests to verify that the queue index will not overflow.
+- Rebased.
+- Link to v2: https://lore.kernel.org/r/20231015141644.260646-1-akihiko.odaki@daynix.com
+
+---
+Akihiko Odaki (10):
+      virtio_net: Add functions for hashing
+      net: flow_dissector: Export flow_keys_dissector_symmetric
+      tun: Allow steering eBPF program to fall back
+      tun: Add common virtio-net hash feature code
+      tun: Introduce virtio-net hash feature
+      tap: Introduce virtio-net hash feature
+      selftest: tun: Test vnet ioctls without device
+      selftest: tun: Add tests for virtio-net hashing
+      selftest: tap: Add tests for virtio-net ioctls
+      vhost/net: Support VIRTIO_NET_F_HASH_REPORT
+
+ Documentation/networking/tuntap.rst  |   7 +
+ drivers/net/Kconfig                  |   1 +
+ drivers/net/ipvlan/ipvtap.c          |   2 +-
+ drivers/net/macvtap.c                |   2 +-
+ drivers/net/tap.c                    |  78 +++++-
+ drivers/net/tun.c                    |  90 +++++--
+ drivers/net/tun_vnet.h               | 155 ++++++++++-
+ drivers/vhost/net.c                  |  68 ++---
+ include/linux/if_tap.h               |   4 +-
+ include/linux/skbuff.h               |   3 +
+ include/linux/virtio_net.h           | 188 ++++++++++++++
+ include/net/flow_dissector.h         |   1 +
+ include/uapi/linux/if_tun.h          |  82 ++++++
+ net/core/flow_dissector.c            |   3 +-
+ net/core/skbuff.c                    |   4 +
+ tools/testing/selftests/net/Makefile |   2 +-
+ tools/testing/selftests/net/tap.c    |  97 ++++++-
+ tools/testing/selftests/net/tun.c    | 491 ++++++++++++++++++++++++++++++++++-
+ 18 files changed, 1194 insertions(+), 84 deletions(-)
+---
+base-commit: dd83757f6e686a2188997cb58b5975f744bb7786
+change-id: 20240403-rss-e737d89efa77
+prerequisite-change-id: 20241230-tun-66e10a49b0c7:v6
+prerequisite-patch-id: 871dc5f146fb6b0e3ec8612971a8e8190472c0fb
+prerequisite-patch-id: 2797ed249d32590321f088373d4055ff3f430a0e
+prerequisite-patch-id: ea3370c72d4904e2f0536ec76ba5d26784c0cede
+prerequisite-patch-id: 837e4cf5d6b451424f9b1639455e83a260c4440d
+prerequisite-patch-id: ea701076f57819e844f5a35efe5cbc5712d3080d
+prerequisite-patch-id: 701646fb43ad04cc64dd2bf13c150ccbe6f828ce
+prerequisite-patch-id: 53176dae0c003f5b6c114d43f936cf7140d31bb5
+prerequisite-change-id: 20250116-buffers-96e14bf023fc:v2
+prerequisite-patch-id: 25fd4f99d4236a05a5ef16ab79f3e85ee57e21cc
+
+Best regards,
+-- 
+Akihiko Odaki <akihiko.odaki@daynix.com>
 
 
