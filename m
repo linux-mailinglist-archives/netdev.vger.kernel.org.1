@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-175256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD48BA649F8
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 11:31:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CD7BA64A09
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 11:32:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76BDC3B011C
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 10:27:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A3F318891AE
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 10:29:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD7D723909F;
-	Mon, 17 Mar 2025 10:24:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5607233702;
+	Mon, 17 Mar 2025 10:28:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="J+GbE6C1"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="x+bhBU1o"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8AD2376F2;
-	Mon, 17 Mar 2025 10:24:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C7313B7A3;
+	Mon, 17 Mar 2025 10:28:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742207085; cv=none; b=J8asXdmgqUKv+DdM2mTOR85V6tr2VgiM9gUiVPIMf3bFGMNJfK8QlvjxY+Vog8lGHuQXFSOSKvO86mukxalXp0tVoeejU+deVBh8YBT5WbxB4YG2lhdbhfpD34bOCrPItUVONiRd6F2Hdx/6Uj7JwkEwQ813U+rqNw9ne3lugcA=
+	t=1742207329; cv=none; b=QkysIlZJZjHfv7Mben8gydjhfOnEEeZP89hFVDR2pC5xlMsi7hXpFeu/7LPtn6u33uTtNxeIus4q9prdLd171jd2/3L57QQVLY5czLmHYY70KQKJyxpWdK0b+QK1oqtd3JenF33phWcAFbfc1YQpr8OLWT/9OR9g31UPg8Sk/Ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742207085; c=relaxed/simple;
-	bh=nlCD2AI4xClEigMb987YjLNUYCSZ0DFUEakh+UBVyNM=;
+	s=arc-20240116; t=1742207329; c=relaxed/simple;
+	bh=D475GWEV9xZkUiRyncrmvUAsUnBc2KaZ13XrCGru9zM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V/OAmHhPMUq1ASHDT58vqb/SAIjMODNeHY9/WCQYWWbizJzH18xbXCRuja072Qv+XHqSYG71NiPnFlKhM1qFjAVrMJbRPpoOXtKK5XMnhk7HUcSdWC6jMmPLHj/Q4Z1+80NWo+/fB+Rt+dqi7GCOX5NoWbzk7ndZLoneKjMpI5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=J+GbE6C1; arc=none smtp.client-ip=78.32.30.218
+	 Content-Type:Content-Disposition:In-Reply-To; b=QhjenMTA76+UoCm2sC1trQUXalT46oQoGYJSXx5TPiIBjBK4l2wbvB8k1zWhMOe4Esf5MJHVeRXWpbeC9sCQPqJISBwqtBaSML0+Xa4AG5Ihe4IkhyqLgjQH5BNojNQ1NXNYM2BkMeXqx/HF1coz2dED5szYlMxmYvZHRklZn6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=x+bhBU1o; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,34 +37,34 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
 	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
 	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=HNSydyEfg2Wb3PXmd93dXABCEL4krGbTEUi5/yWVKPc=; b=J+GbE6C1/4MDpoNoRhujOR86gT
-	siauauWuCKOaoc/NrCZejL1EQR1O+daq3QLE2db+LElog01yIvqh9XKhxCkJ1SQNfXoqur8+cpgLR
-	FSkz3yOVr5LLQvm52nYKJfq6VBWHFc9pfELQQK6rS/BPSO2l600UkGgMUqYv4q4EZXk5dVAzWqRbo
-	5ge+2GIbKdjEkKoia/Ow/O/1hVKawGPTXSRNYKIKzRV4QZX9RrG1OVE+jWGxnFbbUTFPo5CtS7Mv+
-	mpmkXSSoeFv/YK1qN5Zr6o3zBK5xVvpBcDma8iAEWbJa5pugt//E7jUQ/cyuNAgza4CfUGXC3GEAB
-	JLq6kEbg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33602)
+	bh=tzhM71c7XeDXnGaEMVePBynM75aidEmqvkMrNMTXDQI=; b=x+bhBU1ozAin+2pMbdUoolbzcR
+	1tX9ivxR2w4CSndXSYOkO5+ofjj2hAwRUz84zpzsZ5dsxVJTvAxC+GNIaiSL0zd4wwNDGU+ikEeVu
+	BdbNJDByWGYrQHs3kLGFjSG28wG8ZACc33HVSuG76dToZo1BdiP6DCXR/xzngvWxd+TRtXvf8DQYU
+	0QsVEhG/X1Zl7ryUyFsCX0eItCYNHFksGz58gKP/Cwzrdr0oPiYILhiCEzST1dgGSYFEvQOln5UCN
+	nr6nIs1c1af+w8D1HiWbRDz6EYdj8Q+A82eE7ymRgQRM9MEeyLJxws60pBKLJ9oyE3f3qP+ToYsCh
+	GiOgrpMA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54150)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <linux@armlinux.org.uk>)
-	id 1tu7e4-0003LE-0t;
-	Mon, 17 Mar 2025 10:24:32 +0000
+	id 1tu7i0-0003Ll-1n;
+	Mon, 17 Mar 2025 10:28:36 +0000
 Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
 	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tu7dz-0003Tx-2T;
-	Mon, 17 Mar 2025 10:24:27 +0000
-Date: Mon, 17 Mar 2025 10:24:27 +0000
+	id 1tu7hx-0003U7-1w;
+	Mon, 17 Mar 2025 10:28:33 +0000
+Date: Mon, 17 Mar 2025 10:28:33 +0000
 From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jim Liu <jim.t90615@gmail.com>
-Cc: JJLIU0@nuvoton.com, florian.fainelli@broadcom.com, andrew@lunn.ch,
-	hkallweit1@gmail.com, kuba@kernel.org, edumazet@google.com,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	giulio.benetti+tekvox@benettiengineering.com,
-	bcm-kernel-feedback-list@broadcom.com, linux-kernel@vger.kernel.org
-Subject: Re: [v2,net] net: phy: broadcom: Correct BCM5221 PHY model detection
- failure
-Message-ID: <Z9f4W86z90PgtkBc@shell.armlinux.org.uk>
-References: <20250317063452.3072784-1-JJLIU0@nuvoton.com>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: Jim Liu <jim.t90615@gmail.com>, JJLIU0@nuvoton.com,
+	florian.fainelli@broadcom.com, andrew@lunn.ch, hkallweit1@gmail.com,
+	kuba@kernel.org, edumazet@google.com, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1] net: phy: broadcom: Correct BCM5221 PHY model
+ detection failure
+Message-ID: <Z9f5UQPRTPT8lbXm@shell.armlinux.org.uk>
+References: <20250317035005.3064083-1-JJLIU0@nuvoton.com>
+ <Z9fhqbfoQGSm1Njx@mev-dev.igk.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,66 +73,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250317063452.3072784-1-JJLIU0@nuvoton.com>
+In-Reply-To: <Z9fhqbfoQGSm1Njx@mev-dev.igk.intel.com>
 Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Mar 17, 2025 at 02:34:52PM +0800, Jim Liu wrote:
-> Use "BRCM_PHY_MODEL" can be applied to the entire 5221 family of PHYs.
-> 
-> Fixes: 3abbd0699b67 ("net: phy: broadcom: add support for BCM5221 phy")
-> Signed-off-by: Jim Liu <jim.t90615@gmail.com>
+On Mon, Mar 17, 2025 at 09:47:37AM +0100, Michal Swiatkowski wrote:
+> It will be nice to have wider explanation what it is fixing in commit
+> message. Is phydev->phy_id different than phydev->driver->phy_id? Looks
+> like masking isn't crucial as phydev->driver->phy_id is initialized by
+> PHY_ID_BCM5221 which is already masked.
 
-Looking at BRCM_PHY_MODEL() and BRCM_PHY_REV(), I think there's more
-issues with this driver. E.g.:
+The two are very different, and this driver just gets it totally wrong.
 
-#define BRCM_PHY_MODEL(phydev) \
-        ((phydev)->drv->phy_id & (phydev)->drv->phy_id_mask)
+phydev->phy_id is the ID read from the PHY. It includes the revision
+field.
 
-#define BRCM_PHY_REV(phydev) \
-        ((phydev)->drv->phy_id & ~((phydev)->drv->phy_id_mask))
+phydev->drv is one of the phy_driver entries at the bottom of the file.
+These contain whatever the driver author puts there, which in this
+case would be PHY_ID_BCM5221, and PHY_ID_BCM5221 is defined without
+the revision number.
 
-#define PHY_ID_BCM50610                 0x0143bd60
-#define PHY_ID_BCM50610M                0x0143bd70
+So doing the masking is entirely redundant if you're comparing the
+drv->phy_id that was initialised with a definition against the same
+definition.
 
-        if ((BRCM_PHY_MODEL(phydev) == PHY_ID_BCM50610 ||
-             BRCM_PHY_MODEL(phydev) == PHY_ID_BCM50610M) &&
-            BRCM_PHY_REV(phydev) >= 0x3) {
-
-and from the PHY driver table:
-
-        .phy_id         = PHY_ID_BCM50610,
-        .phy_id_mask    = 0xfffffff0,
-
-        .phy_id         = PHY_ID_BCM50610M,
-        .phy_id_mask    = 0xfffffff0,
-
-BRCM_PHY_REV() looks at _this_ .phy_id in the table, and tries to match
-it against the revision field bits 0-3 being >= 3 - but as we can see,
-this field is set to the defined value which has bits 0-3 always as
-zero. So, this if() statement is always false.
-
-So, BRCM_PHY_REV() should be:
-
-#define BRCM_PHY_REV(phydev) \
-	((phydev)->phy_id & ~(phydev)->drv->phy_id_mask)
-
-
-Next, I question why BRCM_PHY_MODEL() exists in the first place.
-phydev->drv->phy_id is initialised to the defined value(s), and then
-we end up doing:
-
-	(phydev->drv->phy_id & phydev->drv->phy_id_mask) ==
-		one-of-those-defined-values
-
-which is pointless, because we know that what is in phydev->drv->phy_id
-/is/ one-of-those-defined-values.
-
-Therefore, I would suggest:
-
-#define BRCM_PHY_MODEL(phydev) ((phydev)->drv->phy_id)
-
-is entirely sufficient, and with such a simple definition, I question
-the value of BRCM_PHY_MODEL() existing.
+As pointed out in my review with v2, there's more problems in this
+driver _because_ this has not been understood. In an attempt to get
+rid of some of this stuff, I introduced phydev_id_compare() and
+phy_id_compare() helpers into core phylib code, but didn't get
+around to updating broadcom.c. See my comments against v2.
 
 -- 
 RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
