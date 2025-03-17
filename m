@@ -1,209 +1,193 @@
-Return-Path: <netdev+bounces-175243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CD5EA64871
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 11:00:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E016A64891
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 11:00:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D4A53A4CAB
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 09:59:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3BD6165714
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 10:00:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4B4B22F397;
-	Mon, 17 Mar 2025 09:59:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09C7C230BE1;
+	Mon, 17 Mar 2025 10:00:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="ONukwLx1"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2055.outbound.protection.outlook.com [40.107.21.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D230225A32
-	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 09:59:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742205565; cv=none; b=LwhCf//6+OWyDOrIeS91VShK9TuotaLM9wzOYKxGQygos/07vsnEHvHG8Bx9qeXwqA85adhp/Yann6HLzSkovzmLiKL2n3WrA0JKACY66KlLwuvn647vZWrE8Hy2BgngtPX/KZLDTL63cAGkeo920M9WY0tPVVg+EJrsnGwVPow=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742205565; c=relaxed/simple;
-	bh=eLTZeaMW6RqboQrRfMoLdJ3QLbgZhIQQ6M3lPH/kUsg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CMgqsviKsrrNtYvt3uH0ZtSHrM7SMGGPLrcKIcb7OXu3ocpqJ+IaOP4a/OptEiMlpKADogqXn1+qKljKLjiSMYprdU4wShinM35oBZQ8mpE5PlQfcJu21I5GUA1/7ckm1K1/xFtmeKy7p0rhyXSyD+KkLD+O/vtBwpN7CC8ra/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tu7FP-0006dd-GS; Mon, 17 Mar 2025 10:59:03 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tu7FO-000Dti-1d;
-	Mon, 17 Mar 2025 10:59:02 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tu7FO-0018Rw-2T;
-	Mon, 17 Mar 2025 10:59:02 +0100
-Date: Mon, 17 Mar 2025 10:59:02 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v6 04/12] net: pse-pd: Add support for PSE power
- domains
-Message-ID: <Z9fyZkAOB602cFJY@pengutronix.de>
-References: <20250304-feature_poe_port_prio-v6-0-3dc0c5ebaf32@bootlin.com>
- <20250304-feature_poe_port_prio-v6-4-3dc0c5ebaf32@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 078EF230BDC;
+	Mon, 17 Mar 2025 10:00:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.55
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742205645; cv=fail; b=HCA1v3adgVOVVTS0qi9PpBhgeD/L1v9prrb/Op2sobHiPgjdrVKV9nkTZS+A9AzlFWmJ9xBK+IH4pGM2bcTmpx5oaFLo1O4/1dXbgH9wASUp9yVzBzRzDt9Eucd9ZX57o4S/QnqPbAQ6RQiB2LLwXljurxecK1EDn+Jh4pNMYrw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742205645; c=relaxed/simple;
+	bh=12TxkwmtZU2/TPEgEw5UFTkuDwI6IyHHJSG7qm8/Y0U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=MjflzhXeLI0iw1XD1SsGQVyynUYu6KnQBndM9eoVio+zD4R1u81+Rn2/arvXmA2ALPd0mqwdZv6vwdXj7CtclVHA1Qmew4MrHWuQkTA9qs08XnrSOSAmXf4PVNVN/fKbRFqciRHRJrYwKo4JwmXrNKcc+tPB2wsoVOaCP/fDuE4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=ONukwLx1; arc=fail smtp.client-ip=40.107.21.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RucYqQUWogWonhfPTBQsqouHwUleQboJG2FIu8p6TkyxhJLg+k40HUj6VWfgtKY22da3yZcJmQPEmq/SK5U61VKx5CaQAmGHDt3Cv2Fg9T1LU3NygKjDPQCLtP4ShnsYEMQs2024MeHznMzm0Hj7wcx/8EMPGYpHlV6b8eHz/BoFF31ZW0NdL4XOp4rX0FYQnPs0lXyidqzY+TUPT3nl9h1BMItd1unWcJlbPBiWf2Xbn5io9ASR+SwaEVnbRFvILZEtEOiaensgrODrfQ8uz5yTYaZE8/CcUlLEJcHMmUz8rEC9tJRdrI9Z9eeUu+O9t4Yp4K4iofSOHSyQBnplyA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9CLaaNIFVMdx2mWYpN5COpnkx/9WEM+JFnDT824eRe4=;
+ b=hEAn25QuhI8iwuNFGKR87PqgQZlnkqDKMoBSwdZT85CgaRGWmCx37/9sEGCI+JzbeGhVUIfF0tDEICRylRtXuC+Qd9carXplfc40s7hcqvKnYsdQJdK1VrrzqVz97TbSyXVpIYWnj9U72L/6EULijBfpg/eVN8LOXfTb5DlsXb4xEiTxZYaflwpAlokGipsKIlEU4/Zbjuc+nDTcR42yneIjOizI2TqoSPQsaKNsgti+/nJPnUmstKIRvCQUXc/9nAbGeZl0kaK5UDLF/Y06saDSI8aI3Q0jdwdMJuQMptPiV0w+P4bWLAFqOsZjBmN+nsQsr08rSvXqk/Nraiupgw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9CLaaNIFVMdx2mWYpN5COpnkx/9WEM+JFnDT824eRe4=;
+ b=ONukwLx1hm9Ha9p0BXX599ZgpKUHS126izaf8ADON1RoNsdZUfRGOgO+b0+rTMgkAuiw9Ke+OIT7YqpnzSYLvSxfasxBCDx57mvTW9wD3retFRx9Cgn/0JlQ4drkrrdbs3XUQrlI3y6UxiioKiGFKuciKF5WR76OQF7yBZsDRLmzk0pJfn4WScLO6h0HvqHmIos35b/jVDWT88lZ/dDBqUnTp8OUXF42HN4BTmZKW/ZF7QeiAWEVJ8OMfLsKT8Ant4lftHz8PcxQfxBcZ/vj51K7vJQy+pgMg+6HKjrShTtOtG8Twb/rcMUodBJfptD8fmbDGX08xuR6hwrYYeAcEQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
+ by PAXPR04MB8176.eurprd04.prod.outlook.com (2603:10a6:102:1c9::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.33; Mon, 17 Mar
+ 2025 10:00:40 +0000
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2%6]) with mapi id 15.20.8534.031; Mon, 17 Mar 2025
+ 10:00:40 +0000
+Date: Mon, 17 Mar 2025 12:00:37 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"christophe.leroy@csgroup.eu" <christophe.leroy@csgroup.eu>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH v4 net-next 01/14] net: enetc: add initial netc-lib
+ driver to support NTMP
+Message-ID: <20250317100037.7o7r7gch433s5lq4@skbuf>
+References: <20250311053830.1516523-1-wei.fang@nxp.com>
+ <20250311053830.1516523-2-wei.fang@nxp.com>
+ <20250313163526.pqwp2wsfvio7avs6@skbuf>
+ <PAXPR04MB8510327277CFEAC750FE49F888D22@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <20250314123715.fivq2cbczd4khxkk@skbuf>
+ <PAXPR04MB851027E5F830F08F3395083888D22@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <20250317092808.jel2au3cgfwblaxk@skbuf>
+ <PAXPR04MB85102185D0A4C30F0688AA5488DF2@PAXPR04MB8510.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <PAXPR04MB85102185D0A4C30F0688AA5488DF2@PAXPR04MB8510.eurprd04.prod.outlook.com>
+X-ClientProxiedBy: VI1P195CA0075.EURP195.PROD.OUTLOOK.COM
+ (2603:10a6:802:59::28) To AM8PR04MB7779.eurprd04.prod.outlook.com
+ (2603:10a6:20b:24b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250304-feature_poe_port_prio-v6-4-3dc0c5ebaf32@bootlin.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|PAXPR04MB8176:EE_
+X-MS-Office365-Filtering-Correlation-Id: f3e5677f-5aea-4049-c5ac-08dd653a92f6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?OjT80u0mPGzfNMxP1HucSk3g/Yj7EXian+LpA5/HpvFy5s8gJzFw+6kSh0jV?=
+ =?us-ascii?Q?lZKSnCp46YUE2Vt1lo+UmKFeHNk4Oad7rieeY+hdikafqUm98KJVS5XLgvYe?=
+ =?us-ascii?Q?6N3g6Wl4DpHbjU0D58lHoCly00aIcD34XI+Sb0eFSHeq3nYbRS3G8AgSD/cJ?=
+ =?us-ascii?Q?LINaPCLRm7TgNEzZ/25kgXvNf6DBPVEv4eW6koZjkmJtKEFgfYq4iIeejjQH?=
+ =?us-ascii?Q?NlWLbHkHz9inf+nX8BMYQ3uTZ/cWlrmv7qpDmLydxP5oegLIXeTnCvDzGn22?=
+ =?us-ascii?Q?c+Hm0kuxPONjpPqKSEwC/MeV5cF1WlpNyxMMHq5H/sheLpEIlPbsSmODU9aH?=
+ =?us-ascii?Q?eG+Tq0lzvf8NsUioFNuT1KmnK8a1MfEZPO98qZiXIEy4mLtNGNI/lpB006Ed?=
+ =?us-ascii?Q?Hi8OHhH3ZtEZAPKGXpY/6xXx2Xdk5GAvYJ7QbSQZqg9yI62sNF25OTyw88C8?=
+ =?us-ascii?Q?NS9cvu22/cg9xAMXeUJDx1IivW3FOZ7fZnqGHk+cGlhwOrQl4rA7WXMUDoUb?=
+ =?us-ascii?Q?YR0b6jZbe0gcO/bh977RDAUOrw5kw5oRoKaX44roIzm+NcYmB9e06DXyGUpa?=
+ =?us-ascii?Q?yamUvLF4bIYJpKsO92GZ75xBr1rNSJVNggRxDh8vo2vfNK4+wpOU6/e5P2yt?=
+ =?us-ascii?Q?MAnQssRTsBusU8Y2YhrTNaopbE6U/qmNohD9qgB0XeCEIVkuXXLFIiKvJ4Mb?=
+ =?us-ascii?Q?ogvyJWohkgEvwrjxN0TzAWUtmDW6qdsM8N2r0e4Yd4FBLhHJPPIHOuc211lV?=
+ =?us-ascii?Q?O5oORwNB+OxnFbpgaGNrkx1bb+bYJ8Q3magzrXKQC1W5MdscZl9ZAOGTvjSc?=
+ =?us-ascii?Q?0W0Nf9BVcD51SSNntP9d4seU+i2Shb6MwNU5z6JCSwxCQ+zqxU7DhGkbZEBk?=
+ =?us-ascii?Q?UufnsM2lpmtm2/p2cnX/WzFaWaqY254RgxQiunxn7Ep85ToDmGT8n9raa/VA?=
+ =?us-ascii?Q?xPqEEQHUHx2YWqg7eBXODiz5aY+0FpBcKKfDRkZVfhnnf/+EzL2b+5HirMGV?=
+ =?us-ascii?Q?KoA3WwKlU5nVtM5MV8xmAK57T9QjERzAe7G5omzb0uYtWN8GFJ/lWjEnFRx9?=
+ =?us-ascii?Q?ijJ3TWqJTlBHhmjgY61p4sXCuXwyMTe/DF3MV5ezEKrzNsTnqelGtq7eso43?=
+ =?us-ascii?Q?fgEx7bdfHrFPkTou3uAZeVO9q2ABNbAMZOK7AUZUmEhZzfSyYwiNoKQjt6IL?=
+ =?us-ascii?Q?MTfUlAS8Ppygww2ioeCJmGWJUQVJINvUOGCjzXgCu0OVo+sZpn0++lS6S0Cs?=
+ =?us-ascii?Q?ywQYv4SNyedze5PvPmIycyEXGKDXokj7rG9zKwMJEwveykSjhGI4mvCiOu20?=
+ =?us-ascii?Q?S3cBsPXX05w9uPkkWKqMPVKyiObqKHbE2jpUGNCpxjQpoO3M0k81LNU1yDWT?=
+ =?us-ascii?Q?lxkKIyqaPvF1RPUKi+q3EG+sr4St?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?atJnQHkTxlPcRKSG2ZGgTd18bdg0t3FR9TF9YDNBI9N3tPguTqSK4rA7/TXA?=
+ =?us-ascii?Q?RK+E7g9XJd2ukmBYfsuxGxuPN1+YETRmExeeO4dsc6AkWmFRmvWxsdVNNgNm?=
+ =?us-ascii?Q?8MT/qwYc0gXvElXs9obDO/52RJaZUR7NjwofwEVy27Cg287pypQqACghxLdv?=
+ =?us-ascii?Q?DqUCc2BSbQB5ZJBxG5VXQxD0XFeDSOThAkeHOU7u1FWqyDtA3+7JkZnHRga9?=
+ =?us-ascii?Q?DXgUTT43sE1EoJgWoiKI8a8dG1mvHq2uElV0VN90vgiOlkKMH8ojFGSlipM1?=
+ =?us-ascii?Q?048drxPkbs8Fefo85p3HkjPuIOlFgYb+L8nLpu62Q3KUCLrMj31DLj1OLCiI?=
+ =?us-ascii?Q?6UwR6PHbVeeCHgjzdgSACv4hyU6mNERJ2e5F5j0Qk8detATLcD2rMU13++Sa?=
+ =?us-ascii?Q?zV5gy3e79F6bR7RCQ0g+qSNMMAwTh5IZCSaXHbtl9qCVy1cN7Lthmp10mmR0?=
+ =?us-ascii?Q?Ux6VaJGYT6p9LQsKpCNqrfzOHpjDQxWoCf8QCuj6vmqSOpDJPLFMKuGNm1bA?=
+ =?us-ascii?Q?ta/j5BuAf4zCUW4fZgcRkFxlQr/lNpRuqBTpi5Jsj6QIfeP4Y9puWvFQ+P0E?=
+ =?us-ascii?Q?iaJ2Tb6g5L4uVpAQUY3F1r/e0DpasJGsJzmYeeo3Mb7GqwuV8cpPmo2gKHPY?=
+ =?us-ascii?Q?RTi+TVwqvJdpnbFFF/e3XoqifM//YtLHoYFyupGxv7PheAHf12v4BZsDN6GA?=
+ =?us-ascii?Q?e7YWVTZiHFuixvCG73jH6gQUs3IRPW4Q5zkrWlvNLehyMrInDsXccSclAAKl?=
+ =?us-ascii?Q?K8D8geDz2xND7tNqiT9kvlowAQ4OB3q8iA4hUudWyiW79+C+0zEdTEbQgWIH?=
+ =?us-ascii?Q?f4ZvcBWHHb+PEeeVd54bpNlm1k+wV5ozFEYySEVEX6PYvA3sXuT65esr5BTZ?=
+ =?us-ascii?Q?7uT4qBwU916OeQjUBtg0p/oe8qCyObFLf5jfWjw0h6+ad16G1hE7QEg+j8c7?=
+ =?us-ascii?Q?+hrhs+QUSSWXitPr//pnK9Z/+0todBgpwX50aSoANTnStXvb2GfpjnPMzFnt?=
+ =?us-ascii?Q?nPKdBeZxAo2+Mj4IUTrMhbT4ndNGap7HMLgEEYR91bNkOu0bxaYcDoZT4i6S?=
+ =?us-ascii?Q?qG4KBlBUpDKjzmT8suIOqI/X5adjXrK2niahL0eYoi1iuCpZE0MgAM9HejKE?=
+ =?us-ascii?Q?M1VMYXkqQE+Zg2Fsv5Net9X7bLLKYCbTMYC2uB6q63pxlmafIGbk1ebXlq0/?=
+ =?us-ascii?Q?ktJmXQj8J3tEIbODAHU1oysS42s+Z3gur4f7zUSNlz+fmf1nuna1PjHkMA83?=
+ =?us-ascii?Q?GkQJ5Senajqto1EuWlacNPJfTRvzY4t4kcXftAojd2zLrX/p1I7B05CQe+Y7?=
+ =?us-ascii?Q?PJLBW1VVArEhlzaBiDCYgg1GDbJCoTiF7Ae77TstQeMYdiESMvklcQU8r/On?=
+ =?us-ascii?Q?cJ2qtUzsEtec55+c/LEERYHIsX9N+1N2asarpd4S5AjwTrGL9YIaHlIt2zG/?=
+ =?us-ascii?Q?UkRyknINpHRXWklgV9rRgKXbWh8lKolQUlP+jspFay0HNPMe7wV8ZakzbpRg?=
+ =?us-ascii?Q?uhmTNVltN07ZAfOcbnhEyf1V8M1jtTUbeC9PG2s+ztgdutfMVPBpZ4LUPhX7?=
+ =?us-ascii?Q?leUt3AafAbjpy4pcP5sUVZSMz6ft3jb0hmIxEjs9d4g1HvMUP2tXPQF2k3hW?=
+ =?us-ascii?Q?oQ=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f3e5677f-5aea-4049-c5ac-08dd653a92f6
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2025 10:00:40.8241
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: XCVlAs9Lki/yqR71/jsYctM1OixoV2FPDcRWUiuh7aMFHITKr5EnqmdpfU1LkCBTKz90FSqrEsVTT7/45ph3Lg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8176
 
-On Tue, Mar 04, 2025 at 11:18:53AM +0100, Kory Maincent wrote:
-> +/**
-> + * pse_flush_pw_ds - flush all PSE power domains of a PSE
-> + * @pcdev: a pointer to the initialized PSE controller device
-> + */
-> +static void pse_flush_pw_ds(struct pse_controller_dev *pcdev)
-> +{
-> +	struct pse_power_domain *pw_d;
-> +	int i;
-> +
-> +	for (i = 0; i < pcdev->nr_lines; i++) {
-> +		if (!pcdev->pi[i].pw_d)
-> +			continue;
-> +
-> +		pw_d = xa_load(&pse_pw_d_map, pcdev->pi[i].pw_d->id);
-> +		if (pw_d) {
-> +			regulator_put(pw_d->supply);
-> +			xa_erase(&pse_pw_d_map, pw_d->id);
-> +		}
-> +	}
-> +}
-> +
-> +/**
-> + * devm_pse_alloc_pw_d - allocate a new PSE power domain for a device
-> + * @dev: device that is registering this PSE power domain
-> + *
-> + * Return: Pointer to the newly allocated PSE power domain or error pointers
-> + */
-> +static struct pse_power_domain *devm_pse_alloc_pw_d(struct device *dev)
-> +{
-> +	struct pse_power_domain *pw_d;
-> +	int index, ret;
-> +
-> +	pw_d = devm_kzalloc(dev, sizeof(*pw_d), GFP_KERNEL);
-> +	if (!pw_d)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	ret = xa_alloc(&pse_pw_d_map, &index, pw_d, XA_LIMIT(1, INT_MAX), GFP_KERNEL);
+On Mon, Mar 17, 2025 at 11:55:26AM +0200, Wei Fang wrote:
+> Actually I did this is the original version, I mean in downstream kernel 6.6
+> tree. I add a "ntmp_mfe" in ntmp.h like below
+> 
+> struct ntmp_mfe {
+> 	u8 mac[ETH_ALEN];
+> 	u16 si_bitmap;
+> };
+> 
+> And the conversion was done by the NTMP driver. But then I found that this was
+> very troublesome. We get data from kernel "struct A,B,C", then the enetc driver
+> converts them to "struct D", and finally the ntmp driver converts it to "struct E".
+> So I thought why don't we convert "struct A,B,C" to "struct E" from the beginning?
+> After all, these data structures are only used by enetc and netc switch drivers, so
+> in kernel 6.12, I changed it to the current way.
 
-#define PSE_PW_D_LIMIT INT_MAX
-
-XA_LIMIT(1, PSE_PW_D_LIMIT)
-
-> +	if (ret)
-> +		return ERR_PTR(ret);
-> +
-> +	pw_d->id = index;
-> +	return pw_d;
-> +}
-> +
-> +/**
-> + * pse_register_pw_ds - register the PSE power domains for a PSE
-> + * @pcdev: a pointer to the PSE controller device
-> + *
-> + * Return: 0 on success and failure value on error
-> + */
-> +static int pse_register_pw_ds(struct pse_controller_dev *pcdev)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < pcdev->nr_lines; i++) {
-> +		struct regulator_dev *rdev = pcdev->pi[i].rdev;
-> +		struct pse_power_domain *pw_d;
-> +		struct regulator *supply;
-> +		bool present = false;
-> +		unsigned long index;
-> +
-> +		/* No regulator or regulator parent supply registered.
-> +		 * We need a regulator parent to register a PSE power domain
-> +		 */
-> +		if (!rdev || !rdev->supply)
-> +			continue;
-> +
-
-Should we use xa_lock() before iteration over the map?
-
-> +		xa_for_each(&pse_pw_d_map, index, pw_d) {
-> +			/* Power supply already registered as a PSE power
-> +			 * domain.
-> +			 */
-> +			if (regulator_is_equal(pw_d->supply, rdev->supply)) {
-> +				present = true;
-> +				pcdev->pi[i].pw_d = pw_d;
-> +				break;
-> +			}
-> +		}
-> +		if (present)
-> +			continue;
-> +
-> +		pw_d = devm_pse_alloc_pw_d(pcdev->dev);
-> +		if (IS_ERR_OR_NULL(pw_d))
-> +			return PTR_ERR(pw_d);
-
-It is better to break the loop and roll back previous allocations.
-
-> +
-> +		supply = regulator_get(&rdev->dev, rdev->supply_name);
-> +		if (IS_ERR(supply)) {
-> +			xa_erase(&pse_pw_d_map, pw_d->id);
-> +			return PTR_ERR(supply);
-
-same here.
-
-> +		}
-> +
-> +		pw_d->supply = supply;
-> +		pcdev->pi[i].pw_d = pw_d;
-> +	}
-> +
-> +	return 0;
-> +}
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+I understand. With pack_fields(), "struct E" (the packed representation
+of "struct D") doesn't explicitly exist, just an abstract type
+representing the u8 *buffer, and the struct packed_field_u8 array[]
+which is hidden inside the NTMP layer.
 
