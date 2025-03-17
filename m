@@ -1,122 +1,137 @@
-Return-Path: <netdev+bounces-175156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51225A63A26
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 02:25:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7745A63A2A
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 02:26:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1AC816D572
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 01:25:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB23A3AE44F
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 01:26:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AEEC136337;
-	Mon, 17 Mar 2025 01:25:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 513215674E;
+	Mon, 17 Mar 2025 01:26:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ICzomQ58"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mKBlIwdW"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A870B2FB6
-	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 01:25:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC266481B1;
+	Mon, 17 Mar 2025 01:26:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742174722; cv=none; b=ZNk8Av/7PZWIYB3LtOykPdswk4dLbsb7ej8wOtj+rY5R8Tolfz0ZVkSiQjLvDHkVpIh6Am0oARWf2AraGOsA29c5mz38pD2oh4bX0zs0vVRzr9eYGyGs5f9oJo1e9KRoWThz9OtxJ9q1/CC5Sm4Ma9D2olpxkJ/4Any/SirIwkI=
+	t=1742174770; cv=none; b=Vqq2wmuKwimzCfYRpC5vzO57iFpRA43fAHlgd/zBlrza1hD1dDFZpLvVbcgi0zoN5G3araWhlIgrRTcL6o27FFQ/HHX927DtwHsJCiOj7kxD0JGr/UfhpFckDDDuM6DfX2H8E/0SyT91xnUtSaYRgdoAe7PMnQvbRIGa21Qzlik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742174722; c=relaxed/simple;
-	bh=z2j4KcJQv7zmf0c5iq2uhZ0gNgD/LlN6plFD8qvMa68=;
+	s=arc-20240116; t=1742174770; c=relaxed/simple;
+	bh=vh9xTMtufPDw2+00eoqL7kOeCts77NcSqZTpbcrx/ws=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N3gIKtkzOpjbxhU163SkIcNdYkPOzjlSnc86FUVxbWi7OlgiOL28+9COze4Mickk23TLD8+RtLWUM0YQXZf4uASUIRISgwTK7IDaKJa8UNWV4m5D44XX7pnErPbM6G8UQK6QQWJJF8wDFqxCkW+WuA9u4ckDCBb5Xlqzx5fdaoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ICzomQ58; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742174719;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=z2j4KcJQv7zmf0c5iq2uhZ0gNgD/LlN6plFD8qvMa68=;
-	b=ICzomQ58MBgRwCTb4onufFl5uy0tSdeRRLR32yV5VdC7lFQHc7JVkYooX5NOaqK2mS1tlJ
-	rpeiJuGO9Hd0QogC6HyWe0yQ6kUSXYoVYLPS9Pe/sJibqPWk8jhjGtjeFokKnHZ6NQDO3j
-	HGRH1LdQvG5IWpMmemL95tGOK0rfVWY=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-611-AlzFTr7iP_G-ojPzpsp5hg-1; Sun, 16 Mar 2025 21:25:18 -0400
-X-MC-Unique: AlzFTr7iP_G-ojPzpsp5hg-1
-X-Mimecast-MFC-AGG-ID: AlzFTr7iP_G-ojPzpsp5hg_1742174717
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2ff4b130bb2so2166384a91.0
-        for <netdev@vger.kernel.org>; Sun, 16 Mar 2025 18:25:18 -0700 (PDT)
+	 To:Cc:Content-Type; b=hVkoiQr5O+z9fgTAJy5xqfhKKwVPckfCQ7WMNhHl9G/HX/EfH9UD32lbwdW4wGmQ8DF+1ou3xNNpdL9qBrNsHEOAmeLha5Rfwpruff0IFZKWo4MTsYWB/kPwWc1vLx2Glxs7HZbuSxrHtG0x28fjFWh76qeWzQMwqrEHhMUUdrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mKBlIwdW; arc=none smtp.client-ip=209.85.128.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-6ff07872097so30176177b3.3;
+        Sun, 16 Mar 2025 18:26:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742174767; x=1742779567; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e+Z6MPDlHxM6XfzWRhi1r9HNAsbSPQrdOBmdmqDNu4U=;
+        b=mKBlIwdW/O3KpzKoEfR/asAKK5Pcj1ZoINYgHW8Sy7Utpfu9pmBl6bQH9EiLuxZ4lU
+         dPJKzCdTJ79nH/RJK2+kknpqenHkmRYPulRd0xi9VLSWWWcg3Zxi//rOxGVvHZjXU79Z
+         J4TtM+FVu33uYoUhImB8PQPJuFe+KNvwpY3luLB0oGxFMX44kmQIXfHuJzTeLvMLE2ah
+         FbIvfdkvpp8nEcXnFu3qStZkMTJUzGo0qqyOgIlE+7ZyLOMvyx+1gJlf0UtxtcfWtaSJ
+         5W3yd2gKc3bdRb3y/yKr2/U9lJnYSoGDQOLdc0C7jq9P8AtCljdBORzk4otvm+288CWE
+         kwhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742174717; x=1742779517;
+        d=1e100.net; s=20230601; t=1742174767; x=1742779567;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=z2j4KcJQv7zmf0c5iq2uhZ0gNgD/LlN6plFD8qvMa68=;
-        b=kvW9PFErt89wHOjLBYFtcjT+G8EZNIDvd7a4bqYSB6WhS3JEBoAD9zeeylDHmc/Jfy
-         iP8TgkhpLJEK+d2zp6y2jbKaTir084BNS6OQUFHR+zGHeLhFuIQTcekbm/neiDESzqQu
-         ZZTZZTGsvHwzSPeGnA1YHW/ThftDqAvk31B+tAihgbr7hy/ajYd00eu1OYkTpjFw3+rA
-         5adsZciQcTmXzCa6RLpQLsSSM+LxKTHHOnudjOk+6Ln7HBDS2o3wzRvSY3O87Xm/MReE
-         JIER87CqcqWsCDI+pe+lRQm/+pS6mv0UB+J/lu6VoWnSSEMYYmK7ezJLeG0wh4/0+20N
-         WMQA==
-X-Forwarded-Encrypted: i=1; AJvYcCVUMVzqiXRJuG6yZ6bly+/D8wAqitlK/ZCw9Tm2QUdoAqzOMQNvtcb7ZGDIzCBE3PGYBeQMjts=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxO2zy79FbBbtpSBwn7O6yV+wE9criSB9Xllt5QNxDzETAlPlNb
-	67jr3zjzuR6CGZbkWy2sVDItLHO7YQCOxqIqwhDGoifW6BMFq4bf+jqS2dQBuxxIrZxEWvcTbxA
-	3erQrUzTZLLHhsvrEjp8HiJC2Tb0dMnIXdbrr0EpC/XeQBvrF7JKJG3CjA6sZnDy6yazL6zK0Bd
-	mq1daHbkmleewNEhKpCnKmWgvwAohs
-X-Gm-Gg: ASbGncvcIzeevL6doyAvs8y6N0p9chKkN0z/zg2I5g9Z9b8AVO83jkG+XZir+eCSaAI
-	lJqHjeOZ5A60Zuqpm9sl9X2ax6pJ7mo8iK3GN5MA7eMETmGeVUGx2SmMXiIPHw+gojLtkCgwpXw
-	==
-X-Received: by 2002:a17:90b:1f90:b0:2ff:4e8f:b055 with SMTP id 98e67ed59e1d1-30151d820f1mr12979534a91.35.1742174717400;
-        Sun, 16 Mar 2025 18:25:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEhY7Q6CEBtn6gSdQV7+N48LRSWSFUwUYTebXNWN8iyFQF0YN/QWMy1GYMr8eTv0NQFETp81q/gb2zZs+fo6Uo=
-X-Received: by 2002:a17:90b:1f90:b0:2ff:4e8f:b055 with SMTP id
- 98e67ed59e1d1-30151d820f1mr12979510a91.35.1742174717010; Sun, 16 Mar 2025
- 18:25:17 -0700 (PDT)
+        bh=e+Z6MPDlHxM6XfzWRhi1r9HNAsbSPQrdOBmdmqDNu4U=;
+        b=MMMOit09JrK9kCayGatkd/yJbU9TSZCU488kjAuqzsLi7PVdNEqe60BKdbDxdpqstj
+         5+B9vZF0xwlH0Z4czq3nkxEw005sbg11AbIBQ0rIZQyTYz5nLiVGXIEmMJ3cVLmdetJ0
+         hcN84NWKX4NQ9h1R2RgngAqEXD+d3FBTfDwYkiktsNlA3LSlv1mPSNNBKr6ynFGXwnFL
+         0wznbgkE07pPROXblI+BKdfzjt7FQKv2MsUSXYLYXj9J0TpZRnBqxhKMO550tkLTPdIR
+         lhR50xkgRE4//OcKJ+oswF/8CK7me4jyIF1E9gOpQGeglUxhpE36UBI1iTEV496xGMGi
+         Y4Wg==
+X-Forwarded-Encrypted: i=1; AJvYcCUtV4kPbZvz7of01TitsiCet1OuP1+M/TZADcjxJ+v2rkNU3FH8jzlDlVd0EHZuZ4ynCSo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7b2NoXWVAitMPLytVaIyQvAzM7Ohkq2eX7/AIHDZRtf9sxPBi
+	T6PGEinPVOA8H0VR9//bwF4vrxKg4bJLsAq7/9JRCG7SMJdQq71xEUFURyDjXgEqVtVhBj+QLL0
+	4XKU4Rb+x44VIrWoTGOFwH+BveKE=
+X-Gm-Gg: ASbGncsO5Q88OjTTCCDd29m53UxQ4TKB6OZkXEZ+O9C8Gw2VrATwjo7nx3tvCxekJcw
+	EUKKhuppsK+Cv/RoMDPPcYenR7uHX3hTiPvY9o25it9lQKaFnSJik95kUJ3xQixICLLqSy3Vv5h
+	vIBhI2goJRUUHJw4O61FgBhmpWHQ==
+X-Google-Smtp-Source: AGHT+IHYCm/m1R6Y3V3X7NdE295rMqWuWHr4lk46l1x1sPX0TS5ZMtvWIvJ3rIWNi11bGHNY2HzgdKF+3Oy2YIyC/pI=
+X-Received: by 2002:a05:690c:c8e:b0:6ff:1c1a:f61f with SMTP id
+ 00721157ae682-6ff45fe5df5mr138365347b3.30.1742174766708; Sun, 16 Mar 2025
+ 18:26:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250313-rss-v10-0-3185d73a9af0@daynix.com> <20250313-rss-v10-3-3185d73a9af0@daynix.com>
-In-Reply-To: <20250313-rss-v10-3-3185d73a9af0@daynix.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 17 Mar 2025 09:25:05 +0800
-X-Gm-Features: AQ5f1JpE0rK7CwWDqP6FbtvINFxO-X4ILccNQzNMTQCiB6CvQEMSnvUz3v4UdcU
-Message-ID: <CACGkMEv8g6JNvGCy95x9jRD893qBvhztkCzBy9sFz+9N6A69Bw@mail.gmail.com>
-Subject: Re: [PATCH net-next v10 03/10] tun: Allow steering eBPF program to
- fall back
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
-	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
-	Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
-	Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>
+References: <20250313190309.2545711-1-ameryhung@gmail.com> <20250313190309.2545711-13-ameryhung@gmail.com>
+ <CAADnVQKrndZ25SuRj-Ofv8tA50XjTwVVyQWmasN94LT9zeV7JQ@mail.gmail.com>
+In-Reply-To: <CAADnVQKrndZ25SuRj-Ofv8tA50XjTwVVyQWmasN94LT9zeV7JQ@mail.gmail.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Mon, 17 Mar 2025 01:25:55 +0000
+X-Gm-Features: AQ5f1JpAhL4FwuMUCfAellIo2hw6hNkqLXmHT0-zx8fuphRwh7V31zwhwYc7W1Q
+Message-ID: <CAMB2axO9siaKQ6yLyzeFR8v1bxJLUo3Aiu-Cf2r9zxhY5LdyBA@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v5 12/13] selftests/bpf: Add a bpf fq qdisc to selftest
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Kui-Feng Lee <sinquersw@gmail.com>, 
+	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	Jiri Pirko <jiri@resnulli.us>, Stanislav Fomichev <stfomichev@gmail.com>, 
+	ekarani.silvestre@ccc.ufcg.edu.br, yangpeihao@sjtu.edu.cn, 
+	Peilin Ye <yepeilin.cs@gmail.com>, Kernel Team <kernel-team@meta.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 13, 2025 at 3:01=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix=
-.com> wrote:
+On Fri, Mar 14, 2025 at 8:35=E2=80=AFPM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
 >
-> This clarifies a steering eBPF program takes precedence over the other
-> steering algorithms.
+> On Thu, Mar 13, 2025 at 12:03=E2=80=AFPM Amery Hung <ameryhung@gmail.com>=
+ wrote:
+> >
+> > From: Amery Hung <amery.hung@bytedance.com>
+> >
+> > This test implements a more sophisticated qdisc using bpf. The bpf fair=
+-
+> > queueing (fq) qdisc gives each flow an equal chance to transmit data. I=
+t
+> > also respects the timestamp of skb for rate limiting.
+> >
+> > Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+> > ---
+> >  .../selftests/bpf/prog_tests/bpf_qdisc.c      |  24 +
+> >  .../selftests/bpf/progs/bpf_qdisc_fq.c        | 718 ++++++++++++++++++
 >
-> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> ---
+> On the look of it, it's a pretty functional qdisc.
+> Since bpftool supports loading st_ops,
+> please list commands bpftool and tc the one can enter
+> to use this qdisc without running selftests.
+>
 
-I think we should elaborate more on the advantages of *not* making
-this implicit.
+Thanks for the suggestion. That should be very helpful. I will add the comm=
+ands.
 
-Or what's the advantages of having RSS has a priority than eBPF.
+> Probably at the comment section at the top of bpf_qdisc_fq.c
+>
+> It also needs SPDX and copyright.
 
-Thanks
+I will add SPDX and copyright as well.
 
+Thanks,
+Amery
+
+>
+> pw-bot: cr
 
