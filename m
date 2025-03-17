@@ -1,98 +1,123 @@
-Return-Path: <netdev+bounces-175422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7725AA65BF7
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 19:10:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F6DAA65CDF
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 19:38:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DE253BEFE8
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 18:09:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F31DB1640DC
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 18:38:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB3E61D5CE5;
-	Mon, 17 Mar 2025 18:09:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o67oqCV1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E54931C9B9B;
+	Mon, 17 Mar 2025 18:38:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D72D1527B4;
-	Mon, 17 Mar 2025 18:09:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60457176ADB;
+	Mon, 17 Mar 2025 18:38:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742234999; cv=none; b=d95OJVHh4Ka/2BmJAy4UsIc0F3pSbc36tyWwsOsDG31KZxAr6bjLIOqxoR/sllKhPLkdgIAxBXsmoaY7bgSpAhttADyQY9lh6aefq5YtfO9rPsqw2i/tI0NIISKzGJ6Ek+kx6wtwRlm4hcV4FD4SseZnL+x8N7h4xOgizkn0gLw=
+	t=1742236698; cv=none; b=KRQGP7dQVzLTljbStIO+CL7MmsiyxzSmzKYnabxgJA+cJVF+3lWrrAE5SYgZo6Waw3lRpB0KY7yl55fkp5XuP1q5HFf68VqDGWF/9r/UYdmA/ukpnOK4/CbcGEWQb5ne5ntn+Spv3mMxBBTPAyjuqCxAyyOEuifr0yCG0Ye7leY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742234999; c=relaxed/simple;
-	bh=S61WwX5SYcFVNzBvRGsTiux8cCXQ2421uz6PYqITOes=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=oMcbvyYcPGeUoTdl3+uidfLqZCrCRq27flD12YB8mjU/drLSLSCV/FN9gxPbdlK6dcgNKqEhJ86XDijUmMsG60Do6jm8Gu8dsrrNI25eEb7/PBNXXPww+uh+o2pwIoSq+7bTFn9xL0pJLYHnRAymOPatCJi1XGiRcEwLNngpLQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o67oqCV1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEE77C4CEED;
-	Mon, 17 Mar 2025 18:09:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742234999;
-	bh=S61WwX5SYcFVNzBvRGsTiux8cCXQ2421uz6PYqITOes=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=o67oqCV1PP9VCQRXJUZXANOao7HKeO8o0o5AjTmcbmE8hdgnio9qjKkdoKFVQm14e
-	 LVLwssWBSgJuQqOWgWal00dYMnRoGIq21iwXmSNSi2KNdpfqUm9mdMAZPYrww/VG2+
-	 7RYtr9xDi6HwophRftsbMVuZteBtb9urP0rgvpD4g8hcsaJFjUdsRkS/iG46RwEEd3
-	 aEXH3RVQXNBsdsZQRm1sPdLOuBbGEhfrLtJgj4gVwHoDiMgiU1zyOLweUxqi9Uj1r2
-	 76k1RpQF96prgBHSDQkzowyIstoV7FKkB7+QctboOPfJPElphukXCXjQjEicBNE+MS
-	 UZnuHK305vrXA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7108D380CFF7;
-	Mon, 17 Mar 2025 18:10:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1742236698; c=relaxed/simple;
+	bh=x8VzNlnfyxrbj98l+2sMkUMZwVMQl42R9kHvQVPYs+k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=L8TCpwvAnqX/xWaXVn3GNPIxnV4MuiS88d170d3qG0pW2eG/7kNO+5TIlOFR6I2NyZ7CTMqCA/aKsQ5xgw65nQhkWMxODOeC7bLu7QvayAtzh1HeJSleTMAgi+rItZMJQd25NyD89ZKOslkchsaMEgK7VtkNlPX8D84Z5Z+JBGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1tuFLa-000000007G3-0hL0;
+	Mon, 17 Mar 2025 18:37:58 +0000
+Date: Mon, 17 Mar 2025 18:37:54 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: "Lucien.Jheng" <lucienx123@gmail.com>
+Cc: linux-clk@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, kuba@kernel.org, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, ericwouds@gmail.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	joseph.lin@airoha.com, wenshin.chung@airoha.com
+Subject: Re: [PATCH v4 net-next PATCH 1/1] net: phy: air_en8811h: Add clk
+ provider for CKO pin
+Message-ID: <Z9hsAmiD9sZ_NAR-@makrotopia.org>
+References: <20250317143111.28824-1-lucienX123@gmail.com>
+ <20250317143111.28824-2-lucienX123@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/3] mlx5: Support HWS flow meter/sampler actions in
- FS core
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174223503427.3862374.13525687285276014271.git-patchwork-notify@kernel.org>
-Date: Mon, 17 Mar 2025 18:10:34 +0000
-References: <1741543663-22123-1-git-send-email-tariqt@nvidia.com>
-In-Reply-To: <1741543663-22123-1-git-send-email-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew+netdev@lunn.ch, gal@nvidia.com, mbloch@nvidia.com,
- moshe@nvidia.com, saeedm@nvidia.com, leon@kernel.org, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250317143111.28824-2-lucienX123@gmail.com>
 
-Hello:
+On Mon, Mar 17, 2025 at 10:31:11PM +0800, Lucien.Jheng wrote:
+> EN8811H outputs 25MHz or 50MHz clocks on CKO, selected by GPIO3.
+> CKO clock activates on power-up and continues through md32 firmware loading.
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Maybe add here:
+"Implement clk provider driver so we can disable the clock output in case
+it isn't needed, which also helps to reduce EMF noise"
 
-On Sun, 9 Mar 2025 20:07:40 +0200 you wrote:
-> Hi,
-> 
-> This series by Moshe adds support for flow meter and flow sampler HW
-> Steering actions in FS core level. As these actions can be shared by
-> multiple rules, these patches use refcounts to manage the HWS actions
-> sharing in FS core level.
-> 
-> [...]
+Ie. the description you had was fine and good to have, just the lines had to
+be shorter (ie. just insert linebreaks at 70~75 chars).
 
-Here is the summary with links:
-  - [net-next,1/3] net/mlx5: fs, add API for sharing HWS action by refcount
-    https://git.kernel.org/netdev/net-next/c/cc2cc56fc6e6
-  - [net-next,2/3] net/mlx5: fs, add support for flow meters HWS action
-    https://git.kernel.org/netdev/net-next/c/82d3639ef7dc
-  - [net-next,3/3] net/mlx5: fs, add support for dest flow sampler HWS action
-    https://git.kernel.org/netdev/net-next/c/32e658c84b6d
+See more comments inline below:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> ...
+> @@ -806,6 +817,84 @@ static int en8811h_led_hw_is_supported(struct phy_device *phydev, u8 index,
+>  	return 0;
+>  };
+>  
+> +static unsigned long en8811h_recalc_rate(struct clk_hw *hw, unsigned long parent)
 
+calling this en8811h_clk_recalc_rate() would be better imho.
 
+> +{
+> +	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
+> +	struct phy_device *phydev = priv->phydev;
+> +	u32 pbus_value;
+> +	int ret;
+> +
+> +	ret = air_buckpbus_reg_read(phydev, EN8811H_HWTRAP1, &pbus_value);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	return (pbus_value & EN8811H_HWTRAP1_CKO) ? 50000000 : 25000000;
+> +}
+> +
+> +static int en8811h_enable(struct clk_hw *hw)
+
+call this en8811h_clk_enable()
+
+> +{
+> +	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
+> +	struct phy_device *phydev = priv->phydev;
+> +
+> +	return air_buckpbus_reg_modify(phydev, EN8811H_CLK_CGM,
+> +				EN8811H_CLK_CGM_CKO, EN8811H_CLK_CGM_CKO);
+> +}
+> +
+> +static void en8811h_disable(struct clk_hw *hw)
+
+call this en8811h_clk_disable()
+
+> +{
+> +	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
+> +	struct phy_device *phydev = priv->phydev;
+> +
+> +	air_buckpbus_reg_modify(phydev, EN8811H_CLK_CGM,
+> +				EN8811H_CLK_CGM_CKO, 0);
+> +}
+> +
+> +static int en8811h_is_enabled(struct clk_hw *hw)
+
+call this en8811h_clk_is_enabled()
 
