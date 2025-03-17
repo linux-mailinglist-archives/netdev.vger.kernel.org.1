@@ -1,158 +1,137 @@
-Return-Path: <netdev+bounces-175192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81154A64307
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 08:12:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CC97A6439C
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 08:29:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1FCA1680E4
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 07:12:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A062718935AB
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 07:30:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6286C21506D;
-	Mon, 17 Mar 2025 07:12:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="DUrNgQlX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D1FD21ABB8;
+	Mon, 17 Mar 2025 07:29:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [63.216.63.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A0E21ABBC
-	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 07:12:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3D0214A8F;
+	Mon, 17 Mar 2025 07:29:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.216.63.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742195528; cv=none; b=XLdu55clVPZnUhA7n1RotaPVvM2Vn05DaIJPeC+pC3kjNMomsMbTkQg/5SvepTnGGM05O4ecoYb4cBIOn3ogPOJxZq85atDYn/BeRGSwjChfcjbFFevOTGSjD2QXGMBaJJhzdQat+/XoDwRZMiD1xaGatB5a5ETvJA4uWO0nYKM=
+	t=1742196591; cv=none; b=F3aL8JPJkYN/Tl1PNC/wDA9pzYQW9EDc6EIaf7Va/SsvxLHq7I0RfMxl8gWJZaDWNcAYUHdYw5Tn40HQmdr6ljBUw9QFHx0FnSqbeCjKSSuHIPLzjS0QUTgCcuE4wKPFf8HyzoQJkkxRhlk03VwnK22o2R7Yujt6kfDK+uChfE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742195528; c=relaxed/simple;
-	bh=XaoGzoSd4+DMOue9Qeo8FUW6Jbk6hQfwUT8swY2Ry3I=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PbcP/7QV9hPj2s9ETzv3/aFzy4z8zuzQBRGfLzld67ol0LmNO5H2DEdGvlC3j1/ZbAo/vj7ILFM/FRmUae3oOIWLJ8swJaMkiWgvN3gMDgDrXMveHbm15vari6EHdYOIsEGlW6EiHPWKNmVXxIxfrdjG1T84qOZjYAR2MR1awjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=DUrNgQlX; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1742195527; x=1773731527;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=I/JTemISKXr2LCxUz2k1XAzsN3l2PzZBF8J95tQqeDY=;
-  b=DUrNgQlX4UVre9uDJZJj8+a8ROuP6GsX7oj6eLm0no0iicc0qti0KFQf
-   uMTa7OyNJsJmRo5jL02w1iNt0iFdHwgrOxnxUtLQT6OTDPz2d8HZJjg9F
-   PRbDv9hI+fS8XffJHkdQJqP64bRn4N6ci6iR32L6y7WVwszd/Dvfrh0sW
-   s=;
-X-IronPort-AV: E=Sophos;i="6.14,253,1736812800"; 
-   d="scan'208";a="387235735"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2025 07:12:05 +0000
-Received: from EX19MTAUEB001.ant.amazon.com [10.0.44.209:46829]
- by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.46.185:2525] with esmtp (Farcaster)
- id 1bd349c6-41d4-4499-a565-bf7bb74886c0; Mon, 17 Mar 2025 07:12:03 +0000 (UTC)
-X-Farcaster-Flow-ID: 1bd349c6-41d4-4499-a565-bf7bb74886c0
-Received: from EX19D008UEA004.ant.amazon.com (10.252.134.191) by
- EX19MTAUEB001.ant.amazon.com (10.252.135.108) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 17 Mar 2025 07:11:57 +0000
-Received: from EX19MTAUEA002.ant.amazon.com (10.252.134.9) by
- EX19D008UEA004.ant.amazon.com (10.252.134.191) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 17 Mar 2025 07:11:56 +0000
-Received: from email-imr-corp-prod-pdx-1box-2b-8c2c6aed.us-west-2.amazon.com
- (10.43.8.2) by mail-relay.amazon.com (10.252.134.34) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1544.14 via Frontend Transport; Mon, 17 Mar 2025 07:11:56 +0000
-Received: from HFA15-G9FV5D3.amazon.com (unknown [10.85.143.178])
-	by email-imr-corp-prod-pdx-1box-2b-8c2c6aed.us-west-2.amazon.com (Postfix) with ESMTP id 71DDBA0607;
-	Mon, 17 Mar 2025 07:11:50 +0000 (UTC)
-From: David Arinzon <darinzon@amazon.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	<netdev@vger.kernel.org>
-CC: David Arinzon <darinzon@amazon.com>, Ahmed Zaki <ahmed.zaki@intel.com>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Simon
- Horman" <horms@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
-	"Woodhouse, David" <dwmw@amazon.com>, "Machulsky, Zorik" <zorik@amazon.com>,
-	"Matushevsky, Alexander" <matua@amazon.com>, Saeed Bshara
-	<saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>, "Liguori, Anthony"
-	<aliguori@amazon.com>, "Bshara, Nafea" <nafea@amazon.com>, "Schmeilin,
- Evgeny" <evgenys@amazon.com>, "Belgazal, Netanel" <netanel@amazon.com>,
-	"Saidi, Ali" <alisaidi@amazon.com>, "Herrenschmidt, Benjamin"
-	<benh@amazon.com>, "Kiyanovski, Arthur" <akiyano@amazon.com>, "Dagan, Noam"
-	<ndagan@amazon.com>, "Bernstein, Amit" <amitbern@amazon.com>, "Agroskin,
- Shay" <shayagr@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>,
-	"Tabachnik, Ofir" <ofirt@amazon.com>
-Subject: [PATCH net-next v2] net: ena: resolve WARN_ON when freeing IRQs
-Date: Mon, 17 Mar 2025 09:11:47 +0200
-Message-ID: <20250317071147.1105-1-darinzon@amazon.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1742196591; c=relaxed/simple;
+	bh=71xyelr37/P1vqoVyhq2nM/jAhPFe2onPN0Cv7H5xkY=;
+	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=tQ1pJCNPfw1P3lVMKsnmLbzNdCuynT8BDbhfY9pHcuFkDprgkX9AyBrZegKPYcOp71q0pFUrKPoZlMJauuDVEH+zBW1qbbHcBe6WH6FT3Po4o9oUfg+YKNvfX9yyoiBAyiI+e0+cbV7dzDV3ZvWFy48s+emxYJalNvTNuDw1nnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=63.216.63.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4ZGRSV3C9gz5B1K0;
+	Mon, 17 Mar 2025 15:29:46 +0800 (CST)
+Received: from xaxapp02.zte.com.cn ([10.88.97.241])
+	by mse-fl1.zte.com.cn with SMTP id 52H7TVCK098170;
+	Mon, 17 Mar 2025 15:29:31 +0800 (+08)
+	(envelope-from xie.ludan@zte.com.cn)
+Received: from mapi (xaxapp04[null])
+	by mapi (Zmail) with MAPI id mid32;
+	Mon, 17 Mar 2025 15:29:33 +0800 (CST)
+Date: Mon, 17 Mar 2025 15:29:33 +0800 (CST)
+X-Zmail-TransId: 2afb67d7cf5d0f9-ef56e
+X-Mailer: Zmail v1.0
+Message-ID: <20250317152933756kWrF1Y_e-2EKtrR_GGegq@zte.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Mime-Version: 1.0
+From: <xie.ludan@zte.com.cn>
+To: <davem@davemloft.net>
+Cc: <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <horms@kernel.org>, <xie.ludan@zte.com.cn>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <xu.xin16@zte.com.cn>,
+        <yang.yang29@zte.com.cn>
+Subject: =?UTF-8?B?wqBbUEFUQ0ggbGludXgtbmV4dF0gbmV0OiBhdG06IHVzZSBzeXNmc19lbWl0KCkvc3lzZnNfZW1pdF9hdCgpIGluc3RlYWQgb2Ygc2NucHJpbnRmKCku?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl1.zte.com.cn 52H7TVCK098170
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 67D7CF6A.001/4ZGRSV3C9gz5B1K0
 
-When IRQs are freed, a WARN_ON is triggered as the
-affinity notifier is not released.
-This results in the below stack trace:
+From: XieLudan <xie.ludan@zte.com.cn>
 
-[  484.544586]  ? __warn+0x84/0x130
-[  484.544843]  ? free_irq+0x5c/0x70
-[  484.545105]  ? report_bug+0x18a/0x1a0
-[  484.545390]  ? handle_bug+0x53/0x90
-[  484.545664]  ? exc_invalid_op+0x14/0x70
-[  484.545959]  ? asm_exc_invalid_op+0x16/0x20
-[  484.546279]  ? free_irq+0x5c/0x70
-[  484.546545]  ? free_irq+0x10/0x70
-[  484.546807]  ena_free_io_irq+0x5f/0x70 [ena]
-[  484.547138]  ena_down+0x250/0x3e0 [ena]
-[  484.547435]  ena_destroy_device+0x118/0x150 [ena]
-[  484.547796]  __ena_shutoff+0x5a/0xe0 [ena]
-[  484.548110]  pci_device_remove+0x3b/0xb0
-[  484.548412]  device_release_driver_internal+0x193/0x200
-[  484.548804]  driver_detach+0x44/0x90
-[  484.549084]  bus_remove_driver+0x69/0xf0
-[  484.549386]  pci_unregister_driver+0x2a/0xb0
-[  484.549717]  ena_cleanup+0xc/0x130 [ena]
-[  484.550021]  __do_sys_delete_module.constprop.0+0x176/0x310
-[  484.550438]  ? syscall_trace_enter+0xfb/0x1c0
-[  484.550782]  do_syscall_64+0x5b/0x170
-[  484.551067]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+Follow the advice in Documentation/filesystems/sysfs.rst:
+show() should only use sysfs_emit() or sysfs_emit_at() when formatting
+the value to be returned to user space.
 
-Adding a call to `netif_napi_set_irq` with -1 as the IRQ index,
-which frees the notifier.
-
-Fixes: de340d8206bf ("net: ena: use napi's aRFS rmap notifers")
-Signed-off-by: David Arinzon <darinzon@amazon.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Ahmed Zaki <ahmed.zaki@intel.com>
+Signed-off-by: XieLudan <xie.ludan@zte.com.cn>
 ---
-Changes in v2:
-- Remove an unnecessary cast
+ net/atm/atm_sysfs.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-Link to v1: https://lore.kernel.org/netdev/20250312143929.GT4159220@kernel.org/T/
----
- drivers/net/ethernet/amazon/ena/ena_netdev.c | 4 ++++
- 1 file changed, 4 insertions(+)
+diff --git a/net/atm/atm_sysfs.c b/net/atm/atm_sysfs.c
+index 54e7fb1a4ee5..ae0d921157c5 100644
+--- a/net/atm/atm_sysfs.c
++++ b/net/atm/atm_sysfs.c
+@@ -16,7 +16,7 @@ static ssize_t type_show(struct device *cdev,
+ {
+ 	struct atm_dev *adev = to_atm_dev(cdev);
 
-diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-index 6aab85a7..70fa3adb 100644
---- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-@@ -1716,8 +1716,12 @@ static void ena_free_io_irq(struct ena_adapter *adapter)
- 	int i;
- 
- 	for (i = ENA_IO_IRQ_FIRST_IDX; i < ENA_MAX_MSIX_VEC(io_queue_count); i++) {
-+		struct ena_napi *ena_napi;
-+
- 		irq = &adapter->irq_tbl[i];
- 		irq_set_affinity_hint(irq->vector, NULL);
-+		ena_napi = irq->data;
-+		netif_napi_set_irq(&ena_napi->napi, -1);
- 		free_irq(irq->vector, irq->data);
- 	}
+-	return scnprintf(buf, PAGE_SIZE, "%s\n", adev->type);
++	return sysfs_emit(buf, "%s\n", adev->type);
  }
--- 
-2.47.1
 
+ static ssize_t address_show(struct device *cdev,
+@@ -24,7 +24,7 @@ static ssize_t address_show(struct device *cdev,
+ {
+ 	struct atm_dev *adev = to_atm_dev(cdev);
+
+-	return scnprintf(buf, PAGE_SIZE, "%pM\n", adev->esi);
++	return sysfs_emit(buf, "%pM\n", adev->esi);
+ }
+
+ static ssize_t atmaddress_show(struct device *cdev,
+@@ -37,7 +37,7 @@ static ssize_t atmaddress_show(struct device *cdev,
+
+ 	spin_lock_irqsave(&adev->lock, flags);
+ 	list_for_each_entry(aaddr, &adev->local, entry) {
+-		count += scnprintf(buf + count, PAGE_SIZE - count,
++		count += sysfs_emit_at(buf, count,
+ 				   "%1phN.%2phN.%10phN.%6phN.%1phN\n",
+ 				   &aaddr->addr.sas_addr.prv[0],
+ 				   &aaddr->addr.sas_addr.prv[1],
+@@ -55,7 +55,7 @@ static ssize_t atmindex_show(struct device *cdev,
+ {
+ 	struct atm_dev *adev = to_atm_dev(cdev);
+
+-	return scnprintf(buf, PAGE_SIZE, "%d\n", adev->number);
++	return sysfs_emit(buf, "%d\n", adev->number);
+ }
+
+ static ssize_t carrier_show(struct device *cdev,
+@@ -63,7 +63,7 @@ static ssize_t carrier_show(struct device *cdev,
+ {
+ 	struct atm_dev *adev = to_atm_dev(cdev);
+
+-	return scnprintf(buf, PAGE_SIZE, "%d\n",
++	return sysfs_emit(buf, "%d\n",
+ 			 adev->signal == ATM_PHY_SIG_LOST ? 0 : 1);
+ }
+
+@@ -87,7 +87,7 @@ static ssize_t link_rate_show(struct device *cdev,
+ 	default:
+ 		link_rate = adev->link_rate * 8 * 53;
+ 	}
+-	return scnprintf(buf, PAGE_SIZE, "%d\n", link_rate);
++	return sysfs_emit(buf, "%d\n", link_rate);
+ }
+
+ static DEVICE_ATTR_RO(address);
+-- 
+2.25.1
 
