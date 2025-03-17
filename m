@@ -1,189 +1,131 @@
-Return-Path: <netdev+bounces-175247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBAF5A64902
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 11:11:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D1EBA6491A
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 11:14:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5B323A74A9
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 10:10:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C14C416CC81
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 10:13:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79CF4230BDC;
-	Mon, 17 Mar 2025 10:10:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FMZvZPEV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABE8E233141;
+	Mon, 17 Mar 2025 10:13:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D794D229B28;
-	Mon, 17 Mar 2025 10:10:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B24C322257F;
+	Mon, 17 Mar 2025 10:13:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742206259; cv=none; b=pyCmnq05l+YgjfIaC82tLuZuE6jSxDW5OX+QmEGGb9vPIJ+61qc5dr5FDCK8FY/Zr1LKLSqnEMCShXP0vfMzgabSNwb12Fbaz0rUshb0N/zn9SQnzxyZWURHK9efx/HZo2bNGv6B4l3PwoQV3HHjASRGFJWLbHMXYGdFn2e7VLg=
+	t=1742206434; cv=none; b=sVqPf1uq/1G2DjJ+WAiI5W+Hha/aHzDlzUIX6W7E9doOGNPYn2gE1gZR9+gxM3HbQ1yMdHJ1uBfMJibLs/lqe4fuflvfdenKIDmltnxpeLrNrQkOc2IUfd9juQoQ5ucra3iB+nDuXiH3DBvYWwM2wQRSWamOHd/OtqMi6GJSJR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742206259; c=relaxed/simple;
-	bh=Wxs+z1Wms/rz3FZCDLd8lPCpX3EWYhXBgRFH5+EsDvI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Zg5O6WoDgP/io9Gf7KRvu2uhDtjC5aXYUDFqWjiBNjnO/3syCoKyOx+obTGWXBb+6Km0hmp95cbK/ca1C2r/wqhvUg/vabroFxxuST6AdhQO8ghzb0fJF9yZpacfixuXR0QYQsESKaU/gSTzZ/ij+McAHPDC46nREN0OmakPFS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FMZvZPEV; arc=none smtp.client-ip=209.85.219.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-e573136107bso3864774276.3;
-        Mon, 17 Mar 2025 03:10:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742206257; x=1742811057; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=14ZjU9nXfljCfIeuLE7AsggRfd6lcojl1mTtLC8IsKk=;
-        b=FMZvZPEVl1B85+p0MGMQwQL3+E6s+OvtZ3cpqlAq+6lPZ+QqBs4/Bkn7+9LlB1bFTH
-         82G6UJd21KozlEbBQHRQi0VaDCV0zURxrVBA8AJl+6XDvAt+AKbys37pfx2g4EOaYtst
-         d6X/MeT/8k8dFvxr1VJOynAXBVnGMiB1Tt8nqBvyAxqpwTI94UVaqG/pDQOYpvW4xcsh
-         xzgnf/gNZDlGRpzzQdRhYhtXVPhekUCLL58tbBeePCjViHxWb7s2WQCm19s3hXnGt/0u
-         VtQX9QPb81eKL5su4bWhf5o880T2jAl02LQQMltsA2P4xa2LNgCsOaQQoaOmIl1njHHf
-         /HrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742206257; x=1742811057;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=14ZjU9nXfljCfIeuLE7AsggRfd6lcojl1mTtLC8IsKk=;
-        b=ARF3fMsTkkWnKNMED2rocymHfHc0x19RJrv3hNayVXwj0qlv+zAdBwJ3ejv5z2On6A
-         g0nU3OLAmd5mohb+xEWykBX8NnXlZFLcQ0c7tYTkffFOGr3OpwveDvF5wdPGKFoljM/8
-         Rs9XqtrKPIjUYP1nHcdRh0yDW8jeeEUt6ooYbr1ZcgH2KzYpHai7f2oPq8GNQLPWhSp7
-         KCfjI4dR5mQLHfp8Wcj0a9IqoEmUcpJRgyFKb3UpP6KHRA8mX5XFXCJTYC8ZH8UpbAfY
-         6gmWq38ewUUxhCoCAs/XA8zsTqdPG+YdsGRqsFNoF4Rxa3IopwK9+I2t4yO6cINO+lT2
-         pvUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUY+3BQGkDF854s5ISwEq4FgnCfIIw1cWujEQZyQWPM8uPlzV6HbWDyPUFKIoJe3/mwaB2rbpdsnTq3ptiP/NXX@vger.kernel.org, AJvYcCUmFpjZuka3y4/glUNliHT4RALii7qiyXw/CHWK7XWiJ1nX0EDhbVwRYBdT7qZUfyf3/9wu2k4Z@vger.kernel.org, AJvYcCV8vL2RuG6ssWkYEAUEVq0/yHQBc+s52JzKcnlwmNbpUJ9fExW0huH39v26x52+Di3NEUwoQCJJLZ2bs3w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwklkZsw8UOLs0+WoLCi7Y/vGoLxT+oaYLik6SsYGkO1D4Usl3n
-	yJ9KeCB42SkEGX2KSryfSOGcJ9eMKDlnFlHNPo/vjnyVra4oGhaxfgH1N/eDkJQpxEAyYSuuwo7
-	E0LcVGdr18boCOdlVP1CmKn8BhGs=
-X-Gm-Gg: ASbGnct5h5QQhDKn9oTFX68O5o2YJVunOBdTQVLzyDziykII4eEcVRrpD7ExuYvlC8x
-	tQjvrNz/9cQJM38Ba9Tmkyq6I5mgBi7Pa9zTgeKWbCru3cBw/pkfs5ODYLO3FigTVkNM73lqKii
-	s8iHaPkJ0ZCDorhG+CAriMbmdiMwVWqAZomodCwkLJqg==
-X-Google-Smtp-Source: AGHT+IFeEwX2XBlKWWzrkEKnBTAYiIEeloN1LG9w0cpntS5lTgsKiw5wSHUPI3GA92GyKQZHSvhzhxajCnV/EuAnk2I=
-X-Received: by 2002:a05:6902:2747:b0:e5a:c5d6:3948 with SMTP id
- 3f1490d57ef6-e63f5cf0c16mr13681061276.0.1742206256657; Mon, 17 Mar 2025
- 03:10:56 -0700 (PDT)
+	s=arc-20240116; t=1742206434; c=relaxed/simple;
+	bh=/Q8Aa9fYv9wbyrx2wObs4CMSJP+hTNYqKzlwyrJhFsM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=YN9l0KVFSyecyFL1B7mn2mSxeHeYsdL4XmU6fNVw+mPMuJ9yisgVUGw9yhOg2QXbOZryB/AFq8d1x0POIy9Bw6uk1TEW1L1I4GiHbKMTglIDfGL588XAaIDPqjYkUitMiqHnXCZBuDQafn3RA8RO+FH+naSqTiTUHp37qxmPyfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A3E2813D5;
+	Mon, 17 Mar 2025 03:14:00 -0700 (PDT)
+Received: from e133711.arm.com (e133711.arm.com [10.1.196.55])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0B7D03F673;
+	Mon, 17 Mar 2025 03:13:47 -0700 (PDT)
+From: Sudeep Holla <sudeep.holla@arm.com>
+Subject: [PATCH 0/9] drivers: Transition to the faux device interface
+Date: Mon, 17 Mar 2025 10:13:12 +0000
+Message-Id: <20250317-plat2faux_dev-v1-0-5fe67c085ad5@arm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250312-b4-ovpn-v23-3-76066bc0a30c@openvpn.net>
- <20250317060947.2368390-1-dqfext@gmail.com> <f4c9a29f-a5c6-464a-a659-c7ffeaf123c1@openvpn.net>
- <CALW65jZe3JQGNcWsZtqU-B4-V-JZ6ocninxvoqMGeusMaU7C=A@mail.gmail.com> <0d8a8602-2db4-4c19-ab1c-51efef42cef6@openvpn.net>
-In-Reply-To: <0d8a8602-2db4-4c19-ab1c-51efef42cef6@openvpn.net>
-From: Qingfang Deng <dqfext@gmail.com>
-Date: Mon, 17 Mar 2025 18:10:46 +0800
-X-Gm-Features: AQ5f1JrZOv5SDMKrcUIEXFo9D0GgKi-eZeGIu0RavrSG4UmNhD3vkPc4aOtmKg8
-Message-ID: <CALW65jYaMBuMqzCFYwUJfLBg8+epQEjCg0MOpssGCwXqxbFP9w@mail.gmail.com>
-Subject: Re: [PATCH net-next v23 03/23] ovpn: add basic interface
- creation/destruction/management routines
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: andrew+netdev@lunn.ch, donald.hunter@gmail.com, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	ryazanov.s.a@gmail.com, sd@queasysnail.net, shaw.leon@gmail.com, 
-	shuah@kernel.org, "Jason A. Donenfeld" <Jason@zx2c4.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALv112cC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI1MDY0NT3YKcxBKjtMTSiviU1DJdi2QjiyRj06RUS7NEJaCegqLUtMwKsHn
+ RsbW1AJ+HYAdfAAAA
+X-Change-ID: 20250315-plat2faux_dev-8c28b35be96a
+To: linux-kernel@vger.kernel.org
+Cc: Sudeep Holla <sudeep.holla@arm.com>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Lorenzo Pieralisi <lpieralisi@kernel.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, 
+ Daniel Lezcano <daniel.lezcano@linaro.org>, linux-pm@vger.kernel.org, 
+ Andre Przywara <andre.przywara@arm.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, 
+ Jeff Johnson <jeff.johnson@oss.qualcomm.com>, linux-crypto@vger.kernel.org, 
+ Ard Biesheuvel <ardb@kernel.org>, linux-efi@vger.kernel.org, 
+ Alexandre Belloni <alexandre.belloni@bootlin.com>, 
+ linux-rtc@vger.kernel.org, Mark Brown <broonie@kernel.org>, 
+ Takashi Iwai <tiwai@suse.com>, linux-sound@vger.kernel.org, 
+ Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+ netdev@vger.kernel.org, Borislav Petkov <bp@alien8.de>, 
+ linux-acpi@vger.kernel.org, Jonathan Cameron <Jonathan.Cameron@huawei.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2229; i=sudeep.holla@arm.com;
+ h=from:subject:message-id; bh=/Q8Aa9fYv9wbyrx2wObs4CMSJP+hTNYqKzlwyrJhFsM=;
+ b=owEBbQKS/ZANAwAIAQBBurwxfuKYAcsmYgBn1/XaXg/cczfp9LKToTU0Xvg1jjtICG+G14QuE
+ jF8HdVkidyJAjMEAAEIAB0WIQS6ceUSBvMeskPdk+EAQbq8MX7imAUCZ9f12gAKCRAAQbq8MX7i
+ mL+sEACUOKVk2OIBxRBYI5oleTH4ttn1o568PHz46upYDllAy68d3qhxx0E4xnIdB60mEjQBzDu
+ pZD62v90A+KDS4L4tmUprsU7NWILTGj7z8ga03muX133xHYBl3IBUvax/9o/+bum82neHCv1Pba
+ d8H+us51UfUHU9RNZlv0RBm5VVa/c8Uw1HgXOr5pKwbjSb8e3qQCqNIHDnZlch9Nieifbsr/76z
+ gG6mbYz1uW4/b7QLjmoUjKSeUxVj+2GPLep8+YRtNuA1S4RPJK5HAWWzuehomacfsXjmB58nG+q
+ RnT2Myy8yJNRXSJ2M4hQ4q0xSovkDs1Fs3BsAWVhnk34koAzgflqjj2nSvvviGN1NfHBDbkbsIn
+ ICmtLUmPDj6wh+Iuh95Z7TR2a2bxv4ZcvOdEjiSE3ePYG3mtX71NIGCtGLT/U+heYKLFl80Q288
+ NDDOuKCfChTKQnT1TO4A3iHJBUcm2GH5eQfKisbIr0fGMwWJmzfkkbw/JRUDDgsPLZf+gg4zpbg
+ YuDDMuht91nrSsN6M3frGjU78FZxQBTizKPNnlYBi9rEhb+sN0amzbmmQHOiOLtx/CWe71UQuQu
+ xZRpzua8GypLhrf83niYHYJRoY3H6cihvbNg4Yh/mS87pjun48IYIRWWPRW8PyPsuDd+Zfow2uU
+ 2BgXIq8hNqRm+cw==
+X-Developer-Key: i=sudeep.holla@arm.com; a=openpgp;
+ fpr=7360A21742ADF5A11767C1C139CFD4755FE2D5B4
 
-On Mon, Mar 17, 2025 at 6:00=E2=80=AFPM Antonio Quartulli <antonio@openvpn.=
-net> wrote:
->
-> On 17/03/2025 10:41, Qingfang Deng wrote:
-> > Hi Antonio,
-> >
-> > On Mon, Mar 17, 2025 at 5:23=E2=80=AFPM Antonio Quartulli <antonio@open=
-vpn.net> wrote:
-> >>>> +static void ovpn_setup(struct net_device *dev)
-> >>>> +{
-> >>>> +    netdev_features_t feat =3D NETIF_F_SG | NETIF_F_HW_CSUM | NETIF=
-_F_RXCSUM |
-> >>>
-> >>> Do not advertise NETIF_F_HW_CSUM or NETIF_F_RXCSUM, as TX/RX checksum=
- is
-> >>> not handled in hardware.
-> >>
-> >> The idea behind these flags was that the OpenVPN protocol will take ca=
-re
-> >> of authenticating packets, thus substituting what the CSUM would do he=
-re.
-> >> For this I wanted to avoid the stack to spend time computing the CSUM =
-in
-> >> software.
-> >
-> > For the RX part (NETIF_F_RXCSUM), you might be correct, but in patch
-> > 08 you wrote:
-> >> /* we can't guarantee the packet wasn't corrupted before entering the
-> >> * VPN, therefore we give other layers a chance to check that
-> >> */
-> >> skb->ip_summed =3D CHECKSUM_NONE;
->
-> Right. This was the result after a lengthy discussion with Sabrina.
-> Despite authenticating what enters the tunnel, we indeed concluded it is
-> better to let the stack verify that what entered was not corrupted.
->
-> >
-> > So NETIF_F_RXCSUM has no effect.
->
-> Does it mean I can drop NETIF_F_RXCSUM and also the line
->
-> skb->ip_summed =3D CHECKSUM_NONE;
->
-> at the same time?
+Recently when debugging why one of the scmi platform device was not
+showing up under /sys/devices/platform/firmware:scmi instead was
+appearing directly under /sys/devices/platform, I noticed the new
+faux interface /sys/devices/faux.
 
-I don't think so. skb->ip_summed might have been set to
-CHECKSUM_UNNECESSARY on the lower layer with UDP/TCP RX checksum.
+Looking through the discussion and the background, I got excited and
+took the opportunity to clear all the platform devices under
+/sys/devices/platform on the Arm Juno/FVP platforms that are really
+faux devices. Only the platform devices created for the device nodes
+from the DT remain under /sys/devices/platform after these changes.
 
->
-> >
-> > For the TX part (NETIF_F_HW_CSUM) however, I believe wireguard made
-> > the same mistake.
-> > Your code both contains the pattern:
-> >
-> > if (skb->ip_summed =3D=3D CHECKSUM_PARTIAL && skb_checksum_help(skb)) /=
-/ ...
-> >
-> > NETIF_F_HW_CSUM causes the upper layers to send packets with
-> > CHECKSUM_PARTIAL, assuming hardware offload will complete the
-> > checksum, but if skb_checksum_help(skb) is invoked, the checksum is
-> > still computed in software. This means there's no real benefit unless
-> > there's an actual hardware offload mechanism.
->
-> Got it.
-> Then as per your suggestion I can drop both NETIF_F_HW_CSUM and the
-> if/call to skb_checksum_help().
->
-> Regards,
->
-> >
-> > +Cc: zx2c4
-> >
-> >>
-> >> I believe wireguard sets those flags for the same reason.
-> >>
-> >> Does it make sense to you?
-> >>
-> >>>
-> >>>> +                             NETIF_F_GSO | NETIF_F_GSO_SOFTWARE |
-> >>>> +                             NETIF_F_HIGHDMA;
-> >>
-> >>
-> >> Regards,
-> >>
-> >> --
-> >> Antonio Quartulli
-> >> OpenVPN Inc.
-> >>
->
-> --
-> Antonio Quartulli
-> OpenVPN Inc.
->
+All the patches are independent of each other.
+
+Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+---
+Greg Kroah-Hartman (1):
+      regulator: dummy: convert to use the faux device interface
+
+Sudeep Holla (8):
+      cpuidle: psci: Transition to the faux device interface
+      hwrng: arm-smccc-trng - transition to the faux device interface
+      efi: Remove redundant creation of the "efivars" platform device
+      rtc: efi: Transition to the faux device interface
+      virt: efi_secret: Transition to the faux device interface
+      ASoC: soc-utils: Transition to the faux device interface
+      net: phy: fixed_phy: transition to the faux device interface
+      ACPI: APEI: EINJ: Transition to the faux device interface
+
+ drivers/acpi/apei/einj-core.c             | 32 +++++++++---------------
+ drivers/char/hw_random/arm_smccc_trng.c   | 40 +++++++++++++++++++++---------
+ drivers/cpuidle/cpuidle-psci.c            | 26 +++++++-------------
+ drivers/firmware/efi/efi.c                | 10 --------
+ drivers/firmware/smccc/smccc.c            | 21 ----------------
+ drivers/net/phy/fixed_phy.c               | 16 ++++++------
+ drivers/regulator/dummy.c                 | 37 +++++++---------------------
+ drivers/rtc/rtc-efi.c                     | 31 ++++++++++++++++-------
+ drivers/virt/coco/efi_secret/efi_secret.c | 41 ++++++++++++++++++-------------
+ sound/soc/soc-utils.c                     | 34 +++++++++----------------
+ 10 files changed, 124 insertions(+), 164 deletions(-)
+---
+base-commit: 80e54e84911a923c40d7bee33a34c1b4be148d7a
+change-id: 20250315-plat2faux_dev-8c28b35be96a
+-- 
+Regards,
+Sudeep
+
 
