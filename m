@@ -1,108 +1,152 @@
-Return-Path: <netdev+bounces-175258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CD7BA64A09
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 11:32:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B916FA64A0E
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 11:34:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A3F318891AE
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 10:29:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 138B5188AB49
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 10:30:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5607233702;
-	Mon, 17 Mar 2025 10:28:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49AAE2236FD;
+	Mon, 17 Mar 2025 10:29:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="x+bhBU1o"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h/SNH52u"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C7313B7A3;
-	Mon, 17 Mar 2025 10:28:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 214F41459F7;
+	Mon, 17 Mar 2025 10:29:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742207329; cv=none; b=QkysIlZJZjHfv7Mben8gydjhfOnEEeZP89hFVDR2pC5xlMsi7hXpFeu/7LPtn6u33uTtNxeIus4q9prdLd171jd2/3L57QQVLY5czLmHYY70KQKJyxpWdK0b+QK1oqtd3JenF33phWcAFbfc1YQpr8OLWT/9OR9g31UPg8Sk/Ko=
+	t=1742207398; cv=none; b=CByDiTfmshg7X2AXY5dsjRN3oIcMORLt8ESFEfAtJF2xGO+NXHn437x9o8QBTwbEF5pq/VWLllTFao81QJziWJv4MYDNDtpwXkeNw49W6ELlSAQztTS9ZhZHQNIej8n5srORvSt0FY4pYzV4F8zYfIeyuOpGt+qGfpsbLqcUdu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742207329; c=relaxed/simple;
-	bh=D475GWEV9xZkUiRyncrmvUAsUnBc2KaZ13XrCGru9zM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QhjenMTA76+UoCm2sC1trQUXalT46oQoGYJSXx5TPiIBjBK4l2wbvB8k1zWhMOe4Esf5MJHVeRXWpbeC9sCQPqJISBwqtBaSML0+Xa4AG5Ihe4IkhyqLgjQH5BNojNQ1NXNYM2BkMeXqx/HF1coz2dED5szYlMxmYvZHRklZn6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=x+bhBU1o; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=tzhM71c7XeDXnGaEMVePBynM75aidEmqvkMrNMTXDQI=; b=x+bhBU1ozAin+2pMbdUoolbzcR
-	1tX9ivxR2w4CSndXSYOkO5+ofjj2hAwRUz84zpzsZ5dsxVJTvAxC+GNIaiSL0zd4wwNDGU+ikEeVu
-	BdbNJDByWGYrQHs3kLGFjSG28wG8ZACc33HVSuG76dToZo1BdiP6DCXR/xzngvWxd+TRtXvf8DQYU
-	0QsVEhG/X1Zl7ryUyFsCX0eItCYNHFksGz58gKP/Cwzrdr0oPiYILhiCEzST1dgGSYFEvQOln5UCN
-	nr6nIs1c1af+w8D1HiWbRDz6EYdj8Q+A82eE7ymRgQRM9MEeyLJxws60pBKLJ9oyE3f3qP+ToYsCh
-	GiOgrpMA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54150)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tu7i0-0003Ll-1n;
-	Mon, 17 Mar 2025 10:28:36 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tu7hx-0003U7-1w;
-	Mon, 17 Mar 2025 10:28:33 +0000
-Date: Mon, 17 Mar 2025 10:28:33 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: Jim Liu <jim.t90615@gmail.com>, JJLIU0@nuvoton.com,
-	florian.fainelli@broadcom.com, andrew@lunn.ch, hkallweit1@gmail.com,
-	kuba@kernel.org, edumazet@google.com, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1] net: phy: broadcom: Correct BCM5221 PHY model
- detection failure
-Message-ID: <Z9f5UQPRTPT8lbXm@shell.armlinux.org.uk>
-References: <20250317035005.3064083-1-JJLIU0@nuvoton.com>
- <Z9fhqbfoQGSm1Njx@mev-dev.igk.intel.com>
+	s=arc-20240116; t=1742207398; c=relaxed/simple;
+	bh=xrD7KE1k+H1Nc/t93XgQlgKaIsN4lFSxsm+U0bjj+xA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=b2zNtEZoM9MIOZrIhGFPz4fmBqzN/q+dvrWTxAYN6WFXWSp/4sy0TIXvKyYjYSoU/FSa5UCUcu6J+PXi1ex1tRUiqewccszWz6+Q/obrvwoQRjUNnMn+bQoCqJHb99I4jurOh8Zx5sHTJfkqJtgTjt34w6Gw2IcOUy7E6wSe4KU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h/SNH52u; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5398BC4CEE3;
+	Mon, 17 Mar 2025 10:29:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742207397;
+	bh=xrD7KE1k+H1Nc/t93XgQlgKaIsN4lFSxsm+U0bjj+xA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=h/SNH52u6OpVd5Vt54HwN0ScwOPm4VDjF35j0KHfLm27yOaGC1SSlhEKyESZESOoC
+	 LJFJvwSdgv5a3nRJw8oUSileks/Vv0yZkiKz525ZSR1jH22bw/EPUWnwPsPGBI/ke3
+	 G6leTGCBf0DT8vCkv0jr+w3XJfeOhZbXXSo4wOv8nCdeIgGrO8S5i0oYedaQsdYp3X
+	 nj2WgCnYnpZZuN41owN/pFNXx2QHVg/zjLezlGcLS9cuqcve16iCLJXRfEr2AGVwN1
+	 ZPz6ZnMj9f0wvf+px8QCiT6wcl8G9jfU++WSHaCXCrtHT9eEhP2aGN+fJOQhE4LsKM
+	 sUlTpW81de8wQ==
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 9640F18FAE48; Mon, 17 Mar 2025 11:29:43 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, Ricardo =?utf-8?Q?Ca?=
+ =?utf-8?Q?=C3=B1uelo?= Navarro
+ <rcn@igalia.com>, Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko
+ <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, "David S.
+ Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [RFC] Use after free in BPF/ XDP during XDP_REDIRECT
+In-Reply-To: <20250314172749.hsmtyM3N@linutronix.de>
+References: <20250313183911.SPAmGLyw@linutronix.de> <87ecz0u3w9.fsf@toke.dk>
+ <20250313203226.47_0q7b6@linutronix.de> <871pv0rmr8.fsf@toke.dk>
+ <20250314153041.9BKexZXH@linutronix.de> <875xkbha5k.fsf@toke.dk>
+ <20250314172749.hsmtyM3N@linutronix.de>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Mon, 17 Mar 2025 11:29:43 +0100
+Message-ID: <874izshrvs.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z9fhqbfoQGSm1Njx@mev-dev.igk.intel.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 17, 2025 at 09:47:37AM +0100, Michal Swiatkowski wrote:
-> It will be nice to have wider explanation what it is fixing in commit
-> message. Is phydev->phy_id different than phydev->driver->phy_id? Looks
-> like masking isn't crucial as phydev->driver->phy_id is initialized by
-> PHY_ID_BCM5221 which is already masked.
+Sebastian Andrzej Siewior <bigeasy@linutronix.de> writes:
 
-The two are very different, and this driver just gets it totally wrong.
+> On 2025-03-14 17:03:35 [+0100], Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>> > While at it, is there anything that ensures that only bpf_prog_run_xdp=
+()
+>> > can invoke the map_redirect callback? Mainline only assigns the task
+>> > pointer in NAPI callback so any usage outside of bpf_prog_run_xdp() wi=
+ll
+>> > lead to a segfault and I haven't seen a report yet so=E2=80=A6
+>>=20
+>> Yes, the verifier restricts which program types can call the
+>> map_redirect helper.
+>
+> Okay. So checks for the BPF_PROG_TYPE_XDP type for the map_redirect and
+> that is the only one setting it. Okay. Now I remember Alexei mentioning
+> something=E2=80=A6
 
-phydev->phy_id is the ID read from the PHY. It includes the revision
-field.
+Yeah, there's basically a mapping between BPF program types and the
+available helpers. For XDP this is in xdp_func_proto() in net/core/filter.c.
 
-phydev->drv is one of the phy_driver entries at the bottom of the file.
-These contain whatever the driver author puts there, which in this
-case would be PHY_ID_BCM5221, and PHY_ID_BCM5221 is defined without
-the revision number.
+>> > --- a/include/net/xdp.h
+>> > +++ b/include/net/xdp.h
+>> > @@ -486,7 +486,12 @@ static __always_inline u32 bpf_prog_run_xdp(const=
+ struct bpf_prog *prog,
+>> >  	 * under local_bh_disable(), which provides the needed RCU protection
+>> >  	 * for accessing map entries.
+>> >  	 */
+>> > -	u32 act =3D __bpf_prog_run(prog, xdp, BPF_DISPATCHER_FUNC(xdp));
+>> > +	struct bpf_redirect_info *ri =3D this_cpu_ptr(&bpf_redirect_info);
+>> > +	u32 act;
+>> > +
+>>=20
+>> Add an if here like
+>>=20
+>> if (ri->map_id | ri->map_type) { /* single | to make it a single branch =
+*/
+>>=20
+>> > +	ri->map_id =3D INT_MAX;
+>> > +	ri->map_type =3D BPF_MAP_TYPE_UNSPEC;
+>>=20
+>> }
+>>=20
+>> Also, ri->map_id should be set to 0, not INT_MAX.
+>
+> The or variant does
+>
+> |         add %gs:this_cpu_off(%rip), %rax        # this_cpu_off, tcp_ptr=
+__
+> |         movl    32(%rax), %edx  # _51->map_id, _51->map_id
+> |         orl     36(%rax), %edx  # _51->map_type, tmp311
+> |         je      .L1546  #,
+> |         movq    $0, 32(%rax)    #, MEM <vector(2) unsigned int> [(unsig=
+ned int *)_51 + 32B]
+> | .L1546:
+>
+> while the || does
+>
+> |         add %gs:this_cpu_off(%rip), %rax        # this_cpu_off, tcp_ptr=
+__
+> |         cmpq    $0, 32(%rax)    #, *_51
+> |         je      .L1546  #,
+> |         movq    $0, 32(%rax)    #, MEM <vector(2) unsigned int> [(unsig=
+ned int *)_51 + 32B]
+> | .L1546:
+>
+> gcc isn't bad at optimizing here ;)
 
-So doing the masking is entirely redundant if you're comparing the
-drv->phy_id that was initialised with a definition against the same
-definition.
+Ohh, neat! Didn't consider that this is two U32s, so they can be loaded
+in one go. That's what I get from trying to second-guess the compiler, I
+suppose :)
 
-As pointed out in my review with v2, there's more problems in this
-driver _because_ this has not been understood. In an attempt to get
-rid of some of this stuff, I introduced phydev_id_compare() and
-phy_id_compare() helpers into core phylib code, but didn't get
-around to updating broadcom.c. See my comments against v2.
+Let's just go with the obvious one (||) instead of the OR thing, then.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> This is the or version as asked for. I don't mind doing any of the both.
+> I everyone agrees then I would send it to Greg.
+
+Sure, with the above, feel free to add my:
+
+Acked-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@kernel.org>
 
