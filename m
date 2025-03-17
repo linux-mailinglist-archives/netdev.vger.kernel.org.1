@@ -1,164 +1,141 @@
-Return-Path: <netdev+bounces-175219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB050A646AC
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 10:10:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EBB4A6471D
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 10:23:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99F381894919
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 09:09:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AADC33AB985
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 09:22:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FA83221F1B;
-	Mon, 17 Mar 2025 09:09:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF8C4222561;
+	Mon, 17 Mar 2025 09:22:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mxct.zte.com.cn (mxct.zte.com.cn [183.62.165.209])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23A53221F15;
-	Mon, 17 Mar 2025 09:09:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=183.62.165.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B9C22171B
+	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 09:22:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742202565; cv=none; b=C+je3R5wm8KbB+i7yzu4aJx/eYTMl16zg6+3GFFq1kjN+/ukOEhW1try/4b9qH0UDw3LHK0HxhdCjUKb9TOjntXr/Q9dYowfz2aG/uBGPOx+LGrRu4qP6aLXQed+CZovgPj8ahbRTP8d0QKHogbR2vHo+2AzBlUsTUjLtcmc0q8=
+	t=1742203345; cv=none; b=AJLTf3vpIJM1oL02a5qe7Hl4dUa0YzMIhBv+yIx5h4p+TVb77iQoFxqYTDvx2lRq5eZ3M/MAU/esZFadrIPayB+DnH4A+a/yXG5usVYXWAwHMrWaaOfddZGrtMsUEZXTx8pV2GQJZsSgSXMMbbXRx19D9JCj0zyzqlzOG4bCa5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742202565; c=relaxed/simple;
-	bh=A58IKkT2v4JxafP4IjCwILzRT1z9Vw+XfcSbYNDROaE=;
-	h=Date:Message-ID:In-Reply-To:References:Mime-Version:From:To:Cc:
-	 Subject:Content-Type; b=bIdubHFPn+dXoe9wwuyckKE2gLLvTZK7XjFOZq59dglcZdznMO7rR/aRLhwFaRrt76lRXu58MszQnv/S39qx2l/zMX8oToos9Fi7gyQNlgsb8njEhcKeIlI+smtp42U+L2eWP56PjoEbFFk+pJNw/oGsVqTm3j3QKcISf7fbJHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=183.62.165.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mxct.zte.com.cn (FangMail) with ESMTPS id 4ZGTgH3yMRz501gV;
-	Mon, 17 Mar 2025 17:09:15 +0800 (CST)
-Received: from xaxapp02.zte.com.cn ([10.88.97.241])
-	by mse-fl1.zte.com.cn with SMTP id 52H98xbl059278;
-	Mon, 17 Mar 2025 17:08:59 +0800 (+08)
-	(envelope-from tang.dongxing@zte.com.cn)
-Received: from mapi (xaxapp01[null])
-	by mapi (Zmail) with MAPI id mid32;
-	Mon, 17 Mar 2025 17:09:02 +0800 (CST)
-Date: Mon, 17 Mar 2025 17:09:02 +0800 (CST)
-X-Zmail-TransId: 2af967d7e6ae63b-29978
-X-Mailer: Zmail v1.0
-Message-ID: <20250317170902154iQh7_gBiO8KjCrFrhnAqn@zte.com.cn>
-In-Reply-To: <e0204a28-7e3a-48f9-aea9-20b35294ada6@kernel.org>
-References: 20250317155102808MZdMkiovw52X0oY7n47wI@zte.com.cn,e0204a28-7e3a-48f9-aea9-20b35294ada6@kernel.org
+	s=arc-20240116; t=1742203345; c=relaxed/simple;
+	bh=RCXMiTQVBNYBPJfpmsdm6M3UyDf5ie66TGTqQRiknF8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hy9nuepDgKZwa8QyrZV8ECi/1lseKJ6OiUwnizE+IzKeCZSlwAb+Vacd9f6TmELJoD5Kuyewl0WIPF4k5vhYwusKCqX8DdCuK6v4LIVa0Dx9VgpZfQIh5i6uPFLr57Z9JG0vQGEu5UEsmkBBSwc3qRRtYi6uVeNCDX9EAfu2X7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tu6fD-0006qI-Un; Mon, 17 Mar 2025 10:21:39 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tu6f8-000Dix-1r;
+	Mon, 17 Mar 2025 10:21:35 +0100
+Received: from pengutronix.de (p5b1645f7.dip0.t-ipconnect.de [91.22.69.247])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 1974B3DD0DA;
+	Mon, 17 Mar 2025 09:13:43 +0000 (UTC)
+Date: Mon, 17 Mar 2025 10:13:42 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Ming Yu <a0282524688@gmail.com>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
+	brgl@bgdev.pl, andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org, 
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH v8 4/7] can: Add Nuvoton NCT6694 CANFD support
+Message-ID: <20250317-cuttlefish-of-simple-champagne-ee666c-mkl@pengutronix.de>
+References: <20250225081644.3524915-1-a0282524688@gmail.com>
+ <20250225081644.3524915-5-a0282524688@gmail.com>
+ <20250227-spicy-grebe-of-dignity-68c847-mkl@pengutronix.de>
+ <CAOoeyxWSsy0Q0Y7iJE8-DZM5Yvcdto8mncFkM8X4BvVMEgfUiQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <tang.dongxing@zte.com.cn>
-To: <krzk@kernel.org>
-Cc: <davem@davemloft.net>, <feng.wei8@zte.com.cn>, <shao.mingyin@zte.com.cn>,
-        <xie.ludan@zte.com.cn>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <horms@kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yang.guang5@zte.com.cn>,
-        <yang.yang29@zte.com.cn>, <ye.xingchen@zte.com.cn>,
-        <xu.xin16@zte.com.cn>
-Subject: =?UTF-8?B?UmU6IFtQQVRDSF0gbmV0OiBhdG06IHVzZSBzeXNmc19lbWl0X2F0KCkgaW5zdGVhZCBvZiBzY25wcmludGYoKQ==?=
-Content-Type: multipart/mixed;
-	boundary="=====_001_next====="
-X-MAIL:mse-fl1.zte.com.cn 52H98xbl059278
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 67D7E6BB.000/4ZGTgH3yMRz501gV
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="23gmkzuie32cja6b"
+Content-Disposition: inline
+In-Reply-To: <CAOoeyxWSsy0Q0Y7iJE8-DZM5Yvcdto8mncFkM8X4BvVMEgfUiQ@mail.gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 
+--23gmkzuie32cja6b
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v8 4/7] can: Add Nuvoton NCT6694 CANFD support
+MIME-Version: 1.0
 
---=====_001_next=====
-Content-Type: multipart/related;
-	boundary="=====_002_next====="
+On 17.03.2025 10:24:11, Ming Yu wrote:
+[...]
+> > > +     priv->can.clock.freq =3D can_clk;
+> > > +     priv->can.bittiming_const =3D &nct6694_can_bittiming_nominal_co=
+nst;
+> > > +     priv->can.data_bittiming_const =3D &nct6694_can_bittiming_data_=
+const;
+> > > +     priv->can.do_set_mode =3D nct6694_can_set_mode;
+> > > +     priv->can.do_get_berr_counter =3D nct6694_can_get_berr_counter;
+> > > +     priv->can.ctrlmode_supported =3D CAN_CTRLMODE_LOOPBACK |
+> > > +             CAN_CTRLMODE_LISTENONLY | CAN_CTRLMODE_BERR_REPORTING |
+> > > +             CAN_CTRLMODE_FD | CAN_CTRLMODE_FD_NON_ISO;
+> >
+> > Does your device run in CAN-FD mode all the time? If so, please use
+> > can_set_static_ctrlmode() to set it after priv->can.ctrlmode_supported
+> > and remove CAN_CTRLMODE_FD from ctrlmode_supported.
+> >
+>=20
+> Our device is designed to allow users to dynamically switch between
+> Classical CAN and CAN-FD mode via ip link set ... fd on/off.
+> Therefore, CAN_CTRLMODE_FD needs to remain in ctrlmode_supported, and
+> can_set_static_ctrlmode() is not suitable in this case.
+> Please let me know if you have any concerns about this approach.
 
+Where do you evaluate if the user has configured CAN_CTRLMODE_FD or not?
 
---=====_002_next=====
-Content-Type: multipart/alternative;
-	boundary="=====_003_next====="
+regards,
+Marc
 
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
---=====_003_next=====
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
+--23gmkzuie32cja6b
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Pk9uIDE3LzAzLzIwMjUgMDg6NTEsIHRhbmcuZG9uZ3hpbmdAenRlLmNvbS5jbiB3cm90ZTo+IEZy
-b206IFRhbmdEb25neGluZyA8dGFuZy5kb25neGluZ0B6dGUuY29tLmNuPg0KPj4gDQo+PiBGb2xs
-b3cgdGhlIGFkdmljZSBpbiBEb2N1bWVudGF0aW9uL2ZpbGVzeXN0ZW1zL3N5c2ZzLnJzdDoNCj4+
-IHNob3coKSBzaG91bGQgb25seSB1c2Ugc3lzZnNfZW1pdCgpIG9yIHN5c2ZzX2VtaXRfYXQoKSB3
-aGVuIGZvcm1hdHRpbmcNCj4+IHRoZSB2YWx1ZSB0byBiZSByZXR1cm5lZCB0byB1c2VyIHNwYWNl
-Lg0KPj4gDQo+PiBTaWduZWQtb2ZmLWJ5OiBUYW5nIERvbmd4aW5nIDx0YW5nLmRvbmd4aW5nQHp0
-ZS5jb20uY24+RGVhciBaVEUsDQo+DQo+Q2FuIHlvdSBzbG93IGRvd24/IFlvdSBzZW50IGEgYnVu
-Y2ggb2YgZW1haWxzIHdpdGggc2ltaWxhciBpc3N1ZXMgd2hpY2gNCj5tZWFucyB0aGF0IGRvemVu
-IG9mIG1haW50YWluZXJzIHdpbGwgZGVhbCB3aXRoIHRoZSBzYW1lIGlzc3Vlcw0KPmluZGVwZW5k
-ZW50bHkuIFRoaXMgbG9va3MgbGlrZSBhbm90aGVyIHZpdm8gb3IgaHVhd2VpIHN0eWxlIHN1Ym1p
-c3Npb24sDQo+bGVhZGluZyB0byBidWdzIHNuZWFrZWQgdmlhIGZsb29kIG9mIHBhdGNoZXMuDQo+
-DQo+Rmlyc3QsIGZpeCB0aGUgbmFtZSB1c2VkIGluIHRoZSBTb0IgKHNlZSBzdWJtaXR0aW5nIHBh
-dGNoZXMpIHRvIG1hdGNoDQo+TGF0aW4gdHJhbnNjcmlwdGlvbi4NCj4NCj5TZWNvbmQsIHVzZSBw
-cm9wZXIgU29CIGNoYWluLCBzZWUgc3VibWl0dGluZyBwYXRjaGVzLg0KPg0KPlRoaXJkLCByZWFs
-bHksIHJlYWxseSBiZSBzdXJlIHRoYXQgd2hhdCB5b3Ugc2VuZCBpcyBjb3JyZWN0LiBZb3UgYWxy
-ZWFkeQ0KPmdvdCBxdWl0ZSByZXNwb25zZXMsIGJ1dCB5b3Ugc3RpbGwga2VlcCBzZW5kaW5nIHBh
-dGNoZXMuDQo+DQo+Rm91cnRoLCByZXNwb25kIHRvIHJlY2VpdmVkIGZlZWRiYWNrIGluc3RlYWQg
-b2YgZmxvb2RpbmcgdXMgd2l0aCBtb3JlIG9mDQo+dGhpcyENCg0KRGVhciBLcnp5c3p0b2YsDQpU
-aGFuayB5b3UgZm9yIHlvdXIgZmVlZGJhY2suIEkgYXBvbG9naXplIGZvciBteSBwcmV2aW91cyBz
-dWJtaXNzaW9ucy4NClJlZ2FyZGluZyB0aGUgaXNzdWVzIHlvdSd2ZSBwb2ludGVkIG91dDoNCkkg
-d2lsbCBjb3JyZWN0IHRoZSBuYW1lIHVzZWQgaW4gdGhlIFNvQiB0byBlbnN1cmUgaXQgbWF0Y2hl
-cyB0aGUgTGF0aW4gdHJhbnNjcmlwdGlvbiBhcyByZXF1aXJlZC4NCkkgd2lsbCBkb3VibGUtY2hl
-Y2sgbXkgd29yayBiZWZvcmUgc2VuZGluZyBhbnkgZnVydGhlciB1cGRhdGVzLg0KSSBhcHByZWNp
-YXRlIHlvdXIgZ3VpZGFuY2UgYW5kIHdpbGwgZm9sbG93IHRoZSBzdWJtaXNzaW9uIGd1aWRlbGlu
-ZXMgbW9yZSBjYXJlZnVsbHkgZ29pbmcgZm9yd2FyZC4gSWYgeW91IGhhdmUgYW55IGZ1cnRoZXIg
-YWR2aWNlIG9yIHJlc291cmNlcyB0byBoZWxwIG1lIGltcHJvdmUgbXkgc3VibWlzc2lvbnMsIEkg
-d291bGQgYmUgZ3JhdGVmdWwgZm9yIHlvdXIgaW5wdXQuDQpCZXN0IHJlZ2FyZHMsIA0KVGFuZyBE
-b25neGluZw==
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmfX58MACgkQDHRl3/mQ
+kZwFAQf9GoWsVJLES07w392fRsnC/rJTEBHJ+gWGk0Zaqdl7cUlNxdf7ITy2fLQT
+jVyEF5A8MMT/txn8IyEHDiz1XQ5ptSoQZCQZzZSCAyTF/t4c5MFH9QyKlhvzocSY
+xEg4egeM/22pi+2Y+H7Ft6ueQ2gJUgtMnTVpEefren3c+dgDVAOu9gfJGh2XikpF
+Iq6S4h/5UXf60oM/NNhtp/ApUqbcAzfVll1i2C6RhEDVM1jw6CF8qZ5lRMUCAGO5
+ZGcps/NHX9dD4Z9bz5EKQ0vp04JBZC5mxEegZN72Mlj4NAPBYklROlG4qPBc6Qvn
+ly1l8zW07HNRO/FpuxTOgjisVpV65A==
+=jXP5
+-----END PGP SIGNATURE-----
 
---=====_003_next=====
-Content-Type: text/html ;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-
-PGRpdiBjbGFzcz0iemNvbnRlbnRSb3ciPjxwPiZndDtPbiAxNy8wMy8yMDI1IDA4OjUxLCB0YW5n
-LmRvbmd4aW5nQHp0ZS5jb20uY24gd3JvdGU6Jmd0OyBGcm9tOiBUYW5nRG9uZ3hpbmcgJmx0O3Rh
-bmcuZG9uZ3hpbmdAenRlLmNvbS5jbiZndDs8L3A+PHA+Jmd0OyZndDsmbmJzcDs8L3A+PHA+Jmd0
-OyZndDsgRm9sbG93IHRoZSBhZHZpY2UgaW4gRG9jdW1lbnRhdGlvbi9maWxlc3lzdGVtcy9zeXNm
-cy5yc3Q6PC9wPjxwPiZndDsmZ3Q7IHNob3coKSBzaG91bGQgb25seSB1c2Ugc3lzZnNfZW1pdCgp
-IG9yIHN5c2ZzX2VtaXRfYXQoKSB3aGVuIGZvcm1hdHRpbmc8L3A+PHA+Jmd0OyZndDsgdGhlIHZh
-bHVlIHRvIGJlIHJldHVybmVkIHRvIHVzZXIgc3BhY2UuPC9wPjxwPiZndDsmZ3Q7Jm5ic3A7PC9w
-PjxwPiZndDsmZ3Q7IFNpZ25lZC1vZmYtYnk6IFRhbmcgRG9uZ3hpbmcgJmx0O3RhbmcuZG9uZ3hp
-bmdAenRlLmNvbS5jbiZndDtEZWFyIFpURSw8L3A+PHA+Jmd0OzwvcD48cD4mZ3Q7Q2FuIHlvdSBz
-bG93IGRvd24/IFlvdSBzZW50IGEgYnVuY2ggb2YgZW1haWxzIHdpdGggc2ltaWxhciBpc3N1ZXMg
-d2hpY2g8L3A+PHA+Jmd0O21lYW5zIHRoYXQgZG96ZW4gb2YgbWFpbnRhaW5lcnMgd2lsbCBkZWFs
-IHdpdGggdGhlIHNhbWUgaXNzdWVzPC9wPjxwPiZndDtpbmRlcGVuZGVudGx5LiBUaGlzIGxvb2tz
-IGxpa2UgYW5vdGhlciB2aXZvIG9yIGh1YXdlaSBzdHlsZSBzdWJtaXNzaW9uLDwvcD48cD4mZ3Q7
-bGVhZGluZyB0byBidWdzIHNuZWFrZWQgdmlhIGZsb29kIG9mIHBhdGNoZXMuPC9wPjxwPiZndDs8
-L3A+PHA+Jmd0O0ZpcnN0LCBmaXggdGhlIG5hbWUgdXNlZCBpbiB0aGUgU29CIChzZWUgc3VibWl0
-dGluZyBwYXRjaGVzKSB0byBtYXRjaDwvcD48cD4mZ3Q7TGF0aW4gdHJhbnNjcmlwdGlvbi48L3A+
-PHA+Jmd0OzwvcD48cD4mZ3Q7U2Vjb25kLCB1c2UgcHJvcGVyIFNvQiBjaGFpbiwgc2VlIHN1Ym1p
-dHRpbmcgcGF0Y2hlcy48L3A+PHA+Jmd0OzwvcD48cD4mZ3Q7VGhpcmQsIHJlYWxseSwgcmVhbGx5
-IGJlIHN1cmUgdGhhdCB3aGF0IHlvdSBzZW5kIGlzIGNvcnJlY3QuIFlvdSBhbHJlYWR5PC9wPjxw
-PiZndDtnb3QgcXVpdGUgcmVzcG9uc2VzLCBidXQgeW91IHN0aWxsIGtlZXAgc2VuZGluZyBwYXRj
-aGVzLjwvcD48cD4mZ3Q7PC9wPjxwPiZndDtGb3VydGgsIHJlc3BvbmQgdG8gcmVjZWl2ZWQgZmVl
-ZGJhY2sgaW5zdGVhZCBvZiBmbG9vZGluZyB1cyB3aXRoIG1vcmUgb2Y8L3A+PHA+Jmd0O3RoaXMh
-PC9wPjxwPjxicj48L3A+PHA+RGVhciBLcnp5c3p0b2YsPC9wPjxwPlRoYW5rIHlvdSBmb3IgeW91
-ciBmZWVkYmFjay4gSSBhcG9sb2dpemUgZm9yIG15IHByZXZpb3VzIHN1Ym1pc3Npb25zLjwvcD48
-cD5SZWdhcmRpbmcgdGhlIGlzc3VlcyB5b3UndmUgcG9pbnRlZCBvdXQ6PC9wPjxwPkkgd2lsbCBj
-b3JyZWN0IHRoZSBuYW1lIHVzZWQgaW4gdGhlIFNvQiB0byBlbnN1cmUgaXQgbWF0Y2hlcyB0aGUg
-TGF0aW4gdHJhbnNjcmlwdGlvbiBhcyByZXF1aXJlZC48L3A+PHA+SSB3aWxsIGRvdWJsZS1jaGVj
-ayBteSB3b3JrIGJlZm9yZSBzZW5kaW5nIGFueSBmdXJ0aGVyIHVwZGF0ZXMuPC9wPjxwPkkgYXBw
-cmVjaWF0ZSB5b3VyIGd1aWRhbmNlIGFuZCB3aWxsIGZvbGxvdyB0aGUgc3VibWlzc2lvbiBndWlk
-ZWxpbmVzIG1vcmUgY2FyZWZ1bGx5IGdvaW5nIGZvcndhcmQuIElmIHlvdSBoYXZlIGFueSBmdXJ0
-aGVyIGFkdmljZSBvciByZXNvdXJjZXMgdG8gaGVscCBtZSBpbXByb3ZlIG15IHN1Ym1pc3Npb25z
-LCBJIHdvdWxkIGJlIGdyYXRlZnVsIGZvciB5b3VyIGlucHV0LjwvcD48cD5CZXN0IHJlZ2FyZHMs
-Jm5ic3A7PC9wPjxwPlRhbmcgRG9uZ3hpbmc8L3A+PHA+PGJyPjwvcD48L2Rpdj4=
-
-
---=====_003_next=====--
-
---=====_002_next=====--
-
---=====_001_next=====--
-
+--23gmkzuie32cja6b--
 
