@@ -1,64 +1,61 @@
-Return-Path: <netdev+bounces-175303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9539A65024
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 14:03:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 036DEA65030
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 14:05:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 945A61894109
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 13:03:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 310CB1886091
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 13:04:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7C8623C8BB;
-	Mon, 17 Mar 2025 13:03:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 642F223E344;
+	Mon, 17 Mar 2025 13:04:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="goLK9Dhp"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lYp3UZUY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2DD22259A;
-	Mon, 17 Mar 2025 13:03:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81E2523372E;
+	Mon, 17 Mar 2025 13:04:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742216600; cv=none; b=LlouitI/yncX1Fn9yqE1H2OGkkYRES2MI95pYK1Jz6PzJtdMHdgbRE6sZn7go1sW8nfMwT3XuMrDIWzPncxj9SQogMlsOGFu967nn0H7m4d8Gd3WSZD4OFeEJuHlUkwMxwEUhtsNCXB02KKNQsyWxJmsI8mmCrB+V3iZq3Poo0A=
+	t=1742216654; cv=none; b=RTY4quVFi1Ny0tpBvHpgivILf1zB2K93fmgtZL0TuXtDboFzdwkMDreHJcKUhyJrLjT2v4BB5Oc/TkO4Zu212djALFZUqhL3CYFBz4LTRyTgyTIXwZC7KkpHKRZWriqydvYnhXkMno+fV16p4KdWMVKr9f3cqPsxXXdpQRu4Bz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742216600; c=relaxed/simple;
-	bh=fEwQ0C5kR1bbzBiLEQfApgF2TVTQ7AcnbeLV+bPV28U=;
+	s=arc-20240116; t=1742216654; c=relaxed/simple;
+	bh=EHLMuw/JyYlLvDqU6h58lMcp/uEcpIyU1m8aaA3ufQM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MDS46XcIzMn6EHqQQBcx4ZYcs6uxd5qerjcXE9RndGSgOXog/9HCPUbq6L85TayfrcfXuiNii+AlTuMdsAmSuxJ+P//jA54Alxke8IXWvRXpJDZ116WO4kxXomevclsKroRiQ5BfwNHglqdPMYgupsNs8aRwdp/G6Ng7nl4p/d8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=goLK9Dhp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4476C4CEE3;
-	Mon, 17 Mar 2025 13:03:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1742216599;
-	bh=fEwQ0C5kR1bbzBiLEQfApgF2TVTQ7AcnbeLV+bPV28U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=goLK9DhpAOLTYKopLe7M3gDVmm+fXVJUIiZTmjyu5CMRgXsZlrwDJy+GSmN8k4MjP
-	 8WYiYMBl0Jo5dt7260IQmVrKiWobh6hS2rbBhEenaMs8n39NSDLYvGV1BoaIBDGDl9
-	 tXu3q/tih1qNrKApDk3wjPCkD4vUGsQ8X8DuJqHg=
-Date: Mon, 17 Mar 2025 14:01:55 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Sudeep Holla <sudeep.holla@arm.com>
-Cc: linux-kernel@vger.kernel.org, Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	linux-pm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jeff Johnson <jeff.johnson@oss.qualcomm.com>,
-	linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	linux-efi@vger.kernel.org,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	linux-rtc@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-	Takashi Iwai <tiwai@suse.com>, linux-sound@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-	Borislav Petkov <bp@alien8.de>, linux-acpi@vger.kernel.org,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Subject: Re: [PATCH 0/9] drivers: Transition to the faux device interface
-Message-ID: <2025031705-scouting-scolding-8ff7@gregkh>
-References: <20250317-plat2faux_dev-v1-0-5fe67c085ad5@arm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=p2nocHr+SYn4i/ZAAO4eqf5Qvv8Sckh6M7MZ0CmWCTPRvDIWyvVdeihhMyTBRkS2+N8jYTkBWHnIgXxd32lLYH2QdjE+MvFBtbHIKVcdKW6KTb2OYiop9dTj5E8GvSa8V0zihYDRTQXNphkThg8AckrC9jOXvv0wtdual0FvFDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lYp3UZUY; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=QQDJSZlvsPxdtXrcfxhzYY3pnuTPlN7iObJIZ09ja6k=; b=lYp3UZUYsynZHh9SB8+AUqn7QV
+	AyCwpZ8gMkzuLmEHDZlx0CX1cJWd/yocolMKVYsRv55tey9MEQwUSpi36y3RIBZAPtPPkU3wUiSOx
+	ef+YKgM+xnNz05PyqngL0J8pWFoe17d+g4PUZE99fHXCZppS+aSBCwmUiLyNxV/j14aY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tuA8M-0068KE-SL; Mon, 17 Mar 2025 14:03:58 +0100
+Date: Mon, 17 Mar 2025 14:03:58 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jacky Chou <jacky_chou@aspeedtech.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, joel@jms.id.au,
+	andrew@codeconstruct.com.au, ratbert@faraday-tech.com,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-aspeed@lists.ozlabs.org, BMC-SW@aspeedtech.com
+Subject: Re: [net-next 4/4] net: ftgmac100: add RGMII delay for AST2600
+Message-ID: <dc7296b2-e7aa-4cc3-9aa7-44e97ec50fc3@lunn.ch>
+References: <20250317025922.1526937-1-jacky_chou@aspeedtech.com>
+ <20250317025922.1526937-5-jacky_chou@aspeedtech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,27 +64,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250317-plat2faux_dev-v1-0-5fe67c085ad5@arm.com>
+In-Reply-To: <20250317025922.1526937-5-jacky_chou@aspeedtech.com>
 
-On Mon, Mar 17, 2025 at 10:13:12AM +0000, Sudeep Holla wrote:
-> Recently when debugging why one of the scmi platform device was not
-> showing up under /sys/devices/platform/firmware:scmi instead was
-> appearing directly under /sys/devices/platform, I noticed the new
-> faux interface /sys/devices/faux.
-> 
-> Looking through the discussion and the background, I got excited and
-> took the opportunity to clear all the platform devices under
-> /sys/devices/platform on the Arm Juno/FVP platforms that are really
-> faux devices. Only the platform devices created for the device nodes
-> from the DT remain under /sys/devices/platform after these changes.
-> 
-> All the patches are independent of each other.
+> +	u32 rgmii_tx_delay, rgmii_rx_delay;
+> +	u32 dly_reg, tx_dly_mask, rx_dly_mask;
+> +	int tx, rx;
+> +
+> +	netdev = platform_get_drvdata(pdev);
+> +	priv = netdev_priv(netdev);
+> +
+> +	tx = of_property_read_u32(np, "tx-internal-delay-ps", &rgmii_tx_delay);
+> +	rx = of_property_read_u32(np, "rx-internal-delay-ps", &rgmii_rx_delay);
 
-That's great, but you need to send these all independently to each
-subsystem as needed.  Having it all in one series doesn't work for any
-of the maintainers of any of the subsystems.
+> +	if (!tx) {
 
-And I'm glad to see this work happening, thanks for doing that!
+The documentation for of_property_read_u32() says:
 
-greg k-h
+ * Return: 0 on success, -EINVAL if the property does not exist,
+ * -ENODATA if property does not have a value, and -EOVERFLOW if the
+ * property data isn't large enough.
+
+You need to handle EINVAL different to the other errors, which are
+real errors and should fail the probe.
+
+The commit message, and probably the binding needs to document what
+happens when the properties are not in the DT blob. This needs to be
+part of the bigger picture of how you are going to sort out the mess
+with existing .dts files listing 'rgmii' when in fact they should be
+'rgmii-id'.
+
+> +		/* Use tx-internal-delay-ps as index to configure tx delay
+> +		 * into scu register.
+> +		 */
+> +		if (rgmii_tx_delay > 64)
+> +			dev_warn(&pdev->dev, "Get invalid tx delay value");
+
+Return EINVAL and fail the probe.
+
+	Andrew
 
