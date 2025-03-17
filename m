@@ -1,96 +1,110 @@
-Return-Path: <netdev+bounces-175326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C0EFA65253
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 15:08:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0B46A6525F
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 15:10:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7208C18942E6
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 14:08:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1148718889FA
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 14:09:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB0C23F420;
-	Mon, 17 Mar 2025 14:08:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2550C23E35D;
+	Mon, 17 Mar 2025 14:08:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IHDA0cUy"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="28W/+NQd";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="FZuxdFD+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3DE423E35D;
-	Mon, 17 Mar 2025 14:08:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B42022E41D;
+	Mon, 17 Mar 2025 14:08:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742220506; cv=none; b=q8ZSzoBA5y61CVLj3FJf63oNmLOszV+kHiEqaxN9Pm1djHW1k1ZP35+x3t+a2RwNC7EG9fOR44sWfbp/B+FKUZphtXLRK6Ok7ZYquKZ5yzW9Wq3F6knGsTbbJ8wjb0xgADqFOnRAipWOOvwxApwesEYxHikDAZlmbrhjZSpEXWw=
+	t=1742220536; cv=none; b=FwbZL5lTe1yNq18lMn2Gf3dJTKEdBZflJevoJO1PKn5r9HWkeFU6VlBz7WKAORc6WHGnj5cmHFMSv0Dg707APXeJOdGgZlmv1RiIHhMxnEdZAj0yRcCyHhBLOCcHCP9OVdYAsgyidIG47DMSBA1QkdJfl+J7O5NIqKapzyR2rBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742220506; c=relaxed/simple;
-	bh=FEPHIwDyK7Tr4mXhiKsjBTrxFWaEJhWGW9kE0joAnEk=;
+	s=arc-20240116; t=1742220536; c=relaxed/simple;
+	bh=LaBllksMXNcHn9jcIH65hwRzMgxWyFEhpdNoPDS8o4M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z4dUaTOVLO8E3VMxGEjuRKH32XsfAS59J3dt+cvc2kzzP42enH5Zx/KKwYCpf+LTgyLn9GYNqRfmHs+qPiin99ZPLaRLdzaDpqYkaRudLeVh049gjeA7Lw4cfj4shBR7wj0Z7XGfuK1vUxVlMuXrq7YxKmMYfsxzmKUHIWrQ2Z0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IHDA0cUy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CEBFC4CEE3;
-	Mon, 17 Mar 2025 14:08:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742220505;
-	bh=FEPHIwDyK7Tr4mXhiKsjBTrxFWaEJhWGW9kE0joAnEk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IHDA0cUyq4XAc4DX4FKFkAV+J5U7Vgze+OeF+RN+Rt9t8HKtTLr0usCZiG7B9lUX2
-	 78RL7UkwQ6Ov8pRrumSCoWar33zkK0eKVIfpnJ/4M++v9DTmAF1beUrmZr4Y9hnmIj
-	 j2Fo9wQGCb78kV7p4a+OOqe2+ZIoEj2A/B2+8zsoMReBtSGZBGTuB8WxOPz9wJ8T+n
-	 eIvkXDMfzs613KUYOSzoh7/89JTYJIpZCcOZXtXcdeLfDZ/ggfSCiH2j+Il1Ly62of
-	 ewmP9do4wnTyN2jHObK3NFFuhC1bYIpfo7uZhnHmNTgMZhXCwQfxB46a/k91jsq+IU
-	 VunRAG9oVd/AQ==
-Date: Mon, 17 Mar 2025 15:08:16 +0100
-From: Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>
-To: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
-Cc: andersson@kernel.org, mturquette@baylibre.com, sboyd@kernel.org, 
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, konradybcio@kernel.org, 
-	catalin.marinas@arm.com, will@kernel.org, p.zabel@pengutronix.de, 
-	richardcochran@gmail.com, geert+renesas@glider.be, lumag@kernel.org, heiko@sntech.de, 
-	biju.das.jz@bp.renesas.com, quic_tdas@quicinc.com, nfraprado@collabora.com, 
-	elinor.montmasson@savoirfairelinux.com, ross.burton@arm.com, javier.carrasco@wolfvision.net, 
-	ebiggers@google.com, quic_anusha@quicinc.com, linux-arm-msm@vger.kernel.org, 
-	linux-clk@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, quic_varada@quicinc.com, 
-	quic_srichara@quicinc.com
-Subject: Re: [PATCH v12 4/6] clk: qcom: Add NSS clock Controller driver for
- IPQ9574
-Message-ID: <65gl7d6qd55xrdm3as3pnqevpmakin3k4jzyocehq7wq7565jj@x35t2inlykop>
-References: <20250313110359.242491-1-quic_mmanikan@quicinc.com>
- <20250313110359.242491-5-quic_mmanikan@quicinc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=p6cBQHmxvDjSCx+Ond+ZsDbbFIEDVPEivbo/7Udmp+Qfut0S6ubdhDKnMm/CbgBqBEBPgQYw5qdV4dt11XLki+atVRvMJxfCf1jqHrLtoYSKxvFpvaRcSxSHe//1s+7YVK1yeDR4tzXdCnrEcamQ4/eWqwzVgyzWT/VlC3He/6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=28W/+NQd; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=FZuxdFD+; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Mon, 17 Mar 2025 15:08:49 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1742220532;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+VmJSsk64HA0bX+prW9/tesp5wyAHGS66/Z9Jcapr34=;
+	b=28W/+NQdCpo9WjR9RGG7NwmtBraaBCW+jXmjkTxWvOwnmGczMH/urrf/4t3o71lDB6uP0s
+	MZm4oWIh0M0lH7cphRgV+TfXMpY36hUasSUfoyCWU1goy/zhPdI2J81ZwbEWtO7F/rpo3t
+	AnctrlF+/7sIH1pSt0W2ncsrqbu66yJu09wqsVHmdUXvgUq1g7a/8cdOhH4QVHwFgqgOKO
+	BS0u+5ZlBL+DmxLvhVOQJ5uN1sk7M5dXTHJsm5MGt2nmrifWPs+VKMP7+ZT74hxStJR4RT
+	CnCfZseTTD8k0PHrS8ssLKoycGbZFl6JpSYSVGq+EqyoQTcQ+z3hnd2NSDhN4g==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1742220532;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+VmJSsk64HA0bX+prW9/tesp5wyAHGS66/Z9Jcapr34=;
+	b=FZuxdFD+2Nr3gdbrCj+PMZO8cVs8PDeIgVhjzjRjn3XsN/g928yrG0t6SR/4vpEx9y1AzY
+	4qk8qNFfjN+KmeDQ==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: stable@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
+	Ricardo =?utf-8?Q?Ca=C3=B1uelo?= Navarro <rcn@igalia.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
+Subject: Re: [PATCH stable] xdp: Reset bpf_redirect_info before running a
+ xdp's BPF prog.
+Message-ID: <20250317140849.H4eSnqFl@linutronix.de>
+References: <20250317133813.OwHVKUKe@linutronix.de>
+ <2025031733-collide-dad-203a@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250313110359.242491-5-quic_mmanikan@quicinc.com>
+In-Reply-To: <2025031733-collide-dad-203a@gregkh>
 
-On Thu, Mar 13, 2025 at 04:33:57PM +0530, Manikanta Mylavarapu wrote:
+> > I added the commit introducing map redirects as the origin of the
+> > problem which is v4.14-rc1. The code is a bit different there it seems
+> > to work similar.
+> 
+> What stable tree(s) is this for?  Just 6.6.y?  Why not older ones?
 
-> +static struct clk_rcg2 nss_cc_clc_clk_src = {
-> +	.cmd_rcgr = 0x28604,
-> +	.mnd_width = 0,
-> +	.hid_width = 5,
-> +	.parent_map = nss_cc_parent_map_6,
-> +	.freq_tbl = ftbl_nss_cc_clc_clk_src,
-> +	.clkr.hw.init = &(const struct clk_init_data) {
-> +		.name = "nss_cc_clc_clk_src",
-> +		.parent_data = nss_cc_parent_data_6,
-> +		.num_parents = ARRAY_SIZE(nss_cc_parent_data_6),
-> +		.ops = &clk_rcg2_ops,
-> +	},
-> +};
+I didn't say just v6.6.y. The commit introducing the problem is in
+v4.14-rc1 so I would say all the way down for the supported trees. Just
+let me know if it does not apply for some of the older kernel.
 
-This structure definition gets repeated many times in this driver,
-with only slight changes. (This also happens in other qualcomm clock
-drivers.)
+> > Greg, feel free to decide if this is worth a CVE.
+> 
+> That's not how CVEs are assigned :)
+> 
+> If you want one, please read the in-tree documentation we have for that.
 
-Would it be possible to refactor it into a macro, to avoid the
-insane code repetition?
+I don't need one but it is tempting to go through the new process :).
+If it does not make your handling here easier (since you have two
+different patches for one issue) there is no need for it from my side.
 
-Marek
+Thank you.
+
+> thanks,
+> 
+> greg k-h
+
+Sebastian
 
