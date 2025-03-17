@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-175400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63676A65AD3
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 18:32:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDA6CA65AD5
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 18:33:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DA1B16E674
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 17:32:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FC9016E7D2
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 17:33:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3E9619F40A;
-	Mon, 17 Mar 2025 17:32:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4549D1ACECB;
+	Mon, 17 Mar 2025 17:32:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kKXf6Y5b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e1+SBIXs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE2CA323D
-	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 17:32:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B25B1A2C0B;
+	Mon, 17 Mar 2025 17:32:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742232775; cv=none; b=J4XzAUaTxE33Su16weihOX4/XjEzVBTieKn6xSVDomVT3AaqchQukclABtUEk8lt8gNTTywx1IH5Y/i1B9OWRBogVkUr5TiEx8wV0hjYxbdtqQn21AtU1IwjSzNZd0qNoCvgwfrz2RR3fWhX5HUfgZQzo3lKGr76J8DD/8mg1gY=
+	t=1742232779; cv=none; b=cFAlMprSNxLqs/NQXoRpgWwnWjC8AVYbIcZUDhjUJ7IZfKSDz19z1ey7PANBjTPsMH53QkG0xokqDTwRMXfMTfIAzQhZiiY4xB/xF4Ui7SWtiXpGrbdkGb23sgFgAn1RMDMi3+A/t4nF8n+xdiiRIqaZjFEYojZPxwczZiLKRV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742232775; c=relaxed/simple;
-	bh=etRNOSTYd8peP13e+WEuBLs3dcxOGaUpLwiMM7hmM7o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RQMy629v1No15kIp61d5Jl/ZFBeP2k/mNYmfr9Brju6AJm1AuCL05DBLUyIEX6p4nLGpk1Qm1jStZr4zOnc7w9lF61L9jggDeFX41Ec63x9XZcW5P4nqfqE5pavSNIiphb4+8tBSI3dWUhehJdqeenSuBJZGYn5+BO1ZHv0yECI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kKXf6Y5b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E15BC4CEE3;
-	Mon, 17 Mar 2025 17:32:53 +0000 (UTC)
+	s=arc-20240116; t=1742232779; c=relaxed/simple;
+	bh=GWXkJbMmNBZ3iyyjfilxQwj6Vp6gqC7I7iHwyIVQcr8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JzFjJ4LEb7HVnUmlKW1HhlrStqOCfbSFUWF0fOrk3F+xko5nAay7Jaz+R9J6J9cqpfU99b95OGceTmT8DQQIvnlzm0Pl6Licpru2U5LqqqvQeW6SYHjO1qaTBewFoWsFqPiJ6DKtnXq+8bDLRwBm7QbEYuDv4SvXv2TJI/TPhUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e1+SBIXs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BB4CC4CEEF;
+	Mon, 17 Mar 2025 17:32:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742232775;
-	bh=etRNOSTYd8peP13e+WEuBLs3dcxOGaUpLwiMM7hmM7o=;
-	h=From:To:Cc:Subject:Date:From;
-	b=kKXf6Y5bI1QCLPUiPJP5CON9L8Ne4EeAEL67fXUsKyCl4SFfqpYByd/ckluGvSgNu
-	 9O5tlgx6Hruu1beJoN9ul0u/mjUa8KGtAtFoHcU/bdltBcBI0+irfqxI9oj8OnxxCb
-	 LkqC1IWyPk251uua2LCItd5X/cN4iKFXUDnuLbh1IvwmPuwK4wCl9BMcWMgjmBpRGQ
-	 Yeh0b2HZ4Fr8dKhLwLFOjd2nAnu36ybdmkXwhhp3JAZ56Hcb6LNz7q+aaZwLnhcEt+
-	 mtJCY0GhnhsoaYaH1OxrZGW/tYPLjn1TZFKSFtygku/etTkL3w/xn/WbFMISy9NODS
-	 So4gbrI72lmQg==
+	s=k20201202; t=1742232777;
+	bh=GWXkJbMmNBZ3iyyjfilxQwj6Vp6gqC7I7iHwyIVQcr8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=e1+SBIXsszbvs7O3uqpCLhaeOzk7Wu6oPjt85qQsFUFnywbyxvHVeffdgoJOvMx0V
+	 YeHAygjPzIQgcrPVyL2Hx/ZiOfJXoXhzvBTTOPnAQ9KaeriflTboJt/BlbMMEuLI9n
+	 JNumBCq9S1RsMIQ/OfZqrMOw8YM36pklcXtGdtQOE4G8neNb7Q/67LZw7HPQ5P/E74
+	 tCV8eK9qctaP98vl3B6F8L7hYAK1quEil7YqiK89/aL9dIbCkWR16s1YajhGa0V4o8
+	 nu/s4XU8L3J3g/JyBAIpLZpIciYI8AuAOVeg4xD7uqiOX+5jvXRl1Gc3Cmm+fN+6RH
+	 /NmNpzxWE9S8g==
 From: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
 To: Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -48,11 +49,14 @@ To: Andrew Lunn <andrew@lunn.ch>,
 	Tobias Waldekranz <tobias@waldekranz.com>,
 	netdev@vger.kernel.org
 Cc: Lev Olshvang <lev_o@rad.com>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
-Subject: [PATCH net v2 0/7] Fixes for mv88e6xxx (mainly 6320 family)
-Date: Mon, 17 Mar 2025 18:32:43 +0100
-Message-ID: <20250317173250.28780-1-kabel@kernel.org>
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	stable@vger.kernel.org
+Subject: [PATCH net v2 1/7] net: dsa: mv88e6xxx: fix VTU methods for 6320 family
+Date: Mon, 17 Mar 2025 18:32:44 +0100
+Message-ID: <20250317173250.28780-2-kabel@kernel.org>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250317173250.28780-1-kabel@kernel.org>
+References: <20250317173250.28780-1-kabel@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,30 +66,42 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hello Andrew et al.,
+The VTU registers of the 6320 family use the 6352 semantics, not 6185.
+Fix it.
 
-this is v2 of fixes for the mv88e6xxx driver.
-As requested, I left only the fixes that are needed for our board
-to be backported, the rest will be sent to net-next.
+Fixes: b8fee9571063 ("net: dsa: mv88e6xxx: add VLAN Get Next support")
+Signed-off-by: Marek Behún <kabel@kernel.org>
+Cc: <stable@vger.kernel.org> # 5.15.x
+---
+ drivers/net/dsa/mv88e6xxx/chip.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Marek
-
-v1 at:
-  https://patchwork.kernel.org/project/netdevbpf/cover/20250313134146.27087-1-kabel@kernel.org/
-
-Marek Behún (7):
-  net: dsa: mv88e6xxx: fix VTU methods for 6320 family
-  net: dsa: mv88e6xxx: fix atu_move_port_mask for 6341 family
-  net: dsa: mv88e6xxx: enable PVT for 6321 switch
-  net: dsa: mv88e6xxx: enable .port_set_policy() for 6320 family
-  net: dsa: mv88e6xxx: enable STU methods for 6320 family
-  net: dsa: mv88e6xxx: fix internal PHYs for 6320 family
-  net: dsa: mv88e6xxx: workaround RGMII transmit delay erratum for 6320
-    family
-
- drivers/net/dsa/mv88e6xxx/chip.c | 44 ++++++++++++++++++++++++++------
- 1 file changed, 36 insertions(+), 8 deletions(-)
-
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+index 5db96ca52505..06b17c3b2205 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.c
++++ b/drivers/net/dsa/mv88e6xxx/chip.c
+@@ -5169,8 +5169,8 @@ static const struct mv88e6xxx_ops mv88e6320_ops = {
+ 	.hardware_reset_pre = mv88e6xxx_g2_eeprom_wait,
+ 	.hardware_reset_post = mv88e6xxx_g2_eeprom_wait,
+ 	.reset = mv88e6352_g1_reset,
+-	.vtu_getnext = mv88e6185_g1_vtu_getnext,
+-	.vtu_loadpurge = mv88e6185_g1_vtu_loadpurge,
++	.vtu_getnext = mv88e6352_g1_vtu_getnext,
++	.vtu_loadpurge = mv88e6352_g1_vtu_loadpurge,
+ 	.gpio_ops = &mv88e6352_gpio_ops,
+ 	.avb_ops = &mv88e6352_avb_ops,
+ 	.ptp_ops = &mv88e6352_ptp_ops,
+@@ -5217,8 +5217,8 @@ static const struct mv88e6xxx_ops mv88e6321_ops = {
+ 	.hardware_reset_pre = mv88e6xxx_g2_eeprom_wait,
+ 	.hardware_reset_post = mv88e6xxx_g2_eeprom_wait,
+ 	.reset = mv88e6352_g1_reset,
+-	.vtu_getnext = mv88e6185_g1_vtu_getnext,
+-	.vtu_loadpurge = mv88e6185_g1_vtu_loadpurge,
++	.vtu_getnext = mv88e6352_g1_vtu_getnext,
++	.vtu_loadpurge = mv88e6352_g1_vtu_loadpurge,
+ 	.gpio_ops = &mv88e6352_gpio_ops,
+ 	.avb_ops = &mv88e6352_avb_ops,
+ 	.ptp_ops = &mv88e6352_ptp_ops,
 -- 
 2.48.1
 
