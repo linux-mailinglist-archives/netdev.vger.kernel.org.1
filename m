@@ -1,54 +1,64 @@
-Return-Path: <netdev+bounces-175302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7301A6501D
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 14:02:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9539A65024
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 14:03:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF6FC3B456B
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 13:02:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 945A61894109
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 13:03:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2360829D19;
-	Mon, 17 Mar 2025 13:02:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7C8623C8BB;
+	Mon, 17 Mar 2025 13:03:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="seW/ADE4"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="goLK9Dhp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE1CF7485;
-	Mon, 17 Mar 2025 13:02:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2DD22259A;
+	Mon, 17 Mar 2025 13:03:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742216541; cv=none; b=aRIY+Tuiy+wOMMc5A4CXgBQiqMqa+55xX7cTlakIkQnPEtraVG8l7PKfxY10HS8O16QPqCkd/JGdxOMnXn7avg0pZi5eO1uNEAj4YdblP9AgrXhEATMMGcrZ/B/Hrwz6xa4PUBUyavWQ8eJv9gJtuk+l4ibjfmV6q0M3Un77+WE=
+	t=1742216600; cv=none; b=LlouitI/yncX1Fn9yqE1H2OGkkYRES2MI95pYK1Jz6PzJtdMHdgbRE6sZn7go1sW8nfMwT3XuMrDIWzPncxj9SQogMlsOGFu967nn0H7m4d8Gd3WSZD4OFeEJuHlUkwMxwEUhtsNCXB02KKNQsyWxJmsI8mmCrB+V3iZq3Poo0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742216541; c=relaxed/simple;
-	bh=Flnd+885JO4syD/z3UtFgokBx1Oa9WBjkE2Bez7q3Ac=;
+	s=arc-20240116; t=1742216600; c=relaxed/simple;
+	bh=fEwQ0C5kR1bbzBiLEQfApgF2TVTQ7AcnbeLV+bPV28U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z8y4UOTRgZzlyKhzIk1IPKilJk4X96Icp2t2Yc07dLgCK88g9i7TYhCG0kPAmRDJK7spbPX9u+QYtPMa+hlg54n+TxhV07veNFN3uwrELd+i3hxHDI3dJtgVvuMB6/hPfR09EDhz0Kg61AylQ3VxLvk+V5ABevxWPjonmtBK7CI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=seW/ADE4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67275C4CEE3;
-	Mon, 17 Mar 2025 13:02:19 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=MDS46XcIzMn6EHqQQBcx4ZYcs6uxd5qerjcXE9RndGSgOXog/9HCPUbq6L85TayfrcfXuiNii+AlTuMdsAmSuxJ+P//jA54Alxke8IXWvRXpJDZ116WO4kxXomevclsKroRiQ5BfwNHglqdPMYgupsNs8aRwdp/G6Ng7nl4p/d8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=goLK9Dhp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4476C4CEE3;
+	Mon, 17 Mar 2025 13:03:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1742216540;
-	bh=Flnd+885JO4syD/z3UtFgokBx1Oa9WBjkE2Bez7q3Ac=;
+	s=korg; t=1742216599;
+	bh=fEwQ0C5kR1bbzBiLEQfApgF2TVTQ7AcnbeLV+bPV28U=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=seW/ADE46smYoY5WT/fFRDwHocj9UNL53O2UEFoVZnKrwVusGueXnx1VNCCFh55Ir
-	 cUtX5zYPDqMz6/Bie6n6YQAiH3sqY7uX5UPNPP0Z4kLMgTPxELqbjsjzfVlXBsKyIL
-	 XMhucKQslFia8cnx20zKZbUlIGuPCIjz1pc2Nchw=
-Date: Mon, 17 Mar 2025 14:00:55 +0100
+	b=goLK9DhpAOLTYKopLe7M3gDVmm+fXVJUIiZTmjyu5CMRgXsZlrwDJy+GSmN8k4MjP
+	 8WYiYMBl0Jo5dt7260IQmVrKiWobh6hS2rbBhEenaMs8n39NSDLYvGV1BoaIBDGDl9
+	 tXu3q/tih1qNrKApDk3wjPCkD4vUGsQ8X8DuJqHg=
+Date: Mon, 17 Mar 2025 14:01:55 +0100
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Sudeep Holla <sudeep.holla@arm.com>, linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org
-Subject: Re: [PATCH 7/9] net: phy: fixed_phy: transition to the faux device
- interface
-Message-ID: <2025031706-diffusion-posting-a617@gregkh>
+To: Sudeep Holla <sudeep.holla@arm.com>
+Cc: linux-kernel@vger.kernel.org, Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	linux-pm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jeff Johnson <jeff.johnson@oss.qualcomm.com>,
+	linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	linux-efi@vger.kernel.org,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	linux-rtc@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+	Takashi Iwai <tiwai@suse.com>, linux-sound@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+	Borislav Petkov <bp@alien8.de>, linux-acpi@vger.kernel.org,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Subject: Re: [PATCH 0/9] drivers: Transition to the faux device interface
+Message-ID: <2025031705-scouting-scolding-8ff7@gregkh>
 References: <20250317-plat2faux_dev-v1-0-5fe67c085ad5@arm.com>
- <20250317-plat2faux_dev-v1-7-5fe67c085ad5@arm.com>
- <ea159cab-e09f-4afc-b0da-807d22d272c8@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,38 +67,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ea159cab-e09f-4afc-b0da-807d22d272c8@lunn.ch>
+In-Reply-To: <20250317-plat2faux_dev-v1-0-5fe67c085ad5@arm.com>
 
-On Mon, Mar 17, 2025 at 01:29:31PM +0100, Andrew Lunn wrote:
-> On Mon, Mar 17, 2025 at 10:13:19AM +0000, Sudeep Holla wrote:
-> > The net fixed phy driver does not require the creation of a platform
-> > device. Originally, this approach was chosen for simplicity when the
-> > driver was first implemented.
-> > 
-> > With the introduction of the lightweight faux device interface, we now
-> > have a more appropriate alternative. Migrate the driver to utilize the
-> > faux bus, given that the platform device it previously created was not
-> > a real one anyway. This will simplify the code, reducing its footprint
-> > while maintaining functionality.
-> > 
-> > Cc: Andrew Lunn <andrew@lunn.ch>
-> > Cc: "David S. Miller" <davem@davemloft.net>
-> > Cc: netdev@vger.kernel.org
-> > Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
-> > ---
-> >  drivers/net/phy/fixed_phy.c | 16 ++++++++--------
-> >  1 file changed, 8 insertions(+), 8 deletions(-)
+On Mon, Mar 17, 2025 at 10:13:12AM +0000, Sudeep Holla wrote:
+> Recently when debugging why one of the scmi platform device was not
+> showing up under /sys/devices/platform/firmware:scmi instead was
+> appearing directly under /sys/devices/platform, I noticed the new
+> faux interface /sys/devices/faux.
 > 
-> 8 insertions, 8 deletions. How does this reduce its footprint?
+> Looking through the discussion and the background, I got excited and
+> took the opportunity to clear all the platform devices under
+> /sys/devices/platform on the Arm Juno/FVP platforms that are really
+> faux devices. Only the platform devices created for the device nodes
+> from the DT remain under /sys/devices/platform after these changes.
 > 
-> Seems like pointless churn to me. Unless there is a real advantage to
-> faux bus you are not enumerating in your commit message.
+> All the patches are independent of each other.
 
-It stops the abuse of using a platform device for something that is NOT
-a platform device.  This file should have never used a platform device
-for this in the first place, and this change is fixing that design bug.
+That's great, but you need to send these all independently to each
+subsystem as needed.  Having it all in one series doesn't work for any
+of the maintainers of any of the subsystems.
 
-thanks,
+And I'm glad to see this work happening, thanks for doing that!
 
 greg k-h
 
