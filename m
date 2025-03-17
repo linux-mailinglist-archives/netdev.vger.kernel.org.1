@@ -1,147 +1,96 @@
-Return-Path: <netdev+bounces-175325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 343E1A651F2
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 14:57:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C0EFA65253
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 15:08:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 606C91890AC8
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 13:57:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7208C18942E6
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 14:08:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4414623E34E;
-	Mon, 17 Mar 2025 13:57:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB0C23F420;
+	Mon, 17 Mar 2025 14:08:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="N9Ic8yF1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IHDA0cUy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93336241129;
-	Mon, 17 Mar 2025 13:57:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3DE423E35D;
+	Mon, 17 Mar 2025 14:08:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742219836; cv=none; b=XAicYnvG0PFNaaHPD4SX/pf8oVs295vZjSsYlXE282XeT+zhFbMYiWsK2jGaazeOXDLNQkVzXlIUwJsFjsk5Eq0aNLtqCWjmYOJR6IJBeXstVP//nlK28WIk6lpztfeRl1K9Rav/Nf5bh6WKrJLragqNt6YwUdCv8o+YS2Goqi0=
+	t=1742220506; cv=none; b=q8ZSzoBA5y61CVLj3FJf63oNmLOszV+kHiEqaxN9Pm1djHW1k1ZP35+x3t+a2RwNC7EG9fOR44sWfbp/B+FKUZphtXLRK6Ok7ZYquKZ5yzW9Wq3F6knGsTbbJ8wjb0xgADqFOnRAipWOOvwxApwesEYxHikDAZlmbrhjZSpEXWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742219836; c=relaxed/simple;
-	bh=sSjPqbu9OFPuvQnENGQoGhHTGaKcRFEGnMtAb/gleBA=;
+	s=arc-20240116; t=1742220506; c=relaxed/simple;
+	bh=FEPHIwDyK7Tr4mXhiKsjBTrxFWaEJhWGW9kE0joAnEk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g8isn9OSlw9M5w9si5h0zEv0w4eiaaJdKxHdGU3IYY1qfB+6SvIi5UtU5ysWWnYEDTfjV87kcbYGjwwO6GoFcOQ7WTqTOyOpmuHazMxf0j6RQTjPKiSWIljlJv/GNuUvj1rHcvTP8zKhY5GKw4g6ZC3X1W7tx8ZiF0uWJSXHtbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=N9Ic8yF1; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52HDa3Zn018184;
-	Mon, 17 Mar 2025 13:57:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=GUH8cm
-	mKancpQH41aPR1l9wcULwXArnAHaNi/ZU5n4c=; b=N9Ic8yF13L5elng7ZY/pKj
-	Nuw0eIJsxnhhHCew2nnnm9/iYnfYoOxLaAA7eTSbUoRmjsRmRYyCiQv97CPlt4D3
-	b/AwoqOUIBO/hZ3mRbfDvz8YqE+cRlqFdqu8Q2qkIPXIgJWmYdbMOyjX5KTBxxQZ
-	5Bo4VFC2966+tYGVgnIHoYfjYdJ864lDLFWOmFFRSobFOAOxdsyCpTt5RV3CxZgC
-	NDxF+Q87J3lw7xm91xzgFq5EDnlCU8E6PxIjoZQ1CkaChJjtk4nyGPG8JEezQnJ4
-	GLsWGPnRn6BRzSdQMaJpA2ICrC2azsCmJWR7jL2KJd03gbic3Mnl1nU4vq1s7D7A
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45e5v03rfw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 17 Mar 2025 13:57:05 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 52HDa4dE018418;
-	Mon, 17 Mar 2025 13:57:04 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45e5v03rec-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 17 Mar 2025 13:57:04 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52HDqkRI005742;
-	Mon, 17 Mar 2025 13:56:37 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 45dpk264tc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 17 Mar 2025 13:56:37 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52HDuYWO52101546
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 17 Mar 2025 13:56:34 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2222820049;
-	Mon, 17 Mar 2025 13:56:34 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 289F72004B;
-	Mon, 17 Mar 2025 13:56:33 +0000 (GMT)
-Received: from osiris (unknown [9.179.24.138])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 17 Mar 2025 13:56:33 +0000 (GMT)
-Date: Mon, 17 Mar 2025 14:56:31 +0100
-From: Heiko Carstens <hca@linux.ibm.com>
-To: Wenjia Zhang <wenjia@linux.ibm.com>
-Cc: I Hsin Cheng <richard120310@gmail.com>, alibuda@linux.alibaba.com,
-        jaka@linux.ibm.com, mjambigi@linux.ibm.com, sidraya@linux.ibm.com,
-        tonylu@linux.alibaba.com, guwen@linux.alibaba.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        horms@kernel.org, linux-rdma@vger.kernel.org,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
-        jserv@ccns.ncku.edu.tw, linux-kernel-mentees@lists.linux.dev
-Subject: Re: [PATCH] net/smc: Reduce size of smc_wr_tx_tasklet_fn
-Message-ID: <20250317135631.21754E85-hca@linux.ibm.com>
-References: <20250315062516.788528-1-richard120310@gmail.com>
- <66ce34a0-b79d-4ef0-bdd5-982e139571f1@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z4dUaTOVLO8E3VMxGEjuRKH32XsfAS59J3dt+cvc2kzzP42enH5Zx/KKwYCpf+LTgyLn9GYNqRfmHs+qPiin99ZPLaRLdzaDpqYkaRudLeVh049gjeA7Lw4cfj4shBR7wj0Z7XGfuK1vUxVlMuXrq7YxKmMYfsxzmKUHIWrQ2Z0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IHDA0cUy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CEBFC4CEE3;
+	Mon, 17 Mar 2025 14:08:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742220505;
+	bh=FEPHIwDyK7Tr4mXhiKsjBTrxFWaEJhWGW9kE0joAnEk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IHDA0cUyq4XAc4DX4FKFkAV+J5U7Vgze+OeF+RN+Rt9t8HKtTLr0usCZiG7B9lUX2
+	 78RL7UkwQ6Ov8pRrumSCoWar33zkK0eKVIfpnJ/4M++v9DTmAF1beUrmZr4Y9hnmIj
+	 j2Fo9wQGCb78kV7p4a+OOqe2+ZIoEj2A/B2+8zsoMReBtSGZBGTuB8WxOPz9wJ8T+n
+	 eIvkXDMfzs613KUYOSzoh7/89JTYJIpZCcOZXtXcdeLfDZ/ggfSCiH2j+Il1Ly62of
+	 ewmP9do4wnTyN2jHObK3NFFuhC1bYIpfo7uZhnHmNTgMZhXCwQfxB46a/k91jsq+IU
+	 VunRAG9oVd/AQ==
+Date: Mon, 17 Mar 2025 15:08:16 +0100
+From: Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>
+To: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
+Cc: andersson@kernel.org, mturquette@baylibre.com, sboyd@kernel.org, 
+	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, konradybcio@kernel.org, 
+	catalin.marinas@arm.com, will@kernel.org, p.zabel@pengutronix.de, 
+	richardcochran@gmail.com, geert+renesas@glider.be, lumag@kernel.org, heiko@sntech.de, 
+	biju.das.jz@bp.renesas.com, quic_tdas@quicinc.com, nfraprado@collabora.com, 
+	elinor.montmasson@savoirfairelinux.com, ross.burton@arm.com, javier.carrasco@wolfvision.net, 
+	ebiggers@google.com, quic_anusha@quicinc.com, linux-arm-msm@vger.kernel.org, 
+	linux-clk@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, quic_varada@quicinc.com, 
+	quic_srichara@quicinc.com
+Subject: Re: [PATCH v12 4/6] clk: qcom: Add NSS clock Controller driver for
+ IPQ9574
+Message-ID: <65gl7d6qd55xrdm3as3pnqevpmakin3k4jzyocehq7wq7565jj@x35t2inlykop>
+References: <20250313110359.242491-1-quic_mmanikan@quicinc.com>
+ <20250313110359.242491-5-quic_mmanikan@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <66ce34a0-b79d-4ef0-bdd5-982e139571f1@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: NSqFDVsAl9mx0PzomBeGQR0XnQ_batOr
-X-Proofpoint-GUID: NSIGZDVbzXe3CNF4ynR9y7mDwn94_QbP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-17_05,2025-03-17_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 suspectscore=0
- impostorscore=0 adultscore=0 mlxscore=0 spamscore=0 phishscore=0
- priorityscore=1501 lowpriorityscore=0 malwarescore=0 mlxlogscore=979
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502280000 definitions=main-2503170101
+In-Reply-To: <20250313110359.242491-5-quic_mmanikan@quicinc.com>
 
-On Mon, Mar 17, 2025 at 12:22:46PM +0100, Wenjia Zhang wrote:
-> 
-> 
-> On 15.03.25 07:25, I Hsin Cheng wrote:
-> > The variable "polled" in smc_wr_tx_tasklet_fn is a counter to determine
-> > whether the loop has been executed for the first time. Refactor the type
-> > of "polled" from "int" to "bool" can reduce the size of generated code
-> > size by 12 bytes shown with the test below
-> > 
-> > $ ./scripts/bloat-o-meter vmlinux_old vmlinux_new
-> > add/remove: 0/0 grow/shrink: 0/1 up/down: 0/-12 (-12)
-> > Function                                     old     new   delta
-> > smc_wr_tx_tasklet_fn                        1076    1064     -12
-> > Total: Before=24795091, After=24795079, chg -0.00%
-> > 
-> > In some configuration, the compiler will complain this function for
-> > exceeding 1024 bytes for function stack, this change can at least reduce
-> > the size by 12 bytes within manner.
-> > 
-> The code itself looks good. However, I’m curious about the specific
-> situation where the compiler complained. Also, compared to exceeding the
-> function stack limit by 1024 bytes, I don’t see how saving 12 bytes would
-> bring any significant benefit.
+On Thu, Mar 13, 2025 at 04:33:57PM +0530, Manikanta Mylavarapu wrote:
 
-The patch description doesn't make sense: bloat-a-meter prints the _text
-size_ difference of two kernels, which really has nothing to do with
-potential stack size savings.
+> +static struct clk_rcg2 nss_cc_clc_clk_src = {
+> +	.cmd_rcgr = 0x28604,
+> +	.mnd_width = 0,
+> +	.hid_width = 5,
+> +	.parent_map = nss_cc_parent_map_6,
+> +	.freq_tbl = ftbl_nss_cc_clc_clk_src,
+> +	.clkr.hw.init = &(const struct clk_init_data) {
+> +		.name = "nss_cc_clc_clk_src",
+> +		.parent_data = nss_cc_parent_data_6,
+> +		.num_parents = ARRAY_SIZE(nss_cc_parent_data_6),
+> +		.ops = &clk_rcg2_ops,
+> +	},
+> +};
 
-If there are any changes in stack size with this patch is unknown; at least
-if you rely only on the patch description.
+This structure definition gets repeated many times in this driver,
+with only slight changes. (This also happens in other qualcomm clock
+drivers.)
 
-You may want to have a look at scripts/stackusage and scripts/stackdelta.
+Would it be possible to refactor it into a macro, to avoid the
+insane code repetition?
+
+Marek
 
