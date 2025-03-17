@@ -1,153 +1,190 @@
-Return-Path: <netdev+bounces-175234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFBA6A647CB
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 10:42:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75A6CA647D0
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 10:43:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0DD787A7063
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 09:40:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 72A911891393
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 09:43:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C7C722579B;
-	Mon, 17 Mar 2025 09:41:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B82F6221F1A;
+	Mon, 17 Mar 2025 09:43:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XF+IwOx/"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="P0yLGz4m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2082.outbound.protection.outlook.com [40.107.104.82])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A80922253E4;
-	Mon, 17 Mar 2025 09:41:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742204513; cv=none; b=IQXN186D4772MQ5R5KogOFTE0OQPjXMl3koHnC2Os5obh7sxz5eSi08rp0RLhf40TwCv2sa93GUGwSt6Z9AxA1Us7KwsFdzP7XfeIx1P+l0v49gZq8j1t+1NVCfmb+P+ECTP7mqykNIp7WFo/PlQczoDfesDQxlYXxljioA5D8I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742204513; c=relaxed/simple;
-	bh=WgoXdLJiBNEJMMeoeNJzawp92D0dkUqgjc8b4u8OfM0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=o9wxpiKsL29o361GBkg/2Yk2uPhWAjKE4Y+iZ+FIPwVZsQiYYZ6HPDQM15u3bNH1tQQEn0elqFQ5y3Vb3t+0uzntCnTA2MBAvCFnitpIq31IlcO0OmvQtLrO2M2yuv6gV5VejvFLMGNiqmAGF8O3s7OUln96JXUCc3EAtMcl4qo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XF+IwOx/; arc=none smtp.client-ip=209.85.219.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-e53a91756e5so3793288276.1;
-        Mon, 17 Mar 2025 02:41:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742204510; x=1742809310; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4XfnRDuFPcGv3nyYq3wNZc9i5NYc3wanimznJNeWrG4=;
-        b=XF+IwOx/m2sYkrMeLquRAchocuwXUhK/YnCufhRuN2Z5tBC44LgtXd5E5gmywesk84
-         gF9alZEvXFBZThyntOxGsFcMY72ODlFXz61nEA0Dd+N7euDZw0saL9N5jHNqihoDXR4v
-         H6zpORRRaRZZ+Ic75MQAvAFjNWeelCRePck1wDeJYwAWwzPvkpCqUx+e16WI8pXLZk8K
-         hFr+2JgfopBDXSwPalDMK51Q+swkiszXwA3VSULycmlv/FwLILPWc8TS/xYsDRDBEiex
-         3iYA0C57rDhOg5z0Tkj8uHy06agdubDXO7iKnyGb8zlIrkeiocM41ERmozZ7Qr+3VkzH
-         Fupg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742204510; x=1742809310;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4XfnRDuFPcGv3nyYq3wNZc9i5NYc3wanimznJNeWrG4=;
-        b=n71dItC+DjJpMZXYrgWr51m3x0kaclKXsOWa8dE1m109R025agttRjKoEIVoKBInhn
-         Zp+8uAzD9vvLcllAx/Fr2SaZonZ+7iVvFnZ9nC39RZPtIpcb7oxdXwLtAVeIcUfdPBkA
-         ORZTRKiv9g7OGZlt8ROqJxxksS9IpnR49R9+TC1ARl2DBDM/K0oOhA/VZCODG2jcGEzi
-         Ec6bCMKG3gk3dM+wTpaSW02/fDx6MLEOddZsxyQ4xFM8BVynJPC1I63bkffW7pdvzC5e
-         bJnZWmr4/4ZuptJAh6LBSBXrTF0DjRapB/Wv41PTEBF2dZGl7p77ozTNv3YALKsQ/rkA
-         seyg==
-X-Forwarded-Encrypted: i=1; AJvYcCV70dcVxXw+dMa9lL3m+Oxco1R4lQT00qAZjprT6fp34tzGSbyx9LPUjPrpERiWqrkRE9WOWVE2uIWDQibGhY51@vger.kernel.org, AJvYcCVSI6xtjPzzFeS8XDFW55h7qAjnXvH2eUrS2A7TGHOf678bDEOSrMYJaMckiq9Y0lx9XijMqowB@vger.kernel.org, AJvYcCXHieT9LkXcPWpH9OSKHN+ItOBIbeGMJSG7Swlblf6rtfI8TJGEZdNz5Kr/9ntxrZJZso4crVpRJo35Vqc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9I4j9S82V42rXFoK/lcGM3d5bsnDOPA5R1MpD0d20qC2wVTMG
-	WrEGfgaFoF2NPshssnPmNB6UFYa2H82A3+dU8wp6DuyOj2CdSb5UcSmgwEBwD/vk7foXwcmIvcz
-	dcCRa8R36jH4TF4rOzn91/BUgdBCrJKEaaWw7Dg==
-X-Gm-Gg: ASbGncsFMy2tDLIu14scUB/Km3pTK1lRSgsRvKUgrzywiYEq/Fl8koPmTGZvbxuu9zv
-	AzRpNnjD0n2f+8zyIaBvRh1Ax4q3QIpUvtt1pwyAuyJH01H2MTHCMTwEZsBTYWJm/mrk7FvxmOQ
-	RvvcczOQsNZoYEfkH7te5PF40aBfIFMqxqd03g+mQ2sw==
-X-Google-Smtp-Source: AGHT+IHecUoXKGAeLJ4sKHHMSQWvvRkqT9levx35XDLPlH6rsi48/CowlJANQ7a2C4L6J9CWmMAeDZfnMSiJVxYp+ig=
-X-Received: by 2002:a05:6902:208a:b0:e5b:3823:4176 with SMTP id
- 3f1490d57ef6-e63f64f855amr14527392276.13.1742204510491; Mon, 17 Mar 2025
- 02:41:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFF81226863;
+	Mon, 17 Mar 2025 09:43:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.104.82
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742204587; cv=fail; b=JFNAVTwqntuplcKlyMccQNPd70mWY9weDId5pMWw7/iY6ctKq5BUsbly1ZIta8NoPaHpTFC6iU6VCGQl9PTNofj3TXozphaoxIaSS/cZNITrwS++aUZd7nLAHUAMx47gPAR5oL9xQyDPiigQcE902IkuMQ5X4QOwa64/ryKWQhs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742204587; c=relaxed/simple;
+	bh=i/FnjF71GU1uRlOyMvPEkOQJT6GnFpduVHNoxbfPePg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=lk0CCyZyfmap+w5vjVr9RMibMc/FIFqf7WrqSp8y0JE7Unv6Pz4wT9pXhO+a9FZMTh6WVdlVkYIy+vWpOtmAP2k+YnzZ1zvF+Ccr9G1S029HEaiplWLgW/oTKPFmLi34l6aml3h00hB/c+iCVPYs5ulXGvrr8CJk+gfO69dHUZE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=P0yLGz4m; arc=fail smtp.client-ip=40.107.104.82
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=cY/dXggouxNVwOT1bu2TI/cwuJfAyRW4FQ3drmLfp/272oJqtH/oa6uy3SmrKtigPRPiP7TJZZ1zq2lidAmaEJeI/5PjJM9kpEfKEYK3gJqEsAu1AUDmPLsK7wYH95OMhS7AwlbLAJh9IcmhK/ANX/KuIh8veuFsSbJsHG1Tt/Eaz+K3s015I7K/tT+oF0kx1wNnIgB8wOxCjYR8JyOHEdULx/CYIa6kEgNXsUrh/hmbTD5f5b5TM6BhHUgxOrXwMArFu+ZBrgbOJc0Sdghi3I6IZFFZtePRqnvSoBaeY5/hVkByq7Rz2notAi7a1wG2cdcfGaiEmmigTJL3PeYMfQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=n6Chb4BEKFiohxMu56XswWBYmWZryunrkL08HUjfJmE=;
+ b=jvsVKFG//LPZJWBY4+Kr+vrg4aULoj4r4VLry3K2iXyd2aPd7+JfQrfSCr4m1TpARfwn7FM6p2r0F8Gp7wIfQ2SEvB4HOyag4wUoavFgHd6BD+vh/s4BQK+/68Ox955n53R85jmio5Dep2hMVuGM5HJrm+mOARhqadaAuwvamMck3a7w6YecTgKHQvk4eYmDzDWrPzfLnVjjESFtibE1oH5EBv5jSGThzouyoKwVu3/N8uL2+UbDTKSK0MsGSAxVi2Qv8ng5vCsOI4jZuZtN63QppKQTqRhWGoq1oGnNKdoxA5gzAfcp9qCCo3tdK45k8sQk/qXN/XurNOtxum+P3g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=n6Chb4BEKFiohxMu56XswWBYmWZryunrkL08HUjfJmE=;
+ b=P0yLGz4m4IEs3lyowi3Bs5+GhE4yJxu0Wg+Igj8CXGooa9T8ni9LnmDGex13kW1zLpjxvt995qgGUr1llR24A62dOMHv0jMRpnLpFd+0uR5E7iBznbcWCVB5T3POHup1UYPx9AQFgIPLrZVNHILz4E3w3WmT6s/l/VOz+BcHE74usNiLo2ro+H7C+jkm+j8S0DkizJ4ob9G2beRAb+tGQwvdPt3O2c0YV6/luTlu3LuMXQIUuI02PA6xKXRWyI+eSK+YWfNFMOObEhDORvL1rw6O+0iR0EJV+rWbjsIrSM4+JZQR2QoIdfF6rMrsOJkWqkELQq/Ejbn7/tIcVTKDKg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
+ by DBBPR04MB8060.eurprd04.prod.outlook.com (2603:10a6:10:1e6::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.33; Mon, 17 Mar
+ 2025 09:43:03 +0000
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2%6]) with mapi id 15.20.8534.031; Mon, 17 Mar 2025
+ 09:43:03 +0000
+Date: Mon, 17 Mar 2025 11:42:59 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: claudiu.manoil@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, christophe.leroy@csgroup.eu,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v4 net-next 03/14] net: enetc: move generic MAC filterng
+ interfaces to enetc-core
+Message-ID: <20250317094259.b6mwygvr75lxgkwh@skbuf>
+References: <20250311053830.1516523-1-wei.fang@nxp.com>
+ <20250311053830.1516523-1-wei.fang@nxp.com>
+ <20250311053830.1516523-4-wei.fang@nxp.com>
+ <20250311053830.1516523-4-wei.fang@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250311053830.1516523-4-wei.fang@nxp.com>
+ <20250311053830.1516523-4-wei.fang@nxp.com>
+X-ClientProxiedBy: VI1P190CA0023.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:802:2b::36) To AM8PR04MB7779.eurprd04.prod.outlook.com
+ (2603:10a6:20b:24b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250312-b4-ovpn-v23-3-76066bc0a30c@openvpn.net>
- <20250317060947.2368390-1-dqfext@gmail.com> <f4c9a29f-a5c6-464a-a659-c7ffeaf123c1@openvpn.net>
-In-Reply-To: <f4c9a29f-a5c6-464a-a659-c7ffeaf123c1@openvpn.net>
-From: Qingfang Deng <dqfext@gmail.com>
-Date: Mon, 17 Mar 2025 17:41:39 +0800
-X-Gm-Features: AQ5f1JptaNz1J3kvfSOyKipGWiLpaJWangM2TfyyVpkqlY7egoQOh0qGwq6CYZQ
-Message-ID: <CALW65jZe3JQGNcWsZtqU-B4-V-JZ6ocninxvoqMGeusMaU7C=A@mail.gmail.com>
-Subject: Re: [PATCH net-next v23 03/23] ovpn: add basic interface
- creation/destruction/management routines
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: andrew+netdev@lunn.ch, donald.hunter@gmail.com, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	ryazanov.s.a@gmail.com, sd@queasysnail.net, shaw.leon@gmail.com, 
-	shuah@kernel.org, "Jason A. Donenfeld" <Jason@zx2c4.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|DBBPR04MB8060:EE_
+X-MS-Office365-Filtering-Correlation-Id: 32938dbd-f18f-4324-162f-08dd65381c8a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?AYNL2RIeYmeiaE8LNOPOJ1FVBpIktGKEIe1iVDGT5cfJ8W97etArmrXcrjuQ?=
+ =?us-ascii?Q?RauNnxwo8kZMKKXBPDqGFntRxRvNIum+bl8CqpOfzEbZm/uhHjfS2KkHwNJg?=
+ =?us-ascii?Q?/FsqS3KddkElD2tCvOv+ky2j4n4K9YeSgloi52jgSkhq1ERv/jxoIF3GWS7Y?=
+ =?us-ascii?Q?LM68notIef92MiEKpnoKWUK9LkRlFocH3DblLU7G0wKsJMX42n91nVNFvXU1?=
+ =?us-ascii?Q?Nkt20ekxDXDIzLJogwjmuALEtiUcAgSSGdjZYx2UrXvvx+Rn0VD9ATPNsjSX?=
+ =?us-ascii?Q?3xl8fYtCNQ/mtkEEv/8dWCseSXkPYIZqRCaEFL9hqP7+7rkiUxs4yhjfebhm?=
+ =?us-ascii?Q?5njOarpAoVCcnGbfDQM8z5pUAhx6h1jsJcnas1r7EJfzabCEMt2A8kBICiOb?=
+ =?us-ascii?Q?Cze7VaAsp9xxEhQyXJSjsz4gcySNz5ucWmyyeJ1BFfSX022Ecm0xxb7pbzqg?=
+ =?us-ascii?Q?eaL1Z7gRmsIbyh+XbozMYoOMsGAl4ZgJoaTvkkhwYAs6YxSwSwcgirlkQrEu?=
+ =?us-ascii?Q?KSOa1I0SU/nS4X4Dz0lBizwsmavnAgfBlrUx/Q8oM4mn4xgrIV6Fbd/YTO+z?=
+ =?us-ascii?Q?ejW/8I5QKHnS/HTwjTM4n5JqTF6ppGXq6u055pOsZGT64AM5pDmsqfibmhCN?=
+ =?us-ascii?Q?7B4R1Ts8XQO9brRR+zovkljL35XzC/mEqDIvibcuPwmkOpP+twroC3dZIBga?=
+ =?us-ascii?Q?eqivV/yyjXZ+Ehvdy7dORSoHQn6G3Yv26t1bLvyJxoLRG58pFuEic9Q6c0O0?=
+ =?us-ascii?Q?9uXT3xre6WlnYT3zWbClLX8J5bFqe0iGtSNXQ++HKxRyGg3bZ6KB57htduDU?=
+ =?us-ascii?Q?QJIuOs3dd7ChZVzQp3z75yP4+jAkYMDvHpzNEcDQp1Bf44MYKHYag0h6jomr?=
+ =?us-ascii?Q?wvXUKrdjAx5y8WbIThxpEHXWi+a8CVu6IocXAOVw+glQx+l562mIz0wRKiSz?=
+ =?us-ascii?Q?TNu1YXKgtfTwFeuyR5LA4ReaLbytmZH59Mpa//2HlsEjbaqcc7LiQD6D5qIX?=
+ =?us-ascii?Q?bfJdkLLg9/fzLeoJJC23fn7NTsgKR0yqaDspnhNiBbKU+QzAzjSahUnV2a6k?=
+ =?us-ascii?Q?87EdxpeOQDg/gBCKXv/4g5EEiPq6s4Rq4rzp8ptSGe1gqUhLe49aVvzbek7b?=
+ =?us-ascii?Q?/i40Mo9GxS2DKusuJsNAOys61/iNTU+vf9w7io8hUWcAMbM4YcuVdDsrOHOZ?=
+ =?us-ascii?Q?zBOPuxuO3nuvKTsRns3/XJeo73VH2niuCh+8JgBOvr/CUTZe4Ecq5eU4jvTw?=
+ =?us-ascii?Q?mzdJ99QoSlNfTJmpW4jbsPLfCS1QqGQI5Xft8Hokc4F1Bda4Uupxz0GhlgBn?=
+ =?us-ascii?Q?O0lgMFbWXSrNPseH8ZWk9Xp1YHglhWgj5hnE2cb5rNe7ScEu1H7IspPUqPP8?=
+ =?us-ascii?Q?4TzP4znOfbMLmPnq+z6WHO0dcxUR?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?e69cWLOo7VN1suVvA9bYL2YF0rCDtDAVIiYISnrXQ9unmwle5u3FItP7i0sh?=
+ =?us-ascii?Q?AjZO+zSyOQ/f85DD6FmeDj0TQppvt3HsWwrPR6QAdKadZz1ivlOt5Ej1AVOA?=
+ =?us-ascii?Q?1rEDa4dZyPcrlKb9P5Vk6JBjEdpU70z6eRvJOwIoMePuVIy+ZOt8f5FLsS+v?=
+ =?us-ascii?Q?XnZTAPgA8j8qnyLasiKfwGPn8RNzjGXk3YaFYtcl7xh5NTi/y4oNty7bnXGK?=
+ =?us-ascii?Q?WXy2XK1fFPE5rSlXPb3ShfhC164SUT/F/KfqsBsoczCD+SQMJZ0pszgT/7+g?=
+ =?us-ascii?Q?zim79PmlS2TeQj03zs/k5lsKHzkQt/CKntiXa1qR5iUR6phsgI/bfXaNf44+?=
+ =?us-ascii?Q?HxWQRJ091DsAnfwOPOXkS/0Bp3YGsVgHBUG9ChLD3z8MJAJ+TFRKOoya6OIh?=
+ =?us-ascii?Q?VCeu3UFaMIEiQv5/k2u1nLNp3rN/Q/2SOu1dk2NG4APadP46FjBA+gkc3/jz?=
+ =?us-ascii?Q?oZq1Ns6KJvCbVg6/D3jeu1XvYgWNpYEfaCMZu6thstMXLE+bVRJu6B2dXlUW?=
+ =?us-ascii?Q?1yji5Rkxv5JmvvmNy22tfLC4l/FI+JayYAsKA/iBA9rD7SJ3pDQVTeC+yx+r?=
+ =?us-ascii?Q?dZoJ8aeLPADSPxjonY1W/b/3U45e78wLp4ExIpnrcuyq9MGsgeztTkQk5W1L?=
+ =?us-ascii?Q?nPWmmmgpxH5VF2v2CUidgz7W69vhyb2BQyyJniUyg3my7YSJarUfVH8Ww1Lu?=
+ =?us-ascii?Q?X3Uf4wsbfdXRHAjycIHzfTZluxt54SD6oksyCJ1huMhFj4QGU1aWqW29hODs?=
+ =?us-ascii?Q?msu04/HIaznbT79e8KQszBi61lDmKnoWlefHiIK1glnyqz8bhORwsJoRk4Bm?=
+ =?us-ascii?Q?zqkxwLB8ZW4/eDxiBUbso5SRLM+ocXFzr4QehmQ4BKxVAOZlsqGBdCpaSDa8?=
+ =?us-ascii?Q?HgUb+Yknh7S5Wz6lq/N8LQrlgGWUV3y+ppcWVT81sogOIAJF9Lm9Ualmw/ac?=
+ =?us-ascii?Q?6mkOWtxnidkC4A1zO2gmsgoam3Mwx+8JRJjizJ0uze63rksdvsaJTAXpaUJY?=
+ =?us-ascii?Q?51yOv3oPbmVcI/b+mbPBexh0YXFFzMkxj0EbOrGG+4gZoy0E0iVors5pr677?=
+ =?us-ascii?Q?OybQQaVsfjtv1vFOef6V2nCn/DNcaXG7lZIFCRmNqXyFEgOZHgL6jPPbTuFT?=
+ =?us-ascii?Q?7W7qqIrUuH3Pq3w+JsbWrVEEYZB5rVwVlCYDjBBo07HfPOGp8GKy6dI5WyWZ?=
+ =?us-ascii?Q?Z+Uj5pZCmXs1n/H/Qy5H6FjYv2SpqbzhjPUj9L3qBlcGKzMxOLiyH/8vrp7B?=
+ =?us-ascii?Q?U++ykKVZ1/Er80wapFJDkj+jV36Fi5MsV/EzddNIR8rvLOahx/4blMm1Jc5E?=
+ =?us-ascii?Q?Oul5V2ENoRpE1k8wqYySeSMMAzLxxS4NTYZEg8De5c1M0HjH025S5SF5Gmvg?=
+ =?us-ascii?Q?Ok2ip/4on2po1qAfouJcYNOo96YeII6+xjIU+2bxy6fhCv+PsITix5bJigTY?=
+ =?us-ascii?Q?3JmgmkNqAnk2yToUdjv7INS7Sie+7vCQMwL4A2Icqfafm+jFP/8i7bQfAVTT?=
+ =?us-ascii?Q?XbnQZOE2KcBpHzRh3VhNusoedsiefiVlfb3yqsUQUYyCFgiSWsyD4Udxnm0K?=
+ =?us-ascii?Q?fMOc+7Q851wdj99Ybl7VITrGp/oGQSTylvJ8QifS7/Bji299XL9v83i9vPQy?=
+ =?us-ascii?Q?6w=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 32938dbd-f18f-4324-162f-08dd65381c8a
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2025 09:43:03.0387
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YsVdy8OapEo3M1lA4WGjEKrkUc6OpqPfmmaozkU8MBJGOBYx+mBAqOVPPYw1YR7h9z+o/l5DeGKkAoxGmrGE7A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB8060
 
-Hi Antonio,
+title: s/filterng/filtering/
 
-On Mon, Mar 17, 2025 at 5:23=E2=80=AFPM Antonio Quartulli <antonio@openvpn.=
-net> wrote:
-> >> +static void ovpn_setup(struct net_device *dev)
-> >> +{
-> >> +    netdev_features_t feat =3D NETIF_F_SG | NETIF_F_HW_CSUM | NETIF_F=
-_RXCSUM |
-> >
-> > Do not advertise NETIF_F_HW_CSUM or NETIF_F_RXCSUM, as TX/RX checksum i=
-s
-> > not handled in hardware.
->
-> The idea behind these flags was that the OpenVPN protocol will take care
-> of authenticating packets, thus substituting what the CSUM would do here.
-> For this I wanted to avoid the stack to spend time computing the CSUM in
-> software.
+On Tue, Mar 11, 2025 at 01:38:19PM +0800, Wei Fang wrote:
+> Although only ENETC PF can access the MAC address filter table, the table
+> entries can specify MAC address filtering for one or more SIs based on
+> SI_BITMAP, which means that the table also supports MAC address filtering
+> for VFs.
+> 
+> Currently, only the ENETC v1 PF driver supports MAC address filtering. In
+> order to add the MAC address filtering support for the ENETC v4 PF driver
+> and VF driver in the future, the relevant generic interfaces are moved to
+> the enetc-core driver. At the same time, the struct enetc_mac_filter is
+> moved from enetc_pf to enetc_si, because enetc_si is a structure shared by
+> PF and VFs. This lays the basis for i.MX95 ENETC PF and VFs to support
+> MAC address filtering.
+> 
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> ---
 
-For the RX part (NETIF_F_RXCSUM), you might be correct, but in patch
-08 you wrote:
-> /* we can't guarantee the packet wasn't corrupted before entering the
-> * VPN, therefore we give other layers a chance to check that
-> */
-> skb->ip_summed =3D CHECKSUM_NONE;
+For this series I don't see any VF implementation of ndo_set_rx_mode().
+I don't think you have to move struct enetc_mac_filter from struct enetc_pf
+to struct enetc_si, so please don't do that until there is a justification
+for it that is contained in the same patch set, and the two can be
+evaluated together.
 
-So NETIF_F_RXCSUM has no effect.
-
-For the TX part (NETIF_F_HW_CSUM) however, I believe wireguard made
-the same mistake.
-Your code both contains the pattern:
-
-if (skb->ip_summed =3D=3D CHECKSUM_PARTIAL && skb_checksum_help(skb)) // ..=
-.
-
-NETIF_F_HW_CSUM causes the upper layers to send packets with
-CHECKSUM_PARTIAL, assuming hardware offload will complete the
-checksum, but if skb_checksum_help(skb) is invoked, the checksum is
-still computed in software. This means there's no real benefit unless
-there's an actual hardware offload mechanism.
-
-+Cc: zx2c4
-
->
-> I believe wireguard sets those flags for the same reason.
->
-> Does it make sense to you?
->
-> >
-> >> +                             NETIF_F_GSO | NETIF_F_GSO_SOFTWARE |
-> >> +                             NETIF_F_HIGHDMA;
->
->
-> Regards,
->
-> --
-> Antonio Quartulli
-> OpenVPN Inc.
->
+Moving enetc_add_mac_addr_ht_filter() and enetc_reset_mac_addr_filter()
+to enetc.c seems fine.
 
