@@ -1,134 +1,97 @@
-Return-Path: <netdev+bounces-175374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E57ABA657B9
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 17:17:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5348A657D7
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 17:21:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 256B57A45E0
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 16:16:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 856943A5FC6
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 16:20:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BA0D188907;
-	Mon, 17 Mar 2025 16:17:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61E2719D8A2;
+	Mon, 17 Mar 2025 16:21:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="PrHYv3F7";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="kjuIUQrl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UNP6zHfb"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b5-smtp.messagingengine.com (fout-b5-smtp.messagingengine.com [202.12.124.148])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63EAB8C1F
-	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 16:17:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D9174BE1;
+	Mon, 17 Mar 2025 16:21:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742228262; cv=none; b=RVxj799Go9F/j76nqvtFdHXHCCQkffITFLxEkGj9NOGtdRnX/3wNN+Kw4KcV4cwY3pW6KR6qCA0gZD/ph+Byj/VdMhg2XF0VzPMbiYrazrQi3rulS4b5StS4Mc7GMi2NQipoEq+iwyts7OsPSZ7wAjd+k0r9kb6b/CAxxAxKsTI=
+	t=1742228466; cv=none; b=ZNnofXTwa4kv2bkbBiCBGHX6ElGjTX1Qfd0Hd4Z00ezKMDM9TKbV80JxTM2FxpQBAU+mlTPJgqImD2tJtSnGKMBUjr+lINos4X6OhQyboMrflYII44FXUK+QiHxA6gXpjKqOCGzU6VOEwWI99g1/pVrWuUqSoU5gfZB/jm260o0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742228262; c=relaxed/simple;
-	bh=DkxM2XIkdIcuvoC7cMCwQnYH7PW7SvIfahaSZB9Cn3E=;
+	s=arc-20240116; t=1742228466; c=relaxed/simple;
+	bh=vF7ad/Mcki5NOq2HyTnzqiMe2ZTcqukB3pbb+0Dn7dg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WyJlvKHhGfs1ztlgZ03b+QMD3eXi9AQln+UJclpp4SrSW4J8Ngc+ObJ/TrM74wvV6xL1GAgDPA9c6GTZrPu1CLs6un3GEUkcFlozCTJwMaOO8l/sAsTcfEt624/OPwBcs+ZVyLBMqPDxWSfLmwrXuIVcifCN3haeRCcZk+rfUMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=PrHYv3F7; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=kjuIUQrl; arc=none smtp.client-ip=202.12.124.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
-	by mailfout.stl.internal (Postfix) with ESMTP id DE12411401D7;
-	Mon, 17 Mar 2025 12:17:37 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-10.internal (MEProxy); Mon, 17 Mar 2025 12:17:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1742228257; x=
-	1742314657; bh=rChHcIiTsqfJMfRRaSk9XzCEBpSq53JiuYtJYOMaOXs=; b=P
-	rHYv3F7pdvTvJ9p7CkKL+OESnK/481FPd8M/2NOZl5brmBkA4CYQYaa56StVYEjH
-	aqHdR4r4+AU59/5uuRw/3P4fBM5PHkhFnTEbBdV9X2hhgFH9oUokLq0svdLNNtHT
-	CqEeIZnR1Id5Gmn6Zx6jZV62ro6vLvsOHJ7Pt69Oq6p64CnBvZP9VQtn4/D7f1Y4
-	XkrICapEy+nP2kMp/A0Gz8wWe3MIOCWXIebzfevi4ul5pJLm2Q7rfszmhPkTYX/0
-	9271W2eVji1beGetXbO1lOBhbLaiQiMkVPengk6EjU9Hld6R8dBzA64JfJcPvV4c
-	OCRgSmfR3aVvrmfdAVLUg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1742228257; x=1742314657; bh=rChHcIiTsqfJMfRRaSk9XzCEBpSq53JiuYt
-	JYOMaOXs=; b=kjuIUQrlCAUHJ2I4ZHJmh28HOe8KyRo2h5zuZvEUHGxA0D5pGYV
-	Ja1zOLGO5sl9PBvptarugXd6LNQtipWyGgceuqjl6nqbtGfrCoi03D7jhr2jJFu0
-	Z7VX7ftQ5HIiGwqO7rHtRZIK36VmhGXprpAvr3VYJr/gfsxhvFRu/9NyBHvOvnaX
-	plrvGQbWSROHnbAv9KqihFn35wwr98iFMxx0iW7ZanNBSHzuSTwK6yirUDBJHXzZ
-	R9eKQAsaQUrgtgzG5dbgvXAZK3oEATU5/caVWGg4VO5pyqjftePdq+XbDkXSMCSX
-	968NIK8KnxtcgRMkGcn4zSB0FpuCjS11jug==
-X-ME-Sender: <xms:IUvYZ_oRjpgaYD1YCI9g7EthIN5VNfPnr5C2LYdWePdovW6DSitNzA>
-    <xme:IUvYZ5pfEj9Tvj96-Nmvy2k3-gmH76SSKnpXJbCim9H4KL7PGBewIuxZASn-zhTI0
-    sFtMdKnTWJaxP_R2L8>
-X-ME-Received: <xmr:IUvYZ8NoDwIhnf6AcHC-wUp8LqTjEcKxaw6K3zez49INd3JcXhrlVutGkvH1>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddufeelleejucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
-    jeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihsh
-    hnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdef
-    hfekgeetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenuc
-    frrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhn
-    sggprhgtphhtthhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepvgguuh
-    hmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghm
-    lhhofhhtrdhnvghtpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtph
-    htthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepnhgtrghrugif
-    vghllhesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhunhhihihusegrmhgriihonh
-    drtghomhdprhgtphhtthhopegsohhrihhsphesnhhvihguihgrrdgtohhmpdhrtghpthht
-    ohepjhhohhhnrdhfrghsthgrsggvnhgusehgmhgrihhlrdgtohhmpdhrtghpthhtohephh
-    horhhmsheskhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:IUvYZy45VqukZ9YePzGGrVmkjGDU2aoI247Oz-CtBuvSqvi8jjekcA>
-    <xmx:IUvYZ-5wwUHfok9bxbc51PRiOkZzRsOZhs6mrrIOzMXQrxaA-WcS2A>
-    <xmx:IUvYZ6iFIcvpnB08BleTdipRScQ0jobG-wk04O5KpnOxmyaS01H8tQ>
-    <xmx:IUvYZw5q2PQ2ZvOPITTAMBkfhS8EiSmvMM59_ODMp0RRaB1RO85nGA>
-    <xmx:IUvYZ2hSRKUzDmcgZb5FctANgVM9Co0nLuoVSLHyh5nZar-anatI58Up>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 17 Mar 2025 12:17:36 -0400 (EDT)
-Date: Mon, 17 Mar 2025 17:17:34 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Boris Pismenny <borisp@nvidia.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next] tcp: move icsk_clean_acked to a better location
-Message-ID: <Z9hLHoGnvHqD5da4@krikkit>
-References: <20250317085313.2023214-1-edumazet@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=U2BGIyEBbETW/Kxfz2GWujy2W0Toj8w4TfBE1fdNLeO+ZsOu9xgaqp0FuK/Upogw/tiAfq+TBl5Qo1hsM3S11kjVWOd5nheXkBaceQuMGx2QPwU+FS/TJzUtfLydDPKLhMYETX+1Y+p6oBfZadbUg2WCfaxLoF/UnJbOtR9+niQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UNP6zHfb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52745C4CEE3;
+	Mon, 17 Mar 2025 16:21:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742228465;
+	bh=vF7ad/Mcki5NOq2HyTnzqiMe2ZTcqukB3pbb+0Dn7dg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UNP6zHfbeqKFnPIED0zdcRQimNpHnL50ZjQw/SF2NtUKHkJKf+WsK8Puc0q/HRC5Q
+	 onsOiDyvNoV9I+gK/9P9UtAQWijdj+yFOF294HY5ZRdwOUJESoBpFeDSMjOUnV/tMb
+	 LGl0pVHBIhsIpmJ4mCJBqxLGoyFSE8nwWvMrmpAR5euAb3/3Y4JF8rCW/r7HPLZ283
+	 tEjE0x3ifwLcDaMyGL+724wsBU0E2DxXpycWU0RIX9dNzNk31tWJF72zZU1HWW4xSf
+	 dOMKc63X/TiQUDyNsTttNXexINS3UNfcOMokM+zEqcHr+RjiWmygyhgkt9/MmX/MKB
+	 fBchnaF6xNSFA==
+Date: Mon, 17 Mar 2025 11:21:04 -0500
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-mediatek@lists.infradead.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	upstream@airoha.com, Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Conor Dooley <conor+dt@kernel.org>, Lee Jones <lee@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>
+Subject: Re: [net-next PATCH v13 03/14] dt-bindings: net: dsa: Document
+ support for Airoha AN8855 DSA Switch
+Message-ID: <174222846382.166778.10361750788975293677.robh@kernel.org>
+References: <20250315154407.26304-1-ansuelsmth@gmail.com>
+ <20250315154407.26304-4-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250317085313.2023214-1-edumazet@google.com>
+In-Reply-To: <20250315154407.26304-4-ansuelsmth@gmail.com>
 
-2025-03-17, 08:53:13 +0000, Eric Dumazet wrote:
-> As a followup of my presentation in Zagreb for netdev 0x19:
-> 
-> icsk_clean_acked is only used by TCP when/if CONFIG_TLS_DEVICE
-> is enabled from tcp_ack().
-> 
-> Rename it to tcp_clean_acked, move it to tcp_sock structure
-> in the tcp_sock_read_rx for better cache locality in TCP
-> fast path.
-> 
-> Define this field only when CONFIG_TLS_DEVICE is enabled
-> saving 8 bytes on configs not using it.
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+On Sat, 15 Mar 2025 16:43:43 +0100, Christian Marangi wrote:
+> Document support for Airoha AN8855 5-port Gigabit Switch.
+> 
+> It does expose the 5 Internal PHYs on the MDIO bus and each port
+> can access the Switch register space by configurting the PHY page.
+> 
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
+>  .../net/dsa/airoha,an8855-switch.yaml         | 86 +++++++++++++++++++
+>  MAINTAINERS                                   |  1 +
+>  2 files changed, 87 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/dsa/airoha,an8855-switch.yaml
+> 
 
--- 
-Sabrina
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+
 
