@@ -1,90 +1,91 @@
-Return-Path: <netdev+bounces-175414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1420A65B19
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 18:40:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9DEAA65B1A
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 18:40:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2813B174493
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 17:40:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F5841685C9
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 17:40:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 210121AF0BF;
-	Mon, 17 Mar 2025 17:40:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E98941AD403;
+	Mon, 17 Mar 2025 17:40:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="JhlLTv9y"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="XRKI2kIR"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2079.outbound.protection.outlook.com [40.107.220.79])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2079.outbound.protection.outlook.com [40.107.94.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 751911A3BD8
-	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 17:40:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6E71ACECE
+	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 17:40:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.79
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742233234; cv=fail; b=Rm+2McTyAqHQYzshmB/jgzssJMXmfqgpJZEr+tB0smvsXrwoOSX4/pNiOiy92c/wHjoYhquU4n6yL0aLsWPHJ9wonC3bVmjHruNdCYR6cgh62rg9caF8P9KkSQ2f21zlqNT/fM/bnkPt55iQeuCbLHAvd1vHRCfBTB0lOTe720Q=
+	t=1742233241; cv=fail; b=stb68IVUXbfVeV6l9lgS3hcTNL1IH+Q784PHphAIq9pVbXs2HS8ofwpsTlctKJK8zkxIY+VhnI78k83LT4ECZ5Yobo42M7kVzvjWgc0aY4UJHauyFiOicWXXaXgITysSyrMao6h8Wntbo6osdw+Z3UrDAQJl4J8iCqznGgkB+IU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742233234; c=relaxed/simple;
-	bh=CuHdI96jeowwsuQVEzllgMg+cNxtT5+claVO1iiyvkY=;
+	s=arc-20240116; t=1742233241; c=relaxed/simple;
+	bh=4gLtf+yt6c62EkfgKWhCgywY/7J2I9czV/pPdq/HpcE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EyMpeFdaKQMues80pSR/nwW4FufaaGJOclaeL6vaZQVymDJsqkZvMVxXrM+gSo2dAleeVnss63qjQIYYWBTzzsx3/aQIEdxEj0Gfa+ahX0u2S/suk77psMz66NF76ZUbB4Sln059YbGBxUuvPs6N+bfLznLLeYUnl/R3EX8Jddw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=JhlLTv9y; arc=fail smtp.client-ip=40.107.220.79
+	 MIME-Version:Content-Type; b=Q7MEiQugkqpkX9mBvOOadg+7lMVStUq97ve7gf4u7fKh/cU63YIdLPNffDpD285uESg/siMKrsHe1Fob09r7eajfTMxqpHhPbWcZaQPeu2JNVR/cql31lI6h1R8VO0T1M13fPJbqoE8RtOIap7M0yyz2ZYSeOrcnIsEdy2HJU4Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=XRKI2kIR; arc=fail smtp.client-ip=40.107.94.79
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=E59wTTRxfaRdrjWjWUPgjmjrJCOn1B/HQ2JBQhifXBENcvb1XJrgfblIVxhvofZejRLb52Xq33UpDpuDWksyJOJyFiMIpQggI3T9f91AZRxpUdBIYNyID2MRHIh2nax9J9qDk3ylYOmJwdYJvI34psH4BOzbdGsbcGPgxD6cJxKPwpy47Ug6co1sau99y7iJsCAPnW4Mv6LvrG6mqvJiyHcY0hEdnQx5F0rMf/NzUt+jxQVufi423/RczZlW7AK9L7mhuGJQNUP5wKhThnfQwaafFNJYF9M88bNR6BKdx33g/Jqlombffn6FmEMINAG+WLNXNaPU9QsHquM90OcgAQ==
+ b=UYqtSKAYI4PpaW2ffGdx9oNLuIv9sv3R1fMKUWmvELKF3Nu3jrp2sMul1AxqgAJSvmL3wVIaMmjzr7BuwF2B2cR1QrnRDlUA8xlh0cdLg4uZwdC/vFoc91wBr7u1uKS1wXNyXOv5tKI0T4C49rn1S3Mf/YMUyl5u5p+WoGoaYa2B13yr+C2eLYGb+GEw90dDBZfr9O7rG7mb0k/5FOz7DCUj+ISijYO1GqTgIZQzKkki8otkphq641t8eDDatJFUvQNKnkrddNlLdgxCiW856TFN1ou4xHMRTWOcaYUn0NwFAiBp6jt9E95htFDg8GQz+/gopQfsSiZjY6g1Q6Jykw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=u46+UHEKviopyN1/H1v4qeV0ZyLM8r7KQN7wZnRoXcM=;
- b=Jv0iUtpRR4g1tajufad7pUQYXhqcS1XfQrUgNkL50RTo55M5IBb2ESfR12bXQ55d+om9agkA44WzjaWCBO+c1cILbMb1KtUCdEoVuHYNq+RYaLGBMdwjPCirLbz9STtHgEnUKCNB10oV2regqT29cIsO201r9E2FCqRzyCJnCesOBNzzu6m11nQXi/B2PpftowLxkAV2t1r9HbJmwFiLb+n4Vg55H7GpvveRWzr32GLcNDhVpSgQYsMth0TaLC9pCrtnzbYsnDyvnHQCO/xgIXy46AKwcxNRpBgD2IcFaUMCyHb36iCgz+7ckgf+ePH6x1A813zX6nmemtASRFdEvw==
+ bh=uyfjVq5laykueUcFx31nQXMz11sty6JOLXq2+ua0GBs=;
+ b=BnkUr1/YMe5zuP4tCew04znH9xd51rc7yTiXegjQ2ZxQDVStxhYxIkbtL6gVH3J07cgOUqvHYEE4x1J9s9chLo0+oKTF2UPZLbZopCbkhDaKW+qngv/GOYEGpNovmdws0SJVEwwjuTd0VTR4BamzeELWTW2w/AXX9uL1alRG9Do3+3YwvBJ/nAkNy7cujYaf9PbD8wRx6pgqMqnOnAFQDnC7bIS9h9J01b+wx6lUhPAIPnNye00p1Bg1HNPVfpmoHLlumlngdN2aStHKIooqjyCINIrH6Qu6DYWq9iKwPQCPNkeFA5Po6NsjGFz4vm65DNQ5vtAPmPFidO1gfvS/CA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=u46+UHEKviopyN1/H1v4qeV0ZyLM8r7KQN7wZnRoXcM=;
- b=JhlLTv9yB14lFpvxUrlpZC2g/mdjgHCQYj7BjKXn11/Qf706SC+452+nWF9beYD+BnVu7u7vAtoMNJmqqIktGDN106VxFrM2luJ9C9zd6C04w60VeTrAsfvVGhnNu0pVcZe102CUM4FPw7kyuM03xNpylAJ4024dyYUBbPgG0WPOdxLC+3LBShy62JGTSWyvBADKQfkK6RAtJKYF0GwYN80Sug3TBzF+7bH75SogWDFieRuD1pp9utKnGf7dNURB3z9aFbMD+s+Y17LT+8Q3z8ICZHmPdqg/2aiTcu3p+ms1aLXt36uzXKSbDcsjGHfZzt0MdmFdGVDBwQP/td02fg==
-Received: from BL1PR13CA0399.namprd13.prod.outlook.com (2603:10b6:208:2c2::14)
- by IA1PR12MB9029.namprd12.prod.outlook.com (2603:10b6:208:3f0::15) with
+ bh=uyfjVq5laykueUcFx31nQXMz11sty6JOLXq2+ua0GBs=;
+ b=XRKI2kIRq1I7SnGi4uFHd5JFACRgQw41RCDUZgJJFPTOhki5vZwitNEc+J4TtlZrc8CKV5XwqVAVmpmlLVHATlL7gdcVykJtpQ/WyVsR4vu7pgauQQYisDYQVCAHf8Jw6HDwpRsCG0SZy04eHGfhUPjsV6fde+XArdeUK0nl0E/WXQgkObetKavLJ2Zq8mNVkPqwQeDGMwKeZa2qbIZyUzc9yRyQalf1aZCxXhAtZNvyUlLBeLOkYTEPTq9UU5EFHDk1dTNxFYhG1Alyzcr3E4n4VX7EL3elHdoA2XvrjrJccxYP8WpWRxj2XxkdkM7KesLo8sBXxvh73lSjve75yQ==
+Received: from MN0PR04CA0028.namprd04.prod.outlook.com (2603:10b6:208:52d::27)
+ by CY3PR12MB9631.namprd12.prod.outlook.com (2603:10b6:930:ff::6) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.33; Mon, 17 Mar
- 2025 17:40:28 +0000
-Received: from BN1PEPF0000468E.namprd05.prod.outlook.com
- (2603:10b6:208:2c2:cafe::30) by BL1PR13CA0399.outlook.office365.com
- (2603:10b6:208:2c2::14) with Microsoft SMTP Server (version=TLS1_3,
+ 2025 17:40:36 +0000
+Received: from BN2PEPF000044A2.namprd02.prod.outlook.com
+ (2603:10b6:208:52d:cafe::f7) by MN0PR04CA0028.outlook.office365.com
+ (2603:10b6:208:52d::27) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.8534.33 via Frontend Transport; Mon,
- 17 Mar 2025 17:40:28 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ 17 Mar 2025 17:40:35 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BN1PEPF0000468E.mail.protection.outlook.com (10.167.243.139) with Microsoft
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN2PEPF000044A2.mail.protection.outlook.com (10.167.243.153) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8534.20 via Frontend Transport; Mon, 17 Mar 2025 17:40:27 +0000
+ 15.20.8534.20 via Frontend Transport; Mon, 17 Mar 2025 17:40:35 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 17 Mar
- 2025 10:40:13 -0700
+ 2025 10:40:19 -0700
 Received: from localhost.localdomain (10.126.231.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Mon, 17 Mar
- 2025 10:40:08 -0700
+ 2025 10:40:13 -0700
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
 	<andrew+netdev@lunn.ch>, <netdev@vger.kernel.org>
 CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, "Amit
- Cohen" <amcohen@nvidia.com>, <mlxsw@nvidia.com>
-Subject: [PATCH net-next 4/6] mlxsw: spectrum_switchdev: Move mlxsw_sp_bridge_vxlan_join()
-Date: Mon, 17 Mar 2025 18:37:29 +0100
-Message-ID: <64750a0965536530482318578bada30fac372b8a.1742224300.git.petrm@nvidia.com>
+ Cohen" <amcohen@nvidia.com>, <mlxsw@nvidia.com>, Vladimir Oltean
+	<olteanv@gmail.com>, Vladyslav Mykhaliuk <vmykhaliuk@nvidia.com>
+Subject: [PATCH net-next 5/6] mlxsw: Add VXLAN bridge ports to same hardware domain as physical bridge ports
+Date: Mon, 17 Mar 2025 18:37:30 +0100
+Message-ID: <7279056843140fae3a72c2d204c7886b79d03899.1742224300.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <cover.1742224300.git.petrm@nvidia.com>
 References: <cover.1742224300.git.petrm@nvidia.com>
@@ -101,115 +102,159 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
 X-NV-OnPremToCloud: AnonymousSubmission
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF0000468E:EE_|IA1PR12MB9029:EE_
-X-MS-Office365-Filtering-Correlation-Id: e5832b03-6e7e-414d-922f-08dd657ace41
+X-MS-TrafficTypeDiagnostic: BN2PEPF000044A2:EE_|CY3PR12MB9631:EE_
+X-MS-Office365-Filtering-Correlation-Id: 24115f95-902c-4df8-ea25-08dd657ad321
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|36860700013|82310400026;
+	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?0dJlFw39pUelDevV7x+S/bhekQyK3wgjQ+ojX6YoJYjIfyuzmHWFMlEOL920?=
- =?us-ascii?Q?VpngpwBOImxQHRfPSandCGmhiLkbGdQNtc6aJ1zGxbddZDEL5mxIBSrj69Xj?=
- =?us-ascii?Q?rYfzhJKYv5rxoxq9Ew91W5Z7GwokdxZLZI9slEgUemcYpl2aowyoWXQF1E+c?=
- =?us-ascii?Q?eBpELcm0tWqiQIoD2Z785h2epLteT4bOxyy2MiMVkDotQwdQ5Zz0NMARxZTV?=
- =?us-ascii?Q?9l5yKifVzwIku18vwgjiogk3VFLdxRIz6rFpX9puM0hPa3fx1As4xmaQH2vH?=
- =?us-ascii?Q?1Lqyinrv3yXgDh9pvkTw006hzs3H2JP6lo+pI7Ql9kT0/RXRZpjoTjm3xJYg?=
- =?us-ascii?Q?jnUYrGsui0C+hZv+mInHRM+eNl1DhbspOBjeZ8FjsynQVWkfFwcIXUs96Xuv?=
- =?us-ascii?Q?YFM732R0JCD7hMSskIbFcElHsHXqLg5b4X1b/xvwOjUHvc7DsOhslVKHpftJ?=
- =?us-ascii?Q?iBjB2ttbFs9N8YNxp9z+YlKLWuaYxofIBHYBJ2rJ1cdMW98EuPivtK9sRFex?=
- =?us-ascii?Q?a7SYIeRkHsyqqnPURPI7tGi2knw9xf/9VTP/RSAsawI26oGAPvHknl9nEoot?=
- =?us-ascii?Q?rr20GkjxuoT0xEW6DCFw4D8w1X7+TTtXE/BNfeAztX+Y4KDA7Rs0aC1ALiDQ?=
- =?us-ascii?Q?uImcX0CKY32VDEwvfhRb8wbMqPE0s4nfKjOfnBTvhQI+oO4r5jL3/w1nYLBl?=
- =?us-ascii?Q?Bj5zcnh4t1LVI50rBrz5Rz5NmpJjHt5F5Hr9bpzTwk1jJimYkWWVxwip38+y?=
- =?us-ascii?Q?G8VCR9tmkgCIB5DTDRPsaIRSeRzIIoiF9FRJCHLKJM6PpitzoeBptMQfhVX3?=
- =?us-ascii?Q?TLIjb0w98CdG6gGt1VGNBMHPbV6KyVfjrBnRHRh8/Sl2wztTdbPSNNF1bjSI?=
- =?us-ascii?Q?hiSr3mZp188+GqOxAptu8Bble94qhmj7YEODa/h5APgj7PQ1Xd0BsCW4CrZk?=
- =?us-ascii?Q?akDXL3H7q99xE4YA/fxSgvkupjLC5+VGdab2cPPkQUBZAftTUxxzSUmhNGYi?=
- =?us-ascii?Q?VRLBDzEPaMSo+HhDTm4jdr3v8YEHWREK3TPTwTgkGc03exdcfujhbFJUZzeC?=
- =?us-ascii?Q?yRhsLKqwKNarACnR3f4z35am7un32tfGdt4hph3QwjrGsdgpIkE20yQDFN7w?=
- =?us-ascii?Q?Mba/r9/MBCejtMz4WUbtb7YhVgnITR5D+v0oxQQuwUw/MMkRqGiJj41y5DfN?=
- =?us-ascii?Q?Wp/pfzKs2kSFOQHHxSUnEyDZhYwxVwq+SkI8n7sxtztwWaqiQ7ucLs9BbOvL?=
- =?us-ascii?Q?XQZ8qL7gIgUJ2aYcMIOddzd2Q65SMBjt2GSq6TnJwVcLi07Z95TEDQ2Kp6LI?=
- =?us-ascii?Q?XcdUALXHOQnTyeaXTWQBs00YaEXi2sgieZmwNN35jCw98M9LFnhNoJ+SDgDg?=
- =?us-ascii?Q?zbJuu0PsapqRlNOE5c3mlAfJovniNBCfLvUrmJFC6399gr8l04t7+0iXxchr?=
- =?us-ascii?Q?dHRtfnRNjqxCe9lc0Z+6c6vLavoTYmrLEPmfUUFRHwYeIPDYuspwPzBIg6vQ?=
- =?us-ascii?Q?qj0c4F1NEEsjm+k=3D?=
+	=?us-ascii?Q?0nfePRECHFp+ehIod8JfeuWGfncBTF7mB+pqBq1QdToc0qbI95AfFnRB2yMF?=
+ =?us-ascii?Q?X7NWncM0YIQWANKK8/DaV9by17glao/lmPFDT5PCxS4DHK5khNeTbySw0KAw?=
+ =?us-ascii?Q?CSyvNR11zRBM/iM51EI4/VAP0uTL0DK15oZfENmGjdu3Yw7i6X+hlicpoeC5?=
+ =?us-ascii?Q?M85YvJ4i0sAgP1qUvRUmVYgd0LO+fjhaHWHNBN/CdkKIF2Oph9rZ4t/0caVQ?=
+ =?us-ascii?Q?uZEN4xsyphy5cX13NLyntCF0xtVuozE6UaP2YZuyis9Psp8D4mDAxRnN8XXG?=
+ =?us-ascii?Q?5ByUlhbmtxWva/NA7OVGUHubOuSCBZRzhwg5r7j8P1+vz4FUQ34l1FY6sVZM?=
+ =?us-ascii?Q?freggZdwFiA6c16Sr6K+1PruCwSz+g3f8/++tShBKb3bxOMHq67Y1Z6fVGpZ?=
+ =?us-ascii?Q?Pzw1a0/V/iNyqYzoGZ/h74UZF+VVtGXDGKwHs6dKfarLGdflOPrA8rX4BMpC?=
+ =?us-ascii?Q?kD6L5ndWnIhyz0f+9pylw750p8A8KaQ04PNYztw+ocw+lGojMiKJZPj8eVBL?=
+ =?us-ascii?Q?/QvCIWhm8dyFNrZKXIbrtA0ihezC7hse+1VxFStpD57j8gEXPgO+/mfg0OLo?=
+ =?us-ascii?Q?ppjR+M9UeVc+gFo1XzMBFZ0SU/ECQJs0Xi+sydBzA7FpMMhXe/2aIOBEEmN+?=
+ =?us-ascii?Q?WBAkddcfNVYkGqdTHjO2zkCxZ0h7XihiSyPqMzWTyIQJ6qJCuBvOUVqU9104?=
+ =?us-ascii?Q?OCTtqLRwBhwx7qeybotO1UOS4GQJ3pXXy1aqoAjDF5Zr6dGgWxUWIx07vr+Z?=
+ =?us-ascii?Q?JHnLv6Lyt8+lRgTBxj9dObH05Xzy4lIv657IZRmsduTuzN2COHe8ciUJ/BCL?=
+ =?us-ascii?Q?7UjzqUKjN92+mZXAqFeNOnVyiS4imBVWWahMgKcrekKrewA+aGE0XUpw8dEE?=
+ =?us-ascii?Q?/SSj1F7Qv0/Kd2f1gT0LK3B1Yq9tPxjA8qCTQXNu+fEOo0vPaHyZDr0Y2IMR?=
+ =?us-ascii?Q?+p++3vYF4d1EV8kP0XJDm0GTsC4bE4hAYO5mplcnuJaZrI6cgzebz+z91MfH?=
+ =?us-ascii?Q?3qbP5TJkOpHehM/3ouLRv5EYzEIs/cBPAjm+QrWUspdiFqpfmav6IGss+VU/?=
+ =?us-ascii?Q?LtjTBHOuPvZbJDyp7z9YyNKtzuLWYshIUF1UeTaesiFAj1+2QEEGtswHdrvM?=
+ =?us-ascii?Q?IovJ1ET5PZU+MQNy3SnDxfQRGZrAdbYwWN0ReV/2iy1K8w52ZKEOeZqQe6pp?=
+ =?us-ascii?Q?pthpCcEXMnr/0/vX8sFH1jZN9vPiDnlGsgAs74M8yEVr+c/AMBkKt9uDFKIt?=
+ =?us-ascii?Q?9cv3ZIcMNZK/3FUXci0yTQtb9BZOHONxICwqif84b5kOeRCGGlZb2gS+0ai8?=
+ =?us-ascii?Q?y7fwXy0UdYeRWg/gqc1/9UC6Sa9K3Sf0K4jEY+49wK1wAl5xVkeTyFxd74/p?=
+ =?us-ascii?Q?2phhOsZlYSISwDVjvUtbBfpC2gQ2++ofAAGprW3MWfXWI7Yu+A4NrGw+4mO+?=
+ =?us-ascii?Q?pUkSOO8Mbeq9McUaNXeiGNmZqI7uvo0+DS6ZN3VDPtAV+/uzoCK1rLq3wmgF?=
+ =?us-ascii?Q?Oo3nRM+W1H4Vxi8=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(376014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2025 17:40:27.5422
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2025 17:40:35.7077
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e5832b03-6e7e-414d-922f-08dd657ace41
+X-MS-Exchange-CrossTenant-Network-Message-Id: 24115f95-902c-4df8-ea25-08dd657ad321
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF0000468E.namprd05.prod.outlook.com
+	BN2PEPF000044A2.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB9029
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY3PR12MB9631
 
 From: Amit Cohen <amcohen@nvidia.com>
 
-Next patch will call __mlxsw_sp_bridge_vxlan_leave() from
-mlxsw_sp_bridge_vxlan_join() as part of error flow, move the function to
-be able to call the second one.
+When hardware floods packets to bridge ports, but flooding to VXLAN bridge
+port fails during encapsulation to one of the remote VTEPs, the packets are
+trapped to CPU. In such case, the packets are marked with
+skb->offload_fwd_mark, which means that packet was L2-forwarded in
+hardware. Software data path repeats flooding, but packets which are
+marked with skb->offload_fwd_mark will not be flooded by the bridge to
+bridge ports which are in the same hardware domain as the ingress port.
 
+Currently, mlxsw does not add VXLAN bridge ports to the same hardware
+domain as physical bridge ports despite the fact that the device is able
+to forward packets to and from VXLAN tunnels in hardware. In some scenarios
+(as mentioned above) this can result in remote VTEPs receiving duplicate
+packets. The packets are first flooded by hardware and after an
+encapsulation failure, they are flooded again to all remote VTEPs by
+software.
+
+Solve this by adding VXLAN bridge ports to the same hardware domain as
+physical bridge ports, so then nbp_switchdev_allowed_egress() will return
+false also for VXLAN, and packets will not be sent twice from VXLAN device.
+
+switchdev_bridge_port_offload() should get vxlan_dev not as const, so
+some changes are required. Call switchdev API from
+mlxsw_sp_bridge_vxlan_{join,leave}() which handle offload configurations.
+
+Reported-by: Vladimir Oltean <olteanv@gmail.com>
+Closes: https://lore.kernel.org/all/20250210152246.4ajumdchwhvbarik@skbuf/
+Reported-by: Vladyslav Mykhaliuk <vmykhaliuk@nvidia.com>
 Signed-off-by: Amit Cohen <amcohen@nvidia.com>
 Reviewed-by: Petr Machata <petrm@nvidia.com>
 Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 Signed-off-by: Petr Machata <petrm@nvidia.com>
 ---
- .../mellanox/mlxsw/spectrum_switchdev.c       | 30 +++++++++----------
- 1 file changed, 15 insertions(+), 15 deletions(-)
+ .../net/ethernet/mellanox/mlxsw/spectrum.h    |  4 +--
+ .../mellanox/mlxsw/spectrum_switchdev.c       | 28 ++++++++++++++++---
+ 2 files changed, 26 insertions(+), 6 deletions(-)
 
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum.h b/drivers/net/ethernet/mellanox/mlxsw/spectrum.h
+index fa7082ee5183..37cd1d002b3b 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum.h
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum.h
+@@ -661,10 +661,10 @@ bool mlxsw_sp_bridge_device_is_offloaded(const struct mlxsw_sp *mlxsw_sp,
+ 					 const struct net_device *br_dev);
+ int mlxsw_sp_bridge_vxlan_join(struct mlxsw_sp *mlxsw_sp,
+ 			       const struct net_device *br_dev,
+-			       const struct net_device *vxlan_dev, u16 vid,
++			       struct net_device *vxlan_dev, u16 vid,
+ 			       struct netlink_ext_ack *extack);
+ void mlxsw_sp_bridge_vxlan_leave(struct mlxsw_sp *mlxsw_sp,
+-				 const struct net_device *vxlan_dev);
++				 struct net_device *vxlan_dev);
+ extern struct notifier_block mlxsw_sp_switchdev_notifier;
+ 
+ /* spectrum.c */
 diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_switchdev.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_switchdev.c
-index c95ef79eaf3d..13ad4e31d701 100644
+index 13ad4e31d701..a48bf342084d 100644
 --- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_switchdev.c
 +++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_switchdev.c
-@@ -2929,21 +2929,6 @@ void mlxsw_sp_port_bridge_leave(struct mlxsw_sp_port *mlxsw_sp_port,
- 	mlxsw_sp_bridge_port_put(mlxsw_sp->bridge, bridge_port);
- }
+@@ -2950,22 +2950,42 @@ static void __mlxsw_sp_bridge_vxlan_leave(struct mlxsw_sp *mlxsw_sp,
  
--int mlxsw_sp_bridge_vxlan_join(struct mlxsw_sp *mlxsw_sp,
--			       const struct net_device *br_dev,
+ int mlxsw_sp_bridge_vxlan_join(struct mlxsw_sp *mlxsw_sp,
+ 			       const struct net_device *br_dev,
 -			       const struct net_device *vxlan_dev, u16 vid,
--			       struct netlink_ext_ack *extack)
--{
--	struct mlxsw_sp_bridge_device *bridge_device;
--
--	bridge_device = mlxsw_sp_bridge_device_find(mlxsw_sp->bridge, br_dev);
--	if (WARN_ON(!bridge_device))
--		return -EINVAL;
--
++			       struct net_device *vxlan_dev, u16 vid,
+ 			       struct netlink_ext_ack *extack)
+ {
+ 	struct mlxsw_sp_bridge_device *bridge_device;
++	struct mlxsw_sp_port *mlxsw_sp_port;
++	int err;
+ 
+ 	bridge_device = mlxsw_sp_bridge_device_find(mlxsw_sp->bridge, br_dev);
+ 	if (WARN_ON(!bridge_device))
+ 		return -EINVAL;
+ 
 -	return bridge_device->ops->vxlan_join(bridge_device, vxlan_dev, vid,
 -					      extack);
--}
--
- static void __mlxsw_sp_bridge_vxlan_leave(struct mlxsw_sp *mlxsw_sp,
- 					  const struct net_device *vxlan_dev)
- {
-@@ -2963,6 +2948,21 @@ static void __mlxsw_sp_bridge_vxlan_leave(struct mlxsw_sp *mlxsw_sp,
- 	mlxsw_sp_fid_put(fid);
- }
- 
-+int mlxsw_sp_bridge_vxlan_join(struct mlxsw_sp *mlxsw_sp,
-+			       const struct net_device *br_dev,
-+			       const struct net_device *vxlan_dev, u16 vid,
-+			       struct netlink_ext_ack *extack)
-+{
-+	struct mlxsw_sp_bridge_device *bridge_device;
-+
-+	bridge_device = mlxsw_sp_bridge_device_find(mlxsw_sp->bridge, br_dev);
-+	if (WARN_ON(!bridge_device))
++	mlxsw_sp_port = mlxsw_sp_port_dev_lower_find(bridge_device->dev);
++	if (!mlxsw_sp_port)
 +		return -EINVAL;
 +
-+	return bridge_device->ops->vxlan_join(bridge_device, vxlan_dev, vid,
-+					      extack);
-+}
++	err = bridge_device->ops->vxlan_join(bridge_device, vxlan_dev, vid,
++					     extack);
++	if (err)
++		return err;
 +
++	err = switchdev_bridge_port_offload(vxlan_dev, mlxsw_sp_port->dev,
++					    NULL, NULL, NULL, false, extack);
++	if (err)
++		goto err_bridge_port_offload;
++
++	return 0;
++
++err_bridge_port_offload:
++	__mlxsw_sp_bridge_vxlan_leave(mlxsw_sp, vxlan_dev);
++	return err;
+ }
+ 
  void mlxsw_sp_bridge_vxlan_leave(struct mlxsw_sp *mlxsw_sp,
- 				 const struct net_device *vxlan_dev)
+-				 const struct net_device *vxlan_dev)
++				 struct net_device *vxlan_dev)
  {
++	switchdev_bridge_port_unoffload(vxlan_dev, NULL, NULL, NULL);
+ 	__mlxsw_sp_bridge_vxlan_leave(mlxsw_sp, vxlan_dev);
+ }
+ 
 -- 
 2.47.0
 
