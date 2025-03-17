@@ -1,256 +1,144 @@
-Return-Path: <netdev+bounces-175334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD565A653A2
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 15:32:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BAF3A65429
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 15:47:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 865553A527F
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 14:32:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B2327A2CE3
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 14:45:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AFFF2405E9;
-	Mon, 17 Mar 2025 14:32:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6622E245029;
+	Mon, 17 Mar 2025 14:46:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k9VDRgMa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HcN0nLDs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E840323F401;
-	Mon, 17 Mar 2025 14:32:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC3D22CBFC;
+	Mon, 17 Mar 2025 14:46:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742221938; cv=none; b=IjzItn/7KHvsTc+UY6U37VFg7xWubOLe6mwgcLGgslxQgS+gVZr7U5PKttFTC5/E0/0wvbZqEqTvR6y5gRhw6XCq8bg3hydfKykRel9zAKfKwIME/GD2xDfamXjkBbjGV3uUrZIFkKSXcWUZSHPi3eI2UCoud8N6tYafdUxloOU=
+	t=1742222806; cv=none; b=ZwVBJS24b0JnUggX47t8ORF7D2tDvANH3Cnura3HsT14p+zR3cLEbxDOiIHbDnmp6okXLWOUeFpycp+qoYMKv56j/ZMvKCS6hOFe/gQy50VGmFHX5nyJ9jH2vKtEo2z0IFu4aR+eC/Bc6SrQ5iKLsFgjNKM7XGJCdfzwXuR6HwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742221938; c=relaxed/simple;
-	bh=herKpa2IkJjNHU1PgoJjzm1RKCPFlsOJSpst31PrWMk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=d3HF7ObhrryDm/6QXVG2ilBQcoBbQAf0B3BUJIv2cd7043az6lMDxHc/1FWDdyydF+jB4fKq9Qz+an4AJbZBmUVhUsXYlCSwgLQXA0zDKxnuTv5KDS9HQTS//651VZsJsbFdoWgwBz2jwRTqpoiD+YZEUDFoNcnuxGh545GHBg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k9VDRgMa; arc=none smtp.client-ip=209.85.214.181
+	s=arc-20240116; t=1742222806; c=relaxed/simple;
+	bh=KEmS1iazSZ7MW4u0s0WffWWZI/F30vXJvZhHvLypmnE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=abbccbcLnyw+OyvafPwypjNd4Scc3Gf3EPk8u4N3XeFW+vN6uBoFjBaJcvyxrq9fYHoAqBi04RAU2DCvnm63gOifVKgSS6uRFSWiigXq7ZqAtkmX8DzJycNH4z6QcfNqhNJVNSnjSVb5H71kaB4iR3uvTw/SH/gxjmr5UKUc/c4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HcN0nLDs; arc=none smtp.client-ip=209.85.221.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2243803b776so38168325ad.0;
-        Mon, 17 Mar 2025 07:32:16 -0700 (PDT)
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-390fdaf2897so4255071f8f.0;
+        Mon, 17 Mar 2025 07:46:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742221935; x=1742826735; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QShWfKeXB5flxGPwyFee/7W6zwcpUiEOR04VZFOgFbc=;
-        b=k9VDRgMa7jVYYwmehSIsKSdlIcheSv85eZIBWwf2C0f13T2+mGIvIwP/RXTegddTj3
-         KClYP/ZBdLUalEFyqDPs1qvcCgwTMwf9NVK9RhqrlCCVnkdXyNkptzOuXkGJZXlfG85y
-         SvpXY98s4D/53bMH9zsYTakPYbZYl1ZeSAsr+4MF99lqw7biQnec7kWmkAV7vhJp2/qu
-         /5/VDspffysU1oJQnSENedMp1Our1l0dUmKTGfn66GOdYQASKuanMaKzzYfac64oQR9e
-         oioPoDyp74kixRhzdGYSalvO+dHbC5BuirGFJo22rF+4mMD7nTperqYhF2g9Y0mKIL/5
-         b0fw==
+        d=gmail.com; s=20230601; t=1742222803; x=1742827603; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HEE7cJguboNfIM/ImN+bEQAuxRuRsoshNhnvPdF6CRk=;
+        b=HcN0nLDs4AimQH8YzhjWDKN+y9adOGi233YcpIQ1Xq4+xeojr1emNBp9inuBnrTJtF
+         vSyxe9mmnq7RFJ+Qk/0xJ90TwQXAVWc40oNS7m5r8SbdAE1XnV752dVxUczzYT6vVKN+
+         x1qGQHM0KXQk0pthbSIS0Adt0JfPBIh3/kNIM4EL5L1TABB0/VDj4+v0yyWOuYF9+vlL
+         QLU4tSDkrj41TqjEeU9veyPiYWCtUufwwt1XVzldoz1HBpK64yXRUT8Y/b/v/R60mXWU
+         4+n9rrncSnrX1fOe2xyER6coUpr2TTbTBiAbWaAi2y/yLXheuAJ5jM/t1EjV/hPG7M+f
+         TTxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742221935; x=1742826735;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QShWfKeXB5flxGPwyFee/7W6zwcpUiEOR04VZFOgFbc=;
-        b=rJabR4/p8Zn9acHxIR/Gu7+41bcUx1yW9UWqjeT05xQH+G0OUNAtcR8hTUJcO4bnH1
-         mWTrpKm4+c+1b7dlgXwixMfG6kCsVqeXKb2blxKBJ3hstZ4Ng2sETauDRHByvKIKYqJz
-         U46sbIM8gMmUJZy5P0B7hlvTfvPhP3rE5jez0ArUiUxBcpcw3pm6HsuJH/G42AwdCBWe
-         0ILYArT0bI3WnC9qj/HmamR5vrwClA9CwQW/vsPP3uWwXWn6PUONi/WBYxhV3WEze0D3
-         k3xJwzciVq/dWZ0hVPImHDbhtL7ztjf7mUwPrSIkDdn551rfcFHx7RO/HvK9GKdaw3gS
-         Zt+A==
-X-Forwarded-Encrypted: i=1; AJvYcCVPIfrWO+RpGqG9lz/XRHLJJBzDUXZ9z4+Ke7Wp03zzlMX9Th/Atk+/XhxZ1uQyBXor5it+ibAQ6RwwxfE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvNuDSLz93y9gjVH2VR7rbtp0Dss0cTU4zm/pVZxNy41oTUvmw
-	NmXHDq8dG0JyPS/4hewZ8druIi4higf4jLN0BaANeGYALECOkzOq+7BR/Cg=
-X-Gm-Gg: ASbGnct72R6GFuW5hWFI9K4EES9llgo9CVtXZdEDlhjfuNK39XSNU4B6vtQ1bEJbCtf
-	v39clvcO3ERG5lCgE6JBNr+EU1Hi9Q5zWH2GYYsQLuDNauXm/7VKOw+mSC1FyzG4Pe7/rFP+xa2
-	DqRO10hdmujKw00WGOb3ZmLCJvn+WfflrUHsdk2NPMZb5wsxMtdxSMKanAup4a2WPVepp9nOVPn
-	6juR477U/OkWIWOgcw8pPkrF0DJXjHMAQfmqTqi7Ln3B7LSnrLnttnt8aCxSFq0wBBLT2GFosWS
-	aupPcf32G5N5wx9LG9LDClAUvnztR9PE82GEAukr4U2MKr3M6ogRhdRSYn73nDCF4uERz/gHQU+
-	Ay/622BMr49/gLp0EjgQIsh7XXrZ+KF96LIVxmg==
-X-Google-Smtp-Source: AGHT+IEoybxuOWwvkhUpeweyH8+pOfe5e1seKQhwXRRFowH6w5Dm71hgoI1K+QKk4dvzKVgCXgXrLw==
-X-Received: by 2002:a17:902:c952:b0:21f:dbb:20a6 with SMTP id d9443c01a7336-225e0ae70d3mr148361275ad.33.1742221935514;
-        Mon, 17 Mar 2025 07:32:15 -0700 (PDT)
-Received: from localhost.localdomain (124-218-201-66.cm.dynamic.apol.com.tw. [124.218.201.66])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-225c688856fsm76058925ad.14.2025.03.17.07.32.12
+        d=1e100.net; s=20230601; t=1742222803; x=1742827603;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HEE7cJguboNfIM/ImN+bEQAuxRuRsoshNhnvPdF6CRk=;
+        b=NlfdUWAyqwhLoruDHrgJGldwtkTP+PITT/vShtid1E8fXLNZBKdSFqrpKTFU+X1he6
+         +WJrbdXsr8zbCcbU06MG9EIn4uy7hjtSVZZUJBkrddn6k4WpvcuDALV61iLSH1GiURy0
+         yhHAp1VXa2N79puW7uQIpTgJ+lCdeEbL3Ws/NE8EKKDzT82oUuZJfMmM9nNzJMB3N5E4
+         Mmv3PaC7T1b03rDIejhlDKTD7VQnGYB9Jk/5x5dytoKqMSf2faXu/ApF3qHT76SgBj+w
+         gViwprkk9zMAl0vGBOf7vf7gvT2znux5y0WnemC27uZXH2fwdNb6SeP8oB6607qTXyq1
+         trFA==
+X-Forwarded-Encrypted: i=1; AJvYcCVDJTGnZVPtyv4BVyGnig+glYy4hnrysSv5f51cmcUBLjXETxQNJu6sBfCbYMC9qhTJB37XNaQ4Y7ipXKc=@vger.kernel.org, AJvYcCWcPiUUF9q66ZKl92LgRZJQLKVW+JEJJ/CsoKii6KYNY186R8uuc3U4qWLEHgd3y1kjNzfL3zcW@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3Z/H997Dav0uWHHLSbt1HGNgcjgH/3bIQ+mKcO5gz7kEfHwLG
+	Is3W6xOYiXNwcLyHDMUy+ljoArdfVErHxSxg/8160A+eNu5VVKut
+X-Gm-Gg: ASbGncvQm96ZRw21QYePwTkW7DtXVQTVlxTasRnJCXnCKvs1p1/GdRMY2fVFumqw6Ng
+	OS5snhzzhaS1kjIekxTiRD+q6WKfoUFJwkne0dplErl+JVsVa1+909Jb/A6NxYJrxJIsrTrUYzX
+	VcMczzSBpYI8nhtIFvkFflqwhynU1EZQHs4oolWs0Vj8kjTInf7fhFjiKnMzEY8m8LD7dlloThX
+	gHd4AsFoOKBjEdAGp8y4Jv+OcspZjV8exs+WgkjNHt02GvGuLfTJ6jOgX6kmbauAbDZ4yyGPQzu
+	AESJTw09B36aGIxkzB/zSoM4uurSrDwZp4Y9fptLaU0K4w==
+X-Google-Smtp-Source: AGHT+IFivRZ2EUR5/RimYhdOCuEzRooY6An887/W/KkgBBJttW2RvsoNsxmtBckobWqWYaquB0gK1w==
+X-Received: by 2002:a05:6000:18ae:b0:391:40bd:621e with SMTP id ffacd0b85a97d-39720398fe7mr13511129f8f.44.1742222802524;
+        Mon, 17 Mar 2025 07:46:42 -0700 (PDT)
+Received: from localhost ([194.120.133.58])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-395cb7ec14bsm15130948f8f.100.2025.03.17.07.46.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Mar 2025 07:32:15 -0700 (PDT)
-From: "Lucien.Jheng" <lucienx123@gmail.com>
-X-Google-Original-From: "Lucien.Jheng" <lucienX123@gmail.com>
-To: linux-clk@vger.kernel.org,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	daniel@makrotopia.org,
-	ericwouds@gmail.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	joseph.lin@airoha.com,
-	wenshin.chung@airoha.com,
-	"Lucien.Jheng" <lucienX123@gmail.com>
-Subject: [PATCH v4 net-next PATCH 1/1] net: phy: air_en8811h: Add clk provider for CKO pin
-Date: Mon, 17 Mar 2025 22:31:11 +0800
-Message-Id: <20250317143111.28824-2-lucienX123@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250317143111.28824-1-lucienX123@gmail.com>
-References: <20250317143111.28824-1-lucienX123@gmail.com>
+        Mon, 17 Mar 2025 07:46:42 -0700 (PDT)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	David Airlie <airlied@gmail.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	intel-gfx@lists.freedesktop.org,
+	dri-devel@lists.freedesktop.org,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH][next] ice: make const read-only array dflt_rules static
+Date: Mon, 17 Mar 2025 14:46:06 +0000
+Message-ID: <20250317144606.478431-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-EN8811H outputs 25MHz or 50MHz clocks on CKO, selected by GPIO3.
-CKO clock activates on power-up and continues through md32 firmware loading.
+Don't populate the const read-only array dflt_rules on the stack at run
+time, instead make it static.
 
-Signed-off-by: Lucien.Jheng <lucienX123@gmail.com>
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
 ---
- drivers/net/phy/air_en8811h.c | 95 +++++++++++++++++++++++++++++++++++
- 1 file changed, 95 insertions(+)
+ drivers/gpu/drm/i915/intel_memory_region.c        | 2 +-
+ drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/phy/air_en8811h.c b/drivers/net/phy/air_en8811h.c
-index e9fd24cb7270..eb349b4ff327 100644
---- a/drivers/net/phy/air_en8811h.c
-+++ b/drivers/net/phy/air_en8811h.c
-@@ -16,6 +16,7 @@
- #include <linux/property.h>
- #include <linux/wordpart.h>
- #include <linux/unaligned.h>
-+#include <linux/clk-provider.h>
- 
- #define EN8811H_PHY_ID		0x03a2a411
- 
-@@ -112,6 +113,11 @@
- #define   EN8811H_POLARITY_TX_NORMAL		BIT(0)
- #define   EN8811H_POLARITY_RX_REVERSE		BIT(1)
- 
-+#define EN8811H_CLK_CGM     0xcf958
-+#define EN8811H_CLK_CGM_CKO     BIT(26)
-+#define EN8811H_HWTRAP1     0xcf914
-+#define EN8811H_HWTRAP1_CKO     BIT(12)
-+
- #define EN8811H_GPIO_OUTPUT		0xcf8b8
- #define   EN8811H_GPIO_OUTPUT_345		(BIT(3) | BIT(4) | BIT(5))
- 
-@@ -142,10 +148,15 @@ struct led {
- 	unsigned long state;
- };
- 
-+#define clk_hw_to_en8811h_priv(_hw)			\
-+	container_of(_hw, struct en8811h_priv, hw)
-+
- struct en8811h_priv {
- 	u32		firmware_version;
- 	bool		mcu_needs_restart;
- 	struct led	led[EN8811H_LED_COUNT];
-+	struct clk_hw        hw;
-+	struct phy_device *phydev;
- };
- 
- enum {
-@@ -806,6 +817,84 @@ static int en8811h_led_hw_is_supported(struct phy_device *phydev, u8 index,
- 	return 0;
- };
- 
-+static unsigned long en8811h_recalc_rate(struct clk_hw *hw, unsigned long parent)
-+{
-+	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
-+	struct phy_device *phydev = priv->phydev;
-+	u32 pbus_value;
-+	int ret;
-+
-+	ret = air_buckpbus_reg_read(phydev, EN8811H_HWTRAP1, &pbus_value);
-+	if (ret < 0)
-+		return ret;
-+
-+	return (pbus_value & EN8811H_HWTRAP1_CKO) ? 50000000 : 25000000;
-+}
-+
-+static int en8811h_enable(struct clk_hw *hw)
-+{
-+	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
-+	struct phy_device *phydev = priv->phydev;
-+
-+	return air_buckpbus_reg_modify(phydev, EN8811H_CLK_CGM,
-+				EN8811H_CLK_CGM_CKO, EN8811H_CLK_CGM_CKO);
-+}
-+
-+static void en8811h_disable(struct clk_hw *hw)
-+{
-+	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
-+	struct phy_device *phydev = priv->phydev;
-+
-+	air_buckpbus_reg_modify(phydev, EN8811H_CLK_CGM,
-+				EN8811H_CLK_CGM_CKO, 0);
-+}
-+
-+static int en8811h_is_enabled(struct clk_hw *hw)
-+{
-+	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
-+	struct phy_device *phydev = priv->phydev;
-+	int ret = 0;
-+	u32 pbus_value;
-+
-+	ret = air_buckpbus_reg_read(phydev, EN8811H_CLK_CGM, &pbus_value);
-+	if (ret < 0)
-+		return ret;
-+
-+	return (pbus_value & EN8811H_CLK_CGM_CKO);
-+}
-+
-+static const struct clk_ops en8811h_clk_ops = {
-+	.recalc_rate = en8811h_recalc_rate,
-+	.enable = en8811h_enable,
-+	.disable = en8811h_disable,
-+	.is_enabled	= en8811h_is_enabled,
-+};
-+
-+static int en8811h_clk_provider_setup(struct device *dev, struct clk_hw *hw)
-+{
-+	struct clk_init_data init;
-+	int ret;
-+
-+	if (!IS_ENABLED(CONFIG_COMMON_CLK))
-+		return 0;
-+
-+	init.name =  devm_kasprintf(dev, GFP_KERNEL, "%s-cko",
-+				    fwnode_get_name(dev_fwnode(dev)));
-+	if (!init.name)
-+		return -ENOMEM;
-+
-+	init.ops = &en8811h_clk_ops;
-+	init.flags = 0;
-+	init.num_parents = 0;
-+	hw->init = &init;
-+
-+	ret = devm_clk_hw_register(dev, hw);
-+	if (ret)
-+		return ret;
-+
-+	return devm_of_clk_add_hw_provider(dev, of_clk_hw_simple_get, hw);
-+}
-+
- static int en8811h_probe(struct phy_device *phydev)
+diff --git a/drivers/gpu/drm/i915/intel_memory_region.c b/drivers/gpu/drm/i915/intel_memory_region.c
+index d40ee1b42110..7f4102edc75b 100644
+--- a/drivers/gpu/drm/i915/intel_memory_region.c
++++ b/drivers/gpu/drm/i915/intel_memory_region.c
+@@ -62,7 +62,7 @@ static int iopagetest(struct intel_memory_region *mem,
+ 		      resource_size_t offset,
+ 		      const void *caller)
  {
- 	struct en8811h_priv *priv;
-@@ -838,6 +927,12 @@ static int en8811h_probe(struct phy_device *phydev)
- 		return ret;
- 	}
- 
-+	priv->phydev = phydev;
-+	/* Co-Clock Output */
-+	ret = en8811h_clk_provider_setup(&phydev->mdio.dev, &priv->hw);
-+	if (ret)
-+		return ret;
-+
- 	/* Configure led gpio pins as output */
- 	ret = air_buckpbus_reg_modify(phydev, EN8811H_GPIO_OUTPUT,
- 				      EN8811H_GPIO_OUTPUT_345,
+-	const u8 val[] = { 0x0, 0xa5, 0xc3, 0xf0 };
++	static const u8 val[] = { 0x0, 0xa5, 0xc3, 0xf0 };
+ 	void __iomem *va;
+ 	int err;
+ 	int i;
+diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
+index 1d118171de37..aceec184e89b 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
++++ b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
+@@ -1605,7 +1605,7 @@ void ice_fdir_replay_fltrs(struct ice_pf *pf)
+  */
+ int ice_fdir_create_dflt_rules(struct ice_pf *pf)
+ {
+-	const enum ice_fltr_ptype dflt_rules[] = {
++	static const enum ice_fltr_ptype dflt_rules[] = {
+ 		ICE_FLTR_PTYPE_NONF_IPV4_TCP, ICE_FLTR_PTYPE_NONF_IPV4_UDP,
+ 		ICE_FLTR_PTYPE_NONF_IPV6_TCP, ICE_FLTR_PTYPE_NONF_IPV6_UDP,
+ 	};
 -- 
-2.34.1
+2.47.2
 
 
