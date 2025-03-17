@@ -1,53 +1,58 @@
-Return-Path: <netdev+bounces-175424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F6DAA65CDF
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 19:38:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DF8BA65D5F
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 19:57:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F31DB1640DC
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 18:38:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B85F916BC26
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 18:57:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E54931C9B9B;
-	Mon, 17 Mar 2025 18:38:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C696E1EB5C8;
+	Mon, 17 Mar 2025 18:56:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g49BcDQt"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60457176ADB;
-	Mon, 17 Mar 2025 18:38:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CBA01E1E03;
+	Mon, 17 Mar 2025 18:56:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742236698; cv=none; b=KRQGP7dQVzLTljbStIO+CL7MmsiyxzSmzKYnabxgJA+cJVF+3lWrrAE5SYgZo6Waw3lRpB0KY7yl55fkp5XuP1q5HFf68VqDGWF/9r/UYdmA/ukpnOK4/CbcGEWQb5ne5ntn+Spv3mMxBBTPAyjuqCxAyyOEuifr0yCG0Ye7leY=
+	t=1742237786; cv=none; b=N1VxvIbXIn/LQMpqU8an9bW8fSdF2c2LM3SbZA1CpYvd7OlDUTWwuvn+XC31J+FFkhFL1XpEdzW13EDBlvuRlceb9tgG/GqdQXvWde3Rq1tSdVky4PpeM/Zf/tkDjs4VEhPGxsB9f0Ws16vefUJRxL7fXBc0+Eqha1OlksAQxqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742236698; c=relaxed/simple;
-	bh=x8VzNlnfyxrbj98l+2sMkUMZwVMQl42R9kHvQVPYs+k=;
+	s=arc-20240116; t=1742237786; c=relaxed/simple;
+	bh=1e4w5hz4mFH34gA0uZbOVpuAdr2fk4qSjjH+ov2gFLc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L8TCpwvAnqX/xWaXVn3GNPIxnV4MuiS88d170d3qG0pW2eG/7kNO+5TIlOFR6I2NyZ7CTMqCA/aKsQ5xgw65nQhkWMxODOeC7bLu7QvayAtzh1HeJSleTMAgi+rItZMJQd25NyD89ZKOslkchsaMEgK7VtkNlPX8D84Z5Z+JBGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1tuFLa-000000007G3-0hL0;
-	Mon, 17 Mar 2025 18:37:58 +0000
-Date: Mon, 17 Mar 2025 18:37:54 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: "Lucien.Jheng" <lucienx123@gmail.com>
-Cc: linux-clk@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, kuba@kernel.org, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, ericwouds@gmail.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	joseph.lin@airoha.com, wenshin.chung@airoha.com
-Subject: Re: [PATCH v4 net-next PATCH 1/1] net: phy: air_en8811h: Add clk
- provider for CKO pin
-Message-ID: <Z9hsAmiD9sZ_NAR-@makrotopia.org>
-References: <20250317143111.28824-1-lucienX123@gmail.com>
- <20250317143111.28824-2-lucienX123@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ueLw3EY0bOaB0BiYblJ2QsF4OnKUarKxVV/8++cxbvwoxdyE38P+LhCh/UryyAanQoCmFkOjVgCq/ntfy7tG0sOzXJcTCwAyf7NfI3eU23+oiBjYTwQawZ3L4wZT11vRUfaQBV2CDR7BIthkvyBxdA7LFG2wXpOTF1QE+I93Cyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g49BcDQt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 032BDC4CEE3;
+	Mon, 17 Mar 2025 18:56:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742237786;
+	bh=1e4w5hz4mFH34gA0uZbOVpuAdr2fk4qSjjH+ov2gFLc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=g49BcDQtydEODtoRxCv/0Ge+wIgFimsFVv5x/AJpF/ythvIFKKS9oYn5Wxtb0BJzm
+	 /mEW9xjQyZ8X47jAFPu+Ra2biaQu7IC+TlIdOerTe1HCdu1NxIdyV8zKGyKNZM4m/k
+	 O0aQ/Ls1cmqO8npyLDm9xHwu3TigAfP9s3shzHGxydmEu177pGTcYYoUY9jk7HRy04
+	 6iJ4WORIARH2yTic/VTMJJ7Ek6GytJFI19GvNj75KvmWS43x1staKu6FjidFD0Ja2O
+	 vLnEeLYC3CXvXLmDUw6T/odZ1CC2NS/H7XIv+2hhZHNOo5SdEkHECKiNAW64RjE37N
+	 IK3SO3DDadWgg==
+Date: Mon, 17 Mar 2025 18:56:22 +0000
+From: Simon Horman <horms@kernel.org>
+To: Michal Kubiak <michal.kubiak@intel.com>
+Cc: Chen Ni <nichen@iscas.ac.cn>, manishc@marvell.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] qed: remove cast to pointers passed to kfree
+Message-ID: <20250317185622.GK688833@kernel.org>
+References: <20250311070624.1037787-1-nichen@iscas.ac.cn>
+ <Z9BuCIqxg5CRzD8w@localhost.localdomain>
+ <Z9Bv+cjkxlVHsKAd@localhost.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,68 +61,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250317143111.28824-2-lucienX123@gmail.com>
+In-Reply-To: <Z9Bv+cjkxlVHsKAd@localhost.localdomain>
 
-On Mon, Mar 17, 2025 at 10:31:11PM +0800, Lucien.Jheng wrote:
-> EN8811H outputs 25MHz or 50MHz clocks on CKO, selected by GPIO3.
-> CKO clock activates on power-up and continues through md32 firmware loading.
+On Tue, Mar 11, 2025 at 06:16:41PM +0100, Michal Kubiak wrote:
+> On Tue, Mar 11, 2025 at 06:08:24PM +0100, Michal Kubiak wrote:
+> > On Tue, Mar 11, 2025 at 03:06:24PM +0800, Chen Ni wrote:
+> > > Remove unnecessary casts to pointer types passed to kfree.
+> > > Issue detected by coccinelle:
+> > > @@
+> > > type t1;
+> > > expression *e;
+> > > @@
+> > > 
+> > > -kfree((t1 *)e);
+> > > +kfree(e);
+> > > 
+> > > Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
+> > > ---
+> > >  drivers/net/ethernet/qlogic/qed/qed_main.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > 
+> > > diff --git a/drivers/net/ethernet/qlogic/qed/qed_main.c b/drivers/net/ethernet/qlogic/qed/qed_main.c
+> > > index f915c423fe70..886061d7351a 100644
+> > > --- a/drivers/net/ethernet/qlogic/qed/qed_main.c
+> > > +++ b/drivers/net/ethernet/qlogic/qed/qed_main.c
+> > > @@ -454,7 +454,7 @@ int qed_fill_dev_info(struct qed_dev *cdev,
+> > >  
+> > >  static void qed_free_cdev(struct qed_dev *cdev)
+> > >  {
+> > > -	kfree((void *)cdev);
+> > > +	kfree(cdev);
+> > >  }
+> > >  
+> > >  static struct qed_dev *qed_alloc_cdev(struct pci_dev *pdev)
+> > > -- 
+> > > 2.25.1
+> > > 
+> > > 
+> > 
+> > 
+> > LGTM.
+> > 
+> > Thanks,
+> > Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
+> > 
+> 
+> I'm sorry I missed that the patch is addressed to "net-next".
+> It rather looks like as a candidate for the "net" tree.
+> 
+> Please resend it to the "net" tree with an appropriate "Fixes" tag.
+> 
+> My apologies for the noise.
 
-Maybe add here:
-"Implement clk provider driver so we can disable the clock output in case
-it isn't needed, which also helps to reduce EMF noise"
+Hi Michal,
 
-Ie. the description you had was fine and good to have, just the lines had to
-be shorter (ie. just insert linebreaks at 70~75 chars).
+I'm unclear what bug this fixes.
 
-See more comments inline below:
-
-> ...
-> @@ -806,6 +817,84 @@ static int en8811h_led_hw_is_supported(struct phy_device *phydev, u8 index,
->  	return 0;
->  };
->  
-> +static unsigned long en8811h_recalc_rate(struct clk_hw *hw, unsigned long parent)
-
-calling this en8811h_clk_recalc_rate() would be better imho.
-
-> +{
-> +	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
-> +	struct phy_device *phydev = priv->phydev;
-> +	u32 pbus_value;
-> +	int ret;
-> +
-> +	ret = air_buckpbus_reg_read(phydev, EN8811H_HWTRAP1, &pbus_value);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	return (pbus_value & EN8811H_HWTRAP1_CKO) ? 50000000 : 25000000;
-> +}
-> +
-> +static int en8811h_enable(struct clk_hw *hw)
-
-call this en8811h_clk_enable()
-
-> +{
-> +	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
-> +	struct phy_device *phydev = priv->phydev;
-> +
-> +	return air_buckpbus_reg_modify(phydev, EN8811H_CLK_CGM,
-> +				EN8811H_CLK_CGM_CKO, EN8811H_CLK_CGM_CKO);
-> +}
-> +
-> +static void en8811h_disable(struct clk_hw *hw)
-
-call this en8811h_clk_disable()
-
-> +{
-> +	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
-> +	struct phy_device *phydev = priv->phydev;
-> +
-> +	air_buckpbus_reg_modify(phydev, EN8811H_CLK_CGM,
-> +				EN8811H_CLK_CGM_CKO, 0);
-> +}
-> +
-> +static int en8811h_is_enabled(struct clk_hw *hw)
-
-call this en8811h_clk_is_enabled()
+It seems to me that this is a clean-up.
+That as such it should only be considered in the context
+of more material changes to this driver.
 
