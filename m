@@ -1,242 +1,236 @@
-Return-Path: <netdev+bounces-175274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B6DDA64B8A
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 12:03:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 709EFA64B9D
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 12:04:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3EBF318860CF
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 11:02:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD52116635D
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 11:03:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAAEF241671;
-	Mon, 17 Mar 2025 10:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0413221730;
+	Mon, 17 Mar 2025 11:01:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="LoD68JKl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lMXpWIOj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84B38241664
-	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 10:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742209152; cv=none; b=HxcP8JApkkoNtzQfFR1WDw/6nx7frAcS6WXV8SD6fzCTEJ687fBYgYoi9w3KsLRCuZfzqButTREEw3ApRBywa+haXFKrtnvbGQFA0Ktg4z2zNrLzdwn8LwzSvHrO32qutILw/OSvzYlAWY61ZPuAIQorj/N+XXB6HwqYQWJzyO4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742209152; c=relaxed/simple;
-	bh=QysKwJMoIqaKFtrng8JoZjRW/Qn7QIvbuXMh0UY/638=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To; b=DHZ+HBOt6mlFXOz3eCLhwjLVb8WxWwL/5gUyv8OoLykh+1lHZkkFbxTzfl17UeoGoHk3s9yvX7iys2dwC5FKp0+8L8Q3MXg/bgYq5vdy8Dn+PDXsDevHYaAJOpR5DHMgAQsAP+BRzV9ol1C1075VX17A+P+Miwpkr7XD0AcFeY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=LoD68JKl; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-3018e2d042bso771164a91.2
-        for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 03:59:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1742209150; x=1742813950; darn=vger.kernel.org;
-        h=to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jXhv781+liPB0AwwevhkbIFrQwob4kiywxMETbO/hoM=;
-        b=LoD68JKl8vo/f2E53adWY+nT0lJpYRv7solt6X2M90zVKUCGQ5miR5UzpTebBm96kW
-         juy3XY+96hrDCHov9P+9mXpeV5MU9KtxFtm73dHz9S0s9ZNCVJram1rWphZNkzP4psT0
-         XrGHY6zAL4xuapVEWyLA86OdW149Gs1foDmlREc3uuAxlcIX7JPGTScIiT6NSdZrKjfJ
-         NgYU1JlFtSU0jomtYVVN8BAqqZvJ16QQA4LiN0gBNYCnPfVJTIHMAXGwRPIA/n+jKYoW
-         X4yKAWamOIJY/xFuHZX/eUEFwM3ig8oS0zzaNveOrZJLpIPv+ID2kMEDPPQF/1j1wPW0
-         s8lg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742209150; x=1742813950;
-        h=to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jXhv781+liPB0AwwevhkbIFrQwob4kiywxMETbO/hoM=;
-        b=P9oRRtZyD5Ba2GuPYdmMECFA0So49saqM4nnQBomSWGsSzUVnGmTCVG32V33HYmdAT
-         sOtU9TBngaNzl0OXcgAXCH/8S+qE4fFvNHoRIZjKqj7z3kSFQmlhCSLkjNjANhyrQpzM
-         ZF7JJ1qNxYDMwmuaeaIPOlShTS9EHhSs9lHggBrjLMblVjKjA0J7ZfebFcL5ksS0WFib
-         IRR4GBtB7su9iJSyglR6DSA4rMguH0sUH93YXHCSQxgDhmjpb04jrH70IFuLfkI3TO4R
-         IEPlnsKp7hR3fEm6Q4zgQuTk8TxGDTYejfGQE4xlpWcdWPo9oOfMAEt0OKX2DQajXCaS
-         PX1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVITJUNZc6XgMBAPQV44IQ0N6LzTbtpu1ACuvNtjmyxrfKQEFEWIICnaA95x30/a0f+9aF3Hc4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWswtk+Te29JDCBWp7C/zdh2Jq2SZz1EDqjfMsYmoxV71H+CG4
-	giqSGz7txplc5v72O+XSZEkX0S+GXvkCzHkTIh/tg76GHSJn5mGOGYHCwcfGhfs=
-X-Gm-Gg: ASbGnctKNCsZf2WWCGQ+DXjYr1eJgujRTxPxavNo9g5iQd0BmJUk4x/AxVqnHMONwvw
-	LHixAurlu7A8JzFWfizl0h0yVi2YF6bmGekExsChgQCYvLjiZrl31jzy3CR8NJHPZsHbuvQ8HB3
-	LbGrNXSIiu7J75SK4QtDidYcTxIR2to5FPdU7nkd+Jzv91K89IsxA51w3jJABT+6BHBmWcjhewi
-	UhbMiqX9Uy5xDtaxwxrDoXNjJpOr719x0P2JieSvFsKGyxFw4X00FrnOrO+FlBNNVML0HpbSNgO
-	upNwyq01eVWV5go9nC5pBSCZaG4VZu5NMMx3PIV14QNZk22Q
-X-Google-Smtp-Source: AGHT+IFBTzBt4W91RO9hEmwf21fzT3s8Bp70zxhXco8GCOaNp4xUeMJNMRSu3auEGTPJcF2HKgGT2A==
-X-Received: by 2002:a17:90b:5347:b0:2ff:58c7:a71f with SMTP id 98e67ed59e1d1-30151dc7588mr13016176a91.32.1742209149802;
-        Mon, 17 Mar 2025 03:59:09 -0700 (PDT)
-Received: from localhost ([157.82.207.107])
-        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-3015364ec6esm5760309a91.49.2025.03.17.03.59.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Mar 2025 03:59:09 -0700 (PDT)
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-Date: Mon, 17 Mar 2025 19:58:00 +0900
-Subject: [PATCH net-next v11 10/10] vhost/net: Support
- VIRTIO_NET_F_HASH_REPORT
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8525E230BC7
+	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 11:01:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742209317; cv=fail; b=AidxKG72eoeMg7ktZlwYRJblb7bCN2SrNHrn91R0/3Pmb53LygSJWNAJt3LlVsrBg2qapDP0PWMV8APcmNU8eB3a29wj+Wifb33H//8fsFcDQ0DbcWbTWT3bDLLYBQSKzoY+XnL4+bCZXV87VyEwu4J5XtRLisXLUwGnCclfliY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742209317; c=relaxed/simple;
+	bh=fUmy9QvYK4rmYcM6ErHEbnxFbyFYSr1ef0M47lNMI0U=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=HKKDdVNjTp5WOG5sabQb2cwpDTD9B6eO7MyT8Rqi6FLUCFNBzAPFVwLcaO2f7ARay8EC6JeIwGMDPdfgLIS/sCsl61EquH+P0++ubZ2IS2wBFtlHuRBEXZWySH5uGqw3hVWcDD6lZpgfUJdt8Elx0Fi6Z6CWKcDTj2O1VQ+RPSQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lMXpWIOj; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1742209315; x=1773745315;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=fUmy9QvYK4rmYcM6ErHEbnxFbyFYSr1ef0M47lNMI0U=;
+  b=lMXpWIOjgLD11C7flm7XqSuqhjSma1PerEZHbbmuJJ22W20aGLQp2vph
+   y3XLv65fZKrKDzN+97QQGrp3ooMwgOyKU18V1twKlIDtTN9ZhxC1M1aZH
+   RpsZ/jJ2CC+ZEUq10j+kyUpuQRV+/mUZRcLEySr1hy4GqIIWvxY6ALRKN
+   fN5sXcmfRilzovlV05dJyD4MiDiGeQ+70C9+fr79EyfH/FQtuiahJTbaI
+   8mh2CXlYUTW89plNumDs4V3SIGoA3C+4qtTCGd3nMNfIIV1Hl1JtRpjN4
+   g1zWPuaBxLP+FVkZ568DfmZDC2Ss9HAOKzco4W+xwvNw+YQr+OlsnL82c
+   A==;
+X-CSE-ConnectionGUID: l7MvOrMQRZegkYLxJOR3QQ==
+X-CSE-MsgGUID: jSmSUZKBQYumxRKtX0DH6Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11375"; a="53505551"
+X-IronPort-AV: E=Sophos;i="6.14,253,1736841600"; 
+   d="scan'208";a="53505551"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2025 04:01:50 -0700
+X-CSE-ConnectionGUID: s/ZMGFUwTEKrRmqu1tpo3g==
+X-CSE-MsgGUID: bT3mK/VhRNOktQWADKI5AQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,253,1736841600"; 
+   d="scan'208";a="121710378"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2025 04:01:49 -0700
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1544.14; Mon, 17 Mar 2025 04:01:48 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Mon, 17 Mar 2025 04:01:48 -0700
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.170)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Mon, 17 Mar 2025 04:01:47 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=s/mmW33XSbSQGsJixy+4ySQJfNT9HZINXlsASF9JtKRSc6+t1mr2dUmWTKxcs75LdNObbGZBBbzmQCXkpkHQFdib09wGXZXk58jdq3RB195eASxYjIBKB0WItRSdGDq9HBENOQ4ofPTwnBmr55yaecF3BDfYBE0asAyBA/CgA3U+9bxUz7gfSll/cdpP5ykn88Zf6X4VTyfGcFBWVTQFF2vwCqCrMNiTFgWkTI1YQZSLnaBRV709VmG/QQz3yY+5T099oTgGgoydMMaKbGpfNpyI5ikGFpoMnA49UO+dksDY7cSYi0zIe9qAyjwJX4hjQdz136GRpHVgpG/yDLHGGQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fUmy9QvYK4rmYcM6ErHEbnxFbyFYSr1ef0M47lNMI0U=;
+ b=Ze8fvvtLWEmAN50BNlTQBPjN+KOjJK7y5DH/tNl4X5e4/lIljkP/gnKFmahPZueeU+NnubabK2oJWj9DmZz1139FWcpwbCBSUUlzh6XczcWjXiXlyrOOGHqLtWhtcfXFXvVF80qHB6rCLoPCPHNwDaIBHpghADzMeN7CaCJBO9GBSx8oWhUUzeAhWNyPv0ofKzu/E6jQi7ghYMToqSH1BlkgsLRvQBt5HQXwahq+Kqx9RMLGT0+NbJDmNjePhRO6S6qbYNNBxL7/uvGLZzRlf6Hop5RE0fMDtrTxL/IF3tM+ZLAmVyR45h2RBPFaIthAK+n+BhqTZ9/cznfsfZZMjQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
+ by PH0PR11MB5063.namprd11.prod.outlook.com (2603:10b6:510:3d::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.33; Mon, 17 Mar
+ 2025 11:01:44 +0000
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::90b0:6aad:5bb6:b3ae]) by IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::90b0:6aad:5bb6:b3ae%7]) with mapi id 15.20.8534.031; Mon, 17 Mar 2025
+ 11:01:44 +0000
+From: "Rinitha, SX" <sx.rinitha@intel.com>
+To: Jesse Brandeburg <jbrandeb@kernel.org>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>
+CC: "Brandeburg, Jesse" <jbrandeburg@cloudflare.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "kernel-team@cloudflare.com"
+	<kernel-team@cloudflare.com>, "leon@kernel.org" <leon@kernel.org>, "Kitszel,
+ Przemyslaw" <przemyslaw.kitszel@intel.com>, "Ertman, David M"
+	<david.m.ertman@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH intel-net v2] ice: fix reservation of
+ resources for RDMA when disabled
+Thread-Topic: [Intel-wired-lan] [PATCH intel-net v2] ice: fix reservation of
+ resources for RDMA when disabled
+Thread-Index: AQHbjsE6+hscqt2p30GQtLAKEFNfSLN3LDJQ
+Date: Mon, 17 Mar 2025 11:01:44 +0000
+Message-ID: <IA1PR11MB62416710DD666A1C278002D48BDF2@IA1PR11MB6241.namprd11.prod.outlook.com>
+References: <20250306175640.29565-1-jbrandeb@kernel.org>
+In-Reply-To: <20250306175640.29565-1-jbrandeb@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|PH0PR11MB5063:EE_
+x-ms-office365-filtering-correlation-id: 5fd89cc1-759c-4a77-c175-08dd65431ac5
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018|7053199007;
+x-microsoft-antispam-message-info: =?us-ascii?Q?Z3tVAiE0h1bUaQdH2IxcLPvfghKyUBauACxIJynS6dSESLiz6QE1VofhPHKP?=
+ =?us-ascii?Q?FpKpDsZD/LR0wXlFaa3AnVM1JIYCA8HtAn2lpNGRPqJenlcYtvaIrvMEQNdk?=
+ =?us-ascii?Q?BMKZzfmfmyFLHXjfIc/uGaNVptwUCnF4F/eUynqhTVdmboITcGAZzPjZ8HAf?=
+ =?us-ascii?Q?uhAkGuY/SUz6m7tGCFasHYlbQrkRD4ebktebEi3y4Qpwdm3YwRtDyYXYt/l8?=
+ =?us-ascii?Q?rEbjEBgLn7ALq5UscnX85eq9u1FalkVIX3BoGe6/7IfNn7QONSJpXR41W2VI?=
+ =?us-ascii?Q?JFId9rUb4mBk5MA73yfX5+nIL5afv1q74ys1L4m/5JIx9uEL+O0lKtOw8h1S?=
+ =?us-ascii?Q?ob/AktoG8zO5+CJ9rc3w5cLCccYjVOrqJ+8wOVTiPn6mUlspNaM1cFPL5Qmv?=
+ =?us-ascii?Q?c+JTZhtXhFfnyKghItqpdwOh+gTQj04q3Gsj9G3w6CPcpAYTukMxeqD9ied6?=
+ =?us-ascii?Q?MRDGacdPta810kUCf5qFKBKMzDS6goEHBmWJiRBXVFL/NFDdn/M4NElgMwwf?=
+ =?us-ascii?Q?EShIC66O05CDk/86B9ReL9eekLJ95IlzJirAMqr5JmaxF05LCWd0JOX9mClN?=
+ =?us-ascii?Q?W4k/ZRXv13D7IbmqMpadfZkb3tgBUkd74npUbNu47oa4Elba1sdTWFQ/aWES?=
+ =?us-ascii?Q?NeuJ/2CSTUmT6swjMI2hfd9dC6bKkwLjb8INln7GDDDV/l/aS4Y4Yo3zUryi?=
+ =?us-ascii?Q?8+pmDklR3bOjz/2xUCDUCfucfNVrR2CQUeINzn12640Nfd9ux+mA1rjkbAYN?=
+ =?us-ascii?Q?j61MKT6PUUFu2U1o1WgLHCfbRLL7tebQUxGoHvC2oTgkiXuAg9ShBTFAeNEz?=
+ =?us-ascii?Q?o98NTO1Lp2x2TpEQBbxs8FNMk6U4yhFmbjPZ6Y4xkjomGS/v4HanLt2AtLRU?=
+ =?us-ascii?Q?r+gWgmvkK5S9j4NPue0I8J6UMakNg2WL6eL1I0Wzw2+8A5lXibivKuHHwp2g?=
+ =?us-ascii?Q?jgdEuCRki1yTT1/MGVD1rsvkoYTcAOAUYTWVrOgBY40wCWPZHKzVzALfJhiC?=
+ =?us-ascii?Q?Th03ieFqcSqk7PbzQGDGEjuG49vbKF5R7+NXCHpSjL/nMVydRon6O61h3ycD?=
+ =?us-ascii?Q?kMu5m1VNY5j4zZWc06XyyNAM4GS6DSYOvszV357nwpeEqT+/gAPII2xjNiQD?=
+ =?us-ascii?Q?U5NTxJSW0lzCTH887yShS3QqJp2zzkDr7oro69UVvq86jgJmvkxJyT0eYXUv?=
+ =?us-ascii?Q?XknI7/QaH1fEubCKXG4ocWhFoMP5iXu43Prlm4XETMHkbhzqU/tblkErtt27?=
+ =?us-ascii?Q?wqWP2uaJS9+p3miq7ChYYx+KFxNtM10hZU+9vcSO7szEK7Q4jb46NIAtOzZl?=
+ =?us-ascii?Q?hk2pXsqSpo3cndi0hFCxmfApiNM+erg0nfgAdkrYm3q+6z02+NYdmM4jzcnH?=
+ =?us-ascii?Q?Xni4zzz02VtvXIz8rNfeFQlmvUDbR9kkh/IIrnkMLoysodZDaAFaSXNk0baH?=
+ =?us-ascii?Q?MCnzaUKe66OBZ/gtEfrwv4+0WmY2jQZS?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018)(7053199007);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?hJTiPVnLccappCGcruG4YBF7d0XW00FaihL6Y4xsBj4vVsHorevbxI1AGbD7?=
+ =?us-ascii?Q?2ReWnBvn1zDEgMAmJ1I+rmz9s+lP9QTDf7EmJJB/Cb12uwOsNOWWpbDgbW6d?=
+ =?us-ascii?Q?siAq+wEDfvAtxnGvDVB3Lre1siZw0pc6TBnyh93uf5KrAOtbvNqqCAe9B1RN?=
+ =?us-ascii?Q?70cDpaMokLWtpUrRoGPU6oOH/sW/sZMnUM1T55qEPRm+nuPB+KeR+GhkrjOA?=
+ =?us-ascii?Q?x2o1W+6SCY3M+bjJCoezqQtm+YIA+RbcI2dUo9RgVGl1u2J+w5R/kybLBicB?=
+ =?us-ascii?Q?dCjNzmW/ldwDW2dgfMiCZdtcOJzbJBxodoKQr6BykTx45x5OwhrzAmI1fhnt?=
+ =?us-ascii?Q?Pc9R4QPX55qSghtsjATdiQqvnHIptv5jfjaB7a9LWL/Z/G0vb5ninoZjwlOC?=
+ =?us-ascii?Q?D2VD/b/QQmcLZWZoC+qHNQwOfLfY5po3Yu7ymygn6x11AnKnMY78wKSt/xp1?=
+ =?us-ascii?Q?l2DVQ6PH7+bq3PbAzxDA/M9dlDCM9MemgD6UUlf3dU8W0x3r58Pjt/TGIUUq?=
+ =?us-ascii?Q?YglfwWCsiCh2BaFgniEqOU4vU92+Z/rRprTRsoWYTrkbgc1M3eWE2BakmidD?=
+ =?us-ascii?Q?J6i7B1uscLbnjxHsPOeLxvUlIPhKSN5eYNaALCEX9ER+RqKSDj555WWQ18ik?=
+ =?us-ascii?Q?f1G8kl4jRxBd33R7hm8Dwv4ocIQwTAN0zpxsdc/A/f9FVcgwQXqzQ/hVQoMJ?=
+ =?us-ascii?Q?on/h55PnTE2/d2cmbCMAsDypBKwU5QhEB1OigEi0wRQ2MuF1PyH8hsqcaD13?=
+ =?us-ascii?Q?1ZBdzxEeoFmpFXiqaLvIuNRyitRLYFt+Rth5t9o4c9Dz4W4WN+c6PEmm1ued?=
+ =?us-ascii?Q?DLOazPraeUXyGFTzKO6qQgkLqwekCFVTmJg6wNmfrjpwyowKedgqhQ0t+4Ew?=
+ =?us-ascii?Q?bRQMRj69SRWdsBiCvbrsAIg2LnDYEkjQ3wk01+PSXsh6w8lE4SGeZOzIUyJl?=
+ =?us-ascii?Q?dN0Ov4zY8JDAdLCAa8vUymXPA/BnVm9+OAENMyBiZtSWdvxd/L4iS41Z001q?=
+ =?us-ascii?Q?bnCtkxHqaQ3QKSxV9sZfHEOUheXy8oVaZOws67dClnImTCmc1kwxeMFwr6bk?=
+ =?us-ascii?Q?Z49qlOjy58N2Z7tMcPsECRZFB1cN2HxQTNB4hKF8Wi/DbvTocaQI93HVfO+j?=
+ =?us-ascii?Q?jjIjgY3mUY/iFTRBNKPl5afRZ7skWxXpLI8a0aB8+fdAJK14Kp4yV+dtfWKf?=
+ =?us-ascii?Q?nV3RcNekCJRMHnXiRDCnhIxknbNMAxF8vl4/cGejLiK8QhorxFNEVhrV0UZl?=
+ =?us-ascii?Q?GaFhTX4J0gf9GniiHy/dQMOTad2yQ5/FstEhxPnTPsnS4fCLgZ6dVsr+Phwt?=
+ =?us-ascii?Q?mH02hgiY2/bPaDzD4eRfXzdsHsBZ1gLUHJthFjLsZYN6+ns+h/zoPcG6la6Q?=
+ =?us-ascii?Q?O+wMumo12irvdeKBW5k77Uu1j7w0vff5z4zO1ULvDL1iEBvYbtFxosvyb4FF?=
+ =?us-ascii?Q?+6lNamNeQ/QKQAtsVGK/jbcUFEtqi3AZqg1mwim67E6g7ZYne7SUqjUhQ48b?=
+ =?us-ascii?Q?UNSr3rwqdJ6m6YdMUbHfguEygmorItGJiCx5YcXgJczB1zpHcT4D+LldM0AZ?=
+ =?us-ascii?Q?/+l9p5BIl1BWlZVs+M6wMqXPzTIGpV5JwruVaAa3?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250317-rss-v11-10-4cacca92f31f@daynix.com>
-References: <20250317-rss-v11-0-4cacca92f31f@daynix.com>
-In-Reply-To: <20250317-rss-v11-0-4cacca92f31f@daynix.com>
-To: Jonathan Corbet <corbet@lwn.net>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>, 
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, kvm@vger.kernel.org, 
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
- Yuri Benditovich <yuri.benditovich@daynix.com>, 
- Andrew Melnychenko <andrew@daynix.com>, 
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
- Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>, 
- Akihiko Odaki <akihiko.odaki@daynix.com>
-X-Mailer: b4 0.15-dev-edae6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5fd89cc1-759c-4a77-c175-08dd65431ac5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Mar 2025 11:01:44.2748
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ynn3cJfqZcB5LGVfjZ4BSf0PNW+e02tm0p89dnoItFsO4x3uMpwY+JSu6WhP4Fsy5yskiSWdy0nMKp1+GFM8cw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5063
+X-OriginatorOrg: intel.com
 
-VIRTIO_NET_F_HASH_REPORT allows to report hash values calculated on the
-host. When VHOST_NET_F_VIRTIO_NET_HDR is employed, it will report no
-hash values (i.e., the hash_report member is always set to
-VIRTIO_NET_HASH_REPORT_NONE). Otherwise, the values reported by the
-underlying socket will be reported.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of J=
+esse Brandeburg
+> Sent: 06 March 2025 23:27
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: Brandeburg, Jesse <jbrandeburg@cloudflare.com>; netdev@vger.kernel.or=
+g; kernel-team@cloudflare.com; jbrandeb@kernel.org; leon@kernel.org; Kitsze=
+l, Przemyslaw <przemyslaw.kitszel@intel.com>; Ertman, David M <david.m.ertm=
+an@intel.com>
+> Subject: [Intel-wired-lan] [PATCH intel-net v2] ice: fix reservation of r=
+esources for RDMA when disabled
+>
+> From: Jesse Brandeburg <jbrandeburg@cloudflare.com>
+>
+> If the CONFIG_INFINIBAND_IRDMA symbol is not enabled as a module or a bui=
+lt-in, then don't let the driver reserve resources for RDMA. The result of =
+this change is a large savings in resources for older kernels, and a cleane=
+r driver configuration for the IRDMA=3Dn case for old and new kernels.
+>
+> Implement this by avoiding enabling the RDMA capability when scanning har=
+dware capabilities.
+>
+> Note: Loading the out-of-tree irdma driver in connection to the in-kernel=
+ ice driver, is not supported, and should not be attempted, especially when=
+ disabling IRDMA in the kernel config.
+>
+> Fixes: d25a0fc41c1f ("ice: Initialize RDMA support")
+> Signed-off-by: Jesse Brandeburg <jbrandeburg@cloudflare.com>
+> Acked-by: Dave Ertman <david.m.ertman@intel.com>
+> ---
+> v2: resend with acks, add note about oot irdma (Leon), reword commit mess=
+age
+> v1: https://lore.kernel.org/netdev/20241114000105.703740-1-jbrandeb@kerne=
+l.org/
+> ---
+> drivers/net/ethernet/intel/ice/ice_common.c | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
+>
 
-VIRTIO_NET_F_HASH_REPORT requires VIRTIO_F_VERSION_1.
-
-Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-Tested-by: Lei Yang <leiyang@redhat.com>
----
- drivers/vhost/net.c | 68 +++++++++++++++++++++++++++--------------------------
- 1 file changed, 35 insertions(+), 33 deletions(-)
-
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index b9b9e9d40951..fc5b43e43a06 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -73,6 +73,7 @@ enum {
- 	VHOST_NET_FEATURES = VHOST_FEATURES |
- 			 (1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
- 			 (1ULL << VIRTIO_NET_F_MRG_RXBUF) |
-+			 (1ULL << VIRTIO_NET_F_HASH_REPORT) |
- 			 (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
- 			 (1ULL << VIRTIO_F_RING_RESET)
- };
-@@ -1097,10 +1098,6 @@ static void handle_rx(struct vhost_net *net)
- 		.msg_controllen = 0,
- 		.msg_flags = MSG_DONTWAIT,
- 	};
--	struct virtio_net_hdr hdr = {
--		.flags = 0,
--		.gso_type = VIRTIO_NET_HDR_GSO_NONE
--	};
- 	size_t total_len = 0;
- 	int err, mergeable;
- 	s16 headcount;
-@@ -1174,11 +1171,15 @@ static void handle_rx(struct vhost_net *net)
- 		/* We don't need to be notified again. */
- 		iov_iter_init(&msg.msg_iter, ITER_DEST, vq->iov, in, vhost_len);
- 		fixup = msg.msg_iter;
--		if (unlikely((vhost_hlen))) {
--			/* We will supply the header ourselves
--			 * TODO: support TSO.
--			 */
--			iov_iter_advance(&msg.msg_iter, vhost_hlen);
-+		/*
-+		 * Supply virtio_net_hdr if VHOST_NET_F_VIRTIO_NET_HDR
-+		 * TODO: support TSO.
-+		 */
-+		if (unlikely(vhost_hlen) &&
-+		    iov_iter_zero(vhost_hlen, &msg.msg_iter) != vhost_hlen) {
-+			vq_err(vq, "Unable to write vnet_hdr at addr %p\n",
-+			       vq->iov->iov_base);
-+			goto out;
- 		}
- 		err = sock->ops->recvmsg(sock, &msg,
- 					 sock_len, MSG_DONTWAIT | MSG_TRUNC);
-@@ -1191,30 +1192,24 @@ static void handle_rx(struct vhost_net *net)
- 			vhost_discard_vq_desc(vq, headcount);
- 			continue;
- 		}
--		/* Supply virtio_net_hdr if VHOST_NET_F_VIRTIO_NET_HDR */
--		if (unlikely(vhost_hlen)) {
--			if (copy_to_iter(&hdr, sizeof(hdr),
--					 &fixup) != sizeof(hdr)) {
--				vq_err(vq, "Unable to write vnet_hdr "
--				       "at addr %p\n", vq->iov->iov_base);
--				goto out;
--			}
--		} else {
--			/* Header came from socket; we'll need to patch
--			 * ->num_buffers over if VIRTIO_NET_F_MRG_RXBUF
--			 */
--			iov_iter_advance(&fixup, sizeof(hdr));
--		}
- 		/* TODO: Should check and handle checksum. */
- 
-+		/*
-+		 * We'll need to patch ->num_buffers over if
-+		 * VIRTIO_NET_F_MRG_RXBUF or VIRTIO_F_VERSION_1
-+		 */
- 		num_buffers = cpu_to_vhost16(vq, headcount);
--		if (likely(set_num_buffers) &&
--		    copy_to_iter(&num_buffers, sizeof num_buffers,
--				 &fixup) != sizeof num_buffers) {
--			vq_err(vq, "Failed num_buffers write");
--			vhost_discard_vq_desc(vq, headcount);
--			goto out;
-+		if (likely(set_num_buffers)) {
-+			iov_iter_advance(&fixup, offsetof(struct virtio_net_hdr_v1, num_buffers));
-+
-+			if (copy_to_iter(&num_buffers, sizeof(num_buffers),
-+					 &fixup) != sizeof(num_buffers)) {
-+				vq_err(vq, "Failed num_buffers write");
-+				vhost_discard_vq_desc(vq, headcount);
-+				goto out;
-+			}
- 		}
-+
- 		nvq->done_idx += headcount;
- 		if (nvq->done_idx > VHOST_NET_BATCH)
- 			vhost_net_signal_used(nvq);
-@@ -1607,10 +1602,13 @@ static int vhost_net_set_features(struct vhost_net *n, u64 features)
- 	size_t vhost_hlen, sock_hlen, hdr_len;
- 	int i;
- 
--	hdr_len = (features & ((1ULL << VIRTIO_NET_F_MRG_RXBUF) |
--			       (1ULL << VIRTIO_F_VERSION_1))) ?
--			sizeof(struct virtio_net_hdr_mrg_rxbuf) :
--			sizeof(struct virtio_net_hdr);
-+	if (features & (1ULL << VIRTIO_NET_F_HASH_REPORT))
-+		hdr_len = sizeof(struct virtio_net_hdr_v1_hash);
-+	else if (features & ((1ULL << VIRTIO_NET_F_MRG_RXBUF) |
-+			     (1ULL << VIRTIO_F_VERSION_1)))
-+		hdr_len = sizeof(struct virtio_net_hdr_mrg_rxbuf);
-+	else
-+		hdr_len = sizeof(struct virtio_net_hdr);
- 	if (features & (1 << VHOST_NET_F_VIRTIO_NET_HDR)) {
- 		/* vhost provides vnet_hdr */
- 		vhost_hlen = hdr_len;
-@@ -1691,6 +1689,10 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
- 			return -EFAULT;
- 		if (features & ~VHOST_NET_FEATURES)
- 			return -EOPNOTSUPP;
-+		if ((features & ((1ULL << VIRTIO_F_VERSION_1) |
-+				 (1ULL << VIRTIO_NET_F_HASH_REPORT))) ==
-+		    (1ULL << VIRTIO_NET_F_HASH_REPORT))
-+			return -EINVAL;
- 		return vhost_net_set_features(n, features);
- 	case VHOST_GET_BACKEND_FEATURES:
- 		features = VHOST_NET_BACKEND_FEATURES;
-
--- 
-2.48.1
-
+Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 
