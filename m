@@ -1,236 +1,231 @@
-Return-Path: <netdev+bounces-175233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24BDFA6476F
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 10:31:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74608A64731
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 10:25:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91C1C18922C6
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 09:30:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FAB417273C
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 09:25:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 286CA22422C;
-	Mon, 17 Mar 2025 09:29:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FFC7221DAE;
+	Mon, 17 Mar 2025 09:24:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79A97222570
-	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 09:29:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FB34222581;
+	Mon, 17 Mar 2025 09:24:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742203762; cv=none; b=sD9PS3b3394qxnIWSbwAdR9L5aedvglP6vONcNXzg7w/osvpczM1bS8KBqVEdH+//wIhPgXoZB2VILlz49t5S6Kba0d39faXlfFshwfv8m2+qU8gRUlgB8W1Dj56+STS7lgt3L6zFGf0i3+Up3f88kYlWRbXXxo19ogmtUgP4nA=
+	t=1742203464; cv=none; b=hZzD7W0hWpewhrgtqspnuGcVpy98jxbLCluCtZGYtXX3EvoyBG9sJcVkolfcsSGZwSSrYW49VqCvXhxN8Aqx938pDV5ahX5jAX0ezG7M8oAM9ZYjJeM3y0OsltUrtA+jq6G3Um56qlWp8nfUtU3wOMHoybE1FDR/PNd42dixnRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742203762; c=relaxed/simple;
-	bh=v6b1hOqA8LaA+3NZNe9pj0/6BawfIs755ND7o1Yr1G4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aXOaKu4zkbocE/L13/A/UuFSg5Nrw4aXOLE8iO6LrXYGaTo0mvApCfgsD7stGb/Y5u862gJb7SStbql3ut4OjlcJnwA4IE1XaTjSDHCFUrk2l3l9F4LtHo10K5VCk4596+0U3CciZeUE5K8YIoa9GdEV1XxpVMhphfKrhKoj6Vo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tu6mJ-00007m-3d; Mon, 17 Mar 2025 10:28:59 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tu6mH-000Dk8-2m;
-	Mon, 17 Mar 2025 10:28:58 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tu6mI-001857-0S;
-	Mon, 17 Mar 2025 10:28:58 +0100
-Date: Mon, 17 Mar 2025 10:28:58 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v6 02/12] net: pse-pd: Add support for reporting
- events
-Message-ID: <Z9frWsKESEaB9GcZ@pengutronix.de>
-References: <20250304-feature_poe_port_prio-v6-0-3dc0c5ebaf32@bootlin.com>
- <20250304-feature_poe_port_prio-v6-2-3dc0c5ebaf32@bootlin.com>
+	s=arc-20240116; t=1742203464; c=relaxed/simple;
+	bh=Ed0LyCrah81ZxmUMKq4SYzGoz+Ef0ieRc77yW0Qxlag=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cMaNFhiiNAkvpC+GrIl8P63gxbo2DEmlVh6Zs1BM0xtseJQQj2yrdM5Dl075+I7bkATxspAs+P00h30RiUKlyGkgAVZ2ONVuv0vDbJqRivdt+tuUjoEKYDkDeifcO0eAvioQZkEqhkb0w7Tbm4TBLz0W3MsbGQeOM5jPT/GToW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ZGTwl4420z6M4XF;
+	Mon, 17 Mar 2025 17:20:55 +0800 (CST)
+Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
+	by mail.maildlp.com (Postfix) with ESMTPS id E0611140520;
+	Mon, 17 Mar 2025 17:24:10 +0800 (CST)
+Received: from china (10.220.118.114) by frapeml500005.china.huawei.com
+ (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Mon, 17 Mar
+ 2025 10:23:58 +0100
+From: Gur Stavi <gur.stavi@huawei.com>
+To: Gur Stavi <gur.stavi@huawei.com>, Fan Gong <gongfan1@huawei.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Lee Trager
+	<lee@trager.us>, <linux-doc@vger.kernel.org>, Jonathan Corbet
+	<corbet@lwn.net>, Bjorn Helgaas <helgaas@kernel.org>, Cai Huoqing
+	<cai.huoqing@linux.dev>, luosifu <luosifu@huawei.com>, Xin Guo
+	<guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>, Zhou
+ Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
+	<shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>, Suman Ghosh
+	<sumang@marvell.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, Joe
+ Damato <jdamato@fastly.com>
+Subject: [PATCH net-next v09 0/1] net: hinic3: Add a driver for Huawei 3rd gen NIC
+Date: Mon, 17 Mar 2025 11:40:38 +0200
+Message-ID: <cover.1742202778.git.gur.stavi@huawei.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250304-feature_poe_port_prio-v6-2-3dc0c5ebaf32@bootlin.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ frapeml500005.china.huawei.com (7.182.85.13)
 
-Hi Köry,
+This is the 1/3 patch of the patch-set described below.
 
-sorry for late review.
+The patch-set contains driver for Huawei's 3rd generation HiNIC
+Ethernet device that will be available in the future.
 
-On Tue, Mar 04, 2025 at 11:18:51AM +0100, Kory Maincent wrote:
-> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
-...
-> diff --git a/drivers/net/mdio/fwnode_mdio.c b/drivers/net/mdio/fwnode_mdio.c
-> index aea0f03575689..9b41d4697a405 100644
-> --- a/drivers/net/mdio/fwnode_mdio.c
-> +++ b/drivers/net/mdio/fwnode_mdio.c
-> @@ -18,7 +18,8 @@ MODULE_LICENSE("GPL");
->  MODULE_DESCRIPTION("FWNODE MDIO bus (Ethernet PHY) accessors");
->  
->  static struct pse_control *
-> -fwnode_find_pse_control(struct fwnode_handle *fwnode)
-> +fwnode_find_pse_control(struct fwnode_handle *fwnode,
-> +			struct phy_device *phydev)
->  {
->  	struct pse_control *psec;
->  	struct device_node *np;
-> @@ -30,7 +31,7 @@ fwnode_find_pse_control(struct fwnode_handle *fwnode)
->  	if (!np)
->  		return NULL;
->  
-> -	psec = of_pse_control_get(np);
-> +	psec = of_pse_control_get(np, phydev);
->  	if (PTR_ERR(psec) == -ENOENT)
->  		return NULL;
->  
-> @@ -128,15 +129,9 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
->  	u32 phy_id;
->  	int rc;
->  
-> -	psec = fwnode_find_pse_control(child);
-> -	if (IS_ERR(psec))
-> -		return PTR_ERR(psec);
-> -
->  	mii_ts = fwnode_find_mii_timestamper(child);
-> -	if (IS_ERR(mii_ts)) {
-> -		rc = PTR_ERR(mii_ts);
-> -		goto clean_pse;
-> -	}
-> +	if (IS_ERR(mii_ts))
-> +		return PTR_ERR(mii_ts);
->  
->  	is_c45 = fwnode_device_is_compatible(child, "ethernet-phy-ieee802.3-c45");
->  	if (is_c45 || fwnode_get_phy_id(child, &phy_id))
-> @@ -169,6 +164,12 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
->  			goto clean_phy;
->  	}
->  
-> +	psec = fwnode_find_pse_control(child, phy);
-> +	if (IS_ERR(psec)) {
-> +		rc = PTR_ERR(psec);
-> +		goto unregister_phy;
-> +	}
+This is an SRIOV device, designed for data centers.
+Initially, the driver only supports VFs.
 
-Hm... we are starting to dereference the phydev pointer to a different
-framework without managing the ref-counting.
+Following the discussion over RFC01, the code will be submitted in
+separate smaller patches where until the last patch the driver is
+non-functional. The RFC02 submission contains overall view of the entire
+driver but every patch will be posted as a standalone submission.
 
-We will need to have some form of get_device(&phydev->mdio.dev).
-Normally it is done by phy_attach_direct().
+Changes:
 
-And the counterpart: put_device() or phy_device_free()
+RFC V01: https://lore.kernel.org/netdev/cover.1730290527.git.gur.stavi@huawei.com
 
- 
->  static int of_load_single_pse_pi_pairset(struct device_node *node,
-> @@ -557,6 +560,151 @@ int devm_pse_controller_register(struct device *dev,
->  }
->  EXPORT_SYMBOL_GPL(devm_pse_controller_register);
->  
-> +struct pse_irq {
-> +	struct pse_controller_dev *pcdev;
-> +	struct pse_irq_desc desc;
-> +	unsigned long *notifs;
-> +};
-> +
-> +/**
-> + * pse_to_regulator_notifs - Convert PSE notifications to Regulator
-> + *			     notifications
-> + * @notifs: PSE notifications
-> + *
-> + * Return: Regulator notifications
-> + */
-> +static unsigned long pse_to_regulator_notifs(unsigned long notifs)
-> +{
-> +	unsigned long rnotifs = 0;
-> +
-> +	if (notifs & ETHTOOL_PSE_EVENT_OVER_CURRENT)
-> +		rnotifs |= REGULATOR_EVENT_OVER_CURRENT;
-> +	if (notifs & ETHTOOL_PSE_EVENT_OVER_TEMP)
-> +		rnotifs |= REGULATOR_EVENT_OVER_TEMP;
-> +
-> +	return rnotifs;
-> +}
-> +
-> +/**
-> + * pse_control_find_phy_by_id - Find PHY attached to the pse control id
-> + * @pcdev: a pointer to the PSE
-> + * @id: index of the PSE control
-> + *
-> + * Return: PHY device pointer or NULL
-> + */
-> +static struct phy_device *
-> +pse_control_find_phy_by_id(struct pse_controller_dev *pcdev, int id)
-> +{
-> +	struct pse_control *psec;
-> +
-> +	mutex_lock(&pse_list_mutex);
-> +	list_for_each_entry(psec, &pcdev->pse_control_head, list) {
-> +		if (psec->id == id) {
-> +			mutex_unlock(&pse_list_mutex);
-> +			return psec->attached_phydev;
-> +		}
-> +	}
-> +	mutex_unlock(&pse_list_mutex);
-> +
+RFC V02: https://lore.kernel.org/netdev/cover.1733990727.git.gur.stavi@huawei.com
+* Reduce overall line of code by removing optional functionality.
+* Break down into smaller patches.
+
+PATCH 01 V01: https://lore.kernel.org/netdev/cover.1734599672.git.gur.stavi@huawei.com
+* Documentation style and consistency fixes (from Bjorn Helgaas)
+* Use ipoll instead of custom code (from Andrew Lunn)
+* Move dev_set_drvdata up in initialization order (from Andrew Lunn)
+* Use netdev's max_mtu, min_mtu (from Andrew Lunn)
+* Fix variable 'xxx' set but not used warnings (from Linux patchwork)
+
+PATCH 01 V02: https://lore.kernel.org/netdev/cover.1735206602.git.gur.stavi@huawei.com
+* Add comment regarding usage of random MAC. (Andrew Lunn)
+* Add COMPILE_TEST to Kconfig (Jakub Kicinski)
+
+PATCH 01 V03: https://lore.kernel.org/netdev/cover.1735735608.git.gur.stavi@huawei.com
+* Rephrase Kconfig comment (Jakub Kicinski)
+* Kconfig: add 'select AUXILIARY_BUS' (Kernel test robot)
+* ARCH=um: missing include 'net/ip6_checksum.h' (Kernel test robot)
+
+PATCH 01 V04: https://lore.kernel.org/netdev/cover.1737013558.git.gur.stavi@huawei.com
+* Improve naming consistency, missing hinic3 prefixes (Suman Ghosh)
+* Change hinic3_remove_func to void (Suman Ghosh)
+* Add adev_event_unregister (Suman Ghosh)
+* Add comment for service types enum (Suman Ghosh)
+
+PATCH 01 V05: https://lore.kernel.org/netdev/cover.1740312670.git.gur.stavi@huawei.com
+* Fix signed-by signatures (Przemek Kitszel)
+* Expand initials in documentation (Przemek Kitszel)
+* Update copyright messages to 2025 (Przemek Kitszel)
+* Sort filenames in makefile (Przemek Kitszel)
+* Sort include statements (Przemek Kitszel)
+* Reduce padding in irq allocation struct (Przemek Kitszel)
+* Replace memset of zero with '= {}' init (Przemek Kitszel)
+* Revise mbox API to avoid using same pointer twice (Przemek Kitszel)
+* Use 2 underscores for header file ifdef guards (Przemek Kitszel)
+* Remove 'Intelligent' from Kconfig (Przemek Kitszel)
+* Documentation, fix line length mismatch to header (Simon Horman)
+
+PATCH 01 V06: https://lore.kernel.org/netdev/cover.1740487707.git.gur.stavi@huawei.com
+* Add hinic3 doc to device_drivers/ethernet TOC (Jakub Kicinski)
+
+PATCH 01 V07: https://lore.kernel.org/netdev/cover.1741069877.git.gur.stavi@huawei.com
+* Remove unneeded conversion to bool (Jakub Kicinski)
+* Use net_prefetch and net_prefetchw (Joe Damato)
+* Push IRQ coalescing and rss alloc/free to later patch (Joe Damato)
+* Pull additional rx/tx/napi code from next patch (Joe Damato)
+
+PATCH 01 V08: https://lore.kernel.org/netdev/cover.1741247008.git.gur.stavi@huawei.com
+* Fix build warning following pulling napi code from later patch (patchwork)
+* Add missing net/gro.h include for napi_gro_flush (patchwork)
+
+PATCH 01 V09:
+* Maintain non-error paths in the main flow (Simon Horman)
+* Rename Pcie to PCIe in debug messages (Simon Horman)
+* Remove do-nothing goto label (Simon Horman)
+* Remove needless override of error value (Simon Horman)
+
+Fan Gong (1):
+  hinic3: module initialization and tx/rx logic
+
+ .../device_drivers/ethernet/huawei/hinic3.rst | 137 ++++
+ .../device_drivers/ethernet/index.rst         |   1 +
+ MAINTAINERS                                   |   7 +
+ drivers/net/ethernet/huawei/Kconfig           |   1 +
+ drivers/net/ethernet/huawei/Makefile          |   1 +
+ drivers/net/ethernet/huawei/hinic3/Kconfig    |  19 +
+ drivers/net/ethernet/huawei/hinic3/Makefile   |  21 +
+ .../ethernet/huawei/hinic3/hinic3_common.c    |  53 ++
+ .../ethernet/huawei/hinic3/hinic3_common.h    |  27 +
+ .../ethernet/huawei/hinic3/hinic3_hw_cfg.c    |  24 +
+ .../ethernet/huawei/hinic3/hinic3_hw_cfg.h    |  53 ++
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.c   |  32 +
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.h   |  13 +
+ .../ethernet/huawei/hinic3/hinic3_hw_intf.h   | 113 +++
+ .../net/ethernet/huawei/hinic3/hinic3_hwdev.c |  24 +
+ .../net/ethernet/huawei/hinic3/hinic3_hwdev.h |  81 ++
+ .../net/ethernet/huawei/hinic3/hinic3_hwif.c  |  21 +
+ .../net/ethernet/huawei/hinic3/hinic3_hwif.h  |  58 ++
+ .../net/ethernet/huawei/hinic3/hinic3_irq.c   |  47 ++
+ .../net/ethernet/huawei/hinic3/hinic3_lld.c   | 416 +++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_lld.h   |  21 +
+ .../net/ethernet/huawei/hinic3/hinic3_main.c  | 357 +++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_mbox.c  |  16 +
+ .../net/ethernet/huawei/hinic3/hinic3_mbox.h  |  15 +
+ .../net/ethernet/huawei/hinic3/hinic3_mgmt.h  |  13 +
+ .../huawei/hinic3/hinic3_mgmt_interface.h     | 105 +++
+ .../huawei/hinic3/hinic3_netdev_ops.c         |  77 ++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.c   | 230 ++++++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.h   |  39 +
+ .../ethernet/huawei/hinic3/hinic3_nic_dev.h   |  91 +++
+ .../ethernet/huawei/hinic3/hinic3_nic_io.c    |  21 +
+ .../ethernet/huawei/hinic3/hinic3_nic_io.h    | 118 +++
+ .../huawei/hinic3/hinic3_queue_common.c       |  67 ++
+ .../huawei/hinic3/hinic3_queue_common.h       |  54 ++
+ .../net/ethernet/huawei/hinic3/hinic3_rx.c    | 404 ++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_rx.h    |  91 +++
+ .../net/ethernet/huawei/hinic3/hinic3_tx.c    | 691 ++++++++++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_tx.h    | 130 ++++
+ .../net/ethernet/huawei/hinic3/hinic3_wq.c    |  29 +
+ .../net/ethernet/huawei/hinic3/hinic3_wq.h    |  76 ++
+ 40 files changed, 3794 insertions(+)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/huawei/hinic3.rst
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/Kconfig
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/Makefile
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_common.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_common.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_intf.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hwif.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hwif.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_irq.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_lld.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_lld.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_main.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mbox.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mgmt.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mgmt_interface.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_queue_common.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_queue_common.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_rx.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_rx.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_tx.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_wq.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_wq.h
 
 
-Here we should increase ref-counting withing the mutex protection:
-
-    mutex_lock(&pse_list_mutex);
-    list_for_each_entry(psec, &pcdev->pse_control_head, list) {
-        if (psec->id == id) {
-            phydev = psec->attached_phydev;
-            if (phydev)
-                get_device(&phydev->mdio.dev);  // Increase reference count
-            break;
-        }
-    }
-    mutex_unlock(&pse_list_mutex);
-
-
-May be we will need a generic function for the PHYlib: phy_device_get() ?
- 
-
+base-commit: bfc6c67ec2d64d0ca4e5cc3e1ac84298a10b8d62
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.45.2
+
 
