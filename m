@@ -1,216 +1,144 @@
-Return-Path: <netdev+bounces-175204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95142A64504
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 09:19:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A036A6453B
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 09:24:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D71B7171456
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 08:19:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20678162CCB
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 08:23:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05EFB21D00E;
-	Mon, 17 Mar 2025 08:19:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF2BF21D3F6;
+	Mon, 17 Mar 2025 08:23:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zm+pCnOv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T3H1ktej"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A97821CFF6
-	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 08:19:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C8EC21D3E8
+	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 08:23:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742199559; cv=none; b=qzMGLyUU2KcVNcxGQfVWuzdr+p3jc8X2Re0GWBVwVQUyCnBhA4+dqbbgXcbwSBDCjy/qDqhwm3bwooKxMqwYwIXhFlyAwCLEvkPspIrH1itv0xiWDmzgubzI85HaXo8Slj00EsWzet30eVHsKi/JPHajv9CPfo0r5Oc6qvoVlBY=
+	t=1742199830; cv=none; b=sRjCtWTwdlrLg33rpV8W7oF9rOP1NHPw7adTWDOOGM+2TR+dv7cJdZcdxu0nZlhwR35F76m2TzBW/jMWG4mPo0v54JW2Wk8Q8w50Vhn+p4ctuEtmeOGyMdWGHMZcWCyvbJhXcMRW7TwYT4q6LONpNx6gMA6LXTY0wxK/WctDP1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742199559; c=relaxed/simple;
-	bh=AC5b3cOdcuPvQOXOujuOCv5VyyVIXIlom9fJtvwDBAg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pC7FW8y9QytgXfDOcl6DvVYWNp7RGmthjPQAm4r+/sJyKNlVhwXwEEK2Eqm9ZR2towd18vEil6M6ER2Wy8nIQ+gPToTaXJKv/ViDB12kFBcemA9IYX7ZC5X/02/eFzIB4CIR1mdpkXMrjE7EBYgA0v5QWwStGjhb564ME02h9cg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zm+pCnOv; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4769aef457bso47537301cf.2
-        for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 01:19:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742199555; x=1742804355; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0dmAl3f2a2eQALrDQqK+2x+vrO6J4Ix9fdjwK9KU9dg=;
-        b=zm+pCnOvvVtJC5smx5wFyQwj/cf8nEKmsB+81+K6+0UfWLGqL0WCRWAOmtQ+s5/quR
-         FhP67WPyuxn3Rzh3fZsIzfX/7dNcP7sf4MdamjubrI0M87BaStRaPvWgtUoTk1Zx9EME
-         50vxMe1CKtotCe0m0DXAjQuRUX1DMu8PQwKPhoCoG5fHQKndxZXjDD0A2DK76TCTR9J0
-         kvdMs32FcMDK0HGEVAbv0hzS6yEcFygcjM8ryD+qpsppKEBBLxeMSOKGik5qh+/QED4c
-         YTPn/cUFBd4zpzQKroCpCkT+frvPS/198ug+RXJwyU2UtN/fHycR+hiUqFPWwrwURz5V
-         V6sQ==
+	s=arc-20240116; t=1742199830; c=relaxed/simple;
+	bh=6F6vk/bCuTRFj9sHasYFtzBPnP8c9sLQfBUMl+1ThkY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tArJA8Nw5smm1+B6X/NHbbaZ7IR/xGk3+bjTolEt1fQ0eSQjy9wKyloG8AVQV1+Et7mCU2CI9NUzR3aIt8H60hXKGraN2sGHAKyG1AA2k+tmWbWsX517VHfifZ/S3Cm5jFEqG3mAMAfO/82+ukz1ErWHmx9gCBSITVjCdy003UU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T3H1ktej; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742199828;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rC5lK1FxM1eWQXOh9AroE9tnp2td4VImfPnxc4mu+rg=;
+	b=T3H1ktejRD0Vh4sK7aDZUzpjaMS6nV/QZlHsgMGOhKwzEOcZyEmPPXxLsqEWE0kvvJNao1
+	GQjq2qyskoAOvH0vUjUQdkF6YA/l7stQRNnnNv9H1Ucs+EBRVN4tNaYlBz5nZELtZiDJ61
+	VGj5psdB1Ws2uXfqA6vvTstPhiMrijU=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-255-WCQgMQznMPiHVYmsc8V2-Q-1; Mon, 17 Mar 2025 04:23:46 -0400
+X-MC-Unique: WCQgMQznMPiHVYmsc8V2-Q-1
+X-Mimecast-MFC-AGG-ID: WCQgMQznMPiHVYmsc8V2-Q_1742199825
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43cf172ff63so10475785e9.3
+        for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 01:23:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742199555; x=1742804355;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0dmAl3f2a2eQALrDQqK+2x+vrO6J4Ix9fdjwK9KU9dg=;
-        b=r5kHFH9iJaBmCZw7ulPhpKzuIXf2ddX3awYAIWuXg5xmwE/9ngy+J/yohI61xN0y1F
-         gt1SwFPlyh+XcboGp77JmvitmWaRAw+UtA/I7MtKLiB3AJsJt9qdwgk6gFkducoI9q94
-         YSf8Un6ZgdTtDB1/vYI/ysFMxCvygmgNiAnepqCsATv9vY0fKRTJCj8Qo9yTD17lWi7e
-         hjqZPaV93qqHT4QEjgqLCMcyzp22Wru9O0u4W60JMabAnXou9FncBHOv6MUhz0mONRAc
-         5/s3Wuj5WIz/z+VGuDDFBgHjGZ/S0QRzrFYv5T8LR37BeLUa9uvw6o6QSdzcBZi/KQBi
-         rVag==
-X-Forwarded-Encrypted: i=1; AJvYcCXRAVN+Jl/yUHs09MTA1kqp/9P90QyPYAAeVgzzpk+ezqJVjxlfw9K0IqQGaodyzZSvgckmf/A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzybFoQETbqOA31JnkGu82zVEEw2yJCkd2xmgIiLdjT1ympSn18
-	ZYvWGo3psTfsXai+T4T7EhnT1TyOr8XCBairlw4Yn3yyR/j3iky4bhzT2ND680YfCoXlfKg8RKw
-	6N7qm30SviA11Ws36DPctGXn0+VmEA66s4JJZ
-X-Gm-Gg: ASbGncvdR898Sspzfmko3KgTCPpAfn3EJhpoR6f/reA3uBlGiDkM43x+KUqnA6jJWLw
-	qsXXGILJCjBvtG9UNMi7lKHSpxaP5pUJ3y+4fgijBASbhiAbY/mwM0G4SPxPEM5QkPshaKyeHCW
-	f1p81XBbJ883kRta4oJtYqL9mNPSM886tmJvwFVg==
-X-Google-Smtp-Source: AGHT+IEzy2OwmJNbTR+LoL63WELKekffIl6f07YU6uyVtWxBMpwrlDuP9NJrtsxwFqMyzs0G5HunpMAE1csZ9MBVPn4=
-X-Received: by 2002:ac8:5fcc:0:b0:476:a969:90d2 with SMTP id
- d75a77b69052e-476c81515c4mr153398991cf.26.1742199554797; Mon, 17 Mar 2025
- 01:19:14 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1742199825; x=1742804625;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rC5lK1FxM1eWQXOh9AroE9tnp2td4VImfPnxc4mu+rg=;
+        b=N//lpulsaYs/c9eW5MVyRrqSZC36HfPhQLyzedKCC+mRT5be4YPIpqYcB9FDIPyWlZ
+         7izuZs1lHVWrX+ViaISMD94c8k2Jzyp+7s9ZeiPzXRAnWTjU/T7iZ7SYcMCf792PSAC9
+         QC84DcGh+rVu8QUys+KSKVY0er38dy6DJ38J2d4ewRWZ2t5ats+mOObKxodIR6h/BglJ
+         dJ+20x7xSeX/wG1odpedb5KRPYG7kJhQIuBTIWM65a2/JSEoxeKInaApZoBF7Kofo+ED
+         CzUKH98Mo4EyHrO/xIDaIuRVhNXVPRMW94mm2w1ZPysA/Aiy4bsSINrPPlufhhv0wxTS
+         w+KA==
+X-Gm-Message-State: AOJu0Yx8CLAFUpQ0GtjEtV4p7EQ5nNlgYws/TWsdYtt+qgztHtQd8HUl
+	lVpFg5r4rPPre/r7lrH+sJNP84ItYmolsvFYpvsy68qWd/9S/NrcKNNpz06lixjjkl5UFnUmVSf
+	0wKGdzHm/do/3DdO+PznXKIk7oDdMLhv3yvPed3325Y02n0b3UuNL/A==
+X-Gm-Gg: ASbGncsgVxRrbEj0iF5FdaEoyNIGO4eLygMeGSAbakH0RtuvHDRDl6tNuMcLRHZ2EPh
+	cvxAp8UCxT55uQV/iHtkV9BoCJFOnPIoYPW2ie7FrlyDS+lzeChQ4jispQxRomaBpkOdLBMHEpl
+	zaaa88tyjaCnCMvEq6vnby3qZ7vhZi18nxdM77O66sbAi33Kp36eMFjxYFGrRLFrT91ijdG3Ona
+	VRJe2TFhhU3Aa77jEdOluabpjMlyzB0P+2kBIndgemj3oBJr3GGxN5lXb0x38PNNy1qBEZA64o+
+	4lmwy7SSJfLPbxSZWLNH19AwbOPZsnEBLdl2AuvTokeVmg==
+X-Received: by 2002:a05:600c:511c:b0:43c:fbba:41ba with SMTP id 5b1f17b1804b1-43d1ecd60c1mr109892895e9.28.1742199825095;
+        Mon, 17 Mar 2025 01:23:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGvXGGv6tXY3ajGLLrOXr011xmJAYRLTHi8JZasNx5okT9lH6f9KisDDn8lGridr/hz5ZTMqg==
+X-Received: by 2002:a05:600c:511c:b0:43c:fbba:41ba with SMTP id 5b1f17b1804b1-43d1ecd60c1mr109892625e9.28.1742199824734;
+        Mon, 17 Mar 2025 01:23:44 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-10-172.dyn.eolo.it. [146.241.10.172])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d2010de59sm96734785e9.33.2025.03.17.01.23.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Mar 2025 01:23:44 -0700 (PDT)
+Message-ID: <981a871f-e0c0-4741-8e7e-4a4e5d93541d@redhat.com>
+Date: Mon, 17 Mar 2025 09:23:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250316022706.91570-1-kerneljasonxing@gmail.com> <20250316022706.91570-2-kerneljasonxing@gmail.com>
-In-Reply-To: <20250316022706.91570-2-kerneljasonxing@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 17 Mar 2025 09:19:03 +0100
-X-Gm-Features: AQ5f1Josz2brwD4quZO-R6vvdTcPKXTxl2qqVLf43BuHp_BiXWmV0OR2gHzRuOE
-Message-ID: <CANn89iJsZ4z50KWh22wZyRHUj9rF3ef4HbMvmKez2xHLT=UT2g@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 1/2] tcp: support TCP_RTO_MIN_US for
- set/getsockopt use
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	dsahern@kernel.org, horms@kernel.org, kuniyu@amazon.com, ncardwell@google.com, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3 2/3] selftest/bpf: Add test for AF_VSOCK connect()
+ racing sockmap update
+To: Michal Luczaj <mhal@rbox.co>, Stefano Garzarella <sgarzare@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Bobby Eshleman <bobby.eshleman@bytedance.com>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Mykola Lysenko <mykolal@fb.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+ virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20250316-vsock-trans-signal-race-v3-0-17a6862277c9@rbox.co>
+ <20250316-vsock-trans-signal-race-v3-2-17a6862277c9@rbox.co>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250316-vsock-trans-signal-race-v3-2-17a6862277c9@rbox.co>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Mar 16, 2025 at 3:27=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> Support adjusting RTO MIN for socket level by using setsockopt().
+On 3/16/25 11:45 PM, Michal Luczaj wrote:
+> Racing signal-interrupted connect() and sockmap update may result in an
+> unconnected (and missing vsock transport) socket in a sockmap.
+> 
+> Test spends 2 seconds attempting to reach WARN_ON_ONCE().
+> 
+> connect
+>   / state = SS_CONNECTED /
+>                                 sock_map_update_elem
+>   if signal_pending
+>     state = SS_UNCONNECTED
+> 
+> connect
+>   transport = NULL
+>                                 vsock_bpf_recvmsg
+>                                   WARN_ON_ONCE(!vsk->transport)
+> 
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
 
+This is apparently causing some bpf self-test failure. (Timeout? the
+self-test failure output is not clear to me.)
 
-This changelog is small :/
+Could you please have a look?
 
-You should clearly state that this option has no effect if the route
-has a RTAX_RTO_MIN attribute set.
+Thanks!
 
-Also document what is the default socket value after a socket() system
-call and/or accept() in the changelog.
+Paolo
 
->
-> Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
-> ---
->  Documentation/networking/ip-sysctl.rst |  4 ++--
->  include/net/tcp.h                      |  2 +-
->  include/uapi/linux/tcp.h               |  1 +
->  net/ipv4/tcp.c                         | 16 +++++++++++++++-
->  4 files changed, 19 insertions(+), 4 deletions(-)
->
-> diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/netwo=
-rking/ip-sysctl.rst
-> index 054561f8dcae..5c63ab928b97 100644
-> --- a/Documentation/networking/ip-sysctl.rst
-> +++ b/Documentation/networking/ip-sysctl.rst
-> @@ -1229,8 +1229,8 @@ tcp_pingpong_thresh - INTEGER
->  tcp_rto_min_us - INTEGER
->         Minimal TCP retransmission timeout (in microseconds). Note that t=
-he
->         rto_min route option has the highest precedence for configuring t=
-his
-> -       setting, followed by the TCP_BPF_RTO_MIN socket option, followed =
-by
-> -       this tcp_rto_min_us sysctl.
-> +       setting, followed by the TCP_BPF_RTO_MIN and TCP_RTO_MIN_US socke=
-t
-> +       options, followed by this tcp_rto_min_us sysctl.
->
->         The recommended practice is to use a value less or equal to 20000=
-0
->         microseconds.
-> diff --git a/include/net/tcp.h b/include/net/tcp.h
-> index 7207c52b1fc9..6a7aab854b86 100644
-> --- a/include/net/tcp.h
-> +++ b/include/net/tcp.h
-> @@ -806,7 +806,7 @@ u32 tcp_delack_max(const struct sock *sk);
->  static inline u32 tcp_rto_min(const struct sock *sk)
->  {
->         const struct dst_entry *dst =3D __sk_dst_get(sk);
-> -       u32 rto_min =3D inet_csk(sk)->icsk_rto_min;
-> +       u32 rto_min =3D READ_ONCE(inet_csk(sk)->icsk_rto_min);
->
->         if (dst && dst_metric_locked(dst, RTAX_RTO_MIN))
->                 rto_min =3D dst_metric_rtt(dst, RTAX_RTO_MIN);
-> diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
-> index 32a27b4a5020..b2476cf7058e 100644
-> --- a/include/uapi/linux/tcp.h
-> +++ b/include/uapi/linux/tcp.h
-> @@ -137,6 +137,7 @@ enum {
->
->  #define TCP_IS_MPTCP           43      /* Is MPTCP being used? */
->  #define TCP_RTO_MAX_MS         44      /* max rto time in ms */
-> +#define TCP_RTO_MIN_US         45      /* min rto time in us */
->
->  #define TCP_REPAIR_ON          1
->  #define TCP_REPAIR_OFF         0
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index 46951e749308..f2249d712fcc 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -3352,7 +3352,7 @@ int tcp_disconnect(struct sock *sk, int flags)
->         icsk->icsk_probes_out =3D 0;
->         icsk->icsk_probes_tstamp =3D 0;
->         icsk->icsk_rto =3D TCP_TIMEOUT_INIT;
-> -       icsk->icsk_rto_min =3D TCP_RTO_MIN;
-> +       WRITE_ONCE(icsk->icsk_rto_min, TCP_RTO_MIN);
->         icsk->icsk_delack_max =3D TCP_DELACK_MAX;
->         tp->snd_ssthresh =3D TCP_INFINITE_SSTHRESH;
->         tcp_snd_cwnd_set(tp, TCP_INIT_CWND);
-> @@ -3833,6 +3833,14 @@ int do_tcp_setsockopt(struct sock *sk, int level, =
-int optname,
->                         return -EINVAL;
->                 WRITE_ONCE(inet_csk(sk)->icsk_rto_max, msecs_to_jiffies(v=
-al));
->                 return 0;
-> +       case TCP_RTO_MIN_US: {
-> +               int rto_min =3D usecs_to_jiffies(val);
-
-> +
-> +               if (rto_min > TCP_RTO_MIN || rto_min < TCP_TIMEOUT_MIN)
-> +                       return -EINVAL;
-> +               WRITE_ONCE(inet_csk(sk)->icsk_rto_min, rto_min);
-> +               return 0;
-> +       }
->         }
->
->         sockopt_lock_sock(sk);
-> @@ -4672,6 +4680,12 @@ int do_tcp_getsockopt(struct sock *sk, int level,
->         case TCP_RTO_MAX_MS:
->                 val =3D jiffies_to_msecs(tcp_rto_max(sk));
->                 break;
-> +       case TCP_RTO_MIN_US: {
-> +               int rto_min =3D READ_ONCE(inet_csk(sk)->icsk_rto_min);
-> +
-> +               val =3D jiffies_to_usecs(rto_min);
-
-Reuse val directly, no need for a temporary variable, there is no
-fancy computation on it.
-
-                   val =3D
-jiffies_to_usecs(READ_ONCE(inet_csk(sk)->icsk_rto_min));
-                   break;
-
-> +               break;
-> +       }
->         default:
->                 return -ENOPROTOOPT;
->         }
-> --
-> 2.43.5
->
 
