@@ -1,58 +1,57 @@
-Return-Path: <netdev+bounces-175380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C69FA65833
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 17:36:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AB34A65839
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 17:36:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC97516A213
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 16:36:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8D0C16B985
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 16:36:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 178A81A00D1;
-	Mon, 17 Mar 2025 16:36:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E26F41A23BB;
+	Mon, 17 Mar 2025 16:36:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eim7GMPZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nT7f2LfZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E2E1922D3
-	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 16:36:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEFB01A00F0
+	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 16:36:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742229372; cv=none; b=q3bbP0fqXv+pfy6HehPxbWGDCwXqaqjCq4IteSLqvcj8e/Jak1X8NfRvhWFzLoYe9jdKeTW6ih6ICCH3OvvPRLFHTFBoS6vbyLRb50KPnKHXhjp6e2jVE5uJkct69sGgYSuvsW15D/Sv72oq8npw6bcPEXwwsl7t5zZn75UK5Y4=
+	t=1742229397; cv=none; b=DGPsyNYpEfabaX7VyswyLdsVCW6hbva+eoVsqIdvTPDbhkgRFl57TqQzSdFOZ8/SHfUgewu3w4+x3UUCvpIYs168+IHRlFQbfADkA5cFLIOOjNCHVSxy6CIT79Dr8jrN4KIpeWzx/Wd4/2KXUMcxAGzyMR+fxR0G7LihB1gd/wU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742229372; c=relaxed/simple;
-	bh=hxUGwuq7WDdmDJmZwXTfkiEjKSTVRymvuQfO+oKCd2s=;
+	s=arc-20240116; t=1742229397; c=relaxed/simple;
+	bh=Jo5bYLXd2n3FxjbuIWaKZfgiA2G8U5y0lBTzVuRSLVs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OaVQvSISqMTJ3wWE+HaRHRjyJZAM2O7ZVtBHqxf5SGwW5lp0XPnonTNeG/7GcruxHbfuyRk7ksZdqGiVN7s9KgxuzeJWbIF89hzLP9Iz2SDXJ45EnJuNMCRSPUdNwbPtHZIQQL9d+ptUmIduWSjVaKKzxTyHZEI7i3SUhrvl+ec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eim7GMPZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27D6DC4CEE3;
-	Mon, 17 Mar 2025 16:36:08 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ozYKRGRm8+qGek/ILUeBrBuBli8nwWAwewHFB7uV/wZav00gERDrUQyORBWTDmKC79gYT/IivxnIi036l5Hw5pUooa+2++h1A19MVCIgfZ6DF7ITkRTNuC8Qmoexhj0LGe2RosOdNjOlTr061/5HBRdb16QoRrr1jqPza/rZqNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nT7f2LfZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26BA7C4CEE3;
+	Mon, 17 Mar 2025 16:36:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742229370;
-	bh=hxUGwuq7WDdmDJmZwXTfkiEjKSTVRymvuQfO+oKCd2s=;
+	s=k20201202; t=1742229397;
+	bh=Jo5bYLXd2n3FxjbuIWaKZfgiA2G8U5y0lBTzVuRSLVs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eim7GMPZJ+a7J8RIAakBUTHU5Hl4HUVOxQlDkCp7Az77Y1ooTCXtn7CT4PydNT9ML
-	 34Yna0UV8nQUFO3Gr+TJ08s1Zdf8kXQA+dNCTHZlgPfdbSymzXSJPlcxo/te6GtpYe
-	 ryZ27ab6g42K9XJ/7CQk+YP/KqrSk3OJfruoFYdt/46vo1oWDjsO2FwXAy5MECOjDv
-	 miRVvAPL0THlFytOTz3wVGDPpVB9UWKmm1uFdSL8sn7aWpGaIZA05tcYSlGBd2l8Yu
-	 bIEUfWTT/vfkvqmbfR/bvqimtQ3jAOLxJ2pqfxt/ATslJchpRwtA1W1U+cA1hiazwD
-	 hq1aVhOoXfuXQ==
-Date: Mon, 17 Mar 2025 16:36:07 +0000
+	b=nT7f2LfZLmvgPljLSXdlXzdjk3UfhjNzIwcO1r7yQnwaOfNBK12mKD9TMx7CyfJsu
+	 hm6o812LhzNDhS0nbNGQ95cb9Ianx0UNU792TqNnA7/qQqTudqUMYpcmz021DxL/ti
+	 DUUoquUwEMSLQAd/Kg4Rl8t5gAOAcnjp1tmIEePcrkSy+oJRZ9B/vYQVddW7biSZ92
+	 SzNrH1RDC0iKPskc+aUrIiSweol6LMY/UPi9+rJ18vb3ChWPCxvXeBz84hqRuo0kby
+	 jX88P68QS1295RL39epC4Yds7mLxzE4ncxwJrIFUxGMBqU8ky/G38BBRitM2mxlkrB
+	 R4QguFT/fzQcw==
+Date: Mon, 17 Mar 2025 16:36:34 +0000
 From: Simon Horman <horms@kernel.org>
 To: Grzegorz Nitka <grzegorz.nitka@intel.com>
 Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
 	Karol Kolacinski <karol.kolacinski@intel.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH iwl-next v2 1/3] ice: remove SW side band access
- workaround for E825
-Message-ID: <20250317163607.GD688833@kernel.org>
+Subject: Re: [PATCH iwl-next v2 3/3] ice: enable timesync operation on 2xNAC
+ E825 devices
+Message-ID: <20250317163634.GE688833@kernel.org>
 References: <20250310122439.3327908-1-grzegorz.nitka@intel.com>
- <20250310122439.3327908-2-grzegorz.nitka@intel.com>
+ <20250310122439.3327908-4-grzegorz.nitka@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,33 +60,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250310122439.3327908-2-grzegorz.nitka@intel.com>
+In-Reply-To: <20250310122439.3327908-4-grzegorz.nitka@intel.com>
 
-On Mon, Mar 10, 2025 at 01:24:37PM +0100, Grzegorz Nitka wrote:
+On Mon, Mar 10, 2025 at 01:24:39PM +0100, Grzegorz Nitka wrote:
 > From: Karol Kolacinski <karol.kolacinski@intel.com>
 > 
-> Due to the bug in FW/NVM autoload mechanism (wrong default
-> SB_REM_DEV_CTL register settings), the access to peer PHY and CGU
-> clients was disabled by default.
+> According to the E825C specification, SBQ address for ports on a single
+> complex is device 2 for PHY 0 and device 13 for PHY1.
+> For accessing ports on a dual complex E825C (so called 2xNAC mode),
+> the driver should use destination device 2 (referred as phy_0) for
+> the current complex PHY and device 13 (referred as phy_0_peer) for
+> peer complex PHY.
 > 
-> As the workaround solution, the register value was overwritten by the
-> driver at the probe or reset handling.
-> Remove workaround as it's not needed anymore. The fix in autoload
-> procedure has been provided with NVM 3.80 version.
-
-Hi Grzegorz,
-
-As per my belated comment on v2 [*], I think it would be worth adding
-a brief comment here regarding this not being expected to cause
-a regression in HW+FW seen in the wild.
-
-[*] https://lore.kernel.org/netdev/20250317163359.GC688833@kernel.org/
-
+> Differentiate SBQ destination device by checking if current PF port
+> number is on the same PHY as target port number.
 > 
-> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Adjust 'ice_get_lane_number' function to provide unique port number for
+> ports from PHY1 in 'dual' mode config (by adding fixed offset for PHY1
+> ports). Cache this value in ice_hw struct.
+> 
+> Introduce ice_get_primary_hw wrapper to get access to timesync register
+> not available from second NAC.
+> 
 > Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 > Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+> Co-developed-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
 > Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
 
-...
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
