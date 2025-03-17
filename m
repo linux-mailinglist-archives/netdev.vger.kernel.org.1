@@ -1,48 +1,80 @@
-Return-Path: <netdev+bounces-175194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F0D8A643C3
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 08:32:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8841EA643E4
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 08:39:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1EB016A730
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 07:32:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3428163DAE
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 07:39:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14C8921ABAA;
-	Mon, 17 Mar 2025 07:32:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFCE221ADB9;
+	Mon, 17 Mar 2025 07:39:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kBHOzH5f"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="BvUQEJKf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBF3D218591;
-	Mon, 17 Mar 2025 07:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C440821A444
+	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 07:39:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742196749; cv=none; b=OeGHSn7bXrRaOxMGu20PTTcdHGor2jlCIRWDfwizBjcITyHzq2KQP1OVgZFI6icgeZtBYkTE21VoD7qX73gtXRSvBD7O6zjhcX7aOaiBlgwjDZRil4tqIw9STjveSV7woM90QHYmoX3rgr9Es14GKnPrtAl1CXPkE9dBe6O7UwE=
+	t=1742197155; cv=none; b=BLLnGBfTgbmkgxfJ4312u+r1BLCjDmagnNh3YbglFOpVPfbLNkt6cVj5tJ1d2/JfGNbPt+qQhpmQnr+TSoEWFs2hBVEA5EScHYf6ky+mC3hrNBXzbaO0jTEcVyzNlYslngbf0YAeZs9YpDb6EB5952fGLxMPpd0lYZo4fO79Kcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742196749; c=relaxed/simple;
-	bh=uWRBhGYc6EgYaSJe5jVFgCPxsSX9BUuM9hicfeD/bRw=;
+	s=arc-20240116; t=1742197155; c=relaxed/simple;
+	bh=Th8f45SOQCPR890tBRd7bDTWMo3bJcioqXxHTMd02+Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=djzpVfHO0G/DFD7Xd9Hbuda/svbE5iVVVO2gwFK4e6MmdIBVb3f5qUOXseZBs+lSmmoc33az6fZSPlPfr4Lytc05tkq5KZnuWQBUGlCpsXyke3asVjc3b+XhAuBKcpZeFald1ED+nS1t5MISAlxihD1fjL5eci4b1VE0bCbjgkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kBHOzH5f; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6EB4C4CEE3;
-	Mon, 17 Mar 2025 07:32:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742196748;
-	bh=uWRBhGYc6EgYaSJe5jVFgCPxsSX9BUuM9hicfeD/bRw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=kBHOzH5fF+FfLYhEHVBR7D4eXqv/Men3p9DUz9R1U39yYHuI2TA/VXebBkV87PUJ8
-	 HtzED47ZYq57M1gh0kWZAuwETCS2AJmM7xivtR0MOoS3gwvFFoXpUaWjBToRWp/xdq
-	 wWIOfgX5XbFWuBKeM17g8e03YHAHtvfOlRZralXzyfGSxt9lPuEgxKv2Tuw6ayAmS3
-	 rmHBvY14P8QO4wqo42vcgyT1SytTDk2xcEiFA4jWNDMxmcs9P5Mj9txi/uuFstEhdu
-	 4phyjzlzX41xWSYO3ccXmxIOqWNgszUJBU6+RiMt/revRMpL1J8sRpHr0r9yE1dfx8
-	 hTfbCGLGJr34w==
-Message-ID: <0d5cf176-f084-467b-b4a1-9a1f862d0781@kernel.org>
-Date: Mon, 17 Mar 2025 08:32:19 +0100
+	 In-Reply-To:Content-Type; b=sPQc21IIUO5bB45Qwy7gQGqmWjHqomZHutJem7Xhv7ZRxI4q8ccsFB8liV5SMhRX4QsV9P5+x8k3QI9kIkNLkMGtcLQtDks3TeWPuH3uwf1PvzJaBlOdXDMIHtfjk8j9yMDBKHbu5fSG2qMkIS06mp8ggpD6wypa4LYAgfUOOjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=BvUQEJKf; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3914a5def6bso2061786f8f.1
+        for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 00:39:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1742197152; x=1742801952; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WvL6YVUC/iLIzrgQ7ghXKRXq4PF6b66cA4hhiSylm1U=;
+        b=BvUQEJKf2t4OFEs8T/vvLjLOZxJDAYxxyO2bb9fnK4I7PvIvgc1q2Mjp8fRn1x13Z+
+         YAxPQ6B5Bv7Ae4ZWM2lSLQzrtjsYhNWsvfLe8t7ob6NGgriTxjMk5iFjOS4SxKeEm0P+
+         tOzhuNNZ0AQucen62rjgyDheXziW4SLoUZQx7DV3EgQbGucuCqAz8gD1dz/NqPzxud5Q
+         49qgBAui4oKZF2POEJ9QuUNW/D1kVUC47pAtPg5ku16fhhzdO2DS2c6L4WXJzWAgfr56
+         FQr/I+7n0p0m2qr5VW8+HSfNaVsSoa4shmbIoUYUjhSWKv17xJSh6LRnJYdPoyV/x3oS
+         7hRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742197152; x=1742801952;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WvL6YVUC/iLIzrgQ7ghXKRXq4PF6b66cA4hhiSylm1U=;
+        b=XkOskOTxhucgDMUhyQPcaCtbMRjZlKudEtrHjvgTaC1fo1GyK7NtVlzicedhZmHjbA
+         zPLTL4rmYhCRdhVxZRqbzFrtR/fhZquM/+Jx7u1P2Gj4GoSgsjeWDbp02e4d9ebdvqb5
+         vlCI4zUQ7Ycecj07JXxM3W6bkz0op8i1T9ophpQzN2jNKBqbIY+2B51qUHCMUp5IMgYz
+         wYRDpzKDgZxpA6sw8ou+6Y6ZyxcINyjbFQ9vOtB6kwvO+lnm/UP3Pzm2IHFgHnXp9hxh
+         91THifIM9T97Ar4mfWesQxzLX9IP6ukEo18CV3uamX5toXGNH8OsxtcsIDZIvrRfGM1I
+         1FAw==
+X-Forwarded-Encrypted: i=1; AJvYcCXBkVAc1qgC4ypmVF18dFdCErzT6sYSsuoRdukyo44pQB5mpwBCCtUMBzvUo1GK+I1T2rDPdpk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1JrlzVbFR4vS3bUFtoCeBrzO2s8MAGri5pA0FJt2ZGBP6OIV0
+	48jOXw4l1i+5h55eVo5XEW43yg++W1imWrD6TDORU9TczS9fDIOiXQVHyPDnuHM=
+X-Gm-Gg: ASbGncvh3spas7qbXoOQe5Z2O8uGUr8MSpZbTT1rSAt+B/dlNTP6VWOsSDuNN4M4uNk
+	w+1RaZ04DaZ75/ECwXTjQubTOMp6h1c53lT20Ye7nBTB5uevuzKU36pQ5j3doCrWMB2HgCwX7hn
+	85lc+1KBx3ERdMzQCRGPTrlaRJrMM7T6dM3V39D6yabY7/llnkyHMemjWEvekXcffNISYdAycfi
+	wNbbradpLyKan9OxrNK2qB2JBN7Ta40hR3ZFkxhrwG4U7OSnWmPNK2DFrfllOdLZ7rOItG/Ygp6
+	ZcU1VGP1yprkjGKNp0V9iWALxvKN26NXty7Dq1Cx6GZAMZlHaczr9Ns82/wO8Knh5t8LhVcn9xs
+	9wBnoF/6IXMk=
+X-Google-Smtp-Source: AGHT+IHqwKjiX7teb/pYc+lujlnEosSIXQee1577UGyyGKXpSNDEIcsnj3vai7+fhOIxXIGibFhRIg==
+X-Received: by 2002:a5d:59a9:0:b0:391:ffc:2413 with SMTP id ffacd0b85a97d-3971f9e497amr14184713f8f.40.1742197151769;
+        Mon, 17 Mar 2025 00:39:11 -0700 (PDT)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d1fe60951sm96760055e9.26.2025.03.17.00.39.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Mar 2025 00:39:11 -0700 (PDT)
+Message-ID: <6ea34ad0-8456-4e49-8eb1-372cf571d91b@blackwall.org>
+Date: Mon, 17 Mar 2025 09:39:09 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,102 +82,143 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next 3/4] dt-bindings: net: ftgmac100: add rgmii delay
- properties
-To: Jacky Chou <jacky_chou@aspeedtech.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- joel@jms.id.au, andrew@codeconstruct.com.au, ratbert@faraday-tech.com,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-aspeed@lists.ozlabs.org
-Cc: BMC-SW@aspeedtech.com
-References: <20250317025922.1526937-1-jacky_chou@aspeedtech.com>
- <20250317025922.1526937-4-jacky_chou@aspeedtech.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH net] bonding: check xdp prog when set bond mode
+To: Wang Liang <wangliang74@huawei.com>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ jv@jvosburgh.net, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org,
+ daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+ joamaki@gmail.com
+Cc: yuehaibing@huawei.com, zhangchangzhong@huawei.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+References: <20250314073549.1030998-1-wangliang74@huawei.com>
+ <87y0x7rkck.fsf@toke.dk> <21d52659-622a-4b2a-b091-787bf0f5d67f@blackwall.org>
+ <96a4043b-fdac-4ca1-a7b9-a6352b1d7dfe@blackwall.org>
+ <fad4cb08-be38-4f43-ba61-db147e4d26d0@huawei.com>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20250317025922.1526937-4-jacky_chou@aspeedtech.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <fad4cb08-be38-4f43-ba61-db147e4d26d0@huawei.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 17/03/2025 03:59, Jacky Chou wrote:
-> Add tx-internal-delay-ps and rx-internal-delay-ps to
-
-Please wrap code according to the preferred limit expressed in Kernel
-coding style (checkpatch is not a coding style description, but only a
-tool).  However don't wrap blindly (see Kernel coding style).
-
-> configure the RGMII delay for MAC. According to
-> ethernet-controller.yaml, they use for RGMII TX and RX delay.
+On 3/17/25 06:07, Wang Liang wrote:
 > 
-> In Aspeed desgin, the RGMII delay is a number of ps as unit to
-> set delay, do not use one ps as unit. The values are different
-> from each MAC. So, here describes the property values
-> as index to configure corresponding scu register.
+> 在 2025/3/14 18:44, Nikolay Aleksandrov 写道:
+>> On 3/14/25 12:22 PM, Nikolay Aleksandrov wrote:
+>>> On 3/14/25 12:13 PM, Toke Høiland-Jørgensen wrote:
+>>>> Wang Liang <wangliang74@huawei.com> writes:
+>>>>
+>>>>> Following operations can trigger a warning[1]:
+>>>>>
+>>>>>      ip netns add ns1
+>>>>>      ip netns exec ns1 ip link add bond0 type bond mode balance-rr
+>>>>>      ip netns exec ns1 ip link set dev bond0 xdp obj af_xdp_kern.o sec xdp
+>>>>>      ip netns exec ns1 ip link set bond0 type bond mode broadcast
+>>>>>      ip netns del ns1
+>>>>>
+>>>>> When delete the namespace, dev_xdp_uninstall() is called to remove xdp
+>>>>> program on bond dev, and bond_xdp_set() will check the bond mode. If bond
+>>>>> mode is changed after attaching xdp program, the warning may occur.
+>>>>>
+>>>>> Some bond modes (broadcast, etc.) do not support native xdp. Set bond mode
+>>>>> with xdp program attached is not good. Add check for xdp program when set
+>>>>> bond mode.
+>>>>>
+>>>>>      [1]
+>>>>>      ------------[ cut here ]------------
+>>>>>      WARNING: CPU: 0 PID: 11 at net/core/dev.c:9912 unregister_netdevice_many_notify+0x8d9/0x930
+>>>>>      Modules linked in:
+>>>>>      CPU: 0 UID: 0 PID: 11 Comm: kworker/u4:0 Not tainted 6.14.0-rc4 #107
+>>>>>      Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.15.0-0-g2dd4b9b3f840-prebuilt.qemu.org 04/01/2014
+>>>>>      Workqueue: netns cleanup_net
+>>>>>      RIP: 0010:unregister_netdevice_many_notify+0x8d9/0x930
+>>>>>      Code: 00 00 48 c7 c6 6f e3 a2 82 48 c7 c7 d0 b3 96 82 e8 9c 10 3e ...
+>>>>>      RSP: 0018:ffffc90000063d80 EFLAGS: 00000282
+>>>>>      RAX: 00000000ffffffa1 RBX: ffff888004959000 RCX: 00000000ffffdfff
+>>>>>      RDX: 0000000000000000 RSI: 00000000ffffffea RDI: ffffc90000063b48
+>>>>>      RBP: ffffc90000063e28 R08: ffffffff82d39b28 R09: 0000000000009ffb
+>>>>>      R10: 0000000000000175 R11: ffffffff82d09b40 R12: ffff8880049598e8
+>>>>>      R13: 0000000000000001 R14: dead000000000100 R15: ffffc90000045000
+>>>>>      FS:  0000000000000000(0000) GS:ffff888007a00000(0000) knlGS:0000000000000000
+>>>>>      CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>>>>      CR2: 000000000d406b60 CR3: 000000000483e000 CR4: 00000000000006f0
+>>>>>      Call Trace:
+>>>>>       <TASK>
+>>>>>       ? __warn+0x83/0x130
+>>>>>       ? unregister_netdevice_many_notify+0x8d9/0x930
+>>>>>       ? report_bug+0x18e/0x1a0
+>>>>>       ? handle_bug+0x54/0x90
+>>>>>       ? exc_invalid_op+0x18/0x70
+>>>>>       ? asm_exc_invalid_op+0x1a/0x20
+>>>>>       ? unregister_netdevice_many_notify+0x8d9/0x930
+>>>>>       ? bond_net_exit_batch_rtnl+0x5c/0x90
+>>>>>       cleanup_net+0x237/0x3d0
+>>>>>       process_one_work+0x163/0x390
+>>>>>       worker_thread+0x293/0x3b0
+>>>>>       ? __pfx_worker_thread+0x10/0x10
+>>>>>       kthread+0xec/0x1e0
+>>>>>       ? __pfx_kthread+0x10/0x10
+>>>>>       ? __pfx_kthread+0x10/0x10
+>>>>>       ret_from_fork+0x2f/0x50
+>>>>>       ? __pfx_kthread+0x10/0x10
+>>>>>       ret_from_fork_asm+0x1a/0x30
+>>>>>       </TASK>
+>>>>>      ---[ end trace 0000000000000000 ]---
+>>>>>
+>>>>> Fixes: 9e2ee5c7e7c3 ("net, bonding: Add XDP support to the bonding driver")
+>>>>> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+>>>>> ---
+>>>>>   drivers/net/bonding/bond_options.c | 3 +++
+>>>>>   1 file changed, 3 insertions(+)
+>>>>>
+>>>>> diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
+>>>>> index 327b6ecdc77e..127181866829 100644
+>>>>> --- a/drivers/net/bonding/bond_options.c
+>>>>> +++ b/drivers/net/bonding/bond_options.c
+>>>>> @@ -868,6 +868,9 @@ static bool bond_set_xfrm_features(struct bonding *bond)
+>>>>>   static int bond_option_mode_set(struct bonding *bond,
+>>>>>                   const struct bond_opt_value *newval)
+>>>>>   {
+>>>>> +    if (bond->xdp_prog)
+>>>>> +        return -EOPNOTSUPP;
+>>>>> +
+>>>> Should we allow changing as long as the new mode also supports XDP?
+>>>>
+>>>> -Toke
+>>>>
+>>>>
+>>> +1
+>>> I think we should allow it, the best way probably is to add a new option
+>>> BOND_VALFLAG_XDP_UNSUPP (for example) as a bond option flag and to set
+>>> it in bond_options.c for each mode that doesn't support XDP, then you
+>>> can do the check in a generic way (for any option) in
+>>> bond_opt_check_deps. Any bond option that can't be changed with XDP prog
+>> err, I meant any bond option's value that isn't supported with XDP, for
+>> a whole option it would be a bit different
+> Thanks for your suggestions!
 > 
-> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
-> ---
+> When install xdp prog, bond_xdp_set() use bond_xdp_check() to check whether the bond mode support xdp.
+> 
+> When uninstall xdp prog, the paramter prog of bond_xdp_set() is NULL. How about not call bond_xdp_check() to avoid the warning when the prog is NULL, like:
+> 
+> static int bond_xdp_set(struct net_device *dev, struct bpf_prog *prog,
+>             struct netlink_ext_ack *extack)
+>     ...
+>     if (prog && !bond_xdp_check(bond))
 
-...
+No, this could cause other problems. Actually, for -net I think the best would be to stick to
+a simpler fix and just do bond_xdp_check() if there's a XDP program attached when changing
+the mode so it can be backported easier. The option value flag can be done in the future
+if more option values (or options) need to be disabled for XDP.
 
->    mdio:
->      $ref: /schemas/net/mdio.yaml#
->  
-> @@ -102,4 +116,4 @@ examples:
->                  reg = <1>;
->              };
->          };
-> -    };
-> +    };
-> \ No newline at end of file
+Cheers,
+ Nik
 
+>>> should have that flag set.
+>>>
+>>> Cheers,
+>>>   Nik
+>>>
+>>
 
-This was neither tested nor reviewed by you before sending.
-
-
-Best regards,
-Krzysztof
 
