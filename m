@@ -1,386 +1,238 @@
-Return-Path: <netdev+bounces-175182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABF1AA640D4
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 07:10:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54775A6410F
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 07:17:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A79B03A3D7F
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 06:09:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 530F6189121F
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 06:17:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5BE42192EE;
-	Mon, 17 Mar 2025 06:09:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48B151DF24E;
+	Mon, 17 Mar 2025 06:17:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VXazHtBc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FtbOcPJo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECEBE148FE6;
-	Mon, 17 Mar 2025 06:09:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F5F28E3F
+	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 06:17:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742191796; cv=none; b=W0UvXCj5q2KwOihPEQ7ARGfLRDYciGfPSD/IPOJvFfTSj9+gONPIKIzp89duri89A6A6qCMNfCW33TaWSMCHywzISoyPRA7xVVRs0WERZ3RN56wnCTmCEXrJgI2RQsjIGqrOlNISZ1bQYJ5X3BD1ln1+fDoMEh5DXi6spa1FjHY=
+	t=1742192245; cv=none; b=VQHeIEHbiyae9jTJps6btT8S3lahdj3LRqHbibsMpe90n219PjV2AXa8zqlQcwpZfE5adsqVuBAGP/rnxpJv1Q0Fa73r1Uq7nxqmFftLkLLGcrkNBfboEHeKMxXfFFtAkGX49AdV6mO8iB22X5MD5CytcMaVCgHWzC6q2dDgpaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742191796; c=relaxed/simple;
-	bh=Px8vpVh9fykiQJEyVByA9IcxFMZmVpdPBx0cH689/Zg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OMCq8Q4OOoaYuR8XMmG+aVo6txQyMZOmjSTG9x8VkVvqT/D02fDOPdU3ktZImJb2oV38fxCU5QDOYn9H8uaopKTfc9MCbqEocYigACdfYV77PQZk7K94IP6xkqH5IbwNbn/iBrZ25kgCIg5p0AeJbYC5xShYQlpg7psbFwITHpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VXazHtBc; arc=none smtp.client-ip=209.85.214.174
+	s=arc-20240116; t=1742192245; c=relaxed/simple;
+	bh=jJxCszxbJOiO/3VvhDNyqf9hQuzn+3D4SlBkuBddPUs=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=vCTm+vdHZ5rikE5x4Rl1DPCMkXFxD7NJnSZUF7YzPVLQgMfVPrR4ka50L/AT8PW9C9uHvabBR1Y0Eq4ZOCcjTPe4ahnEqY+0OzWNWAkJmnJtmXCfLVTcNMQujY1esx84SJPD5bdIc7CFqbmzyMZzUdItquX+ygq4JsIlqwnbH8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FtbOcPJo; arc=none smtp.client-ip=209.85.208.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-223f4c06e9fso66275645ad.1;
-        Sun, 16 Mar 2025 23:09:54 -0700 (PDT)
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5e6194e9d2cso7119844a12.2
+        for <netdev@vger.kernel.org>; Sun, 16 Mar 2025 23:17:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742191794; x=1742796594; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Pa9BV1jXSQB73rHHnYGQnNymMvpBIjyjfGKtqPjN3Y8=;
-        b=VXazHtBc3gQQOBYBdSXSSeG7O0ymlQ76l0U5toU6w5U+ZcbM0gBoFT8sUbpPJWtFUS
-         uqiWN4B5VZzd0GfUZ8EeAd2RVjNcqw2kOjd7tHdKKvkwYynQTgr5FSBe9wOWvY4rPEWr
-         nxdLOcYg6B9HoXIb7a6oCZX06uMjWAJEiiBbRmSrJHK3ER3EVY0rmKc/0yaCrAIwKFO3
-         qXDril4QQh/uRoCm0DwLiCnzEOiyrCtMUxIHMNUm1GjYPoGI6/j7sXgMB74349NASrLQ
-         2JcCAv080eHW7BFZ2+u1OtqJwVOtmKSOfD7siquSG4nJTppGQo/unIJXW2M3KR0nLsGm
-         7tuw==
+        d=gmail.com; s=20230601; t=1742192241; x=1742797041; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=PXi8STk1nKKZsJst7Aq2xD99ogtnMVrEfct9SThPE0k=;
+        b=FtbOcPJoOEsH3KWGXM29ZB77DkfvH/trV4mAIjaqONfWDRTowt8LMOCBcOrVy4uk31
+         dloCXhzE0FOk7jGAHxf8CYRB4vBP4LRJSl+w1b5+xDNE30Kcym7iLqa+N5YNQAEA/9Jh
+         wo9kpxgQrp2fg79cnsDUNurXyaV1N8RqD0sPVc4FalBa1imEduZPf33ObUIVTHqBa7PJ
+         zoeHGtRHLyPkBly3HThacbY4epMQ83jyGEVgrCjI4a0bwzwnFGqrMcoW2m2jnBcvhuHt
+         1yA4xp2Aoz9MEzj+/VehpmZJrBQMa7vdXmiBFThOLegMJQrPsK6HbuLCavX9Rv+1awS6
+         PDBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742191794; x=1742796594;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Pa9BV1jXSQB73rHHnYGQnNymMvpBIjyjfGKtqPjN3Y8=;
-        b=TCjlSAYRfmdAHv70eqZia97SeMobCnfSpOmq7ZpF4b3uW9DV8bZ9VHeuM9tvQzqKa6
-         fKVI88AThin6QmZYbIz0lL5mS/YB6OM7qr0gfF79EmkWpA5S3DOv8KyKCXVmvbRjvDlC
-         MieNL2OBt2S0l5CwvR5XkdbZXPG7hnpq7x8V68GP2lOFwlRzTsXJLS2+WFDdFUDa5quK
-         MA0pLYq7NZ/r39Pzyzz9n8fNKZVZYp8URf6VvolXkI1OV3KQkQ8IvAIN/eNF0blIvggP
-         NU5t66iPisWY4ze4ooghpJG53VZWHDIAgUTiEN9QCTkwtSzP3gQDBnWGFNZ3/4gu+gLm
-         YmXw==
-X-Forwarded-Encrypted: i=1; AJvYcCVkYRu2us38UfbAGDJzuFKAwXt2Y690w1RDcKowDta887EOt/59HckymcusAUWgowzWCRVUnOSK4Ix00xPlDfU4@vger.kernel.org, AJvYcCW2/8GN0i+6zuT0LxkzGGDVVqeyhbbp+V1Cpp4QL8kJOKcuwBQIb9OgmcyuPi9PUtfG5T7jyVOC@vger.kernel.org, AJvYcCXG6tC29rHrk6S2H/0w1yKkzx6uU8tGxK/EMTDKPW5gmph94FQiFmXO9T0C1dLKcbz5QBXP9rcyreLwqjE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YylfdHXItDUZGfOuBP0cqhY8sJtd6cFtvkU8GCtXXrPdX1KidMg
-	0qs/MHMZLTcdSVPYTiqvwSyFuqxFhZNcYH2pu+Scd2z3prtgZCwHuq9osFSLwzk=
-X-Gm-Gg: ASbGncsWoVeT0RIfQ+4EIgVrMrWiqrGM97gQPZRBeVkhSWrUnro1KyyeizjsafFkqfb
-	U6mnADuByXgDJs2PFyFTVcLsoPHkw7+WWlsQkY3KWjE3cObyBKyXATNsjRg/Mq3XCYmWn+p/LCg
-	DSqlMOWw/7N8LbLiRUcW90tM5JYmwBpDNWuSPWzCmk0XMlqRFFYEKZZAH2q57WToL578V9yH2yb
-	1erEIUUxH7rYuw1Qp+ghNIFUixmdvjIP3DvvtSIqhEJI7hJMxZ+9p0jNHyAJ0ZqNlB+s4mnOut5
-	k10FzxV4mH5udqRNpXNx1REAk4vJt9frzamroFaheC1LOGwx
-X-Google-Smtp-Source: AGHT+IELF7SXmc16DSlKnGIz+mGWt6C3WmN7fVaNUJ8YqnjdSwECd/zhHKcZw9V/bdtpiwCiLfzuBg==
-X-Received: by 2002:a17:902:f693:b0:223:3394:3a2e with SMTP id d9443c01a7336-225e175c2c5mr133175745ad.18.1742191794015;
-        Sun, 16 Mar 2025 23:09:54 -0700 (PDT)
-Received: from gmail.com ([116.237.135.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-225c68a4134sm66962305ad.56.2025.03.16.23.09.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Mar 2025 23:09:53 -0700 (PDT)
-From: Qingfang Deng <dqfext@gmail.com>
-To: antonio@openvpn.net
-Cc: andrew+netdev@lunn.ch,
-	donald.hunter@gmail.com,
-	edumazet@google.com,
-	horms@kernel.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	ryazanov.s.a@gmail.com,
-	sd@queasysnail.net,
-	shaw.leon@gmail.com,
-	shuah@kernel.org
-Subject: Re: [PATCH net-next v23 03/23] ovpn: add basic interface creation/destruction/management routines
-Date: Mon, 17 Mar 2025 14:09:47 +0800
-Message-ID: <20250317060947.2368390-1-dqfext@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250312-b4-ovpn-v23-3-76066bc0a30c@openvpn.net>
-References: <20250312-b4-ovpn-v23-3-76066bc0a30c@openvpn.net>
+        d=1e100.net; s=20230601; t=1742192241; x=1742797041;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PXi8STk1nKKZsJst7Aq2xD99ogtnMVrEfct9SThPE0k=;
+        b=pUrhIJ58CoH197rFoqICKL5/Ak/bFD7WOWgNaD5EZ5uOVsSVtbCxlyHxp16UdjTgxw
+         5Ry6d0SsXgal/Oe2iLJBm7ydNxIGv3QeY/S/1bPcfK3p7BQY4oCLpkc2neW9FH8sgcM7
+         A8VwnvRo6o5agsrTLE5TK9TiIH8djrYQy0P7LjQdSfwPz/A1znneQPQ56mBjCLHhdLsF
+         keD6YtGKBP2AnfQE2zf1WIfhqnOYeBaDJm0kFql0EylHnRKmUeCYkAgoTW4c2m0a+gkm
+         ttSs5qEB+1Ozj8i3FPHE7vKKY57wRm36BbHsmLvST3hNqsz4jUy6PWJ+iWLV55jh8vR2
+         wJug==
+X-Gm-Message-State: AOJu0Ywew5kHWh6jAmdnpqp+/f26qxCLTvH5gz0EzA1ogmjguVgHK3C1
+	81bLifKJG1JhrccRtVVPVwYbdTDtFa36cIvmwaR3hBfRuueos8XoVkg9LKAJamzjL727Y7ZVjnZ
+	KMKaeK+sTxgIM5LHqlS8LYUGqONe0WSZqF10=
+X-Gm-Gg: ASbGncvXRd6iBrzkI9gWln8m36sjHi0hSlCyUI6szieMYmnraiG/C2na+TyF4OxRWQ8
+	nFTzYu26M2dsbi7UxA9M9hHxPHRGAhqHqRiL7OKIfeFVFAg6JsKzYjeegm01L0grNxtSO0QNKnN
+	gwuSVxproxIfRx4YoaZCJBwvCXrCuj
+X-Google-Smtp-Source: AGHT+IGcgaBjIvGM5ZZKlH4qKrHDn66vTkNDLVRECnySc7Po++cNJ/492vz0OK7WTBf9E/XjoVDCt3vF8GT6Z8YCBEo=
+X-Received: by 2002:a05:6402:50d0:b0:5e4:b66f:880e with SMTP id
+ 4fb4d7f45d1cf-5e89f24f5e8mr8013703a12.7.1742192241244; Sun, 16 Mar 2025
+ 23:17:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Mon, 17 Mar 2025 15:17:09 +0900
+X-Gm-Features: AQ5f1Jp9HoLJpzFPba545PtTITeyn4eHZz6qIjQTCDdacpYZYJxugM68jHi9DlE
+Message-ID: <CAMArcTX2dEs=H586fumSEv_V8_p-pcAjyyPXkcLG9WkQM+c0cA@mail.gmail.com>
+Subject: Report deadlock in the latest net-next
+To: Netdev <netdev@vger.kernel.org>, Stanislav Fomichev <sdf@fomichev.me>
+Cc: David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Antonio,
+Hi Stanislav,
+I found a deadlock in the latest net-next kernel.
+The calltrace indicates your current
+commit ad7c7b2172c3 ("net: hold netdev instance lock during sysfs operations").
+The dev->lock was acquired in do_setlink.constprop.0+0x12a/0x3440,
+which is net/core/rtnetlink.c:3025
+And then dev->lock is acquired in dev_disable_lro+0x81/0x1f0,
+which is /net/core/dev_api.c:255
+dev_disable_lro() is called by netdev notification, but notification
+seems to be called both outside and inside dev->lock context.
+This case is that netdev notification is called inside dev->lock context.
+So deadlock occurs.
+Could you please look into this?
 
-On Wed, 12 Mar 2025 21:54:32 +0100, Antonio Quartulli Wrote:
-> diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
-> index 28133e7e15e74b8a4a937ed03f70d9f83d7a14c8..e71183e6f42cd801861caaec9eb0f6828b64cda9 100644
-> --- a/drivers/net/ovpn/main.c
-> +++ b/drivers/net/ovpn/main.c
-> @@ -10,14 +10,42 @@
->  #include <linux/genetlink.h>
->  #include <linux/module.h>
->  #include <linux/netdevice.h>
-> +#include <linux/inetdevice.h>
-> +#include <net/ip.h>
->  #include <net/rtnetlink.h>
-> -#include <uapi/linux/ovpn.h>
-> +#include <uapi/linux/if_arp.h>
->  
->  #include "ovpnpriv.h"
->  #include "main.h"
->  #include "netlink.h"
-> +#include "io.h"
-> +#include "proto.h"
-> +
-> +static int ovpn_net_open(struct net_device *dev)
-> +{
-> +	netif_tx_start_all_queues(dev);
+Reproducer:
+modprobe netdevsim
+ip netns add ns_test
+echo 1 > /sys/bus/netdevsim/new_device
+ip link set $interface netns ns_test
 
-This is not required as the virtual interface does not have a queue
-(marked as IFF_NO_QUEUE).
+============================================
+WARNING: possible recursive locking detected
+6.14.0-rc6+ #56 Not tainted
+--------------------------------------------
+ip/1672 is trying to acquire lock:
+ffff888231fbad90 (&dev->lock){+.+.}-{4:4}, at: dev_disable_lro+0x81/0x1f0
 
-> +	return 0;
-> +}
-> +
-> +static int ovpn_net_stop(struct net_device *dev)
-> +{
-> +	netif_tx_stop_all_queues(dev);
+but task is already holding lock:
+ffff888231fbad90 (&dev->lock){+.+.}-{4:4}, at:
+do_setlink.constprop.0+0x12a/0x3440
 
-Same as above.
+other info that might help us debug this:
+ Possible unsafe locking scenario:
 
-> +	return 0;
-> +}
->  
->  static const struct net_device_ops ovpn_netdev_ops = {
-> +	.ndo_open		= ovpn_net_open,
-> +	.ndo_stop		= ovpn_net_stop,
-> +	.ndo_start_xmit		= ovpn_net_xmit,
-> +};
-> +
-> +static const struct device_type ovpn_type = {
-> +	.name = OVPN_FAMILY_NAME,
-> +};
-> +
-> +static const struct nla_policy ovpn_policy[IFLA_OVPN_MAX + 1] = {
-> +	[IFLA_OVPN_MODE] = NLA_POLICY_RANGE(NLA_U8, OVPN_MODE_P2P,
-> +					    OVPN_MODE_MP),
->  };
->  
->  /**
-> @@ -31,44 +59,120 @@ bool ovpn_dev_is_valid(const struct net_device *dev)
->  	return dev->netdev_ops == &ovpn_netdev_ops;
->  }
->  
-> +static void ovpn_setup(struct net_device *dev)
-> +{
-> +	netdev_features_t feat = NETIF_F_SG | NETIF_F_HW_CSUM | NETIF_F_RXCSUM |
+       CPU0
+       ----
+  lock(&dev->lock);
+  lock(&dev->lock);
 
-Do not advertise NETIF_F_HW_CSUM or NETIF_F_RXCSUM, as TX/RX checksum is
-not handled in hardware.
+ *** DEADLOCK ***
 
-> +				 NETIF_F_GSO | NETIF_F_GSO_SOFTWARE |
-> +				 NETIF_F_HIGHDMA;
-> +
-> +	dev->needs_free_netdev = true;
-> +
-> +	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
-> +
-> +	dev->netdev_ops = &ovpn_netdev_ops;
-> +
-> +	dev->hard_header_len = 0;
-> +	dev->addr_len = 0;
-> +	dev->mtu = ETH_DATA_LEN - OVPN_HEAD_ROOM;
-> +	dev->min_mtu = IPV4_MIN_MTU;
-> +	dev->max_mtu = IP_MAX_MTU - OVPN_HEAD_ROOM;
-> +
-> +	dev->type = ARPHRD_NONE;
-> +	dev->flags = IFF_POINTOPOINT | IFF_NOARP;
-> +	dev->priv_flags |= IFF_NO_QUEUE;
-> +
-> +	dev->lltx = true;
-> +	dev->features |= feat;
-> +	dev->hw_features |= feat;
-> +	dev->hw_enc_features |= feat;
-> +
-> +	dev->needed_headroom = ALIGN(OVPN_HEAD_ROOM, 4);
-> +	dev->needed_tailroom = OVPN_MAX_PADDING;
-> +
-> +	SET_NETDEV_DEVTYPE(dev, &ovpn_type);
-> +}
-> +
->  static int ovpn_newlink(struct net_device *dev,
->  			struct rtnl_newlink_params *params,
->  			struct netlink_ext_ack *extack)
->  {
-> -	return -EOPNOTSUPP;
-> +	struct ovpn_priv *ovpn = netdev_priv(dev);
-> +	struct nlattr **data = params->data;
-> +	enum ovpn_mode mode = OVPN_MODE_P2P;
-> +
-> +	if (data && data[IFLA_OVPN_MODE]) {
-> +		mode = nla_get_u8(data[IFLA_OVPN_MODE]);
-> +		netdev_dbg(dev, "setting device mode: %u\n", mode);
-> +	}
-> +
-> +	ovpn->dev = dev;
-> +	ovpn->mode = mode;
-> +
-> +	/* turn carrier explicitly off after registration, this way state is
-> +	 * clearly defined
-> +	 */
-> +	netif_carrier_off(dev);
-> +
-> +	return register_netdevice(dev);
-> +}
-> +
-> +static int ovpn_fill_info(struct sk_buff *skb, const struct net_device *dev)
-> +{
-> +	struct ovpn_priv *ovpn = netdev_priv(dev);
-> +
-> +	if (nla_put_u8(skb, IFLA_OVPN_MODE, ovpn->mode))
-> +		return -EMSGSIZE;
-> +
-> +	return 0;
->  }
->  
->  static struct rtnl_link_ops ovpn_link_ops = {
->  	.kind = "ovpn",
->  	.netns_refund = false,
-> +	.priv_size = sizeof(struct ovpn_priv),
-> +	.setup = ovpn_setup,
-> +	.policy = ovpn_policy,
-> +	.maxtype = IFLA_OVPN_MAX,
->  	.newlink = ovpn_newlink,
->  	.dellink = unregister_netdevice_queue,
-> +	.fill_info = ovpn_fill_info,
->  };
->  
->  static int ovpn_netdev_notifier_call(struct notifier_block *nb,
->  				     unsigned long state, void *ptr)
->  {
->  	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
-> +	struct ovpn_priv *ovpn;
->  
->  	if (!ovpn_dev_is_valid(dev))
->  		return NOTIFY_DONE;
->  
-> +	ovpn = netdev_priv(dev);
-> +
->  	switch (state) {
->  	case NETDEV_REGISTER:
-> -		/* add device to internal list for later destruction upon
-> -		 * unregistration
-> -		 */
-> +		ovpn->registered = true;
->  		break;
->  	case NETDEV_UNREGISTER:
-> +		/* twiddle thumbs on netns device moves */
-> +		if (dev->reg_state != NETREG_UNREGISTERING)
-> +			break;
-> +
->  		/* can be delivered multiple times, so check registered flag,
->  		 * then destroy the interface
->  		 */
-> +		if (!ovpn->registered)
-> +			return NOTIFY_DONE;
-> +
-> +		netif_carrier_off(dev);
-> +		ovpn->registered = false;
->  		break;
->  	case NETDEV_POST_INIT:
->  	case NETDEV_GOING_DOWN:
->  	case NETDEV_DOWN:
->  	case NETDEV_UP:
->  	case NETDEV_PRE_UP:
-> +		break;
->  	default:
->  		return NOTIFY_DONE;
->  	}
-> diff --git a/drivers/net/ovpn/ovpnpriv.h b/drivers/net/ovpn/ovpnpriv.h
-> index f9322536b06d6baa5524de57cd7d69f5ecbbd194..33c2a41edf9b3204e8aebd2679649cb7158f05f2 100644
-> --- a/drivers/net/ovpn/ovpnpriv.h
-> +++ b/drivers/net/ovpn/ovpnpriv.h
-> @@ -10,12 +10,19 @@
->  #ifndef _NET_OVPN_OVPNSTRUCT_H_
->  #define _NET_OVPN_OVPNSTRUCT_H_
->  
-> +#include <uapi/linux/if_link.h>
-> +#include <uapi/linux/ovpn.h>
-> +
->  /**
->   * struct ovpn_priv - per ovpn interface state
->   * @dev: the actual netdev representing the tunnel
-> + * @registered: whether dev is still registered with netdev or not
-> + * @mode: device operation mode (i.e. p2p, mp, ..)
->   */
->  struct ovpn_priv {
->  	struct net_device *dev;
-> +	bool registered;
-> +	enum ovpn_mode mode;
->  };
->  
->  #endif /* _NET_OVPN_OVPNSTRUCT_H_ */
-> diff --git a/drivers/net/ovpn/proto.h b/drivers/net/ovpn/proto.h
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..5f95a78bebd3702868ffeeab3ea4938e957d568c
-> --- /dev/null
-> +++ b/drivers/net/ovpn/proto.h
-> @@ -0,0 +1,38 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*  OpenVPN data channel offload
-> + *
-> + *  Copyright (C) 2020-2025 OpenVPN, Inc.
-> + *
-> + *  Author:	Antonio Quartulli <antonio@openvpn.net>
-> + *		James Yonan <james@openvpn.net>
-> + */
-> +
-> +#ifndef _NET_OVPN_PROTO_H_
-> +#define _NET_OVPN_PROTO_H_
-> +
-> +/* When the OpenVPN protocol is ran in AEAD mode, use
-> + * the OpenVPN packet ID as the AEAD nonce:
-> + *
-> + *    00000005 521c3b01 4308c041
-> + *    [seq # ] [  nonce_tail   ]
-> + *    [     12-byte full IV    ] -> OVPN_NONCE_SIZE
-> + *    [4-bytes                   -> OVPN_NONCE_WIRE_SIZE
-> + *    on wire]
-> + */
-> +
-> +/* nonce size (96bits) as required by AEAD ciphers */
-> +#define OVPN_NONCE_SIZE			12
-> +/* last 8 bytes of AEAD nonce: provided by userspace and usually derived
-> + * from key material generated during TLS handshake
-> + */
-> +#define OVPN_NONCE_TAIL_SIZE		8
-> +
-> +/* OpenVPN nonce size reduced by 8-byte nonce tail -- this is the
-> + * size of the AEAD Associated Data (AD) sent over the wire
-> + * and is normally the head of the IV
-> + */
-> +#define OVPN_NONCE_WIRE_SIZE (OVPN_NONCE_SIZE - OVPN_NONCE_TAIL_SIZE)
-> +
-> +#define OVPN_OPCODE_SIZE		4 /* DATA_V2 opcode size */
-> +
-> +#endif /* _NET_OVPN_PROTO_H_ */
-> diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-> index 318386cc5b0d19ed6a37734feffb450353dd9440..3ad2d5d9803479a10a6b2cfab2df98ce0f823926 100644
-> --- a/include/uapi/linux/if_link.h
-> +++ b/include/uapi/linux/if_link.h
-> @@ -1986,4 +1986,19 @@ enum {
->  
->  #define IFLA_DSA_MAX	(__IFLA_DSA_MAX - 1)
->  
-> +/* OVPN section */
-> +
-> +enum ovpn_mode {
-> +	OVPN_MODE_P2P,
-> +	OVPN_MODE_MP,
-> +};
-> +
-> +enum {
-> +	IFLA_OVPN_UNSPEC,
-> +	IFLA_OVPN_MODE,
-> +	__IFLA_OVPN_MAX,
-> +};
-> +
-> +#define IFLA_OVPN_MAX	(__IFLA_OVPN_MAX - 1)
-> +
->  #endif /* _UAPI_LINUX_IF_LINK_H */
-> 
+ May be due to missing lock nesting notation
 
--- Qingfang
+3 locks held by ip/1672:
+ #0: ffffffff943ba050 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0x6b4/0x1c60
+ #1: ffff88813abc6170 (&net->rtnl_mutex){+.+.}-{4:4}, at:
+rtnl_newlink+0x6f6/0x1c60
+ #2: ffff888231fbad90 (&dev->lock){+.+.}-{4:4}, at:
+do_setlink.constprop.0+0x12a/0x3440
+
+stack backtrace:
+CPU: 2 UID: 0 PID: 1672 Comm: ip Not tainted 6.14.0-rc6+ #56
+66129e0c5b1b922fef38623168aea99c0593a519
+Hardware name: ASUS System Product Name/PRIME Z690-P D4, BIOS 0603 11/01/2021
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x7e/0xc0
+ print_deadlock_bug+0x4fd/0x8e0
+ __lock_acquire+0x3082/0x4fd0
+ ? __pfx___lock_acquire+0x10/0x10
+ ? mark_lock.part.0+0xfa/0x2f60
+ ? __pfx___lock_acquire+0x10/0x10
+ ? check_chain_key+0x1c1/0x520
+ lock_acquire+0x1b0/0x570
+ ? dev_disable_lro+0x81/0x1f0
+ ? __pfx_lock_acquire+0x10/0x10
+ __mutex_lock+0x17c/0x17c0
+ ? dev_disable_lro+0x81/0x1f0
+ ? dev_disable_lro+0x81/0x1f0
+ ? __pfx___mutex_lock+0x10/0x10
+ ? mark_held_locks+0xa5/0xf0
+ ? neigh_parms_alloc+0x36b/0x4f0
+ ? __local_bh_enable_ip+0xa5/0x120
+ ? lockdep_hardirqs_on+0xbe/0x140
+ ? dev_disable_lro+0x81/0x1f0
+ dev_disable_lro+0x81/0x1f0
+ inetdev_init+0x2d1/0x4a0
+ inetdev_event+0x9b3/0x1590
+ ? __pfx_lock_release+0x10/0x10
+ ? __pfx_inetdev_event+0x10/0x10
+ ? notifier_call_chain+0x9b/0x300
+ notifier_call_chain+0x9b/0x300
+ netif_change_net_namespace+0xdfe/0x1390
+ ? __pfx_netif_change_net_namespace+0x10/0x10
+ ? __pfx_validate_linkmsg+0x10/0x10
+ ? __pfx___lock_acquire+0x10/0x10
+ do_setlink.constprop.0+0x241/0x3440
+ ? lock_acquire+0x1b0/0x570
+ ? __pfx_do_setlink.constprop.0+0x10/0x10
+ ? rtnl_newlink+0x6f6/0x1c60
+ ? __pfx_lock_acquired+0x10/0x10
+ ? netlink_sendmsg+0x712/0xbc0
+ ? rcu_is_watching+0x11/0xb0
+ ? trace_contention_end+0xef/0x140
+ ? __mutex_lock+0x935/0x17c0
+ ? __create_object+0x36/0x90
+ ? __pfx_lock_release+0x10/0x10
+ ? rtnl_newlink+0x6f6/0x1c60
+ ? __nla_validate_parse+0xb9/0x2830
+ ? __pfx___mutex_lock+0x10/0x10
+ ? lockdep_hardirqs_on+0xbe/0x140
+ ? __pfx___nla_validate_parse+0x10/0x10
+ ? rcu_is_watching+0x11/0xb0
+ ? cap_capable+0x17d/0x360
+ ? fdget+0x4e/0x1d0
+ rtnl_newlink+0x108d/0x1c60
+ ? __pfx_rtnl_newlink+0x10/0x10
+ ? mark_lock.part.0+0xfa/0x2f60
+ ? __pfx___lock_acquire+0x10/0x10
+ ? __pfx_mark_lock.part.0+0x10/0x10
+ ? __pfx_lock_release+0x10/0x10
+ ? __pfx_rtnl_newlink+0x10/0x10
+ rtnetlink_rcv_msg+0x71c/0xc10
+ ? __pfx_rtnetlink_rcv_msg+0x10/0x10
+ ? check_chain_key+0x1c1/0x520
+ ? __pfx___lock_acquire+0x10/0x10
+ netlink_rcv_skb+0x12c/0x360
+ ? __pfx_rtnetlink_rcv_msg+0x10/0x10
+ ? __pfx_netlink_rcv_skb+0x10/0x10
+ ? netlink_deliver_tap+0xcb/0x9e0
+ ? netlink_deliver_tap+0x14b/0x9e0
+ netlink_unicast+0x447/0x710
+ ? __pfx_netlink_unicast+0x10/0x10
+ netlink_sendmsg+0x712/0xbc0
+ ? __pfx_netlink_sendmsg+0x10/0x10
+ ? _copy_from_user+0x3e/0xa0
+ ____sys_sendmsg+0x7ab/0xa10
+ ? __pfx_____sys_sendmsg+0x10/0x10
+ ? __pfx_copy_msghdr_from_user+0x10/0x10
+ ___sys_sendmsg+0xee/0x170
+ ? __pfx___lock_acquire+0x10/0x10
+ ? kasan_save_stack+0x20/0x40
+ ? __pfx____sys_sendmsg+0x10/0x10
+ ? entry_SYSCALL_64_after_hwframe+0x76/0x7e
+ ? kasan_save_stack+0x30/0x40
+ ? __pfx_lock_release+0x10/0x10
+ ? __might_fault+0xbf/0x170
+ __sys_sendmsg+0x105/0x190
+ ? __pfx___sys_sendmsg+0x10/0x10
+ ? rseq_syscall+0xc3/0x130
+ do_syscall_64+0x64/0x140
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+RIP: 0033:0x7fd20f92c004
+Code: 15 19 6e 0d 00 f7 d8 64 89 02 b8 ff ff ff ff eb bf 0f 1f 44 00
+00 f3 0f 1e fa 80 3d 45 f0 0d 00 00 74 13 b8 2e 00 00 00 0f 05 <48> 3d
+005
+RSP: 002b:00007fff40636e68 EFLAGS: 00000202 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007fd20f92c004
+RDX: 0000000000000000 RSI: 00007fff40636ee0 RDI: 0000000000000003
+RBP: 00007fff40636f50 R08: 0000000067d7b7e9 R09: 0000000000000050
+R10: 0000000000000001 R11: 0000000000000202 R12: 0000000000000003
+R13: 0000000067d7b7ea R14: 000055d14b9e4040 R15: 0000000000000000
+
+Thanks a lot!
+Taehee Yoo
 
