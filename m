@@ -1,102 +1,103 @@
-Return-Path: <netdev+bounces-175189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93E43A64299
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 08:05:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62B1AA6426D
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 08:01:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD9811892547
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 07:04:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76FD016F445
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 07:01:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5160E2236FF;
-	Mon, 17 Mar 2025 07:01:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8351721ADC4;
+	Mon, 17 Mar 2025 07:00:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="F5VBEoTF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fEELfaAE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A7A222589;
-	Mon, 17 Mar 2025 07:01:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5455121ADB5;
+	Mon, 17 Mar 2025 07:00:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742194881; cv=none; b=N9PcXRzMcFUkjD0exx4QUxj+j1+SIBsE0qYbmhlt5ceQdOIG5Tzivlu0gEp26eNvkFKPKRlxy7zLlMGf9+Z2/vBg/9qbGQAjAHksyf/fU5PzzkMl2BFJr/b2YKn0moJZSzF0mgJcbV/ZdDprohFs1l4GtTqn9zQglELAQcWv7Qs=
+	t=1742194855; cv=none; b=VoK+Ka5UMhDXnBoSYmOjOqFlG/Ywgf3cN4Eq68QS1MJDBows/9/voVjSHYPkG8YoULt1EXXwdVPj2OBwq8TWz6qId2UwLBgUYso30DpHC4YLCaARWnobxfDLMdGirVwodvBlsm51kU76JAGOtqeGc+TpYEHZjTZxqoYCFDLz7T8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742194881; c=relaxed/simple;
-	bh=aBPpmUcGDUxtVqNYBJ0y1S8mhJ2vEs38pfC3bkBgSxs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MoqIyjcGrz9F5j1VhDDWJnlTMxMb4bcugRbEWhRNyYsQi35MZgMkU0syXmGyfOAs4IYxheAv5Ca/B6d9JtqQo302O0HIWWj5lAGu5mNe+mT69H4Eiqcc7PrK4gaGJ4aXnDpXi32CqVAu+Rm0ji352qq8wPI26Dt5oUI9aqmAlTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=F5VBEoTF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E96FC4CEEC;
-	Mon, 17 Mar 2025 07:01:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1742194880;
-	bh=aBPpmUcGDUxtVqNYBJ0y1S8mhJ2vEs38pfC3bkBgSxs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=F5VBEoTF11phoho4ypFGxNctozFRv+i9J46Vxp2mq479IyHBO7fyElGFis6V1TKlh
-	 5JWjBPsa8D3NCl3F5KnUxekvFFMtb2rKKywyaJAAPgjfrNAeCSeTawyk4V7Xo4vqmT
-	 EpbLzb1LWK1bJ6Hq1yoKYAGJNdO1bGYOPi0Q/fa8=
-Date: Mon, 17 Mar 2025 08:00:01 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Jiri Slaby <jirislaby@kernel.org>
-Cc: linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Alex Elder <elder@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	David Lin <dtwlin@gmail.com>,
+	s=arc-20240116; t=1742194855; c=relaxed/simple;
+	bh=yigraz6gtl0qy6j2K57A2C+zse8kZCtw33CRv7cnvHU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=HmGqHUODL4T40+4MzpylUgTsAD96KjPz/ak0ZXSkJzylDekcAWP09y6uBkMDYk8+jnq3349hzWZ4YA2akNVS6PvVHWdS7BMVdJzN6dvFhuGiV4juN7KjP6xEyITcmR/dKjJ6Grz/BkxgRgSVKJmzhXxkyWu6NLzCreejynDAZu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fEELfaAE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 106CAC4CEEF;
+	Mon, 17 Mar 2025 07:00:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742194855;
+	bh=yigraz6gtl0qy6j2K57A2C+zse8kZCtw33CRv7cnvHU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=fEELfaAEZyx4zAeonEc7yuW8832rUeOgP7L8ySAY96F4wYOA6tG+O+8lRBun4T4cN
+	 lMcndyT5Y7pXW7mbi93x2x5wBhK68r21gwTdwpuJXAUGR0ujbLZFGJFORJiZXdWeoI
+	 vSbon5VkhcJYMqBMUScT3Lblhuz8oefXVWEmAKs7OZycgSzHZ6NNGAU47p8Pd7kUrs
+	 dtuwJ3AG/9K0z3V+LEfBqLY1s21BaxQNRqEz2JIBR2IpG0kXEJ6ROP5FwgxTU+twsi
+	 qfg6U1QqmrI5cbqI080Jm1rZTGI64oSQ8UtvBXUyTxwaojFwGNGBrY9ZmzFQKaCoRt
+	 0WsMLRvDNOgLw==
+From: "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
+To: gregkh@linuxfoundation.org
+Cc: linux-serial@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, greybus-dev@lists.linaro.org,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Jakub Kicinski <kuba@kernel.org>, Johan Hovold <johan@kernel.org>,
-	linux-alpha@vger.kernel.org, linux-staging@lists.linux.dev,
-	Matt Turner <mattst88@gmail.com>, netdev@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Rob Herring <robh@kernel.org>, sparclinux@vger.kernel.org
-Subject: Re: [PATCH 00/29] tty: cleanup no. 99
-Message-ID: <2025031738-variable-desecrate-ec2f@gregkh>
-References: <20250220111606.138045-1-jirislaby@kernel.org>
- <2025031738-fabric-alright-6a32@gregkh>
- <e8fb71ea-84cb-427a-9dc9-9c44ec0db08f@kernel.org>
+	netdev@vger.kernel.org
+Subject: [PATCH v2 03/31] tty: caif: do not use N_TTY_BUF_SIZE
+Date: Mon, 17 Mar 2025 08:00:18 +0100
+Message-ID: <20250317070046.24386-4-jirislaby@kernel.org>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250317070046.24386-1-jirislaby@kernel.org>
+References: <20250317070046.24386-1-jirislaby@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e8fb71ea-84cb-427a-9dc9-9c44ec0db08f@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 17, 2025 at 05:59:01AM +0100, Jiri Slaby wrote:
-> On 17. 03. 25, 5:28, Greg KH wrote:
-> > On Thu, Feb 20, 2025 at 12:15:37PM +0100, Jiri Slaby (SUSE) wrote:
-> > > Hi,
-> > > 
-> > > this is (again) a series of cleanup in tty. I am trying to rework
-> > > tty+serial to avoid limitations of devices (so called NR_UART or
-> > > tty_alloc_driver()'s first parameter). And the below popped up while
-> > > crawling through the code. So this is only a prep cleanup.
-> > > 
-> > > * many tty flags are now enums
-> > > * many functions were improved for readability
-> > > * quite a few unused or old code dropped
-> > > 
-> > > In particular, the runtime behaviour of the kernel before and after the
-> > > changes is supposed to be bug to bug compatible (except moxa's ioctl
-> > > and ISA evils dropped). That is, noone should notice.
-> > 
-> > Were you going to do a new respin of this, or do you want me to take
-> > this as-is and you will send a follow-up ones for the commented-on
-> > changes?
-> 
-> I planned to send a v2 on Fri, but did not make it. I will today.
+N_TTY_BUF_SIZE -- as the name suggests -- is the N_TTY's buffer size.
+There is no reason to couple that to caif's tty->receive_room. Use 4096
+directly -- even though, it should be some sort of "SKB_MAX_ALLOC" or
+alike. But definitely not N_TTY_BUF_SIZE.
 
-Not a problem, just wanted to make sure I didn't drop these on my side
-accidentally.
+N_TTY_BUF_SIZE is private and will be moved to n_tty.c later.
 
-thanks,
+Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
+Acked-by: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org
+---
+ drivers/net/caif/caif_serial.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-greg k-h
+diff --git a/drivers/net/caif/caif_serial.c b/drivers/net/caif/caif_serial.c
+index ed3a589def6b..e7d1b9301fde 100644
+--- a/drivers/net/caif/caif_serial.c
++++ b/drivers/net/caif/caif_serial.c
+@@ -344,7 +344,7 @@ static int ldisc_open(struct tty_struct *tty)
+ 	ser->tty = tty_kref_get(tty);
+ 	ser->dev = dev;
+ 	debugfs_init(ser, tty);
+-	tty->receive_room = N_TTY_BUF_SIZE;
++	tty->receive_room = 4096;
+ 	tty->disc_data = ser;
+ 	set_bit(TTY_DO_WRITE_WAKEUP, &tty->flags);
+ 	rtnl_lock();
+-- 
+2.49.0
+
 
