@@ -1,144 +1,187 @@
-Return-Path: <netdev+bounces-175176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70675A63ED3
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 05:59:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81818A63F14
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 06:04:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB0037A5A26
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 04:58:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5491E188810C
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 05:05:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95D1F20FAA9;
-	Mon, 17 Mar 2025 04:59:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDE47215079;
+	Mon, 17 Mar 2025 05:03:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I+t8mhR4"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="mAnyiBPx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2B022F01;
-	Mon, 17 Mar 2025 04:59:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22839215055
+	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 05:03:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742187548; cv=none; b=VEsRtYVjpRaqZYMD0ClA7j1dRKaPD/Ee8DU3XgmUF8az7DBGtA/5yJMJuuNsmyKeEDRsoNLZ15XiS7t0bwQ372N32Xzu/arIaLQUKxnLe1LguKZZnvmfk86csks2DhmPMecx6hBKCIFSDu6jaRFsuTPeJxZs2BuYoFmzft7Ohlg=
+	t=1742187833; cv=none; b=joLuIzxjohh6V6+iTKBDE6RwUuq/5Ngd/iMd23DgvJmyhOfUpGgnLlFxdPaXWZaVHEKFJZq4qJOlhc60QH8HiUyVMntBowR7jWeLs2fukYH86xL6cH9+WShctbpj6A4ojh+Ght6/fnNtroqwKMtvZxvOvpWf/mgBJ3DLO6qWuLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742187548; c=relaxed/simple;
-	bh=6VnMyDZwa6cw1ap/4K/skRrOVO89UvB+zZL65t5WJYE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VThAtPwc8REnsZbxIbG+Um/i5DBdBtebdid0qwwSTCX7CCkRzsVD4FpXIWV4CKfZ7gH4IgO3oyLAMqmxL9EqMeRcN/3llbRNazoUBUUsUux6+kyNO7JhwnXabSCt/VTj8u7MJ/vEQJYHM1sWOILaYiT3CdWrbihImy12UsKZDNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I+t8mhR4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7D91C4CEEC;
-	Mon, 17 Mar 2025 04:59:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742187547;
-	bh=6VnMyDZwa6cw1ap/4K/skRrOVO89UvB+zZL65t5WJYE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=I+t8mhR44VuOprWH/sIp5oYYWtlC2cKIf5pcKH81Jol5XdGXk5C9bNFRZms0fsWZI
-	 aedk/a4IKpG3aXkfxcWDu2xvmx5FtOE/+8JcR6C0vnEf7iFFbZvHn421f9phxmURVR
-	 1ddRbsCRrWDfL5vHEktlpwk1eRYQbA2Abfvr+oX8FfQ6tflfodoM4veR3Kpdja/eDO
-	 PchKIazdQRHOOErtgg7lFllw+ZEnXqNIuHt3S/rLlZeoWJ4zafYbYA0Tvef9FMVJbN
-	 j6/LuzqmJz4mI0KbF+bif8QUjRnA7SuzaFiq1qpc7CX0hx7reTo5B1Rm9vk2p1twab
-	 qO9hUfVGraFVA==
-Message-ID: <e8fb71ea-84cb-427a-9dc9-9c44ec0db08f@kernel.org>
-Date: Mon, 17 Mar 2025 05:59:01 +0100
+	s=arc-20240116; t=1742187833; c=relaxed/simple;
+	bh=7KtKbUBfRVsOM0YpzDH79MW3tYGWwRDfDO+qSC9dc9E=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 References; b=nQOXW6UXuGn7DPN3y/zZfwkt0hz4ZKUnUzW45xkvtOvIgMzOlxK/YK6WGGVjio2izsBZiS4lTkQhE1fY76a/FFPG/KWMhv5reUdZac76zr8PklZuFof11myYf1Mm52DWyApMpPYgnqIyRJANSJWtn90PE9PxrBmDiJPABwiUtu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=mAnyiBPx; arc=none smtp.client-ip=203.254.224.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from epcas2p4.samsung.com (unknown [182.195.41.56])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20250317050347epoutp0305ef26158f3d7b362c762c7446e53f14~tfplXtILX0710707107epoutp03N
+	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 05:03:47 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20250317050347epoutp0305ef26158f3d7b362c762c7446e53f14~tfplXtILX0710707107epoutp03N
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1742187827;
+	bh=g3lhbddvt7BuVPUO8gjUzJrDreH9HIqkAq2uIjjyAqc=;
+	h=From:To:Cc:Subject:Date:References:From;
+	b=mAnyiBPxqBebVCuxkiyZStbKdHVvxBORqgXgq8mFMuHqh0ux9NDM4okPa1hjg7H9P
+	 dKPorktU6QYWwcEWZSRJ9VzhOLaKzOelRE67YTzaten7cTeKtHhPMC8ui5lP16OhIi
+	 IcV7tpHqufd0/AlWPVdHbUqztaEyfmXHdWba4nqU=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+	epcas2p2.samsung.com (KnoxPortal) with ESMTP id
+	20250317050347epcas2p2ae6b870fffc8fedc9631cb866c84364f~tfpko6mVd1700117001epcas2p2d;
+	Mon, 17 Mar 2025 05:03:47 +0000 (GMT)
+Received: from epsmges2p4.samsung.com (unknown [182.195.36.70]) by
+	epsnrtp2.localdomain (Postfix) with ESMTP id 4ZGND233bXz4x9Pw; Mon, 17 Mar
+	2025 05:03:46 +0000 (GMT)
+Received: from epcas2p4.samsung.com ( [182.195.41.56]) by
+	epsmges2p4.samsung.com (Symantec Messaging Gateway) with SMTP id
+	24.79.22094.23DA7D76; Mon, 17 Mar 2025 14:03:46 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas2p4.samsung.com (KnoxPortal) with ESMTPA id
+	20250317050345epcas2p4cc44d6e10bb9916fba56d633f505a7e5~tfpjbzg6k1034110341epcas2p4J;
+	Mon, 17 Mar 2025 05:03:45 +0000 (GMT)
+Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20250317050345epsmtrp1458ed71deaa687a563cdb11d04398c2a~tfpjZw-N_0187101871epsmtrp1P;
+	Mon, 17 Mar 2025 05:03:45 +0000 (GMT)
+X-AuditID: b6c32a48-e7eec7000000564e-e0-67d7ad32b25f
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	F3.27.23488.13DA7D76; Mon, 17 Mar 2025 14:03:45 +0900 (KST)
+Received: from perf.dsn.sec.samsung.com (unknown [10.229.95.91]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20250317050345epsmtip1b127f254a5bcd3787aea173ded975727~tfpjDOBAE2572925729epsmtip1i;
+	Mon, 17 Mar 2025 05:03:45 +0000 (GMT)
+From: Youngmin Nam <youngmin.nam@samsung.com>
+To: stable@vger.kernel.org
+Cc: ncardwell@google.com, edumazet@google.com, kuba@kernel.org,
+	davem@davemloft.net, dsahern@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, guo88.liu@samsung.com, yiwang.cai@samsung.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	joonki.min@samsung.com, hajun.sung@samsung.com, d7271.choe@samsung.com,
+	sw.ju@samsung.com, dujeong.lee@samsung.com, ycheng@google.com,
+	yyd@google.com, kuro@kuroa.me, youngmin.nam@samsung.com,
+	cmllamas@google.com, willdeacon@google.com, maennich@google.com,
+	gregkh@google.com, lorenzo@google.com, kerneljasonxing@gmail.com
+Subject: [PATCH v2 stable 6.1 1/2] tcp: fix races in tcp_abort()
+Date: Mon, 17 Mar 2025 14:07:42 +0900
+Message-Id: <20250317050743.2350136-1-youngmin.nam@samsung.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/29] tty: cleanup no. 99
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org,
- Alex Elder <elder@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- David Lin <dtwlin@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, greybus-dev@lists.linaro.org,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Jakub Kicinski <kuba@kernel.org>, Johan Hovold <johan@kernel.org>,
- linux-alpha@vger.kernel.org, linux-staging@lists.linux.dev,
- Matt Turner <mattst88@gmail.com>, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Rob Herring <robh@kernel.org>, sparclinux@vger.kernel.org
-References: <20250220111606.138045-1-jirislaby@kernel.org>
- <2025031738-fabric-alright-6a32@gregkh>
-Content-Language: en-US
-From: Jiri Slaby <jirislaby@kernel.org>
-Autocrypt: addr=jirislaby@kernel.org; keydata=
- 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
-In-Reply-To: <2025031738-fabric-alright-6a32@gregkh>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA01TfVBUVRT37nu892CEeS4b3DZDZjUamQF3Nz6uJUggzmbUMONY2GDwBp7L
+	xn7Nvt2mZCjiQwiK1STFhaYVaCI0kQ0YXKSINSBIMBEIikhQUD5EWEOxwnbZtfzvd8/5/c75
+	nXPvpTD+LCGkFGo9q1MzShHhhTfbtqIQ6dfDcnHPtC+6236FRENtR0lU2Z+Po7PWAh6aMpfj
+	6EbnBImmllcwdKwMoNzvrmBowthNoMHW2xhqbT5BosvNpR6owzZNogFrJYHqe28DtNw2R6Ki
+	39pw1Gn2Q8u9cwCZGyYAKpi0k6hwZRZHdycHCbTYlUui6vYlEuWdOovHPCVr/GqEJztvGiNl
+	ZotBZqn7kJCZS0nZwreDhKy0sQ7I7JaAROqNzB0ZLJPO6gJZdZomXaGWR4le3psSlxIeIZaE
+	SLajSFGgmlGxUaJdCYkhuxVKx9SiwLcZpcERSmQ4TrQteodOY9CzgRkaTh8lYrXpSm2kNpRj
+	VJxBLQ9Vs/rnJWKxNNxBTM3MaDs/6KE1rn9nsbwXzwGfeRUDTwrSYdB6pBMvBhTFp1sAXNhX
+	DLwccAnA07UVHq7DMoBNHzQQjwS/2vLdiTYAx2ZMHs4En/4TwAt5Kicm6BDY3L0KnFUFtBCO
+	D77g5GP0RRz2npknnRxfOgb2nOrjOTFOPwNH783hTuxN74RDi7+QTi2kN8HqP6ArvAH+ePL6
+	GgVzhPOaKjBnTUjfoWBv2RjPZW4XHPl7hnRhXzjT1ejGQnjLeNiNOZgzPuoW5wPYM3wTcyWe
+	g6apwjXTGL0V1lu3uTxshhdH3X19YJHtH7c1b1h0mO8SBsEHZeeAC2+ErdW17oIyaL+/hLu2
+	cwA+rKzGj4BNpsemMT02jen/vmaA1QE/Vsup5Cwn1Yb9d6NpGpUFrL36YFkLqJi/E9oBeBTo
+	AJDCRAJvY9WwnO+dzrx7iNVpUnQGJct1gHDHeo9iwifSNI5vo9anSMK2i8MiIiSR0nBxpMjf
+	O6slX86n5YyezWRZLat7pONRnsIcXnGCVK0KXs27qph89tpi3yWvV4ZLxpIKu06bfB7WmFOL
+	vhG+xu00xKfuyxO0Mw8KmNpiZcNAWe6F7D0H7BMv+o1X+Ht231s4+MlHx/uMQfvzYxOY5EM1
+	qCQ5+fUGgXVLvCH4TFCgVOivmM+O+nlPv+CGD288q3Ex/GTodct79eJVScpwfaL92rEnh8CK
+	wjrdGLKuv79qvaXqRPS6JPunr6qz98/eesun6/5LGwfif48W5B6MHFux+RH2mO+7A1I3FP50
+	vHzk8ptZl6KT6wqJplgRyP1r7tzTnqov4hbiOvps/uWyvT9c3VIi/tKeQ30e+7H9/cm4pPSw
+	dkNNbMDuzUU35VKeCOcyGEkwpuOYfwHYxFCMfgQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Ra0hTYRzGec85O+c4Uk7T9E1l1io0wctS6s1kSmacjKLUrhA69TBNXWtH
+	uxLVnKgjZmUXs0UzP9SWJg4b5ZjXMMvIMtbFiobLSWWGKcbCblMCv/14fs/z//KncZGBCKYL
+	lCWcWikvkpBCwtojEUdJm14pYnWvV6KpzkEKvbSfo5BhQEugO23lGHIbawk00jtMIfe0B0c1
+	FwDSdAziaLi6j0QO2ziObNbLFHpm1QtQd88ohV60GUjU3D8O0LR9jEKV7+wE6jUGoun+MYCM
+	LcMAlbsmKVTh+UKgKZeDRBMPNRRq6PxOobL6O0RyCNtqeoOx9+veU6zRUspazFUka9RT7Ld2
+	B8nqW82AnbSIt9F7hYl5XFHBIU4dI8sW5tvvOwSq6gVHJmr7iVPgmlAHfGjIxMO3PVqBDghp
+	EWMD0HBulJwTofCt6YVgjv3hB+2DWRYxkwA6b1JeJpkoaO37DXSApgOYYPjBsc57B2fcBNQ2
+	9gFvx59Jho/rn2JeJpgVcOjHGOFlXyYJvpx4TXm3kAmDDU44Fy+Ej658nK3g/+Kyu1fxs8Cv
+	bp6qm6eMADODxZyKL1YU50pVUiV3OJqXF/OlSkV07oFiC5h9YGTEPTA+rYnpBhgNugGkcUmA
+	b/WNVwqRb5786DFOfSBLXVrE8d0ghCYkQb4m6W6FiFHIS7hCjlNx6v8Wo32CT2Hbn2QZ3Has
+	azQox68kUd4YuqizCltGiAtTMhv2SZSmWtY/XU/+HDHLwvoX1Ck3JCX4nOaTNEzcqq0BJS12
+	q2XoSOKS1Um2XX7Ps7RbVGIsvSBjSfoiOj5VmC9tDtDtOAFqvrmC0lTOSsblCdfUTrYzTrFs
+	pBlFuApdy7gU19BMu0Nh35hx4ZL7+vpfgnjhD0PX45MxgTldPR0zsQMJfP3tke+3Igdm9tRs
+	1qWZBg6uTgvNtM+0fg6PqbCFedYcipRVZo2WeS6ad659dkyX2lupTx2URW+K+iMuxFsuj2ef
+	jzu+nOuKGkwvbW/C+Zavn84svVZm2rX/i/yK872E4PPl0khczcv/AvgPiZgvAwAA
+X-CMS-MailID: 20250317050345epcas2p4cc44d6e10bb9916fba56d633f505a7e5
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: AUTO_CONFIDENTIAL
+CMS-TYPE: 102P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20250317050345epcas2p4cc44d6e10bb9916fba56d633f505a7e5
+References: <CGME20250317050345epcas2p4cc44d6e10bb9916fba56d633f505a7e5@epcas2p4.samsung.com>
 
-On 17. 03. 25, 5:28, Greg KH wrote:
-> On Thu, Feb 20, 2025 at 12:15:37PM +0100, Jiri Slaby (SUSE) wrote:
->> Hi,
->>
->> this is (again) a series of cleanup in tty. I am trying to rework
->> tty+serial to avoid limitations of devices (so called NR_UART or
->> tty_alloc_driver()'s first parameter). And the below popped up while
->> crawling through the code. So this is only a prep cleanup.
->>
->> * many tty flags are now enums
->> * many functions were improved for readability
->> * quite a few unused or old code dropped
->>
->> In particular, the runtime behaviour of the kernel before and after the
->> changes is supposed to be bug to bug compatible (except moxa's ioctl
->> and ISA evils dropped). That is, noone should notice.
-> 
-> Were you going to do a new respin of this, or do you want me to take
-> this as-is and you will send a follow-up ones for the commented-on
-> changes?
+From: Eric Dumazet <edumazet@google.com>
 
-I planned to send a v2 on Fri, but did not make it. I will today.
+tcp_abort() has the same issue than the one fixed in the prior patch
+in tcp_write_err().
 
-thanks,
+commit 5ce4645c23cf5f048eb8e9ce49e514bababdee85 upstream.
+
+To apply commit bac76cf89816bff06c4ec2f3df97dc34e150a1c4,
+this patch must be applied first.
+
+In order to get consistent results from tcp_poll(), we must call
+sk_error_report() after tcp_done().
+
+We can use tcp_done_with_error() to centralize this logic.
+
+Fixes: c1e64e298b8c ("net: diag: Support destroying TCP sockets.")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Acked-by: Neal Cardwell <ncardwell@google.com>
+Link: https://lore.kernel.org/r/20240528125253.1966136-4-edumazet@google.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Cc: <stable@vger.kernel.org>
+[youngmin: Resolved minor conflict in net/ipv4/tcp.c]
+Signed-off-by: Youngmin Nam <youngmin.nam@samsung.com>
+---
+ net/ipv4/tcp.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 7d591a0cf0c7..1ad3a20eb9b7 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -4755,13 +4755,9 @@ int tcp_abort(struct sock *sk, int err)
+ 	bh_lock_sock(sk);
+ 
+ 	if (!sock_flag(sk, SOCK_DEAD)) {
+-		WRITE_ONCE(sk->sk_err, err);
+-		/* This barrier is coupled with smp_rmb() in tcp_poll() */
+-		smp_wmb();
+-		sk_error_report(sk);
+ 		if (tcp_need_reset(sk->sk_state))
+ 			tcp_send_active_reset(sk, GFP_ATOMIC);
+-		tcp_done(sk);
++		tcp_done_with_error(sk, err);
+ 	}
+ 
+ 	bh_unlock_sock(sk);
 -- 
-js
-suse labs
+2.39.2
+
 
