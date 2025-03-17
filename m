@@ -1,189 +1,144 @@
-Return-Path: <netdev+bounces-175175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2A11A63E59
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 05:32:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70675A63ED3
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 05:59:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0E643AA377
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 04:32:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB0037A5A26
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 04:58:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6361F1A7249;
-	Mon, 17 Mar 2025 04:32:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95D1F20FAA9;
+	Mon, 17 Mar 2025 04:59:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="piiOc7wn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I+t8mhR4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71792170A23
-	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 04:32:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2B022F01;
+	Mon, 17 Mar 2025 04:59:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742185957; cv=none; b=ZoI2e6iKXqS77IBvP7Z2erBuNtZjHsE/oDE6atknEv0ABucaYY15rTFGl4HJvgWaW50M39vviIan4zYR+gvo70CB8gHDG/ZDqoEkXlYXBWVUvln4gM4FatNQrwPLrW4tyM1u9jE0AKMPJtAkaDB0pikGWhMN45vm91wvk0RwK5A=
+	t=1742187548; cv=none; b=VEsRtYVjpRaqZYMD0ClA7j1dRKaPD/Ee8DU3XgmUF8az7DBGtA/5yJMJuuNsmyKeEDRsoNLZ15XiS7t0bwQ372N32Xzu/arIaLQUKxnLe1LguKZZnvmfk86csks2DhmPMecx6hBKCIFSDu6jaRFsuTPeJxZs2BuYoFmzft7Ohlg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742185957; c=relaxed/simple;
-	bh=IOhGaXq1CIyRqLCk9AID5H6e1heMG9jjAvMzzoEgIIs=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
-	 Content-Type:References; b=tX5H28QUpRxOnevhwcb2c8e1p1ZguDOflCvQa7xUQlnJFQloPlbC3ntx470xaWrC/3e4jBVMLEoVU+VqCca4rVvujTlCm8wShUgtKICkxCDFzFTyTrNjXeGVPzZrRNNRDSD2XpfnMIemhTZAnbbb+5AxGpW5gWbuN5vtXfyfCt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=piiOc7wn; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from epcas2p3.samsung.com (unknown [182.195.41.55])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20250317043233epoutp03daf5d04bad8bbf6b804178a61deb6e11~tfOTsI6_l0742007420epoutp03D
-	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 04:32:33 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20250317043233epoutp03daf5d04bad8bbf6b804178a61deb6e11~tfOTsI6_l0742007420epoutp03D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1742185953;
-	bh=CDS21IpwWqt7ZRocUWjRABgv3Dgf/G8yTwuk6a2wW7A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=piiOc7wnYKShbvhndy6ZzQaK1XcwfVo9WbdLPD2AsfJkML6EZPMj/Lg/6jLxld4Wq
-	 mF+iKdCNL1MRtOnuDZFEEJg1+J14FOXOG2rAAMhkGGMmWYepfsUYCxwUAECGLbUIsb
-	 zneFL8xfkldG5GBtFNmKvHF0DWJbMxVJ2AysE/Xo=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-	epcas2p4.samsung.com (KnoxPortal) with ESMTP id
-	20250317043232epcas2p40964da2213e804d734c62516ca5daf50~tfOSyT7pi0713107131epcas2p4q;
-	Mon, 17 Mar 2025 04:32:32 +0000 (GMT)
-Received: from epsmges2p2.samsung.com (unknown [182.195.36.90]) by
-	epsnrtp3.localdomain (Postfix) with ESMTP id 4ZGMWz73RJz4x9Q3; Mon, 17 Mar
-	2025 04:32:31 +0000 (GMT)
-Received: from epcas2p3.samsung.com ( [182.195.41.55]) by
-	epsmges2p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-	88.44.22094.FD5A7D76; Mon, 17 Mar 2025 13:32:31 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas2p2.samsung.com (KnoxPortal) with ESMTPA id
-	20250317043231epcas2p2a42eecaaabed96be1d19059416ad38da~tfOR0Uqfh1582715827epcas2p2v;
-	Mon, 17 Mar 2025 04:32:31 +0000 (GMT)
-Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20250317043231epsmtrp1f7364e4452314d8f07aa6fccfc31dd92~tfORzC5XY1640716407epsmtrp1U;
-	Mon, 17 Mar 2025 04:32:31 +0000 (GMT)
-X-AuditID: b6c32a46-484397000000564e-cd-67d7a5df5e06
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	BD.83.23488.FD5A7D76; Mon, 17 Mar 2025 13:32:31 +0900 (KST)
-Received: from perf (unknown [10.229.95.91]) by epsmtip2.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20250317043231epsmtip24a0871609fea3b04312495e8d4bbc518~tfORgMzGt1487914879epsmtip2G;
-	Mon, 17 Mar 2025 04:32:31 +0000 (GMT)
-Date: Mon, 17 Mar 2025 13:36:42 +0900
-From: Youngmin Nam <youngmin.nam@samsung.com>
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: stable@vger.kernel.org, ncardwell@google.com, edumazet@google.com,
-	kuba@kernel.org, davem@davemloft.net, dsahern@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, guo88.liu@samsung.com, yiwang.cai@samsung.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	joonki.min@samsung.com, hajun.sung@samsung.com, d7271.choe@samsung.com,
-	sw.ju@samsung.com, dujeong.lee@samsung.com, ycheng@google.com,
-	yyd@google.com, kuro@kuroa.me, cmllamas@google.com, willdeacon@google.com,
-	maennich@google.com, gregkh@google.com, Lorenzo Colitti
-	<lorenzo@google.com>, Jason Xing <kerneljasonxing@gmail.com>, Youngmin Nam
-	<youngmin.nam@samsung.com>
-Subject: Re: [PATCH 1/2] tcp: fix races in tcp_abort()
-Message-ID: <Z9em2njRsaoKNBG0@perf>
+	s=arc-20240116; t=1742187548; c=relaxed/simple;
+	bh=6VnMyDZwa6cw1ap/4K/skRrOVO89UvB+zZL65t5WJYE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VThAtPwc8REnsZbxIbG+Um/i5DBdBtebdid0qwwSTCX7CCkRzsVD4FpXIWV4CKfZ7gH4IgO3oyLAMqmxL9EqMeRcN/3llbRNazoUBUUsUux6+kyNO7JhwnXabSCt/VTj8u7MJ/vEQJYHM1sWOILaYiT3CdWrbihImy12UsKZDNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I+t8mhR4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7D91C4CEEC;
+	Mon, 17 Mar 2025 04:59:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742187547;
+	bh=6VnMyDZwa6cw1ap/4K/skRrOVO89UvB+zZL65t5WJYE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=I+t8mhR44VuOprWH/sIp5oYYWtlC2cKIf5pcKH81Jol5XdGXk5C9bNFRZms0fsWZI
+	 aedk/a4IKpG3aXkfxcWDu2xvmx5FtOE/+8JcR6C0vnEf7iFFbZvHn421f9phxmURVR
+	 1ddRbsCRrWDfL5vHEktlpwk1eRYQbA2Abfvr+oX8FfQ6tflfodoM4veR3Kpdja/eDO
+	 PchKIazdQRHOOErtgg7lFllw+ZEnXqNIuHt3S/rLlZeoWJ4zafYbYA0Tvef9FMVJbN
+	 j6/LuzqmJz4mI0KbF+bif8QUjRnA7SuzaFiq1qpc7CX0hx7reTo5B1Rm9vk2p1twab
+	 qO9hUfVGraFVA==
+Message-ID: <e8fb71ea-84cb-427a-9dc9-9c44ec0db08f@kernel.org>
+Date: Mon, 17 Mar 2025 05:59:01 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <2025031453-underpay-gigahertz-9ba4@gregkh>
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Tf0xbVRTHvX2P91pGl0dBdmXLwkpGBFdoEejdLE4jNvVXwoIxUUawwrMQ
-	Stu0ZXOYTAJ0MIb8jjDEpQqOgcuQrgGkFgiFwgbKQBg/xlJ+OAaOAWsJBiPEwgOz/z7n3O+5
-	33PuyWVjvFzSn52q0tNalVzJJzzxFluwWOD4cVwhXJwWo/WuERLdt5aSqGYoF0e32g0stGCs
-	wtEj+xyJFjY2MZRT20Sg8gqAsjtHMDRX3E+gMcsKhiwtlSS611Lkgbptj0n0R3sNgZoGVgDa
-	sC6TKH/aiiO70Q9tDCwDZGyeA8gw7yJR3uYTHK3PjxHoWV82iWq7nCTK+f4W/sYRmblhkiX7
-	pfohKTOaMmSmxsuEzFhEyjq/u0nKVjvGCFmRuRHIXKajsZxP0iQptDyZ1gbQqiR1cqpKEc1/
-	Ly7xrcTIKKFIIDqJxPwAlTydjubHvB8rkKYq3fPzA87JlRnuVKxcp+OHvS7RqjP0dECKWqeP
-	5tOaZKVGrAnVydN1GSpFqIrWnxIJheGRbuGnaSk3J/oJTavXF1P3S1lZ4IZnAeCwIRUBf7OV
-	4QXAk82j2gC0jM6wmMAJ4OTXo+SOikdtAFg1f3y/Yq3u0Z7ICmBn2W2CCWYBNNQ3YDsqnDoO
-	Fyt6wA4TlAC29G/vsi/1MlzqncJ3GKMKPaBj5asd9qGi4GZR3a4blwqE5c3XPBj2hneu/rmr
-	51AIWmebWUwXtRz45J6A4Ri4cPkBwbAP/KvPTDLsD5eKL+2xDmY5prCdRiGVC+Dd8UWMOXgV
-	Vi/kAaahFNheOus2ZrvzgbBnv8+DMN+2RTJpLsy/xGMqg+A/FT8Dho9AS+2NvRtl0Gm3Ycyb
-	dAHY7VpmlYCj1c+NU/2cG8MnoNHiJKrdFhh1GNZvsxkMhk3tYUbg0Qj8aI0uXUHrwjXh/y84
-	SZ1uArvfIUTaBiqeroV2AxYbdAPIxvi+3OIfxhU8brL8QiatVSdqM5S0rhtEundTivm/mKR2
-	/yeVPlEUcVIYERUlEodHCsX8Q9wv23IVPEoh19NpNK2htft1LDbHP4t1Gztd6XowX/NKSOtw
-	TupIYF3YRf4z/HpHzHzrFYlXvHqg54N8fYLIWnZQeqbhWkeQivvS7+tn1+WfedebI/IcnqdX
-	7E3xQQaZOVd6/mrHCdPoVK00PyG1pMkwkcAvA3AwUzWU882Ms2dViJf49WUqwbu+OY4rRaeU
-	YWsfsX3/PXZm4mx88GD2QezA+WnvknNDlW/y2j8Mdl4fLbhT806vV7gx2vz3U5g38PjwxE/2
-	YYltNTtGUvgQqxesxvfWuPChA2WSeoErzu7TNXEx3jA36fjYK05mGvz18wt5hmGnaYZz7LVv
-	u9LGt5ekqsItS2j60t3yF2KI1gHyUEfV29gWH9elyEUhmFYn/w+S70kulwQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrDIsWRmVeSWpSXmKPExsWy7bCSvO79pdfTDU6sFrP4cuASu8W1vRPZ
-	Leacb2GxWLerlcni2YIZLBZPjz1it3j27SezRfPi9WwWk6cwWjTtv8Rs8aj/BJvF1d3vmC12
-	b5vObnFhWx+rxaHDz9ktLu+aw2ax/vQ7Rotve9+wW3Tc2cticWyBmMW3028YLRZsfMRo0fr4
-	M7tF+8/XLBZfHl9ls/h4vIndYvGBT+wWzQvXsTjIeGxZeZPJY+esu+weCzaVemxa1cnmsaCP
-	3WP/3DXsHu/3XWXz6NuyitHj8ya5AM4oLpuU1JzMstQifbsEroyGrgPsBd85K1pOf2RsYGzk
-	6GLk5JAQMJH4sOQpUxcjF4eQwG5Giakzm1ggEjISt1deZoWwhSXutxxhhSi6zyjRee44M0iC
-	RUBV4sWUI4wgNpuArsS2E//AbBEBDYmXR2+xgDQwC0xglZj25QQTSEJYwEziZ98SdhCbV0BZ
-	YvLGeVBTDzBK3N63gwUiIShxcuYTMJtZQEvixr+XQM0cQLa0xPJ/YGdzClhI7H24kWkCo8As
-	JB2zkHTMQuhYwMi8ilEytaA4Nz032bDAMC+1XK84Mbe4NC9dLzk/dxMjOMK1NHYwvvvWpH+I
-	kYmD8RCjBAezkghv/6Lr6UK8KYmVValF+fFFpTmpxYcYpTlYlMR5VxpGpAsJpCeWpGanphak
-	FsFkmTg4pRqYhOPnHLnuGmRm/apKdxMPwxJ1s+Um4vZsm8oDfXU3T/4rqnCkLjrpQP0fRtu9
-	5cGi+wperpHMt/L9yZ6/dt/yhRWTDD4EKwlYx36I3+64kuW6N+vFtN8h3mYs2zwd6mYmyzIp
-	f9HicWHxLP6294By+muf5Kc+x0tuH+kLmLK18e9nsQ83LFcuWbOsO4j7o51H2KSEbXPO1S86
-	vfo0m+NJwdhnW0wcr77eo3hha1Hjh3uMp93e8KppXjNKMg5pzRXRjGNJUA68NuvsH81uvxyl
-	V/8CEl+alkUpCnrlrwjWufk2fFPW9w3ejZEtoosSzr+9YG31xXSKx5rwJ85xZXVPD50R/bM0
-	rjpxwsyrLLOUWIozEg21mIuKEwHqvlz2XwMAAA==
-X-CMS-MailID: 20250317043231epcas2p2a42eecaaabed96be1d19059416ad38da
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-	boundary="----K-Xcka4Xsim0K0-JuHAa3VmVr3oPR9my9iMvsSsU8QXUQUBj=_21b24_"
-X-Sendblock-Type: AUTO_CONFIDENTIAL
-CMS-TYPE: 102P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250314092125epcas2p418cd0caeffc32b05fba4fdd2e4ffb9fa
-References: <CGME20250314092125epcas2p418cd0caeffc32b05fba4fdd2e4ffb9fa@epcas2p4.samsung.com>
-	<20250314092446.852230-1-youngmin.nam@samsung.com>
-	<2025031453-underpay-gigahertz-9ba4@gregkh>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/29] tty: cleanup no. 99
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Alex Elder <elder@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ David Lin <dtwlin@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, greybus-dev@lists.linaro.org,
+ =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Jakub Kicinski <kuba@kernel.org>, Johan Hovold <johan@kernel.org>,
+ linux-alpha@vger.kernel.org, linux-staging@lists.linux.dev,
+ Matt Turner <mattst88@gmail.com>, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Rob Herring <robh@kernel.org>, sparclinux@vger.kernel.org
+References: <20250220111606.138045-1-jirislaby@kernel.org>
+ <2025031738-fabric-alright-6a32@gregkh>
+Content-Language: en-US
+From: Jiri Slaby <jirislaby@kernel.org>
+Autocrypt: addr=jirislaby@kernel.org; keydata=
+ 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
+In-Reply-To: <2025031738-fabric-alright-6a32@gregkh>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-------K-Xcka4Xsim0K0-JuHAa3VmVr3oPR9my9iMvsSsU8QXUQUBj=_21b24_
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-
-On Fri, Mar 14, 2025 at 01:24:09PM +0100, Greg KH wrote:
-> On Fri, Mar 14, 2025 at 06:24:45PM +0900, Youngmin Nam wrote:
-> > From: Eric Dumazet <edumazet@google.com>
-> > 
-> > tcp_abort() has the same issue than the one fixed in the prior patch
-> > in tcp_write_err().
-> > 
-> > commit 5ce4645c23cf5f048eb8e9ce49e514bababdee85 upstream.
-> > 
-> > To apply commit bac76cf89816bff06c4ec2f3df97dc34e150a1c4,
-> > this patch must be applied first.
-> > 
-> > In order to get consistent results from tcp_poll(), we must call
-> > sk_error_report() after tcp_done().
-> > 
-> > We can use tcp_done_with_error() to centralize this logic.
-> > 
-> > Fixes: c1e64e298b8c ("net: diag: Support destroying TCP sockets.")
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > Acked-by: Neal Cardwell <ncardwell@google.com>
-> > Link: https://lore.kernel.org/r/20240528125253.1966136-4-edumazet@google.com
-> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> > Cc: <stable@vger.kernel.org> # v5.10+
+On 17. 03. 25, 5:28, Greg KH wrote:
+> On Thu, Feb 20, 2025 at 12:15:37PM +0100, Jiri Slaby (SUSE) wrote:
+>> Hi,
+>>
+>> this is (again) a series of cleanup in tty. I am trying to rework
+>> tty+serial to avoid limitations of devices (so called NR_UART or
+>> tty_alloc_driver()'s first parameter). And the below popped up while
+>> crawling through the code. So this is only a prep cleanup.
+>>
+>> * many tty flags are now enums
+>> * many functions were improved for readability
+>> * quite a few unused or old code dropped
+>>
+>> In particular, the runtime behaviour of the kernel before and after the
+>> changes is supposed to be bug to bug compatible (except moxa's ioctl
+>> and ISA evils dropped). That is, noone should notice.
 > 
-> Did not apply to 5.10.y, what did you want this added to?
-> 
-> thanks,
-> 
-> greg k-h
-> 
+> Were you going to do a new respin of this, or do you want me to take
+> this as-is and you will send a follow-up ones for the commented-on
+> changes?
 
-Hi Greg,
+I planned to send a v2 on Fri, but did not make it. I will today.
 
-Sorry about that.
-
-As for 5.10, it seems to have more dependencies for the backport.
-I think the maintainer should handle it to ensure a safe backport.
-
-------K-Xcka4Xsim0K0-JuHAa3VmVr3oPR9my9iMvsSsU8QXUQUBj=_21b24_
-Content-Type: text/plain; charset="utf-8"
-
-
-------K-Xcka4Xsim0K0-JuHAa3VmVr3oPR9my9iMvsSsU8QXUQUBj=_21b24_--
+thanks,
+-- 
+js
+suse labs
 
