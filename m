@@ -1,171 +1,183 @@
-Return-Path: <netdev+bounces-175170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF53FA63DAB
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 04:57:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6FE9A63DD9
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 05:07:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAD3D188F3D4
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 03:57:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37B9C16D0BB
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 04:07:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4A12167DB7;
-	Mon, 17 Mar 2025 03:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="eBTypSTn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6061F16F288;
+	Mon, 17 Mar 2025 04:07:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5E2214A4F9;
-	Mon, 17 Mar 2025 03:57:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA8179D2;
+	Mon, 17 Mar 2025 04:07:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742183846; cv=none; b=CmR24MDpp2VwUggHLmGl/w44NuIfRCQNKzqHCfBfClVLxhDsStScrLDptytIXQJErCxKGFwzSrigjIcu7pK4aoBrsJO2IZDzixuHrF+kILou5qaoho8oaLeMODpSzIoCAwDCt8lHv2PjBVPStxS3DNpPszPxR7dXePv8/0RrmEI=
+	t=1742184468; cv=none; b=NOeGywel7+s6wobB+YN8htLhqpcbfngws/izno6fV+ASl8YHM5lU+X8hyx5IDMDBMJzH/w7BVaPotI2NSSoBNvMSwX0z4DRM7rv7XtPDBVGRes2zkyDUANMaekyDcuiPOftmcaTaEcZ4xcZIKLz5z3xiqxtsF3v+JhdMcNee5mU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742183846; c=relaxed/simple;
-	bh=bTXhexVaI+W5KWG7d5Svg2VmXApCu8ktNMe5tbjLp8U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DsseLdG1+zizhQLJUeVtrGgvuxev/JBYpud+Y08sOOQuWKX1fbRmbvao9t8zJ3IyfqmvLb2mjUXcu8PQ+UkJruf9Xn/XZ0UXFSUciX3NudzqUgoVmHnWnJl5OG2x2MdMJYQ2iRQz6G2vS4BQR42jkTq006Sn6ID5RYYsxGBUpOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=eBTypSTn; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1742183839; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=uE6H0MBz98j5rhIzPJHfWr/CNL9ORRA0RW3EN1COpxM=;
-	b=eBTypSTnXuFlhKc+ixGvt8BjmjPdCkwmmSi5/ONZA+vVIi7u0zxY+gxtzsn90B8pP9q/X0aiSwLhM1ZA3/7dcEaMOJ4vvzp0odKHubAFLWj97FnPUabEzTd8qOa3IdjlGwerbXBxwyKzk30vTfUuwLhyFwHSnOhqSfTGHDB4BsE=
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WRYMu4H_1742183838 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 17 Mar 2025 11:57:18 +0800
-Date: Mon, 17 Mar 2025 11:57:18 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com,
-	guwen@linux.alibaba.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
-	tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
-Subject: Re: [RFC PATCH net-next] net/smc: avoid conflict with sockmap after
- fallback
-Message-ID: <20250317035718.GD56800@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20250312133014.35775-1-alibuda@linux.alibaba.com>
+	s=arc-20240116; t=1742184468; c=relaxed/simple;
+	bh=IhtH9py8CA8+Ld8RzERKZArjkqCMGLSW+c97C3UWBgk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=AO23SATw42MkVpn/WRcU7BVUbQdvexwt6hRnORjuvqs+t5XYHscvEWpKX0FAjNGCOTOP7GVcGpH4Ki8nUgTmrsWWXXITD23uohiQL8nTSSjEpANpIZAyQ8KJAuTXP/4zKMN6JE2NzMVAYtITOI2Nfe1IlIsDeGIS4zWSgCuSWX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4ZGLzx4DLyz27gks;
+	Mon, 17 Mar 2025 12:08:13 +0800 (CST)
+Received: from kwepemg200005.china.huawei.com (unknown [7.202.181.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id A8E1F1401F1;
+	Mon, 17 Mar 2025 12:07:37 +0800 (CST)
+Received: from [10.174.176.70] (10.174.176.70) by
+ kwepemg200005.china.huawei.com (7.202.181.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 17 Mar 2025 12:07:36 +0800
+Message-ID: <fad4cb08-be38-4f43-ba61-db147e4d26d0@huawei.com>
+Date: Mon, 17 Mar 2025 12:07:35 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250312133014.35775-1-alibuda@linux.alibaba.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] bonding: check xdp prog when set bond mode
+To: Nikolay Aleksandrov <razor@blackwall.org>,
+	=?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	<jv@jvosburgh.net>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<ast@kernel.org>, <daniel@iogearbox.net>, <hawk@kernel.org>,
+	<john.fastabend@gmail.com>, <joamaki@gmail.com>
+CC: <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<bpf@vger.kernel.org>
+References: <20250314073549.1030998-1-wangliang74@huawei.com>
+ <87y0x7rkck.fsf@toke.dk> <21d52659-622a-4b2a-b091-787bf0f5d67f@blackwall.org>
+ <96a4043b-fdac-4ca1-a7b9-a6352b1d7dfe@blackwall.org>
+From: Wang Liang <wangliang74@huawei.com>
+In-Reply-To: <96a4043b-fdac-4ca1-a7b9-a6352b1d7dfe@blackwall.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemg200005.china.huawei.com (7.202.181.32)
 
-On 2025-03-12 21:30:14, D. Wythe wrote:
->Currently, after fallback, SMC will occupy the sk_user_data of the TCP sock(clcsk) to
->forward events. As a result, we cannot use sockmap after that, since sockmap also
->requires the use of the sk_user_data. Even more, in some cases, this may result in
->abnormal panic.
 
-Looks like this is a bugfix more then a feature.
+在 2025/3/14 18:44, Nikolay Aleksandrov 写道:
+> On 3/14/25 12:22 PM, Nikolay Aleksandrov wrote:
+>> On 3/14/25 12:13 PM, Toke Høiland-Jørgensen wrote:
+>>> Wang Liang <wangliang74@huawei.com> writes:
+>>>
+>>>> Following operations can trigger a warning[1]:
+>>>>
+>>>>      ip netns add ns1
+>>>>      ip netns exec ns1 ip link add bond0 type bond mode balance-rr
+>>>>      ip netns exec ns1 ip link set dev bond0 xdp obj af_xdp_kern.o sec xdp
+>>>>      ip netns exec ns1 ip link set bond0 type bond mode broadcast
+>>>>      ip netns del ns1
+>>>>
+>>>> When delete the namespace, dev_xdp_uninstall() is called to remove xdp
+>>>> program on bond dev, and bond_xdp_set() will check the bond mode. If bond
+>>>> mode is changed after attaching xdp program, the warning may occur.
+>>>>
+>>>> Some bond modes (broadcast, etc.) do not support native xdp. Set bond mode
+>>>> with xdp program attached is not good. Add check for xdp program when set
+>>>> bond mode.
+>>>>
+>>>>      [1]
+>>>>      ------------[ cut here ]------------
+>>>>      WARNING: CPU: 0 PID: 11 at net/core/dev.c:9912 unregister_netdevice_many_notify+0x8d9/0x930
+>>>>      Modules linked in:
+>>>>      CPU: 0 UID: 0 PID: 11 Comm: kworker/u4:0 Not tainted 6.14.0-rc4 #107
+>>>>      Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.15.0-0-g2dd4b9b3f840-prebuilt.qemu.org 04/01/2014
+>>>>      Workqueue: netns cleanup_net
+>>>>      RIP: 0010:unregister_netdevice_many_notify+0x8d9/0x930
+>>>>      Code: 00 00 48 c7 c6 6f e3 a2 82 48 c7 c7 d0 b3 96 82 e8 9c 10 3e ...
+>>>>      RSP: 0018:ffffc90000063d80 EFLAGS: 00000282
+>>>>      RAX: 00000000ffffffa1 RBX: ffff888004959000 RCX: 00000000ffffdfff
+>>>>      RDX: 0000000000000000 RSI: 00000000ffffffea RDI: ffffc90000063b48
+>>>>      RBP: ffffc90000063e28 R08: ffffffff82d39b28 R09: 0000000000009ffb
+>>>>      R10: 0000000000000175 R11: ffffffff82d09b40 R12: ffff8880049598e8
+>>>>      R13: 0000000000000001 R14: dead000000000100 R15: ffffc90000045000
+>>>>      FS:  0000000000000000(0000) GS:ffff888007a00000(0000) knlGS:0000000000000000
+>>>>      CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>>>      CR2: 000000000d406b60 CR3: 000000000483e000 CR4: 00000000000006f0
+>>>>      Call Trace:
+>>>>       <TASK>
+>>>>       ? __warn+0x83/0x130
+>>>>       ? unregister_netdevice_many_notify+0x8d9/0x930
+>>>>       ? report_bug+0x18e/0x1a0
+>>>>       ? handle_bug+0x54/0x90
+>>>>       ? exc_invalid_op+0x18/0x70
+>>>>       ? asm_exc_invalid_op+0x1a/0x20
+>>>>       ? unregister_netdevice_many_notify+0x8d9/0x930
+>>>>       ? bond_net_exit_batch_rtnl+0x5c/0x90
+>>>>       cleanup_net+0x237/0x3d0
+>>>>       process_one_work+0x163/0x390
+>>>>       worker_thread+0x293/0x3b0
+>>>>       ? __pfx_worker_thread+0x10/0x10
+>>>>       kthread+0xec/0x1e0
+>>>>       ? __pfx_kthread+0x10/0x10
+>>>>       ? __pfx_kthread+0x10/0x10
+>>>>       ret_from_fork+0x2f/0x50
+>>>>       ? __pfx_kthread+0x10/0x10
+>>>>       ret_from_fork_asm+0x1a/0x30
+>>>>       </TASK>
+>>>>      ---[ end trace 0000000000000000 ]---
+>>>>
+>>>> Fixes: 9e2ee5c7e7c3 ("net, bonding: Add XDP support to the bonding driver")
+>>>> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+>>>> ---
+>>>>   drivers/net/bonding/bond_options.c | 3 +++
+>>>>   1 file changed, 3 insertions(+)
+>>>>
+>>>> diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
+>>>> index 327b6ecdc77e..127181866829 100644
+>>>> --- a/drivers/net/bonding/bond_options.c
+>>>> +++ b/drivers/net/bonding/bond_options.c
+>>>> @@ -868,6 +868,9 @@ static bool bond_set_xfrm_features(struct bonding *bond)
+>>>>   static int bond_option_mode_set(struct bonding *bond,
+>>>>   				const struct bond_opt_value *newval)
+>>>>   {
+>>>> +	if (bond->xdp_prog)
+>>>> +		return -EOPNOTSUPP;
+>>>> +
+>>> Should we allow changing as long as the new mode also supports XDP?
+>>>
+>>> -Toke
+>>>
+>>>
+>> +1
+>> I think we should allow it, the best way probably is to add a new option
+>> BOND_VALFLAG_XDP_UNSUPP (for example) as a bond option flag and to set
+>> it in bond_options.c for each mode that doesn't support XDP, then you
+>> can do the check in a generic way (for any option) in
+>> bond_opt_check_deps. Any bond option that can't be changed with XDP prog
+> err, I meant any bond option's value that isn't supported with XDP, for
+> a whole option it would be a bit different
+Thanks for your suggestions!
 
+When install xdp prog, bond_xdp_set() use bond_xdp_check() to check 
+whether the bond mode support xdp.
+
+When uninstall xdp prog, the paramter prog of bond_xdp_set() is NULL. 
+How about not call bond_xdp_check() to avoid the warning when the prog 
+is NULL, like:
+
+static int bond_xdp_set(struct net_device *dev, struct bpf_prog *prog,
+             struct netlink_ext_ack *extack)
+     ...
+     if (prog && !bond_xdp_check(bond))
+>> should have that flag set.
+>>
+>> Cheers,
+>>   Nik
+>>
 >
->To enable sockmap after SMC fallback , we need to avoid using sk_user_data and
->instead introduce an additional smc_ctx in tcp_sock to index from TCP sock to SMC sock.
->
->Additionally, we bind the lifecycle of the SMC sock to that of the TCP sock, ensuring
->that the indexing to the SMC sock remains valid throughout the lifetime of the TCP sock.
->
->One key reason is that SMC overrides inet_connection_sock_af_ops, which introduces
->potential dependencies. We must ensure that the af_ops remain visible throughout the
->lifecycle of the TCP socket. In addition, this also resolves potential issues in some
->scenarios where the SMC sock might be invalid.
->
->Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->---
-> include/linux/tcp.h |  1 +
-> net/smc/af_smc.c    | 53 ++++++++++++++++++++++-----------------------
-> net/smc/smc.h       |  8 +++----
-> net/smc/smc_close.c |  1 -
-> 4 files changed, 30 insertions(+), 33 deletions(-)
->
->diff --git a/include/linux/tcp.h b/include/linux/tcp.h
->index f88daaa76d83..f2223b1cc0d0 100644
->--- a/include/linux/tcp.h
->+++ b/include/linux/tcp.h
->@@ -478,6 +478,7 @@ struct tcp_sock {
-> #if IS_ENABLED(CONFIG_SMC)
-> 	bool	syn_smc;	/* SYN includes SMC */
-> 	bool	(*smc_hs_congested)(const struct sock *sk);
->+	void	*smc_ctx;
-> #endif
-> 
-> #if defined(CONFIG_TCP_MD5SIG) || defined(CONFIG_TCP_AO)
->diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->index bc356f77ff1d..d434105639c1 100644
->--- a/net/smc/af_smc.c
->+++ b/net/smc/af_smc.c
->@@ -127,7 +127,7 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
-> 	struct smc_sock *smc;
-> 	struct sock *child;
-> 
->-	smc = smc_clcsock_user_data(sk);
->+	smc = smc_sk_from_clcsk(sk);
-> 
-> 	if (READ_ONCE(sk->sk_ack_backlog) + atomic_read(&smc->queued_smc_hs) >
-> 				sk->sk_max_ack_backlog)
->@@ -143,8 +143,6 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
-> 					       own_req);
-> 	/* child must not inherit smc or its ops */
-> 	if (child) {
->-		rcu_assign_sk_user_data(child, NULL);
->-
-> 		/* v4-mapped sockets don't inherit parent ops. Don't restore. */
-> 		if (inet_csk(child)->icsk_af_ops == inet_csk(sk)->icsk_af_ops)
-> 			inet_csk(child)->icsk_af_ops = smc->ori_af_ops;
->@@ -161,10 +159,7 @@ static bool smc_hs_congested(const struct sock *sk)
-> {
-> 	const struct smc_sock *smc;
-> 
->-	smc = smc_clcsock_user_data(sk);
->-
->-	if (!smc)
->-		return true;
->+	smc = smc_sk_from_clcsk(sk);
-
-I don't see any users of smc in this function. Seems it is redundant here.
-
-> 
-> 	if (workqueue_congested(WORK_CPU_UNBOUND, smc_hs_wq))
-> 		return true;
->@@ -250,7 +245,6 @@ static void smc_fback_restore_callbacks(struct smc_sock *smc)
-> 	struct sock *clcsk = smc->clcsock->sk;
-> 
-> 	write_lock_bh(&clcsk->sk_callback_lock);
->-	clcsk->sk_user_data = NULL;
-> 
-> 	smc_clcsock_restore_cb(&clcsk->sk_state_change, &smc->clcsk_state_change);
-> 	smc_clcsock_restore_cb(&clcsk->sk_data_ready, &smc->clcsk_data_ready);
->@@ -832,11 +826,10 @@ static void smc_fback_forward_wakeup(struct smc_sock *smc, struct sock *clcsk,
-> 
-> static void smc_fback_state_change(struct sock *clcsk)
-> {
->-	struct smc_sock *smc;
->+	struct smc_sock *smc = smc_sk_from_clcsk(clcsk);
-> 
-> 	read_lock_bh(&clcsk->sk_callback_lock);
->-	smc = smc_clcsock_user_data(clcsk);
->-	if (smc)
->+	if (smc->clcsk_state_change)
-> 		smc_fback_forward_wakeup(smc, clcsk,
-> 					 smc->clcsk_state_change);
-
-Since we checked the clcsock_callback everywhere, why not put it into
-smc_fback_forward_wakeup() ?
-
-
-Best regards,
-Dust
-
 
