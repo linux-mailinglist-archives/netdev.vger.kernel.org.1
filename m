@@ -1,224 +1,211 @@
-Return-Path: <netdev+bounces-175245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E22C8A64897
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 11:01:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAC4FA6489A
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 11:01:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63F0D1884F7F
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 10:01:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00E3E3B002E
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 10:01:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40431230BCD;
-	Mon, 17 Mar 2025 10:00:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2766A233726;
+	Mon, 17 Mar 2025 10:01:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="g4l1QVmy"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="kq0Ifo9H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2081.outbound.protection.outlook.com [40.107.105.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA16321A45E
-	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 10:00:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742205657; cv=none; b=omAkBBVlNbeH7AT6ilMY3r69ejLVGCjT6gwizgGyVDec35SDifc+TDB8G55Hhm3TtBrh8Wx08bepzdy6kG8EsurGS8zuC46UeQq9ubqykFDwgr9kn1Xfqa9FjQVf4GXf/htalm86X6WcTW522W8r6g92FmqnnVu+3wbYFbSpjTE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742205657; c=relaxed/simple;
-	bh=TtQ8IkLQe7b+zZk8N3mLfBrLSOius3YlLTFkfIH8qFY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ilIc5XCgEGp4RG+LeAXD4jhvi68tXzSTLurqZkS3BEAxz9vn/L6P2A5xbAgLFXbie7/Hdi40L5qpltpAo2ODbRmUlLqrAl8TUf6XBVhs+KiFl9W/Sntd0HTRl1rcWQj1M8jGlxWbugBV/8I+AolR49MSu01SceJKu3IfcI3b964=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=g4l1QVmy; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-39127512371so2531993f8f.0
-        for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 03:00:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1742205653; x=1742810453; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=svJwQfChR0jzLhTJA4RtfWruh6xe77kq6yeIs3iHID4=;
-        b=g4l1QVmyAyZXqPVhjEs1VNVBpbM6PfBAprKpwuH9P1N244SbGBu9RYEH+Gd8/x0yX1
-         YiHOjsw6QKU/TyUtW3/a3D6EN80D+waRRw6LR5DLNe6dF7uYtg3HerupYvBO2ExI0cH5
-         HNU7OSi6U33rapC0ri0CFFQMve+w6uVd5/V34pUTvrHmTj1wvhZ+kXba+RzH3QjD8IIq
-         V/pwsoLk2liSSA62UISai+erMBF1XTzgyc6bWF5sdGGc+475ZDyKtcraf/3qwBj/LAXP
-         FLFQX1kldPwZAowd4URw/iGpG9Ltu6U3YoeNSB6X919yGAbYgMQk45+cA8d9ytdtyJ0S
-         ehhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742205653; x=1742810453;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=svJwQfChR0jzLhTJA4RtfWruh6xe77kq6yeIs3iHID4=;
-        b=LYs3eaCFVvkwt7Ui5ksjlwVyIGsltgpn2V6dW/RFaC9qZq/rRgTiHznirjwSRhZzq9
-         uz4SVoiOFrvuRO3Lq6RBWKPazW+YLNOi7DmbftOMY4docqP7bF5lR2XDmsA/+WOBqa/s
-         sh6nrxvIJ9f+sBgs06SsZ4ZLvotnfiri0cNwXKGlu68ZOMYCHTmlfr5HVezMPXypRtlp
-         ncPOXo5DQ6uogpQf1a0pqFjxj6WI+ae+Ow87AWaUjL4GurOkARE+LXW5zlEoK8MLWy9g
-         1Z4JlzAgmwFic2AIbDgn2qml+howuWOaYvq8bSQIxFhRK9KQfzNbbRz6of2bW7KF+Xlx
-         8MUw==
-X-Forwarded-Encrypted: i=1; AJvYcCWbbdLoM2hMDpQYaOZPuhYTV2M3Wfw6ykVBiT2kFRGWWL4VHAte3nszUicb2UxPm5bCP7aKfxw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxG+HGe4p/QAEAyaaeGskC3t1GhHTXoNfiDYYPQ43egvF8mlTzu
-	q3EAqjVmRhDUjY9r8/WdGnhyziIVNBPo/N9Lwn6GnGielpj0smKtQAnfrDxLmCOt8Vm/QE183n4
-	PcuJaTjCeURK2kMCK4MnEDkWPtVxFQIUokrLslbiNiYJ4vKM=
-X-Gm-Gg: ASbGncvq7YMmdeNQb6evcU253OxuLUBEpRTXhqdieFLAJKdKpfBvxpB0DLTHWRmR9dR
-	91dakS3JY24f0EKjdBdlPeQrEbch5hVxmjhhfgT0PO148yj8nHVjtNtYTloqFi0mmBtzRoY/ZAz
-	83KTA5BPFILGp+jyRPnCsckDky3mSUaxTmHiUsnSEKBCuVArAEgSDSi9q72uK2eeacj9/DTYizO
-	PKgQ+LQJklZdFaYjarWkAOgm3eeALtDEpJIgijW8vHz0bf1FGPO51DXUtVI7i4XOMB6Gu+c0KXy
-	zg1LDEXN7LOUqEzsOHI0LHxeWpwkurpfUWIKtSHNw37XJyhGlv4ZaDD3F6m94FUq786r30GGyRd
-	ubyzbW2o=
-X-Google-Smtp-Source: AGHT+IFclieKK4uS5HmG9l6VJYMHBkpPnwG+xgqli7WoI//nWaxZF7goHLBSa7kPMH0H/8Wiqr3yAQ==
-X-Received: by 2002:a5d:584a:0:b0:391:2192:ccd6 with SMTP id ffacd0b85a97d-3971ee44b62mr14430814f8f.39.1742205652886;
-        Mon, 17 Mar 2025 03:00:52 -0700 (PDT)
-Received: from ?IPV6:2001:67c:2fbc:1:23e9:a6ad:805e:ca75? ([2001:67c:2fbc:1:23e9:a6ad:805e:ca75])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395cb7eb953sm14633383f8f.93.2025.03.17.03.00.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Mar 2025 03:00:52 -0700 (PDT)
-Message-ID: <0d8a8602-2db4-4c19-ab1c-51efef42cef6@openvpn.net>
-Date: Mon, 17 Mar 2025 11:00:51 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D252221F33;
+	Mon, 17 Mar 2025 10:00:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.105.81
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742205661; cv=fail; b=LSdfzjg8hmlc+H4pnbcw+8twBeCoXsVLEfhPl9MCPOb2didskVfB4fJYF4Pg05+DdAe+iNhzf+lKlOGE1Eg5kd1yNYcJY875jGa+tJCRYK0LLIcO8E5i5iHc4vHiAVtNyxlnjdNhApWG2avotiIxe5ToyQMORATKqGDQvBiLAH4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742205661; c=relaxed/simple;
+	bh=+mNHCjfb/DtDw4J4SakbzoCjCysgITVRQ/YBjTaifNk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=E96WXVehcxIx4XAXL/9O/GjI31SlabQ+jhOQ0uU5zEiOWqbQJTZARHWCkPZW7WfKoWNQaSZMFGSeq+vwrhq5Jach53g6497+5Vc/QuEMGLqlcDFYB/jsMzi/rllD3ZwJk0/zA3sXB/MS63FBI2Ib5G1Iehb1lhBkY34kJ3q3npc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=kq0Ifo9H; arc=fail smtp.client-ip=40.107.105.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=NS5stbffiZy/5onXF2Ot205YgTNJtVXeE71qPqQUIR2zT1DwRuQCdBhI+qU8qGkSyLeLg2DmO16Vl/EVW97+N198Zg4twjMpi4i2mHKfM0L45TyRU7rtrv97uVFqm0qGi5uCjd/ySbd+0NMvMa8JMPFZBYoXF74S2KgTnEW7aSdMQIkMUMurmM2YV5IyjA8jGtVeAnRrTllXl+zDf2P8wvBV/255tA5zNEhqQOWLcy+RO8FO7nafY2MT6Rpf1BNr7dRY+dIoQGt1o2IBTtFrZiNvaKD/5laulWtsbrlXvugkEg5M5hopGpBNqGYBxVMlZ5HUrF+jpJSM3LzQesmHZA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+mNHCjfb/DtDw4J4SakbzoCjCysgITVRQ/YBjTaifNk=;
+ b=h9UpVyPvfyypV2AN/mg+TwqC9jzrLHPdUjxcnfcIo6x0Myf2AURvMWSaZ7b2NEcRb9GyfP9fjKZ/cXYZeZnTCg/urLEe7/U3fyz2+v1yXc5BztxVMYm6jTb40Lx+qF5PPN6aSZm/6FEKtCsf36jQdC0SiESGBUhU4PYN6D2mxU9zuU20RjCXCYWvbuv+Hp9qmBV33eL5gHoA7ZTC1/C2La8YoU7Ji9U1Vj4WSbW2iEfPL+mnAmyBoAkgWhoEl0YFZAJz00WyqEsauFcx4TbkCP6JLlDimUHRGFO7y3IcbBlcuZA/ptdJgAOzOwhlOzzIT6uyqqvXQz10+AjM274jzg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+mNHCjfb/DtDw4J4SakbzoCjCysgITVRQ/YBjTaifNk=;
+ b=kq0Ifo9Hqcc9q0h/2dE+3jkOJ5aKxCtYhwhm0bDLzcPCPv9zMnlwxOfzXfYqQj16iZhnNzMhKHDOVz7KWMvhCYATztF4yX+96Gz+Fi5aaS+Iq2/4d29+E5BVnhG72gDyccttPV+6QSfPvZ45DK3YdWj7zttfp2OliNgfHSWkQe2x2yixO4pSS57gIQG8iMskwhaiLx78crjyazh1mJJ9Q6GDO38NtnyCbynIufCHdZvs5X+2CfsWQX/tkxBbqTS2/SdAsTH5lDmxA62YsXPBU8wGuGHZNsLE0fJ27CqVsmIS242M3XUuOxZ4WCJxa8sKUHwxQJoIDHvc8uBin1bldw==
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by PA4PR04MB7760.eurprd04.prod.outlook.com (2603:10a6:102:c5::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.33; Mon, 17 Mar
+ 2025 10:00:56 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%5]) with mapi id 15.20.8534.031; Mon, 17 Mar 2025
+ 10:00:56 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+CC: Claudiu Manoil <claudiu.manoil@nxp.com>, Clark Wang
+	<xiaoning.wang@nxp.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "christophe.leroy@csgroup.eu"
+	<christophe.leroy@csgroup.eu>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "imx@lists.linux.dev" <imx@lists.linux.dev>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Subject: RE: [PATCH v4 net-next 03/14] net: enetc: move generic MAC filterng
+ interfaces to enetc-core
+Thread-Topic: [PATCH v4 net-next 03/14] net: enetc: move generic MAC filterng
+ interfaces to enetc-core
+Thread-Index: AQHbkkpOrze484r8D0W5Y5Kfclxt2rN3HWEQgAAD5vA=
+Date: Mon, 17 Mar 2025 10:00:56 +0000
+Message-ID:
+ <PAXPR04MB85106C0A4AB17B67A5A4982F88DF2@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <20250311053830.1516523-1-wei.fang@nxp.com>
+ <20250311053830.1516523-1-wei.fang@nxp.com>
+ <20250311053830.1516523-4-wei.fang@nxp.com>
+ <20250311053830.1516523-4-wei.fang@nxp.com>
+ <20250317094259.b6mwygvr75lxgkwh@skbuf>
+In-Reply-To: <20250317094259.b6mwygvr75lxgkwh@skbuf>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|PA4PR04MB7760:EE_
+x-ms-office365-filtering-correlation-id: fefc91fb-ee1d-4bc5-1e20-08dd653a9c83
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?lhPl9hBgydR9JJJHA6Nxzk/U0BsqHRoM6Cb/IibbySEvdbbJJPB6/uhrk9v+?=
+ =?us-ascii?Q?l4Nc9DHI/BV4+LzXEzOTWiu8n1JMVXA+X4NwF4A1NApnwZUue6sgO+DZqr7N?=
+ =?us-ascii?Q?Zlv00HKYqHi1O5jrsFjaB/8+kGZr26lBIUDshMC2EsMlWM/yqSgesr+BL/rS?=
+ =?us-ascii?Q?T6F2iBlIGuqxB/MY1td+lkTktL9rINUUASWQq6claEAvzKlr92z0uv1A5fRK?=
+ =?us-ascii?Q?tdLOmQNZLe15yl4k1dCpkBSd2fUIfwXJDFju/Ah1C0TbOVxAo3j6F71ViMHv?=
+ =?us-ascii?Q?gJSOL2RCtHA35N9DAt0HnZ+H/m4j17cJqGREINQnI9GCpsUHI4mHx+0N+zGj?=
+ =?us-ascii?Q?Wt7UKNWlP0ZrMAdYb5IFnuYALMpuavqPq4yKPivuhhQCH9loNtnfMJaCakOl?=
+ =?us-ascii?Q?3yZ6ef8g4BDuhrIpHZIR/Go8a67uvugK9zX8SQFtDRayDGVcBcVWeGw+FLl3?=
+ =?us-ascii?Q?e5wtOp/fzIymRSNOgLLYNFSxs+7Ihwt2YhxCYZbv4Bh7tTc8cbk0F9frgBha?=
+ =?us-ascii?Q?ygsOnWxooTOhTVfKwD2GNPKnAnhk4DJTX/QZFDGbuLUY1B901p/gI2qsFZyH?=
+ =?us-ascii?Q?N8XirvTIjMdVpuxq32a+qLSbClHFVL/1PWhfco8ri1xRw4yvY1/YQpqXwfiY?=
+ =?us-ascii?Q?ts4PSXCZW4TDAU0R2JaPnkDFCij+uotvIZrMHSF2CZgrFyXNfEMKkm3BJZZ8?=
+ =?us-ascii?Q?IizPm2p7WdGez1tkjEPWXLyXLqbVCfmspAPF84DSJSNeFV+/aWgSQO8JF4K6?=
+ =?us-ascii?Q?92/AlNLZoW8NcdAXAdFchTsnvnTXTcpDvpiq7kSPUOc1mJl6lbrp1dk7b8jx?=
+ =?us-ascii?Q?fxEy/yFw6PrVJdrJA9JlnOIH726Y3YMjldGOES2crLtpT0GakhxdGffC+n1y?=
+ =?us-ascii?Q?F7UxxBKEg3dx7WZRPXum/t3n525usgvHG3ebKD4oMap44RlNnIEWgiOk9+lX?=
+ =?us-ascii?Q?fupwS3PfI9gKlpwJFZr2Pj0nBjVyvxrjqw0z3vgwrVNwQO9zabupkvEjEuts?=
+ =?us-ascii?Q?k3Ahb6zis5lhq+AaGltpxgHrmkJ8jrkbm2iaDHIhE+GSzchh2DpQMFoZ1GBt?=
+ =?us-ascii?Q?VhB0oP/0quo4IATVyMMqORtesWDNgQfEO9YIcRpXwr9v49hU90YiH0X48HDm?=
+ =?us-ascii?Q?ewHhLAFOvjcL61N+uoQKJG6ugdZAhT7V7m4QjqJmZPKHqV5JnWE/kRhwWAAl?=
+ =?us-ascii?Q?XrVR7z1J4QuSa1r1xiVKn06fVVfyH5Dg4pAtsMY6yfXcZyty5UFbyycvP3oS?=
+ =?us-ascii?Q?A04mOqlT1Bgyn63927oybRP0SeIw+IAOqnug4YaSP6LNk6OjYQ1I09LKDdZj?=
+ =?us-ascii?Q?aW2A1Z5Qjyijy0oE0N7pLWXvemGvAuQ+rW454EOvSt0fAA72E+oCmz7aydII?=
+ =?us-ascii?Q?TOqXEJWyAp/1nw+HPOS2Uv28nRyCglRW1t1djS+ION1Xri6KzsmCtIhmAZ5W?=
+ =?us-ascii?Q?4oyfu9F2du3Z2R3GLapYzhXmxSsjUuDP?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?KVK4V5/pnIO2dqxQFwYbpu7AdmMy1+3ni+cgcpGLR/ASmF7G8qQZqPeEqckv?=
+ =?us-ascii?Q?hY0U6iQ4fXbf7WyNyhJlwSVzu/ATOXi/Ne77xp0lSne0B46qlC10jqTJLIxX?=
+ =?us-ascii?Q?zmgJ3X4LwtrIibpiKfknSxgMR0Idt7sTEgDyH7vJe5hbhCWkOBfeam5XzqG8?=
+ =?us-ascii?Q?Qq5vTiZr4JSJ/RR04xZxT7ct6uOZv/VhWEdQOusqDG4YqK6XxDKjF4bVle8+?=
+ =?us-ascii?Q?OrJajVDfOnmw47AZDDY1Zi8J6B0fm16MGIw25i/l15cfKx04q+Io2aKtIwAl?=
+ =?us-ascii?Q?hgwTrjRvA7rgZBELSGlc0z3Zgxwtq3/b54z+9UYGSHrobUXEphIWOyPXYv5J?=
+ =?us-ascii?Q?mUyNuuhy8qUNtZszFwV82vr0DO6tS95d7apln1lww3gXAvJk8/6Eo2GB1LJW?=
+ =?us-ascii?Q?tNxdvUIqMoeGSAqgXhrJpfJfT2HFDk3NULrts8T3Pq7UxmOgH0jNB9v1Olrq?=
+ =?us-ascii?Q?IyYknXOEOlUu2QQI+emEI+2GN5c0OjqgAqrwzbpMxycc1evjXy0s/9xMrtdY?=
+ =?us-ascii?Q?SuohftfOvVQYl319O7xzb5F4rDbehr0wVyPDGBZ7OwE63F4xoSlXEC+hGawK?=
+ =?us-ascii?Q?Kqp8b4kARxcfrg/Bjw6Jd1nkEGbHrthFyZFBXUmME9xSo34k0sB9M0bYaahb?=
+ =?us-ascii?Q?awW5QUOK1pEmGkBLjlsSuMlWVnz9XM8iEvWTUgs11iMgPbfWffwuatSglLW0?=
+ =?us-ascii?Q?N4ytH3dhLfCWTwH294vFV4hqqlpFjuh7HM88emWygn4pY1QpHH748Y+qjNMw?=
+ =?us-ascii?Q?LuU97uu5GrvON1KEnaRYhnG+3yss3ZFO/OQE4qBsgm/pj1BNyZS2g8t2MVEE?=
+ =?us-ascii?Q?w4ugu1hq4WPToqDPhRsxRciJtSSPcjroAAACdz3Pr4FoyxshJ46RLUI1qdbz?=
+ =?us-ascii?Q?0fdZydZdkxzi3fHlW0N/YWYoo4Bba2e9NFqZaPXri6tOT4XMy+C2yhB9RBHV?=
+ =?us-ascii?Q?QQQJf6+hQs18x045uoN0+uL9Z/CZgu6r31XPvahVE3Rs2j86HwsfrvJmGoAO?=
+ =?us-ascii?Q?r5UVRRGW/KUGjL1qB6mfwRyF5VOL6ldC8LZw/Fq0XjY9uD5xSCu5K2odGF8G?=
+ =?us-ascii?Q?/e400Y8z0OcTPLBhc34pQNp+jKiIQ3saOuC0BoBz8PaBNLzeMGMgtj+LIAlP?=
+ =?us-ascii?Q?VxMzRy/9X0y/wApWpDg/ql0PCmtMJOsfnzXRxKJOGw1k3YMoISApBXY4v8pi?=
+ =?us-ascii?Q?d0B80ta5rOoFcTf43oEGAZpHCPDOhZ7jh2Vl3CkNoHTUALzWIZFH9UNUUB66?=
+ =?us-ascii?Q?VGvJKXBiLwzfjGLkrnY3J/ut26yH1rq9gipSVHOv+6sGansMi9z1ZkuFIwh6?=
+ =?us-ascii?Q?qxt4MeqJmzt8D+zvpO6k/yawxXkfKBVIzhtQw9rfvXq45rNZu3huJW0JFr6T?=
+ =?us-ascii?Q?aQRPr6uhgF1i+TZBA9X2EzynpeG1ikv4GSX8a0sAUScKGz7K48tA1yu8Hunn?=
+ =?us-ascii?Q?9Hw9z7TIanwn1j06JPCUAhzzxt9ET8ss7KxXDQtyWGgC3+Q4yHyssY1pKAZk?=
+ =?us-ascii?Q?8JeUx5G2dxcaZeRgbqoqN7r/4+gwpFDbmshtvcwksyJRF6iRAHJbXJQC1fpu?=
+ =?us-ascii?Q?1IKKbECGBQEnnKSa+FQ=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v23 03/23] ovpn: add basic interface
- creation/destruction/management routines
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: andrew+netdev@lunn.ch, donald.hunter@gmail.com, edumazet@google.com,
- horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- ryazanov.s.a@gmail.com, sd@queasysnail.net, shaw.leon@gmail.com,
- shuah@kernel.org, "Jason A. Donenfeld" <Jason@zx2c4.com>
-References: <20250312-b4-ovpn-v23-3-76066bc0a30c@openvpn.net>
- <20250317060947.2368390-1-dqfext@gmail.com>
- <f4c9a29f-a5c6-464a-a659-c7ffeaf123c1@openvpn.net>
- <CALW65jZe3JQGNcWsZtqU-B4-V-JZ6ocninxvoqMGeusMaU7C=A@mail.gmail.com>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <CALW65jZe3JQGNcWsZtqU-B4-V-JZ6ocninxvoqMGeusMaU7C=A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fefc91fb-ee1d-4bc5-1e20-08dd653a9c83
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Mar 2025 10:00:56.4408
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: h500DtXXxvmRJXrlaTbMUyaNJgQS2P4xJZ0j/AL9GFbix/WXbgPW92wok7FL/MFYl+1FW7ZqWHlwgTAWaKm5+w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB7760
 
-On 17/03/2025 10:41, Qingfang Deng wrote:
-> Hi Antonio,
-> 
-> On Mon, Mar 17, 2025 at 5:23 PM Antonio Quartulli <antonio@openvpn.net> wrote:
->>>> +static void ovpn_setup(struct net_device *dev)
->>>> +{
->>>> +    netdev_features_t feat = NETIF_F_SG | NETIF_F_HW_CSUM | NETIF_F_RXCSUM |
->>>
->>> Do not advertise NETIF_F_HW_CSUM or NETIF_F_RXCSUM, as TX/RX checksum is
->>> not handled in hardware.
->>
->> The idea behind these flags was that the OpenVPN protocol will take care
->> of authenticating packets, thus substituting what the CSUM would do here.
->> For this I wanted to avoid the stack to spend time computing the CSUM in
->> software.
-> 
-> For the RX part (NETIF_F_RXCSUM), you might be correct, but in patch
-> 08 you wrote:
->> /* we can't guarantee the packet wasn't corrupted before entering the
->> * VPN, therefore we give other layers a chance to check that
->> */
->> skb->ip_summed = CHECKSUM_NONE;
+> title: s/filterng/filtering/
+>=20
+> On Tue, Mar 11, 2025 at 01:38:19PM +0800, Wei Fang wrote:
+> > Although only ENETC PF can access the MAC address filter table, the tab=
+le
+> > entries can specify MAC address filtering for one or more SIs based on
+> > SI_BITMAP, which means that the table also supports MAC address filteri=
+ng
+> > for VFs.
+> >
+> > Currently, only the ENETC v1 PF driver supports MAC address filtering. =
+In
+> > order to add the MAC address filtering support for the ENETC v4 PF driv=
+er
+> > and VF driver in the future, the relevant generic interfaces are moved =
+to
+> > the enetc-core driver. At the same time, the struct enetc_mac_filter is
+> > moved from enetc_pf to enetc_si, because enetc_si is a structure shared=
+ by
+> > PF and VFs. This lays the basis for i.MX95 ENETC PF and VFs to support
+> > MAC address filtering.
+> >
+> > Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> > ---
+>=20
+> For this series I don't see any VF implementation of ndo_set_rx_mode().
+> I don't think you have to move struct enetc_mac_filter from struct enetc_=
+pf
+> to struct enetc_si, so please don't do that until there is a justificatio=
+n
+> for it that is contained in the same patch set, and the two can be
+> evaluated together.
 
-Right. This was the result after a lengthy discussion with Sabrina.
-Despite authenticating what enters the tunnel, we indeed concluded it is 
-better to let the stack verify that what entered was not corrupted.
-
-> 
-> So NETIF_F_RXCSUM has no effect.
-
-Does it mean I can drop NETIF_F_RXCSUM and also the line
-
-skb->ip_summed = CHECKSUM_NONE;
-
-at the same time?
-
-> 
-> For the TX part (NETIF_F_HW_CSUM) however, I believe wireguard made
-> the same mistake.
-> Your code both contains the pattern:
-> 
-> if (skb->ip_summed == CHECKSUM_PARTIAL && skb_checksum_help(skb)) // ...
-> 
-> NETIF_F_HW_CSUM causes the upper layers to send packets with
-> CHECKSUM_PARTIAL, assuming hardware offload will complete the
-> checksum, but if skb_checksum_help(skb) is invoked, the checksum is
-> still computed in software. This means there's no real benefit unless
-> there's an actual hardware offload mechanism.
-
-Got it.
-Then as per your suggestion I can drop both NETIF_F_HW_CSUM and the 
-if/call to skb_checksum_help().
-
-Regards,
-
-> 
-> +Cc: zx2c4
-> 
->>
->> I believe wireguard sets those flags for the same reason.
->>
->> Does it make sense to you?
->>
->>>
->>>> +                             NETIF_F_GSO | NETIF_F_GSO_SOFTWARE |
->>>> +                             NETIF_F_HIGHDMA;
->>
->>
->> Regards,
->>
->> --
->> Antonio Quartulli
->> OpenVPN Inc.
->>
-
--- 
-Antonio Quartulli
-OpenVPN Inc.
+Okay, I will keep them in "struct enetc_pf". :)
+>=20
+> Moving enetc_add_mac_addr_ht_filter() and enetc_reset_mac_addr_filter()
+> to enetc.c seems fine.
 
 
