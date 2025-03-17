@@ -1,131 +1,151 @@
-Return-Path: <netdev+bounces-175320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D3B0A65149
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 14:36:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2674BA65163
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 14:39:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AFA217A166D
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 13:35:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F9641884287
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 13:38:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46AFA239586;
-	Mon, 17 Mar 2025 13:36:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1270D27E;
+	Mon, 17 Mar 2025 13:38:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="PZesGYZL"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="vh7Tdpq3";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="eSPwY0xJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C306732C8B
-	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 13:36:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14CA3233D85;
+	Mon, 17 Mar 2025 13:38:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742218585; cv=none; b=N+M5PwpDxDyokDQCTcUhrLPAbQOSCiFqy5XRH4n8YO6fNmPhwnRksqKMaIcRp5b6AZJMcVNcEM5zdv6YHHoNAossgHCPakh0wgNbzB0BjlVH8OGYKc9FCgrY/E5wXkcQfserc6TBIvm49l0iFexWXq4oLucWAbg4Mm4F/JVqpX8=
+	t=1742218698; cv=none; b=bn34h/vvAZxyqrpUtgQPqxc76UNTvbz4BcgR2zf7L0s2i/y4FJjmBF3X+mMpv4D+h1IA53vc9fdaysJAOBtgSJXyzJ3K7qcclL4+AbI/IGHjI6YNgwbNk8sDttAWyyW2aeuRCt7STY6P1qcSMxafIBjcRDwZ0ZWloep3ejT5JqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742218585; c=relaxed/simple;
-	bh=Trb02ucwdNT7njn5fU7IQgeC1x6g8J7T0PM9NITVyU0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=vBz6qIb447WglyZHczwx4Ib1er4PjO97EJcyVgXEWvg8rzOEeyFkDdAijIKOVqDGzv7pfmysXLM1kJEPAX9dyXjQ4WOG70aka0XvUSkagIYNbKcL5Za9jAaebFBxYf97qrtJ+PL9V8Osdfm1N5t21iw+P+61hqy+N28pljjGvFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=PZesGYZL; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-22409077c06so108206265ad.1
-        for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 06:36:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1742218583; x=1742823383; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+bM9J0DqT2fl7geMphRuEwoWQW8kW6asNpCDgXyvg7U=;
-        b=PZesGYZLWG6r3VpIBTT5XAiDbrq8yJUY+xEk3amSGxF+/SQZVpJOWSD9M47AWQ+OiP
-         hc+fjsKX//dy2eTAeRdw8RjAJFn8e7sPhGnyvks3YV+9Q3hSZSDUPiTboj1CP8aPiOy2
-         Uwn5vpD9/GlqNTvzs1xxSVTcNa/N/L7QWzR3GgnwDpSgfdtBD49SIijh0BBH6BYtk0d7
-         3ver5PaGwFjm5YZjtJe80ptV/J0QDwU6h5jlnCHVDytSqpIMSGZyqge8duarZbOa9DZK
-         muewJyx3AYQ56F/9ACT24yDHWEnTgJSHSwKsyf7MHztgMWpJDWphPti1Zo2hdFF0gkgp
-         hJSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742218583; x=1742823383;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+bM9J0DqT2fl7geMphRuEwoWQW8kW6asNpCDgXyvg7U=;
-        b=bsnTdhd+SvIsZBMVsQZNq2dbN6C0FcISFAxThx6XPr7UvuTyr/QQiSs2lC/0ACXO7K
-         BaWK797CBbMNhiNWqrfjZVcFtad7qVL7W2wHAdmfSp4z+3j0I1AZo9XUI6/EaJaQPpD2
-         1rRIvC8NkQsohZuS6Dtpdp15lcsCYzoj4fPdi+DYyZ7WKVzT6x0kLN7Q8MoSitpQf+Jy
-         l043CFqP2su56R/XEAzrdO850ib3VQzR971K1l9NI+ZMC8iUTrNWzAQoZ3ydxJfdQTwt
-         H7mOkUclvIqjdlxqxwZH7GZYSP47oRb9NShp+oovkxi5RgbL+NIZepZYBrFEv4yZk5ww
-         xu5Q==
-X-Gm-Message-State: AOJu0Yxr8kT0dNvi06ndtdRjQNVCuWW/9hTw3AmD2R87OBbUgTJDWSIB
-	ShnIxCF6AnuNbEXnK91/tLBrpoxMkx3DCa4cVWT2fpTGqG+OyI5RkqrG0rJ/Bzs=
-X-Gm-Gg: ASbGncsbMFvDiguoQyaOhWvpfs4te9up8C06mU3q2GlMWQH3lGV2krV7Zz6mCSNYQk0
-	bxpa4hfU57FE6pS+fscCJlF+AF7mXvmLX58surZ7hWa0pfQwC+2X+shgSTPn8L3PhWUkD0kS7id
-	mGUryRUz2yZVw/y0XojInp0QtdUURFx7DmnqMBXo5IelcsMocd4NLRGXW9tATX0aJpwsO7pqfMf
-	dhs3d4fitsocpnwPeVDiu66FhjrHidmvuH3aW/v/S3oPrF7cQx6Kivhugkq9bYqzdu8TX2UhPfq
-	cLsWJD90c0z09UAS1sNdO/BmayA8iK27uM4eXDkwKFwAjP7F/pqic4TyZMQW8rNCXnseHNDFS83
-	sMUoR04uY+o6Yhmbkl/yjFC3gKyUCOvl+
-X-Google-Smtp-Source: AGHT+IEl6kJWDflT3Rn8WDp+ZhQkPU3xUJHHdwZaiwpfDRF2sCE9f35xMBvQNtn+dAgTXcRv+AElKw==
-X-Received: by 2002:a17:902:e74f:b0:223:26da:4b6f with SMTP id d9443c01a7336-225e0a369b5mr135088635ad.14.1742218583022;
-        Mon, 17 Mar 2025 06:36:23 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-225c68a403fsm74737375ad.61.2025.03.17.06.36.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Mar 2025 06:36:22 -0700 (PDT)
-Date: Mon, 17 Mar 2025 06:36:20 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: chia-yu.chang@nokia-bell-labs.com
-Cc: netdev@vger.kernel.org, dave.taht@gmail.com, pabeni@redhat.com,
- jhs@mojatatu.com, kuba@kernel.org, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
- horms@kernel.org, andrew+netdev@lunn.ch, donald.hunter@gmail.com,
- ast@fiberby.net, liuhangbin@gmail.com, shuah@kernel.org,
- linux-kselftest@vger.kernel.org, ij@kernel.org, ncardwell@google.com,
- koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com,
- ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
- cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
- vidhi_goel@apple.com, Olga Albisser <olga@albisser.org>, Oliver Tilmans
- <olivier.tilmans@nokia.com>, Bob Briscoe <research@bobbriscoe.net>, Henrik
- Steen <henrist@henrist.net>
-Subject: Re: [PATCH v4 iproute2-next 1/1] tc: add dualpi2 scheduler module
-Message-ID: <20250317063620.30d24269@hermes.local>
-In-Reply-To: <20250316153917.21005-2-chia-yu.chang@nokia-bell-labs.com>
-References: <20250316153917.21005-1-chia-yu.chang@nokia-bell-labs.com>
-	<20250316153917.21005-2-chia-yu.chang@nokia-bell-labs.com>
+	s=arc-20240116; t=1742218698; c=relaxed/simple;
+	bh=e2io7ptcxFmW5Qs9opGBcmI7o/vPG4j3jsWs2RY9WNQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=PxBC8WwOG/aXiSHl1BQ8rJnUSXzqI8W4lp6al4TOmAOfY06Bx+F7l2RRxULv2Sua8DL9JsIpvEP/Bgbr9QHwcX6SkzuRUeYm95IJs06fi5pWxQInzUzJN6nkH4juL3euNsCKikT542iyyD4a7VG8c/6eNEzJwRsUm7ZrLV4xplI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=vh7Tdpq3; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=eSPwY0xJ; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Mon, 17 Mar 2025 14:38:13 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1742218695;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=9mYhKCKkQeh1xoUUrBNONZMgksp7fouadlY++sz6VII=;
+	b=vh7Tdpq3LF2SENd45P4mHeEemLVrbJO3jZwRU5g+6rfpj7UfKsNJ1KHiYepNg6MgmG4GWV
+	4ADtIZzdbIGOSyOyN847YKo62/T16228Z7P6qgBi1mzanhzzYUTlHxFcjQ2qa8HwHl6/2b
+	4v95vygFRrpodZFuUyS22jRYv8KCyOhiDOSUy72+mTyL7E+Z9bWfqb4JX5Dp6moyOtvX7R
+	2KLv6tV85pGyHJgf0pG4hrLSvATZ/H5+X7Q38BLllJH6S/HamMUgVdWiSwMp7Q46Be0ZqO
+	mSpdGQbBgyHo+GwGSRqVv8wRBgS6G3BUAsc7jc3PZ9szqaT+u4q/0h3vyfxorQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1742218695;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=9mYhKCKkQeh1xoUUrBNONZMgksp7fouadlY++sz6VII=;
+	b=eSPwY0xJHP75CCWVgIVOqdwFfGzcA3WHypDMp4vDPqurwv4hmpJxBpnm00P6VEOazDRO4Q
+	y5/sisJAvxmuxDDw==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Greg KH <gregkh@linuxfoundation.org>, stable@vger.kernel.org
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+	Ricardo =?utf-8?Q?Ca=C3=B1uelo?= Navarro <rcn@igalia.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
+Subject: [PATCH stable] xdp: Reset bpf_redirect_info before running a xdp's
+ BPF prog.
+Message-ID: <20250317133813.OwHVKUKe@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, 16 Mar 2025 16:39:17 +0100
-chia-yu.chang@nokia-bell-labs.com wrote:
+Ricardo reported a KASAN discovered use after free in v6.6-stable.
 
-> +static int dualpi2_print_xstats(struct qdisc_util *qu, FILE *f,
-> +			    struct rtattr *xstats)
-> +{
-> +	struct tc_dualpi2_xstats *st;
-> +
-> +	if (xstats == NULL)
-> +		return 0;
-> +
-> +	if (RTA_PAYLOAD(xstats) < sizeof(*st))
-> +		return -1;
-> +
-> +	st = RTA_DATA(xstats);
-> +	fprintf(f, "prob %f delay_c %uus delay_l %uus\n",
-> +		(double)st->prob / (double)MAX_PROB, st->delay_c, st->delay_l);
-> +	fprintf(f, "pkts_in_c %u pkts_in_l %u maxq %u\n",
-> +		st->packets_in_c, st->packets_in_l, st->maxq);
-> +	fprintf(f, "ecn_mark %u step_marks %u\n", st->ecn_mark, st->step_marks);
-> +	fprintf(f, "credit %d (%c)\n", st->credit, st->credit > 0 ? 'C' : 'L');
-> +	fprintf(f, "memory used %u (max %u) of memory limit %u\n",
-> +		st->memory_used, st->max_memory_used, st->memory_limit);
-> +	return 0;
-> +
+The syzbot starts a BPF program via xdp_test_run_batch() which assigns
+ri->tgt_value via dev_hash_map_redirect() and the return code isn't
+XDP_REDIRECT it looks like nonsense. So the output in
+bpf_warn_invalid_xdp_action() appears once.
+Then the TUN driver runs another BPF program (on the same CPU) which
+returns XDP_REDIRECT without setting ri->tgt_value first. It invokes
+bpf_trace_printk() to print four characters and obtain the required
+return value. This is enough to get xdp_do_redirect() invoked which
+then accesses the pointer in tgt_value which might have been already
+deallocated.
 
-You should support JSON for the stats as well.
+This problem does not affect upstream because since commit
+	401cb7dae8130 ("net: Reference bpf_redirect_info via task_struct on PREEMP=
+T_RT.")
+
+the per-CPU variable is referenced via task's task_struct and exists on
+the stack during NAPI callback. Therefore it is cleared once before the
+first invocation and remains valid within the RCU section of the NAPI
+callback.
+
+Instead of performing the huge backport of the commit (plus its fix ups)
+here is an alternative version which only resets the variable in
+question prior invoking the BPF program.
+
+Acked-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@kernel.org>
+Reported-by: Ricardo Ca=C3=B1uelo Navarro <rcn@igalia.com>
+Closes: https://lore.kernel.org/all/20250226-20250204-kasan-slab-use-after-=
+free-read-in-dev_map_enqueue__submit-v3-0-360efec441ba@igalia.com/
+Fixes: 97f91a7cf04ff ("bpf: add bpf_redirect_map helper routine")
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+
+I discussed this with Toke, thread starts at
+	https://lore.kernel.org/all/20250313183911.SPAmGLyw@linutronix.de/
+
+The commit, which this by accident, is part of v6.11-rc1.
+I added the commit introducing map redirects as the origin of the
+problem which is v4.14-rc1. The code is a bit different there it seems
+to work similar.
+
+Greg, feel free to decide if this is worth a CVE.
+
+ include/net/xdp.h | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/include/net/xdp.h b/include/net/xdp.h
+index de08c8e0d1348..b39ac83618a55 100644
+--- a/include/net/xdp.h
++++ b/include/net/xdp.h
+@@ -486,7 +486,14 @@ static __always_inline u32 bpf_prog_run_xdp(const stru=
+ct bpf_prog *prog,
+ 	 * under local_bh_disable(), which provides the needed RCU protection
+ 	 * for accessing map entries.
+ 	 */
+-	u32 act =3D __bpf_prog_run(prog, xdp, BPF_DISPATCHER_FUNC(xdp));
++	struct bpf_redirect_info *ri =3D this_cpu_ptr(&bpf_redirect_info);
++	u32 act;
++
++	if (ri->map_id || ri->map_type) {
++		ri->map_id =3D 0;
++		ri->map_type =3D BPF_MAP_TYPE_UNSPEC;
++	}
++	act =3D __bpf_prog_run(prog, xdp, BPF_DISPATCHER_FUNC(xdp));
+=20
+ 	if (static_branch_unlikely(&bpf_master_redirect_enabled_key)) {
+ 		if (act =3D=3D XDP_TX && netif_is_bond_slave(xdp->rxq->dev))
+--=20
+2.49.0
 
