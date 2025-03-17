@@ -1,119 +1,198 @@
-Return-Path: <netdev+bounces-175489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2169CA6615C
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 23:14:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F5AAA66184
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 23:25:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AD501789E3
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 22:13:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 393E83A690A
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 22:24:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90206204C0D;
-	Mon, 17 Mar 2025 22:13:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20A33204C35;
+	Mon, 17 Mar 2025 22:24:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PyoUI7IL"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="h9kEHX5F"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2080.outbound.protection.outlook.com [40.107.100.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CEC5202C40
-	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 22:13:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742249620; cv=none; b=ekwlHWwT5MrKlSDGhrIdRf+HxERf4oEOew5MOq3i5Rf7A8qUbIwt/b8BHDlzRqC5Qs90RhQoPv2nQXWbn7hells9dDFIq3jIM532MbLYzfubBbksvCbaKGCl82YZj3hQ1d+mOeqSw3IXC740wjZDuISK1qg6j+9Jz9X4GIflur4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742249620; c=relaxed/simple;
-	bh=Uh+nmDKbhG1xHYkMpyQDFKNEf98tHwNKGwhikylTkfc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CCVDfD/zWfjfrbkbkIcjy2CntBPeCaCc3pdQfIHCHiWUV0bXTJh5Sor+FrRvWfaiRblO4QO7XZbZT4b4u4dSMpZkbcV+UkVwHXx3tgYGf20c9o1J9XWIDoLJQiXanUG86IuDawGJGfpFmDN43CeDChO6/uPk0U63MYPcRJZSOes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=PyoUI7IL; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=h795jI0CAMNF+C3Dm1ua7LbpU0qTKbX2Kx6UIxSQgOw=; b=PyoUI7IL9ylAbP+IBiX8U69TtL
-	gJfAsdlQij9iQrOW40euE3H3kiRsDRvGrh6Hbcwu3p9+ZGNEXysQnssr61Vr6zvdCxZxExskMsqVN
-	UfYwUTuxEkfQoi8kLldHEOBIC9vQWyIDY4W9LGQ8x7b2LcRTbu6Jmu/jacG7PtIFN7pEsu1X21r6e
-	Ar/w/2AG1MNuubqgIkGnE+RSgd6PYQkd/SbYZdV13r+I8fdMJTk28sKY7PZJHvO/lxlYvEDgl85Ex
-	aMyHlwXrChdwGivljcZR9tJNIvVR7bW2dVEdF5aVJhSoch+QC2mBSGc6xXwuH9dmPkPIO97j5u2n6
-	J3tZPuGg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58524)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tuIiC-0004B1-1f;
-	Mon, 17 Mar 2025 22:13:32 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tuIi9-0003vo-2y;
-	Mon, 17 Mar 2025 22:13:29 +0000
-Date: Mon, 17 Mar 2025 22:13:29 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next] net: phy: realtek: disable PHY-mode EEE
-Message-ID: <Z9ieiYHUSnBbppe4@shell.armlinux.org.uk>
-References: <E1ttnHW-00785s-Uq@rmk-PC.armlinux.org.uk>
- <303bfbde-db51-4826-b36e-030114b2630c@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 694F8156F4A;
+	Mon, 17 Mar 2025 22:24:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.80
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742250296; cv=fail; b=BvGw875vENxec1b4k2Sk4lfy7hADKmWtZ7HqU0v9h9JlR5K9evzJ9qakwFmvR0q1JeaPjsI7QNw/xDcZ7lmZlDoqqfNb/SC0qZZ9lJtW4ZSU1pzaz17kPlhHwxGToV46koHErhY+67QLQRqYWFUw824iiPDLr1dQCcOn29//aso=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742250296; c=relaxed/simple;
+	bh=OsQqmFZ9lEuX4huKTKoc8MVLQstCVLq25WGY02eLH+4=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=UETqioT0/ZVYHOEbxMzaFCVusc9j4JbqShxJo3+ZzAjaOiATPJLEDsCFF/6UViV56QOw3oZB+9rK0fjPO7+7frRv4cHXtnkzeTlzyc6ULUtR6z0yvLF/eMg9mEzFXXZLeoAw92eybm+SxyicpQMPzyd9WCdZq5CL4e7K0VL/xGE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=h9kEHX5F; arc=fail smtp.client-ip=40.107.100.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=WsJECBKfRmVtaacndOjFvfCLhX4y/M6Lltmdw/wH8mfWDseBSsUs9yAQcXPI5AV9teIrNXvmQjq6YhEwKwr7sIM2jJ53b/V51R+zvMQMHeLFoKQ9IcuAxz1AhxYWueynXpUaGTwh/IqKTSHJdYynQC83nW+gGHI98lTY0nwIUE2BG42Y0HdzgaqbSxmCX+8g5/rZ1JiHML/4SCBija8Z3mZCtGswrsUxzdTT+bOjJV9cwm5ag9/BcK9EAU/FcqkIQVeu3Ihx5BtQbhM/81XviT6oP3g11pNDKZr0bo7Jb3pd0GYADnHrTsKZO8Ebo/Ac0RbmLiTrLPYxUCU2k8Zg9w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=n7m2UTaXF5nijElJxP6isDbgdhYVIDVxiysc+80OB2k=;
+ b=NU0/4+oPvHiFtxVAPFOwZwadY1ACIjUWNU8CCPuMuSIqrNzN3s5oUKfN4nI/UXJ/PYjpj4Jh2ArH2rj9Uu7NMy8kzc69rJogxfbQXriiH8UdqM1OAcWhfJ/NV78rd11Dob5z2L6uVdy3AeGwmGSOMUeB9s/nzX73MrXVMfTAkUPvmCq9RdRmK+fKG7VcjIntzK88XwldkVgyAJqkVKa4ZwhpZIz3arKSKcBl+SSDEz4BxYSlSuciCq7QrE4gh195CjS0lZPK0q9lZDEGKI2NNvXn5lJLC9ZU+JJfv9d5PcmW4lNK0jYQNE118nzJXonnrSZiyt32MMbsiWx3ICK8Qg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=n7m2UTaXF5nijElJxP6isDbgdhYVIDVxiysc+80OB2k=;
+ b=h9kEHX5Fr6LdxV79ByMf8F/ltguQkYmkHCnna6yfyDoIATtUWxr0+W4Xgt2maZUQBHhS3PIQw+5KIiA9udz+J+ygHYGlO9JTpRbuQwi9EXJHiKXZOLwG+Wx+W5NoM4ZavQo0nCTTxK0o+1g45cJuYCbodcMHPG3x0oJgEVfP9co=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
+ MW4PR12MB5642.namprd12.prod.outlook.com (2603:10b6:303:187::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8534.33; Mon, 17 Mar 2025 22:24:50 +0000
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::c8a9:4b0d:e1c7:aecb]) by DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::c8a9:4b0d:e1c7:aecb%5]) with mapi id 15.20.8534.031; Mon, 17 Mar 2025
+ 22:24:50 +0000
+Message-ID: <90aefca2-1799-4232-9db5-8d708f1e5f20@amd.com>
+Date: Mon, 17 Mar 2025 15:24:47 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 5/6] pds_fwctl: add rpc and query support
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: andrew.gospodarek@broadcom.com, aron.silverton@oracle.com,
+ dan.j.williams@intel.com, daniel.vetter@ffwll.ch, dave.jiang@intel.com,
+ dsahern@kernel.org, gregkh@linuxfoundation.org, hch@infradead.org,
+ itayavr@nvidia.com, jiri@nvidia.com, Jonathan.Cameron@huawei.com,
+ kuba@kernel.org, lbloch@nvidia.com, leonro@nvidia.com,
+ linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org, saeedm@nvidia.com, brett.creeley@amd.com
+References: <20250307185329.35034-1-shannon.nelson@amd.com>
+ <20250307185329.35034-6-shannon.nelson@amd.com>
+ <20250307233811.GZ354511@nvidia.com>
+Content-Language: en-US
+From: "Nelson, Shannon" <shannon.nelson@amd.com>
+In-Reply-To: <20250307233811.GZ354511@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0245.namprd03.prod.outlook.com
+ (2603:10b6:303:b4::10) To DS0PR12MB6583.namprd12.prod.outlook.com
+ (2603:10b6:8:d1::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <303bfbde-db51-4826-b36e-030114b2630c@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|MW4PR12MB5642:EE_
+X-MS-Office365-Filtering-Correlation-Id: cdc6e25c-e3da-4d58-f651-08dd65a2884c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?SjhNUUxMWkp4S2JQa0tIVzRSZGFCYzVlK093dmllRkxPb0doTmxvckxIK1Vp?=
+ =?utf-8?B?NzNDaEJpNWY1WlUxaW90VGthZWt3Q3R0eEhjVHB5RzY4VjB4enZTeFlkUW5r?=
+ =?utf-8?B?WGNzdVk1NCthVGkxZG9MWWliK0NyT2RwazRWelN3T0hZRWJUVzk5RVNBdDB1?=
+ =?utf-8?B?MVZwK0J3ckVuZkY1Y2c4S3JyUzJzUFl3WHZ5SStRaE9yTHlrQnY3QUc1RU94?=
+ =?utf-8?B?anJXckMzY1U2clE3Z2tINnZuaFpFV1pGSG02N0xFOEpSRG1VNmRQTEtrVHVt?=
+ =?utf-8?B?NGdPaXdTTWMzdzdSMXlEenNmQktPNThwTWpScS80QVdQUzl1a2JNMkJ5cWVp?=
+ =?utf-8?B?MzZSUHZkZHIvbERtcnNDZXVua0J3VUxVTkJ4YkJCS3RKVDlJWlNIeGovSHd0?=
+ =?utf-8?B?WWtLYlV2dUNPcW9JbTJmcERnNDRYK1VDTVhTM21JclFEUFlLa29JaisrZXVC?=
+ =?utf-8?B?Zzd5QmlsZURMRmFDM056bXoxYlgvRnZqYk9XNGxwdHV5MWZZK0xORlFlcWxX?=
+ =?utf-8?B?TlNzcU0wc1RkckFqY3FQNnJoM2R1ZE5MamVJU3R2Z0xuYlBCTDFVako0anJx?=
+ =?utf-8?B?cCtla2c5T2VZVHRnM1dpbVR0RURTZ01DOXpud05nTm5XMWxQc3ppdFJnc2xC?=
+ =?utf-8?B?QU56bTA1clJScDROZkRLR1p1WkkvRi9UNTk2OURrN1dkZ0QzZS9sZTJWalBQ?=
+ =?utf-8?B?RmZjTmRRSkp4TURIbEZnMUdxR0szSU1RckYxVDk3bnphWmViemxMcGNtWU9P?=
+ =?utf-8?B?SDM0MkR3VjVPZnhWS25NODJsRjNsZnpvTVduZGFoWGhsREkvVWxlUjBFN0hB?=
+ =?utf-8?B?SWhMd3AvcStieXRhNjE3L0RxMEZUcFNreHVjTm9aRE0yY3pKYTRwNWJrOXc2?=
+ =?utf-8?B?anpBYjdrMGpGZTc5TlZENU9TbjhsTlh6QXZac1QwcEU4WkJJRjhWK1ZIRUY1?=
+ =?utf-8?B?TFgrQ3BCRU1xMFBTd2x6c2xHUW4rSWsrTFlVbkNLbXk0M3RVcVJFYkhnMVkr?=
+ =?utf-8?B?Tml4RmdqbkRvZ2NkT1RZUko3am9kcjhZbHlTODNDVlhlcU1lRXVUWElhYSt4?=
+ =?utf-8?B?RnhIeDJiV29VQkpYQXNPVHpOdWJSUUZWN3FkUzJ4cXZTdW5Zclp5RnptZ21r?=
+ =?utf-8?B?VGNqMkREY0pOV1BwNytXMW1FaVQwSkdKaFRnanROU3RDTEd3dHF5YzZjSHJp?=
+ =?utf-8?B?OHF4VFBjOEE1RW9sMTRzZ3NSa2lxMlBpSkZJUVB3UEdHcnVDN1ZCekVIQ0ha?=
+ =?utf-8?B?V04zR3I4K2JUcHpkMGNackJneGd3TjRNV0Evd2JKRlgxN0xZWjRiR0JMTmhF?=
+ =?utf-8?B?WVFEREZscG5PNG1NYlM4MVRIVjRONHE5ZVFEeU5NYnA1WWRVUitrRVRrQStr?=
+ =?utf-8?B?ZWZ6UVE2UUN6dUZzYWNQaFpMeWVYYjJHeFdnMVR5MXBIWk5MaUQxUXdjVkZO?=
+ =?utf-8?B?TUFHKzdvSXA2TDdQendVa3pjNlJNT0Z4VWtkeGtqOUlVWlkwMER1VjZPOFpZ?=
+ =?utf-8?B?QVhnVUFsNHRSQUhTMVdnaVFsTzFBTHRLTmdGNU1UNHJ1NDc1MndTY2plckpQ?=
+ =?utf-8?B?Y3FueXdNaDRaSmR0aWxrSTMzejVHL0tBeHM5cU5nenFJamRVMW9TenQ2WGRn?=
+ =?utf-8?B?dXZsOFk2eGh3SDJvUnkyR0ZOSFIycGo2N01OWThiei95QW5JQmJxTUpWMmNC?=
+ =?utf-8?B?M3NwU3JiMjJsOTBSUDNHS0sxbTFyRWxaT2RSMmMwWVY1T2J0WkZkSmwzTi8y?=
+ =?utf-8?B?Z282OGJZSFlLeXRvazBQcUx4ZnRZNUtRNDJKRjAybFZub1JRenY0anpualB4?=
+ =?utf-8?B?VFR0U2tDdEJIWWVPdGdiSXJZcnc2Wk81eHBDN3daZEdQSzBydTdvMGNpOURr?=
+ =?utf-8?Q?Xg2mJ/6VoGsAB?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?R3I5R1hXc29mZjgvMkMvRGNQVjVSQzRGZU03eFFrQzhKVUFCZ3F6VWRxUHRy?=
+ =?utf-8?B?VmZkMUFudGxrSldNYlhWTHR3Q1lqeHNmVmEvZE1RSEYwNWppMWpncXp6STBK?=
+ =?utf-8?B?N3grWFlCT05pdTJSSHRGMTg2aFpoQXVodGg3RlNPRERNTzZtTjNXNUErWEY0?=
+ =?utf-8?B?TFdaMmo4MkdwdzB4ZnVWeFdQY1BiYnpFOUk3VHBjS0xYbm1mK1V1MlNTSElS?=
+ =?utf-8?B?WUY1OHI0R2JQR0dzcVRtYzVJdWFBWFFheElsamduMkhLa1pRakdnVmF4OUkr?=
+ =?utf-8?B?VUNQalJjZVhvcjZBeVE5RDlqQ3ptZjJQUDRncmxNRWZRRGFvMmNGdElpRnNr?=
+ =?utf-8?B?SUNlSmlralRONXozMmhiUDJYL1pSS0xKWDNvQ0F2cXExNXZaamUyVEVNK3Nj?=
+ =?utf-8?B?bHFmUWNGVm93OVh5L1pMOU5HRW9wZUpQelRneTg0TTlmZlV2c1Y4VGFCQXho?=
+ =?utf-8?B?dDlRZ2htem85b3FjcVBNNi9JYjNJSlMvWHhaMlJBSGQzZ2VjRjYyS1Y2KzZD?=
+ =?utf-8?B?RUlqRmRZRXdyajhOMjdXeGExUGp3ZThXdUtYbmdNWXlyakppcnhiYkR4TGpV?=
+ =?utf-8?B?MHo4azQ5U2pWamZRRmVBYmZWa1RleVlPVXBuL3RxSmlqWTBFdE0wc0RkY2lk?=
+ =?utf-8?B?ZzJnK0RUYTBENzBZd0liNWk4SW9lQUg3UHlFeWxLNnp3a2FzUUJCUTFiY2Y1?=
+ =?utf-8?B?U0dtSHNyMW9DOUJWOVZWNjQrUk04MjZVSy9hSTBDNG1BWERSUlYxRGxSQis3?=
+ =?utf-8?B?bktSTHNMUm5XdmFsSkFINEVuWkYrbjJQVnBEdEtBanRxWG16T2lUSW4yQ05W?=
+ =?utf-8?B?aHNscWxZU2VPRGxHUUFBV0wrNmsyWDdZcytORjdEQ25nbmxyOElMcGNHTytW?=
+ =?utf-8?B?Qkkwa2dtVStIMjdnVTRvZUlvbTVuUGV4Wis3Y3V5cWNvQ0srUWF2dWRCR1ZX?=
+ =?utf-8?B?NDErcCsxUkh6WmtadCtLRGt2c1U5RXFGN09RU0pXdW5yZEpiVEJwc3NQd1Zn?=
+ =?utf-8?B?blQzQzZZdnBENXZHTU44U1NkbHpvTmN5V05ucWhoSFhOUzNGVlRIbEdZT1Bs?=
+ =?utf-8?B?R3huMUsxZENRWkRDU2dwR0Vha0ovem9FYVlDUFp6anByNm80N2xMMG5MOE9s?=
+ =?utf-8?B?QWNmK1hPMXdBUjNpOUNjUEo2UHhJY09WVTRWMWN2RGRBVXgvZkt4REFITndP?=
+ =?utf-8?B?QVc3Vk9TMTd4WDBKNld4NjBxRjZvZHA2alp5THB3MHNUWUpYWjgzL1Jwc29s?=
+ =?utf-8?B?S0JRTk0rMHo0cmFiM09HL2pobTA1bk1TQ0xWZFVpaU1KbnYxWUxsOHNKTmcr?=
+ =?utf-8?B?L0xHbVcvYUJPMGJEcHJSTlBESGRueGx6cFRsWVZOMkwxYXo5c2daN1I2VFlk?=
+ =?utf-8?B?TVNiTHdrOWZVUDRUQUFveDdoK29uRFZPc1dhSzZEMTM1c0E3OTRhZkVKUmU3?=
+ =?utf-8?B?KzV0T2RYRHkrZzU4Y0xSNWJYTzJCYldleG54UDY1bnY2cmdkUTVYRHV1V3Iw?=
+ =?utf-8?B?MEU0c3NXNWtKOHZFV3UyZ0hLUGxhelAwTDQ2VHNXSFFydzJpK01kVHpTclZx?=
+ =?utf-8?B?ck5mQ01DaGZtcWlkMEJTWlVZcVpLejdFOXBhTW9YTkNhNlZlY2ltdTE0VGZq?=
+ =?utf-8?B?Z01DNytwbEVXWGtqcGJWR0xOdGNQN3lTcEVOcEZDQThZakZzVHgvTXhyRW5D?=
+ =?utf-8?B?V2FGaXUyZTBWc1NMa0l0dDZYLzk3ZlhVME1FVmNwaytVOWoxM2dzb2RXQ2x2?=
+ =?utf-8?B?MVZBWFM0ajEzQjYzSUY1ekJRVXpxNEQzMzVlWlpnN2pqMmNTbGZGbTRFR2lS?=
+ =?utf-8?B?cGFOS1VJWSt6bDVwWlB2a05WR09UUWFSWWZTbmJ5RVViazFodUptalQ2VjBC?=
+ =?utf-8?B?SEh5VklvQmtVaU5CNFlVZFdDTlZydHZlajZlZmZxckJLZDZ1ZlI2TDBLcjVn?=
+ =?utf-8?B?Sk5UbE5iTWNWUWhjZU9wRCt6Ym55dEdYWXc5V2hsd3RqZXVsY3hHaElycXNV?=
+ =?utf-8?B?Y2NaWGl5WkZhVXpEaFJNM1dNTG5WR1pNZUdvV252dkJjdUkvSlNBOHJldWVm?=
+ =?utf-8?B?Nm5WUjF3U2ZCTm1ZZ0NTY05rQnI5bkNWOXg3WWFaNW9IY0VTVTIvemlWYWRF?=
+ =?utf-8?Q?NThhkGxNvXc05CFDseII2Fip4?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cdc6e25c-e3da-4d58-f651-08dd65a2884c
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2025 22:24:50.4834
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: CiQjJWhukBeF1PIOnPjEMK9dfrb25tps4Wp7pBV0TR1IGRZEgkBOfbXg76NkNH0AGQyR8b26ztkpc7B5uIqaZA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5642
 
-On Mon, Mar 17, 2025 at 10:40:38PM +0100, Andrew Lunn wrote:
-> On Sun, Mar 16, 2025 at 12:39:54PM +0000, Russell King (Oracle) wrote:
-> > Realtek RTL8211F has a "PHY-mode" EEE support which interferes with an
-> > IEEE 802.3 compliant implementation. This mode defaults to enabled, and
-> > results in the MAC receive path not seeing the link transition to LPI
-> > state.
-> > 
-> > Fix this by disabling PHY-mode EEE.
-> > 
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> > ---
-> > This patch isn't the best approach...
+On 3/7/2025 3:38 PM, Jason Gunthorpe wrote:
 > 
-> But i guess a better approach requires we have support for PHY-mode
-> EEE? Which at the moment we do not have.
+> On Fri, Mar 07, 2025 at 10:53:28AM -0800, Shannon Nelson wrote:
+> 
+>> +#define PDS_FWCTL_RPC_OPCODE_GET_CMD(op)  FIELD_GET(PDS_FWCTL_RPC_OPCODE_CMD_MASK, op)
+>> +#define PDS_FWCTL_RPC_OPCODE_GET_VER(op)  FIELD_GET(PDS_FWCTL_RPC_OPCODE_VER_MASK, op)
+> 
+> ../drivers/fwctl/pds/main.c:302:7: error: call to undeclared function 'FIELD_GET'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+>    302 |                 if (PDS_FWCTL_RPC_OPCODE_CMP(rpc->in.op, op_entry[i].id)) {
+> 
+> Add:
+> 
+> #include <linux/bitfield.h>
+> 
+> Jason
 
-I'm not sure what this "PHY-mode" is - the datasheet for the PHY doesn't
-mention the mode in its functional description, it only exists as a
-simple description in the register documentation!
+Odd that I didn't run into that... perhaps a .config difference.
+Sure, I can add that.
 
-What I do know is that with this bit set, a MAC behind it never sees
-the LPI signalled from the remote end, but 'scope shows that the
-physical link has quietened down except for what I'd call the chirps
-to keep both ends synchronised.
-
-With the bit clear, then everything works as expected - as tested with
-the stmmac driver on a Tegra platform. The stmmac MAC sees LPI on its
-receive side, and all the nice juicy stmmac bugs requiring RXC to be
-running can then be reproduced. :)
-
-Not sure whether it would be better to fix stmmac first before this
-is merged, but in order to develop and test, it needs to be fixed
-first so the bug(s) can be reproduced. Given the netdev backlog, it
-is unlikely that I'll get the stmmac patches out before the merge
-window opens and net-next closes - so the "regression" that nvidia
-reported is not going to get fixed in this cycle.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+sln
 
