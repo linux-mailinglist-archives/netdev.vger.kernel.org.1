@@ -1,50 +1,74 @@
-Return-Path: <netdev+bounces-175440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E7D1A65F01
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 21:20:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E4AEA65F0C
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 21:22:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A064189D683
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 20:20:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F6AA189D484
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 20:23:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32D581F582A;
-	Mon, 17 Mar 2025 20:20:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABD1C1DD529;
+	Mon, 17 Mar 2025 20:22:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c00kyITz"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="THbJCqkm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A8A51F4E47;
-	Mon, 17 Mar 2025 20:20:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB5231A00F0
+	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 20:22:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742242814; cv=none; b=X6PUAv6hAyA/XsNHpuoHP9v0+7VFqOlqGQPjjgFv0147IZIoU1je49tfgKxWTxFBbyxaXOFcR+ju6YnYLExavIM5feVVUTejEMbt/x4jmV8OJzRpPH/KLx9hx4aN7qggS2/4HnLIrmb2XpAdTNpsTujG79lrGHOJXAwqG02mc8k=
+	t=1742242972; cv=none; b=fXr30871Z2TEQPlyQqffG4l2azs8ip82E4xxe3XEVjrK061F/3uSbv1VvjhzfB8yWiLJ7ri1zHx/4ET0+0xe8hqtaSQD2+zsvxPfwNyFwAQMZ/NTwKm3cMclW5sFsVjtatPBBC+ccLdn7y1mjYYMi8EU+45iekOOYE3G1BYlpB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742242814; c=relaxed/simple;
-	bh=PGe2zkk9t3wpiVapprqxZNUBlwXJz6fSOXIRXWg3MrM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=VODIutZUCgvbE9j5E5GL8YfE7wNtDvLHrl3CSfbPID5hPMTiw0cob3WPeGPRH9BCmNYr2JhY6sc5CneXTzgKtYWSZWFI4oVKGMkh17X3HJOtKJHS0c7FTzbSv9siEKZqjdCckFBlcc2pkQ1eRbXBn5nb3EcVhPJd4ilPXY0hfqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c00kyITz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66A5BC4CEE3;
-	Mon, 17 Mar 2025 20:20:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742242813;
-	bh=PGe2zkk9t3wpiVapprqxZNUBlwXJz6fSOXIRXWg3MrM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=c00kyITzeyheVyBmzCx8pY6PlwOek/naieESbTbm4FbJlZFWWiKhfeewS2jh2a+Cb
-	 7umPiM/7p5nPceIxqBHWZ6Dj5qyA0aa+zZ4eaE5nqOVq1GNcdMIfrr9v8c7/B1DOQA
-	 LT2vMbaF5MPsmToJQn6Eh/XyO1GINQMZnwVhXKJuSznQ/Ynsf7EULHwA0w/zzQI7JZ
-	 /3DyllNlwwxI4J2qiOeHJkqRWqERyqNYEK+6iprqubwQM5ptz+0nQ7OaTuIrlp72wx
-	 3BPTFaLKb0+OwSBRX7b+oliJb8nVAZhX7yHPmIny3GKw6PBelk5rmc/sk45zqG9rSH
-	 +B/M3DEIqZCKw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEE0380DBE3;
-	Mon, 17 Mar 2025 20:20:49 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1742242972; c=relaxed/simple;
+	bh=Mp7AVDMrS/ib2NF/YH9bK2zFL4l/UsQbiIoIfb2AIaQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ICx45mS5LxWwhzEm5I6/IGv/u3EMzNQ0RnTxiV3X9fOeE2NnlSAhc9dWgEsy8Enqpjh9UvCMUXu1oHJFQIo0iUaYwwnL3gaieemlixn4z94Y5nt+hBON5WuC8jamC9pqm1Q19PbLeKwCL1ZSYqiWE0Ng2mQFOeQQeu/lDIrOeIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=THbJCqkm; arc=none smtp.client-ip=52.95.48.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1742242971; x=1773778971;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=820PCY+r4yor30og4vk3YoLgyROldp4iQlCBKyu2L0c=;
+  b=THbJCqkm7gIdKA0T4P3vLctVvqX8xSH0xPfh9hRsxYbmVJ6dRDdblTRT
+   dDji7zL7kdcbaP9rrSFdwdzfwQUcjd3tYJpVfVP5nZG96yDPm+rtRcyaW
+   xou75hgfAEhgfxZeq0oPxtqoDEZvfGgNAKZMK1937/YvHT7NjwjafweZq
+   4=;
+X-IronPort-AV: E=Sophos;i="6.14,254,1736812800"; 
+   d="scan'208";a="471856928"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2025 20:22:46 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:10468]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.40.101:2525] with esmtp (Farcaster)
+ id 32a216dc-5857-47ef-8500-0bc594ddfe38; Mon, 17 Mar 2025 20:22:45 +0000 (UTC)
+X-Farcaster-Flow-ID: 32a216dc-5857-47ef-8500-0bc594ddfe38
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 17 Mar 2025 20:22:45 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.106.100.54) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 17 Mar 2025 20:22:42 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <borisp@nvidia.com>, <davem@davemloft.net>, <eric.dumazet@gmail.com>,
+	<horms@kernel.org>, <john.fastabend@gmail.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <ncardwell@google.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>
+Subject: Re: [PATCH net-next 1/2] tcp/dccp: remove icsk->icsk_timeout
+Date: Mon, 17 Mar 2025 13:21:56 -0700
+Message-ID: <20250317202232.23864-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250317085313.2023214-1-edumazet@google.com>
+References: <20250317085313.2023214-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,46 +76,22 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v1 1/1] stmmac: intel: Fix warning message for return
- value in intel_tsn_lane_is_available()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174224284849.3901460.9366636522852386074.git-patchwork-notify@kernel.org>
-Date: Mon, 17 Mar 2025 20:20:48 +0000
-References: <20250310050835.808870-1-yong.liang.choong@linux.intel.com>
-In-Reply-To: <20250310050835.808870-1-yong.liang.choong@linux.intel.com>
-To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
- alexandre.torgue@foss.st.com, dan.carpenter@linaro.org,
- netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D033UWC003.ant.amazon.com (10.13.139.217) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Mon, 10 Mar 2025 13:08:35 +0800 you wrote:
-> Fix the warning "warn: missing error code? 'ret'" in the
-> intel_tsn_lane_is_available() function.
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 17 Mar 2025 15:14:00 +0000
+> icsk->icsk_timeout can be replaced by icsk->icsk_retransmit_timer.expires
 > 
-> The function now returns 0 to indicate that a TSN lane was found and
-> returns -EINVAL when it is not found.
+> This saves 8 bytes in TCP/DCCP sockets and helps for better cache locality.
 > 
-> Fixes: a42f6b3f1cc1 ("net: stmmac: configure SerDes according to the interface mode")
-> Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-> 
-> [...]
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Here is the summary with links:
-  - [net-next,v1,1/1] stmmac: intel: Fix warning message for return value in intel_tsn_lane_is_available()
-    https://git.kernel.org/netdev/net-next/c/38f13bf80130
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+We may want to add a paired WRITE_ONCE() in __mod_timer() later.
 
-
+Btw, DCCP removal series is almost ready and I will post it
+in the next cycle as the patch queue is long now.
 
