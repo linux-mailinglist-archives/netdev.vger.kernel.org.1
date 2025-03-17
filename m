@@ -1,259 +1,202 @@
-Return-Path: <netdev+bounces-175307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D00B0A6507B
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 14:17:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE07BA6507D
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 14:18:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22AB23B1DF4
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 13:17:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BEB167A7BF5
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 13:17:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4915823AE96;
-	Mon, 17 Mar 2025 13:17:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D40A23C8B6;
+	Mon, 17 Mar 2025 13:18:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="sANmLoSq"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="PpRNuXbJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18F09221723;
-	Mon, 17 Mar 2025 13:17:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D86512356B0
+	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 13:18:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742217462; cv=none; b=Z/brXzs1kWfYt5aSnZYZ/Ur1BKOn0wgO/360P68DbdTww/QFFjWRCyXOXzM2pHagYO5SB4yN9fhrr6vGY3LuvLebdfzSJXB5siC4/h0+UgPuXr1Ol2ouz2uIWmvxhglDNCi8VSW4wf5aQERSqFMuLe6whKkvmhEgNHlNEr0GNsU=
+	t=1742217504; cv=none; b=oC1DUCu1ml02pO8qWMB5zCoVF/95wxE8wL2tdrI1nUQ+gvo81Zp4TieECn8/yOyd7Ulr//OhtsiLR+QmFEtuq1LSSOIsfWxB3F1Sl7NQVeWublFYBw9T4Ij2GT2lIpdiblMq3D2NRZqHD1sm5ZSi5MkaCerb64v7JEafOP4f0ik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742217462; c=relaxed/simple;
-	bh=TPKHUiHB8npev+o/UGiouI0z2ofhbOshB8WZo/QHzho=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f6kpX+dfSTRUP/dCJF1EcDEgrOEnG1yUd6XNsH1VBxpuSi0vO/Hq5mJ0LUnaBky97wtKkFAHv7qnkHdBC/sz8Ny1sOauMqbMRLbmYRC4IUaGZNkRljNSX6lPDSRvocPKSGx+FvRdD5xtKaISlfavsdn3v4GymWdDvvCfALJPXSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=sANmLoSq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73D61C4CEE3;
-	Mon, 17 Mar 2025 13:17:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1742217461;
-	bh=TPKHUiHB8npev+o/UGiouI0z2ofhbOshB8WZo/QHzho=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sANmLoSqJM4QLLMO1IeYa67AZ5wgqu22WjonvrN8VYOUdJi/00OaCt5HCvu1QmcGQ
-	 cGvrcmE6QjVz5E0jsS5JcOK1YbcZL3twB4sAHjnS3cITAqb4WcqZIx++MscVyFj0yF
-	 ciryUwQRx62o959XR4oPCw7Ju6uRrKlS4JdOgpJg=
-Date: Mon, 17 Mar 2025 14:16:15 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: Dave Ertman <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, horms@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, leon@kernel.org, shayd@nvidia.com,
-	przemyslaw.kitszel@intel.com, parav@nvidia.com,
-	Amir Tzin <amirtz@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>
-Subject: Re: [PATCH net] driver core: auxiliary bus: Fix sysfs creation on
- bind
-Message-ID: <2025031710-herald-sinner-cbc2@gregkh>
-References: <20250317103254.573985-1-mbloch@nvidia.com>
+	s=arc-20240116; t=1742217504; c=relaxed/simple;
+	bh=aVcHGNdwciv1x96+nP9FQZY1KyCMeUcoQR7WsYS3qOc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Dq5O0JEXaYHJ2sTE+XU+i+IKm2RSnP5wYODzkK5E/vjFHlqmuyFxH4cAw7hlsM4ADJ/Wf7Bbu25DbpQDJW4XvA752CiK+r0d7Gbk7y4yYbLcCg7hRsai4kuNa6cGuOnu9HPmwa9lZ3q71I8xMCpAV0sTrdbBUPYV/eWAd6nzhvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=PpRNuXbJ; arc=none smtp.client-ip=209.85.167.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3f7f7b70aebso1670307b6e.2
+        for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 06:18:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1742217501; x=1742822301; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=gjTa/odeiCyyfRBNYurJGt+2DoWifmwArWd16/w8hDo=;
+        b=PpRNuXbJb/yTyX1Gxdw3BUIvoeso7vVTItce9p5YCBNMtAnX3/f8XDkqmdBGYFaOOU
+         GJMG+v+meYvXn4Qp99A4Y3Cq6hAZOOyjvNWSDP0V3ZCMq7hEPSXzfTfftVwMXO7ELZ/Q
+         NRSSO5FkObECKAeTxDkFHQao2QOZ6IoFIJ4Kc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742217501; x=1742822301;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gjTa/odeiCyyfRBNYurJGt+2DoWifmwArWd16/w8hDo=;
+        b=kcmoQvIMXkStV38BXL2DQFgAdv+TRrJqnssU0KRinB6N0wGFVg1vLJ1QaA2lxJFTL/
+         GrcHh/qmM/OGP10OnqDyZg+1LA9HjL3kUPYjnhsZxnsdKheNIPhTaBCsd6u7aLWSF06g
+         VuadjR8CTkl34osFIVxMnkFhh4dKnYGrI+YCKo9wqbZV1o0AXlPnSN4NbEopWqvac8jc
+         dH8pP2XmZLwmqNUeoQa4O8QuNHgH+e0QIm/+5A6swqsSGyXRsJ++Nv3BmM08AA3wTjS8
+         58dy/zeISUbyHAAUGjcnVIQtizLyKKyUtD+ImXmych7SAw+1G+qLPu8boME2VcQsVHtL
+         N+nA==
+X-Forwarded-Encrypted: i=1; AJvYcCUnjLXRMdElBX4c81bneG53mL9zSoxm2KgEpUIAWq3Fk9We83WGhDVZUzGD5BYTT+3DhtyhUh4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAF6ktoaqmEFP1AxYdzBuMOGvILPX4wiHj1jxrzbDPymCl+rFS
+	b4HVLr5VyMSyFQsmyetfPdUKMJTzUsxHYQemP8giwuGTxrY381gM1Et3fb3icw==
+X-Gm-Gg: ASbGnctVLOsoMyyd0+n8yN6Rq0iItE9IEo7BahqtU+DfzxYpqW/ZacnKI/uuyHkafzn
+	r0XKx62zDAQKbTNU48JVSQ/Y5OjcA7SUBDrDSIcIDsITROvL7IHVPJ+PcKRzfigZmip/kQyirPp
+	Hgbb8Di/KqShFh5eWsUB+bMVv9u8IcKtBp3bWucb8QOYHondW62jN6oaxg94UAGv3V37XTwvfnw
+	gPjlFcUmukB1EE6lW91XnbQ05vQKIIqjRlOhAdxEQ7CI/evWcYMicoThxCvmjf+H949DA4qLQgt
+	aKxwuIGktk/a5tkSTg+z3DcWNvo7yugzo45Phr0zfGpOL992nQr6lr1zDBlju13WEf8pWEEYSCa
+	r/EiEfPUUsXcoYFhOTnw=
+X-Google-Smtp-Source: AGHT+IHOP4dAfgtYXFSWaOQMBXTcfTVWX3nCIbTlwtwvnqt3ECTfJHoncDFXtvDvaQRx5AUjr9Pr0A==
+X-Received: by 2002:a05:6808:244c:b0:3f6:a7c7:909b with SMTP id 5614622812f47-3fdeed0d634mr6760883b6e.22.1742217500826;
+        Mon, 17 Mar 2025 06:18:20 -0700 (PDT)
+Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-3fcd4521404sm1769163b6e.15.2025.03.17.06.18.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Mar 2025 06:18:18 -0700 (PDT)
+Message-ID: <9391fb55-11c4-4fa9-b38f-500cb1ae325c@broadcom.com>
+Date: Mon, 17 Mar 2025 06:18:17 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250317103254.573985-1-mbloch@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [v2,net] net: phy: broadcom: Correct BCM5221 PHY model detection
+ failure
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Jim Liu <jim.t90615@gmail.com>
+Cc: JJLIU0@nuvoton.com, andrew@lunn.ch, hkallweit1@gmail.com,
+ kuba@kernel.org, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, giulio.benetti+tekvox@benettiengineering.com,
+ bcm-kernel-feedback-list@broadcom.com, linux-kernel@vger.kernel.org
+References: <20250317063452.3072784-1-JJLIU0@nuvoton.com>
+ <Z9f4W86z90PgtkBc@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <Z9f4W86z90PgtkBc@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 17, 2025 at 12:32:54PM +0200, Mark Bloch wrote:
-> From: Amir Tzin <amirtz@nvidia.com>
+
+
+On 3/17/2025 3:24 AM, Russell King (Oracle) wrote:
+> On Mon, Mar 17, 2025 at 02:34:52PM +0800, Jim Liu wrote:
+>> Use "BRCM_PHY_MODEL" can be applied to the entire 5221 family of PHYs.
+>>
+>> Fixes: 3abbd0699b67 ("net: phy: broadcom: add support for BCM5221 phy")
+>> Signed-off-by: Jim Liu <jim.t90615@gmail.com>
 > 
-> In case an auxiliary device with IRQs directory is unbinded, the
-> directory is released, but auxdev->sysfs.irq_dir_exists remains true.
-> This leads to a failure recreating the directory on bind.
+> Looking at BRCM_PHY_MODEL() and BRCM_PHY_REV(), I think there's more
+> issues with this driver. E.g.:
 > 
-> Remove flag auxdev->sysfs.irq_dir_exists, add an API for updating
-> managed attributes group and use it to create the IRQs attribute group
-> as it does not fail if the group exists. Move initialization of the
-> sysfs xarray to auxiliary device probe.
-
-This feels like a lot of different things all tied up into one patch,
-why isn't this a series?
-
-> Fixes: a808878308a8 ("driver core: auxiliary bus: show auxiliary device IRQs")
-> Signed-off-by: Amir Tzin <amirtz@nvidia.com>
-> Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
-> Signed-off-by: Mark Bloch <mbloch@nvidia.com>
-
-Why the [net] on the subject line, this is not for the networking
-tree...
-
-> ---
->  drivers/base/auxiliary.c       | 20 +++++++++--
->  drivers/base/auxiliary_sysfs.c | 13 +------
->  drivers/base/core.c            | 65 +++++++++++++++++++++++++++-------
->  include/linux/auxiliary_bus.h  |  2 --
->  include/linux/device.h         |  2 ++
->  5 files changed, 73 insertions(+), 29 deletions(-)
+> #define BRCM_PHY_MODEL(phydev) \
+>          ((phydev)->drv->phy_id & (phydev)->drv->phy_id_mask)
 > 
-> diff --git a/drivers/base/auxiliary.c b/drivers/base/auxiliary.c
-> index afa4df4c5a3f..56a487fce053 100644
-> --- a/drivers/base/auxiliary.c
-> +++ b/drivers/base/auxiliary.c
-> @@ -201,6 +201,18 @@ static const struct dev_pm_ops auxiliary_dev_pm_ops = {
->  	SET_SYSTEM_SLEEP_PM_OPS(pm_generic_suspend, pm_generic_resume)
->  };
->  
-> +static void auxiliary_bus_sysfs_probe(struct auxiliary_device *auxdev)
-> +{
-> +	mutex_init(&auxdev->sysfs.lock);
-> +	xa_init(&auxdev->sysfs.irqs);
+> #define BRCM_PHY_REV(phydev) \
+>          ((phydev)->drv->phy_id & ~((phydev)->drv->phy_id_mask))
+> 
+> #define PHY_ID_BCM50610                 0x0143bd60
+> #define PHY_ID_BCM50610M                0x0143bd70
+> 
+>          if ((BRCM_PHY_MODEL(phydev) == PHY_ID_BCM50610 ||
+>               BRCM_PHY_MODEL(phydev) == PHY_ID_BCM50610M) &&
+>              BRCM_PHY_REV(phydev) >= 0x3) {
+> 
+> and from the PHY driver table:
+> 
+>          .phy_id         = PHY_ID_BCM50610,
+>          .phy_id_mask    = 0xfffffff0,
+> 
+>          .phy_id         = PHY_ID_BCM50610M,
+>          .phy_id_mask    = 0xfffffff0,
+> 
+> BRCM_PHY_REV() looks at _this_ .phy_id in the table, and tries to match
+> it against the revision field bits 0-3 being >= 3 - but as we can see,
+> this field is set to the defined value which has bits 0-3 always as
+> zero. So, this if() statement is always false.
+> 
+> So, BRCM_PHY_REV() should be:
+> 
+> #define BRCM_PHY_REV(phydev) \
+> 	((phydev)->phy_id & ~(phydev)->drv->phy_id_mask)
+> 
+> 
+> Next, I question why BRCM_PHY_MODEL() exists in the first place.
+> phydev->drv->phy_id is initialised to the defined value(s), and then
+> we end up doing:
+> 
+> 	(phydev->drv->phy_id & phydev->drv->phy_id_mask) ==
+> 		one-of-those-defined-values
+> 
+> which is pointless, because we know that what is in phydev->drv->phy_id
+> /is/ one-of-those-defined-values.
+> 
+> Therefore, I would suggest:
+> 
+> #define BRCM_PHY_MODEL(phydev) ((phydev)->drv->phy_id)
+> 
+> is entirely sufficient, and with such a simple definition, I question
+> the value of BRCM_PHY_MODEL() existing.
 
-You aren't adding anything to sysfs here, so why is this called
-auxiliary_bus_sysfs_probe()?  Naming is hard, I know :(
+If I were to make a guess, BRCM_PHY_MODEL() might have existed to ease 
+the porting of a non-Linux PHY driver to a Linux PHY driver environment 
+at a time where the subsystem was not as mature as it is now.
 
-> +}
-> +
-> +static void auxiliary_bus_sysfs_remove(struct auxiliary_device *auxdev)
-> +{
-> +	xa_destroy(&auxdev->sysfs.irqs);
-> +	mutex_destroy(&auxdev->sysfs.lock);
+In the interest of a targeted bug fix, I would be keen on taking this 
+patch in its current form and follow up in net next with a removal of 
+BRCM_PHY_MODEL() later on.
+-- 
+Florian
 
-Same here, you aren't removing anything from sysfs.
-
-> --- a/drivers/base/core.c
-> +++ b/drivers/base/core.c
-> @@ -2835,17 +2835,8 @@ static void devm_attr_group_remove(struct device *dev, void *res)
->  	sysfs_remove_group(&dev->kobj, group);
->  }
->  
-> -/**
-> - * devm_device_add_group - given a device, create a managed attribute group
-> - * @dev:	The device to create the group for
-> - * @grp:	The attribute group to create
-> - *
-> - * This function creates a group for the first time.  It will explicitly
-> - * warn and error if any of the attribute files being created already exist.
-> - *
-> - * Returns 0 on success or error code on failure.
-> - */
-> -int devm_device_add_group(struct device *dev, const struct attribute_group *grp)
-> +static int __devm_device_add_group(struct device *dev, const struct attribute_group *grp,
-> +				   bool sysfs_update)
->  {
->  	union device_attr_group_devres *devres;
->  	int error;
-> @@ -2855,7 +2846,8 @@ int devm_device_add_group(struct device *dev, const struct attribute_group *grp)
->  	if (!devres)
->  		return -ENOMEM;
->  
-> -	error = sysfs_create_group(&dev->kobj, grp);
-> +	error = sysfs_update ? sysfs_update_group(&dev->kobj, grp) :
-> +			       sysfs_create_group(&dev->kobj, grp);
-
-Add is really an update?  That feels broken.
-
->  	if (error) {
->  		devres_free(devres);
->  		return error;
-> @@ -2865,8 +2857,57 @@ int devm_device_add_group(struct device *dev, const struct attribute_group *grp)
->  	devres_add(dev, devres);
->  	return 0;
->  }
-> +
-> +/**
-> + * devm_device_add_group - given a device, create a managed attribute group
-> + * @dev:	The device to create the group for
-> + * @grp:	The attribute group to create
-> + *
-> + * This function creates a group for the first time.  It will explicitly
-> + * warn and error if any of the attribute files being created already exist.
-> + *
-> + * Returns 0 on success or error code on failure.
-> + */
-> +int devm_device_add_group(struct device *dev, const struct attribute_group *grp)
-> +{
-> +	return __devm_device_add_group(dev, grp, false);
-> +}
->  EXPORT_SYMBOL_GPL(devm_device_add_group);
->  
-> +static int devm_device_group_match(struct device *dev, void *res, void *grp)
-> +{
-> +	union device_attr_group_devres *devres = res;
-> +
-> +	return devres->group == grp;
-> +}
-> +
-> +/**
-> + * devm_device_update_group - given a device, update managed attribute group
-> + * @dev:	The device to update the group for
-> + * @grp:	The attribute group to update
-> + *
-> + * This function updates a managed attribute group, create it if it does not
-> + * exist and converts an unmanaged attributes group into a managed attributes
-> + * group. Unlike devm_device_add_group it will explicitly not warn or error if
-> + * any of the attribute files being created already exist. Furthermore, if the
-> + * visibility of the files has changed through the is_visible() callback, it
-> + * will update the permissions and add or remove the relevant files. Changing a
-> + * group's name (subdirectory name under kobj's directory in sysfs) is not
-> + * allowed.
-> + *
-> + * Returns 0 on success or error code on failure.
-> + */
-> +int devm_device_update_group(struct device *dev, const struct attribute_group *grp)
-> +{
-> +	union device_attr_group_devres *devres;
-> +
-> +	devres = devres_find(dev, devm_attr_group_remove, devm_device_group_match, (void *)grp);
-> +
-> +	return devres ? sysfs_update_group(&dev->kobj, grp) :
-> +			__devm_device_add_group(dev, grp, true);
-> +}
-> +EXPORT_SYMBOL_GPL(devm_device_update_group);
-
-Who is now using this new function?  I don't see it here in this patch,
-so why is it included here?
-
-> +
->  static int device_add_attrs(struct device *dev)
->  {
->  	const struct class *class = dev->class;
-> diff --git a/include/linux/auxiliary_bus.h b/include/linux/auxiliary_bus.h
-> index 65dd7f154374..d8684cbff54e 100644
-> --- a/include/linux/auxiliary_bus.h
-> +++ b/include/linux/auxiliary_bus.h
-> @@ -146,7 +146,6 @@ struct auxiliary_device {
->  	struct {
->  		struct xarray irqs;
->  		struct mutex lock; /* Synchronize irq sysfs creation */
-> -		bool irq_dir_exists;
->  	} sysfs;
->  };
->  
-> @@ -238,7 +237,6 @@ auxiliary_device_sysfs_irq_remove(struct auxiliary_device *auxdev, int irq) {}
->  
->  static inline void auxiliary_device_uninit(struct auxiliary_device *auxdev)
->  {
-> -	mutex_destroy(&auxdev->sysfs.lock);
->  	put_device(&auxdev->dev);
->  }
->  
-> diff --git a/include/linux/device.h b/include/linux/device.h
-> index 80a5b3268986..faec7a3fab68 100644
-> --- a/include/linux/device.h
-> +++ b/include/linux/device.h
-> @@ -1273,6 +1273,8 @@ static inline void device_remove_group(struct device *dev,
->  
->  int __must_check devm_device_add_group(struct device *dev,
->  				       const struct attribute_group *grp);
-> +int __must_check devm_device_update_group(struct device *dev,
-> +					  const struct attribute_group *grp);
-
-Oh no, please no.  I hate the devm_device_add_group() to start with (and
-still think it is wrong and will break people's real use cases), I don't
-want to mess with a update group thing as well.
-
-Please fix this up and make this a patch series to make it more obvious
-why all of this is needed, and that the change really is fixing a real
-problem.  As it is, I can't take this, sorry.
-
-greg k-h
 
