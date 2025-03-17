@@ -1,223 +1,259 @@
-Return-Path: <netdev+bounces-175306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C20FA65068
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 14:13:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D00B0A6507B
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 14:17:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88113169A5B
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 13:13:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22AB23B1DF4
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 13:17:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02A0E23DE95;
-	Mon, 17 Mar 2025 13:13:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4915823AE96;
+	Mon, 17 Mar 2025 13:17:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="FgOcj101"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="sANmLoSq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 939D523C8D6
-	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 13:13:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18F09221723;
+	Mon, 17 Mar 2025 13:17:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742217208; cv=none; b=UXgXbX7j5CL0XdBOy/jgFgat6uNcXRPrwYdUNicRXiUbioA460+6VEDGv3T2D4ex+9q0iv3VXJ5ZNSBfpmRBYlPeiBamNfjpSEbxdOoalNhFgq0+mi9+BR8klnPB/2roWLRl/b/c3cVWZvvTkDNQ5gz1CFLhYOgaaypDmzRC9ps=
+	t=1742217462; cv=none; b=Z/brXzs1kWfYt5aSnZYZ/Ur1BKOn0wgO/360P68DbdTww/QFFjWRCyXOXzM2pHagYO5SB4yN9fhrr6vGY3LuvLebdfzSJXB5siC4/h0+UgPuXr1Ol2ouz2uIWmvxhglDNCi8VSW4wf5aQERSqFMuLe6whKkvmhEgNHlNEr0GNsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742217208; c=relaxed/simple;
-	bh=7wI0GFr6NEtBefK5vBeM6pSYWVuW1EUTOFVTFysVtfw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eNUs0/dB4pDTKAPh2Txxye1qhCST5DeHzFBemJT3Q4xRmEvfKPpYE1Aj1+2iGmjZMjglYucNLpDzhQhFLtg+7otLTLxbRiHO0jPYlfwED/z4CTCsxfA75aHrU60+P7HvES6qi+nntcGlgp3ERwMkaOkXcFdOfH14DKkuVUISyy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=FgOcj101; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ac2a9a74d9cso901347666b.1
-        for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 06:13:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1742217205; x=1742822005; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=cmuHqqWaECn9+fr8TyC+jop8pIhCRJbKxkuWi0YwZ9M=;
-        b=FgOcj101/X5dA5I0SLGl40v2IZ5x2h3M4ui5vivkvey58gI23it4URbq6eqCgIH0ja
-         2R2b/cOFWA4BwvzkPqcZazsGvxprQYR3v4NgMwVM+4d8wHtxPHuecUFPKsQncMnkfmp/
-         YlXFahxqO+yOsNrvpYg635VUy0b9kxfxcpFhxettqElyberyNUIAuOm3mutzUkYkEcdr
-         nbkRyP2Pn1A8LuZxYfpGsIB0M0B3vncKSH751SoUMZnTUxGq51z/sZ01iAYVdZjNjd3i
-         23JYtfHTKzScEJHVZpxsYBp2AbmH37vHWBDhgwCJbz1+a3zihafz/o0l8/k4XvCP5jJ+
-         Ptzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742217205; x=1742822005;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cmuHqqWaECn9+fr8TyC+jop8pIhCRJbKxkuWi0YwZ9M=;
-        b=OniOCxCxSAL+4/nWmjcxRKzpZ+6RH7yrvEGr12heUitpYZocHy2qNSISHOoSWx61nF
-         wNsg/94OdkMeZeSa7JvJFcZrdq2eTl5hEvqgyQF7LShmwjRwpGrPuqhx+x28EkUmQjyM
-         ofdskSOU0dj1D7+Eh0BhcTM5X5aPo03C866CFfsomJLZMbZrrZiu6gShU4gviQ8XteAx
-         EqAKUvCEtW+JhIFqy84/RxIEnuwUB5I6C8zzWnkJTpYHCYOclsWy4c0guy16egEZrR/2
-         z9RKdHNp6/um41c7tE2CoRhTGSG2tkHZ2AdHZfs4s2hN+KO8xP+Txu222m9UkpisoI+e
-         tRmA==
-X-Gm-Message-State: AOJu0YwPif9tUmtg1LBQfXmdEnvmPcaU/Rsv3tbYeM/R/3+GodQvfMBd
-	8FoZabCTILK4thAQUa1WuRUkjIPAlAiNR8QlgNo8fI23Au7Tqw9TFahICQ4Cu78/HojcI46AgLK
-	QAw1PmGtB9iByqQ/G0oHVB5gGDgDl7dySxRqGVKc44tEg/eA=
-X-Gm-Gg: ASbGncsdGph09oC5aI3THcYUujRZu1kr00ZZ8hVFajMv6snEhb3uDUMuh/pAPQ9EWAZ
-	sPRpXvKvwR5LDl934ighwqNNSfUk6BMmyNlfNDwB5v0j+bRPN5b61cIvrc7eREfQJ+ffMH0j/cI
-	vL54Fs86h8Bru35l81OOcCp13JH7p5yks9Le9uiuFXx39J7GqWFnypuaAUExil2TcyV4s76mvdN
-	bZkopxABxrabk3ahFSBnGiSYLuH5n5YOdvixszRkzJrXC4dssXUtlvhtDaoHWiqE0DYdsu/v+2U
-	LftO9Sl/Y+ndS5pH56xSmX/NP3uG6lQuez2Yd1+CTYWRtHJfBCVLWjX6Dp9O5Kzyy+vUuqO+8rW
-	umR8LJWU=
-X-Google-Smtp-Source: AGHT+IEynz9NgaiPiOrnil0ZctkBGMDjxMtCDg8JJcR4DlOmkm44qC3owxqgHREci25oeAobfTCYPw==
-X-Received: by 2002:a17:907:9725:b0:abf:73ba:fd60 with SMTP id a640c23a62f3a-ac3301fbefcmr1023515166b.29.1742217204702;
-        Mon, 17 Mar 2025 06:13:24 -0700 (PDT)
-Received: from ?IPV6:2001:67c:2fbc:1:23e9:a6ad:805e:ca75? ([2001:67c:2fbc:1:23e9:a6ad:805e:ca75])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac314a9daf1sm661556666b.166.2025.03.17.06.13.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Mar 2025 06:13:24 -0700 (PDT)
-Message-ID: <729e6413-98fb-439b-ad33-830bb10d1016@openvpn.net>
-Date: Mon, 17 Mar 2025 14:13:23 +0100
+	s=arc-20240116; t=1742217462; c=relaxed/simple;
+	bh=TPKHUiHB8npev+o/UGiouI0z2ofhbOshB8WZo/QHzho=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f6kpX+dfSTRUP/dCJF1EcDEgrOEnG1yUd6XNsH1VBxpuSi0vO/Hq5mJ0LUnaBky97wtKkFAHv7qnkHdBC/sz8Ny1sOauMqbMRLbmYRC4IUaGZNkRljNSX6lPDSRvocPKSGx+FvRdD5xtKaISlfavsdn3v4GymWdDvvCfALJPXSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=sANmLoSq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73D61C4CEE3;
+	Mon, 17 Mar 2025 13:17:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1742217461;
+	bh=TPKHUiHB8npev+o/UGiouI0z2ofhbOshB8WZo/QHzho=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sANmLoSqJM4QLLMO1IeYa67AZ5wgqu22WjonvrN8VYOUdJi/00OaCt5HCvu1QmcGQ
+	 cGvrcmE6QjVz5E0jsS5JcOK1YbcZL3twB4sAHjnS3cITAqb4WcqZIx++MscVyFj0yF
+	 ciryUwQRx62o959XR4oPCw7Ju6uRrKlS4JdOgpJg=
+Date: Mon, 17 Mar 2025 14:16:15 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Mark Bloch <mbloch@nvidia.com>
+Cc: Dave Ertman <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, horms@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, leon@kernel.org, shayd@nvidia.com,
+	przemyslaw.kitszel@intel.com, parav@nvidia.com,
+	Amir Tzin <amirtz@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>
+Subject: Re: [PATCH net] driver core: auxiliary bus: Fix sysfs creation on
+ bind
+Message-ID: <2025031710-herald-sinner-cbc2@gregkh>
+References: <20250317103254.573985-1-mbloch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v23 18/23] ovpn: implement peer
- add/get/dump/delete via netlink
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
-References: <20250312-b4-ovpn-v23-0-76066bc0a30c@openvpn.net>
- <20250312-b4-ovpn-v23-18-76066bc0a30c@openvpn.net> <Z9gZ8l9mrF75M-Ih@krikkit>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- xsFNBFN3k+ABEADEvXdJZVUfqxGOKByfkExNpKzFzAwHYjhOb3MTlzSLlVKLRIHxe/Etj13I
- X6tcViNYiIiJxmeHAH7FUj/yAISW56lynAEt7OdkGpZf3HGXRQz1Xi0PWuUINa4QW+ipaKmv
- voR4b1wZQ9cZ787KLmu10VF1duHW/IewDx9GUQIzChqQVI3lSHRCo90Z/NQ75ZL/rbR3UHB+
- EWLIh8Lz1cdE47VaVyX6f0yr3Itx0ZuyIWPrctlHwV5bUdA4JnyY3QvJh4yJPYh9I69HZWsj
- qplU2WxEfM6+OlaM9iKOUhVxjpkFXheD57EGdVkuG0YhizVF4p9MKGB42D70pfS3EiYdTaKf
- WzbiFUunOHLJ4hyAi75d4ugxU02DsUjw/0t0kfHtj2V0x1169Hp/NTW1jkqgPWtIsjn+dkde
- dG9mXk5QrvbpihgpcmNbtloSdkRZ02lsxkUzpG8U64X8WK6LuRz7BZ7p5t/WzaR/hCdOiQCG
- RNup2UTNDrZpWxpwadXMnJsyJcVX4BAKaWGsm5IQyXXBUdguHVa7To/JIBlhjlKackKWoBnI
- Ojl8VQhVLcD551iJ61w4aQH6bHxdTjz65MT2OrW/mFZbtIwWSeif6axrYpVCyERIDEKrX5AV
- rOmGEaUGsCd16FueoaM2Hf96BH3SI3/q2w+g058RedLOZVZtyQARAQABzSdBbnRvbmlvIFF1
- YXJ0dWxsaSA8YW50b25pb0BvcGVudnBuLm5ldD7Cwa0EEwEIAFcCGwMFCwkIBwMFFQoJCAsF
- FgIDAQACHgECF4AFCRWQ2TIWIQTKvaEoIBfCZyGYhcdI8My2j1nRTAUCYRUquBgYaGtwczov
- L2tleXMub3BlbnBncC5vcmcACgkQSPDMto9Z0UzmcxAAjzLeD47We0R4A/14oDKlZxXO0mKL
- fCzaWFsdhQCDhZkgxoHkYRektK2cEOh4Vd+CnfDcPs/iZ1i2+Zl+va79s4fcUhRReuwi7VCg
- 7nHiYSNC7qZo84Wzjz3RoGYyJ6MKLRn3zqAxUtFECoS074/JX1sLG0Z3hi19MBmJ/teM84GY
- IbSvRwZu+VkJgIvZonFZjbwF7XyoSIiEJWQC+AKvwtEBNoVOMuH0tZsgqcgMqGs6lLn66RK4
- tMV1aNeX6R+dGSiu11i+9pm7sw8tAmsfu3kQpyk4SB3AJ0jtXrQRESFa1+iemJtt+RaSE5LK
- 5sGLAO+oN+DlE0mRNDQowS6q/GBhPCjjbTMcMfRoWPCpHZZfKpv5iefXnZ/xVj7ugYdV2T7z
- r6VL2BRPNvvkgbLZgIlkWyfxRnGh683h4vTqRqTb1wka5pmyBNAv7vCgqrwfvaV1m7J9O4B5
- PuRjYRelmCygQBTXFeJAVJvuh2efFknMh41R01PP2ulXAQuVYEztq3t3Ycw6+HeqjbeqTF8C
- DboqYeIM18HgkOqRrn3VuwnKFNdzyBmgYh/zZx/dJ3yWQi/kfhR6TawAwz6GdbQGiu5fsx5t
- u14WBxmzNf9tXK7hnXcI24Z1z6e5jG6U2Swtmi8sGSh6fqV4dBKmhobEoS7Xl496JN2NKuaX
- jeWsF2rOwE0EZmhJFwEIAOAWiIj1EYkbikxXSSP3AazkI+Y/ICzdFDmiXXrYnf/mYEzORB0K
- vqNRQOdLyjbLKPQwSjYEt1uqwKaD1LRLbA7FpktAShDK4yIljkxhvDI8semfQ5WE/1Jj/I/Q
- U+4VXhkd6UvvpyQt/LiWvyAfvExPEvhiMnsg2zkQbBQ/M4Ns7ck0zQ4BTAVzW/GqoT2z03mg
- p1FhxkfzHMKPQ6ImEpuY5cZTQwrBUgWif6HzCtQJL7Ipa2fFnDaIHQeiJG0RXl/g9x3YlwWG
- sxOFrpWWsh6GI0Mo2W2nkinEIts48+wNDBCMcMlOaMYpyAI7fT5ziDuG2CBA060ZT7qqdl6b
- aXUAEQEAAcLBfAQYAQgAJhYhBMq9oSggF8JnIZiFx0jwzLaPWdFMBQJmaEkXAhsMBQkB4TOA
- AAoJEEjwzLaPWdFMbRUP/0t5FrjF8KY6uCU4Tx029NYKDN9zJr0CVwSGsNfC8WWonKs66QE1
- pd6xBVoBzu5InFRWa2ed6d6vBw2BaJHC0aMg3iwwBbEgPn4Jx89QfczFMJvFm+MNc2DLDrqN
- zaQSqBzQ5SvUjxh8lQ+iqAhi0MPv4e2YbXD0ROyO+ITRgQVZBVXoPm4IJGYWgmVmxP34oUQh
- BM7ipfCVbcOFU5OPhd9/jn1BCHzir+/i0fY2Z/aexMYHwXUMha/itvsBHGcIEYKk7PL9FEfs
- wlbq+vWoCtUTUc0AjDgB76AcUVxxJtxxpyvES9aFxWD7Qc+dnGJnfxVJI0zbN2b37fX138Bf
- 27NuKpokv0sBnNEtsD7TY4gBz4QhvRNSBli0E5bGUbkM31rh4Iz21Qk0cCwR9D/vwQVsgPvG
- ioRqhvFWtLsEt/xKolOmUWA/jP0p8wnQ+3jY6a/DJ+o5LnVFzFqbK3fSojKbfr3bY33iZTSj
- DX9A4BcohRyqhnpNYyHL36gaOnNnOc+uXFCdoQkI531hXjzIsVs2OlfRufuDrWwAv+em2uOT
- BnRX9nFx9kPSO42TkFK55Dr5EDeBO3v33recscuB8VVN5xvh0GV57Qre+9sJrEq7Es9W609a
- +M0yRJWJEjFnMa/jsGZ+QyLD5QTL6SGuZ9gKI3W1SfFZOzV7hHsxPTZ6
-Organization: OpenVPN Inc.
-In-Reply-To: <Z9gZ8l9mrF75M-Ih@krikkit>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250317103254.573985-1-mbloch@nvidia.com>
 
-On 17/03/2025 13:47, Sabrina Dubroca wrote:
-> Hello,
+On Mon, Mar 17, 2025 at 12:32:54PM +0200, Mark Bloch wrote:
+> From: Amir Tzin <amirtz@nvidia.com>
 > 
-> A few comments since it seems you'll have to send one more version
-> (otherwise they could be fixed later).
+> In case an auxiliary device with IRQs directory is unbinded, the
+> directory is released, but auxdev->sysfs.irq_dir_exists remains true.
+> This leads to a failure recreating the directory on bind.
 > 
-> 2025-03-12, 21:54:27 +0100, Antonio Quartulli wrote:
->> diff --git a/drivers/net/ovpn/netlink.c b/drivers/net/ovpn/netlink.c
->> index 8d267d4c82283d9b5f989478102086ce385195d5..407b5b908be431625a3c258e7887211ef0f4b197 100644
->> --- a/drivers/net/ovpn/netlink.c
->> +++ b/drivers/net/ovpn/netlink.c
-> [...]
->> +static int ovpn_nl_peer_modify(struct ovpn_peer *peer, struct genl_info *info,
->> +			       struct nlattr **attrs)
->> +{
->> +	struct sockaddr_storage ss = {};
->> +	void *local_ip = NULL;
->> +	u32 interv, timeout;
->> +	bool rehash = false;
->> +	int ret;
->> +
->> +	spin_lock_bh(&peer->lock);
->> +
->> +	if (ovpn_nl_attr_sockaddr_remote(attrs, &ss)) {
->> +		/* we carry the local IP in a generic container.
->> +		 * ovpn_peer_reset_sockaddr() will properly interpret it
->> +		 * based on ss.ss_family
->> +		 */
->> +		local_ip = ovpn_nl_attr_local_ip(attrs);
->> +
->> +		/* set peer sockaddr */
->> +		ret = ovpn_peer_reset_sockaddr(peer, &ss, local_ip);
->> +		if (ret < 0) {
->> +			NL_SET_ERR_MSG_FMT_MOD(info->extack,
->> +					       "cannot set peer sockaddr: %d",
->> +					       ret);
->> +			goto err_unlock;
->> +		}
+> Remove flag auxdev->sysfs.irq_dir_exists, add an API for updating
+> managed attributes group and use it to create the IRQs attribute group
+> as it does not fail if the group exists. Move initialization of the
+> sysfs xarray to auxiliary device probe.
+
+This feels like a lot of different things all tied up into one patch,
+why isn't this a series?
+
+> Fixes: a808878308a8 ("driver core: auxiliary bus: show auxiliary device IRQs")
+> Signed-off-by: Amir Tzin <amirtz@nvidia.com>
+> Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
+> Signed-off-by: Mark Bloch <mbloch@nvidia.com>
+
+Why the [net] on the subject line, this is not for the networking
+tree...
+
+> ---
+>  drivers/base/auxiliary.c       | 20 +++++++++--
+>  drivers/base/auxiliary_sysfs.c | 13 +------
+>  drivers/base/core.c            | 65 +++++++++++++++++++++++++++-------
+>  include/linux/auxiliary_bus.h  |  2 --
+>  include/linux/device.h         |  2 ++
+>  5 files changed, 73 insertions(+), 29 deletions(-)
 > 
-> Similar to the floating case, this should reset the peer dst_cache? In
-> both cases we're updating the remote peer's address and our local
-> address.
-> 
+> diff --git a/drivers/base/auxiliary.c b/drivers/base/auxiliary.c
+> index afa4df4c5a3f..56a487fce053 100644
+> --- a/drivers/base/auxiliary.c
+> +++ b/drivers/base/auxiliary.c
+> @@ -201,6 +201,18 @@ static const struct dev_pm_ops auxiliary_dev_pm_ops = {
+>  	SET_SYSTEM_SLEEP_PM_OPS(pm_generic_suspend, pm_generic_resume)
+>  };
+>  
+> +static void auxiliary_bus_sysfs_probe(struct auxiliary_device *auxdev)
+> +{
+> +	mutex_init(&auxdev->sysfs.lock);
+> +	xa_init(&auxdev->sysfs.irqs);
 
-makes sense.
-Then I should probably move the call to dst_cache_reset() to 
-ovpn_peer_reset_sockaddr() and slightly adjust 
-ovpn_peer_endpoints_update() to avoid a double invocation.
+You aren't adding anything to sysfs here, so why is this called
+auxiliary_bus_sysfs_probe()?  Naming is hard, I know :(
 
-> 
-> ...
->> diff --git a/drivers/net/ovpn/peer.c b/drivers/net/ovpn/peer.c
->> index 0d8b12fd5de4cd6fe15455b435c7d6807203a825..aead1d75400a604a320c886aed5308fb20475da3 100644
->> --- a/drivers/net/ovpn/peer.c
->> +++ b/drivers/net/ovpn/peer.c
-> ...
->> @@ -1335,8 +1356,11 @@ void ovpn_peer_keepalive_work(struct work_struct *work)
->>   		netdev_dbg(ovpn->dev,
->>   			   "scheduling keepalive work: now=%llu next_run=%llu delta=%llu\n",
->>   			   next_run, now, next_run - now);
->> +		/* due to the waiting above, the next_run deadline may have
->> +		 * passed: in this case we reschedule the worker immediately
->> +		 */
->>   		schedule_delayed_work(&ovpn->keepalive_work,
->> -				      (next_run - now) * HZ);
->> +				      (now - next_run) * HZ);
-> 
-> This whole hunk should be dropped, no? The comment is outdated, and
-> the sign swap is confusing me.
+> +}
+> +
+> +static void auxiliary_bus_sysfs_remove(struct auxiliary_device *auxdev)
+> +{
+> +	xa_destroy(&auxdev->sysfs.irqs);
+> +	mutex_destroy(&auxdev->sysfs.lock);
 
-ouch right. fix-during-rebase gone slightly wrong.
+Same here, you aren't removing anything from sysfs.
 
-Thanks!
+> --- a/drivers/base/core.c
+> +++ b/drivers/base/core.c
+> @@ -2835,17 +2835,8 @@ static void devm_attr_group_remove(struct device *dev, void *res)
+>  	sysfs_remove_group(&dev->kobj, group);
+>  }
+>  
+> -/**
+> - * devm_device_add_group - given a device, create a managed attribute group
+> - * @dev:	The device to create the group for
+> - * @grp:	The attribute group to create
+> - *
+> - * This function creates a group for the first time.  It will explicitly
+> - * warn and error if any of the attribute files being created already exist.
+> - *
+> - * Returns 0 on success or error code on failure.
+> - */
+> -int devm_device_add_group(struct device *dev, const struct attribute_group *grp)
+> +static int __devm_device_add_group(struct device *dev, const struct attribute_group *grp,
+> +				   bool sysfs_update)
+>  {
+>  	union device_attr_group_devres *devres;
+>  	int error;
+> @@ -2855,7 +2846,8 @@ int devm_device_add_group(struct device *dev, const struct attribute_group *grp)
+>  	if (!devres)
+>  		return -ENOMEM;
+>  
+> -	error = sysfs_create_group(&dev->kobj, grp);
+> +	error = sysfs_update ? sysfs_update_group(&dev->kobj, grp) :
+> +			       sysfs_create_group(&dev->kobj, grp);
 
-> 
+Add is really an update?  That feels broken.
 
--- 
-Antonio Quartulli
-OpenVPN Inc.
+>  	if (error) {
+>  		devres_free(devres);
+>  		return error;
+> @@ -2865,8 +2857,57 @@ int devm_device_add_group(struct device *dev, const struct attribute_group *grp)
+>  	devres_add(dev, devres);
+>  	return 0;
+>  }
+> +
+> +/**
+> + * devm_device_add_group - given a device, create a managed attribute group
+> + * @dev:	The device to create the group for
+> + * @grp:	The attribute group to create
+> + *
+> + * This function creates a group for the first time.  It will explicitly
+> + * warn and error if any of the attribute files being created already exist.
+> + *
+> + * Returns 0 on success or error code on failure.
+> + */
+> +int devm_device_add_group(struct device *dev, const struct attribute_group *grp)
+> +{
+> +	return __devm_device_add_group(dev, grp, false);
+> +}
+>  EXPORT_SYMBOL_GPL(devm_device_add_group);
+>  
+> +static int devm_device_group_match(struct device *dev, void *res, void *grp)
+> +{
+> +	union device_attr_group_devres *devres = res;
+> +
+> +	return devres->group == grp;
+> +}
+> +
+> +/**
+> + * devm_device_update_group - given a device, update managed attribute group
+> + * @dev:	The device to update the group for
+> + * @grp:	The attribute group to update
+> + *
+> + * This function updates a managed attribute group, create it if it does not
+> + * exist and converts an unmanaged attributes group into a managed attributes
+> + * group. Unlike devm_device_add_group it will explicitly not warn or error if
+> + * any of the attribute files being created already exist. Furthermore, if the
+> + * visibility of the files has changed through the is_visible() callback, it
+> + * will update the permissions and add or remove the relevant files. Changing a
+> + * group's name (subdirectory name under kobj's directory in sysfs) is not
+> + * allowed.
+> + *
+> + * Returns 0 on success or error code on failure.
+> + */
+> +int devm_device_update_group(struct device *dev, const struct attribute_group *grp)
+> +{
+> +	union device_attr_group_devres *devres;
+> +
+> +	devres = devres_find(dev, devm_attr_group_remove, devm_device_group_match, (void *)grp);
+> +
+> +	return devres ? sysfs_update_group(&dev->kobj, grp) :
+> +			__devm_device_add_group(dev, grp, true);
+> +}
+> +EXPORT_SYMBOL_GPL(devm_device_update_group);
 
+Who is now using this new function?  I don't see it here in this patch,
+so why is it included here?
+
+> +
+>  static int device_add_attrs(struct device *dev)
+>  {
+>  	const struct class *class = dev->class;
+> diff --git a/include/linux/auxiliary_bus.h b/include/linux/auxiliary_bus.h
+> index 65dd7f154374..d8684cbff54e 100644
+> --- a/include/linux/auxiliary_bus.h
+> +++ b/include/linux/auxiliary_bus.h
+> @@ -146,7 +146,6 @@ struct auxiliary_device {
+>  	struct {
+>  		struct xarray irqs;
+>  		struct mutex lock; /* Synchronize irq sysfs creation */
+> -		bool irq_dir_exists;
+>  	} sysfs;
+>  };
+>  
+> @@ -238,7 +237,6 @@ auxiliary_device_sysfs_irq_remove(struct auxiliary_device *auxdev, int irq) {}
+>  
+>  static inline void auxiliary_device_uninit(struct auxiliary_device *auxdev)
+>  {
+> -	mutex_destroy(&auxdev->sysfs.lock);
+>  	put_device(&auxdev->dev);
+>  }
+>  
+> diff --git a/include/linux/device.h b/include/linux/device.h
+> index 80a5b3268986..faec7a3fab68 100644
+> --- a/include/linux/device.h
+> +++ b/include/linux/device.h
+> @@ -1273,6 +1273,8 @@ static inline void device_remove_group(struct device *dev,
+>  
+>  int __must_check devm_device_add_group(struct device *dev,
+>  				       const struct attribute_group *grp);
+> +int __must_check devm_device_update_group(struct device *dev,
+> +					  const struct attribute_group *grp);
+
+Oh no, please no.  I hate the devm_device_add_group() to start with (and
+still think it is wrong and will break people's real use cases), I don't
+want to mess with a update group thing as well.
+
+Please fix this up and make this a patch series to make it more obvious
+why all of this is needed, and that the change really is fixing a real
+problem.  As it is, I can't take this, sorry.
+
+greg k-h
 
