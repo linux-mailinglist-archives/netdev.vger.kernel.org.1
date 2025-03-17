@@ -1,291 +1,245 @@
-Return-Path: <netdev+bounces-175353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38C4BA65583
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 16:26:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8700DA65593
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 16:30:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAB041747EE
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 15:26:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABF0B3B8CB0
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 15:30:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 797162459DC;
-	Mon, 17 Mar 2025 15:26:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0917B246326;
+	Mon, 17 Mar 2025 15:30:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gCVvCDg+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XvvTdAZh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7781516E863;
-	Mon, 17 Mar 2025 15:26:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742225206; cv=fail; b=QmBfJpLBnYxZgN+x8KcukN9tRtawPJj4+Io3ECsihbbnFbORI0ChZCaOMDZ9YI9T44e14nVvpZEj/4cDUe8/cYtFMNM0xjb1PRFJGF2RSLbihPx2/M4K9JPe3t5Jy++YJmo3sTE6k1p1PiROXKxIZW2ZsbpikbfpfbcyfyP+Oks=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742225206; c=relaxed/simple;
-	bh=W1eepay6lE4b+JRy548CGUdWIHMweKdbISKLVMjITco=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=EnQHQ9Sbb6Kf1m7hSMSwJe/x7ZJVHbzE92ZXj1L1cpDVtMWKfGsodFYTqrTXypU+R5IWA62hjFHuE0N1MksDlJ2Q8WgHm2CeZ1jmVYZb/ep51IxHyRSgmhq5vMrUMLflKv1XLIgXFO295vP4mr8xzAsJ6Xz52DR7yufrawezCCU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gCVvCDg+; arc=fail smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1742225204; x=1773761204;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=W1eepay6lE4b+JRy548CGUdWIHMweKdbISKLVMjITco=;
-  b=gCVvCDg+/KvI7SeCWysbM+c+Kb4GUcAtNjs3WiChgXZOK7zYdg1blAG0
-   EliFjHio8L5oaboTlTVPmixhdpyY7+W2FpoEJxMrBEEz67k6/mhAvdwtX
-   D/CyJhOXc9JfRHQGnqZuqT/oRv0KVcQos4Kibky4vmGTEBBQkxFliam+w
-   QJD70byseNHpqGNgqwyApa6qtvy5+0ghivczKJ6wFEiMv/thzwpAovyTY
-   +2l3B6jOKliZffDw0IeP2Vv+M5GcWkLrT6xryIuIj6nOVN0wKwCZPcGsT
-   Y2Uw8B81+Fz3RabpE2qn3g2+COvtMiz0Qtgfo0s/vzuZLlKh3c14yILkw
-   w==;
-X-CSE-ConnectionGUID: uOZzFq6DTG6BYTBgdOOfuw==
-X-CSE-MsgGUID: 6Spzy3qjSOef02goR0WKtQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11376"; a="65789849"
-X-IronPort-AV: E=Sophos;i="6.14,254,1736841600"; 
-   d="scan'208";a="65789849"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2025 08:26:38 -0700
-X-CSE-ConnectionGUID: Y91+bUq2S7ydf7KjBwpYoA==
-X-CSE-MsgGUID: QebGlAERR1u13llFfc1zzQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,254,1736841600"; 
-   d="scan'208";a="121695841"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2025 08:26:35 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Mon, 17 Mar 2025 08:26:34 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Mon, 17 Mar 2025 08:26:34 -0700
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.42) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Mon, 17 Mar 2025 08:26:30 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=VPyRy7ZzsxKYhgFJtpeQN+XXnffrtzUPV0iRVmPjkZD2dd8vpsfP8y2TwD0G2cEuCIPoXqnVEUmKjmu0GZYw17TULYL+kisyD5fALwKGEQM3XZ+KUpQEOy0jyEr5rLDWaqydrjiLJYzI1uSBv91wFGLfP7pEJkIbJscSQm9uRB1JDY/p87uZVdJNhejYYK3xK+BldL0fu3uYMBpK+qdryHzh044d2xT0VZ1cx2lyuI9BsnBRH9/W67r237bx1lCC3yCU9PKULCyDXuldt/fJ+StW6gg264geySoqMHEsFp69i2/R/PiunecGsqrieXUC8mUfloarfwPMAQnF4qpr0Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TQVohaY0LOeTm1pIT8iyKUZ8QHiG8O6GhpkbXYqbPNk=;
- b=uCwMkfm4v2xxf02av7U1ZGA1ZY1pX09cNdjnooZmt722tCBUiQlDRY+HSF67lgxpUiq2DEH20L3ZytppzdrJ+tT1vuSuNPy+kP/8SkYWffgQJQajoWPMmf/1hKo1FvH/QVesE5CZoTvsAWOIJzyxxo2p3tIGFF+KR24RM8H+bP0G8KVPbAhnAJ0LOcZF2SB/FMnRwCfSfGwMD+XZH848G1quDD9pYbMgFWDtoP0nRQ/NglISiHO8NugiC9WLx08qpZvkBVtPzUIg/MDf4YDF1cZOG9Gtc/cox9md6Yn8LzyblY21On1cQI1ugxc4zmdtoR36Sm9iAxp0LG1bSv7SKw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by MN2PR11MB4744.namprd11.prod.outlook.com (2603:10b6:208:263::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.33; Mon, 17 Mar
- 2025 15:26:10 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808%5]) with mapi id 15.20.8534.031; Mon, 17 Mar 2025
- 15:26:10 +0000
-Message-ID: <fc94190c-3ea1-4034-a65d-7b5e8684812d@intel.com>
-Date: Mon, 17 Mar 2025 16:26:04 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 03/16] libeth: add a couple of XDP helpers
- (libeth_xdp)
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, Michal Kubiak
-	<michal.kubiak@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, "Przemek
- Kitszel" <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Alexei
- Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
-	"Jesper Dangaard Brouer" <hawk@kernel.org>, John Fastabend
-	<john.fastabend@gmail.com>, Simon Horman <horms@kernel.org>,
-	<bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20250305162132.1106080-1-aleksander.lobakin@intel.com>
- <20250305162132.1106080-4-aleksander.lobakin@intel.com>
- <Z9BDMrydhXrNlhVV@boxer>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <Z9BDMrydhXrNlhVV@boxer>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MI2P293CA0010.ITAP293.PROD.OUTLOOK.COM
- (2603:10a6:290:45::20) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B556923FC48;
+	Mon, 17 Mar 2025 15:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742225417; cv=none; b=r/fWUjitE599Mi5UWtXXsjRYBAY4uj42Xo06wmnusXqbrIankP+i63TfUQaWLCT7w/NlfooNa6A/tVp+/MLeEsG40ku7Hy0ZF0Jgqp5XJPRr+hSk1vQA4pxV55Mzj3VBSPbwVh+xT2j02eVIeCSF3ZY8/QGvcz0vB6Gj0V+m8jM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742225417; c=relaxed/simple;
+	bh=RmOfo764WtO4PPZFDYSz67TtQVy6busHNjQ/gySH6kk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=AblNPq3xiWwTL62tJINd9fSLpw0U6oLibg1o5WQOB1KjY1f3Lqrzrv33E/mblor8z5E+axvRb2jCDPYn7esR1OiX8L7mVhNXxey2R9LamT7mWJXDijJhs5uzN74j5beB8YtIF5Dvg0PXSPaxAWP6Gihm5qBRgqE5si3dt1d8/Vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XvvTdAZh; arc=none smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6dd01781b56so60681676d6.0;
+        Mon, 17 Mar 2025 08:30:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742225414; x=1742830214; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5VnHac+67NezyG9Z5kQPIahJscKgGgBzlwii56QtL5I=;
+        b=XvvTdAZhwUMK7rXQ1chgPmvFIuinlwTL3wCf8shnjHNq4Nd38CHWnewkoHjkmKzOjN
+         ZuAH3qQ+dBgVPeLVOE96yD/uLGPc0JDYxvSR+lDGu3aQEm9XrEqkhutotIiSoRy04hj1
+         IDPTunFXWOM+o9ll+9D13Hc9+MiMYrqRV4zEqM/6GTCgD0CjUiQyzc3qMDCBD91g8PX9
+         yJnpBWbpy0KNfPVq8uka2JVt8lgQvZ3Q9HKinPDBaLeElvMMNKe8todIvuu9agIwF9TR
+         s5GMTuB7kAIFDw9eaK6FJqqgHHm7MbgdzIsXr2m0tHx7gqpk9G3F7kVHj29BWZxITPQs
+         NHJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742225414; x=1742830214;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5VnHac+67NezyG9Z5kQPIahJscKgGgBzlwii56QtL5I=;
+        b=TnXdrtYafWdlpFp9JbmNuaFRXj3haUVJYelAfHNUasCl0VW1c1hLHlds/V7JbmM15x
+         z6lFzy8Lp++651Hq7f7iKdD/GK32bpPvKsYM+Lj7tlPZpPTSP5oDaJlm1zpFrxR2LyFH
+         oms3yTzbgOfe8NTbBXIwFcNzSqsPy4kgWn66FYUF6NFmWTYZGqfSOIcXhwHH1y3Dgboh
+         bQNq+iFTU4NTicYPxsxDXxt0wnHGBJYpir11QZwcw1F8LEncJV8SQocsZOhfZ614ZyA+
+         kcq/xrXVOVhWIqJeTFljaP73V2Vecm6aO1rTbF128/HjH1HTmfC2edu1HYhV/f5s75Cs
+         bJVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVHF88qIGlL5+T/9EvFTBgwd7DmYWCCDXRY0EJ1S8P2Yn7p2wqk20KjZecvrr6dr/YvESVUsn8cWaYEcidP@vger.kernel.org, AJvYcCVHJ21ESmI4OXDAMnRLid+YRfo+Dm205kX5TgcvVUDFHnpkX16bOfbPbHdQmH/c+u54tasOWbIy@vger.kernel.org, AJvYcCX6NpFS1JlCivjE/nFBWEaFibnVbq8cQUys6qVUHASFRx7vypz1emSs99Ns/Czy+prv3KDWEFUUURK1@vger.kernel.org, AJvYcCX6gjYIlnUtjCeQL9m8tczVzoxclWdlVovhQLETORhlaz4ntNTjYBPHa9/KpKX57M6QFWeMv1rQfnE1@vger.kernel.org, AJvYcCXzTyKvioKjnqS8yv4AcxyJkkOzbJ1HxTBNicErTlRf6XfOH7UoyP1ufL7nkHaLaJEyk373ftonLMqKjGSnrfyf@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDXJxWPdlbf22OzSxTRmaVenBumQzalRC45UvGFoC5LJevZJPr
+	SmsSieGq0h1kK85p3Lci+Ef8KcMXZXQviVOtzMBCZ6mRbjqeOqWs
+X-Gm-Gg: ASbGncsN8qfQMKCMsN3NT1YwBQzb5UgvQvq5wdd9A/4h7QrHP4hOT+ouhNmZAOGX3+v
+	RQqUpoerzBjnfHWt55odXuVsR0gf9Z0EGoXTpKgtXr6unK6kKt8PW9opaSUkgXprZE6qd7+GP1P
+	lOtFmowE4JyxGFvHWzvOZEjnFHd5cpmbAuNLnQT+jyQlpZu+CgLhWjDySLHamqOyk4NvcSbPwM6
+	aCqX0kf3EVD4u9wn1ERSXi1FP9ybPWS/oCB9f/hxvY+PA3sDboUKK+s7Qym2x6fKqPiZSzRwNDM
+	FYn/+GrLHI+s7AcP4SU+i3P+yweeJT51WIBQ0pgox0jKUg99xaarj2mOG2cl9M+bOBVY1Dg6Mjs
+	SXvN3RlpWR+UqEaSl
+X-Google-Smtp-Source: AGHT+IHNmtB9c12zhL5/E0oWznPUv4bUb/VjSZ9loMwleCwsOPZRUcNYkvDBkshuzLWydzExi8biFQ==
+X-Received: by 2002:ad4:5f46:0:b0:6d4:238e:35b0 with SMTP id 6a1803df08f44-6eaea9fac05mr181158406d6.17.1742225414336;
+        Mon, 17 Mar 2025 08:30:14 -0700 (PDT)
+Received: from 1.0.0.127.in-addr.arpa ([2600:4041:5be7:7c00:6895:24c6:e898:e320])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6eade34c51fsm55736766d6.109.2025.03.17.08.30.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Mar 2025 08:30:13 -0700 (PDT)
+From: Tamir Duberstein <tamird@gmail.com>
+Subject: [PATCH v9 0/4] rust: replace kernel::str::CStr w/ core::ffi::CStr
+Date: Mon, 17 Mar 2025 11:30:02 -0400
+Message-Id: <20250317-cstr-core-v9-0-51d6cc522f62@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|MN2PR11MB4744:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8df25010-44cc-4c92-5882-08dd65680b9d
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?NUhZMGM3WEZrZUNHQTMrOWhtSEdLaU5EUUdmakoybmsrd0tlZXBjdlNRN0Z2?=
- =?utf-8?B?ZUlkVmNxdXZ1dVFFOFV3Mmd1M1FLQzk5WWlkcXdzU2x3TStiSU1PWjc5Mjdj?=
- =?utf-8?B?eEdNcHNpVEMrb3BEZGNDbDlHL3IzTGpjcExWSjE1ODZ3R0lFbnR6WkFVQ29V?=
- =?utf-8?B?RVhybzVzdTh5K3hxbUYxM1V5MklvV0lCZVFKcGlxWDVGMndKcDlYMFVMUWpU?=
- =?utf-8?B?N3B4RE9NRlBvNzVNMUdjUzBIeWJUYU02Z0NHNGVvdzZaZVF4dlNpa1phdWVU?=
- =?utf-8?B?RHdFc3ZUTnFocFlLZUpOeUJvZy9zY0FqdThtZStrQWk0TmhHMzduS1U2eTcv?=
- =?utf-8?B?ckdLOFF0d3hBMFdET2NJM0lGR0FzNis2WDdEbHp5bnV0SXBNL3RNOEVJSHlo?=
- =?utf-8?B?RU1OQWZseDBRa29HYWNhZVhDUzZ5dWlxSVo1VW9KMUlhZVJLWDc0eGNoUWU1?=
- =?utf-8?B?SHJCd0ovcnVZckpnUHJDZmVqemJUSDRqMStzV3BjOVdrSFNvejNKaVBHTHoy?=
- =?utf-8?B?T0dwSXBsbUs1dExBTmRUWGRkemhvSnRCdFhibFZ4clVObXFrR3VNQnpCazBz?=
- =?utf-8?B?cXVKMHVDU3IwNnIvNFJZWEFTZUZtUmZQSWNTU1p1bXkxdkJPL3dwbytEcXBs?=
- =?utf-8?B?L2RiK3lLYkt3bFR2UkY4dWlrTHBJWWxJc3JRZENRRFhGTFJZTWhydGJlTERE?=
- =?utf-8?B?UTF0NCtvaEpEdlkxVmpVdWN5WC9WZXB2aVNOS0FRL09WeXprL2hjNUQwQWdp?=
- =?utf-8?B?clUxQW5kUHBvdkw2bEovVXJnWTI1UHgyUzc1dzN2ekR2ZnFON0J6ODJweS9Q?=
- =?utf-8?B?M09haUw5KytqZVlJTmpVcUFQSExPSTNxemZBZUp5Ry9CNERRZlkxcGJ5SXdk?=
- =?utf-8?B?YzNoVFNlaThKQmlydlorak1NMGxqMTcrZGljc0g4bndDUWMyYzBMQWJiTEQ2?=
- =?utf-8?B?clhqNmpzMEhDSmhPbjlFVzZmNlh2MGJVYWl2bXcrbzRZZlU2QmVid3B5TXA5?=
- =?utf-8?B?SmwxREI1c2pEbXZVVmYvWkRrSm81Z0toSmY2dUFjTVRmSG9MZlEyVUNrYThS?=
- =?utf-8?B?TU4zQjYyNXNqbjJYQzYzWjRRZnhRZXFHdzFVSmxma2p4Q0tmSlFyTkdKbG1k?=
- =?utf-8?B?TTd0Vi9qa2VsSmgvcEhMR0RRS3dXYUMwdkpCdjZ0eGpkWFdLeWVNYjFBVW5R?=
- =?utf-8?B?c25jUFd1Q2ZaSWRneFcyZUF6QXRnSU1wMDdHeUQxNlBTazBBSTRJTEhPYXdM?=
- =?utf-8?B?eEVWZnYyNC96c3hoTWNSa21uczZPWGxBZTdpa3BWRjByNVh3Z0ZqQm9UWVJa?=
- =?utf-8?B?L1I2U2ttd3k0b2FzWithNXdTbkZ1NCthNGQwT3YwYWJkVzBTQXpMWFZxZkRX?=
- =?utf-8?B?amdxVlJXbzRJc00zNUx0OUMrN0NLd2RUak9ReU5aWnFEZ2JxQ3ZaenBOSmdF?=
- =?utf-8?B?Sk9PYWlKQ0p0Q0ZVeEV1RDBnUlFKeTRtaVl4RW1XaFlvUmwyakZRMzRBMS9N?=
- =?utf-8?B?RjR1WkFJMThQRDgvUDU2RTR6UGpzcHpKRUR1Wjg2VG5jVEUwMjY0V2Z2WnFB?=
- =?utf-8?B?TU91RDBralRab3Q1eXlydmFqaTBEWUUwdFBYT2JXWVdhd1ZSQlM2RFVmVEtx?=
- =?utf-8?B?MGxmdzN4Q2YrTEhrMytYUjF0SmRyczh5Qk1JRkxSY3JVMHVUajZ4SW5mRkVa?=
- =?utf-8?B?SlBjdUg0aCtUaU1qcGZVbGRFSHAwSndEQ1hUbXV5QVNoTzBqQ1k0Y09TQnNS?=
- =?utf-8?B?WmEydSszSHNLTHNEeE84SFdMYzdoWFB0dUM5QzFFQzBUSzN4NWkrQnBtYmY5?=
- =?utf-8?B?YUMzYXhGZkI4cjhKVnBpSVpTcFVjallIeUs3a1pJQ2t3dDNEYjRVb0lMM1M1?=
- =?utf-8?Q?FzSx7UOZz77rR?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YjYwcFBzVWpvdVlzb2ZndVlxcVBiRnJpVEFiSEFJREVydEJBYkU3RWgxNTdj?=
- =?utf-8?B?NEZDZS9xbzFhaklGZWhEdXVGZGhGTjdFakVVanFacTkrRDVZQ2YzY29lTWlh?=
- =?utf-8?B?UnJoS1k1Z0M2alBCb0xHR25kbGE3ZUlCYkx6YkxyeVRiNjM3engwR20zQnZO?=
- =?utf-8?B?UCt0RTRicHlETXNJOUVXL0ZOU2JqNDN3MXRYS2lXNjJEUEV6bjFJTzlmMnJi?=
- =?utf-8?B?YjhSNXVPQ3FsL1RQWlg4TThZMDRtL0c4aEswQVR5MzA1UWV6M3RTdmlHYnNJ?=
- =?utf-8?B?Z01saFlhQlNkYmpKZXdqV0swa1g1WVdJeG9VZ0Q4N1lIL1IrVkpVMlZ1Z01K?=
- =?utf-8?B?d01HNEZIeVhJQnNSOXRqc0ZUSE1ZQTlQdG9VVjNWeGFlejc3NlpBTnJDTS9i?=
- =?utf-8?B?WnZqdTFnMlNpRkdsYng5NXQrOFNwY29VajRBNGZ6SEE4SjM5QUhwQWtOd3or?=
- =?utf-8?B?em91ZHNHZTg0T3hmOGlxRVZSNHdad29tenZ4NE1MZEpSdFlzeFZhenFaOHBO?=
- =?utf-8?B?RVJMNjgzZStzYThqRllxbVFLb1FJU1E1K0Q5M1JrMVBTNGNtWGYweGRnYm4r?=
- =?utf-8?B?azVTVXZEcXV6WGJiS3VzQW4zeVJiRERZUHZQQnpLaVl2ZHBmZWtUVXl5elJ5?=
- =?utf-8?B?OEROZmNySFJFUElEWTRKK3lzNmN4c0pGTjFiSHhMZFRzK003dC8ycDVEVHF4?=
- =?utf-8?B?Z0k3dUR3eTk2aFVRTlU3c3lFblBaa094Ynl2RFQwRWlnRFdXSWhwME1wV2Q2?=
- =?utf-8?B?V3RjZG1pZHdoTDljS2s4dWNoV0tnZFJSR3VDQlkxU00rNkJlV2VNanR1bFdN?=
- =?utf-8?B?cE9qajFMNXlJMDVGZFBwRkRvUllXZDY5L2MxNFVvT1B0VHFWNGFCM20xU1M2?=
- =?utf-8?B?STR3RnExRVRRZkZGc2paTDVzVDRsa2FSOUlFak1mTGdONUFxZUNNY3ZGT01x?=
- =?utf-8?B?MFEvbmdHTjZvSzlSZmJIZ1kzSlp0bkR5bitMcm5uOE56VDdQN1lYSmdZVmxn?=
- =?utf-8?B?TldRVHhLcDVoQ01tTkhkUkNKdC9JeEJ3eUdDUFRPMG85WWxNdTJ5d3Y1MjhF?=
- =?utf-8?B?eGNhYzBDWGVzWTVSclBMODVIUEhKMFVtMzBZdWJyNU1XZzRIT0dTWldVOTJn?=
- =?utf-8?B?QnQyblAxSy9zaVVqNlAzLy94NGJjS3FTbWlOeTJWYzNvdW00YUc4RDBZcitJ?=
- =?utf-8?B?TVZEdzlmZDZiYmFTamN0WE5tNUJZNlRvOTZkUjhpbEYvQmdONEpXZTdxMWlI?=
- =?utf-8?B?NG5xTnV2bUxlbUF0SHF0dmJTMk5tN0IrcUFpUWxxVTVHQUMwNlA4VzZPcCsz?=
- =?utf-8?B?bHUxMkZyYm1SZmV3dU1iZGE0ZDd2cXpvNjFPMmxCM0dRdWN2RnZvZ2ZWZlJ3?=
- =?utf-8?B?alMyd1pPdU1PTElxdkhSWitXU1JJbzlnam1KN0hZV0IycXAzeVhkYXYvclpm?=
- =?utf-8?B?WFdYSUNrTUo3RVZXOG4rbnVxeUhYaXVJRnA5aElUZHJqWjZkVHFCVkdhQlhr?=
- =?utf-8?B?YWFTTk83VjJzNlNkRFY0OW8wdHVhdmp6RDA4THNRKzZQRkoxc1dYUVZTZk40?=
- =?utf-8?B?NFljT1lodm1mbHNGdnFpK0M4TkI4NXZUc0NZc1kzcitsNkVJVTZ0UjdjbVk4?=
- =?utf-8?B?TFM2dkRFcVc3UU5ocExNYkIrM0FtYUtLY0JNWVU5bGpPa2ZCUXE1Z1NDVlJK?=
- =?utf-8?B?aHAyZ2FkYTd2aTRUb3F4bGJicCs4b2lhajdSd1RjNTcxM1l5cUdKZy9iUlVM?=
- =?utf-8?B?Wkt0ZW5mQWZHeFhRazhCNW1wejlFcllVNXBHRm85ZVRBeTVMR2xpMi8wc0tC?=
- =?utf-8?B?dHpVeHhKS2t5YVFDdnpnSjRYVzE5Z3UyZlNPWkc0ZGgvRzRoZW9BbVVvc1NS?=
- =?utf-8?B?S21JTlAzeUJ6MkxqY2E5SjVZZE9tS3BlM2VCSWVpY0MzWXhhd1lWcTg5cnJ1?=
- =?utf-8?B?c0w2N2l0UWNmalIxSkllWVVvV29OL0owbFZkclBWcElDaitWNGsvaitEUm5T?=
- =?utf-8?B?ZmxIZnlnVW9ERlBmN2d2SXNQQjc2YzNaQzVHWUF1ZlRyT3d5cThYNFNJQW5h?=
- =?utf-8?B?Umx5dlJvbzJMS05jMGY0RFNVVVZ5OU41eGRNOWNQZk5vZGVzL3ZuQ01QL2Nh?=
- =?utf-8?B?eEFOWXFSMHM1MmVscVRsdWFscVlvZlhFUkpZVFZJMjdyNmJPYitJdDZMS0p2?=
- =?utf-8?B?V2c9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8df25010-44cc-4c92-5882-08dd65680b9d
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2025 15:26:10.4917
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iFeCfFRObXd29DlDxBArUeRSoaIro6RxMytbTzXWYBDT/hOnOQuZb1bFHgY5WYda3bAGtI7AzI5+hBCKUConJN5z95fMymV7w18hWS9LB6A=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4744
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAPo/2GcC/3WOzWrDMBAGXyXoXAVJtternPIeJQdZP7FobYWVE
+ Q3B7x45kGIKPX7szjAPlj1Fn9np8GDkS8wxzXXojwOzo5mvnkdXN1NCdUIJyW1eiNtEnrt20AN
+ oqYQNrP7fyIf483J9XuoOlCa+jOTN29AKlFp2DXRwVIii54oX4xKlkr/u5xulJc2Tid9Hm6ZNO
+ ca8JLq/6gps4neI2oUU4IJjC9o6cEoHd77+SraQ0v9L9pV0RmI9KdE2+JfEPdnsSaykHZqgwPc
+ ICHtyXdcnyCWNaVkBAAA=
+X-Change-ID: 20250201-cstr-core-d4b9b69120cf
+To: Michal Rostecki <vadorovsky@protonmail.com>, 
+ Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+ Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <benno.lossin@proton.me>, 
+ Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+ Trevor Gross <tmgross@umich.edu>, 
+ Brendan Higgins <brendan.higgins@linux.dev>, 
+ David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
+ Danilo Krummrich <dakr@kernel.org>, 
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, 
+ Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
+ FUJITA Tomonori <fujita.tomonori@gmail.com>, Rob Herring <robh@kernel.org>, 
+ Saravana Kannan <saravanak@google.com>, 
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+ Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, 
+ Nathan Chancellor <nathan@kernel.org>, 
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Bjorn Helgaas <bhelgaas@google.com>, Arnd Bergmann <arnd@arndb.de>
+Cc: rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+ dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, 
+ devicetree@vger.kernel.org, llvm@lists.linux.dev, linux-pci@vger.kernel.org, 
+ Tamir Duberstein <tamird@gmail.com>
+X-Mailer: b4 0.15-dev
 
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Date: Tue, 11 Mar 2025 15:05:38 +0100
+This picks up from Michal Rostecki's work[0]. Per Michal's guidance I
+have omitted Co-authored tags, as the end result is quite different.
 
-> On Wed, Mar 05, 2025 at 05:21:19PM +0100, Alexander Lobakin wrote:
->> "Couple" is a bit humbly... Add the following functionality to libeth:
->>
->> * XDP shared queues managing
->> * XDP_TX bulk sending infra
->> * .ndo_xdp_xmit() infra
->> * adding buffers to &xdp_buff
->> * running XDP prog and managing its verdict
->> * completing XDP Tx buffers
->>
->> Suggested-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com> # lots of stuff
->> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> 
-> Patch is really big and I'm not sure how to trim this TBH to make my
-> comments bearable. I know this is highly optimized but it's rather hard to
-> follow with all of the callbacks, defines/aligns and whatnot. Any chance
-> to chop this commit a bit?
+Link: https://lore.kernel.org/rust-for-linux/20240819153656.28807-2-vadorovsky@protonmail.com/t/#u [0]
+Closes: https://github.com/Rust-for-Linux/linux/issues/1075
 
-Sometimes "highly optimized" code means "not really readable". See
-PeterZ's code :D I mean, I'm not able to write it to look more readable
-without hurting object code or not provoking code duplications. Maybe
-it's an art which I don't possess.
-I tried by best and left the documentation, even with pseudo-examples.
-Sorry if it doesn't help =\
+Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+---
+Changes in v9:
+- Rebase on rust-next.
+- Restore `impl Display for BStr` which exists upstream[1].
+- Link: https://doc.rust-lang.org/nightly/std/bstr/struct.ByteStr.html#impl-Display-for-ByteStr [1]
+- Link to v8: https://lore.kernel.org/r/20250203-cstr-core-v8-0-cb3f26e78686@gmail.com
 
-> 
-> Timers and locking logic could be pulled out to separate patches I think.
-> You don't ever say what improvement gave you the __LIBETH_WORD_ACCESS
-> approach. You've put a lot of thought onto this work and I feel like this
+Changes in v8:
+- Move `{from,as}_char_ptr` back to `CStrExt`. This reduces the diff
+  some.
+- Restore `from_bytes_with_nul_unchecked_mut`, `to_cstring`.
+- Link to v7: https://lore.kernel.org/r/20250202-cstr-core-v7-0-da1802520438@gmail.com
 
-I don't record/remember all of the perf changes. Couple percent for
-sure. Plus lighter object code.
-I can recall ~ -50-60 bytes in libeth_xdp_process_buff(), even though
-there's only 1 64-bit write replacing 2 32-bit writes. When there's a
-lot, like descriptor filling, it was 100+ bytes off, esp. when unrolling.
+Changes in v7:
+- Rebased on mainline.
+- Restore functionality added in commit a321f3ad0a5d ("rust: str: add
+  {make,to}_{upper,lower}case() to CString").
+- Used `diff.algorithm patience` to improve diff readability.
+- Link to v6: https://lore.kernel.org/r/20250202-cstr-core-v6-0-8469cd6d29fd@gmail.com
 
-> is not explained/described thoroughly. What would be nice to see is to
-> have this in the separate commit as well with a comment like 'this gave me
-> +X% performance boost on Y workload'. That would be probably a non-zero
-> effort to restructure it but generally while jumping back and forth
+Changes in v6:
+- Split the work into several commits for ease of review.
+- Restore `{from,as}_char_ptr` to allow building on ARM (see commit
+  message).
+- Add `CStrExt` to `kernel::prelude`. (Alice Ryhl)
+- Remove `CStrExt::from_bytes_with_nul_unchecked_mut` and restore
+  `DerefMut for CString`. (Alice Ryhl)
+- Rename and hide `kernel::c_str!` to encourage use of C-String
+  literals.
+- Drop implementation and invocation changes in kunit.rs. (Trevor Gross)
+- Drop docs on `Display` impl. (Trevor Gross)
+- Rewrite docs in the style of the standard library.
+- Restore the `test_cstr_debug` unit tests to demonstrate that the
+  implementation has changed.
 
-Yeah it would be quite a big. I had a bit of hard time splitting it into
-2 commits (XDP and XSk) from one, that request would cost a bunch more.
+Changes in v5:
+- Keep the `test_cstr_display*` unit tests.
 
-Dunno if it would make sense at all? Defines, alignments etc, won't go
-away. Same for "head-scratching moments". Moreover, sometimes splitting
-the code borns more questions as it feels incomplete until the last
-patch and then there'll be a train of replies like "this will be
-added/changes in patch number X", which I don't like to do :s
-I mean, I would like to not sacrifice time splitting it only for the
-sake of split, depends on how critical this is and what it would give.
+Changes in v4:
+- Provide the `CStrExt` trait with `display()` method, which returns a
+   `CStrDisplay` wrapper with `Display` implementation. This addresses
+   the lack of `Display` implementation for `core::ffi::CStr`.
+- Provide `from_bytes_with_nul_unchecked_mut()` method in `CStrExt`,
+   which might be useful and is going to prevent manual, unsafe casts.
+- Fix a typo (s/preffered/prefered/).
 
-> through this code I had a lot of head-scratching moments.
-> 
->> ---
->>  drivers/net/ethernet/intel/libeth/Kconfig  |   10 +-
->>  drivers/net/ethernet/intel/libeth/Makefile |    7 +-
->>  include/net/libeth/types.h                 |  106 +-
->>  drivers/net/ethernet/intel/libeth/priv.h   |   26 +
->>  include/net/libeth/tx.h                    |   30 +-
->>  include/net/libeth/xdp.h                   | 1827 ++++++++++++++++++++
->>  drivers/net/ethernet/intel/libeth/tx.c     |   38 +
->>  drivers/net/ethernet/intel/libeth/xdp.c    |  431 +++++
->>  8 files changed, 2467 insertions(+), 8 deletions(-)
->>  create mode 100644 drivers/net/ethernet/intel/libeth/priv.h
->>  create mode 100644 include/net/libeth/xdp.h
->>  create mode 100644 drivers/net/ethernet/intel/libeth/tx.c
->>  create mode 100644 drivers/net/ethernet/intel/libeth/xdp.c
+Changes in v3:
+- Fix the commit message.
+- Remove redundant braces in `use`, when only one item is imported.
 
-Thanks,
-Olek
+Changes in v2:
+- Do not remove `c_str` macro. While it's preferred to use C-string
+   literals, there are two cases where `c_str` is helpful:
+   - When working with macros, which already return a Rust string literal
+     (e.g. `stringify!`).
+   - When building macros, where we want to take a Rust string literal as an
+     argument (for caller's convenience), but still use it as a C-string
+     internally.
+- Use Rust literals as arguments in macros (`new_mutex`, `new_condvar`,
+   `new_mutex`). Use the `c_str` macro to convert these literals to C-string
+   literals.
+- Use `c_str` in kunit.rs for converting the output of `stringify!` to a
+   `CStr`.
+- Remove `DerefMut` implementation for `CString`.
+
+---
+Tamir Duberstein (4):
+      rust: move `CStr`'s `Display` to helper struct
+      rust: replace `CStr` with `core::ffi::CStr`
+      rust: replace `kernel::c_str!` with C-Strings
+      rust: remove core::ffi::CStr reexport
+
+ drivers/gpu/drm/drm_panic_qr.rs      |   6 +-
+ drivers/net/phy/ax88796b_rust.rs     |   8 +-
+ drivers/net/phy/qt2025.rs            |   6 +-
+ rust/kernel/device.rs                |   7 +-
+ rust/kernel/devres.rs                |   2 +-
+ rust/kernel/driver.rs                |   4 +-
+ rust/kernel/error.rs                 |  10 +-
+ rust/kernel/faux.rs                  |   5 +-
+ rust/kernel/firmware.rs              |   8 +-
+ rust/kernel/kunit.rs                 |  18 +-
+ rust/kernel/lib.rs                   |   2 +-
+ rust/kernel/miscdevice.rs            |   5 +-
+ rust/kernel/net/phy.rs               |  12 +-
+ rust/kernel/of.rs                    |   5 +-
+ rust/kernel/pci.rs                   |   3 +-
+ rust/kernel/platform.rs              |   7 +-
+ rust/kernel/prelude.rs               |   2 +-
+ rust/kernel/seq_file.rs              |   4 +-
+ rust/kernel/str.rs                   | 499 +++++++++++++----------------------
+ rust/kernel/sync.rs                  |   4 +-
+ rust/kernel/sync/condvar.rs          |   3 +-
+ rust/kernel/sync/lock.rs             |   4 +-
+ rust/kernel/sync/lock/global.rs      |   6 +-
+ rust/kernel/sync/poll.rs             |   1 +
+ rust/kernel/workqueue.rs             |   1 +
+ rust/macros/module.rs                |   2 +-
+ samples/rust/rust_driver_faux.rs     |   4 +-
+ samples/rust/rust_driver_pci.rs      |   4 +-
+ samples/rust/rust_driver_platform.rs |   4 +-
+ samples/rust/rust_misc_device.rs     |   3 +-
+ 30 files changed, 256 insertions(+), 393 deletions(-)
+---
+base-commit: 433b1bd6e0a98938105c43c0553f24e0747ef52c
+change-id: 20250201-cstr-core-d4b9b69120cf
+
+Best regards,
+-- 
+Tamir Duberstein <tamird@gmail.com>
+
 
