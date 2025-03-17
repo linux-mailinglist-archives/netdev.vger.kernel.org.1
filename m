@@ -1,56 +1,75 @@
-Return-Path: <netdev+bounces-175495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66A1AA66202
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 23:50:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0667A662F8
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 00:51:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 470407AB3B9
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 22:49:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A09C189B3A1
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 23:52:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 991DC204F6A;
-	Mon, 17 Mar 2025 22:50:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4217205ADA;
+	Mon, 17 Mar 2025 23:51:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=sandropischinger.de header.i=@sandropischinger.de header.b="LrlPBbb/"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="XjmkDS/d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgate02.uberspace.is (mailgate02.uberspace.is [185.26.156.114])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8CF204596
-	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 22:50:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.26.156.114
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10CA1205505;
+	Mon, 17 Mar 2025 23:51:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742251813; cv=none; b=M25WkF3NLCcz7RsEfx34bUaD9gjFSiH3R6fVEwgegdTKu96JN9lHm7FezDs4OuP+RL4/q0u6KhtNM7eAUMi/keBbTLw5gxvP6P7J7NaKECNYn3Iz86L+I/+zouexVxkmPZOkqOLNPcIKoiFsT0xdgy2shIbS/y0SvXctZKcOAks=
+	t=1742255512; cv=none; b=na7H1+VZHMJ7YHckAgAOo0pkXY2bJSKd99sgH4G1el36O1YrjaovutaKDVo90pto94JZkE6Y5bOQDs0gS5Iwyp0/buInAgrXQUA+RAW5KIj+GoYRLSjJnnzaGcJft6lGk48UmQAuOsBrkVbuuSOKK+mHwtq0RtfWSDi45ApDv7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742251813; c=relaxed/simple;
-	bh=fc3WG6UFW0l4VdaDXLqPFhzUts1S6Myw6fnyGAl1OMA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oRd/bgr3supdWEgiOUGoXYQXirVCC+dDZEBhpxP4fTs1+51my8rC5OK7n+PCybBdgTChH3TOSOehe0QL+dh+CSZD728IOjeOFkti8zgtvkx/UHN2LwGI2QWrjuWL27tnZHgm7a69gizc6cKg1gyiRjxbfZgSUOcy6my16TDvDd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sandropischinger.de; spf=pass smtp.mailfrom=sandropischinger.de; dkim=pass (4096-bit key) header.d=sandropischinger.de header.i=@sandropischinger.de header.b=LrlPBbb/; arc=none smtp.client-ip=185.26.156.114
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sandropischinger.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sandropischinger.de
-Received: from daphnis.uberspace.de (daphnis.uberspace.de [185.26.156.151])
-	by mailgate02.uberspace.is (Postfix) with ESMTPS id 8AD0B181451
-	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 23:43:52 +0100 (CET)
-Received: (qmail 9731 invoked by uid 989); 17 Mar 2025 22:43:52 -0000
-Authentication-Results: daphnis.uberspace.de;
-	auth=pass (plain)
-Received: from unknown (HELO unkown) (::1)
-	by daphnis.uberspace.de (Haraka/3.0.1) with ESMTPSA; Mon, 17 Mar 2025 23:43:52 +0100
-From: Sandro Pischinger <kernel@sandropischinger.de>
-To: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Sandro Pischinger <kernel@sandropischinger.de>
-Subject: [bug report, net-next] lo.disable_ipv6=1 allows ::1 dst packet to take a default route
-Date: Mon, 17 Mar 2025 23:43:00 +0100
-Message-ID: <20250317224300.25985-1-kernel@sandropischinger.de>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1742255512; c=relaxed/simple;
+	bh=XsNjQyivH1Hog8A2iZ+anJbWkZpmM+zPGmHGJX63sTY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t4n/OHjhi2jP49BaWmkLQhAmeRx/yt/+UWcMnjdXww0++Ni680cMkQhu3Ux7dV+Y0ZolKlScJo4cqa3i0qgt7ynh9aWWOwt8mxMyMO3kfzdTN9czmcHITJ1uqYeCZsqjLz4WDOo/5z8MGqu5LQFvOQHif89Ik+QfAALpq8X2HTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=XjmkDS/d; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52HLuhUO029836;
+	Mon, 17 Mar 2025 23:51:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2023-11-20; bh=2c4Tw6svFVVlMG5F1jrrJOHoil02h
+	jZZOtzQ9FEz1Hc=; b=XjmkDS/degSYOs30P9v6YK8zMDZzuoaBFVKatpuNs34Ex
+	vwCVEEnUF0xK5Aw/3SHHO+AiKKrMSRs5f59rmr/Mvfa8KX812tl9QbMYMlC/lpCz
+	+zmQ77dYUONLOk9ZkIADZtAw+LwrBbao+33/sJfNvuywOhKtARYhwgSxxkpR0fNh
+	hxsTMCjAz+mL2S10CZhRWyz3JVeOZ9ToVCtm/HeCBcdA6leVsRC8Ngy/rVo32xCr
+	0wqG28JCnuMI6G6PHQX+XV3RH6tbbmY3CFdiucUvNVMKW3Gazw561sOS/OXa9W0w
+	+PIU6m6XIlcH0XiK9VDqot7zCVWxPTNgN4r/iZhlw==
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 45d23rv2yv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 17 Mar 2025 23:51:45 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 52HLjXp0022498;
+	Mon, 17 Mar 2025 23:51:45 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 45dxeekf77-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 17 Mar 2025 23:51:45 +0000
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 52HNpi2f016519;
+	Mon, 17 Mar 2025 23:51:44 GMT
+Received: from localhost.localdomain (ca-dev80.us.oracle.com [10.211.9.80])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 45dxeekf68-1;
+	Mon, 17 Mar 2025 23:51:44 +0000
+From: Dongli Zhang <dongli.zhang@oracle.com>
+To: virtualization@lists.linux.dev, kvm@vger.kernel.org,
+        netdev@vger.kernel.org
+Cc: mst@redhat.com, jasowang@redhat.com, michael.christie@oracle.com,
+        pbonzini@redhat.com, stefanha@redhat.com, eperezma@redhat.com,
+        joao.m.martins@oracle.com, joe.jin@oracle.com, si-wei.liu@oracle.com,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2 00/10] vhost-scsi: log write descriptors for live migration (and three bugfix)
+Date: Mon, 17 Mar 2025 16:55:08 -0700
+Message-ID: <20250317235546.4546-1-dongli.zhang@oracle.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,142 +77,85 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Bar: +
-X-Rspamd-Report: MID_CONTAINS_FROM(1) MIME_GOOD(-0.1) R_MISSING_CHARSET(0.5)
-X-Rspamd-Score: 1.4
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=sandropischinger.de; s=uberspace;
-	h=from:to:cc:subject:date;
-	bh=fc3WG6UFW0l4VdaDXLqPFhzUts1S6Myw6fnyGAl1OMA=;
-	b=LrlPBbb/vaFOGJVms/tE4DkxaNf914t/C+Uv+AoAgBzT1oTsTrowTO34DMnlV7BZtn0bqgk4RW
-	DH+M5Ui5i544Oq8mEa91ZuN6vZrb6fWZBgSJVqGAQzv2bIPrPb8YcpRwGcsXEjAsA0pPjoAER4GU
-	1Y5FM8SIxl7XE7CKyEScJvC84S4pAJL5tIlzfBSVprMagTItI1O4iexve6fTcBRzeK89Js4ZPEZq
-	hmBg5Z2cvm2EU038EXtseFpjTkmO+wl1zZsrDZW98NbXuKxnlzeEobHeCdWXpfkoKhl0dKIiV3rp
-	NOe8uiJC3+3FIr1NwRjRuVEOVnlKEU08EP0eE/lVAEbX7Je3sFXDFsrG2LALBvkUsLiZj00wIQmQ
-	QVjAsMphQfMstP9OjLFvA+9FARsOBx6WdRTLZDiL9eoZ56LITZcD+roJWr621gUow8BecAkSGLJB
-	zzkE+0QwqoCx97Lvn2exPqx1o4i/k8y69AnfiQv2Flu+wQF6yTLZoAgS3HvVQ+sUxUO6hccOAdnb
-	4JDSqQnWX8MobQz1+3rwpnUigHivjPamV8q5dnI0jgPXLYgxF2YTGnclkaEiReBNbMPpG+zR6W40
-	9vl7/Fzq0KSxXjndXvHLL7fO3+LQB3pmJGGV8Hqe+vaHy7xVFPypZD7/k5iQXbAt1S+tnLJ7Wfgg
-	0=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-17_10,2025-03-17_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0 mlxscore=0
+ adultscore=0 mlxlogscore=999 spamscore=0 malwarescore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2502280000
+ definitions=main-2503170173
+X-Proofpoint-GUID: zpUf-Csj4TO_jCYy7QHMXr_QTfgwFaBB
+X-Proofpoint-ORIG-GUID: zpUf-Csj4TO_jCYy7QHMXr_QTfgwFaBB
 
-Hello all,
+The live migration with vhost-scsi has been enabled by QEMU commit
+b3e89c941a85 ("vhost-scsi: Allow user to enable migration"), which
+thoroughly explains the workflow that QEMU collaborates with vhost-scsi on
+the live migration.
 
-I stumbled upon an issue when disabling ipv6 just for the loopback device.
-Afer doing so, sending a packet with destination ::1 will follow an available
-default route, if exists, e.g. "default via fe80::2 dev ens3". This seems
-to contradict RFC4291 2.5.3, which states that loopback packets must never leave
-the node.
+Although it logs dirty data for the used ring, it doesn't log any write
+descriptor (VRING_DESC_F_WRITE).
 
-Using mainline kernel v6.14-rc7, configured with
-x86_64_defconfig and kvm_guest.config on archlinux (in qemu):
+In comparison, vhost-net logs write descriptors via vhost_log_write(). The
+SPDK (vhost-user-scsi backend) also logs write descriptors via
+vhost_log_req_desc().
 
-$ ip -6 r
-fe80::/64 dev ens3 proto kernel metric 256 pref medium
-fec0::/64 dev ens3 proto ra metric 1002 pref medium
-multicast ff00::/8 dev ens3 proto kernel metric 256 pref medium
-default via fe80::2 dev ens3 proto ra metric 1002 pref medium
+As a result, there is likely data mismatch between memory and vhost-scsi
+disk during the live migration.
 
-$ ip -6 r get ::1
-local ::1 dev lo proto kernel src ::1 metric 0 pref medium
+1. Suppose there is high workload and high memory usage. Suppose some
+systemd userspace pages are swapped out to the swap disk.
 
-$ sysctl -w net.ipv6.conf.lo.disable_ipv6=1
-net.ipv6.conf.lo.disable_ipv6 = 1
+2. Upon request from systemd, the kernel reads some pages from the swap
+disk to the memory via vhost-scsi.
 
-$ ip -6 r get ::1
-::1 via fe80::2 dev ens3 proto ra src fe80::c9cb:505e:82a2:8ca7 metric 1002 pref medium
+3. Although those userspace pages' data are updated, they are not marked as
+dirty by vhost-scsi (this is the bug). They are not going to migrate to the
+target host during memory transfer iterations.
 
-When observing trace events `fib6_table_lookup` for ping ::1, then we see that the ens3 device is selected
-for the case when ipv6 is disabled for lo:
-== lo.disable_ipv6=0
-            ping-356   [000] .....   292.199930: fib6_table_lookup:    (ffffffff84041fd4)
-            ping-356   [000] .....   292.199932: fib6_table_lookup:    table 254 oif 0 iif 1 proto 17 ::/56460 -> ::1/1025 flowlabel 0 tos 0 scope 0 flags 0 ==> dev lo gw :: err 0
-            ping-356   [000] .....   292.200176: fib6_table_lookup:    (ffffffff84041fd4)
-            ping-356   [000] .....   292.200176: fib6_table_lookup:    table 254 oif 0 iif 1 proto 58 ::/0 -> ::1/0 flowlabel 0 tos 0 scope 0 flags 0 ==> dev lo gw :: err 0
-            ping-356   [000] ..s2.   292.200187: fib6_table_lookup:    (ffffffff84041fd4)
-            ping-356   [000] ..s2.   292.200187: fib6_table_lookup:    table 254 oif 1 iif 1 proto 58 ::1/0 -> ::1/0 flowlabel 0 tos 0 scope 0 flags 0 ==> dev lo gw :: err 0
-            ping-356   [000] .....   293.255592: fib6_table_lookup:    (ffffffff84041fd4)
-            ping-356   [000] .....   293.255594: fib6_table_lookup:    table 254 oif 0 iif 1 proto 58 ::/0 -> ::1/0 flowlabel 0 tos 0 scope 0 flags 0 ==> dev lo gw :: err 0
-            ping-356   [000] ..s2.   293.255606: fib6_table_lookup:    (ffffffff84041fd4)
-            ping-356   [000] ..s2.   293.255606: fib6_table_lookup:    table 254 oif 1 iif 1 proto 58 ::1/0 -> ::1/0 flowlabel 0 tos 0 scope 0 flags 0 ==> dev lo gw :: err 0
-            ping-356   [000] .....   294.279429: fib6_table_lookup:    (ffffffff84041fd4)
-            ping-356   [000] .....   294.279430: fib6_table_lookup:    table 254 oif 0 iif 1 proto 58 ::/0 -> ::1/0 flowlabel 0 tos 0 scope 0 flags 0 ==> dev lo gw :: err 0
-            ping-356   [000] ..s2.   294.279441: fib6_table_lookup:    (ffffffff84041fd4)
-            ping-356   [000] ..s2.   294.279441: fib6_table_lookup:    table 254 oif 1 iif 1 proto 58 ::1/0 -> ::1/0 flowlabel 0 tos 0 scope 0 flags 0 ==> dev lo gw :: err 0
-            ping-356   [000] .....   295.303440: fib6_table_lookup:    (ffffffff84041fd4)
-            ping-356   [000] .....   295.303442: fib6_table_lookup:    table 254 oif 0 iif 1 proto 58 ::/0 -> ::1/0 flowlabel 0 tos 0 scope 0 flags 0 ==> dev lo gw :: err 0
-            ping-356   [000] ..s2.   295.303451: fib6_table_lookup:    (ffffffff84041fd4)
-            ping-356   [000] ..s2.   295.303452: fib6_table_lookup:    table 254 oif 1 iif 1 proto 58 ::1/0 -> ::1/0 flowlabel 0 tos 0 scope 0 flags 0 ==> dev lo gw :: err 0
+4. Suppose systemd doesn't write to those pages any longer. Those pages
+never get the chance to be dirty or migrated any longer.
 
-== lo.disable_ipv6=1
-            ping-363   [000] .....   358.104211: fib6_table_lookup:    (ffffffff84041fd4)
-            ping-363   [000] .....   358.104213: fib6_table_lookup:    table 254 oif 0 iif 1 proto 17 ::/37566 -> ::1/1025 flowlabel 0 tos 0 scope 0 flags 0 ==> dev ens3 gw fe80::2 err 0
-            ping-363   [000] .....   358.104453: fib6_table_lookup:    (ffffffff84041fd4)
-            ping-363   [000] .....   358.104453: fib6_table_lookup:    table 254 oif 0 iif 1 proto 58 ::/0 -> ::1/0 flowlabel 0 tos 0 scope 0 flags 0 ==> dev ens3 gw fe80::2 err 0
-            ping-363   [000] .....   359.111414: fib6_table_lookup:    (ffffffff84041fd4)
-            ping-363   [000] .....   359.111415: fib6_table_lookup:    table 254 oif 0 iif 1 proto 58 ::/0 -> ::1/0 flowlabel 0 tos 0 scope 0 flags 0 ==> dev ens3 gw fe80::2 err 0
-            ping-363   [000] .....   360.135436: fib6_table_lookup:    (ffffffff84041fd4)
-            ping-363   [000] .....   360.135437: fib6_table_lookup:    table 254 oif 0 iif 1 proto 58 ::/0 -> ::1/0 flowlabel 0 tos 0 scope 0 flags 0 ==> dev ens3 gw fe80::2 err 0
-            ping-363   [000] .....   361.159595: fib6_table_lookup:    (ffffffff84041fd4)
-            ping-363   [000] .....   361.159597: fib6_table_lookup:    table 254 oif 0 iif 1 proto 58 ::/0 -> ::1/0 flowlabel 0 tos 0 scope 0 flags 0 ==> dev ens3 gw fe80::2 err 0
-            ping-363   [000] .....   362.183614: fib6_table_lookup:    (ffffffff84041fd4)
-            ping-363   [000] .....   362.183616: fib6_table_lookup:    table 254 oif 0 iif 1 proto 58 ::/0 -> ::1/0 flowlabel 0 tos 0 scope 0 flags 0 ==> dev ens3 gw fe80::2 err 0
-            ping-363   [000] .....   363.207450: fib6_table_lookup:    (ffffffff84041fd4)
-            ping-363   [000] .....   363.207452: fib6_table_lookup:    table 254 oif 0 iif 1 proto 58 ::/0 -> ::1/0 flowlabel 0 tos 0 scope 0 flags 0 ==> dev ens3 gw fe80::2 err 0
-     ksoftirqd/0-16    [000] ..s..   363.527470: fib6_table_lookup:    (ffffffff84041fd4)
-     ksoftirqd/0-16    [000] ..s..   363.527471: fib6_table_lookup:    table 254 oif 0 iif 2 proto 58 fe80::2/0 -> fe80::c9cb:505e:82a2:8ca7/0 flowlabel 0 tos 0 scope 0 flags 0 ==> dev ens3 gw :: err 0
+5. Once the guest VM is resumed on the target host, because of the lack of
+those dirty pages' data, the systemd may run into abnormal status, i.e.,
+there may be systemd segfault.
 
-Intuitively I would expect `ping ::1` to fail with `ping: connect: Network is unreachable`,
-as it does if there's no default route configured. However if there is one,
-then ping just continues trying to send packets via the matching default route.
+Log all write descriptors to fix the issue.
 
-$ ping ::1
-PING ::1 (::1) 56 data bytes
-^C
-    ::1 ping statistics ---
-11 packets transmitted, 0 received, 100% packet loss, time 10230ms
+In addition, the patchset also fixes three bugs in vhost-scsi.
 
-Searching through the netdev mailing list archive, I found a somewaht related discussion,
-where special handling for ::1 was mentioned. In particular one comment by Stephen Hemminger was:
-as found in
-  https://lore.kernel.org/netdev/20101216132812.2d7fd885@nehalam/
-  Message-ID: <20101216132812.2d7fd885@nehalam> :
+Changed since v1:
+  - Rebase on top of most recent vhost changes.
+  - Don't allocate log buffer during initialization. Allocate during
+    VHOST_SET_FEATURES or VHOST_SCSI_SET_ENDPOINT.
+  - Add bugfix for vhost_scsi_send_status().
 
-> When loopback device is being brought down, then keep the route table
-> entries because they are special. The entries in the local table for
-> linklocal routes and ::1 address should not be purged.
+Dongli Zhang (vhost-scsi bugfix):
+  vhost-scsi: protect vq->log_used with vq->mutex
+  vhost-scsi: Fix vhost_scsi_send_bad_target()
+  vhost-scsi: Fix vhost_scsi_send_status()
 
-I don't understand enough of kernel IPv6 networking in order to
-known if this is (still) the case today.
+Dongli Zhang (log descriptor, suggested by Joao Martins):
+  vhost: modify vhost_log_write() for broader users
+  vhost-scsi: adjust vhost_scsi_get_desc() to log vring descriptors
+  vhost-scsi: cache log buffer in I/O queue vhost_scsi_cmd
+  vhost-scsi: log I/O queue write descriptors
+  vhost-scsi: log control queue write descriptors
+  vhost-scsi: log event queue write descriptors
+  vhost: add WARNING if log_num is more than limit
 
-Is this behavior intended? If not, here's my draft patch for this, though
-I'm not familiar with the codebase and cannot foresee any side-effects.
+ drivers/vhost/net.c   |   2 +-
+ drivers/vhost/scsi.c  | 314 ++++++++++++++++++++++++++++++++++++++++-----
+ drivers/vhost/vhost.c |  46 +++++--
+ drivers/vhost/vhost.h |   2 +-
+ 4 files changed, 322 insertions(+), 42 deletions(-)
 
-Best regards,
-Sandro Pischinger
 
-Signed-off-by: Sandro Pischinger <kernel@sandropischinger.de>
----
- net/ipv6/route.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+base-commit: 9d8960672d63db4b3b04542f5622748b345c637a
+branch: remotes/origin/linux-next
+tree: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git
 
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index fb2e99a56529..b27844de3baa 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -2193,6 +2193,12 @@ int fib6_table_lookup(struct net *net, struct fib6_table *table, int oif,
- 
- redo_rt6_select:
- 	rt6_select(net, fn, oif, res, strict);
-+	if (ipv6_addr_loopback(&fl6->daddr)) {
-+		struct fib6_info *rt = res->f6i;
-+
-+		if (!rt || !(rt->fib6_flags & RTF_LOCAL))
-+			res->f6i = net->ipv6.fib6_null_entry;
-+	}
- 	if (res->f6i == net->ipv6.fib6_null_entry) {
- 		fn = fib6_backtrack(fn, &fl6->saddr);
- 		if (fn)
--- 
-2.48.1
+Thank you very much!
+
+Dongli Zhang
 
 
