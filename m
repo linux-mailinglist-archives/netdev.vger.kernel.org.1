@@ -1,207 +1,107 @@
-Return-Path: <netdev+bounces-175284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 144CEA64DCC
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 13:03:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E66CA64BFB
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 12:12:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ABBEE7A3BAB
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 12:02:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 002253A5616
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 11:09:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6299623A9BB;
-	Mon, 17 Mar 2025 12:02:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E83DE2356A8;
+	Mon, 17 Mar 2025 11:09:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="L3ANOjmC"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C793923A9AB
-	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 12:02:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E2681459F7;
+	Mon, 17 Mar 2025 11:09:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742212932; cv=none; b=j/14fWD/R5JBO7uHD/QOlOUu5BChIuMPbntSP40RaA7U4adg2HecC5Mz6LcBQ1t321Gwwg4SAmX0X/5mM6P5MQJMGqH7XGE3nVWv4iQxHT1EgRYk1NroXHVSLhbbQKO11kPG6OFTqUp8fLkAH/6/anXeF4UKzw2UOWAlu+USNw8=
+	t=1742209791; cv=none; b=ZlPyjiFsyJ6+LviQmDiugj1vJ7KIhGweb29pj1j2E+8OLAonOSkzfnQoNdmb0oOyr/68S6UHHT2i+/HvdmOCCInCNlxhQ5vx4YrB0vqkl+Hogl0luCpupuelDcau7458jsWA7dSQxBCOPxYYyH35v9vAwIGaPf/HK7i8exJvXFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742212932; c=relaxed/simple;
-	bh=PlMEiEJDam59+aty2oFc2pESN+enaEybP02730+FEq8=;
+	s=arc-20240116; t=1742209791; c=relaxed/simple;
+	bh=k/BM4FwwagS7ER/y5fUKx6y06iSE8U8+RTLffCOxvAg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WBx7+ZpJOlGGs2eAZWVRn8uOr/xPFqdMfjvqdnhlBZN1LMISsgSf/IkxcW8w/rQ7pktGWMxmlhyTwzeQ5lG3n+1F53wpl0qVxkF+nG4KR5FIIwbQKT/jzUNUO3WcThvs2PvAlAB8P2XQyPV93FwNuamSrJauLi1+XfQlRi3CQd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tu99w-00020y-0U; Mon, 17 Mar 2025 13:01:32 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	 Content-Type:Content-Disposition:In-Reply-To; b=NeYx+bCEPOhWY2Oa2sbdHsvrVwD8gnAc/1AeNk9xm/AP3ku4r5VW3B/ozehPf2tSCbCoVUcze/jV7zCUPskzFA0U5K4iZhjCu5uCHeYgincikaSjJU/0qnHDKaz3Sym1tffD7JIWYjCpjlPGl0TskD8zV2mrDZ1PF7t/vZXEN84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=L3ANOjmC; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=CucQxAMz4q00rKoqMFkXW/rTlFZs/81VWM2dWuS9iPE=; b=L3ANOjmC4JYjNEDTGSFlYSj+EY
+	lDMUKIAPuul1T4GUZ6puKUkV8BzHq5WJJG6+uQGshRelm43SbzWOXlnmp3+t9vl5U/CCIqrkoFocf
+	0CLTtY4lXl6Aov3FiPFUso512czcMF1HO/Kfq/XAlzRMnW/HXJL2jAIjFrAL1OAvRukC77bqdyIAv
+	vnzXTJERSI/rnvJZYtJBQUhNFNs9z9CSA7BH9VOZ2jnPlNjMcvT0nKfMAOf3fOK49uAvKalEejjFu
+	SziT/8P/6JFZWVLYKFbO8dKi4HTjASat0y9ujjRXOzcAOdpA22UH87wRqpGq1Z7yFEyP30SG71LHf
+	YJq6KtAQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59148)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tu99t-000EuM-0g;
-	Mon, 17 Mar 2025 13:01:29 +0100
-Received: from pengutronix.de (p5b1645f7.dip0.t-ipconnect.de [91.22.69.247])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id A87EC3DE480;
-	Mon, 17 Mar 2025 10:41:48 +0000 (UTC)
-Date: Mon, 17 Mar 2025 11:41:48 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Ming Yu <a0282524688@gmail.com>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
-	brgl@bgdev.pl, andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org, 
-	linux-usb@vger.kernel.org
-Subject: Re: [PATCH v8 4/7] can: Add Nuvoton NCT6694 CANFD support
-Message-ID: <20250317-outrageous-helpful-agama-39476f-mkl@pengutronix.de>
-References: <20250225081644.3524915-1-a0282524688@gmail.com>
- <20250225081644.3524915-5-a0282524688@gmail.com>
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tu8LT-0003PO-0x;
+	Mon, 17 Mar 2025 11:09:23 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tu8LL-0003W9-0k;
+	Mon, 17 Mar 2025 11:09:15 +0000
+Date: Mon, 17 Mar 2025 11:09:14 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Jacky Chou <jacky_chou@aspeedtech.com>, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, joel@jms.id.au, andrew@codeconstruct.com.au,
+	ratbert@faraday-tech.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-aspeed@lists.ozlabs.org,
+	BMC-SW@aspeedtech.com
+Subject: Re: [net-next 4/4] net: ftgmac100: add RGMII delay for AST2600
+Message-ID: <Z9gC2vz2w5dfZsum@shell.armlinux.org.uk>
+References: <20250317025922.1526937-1-jacky_chou@aspeedtech.com>
+ <20250317025922.1526937-5-jacky_chou@aspeedtech.com>
+ <20250317095229.6f8754dd@fedora.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="vzg54m2aeg5i4qkb"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250225081644.3524915-5-a0282524688@gmail.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20250317095229.6f8754dd@fedora.home>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+On Mon, Mar 17, 2025 at 09:53:33AM +0100, Maxime Chevallier wrote:
+> So this goes completely against the naming of the property. It has the
+> -ps suffix, so you would expect to have picoseconds values passed, and
+> not an arbiraty index.
+> 
+> Take a look at other drivers, you should accept picseconds values from
+> these properties, then compute the relevant index in the driver. That
+> index should be something internal to your driver.
+> 
+> An example here :
+> 
+> https://elixir.bootlin.com/linux/v6.14-rc6/source/drivers/net/ethernet/microchip/sparx5/lan969x/lan969x_rgmii.c#L51
 
---vzg54m2aeg5i4qkb
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v8 4/7] can: Add Nuvoton NCT6694 CANFD support
-MIME-Version: 1.0
+Another example would be drivers/net/phy/adin.c::adin_get_reg_value()
+and associated functions - these lookup a DT property and then look
+that up in a table to convert it to a register value.
 
-On 25.02.2025 16:16:41, Ming Yu wrote:
-[...]
+I suspect that's something which could become generic, as I suspect
+most hardware isn't going to accept a picosecond value, but be a
+choice of N different options.
 
-> diff --git a/drivers/net/can/usb/nct6694_canfd.c b/drivers/net/can/usb/nc=
-t6694_canfd.c
-> new file mode 100644
-> index 000000000000..d97fce5cdf32
-> --- /dev/null
-> +++ b/drivers/net/can/usb/nct6694_canfd.c
-
-[...]
-
-> +static const struct can_bittiming_const nct6694_can_bittiming_nominal_co=
-nst =3D {
-> +	.name =3D DRVNAME,
-> +	.tseg1_min =3D 2,
-> +	.tseg1_max =3D 256,
-> +	.tseg2_min =3D 2,
-> +	.tseg2_max =3D 128,
-> +	.sjw_max =3D 128,
-> +	.brp_min =3D 1,
-> +	.brp_max =3D 511,
-> +	.brp_inc =3D 1,
-> +};
-> +
-> +static const struct can_bittiming_const nct6694_can_bittiming_data_const=
- =3D {
-> +	.name =3D DRVNAME,
-> +	.tseg1_min =3D 1,
-> +	.tseg1_max =3D 32,
-> +	.tseg2_min =3D 1,
-> +	.tseg2_max =3D 16,
-> +	.sjw_max =3D 16,
-> +	.brp_min =3D 1,
-> +	.brp_max =3D 31,
-> +	.brp_inc =3D 1,
-> +};
-
-[...]
-
-> +static int nct6694_can_start(struct net_device *ndev)
-> +{
-> +	struct nct6694_can_priv *priv =3D netdev_priv(ndev);
-> +	const struct can_bittiming *d_bt =3D &priv->can.data_bittiming;
-> +	const struct can_bittiming *n_bt =3D &priv->can.bittiming;
-> +	struct nct6694_can_setting *setting __free(kfree) =3D NULL;
-> +	const struct nct6694_cmd_header cmd_hd =3D {
-> +		.mod =3D NCT6694_CAN_MOD,
-> +		.cmd =3D NCT6694_CAN_SETTING,
-> +		.sel =3D ndev->dev_port,
-> +		.len =3D cpu_to_le16(sizeof(*setting))
-> +	};
-> +	int ret;
-> +
-> +	setting =3D kzalloc(sizeof(*setting), GFP_KERNEL);
-> +	if (!setting)
-> +		return -ENOMEM;
-> +
-> +	setting->nbr =3D cpu_to_le32(n_bt->bitrate);
-> +	setting->dbr =3D cpu_to_le32(d_bt->bitrate);
-
-I just noticed one thing that needs clarification/documentation.
-
-You have nct6694_can_bittiming_nominal_const and
-nct6694_can_bittiming_data_const, but only pass the bit rates to your
-device.
-
-Do the bit timing const really reflect the HW limitations of your
-device?
-
-Are you sure your device uses the same algorithm as the kernel and
-calculates the same bit timing parameters as the kernel, so that the
-values given to the user space reflects the bit timing parameter chosen
-by your device?
-
-> +
-> +	if (priv->can.ctrlmode & CAN_CTRLMODE_LISTENONLY)
-> +		setting->ctrl1 |=3D cpu_to_le16(NCT6694_CAN_SETTING_CTRL1_MON);
-> +
-> +	if (priv->can.ctrlmode & CAN_CTRLMODE_FD_NON_ISO)
-> +		setting->ctrl1 |=3D cpu_to_le16(NCT6694_CAN_SETTING_CTRL1_NISO);
-> +
-> +	if (priv->can.ctrlmode & CAN_CTRLMODE_LOOPBACK)
-> +		setting->ctrl1 |=3D cpu_to_le16(NCT6694_CAN_SETTING_CTRL1_LBCK);
-> +
-> +	ret =3D nct6694_write_msg(priv->nct6694, &cmd_hd, setting);
-> +	if (ret)
-> +		return ret;
-> +
-> +	priv->can.state =3D CAN_STATE_ERROR_ACTIVE;
-> +
-> +	return 0;
-> +}
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---vzg54m2aeg5i4qkb
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmfX/GkACgkQDHRl3/mQ
-kZzJDgf8DgOIcr0MWwz7wlhWys5Fxw4Vtn5MszTN3NLbf2p+jPRy/TQKbi3A7p+B
-PZFdTyo+sYOdG9csQChfdGGqWEA5cd6vIMYmIbUO1401s5U+bYudq1+h68pyfOhf
-XOKXDxnSWXlzFLw2vu2SsZ3M4svT1cU0S6NRSxPx/o4QuFfsG7KLFqwdMK+MEc8P
-CcqcJKo47KwOEcWuQm/eTq4LQFvmmKz8/6PCcrY2P99PQ9bqTkoiC7R+KMONa1p3
-f2/q875xuTHckepTB7slLcXA9K7ikoT7T865z4jHsZt5ClD3+L/j5pSa82E1kcxN
-nv4xvBHXTSmzW8wtGa6VrUWOif5cYg==
-=GQzc
------END PGP SIGNATURE-----
-
---vzg54m2aeg5i4qkb--
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
