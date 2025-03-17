@@ -1,92 +1,120 @@
-Return-Path: <netdev+bounces-175381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AB34A65839
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 17:36:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27D56A65887
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 17:42:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8D0C16B985
-	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 16:36:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6998C3B7336
+	for <lists+netdev@lfdr.de>; Mon, 17 Mar 2025 16:40:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E26F41A23BB;
-	Mon, 17 Mar 2025 16:36:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDA6E1AA782;
+	Mon, 17 Mar 2025 16:38:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nT7f2LfZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GNdvcli1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEFB01A00F0
-	for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 16:36:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A22C81AA1EC;
+	Mon, 17 Mar 2025 16:38:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742229397; cv=none; b=DGPsyNYpEfabaX7VyswyLdsVCW6hbva+eoVsqIdvTPDbhkgRFl57TqQzSdFOZ8/SHfUgewu3w4+x3UUCvpIYs168+IHRlFQbfADkA5cFLIOOjNCHVSxy6CIT79Dr8jrN4KIpeWzx/Wd4/2KXUMcxAGzyMR+fxR0G7LihB1gd/wU=
+	t=1742229490; cv=none; b=ur6VPkSfichzMuNxjtWOU4fgj1UdyXuvmjwZAKPcQwtYCRHVEg6J8DKW+YujSUKpjrHXmzMgNP8ZBoM8wvAkhI+hPXIqhN1UMKAIKJz47BW6oBDuVWZi9tJ5fq5UxdJ++onYIfoxVcSYn7hSXH6WIzAkimjnMo5O0DgGRItY+hE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742229397; c=relaxed/simple;
-	bh=Jo5bYLXd2n3FxjbuIWaKZfgiA2G8U5y0lBTzVuRSLVs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ozYKRGRm8+qGek/ILUeBrBuBli8nwWAwewHFB7uV/wZav00gERDrUQyORBWTDmKC79gYT/IivxnIi036l5Hw5pUooa+2++h1A19MVCIgfZ6DF7ITkRTNuC8Qmoexhj0LGe2RosOdNjOlTr061/5HBRdb16QoRrr1jqPza/rZqNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nT7f2LfZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26BA7C4CEE3;
-	Mon, 17 Mar 2025 16:36:35 +0000 (UTC)
+	s=arc-20240116; t=1742229490; c=relaxed/simple;
+	bh=nPcvCsCRgv6WrfYsWQMws0+Y9HYX7FAwpVGL1NHNTy8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=HNntMHOdesTBdaujWVNEiD2S6XAzFbc3SDyofDceX5Fa3aaVHHc1+4j4SdHm30J9EiuZWzp07LoWfKGLgKSd/+f5JQA3GRBrOCpiZh+fBY3aBchDI+yiL2MgphFRO7Ukwx9Fz1M++1nf8PF5Xmwxy/fNSUt9SHMGXWAq66uNpds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GNdvcli1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EED9C4CEEC;
+	Mon, 17 Mar 2025 16:38:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742229397;
-	bh=Jo5bYLXd2n3FxjbuIWaKZfgiA2G8U5y0lBTzVuRSLVs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nT7f2LfZLmvgPljLSXdlXzdjk3UfhjNzIwcO1r7yQnwaOfNBK12mKD9TMx7CyfJsu
-	 hm6o812LhzNDhS0nbNGQ95cb9Ianx0UNU792TqNnA7/qQqTudqUMYpcmz021DxL/ti
-	 DUUoquUwEMSLQAd/Kg4Rl8t5gAOAcnjp1tmIEePcrkSy+oJRZ9B/vYQVddW7biSZ92
-	 SzNrH1RDC0iKPskc+aUrIiSweol6LMY/UPi9+rJ18vb3ChWPCxvXeBz84hqRuo0kby
-	 jX88P68QS1295RL39epC4Yds7mLxzE4ncxwJrIFUxGMBqU8ky/G38BBRitM2mxlkrB
-	 R4QguFT/fzQcw==
-Date: Mon, 17 Mar 2025 16:36:34 +0000
-From: Simon Horman <horms@kernel.org>
-To: Grzegorz Nitka <grzegorz.nitka@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Karol Kolacinski <karol.kolacinski@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH iwl-next v2 3/3] ice: enable timesync operation on 2xNAC
- E825 devices
-Message-ID: <20250317163634.GE688833@kernel.org>
-References: <20250310122439.3327908-1-grzegorz.nitka@intel.com>
- <20250310122439.3327908-4-grzegorz.nitka@intel.com>
+	s=k20201202; t=1742229490;
+	bh=nPcvCsCRgv6WrfYsWQMws0+Y9HYX7FAwpVGL1NHNTy8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=GNdvcli1y/cgee3JbQsT9M57bDSznd5J1sUbLtavX206ntnlKBotF10aXt/NjQe5Y
+	 mmOItBA+q7QQMp1RrLUe2iSSyA5jc3mTNL5Mh+ga/hI8gUiY0BhdK1RarOGQbWPxXW
+	 Y27OYECEw3afybcOkMVysrOYVIm8R5P49NpwyNvXHbalNmajrSHgnoxWBkykWlRBgp
+	 5iARhW9oZKLDxg/RzzF4jTjs8qEFp79vZJLoIWlqEeDBry9hasVgi8qG+o3+vvgjj6
+	 5tXs/vJcIJ6lCcbNMp3mIjpzBy1PCvmPesikyEfv9nFUwERU2JwbUGCfcvZ0FmkBFc
+	 z0kzZnqxN3pWg==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Taehee Yoo <ap420073@gmail.com>,
+	Mina Almasry <almasrymina@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	asml.silence@gmail.com,
+	kaiyuanz@google.com,
+	willemb@google.com,
+	skhawaja@google.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.13 13/16] net: devmem: do not WARN conditionally after netdev_rx_queue_restart()
+Date: Mon, 17 Mar 2025 12:37:22 -0400
+Message-Id: <20250317163725.1892824-13-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250317163725.1892824-1-sashal@kernel.org>
+References: <20250317163725.1892824-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250310122439.3327908-4-grzegorz.nitka@intel.com>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.13.7
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 10, 2025 at 01:24:39PM +0100, Grzegorz Nitka wrote:
-> From: Karol Kolacinski <karol.kolacinski@intel.com>
-> 
-> According to the E825C specification, SBQ address for ports on a single
-> complex is device 2 for PHY 0 and device 13 for PHY1.
-> For accessing ports on a dual complex E825C (so called 2xNAC mode),
-> the driver should use destination device 2 (referred as phy_0) for
-> the current complex PHY and device 13 (referred as phy_0_peer) for
-> peer complex PHY.
-> 
-> Differentiate SBQ destination device by checking if current PF port
-> number is on the same PHY as target port number.
-> 
-> Adjust 'ice_get_lane_number' function to provide unique port number for
-> ports from PHY1 in 'dual' mode config (by adding fixed offset for PHY1
-> ports). Cache this value in ice_hw struct.
-> 
-> Introduce ice_get_primary_hw wrapper to get access to timesync register
-> not available from second NAC.
-> 
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-> Co-developed-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+From: Taehee Yoo <ap420073@gmail.com>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+[ Upstream commit a70f891e0fa0435379ad4950e156a15a4ef88b4d ]
+
+When devmem socket is closed, netdev_rx_queue_restart() is called to
+reset queue by the net_devmem_unbind_dmabuf(). But callback may return
+-ENETDOWN if the interface is down because queues are already freed
+when the interface is down so queue reset is not needed.
+So, it should not warn if the return value is -ENETDOWN.
+
+Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+Link: https://patch.msgid.link/20250309134219.91670-8-ap420073@gmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/core/devmem.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/core/devmem.c b/net/core/devmem.c
+index 11b91c12ee113..17f8a83a5ee74 100644
+--- a/net/core/devmem.c
++++ b/net/core/devmem.c
+@@ -108,6 +108,7 @@ void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding)
+ 	struct netdev_rx_queue *rxq;
+ 	unsigned long xa_idx;
+ 	unsigned int rxq_idx;
++	int err;
+ 
+ 	if (binding->list.next)
+ 		list_del(&binding->list);
+@@ -119,7 +120,8 @@ void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding)
+ 
+ 		rxq_idx = get_netdev_rx_queue_index(rxq);
+ 
+-		WARN_ON(netdev_rx_queue_restart(binding->dev, rxq_idx));
++		err = netdev_rx_queue_restart(binding->dev, rxq_idx);
++		WARN_ON(err && err != -ENETDOWN);
+ 	}
+ 
+ 	xa_erase(&net_devmem_dmabuf_bindings, binding->id);
+-- 
+2.39.5
 
 
