@@ -1,71 +1,61 @@
-Return-Path: <netdev+bounces-175857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E54ABA67C3A
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 19:47:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E225A67C80
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 20:01:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FC7E42303F
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 18:47:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12B3988235E
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 19:01:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EA211AB50D;
-	Tue, 18 Mar 2025 18:47:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AFC7211A3D;
+	Tue, 18 Mar 2025 18:56:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DLGYgmOV"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jQtxxWMN"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F4F31898FB
-	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 18:47:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 725FB20F073
+	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 18:56:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742323665; cv=none; b=M4NPZuj+FzHMrv8sHHg28JsQNLDf5xvANOgDdlkP/JK6iqCMq6Sa9H1LqTQuF4OEBOL9IG1r5UVFrgiaSdzyamhw8ImQa/R5ZU9Q3QJu+BO89pjZ+yoxpvrvlXFoiL33PVBhjUvnsns3fgUFbOnxDV2V0p3Gogoz0u6BbQIO9To=
+	t=1742324186; cv=none; b=YV4k1jNm1zyB4fI55H1W7q4Ju03D920RQywHXYnU6KJTl9ejOu+VyXwJpBSh6LdJGHJ+jNQx174bNO9F+WDZHYXxAD6hErtqRGQotDQKZ7GrU4OYWhXq34ul1QTS8oOSNPRuGEfeuzbZpUwi3seHbUrmGlgJVPgvf1B7R/oyR/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742323665; c=relaxed/simple;
-	bh=OpRmsDExUANV0p0hffFIVTJXoa/plVnm6JMRrHjKwx8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IXZPhvcpch7icSr0fE9iMM8m079SvOivBP9Ih88sc2TpniEJ1kYDGB/tU8Er1VLwl0EgsnbgbU5eN5UkKV0a5YGN56CV2ZfgXe6tPk4JzI4A3tYYXo996OYjAZXyOzbofmnLVH9SbNbIN0jZcIXxPhsl+uXpIr8VrgMIpcm+9bA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DLGYgmOV; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742323662;
+	s=arc-20240116; t=1742324186; c=relaxed/simple;
+	bh=3pC3gjvSu3lQEdG9zh7ylkORQiG7ySyfjcVk4Nq9ttw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PGb9EAg2Z2gfyRKuhXqrLSdoR475mhz5Gnu5BZy+T7aPlr/8mIUVRkgdj5Q1KdOg0Au5YlFKqe2HQbanb/OlxUaptnD+e1Ff06zlV7NqSxZt0I+mzh3SdR44bWW/WfCgH5Sxre9QxPQ8YCSQ62IAHtipc4Dk/2tdkcTGcDnURFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jQtxxWMN; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1742324178;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=uIWpSWFwRmhJqErXn2M5EsepnZBsIhKVcTOE1aiCETI=;
-	b=DLGYgmOVKCCkQHq8SpG44sPbpvaaSKdDx1NctRvKMjaboIZbTpgF/SOcpBZ+AL1c/BEdwQ
-	Ho+5skJN/HVH0OibhbmTFRXbwEdyEN9Fy0GAmgtO5dN68BEh+U8Pwups6MgrBsDvUg8/6F
-	A7pY7sggrKYjSz3EtfZtYTBAtqIoMTU=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-144-2T-btuQ2NzW4QP-6IiC5cA-1; Tue,
- 18 Mar 2025 14:47:39 -0400
-X-MC-Unique: 2T-btuQ2NzW4QP-6IiC5cA-1
-X-Mimecast-MFC-AGG-ID: 2T-btuQ2NzW4QP-6IiC5cA_1742323657
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 65C9519560B4;
-	Tue, 18 Mar 2025 18:47:37 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.32.222])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5D37A1955DCD;
-	Tue, 18 Mar 2025 18:47:34 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
+	bh=djNKGzX9ZcA55R+w5dijyS9ARkrFmZ7NXtXx0AoZVw8=;
+	b=jQtxxWMNDhi/Xrme4343z8GIhKshDUS/qBiefA8vduB3JEb5BOYt9aDHT/a+ugnRRzSZcB
+	vdA6F8Ou1n52SKyffUQ0AHMn1UhzqDkVOKCpBE08KPyPuOFcPt9tH56Y/IMWVsBzFUUrQi
+	AekjmmJcaoIEq6lq9kauiWFCbRN7fjk=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net-next] udp_tunnel: properly deal with xfrm gro encap.
-Date: Tue, 18 Mar 2025 19:47:20 +0100
-Message-ID: <6001185ace17e7d7d2ed176c20aef2461b60c613.1742323321.git.pabeni@redhat.com>
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] netfilter: xtables: Use strscpy() instead of strscpy_pad()
+Date: Tue, 18 Mar 2025 19:55:19 +0100
+Message-ID: <20250318185519.107323-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,48 +63,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-Migadu-Flow: FLOW_OUT
 
-The blamed commit below does not take in account that xfrm
-can enable GRO over UDP encapsulation without going through
-setup_udp_tunnel_sock().
+kzalloc() already zero-initializes the destination buffer, making
+strscpy() sufficient for safely copying the name. The additional NUL-
+padding performed by strscpy_pad() is unnecessary.
 
-At deletion time such socket will still go through
-udp_tunnel_cleanup_gro(), and the failed GRO type lookup will
-trigger the reported warning.
+The size parameter is optional, and strscpy() automatically determines
+the size of the destination buffer using sizeof() if the argument is
+omitted. This makes the explicit sizeof() call unnecessary; remove it.
 
-We can safely remove such warning, simply performing no action
-on failed GRO type lookup at deletion time.
+No functional changes intended.
 
-Reported-by: syzbot+8c469a2260132cd095c1@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=8c469a2260132cd095c1
-Fixes: 311b36574ceac ("udp_tunnel: use static call for GRO hooks when possible")
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 ---
- net/ipv4/udp_offload.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+ net/netfilter/xt_repldata.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index 088aa8cb8ac0c..2e0b52ae665bc 100644
---- a/net/ipv4/udp_offload.c
-+++ b/net/ipv4/udp_offload.c
-@@ -110,14 +110,7 @@ void udp_tunnel_update_gro_rcv(struct sock *sk, bool add)
- 		cur = &udp_tunnel_gro_types[udp_tunnel_gro_type_nr++];
- 		refcount_set(&cur->count, 1);
- 		cur->gro_receive = up->gro_receive;
--	} else {
--		/*
--		 * The stack cleanups only successfully added tunnel, the
--		 * lookup on removal should never fail.
--		 */
--		if (WARN_ON_ONCE(!cur))
--			goto out;
--
-+	} else if (cur) {
- 		if (!refcount_dec_and_test(&cur->count))
- 			goto out;
- 
--- 
-2.48.1
-
+diff --git a/net/netfilter/xt_repldata.h b/net/netfilter/xt_repldata.h
+index 5d1fb7018dba..600060ca940a 100644
+--- a/net/netfilter/xt_repldata.h
++++ b/net/netfilter/xt_repldata.h
+@@ -29,7 +29,7 @@
+ 	if (tbl == NULL) \
+ 		return NULL; \
+ 	term = (struct type##_error *)&(((char *)tbl)[term_offset]); \
+-	strscpy_pad(tbl->repl.name, info->name, sizeof(tbl->repl.name)); \
++	strscpy(tbl->repl.name, info->name); \
+ 	*term = (struct type##_error)typ2##_ERROR_INIT;  \
+ 	tbl->repl.valid_hooks = hook_mask; \
+ 	tbl->repl.num_entries = nhooks + 1; \
 
