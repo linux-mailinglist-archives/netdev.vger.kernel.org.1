@@ -1,137 +1,206 @@
-Return-Path: <netdev+bounces-175876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92E91A67D8E
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 20:58:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 373B5A67D92
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 20:59:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 85E0A19C7364
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 19:58:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D535E18922F4
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 19:59:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D012621480E;
-	Tue, 18 Mar 2025 19:56:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D60B2210F5A;
+	Tue, 18 Mar 2025 19:59:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="murbe5Fp"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="bwOMk4Bt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2087.outbound.protection.outlook.com [40.107.236.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 864542139C1;
-	Tue, 18 Mar 2025 19:56:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742327809; cv=none; b=nUyFbn61ax+I/5IWSMDGmyG3eLVlTqNJkJlA3WnYelZOt4O3dfpI1oj+/rSsftYT4KECkFF2OPm0A0Gl+8aSi/q7YlXnACah8ygQQAo+C6ZBYgSe/ujrKdL/STVQ6NyQrg7DvW1xvzuHRBv47tu33duKzUBYGmiZ4lpNZp5HLm4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742327809; c=relaxed/simple;
-	bh=brPpw9Upi2pphbjic3XdO4/cXehcdzvhX6hXEGsW1PI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=kfOdA4YgYbtS47g6ys/Q8rtvSDqawKx36Nn087Nw7VtaePv2pOJy2qyzjYrQibBHmxz54Xs2aKI0pBE/4yqUati0zfnCC/6EAJ/j16kHeX8teSEaTGcqjt4+/SPqLSTYGEjF4MhX5Hw6ej+wcxH9aZqlVcrUabCgg9Gh4LQ88hQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=murbe5Fp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C4D6DC4CEFC;
-	Tue, 18 Mar 2025 19:56:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742327808;
-	bh=brPpw9Upi2pphbjic3XdO4/cXehcdzvhX6hXEGsW1PI=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=murbe5Fp4DfgdyT0waCSisCnPNhHOnQI/lv9QrNvky5W/QEO7B960DB1hexjjxuTS
-	 vbfWgAtANDVahWQ+k6G9P0nYGUkUvyQDx4Lg65yvuK6r2ecGNukph3wTXKWJlqCM60
-	 uvrG6HiGbu75f6s7fqOL56INdpO2tDnYJtjoGzf4seCy8zj8Ea3/56zd8MJzljHER8
-	 paWuWEXvTqJR7k6jh+IrMz7efaKnm8x/YYthmIA6Pzo+E2RfwZ6ZcVlfetKZDUWcAM
-	 5kb4OCy1Dp7v2bdNX2m8rrtbrUu9FtYBkLVWPHehNIhFg2LXG7pJ/GE2RxnHX73kOb
-	 BDEl/NUyDCPzA==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA339C35FF8;
-	Tue, 18 Mar 2025 19:56:48 +0000 (UTC)
-From: David Heidelberg via B4 Relay <devnull+david.ixit.cz@kernel.org>
-Date: Tue, 18 Mar 2025 20:56:48 +0100
-Subject: [PATCH v3 5/5] dt-bindings: wireless: qcom,wcnss: Use
- wireless-controller.yaml
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F90EACD
+	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 19:59:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.87
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742327955; cv=fail; b=Dw4GB+QJJea4n4KkbKQGChzYe94eNniE7VCK7h3Z8er59AWKXLlEUNmzIpF3I44vdgb5qh0z6iB2DNB0nU8xtx8owkGuC0Mhqpxtxir+UIdKh2MrSEvHsZ9GA2YQFdh3XES1IuvGtfgCOEV5d0JuSzfEWpzz/deL598KNSdYYNk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742327955; c=relaxed/simple;
+	bh=iRHq7vlQ81nQ2Dy7KQgr1TOpuhgFAsWnRvse4zWH+KQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=U7x1rcU9PxX/tckM6HwIvYcgmTJSCpbZUIk2tVveUBhPE5Ubi1gQLhIKoEup7KNih4FgFS0VIX02TAc8Cf1P0ncbIb79qTKCa4tpsIJELpnW61G80eRbpNDY0z8NeYIQtKN6isOObdqD9MFs1zVcchJVIJFKIiT0mgsCCGUhOR4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=bwOMk4Bt; arc=fail smtp.client-ip=40.107.236.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=SCQhYESgumE4suYnjktWAKwGajYgfvtSMN2diNKFBXYscSpLxovYezGh3bp9kanXRtp3EpWXEteGQe06K8cOKLEMoSBm5O3ALdJjZ+Uz/buXT+lg3JaSntoPvy9yXBNC2mdO27Rb6ES74tLAb6+vdCyceAsuYj/Roq+wxWelP0yMNoC/D+I0ZFQFMyttPI6pJYtDgXyclb07Gl60UAlJmnJ9ovx9Zsmb90qGHA3HiTbwnzlC8Zrq4/htpWugWtcSQ4MEgdCy96jDZsoBiSRpgL92UvpZzNZ2iSEEtjY53FtApymMqOT0bWCd9XFNUMCbDVsZVwmNSSwZs7b6OaRlTQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ybpxq/2teElS+vX2GnWhc+nqwhoeprMhxSUW31Mgr6E=;
+ b=SAEvkX7DnvMIyGIVWrX1c4Ns5+nHgIf9dWzpmKKRS+rTq+jM5N4mjAF4yYB83+DKS+nlcZXtx1kPt3Kb9t8iMnFWmhPg/50i4NADA1h1u0hOla5zlFxHsCzMx80sQuz1HSXoapnEzXnebq9//Zsc5esd0QsBvEDrzeL0ACgWm6o86vqS51Z5qYwAsm7ex51VDmODUu4snGtAVgt5dWduAgdVq73czCjm70rbKkj5aLsT02VJm4FGgKEFJbL79RyMUuXSfgKvL1X7qKqKIdLBLJArxqXcMj+mA/c1E0b33VkzgFWjoNU3Ko0Djxv6KwbDHyNjdS5qXIzUo2E8IjJ0Cw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ybpxq/2teElS+vX2GnWhc+nqwhoeprMhxSUW31Mgr6E=;
+ b=bwOMk4BtssiUchFvNvfgHVNmc7puNByQxezvLVuwyPHgJ4fhUX8L48Bucwoot0v785vgNiLM6ipVil/PxoN0n0LOIusU34vVekmCAYaJE1FOjQ2hXAjoq+LnBfIMJyOQTBgzSL5grB+LdTK+WJp5C49boiySdWgXtnvjwZ2epZV24Y5Q0Tp4/u4cDDLLwmteoX64kqaE8MtzyDHVjdQeFWj5TPQxfwbZACXwXqMwnWk7K9oMEQUBrmBhkeM5lUUSF5V8jEdoJ7REUFt6u/ZQDOFPoY8b+TnIJaHrE0bcMcreUNC/N2jlfXR+tSbdQF3iVoesCYhkx1T+MSzxqwm6yg==
+Received: from DM3PR11MB8736.namprd11.prod.outlook.com (2603:10b6:0:47::9) by
+ SJ2PR11MB8471.namprd11.prod.outlook.com (2603:10b6:a03:578::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8534.33; Tue, 18 Mar 2025 19:59:07 +0000
+Received: from DM3PR11MB8736.namprd11.prod.outlook.com
+ ([fe80::b929:8bd0:1449:67f0]) by DM3PR11MB8736.namprd11.prod.outlook.com
+ ([fe80::b929:8bd0:1449:67f0%4]) with mapi id 15.20.8534.034; Tue, 18 Mar 2025
+ 19:59:07 +0000
+From: <Tristram.Ha@microchip.com>
+To: <linux@armlinux.org.uk>
+CC: <andrew@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<hkallweit1@gmail.com>, <kuba@kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <UNGLinuxDriver@microchip.com>, <olteanv@gmail.com>,
+	<Woojung.Huh@microchip.com>
+Subject: RE: [PATCH RFC net-next 0/4] net: xpcs: cleanups and partial support
+ for KSZ9477
+Thread-Topic: [PATCH RFC net-next 0/4] net: xpcs: cleanups and partial support
+ for KSZ9477
+Thread-Index: AQHbd9G7VcLFvSdnAUmXjlhnL1yQjrM9UseAgDw9RUA=
+Date: Tue, 18 Mar 2025 19:59:07 +0000
+Message-ID:
+ <DM3PR11MB8736D45A311DA7C448825BABECDE2@DM3PR11MB8736.namprd11.prod.outlook.com>
+References: <Z6NnPm13D1n5-Qlw@shell.armlinux.org.uk>
+ <Z6dHo0DFWUiMMUyN@shell.armlinux.org.uk>
+In-Reply-To: <Z6dHo0DFWUiMMUyN@shell.armlinux.org.uk>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM3PR11MB8736:EE_|SJ2PR11MB8471:EE_
+x-ms-office365-filtering-correlation-id: 0a6be0da-81e0-4d3f-5dde-08dd665757b5
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?4yrpQhYkPKir8ax3pi3U3uCI5RaYe8aUlUq7ti1HttguO10prNId4b5WwaW9?=
+ =?us-ascii?Q?/dMdbaKQIe4gyfVPjiTb9XK2daZ+WDhRViOHhOmHnDXeyMthxRl3x3cfxzCQ?=
+ =?us-ascii?Q?kNLpPgWW+jw4fTiJcv9ye9LdGTMYmZJk6iaEs7X1gL8/waVROV/IqnqGXEUu?=
+ =?us-ascii?Q?LfdCn8jUhvngnGRS8+eASriTa2BC1figZqvr9nuEUfzsf4p1ncvbxUAMDz0s?=
+ =?us-ascii?Q?au5K9pkBQdWGwjhRxenzs4I7qN9PCRE10XIXOYOktsTehnOtyHlQevKT2HVE?=
+ =?us-ascii?Q?f00ndTdHEB3W8M6YRkGnYAA/kl/RwTe3xl3b4hQ9fnoWR893yQ2sBlt3ppyN?=
+ =?us-ascii?Q?6xP5IMi7BrBUO0EaZDMN39WqhF59hmZo99TAx4eXXGV38Lcq1bkKkiVyL/jF?=
+ =?us-ascii?Q?yHw7t9An1jirWI7kaXeMV53jaVI3NmeW0LsJBqOqfUb7lHqOfqJX0E4S3hrF?=
+ =?us-ascii?Q?RVtRn3TFF5n7kJH9xZ7bOjkLx61bJXY7uGq2wPQbWFXwfMZTagNFup7CrutE?=
+ =?us-ascii?Q?qvEpyhGq3xeNAIauwgcUVKlQJsMi8KDjBKNFsw+oNGmqi2cLAsHzJt++nr7E?=
+ =?us-ascii?Q?qSMIdQ31FekmpDRtH3oMw9AqYLoOplYHKzef5ruFTfsliPpMbvP1pGbaaB25?=
+ =?us-ascii?Q?1daDIYqSQN3gwUFfKDqCZTNdKM17o9yiCNm3HVm+e63BKISra6R/Lwq6A0wl?=
+ =?us-ascii?Q?WrBjEHc1PORUxmlfy1eHYTfa2EYcmLXxc3W3nDPBTJKNg9QE+FJ1T7JMchr3?=
+ =?us-ascii?Q?n8DitxpJX/8icOYtyK6cFvbWWcgFb6br6gP0rQj4n31ceURnuUWIfXASW/w8?=
+ =?us-ascii?Q?YGrSpqoau3y5iJGMC/PjMxL1JLaqsuLf/TltzfH3n7vFElPR/ynQrmnpcRQI?=
+ =?us-ascii?Q?X4wqzpLPi8pcRcY2DI2Y8N5gU7wTDffBGAGCgfO5klKZwBks6zRqHCFderKk?=
+ =?us-ascii?Q?liN/W8+cIOpyNKZNDnytItRx+xSoNLRELiXJ9nL6BL5p+dtkKBzELGVz5FQy?=
+ =?us-ascii?Q?cl3d662A/niBLsjQLvkp3dLnqCX5hJz3/tUNW0SxAos20Oe46M9jAmsp5mXu?=
+ =?us-ascii?Q?wbAj+ejmmAwpBK55bbIC1O8zK2Vm5udg74roIAn1Z03cvvQdoukx2V3OpUef?=
+ =?us-ascii?Q?1pl64p6b7QNZfe5Hs3aCX9KEqRwvrhEKUBJncMr4rVMaFjdhpvpXmPKksCOu?=
+ =?us-ascii?Q?pirrRI8gr22PNNjA82iaA0OgcJBlB9uKb9irl0lVEsJAuZOvdMTSZdMP3fpE?=
+ =?us-ascii?Q?YeFU32U7dUZdjT+BKw0wpjGuCkM5p+xDiSlbSBvE/bhpvY0tfmxob6gBZvog?=
+ =?us-ascii?Q?29kQeuOOYNLYAv9a1SQsAji6eX1oSFSNO8GWbhcUsBovxSlqOYxZhXbMpT3z?=
+ =?us-ascii?Q?RbirPdKYWabLsvCHpI501gNqMMBr5MalkRohKuAGZLRQemjDKHFvRGi5NIcx?=
+ =?us-ascii?Q?ih+4ra9Yh9crG7axC8PSXVOm7BJrZkLy?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM3PR11MB8736.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?fZIrjpNb2m8NdFpz6whTR8nzJzbncIrJe7ny/zQbuwNr43VfhibzI+Smfn2y?=
+ =?us-ascii?Q?75SaTcG9BT2+wXor68QXPzBkcTiYA24h8KHK8Q7WPLqGjix6BDCkOyBsYBZ9?=
+ =?us-ascii?Q?1Whncc8ndP8gkMzMYr7Mlcy5yKi2bPnFbYQiND+bQOQ7ZSMZosH0mOzz4ZC8?=
+ =?us-ascii?Q?nc/I2gnbbD222updkfMXVaKfuMBhg8dkDzXnLPxO7S9CR//2tRgR04kv6vPa?=
+ =?us-ascii?Q?99n/YraPng8DKRg5J/2APfRYB59Av7RiGJd9T2r33c3Qo4kR+2h2tAt1BRMX?=
+ =?us-ascii?Q?4/QpfdCUY7l2EH/7rKDp8XHgaH6HqFRJr2InF7EH4J7spYAGthcyZk2DTRW6?=
+ =?us-ascii?Q?T8avWGA9oarl48IV1Q4gv0Y5b18MQKdLMXmTQAvXHYmd2wItHHjMHw26WsBS?=
+ =?us-ascii?Q?n7pDtFIF1qKJVuHGlMwKHPGDrm6VfOwssdnIR/N+ZGBLTRIVuJBtrMIKxMX8?=
+ =?us-ascii?Q?r4PrPVrGk11Uk1oJFaiqNJ9Mfe9i7o75U5MoXzinyuAcCGzXvwLeVfzQoWAl?=
+ =?us-ascii?Q?RYhJjAbqwBSOUOfjTfCWxyWzWG2w/Gvbzs6LIdwyn6vSVh0XkJXTl7xkMj4R?=
+ =?us-ascii?Q?tJdkEMSQeSBngiT4R6esLtMZh6o0z8DSYWLX0jOc0rbzjL7SXmxnQbB+gB8Y?=
+ =?us-ascii?Q?cMAB1TDhZKCWNU0DIxtXiZ84wOLsTubtKciuSvvr27RkIS4bbaM73k2RBjzM?=
+ =?us-ascii?Q?520uTnOVszID3dWxA54SJO2ndCfa0/NyPLqluk343LN6Y+zFchkHi5GnvQbT?=
+ =?us-ascii?Q?D1qyEiuSA+aVNTuiJKyEhsHAjf8ZSROt1YfYnGeH+c5a3ecqLEcBssIMAypZ?=
+ =?us-ascii?Q?BMTMlTvMvXJovoAG7wD6iF/G+aPZv9KO0U9+9JPaiSflvtcjLq+DrcK8TUTh?=
+ =?us-ascii?Q?KAi3LuVpqj6Gq3HVmjeqVAfsCWg0O50Q/K1JaxomNJhrOPwq1H8uzrLjtIJh?=
+ =?us-ascii?Q?qSHq/ADpK3lbDRK2XpxqSCQ0uTnMhDQszXgK0AuLeiZ1t1FxwVifv2oxaf8V?=
+ =?us-ascii?Q?+G7rAmPQM1NnguyDFH2/cKr87RZ9eG29JciBeDdCqomTBNtGTWt0fPNQZkgR?=
+ =?us-ascii?Q?Kvj0g59em+nQPF1CD1ySqB3MO5FJ4UKM+ciSkQwfbmOagqWSiH7W4eddbJ6y?=
+ =?us-ascii?Q?LhnTGFTUzYO69W+BdIcPc5Mc2Am1TGJctlGNMTKQfylIH1oKjCYukM3Z0ySf?=
+ =?us-ascii?Q?XPjxbP0YdgnS55dwY7oYXMJ6d0JihUdGPXgm0Fj8upLjYXjytC1wPlQKP61G?=
+ =?us-ascii?Q?9Vfi5SPSXL7Cc1aVvZcjYzYCxxA8GB2PLpdgortMlOEaGizcv42KYG6WdqUy?=
+ =?us-ascii?Q?ebFbak25j5pjYbVqBuQuB9oRySIWwoQT9mI0DivQbmdF059qJi9hOhxY9/Ee?=
+ =?us-ascii?Q?Is/ygeUNW08lRWH9LLUIhoV2sF0uARAquHE0NN9xzvK2mQNsr8JjA18lr7bf?=
+ =?us-ascii?Q?ajffMW7dRtthxJYtpTouOn2WlVzxaeQWLFIgcpbcg+nFWuzYMmFev605XjKe?=
+ =?us-ascii?Q?2nv5naC1YDM76D4/jcbc3a5IlFDSxbrBR7pDS5lodvSTNNAzbx9U60xQXqbI?=
+ =?us-ascii?Q?Zj2U1ZH0vNa7POc6J1hCjapR0NPdGDobcTAgAfwa?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250318-dt-bindings-network-class-v3-5-4d8d04ddfb61@ixit.cz>
-References: <20250318-dt-bindings-network-class-v3-0-4d8d04ddfb61@ixit.cz>
-In-Reply-To: <20250318-dt-bindings-network-class-v3-0-4d8d04ddfb61@ixit.cz>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Mailing List <devicetree-spec-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, 
- Johannes Berg <johannes@sipsolutions.net>, 
- Lorenzo Bianconi <lorenzo@kernel.org>, van Spriel <arend@broadcom.com>, 
- =?utf-8?q?J=C3=A9r=C3=B4me_Pouiller?= <jerome.pouiller@silabs.com>, 
- Bjorn Andersson <andersson@kernel.org>, 
- Konrad Dybcio <konradybcio@kernel.org>, Andy Gross <agross@kernel.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
- linux-arm-msm@vger.kernel.org, Janne Grunau <j@jannau.net>, 
- David Heidelberg <david@ixit.cz>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1072; i=david@ixit.cz;
- h=from:subject:message-id;
- bh=gmn5ThPDUPmISVwNn4Be9D1nVjSGuTMMZ+wDLTHXKfs=;
- b=owEBbQKS/ZANAwAIAWACP8TTSSByAcsmYgBn2c/+fSLSvOOP/1NrHIs5zBZKCZkCM9H07z63p
- +w64xSd1mSJAjMEAAEIAB0WIQTXegnP7twrvVOnBHRgAj/E00kgcgUCZ9nP/gAKCRBgAj/E00kg
- crnBD/wKnlKViZa7j9xXS4zIroJ+mYGOGFXAK8GCBybRxkEyKbEGnWWJaeZ4bxNl+bTIr1dKClS
- G2FRnubcXBSk/w0JWDQOSw4SKJk4vvWgroqj5Nv5oaCQOxbxORBuUoOzRZMgkxxcA9w1v/g9Di7
- EQmvmzRuRxbTSfVCCHTSl4fl7zsiimAUsAzgry6WO3teaoRTlwM803VC6rNg8bnvPXtThU4w4xg
- UZ+GbUFC+FJShhA6XEWuT243WnOrlnz/9Po+usChnz+tbDy/fd3F+FyuHPOh6kwCDtZFNZSRRp5
- J36Xe2Q6Q1mzXZvJpnrI1gHsPRhWpVSV/vRyOdpcytb4XIV+L4vVIuE3cYjmI1xptluh1F9cfI9
- lg/YlbxrhwydDGSlP7PmUhk0l9fCr1/4/iEkrkVRZpLbdIAD9gbCIYza3uFBGhhCK3wPjNp2/G/
- oRDz6sTt084KYiPopdK6AMaIOXftTbnv8vvJAt/puaLkfFnTP1kf6ahdP2DUz5S4rrLXmuI+d+T
- oyDrfMmoH9Pb9MuyWcotYHxqZGToxIO+1V7WWyAHkeEhERajbFsRTTOCQALg27tCA1lYl//p9zC
- AgiOOblZW6Z17xyVVHfrhDxXs13zIz2vtAR897ISRaQhgMEZQLh09eg46bmLM9Pwlb3bqmXGHbV
- bbrM2205srJAXsw==
-X-Developer-Key: i=david@ixit.cz; a=openpgp;
- fpr=D77A09CFEEDC2BBD53A7047460023FC4D3492072
-X-Endpoint-Received: by B4 Relay for david@ixit.cz/default with auth_id=355
-X-Original-From: David Heidelberg <david@ixit.cz>
-Reply-To: david@ixit.cz
+X-OriginatorOrg: microchip.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM3PR11MB8736.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0a6be0da-81e0-4d3f-5dde-08dd665757b5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Mar 2025 19:59:07.6132
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: HPBywYtV3kFYeI65VcmomoFE9iqWpsYLO4fdqSNDoN3UDjSb5POUzSsJXzNXK4haG1wlXPcGFE+ULiJ8W24S0464ZTQQ30hQFGcj+eaDz7A=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8471
 
-From: David Heidelberg <david@ixit.cz>
+> Subject: Re: [PATCH RFC net-next 0/4] net: xpcs: cleanups and partial sup=
+port for
+> KSZ9477
+>=20
+> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
+e content
+> is safe
+>=20
+> On Wed, Feb 05, 2025 at 01:27:26PM +0000, Russell King (Oracle) wrote:
+> > Work for Microchip to do before this series can be merged:
+> >
+> > 1. work out how to identify their XPCS integration from other
+> >    integrations, so allowing MAC_MANUAL SGMII mode to be selected.
+>=20
+> This is now complete.
+>=20
+> > 2. verify where the requirement for setting the two bits for 1000BASE-X
+> >    has come from (from what Jose has said, we don't believe it's from
+> >    Synopsys.)
+>=20
+> I believe this is still outstanding - and is a question that Vladimir
+> asked of you quite a while ago. What is the status of this?
+>=20
+> Until this is answered, we can't move forward with these patches
+> unless Vladimir is now happy to accept them given Jose's response.
+> Vladimir seemed to be quite adamant that this needed to be answered.
 
-Reference wireless-controller.yaml schema, so we can use properties
-as local-mac-address or mac-address.
+Sorry for the long delay.  After discussing with the Microchip design
+team we come up with this explanation for setting the
+DW_VR_MII_TX_CONFIG_PHY_SIDE_SGMII (bit 3) of DW_VR_MII_AN_CTRL (0x8001)
+register in 1000Base-X mode to make it work with AN on.
 
-Signed-off-by: David Heidelberg <david@ixit.cz>
----
- Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.yaml | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+KSZ9477 has the older version of 1000Base-X Synopsys IP which works in
+1000Base-X mode without AN.  When AN is on the port does not pass traffic
+because it does not detect a link.  Setting
+DW_VR_MII_TX_CONFIG_PHY_SIDE_SGMII allows the link to be turned on by
+either setting DW_VR_MII_SGMII_LINK_STS (bit 4) or
+DW_VR_MII_DIG_CTRL1_PHY_MODE_CTRL (bit 0) in DW_VR_MII_DIG_CTRL1 (0x8000)
+register.  After that the port can pass traffic.
 
-diff --git a/Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.yaml b/Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.yaml
-index fd6db0ca98eb7e56d7399f55c408844d5e782805..4fcae6bedfffa845ad61c776ee0b70768e9a38a5 100644
---- a/Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.yaml
-+++ b/Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.yaml
-@@ -54,7 +54,7 @@ properties:
-       - compatible
- 
-   wifi:
--    additionalProperties: false
-+    unevaluatedProperties: false
-     type: object
-     properties:
-       compatible:
-@@ -88,6 +88,9 @@ properties:
-       - qcom,smem-states
-       - qcom,smem-state-names
- 
-+    allOf:
-+      - $ref: /schemas/net/wireless/wireless-controller.yaml#
-+
- required:
-   - compatible
-   - qcom,mmio
-
--- 
-2.49.0
-
+This is still a specific KSZ9477 problem so it may be safer to put this
+code under "if (xpcs->info.pma =3D=3D MICROCHIP_KSZ9477_PMD_ID)" check.
 
 
