@@ -1,102 +1,73 @@
-Return-Path: <netdev+bounces-175737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1B96A67531
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 14:34:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 830FCA67567
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 14:43:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D678819A656E
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 13:32:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 61A377A366F
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 13:42:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD87320CCFF;
-	Tue, 18 Mar 2025 13:32:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAB9A20D50C;
+	Tue, 18 Mar 2025 13:43:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KkqIFrRA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SZ6dmNsF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2866D20CCED;
-	Tue, 18 Mar 2025 13:32:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BAC920D4E6
+	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 13:43:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742304754; cv=none; b=NhbQdg866CUlQbYI8epYejBIfhHNlL84fbxNJsUq74vmLzRctNgxMhXGKOCuSmGDMCFVrQlkOrDXzWIv8YUhlH4YZT4xBhn0VoUL3SZw1slRhrHd/Fzh4TKFa2K17QlzGQqZpMtUho0bk+yRumT/uLSE5P6uyvnauPzZNfftn5A=
+	t=1742305409; cv=none; b=oAlPgWBEj/+SMjyi8BpVq1XTBzrZm3YhMVjifA2ecsbfpZ0w5w9WfEMOmw9njr6FsgBh1xR7HmqjhR0QE65bdOngisx4sQnQdJhKE41zmC8XRs5Qp5Rbkd70bi5H+4SF3UcxROseNEBR4pJA75GMw36sYkR9zoISiWRIHcjoUds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742304754; c=relaxed/simple;
-	bh=atZyZBDaKu8zgIvWhjv6QkvBeza+jB3VmH5MdFx9o3U=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=s/ZDrzEm0u6mOF0kB+7XkDzd9z5GuxSRhgMLvc8zLHnVMr6oLq34dl+RRgfGkthISP5F9E/9msIIST+XRiQXcQpezz2gPuPkFaghZncnsfsJDW3P2kdXHRAXs3LVkW2RUmp/j16mRidk4YikM9eVFeaqyyVK0RHoEX2w3FLsgmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KkqIFrRA; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2ff65d88103so6133342a91.2;
-        Tue, 18 Mar 2025 06:32:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742304752; x=1742909552; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aiGEccXl9Y/5xx8hXRp6JuAdI46/d2pVYeRgnwqo7io=;
-        b=KkqIFrRAcCobzCT24oifF0SarhfeDW3ySTjfnDF+zjEdr8Di9ETB6AaVGvutWTJDh9
-         cUclInMZ505XXw7oeffHKfb0A3ebRRXtLB2KL3UELVd+FRi3Lr2jdqwlmMZmvn73SU1c
-         WRi/cSdZ9ilZwzRth186l1jK8fMUew5wGk7cXL6i5KsL/ZN5dmbWJVu8wSB5Sg4Bdl0Z
-         +6wdV94ONXKe6AQtbj+2wouBb8f1r+x5F6LOp0tZ5nJDkxfxCIji5hHob1Xw6BSrX0Is
-         gBxLF4HYpK0Qr3ECOXdOH6eC4dtAiQMJGyNgW3XqS5JXnM0hNUdIBgBP4GAHHent9B4y
-         DnTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742304752; x=1742909552;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aiGEccXl9Y/5xx8hXRp6JuAdI46/d2pVYeRgnwqo7io=;
-        b=cRpHz19TL6cRebO9NB0ISbwtGRmwgJMEAZSYUYYIOTpZ2ipUOITuBT//22omUYdpuV
-         R3+HjBGm0OvSBdxzqRdfLuPixfIOK62BvnUuxE+ksacTqBXDw8j1pBtv7t3Q/tpeMj6o
-         crMZA+SD5smgCUbzGbB2RkzaloBU8g71lD8ogV5fT5+jKNALatxr42bfGHv6CGK+vZE9
-         gSFCnmk1iNwa0snH35ZtBWpyMwHXAoSGlZuK1nd2rR7B7ggh1kkdHpbDvVybdHP9LCyn
-         xhZGzsRe0sOPqoN5NgO7Hm4dDpB0K0pV/EcIvGw0Ax8nC2qxt57kr+RUp9nK197LryrG
-         9tIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWfqk6GzNk+YYGHPRlaP+NZMEIoD6Q7HRLKkXy3sIyPADgoWooqTaqhjC6WHzJYCtRxJQjKDKADLnHYagg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6JRu7s8xbMW+Rtvrx56ZFsnVg0PXAk2DGUcvSvsipBnCKW9gS
-	Ek9N84hCEARe1ARtCUTzHmWFWudHBKI1sRrbCmwyVHTUJn8GJBjSZPrr1pI=
-X-Gm-Gg: ASbGncu5eMw6Afw+Pdy0HXPA/ctvS+BOgxkVsoq8oerTImqJYRSKmaxuVBLWxXw2dbu
-	AiHuHUrGD1uX1yV+nNRKy9ukYhcndsN9jOgWmm+fJ1HCjuNzYQxyW4223PEgc/yHHVAhns2tHK1
-	PWZn1+6d04peGpBk71G3jfihIrlyMeQtLJK5QlQQwfO7efJUtwHwV0qNcd7uBkVpJvw3KJtcu8r
-	mUhYB6Doydt1kXcJve19wEO+wJ6AYgqfNUurz4XRm1LnLqCMmB4SD8AWh8vNOdeD2PQbrM0VILq
-	m2m10t21BTSrz+nH2XMnV2vIjemRQNGnrF9IUCDtI7Esmm7DbnmTLyWoVWt7PMh8+LfHweMLE0a
-	K8y1+nDgKcPhJbwe7sTK+M80nmyBdh8xUvRaQVg==
-X-Google-Smtp-Source: AGHT+IGXhfnisLMrxeiE9MJU0p7Lq3D8DFd7wT1rb1S7PwypIfPgi9Pn5QlpBKKPkeupVyQoxCjvoA==
-X-Received: by 2002:a05:6a20:7f9e:b0:1f5:769a:a4c2 with SMTP id adf61e73a8af0-1f5c127ad1amr21646425637.22.1742304751930;
-        Tue, 18 Mar 2025 06:32:31 -0700 (PDT)
-Received: from localhost.localdomain (124-218-201-66.cm.dynamic.apol.com.tw. [124.218.201.66])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af56ea94891sm8936161a12.67.2025.03.18.06.32.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Mar 2025 06:32:31 -0700 (PDT)
-From: "Lucien.Jheng" <lucienx123@gmail.com>
-X-Google-Original-From: "Lucien.Jheng" <lucienX123@gmail.com>
-To: linux-clk@vger.kernel.org,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	daniel@makrotopia.org,
-	ericwouds@gmail.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	joseph.lin@airoha.com,
-	wenshin.chung@airoha.com,
-	lucien.jheng@airoha.com,
-	"Lucien.Jheng" <lucienX123@gmail.com>
-Subject: [PATCH v5 net-next PATCH 1/1] net: phy: air_en8811h: Add clk provider for CKO pin
-Date: Tue, 18 Mar 2025 21:31:05 +0800
-Message-Id: <20250318133105.28801-2-lucienX123@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250318133105.28801-1-lucienX123@gmail.com>
-References: <20250318133105.28801-1-lucienX123@gmail.com>
+	s=arc-20240116; t=1742305409; c=relaxed/simple;
+	bh=fclbCAAogzO5TELWwNeVPp4YXPQGdH0oHV8kXh8JcZo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=f7OiLQMynPNAx+dcWUjluzRm8OGypNUviIJjxZ+UJaFVB+5u31tkMNThoyiOjKJ83CMm5PFbrDiJTWZH7AjWEIR6k1auaYbTrJAUQvBAW4rJgdIRaxcdc6wqcn/YTeu0M13S4uEH+iIbiflCe2o5dSU9N712povXx3D45xJvG6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SZ6dmNsF; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742305407;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=J9ZqlqhDnmyRhXG5WpWZX4M2zoIV7vrfnOKM1wlQCW0=;
+	b=SZ6dmNsFOS8osZnOZ+hSgoQsPq2PyPLZHYuCzEWBfjxetjxhFjY11vUZbVsejCRLPa2mt/
+	Y3Z0zfuahEDMK1HMPs6TiQOCe8DXEDQNuNLW1S6WFHFrd4gRQrmKztj3Gbom4e42fKe8nm
+	9QDfz0q2rTE78I05zk05F6TcFx+Yovo=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-618-1REig4SIOuqvV5P52APSbw-1; Tue,
+ 18 Mar 2025 09:43:24 -0400
+X-MC-Unique: 1REig4SIOuqvV5P52APSbw-1
+X-Mimecast-MFC-AGG-ID: 1REig4SIOuqvV5P52APSbw_1742305403
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4EC47195609E;
+	Tue, 18 Mar 2025 13:43:23 +0000 (UTC)
+Received: from pablmart-thinkpadt14gen4.rmtes.csb (unknown [10.42.28.99])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3EAFB1956095;
+	Tue, 18 Mar 2025 13:43:20 +0000 (UTC)
+From: Pablo Martin Medrano <pablmart@redhat.com>
+To: netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Petr Machata <petrm@nvidia.com>,
+	Pablo Martin Medrano <pablmart@redhat.com>
+Subject: [PATCH net v3] selftests/net: big_tcp: return xfail on slow machines
+Date: Tue, 18 Mar 2025 14:42:50 +0100
+Message-ID: <472257e02c57.git.pablmart@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,156 +75,108 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-EN8811H outputs 25MHz or 50MHz clocks on CKO, selected by GPIO3.
-CKO clock operates continuously from power-up through md32 loading.
-Implement clk provider driver so we can disable the clock output in case
-it isn't needed, which also helps to reduce EMF noise
+After debugging the following output for big_tcp.sh on a board:
 
-Signed-off-by: Lucien.Jheng <lucienX123@gmail.com>
+CLI GSO | GW GRO | GW GSO | SER GRO
+on        on       on       on      : [PASS]
+on        off      on       off     : [PASS]
+off       on       on       on      : [FAIL_on_link1]
+on        on       off      on      : [FAIL_on_link1]
+
+Davide Caratti found that by default the test duration 1s is too short
+in slow systems to reach the correct cwd size necessary for tcp/ip to
+generate at least one packet bigger than 65536 (matching the iptables
+match on length rule the test evaluates)
+
+This skips (with xfail) the aforementioned failing combinations when
+KSFT_MACHINE_SLOW is set. For that the test has been modified to use
+facilities from net/lib.sh.
+
+The new output for the test will look like this (example with a forced
+XFAIL)
+
+Testing for BIG TCP:
+      CLI GSO | GW GRO | GW GSO | SER GRO
+TEST: on        on       on       on                    [ OK ]
+TEST: on        off      on       off                   [ OK ]
+TEST: off       on       on       on                    [XFAIL]
+
+Fixes: a19747c3b9bf ("selftests: net: let big_tcp test cope with slow env")
+Suggested-by: Davide Caratti <dcaratti@redhat.com>
+Suggested-by: Petr Machata <petrm@nvidia.com>
+Signed-off-by: Pablo Martin Medrano <pablmart@redhat.com>
 ---
- drivers/net/phy/air_en8811h.c | 95 +++++++++++++++++++++++++++++++++++
- 1 file changed, 95 insertions(+)
+Changes in v3:
+- Added 12 characters of length to the Fixes: tag
+- Exit test on the first fail
 
-diff --git a/drivers/net/phy/air_en8811h.c b/drivers/net/phy/air_en8811h.c
-index e9fd24cb7270..47ace7fac1d3 100644
---- a/drivers/net/phy/air_en8811h.c
-+++ b/drivers/net/phy/air_en8811h.c
-@@ -16,6 +16,7 @@
- #include <linux/property.h>
- #include <linux/wordpart.h>
- #include <linux/unaligned.h>
-+#include <linux/clk-provider.h>
+Changes in v2:
+- Don't break the loop and use lib.sh facilities (thanks Peter Machata)
+- Rephrased the subject from "longer netperf session on slow machines"
+  as the patch is not configuring a longer session but skipping
+- Added tags and SOB and the Fixes: hash (thank you Davide Caratti)
+- Link to v1: https://lore.kernel.org/all/b800a71479a24a4142542051636e980c3b547434.1739794830.git.pablmart@redhat.com/
+---
+ tools/testing/selftests/net/big_tcp.sh | 23 +++++++++++------------
+ 1 file changed, 11 insertions(+), 12 deletions(-)
+
+diff --git a/tools/testing/selftests/net/big_tcp.sh b/tools/testing/selftests/net/big_tcp.sh
+index 2db9d15cd45f..52b9a76b1c19 100755
+--- a/tools/testing/selftests/net/big_tcp.sh
++++ b/tools/testing/selftests/net/big_tcp.sh
+@@ -21,8 +21,7 @@ CLIENT_GW6="2001:db8:1::2"
+ MAX_SIZE=128000
+ CHK_SIZE=65535
  
- #define EN8811H_PHY_ID		0x03a2a411
+-# Kselftest framework requirement - SKIP code is 4.
+-ksft_skip=4
++source lib.sh
  
-@@ -112,6 +113,11 @@
- #define   EN8811H_POLARITY_TX_NORMAL		BIT(0)
- #define   EN8811H_POLARITY_RX_REVERSE		BIT(1)
+ setup() {
+ 	ip netns add $CLIENT_NS
+@@ -143,21 +142,20 @@ do_test() {
+ 	start_counter link3 $SERVER_NS
+ 	do_netperf $CLIENT_NS
  
-+#define EN8811H_CLK_CGM     0xcf958
-+#define EN8811H_CLK_CGM_CKO     BIT(26)
-+#define EN8811H_HWTRAP1     0xcf914
-+#define EN8811H_HWTRAP1_CKO     BIT(12)
-+
- #define EN8811H_GPIO_OUTPUT		0xcf8b8
- #define   EN8811H_GPIO_OUTPUT_345		(BIT(3) | BIT(4) | BIT(5))
+-	if check_counter link1 $ROUTER_NS; then
+-		check_counter link3 $SERVER_NS || ret="FAIL_on_link3"
+-	else
+-		ret="FAIL_on_link1"
+-	fi
++	check_counter link1 $ROUTER_NS
++	check_err $? "fail on link1"
++	check_counter link3 $SERVER_NS
++	check_err $? "fail on link3"
  
-@@ -142,10 +148,15 @@ struct led {
- 	unsigned long state;
- };
+ 	stop_counter link1 $ROUTER_NS
+ 	stop_counter link3 $SERVER_NS
+-	printf "%-9s %-8s %-8s %-8s: [%s]\n" \
+-		$cli_tso $gw_gro $gw_tso $ser_gro $ret
+-	test $ret = "PASS"
++	log_test "$(printf "%-9s %-8s %-8s %-8s" \
++			$cli_tso $gw_gro $gw_tso $ser_gro)"
++	test $RET -eq 0
+ }
  
-+#define clk_hw_to_en8811h_priv(_hw)			\
-+	container_of(_hw, struct en8811h_priv, hw)
-+
- struct en8811h_priv {
- 	u32		firmware_version;
- 	bool		mcu_needs_restart;
- 	struct led	led[EN8811H_LED_COUNT];
-+	struct clk_hw        hw;
-+	struct phy_device *phydev;
- };
+ testup() {
+-	echo "CLI GSO | GW GRO | GW GSO | SER GRO" && \
++	echo "      CLI GSO | GW GRO | GW GSO | SER GRO" && \
+ 	do_test "on"  "on"  "on"  "on"  && \
+ 	do_test "on"  "off" "on"  "off" && \
+ 	do_test "off" "on"  "on"  "on"  && \
+@@ -176,7 +174,8 @@ if ! ip link help 2>&1 | grep gso_ipv4_max_size &> /dev/null; then
+ fi
  
- enum {
-@@ -806,6 +817,84 @@ static int en8811h_led_hw_is_supported(struct phy_device *phydev, u8 index,
- 	return 0;
- };
- 
-+static unsigned long en8811h_clk_recalc_rate(struct clk_hw *hw, unsigned long parent)
-+{
-+	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
-+	struct phy_device *phydev = priv->phydev;
-+	u32 pbus_value;
-+	int ret;
-+
-+	ret = air_buckpbus_reg_read(phydev, EN8811H_HWTRAP1, &pbus_value);
-+	if (ret < 0)
-+		return ret;
-+
-+	return (pbus_value & EN8811H_HWTRAP1_CKO) ? 50000000 : 25000000;
-+}
-+
-+static int en8811h_clk_enable(struct clk_hw *hw)
-+{
-+	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
-+	struct phy_device *phydev = priv->phydev;
-+
-+	return air_buckpbus_reg_modify(phydev, EN8811H_CLK_CGM,
-+				EN8811H_CLK_CGM_CKO, EN8811H_CLK_CGM_CKO);
-+}
-+
-+static void en8811h_clk_disable(struct clk_hw *hw)
-+{
-+	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
-+	struct phy_device *phydev = priv->phydev;
-+
-+	air_buckpbus_reg_modify(phydev, EN8811H_CLK_CGM,
-+				EN8811H_CLK_CGM_CKO, 0);
-+}
-+
-+static int en8811h_clk_is_enabled(struct clk_hw *hw)
-+{
-+	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
-+	struct phy_device *phydev = priv->phydev;
-+	int ret = 0;
-+	u32 pbus_value;
-+
-+	ret = air_buckpbus_reg_read(phydev, EN8811H_CLK_CGM, &pbus_value);
-+	if (ret < 0)
-+		return ret;
-+
-+	return (pbus_value & EN8811H_CLK_CGM_CKO);
-+}
-+
-+static const struct clk_ops en8811h_clk_ops = {
-+	.recalc_rate = en8811h_clk_recalc_rate,
-+	.enable = en8811h_clk_enable,
-+	.disable = en8811h_clk_disable,
-+	.is_enabled	= en8811h_clk_is_enabled,
-+};
-+
-+static int en8811h_clk_provider_setup(struct device *dev, struct clk_hw *hw)
-+{
-+	struct clk_init_data init;
-+	int ret;
-+
-+	if (!IS_ENABLED(CONFIG_COMMON_CLK))
-+		return 0;
-+
-+	init.name =  devm_kasprintf(dev, GFP_KERNEL, "%s-cko",
-+				    fwnode_get_name(dev_fwnode(dev)));
-+	if (!init.name)
-+		return -ENOMEM;
-+
-+	init.ops = &en8811h_clk_ops;
-+	init.flags = 0;
-+	init.num_parents = 0;
-+	hw->init = &init;
-+
-+	ret = devm_clk_hw_register(dev, hw);
-+	if (ret)
-+		return ret;
-+
-+	return devm_of_clk_add_hw_provider(dev, of_clk_hw_simple_get, hw);
-+}
-+
- static int en8811h_probe(struct phy_device *phydev)
- {
- 	struct en8811h_priv *priv;
-@@ -838,6 +927,12 @@ static int en8811h_probe(struct phy_device *phydev)
- 		return ret;
- 	}
- 
-+	priv->phydev = phydev;
-+	/* Co-Clock Output */
-+	ret = en8811h_clk_provider_setup(&phydev->mdio.dev, &priv->hw);
-+	if (ret)
-+		return ret;
-+
- 	/* Configure led gpio pins as output */
- 	ret = air_buckpbus_reg_modify(phydev, EN8811H_GPIO_OUTPUT,
- 				      EN8811H_GPIO_OUTPUT_345,
+ trap cleanup EXIT
++xfail_on_slow
+ setup && echo "Testing for BIG TCP:" && \
+ NF=4 testup && echo "***v4 Tests Done***" && \
+ NF=6 testup && echo "***v6 Tests Done***"
+-exit $?
++exit $EXIT_STATUS
 -- 
-2.34.1
+2.48.1
 
 
