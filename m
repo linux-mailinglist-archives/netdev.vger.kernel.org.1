@@ -1,114 +1,92 @@
-Return-Path: <netdev+bounces-175663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDBFFA670BB
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 11:06:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58B1FA670C4
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 11:10:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 366F7189C1DD
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 10:06:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B44DD16BAF2
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 10:10:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D7062054F1;
-	Tue, 18 Mar 2025 10:06:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 137F6206F3E;
+	Tue, 18 Mar 2025 10:09:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="afjgRjJ+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EVo06fBh"
 X-Original-To: netdev@vger.kernel.org
-Received: from va-2-32.ptr.blmpb.com (va-2-32.ptr.blmpb.com [209.127.231.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BB542066EF
-	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 10:06:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4F21EB5F8;
+	Tue, 18 Mar 2025 10:09:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742292390; cv=none; b=ozuHGFuTyPxLr7jT4mOZbdvWB2oIGhYhWHhy0n5mPp+WXDgM6LZ5C42RjidEshIzq6SDrqVTVBOuSM+Amlukf6LsoctZOtG3ckcuueel+N3RHr26LpsvIWfnx6ObwBY+02o7VArNquJIY4vCElI2VeSDgq+WM08uPSsmGMRbMDI=
+	t=1742292599; cv=none; b=J4oLn1i7EgOqh0bYYel6ytQlTS+SQJM6G0D/xUcpQWrMtT7QXP1vNcIvQG8JhRG9rUpllaLph2KpLtwuehg/Yzo2/fMssFz0Vjr/aM3EC3bWmbuUJwhneds+x3W5kn9BKV63O1dJ8j3LAvG+9T9YrD1OAfYXk6W9J/edf9WKfYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742292390; c=relaxed/simple;
-	bh=3aByyzzlxQntWJLvDI57KkWkxrdgOCicA+69JTcAhB8=;
-	h=Content-Type:From:In-Reply-To:Date:Cc:Subject:Message-Id:
-	 Mime-Version:References:To; b=mRTb78DSS//8n3IPLGgh90tI1N5DCIN1HrhVhJ7z9+RlLF0zVtm/FusfftZkM5rT7crx7thdpjdB+5nZ0gpGj3EhBZ1UGgIXbUZnQd8K7w6qOG7Cq6YF7BOr8fu7QU+UeSRfmhcl+tf3vyQr5Aj9NCTf1D1706k+cfMLjk9JWrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=afjgRjJ+; arc=none smtp.client-ip=209.127.231.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=feishu2403070942; d=yunsilicon.com; t=1742292372; h=from:subject:
- mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
- mime-version:in-reply-to:message-id;
- bh=Hgw4pyhV9IXk0fgTMKvvY5d8ZlCtr9DdunGzDDslLKo=;
- b=afjgRjJ+uABHd7mF1VTHbnneitDupGTRgD+7XGcHaZ/Dw/DHreyrw14Wt/4vTJg6mEmLRn
- KKZS6vwvv7hrF3UKMUNeRzSK/+cgGs8A+8ar8C5PnDJ1Ox85c4sPPCkUlPo6ULqAAUCrJc
- coL7AkrPrF37fiXisQf8glVV7KrDLvrhn9efOKJiwR/6nJJpSb3L3esn0YC9LApgfjl6oN
- LzGy3NEG4iMnEtcQJkABoy4oRtBaxWH9hl8jf77zKXrg3KcsOBxPCsFl9di7F1tNWtcPAH
- gA8WrouC0wkykLqqS3ilVjbLSImU7V2lmfYivbp5PvECIREKDBW4VDvRtmuXdA==
-Content-Type: text/plain; charset=UTF-8
-X-Lms-Return-Path: <lba+267d94592+5e1e26+vger.kernel.org+tianx@yunsilicon.com>
-Received: from [127.0.0.1] ([218.1.186.193]) by smtp.feishu.cn with ESMTPS; Tue, 18 Mar 2025 18:06:09 +0800
-From: "Xin Tian" <tianx@yunsilicon.com>
-User-Agent: Mozilla Thunderbird
-In-Reply-To: <69c322e0-7e38-4ac6-b390-7a9b294261b3@yunsilicon.com>
-Date: Tue, 18 Mar 2025 18:06:07 +0800
-X-Original-From: Xin Tian <tianx@yunsilicon.com>
-Cc: <netdev@vger.kernel.org>, <leon@kernel.org>, <andrew+netdev@lunn.ch>, 
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>, 
-	<davem@davemloft.net>, <jeff.johnson@oss.qualcomm.com>, 
-	<przemyslaw.kitszel@intel.com>, <weihg@yunsilicon.com>, 
-	<wanry@yunsilicon.com>, <jacky@yunsilicon.com>, 
-	<parthiban.veerasooran@microchip.com>, <masahiroy@kernel.org>, 
-	<kalesh-anakkur.purayil@broadcom.com>, <geert+renesas@glider.be>
-Subject: Re: [PATCH net-next v8 02/14] xsc: Enable command queue
-Message-Id: <c94717a8-0d96-4914-8e24-9eb2959aa193@yunsilicon.com>
+	s=arc-20240116; t=1742292599; c=relaxed/simple;
+	bh=C3maJ1IGMFjownQSFkIvyjueS0L51aE8ntpupS0+5oQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Q+FXHaiQ82L46Nl5AlA6KHou/toPyBBiD5sWMVxoOpsKyrRRsuxn2QlnonaNV2mGlhffe6EUXjv1stSOmymO1JUA77UDcAk/Qmrp2swm8u8miOVlsukxM86upH9EQDedwmvPI/DLSfQhgYk5jws8/JdI4ul/tlMHgw9oFRZQNZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EVo06fBh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58DFDC4CEDD;
+	Tue, 18 Mar 2025 10:09:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742292597;
+	bh=C3maJ1IGMFjownQSFkIvyjueS0L51aE8ntpupS0+5oQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=EVo06fBhI2lsM6JVLzi2odfprQRfiE8wKaEbQqRLfHpAaripiriIEx09ry5uzsptD
+	 Lyr2HVXtfhbyc/sJB4K9yk3cgYRUeipXfVU/F330y+2sOpG4DoAVAsduXdyyAGtDSK
+	 y0UEt1nZHSyjQhNRjcitwJqcfaECKheB37I5wS9QDlieb0HZaLadIXIP/oyDmVX2Cc
+	 thcuJxD5yX4xd4UhkuOP7wcHecEKV6nnhJKY3pfkPuYV38zgh1jkYfF8hj5BMxPT8w
+	 3W3tT7TSiKXsb0g5O2Ek0UiEblL7ZxxqY9BFK/2ejsZkgXYOLvT0dmtKjWtwDcEcVU
+	 G/48f/7Pgye+Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EBCFD380DBE8;
+	Tue, 18 Mar 2025 10:10:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-References: <20250307100824.555320-1-tianx@yunsilicon.com> <20250307100827.555320-3-tianx@yunsilicon.com> <20250310063429.GF4159220@kernel.org> <69c322e0-7e38-4ac6-b390-7a9b294261b3@yunsilicon.com>
-To: "Simon Horman" <horms@kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] qed: remove cast to pointers passed to kfree
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174229263277.4111172.9454452389571676376.git-patchwork-notify@kernel.org>
+Date: Tue, 18 Mar 2025 10:10:32 +0000
+References: <20250311070624.1037787-1-nichen@iscas.ac.cn>
+In-Reply-To: <20250311070624.1037787-1-nichen@iscas.ac.cn>
+To: Chen Ni <nichen@iscas.ac.cn>
+Cc: manishc@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 2025/3/12 17:17, Xin Tian wrote:
-> On 2025/3/10 14:34, Simon Horman wrote:
->> On Fri, Mar 07, 2025 at 06:08:29PM +0800, Xin Tian wrote:
->>> The command queue is a hardware channel for sending
->>> commands between the driver and the firmware.
->>> xsc_cmd.h defines the command protocol structures.
->>> The logic for command allocation, sending,
->>> completion handling, and error handling is implemented
->>> in cmdq.c.
->>>
->>> Co-developed-by: Honggang Wei <weihg@yunsilicon.com>
->>> Signed-off-by: Honggang Wei <weihg@yunsilicon.com>
->>> Co-developed-by: Lei Yan <jacky@yunsilicon.com>
->>> Signed-off-by: Lei Yan <jacky@yunsilicon.com>
->>> Signed-off-by: Xin Tian <tianx@yunsilicon.com>
->> Hi Xin,
->>
->> Some minor feedback from my side.
->>
->> ...
->>
->>> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/cmdq.c b/drivers/net/ethernet/yunsilicon/xsc/pci/cmdq.c
->> ...
->>
->>> +static int xsc_copy_to_cmd_msg(struct xsc_cmd_msg *to, void *from, int size)
->>> +{
->>> +	struct xsc_cmd_prot_block *block;
->>> +	struct xsc_cmd_mailbox *next;
->>> +	int copy;
->>> +
->>> +	if (!to || !from)
->>> +		return -ENOMEM;
->>> +
->>> +	copy = min_t(int, size, sizeof(to->first.data));
->> nit: I expect that using min() is sufficient here...
-> Ack
+Hello:
 
-min(size, sizeof(to->first.data)) will lead to a compile warning.
-size is int and sizeof(to->first.data) is size_t.
-So I kept this in v9
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Thanks,
-Xin
+On Tue, 11 Mar 2025 15:06:24 +0800 you wrote:
+> Remove unnecessary casts to pointer types passed to kfree.
+> Issue detected by coccinelle:
+> @@
+> type t1;
+> expression *e;
+> @@
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] qed: remove cast to pointers passed to kfree
+    https://git.kernel.org/netdev/net-next/c/f5825e79b2b7
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
