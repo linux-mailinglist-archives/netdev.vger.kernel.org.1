@@ -1,106 +1,74 @@
-Return-Path: <netdev+bounces-175576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4734FA66718
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 04:15:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45A33A6671C
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 04:15:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B2F33AE397
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 03:12:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00F531888611
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 03:14:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6C4C1A8F8A;
-	Tue, 18 Mar 2025 03:10:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 890C0199EB2;
+	Tue, 18 Mar 2025 03:14:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TwJ5F5Rf"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="XO5R4i5D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from xmbghk7.mail.qq.com (xmbghk7.mail.qq.com [43.163.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E62719341F;
-	Tue, 18 Mar 2025 03:10:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA48D18FC67;
+	Tue, 18 Mar 2025 03:13:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.163.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742267418; cv=none; b=YFkHv4TQWs+DSOSUdnEiBy5eIosWwG5qookhv94zXb+gY78dbL+OAtZ2Bvj9VaaGIeiHEBYtCS6tG0gzH3pISod7bYyxVj+nOpBv6KL8Yy/wYTezzJHX4P+OmWTljJg8nXURiZWrMRPdiuFp4Mx+AMLNXCxL+WdAvr+vvyOYQfY=
+	t=1742267647; cv=none; b=r9IAvRsOvxncBsY7EYACIed+KyI0xE2fzqXvRg4sENj/c8faO+dDBaepeTHrtHdAWvDwD9Zd/6GeSB6ubjN4n3/86Lz4ctiKnGaTQ2ngXrjCbDSp9p4K8m2Ec3EjIbIhjGDV8J7y57te8CAdFkACKeMAZjtI/SPI9Uougm4nlNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742267418; c=relaxed/simple;
-	bh=3IZ4KIMokVKhdTfXCW+naj0KUzLIZ662FdCXfyXBtyQ=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=sGsGYednHs1eOSVkLb3/edNK2hGkZ6TZoUqElzwGQ5VjOyfW/WgkeN1Qw23YLYv8m0a08kVfYQgrCdUIbKU5Sj64h/r8LzaXrBKibf65URY/dp+ZZR1FYDDJMT4EwrTfCWArS3OQ79OxTx2RH6Gnzc84ZU5BHtCwmaAnUfvgs20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TwJ5F5Rf; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1742267417; x=1773803417;
-  h=from:to:subject:date:message-id:in-reply-to:references:
-   mime-version:content-transfer-encoding;
-  bh=3IZ4KIMokVKhdTfXCW+naj0KUzLIZ662FdCXfyXBtyQ=;
-  b=TwJ5F5RfOieMEmLI+vX4XZCxsRyDeXDMSLyeG+Z2VCBil7Vs+gwne2as
-   FfL7PoXBffOLrklW8qxm+31EaHj/nRFfzkw3rAdVuUInVxrCcaYhhl7XZ
-   lj8IuWUpHi65OoYHRlqP6xbEVEjEN0d/GQmC0lJLa6TpsXU9yiEUkJ02d
-   Ua62iSDiNQv1Bbxp4kgg/8IYqDnchDARUPOGA+pHN3qf6tKvm/FvJLq15
-   LPfp0msaKVCoLkp+oGDSXUXnilY7q1nd+r9SN6UiA3eLiAiLsTfoNHacn
-   Vm6efZJwUMugFTWHHhcOn0OTMT6CuFMnXBr6axoFQMbhqxcLXfFmlJKKz
-   g==;
-X-CSE-ConnectionGUID: a0uokgXvRRWfWEsJpmveWA==
-X-CSE-MsgGUID: V1ZypqNCRaKr0jv3DHSE3g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11376"; a="54383290"
-X-IronPort-AV: E=Sophos;i="6.14,255,1736841600"; 
-   d="scan'208";a="54383290"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Mar 2025 20:10:13 -0700
-X-CSE-ConnectionGUID: oRlpz5nWTyqIvBViMP3UAA==
-X-CSE-MsgGUID: 4BSoNZ57Qz6hE25r114VvA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,255,1736841600"; 
-   d="scan'208";a="126313976"
-Received: from mohdfai2-ilbpg12-1.png.intel.com ([10.88.227.73])
-  by fmviesa003.fm.intel.com with ESMTP; 17 Mar 2025 20:10:05 -0700
-From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Simon Horman <horms@kernel.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Furong Xu <0x1207@gmail.com>,
-	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Hariprasad Kelam <hkelam@marvell.com>,
-	Xiaolei Wang <xiaolei.wang@windriver.com>,
-	Suraj Jaiswal <quic_jsuraj@quicinc.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Gal Pressman <gal@nvidia.com>,
-	Jesper Nilsson <jesper.nilsson@axis.com>,
-	linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org,
+	s=arc-20240116; t=1742267647; c=relaxed/simple;
+	bh=AZ55Y92hDkMTOjwm7JJ9rYKlm9+ZZbx/UiUTMCgRNrg=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=eMgvaB12SbWPHmiJrgonY8HCvrXaJg4uHZmoCGO4SEhRy940uuG9zk6emH+HFtd/KdcCYePkuq4hpnimYJ9aSjArJ+CjDnw2ghQVJ1bERjf7CnNywwWiJS/D4OGTNC9mfOzSRbRzmVg/9JOUumoU9SempeZrDzMohl3V6qj4SPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=XO5R4i5D; arc=none smtp.client-ip=43.163.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1742267626; bh=RbkgErBKSjIjyF/NQ8SNlrc08UBPt0RCDXZR18vxpx0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=XO5R4i5DvgofXa8GJUrpll78yZaxMc8y9TODoPv//kPBSG38Wi4Tlnpdw5qzYuAz0
+	 fR2920lwn7fytgyPhkc6juIq2jHSypRfv0a3PFkxVRMGW66BQTq5JDYJGHdFUeq9Ex
+	 vNiAZBf1EJS4MfikJ2PPhKsSvm4k/LTw+J/lBGfM=
+Received: from pek-lxu-l1.wrs.com ([114.244.57.157])
+	by newxmesmtplogicsvrszb21-0.qq.com (NewEsmtp) with SMTP
+	id 36CB9081; Tue, 18 Mar 2025 11:13:44 +0800
+X-QQ-mid: xmsmtpt1742267624tayv9vcrg
+Message-ID: <tencent_258DD9121DDDB9DD9A1939CFAA0D8625B107@qq.com>
+X-QQ-XMAILINFO: N2OjbX1i5tuyTIiVi6B6/ExXFm3Cn/m/CL81NjqXX405hDX1Nl0Us9snWAQ5+F
+	 dnaHTj4NZwLVj1hzU3GFjc2Dtpu6I65OR5+9y0SBTrxYHnrwm0ob+KbJHvCGH1IPNTfvIk7ZTq8Q
+	 o1WHR3Y4R3GBeQbNqqIHNjibqyqS3D4SyfekJEGDV6A8e407QChzzPH4kx4YI/4/L4IVzyz9+SSI
+	 zjE39tsinsIB4cYYyWRftinBVT3jsdUgIOrDlaf9+73ZubpjREC9QIP8GJcSvH4eVkCjGh5GR7dh
+	 Qt9QhCWlgW9VP0yg5s0icjSCSCL/k5+rgS1C239EOK805Mh4Hrqp0A6T8U7avzEncvJHVPbpjntF
+	 4GZTcsn+eupV7MKufWnUxl2IDeN/sJjUtB4q/oWtFUX+pC3/AxAhHFZ6v+NRNTZO7pfZweQwabux
+	 Uo72l33vnEqKgFw0M7Zq4Ik3NS8pp472JyObv4S7H4wkq7CIYDQ0FQ+RfsywcpvE80CETG4rdRZM
+	 8acTg8p68MDANoif1Kr1fXeYleLKq0E9GKa6dHSZNvIdcMZZ8ZzmqwvpMyasm3WG2BpfN5Cgf3j2
+	 zykhXbzUT5msO4N7nB/w1mtIw7LPW5R7wYrrrbsiiS2QRoTt3Is0lWjbFZgE77VCKFm3RV2sCJWw
+	 zJwKheNRs94wqpzQt0SZyAwabaQ0A1AoOQEqRBbSDo6jNbW7J5w9G1kDwGDS6omZNytLYq40WBfv
+	 S8/2MmFeLIWDg+EC/vu7Ai6HeGkb6w6bjZ5jQutdu3qn/DHpIZHFiTbmZDQ2BdptG4GSF4TApC9D
+	 +s8oZYxwlBDB8b5oKz9d+5Sy4QmPEEQComRz9e2VTlikd0tBcgL3P4uEba6hj9LoJCtww8hXKht9
+	 4yZK0HjZeSG3zHw1CrIGEUjKt1adLbla88MCI5e0OVGaKK1eluZ1I=
+X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+From: Edward Adam Davis <eadavis@qq.com>
+To: syzbot+aaf0488c83d1d5f4f029@syzkaller.appspotmail.com
+Cc: johannes@sipsolutions.net,
 	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Chwee-Lin Choong <chwee.lin.choong@intel.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	Serge Semin <fancer.lancer@gmail.com>
-Subject: [PATCH iwl-next v10 14/14] igc: add support to get frame preemption statistics via ethtool
-Date: Mon, 17 Mar 2025 23:07:42 -0400
-Message-Id: <20250318030742.2567080-15-faizal.abdul.rahim@linux.intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250318030742.2567080-1-faizal.abdul.rahim@linux.intel.com>
-References: <20250318030742.2567080-1-faizal.abdul.rahim@linux.intel.com>
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH] wifi: cfg80211: init wiphy_work before allocating rfkill fails
+Date: Tue, 18 Mar 2025 11:13:45 +0800
+X-OQ-MSGID: <20250318031344.3109525-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <67d8804b.050a0220.2ca2c6.006b.GAE@google.com>
+References: <67d8804b.050a0220.2ca2c6.006b.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -109,138 +77,94 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Implemented "ethtool --include-statistics --show-mm" callback for IGC.
+syzbort reported a uninitialize wiphy_work_lock in cfg80211_dev_free. [1]
 
-Tested preemption scenario to check preemption statistics:
-1) Trigger verification handshake on both boards:
-    $ sudo ethtool --set-mm enp1s0 pmac-enabled on
-    $ sudo ethtool --set-mm enp1s0 tx-enabled on
-    $ sudo ethtool --set-mm enp1s0 verify-enabled on
-2) Set preemptible or express queue in taprio for tx board:
-    $ sudo tc qdisc replace dev enp1s0 parent root handle 100 taprio \
-      num_tc 4 map 3 2 1 0 3 3 3 3 3 3 3 3 3 3 3 3 \
-      queues 1@0 1@1 1@2 1@3 base-time 0 sched-entry S F 100000 \
-      fp E E P P
-3) Send large size packets on preemptible queue
-4) Send small size packets on express queue to preempt packets in
-   preemptible queue
-5) Show preemption statistics on the receiving board:
-   $ ethtool --include-statistics --show-mm enp1s0
-     MAC Merge layer state for enp1s0:
-     pMAC enabled: on
-     TX enabled: on
-     TX active: on
-     TX minimum fragment size: 64
-     RX minimum fragment size: 60
-     Verify enabled: on
-     Verify time: 128
-     Max verify time: 128
-     Verification status: SUCCEEDED
-     Statistics:
-      MACMergeFrameAssErrorCount: 0
-      MACMergeFrameSmdErrorCount: 0
-      MACMergeFrameAssOkCount: 511
-      MACMergeFragCountRx: 764
-      MACMergeFragCountTx: 0
-      MACMergeHoldCount: 0
+After rfkill allocation fails, the wiphy release process will be performed,
+which will cause cfg80211_dev_free to access the uninitialized wiphy_work
+related data.
 
-Co-developed-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Co-developed-by: Chwee-Lin Choong <chwee.lin.choong@intel.com>
-Signed-off-by: Chwee-Lin Choong <chwee.lin.choong@intel.com>
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+Move the initialization of wiphy_work to before rfkill initialization to
+avoid this issue.
+
+[1]
+INFO: trying to register non-static key.
+The code is fine but needs lockdep annotation, or maybe
+you didn't initialize this object before use?
+turning off the locking correctness validator.
+CPU: 0 UID: 0 PID: 5935 Comm: syz-executor550 Not tainted 6.14.0-rc6-syzkaller-00103-g4003c9e78778 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
+ assign_lock_key kernel/locking/lockdep.c:983 [inline]
+ register_lock_class+0xc39/0x1240 kernel/locking/lockdep.c:1297
+ __lock_acquire+0x135/0x3c40 kernel/locking/lockdep.c:5103
+ lock_acquire.part.0+0x11b/0x380 kernel/locking/lockdep.c:5851
+ __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+ _raw_spin_lock_irqsave+0x3a/0x60 kernel/locking/spinlock.c:162
+ cfg80211_dev_free+0x30/0x3d0 net/wireless/core.c:1196
+ device_release+0xa1/0x240 drivers/base/core.c:2568
+ kobject_cleanup lib/kobject.c:689 [inline]
+ kobject_release lib/kobject.c:720 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1e4/0x5a0 lib/kobject.c:737
+ put_device+0x1f/0x30 drivers/base/core.c:3774
+ wiphy_free net/wireless/core.c:1224 [inline]
+ wiphy_new_nm+0x1c1f/0x2160 net/wireless/core.c:562
+ ieee80211_alloc_hw_nm+0x1b7a/0x2260 net/mac80211/main.c:835
+ mac80211_hwsim_new_radio+0x1d6/0x54e0 drivers/net/wireless/virtual/mac80211_hwsim.c:5185
+ hwsim_new_radio_nl+0xb42/0x12b0 drivers/net/wireless/virtual/mac80211_hwsim.c:6242
+ genl_family_rcv_msg_doit+0x202/0x2f0 net/netlink/genetlink.c:1115
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0x565/0x800 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2533
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1312 [inline]
+ netlink_unicast+0x53c/0x7f0 net/netlink/af_netlink.c:1338
+ netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1882
+ sock_sendmsg_nosec net/socket.c:718 [inline]
+ __sock_sendmsg net/socket.c:733 [inline]
+ ____sys_sendmsg+0xaaf/0xc90 net/socket.c:2573
+ ___sys_sendmsg+0x135/0x1e0 net/socket.c:2627
+ __sys_sendmsg+0x16e/0x220 net/socket.c:2659
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+
+Fixes: 72d520476a2f ("wifi: cfg80211: cancel wiphy_work before freeing wiphy")
+Reported-by: syzbot+aaf0488c83d1d5f4f029@syzkaller.appspotmail.com
+Close: https://syzkaller.appspot.com/bug?extid=aaf0488c83d1d5f4f029
+Tested-by: syzbot+aaf0488c83d1d5f4f029@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
 ---
- drivers/net/ethernet/intel/igc/igc_ethtool.c | 40 ++++++++++++++++++++
- drivers/net/ethernet/intel/igc/igc_regs.h    | 16 ++++++++
- 2 files changed, 56 insertions(+)
+ net/wireless/core.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-index fd4b4b332309..324a27a5bef9 100644
---- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-@@ -1819,6 +1819,45 @@ static int igc_ethtool_set_mm(struct net_device *netdev,
- 	return igc_tsn_offload_apply(adapter);
- }
+diff --git a/net/wireless/core.c b/net/wireless/core.c
+index 828e29872633..ceb768925b85 100644
+--- a/net/wireless/core.c
++++ b/net/wireless/core.c
+@@ -546,6 +546,9 @@ struct wiphy *wiphy_new_nm(const struct cfg80211_ops *ops, int sizeof_priv,
+ 	INIT_WORK(&rdev->mgmt_registrations_update_wk,
+ 		  cfg80211_mgmt_registrations_update_wk);
+ 	spin_lock_init(&rdev->mgmt_registrations_lock);
++	INIT_WORK(&rdev->wiphy_work, cfg80211_wiphy_work);
++	INIT_LIST_HEAD(&rdev->wiphy_work_list);
++	spin_lock_init(&rdev->wiphy_work_lock);
  
-+/**
-+ * igc_ethtool_get_frame_ass_error - Get the frame assembly error count.
-+ * @reg_value: Register value for IGC_PRMEXCPRCNT
-+ * Return: The count of frame assembly errors.
-+ */
-+static u64 igc_ethtool_get_frame_ass_error(u32 reg_value)
-+{
-+	/* Out of order statistics */
-+	u32 ooo_frame_cnt, ooo_frag_cnt;
-+	u32 miss_frame_frag_cnt;
-+
-+	ooo_frame_cnt = FIELD_GET(IGC_PRMEXCPRCNT_OOO_FRAME_CNT, reg_value);
-+	ooo_frag_cnt = FIELD_GET(IGC_PRMEXCPRCNT_OOO_FRAG_CNT, reg_value);
-+	miss_frame_frag_cnt = FIELD_GET(IGC_PRMEXCPRCNT_MISS_FRAME_FRAG_CNT, reg_value);
-+
-+	return ooo_frame_cnt + ooo_frag_cnt + miss_frame_frag_cnt;
-+}
-+
-+static u64 igc_ethtool_get_frame_smd_error(u32 reg_value)
-+{
-+	return FIELD_GET(IGC_PRMEXCPRCNT_OOO_SMDC, reg_value);
-+}
-+
-+static void igc_ethtool_get_mm_stats(struct net_device *dev,
-+				     struct ethtool_mm_stats *stats)
-+{
-+	struct igc_adapter *adapter = netdev_priv(dev);
-+	struct igc_hw *hw = &adapter->hw;
-+	u32 reg_value;
-+
-+	reg_value = rd32(IGC_PRMEXCPRCNT);
-+
-+	stats->MACMergeFrameAssErrorCount = igc_ethtool_get_frame_ass_error(reg_value);
-+	stats->MACMergeFrameSmdErrorCount = igc_ethtool_get_frame_smd_error(reg_value);
-+	stats->MACMergeFrameAssOkCount = rd32(IGC_PRMPTDRCNT);
-+	stats->MACMergeFragCountRx = rd32(IGC_PRMEVNTRCNT);
-+	stats->MACMergeFragCountTx = rd32(IGC_PRMEVNTTCNT);
-+}
-+
- static int igc_ethtool_get_link_ksettings(struct net_device *netdev,
- 					  struct ethtool_link_ksettings *cmd)
- {
-@@ -2115,6 +2154,7 @@ static const struct ethtool_ops igc_ethtool_ops = {
- 	.set_link_ksettings	= igc_ethtool_set_link_ksettings,
- 	.self_test		= igc_ethtool_diag_test,
- 	.get_mm			= igc_ethtool_get_mm,
-+	.get_mm_stats		= igc_ethtool_get_mm_stats,
- 	.set_mm			= igc_ethtool_set_mm,
- };
+ #ifdef CONFIG_CFG80211_DEFAULT_PS
+ 	rdev->wiphy.flags |= WIPHY_FLAG_PS_ON_BY_DEFAULT;
+@@ -563,9 +566,6 @@ struct wiphy *wiphy_new_nm(const struct cfg80211_ops *ops, int sizeof_priv,
+ 		return NULL;
+ 	}
  
-diff --git a/drivers/net/ethernet/intel/igc/igc_regs.h b/drivers/net/ethernet/intel/igc/igc_regs.h
-index 12ddc5793651..f343c6bfc6be 100644
---- a/drivers/net/ethernet/intel/igc/igc_regs.h
-+++ b/drivers/net/ethernet/intel/igc/igc_regs.h
-@@ -222,6 +222,22 @@
- 
- #define IGC_FTQF(_n)	(0x059E0 + (4 * (_n)))  /* 5-tuple Queue Fltr */
- 
-+/* Time sync registers - preemption statistics */
-+#define IGC_PRMPTDRCNT		0x04284	/* Good RX Preempted Packets */
-+#define IGC_PRMEVNTTCNT		0x04298	/* TX Preemption event counter */
-+#define IGC_PRMEVNTRCNT		0x0429C	/* RX Preemption event counter */
-+
-+ /* Preemption Exception Counter */
-+ #define IGC_PRMEXCPRCNT				0x42A0
-+/* Received out of order packets with SMD-C */
-+#define IGC_PRMEXCPRCNT_OOO_SMDC			0x000000FF
-+/* Received out of order packets with SMD-C and wrong Frame CNT */
-+#define IGC_PRMEXCPRCNT_OOO_FRAME_CNT			0x0000FF00
-+/* Received out of order packets with SMD-C and wrong Frag CNT */
-+#define IGC_PRMEXCPRCNT_OOO_FRAG_CNT			0x00FF0000
-+/* Received packets with SMD-S and wrong Frag CNT and Frame CNT */
-+#define IGC_PRMEXCPRCNT_MISS_FRAME_FRAG_CNT		0xFF000000
-+
- /* Transmit Scheduling Registers */
- #define IGC_TQAVCTRL		0x3570
- #define IGC_TXQCTL(_n)		(0x3344 + 0x4 * (_n))
+-	INIT_WORK(&rdev->wiphy_work, cfg80211_wiphy_work);
+-	INIT_LIST_HEAD(&rdev->wiphy_work_list);
+-	spin_lock_init(&rdev->wiphy_work_lock);
+ 	INIT_WORK(&rdev->rfkill_block, cfg80211_rfkill_block_work);
+ 	INIT_WORK(&rdev->conn_work, cfg80211_conn_work);
+ 	INIT_WORK(&rdev->event_work, cfg80211_event_work);
 -- 
-2.34.1
+2.43.0
 
 
