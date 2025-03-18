@@ -1,143 +1,127 @@
-Return-Path: <netdev+bounces-175672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BCE5A67121
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 11:24:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D40CA6712A
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 11:25:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6BBB3B7D51
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 10:23:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 009293B847B
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 10:24:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC30C2080F6;
-	Tue, 18 Mar 2025 10:23:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8853F207E0C;
+	Tue, 18 Mar 2025 10:25:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ib3c9nwE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y9Cn2E0L"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A3241FF61A
-	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 10:23:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAABD204F97;
+	Tue, 18 Mar 2025 10:25:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742293415; cv=none; b=Y6rrNuQZ4XxMqOPKwQIep57uKCi4y/VR6USwbaby9kYJB19bhWkGvehk4kM6+oG9XwhJ0q36a8hPxEtbfra2w/lZ+srFAC1FHHF3pCdEuaAFvdYaKLihNITJWjCsntaTKWKZkSxj5OFp6NHpZ2kxmsW3+22eWhy4fyRVrtWkq10=
+	t=1742293507; cv=none; b=Z3bPyMOP5nVa8cgDweAnEtf4iK7p2wxOtpDT38562+4tuayZFhPn0/DiHi+MvzI0P3eizX9ZW1b9vZSR77NV4l0eyVprdCD9Q46OsJwhYg82CAPhR/6K8DpapJQI1jw+t1WfqUMW/hLY48lkzuSE+QnlxENNoD7KwX25TgDICHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742293415; c=relaxed/simple;
-	bh=yu/miwHG/5DBOWrVzesxZsGrjR/i09ERA/Qp7bJIj1s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=e3WL6YCRI29eRLjin7CnEw9uAdZEBDf0VNUUGO1Ee14+5RujH54/NCtFS+nThX6aWw5XUvMgTUONjZFlVGEOk0dQkmKBbe/GgNZBqR+11NSifKHQ3zcRpZ4W6O7yhxXz8Tu6ctheAM8B2wh9sCmdFi/ElmpG19YT+LcyZ5umAUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ib3c9nwE; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742293409;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yu/miwHG/5DBOWrVzesxZsGrjR/i09ERA/Qp7bJIj1s=;
-	b=ib3c9nwELDYrrI292ukohrF9jF8bTR9WFSKpH0hTtv6pkapFYQGXvGr9QOv8dB13rQyGam
-	B4pFiRlrzcKLzFbfhAYqhYF4vqqsCxAAjrrav7rgAN7Gu8khCSwj3c5RQUzE+OnAq+HMtL
-	VDycQFxW9t3TV34ZJNi+873DxVmQXR4=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-694-pSVuFmE8OUSEc2hNc3bXcQ-1; Tue, 18 Mar 2025 06:23:28 -0400
-X-MC-Unique: pSVuFmE8OUSEc2hNc3bXcQ-1
-X-Mimecast-MFC-AGG-ID: pSVuFmE8OUSEc2hNc3bXcQ_1742293407
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-5e6caac1488so6151617a12.0
-        for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 03:23:28 -0700 (PDT)
+	s=arc-20240116; t=1742293507; c=relaxed/simple;
+	bh=L642RSwY3Rs3Y6ml+gWQYS1/2YS01C+t38KIsfFZw7U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dlH8AWmxPRNFfV5UH57eD9cuumsddH5aXa76QhzbhIJUSbfu4GtcMiO36eoiMfxdXvSHrcijAn+PyDbTjWgjXbXWajbLqEujowALRZT8ZlVunGBSONjTZ5AM+aLPYVwuXaZ1xtPe1Y+b6lcHvJkM9hr1/Dn3oRwYBMDATRskE7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y9Cn2E0L; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-224341bbc1dso99939195ad.3;
+        Tue, 18 Mar 2025 03:25:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742293505; x=1742898305; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vHJpZP+ouwvFF8IfLMmV8qW0ir9r9wU3clAjxfEY604=;
+        b=Y9Cn2E0LwqT5JQQCuTK2KxyXsbqwLQN5rG+HlhM0dr8M5dU+W5aVlQXpeKaJYEoQs3
+         1bxvMNA6S1HPcXLE6cPw9ne1BIlATJ5RYjIrjwwyiERCgKg5uwKIcZMGMxI7E+cxMhnL
+         yxNcX6ay5mB0YdWWXOcbQvxsod1KfbeGig4cNtxoY7/tloOKjG6DhTz0Zq8dfpf0Xc8T
+         ij6s1N0k4l2lQ7RXJ+VYukyJULYvtvH/OYDgppmxscCQuV8w/KttAIrtrtszADAPSK9g
+         ilcwSxj8WmWSXpRs13MxID8Svzm67A+krt6qG2m9FKtLgMquK2roIowh+6EICOIWDR+0
+         gyDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742293407; x=1742898207;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yu/miwHG/5DBOWrVzesxZsGrjR/i09ERA/Qp7bJIj1s=;
-        b=m7uljq3kBF56x+SVbcapwCUCMDsH8MHlZR6iBnms34nCzRfQvJ5m4r9wqDhCYqBNPh
-         w32jZR3Zekb+gJMbkpBNL6U7fArKUeguUmAQzu2QawoyP9cmT+26eqe/hnvcPzxJ6xON
-         2Cg3MLdxbsIskvoz35dx3EdJgnUwuBgrEaGEt3wYntitg6weOxTLNFvN9CR/V6p4qDia
-         CsrqT/mKPhVcCY+NSnVSFDkKplh8243JNsYLlefsN+xMipzqRRD+Dfb55mvOWk71HqHv
-         wQSV1gdFFqAHQ09dFbfTwsKIDRU6h9hHawLKKUmacEAoHaWZB4eLSW+D8K6TTlmb7iJK
-         mkow==
-X-Forwarded-Encrypted: i=1; AJvYcCXfpTYQ8qRuZZ8EOGHgcewRGUaQQcjmDVpTD7gK4X+tpg/AhrENAzbAEqNZABTPBZY4w2XaUho=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/tZYZLbaCfbv9UauPL9IFPOvPjQAWFsKFxMdojubPLCV3rByB
-	ggJ48uKU0NiwupdmRPnB0KI1v9thGwFJx1keKwTAnPb1U9B4WT2STGK68GrDOuCLG27aNKGnBCx
-	WUvLCNqqLF4mVJ6BLxwI9z5b3gvHxxSQHBRQaBQoeXRGWkyn95OavuFrQP8KYJIH6/kLZAuwV+G
-	uIecbWogHZ26k/CvueSyBV1cx+I4yL
-X-Gm-Gg: ASbGncvppVvOlsmhH+0pLLgKucV/yEVdQW1ok5yWjjLecy+EtPKE+pnKYWeV1uebz8o
-	DN0y/O7tzyXt25xwqUIuzRRY05zGzQqRPjsur0quvSr5nbMaDwIHhs+cmNs9IxOkFDGZHKgLzSQ
-	==
-X-Received: by 2002:a05:6402:2746:b0:5e0:4c25:1491 with SMTP id 4fb4d7f45d1cf-5eb1f0003a8mr2755910a12.7.1742293407132;
-        Tue, 18 Mar 2025 03:23:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGjyrDRk1usiBEXrUhkwIqs03+nWpkGjuY57aQwx3IT25kzIUISqmC8GAQ0nzFy+hG1pV9t2z5H2wCr9D8rn8k=
-X-Received: by 2002:a05:6402:2746:b0:5e0:4c25:1491 with SMTP id
- 4fb4d7f45d1cf-5eb1f0003a8mr2755871a12.7.1742293406690; Tue, 18 Mar 2025
- 03:23:26 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1742293505; x=1742898305;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vHJpZP+ouwvFF8IfLMmV8qW0ir9r9wU3clAjxfEY604=;
+        b=OU/A44gnl1FKd463Tit9jdTyizDTlVT2THcjJNx4EcXTc8Pb1WFfdLq1fkp+3/S2N4
+         pKLUjH71PP76Waf7VCxVoj2P3CaOSFmUXliaLpqxp/gBc8ly4Yhe1eL21hkn2vCVPgR8
+         VbU4EBo7NrtfZaChP4yVJkAZ6mzalRCrA0m4qXXRGzUQnNdUixuitCrQANUgOS8UdadV
+         hPAKOmN1576o/i9UTpwIWPJIyOmfonIhgoiwuy7iHsODGsT74uCm1HV8rAXl4wpM4BFu
+         M2+r5zIeG/4+Wa6DmvjnRY1JwzhFiJ7DS18hyuNPl4YzP5k72k80sSkhekXKE5b72qOh
+         fr5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV97SV/4baFhKPNR9v+fL/HXZmHvKyh9o6cGg0Wek3WSf97+sb0Yri4wY7jAurSKec4iRM=@vger.kernel.org, AJvYcCWsr82XFYIcU5n0defP92hohxzpfod6NXIHKfQKexTWsujbd3ACVMjnH+GGk0MEIzdsabZEwi3d@vger.kernel.org, AJvYcCXHER7oGbzfXdPX397cizmMRoajAwKPgupiLT8pElrlssSQ3UHDfzRbp5gVDQsi/B9OI1xdFf9yByGC9DZq@vger.kernel.org, AJvYcCXk/otUKiEsIxecwkfWnrM9cyI9M88rUP+Gssi8AgFaVx6UNlRSn4TMaM2YlX4LelAc6lIrcFkP8Hxz0dyX5mif@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNLjZD0lfOLWMP9nVcbCAmNP1wJou/JLEiNDqJRLJRVKn2W6wk
+	d76U8jEazt8N/X9KkFbHd+w2nDLEjsxQyYH9o1uGln4bHtTHWkA1pUUC5dy7syoOwg==
+X-Gm-Gg: ASbGncvwJU0NclE9/VqbiKYw4n0ApONBLRpycZsyPGUbBHIOSBOlxfRCS1yBnTLdljR
+	g0uMWk5RK7Fg97wdyzrGZ/+icYqy6FsZHCGvpx9Z/bjyoPVdRFX8d+x53fCYu1CZwIKHfz69WqA
+	XF5MU8o59hAnIv/JG82NP37FeWpMMTV2YacG5Tu8TtXmQC+o6P2o3gex1wH5eZc0h3aarpyrPPi
+	veFzs++fR97miypS72Lii/nRwqjcciajZ4/jHNOf2KYw6p8KYVAuw0Sf1qMij2pVCRS+WX3Z0kJ
+	FQOvfAJ0vRZ0KIgeISdbwW4CdvHiUtAYJmcnC6Hyukw7SX+gCw==
+X-Google-Smtp-Source: AGHT+IE6gdO1UuE0ixmpB6cazW3Pjzhx+tIz6PbNhLSt1J2XBNAgq1vv++MsWYhJd831LrG0jM1yLg==
+X-Received: by 2002:a17:902:d2ce:b0:210:fce4:11ec with SMTP id d9443c01a7336-2262c51bc7dmr45795425ad.1.1742293505083;
+        Tue, 18 Mar 2025 03:25:05 -0700 (PDT)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-225c6ba6a38sm90449665ad.108.2025.03.18.03.24.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Mar 2025 03:25:03 -0700 (PDT)
+Date: Tue, 18 Mar 2025 10:24:40 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>, netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>, Phil Sutter <phil@nwl.cc>,
+	Florian Westphal <fw@strlen.de>, Petr Mladek <pmladek@suse.com>,
+	Yoann Congal <yoann.congal@smile.fr>, wireguard@lists.zx2c4.com,
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv4 RESEND net-next 0/2] selftests: wireguards: use
+ nftables for testing
+Message-ID: <Z9lJ6PXHeL7tfhUf@fedora>
+References: <20250106081043.2073169-1-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250313173707.1492-1-quic_philber@quicinc.com>
- <CAPpAL=we6VkyBXBO2cBiszpGUP5f7QSioQbp6x3YoCqa9qUPRQ@mail.gmail.com> <xogief67mb2wonb7angoypj4ddvvecyrcsnncqitggpij6ssim@fo3psnqqhovp>
-In-Reply-To: <xogief67mb2wonb7angoypj4ddvvecyrcsnncqitggpij6ssim@fo3psnqqhovp>
-From: Lei Yang <leiyang@redhat.com>
-Date: Tue, 18 Mar 2025 18:22:49 +0800
-X-Gm-Features: AQ5f1JrBFyW8xkFgMxVk6GGg-rvzIxamknFWt0oP1OOTPXdljbsO7bXLrfDxGHk
-Message-ID: <CAPpAL=xiQ0x7Vk55of1=-Hm0ijsVQkeLixv65WJc-J0sL9Fnww@mail.gmail.com>
-Subject: Re: [PATCH v6 0/4] Add virtio_rtc module
-To: Peter Hilber <quic_philber@quicinc.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Marc Zyngier <maz@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Trilok Soni <quic_tsoni@quicinc.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, virtualization@lists.linux.dev, 
-	David Woodhouse <dwmw2@infradead.org>, "Ridoux, Julien" <ridouxj@amazon.com>, 
-	Daniel Lezcano <daniel.lezcano@linaro.org>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Parav Pandit <parav@nvidia.com>, 
-	Matias Ezequiel Vara Larsen <mvaralar@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Simon Horman <horms@kernel.org>, 
-	virtio-dev@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-rtc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250106081043.2073169-1-liuhangbin@gmail.com>
 
-On Tue, Mar 18, 2025 at 6:14=E2=80=AFPM Peter Hilber <quic_philber@quicinc.=
-com> wrote:
->
-> On Tue, Mar 18, 2025 at 10:04:07AM +0800, Lei Yang wrote:
-> > QE tested this series of patches v6 with virtio-net regression tests,
-> > everything works fine.
-> >
-> > Tested-by: Lei Yang <leiyang@redhat.com>
-> >
->
-> Hi Lei,
->
-Hi Peter
+Hi Jason,
 
-> thanks for the reply! However, I am not sure which virtio-net regression
-> tests you are referring to, and how these tests would be relevant to
-> virtio_rtc. The virtio_rtc driver does not have any relation to
-> virtio-net ATM. Reusing virtio_rtc within virtio-net has been discussed
-> in the past, but not done yet.
+I saw the patch status[1] is still "Awaiting Upstream".
+Is there anything I need to do?
 
-First let me introduce the virtio-net tests which include
-ping,hotplug/unplug nic device, live migration under stress etc
-scenarios. This test was triggered because some of the monitoring
-conditions of the CI tool are general. I will change the code later to
-avoid similar things happening in the future. Please ignore the last
-comment from my side, and sorry for bothering everyone.
+https://patchwork.kernel.org/project/netdevbpf/patch/20250106081043.2073169-2-liuhangbin@gmail.com/
 
-Best Regards
-Lei
->
-> Best regards,
->
-> Peter
->
-
+Thanks
+Hangbin
+On Mon, Jan 06, 2025 at 08:10:41AM +0000, Hangbin Liu wrote:
+> This patch set convert iptables to nftables for wireguard testing, as
+> iptables is deparated and nftables is the default framework of most releases.
+> 
+> v3: drop iptables directly (Jason A. Donenfeld)
+>     Also convert to using nft for qemu testing (Jason A. Donenfeld)
+> v2: use one nft table for testing (Phil Sutter)
+> 
+> Hangbin Liu (2):
+>   selftests: wireguards: convert iptables to nft
+>   selftests: wireguard: update to using nft for qemu test
+> 
+>  tools/testing/selftests/wireguard/netns.sh    | 29 +++++++++-----
+>  .../testing/selftests/wireguard/qemu/Makefile | 40 ++++++++++++++-----
+>  .../selftests/wireguard/qemu/kernel.config    |  7 ++--
+>  3 files changed, 53 insertions(+), 23 deletions(-)
+> 
+> -- 
+> 2.46.0
+> 
 
