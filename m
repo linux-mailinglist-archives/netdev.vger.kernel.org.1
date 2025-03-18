@@ -1,144 +1,162 @@
-Return-Path: <netdev+bounces-175652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B11C6A66FFA
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 10:38:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1757DA67001
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 10:40:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EF024231FB
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 09:38:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B2E57AC0DE
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 09:39:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79CB5207A34;
-	Tue, 18 Mar 2025 09:37:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FAFC207A0F;
+	Tue, 18 Mar 2025 09:40:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 983C21F7076
-	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 09:37:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED4132040B7
+	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 09:40:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742290629; cv=none; b=fhzx+YAMiEC2mWiDUhqGzEbMWgx6os98N/E9HebQgJ1ah3jvF9OvrCjRFmX71L382WgZt5vb6+/mqgHpQRgRbqLDKwUlRm6805nxcCUFalOdp7g45sxyGHtdNkU2kr3TTQLgx7vxG9HuOawjzAbf8aNyDF2axL10/GNkLRq2XoY=
+	t=1742290814; cv=none; b=VhukJ2zZfWp1erBJZUPu/cftRNfDb2FMb9Fp9HStOsJzx63AYnW+BQcd1b7yKrFijktjyLkDy6ttpuc2ZQD8B9T2PwNiHvar9CxD70I7SofYT2qqs1MdnpSd7yjNQVgWd/tBUD1lyIhbeP5abQAa1RQ1MkgcwnR325ehpxs4A/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742290629; c=relaxed/simple;
-	bh=Qtu0CfwKAeZe4zGYxFPTzRyM57dh+wp3XLeqU0dGaHA=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=IY26frvFQxBNZ/9/2DDb0EtfXPl+4dD4AeyLjszXrlQcbci6MdFq0/ae2nqogW3DFx6KqOGDaBDDSSrUACIgCdAhuSokPdaAlEVX4rYXZX4UJ33pPwcdPtVRl0Ka0rkumo9ELRttUPK/l7WJ2z7w0YClQw24quDcvWtaJHrw9rM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.92.39.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid:Yeas3t1742290595t765t09490
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [60.186.240.18])
-X-QQ-SSF:0001000000000000000000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 2908365651493764068
-To: "'Mengyuan Lou'" <mengyuanlou@net-swift.com>,
-	<netdev@vger.kernel.org>
-Cc: <kuba@kernel.org>,
-	<duanqiangwen@net-swift.com>
-References: <20250309154252.79234-1-mengyuanlou@net-swift.com> <20250309154252.79234-3-mengyuanlou@net-swift.com>
-In-Reply-To: <20250309154252.79234-3-mengyuanlou@net-swift.com>
-Subject: RE: [PATCH net-next v8 2/6] net: libwx: Add sriov api for wangxun nics
-Date: Tue, 18 Mar 2025 17:36:34 +0800
-Message-ID: <01d201db97e9$3d50a0f0$b7f1e2d0$@trustnetic.com>
+	s=arc-20240116; t=1742290814; c=relaxed/simple;
+	bh=WChQF7TtuUtzCTdzukaysCL3gi4APAjdIMuYzKD+0nI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rNnWkQrJdEXdvBk8diYOPqYHnaNQhSynfXcgNvJ6RhOd6077kkOSq6xvnLUCs3VCqjS7rac7QSIWRkbSjAJc74qpUPQbFmodObf1ssNJsSz9Y5fFFDI/4WNF2spKSnz69s4rtqMbzpmeqBwXsdmRKGNVyAsnePuW4rizeW47OoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tuTQS-0007RA-VB; Tue, 18 Mar 2025 10:39:56 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tuTQS-000P4Y-02;
+	Tue, 18 Mar 2025 10:39:56 +0100
+Received: from pengutronix.de (p5b1645f7.dip0.t-ipconnect.de [91.22.69.247])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 0018E3DF4D5;
+	Tue, 18 Mar 2025 09:39:55 +0000 (UTC)
+Date: Tue, 18 Mar 2025 10:39:55 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Woojung Huh <woojung.huh@microchip.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Russell King <rmk+kernel@armlinux.org.uk>, 
+	Thangaraj Samynathan <Thangaraj.S@microchip.com>, Rengarajan Sundararajan <Rengarajan.S@microchip.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, Phil Elwell <phil@raspberrypi.org>, 
+	linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com, kernel@pengutronix.de, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v4 01/10] net: usb: lan78xx: handle errors in
+ lan7801 PHY initialization
+Message-ID: <20250318-friendly-victorious-bustard-fcfbfe-mkl@pengutronix.de>
+References: <20250318093410.3047828-1-o.rempel@pengutronix.de>
+ <20250318093410.3047828-2-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQIdnCnDiPhOE0ov2X5Z+2K6KJbCAAI+4deUsuDZxIA=
-Content-Language: zh-cn
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: NzSDQCFWCzVTF+Sps1TZsQAg3pwU5o31D5HxMI34KZqO+MfNpZ8xPeEA
-	8v0R0Nn9lW3JfMj0cpwo/f5sqBrbHKB3UyBXRPNknh2RZHHHbg3iIX5m3tYamZVlkRJ2ehV
-	iKnlEKV7HN0VkeFHris8LSi1LdAvtAVhTALbW5IXKAsvegkE4wjPIIJbkaQ5pbk3sEHXOYf
-	SLehrbQsm+OtyeU424OwNLaH0sB+Yl3/w5EyCP8J9I2/+sR8/9t7Q/uedoLIXZyt9GC3veC
-	guDSlf2tPsUbj8ecF118kLTnPfsUCnB0bM8CEvBY/Fsbsq2lnehvE4qMA6hzAMTNySS5bRq
-	N12zRtQBMbSJjJdbXkjvjh3YtoqYEqTZk2cuNFb3yAKLBdcNpjdbRwFdUqjI1/6eixEzZKN
-	glyv8/QKM290sRVywI/vcU4NsoPuSbnsvv5kNmtb8dfBHu0CXXZjPnWSGLDbBMs2K+ECy0P
-	mgPLoXUqCJmEEuRRVjiuxq49K+ojrgARZZBp5JjkzcACvT8gFYITH33TZYRyYogR+Ww4SrQ
-	J8wGpfkSSSepG7f8p6SanBbRqZ/CcrNf6qqHSMTAuwq9sQDY2XchK02LD7J6q4M/JYPxFAm
-	j0wbyAPQDFhultNboYSer1BknM6WlA5PKZ+wslrmQNczw26M8flhSTvv/EAcxTux0akHvTz
-	SLHrQJe1jxvoATvKCzDJ+CJNmfdpzIGuwe5glUSj/0zASbPLNcCN6Cz28qvtdqSy6Ix+K0Y
-	z+iNrHDkiWgziTVMoXoGiFpCh1u/RyGI9rblwJG6rWspxZ5PqLcNd/Wqx1d7ztjJ05Nr9Lf
-	IZDMq0M6sKfKF+mZwWFy9OU//mW6HH+cDtBZ3Ab2WLo7/PTAMm26jTmi6G/iqgQY1ac7r3E
-	moeQYWqk9NUX/Bgu9JX4zPec7oZKHmQ+k/hmivGDkYePy6pUNOmj9QO/+wi1pgsRp6u7pN6
-	/2mYStin41fDK2N/FDMTgC0zptZkuZPI/0b2qMDlyfJovTUybYuOk+MmmfDBgeNLTSdw=
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-X-QQ-RECHKSPAM: 0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="gxukq2mcwm43hawu"
+Content-Disposition: inline
+In-Reply-To: <20250318093410.3047828-2-o.rempel@pengutronix.de>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-> +static int __wx_enable_sriov(struct wx *wx, u8 num_vfs)
-> +{
-> +	int i, ret = 0;
-> +	u32 value = 0;
-> +
-> +	set_bit(WX_FLAG_SRIOV_ENABLED, wx->flags);
-> +	wx_err(wx, "SR-IOV enabled with %d VFs\n", num_vfs);
-> +
-> +	/* Enable VMDq flag so device will be set in VM mode */
-> +	set_bit(WX_FLAG_VMDQ_ENABLED, wx->flags);
-> +	if (!wx->ring_feature[RING_F_VMDQ].limit)
-> +		wx->ring_feature[RING_F_VMDQ].limit = 1;
-> +	wx->ring_feature[RING_F_VMDQ].offset = num_vfs;
-> +
-> +	wx->vfinfo = kcalloc(num_vfs, sizeof(struct vf_data_storage),
-> +			     GFP_KERNEL);
-> +	if (!wx->vfinfo)
-> +		return -ENOMEM;
-> +
-> +	ret = wx_alloc_vf_macvlans(wx, num_vfs);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* Initialize default switching mode VEB */
-> +	wr32m(wx, WX_PSR_CTL, WX_PSR_CTL_SW_EN, WX_PSR_CTL_SW_EN);
-> +
-> +	for (i = 0; i < num_vfs; i++) {
-> +		/* enable spoof checking for all VFs */
-> +		wx->vfinfo[i].spoofchk_enabled = true;
-> +		wx->vfinfo[i].link_enable = true;
-> +		/* untrust all VFs */
-> +		wx->vfinfo[i].trusted = false;
-> +		/* set the default xcast mode */
-> +		wx->vfinfo[i].xcast_mode = WXVF_XCAST_MODE_NONE;
-> +	}
-> +
-> +	if (wx->mac.type == wx_mac_sp) {
-> +		if (num_vfs < 32)
-> +			value = WX_CFG_PORT_CTL_NUM_VT_32;
-> +		else
-> +			value = WX_CFG_PORT_CTL_NUM_VT_64;
-> +	} else {
-> +		value = WX_CFG_PORT_CTL_NUM_VT_8;
-> +	}
 
-For the intention of supporting AML devices,
+--gxukq2mcwm43hawu
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next v4 01/10] net: usb: lan78xx: handle errors in
+ lan7801 PHY initialization
+MIME-Version: 1.0
 
-switch (wx->mac.type) {
-case wx_mac_sp:
-case wx_mac_aml:
-	...
-case wx_mac_em:
-	...
-default:
-	...
-}
+On 18.03.2025 10:34:01, Oleksij Rempel wrote:
+> Add error handling for `lan78xx_write_reg()` and `lan78xx_read_reg()`
+> in `lan7801_phy_init()`. If any register operation fails, return
+> an appropriate error using `ERR_PTR(ret)` to prevent further execution
+> with invalid configurations.
 
-> +	wr32m(wx, WX_CFG_PORT_CTL,
-> +	      WX_CFG_PORT_CTL_NUM_VT_MASK,
-> +	      value);
+You have to convert the caller of lan7801_phy_init(), too. AFICS it
+checks for NULL only.
+
+Marc
+
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> ---
+>  drivers/net/usb/lan78xx.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>=20
+> diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
+> index 137adf6d5b08..d03668c2c1c9 100644
+> --- a/drivers/net/usb/lan78xx.c
+> +++ b/drivers/net/usb/lan78xx.c
+> @@ -2531,11 +2531,22 @@ static struct phy_device *lan7801_phy_init(struct=
+ lan78xx_net *dev)
+>  		dev->interface =3D PHY_INTERFACE_MODE_RGMII;
+>  		ret =3D lan78xx_write_reg(dev, MAC_RGMII_ID,
+>  					MAC_RGMII_ID_TXC_DELAY_EN_);
+> +		if (ret < 0)
+> +			return ERR_PTR(ret);
 > +
-> +	return ret;
-> +}
+>  		ret =3D lan78xx_write_reg(dev, RGMII_TX_BYP_DLL, 0x3D00);
+> +		if (ret < 0)
+> +			return ERR_PTR(ret);
 > +
- 
+>  		ret =3D lan78xx_read_reg(dev, HW_CFG, &buf);
+> +		if (ret < 0)
+> +			return ERR_PTR(ret);
+> +
+>  		buf |=3D HW_CFG_CLK125_EN_;
+>  		buf |=3D HW_CFG_REFCLK25_EN_;
+>  		ret =3D lan78xx_write_reg(dev, HW_CFG, buf);
+> +		if (ret < 0)
+> +			return ERR_PTR(ret);
+>  	} else {
+>  		if (!phydev->drv) {
+>  			netdev_err(dev->net, "no PHY driver found\n");
+> --=20
+> 2.39.5
+>=20
+>=20
+>=20
 
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--gxukq2mcwm43hawu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmfZP2gACgkQDHRl3/mQ
+kZwvKwf+MEPLjAHblaP3leTqe2XdoA6+NbuGVEDc6sJ3G1sHtzQxNS5flMKBZWya
+GHCk09YMmS5zX/6HSurJ61peWXiazuT6gfZYSo54VkO8PU2s3WRAzY+BYuQB/6yr
+SslI4ODRORclVQWfgwLR/mX4rVIIDu+tXJvzKc7vCScGHUrQe+rlaAoW/t+xVrGE
+fnr4MXUmvFi+eGQ0edWZAHE3fffDJxh1P+DyDcCe66g7QMnoOQDOdkPhb+S2fSLP
+cfZuNrwoSHAfQ0ELXFqpug2qDgYh5kWhOSxUloiZvZfHwLHfuMwf86ikgrNc8WuU
+4dlH2gA6JqmWHJ7MKHx5JKv2kueCRw==
+=iR3z
+-----END PGP SIGNATURE-----
+
+--gxukq2mcwm43hawu--
 
