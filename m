@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-175771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DD36A67726
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 16:02:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A1EFA67721
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 16:01:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A6293AAED9
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 14:59:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A80817ACE02
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 15:00:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48D2920E6E4;
-	Tue, 18 Mar 2025 14:59:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y7BIYDHM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFCA720E710;
+	Tue, 18 Mar 2025 15:00:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BBA620468F;
-	Tue, 18 Mar 2025 14:59:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B773B20E034
+	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 15:00:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.38.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742309999; cv=none; b=QL9w8lNG6Ewr0J1Ng747Fs2iyJ9ggmhKzruAlwutG8AqQhHeydmHbTZWTcd++rOrhd8zBi2J8zE8d2MeHg8qOmS87aYfKCXcJe6TjFIhvgQ29J7SWEgS+KYBdeAB/qaFMEhE2mgtXACLtd6mVR9OcTtG5WzrwsATKl/PQduvy9k=
+	t=1742310051; cv=none; b=uptkKsSnbKkbv++PDKaQ6GO1rhZG1cR+Tcr1LZEgkB0I01sZlUysC/SK+XSExY1eLSQ2k+jYEvS00Q15sh6b8s+SNAXL97yTz8R261MooDv4r3JICe+WrhOodGTmpXFINE5sQ2ibOm2nOFl+I3Pg0UGeke/Ib4zdRm3KU2qU4+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742309999; c=relaxed/simple;
-	bh=r0NrzcNDxEAo6t+Xoz4A+ZsjzVa5mHQEjDvSbM8+ItM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=D4DmxnWlalXKhAQCcNgF3DdpZvZcTTJBxiLk7JlNNslFFhEMChaHZVvlMgNdpihKZuBRdg0pXBz4v7OhpEMsyyEwPGbPnr1719CsXH7vd4KXaMVifvzXKaqv2Ex3ctzaZAdybzMDF/9BeohHVQVPmldLS1vtbG7NiwGjOlBVN0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y7BIYDHM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8457EC4CEE3;
-	Tue, 18 Mar 2025 14:59:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742309998;
-	bh=r0NrzcNDxEAo6t+Xoz4A+ZsjzVa5mHQEjDvSbM8+ItM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Y7BIYDHM86vWww2amj46/mLjgIS9Pd+7uQlOXialHBqRDb8TRbN8eHCTUEXr44qjw
-	 aOIsxiBVjuJYca07fp8YJLOmvV2xbFRNjwOTK8w5dGpjOC458+667lzGFnKd2sgF/1
-	 MEqYnxpu7gk3iP8HTvN1PWsLX0tL2Uj55mHuE+F3f28JLUTnj9Z4g7dyNsZ3F+4/H6
-	 R50JhgxMv4KAL7casbv0AMtCC8Z+tM+JYOUVRCDLWi9HIqN1ZRbUBrCJxUCMly60Ol
-	 WGvhYD4LhyMINquvspNJGrgYwK7dKnt2Dl9H9NLPMMwWUBPcz/3jkWkeTnNeNlWhPd
-	 3mvxeqCe3WO5Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FFB380DBE8;
-	Tue, 18 Mar 2025 15:00:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1742310051; c=relaxed/simple;
+	bh=JWBthlJdSUQ0ig3fMPAMN8QayF88ZJDcW/XQofraKm8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OlEta3snR+YyBYbs48B+3kgnuDx/soFKzlXZuKPgC2iR7u+BhRXTo8P41BkV01Rn8/5ONPAgk4AHRJekVYyyZ1gIcJ7jr/G2E9BIiyeXROZHlv7iG8FnCJKEch7zLsu1hWvxRmwKVZZd/TjRSpl456nhlJZmtdYh7KIapFG0ryY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; arc=none smtp.client-ip=23.88.38.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simonwunderlich.de
+Received: from kero.packetmixer.de (p200300C5973197D81320d84731f3581A.dip0.t-ipconnect.de [IPv6:2003:c5:9731:97d8:1320:d847:31f3:581a])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.simonwunderlich.de (Postfix) with ESMTPSA id C7F02FA131;
+	Tue, 18 Mar 2025 16:00:37 +0100 (CET)
+From: Simon Wunderlich <sw@simonwunderlich.de>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	b.a.t.m.a.n@lists.open-mesh.org,
+	Simon Wunderlich <sw@simonwunderlich.de>
+Subject: [PATCH net 0/1] ] pull request: batman-adv 2025-03-18
+Date: Tue, 18 Mar 2025 16:00:34 +0100
+Message-Id: <20250318150035.35356-1-sw@simonwunderlich.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,65 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/9] net: stmmac: remove unnecessary
- of_get_phy_mode() calls
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174231003400.344268.9977818669398853411.git-patchwork-notify@kernel.org>
-Date: Tue, 18 Mar 2025 15:00:34 +0000
-References: <Z9FQjQZb0IMaQJ9H@shell.armlinux.org.uk>
-In-Reply-To: <Z9FQjQZb0IMaQJ9H@shell.armlinux.org.uk>
-To: Russell King (Oracle) <linux@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
- andrew+netdev@lunn.ch, angelogioacchino.delregno@collabora.com,
- wens@csie.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- jernej.skrabec@gmail.com, jbrunet@baylibre.com, khilman@baylibre.com,
- linux-amlogic@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
- linux-arm-msm@vger.kernel.org, linux-mediatek@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, linux-sunxi@lists.linux.dev,
- martin.blumenstingl@googlemail.com, matthias.bgg@gmail.com,
- mcoquelin.stm32@gmail.com, neil.armstrong@linaro.org, netdev@vger.kernel.org,
- pabeni@redhat.com, samuel@sholland.org, vkoul@kernel.org
 
-Hello:
+Hi David, hi Jakub,
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+here is a bugfix for batman-adv which we would like to have integrated into net.
 
-On Wed, 12 Mar 2025 09:14:53 +0000 you wrote:
-> Hi,
-> 
-> This series removes unnecessary of_get_phy_mode() calls from the stmmac
-> glue drivers. stmmac_probe_config_dt() / devm_stmmac_probe_config_dt()
-> already gets the interface mode using device_get_phy_mode() and stores
-> it in plat_dat->phy_interface.
-> 
-> [...]
+Please note that this pull request supersedes the pull request from
+2025-03-13, as Paolo mentioned that there were some issues pulling due
+to too many patches added from my end.
 
-Here is the summary with links:
-  - [net-next,v2,1/9] net: stmmac: qcom-ethqos: remove of_get_phy_mode()
-    https://git.kernel.org/netdev/net-next/c/8ee1c926f31e
-  - [net-next,v2,2/9] net: stmmac: mediatek: remove of_get_phy_mode()
-    https://git.kernel.org/netdev/net-next/c/46f84d700cb8
-  - [net-next,v2,3/9] net: stmmac: anarion: remove of_get_phy_mode()
-    https://git.kernel.org/netdev/net-next/c/e3ef12172a83
-  - [net-next,v2,4/9] net: stmmac: ipq806x: remove of_get_phy_mode()
-    https://git.kernel.org/netdev/net-next/c/f07cb4b4b481
-  - [net-next,v2,5/9] net: stmmac: meson8b: remove of_get_phy_mode()
-    https://git.kernel.org/netdev/net-next/c/3e5833060efb
-  - [net-next,v2,6/9] net: stmmac: rk: remove of_get_phy_mode()
-    https://git.kernel.org/netdev/net-next/c/9886718ad1c5
-  - [net-next,v2,7/9] net: stmmac: sti: remove of_get_phy_mode()
-    https://git.kernel.org/netdev/net-next/c/3e2858bb3f59
-  - [net-next,v2,8/9] net: stmmac: sun8i: remove of_get_phy_mode()
-    https://git.kernel.org/netdev/net-next/c/3d9e9dfce04c
-  - [net-next,v2,9/9] net: stmmac: sunxi: remove of_get_phy_mode()
-    https://git.kernel.org/netdev/net-next/c/00d2c3c07124
+Please pull or let me know of any problem!
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Thank you,
+      Simon
 
+The following changes since commit f4c9c2cc827d803159730b1da813a0c595969831:
 
+  batman-adv: Fix incorrect offset in batadv_tt_tvlv_ogm_handler_v1() (2025-01-28 22:06:56 +0100)
+
+are available in the Git repository at:
+
+  git://git.open-mesh.org/linux-merge.git tags/batadv-net-pullrequest-20250318
+
+for you to fetch changes up to 548b0c5de7619ef53bbde5590700693f2f6d2a56:
+
+  batman-adv: Ignore own maximum aggregation size during RX (2025-02-08 19:24:33 +0100)
+
+----------------------------------------------------------------
+Here is batman-adv bugfix:
+
+- Ignore own maximum aggregation size during RX, Sven Eckelmann
+
+----------------------------------------------------------------
+Sven Eckelmann (1):
+      batman-adv: Ignore own maximum aggregation size during RX
+
+ net/batman-adv/bat_iv_ogm.c | 3 +--
+ net/batman-adv/bat_v_ogm.c  | 3 +--
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
