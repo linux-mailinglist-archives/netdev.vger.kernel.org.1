@@ -1,50 +1,70 @@
-Return-Path: <netdev+bounces-175639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3023A66FCB
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 10:30:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ED3DDA66FE6
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 10:36:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24FAB169794
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 09:30:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B1A44226A7
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 09:36:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D1420764C;
-	Tue, 18 Mar 2025 09:29:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XPtcBTZR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6005920A5CC;
+	Tue, 18 Mar 2025 09:34:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D2A3207665
-	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 09:29:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8561B207E18
+	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 09:34:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742290198; cv=none; b=O+dwYqP7cmEIJh1xJVQXiUy/e/EL/ZEBKbM2WM98lyRtJRq/2vsVn89qKmp1wD+xHB/MsRsrtrbMmrHCHMWoFGByrUne75ckKkt72s69zAZvmkcVE4opBzPoS8dkZg7aN1XiNm3HA9BVtfbXENqfXpE95c2sXuISZFx34TcrYeI=
+	t=1742290465; cv=none; b=HV7sJ+smgIxQgyr9ldVQ9Yb0my8yxOAFwQuy3SGxmcnfOuSecRxXQFSqoFoz+yV0Ez02t89vzPNarToH1tls0m2ldk0aopDZ3ts92QGBW2YSaVGA1cl7zSANFCIz8fGFirsB+MsNGE5iE/hrjlwx9r7O2Z8WDfKe4BFqAVFJb+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742290198; c=relaxed/simple;
-	bh=QO7+yGQla6Izw0IXrHzRnvBrA1ki/jNnj/KTaulV/+4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gHwMvTUo4bgzD55kep6LfbYkpijsOi1VS4TC8cptrDoxZNrBETbfndkJQ46L1wO9OWPuGqJkCJh9iTsQP+KZ5eFK7sj624Ezi9f84Pjc20sNJd+2QniwEHnOm/3HhGYdqBnq0LORHZz9MSJS+joajybtCDGQx9Nq9+pAWMog89A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XPtcBTZR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A236C4CEDD;
-	Tue, 18 Mar 2025 09:29:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742290198;
-	bh=QO7+yGQla6Izw0IXrHzRnvBrA1ki/jNnj/KTaulV/+4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XPtcBTZRZ5OYHjRZ/hik6ZeGS91mh7SkYDoCRiecaQvabs8DNMf6EoYNY5d8fPF5D
-	 UU1oooLNxAjJx7cjFOQe9nsC6W7EMFyoaydsl7caOrUJxoMeIKCWIEGI5wtT6w0g+G
-	 xMsgVRWTlmbehexF4pZldWqLHLbtVbkBWalSB3b0gvkfAVFVuM4+Ehn+oB5ueXG8+r
-	 khVYidUW5KriS1yDteFumu1sJmyPUzVOY96m9Dwrgklh2rSQZNKFx905Rmjz91WGb7
-	 yoTofxiIPk1TKOP8iyvpYWApO8KEXx/B0vENHon5Ag/0EAYsZYk7wF2snnZ33EccNl
-	 AaKPN4ETsJUcQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE17F380DBE8;
-	Tue, 18 Mar 2025 09:30:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1742290465; c=relaxed/simple;
+	bh=ehPzU4DJEAPmmLFyJciZ08r1EO3Xrp7ByFPIIC4bucQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=m4HKtM8bI8Br3zmTZ4ZzUsd/a5MCeYJQwdA1XT5YKY8FvwrlBEaju4v4Ruo/1iCrC/zOkxymtOox7pLkz5lkhSzbOr41bRE638WxRTELpU83fj2B0MxRbooFgkMY7svVUXnuJ9XlI7iHr65avwtSRpBwfAN+kc07rJWjhFXlva8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tuTKu-0005yB-LY; Tue, 18 Mar 2025 10:34:12 +0100
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tuTKs-000OyM-2m;
+	Tue, 18 Mar 2025 10:34:11 +0100
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tuTKt-00Cmu6-0c;
+	Tue, 18 Mar 2025 10:34:11 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Thangaraj Samynathan <Thangaraj.S@microchip.com>,
+	Rengarajan Sundararajan <Rengarajan.S@microchip.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	Phil Elwell <phil@raspberrypi.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next v4 00/10] Convert LAN78xx to PHYLINK
+Date: Tue, 18 Mar 2025 10:34:00 +0100
+Message-Id: <20250318093410.3047828-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,54 +72,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/7] bnxt_en: Driver update
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174229023350.4098201.6052285322311949172.git-patchwork-notify@kernel.org>
-Date: Tue, 18 Mar 2025 09:30:33 +0000
-References: <20250310183129.3154117-1-michael.chan@broadcom.com>
-In-Reply-To: <20250310183129.3154117-1-michael.chan@broadcom.com>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
- pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hello:
+changes v4:
+- split "Improve error handling in PHY initialization" patch and move
+  some parts before PHYlink porting to address some of compile warning
+  as early as possible.
+- add cleanup patch to remove unused struct members
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+This patch series refactors the LAN78xx USB Ethernet driver to use the
+PHYLINK API.
 
-On Mon, 10 Mar 2025 11:31:22 -0700 you wrote:
-> This patchset contains these updates to the driver:
-> 
-> 1. New ethtool coredump type for FW to include cached context for live dump.
-> 2. Support ENABLE_ROCE devlink generic parameter.
-> 3. Support capability change flag from FW.
-> 4. FW interface update.
-> 5. Support .set_module_eeprom_by_page().
-> 
-> [...]
+Oleksij Rempel (10):
+  net: usb: lan78xx: handle errors in lan7801 PHY initialization
+  net: usb: lan78xx: handle errors in LED configuration during PHY init
+  net: usb: lan78xx: Convert to PHYlink for improved PHY and MAC
+    management
+  net: usb: lan78xx: improve error reporting on PHY attach failure
+  net: usb: lan78xx: Improve error handling in PHY initialization
+  net: usb: lan78xx: Use ethtool_op_get_link to reflect current link
+    status
+  net: usb: lan78xx: port link settings to phylink API
+  net: usb: lan78xx: Transition get/set_pause to phylink
+  net: usb: lan78xx: Integrate EEE support with phylink LPI API
+  net: usb: lan78xx: remove unused struct members
 
-Here is the summary with links:
-  - [net-next,1/7] bnxt_en: Add support for a new ethtool dump flag 3
-    https://git.kernel.org/netdev/net-next/c/b54b24908464
-  - [net-next,2/7] bnxt_en: Refactor bnxt_hwrm_nvm_req()
-    https://git.kernel.org/netdev/net-next/c/ed827402d4f0
-  - [net-next,3/7] bnxt_en: Add devlink support for ENABLE_ROCE nvm parameter
-    https://git.kernel.org/netdev/net-next/c/2c4d376c3a48
-  - [net-next,4/7] bnxt_en: Query FW parameters when the CAPS_CHANGE bit is set
-    https://git.kernel.org/netdev/net-next/c/a6c81e32aeac
-  - [net-next,5/7] bnxt_en: Update firmware interface to 1.10.3.97
-    https://git.kernel.org/netdev/net-next/c/17596d239f34
-  - [net-next,6/7] bnxt_en: Refactor bnxt_get_module_eeprom_by_page()
-    https://git.kernel.org/netdev/net-next/c/1b64544d634c
-  - [net-next,7/7] bnxt_en: add .set_module_eeprom_by_page() support
-    https://git.kernel.org/netdev/net-next/c/c3be245dfc8a
+ drivers/net/usb/Kconfig   |   3 +-
+ drivers/net/usb/lan78xx.c | 827 ++++++++++++++++++--------------------
+ 2 files changed, 402 insertions(+), 428 deletions(-)
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+--
+2.39.5
 
 
