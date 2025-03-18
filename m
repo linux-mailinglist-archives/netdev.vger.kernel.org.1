@@ -1,126 +1,136 @@
-Return-Path: <netdev+bounces-175527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDA93A663E8
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 01:34:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A053FA66414
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 01:48:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C85943B7E93
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 00:33:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA0AD1896636
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 00:48:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 474971B960;
-	Tue, 18 Mar 2025 00:33:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E1CF4594A;
+	Tue, 18 Mar 2025 00:47:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Riinb0At"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OGx77hxb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B247E9
-	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 00:33:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EFD84409
+	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 00:47:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742258037; cv=none; b=SYjM6qZJs1TIsd5VpL3Q/K8MOG0Sfnts3t2b1zB58raiO4BniGvKLg2r2kbjGEqea4I0HluLuB5/5RxU1KPqrOHIFuO7i+LsgD9DlbZNpEzdfAIfb130+zjmJO75dyU/C48HTAZtum2mrADdhmuvLOsI2hUP8+fhLJrZdWGmk0s=
+	t=1742258879; cv=none; b=IhhGG2uFit0RfhxirCTzf/jt5uXCedSMhM/p+c0cAPy4xp8x2gZyIs/pkzifgNSFzxYVMKqNugO+vXqnAng5PUV5vjii9jf+toqdx9fSezpRAslvfvzOkjO0ZI6fmn/SDvzC4SII+8117xQ2fgZEyErvTgJJmSnfdoGyOCN+VeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742258037; c=relaxed/simple;
-	bh=UFX9Amd1Sa3L7j2u30pii3KSejzTFjjeMc8qd6DXH7c=;
+	s=arc-20240116; t=1742258879; c=relaxed/simple;
+	bh=q9cORwpFr2i7u4nU59k5OUVSEIAbi61v48KFlNjBrec=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RcVl4cigzf9ZLptosa2afaYYct/AdnAu/okosPPKe4uzYO8Q2iz5EWXlWiYL106STUdeppjmS0glB66SFxo7qsEKyR09cPnkskqcBPW52k8afCKLo8YsWSlA1tNaxiUOM+o0021YTy0pM4E1XZQ0KXKGv9I1S/FFWy34K5Fj5kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Riinb0At; arc=none smtp.client-ip=209.85.219.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6e41e17645dso45568656d6.2
-        for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 17:33:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742258034; x=1742862834; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3SPiMm6hu0rT5t1g7jQBHzrTzsjEu+uco3Adx61lyIQ=;
-        b=Riinb0AtUKUIaYt0PXHPCbM5wn8AF5LNwGvJtRdSzpP2IurkewbkbM7fHXm840WQ7B
-         LyhKMfoyrx+KiYYyPryLA53rsfdSDVD4C20SsyS0icpE/Pm0QTyiQb+X8B3nEzczjSKo
-         bgTtRr4mGsWNAPDbUn1u2iwyU+r74CrzfFTCAeSVzX8XnPYkwFBtdCvPVB/1QCkyvRSS
-         9TPN/jHletgCjWdFN+Z8F/GSad8hRcgVKCRaESnqCbIZ90qtnsBT9Ayy1A6h13dZg+IQ
-         uh1gnbP4b4zg4NPSDlfKLf1sUI6/l4eaJKrMipu6EHSoOzXsl4KMVIoOU9DF84jakXfl
-         80iA==
+	 To:Cc:Content-Type; b=YW/LB01IecL4Eu9KBzOFO6SlaDhb6QM5XT5E2W4n5fN6CdsHrn1v6wCxRZ63S/85aaOPL2/MC+05zUF9F+VeakGBcjNudkVQ6cvHC6DcgY8q1RYCtdSnJo5RscJPPPVL/xJS2X56zrhibJW/682wJFCWAAFlm+GqlL9FTjmVTe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OGx77hxb; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742258875;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jZfDnbuROQarLxKZz2VKb8iNL/v4tVesJARFvFI6DSM=;
+	b=OGx77hxbsN/9TvSr4gopO1JTaKyq4JcwQBWtH5rXEsS+LqQnCiDOXgVY8tgt7mxoGW2tKm
+	ctDsconUMteClzW2iAVM4m2Aww952VSL51JyxBkZy8/VeHV9+saS2GeVTfkkGebcIif2hq
+	90N99VaGp2WD25EBW4KcGemib2uVW0A=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-653-CemCVxglNf6e9tPyZKB2Og-1; Mon, 17 Mar 2025 20:47:54 -0400
+X-MC-Unique: CemCVxglNf6e9tPyZKB2Og-1
+X-Mimecast-MFC-AGG-ID: CemCVxglNf6e9tPyZKB2Og_1742258873
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2ff799be8f5so4090026a91.1
+        for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 17:47:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742258034; x=1742862834;
+        d=1e100.net; s=20230601; t=1742258873; x=1742863673;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3SPiMm6hu0rT5t1g7jQBHzrTzsjEu+uco3Adx61lyIQ=;
-        b=EowFaMwuB2LlSwzinHcQKbXwTNLwxptr5ROpY8peMGJm+wP/285dgblaXyxmr8KXea
-         Gsq/cL9Ck2Aercw57ktrdwSNW/6pWtM2O4wZKcYENx1rsvu9n/23q1wFv06oQGJ3oOAr
-         ZXoqlbUwWAqu9AoTkS/7D4uQpOIVKwTocO4RIbH8aFiz6ZpYf4pU2Nlo61WmdBQmrteR
-         32zPCz7YDgJoAF24qQqJdwtyu7xKq9Frwl5y/Wz6ZTxMpzcXJErORJpw0Hm2LOEaBEAp
-         ktbycavgj2IaBgR3DlNte43W2wpkKO/0OBMk/wliFY8E/HOStHJ1imOBXXCBHD722rXl
-         FO+w==
-X-Gm-Message-State: AOJu0Yzar3gkSpO2jKJfknhQrPfio9IyLazZT8PGVb1BKt+iMK9sRNu1
-	Sz8KVz8roGewmZ75X/OX6FLE/Pwguh3wyFglMCx3UukLSkM6zH11JVp55FiyjJOc4A1OeYh8VDo
-	zMm/uFHAPFbmkz7018gNEJqWMTVNqInZ9vyJr
-X-Gm-Gg: ASbGncvUkDxMjcMT6W3KyGG8RtB93vxKz1COhhDTEz7cATSyELNe1iHdFG5VSDkIeYc
-	z1d9pqTnxsRsQctWprvVVa6vWp/NUphA1L9+4JGbdOSEHhzQ+9DkUhWIwdBaMJFx7WQPK0O7UqA
-	wiHcPg0Abqf1DfRhkZp5sugsaIfg==
-X-Google-Smtp-Source: AGHT+IGhNmM9uCztfv3Yrx5mEjhVctcDn+m/TYBvEiVHdY6A8JWEnSXJZ3ARinshC1FdMURLcUoEMTins+O5/VtwFUc=
-X-Received: by 2002:a05:6214:1d22:b0:6e8:feae:9291 with SMTP id
- 6a1803df08f44-6eaeaa5f7efmr188720196d6.24.1742258034316; Mon, 17 Mar 2025
- 17:33:54 -0700 (PDT)
+        bh=jZfDnbuROQarLxKZz2VKb8iNL/v4tVesJARFvFI6DSM=;
+        b=boBRuU2wCsT47hxH4Z43mYwextaWf4SwF9lGLqTtFNvL4ckTF8RSdqEF8puyeQLjxO
+         WFWpP+VcP45b7lJKT5E3UN1hNvOSwNy5jWd1knQXddaH1+Nb27SgFHKPhYtCZgPBgf5H
+         hf4OXmda6WdZBn2Op1aSFMJV+NteDL+d/n55jFV16mw16eEFxyO9riVurjdVDrrdkynu
+         hlIu+8ePqZ32Mr/twntLJfqWlWDCf4soMm1/MPCON4UCvgxRli7zxJYRthYXFFmiLid9
+         RHsrbNqVCuu1Zta0TjLQrKLWVtqzzjIA99PONSUQFovj4/+N5iK17ZnFsZakohrKeT4e
+         elPw==
+X-Forwarded-Encrypted: i=1; AJvYcCVV8vfswKj1qMnAreTAxLta9ERUHVwedDOA+fQTO4zQfhKAIUOp1T8v6BJurMAkD/+8svdGgNg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXI1aYynMsWuLX2JIZ6jil51PfUECdbsm70naco7dwxIXn6tDW
+	oXasAiaGH4cp9stqt+KnSTnwp6cm031N8hnBSDAdlKnT25pp9H9mSjmUKZ3UaPaakiQ1C5l1/x9
+	4wLPDVs8p4Glo69vKK+G4arKz4StpPeX1EXTmVD2bpElVaiXWmSY52hiT9EEzOjgwBkF4zF6ppc
+	2Ed9N+++RHYE8NGCYNQFWejx2JW4D9
+X-Gm-Gg: ASbGnct7Yb/eywJ4sNzj37EA9B+Zu/EirLXwBiB5Df2MKEuS2ddOh6KiQYpxjDF2nb2
+	ivwNDElkgZjwYzVPPvZeAwWksWHQgtvnyFK7Dam3Av/HMENZL2YCC37sEZMVO+po1rwJIzg==
+X-Received: by 2002:a17:90b:4c92:b0:2ff:71ad:e84e with SMTP id 98e67ed59e1d1-301a5b12f2cmr456113a91.10.1742258873520;
+        Mon, 17 Mar 2025 17:47:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFzHqvPHhOWayxt9nOn+uABgh4pj7w82asDqMrwDQrO6X0w+kGSrD+YsTLhPM5iW1l3zRKfAFj+h8otb7DW0Pk=
+X-Received: by 2002:a17:90b:4c92:b0:2ff:71ad:e84e with SMTP id
+ 98e67ed59e1d1-301a5b12f2cmr456092a91.10.1742258873172; Mon, 17 Mar 2025
+ 17:47:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250318002710.29483-1-chia-yu.chang@nokia-bell-labs.com>
-In-Reply-To: <20250318002710.29483-1-chia-yu.chang@nokia-bell-labs.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 18 Mar 2025 01:33:43 +0100
-X-Gm-Features: AQ5f1JpJfi6iMrvlbT6t2Jw10_2qAm2wyZLZ8UTdk941UBV-P6U8UE7Q69QLIy0
-Message-ID: <CANn89iLQcVAwgsO-n91j48D30wwcufo72E_uS2CuppFxeUREzg@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 00/15] AccECN protocol patch series
-To: chia-yu.chang@nokia-bell-labs.com
-Cc: netdev@vger.kernel.org, dave.taht@gmail.com, pabeni@redhat.com, 
-	jhs@mojatatu.com, kuba@kernel.org, stephen@networkplumber.org, 
-	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
-	horms@kernel.org, andrew+netdev@lunn.ch, donald.hunter@gmail.com, 
-	ast@fiberby.net, liuhangbin@gmail.com, shuah@kernel.org, 
-	linux-kselftest@vger.kernel.org, ij@kernel.org, ncardwell@google.com, 
-	koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com, 
-	ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com, 
-	cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com, 
-	vidhi_goel@apple.com
+References: <20250317235546.4546-1-dongli.zhang@oracle.com> <20250317235546.4546-2-dongli.zhang@oracle.com>
+In-Reply-To: <20250317235546.4546-2-dongli.zhang@oracle.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 18 Mar 2025 08:47:41 +0800
+X-Gm-Features: AQ5f1Jps6JQeDE5rVwNMXQm81xnyDS129cpfEryeka1nOPKDMf2qheCIDs5KSLc
+Message-ID: <CACGkMEvDk-GzpVMPJPEJLRSrJjVHFsbXsd7LB9MjNEghbUc5pw@mail.gmail.com>
+Subject: Re: [PATCH v2 01/10] vhost-scsi: protect vq->log_used with vq->mutex
+To: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: virtualization@lists.linux.dev, kvm@vger.kernel.org, 
+	netdev@vger.kernel.org, mst@redhat.com, michael.christie@oracle.com, 
+	pbonzini@redhat.com, stefanha@redhat.com, eperezma@redhat.com, 
+	joao.m.martins@oracle.com, joe.jin@oracle.com, si-wei.liu@oracle.com, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 18, 2025 at 1:27=E2=80=AFAM <chia-yu.chang@nokia-bell-labs.com>=
- wrote:
+On Tue, Mar 18, 2025 at 7:51=E2=80=AFAM Dongli Zhang <dongli.zhang@oracle.c=
+om> wrote:
 >
-> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> The vhost-scsi completion path may access vq->log_base when vq->log_used =
+is
+> already set to false.
 >
-> Hello,
+>     vhost-thread                       QEMU-thread
 >
-> Plese find v2:
+> vhost_scsi_complete_cmd_work()
+> -> vhost_add_used()
+>    -> vhost_add_used_n()
+>       if (unlikely(vq->log_used))
+>                                       QEMU disables vq->log_used
+>                                       via VHOST_SET_VRING_ADDR.
+>                                       mutex_lock(&vq->mutex);
+>                                       vq->log_used =3D false now!
+>                                       mutex_unlock(&vq->mutex);
 >
-> v2 (18-03-2025)
-> - Add one missing patch from previous AccECN protocol preparation patch s=
-eries to this patch series
+>                                       QEMU gfree(vq->log_base)
+>         log_used()
+>         -> log_write(vq->log_base)
 >
-> The full patch series can be found in
-> https://github.com/L4STeam/linux-net-next/commits/upstream_l4steam/
+> Assuming the VMM is QEMU. The vq->log_base is from QEMU userpace and can =
+be
+> reclaimed via gfree(). As a result, this causes invalid memory writes to
+> QEMU userspace.
 >
-> The Accurate ECN draft can be found in
-> https://datatracker.ietf.org/doc/html/draft-ietf-tcpm-accurate-ecn-28
+> The control queue path has the same issue.
 >
-> Best regards,
-> Chia-Yu
->
-> Chia-Yu Chang (1):
->   tcp: accecn: AccECN option failure handling
+> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+> ---
 
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-I do not see any tests, how can this be tested ?
+Thanks
 
-I am extremely worried.
 
