@@ -1,328 +1,139 @@
-Return-Path: <netdev+bounces-175858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8A8CA67C64
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 19:57:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02211A67D0D
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 20:25:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B2DC19C61E7
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 18:56:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 404223B359E
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 19:23:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80A241DDC34;
-	Tue, 18 Mar 2025 18:55:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F6511E1DF1;
+	Tue, 18 Mar 2025 19:23:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hEovC21U"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="dk2UIv/w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx09lb.world4you.com (mx09lb.world4you.com [81.19.149.119])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA8C20F065
-	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 18:55:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 822121DF263;
+	Tue, 18 Mar 2025 19:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742324148; cv=none; b=taJoIpPqAG0KfpHIxqF6WG4b6qLnJivVdzrMKwDinYxBderFNpSKFYoPOVPsyBS+Kw5wDx5G2c+MH43dqq9LCOWZjRTigAfQXyCD8aIuhvZigyk3SYOrYNpmXATW5gNg8PxlnyXMj7oEJJaEXWpAZmXcW3thmfkb1gify3tWMc4=
+	t=1742325827; cv=none; b=FZpD80JV9g/Df0TekMbjeFs0j2g5nm59PHQyeKEXEQ2Foq8m29MfwujLSm/LCMrRanbZkh4+9/SCA+vVGiVwwo6qgovkbE5p/zDB5w4/qwB+fYPZas7NMLIb0LtiC4tctShXi9dRaxdJUS5bxJMazPKv4pouyRs3juUVn4V8C0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742324148; c=relaxed/simple;
-	bh=En81vOHQ1vzJG8Q8xJibgImdzJiNjpB1ktpx76Isi/s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kibmbJjhZdUF64T+CGuFIgWXn+7fz7bEm3jq1b3T/wI89FmnAsZMalcUBaae9BN1OnyGR580GqVKW5/ayCJs+N/Xm1HG8b52HS8vDcj8dL9ceHq8kvC6+TORkWOL4btWELZPnmvC97exwLwf1DzXKWXEQKedE/oegWkBwFRYOS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hEovC21U; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-47688ae873fso57927621cf.0
-        for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 11:55:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742324144; x=1742928944; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EkrBqvi+RNrDi2kSUG0zHgHqlHKLe+pZlicvrK34/RU=;
-        b=hEovC21UiPZzvtvdDH498nOVfF0TGPqBM02NjCL1RYHoH8XbKH5u/894c2jjXb90nn
-         3G+3aolLf8jxNzxfqrl9O2wKxloul1bJlCXIGV0OZjr300xLt0HR9kx4S0QhGOLMAMKI
-         4Pbuen8p+hqi18kfL6QRJ/MuZr6u4qP+kxuDrcnWDpxpyuFQZmj7H8AdhLSfj/0xTmDa
-         1sw4dq8JLrRUaH+t8hTVIDbbhwNG0pKNyAi6CuUjX6BdC0cJ8G8T0JgwOKMYm63P4fXd
-         v5onzGQ2ssqJMMSCDVtLF9/qm14IH+CeMRckqmMB9LvAkBrh6CQyQ5j8KypQow3O3WI+
-         t2fQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742324144; x=1742928944;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EkrBqvi+RNrDi2kSUG0zHgHqlHKLe+pZlicvrK34/RU=;
-        b=mmSpwfBUAWb4H/zK38JIUeiJ9rdRdi+OEA9tcJRc7cQIbOJtOw05nIuTPiZPUnB3Id
-         lFObxl9ooPiSm3gdglRaGbGq7VH9n+MhdvSmXxW5fscpHYsFL4AsXmCLa1KIIA6tkKQ5
-         kK7uOUogDCWZk0Eg8cVSN1DzN0xCUVTpDoVrWzkd4rG5Bs0w+i2SQBvb3Wjvs/8EwJmu
-         L+TFP9wbFr3cyG9/gpqJ9RbkxCGWApzw0rJ7la/dzGKfPfmMeYdFMp26V/PU1HFjE6dE
-         aUvVvES2e3va6HhZTRkV1e3AjmMuW/XHgrNGncH6Q8rLEsNhSbuCXdpcSHmjzKHZpf3/
-         86yg==
-X-Gm-Message-State: AOJu0YzjRxAQOVbpfsBifO/eIpPAzUv2bZYWAs163RwnPDT4k0QFXUv/
-	plgLiGZULc2rwjiyXuB9xRoEmqy1O99AMaO/fV3G44fcIke/wMCG5wPqQz7cdGrEiqNfK57O0Yu
-	hNdtINQZUdahpRiSi7VaTyYL3bg0/RqSzeZ+C
-X-Gm-Gg: ASbGncuhGgo3V9jStrKWSycgKmzrpkyLCfuNVxsyKrtCJEYEoizvxLo2Q+pITrQzoA7
-	AfJY6IXHGp3aQzeOVXoRaHXXYV9PruAE6IH/2VcbZT0IMiZYJFX2rcqQxi0uPwDsAbtNzm990Eg
-	zNYs2SZgZmUEL8Br80FUM99jaOwiY=
-X-Google-Smtp-Source: AGHT+IGTJGnBwQOqHBmfaSlBfAhuK+W5PXqIt3Wv4Prb+4i2npnSeb2H6ykpM/9aLswtvvoELvA0cAnN20NrMf1yOfE=
-X-Received: by 2002:a05:622a:1c17:b0:476:fd83:eedd with SMTP id
- d75a77b69052e-477082f5cc0mr916841cf.21.1742324144147; Tue, 18 Mar 2025
- 11:55:44 -0700 (PDT)
+	s=arc-20240116; t=1742325827; c=relaxed/simple;
+	bh=ryyR+HrYMLoW4SNLndsy19HN0trwbWjPEVMYaDrD0TM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OUQD0k7OAVvKtUdHTrh27eruFfQ5+xdtfLPCU8R5npnSkBjWk5yF4S12ln6etlnMCMPQSrGUoqJEPWZgx4NtQ8oAhvz6Ow6jKfbKe3F03guBsW3230u4SH+k2vmEdMEvUZRPkHk/m5som4WjkEUp28kNGre1Xf3BVrC289Yfsg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=dk2UIv/w; arc=none smtp.client-ip=81.19.149.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=cE39IEPuwH2j4O8dxJdTTPGzr20e/m35SIHAvpjbl1I=; b=dk2UIv/wSC7dmWGu7VRacPeGrt
+	05TI9iQ6iWKs1ghiuR6E/qrMYtBj54izlETPj9jKkzKN9Qc9aF+yOdzwOj94aXnkRpcLkIPXHPtb+
+	nlciNhey3ztMesIibkFpDwBk/fTIKNIkR0nHt0Lhz5XYBhgkj92uJ2UZDyGKiD76E6j8=;
+Received: from [80.121.79.4] (helo=[10.0.0.160])
+	by mx09lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1tuc90-000000005MH-3HYp;
+	Tue, 18 Mar 2025 19:58:33 +0100
+Message-ID: <46a0a5e2-2def-4ed1-ab54-40b6c8393239@engleder-embedded.com>
+Date: Tue, 18 Mar 2025 19:58:29 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <2a1893e924bd34f4f5b6124b568d1cdfc15573d5.1742320185.git.pabeni@redhat.com>
-In-Reply-To: <2a1893e924bd34f4f5b6124b568d1cdfc15573d5.1742320185.git.pabeni@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 18 Mar 2025 19:55:33 +0100
-X-Gm-Features: AQ5f1JpRCuGGJEalUJqq1outC9oQo0iNgx_aRz7JE_ioRbKRd1cvq65ZteG2lAk
-Message-ID: <CANn89iLst-RHUmidAqHxxQAPrH8bJYT+WiFxPU0THJyWWH0ngQ@mail.gmail.com>
-Subject: Re: [PATCH v2] net: introduce per netns packet chains
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Sabrina Dubroca <sd@queasysnail.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH linux-next] net: atm: use sysfs_emit()/sysfs_emit_at()
+ instead of scnprintf().
+To: xie.ludan@zte.com.cn
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ xu.xin16@zte.com.cn, yang.yang29@zte.com.cn, davem@davemloft.net
+References: <20250317152933756kWrF1Y_e-2EKtrR_GGegq@zte.com.cn>
+Content-Language: en-US
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+In-Reply-To: <20250317152933756kWrF1Y_e-2EKtrR_GGegq@zte.com.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AV-Do-Run: Yes
 
-On Tue, Mar 18, 2025 at 7:03=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> Currently network taps unbound to any interface are linked in the
-> global ptype_all list, affecting the performance in all the network
-> namespaces.
->
-> Add per netns ptypes chains, so that in the mentioned case only
-> the netns owning the packet socket(s) is affected.
->
-> While at that drop the global ptype_all list: no in kernel user
-> registers a tap on "any" type without specifying either the target
-> device or the target namespace (and IMHO doing that would not make
-> any sense).
->
-> Note that this adds a conditional in the fast path (to check for
-> per netns ptype_specific list) and increases the dataset size by
-> a cacheline (owing the per netns lists).
->
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+On 17.03.25 08:29, xie.ludan@zte.com.cn wrote:
+> From: XieLudan <xie.ludan@zte.com.cn>
+> 
+> Follow the advice in Documentation/filesystems/sysfs.rst:
+> show() should only use sysfs_emit() or sysfs_emit_at() when formatting
+> the value to be returned to user space.
+> 
+> Signed-off-by: XieLudan <xie.ludan@zte.com.cn>
 > ---
-> v1  -> v2:
->  - fix comment typo
->  - drop the doubtful RCU optimization
->
-> rfc -> v1
->  - fix procfs dump
->  - fix dev->ptype_specific -> dev->ptype_all type in ptype_head()
->  - dev_net() -> dev_net_rcu
->  - add dev_nit_active_rcu  variant
->  - ptype specific netns deliver uses dev_net_rcu(skb->dev)) instead
->    of dev_net(orig_dev)
-> ---
->  include/linux/netdevice.h   | 12 ++++++++-
->  include/net/hotdata.h       |  1 -
->  include/net/net_namespace.h |  3 +++
->  net/core/dev.c              | 52 +++++++++++++++++++++++++++----------
->  net/core/hotdata.c          |  1 -
->  net/core/net-procfs.c       | 28 +++++++++++++++-----
->  net/core/net_namespace.c    |  2 ++
->  7 files changed, 76 insertions(+), 23 deletions(-)
->
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index 67527243459b3..c51a99f24800d 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -4276,7 +4276,17 @@ static __always_inline int ____dev_forward_skb(str=
-uct net_device *dev,
->         return 0;
->  }
->
-> -bool dev_nit_active(struct net_device *dev);
-> +bool dev_nit_active_rcu(struct net_device *dev);
-> +static inline bool dev_nit_active(struct net_device *dev)
-> +{
-> +       bool ret;
-> +
-> +       rcu_read_lock();
-> +       ret =3D dev_nit_active_rcu(dev);
-> +       rcu_read_unlock();
-> +       return ret;
-> +}
-> +
->  void dev_queue_xmit_nit(struct sk_buff *skb, struct net_device *dev);
->
->  static inline void __dev_put(struct net_device *dev)
-> diff --git a/include/net/hotdata.h b/include/net/hotdata.h
-> index 30e9570beb2af..fda94b2647ffa 100644
-> --- a/include/net/hotdata.h
-> +++ b/include/net/hotdata.h
-> @@ -23,7 +23,6 @@ struct net_hotdata {
->         struct net_offload      udpv6_offload;
->  #endif
->         struct list_head        offload_base;
-> -       struct list_head        ptype_all;
->         struct kmem_cache       *skbuff_cache;
->         struct kmem_cache       *skbuff_fclone_cache;
->         struct kmem_cache       *skb_small_head_cache;
-> diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
-> index f467a66abc6b1..bd57d8fb54f14 100644
-> --- a/include/net/net_namespace.h
-> +++ b/include/net/net_namespace.h
-> @@ -83,6 +83,9 @@ struct net {
->         struct llist_node       defer_free_list;
->         struct llist_node       cleanup_list;   /* namespaces on death ro=
-w */
->
-> +       struct list_head ptype_all;
-> +       struct list_head ptype_specific;
-> +
->  #ifdef CONFIG_KEYS
->         struct key_tag          *key_domain;    /* Key domain of operatio=
-n tag */
->  #endif
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 6fa6ed5b57987..99ce4a3526e54 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -572,11 +572,19 @@ static inline void netdev_set_addr_lockdep_class(st=
-ruct net_device *dev)
->
->  static inline struct list_head *ptype_head(const struct packet_type *pt)
->  {
-> -       if (pt->type =3D=3D htons(ETH_P_ALL))
-> -               return pt->dev ? &pt->dev->ptype_all : &net_hotdata.ptype=
-_all;
-> -       else
-> -               return pt->dev ? &pt->dev->ptype_specific :
-> -                                &ptype_base[ntohs(pt->type) & PTYPE_HASH=
-_MASK];
-> +       if (pt->type =3D=3D htons(ETH_P_ALL)) {
-> +               if (!pt->af_packet_net && !pt->dev)
-> +                       return NULL;
-> +
-> +               return pt->dev ? &pt->dev->ptype_all :
-> +                                &pt->af_packet_net->ptype_all;
-> +       }
-> +
-> +       if (pt->dev)
-> +               return &pt->dev->ptype_specific;
-> +
-> +       return pt->af_packet_net ? &pt->af_packet_net->ptype_specific :
-> +                                  &ptype_base[ntohs(pt->type) & PTYPE_HA=
-SH_MASK];
->  }
->
->  /**
-> @@ -596,6 +604,9 @@ void dev_add_pack(struct packet_type *pt)
->  {
->         struct list_head *head =3D ptype_head(pt);
->
-> +       if (WARN_ON_ONCE(!head))
-> +               return;
-> +
->         spin_lock(&ptype_lock);
->         list_add_rcu(&pt->list, head);
->         spin_unlock(&ptype_lock);
-> @@ -620,6 +631,9 @@ void __dev_remove_pack(struct packet_type *pt)
->         struct list_head *head =3D ptype_head(pt);
->         struct packet_type *pt1;
->
-> +       if (!head)
-> +               return;
-> +
->         spin_lock(&ptype_lock);
->
->         list_for_each_entry(pt1, head, list) {
-> @@ -2463,16 +2477,18 @@ static inline bool skb_loop_sk(struct packet_type=
- *ptype, struct sk_buff *skb)
->  }
->
->  /**
-> - * dev_nit_active - return true if any network interface taps are in use
-> + * dev_nit_active_rcu - return true if any network interface taps are in=
- use
-> + *
-> + * The caller must hold the RCU lock
->   *
->   * @dev: network device to check for the presence of taps
->   */
-> -bool dev_nit_active(struct net_device *dev)
-> +bool dev_nit_active_rcu(struct net_device *dev)
->  {
-> -       return !list_empty(&net_hotdata.ptype_all) ||
-> +       return !list_empty(&dev_net_rcu(dev)->ptype_all) ||
->                !list_empty(&dev->ptype_all);
->  }
-> -EXPORT_SYMBOL_GPL(dev_nit_active);
-> +EXPORT_SYMBOL_GPL(dev_nit_active_rcu);
->
->  /*
->   *     Support routine. Sends outgoing frames to any network
-> @@ -2481,11 +2497,12 @@ EXPORT_SYMBOL_GPL(dev_nit_active);
->
->  void dev_queue_xmit_nit(struct sk_buff *skb, struct net_device *dev)
->  {
-> -       struct list_head *ptype_list =3D &net_hotdata.ptype_all;
->         struct packet_type *ptype, *pt_prev =3D NULL;
-> +       struct list_head *ptype_list;
->         struct sk_buff *skb2 =3D NULL;
->
->         rcu_read_lock();
-> +       ptype_list =3D &dev_net_rcu(dev)->ptype_all;
->  again:
->         list_for_each_entry_rcu(ptype, ptype_list, list) {
->                 if (READ_ONCE(ptype->ignore_outgoing))
-> @@ -2529,7 +2546,7 @@ void dev_queue_xmit_nit(struct sk_buff *skb, struct=
- net_device *dev)
->                 pt_prev =3D ptype;
->         }
->
-> -       if (ptype_list =3D=3D &net_hotdata.ptype_all) {
-> +       if (ptype_list =3D=3D &dev_net_rcu(dev)->ptype_all) {
+>   net/atm/atm_sysfs.c | 12 ++++++------
+>   1 file changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/net/atm/atm_sysfs.c b/net/atm/atm_sysfs.c
+> index 54e7fb1a4ee5..ae0d921157c5 100644
+> --- a/net/atm/atm_sysfs.c
+> +++ b/net/atm/atm_sysfs.c
+> @@ -16,7 +16,7 @@ static ssize_t type_show(struct device *cdev,
+>   {
+>   	struct atm_dev *adev = to_atm_dev(cdev);
+> 
+> -	return scnprintf(buf, PAGE_SIZE, "%s\n", adev->type);
+> +	return sysfs_emit(buf, "%s\n", adev->type);
+>   }
+> 
+>   static ssize_t address_show(struct device *cdev,
+> @@ -24,7 +24,7 @@ static ssize_t address_show(struct device *cdev,
+>   {
+>   	struct atm_dev *adev = to_atm_dev(cdev);
+> 
+> -	return scnprintf(buf, PAGE_SIZE, "%pM\n", adev->esi);
+> +	return sysfs_emit(buf, "%pM\n", adev->esi);
+>   }
+> 
+>   static ssize_t atmaddress_show(struct device *cdev,
+> @@ -37,7 +37,7 @@ static ssize_t atmaddress_show(struct device *cdev,
+> 
+>   	spin_lock_irqsave(&adev->lock, flags);
+>   	list_for_each_entry(aaddr, &adev->local, entry) {
+> -		count += scnprintf(buf + count, PAGE_SIZE - count,
+> +		count += sysfs_emit_at(buf, count,
+>   				   "%1phN.%2phN.%10phN.%6phN.%1phN\n",
+>   				   &aaddr->addr.sas_addr.prv[0],
+>   				   &aaddr->addr.sas_addr.prv[1],
 
-Using the following should be faster, generated code will be shorter.
+Does the alignment of the following argument lines needs to be adapted?
 
-        if (ptype_list !=3D &dev->ptype_all)
+> @@ -55,7 +55,7 @@ static ssize_t atmindex_show(struct device *cdev,
+>   {
+>   	struct atm_dev *adev = to_atm_dev(cdev);
+> 
+> -	return scnprintf(buf, PAGE_SIZE, "%d\n", adev->number);
+> +	return sysfs_emit(buf, "%d\n", adev->number);
+>   }
+> 
+>   static ssize_t carrier_show(struct device *cdev,
+> @@ -63,7 +63,7 @@ static ssize_t carrier_show(struct device *cdev,
+>   {
+>   	struct atm_dev *adev = to_atm_dev(cdev);
+> 
+> -	return scnprintf(buf, PAGE_SIZE, "%d\n",
+> +	return sysfs_emit(buf, "%d\n",
+>   			 adev->signal == ATM_PHY_SIG_LOST ? 0 : 1);
 
->                 ptype_list =3D &dev->ptype_all;
->                 goto again;
->         }
-> @@ -3774,7 +3791,7 @@ static int xmit_one(struct sk_buff *skb, struct net=
-_device *dev,
->         unsigned int len;
->         int rc;
->
-> -       if (dev_nit_active(dev))
-> +       if (dev_nit_active_rcu(dev))
->                 dev_queue_xmit_nit(skb, dev);
->
->         len =3D skb->len;
-> @@ -5718,7 +5735,8 @@ static int __netif_receive_skb_core(struct sk_buff =
-**pskb, bool pfmemalloc,
->         if (pfmemalloc)
->                 goto skip_taps;
->
-> -       list_for_each_entry_rcu(ptype, &net_hotdata.ptype_all, list) {
-> +       list_for_each_entry_rcu(ptype, &dev_net_rcu(skb->dev)->ptype_all,
-> +                               list) {
->                 if (pt_prev)
->                         ret =3D deliver_skb(skb, pt_prev, orig_dev);
->                 pt_prev =3D ptype;
-> @@ -5830,6 +5848,14 @@ static int __netif_receive_skb_core(struct sk_buff=
- **pskb, bool pfmemalloc,
->                 deliver_ptype_list_skb(skb, &pt_prev, orig_dev, type,
->                                        &ptype_base[ntohs(type) &
->                                                    PTYPE_HASH_MASK]);
-> +
-> +               /* The only per net ptype user - packet socket - matches
-> +                * the target netns vs dev_net(skb->dev); we need to
-> +                * process only such netns even when orig_dev lays in a
-> +                * different one.
-> +                */
-> +               deliver_ptype_list_skb(skb, &pt_prev, orig_dev, type,
-> +                                      &dev_net_rcu(skb->dev)->ptype_spec=
-ific);
+Adapt alignment of following line?
 
-I am banging my head here.  I probably need some sleep :)
+Gerhard
+
 
