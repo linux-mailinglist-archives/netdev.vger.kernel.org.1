@@ -1,321 +1,262 @@
-Return-Path: <netdev+bounces-175794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58D30A677AC
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 16:25:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23C32A677C9
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 16:30:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AA3616F70B
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 15:24:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65838188BD02
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 15:25:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 594C720F09F;
-	Tue, 18 Mar 2025 15:24:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52ECF20FAB9;
+	Tue, 18 Mar 2025 15:24:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Aey0y2P2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cHmBZ1RF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B94BC20F066
-	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 15:24:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CB2042AA1;
+	Tue, 18 Mar 2025 15:24:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742311484; cv=none; b=Tg6orBGDgh5Yj+xgMYUmW6StiLbHXFAhYnJui43x/y2vjN83zQP5z0dU5ytaZPwTyhGX/B7seln09ZvU3GnStXl4rDdTrejXJn05LoLEMkOUYSs5A6+z5/9R+lr4S0kWYKMQYqOJhiXOfcobuozl4AYY2Mu7BGD4H6on/HJfhE4=
+	t=1742311499; cv=none; b=mWCXR/TcZsu8dOB6xLUENmYitvspsR0ZJ2vZFWgVQ92WvPV8RqJ/7PJvdxSINvBoThZIoe4IKfzWdQaCH3GDdH5E3aHSitG4ifotfb9cnYFOoV8eIXnWtzlCg3d2W1zz5TDTb7IGjBOXjrtYAOKzs4mJwYGo8WQl6x9Ukl/IOjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742311484; c=relaxed/simple;
-	bh=nwUVJN4gAnpHbpMJTe6ZpZkbPRBWjH0WP7Gslu1wwWw=;
+	s=arc-20240116; t=1742311499; c=relaxed/simple;
+	bh=/Vxtk/M/zsYmwadz5SgxJ5mP+fz1qKWq85EWjMZiyDo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V5+CCzh76uNr+ybHhFIAKZiAVKVCrj+PcUzBkJcQ/zgyn0jOdflcFE4xjAKXjT57H1/B7HRpG5VowEl2es7QgdtlmeofXnAKjHQSnXwmr6c+WWkDm9n8/8mXAwonHdHdN5uU0gjyTR7sq8z5xm6rcKXE5CVpLKphU/FpCidg5zw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Aey0y2P2; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742311477;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hqTTkSk1AS0bS0c1yGdSEW4YtI0XIvKuEUyQjEJj824=;
-	b=Aey0y2P23eIFJLDaRiNaUclg7iHGoofSSedsy83d54GUdsNwVGRi50d5ksr3f0r3hR39M3
-	VtkCZU2enlQ2xMZld/ZPTPGKgrCF4qbY4zIE7S1vaTkNz/+r2hCCqJ06U17jls7mvOSVuK
-	5uyqTMeTx1s+hiSEj/CCpnHy3aRWyI4=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-248-bLfBJ5soOO266TfCN80n-w-1; Tue, 18 Mar 2025 11:24:35 -0400
-X-MC-Unique: bLfBJ5soOO266TfCN80n-w-1
-X-Mimecast-MFC-AGG-ID: bLfBJ5soOO266TfCN80n-w_1742311474
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-ac297c79dabso571443866b.0
-        for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 08:24:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742311474; x=1742916274;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hqTTkSk1AS0bS0c1yGdSEW4YtI0XIvKuEUyQjEJj824=;
-        b=ka5PiJ69lkChdVJH/f/Eg1iiR5eOy60BSWqP2Ff+jDVvHsBYiSC/muh7h+Uq0MyNU9
-         ix1M5f5z1d8guGnpHrXbCY2Q89LoL8hQqLCKQsytn1bnyNR1l/VnoJq9xbqFumtcXxsi
-         SH4bBZpPNS6XlPhf8WzQR4q3tHl7B82OwTp2g+ypBKsJlkUGKObYO78hQ8cHWwvxi2vr
-         Z8eKt2HNiqCyBJsflkEM76eKUiNSGlJP/fcEAHzzsF1vsxwibYgG86nZTMWRJIAW+6r1
-         X/eZ9Vho8LFXf49pbtzCnl9hPIcb2fXxXbr26LrI1e6CbpVNiqY3+1389oSfe22iGofF
-         jAow==
-X-Forwarded-Encrypted: i=1; AJvYcCXy/vVh/tyTr2k2xMVmHmxg9pPyye3owmF4DDRPtXNoxaZ18TPEv0kWGE0nFcukifBISZkLqO0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbWFbLBx7EgxwVQqWoqPG7JYpKiNbQp2qHAr2qz9HgsjZsICud
-	ToDwkaRkpp5SZCgKbbfgVj74+SsbSc3amux212SeDq2Af2RTq0cmeS0AQFBkJPLIbde1gkgsPC0
-	JScFbrzJlIYLJgyHDAz5hgpKR7hB9NSwDWr5aohY5JCcq/KbaBgANAg==
-X-Gm-Gg: ASbGncuX1uxeUiojuc/MhzoFJOEkKKcosfhlr6A31ql3tHQ6vt8s2hqHBs9KMHRvgOz
-	97qjWcpoJNiwugQklMwrlZaGopZz559egTniAccyGq5DAdZB0LnF5NhJKIGEDWHbiq1jVD7fOL5
-	xqif4MAZAyyeQDzVuVS7lOO+LshdJk4Mh6Il5ElHHzx4WBvj0t+J66U9lQh+uvMLmYwtMuP9FhU
-	jRuVHltB34B9SQI/AMSz4uP0rQ+/lonujl2VUpQkMPJB3SsYV75XTfRIP18UlqgkKRICGJQTZgi
-	q+qN6B8tewE+xkOorgohcy3ba2k0gJ5KkJycqKecrDCALQEHTxWQdNIlFYmSCE1P
-X-Received: by 2002:a17:907:d92:b0:abe:fa18:1fc6 with SMTP id a640c23a62f3a-ac33010b594mr1889901866b.10.1742311473956;
-        Tue, 18 Mar 2025 08:24:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEYKgdyBOe4N9SqzNdQv0/ja/tFgBWXAA/B9X5QxvZp4bZLbnQYU/EpiDkc3dvPqkEg8rOP6g==
-X-Received: by 2002:a17:907:d92:b0:abe:fa18:1fc6 with SMTP id a640c23a62f3a-ac33010b594mr1889895666b.10.1742311473178;
-        Tue, 18 Mar 2025 08:24:33 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac37dc4e0afsm292211266b.21.2025.03.18.08.24.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Mar 2025 08:24:32 -0700 (PDT)
-Date: Tue, 18 Mar 2025 16:24:28 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Luigi Leonardi <leonardi@redhat.com>
-Cc: Michal Luczaj <mhal@rbox.co>, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Hyunwoo Kim <v4bel@theori.io>
-Subject: Re: [PATCH net-next v2] vsock/test: Add test for null ptr deref when
- transport changes
-Message-ID: <tjuxwbbkwyi2ggjv6744h27rkk3kjhdbkv6mnzflg22brhakzq@dvcduolqwhl6>
-References: <20250314-test_vsock-v2-1-3c0a1d878a6d@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=H/U8Cak+/BKD0HvHAyeouGd4MJt3LlLRjx6f+PaBLom5Bj5paXyoLge7Uph/36woz+eziAcVPRO7s12ZIMoQ97XsHqG4+IdKCk/21HUgK7Sqs1u4az8dEDkD6/BkdR+nfkJVrs1SrI88Bne1aaHGa4CI0dS3ScgCU95V9Q7Engs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cHmBZ1RF; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1742311493; x=1773847493;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=/Vxtk/M/zsYmwadz5SgxJ5mP+fz1qKWq85EWjMZiyDo=;
+  b=cHmBZ1RFSRqe4FUE5X+nAlMFWrBarJHKUUCo1ZnXcv5rKPZwXYxFcIDc
+   OyeMFEMjPOQNtt5gXueGH47KywBKLYIHn/VcsyghrNCdJWp/ZLhIJ7X6j
+   9SA6GAcSQVCnK7hssZZqzAq4aTt8FBEuJ5Zs2fMPJdQbNi/w20Ule638h
+   WUG6LkBphcdeHv7myEgcUehy0Wi1B9Bi4RpwJcMhdXywfZE5593xeYhc1
+   wPH1fEjnBFzRXANhMsGuOfQu2Z3pQyWiZWZ72JDEXF7mdZ65fpsfKeCD/
+   QXnJwQcTWTUQ2cWb4KoSyleC49n0kF7KiAOGCwCGECbv1HqJqGGzBjHhO
+   A==;
+X-CSE-ConnectionGUID: 9w61opJDRF+XTadj9AwZGQ==
+X-CSE-MsgGUID: +64MRf30QU6k6pS7L84zkg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11377"; a="54135685"
+X-IronPort-AV: E=Sophos;i="6.14,257,1736841600"; 
+   d="scan'208";a="54135685"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2025 08:24:52 -0700
+X-CSE-ConnectionGUID: kMdL4c7YRZKiJ3gE8xKbMw==
+X-CSE-MsgGUID: fO2F/3zYQOS+T4NonmXKdw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,257,1736841600"; 
+   d="scan'208";a="122233599"
+Received: from turnipsi.fi.intel.com (HELO kekkonen.fi.intel.com) ([10.237.72.44])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2025 08:24:48 -0700
+Received: from kekkonen.localdomain (localhost [127.0.0.1])
+	by kekkonen.fi.intel.com (Postfix) with SMTP id 95F1711F9BD;
+	Tue, 18 Mar 2025 17:24:44 +0200 (EET)
+Date: Tue, 18 Mar 2025 15:24:44 +0000
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+From: Sakari Ailus <sakari.ailus@linux.intel.com>
+To: Matti Vaittinen <mazziesaccount@gmail.com>
+Cc: Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>,
+	Jonathan Cameron <jic23@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Daniel Scally <djrscally@gmail.com>,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-iio@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v8 02/10] property: Add functions to iterate named child
+Message-ID: <Z9mQPJwnKAkPHriT@kekkonen.localdomain>
+References: <cover.1742225817.git.mazziesaccount@gmail.com>
+ <9c3880f74476436f39d796b5c10c540ae50b722c.1742225817.git.mazziesaccount@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250314-test_vsock-v2-1-3c0a1d878a6d@redhat.com>
+In-Reply-To: <9c3880f74476436f39d796b5c10c540ae50b722c.1742225817.git.mazziesaccount@gmail.com>
 
-On Fri, Mar 14, 2025 at 10:27:33AM +0100, Luigi Leonardi wrote:
->Add a new test to ensure that when the transport changes a null pointer
->dereference does not occur[1].
+Moi,
 
-I'd add something like this:
+On Mon, Mar 17, 2025 at 05:50:38PM +0200, Matti Vaittinen wrote:
+> There are a few use-cases where child nodes with a specific name need to
+> be parsed. Code like:
+> 
+> fwnode_for_each_child_node()
+> 	if (fwnode_name_eq())
+> 		...
+> 
+> can be found from a various drivers/subsystems. Adding a macro for this
+> can simplify things a bit.
+> 
+> In a few cases the data from the found nodes is later added to an array,
+> which is allocated based on the number of found nodes. One example of
+> such use is the IIO subsystem's ADC channel nodes, where the relevant
+> nodes are named as channel[@N].
+> 
+> Add helpers for iterating and counting device's sub-nodes with certain
+> name instead of open-coding this in every user.
+> 
+> Suggested-by: Jonathan Cameron <jic23@kernel.org>
+> Signed-off-by: Matti Vaittinen <mazziesaccount@gmail.com>
+> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> Reviewed-by: Marcelo Schmitt <marcelo.schmitt1@gmail.com>
+> ---
+> Revision history:
+> v7 => v8:
+>  - Fix the example in fwnode_get_named_child_node_count() documentation
+>    to use the fwnode_get_named_child_node_count() and not the
+>    device_get_named_child_node_count()
+>  - Fix the rest of the new macro's indentiations
+> v6 => v7:
+>  - Improve kerneldoc
+>  - Inline device_get_named_child_node_count() and change it to call
+>    fwnode_get_named_child_node_count() inside
+>  - Fix indentiation of the new macros
+> v5 => v6:
+>  - Add helpers to also iterate through the nodes.
+> v4 => v5:
+>  - Use given name instead of string 'channel' when counting the nodes
+>  - Add also fwnode_get_child_node_count_named() as suggested by Rob.
+> v3 => v4:
+>  - New patch as suggested by Jonathan, see discussion in:
+> https://lore.kernel.org/lkml/20250223161338.5c896280@jic23-huawei/
+> ---
+>  drivers/base/property.c  | 27 +++++++++++++++++++++++++++
+>  include/linux/property.h | 24 ++++++++++++++++++++++++
+>  2 files changed, 51 insertions(+)
+> 
+> diff --git a/drivers/base/property.c b/drivers/base/property.c
+> index c1392743df9c..f42f32ff45fc 100644
+> --- a/drivers/base/property.c
+> +++ b/drivers/base/property.c
+> @@ -945,6 +945,33 @@ unsigned int device_get_child_node_count(const struct device *dev)
+>  }
+>  EXPORT_SYMBOL_GPL(device_get_child_node_count);
+>  
+> +/**
+> + * fwnode_get_named_child_node_count - number of child nodes with given name
+> + * @fwnode: Node which child nodes are counted.
+> + * @name: String to match child node name against.
+> + *
+> + * Scan child nodes and count all the nodes with a specific name. Potential
+> + * 'number' -ending after the 'at sign' for scanned names is ignored.
+> + * E.g.::
+> + *   fwnode_get_named_child_node_count(fwnode, "channel");
+> + * would match all the nodes::
+> + *   channel { }, channel@0 {}, channel@0xabba {}...
+> + *
+> + * Return: the number of child nodes with a matching name for a given device.
+> + */
+> +unsigned int fwnode_get_named_child_node_count(const struct fwnode_handle *fwnode,
+> +					       const char *name)
+> +{
+> +	struct fwnode_handle *child;
+> +	unsigned int count = 0;
+> +
+> +	fwnode_for_each_named_child_node(fwnode, child, name)
+> +		count++;
+> +
+> +	return count;
+> +}
+> +EXPORT_SYMBOL_GPL(fwnode_get_named_child_node_count);
+> +
+>  bool device_dma_supported(const struct device *dev)
+>  {
+>  	return fwnode_call_bool_op(dev_fwnode(dev), device_dma_supported);
+> diff --git a/include/linux/property.h b/include/linux/property.h
+> index e214ecd241eb..a1856e6b714c 100644
+> --- a/include/linux/property.h
+> +++ b/include/linux/property.h
+> @@ -167,10 +167,18 @@ struct fwnode_handle *fwnode_get_next_available_child_node(
+>  	for (child = fwnode_get_next_child_node(fwnode, NULL); child;	\
+>  	     child = fwnode_get_next_child_node(fwnode, child))
+>  
+> +#define fwnode_for_each_named_child_node(fwnode, child, name)		\
+> +	fwnode_for_each_child_node(fwnode, child)			\
+> +		if (!fwnode_name_eq(child, name)) { } else
+> +
+>  #define fwnode_for_each_available_child_node(fwnode, child)		       \
+>  	for (child = fwnode_get_next_available_child_node(fwnode, NULL); child;\
+>  	     child = fwnode_get_next_available_child_node(fwnode, child))
+>  
+> +#define fwnode_for_each_available_named_child_node(fwnode, child, name)	\
+> +	fwnode_for_each_available_child_node(fwnode, child)		\
+> +		if (!fwnode_name_eq(child, name)) { } else
+> +
 
-"... does not occur. The bug was reported upstream [1] and fixed with
-commit 2cb7c756f605 ("vsock/virtio: discard packets if the transport
-changes")."
+OF only enumerates available nodes via the fwnode API, software nodes don't
+have the concept but on ACPI I guess you could have a difference in nodes
+where you have device sub-nodes that aren't available. Still, these ACPI
+device nodes don't have meaningful names in this context (they're
+4-character object names) so you wouldn't use them like this anyway.
 
->
->Note that this test does not fail, but it may hang on the client side if
->it triggers a kernel oops.
+So my question is: is it useful to provide this besides
+fwnode_for_each_named_child_node(), given that both are effectively the
+same?
 
-In my case the test failed (I guess the other side that was still
-working), so I'd say: "Note that this test may not fail in a kernel
-without the fix, ..."
+>  struct fwnode_handle *device_get_next_child_node(const struct device *dev,
+>  						 struct fwnode_handle *child);
+>  
+> @@ -178,11 +186,19 @@ struct fwnode_handle *device_get_next_child_node(const struct device *dev,
+>  	for (child = device_get_next_child_node(dev, NULL); child;	\
+>  	     child = device_get_next_child_node(dev, child))
+>  
+> +#define device_for_each_named_child_node(dev, child, name)		\
+> +	device_for_each_child_node(dev, child)				\
+> +		if (!fwnode_name_eq(child, name)) { } else
+> +
+>  #define device_for_each_child_node_scoped(dev, child)			\
+>  	for (struct fwnode_handle *child __free(fwnode_handle) =	\
+>  		device_get_next_child_node(dev, NULL);			\
+>  	     child; child = device_get_next_child_node(dev, child))
+>  
+> +#define device_for_each_named_child_node_scoped(dev, child, name)	\
+> +	device_for_each_child_node_scoped(dev, child)			\
+> +		if (!fwnode_name_eq(child, name)) { } else
+> +
+>  struct fwnode_handle *fwnode_get_named_child_node(const struct fwnode_handle *fwnode,
+>  						  const char *childname);
+>  struct fwnode_handle *device_get_named_child_node(const struct device *dev,
+> @@ -210,6 +226,14 @@ int fwnode_irq_get_byname(const struct fwnode_handle *fwnode, const char *name);
+>  
+>  unsigned int device_get_child_node_count(const struct device *dev);
+>  
+> +unsigned int fwnode_get_named_child_node_count(const struct fwnode_handle *fwnode,
+> +					       const char *name);
+> +static inline unsigned int device_get_named_child_node_count(const struct device *dev,
+> +							     const char *name)
+> +{
+> +	return fwnode_get_named_child_node_count(dev_fwnode(dev), name);
+> +}
+> +
+>  static inline int device_property_read_u8(const struct device *dev,
+>  					  const char *propname, u8 *val)
+>  {
 
->
->This works by creating a socket, trying to connect to a server, and then
->executing a second connect operation on the same socket but to a
->different CID (0). This triggers a transport change. If the connect
->operation is interrupted by a signal, this could cause a null-ptr-deref.
->
->Since this bug is non-deterministic, we need to try several times. It
->is safe to assume that the bug will show up within the timeout period.
+-- 
+Terveisin,
 
-s/safe/reasonable
-
->
->If there is a G2H transport loaded in the system, the bug is not
->triggered and this test will always pass.
-
-The rest LGTM.
-
-Thanks,
-Stefano
-
->
->[1]https://lore.kernel.org/netdev/Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX/
->
->Suggested-by: Hyunwoo Kim <v4bel@theori.io>
->Suggested-by: Michal Luczaj <mhal@rbox.co>
->Signed-off-by: Luigi Leonardi <leonardi@redhat.com>
->---
->This series introduces a new test that checks for a null pointer
->dereference that may happen when there is a transport change[1]. This
->bug was fixed in [2].
->
->Note that this test *cannot* fail, it hangs if it triggers a kernel
->oops. The intended use-case is to run it and then check if there is any
->oops in the dmesg.
->
->This test is based on Hyunwoo Kim's[3] and Michal's python
->reproducers[4].
->
->[1]https://lore.kernel.org/netdev/Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX/
->[2]https://lore.kernel.org/netdev/20250110083511.30419-1-sgarzare@redhat.com/
->[3]https://lore.kernel.org/netdev/Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX/#t
->[4]https://lore.kernel.org/netdev/2b3062e3-bdaa-4c94-a3c0-2930595b9670@rbox.co/
->---
->Changes in v2:
->- Addressed Stefano's comments:
->    - Timeout is now using current_nsec()
->    - Check for return values
->    - Style issues
->- Added Hyunwoo Kim to Suggested-by
->- Link to v1: https://lore.kernel.org/r/20250306-test_vsock-v1-0-0320b5accf92@redhat.com
->---
-> tools/testing/vsock/Makefile     |   1 +
-> tools/testing/vsock/vsock_test.c | 101 +++++++++++++++++++++++++++++++++++++++
-> 2 files changed, 102 insertions(+)
->
->diff --git a/tools/testing/vsock/Makefile b/tools/testing/vsock/Makefile
->index 6e0b4e95e230500f99bb9c74350701a037ecd198..88211fd132d23ecdfd56ab0815580a237889e7f2 100644
->--- a/tools/testing/vsock/Makefile
->+++ b/tools/testing/vsock/Makefile
->@@ -5,6 +5,7 @@ vsock_test: vsock_test.o vsock_test_zerocopy.o timeout.o control.o util.o msg_ze
-> vsock_diag_test: vsock_diag_test.o timeout.o control.o util.o
-> vsock_perf: vsock_perf.o msg_zerocopy_common.o
->
->+vsock_test: LDLIBS = -lpthread
-> vsock_uring_test: LDLIBS = -luring
-> vsock_uring_test: control.o util.o vsock_uring_test.o timeout.o msg_zerocopy_common.o
->
->diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index d0f6d253ac72d08a957cb81a3c38fcc72bec5a53..d2820a67403c95bc4a7e7a16113ae2f6137b4c73 100644
->--- a/tools/testing/vsock/vsock_test.c
->+++ b/tools/testing/vsock/vsock_test.c
->@@ -23,6 +23,7 @@
-> #include <sys/ioctl.h>
-> #include <linux/sockios.h>
-> #include <linux/time64.h>
->+#include <pthread.h>
->
-> #include "vsock_test_zerocopy.h"
-> #include "timeout.h"
->@@ -1788,6 +1789,101 @@ static void test_stream_connect_retry_server(const struct test_opts *opts)
-> 	close(fd);
-> }
->
->+static void *test_stream_transport_change_thread(void *vargp)
->+{
->+	pid_t *pid = (pid_t *)vargp;
->+
->+	/* We want this thread to terminate as soon as possible */
->+	if (pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL)) {
->+		perror("pthread_setcanceltype");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	while (true) {
->+		if (kill(*pid, SIGUSR1) < 0) {
->+			perror("kill");
->+			exit(EXIT_FAILURE);
->+		}
->+	}
->+	return NULL;
->+}
->+
->+static void test_transport_change_signal_handler(int signal)
->+{
->+	/* We need a custom handler for SIGUSR1 as the default one terminates the process. */
->+}
->+
->+static void test_stream_transport_change_client(const struct test_opts *opts)
->+{
->+	__sighandler_t old_handler;
->+	pid_t pid = getpid();
->+	pthread_t thread_id;
->+	time_t tout;
->+
->+	old_handler = signal(SIGUSR1, test_transport_change_signal_handler);
->+	if (old_handler == SIG_ERR) {
->+		perror("signal");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	if (pthread_create(&thread_id, NULL, test_stream_transport_change_thread, &pid)) {
->+		perror("pthread_create");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	tout = current_nsec() + TIMEOUT * NSEC_PER_SEC;
->+	do {
->+		struct sockaddr_vm sa = {
->+			.svm_family = AF_VSOCK,
->+			.svm_cid = opts->peer_cid,
->+			.svm_port = opts->peer_port,
->+		};
->+		int s;
->+
->+		s = socket(AF_VSOCK, SOCK_STREAM, 0);
->+		if (s < 0) {
->+			perror("socket");
->+			exit(EXIT_FAILURE);
->+		}
->+
->+		connect(s, (struct sockaddr *)&sa, sizeof(sa));
->+
->+		/* Set CID to 0 cause a transport change. */
->+		sa.svm_cid = 0;
->+		connect(s, (struct sockaddr *)&sa, sizeof(sa));
->+
->+		close(s);
->+	} while (current_nsec() < tout);
->+
->+	if (pthread_cancel(thread_id)) {
->+		perror("pthread_cancel");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	/* Wait for the thread to terminate */
->+	if (pthread_join(thread_id, NULL)) {
->+		perror("pthread_join");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	/* Restore the old handler */
->+	if (signal(SIGUSR1, old_handler) == SIG_ERR) {
->+		perror("signal");
->+		exit(EXIT_FAILURE);
->+	}
->+}
->+
->+static void test_stream_transport_change_server(const struct test_opts *opts)
->+{
->+	time_t tout = current_nsec() + TIMEOUT * NSEC_PER_SEC;
->+
->+	do {
->+		int s = vsock_stream_listen(VMADDR_CID_ANY, opts->peer_port);
->+
->+		close(s);
->+	} while (current_nsec() < tout);
->+}
->+
-> static void test_stream_linger_client(const struct test_opts *opts)
-> {
-> 	struct linger optval = {
->@@ -1984,6 +2080,11 @@ static struct test_case test_cases[] = {
-> 		.run_client = test_stream_linger_client,
-> 		.run_server = test_stream_linger_server,
-> 	},
->+	{
->+		.name = "SOCK_STREAM transport change null-ptr-deref",
->+		.run_client = test_stream_transport_change_client,
->+		.run_server = test_stream_transport_change_server,
->+	},
-> 	{},
-> };
->
->
->---
->base-commit: 4d872d51bc9d7b899c1f61534e3dbde72613f627
->change-id: 20250306-test_vsock-3e77a9c7a245
->
->Best regards,
->-- 
->Luigi Leonardi <leonardi@redhat.com>
->
-
+Sakari Ailus
 
