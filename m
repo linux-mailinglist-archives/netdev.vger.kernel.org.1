@@ -1,132 +1,124 @@
-Return-Path: <netdev+bounces-175743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA400A675A3
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 14:55:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A073BA675FD
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 15:10:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1C0417D5C7
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 13:54:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3BAE19C040A
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 14:02:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AB1520DD45;
-	Tue, 18 Mar 2025 13:54:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3245520DD65;
+	Tue, 18 Mar 2025 14:02:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kw3vspTL"
+	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="0mT47E2y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD8020D4FE;
-	Tue, 18 Mar 2025 13:54:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B417126BFA
+	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 14:02:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742306056; cv=none; b=l2n62RPfjqqeotsHvX0QJZolZNEcWTLH6giU/SgHTQ7Eqzk/Fl5DiVpxtkTFDRqcztkQh8j6nOLSprfPH7FoCRqF3svNhWnnuXfrOkvGdrdMcnStKAmhqcAkQI4/7OeXz0tkr4yA1ftwmASFtnAghBob6hYmEm3dycRkq69rVjo=
+	t=1742306559; cv=none; b=Yr8SN0MlvYxV5DvHiKfDKSmQMF5kyOKHGvLrayGASGleURP5+eKWeV/5ncMxj77NXFL2o3MeAaNxpmMvffPTdQuAVtBSEdqyw7pxzQV0Vqv8IMhKpg/g/kSOWPiixJOy9glbiOZ7hYmFgYa4mB5NI5cxVwuJj7GTwjA8zUO0ZdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742306056; c=relaxed/simple;
-	bh=MQJNg6mROFDZ7aRUJyj8+ib7C6toJaNGkiuTO74TuVs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=pF0PljLy5o50ZdHYFuwK41JYYsGgoo+MqmxLh3dGAgQLptQJSVx8jz1dgz050YTUQJkGD7BDEtt8LnnxI77peJLbCKfa2sxS7LC5Jrn3oxAV9D4c3090C49FH+6kuWec5flZ6doYgu1Xy50sEFsZLjIjs9UjJzISR631WzwmIfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kw3vspTL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 160E1C4CEE3;
-	Tue, 18 Mar 2025 13:54:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742306055;
-	bh=MQJNg6mROFDZ7aRUJyj8+ib7C6toJaNGkiuTO74TuVs=;
-	h=From:Date:Subject:To:Cc:From;
-	b=kw3vspTLYcuBLz+iPQk+dJ4KMTcNmA3+xP7dYcNp8M+DQP5rpmuxJPQjoLWF+bx+B
-	 vZLHezaDIuJvUeYzG2EVwBQH8Xjq6GCCbHm3uSrV5FvXyH9UUpBL732JJf53sIubJw
-	 bfGzVNY/qidjvHrJwB1nXWtbTMa+Zrzd0emXl/FKowoifTvxcUHmAOrHZZg0KLaiLj
-	 +a3lUANpcFLeAGzoUUuxn41W/dC/IPpvhhXzj53evIjW+FTqxbouJ5ngyDzvgqOqAk
-	 +9qizX8kUlvLBTb6+/p/bDgXy3zS4Ln9Ko69BIZNEVqAND21ngPpYnLvkk218QsgcI
-	 WGLTJAR81ByGg==
-From: Simon Horman <horms@kernel.org>
-Date: Tue, 18 Mar 2025 13:53:34 +0000
-Subject: [PATCH net-next v3] net: tulip: avoid unused variable warning
+	s=arc-20240116; t=1742306559; c=relaxed/simple;
+	bh=F2e40r40n6eqSC6k5MgBH3+wCup0YURGMSpP32SAcWc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=D62Oi4nnQapxavP9IIgKv+GIvLio0RPOKVKRQYHYqCyknROJYNRRyX1Tul0SR9fwA1LHkLOYS8WJKV1zIx3fZxIvXwt7+rJ54OjIDCsXhVKcXOxkas+4tIFjAQDBg36sBKTOFgHv8i3mYmxANUldvPF0FC54JzhXUXtbAWW73U0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=0mT47E2y; arc=none smtp.client-ip=213.160.73.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
+	s=20121; t=1742306170;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zS6U9IbqxukiJ1clWx1A4PxWHL2mCHGPOXvVeRtKO/w=;
+	b=0mT47E2yVSK9sQUtr2JzKuXdSBEYGzBRbtTqUi6/gq6OOpst2y3o9eErHmgUIOC2b45dNM
+	Zooer++1C3wtMq0Ny7oqY3hp7V5Xv2cWZz3iH7s22ByHUs/BA1dX2yUU4YFq68mumjPtEd
+	DRYMGzX0hI7yjd78mlCtcrGgOdQjYGo=
+From: Sven Eckelmann <sven@narfation.org>
+To: Simon Wunderlich <sw@simonwunderlich.de>, davem@davemloft.net,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: kuba@kernel.org, netdev@vger.kernel.org, b.a.t.m.a.n@lists.open-mesh.org
+Subject: Re: [PATCH 0/5] pull request for net: batman-adv 2025-03-13
+Date: Tue, 18 Mar 2025 14:56:07 +0100
+Message-ID: <3809149.MHq7AAxBmi@ripper>
+In-Reply-To: <a0f1deec-2770-4b51-ad2b-b3d0e846be25@redhat.com>
+References:
+ <20250313161738.71299-1-sw@simonwunderlich.de>
+ <a0f1deec-2770-4b51-ad2b-b3d0e846be25@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20250318-tulip-w1-v3-1-a813fadd164d@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAN162WcC/2WNQQqDMBBFryKz7pSYVMWueo/iIpiJDpUoSWotk
- rs3ZNvl433ePyGQZwpwr07wtHPg1WVQlwrGWbuJkE1mkEI2QtUK43vhDT81Umd1c9OmbbsR8nz
- zZPkoqSc4iujoiDBkM3OIq/+Wj10W/5/bJdYo9SiMMr3obf94kXe0XFc/wZBS+gEN5fRPqwAAA
- A==
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Helge Deller <deller@gmx.de>, netdev@vger.kernel.org, 
- linux-parisc@vger.kernel.org
-X-Mailer: b4 0.14.0
+Content-Type: multipart/signed; boundary="nextPart1964837.taCxCBeP46";
+ micalg="pgp-sha512"; protocol="application/pgp-signature"
 
-There is an effort to achieve W=1 kernel builds without warnings.
-As part of that effort Helge Deller highlighted the following warnings
-in the tulip driver when compiling with W=1 and CONFIG_TULIP_MWI=n:
+--nextPart1964837.taCxCBeP46
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"; protected-headers="v1"
+From: Sven Eckelmann <sven@narfation.org>
+Subject: Re: [PATCH 0/5] pull request for net: batman-adv 2025-03-13
+Date: Tue, 18 Mar 2025 14:56:07 +0100
+Message-ID: <3809149.MHq7AAxBmi@ripper>
+In-Reply-To: <a0f1deec-2770-4b51-ad2b-b3d0e846be25@redhat.com>
+MIME-Version: 1.0
 
-  .../tulip_core.c: In function ‘tulip_init_one’:
-  .../tulip_core.c:1309:22: warning: variable ‘force_csr0’ set but not used
+On Tuesday, 18 March 2025 12:05:52 CET Paolo Abeni wrote:
+> The series does not apply cleanly to the net tree, could you please
+> rebase it?
 
-This patch addresses that problem using IS_ENABLED(). This approach has
-the added benefit of reducing conditionally compiled code. And thus
-increasing compile coverage. E.g. for allmodconfig builds which enable
-CONFIG_TULIP_MWI.
+$ git log -1 --oneline
+9a81fc3480bf (HEAD, net/main) ipv6: Set errno after ip_fib_metrics_init() in ip6_route_info_create().
 
-Compile tested only.
-No run-time effect intended.
+$ git pull --no-ff git://git.open-mesh.org/linux-merge.git tags/batadv-net-pullrequest-20250313
+From git://git.open-mesh.org/linux-merge
+ * tag                         batadv-net-pullrequest-20250313 -> FETCH_HEAD
+Merge made by the 'ort' strategy.
+ net/batman-adv/bat_iv_ogm.c | 3 +--
+ net/batman-adv/bat_v_ogm.c  | 3 +--
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-Acked-by: Helge Deller <deller@gmx.de>
-Signed-off-by: Simon Horman <horms@kernel.org>
----
-Changes in v3:
-- Fix mangled commit message
-- Link to v2: https://lore.kernel.org/r/20250313-tulip-w1-v2-1-2ac0d3d909f9@kernel.org
+So, it works perfectly fine for me .
 
-Changes in v2:
-- Use IS_ENABLED rather than __maybe_unused
-- Link to v1: https://lore.kernel.org/netdev/20250309214238.66155-1-deller@kernel.org/
+I understand that it is confusing that that Simon send a PR with 5 patches 
+mentioned. It is actually only 1 patch - 4 were already submitted in the last 
+PR. But still, the PR seems to apply cleanly for me.
 
-Note about v1:
-- Original patch by Helge Deller
----
- drivers/net/ethernet/dec/tulip/tulip_core.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/dec/tulip/tulip_core.c b/drivers/net/ethernet/dec/tulip/tulip_core.c
-index 27e01d780cd0..75eac18ff246 100644
---- a/drivers/net/ethernet/dec/tulip/tulip_core.c
-+++ b/drivers/net/ethernet/dec/tulip/tulip_core.c
-@@ -1177,7 +1177,6 @@ static void set_rx_mode(struct net_device *dev)
- 	iowrite32(csr6, ioaddr + CSR6);
- }
+Any hints how to reproduce your problem?
  
--#ifdef CONFIG_TULIP_MWI
- static void tulip_mwi_config(struct pci_dev *pdev, struct net_device *dev)
- {
- 	struct tulip_private *tp = netdev_priv(dev);
-@@ -1251,7 +1250,6 @@ static void tulip_mwi_config(struct pci_dev *pdev, struct net_device *dev)
- 		netdev_dbg(dev, "MWI config cacheline=%d, csr0=%08x\n",
- 			   cache, csr0);
- }
--#endif
- 
- /*
-  *	Chips that have the MRM/reserved bit quirk and the burst quirk. That
-@@ -1463,10 +1461,9 @@ static int tulip_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 
- 	INIT_WORK(&tp->media_work, tulip_tbl[tp->chip_id].media_task);
- 
--#ifdef CONFIG_TULIP_MWI
--	if (!force_csr0 && (tp->flags & HAS_PCI_MWI))
-+	if (IS_ENABLED(CONFIG_TULIP_MWI) && !force_csr0 &&
-+	    (tp->flags & HAS_PCI_MWI))
- 		tulip_mwi_config (pdev, dev);
--#endif
- 
- 	/* Stop the chip's Tx and Rx processes. */
- 	tulip_stop_rxtx(tp);
+> While at it, could you please include the target tree in the subj prefix?
+
+It currently mentions net in the subject. But I think you mean to change it 
+from "[PATCH 0/5] pull request for net: batman-adv 2025-03-13" to 
+"[PATCH net 0/5] pull request: batman-adv 2025-03-13". Or which exact format 
+do you prefer?
+
+Kind regards,
+	Sven
+
+
+--nextPart1964837.taCxCBeP46
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQS81G/PswftH/OW8cVND3cr0xT1ywUCZ9l7dwAKCRBND3cr0xT1
+y5/DAQD20CG4iCNDzl8RXkBPzxz4miX+U6QNUXpR+iB0JCSm8QEAzVj7p6ylNvFQ
+Cqf6IBTk8Z+k1c9gZxXP1SkDzm6uAwk=
+=+ADe
+-----END PGP SIGNATURE-----
+
+--nextPart1964837.taCxCBeP46--
+
+
 
 
