@@ -1,494 +1,235 @@
-Return-Path: <netdev+bounces-175726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 810C7A6743B
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 13:47:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8375A67455
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 13:51:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21A4617E9EE
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 12:47:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08D02189CB5A
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 12:52:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AF5A20371E;
-	Tue, 18 Mar 2025 12:47:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BFFE20C03F;
+	Tue, 18 Mar 2025 12:51:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="UfYEMZtI"
+	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="rVWrYMeY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2041.outbound.protection.outlook.com [40.107.22.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F0A3F9D5
-	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 12:47:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742302048; cv=none; b=KW3s2HmfA5yGdoNRkrU2jfSxfgEOTZzjI1ohFTq15FAwdeiqatYDP1p+LjxeRGJlmxqB2nHGT3VHh/MTO/O2bphhzyDeJAG8W/Bex8xm1lkFMvmUDW6tgWH4bzFqn2pLmV56JKQ/71+m+g6SAjyY4I+aLxK2e0IahcnsXmDg7Tg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742302048; c=relaxed/simple;
-	bh=0cqpnElSV22LUdepMjkOs87wAMn3hbYMoar/tqXoLWo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Zd6KEXXxz7wOZr3tdSmGesK+/ixFdgCRRO4uLdWlSn69z+ER5AZlQsCVFOXyglmbbUXkEBuroC2ZYryQngdnqgse8Smf3Ayy+1xQWdjYs9xUjVWSNXDEdNI7XcA8EplsNTyr/RUxm3q96Xxa/L5bBZ27g0FV9sNfcnnCAS3kf1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=UfYEMZtI; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3913d129c1aso4456445f8f.0
-        for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 05:47:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1742302044; x=1742906844; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ld4N8KJs+W7nuEw0yiCsi578Y5LVF8wq4N/IB5nYZak=;
-        b=UfYEMZtIzXbB+BDCtM38yU3EXALWO2r0+tf7XjZs1TACnMOOeo5+UrDwsOLRiMXb5R
-         abQNZpJkv/EVA+V2gNbUJK/6Mypgwpt3jhtGfNn0d2yatlmFZEStZ8rqhhdEqzEMNiFx
-         +gz8aYpt8KFMq/nsh+w/Adg+pCm0M7zN/iMq6uRxwrxhaaEeLlNKZRvmX97zqLRJQF0D
-         ulcBHrVrqfTDrQwB20G5Ve3+axAWB3RebEs8U1lMGzVp7pu+jbWrA/7gbJLwMjJkkwsx
-         Bcnm3WzTXc4envtj0LuBv7pl6TleQW9mkiyj8wYX1tF4VhoiR1560bvUt9Kjz/TT+L0P
-         Safg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742302044; x=1742906844;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ld4N8KJs+W7nuEw0yiCsi578Y5LVF8wq4N/IB5nYZak=;
-        b=X5Zy7DG/UZTrQOvpO3W9TeSFgaSFXgX/evhq8YVD8n6S7ihxKxLVVucztfNiPBFH93
-         +JAvAPGj6HVboOEbepzDU3WjZSmefE0pleDdtkothBOlzkfPUQy+pdr2i05SYJe3ec9u
-         vtgyNqGkPQxyAbXLhDeMrXFyE4GnGDysizff9rswrsRk8rU68cguH7WW7BXuy5JGdRHX
-         c2V22Wd4vnvZn02LOHrwDbpH0gsx5TTUKukFZWhIDdsfJ2feYu5FGuzkzr0OMceBGp+T
-         qC/UtZMsDC5+cFwEmckYBYiDYhACpWA9BOoUHyFChbs/GaYEIM+YCjD8e9bX5KJjgDNY
-         k+MA==
-X-Gm-Message-State: AOJu0YzvwrgeezACUITSQ1+fYat859b8zgG3TXfrJjmapk0gAteFprsO
-	D2XsbsrEwetphVkT3LXuZbfM9g0sqhDSDi1oYjFvISqCagUeUrdoibw2rc0ybUL7Dp5AyTo34Un
-	1
-X-Gm-Gg: ASbGnct0IilsfcxmA3ZGa4qmSZimrQ0GAmP6u+GgB/Zippv3UFDMw43iSG4/Oj5D2kV
-	mZZQHxIwiOsocXX8IVYrAXIHjnJS6+LTn4Fk6BcjxUDS9DXvL3RmYyHSFenm13AauAPwUT5uFFt
-	Dxd2dcnrNm0dwiCWD2833fveyC/nwJ25rBy3lO9y/kMFBeITkn6r62JgSK8iShU6bjndWKMFcZ7
-	x5rdVZnBQ5jlBWV1viSA9qEjwvm72EM+m6zZAsGWSIO9eJapMk0FVgJv8fw819m73ToHhb4+svs
-	2J47OFrZnws2ZdlH50f+8Q0SN1gC3vZaroSubw==
-X-Google-Smtp-Source: AGHT+IHZFyyjmkWTRfi7EmlgEfwlvwGMIo6lUfvAl/RX9x3W+BT8rtqE7tg1YuWW4+r59bUFKxPymw==
-X-Received: by 2002:a05:6000:2aa:b0:391:b93:c971 with SMTP id ffacd0b85a97d-3996bb774b6mr2518746f8f.20.1742302044005;
-        Tue, 18 Mar 2025 05:47:24 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395cb7ebaa5sm17945072f8f.87.2025.03.18.05.47.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Mar 2025 05:47:23 -0700 (PDT)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	saeedm@nvidia.com,
-	leon@kernel.org,
-	tariqt@nvidia.com,
-	andrew+netdev@lunn.ch,
-	dakr@kernel.org,
-	rafael@kernel.org,
-	gregkh@linuxfoundation.org,
-	przemyslaw.kitszel@intel.com,
-	anthony.l.nguyen@intel.com,
-	cratiu@nvidia.com,
-	jacob.e.keller@intel.com,
-	konrad.knitter@intel.com,
-	cjubran@nvidia.com
-Subject: [PATCH net-next RFC 3/3] net/mlx5: Introduce enable_sriov param for shared devlink
-Date: Tue, 18 Mar 2025 13:47:06 +0100
-Message-ID: <20250318124706.94156-4-jiri@resnulli.us>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250318124706.94156-1-jiri@resnulli.us>
-References: <20250318124706.94156-1-jiri@resnulli.us>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EFB5290F;
+	Tue, 18 Mar 2025 12:51:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742302315; cv=fail; b=qLEq3G0ZjMRUqHcpN5Af6aTM/U3BDc1+9j1GWqYGV+LnDQ/d1XAgpuyWA7HFr4s51gmA/6FX49E21jsmE/Hq/eAOFd7AWFNKEOF1wAe8n0dDVj+mBRCRuZE6aDB+eKOKtvheN3LLheQn1L6elTksbJStDyG64Chex4K4teJ64Jo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742302315; c=relaxed/simple;
+	bh=5K79aDg9E3vgakKY4ORTNHg6kZnPxL68OvxiyXubYfE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=mQ69k0Mkvxe+Kt7qA6Ywa9VRdsSYQiu+61yplgyXpVyJ1eP66EGs71zrWDjKqzG/cpaZ5k+MJ+9BA/d2yE3OoE7BbjPZeBlfZLcFTNZ2aFu6vAxo7Jal/c8YbGMXgWvTYa3xg1IfdLc8g98uuJ/NtKUdUR6RqzK/EhggVpgrMo0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=rVWrYMeY; arc=fail smtp.client-ip=40.107.22.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=i7drx8yggLQM8eppblx3NHjmv3/ypk38t52lBwQsettfMBkkY8FuA1lulo+c6arl5E4Q2W85SWWcw0MKKfZP3TOOjWiqzgUqpAI2G3BNW7C2vFzdw49JIcHIdbiOb6ilkjuZlGkPmQeT39jqASDhrBXIo/5IJUk+FyPK2PlodK9fHDTzIO2iuWbAjk66fQt3DdGpm2kHOIyLOZxVQvIa5HKm4l1DncasDo6TsN8jASjDUGGVaOdcYP0TT+AG1mYBEtkAUlLkwvBg3ke924aSijxUrQSNyds+2jwAAbCZkTgQgpI0KJNfVnmFHN8kQLfbr368U5iWgdwNx1ubEojqqg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Jksi8tHrnlJaEfu3rIrYngCeJO5E8ax9BgzF0asO/gw=;
+ b=I5knE4TZhmftIUO6JYGvnke9IoJGApFIpXscoAK0FbiV52Jt0sXT2ocBCfdZ6Qggs3Bq5A4BWMIYS7tUva1JE4cPOC/cVfIH4IzdgnAth27x48UnwXWb2G37EmCFAmn6h203mur5cfvNwL8Il9hsxuyXsD5lHFvFDMBKGpHnGm0LjUApYy2EMPnHtyXNYoYsF2YpI98K9kbFj0N9VOT+mO+FsLE4kFzvQdavo/Sc8miL3bTlOWg/9aTdKmqUmwLAxjsb1QdKWQQz+KU8kEvgIrZCzIBPXjO23032FwzW/r6+QTMn7uYggqieEjTUSEJXzJ2dK0ZIh+2i6vXG/iG9Pg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nokia-bell-labs.com; dmarc=pass action=none
+ header.from=nokia-bell-labs.com; dkim=pass header.d=nokia-bell-labs.com;
+ arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Jksi8tHrnlJaEfu3rIrYngCeJO5E8ax9BgzF0asO/gw=;
+ b=rVWrYMeYNtYWcvA5lDF6+effZDVpf87riaxgUoNTs5bvZ5AQvuQ6QfvuvZQPgF6h14vvmoeihd+IiIZf1JpIHJTb6c5yexdl7tJQkkYW9tkwkyPWj81ahIjok+rnnHKWuzTJm1Yc5EAdiVNnV7y5JwYa1ds4kIKUvEPyRPCjQ9ww/SNKOgLNlUWycwwFtwNWgoGRraDZ74AsY+BZNIF/zD16Ei7vmZUNkNF8XwuWXwitMMUQ//yEYkcZDBaJ8solyLteY6Rk5cx/nmV7gXCUW0wTtjm7fkZhzDuP9UmBRbbXiZsggc6wxYNUyOjXk0w8OS5ygVxmrA6njiDIqt6Heg==
+Received: from PAXPR07MB7984.eurprd07.prod.outlook.com (2603:10a6:102:133::12)
+ by DB9PR07MB9007.eurprd07.prod.outlook.com (2603:10a6:10:3dd::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.33; Tue, 18 Mar
+ 2025 12:51:47 +0000
+Received: from PAXPR07MB7984.eurprd07.prod.outlook.com
+ ([fe80::b7f8:dc0a:7e8d:56]) by PAXPR07MB7984.eurprd07.prod.outlook.com
+ ([fe80::b7f8:dc0a:7e8d:56%4]) with mapi id 15.20.8534.031; Tue, 18 Mar 2025
+ 12:51:47 +0000
+From: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "dave.taht@gmail.com"
+	<dave.taht@gmail.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"jhs@mojatatu.com" <jhs@mojatatu.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"xiyou.wangcong@gmail.com" <xiyou.wangcong@gmail.com>, "jiri@resnulli.us"
+	<jiri@resnulli.us>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "horms@kernel.org"
+	<horms@kernel.org>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"donald.hunter@gmail.com" <donald.hunter@gmail.com>, "ast@fiberby.net"
+	<ast@fiberby.net>, "liuhangbin@gmail.com" <liuhangbin@gmail.com>,
+	"shuah@kernel.org" <shuah@kernel.org>, "linux-kselftest@vger.kernel.org"
+	<linux-kselftest@vger.kernel.org>, "ij@kernel.org" <ij@kernel.org>,
+	"ncardwell@google.com" <ncardwell@google.com>, "Koen De Schepper (Nokia)"
+	<koen.de_schepper@nokia-bell-labs.com>, g.white <g.white@cablelabs.com>,
+	"ingemar.s.johansson@ericsson.com" <ingemar.s.johansson@ericsson.com>,
+	"mirja.kuehlewind@ericsson.com" <mirja.kuehlewind@ericsson.com>,
+	"cheshire@apple.com" <cheshire@apple.com>, "rs.ietf@gmx.at" <rs.ietf@gmx.at>,
+	"Jason_Livingood@comcast.com" <Jason_Livingood@comcast.com>, vidhi_goel
+	<vidhi_goel@apple.com>, Olga Albisser <olga@albisser.org>, "Olivier Tilmans
+ (Nokia)" <olivier.tilmans@nokia.com>, Bob Briscoe <research@bobbriscoe.net>,
+	Henrik Steen <henrist@henrist.net>
+Subject: RE: [PATCH v4 iproute2-next 1/1] tc: add dualpi2 scheduler module
+Thread-Topic: [PATCH v4 iproute2-next 1/1] tc: add dualpi2 scheduler module
+Thread-Index: AQHblomz65WqQmgTSEiGQj+R5VbIwrN3V1SAgAGCnHA=
+Date: Tue, 18 Mar 2025 12:51:47 +0000
+Message-ID:
+ <PAXPR07MB7984DC2DA693FD00EABC0392A3DE2@PAXPR07MB7984.eurprd07.prod.outlook.com>
+References: <20250316153917.21005-1-chia-yu.chang@nokia-bell-labs.com>
+	<20250316153917.21005-2-chia-yu.chang@nokia-bell-labs.com>
+ <20250317064053.4fe8425b@hermes.local>
+In-Reply-To: <20250317064053.4fe8425b@hermes.local>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nokia-bell-labs.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR07MB7984:EE_|DB9PR07MB9007:EE_
+x-ms-office365-filtering-correlation-id: bec8af8a-a025-4d80-e066-08dd661ba4e5
+x-ld-processed: 5d471751-9675-428d-917b-70f44f9630b0,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|7416014|376014|366016|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?gCzhtRIVc1Hp6sh/kyO5FqOseNit/b3yCzvqfnt/c5hMRR6cVASkSgx7PzBd?=
+ =?us-ascii?Q?2use1+z+a/fACb/J6DEaYNhbBkRxqOTDdeDhdaY+CCr8L3fTX3PEN1TDsTi2?=
+ =?us-ascii?Q?1nlYURGlVxQDCljpuhx8/RqzJ7lgvNxY0+boeQVmR28LuTUEsJOlG8ap4jM9?=
+ =?us-ascii?Q?QEgXYZMEa80LFnIyVaxF55SJUnmlhM/Fr28GJMFxyfQ7EHmteGJUIrt4C3WP?=
+ =?us-ascii?Q?gNOs4mcor2ng0s4PAKn3/pkSm3RPfDKFWZTob1ZusWnrVkwZrtOZtVQyuB+Y?=
+ =?us-ascii?Q?Eu1sLST7vLV6N6mOOTvh477lo1Cr1L76iYrJHg3YuFeqdeiEQjT5Y3+1QtFb?=
+ =?us-ascii?Q?Ox/6ClQhlXcgGcVks+COOEfb4njykeVo6lXZF8V3KxkRoDkP0WIfEISXMrXU?=
+ =?us-ascii?Q?p10ZVnHMUkMGNzrLuhqRXRP+aB6MCSb9A2J1m0gIPcNDewy2SqF2DFNffnhM?=
+ =?us-ascii?Q?NiZkDobdpgc+sZiMpCBLwQjAqTZYEI7XJzRvdfryFSkHJ1tF0wJCvOoVKSgE?=
+ =?us-ascii?Q?/NHXt74/EU0CTHnn4VbdURu7Kx0w9ghwU6Nl3VzKtcC90s8a66CllP9DzpQf?=
+ =?us-ascii?Q?Qm1SjLQUHXp+BYo+4fPUKLxUKeLRB91L9GNAZLQRDBZsqxTE3qdaH1mjRXd3?=
+ =?us-ascii?Q?tZTu4fYI7+KCyjqqQ9zvfw5OHAWAV3CMkDn52BDgrVcEhUESQ4I6jq+9no7o?=
+ =?us-ascii?Q?LINwrEygqnQIuvYd2ygcmTpk4OGtz93AC5cd+SPOXRofrSA3RAZ8+ymDYb3E?=
+ =?us-ascii?Q?D7y2m2BMNLJcDA1Rlw1tqvUBJ/beh5yM7rKC0Bin8FlzpPgyx+K6JGHXC5SS?=
+ =?us-ascii?Q?E4Bh+Lzn4AC8Kal5uZG3zIJPDHqGpxOUDamSQGnZCEcwY9oMxLK2iHPYAEpT?=
+ =?us-ascii?Q?TDpp2EuYeKQnWzeeKgfBZpyMo3fQpD3tbcLmxB5quhQbyymfA9ya363SVgoN?=
+ =?us-ascii?Q?PJOr0TR3zzwG1YbmnapXt6fe7L9qMDG3qDFQ2zWQ26K0LKa66kATyQDhg17s?=
+ =?us-ascii?Q?I38M9Sv9x9fLETQJLdMKdxZ7M8N5mCQpqV/sq2cE8vMmlY8Hhh5XlCPzXd1/?=
+ =?us-ascii?Q?EqCP7SDuvahp64Yk+P9BMO0ZrRbVyoyWfBlYntaRc/M4lj25Zk5ESvCEikuu?=
+ =?us-ascii?Q?R/rZuWkFJj5k3EpUDxTekTD82hYJaTJrAFlaU6qEQpx831roX5rv3DvHHjn5?=
+ =?us-ascii?Q?05wJMe4qF65uQvStQ77Y9I/RMiYowrH+1CE4zQmOQgeicK471AJ0R0tdi1rz?=
+ =?us-ascii?Q?AtpBNxNF02PZnvsD111Lo5K9p+BBuwb22mOu7CYzEfPnDozxscDXJQ5eChns?=
+ =?us-ascii?Q?JNCrjMwvdDM4TJwaS1cTr9PP?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR07MB7984.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?RUiYHyXru/VMItytmgwZYsL66gQDBrJgCMdCvuO3T5ULc1NKk5zOzzqk7C1i?=
+ =?us-ascii?Q?p0RqZg6CZbbBPNvbyIc643P98wzQxY7ddROYOl3wet8SaZMwV0WPiA9uOuDn?=
+ =?us-ascii?Q?Uovsg2AXxghqkMW8DZMLodsSksqximdbYflfTI472X7vGKa8gQgfYNdjKK7W?=
+ =?us-ascii?Q?vaQ4nGdspsZdh/YpavkyeAQqhyPCwmp+2G3B/B49JPvwbSMyf5aG98crccKN?=
+ =?us-ascii?Q?McnLveBWtiCyj4rv/NkrY/vrvt1uTjcbuiC5MLANqoWO1HSEj2EniNAedNFE?=
+ =?us-ascii?Q?jYH83SVhUfbVDZ4kb98WZBOfcXdwXudPVyHLz4mVZ5g0fsAKr9iMdm5h3gnR?=
+ =?us-ascii?Q?KI4ty4WHmbvf48gURlU2ii/IB/oTXtmX82MEIMGyUxjK3upfGK5ufQu9xrkF?=
+ =?us-ascii?Q?kR3ghxNhl6uHLW1t7vjwrYcu/AaeUKgLqGaX2/dUOSy3848oITbA7X1aR4sy?=
+ =?us-ascii?Q?kzmAvuPzyW6x0HipSFzUTF+bD7rY1zDCJ1INEHcBdS4LQUCBt7xYbvai8swD?=
+ =?us-ascii?Q?GwYg2GQKt3DJmDGjW+4VTG51iwxZhPqWrsNlJ2WtK3yFeoTVXtKWyKhomkz+?=
+ =?us-ascii?Q?QKJuT35xY3U5Zl/H5VmpbjBqWhgf/7riiHibCvTyqKwopWAc4RVEkSoR43Au?=
+ =?us-ascii?Q?fpRT/O3y7QKRXp8gwykU4u4KzsUDw+Y34nv2wBk8rPzguM4zujQDLcFai68V?=
+ =?us-ascii?Q?yAh7uEDpAkhs/OWOj2ATZ2zB0i00CHMzPunQxtH227IBm/UJSRSzq6kNFwp/?=
+ =?us-ascii?Q?tGB6BUJVs5/sLtiNAURl47Y7gjHN88c3epqRPdUU7XaBrE1v9miP38GabUnd?=
+ =?us-ascii?Q?sHsjSS88uL5ogfoiU8V8OLyWCnomk9xDSxLJoK+rXBlgqUXJH3a/S/tyE1rp?=
+ =?us-ascii?Q?6ZxBjIFJUwXujkbtJFVQ+l4Jip7/DsPLnQVpaOLdNWd23j1hix1puzR9khHq?=
+ =?us-ascii?Q?79KheIZZh9aBQPnyO/13Yh8RfRzdSstPL/xW0kRegeTOOxfw+p+VWz2R6mdt?=
+ =?us-ascii?Q?62VWsG3Fj9bpqhD4Z27n1OixTHy8fIMZxT90W1gv7jk7Q11UDQge9M5y3eBP?=
+ =?us-ascii?Q?b0i70BNCZmE4qPIgpH0a4RnWRah9czjXv5/PP4VZKLeBuVnmNzhXXkcqTixI?=
+ =?us-ascii?Q?W2Ov5HI1OuzzF5zlrvTzlkvGGfJPqugKtTPHnG+fRzyS6aExf9fGhxykzpIY?=
+ =?us-ascii?Q?fqFkKnBtSqIQQ3dJxybPEGvL/er+gXmsKt0TLgLb2ekA/5I9zGQbn5AoSKin?=
+ =?us-ascii?Q?x4nB8AGVRYhyV1Firy5ry9yszD6TlXpoGv7h3utkk6lZBmSP1LYteiIvcYn/?=
+ =?us-ascii?Q?snTnHDtfvv07Qw3fcm3TfEpyb9Ighx6REUIgxyajsB/OjY7LB609ub/7+8ie?=
+ =?us-ascii?Q?n1DmKOShNHyVUrXirVzFLTRmiJoZIrm0k0189utfj3+LWF9kLacjDCvIRlKW?=
+ =?us-ascii?Q?yxDuUl/RdF7AAAxInmtrWjIR+8zq5gqPvGLs+mqG13na3ABZfVz8H93W98ud?=
+ =?us-ascii?Q?xfxm9eAiL8dmSk3f67Cw8RGtvog8949hlbOKF0n03X3sjG0LUs+XFQeLGi3F?=
+ =?us-ascii?Q?s2BFL99EdsfKBqPvztexr8reRtTcYQK0QcGfhmUcaqCAmSYjYOBtd5hT70SK?=
+ =?us-ascii?Q?mwWYDSg8KmtDbPlquaffzLk=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: nokia-bell-labs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR07MB7984.eurprd07.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bec8af8a-a025-4d80-e066-08dd661ba4e5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Mar 2025 12:51:47.2884
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 5d471751-9675-428d-917b-70f44f9630b0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: fAXthO8mNjlCEdkih2MtWJrA2RtR3wz8ZwHwcWgOgPMERnuomG4lI9Ym6Agfc4GZXN1OlTKOn/qaWnCufZi+sUmY1sOJK9wQPId84kpN+I64vpNDDkJs9wG8b+uM2Ee5
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR07MB9007
 
-From: Jiri Pirko <jiri@nvidia.com>
+> From: Stephen Hemminger <stephen@networkplumber.org>=20
+> Sent: Monday, March 17, 2025 2:41 PM
+> To: Chia-Yu Chang (Nokia) <chia-yu.chang@nokia-bell-labs.com>
+> Cc: netdev@vger.kernel.org; dave.taht@gmail.com; pabeni@redhat.com; jhs@m=
+ojatatu.com; kuba@kernel.org; xiyou.wangcong@gmail.com; jiri@resnulli.us; d=
+avem@davemloft.net; edumazet@google.com; horms@kernel.org; andrew+netdev@lu=
+nn.ch; donald.hunter@gmail.com; ast@fiberby.net; liuhangbin@gmail.com; shua=
+h@kernel.org; linux-kselftest@vger.kernel.org; ij@kernel.org; ncardwell@goo=
+gle.com; Koen De Schepper (Nokia) <koen.de_schepper@nokia-bell-labs.com>; g=
+.white <g.white@cablelabs.com>; ingemar.s.johansson@ericsson.com; mirja.kue=
+hlewind@ericsson.com; cheshire@apple.com; rs.ietf@gmx.at; Jason_Livingood@c=
+omcast.com; vidhi_goel <vidhi_goel@apple.com>; Olga Albisser <olga@albisser=
+.org>; Olivier Tilmans (Nokia) <olivier.tilmans@nokia.com>; Bob Briscoe <re=
+search@bobbriscoe.net>; Henrik Steen <henrist@henrist.net>
+> Subject: Re: [PATCH v4 iproute2-next 1/1] tc: add dualpi2 scheduler modul=
+e
+>=20
+>=20
+> CAUTION: This is an external email. Please be very careful when clicking =
+links or opening attachments. See the URL nok.it/ext for additional informa=
+tion.
+>=20
+>=20
+>=20
+> On Sun, 16 Mar 2025 16:39:17 +0100
+> chia-yu.chang@nokia-bell-labs.com wrote:
+>=20
+> > +static int try_get_percentage(int *val, const char *arg, int base) {
+> > +     long res;
+> > +     char *ptr;
+> > +
+> > +     if (!arg || !*arg)
+> > +             return -1;
+> > +     res =3D strtol(arg, &ptr, base);
+> > +     if (!ptr || ptr =3D=3D arg || (*ptr && strcmp(ptr, "%")))
+> > +             return -1;
+> > +     if (res =3D=3D ULONG_MAX && errno =3D=3D ERANGE)
+> > +             return -1;
+> > +     if (res < 0 || res > 100)
+> > +             return -1;
+> > +
+> > +     *val =3D res;
+> > +     return 0;
+> > +}
+> > +
+>=20
+> I wonder if dualpi2 and netem could share some code on handling scaled pe=
+rcentage values.
 
-As some of the mlx5 devices only support enabling/disabling SR-IOV
-per-chip and not per-PF, introduce this param attached to shared
-devlink instance.
+Thanks for the feedback, and I would reuse "parse_percent" in tc/tc_util.c =
+in the next version.
 
-Example:
-$ devlink dev param show faux/mlx5_core_83013c12b77faa1a30000c82a1045c91
-faux/mlx5_core_83013c12b77faa1a30000c82a1045c91:
-  name enable_sriov type generic
-    values:
-      cmode permanent value false
-$ devlink dev param set faux/mlx5_core_83013c12b77faa1a30000c82a1045c91 name enable_sriov cmode permanent value true
-
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
- .../net/ethernet/mellanox/mlx5/core/Makefile  |   3 +-
- .../mellanox/mlx5/core/lib/nv_param.c         | 236 ++++++++++++++++++
- .../mellanox/mlx5/core/lib/nv_param.h         |  14 ++
- .../ethernet/mellanox/mlx5/core/sh_devlink.c  |  16 +-
- .../ethernet/mellanox/mlx5/core/sh_devlink.h  |   1 +
- include/linux/mlx5/driver.h                   |   1 +
- 6 files changed, 269 insertions(+), 2 deletions(-)
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.h
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Makefile b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-index 510850b6e6e2..238c212ad0fd 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-@@ -17,7 +17,8 @@ mlx5_core-y :=	main.o cmd.o debugfs.o fw.o eq.o uar.o pagealloc.o \
- 		fs_counters.o fs_ft_pool.o rl.o lag/debugfs.o lag/lag.o dev.o events.o wq.o lib/gid.o \
- 		lib/devcom.o lib/pci_vsc.o lib/dm.o lib/fs_ttc.o diag/fs_tracepoint.o \
- 		diag/fw_tracer.o diag/crdump.o devlink.o sh_devlink.o diag/rsc_dump.o \
--		diag/reporter_vnic.o fw_reset.o qos.o lib/tout.o lib/aso.o wc.o fs_pool.o
-+		diag/reporter_vnic.o fw_reset.o qos.o lib/tout.o lib/aso.o wc.o fs_pool.o \
-+		lib/nv_param.o
- 
- #
- # Netdev basic
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
-new file mode 100644
-index 000000000000..04682bec8fa5
---- /dev/null
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
-@@ -0,0 +1,236 @@
-+// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
-+/* Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved. */
-+
-+#include "nv_param.h"
-+#include "sh_devlink.h"
-+#include "mlx5_core.h"
-+
-+enum {
-+	MLX5_CLASS_0_CTRL_ID_NV_GLOBAL_PCI_CONF	       = 0x80,
-+	MLX5_CLASS_0_CTRL_ID_NV_GLOBAL_PCI_CAP		= 0x81,
-+};
-+
-+struct mlx5_ifc_configuration_item_type_class_global_bits {
-+	u8	 type_class[0x8];
-+	u8	 parameter_index[0x18];
-+};
-+
-+union mlx5_ifc_config_item_type_auto_bits {
-+	struct mlx5_ifc_configuration_item_type_class_global_bits
-+				configuration_item_type_class_global;
-+	u8 reserved_at_0[0x40];
-+};
-+
-+struct mlx5_ifc_config_item_bits {
-+	u8	 valid[0x2];
-+	u8	 priority[0x2];
-+	u8	 header_type[0x2];
-+	u8	 ovr_en[0x1];
-+	u8	 rd_en[0x1];
-+	u8	 access_mode[0x2];
-+	u8	 reserved_at_a[0x1];
-+	u8	 writer_id[0x5];
-+	u8	 version[0x4];
-+	u8	 reserved_at_14[0x2];
-+	u8	 host_id_valid[0x1];
-+	u8	 length[0x9];
-+
-+	union mlx5_ifc_config_item_type_auto_bits type;
-+
-+	u8	 reserved_at_40[0x10];
-+	u8	 crc16[0x10];
-+};
-+
-+struct mlx5_ifc_mnvda_reg_bits {
-+	struct mlx5_ifc_config_item_bits configuration_item_header;
-+
-+	u8	 configuration_item_data[64][0x20];
-+};
-+
-+struct mlx5_ifc_nv_global_pci_conf_bits {
-+	u8	 sriov_valid[0x1];
-+	u8	 reserved_at_1[0x10];
-+	u8	 per_pf_total_vf[0x1];
-+	u8	 reserved_at_12[0xe];
-+
-+	u8	 sriov_en[0x1];
-+	u8	 reserved_at_21[0xf];
-+	u8	 total_vfs[0x10];
-+
-+	u8	 reserved_at_40[0x20];
-+};
-+
-+struct mlx5_ifc_nv_global_pci_cap_bits {
-+	u8	 max_vfs_per_pf_valid[0x1];
-+	u8	 reserved_at_1[0x13];
-+	u8	 per_pf_total_vf_supported[0x1];
-+	u8	 reserved_at_15[0xb];
-+
-+	u8	 sriov_support[0x1];
-+	u8	 reserved_at_21[0xf];
-+	u8	 max_vfs_per_pf[0x10];
-+
-+	u8	 reserved_at_40[0x60];
-+};
-+
-+#define MNVDA_HDR_SZ \
-+	(MLX5_ST_SZ_BYTES(mnvda_reg) - MLX5_BYTE_OFF(mnvda_reg, configuration_item_data))
-+
-+#define MLX5_SET_CONFIG_ITEM_TYPE(_cls_name, _mnvda_ptr, _field, _val) \
-+	MLX5_SET(mnvda_reg, _mnvda_ptr, \
-+		 configuration_item_header.type.configuration_item_type_class_##_cls_name._field, \
-+		 _val)
-+
-+#define MLX5_SET_CONFIG_HDR_LEN(_mnvda_ptr, _cls_name) \
-+	MLX5_SET(mnvda_reg, _mnvda_ptr, configuration_item_header.length, \
-+		 MLX5_ST_SZ_BYTES(_cls_name))
-+
-+#define MLX5_GET_CONFIG_HDR_LEN(_mnvda_ptr) \
-+	MLX5_GET(mnvda_reg, _mnvda_ptr, configuration_item_header.length)
-+
-+static int mlx5_nv_param_read(struct mlx5_core_dev *dev, void *mnvda, size_t len)
-+{
-+	u32 param_idx, type_class;
-+	u32 header_len;
-+	void *cls_ptr;
-+	int err;
-+
-+	if (WARN_ON(len > MLX5_ST_SZ_BYTES(mnvda_reg)) || len < MNVDA_HDR_SZ)
-+		return -EINVAL; /* A caller bug */
-+
-+	err = mlx5_core_access_reg(dev, mnvda, len, mnvda, len, MLX5_REG_MNVDA, 0, 0);
-+	if (!err)
-+		return 0;
-+
-+	cls_ptr = MLX5_ADDR_OF(mnvda_reg, mnvda,
-+			       configuration_item_header.type.configuration_item_type_class_global);
-+
-+	type_class = MLX5_GET(configuration_item_type_class_global, cls_ptr, type_class);
-+	param_idx = MLX5_GET(configuration_item_type_class_global, cls_ptr, parameter_index);
-+	header_len = MLX5_GET_CONFIG_HDR_LEN(mnvda);
-+
-+	mlx5_core_warn(dev, "Failed to read mnvda reg: type_class 0x%x, param_idx 0x%x, header_len %u, err %d\n",
-+		       type_class, param_idx, header_len, err);
-+
-+	/* Let devlink skip this one if it fails, kernel log will have the failure */
-+	return -EOPNOTSUPP;
-+}
-+
-+static int mlx5_nv_param_write(struct mlx5_core_dev *dev, void *mnvda, size_t len)
-+{
-+	if (WARN_ON(len > MLX5_ST_SZ_BYTES(mnvda_reg)) || len < MNVDA_HDR_SZ)
-+		return -EINVAL;
-+
-+	if (WARN_ON(MLX5_GET_CONFIG_HDR_LEN(mnvda) == 0))
-+		return -EINVAL;
-+
-+	return mlx5_core_access_reg(dev, mnvda, len, mnvda, len, MLX5_REG_MNVDA, 0, 1);
-+}
-+
-+static int
-+mlx5_nv_param_read_global_pci_conf(struct mlx5_core_dev *dev, void *mnvda, size_t len)
-+{
-+	MLX5_SET_CONFIG_ITEM_TYPE(global, mnvda, type_class, 0);
-+	MLX5_SET_CONFIG_ITEM_TYPE(global, mnvda, parameter_index,
-+				  MLX5_CLASS_0_CTRL_ID_NV_GLOBAL_PCI_CONF);
-+	MLX5_SET_CONFIG_HDR_LEN(mnvda, nv_global_pci_conf);
-+
-+	return mlx5_nv_param_read(dev, mnvda, len);
-+}
-+
-+static int
-+mlx5_nv_param_read_global_pci_cap(struct mlx5_core_dev *dev, void *mnvda, size_t len)
-+{
-+	MLX5_SET_CONFIG_ITEM_TYPE(global, mnvda, type_class, 0);
-+	MLX5_SET_CONFIG_ITEM_TYPE(global, mnvda, parameter_index,
-+				  MLX5_CLASS_0_CTRL_ID_NV_GLOBAL_PCI_CAP);
-+	MLX5_SET_CONFIG_HDR_LEN(mnvda, nv_global_pci_cap);
-+
-+	return mlx5_nv_param_read(dev, mnvda, len);
-+}
-+
-+static int mlx5_shd_enable_sriov_get(struct devlink *devlink, u32 id,
-+				     struct devlink_param_gset_ctx *ctx)
-+{
-+	struct mlx5_core_dev *dev = mlx5_shd_dev(devlink_priv(devlink));
-+	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
-+	void *cap, *data;
-+	int err;
-+
-+	err = mlx5_nv_param_read_global_pci_cap(dev, mnvda, sizeof(mnvda));
-+	if (err)
-+		return err;
-+
-+	cap = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+	if (!MLX5_GET(nv_global_pci_cap, cap, sriov_support))
-+		return -EOPNOTSUPP;
-+
-+	memset(mnvda, 0, sizeof(mnvda));
-+	err = mlx5_nv_param_read_global_pci_conf(dev, mnvda, sizeof(mnvda));
-+	if (err)
-+		return err;
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+	ctx->val.vbool = MLX5_GET(nv_global_pci_conf, data, sriov_en);
-+	return 0;
-+}
-+
-+static int mlx5_shd_enable_sriov_set(struct devlink *devlink, u32 id,
-+				     struct devlink_param_gset_ctx *ctx,
-+				     struct netlink_ext_ack *extack)
-+{
-+	struct mlx5_core_dev *dev = mlx5_shd_dev(devlink_priv(devlink));
-+	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
-+	void *cap, *data;
-+	int err;
-+
-+	err = mlx5_nv_param_read_global_pci_cap(dev, mnvda, sizeof(mnvda));
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack, "Failed to read global PCI capability");
-+		return err;
-+	}
-+
-+	cap = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+
-+	if (!MLX5_GET(nv_global_pci_cap, cap, sriov_support)) {
-+		NL_SET_ERR_MSG_MOD(extack, "Not configurable on this device");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	memset(mnvda, 0, sizeof(mnvda));
-+	err = mlx5_nv_param_read_global_pci_conf(dev, mnvda, sizeof(mnvda));
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack, "Unable to read global PCI configuration");
-+		return err;
-+	}
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+	MLX5_SET(nv_global_pci_conf, data, sriov_valid, 1);
-+	MLX5_SET(nv_global_pci_conf, data, sriov_en, ctx->val.vbool);
-+
-+	err = mlx5_nv_param_write(dev, mnvda, sizeof(mnvda));
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack, "Unable to write global PCI configuration");
-+		return err;
-+	}
-+
-+	return 0;
-+}
-+
-+static const struct devlink_param mlx5_shd_nv_param_devlink_params[] = {
-+	DEVLINK_PARAM_GENERIC(ENABLE_SRIOV, BIT(DEVLINK_PARAM_CMODE_PERMANENT),
-+			      mlx5_shd_enable_sriov_get,
-+			      mlx5_shd_enable_sriov_set, NULL),
-+};
-+
-+int mlx5_shd_nv_param_register_dl_params(struct devlink *devlink)
-+{
-+	return devl_params_register(devlink, mlx5_shd_nv_param_devlink_params,
-+				    ARRAY_SIZE(mlx5_shd_nv_param_devlink_params));
-+}
-+
-+void mlx5_shd_nv_param_unregister_dl_params(struct devlink *devlink)
-+{
-+	devl_params_unregister(devlink, mlx5_shd_nv_param_devlink_params,
-+			       ARRAY_SIZE(mlx5_shd_nv_param_devlink_params));
-+}
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.h b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.h
-new file mode 100644
-index 000000000000..785edfe9bf15
---- /dev/null
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.h
-@@ -0,0 +1,14 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB */
-+/* Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved. */
-+
-+#ifndef __MLX5_NV_PARAM_H
-+#define __MLX5_NV_PARAM_H
-+
-+#include <linux/mlx5/driver.h>
-+#include "devlink.h"
-+
-+int mlx5_shd_nv_param_register_dl_params(struct devlink *devlink);
-+void mlx5_shd_nv_param_unregister_dl_params(struct devlink *devlink);
-+
-+#endif
-+
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c b/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
-index 671a3442525b..1c730071f00f 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
-@@ -2,9 +2,10 @@
- /* Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved. */
- 
- #include <linux/device/faux.h>
-+#include <linux/mlx5/device.h>
- #include <linux/mlx5/driver.h>
- #include <linux/mlx5/vport.h>
--
-+#include "lib/nv_param.h"
- #include "sh_devlink.h"
- 
- static LIST_HEAD(shd_list);
-@@ -24,6 +25,12 @@ struct mlx5_shd {
- 	struct faux_device *faux_dev;
- };
- 
-+struct mlx5_core_dev *mlx5_shd_dev(struct mlx5_shd *shd)
-+{
-+	return list_first_entry(&shd->dev_list,
-+				struct mlx5_core_dev, shd_list);
-+}
-+
- static const struct devlink_ops mlx5_shd_ops = {
- };
- 
-@@ -31,6 +38,7 @@ static int mlx5_shd_faux_probe(struct faux_device *faux_dev)
- {
- 	struct devlink *devlink;
- 	struct mlx5_shd *shd;
-+	int err;
- 
- 	devlink = devlink_alloc(&mlx5_shd_ops, sizeof(struct mlx5_shd), &faux_dev->dev);
- 	if (!devlink)
-@@ -39,6 +47,11 @@ static int mlx5_shd_faux_probe(struct faux_device *faux_dev)
- 	faux_device_set_drvdata(faux_dev, shd);
- 
- 	devl_lock(devlink);
-+	err = mlx5_shd_nv_param_register_dl_params(devlink);
-+	if (err) {
-+		devl_unlock(devlink);
-+		return err;
-+	}
- 	devl_register(devlink);
- 	devl_unlock(devlink);
- 	return 0;
-@@ -51,6 +64,7 @@ static void mlx5_shd_faux_remove(struct faux_device *faux_dev)
- 
- 	devl_lock(devlink);
- 	devl_unregister(devlink);
-+	mlx5_shd_nv_param_unregister_dl_params(devlink);
- 	devl_unlock(devlink);
- 	devlink_free(devlink);
- }
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.h b/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.h
-index 67df03e3c72e..837b8a3ca54e 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.h
-@@ -4,6 +4,7 @@
- #ifndef __MLX5_SH_DEVLINK_H__
- #define __MLX5_SH_DEVLINK_H__
- 
-+struct mlx5_core_dev *mlx5_shd_dev(struct mlx5_shd *shd);
- int mlx5_shd_init(struct mlx5_core_dev *dev);
- void mlx5_shd_uninit(struct mlx5_core_dev *dev);
- 
-diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
-index 78f1f034568f..044a45abe614 100644
---- a/include/linux/mlx5/driver.h
-+++ b/include/linux/mlx5/driver.h
-@@ -135,6 +135,7 @@ enum {
- 	MLX5_REG_MTCAP		 = 0x9009,
- 	MLX5_REG_MTMP		 = 0x900A,
- 	MLX5_REG_MCIA		 = 0x9014,
-+	MLX5_REG_MNVDA		 = 0x9024,
- 	MLX5_REG_MFRL		 = 0x9028,
- 	MLX5_REG_MLCR		 = 0x902b,
- 	MLX5_REG_MRTC		 = 0x902d,
--- 
-2.48.1
-
+Since the scaling factor of percentage in netem is to UINT32_MAX, while in =
+dualpi2 is between 0 to 100.
 
