@@ -1,213 +1,172 @@
-Return-Path: <netdev+bounces-175896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8AB6A67E2D
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 21:46:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40CEDA67E48
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 21:52:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 54B447A2C0F
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 20:45:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C02218975C8
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 20:52:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 047C01FF7CD;
-	Tue, 18 Mar 2025 20:46:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6065920E700;
+	Tue, 18 Mar 2025 20:52:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b="CMjwLu6f"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Kr+U19/e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2073.outbound.protection.outlook.com [40.107.236.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26060DDC5
-	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 20:46:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742330797; cv=none; b=Hh5hbZ/MurDHMuhU7hAvcbsMICz/3g9xUxEarZdeKqn7LOqtezEDKUaM/7eNJROPwvF67ID8v9Vk/fS4HxAto0B7uKG2vJ/WVuIXZuLXPueKeAEUpZYdn/TCoBDaw70Xuj6cTHIisOpYOZOyMLomdrUkCSeAPvSwHa1Pl6jlbeM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742330797; c=relaxed/simple;
-	bh=xkay5qH9AM2QFXK8oihleucAVC2ss5YBgCNpmJ4izJM=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:Content-Type; b=nusqFkFMagIDM9yUgD2K4dBkMS+aFwGpk7SGLeEubtfPeFgU8EtuSZxYwQ+52TLUraVyuUX6kcTeq63EaiP2olBel0pcPhgYVxbWgLVrU06mQypG7Z3/VSIUeVpcIhF7bOS4Js0eC2D7wo61O7hMXHBfMU1QUkimjDaFUHvMZpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info; spf=pass smtp.mailfrom=jacekk.info; dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b=CMjwLu6f; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jacekk.info
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5e5b56fc863so8591216a12.3
-        for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 13:46:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jacekk.info; s=g2024; t=1742330793; x=1742935593; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:cc:to:subject:user-agent
-         :mime-version:date:message-id:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vOxN+ZknqyDDX0vVNYFZ1rF8uRtHiCBa7wmST/H5E7g=;
-        b=CMjwLu6felEdlBpgEoiJ46WY5nXUYzdR1x2FuCtzffpS5pS1PGyM1rUm27Xe4ApqWS
-         pia93oXFRBw0XQO0c9FHAtPLj2aZlECwwagSUmxswCeEM0CIoNApso9bl3cUAmvs1upO
-         1ABHDvPWROUdmSs/kW8MdSJkMr1Xd5o5TWr4jh4/4y/1iXmOp47h0iw+dzOvn32wqG1v
-         c2PCVG4Er+8ppMje9GrXnAL3FvGOORpe9+RNLDhmDpjCA3ZKXf1ATefo3NTX5SAb2Ziy
-         oILjeJ0nQ/9i0P1stBudgDoRvs7s2gNcm78wW9RwAh85KFyDpkwcUVbS14DmSDbzhf6g
-         kaTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742330793; x=1742935593;
-        h=content-transfer-encoding:content-language:cc:to:subject:user-agent
-         :mime-version:date:message-id:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vOxN+ZknqyDDX0vVNYFZ1rF8uRtHiCBa7wmST/H5E7g=;
-        b=GZ4oCPQ9t5qyUR8YzwdLGAualksCpsBOvD9K+CjqygXDXmkhfufNUcADFPrFlo8rxF
-         U6HNd675AF5ZK/IKpldVSBjjci9Ksujdf5U9xvwhfqX+8yvtowmWMZ86MBw/5I9hll6M
-         243aDfu2Q2lpOdqoFo8nwap7JznCTnuCr0TOP9Wu2mYtHszGUeJbaR23o3D4ahR34Iqw
-         UrOI0Lszt9ABMrdu5J23D/w1t1vH8Dsg/Z9M7I6wxX+BGCm4xn/SG9uQwUO9Nx2FEbsq
-         RHAgh0JibsZEQhc+8KfBv2IxzWaq3ncmB5Y9Zi0T1hMOIG1f4q2MiEn5obAJMQ3jfn3M
-         aT8g==
-X-Forwarded-Encrypted: i=1; AJvYcCWAD5zHDFfqTD8l/SPtS0yyGJzpD5NCbVhZ6HNAPLMacHEbA7LfpxDB/uTWcXpCVWzJLkLBjyM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlZmVvBI7G/I9eVkY+tRRx80y0ORLp5fUPXwHmYdQAN0xdQ8Y9
-	D8Dr2UsMjZINRM6yghcXnG52Bl2DYfK4C7hy+EGN6azUG7GLAtOlqCP4r69XFA==
-X-Gm-Gg: ASbGnctpx11rmnzKM+97qmzU4z1e1fA/waUXiJE4xTFvmGBTLU+fWrjK5K09aYnpLRb
-	63mC3jg8CmLKs5VaPkJWmwp0KgaZhr5ZCRpq3Fa33N7Zv07HN5Sk4udanv+O/gU/fC6lAFI+wuL
-	i3GOYqbshDFIley6kvHSCNwHaLHakFxTP+Vl2wbRu4cbB2COWWetNaOM9wab5zd1ae8nhhGiK1y
-	H6rY765hpZLueJinfuoZzk0TdsjvzxiHYcyuEU50U0leE/wBJ2SEMl3WPW6FXYyCJe7kGY41w52
-	8DNQBCCLw14BjCtXb0sK1dv/qVHyySPjBnqgUKNA9FU=
-X-Google-Smtp-Source: AGHT+IHuT5Q8Sx3B+XRIeJFH5Nv0x7Ff5aMv5XHIeldVLfzmgtrOAgutMuXojagHXaBw8zQjZMqy/A==
-X-Received: by 2002:a05:6402:254d:b0:5e4:a88a:657 with SMTP id 4fb4d7f45d1cf-5eb80fcaeb0mr162425a12.28.1742330793244;
-        Tue, 18 Mar 2025 13:46:33 -0700 (PDT)
-Received: from [10.2.1.132] ([194.53.194.238])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e816968bfbsm8049409a12.17.2025.03.18.13.46.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Mar 2025 13:46:33 -0700 (PDT)
-From: Jacek Kowalski <jacek@jacekk.info>
-X-Google-Original-From: Jacek Kowalski <Jacek@jacekk.info>
-Message-ID: <c0435964-44ad-4b03-b246-6db909e419df@jacekk.info>
-Date: Tue, 18 Mar 2025 21:46:32 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA54E20468F;
+	Tue, 18 Mar 2025 20:52:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.73
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742331137; cv=fail; b=jSA49mfRTscdypjzd4Vd6hKRftOsiWrvJKF/0Wa+yAaamkCzCp3YbHEmhAENIjLPSVJ64XUUDlp6/6wPE6D/qgPYs5ye/TG+11LMJ8i1Z25cQO2Eh5n282lLfUizd4zopFMDeRJ1V3jEsHOFUaFtuWlHNKxNejf2AMTEwYN2bU8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742331137; c=relaxed/simple;
+	bh=0QZuZcSSojIuQLGHJ0h9k3YBA5ogEyfpKnERXmhq/KE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jXIskdTaNz+8newPYzRIPvwnvnRYQAcFB898Oe5YI+bJ1YTTzIQRjasdEiDfKJzOBsq45JIWNvJbcGI2G1NUqLdrn925Ypl7tZEZ0otpWWsFOWqX6K+Vk9lcvi1kucv3PTeF8rH9/cRYGNoYvFIGOh15iQSC+Qk8HQqiemFLB1o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Kr+U19/e; arc=fail smtp.client-ip=40.107.236.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Ww1cfkt2N3z0StB5lC3UPDEP4zjeEwgpCmBhVBcwRdcDUUC5OC3ZK9Map/E9eBesi0TybRSAwnMIXVXUbqFMct6JcnKrWtbIwMZwZN5UGqEWAZiwJm3wcOIHtvFvMPq3Qgda+WqsILOfDH7GdVg17jg9x9DxQXoFJcxVnEbfaWulf3tO/KKEo4nDMT5DKHi3W3klil8S4+JXJiF8qRjbtzdKAuXlGbJkWbZjQetvViubyBcM/BtIvkyRr1WFToJfPTJ2K9QfvVj80RUJz0LjsSkKQjfG8DXP8Enftcz/Iv3jJR28rccwp8GzBsU9mBiXboFROAUPDSj3uKNc4sYTng==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SPm+vQcLrl9aWzSDlw2Uj2HM5oSC+vGEDG7Cl2VfTec=;
+ b=IHm+e21WBXWmZJj+ilisPZX0rar0DC5B5IJ27bexMVjZ3TvAbxvHvOZhJ2CbF46xu3c5LSXGUZ/UYZkP/qpcYldtPMlxUIkiXFSvFfpxy2gdjhws6IADcjo/0q0AAty/isGDqeH1v2dVmUiAp1vxGryUTwcH/wmvzoqeB/R9P9TPOaiHMklfy5SmceJKW9NZwagitTr6egcHRM7w7X8rwAgyMVQA9UqBHKo/PiLnmMRn+5RJOkX8naxv7O9Pc6iJYpGMLgR8riPPwESrEjkArbjeoqwqSq+ry6rwUgw1mZRjSPVD0ENLfjbrEn3//n0mAFkseC1u6b+EfJWCLB+7Iw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SPm+vQcLrl9aWzSDlw2Uj2HM5oSC+vGEDG7Cl2VfTec=;
+ b=Kr+U19/en2i6KkfnCfNA3pXllTnlznBlgh6WvCMO9C/CaHNVlqpjcTjdOWwap4wzVznVtaIgv+GxydWP8mtEesYKiXerAY3Y9m57H2ukZf7b3EMjWAD5RrxAoe+8ublfolGRINALLtFrokHU3lfIq9s8BACmn6BtMQKvJoad6/B2gzJSap632Tngxc2xabyNWZVxEWDABTe1ZoGWVFG69cg6ULjkErMcnblOHocKsmIkffXDt0gbYzRJ6+wC83TWFzaRaJN0PzJj7AZeriXGIm+snFSNaDoEHt9Fzmmc+NAlBMnnBXeRg2KEj2rW4hxHpnQllK99/mCkfwO8plHodA==
+Received: from CY8PR10CA0018.namprd10.prod.outlook.com (2603:10b6:930:4f::26)
+ by DS0PR12MB8765.namprd12.prod.outlook.com (2603:10b6:8:14e::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.33; Tue, 18 Mar
+ 2025 20:52:11 +0000
+Received: from CY4PEPF0000EE3D.namprd03.prod.outlook.com
+ (2603:10b6:930:4f:cafe::a) by CY8PR10CA0018.outlook.office365.com
+ (2603:10b6:930:4f::26) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8534.32 via Frontend Transport; Tue,
+ 18 Mar 2025 20:52:11 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CY4PEPF0000EE3D.mail.protection.outlook.com (10.167.242.15) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8534.20 via Frontend Transport; Tue, 18 Mar 2025 20:52:10 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 18 Mar
+ 2025 13:51:55 -0700
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 18 Mar
+ 2025 13:51:55 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Tue, 18
+ Mar 2025 13:51:51 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>
+CC: Gal Pressman <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, "Saeed
+ Mahameed" <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq
+ Toukan <tariqt@nvidia.com>, <netdev@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Moshe Shemesh
+	<moshe@nvidia.com>, Mark Bloch <mbloch@nvidia.com>
+Subject: [PATCH net 0/2] mlx5 misc fixes 2025-03-18
+Date: Tue, 18 Mar 2025 22:51:15 +0200
+Message-ID: <1742331077-102038-1-git-send-email-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.8.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH] e1000e: add option not to verify NVM checksum
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3D:EE_|DS0PR12MB8765:EE_
+X-MS-Office365-Filtering-Correlation-Id: 945f3fe7-d683-464e-cbba-08dd665ec0f8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?pjSyBnvyNjx5vGXSPFelq+pRAcg8KD4QHv/UY+FmhHbZvR0DNmtfpfnzgbLe?=
+ =?us-ascii?Q?6FAAKbMS5x9maRegiqHdg54Y6YxfIpvnYVoW0agGa3NCAw2IVanZmV8mQ/xv?=
+ =?us-ascii?Q?jPTi/PxrZi7DeHNlhO7q3J/v3/v85Gm/CevnBMtLEF5yYZ1BlG6F9DmwF4QG?=
+ =?us-ascii?Q?J8jDQBWqAse+qhxwDysrcLcDeRh4fUrX6bvs483wskSx/v5ubVqcdGYIktev?=
+ =?us-ascii?Q?FVeDsWrStyzjcxwAdiHh/lMx6mmjsWB6QXgm5ZqumrJvlrCPNppGhySdsPsp?=
+ =?us-ascii?Q?AiIYtE9dhtM1YCQ3909OtZZicBZ9kxki7h+ELqj/UOIR2pG0UkWYKCy9MaLF?=
+ =?us-ascii?Q?PiGgZNZ61dHfg3NYSfrt2c9lcOPCpn6OwdpnvyEFrcP2p2/Pt/v7ZLSRjx8u?=
+ =?us-ascii?Q?gVz1wx8n2X0o8Ohp+WdQFong1/rd6U9iRBXzMMUKUljO7fUXgNHIwm1/6WDo?=
+ =?us-ascii?Q?F0ZCY6Dw5r9gpsehn7IXlukmBayg6WeVA6ySfViVeTogbgyXe+3zUMyv/OCs?=
+ =?us-ascii?Q?WCILMkBT3x8Fk3AwzknDBoCj15njBYxKIiHG6CzzYtnrIoBTD53CvqEA/EJe?=
+ =?us-ascii?Q?/oPsa/T1A6skEpcL9x75bCVaC5N663pyqu1mZAxY5WcxCsxwzgz15Pqgts79?=
+ =?us-ascii?Q?CF5pNSwi+kSzC6tP/sx1z3JJWdy/yWQLfyfi6xGY4Ba+dKR514QZ9QNSVosG?=
+ =?us-ascii?Q?ZGfxgYERwZfNONhz5SjkxyUXGweRW9qfQcWbh/vnJMsEWEGhnfF4rQEByOZw?=
+ =?us-ascii?Q?FI3nnABJLDENEbcYuWU0EbpCkgKpteCq9b7gIE44+1MWW4ESi8GnqzCOhKl5?=
+ =?us-ascii?Q?Cr+De7tMBtYHSxQF92MfY7+xLx82YE9/GRNuHNkXWhzitTO2OAtBRQuzotxZ?=
+ =?us-ascii?Q?UTEvoTHBtG85+O0+jzSCRX0B3GMMT40BHWgd6wo8v31QQZQw3qQgpANivRCT?=
+ =?us-ascii?Q?l05O3Sk4D0Zm3mEzYgsZi8Vt7wZ7AJW5e3klWTJeAVKK9mVNmKSuQu/IbYnx?=
+ =?us-ascii?Q?cnPaxtrufP1i/pVngpSTMFLA6DsK3icH+pFn3OA7nCIOpyf1XW03IqI5L1wx?=
+ =?us-ascii?Q?GLZzOG9Fvjc7ia7C1f0T0Hy5uepPfEZ2EoH+urPhm+XBESsmZEEyrB8FrL+r?=
+ =?us-ascii?Q?JNY5uQa51Pu1j7ls1rUW+W2BWZshtTH76LqNqAOmdDpzXlnUxrSh6TIG/XJr?=
+ =?us-ascii?Q?wpRfHI8TaOfDQiGNHjc8J6L5gOVqWoIBz9eYCAfCNx5qecAZnBCiD6GFtQWq?=
+ =?us-ascii?Q?pOTSmKu63US8TRpYuLObMy1pXrb2VKoyfLhztCaZXE0djAh0JFH4FG5aLj8m?=
+ =?us-ascii?Q?B3rHT5SLVqwC42E4rC1Fx2z/HB4fQHE61JZQHQ7jU4dDfB7dHmuVv4N+Hydp?=
+ =?us-ascii?Q?cEXgJCgFSiK2OGI/At/3M1SHiH6G+bWkYG++vUvXPzuc5hIxyWzre0WWBwL3?=
+ =?us-ascii?Q?6LakG8skj9czyd9jDu0qYyB+H8l6Bs0dNe/xRbnevl+QptP8SEfwFQ=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Mar 2025 20:52:10.5561
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 945f3fe7-d683-464e-cbba-08dd665ec0f8
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE3D.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8765
 
-Many laptops and motherboards including I219-V network card have
-invalid NVM checksum. While in most instances checksum is fixed by
-e1000e module or by using bootutil, some setups are resistant to NVM
-modifications. This result in the network card being completely
-unusable.
+Hi,
 
-It seems to be the case on Dell Latitude 5420 where UEFI firmware
-corrupts (in this module's sense) checksums on each boot. No set of
-BIOS options seems to help.
+This small patchset provides misc bug fixes to the mlx5 core driver.
 
-This commit adds e1000e module option called VerifyNVMChecksum
-(defaults to 1) that allows advanced users to skip checkum verification
-by setting it to 0.
+Thanks,
+Tariq.
 
-Signed-off-by: Jacek Kowalski <Jacek@jacekk.info>
-Cc: stable@vger.kernel.org
----
- drivers/net/ethernet/intel/e1000e/e1000.h  |  1 +
- drivers/net/ethernet/intel/e1000e/netdev.c | 22 ++++++++--------
- drivers/net/ethernet/intel/e1000e/param.c  | 30 ++++++++++++++++++++++
- 3 files changed, 43 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/e1000e/e1000.h b/drivers/net/ethernet/intel/e1000e/e1000.h
-index ba9c19e6994c..61dcc88dd2ff 100644
---- a/drivers/net/ethernet/intel/e1000e/e1000.h
-+++ b/drivers/net/ethernet/intel/e1000e/e1000.h
-@@ -461,6 +461,7 @@ s32 e1000e_get_base_timinca(struct e1000_adapter *adapter, u32 *timinca);
- #define FLAG2_CHECK_RX_HWTSTAMP           BIT(13)
- #define FLAG2_CHECK_SYSTIM_OVERFLOW       BIT(14)
- #define FLAG2_ENABLE_S0IX_FLOWS           BIT(15)
-+#define FLAG2_VERIFY_NVM_CHECKSUM         BIT(16)
- 
- #define E1000_RX_DESC_PS(R, i)	    \
- 	(&(((union e1000_rx_desc_packet_split *)((R).desc))[i]))
-diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
-index 286155efcedf..b99b22dcaba4 100644
---- a/drivers/net/ethernet/intel/e1000e/netdev.c
-+++ b/drivers/net/ethernet/intel/e1000e/netdev.c
-@@ -7567,16 +7567,18 @@ static int e1000_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	 */
- 	adapter->hw.mac.ops.reset_hw(&adapter->hw);
- 
--	/* systems with ASPM and others may see the checksum fail on the first
--	 * attempt. Let's give it a few tries
--	 */
--	for (i = 0;; i++) {
--		if (e1000_validate_nvm_checksum(&adapter->hw) >= 0)
--			break;
--		if (i == 2) {
--			dev_err(&pdev->dev, "The NVM Checksum Is Not Valid\n");
--			err = -EIO;
--			goto err_eeprom;
-+	if (adapter->flags2 & FLAG2_VERIFY_NVM_CHECKSUM) {
-+		/* systems with ASPM and others may see the checksum fail on the first
-+		* attempt. Let's give it a few tries
-+		*/
-+		for (i = 0;; i++) {
-+			if (e1000_validate_nvm_checksum(&adapter->hw) >= 0)
-+				break;
-+			if (i == 2) {
-+				dev_err(&pdev->dev, "The NVM Checksum Is Not Valid\n");
-+				err = -EIO;
-+				goto err_eeprom;
-+			}
- 		}
- 	}
- 
-diff --git a/drivers/net/ethernet/intel/e1000e/param.c b/drivers/net/ethernet/intel/e1000e/param.c
-index 3132d8f2f207..8711eb10dd11 100644
---- a/drivers/net/ethernet/intel/e1000e/param.c
-+++ b/drivers/net/ethernet/intel/e1000e/param.c
-@@ -127,6 +127,15 @@ E1000_PARAM(KumeranLockLoss, "Enable Kumeran lock loss workaround");
- E1000_PARAM(WriteProtectNVM,
- 	    "Write-protect NVM [WARNING: disabling this can lead to corrupted NVM]");
- 
-+/* Verify NVM Checksum
-+ *
-+ * Valid Range: 0, 1
-+ *
-+ * Default Value: 1 (enabled)
-+ */
-+E1000_PARAM(VerifyNVMChecksum,
-+	    "Verify NVM checksum [WARNING: disabling can cause invalid behavior]");
-+
- /* Enable CRC Stripping
-  *
-  * Valid Range: 0, 1
-@@ -524,4 +533,25 @@ void e1000e_check_options(struct e1000_adapter *adapter)
- 			}
- 		}
- 	}
-+	/* Verify NVM checksum */
-+	{
-+		static const struct e1000_option opt = {
-+			.type = enable_option,
-+			.name = "Verify NVM checksum",
-+			.err  = "defaulting to Enabled",
-+			.def  = OPTION_ENABLED
-+		};
-+
-+		if (num_VerifyNVMChecksum > bd) {
-+			unsigned int verify_nvm_checksum =
-+				VerifyNVMChecksum[bd];
-+			e1000_validate_option(&verify_nvm_checksum, &opt,
-+						adapter);
-+			if (verify_nvm_checksum)
-+				adapter->flags2 |= FLAG2_VERIFY_NVM_CHECKSUM;
-+		} else {
-+			if (opt.def)
-+				adapter->flags2 |= FLAG2_VERIFY_NVM_CHECKSUM;
-+		}
-+	}
- }
+Mark Bloch (1):
+  net/mlx5: LAG, reload representors on LAG creation failure
+
+Moshe Shemesh (1):
+  net/mlx5: Start health poll after enable hca
+
+ drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c |  4 ++++
+ drivers/net/ethernet/mellanox/mlx5/core/main.c    | 15 +++++++--------
+ 2 files changed, 11 insertions(+), 8 deletions(-)
+
+
+base-commit: daa624d3c2ddffdcbad140a9625a4064371db44f
 -- 
-2.39.5
+2.31.1
 
 
