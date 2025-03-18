@@ -1,116 +1,108 @@
-Return-Path: <netdev+bounces-175772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82D57A6772F
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 16:03:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45B5EA67728
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 16:02:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 360723BDDD0
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 15:00:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A239316B04A
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 15:02:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A91D191F92;
-	Tue, 18 Mar 2025 15:00:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EDDD20E32B;
+	Tue, 18 Mar 2025 15:02:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xm7fQJFs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D680F20F065;
-	Tue, 18 Mar 2025 15:00:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.38.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C0F20E034;
+	Tue, 18 Mar 2025 15:02:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742310050; cv=none; b=S154w34fx/N5VBXT2U1VsNUP+8+Q+xu5WvbA0+0+2qkT94uGo9/si7wY7Ui3JfW313/dpiReXt1mzhC4Iz7s+HMFqKKi9ZCqLyEwQ3YsG8LfCUwhCJwDw+hDs8Hl3kanQW9Hsq0FS/q/jfVPJgqfGDDrrzvPaSoerdMKu42mMh8=
+	t=1742310159; cv=none; b=YoB7FfxoYTKfsZ0zTsui8Ty/bWJuVcKdGA7Cr9k7JxEfduCJsl4C3SKQHFrR8lKWCDie6sPYivVJNYEgEtdmKqkZ21BSTDHa7cTP1v6PolffjL1dSle/Qk2kGtZA+tNo22oW5qZLLS38xVyxA2SMFevAbHXsZ04yWU3SUXKOFXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742310050; c=relaxed/simple;
-	bh=wyn3VpaSleocOcFN9TKcRvlozK514gBG9UmOzKFHjxc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MxLQhSDpBuJz6ek5Uh3JgX0+zIG2mKl1PykBfJF9Q0gBdfR+APV3ztXb7GFSZ9zi39IDKYmVKJIWdN1wsI3DebiZZmqBM0VcEOsI4yYLchFZw4dtRHHe41MiGRMz6AOAU06kcLmpifOFMbi/zPZN8ArRy7/cd6hrzbp9E2auIbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; arc=none smtp.client-ip=23.88.38.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simonwunderlich.de
-Received: from kero.packetmixer.de (p200300C5973197D81320d84731f3581A.dip0.t-ipconnect.de [IPv6:2003:c5:9731:97d8:1320:d847:31f3:581a])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.simonwunderlich.de (Postfix) with ESMTPSA id D3090FA132;
-	Tue, 18 Mar 2025 16:00:38 +0100 (CET)
-From: Simon Wunderlich <sw@simonwunderlich.de>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	b.a.t.m.a.n@lists.open-mesh.org,
-	Sven Eckelmann <sven@narfation.org>,
-	stable@vger.kernel.org,
-	Simon Wunderlich <sw@simonwunderlich.de>
-Subject: [PATCH net 1/1] batman-adv: Ignore own maximum aggregation size during RX
-Date: Tue, 18 Mar 2025 16:00:35 +0100
-Message-Id: <20250318150035.35356-2-sw@simonwunderlich.de>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250318150035.35356-1-sw@simonwunderlich.de>
-References: <20250318150035.35356-1-sw@simonwunderlich.de>
+	s=arc-20240116; t=1742310159; c=relaxed/simple;
+	bh=ZbdWLia4awlzBoHhYnAGT34AyyoQVUvRPjT/kLhTMRI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KTZufBTvyxtKiX6lu+gxFSg9NPp8H1iEMvaMFyeCbSt3jEIxtLT2uh+kqQjImqjK0jScqWNkTUebpEcYkwy1TvtO/+FCsj3dfVSC8blnFu2/lqs8XmJ7VN/kd182XwIGJFATz6LhpThAz+YpSOKLfiGnz01XxugRquz5iN/ZZfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xm7fQJFs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40165C4CEE3;
+	Tue, 18 Mar 2025 15:02:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742310158;
+	bh=ZbdWLia4awlzBoHhYnAGT34AyyoQVUvRPjT/kLhTMRI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Xm7fQJFsQCh5TF7hjz7qkC6etZ5L29XyppyVS39/rIayVwtyxBXF54tzn/TmCLY+V
+	 ULGzrBX2nKLBK+RwpcggBmzHS2N52fMRAF7VLqV/SR7dsgu2h0DDfodBRUf/2A4UGa
+	 mv7nGbVsqCsJ+kPG09YKOP4sJsqgaHma2rEzcZXa9fK/COFlKP3iesB4EgU7LKEQMx
+	 pAZtCBbcQJCBKA9PPQMVGqudZ7W11a46tzpkLBrX0LOfeudUqDZit7Z9pMUkqXo6T2
+	 pqAq8tKQfiGDyg/G52gv+adDLvc492pphXqtnNoz666pBjR0gPoo3k1/uHzcPEqIH/
+	 cY906BpeP9LdA==
+Message-ID: <e8da7ce4-c76c-488e-80cb-dff95bf00fe0@kernel.org>
+Date: Tue, 18 Mar 2025 09:02:37 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: fix NULL pointer dereference in l3mdev_l3_rcv
+Content-Language: en-US
+To: Simon Horman <horms@kernel.org>, Wang Liang <wangliang74@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, fw@strlen.de, daniel@iogearbox.net,
+ yuehaibing@huawei.com, zhangchangzhong@huawei.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250313012713.748006-1-wangliang74@huawei.com>
+ <20250318143800.GA688833@kernel.org>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20250318143800.GA688833@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Sven Eckelmann <sven@narfation.org>
+On 3/18/25 3:38 PM, Simon Horman wrote:
+> On Thu, Mar 13, 2025 at 09:27:13AM +0800, Wang Liang wrote:
+>> When delete l3s ipvlan:
+>>
+>>     ip link del link eth0 ipvlan1 type ipvlan mode l3s
+>>
+>> This may cause a null pointer dereference:
+>>
+>>     Call trace:
+>>      ip_rcv_finish+0x48/0xd0
+>>      ip_rcv+0x5c/0x100
+>>      __netif_receive_skb_one_core+0x64/0xb0
+>>      __netif_receive_skb+0x20/0x80
+>>      process_backlog+0xb4/0x204
+>>      napi_poll+0xe8/0x294
+>>      net_rx_action+0xd8/0x22c
+>>      __do_softirq+0x12c/0x354
+>>
+>> This is because l3mdev_l3_rcv() visit dev->l3mdev_ops after
+>> ipvlan_l3s_unregister() assign the dev->l3mdev_ops to NULL. The process
+>> like this:
+>>
+>>     (CPU1)                     | (CPU2)
+>>     l3mdev_l3_rcv()            |
+>>       check dev->priv_flags:   |
+>>         master = skb->dev;     |
+>>                                |
+>>                                | ipvlan_l3s_unregister()
+>>                                |   set dev->priv_flags
+>>                                |   dev->l3mdev_ops = NULL;
+>>                                |
+>>       visit master->l3mdev_ops |
+>>
+>> Add lock for dev->priv_flags and dev->l3mdev_ops is too expensive. Resolve
+>> this issue by add check for master->l3mdev_ops.
+> 
+> Hi Wang Liang,
+> 
+> It seems to me that checking master->l3mdev_ops like this is racy.
 
-An OGMv1 and OGMv2 packet receive processing were not only limited by the
-number of bytes in the received packet but also by the nodes maximum
-aggregation packet size limit. But this limit is relevant for TX and not
-for RX. It must not be enforced by batadv_(i)v_ogm_aggr_packet to avoid
-loss of information in case of a different limit for sender and receiver.
-
-This has a minor side effect for B.A.T.M.A.N. IV because the
-batadv_iv_ogm_aggr_packet is also used for the preprocessing for the TX.
-But since the aggregation code itself will not allow more than
-BATADV_MAX_AGGREGATION_BYTES bytes, this check was never triggering (in
-this context) prior of removing it.
-
-Cc: stable@vger.kernel.org
-Fixes: c6c8fea29769 ("net: Add batman-adv meshing protocol")
-Fixes: 9323158ef9f4 ("batman-adv: OGMv2 - implement originators logic")
-Signed-off-by: Sven Eckelmann <sven@narfation.org>
-Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
----
- net/batman-adv/bat_iv_ogm.c | 3 +--
- net/batman-adv/bat_v_ogm.c  | 3 +--
- 2 files changed, 2 insertions(+), 4 deletions(-)
-
-diff --git a/net/batman-adv/bat_iv_ogm.c b/net/batman-adv/bat_iv_ogm.c
-index 07ae5dd1f150..b12645949ae5 100644
---- a/net/batman-adv/bat_iv_ogm.c
-+++ b/net/batman-adv/bat_iv_ogm.c
-@@ -325,8 +325,7 @@ batadv_iv_ogm_aggr_packet(int buff_pos, int packet_len,
- 	/* check if there is enough space for the optional TVLV */
- 	next_buff_pos += ntohs(ogm_packet->tvlv_len);
- 
--	return (next_buff_pos <= packet_len) &&
--	       (next_buff_pos <= BATADV_MAX_AGGREGATION_BYTES);
-+	return next_buff_pos <= packet_len;
- }
- 
- /* send a batman ogm to a given interface */
-diff --git a/net/batman-adv/bat_v_ogm.c b/net/batman-adv/bat_v_ogm.c
-index e503ee0d896b..8f89ffe6020c 100644
---- a/net/batman-adv/bat_v_ogm.c
-+++ b/net/batman-adv/bat_v_ogm.c
-@@ -839,8 +839,7 @@ batadv_v_ogm_aggr_packet(int buff_pos, int packet_len,
- 	/* check if there is enough space for the optional TVLV */
- 	next_buff_pos += ntohs(ogm2_packet->tvlv_len);
- 
--	return (next_buff_pos <= packet_len) &&
--	       (next_buff_pos <= BATADV_MAX_AGGREGATION_BYTES);
-+	return next_buff_pos <= packet_len;
- }
- 
- /**
--- 
-2.39.5
-
+vrf device leaves the l3mdev ops set; that is probably the better way to go.
 
