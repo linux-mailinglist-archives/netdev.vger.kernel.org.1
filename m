@@ -1,152 +1,138 @@
-Return-Path: <netdev+bounces-175615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17EEEA66E1C
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 09:26:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5044BA66E25
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 09:28:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D785A1897AB2
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 08:26:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9B361683CA
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 08:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D83481F4C9C;
-	Tue, 18 Mar 2025 08:26:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4B661F418A;
+	Tue, 18 Mar 2025 08:28:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mdaolHjc"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="Gxn4TP23"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F4E41C6FF4;
-	Tue, 18 Mar 2025 08:25:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 372E11E8344;
+	Tue, 18 Mar 2025 08:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742286362; cv=none; b=ureWDcfdqHdQVKHdQVUsu5iGpxZGBiTJyx6WaXGwQHc2Exp5eEWUzW16za1OqVAn/TUIY1AO5Q3xkByf18ytQjNDDGGreTW8JGTFd3QPfmuwN7lifttMltI6FR+HSRzAXqib+D5UFt0qsvWcjpNxl2tV1rrLd+/xwbLevSz9liU=
+	t=1742286510; cv=none; b=TbZUXsCAhW8Pzaf8ZlcbaL+/Rubjm1JbuWlRDzEvfpdmlQTOrqqOkR2f+fMiK4K9vYF7YD2Q2SU8FVNJxTqg5vPlUUlk9ktLLIL+0M+CJGlmP7HzuQOUzO0nEsCCrc4ZwEudP/YtPMaguV5sWW+s/JIjcdnn1DfKI0bsUmH92yk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742286362; c=relaxed/simple;
-	bh=tVxzXdFnSTbKiW+Z6b1CkG5VCROLmVTDUl4+wBdGll4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RKc5hQY580ARlE7A364s5iMCogfVkSfD8Yc5VUBf/lrTNXEqs2wtbJ3kq4mcrUKC0dVtSyow+tJk6CqvFhC1ayHVGcHsTxysqVQBHR7t195JOx10Wr+t9ne8ISLNEr75oQDkJ6CX6CpGNv/HOqZ99uYa948BZDgRWvAjbDcqIzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mdaolHjc; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B6A97442A7;
-	Tue, 18 Mar 2025 08:25:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1742286358;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wH9krpUaOUfNxPqmjVtIC4eOg6NnJP0I0NYX9C6ILs0=;
-	b=mdaolHjcBM5J+3USTKkvgACDoOJRIL/AZRaMIkYGvGR0P1OhmDOqyM1wf4jSgl+dfFQpwj
-	Qi4OGN8uFpLM95YpnzxFfvihz3DyzKsjGMBysp9lTdvEwc6SGODz04nahDPWVp84YrW9HT
-	C7JIcWrkX6x/yVN7f1UtqnNrk2kyQAV7lg1dj08exOhf9oC0zmJuiOQ4zZPo34aYDLDtwM
-	WiW9uDXFaAiUHGtdx0SsoLEU9egfuii5yoHI6LpDwEGqjeS0hctP1lnbyRE82jMkedXgGS
-	B8NemPce+4fzsFw+oIIsdPTlmkZ/ZB1TnZ6Dmg8yKIwt6Fj/9DbOkB+Qt8dt/Q==
-Date: Tue, 18 Mar 2025 09:25:51 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
- <linux@armlinux.org.uk>, Heiner Kallweit <hkallweit1@gmail.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Florian Fainelli <f.fainelli@gmail.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Simon Horman
- <horms@kernel.org>, Romain Gantois <romain.gantois@bootlin.com>, Antoine
- Tenart <atenart@kernel.org>, Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>,
- Sean Anderson <sean.anderson@linux.dev>, =?UTF-8?B?QmrDuHJu?= Mork
- <bjorn@mork.no>
-Subject: Re: [PATCH net-next v3 0/2] net: phy: sfp: Add single-byte SMBus
- SFP access
-Message-ID: <20250318092551.3beed50d@fedora.home>
-In-Reply-To: <1653ddbd-af37-4ed1-8419-06d17424b894@lunn.ch>
-References: <20250314162319.516163-1-maxime.chevallier@bootlin.com>
-	<1653ddbd-af37-4ed1-8419-06d17424b894@lunn.ch>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1742286510; c=relaxed/simple;
+	bh=CDiB/eZ+HOnWhcgTFstgP4zJqj01bVvjf3wKTzKOUC4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=DBRVaZL6Rh8RqENlIpDgKi7VagomYrOghR9d0XLSma8acuMPHaGOVbQsEic4vXrwAvB8+OGtVeIWHv9CfW+hdn/rt+fWpnPoX+iJ4lQiUpGJQyulx/gmyhoHCiiNoftThALmvdetE3+yZhqbTjBDjA6DnZpGzh1HJOIkgqAFaXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=Gxn4TP23; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 52I8S0H402581256, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1742286480; bh=CDiB/eZ+HOnWhcgTFstgP4zJqj01bVvjf3wKTzKOUC4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=Gxn4TP23Fl+OQqw0VVYOHHAN5OibD49QMcRv9lq1xq5dxUaW10934F7cOyQQo/J3H
+	 Zo+ndmLqmDgYGCpszVMIbgwi4jlRKUUsa8Ouy8BdN7j9g2FVyRsxh0ZYa19vHo1v6v
+	 AbH9S0A4OM3hLcxH8NqVtoL3ofyR3IpqRne/l3nDwQqX/7Bg5mgFJ9Fi8CVN8c4u71
+	 L96aZRc4tFpI8Ma1XzwwKPgCxaazBlm7MLeyWHghZk0ylClnR+kU9eNqbOfc9KPf5U
+	 +Qlo4Ga4ZMhfq0nO/moSvHooupREFEHUd4/uMQ/TV6jt1ThTI8ZrTF1EuAHsG5W+CH
+	 8s6ntgKP3piAg==
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 52I8S0H402581256
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 18 Mar 2025 16:28:00 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 18 Mar 2025 16:28:00 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 18 Mar 2025 16:27:59 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622]) by
+ RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622%5]) with mapi id
+ 15.01.2507.035; Tue, 18 Mar 2025 16:27:59 +0800
+From: Hau <hau@realtek.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd <nic_swsd@realtek.com>,
+        "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH net-next v2 2/2] r8169: disable RTL8126 ZRX-DC timeout
+Thread-Topic: [PATCH net-next v2 2/2] r8169: disable RTL8126 ZRX-DC timeout
+Thread-Index: AQHblxiRYH4CHyDj5kexwb8pyB4RDLN3SyIAgAFFt3A=
+Date: Tue, 18 Mar 2025 08:27:59 +0000
+Message-ID: <0fca76aeb8ac4b4c8d925b93fd622979@realtek.com>
+References: <20250317084236.4499-1-hau@realtek.com>
+ <20250317084236.4499-3-hau@realtek.com>
+ <9cc1ed25-1244-4f4d-8e5e-fe5113a07fbe@gmail.com>
+In-Reply-To: <9cc1ed25-1244-4f4d-8e5e-fe5113a07fbe@gmail.com>
+Accept-Language: zh-TW, en-US
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddugeduleehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepjeetjefgheegfeejtdetfefggfekveeggeehudeuteeuleeviedvheevtdeugfetnecuffhomhgrihhnpehmihgtrhhotghhihhprdgtohhmnecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudekpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehkuhgsr
- geskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hello Andrew,
-
-On Mon, 17 Mar 2025 22:34:09 +0100
-Andrew Lunn <andrew@lunn.ch> wrote:
-
-> On Fri, Mar 14, 2025 at 05:23:16PM +0100, Maxime Chevallier wrote:
-> > Hello everyone,
-> > 
-> > This is V3 for the single-byte SMBus support for SFP cages as well as
-> > embedded PHYs accessed over mdio-i2c.  
-> 
-> Just curious, what hardware is this? And does it support bit-banging
-> the I2C pins? If it does, you get a choice, slow but correct vs fast
-> but broken and limited?
-
-The HW is a VSC8552 PHY that includes a so-called "i2c mux", which in
-reality is that smbus interface.
-
-             +---------+
- +-----+     |         |     +-----+
- | MAC | --- | VSC8552 | --- | SFP |
- +-----+     |         |     +-----+
-    |        |         |        |
-    +-mdio---|         |-smbus--+
-             +---------+
-
-it has 4 SCL and 1 SDA lines, that you can connect to 4 different SFP
-cages.
-
-You perform transfers by using 2 dedicated MDIO registers , one
-register contains xfer info such as the address to access over smbus,
-the direction of the xfer, and the other one contains data :
- - lower byte is write data
- - upper byte is read-back data
-
-and that's all you have :( so the HW can only really do one single byte
-transfer at a time, then you re-configure the 2 registers above, rinse
-and repeat.
-
-Looks like the datasheet is publicly available :
-
-https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocuments/DataSheets/60001809A.pdf
-
-The whole xfer protocol is described in page 35.
-
-On the board itself, the i2c for the SFP cage is connected to that PHY
-smbus.
-
-Now it looks like there's some pinmux within the PHY and we can use the
-PHY as a gpio controller, so we could consider using a bitbang approach
-indeed (provided that SFP is on PHY smbus bus 0 or 1).
-
-I didn't consider that, it's probably worth giving a try, even if as
-you say it's probably be very slow, each bit being set amounting to a
-mdio xfer towards the PHY.
-
-But if it allows better HW support, and the SFP reacts well on slow
-busses, it may be work :)
-
-Do we still want the current series ? Looks like some other people were
-interested in that.
-
-On my side that's the second time I deal with a product that uses a PHY
-from this family and uses that smbus feature (but if that bitbang thing
-works it's probably better)
-
-Thanks,
-
-Maxime
+PiANCj4gRXh0ZXJuYWwgbWFpbCA6IFRoaXMgZW1haWwgb3JpZ2luYXRlZCBmcm9tIG91dHNpZGUg
+dGhlIG9yZ2FuaXphdGlvbi4gRG8gbm90DQo+IHJlcGx5LCBjbGljayBsaW5rcywgb3Igb3BlbiBh
+dHRhY2htZW50cyB1bmxlc3MgeW91IHJlY29nbml6ZSB0aGUgc2VuZGVyIGFuZA0KPiBrbm93IHRo
+ZSBjb250ZW50IGlzIHNhZmUuDQo+IA0KPiANCj4gDQo+IE9uIDE3LjAzLjIwMjUgMDk6NDIsIENo
+dW5IYW8gTGluIHdyb3RlOg0KPiA+IERpc2FibGUgaXQgZHVlIHRvIGl0IGRvc2Ugbm90IG1lZXQg
+WlJYLURDIHNwZWNpZmljYXRpb24uIElmIGl0IGlzDQo+ID4gZW5hYmxlZCwgZGV2aWNlIHdpbGwg
+ZXhpdCBMMSBzdWJzdGF0ZSBldmVyeSAxMDBtcy4gRGlzYWJsZSBpdCBmb3INCj4gPiBzYXZpbmcg
+bW9yZSBwb3dlciBpbiBMMSBzdWJzdGF0ZS4NCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IENodW5I
+YW8gTGluIDxoYXVAcmVhbHRlay5jb20+DQo+ID4gLS0tDQo+ID4gIGRyaXZlcnMvbmV0L2V0aGVy
+bmV0L3JlYWx0ZWsvcjgxNjlfbWFpbi5jIHwgMjAgKysrKysrKysrKysrKysrKysrKysNCj4gPiAg
+MSBmaWxlIGNoYW5nZWQsIDIwIGluc2VydGlvbnMoKykNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9k
+cml2ZXJzL25ldC9ldGhlcm5ldC9yZWFsdGVrL3I4MTY5X21haW4uYw0KPiA+IGIvZHJpdmVycy9u
+ZXQvZXRoZXJuZXQvcmVhbHRlay9yODE2OV9tYWluLmMNCj4gPiBpbmRleCAzYzY2M2ZjYTA3ZDMu
+LmFkMzYwM2NmNzU5NSAxMDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9yZWFs
+dGVrL3I4MTY5X21haW4uYw0KPiA+ICsrKyBiL2RyaXZlcnMvbmV0L2V0aGVybmV0L3JlYWx0ZWsv
+cjgxNjlfbWFpbi5jDQo+ID4gQEAgLTI4NTIsNiArMjg1MiwyNSBAQCBzdGF0aWMgdTMyIHJ0bF9j
+c2lfcmVhZChzdHJ1Y3QgcnRsODE2OV9wcml2YXRlICp0cCwNCj4gaW50IGFkZHIpDQo+ID4gICAg
+ICAgICAgICAgICBSVExfUjMyKHRwLCBDU0lEUikgOiB+MDsgIH0NCj4gPg0KPiA+ICtzdGF0aWMg
+dm9pZCBydGxfZGlzYWJsZV96cnhkY190aW1lb3V0KHN0cnVjdCBydGw4MTY5X3ByaXZhdGUgKnRw
+KSB7DQo+ID4gKyAgICAgc3RydWN0IHBjaV9kZXYgKnBkZXYgPSB0cC0+cGNpX2RldjsNCj4gPiAr
+ICAgICB1MzIgY3NpOw0KPiA+ICsgICAgIHU4IHZhbDsNCj4gPiArDQo+ID4gKyNkZWZpbmUgUlRM
+X0dFTjNfUkVMQVRFRF9PRkYgMHgwODkwDQo+ID4gKyNkZWZpbmUgUlRMX0dFTjNfWlJYRENfTk9O
+Q09NUEwgICAgICAweDENCj4gPiArICAgICBpZiAocGRldi0+Y2ZnX3NpemUgPiBSVExfR0VOM19S
+RUxBVEVEX09GRiAmJg0KPiA+ICsgICAgICAgICBwY2lfcmVhZF9jb25maWdfYnl0ZShwZGV2LCBS
+VExfR0VOM19SRUxBVEVEX09GRiwgJnZhbCkgPT0NCj4gUENJQklPU19TVUNDRVNTRlVMICYmDQo+
+ID4gKyAgICAgICAgIHBjaV93cml0ZV9jb25maWdfYnl0ZShwZGV2LCBSVExfR0VOM19SRUxBVEVE
+X09GRiwgdmFsICYNCj4gPiArflJUTF9HRU4zX1pSWERDX05PTkNPTVBMKSA9PSBQQ0lCSU9TX1NV
+Q0NFU1NGVUwpDQo+IA0KPiBUaGVzZSB0d28gbGluZXMgYXJlIHRvbyBsb25nLiBOZXRkZXYgYWxs
+b3dzIG9ubHkgODAgY2hhcnMuDQo+IGNoZWNrcGF0Y2gucGwgd291bGQgaGF2ZSBub3RpY2VkIHlv
+dS4NCj4gDQo+IEFwYXJ0IGZyb20gdGhhdCwgbG9va3MgZ29vZCB0byBtZS4NCj4gDQpJIHdpbGwg
+Zml4IGl0LiBUaGFua3MuDQoNCj4gPiArICAgICAgICAgICAgIHJldHVybjsNCj4gPiArDQo+ID4g
+KyAgICAgbmV0ZGV2X25vdGljZV9vbmNlKHRwLT5kZXYsDQo+ID4gKyAgICAgICAgICAgICAiTm8g
+bmF0aXZlIGFjY2VzcyB0byBQQ0kgZXh0ZW5kZWQgY29uZmlnIHNwYWNlLCBmYWxsaW5nIGJhY2sg
+dG8NCj4gQ1NJXG4iKTsNCj4gPiArICAgICBjc2kgPSBydGxfY3NpX3JlYWQodHAsIFJUTF9HRU4z
+X1JFTEFURURfT0ZGKTsNCj4gPiArICAgICBydGxfY3NpX3dyaXRlKHRwLCBSVExfR0VOM19SRUxB
+VEVEX09GRiwgY3NpICYNCj4gPiArIH5SVExfR0VOM19aUlhEQ19OT05DT01QTCk7DQo+IA0KPiBG
+b3IgbXkgdW5kZXJzdGFuZGluZzogVGhlIGNzaSBmdW5jdGlvbnMgYWx3YXlzIGRlYWwgd2l0aCAz
+MmJpdCB2YWx1ZXMuDQo+IERvZXMgdGhpcyBtZWFuIHRoYXQgYWxsIFJlYWx0ZWstc3BlY2lmaWMg
+cmVnaXN0ZXJzIGluIGV4dGVuZGVkIGNvbmZpZyBzcGFjZQ0KPiBhcmUgMzJiaXQgcmVnaXN0ZXJz
+Pw0KPiANCj4gPiArfQ0KPiA+ICsNCj4gPiAgc3RhdGljIHZvaWQgcnRsX3NldF9hc3BtX2VudHJ5
+X2xhdGVuY3koc3RydWN0IHJ0bDgxNjlfcHJpdmF0ZSAqdHAsIHU4DQo+ID4gdmFsKSAgew0KPiA+
+ICAgICAgIHN0cnVjdCBwY2lfZGV2ICpwZGV2ID0gdHAtPnBjaV9kZXY7IEBAIC0zODI0LDYgKzM4
+NDMsNyBAQCBzdGF0aWMNCj4gPiB2b2lkIHJ0bF9od19zdGFydF84MTI1ZChzdHJ1Y3QgcnRsODE2
+OV9wcml2YXRlICp0cCkNCj4gPg0KPiA+ICBzdGF0aWMgdm9pZCBydGxfaHdfc3RhcnRfODEyNmEo
+c3RydWN0IHJ0bDgxNjlfcHJpdmF0ZSAqdHApICB7DQo+ID4gKyAgICAgcnRsX2Rpc2FibGVfenJ4
+ZGNfdGltZW91dCh0cCk7DQo+ID4gICAgICAgcnRsX3NldF9kZWZfYXNwbV9lbnRyeV9sYXRlbmN5
+KHRwKTsNCj4gPiAgICAgICBydGxfaHdfc3RhcnRfODEyNV9jb21tb24odHApOw0KPiA+ICB9DQoN
+Cg==
 
