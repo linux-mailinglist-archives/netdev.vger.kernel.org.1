@@ -1,56 +1,63 @@
-Return-Path: <netdev+bounces-175782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 725CBA6777F
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 16:17:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 244F3A677A5
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 16:23:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1AD717D56A
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 15:16:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFADF3A9261
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 15:23:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE13E20E013;
-	Tue, 18 Mar 2025 15:16:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C48E20E706;
+	Tue, 18 Mar 2025 15:23:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W5hKfX1b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uQ28CrdD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 874DA20D505;
-	Tue, 18 Mar 2025 15:16:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77B2120E6F9
+	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 15:23:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742310989; cv=none; b=S0gT7Pd70QRtjlm+02uA0ZzMqdWrdZSwmm5u5Cou6yWxgPqLiDU2iX9JQUva4QGt6HrSLKmJgAHmM3o41pfl+f3Y4Uep/W8hV0Exlq30bxE0fkQuRFH7xSacvRACNxpBlOdew/E8O7jWvmC8LK1fYdkenyj4QrpgHEqoSe5Q9F8=
+	t=1742311405; cv=none; b=DPU5PnbkGbEtDaEAc4FOn3pAFM8YCZOPjNlgrxtkGck2qmJ1Yz+oabuNOdHL0azWUevotirAOQtfaIN/yr3hnJGnlD2HL+kCpw9j3GdLF6O09WBtSmpkzrQXSB1EEv/jLqix1NZhLYcMNbfYuVA6vc3ELbQJEdyDDSOGEYU713M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742310989; c=relaxed/simple;
-	bh=sd/wzBX9but7ZOJjYceVNbvV3MbkJU9nIM6WwRq6E1M=;
+	s=arc-20240116; t=1742311405; c=relaxed/simple;
+	bh=NSn77dprZE47x15imTAgkQ7QqmIV6qgxr8wuRb9XVm4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qkodW9TXpHDHYtV3ks+GullhpaS2aB7sXyfw3RocYqdaiX7q+87FgSOmlFB/iP4ZNRaeDVHHVdmKgalt4uutMTM37usE1IfKAzBOtZqAsisZatOExiM+Z73mI5UKNjtbansIO756+pX3ZXr1r+xzRRgzsQjQSBqyjbd0E/yNb/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W5hKfX1b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11D01C4CEF3;
-	Tue, 18 Mar 2025 15:16:26 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=psVVmh7aq4KUKWcHIEsXfR3Y252mVrPXf1m4EfacQ/kDDLI8R4n/6Lbepa6YVv59I4esQeOHBpvdkyLR4j6Kop6mvB22yzoYP3HF+rptKFjF4SqVH27/dbFJ5oogRD8YrnhJLTmf6YLweDwYmk6kKMjw+CKMk+mGLw3ac7QPqBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uQ28CrdD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3B59C4CEE3;
+	Tue, 18 Mar 2025 15:23:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742310989;
-	bh=sd/wzBX9but7ZOJjYceVNbvV3MbkJU9nIM6WwRq6E1M=;
+	s=k20201202; t=1742311404;
+	bh=NSn77dprZE47x15imTAgkQ7QqmIV6qgxr8wuRb9XVm4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=W5hKfX1b8wXJq9AT/9xZ2qjVT/J6/LbJ7eEhR+/PC5Qdgq/Flo1J8qKuPcNriqeyX
-	 K1hzO05EjO3Nlz+br3sxHUTVBhHceQBHSDv4fzF9XHejECYyO02pjynrUiipolaLVz
-	 RNKFFRyblNzFqdqUEWHS/hgt52RFhy4z3+cicG5T1FdsPB5tohrFKrKidW6Ih7yLmX
-	 fmoR80qCRBz4OIxhBxhnTzqtVtm3mOks3ySi2sMK6rxQDvS9C8zCDxCvIPJFf2R1FB
-	 fC/tJDRICD0268GyGRFCeScM4u/seMnKyPLBBP0x0m7Gw7YHGwOX016NCN6SsUjiPh
-	 /3Am4osxcOHjg==
-Date: Tue, 18 Mar 2025 15:16:24 +0000
+	b=uQ28CrdDjjpSQc0ea4Ta0klZCMeNKOOiMn3aYK4/BmuRdqpyvkFi4xfeoVesjB0YT
+	 Oz3rf9hgLKq+6vtbF9RQ2UO3XPyFTNFVgOQMAfBZdM1N+qf/LD+vQizZuyoEMRagG1
+	 mHcxRxrUFjeXvZ0fF0eB02Gx9lngBY8/IfW8TBnRo24pg0tGp6dknHETUD2qTzfL3I
+	 9omlx8pZUxZ1q641SO/aavX48ElaSGUMQKR/wK38mPjo53FidPpdHeZuK+ILiaWGTA
+	 4W2h0qXi/7tDkendcXrUUcPTas1t46D/976erYXqCR9637J9ztZDPpX88/QwQTvE6T
+	 MfjTY2ieaLmTQ==
+Date: Tue, 18 Mar 2025 15:23:19 +0000
 From: Simon Horman <horms@kernel.org>
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us
-Subject: Re: [PATCH net-next] net: don't relock netdev when on qdisc_create
- replay
-Message-ID: <20250318151624.GC688833@kernel.org>
-References: <20250313100407.2285897-1-sdf@fomichev.me>
+To: Xin Tian <tianx@yunsilicon.com>
+Cc: netdev@vger.kernel.org, leon@kernel.org, andrew+netdev@lunn.ch,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	davem@davemloft.net, jeff.johnson@oss.qualcomm.com,
+	przemyslaw.kitszel@intel.com, weihg@yunsilicon.com,
+	wanry@yunsilicon.com, jacky@yunsilicon.com,
+	parthiban.veerasooran@microchip.com, masahiroy@kernel.org,
+	kalesh-anakkur.purayil@broadcom.com, geert+renesas@glider.be
+Subject: Re: [PATCH net-next v8 02/14] xsc: Enable command queue
+Message-ID: <20250318152319.GD688833@kernel.org>
+References: <20250307100824.555320-1-tianx@yunsilicon.com>
+ <20250307100827.555320-3-tianx@yunsilicon.com>
+ <20250310063429.GF4159220@kernel.org>
+ <69c322e0-7e38-4ac6-b390-7a9b294261b3@yunsilicon.com>
+ <c94717a8-0d96-4914-8e24-9eb2959aa193@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,69 +66,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250313100407.2285897-1-sdf@fomichev.me>
+In-Reply-To: <c94717a8-0d96-4914-8e24-9eb2959aa193@yunsilicon.com>
 
-On Thu, Mar 13, 2025 at 03:04:07AM -0700, Stanislav Fomichev wrote:
-> Eric reports that by the time we call netdev_lock_ops after
-> rtnl_unlock/rtnl_lock, the dev might point to an invalid device.
-> Don't relock the device after request_module and don't try
-> to unlock it in the caller (tc_modify_qdisc) in case of replay.
+On Tue, Mar 18, 2025 at 06:06:07PM +0800, Xin Tian wrote:
+> On 2025/3/12 17:17, Xin Tian wrote:
+> > On 2025/3/10 14:34, Simon Horman wrote:
+> >> On Fri, Mar 07, 2025 at 06:08:29PM +0800, Xin Tian wrote:
+> >>> The command queue is a hardware channel for sending
+> >>> commands between the driver and the firmware.
+> >>> xsc_cmd.h defines the command protocol structures.
+> >>> The logic for command allocation, sending,
+> >>> completion handling, and error handling is implemented
+> >>> in cmdq.c.
+> >>>
+> >>> Co-developed-by: Honggang Wei <weihg@yunsilicon.com>
+> >>> Signed-off-by: Honggang Wei <weihg@yunsilicon.com>
+> >>> Co-developed-by: Lei Yan <jacky@yunsilicon.com>
+> >>> Signed-off-by: Lei Yan <jacky@yunsilicon.com>
+> >>> Signed-off-by: Xin Tian <tianx@yunsilicon.com>
+> >> Hi Xin,
+> >>
+> >> Some minor feedback from my side.
+> >>
+> >> ...
+> >>
+> >>> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/cmdq.c b/drivers/net/ethernet/yunsilicon/xsc/pci/cmdq.c
+> >> ...
+> >>
+> >>> +static int xsc_copy_to_cmd_msg(struct xsc_cmd_msg *to, void *from, int size)
+> >>> +{
+> >>> +	struct xsc_cmd_prot_block *block;
+> >>> +	struct xsc_cmd_mailbox *next;
+> >>> +	int copy;
+> >>> +
+> >>> +	if (!to || !from)
+> >>> +		return -ENOMEM;
+> >>> +
+> >>> +	copy = min_t(int, size, sizeof(to->first.data));
+> >> nit: I expect that using min() is sufficient here...
+> > Ack
 > 
-> Fixes: a0527ee2df3f ("net: hold netdev instance lock during qdisc ndo_setup_tc")
-> Reported-by: Eric Dumazet <edumazet@google.com>
-> Link: https://lore.kernel.org/netdev/20250305163732.2766420-1-sdf@fomichev.me/T/#me8dfd778ea4c4463acab55644e3f9836bc608771
-> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-> ---
->  net/sched/sch_api.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-> index abace7665cfe..f1ec6ec0cf05 100644
-> --- a/net/sched/sch_api.c
-> +++ b/net/sched/sch_api.c
-> @@ -1278,13 +1278,14 @@ static struct Qdisc *qdisc_create(struct net_device *dev,
->  			 * tell the caller to replay the request.  We
->  			 * indicate this using -EAGAIN.
->  			 * We replay the request because the device may
-> -			 * go away in the mean time.
-> +			 * go away in the mean time. Note that we also
-> +			 * don't relock the device because it might
-> +			 * be gone at this point.
->  			 */
->  			netdev_unlock_ops(dev);
->  			rtnl_unlock();
->  			request_module(NET_SCH_ALIAS_PREFIX "%s", name);
->  			rtnl_lock();
-> -			netdev_lock_ops(dev);
->  			ops = qdisc_lookup_ops(kind);
->  			if (ops != NULL) {
+> min(size, sizeof(to->first.data)) will lead to a compile warning.
+> size is int and sizeof(to->first.data) is size_t.
+> So I kept this in v9
 
-Hi Stan,
-
-I see that if this condition is met then the replay logic
-in the next hunk works as intended by this patch.
-
-But what if this condition is not met?
-It seems to me that qdisc_create(), and thus __tc_modify_qdisc()
-will return with an unlocked device, but the replay logic
-won't take effect in tc_modify_qdisc().
-
-Am I missing something?
-
->  				/* We will try again qdisc_lookup_ops,
-> @@ -1837,9 +1838,10 @@ static int tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
->  	replay = false;
->  	netdev_lock_ops(dev);
->  	err = __tc_modify_qdisc(skb, n, extack, dev, tca, tcm, &replay);
-> -	netdev_unlock_ops(dev);
-> +	/* __tc_modify_qdisc returns with unlocked dev in case of replay */
->  	if (replay)
->  		goto replay;
-> +	netdev_unlock_ops(dev);
->  
->  	return err;
->  }
-> -- 
-> 2.48.1
-> 
+Ack, thanks for checking.
 
