@@ -1,75 +1,78 @@
-Return-Path: <netdev+bounces-175952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE9C4A680F1
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 00:59:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF485A680F5
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 00:59:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 191EA424237
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 23:59:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C245C4244BA
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 23:59:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5020209F2A;
-	Tue, 18 Mar 2025 23:59:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D124620A5F8;
+	Tue, 18 Mar 2025 23:59:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bPkSk2Oz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lMAZ3hLF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8ECC250F8;
-	Tue, 18 Mar 2025 23:59:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B7D20967E;
+	Tue, 18 Mar 2025 23:59:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742342371; cv=none; b=EetSm951KAC8+EkdX7FoYtLFEbCZ/pa9uyJPEybh4dQEQs8mH+9vpIjU6hxoxFazkjNGaXTl+PoIrxDAIlEq0OMeqeQOxqjIN10XdclCe+4Rn4DZWUvc61qimkNMc7DHcsS7mxZ9bljydsvUqtvp+hDWimJxpMWH9EkXrW/Btpo=
+	t=1742342372; cv=none; b=VfScc0pr8J4Kjy3YHjlxiRLiiu86lTNr9RAhLM56JuV0O4cemFT0MjyduxYZ3I/Z3fUHCvRgzyfshG4arquOIT3j7joD56sLqiu3qvB0PaCpBK5Pswlkz2VqIWF+YMWVw85bJNO4TXiOrHEdIQbLb0QzUPDrRD6ZHVdnj0wEfAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742342371; c=relaxed/simple;
-	bh=3PtKh13sIYCt1eK6SKMRDuOeadR5pjAA+a1NszLDiGg=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=srsKqI0ikkDgC2XLTC/ouCBQ96Q1FvT06+fHK47D2h9HMFGdzam66ArOB2iPEaoyppkp71jee9SFBI3rLpUuiOCkyhk88auINNBi2MRGM9SsTdgiIT+w+dxz/gPqMaZ6kxcgZe1QZWRHCb1fAeDInbUpv4rD3PGGg0E5xzoYTUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bPkSk2Oz; arc=none smtp.client-ip=209.85.221.51
+	s=arc-20240116; t=1742342372; c=relaxed/simple;
+	bh=hTifPPlQKm2WdPHJNGPglbLMy1DZJvDDRfNnU5GT/so=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=i4da9szi8qGQTVYzGxoh5Pvl+E9GSU573Ofbi4q94xrUpF3Jo254i268quS4zeeCiKXiFP5JtNor9HBzZ2wfSKDNTiZ7fM+L2HyFvdIGbtl1WsWJubmU748yLhcsX05QaE78HC5fdTsDhWs0twjGb1zZQ3osG4C7UA79y/5GHuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lMAZ3hLF; arc=none smtp.client-ip=209.85.221.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-39143200ddaso3950626f8f.1;
-        Tue, 18 Mar 2025 16:59:29 -0700 (PDT)
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-399749152b4so32853f8f.3;
+        Tue, 18 Mar 2025 16:59:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742342368; x=1742947168; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=lZjbTfL2Hj9AUEhnmLWjkxFCTyBrLV8FI1UiGduw1ng=;
-        b=bPkSk2OzsC1oqjNMePGimKpBEQ7hOO1osydCVU2RqzVXNrt8HxbWqU2w5ck6RS3/Hb
-         HsfzscZyq8SUzPTr1rgTcWdinKATKHxOxZvng5TH9iNLL/LoH2Xtqipb+42LqB/0ulW7
-         44ronhjjUkdyQoqxSIXXjcMgZ0Uo4y2pP5N3bLP+BgJ6yjKUvZteWED+KVx1cFL+7sw1
-         sp13hYh+U9KlmR3i/2q84hQAAbKhKz9+VGCRISHyFWAO+yCDHnNZmoMt/yIHb6LrOPTZ
-         dnh7VXn9iz82pBidcxrWvP6qXQs5vtBkH6cIxZiae4unSqtSpi2J4NUe0PoxxbngQ6/v
-         Ybkw==
+        d=gmail.com; s=20230601; t=1742342369; x=1742947169; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1uCllGBD+amkDxWsOywJFoq12/wp8Il5PeOW8b/6RHw=;
+        b=lMAZ3hLF90ax8Xj6huW6G/KBUBdHVOES9aqPyaPUahWjM/qwyVriNFyf8XATZGFXga
+         rOVpWRnFcfBs9OZd08HmftcwZUKws1megMbkd0gEncIUcJDvZlzuooW/CEpsEEMyxlsu
+         kLkHAFm8L6yf+c6+fcfl19QgOO7nq5pfU05r91Yx44mKZrqovgEXfvuNa3xHGtI6gRff
+         Kbxb8hEZ6im5qaopqJpu3Oqx+qsb09DdJwFwgKL+MXN6CyH+g13lbn3WPTsPZhRGDsoF
+         OesFbtUmzdgTULDRGgt+X0kDaaOKHP8fxgNWLB4JAvH5fN9Ry30UMj4gIhf74tzPtLnG
+         /Clw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742342368; x=1742947168;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lZjbTfL2Hj9AUEhnmLWjkxFCTyBrLV8FI1UiGduw1ng=;
-        b=cfWlISEte02OxU2OJ1JLg06LrbPhf+AaZociU4gFhMzNmjQDogqgBeVDqLxxN6/n8K
-         NpAIw/c+URxHwh5uNMisYmL7ec3d8iK6PjpLX6bAK4EH1tFYxP5ti8CHUfvt068d95JT
-         aRX3THRaWUlgQa67CkiBSSQw4eoi16Vljw8UKmYt+wJEDYWEBu1cUlAP2N+ZoBhpvbIi
-         fWxx7TTyo7u71DTTdwN5NuncHuKh5J/m9X8qWHNTwCeRlohVr5kUD/SJazblXIS8EhOD
-         X/r1oblPFz59AZugX0Y5atH1xRsRCIvxRw+gDGD8kGzqliTRua9vD1HwqM6XVgADV3Zl
-         +SoA==
-X-Forwarded-Encrypted: i=1; AJvYcCVbFPJicXEvFlgDd7Zf6ePLQz3rgcTdNUEN/RBN4Eg8VnezOqdOUbfyFQOspLN6krDHDqOvdrWd@vger.kernel.org, AJvYcCX9YnvIOq4HM2aFBMtjWKkzPtaMbfw/r3wZDDfeZ8uP3g8YoxR5gdnM2mwwcdjmrD3b5s+fqFZDiWI0@vger.kernel.org, AJvYcCXtMHoV7uFpDDUuKMGgAcGH/J9z41mEZF7LV2ClzjtQJ6MLH6mNVZCm+FoA7byUVeZheJgy/9uhzMb9lmbG@vger.kernel.org
-X-Gm-Message-State: AOJu0YyffGLGjCZ/cWP+T/yUmi0B7IpBNGsy5AsG+B371VXaUJKaeeMc
-	/BPjKgahWjbiqjofTKugpVpykm2qP4OnfDD3QilpL8FWjHXOXAGc
-X-Gm-Gg: ASbGncuVFK6kcsHWcLplSfUWicinOKi4/ln4u/y9Gl6FjhPSPqyOkF7uFnbBAgu8+uo
-	nn+VP/IhdXpjUXK+A8qIOpcQBk7lhojea7pX7jnphR7eOHq/LwijMux0qZFWF88GYKnZBRltNCN
-	nw/eI85B7LW4AWgdfPVMpKsBFPx3F0vwtWr0ABIvtpElorZjsPkd3SKtINpC0g/rJC5m438HKGE
-	m7ZQTOm2q+D9ajjNlRBF3TsfwYYyRuVNaagxf72Ezj204H7ZiEkKkP7DS5fGQ0AnkCSBqN6Y8Ih
-	iceBf0kUeCMn9VeGbXY0V5Zs+tWALK9cykbooGrjzmrNkhi/7WQ9bkAOZuofYV8v9/tzDWxbfP1
-	lSqg/HpYCeZfZ7aCrGhNTWxEA
-X-Google-Smtp-Source: AGHT+IFK3EBw1ZYUKE9uEOQCOdl5tB6+diYT5Op28PMO59u02BarJ20ylLIC5oJ7rxyr7ZawsIpLUQ==
-X-Received: by 2002:a5d:64a4:0:b0:397:3900:ef8c with SMTP id ffacd0b85a97d-39973b028c4mr751354f8f.35.1742342367967;
-        Tue, 18 Mar 2025 16:59:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1742342369; x=1742947169;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1uCllGBD+amkDxWsOywJFoq12/wp8Il5PeOW8b/6RHw=;
+        b=wQSJq/lw+h2Zomp8n80ey1JvtMtvqaw5H5c68sBqwUU35jmdXqycwvkfWcMa+BDVHe
+         W9x/I0vgHYJvDl14co1ZSQMEahlmC0kE6jW0bL1SxkfL5nsWbkr3AxJB2UrN3AN26hND
+         wsNDT0hJeqMpcYIqOPL5SIIbbb2e7pIBv/+/uCbSBjig/rNIiwgmQoFu7DLakrv1UrJc
+         Kj1meQ8t/f47GV9UiCiDHQpOZck1W+myhPm+LNkEvOxd+gCaQA3XUWIT9i8ziQ+H9FR7
+         yDs9iP8T2lkJQrwK+9pvuA2lyb1qK2GO07qVWfYMuLJlZFxx0ZFAakbDv5r/JuPopjbl
+         ZinA==
+X-Forwarded-Encrypted: i=1; AJvYcCX5mdq/VIXo2WUREfqn/BvKKSuyXIyn9oeGmmeulx+QTq+L0Iy6mtwqk86js9rbozMs6J5tentZKr+b@vger.kernel.org, AJvYcCXZjS480/OO1N5LaizGKRpUZ+a3+riRMZIIOcoMzreEVMFS+Ar+fCAG66/1FxChgptZ6xAeIXgslUx6kd/d@vger.kernel.org, AJvYcCXzaVXbC/mPr4RgDGWwQfI4NgsbqXZCTyRddkXXqADC5Rr53rvNX+ozEOVavplY1MrzCiRrw6YK@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFagIlCrE1cc4IVZKv/p3WTR/xFS57kZNSVdj+0+ygdAe51W/6
+	nKOdPlQ0Pz8G7sZhHZ30TCMAeFLPlPYxc2zIP1qVXdp2aZnNga/d
+X-Gm-Gg: ASbGncueldohMnItShoNCVYiNks3WJhqLxogz/ivPcN87yvWw0Ln9i5TnE16vzi/x6p
+	mcnFQ5rX2tiGY4QX9+0a9SGHpRqX+t6ZndiRVoLC6iRTt/dzuR7VMhtaCIh2CI5t2DOUJMiqnlx
+	6QDZxFFS+VNc+OZTipw8v8mNYBkFo74LEowcFFo5S/LvvYY+gdYafAVVzqOzYDYvpXWmZFGkI91
+	kKS5DWrTOYjxeUL2a3ERrpzk9vAFPrCmZsC84qNb33GIU0HJc6ELK7cjaLY5HlgJre4Xc9Lf72L
+	V7AagPdzruGgw/JWcgiGXmAQcYq2Jdu6bW2O9NveCEjgLKTVi3nABAo4hRnv+vxYza7J5pKe1qK
+	ZtqGMTaqUpWQ8T5t5SNzo8+7Z
+X-Google-Smtp-Source: AGHT+IHthQaWOjyZ9/XK5/O9h+NYJQnb1Hrdj2pr39SOaYj+gPSiHtN3rqVRxG7/5PaWL1ztpEfVHw==
+X-Received: by 2002:a05:6000:2cf:b0:390:f400:2083 with SMTP id ffacd0b85a97d-39973833d3cmr432604f8f.0.1742342369159;
+        Tue, 18 Mar 2025 16:59:29 -0700 (PDT)
 Received: from localhost.localdomain (93-34-90-129.ip49.fastwebnet.it. [93.34.90.129])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-395c83b748bsm19713268f8f.39.2025.03.18.16.59.26
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-395c83b748bsm19713268f8f.39.2025.03.18.16.59.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Mar 2025 16:59:27 -0700 (PDT)
+        Tue, 18 Mar 2025 16:59:28 -0700 (PDT)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -88,10 +91,12 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	upstream@airoha.com
-Subject: [net-next PATCH 0/6] net: pcs: Introduce support for PCS OF
-Date: Wed, 19 Mar 2025 00:58:36 +0100
-Message-ID: <20250318235850.6411-1-ansuelsmth@gmail.com>
+Subject: [net-next PATCH 1/6] net: phylink: reset PCS-Phylink double reference on phylink_stop
+Date: Wed, 19 Mar 2025 00:58:37 +0100
+Message-ID: <20250318235850.6411-2-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250318235850.6411-1-ansuelsmth@gmail.com>
+References: <20250318235850.6411-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,82 +105,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series introduce a most awaited feature that is correctly
-provide PCS with OF without having to use specific export symbol.
+On calling phylink_stop, the double reference between PCS and Phylink is
+never reset. This is OK in the current rudimental implementation of PCS
+as current PCS driver doesn't autonomously handle link termination (or
+actually doesn't handle removal of the PCS driver at all)
 
-The concept is to implement a producer-consumer API similar to other
-subsystem like clock or PHY.
+But this immediately became problematic if the PCS driver makes use of
+this double reference to track if the PCS have an actual user attached.
+If a driver makes use of this and the double reference is not reset, the
+driver might erroneously detect the PCS have a user and execute stop
+operation even if not actually used. (causing unwanted link termination)
 
-That seems to be the best solution to the problem as PCS driver needs
-to be detached from phylink and implement a simple way to provide a
-PCS while maintaining support for probe defer or driver removal.
+To permit PCS driver to detect this correctly, and to better handle this
+similar to how it done with phylink_major_config, set to NULL the double
+reference between PCS and Phylink on phylink_stop.
 
-To keep the implementation simple, the PCS driver devs needs some
-collaboration to correctly implement this. This is O.K. as helper
-to correctly implement this are provided hence it's really a matter
-of following a pattern to correct follow removal of a PCS driver.
+On phylink_major_config, PCS is always refreshed by calling
+mac_select_pcs hence it's save to always reset it in phylink_stop.
 
-A PCS provider have to implement and call of_pcs_add_provider() in
-probe function and define an xlate function to define how the PCS
-should be provided based on the requested interface and phandle spec
-defined in DT (based on the #pcs-cells)
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+---
+ drivers/net/phy/phylink.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-of_pcs_get() is provided to provide a specific PCS declared in DT
-an index.
-
-A simple xlate function is provided for simple single PCS
-implementation, of_pcs_simple_get.
-
-A PCS provider on driver removal should first call
-phylink_pcs_release() to release the PCS from phylink and then
-delete itself as a provider with of_pcs_del_provider() helper.
-
-A PCS declared with a PCS provider implementation can be used
-by declaring in the MAC OPs the .mac_select_pcs with the helper
-of_phylink_mac_select_pcs().
-
-This helper will just try every phandle declared in "pcs-handle"
-until one supported for the requested interface is found.
-
-A user for this new implementation is provided as an Airoha PCS
-driver. This was also tested downstream with the IPQ95xx QCOM SoC
-and with the help of Daniel also on the various Mediatek MT7988
-SoC with both SFP cage implementation and DSA attached.
-
-Lots of tests were done with driver unbind/bind and with interface
-up/down. It was initially used phylink_stop to handle PCS driver
-removal, but it was then decided to use dev_close with
-phylink_pcs_release() as it does better handle interface drop
-and communicate more info to the user than leaving the interface
-in a dangling state.
-
-Christian Marangi (6):
-  net: phylink: reset PCS-Phylink double reference on phylink_stop
-  net: pcs: Implement OF support for PCS driver
-  net: phylink: Correctly handle PCS probe defer from PCS provider
-  dt-bindings: net: ethernet-controller: permit to define multiple PCS
-  net: pcs: airoha: add PCS driver for Airoha SoC
-  dt-bindings: net: pcs: Document support for Airoha Ethernet PCS
-
- .../bindings/net/ethernet-controller.yaml     |    2 -
- .../bindings/net/pcs/airoha,pcs.yaml          |  112 +
- drivers/net/pcs/Kconfig                       |   13 +
- drivers/net/pcs/Makefile                      |    2 +
- drivers/net/pcs/pcs-airoha.c                  | 2858 +++++++++++++++++
- drivers/net/pcs/pcs.c                         |  185 ++
- drivers/net/phy/phylink.c                     |   46 +-
- include/linux/pcs/pcs-airoha.h                |   11 +
- include/linux/pcs/pcs-provider.h              |   46 +
- include/linux/pcs/pcs.h                       |   62 +
- include/linux/phylink.h                       |    2 +
- 11 files changed, 3336 insertions(+), 3 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/pcs/airoha,pcs.yaml
- create mode 100644 drivers/net/pcs/pcs-airoha.c
- create mode 100644 drivers/net/pcs/pcs.c
- create mode 100644 include/linux/pcs/pcs-airoha.h
- create mode 100644 include/linux/pcs/pcs-provider.h
- create mode 100644 include/linux/pcs/pcs.h
-
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 76b1a329607b..eef1712ec22c 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -2589,6 +2589,9 @@ void phylink_stop(struct phylink *pl)
+ 	pl->pcs_state = PCS_STATE_DOWN;
+ 
+ 	phylink_pcs_disable(pl->pcs);
++	if (pl->pcs)
++		pl->pcs->phylink = NULL;
++	pl->pcs = NULL;
+ }
+ EXPORT_SYMBOL_GPL(phylink_stop);
+ 
 -- 
 2.48.1
 
