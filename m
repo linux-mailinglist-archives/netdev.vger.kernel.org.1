@@ -1,132 +1,161 @@
-Return-Path: <netdev+bounces-175798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04F8CA677DC
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 16:31:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BC6CA6780C
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 16:38:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 537C717E620
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 15:31:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3FA2188B31B
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 15:36:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C18E2101AF;
-	Tue, 18 Mar 2025 15:30:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F52317A30D;
+	Tue, 18 Mar 2025 15:36:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XUoW4tge"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="1sFfj+tS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B87320FABC;
-	Tue, 18 Mar 2025 15:30:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E677D20E333
+	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 15:36:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742311848; cv=none; b=dKX2nyr8ttPrMyeW7WaMiFG7FJ3PRiBg6ubibQ5bLR0Q7UOUiouqxU5kSnto9gg2M1Pn9y5MVAakRDsHz9W8sYl2tcmp+kfXymWh6HK4bDd9g71BIMBop/AP15z7d6wwTSl2+Qi0EfB/3QFBw6MUWBAhPUSH4NK5S3Dh+nFCU1o=
+	t=1742312195; cv=none; b=IEE6SxjVX96ACbp6XSP5CsqGraJaNXz7Pn8mkmhNpXt+qCjcYZ1PESPNSFwkE3fPbBFQ0gLc246YWQwzAZscJlGrBo2mJrwcfezuT46cGFl5x/YXi7LdGbOOCgT2okVaQ18ZSMhjVRqT9U6YQqOvIjIC8QKE1iWGujQ1S36yBP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742311848; c=relaxed/simple;
-	bh=HVBz2aT+/RHcd9VZQ6XrEog43pPGxZQceGs8IeJP6oc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n2lyeSIOmBFI8YJmkufdqXNF2r27xJXut8GcvErvsLfjnSCQQBqEflFHjyzR9cdOO/i8F5K1JpXvO4SjH746Uv0aI6UPs59lHoO2g4FrVa2ZFdwxs4JOMFZJBF7AfgVkRzzlAHV/+wOWZIYga88fbX/LfdHH+gqmvIPGCCdXq34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XUoW4tge; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0244DC4CEDD;
-	Tue, 18 Mar 2025 15:30:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742311848;
-	bh=HVBz2aT+/RHcd9VZQ6XrEog43pPGxZQceGs8IeJP6oc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XUoW4tgeJI1qkqHA8wzUVgYQSoY+aOz8Q2mvlmnDsT5jlUIWvVvsDrwcAh+mvdJcm
-	 FchVJjLo9kTuxGacsk79c7OAUx7NJO7BGusb58YMjDYBAaFqR3a5jariprgb4DkfTH
-	 Y4Abf0av5IvwjG3TkwPUayTU/4+zYb3JUSs5x20FqUwAe5P9ifDprpWqiqeJZING8T
-	 NT1bfAo3ZBnaTXUfdUFYE/P3Q4koEGvV4PrKANZ4bk+PMB93RQTfbHOAf5evdgKIqy
-	 t/cBbkemhscPWWaViv47JUZikUvLqPE6HgfRL4/G5oymAbGbo3Hlvc93ImhCmfDcKF
-	 iWkA4ztEDM2fA==
-Date: Tue, 18 Mar 2025 15:30:43 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jonas Karlman <jonas@kwiboo.se>
-Cc: Heiko Stuebner <heiko@sntech.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	David Wu <david.wu@rock-chips.com>, Yao Zi <ziyao@disroot.org>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-rockchip@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/5] net: stmmac: dwmac-rk: Add GMAC support for RK3528
-Message-ID: <20250318153043.GE688833@kernel.org>
-References: <20250309232622.1498084-1-jonas@kwiboo.se>
- <20250317194309.GL688833@kernel.org>
- <db3bf1cb-3385-4676-8ba4-41fea0212bf2@kwiboo.se>
+	s=arc-20240116; t=1742312195; c=relaxed/simple;
+	bh=c0GfpY34SerzYckqCnK50cpckfKuGiwAC1p2R/P9T/k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dwyacgNDqJiy+IzbRbizPIWJQ2pCEztcp4w3UVMs1UwW6zpXUjfeXm1FxB15sQ+dgcZgnB81p8EGPqwKnXhrVw4PV4YBaOT5TBnLXbULQAmwkCKVD6tfxwu53pkPnpWiUniKvyX8n5CweJk376ZAHFupiowNsqVMG4rDSpmQ4uw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=1sFfj+tS; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43cf05f0c3eso26439935e9.0
+        for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 08:36:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1742312191; x=1742916991; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CjxeQqNvUz3OAMLVjVwur7a7aHj79kadNmROEZ2qm+c=;
+        b=1sFfj+tSc5jiy19F4rDVl0ESA5AxHx4dKtOj9+velZSwSClTWeccWiRhZBF+PCdStm
+         yxQNj+D3b3qwwd9JPfJdEaUmLkm7j4jNG2zW/khoK7h9xYUyqENHzSQPp15kJJDv+z9W
+         U6k4fT8koOZ1izRqHMY6Nsf2XYqTlC4CexIPRbtXkDjnci/RXNdJUxX49/+U5iXH3NlG
+         AAdVhyQhD1rHBt8cjI55FatAsPBgK11E06ykMmvUyEJFChURf1ozzHKGsmsHznUKJfNs
+         aQ5w/ZfEJThpzBeyIPbh3juRgixnqU/JpW5mCMnBZh9HgOwYE4gHXg+3eBr5H7NEcpFs
+         T1XA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742312191; x=1742916991;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CjxeQqNvUz3OAMLVjVwur7a7aHj79kadNmROEZ2qm+c=;
+        b=tBaPxiqyYdwFb4uRARKYvB7wXe/A1CWsBYhbEdCgocP7UAc1i0v6gw3mBRPqouqHn9
+         Wck3KtbwbfRrB9o+0zIH5xikIGw60jfXdovqYFz8Nz9QEdEgiM8d0vEJ0+/UwBFDWsPs
+         uDiciQe52sAbfLaCRctvl9R9OgYy0mExDfbkhU1Zn5idlQju4yzt/JHWxyICoepC5AFA
+         1fNtAGDF4qd6QFYQ+x7oKUyOogYIc7JhH9qYMmMsScuw2N56O9tnf4xlMHESvQIwFpir
+         vH5733sSkMJp6QjHNAhuTVl0xtIMNAhLteYdsHt8uX+a5xzQ13DUOTiAvLm0xyRxxWaV
+         zGNg==
+X-Gm-Message-State: AOJu0YxZlUwYJVCY5h9EcZahun4ip4ccayUXOXqKmrCEK3USoUBrrFSy
+	JB3sWnzXzUXJn1nOygEIYlxo/8F9mRODIGPjTibvQxttAwjmN75h3AE083CtsmWLrbKtrbvuFy0
+	2
+X-Gm-Gg: ASbGnct4Slo0Y9z+xoLs0elPoMmjqVryXTBpSnh9WvhS3nqtNhG/VPK77Bzrjc6B6aF
+	Zy1+liBebLKXKEdBT1sJeRZq19swXyA8j7Mnh1jt0H7lLEEs/tidwvhUP8tugkzIjoaBgEECZHl
+	NFCao6SJZ01POz60sDZWkfBenunEgfWUk/hz5zIQgIkUivqwmfb7QGI+dW2LS5Jh5K5C230oj6k
+	2i7Z1P5+TUwOQeufZ9uZUvO0PXvSXkuIFK27WrVczdDTONSB4WhB69soW2xP6VFqrmqlI7xTMEe
+	S9ymw2LNON7OFOX4UdZ3sJ5IxTf9LF3Bs/0Prg==
+X-Google-Smtp-Source: AGHT+IEOfbE3ER4vOVrbkAE+m+TRaJamKqBWJGSzHLvvrnqpmxx6/iPY2P3BjfmPDT43Kv0wtZUcyQ==
+X-Received: by 2002:a05:600c:310e:b0:43c:fc04:6d48 with SMTP id 5b1f17b1804b1-43d3b7c9a0fmr31279315e9.0.1742312190963;
+        Tue, 18 Mar 2025 08:36:30 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d1fe60965sm138325085e9.25.2025.03.18.08.36.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Mar 2025 08:36:30 -0700 (PDT)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	saeedm@nvidia.com,
+	leon@kernel.org,
+	tariqt@nvidia.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	donald.hunter@gmail.com,
+	parav@nvidia.com
+Subject: [PATCH net-next 0/4] net/mlx5: Expose additional devlink dev info
+Date: Tue, 18 Mar 2025 16:36:23 +0100
+Message-ID: <20250318153627.95030-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <db3bf1cb-3385-4676-8ba4-41fea0212bf2@kwiboo.se>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 17, 2025 at 08:50:34PM +0100, Jonas Karlman wrote:
-> Hi Simon,
-> 
-> On 2025-03-17 20:43, Simon Horman wrote:
-> > On Sun, Mar 09, 2025 at 11:26:10PM +0000, Jonas Karlman wrote:
-> >> The Rockchip RK3528 has two Ethernet controllers, one 100/10 MAC to be
-> >> used with the integrated PHY and a second 1000/100/10 MAC to be used
-> >> with an external Ethernet PHY.
-> >>
-> >> This series add initial support for the Ethernet controllers found in
-> >> RK3528 and initial support to power up/down the integrated PHY.
-> >>
-> >> This series depends on v2 of the "net: stmmac: dwmac-rk: Validate GRF
-> >> and peripheral GRF during probe" [1] cleanup series.
-> >>
-> >>
-> >> Changes in v2:
-> >> - Restrict the minItems: 4 change to rockchip,rk3528-gmac
-> >> - Add initial support to power up/down the integrated PHY in RK3528
-> >> - Split device tree changes into a separate series
-> >>
-> >> [1] https://lore.kernel.org/r/20250308213720.2517944-1-jonas@kwiboo.se/
-> > 
-> > Hi Jonas,
-> > 
-> > This patchset looks reasonable to me. However it will need
-> > to be reposted once it's dependencies ([1]) are present in net-next.
-> 
-> The dependent series ([1]) has already been merged into net-next [2].
+From: Jiri Pirko <jiri@nvidia.com>
 
-Thanks, and sorry for not noticing that.
+This patchset aims to expose couple of already defined serial numbers
+for mlx5 driver.
 
-> Do I still need to repost this series?
+On top of that, it introduces new field, "function.uid" and exposes
+that for mlx5 driver.
 
-Yes, I think that would be best so there is a CI run over the series
-(the CI doesn't understand dependencies).
+Example:
 
-> [2] https://lore.kernel.org/r/174186063226.1446759.12026198009173732573.git-patchwork-notify@kernel.org/
-> 
-> > 
-> > And on the topic of process:
-> > 
-> > * As this is a patch-set for net-next it would be best to
-> >   target it accordingly:
-> > 
-> >   Subject: [PATCH net-next] ...
-> > 
-> > * Please post patches for net/net-next which have dependencies as RFCs.
-> > 
-> > For more information on Netdev processes please take a look at
-> > https://docs.kernel.org/process/maintainer-netdev.html
-> > 
-> 
-> Thanks, I see, netdev seem to use a slight different process than what
-> I am familiar with compared to other Linux subsystems and U-Boot :-)
-> 
-> Regards,
-> Jonas
-> 
+$ devlink dev info
+pci/0000:08:00.0:
+  driver mlx5_core
+  serial_number e4397f872caeed218000846daa7d2f49
+  board.serial_number MT2314XZ00YA
+  function.uid MT2314XZ00YAMLNXS0D0F0
+  versions:
+      fixed:
+        fw.psid MT_0000000894
+      running:
+        fw.version 28.41.1000
+        fw 28.41.1000
+      stored:
+        fw.version 28.41.1000
+        fw 28.41.1000
+auxiliary/mlx5_core.eth.0:
+  driver mlx5_core.eth
+pci/0000:08:00.1:
+  driver mlx5_core
+  serial_number e4397f872caeed218000846daa7d2f49
+  board.serial_number MT2314XZ00YA
+  function.uid MT2314XZ00YAMLNXS0D0F1
+  versions:
+      fixed:
+        fw.psid MT_0000000894
+      running:
+        fw.version 28.41.1000
+        fw 28.41.1000
+      stored:
+        fw.version 28.41.1000
+        fw 28.41.1000
+auxiliary/mlx5_core.eth.1:
+  driver mlx5_core.eth
+
+The first patch just adds a small missing bit in devlink ynl spec.
+
+Jiri Pirko (4):
+  ynl: devlink: add missing board-serial-number
+  net/mlx5: Expose serial numbers in devlink info
+  devlink: add function unique identifier to devlink dev info
+  net/mlx5: Expose function UID in devlink info
+
+ Documentation/netlink/specs/devlink.yaml      |  5 ++
+ .../networking/devlink/devlink-info.rst       |  5 ++
+ .../net/ethernet/mellanox/mlx5/core/devlink.c | 62 +++++++++++++++++++
+ include/net/devlink.h                         |  2 +
+ include/uapi/linux/devlink.h                  |  2 +
+ net/devlink/dev.c                             |  9 +++
+ 6 files changed, 85 insertions(+)
+
+-- 
+2.48.1
+
 
