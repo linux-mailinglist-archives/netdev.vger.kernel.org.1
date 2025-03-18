@@ -1,564 +1,180 @@
-Return-Path: <netdev+bounces-175905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E5B7A67F39
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 23:05:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1CFEA67F48
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 23:08:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3F4317800C
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 22:05:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 527A83B6877
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 22:07:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0B9E205AD2;
-	Tue, 18 Mar 2025 22:05:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCD15206F19;
+	Tue, 18 Mar 2025 22:07:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e01gNm3a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XCKNwzyn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CD6DF9DA
-	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 22:05:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742335530; cv=fail; b=tsfCVHJSO3moPWQu6cwX1Q9M166GwFCRpsYNq6M7p4GeA7zZ9FyO52HERKnYV2jPIna9Jt6ffSFpbP1Cv3RbXqw7oVuKOc++4fPA/56TPjWLl/gIvl5y0pxUQRdfz9Ed2m/ARyf0EAEy5UKPNkUSbVDAmp/nQixgRwW9B/PB2S4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742335530; c=relaxed/simple;
-	bh=LWgwwNjvrmpRL0LS44xexKDWuwCFSu0ioAb6+bgl0f4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=DE55q/VZm3ycGp7taiafuvdSZFt9Hyki8bD2rhuneiW9mp8U+IWrd118JlWH3GnvfYzmwS2Rg0fkY57K7GkrQDH9vlvlk+OAdQy9fo9fAcqU6gSXYCtE18lfbP2S5xUp+lwf2K3UIKq/YnDClri6mW/T51T6bw9b4HhfnL9UMC0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e01gNm3a; arc=fail smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1742335529; x=1773871529;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=LWgwwNjvrmpRL0LS44xexKDWuwCFSu0ioAb6+bgl0f4=;
-  b=e01gNm3a6kPHSBKyaU1fIwvbmXqsthbpDY4NxeBE90UHZpeVnv6VnHBU
-   UlAuskIo7M+JZKD14GW5S3djS4cwtZEVyjKIzBaufn3n7wzFBm2Y9yBW1
-   uOMeHvPWr7BTm/h9/oZgH5EEDovedisv7w01z2Cu9AWNaWZRFnodoklca
-   4/nngaf/vsJbAFxDGNN4d0DgCZ3HQmn4d7vTknsiqa0kgb0i0yxqGbRPo
-   7qdqSCoNon6uL0pz6l5TsMsVcr3RW0l6hU6YkoEdapImg+Ui/cEsKfcbN
-   ew8OTrrngGigbsChn/U6lp6EaMQE0vQAvZnnlafDna7ivjpTnP9n+3V3N
-   g==;
-X-CSE-ConnectionGUID: oG1NXd41Ty6FwN5ly5OdtA==
-X-CSE-MsgGUID: 2AcZW5IgQFWZYiFm9LJ/fg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11377"; a="43235672"
-X-IronPort-AV: E=Sophos;i="6.14,258,1736841600"; 
-   d="scan'208";a="43235672"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2025 15:05:28 -0700
-X-CSE-ConnectionGUID: KTK96JkvTx6hjYe7vsKJbg==
-X-CSE-MsgGUID: bjvULAxITOqSaJvF+KYPhA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,258,1736841600"; 
-   d="scan'208";a="159547616"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2025 15:05:28 -0700
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.14; Tue, 18 Mar 2025 15:05:27 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Tue, 18 Mar 2025 15:05:27 -0700
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.44) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Tue, 18 Mar 2025 15:05:27 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=u3B+Y7b3zSxSHqqFPZjMc3ozjKML+B0VZHxCQqw3FGlTTz0KV4Kqq3hJhW6jmsj0V2ZiakK6rcR7LF9lpCuwkFf7B+A2M/yLsyTTZrK2H7Us3o3Gt9f7HLMLWAPrA2QXeVscTep/DeJ15i9ZO4waGKYPP0Lm6j/WYZce3eibgzKW0DjofiIf77vN52rB0ioH3zcgnJ4h/2HQO/0g7W/PyTcmuPkCZaYYhPoFk5bXccNUqV/w6BCNIgUTP4z1cnhsAa533Dybve22BkSntnm5Z8Qi4iu6Qp6UE5yp/ChLhcKskwD/4ZJ+wZ91mFD0enH/qQE6qdXDZZQw8zHlEmKMTg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2sS+ynj7ilN+3/r58myLKcCbWUo8WAIFhS/B6NA4zek=;
- b=a3J/0kYdHzpo1HR+lSXHdFF7COxhs/n8TX92A+SdMWwLeWI96Dg+Wfq/+2bUy7Eaao/0Rzvi7HzGfccCHbO/7LiU+hzyRMz1lmi26KnNwoTB9U/FKfIvUhvfd1rMf9Kp1mwCNep2eHAabv+J5pjokXbioL3SbER5EfT3Nr3aM2sewHi7j6xzv55HPEQ5qg/hEanvsd1l/i2ogxpI09yc3xi8ZkOUldgxLxaWw/iIddC4kbxDq5CBbbbHx2at9O+3oOy3ZZFYCW6v1/+f+pYcjWDs9XxaQsYxCUloZ6XdbwjiulMP874pTmuTfmxHVX4c6/hIg0VIMVafeR+QMr8mSA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by SJ0PR11MB5184.namprd11.prod.outlook.com (2603:10b6:a03:2d5::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.33; Tue, 18 Mar
- 2025 22:05:23 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8%4]) with mapi id 15.20.8534.034; Tue, 18 Mar 2025
- 22:05:23 +0000
-From: "Keller, Jacob E" <jacob.e.keller@intel.com>
-To: Jiri Pirko <jiri@resnulli.us>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: "davem@davemloft.net" <davem@davemloft.net>, "Dumazet, Eric"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "saeedm@nvidia.com"
-	<saeedm@nvidia.com>, "leon@kernel.org" <leon@kernel.org>, "tariqt@nvidia.com"
-	<tariqt@nvidia.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"dakr@kernel.org" <dakr@kernel.org>, "rafael@kernel.org" <rafael@kernel.org>,
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, "Kitszel,
- Przemyslaw" <przemyslaw.kitszel@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "cratiu@nvidia.com" <cratiu@nvidia.com>,
-	"Knitter, Konrad" <konrad.knitter@intel.com>, "cjubran@nvidia.com"
-	<cjubran@nvidia.com>
-Subject: RE: [PATCH net-next RFC 2/3] net/mlx5: Introduce shared devlink
- instance for PFs on same chip
-Thread-Topic: [PATCH net-next RFC 2/3] net/mlx5: Introduce shared devlink
- instance for PFs on same chip
-Thread-Index: AQHbmAPpzfoItpIqX0GHVOB42/z0m7N5cs1A
-Date: Tue, 18 Mar 2025 22:05:23 +0000
-Message-ID: <CO1PR11MB5089BDFAF1B498FE9FDDA3FCD6DE2@CO1PR11MB5089.namprd11.prod.outlook.com>
-References: <20250318124706.94156-1-jiri@resnulli.us>
- <20250318124706.94156-3-jiri@resnulli.us>
-In-Reply-To: <20250318124706.94156-3-jiri@resnulli.us>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CO1PR11MB5089:EE_|SJ0PR11MB5184:EE_
-x-ms-office365-filtering-correlation-id: 8839f2d0-9f91-4578-51e8-08dd6668fb18
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?Oo1n4B68Q45hT+/y7OV6hhpdoUZGB9bsvcuD/CvccH/GlQNF4Z1WM4Pg/Ij4?=
- =?us-ascii?Q?pBmfuFdr5hpRL40KPCwkxOB96ry9BJqw1X2LKAbStBL/PLl95zGEiiP79oUS?=
- =?us-ascii?Q?r/6Y915SSmmhbQFVv7W5RmsDnfC6gsgGXeqOBod9OcYYb0fbR5rOJN9mHFB5?=
- =?us-ascii?Q?swmIuKz2hCHUPagt9vkXrbIX+FKPYBdYTOGGbTxIfVdpRH/ufXb1fB4rIv9h?=
- =?us-ascii?Q?FcVB1tFcXoLxWwOn7+CGeJPZmuhQ6FX8a7XIObzm/JLDQPseieJPxprZPBB7?=
- =?us-ascii?Q?npHaW3L7Ez3ocxNtJ7y1xzr1uUv+mfH2OgZNWPgjdHUmwIGM6VQABzTzAAlA?=
- =?us-ascii?Q?CVG3BdacNzdZ+32DtjUn6ykMDjcdlAiDb71T+cI0UzHQhmjcoOKmlGXfIwoT?=
- =?us-ascii?Q?laK7jeQ8u86QJi/JCCnHT7Cl+2IgcfNbK/uUj8g08S3rWPTOb/k5dI4BG2Tp?=
- =?us-ascii?Q?3gxT1OgvozRfY+VfMWRlZzXNkVyOnzO15+wlDcXzNdHkX7uex57wfSVvEDQi?=
- =?us-ascii?Q?qAk8eVCxBPOG2bE9VYTkh3z92a1U8J08eTyPRld2W7ewgQZuCKdKu/n18qK9?=
- =?us-ascii?Q?n14Mk5MQGASOxYBzC5VscQGM81nXoRz/v2vhLsxqWQVVTnLKeYGFqUpBcyL8?=
- =?us-ascii?Q?ks2FnSYy53NWGxb1czWVfdesC0nstD2tvLsIAXzP5FGW3qtfLB8KhbwNzxWX?=
- =?us-ascii?Q?Wa0DrzSUGJ5OXW+OW43752lT+SC65ltvwNlx3eupjLxNA6y/fJf4OVLr3bwD?=
- =?us-ascii?Q?fgBVit9mHvV055j9ZZa6hF8pPJ/Dj/8AzkacyalDfGuk+nLeSpa+IDq2mG70?=
- =?us-ascii?Q?4sHTszqlt8aBRaVZTHvXwCrhC4z4yJLQH9OQQnl7HZSf0jabO+dX33TfWXL+?=
- =?us-ascii?Q?cktcs0/xgQ+Gvjvh2p08OPb501e73/f+ASsy//qw50/PRsIGSfxggazWRAtj?=
- =?us-ascii?Q?wSMAi0HsxvwKK3D4RBBNxToUO5wwzrpVqCP2oxiIfB6okB+tn7LDx2jyiCUn?=
- =?us-ascii?Q?Lj5sNssBPEZBoeLsPQsUaab1b30wLPTTzCRbNLmcDJfpQoP7nhAVILbv1oV/?=
- =?us-ascii?Q?xRMUc4C25uq1mmeZYJeXvJceVqOShHJEvTVwsMzvuXlQOWHp6FY+zLruUOpx?=
- =?us-ascii?Q?5fl4nNF1MzB+mrh/IpFNcM2r0kqfiI0iaBlhO+7eaALMJSELSP8094NPxS7y?=
- =?us-ascii?Q?ZA8ON2ruqOOqPsXs9jK5ieiVWQ64mgI30N/yMveDpvArMn6Uww1bQ/P78ofz?=
- =?us-ascii?Q?0Ajg1Qp+PHgfx+wYunO25a33IYdSqkQ/VMD7FWMpV2sk7LXx9i25rKP5FC+w?=
- =?us-ascii?Q?dLm1c1D6lYm0iPkMvvs46LP/qJ5MQ5cJUCOkeIWVR9NtBYp8ri/0uAuQ6KZn?=
- =?us-ascii?Q?bV/+vyEzvaeQ6OIqEOuk6y8m+cecgVWk3GaMFh/2hS6YcFVs53LIbieBeYKf?=
- =?us-ascii?Q?upW0WorbyFEmQAwZcllEEZjYC8v915Mn?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?k7yuO+slOPTyfUbuFU1CVENl9n5joYgn2a/hVjgeOzafes5mh/boUi1PX07O?=
- =?us-ascii?Q?czdKkbfHn+4jk3KGw2ye/wDQpr/5yZvaSos4iyw6dUaerQIxSOTZFQErGmjQ?=
- =?us-ascii?Q?xiS2YBysEoQZBDU/iWW1wPvDQIjFpihTo/8RM1JHbMtTMiTCbT1LJoM7x6es?=
- =?us-ascii?Q?JjA9vNL2Op5yQr07eUOmLcn0d3wPYpTR2TguA/2nNJeJXg/A915pZLH5Ml0E?=
- =?us-ascii?Q?CFb5RaAnjkm09pK7/lWHNGvgCA0uXK/HAtadj9u0XkCWZId52maQlPRHDMkP?=
- =?us-ascii?Q?RB+PAzAOkZ/itjx6GM3S7cIqjI2Ff9eNEThITbx+2meBCkM3uznzpFdsVMWC?=
- =?us-ascii?Q?m/mpKxWnsgSBGxZZDErrqJOl9lyRP3dR+3edwcWODVnEBPIDFamCP9f+kdBM?=
- =?us-ascii?Q?wbBX8hmsSaSJ//xXCfm9wRm+YR1xx606KO5d98J7Pi5Z3+RepHY+i0D54cJ7?=
- =?us-ascii?Q?s2TVwXfiIXDPkY3LIDbViM5uxoM6rHDn1qotSkahe9Cf5tB+b1IDqwGAH/nq?=
- =?us-ascii?Q?KD2LFqx2T6Kpyl51g5Gg0i/Io5hnHGblHMLV02YkCRMlZW5UykdOPDKHo0Hs?=
- =?us-ascii?Q?2xKg1BSzOWXqNXuhdxJJM2O35b7yPYS21f6B7loYK4ewMnIsVyewQFDNs3D1?=
- =?us-ascii?Q?k9j1+NVeONx4aD5Ss5FIIHgV8l6ciIGO4VESsbVJYBPXTf+88LDa4THiaG6M?=
- =?us-ascii?Q?YR1guIa7JO9ceJfk5PA8wbBwkePNqh+b/3HAkbV+8rOXy4fveejwPinDlASO?=
- =?us-ascii?Q?zhA5pDEsgBTqMQMiNok11i3oiBz7gFBjV5vb0wjz+N7Qemf5pKeqauREFkK0?=
- =?us-ascii?Q?nau2oYc1zjY5xmAAmYsDwW3SF7sy7NoEhlwZdSHwt74HRCNFXRvaZ0MlHT0I?=
- =?us-ascii?Q?JHAHWX1L0Ck0G/8621iD2lH9x8ZE9stIMcN11ItW9cTjRMZ/MDPutaIe0E3x?=
- =?us-ascii?Q?pQg8PssqFDN4lXc1H01eGG0u1F7DlC8VRC/5k2LFXafHjjljvpzFpmYCf6mc?=
- =?us-ascii?Q?Bl2ycjx/Nw/ajM46RgnszyT2dQ/UEzxh/uDGGH7fVAaNad2Oplopzzft9/K5?=
- =?us-ascii?Q?9bvgpu/CN301/htalLxGSUonm2ySMYAED0NvTrG00QSXOLNmguMJZtJewtmH?=
- =?us-ascii?Q?g/NjVYB1EYmp4UZQwRDZrHAqQtQGi7W1a8hFsi92zhkxQONfmcR8cNPZjPlR?=
- =?us-ascii?Q?tNiW5VTg8/PQjiLeCjdJXSXGk1TQ+WvkwpgttFysofFD/+llV6RU31gbCe/L?=
- =?us-ascii?Q?MrAQpsRxkpC/FcHjCjfjLLlU4W1FnGQ8aInU9gFnTUHAItzK8zk6EHRDgIAB?=
- =?us-ascii?Q?ZpEjMJ3anj69K3YNGN8cjVHA/yKJOaDfbQB0a1tChvVXT4zMWfltI2shErOI?=
- =?us-ascii?Q?AqTlXTDbV/rDAarfDcBZUhaltevlfwTXq7VkyoaF1+syD8IR9lskW+qEYsTF?=
- =?us-ascii?Q?+z6mjt8UnDnlbYYNCo9OsAQglS441xAiXsBe+30uQ8z4R1P8dEQNlEBCmA3y?=
- =?us-ascii?Q?iysp/czDgkJiv4Eae4iPUCE+64gI1RIdXZH9Bz1kkOjAFCdaqNx/65hlO+bm?=
- =?us-ascii?Q?JlPLMxQaWTIOXv0wwnXxweWc9cekt1yc4Sbe5PjZ?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B356C2066EC;
+	Tue, 18 Mar 2025 22:07:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742335638; cv=none; b=uTk5ZjvIEWetEd/Jy9+/AEczQNTijDRfiHNDlpoUFcMA7gvDS9iUaTQl3LTHC2YY4xSwMyEcTBf3aT5BGWvBY2oWWy5o/vfjlR1VZcmqQo04i7P+UT5z0zJ8ME6QxZ6ad4ghMSmL7ndB1kaLlx2Qhy38eJK7LYTti3GVZFMRBX0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742335638; c=relaxed/simple;
+	bh=fuSRRLCgAuHKfgkb7sAtUwteFXpUie9s2v2hW3tLt7w=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=RwJxint1dj3Iv8WXKxh0RLdwMbh5QiejeR1BosvpJSHLFvXENZVx7M8NIijG1Ij3JWyhACZhPGKuoBYHdnt2DYyzw7NOBoOGxHlsKPVZptbwujZlQY09Ut11NpKcZAd+DfepfIDbRdZuJwmB0sg/1k4ofl0sIlDPwEra/MjO6i0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XCKNwzyn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0EE00C4CEDD;
+	Tue, 18 Mar 2025 22:07:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742335638;
+	bh=fuSRRLCgAuHKfgkb7sAtUwteFXpUie9s2v2hW3tLt7w=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=XCKNwzynzsCPNPcR8XmSOqy5CVI1WWVVBMGN9NtMUpHdu5Pj1UyqJkw/dhL2G2K+N
+	 z37NCozVZimajjoE5ZsAjMeD/krxL9yxjiMynDiFme0YkRKnQTzY62lygqEOKEnfil
+	 WpnIEM7guT0ipZu3BsQsqiW7fLq1xhltrJs2QIlozJPpKhoJnlSYoiLvOC9ndcz5fL
+	 W+tl36sSqlZm/yrFB6VUIlMFRZ3xtqrkieRmJqwRmI8EsrSR4sEqc1c0oi0MBK9Zj3
+	 av6F9j9KAOceV9Qd7uFRgIyyltPv8UJ+fi4JD5HIUeoX2gwjF+mEdtPYALm553Y97l
+	 4WVm0pXt16qMg==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8F21C35FF3;
+	Tue, 18 Mar 2025 22:07:17 +0000 (UTC)
+From: Hans-Frieder Vogt via B4 Relay <devnull+hfdevel.gmx.net@kernel.org>
+Subject: [PATCH net-next v6 0/7] net: tn40xx: add support for AQR105 based
+ cards
+Date: Tue, 18 Mar 2025 23:06:51 +0100
+Message-Id: <20250318-tn9510-v3a-v6-0-808a9089d24b@gmx.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8839f2d0-9f91-4578-51e8-08dd6668fb18
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Mar 2025 22:05:23.1251
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 8dch3mDet50l2VslXEC3K8w8mUtdvTyhUP05v16di43aP8ZRomGz6er/whlPEFfn2HFc0MzgWISST4v1Zz5RpP+aNCebJdTeHelnf+FAZdw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5184
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHvu2WcC/1XNTQ6CMBCG4auQrq3pP9SV9zAuCkyhC4ppSYMh3
+ N1CNMJyMnm+d0ERgoOIbsWCAiQX3ejzoS4FanrjO8CuzTdihAnKqMKT15ISnLjBrLENrWSrKmJ
+ RBq8A1s372AN5mLCHeULP/KlNBFwH45t+GxuM8xvoXZzG8N7jie/s2ymPncQxwaKVYJVVlQJy7
+ 4b5mgP7dhIHyOgJigxbY62tdG1KU56h/EFJGGMnKDPUmitJRAmc6D9c1/UD0rIKOzUBAAA=
+X-Change-ID: 20241216-tn9510-v3a-2cfc185d680f
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Hans-Frieder Vogt <hfdevel@gmx.net>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1742335636; l=4709;
+ i=hfdevel@gmx.net; s=20240915; h=from:subject:message-id;
+ bh=fuSRRLCgAuHKfgkb7sAtUwteFXpUie9s2v2hW3tLt7w=;
+ b=m4k+HQ2xY+rjO5FT0aVg4u+UnpLTAxchkqtcWzSCb41gU4uIWDkegFhbLFQaQPapO9CiJ/2Dl
+ LQrXSKRe/LYBFEhAU4ZueosDmcZGw2OTgluIvgMChTnoxzfb1jKhphI
+X-Developer-Key: i=hfdevel@gmx.net; a=ed25519;
+ pk=s3DJ3DFe6BJDRAcnd7VGvvwPXcLgV8mrfbpt8B9coRc=
+X-Endpoint-Received: by B4 Relay for hfdevel@gmx.net/20240915 with
+ auth_id=209
+X-Original-From: Hans-Frieder Vogt <hfdevel@gmx.net>
+Reply-To: hfdevel@gmx.net
 
+This patch series adds support to the Tehuti tn40xx driver for TN9510 cards
+which combine a TN4010 MAC with an Aquantia AQR105.
+It is an update of the patch series "net: tn40xx: add support for AQR105
+based cards", addressing review comments and generally cleaning up the series.
 
+The patch was tested on a Tehuti TN9510 card (1fc9:4025:1fc9:3015).
 
-> -----Original Message-----
-> From: Jiri Pirko <jiri@resnulli.us>
-> Sent: Tuesday, March 18, 2025 5:47 AM
-> To: netdev@vger.kernel.org
-> Cc: davem@davemloft.net; Dumazet, Eric <edumazet@google.com>;
-> kuba@kernel.org; pabeni@redhat.com; saeedm@nvidia.com; leon@kernel.org;
-> tariqt@nvidia.com; andrew+netdev@lunn.ch; dakr@kernel.org;
-> rafael@kernel.org; gregkh@linuxfoundation.org; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; Nguyen, Anthony L
-> <anthony.l.nguyen@intel.com>; cratiu@nvidia.com; Keller, Jacob E
-> <jacob.e.keller@intel.com>; Knitter, Konrad <konrad.knitter@intel.com>;
-> cjubran@nvidia.com
-> Subject: [PATCH net-next RFC 2/3] net/mlx5: Introduce shared devlink inst=
-ance for
-> PFs on same chip
->=20
-> From: Jiri Pirko <jiri@nvidia.com>
->=20
-> Multiple PFS may reside on the same physical chip, running a single
-> firmware. Some of the resources and configurations may be shared among
-> these PFs. Currently, there is not good object to pin the configuration
-> knobs on.
->=20
-> Introduce a shared devlink, instantiated upon probe of the first PF,
-> removed during remove of the last PF. Back this shared devlink instance
-> by faux device, as there is no PCI device related to it.
->=20
-> Make the PF devlink instances nested in this shared devlink instance.
->=20
-> Example:
->=20
-> $ devlink dev
-> pci/0000:08:00.0:
->   nested_devlink:
->     auxiliary/mlx5_core.eth.0
-> faux/mlx5_core_83013c12b77faa1a30000c82a1045c91:
->   nested_devlink:
->     pci/0000:08:00.0
->     pci/0000:08:00.1
-> auxiliary/mlx5_core.eth.0
-> pci/0000:08:00.1:
->   nested_devlink:
->     auxiliary/mlx5_core.eth.1
-> auxiliary/mlx5_core.eth.1
->=20
-> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
-> ---
->  .../net/ethernet/mellanox/mlx5/core/Makefile  |   4 +-
->  .../net/ethernet/mellanox/mlx5/core/main.c    |  18 +++
->  .../ethernet/mellanox/mlx5/core/sh_devlink.c  | 150 ++++++++++++++++++
->  .../ethernet/mellanox/mlx5/core/sh_devlink.h  |  10 ++
->  include/linux/mlx5/driver.h                   |   5 +
->  5 files changed, 185 insertions(+), 2 deletions(-)
->  create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
->  create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.h
->=20
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-> b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-> index 568bbe5f83f5..510850b6e6e2 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-> @@ -16,8 +16,8 @@ mlx5_core-y :=3D	main.o cmd.o debugfs.o fw.o eq.o uar.o
-> pagealloc.o \
->  		transobj.o vport.o sriov.o fs_cmd.o fs_core.o pci_irq.o \
->  		fs_counters.o fs_ft_pool.o rl.o lag/debugfs.o lag/lag.o dev.o
-> events.o wq.o lib/gid.o \
->  		lib/devcom.o lib/pci_vsc.o lib/dm.o lib/fs_ttc.o
-> diag/fs_tracepoint.o \
-> -		diag/fw_tracer.o diag/crdump.o devlink.o diag/rsc_dump.o
-> diag/reporter_vnic.o \
-> -		fw_reset.o qos.o lib/tout.o lib/aso.o wc.o fs_pool.o
-> +		diag/fw_tracer.o diag/crdump.o devlink.o sh_devlink.o
-> diag/rsc_dump.o \
-> +		diag/reporter_vnic.o fw_reset.o qos.o lib/tout.o lib/aso.o wc.o
-> fs_pool.o
->=20
->  #
->  # Netdev basic
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c
-> b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-> index 710633d5fdbe..e1217a8bf4db 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-> @@ -74,6 +74,7 @@
->  #include "mlx5_irq.h"
->  #include "hwmon.h"
->  #include "lag/lag.h"
-> +#include "sh_devlink.h"
->=20
->  MODULE_AUTHOR("Eli Cohen <eli@mellanox.com>");
->  MODULE_DESCRIPTION("Mellanox 5th generation network adapters (ConnectX
-> series) core driver");
-> @@ -1554,10 +1555,17 @@ int mlx5_init_one(struct mlx5_core_dev *dev)
->  	int err;
->=20
->  	devl_lock(devlink);
-> +	if (dev->shd) {
-> +		err =3D devl_nested_devlink_set(priv_to_devlink(dev->shd),
-> +					      devlink);
-> +		if (err)
-> +			goto unlock;
-> +	}
->  	devl_register(devlink);
->  	err =3D mlx5_init_one_devl_locked(dev);
->  	if (err)
->  		devl_unregister(devlink);
-> +unlock:
->  	devl_unlock(devlink);
->  	return err;
->  }
-> @@ -1998,6 +2006,13 @@ static int probe_one(struct pci_dev *pdev, const s=
-truct
-> pci_device_id *id)
->  		goto pci_init_err;
->  	}
->=20
-> +	err =3D mlx5_shd_init(dev);
-> +	if (err) {
-> +		mlx5_core_err(dev, "mlx5_shd_init failed with error code %d\n",
-> +			      err);
-> +		goto shd_init_err;
-> +	}
-> +
->  	err =3D mlx5_init_one(dev);
->  	if (err) {
->  		mlx5_core_err(dev, "mlx5_init_one failed with error code %d\n",
-> @@ -2009,6 +2024,8 @@ static int probe_one(struct pci_dev *pdev, const st=
-ruct
-> pci_device_id *id)
->  	return 0;
->=20
->  err_init_one:
-> +	mlx5_shd_uninit(dev);
-> +shd_init_err:
->  	mlx5_pci_close(dev);
->  pci_init_err:
->  	mlx5_mdev_uninit(dev);
-> @@ -2030,6 +2047,7 @@ static void remove_one(struct pci_dev *pdev)
->  	mlx5_drain_health_wq(dev);
->  	mlx5_sriov_disable(pdev, false);
->  	mlx5_uninit_one(dev);
-> +	mlx5_shd_uninit(dev);
->  	mlx5_pci_close(dev);
->  	mlx5_mdev_uninit(dev);
->  	mlx5_adev_idx_free(dev->priv.adev_idx);
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
-> b/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
-> new file mode 100644
-> index 000000000000..671a3442525b
-> --- /dev/null
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
-> @@ -0,0 +1,150 @@
-> +// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
-> +/* Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reser=
-ved. */
-> +
-> +#include <linux/device/faux.h>
-> +#include <linux/mlx5/driver.h>
-> +#include <linux/mlx5/vport.h>
-> +
-> +#include "sh_devlink.h"
-> +
-> +static LIST_HEAD(shd_list);
-> +static DEFINE_MUTEX(shd_mutex); /* Protects shd_list and shd->list */
-> +
-> +/* This structure represents a shared devlink instance,
-> + * there is one created for PF group of the same chip.
-> + */
-> +struct mlx5_shd {
-> +	/* Node in shd list */
-> +	struct list_head list;
-> +	/* Serial number of the chip */
-> +	const char *sn;
-> +	/* List of per-PF dev instances. */
-> +	struct list_head dev_list;
-> +	/* Related faux device */
-> +	struct faux_device *faux_dev;
-> +};
-> +
+---
+Changes in v6:
+- rebaseline to net-next
+- remove unneeded loop timing ability advertisment in aquantia_main.c
+  (highlighted by Maxime Chevallier <maxime.chevallier@bootlin.com>)
+- add failure path in tn40_mdio.c if device_add_software_node fails
+  (suggested by Ratheesh Kannoth <rkannoth@marvell.com>)
+- Link to v5: https://lore.kernel.org/r/20250222-tn9510-v3a-v5-0-99365047e309@gmx.net
 
-For ice, the equivalent of this would essentially replace ice_adapter I ima=
-gine.
+Changes in v5:
+- changed version because "b4 send --resend v4" did not succeed
+- used opportunity to rebaseline to net-next
+- only source code change is merging a split string in tn40_mdio.c, removing
+  a warning from b4 prep --check
+- changed format of cover letter in line with b4 (sequence of changes from
+  latest to oldest)
+- Link to v4: https://lore.kernel.org/r/20241221-tn9510-v3a-v4-0-dafff89ba7a7@gmx.net
 
-> +static const struct devlink_ops mlx5_shd_ops =3D {
-> +};
-> +
-> +static int mlx5_shd_faux_probe(struct faux_device *faux_dev)
-> +{
-> +	struct devlink *devlink;
-> +	struct mlx5_shd *shd;
-> +
-> +	devlink =3D devlink_alloc(&mlx5_shd_ops, sizeof(struct mlx5_shd),
-> &faux_dev->dev);
-> +	if (!devlink)
-> +		return -ENOMEM;
-> +	shd =3D devlink_priv(devlink);
-> +	faux_device_set_drvdata(faux_dev, shd);
-> +
-> +	devl_lock(devlink);
-> +	devl_register(devlink);
-> +	devl_unlock(devlink);
-> +	return 0;
-> +}
-> +
-> +static void mlx5_shd_faux_remove(struct faux_device *faux_dev)
-> +{
-> +	struct mlx5_shd *shd =3D faux_device_get_drvdata(faux_dev);
-> +	struct devlink *devlink =3D priv_to_devlink(shd);
-> +
-> +	devl_lock(devlink);
-> +	devl_unregister(devlink);
-> +	devl_unlock(devlink);
-> +	devlink_free(devlink);
-> +}
-> +
-> +static const struct faux_device_ops mlx5_shd_faux_ops =3D {
-> +	.probe =3D mlx5_shd_faux_probe,
-> +	.remove =3D mlx5_shd_faux_remove,
-> +};
-> +
-> +static struct mlx5_shd *mlx5_shd_create(const char *sn)
-> +{
-> +	struct faux_device *faux_dev;
-> +	struct mlx5_shd *shd;
-> +
-> +	faux_dev =3D faux_device_create(THIS_MODULE, sn, NULL,
-> &mlx5_shd_faux_ops);
-> +	if (!faux_dev)
-> +		return NULL;
-> +	shd =3D faux_device_get_drvdata(faux_dev);
-> +	if (!shd)
-> +		return NULL;
-> +	list_add_tail(&shd->list, &shd_list);
-> +	shd->sn =3D sn;
-> +	INIT_LIST_HEAD(&shd->dev_list);
-> +	shd->faux_dev =3D faux_dev;
-> +	return shd;
-> +}
-> +
-> +static void mlx5_shd_destroy(struct mlx5_shd *shd)
-> +{
-> +	list_del(&shd->list);
-> +	kfree(shd->sn);
-> +	faux_device_destroy(shd->faux_dev);
-> +}
-> +
-> +int mlx5_shd_init(struct mlx5_core_dev *dev)
-> +{
-> +	u8 *vpd_data __free(kfree) =3D NULL;
-> +	struct pci_dev *pdev =3D dev->pdev;
-> +	unsigned int vpd_size, kw_len;
-> +	struct mlx5_shd *shd;
-> +	const char *sn;
-> +	char *end;
-> +	int start;
-> +	int err;
-> +
-> +	if (!mlx5_core_is_pf(dev))
-> +		return 0;
-> +
-> +	vpd_data =3D pci_vpd_alloc(pdev, &vpd_size);
-> +	if (IS_ERR(vpd_data)) {
-> +		err =3D PTR_ERR(vpd_data);
-> +		return err =3D=3D -ENODEV ? 0 : err;
-> +	}
-> +	start =3D pci_vpd_find_ro_info_keyword(vpd_data, vpd_size, "V3",
-> &kw_len);
-> +	if (start < 0) {
-> +		/* Fall-back to SN for older devices. */
-> +		start =3D pci_vpd_find_ro_info_keyword(vpd_data, vpd_size,
-> +
-> PCI_VPD_RO_KEYWORD_SERIALNO, &kw_len);
-> +		if (start < 0)
-> +			return -ENOENT;
-> +	}
-> +	sn =3D kstrndup(vpd_data + start, kw_len, GFP_KERNEL);
-> +	if (!sn)
-> +		return -ENOMEM;
-> +	end =3D strchrnul(sn, ' ');
-> +	*end =3D '\0';
-> +
-> +	guard(mutex)(&shd_mutex);
-> +	list_for_each_entry(shd, &shd_list, list) {
-> +		if (!strcmp(shd->sn, sn)) {
-> +			kfree(sn);
-> +			goto found;
-> +		}
-> +	}
-> +	shd =3D mlx5_shd_create(sn);
-> +	if (!shd) {
-> +		kfree(sn);
-> +		return -ENOMEM;
-> +	}
+Changes in v4:
+- use separate aqr105 specific functions instead of adding aqr105 functionality
+  in common functions, with need of "chip generation" parameter
+  (suggested by Andrew Lunn <andrew@lunn.ch>)
+- make generation and cleanup of swnodes more symmetric
+  (suggested by Andrew Lunn <andrew@lunn.ch>)
+- add MDIO/PHY software nodes only for devices that have an aqr105 PHY
+  (suggested by FUJITA Tomonori <fujita.tomonori@gmail.com>)
+- Link to v3: https://lore.kernel.org/r/20241217-tn9510-v3a-v3-0-4d5ef6f686e0@gmx.net
 
-How is the faux device kept in memory? I guess its reference counted somewh=
-ere? But I don't see that reference being incremented in the list_for_each.
+Changes in v3:
+- aquantia_firmware: remove call to of_property_read_string. It should be
+  called from the more generic function device_property_read_string
+- add more AQR105-specific function, to support proper advertising and auto-
+  negotiation
+- re-organize the patches about the mdio speed and TN40_REG_MDIO_CMD_STAT,
+  skipping the 1MHz intermediate speed step
+- re-organized the sequence of the patches:
+    1. changes to the general support functions (net/phy/mdio_bus.c)
+    2. changes to the aquantia PHY driver
+    3. changes to the tn40xx MAC driver, required to support the TN9510 cards
+- Link to v2: https://lore.kernel.org/netdev/trinity-602c050f-bc76-4557-9824-252b0de48659-1726429697171@3c-app-gmx-bap07/
 
-> +found:
-> +	list_add_tail(&dev->shd_list, &shd->dev_list);
-> +	dev->shd =3D shd;
-> +	return 0;
-> +}
-> +
-> +void mlx5_shd_uninit(struct mlx5_core_dev *dev)
-> +{
-> +	struct mlx5_shd *shd =3D dev->shd;
-> +
-> +	if (!dev->shd)
-> +		return;
-> +
-> +	guard(mutex)(&shd_mutex);
-> +	list_del(&dev->shd_list);
-> +	if (list_empty(&shd->dev_list))
-> +		mlx5_shd_destroy(shd);
-> +}
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.h
-> b/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.h
-> new file mode 100644
-> index 000000000000..67df03e3c72e
-> --- /dev/null
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.h
-> @@ -0,0 +1,10 @@
-> +/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB */
-> +/* Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reser=
-ved. */
-> +
-> +#ifndef __MLX5_SH_DEVLINK_H__
-> +#define __MLX5_SH_DEVLINK_H__
-> +
-> +int mlx5_shd_init(struct mlx5_core_dev *dev);
-> +void mlx5_shd_uninit(struct mlx5_core_dev *dev);
-> +
-> +#endif /* __MLX5_SH_DEVLINK_H__ */
-> diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
-> index 46bd7550adf8..78f1f034568f 100644
-> --- a/include/linux/mlx5/driver.h
-> +++ b/include/linux/mlx5/driver.h
-> @@ -721,6 +721,8 @@ enum mlx5_wc_state {
->  	MLX5_WC_STATE_SUPPORTED,
->  };
->=20
-> +struct mlx5_shd;
-> +
->  struct mlx5_core_dev {
->  	struct device *device;
->  	enum mlx5_coredev_type coredev_type;
-> @@ -783,6 +785,9 @@ struct mlx5_core_dev {
->  	enum mlx5_wc_state wc_state;
->  	/* sync write combining state */
->  	struct mutex wc_state_lock;
-> +	/* node in shared devlink list */
-> +	struct list_head shd_list;
-> +	struct mlx5_shd *shd;
->  };
->=20
->  struct mlx5_db {
-> --
-> 2.48.1
+Changes in v2:
+- simplify the check for a firmware-name in a swnode in the aquantia PHY driver
+(comment from Andrew Lunn)
+- changed the software node definition to an mdio node with phy child nodes, to
+be more in line with a typical device tree definition (also comment from
+Andrew Lunn)
+This also solves the problem with several TN4010-based cards that FUJITA
+Tomonori reported
+- clarified the cleanup calls, now calling fwnode_handle_put instead of
+software_node_unregister (comment by FUJITA Tomonori)
+- updated the function mdiobus_scan to support swnodes (following hint of
+Andrew Lunn)
+- remove the small patch to avoid failing after aqr_wait_reset_complete, now
+that a proper patch by Vladimir Oltean is available
+- replace setting of bit 3 in TN40_REG_MDIO_CMD_STAT by calling of
+tn40_mdio_set_speed (suggestion by FUJITA Tomonori)
+- cleaning up the distributed calls to set the MDIO speed in the tn40xx driver
+- define supported PCI-IDs including subvendor IDs to prevent loading on
+unsupported card
+- Link to v1: https://lore.kernel.org/netdev/trinity-33332a4a-1c44-46b7-8526-b53b1a94ffc2-1726082106356@3c-app-gmx-bs04/
+
+---
+Hans-Frieder Vogt (7):
+      net: phy: Add swnode support to mdiobus_scan
+      net: phy: aquantia: add probe function to aqr105 for firmware loading
+      net: phy: aquantia: search for firmware-name in fwnode
+      net: phy: aquantia: add essential functions to aqr105 driver
+      net: tn40xx: create swnode for mdio and aqr105 phy and add to mdiobus
+      net: tn40xx: prepare tn40xx driver to find phy of the TN9510 card
+      net: tn40xx: add pci-id of the aqr105-based Tehuti TN4010 cards
+
+ drivers/net/ethernet/tehuti/tn40.c           |   9 +-
+ drivers/net/ethernet/tehuti/tn40.h           |  31 ++++
+ drivers/net/ethernet/tehuti/tn40_mdio.c      |  84 +++++++++-
+ drivers/net/phy/aquantia/aquantia_firmware.c |   7 +-
+ drivers/net/phy/aquantia/aquantia_main.c     | 240 ++++++++++++++++++++++++++-
+ drivers/net/phy/mdio_bus.c                   |  14 ++
+ 6 files changed, 376 insertions(+), 9 deletions(-)
+---
+base-commit: 23c9ff659140f97d44bf6fb59f89526a168f2b86
+change-id: 20241216-tn9510-v3a-2cfc185d680f
+
+Best regards,
+-- 
+Hans-Frieder Vogt <hfdevel@gmx.net>
+
 
 
