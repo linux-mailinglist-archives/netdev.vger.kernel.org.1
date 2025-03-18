@@ -1,263 +1,195 @@
-Return-Path: <netdev+bounces-175808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175809-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDF2EA67831
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 16:45:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87513A67877
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 16:55:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 033D23A6D00
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 15:44:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B1BF3BADF4
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 15:53:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A87E20FA84;
-	Tue, 18 Mar 2025 15:44:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8806E20F078;
+	Tue, 18 Mar 2025 15:53:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IrxykW9a"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Ca09Rx5f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2076.outbound.protection.outlook.com [40.107.92.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D42CF199E80
-	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 15:44:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742312647; cv=none; b=XkMA+m7mxcXNdqT47ougwSnXnO3DCd/Cm7nFyZUdOsHBqrZkXWzBfVNg8QB5H9UpNZctF/fr7nXxvnD4HCkx42Qzbaa0qOpSb3scgLwWawJmuGWiFug3ePzyNi37l5guCW3naGRZbQz2/E1hA/+UqGfqozA175AzkaLxECsjzEU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742312647; c=relaxed/simple;
-	bh=U5Zfs0WaqNpJJY+E9u/eSco3wa3Cgvk66eJCnedOEg4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=stsHPnzeFyyjsREHHjLXKC+q13DhjZovv5yPD1Oi8qIQbZAnGBNmOPgMPCGjyHStA9dKE+C44tCo85E2dRKjHe3Q1hducTFpiZYp7Hnce3pzVzXUBimcSUbvvIwWlmZRl6KFiCORO1Lu4970gazM7oJsrvUNkjwWgwY9wu5+/Ms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IrxykW9a; arc=none smtp.client-ip=209.85.160.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4766afee192so179095731cf.0
-        for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 08:44:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742312644; x=1742917444; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Up69gqvpDcMzZHCcuFL/XS4TvUaIijpcUebqy+6lGtw=;
-        b=IrxykW9aPo+0nFGyaeNBFJYVi3n7qb4ltE2h7uOMkg28T/+hdWyQI9fFxbxXDoZkt2
-         N8Rmw88pFs7oQnmMF5GFLop+pez10cK8pQoJF6AuoJCEcsIBxcIdAlDaU0CWemAw2AQO
-         zaf+MaPBf1wQXk9GXykQdqdpClGe5qdABKkhzmUHp0GMCGJN2nT4e+ATBrRvkatOUGIb
-         rIu9e/25UvPdUueDaXqCiuHoKaVPCAC92cNx+shup5y6SLE6k1HE8gY7L8zckMdt8vDp
-         ujd3S6lD6OpOPF/keOqiz4S2MWbsuE9wf/ulmjA1whUuxqHQ3mS23+WPnmI+vKvZhJXg
-         Qdbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742312644; x=1742917444;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Up69gqvpDcMzZHCcuFL/XS4TvUaIijpcUebqy+6lGtw=;
-        b=b2KsgRfKJ+s/7EQWCv1pgYF2+024+1cfEv1SFVafi8RturZaBAzlZxVwKQNVX0GFqO
-         vwpr6/a7+9ZrHQ+5hq/bQQLv0rO84n1eejC39shmftEmHeCszL6/cPLecFLbYMRtNuwm
-         AZEWsxJFYKDzemayRxE2XKL/xE3N+MaKxXjFvJc0cSPjlhOD6afTKWvbzUpNX51aEyek
-         FmVaNlLantItnHdcnnq1u509m/Vo3Juugn2plcaVzlhV1sBGh9SfxLcK/9P6VlmbaaeL
-         OjPvHm/a2ug8QAnPc6qs8QHrOjz6F5HWkOgdw3lqLmDFh4GeYm9J949kxFuaS4jK8CVB
-         cSvw==
-X-Forwarded-Encrypted: i=1; AJvYcCVY+3xPYUY3CaK0E3UPxY5rr8RHwyd+hOX8meLyfwILlcKRHI1rE5Pz20iWpxgLsBw9EgqEcTM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7bm+5LL2A827WSZh7uXOcK/87SQGHQXD/UEUWYPkhKJJM9jWg
-	CSjzfEVfBVpSopLnvrnqPk0EyT8Wn+00FMUZtNmk6pjId7XrHyxFFps+berF6DP9mPptyfEwScW
-	kqdS2CxhBeA==
-X-Google-Smtp-Source: AGHT+IEm+mk9CJ4MsaDKUVe6KK9yekkYaIfX2LXvo2KRiAt00/zCZsKup+PBNKpv9pR1LboPROJF4XAdseFwlg==
-X-Received: from qtbch11.prod.google.com ([2002:a05:622a:40cb:b0:477:529:6eae])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:7dc4:0:b0:476:8a1d:f18e with SMTP id d75a77b69052e-476c81b7e6emr213155541cf.36.1742312643777;
- Tue, 18 Mar 2025 08:44:03 -0700 (PDT)
-Date: Tue, 18 Mar 2025 15:43:59 +0000
-In-Reply-To: <20250318154359.778438-1-edumazet@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7B457464
+	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 15:53:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.76
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742313214; cv=fail; b=BFj8B8wyyBS1Fcn/Xo2+G+oG3Y+pbB9zGjhHY5YnU7QleXD9V0U3093onOEg2CTIozjYEQuU3p+qEppj503PlpAg+er6VSmULiJybO7h96jcrb7McG2vDVEM3dG24hATFgb5al6veoNtiN4zVwku0lFGpZc/+sHgleESnfm0CVo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742313214; c=relaxed/simple;
+	bh=Xwy65l1jXArgLPaPPQ/LAP6i4tAYHjQvEpvlfvwVyKA=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=dYS0psNxbjqA+P3xcMEsbskEnDEgICILEzcXncPtaylAzY7Jyq5EHAAHactiyPFUrVstxCxrv7EY59AgbN/zIc2ys37wMMZPxtd50rpB23QdjfuJdUjw1uzZf0e2Jm67+pADzOHjOA/VTphgEzhcRXNKNOPYzhhQhqVEcBnhf5U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Ca09Rx5f; arc=fail smtp.client-ip=40.107.92.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hzxSnCSs5+mk5tnu6Sr7gyHzegww2fMHKvK9q5r1h7tvq4puUa1r1EQfo/KbMKMHFJTOIC3FnK9DNFB4YItNA9vjroJ1qUwWCt1XyjkBdTkl6VipELF5vFBNDK0Bzbqae2anN4j2dkilRGfFeBcfofDb0GSFXq4tK4kkLterzP07U29S7ZE5y9QRgGE5tIoSfg9lixUlUvryGh10OUsKenJzt8rfOFpuTshINruOHRL98u8pNQckmYkxEh8iB207mu4LkSabYQ4S5yC2BcHS3ZoZAbozl73Upi+drJ0Kt+rLhRZXtOUWta0fF+pHWUn54jktq3OVg1wRoPzDemlCGw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vwuFRsfpHjoJE0RCyzKX3A+/NCP5s+NoqAsOHEni12A=;
+ b=ly+O0GhacGQEbiRmecC77sEuWvDM5lQPeHQ2lAAn/RAiJmlCmsBrmr1JLyRWi/gBBs2/hHZijSFE6zhCiFf51NObiWXPJdIoyI2wvDxkEhOeFOYX65IEmouxcuoWH9oPSJqw3bxDDIQNn3n6uOr4SO+XoYSPq8dTGWjASADhIKpLymuiih0I2fpY7SzxYJbtjV9Gbhs/J3Ei3L184dwk+s4O5dgHsRJWVevguzYMp6tG5YHALTyAPWn+yJSBBgdLhqmzG3JmUDe4+mtgbLUkC8fXu162k5w4S5sqTacOr9EuJZ1hemSOHq1iXj0muqQw0g1IBRARWFraxwCOkl8PcA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vwuFRsfpHjoJE0RCyzKX3A+/NCP5s+NoqAsOHEni12A=;
+ b=Ca09Rx5f42NNgY6iKFcQoS00eyexBrCQl5W94S7MlZE85ez01JP3RWVo0SBnZJaPezqM8WYe5m4ICsEXugq0P1fR39Nwfi3f2oBT2WKvBRB5LluDMsvNQt2M9HTLZZHpd3riSoLulMV9T5asuIxEpBb5QeRFRucSzVSs4mAJ3cqMosq/AqlnFGcz+bCQR9W7wWCjr2JnDUm/xlHuODRBMwi+bbtl9qbcdwhdDjyx8sdcbIekpH9kocUeWXH08+ewkFFV3A/OqtcrF+FPojmVZIHO5N7ASp6wsh3A1fOprMBJaIBOpkfZNwVSvY6WZvHo85TyMTIP+fLEUiKBhQO2NQ==
+Received: from CH0P221CA0025.NAMP221.PROD.OUTLOOK.COM (2603:10b6:610:11d::9)
+ by BY5PR12MB4035.namprd12.prod.outlook.com (2603:10b6:a03:206::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.33; Tue, 18 Mar
+ 2025 15:53:26 +0000
+Received: from CH1PEPF0000A346.namprd04.prod.outlook.com
+ (2603:10b6:610:11d:cafe::4b) by CH0P221CA0025.outlook.office365.com
+ (2603:10b6:610:11d::9) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8534.28 via Frontend Transport; Tue,
+ 18 Mar 2025 15:53:26 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CH1PEPF0000A346.mail.protection.outlook.com (10.167.244.11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8534.20 via Frontend Transport; Tue, 18 Mar 2025 15:53:26 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 18 Mar
+ 2025 08:53:10 -0700
+Received: from fedora (10.126.230.35) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 18 Mar
+ 2025 08:53:06 -0700
+References: <472257e02c57.git.pablmart@redhat.com>
+User-agent: mu4e 1.8.14; emacs 29.4
+From: Petr Machata <petrm@nvidia.com>
+To: Pablo Martin Medrano <pablmart@redhat.com>
+CC: <netdev@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Shuah Khan
+	<shuah@kernel.org>, Petr Machata <petrm@nvidia.com>
+Subject: Re: [PATCH net v3] selftests/net: big_tcp: return xfail on slow
+ machines
+Date: Tue, 18 Mar 2025 16:49:52 +0100
+In-Reply-To: <472257e02c57.git.pablmart@redhat.com>
+Message-ID: <87y0x2pc81.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250318154359.778438-1-edumazet@google.com>
-X-Mailer: git-send-email 2.49.0.rc1.451.g8f38331e32-goog
-Message-ID: <20250318154359.778438-3-edumazet@google.com>
-Subject: [PATCH v2 net-next 2/2] tcp/dccp: remove icsk->icsk_ack.timeout
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000A346:EE_|BY5PR12MB4035:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1d2e4470-9ee1-4272-d946-08dd66350551
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?TzpYqjjYF8iHy5mBbzy6WWiy7SM3gYbAOB/Bn4SkJxJAFdgxnQgF9h9jNW9p?=
+ =?us-ascii?Q?OPLcceN7tAo2X3LFkaVLYnllgXiro5bl6s2E6uYvaJ1dDgNUVJ6tslsxMxtC?=
+ =?us-ascii?Q?0MlRCmWFuO4QeWPa/6AUEMaxDrabT2zhBn0ao1Dzh5DyVRA0rwwy0WKXzuCB?=
+ =?us-ascii?Q?FDKJ4lgNA6d18CpiTr9+Hi5XpPeAV8sIIbzJ8/nXiEqpSu9rBfIsdUitMdJI?=
+ =?us-ascii?Q?hp83Z4pJLF1qyfWgVcsfQBGlxDoIuW9nVeB+EegaZcRLeL+vWw4rjcVh20Vi?=
+ =?us-ascii?Q?nnPUZVnCUZBjdn1wfH1Ymmi6g5C+IWLQcrmWnXSohF6EFDCI8Wzki70Cs0+G?=
+ =?us-ascii?Q?CmYfjpwthfDCdk8+vlQ3Nz7usr9GhQ7uA41IiDh3Xx/JLCNbGJVRSCRbliym?=
+ =?us-ascii?Q?g0B6jVQv7I+KukMbrCVM6k4VkzXsrejptm8IGTNjlLojBsBKu0mmXtrfeMov?=
+ =?us-ascii?Q?C/N/NSfuN1Vew02/1C8E7Y6grt/HvCcBwlEBQrl2kjX50ISd8DRScq74MRpp?=
+ =?us-ascii?Q?Ekd3qEkkyHJGE6HZ3f6XTwA9ARgoCy9/VNIHsekOVJrqMBqZP1zFaLQSh15R?=
+ =?us-ascii?Q?TeGpl4hTZZbWhagoVacZ0fdYj+akFJMifewyfwBp0mOk7H+NaYZ/DvSKH3QC?=
+ =?us-ascii?Q?r+fhaSb9bUmrruMFm6TXno6q/d0WS3zXYb9fkx1gOo+rIffF8iBAQDtaM3vj?=
+ =?us-ascii?Q?sCGyrL6cm78h8MQSzZ7zv03RFmHlEb7DklCv6nRJAnjzrp51flhpJA3FJ8UZ?=
+ =?us-ascii?Q?4zrdb9TUCEM5Fb99vAJkXssdUYydpWNvOH1KVSvKNEAA+XdTI0bFlXzjFoI/?=
+ =?us-ascii?Q?cie84OSNcbyoZmcS2C372nzc4kYjragnttfds7CRm59u1lsFzdgs4uoYvGmB?=
+ =?us-ascii?Q?k4nsVR1zqfcoCXiG+1jg8x6EVdkAvRInG7M3UeO4myNW/qOdKapry/LwXXjG?=
+ =?us-ascii?Q?3qwS+EUaIiFzyouhi8cZaG9POX6xpL+RiDc6eWuz/lZKuD6trilg4o7c64nE?=
+ =?us-ascii?Q?GIyWVA2wmRQDXcYVH86CZOE6m2EQ5pyoirrAymTgM4VcdkH5001uzZZwkBqI?=
+ =?us-ascii?Q?HZUN2dOR/QIGjJtGCSSmyrapPRGndIl86YcIdiQOjPZtCJJP9IUzZacxOJIg?=
+ =?us-ascii?Q?3cHeTUJPtbVtvG08OKIkBeP8h3dIhrHOOwnJfkaMLShtXMMM+e3loFWJ8upC?=
+ =?us-ascii?Q?+Gux2S9XllzpBP9tZcNa8yd30JVPemcrO30J0lpnpjCZ0u6aF+Inge4vKSAJ?=
+ =?us-ascii?Q?lzK/EzbHLCeNY1HBGzNN6/34cHc383qof1xR+5Q7ffto/YsOQ3qb/xvC2Z06?=
+ =?us-ascii?Q?SC7ha1oxJdxjyfJOwMe3hjdGTCwHWUN1XnEobPnEEbon9PwAXCKABcq5dm/L?=
+ =?us-ascii?Q?nk1erHkwRDU4EgABCctpBEglFBx5oW4Q03eC2XZcJpdSMwsYzhM/eyHp0pPN?=
+ =?us-ascii?Q?QTJM6FxjIkDZWB+yOoVzUCV2XS+i83C8nmDtvv60p1crJOvHh3L77oS6faS+?=
+ =?us-ascii?Q?Dyxb2pppZD10yHk=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Mar 2025 15:53:26.3465
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1d2e4470-9ee1-4272-d946-08dd66350551
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH1PEPF0000A346.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4035
 
-icsk->icsk_ack.timeout can be replaced by icsk->csk_delack_timer.expires
 
-This saves 8 bytes in TCP/DCCP sockets and helps for better cache locality.
+Pablo Martin Medrano <pablmart@redhat.com> writes:
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
-v2: rebase after "tcp: cache RTAX_QUICKACK metric in a hot cache line"
+> diff --git a/tools/testing/selftests/net/big_tcp.sh b/tools/testing/selftests/net/big_tcp.sh
+> index 2db9d15cd45f..52b9a76b1c19 100755
+> --- a/tools/testing/selftests/net/big_tcp.sh
+> +++ b/tools/testing/selftests/net/big_tcp.sh
+> @@ -21,8 +21,7 @@ CLIENT_GW6="2001:db8:1::2"
+>  MAX_SIZE=128000
+>  CHK_SIZE=65535
+>  
+> -# Kselftest framework requirement - SKIP code is 4.
+> -ksft_skip=4
+> +source lib.sh
+>  
+>  setup() {
+>  	ip netns add $CLIENT_NS
+> @@ -143,21 +142,20 @@ do_test() {
 
- .../net_cachelines/inet_connection_sock.rst		  |  1 -
- include/net/inet_connection_sock.h 				  | 12 ++++++++----
- net/dccp/output.c									  |  5 ++---
- net/dccp/timer.c									  |  4 ++--
- net/ipv4/tcp_output.c								  |  7 +++----
- net/ipv4/tcp_timer.c								  |  5 +++--
- net/mptcp/options.c								  |  1 -
- net/mptcp/protocol.c								  |  1 -
- 8 files changed, 18 insertions(+), 18 deletions(-)
+The local ret="PASS" can now be dropped.
 
-diff --git a/Documentation/networking/net_cachelines/inet_connection_sock.rst b/Documentation/networking/net_cachelines/inet_connection_sock.rst
-index 5fb0dd70c9af76ca68b3406ce76d4b61957c7da9..8fae85ebb773085b249c606ce37872e0566b70b4 100644
---- a/Documentation/networking/net_cachelines/inet_connection_sock.rst
-+++ b/Documentation/networking/net_cachelines/inet_connection_sock.rst
-@@ -38,7 +38,6 @@ struct icsk_ack_u8				  quick 				 read_write 		 w
- struct icsk_ack_u8 				 pingpong
- struct icsk_ack_u8 				 retry					write_mostly		read_write			inet_csk_clear_xmit_timer,tcp_rearm_rto,tcp_event_new_data_sent,tcp_write_xmit,__tcp_send_ack,tcp_send_ack,
- struct icsk_ack_u8 				 ato					read_mostly 		write_mostly		tcp_dec_quickack_mode,tcp_event_ack_sent,__tcp_transmit_skb,__tcp_send_ack,tcp_send_ack
--struct icsk_ack_unsigned_long		 timeout				read_write			read_write			inet_csk_reset_xmit_timer,tcp_connect
- struct icsk_ack_u32				 lrcvtime				read_write								tcp_finish_connect,tcp_connect,tcp_event_data_sent,__tcp_transmit_skb
- struct icsk_ack_u16				 rcv_mss				write_mostly		read_mostly 		__tcp_select_window,__tcp_cleanup_rbuf,tcp_initialize_rcv_mss,tcp_connect_init
- struct icsk_mtup_int				 search_high			read_write								tcp_mtup_init,tcp_sync_mss,tcp_connect_init,tcp_mtu_check_reprobe,tcp_write_xmit
-diff --git a/include/net/inet_connection_sock.h b/include/net/inet_connection_sock.h
-index 018118da0ce15c5ba5e3b7fcc1b36425794ec9a1..597f2b98dcf565a8512e815d9eae2b521bac7807 100644
---- a/include/net/inet_connection_sock.h
-+++ b/include/net/inet_connection_sock.h
-@@ -117,7 +117,6 @@ struct inet_connection_sock {
-				  lrcv_flowlabel:20, /* last received ipv6 flowlabel	   */
-				  dst_quick_ack:1, /* cache dst RTAX_QUICKACK		   */
-				  unused:3;
--		unsigned long	  timeout;	 /* Currently scheduled timeout		   */
-		__u32		  lrcvtime;	 /* timestamp of last received data packet */
-		__u16		  last_seg_size; /* Size of last incoming segment	   */
-		__u16		  rcv_mss;	 /* MSS used for delayed ACK decisions	   */
-@@ -195,6 +194,12 @@ icsk_timeout(const struct inet_connection_sock *icsk)
-	return READ_ONCE(icsk->icsk_retransmit_timer.expires);
- }
+>  	start_counter link3 $SERVER_NS
+>  	do_netperf $CLIENT_NS
+>  
+> -	if check_counter link1 $ROUTER_NS; then
+> -		check_counter link3 $SERVER_NS || ret="FAIL_on_link3"
+> -	else
+> -		ret="FAIL_on_link1"
+> -	fi
+> +	check_counter link1 $ROUTER_NS
+> +	check_err $? "fail on link1"
+> +	check_counter link3 $SERVER_NS
+> +	check_err $? "fail on link3"
+>  
+>  	stop_counter link1 $ROUTER_NS
+>  	stop_counter link3 $SERVER_NS
+> -	printf "%-9s %-8s %-8s %-8s: [%s]\n" \
+> -		$cli_tso $gw_gro $gw_tso $ser_gro $ret
+> -	test $ret = "PASS"
+> +	log_test "$(printf "%-9s %-8s %-8s %-8s" \
+> +			$cli_tso $gw_gro $gw_tso $ser_gro)"
+> +	test $RET -eq 0
+>  }
 
-+static inline unsigned long
-+icsk_delack_timeout(const struct inet_connection_sock *icsk)
-+{
-+	return READ_ONCE(icsk->icsk_delack_timer.expires);
-+}
-+
- static inline void inet_csk_clear_xmit_timer(struct sock *sk, const int what)
- {
-	struct inet_connection_sock *icsk = inet_csk(sk);
-@@ -230,16 +235,15 @@ static inline void inet_csk_reset_xmit_timer(struct sock *sk, const int what,
-		when = max_when;
-	}
-
-+	when += jiffies;
-	if (what == ICSK_TIME_RETRANS || what == ICSK_TIME_PROBE0 ||
-		what == ICSK_TIME_LOSS_PROBE || what == ICSK_TIME_REO_TIMEOUT) {
-		smp_store_release(&icsk->icsk_pending, what);
--		when += jiffies;
-		sk_reset_timer(sk, &icsk->icsk_retransmit_timer, when);
-	} else if (what == ICSK_TIME_DACK) {
-		smp_store_release(&icsk->icsk_ack.pending,
-				  icsk->icsk_ack.pending | ICSK_ACK_TIMER);
--		icsk->icsk_ack.timeout = jiffies + when;
--		sk_reset_timer(sk, &icsk->icsk_delack_timer, icsk->icsk_ack.timeout);
-+		sk_reset_timer(sk, &icsk->icsk_delack_timer, when);
-	} else {
-		pr_debug("inet_csk BUG: unknown timer value\n");
-	}
-diff --git a/net/dccp/output.c b/net/dccp/output.c
-index 5c2e24f3c39b7ff4ee1d5d96d5e406c96609a022..39cf3430177ac597b0a9fd40bf0d8dfbff5fd92d 100644
---- a/net/dccp/output.c
-+++ b/net/dccp/output.c
-@@ -627,11 +627,10 @@ void dccp_send_delayed_ack(struct sock *sk)
-			return;
-		}
-
--		if (!time_before(timeout, icsk->icsk_ack.timeout))
--			timeout = icsk->icsk_ack.timeout;
-+		if (!time_before(timeout, icsk_delack_timeout(icsk)))
-+			timeout = icsk_delack_timeout(icsk);
-	}
-	icsk->icsk_ack.pending |= ICSK_ACK_SCHED | ICSK_ACK_TIMER;
--	icsk->icsk_ack.timeout = timeout;
-	sk_reset_timer(sk, &icsk->icsk_delack_timer, timeout);
- }
- #endif
-diff --git a/net/dccp/timer.c b/net/dccp/timer.c
-index 9fd14a3361893d5f2d9f0ad18a65cff963cc7e22..232ac4ae0a73ff31beca730c14d8b02107aeb926 100644
---- a/net/dccp/timer.c
-+++ b/net/dccp/timer.c
-@@ -185,9 +185,9 @@ static void dccp_delack_timer(struct timer_list *t)
-	if (sk->sk_state == DCCP_CLOSED ||
-		!(icsk->icsk_ack.pending & ICSK_ACK_TIMER))
-		goto out;
--	if (time_after(icsk->icsk_ack.timeout, jiffies)) {
-+	if (time_after(icsk_delack_timeout(icsk), jiffies)) {
-		sk_reset_timer(sk, &icsk->icsk_delack_timer,
--				   icsk->icsk_ack.timeout);
-+				   icsk_delack_timeout(icsk));
-		goto out;
-	}
-
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index e0a4e5432399a3874e471f2d908bf976350f2696..c29e689d966097fabb83876f21d54201989b444d 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -4225,17 +4225,16 @@ void tcp_send_delayed_ack(struct sock *sk)
-	/* Use new timeout only if there wasn't a older one earlier. */
-	if (icsk->icsk_ack.pending & ICSK_ACK_TIMER) {
-		/* If delack timer is about to expire, send ACK now. */
--		if (time_before_eq(icsk->icsk_ack.timeout, jiffies + (ato >> 2))) {
-+		if (time_before_eq(icsk_delack_timeout(icsk), jiffies + (ato >> 2))) {
-			tcp_send_ack(sk);
-			return;
-		}
-
--		if (!time_before(timeout, icsk->icsk_ack.timeout))
--			timeout = icsk->icsk_ack.timeout;
-+		if (!time_before(timeout, icsk_delack_timeout(icsk)))
-+			timeout = icsk_delack_timeout(icsk);
-	}
-	smp_store_release(&icsk->icsk_ack.pending,
-			  icsk->icsk_ack.pending | ICSK_ACK_SCHED | ICSK_ACK_TIMER);
--	icsk->icsk_ack.timeout = timeout;
-	sk_reset_timer(sk, &icsk->icsk_delack_timer, timeout);
- }
-
-diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
-index d828b74c3e73d75cdae777645e8e8856c0751201..d64383b06a295affb735f60edd4dfd64ad5fb1c8 100644
---- a/net/ipv4/tcp_timer.c
-+++ b/net/ipv4/tcp_timer.c
-@@ -322,8 +322,9 @@ void tcp_delack_timer_handler(struct sock *sk)
-	if (!(icsk->icsk_ack.pending & ICSK_ACK_TIMER))
-		return;
-
--	if (time_after(icsk->icsk_ack.timeout, jiffies)) {
--		sk_reset_timer(sk, &icsk->icsk_delack_timer, icsk->icsk_ack.timeout);
-+	if (time_after(icsk_delack_timeout(icsk), jiffies)) {
-+		sk_reset_timer(sk, &icsk->icsk_delack_timer,
-+				   icsk_delack_timeout(icsk));
-		return;
-	}
-	icsk->icsk_ack.pending &= ~ICSK_ACK_TIMER;
-diff --git a/net/mptcp/options.c b/net/mptcp/options.c
-index fd2de185bc939f8730e87a63ac02a015e610e99c..ad1413e9062d54e60a8441deb12406ed63e4aa72 100644
---- a/net/mptcp/options.c
-+++ b/net/mptcp/options.c
-@@ -432,7 +432,6 @@ static void clear_3rdack_retransmission(struct sock *sk)
-	struct inet_connection_sock *icsk = inet_csk(sk);
-
-	sk_stop_timer(sk, &icsk->icsk_delack_timer);
--	icsk->icsk_ack.timeout = 0;
-	icsk->icsk_ack.ato = 0;
-	icsk->icsk_ack.pending &= ~(ICSK_ACK_SCHED | ICSK_ACK_TIMER);
- }
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index 1ac378ba1d67cd17449ab6c4b4793b65d520ec44..44f7ab463d7550ad728651bad2b1aeb4cd4dea05 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -3420,7 +3420,6 @@ static void schedule_3rdack_retransmission(struct sock *ssk)
-	WARN_ON_ONCE(icsk->icsk_ack.pending & ICSK_ACK_TIMER);
-	smp_store_release(&icsk->icsk_ack.pending,
-			  icsk->icsk_ack.pending | ICSK_ACK_SCHED | ICSK_ACK_TIMER);
--	icsk->icsk_ack.timeout = timeout;
-	sk_reset_timer(ssk, &icsk->icsk_delack_timer, timeout);
- }
-
---
-2.49.0.rc1.451.g8f38331e32-goog
-
+You can drop the final test. log_test() already ends with a "return
+$RET", which has the same effect.
 
