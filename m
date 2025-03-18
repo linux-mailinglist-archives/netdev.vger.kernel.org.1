@@ -1,132 +1,128 @@
-Return-Path: <netdev+bounces-175609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2A50A66BF8
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 08:38:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE0DDA66CD6
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 08:54:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 679623BCF67
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 07:38:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD3A1189FF52
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 07:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 298CA201000;
-	Tue, 18 Mar 2025 07:37:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBEDD1DF742;
+	Tue, 18 Mar 2025 07:47:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MV1sjgCN"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="STWlnEc/"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 664281EB5CC
-	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 07:37:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E8F11C5F2C
+	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 07:47:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742283424; cv=none; b=RfTevqZ40yUqzm/rpiZBjtrfFJvD6K2Pbk0b333m4ZVP6eKitg3TYYApUFboCLENFwhsWvNB6X4mp3oqpbV2vAyd/6lrhzt+ac0wx1YnArSnUBYSADpG594TZ4l2CIwg429cbHd0sN+u/uQ1ximAu5i3xczw/t661lLO3BQtl1w=
+	t=1742284050; cv=none; b=u6bwk+eNTjVe9DE3Z5Nb7y3nFCPWdCJDJ/KZFubTVRP0jSAxvXCXoRO4Ofdm87gEfbv2KNm9/gNchmcfR0d6Gd0uphWuB6zEhTH2PPMQ4pOk1/VZ/nACkLPZzSK10xGhj5FqmNGL3xqquyntUEHc4+LwafVPpnCym76FiltkBFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742283424; c=relaxed/simple;
-	bh=lNZiMRL/KtuCJTDp+dxz+A31936lctZdVcKTBYjxWIQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JccQQ5KZnunKMzcw+HEpx1aXXUh9vE+AFWTlut/cJ5yuYf9HBuZCJX89lUhj4MAEcUd6XFSpyBpYWP5VML2YlLVsRxsnNUXz69lMvMQ4Ehb55V1j4pQwOxhBGtA4oo2pxlPRxLUufsN2odkQalMJw0kWIKICKXEbADqByNCaRnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MV1sjgCN; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742283421;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UuwSkGFuQ9PYTH04qYS2caVrm8hJvYFBtjYS3q+XiXk=;
-	b=MV1sjgCNQ9yaicSYz03E32tHXooJP/Otezj/TtCUa/uYOLlkZ3VQ4EBHwlGlFJZ8Ckzl8W
-	sHixw8fV6rHxY2DyTpxktpV2gl139YG1WsBCrSwwDYgXZvFKmMkroBeXFfaXnBo/cm/N0W
-	mkrPe/qE9iqo52JLqDHbJP2LLgrbZHQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-658-t57s9aHTMNuuEkgiPXWU7g-1; Tue, 18 Mar 2025 03:36:59 -0400
-X-MC-Unique: t57s9aHTMNuuEkgiPXWU7g-1
-X-Mimecast-MFC-AGG-ID: t57s9aHTMNuuEkgiPXWU7g_1742283418
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43cf3168b87so15921065e9.2
-        for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 00:36:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742283418; x=1742888218;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UuwSkGFuQ9PYTH04qYS2caVrm8hJvYFBtjYS3q+XiXk=;
-        b=Dvgn+crKx4ECDWdnqvnigzYF/vxflML4ta6sepimIi8kYCH4Ui3/p+RQBQUfoL4Aii
-         Jtsx3Ah2K1LVsGkS0RWSyheXsnMsC94nstKzlesrofcA1ymzxLG/0VQMoA/TQdeHbhRU
-         4n32iEy06ilx9DiWNkUY+ok3+9DymwZuuqxCorqnZ8Zz3ie64b7HZvUz9mAYZgZvcI7I
-         m1VRsE2Fvw2OmimImZ2sSkvG9f2zqJGcFyuDpeRVaTFF440TIi1fjprrh3F/LMTnBa7R
-         vk1A90cyYLxj8aCiy59QYD5yZuQEarzSm1KcCv9jTpkBR0Z1x5thooQOka804k232QzM
-         lLzg==
-X-Forwarded-Encrypted: i=1; AJvYcCVFLxGVGIpCVBETbmUKX55OBoIN7rfnIcbWH2z9+DFzqv/wOlE4+iYsg246B5uzw6WAj+tn9oM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyg2qGVMADsMfAe7CLnZsLkvgrWGuiTqf63IP7Z7rAr1oRWAgF3
-	OaD+MKFZ2q9PyluvJfmT1luXBMsKmX+wuyB/x4sT1gc/pGDeaAjXyrgN7sDZFI7CHXjwm5zPY0k
-	TD+njEaxyj/3XS9qN3IY3SLtuKwD+CTMQhfjsDqCV3h/+MHzHSpAMrw==
-X-Gm-Gg: ASbGncvevMIeecDU8Qi51Ef9XDy7K4vAqUQZyk651CIDQb1RPjF1nYtlJRgyJFHc911
-	xDbgopvjqOBKJrmns9RTr/VY9bG+mKEIozZkZO0D1QOIuiXPgl+BEfLHZMi5vl1msSvXgdsRZA0
-	gweufzDSg5CdXalfcFLi/Pw1gCwTXGaRgF+ch7uz187omnAXz/LwEg+OtkV1CwOXgSspaLaidOr
-	fpOgyqVS23nzlRILHyPWUaRO3f6i2ZxlC+1ovJjA943rK6AMEVi9kSoufpgy9llbkfVxN8D8N4S
-	W9qYVO76iJVLgh6AMMocBY7Znk4iq+GIADSkK3Vnlp9e9g==
-X-Received: by 2002:adf:c08d:0:b0:390:fbba:e65e with SMTP id ffacd0b85a97d-3971e0bf383mr12447807f8f.32.1742283417893;
-        Tue, 18 Mar 2025 00:36:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEb3LZOLOKi/T4T42PWCNaP9JVSbcDVK+VGivaIA4skwK7mEqohCRPCdXaEW5et6m5LbCPE7w==
-X-Received: by 2002:adf:c08d:0:b0:390:fbba:e65e with SMTP id ffacd0b85a97d-3971e0bf383mr12447790f8f.32.1742283417573;
-        Tue, 18 Mar 2025 00:36:57 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-10-172.dyn.eolo.it. [146.241.10.172])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395c82c255bsm16931803f8f.23.2025.03.18.00.36.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Mar 2025 00:36:56 -0700 (PDT)
-Message-ID: <9af06d0b-8b3b-4353-8cc7-65ec50bf4edb@redhat.com>
-Date: Tue, 18 Mar 2025 08:36:55 +0100
+	s=arc-20240116; t=1742284050; c=relaxed/simple;
+	bh=PiTmRzbTygWH1lLN0blb1/x2kmM+fyMCiD0dtvyVriU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oXcEO5c1Cd8sGLl9IIZDFVggjzTCynbt+u9NlhHcv5GodRE0ANiGDe3knhHWJdTjTc4lTweadc570RGNSAyXsDVb7i3sU4vQGledg4Xl7zivopfhKPs5mgCRe/HFNcQB6BsrJdoySViLu7Fk/Wd/R16e4DntEud0gxT7a+2WoUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=STWlnEc/; arc=none smtp.client-ip=18.132.163.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1742284034;
+	bh=fxtfU5VJRnJzZUAvhJzy3Ea93trYsTtSrjDniPVubhU=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=STWlnEc/yEsCVBZvnYHlVn1OmJAmt1qJYwB1Q0K0ma9kfJ8296bl5Er24LdqQR6Bl
+	 VuGLCucMQUgngN9rWsafd2wLFEfJXlOOuXNTZwpJNWCB2xTlmGjwfawbbzgMuB3pRm
+	 vowztSgO70j3Mx3Tf5dsfnq4R26yp+mu3FloPNcU=
+X-QQ-mid: bizesmtpip2t1742284023tvs5xyy
+X-QQ-Originating-IP: A/rClot4DoAeHUjd/IqQnETxzddDYCW2UZntEibBBFk=
+Received: from localhost.localdomain ( [localhost])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 18 Mar 2025 15:47:00 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 11619654860580283103
+From: WangYuli <wangyuli@uniontech.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	corbet@lwn.net
+Cc: netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	tom@herbertland.com,
+	zhanjun@uniontech.com,
+	niecheng1@uniontech.com,
+	guanwentao@uniontech.com,
+	WangYuli <wangyuli@uniontech.com>,
+	Sourcery AI <hello@sourcery.ai>
+Subject: [PATCH] docs: networking: strparser: Fix a typo
+Date: Tue, 18 Mar 2025 15:46:56 +0800
+Message-ID: <A43BEA49ED5CC6E5+20250318074656.644391-1-wangyuli@uniontech.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] ethtool: Block setting of symmetric RSS when
- non-symmetric rx-flow-hash is requested
-To: Gal Pressman <gal@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org
-Cc: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Tariq Toukan <tariqt@nvidia.com>
-References: <20250310072329.222123-1-gal@nvidia.com>
- <f7a63428-5b2e-47fe-a108-cdf93f732ea2@redhat.com>
- <9461675d-3385-4948-83a5-de34e0605b10@nvidia.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <9461675d-3385-4948-83a5-de34e0605b10@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: NIzMBgenmFvtYTCCG5ODXYQvkRvfpjXLXyhI7HUT29CEVuzh6/+vqAnH
+	OoYFAfSsQBeND5y0XjsNhDiyKWHuORH1H91l/y3YWxDQH1gBPHV9HcjAXEaZIbDFzcUeGim
+	0rLOmryJV6sYS6iRvkL30zsfGDcicnjoRlWhh7ZBztxMDPXxuZTTBHQn6PZOdqj89xbUFdW
+	PjOyzGmJVLT3HQZPnhEH3RhW1V4+YEv+F29qy0kWkXSVqd0gvzNA5HgUPSCrANMBtgTeo2a
+	PPFTgheUhGjdazX95uDePQj9FH+lLQJs407PlL9+3yssr/nV9nlfIynv40a08UDAnwgFtXx
+	LXkbdvrWMSDcLpq5K4/+2LxI0yzUZLKG6XKNsgPF6qxrWrMbZI9Oczl51U/iRoBGghO0ZnZ
+	LW08t1l2npzK1MH7afCsb/Cx4tELwJqzr3QLgLX8abt6DU64MLAV+h+SDu6X7oFRSwyQqb+
+	zpCS8sB7sGlIueU0ZK9U1VMQbMakRKtMyZBcsK1qb2p2266WCXnq79r+sIBoCYRIzUZD9oi
+	0GKkx+r+JIvb+bGukkHEmT3NtG7tQLq5yLwgGY5QNTarNy+hOixInhjktPuV6UOUCQLJ/Gi
+	HeVYoBhSWh1pNp2hIaKp3A1cWuIBBOE0cXtP4NCrfCCTP8gH/WLce0SHr78qHbTlreEl3Fg
+	DkuHB2ojOzbO1HHVrUs7Dd48Fkiz1X4q8GhSv2BWizT03BnHssNGkPKlcbk0la8S8imAbXC
+	1AbgDKnGQ4uRcd+lGmwZJNUmFj6QfFQhhT+BdBCqzpF1YzK3G1sL3QgvUUQJMuTYISi4Yf0
+	ayEO4+1lKB1bqRhDtR/RtQPyvfhfUpT/hr1dT6YOg+Xps1G+jBkR/2xVf8SwBVyU8bZEuj4
+	ztSxzWFt7nis+ImxYuYPD9YamPxBPGYNd20tAI69ptr1Eu/TjydOHFlE6hSmPUsBkSvmC5X
+	SMSrcvszZo0dxKi5h12IPXywc9VXc7ZbFCuUPO9MgcH5E4Z1fXt0s7vt3xNX4LUKpL8zujS
+	B9iL5mLtJUgcurnunR
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+X-QQ-RECHKSPAM: 0
 
-On 3/18/25 8:28 AM, Gal Pressman wrote:
-> On 17/03/2025 22:19, Paolo Abeni wrote:
->> I fear we can't replace macros with enum in uAPI: existing application
->> could do weird thing leveraging the macro defintion and would break with
->> this change.
-> 
-> I couldn't think of any issues, you got me curious, do you have an example?
+The context indicates that 'than' is the correct word instead of 'then',
+as a comparison is being performed.
 
-I guess something alike the following could be quite common or at least
-possible:
+Given that 'then' is also a valid English word, checkpatch.pl wouldn't
+have picked up on this spelling error.
 
-#ifdef AH_V4_FLOW
+This typo was caught by AI during code review.
 
-// kernel support AH flow, implement user-space side
+Fixes: adcce4d5dd46 ("strparser: Documentation")
+Reported-by: Sourcery AI <hello@sourcery.ai>
+Suggested-by: Wentao Guan <guanwentao@uniontech.com>
+Signed-off-by: WangYuli <wangyuli@uniontech.com>
+---
+ Documentation/networking/strparser.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-#else
-
-// fail on any AH-flow related code path
-
-#endif
-
-Cheers,
-
-Paolo
+diff --git a/Documentation/networking/strparser.rst b/Documentation/networking/strparser.rst
+index 7f623d1db72a..8dc6bb04c710 100644
+--- a/Documentation/networking/strparser.rst
++++ b/Documentation/networking/strparser.rst
+@@ -180,7 +180,7 @@ There are seven callbacks:
+     struct contains two fields: offset and full_len. Offset is
+     where the message starts in the skb, and full_len is the
+     the length of the message. skb->len - offset may be greater
+-    then full_len since strparser does not trim the skb.
++    than full_len since strparser does not trim the skb.
+ 
+     ::
+ 
+-- 
+2.49.0
 
 
