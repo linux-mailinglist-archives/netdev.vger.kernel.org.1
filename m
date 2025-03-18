@@ -1,180 +1,279 @@
-Return-Path: <netdev+bounces-175704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49B48A67312
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 12:47:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30FF9A6731D
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 12:49:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83FC43BE593
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 11:47:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A7583A8813
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 11:49:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99E5E20B7F7;
-	Tue, 18 Mar 2025 11:46:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3366D205ABF;
+	Tue, 18 Mar 2025 11:49:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qjjG1njZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hHK1V7mI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8F6205ABF;
-	Tue, 18 Mar 2025 11:46:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A98204F8E
+	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 11:49:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742298393; cv=none; b=P8/YTBP6qJgYzjqPwHHkw8Bay60Loskg8trrE7ay2GUyLNT7T0cC7Hr256insG8SdpRpDyB9hJUXn2KF4DwOD+zSqatc6NC4/DmfLqIn6pkXnxPe8eTQSUhYEJSmqj3jucK4qWJZsDE6BrjBMc52r7sQddetZW5zjElDdbkZONs=
+	t=1742298552; cv=none; b=bAQsq9c/It9ZvuN5j1Q4WKQKWXc01mf7vC98SaPctfD/zsPycKFfdQc1tKoHBBQHLPUk6BF47hzMY0MMKIq5sEnGrjEJccyDSeghzmXs3Jqqa7Z0pISu1UJ5WrILfXFrXvZ/0WTNsfFynGEb3bzUUjcwzUs/yG7BV3S70wH7mIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742298393; c=relaxed/simple;
-	bh=tn+hq/0Bcb87RovOeP5Bt+IfR0Zp29EmcXvKf0cZpUk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=eTPO6JRuZLQSHf7bd98oECktNJdpscA7K6u7QQzM+sgcTaciY1YOWLOOHH+dCar04EVfH0hXjY/Iw3gPpd25VX767Uzn01IH0Rmtpa/j+HD3Uy0NKBU+EEoXqyfOjxZjGB5EEzSdPsX+vgpvJWV8A1ywbhgedfhsp1GYJ/4kkEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qjjG1njZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A68BC4CEDD;
-	Tue, 18 Mar 2025 11:46:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742298392;
-	bh=tn+hq/0Bcb87RovOeP5Bt+IfR0Zp29EmcXvKf0cZpUk=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=qjjG1njZTUG9rTBF7/APH6lBgtwgCIYSgX0FQiQLgna6AbPIzk+CTTlZZSa1gerVt
-	 Rp/KCVp7JDwwYy504ZHF+lk8Wu+9lzNNTYVo04k8zZKdBZ+JIa/YjbKycMcjpuNqz6
-	 iJCeFzES9xKg7DgrNR2Z884Lhz4irjZHKm4KorN1QgF+iIO2TmK2MCbzrwoTIRIzrp
-	 nnVxKIPAmMV3tJjqP42kQPoUI3rlLapeeJaWXuYs0oSfUpnEgAPl7E6wwkpW6Ku8/0
-	 EoklRCPx8CWC4gJmymjnaLAx1yUNE/tVzSdImFL0iKRYWWFOeOP7bYHT4XCHXqZ+Jv
-	 BAiaHx489kSFg==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Tue, 18 Mar 2025 12:46:11 +0100
-Subject: [PATCH net-next v2 7/7] net: ti: cpsw: Add metadata support for
- xdp mode
+	s=arc-20240116; t=1742298552; c=relaxed/simple;
+	bh=KxoYITn417uyN3i8B3pdy3asxQq3DsyDyfN10Wrb9IY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JdQBvSPhR5H6XHAfFylcpclhlAQ+aUqNwjoZwKplg8TF330uGcB2/eMr56/6aCJlMNDv1otzwaVUcAUWK2JgK/E034eEYpkkMuUOUC+BVg8IAzQd+80+/ZXv/qJge+ADX+Ti8zN7W+SYuUeetXMn6yMdR88apE2fWUSlp3ozHJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hHK1V7mI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742298545;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+98WTI3qimtBwRWvbDj1dFBf/uuxSj736wvi5kpnIIE=;
+	b=hHK1V7mIC3REeRhg7MxFYEVPbmsgJXDSqYYxOEHIPDSpjFfe+VIN3FsWVLtcOO2GffmDz0
+	FelcUgIW2yEleNjoS1GXdySPhjSDxs8tUhW0vwFuEJz1s4Olp8Hhi2UvUbppKYgrLGBSkO
+	SyrFsGJMoUhq/TJBbCCrfzlRWWypqYA=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-634-3tZJNoh6MjeorutI25kR6g-1; Tue, 18 Mar 2025 07:49:04 -0400
+X-MC-Unique: 3tZJNoh6MjeorutI25kR6g-1
+X-Mimecast-MFC-AGG-ID: 3tZJNoh6MjeorutI25kR6g_1742298543
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-391492acb59so3534727f8f.3
+        for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 04:49:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742298543; x=1742903343;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+98WTI3qimtBwRWvbDj1dFBf/uuxSj736wvi5kpnIIE=;
+        b=jJoOy3OKXYYKT0BafQiFVe4Zry7zpHwVtHxgur2IsZgaZ/WVj97vuEpi1CbNSOxXCs
+         0PEoul18e/XBXnKkFzmLJh09IL3ce5JrUg3JtrjlWqbyTakO0gFT4OlgmLgP9VGj8w6L
+         0RAMlNmgp7M895q30ajjuZ8Wl0hoC/6K/85tVozmhWfs6+TN+LHxTUq6pjNnVTBZVj3K
+         lDKYyvuD/exEu1Uut2rF5DwW1Ga0AluJJ34b95HeeSXhF0/GRvwoJMYFmhoC0WLhclKj
+         bDFcPAE4QxFDAaVLSnLVUWM4MMOGycpi4v28lD/Crl9G1a1OHnLjJ571SXx8KnJSOl4c
+         AbGw==
+X-Gm-Message-State: AOJu0YwDJUbcfYsh7pp+jQ8u9+0Jw5kT7jgHMlbOEBhhTV74Bbdw8k42
+	VsZE3cCilPuinhSq/eKHpb82I/7V6ATmFLMKoO8IcFqRPDhCF50mbHFykFmYUy+q9d3sR1Lt5KS
+	4LArP9IjzEh9fPwu6WENqDQAiu784Z9r3/8Gs3Cpr+NzhOPpsD4/QxA==
+X-Gm-Gg: ASbGncuYepVAkCDfBjEq/ae5uTYxdFtVN0egr5opRzqSZHYjZe7Nv/FH0OGVVJiK7wO
+	pVE3rT3kGVy9vz7xF9PTBHdAOJtWEo0jAqLecKXH0pAZ1S377XgnTEHTKj3db4qLm8cTyMJI3ba
+	UK3jwPMk1Gca8kGcKp+CZbQUKdebclETcnsmj1ZmBp0AoYdoS9bBDeLZtd43H/AoywJm2/pkLtk
+	IQTQKVWZHhprQrhz82jRqF/vziJYoO97DXUoOPTJVQ7ml49h5WAIe8oduF6+rkrNUQsqY0hrd9Y
+	0bXt8mgQTM2r4LLyurRdJFynZHhG/8qIAr94DBQkeN4axQ==
+X-Received: by 2002:adf:8bdb:0:b0:391:1923:5a91 with SMTP id ffacd0b85a97d-3971fadd9e3mr13002763f8f.55.1742298542986;
+        Tue, 18 Mar 2025 04:49:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGx0IeMONgddVVQsqatQ0bl5f81F+UWy6bvMWzQp6yAeocvppNFdnjEe8Tw47M/ZBSdf4PCXg==
+X-Received: by 2002:adf:8bdb:0:b0:391:1923:5a91 with SMTP id ffacd0b85a97d-3971fadd9e3mr13002740f8f.55.1742298542568;
+        Tue, 18 Mar 2025 04:49:02 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-10-172.dyn.eolo.it. [146.241.10.172])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395c8975b83sm18462397f8f.52.2025.03.18.04.49.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Mar 2025 04:49:02 -0700 (PDT)
+Message-ID: <8e804715-3123-4ab5-94ce-625060df4835@redhat.com>
+Date: Tue, 18 Mar 2025 12:49:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 3/3] net: stmmac: Add DWMAC glue layer for
+ Renesas GBETH
+To: Prabhakar <prabhakar.csengg@gmail.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ Biju Das <biju.das.jz@bp.renesas.com>,
+ Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+ Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+References: <20250311221730.40720-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250311221730.40720-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250311221730.40720-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250318-mvneta-xdp-meta-v2-7-b6075778f61f@kernel.org>
-References: <20250318-mvneta-xdp-meta-v2-0-b6075778f61f@kernel.org>
-In-Reply-To: <20250318-mvneta-xdp-meta-v2-0-b6075778f61f@kernel.org>
-To: Marcin Wojtas <marcin.s.wojtas@gmail.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
- Masahisa Kojima <kojima.masahisa@socionext.com>, 
- Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, 
- Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>, 
- Bharat Bhushan <bbhushan2@marvell.com>, Felix Fietkau <nbd@nbd.name>, 
- Sean Wang <sean.wang@mediatek.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- "K. Y. Srinivasan" <kys@microsoft.com>, 
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
- Dexuan Cui <decui@microsoft.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
- Roger Quadros <rogerq@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
- linux-hyperv@vger.kernel.org, linux-omap@vger.kernel.org, 
- Michal Kubiak <michal.kubiak@intel.com>
-X-Mailer: b4 0.14.2
 
-Set metadata size building the skb from xdp_buff in cpsw/cpsw_new
-drivers. ti cpsw and cpsw_new drivers set xdp headroom at least to
-CPSW_HEADROOM_NA:
+On 3/11/25 11:17 PM, Prabhakar wrote:
+> @@ -0,0 +1,166 @@
+> +// SPDX-License-Identifier: GPL-2.0+
+> +/*
+> + * dwmac-renesas-gbeth.c - DWMAC Specific Glue layer for Renesas GBETH
+> + *
+> + * The Rx and Tx clocks are supplied as follows for the GBETH IP.
+> + *
+> + *                         Rx / Tx
+> + *   -------+------------- on / off -------
+> + *          |
+> + *          |            Rx-180 / Tx-180
+> + *          +---- not ---- on / off -------
+> + *
+> + * Copyright (C) 2025 Renesas Electronics Corporation
+> + */
+> +
+> +#include <linux/clk.h>
+> +#include <linux/device.h>
+> +#include <linux/module.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/reset.h>
+> +
+> +#include "dwmac4.h"
+> +#include "stmmac_platform.h"
+> +
+> +struct renesas_gbeth {
+> +	struct plat_stmmacenet_data *plat_dat;
+> +	struct reset_control *rstc;
+> +	struct device *dev;
+> +	void __iomem *regs;
+> +};
+> +
+> +static const char *const renesas_gbeth_clks[] = {
+> +	"tx", "tx-180", "rx", "rx-180",
+> +};
+> +
+> +static struct clk *renesas_gbeth_find_clk(struct plat_stmmacenet_data *plat_dat,
+> +					  const char *name)
+> +{
+> +	for (unsigned int i = 0; i < plat_dat->num_clks; i++)
+> +		if (!strcmp(plat_dat->clks[i].id, name))
+> +			return plat_dat->clks[i].clk;
+> +
+> +	return NULL;
+> +}
+> +
+> +static int renesas_gbeth_clks_config(void *priv, bool enabled)
+> +{
+> +	struct renesas_gbeth *gbeth = priv;
+> +	struct plat_stmmacenet_data *plat_dat = gbeth->plat_dat;
 
-CPSW_HEADROOM_NA max(XDP_PACKET_HEADROOM, NET_SKB_PAD) + NET_IP_ALIGN
+Minor nit: please respect the reverse christmas tree order above:
 
-so the headroom is large enough to contain xdp_frame and xdp metadata.
-Please note this patch is just compiled tested.
+	struct plat_stmmacenet_data *plat_dat;
+	struct renesas_gbeth *gbeth = priv;
 
-Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/ti/cpsw.c     | 6 +++++-
- drivers/net/ethernet/ti/cpsw_new.c | 6 +++++-
- 2 files changed, 10 insertions(+), 2 deletions(-)
+and init plat_dat later.
 
-diff --git a/drivers/net/ethernet/ti/cpsw.c b/drivers/net/ethernet/ti/cpsw.c
-index 0cb6fa6e5b7d4fb9703633f0d67a7e95e6e7d8aa..a984b7d84e5e5917b83547c862924ccd30d83601 100644
---- a/drivers/net/ethernet/ti/cpsw.c
-+++ b/drivers/net/ethernet/ti/cpsw.c
-@@ -351,6 +351,7 @@ static void cpsw_rx_handler(void *token, int len, int status)
- 	int			ret = 0, port, ch = xmeta->ch;
- 	int			headroom = CPSW_HEADROOM_NA;
- 	struct net_device	*ndev = xmeta->ndev;
-+	u32			metasize = 0;
- 	struct cpsw_priv	*priv;
- 	struct page_pool	*pool;
- 	struct sk_buff		*skb;
-@@ -400,7 +401,7 @@ static void cpsw_rx_handler(void *token, int len, int status)
- 			size -= CPSW_RX_VLAN_ENCAP_HDR_SIZE;
- 		}
- 
--		xdp_prepare_buff(&xdp, pa, headroom, size, false);
-+		xdp_prepare_buff(&xdp, pa, headroom, size, true);
- 
- 		port = priv->emac_port + cpsw->data.dual_emac;
- 		ret = cpsw_run_xdp(priv, ch, &xdp, page, port, &len);
-@@ -408,6 +409,7 @@ static void cpsw_rx_handler(void *token, int len, int status)
- 			goto requeue;
- 
- 		headroom = xdp.data - xdp.data_hard_start;
-+		metasize = xdp.data - xdp.data_meta;
- 
- 		/* XDP prog can modify vlan tag, so can't use encap header */
- 		status &= ~CPDMA_RX_VLAN_ENCAP;
-@@ -423,6 +425,8 @@ static void cpsw_rx_handler(void *token, int len, int status)
- 
- 	skb_reserve(skb, headroom);
- 	skb_put(skb, len);
-+	if (metasize)
-+		skb_metadata_set(skb, metasize);
- 	skb->dev = ndev;
- 	if (status & CPDMA_RX_VLAN_ENCAP)
- 		cpsw_rx_vlan_encap(skb);
-diff --git a/drivers/net/ethernet/ti/cpsw_new.c b/drivers/net/ethernet/ti/cpsw_new.c
-index 3da1c131335df1ff79b32ce0e3ea5200a2e53f4b..5b5b52e4e7a757a14965fe6df41935aed547111f 100644
---- a/drivers/net/ethernet/ti/cpsw_new.c
-+++ b/drivers/net/ethernet/ti/cpsw_new.c
-@@ -293,6 +293,7 @@ static void cpsw_rx_handler(void *token, int len, int status)
- 	struct page_pool *pool;
- 	struct sk_buff *skb;
- 	struct xdp_buff xdp;
-+	u32 metasize = 0;
- 	int ret = 0;
- 	dma_addr_t dma;
- 
-@@ -345,13 +346,14 @@ static void cpsw_rx_handler(void *token, int len, int status)
- 			size -= CPSW_RX_VLAN_ENCAP_HDR_SIZE;
- 		}
- 
--		xdp_prepare_buff(&xdp, pa, headroom, size, false);
-+		xdp_prepare_buff(&xdp, pa, headroom, size, true);
- 
- 		ret = cpsw_run_xdp(priv, ch, &xdp, page, priv->emac_port, &len);
- 		if (ret != CPSW_XDP_PASS)
- 			goto requeue;
- 
- 		headroom = xdp.data - xdp.data_hard_start;
-+		metasize = xdp.data - xdp.data_meta;
- 
- 		/* XDP prog can modify vlan tag, so can't use encap header */
- 		status &= ~CPDMA_RX_VLAN_ENCAP;
-@@ -368,6 +370,8 @@ static void cpsw_rx_handler(void *token, int len, int status)
- 	skb->offload_fwd_mark = priv->offload_fwd_mark;
- 	skb_reserve(skb, headroom);
- 	skb_put(skb, len);
-+	if (metasize)
-+		skb_metadata_set(skb, metasize);
- 	skb->dev = ndev;
- 	if (status & CPDMA_RX_VLAN_ENCAP)
- 		cpsw_rx_vlan_encap(skb);
+> +	int ret;
+> +
+> +	if (enabled) {
+> +		ret = reset_control_deassert(gbeth->rstc);
+> +		if (ret) {
+> +			dev_err(gbeth->dev, "Reset deassert failed\n");
+> +			return ret;
+> +		}
+> +
+> +		ret = clk_bulk_prepare_enable(plat_dat->num_clks, plat_dat->clks);
+> +		if (ret)
+> +			reset_control_assert(gbeth->rstc);
+> +	} else {
+> +		clk_bulk_disable_unprepare(plat_dat->num_clks, plat_dat->clks);
+> +		ret = reset_control_assert(gbeth->rstc);
+> +		if (ret)
+> +			dev_err(gbeth->dev, "Reset assert failed\n");
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +static int renesas_gbeth_probe(struct platform_device *pdev)
+> +{
+> +	struct plat_stmmacenet_data *plat_dat;
+> +	struct stmmac_resources stmmac_res;
+> +	struct device *dev = &pdev->dev;
+> +	struct renesas_gbeth *gbeth;
+> +	unsigned int i;
+> +	int err;
+> +
+> +	err = stmmac_get_platform_resources(pdev, &stmmac_res);
+> +	if (err)
+> +		return dev_err_probe(dev, err,
+> +				     "failed to get resources\n");
+> +
+> +	plat_dat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
+> +	if (IS_ERR(plat_dat))
+> +		return dev_err_probe(dev, PTR_ERR(plat_dat),
+> +				     "dt configuration failed\n");
+> +
+> +	gbeth = devm_kzalloc(dev, sizeof(*gbeth), GFP_KERNEL);
+> +	if (!gbeth)
+> +		return -ENOMEM;
+> +
+> +	plat_dat->num_clks = ARRAY_SIZE(renesas_gbeth_clks);
+> +	plat_dat->clks = devm_kcalloc(dev, plat_dat->num_clks,
+> +				      sizeof(*plat_dat->clks), GFP_KERNEL);
+> +	if (!plat_dat->clks)
+> +		return -ENOMEM;
+> +
+> +	for (i = 0; i < plat_dat->num_clks; i++)
+> +		plat_dat->clks[i].id = renesas_gbeth_clks[i];
+> +
+> +	err = devm_clk_bulk_get(dev, plat_dat->num_clks, plat_dat->clks);
+> +	if (err < 0)
+> +		return err;
+> +
+> +	plat_dat->clk_tx_i = renesas_gbeth_find_clk(plat_dat, "tx");
+> +	if (!plat_dat->clk_tx_i)
+> +		return dev_err_probe(dev, -EINVAL,
+> +				     "error finding tx clock\n");
+> +
+> +	gbeth->rstc = devm_reset_control_get_exclusive(dev, NULL);
+> +	if (IS_ERR(gbeth->rstc))
+> +		return PTR_ERR(gbeth->rstc);
+> +
+> +	gbeth->dev = dev;
+> +	gbeth->regs = stmmac_res.addr;
+> +	gbeth->plat_dat = plat_dat;
+> +	plat_dat->bsp_priv = gbeth;
+> +	plat_dat->set_clk_tx_rate = stmmac_set_clk_tx_rate;
+> +	plat_dat->clks_config = renesas_gbeth_clks_config;
+> +	plat_dat->flags |= STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY |
+> +			   STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP |
 
--- 
-2.48.1
+The above does not compile:
+
+../drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c:124:7:
+error: use of undeclared identifier 'STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP'
+
+
+> +			   STMMAC_FLAG_SPH_DISABLE;
+> +
+> +	err = renesas_gbeth_clks_config(gbeth, true);
+> +	if (err)
+> +		return err;
+> +
+> +	err = stmmac_dvr_probe(dev, plat_dat, &stmmac_res);
+> +	if (err) {
+> +		renesas_gbeth_clks_config(gbeth, false);
+> +		return err;
+
+Just:
+
+	if (err)
+		renesas_gbeth_clks_config(gbeth, false);
+
+	return err;
+
+Thanks,
+
+Paolo
 
 
