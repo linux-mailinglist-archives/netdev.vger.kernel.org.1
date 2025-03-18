@@ -1,138 +1,132 @@
-Return-Path: <netdev+bounces-175666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A36D5A670E3
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 11:14:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 248E8A670E6
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 11:14:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 618393ACAC6
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 10:13:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2780019A018C
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 10:14:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1A15207A04;
-	Tue, 18 Mar 2025 10:13:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68064207A23;
+	Tue, 18 Mar 2025 10:14:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AQpgYCmf"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="JE1Q1JaG"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8400205AC1
-	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 10:13:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFBA1205AC1;
+	Tue, 18 Mar 2025 10:14:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742292809; cv=none; b=Sx3yNsgNw0CKcImBFu3xCX3LeX2fzII6HbL9r66zJ3V4UxEdaT/YjIsfxqB1yBkm/ldAIXrXhowsI9jB+N2Nc4SLuJrBpStFUmNbVXy5Cmx6GXFyyfChhqZPkAkgf22i7kgMC3GczNpxX1uhSfqYwlqONKIQFdE7RpsYOQve1PA=
+	t=1742292844; cv=none; b=DaaXqhZ1NA0rX7vTvLYaItlwfNMD8Osv5r0OFFe/BQVYFghByUUZHuCssC6ClIXzaMIY+0mNPmHGQJV4WwqwvzYYpQY4hqjj1qKGOuDhfxz+W3UB9f1Ty7n76THQhO/hvi1c0EiLFKsLzSy9De1xT4as9uLXhtbS/klpAYuSre0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742292809; c=relaxed/simple;
-	bh=bTXyPUX/nTogcTrzO4w+0DnzKj6GcEsE6zMX5lpp/T8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IRRD+Mrb87PAge4goUPB3eYhG3Zzyv5p5qf/YVX/2EFo8/r+eIhQUzxc1Ete6dFS+S80zDUVg7STUI6HLiwao7avma2Zd+wiEItgRCubXrOrohTHQX20Ui9KlSgCBXW11CyH/wLoLSwSWIK3rYNy3DlKB3tckrymFGrHa72OVIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AQpgYCmf; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742292807;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bTXyPUX/nTogcTrzO4w+0DnzKj6GcEsE6zMX5lpp/T8=;
-	b=AQpgYCmfpA2TBL9C2S2jkX34ddR0CnZKOoYKQbKX/3evvYkWW+bPjcFOit+tFC/2noS2Sc
-	pyp1YrNhQ7zrpCScspKNxPf0WUP2hGBvrIKKkpyQYCY+Iy25TtxlD4uXMvxSsRhl3DfwEw
-	zoXJeNtVbPahL/3ghvYnAf2svs3QQh8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-312-s15r23kPM0yIhuXV98v35w-1; Tue, 18 Mar 2025 06:13:25 -0400
-X-MC-Unique: s15r23kPM0yIhuXV98v35w-1
-X-Mimecast-MFC-AGG-ID: s15r23kPM0yIhuXV98v35w_1742292804
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43941ad86d4so15410975e9.2
-        for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 03:13:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742292804; x=1742897604;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bTXyPUX/nTogcTrzO4w+0DnzKj6GcEsE6zMX5lpp/T8=;
-        b=uEk+PETvCCiOIYhbA8RfNGuHtv6A00dPq3wmH+xsXKQYz3hVkW7idE2dw/+Xpe/1NW
-         5RaqN78mdfCC1z2i2JqoizmKcRAeeiiJWnZX0G6pO1ato8+XYdAk5d+LYqK8klliSC9W
-         HIokxNM7pCKh8xIwe6H7WHGW9+37nXNgOfLHhyGIrbM+v8ekjF6m/AIGIMfJNtXf+c4o
-         9OjxdlKx5vvMxMxQUdZCoOVkGZ5M1nTz2KDIOI8kWZ/2yGX15SWrJ/tQ1M94zkvo9Rrw
-         nJcHrVOUs+d8lNtSlnYUNY1D3HKYd1a1BSirS17WRwBwZFuf2Y/aVfbfbPcM+XmKBxpm
-         B4XQ==
-X-Gm-Message-State: AOJu0Yx931z18kgNlbHo+xZQpMSblk+1gOLnTVtV5kC2tnUryEhgASkp
-	9LmjEi43bTvWYBK5stiyKRIJJ3ZDK+C4HgriTCIpbUuqBmM81KEIIzJWhzIfv3vF/33QdNNogre
-	47eejGvP+HIeDYcmG7oVxrF8IAKsn7F1v/AnE+H2rmkEuybS5Bz4Mvg==
-X-Gm-Gg: ASbGncsxR0Z9muEssR/JawX91fgnXHvyygih7wsBDfHhVN14vQiyKpuVWmuFZur5kcJ
-	pwepX1g7RB6qHGtaQBAZnAxp/48pSxlRR7fW9ixq4joTf0fPgIfV0gGWtf29PRBvFq9jviKeO+8
-	CUi1KZ43q5CV9McSc11cya6DRyNOWnTsHS+QDSd5RIMsoiabkTIO+EjM6H4DqEA4HmgMmWAD0ob
-	4ZY+oxJ5JQfKv8tu5Qpzu+0klwBeuLCeWm6y6IPxUGqi85tbG7OTg1ZQZv40HVLyMzS57vorE2k
-	ah+MgMhvt7Oe2lG2AcdZinPF0fQ6y9LrglVQK3/E9mG4YA==
-X-Received: by 2002:a05:600c:5112:b0:43c:e70d:4504 with SMTP id 5b1f17b1804b1-43d3b9cd704mr14645115e9.19.1742292804464;
-        Tue, 18 Mar 2025 03:13:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEa2x79C78ENEoyzPPniqeGCkHBce2M9I0jdc1yv0/RSaEENBZYufXun9PO4beIARs4YqnHHQ==
-X-Received: by 2002:a05:600c:5112:b0:43c:e70d:4504 with SMTP id 5b1f17b1804b1-43d3b9cd704mr14644695e9.19.1742292804010;
-        Tue, 18 Mar 2025 03:13:24 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-10-172.dyn.eolo.it. [146.241.10.172])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d1fe609dasm129105475e9.28.2025.03.18.03.13.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Mar 2025 03:13:23 -0700 (PDT)
-Message-ID: <6259af5f-f518-4f88-ada9-31c3425ce6ed@redhat.com>
-Date: Tue, 18 Mar 2025 11:13:20 +0100
+	s=arc-20240116; t=1742292844; c=relaxed/simple;
+	bh=FX4cyBVUiAzeSPf8RPJP9YjElLpzhnZapb3umk3pBHU=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i022BMRyp0vnC3fQ0uWvm3pGTbQ2b/Gms+qCZBTezJWPIqu7MWyViZ7Cgm3wdAFh0exWBdbP8Ny5BfxIYTMVJ16YSf6/DWrur53StdSWOHY/CRJOd32zgsLhrhomMpPOuQGXFsaEtZSy/p14VqB4mamQjfbdLMAFQdPSRoIFZP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=JE1Q1JaG; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52I1950C027156;
+	Tue, 18 Mar 2025 10:13:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=jjWDZoORKIOqq8Zml1sJRSMh
+	3yhKgNOhNoM65Pniax8=; b=JE1Q1JaGJjAZLmsWACXleDCjXY2dIXtZvMf3YpyI
+	VRpJkhdOXs2h29zdIDg8Dyiu6s0vnWdgJ3ou0e6rGcjtruK/myjnCaUtyjmWUdgA
+	8jT+pfV+/yQNuF7idNBFJsgYyv73O/SFQ3/34CP0K6AqRtr+ZN4kjZWd+D7U+PTy
+	4nKOStzdK24sg10r8y0hwHV8c+YDFVSc5xz+ioiSRo5lHdQjIHNzDHf2L/ov2VM4
+	hVjWI0h4854vzwaOM8fo8I0dF14+2TKvDuADpDhi5GIjzJnw+kaTB9YBV03M+BIc
+	d5DmAW9HJF36ta3Bk7QO7B4OzjxxLWmuDBwgV5GfQtt3hQ==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 45exwthchr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 18 Mar 2025 10:13:30 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 52IADUYt020637
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 18 Mar 2025 10:13:30 GMT
+Received: from PHILBER.na.qualcomm.com (10.80.80.8) by
+ nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Tue, 18 Mar 2025 03:13:25 -0700
+Date: Tue, 18 Mar 2025 11:13:22 +0100
+From: Peter Hilber <quic_philber@quicinc.com>
+To: Lei Yang <leiyang@redhat.com>
+CC: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+        Trilok Soni <quic_tsoni@quicinc.com>,
+        Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+        Xuan Zhuo
+	<xuanzhuo@linux.alibaba.com>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <virtualization@lists.linux.dev>,
+        David Woodhouse
+	<dwmw2@infradead.org>,
+        "Ridoux, Julien" <ridouxj@amazon.com>,
+        Daniel Lezcano
+	<daniel.lezcano@linaro.org>,
+        Alexandre Belloni
+	<alexandre.belloni@bootlin.com>,
+        Parav Pandit <parav@nvidia.com>,
+        "Matias
+ Ezequiel Vara Larsen" <mvaralar@redhat.com>,
+        Cornelia Huck
+	<cohuck@redhat.com>, Simon Horman <horms@kernel.org>,
+        <virtio-dev@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
+        <linux-rtc@vger.kernel.org>
+Subject: Re: [PATCH v6 0/4] Add virtio_rtc module
+Message-ID: <xogief67mb2wonb7angoypj4ddvvecyrcsnncqitggpij6ssim@fo3psnqqhovp>
+References: <20250313173707.1492-1-quic_philber@quicinc.com>
+ <CAPpAL=we6VkyBXBO2cBiszpGUP5f7QSioQbp6x3YoCqa9qUPRQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/7] net: xdp: Add missing metadata support for
- some xdp drvs
-To: Lorenzo Bianconi <lorenzo@kernel.org>,
- Marcin Wojtas <marcin.s.wojtas@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Russell King <linux@armlinux.org.uk>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Masahisa Kojima <kojima.masahisa@socionext.com>,
- Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>,
- Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>,
- Bharat Bhushan <bbhushan2@marvell.com>, Felix Fietkau <nbd@nbd.name>,
- Sean Wang <sean.wang@mediatek.com>, Matthias Brugger
- <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- "K. Y. Srinivasan" <kys@microsoft.com>,
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
- Dexuan Cui <decui@microsoft.com>, Siddharth Vadapalli <s-vadapalli@ti.com>,
- Roger Quadros <rogerq@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- linux-hyperv@vger.kernel.org, linux-omap@vger.kernel.org
-References: <20250311-mvneta-xdp-meta-v1-0-36cf1c99790e@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250311-mvneta-xdp-meta-v1-0-36cf1c99790e@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <CAPpAL=we6VkyBXBO2cBiszpGUP5f7QSioQbp6x3YoCqa9qUPRQ@mail.gmail.com>
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: Mr7Thedl-QJOp0Aoc6AvPfrSkmEMvY8n
+X-Proofpoint-ORIG-GUID: Mr7Thedl-QJOp0Aoc6AvPfrSkmEMvY8n
+X-Authority-Analysis: v=2.4 cv=UoJjN/wB c=1 sm=1 tr=0 ts=67d9474a cx=c_pps a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17 a=GEpy-HfZoHoA:10 a=kj9zAlcOel0A:10 a=Vs1iUdzkB0EA:10 a=20KFwNOVAAAA:8 a=g3YzpIbaydEdkk7JLBIA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-18_05,2025-03-17_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ impostorscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=738
+ phishscore=0 adultscore=0 clxscore=1011 spamscore=0 suspectscore=0
+ lowpriorityscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
+ definitions=main-2503180074
 
-On 3/11/25 1:18 PM, Lorenzo Bianconi wrote:
-> Introduce missing metadata support for some xdp drivers setting metadata
-> size building the skb from xdp_buff.
-> Please note most of the drivers are just compile tested.
+On Tue, Mar 18, 2025 at 10:04:07AM +0800, Lei Yang wrote:
+> QE tested this series of patches v6 with virtio-net regression tests,
+> everything works fine.
+> 
+> Tested-by: Lei Yang <leiyang@redhat.com>
+> 
 
-I'm sorry, but you should at very least report explicitly on per patch
-basis which ones have been compile tested.
+Hi Lei,
 
-Even better, please additionally document in each patch why/how the
-current headroom is large enough.
+thanks for the reply! However, I am not sure which virtio-net regression
+tests you are referring to, and how these tests would be relevant to
+virtio_rtc. The virtio_rtc driver does not have any relation to
+virtio-net ATM. Reusing virtio_rtc within virtio-net has been discussed
+in the past, but not done yet.
 
-Thanks,
+Best regards,
 
-Paolo
-
+Peter
 
