@@ -1,298 +1,152 @@
-Return-Path: <netdev+bounces-175934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F259BA68073
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 00:07:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4A6BA68076
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 00:08:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2116D19C1B2A
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 23:07:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8ECE3B2F95
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 23:07:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E74B220CCF0;
-	Tue, 18 Mar 2025 23:07:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85401207E02;
+	Tue, 18 Mar 2025 23:07:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="Gwb7Vcps";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="VmOi1ol5"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="TTAOBaRU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE06D2066D6;
-	Tue, 18 Mar 2025 23:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED4EF18C03A
+	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 23:07:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742339250; cv=none; b=q+hEtpixdJEYdr4zDcVNhHm3RHV7jLxgQPY8pDJxh89lkpU8a99WfXOu4yVRYpNCVVrr9vyxJyu5xd6+cw5fBUr9V724WKVmsqyhsOTbsz1/XHAkUKl5DZZP8hut13TKE/20Tm1lOIuYCjk55LHrq1qgLcmvlld65bpMx8reh2k=
+	t=1742339272; cv=none; b=FWb8jw9XFkZlDfjEhFhGOCWjJTxYZ7tOrTxEnOmeJNN+fNVAEBf6iNR0xwk9NaP2t4xpmPZOhNfIfL9gBV2Gt5UUue0DbbwQkTDkwfqk6O6l95POM+1dKQu4bhqruZEHh3pnOCME5NzUT3gqXb2GSJvg+KzG6npM3I+ZMiKA/Z8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742339250; c=relaxed/simple;
-	bh=9kP2VUa1B6ZrmUIz57sX1FjbwUSsKOgNiqvAqqRtzT4=;
+	s=arc-20240116; t=1742339272; c=relaxed/simple;
+	bh=q7ryEWx94sGFK9j4bbYaRkOisLAZ1YYAgqwn4dwvZj8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YaIHYWLldiGaPM6NaU52nrYJStOrn0S8vwONaZNNxyin4MYz1qZIXnerQM/pC4uyd6yIW7gaweN8ozW2ulWH+spL4bdNBqcXjj55PHu4MujGTo1IP75JVvzOGTORMLmLixJKXSQWCDO4wjQv/k2oQm4YtAofRtMWG2miomn/KOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=Gwb7Vcps; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=VmOi1ol5; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id 32B05605D0; Wed, 19 Mar 2025 00:07:27 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1742339247;
-	bh=N3Cr+riLTVFzQOy+96h/MCkRT4+P0yY2oEt6mJomR6o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Gwb7Vcpsrc3efEFOVIl7NrgyUoHU6kWdZfQx3z+TczqM1lK6E05XFd4olKoWVaKtw
-	 Y2jQE6dWKjrkyFaFMKv5Ys9Iq26naSGuWoU+Aw9ZAYqqsF/nmxi8kTQNxOXMdV6SSx
-	 Usgwg/8g4YRwh78nl/HcZ/QW5SLWfvUnCl2cS2uzuf8Om/gDYbTwAhuuI9JZsXCvJD
-	 xIMHJ05uuwdb/zvmygOYR5W0lravn7N0HT88eT8wcgyA1GvTjGlJgeze9cH3qTkppS
-	 EatUzv98HuYpypycbc3bLFZdSUmI538Afgt/NmE2uoiIf1L9dEMyV4Igj+LoppF+kv
-	 FWIP1wHcHOzNw==
-X-Spam-Level: 
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id B37B5605BD;
-	Wed, 19 Mar 2025 00:07:22 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1742339242;
-	bh=N3Cr+riLTVFzQOy+96h/MCkRT4+P0yY2oEt6mJomR6o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VmOi1ol5l75GrD0dsZBl4s1wI30DbqYr//16bJ9sLBCBFt1NVSQGhS2fvT3QfrUE3
-	 wwqs1n/PVsTpm8LjCkldQUiI/FfIC65r9BFa91nLFQ289DOLzfDAX4tHkIb1jVWvgl
-	 o3nGs4q4j2v6tDrgyp4VaNfbfXgP3yDX7Xe3hMt1O6SKzWISxfB0zSA8ztbsBtXGiN
-	 XB8gx7ZmIyFYMj6YQkWkN06SU5uE7XEJp+rzs+dntWZ+X9wjMBYSsLWVna6sWj1kBs
-	 MTGCjAiLqJZg7QsLYDbb+fla0SP0StFWSFQj0Y8jl7U6POAGHIN8QxuDd43UfxacIh
-	 2evPct8GiNpUQ==
-Date: Wed, 19 Mar 2025 00:07:20 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Eric Woudstra <ericwouds@gmail.com>
-Cc: Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=ukFbvPb5mR6y8orkDDqAj7jfjDsja0Htk7IrCmLvvvUNbJsVyIBQDOYEOc87eNWdhB4hxFZAFjMZXgFAZ4lQ4fGYUXwkq7LLYbJn9HjlawU3E9QL+ewu0LVCXMz9OTuUIOnz0QOeu5W5ffEwNK+C7o2hnZHTLkyrTke35QX9ZE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=TTAOBaRU; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2ff85fec403so252777a91.1
+        for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 16:07:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1742339270; x=1742944070; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LryqtCOl1kW/qjkSVK7YUBP0UtxICvr9+FISp7QIe74=;
+        b=TTAOBaRU4Irr73SZvbdS46OZpgYrEcSQ60+Bh/fA4KgzspKQFwzt8eiXhZ+6zFn8fV
+         V0bMhcRbhVatJsEMIcftXRpDfx6dwrSUywjEydXHXT8bQbyJqzxHTh+zuykg8RR2tdvP
+         pbY0N/3St7AXbZ5wv9hHD7z4+13WtxzUDP+ro=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742339270; x=1742944070;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LryqtCOl1kW/qjkSVK7YUBP0UtxICvr9+FISp7QIe74=;
+        b=CGjAYmgScEfT4+lVTvDjxtcr//hwp/TegoDeE8jPD9yt8Wb4MvxLjrKABGnyRYrlEq
+         qyOz099EzQqqHnNIygotHVfTKqULwpi1p8F1iATrR/riOA4vv7H8QOdO6ZVFUPDfJ9o0
+         cJbeEgJ+jVLhK5OlDoDbfpsXwaDtobTHQFPDP4reV/ccbWWsWzijIMRinM7d4LKhmHLY
+         1aoP7M59Eu2k0auFhJcZ4h4FQ54MfaL17im/jF2njgIZlZE2ta8NFDq+aey4hJdefHJ8
+         Ln0oCZCxp8/E/MFYuC0upo7VaGK+xaPqF99NuhSLn3AAeL40CaH2fAL1EvV1M56D1PK1
+         /GsA==
+X-Forwarded-Encrypted: i=1; AJvYcCUlke7oFyjRQsC0KV4D4mIcRyy1YNCNIxVwuhKPzP1mZsZLv0rCvsrehU5BPtQVbw1yxm/YEp8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCIj3VYz4dfWAY73puoDKat6HuBfR1lfiUWcFi9P3IMI8J8I6C
+	/1Yi3uI4rnjZnMJRb+iNjKQiPkvHLNkAyzaVbxCgvrrnVs0oqaXUjw3VFI4mphM=
+X-Gm-Gg: ASbGnctO5BBJVeSCPOtRaZJf2eTcXulkcL7UDStlLYv67KSK2jmIuSsd+D+G+HCZZsa
+	wXGdYvTe9wa2aO2GjfGHTOusnTr5sZB3jcMij2/OMmo38GpBXecpVJumVs3JhCsGK8encqok6a/
+	Xf05cpg4upC+mQA3galIp2/FIqZr+0ahGYZmaJJu3DnPb/3Ud0in0Oef8dZToY5IUqQRn6kG6/v
+	L2AHAB9aWTxy/HvYBSJqfCpbXDt8OloYC7mXk6Id0yvSFaT3QYb4HNzvy3hzf37uTQQPZZ+OEtl
+	vj7i1/pL2Bcej/9LVN6PVDtRA6V0OYVgKPul/PQY1myiNJhQWxjY7Ve/96fNLHQqBAHGnIULwMK
+	EhMJ15xg8laMIw2ik3mV3HT2yEsI=
+X-Google-Smtp-Source: AGHT+IFnviLx/vP38B/hCrcK1kFuSsgcpEy/4bCGNVluUVWJ03VuUZ5QDI952bqfcFDYVkbjIejZfA==
+X-Received: by 2002:a17:90a:d445:b0:2fa:562c:c1cf with SMTP id 98e67ed59e1d1-301a5b04431mr7113218a91.1.1742339270209;
+        Tue, 18 Mar 2025 16:07:50 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-225c6ba712asm99983285ad.131.2025.03.18.16.07.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Mar 2025 16:07:49 -0700 (PDT)
+Date: Tue, 18 Mar 2025 16:07:47 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v1 net-next 1/4] af_unix: Sort headers.
+Message-ID: <Z9n8w-6nXiBUI20T@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	netfilter-devel@vger.kernel.org, bridge@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v10 nf-next 3/3] selftests: netfilter: Add
- conntrack_bridge.sh
-Message-ID: <Z9n8qBrt-TK4XlRq@calendula>
-References: <20250315200033.17820-1-ericwouds@gmail.com>
- <20250315200033.17820-4-ericwouds@gmail.com>
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+References: <20250318034934.86708-1-kuniyu@amazon.com>
+ <20250318034934.86708-2-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250315200033.17820-4-ericwouds@gmail.com>
+In-Reply-To: <20250318034934.86708-2-kuniyu@amazon.com>
 
-On Sat, Mar 15, 2025 at 09:00:33PM +0100, Eric Woudstra wrote:
-> Check conntrack bridge is functional in various vlan setups.
-
-Only conntrack bridge support is tested here, patch 2/3 does not seem
-to be covered :(
-
-> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+On Mon, Mar 17, 2025 at 08:48:48PM -0700, Kuniyuki Iwashima wrote:
+> This is a prep patch to make the following changes cleaner.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 > ---
->  .../testing/selftests/net/netfilter/Makefile  |   1 +
->  .../net/netfilter/conntrack_bridge.sh         | 176 ++++++++++++++++++
->  2 files changed, 177 insertions(+)
->  create mode 100755 tools/testing/selftests/net/netfilter/conntrack_bridge.sh
-> 
-> diff --git a/tools/testing/selftests/net/netfilter/Makefile b/tools/testing/selftests/net/netfilter/Makefile
-> index ffe161fac8b5..bee403d423f5 100644
-> --- a/tools/testing/selftests/net/netfilter/Makefile
-> +++ b/tools/testing/selftests/net/netfilter/Makefile
-> @@ -8,6 +8,7 @@ MNL_LDLIBS := $(shell $(HOSTPKG_CONFIG) --libs libmnl 2>/dev/null || echo -lmnl)
->  
->  TEST_PROGS := br_netfilter.sh bridge_brouter.sh
->  TEST_PROGS += br_netfilter_queue.sh
-> +TEST_PROGS += conntrack_bridge.sh
->  TEST_PROGS += conntrack_dump_flush.sh
->  TEST_PROGS += conntrack_icmp_related.sh
->  TEST_PROGS += conntrack_ipip_mtu.sh
-> diff --git a/tools/testing/selftests/net/netfilter/conntrack_bridge.sh b/tools/testing/selftests/net/netfilter/conntrack_bridge.sh
-> new file mode 100755
-> index 000000000000..806551ef8cc2
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/netfilter/conntrack_bridge.sh
-> @@ -0,0 +1,176 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-2.0
-> +#
-> +# Check conntrack bridge is functional in various vlan setups.
-> +#
-> +# Setup is:
-> +#
-> +# nsclient1 -> nsbr -> nsclient2
-> +# ping nsclient2 from nsclient1, checking that conntrack established
-> +# packets are seen.
-> +#
-> +
-> +source lib.sh
-> +
-> +if ! nft --version > /dev/null 2>&1;then
-> +	echo "SKIP: Could not run test without nft tool"
-> +	exit $ksft_skip
-> +fi
-> +
-> +cleanup() {
-> +	cleanup_all_ns
-> +}
-> +
-> +trap cleanup EXIT
-> +
-> +setup_ns nsclient1 nsclient2 nsbr
-> +
-> +ret=0
-> +
-> +add_addr()
-> +{
-> +	ns=$1
-> +	dev=$2
-> +	i=$3
-> +
-> +	ip -net "$ns" link set "$dev" up
-> +	ip -net "$ns" addr add "192.168.1.$i/24" dev "$dev"
-> +	ip -net "$ns" addr add "dead:1::$i/64" dev "$dev" nodad
-> +	ip -net "$ns" route add default dev "$dev"
-> +}
-> +
-> +del_addr()
-> +{
-> +	ns=$1
-> +	dev=$2
-> +	i=$3
-> +
-> +	ip -net "$ns" route del default dev "$dev"
-> +	ip -net "$ns" addr del "dead:1::$i/64" dev "$dev" nodad
-> +	ip -net "$ns" addr del "192.168.1.$i/24" dev "$dev"
-> +	ip -net "$ns" link set "$dev" down
-> +}
-> +
-> +send_pings()
-> +{
-> +	for ad in "$@"; do
-> +		if ! ip netns exec "$nsclient1" ping -c 1 -s 962 -q "$ad" >/dev/null; then
-> +			echo "ERROR: netns routing/connectivity broken to $ad" 1>&2
-> +			exit 1
-> +		fi
-> +	done
-> +}
-> +
-> +check_counter()
-> +{
-> +	ns=$1
-> +	name=$2
-> +	expect=$3
-> +	local lret=0
-> +
-> +	if ! ip netns exec "$ns" nft list counter bridge filter "$name" | grep -q "$expect"; then
-> +		echo "ERROR: counter $name in $ns has unexpected value (expected $expect)" 1>&2
-> +		ip netns exec "$ns" nft list counter bridge filter "$name" 1>&2
-> +		lret=1
-> +	fi
-> +	ip netns exec "$ns" nft reset counters >/dev/null
-> +
-> +	return $lret
-> +}
-> +
-> +BR=br0
-> +if ! ip -net "$nsbr" link add $BR type bridge; then
-> +	echo "SKIP: Can't create bridge $BR"
-> +	exit $ksft_skip
-> +fi
-> +
-> +DEV=veth0
-> +ip link add "$DEV" netns "$nsclient1" type veth peer name eth1 netns "$nsbr"
-> +ip link add "$DEV" netns "$nsclient2" type veth peer name eth2 netns "$nsbr"
-> +
-> +ip -net "$nsbr" link set eth1 master $BR up
-> +ip -net "$nsbr" link set eth2 master $BR up
-> +ip -net "$nsbr" link set $BR up
-> +
-> +ip netns exec "$nsbr" nft -f - <<EOF
-> +table bridge filter {
-> +	counter established { }
-> +	chain forward {
-> +		type filter hook forward priority 0; policy accept;
-> +		ct state "established" counter name "established"
-> +	}
-> +}
-> +EOF
-> +
-> +a=1;
-> +for ns in "$nsclient1" "$nsclient2"; do
-> +	add_addr "$ns" "$DEV" $a
-> +	((a++))
-> +done
-> +
-> +send_pings "192.168.1.2" "dead:1::2"
-> +expect="packets 2 bytes 2000"
-> +if ! check_counter "$nsbr" "established" "$expect"; then
-> +	msg+="\nFAIL: without vlan, established packets not seen"
-> +	ret=1
-> +fi
-> +
-> +a=1;
-> +for ns in "$nsclient1" "$nsclient2"; do
-> +	del_addr "$ns" "$DEV" $a
-> +	ip -net "$ns" link add link "$DEV" name "$DEV.10" type vlan id 10
-> +	ip -net "$ns" link set "$DEV" up
-> +	add_addr "$ns" "$DEV.10" $a
-> +	((a++))
-> +done
-> +
-> +send_pings "192.168.1.2" "dead:1::2"
-> +expect="packets 2 bytes 2000"
-> +if ! check_counter "$nsbr" "established" "$expect"; then
-> +	msg+="\nFAIL: with single vlan, established packets not seen"
-> +	ret=1
-> +fi
-> +
-> +a=1;
-> +for ns in "$nsclient1" "$nsclient2"; do
-> +	del_addr "$ns" "$DEV.10" $a
-> +	ip -net "$ns" link add link "$DEV.10" name "$DEV.10.20" type vlan id 20
-> +	ip -net "$ns" link set "$DEV.10" up
-> +	add_addr "$ns" "$DEV.10.20" $a
-> +	((a++))
-> +done
-> +
-> +send_pings "192.168.1.2" "dead:1::2"
-> +expect="packets 2 bytes 2008"
-> +if ! check_counter "$nsbr" "established" "$expect"; then
-> +	msg+="\nFAIL: with double q vlan, established packets not seen"
-> +	ret=1
-> +fi
-> +
-> +a=1;
-> +for ns in "$nsclient1" "$nsclient2"; do
-> +	del_addr "$ns" "$DEV.10.20" $a
-> +	ip -net "$ns" link del "$DEV.10.20"
-> +	ip -net "$ns" link del "$DEV.10"
-> +	ip -net "$ns" link add link "$DEV" name "$DEV.10" type vlan id 10 protocol 802.1ad
-> +	ip -net "$ns" link add link "$DEV.10" name "$DEV.10.20" type vlan id 20
-> +	ip -net "$ns" link set "$DEV.10" up
-> +	add_addr "$ns" "$DEV.10.20" $a
-> +	((a++))
-> +done
-> +
-> +send_pings "192.168.1.2" "dead:1::2"
-> +expect="packets 2 bytes 2008"
-> +if ! check_counter "$nsbr" "established" "$expect"; then
-> +	msg+="\nFAIL: with 802.1ad vlan, established packets not seen "
-> +	ret=1
-> +fi
-> +
-> +if [ $ret -eq 0 ];then
-> +	echo "PASS: established packets seen in all cases"
-> +else
-> +	echo -e "$msg"
-> +fi
-> +
-> +exit $ret
-> +
-> -- 
-> 2.47.1
-> 
+>  include/net/af_unix.h      |  4 +--
+>  net/unix/af_unix.c         | 62 +++++++++++++++++++-------------------
+>  net/unix/diag.c            | 15 ++++-----
+>  net/unix/garbage.c         | 17 +++++------
+>  net/unix/sysctl_net_unix.c |  1 -
+>  net/unix/unix_bpf.c        |  4 +--
+>  6 files changed, 51 insertions(+), 52 deletions(-)
+
+[...]
+
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index 7f8f3859cdb3..1ff0ac99f3f3 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+
+[...]
+
+> +#include <linux/in.h>
+>  #include <linux/init.h>
+> +#include <linux/kernel.h>
+> +#include <linux/module.h>
+> +#include <linux/mount.h>
+> +#include <linux/namei.h>
+> +#include <linux/net.h>
+> +#include <linux/netdevice.h>
+>  #include <linux/poll.h>
+> +#include <linux/proc_fs.h>
+>  #include <linux/rtnetlink.h>
+> -#include <linux/mount.h>
+> -#include <net/checksum.h>
+> +#include <linux/sched/signal.h>
+
+Not sure what the sorting rules are, but I was wondering if maybe
+"linux/sched/*.h" should come after linux/*.h and not sorted within
+linux/s*.h ?
+
+>  #include <linux/security.h>
+> +#include <linux/seq_file.h>
+> +#include <linux/signal.h>
+> +#include <linux/skbuff.h>
+> +#include <linux/slab.h>
+> +#include <linux/socket.h>
+> +#include <linux/sockios.h>
 
