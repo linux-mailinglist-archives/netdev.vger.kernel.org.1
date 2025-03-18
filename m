@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-175948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83A4DA680C1
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 00:35:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F0C4A680C3
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 00:36:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AC3116C569
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 23:35:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 174B43B7194
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 23:35:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B54312080CB;
-	Tue, 18 Mar 2025 23:35:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2159B209692;
+	Tue, 18 Mar 2025 23:35:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="lc8aImgz"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="pnC9gyar"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B86A207649
-	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 23:35:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A402080FB
+	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 23:35:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742340920; cv=none; b=V/Q7GuWPsw/YZP5h0zhKiIiFfnkdtQhXLMpRG3sQCSjK114LoujjOM60jyc9jOkra/mJbzdHJtKbqzTsBwJh5of5EtAe+h63wYBStRZJcJ3tcaAe/OpNS1CPEYRQmq6FpQsDJi6DwS3pB192d22/Dj9qyFUeaLZ8LaavYh4vCr8=
+	t=1742340947; cv=none; b=c5C7U9aEkiTPvyN2kcGiPeK339r4mnRdb4rsgMhbMRabtP2vLJKNv+Cm5uD5/M9CJ5mHqq6HnmxUTM5sVWsDQpQVNAHxPxbLfSDW9ngf9C8ufQbOLpQ8YbNQPZXlYU5nngV+wqufbbJxBvMaGI53w0A1ra76PKaHX+cb0yljAZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742340920; c=relaxed/simple;
-	bh=ddUSUo6k/KwRkL6XKbIbIvMULYgm2LOTl/6DJtFMpC4=;
+	s=arc-20240116; t=1742340947; c=relaxed/simple;
+	bh=82BAcFJ1uV8GF3R5nNpvUyY1LZ4+B4SpwleyGbJoFGM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oRq7LAiOgU6yLfmYQeuhKrzWj87mXcmAxZagsOkQ/Pj5Kd+VTOsaqZcj1wGMRoSdqxINYb48qtIamx4Xh6zbT2Oc6wYSeDAvGHkoYYboh/ODGzGKpHdHtHUH1C7Vp+S65vbKkSYaG9XdaxpwK0AVIph9mzPoAQD/MqI/DvSg2d0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=lc8aImgz; arc=none smtp.client-ip=99.78.197.219
+	 MIME-Version:Content-Type; b=j/6rgnoF84J28Z6FTNo6D5dVNS60Tpz1gIi8oWVfAp/DR/rr9UkJg+Z8qlKJH2FwFCMXMXJ0Wm+Dt3R12wlzs/saNWwFDdkVPR4gNIHF9SG5icasiR/jvkpwuVxHsbbM9CamQGpFJ1cOaX8THqCGYy2TzOzT+gZhBVGSWteeZgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=pnC9gyar; arc=none smtp.client-ip=52.119.213.154
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1742340919; x=1773876919;
+  t=1742340945; x=1773876945;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=1QJUdUvB0Zqw8+oT2He2sFBsFvqtkfTr0kewt07t1H8=;
-  b=lc8aImgzfR70Uwlq4CI8vKiEJhINuijkXY0ZpuYdos5zULNl0RzOS7in
-   e1p/GVM9ax4+1Fy7tx3h5A83K+lHZiX7Soxp4ewbNBC7wjQAnLnpWhuHQ
-   uEVd+MGA3M5kocZfOifCM0Lt4YViY+rS8r0XR5td3q6iII6jvE8R0hFUI
-   Q=;
+  bh=swg7IjG+TErjkoFAu6DgewpwfsJgarMsY8qYR9KCcBA=;
+  b=pnC9gyarPL3xCMUu6advkZfKUS7VBLrAf7SnJ/gRfX/jX/9qvLME38vB
+   zXOSSvksOgEIGeLVRTtleqX6hH/k3U6k0udlfGrtSAjUxoAk5Fyb7y5RE
+   PZ0qrgvpVBJuiuJc+RksJ7ff0tb6NSjdv1jBr0yenyWnfhavA83Y3xF+H
+   A=;
 X-IronPort-AV: E=Sophos;i="6.14,258,1736812800"; 
-   d="scan'208";a="179801682"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2025 23:35:16 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:29127]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.40.40:2525] with esmtp (Farcaster)
- id 9d6e4900-ed01-4137-ab6e-ccac72378cd4; Tue, 18 Mar 2025 23:35:16 +0000 (UTC)
-X-Farcaster-Flow-ID: 9d6e4900-ed01-4137-ab6e-ccac72378cd4
+   d="scan'208";a="280531422"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2025 23:35:41 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:54467]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.52.235:2525] with esmtp (Farcaster)
+ id 8f45bd48-2be1-495d-85de-e5bc6a0ac22c; Tue, 18 Mar 2025 23:35:40 +0000 (UTC)
+X-Farcaster-Flow-ID: 8f45bd48-2be1-495d-85de-e5bc6a0ac22c
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 18 Mar 2025 23:35:16 +0000
+ Tue, 18 Mar 2025 23:35:40 +0000
 Received: from 6c7e67bfbae3.amazon.com (10.135.212.115) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 18 Mar 2025 23:35:13 +0000
+ Tue, 18 Mar 2025 23:35:37 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: David Ahern <dsahern@kernel.org>, "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
  Abeni" <pabeni@redhat.com>
 CC: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 6/7] nexthop: Convert RTM_NEWNEXTHOP to per-netns RTNL.
-Date: Tue, 18 Mar 2025 16:31:49 -0700
-Message-ID: <20250318233240.53946-7-kuniyu@amazon.com>
+Subject: [PATCH v1 net-next 7/7] nexthop: Convert RTM_DELNEXTHOP to per-netns RTNL.
+Date: Tue, 18 Mar 2025 16:31:50 -0700
+Message-ID: <20250318233240.53946-8-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250318233240.53946-1-kuniyu@amazon.com>
 References: <20250318233240.53946-1-kuniyu@amazon.com>
@@ -77,75 +77,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D042UWA004.ant.amazon.com (10.13.139.16) To
+X-ClientProxiedBy: EX19D036UWB002.ant.amazon.com (10.13.139.139) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-If we pass false to the rtnl_held param of lwtunnel_valid_encap_type(),
-we can move RTNL down before rtm_to_nh_config_rtnl().
+In rtm_del_nexthop(), only nexthop_find_by_id() and remove_nexthop()
+require RTNL as they touch net->nexthop.rb_root.
 
-Let's use rtnl_net_lock() in rtm_new_nexthop().
+Let's move RTNL down as rtnl_net_lock() before nexthop_find_by_id().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- net/ipv4/nexthop.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+ net/ipv4/nexthop.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
 diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-index 409f13d64ed4..ea62454e0a0c 100644
+index ea62454e0a0c..66d7796ba174 100644
 --- a/net/ipv4/nexthop.c
 +++ b/net/ipv4/nexthop.c
-@@ -3169,7 +3169,7 @@ static int rtm_to_nh_config(struct net *net, struct sk_buff *skb,
- 
- 		cfg->nh_encap_type = nla_get_u16(tb[NHA_ENCAP_TYPE]);
- 		err = lwtunnel_valid_encap_type(cfg->nh_encap_type,
--						extack, true);
-+						extack, false);
- 		if (err < 0)
- 			goto out;
- 
-@@ -3245,13 +3245,18 @@ static int rtm_new_nexthop(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		goto out;
- 	}
+@@ -3314,13 +3314,17 @@ static int rtm_del_nexthop(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	if (err)
+ 		return err;
  
 +	rtnl_net_lock(net);
 +
- 	err = rtm_to_nh_config_rtnl(net, tb, &cfg, extack);
- 	if (!err)
--		goto out;
-+		goto unlock;
+ 	nh = nexthop_find_by_id(net, id);
+-	if (!nh)
+-		return -ENOENT;
++	if (nh)
++		remove_nexthop(net, nh, &nlinfo);
++	else
++		err = -ENOENT;
  
- 	nh = nexthop_add(net, &cfg, extack);
- 	if (IS_ERR(nh))
- 		err = PTR_ERR(nh);
-+
-+unlock:
+-	remove_nexthop(net, nh, &nlinfo);
 +	rtnl_net_unlock(net);
- out:
- 	return err;
- }
-@@ -4067,18 +4072,19 @@ static struct pernet_operations nexthop_net_ops = {
- };
  
+-	return 0;
++	return err;
+ }
+ 
+ /* rtnl */
+@@ -4074,7 +4078,8 @@ static struct pernet_operations nexthop_net_ops = {
  static const struct rtnl_msg_handler nexthop_rtnl_msg_handlers[] __initconst = {
--	{.msgtype = RTM_NEWNEXTHOP, .doit = rtm_new_nexthop},
-+	{.msgtype = RTM_NEWNEXTHOP, .doit = rtm_new_nexthop,
+ 	{.msgtype = RTM_NEWNEXTHOP, .doit = rtm_new_nexthop,
+ 	 .flags = RTNL_FLAG_DOIT_PERNET},
+-	{.msgtype = RTM_DELNEXTHOP, .doit = rtm_del_nexthop},
++	{.msgtype = RTM_DELNEXTHOP, .doit = rtm_del_nexthop,
 +	 .flags = RTNL_FLAG_DOIT_PERNET},
- 	{.msgtype = RTM_DELNEXTHOP, .doit = rtm_del_nexthop},
  	{.msgtype = RTM_GETNEXTHOP, .doit = rtm_get_nexthop,
  	 .dumpit = rtm_dump_nexthop},
  	{.msgtype = RTM_GETNEXTHOPBUCKET, .doit = rtm_get_nexthop_bucket,
- 	 .dumpit = rtm_dump_nexthop_bucket},
- 	{.protocol = PF_INET, .msgtype = RTM_NEWNEXTHOP,
--	 .doit = rtm_new_nexthop},
-+	 .doit = rtm_new_nexthop, .flags = RTNL_FLAG_DOIT_PERNET},
- 	{.protocol = PF_INET, .msgtype = RTM_GETNEXTHOP,
- 	 .dumpit = rtm_dump_nexthop},
- 	{.protocol = PF_INET6, .msgtype = RTM_NEWNEXTHOP,
--	 .doit = rtm_new_nexthop},
-+	 .doit = rtm_new_nexthop, .flags = RTNL_FLAG_DOIT_PERNET},
- 	{.protocol = PF_INET6, .msgtype = RTM_GETNEXTHOP,
- 	 .dumpit = rtm_dump_nexthop},
- };
 -- 
 2.48.1
 
