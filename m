@@ -1,92 +1,92 @@
-Return-Path: <netdev+bounces-175529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C628A6641A
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 01:49:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BB19A66431
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 01:51:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F304718933FF
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 00:49:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CBDA189B59B
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 00:49:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CA7045C14;
-	Tue, 18 Mar 2025 00:49:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A79A7DA95;
+	Tue, 18 Mar 2025 00:49:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TXFJXX5C"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PO52kE7+"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4BF621348
-	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 00:48:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ABCA76410
+	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 00:49:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742258940; cv=none; b=AXBdkZKXDheNXJzpDOLaeBHWXpC19YRqLdp/PgBfoWqq3nBKz5urx9jLaXVtDqP1xqXxhI/X/vBPhYzwpxKvFf2z2o82RzkoVI/fIj/OZ3QOr8Bm7PzA1/LYlbfci9eKJwly/Ps30uTQ+ktHYsEOaM1XH52PNzi+ApfmfKzMgK0=
+	t=1742258948; cv=none; b=Scn2uIkiRbxSBXwFnbTBnB0yD4jAYwrtGN2/l/2TxbfME8571I1eoQvgNuCBbXgBpMuBxAyF3Rf7+wulZyBMsoDhcRKnV5ZCy8h1eKoAB4FByFFlnHPl1NZpe2JlzoN05OkNxnweHaNShX803ESeGiZLZIlQ++s9kbcx4XsDFNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742258940; c=relaxed/simple;
-	bh=747T9jLSqH8bFgDb72pde2D+kt0cpKYYu/2oRmA4qo8=;
+	s=arc-20240116; t=1742258948; c=relaxed/simple;
+	bh=2GbqXqnbS5Gg8/qIgu8A5aL+NFbKddcn9ze7u+q6+yU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=c99dyLHepnzSsxui/9yQ7n/M2zJVRSC++p5zaaJaeW4hgsPQaWBaU2MUC7QCEylwBHWi6dXwFbXkC+gEOI/lOFUhHeEx9cSaPmGtpV9rejr0rD7/kwBYhXHhZ3pcBohi8+rwLG0Q/6P6uy5EugiqoTa2cvFef7tQkcyUiGW33CA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TXFJXX5C; arc=none smtp.client-ip=170.10.133.124
+	 To:Cc:Content-Type; b=QQmQJGoK6a/kgcdu0QN1Q1VOeSewkqK4/pKb9ljjTcYuxx4nYhu5F03kva7vB54KgFSNRBsfHxFYK7szi6QpV4qG68shNKBs4l2jqW98yOln/YhIklCjoKzuZT4nT/Y6bKv16pSqURD8AP84c4RhHkZyYN5jNlmEiSnPyVULDM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PO52kE7+; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742258937;
+	s=mimecast20190719; t=1742258946;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=nlAq9ja2RSbJ2WExbn5JQkIBqDsE/3iSsVzG9YVP7BE=;
-	b=TXFJXX5CoBrtvTTjf2ILo2xWysKiBPc8sqb9l1dzHnbZTTdN2eKnxewIlQ6oE1GEA6OFog
-	pmhywWcwZaq0zPpgk4UU2rTD1Lgu7SHGDO3Iwktxw9h/WgioiW7LK9rzZx8N3pz5yZSC3t
-	pnb8L+Op2xWH/89/3nTQ0+YPM4uERyg=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=D1wTYqcCo1fX2H4Rx0UpSTErsXiY/CdMyhzV1Dxv2kU=;
+	b=PO52kE7+eEpBsBB8QmskixZLdLhrc4WpE8CQpYwDlde54udsBBp/pFwgj9Bt0JeswE+KW3
+	PSjZnqfoZMB1kzsBI0p2wEnj99dspt/IBB/cUKI8g4E4tMlTzzp8YwTmjd89LtPWX2P9F6
+	29resbTM0AJAL3ayAb/hmCC0gL4jzxQ=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-230-91G8EHITMru_yoTSqdXQrg-1; Mon, 17 Mar 2025 20:48:56 -0400
-X-MC-Unique: 91G8EHITMru_yoTSqdXQrg-1
-X-Mimecast-MFC-AGG-ID: 91G8EHITMru_yoTSqdXQrg_1742258935
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2ff55176edcso3763004a91.1
-        for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 17:48:56 -0700 (PDT)
+ us-mta-478-7-EOyNpLMQibecH5j23CoA-1; Mon, 17 Mar 2025 20:49:04 -0400
+X-MC-Unique: 7-EOyNpLMQibecH5j23CoA-1
+X-Mimecast-MFC-AGG-ID: 7-EOyNpLMQibecH5j23CoA_1742258944
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2ff8340d547so4417862a91.2
+        for <netdev@vger.kernel.org>; Mon, 17 Mar 2025 17:49:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742258935; x=1742863735;
+        d=1e100.net; s=20230601; t=1742258944; x=1742863744;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=nlAq9ja2RSbJ2WExbn5JQkIBqDsE/3iSsVzG9YVP7BE=;
-        b=nAXWONmlnvaU+IQpkzuz4fsb6BpW1V5DrW+vrYYzJMfkXBg58rHysYouc6EW2V5EnE
-         mwkmosQthQp07kgHaR9TV8DaDV38K+udohEI9+/hr5/SsCJEcDY4OKsS6k8ojHpKQKie
-         5+/hwDS9LgGVs8gD5BqUngCyiOJDOrLKYRWNYFKV/ImmjZQaS27uQgNdIWudkSNH0yLt
-         vjjEKg9XEW3QKo2uMLKz8x32S1j8r9bbpZPzuXm7RabWlsy+nblVgXB1AtyayXvlG8Xw
-         YVXfdqmNNSp72VzGhIxJ2i1hm5eTdjpKMRJEnUj4V2nKAYB72LEKL8RK8CNEfWlTawC8
-         8o3A==
-X-Forwarded-Encrypted: i=1; AJvYcCVNIdoNL/A2Y2b9BbTaivkbE1wMWq7Qsa873lANnP/vxU+ceVXl3VmoidafArSmiMfttDP57oM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGTBJcPW8yrdjJKngBr7fevK8IZg5PENlHXpCiqaHlRVZ9h3Y9
-	YJPKhoubuCc3xwwtI+4j+vtWttIUBw1oJwrV3i0/o/2388oAqXEkw6rB3AkpjaTG+bJUuteiK+Q
-	yP5vMb8avmwWjaUU0HwB/QeT/AAp9CRutfRZoKU80zJ1dJS7J1Rkkfw575pOpch+Zl6HZH7twXe
-	LXK0ql+3a/iQceMUUcg3MItboi5AQ+
-X-Gm-Gg: ASbGncu7ElcRc1SObvRVwjT+2WSCGl5yv0QD8HCKah4Xlu7FoS+gRgbpQruEbuddhYt
-	sc5pM80Kx0kMXlfeVUui0ZKDZ2bhLKew7xBy8D92e9Dr/Wp0UB2gu3abiei83eJB3ZTFkrQ==
-X-Received: by 2002:a17:90b:4b10:b0:2ee:741c:e9f4 with SMTP id 98e67ed59e1d1-301a5b1313fmr486183a91.11.1742258935177;
-        Mon, 17 Mar 2025 17:48:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFjSE8bZtH24Q4k70pqmCF3Pl5ZG79aTMFklPXXWxS7VadnbTFOusaQmH8Wzxx/kb4T1iFplzJMw+APpySRBkg=
-X-Received: by 2002:a17:90b:4b10:b0:2ee:741c:e9f4 with SMTP id
- 98e67ed59e1d1-301a5b1313fmr486162a91.11.1742258934866; Mon, 17 Mar 2025
- 17:48:54 -0700 (PDT)
+        bh=D1wTYqcCo1fX2H4Rx0UpSTErsXiY/CdMyhzV1Dxv2kU=;
+        b=aCqXvymr0tNA+MA10tkO7LqQgndHoqInqQtQvHQUztfe6JYkkd1k+sJ3dJcBuaDkbu
+         J0KAeIm8p0c3uBPSaVqt+zo5vcD3Oa3RHch5lQaJYHZnDUYA43e5RX14X7alXJGkJ+La
+         knIrHXMw5c/KdO1/yDETjNrNfc8GZCSZCeBA6xSWpoUc61ssci6xewO2vhPFw7uJJWbs
+         TH8lQFpvczZ2XEAmpkTCOOFAx71LlJNTd286ioJ3cfFkc3WlH+8CBb0vLqp95q79GE4W
+         6kCYEh74U9CjqXH+hCWIBNC7NZqPtkehgnTabP5WlrPK5DdS+bdcugKOw+nsyF8dd0RM
+         R53w==
+X-Forwarded-Encrypted: i=1; AJvYcCUFROSZvBxExNfaI9bKp9OLQXp2QHDeKyjMns4FjeepYtqWFP5WaH9Qn3QPIE4VnBZOPU+F6VQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzb0qKg7xlkuBl+GNHqjxGP+L2jwdim3Z79xc/qMDuOV58xB4lo
+	fFRNCdZQSIoiJcq0WOTFaYsMv5GxvV5c7+3oNFQ5HB3tD1a6hQLhV3Ki5HHppiquZKYvqy17UZ2
+	xXu/kBitQfPppqL0Mk6Mx37yHdeQWXo7omFkAlQoj1sexJXqttlW9MG5ntg2fUawKdxs/yNQ1Ou
+	dAeRGmUU/8m0qbFgEWdp94GxFHhIFR
+X-Gm-Gg: ASbGncszdhbLlg1Wk+FlC55VASt9vOGp+8ZaDT0aSzScEU/VDYks/ie+wPNvlJ7qDpf
+	gmlOEsH4lyG8X19fXUIMSg+yEpvFqR8OWaurkiTivO/t6/BFvYxnn//+1aFwboSwpujGQ2Q==
+X-Received: by 2002:a17:90b:4ac9:b0:2ff:7ad4:77b1 with SMTP id 98e67ed59e1d1-301a5b02909mr460975a91.2.1742258943945;
+        Mon, 17 Mar 2025 17:49:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHX+O7xUMVOLYXNcB0tMwzNzV42Bp5ZfdlbP7y8y9JbwXKmUX7+sFNpCUYyl3mQ2HUBXmQZCW6q/VS+oPLI/5g=
+X-Received: by 2002:a17:90b:4ac9:b0:2ff:7ad4:77b1 with SMTP id
+ 98e67ed59e1d1-301a5b02909mr460946a91.2.1742258943615; Mon, 17 Mar 2025
+ 17:49:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250317235546.4546-1-dongli.zhang@oracle.com> <20250317235546.4546-3-dongli.zhang@oracle.com>
-In-Reply-To: <20250317235546.4546-3-dongli.zhang@oracle.com>
+References: <20250317235546.4546-1-dongli.zhang@oracle.com> <20250317235546.4546-4-dongli.zhang@oracle.com>
+In-Reply-To: <20250317235546.4546-4-dongli.zhang@oracle.com>
 From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 18 Mar 2025 08:48:42 +0800
-X-Gm-Features: AQ5f1JrAlxtKtwUtKRrW-cmJuRCs9VYdUge7DAbLNhWk3XLXSW2HZUWTJOSqcLg
-Message-ID: <CACGkMEuhqbxr-20Jghn10fWH+pCAVih_KvWU6Mj+FXgE6TOTVA@mail.gmail.com>
-Subject: Re: [PATCH v2 02/10] vhost-scsi: Fix vhost_scsi_send_bad_target()
+Date: Tue, 18 Mar 2025 08:48:51 +0800
+X-Gm-Features: AQ5f1JrJY7aJ8s6QNMasECLw6cRwuthV2ZgIcitKqlIwb3XaZrdvCSNgD8tZbAw
+Message-ID: <CACGkMEsG4eR3dErdSKsLxQgDqBV55NUyf=Lo-UUVj1tqQ-T8QA@mail.gmail.com>
+Subject: Re: [PATCH v2 03/10] vhost-scsi: Fix vhost_scsi_send_status()
 To: Dongli Zhang <dongli.zhang@oracle.com>
 Cc: virtualization@lists.linux.dev, kvm@vger.kernel.org, 
 	netdev@vger.kernel.org, mst@redhat.com, michael.christie@oracle.com, 
@@ -105,20 +105,73 @@ om> wrote:
 > vhost_scsi_send_bad_target() still assumes the response in a single
 > descriptor.
 >
-> In addition, although vhost_scsi_send_bad_target() is used by both I/O
-> queue and control queue, the response header is always
-> virtio_scsi_cmd_resp. It is required to use virtio_scsi_ctrl_tmf_resp or
-> virtio_scsi_ctrl_an_resp for control queue.
+> Similar issue in vhost_scsi_send_bad_target() has been fixed in previous
+> commit.
 >
-> Fixes: 664ed90e621c ("vhost/scsi: Set VIRTIO_F_ANY_LAYOUT + VIRTIO_F_VERS=
-ION_1 feature bits")
+> Fixes: 3ca51662f818 ("vhost-scsi: Add better resource allocation failure =
+handling")
+
+And
+
+6dd88fd59da84631b5fe5c8176931c38cfa3b265 ("vhost-scsi: unbreak any
+layout for response")
+
 > Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
 > ---
 > Changed since v1:
->   - Move this bugfix patch to before dirty log tracking patches.
+>   - New patch to fix vhost_scsi_send_status().
 >
->  drivers/vhost/scsi.c | 48 ++++++++++++++++++++++++++++++++++----------
->  1 file changed, 37 insertions(+), 11 deletions(-)
+>  drivers/vhost/scsi.c | 18 +++++++++++-------
+>  1 file changed, 11 insertions(+), 7 deletions(-)
+>
+> diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
+> index 59d907b94c5e..26bcf3a7f70c 100644
+> --- a/drivers/vhost/scsi.c
+> +++ b/drivers/vhost/scsi.c
+> @@ -999,18 +999,22 @@ static void vhost_scsi_target_queue_cmd(struct vhos=
+t_scsi_nexus *nexus,
+>
+>  static void
+>  vhost_scsi_send_status(struct vhost_scsi *vs, struct vhost_virtqueue *vq=
+,
+> -                      int head, unsigned int out, u8 status)
+> +                      struct vhost_scsi_ctx *vc, u8 status)
+>  {
+> -       struct virtio_scsi_cmd_resp __user *resp;
+>         struct virtio_scsi_cmd_resp rsp;
+> +       struct iov_iter iov_iter;
+>         int ret;
+>
+>         memset(&rsp, 0, sizeof(rsp));
+>         rsp.status =3D status;
+> -       resp =3D vq->iov[out].iov_base;
+> -       ret =3D __copy_to_user(resp, &rsp, sizeof(rsp));
+> -       if (!ret)
+> -               vhost_add_used_and_signal(&vs->dev, vq, head, 0);
+> +
+> +       iov_iter_init(&iov_iter, ITER_DEST, &vq->iov[vc->out], vc->in,
+> +                     sizeof(rsp));
+> +
+> +       ret =3D copy_to_iter(&rsp, sizeof(rsp), &iov_iter);
+> +
+> +       if (likely(ret =3D=3D sizeof(rsp)))
+> +               vhost_add_used_and_signal(&vs->dev, vq, vc->head, 0);
+>         else
+>                 pr_err("Faulted on virtio_scsi_cmd_resp\n");
+>  }
+> @@ -1420,7 +1424,7 @@ vhost_scsi_handle_vq(struct vhost_scsi *vs, struct =
+vhost_virtqueue *vq)
+>                 else if (ret =3D=3D -EIO)
+>                         vhost_scsi_send_bad_target(vs, vq, &vc, TYPE_IO_C=
+MD);
+>                 else if (ret =3D=3D -ENOMEM)
+> -                       vhost_scsi_send_status(vs, vq, vc.head, vc.out,
+> +                       vhost_scsi_send_status(vs, vq, &vc,
+>                                                SAM_STAT_TASK_SET_FULL);
+>         } while (likely(!vhost_exceeds_weight(vq, ++c, 0)));
+>  out:
+> --
+> 2.39.3
 >
 
 Acked-by: Jason Wang <jasowang@redhat.com>
