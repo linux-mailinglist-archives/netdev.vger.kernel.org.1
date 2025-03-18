@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-175910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1CFEA67F48
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 23:08:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81329A67F44
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 23:07:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 527A83B6877
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 22:07:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D91434242E6
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 22:07:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCD15206F19;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 844BF2066D9;
 	Tue, 18 Mar 2025 22:07:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XCKNwzyn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sYuyM7eY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B356C2066EC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE022063DB;
 	Tue, 18 Mar 2025 22:07:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742335638; cv=none; b=uTk5ZjvIEWetEd/Jy9+/AEczQNTijDRfiHNDlpoUFcMA7gvDS9iUaTQl3LTHC2YY4xSwMyEcTBf3aT5BGWvBY2oWWy5o/vfjlR1VZcmqQo04i7P+UT5z0zJ8ME6QxZ6ad4ghMSmL7ndB1kaLlx2Qhy38eJK7LYTti3GVZFMRBX0=
+	t=1742335638; cv=none; b=XaNG/ULv8K8wipYfHHtyh7P74QMT/piRM+SRKmOdUhH4ahrf3elx3QfhOVh8kvje/fQpwyA/lG8sdIJw755fL3vXzxUaB24crlyxHGSblAu0SNVjnGvtsVlrDQgDVvF2tFbLKVovLNyL2xBe+CjNPXHwgLDinFeRN6Tu7kd6EY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1742335638; c=relaxed/simple;
-	bh=fuSRRLCgAuHKfgkb7sAtUwteFXpUie9s2v2hW3tLt7w=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=RwJxint1dj3Iv8WXKxh0RLdwMbh5QiejeR1BosvpJSHLFvXENZVx7M8NIijG1Ij3JWyhACZhPGKuoBYHdnt2DYyzw7NOBoOGxHlsKPVZptbwujZlQY09Ut11NpKcZAd+DfepfIDbRdZuJwmB0sg/1k4ofl0sIlDPwEra/MjO6i0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XCKNwzyn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0EE00C4CEDD;
+	bh=z15Ls+N2f4qhQa8zHLA/8pAS/OD9DivM6Ks6EyIuxMQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=p21br/o2xW5EuTPhHS/5bT2gNPn5dYu6lF8Qs4NoT+Qp6QUkAk3nhCjuX7taS/TioUdf7vV5Nooezem7O6bc3Rqe2pqQf6nmUQxugF4lt7TWHFlDgQC3eNHeY8vTNgVwYhwqu/P98hgeWRsEoWLoM8Aa29sL1joEqDMi4yYGAv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sYuyM7eY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2E51FC4CEF0;
 	Tue, 18 Mar 2025 22:07:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1742335638;
-	bh=fuSRRLCgAuHKfgkb7sAtUwteFXpUie9s2v2hW3tLt7w=;
-	h=From:Subject:Date:To:Cc:Reply-To:From;
-	b=XCKNwzynzsCPNPcR8XmSOqy5CVI1WWVVBMGN9NtMUpHdu5Pj1UyqJkw/dhL2G2K+N
-	 z37NCozVZimajjoE5ZsAjMeD/krxL9yxjiMynDiFme0YkRKnQTzY62lygqEOKEnfil
-	 WpnIEM7guT0ipZu3BsQsqiW7fLq1xhltrJs2QIlozJPpKhoJnlSYoiLvOC9ndcz5fL
-	 W+tl36sSqlZm/yrFB6VUIlMFRZ3xtqrkieRmJqwRmI8EsrSR4sEqc1c0oi0MBK9Zj3
-	 av6F9j9KAOceV9Qd7uFRgIyyltPv8UJ+fi4JD5HIUeoX2gwjF+mEdtPYALm553Y97l
-	 4WVm0pXt16qMg==
+	bh=z15Ls+N2f4qhQa8zHLA/8pAS/OD9DivM6Ks6EyIuxMQ=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=sYuyM7eYgOIg1TUayAEGE3wv1u1h98toEAI7iwnVwnC9TFfSX1i5gSYsrbN9/W/Dm
+	 bQg+ZapJ6tAlhRHXBTXtIWjdERy6Jn2RfgBdq3fdkcHS+B1MPqGcy5F3LDl3HRVnun
+	 z6xk31XrJYvBnW5UNGV0CixMrPgVC3RAHRR4wrcdagoQTf2QV9f5lim9leemNc9Gsg
+	 XACQd4Au/fM+TcQyavWzgVoNrHRvjjz/nz/8kYRwobOCy4WkF5JXx042fKGt5p8Jy/
+	 NUtFr25cjz6gSkaulUHc5m24ib9jmE7MmUlkLWJRTS1WXqn0mDs4q7M+0dcB0yReQZ
+	 m4hiBrNYs3FWQ==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8F21C35FF3;
-	Tue, 18 Mar 2025 22:07:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19869C35FF8;
+	Tue, 18 Mar 2025 22:07:18 +0000 (UTC)
 From: Hans-Frieder Vogt via B4 Relay <devnull+hfdevel.gmx.net@kernel.org>
-Subject: [PATCH net-next v6 0/7] net: tn40xx: add support for AQR105 based
- cards
-Date: Tue, 18 Mar 2025 23:06:51 +0100
-Message-Id: <20250318-tn9510-v3a-v6-0-808a9089d24b@gmx.net>
+Date: Tue, 18 Mar 2025 23:06:52 +0100
+Subject: [PATCH net-next v6 1/7] net: phy: Add swnode support to
+ mdiobus_scan
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,11 +56,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAHvu2WcC/1XNTQ6CMBCG4auQrq3pP9SV9zAuCkyhC4ppSYMh3
- N1CNMJyMnm+d0ERgoOIbsWCAiQX3ejzoS4FanrjO8CuzTdihAnKqMKT15ISnLjBrLENrWSrKmJ
- RBq8A1s372AN5mLCHeULP/KlNBFwH45t+GxuM8xvoXZzG8N7jie/s2ymPncQxwaKVYJVVlQJy7
- 4b5mgP7dhIHyOgJigxbY62tdG1KU56h/EFJGGMnKDPUmitJRAmc6D9c1/UD0rIKOzUBAAA=
-X-Change-ID: 20241216-tn9510-v3a-2cfc185d680f
+Message-Id: <20250318-tn9510-v3a-v6-1-808a9089d24b@gmx.net>
+References: <20250318-tn9510-v3a-v6-0-808a9089d24b@gmx.net>
+In-Reply-To: <20250318-tn9510-v3a-v6-0-808a9089d24b@gmx.net>
 To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
  Russell King <linux@armlinux.org.uk>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -70,11 +68,11 @@ To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
  Hans-Frieder Vogt <hfdevel@gmx.net>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1742335636; l=4709;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1742335636; l=1936;
  i=hfdevel@gmx.net; s=20240915; h=from:subject:message-id;
- bh=fuSRRLCgAuHKfgkb7sAtUwteFXpUie9s2v2hW3tLt7w=;
- b=m4k+HQ2xY+rjO5FT0aVg4u+UnpLTAxchkqtcWzSCb41gU4uIWDkegFhbLFQaQPapO9CiJ/2Dl
- LQrXSKRe/LYBFEhAU4ZueosDmcZGw2OTgluIvgMChTnoxzfb1jKhphI
+ bh=eboV90jxD+Bku0BOXjDGCNU60DTUE9kSyEbR0D3C8dU=;
+ b=BBFK0D+bzMirEJuwUbn+Gj2hKJBmo7eC8cXE3v2eeiURfLhONRulpN0Zsg/XF5SwGa3ClvjAX
+ ow9ecsbYkWTBOEDip/IHJx67lDAa1ndFEGvYNzuaHiJHMvBG7qnFu2c
 X-Developer-Key: i=hfdevel@gmx.net; a=ed25519;
  pk=s3DJ3DFe6BJDRAcnd7VGvvwPXcLgV8mrfbpt8B9coRc=
 X-Endpoint-Received: by B4 Relay for hfdevel@gmx.net/20240915 with
@@ -82,99 +80,59 @@ X-Endpoint-Received: by B4 Relay for hfdevel@gmx.net/20240915 with
 X-Original-From: Hans-Frieder Vogt <hfdevel@gmx.net>
 Reply-To: hfdevel@gmx.net
 
-This patch series adds support to the Tehuti tn40xx driver for TN9510 cards
-which combine a TN4010 MAC with an Aquantia AQR105.
-It is an update of the patch series "net: tn40xx: add support for AQR105
-based cards", addressing review comments and generally cleaning up the series.
+From: Hans-Frieder Vogt <hfdevel@gmx.net>
 
-The patch was tested on a Tehuti TN9510 card (1fc9:4025:1fc9:3015).
+This patch will allow to use a swnode/fwnode defined for a phy_device. The
+MDIO bus (mii_bus) needs to contain nodes for the PHY devices, named
+"ethernet-phy@i", with i being the MDIO address (0 .. PHY_MAX_ADDR - 1).
 
+The fwnode is only attached to the phy_device if there isn't already an
+fwnode attached.
+
+fwnode_get_named_child_node will increase the usage counter of the fwnode.
+However, no new code is needed to decrease the counter again, since this is
+already implemented in the phy_device_release function.
+
+Signed-off-by: Hans-Frieder Vogt <hfdevel@gmx.net>
 ---
-Changes in v6:
-- rebaseline to net-next
-- remove unneeded loop timing ability advertisment in aquantia_main.c
-  (highlighted by Maxime Chevallier <maxime.chevallier@bootlin.com>)
-- add failure path in tn40_mdio.c if device_add_software_node fails
-  (suggested by Ratheesh Kannoth <rkannoth@marvell.com>)
-- Link to v5: https://lore.kernel.org/r/20250222-tn9510-v3a-v5-0-99365047e309@gmx.net
+ drivers/net/phy/mdio_bus.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-Changes in v5:
-- changed version because "b4 send --resend v4" did not succeed
-- used opportunity to rebaseline to net-next
-- only source code change is merging a split string in tn40_mdio.c, removing
-  a warning from b4 prep --check
-- changed format of cover letter in line with b4 (sequence of changes from
-  latest to oldest)
-- Link to v4: https://lore.kernel.org/r/20241221-tn9510-v3a-v4-0-dafff89ba7a7@gmx.net
+diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
+index 7e2f10182c0cf37bef4cea1820863f047b5cb466..ede596c1a69d1b2b986e9eef51c3beb4a5fbc805 100644
+--- a/drivers/net/phy/mdio_bus.c
++++ b/drivers/net/phy/mdio_bus.c
+@@ -551,6 +551,8 @@ static int mdiobus_create_device(struct mii_bus *bus,
+ static struct phy_device *mdiobus_scan(struct mii_bus *bus, int addr, bool c45)
+ {
+ 	struct phy_device *phydev = ERR_PTR(-ENODEV);
++	struct fwnode_handle *fwnode;
++	char node_name[16];
+ 	int err;
+ 
+ 	phydev = get_phy_device(bus, addr, c45);
+@@ -562,6 +564,18 @@ static struct phy_device *mdiobus_scan(struct mii_bus *bus, int addr, bool c45)
+ 	 */
+ 	of_mdiobus_link_mdiodev(bus, &phydev->mdio);
+ 
++	/* Search for a swnode for the phy in the swnode hierarchy of the bus.
++	 * If there is no swnode for the phy provided, just ignore it.
++	 */
++	if (dev_fwnode(&bus->dev) && !dev_fwnode(&phydev->mdio.dev)) {
++		snprintf(node_name, sizeof(node_name), "ethernet-phy@%d",
++			 addr);
++		fwnode = fwnode_get_named_child_node(dev_fwnode(&bus->dev),
++						     node_name);
++		if (fwnode)
++			device_set_node(&phydev->mdio.dev, fwnode);
++	}
++
+ 	err = phy_device_register(phydev);
+ 	if (err) {
+ 		phy_device_free(phydev);
 
-Changes in v4:
-- use separate aqr105 specific functions instead of adding aqr105 functionality
-  in common functions, with need of "chip generation" parameter
-  (suggested by Andrew Lunn <andrew@lunn.ch>)
-- make generation and cleanup of swnodes more symmetric
-  (suggested by Andrew Lunn <andrew@lunn.ch>)
-- add MDIO/PHY software nodes only for devices that have an aqr105 PHY
-  (suggested by FUJITA Tomonori <fujita.tomonori@gmail.com>)
-- Link to v3: https://lore.kernel.org/r/20241217-tn9510-v3a-v3-0-4d5ef6f686e0@gmx.net
-
-Changes in v3:
-- aquantia_firmware: remove call to of_property_read_string. It should be
-  called from the more generic function device_property_read_string
-- add more AQR105-specific function, to support proper advertising and auto-
-  negotiation
-- re-organize the patches about the mdio speed and TN40_REG_MDIO_CMD_STAT,
-  skipping the 1MHz intermediate speed step
-- re-organized the sequence of the patches:
-    1. changes to the general support functions (net/phy/mdio_bus.c)
-    2. changes to the aquantia PHY driver
-    3. changes to the tn40xx MAC driver, required to support the TN9510 cards
-- Link to v2: https://lore.kernel.org/netdev/trinity-602c050f-bc76-4557-9824-252b0de48659-1726429697171@3c-app-gmx-bap07/
-
-Changes in v2:
-- simplify the check for a firmware-name in a swnode in the aquantia PHY driver
-(comment from Andrew Lunn)
-- changed the software node definition to an mdio node with phy child nodes, to
-be more in line with a typical device tree definition (also comment from
-Andrew Lunn)
-This also solves the problem with several TN4010-based cards that FUJITA
-Tomonori reported
-- clarified the cleanup calls, now calling fwnode_handle_put instead of
-software_node_unregister (comment by FUJITA Tomonori)
-- updated the function mdiobus_scan to support swnodes (following hint of
-Andrew Lunn)
-- remove the small patch to avoid failing after aqr_wait_reset_complete, now
-that a proper patch by Vladimir Oltean is available
-- replace setting of bit 3 in TN40_REG_MDIO_CMD_STAT by calling of
-tn40_mdio_set_speed (suggestion by FUJITA Tomonori)
-- cleaning up the distributed calls to set the MDIO speed in the tn40xx driver
-- define supported PCI-IDs including subvendor IDs to prevent loading on
-unsupported card
-- Link to v1: https://lore.kernel.org/netdev/trinity-33332a4a-1c44-46b7-8526-b53b1a94ffc2-1726082106356@3c-app-gmx-bs04/
-
----
-Hans-Frieder Vogt (7):
-      net: phy: Add swnode support to mdiobus_scan
-      net: phy: aquantia: add probe function to aqr105 for firmware loading
-      net: phy: aquantia: search for firmware-name in fwnode
-      net: phy: aquantia: add essential functions to aqr105 driver
-      net: tn40xx: create swnode for mdio and aqr105 phy and add to mdiobus
-      net: tn40xx: prepare tn40xx driver to find phy of the TN9510 card
-      net: tn40xx: add pci-id of the aqr105-based Tehuti TN4010 cards
-
- drivers/net/ethernet/tehuti/tn40.c           |   9 +-
- drivers/net/ethernet/tehuti/tn40.h           |  31 ++++
- drivers/net/ethernet/tehuti/tn40_mdio.c      |  84 +++++++++-
- drivers/net/phy/aquantia/aquantia_firmware.c |   7 +-
- drivers/net/phy/aquantia/aquantia_main.c     | 240 ++++++++++++++++++++++++++-
- drivers/net/phy/mdio_bus.c                   |  14 ++
- 6 files changed, 376 insertions(+), 9 deletions(-)
----
-base-commit: 23c9ff659140f97d44bf6fb59f89526a168f2b86
-change-id: 20241216-tn9510-v3a-2cfc185d680f
-
-Best regards,
 -- 
-Hans-Frieder Vogt <hfdevel@gmx.net>
+2.47.2
 
 
 
