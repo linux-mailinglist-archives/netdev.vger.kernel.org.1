@@ -1,115 +1,161 @@
-Return-Path: <netdev+bounces-175812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8C3EA678BC
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 17:08:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63376A678C8
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 17:13:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14BC719C2DE7
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 16:07:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89C9F188A804
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 16:13:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53F2D20E6FA;
-	Tue, 18 Mar 2025 16:07:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17FB3210F58;
+	Tue, 18 Mar 2025 16:13:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="s3XKkAO+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Yt9VG6yf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270B420B1E1;
-	Tue, 18 Mar 2025 16:07:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5915C20ADF4
+	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 16:13:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742314056; cv=none; b=JsoW3eMOnoVfzMTRpHW9EpI+7dpb8tUkrF96Xs9LLA8+oDWfc5uzzNgKoLmRgDlGtFVJTaVo+HtLKcu8KDxtGYtJ7fsw954Z1eET532OxbiSNuClI1RBXaAf/vrBRHpcLkoUs6GkV/7jkwU//yzg2NhGHxfZkL3U+RlC0I2NDvk=
+	t=1742314419; cv=none; b=MY+Z78WtJK4NnDxNSaPzt7I4ER/kLewgPnMRvBo5fJ2CoJyHF0/OrQFRJAfMXRxt75Eh6k4w6W67BIaEflXErjqSyBRv1MnTnkEMQb07qiPY5a9XdTXo3M5VLeBgzFeiaHQERclUFhiZR8SNk56ITzW8FDlAC+ChA7VV/FkZg4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742314056; c=relaxed/simple;
-	bh=xzbL2Vk3RuWSOaBf8aMKsNbb3lDjQ0mzGl/IwHJ1YNU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FfryEsDdhRxBOxqpNxomqcy3UPDiMOptdLTcmao9UDNvv6QWo/xo1IWS4NbewRROV9Ck4hJnWjWo+YV5g6lnWwmUvB7CB3u0afkHlzxcgS/Yk/Do7gvaN0JHRP4kGCQWuNJ/P+pcePnTIifdva1bmyAwVIHRtRGGgGIKNPUCNIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=s3XKkAO+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DF2BC4CEE3;
-	Tue, 18 Mar 2025 16:07:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1742314055;
-	bh=xzbL2Vk3RuWSOaBf8aMKsNbb3lDjQ0mzGl/IwHJ1YNU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=s3XKkAO+S1S90H9Doa+MAZ4fbkJZ/t4tCb7a06lWM6MEKeB4rBmJh9q+T5vcLTBzd
-	 QxQ4XuP2jmTyBW4Fz1K37XnUdBIxUZzvbv7jo607a1UjHrVdTaNd5XVBVFc+BnngnU
-	 7KcFwOe6nfph5Dq1SSEaCB6WElcFL1agmpKHjJpI=
-Date: Tue, 18 Mar 2025 17:06:17 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Dave Jiang <dave.jiang@intel.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>,
-	"Keller, Jacob E" <jacob.e.keller@intel.com>,
-	David Ahern <dsahern@kernel.org>,
-	"Nelson, Shannon" <shannon.nelson@amd.com>,
-	Leon Romanovsky <leon@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	"Williams, Dan J" <dan.j.williams@intel.com>,
-	Daniel Vetter <daniel.vetter@ffwll.ch>,
-	Christoph Hellwig <hch@infradead.org>,
-	Itay Avraham <itayavr@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Leonid Bloch <lbloch@nvidia.com>,
-	"linux-cxl@vger.kernel.org" <linux-cxl@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	"Sinyuk, Konstantin" <konstantin.sinyuk@intel.com>
-Subject: Re: [PATCH v5 0/8] Introduce fwctl subystem
-Message-ID: <2025031836-monastery-imaginary-7f5e@gregkh>
-References: <dc72c6fe-4998-4dba-9442-73ded86470f5@kernel.org>
- <20250313124847.GM1322339@unreal>
- <54781c0c-a1e7-4e97-acf1-1fc5a2ee548c@amd.com>
- <d0e95c47-c812-4aa8-812f-f5d7f6abbbb1@intel.com>
- <20250317123333.GB9311@nvidia.com>
- <1eae139c-f678-4b28-a466-5c47967b5d13@kernel.org>
- <CO1PR11MB5089AB36220DFEACBF7A5D1CD6DF2@CO1PR11MB5089.namprd11.prod.outlook.com>
- <2025031840-phrasing-rink-c7bb@gregkh>
- <20250318132528.GR9311@nvidia.com>
- <9e3019af-7817-49db-a293-3242e2962c22@intel.com>
+	s=arc-20240116; t=1742314419; c=relaxed/simple;
+	bh=KHZmWIDBjEhcVDZ+cpgRQhrqLsnPQKA55BEIHKUA1rc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ptaNMkxB7IM1LdAgbiLimukkRUH40H3yFaZtUCJt/P25CPcNDIiJ73/WV6lXJb7u4YdT634JOyoAB07hEbehJCA3p5MOPmUZ2eaMdvJ6dPMVyHDKsNT5Tm8lxzB+EiPQoT5+YlfIIS9Y5/5Hc0Aw1GJeSQ4SNkbgrV0BgAHq5jA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Yt9VG6yf; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1742314413; x=1773850413;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=KHZmWIDBjEhcVDZ+cpgRQhrqLsnPQKA55BEIHKUA1rc=;
+  b=Yt9VG6yfBhIloDOe4aE+dKjWU/ypOZ8SKBVVGqTytnUwCKh/q0ukYOFo
+   vBGKKa9ZbEGGwZHIKeVUySg7wevVIN3n6yVNWdZvkmfVl0KW3a50Mwi9C
+   dgbcRsr88UYit9r7hr2IH2j4XcGhwT4WhwwVBCoketxCOj4aJctxpNWUp
+   t7NZdZWc5Fjg6RVjpUCKzHZrgPFJLqs9iLiquvz2P+56ZQ+OiGVk+2gx1
+   yRmK+D3C8mlmacN5I8QaFDB5eBQEOegxk1yGdUk3GqXwhr4oEVL+ZhTnM
+   32r/8RP/ZqKERiNW+zbzAFztykQ386jfIWwmry5lGM3WyTxD9YkxTPvJO
+   A==;
+X-CSE-ConnectionGUID: APVNPKNAQgmK2NvBekREtw==
+X-CSE-MsgGUID: bi+vL7/FS2KFLwhUtML7gg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11377"; a="54458787"
+X-IronPort-AV: E=Sophos;i="6.14,257,1736841600"; 
+   d="scan'208";a="54458787"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2025 09:13:32 -0700
+X-CSE-ConnectionGUID: 8bJRR5y4Q9eUOfTyEIfqPg==
+X-CSE-MsgGUID: /GbrMGfiQYGjr6gcQe3OaQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,257,1736841600"; 
+   d="scan'208";a="122041923"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa009.jf.intel.com with ESMTP; 18 Mar 2025 09:13:33 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	milena.olech@intel.com,
+	przemyslaw.kitszel@intel.com,
+	karol.kolacinski@intel.com,
+	richardcochran@gmail.com
+Subject: [PATCH net-next 00/10][pull request] idpf: add initial PTP support
+Date: Tue, 18 Mar 2025 09:13:15 -0700
+Message-ID: <20250318161327.2532891-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9e3019af-7817-49db-a293-3242e2962c22@intel.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Mar 18, 2025 at 08:39:50AM -0700, Dave Jiang wrote:
-> 
-> 
-> On 3/18/25 6:25 AM, Jason Gunthorpe wrote:
-> > On Tue, Mar 18, 2025 at 02:20:45PM +0100, Greg Kroah-Hartman wrote:
-> > 
-> >> Yes, note, the issue came up in the 2.5.x kernel days, _WAY_ before we
-> >> had git, so this wasn't a git issue.  I'm all for "drivers/core/" but
-> >> note, that really looks like "the driver core" area of the kernel, so
-> >> maybe pick a different name?
-> > 
-> > Yeah, +1. We have lots of places calling what is in drivers/base 'core'.
-> 
-> just throwing in my 2c
-> 
-> drivers/main
+Milena Olech says:
 
-Implies the "driver core"
+This patch series introduces support for Precision Time Protocol (PTP) to
+Intel(R) Infrastructure Data Path Function (IDPF) driver. PTP feature is
+supported when the PTP capability is negotiated with the Control
+Plane (CP). IDPF creates a PTP clock and sets a set of supported
+functions.
 
-> drivers/common
+During the PTP initialization, IDPF requests a set of PTP capabilities
+and receives a writeback from the CP with the set of supported options.
+These options are:
+- get time of the PTP clock
+- get cross timestamp
+- set the time of the PTP clock
+- adjust the PTP clock
+- Tx timestamping
 
-lib/ maybe?
+Each feature is considered to have direct access, where the operations
+on PCIe BAR registers are allowed, or the mailbox access, where the
+virtchnl messages are used to perform any PTP action. Mailbox access
+means that PTP requests are sent to the CP through dedicated secondary
+mailbox and the CP reads/writes/modifies desired resource - PTP Clock
+or Tx timestamp registers.
 
-> drivers/primary
+Tx timestamp capabilities are negotiated only for vports that have
+UPLINK_VPORT flag set by the CP. Capabilities provide information about
+the number of available Tx timestamp latches, their indexes and size of
+the Tx timestamp value. IDPF requests Tx timestamp by setting the
+TSYN bit and the requested timestamp index in the context descriptor for
+the PTP packets. When the completion tag for that packet is received,
+IDPF schedules a worker to read the Tx timestamp value.
+---
+IWL: https://lore.kernel.org/intel-wired-lan/20250313180417.2348593-1-milena.olech@intel.com/
 
-It's not going to be the primary drivers for my laptop :)
+The following are changes since commit 23c9ff659140f97d44bf6fb59f89526a168f2b86:
+  Merge branch 'net-stmmac-remove-unnecessary-of_get_phy_mode-calls'
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 200GbE
 
-Naming is hard.  Let's see some code first...
+Milena Olech (10):
+  idpf: add initial PTP support
+  virtchnl: add PTP virtchnl definitions
+  idpf: move virtchnl structures to the header file
+  idpf: negotiate PTP capabilities and get PTP clock
+  idpf: add mailbox access to read PTP clock time
+  idpf: add PTP clock configuration
+  idpf: add Tx timestamp capabilities negotiation
+  idpf: add Tx timestamp flows
+  idpf: add support for Rx timestamping
+  idpf: change the method for mailbox workqueue allocation
 
-greg k-h
+ drivers/net/ethernet/intel/idpf/Kconfig       |    1 +
+ drivers/net/ethernet/intel/idpf/Makefile      |    3 +
+ drivers/net/ethernet/intel/idpf/idpf.h        |   35 +
+ .../ethernet/intel/idpf/idpf_controlq_api.h   |    3 +
+ drivers/net/ethernet/intel/idpf/idpf_dev.c    |   14 +
+ .../net/ethernet/intel/idpf/idpf_ethtool.c    |   75 +-
+ .../ethernet/intel/idpf/idpf_lan_pf_regs.h    |    4 +
+ .../net/ethernet/intel/idpf/idpf_lan_txrx.h   |   13 +-
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    |   57 +
+ drivers/net/ethernet/intel/idpf/idpf_main.c   |    9 +-
+ drivers/net/ethernet/intel/idpf/idpf_ptp.c    | 1000 +++++++++++++++++
+ drivers/net/ethernet/intel/idpf/idpf_ptp.h    |  370 ++++++
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   |  171 ++-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h   |   18 +-
+ .../net/ethernet/intel/idpf/idpf_virtchnl.c   |  161 ++-
+ .../net/ethernet/intel/idpf/idpf_virtchnl.h   |   84 ++
+ .../ethernet/intel/idpf/idpf_virtchnl_ptp.c   |  677 +++++++++++
+ drivers/net/ethernet/intel/idpf/virtchnl2.h   |  314 +++++-
+ 18 files changed, 2906 insertions(+), 103 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_ptp.c
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_ptp.h
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_virtchnl_ptp.c
+
+-- 
+2.47.1
+
 
