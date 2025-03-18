@@ -1,52 +1,53 @@
-Return-Path: <netdev+bounces-175674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A203DA67136
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 11:26:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 330CAA6714C
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 11:30:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4322D421FAF
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 10:26:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B458C19A2D3E
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 10:29:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0852F207E0C;
-	Tue, 18 Mar 2025 10:26:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ED72207E00;
+	Tue, 18 Mar 2025 10:29:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="G7z/occu"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="Wh1QyxjG"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA300206F18;
-	Tue, 18 Mar 2025 10:26:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D53E7207A1F;
+	Tue, 18 Mar 2025 10:29:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.243.244.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742293563; cv=none; b=MamwU2Vn0CXxjeH7+6l1F1Dz4ZyTkxD0B7MlKGz7y4XOquAByrhTEP6Bq9HGYuRy+soP+BbGlYAUcvm0e/ttfLhh0GOsTIBvWziZPQeU2vrv4poYWg9VYV++bUV1Cb/HKN+JPcHEIg9Rn4+HVoHLzXnHmUzoutFmp126AGmysA4=
+	t=1742293779; cv=none; b=ivXp2clh5s7u6aGONJA6/UrBG+w5gpT7bd6h7hGkpqu7wjBPao/F9f6lFzSgNwh7jD2A2ip9m8a5PP4u/KlqmMnvhMi2e342yqR/jgSO2zNC3aPmHSBE3fX20FgjVYKUYUoXHPnb1i/kw58Dy4gb4YfkbziDvBnCS++VjnMKv8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742293563; c=relaxed/simple;
-	bh=5jmDAGXiKABLCfb/KqDmMFp6vEjQ7B/rBqEoAHMmpxY=;
+	s=arc-20240116; t=1742293779; c=relaxed/simple;
+	bh=o85dNYKxjhVyQic2tzOaS2dDGnYUZB+vuSQDNjhlJc0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hRLbXYOegxrYRuFws6Q4pnx4RZCHnQmj6D9GyGS+ulAGRJrek3Ec4EiNADDMvFJh3zWb5cW1JVryYv5l1dl/viJFv+jT4X/mgON0TuHj1OwW3xPVNAZoarrb64Xh6Fb1o5fAdj+T2hofRbHdwfhP677AjptPEYQIPHilMpqzXjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=G7z/occu; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 160CC441CC;
-	Tue, 18 Mar 2025 10:25:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1742293558;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Zc6oFFUkHlFqpMlsRLdHY4M65dhXM48dn+z1oDl557o=;
-	b=G7z/occuwy0xr3+04zbh37s1Cajns5D+bR/lPxepiSwcGntuCZn6jkXFFBFo6mAvBb3kws
-	N/E9oeWnI72T5bbg+/TT/TF1bYkXEmLODtmMoxpqLsEzefSupFIKAvI2+r0Grff6NJ9vU8
-	C7Kg/3ZnvPDce8NL7ywILWBGpN8/E1mnqF5RGwgQRVcw8CU9H8acvUgeDByTRWqVKnN/EU
-	FTr6gzzsGZcMO3Lq8l2tnV+WfScQ6fGFUFJ6u4h5sotUpEg2THMR5+pPJxL7hB0hBFr3lw
-	V4uMBqF5kN4e2adzAeryTPGulf66tD3D8Zj1ZA2yDjxQiPBkPGSCF+zdxHYtNA==
-Message-ID: <f416d179-6405-4a84-8fea-2f6c0a60aef3@bootlin.com>
-Date: Tue, 18 Mar 2025 11:25:56 +0100
+	 In-Reply-To:Content-Type; b=btDwF9V8KVlOJ1ql2TXPSjvvtPV4Q2DsGbnpaM2gkN/4J7oW1xwN1ns7730aSMeCzO3ewA8aiQszoXxomOjdckNUi9ae50snInnwf67N7WkvRcjLC8uiH04glcgyVj1d1Gm1LvheM3AIUgZ0yc9TTeN1zfg5a9Ff4myTg8vQarY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=Wh1QyxjG; arc=none smtp.client-ip=54.243.244.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1742293715;
+	bh=o85dNYKxjhVyQic2tzOaS2dDGnYUZB+vuSQDNjhlJc0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=Wh1QyxjGQDU5ZRwNDDEM+G8Cs7ZDtoD4ZGwpHHWyP+VFDMVB4GXeEVYswNdJvYISC
+	 9MTVElaqUaGDlJbpOiMDxOQSxjB9NwAktjRo83AE+zPa3rBFM9HTU2vmVoehAyxdqW
+	 FhzZs9uOIJ2lJVw9JiIZdSoPi5LuUxG1zLgl7TFc=
+X-QQ-mid: bizesmtpip4t1742293676tc8iuox
+X-QQ-Originating-IP: aObwQ7kshVJ3gRnrbd8euD+E7nA+/AAMUnXKji9wq9o=
+Received: from [IPV6:240e:668:120a::212:156] ( [localhost])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 18 Mar 2025 18:27:54 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 16948721884944530558
+Message-ID: <540019E19B3FCA3D+99198df4-b799-4639-9a62-993abfc6cd69@uniontech.com>
+Date: Tue, 18 Mar 2025 18:27:54 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,60 +55,114 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next 0/2] selftests/bpf: Migrate test_xdp_vlan.sh into
- test_progs
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Mykola Lysenko <mykolal@fb.com>, Martin KaFai Lau <martin.lau@linux.dev>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Shuah Khan <shuah@kernel.org>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- Alexis Lothore <alexis.lothore@bootlin.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250221-xdp_vlan-v1-0-7d29847169af@bootlin.com>
- <Z7yZ8OxdisKbFYBi@mini-arch>
+Subject: Re: [PATCH net v2] mlxsw: spectrum_acl_bloom_filter: Workaround for
+ some LLVM versions
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: petrm@nvidia.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, czj2441@163.com,
+ zhanjun@uniontech.com, niecheng1@uniontech.com, guanwentao@uniontech.com
+References: <CBD5806B120ADEEE+20250318054803.462085-1-wangyuli@uniontech.com>
+ <Z9k4XQUDEKPHHI5k@shredder>
 Content-Language: en-US
-From: Bastien Curutchet <bastien.curutchet@bootlin.com>
-In-Reply-To: <Z7yZ8OxdisKbFYBi@mini-arch>
+From: WangYuli <wangyuli@uniontech.com>
+Autocrypt: addr=wangyuli@uniontech.com; keydata=
+ xjMEZoEsiBYJKwYBBAHaRw8BAQdAyDPzcbPnchbIhweThfNK1tg1imM+5kgDBJSKP+nX39DN
+ IVdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPsKJBBMWCAAxFiEEa1GMzYeuKPkg
+ qDuvxdofMEb0C+4FAmaBLIgCGwMECwkIBwUVCAkKCwUWAgMBAAAKCRDF2h8wRvQL7g0UAQCH
+ 3mrGM0HzOaARhBeA/Q3AIVfhS010a0MZmPTRGVfPbwD/SrncJwwPAL4GiLPEC4XssV6FPUAY
+ 0rA68eNNI9cJLArOOARmgSyJEgorBgEEAZdVAQUBAQdA88W4CTLDD9fKwW9PB5yurCNdWNS7
+ VTL0dvPDofBTjFYDAQgHwngEGBYIACAWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZoEsiQIb
+ DAAKCRDF2h8wRvQL7sKvAP4mBvm7Zn1OUjFViwkma8IGRGosXAvMUFyOHVcl1RTgFQEAuJkU
+ o9ERi7qS/hbUdUgtitI89efbY0TVetgDsyeQiwU=
+In-Reply-To: <Z9k4XQUDEKPHHI5k@shredder>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------zRvarJ8jpADb0bkjEy3uRGfr"
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: NtMl7YUnlkICryeo7xo0hPcSQn1vuxO4YowKP9lNW8qpWl4dd5F0nSHO
+	H0j3jvOVs35gzr2zaoQMFhJPQ8RRoTo7dB8CYUrQTtMyzPU0baB4fXZ/fc4FtEaYFtpWyNi
+	k5ATHT+U+Ezkb+UJAHTaGxvhedHy1IshdsTQT/T+l/6UUDiwLXnY5ASZTq13GUNVqY+snSe
+	NTHNrYtECfd5PU5ceYWhGHnvYjgfZkuw8PfMPXM25zSF5mtiAaAEfwNKGIsu66N3OXO61b3
+	lZxCt0VqXQcnsLbTaMODX54uWz95Y/A9gMsUFvpngg505ecghwMEaKLDuhjOxcXB5m+gFQu
+	0fp1+jTYMvHTko63axxsAopqOOt12vUYIFzNPqMtq9PSBK4qa8qE5cJ9PDd8+wXP+Na7mjV
+	7Vj69OLoHhiSRfkjpFKE6qWsBOlmBwBbJe4vgcaAhpIFD0AL9y+XrscwooKPFulvChKqmtn
+	5y52bJFay6W763cwwlbBkIg7//4+mivgpDA6Ydt4RjndEhZ8TDmcBvi7pTvMIyFCZqxITig
+	nU6gE4N+4zoeTKjMWZxMQn6Xt9MsqWv87/lGB4cSGDLdwFw/FSkqO1BEVI8P31yqyJmKT/D
+	py9I+dRDAZBLp0lKYTo6osJgov8PAXXt9vPKcSTYBDMyuuuctCMYhm9JDxMTu/DdBSOoYUU
+	Rx9pKlGjzAkC4t7AoTBReqZtIfK8uvCVbD5dcXMfV4QmVJOrkKBSbh/Dtb73DNYpX0dQ07S
+	h1gvwiGgwdDhxKCNgu0GdzPnxNw18mHmGuoRkr0CifbkgGUAqeghwdfIRbrhcg9DFmQ82W/
+	iDG+EoO5b3LAdJ1roRRiw5K01LuEymDGH0J4NmKl2ZmB22TeIbpAgGDzPSgzEpzXL25fTXu
+	YXq2fVzRht9WAJEC1xX3YJVp5vayedZJfUoxUUTj9/dEYAFKwMrYl9/6J0Kx5MPyk+dJtDg
+	XYTyVrKHHjJmhzwtbszwqwM2lgOvXEuH/xQJjsY3fy/tGq9tG+wHO/m+QuB7iNLfBI4XPiR
+	8h0tWThXpS7jMBhz94Ltu19qlsnRKMUVWgpU4sxpBhuXOuP3WdERN/lJQGJMVsa9snxWAaF
+	Q==
+X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
+X-QQ-RECHKSPAM: 0
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------zRvarJ8jpADb0bkjEy3uRGfr
+Content-Type: multipart/mixed; boundary="------------kBUSRutY3n4c4uQF6O2Zf3dh";
+ protected-headers="v1"
+From: WangYuli <wangyuli@uniontech.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: petrm@nvidia.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, czj2441@163.com,
+ zhanjun@uniontech.com, niecheng1@uniontech.com, guanwentao@uniontech.com
+Message-ID: <99198df4-b799-4639-9a62-993abfc6cd69@uniontech.com>
+Subject: Re: [PATCH net v2] mlxsw: spectrum_acl_bloom_filter: Workaround for
+ some LLVM versions
+References: <CBD5806B120ADEEE+20250318054803.462085-1-wangyuli@uniontech.com>
+ <Z9k4XQUDEKPHHI5k@shredder>
+In-Reply-To: <Z9k4XQUDEKPHHI5k@shredder>
+
+--------------kBUSRutY3n4c4uQF6O2Zf3dh
+Content-Type: multipart/mixed; boundary="------------IZuLjKHBvEiD5jxy855i5itO"
+
+--------------IZuLjKHBvEiD5jxy855i5itO
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddugedvudelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkffggfgfuvfevfhfhjggtgfesthejredttddvjeenucfhrhhomhepuegrshhtihgvnhcuvehurhhuthgthhgvthcuoegsrghsthhivghnrdgtuhhruhhttghhvghtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefhheeggfetffekheevuedvkedvvdeufeegjeevgfelveevveetffevfefgheeijeenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghloheplgduledvrdduieekrddtrddugegnpdhmrghilhhfrhhomhepsggrshhtihgvnhdrtghurhhuthgthhgvthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdegpdhrtghpthhtohepshhtfhhomhhitghhvghvsehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghstheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrnhhivghlsehiohhgvggrrhgsohigrdhnvghtpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpt
- hhtohephhgrfihksehkvghrnhgvlhdrohhrghdprhgtphhtthhopehjohhhnhdrfhgrshhtrggsvghnugesghhmrghilhdrtghomhdprhgtphhtthhopegrnhgurhhiiheskhgvrhhnvghlrdhorhhg
-X-GND-Sasl: bastien.curutchet@bootlin.com
+Content-Transfer-Encoding: base64
 
-Hi all,
+QXBvbG9naWVzLCBhIG1pbm9yIGZvcm1hdHRpbmcgZXJyb3IuDQoNCldpbGwgc2VuZCBhIHBh
+dGNoIHYzLg0KDQpUaGFua3MsDQoNCi0tDQoNCldhbmdZdWxpDQoNCg==
+--------------IZuLjKHBvEiD5jxy855i5itO
+Content-Type: application/pgp-keys; name="OpenPGP_0xC5DA1F3046F40BEE.asc"
+Content-Disposition: attachment; filename="OpenPGP_0xC5DA1F3046F40BEE.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
-On 2/24/25 5:10 PM, Stanislav Fomichev wrote:
-> On 02/21, Bastien Curutchet (eBPF Foundation) wrote:
->> Hi all,
->>
->> This patch series continues the work to migrate the script tests into
->> prog_tests.
->>
->> test_xdp_vlan.sh tests the ability of an XDP program to modify the VLAN
->> ids on the fly. This isn't currently covered by an other test in the
->> test_progs framework so I add a new file prog_tests/xdp_vlan.c that does
->> the exact same tests (same network topology, same BPF programs) and
->> remove the script.
->>
->> Signed-off-by: Bastien Curutchet (eBPF Foundation) <bastien.curutchet@bootlin.com>
-> 
-> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+-----BEGIN PGP PUBLIC KEY BLOCK-----
 
-Small gentle ping on this, as I haven't received any updates since 
-Stanislav acked it.
+xjMEZoEsiBYJKwYBBAHaRw8BAQdAyDPzcbPnchbIhweThfNK1tg1imM+5kgDBJSK
+P+nX39DNIVdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPsKJBBMWCAAx
+FiEEa1GMzYeuKPkgqDuvxdofMEb0C+4FAmaBLIgCGwMECwkIBwUVCAkKCwUWAgMB
+AAAKCRDF2h8wRvQL7g0UAQCH3mrGM0HzOaARhBeA/Q3AIVfhS010a0MZmPTRGVfP
+bwD/SrncJwwPAL4GiLPEC4XssV6FPUAY0rA68eNNI9cJLArOOARmgSyJEgorBgEE
+AZdVAQUBAQdA88W4CTLDD9fKwW9PB5yurCNdWNS7VTL0dvPDofBTjFYDAQgHwngE
+GBYIACAWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZoEsiQIbDAAKCRDF2h8wRvQL
+7sKvAP4mBvm7Zn1OUjFViwkma8IGRGosXAvMUFyOHVcl1RTgFQEAuJkUo9ERi7qS
+/hbUdUgtitI89efbY0TVetgDsyeQiwU=3D
+=3DBlkq
+-----END PGP PUBLIC KEY BLOCK-----
 
+--------------IZuLjKHBvEiD5jxy855i5itO--
 
-Best regards,
-Bastien
+--------------kBUSRutY3n4c4uQF6O2Zf3dh--
+
+--------------zRvarJ8jpADb0bkjEy3uRGfr
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wnsEABYIACMWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZ9lKqgUDAAAAAAAKCRDF2h8wRvQL7i0l
+APoCoN3Vd6b3dWxRYkqED+Jdl/OuR5bU9WK/thyKyiRa6QEA7a+EnaW4KFR4TyWc8e9s7hmxusy/
+qbiJNS09+h5/ZAE=
+=oRcs
+-----END PGP SIGNATURE-----
+
+--------------zRvarJ8jpADb0bkjEy3uRGfr--
 
