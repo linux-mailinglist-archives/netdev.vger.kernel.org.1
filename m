@@ -1,314 +1,205 @@
-Return-Path: <netdev+bounces-175780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBA72A67776
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 16:16:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 251E4A67777
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 16:16:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA39F880617
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 15:15:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C72EE17EF09
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 15:15:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEA5020E024;
-	Tue, 18 Mar 2025 15:15:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24AE320F063;
+	Tue, 18 Mar 2025 15:15:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="i/qCPP5M"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T8F8yrZW"
 X-Original-To: netdev@vger.kernel.org
-Received: from va-2-60.ptr.blmpb.com (va-2-60.ptr.blmpb.com [209.127.231.60])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E17A146D65
-	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 15:15:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.60
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27DAAC2C8;
+	Tue, 18 Mar 2025 15:15:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742310941; cv=none; b=BpEzdB/SmkQky6FQR0DMf3iMU40CWUeqDolYkrHuiHZcpapNE5hp+IhPIE5FNHAEL1gb0sRjZWoDTcxZ/QRd6bRvPlTVnkpLXnHCVDM1xjXLOgbUdLLjNMMJq8WtUB2Wsy0uRL1+LNqP5jzTBN78ujSjihNoNhux3F4rkTvPO/E=
+	t=1742310948; cv=none; b=et+XncyHZz9mcsg2ey9CRbjB9TxersbgH/POxAJxASuWKFjnKzoO3P3EQlY1TI8mlzs6x850S5tJq1+CJazBxvmkwy+/KGRZoTjx8px/1kIxMnv6BnXPT+P693RIOzUOGblNPhnlXXLozeBE/sOU+PUIMbh9jevWGnwwys0j9F4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742310941; c=relaxed/simple;
-	bh=dbrAd354cltippqkS1BT0083iEoM3MOeeOUbNc9FYH4=;
-	h=Message-Id:Content-Type:Cc:Date:Mime-Version:From:Subject:To; b=SjRgdoEMdtSxN78Th+2E594BCoIsMvlreETTKdxH95nMV/dnNc1TiUIU6DPSBP1/ewWSqjKIywndxjEmBvybnXCXABUk4GmFeMg4Y5DAXt0cUQocA3ff7lo+vWAB2IyRVkc2xjmZwUlJAIqQTqsMaaTfOvQPCwoH/9a1ZiMp64I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=i/qCPP5M; arc=none smtp.client-ip=209.127.231.60
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=feishu2403070942; d=yunsilicon.com; t=1742310928; h=from:subject:
- mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
- mime-version:in-reply-to:message-id;
- bh=SGAJWnQpfu0cuWNSAphgScgVHLVGmkgPn4ItWZJbIIw=;
- b=i/qCPP5M9EGi0O9+n7okonekBnNi4lgRPAtu3cSCRj8d/y9QdyLMVpGLz+NU2WinxJ/Jm4
- tHAjoI7v7ZLIH1twXkEINouAiHmHqybTHPsiSL0t8577iFNhm11cX0eHa9Zjw8F7Mo5beP
- S/zlb8bhqYSzxNj1VAK43F7c7ybS/UN7C6MhKkKgIjsMvym28hjKaP97Dz3h8B3/dD/Koc
- F5Lb9ZvX2GE/sAR9mMe2sRvuJEFWG0fB9W13ML/RVWPTDZR9VizwxOJphoaALahPCZDRd0
- mg4hGgUTSE+Irga0fi+IGUUTHz9WNBC8NSEJGG7rl7KZFZvxSJWoytOh3bAsDg==
-Message-Id: <20250318151449.1376756-1-tianx@yunsilicon.com>
-X-Original-From: Xin Tian <tianx@yunsilicon.com>
-Content-Type: text/plain; charset=UTF-8
-Cc: <leon@kernel.org>, <andrew+netdev@lunn.ch>, <kuba@kernel.org>, 
-	<pabeni@redhat.com>, <edumazet@google.com>, <davem@davemloft.net>, 
-	<jeff.johnson@oss.qualcomm.com>, <przemyslaw.kitszel@intel.com>, 
-	<weihg@yunsilicon.com>, <wanry@yunsilicon.com>, <jacky@yunsilicon.com>, 
-	<horms@kernel.org>, <parthiban.veerasooran@microchip.com>, 
-	<masahiroy@kernel.org>, <kalesh-anakkur.purayil@broadcom.com>, 
-	<geert+renesas@glider.be>, <pabeni@redhat.com>, <geert@linux-m68k.org>
-Date: Tue, 18 Mar 2025 23:15:26 +0800
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1742310948; c=relaxed/simple;
+	bh=MTvGD/HLFcaWAg3V8FM8ucXkDq1L3xRV98aw/ozj9gU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ohpakS2G7VnjJ/BaKGfj1Or1oG4BVsczWa+BGEqHd83T8i50io1qLkXyxT5R1Qg9U6IH5qV42XZLqBQBJCWSDnnNfXh+qiQ4AA3A6fUwO5k/BeXjihwrpCRlaw4WDgiNAKIdHFDdN5a/6V+CdSKJf0h5Musw1tVn7WazM3f6lYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T8F8yrZW; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43935d1321aso2212635e9.1;
+        Tue, 18 Mar 2025 08:15:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742310945; x=1742915745; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vfsZ4Hr0wmB5sa2cUchGQZzT0be/9tuArc+VqsT04RU=;
+        b=T8F8yrZWlGt8n0Pv+/I6dhtw5AEyFPghYBLTyCc2iZxZVTIIw+ZkuZvwC+34rpSl0k
+         Fsms1Velu/3zFxlBm8EWZRc4rWyuUrjCMcnB1aNjk4dQwKJqfJEW9jmB7g9BaOtezjCr
+         Bn/iYMtfNwkHHw9jZjOUCCE0n+W22gE8/HAklA93Dh3Tjd7pdhoSMdfQ6q4tdGM4Cj+4
+         rsJV5AfNeALjH+gWDGOlzIeGxdh8BmbuJVFfMlt1vE++USknXO0suJKS80dDBOpb3apj
+         w8WasNtg1/MgAFnZAFPNXrU9uX7p4bfNz3UBelI9sPjWBGPSwx0NZgiG4vI5wGvFCjFv
+         SgAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742310945; x=1742915745;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vfsZ4Hr0wmB5sa2cUchGQZzT0be/9tuArc+VqsT04RU=;
+        b=K3O7uEdpy5astgN1JrLVahn40se13WFLC9NR4KDKBRSxxlGwlqQrk3NqcYevdpWRxa
+         zrUrPKy/FvUNJqmWSnk0gzMSTI8PPZWjwP5ZjeVBj6efheUFax6LjPG2u+wJlRD+FNQ5
+         y2h7i1V0cE1KWyJvLmEEZDpMZcnXYUrra78rxVd1qwOlSj+V9hYDF1PcBq7CllezUO7p
+         PQI+yqNREXw1M6lG3IM2GDG+64ZT+/a+vfgUqs9zeYEvyC+1e6u5rNtStck6oOU3vchM
+         fwtipjnd8fTHGEBghpB5KtVTiwRMVmBNoCf8ZooWEX6I/AmnipM1q4WAUlY0wu6w28j/
+         jEhw==
+X-Forwarded-Encrypted: i=1; AJvYcCVCFWynPY7ZHVFCCqzOFXkw0+W+iTkOu5XSCWF4IxGUnQ6XmXt3eIooelOOOBQXwcsholLxLgHahp7P@vger.kernel.org, AJvYcCWchxhdvxO/SfWa/HwxW5J9DoeCg9Cnulz2+i9p3Q+0JQX8H8n/MHcxzje+4LFKiKMPFnEIs0Pq@vger.kernel.org, AJvYcCWk1c7BzTYWncytSYIT6ilriKN8R9Uc6SgVapDdBD2OkEKafAVQtyDNRYwsco8q9DUnXP97Bsn6Ziq0VP4U@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOymsPWlxJ06ISrXwtuUZC906mKLhpPp0sPuUojvZYfD2ANZyW
+	f8OV1yeIBG+7FsSHtZnBeaP9kzQUpoL0qQjl+rJmvMJPIhW7Yt5F
+X-Gm-Gg: ASbGncvZDI2SWmcdZT9sKzqou9WJaDr5VYwiwHMqVqPyLDsgisRSZoweMau3FE93IHR
+	XahGanv1/5NsIncmmzADuDu4wu0kbHQmFNaM+b3MmlUWY4ENBRAtveFs3QXqgKML/Grc76V5GqG
+	UUrLcZXDYYV9BFK6Toohlc4iBJllN8FhgvGcpjgWONnN2kLiDzH+YBdbZyPn0a+pJL9SOF/9lcL
+	DgUzMWIfRE40NLvgjTv6ann3DGsAOBNfje7Ymnp5iCl8kPzk7McIRBiMKq2MF+wv3VbEkbU90dh
+	vSAK5dSB2pLtCs7JMN8hAT4l0WwcmQg+
+X-Google-Smtp-Source: AGHT+IFoFkrvmKX6oudoUNLDCMY8f1EeKRpKsVXrfH4lPyc9AssKZHYKJOieMoARGtgxMGgZdLntEA==
+X-Received: by 2002:a5d:59a9:0:b0:382:4e71:1a12 with SMTP id ffacd0b85a97d-3971d239c31mr6323034f8f.1.1742310944949;
+        Tue, 18 Mar 2025 08:15:44 -0700 (PDT)
+Received: from skbuf ([86.127.125.88])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d2bb5f987sm82930845e9.24.2025.03.18.08.15.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Mar 2025 08:15:43 -0700 (PDT)
+Date: Tue, 18 Mar 2025 17:15:40 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	upstream@airoha.com
+Subject: Re: [net-next PATCH v13 13/14] net: dsa: Add Airoha AN8855 5-Port
+ Gigabit DSA Switch driver
+Message-ID: <20250318151540.4rmw6jj5hh2rp4b4@skbuf>
+References: <20250315154407.26304-1-ansuelsmth@gmail.com>
+ <20250315154407.26304-14-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Received: from ubuntu-liun.yunsilicon.com ([58.34.192.114]) by smtp.feishu.cn with ESMTPS; Tue, 18 Mar 2025 23:15:26 +0800
-From: "Xin Tian" <tianx@yunsilicon.com>
-Subject: [PATCH net-next v9 00/14] xsc: ADD Yunsilicon XSC Ethernet Driver
-Content-Transfer-Encoding: 7bit
-To: <netdev@vger.kernel.org>
-X-Lms-Return-Path: <lba+267d98e0e+3271b2+vger.kernel.org+tianx@yunsilicon.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250315154407.26304-14-ansuelsmth@gmail.com>
 
-The patch series adds the xsc driver, which will support the YunSilicon
-MS/MC/MV series of network cards. These network cards offer support for
-high-speed Ethernet and RDMA networking, with speeds of up to 200Gbps.
+On Sat, Mar 15, 2025 at 04:43:53PM +0100, Christian Marangi wrote:
+> +/* Similar to MT7530 also trap link local frame and special frame to CPU */
+> +static int an8855_trap_special_frames(struct an8855_priv *priv)
+> +{
+> +	int ret;
+> +
+> +	/* Trap BPDUs to the CPU port(s) and egress them
+> +	 * VLAN-untagged.
+> +	 */
+> +	ret = regmap_update_bits(priv->regmap, AN8855_BPC,
+> +				 AN8855_BPDU_BPDU_FR | AN8855_BPDU_EG_TAG |
+> +				 AN8855_BPDU_PORT_FW,
+> +				 AN8855_BPDU_BPDU_FR |
+> +				 FIELD_PREP(AN8855_BPDU_EG_TAG, AN8855_VLAN_EG_UNTAGGED) |
+> +				 FIELD_PREP(AN8855_BPDU_PORT_FW, AN8855_BPDU_CPU_ONLY));
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Trap 802.1X PAE frames to the CPU port(s) and egress them
+> +	 * VLAN-untagged.
+> +	 */
+> +	ret = regmap_update_bits(priv->regmap, AN8855_PAC,
+> +				 AN8855_PAE_BPDU_FR | AN8855_PAE_EG_TAG |
+> +				 AN8855_PAE_PORT_FW,
+> +				 AN8855_PAE_BPDU_FR |
+> +				 FIELD_PREP(AN8855_PAE_EG_TAG, AN8855_VLAN_EG_UNTAGGED) |
+> +				 FIELD_PREP(AN8855_PAE_PORT_FW, AN8855_BPDU_CPU_ONLY));
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Trap frames with :01 MAC DAs to the CPU port(s) and egress
+> +	 * them VLAN-untagged.
+> +	 */
+> +	ret = regmap_update_bits(priv->regmap, AN8855_RGAC1,
+> +				 AN8855_R01_BPDU_FR | AN8855_R01_EG_TAG |
+> +				 AN8855_R01_PORT_FW,
+> +				 AN8855_R01_BPDU_FR |
+> +				 FIELD_PREP(AN8855_R01_EG_TAG, AN8855_VLAN_EG_UNTAGGED) |
+> +				 FIELD_PREP(AN8855_R01_PORT_FW, AN8855_BPDU_CPU_ONLY));
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Trap frames with :02 MAC DAs to the CPU port(s) and egress
+> +	 * them VLAN-untagged.
+> +	 */
+> +	ret = regmap_update_bits(priv->regmap, AN8855_RGAC1,
+> +				 AN8855_R02_BPDU_FR | AN8855_R02_EG_TAG |
+> +				 AN8855_R02_PORT_FW,
+> +				 AN8855_R02_BPDU_FR |
+> +				 FIELD_PREP(AN8855_R02_EG_TAG, AN8855_VLAN_EG_UNTAGGED) |
+> +				 FIELD_PREP(AN8855_R02_PORT_FW, AN8855_BPDU_CPU_ONLY));
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Trap frames with :03 MAC DAs to the CPU port(s) and egress
+> +	 * them VLAN-untagged.
+> +	 */
+> +	ret = regmap_update_bits(priv->regmap, AN8855_RGAC1,
+> +				 AN8855_R03_BPDU_FR | AN8855_R03_EG_TAG |
+> +				 AN8855_R03_PORT_FW,
+> +				 AN8855_R03_BPDU_FR |
+> +				 FIELD_PREP(AN8855_R03_EG_TAG, AN8855_VLAN_EG_UNTAGGED) |
+> +				 FIELD_PREP(AN8855_R03_PORT_FW, AN8855_BPDU_CPU_ONLY));
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Trap frames with :0E MAC DAs to the CPU port(s) and egress
+> +	 * them VLAN-untagged.
+> +	 */
+> +	return regmap_update_bits(priv->regmap, AN8855_RGAC1,
+> +				  AN8855_R0E_BPDU_FR | AN8855_R0E_EG_TAG |
+> +				  AN8855_R0E_PORT_FW,
+> +				  AN8855_R0E_BPDU_FR |
+> +				  FIELD_PREP(AN8855_R0E_EG_TAG, AN8855_VLAN_EG_UNTAGGED) |
+> +				  FIELD_PREP(AN8855_R0E_PORT_FW, AN8855_BPDU_CPU_ONLY));
+> +}
 
-The Ethernet functionality is implemented by two modules. One is a
-PCI driver(xsc_pci), which provides PCIe configuration,
-CMDQ service (communication with firmware), interrupt handling,
-hardware resource management, and other services, while offering
-common interfaces for Ethernet and future InfiniBand drivers to
-utilize hardware resources. The other is an Ethernet driver(xsc_eth),
-which handles Ethernet interface configuration and data
-transmission/reception.
+Is there a way in which you could group the registers a bit more?
+The function occupies 2 screens :-/
 
-- Patches 1-7 implement the PCI driver
-- Patches 8-14 implement the Ethernet driver
+There are 4 read-modify-write operations in succession to the RGAC1
+register. Maybe you can converge them into a single regmap_update_bits()
+call.
 
-This submission is the first phase, which includes the PF-based Ethernet
-transmit and receive functionality. Once this is merged, we will submit
-additional patches to implement support for other features, such as SR-IOV,
-ethtool support, and a new RDMA driver.
+Also, for packets which reach the CPU via a trap, we shouldn't set
+skb->offload_fwd_mark = 1. In other words, if the bridge layer wants to
+forward them in software (including to other an8855 ports), let it do so.
+The common example given in commit 515853ccecc6 ("bridge: allow
+forwarding some link local frames") is 802.1X PAE (01-80-C2-00-00-03).
 
-Changes v8->v9:
-Link to v8: https://lore.kernel.org/netdev/20250307100824.555320-1-tianx@yunsilicon.com/
-1. correct netdev feature settings in Patch09 (Paolo)
-2. change sizes from int to unsigned int in Patch02 (Geert)
-3. nit in Patch02: min_t->min, use upper_32_bits/lower_32_bits() (Simon)
-
-Changes v7->v8:
-Link to v7: https://lore.kernel.org/netdev/20250228154122.216053-1-tianx@yunsilicon.com/
-1. add Kconfig NET_VENDOR_YUNSILICON depneds on COMPILE_TEST (Jakub)
-2. rm unnecessary "default n" (Jakub)
-3. select PAGE_POOL in ETH driver (Jakub)
-4. simplify dma_mask set (Jakub)
-5. del pci_state and pci_state_mutex (Kalesh)
-6. I checked and droped intf_state and int_state_mutex too
-7. del some no need lables in patch1 (Kalesh)
-8. ensure consistent label naming throughout the patchset (Simon)
-9. WARN_ONCE instead of meaningless comments (Simon)
-10. Patch 7 add Reviewed-by from Leon Romanovsky, thanks Leon
-11. nits
-
-Changes v6->v7:
-Link to v6: https://lore.kernel.org/netdev/20250227082558.151093-1-tianx@yunsilicon.com/
-1. use _pool_zalloc/vzalloc instead of (_pool_alloc/vmalloc + memset 0)
-2. correct kfree for kvmalloc memory
-3. del comment using NULL adapter pointer
-4. correct num_dma type to int in xsc_eth_tx.c
-- Jakub Kicinski
-
-Changes v5->v6:
-Link to v5: https://lore.kernel.org/netdev/20250224172416.2455751-1-tianx@yunsilicon.com/
-1. fix error return in xsc_adev_init
-- Jakub Kicinski
-2. comment style // -> /* ... */
-3. remove XSC_ADEV_IDX_MAX, and use ARRAY_SIZE() instead
-4. kcalloc for array alloc instead of kzalloc
-- Leon Romanovsky
-5. prefetch/perfetchw to net_prefetch/net_prefetch
-- Joe Damato
-
-Changes v4->v5:
-Link to v4: https://lore.kernel.org/netdev/20250213091402.2067626-1-tianx@yunsilicon.com/
-1. free xsc_adev in release callback
-- Leon Romanovsky
-2. Add more detailed description for patches
-3. use FIELD_PREP() and FIELD_GET() instead of XSC_SET/GET_FIELD
-4. fix sparse complains about endian and types
-5. use unsigned types for unsigned values
-6. del BITS_PER_LONG == 64 check in xsc_buf_alloc
-7. use GENMASK and DIV_ROUND_UP to replace the unclear code
-- Simon Horman
-
-Changes v3->v4:
-Link to v3: https://lore.kernel.org/netdev/20250115102242.3541496-1-tianx@yunsilicon.com/
-1. pci_ioremap_bar returns a negative value in pci_init.
-2. Adjust the declaration order to follow the reverse xmastree rule.
-3. Split lines that exceed 80 columns.
-4. Use XSC_SET_FIELD and XSC_GET_FIELD instead of bitfields.
-- Simon Horman
-5. Use big-endian consistently in cmds
-6. Add comments for sem and rsv0.
-7. Change mode to enum in xsc_cmd, and rename bitmask to cmd_entry_mask.
-8. Remove unnecessary header files such as kernel.h and init.h.
-9. Add the xsc prefix to function names.
-10. Return ENOSPC if alloc_ent fails.
-11. Adjust the position of free_cmd.
-12. Separate different categories of #include statements with blank lines.
-13. Use status instead of admin_status xsc_event_set_port_admin_status_mbox_in
-- Przemek Kitszel
-
-Changes v2->v3:
-Link to v2: https://lore.kernel.org/netdev/20241230101513.3836531-1-tianx@yunsilicon.com/
-1. Use auxiliary bus for ethernet functionality.
-- Leon Romanovsky comments
-2. Remove netdev from struct xsc_core_device, as it can be accessed via eth_priv.
-- Andrew Lunn comments
-
-Changes v1->v2:
-Link to v1: https://lore.kernel.org/netdev/20241218105023.2237645-1-tianx@yunsilicon.com/
-1. Remove the last two patches to reduce the total code submitted.
-- Jakub Kicinski comments
-2. Remove the custom logging interfaces and switch to using
-   pci_xxx/netdev_xxx logging interfaces. Delete the related
-   module parameters.
-3. No use of inline functions in .c files.
-4. Remove unnecessary license information.
-5. Remove unnecessary void casts.
-- Andrew Lunn comments
-6. Use double underscore (__) for header file macros.
-7. Fix the depend field in Kconfig.
-8. Add sign-off for co-developers.
-9. use string directly in MODULE_DESCRIPTION
-10. Fix poor formatting issues in the code.
-11. Modify some macros that don't use the XSC_ prefix.
-12. Remove unused code from xsc_cmd.h that is not part of this patch series.
-13. No comma after items in a complete enum.
-14. Use the BIT() macro to define constants related to bit operations.
-15. Add comments to clarify names like ver, cqe, eqn, pas, etc.
-- Przemek Kitszel comments
-
-Changes v0->v1:
-1. name xsc_core_device as xdev instead of dev
-2. modify Signed-off-by tag to Co-developed-by
-3. remove some obvious comments
-4. remove unnecessary zero-init and NULL-init
-5. modify bad-named goto labels
-6. reordered variable declarations according to the RCT rule
-- Przemek Kitszel comments
-7. add MODULE_DESCRIPTION()
-- Jeff Johnson comments
-8. remove unnecessary dev_info logs
-9. replace these magic numbers with #defines in xsc_eth_common.h
-10. move code to right place
-11. delete unlikely() used in probe
-12. remove unnecessary reboot callbacks
-- Andrew Lunn comments
-
-Xin Tian (14):
-  xsc: Add xsc driver basic framework
-  xsc: Enable command queue
-  xsc: Add hardware setup APIs
-  xsc: Add qp and cq management
-  xsc: Add eq and alloc
-  xsc: Init pci irq
-  xsc: Init auxiliary device
-  xsc: Add ethernet interface
-  xsc: Init net device
-  xsc: Add eth needed qp and cq apis
-  xsc: ndo_open and ndo_stop
-  xsc: Add ndo_start_xmit
-  xsc: Add eth reception data path
-  xsc: add ndo_get_stats64
-
- MAINTAINERS                                   |    7 +
- drivers/net/ethernet/Kconfig                  |    1 +
- drivers/net/ethernet/Makefile                 |    1 +
- drivers/net/ethernet/yunsilicon/Kconfig       |   26 +
- drivers/net/ethernet/yunsilicon/Makefile      |    8 +
- .../yunsilicon/xsc/common/xsc_auto_hw.h       |   94 +
- .../ethernet/yunsilicon/xsc/common/xsc_cmd.h  |  630 ++++++
- .../ethernet/yunsilicon/xsc/common/xsc_cmdq.h |  234 ++
- .../ethernet/yunsilicon/xsc/common/xsc_core.h |  498 ++++
- .../yunsilicon/xsc/common/xsc_device.h        |   77 +
- .../yunsilicon/xsc/common/xsc_driver.h        |   26 +
- .../ethernet/yunsilicon/xsc/common/xsc_pp.h   |   38 +
- .../net/ethernet/yunsilicon/xsc/net/Kconfig   |   17 +
- .../net/ethernet/yunsilicon/xsc/net/Makefile  |    9 +
- .../net/ethernet/yunsilicon/xsc/net/main.c    | 1993 +++++++++++++++++
- .../net/ethernet/yunsilicon/xsc/net/xsc_eth.h |   55 +
- .../yunsilicon/xsc/net/xsc_eth_common.h       |  224 ++
- .../ethernet/yunsilicon/xsc/net/xsc_eth_rx.c  |  601 +++++
- .../yunsilicon/xsc/net/xsc_eth_stats.c        |   46 +
- .../yunsilicon/xsc/net/xsc_eth_stats.h        |   34 +
- .../ethernet/yunsilicon/xsc/net/xsc_eth_tx.c  |  321 +++
- .../yunsilicon/xsc/net/xsc_eth_txrx.c         |  188 ++
- .../yunsilicon/xsc/net/xsc_eth_txrx.h         |   91 +
- .../ethernet/yunsilicon/xsc/net/xsc_eth_wq.c  |   80 +
- .../ethernet/yunsilicon/xsc/net/xsc_eth_wq.h  |  187 ++
- .../net/ethernet/yunsilicon/xsc/net/xsc_pph.h |  180 ++
- .../ethernet/yunsilicon/xsc/net/xsc_queue.h   |  206 ++
- .../net/ethernet/yunsilicon/xsc/pci/Kconfig   |   14 +
- .../net/ethernet/yunsilicon/xsc/pci/Makefile  |   10 +
- .../net/ethernet/yunsilicon/xsc/pci/adev.c    |  115 +
- .../net/ethernet/yunsilicon/xsc/pci/adev.h    |   14 +
- .../net/ethernet/yunsilicon/xsc/pci/alloc.c   |  234 ++
- .../net/ethernet/yunsilicon/xsc/pci/alloc.h   |   17 +
- .../net/ethernet/yunsilicon/xsc/pci/cmdq.c    | 1571 +++++++++++++
- drivers/net/ethernet/yunsilicon/xsc/pci/cq.c  |  155 ++
- drivers/net/ethernet/yunsilicon/xsc/pci/cq.h  |   14 +
- drivers/net/ethernet/yunsilicon/xsc/pci/eq.c  |  340 +++
- drivers/net/ethernet/yunsilicon/xsc/pci/eq.h  |   46 +
- drivers/net/ethernet/yunsilicon/xsc/pci/hw.c  |  283 +++
- drivers/net/ethernet/yunsilicon/xsc/pci/hw.h  |   18 +
- .../net/ethernet/yunsilicon/xsc/pci/main.c    |  326 +++
- .../net/ethernet/yunsilicon/xsc/pci/pci_irq.c |  426 ++++
- .../net/ethernet/yunsilicon/xsc/pci/pci_irq.h |   14 +
- drivers/net/ethernet/yunsilicon/xsc/pci/qp.c  |  194 ++
- drivers/net/ethernet/yunsilicon/xsc/pci/qp.h  |   14 +
- .../net/ethernet/yunsilicon/xsc/pci/vport.c   |   32 +
- 46 files changed, 9709 insertions(+)
- create mode 100644 drivers/net/ethernet/yunsilicon/Kconfig
- create mode 100644 drivers/net/ethernet/yunsilicon/Makefile
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_auto_hw.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_cmd.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_cmdq.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_device.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_driver.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_pp.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/Kconfig
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/Makefile
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/main.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_common.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_rx.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_stats.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_stats.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_tx.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_txrx.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_txrx.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_wq.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_wq.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_pph.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_queue.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/Makefile
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/adev.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/adev.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/alloc.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/alloc.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/cmdq.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/cq.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/cq.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/eq.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/eq.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/hw.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/hw.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/main.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/pci_irq.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/pci_irq.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/qp.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/qp.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/vport.c
-
---
-2.43.0
+I notice mtk_tag_rcv() calls dsa_default_offload_fwd_mark() with no
+pre-condition. Do you know whether there exists any bit in the RX tag
+which signifies whether the packet was received because of a trap
+(or if it was autonomously forwarded by the switch to the other bridge
+ports as well)? The offload_fwd_mark bit should be set based on
+something like that.
 
