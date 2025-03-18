@@ -1,174 +1,127 @@
-Return-Path: <netdev+bounces-175802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB79DA67803
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 16:37:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FE16A67819
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 16:41:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2C3D3BBBC9
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 15:36:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82E371884ED6
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 15:40:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D29519C56C;
-	Tue, 18 Mar 2025 15:36:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2435020CCDB;
+	Tue, 18 Mar 2025 15:39:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="xAoEVvyf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bL6ONo1+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE95828FD
-	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 15:36:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 267D928FD;
+	Tue, 18 Mar 2025 15:39:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742312208; cv=none; b=eD4jsYF51PaYjhaekljaT6ZAeDgCJWUl2EaEeNWqNMl8aqQJ38W3P4Bl6VvQKSlVWbVF6GkqFWWZfwcH05p0fMWAzMMufF0QPAN1dyujS8q8qhgoFNgm3X6SDLLUutKbPLl8+4MqMyHwn0JeOlz75OKdfoz9n9mh1xfdsCR2FbI=
+	t=1742312395; cv=none; b=imAEP2ZVxiPX8ypN7hzsiJ8eIQhmSKJkTFBvktFp8XFpdfJOQAI3sUc/Qh3zXQEa1DR/TARCW71+lxwghvD0k3BYxicfDQzKiNtqlWDbeG639AdA82WeH5wV1uJpZN2TDTI2nAoiAuFWLCQsZMxi++BgkgAXA7R0W8ik9FkdJ3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742312208; c=relaxed/simple;
-	bh=hCzI46TOxf0whbHlZzAK7Y9ErzVtzl/XtM9h25zqMm0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rjVZg2jKQJuiUQ7WpjnORU6lG5cOp8Enlkv0qL6UdVQTnF4NVuGaYRRopKMUlM92q6AmFqGGxWnXz1KH5UyoVm3Kz7Naw70Hlljy9/SVpRi0hjA34+BjbrXg75+Z/DvgN96y/mJy+PUVva0x4b25KvP6BvWyUINcno3kfJ30Tjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=xAoEVvyf; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43cfba466b2so35788625e9.3
-        for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 08:36:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1742312205; x=1742917005; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=At6+XYAcNE+hfaNmHjS9408JCFLx8zx4kdKac5P8Z8M=;
-        b=xAoEVvyfRD/c0DkOceXESGVx8Shd9gF+iIlkz1yXTSZLCjz8efxFIOIL3zmbTb0dwi
-         XZGv2lpPU2c7sdWuPl1IHGP38A8Mp66ylbrLC3pLJcM1snRxWYMJHPlMriIwkSTCyiQ7
-         jhq21ZICgwxBxCVxZ6RF43FPj09hiEPsc6984vkqU6nsxyF5Ogg4LoHs8tDJBYSsAjqA
-         GMZkdoefejJfYWFanABQbOGjogBg/JHiZJXD6W9JhNJ9NYB9fh+ic6DEFB11GjL2iJO6
-         rZCvrZN4GOarxUFJYbKS7WdXOrIJ84NOGtvJ9+YUO98PKcfPpEbGQrnqookotLxsURZ2
-         LETA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742312205; x=1742917005;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=At6+XYAcNE+hfaNmHjS9408JCFLx8zx4kdKac5P8Z8M=;
-        b=lxoUyTFxESGmkHz1lsV7XJOsr0/fiWPCDrqRbn0TEPnSLeUFX3t6HlitL997YuoC1g
-         w4Qb6yX/2SvgYo59+d/1D7jD8EykDC7GpVP7VzvccD93ZTnVzxZOOcNlVYRu3ZenIo1u
-         6UUfta7WPfl4U1aGYucZpbwBPlON08htryeSZ0hPx4GRrFdG5X/LBczVHdBI6fvGello
-         ia/vRi3K3pMCL9wm1L0fwU9+mnT6HSaYq8u0zYMnlGQ0SpHCzAZlw9hDIaL1rpT/BDPT
-         jZA4ae/+Ja8c7di0JR5be7pcZ5SQTlmpxGELvosDa8Hr/jpTPa/NK+7u7jaovqpJCYHn
-         eing==
-X-Gm-Message-State: AOJu0YwKVpBPnsdAhFsgTWGwV0qJNu8488GB5w0EFYXkRKFxOUHI1TZu
-	bFKrvYprkcXm8+aXFI0bcoyuRrCYVuVp7czgWGpyYieon8ON2AGW6Uxqol5P2Ls6pZe7H2kpjSk
-	U
-X-Gm-Gg: ASbGncuaEg4CRSCveaK3kyzOf/dhtr+0J9GXNWIvIBz9x9Z3iFrGRST50mfhEuVgzy2
-	8b8go6ikiJsTaTPoS24+sDImsgdjyZAUvWKByQS1lDa0TrcSGgNxLN2rDdJqvUnApebGWYdqmjm
-	zX2iHclTCCVTNiwLLM6AOJ0uThDg34hnfzoRDhIrf/991Zlhda6ke1XJORX8wArVWv6fnRzA+wi
-	xqsoMyMk9MyRoQSFKWTN+BnzyPDdvRXJYXzxreeHNIQcmOHMXb0TAHcUI0MEHeNljxbwgHCt0wU
-	olxNAzEASdimN16/k8Q3iTYlR+lxDgGPNC7RDg==
-X-Google-Smtp-Source: AGHT+IFAHyg7X6M0U1I6d9cr5SNMGMLTLyD4bdbfak2m4L4DZOyzdIG49U9HDVuL7Qll8MwGOQs7Cg==
-X-Received: by 2002:a5d:6d08:0:b0:391:4940:45c3 with SMTP id ffacd0b85a97d-39720e3c9bcmr18462645f8f.54.1742312205214;
-        Tue, 18 Mar 2025 08:36:45 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395cb7ea16csm18289257f8f.82.2025.03.18.08.36.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Mar 2025 08:36:44 -0700 (PDT)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	saeedm@nvidia.com,
-	leon@kernel.org,
-	tariqt@nvidia.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	donald.hunter@gmail.com,
-	parav@nvidia.com
-Subject: [PATCH net-next 4/4] net/mlx5: Expose function UID in devlink info
-Date: Tue, 18 Mar 2025 16:36:27 +0100
-Message-ID: <20250318153627.95030-5-jiri@resnulli.us>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250318153627.95030-1-jiri@resnulli.us>
-References: <20250318153627.95030-1-jiri@resnulli.us>
+	s=arc-20240116; t=1742312395; c=relaxed/simple;
+	bh=HGMDziiE3s6UYg6dbzugRUjMN9etTjrHdfpaAWINEqM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gGCJXlr2P/E6LQAeccaFQ3nlk0Mh5KE3Z9Fkj2nZZkwz7/hvx89aWB9lYQpUr9fNaOjKDxfj4I4a5uY3vKqFMvcLq/Q0EQ3P6WurTc+/3c6YxzRzdpBjz+fHTKk4aQuqmGQSzghywq65oZhUccXLXtva9/XnfzQ+ObCyDHQzU3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bL6ONo1+; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1742312393; x=1773848393;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=HGMDziiE3s6UYg6dbzugRUjMN9etTjrHdfpaAWINEqM=;
+  b=bL6ONo1+TbG0AVReaEpn09/chZUy7OZhLfTTUWEFHQNheupyv27VpoOJ
+   o7gXbcLw3t5YPmx3hYTBuqOcF439fwpK0fdmqhrJImQFsrVKi7ThWFuXk
+   BTtd8rsDYRyXQeOgTRAX4bEacLtS6Lj3iuhXI9WDvc13aBcUIrarlHZVm
+   9CoWTyueKqdYUhBEs9+PHEQNlHge8Qhs2Pc2iQ71fI+D7WHTmk8i8e66o
+   oemSh5xOLe62wGagpn6KSdFjVcl2LpzpStTOLeH+7RAMyumwj5zgx+Tt8
+   QgQNDsfIcfgAGNQnlyT60XfaW9nWE5HwuzXQA79Q4d8ytpdxR9KJscj6j
+   g==;
+X-CSE-ConnectionGUID: 8meveWqTRHKAJ1I5ZqQHKQ==
+X-CSE-MsgGUID: xfhBtjdsQtahe64nw6hgpw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11377"; a="65923377"
+X-IronPort-AV: E=Sophos;i="6.14,257,1736841600"; 
+   d="scan'208";a="65923377"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2025 08:39:53 -0700
+X-CSE-ConnectionGUID: Qg5gH4J2Rp2uqB52/qWaNg==
+X-CSE-MsgGUID: 5/ca5hK0SqejbTs6A5ffDQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,257,1736841600"; 
+   d="scan'208";a="159459205"
+Received: from msatwood-mobl.amr.corp.intel.com (HELO [10.125.109.211]) ([10.125.109.211])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2025 08:39:51 -0700
+Message-ID: <9e3019af-7817-49db-a293-3242e2962c22@intel.com>
+Date: Tue, 18 Mar 2025 08:39:50 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 0/8] Introduce fwctl subystem
+To: Jason Gunthorpe <jgg@nvidia.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: "Keller, Jacob E" <jacob.e.keller@intel.com>,
+ David Ahern <dsahern@kernel.org>, "Nelson, Shannon"
+ <shannon.nelson@amd.com>, Leon Romanovsky <leon@kernel.org>,
+ Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kuba@kernel.org>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+ Aron Silverton <aron.silverton@oracle.com>,
+ "Williams, Dan J" <dan.j.williams@intel.com>,
+ Daniel Vetter <daniel.vetter@ffwll.ch>, Christoph Hellwig
+ <hch@infradead.org>, Itay Avraham <itayavr@nvidia.com>,
+ Jiri Pirko <jiri@nvidia.com>, Jonathan Cameron
+ <Jonathan.Cameron@huawei.com>, Leonid Bloch <lbloch@nvidia.com>,
+ "linux-cxl@vger.kernel.org" <linux-cxl@vger.kernel.org>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Saeed Mahameed <saeedm@nvidia.com>,
+ "Sinyuk, Konstantin" <konstantin.sinyuk@intel.com>
+References: <bcafcf60-47a8-4faf-bea3-19cf0cbc4e08@kernel.org>
+ <20250305182853.GO1955273@unreal>
+ <dc72c6fe-4998-4dba-9442-73ded86470f5@kernel.org>
+ <20250313124847.GM1322339@unreal>
+ <54781c0c-a1e7-4e97-acf1-1fc5a2ee548c@amd.com>
+ <d0e95c47-c812-4aa8-812f-f5d7f6abbbb1@intel.com>
+ <20250317123333.GB9311@nvidia.com>
+ <1eae139c-f678-4b28-a466-5c47967b5d13@kernel.org>
+ <CO1PR11MB5089AB36220DFEACBF7A5D1CD6DF2@CO1PR11MB5089.namprd11.prod.outlook.com>
+ <2025031840-phrasing-rink-c7bb@gregkh> <20250318132528.GR9311@nvidia.com>
+Content-Language: en-US
+From: Dave Jiang <dave.jiang@intel.com>
+In-Reply-To: <20250318132528.GR9311@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Jiri Pirko <jiri@nvidia.com>
 
-Devlink info allows to expose function UID.
-Get the value from PCI VPD and expose it.
 
-$ devlink dev info
-pci/0000:08:00.0:
-  driver mlx5_core
-  serial_number e4397f872caeed218000846daa7d2f49
-  board.serial_number MT2314XZ00YA
-  function.uid MT2314XZ00YAMLNXS0D0F0
-  versions:
-      fixed:
-        fw.psid MT_0000000894
-      running:
-        fw.version 28.41.1000
-        fw 28.41.1000
-      stored:
-        fw.version 28.41.1000
-        fw 28.41.1000
-auxiliary/mlx5_core.eth.0:
-  driver mlx5_core.eth
-pci/0000:08:00.1:
-  driver mlx5_core
-  serial_number e4397f872caeed218000846daa7d2f49
-  board.serial_number MT2314XZ00YA
-  function.uid MT2314XZ00YAMLNXS0D0F1
-  versions:
-      fixed:
-        fw.psid MT_0000000894
-      running:
-        fw.version 28.41.1000
-        fw 28.41.1000
-      stored:
-        fw.version 28.41.1000
-        fw 28.41.1000
-auxiliary/mlx5_core.eth.1:
-  driver mlx5_core.eth
+On 3/18/25 6:25 AM, Jason Gunthorpe wrote:
+> On Tue, Mar 18, 2025 at 02:20:45PM +0100, Greg Kroah-Hartman wrote:
+> 
+>> Yes, note, the issue came up in the 2.5.x kernel days, _WAY_ before we
+>> had git, so this wasn't a git issue.  I'm all for "drivers/core/" but
+>> note, that really looks like "the driver core" area of the kernel, so
+>> maybe pick a different name?
+> 
+> Yeah, +1. We have lots of places calling what is in drivers/base 'core'.
 
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
-Reviewed-by: Parav Pandit <parav@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/devlink.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+just throwing in my 2c
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/devlink.c b/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
-index be0ae26d1582..6caaf174f44d 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
-@@ -75,6 +75,19 @@ static int mlx5_devlink_serial_numbers_put(struct mlx5_core_dev *dev,
- 		kfree(str);
- 	}
- 
-+	start = pci_vpd_find_ro_info_keyword(vpd_data, vpd_size, "VU", &kw_len);
-+	if (start >= 0) {
-+		str = kstrndup(vpd_data + start, kw_len, GFP_KERNEL);
-+		if (!str) {
-+			err = -ENOMEM;
-+			goto end;
-+		}
-+		end = strchrnul(str, ' ');
-+		*end = '\0';
-+		err = devlink_info_function_uid_put(req, str);
-+		kfree(str);
-+	}
-+
- end:
- 	kfree(vpd_data);
- 	return err;
--- 
-2.48.1
+drivers/main
+drivers/common
+drivers/primary
+
+
+> 
+> Jason
 
 
