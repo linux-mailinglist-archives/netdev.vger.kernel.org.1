@@ -1,119 +1,131 @@
-Return-Path: <netdev+bounces-175688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6EABA6722B
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 12:07:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CBE2A67224
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 12:07:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 048C5188D49D
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 11:06:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2384D3ADAED
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 11:05:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AF072080F8;
-	Tue, 18 Mar 2025 11:06:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 700B7209696;
+	Tue, 18 Mar 2025 11:06:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d2zdxkYZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FZYeGP3C"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63FC11DE2D4
-	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 11:05:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33AEE20967A;
+	Tue, 18 Mar 2025 11:06:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742295960; cv=none; b=Cw9oaz2GsgFH8DLamcyBBu3t4L4dxaVkG2ZGJMbtU7OTGzFtZ3DQD8ML9YA3s7OPVwnyD2dksgVMHnDaDNwMyepM9ct4VixYCBljzSEPNMtHeylzJB5GyRy13o2HfdR2cP9UJYE5CEPpsTMHoUil1RysylwGuVmRQC0vGoIK6KA=
+	t=1742295965; cv=none; b=jgUYEmmapO+MiJmVXiC1GuCL1jhCgidIKaA2aEPq69jfBRhlniBa3R+BUpR8hYLxbJEE5bsETKDaAJmmGvkV+6o4zWtZgtH70dASh8jkg6LpiahWvUBV+KK+lSSEY0Lrzzwz1TpNDhzHInTMbPf9HZ83ZKYEGQHAIYmG3sTwZF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742295960; c=relaxed/simple;
-	bh=AIc+byXUQxY2P9Gq+P0dpjQtpV0SboQBC7kxsHtfBwU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=soCtnG7Q3+4cfDFdzXKs3DT6jYfaJtExjC1rTS0z1UwF401737HEPoJqfQT79tkySWLJDTuxFk0p7ehgAIFJxrvjKs66ZQ4Z8ppYB2rz+A/ZVrqNETw0YMdtt9g3MXvp4HlqCcn88zEIm4azNK1HWZBO5IJTvAl+MFDy4WesWtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d2zdxkYZ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742295957;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JYxupuol3hzt3Y5BwfutJ7GZcSRT1GDccfIhI7TAGlY=;
-	b=d2zdxkYZDeC228ac64ioMhLuEtZDTrMqC4DqGi9VnTtOyVZvxtZeTYWHCULse/3cdvY2Km
-	zv1MlwGn5RV4AnQQbQ1hkYUfMxs42FHqPHoJgqe5jyHS4sLHeFp2XrMDR7+g3gQOUIN62F
-	OK2+3LdTWcnfThIui3ktUeJX0mDcK4E=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-75-t0D7CqzaNROIR3oYE7trSw-1; Tue, 18 Mar 2025 07:05:55 -0400
-X-MC-Unique: t0D7CqzaNROIR3oYE7trSw-1
-X-Mimecast-MFC-AGG-ID: t0D7CqzaNROIR3oYE7trSw_1742295955
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43cec217977so22004945e9.0
-        for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 04:05:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742295954; x=1742900754;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JYxupuol3hzt3Y5BwfutJ7GZcSRT1GDccfIhI7TAGlY=;
-        b=d4RG1bri6o3IbPbohqih5FneHSF8AdTQ5q+t7Bqkecw+bitPUWjbqNLvrzLjLfq/t/
-         vh/HKNoklh7yozlXhGv/SUqnSq2glDSZ6/jbCFl8CEqmjDBAHXaVxWya3RGZzrt58w/W
-         A6qzoym6oi6kPpNY5Jr9c+t1O1cPgbvL0NKs3GHvYeQgwqlLpv12lWN9iYGK6OK8oG8p
-         hCl6fNPolXtr1PUwba78/w91MweJq4kxiep/6IMdy5vZRvnp1RkaeujMF5Tf1dHKP4EX
-         L9iErVQkC7ADJInzwL6uzqiNx1BhOH2TY/J2Vf5ZEyNKxRFeiVLw7ESYmWW0L605dgkO
-         8iKA==
-X-Gm-Message-State: AOJu0YztRYbYGp1F6FJmLwMwNQVkLLn0xyfGyKyLU+Q6RgsPwNVJTLHT
-	DIZmLkgw9tTbHY7CuH1/PN2dMQ6hyACtUVaeRQtCKHGjPUwV7kY5m68Sk0Vpoeeml70SUoYEVhE
-	IKbQYyvSPjC2VdrB0LnNwl/JxdCOYQPOmLmhqvloIpeQatcUBXb5pew==
-X-Gm-Gg: ASbGncuEBUoZkVOT2G6gp7IAIz6TENcE3hirN0qaNBsZXVZdFi4EwccQbLCLcGDiSp0
-	R2JfN5nmtcJUP8oO12/hnmbfpRMNbYkzQbCIBa1ML4UObAz+tSvg1q9Pbmm/xHHrR+8WPTMNYtF
-	EyLC6D02EDGxD/vGBuHBKSeZNxeOnFyjCY9wF5WwMEKkEC061y6fEZbYu7yIph45d8OrAJxNivE
-	kyxyukZLjLXr+jToNQbMGg/KSDK5XfmTRpIhZkk3oMjqOcYH/4JCXHUzK5sOZDb6x3flAIklDTJ
-	sS/jL0qKcNFiZfRnvpL4CS4pcbeW3AM6rw1MhPtZX3X7xw==
-X-Received: by 2002:a05:600c:34c7:b0:43c:fe15:41dd with SMTP id 5b1f17b1804b1-43d3b951a70mr16594195e9.6.1742295954666;
-        Tue, 18 Mar 2025 04:05:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGjOQJ9N2uizMg7NPUyYVTQbobEjlEhqs1ZRY7mDMuFURwbgXUYvDp8nOZ2LQ0I+DuyUV9WnQ==
-X-Received: by 2002:a05:600c:34c7:b0:43c:fe15:41dd with SMTP id 5b1f17b1804b1-43d3b951a70mr16594015e9.6.1742295954311;
-        Tue, 18 Mar 2025 04:05:54 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-10-172.dyn.eolo.it. [146.241.10.172])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395cb7eb92csm18225173f8f.91.2025.03.18.04.05.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Mar 2025 04:05:53 -0700 (PDT)
-Message-ID: <a0f1deec-2770-4b51-ad2b-b3d0e846be25@redhat.com>
-Date: Tue, 18 Mar 2025 12:05:52 +0100
+	s=arc-20240116; t=1742295965; c=relaxed/simple;
+	bh=+6eRMsycQCwnvUIb7YBuRBaRFSAMCS6WfElJU0fnob0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CB87L5QwBXwc8MwdcalIaFr3wE9Hg0Xd7qiIxLtT1pLh8Gc3JsTTnWx5jSlM2V/XPLzXmuqELb3DVq151pUqpyN/nVq+4tOXLAiaj0S0f/eLcR+kJMFPFGg9RxhT4kfXiRHCrTFccVvnt3kaXxueYtYtF3C5PmcJY8Nl60X51ZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FZYeGP3C; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D9C8C4CEDD;
+	Tue, 18 Mar 2025 11:06:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742295964;
+	bh=+6eRMsycQCwnvUIb7YBuRBaRFSAMCS6WfElJU0fnob0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FZYeGP3ChLjFgxxPhXwyrzj+8hdudeUK9TYlMtJjGSLAVE9l7b23fy6AlOGY3cXco
+	 JxmfMzVCnaC8910yJDVJNyWc9cVokzjiSUhLJ9Nwbn3O0bxJNoUovv6P8rxYZkGqUW
+	 8vxI26ywb35jSaW/zqOold5OFSPC3VgWsJPF46QKs3hueJrNGXj/MHgxylHyWs/90j
+	 gcF0O9bB1CgoEohptMg4SEViZ5T3Sa50+WsOO+APy9ZU2ApxdGL0RC3xjifQ7u/F5s
+	 60UVEROqpuCVkYO1fQXx5oetwtG8O03iJJf3018VZ4xMcN/cI+pX2Ms/28vDZz3R1V
+	 2DKF4AiY4dA2A==
+Date: Tue, 18 Mar 2025 12:06:01 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Masahisa Kojima <kojima.masahisa@socionext.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	hariprasad <hkelam@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Roger Quadros <rogerq@kernel.org>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-hyperv@vger.kernel.org,
+	linux-omap@vger.kernel.org
+Subject: Re: [PATCH net-next 0/7] net: xdp: Add missing metadata support for
+ some xdp drvs
+Message-ID: <Z9lTmfyUsY3lqr1m@lore-desk>
+References: <20250311-mvneta-xdp-meta-v1-0-36cf1c99790e@kernel.org>
+ <6259af5f-f518-4f88-ada9-31c3425ce6ed@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/5] pull request for net: batman-adv 2025-03-13
-To: Simon Wunderlich <sw@simonwunderlich.de>, davem@davemloft.net,
- kuba@kernel.org
-Cc: netdev@vger.kernel.org, b.a.t.m.a.n@lists.open-mesh.org
-References: <20250313161738.71299-1-sw@simonwunderlich.de>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250313161738.71299-1-sw@simonwunderlich.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="7FKbPnYNhz7Z7bep"
+Content-Disposition: inline
+In-Reply-To: <6259af5f-f518-4f88-ada9-31c3425ce6ed@redhat.com>
 
-Hi,
 
-On 3/13/25 5:17 PM, Simon Wunderlich wrote:
-> here are some bugfixes for batman-adv which we would like to have integrated into net.
-> 
-> Please pull or let me know of any problem!
+--7FKbPnYNhz7Z7bep
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I'm sorry, we are lagging behind.
+> On 3/11/25 1:18 PM, Lorenzo Bianconi wrote:
+> > Introduce missing metadata support for some xdp drivers setting metadata
+> > size building the skb from xdp_buff.
+> > Please note most of the drivers are just compile tested.
+>=20
+> I'm sorry, but you should at very least report explicitly on per patch
+> basis which ones have been compile tested.
+>=20
+> Even better, please additionally document in each patch why/how the
+> current headroom is large enough.
 
-The series does not apply cleanly to the net tree, could you please
-rebase it?
+ack, I will do in v2.
 
-While at it, could you please include the target tree in the subj prefix?
+Regards,
+Lorenzo
 
-Thanks!
+>=20
+> Thanks,
+>=20
+> Paolo
+>=20
 
-Paolo
+--7FKbPnYNhz7Z7bep
+Content-Type: application/pgp-signature; name=signature.asc
 
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ9lTmQAKCRA6cBh0uS2t
+rDqfAQDOJNpxheA0LSnvOCTN+kPvwHBu5AGV2ArPeTAp70kJ3QD/apFRSAbfIcY1
+1f9jJDVDMRYLq6bmd+WcgF6DA0c7JwE=
+=n3M4
+-----END PGP SIGNATURE-----
+
+--7FKbPnYNhz7Z7bep--
 
