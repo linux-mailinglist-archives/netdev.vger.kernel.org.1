@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-175800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1598A6780D
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 16:38:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74957A67802
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 16:37:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5808A189BA55
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 15:37:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C19CB3BA4A3
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 15:36:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA32220E013;
-	Tue, 18 Mar 2025 15:36:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20D9620F087;
+	Tue, 18 Mar 2025 15:36:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="UHCvKf9m"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="GzJDFQQ3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7063120F078
-	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 15:36:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C2FC20F080
+	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 15:36:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742312201; cv=none; b=lYKlXKTAu9iwpS4SOG9o47ZntSQDSIGYEq41Jw4/+NgI3JNwC1r+tjv42bE6PDvaBUE7P7dXEqCLe6N2wZbBcmC6Q8eSwb5GTueJ25/SG5KjGTkNj2G1glQN+rbs/UkIwoPA8E+rdo9QT+TD4UNfqNoauSQr0iw1tXYMrtoKldo=
+	t=1742312202; cv=none; b=AvYsWJf5x7IV0CbX8q7U1mSVfbJYzmlX7w6obKT7I7dneScqAmMqhYuk5mm/+mcPi77pD9eJYG1EN0z7uYw4xps7INVhKtrjcgkIYYBCDiFdIDGYeu8PqKMCEstXb7UJlrOJC5DkvSPKReK7yohpj+rHkh39TS4EqjSKIlBmCRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742312201; c=relaxed/simple;
-	bh=+OW+RtgKsRJs1bzFMDq5bzw99FZCh7zsF6Y14sSOP+s=;
+	s=arc-20240116; t=1742312202; c=relaxed/simple;
+	bh=7ymDDFxx34gx35rocJ+N5kMEVcblCf9p5CMo54B2U80=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MUW5+CshBDN5VdIrPJArAydNlUtYAFC90IYGq1J6E5M+ynBUyAEqGT9pR1K0RAMf5TQkl4IaipwFeMYl+yZ471vdhZoSuP19zWPm/cNiyizdqRzbp4CdRuyS/BbgX7hwRA5sOze+yUvZMlOMgRJA96DyBpb8QVHoHL2oJnYjMQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=UHCvKf9m; arc=none smtp.client-ip=209.85.221.50
+	 MIME-Version; b=uaj6dcFsEAoCS4Trfd8UuWdwjVfghzYmeOyuWZ0elmFk8okKDzb0ZNtje//DHKMTwq7JrBIKnQJ/VkHzGUP0hktZ2zYPteFSOvdOptcAD+5QtI//9ehIJ8cRBTY82zwW2xuUm2G+Z3sQKa7k0BYXfAHlu99DeZQJkx98jQ2D/s0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=GzJDFQQ3; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3912c09be7dso3935317f8f.1
-        for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 08:36:36 -0700 (PDT)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-43d04dc73b7so35614055e9.3
+        for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 08:36:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1742312195; x=1742916995; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1742312198; x=1742916998; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=a128zcZc5YRGP5mY1JEmfIr8nMkvTHKg1+rmTOEaIJM=;
-        b=UHCvKf9m4ONRBp7gNpP6ubvj20nI0TKA3XQJ/ev2vsb5Jw4O1qAlC2avbQzVKTXSzW
-         LQje3G14CuwyArRFYq3wkcz3CFc56YnSkUT5AzgG8aJ+MglP3nslknBDsh/PHup2hHgW
-         bIYXiw0F9W2Leu2hNKBqeXQmSbkAJwNV4ComPZW8PeyV15ZcCGScoW82jrLAyHXUOh+D
-         tdImoB3feD/KA8X5ktAkg8vAERFVKkOQp5ZRFvLThMvnZTwQLCLuz/uLaQZkcyJAwb1D
-         3wZY9jpuAnHMMdknABZ3jrkxMwLGFfF5tcWC9Xu8O/8XqR155oSw4HEqPRJjBoqOED/E
-         KUEA==
+        bh=hyb1qp9YAp8Vcuqhs/UTA4yMykiwjQ9hNBOz2naJw2U=;
+        b=GzJDFQQ30ixR37hnQEQ1eS4ch/50cVuVdsuIuusC3AxCuvueFGYWvKL6CU4NoI8zpg
+         AVodlxiUYZb+FawYODocsX2XtnamvpPgZZidxKUGS9JH1ZQqunNvNphDnPo9nju2GTGN
+         FNGJJkT+He5QByTJC1cn4kh3b6t25i7Cfvc352ig882JEwULSFfzEz9vQ7FErW+Xgy7i
+         GeRda5Zk2U6LWQl597u7mZoVRJOECAxKh7NYrDOifNyBW/o/pGG0gRXFxpaLNE/gcbby
+         UbeGPsAxkycOBhXAUQLlMEKYkMIGbVFzno4bE9sWPi4VRHt4SSwvhu+rLf1yx/OyxHga
+         8yZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742312195; x=1742916995;
+        d=1e100.net; s=20230601; t=1742312198; x=1742916998;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=a128zcZc5YRGP5mY1JEmfIr8nMkvTHKg1+rmTOEaIJM=;
-        b=ZMBqUyoCh613Zb3tgD/bbJGLc/+g1lqbNrMje/FSqBAynPZ7dt0mlmWaXEPrPVdra4
-         mu3jAzTVF0sVEbqf89mB0+gibCd1s5GNN8/B+dHcZnI0cbc6+9DMk7VAC2I5E4chNw7/
-         igX3Nml1sEj6OOAiHQ4jTEuWMFvqUlg3HZfgtS8f5QTGO28iHv61QXrZdHQ3KzbvXPpC
-         OmoyCqy64sXsh55b+neCVI9nP2zhct762BLwlV2uAVhW2vA2RVM0LIeFi9oQcrVpBn/5
-         B20dZbkPSnDSlRlivaRs8dcexnALuxNtftP8FQhy3n3JA2UdeZIbcGPGtHCnR/aVsBUR
-         NxHQ==
-X-Gm-Message-State: AOJu0YxYU0oTUhChIdbW38R0SXMruOmnSKhZb+eelzvGX6tsEXcCq3FK
-	GNqLCb14NFOAUp6jmuuNeWZ4Q/OoxIUYAFD44qmMvOVDEKQzf4kTO5cFwe9CgvJfdB+7EzoS+oR
-	N
-X-Gm-Gg: ASbGncth5y8p2gHQb7yKeYmRoJbctiGtAIuhd+68Eul9gF2KDzUJylWq368HHB+UQ5N
-	l2XIhkmKP9q4VF8k7w4d9UuNswuxy5Sk83tpP5Mln3uNVlKKC3uaAwPQH18sOeRg/mM46PYp7BQ
-	hQU+kwj3WuFSvS+ovBeeq68/w3ucM0CBakwPaR7RSam25cqCkGhMYSjk1jSd0USyvW2Fnm8rJR/
-	52SuyXVwrO+ocgX+xYftpbZoIoBjYQdduM1pRBwRVvgxESyVNmSwyHKNndBM+Jlxr0vt41m4sZE
-	WcTvoIDeBScwXrS5huV9a7GFsa4pzst/HVFQGQ==
-X-Google-Smtp-Source: AGHT+IGWJxy6nSnJUDah4rsKdnxjkwL9AkkDpmXb53JRF/p5WyC8VVDPVxtF494WtRd8LMsSaOQVxQ==
-X-Received: by 2002:a5d:588b:0:b0:391:4674:b136 with SMTP id ffacd0b85a97d-3971ded2b2dmr17193156f8f.29.1742312194518;
-        Tue, 18 Mar 2025 08:36:34 -0700 (PDT)
+        bh=hyb1qp9YAp8Vcuqhs/UTA4yMykiwjQ9hNBOz2naJw2U=;
+        b=j41C3/ZWf2EwEqBac4113+dd4CWdI9v5kp67PrBHUmzvinE95OjRu8oeC6uC4pMtct
+         aY3JHX1HDd3mPiDN0zyGSiNRInrMP9hHOA19LG3MXqY/C+dncWfiSZFbFHBAC/7eLFSF
+         1umJ55TmgJBaazU4etCz35MOgycNGNBF4NtDt6cshpMpIdlMPL9h8Thb9jADHS9IstaX
+         Oe6dV0NYPLsfvjhMfjapZN46rPk8tw+OHJKuuOgsHpoCI7yFfvdzmNxIQLy5aq4zcJzx
+         G55PSLnt2g2lnEpzBrx8xMGLP+eLqyVgazXID9v3g9Tt6qWrqT8FS14jsviAS/gs6Cu8
+         O7wg==
+X-Gm-Message-State: AOJu0YzHsb9paYj8Nm37uWPo9Ez42TxTkFV0Rvyv7qH+5AB35q2mq+b9
+	RaMQgwZ55nHlvms/K1zX2nnx0vEolQEAl117tusG/4Qal+NCxRvz5jH/1ubOKPj0NYzS+G06XkQ
+	j
+X-Gm-Gg: ASbGncvR7WUCyHdVTwRqmgt8csxY57rn7oXEMoMtEJ1m3ULCok6hh/h46taYUpQM7Xk
+	G8sYZOEg63vpsSsjq3hofWVr+4UitnWPM+m5ALxjeJ7bxvhxulilcsxkdeNUbsDHci124zmj1kA
+	MA3Cdq7+ACEfecIuZALvdjKyn6zUoaPsd/NFpIHs33yF/4AgbJT9XCUM3NZWVB0CspItS8K0Atj
+	X+Hcp2ru9Dp2kBEutOxuv+wQ0ll5u/BSfINPcaoJ7hmQ5Epaf5DEzj7GBWr0r1wSDRhQBq0Zfxs
+	6GWmLq5QT9gTbbiUBNL5z2tKPlrWnqFV6UydtMurMJHQQC2p
+X-Google-Smtp-Source: AGHT+IGcnSItZQd+6FisW0GV3iQhp54/kcszXeTE186KEKzazJuLoncasKd8qhKyBILmiJYYoClL8A==
+X-Received: by 2002:a05:600c:1da6:b0:43d:b51:46fb with SMTP id 5b1f17b1804b1-43d3b950d25mr28262965e9.2.1742312198584;
+        Tue, 18 Mar 2025 08:36:38 -0700 (PDT)
 Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395c7df344dsm19001100f8f.10.2025.03.18.08.36.33
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d1fe294b5sm138391765e9.21.2025.03.18.08.36.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Mar 2025 08:36:34 -0700 (PDT)
+        Tue, 18 Mar 2025 08:36:38 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -85,9 +85,9 @@ Cc: davem@davemloft.net,
 	horms@kernel.org,
 	donald.hunter@gmail.com,
 	parav@nvidia.com
-Subject: [PATCH net-next 1/4] ynl: devlink: add missing board-serial-number
-Date: Tue, 18 Mar 2025 16:36:24 +0100
-Message-ID: <20250318153627.95030-2-jiri@resnulli.us>
+Subject: [PATCH net-next 2/4] net/mlx5: Expose serial numbers in devlink info
+Date: Tue, 18 Mar 2025 16:36:25 +0100
+Message-ID: <20250318153627.95030-3-jiri@resnulli.us>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250318153627.95030-1-jiri@resnulli.us>
 References: <20250318153627.95030-1-jiri@resnulli.us>
@@ -101,25 +101,114 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Add a missing attribute of board serial number.
+Devlink info allows to expose serial number and board serial number
+Get the values from PCI VPD and expose it.
+
+$ devlink dev info
+pci/0000:08:00.0:
+  driver mlx5_core
+  serial_number e4397f872caeed218000846daa7d2f49
+  board.serial_number MT2314XZ00YA
+  versions:
+      fixed:
+        fw.psid MT_0000000894
+      running:
+        fw.version 28.41.1000
+        fw 28.41.1000
+      stored:
+        fw.version 28.41.1000
+        fw 28.41.1000
+auxiliary/mlx5_core.eth.0:
+  driver mlx5_core.eth
+pci/0000:08:00.1:
+  driver mlx5_core
+  serial_number e4397f872caeed218000846daa7d2f49
+  board.serial_number MT2314XZ00YA
+  versions:
+      fixed:
+        fw.psid MT_0000000894
+      running:
+        fw.version 28.41.1000
+        fw 28.41.1000
+      stored:
+        fw.version 28.41.1000
+        fw 28.41.1000
+auxiliary/mlx5_core.eth.1:
+  driver mlx5_core.eth
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+Reviewed-by: Parav Pandit <parav@nvidia.com>
 ---
- Documentation/netlink/specs/devlink.yaml | 1 +
- 1 file changed, 1 insertion(+)
+ .../net/ethernet/mellanox/mlx5/core/devlink.c | 49 +++++++++++++++++++
+ 1 file changed, 49 insertions(+)
 
-diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
-index 09fbb4c03fc8..bd9726269b4f 100644
---- a/Documentation/netlink/specs/devlink.yaml
-+++ b/Documentation/netlink/specs/devlink.yaml
-@@ -1868,6 +1868,7 @@ operations:
-             - info-version-fixed
-             - info-version-running
-             - info-version-stored
-+            - info-board-serial-number
-       dump:
-         reply: *info-get-reply
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/devlink.c b/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
+index 73cd74644378..be0ae26d1582 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
+@@ -35,6 +35,51 @@ static u16 mlx5_fw_ver_subminor(u32 version)
+ 	return version & 0xffff;
+ }
  
++static int mlx5_devlink_serial_numbers_put(struct mlx5_core_dev *dev,
++					   struct devlink_info_req *req,
++					   struct netlink_ext_ack *extack)
++{
++	struct pci_dev *pdev = dev->pdev;
++	unsigned int vpd_size, kw_len;
++	char *str, *end;
++	u8 *vpd_data;
++	int start;
++	int err;
++
++	vpd_data = pci_vpd_alloc(pdev, &vpd_size);
++	if (IS_ERR(vpd_data))
++		return 0;
++
++	start = pci_vpd_find_ro_info_keyword(vpd_data, vpd_size,
++					     PCI_VPD_RO_KEYWORD_SERIALNO, &kw_len);
++	if (start >= 0) {
++		str = kstrndup(vpd_data + start, kw_len, GFP_KERNEL);
++		if (!str) {
++			err = -ENOMEM;
++			goto end;
++		}
++		end = strchrnul(str, ' ');
++		*end = '\0';
++		err = devlink_info_board_serial_number_put(req, str);
++		kfree(str);
++	}
++
++	start = pci_vpd_find_ro_info_keyword(vpd_data, vpd_size, "V3", &kw_len);
++	if (start >= 0) {
++		str = kstrndup(vpd_data + start, kw_len, GFP_KERNEL);
++		if (!str) {
++			err = -ENOMEM;
++			goto end;
++		}
++		err = devlink_info_serial_number_put(req, str);
++		kfree(str);
++	}
++
++end:
++	kfree(vpd_data);
++	return err;
++}
++
+ #define DEVLINK_FW_STRING_LEN 32
+ 
+ static int
+@@ -49,6 +94,10 @@ mlx5_devlink_info_get(struct devlink *devlink, struct devlink_info_req *req,
+ 	if (!mlx5_core_is_pf(dev))
+ 		return 0;
+ 
++	err = mlx5_devlink_serial_numbers_put(dev, req, extack);
++	if (err)
++		return err;
++
+ 	err = devlink_info_version_fixed_put(req, "fw.psid", dev->board_id);
+ 	if (err)
+ 		return err;
 -- 
 2.48.1
 
