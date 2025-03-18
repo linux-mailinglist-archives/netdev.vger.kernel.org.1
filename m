@@ -1,69 +1,72 @@
-Return-Path: <netdev+bounces-175600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5341DA669D7
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 06:50:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3519DA66A0A
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 07:01:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B5967A104A
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 05:49:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 491B2189C707
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 06:01:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E482D1991CF;
-	Tue, 18 Mar 2025 05:50:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D1D617A2E5;
+	Tue, 18 Mar 2025 06:01:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="bGWJTMML"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Z4YmM4iY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70E391581EE;
-	Tue, 18 Mar 2025 05:50:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 690DE25569
+	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 06:01:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742277018; cv=none; b=DmdjFN12pe63YtY4Hu86rxQ+aiMn+/xyLBniXN9bA8uMxHzlg5NFdlz9AxvlBYYQpzR9b8DJCkgcwnbOrSrzuNqrMRUESnLn58ePZh1n2HRVAgLBmhGOTsTqQ5NoEA1fqhqQ3YzfP3xF3/aEEMxiug9XWX4k+GVDyONEnTP0Qcc=
+	t=1742277696; cv=none; b=pv7F974S3lg+xRFuQIUYc6P84Em5hm+YrAR1qqv33Nir49W5/N/qEsxkFWuGvamEKDagk4XAV8atZpegilR0T5SPtV5zdX5QrxF0EfB4ZSQvGW/w0Lhpcn54D7LdEAECDpK7EBwraPBotAMJbu6DqTF14NwVN4KRW5hE0fjioV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742277018; c=relaxed/simple;
-	bh=pvu8Dy/VXpfCbsU1wxKIDJov4xBbmkpNoQHZ+cN+CpQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=U9EvBASdV2/vn5Nj9/IcqSkob1MUjbWD80dElLwxGDGWB78WPXAwJFW2HIu/sX0pfHv4Ub6feZtJA4aDxDjPyia6t+gdVC0p2GCqXAIe4bZh83Q3hMusllhFOngnaRHfAIMvL9dGaee4VUE7FEm5tKN0pps5ENHDO/x16DEQv+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=bGWJTMML; arc=none smtp.client-ip=54.207.22.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1742276905;
-	bh=gnxCvj2Q4txIQOV5P4Py/Ax9TpGa8Qqrm59V7rorQes=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=bGWJTMMLo1vPiblbg8wA/YzaBkh1qg/4v9XjtUjF8i2JbvM0xXwVB7GOZJE+ACXmu
-	 mKKfTtq492sSMuWqdQ+KW7Mq0sXO91kXW/V4aQbK7wyvqMZ+WHtsMqZwvv+b1JScIv
-	 y7KGeyCJc2me9ZFNT5p/5iJ5aFdQeBlXYo+qvyh8=
-X-QQ-mid: bizesmtpip2t1742276892tccjh2r
-X-QQ-Originating-IP: nU1X2tnth8q/r2x9zmTdbfutXO0tdYJJftZxAw3Ni3k=
-Received: from localhost.localdomain ( [localhost])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 18 Mar 2025 13:48:10 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 4937968447994938010
-From: WangYuli <wangyuli@uniontech.com>
-To: idosch@nvidia.com,
-	petrm@nvidia.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	czj2441@163.com,
-	zhanjun@uniontech.com,
-	niecheng1@uniontech.com,
-	guanwentao@uniontech.com,
-	WangYuli <wangyuli@uniontech.com>
-Subject: [PATCH net v2] mlxsw: spectrum_acl_bloom_filter: Workaround for some LLVM versions
-Date: Tue, 18 Mar 2025 13:48:03 +0800
-Message-ID: <CBD5806B120ADEEE+20250318054803.462085-1-wangyuli@uniontech.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1742277696; c=relaxed/simple;
+	bh=HxCkMPWPILauJPgRaYF7HIXuZUllGeMI7eVXEsWsqok=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tCiuHyWjTYzt2nhutQq3iOMQO6+1YemKZtAAzE6CxyeyTvKdKzVRGQ087F2aDy9tGL0CUnGV4JavkRgZDA+jZDEJl+W8bG+LKh3WrMnz7HGFxGLcj/+uool9aBRZtsWi9AY9kpNd1zSbe5HklpwoRu0yiWHhdBRzEHdVsxd8sJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Z4YmM4iY; arc=none smtp.client-ip=207.171.184.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1742277692; x=1773813692;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=SRF6gy8iKPIM0L3UHaq1S2aXoczJ38MmTp6q4OtQ3BI=;
+  b=Z4YmM4iYzQGYhg1A4DYZEc5KD40KzbBMAE1NguxeaGX+S1C3LfEoIIrp
+   HYBlEOnuiYQHHnHF/keCmWirW9VUYb6yvrOxFbk65OXIBci+qn8Kg89I7
+   GAUTY3ZDd/yvulykYAdhMXOWwBpVdw44O8nwn4XTZPuChNZDIEMtDopiJ
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.14,256,1736812800"; 
+   d="scan'208";a="503650908"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2025 06:01:25 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:30054]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.9.151:2525] with esmtp (Farcaster)
+ id dc5c8365-ff51-4883-abbd-3c120306887f; Tue, 18 Mar 2025 06:01:24 +0000 (UTC)
+X-Farcaster-Flow-ID: dc5c8365-ff51-4883-abbd-3c120306887f
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 18 Mar 2025 06:01:24 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.106.100.54) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 18 Mar 2025 06:01:21 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, David Ahern
+	<dsahern@kernel.org>
+CC: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v1 net-next] tcp/dccp: Remove inet_connection_sock_af_ops.addr2sockaddr().
+Date: Mon, 17 Mar 2025 23:01:07 -0700
+Message-ID: <20250318060112.3729-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,134 +74,189 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: MDqtQ4jGWXAGGkXhdGOheQd0DQb8GmA4pV+NZKf2C0W+B7whEvAuecxh
-	Ubc5P5Uaiguc+F72RWQYas6HsJq+/7WZPGamkXvZpv8nWptiwBEz9VFWdPLgqfY32iwgVES
-	GDahTSNRl7LryVYgTanaGdbbOcPtHQEt6Gr+2HHcLHG7+73fSxe7dP8aNIbsn7kVjdNr3S/
-	gV7UvLuDyxzQUtnhypi1mjd1auJmRlIcKZBblwsDpxhkt9aDrDjIM1VzNj+elLIQ3ThLvLB
-	22akizcolK0pM/0eY4+2Nh2v+hGV6ISffuojtjU/5UtpdHOb+byF9i68LNL4XOo3tNf5AF1
-	9nzS/f/VqQ/Yff8ucL5iqZkkl8ABy2aCiYz6m0nIHhANDHvqQlRHLDXGVa+whATMTHPmh3L
-	uVS/dZ3RH1UBbhwUg2X8c962/JUTJ3tb94O0TBYgIkWXK156LTU2ZFgJyGQlwc7Nznc7cPJ
-	kKU/m4vYcz8nd9hIkdbtqLLBgtUCpN0JqtUk2kAB7VSrZ5Bsul9gBS9bne3DD0AVtKhxORu
-	TztH7KtJ02zxCmqPG9UvF58lwpvgZIWQD1SqmE/Otu2aaJLf8U3HbcsUCMRGgb7g8eZNMPT
-	A6JOV7veqywL3nqcJhWSYcW1EY1rv5KHNe7OWKly9QRDQvTRKbDGZgkqOJmKRbgmb0tUO++
-	IAB7uo4McQCnYiCz9G1fXAe7ph45UcpjZSsQNPK5W5BL1m00VxEVSqpXUnhRNPXpVHO29ul
-	dzZ24Kiej3RSf2NcGUpN95euDZrlXC5KzkvYcsHPZ/nuIGN9HjZbg2lTSs0oy6sNl9B6UjZ
-	Wbns06zI1nWCV/hCqzqQuIPmgwjJHJG6mei05hxPxyNDo2oa/5HUfXd3darjyEnE8fQbI+O
-	6POH7DqMT3p3DByKaVDhKRbpsqJVMKItrJ7erlJ3wdMQlwDASpWoGcBkudh+x2bP/zSI0OV
-	z1Ajfqd5HpHiLO5MAjYDK345Vsp+0YzYF8EL/yqJ4hHIelK3hq/LdWbdfT0gjRYjgPA4=
-X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D046UWA003.ant.amazon.com (10.13.139.18) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-This is a workaround to mitigate a compiler anomaly.
+inet_connection_sock_af_ops.addr2sockaddr() hasn't been used at all
+in the git era.
 
-During LLVM toolchain compilation of this driver on s390x architecture, an
-unreasonable __write_overflow_field warning occurs.
+  $ git grep addr2sockaddr $(git rev-list HEAD | tail -n 1)
 
-Contextually, chunk_index is restricted to 0, 1 or 2. By expanding these
-possibilities, the compile warning is suppressed.
+Let's remove it.
 
-Fix follow error with clang-19 when -Werror:
-  In file included from drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_bloom_filter.c:5:
-  In file included from ./include/linux/gfp.h:7:
-  In file included from ./include/linux/mmzone.h:8:
-  In file included from ./include/linux/spinlock.h:63:
-  In file included from ./include/linux/lockdep.h:14:
-  In file included from ./include/linux/smp.h:13:
-  In file included from ./include/linux/cpumask.h:12:
-  In file included from ./include/linux/bitmap.h:13:
-  In file included from ./include/linux/string.h:392:
-  ./include/linux/fortify-string.h:571:4: error: call to '__write_overflow_field' declared with 'warning' attribute: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror,-Wattribute-warning]
-    571 |                         __write_overflow_field(p_size_field, size);
-        |                         ^
-  1 error generated.
+Note that there was a 4 bytes hole after sockaddr_len and now it's
+6 bytes, so the binary layout is not changed.
 
-According to the testing, we can be fairly certain that this is a clang
-compiler bug, impacting only clang-19 and below. Clang versions 20 and
-21 do not exhibit this behavior.
-
-Link: https://lore.kernel.org/all/484364B641C901CD+20250311141025.1624528-1-wangyuli@uniontech.com/
-Fixes: 7585cacdb978 ("mlxsw: spectrum_acl: Add Bloom filter handling")
-Co-developed-by: Zijian Chen <czj2441@163.com>
-Signed-off-by: Zijian Chen <czj2441@163.com>
-Co-developed-by: Wentao Guan <guanwentao@uniontech.com>
-Signed-off-by: Wentao Guan <guanwentao@uniontech.com>
-Suggested-by: Paolo Abeni <pabeni@redhat.com>
-Co-developed-by: Ido Schimmel <idosch@nvidia.com>
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-Tested-by: Ido Schimmel <idosch@nvidia.com>
-Tested-by: WangYuli <wangyuli@uniontech.com>
-Signed-off-by: WangYuli <wangyuli@uniontech.com>
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
-Changelog:
- *v1->v2:
-    1. Combine patch #1 and #2 from v1.
-    2. Take the more simplified change by Ido Schimmel.
-    3. Append more Co-developed-by, Signed-off-by, Tested-by,
-Suggested-by and Fixes tags.
-    4. Retain reverse Christmas tree order for variables.
----
- .../mlxsw/spectrum_acl_bloom_filter.c         | 26 +++++++++++++++----
- 1 file changed, 21 insertions(+), 5 deletions(-)
+ include/net/inet6_connection_sock.h |  2 --
+ include/net/inet_connection_sock.h  |  4 ----
+ net/dccp/ipv4.c                     |  2 --
+ net/dccp/ipv6.c                     |  4 ----
+ net/ipv4/inet_connection_sock.c     | 11 -----------
+ net/ipv4/tcp_ipv4.c                 |  2 --
+ net/ipv6/inet6_connection_sock.c    | 14 --------------
+ net/ipv6/tcp_ipv6.c                 |  4 ----
+ 8 files changed, 43 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_bloom_filter.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_bloom_filter.c
-index a54eedb69a3f..fc8a8cf64ec8 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_bloom_filter.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_bloom_filter.c
-@@ -212,7 +212,22 @@ static const u8 mlxsw_sp4_acl_bf_crc6_tab[256] = {
-  * This array defines key offsets for easy access when copying key blocks from
-  * entry key to Bloom filter chunk.
-  */
--static const u8 chunk_key_offsets[MLXSW_BLOOM_KEY_CHUNKS] = {2, 20, 38};
-+static char *
-+mlxsw_sp_acl_bf_enc_key_get(struct mlxsw_sp_acl_atcam_entry *aentry,
-+			    u8 chunk_index)
-+{
-+		switch (chunk_index) {
-+		case 0:
-+			return &aentry->ht_key.enc_key[2];
-+		case 1:
-+			return &aentry->ht_key.enc_key[20];
-+		case 2:
-+			return &aentry->ht_key.enc_key[38];
-+		default:
-+			WARN_ON_ONCE(1);
-+			return &aentry->ht_key.enc_key[0];
-+		}
-+}
+diff --git a/include/net/inet6_connection_sock.h b/include/net/inet6_connection_sock.h
+index 025bd8d3c769..745891d2e113 100644
+--- a/include/net/inet6_connection_sock.h
++++ b/include/net/inet6_connection_sock.h
+@@ -21,8 +21,6 @@ struct sockaddr;
+ struct dst_entry *inet6_csk_route_req(const struct sock *sk, struct flowi6 *fl6,
+ 				      const struct request_sock *req, u8 proto);
  
- static u16 mlxsw_sp2_acl_bf_crc16_byte(u16 crc, u8 c)
- {
-@@ -235,9 +250,10 @@ __mlxsw_sp_acl_bf_key_encode(struct mlxsw_sp_acl_atcam_region *aregion,
- 			     u8 key_offset, u8 chunk_key_len, u8 chunk_len)
- {
- 	struct mlxsw_afk_key_info *key_info = aregion->region->key_info;
--	u8 chunk_index, chunk_count, block_count;
-+	u8 chunk_index, chunk_count;
- 	char *chunk = output;
- 	__be16 erp_region_id;
-+	u32 block_count;
+-void inet6_csk_addr2sockaddr(struct sock *sk, struct sockaddr *uaddr);
+-
+ int inet6_csk_xmit(struct sock *sk, struct sk_buff *skb, struct flowi *fl);
  
- 	block_count = mlxsw_afk_key_info_blocks_count_get(key_info);
- 	chunk_count = 1 + ((block_count - 1) >> 2);
-@@ -245,12 +261,12 @@ __mlxsw_sp_acl_bf_key_encode(struct mlxsw_sp_acl_atcam_region *aregion,
- 				   (aregion->region->id << 4));
- 	for (chunk_index = max_chunks - chunk_count; chunk_index < max_chunks;
- 	     chunk_index++) {
-+		char *enc_key;
- 		memset(chunk, 0, pad_bytes);
- 		memcpy(chunk + pad_bytes, &erp_region_id,
- 		       sizeof(erp_region_id));
--		memcpy(chunk + key_offset,
--		       &aentry->ht_key.enc_key[chunk_key_offsets[chunk_index]],
--		       chunk_key_len);
-+		enc_key = mlxsw_sp_acl_bf_enc_key_get(aentry, chunk_index);
-+		memcpy(chunk + key_offset, enc_key, chunk_key_len);
- 		chunk += chunk_len;
- 	}
- 	*len = chunk_count * chunk_len;
+ struct dst_entry *inet6_csk_update_pmtu(struct sock *sk, u32 mtu);
+diff --git a/include/net/inet_connection_sock.h b/include/net/inet_connection_sock.h
+index d9978ffacc97..5a5b30e2cc0e 100644
+--- a/include/net/inet_connection_sock.h
++++ b/include/net/inet_connection_sock.h
+@@ -44,12 +44,10 @@ struct inet_connection_sock_af_ops {
+ 				      struct request_sock *req_unhash,
+ 				      bool *own_req);
+ 	u16	    net_header_len;
+-	u16	    sockaddr_len;
+ 	int	    (*setsockopt)(struct sock *sk, int level, int optname,
+ 				  sockptr_t optval, unsigned int optlen);
+ 	int	    (*getsockopt)(struct sock *sk, int level, int optname,
+ 				  char __user *optval, int __user *optlen);
+-	void	    (*addr2sockaddr)(struct sock *sk, struct sockaddr *);
+ 	void	    (*mtu_reduced)(struct sock *sk);
+ };
+ 
+@@ -316,8 +314,6 @@ static inline __poll_t inet_csk_listen_poll(const struct sock *sk)
+ int inet_csk_listen_start(struct sock *sk);
+ void inet_csk_listen_stop(struct sock *sk);
+ 
+-void inet_csk_addr2sockaddr(struct sock *sk, struct sockaddr *uaddr);
+-
+ /* update the fast reuse flag when adding a socket */
+ void inet_csk_update_fastreuse(struct inet_bind_bucket *tb,
+ 			       struct sock *sk);
+diff --git a/net/dccp/ipv4.c b/net/dccp/ipv4.c
+index bfa529a54aca..2045ddac0fe9 100644
+--- a/net/dccp/ipv4.c
++++ b/net/dccp/ipv4.c
+@@ -934,8 +934,6 @@ static const struct inet_connection_sock_af_ops dccp_ipv4_af_ops = {
+ 	.net_header_len	   = sizeof(struct iphdr),
+ 	.setsockopt	   = ip_setsockopt,
+ 	.getsockopt	   = ip_getsockopt,
+-	.addr2sockaddr	   = inet_csk_addr2sockaddr,
+-	.sockaddr_len	   = sizeof(struct sockaddr_in),
+ };
+ 
+ static int dccp_v4_init_sock(struct sock *sk)
+diff --git a/net/dccp/ipv6.c b/net/dccp/ipv6.c
+index 39ae9d89d7d4..e24dbffabfc1 100644
+--- a/net/dccp/ipv6.c
++++ b/net/dccp/ipv6.c
+@@ -988,8 +988,6 @@ static const struct inet_connection_sock_af_ops dccp_ipv6_af_ops = {
+ 	.net_header_len	   = sizeof(struct ipv6hdr),
+ 	.setsockopt	   = ipv6_setsockopt,
+ 	.getsockopt	   = ipv6_getsockopt,
+-	.addr2sockaddr	   = inet6_csk_addr2sockaddr,
+-	.sockaddr_len	   = sizeof(struct sockaddr_in6),
+ };
+ 
+ /*
+@@ -1004,8 +1002,6 @@ static const struct inet_connection_sock_af_ops dccp_ipv6_mapped = {
+ 	.net_header_len	   = sizeof(struct iphdr),
+ 	.setsockopt	   = ipv6_setsockopt,
+ 	.getsockopt	   = ipv6_getsockopt,
+-	.addr2sockaddr	   = inet6_csk_addr2sockaddr,
+-	.sockaddr_len	   = sizeof(struct sockaddr_in6),
+ };
+ 
+ static void dccp_v6_sk_destruct(struct sock *sk)
+diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
+index e93c66034077..dd5cf8914a28 100644
+--- a/net/ipv4/inet_connection_sock.c
++++ b/net/ipv4/inet_connection_sock.c
+@@ -1553,17 +1553,6 @@ void inet_csk_listen_stop(struct sock *sk)
+ }
+ EXPORT_SYMBOL_GPL(inet_csk_listen_stop);
+ 
+-void inet_csk_addr2sockaddr(struct sock *sk, struct sockaddr *uaddr)
+-{
+-	struct sockaddr_in *sin = (struct sockaddr_in *)uaddr;
+-	const struct inet_sock *inet = inet_sk(sk);
+-
+-	sin->sin_family		= AF_INET;
+-	sin->sin_addr.s_addr	= inet->inet_daddr;
+-	sin->sin_port		= inet->inet_dport;
+-}
+-EXPORT_SYMBOL_GPL(inet_csk_addr2sockaddr);
+-
+ static struct dst_entry *inet_csk_rebuild_route(struct sock *sk, struct flowi *fl)
+ {
+ 	const struct inet_sock *inet = inet_sk(sk);
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index 4fa4fbb0ad12..1cd0938d47e0 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -2477,8 +2477,6 @@ const struct inet_connection_sock_af_ops ipv4_specific = {
+ 	.net_header_len	   = sizeof(struct iphdr),
+ 	.setsockopt	   = ip_setsockopt,
+ 	.getsockopt	   = ip_getsockopt,
+-	.addr2sockaddr	   = inet_csk_addr2sockaddr,
+-	.sockaddr_len	   = sizeof(struct sockaddr_in),
+ 	.mtu_reduced	   = tcp_v4_mtu_reduced,
+ };
+ EXPORT_IPV6_MOD(ipv4_specific);
+diff --git a/net/ipv6/inet6_connection_sock.c b/net/ipv6/inet6_connection_sock.c
+index 80043e46117c..dbcf556a35bb 100644
+--- a/net/ipv6/inet6_connection_sock.c
++++ b/net/ipv6/inet6_connection_sock.c
+@@ -56,20 +56,6 @@ struct dst_entry *inet6_csk_route_req(const struct sock *sk,
+ }
+ EXPORT_SYMBOL(inet6_csk_route_req);
+ 
+-void inet6_csk_addr2sockaddr(struct sock *sk, struct sockaddr *uaddr)
+-{
+-	struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *) uaddr;
+-
+-	sin6->sin6_family = AF_INET6;
+-	sin6->sin6_addr = sk->sk_v6_daddr;
+-	sin6->sin6_port	= inet_sk(sk)->inet_dport;
+-	/* We do not store received flowlabel for TCP */
+-	sin6->sin6_flowinfo = 0;
+-	sin6->sin6_scope_id = ipv6_iface_scope_id(&sin6->sin6_addr,
+-						  sk->sk_bound_dev_if);
+-}
+-EXPORT_SYMBOL_GPL(inet6_csk_addr2sockaddr);
+-
+ static inline
+ struct dst_entry *__inet6_csk_dst_check(struct sock *sk, u32 cookie)
+ {
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index e182ee0a2330..c134cf1a603a 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -2068,8 +2068,6 @@ const struct inet_connection_sock_af_ops ipv6_specific = {
+ 	.net_header_len	   = sizeof(struct ipv6hdr),
+ 	.setsockopt	   = ipv6_setsockopt,
+ 	.getsockopt	   = ipv6_getsockopt,
+-	.addr2sockaddr	   = inet6_csk_addr2sockaddr,
+-	.sockaddr_len	   = sizeof(struct sockaddr_in6),
+ 	.mtu_reduced	   = tcp_v6_mtu_reduced,
+ };
+ 
+@@ -2102,8 +2100,6 @@ static const struct inet_connection_sock_af_ops ipv6_mapped = {
+ 	.net_header_len	   = sizeof(struct iphdr),
+ 	.setsockopt	   = ipv6_setsockopt,
+ 	.getsockopt	   = ipv6_getsockopt,
+-	.addr2sockaddr	   = inet6_csk_addr2sockaddr,
+-	.sockaddr_len	   = sizeof(struct sockaddr_in6),
+ 	.mtu_reduced	   = tcp_v4_mtu_reduced,
+ };
+ 
 -- 
-2.49.0
+2.48.1
 
 
