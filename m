@@ -1,229 +1,642 @@
-Return-Path: <netdev+bounces-175578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 891FBA66717
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 04:15:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E73F6A66721
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 04:20:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE5101664E0
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 03:15:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DBC1E7A8546
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 03:19:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 011FA185B4C;
-	Tue, 18 Mar 2025 03:15:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06243191F89;
+	Tue, 18 Mar 2025 03:19:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ch2Z9JrF"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="fdshN/VP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013029.outbound.protection.outlook.com [40.107.162.29])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C950175D47;
-	Tue, 18 Mar 2025 03:15:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742267724; cv=none; b=IyVEpTgrp5k+j8kG/QEwzUIIeiAbEPqNvQa7yy2nJy6skOEKdkqBFg0yjpjOPG7wZAeViMn3bugP1q0kmmhewYsTpp8GEv0RBKEGQdFCz898N0r9poUkTPcd1fR185nnErbiwplj2GP+cQuRzkhC7MyawIKTqObKiNV1A9JePU8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742267724; c=relaxed/simple;
-	bh=8cVF16i3e4q/XBqEUIvF82XXiNo90HepfEkG/2wEU58=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CckXgEy7ljV/XWuM+njGhB3KzrptvWCznghpBgsu+3Go02yVG4LXqbBMFNSH3YW+0bSlba9FVnkjYxYL2PGI0zgPvO4/1RYH5PNsiF0YKyrZ5fycUUySE9GIQsdvI+nEIxIwEQD+gIzmL3Ct+GseBRw1Rn22eR23uqSodFWqLuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ch2Z9JrF; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-ac2ab99e16eso93859866b.0;
-        Mon, 17 Mar 2025 20:15:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742267721; x=1742872521; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Qz+8nPOl91ht+Ope/gao9ixAA3wVpZiHHol9RlFYqeE=;
-        b=Ch2Z9JrFOuo6zw4Dxo8q3/piKtkGOPszolakJWYNv5aeyuc+5kxMQaEFa05NptZlIr
-         6teGvYWJ9IbW8YihkVBD+1EzVyOxoFI8eg92q1GLSMIcQyrPvrQL6LuQPUcmIRn5qGjm
-         U3DcNp7tgIV0trNdEYHqSCjemM0seF6N6bWMJ8fwxwoi3tN66pz7CpHqDG66SafvXRbT
-         j57KurzFAdLr80TILeWldsh4uS0Ak2PBgdhm+9b0lSydVJ/RMT9lBU2MriZIZSW+92oz
-         w6y9IDaihKLbTEY1mEa8F00LbaHnEty9CphzZxFln0t2rCRlcG+hWn6s94PDgvICuzOS
-         3B0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742267721; x=1742872521;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Qz+8nPOl91ht+Ope/gao9ixAA3wVpZiHHol9RlFYqeE=;
-        b=aXHbFhnoAo0ramlFywS0DpPA4J6mSXltHAAww7LgybNQbP0YD9Yic4b4b4yaBMCo6n
-         hcYtkiddt1x/3yPcNMXmpc5WH+twmyJBInFqJBA472okGvMjF4Ofqwf6i8f+9BpT/355
-         CVE0Ahp/NVQ49SqOZqrCl0QuPlfF7N+pwBkd/yWmzzU5UrF1ZcVdPs6DTV8aHut5f80k
-         uKh3O/b4gw9Zdt/bLo5k3qB1WyA8CsHOHxfg6CdC/QvsUsZiaqxkSf9oEBR3ncSEzTVN
-         pq2wlia5XWJjxeMe9ZXLustg94n2P3NLkSOOLTHf6MzYP/F2MI0/EbAWOJ247pYwYwjm
-         spZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWikxkKHA4eaHqhjf5K/wEWZ1nEHTPaog9kil/pszxDIFjwmFFmIWNC6nrQXzkKJ/d2DqLvqx55ZighiYI=@vger.kernel.org, AJvYcCXF41d8Kl6dB+FGZ8Lchu3T3PKEPG8QJ6W3OuONBcOCBwVi5aLxCLz6T9zcC6oUFx9EzH94lyEx@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDMQkTpq8B3XN0+Kv8TldvpNQbJcOoTk+jsCSElRFY9CyIxYqO
-	ztROQ/P/+Arg1kjViXesZogmqi0+vToHwb3vTGREWQMxxkYOSfCHWzxWhsIim6WoCsdRvwv1d5B
-	MlwhtYPo6n4q5Bf5D5vwWRiX1XoQ=
-X-Gm-Gg: ASbGncuFRvpY7U1CsNcb6zYVNdRLqbqfxnRoOht+Vi92qvqvKswj7it0C0//5iWe8jv
-	zGc/0xb1Rs4KXf8gLWZoKpTWAU1nVMUt8g8/1UkaV4F68+KULeR7Vdl2dW6NZIMjvmrADLGoezR
-	7rWvDQ/f8pKkFCvPa3Xp5qXyW3a/U=
-X-Google-Smtp-Source: AGHT+IGhGwpPjAfGVcF+sOoVXVaRZyXYuSygnlXEwmlEulXyHcFu5xGSPio58ZwosgfEOwonIGQ9ZrAzmQnSssDKG9c=
-X-Received: by 2002:a17:907:c27:b0:ac3:4370:f6d2 with SMTP id
- a640c23a62f3a-ac34370f77bmr999085366b.4.1742267721000; Mon, 17 Mar 2025
- 20:15:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 390C935280;
+	Tue, 18 Mar 2025 03:19:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.29
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742267998; cv=fail; b=eWEgleXEx4LSRON7eaFIxW9GLSfH/UoP9+SsT0k/tcR6vmBdAXJ5MYSYZA8TGfr+Z/lkz/BgMmrPDz8b7gMZLXxmpVWlQXpfxdMamGq3tX5dXJdm4ix9mLxp4s+whBNijDisPyYEFNpA5P7pt/BPWbCuvM798GedI5f7ZGpdhxA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742267998; c=relaxed/simple;
+	bh=flooY+clFBHfPKgv+kalXCsmIkwDozbitxz/lbQT15Q=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=IdT/60gsbzAE9DlHtrmZE+0qQwRLXHVO1KncOVKEyIq/vuY26M/kk49LM8GF1Sd3grIqtb0Xr/IcLbX8Y1/uCuspwx7ie0HxdYvnTM5hFPrpAxfGE2I99gjfJpHHvq4ebwsB3VbP1UV/azfy2Jz4LizTr3eRk5W/pRtkxQIrqHw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=fdshN/VP; arc=fail smtp.client-ip=40.107.162.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=yPw3uQeqcykV9O9FTnoXlSpCpgS3gRWYUXDf+58Ww2s/SlqdxVG05bCWUjx1zjPAWmf7rHd7IgtbFgrwVCmWrJj+p0hoGZg3VVyy2lPH5f/3tbDhY1C/8jsQ9sX7xkVphp1tTJS054ZbNG8xD5h97JrmlC6f52Dhun5O6pIvNCoS3nP6INTHAFxgTINkBc2l0RDJnZVG8eDWkrCJFqaI79F52jWa8coEiD9AuVIPu9SOJRp2yKGU/fY7tAqpU8EY4vqsFaXuUKKw9lRH2XRpFr4L8HIFATpe2CKz26zPD/w0BinVNQ0x+DsSfmFSYkAM+xAGHUl1pOGzh31Fe4V6Jw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8S66rsJ28f8XbIIpphYGQAHJK0SQPISv7jKu6M1GhL4=;
+ b=TygWrEEApSMjiBNfUlWOl48u8TPemmJQn3Lq+PVqD9/lXBpsbXiuu5RCSSUL2KX8XsAU7w8rqh8a5ZYdh9BAXEyoLk750MiZo2LFRxVyOWIP0TEBNDtTSU08nXf78FVVHjEZ3bzUP0/A0qUPxwY2MIh94m1LLCDbvlwwA1gGaSfBQAjfdElos/mhJvtXezoBc23id4jznGUhndvaAITZw40HTaKI+VbNoW9U2gT/OPjgQMx9MuR4xImlhT1Ha+o3feUM4sOp4qmLXVRPpD1xASUtmEvxl1Z2RlJ1WnsVDScP8Qdahb08iEOzbUYTNmkQvR5t2OZsHV7wj+9ynEWMfA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8S66rsJ28f8XbIIpphYGQAHJK0SQPISv7jKu6M1GhL4=;
+ b=fdshN/VPgoUgMiOVPF6JKpcBC9MLwnX9u1fujqzrPJo7wiViaG1rQgEDnGeAxzQmTYUzBtjRiGu5JG4eZi5go4Jtqz/+1+mQdBRuxb6Bx2ABn31K8KSnr1qcyfchqERqSTyD0MCb7rcWSucN8rIei1HpvvmboCRQQTmK0NugE5zrtcDf0gDlpby3rOrRWmi9xgt70jIv4QwR9PJu14bifYMdvrpkcKTTNyHClenilmZm/SzthDvFMNQxUVU6zhFkxXyz6cMtNRkRPOQJ1pM17GW3JylNyh0Iip1E8PA/ARU/x6032J7K+ue00D2yGPAQFVP6W46rrFDiw1O84I+rTQ==
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by VI2PR04MB11196.eurprd04.prod.outlook.com (2603:10a6:800:291::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.33; Tue, 18 Mar
+ 2025 03:19:51 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%5]) with mapi id 15.20.8534.031; Tue, 18 Mar 2025
+ 03:19:51 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+CC: Claudiu Manoil <claudiu.manoil@nxp.com>, Clark Wang
+	<xiaoning.wang@nxp.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "christophe.leroy@csgroup.eu"
+	<christophe.leroy@csgroup.eu>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "imx@lists.linux.dev" <imx@lists.linux.dev>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Subject: RE: [PATCH v4 net-next 04/14] net: enetc: add MAC filter for i.MX95
+ ENETC PF
+Thread-Topic: [PATCH v4 net-next 04/14] net: enetc: add MAC filter for i.MX95
+ ENETC PF
+Thread-Index: AQHbkkpRhix/9HtGrU2JdGOiDPyx/7N3ajqAgAC+YcA=
+Date: Tue, 18 Mar 2025 03:19:51 +0000
+Message-ID:
+ <PAXPR04MB8510EECE1FDDA893811EC28B88DE2@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <20250311053830.1516523-1-wei.fang@nxp.com>
+ <20250311053830.1516523-5-wei.fang@nxp.com>
+ <20250317141807.2zobsefxl5vnqdet@skbuf>
+In-Reply-To: <20250317141807.2zobsefxl5vnqdet@skbuf>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|VI2PR04MB11196:EE_
+x-ms-office365-filtering-correlation-id: 367d7040-64d6-4ca7-6836-08dd65cbbf1d
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?M4CbEFnIDEZNhNiiSScw6WqrupQgc45jAWLLu/MeM8w2NR8VboWm0V+vamdI?=
+ =?us-ascii?Q?EA7jFi6+7hz3Aycb9ydbCMjMlWIsz4j5Ms5KG00jnKYuKi7C6LOmFNvIvAo5?=
+ =?us-ascii?Q?XAfgWy9m9/QQNNxy3Z1uwwbsJBd/fZDx6YdkNbEd61EP56nK174piIzHUSlq?=
+ =?us-ascii?Q?rIPT8ezLXSUhIKYziTt9Gt79ycB41M4vYUt0Uv6dUqQlDshETkdKnpeMWF6O?=
+ =?us-ascii?Q?Q7M9BFooYpDNv37G8isNfxboZ6wcqp2LETgugHSalmgriobA3QslPpHMr3XC?=
+ =?us-ascii?Q?PFEtUrjrdf77138p8SQwd6A6sL4TaQtEltNxOTXmvK48oGUlM8NWZCbkdbV8?=
+ =?us-ascii?Q?nvqGcY9d74Mu+voN056NkS3jd7hZHEdoBpFvIFBNAuik/JbN9lqnWkOzn4wA?=
+ =?us-ascii?Q?4vzStbtIaPYKibsQ8WzZWXC0+A6RlXDHW76SxNe2UijRHYrEMhxmkB2c41TN?=
+ =?us-ascii?Q?rwbJHhUqMsupGRMleB4/STwdmOYKSBZHq8ED3uKO38pn6iSVhgTXU/ne5hjm?=
+ =?us-ascii?Q?pl/omDxM4z8l7OIq43xuHxC2ddeoA6+dM8DyTgdvm/EG6TELe0R/J4PH+Q/P?=
+ =?us-ascii?Q?Smq9MPD6FrB3juMWSqC06tqvAzoVR4u0KPgzrxaIh765kicoiWR8HqfCqM6P?=
+ =?us-ascii?Q?ljGvZIVpWV/yxFlZTxlFY1AehrcurSe1TUfacsmowU2q9dYRBIRd4AtDnjim?=
+ =?us-ascii?Q?0hNRsiWdo+CFm8QOZEnewFh0Nq6On6PmB6OZufedKjotb0BtNxS23pcTci4k?=
+ =?us-ascii?Q?tkhR8h16CNFJn+fwqkx0VMFLY8ej+nCaHOmyZDiK7n7tpdTRQCB4+q+HksHm?=
+ =?us-ascii?Q?ZQsp8tEaPwkVX+vav3oPS+8NlOj7EiAgDmNuFdHVxCR2hYj14yYpMTQyqDws?=
+ =?us-ascii?Q?KPqS+l/UdAZwkQa3j2v9VXnDcvZizkRmsHoxQxriqBRvCOxMbjKo4O0fABRm?=
+ =?us-ascii?Q?V7ehVayOSQ5kTe5r0aTngvowzqI5mmvzcJoctNUyfx9hzkaILXYpkM7liMT1?=
+ =?us-ascii?Q?IWR8a8rCqeh4B5tY8vl4LU33gg00Uvadpi4y/nMdnFGmiS2bDrY3C8pVvHah?=
+ =?us-ascii?Q?Cu0tMACbvOMxOISXVfl5sfFlzgYHqhT8JygBGY/sK+wC0OsNW8Gvi1XQ5lwY?=
+ =?us-ascii?Q?OoVGkRt/u6Nq2WRm1iby3JjFg5TkJ+VTPskJXBAkBn4S9wNsqKXg8WblvH0B?=
+ =?us-ascii?Q?7ST4/1pn4avmFYf8yFIf6vShcvz5nNhdZ4/vWn9OkZYSh1uxZiZ6YpWoZb09?=
+ =?us-ascii?Q?N7Xy1vPcl7S36/Wo830WXlcPdv1TBOpxv/8a9IFOe87FOmZ150MaMJzYy3YL?=
+ =?us-ascii?Q?ZQSxBwe8V2JL1TFIP35Uclsjh3WuCRXFYZ+oje+2Xp5VYOVM2ZEfOMdkJQox?=
+ =?us-ascii?Q?ShEE73BRYWE567Uzw1ZZMczSDJOhw54yDtVFqsKQGP0aj26q3H+TpkwWgqP8?=
+ =?us-ascii?Q?ra3Ww3E1YKeDd9jl5C9OLQIltL66a4S9?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?4M1TRa8jwWyj1UoeG6SwR+y8S/dls7ja0fEEMi0lOgJNZkJVv2t5RXe7kNVr?=
+ =?us-ascii?Q?lPDMFSa/pLkFEz7Sj4wkQIe37N0lmDKMDv+XJKT9AMU9vuc/bhNfAoWXoR0l?=
+ =?us-ascii?Q?Bptk8slkKveVVawVotbgtdufiMfPJ62ZyhX7TbNXhh4f0hv2nKXEzo+kMkuo?=
+ =?us-ascii?Q?+9dZUiCBEp2bjWKVLbuvp77Ygc6Qco0elRfBGUQj/usQDxVoTnHwbXQxAVke?=
+ =?us-ascii?Q?o0UYPxkCDpYA3agsIbyR1NkVDLhCjDPcnp0xfM/nvQz1aB54aqYJ5uKuEH5p?=
+ =?us-ascii?Q?6111VOBPhmZ0UbS1/KbLPw6IngzHvkOfsCMaNcl73LkfSCdettvQum5vo89D?=
+ =?us-ascii?Q?hHCzSLKvtYlfUfNJ48xXvz2Ymm9rV7zpzgoOlE6RPvQIVTtDOHMUwT4w7gId?=
+ =?us-ascii?Q?86gZh9KABkhhIyr/kswCuI1InHmr/ugYx/7R4w3JKZgm9COQgBG02NGzg1oy?=
+ =?us-ascii?Q?5b15OiuDNePvVDpopnZ3u8SOBo88N8aInZxfVu4ROF7dnDuxGmOwQ4xRRdFb?=
+ =?us-ascii?Q?rDuC71xgC6M3r+69s8QcTGWmwyAXD/GloKDjTPMcQeV9QTpnugI8oeLwqlfR?=
+ =?us-ascii?Q?E6jT7ElIgue5EySExzjgO1ATtcoaenPoBsP7QecKhvHN7YpT1GyHABm4aJe0?=
+ =?us-ascii?Q?RbZ5/uDXEfdHCWwjDT2Z5bNd4CsmGBC6NxpNeoN+L8iUStE4wseXE9fVnGP1?=
+ =?us-ascii?Q?1O8gQ8zgGlg8tygXWbJLQKi143fr27jUq0t5xsLd8pBtjQi/Qr0rCdwWlVkU?=
+ =?us-ascii?Q?88htLnUvM6q0xpANXIIPMXwOXtyC1+caw3oMiQQ98nT7q+jtxyNKC/zXKnLI?=
+ =?us-ascii?Q?CzNcYdZPLIr201IFP0EjDy8mf63KRJ0JmzjX2nfSxddnQ47yeyZAfNph+zB5?=
+ =?us-ascii?Q?46VF0GRbIxEQAEhH9FH9HhBLanMhBMJjpKH6oJ+19kQNJj2cDtx+YQf1YpbD?=
+ =?us-ascii?Q?Ql4VZUUi82+JewrFOAQZNj4yJDYGkmxxGoxZt99dI+H0FV8mZNE14Ay9Cszd?=
+ =?us-ascii?Q?hxN10A39mHFP3YbpOfPB0bjXRah8qcSV1Ptcmctm8bvU1iocOx6dNTXRJuKV?=
+ =?us-ascii?Q?WBRtS7ejQfR2ctIrE7pTpLQpkzS4bs4CHo10N8UzO/EZDVr1BQHjDXFgIyBR?=
+ =?us-ascii?Q?/OXM2vgE35ow+l9H17/OhIdAJiGa99ATPf1wR+vlJCH4Pc0WFSAeaIbhWcaf?=
+ =?us-ascii?Q?vLgQVWIVVENjZI6ZNlXfL1hKONw9r/2jfG5tUs/GBxMikup+MaFvywaD586O?=
+ =?us-ascii?Q?zFv0oaDasAfX1lNDy74R6SLmeYllKmgk6KaRqbVty7JtBCC5hpSOUwmgBidV?=
+ =?us-ascii?Q?okdjLA23OvlxQP7Kh3i0n13Q+54+dcH6dlWYqDbbyYuwoptjgwMwAluQMl4f?=
+ =?us-ascii?Q?ZrFcZqZ3/2OtxEyq9h8j5S/ds0IY4EAdQZJEXBOLGZQoYZnxPr0hu5722M2t?=
+ =?us-ascii?Q?6I4MAfDHtftStM19cLYSnPb7xT0v2FORdXbz+bvJxK9nUhoD6ueAOHbvY0fW?=
+ =?us-ascii?Q?SoSYd8TMN6dThZkjUiOIfdwXdczXd69amJgimDirQF+Og/vodu2bUYCTvva0?=
+ =?us-ascii?Q?HIDHFkCNUGljj5llmK4=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250317063452.3072784-1-JJLIU0@nuvoton.com> <Z9f4W86z90PgtkBc@shell.armlinux.org.uk>
- <9391fb55-11c4-4fa9-b38f-500cb1ae325c@broadcom.com> <Z9gjylMFV5zFG-i5@shell.armlinux.org.uk>
-In-Reply-To: <Z9gjylMFV5zFG-i5@shell.armlinux.org.uk>
-From: Jim Liu <jim.t90615@gmail.com>
-Date: Tue, 18 Mar 2025 11:15:09 +0800
-X-Gm-Features: AQ5f1JqrCuozrar-Wau3wKdPaM3garPvIPXN5tPufplw4m7cBiwsaE4NS9x_w1A
-Message-ID: <CAKUZ0+GV1J0VxU8Eycv2eCNs2yKvJ9YTob27n+G4Jy-TJhhLZQ@mail.gmail.com>
-Subject: Re: [v2,net] net: phy: broadcom: Correct BCM5221 PHY model detection failure
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>, JJLIU0@nuvoton.com, andrew@lunn.ch, 
-	hkallweit1@gmail.com, kuba@kernel.org, edumazet@google.com, pabeni@redhat.com, 
-	netdev@vger.kernel.org, giulio.benetti+tekvox@benettiengineering.com, 
-	bcm-kernel-feedback-list@broadcom.com, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 367d7040-64d6-4ca7-6836-08dd65cbbf1d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Mar 2025 03:19:51.5234
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: WBpqiYv3JUHScWRJZ/Bv7Ew1xnX7wwy0ZbYwTF5I0v+slKxH8EbUWTKMunWadIMmkiEaQ1CyDzUqqpBiv+7ckw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI2PR04MB11196
 
-Hi Russell King  & Florian Fainelli
+> > +
+> > +static void enetc4_pf_set_si_mac_hash_filter(struct enetc_hw *hw, int =
+si,
+> > +					     int type, u64 hash)
+> > +{
+> > +	if (type =3D=3D UC) {
+> > +		enetc_port_wr(hw, ENETC4_PSIUMHFR0(si), lower_32_bits(hash));
+> > +		enetc_port_wr(hw, ENETC4_PSIUMHFR1(si), upper_32_bits(hash));
+> > +	} else { /* MC */
+> > +		enetc_port_wr(hw, ENETC4_PSIMMHFR0(si), lower_32_bits(hash));
+> > +		enetc_port_wr(hw, ENETC4_PSIMMHFR1(si), upper_32_bits(hash));
+> > +	}
+> > +}
+>=20
+> Please split into separate functions for unicast and for multicast.
+> The implementations don't share any code, and the callers are not in
+> common code either.
+>=20
 
-Very thanks for your comment.
-Our EVB uses BCM5221A4K so the id is 0x004061e4
-If using the new kernel, the condition in the if statement prevents
-the PHY from functioning.
-So I followed the driver 's style to modify this condition and use
-BRCM_PHY_MODEL().
+Just copied from enetc_set_mac_ht_flt (), I can split into two separate
+functions.
 
-After checking the net framework I see phydev_id_compare can be used.
-It is a good feature for all phy drivers.
-but now I just followed the driver style to modify it.
+> > +
+> > +static void enetc4_pf_destroy_mac_list(struct enetc_pf *pf)
+> > +{
+> > +	struct enetc_mac_list_entry *entry;
+> > +	struct hlist_node *tmp;
+> > +
+> > +	mutex_lock(&pf->mac_list_lock);
+>=20
+> The mutex_lock() usage here should raise serious questions. This is
+> running right before mutex_destroy(). So if there were any concurrent
+> attempt to acquire this lock, that concurrent code would have been broken
+> any time it would have lost arbitration, by the fact that it would
+> attempt to acquire a destroyed mutex.
+>=20
+> But there's no such concurrent thread, because we run after
+> destroy_workqueue()
+> which flushes those concurrent calls and prevents new ones. So the mutex
+> usage here is not necessary.
+>=20
 
-I think Perhaps this obvious error should be addressed first.
-And the next step is to  transition Broadcom or other drivers to use
-the net framework functions.
+You are right, but I'm afraid of the Coverity will report an issue, because=
+ the
+pf->mac_list and pf->num_mfe are protected by the mac_list_lock in other
+functions. And enetc4_pf_destroy_mac_list() will be called in other functio=
+n
+in the subsequent patches. I don't think it is unnecessary.
 
-Maybe i can add this modify in patch
+> [ same thing with mutex_init() immediately followed by mutex_lock().
+>   It is an incorrect pattern most of the time. ]
+>=20
+> > +
+> > +	hlist_for_each_entry_safe(entry, tmp, &pf->mac_list, node) {
+> > +		hlist_del(&entry->node);
+> > +		kfree(entry);
+> > +	}
+> > +
+> > +	pf->num_mfe =3D 0;
+> > +
+> > +	mutex_unlock(&pf->mac_list_lock);
+> > +}
+> > +
+> > +static bool enetc_mac_filter_type_check(int type, const u8 *addr)
+> > +{
+> > +	if (type =3D=3D ENETC_MAC_FILTER_TYPE_UC)
+> > +		return !is_multicast_ether_addr(addr);
+> > +	else if (type =3D=3D ENETC_MAC_FILTER_TYPE_MC)
+> > +		return is_multicast_ether_addr(addr);
+> > +	else
+> > +		return true;
+> > +}
+> > +
+> > +static struct enetc_mac_list_entry *
+> > +enetc_mac_list_lookup_entry(struct enetc_pf *pf, const unsigned char
+> *addr)
+> > +{
+> > +	struct enetc_mac_list_entry *entry;
+> > +
+> > +	hlist_for_each_entry(entry, &pf->mac_list, node)
+> > +		if (ether_addr_equal(entry->mac, addr))
+> > +			return entry;
+> > +
+> > +	return NULL;
+> > +}
+> > +
+> > +static void enetc_mac_list_add_entry(struct enetc_pf *pf,
+> > +				     struct enetc_mac_list_entry *entry)
+> > +{
+> > +	hlist_add_head(&entry->node, &pf->mac_list);
+> > +}
+> > +
+> > +static void enetc_mac_list_del_entry(struct enetc_mac_list_entry *entr=
+y)
+> > +{
+> > +	hlist_del(&entry->node);
+> > +	kfree(entry);
+> > +}
+> > +
+> > +static void enetc_mac_list_del_matched_entries(struct enetc_pf *pf, u1=
+6
+> si_bit,
+> > +					       struct enetc_mac_addr *mac,
+> > +					       int mac_cnt)
+> > +{
+> > +	struct enetc_mac_list_entry *entry;
+> > +	int i;
+> > +
+> > +	for (i =3D 0; i < mac_cnt; i++) {
+> > +		entry =3D enetc_mac_list_lookup_entry(pf, mac[i].addr);
+> > +		if (!entry)
+> > +			continue;
+> > +
+> > +		entry->si_bitmap &=3D ~si_bit;
+> > +		if (entry->si_bitmap)
+> > +			continue;
+> > +
+> > +		enetc_mac_list_del_entry(entry);
+> > +		pf->num_mfe--;
+> > +	}
+> > +}
+> > +
+> > +static bool enetc_mac_list_is_available(struct enetc_pf *pf,
+> > +					struct enetc_mac_addr *mac,
+> > +					int mac_cnt)
+> > +{
+> > +	int max_num_mfe =3D pf->caps.mac_filter_num;
+> > +	struct enetc_mac_list_entry *entry;
+> > +	int cur_num_mfe =3D pf->num_mfe;
+> > +	int i, new_mac_cnt =3D 0;
+> > +
+> > +	if (mac_cnt > max_num_mfe)
+> > +		return false;
+> > +
+> > +	/* Check MAC filter table whether has enough available entries */
+> > +	hlist_for_each_entry(entry, &pf->mac_list, node) {
+> > +		for (i =3D 0; i < mac_cnt; i++) {
+> > +			if (ether_addr_equal(entry->mac, mac[i].addr))
+> > +				break;
+> > +		}
+> > +
+> > +		if (i =3D=3D mac_cnt)
+> > +			new_mac_cnt++;
+> > +
+> > +		if ((cur_num_mfe + new_mac_cnt) > max_num_mfe)
+> > +			return false;
+> > +	}
+> > +
+> > +	return true;
+> > +}
+> > +
+> > +static int enetc4_pf_add_si_mac_exact_filter(struct enetc_pf *pf, int =
+si_id,
+> > +					     struct enetc_mac_addr *mac,
+> > +					     int mac_cnt)
+> > +{
+> > +	struct enetc_mac_list_entry *entry;
+> > +	struct maft_entry_data data =3D {0};
+>=20
+> As I've also learned, what you actually want is an empty struct initializ=
+er "=3D {}"
+> here:
+> https://lore.kernel.org/netdev/20210810091238.GB1343@shell.armlinux.org.u
+> k/
+>=20
 
-#define BRCM_PHY_MODEL(phydev) \
--       ((phydev)->drv->phy_id & (phydev)->drv->phy_id_mask)
-+       ((phydev)->phy_id & (phydev)->drv->phy_id_mask)
+Thanks for the info, I will improve all of this in the patch set.
 
- #define BRCM_PHY_REV(phydev) \
--       ((phydev)->drv->phy_id & ~((phydev)->drv->phy_id_mask))
-+       ((phydev)->phy_id & ~((phydev)->drv->phy_id_mask))
+> > +	struct enetc_si *si =3D pf->si;
+> > +	u16 si_bit =3D BIT(si_id);
+> > +	int i, num_mfe, err =3D 0;
+> > +
+> > +	mutex_lock(&pf->mac_list_lock);
+> > +
+> > +	if (!enetc_mac_list_is_available(pf, mac, mac_cnt)) {
+> > +		err =3D -ENOSPC;
+> > +		goto mac_list_unlock;
+> > +	}
+> > +
+> > +	num_mfe =3D pf->num_mfe;
+> > +	/* Update mac_list */
+> > +	for (i =3D 0; i < mac_cnt; i++) {
+> > +		entry =3D enetc_mac_list_lookup_entry(pf, mac[i].addr);
+> > +		if (entry) {
+> > +			entry->si_bitmap |=3D si_bit;
+> > +			continue;
+> > +		}
+> > +
+> > +		entry =3D kzalloc(sizeof(*entry), GFP_KERNEL);
+> > +		if (unlikely(!entry)) {
+> > +			/* Restore MAC list to the state before the update
+> > +			 * if an error occurs.
+> > +			 */
+> > +			enetc_mac_list_del_matched_entries(pf, si_bit,
+> > +							   mac, i + 1);
+> > +			err =3D -ENOMEM;
+> > +			goto mac_list_unlock;
+> > +		}
+> > +
+> > +		ether_addr_copy(entry->mac, mac[i].addr);
+> > +		entry->si_bitmap =3D si_bit;
+> > +		enetc_mac_list_add_entry(pf, entry);
+> > +		pf->num_mfe++;
+> > +	}
+> > +
+> > +	/* Clear MAC filter table */
+> > +	for (i =3D 0; i < num_mfe; i++)
+> > +		ntmp_maft_delete_entry(&si->ntmp.cbdrs, i);
+> > +
+> > +	i =3D 0;
+> > +	hlist_for_each_entry(entry, &pf->mac_list, node) {
+> > +		data.cfge.si_bitmap =3D cpu_to_le16(entry->si_bitmap);
+> > +		ether_addr_copy(data.keye.mac_addr, entry->mac);
+> > +		ntmp_maft_add_entry(&si->ntmp.cbdrs, i++, &data);
+>=20
+> Don't discard error code.
 
+Okay, I will add error check.
+>=20
+> > +	}
+> > +
+> > +mac_list_unlock:
+> > +	mutex_unlock(&pf->mac_list_lock);
+> > +
+> > +	return err;
+> > +}
+> > +
+> > +static void enetc4_pf_flush_si_mac_exact_filter(struct enetc_pf *pf, i=
+nt si_id,
+> > +						int mac_type)
+> > +{
+> > +	struct enetc_mac_list_entry *entry;
+> > +	struct maft_entry_data data =3D {0};
+>=20
+> s/{0}/{}/
+>=20
+> > +	struct enetc_si *si =3D pf->si;
+> > +	u16 si_bit =3D BIT(si_id);
+> > +	struct hlist_node *tmp;
+> > +	int i, num_mfe;
+> > +
+> > +	mutex_lock(&pf->mac_list_lock);
+> > +
+> > +	num_mfe =3D pf->num_mfe;
+> > +	hlist_for_each_entry_safe(entry, tmp, &pf->mac_list, node) {
+> > +		if (enetc_mac_filter_type_check(mac_type, entry->mac) &&
+> > +		    entry->si_bitmap & si_bit) {
+> > +			entry->si_bitmap ^=3D si_bit;
+> > +			if (entry->si_bitmap)
+> > +				continue;
+> > +
+> > +			enetc_mac_list_del_entry(entry);
+> > +			pf->num_mfe--;
+> > +		}
+> > +	}
+> > +
+> > +	for (i =3D 0; i < num_mfe; i++)
+> > +		ntmp_maft_delete_entry(&si->ntmp.cbdrs, i);
+> > +
+> > +	i =3D 0;
+> > +	hlist_for_each_entry(entry, &pf->mac_list, node) {
+> > +		data.cfge.si_bitmap =3D cpu_to_le16(entry->si_bitmap);
+> > +		ether_addr_copy(data.keye.mac_addr, entry->mac);
+> > +		ntmp_maft_add_entry(&si->ntmp.cbdrs, i++, &data);
+>=20
+> Don't discard error code.
+>=20
+> Also, can't you edit MAFT entries in-place over NTMP? Deleting and
+> re-adding filters creates small time windows where you might have
+> RX packet loss, which is not ideal.
 
-Feel free to provide any suggestions to improve v3.
+Actually MAFT does not support update action, if a MAC address has
+been used by a SI, then another SI also wants to filter the same MAC
+address, we only can delete the old entry and then add a new entry.
+So there will be Rx packet loss as you said.
 
+Second, the MAFT does not support key match, so we only access the
+table through entry id. If we don't want to delete and re-add these
+existing entries, then the driver needs to record the entry id of each
+entry, this will make adding and removing entries more complicated.
 
-Best regards,
-Jim
+So for your question about Rx packet loss, although it is a very corner
+case, the solution I can think of is that we can use temporary MAC hash
+filters before deleting MAFT entries and delete them after adding the
+MAFT entries. Can you accept this proposal?
 
-On Mon, Mar 17, 2025 at 9:29=E2=80=AFPM Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
->
-> On Mon, Mar 17, 2025 at 06:18:17AM -0700, Florian Fainelli wrote:
-> > On 3/17/2025 3:24 AM, Russell King (Oracle) wrote:
-> > > On Mon, Mar 17, 2025 at 02:34:52PM +0800, Jim Liu wrote:
-> > > > Use "BRCM_PHY_MODEL" can be applied to the entire 5221 family of PH=
-Ys.
-> > > >
-> > > > Fixes: 3abbd0699b67 ("net: phy: broadcom: add support for BCM5221 p=
-hy")
-> > > > Signed-off-by: Jim Liu <jim.t90615@gmail.com>
-> > >
-> > > Looking at BRCM_PHY_MODEL() and BRCM_PHY_REV(), I think there's more
-> > > issues with this driver. E.g.:
-> > >
-> > > #define BRCM_PHY_MODEL(phydev) \
-> > >          ((phydev)->drv->phy_id & (phydev)->drv->phy_id_mask)
-> > >
-> > > #define BRCM_PHY_REV(phydev) \
-> > >          ((phydev)->drv->phy_id & ~((phydev)->drv->phy_id_mask))
-> > >
-> > > #define PHY_ID_BCM50610                 0x0143bd60
-> > > #define PHY_ID_BCM50610M                0x0143bd70
-> > >
-> > >          if ((BRCM_PHY_MODEL(phydev) =3D=3D PHY_ID_BCM50610 ||
-> > >               BRCM_PHY_MODEL(phydev) =3D=3D PHY_ID_BCM50610M) &&
-> > >              BRCM_PHY_REV(phydev) >=3D 0x3) {
-> > >
-> > > and from the PHY driver table:
-> > >
-> > >          .phy_id         =3D PHY_ID_BCM50610,
-> > >          .phy_id_mask    =3D 0xfffffff0,
-> > >
-> > >          .phy_id         =3D PHY_ID_BCM50610M,
-> > >          .phy_id_mask    =3D 0xfffffff0,
-> > >
-> > > BRCM_PHY_REV() looks at _this_ .phy_id in the table, and tries to mat=
-ch
-> > > it against the revision field bits 0-3 being >=3D 3 - but as we can s=
-ee,
-> > > this field is set to the defined value which has bits 0-3 always as
-> > > zero. So, this if() statement is always false.
-> > >
-> > > So, BRCM_PHY_REV() should be:
-> > >
-> > > #define BRCM_PHY_REV(phydev) \
-> > >     ((phydev)->phy_id & ~(phydev)->drv->phy_id_mask)
-> > >
-> > >
-> > > Next, I question why BRCM_PHY_MODEL() exists in the first place.
-> > > phydev->drv->phy_id is initialised to the defined value(s), and then
-> > > we end up doing:
-> > >
-> > >     (phydev->drv->phy_id & phydev->drv->phy_id_mask) =3D=3D
-> > >             one-of-those-defined-values
-> > >
-> > > which is pointless, because we know that what is in phydev->drv->phy_=
-id
-> > > /is/ one-of-those-defined-values.
-> > >
-> > > Therefore, I would suggest:
-> > >
-> > > #define BRCM_PHY_MODEL(phydev) ((phydev)->drv->phy_id)
-> > >
-> > > is entirely sufficient, and with such a simple definition, I question
-> > > the value of BRCM_PHY_MODEL() existing.
+>=20
+> > +	}
+> > +
+> > +	mutex_unlock(&pf->mac_list_lock);
+> > +}
+> > +
+> > +static int enetc4_pf_set_mac_exact_filter(struct enetc_pf *pf, int typ=
+e)
+> > +{
+> > +	int max_num_mfe =3D pf->caps.mac_filter_num;
+> > +	struct net_device *ndev =3D pf->si->ndev;
+> > +	struct enetc_mac_addr *mac_tbl;
+> > +	struct netdev_hw_addr *ha;
+> > +	u8 si_mac[ETH_ALEN];
+> > +	int mac_cnt =3D 0;
+> > +	int err;
+> > +
+> > +	mac_tbl =3D kcalloc(max_num_mfe, sizeof(*mac_tbl), GFP_KERNEL);
+>=20
+> Can't you know ahead of time, based on netdev_uc_count(), whether you
+> will have space for exact match filters, and avoid unnecessary
+> allocations if not? enetc_mac_list_is_available() seems way too late.
+>=20
+
+I can add a check before alloc mac_tbl, but enetc_mac_list_is_available()
+is still needed, because enetc4_pf_add_si_mac_exact_filter() is a common
+function for all Sis, not only for PSI.
+
+> > +	if (!mac_tbl)
+> > +		return -ENOMEM;
+> > +
+> > +	enetc_get_primary_mac_addr(&pf->si->hw, si_mac);
+> > +
+> > +	netif_addr_lock_bh(ndev);
+> > +	if (type & ENETC_MAC_FILTER_TYPE_UC) {
+> > +		netdev_for_each_uc_addr(ha, ndev) {
+> > +			if (!is_valid_ether_addr(ha->addr) ||
+> > +			    ether_addr_equal(ha->addr, si_mac))
+> > +				continue;
+> > +
+> > +			if (mac_cnt >=3D max_num_mfe)
+> > +				goto err_nospace_out;
+> > +
+> > +			ether_addr_copy(mac_tbl[mac_cnt++].addr, ha->addr);
+> > +		}
+> > +	}
+> > +
+> > +	if (type & ENETC_MAC_FILTER_TYPE_MC) {
+>=20
+> Dead code, you never add multicast addresses as exact match filters.
+> Please remove.
+
+Okay, I thought that we could support multicast exact filter for later
+SoCs in the future with slight modification.
+
+>=20
+> > +static void enetc4_pf_do_set_rx_mode(struct work_struct *work)
+> > +{
+> > +	struct enetc_si *si =3D container_of(work, struct enetc_si, rx_mode_t=
+ask);
+> > +	struct enetc_pf *pf =3D enetc_si_priv(si);
+> > +	struct net_device *ndev =3D si->ndev;
+> > +	struct enetc_hw *hw =3D &si->hw;
+> > +	bool uc_promisc =3D false;
+> > +	bool mc_promisc =3D false;
+> > +	int type =3D 0;
+> > +
+> > +	if (ndev->flags & IFF_PROMISC) {
+> > +		uc_promisc =3D true;
+> > +		mc_promisc =3D true;
+> > +	} else if (ndev->flags & IFF_ALLMULTI) {
+> > +		mc_promisc =3D true;
+> > +		type =3D ENETC_MAC_FILTER_TYPE_UC;
+> > +	} else {
+> > +		type =3D ENETC_MAC_FILTER_TYPE_ALL;
+> > +	}
+> > +
+> > +	enetc4_pf_set_si_mac_promisc(hw, 0, UC, uc_promisc);
+> > +	enetc4_pf_set_si_mac_promisc(hw, 0, MC, mc_promisc);
+>=20
+> Why don't you call the function just once and provide both uc_promisc
+> and mc_promisc arguments? You would avoid a useless read of the
+> ENETC4_PSIPMMR register.
+>=20
+Okay, I will refine the enetc4_pf_set_si_mac_promisc().
+
+> > +static int enetc4_pf_wq_task_init(struct enetc_si *si)
+> > +{
+> > +	char wq_name[24];
+> > +
+> > +	INIT_WORK(&si->rx_mode_task, enetc4_pf_do_set_rx_mode);
+> > +	snprintf(wq_name, sizeof(wq_name), "enetc-%s", pci_name(si->pdev));
+> > +	si->workqueue =3D create_singlethread_workqueue(wq_name);
+> > +	if (!si->workqueue)
+> > +		return -ENOMEM;
+> > +
+> > +	return 0;
+> > +}
+>=20
+> Naming scheme is inconsistent here: the function is called "pf" but
+> takes "si" as argument. Same for enetc4_pf_do_set_rx_mode() where the
+> rx_mode_task is part of the station interface structure.
+>=20
+
+So change 'pf' to 'psi'?
+
+> > diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf.h
+> b/drivers/net/ethernet/freescale/enetc/enetc_pf.h
+> > index 2b9d0f625f01..3b0cb0d8bf48 100644
+> > --- a/drivers/net/ethernet/freescale/enetc/enetc_pf.h
+> > +++ b/drivers/net/ethernet/freescale/enetc/enetc_pf.h
+> > @@ -22,6 +22,13 @@ struct enetc_port_caps {
+> >  	int num_msix;
+> >  	int num_rx_bdr;
+> >  	int num_tx_bdr;
+> > +	int mac_filter_num;
+> > +};
+> > +
+> > +struct enetc_mac_list_entry {
+> > +	u8 mac[ETH_ALEN];
+> > +	u16 si_bitmap;
+> > +	struct hlist_node node;
+> >  };
 > >
-> > If I were to make a guess, BRCM_PHY_MODEL() might have existed to ease =
-the
-> > porting of a non-Linux PHY driver to a Linux PHY driver environment at =
-a
-> > time where the subsystem was not as mature as it is now.
+> >  struct enetc_pf;
+> > @@ -57,6 +64,10 @@ struct enetc_pf {
 > >
-> > In the interest of a targeted bug fix, I would be keen on taking this p=
-atch
-> > in its current form and follow up in net next with a removal of
-> > BRCM_PHY_MODEL() later on.
->
-> Note that commit 32e5a8d651c0 ("tg3 / broadcom: Add code to disable rxc
-> refclk") is still wrong (which introduced BRCM_PHY_REV().)
->
-> Given its age, I would suggest that the commit I reference above was
-> not properly tested, and *possibly* fixing the bug might actually
-> cause a regression on TG3.
->
-> Also, the original commit description (which references RXC) which is
-> supposed to be synchronous to the received data, but the code talks
-> about CLK125 which is *technically* a different clock.
->
-> We know that the current driver logic works, even though it doesn't
-> do what the original author of the code wanted it to do.
->
-> Taking these three points together, I don't think it would be wise
-> to fix the logical error (and actually test the revision field).
-> Instead, I think getting rid of the always-false if() and simplifying
-> the code would be better to avoid causing a possible regression on
-> TG3.
->
-> --
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> >  	struct enetc_port_caps caps;
+> >  	const struct enetc_pf_ops *ops;
+> > +
+> > +	struct hlist_head mac_list; /* MAC address filter table */
+>=20
+> One thing I don't understand is why, given this implementation and
+> final effect, you even bother to keep the mac_list persistently in
+> struct enetc_pf. You have:
+>=20
+> enetc4_pf_do_set_rx_mode()
+> -> enetc4_pf_flush_si_mac_exact_filter(ENETC_MAC_FILTER_TYPE_ALL)
+>    -> hlist_for_each_entry_safe(&pf->mac_list)
+>       -> enetc_mac_list_del_entry()
+>=20
+> which practically deletes all &pf->mac_list elements every time.
+> So why even store them persistently in the first place? Why not just
+> create an on-stack INIT_HLIST_HEAD() list?
+
+The enetc4_pf_add_si_mac_exact_filter() and
+enetc4_pf_add_si_mac_exact_filter() are used for all Sis, but only
+PF can access MAFT, and PSI and VSIs may share the same MAFT
+entry, so we need to store them in struct enetc_pf. Although we
+have not added VFs support yet, for such shared functions, we
+should design its implementation from the beginning, rather than
+modifying them when we add the VFs support.
+
+>=20
+> > +	struct mutex mac_list_lock; /* mac_list lock */
+>=20
+> Unsatisfactory explanation. If you try to explain why it is needed, you
+> will find it's not needed. That's the intention behind checkpatch
+> emitting warnings when locks don't have comments. Not to force you to
+> write blabla, but to force you to verbalize, and thus to think whether
+> the proposed locking scheme makes sense.
+>=20
+> The si->rx_mode_task is an ordered workqueue, which, as per
+> include/linux/workqueue.h, "executes at most one work item at any given
+> time in the queued order". In other words, enetc4_pf_do_set_rx_mode()
+> doesn't race with itself.
+>=20
+> Combined with the previous comment on enetc4_pf_destroy_mac_list(), I
+> suggest that there is no need for this lock.
+>=20
+
+I thought we could lay some foundation for VF's MAC filter support, so that
+it would be easier to support VF later. However, judging from the current p=
+atch,
+what you said is not unreasonable, we should pay more attention to whether
+the current implementation is consistent with the current functions to be
+supported. I will remove some parts related to VF, thank you.
+
+> > +	int num_mfe;	/* number of mac address filter table entries */
+> >  };
+> >
+> >  #define phylink_to_enetc_pf(config) \
+> > --
+> > 2.34.1
+> >
 
