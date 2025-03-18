@@ -1,121 +1,111 @@
-Return-Path: <netdev+bounces-175950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E36BEA680DA
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 00:45:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6146A680E8
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 00:52:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1689017EB22
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 23:45:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E2993A3E49
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 23:52:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3C14208989;
-	Tue, 18 Mar 2025 23:44:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E102207A2C;
+	Tue, 18 Mar 2025 23:52:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mDoEKJ/H"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Q4rV6yv2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7782F2063E2;
-	Tue, 18 Mar 2025 23:44:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79CB51C5F2C
+	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 23:52:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742341498; cv=none; b=RI1NgUp203YUVGAhcBaZpq4JoTDe+XFC+Z7DSPiejtQ5qGb9yIuVvKSXHhe89Ylw3k1OopPD401yup21JKbyQH+Ev8ULVOHkyU6ofZNsz9xWFqWJSMdia1aBay0kUYAZEw9aAtWZFBYm5Kb3WjXbDBvXmOiBgSV12GrZHXQCVvw=
+	t=1742341941; cv=none; b=Ud9kTQ7acVpnMsFD31QucHNJYxjq50BDk/X92ovqOG2YMazizIUz7n0pEyYQjQymev2sGs1kJUBPs1QxK0RvB6uWFQO/H+BKIevtr0MeW/Ue2UwcPGN4BS9nRi9PREZVDX0H6IBYhcCaC3nKvNmbUE/PRZQhOMKgjOodv1njOrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742341498; c=relaxed/simple;
-	bh=PPDImG+tenmpOKpR1XdgpEvmLmyLphwsMUh+utHUAlc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A8c3bB2deKf0fSPptOLFSnXu28ui823AfIIil/XNuPmiLUcmG6WDU16Ac9D7XOifN0EBSg0AN32nw6YcS3Z0YNBoV95Ez4LbmWPWlwtJBnc5CnkzR7dTDzP9Z90KzlHEC/ryzu1G825wh0tJTl2v5kzIInjPEuiv3HCI/2IiYQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mDoEKJ/H; arc=none smtp.client-ip=209.85.166.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3cda56e1dffso33040785ab.1;
-        Tue, 18 Mar 2025 16:44:56 -0700 (PDT)
+	s=arc-20240116; t=1742341941; c=relaxed/simple;
+	bh=fS+xgsu3JIQzDn0IHsFH9pgwubgRfqWG3ohTsyusGhM=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=m2UzVOxFHJLvXmSG5yZ1aeK+j3PRr71x89rGCGRIqmywLikv4HucLO0lDtrX0FfcAS48QKeoAJ1ck32RJYzWVVU2coeWZ11LXEGe49inKHZF8FDHP44t2NLGONSD04ebcklg92d4+gakVsqq9oHRumnjOLhnA6UxQVPR16PmIfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Q4rV6yv2; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742341495; x=1742946295; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PPDImG+tenmpOKpR1XdgpEvmLmyLphwsMUh+utHUAlc=;
-        b=mDoEKJ/HsMWi/Y5drfFGiF4jCK4vZQ5hMT/pU7urGl29ysWkPW3e4givJoKLRRe7FG
-         gBAfAJxOaJCqpAE1QhI9qThBumS6V80GXAeqitSQZqMM8oqftqYYINtXnLJx3DlZ+YLc
-         e76g+EDONgj/vuQhKXNLMPqqPd2ZVAeJRdLOEaaKaPzb9gKciDh9X+vHXYzKMCLFXyXH
-         Qt4P5FhT3EfF87PnQZEti9KCwkIbYbvqjCsHfl8/uM+X5LiytLN11DV6u8f+9PJjtKqK
-         iFjugAJi+GrR9w4xvY5dQlvq2UUnI+OuHegCYWdy5tTtKkIA9SAXZY4dKKtP/qxcFc/S
-         CvDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742341495; x=1742946295;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PPDImG+tenmpOKpR1XdgpEvmLmyLphwsMUh+utHUAlc=;
-        b=VaavgZPtbzhbQSuRXTSCr7Cx5hDXIXmpSHVOgSbSJEPWGMUlsnl9mOBHlFkNbtRous
-         kTJwU9v73+S1E/G9yeuN1OkqigqlCqu0RGLOgU0Tm7N4TfFRcMgvxe6dDcjZZfg/2eCC
-         x2dcsUsvrMVw9ynVwRZlX4PnCcTXRa/7cCcTU7KQ7ipkznE7/kgj8ztJMXcQPvh0k5Xb
-         2DrH8ngAjukunNKNgyfgnGm6XBLKMPV8GUerkJe4EbDxJBi5iBv2qLYsLK8AjWlnDYwa
-         TxEEencLkCao3CzcPbTVbyyWI2UaHX7lv7+LlgsBeRq0wOL39Aox5LGsINOLe4s3m+A3
-         sJ4w==
-X-Forwarded-Encrypted: i=1; AJvYcCUcLMFcaQP61yY7ZPIsZ7dQMYJfG3XmKSpixAjOJUYtiI1Nq4ZCa4C+ioJqnbVKsrO0wwHQm0FdQM8HZMY=@vger.kernel.org, AJvYcCXEd6ls/1sjWjBhWvrKuT6F/oJyHTM+g8YTC49B1ah2qCHeUNmCBKRjxK/6AKFMXlGQ7vbh3nS/@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIx5QNC7p5u+0B2WeUK9lvvb+PfhUgb1+Ilo5N8cMUzY5ncRR7
-	tFdY9oB7U4uc7VJPAjIM9Q6PcJIjT0kt1UkNfThgHoIJ1oIBwUWXJrIGjZRKIyir8xSH+dADt/D
-	6JuSEBBz85KcOPxX147bo7F0Znz0=
-X-Gm-Gg: ASbGncvKrB0XnrRG1LqGe74zjq4zhG4ejWhbfQtoCo5fS3XFEswQg/gREIWupwXpOV4
-	8F7YzPwGJsCWr5kvHc59UM9Cwg8pvpl2bjlRQ82LutXidmtyEYdSSoCYFoP/EpJV+Hw74At0z8F
-	igvMc947XR9gO5vchbQzwdIVRi
-X-Google-Smtp-Source: AGHT+IEWFbm0QYEqa+DzDof8jvHVel5MDHzSw0XpPDJ5JJw/+dKfdRLo9tPahK3cBDqkTNX/yT7/wHd7i2O89/qnEt8=
-X-Received: by 2002:a05:6e02:19ca:b0:3d1:79ec:bef2 with SMTP id
- e9e14a558f8ab-3d586b40a19mr5059135ab.6.1742341495441; Tue, 18 Mar 2025
- 16:44:55 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1742341940; x=1773877940;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=B3xJs9WSL+v4LVD8HMR6EEdG0OydoHDPePmfDVnoavM=;
+  b=Q4rV6yv2iVArrx44RMaLwLgkhAF/4HyRRhqBeiJE8GOEGFSnUcEaYKMm
+   JIMselb6n5D/By4h98UCj9/sQPmeY9KX2NnMTjCW9kR3mgwqG7LfN5Vc/
+   CuBwzIYO29YRjOXkxYNUAwtTSFuWV2JefL9+Wyc4PzRi9+X43f4NVrrIi
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.14,258,1736812800"; 
+   d="scan'208";a="179804447"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2025 23:52:18 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:2760]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.9.151:2525] with esmtp (Farcaster)
+ id d99b7bbd-9507-4919-95fa-c1dc1da4fac7; Tue, 18 Mar 2025 23:52:18 +0000 (UTC)
+X-Farcaster-Flow-ID: d99b7bbd-9507-4919-95fa-c1dc1da4fac7
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 18 Mar 2025 23:52:18 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.135.212.115) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 18 Mar 2025 23:52:15 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <jdamato@fastly.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
+	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH v1 net-next 1/4] af_unix: Sort headers.
+Date: Tue, 18 Mar 2025 16:50:00 -0700
+Message-ID: <20250318235208.57089-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <Z9n8w-6nXiBUI20T@LQ3V64L9R2>
+References: <Z9n8w-6nXiBUI20T@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250314214155.16046-1-aleksandr.mikhalitsyn@canonical.com>
-In-Reply-To: <20250314214155.16046-1-aleksandr.mikhalitsyn@canonical.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 19 Mar 2025 07:44:19 +0800
-X-Gm-Features: AQ5f1Jq-68RXuNIzvyR61dZcmWzG8JRgXWglTI9KqGabgNXrIBc--nvZli8bc9Y
-Message-ID: <CAL+tcoB0fO2hsAgwjmEVMY1FS+vv616TRtcJU7izcnT6Z8gjvg@mail.gmail.com>
-Subject: Re: [PATCH net] tools headers: Sync uapi/asm-generic/socket.h with
- the kernel sources
-To: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-Cc: kuniyu@amazon.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>, Willem de Bruijn <willemb@google.com>, 
-	Anna Emese Nyiri <annaemesenyiri@gmail.com>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D033UWC003.ant.amazon.com (10.13.139.217) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Sat, Mar 15, 2025 at 5:42=E2=80=AFAM Alexander Mikhalitsyn
-<aleksandr.mikhalitsyn@canonical.com> wrote:
->
-> This also fixes a wrong definitions for SCM_TS_OPT_ID & SO_RCVPRIORITY.
->
-> Accidentally found while working on another patchset.
->
-> Cc: linux-kernel@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> Cc: Willem de Bruijn <willemb@google.com>
-> Cc: Jason Xing <kerneljasonxing@gmail.com>
-> Cc: Anna Emese Nyiri <annaemesenyiri@gmail.com>
-> Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Fixes: a89568e9be75 ("selftests: txtimestamp: add SCM_TS_OPT_ID test")
-> Fixes: e45469e594b2 ("sock: Introduce SO_RCVPRIORITY socket option")
-> Link: https://lore.kernel.org/netdev/20250314195257.34854-1-kuniyu@amazon=
-.com/
-> Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com=
->
+From: Joe Damato <jdamato@fastly.com>
+Date: Tue, 18 Mar 2025 16:07:47 -0700
+> > +#include <linux/in.h>
+> >  #include <linux/init.h>
+> > +#include <linux/kernel.h>
+> > +#include <linux/module.h>
+> > +#include <linux/mount.h>
+> > +#include <linux/namei.h>
+> > +#include <linux/net.h>
+> > +#include <linux/netdevice.h>
+> >  #include <linux/poll.h>
+> > +#include <linux/proc_fs.h>
+> >  #include <linux/rtnetlink.h>
+> > -#include <linux/mount.h>
+> > -#include <net/checksum.h>
+> > +#include <linux/sched/signal.h>
+> 
+> Not sure what the sorting rules are, but I was wondering if maybe
+> "linux/sched/*.h" should come after linux/*.h and not sorted within
+> linux/s*.h ?
 
-Now those two headers are synchronised. Thanks.
+It's simply sorted in the alphabetial order.
 
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+Actually I haven't cared about the / level, so I grepped the
+linux/sched/signal.h users and it looks like most didn't care.
+
+  grep -rnI --include=*.c --include=*.h "linux/sched/signal.h" -C 3
+
+Thanks!
 
