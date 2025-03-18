@@ -1,90 +1,65 @@
-Return-Path: <netdev+bounces-175796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31E5BA677B6
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 16:26:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 04F8CA677DC
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 16:31:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7804C16F07E
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 15:26:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 537C717E620
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 15:31:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D68FF20E6E4;
-	Tue, 18 Mar 2025 15:26:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C18E2101AF;
+	Tue, 18 Mar 2025 15:30:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="WCFa6GzS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XUoW4tge"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B7E42AA1
-	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 15:26:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B87320FABC;
+	Tue, 18 Mar 2025 15:30:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742311580; cv=none; b=hEa3r+xiZiHIs6ohdevHRF647VrcjjEe4E8vAQYoIWTaCP2oPINxp4xGom2BPJlB24qNR9BV6YXvYP2lbqD6nG1DvTGeAwt37ZXp783mnnGAryqaQDRoF4eV4jf4d3JizYrmpzx9kuEkFZt9yV/LJ2v/8VXGs1kFtAUAzeXYvGE=
+	t=1742311848; cv=none; b=dKX2nyr8ttPrMyeW7WaMiFG7FJ3PRiBg6ubibQ5bLR0Q7UOUiouqxU5kSnto9gg2M1Pn9y5MVAakRDsHz9W8sYl2tcmp+kfXymWh6HK4bDd9g71BIMBop/AP15z7d6wwTSl2+Qi0EfB/3QFBw6MUWBAhPUSH4NK5S3Dh+nFCU1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742311580; c=relaxed/simple;
-	bh=Xino3bip7/39Mo21Qt2agVQ6aBgyHhTW8dhnz2VwC8M=;
+	s=arc-20240116; t=1742311848; c=relaxed/simple;
+	bh=HVBz2aT+/RHcd9VZQ6XrEog43pPGxZQceGs8IeJP6oc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fkHoL4biH5zYeDyWBuSKPC9yYFVq/aUe2/DxYTRYWey1Ed7h4g3I7EyXRU1DkAol88BzE8XSWf0Fqd36yLptMEOUBYcSS/CXqGGGL1dqBUsND0k+pSDBt6xHcC24eh1v+jN5XRSe9xJAX9RukPzmMB3/Gh5v46XgfH4TMezq4h4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=WCFa6GzS; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43ce71582e9so23813265e9.1
-        for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 08:26:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1742311576; x=1742916376; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yKabdXYryvecCMCJuTILRmeVZYwFv5r99wEjpGSayRA=;
-        b=WCFa6GzSFqpUx9CGe2CYuWOdBYNSAxJh7fxO7S5A0KcLC3PRhEGa+m95hmeGu+3PJ9
-         nOG7r36uIZXF0krPeOfHdwAjhWidyeBpmerKOHfMlDgMJ6fSehQTmANoFIGZIrG1TLMp
-         R21U3A/rzgoXES6SmhyqxlNHdRv+CjZHXrL3JULpz02TMOywI1i3Zj1RMzP2zrj0Yrjq
-         zjRcpRoYNjmRhveVRPtcKYf2hZ2kX6U3TYfWkjfl10fA3xvS31EcXVvuhcFGZzChKJTS
-         a9MDjeij1fcQzsgCHpE35dCQLgZjajTnKmri9Z+Y+MUNHKyCqpFVeH5JKD5ZMFmeCMj3
-         8miQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742311576; x=1742916376;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yKabdXYryvecCMCJuTILRmeVZYwFv5r99wEjpGSayRA=;
-        b=X/TOhCkzBq/0MAHXW6bBxFzYOnp0VyxTfk50spOaMoaH7n/Em8BE69Ii1X5dRQBYST
-         OFTWBo9vb7A/UvoTdJv91nsG9ZFy6s3nAv5pSYxXjCBeaU5UEIvlemMLnOw37/Uigs+P
-         lGJMKgntV109WgCmntbWtkTx+hhdDEmw5p8QCHoeYR3EY43+VIrJotWQOehJsGqfUNj3
-         Me1V+H/UzqofY78KCr/oEUkghrYf8Blu+0jDyJvOpmk9L+IZCJllNTEesmuZ0xcY0Hxq
-         7T5sPFp84oP3U/OgATe4UUk+oCBXr4VNmN7QRA1XhcqQH/l6IkdcS8fcYNvalRWv0/Mr
-         19WA==
-X-Gm-Message-State: AOJu0YzFVgSj2GZyTOAvQULjOz9p3s0aARiWP3xu5/LpJTKhaPX3FCXJ
-	PdR/eHDo2VH3XFhfRmw3SnDaRHIZV4CzydDZt3MN30PaF4/o7iFwSZT/D+VBNfc=
-X-Gm-Gg: ASbGnctQZTCBIm7Lze7rY+JWt7I0lQxgN74D6a3wPQ8kv5jj0NkH3zQjH302X7au1ef
-	YT35/1Lv9ebv3xdV9/N2hCAPc5dNe9fA2FF3LcG/ToZlSeWL9to6u3uVWbEib3/XnuB7XwZ6Id5
-	ihNhl7ajga5S1vEhOeCa/gxuI7tc1LISz0g3jpTSboT14c8iI8cM7LeF/KmuI7nT7jh4TtW/Lbx
-	XeuRyORZH0Fq6ZqttEVvB1HgoGxPcTp5Nw/3NT6fMzOoqV4Jccs9LhEdZ0IWYDldmK5LktxJ+c/
-	aemAGVtoMmY2bWbgeX161ixDljFpShfV3iIbehbT2atvXlZSA8t//I5NJZlm92hCfxUm23dSdT1
-	FHkQ92TVL/e8=
-X-Google-Smtp-Source: AGHT+IFIyMN15Zxwmf3HUEzuEzsz4vayH76978RVYh2LcH12ZLZjRDya1gYN1C8rHeueyC6mfZtI4Q==
-X-Received: by 2002:a05:600c:5246:b0:43b:c878:144c with SMTP id 5b1f17b1804b1-43d3b98e5c8mr31013285e9.12.1742311576032;
-        Tue, 18 Mar 2025 08:26:16 -0700 (PDT)
-Received: from jiri-mlt.client.nvidia.com ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d1ffb627csm137803165e9.5.2025.03.18.08.26.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Mar 2025 08:26:15 -0700 (PDT)
-Date: Tue, 18 Mar 2025 16:26:05 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, saeedm@nvidia.com, leon@kernel.org, 
-	tariqt@nvidia.com, andrew+netdev@lunn.ch, dakr@kernel.org, rafael@kernel.org, 
-	przemyslaw.kitszel@intel.com, anthony.l.nguyen@intel.com, cratiu@nvidia.com, 
-	jacob.e.keller@intel.com, konrad.knitter@intel.com, cjubran@nvidia.com
-Subject: Re: [PATCH net-next RFC 1/3] faux: extend the creation function for
- module namespace
-Message-ID: <6exs3p35dz6e5mydwvchw67gymewpzp5qyikftl2mvdvhp3hqf@saz6uetgya3l>
-References: <20250318124706.94156-1-jiri@resnulli.us>
- <20250318124706.94156-2-jiri@resnulli.us>
- <2025031848-atrocious-defy-d7f8@gregkh>
+	 Content-Type:Content-Disposition:In-Reply-To; b=n2lyeSIOmBFI8YJmkufdqXNF2r27xJXut8GcvErvsLfjnSCQQBqEflFHjyzR9cdOO/i8F5K1JpXvO4SjH746Uv0aI6UPs59lHoO2g4FrVa2ZFdwxs4JOMFZJBF7AfgVkRzzlAHV/+wOWZIYga88fbX/LfdHH+gqmvIPGCCdXq34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XUoW4tge; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0244DC4CEDD;
+	Tue, 18 Mar 2025 15:30:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742311848;
+	bh=HVBz2aT+/RHcd9VZQ6XrEog43pPGxZQceGs8IeJP6oc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XUoW4tgeJI1qkqHA8wzUVgYQSoY+aOz8Q2mvlmnDsT5jlUIWvVvsDrwcAh+mvdJcm
+	 FchVJjLo9kTuxGacsk79c7OAUx7NJO7BGusb58YMjDYBAaFqR3a5jariprgb4DkfTH
+	 Y4Abf0av5IvwjG3TkwPUayTU/4+zYb3JUSs5x20FqUwAe5P9ifDprpWqiqeJZING8T
+	 NT1bfAo3ZBnaTXUfdUFYE/P3Q4koEGvV4PrKANZ4bk+PMB93RQTfbHOAf5evdgKIqy
+	 t/cBbkemhscPWWaViv47JUZikUvLqPE6HgfRL4/G5oymAbGbo3Hlvc93ImhCmfDcKF
+	 iWkA4ztEDM2fA==
+Date: Tue, 18 Mar 2025 15:30:43 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jonas Karlman <jonas@kwiboo.se>
+Cc: Heiko Stuebner <heiko@sntech.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	David Wu <david.wu@rock-chips.com>, Yao Zi <ziyao@disroot.org>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-rockchip@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/5] net: stmmac: dwmac-rk: Add GMAC support for RK3528
+Message-ID: <20250318153043.GE688833@kernel.org>
+References: <20250309232622.1498084-1-jonas@kwiboo.se>
+ <20250317194309.GL688833@kernel.org>
+ <db3bf1cb-3385-4676-8ba4-41fea0212bf2@kwiboo.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,49 +68,65 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2025031848-atrocious-defy-d7f8@gregkh>
+In-Reply-To: <db3bf1cb-3385-4676-8ba4-41fea0212bf2@kwiboo.se>
 
-Tue, Mar 18, 2025 at 03:36:34PM +0100, gregkh@linuxfoundation.org wrote:
->On Tue, Mar 18, 2025 at 01:47:04PM +0100, Jiri Pirko wrote:
->> From: Jiri Pirko <jiri@nvidia.com>
->> 
->> It is hard for the faux user to avoid potential name conflicts, as it is
->> only in control of faux devices it creates. Therefore extend the faux
->> device creation function by module parameter, embed the module name into
->> the device name in format "modulename_permodulename" and allow module to
->> control it's namespace.
->
->Do you have an example of how this will change the current names we have
->in the system to this new way?  What is going to break if those names
->change?
+On Mon, Mar 17, 2025 at 08:50:34PM +0100, Jonas Karlman wrote:
+> Hi Simon,
+> 
+> On 2025-03-17 20:43, Simon Horman wrote:
+> > On Sun, Mar 09, 2025 at 11:26:10PM +0000, Jonas Karlman wrote:
+> >> The Rockchip RK3528 has two Ethernet controllers, one 100/10 MAC to be
+> >> used with the integrated PHY and a second 1000/100/10 MAC to be used
+> >> with an external Ethernet PHY.
+> >>
+> >> This series add initial support for the Ethernet controllers found in
+> >> RK3528 and initial support to power up/down the integrated PHY.
+> >>
+> >> This series depends on v2 of the "net: stmmac: dwmac-rk: Validate GRF
+> >> and peripheral GRF during probe" [1] cleanup series.
+> >>
+> >>
+> >> Changes in v2:
+> >> - Restrict the minItems: 4 change to rockchip,rk3528-gmac
+> >> - Add initial support to power up/down the integrated PHY in RK3528
+> >> - Split device tree changes into a separate series
+> >>
+> >> [1] https://lore.kernel.org/r/20250308213720.2517944-1-jonas@kwiboo.se/
+> > 
+> > Hi Jonas,
+> > 
+> > This patchset looks reasonable to me. However it will need
+> > to be reposted once it's dependencies ([1]) are present in net-next.
+> 
+> The dependent series ([1]) has already been merged into net-next [2].
 
-I was under impression, that since there are no in-tree users of faux
-yet (at least I don't see them in net-next tree), there is no breakage.
+Thanks, and sorry for not noticing that.
 
->
->I say this as the perf devices seem to have "issues" with their names
->and locations in sysfs as userspace tools use them today, and in a
->straight port to faux it is ok, but if the device name changes, that is
->going to have problems.
+> Do I still need to repost this series?
 
-Got it. I didn't consider that.
+Yes, I think that would be best so there is a CI run over the series
+(the CI doesn't understand dependencies).
 
-
->
->Why can't you handle this "namespace" issue yourself in the caller to
->the api?  Why must the faux code handle it for you?  We don't do this
->for platform devices, why is this any different?
-
-Well, I wanted to avoid alloc&printf names in driver, since
-dev_set_name() accepts vararg and faux_device_create()/faux_device_create_with_groups()
-don't.
-
-Perhaps "const char *name" could be formatted as well for
-faux_device_create()/faux_device_create_with_groups(). My laziness
-wanted to avoid that :) Would that make sense to you?
-
->
->thanks,
->
->greg k-h
+> [2] https://lore.kernel.org/r/174186063226.1446759.12026198009173732573.git-patchwork-notify@kernel.org/
+> 
+> > 
+> > And on the topic of process:
+> > 
+> > * As this is a patch-set for net-next it would be best to
+> >   target it accordingly:
+> > 
+> >   Subject: [PATCH net-next] ...
+> > 
+> > * Please post patches for net/net-next which have dependencies as RFCs.
+> > 
+> > For more information on Netdev processes please take a look at
+> > https://docs.kernel.org/process/maintainer-netdev.html
+> > 
+> 
+> Thanks, I see, netdev seem to use a slight different process than what
+> I am familiar with compared to other Linux subsystems and U-Boot :-)
+> 
+> Regards,
+> Jonas
+> 
 
