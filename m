@@ -1,166 +1,153 @@
-Return-Path: <netdev+bounces-175676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CE5AA67147
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 11:29:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90FC8A6714F
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 11:31:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 270C83B69AA
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 10:29:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28AC1422897
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 10:30:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00AA4207E0E;
-	Tue, 18 Mar 2025 10:29:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dpuI138O"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BDF8207E0E;
+	Tue, 18 Mar 2025 10:29:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B1F19F424
-	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 10:29:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 914B6207A1F
+	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 10:29:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742293762; cv=none; b=KoF+EgImGwlXPJ0x+nckVDkXpmjkuCe3Agpp5fcRDkZ4dQvw4i7ThO1gJfUVdj/WPi98LKWTmHhw+XpHLkASnUcQM14Ce9+NAzF04PwyJx9Pv9ObiXKsK5WRGXvORbDpPY9Al46YriygPy1k+nUZQV6gu9lyOE1pxp0aPmsICOM=
+	t=1742293796; cv=none; b=hzMtPhA0tZCtaDFHC3x4Di314nPC6qUjb+fIeo90UG/KDxC2wHd3IZGHjG4hPwYkfOD9ZOSvAZBanobHOWJPINuWmT4LHkAkV5RWEhPlnABULa91uy0cove+URnL8weVgNkVMWA5gW76SqrLXOMrtC63bgCkTi6NAkbRdEyzzd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742293762; c=relaxed/simple;
-	bh=icRL3FzX7n5CwQlt+hD3T1io+oS0x9c6Jm2EpRDFMI8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=grDKY8diLW4KOFD1RFqoW/aOdi+UmDBQZhyuaBnkqfLanDkkbv9mHu1iXOwrlSEW8wBLA8IadqMyh9fZqBXN5u0YteqDR+LF9AqF9o/JW004i9BEb/CbKOXzm2idrwMbvALQUAVPAeQmwqqBnGkbLqTcRQ/K9s0bKB7JCKDMeiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dpuI138O; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742293760;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6+RqQ9ZAEqwS3Wc2GhSiEZkrs2uvAiEdXS3wPJ9ZEBc=;
-	b=dpuI138O+wuQ0/6NBDI134S7odDCBR1jddYoBdsuiTMt/UMhiR98ag+INXQwpH8c2GSE6v
-	M07kuVG7WXvNFVyErXzPJ/4m48wGBdS4FkFpxOJUgYH1MeUQsyJczCzfgUQHF60ymp+dwM
-	cNwlY4aMbYvsK2nv8O2AFGZyyvmKzn8=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-567-EtFALHNYMpubJJrGttEWyg-1; Tue, 18 Mar 2025 06:29:18 -0400
-X-MC-Unique: EtFALHNYMpubJJrGttEWyg-1
-X-Mimecast-MFC-AGG-ID: EtFALHNYMpubJJrGttEWyg_1742293758
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-ac29ae0b2fbso543523866b.0
-        for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 03:29:18 -0700 (PDT)
+	s=arc-20240116; t=1742293796; c=relaxed/simple;
+	bh=nxtYdJtAwIvQV6WWOLH2soTuvIbwPJCNRZf6WBGrXgU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QqSTFYBwBRgcooa1TIFLZviSGl8/aBYMo5r7mLmA2Veax53bIuq9YyxuUWk+SC5O1p/BOtakZ9TiZPUg3RMUhR2Ch97KdwC22/CvE0T29yTbeDuJ0pRgBdrq5MMBTA4IN47Woj26llz3aNg9dkoS5habPjb3fPCW77TkmxjSpEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-86ba07fe7a4so4784297241.2
+        for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 03:29:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742293757; x=1742898557;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6+RqQ9ZAEqwS3Wc2GhSiEZkrs2uvAiEdXS3wPJ9ZEBc=;
-        b=XimsB2by0ZP1MjY1GP+cr23qvHeVHMsYS/tog/UD+oJ2B9DIQvm1qd2dxzktiCdGSX
-         EYZXMNUdoo5JYpQNNYEs6tsBWz4uh9VSDLPc/e9btiSqLq2cLsjXWUM280Uw+OB4JnWC
-         WCEczX1WENixRaHRHZuNmDpp/xsNgZrw2m0E2Jbgre732IlsJpn1X3vjIO9Wa3EMi/BA
-         FkskSnGtxzGrRFaPjPws4BdpuaSeVxv+RVGyWa5d6kgCVtRkBZgEPeRrx0zGGf/Bc6c9
-         yyGdn99CZsHSCvCKP/Tf04Ologhmf9OVu9CFnpYfh0G7oiEHx6x4Ucy+E9MWwf3NFTc6
-         YRwQ==
-X-Gm-Message-State: AOJu0YyGuqfvr69BggECdHdIn5RzftATz83wIXFfQSYRWsXSbwhp3GqS
-	D4Q8fsC8vhVcwt9IYAlkfoRKhmC1bop0JMMpsdXCjdTiNmmqudbwsKm0reZjTnazmJ/vAWeyrPp
-	o0zzq6oB3AdrshKGosmMPC8QBgb+9TVCvGMAYe0o5unm+ZNGfaMFK2Q==
-X-Gm-Gg: ASbGnctHPlwB6b1gaJ6ggWnfYkkfq2LkjTq76myMGjoSm+fOCjp3bpJkk2lnWMyKQkU
-	riDBxcnAW8Co7h62tCIdw+EhPEG4smrltyjqo8msynBMLcF6Bo1uasY0sp2V0unIvupIu+PnpTr
-	TT86kc78W7kryZWkx5vd5U//PyXhlHfahbXB/AOq6LqT6f5NwQpq8ipzvzQIuYPCEpkhzpQK2Ys
-	O27V3kzZUvKuSA3xy747zrQDaEtDTz0v72HzilqYAdK0ytRVSAUOK4iv0p2PPQiVXzEHw1ij8Le
-	McF9y+Y4CkjDtiX9vJa3mQH7ngde1SrkGlwqRjyYVGVkAQ==
-X-Received: by 2002:a17:907:7f20:b0:ac2:690a:12fb with SMTP id a640c23a62f3a-ac38d405ac4mr326112866b.17.1742293757540;
-        Tue, 18 Mar 2025 03:29:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGJ9phnirtnPj5YmMubP6Ht2qkaUfOSLn82FDbJFuRSYXcPah8hVaAareCATLF7C7En8FYvbA==
-X-Received: by 2002:a17:907:7f20:b0:ac2:690a:12fb with SMTP id a640c23a62f3a-ac38d405ac4mr326110166b.17.1742293757124;
-        Tue, 18 Mar 2025 03:29:17 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-10-172.dyn.eolo.it. [146.241.10.172])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3147ed1e4sm831316866b.66.2025.03.18.03.29.16
+        d=1e100.net; s=20230601; t=1742293787; x=1742898587;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yKrk7+vxUdH6kiKOUnmRtc6uP7TiRr77NK3XaYEDH+8=;
+        b=MREaRvVIslCvPOXGhFSV0P5a0+yswZlT8cm9cTG1IP7ixmE9AR5FgHlEiCggYKFCio
+         8ylzoFar3DBoRecq4woa2m0kI06D7UeWjtgztt296MQQzDL57Qps001YTMUiSH/4uHe2
+         Y6a7VEXs3FYkDKEJ0mD0iog0BqbV8/eOK7ZDVOl5xSLk4pe/16D+Oc5oqrp1LtBUq/HP
+         aoSzIdwCCSbBWA+E3ODW5NsntJ3keG553rJ4KhPcEXE6bEa/AmvhXs1kfHup8YLaGe4X
+         D+V3FK/tywpa6BxnyhLkdT/o6h0Zk8dwUN5sFrtQ/da+bxikQiYyc8HCm8RQJfUDNqON
+         fK0g==
+X-Forwarded-Encrypted: i=1; AJvYcCXWV8SmhtVFZSwf2tyv712hCzbc8U3Obg9IoPIcewCsOoSLtDlsf9jrH+iKc124/aevFfzIO40=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyabJLJdvAwM3pnW+x3+Yj3bK/3DecsO0xZ0SO3meNZlQIj96Hp
+	h6WeTnVt8Lsc7PguTzS+epdHt6F5DQhGB4iE2rwmidazHxNhjrLrUsjocWvm
+X-Gm-Gg: ASbGncun6kiRrp1PN+K1pzrZVbsapxz/9zRmarKkNtvPZ2koUu8QsKdA9pzTSrF1j7f
+	RrLaaGymI1cfig9eMW5vDnUO4vgmMm9RfuTxQVUgUpLk1UNsbuFeOuVBXVK/EKCrHVwhLqvEEl9
+	D222XPY62vfIQXzF4Q3khhS7U8z/vHRAItNuY6YtcxjiiEq1dNF+L0DLM6SEgApm1vXJl52OgWw
+	OX8mm8M0GNTzlFzN0v0mSYg2uXvpLLLokLsVXX1jGvuNgjQccudoQj/XbqWvUBp1V39ugydGeXM
+	gWEW5nJxgRSM4L/aSNALrCpNTahfCKqXQCIwKTAbrEV0DwuR1PpW/i0GWFjO+wIQuqIdaRD7EQV
+	BFy3CeiY=
+X-Google-Smtp-Source: AGHT+IFhZgU8jWWHU04jb8EUC366NjSN15BHkQexhYytMb7yLkG/RAKfO+BmZ6yzuyG9E1fSTAdy9g==
+X-Received: by 2002:a05:6102:396f:b0:4c4:e414:b4e4 with SMTP id ada2fe7eead31-4c4e414b996mr252371137.11.1742293786777;
+        Tue, 18 Mar 2025 03:29:46 -0700 (PDT)
+Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com. [209.85.222.51])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-86d90e74885sm1949387241.21.2025.03.18.03.29.45
+        for <netdev@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Mar 2025 03:29:16 -0700 (PDT)
-Message-ID: <491430dd-71ad-4472-b3e1-0531da6d4ecc@redhat.com>
-Date: Tue, 18 Mar 2025 11:29:15 +0100
+        Tue, 18 Mar 2025 03:29:45 -0700 (PDT)
+Received: by mail-ua1-f51.google.com with SMTP id a1e0cc1a2514c-86ba07fe7a4so4784246241.2
+        for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 03:29:45 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCV9GWzcuhLWxVTeZVnh6QhkKW1J0MP+pEMYch/fi5EWSX/y/248sDp0uLtZBxlmHTv8VooDGjQ=@vger.kernel.org
+X-Received: by 2002:a05:6102:511e:b0:4c1:9288:906c with SMTP id
+ ada2fe7eead31-4c38313995cmr10389128137.9.1742293785034; Tue, 18 Mar 2025
+ 03:29:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: fix uninitialised access in mii_nway_restart() and
- cleanup error handling
-To: Qasim Ijaz <qasdev00@gmail.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-usb@vger.kernel.org,
- syzbot <syzbot+3361c2d6f78a3e0892f9@syzkaller.appspotmail.com>,
- stable@vger.kernel.org
-References: <20250311161157.49065-1-qasdev00@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250311161157.49065-1-qasdev00@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250307100824.555320-1-tianx@yunsilicon.com> <20250307100827.555320-3-tianx@yunsilicon.com>
+ <20250310063429.GF4159220@kernel.org> <69c322e0-7e38-4ac6-b390-7a9b294261b3@yunsilicon.com>
+ <c94717a8-0d96-4914-8e24-9eb2959aa193@yunsilicon.com>
+In-Reply-To: <c94717a8-0d96-4914-8e24-9eb2959aa193@yunsilicon.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 18 Mar 2025 11:29:32 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdXxkvE=o7VOpPqSo3dkd6=YP8iWJ5V_=S=uAyrCBygEjQ@mail.gmail.com>
+X-Gm-Features: AQ5f1JpitwGRv5DQHmZTMYSfQvVeXSfwnnU2-gK_Wl1boJP3U0wZ5qy56cU_E2A
+Message-ID: <CAMuHMdXxkvE=o7VOpPqSo3dkd6=YP8iWJ5V_=S=uAyrCBygEjQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v8 02/14] xsc: Enable command queue
+To: Xin Tian <tianx@yunsilicon.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, leon@kernel.org, 
+	andrew+netdev@lunn.ch, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, davem@davemloft.net, jeff.johnson@oss.qualcomm.com, 
+	przemyslaw.kitszel@intel.com, weihg@yunsilicon.com, wanry@yunsilicon.com, 
+	jacky@yunsilicon.com, parthiban.veerasooran@microchip.com, 
+	masahiroy@kernel.org, kalesh-anakkur.purayil@broadcom.com, 
+	geert+renesas@glider.be
+Content-Type: text/plain; charset="UTF-8"
 
-On 3/11/25 5:11 PM, Qasim Ijaz wrote:
-> In mii_nway_restart() during the line:
-> 
->         bmcr = mii->mdio_read(mii->dev, mii->phy_id, MII_BMCR);
-> 
-> The code attempts to call mii->mdio_read which is ch9200_mdio_read().
-> 
-> ch9200_mdio_read() utilises a local buffer, which is initialised
-> with control_read():
-> 
->         unsigned char buff[2];
-> 
-> However buff is conditionally initialised inside control_read():
-> 
->         if (err == size) {
->                 memcpy(data, buf, size);
->         }
-> 
-> If the condition of "err == size" is not met, then buff remains
-> uninitialised. Once this happens the uninitialised buff is accessed
-> and returned during ch9200_mdio_read():
-> 
->         return (buff[0] | buff[1] << 8);
-> 
-> The problem stems from the fact that ch9200_mdio_read() ignores the
-> return value of control_read(), leading to uinit-access of buff.
-> 
-> To fix this we should check the return value of control_read()
-> and return early on error.
-> 
-> Furthermore the get_mac_address() function has a similar problem where
-> it does not directly check the return value of each control_read(),
-> instead it sums up the return values and checks them all at the end
-> which means if any call to control_read() fails the function just 
-> continues on.
-> 
-> Handle this by validating the return value of each call and fail fast
-> and early instead of continuing.
-> 
-> Lastly ch9200_bind() ignores the return values of multiple 
-> control_write() calls.
-> 
-> Validate each control_write() call to ensure it succeeds before
-> continuing with the next call.
-> 
-> Reported-by: syzbot <syzbot+3361c2d6f78a3e0892f9@syzkaller.appspotmail.com>
-> Closes: https://syzkaller.appspot.com/bug?extid=3361c2d6f78a3e0892f9
-> Tested-by: syzbot <syzbot+3361c2d6f78a3e0892f9@syzkaller.appspotmail.com>
-> Fixes: 4a476bd6d1d9 ("usbnet: New driver for QinHeng CH9200 devices")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Qasim Ijaz <qasdev00@gmail.com>
+On Tue, 18 Mar 2025 at 11:06, Xin Tian <tianx@yunsilicon.com> wrote:
+> On 2025/3/12 17:17, Xin Tian wrote:
+> > On 2025/3/10 14:34, Simon Horman wrote:
+> >> On Fri, Mar 07, 2025 at 06:08:29PM +0800, Xin Tian wrote:
+> >>> The command queue is a hardware channel for sending
+> >>> commands between the driver and the firmware.
+> >>> xsc_cmd.h defines the command protocol structures.
+> >>> The logic for command allocation, sending,
+> >>> completion handling, and error handling is implemented
+> >>> in cmdq.c.
+> >>>
+> >>> Co-developed-by: Honggang Wei <weihg@yunsilicon.com>
+> >>> Signed-off-by: Honggang Wei <weihg@yunsilicon.com>
+> >>> Co-developed-by: Lei Yan <jacky@yunsilicon.com>
+> >>> Signed-off-by: Lei Yan <jacky@yunsilicon.com>
+> >>> Signed-off-by: Xin Tian <tianx@yunsilicon.com>
+> >> Hi Xin,
+> >>
+> >> Some minor feedback from my side.
+> >>
+> >> ...
+> >>
+> >>> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/cmdq.c b/drivers/net/ethernet/yunsilicon/xsc/pci/cmdq.c
+> >> ...
+> >>
+> >>> +static int xsc_copy_to_cmd_msg(struct xsc_cmd_msg *to, void *from, int size)
+> >>> +{
+> >>> +   struct xsc_cmd_prot_block *block;
+> >>> +   struct xsc_cmd_mailbox *next;
+> >>> +   int copy;
+> >>> +
+> >>> +   if (!to || !from)
+> >>> +           return -ENOMEM;
+> >>> +
+> >>> +   copy = min_t(int, size, sizeof(to->first.data));
+> >> nit: I expect that using min() is sufficient here...
+> > Ack
+>
+> min(size, sizeof(to->first.data)) will lead to a compile warning.
+> size is int and sizeof(to->first.data) is size_t.
+> So I kept this in v9
 
-Please split the patch in a small series, as suggested by Simon.
+Sizes should be unsigned, perhaps even size_t (depending on the
+expected maximum size).
+What if someone passes a negative number? Then copy will be negative
+too.  When calling memcpy(), it will be promoted to a very large
+unsigned number, ... boom!
 
-Please additionally include the target tree name ('net', in this case)
-in the subj prefix.
+Gr{oetje,eeting}s,
 
-Thanks,
+                        Geert
 
-Paolo
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
