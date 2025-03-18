@@ -1,162 +1,152 @@
-Return-Path: <netdev+bounces-175614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C327A66E10
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 09:23:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17EEEA66E1C
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 09:26:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 579871896837
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 08:23:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D785A1897AB2
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 08:26:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 806E41F09BF;
-	Tue, 18 Mar 2025 08:22:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D83481F4C9C;
+	Tue, 18 Mar 2025 08:26:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TGEaYkq4"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mdaolHjc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5711C6FF4;
-	Tue, 18 Mar 2025 08:22:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F4E41C6FF4;
+	Tue, 18 Mar 2025 08:25:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742286179; cv=none; b=Oy5VkKvxSWF8UqSVL1LE2cvsdX/QK6S127K670od53LsYuCampClbEiOXzMlaJXB2ev15bK4Xc5W2vGsPy67GtmEGxEu3TsYpzPpJ0GuzTX2Br3nAMFR1sAMzDiq0Y+F0/TWh/v/+GjcATbjW8IKfFcMoUqAklILIDZidwWSy/Y=
+	t=1742286362; cv=none; b=ureWDcfdqHdQVKHdQVUsu5iGpxZGBiTJyx6WaXGwQHc2Exp5eEWUzW16za1OqVAn/TUIY1AO5Q3xkByf18ytQjNDDGGreTW8JGTFd3QPfmuwN7lifttMltI6FR+HSRzAXqib+D5UFt0qsvWcjpNxl2tV1rrLd+/xwbLevSz9liU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742286179; c=relaxed/simple;
-	bh=MCjh2nLgKcoaLG5kdK+Wb5APkkLoIjS8PqH45EtRxnM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u3wFa8ZEcfhZ4ilt534G4p7LQRL4aSt40xXc6ukdS49aLqN7/D8SIFSuYiNTxcvAG+V5G3clL8DcyBJR/wSeVkczGAibQSimNpZDbzP55m94kvFs1OUCvZTt8iqP45HaFztaVz6qxiknpd1oVB4GCGhzpvmrZZtcZYkmWxR6Y3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TGEaYkq4; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2ff799d99dcso4924848a91.1;
-        Tue, 18 Mar 2025 01:22:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742286177; x=1742890977; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=66gdttRajZWJvR9DIeRu0efVzTG1k2XN5Qke5urMoJQ=;
-        b=TGEaYkq4mDJIftlhahJDsWdcQ68ETkjwiIwI2kjwFbNmF2NPrBGAYC/2eVBceAIL43
-         zqpoT/WsXqQbnwmIUOQYsjfBvV9AtQAKsX/Q0ahfniakqw8OiTcH2q7d6ogbA0nwbyT0
-         845RYhzSX2AytHvMD9UB9jCvyfcyZMmUSQwRZkUFb1o6aYe/HHi22+bLRLFSH7k6RdLg
-         D8qBy7KpjwFY+Pm7+erp0on7hXRwsoy/cTJ9MiWCnxavUcEHgstkjoNNrZUgOOuggYvd
-         OJ9j1IemLOeA9sdMRV2lpuZI9ZGos/UVQ/QhEo/LRWXSOQiumbfHETfA5/1a0Y/0Ub73
-         gNHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742286177; x=1742890977;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=66gdttRajZWJvR9DIeRu0efVzTG1k2XN5Qke5urMoJQ=;
-        b=WC3LQqKX/1Fn3w/EvaPIedS8OfNU8fj7Qz+pFiLHX9c8w2k37u6lezK16lcivkf3KU
-         4RaV2X5SmLuLeb7ECpFg74LqVDQ7PZnhSisGH48kQqmj4xal5bbLU+5cNDqzcpc+3gGL
-         mme52+2Kg0JzZ1ABvHSjWJFsZeEnNYJhpFr+Q0XW//h7kyzrWrfSQzD/WC0jD2XkMOeD
-         NOlK/8HRSV/Q9lC2z6Gv6X/uuSGb/46G4c/NmO2w8SsfEdOc7eMxcC7xXcVtp/B+SOEJ
-         qSZWtKYcSzIVHvz1XZLdsTPncBOb7Qj+Cdu3JUCXzYkj81nc9t1nvM5wowllpSrD2OtE
-         TSWA==
-X-Forwarded-Encrypted: i=1; AJvYcCUJoJbAxvfl5gXbeYN+OYSBU44uO0u0h1GA/u6QwlamEArIgDJZzeemdU6YOZLJY/7btk3WCz0J93J25AQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtZKIy4nOcwP0auo6Z9675IBh7LMmkyw3B7EAyIoTsCAqMeTpF
-	lFvMZEvNWaLsQgi7DoucDLECQW1Msd5Rmb+fWMM6Sa3N2WaBA5ul
-X-Gm-Gg: ASbGncuOIuRt4gYMTEvqYl9hiHscMEmoY2THUhFWR7hKQdB6rfFPlzIE87Hee2SZGFR
-	nc1DgMzHCxrVLb8aCYEUbUxYBYocg4KZ/3qp8DgEkCME+uScPV8CWMoQGroY/RubwZdV2O2l10K
-	Dr8MxeGyZvfB+/wVLirT1pYI02nrpx+NjLWSV8mGlHv1FGpOsL/NspAbyxAZ6ogphAuYrgO0A+8
-	hHmNJNeFjC/uRA8etfGSnJNOcAy4LPl8VgehOUVAFphTAEsQcE/nDzqPB7xIea8mIqJiT1fRIdH
-	9rRZkfGS69/qzyBa3FIClyJRYY7WWeinxuVjwl5T+Lbaet58BQ==
-X-Google-Smtp-Source: AGHT+IEtHpGsBp0BgxcS9kaaMvlR/hXT7EDrkIPt4HkA2hT2e/dgaUHfpGO24IMLTWaArAhnmg77IQ==
-X-Received: by 2002:a17:90b:388c:b0:2ff:69d4:6fe2 with SMTP id 98e67ed59e1d1-301a5b2b4bfmr2007594a91.16.1742286177145;
-        Tue, 18 Mar 2025 01:22:57 -0700 (PDT)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30153b9949asm7526680a91.38.2025.03.18.01.22.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Mar 2025 01:22:56 -0700 (PDT)
-Date: Tue, 18 Mar 2025 08:22:50 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jay Vosburgh <jv@jvosburgh.net>
-Cc: netdev@vger.kernel.org, Andy Gospodarek <andy@greyhouse.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCHv2 net] bonding: add ns target multicast address to slave
- device
-Message-ID: <Z9ktWpfepFclm-b-@fedora>
-References: <20241023123215.5875-1-liuhangbin@gmail.com>
- <213367.1730305265@vermin>
+	s=arc-20240116; t=1742286362; c=relaxed/simple;
+	bh=tVxzXdFnSTbKiW+Z6b1CkG5VCROLmVTDUl4+wBdGll4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RKc5hQY580ARlE7A364s5iMCogfVkSfD8Yc5VUBf/lrTNXEqs2wtbJ3kq4mcrUKC0dVtSyow+tJk6CqvFhC1ayHVGcHsTxysqVQBHR7t195JOx10Wr+t9ne8ISLNEr75oQDkJ6CX6CpGNv/HOqZ99uYa948BZDgRWvAjbDcqIzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mdaolHjc; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id B6A97442A7;
+	Tue, 18 Mar 2025 08:25:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1742286358;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wH9krpUaOUfNxPqmjVtIC4eOg6NnJP0I0NYX9C6ILs0=;
+	b=mdaolHjcBM5J+3USTKkvgACDoOJRIL/AZRaMIkYGvGR0P1OhmDOqyM1wf4jSgl+dfFQpwj
+	Qi4OGN8uFpLM95YpnzxFfvihz3DyzKsjGMBysp9lTdvEwc6SGODz04nahDPWVp84YrW9HT
+	C7JIcWrkX6x/yVN7f1UtqnNrk2kyQAV7lg1dj08exOhf9oC0zmJuiOQ4zZPo34aYDLDtwM
+	WiW9uDXFaAiUHGtdx0SsoLEU9egfuii5yoHI6LpDwEGqjeS0hctP1lnbyRE82jMkedXgGS
+	B8NemPce+4fzsFw+oIIsdPTlmkZ/ZB1TnZ6Dmg8yKIwt6Fj/9DbOkB+Qt8dt/Q==
+Date: Tue, 18 Mar 2025 09:25:51 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
+ <linux@armlinux.org.uk>, Heiner Kallweit <hkallweit1@gmail.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Florian Fainelli <f.fainelli@gmail.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Simon Horman
+ <horms@kernel.org>, Romain Gantois <romain.gantois@bootlin.com>, Antoine
+ Tenart <atenart@kernel.org>, Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>,
+ Sean Anderson <sean.anderson@linux.dev>, =?UTF-8?B?QmrDuHJu?= Mork
+ <bjorn@mork.no>
+Subject: Re: [PATCH net-next v3 0/2] net: phy: sfp: Add single-byte SMBus
+ SFP access
+Message-ID: <20250318092551.3beed50d@fedora.home>
+In-Reply-To: <1653ddbd-af37-4ed1-8419-06d17424b894@lunn.ch>
+References: <20250314162319.516163-1-maxime.chevallier@bootlin.com>
+	<1653ddbd-af37-4ed1-8419-06d17424b894@lunn.ch>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <213367.1730305265@vermin>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddugeduleehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepjeetjefgheegfeejtdetfefggfekveeggeehudeuteeuleeviedvheevtdeugfetnecuffhomhgrihhnpehmihgtrhhotghhihhprdgtohhmnecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudekpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehkuhgsr
+ geskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Wed, Oct 30, 2024 at 05:21:05PM +0100, Jay Vosburgh wrote:
-> Hangbin Liu <liuhangbin@gmail.com> wrote:
+Hello Andrew,
+
+On Mon, 17 Mar 2025 22:34:09 +0100
+Andrew Lunn <andrew@lunn.ch> wrote:
+
+> On Fri, Mar 14, 2025 at 05:23:16PM +0100, Maxime Chevallier wrote:
+> > Hello everyone,
+> > 
+> > This is V3 for the single-byte SMBus support for SFP cages as well as
+> > embedded PHYs accessed over mdio-i2c.  
 > 
-> >Commit 4598380f9c54 ("bonding: fix ns validation on backup slaves")
-> >tried to resolve the issue where backup slaves couldn't be brought up when
-> >receiving IPv6 Neighbor Solicitation (NS) messages. However, this fix only
-> >worked for drivers that receive all multicast messages, such as the veth
-> >interface.
-> >
-> >For standard drivers, the NS multicast message is silently dropped because
-> >the slave device is not a member of the NS target multicast group.
-> >
-> >To address this, we need to make the slave device join the NS target
-> >multicast group, ensuring it can receive these IPv6 NS messages to validate
-> >the slave’s status properly.
-> >
-> >There are three policies before joining the multicast group:
-> >1. All settings must be under active-backup mode (alb and tlb do not support
-> >   arp_validate), with backup slaves and slaves supporting multicast.
-> >2. We can add or remove multicast groups when arp_validate changes.
-> >3. Other operations, such as enslaving, releasing, or setting NS targets,
-> >   need to be guarded by arp_validate.
-> >
-> >Fixes: 4e24be018eb9 ("bonding: add new parameter ns_targets")
-> >Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> >---
-> >v2: only add/del mcast group on backup slaves when arp_validate is set (Jay Vosburgh)
-> 
-> 	Sorry for the delay in responding, I've been traveling.
-> 
-> 	For the above, I suspect I wasn't sufficiently clear in my
-> commentary; what I meant wasn't just checking arp_validate being
-> enabled, but that the implementation could be much less complex if it
-> simply kept all of the multicast addresses added to the backup interface
-> (in addition to the active interface) when arp_validate is enabled.
-> 
-> 	I suspect the set of multicast addresses involved is likely to
-> be small in the usual case, so the question then is whether the
-> presumably small amount of traffic that inadvertently passes the filter
-> (and is then thrown away by the kernel RX logic) is worth the complexity
-> added here.
+> Just curious, what hardware is this? And does it support bit-banging
+> the I2C pins? If it does, you get a choice, slow but correct vs fast
+> but broken and limited?
 
-Hi Jan,
+The HW is a VSC8552 PHY that includes a so-called "i2c mux", which in
+reality is that smbus interface.
 
-Apologies for troubling you so many times with the same issue. Recently, we
-discovered another corner case related to IPv6 NS target validation.
+             +---------+
+ +-----+     |         |     +-----+
+ | MAC | --- | VSC8552 | --- | SFP |
+ +-----+     |         |     +-----+
+    |        |         |        |
+    +-mdio---|         |-smbus--+
+             +---------+
 
-Previously, I mainly focused on backup validation when arp_validate is set
-to 2, 3, or 6. However, if arp_validate is set to 0, bond_rcv_validate()
-updates last_rx directly upon receiving any packet. The problem occurs when
-the backup slave only receives IPv6 NS messages sent by the active slave,
-these messages are dropped because the backup slave hasn't joined the NS
-multicast group.
+it has 4 SCL and 1 SDA lines, that you can connect to 4 different SFP
+cages.
 
-So, should we remove the limitation that restricts joining the NS multicast
-group only when arp_validate is set?
+You perform transfers by using 2 dedicated MDIO registers , one
+register contains xfer info such as the address to access over smbus,
+the direction of the xfer, and the other one contains data :
+ - lower byte is write data
+ - upper byte is read-back data
 
-By the way, another question unrelated to this topic. Does target_last_arp_rx
-have any usage? I couldn't find any references to it being used anywhere.
+and that's all you have :( so the HW can only really do one single byte
+transfer at a time, then you re-configure the 2 registers above, rinse
+and repeat.
 
-Thanks
-Hangbin
+Looks like the datasheet is publicly available :
+
+https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocuments/DataSheets/60001809A.pdf
+
+The whole xfer protocol is described in page 35.
+
+On the board itself, the i2c for the SFP cage is connected to that PHY
+smbus.
+
+Now it looks like there's some pinmux within the PHY and we can use the
+PHY as a gpio controller, so we could consider using a bitbang approach
+indeed (provided that SFP is on PHY smbus bus 0 or 1).
+
+I didn't consider that, it's probably worth giving a try, even if as
+you say it's probably be very slow, each bit being set amounting to a
+mdio xfer towards the PHY.
+
+But if it allows better HW support, and the SFP reacts well on slow
+busses, it may be work :)
+
+Do we still want the current series ? Looks like some other people were
+interested in that.
+
+On my side that's the second time I deal with a product that uses a PHY
+from this family and uses that smbus feature (but if that bitbang thing
+works it's probably better)
+
+Thanks,
+
+Maxime
 
