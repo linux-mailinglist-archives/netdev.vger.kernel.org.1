@@ -1,124 +1,162 @@
-Return-Path: <netdev+bounces-175613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99D3EA66D8A
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 09:11:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C327A66E10
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 09:23:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBB5D169AFA
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 08:10:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 579871896837
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 08:23:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9389B1E1DE6;
-	Tue, 18 Mar 2025 08:10:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 806E41F09BF;
+	Tue, 18 Mar 2025 08:22:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZWjcObUZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TGEaYkq4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA121E52D;
-	Tue, 18 Mar 2025 08:10:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5711C6FF4;
+	Tue, 18 Mar 2025 08:22:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742285400; cv=none; b=QEzwHrdsJEvn5ssl9r0l2Ad0YBqrRVGsRwXC+Xo9XthdaT0dUrfz562MzjytUdO3Jg4lz58QEXzTFt9avJTY/QS140y6H5OdBvD676JkHRm22egd324NcNyqfFsgx2SIgfVxalpZHVP0pASmsEndU+oMBva6dDfrqMG8TIEJ+fg=
+	t=1742286179; cv=none; b=Oy5VkKvxSWF8UqSVL1LE2cvsdX/QK6S127K670od53LsYuCampClbEiOXzMlaJXB2ev15bK4Xc5W2vGsPy67GtmEGxEu3TsYpzPpJ0GuzTX2Br3nAMFR1sAMzDiq0Y+F0/TWh/v/+GjcATbjW8IKfFcMoUqAklILIDZidwWSy/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742285400; c=relaxed/simple;
-	bh=e4UkUqezG5Edul9MR9g7cuOdXGh4POpZl16i1wixQDQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SrZmgWkaHwATxjHa8r5JZG+vXRORhLspxHFSvyiQiK+Po43nH6GFZ8SnR5dHq2v5SpQmmMOSMnWwttl3uZGJMRJ4ML1z/aKI5Ss5Aw09SWyBu6n3KdA04gJ/FY6SJvDMPw3Au5pHLcNnvK55Y/YG6qdlvgXaGSn0vR4ubv9zOi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZWjcObUZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE585C4CEDD;
-	Tue, 18 Mar 2025 08:09:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742285399;
-	bh=e4UkUqezG5Edul9MR9g7cuOdXGh4POpZl16i1wixQDQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZWjcObUZxhGiH4eIk1yWPqxDOE5HkuArp5QehkKNI6dRN9NBC7+htVOdEkVXhhUqS
-	 yZ6t/6zxWh4M7++33uZERs75I4qJMmZPg8rwPACrkP9AU768Y1BajdVFGn1B3rIf1i
-	 soZ/X1MkWoTqesRTXq6KABjtY/9szNg13Ap6lHIgA3poaB7NOYCji+pgbeQNfR5/5c
-	 Kip0rplrjKD66t39hV4AEzqv6WZK9WqPtC8W7YyGQLuTSk/J12P5UQbaeZ0Sz044VV
-	 io4OfxejnSAQToQbHLpCUAwXUYoiNp0DdFwKqiK2QE9QSgJnYHGfB2HB92nWEy53/Y
-	 /u4vLPFKKK1aw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E85380DBE8;
-	Tue, 18 Mar 2025 08:10:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1742286179; c=relaxed/simple;
+	bh=MCjh2nLgKcoaLG5kdK+Wb5APkkLoIjS8PqH45EtRxnM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u3wFa8ZEcfhZ4ilt534G4p7LQRL4aSt40xXc6ukdS49aLqN7/D8SIFSuYiNTxcvAG+V5G3clL8DcyBJR/wSeVkczGAibQSimNpZDbzP55m94kvFs1OUCvZTt8iqP45HaFztaVz6qxiknpd1oVB4GCGhzpvmrZZtcZYkmWxR6Y3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TGEaYkq4; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2ff799d99dcso4924848a91.1;
+        Tue, 18 Mar 2025 01:22:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742286177; x=1742890977; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=66gdttRajZWJvR9DIeRu0efVzTG1k2XN5Qke5urMoJQ=;
+        b=TGEaYkq4mDJIftlhahJDsWdcQ68ETkjwiIwI2kjwFbNmF2NPrBGAYC/2eVBceAIL43
+         zqpoT/WsXqQbnwmIUOQYsjfBvV9AtQAKsX/Q0ahfniakqw8OiTcH2q7d6ogbA0nwbyT0
+         845RYhzSX2AytHvMD9UB9jCvyfcyZMmUSQwRZkUFb1o6aYe/HHi22+bLRLFSH7k6RdLg
+         D8qBy7KpjwFY+Pm7+erp0on7hXRwsoy/cTJ9MiWCnxavUcEHgstkjoNNrZUgOOuggYvd
+         OJ9j1IemLOeA9sdMRV2lpuZI9ZGos/UVQ/QhEo/LRWXSOQiumbfHETfA5/1a0Y/0Ub73
+         gNHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742286177; x=1742890977;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=66gdttRajZWJvR9DIeRu0efVzTG1k2XN5Qke5urMoJQ=;
+        b=WC3LQqKX/1Fn3w/EvaPIedS8OfNU8fj7Qz+pFiLHX9c8w2k37u6lezK16lcivkf3KU
+         4RaV2X5SmLuLeb7ECpFg74LqVDQ7PZnhSisGH48kQqmj4xal5bbLU+5cNDqzcpc+3gGL
+         mme52+2Kg0JzZ1ABvHSjWJFsZeEnNYJhpFr+Q0XW//h7kyzrWrfSQzD/WC0jD2XkMOeD
+         NOlK/8HRSV/Q9lC2z6Gv6X/uuSGb/46G4c/NmO2w8SsfEdOc7eMxcC7xXcVtp/B+SOEJ
+         qSZWtKYcSzIVHvz1XZLdsTPncBOb7Qj+Cdu3JUCXzYkj81nc9t1nvM5wowllpSrD2OtE
+         TSWA==
+X-Forwarded-Encrypted: i=1; AJvYcCUJoJbAxvfl5gXbeYN+OYSBU44uO0u0h1GA/u6QwlamEArIgDJZzeemdU6YOZLJY/7btk3WCz0J93J25AQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwtZKIy4nOcwP0auo6Z9675IBh7LMmkyw3B7EAyIoTsCAqMeTpF
+	lFvMZEvNWaLsQgi7DoucDLECQW1Msd5Rmb+fWMM6Sa3N2WaBA5ul
+X-Gm-Gg: ASbGncuOIuRt4gYMTEvqYl9hiHscMEmoY2THUhFWR7hKQdB6rfFPlzIE87Hee2SZGFR
+	nc1DgMzHCxrVLb8aCYEUbUxYBYocg4KZ/3qp8DgEkCME+uScPV8CWMoQGroY/RubwZdV2O2l10K
+	Dr8MxeGyZvfB+/wVLirT1pYI02nrpx+NjLWSV8mGlHv1FGpOsL/NspAbyxAZ6ogphAuYrgO0A+8
+	hHmNJNeFjC/uRA8etfGSnJNOcAy4LPl8VgehOUVAFphTAEsQcE/nDzqPB7xIea8mIqJiT1fRIdH
+	9rRZkfGS69/qzyBa3FIClyJRYY7WWeinxuVjwl5T+Lbaet58BQ==
+X-Google-Smtp-Source: AGHT+IEtHpGsBp0BgxcS9kaaMvlR/hXT7EDrkIPt4HkA2hT2e/dgaUHfpGO24IMLTWaArAhnmg77IQ==
+X-Received: by 2002:a17:90b:388c:b0:2ff:69d4:6fe2 with SMTP id 98e67ed59e1d1-301a5b2b4bfmr2007594a91.16.1742286177145;
+        Tue, 18 Mar 2025 01:22:57 -0700 (PDT)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30153b9949asm7526680a91.38.2025.03.18.01.22.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Mar 2025 01:22:56 -0700 (PDT)
+Date: Tue, 18 Mar 2025 08:22:50 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jay Vosburgh <jv@jvosburgh.net>
+Cc: netdev@vger.kernel.org, Andy Gospodarek <andy@greyhouse.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv2 net] bonding: add ns target multicast address to slave
+ device
+Message-ID: <Z9ktWpfepFclm-b-@fedora>
+References: <20241023123215.5875-1-liuhangbin@gmail.com>
+ <213367.1730305265@vermin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 00/13] net: phy: Rework linkmodes handling in a
- dedicated file
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174228543527.4071400.14783355936899188267.git-patchwork-notify@kernel.org>
-Date: Tue, 18 Mar 2025 08:10:35 +0000
-References: <20250307173611.129125-1-maxime.chevallier@bootlin.com>
-In-Reply-To: <20250307173611.129125-1-maxime.chevallier@bootlin.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, andrew@lunn.ch, kuba@kernel.org, edumazet@google.com,
- pabeni@redhat.com, linux@armlinux.org.uk, hkallweit1@gmail.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, linux-arm-kernel@lists.infradead.org,
- christophe.leroy@csgroup.eu, herve.codina@bootlin.com, f.fainelli@gmail.com,
- vladimir.oltean@nxp.com, kory.maincent@bootlin.com, o.rempel@pengutronix.de,
- horms@kernel.org, romain.gantois@bootlin.com
+In-Reply-To: <213367.1730305265@vermin>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri,  7 Mar 2025 18:35:57 +0100 you wrote:
-> Hello everyone,
+On Wed, Oct 30, 2024 at 05:21:05PM +0100, Jay Vosburgh wrote:
+> Hangbin Liu <liuhangbin@gmail.com> wrote:
 > 
-> This is V5 of the phy_caps series. In a nutshell, this series reworks the way
-> we maintain the list of speed/duplex capablities for each linkmode so that we
-> no longer have multiple definition of these associations.
+> >Commit 4598380f9c54 ("bonding: fix ns validation on backup slaves")
+> >tried to resolve the issue where backup slaves couldn't be brought up when
+> >receiving IPv6 Neighbor Solicitation (NS) messages. However, this fix only
+> >worked for drivers that receive all multicast messages, such as the veth
+> >interface.
+> >
+> >For standard drivers, the NS multicast message is silently dropped because
+> >the slave device is not a member of the NS target multicast group.
+> >
+> >To address this, we need to make the slave device join the NS target
+> >multicast group, ensuring it can receive these IPv6 NS messages to validate
+> >the slave’s status properly.
+> >
+> >There are three policies before joining the multicast group:
+> >1. All settings must be under active-backup mode (alb and tlb do not support
+> >   arp_validate), with backup slaves and slaves supporting multicast.
+> >2. We can add or remove multicast groups when arp_validate changes.
+> >3. Other operations, such as enslaving, releasing, or setting NS targets,
+> >   need to be guarded by arp_validate.
+> >
+> >Fixes: 4e24be018eb9 ("bonding: add new parameter ns_targets")
+> >Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> >---
+> >v2: only add/del mcast group on backup slaves when arp_validate is set (Jay Vosburgh)
 > 
-> That will help making sure that when people add new linkmodes in
-> include/uapi/linux/ethtool.h, they don't have to update phylib and phylink as
-> well, making the process more straightforward and less error-prone.
+> 	Sorry for the delay in responding, I've been traveling.
 > 
-> [...]
+> 	For the above, I suspect I wasn't sufficiently clear in my
+> commentary; what I meant wasn't just checking arp_validate being
+> enabled, but that the implementation could be much less complex if it
+> simply kept all of the multicast addresses added to the backup interface
+> (in addition to the active interface) when arp_validate is enabled.
+> 
+> 	I suspect the set of multicast addresses involved is likely to
+> be small in the usual case, so the question then is whether the
+> presumably small amount of traffic that inadvertently passes the filter
+> (and is then thrown away by the kernel RX logic) is worth the complexity
+> added here.
 
-Here is the summary with links:
-  - [net-next,v5,01/13] net: ethtool: Export the link_mode_params definitions
-    https://git.kernel.org/netdev/net-next/c/79f88a584e35
-  - [net-next,v5,02/13] net: phy: Use an internal, searchable storage for the linkmodes
-    https://git.kernel.org/netdev/net-next/c/d8c838a57ce2
-  - [net-next,v5,03/13] net: phy: phy_caps: Move phy_speeds to phy_caps
-    https://git.kernel.org/netdev/net-next/c/8c8c4a87933d
-  - [net-next,v5,04/13] net: phy: phy_caps: Move __set_linkmode_max_speed to phy_caps
-    https://git.kernel.org/netdev/net-next/c/4823ed060919
-  - [net-next,v5,05/13] net: phy: phy_caps: Introduce phy_caps_valid
-    https://git.kernel.org/netdev/net-next/c/87b22ce31235
-  - [net-next,v5,06/13] net: phy: phy_caps: Implement link_capabilities lookup by linkmode
-    https://git.kernel.org/netdev/net-next/c/dbcd85b05c5b
-  - [net-next,v5,07/13] net: phy: phy_caps: Allow looking-up link caps based on speed and duplex
-    https://git.kernel.org/netdev/net-next/c/fc81e257d19f
-  - [net-next,v5,08/13] net: phy: phy_device: Use link_capabilities lookup for PHY aneg config
-    https://git.kernel.org/netdev/net-next/c/c7ae89c6b4d5
-  - [net-next,v5,09/13] net: phylink: Use phy_caps_lookup for fixed-link configuration
-    https://git.kernel.org/netdev/net-next/c/de7d3f87be3c
-  - [net-next,v5,10/13] net: phy: drop phy_settings and the associated lookup helpers
-    https://git.kernel.org/netdev/net-next/c/ce60fef7fecc
-  - [net-next,v5,11/13] net: phylink: Add a mapping between MAC_CAPS and LINK_CAPS
-    https://git.kernel.org/netdev/net-next/c/3bea75002a05
-  - [net-next,v5,12/13] net: phylink: Convert capabilities to linkmodes using phy_caps
-    https://git.kernel.org/netdev/net-next/c/4ca5b8a258b6
-  - [net-next,v5,13/13] net: phylink: Use phy_caps to get an interface's capabilities and modes
-    https://git.kernel.org/netdev/net-next/c/3bd87f3b4405
+Hi Jan,
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Apologies for troubling you so many times with the same issue. Recently, we
+discovered another corner case related to IPv6 NS target validation.
 
+Previously, I mainly focused on backup validation when arp_validate is set
+to 2, 3, or 6. However, if arp_validate is set to 0, bond_rcv_validate()
+updates last_rx directly upon receiving any packet. The problem occurs when
+the backup slave only receives IPv6 NS messages sent by the active slave,
+these messages are dropped because the backup slave hasn't joined the NS
+multicast group.
 
+So, should we remove the limitation that restricts joining the NS multicast
+group only when arp_validate is set?
+
+By the way, another question unrelated to this topic. Does target_last_arp_rx
+have any usage? I couldn't find any references to it being used anywhere.
+
+Thanks
+Hangbin
 
