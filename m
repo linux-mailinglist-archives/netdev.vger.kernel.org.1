@@ -1,109 +1,72 @@
-Return-Path: <netdev+bounces-175692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AD2FA672BC
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 12:30:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4827A672DD
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 12:38:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 405B417C832
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 11:30:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2BC53AA3B3
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 11:37:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7484020B1E3;
-	Tue, 18 Mar 2025 11:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0936420B208;
+	Tue, 18 Mar 2025 11:37:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tq48iJkb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vD7Ikxmk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5057A204F9B
-	for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 11:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C1F1FCF47;
+	Tue, 18 Mar 2025 11:37:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742297404; cv=none; b=Pd19q/yMTVGRz4BfS2oWbIR/7SrY3XvoeZdtJro8H/IlzWUFYVbcpEIEwQu/5/5CUoK4TyiizkDSY2qA8+hUthi8mu3IHa4NqLbZIqlsb8jClcGdjMejRXzP9L6Sv89+7qAfoVoXg21QJCVgqFLUMbOM/0JcRE+hv55szQl0JEU=
+	t=1742297855; cv=none; b=rjVZsBqFvEBeMpxYRNBZu1zeb9/2/94yIsDoXsYnRuFj4+/t/K8HYyL6wWr/XChhTdke038YuFRuOO+UjtqfuGuC1pNlQTWg+IEY6yANMN7fzahasYtdbQJalWy0KnAlsuEllt0ybDB0GxMRKHncOmeUbq3Vvrp5BG27sRycCyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742297404; c=relaxed/simple;
-	bh=r69d5xBhzd1oSteBxc/VbEo1hdNp79uDB5aVghpztaM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MIxH5z+GVDe2RkjYwtDV2d22Sc4xmkuzL1xQpasCICUiFcX/PU/pJC27SPAn3WqkcJEG7FX2DvHcrTLZFtlmSvgfIPQs9iILXYGRfbGuSnBeIK/zUsX1mXwy/yVvu8Q+2I/s50DCBGkIFMA3BmteHi5go6qYkg5l54EFbjSzsL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tq48iJkb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D06CEC4CEE3;
-	Tue, 18 Mar 2025 11:30:03 +0000 (UTC)
+	s=arc-20240116; t=1742297855; c=relaxed/simple;
+	bh=8dfaj8OhiL8tCmJ2IDbZH8CfigT2oeIo7gW2nLBhHzw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XWKwjzY+7lKuHPuLPEirOqhbwYCC7Muo/05kXw8yyrhTQkO2K1b+47otjLgT0Ntv6fJt3z3OOK+rgRbf0GOafgnlnGr3Az+ytXu5wuUNRnNCLv1CObHGf9hebj1n8zL621htw1cAFleV9dYN3z19B+B85zXjTZwv7ruPoKZuy+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vD7Ikxmk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99B04C4CEDD;
+	Tue, 18 Mar 2025 11:37:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742297403;
-	bh=r69d5xBhzd1oSteBxc/VbEo1hdNp79uDB5aVghpztaM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tq48iJkbASb1aHOoBxNL5OirnAc/ZAXyLmWNVOJUyEerYnbT3RKLOwQwNTvU3wu0A
-	 xXyx4dN2d7skqwW/+Q2IDUvy/acx9JI/RrGOGx8CEGhhAvkDnCsW8IsAWJ7aJV9ZSd
-	 9sc/IY5mPGN8nlJ1laO6KNvJKS+/8J0lr/NHoXLOarFSMkTMyEPTigG0E14jswBvGa
-	 geG+19Og1xndvUvMrOZr0Mhq51cFeXpTV85Zl2mFHeJkZBc1VVgRF/g4qhlqw9uPas
-	 BXbgvn7tCkjTs5bL5HoDKHhmdiA35B2qsXvUpvv0mFIHMqsYPoS76X8rsxzV99X6Eo
-	 Wb1YqyUfmIw6A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 75030380DBE8;
-	Tue, 18 Mar 2025 11:30:40 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1742297855;
+	bh=8dfaj8OhiL8tCmJ2IDbZH8CfigT2oeIo7gW2nLBhHzw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=vD7IkxmkWIrsCw0xHXhyQuisxyWfr5qUMmprP0o2xvMuAFXU5zVihUmckjvDG3sXd
+	 JHiVoWGI1/2m032/XUSOfSxVonLGe7NrBiESatXLiDFbyfzHzYaOE2ZrPE3LGFgJdq
+	 pfqGs1/oDzKk9HE8FsY9PLVXYFoHEk7IaWmVVa/jmOaFpRfB/Scsn4pkAx81awMcNb
+	 dhLabArDBIVXaGWChnTNynPHx5cJkkJc/lqKDpyF3hdgSLRvs48aRFTanIywRJdwUZ
+	 rY0hKKQlNOg7LWW0XmJpBJjNp2GZFHehUVIuv/Zy+Bxmpoi3Dkuk9rZtmV7YHmj1y+
+	 61ZBPonT3SBiA==
+Date: Tue, 18 Mar 2025 11:37:31 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, shuah@kernel.org,
+	ap420073@gmail.com, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net] selftests: drv-net: use defer in the ping test
+Message-ID: <20250318113731.GO688833@kernel.org>
+References: <20250312131040.660386-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 01/10] batman-adv: Start new development cycle
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174229743927.4143607.16972269079132014230.git-patchwork-notify@kernel.org>
-Date: Tue, 18 Mar 2025 11:30:39 +0000
-References: <20250313164519.72808-2-sw@simonwunderlich.de>
-In-Reply-To: <20250313164519.72808-2-sw@simonwunderlich.de>
-To: Simon Wunderlich <sw@simonwunderlich.de>
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
- b.a.t.m.a.n@lists.open-mesh.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250312131040.660386-1-kuba@kernel.org>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Simon Wunderlich <sw@simonwunderlich.de>:
-
-On Thu, 13 Mar 2025 17:45:10 +0100 you wrote:
-> This version will contain all the (major or even only minor) changes for
-> Linux 6.15.
+On Wed, Mar 12, 2025 at 02:10:40PM +0100, Jakub Kicinski wrote:
+> Make sure the test cleans up after itself. The XDP off statements
+> at the end of the test may not be reached.
 > 
-> The version number isn't a semantic version number with major and minor
-> information. It is just encoding the year of the expected publishing as
-> Linux -rc1 and the number of published versions this year (starting at 0).
-> 
-> [...]
+> Fixes: 75cc19c8ff89 ("selftests: drv-net: add xdp cases for ping.py")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Here is the summary with links:
-  - [01/10] batman-adv: Start new development cycle
-    https://git.kernel.org/netdev/net-next/c/b195d60408d4
-  - [02/10] batman-adv: Drop batadv_priv_debug_log struct
-    https://git.kernel.org/netdev/net-next/c/9a006e72d30c
-  - [03/10] batman-adv: adopt netdev_hold() / netdev_put()
-    https://git.kernel.org/netdev/net-next/c/00b35530811f
-  - [04/10] batman-adv: Add support for jumbo frames
-    https://git.kernel.org/netdev/net-next/c/1666951c4424
-  - [05/10] batman-adv: Use consistent name for mesh interface
-    https://git.kernel.org/netdev/net-next/c/94433355027d
-  - [06/10] batman-adv: Limit number of aggregated packets directly
-    https://git.kernel.org/netdev/net-next/c/434becf57bdc
-  - [07/10] batman-adv: Switch to bitmap helper for aggregation handling
-    https://git.kernel.org/netdev/net-next/c/77405977f187
-  - [08/10] batman-adv: Use actual packet count for aggregated packets
-    https://git.kernel.org/netdev/net-next/c/0db110059e79
-  - [09/10] batman-adv: Limit aggregation size to outgoing MTU
-    https://git.kernel.org/netdev/net-next/c/e4aa3412f632
-  - [10/10] batman-adv: add missing newlines for log macros
-    https://git.kernel.org/netdev/net-next/c/7cfb32456ed8
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
