@@ -1,132 +1,99 @@
-Return-Path: <netdev+bounces-175667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 248E8A670E6
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 11:14:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A922A670ED
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 11:15:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2780019A018C
-	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 10:14:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB3503B823D
+	for <lists+netdev@lfdr.de>; Tue, 18 Mar 2025 10:15:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68064207A23;
-	Tue, 18 Mar 2025 10:14:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 193A1207DF6;
+	Tue, 18 Mar 2025 10:14:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="JE1Q1JaG"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="LLRjkuuU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFBA1205AC1;
-	Tue, 18 Mar 2025 10:14:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFE61207A27;
+	Tue, 18 Mar 2025 10:14:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742292844; cv=none; b=DaaXqhZ1NA0rX7vTvLYaItlwfNMD8Osv5r0OFFe/BQVYFghByUUZHuCssC6ClIXzaMIY+0mNPmHGQJV4WwqwvzYYpQY4hqjj1qKGOuDhfxz+W3UB9f1Ty7n76THQhO/hvi1c0EiLFKsLzSy9De1xT4as9uLXhtbS/klpAYuSre0=
+	t=1742292898; cv=none; b=SQWEnfCKFl5dzZDyc6CaPqdCjmSlk45gjkzXKJBtf5BDgaovXKl6Kp7CRj6YlHCTC6GZcpg/H9zYmy44Qk/mBvTyI3MHusE4gXABMJGxw7UZSI3rG5oAnygunXg6caty8yFUGXgW5RqDg8NzK0XrAbuWHOviZNB8sRN1fX7xn7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742292844; c=relaxed/simple;
-	bh=FX4cyBVUiAzeSPf8RPJP9YjElLpzhnZapb3umk3pBHU=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i022BMRyp0vnC3fQ0uWvm3pGTbQ2b/Gms+qCZBTezJWPIqu7MWyViZ7Cgm3wdAFh0exWBdbP8Ny5BfxIYTMVJ16YSf6/DWrur53StdSWOHY/CRJOd32zgsLhrhomMpPOuQGXFsaEtZSy/p14VqB4mamQjfbdLMAFQdPSRoIFZP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=JE1Q1JaG; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52I1950C027156;
-	Tue, 18 Mar 2025 10:13:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=jjWDZoORKIOqq8Zml1sJRSMh
-	3yhKgNOhNoM65Pniax8=; b=JE1Q1JaGJjAZLmsWACXleDCjXY2dIXtZvMf3YpyI
-	VRpJkhdOXs2h29zdIDg8Dyiu6s0vnWdgJ3ou0e6rGcjtruK/myjnCaUtyjmWUdgA
-	8jT+pfV+/yQNuF7idNBFJsgYyv73O/SFQ3/34CP0K6AqRtr+ZN4kjZWd+D7U+PTy
-	4nKOStzdK24sg10r8y0hwHV8c+YDFVSc5xz+ioiSRo5lHdQjIHNzDHf2L/ov2VM4
-	hVjWI0h4854vzwaOM8fo8I0dF14+2TKvDuADpDhi5GIjzJnw+kaTB9YBV03M+BIc
-	d5DmAW9HJF36ta3Bk7QO7B4OzjxxLWmuDBwgV5GfQtt3hQ==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 45exwthchr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 18 Mar 2025 10:13:30 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 52IADUYt020637
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 18 Mar 2025 10:13:30 GMT
-Received: from PHILBER.na.qualcomm.com (10.80.80.8) by
- nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Tue, 18 Mar 2025 03:13:25 -0700
-Date: Tue, 18 Mar 2025 11:13:22 +0100
-From: Peter Hilber <quic_philber@quicinc.com>
-To: Lei Yang <leiyang@redhat.com>
-CC: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-        Trilok Soni <quic_tsoni@quicinc.com>,
-        Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-        Xuan Zhuo
-	<xuanzhuo@linux.alibaba.com>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <virtualization@lists.linux.dev>,
-        David Woodhouse
-	<dwmw2@infradead.org>,
-        "Ridoux, Julien" <ridouxj@amazon.com>,
-        Daniel Lezcano
-	<daniel.lezcano@linaro.org>,
-        Alexandre Belloni
-	<alexandre.belloni@bootlin.com>,
-        Parav Pandit <parav@nvidia.com>,
-        "Matias
- Ezequiel Vara Larsen" <mvaralar@redhat.com>,
-        Cornelia Huck
-	<cohuck@redhat.com>, Simon Horman <horms@kernel.org>,
-        <virtio-dev@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
-        <linux-rtc@vger.kernel.org>
-Subject: Re: [PATCH v6 0/4] Add virtio_rtc module
-Message-ID: <xogief67mb2wonb7angoypj4ddvvecyrcsnncqitggpij6ssim@fo3psnqqhovp>
-References: <20250313173707.1492-1-quic_philber@quicinc.com>
- <CAPpAL=we6VkyBXBO2cBiszpGUP5f7QSioQbp6x3YoCqa9qUPRQ@mail.gmail.com>
+	s=arc-20240116; t=1742292898; c=relaxed/simple;
+	bh=nTWbgF+ovETK40mhMxNeCdkXcRyxjSqIKUT6AykaE6s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qy+7f0UKMXXx0V26VwC4EuxH+TzEEJqlbYNJhXbybYXzanI2yHnani82IWYq1zWFFQ+DI/+aE4Mi95UbhjK8BF5o0PQI1jDBWecuybGUWAQQbEmG2t37i0I0msGI+XrgGfRB+CIHNf5gw4ErCdl9I/V2iuYXDt/P1lilFPtg7Js=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=LLRjkuuU; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=qOygiTV7vrKY1WXHvWHPQYGJdFcrmfXZbEYu0/ob0+4=; b=LLRjkuuUqv7/2IKkv65vhDJsKw
+	V8Y6shPhf9JRvYPOCHNgcMpF18sXzsIxYZT5M7kmGcq+9ifhfQCCr7qiAkUqjc6wbazlGcVQ7vrgc
+	n88hErLxM1TICj8fCv1/JW5FtCCMe2bIZE7tu0LJ1tkB24zLJgGa4UusrCQjCTEyTKvlMbfsQD1n1
+	ptAqtTBBd8oS7SMl9y4kBy899YdensxOw/RQj7Stg/0BhzX/A9A8xAKJyhEGRjjZdLlNgoc/HKjLH
+	XS9KRXLTrD21Xq/KoEvjokZSu8DAOGZOEcWwv+l0urFnqmBdTTSo4t+sBmll1j/YVlOiMNlHL0X1L
+	lZfT1+Jw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40276)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tuTy6-0004qx-23;
+	Tue, 18 Mar 2025 10:14:42 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tuTy2-0004WF-2N;
+	Tue, 18 Mar 2025 10:14:38 +0000
+Date: Tue, 18 Mar 2025 10:14:38 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Thangaraj Samynathan <Thangaraj.S@microchip.com>,
+	Rengarajan Sundararajan <Rengarajan.S@microchip.com>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
+	Phil Elwell <phil@raspberrypi.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next v4 08/10] net: usb: lan78xx: Transition
+ get/set_pause to phylink
+Message-ID: <Z9lHjsIl-b_Jgc6O@shell.armlinux.org.uk>
+References: <20250318093410.3047828-1-o.rempel@pengutronix.de>
+ <20250318093410.3047828-9-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAPpAL=we6VkyBXBO2cBiszpGUP5f7QSioQbp6x3YoCqa9qUPRQ@mail.gmail.com>
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: Mr7Thedl-QJOp0Aoc6AvPfrSkmEMvY8n
-X-Proofpoint-ORIG-GUID: Mr7Thedl-QJOp0Aoc6AvPfrSkmEMvY8n
-X-Authority-Analysis: v=2.4 cv=UoJjN/wB c=1 sm=1 tr=0 ts=67d9474a cx=c_pps a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17 a=GEpy-HfZoHoA:10 a=kj9zAlcOel0A:10 a=Vs1iUdzkB0EA:10 a=20KFwNOVAAAA:8 a=g3YzpIbaydEdkk7JLBIA:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-18_05,2025-03-17_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- impostorscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=738
- phishscore=0 adultscore=0 clxscore=1011 spamscore=0 suspectscore=0
- lowpriorityscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
- definitions=main-2503180074
+In-Reply-To: <20250318093410.3047828-9-o.rempel@pengutronix.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Mar 18, 2025 at 10:04:07AM +0800, Lei Yang wrote:
-> QE tested this series of patches v6 with virtio-net regression tests,
-> everything works fine.
-> 
-> Tested-by: Lei Yang <leiyang@redhat.com>
-> 
+On Tue, Mar 18, 2025 at 10:34:08AM +0100, Oleksij Rempel wrote:
+> Replace lan78xx_get_pause and lan78xx_set_pause implementations with
+> phylink-based functions. This transition aligns pause parameter handling
+> with the phylink API, simplifying the code and improving
+> maintainability.
 
-Hi Lei,
+Doesn't this user API get broken in patch 3 (in other words, shouldn't
+this patch be part of patch 3) ?
 
-thanks for the reply! However, I am not sure which virtio-net regression
-tests you are referring to, and how these tests would be relevant to
-virtio_rtc. The virtio_rtc driver does not have any relation to
-virtio-net ATM. Reusing virtio_rtc within virtio-net has been discussed
-in the past, but not done yet.
-
-Best regards,
-
-Peter
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
