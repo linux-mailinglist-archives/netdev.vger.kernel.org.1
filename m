@@ -1,165 +1,344 @@
-Return-Path: <netdev+bounces-176061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C70CA68885
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 10:47:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14F54A68880
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 10:46:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 698E31B602AC
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 09:45:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F86F18880FB
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 09:45:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81F38254B1C;
-	Wed, 19 Mar 2025 09:41:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UxRpwZqr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E6C025485E;
+	Wed, 19 Mar 2025 09:39:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB85A253F09;
-	Wed, 19 Mar 2025 09:41:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 149F0253B65;
+	Wed, 19 Mar 2025 09:39:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742377269; cv=none; b=nB2eUyF4uEtpEIXJyKs3rRqhj3FeoiumPeKihvfobpdF/xn6otLqkwA3JpAykYtuYRGoFagrPNzApM1GXpD27+HjDaoJ2iZoIc/31Dc8z3U3or/qyB1pE3QPpOUEPsXB7fRwLmEi4+K6OK9DwpuKUMEdV4e6gjeNSlfb1KtBAB8=
+	t=1742377169; cv=none; b=Yr/6OG+ezUy7ClP87EJLdKSu9SwY2QWCTKIe5rjRZFIh73E5Pg+Zjy3pWGqV6o3EvxebefmDYHD896GHsk6WSzdcQjIr7UIAumbLJCAoi+zdQAz2txDiQxacO63fBUW6gAikY7V1WweOgKKWvk5oVWZJ18OQss98N1fiwAE216g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742377269; c=relaxed/simple;
-	bh=PJ7H4hxlsVt4HnZ26XPNszbRIKovfbpjMkYUm9hcA2w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tLjWKomYCLthUm3LtK5ERMsGsKl7IcL/6CvER3JQiVzagrxh14SgC9q1an9bk0HHIK0fDGg7BVDRU3DMsI4jDJ0gCHXybyEmHWdJxYtShNI3juPMycXb/OuWQpMVWPWG389kyZLlrZcKkYxFk+MQZoWGEaD+lWQihaXfDPYfAhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UxRpwZqr; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1742377268; x=1773913268;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=PJ7H4hxlsVt4HnZ26XPNszbRIKovfbpjMkYUm9hcA2w=;
-  b=UxRpwZqrYw/XaJeNnoWUPe8fQO/h3GcmlqixiEN68KYwiPa/AfdYwRnB
-   jaZhgcfaO+RMGHTThE4qJ5ZZSHYl0iZ9O2O4+nZJ2tMieU8vvE1vV3jx2
-   SICtP17AE762gAB1wP+DUR6QZLvRdb6CSCUVInEp6LPZ96DAJhOhwVCCu
-   szp4vhbQzpzqpUa9/kkJCbM16oAwfsg6exVI/d6wAmUy/zKST8GBsSq8u
-   U4b6hAEwnT33RzRmvN9MzSBvZTcYgTRLNNWxE0SR6dmOjVmoYbfE4HYhe
-   nuv+qYATaEPnm8whj2ooze7gXvA1nOgXBMx2WpmdFG60lVteGyGfpZn3u
-   w==;
-X-CSE-ConnectionGUID: mFJ8xhVqQz6SkEOLf1Dk6A==
-X-CSE-MsgGUID: gp5wc2QXSpiVKSZWpTFn5Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11377"; a="43658684"
-X-IronPort-AV: E=Sophos;i="6.14,259,1736841600"; 
-   d="scan'208";a="43658684"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2025 02:40:56 -0700
-X-CSE-ConnectionGUID: 5D0h7bGjRNGNDKS2yrwXHg==
-X-CSE-MsgGUID: ZwOtwQZVQCSFoVZm2GVxWg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,259,1736841600"; 
-   d="scan'208";a="122545409"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2025 02:40:53 -0700
-Date: Wed, 19 Mar 2025 10:36:53 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Moshe Shemesh <moshe@nvidia.com>, Mark Bloch <mbloch@nvidia.com>
-Subject: Re: [PATCH net 2/2] net/mlx5: Start health poll after enable hca
-Message-ID: <Z9qQNe/M7IAkpR33@mev-dev.igk.intel.com>
-References: <1742331077-102038-1-git-send-email-tariqt@nvidia.com>
- <1742331077-102038-3-git-send-email-tariqt@nvidia.com>
+	s=arc-20240116; t=1742377169; c=relaxed/simple;
+	bh=O5m4J2uazvVon6VrejWT7QbkzPd8R8Ka6P+/dKxYqY8=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=FPqyeSEO8sfPgmtpKi0Z1HFOIDT/BkEFIBNL5V1wBimfA2bWGVU2i7P0Rxzfe5Bxpk+qQR5Sny8UHBVtKs9UfKux/jS4MKXe8I6lzkcVcoX2xlE7hoJBjs3O6ekwNUfHtsH7Qamnb4bSVtRFSgeZAk3PBH8RzZQSt2yqKEZMF5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4ZHk9H6zmDzpg72;
+	Wed, 19 Mar 2025 17:36:03 +0800 (CST)
+Received: from kwepemk500005.china.huawei.com (unknown [7.202.194.90])
+	by mail.maildlp.com (Postfix) with ESMTPS id D8A7F14033A;
+	Wed, 19 Mar 2025 17:39:17 +0800 (CST)
+Received: from [10.174.178.46] (10.174.178.46) by
+ kwepemk500005.china.huawei.com (7.202.194.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 19 Mar 2025 17:39:16 +0800
+Subject: Re: [v5 PATCH 13/14] ubifs: Use crypto_acomp interface
+To: Herbert Xu <herbert@gondor.apana.org.au>, Linux Crypto Mailing List
+	<linux-crypto@vger.kernel.org>
+CC: Richard Weinberger <richard@nod.at>, <linux-mtd@lists.infradead.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@ucw.cz>,
+	<linux-pm@vger.kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>,
+	<netdev@vger.kernel.org>
+References: <cover.1742034499.git.herbert@gondor.apana.org.au>
+ <434ca0f270b1e76f2abb222ddb0d68d7f1e0831a.1742034499.git.herbert@gondor.apana.org.au>
+From: Zhihao Cheng <chengzhihao1@huawei.com>
+Message-ID: <d81b956d-8d08-8ddd-9746-5b0262a4e68e@huawei.com>
+Date: Wed, 19 Mar 2025 17:39:16 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1742331077-102038-3-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <434ca0f270b1e76f2abb222ddb0d68d7f1e0831a.1742034499.git.herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemk500005.china.huawei.com (7.202.194.90)
 
-On Tue, Mar 18, 2025 at 10:51:17PM +0200, Tariq Toukan wrote:
-> From: Moshe Shemesh <moshe@nvidia.com>
+ÔÚ 2025/3/15 18:30, Herbert Xu Ð´µÀ:
+> Replace the legacy crypto compression interface with the new acomp
+> interface.
 > 
-> The health poll mechanism performs periodic checks to detect firmware
-> errors. One of the checks verifies the function is still enabled on
-> firmware side, but the function is enabled only after enable_hca command
-> completed. Start health poll after enable_hca command to avoid a race
-> between function enabled and first health polling.
+> Remove the compression mutexes and the overallocation for memory
+> (the offender LZO has been fixed).
 > 
-> Fixes: 9b98d395b85d ("net/mlx5: Start health poll at earlier stage of driver load")
-> Signed-off-by: Moshe Shemesh <moshe@nvidia.com>
-> Reviewed-by: Shay Drori <shayd@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> Cap the output buffer length for compression to eliminate the
+> post-compression check for UBIFS_MIN_COMPRESS_DIFF.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 > ---
->  drivers/net/ethernet/mellanox/mlx5/core/main.c | 15 +++++++--------
->  1 file changed, 7 insertions(+), 8 deletions(-)
+>   fs/ubifs/compress.c | 106 ++++++++++++++++++++++++++------------------
+>   fs/ubifs/journal.c  |   2 +-
+>   fs/ubifs/ubifs.h    |  15 +------
+>   3 files changed, 67 insertions(+), 56 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-> index ec956c4bcebd..7c3312d6aed9 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-> @@ -1205,24 +1205,24 @@ static int mlx5_function_enable(struct mlx5_core_dev *dev, bool boot, u64 timeou
->  	dev->caps.embedded_cpu = mlx5_read_embedded_cpu(dev);
->  	mlx5_cmd_set_state(dev, MLX5_CMDIF_STATE_UP);
->  
-> -	mlx5_start_health_poll(dev);
+
+Tested-by: Zhihao Cheng <chengzhihao1@huawei.com> # For xfstests
+Reviewed-by: Zhihao Cheng <chengzhihao1@huawei.com>
+> diff --git a/fs/ubifs/compress.c b/fs/ubifs/compress.c
+> index 0b48cbab8a3d..a241ba01c9a8 100644
+> --- a/fs/ubifs/compress.c
+> +++ b/fs/ubifs/compress.c
+> @@ -15,7 +15,7 @@
+>    * decompression.
+>    */
+>   
+> -#include <linux/crypto.h>
+> +#include <crypto/acompress.h>
+>   #include "ubifs.h"
+>   
+>   /* Fake description object for the "none" compressor */
+> @@ -26,11 +26,8 @@ static struct ubifs_compressor none_compr = {
+>   };
+>   
+>   #ifdef CONFIG_UBIFS_FS_LZO
+> -static DEFINE_MUTEX(lzo_mutex);
 > -
->  	err = mlx5_core_enable_hca(dev, 0);
->  	if (err) {
->  		mlx5_core_err(dev, "enable hca failed\n");
-> -		goto stop_health_poll;
-> +		goto err_cmd_cleanup;
->  	}
->  
-> +	mlx5_start_health_poll(dev);
+>   static struct ubifs_compressor lzo_compr = {
+>   	.compr_type = UBIFS_COMPR_LZO,
+> -	.comp_mutex = &lzo_mutex,
+>   	.name = "lzo",
+>   	.capi_name = "lzo",
+>   };
+> @@ -42,13 +39,8 @@ static struct ubifs_compressor lzo_compr = {
+>   #endif
+>   
+>   #ifdef CONFIG_UBIFS_FS_ZLIB
+> -static DEFINE_MUTEX(deflate_mutex);
+> -static DEFINE_MUTEX(inflate_mutex);
+> -
+>   static struct ubifs_compressor zlib_compr = {
+>   	.compr_type = UBIFS_COMPR_ZLIB,
+> -	.comp_mutex = &deflate_mutex,
+> -	.decomp_mutex = &inflate_mutex,
+>   	.name = "zlib",
+>   	.capi_name = "deflate",
+>   };
+> @@ -60,13 +52,8 @@ static struct ubifs_compressor zlib_compr = {
+>   #endif
+>   
+>   #ifdef CONFIG_UBIFS_FS_ZSTD
+> -static DEFINE_MUTEX(zstd_enc_mutex);
+> -static DEFINE_MUTEX(zstd_dec_mutex);
+> -
+>   static struct ubifs_compressor zstd_compr = {
+>   	.compr_type = UBIFS_COMPR_ZSTD,
+> -	.comp_mutex = &zstd_enc_mutex,
+> -	.decomp_mutex = &zstd_dec_mutex,
+>   	.name = "zstd",
+>   	.capi_name = "zstd",
+>   };
+> @@ -80,6 +67,30 @@ static struct ubifs_compressor zstd_compr = {
+>   /* All UBIFS compressors */
+>   struct ubifs_compressor *ubifs_compressors[UBIFS_COMPR_TYPES_CNT];
+>   
+> +static int ubifs_compress_req(const struct ubifs_info *c,
+> +			      struct acomp_req *req,
+> +			      void *out_buf, int *out_len,
+> +			      const char *compr_name)
+> +{
+> +	struct crypto_wait wait;
+> +	int in_len = req->slen;
+> +	int dlen = *out_len;
+> +	int err;
 > +
->  	err = mlx5_core_set_issi(dev);
->  	if (err) {
->  		mlx5_core_err(dev, "failed to set issi\n");
-> -		goto err_disable_hca;
-> +		goto stop_health_poll;
->  	}
->  
->  	err = mlx5_satisfy_startup_pages(dev, 1);
->  	if (err) {
->  		mlx5_core_err(dev, "failed to allocate boot pages\n");
-> -		goto err_disable_hca;
-> +		goto stop_health_poll;
->  	}
->  
->  	err = mlx5_tout_query_dtor(dev);
-> @@ -1235,10 +1235,9 @@ static int mlx5_function_enable(struct mlx5_core_dev *dev, bool boot, u64 timeou
->  
->  reclaim_boot_pages:
->  	mlx5_reclaim_startup_pages(dev);
-> -err_disable_hca:
-> -	mlx5_core_disable_hca(dev, 0);
->  stop_health_poll:
->  	mlx5_stop_health_poll(dev, boot);
-> +	mlx5_core_disable_hca(dev, 0);
->  err_cmd_cleanup:
->  	mlx5_cmd_set_state(dev, MLX5_CMDIF_STATE_DOWN);
->  	mlx5_cmd_disable(dev);
-> @@ -1249,8 +1248,8 @@ static int mlx5_function_enable(struct mlx5_core_dev *dev, bool boot, u64 timeou
->  static void mlx5_function_disable(struct mlx5_core_dev *dev, bool boot)
->  {
->  	mlx5_reclaim_startup_pages(dev);
-> -	mlx5_core_disable_hca(dev, 0);
->  	mlx5_stop_health_poll(dev, boot);
-> +	mlx5_core_disable_hca(dev, 0);
->  	mlx5_cmd_set_state(dev, MLX5_CMDIF_STATE_DOWN);
->  	mlx5_cmd_disable(dev);
->  }
+> +	dlen = min(dlen, in_len - UBIFS_MIN_COMPRESS_DIFF);
+> +
+> +	crypto_init_wait(&wait);
+> +	acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+> +				   crypto_req_done, &wait);
+> +	acomp_request_set_dst_dma(req, out_buf, dlen);
+> +	err = crypto_acomp_compress(req);
+> +	err = crypto_wait_req(err, &wait);
+> +	*out_len = req->dlen;
+> +	acomp_request_free(req);
+> +
+> +	return err;
+> +}
+> +
+>   /**
+>    * ubifs_compress - compress data.
+>    * @c: UBIFS file-system description object
+> @@ -112,23 +123,14 @@ void ubifs_compress(const struct ubifs_info *c, const void *in_buf,
+>   	if (in_len < UBIFS_MIN_COMPR_LEN)
+>   		goto no_compr;
+>   
+> -	if (compr->comp_mutex)
+> -		mutex_lock(compr->comp_mutex);
+> -	err = crypto_comp_compress(compr->cc, in_buf, in_len, out_buf,
+> -				   (unsigned int *)out_len);
+> -	if (compr->comp_mutex)
+> -		mutex_unlock(compr->comp_mutex);
+> -	if (unlikely(err)) {
+> -		ubifs_warn(c, "cannot compress %d bytes, compressor %s, error %d, leave data uncompressed",
+> -			   in_len, compr->name, err);
+> -		goto no_compr;
+> +	{
+> +		ACOMP_REQUEST_ALLOC(req, compr->cc, GFP_NOFS | __GFP_NOWARN);
+> +
+> +		acomp_request_set_src_nondma(req, in_buf, in_len);
+> +		err = ubifs_compress_req(c, req, out_buf, out_len, compr->name);
+>   	}
+>   
+> -	/*
+> -	 * If the data compressed only slightly, it is better to leave it
+> -	 * uncompressed to improve read speed.
+> -	 */
+> -	if (in_len - *out_len < UBIFS_MIN_COMPRESS_DIFF)
+> +	if (err)
+>   		goto no_compr;
+>   
+>   	return;
+> @@ -139,6 +141,31 @@ void ubifs_compress(const struct ubifs_info *c, const void *in_buf,
+>   	*compr_type = UBIFS_COMPR_NONE;
+>   }
+>   
+> +static int ubifs_decompress_req(const struct ubifs_info *c,
+> +				struct acomp_req *req,
+> +				const void *in_buf, int in_len, int *out_len,
+> +				const char *compr_name)
+> +{
+> +	struct crypto_wait wait;
+> +	int err;
+> +
+> +	crypto_init_wait(&wait);
+> +	acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+> +				   crypto_req_done, &wait);
+> +	acomp_request_set_src_dma(req, in_buf, in_len);
+> +	err = crypto_acomp_decompress(req);
+> +	err = crypto_wait_req(err, &wait);
+> +	*out_len = req->dlen;
+> +
+> +	if (err)
+> +		ubifs_err(c, "cannot decompress %d bytes, compressor %s, error %d",
+> +			  in_len, compr_name, err);
+> +
+> +	acomp_request_free(req);
+> +
+> +	return err;
+> +}
+> +
+>   /**
+>    * ubifs_decompress - decompress data.
+>    * @c: UBIFS file-system description object
+> @@ -155,7 +182,6 @@ void ubifs_compress(const struct ubifs_info *c, const void *in_buf,
+>   int ubifs_decompress(const struct ubifs_info *c, const void *in_buf,
+>   		     int in_len, void *out_buf, int *out_len, int compr_type)
+>   {
+> -	int err;
+>   	struct ubifs_compressor *compr;
+>   
+>   	if (unlikely(compr_type < 0 || compr_type >= UBIFS_COMPR_TYPES_CNT)) {
+> @@ -176,17 +202,13 @@ int ubifs_decompress(const struct ubifs_info *c, const void *in_buf,
+>   		return 0;
+>   	}
+>   
+> -	if (compr->decomp_mutex)
+> -		mutex_lock(compr->decomp_mutex);
+> -	err = crypto_comp_decompress(compr->cc, in_buf, in_len, out_buf,
+> -				     (unsigned int *)out_len);
+> -	if (compr->decomp_mutex)
+> -		mutex_unlock(compr->decomp_mutex);
+> -	if (err)
+> -		ubifs_err(c, "cannot decompress %d bytes, compressor %s, error %d",
+> -			  in_len, compr->name, err);
+> +	{
+> +		ACOMP_REQUEST_ALLOC(req, compr->cc, GFP_NOFS | __GFP_NOWARN);
+>   
+> -	return err;
+> +		acomp_request_set_dst_nondma(req, out_buf, *out_len);
+> +		return ubifs_decompress_req(c, req, in_buf, in_len, out_len,
+> +					    compr->name);
+> +	}
+>   }
+>   
+>   /**
+> @@ -199,7 +221,7 @@ int ubifs_decompress(const struct ubifs_info *c, const void *in_buf,
+>   static int __init compr_init(struct ubifs_compressor *compr)
+>   {
+>   	if (compr->capi_name) {
+> -		compr->cc = crypto_alloc_comp(compr->capi_name, 0, 0);
+> +		compr->cc = crypto_alloc_acomp(compr->capi_name, 0, 0);
+>   		if (IS_ERR(compr->cc)) {
+>   			pr_err("UBIFS error (pid %d): cannot initialize compressor %s, error %ld",
+>   			       current->pid, compr->name, PTR_ERR(compr->cc));
+> @@ -218,7 +240,7 @@ static int __init compr_init(struct ubifs_compressor *compr)
+>   static void compr_exit(struct ubifs_compressor *compr)
+>   {
+>   	if (compr->capi_name)
+> -		crypto_free_comp(compr->cc);
+> +		crypto_free_acomp(compr->cc);
+>   }
+>   
+>   /**
+> diff --git a/fs/ubifs/journal.c b/fs/ubifs/journal.c
+> index 36ba79fbd2ff..7629ca9ecfe8 100644
+> --- a/fs/ubifs/journal.c
+> +++ b/fs/ubifs/journal.c
+> @@ -1625,7 +1625,7 @@ static int truncate_data_node(const struct ubifs_info *c, const struct inode *in
+>   	int err, dlen, compr_type, out_len, data_size;
+>   
+>   	out_len = le32_to_cpu(dn->size);
+> -	buf = kmalloc_array(out_len, WORST_COMPR_FACTOR, GFP_NOFS);
+> +	buf = kmalloc(out_len, GFP_NOFS);
+>   	if (!buf)
+>   		return -ENOMEM;
+>   
+> diff --git a/fs/ubifs/ubifs.h b/fs/ubifs/ubifs.h
+> index 3375bbe0508c..7d0aaf5d2e23 100644
+> --- a/fs/ubifs/ubifs.h
+> +++ b/fs/ubifs/ubifs.h
+> @@ -124,13 +124,6 @@
+>   #define OLD_ZNODE_AGE 20
+>   #define YOUNG_ZNODE_AGE 5
+>   
+> -/*
+> - * Some compressors, like LZO, may end up with more data then the input buffer.
+> - * So UBIFS always allocates larger output buffer, to be sure the compressor
+> - * will not corrupt memory in case of worst case compression.
+> - */
+> -#define WORST_COMPR_FACTOR 2
+> -
+>   #ifdef CONFIG_FS_ENCRYPTION
+>   #define UBIFS_CIPHER_BLOCK_SIZE FSCRYPT_CONTENTS_ALIGNMENT
+>   #else
+> @@ -141,7 +134,7 @@
+>    * How much memory is needed for a buffer where we compress a data node.
+>    */
+>   #define COMPRESSED_DATA_NODE_BUF_SZ \
+> -	(UBIFS_DATA_NODE_SZ + UBIFS_BLOCK_SIZE * WORST_COMPR_FACTOR)
+> +	(UBIFS_DATA_NODE_SZ + UBIFS_BLOCK_SIZE)
+>   
+>   /* Maximum expected tree height for use by bottom_up_buf */
+>   #define BOTTOM_UP_HEIGHT 64
+> @@ -835,16 +828,12 @@ struct ubifs_node_range {
+>    * struct ubifs_compressor - UBIFS compressor description structure.
+>    * @compr_type: compressor type (%UBIFS_COMPR_LZO, etc)
+>    * @cc: cryptoapi compressor handle
+> - * @comp_mutex: mutex used during compression
+> - * @decomp_mutex: mutex used during decompression
+>    * @name: compressor name
+>    * @capi_name: cryptoapi compressor name
+>    */
+>   struct ubifs_compressor {
+>   	int compr_type;
+> -	struct crypto_comp *cc;
+> -	struct mutex *comp_mutex;
+> -	struct mutex *decomp_mutex;
+> +	struct crypto_acomp *cc;
+>   	const char *name;
+>   	const char *capi_name;
+>   };
+> 
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-
-> -- 
-> 2.31.1
 
