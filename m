@@ -1,82 +1,164 @@
-Return-Path: <netdev+bounces-175983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B07A7A68303
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 03:08:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92DBDA6832C
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 03:33:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C8E31897F14
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 02:09:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32AD216C5CF
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 02:33:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DC7120CCDF;
-	Wed, 19 Mar 2025 02:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7FBA20E01A;
+	Wed, 19 Mar 2025 02:33:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ywsqw3sn"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="JdzJkkTE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02F5185626;
-	Wed, 19 Mar 2025 02:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 852B04A0F;
+	Wed, 19 Mar 2025 02:33:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742350132; cv=none; b=sa1E1o4iyryaVjiodVFt466VuE2GtIHh35+bFSJ7Jcx/0AfQmnVNtupwHLQu/JcH7JzVqGqLstlk5COUHVEqW/z6voW8C7znZcDWdbaQ95oiV7HYWc2Pjap7cew+9nKKHLSIqJFjT+TWfgSKBgMoG5P2dcWtYmOyfMRaia8BCJ4=
+	t=1742351598; cv=none; b=F+DiaLdeZ/ss+HY6zktsAgCbov6alDAs7xA5Dagj5L9OWnu3BwgNzXLEgr5bvNRnC1uI4NVA410zJlpJI3lvXjrXJqOEmM0xEGDu2Cnp8P6CFcfoR9s6MadHKgas8GfLijaWymOXt+NAXhIFQ6wyUYhA79A+qzWfxVIODd/AbQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742350132; c=relaxed/simple;
-	bh=cDziYvmW2mLbrw0ZPswXeZcjuNrMUpHD10f7WBd5At8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IUgZ4jcApfRY0V8TBiukPU1H6xC57JwDi26pdB7xZqXJm6XGkQ1DiaHAGBpD6RzyApL6bNv4aKMzaVEHAJB5ywG9XCoeVmfpXaJQ345Emy5RuSM1yRBOtKKbYrYckk+6t09g2tYju6P+mY/RBn/2xrIYT3qz0FXnpeQzoZ1U89Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ywsqw3sn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07E92C4CEDD;
-	Wed, 19 Mar 2025 02:08:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742350131;
-	bh=cDziYvmW2mLbrw0ZPswXeZcjuNrMUpHD10f7WBd5At8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ywsqw3snI5l+Z4y2+cCrRSwsAgaWDwaYcV72OMsT+I89xYZtXeGLRsfHR72BBX7bV
-	 G/w8iudewnQcMKMRtlZsPqq1xjzOtig/Of7o0LGaehg2F/YO584stAeMbAasGsPODU
-	 QP3hN5VD4iA0p8XonhSA/SMeT7yuKdoHhSh1nUy/yI1BLuxKtYIylLrumcCsC8EstC
-	 qEkjee5f378HEphkdJmr/ybBbwsc6v+hNxk6MdMN1e3bSfO9NLfeU7W1wBs4P2You6
-	 bkzTBM3RniTN3iZ5KmTGzH9TmfKxIhld8AYoajXj6pi9IHzEOVHCR6Py4Morh5hSHP
-	 cAPoERu9OfuJA==
-Message-ID: <fe5947e2-8a91-48f5-9037-f3a48b55fbd6@kernel.org>
-Date: Tue, 18 Mar 2025 20:08:50 -0600
+	s=arc-20240116; t=1742351598; c=relaxed/simple;
+	bh=6xL28zKwqqpaaQr96mvoCi/cHiNgZCp4DtV4hOlawxM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=g4OUNEREObpY52jt1DNHy/M8rNzXghDR2FsN0qXXTrpxKAe1YgYLhTNDdnA+6O9oKDLIcN+xh36g01tN0L+KLkp2kzKmm0LT7jr25dw9rqzoJ5m34V1cENiKfCaeglj1xfpUjgrwOmAsZsa9tNMwRTZJTRuWy/HrhF5Wg6rPSGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=JdzJkkTE; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1742351591;
+	bh=rKs3jHDYafir4OmGXqHNXlXukWNzDtXkTOv1IbjF/rA=;
+	h=Date:From:To:Cc:Subject:From;
+	b=JdzJkkTER65/Vsm2h1n9ZFEsXDB8dvCYrScSh/NX2Ueb4pVCvwkemrdXY+A6Q8E4E
+	 tcBth4Zjzk6IdvAA8e7JM1yovhe3mYvQPOeElcFJ+Vs4gW+/1j/2XzINnAWnTIs7sp
+	 C+VlMQqI5237+aaWEScypKrdX9CbkixZh9+9ZqIg0nVDO5PC01f3rl0pKjcNvQ6QJu
+	 GoRyfMSmVYosvbqnxVby+T5JPvqAKXB1LyL3SWphmPDSYi6YIiB0Jm1kyPSuYJbnKk
+	 oFiz9nTqG3xZg782pPYJOHs0E4ZcC5DqOYwTLv5yskNGlYrBZvW/WnvVsjaScVEqaA
+	 AO0JBUdUg4CRA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4ZHXnM1pZkz4x21;
+	Wed, 19 Mar 2025 13:33:10 +1100 (AEDT)
+Date: Wed, 19 Mar 2025 13:33:09 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
+ <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>
+Cc: Uros Bizjak <ubizjak@gmail.com>, bpf <bpf@vger.kernel.org>, Networking
+ <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: build failure after merge of the bpf-next tree
+Message-ID: <20250319133309.6fce6404@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: fix NULL pointer dereference in l3mdev_l3_rcv
-Content-Language: en-US
-To: Wang Liang <wangliang74@huawei.com>, Simon Horman <horms@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, fw@strlen.de, daniel@iogearbox.net,
- yuehaibing@huawei.com, zhangchangzhong@huawei.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250313012713.748006-1-wangliang74@huawei.com>
- <20250318143800.GA688833@kernel.org>
- <e8da7ce4-c76c-488e-80cb-dff95bf00fe0@kernel.org>
- <94a34aa3-a823-4550-b16a-179e6f6d6292@huawei.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <94a34aa3-a823-4550-b16a-179e6f6d6292@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="Sig_/4j/4fli8+U065xjQkm.vCz=";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On 3/18/25 3:07 AM, Wang Liang wrote:
->>> It seems to me that checking master->l3mdev_ops like this is racy.
->> vrf device leaves the l3mdev ops set; that is probably the better way
->> to go.
-> 
-> Thanks.
-> 
-> Only l3s ipvlan set the dev->l3mdev_ops to NULL at present, I will delete
-> 'dev->l3mdev_ops = NULL' in ipvlan_l3s_unregister(), is that ok?
-> 
+--Sig_/4j/4fli8+U065xjQkm.vCz=
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-I think that avoids the race you saw. vrf has had the ops for 9 years or
-so and not seen that problem.
+Hi all,
+
+After merging the bpf-next tree, today's linux-next build (x86_64
+allmodconfig) failed like this:
+
+In file included from include/asm-generic/percpu.h:7,
+                 from arch/x86/include/asm/percpu.h:630,
+                 from arch/x86/include/asm/preempt.h:6,
+                 from include/linux/preempt.h:79,
+                 from include/linux/smp.h:116,
+                 from kernel/locking/qspinlock.c:16:
+kernel/locking/qspinlock.h: In function 'decode_tail':
+include/linux/percpu-defs.h:219:45: error: initialization from pointer to n=
+on-enclosed address space
+  219 |         const void __percpu *__vpp_verify =3D (typeof((ptr) + 0))NU=
+LL;    \
+      |                                             ^
+include/linux/percpu-defs.h:237:9: note: in expansion of macro '__verify_pc=
+pu_ptr'
+  237 |         __verify_pcpu_ptr(ptr);                                    =
+     \
+      |         ^~~~~~~~~~~~~~~~~
+kernel/locking/qspinlock.h:67:16: note: in expansion of macro 'per_cpu_ptr'
+   67 |         return per_cpu_ptr(&qnodes[idx].mcs, cpu);
+      |                ^~~~~~~~~~~
+include/linux/percpu-defs.h:219:45: note: expected 'const __seg_gs void *' =
+but pointer is of type 'struct mcs_spinlock *'
+  219 |         const void __percpu *__vpp_verify =3D (typeof((ptr) + 0))NU=
+LL;    \
+      |                                             ^
+include/linux/percpu-defs.h:237:9: note: in expansion of macro '__verify_pc=
+pu_ptr'
+  237 |         __verify_pcpu_ptr(ptr);                                    =
+     \
+      |         ^~~~~~~~~~~~~~~~~
+kernel/locking/qspinlock.h:67:16: note: in expansion of macro 'per_cpu_ptr'
+   67 |         return per_cpu_ptr(&qnodes[idx].mcs, cpu);
+      |                ^~~~~~~~~~~
+kernel/locking/qspinlock.c: In function 'native_queued_spin_lock_slowpath':
+kernel/locking/qspinlock.c:285:41: error: passing argument 2 of 'decode_tai=
+l' from pointer to non-enclosed address space
+  285 |                 prev =3D decode_tail(old, qnodes);
+      |                                         ^~~~~~
+In file included from kernel/locking/qspinlock.c:30:
+kernel/locking/qspinlock.h:62:79: note: expected 'struct qnode *' but argum=
+ent is of type '__seg_gs struct qnode *'
+   62 | static inline __pure struct mcs_spinlock *decode_tail(u32 tail, str=
+uct qnode *qnodes)
+      |                                                                 ~~~=
+~~~~~~~~~~~^~~~~~
+In file included from kernel/locking/qspinlock.c:401:
+kernel/locking/qspinlock.c: In function '__pv_queued_spin_lock_slowpath':
+kernel/locking/qspinlock.c:285:41: error: passing argument 2 of 'decode_tai=
+l' from pointer to non-enclosed address space
+  285 |                 prev =3D decode_tail(old, qnodes);
+      |                                         ^~~~~~
+kernel/locking/qspinlock.h:62:79: note: expected 'struct qnode *' but argum=
+ent is of type '__seg_gs struct qnode *'
+   62 | static inline __pure struct mcs_spinlock *decode_tail(u32 tail, str=
+uct qnode *qnodes)
+      |                                                                 ~~~=
+~~~~~~~~~~~^~~~~~
+
+Caused by the resilient-queued-spin-lock branch of the bpf-next tree
+interacting with the "Enable strict percpu address space checks" series
+form the mm-stable tree.
+
+I don't know why this happens, but reverting that branch inf the bpf-next
+tree makes the failure go away, so I have done that for today.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/4j/4fli8+U065xjQkm.vCz=
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmfaLOUACgkQAVBC80lX
+0GxA1Af8ClVgV4Tw7MRGpMw9u4BMEfuIRZMHArqVyDjMpZH+kqPVLcvr17FpQ5VG
+y0TKdNRYPfRSraCkhl9p/Vl79IbyVDmO67c3yJW2XuzuL8+b4QS1UOcyG9Z5k/sG
+z4I1ydwEj9forxebZMporvffFG16/wcHu63Uhv7JU0ZpNRTOWCyDev8qybUX/SC8
+qNQX/3Tlf0RLwpp0IZk/DKNhJiDfDTqVpGXrGjFAsGahX2PjfFJjX/BF1UtrLFpr
+w8lxwN61a+O0a/8BgRJ2tFQrKIK/Y8snhUr2Q1FqwQ6sKsZyFk1k6Oujjz2/dOGL
+NcgN8V8EYTn3l/lkloycRKyvkQHBuQ==
+=FYd3
+-----END PGP SIGNATURE-----
+
+--Sig_/4j/4fli8+U065xjQkm.vCz=--
 
