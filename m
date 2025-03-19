@@ -1,171 +1,121 @@
-Return-Path: <netdev+bounces-176313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F761A69B3C
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 22:51:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8144A69B3D
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 22:51:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23DA219C10AF
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 21:51:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74B308A87AC
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 21:51:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11D21215171;
-	Wed, 19 Mar 2025 21:51:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B02BC219A97;
+	Wed, 19 Mar 2025 21:51:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R0xiSVGQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from maynard.decadent.org.uk (maynard.decadent.org.uk [65.21.191.19])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B31722135C1
-	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 21:51:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.21.191.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF88B219A67
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 21:51:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742421072; cv=none; b=YZ6Wy9EYQpNbeu8Ax+7BwEVBcoc/CgMXb4QBalCueKqKEQ2Sdbw1StGLeorV0v0ZHl5q1hMja+DuBRiTRwvMJuVVzQ0vgxX/4M6P10tWtSa4TQaELdQJsNzuybygnsLbiJToV913TehxK4lM28bb1SwKNDzCpzZ/aBQ7qBokoTc=
+	t=1742421074; cv=none; b=PWz47THBdwAo/VJlPL74wZwvYCy1eipCBm33az3xav/tww3jp0oPXl+O4Sz3y0AZR7eZMxf1JxPpchzcLnHAK+anziwRUZw4utTd76HCrjXxaaOIqcooKuLB/uAcGIrBOT13CCWEBXb7m5H0YJNpuzNvaeTLezUClC5c7WwozfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742421072; c=relaxed/simple;
-	bh=tzIoAGCH1Y1W7YZr8XV1x/E0ijK83jlaKqCdA8ijs98=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=NNYiC1tMgUAPJvxR3dYIItHlaqMKCM0evrKsrRjUCsR5kSl0OWpvV9RTVN2o36M8PuDdS6eN4fPLkTYaFSL4AJX/MwNjfY1QaDK5UbqSzb6vdEZbLtDqJZueGfcExmIcDhTc5inXu5FFf6NC/Fynf57fSnlWk1vpVvD7ysUl6Cw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=decadent.org.uk; arc=none smtp.client-ip=65.21.191.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=decadent.org.uk
-Received: from [2a02:578:851f:1502:391e:c5f5:10e2:b9a3] (helo=deadeye)
-	by maynard with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ben@decadent.org.uk>)
-	id 1tv1JW-009oef-1X;
-	Wed, 19 Mar 2025 21:51:02 +0000
-Received: from ben by deadeye with local (Exim 4.98)
-	(envelope-from <ben@decadent.org.uk>)
-	id 1tv1JV-00000002bKa-0ivC;
-	Wed, 19 Mar 2025 22:51:01 +0100
-Date: Wed, 19 Mar 2025 22:51:01 +0100
-From: Ben Hutchings <benh@debian.org>
-To: netdev@vger.kernel.org
-Cc: 1088739@bugs.debian.org
-Subject: [PATCH iproute2 1/2] color: Introduce and use default_color_opt()
- function
-Message-ID: <Z9s8RSix3wtE8QPf@decadent.org.uk>
+	s=arc-20240116; t=1742421074; c=relaxed/simple;
+	bh=9AcDbLMxeWpZbncq8GxGRZQgFvTcdZytYIEX2q2FJOM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QIMWWpJ3ymEbXbziSZ5t/qRuIYcLtGxhLeKJXCx5K/ccXgWzz4oq7Y+WmzaIyswpeYtFNQq1klarCQcNaSRd9elpbcDgkhACSkNbjaLOXXbGaRTXtMarnKnq1dLdbsDsADWs7b2N5QFbQqaNlLB9lpudtLNqwu/0jd0/Kls4BHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R0xiSVGQ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742421071;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qTBfEOflOyN9LSTymaLKZz6lkixLefi6Hp47M0DpKrc=;
+	b=R0xiSVGQTQPFIVLr/wWHCP3h65aC4sxPp7YFJ9hwBfXAuso8L3mnY7jo/XXw1Uv6gRsbVz
+	1Cz+lIPzn543AU3CuA3sNi+ER7E+z3yhuVOdha4aj8Hr4PawtcBfgCjmIgYHKAHXyJLC7J
+	hcA38qZd04ky7vwALq6lN0/KRk8gTJc=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-649-BHp23ZJ9PZKlLwfb70mwpQ-1; Wed, 19 Mar 2025 17:51:10 -0400
+X-MC-Unique: BHp23ZJ9PZKlLwfb70mwpQ-1
+X-Mimecast-MFC-AGG-ID: BHp23ZJ9PZKlLwfb70mwpQ_1742421068
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43d22c304adso5305645e9.0
+        for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 14:51:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742421068; x=1743025868;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qTBfEOflOyN9LSTymaLKZz6lkixLefi6Hp47M0DpKrc=;
+        b=WEvtUlCb+LqTpf7mj5tOdJXw1iDyzr9pMAvtnQWr1pnMyvnUqxlcvLos11oH5UIOML
+         4i9R7TDWT9jh18qI8iRNFgR6AjhkOriVdPXaZ4V+e8PIWpd7pa32ZBYBENWX8jWoxyXY
+         AmGgupNcnNAr24Uf8I2WKubA0X7E4C8fOVE3FJYT4b18QO1rC11CROuCoCFJ8g2GyYCF
+         Twe0IIskNokMUBSq6LTXXHAyY/KWCBbJtzZ1CTFjZyLB276SlNQt+1zvFKmqxzl9KSq+
+         wnSeSvbzgJMeGH8RTFRwi+FDRpfPl4uIf2khoZyNnsTA5LQ3iNKONGcu5N/pSda9ydZG
+         f/Ow==
+X-Gm-Message-State: AOJu0Ywk3oJFTn9eL/FNQV0Xss/W2KhjskTs89orcJS1+erBeknitats
+	IZR2DAKEaKtZM+PKLxxo7VJ3VIwfZOdtLydtKZRPj0I6wGJZPBdkazMD3R03nCICfmJMuOgKRkk
+	DWwMR1RyaMWY1ovyHSTvmVz3vANZrE9JLX947yPUu43Ql2SsJu2W9DA==
+X-Gm-Gg: ASbGncuGzg70UYIqEtqEwHzcR6bdJCc1dI53a4rgZMEjUmImtOV5eqTIuV+WcGZ0gso
+	FL92H9ODzAQT+qO3VQvqKYACM/4o8q/+2WJwX0FcMS8oWXQnWVzhEKvAyWcvMbVoXoO3WG5CgTc
+	RGrhQIZ85+DU5WuUVQ3VMWrhDC5IB5LLvZVDXdViU8H4IsQlqgz9IfffberJaQNKv63PEHVgvJB
+	VsqXxPBmguVaVirFbKJ75LGOlI4HV2H0uusbqh9WSIywwUzbBXX1qBXmqHA/dd3fYldKVSaY4Vw
+	fs/8W35/JIS5uiF3l0oyxGGzisTzgf2D7g2l0VY+h0c00Q==
+X-Received: by 2002:a05:6000:1a86:b0:391:2e6a:30fa with SMTP id ffacd0b85a97d-3997959cc2amr784896f8f.27.1742421068023;
+        Wed, 19 Mar 2025 14:51:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFU2w0WSmJqJ1ufbRJ0ypCJuntkV6cjNYBqt4Gss5MO+N1ZPZ9SWHPK8nxdfnD1FqbinTU57w==
+X-Received: by 2002:a05:6000:1a86:b0:391:2e6a:30fa with SMTP id ffacd0b85a97d-3997959cc2amr784885f8f.27.1742421067595;
+        Wed, 19 Mar 2025 14:51:07 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-10-172.dyn.eolo.it. [146.241.10.172])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395cb318a5fsm22355449f8f.79.2025.03.19.14.51.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Mar 2025 14:51:07 -0700 (PDT)
+Message-ID: <5d8c2b59-44ba-4444-9cd5-5ba70ba55f32@redhat.com>
+Date: Wed, 19 Mar 2025 22:51:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="IGA8HJnxP42oWw4V"
-Content-Disposition: inline
-X-SA-Exim-Connect-IP: 2a02:578:851f:1502:391e:c5f5:10e2:b9a3
-X-SA-Exim-Mail-From: ben@decadent.org.uk
-X-SA-Exim-Scanned: No (on maynard); SAEximRunCond expanded to false
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 09/11] net: designate XSK pool pointers in queues
+ as "ops protected"
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
+ horms@kernel.org, sdf@fomichev.me
+References: <20250312223507.805719-1-kuba@kernel.org>
+ <20250312223507.805719-10-kuba@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250312223507.805719-10-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 3/12/25 11:35 PM, Jakub Kicinski wrote:
+> diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
+> index 14716ad3d7bc..60b3adb7b2d7 100644
+> --- a/net/xdp/xsk_buff_pool.c
+> +++ b/net/xdp/xsk_buff_pool.c
+> @@ -279,9 +279,12 @@ static void xp_release_deferred(struct work_struct *work)
+>  {
+>  	struct xsk_buff_pool *pool = container_of(work, struct xsk_buff_pool,
+>  						  work);
+> +	struct net_device *netdev = pool->netdev;
+>  
+>  	rtnl_lock();
+> +	netdev_lock_ops(netdev);
 
---IGA8HJnxP42oWw4V
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I agree with Stan, NULL ptr deref. looks possible here.
 
-As a preparatory step for supporting the NO_COLOR environment
-variable, replace the direct use of CONF_COLOR with a
-default_color_opt() function which initially returns CONF_COLOR.
+/P
 
-Signed-off-by: Ben Hutchings <benh@debian.org>
----
- bridge/bridge.c | 2 +-
- include/color.h | 1 +
- ip/ip.c         | 2 +-
- lib/color.c     | 5 +++++
- tc/tc.c         | 2 +-
- 5 files changed, 9 insertions(+), 3 deletions(-)
-
-diff --git a/bridge/bridge.c b/bridge/bridge.c
-index f8b5646a..d993ba19 100644
---- a/bridge/bridge.c
-+++ b/bridge/bridge.c
-@@ -103,7 +103,7 @@ static int batch(const char *name)
- int
- main(int argc, char **argv)
- {
--	int color =3D CONF_COLOR;
-+	int color =3D default_color_opt();
-=20
- 	while (argc > 1) {
- 		const char *opt =3D argv[1];
-diff --git a/include/color.h b/include/color.h
-index 17ec56f3..b543c267 100644
---- a/include/color.h
-+++ b/include/color.h
-@@ -20,6 +20,7 @@ enum color_opt {
- 	COLOR_OPT_ALWAYS =3D 2
- };
-=20
-+int default_color_opt(void);
- bool check_enable_color(int color, int json);
- bool matches_color(const char *arg, int *val);
- int color_fprintf(FILE *fp, enum color_attr attr, const char *fmt, ...);
-diff --git a/ip/ip.c b/ip/ip.c
-index c7151fbd..e4b71bde 100644
---- a/ip/ip.c
-+++ b/ip/ip.c
-@@ -166,7 +166,7 @@ int main(int argc, char **argv)
- 	const char *libbpf_version;
- 	char *batch_file =3D NULL;
- 	char *basename;
--	int color =3D CONF_COLOR;
-+	int color =3D default_color_opt();
-=20
- 	/* to run vrf exec without root, capabilities might be set, drop them
- 	 * if not needed as the first thing.
-diff --git a/lib/color.c b/lib/color.c
-index cd0f9f75..5c4cc329 100644
---- a/lib/color.c
-+++ b/lib/color.c
-@@ -81,6 +81,11 @@ static void enable_color(void)
- 	set_color_palette();
- }
-=20
-+int default_color_opt(void)
-+{
-+	return CONF_COLOR;
-+}
-+
- bool check_enable_color(int color, int json)
- {
- 	if (json || color =3D=3D COLOR_OPT_NEVER)
-diff --git a/tc/tc.c b/tc/tc.c
-index beb88111..0fc658c8 100644
---- a/tc/tc.c
-+++ b/tc/tc.c
-@@ -254,7 +254,7 @@ int main(int argc, char **argv)
- {
- 	const char *libbpf_version;
- 	char *batch_file =3D NULL;
--	int color =3D CONF_COLOR;
-+	int color =3D default_color_opt();
- 	int ret;
-=20
- 	while (argc > 1) {
-
-
---IGA8HJnxP42oWw4V
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAmfbPEAACgkQ57/I7JWG
-EQkkrBAAoo9d7QqJWKzLHUY7MW2dbqH6PMkQn9RxVhL+kwcRxJFOw6aSCB/wwz/T
-66s9PCEmST0fJakN4NPhNllkhGe/g71RRLs5k9WroRNPuKLOQKkDflyYnxDerWbm
-iKy9CZAtyqZ6BueYCqKYZ9QyWwAvxnc3juLzd21te1b71ZS+jwRr56fdnITjIf9f
-1YaMIOpBsrjEy5MRtoQ3HztCMRxdZXPs6Xkv4+6hhPulz06RUUW4TjTT/unPhxzm
-3xDkHNeFbkkJ++B/a3uXxY6PyH03DewaHNpIGtIwCYDmndzsZFX1vdGkGI8LvhD8
-KkMl++sEzw8TzqgjFs4aBTwrwdZ+q814M5l6NzMyCj2VHRNpMladmRbVDs8piAmF
-3drtbWOvCRYj+ukbjzGG69FSyt+LCM6JTmV2W+LQz0U+7AwkShCpmclKEMOPut+t
-lUtg8AZnYHfsADtvHr0Tc21McJ9WRLClSU4YTCohL/8usBsPB3m9wRWUyGoi2KR2
-4GxiVJ35eiyAI4eD76WaCj6m9HQVDWNa5SXA+15l0cw6qloIStrl1kIwK0SBoHJO
-3Na1c5P4YlPGzjoc/tfJjxtUUlR29DyRnGQ0s7RmsILiuiwXEuPmk3aBpQUQCtwz
-Gar3FkWl/92/YzKzgPOjqI5QQMJQj1byoiMTmgJhvc+1roTe6QY=
-=UrRu
------END PGP SIGNATURE-----
-
---IGA8HJnxP42oWw4V--
 
