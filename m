@@ -1,243 +1,270 @@
-Return-Path: <netdev+bounces-175957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C231A680FE
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 01:01:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FB9CA68119
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 01:14:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CF6F3B47A4
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 00:00:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77CFA188E3B1
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 00:14:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDB1A214A60;
-	Tue, 18 Mar 2025 23:59:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 408EC801;
+	Wed, 19 Mar 2025 00:14:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GBwu1zLD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f7uE20AQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAF04209689;
-	Tue, 18 Mar 2025 23:59:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 858138F6D;
+	Wed, 19 Mar 2025 00:14:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742342379; cv=none; b=BeKU1UZvTnGPIfH1KFZ2oxly3/s8nz1sKo0v/9z8fABIMItRU9OtacXN1UtWSZWqmKIva+k8Ssgb/5vY6wIbp9hEVklPhqoZmJoLHw+6NSha3L9vUjQaW7SRv98rzhoudZPyrZ4gqy0Lmmo5wQBtbUtRXTPrslCsDKjrCesX5Yo=
+	t=1742343246; cv=none; b=oC8CQrpgH5rK0yuj6lKSBkj9QYSnhEE2XpykBsDzLz3mu4WngwMFI6KB5jTxNv6GHO3QQghOChXdvUeAJRs+FZwK/GTb66lL+rWZC8Bv8it5+GjKbwLQT5ifwx36UemH++WTirzcAo3Kll/DBfgLutiMPQH5PigYqyQHLkf327U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742342379; c=relaxed/simple;
-	bh=jFcXF/4dVf1e7vAXuyL5qekxKu5hoLO5I3j0YrY52CI=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Od/aXmWpZFOXZY6DA/Pve5zt1jA0wz5u2wnFSt9EkgDrzeTxEHuk9R9C3YYUP8zAnTn8znf2Aa9az9ObdxljzFjfseFp4MbAaZFccazjQcwpKkK1W0pUc+8XEgPLVlDqFhtUSRkzmLVeNZVBZXGXIia/Cutgq96rliYg52tMzxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GBwu1zLD; arc=none smtp.client-ip=209.85.221.41
+	s=arc-20240116; t=1742343246; c=relaxed/simple;
+	bh=MKV9mldf0+4FyDmj8o9yUY5iaNVxvWM0Ed5a/roJW7Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ct/22OmGuyP0DnmYAFdm7OB8yoBXgGIvW80QKpN4j93b6htSkWvxZAjH/98H59D8NK0DkRodC9nMouZ5cemZepEb2bNEXYIkZ6dK+LG9gcmPuRvTbPHP5EIfF5dMxM2l9jYSLZAzt583XE8rq+wS7mfa9hJaOKpVZ0VDAtia08o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f7uE20AQ; arc=none smtp.client-ip=209.85.166.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3914a5def6bso3373767f8f.1;
-        Tue, 18 Mar 2025 16:59:37 -0700 (PDT)
+Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3d450154245so47113685ab.2;
+        Tue, 18 Mar 2025 17:14:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742342376; x=1742947176; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Cwoa6YEoLumzQE8cS+ad1dIlqWJKYevB3c6NtJXNM8U=;
-        b=GBwu1zLDsh3vk/hwlsKsA7RdcSJaP3/Bs7kKVBkDl9VyUD25g+VXNvgGzxTs4WobgN
-         k/Ph6jJlMFMwye0B9zgeUNc4K/5/RC3WOUeT26T8jx57R65xUi/TWllt30Dgky2YTUJC
-         P8mQYG3UdnwyjaX3/PbgWCOQduO+FhbAzbCp/5SAR2f0C6RyWMiD/7nxbXLbAIf2PDY5
-         kolPQNRHjQiA8wMut4ciQGAGtwmCf19mWdHM8eXme9iXf5rKGRQmpvQrEJMG9vJ6H9W3
-         86p3RQYyykLlxrNeQkwvqKgSZCTPAIhtQAOKPtYB5kO72RpSevCxziCz9N6eDtTTIwaB
-         +oiA==
+        d=gmail.com; s=20230601; t=1742343243; x=1742948043; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X2fi7e9XAXBy8lWgbII5AXZTyL4VEd07+VXnYBp5Ecs=;
+        b=f7uE20AQ8t9+DDB9yseKAaVl9gOfrJtrcV5fbYMKKhDxNswAohxuE4cFvEsz/UzRKm
+         VkK6lWntzYOFooPbbf+l84IGwQ5eZpQ6AqrKxrJuRINFKe8fuTmTDRj/MaxgQWRs0fIx
+         ZOoUpjKKFffVMOO5gWTJzS3BF5KxpzahqCC8e6TWqlS094+HcjUuqacDFIuWcCvsAFrJ
+         x1ilW2GoaJVx69/ZcVUHrHvJkwSVN9UHPBVBU8DHvHF0C/2gEe4Y8cRS31UzUUiNEy1T
+         LuaEE4JAECbjWeBFf75TOSILmPrdNoKdKGtD5TNCIIHgPp4ucTxzDm2Pd2UtlUathUgI
+         yQEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742342376; x=1742947176;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1742343243; x=1742948043;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Cwoa6YEoLumzQE8cS+ad1dIlqWJKYevB3c6NtJXNM8U=;
-        b=QVTRoBmEWh2zlxn9IzwPwUKXczjtNDOr1AH1ExSrGpGb9/mS9M/DX2yX5lPwlbEqRn
-         nrl3+UfW/OgNN4qIy+YwW7b+npTBe8eTysKmIhD4Z9oEoDboHWJfpdLTgLO0svA6c6FO
-         tIYEpugwv9kW48UmeWwalCG6PzPpXYS013p3ZcvIhGpJJPCtoc1XBUiUAyBbR0tDtzQx
-         L/4eQJgNBKCCQuNTAMvkxyLbmLpkD/yI740tatcGkOjFjT25nLpWOOGvHgDV8HOM98eY
-         VbwU4ePt3VND/e/WIOovHDKqRRRr/gPBdh9zicAs0TirLexb9/cAYFUSG9Mt4hWGHvqF
-         eeyg==
-X-Forwarded-Encrypted: i=1; AJvYcCU4Fa0uYsx8n/wd+py51KqyyIfzJrrMqcGmB2M9ETVN95W3eHl6UUCPSMfMCc0usqw+nCyf6FDHmkrpI5WD@vger.kernel.org, AJvYcCWKt2OcXkTXzDqI2aeRFvLVAb7JhcHrSJSoTdgcYm/YdwdBmxrBo5TzDBLjWk96rTrbP+oy2EEO@vger.kernel.org, AJvYcCXVHxULPiqJ8zcd5BnPNFwlrkt+uChG8n0u6aviiLiidyDbxTbPAqwjffYt+cimKDmzDP3mGhHRE//l@vger.kernel.org
-X-Gm-Message-State: AOJu0YxS0lauueUxg+dShi4lmvRYtf0woTLIO4st2XByWYDDTJsWUjD5
-	V6DwLcU9JsQ3NhyxcLcM8Cn9BYgRZPnnNY10JOy85/ZOxhYcEVbq
-X-Gm-Gg: ASbGncvrVmu9tlffC9+tk41HvsLnR+AGe9UWJr0l0YenIY1MVXFaf2b7lLFDLLxynUq
-	+cbGNPQfiUK2PnfPBw1gSMqwj7xq35sQ5SgbTiamEnjRiA7Xlvtrdm4JYnpQf9RHcFpAFdqT7q0
-	4kssaZOifiheswbwgRYP0O/yYSj6vQDA5Pt4G8egO6/5l+oTttzBwPUv8mNj7N8nPz8IDIllwt9
-	97To4iInglfvvM+ZFeFwqfIfVKBi9wEgGkRTDN63vLcMOmCajLhHxKCdiW8oH3UlC9nckIqaJ1a
-	lfjIMTLr6LykxXldYhbIrCUL6YJKJ/3DwG+VkwK9dxi+7Df+iN/jhHWcqeCkwEZONIq/TYqFwTs
-	vmEopn7Phmuwkdw==
-X-Google-Smtp-Source: AGHT+IERNl/pUPey+/B30c2nHPSjciwnTH0tROmHtboEq+44mcIocSnX3h3zJgIyWPMByWTyzCy1fA==
-X-Received: by 2002:a05:6000:42ca:b0:391:10c5:d1a9 with SMTP id ffacd0b85a97d-399739cb99dmr397745f8f.31.1742342376093;
-        Tue, 18 Mar 2025 16:59:36 -0700 (PDT)
-Received: from localhost.localdomain (93-34-90-129.ip49.fastwebnet.it. [93.34.90.129])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-395c83b748bsm19713268f8f.39.2025.03.18.16.59.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Mar 2025 16:59:35 -0700 (PDT)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	upstream@airoha.com
-Subject: [net-next PATCH 6/6] dt-bindings: net: pcs: Document support for Airoha Ethernet PCS
-Date: Wed, 19 Mar 2025 00:58:42 +0100
-Message-ID: <20250318235850.6411-7-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250318235850.6411-1-ansuelsmth@gmail.com>
-References: <20250318235850.6411-1-ansuelsmth@gmail.com>
+        bh=X2fi7e9XAXBy8lWgbII5AXZTyL4VEd07+VXnYBp5Ecs=;
+        b=K83NCOojLlK60oq5tFzc22kX+CGmcyYHzYZ1FCoBuBvrftDvdhmy+75KjuHFFxMFT4
+         ASJ5/iPdcGAtPHIlz2cSFj+hryGKa1ZR5AEwJV8ZtBDCbpsIfoVPH0ZdmdDzboT55KUG
+         zqlSUMF8vki1rUXITasD+lHYakS2ttubWU7PfuHxjVIywgAhj521rCqWVdwZFZSaYqma
+         Mgw5ZELvUGqkS/k89tnUp3RkWiYGlIOwtrTx9mrQLbZSXhL29gF0iZHyDam4K0w6meaV
+         YQsjxmwxTyIzLxat2OqoBOXgVwHlk1KbbmathWbST5QVvsMju4vMXMC+gxocljHziFQ5
+         jC3g==
+X-Forwarded-Encrypted: i=1; AJvYcCUjloUGEOlgXWvkAnrtY0j6k5hgtO9yjJgqN+ZOfInxIxcRaf+ahIyxV6jYiof/sEMspmJT6I0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwuzFJwGNpqkVNEpQrr//rwnGg2aUAXld9vyjrwbkyzUxC6llOh
+	YnilcRtdddwOcIykbVKNqUn80ok+yyGkmHRMo9hVHz2NtJ3Nmr1h2BT3iRLsVhriR36AGyEA5KC
+	UHCt2nZPsZ/nBtqE/X8ZWUQFpVzNb9qMw
+X-Gm-Gg: ASbGncuk8NmuMuutYKjMO7xK1kw4yGvZkFcxXuhIzStfb6BbYKqvOgWjfc3yjJrt/St
+	MW+E1diZ2aLctw8AyDCWRbfhr8RVTr3Tf7IwYVUqqa2ezUbzvQYdOELtPxdMYwQDRaqKnbAB4y2
+	wCcsxpaUZwFpmPRCwXfjXGH7oe8QICDqQFOtA=
+X-Google-Smtp-Source: AGHT+IE3gSCH9UrTcfxJRC0OGpuf/+vx1CqPVrvnShQCtYDOtQq48MC7EjkJveX0rCxuXIiH9HKa5jX0znahwJbSs2A=
+X-Received: by 2002:a05:6e02:1a47:b0:3d1:92fc:fb45 with SMTP id
+ e9e14a558f8ab-3d586b243e3mr7670635ab.5.1742343243477; Tue, 18 Mar 2025
+ 17:14:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1742324341.git.pav@iki.fi> <0dfb22ec3c9d9ed796ba8edc919a690ca2fb1fdd.1742324341.git.pav@iki.fi>
+In-Reply-To: <0dfb22ec3c9d9ed796ba8edc919a690ca2fb1fdd.1742324341.git.pav@iki.fi>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 19 Mar 2025 08:13:27 +0800
+X-Gm-Features: AQ5f1JoIE7st4RKueBH-_TmpE1yFcPtsvt5-6nt7lNOw2_qPUkbl84LiibMF_hY
+Message-ID: <CAL+tcoDL0FwC6i_3q46HrKA0Sua-KKXxTpWpR94ev9RovdHgWQ@mail.gmail.com>
+Subject: Re: [PATCH v5 1/5] net-timestamp: COMPLETION timestamp on packet tx completion
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, netdev@vger.kernel.org, davem@davemloft.net, 
+	kuba@kernel.org, willemdebruijn.kernel@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Document support for Airoha Ethernet PCS for AN7581 SoC.
+On Wed, Mar 19, 2025 at 3:08=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
+>
+> Add SOF_TIMESTAMPING_TX_COMPLETION, for requesting a software timestamp
+> when hardware reports a packet completed.
+>
+> Completion tstamp is useful for Bluetooth, as hardware timestamps do not
+> exist in the HCI specification except for ISO packets, and the hardware
+> has a queue where packets may wait.  In this case the software SND
+> timestamp only reflects the kernel-side part of the total latency
+> (usually small) and queue length (usually 0 unless HW buffers
+> congested), whereas the completion report time is more informative of
+> the true latency.
+>
+> It may also be useful in other cases where HW TX timestamps cannot be
+> obtained and user wants to estimate an upper bound to when the TX
+> probably happened.
+>
+> Signed-off-by: Pauli Virtanen <pav@iki.fi>
 
-Airoha AN7581 SoC expose multiple Physical Coding Sublayer (PCS) for
-the various Serdes port supporting different Media Independent Interface
-(10BASE-R, USXGMII, 2500BASE-X, 1000BASE-X, SGMII).
+Hi Pauli,
 
-This follow the new PCS provider with the use of #pcs-cells property.
+This patch overall looks good to me but it depends on the small
+question in another patch that is relevant to how we use this new flag
+in reality. Let's discuss a bit there.
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
- .../bindings/net/pcs/airoha,pcs.yaml          | 112 ++++++++++++++++++
- 1 file changed, 112 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/pcs/airoha,pcs.yaml
+Thanks,
+Jason
 
-diff --git a/Documentation/devicetree/bindings/net/pcs/airoha,pcs.yaml b/Documentation/devicetree/bindings/net/pcs/airoha,pcs.yaml
-new file mode 100644
-index 000000000000..8bcf7757c728
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/pcs/airoha,pcs.yaml
-@@ -0,0 +1,112 @@
-+# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/pcs/airoha,pcs.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Airoha Ethernet PCS and Serdes
-+
-+maintainers:
-+  - Christian Marangi <ansuelsmth@gmail.com>
-+
-+description:
-+  Airoha AN7581 SoC expose multiple Physical Coding Sublayer (PCS) for
-+  the various Serdes port supporting different Media Independent Interface
-+  (10BASE-R, USXGMII, 2500BASE-X, 1000BASE-X, SGMII).
-+
-+properties:
-+  compatible:
-+    enum:
-+      - airoha,an7581-pcs-eth
-+      - airoha,an7581-pcs-pon
-+
-+  reg:
-+    items:
-+      - description: XFI MAC reg
-+      - description: HSGMII AN reg
-+      - description: HSGMII PCS reg
-+      - description: MULTI SGMII reg
-+      - description: USXGMII reg
-+      - description: HSGMII rate adaption reg
-+      - description: XFI Analog register
-+      - description: XFI PMA (Physical Medium Attachment) register
-+
-+  reg-names:
-+    items:
-+      - const: xfi_mac
-+      - const: hsgmii_an
-+      - const: hsgmii_pcs
-+      - const: multi_sgmii
-+      - const: usxgmii
-+      - const: hsgmii_rate_adp
-+      - const: xfi_ana
-+      - const: xfi_pma
-+
-+  resets:
-+    items:
-+      - description: MAC reset
-+      - description: PHY reset
-+
-+  reset-names:
-+    items:
-+      - const: mac
-+      - const: phy
-+
-+  "#pcs-cells":
-+    const: 0
-+
-+required:
-+  - compatible
-+  - reg
-+  - reg-names
-+  - resets
-+  - reset-names
-+  - "#pcs-cells"
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/reset/airoha,en7581-reset.h>
-+
-+    pcs@1fa08000 {
-+        compatible = "airoha,an7581-pcs-pon";
-+        reg = <0x1fa08000 0x1000>,
-+              <0x1fa80000 0x60>,
-+              <0x1fa80a00 0x164>,
-+              <0x1fa84000 0x450>,
-+              <0x1fa85900 0x338>,
-+              <0x1fa86000 0x300>,
-+              <0x1fa8a000 0x1000>,
-+              <0x1fa8b000 0x1000>;
-+        reg-names = "xfi_mac", "hsgmii_an", "hsgmii_pcs",
-+                    "multi_sgmii", "usxgmii",
-+                    "hsgmii_rate_adp", "xfi_ana", "xfi_pma";
-+
-+        resets = <&scuclk EN7581_XPON_MAC_RST>,
-+                 <&scuclk EN7581_XPON_PHY_RST>;
-+        reset-names = "mac", "phy";
-+
-+        #pcs-cells = <0>;
-+    };
-+
-+    pcs@1fa09000 {
-+        compatible = "airoha,an7581-pcs-eth";
-+        reg = <0x1fa09000 0x1000>,
-+              <0x1fa70000 0x60>,
-+              <0x1fa70a00 0x164>,
-+              <0x1fa74000 0x450>,
-+              <0x1fa75900 0x338>,
-+              <0x1fa76000 0x300>,
-+              <0x1fa7a000 0x1000>,
-+              <0x1fa7b000 0x1000>;
-+        reg-names = "xfi_mac", "hsgmii_an", "hsgmii_pcs",
-+                    "multi_sgmii", "usxgmii",
-+                    "hsgmii_rate_adp", "xfi_ana", "xfi_pma";
-+
-+        resets = <&scuclk EN7581_XSI_MAC_RST>,
-+                 <&scuclk EN7581_XSI_PHY_RST>;
-+        reset-names = "mac", "phy";
-+
-+        #pcs-cells = <0>;
-+    };
--- 
-2.48.1
-
+> ---
+>
+> Notes:
+>     v5:
+>     - back to decoupled COMPLETION & SND, like in v3
+>     - BPF reporting not implemented here
+>
+>  Documentation/networking/timestamping.rst | 8 ++++++++
+>  include/linux/skbuff.h                    | 7 ++++---
+>  include/uapi/linux/errqueue.h             | 1 +
+>  include/uapi/linux/net_tstamp.h           | 6 ++++--
+>  net/core/skbuff.c                         | 2 ++
+>  net/ethtool/common.c                      | 1 +
+>  net/socket.c                              | 3 +++
+>  7 files changed, 23 insertions(+), 5 deletions(-)
+>
+> diff --git a/Documentation/networking/timestamping.rst b/Documentation/ne=
+tworking/timestamping.rst
+> index 61ef9da10e28..b8fef8101176 100644
+> --- a/Documentation/networking/timestamping.rst
+> +++ b/Documentation/networking/timestamping.rst
+> @@ -140,6 +140,14 @@ SOF_TIMESTAMPING_TX_ACK:
+>    cumulative acknowledgment. The mechanism ignores SACK and FACK.
+>    This flag can be enabled via both socket options and control messages.
+>
+> +SOF_TIMESTAMPING_TX_COMPLETION:
+> +  Request tx timestamps on packet tx completion.  The completion
+> +  timestamp is generated by the kernel when it receives packet a
+> +  completion report from the hardware. Hardware may report multiple
+> +  packets at once, and completion timestamps reflect the timing of the
+> +  report and not actual tx time. This flag can be enabled via both
+> +  socket options and control messages.
+> +
+>
+>  1.3.2 Timestamp Reporting
+>  ^^^^^^^^^^^^^^^^^^^^^^^^^
+> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> index cd8294cdc249..b974a277975a 100644
+> --- a/include/linux/skbuff.h
+> +++ b/include/linux/skbuff.h
+> @@ -478,8 +478,8 @@ enum {
+>         /* device driver is going to provide hardware time stamp */
+>         SKBTX_IN_PROGRESS =3D 1 << 2,
+>
+> -       /* reserved */
+> -       SKBTX_RESERVED =3D 1 << 3,
+> +       /* generate software time stamp on packet tx completion */
+> +       SKBTX_COMPLETION_TSTAMP =3D 1 << 3,
+>
+>         /* generate wifi status information (where possible) */
+>         SKBTX_WIFI_STATUS =3D 1 << 4,
+> @@ -498,7 +498,8 @@ enum {
+>
+>  #define SKBTX_ANY_SW_TSTAMP    (SKBTX_SW_TSTAMP    | \
+>                                  SKBTX_SCHED_TSTAMP | \
+> -                                SKBTX_BPF)
+> +                                SKBTX_BPF          | \
+> +                                SKBTX_COMPLETION_TSTAMP)
+>  #define SKBTX_ANY_TSTAMP       (SKBTX_HW_TSTAMP | \
+>                                  SKBTX_ANY_SW_TSTAMP)
+>
+> diff --git a/include/uapi/linux/errqueue.h b/include/uapi/linux/errqueue.=
+h
+> index 3c70e8ac14b8..1ea47309d772 100644
+> --- a/include/uapi/linux/errqueue.h
+> +++ b/include/uapi/linux/errqueue.h
+> @@ -73,6 +73,7 @@ enum {
+>         SCM_TSTAMP_SND,         /* driver passed skb to NIC, or HW */
+>         SCM_TSTAMP_SCHED,       /* data entered the packet scheduler */
+>         SCM_TSTAMP_ACK,         /* data acknowledged by peer */
+> +       SCM_TSTAMP_COMPLETION,  /* packet tx completion */
+>  };
+>
+>  #endif /* _UAPI_LINUX_ERRQUEUE_H */
+> diff --git a/include/uapi/linux/net_tstamp.h b/include/uapi/linux/net_tst=
+amp.h
+> index 55b0ab51096c..383213de612a 100644
+> --- a/include/uapi/linux/net_tstamp.h
+> +++ b/include/uapi/linux/net_tstamp.h
+> @@ -44,8 +44,9 @@ enum {
+>         SOF_TIMESTAMPING_BIND_PHC =3D (1 << 15),
+>         SOF_TIMESTAMPING_OPT_ID_TCP =3D (1 << 16),
+>         SOF_TIMESTAMPING_OPT_RX_FILTER =3D (1 << 17),
+> +       SOF_TIMESTAMPING_TX_COMPLETION =3D (1 << 18),
+>
+> -       SOF_TIMESTAMPING_LAST =3D SOF_TIMESTAMPING_OPT_RX_FILTER,
+> +       SOF_TIMESTAMPING_LAST =3D SOF_TIMESTAMPING_TX_COMPLETION,
+>         SOF_TIMESTAMPING_MASK =3D (SOF_TIMESTAMPING_LAST - 1) |
+>                                  SOF_TIMESTAMPING_LAST
+>  };
+> @@ -58,7 +59,8 @@ enum {
+>  #define SOF_TIMESTAMPING_TX_RECORD_MASK        (SOF_TIMESTAMPING_TX_HARD=
+WARE | \
+>                                          SOF_TIMESTAMPING_TX_SOFTWARE | \
+>                                          SOF_TIMESTAMPING_TX_SCHED | \
+> -                                        SOF_TIMESTAMPING_TX_ACK)
+> +                                        SOF_TIMESTAMPING_TX_ACK | \
+> +                                        SOF_TIMESTAMPING_TX_COMPLETION)
+>
+>  /**
+>   * struct so_timestamping - SO_TIMESTAMPING parameter
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index ab8acb737b93..6cbf77bc61fc 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -5523,6 +5523,8 @@ static bool skb_tstamp_tx_report_so_timestamping(st=
+ruct sk_buff *skb,
+>                                                     SKBTX_SW_TSTAMP);
+>         case SCM_TSTAMP_ACK:
+>                 return TCP_SKB_CB(skb)->txstamp_ack & TSTAMP_ACK_SK;
+> +       case SCM_TSTAMP_COMPLETION:
+> +               return skb_shinfo(skb)->tx_flags & SKBTX_COMPLETION_TSTAM=
+P;
+>         }
+>
+>         return false;
+> diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+> index 7e3c16856c1a..0cb6da1f692a 100644
+> --- a/net/ethtool/common.c
+> +++ b/net/ethtool/common.c
+> @@ -476,6 +476,7 @@ const char sof_timestamping_names[][ETH_GSTRING_LEN] =
+=3D {
+>         [const_ilog2(SOF_TIMESTAMPING_BIND_PHC)]     =3D "bind-phc",
+>         [const_ilog2(SOF_TIMESTAMPING_OPT_ID_TCP)]   =3D "option-id-tcp",
+>         [const_ilog2(SOF_TIMESTAMPING_OPT_RX_FILTER)] =3D "option-rx-filt=
+er",
+> +       [const_ilog2(SOF_TIMESTAMPING_TX_COMPLETION)] =3D "tx-completion"=
+,
+>  };
+>  static_assert(ARRAY_SIZE(sof_timestamping_names) =3D=3D __SOF_TIMESTAMPI=
+NG_CNT);
+>
+> diff --git a/net/socket.c b/net/socket.c
+> index b64ecf2722e7..e3d879b53278 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+> @@ -689,6 +689,9 @@ void __sock_tx_timestamp(__u32 tsflags, __u8 *tx_flag=
+s)
+>         if (tsflags & SOF_TIMESTAMPING_TX_SCHED)
+>                 flags |=3D SKBTX_SCHED_TSTAMP;
+>
+> +       if (tsflags & SOF_TIMESTAMPING_TX_COMPLETION)
+> +               flags |=3D SKBTX_COMPLETION_TSTAMP;
+> +
+>         *tx_flags =3D flags;
+>  }
+>  EXPORT_SYMBOL(__sock_tx_timestamp);
+> --
+> 2.48.1
+>
+>
 
