@@ -1,325 +1,254 @@
-Return-Path: <netdev+bounces-176297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A588DA69ADC
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 22:30:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B543A69AE7
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 22:33:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FE333AB469
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 21:30:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CC53189DB30
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 21:33:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE0A71EDA2F;
-	Wed, 19 Mar 2025 21:30:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D7C21A434;
+	Wed, 19 Mar 2025 21:33:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="aLBTGpob"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="lfPVerk7"
 X-Original-To: netdev@vger.kernel.org
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2085.outbound.protection.outlook.com [40.107.92.85])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD8671E5207;
-	Wed, 19 Mar 2025 21:30:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D19BF214801;
+	Wed, 19 Mar 2025 21:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.85
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742419853; cv=pass; b=RGHtBde6yaWbgBfD40PFl7ajzAuEFPfkw2OzQF/TjSSG8j5yY0SGK4vyMO7w3ibq51wLB1mGeYVtAiu0Ub0WW4m6l0T3Qrm91V8GUNPUjl/S53P2Sjsog50PzOkEzfB2on0kZuWYnVklZVzQm7vlX4PGk/x8jthwCzm5WK1YR+Q=
+	t=1742419983; cv=fail; b=OL/MynoWBexrlWKF4T0DOkHp9J/eiBbD1j23XqLtdWxoV5fG5SD6cRgmfLKAf+t295/qSYJP/+bvddO7FMdHnUAhgdVBT2jEUaFk2SomHQRm9Da032Y5yfgkAi5MlA69lY9THeOsVwKt5aIUoGm5d9nSPwWLHvf+ZfZGHgh3f80=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742419853; c=relaxed/simple;
-	bh=6Up16T60ksc4r61EGTl8KhHqMrNLP8w8iKeOqRKvaS4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=SaZv4wltU0tPdFFgbMcb7E+GdGl9Nt4MyQTmzUdrBVS1ACXu4wHnXlmfNTKsFSGU7lwBmaqnqCsWNAR6PQRmGUeO7lVtCe1jxtCU6VrEnT1ZR1hcUSXYQOXNRYIRa0Da93NH3Ch3Fo2gZe28t5zFkATw206vxN8tofrX8GuMDlw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=aLBTGpob; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
-Received: from [192.168.1.195] (unknown [IPv6:2a0c:f040:0:2790::a03d])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4ZJ21s1632z49Q8B;
-	Wed, 19 Mar 2025 23:30:41 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1742419842;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=o4bOguK0wpS9xDJgwVPC3+Y93JtKP0+CbFkaIzJuIOc=;
-	b=aLBTGpobGxy+tat1akSluwj64RBHNvtqC8xB2GS05fJ57ALnrcGdHvgR+jswpxwrw4VguY
-	qnefcL2dcJZsa/YtzPhK1aBBBoKLNyULl4g3mMo6iI6g3eWuIg/nZSYyWWv++SOT5UP0Id
-	tiOnQxLg2D8Z3/GkYOxhvuvWHtlDxDjSGsCdzXK+N2ZpC7RSUrUfgvAs/C1iHl6pTdErkG
-	HFMSMO1/JlmqTHz+whK2orol9qyQIqGekA1qPK8MxWmRg/fBjnSqdUxfYRTd2E82O86S0L
-	A2xfl76Q0OyyOTOrLs8P7AR9acPWZyw6rX/fCu3csjnmr2uu0JxkILshFqBc7Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1742419842;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=o4bOguK0wpS9xDJgwVPC3+Y93JtKP0+CbFkaIzJuIOc=;
-	b=JKvHvJU1kZCcjq45aC6r0j/v8rCDEz9hd5CHi4U9qImNMf8fx+CMF6rFTD+lBLVVEEdqHm
-	r4FEtevhdK+24mIMBhw1WLD17nzSudvNGD65XVZCPlULi3r5FaipJ4s9mLI1MsIwG6dN4D
-	tjBybvvo0jDd+0VQTdiyiOWpWYdi2A2OXH1z7hVeQawZaeafpoKiaD3+g2rvk01xLVmLi4
-	tqujH7wJ+xnX2OeIsIMzKolbQCvR4vvhrocmtBF0Hwn0gyVQS/I+W71vzNL64weDZjjgap
-	99t1QxqFYZ7NxqvquoRmsxlk99U4yWLW0vJvn04nDo8Klzn+5tGBsR/xIfSexw==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1742419842; a=rsa-sha256;
-	cv=none;
-	b=i5EZBnsNfpgreKxbgI1jnF6fiLkqqubEiEe/aAIVImP7metv75MkKc6yAoI1JnLTPpXbXt
-	n510sKByzJOzLxRn0jIhFX8ldw8Hu5N3iAQAFLKd9ZjukqgEUk8YTBPPoAdk/Svz6Bea9R
-	oS9+EUVxQHw1YO/duHgrgCuXga9VWLO0HaJUOGEJ9B5ma1226ev5bt3Q3TLlhULz1E+g1v
-	+kor52BKj63DLUy3VpgfYWi4fBGTdZdgyL05u4Y+WtHhEQYR1GX/Z/4TtFXG9Cjzxp8C4j
-	Y5e0GHQXYlzP0VxZadF01X1U4Y1I1I75LU+ENS45wsHRfySDkCYzEsVUb1oVYQ==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-Message-ID: <c49167b08b7af73bc633e1b195a30e0dd23735d7.camel@iki.fi>
-Subject: Re: [PATCH v5 2/5] Bluetooth: add support for skb TX SND/COMPLETION
- timestamping
-From: Pauli Virtanen <pav@iki.fi>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jason Xing
-	 <kerneljasonxing@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Luiz Augusto von Dentz
-	 <luiz.dentz@gmail.com>, netdev@vger.kernel.org, davem@davemloft.net, 
-	kuba@kernel.org
-Date: Wed, 19 Mar 2025 23:30:38 +0200
-In-Reply-To: <67db224a5412b_2a13f29418@willemb.c.googlers.com.notmuch>
-References: <cover.1742324341.git.pav@iki.fi>
-	 <a5c1b2110e567f499e17a4a67f1cc7c2036566c4.1742324341.git.pav@iki.fi>
-	 <CAL+tcoCr-Z_PrWMsERtsm98Q4f-RXkMVzTW3S1gnNY6cFQM0Sg@mail.gmail.com>
-	 <67dad8635c22c_5948294ac@willemb.c.googlers.com.notmuch>
-	 <5882af942ef8cf5c9b4ce36a348f959807a387b0.camel@iki.fi>
-	 <67db224a5412b_2a13f29418@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+	s=arc-20240116; t=1742419983; c=relaxed/simple;
+	bh=u3NEa5+H3CwPb5pvPzBomkkm3euLBj3e1Z+PYRsu3Pk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Gu0ElWoHoajAW5dWQxvLPapuUCrvRNwgXCZUKhp0jEcjR5CF3Q5oyevb1RkJcLRuknWwAlYJVt7ckylyrqCOuI6m7wEXezNCrSFtjRLyRvKBS1WbphebifKJ3HwvoRjnTwnrWOzeWSQJc1FgZpagqJARDdXkE+XASVZxAiXlcjE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=lfPVerk7; arc=fail smtp.client-ip=40.107.92.85
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qCsXSwphaRWo5rxLiak7O18Xh3X9GUi9wPhm9hE26lWZ7bbJ5jlLFvJ6I9fd4EbFt0afsTGJyAOokfGH3f+P1PEfoxf8pDwMf/59+gmf5maYfCY1RG47SGE/M1hIbApNVF5LHCi8ghmgePGRehWS0bDooJjsTIaePlRCpTm+qOIMDkpRUHk0uGnnNsaM4DVYVT1CSELod83VTThYisvWD01yR/KSzo0ThKWp9TbB5ugmP/nrPFWhQ7nCzbbooCdafwEsJGLnnr3ErR6leP51ifwQ3t6OfVUbvPUimTxDtpyrfDu52k+/xzJ0QoSacKicGtFcU9TLrgxzurt1B2cdvw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4OessLv+FDjZDvWkRMC6hSJMW1OgCCrwaGRcVezHDzs=;
+ b=BBs3f4QRNbddccamxDdHATN3/w4+AUppJJaDN40Fp0P+XXLK78kZylqN55vyXdj1/E1wWbtuyZPv8b+6Eph0cgXckCbRBKCp2CgTxnRBWO6aHtCURzduNew0PVaWNg2H3gFA+D3iVTPmYRGu0THCNnUMoKonynKRJr4qykK9zNfCIBtY+LPtShmHFRMHEBF0mCHQ+47XQBh3nytl3cMKZUCY8zXtmYxIuifJM0RPz3rvZXnI5Mbb0TMIdaFRWy/w1Di2aWUzgodE20TogYbyBM2OGv20y2xpGrd9OELWuvmvp78/nxZU6MitWz9XVFwdVhtDCvP74NXxRtlTaSxUVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=nvidia.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4OessLv+FDjZDvWkRMC6hSJMW1OgCCrwaGRcVezHDzs=;
+ b=lfPVerk7+r52+c3RgUVYJJaYRUigIh8eBO38O+Yz0rFU4f9W6jN9aamURIJzHYhwsHl1jN05L3GZ6ILqmPBF+0x9oG+GYwNm6SsPbITI9X85KpeA+hw6R8v6U8GuEUDR0GWGgkKCafMb+ONSK7GY7aYnD7/lHcyCTdw1t9RaLLc=
+Received: from BYAPR05CA0019.namprd05.prod.outlook.com (2603:10b6:a03:c0::32)
+ by SA3PR12MB7782.namprd12.prod.outlook.com (2603:10b6:806:31c::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.33; Wed, 19 Mar
+ 2025 21:32:54 +0000
+Received: from SJ1PEPF000023DA.namprd21.prod.outlook.com
+ (2603:10b6:a03:c0:cafe::11) by BYAPR05CA0019.outlook.office365.com
+ (2603:10b6:a03:c0::32) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8534.33 via Frontend Transport; Wed,
+ 19 Mar 2025 21:32:54 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ SJ1PEPF000023DA.mail.protection.outlook.com (10.167.244.75) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8583.3 via Frontend Transport; Wed, 19 Mar 2025 21:32:54 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 19 Mar
+ 2025 16:32:51 -0500
+From: Shannon Nelson <shannon.nelson@amd.com>
+To: <jgg@nvidia.com>, <andrew.gospodarek@broadcom.com>,
+	<aron.silverton@oracle.com>, <dan.j.williams@intel.com>,
+	<daniel.vetter@ffwll.ch>, <dave.jiang@intel.com>, <dsahern@kernel.org>,
+	<gregkh@linuxfoundation.org>, <hch@infradead.org>, <itayavr@nvidia.com>,
+	<jiri@nvidia.com>, <Jonathan.Cameron@huawei.com>, <kuba@kernel.org>,
+	<lbloch@nvidia.com>, <leonro@nvidia.com>, <linux-cxl@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>, <saeedm@nvidia.com>
+CC: <brett.creeley@amd.com>, Shannon Nelson <shannon.nelson@amd.com>
+Subject: [PATCH v4 0/6] pds_fwctl: fwctl for AMD/Pensando core devices
+Date: Wed, 19 Mar 2025 14:32:31 -0700
+Message-ID: <20250319213237.63463-1-shannon.nelson@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF000023DA:EE_|SA3PR12MB7782:EE_
+X-MS-Office365-Filtering-Correlation-Id: 98724419-20bc-4cdc-9993-08dd672d9bcc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|1800799024|82310400026|36860700013|921020|13003099007|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?EhXlSII8wWGOe8O1Nco6afxJI2mUMJKmzOJTbjhKaDbdXPU8Gm6k6DTCpbFJ?=
+ =?us-ascii?Q?jCrODJ38CnVcMRYRl9M66/w0ZdDJ1liJ2dOANljzYv37hYoDCRmY7VGIGXVi?=
+ =?us-ascii?Q?x7Ja7PYAwUd2Cb08kWYPVcbcmgvAfOCFRHB6fTo/jxzu6kJvE1uZrUJelf1Z?=
+ =?us-ascii?Q?uiL/VW7jYAIFYJadFzkCWG645VLcKwhDlt4MfM7BK1TTyvMOGSDStCidmyDe?=
+ =?us-ascii?Q?33RYWNVnqhMCr9mhgw7GHEeM6wqdMcNYkbhCe6NjYa5vvzs2TvBtntKcI2is?=
+ =?us-ascii?Q?Yu0QMoC2Qkc1/87el71iHK5xnQ7RQozo3xLlDo/bOc+481IPkxU7yuSr5vzP?=
+ =?us-ascii?Q?XG4mUYUgWMm4K+9SU1b9bB6aktOy6JixTLI8IruUobcp1XMLRJBwwGknskPa?=
+ =?us-ascii?Q?gaSdoQ3bIYrAD0TA63W3eOmQ2WUrQvJ+lsZ0TosHNUEerlYMukYBR/5ByT/x?=
+ =?us-ascii?Q?xJ08gGV2uc9ulQkq76uwESnO3bRsImoevIWMMpj2Zn3Y2qjG+IEbVvSGJCUS?=
+ =?us-ascii?Q?PCgkulCRWs81N5afZHLjYgONt1bdsYYcev+lj099MMIlaQr2Ao0wjlzo76UG?=
+ =?us-ascii?Q?ODfUSrbhULpyUOKrj1ZQtUf3qGxIv7ZHIV6+tx/S+gMQNa+mCKeROXuhTI8p?=
+ =?us-ascii?Q?n+3WuFD8Tw4oUhjmSiq/1Kfca56RGOfUcFn8kfZamkUaIfBMinYl89sn7rPX?=
+ =?us-ascii?Q?/xelEajv0BjQeghipMVfrqrDsRGXk3YojIR5PFad2ehht+HkNr+KmXX3Esr4?=
+ =?us-ascii?Q?l29obEH56fbdLdKK7em2/JYqvll90Ed/fjdO8uoC2TMUgAr8cEukKO/ARQht?=
+ =?us-ascii?Q?KvItWdYRaBCq1x3Xh/zgA5DY2a5/322LjYwM3263kaTsccN6UOEcprUuMkZB?=
+ =?us-ascii?Q?3eLfGj8CzblV2z6aWrb51wgWsKanFim2pEz5A4DXi6I8ovrCivhmefvSAgqo?=
+ =?us-ascii?Q?CxDUoNBNnKJa1A7nyDCbaa9IKJTvCaEPh0bgu/cauecCNGtScMggqdIGjCBO?=
+ =?us-ascii?Q?/v6Ro6MC+jjhjr20X+B5cwxXUhEAOyn+boWRtaCKG1B8wgip/9kRsrdiRdvz?=
+ =?us-ascii?Q?g8nBhFQ59EezQKZKF7MypPX2Io99ST/8vYY8n9OMGQPGoDeE4h4+y3ZLbGyA?=
+ =?us-ascii?Q?tQBhQWMKzoGWpd9DksthuSUvTwCp1zBBb7a5b05c1vlyb9DFk1rwFBU4sAPm?=
+ =?us-ascii?Q?c40yLOiXlpMlzWNREOXONm3ur9LapYmfys2ghQH+DEYW6fZlkxftbWW4UOHT?=
+ =?us-ascii?Q?rdjES2l5S2D0z+v0htJcweygkNv1KuOe3kq/B20pXY+nDI6shNWPn+GeVLmI?=
+ =?us-ascii?Q?oqU2vc4MrQCROH9ejGN2G3If3HgRpnqgrKgyMoQKycQMxzD/w6L38rpJvv/5?=
+ =?us-ascii?Q?aB550hCghvbkpaQAop5H3j5qLqD/jpNluhB+1xOyUUTbcE52ivHd1jfXiO25?=
+ =?us-ascii?Q?gvChUEPKgPwk/jqOku0o21uH92ZnNeq8FophP8TgILLC3U5B+cwY/w0f6a4W?=
+ =?us-ascii?Q?/hW32r4+Z3t5zDLyaSIgfK2jWp1VCd5hucgy?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(82310400026)(36860700013)(921020)(13003099007)(7053199007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2025 21:32:54.0138
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 98724419-20bc-4cdc-9993-08dd672d9bcc
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF000023DA.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7782
 
-Hi,
+Following along from Jason's work [1] we have our initial patchset
+for pds_fwctl - an auxiliary_bus driver for supporting fwctl through the
+pds_core driver and its PDS core device.
 
-ke, 2025-03-19 kello 16:00 -0400, Willem de Bruijn kirjoitti:
-> Pauli Virtanen wrote:
-> > ke, 2025-03-19 kello 10:44 -0400, Willem de Bruijn kirjoitti:
-> > > Jason Xing wrote:
-> > > > On Wed, Mar 19, 2025 at 3:10=E2=80=AFAM Pauli Virtanen <pav@iki.fi>=
- wrote:
-> > > > >=20
-> > > > > Support enabling TX timestamping for some skbs, and track them un=
-til
-> > > > > packet completion. Generate software SCM_TSTAMP_COMPLETION when g=
-etting
-> > > > > completion report from hardware.
-> > > > >=20
-> > > > > Generate software SCM_TSTAMP_SND before sending to driver. Sendin=
-g from
-> > > > > driver requires changes in the driver API, and drivers mostly are=
- going
-> > > > > to send the skb immediately.
-> > > > >=20
-> > > > > Make the default situation with no COMPLETION TX timestamping mor=
-e
-> > > > > efficient by only counting packets in the queue when there is not=
-hing to
-> > > > > track.  When there is something to track, we need to make clones,=
- since
-> > > > > the driver may modify sent skbs.
-> > >=20
-> > > Why count packets at all? And if useful separate from completions,
-> > > should that be a separate patch?
-> >=20
-> > This paragraph was commenting on the implementation of struct tx_queue,
-> > and maybe how it works should be explicitly explained somewhere (code
-> > comment?). Here's some explanation of it:
-> >=20
-> > 1) We have to hang on (clones of) skbs until completion reports for
-> > them arrive, in order to emit COMPLETION timestamps. There's no
-> > existing queue that does this in net/bluetooth (drivers may just copy
-> > data & discard skbs, and they don't know about completion reports), so
-> > something new needs to be added.
-> >=20
-> > 2) It is only needed for emitting COMPLETION timestamps. So it's better
-> > to not do any extra work (clones etc.) when there are no such
-> > timestamps to be emitted.
-> >=20
-> > 3) The new queue should work correctly when timestamping is turned on
-> > or off, or only some packets are timestamped. It should also eventually
-> > return to a state where no extra work is done, when new skbs don't
-> > request COMPLETION timestamps.
->=20
-> So far, fully understood.
->=20
-> > struct tx_queue implements such queue that only "tracks" some skbs.
-> > Logical structure:
-> >=20
-> > HEAD
-> > <no stored skb>  }
-> > <no stored skb>  }  tx_queue::extra is the number of non-tracked
-> > ...              }  logical items at queue head
-> > <no stored skb>  }
-> > <tracked skb>		} tx_queue::queue contains mixture of
-> > <non-tracked skb>	} tracked items  (skb->sk !=3D NULL) and
-> > <non-tracked skb>	} non-tracked items  (skb->sk =3D=3D NULL).
-> > <tracked skb>		} These are ordered after the "extra" items.
-> > TAIL
-> >=20
-> > tx_queue::tracked is the number of tracked skbs in tx_queue::queue.
-> >=20
-> > hci_conn_tx_queue() determines whether skb is tracked (=3D COMPLETION
-> > timestamp shall be emitted for it) and pushes a logical item to TAIL.
-> >=20
-> > hci_conn_tx_dequeue() pops a logical item from HEAD, and emits
-> > timestamp if it corresponds to a tracked skb.
-> >=20
-> > When tracked =3D=3D 0, queue() can just increment tx_queue::extra, and
-> > dequeue() can remove any skb from tx_queue::queue, or if empty then
-> > decrement tx_queue::extra. This allows it to return to a state with
-> > empty tx_queue::queue when new skbs no longer request timestamps.
-> >=20
-> > When tracked !=3D 0, the ordering of items in the queue needs to be
-> > respected strictly, so queue() always pushes real skb (tracked or not)
-> > to TAIL, and dequeue() has to decrement extra to zero, before it can
-> > pop skb from queue head.
->=20
-> Thanks. I did not understand why you need to queue or track any
-> sbs aside from those that have SKBTX_COMPLETION_TSTAMP.
->=20
-> If I follow correctly this is to be able to associate the tx
-> completion with the right skb on the queue.
+The PDS core is PCI device that is separate and distinct from the
+ionic Eth device and from the other PCI devices that can be supported
+by the AMD/Pensando DSC.  It is used by pds_vdpa and pds_vfio_pci to
+coordinate/communicate with the FW for setting up their services.
 
-Yes, it was done to maintain the queue/dequeue ordering.
+Until now the DSC's basic configurations for defining what devices to
+support and for getting low-level device debug information have been
+through internal commands not available from the host side, requiring
+access into the DSC's own OS.  Adding the fwctl service allows us to start
+bringing these capabilities up into the host, but they don't replace the
+existing function-specific tools.  For example, these are things that make
+the Eth PCI device appear on the PCI bus, while the tuning of the specific
+Eth features still go through the standard ethtool/devlink/ip/etc tools.
 
-> The usual model in Ethernet drivers is that every tx descriptor (and
-> completion descriptor) in the ring is associated with a pure software
-> ring of metadata structures, which can point to an skb (or NULL).
->=20
-> In a pinch, instead the skb on the queue itself could record the
-> descriptor id that it is associated with. But hci_conn_tx_queue is
-> too far removed from the HW, so has no direct access to that. And
-> similarly hci_conn_tx_dequeue has no such low level details.
->=20
-> So long story short you indeed have to track this out of band with
-> a separate counter. I also don't immediately see a simpler way.
->=20
-> Though you can perhaps replace the skb_clone (not the skb_clone_sk!)
-> with some sentinel value that just helps count?
+The first two patches are a bit of clean up for pds_core's add and delete
+of auxiliary_devices.  Those are followed by a patch to add the new
+pds_core.fwctl auxiliary_device.  This is only supported by the pds_core
+PF and not on any VFs.
 
-It probably could be done a bit smarter, it could eg. use something
-else than skb_queue. Or, I think we can clobber cb here as the clones
-are only used for timestamping, so:
+The remaining patches add the pds_fwctl driver framework and then fill
+in the details for the fwctl services.
 
+[1] https://lore.kernel.org/netdev/0-v5-642aa0c94070+4447f-fwctl_jgg@nvidia.com/
 
-struct tx_queue {
-	unsigned int pre_items;
-	struct sk_buff_head queue;
-};
+v4:
+  - fix commit description for better imperative (David)
+  - fix comment wording (David)
+  - add kdoc comment on struct fwctl_info_pds (David)
+  - #include <linux/bitfield.h>  (Jason)
+  - fix for error pointer check in pdsfc_validate_rpc() (Brett and Dan)
+  - initialize pdsfc->caps
+  - add translation of FW opcode scope to fwctl scope
+  - several doc edits (David)
+  - added received Reviewd-by tags
 
-struct tx_queue_cb {
-	unsigned int post_items;
-};
+v3: Lots of little cleaning tweaks
+https://lore.kernel.org/netdev/20250307185329.35034-1-shannon.nelson@amd.com/
+  - rebase on Jason's tree
+  - better comment on "an error if there is no auxbus device support" (Jonathan)
+  - don't call pdsc_auxbus_dev_del() if pdsc_auxbus_dev_add() failed (Jonathan)
+  - struct pdsc *pdsc; is unnecessary in struct pdsfc_dev (Jonathan)
+  - remove unused UID field in pdsfc_info (Jonathan, Jason)
+  - change "Word boundary padding" to "Reserved" (Jonathan)
+  - remove the remaining use of cleanup pattern
+  - don't lose err from pds_client_adminq_cmd() in pdsfc_identify() (Jason)
+  - comment on pds_fwctl_ident.features (Jonathan)
+  - change noisy dev_errs to dev_dbg and remove a couple unnecessary ones (Jonathan, Jason)
+  - no cast needed on struct fwctl_rpc_pds *rpc = (struct fwctl_rpc_pds *)in (Jonathan)
+  - more labels and reverse order for cleanup in pdsfc_fw_rpc  (Jonathan)
+  - __counted_by_le() on struct pds_fwctl_query_data (Jonathan)
+  - other comment comments on new structs (Jonathan)
+  - use FIELD_GET (Jason)
+  - Use __aligned_u64 in the uapi headers (Jason)
+  - call fwctl a subsystem in Docs (Jonathan)
+  - clean up text around endpoints in Docs (Jonathan)
 
-static void hci_tx_queue_push(struct tx_queue *q, struct sk_buff *skb)
-{
-	struct tx_queue_cb *cb;
+v2: https://lore.kernel.org/netdev/20250301013554.49511-1-shannon.nelson@amd.com/
+  - removed the RFC tag
+  - add a patch to make pdsc_auxbus_dev_del() a void type (Jonathan)
+  - fix up error handling if pdsc_auxbus_dev_add() fails in probe (Jonathan)
+  - fix auxiliary spelling in commit subject header (Jonathan)
+  - clean up of code around use of __free() gizmo (Jonathan, David)
+  - removed extra whitespace and dev_xxx() calls (Leon)
+  - copy ident info from DMA and release DMA memory in probe (Jonathan)
+  - use dev_err_probe() (Jonathan)
+  - add counted_by_le(num_entries) (Jonathan, David)
+  - convert num_entries from __le32 to host in get_endpoints() (Jonathan)
+  - remove unnecessary variable inits (Jonathan, Leon)
 
-	/* HEAD
-	 * <non-tracked item>  }
-	 * ...                 } tx_queue::pre_items of these
-	 * <non-tracked item>  }
-	 * <tracked skb1>     <- tx_queue::queue first item
-	 * <non-tracked item>  }
-	 * ...                 } ((struct tx_queue_cb *)skb1->cb)->post_items
-	 * <non-tracked item>  }
-	 * ...
-	 * <tracked skbn>     <- tx_queue::queue n-th item
-	 * <non-tracked item>  }
-	 * ...                 } ((struct tx_queue_cb *)skbn->cb)->post_items
-	 * <non-tracked item>  }
-	 * TAIL
-	 */
-	if (skb) {
-		cb =3D (struct tx_queue_cb *)skb->cb;
-		cb->post_items =3D 0;
-		skb_queue_tail(&q->queue, skb);
-	} else {
-		skb =3D skb_peek_tail(&q->queue);
-		if (skb) {
-			cb =3D (struct tx_queue_cb *)skb->cb;
-			cb->post_items++;
-		} else {
-			q->pre_items++;
-		}
-	}
-}
+v1: https://lore.kernel.org/netdev/20250211234854.52277-1-shannon.nelson@amd.com/
 
-static struct sk_buff *hci_tx_queue_pop(struct tx_queue *q)
-{
-	struct sk_buff *skb;
-	struct tx_queue_cb *cb;
+Brett Creeley (1):
+  pds_fwctl: add rpc and query support
 
-	if (q->pre_items) {
-		q->pre_items--;
-		return NULL;
-	}
+Shannon Nelson (5):
+  pds_core: make pdsc_auxbus_dev_del() void
+  pds_core: specify auxiliary_device to be created
+  pds_core: add new fwctl auxiliary_device
+  pds_fwctl: initial driver framework
+  pds_fwctl: add Documentation entries
 
-	skb =3D skb_dequeue(&q->queue);
-	if (skb) {
-		cb =3D (struct tx_queue_cb *)skb->cb;
-		q->pre_items +=3D cb->post_items;
-	}
+ Documentation/userspace-api/fwctl/fwctl.rst   |   1 +
+ Documentation/userspace-api/fwctl/index.rst   |   1 +
+ .../userspace-api/fwctl/pds_fwctl.rst         |  48 ++
+ MAINTAINERS                                   |   7 +
+ drivers/fwctl/Kconfig                         |  10 +
+ drivers/fwctl/Makefile                        |   1 +
+ drivers/fwctl/pds/Makefile                    |   4 +
+ drivers/fwctl/pds/main.c                      | 538 ++++++++++++++++++
+ drivers/net/ethernet/amd/pds_core/auxbus.c    |  44 +-
+ drivers/net/ethernet/amd/pds_core/core.c      |   7 +
+ drivers/net/ethernet/amd/pds_core/core.h      |   8 +-
+ drivers/net/ethernet/amd/pds_core/devlink.c   |   7 +-
+ drivers/net/ethernet/amd/pds_core/main.c      |  25 +-
+ include/linux/pds/pds_adminq.h                | 277 +++++++++
+ include/linux/pds/pds_common.h                |   2 +
+ include/uapi/fwctl/fwctl.h                    |   1 +
+ include/uapi/fwctl/pds.h                      |  60 ++
+ 17 files changed, 1007 insertions(+), 34 deletions(-)
+ create mode 100644 Documentation/userspace-api/fwctl/pds_fwctl.rst
+ create mode 100644 drivers/fwctl/pds/Makefile
+ create mode 100644 drivers/fwctl/pds/main.c
+ create mode 100644 include/uapi/fwctl/pds.h
 
-	return skb;
-}
+-- 
+2.17.1
 
-void hci_conn_tx_queue(struct hci_conn *conn, struct sk_buff *skb)
-{
-	/* Emit SND now, ie. just before sending to driver */
-	if (skb_shinfo(skb)->tx_flags & SKBTX_SW_TSTAMP)
-		__skb_tstamp_tx(skb, NULL, NULL, skb->sk, SCM_TSTAMP_SND);
-
-	/* COMPLETION tstamp is emitted for tracked skb later in Number of
-	 * Completed Packets event. Available only for flow controlled cases.
-	 *
-	 * TODO: SCO support without flowctl (needs to be done in drivers)
-	 */
-	switch (conn->type) {
-	case ISO_LINK:
-	case ACL_LINK:
-	case LE_LINK:
-		break;
-	case SCO_LINK:
-	case ESCO_LINK:
-		if (!hci_dev_test_flag(conn->hdev, HCI_SCO_FLOWCTL))
-			return;
-		break;
-	default:
-		return;
-	}
-
-	if (skb->sk && (skb_shinfo(skb)->tx_flags & SKBTX_COMPLETION_TSTAMP))
-		skb =3D skb_clone_sk(skb);
-	else
-		skb =3D NULL;
-
-	hci_tx_queue_push(&conn->tx_q, skb);
-	return;
-}
-
-void hci_conn_tx_dequeue(struct hci_conn *conn)
-{
-	struct sk_buff *skb =3D hci_tx_queue_pop(&conn->tx_q);
-
-	if (skb) {
-		__skb_tstamp_tx(skb, NULL, NULL, skb->sk,
-				SCM_TSTAMP_COMPLETION);
-		kfree_skb(skb);
-	}
-}
-
-
---=20
-Pauli Virtanen
 
