@@ -1,167 +1,128 @@
-Return-Path: <netdev+bounces-176114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07A55A68DA3
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 14:22:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 671ECA68DC7
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 14:26:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3AE33BFC87
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 13:21:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60D681B60274
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 13:23:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F4892561A9;
-	Wed, 19 Mar 2025 13:21:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BB362561B1;
+	Wed, 19 Mar 2025 13:23:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dSUaJR/S"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HXkGux37"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9003020FABC;
-	Wed, 19 Mar 2025 13:21:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8B3B2561A4
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 13:23:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742390518; cv=none; b=NjaAufFVHIlutlFA04u/fwXLdtP6NiNsKf6ky0mGmukMrhrIWt6mQdtSRXkHQuJrDMOoE/iv0fY1uxUYvv2EnndnGKJoE7fjOv53lqNEJgs3BDVt9ri45s/v+mri7/KYxcQbNPB5i1VTuiUM5AwZE/sCxKDmLC6hQYebQCTkNuA=
+	t=1742390604; cv=none; b=TuZj+5upVy+sROtIppSIr0f+incCFJXuY0zZiqcUV2IZksMY1ZhdqnZOHiSUYEB5Vbbn5tdxv/ZKddq1WeLx4UEtpsBFGixiiKzBBYLgBBJtjVTKudXBQj6rLxeHP2IvZVpXE8hUzwniV3KYHf+dlHXdAIZACr13x1pvztV9Jpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742390518; c=relaxed/simple;
-	bh=7do4dHbDSsCUtXU65wPSmJayj7/Ivkk9Ya9bwGX/z5E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ntc+4N5Bnm00deu9gEksnBPXdHUTmdH8aPFhiZ5V08ee/fxZqiHS/FJnllk9R4at6ZVXf0SJwL0wCbxdrmEy7sxiw1GDgaNb2dv29HmdmpOSMDxCMZcpbkcYsMUHMoVwMn7STpTJS5JsM/TklpYbHVhuLxTXY5/1/o2QrebW3VA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dSUaJR/S; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-22622ddcc35so21047115ad.2;
-        Wed, 19 Mar 2025 06:21:56 -0700 (PDT)
+	s=arc-20240116; t=1742390604; c=relaxed/simple;
+	bh=9ensWkAEv7GTW3OMNwsfZ8Resy2WMOnJtyP8YvyDXuk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UZGEwAuodbfhr7Vz783IGR8QbfDjc9vasdWZqZolyYpeG/Z8BLnmuDnzHaPY36Rv8XRQ94fkmta+VNytDkN23R2cLahIXC/jp20KSvP9VHMi7w6grdtmv2ECs6dEOWPIGoMKLCd0xYM1Zex1jPxstf8J6Y67IrkbG5KK4UBBQ9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HXkGux37; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-471fe5e0a80so59374301cf.1
+        for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 06:23:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742390516; x=1742995316; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tAyfH6kqswLWsr6KnxovBzjKHKjRDDiHqO/1jpHfBtY=;
-        b=dSUaJR/SZyXLz5S7hrXUZjnaPs0U92L1BVgBDG4y0BTT05YVDEjfE1lj/lqYJ8fVyD
-         K/SM0Z1+OwZbs4nvynv7byUBwErfG06f+g+5lFRUSLFgjgowk9oeelnsxVJtM0fYOuMY
-         Ll+lusnQTM64DQu4SxcYASLewHodzC4kpti4WxTK5lzg2T7lNKtO40UcDRrcXPhrKF1K
-         U6XkI48+8daycuRU8kH0P23rAGAOwp254bgjpcR1zasEtJ0btJyreYXGJq/201FDUWXN
-         42/QlVvVSYoV20rTay6zyCBYjSMRKymsVzOQNby5TKB7rDhlM84HR2Bm2JVvr4xMxsk1
-         8f8g==
+        d=google.com; s=20230601; t=1742390602; x=1742995402; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=psYNKA6/4hrBUz3Y0AVHXJKQr5Yjmd3kCp1spfxggwE=;
+        b=HXkGux37siAjGtiqlsaUyMlZ3xyVPP0epwEV5TED3vYak+Wx7zB1ke5xcZtwBgJzzS
+         7DUSk4159dXuxz6uinhzW+51EGn6jtbU/W5VeEgP2lD8mQcu6LpVpL2B+qVWchob8bqL
+         Rdv2OZnfD+O9mcBjcuarty6m+y/E+JGFuTmYwjRnjN+o/kXfN1KabL2GMYbXDI4iMC1/
+         hW+Y+B1gmeCZax/cDVjjtzfs+aXJQNdshY2BhEhQnUGxvhKwlwo+1FNeMrBrApiZSvOR
+         eYfgoRcGLIYD1Udjz+Nk/xbVGWbfb2JYeoGwu57U+HAt3vMDj/lxIrHdyOsmsQzy7RQ/
+         Y6ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742390516; x=1742995316;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tAyfH6kqswLWsr6KnxovBzjKHKjRDDiHqO/1jpHfBtY=;
-        b=fHYTW55uDGEunxf5ZA27sxd5KVxVq9XCeimn2Q10ghvq7j6cgTh+g8af62IXASeiSa
-         mj8qTExDscJQK3ERtv4FwZubpiM3ZqyfgV0kYHFYMUeyCdBtkSSa86allvd6dvaE6F6F
-         jSX2N7jQxsxcEU5bG2H62kde7nddzG/SDAhxmM8LfrpVS8m1pwIEeLFknk2B9PwiPl7n
-         loiZlWobT60y/gy4zZ36JU/6v0U9b/orhtVqI56TQFWquB+yqSWvYELXD+UExmCahTbC
-         hCybMEsmzL3w6oyoKGxThziFNgE12VpuwcDqf5IhWOzIWpXU4+2cme5i2MXN37sw9Hhf
-         hHTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUtGtYPP70dlyhl/89mPHEH3x8Nm9svupPtj961JKw3ErEUNBijSiiehwU6huBGJtU3ogJjdM8HP0WVLYZphw==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDNrhYTOyXPbFvpGWRw2tOsedhgGj7sW0i/YjXZy514JUwY6d2
-	ck8QWqhYD4xpgSenP/WFIgVLjFFRx3AT2fbkf9BFHllGW9mhipoC
-X-Gm-Gg: ASbGncvpyEizpm9w488Sq8r6BORDPDoiirVabUjkuXOBOUYSf0u90SI68+y1BC66h5B
-	P8cB3+kuofxCJIgniybV9mqjhac3/L7mt2FhHaJ3Vjj/QNZ/lBa9fFE5dCqn8uQrPfm3XGumeq+
-	4JeYknxD5730AjKnJjgnA/TjkyXhsO0EP6W5qQEPoCjfZNW9j1vZjWpmQgqCS7bOn1DGgdfLYLj
-	lLNhvz4EIFuCbQ9TZv+VmfFZ6/MFY+naNFB9Xsb2RC9+vmvAy13NdQb2tLThP1+Sr2oFaPxOFbE
-	sKg9oEmocNqsz3TuQQH3MM0fQgypP6Rhu+cXC2xnbbMkmvDS
-X-Google-Smtp-Source: AGHT+IHRycCa0/R8HPIzD00TI8PYaiGAbqcuw7nzqP7PTLjp8g9kUh2PAbj+uLvhvMDgivEreZFslg==
-X-Received: by 2002:a05:6a00:17a7:b0:72d:9cbc:730d with SMTP id d2e1a72fcca58-7376d619c6cmr4925512b3a.11.1742390515740;
-        Wed, 19 Mar 2025 06:21:55 -0700 (PDT)
-Received: from [10.100.121.195] ([152.193.78.90])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7371167e0b1sm11862295b3a.97.2025.03.19.06.21.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Mar 2025 06:21:55 -0700 (PDT)
-Message-ID: <1560b292-6366-4588-ad4d-654377613b84@gmail.com>
-Date: Wed, 19 Mar 2025 06:21:51 -0700
+        d=1e100.net; s=20230601; t=1742390602; x=1742995402;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=psYNKA6/4hrBUz3Y0AVHXJKQr5Yjmd3kCp1spfxggwE=;
+        b=k7tZKQR0j+sBIF9QhenzVaYBH7pGdYfULDnUBxdg1qXMLGtq2oFvgz+I0GXr/hZqSQ
+         bcPhTKsaPEqYjGI0XjoUPJhHf+KJIj6E0fahcOGoKBmOaf8aM7wQEnhmmw8LBOGSs6Wl
+         IaSYF7cIQ3KWvkuGREmTJobGLSD6Ynz5/cEzKsSwOb7g5E7h9SLv4y5h/npZVczMTxFK
+         GhWAV1AYzi19woerPsRqfG1Yk5pUqoFPXQ6Rx3hdpzxfhs/lRw4hn7lDWsZjI04kR48p
+         H9uhprX4QqBzexU5hDEb5I66mM4iyAgbDH+gLtiVKAHlNjsEnczKjbOfmsreIjmIF2i4
+         UfqQ==
+X-Gm-Message-State: AOJu0Yxn/ZxwXGR2fTQWtIbyZwFfojV2+Z2c8oelgO1Md5HWHRHW3t34
+	4DUjsxrEOUXjnv77VqU5fLQtJaNqzv55ilMotPcE9G0B7cmq4jaT0HAYqQ/i5uquEk66ojDZIuD
+	dlSXBXKYDuOhagRTHKzkFWPdiBIvAOp3HVCCO
+X-Gm-Gg: ASbGnctIiMcx9oQr00LwkrClifsLe2mZxqo/p2Zwr7MUgWzj2dtHxnWn8xF/C50W3VO
+	YqTfNbEsq0j1JWWIMtYl8ko0xWjWYCRNoLG/Y3tud5lMl42+S/oQeVQwND/i78ej+KYKSC+fbVn
+	72zln8039q4MgRFmkN4UWEZSAVju8=
+X-Google-Smtp-Source: AGHT+IF1b8V53T9FhdQQrJ8iDAHBINhY7Z1MO722OoUTatpBP7eKEhkGAELedgqDNn8I12Ri2ahW+JWYrwkUR9jzxUE=
+X-Received: by 2002:a05:622a:5513:b0:476:b783:c94d with SMTP id
+ d75a77b69052e-47708377ce1mr41852091cf.35.1742390601434; Wed, 19 Mar 2025
+ 06:23:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH] mac80211: clip ADDBA instead of bailing out
-To: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>,
- linux-wireless@vger.kernel.org
-Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>,
- Johannes Berg <johannes@sipsolutions.net>
-References: <20250317163902.1893378-1-sashal@kernel.org>
- <20250317163902.1893378-2-sashal@kernel.org>
- <69c63a19-5419-4bbe-858f-6ca100345a28@orange.com>
-Content-Language: en-US
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <69c63a19-5419-4bbe-858f-6ca100345a28@orange.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <2a1893e924bd34f4f5b6124b568d1cdfc15573d5.1742320185.git.pabeni@redhat.com>
+ <0063ca98-93c2-4df4-9c0a-7a145e5409ee@redhat.com>
+In-Reply-To: <0063ca98-93c2-4df4-9c0a-7a145e5409ee@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 19 Mar 2025 14:23:10 +0100
+X-Gm-Features: AQ5f1JpbG3U2EG6L3HSNgKKqo7Ema62A_cl0rgdXLof6FtjM2dwpL9bgI7FLJo0
+Message-ID: <CANn89i+cJfGwTw2T6oM=7u3MZe1YL_4pmdZg+TZo0TK28hHr+w@mail.gmail.com>
+Subject: Re: [PATCH v2] net: introduce per netns packet chains
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Sabrina Dubroca <sd@queasysnail.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Alexandre,
+On Wed, Mar 19, 2025 at 1:59=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> On 3/18/25 7:03 PM, Paolo Abeni wrote:
+> > @@ -2463,16 +2477,18 @@ static inline bool skb_loop_sk(struct packet_ty=
+pe *ptype, struct sk_buff *skb)
+> >  }
+> >
+> >  /**
+> > - * dev_nit_active - return true if any network interface taps are in u=
+se
+> > + * dev_nit_active_rcu - return true if any network interface taps are =
+in use
+> > + *
+> > + * The caller must hold the RCU lock
+> >   *
+> >   * @dev: network device to check for the presence of taps
+> >   */
+> > -bool dev_nit_active(struct net_device *dev)
+> > +bool dev_nit_active_rcu(struct net_device *dev)
+> >  {
+> > -     return !list_empty(&net_hotdata.ptype_all) ||
+> > +     return !list_empty(&dev_net_rcu(dev)->ptype_all) ||
+>
+> Sadly lockdep is not happy about the above, the caller can acquire
+> either the RCU lock and the RCU BH lock, and dev_net_rcu() is happy only
+> with the former - even if AFAICT either are safe. I'll use:
+>
+>         /* Callers may hold either RCU or RCU BH lock */
+>         WARN_ON_ONCE(!rcu_read_lock_held() && !rcu_read_lock_bh_held());
+>
+>         return !list_empty(&dev_net(dev)->ptype_all) ||
 
-On 3/19/25 3:58 AM, Alexandre Ferrieux wrote:
-> When a Linux Wifi{4,5} device talks to a Wifi6 AP, if the AP proposes a Block
-> Acknowledgement aggregation size (ADDBA) exceeding its expectations, the code in
-> mac80211 just bails out, rejecting the aggregation. This yields a big
-> performance penalty on the ack path, which is observable in comparison with
-> other OSes (Windows and MacOS) which "play smarter" and accept the proposal with
-> a "clipped" size.
-Out of curiosity do you have any performance numbers for this, like 
-Linux vs Windows vs MacOS? We ran into a significant performance hit 
-after I added multicast RX support on ath10k (after ~30 clients were on 
-the same channel). After looking into the pcaps we saw many ADDBA 
-failures and ultimately had to disable multicast RX. I want to give this 
-patch a try either way, but I was curious if you had any data on 
-performance improvements.
->
-> A typical scenario would be:
->
->    AP -> Device : ADDBA_request(size=256)
->
-> Current Linux reaction:
->
->    Device -> AP : ADDBA_reply(failure)
->
-> Other OSes reaction:
->
->    Device -> AP : ADDBA_reply(size=64)
->
-> Note that the IEEE802.11 standard allows for both reactions, but it sounds
-> really suboptimal to be bailing out instead of clipping. The patch below does
-> the latter.
->
-> Signed-off-by: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
-> ---
->
-> diff --git a/net/mac80211/agg-rx.c b/net/mac80211/agg-rx.c
-> index f3fbe5a4395e..264dad847842 100644
-> --- a/net/mac80211/agg-rx.c
-> +++ b/net/mac80211/agg-rx.c
-> @@ -317,18 +317,20 @@ void __ieee80211_start_rx_ba_session(struct sta_info *sta,
->                  max_buf_size = IEEE80211_MAX_AMPDU_BUF_HT;
->
->          /* sanity check for incoming parameters:
-> -        * check if configuration can support the BA policy
-> -        * and if buffer size does not exceeds max value */
-> +        * check if configuration can support the BA policy */
->          /* XXX: check own ht delayed BA capability?? */
->          if (((ba_policy != 1) &&
-> -            (!(sta->sta.deflink.ht_cap.cap & IEEE80211_HT_CAP_DELAY_BA))) ||
-> -           (buf_size > max_buf_size)) {
-> -               status = WLAN_STATUS_INVALID_QOS_PARAM;
-> +            (!(sta->sta.deflink.ht_cap.cap & IEEE80211_HT_CAP_DELAY_BA)))) {
-> +               status = WLAN_STATUS_INVALID_QOS_PARAM;
->                  ht_dbg_ratelimited(sta->sdata,
->                                     "AddBA Req with bad params from %pM on tid
-> %u. policy %d, buffer size %d\n",
->                                     sta->sta.addr, tid, ba_policy, buf_size);
->                  goto end;
->          }
-> +       if (buf_size > max_buf_size) {
-> +         buf_size = max_buf_size ; // Clip instead of bailing out
-> +       }
-> +
->          /* determine default buffer size */
->          if (buf_size == 0)
->                  buf_size = max_buf_size;
->
->
+This lockdep distinction seems strange.
+
+The old RCU-bh is gone, we might convert network to standard rcu to avoid t=
+hese.
 
