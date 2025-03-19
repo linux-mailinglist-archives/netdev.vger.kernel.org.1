@@ -1,155 +1,120 @@
-Return-Path: <netdev+bounces-176243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEE7AA697CA
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 19:16:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 54CD5A697DC
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 19:19:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05DE2480F98
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 18:15:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9827425CEB
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 18:19:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0B2821146B;
-	Wed, 19 Mar 2025 18:12:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D8201E5214;
+	Wed, 19 Mar 2025 18:19:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="apLVMCIp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEC32212B09;
-	Wed, 19 Mar 2025 18:12:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC7B91DC9A7
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 18:19:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742407950; cv=none; b=nfdygdtOMQwMYC5nUhb/7qUz3ny22ExLJEvZEXfRhHW5XSBiLU9051dJ1HPUwvb0qsDgvOlaY6r7xaizdbzWT8Wr75aJHiw31RGIFtOlXR/TPCCgaynA81iiUIiEkuBxFitok4kcZ8bJKqlCDX+ohUKAd/Kd0tlVXcAf+75UZxU=
+	t=1742408358; cv=none; b=CjRGBTpFyMU/fLrxsMaRk0Xs96kMYykpTjVH6LdtyzPGPfzNKU266Qz7vEtiS498JWqw4zzxd+yXtU7G+6w/GWDc/3lG8pfO9dAobs+IHA1ApfbcvBOrtFQBkiu4CoLxVSrLWier7nF31xexhsL1a+Z/alzXfipya61FIPRWrE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742407950; c=relaxed/simple;
-	bh=yYcxxMaGRCqFRTPVULaIX2bYJGgjsUIv54Fh+juOWow=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pv4ObAYZA5x3SBV2/pEyB6XCRTtsZvMRgYYta2TK4mKSIPsQoi2ZEMnRsRdp4ixyVrBk2oPT5ynbkrR2XW3tsIkqzKg7/XlWufUywqqqhSyOJRcmjxPKrBwKsyZRgw+VEr6ZRFjP106oXLizsN2xYRgIb/HPoakmA5pTEb3u+T0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-ab7430e27b2so164916666b.3;
-        Wed, 19 Mar 2025 11:12:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742407947; x=1743012747;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7Up1xjea84mFFtC/QFUl+9GqZdL4YQBVY41iIzJ7s9w=;
-        b=a3wH9JGAa25Izj6W9yw0ASMT2GQUcKId97otZdw9QDIlvuyCpwCu9xBI5qKpI2OpsN
-         wIxgAB1EpKVUgvoFycglUIVThmTtdgqTPOjCIgQWKq8oP2uHsu8SCwITW2LXKZnMe69C
-         q6CYvvwyRyn0Ch0OgribKmgzR1Lx9R4+wdwRQ4Mcsi5s2CUjlZMaBDgG+90x76JkQNOh
-         Kb6eKsnenBK47BVxKRBCgqekGJmJR405rn8IeSJS5BcyB1p+3dsFaNdjrT2VbXeTgxWX
-         bJAba/yzCghmCTb5i6T85dtofOeV1WIs+ncVN+CAKQ+4cTZ8WS3SeDmH6rSEKnt2nj4g
-         NabQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUIilm+ZH82zizzD9TDvE7tsWT8GIwGcYRvYLKQo068LYRqMfLB6TWpAdBnxXSl2DAoIuMhCbA=@vger.kernel.org, AJvYcCXHNv+1mvJjwvK2DyfWe22oxn/9wLRwWiXPEff35v/xzzKuSch8boJjpkn3G5rABS5VkraC@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWkWp9qf+3rmEzGcr7y19/QQbxEMOAxR7+bUN1qAZ+sb/S4llE
-	3iqcbDs2ncbgvQOMcGpCI72dTA+u4+uj6J+a6lh8DspLT11SS0PK
-X-Gm-Gg: ASbGncu5+MoqnjOtyjEShbXgtJyL+tpCwQ+uaNZxMZcDGHzP3UywBiHR3wUO3DSJ6yQ
-	bA6FtF0o40TixMRyY1uqBtylZcKwk6ihXhNbdkz1KW8JvXxMsY6R18OfP41JG6Chh1/e6MTBy0J
-	UVy6zkzK40aKpo6OrXgTafAur9ODOMPbgkvGiH0xDidWjHf2oK8fOYiuTwrm15naSuRrAG2X02n
-	03paIO+SNSrFK96osSxd1la6uEHPCfgdujXYV6c4ax0YcZRqcz7SsVRh5jgYkUDgVNzhAmrBws+
-	DKBAqh4wH/8/toHVLL+nY2JiWgxqySP/TJg=
-X-Google-Smtp-Source: AGHT+IEuv66u+KPCyIcrPW7krwGJW4YIwC6fn3uWmqhmLRToO2D33FQi8aLT4Don7dLT/nluRUhFqA==
-X-Received: by 2002:a17:907:9706:b0:ac3:3fe3:bea5 with SMTP id a640c23a62f3a-ac3b7f73116mr326822966b.38.1742407946951;
-        Wed, 19 Mar 2025 11:12:26 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff:4::])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e816968c0csm9466508a12.22.2025.03.19.11.12.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Mar 2025 11:12:26 -0700 (PDT)
-Date: Wed, 19 Mar 2025 11:12:24 -0700
-From: Breno Leitao <leitao@debian.org>
-To: "Paul E. McKenney" <paulmck@kernel.org>, longman@redhat.com,
-	bvanassche@acm.org
-Cc: Eric Dumazet <edumazet@google.com>, kuba@kernel.org, jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com, jiri@resnulli.us, kuniyu@amazon.com,
-	rcu@vger.kernel.org, kasan-dev@googlegroups.com,
-	netdev@vger.kernel.org
-Subject: Re: tc: network egress frozen during qdisc update with debug kernel
-Message-ID: <20250319-truthful-whispering-moth-d308b4@leitao>
-References: <20250319-meticulous-succinct-mule-ddabc5@leitao>
- <CANn89iLRePLUiBe7LKYTUsnVAOs832Hk9oM8Fb_wnJubhAZnYA@mail.gmail.com>
- <20250319-sloppy-active-bonobo-f49d8e@leitao>
- <5e0527e8-c92e-4dfb-8dc7-afe909fb2f98@paulmck-laptop>
- <CANn89iKdJfkPrY1rHjzUn5nPbU5Z+VAuW5Le2PraeVuHVQ264g@mail.gmail.com>
- <0e9dbde7-07eb-45f1-a39c-6cf76f9c252f@paulmck-laptop>
+	s=arc-20240116; t=1742408358; c=relaxed/simple;
+	bh=4SgvABaq6fuxY1Xr3kWRrrX4hTl6Z/qczvdO+T0YKKE=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KeBOZe34vFpkwNCWLMZImtoygqIlDo1xPY7QQsgwEI8cKFpzdwkBvnfzmtRnjWwS+wZxKW2z/wZBUcpyGm0KpZYNg6DfAqvYPbk7OxLoy9I3rEtIO5hOGzX2X8k4u/rdBn+Up59igNX3KEN+5Z1BYJBBv82yNCUn7gHFXJBoGTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=apLVMCIp; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1742408357; x=1773944357;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=+PY4HOzdIKy7VAdAqY0HRRSozDqDdjJwRsSe7nzeVI8=;
+  b=apLVMCIpCPTBDuiGZ27G0NYpJ5NHMhUv4MLgQvr6hsJAht9bGQLkzG/d
+   URcihSL6QRHKW7axdBVOxks0hiGjd6xuDyYgm+jgEGXQHRm6gbmSv/MLq
+   MUzxBzKE0WYnDuB4H34n4mdyVmcZE7aa+PC9AwI/l4VKrhgocFFLz5sZ6
+   4=;
+X-IronPort-AV: E=Sophos;i="6.14,259,1736812800"; 
+   d="scan'208";a="476457980"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2025 18:19:13 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:21517]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.16.7:2525] with esmtp (Farcaster)
+ id 1498306c-20b8-458f-8966-a66781477fda; Wed, 19 Mar 2025 18:19:12 +0000 (UTC)
+X-Farcaster-Flow-ID: 1498306c-20b8-458f-8966-a66781477fda
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 19 Mar 2025 18:19:03 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.106.100.42) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 19 Mar 2025 18:18:30 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <willemdebruijn.kernel@gmail.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
+	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH v1 net-next 2/4] af_unix: Move internal definitions to net/unix/.
+Date: Wed, 19 Mar 2025 11:15:06 -0700
+Message-ID: <20250319181821.17223-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <67db03aba87a1_1367b29420@willemb.c.googlers.com.notmuch>
+References: <67db03aba87a1_1367b29420@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0e9dbde7-07eb-45f1-a39c-6cf76f9c252f@paulmck-laptop>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D031UWC001.ant.amazon.com (10.13.139.241) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Wed, Mar 19, 2025 at 09:05:07AM -0700, Paul E. McKenney wrote:
-
-> > I think we should redesign lockdep_unregister_key() to work on a separately
-> > allocated piece of memory,
-> > then use kfree_rcu() in it.
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Wed, 19 Mar 2025 13:49:31 -0400
+> Kuniyuki Iwashima wrote:
+> > net/af_unix.h is included by core and some LSMs, but most definitions
+> > need not be.
 > > 
-> > Ie not embed a "struct lock_class_key" in the struct Qdisc, but a pointer to
+> > Let's move struct unix_{vertex,edge} to net/unix/garbage.c and other
+> > definitions to net/unix/af_unix.h.
 > > 
-> > struct ... {
-> >      struct lock_class_key;
-> >      struct rcu_head  rcu;
-> > }
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 > 
-> Works for me!
+> One trade-off with these kinds of refactors is that it adds an
+> indirection in git history: a git blame on a line no longer points to
+> the relevant commit.
 
-I've tested a different approach, using synchronize_rcu_expedited()
-instead of synchronize_rcu(), given how critical this function is
-called, and the command performance improves dramatically.
+Right, and git has a useful option for that.
 
-This approach has some IPI penalties, but, it might be quicker to review
-and get merged, mitigating the network issue.
 
-Does it sound a bad approach?
+> 
+> Whether the trade-off is worth it is subjective, your call. Just
+> making it explicit.
+> 
+> I still manually check out pre UDP/UDPLite split often to go back in
+> udp history, for instance.
 
-Date:   Wed Mar 19 10:23:56 2025 -0700
+I often use -C5 (track 5 times for line/file moves) and hope this
+helps you :)
 
-    lockdep: Speed up lockdep_unregister_key() with expedited RCU synchronization
-    
-    lockdep_unregister_key() is called from critical code paths, including
-    sections where rtnl_lock() is held. When replacing a qdisc in a network
-    device, network egress traffic is disabled while __qdisc_destroy() is
-    called for every queue. This function calls lockdep_unregister_key(),
-    which was blocked waiting for synchronize_rcu() to complete.
-    
-    For example, a simple tc command to replace a qdisc could take 13
-    seconds:
-    
-      # time /usr/sbin/tc qdisc replace dev eth0 root handle 0x1234: mq
-        real    0m13.195s
-        user    0m0.001s
-        sys     0m2.746s
-    
-    During this time, network egress is completely frozen while waiting for
-    RCU synchronization.
-    
-    Use synchronize_rcu_expedite() instead to minimize the impact on
-    critical operations like network connectivity changes.
-    
-    Signed-off-by: Breno Leitao <leitao@debian.org>
+$ git blame -C1 net/unix/af_unix.h 
+Blaming lines: 100% (75/75), done.
+b24413180f5600 include/net/af_unix.h               (Greg Kroah-Hartman       2017-11-01 15:07:57 +0100  1) /* SPDX-License-Identifier: GPL-2.0 */
+d48846033064e3 net/unix/af_unix.h                  (Kuniyuki Iwashima        2025-03-15 00:54:46 +0000  2) #ifndef __AF_UNIX_H
+d48846033064e3 net/unix/af_unix.h                  (Kuniyuki Iwashima        2025-03-15 00:54:46 +0000  3) #define __AF_UNIX_H
+d48846033064e3 net/unix/af_unix.h                  (Kuniyuki Iwashima        2025-03-15 00:54:46 +0000  4) 
+cae9910e73446c net/unix/diag.c                     (Felipe Gasper            2019-05-20 19:43:51 -0500  5) #include <linux/uidgid.h>
+^1da177e4c3f41 include/net/af_unix.h               (Linus Torvalds           2005-04-16 15:20:36 -0700  6) 
 
-diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
-index 4470680f02269..96b87f1853f4f 100644
---- a/kernel/locking/lockdep.c
-+++ b/kernel/locking/lockdep.c
-@@ -6595,8 +6595,10 @@ void lockdep_unregister_key(struct lock_class_key *key)
- 	if (need_callback)
- 		call_rcu(&delayed_free.rcu_head, free_zapped_rcu);
- 
--	/* Wait until is_dynamic_key() has finished accessing k->hash_entry. */
--	synchronize_rcu();
-+	/* Wait until is_dynamic_key() has finished accessing k->hash_entry.
-+	 * This needs to be quick, since it is called in critical sections
-+	 */
-+	synchronize_rcu_expedite();
- }
- EXPORT_SYMBOL_GPL(lockdep_unregister_key);
- 
-
+Thanks!
 
