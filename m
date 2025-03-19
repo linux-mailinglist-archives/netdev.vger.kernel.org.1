@@ -1,319 +1,387 @@
-Return-Path: <netdev+bounces-176198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3199A694CC
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:25:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E266A694CF
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:26:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0531A8A1F52
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 16:23:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA492881EA1
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 16:24:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C9F71DF974;
-	Wed, 19 Mar 2025 16:24:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFAC41DE3AE;
+	Wed, 19 Mar 2025 16:24:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eCXxkJu3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CTcs9CAj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 626A01D54FA;
-	Wed, 19 Mar 2025 16:23:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742401441; cv=fail; b=RC3EISxT41R9dj3ImfJTbVKbKHoljbm9A10++Jje9/F6DjreUXxNx+ZjkuRYDpzXPRns8vID3xHNhCw5jNtEKXSM+anLzL4TzXLHN4zZT1+9hX227Z0W+R020yedHqjruXRJz0f8LN6uRBA40IXVOgcZndIs4nI8BoqIVX69sN4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742401441; c=relaxed/simple;
-	bh=rsLTneYi+xqrEgF8LxSCWswu9VpDYNLUqGzxDRT11gI=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=t1niarUK7Ihp+fANgXAKjG35/lST7qFtzxTPMNbb4ulyPpb2sybzA3fw//iPQOOc55upt99FBBptfy/KJSIV5U/DQllQR+U8HyLS0CP2XqK3/r69DCL/pv0cY0S9S3quKSRUsuLGpy7gMdizDdOIw5pmwLAe7HL3Tl01JBD7OlI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eCXxkJu3; arc=fail smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1742401439; x=1773937439;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=rsLTneYi+xqrEgF8LxSCWswu9VpDYNLUqGzxDRT11gI=;
-  b=eCXxkJu3lcH6sX7d7stCFd1MF3FKj1CRnD3xoWPKXBDSjjKyPezKZygL
-   hasI1XybWsAAZuvna5eAj59VUqSke3grX3A0QY5wt19Vcg+cF144BOhys
-   LuAHKc/LpRxLeGvkTVTp2F8n11v93eRbSif6B2S3Wua0lL82x5CmWzWVW
-   6FgLgJCAUYJpoUSdTNis35kNMhU4EdjW2POKGjIkEpI47hDmPZLtgCvVl
-   WoI1ljF261EzgZIHsMKsikEAFMZ+0BPxtw/oSceAsuTVtn4zzfL5ZbCeX
-   rmUxSvo6h5w+CjfdbHrNEzNl/zwb5WYnM4szqvXzif/6X6uCWgdYtyqgG
-   g==;
-X-CSE-ConnectionGUID: ARqg/yuNTrGT0R3zjPW/0w==
-X-CSE-MsgGUID: XcqQL2ZhR1Sg/H8Fam8RRQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11378"; a="42773221"
-X-IronPort-AV: E=Sophos;i="6.14,259,1736841600"; 
-   d="scan'208";a="42773221"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2025 09:23:58 -0700
-X-CSE-ConnectionGUID: Z8w15C9eRbaLc/sksEartg==
-X-CSE-MsgGUID: UWLiuMH2Q7GrqnWyQmc6+A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,259,1736841600"; 
-   d="scan'208";a="122410996"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 19 Mar 2025 09:23:59 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Wed, 19 Mar 2025 09:23:58 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Wed, 19 Mar 2025 09:23:57 -0700
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.46) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Wed, 19 Mar 2025 09:23:57 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=g01xh3/VfQ8rk90bTfec1X58P9KWPBCDZXW9Pbez5s69f5rx4bpzyjA8jsQfb32BcXQ8xzpiu9XVGgbdYY+Q06WdUHKM4PlPueJMTwFtFARU8h6K8c7SzUy4NTKxy0JR92Okbzs6x9qTTwtZm3liXvlZFzvjMt9b6HKHoAELS09sejPCx+isHd9WaeCY5SN+OF6q0HKmpEFdXtLi60E5NlnQfwbyavUir+jtr8rbJRw9wW1WwUHANzpC02e5NntB9HuGNhkZX/HP83ZZGBD5loaYF8RAgEvwO6iNnOzOZ0pHqQNM5mSao05m31ozFLwnlNFpiTAm/JVUg04FWhrhsw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jY6w1iq9o8oYp5wEuIV0lrjGpHcJvwxDPHbqoTZOIUI=;
- b=qL0Ewpjo7PHy0RGLcdxEqaHpmFWKmddVZubNFExPvVU5e4S7qQXlnWbWn/DE82MCkYiLu9FwLefrEwIY7cVEysX5awpyKhyScY5Uxg/IOxRz+2+NwYg8BvQ1rBazToLSiiQ8SmypfXCB3cUQRJF7zB9MwlXCd4mrXihztK4lHQBO0jpfo3Lktjl4ydUFbS6c++wHkhYww6N7PVdDvo9lAvbxiRugEsbTfQNBMtXFxA0Pk63+Y0AECKdagERozJWrpmvjgm3HdWBoiWqlG/vGgtrbS4jTb62AwZHmAjKCvl+wuJbCq2bSESyZUor4iiE4C3DNEGiSVZhw1n1nZsBsOg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- SA1PR11MB8573.namprd11.prod.outlook.com (2603:10b6:806:3ab::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.26; Wed, 19 Mar
- 2025 16:23:14 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca%3]) with mapi id 15.20.8534.034; Wed, 19 Mar 2025
- 16:23:13 +0000
-Date: Wed, 19 Mar 2025 17:23:05 +0100
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, Michal Kubiak
-	<michal.kubiak@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, "Przemek
- Kitszel" <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Alexei
- Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
-	"Jesper Dangaard Brouer" <hawk@kernel.org>, John Fastabend
-	<john.fastabend@gmail.com>, Simon Horman <horms@kernel.org>,
-	<bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 12/16] idpf: implement XDP_SETUP_PROG in ndo_bpf
- for splitq
-Message-ID: <Z9rvaVu460sZkUXD@boxer>
-References: <20250305162132.1106080-1-aleksander.lobakin@intel.com>
- <20250305162132.1106080-13-aleksander.lobakin@intel.com>
- <Z8r/0NOkovItGD1E@boxer>
- <428cc7b6-fc80-4028-a9bb-ce65646005f5@intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <428cc7b6-fc80-4028-a9bb-ce65646005f5@intel.com>
-X-ClientProxiedBy: ZR0P278CA0035.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:1c::22) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D95AA1D54FA
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 16:24:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742401470; cv=none; b=PRjTfCPNqL+0p/GBUn8mQlkJtOxoFMRNK7EN/HvjhYBN6sETLe92OG8rDdVyZ9f65y5giKtHxhOaPWYqNDrSIwwGp12DS/pAB6iLoGMtVstV+acB8TcsBTcnUYaCh/wCkBPtqOfabXP+9jCIW85kfwzniXRo9Qv3QLLSmO4Kj44=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742401470; c=relaxed/simple;
+	bh=RtszS+UIQrfv7NxRWmrGRHVkcrm7T2OsSIXFlHCta8E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lokOKServGu5XmU/7j8qQvjmTfl/vU4mJATVavOQeWzITtThicfZksLKwzQiAb8XFMy3HanZzMWNP/T4pvK6NUpmITJ0TEzndvmHfR8QwAS0g66gkzJVJ6XLqfvwHWc7XdXKkXJM6D9QQ+RGJYE2+DazNZ+146wP6hukZzjq3aU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CTcs9CAj; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742401467;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=neNEJzvXoA99628OTR+7ZmFM0cWFx8/s3tGsPirtn5s=;
+	b=CTcs9CAjw8nOxEhIr3yKxZuBtY5whMetC+XytCdppyOdJWz5A9YWhhrOBi6CmkJn8e165G
+	SP5Qfdm2EaLFnBQrYQac66LXu2n6chyvFRxrVnSehm+JD9nJlZOL/XvaDlToQRB4q08Dt5
+	uqoQK3ISPtuAhQfhObcFrV0YSfGt3jE=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-325-AKP4HoKWNP-C30u36qwf6Q-1; Wed,
+ 19 Mar 2025 12:24:21 -0400
+X-MC-Unique: AKP4HoKWNP-C30u36qwf6Q-1
+X-Mimecast-MFC-AGG-ID: AKP4HoKWNP-C30u36qwf6Q_1742401460
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 718A919560A1;
+	Wed, 19 Mar 2025 16:24:19 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.224.139])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 989B718001D4;
+	Wed, 19 Mar 2025 16:24:16 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Sabrina Dubroca <sd@queasysnail.net>
+Subject: [PATCH net-next v3] net: introduce per netns packet chains
+Date: Wed, 19 Mar 2025 17:24:03 +0100
+Message-ID: <2b6ce88cb7da4d74853cc36d7de4b1b11a7362e5.1742401226.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|SA1PR11MB8573:EE_
-X-MS-Office365-Filtering-Correlation-Id: 123aec1c-d387-474b-b593-08dd67025877
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?YzcyUWNxNUcwanJLdnJ3ZTM0d0dLVTRtVERiL01FU1B2dGdNNytQRldyK3pu?=
- =?utf-8?B?WW01YlJKMlRDQnRYMEFYa1NKZ0VYWGVDKzVtR04rZmxLMFFUQXo0NEs2STYz?=
- =?utf-8?B?Q0pFSU1yS2xudjkzUUNOWklBMVJnRzloSnBWK2E4YjF5TUpsSktaVVdlQWJr?=
- =?utf-8?B?MWprRlNYRy96Y003anJITHU2ZWdvd29kSUZHNlBEc0gzeXJFRHFMdkZid1Iy?=
- =?utf-8?B?ejh0NXpsNkJ5MUpQZ3BJcFA2bGZRV0s0MnBFczdUc2RyNGNoZkpvbVNvZDZM?=
- =?utf-8?B?V3BHT3N1cGU4TGtMZ0d0YnRIQVZ2ckJCdjdoa3RlQVRSTTNLUG5GcUtKY1hJ?=
- =?utf-8?B?TTQ0Y1B6eVB3M1NUNTBVMGhUcXYvTGZQcDcwTVdvTWJiKzBveGVZQzJkb0Ux?=
- =?utf-8?B?MXdCUHNBOFFrcjZzNnNobmJrQ3dQdlR6TkVON0drZmY3Q0NwNk5WbVMvTXNC?=
- =?utf-8?B?eDUxdlpaUkovRnRZc01VeGVwZUpETjA3dytKVFZrMGFrYjVpdXByNzk2Y2JO?=
- =?utf-8?B?Wmg0NzR2Z2NWbFV6VCsxM1pnUEdRVVVnMlFzTlhVbWVKMzJVUTF1dXZHa1Az?=
- =?utf-8?B?VFNVa2VZa29qUXV6UXpuamMzaHdMeVd4RFIxNGNMR0dMbVR6ekp0bUt1S2Vv?=
- =?utf-8?B?MWl1Nkxta25WMnhKZlpmWHBLSjRNVUlKSHd4U2dQNko2SXE5N1FKRWlCRkp2?=
- =?utf-8?B?Z0pCZnp6UEpWeHk1cUw5V01EZW1GN3hxYjh4ZjRsSnE1ZGFpOER0dmFzZ2Rt?=
- =?utf-8?B?UG1DUTNlSTB0cENKdENXNE0vaHdXQlFOdFVlWVQ0ZDhIbjJXcFRqU1kySll0?=
- =?utf-8?B?RTIrOTJ2cFhVTnlSb200MHI0SjFvWmhZYlJHbWZYVXNEVWFCZWF4Y0hGTjdh?=
- =?utf-8?B?K0hNY1N3VnQrSC9ud2J6NWlsbDlqRDBnL2RFZmRpVTZadnZDd3pwcUdnRlZv?=
- =?utf-8?B?T0tISzBEbmNUSi8vVGJQSVM5ckNGQVorM3VrUjM4U1RkWldWcWhud3FIZWQy?=
- =?utf-8?B?MVJzdmdDMlpEazZRUW1pNDg2UkJCbm5QK05yZVdoa2NLZG1EbUNXVm1SbmxT?=
- =?utf-8?B?NTNibXkyWWp5QU1BTXJQUDhxWGpoaHVyMkhSMlFCY1hydjNPK05aVi9YaVZh?=
- =?utf-8?B?UXZWaUd3aTRXaWNWK1NuTTA1USszTGZiZ3RobGFWNjN3ZXpROFZ6MnR3dldE?=
- =?utf-8?B?NmdGYmh2eU9GZ0x5WDNTaVQ4NjFBcDRxeEQ3MFF0S0NqNTFRVWV4SUpaa25V?=
- =?utf-8?B?UXR0QkVobHRBemI4UisxZmxvTmthZmJRV3FTSTg4aDcvZTBPcWkvdjlBS01P?=
- =?utf-8?B?MERWNVBaekRUMW1IcCtHNVVrMTFhOFBOZXczT1pBNXlCbzBCbUZhcWZxdDhC?=
- =?utf-8?B?RmM3c3g2ZGhQSXo1TG1rRW1aVUhXM00zb0dSNS9YZ0s3bmxIRXNBRmhqTjMz?=
- =?utf-8?B?U3hvckxJWUtUNnJkbGJmOEY2Zll4T25vd0lNOGU2bTFKcTBPRW10TytoaE45?=
- =?utf-8?B?QWdhRHAzM0FPRVR5Vys4ZFRsMWpuNmNaSzEwU2Q4b0VBN1ZQNGExZS9oeHJM?=
- =?utf-8?B?cThJUEhyY015TlZyWHVvZ0pGRlFqUk1ScEpzeXV2YlJBSjZ1YStoZ1A0Y2x0?=
- =?utf-8?B?VW54UlJCL2hlM1pzY3ZQeHB2SXdKcFN3eG1TeHhZd1owa0JKT2VQejZyb1Bz?=
- =?utf-8?B?QmVHMCtEM3hrL1dJS1ArVWx4QkpZQUVpelExa0dnU1kxWmNZYzR5WmY2aGd1?=
- =?utf-8?B?bHpvTlFOc0tZOTJ1RGM0c3ozZHdNbGZ1QkJ3Q0ZzcUE0ZExsWkU2QWVUS3F2?=
- =?utf-8?B?enhBWVNxdEwzT0RFQzRSMWdwcmd6YitpZHNrbytIUm1KbHozbEpyVnkxSkFq?=
- =?utf-8?Q?W9d+aIk2EQzFS?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NEYzTzJ0NjloN3pMVlZnYTM0cy8yRjFhY1dJQlpxRk12MVBjelpWczBLc3Ax?=
- =?utf-8?B?eW8yZGpkYUpKejVXRG5ldXo1cDkrSnladkhjam9aU2FNb2VTRHlQTHJlRDJV?=
- =?utf-8?B?dldaK3Q4QWdBT2hJekg0N1puWHNpZ0FZNmN2dlBBWDJWTFVFZVY4MXVRNWpC?=
- =?utf-8?B?aXBFa1pLeC9PdUdSQnFFcGhpUnJHSVdneGhROVFPVmx2cGVrY2hTTmNQSktX?=
- =?utf-8?B?VENqaUFmU2FwdCtHaVc4ckYzR2Q1MWFoWEpKR0h3S2NuVDFNK1JYNWFXK1NG?=
- =?utf-8?B?V2J1ZUFPandPMFhiTkpJbTVxYzIxN2Z3NFNPNURNeEpIQys0QkhIUXlqUHZC?=
- =?utf-8?B?KzBGdTRYZmpUR2VKbXZZY1M3UkQ0MkVqWkUzV0ZaOXdKS3Y2czNwcHFwUkxK?=
- =?utf-8?B?Y0RoRVlTZnZHYXR0ZGt1TWt4cmlZUUdBYmJzZnRnemNOT05VbU9sMGlXbnM0?=
- =?utf-8?B?NHdQWndNV0dvNW1QNEhtbEovR24xVFVFRzBTUEo2blIxUVNLenFORDIwd3RJ?=
- =?utf-8?B?Q1gydTVZbnNDN1Z1T29YSUxiMWNpd2lsYUdWcC9oQlZ1N0w4dVVSZURNa0gy?=
- =?utf-8?B?QnF1ZXJjU1FjNVhJWHlBS3cyTDFvN0l3WG1iRHJDRlpEcHJOdTdqRk52K0RC?=
- =?utf-8?B?bFBFaW45NlpkdWVGcWZzVzcrOU85RWE1bktqVDlrNUFnUDBqRyszaGdveWZY?=
- =?utf-8?B?V2Q1bFhEbnI3K2ZCSURocFVLUk8waVBBVjFsSThReEswZHhaME9jZ0pVUXJy?=
- =?utf-8?B?bEpYdnYwYU9QZmtvczhTSzE2WUU3bnNmakRKOWpheXF4M2ZyY2pvSnEwQ2hp?=
- =?utf-8?B?TnRDNDQwaDFFVlAwSTViYXRhNHl4VGw0L1d4VGFma1BNb3J1Zm5qTml3Q1JL?=
- =?utf-8?B?ZlcvdEprb1JvTHdoR1pibXZMUGhzUlBHWFpLV1RWa3FEUFcraWcxeFB4Tmk5?=
- =?utf-8?B?UXJFTU8ydjdYcHJqUFErcTYzd2IzdGVGTlVNRDFwYVEweHJ5WmZQMWxhcnFI?=
- =?utf-8?B?emdSRVBNZUR0NjJOL1VCVmY4akNiZHExT1B0ek5PSFYyRUhNMnNsa3RpSDVL?=
- =?utf-8?B?dWRIV1NQczdJZlNQMEVwcnpiaHFpMU9XVks2Y3JLMTJaVEIvS0s5eGdMaTFK?=
- =?utf-8?B?c2JuY2tBUHV5a1RpOENzenB0SE5TbUphTnNJQnFXL2dFeGJLb0ZDL0hSMUlm?=
- =?utf-8?B?dWNOU28xSnFrUU5neXFGbG1UbmV4SzBDTHlWamt6OHNNYTVZNVEvWkJVTlJX?=
- =?utf-8?B?eStwUTV5YTNvOTdLaFF0a3IyQ0NmczRjTTRjS0ZqVG1GeVNpZVRJUVkycllZ?=
- =?utf-8?B?Um5HZVJJQ3F4RVdoaVczSSt6RHFzUWpXL3Z5QUQ5elh0alI0YmJDZW1jTE1C?=
- =?utf-8?B?VEFEQS9Rc3FGVnRRS014WFk0WDRJdHlNVE0zSmVyNWNwNTNYN3BEMHNjcmV3?=
- =?utf-8?B?WlVpUmptS1NDVHlYeWg2N0hCOWRncFFGdzNxVVYyYW9TcWN3bjhkRlVwbWYw?=
- =?utf-8?B?eEY0TmdNQ3ltOGZKRlYvTVQyUDBWci9kTzgza1d2TUl4Z1IzY1JHSkdsMTJs?=
- =?utf-8?B?U2ZDOEVhSjJ5RVg5alJOaS96Rmw4ZGx3SUM0bm5pVUFYRnJnenpzc2tqYlQ5?=
- =?utf-8?B?N1h0L2szRVVxSzB2ZWMwWjhWcGRXRHJKNDZoTi9TVE9HTlVXVm9Ka0FXbXND?=
- =?utf-8?B?VmYzbWRZZldscXE5TTBHUEFHU0VON3hvamM0RXdmV1ZuWWNLRmU0UVFFMmlB?=
- =?utf-8?B?d2ttUkU5UHhVSm5QOVJHUWFGdWZ4WHNHbXZycENvWVZkQ1FMTWc3c2lXK2pS?=
- =?utf-8?B?ZnkvNEtQT0ROOUpkeWQyNjFEay80R0xuOWt5REdZZ01BTGRvZ0NxdXZxWW1R?=
- =?utf-8?B?TWloVTg5Rk5iSmpYc3hPQUgzVlN6WmJRcmNiK202WGFxcWNnd2VLcVpkOXh4?=
- =?utf-8?B?L214c3gwSDVEK3JkWEVaT3A3Z3ZuNzdNdHhTakRMV2krZ0crdWpqSUxOTVp3?=
- =?utf-8?B?eXpIVVcxd3NNRktrWlcyczBlMHgzb01NRjhma3EyOU5QVC9pOFUyd3B0MUdz?=
- =?utf-8?B?dlc3bEJrSWQ1b0Eza1FSSnlkZksyWHAxRmV0SXN1VkZUVUxMalJnNmgxbjVO?=
- =?utf-8?B?aFVMWTlTNFpqTFE4YjhxNUNjc2ZJK251M1JRY1hpdTRNT2w2YlJzZnR4YU1Q?=
- =?utf-8?B?MXc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 123aec1c-d387-474b-b593-08dd67025877
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2025 16:23:12.9706
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 63QTXm5JqCBlr2q+0+PSnm0CQjL3ew3Dg4vkHLG7wNVoG0KfVTIh9pd4utK5Q8yqBhoH9j4K7yqrx/+eWm+sUew5Iyda35GkAZgl+GanLPE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8573
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Mon, Mar 17, 2025 at 03:58:12PM +0100, Alexander Lobakin wrote:
-> From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> Date: Fri, 7 Mar 2025 15:16:48 +0100
-> 
-> > On Wed, Mar 05, 2025 at 05:21:28PM +0100, Alexander Lobakin wrote:
-> >> From: Michal Kubiak <michal.kubiak@intel.com>
-> >>
-> >> Implement loading/removing XDP program using .ndo_bpf callback
-> >> in the split queue mode. Reconfigure and restart the queues if needed
-> >> (!!old_prog != !!new_prog), otherwise, just update the pointers.
-> >>
-> >> Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
-> >> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> >> ---
-> >>  drivers/net/ethernet/intel/idpf/idpf_txrx.h |   4 +-
-> >>  drivers/net/ethernet/intel/idpf/xdp.h       |   7 ++
-> >>  drivers/net/ethernet/intel/idpf/idpf_lib.c  |   1 +
-> >>  drivers/net/ethernet/intel/idpf/idpf_txrx.c |   4 +
-> >>  drivers/net/ethernet/intel/idpf/xdp.c       | 114 ++++++++++++++++++++
-> >>  5 files changed, 129 insertions(+), 1 deletion(-)
-> >>
-> > 
-> > (...)
-> > 
-> >> +
-> >> +/**
-> >> + * idpf_xdp_setup_prog - handle XDP program install/remove requests
-> >> + * @vport: vport to configure
-> >> + * @xdp: request data (program, extack)
-> >> + *
-> >> + * Return: 0 on success, -errno on failure.
-> >> + */
-> >> +static int
-> >> +idpf_xdp_setup_prog(struct idpf_vport *vport, const struct netdev_bpf *xdp)
-> >> +{
-> >> +	const struct idpf_netdev_priv *np = netdev_priv(vport->netdev);
-> >> +	struct bpf_prog *old, *prog = xdp->prog;
-> >> +	struct idpf_vport_config *cfg;
-> >> +	int ret;
-> >> +
-> >> +	cfg = vport->adapter->vport_config[vport->idx];
-> >> +	if (!vport->num_xdp_txq && vport->num_txq == cfg->max_q.max_txq) {
-> >> +		NL_SET_ERR_MSG_MOD(xdp->extack,
-> >> +				   "No Tx queues available for XDP, please decrease the number of regular SQs");
-> >> +		return -ENOSPC;
-> >> +	}
-> >> +
-> >> +	if (test_bit(IDPF_REMOVE_IN_PROG, vport->adapter->flags) ||
-> > 
-> > IN_PROG is a bit unfortunate here as it mixes with 'prog' :P
-> 
-> Authentic idpf dictionary ¯\_(ツ)_/¯
-> 
-> > 
-> >> +	    !!vport->xdp_prog == !!prog) {
-> >> +		if (np->state == __IDPF_VPORT_UP)
-> >> +			idpf_copy_xdp_prog_to_qs(vport, prog);
-> >> +
-> >> +		old = xchg(&vport->xdp_prog, prog);
-> >> +		if (old)
-> >> +			bpf_prog_put(old);
-> >> +
-> >> +		cfg->user_config.xdp_prog = prog;
-> >> +
-> >> +		return 0;
-> >> +	}
-> >> +
-> >> +	old = cfg->user_config.xdp_prog;
-> >> +	cfg->user_config.xdp_prog = prog;
-> >> +
-> >> +	ret = idpf_initiate_soft_reset(vport, IDPF_SR_Q_CHANGE);
-> >> +	if (ret) {
-> >> +		NL_SET_ERR_MSG_MOD(xdp->extack,
-> >> +				   "Could not reopen the vport after XDP setup");
-> >> +
-> >> +		if (prog)
-> >> +			bpf_prog_put(prog);
-> > 
-> > aren't you missing this for prog->NULL conversion? you have this for
-> > hot-swap case (prog->prog).
-> 
-> This path (soft_reset) handles NULL => prog and prog => NULL. This
-> branch in particular handles errors during the soft reset, when we need
-> to restore the original prog and put the new one.
-> 
-> What you probably meant is that I don't have bpf_prog_put(old) in case
-> everything went well below? Breh =\
+Currently network taps unbound to any interface are linked in the
+global ptype_all list, affecting the performance in all the network
+namespaces.
 
-yes, best to check with bpftool if there are dangling bpf progs on system
-after using few xdp samples, for example.
+Add per netns ptypes chains, so that in the mentioned case only
+the netns owning the packet socket(s) is affected.
 
-> 
-> > 
-> >> +
-> >> +		cfg->user_config.xdp_prog = old;
-> >> +	}
-> >> +
-> >> +	return ret;
-> >> +}
-> 
-> Thanks,
-> Olek
+While at that drop the global ptype_all list: no in kernel user
+registers a tap on "any" type without specifying either the target
+device or the target namespace (and IMHO doing that would not make
+any sense).
+
+Note that this adds a conditional in the fast path (to check for
+per netns ptype_specific list) and increases the dataset size by
+a cacheline (owing the per netns lists).
+
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+---
+v2 -> v3:
+ - optimized dev_queue_xmit_nit() loop
+ - fixed RCU splat false positive
+ - clarified (?) a ptype_specific comment
+
+v1 -> v2:
+ - fix comment typo
+ - drop the doubtful RCU optimization
+
+rfc -> v1
+ - fix procfs dump
+ - fix dev->ptype_specific -> dev->ptype_all type in ptype_head()
+ - dev_net() -> dev_net_rcu
+ - add dev_nit_active_rcu  variant
+ - ptype specific netns deliver uses dev_net_rcu(skb->dev)) instead
+   of dev_net(orig_dev)
+---
+ include/linux/netdevice.h   | 12 +++++++-
+ include/net/hotdata.h       |  1 -
+ include/net/net_namespace.h |  3 ++
+ net/core/dev.c              | 55 ++++++++++++++++++++++++++++---------
+ net/core/hotdata.c          |  1 -
+ net/core/net-procfs.c       | 28 ++++++++++++++-----
+ net/core/net_namespace.c    |  2 ++
+ 7 files changed, 79 insertions(+), 23 deletions(-)
+
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 67527243459b3..c51a99f24800d 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -4276,7 +4276,17 @@ static __always_inline int ____dev_forward_skb(struct net_device *dev,
+ 	return 0;
+ }
+ 
+-bool dev_nit_active(struct net_device *dev);
++bool dev_nit_active_rcu(struct net_device *dev);
++static inline bool dev_nit_active(struct net_device *dev)
++{
++	bool ret;
++
++	rcu_read_lock();
++	ret = dev_nit_active_rcu(dev);
++	rcu_read_unlock();
++	return ret;
++}
++
+ void dev_queue_xmit_nit(struct sk_buff *skb, struct net_device *dev);
+ 
+ static inline void __dev_put(struct net_device *dev)
+diff --git a/include/net/hotdata.h b/include/net/hotdata.h
+index 30e9570beb2af..fda94b2647ffa 100644
+--- a/include/net/hotdata.h
++++ b/include/net/hotdata.h
+@@ -23,7 +23,6 @@ struct net_hotdata {
+ 	struct net_offload	udpv6_offload;
+ #endif
+ 	struct list_head	offload_base;
+-	struct list_head	ptype_all;
+ 	struct kmem_cache	*skbuff_cache;
+ 	struct kmem_cache	*skbuff_fclone_cache;
+ 	struct kmem_cache	*skb_small_head_cache;
+diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
+index f467a66abc6b1..bd57d8fb54f14 100644
+--- a/include/net/net_namespace.h
++++ b/include/net/net_namespace.h
+@@ -83,6 +83,9 @@ struct net {
+ 	struct llist_node	defer_free_list;
+ 	struct llist_node	cleanup_list;	/* namespaces on death row */
+ 
++	struct list_head ptype_all;
++	struct list_head ptype_specific;
++
+ #ifdef CONFIG_KEYS
+ 	struct key_tag		*key_domain;	/* Key domain of operation tag */
+ #endif
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 6fa6ed5b57987..90cc05bb74a7c 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -572,11 +572,19 @@ static inline void netdev_set_addr_lockdep_class(struct net_device *dev)
+ 
+ static inline struct list_head *ptype_head(const struct packet_type *pt)
+ {
+-	if (pt->type == htons(ETH_P_ALL))
+-		return pt->dev ? &pt->dev->ptype_all : &net_hotdata.ptype_all;
+-	else
+-		return pt->dev ? &pt->dev->ptype_specific :
+-				 &ptype_base[ntohs(pt->type) & PTYPE_HASH_MASK];
++	if (pt->type == htons(ETH_P_ALL)) {
++		if (!pt->af_packet_net && !pt->dev)
++			return NULL;
++
++		return pt->dev ? &pt->dev->ptype_all :
++				 &pt->af_packet_net->ptype_all;
++	}
++
++	if (pt->dev)
++		return &pt->dev->ptype_specific;
++
++	return pt->af_packet_net ? &pt->af_packet_net->ptype_specific :
++				   &ptype_base[ntohs(pt->type) & PTYPE_HASH_MASK];
+ }
+ 
+ /**
+@@ -596,6 +604,9 @@ void dev_add_pack(struct packet_type *pt)
+ {
+ 	struct list_head *head = ptype_head(pt);
+ 
++	if (WARN_ON_ONCE(!head))
++		return;
++
+ 	spin_lock(&ptype_lock);
+ 	list_add_rcu(&pt->list, head);
+ 	spin_unlock(&ptype_lock);
+@@ -620,6 +631,9 @@ void __dev_remove_pack(struct packet_type *pt)
+ 	struct list_head *head = ptype_head(pt);
+ 	struct packet_type *pt1;
+ 
++	if (!head)
++		return;
++
+ 	spin_lock(&ptype_lock);
+ 
+ 	list_for_each_entry(pt1, head, list) {
+@@ -2463,16 +2477,21 @@ static inline bool skb_loop_sk(struct packet_type *ptype, struct sk_buff *skb)
+ }
+ 
+ /**
+- * dev_nit_active - return true if any network interface taps are in use
++ * dev_nit_active_rcu - return true if any network interface taps are in use
++ *
++ * The caller must hold the RCU lock
+  *
+  * @dev: network device to check for the presence of taps
+  */
+-bool dev_nit_active(struct net_device *dev)
++bool dev_nit_active_rcu(struct net_device *dev)
+ {
+-	return !list_empty(&net_hotdata.ptype_all) ||
++	/* Callers may hold either RCU or RCU BH lock */
++	WARN_ON_ONCE(!rcu_read_lock_held() && !rcu_read_lock_bh_held());
++
++	return !list_empty(&dev_net(dev)->ptype_all) ||
+ 	       !list_empty(&dev->ptype_all);
+ }
+-EXPORT_SYMBOL_GPL(dev_nit_active);
++EXPORT_SYMBOL_GPL(dev_nit_active_rcu);
+ 
+ /*
+  *	Support routine. Sends outgoing frames to any network
+@@ -2481,11 +2500,12 @@ EXPORT_SYMBOL_GPL(dev_nit_active);
+ 
+ void dev_queue_xmit_nit(struct sk_buff *skb, struct net_device *dev)
+ {
+-	struct list_head *ptype_list = &net_hotdata.ptype_all;
+ 	struct packet_type *ptype, *pt_prev = NULL;
++	struct list_head *ptype_list;
+ 	struct sk_buff *skb2 = NULL;
+ 
+ 	rcu_read_lock();
++	ptype_list = &dev_net_rcu(dev)->ptype_all;
+ again:
+ 	list_for_each_entry_rcu(ptype, ptype_list, list) {
+ 		if (READ_ONCE(ptype->ignore_outgoing))
+@@ -2529,7 +2549,7 @@ void dev_queue_xmit_nit(struct sk_buff *skb, struct net_device *dev)
+ 		pt_prev = ptype;
+ 	}
+ 
+-	if (ptype_list == &net_hotdata.ptype_all) {
++	if (ptype_list != &dev->ptype_all) {
+ 		ptype_list = &dev->ptype_all;
+ 		goto again;
+ 	}
+@@ -3774,7 +3794,7 @@ static int xmit_one(struct sk_buff *skb, struct net_device *dev,
+ 	unsigned int len;
+ 	int rc;
+ 
+-	if (dev_nit_active(dev))
++	if (dev_nit_active_rcu(dev))
+ 		dev_queue_xmit_nit(skb, dev);
+ 
+ 	len = skb->len;
+@@ -5718,7 +5738,8 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
+ 	if (pfmemalloc)
+ 		goto skip_taps;
+ 
+-	list_for_each_entry_rcu(ptype, &net_hotdata.ptype_all, list) {
++	list_for_each_entry_rcu(ptype, &dev_net_rcu(skb->dev)->ptype_all,
++				list) {
+ 		if (pt_prev)
+ 			ret = deliver_skb(skb, pt_prev, orig_dev);
+ 		pt_prev = ptype;
+@@ -5830,6 +5851,14 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
+ 		deliver_ptype_list_skb(skb, &pt_prev, orig_dev, type,
+ 				       &ptype_base[ntohs(type) &
+ 						   PTYPE_HASH_MASK]);
++
++		/* orig_dev and skb->dev could belong to different netns;
++		 * Even is such case we need to traverse only the list
++		 * coming from skb->dev, as the ptype owner (packet socket)
++		 * will use dev_net(skb->dev) to do namespace filtering.
++		 */
++		deliver_ptype_list_skb(skb, &pt_prev, orig_dev, type,
++				       &dev_net_rcu(skb->dev)->ptype_specific);
+ 	}
+ 
+ 	deliver_ptype_list_skb(skb, &pt_prev, orig_dev, type,
+diff --git a/net/core/hotdata.c b/net/core/hotdata.c
+index d0aaaaa556f22..0bc893d5f07b0 100644
+--- a/net/core/hotdata.c
++++ b/net/core/hotdata.c
+@@ -7,7 +7,6 @@
+ 
+ struct net_hotdata net_hotdata __cacheline_aligned = {
+ 	.offload_base = LIST_HEAD_INIT(net_hotdata.offload_base),
+-	.ptype_all = LIST_HEAD_INIT(net_hotdata.ptype_all),
+ 	.gro_normal_batch = 8,
+ 
+ 	.netdev_budget = 300,
+diff --git a/net/core/net-procfs.c b/net/core/net-procfs.c
+index fa6d3969734a6..3e92bf0f9060b 100644
+--- a/net/core/net-procfs.c
++++ b/net/core/net-procfs.c
+@@ -185,7 +185,13 @@ static void *ptype_get_idx(struct seq_file *seq, loff_t pos)
+ 		}
+ 	}
+ 
+-	list_for_each_entry_rcu(pt, &net_hotdata.ptype_all, list) {
++	list_for_each_entry_rcu(pt, &seq_file_net(seq)->ptype_all, list) {
++		if (i == pos)
++			return pt;
++		++i;
++	}
++
++	list_for_each_entry_rcu(pt, &seq_file_net(seq)->ptype_specific, list) {
+ 		if (i == pos)
+ 			return pt;
+ 		++i;
+@@ -210,6 +216,7 @@ static void *ptype_seq_start(struct seq_file *seq, loff_t *pos)
+ 
+ static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
+ {
++	struct net *net = seq_file_net(seq);
+ 	struct net_device *dev;
+ 	struct packet_type *pt;
+ 	struct list_head *nxt;
+@@ -232,15 +239,22 @@ static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
+ 				goto found;
+ 			}
+ 		}
+-
+-		nxt = net_hotdata.ptype_all.next;
+-		goto ptype_all;
++		nxt = net->ptype_all.next;
++		goto net_ptype_all;
+ 	}
+ 
+-	if (pt->type == htons(ETH_P_ALL)) {
+-ptype_all:
+-		if (nxt != &net_hotdata.ptype_all)
++	if (pt->af_packet_net) {
++net_ptype_all:
++		if (nxt != &net->ptype_all && nxt != &net->ptype_specific)
+ 			goto found;
++
++		if (nxt == &net->ptype_all) {
++			/* continue with ->ptype_specific if it's not empty */
++			nxt = net->ptype_specific.next;
++			if (nxt != &net->ptype_specific)
++				goto found;
++		}
++
+ 		hash = 0;
+ 		nxt = ptype_base[0].next;
+ 	} else
+diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+index 4303f2a492624..b0dfdf791ece5 100644
+--- a/net/core/net_namespace.c
++++ b/net/core/net_namespace.c
+@@ -340,6 +340,8 @@ static __net_init void preinit_net(struct net *net, struct user_namespace *user_
+ 	lock_set_cmp_fn(&net->rtnl_mutex, rtnl_net_lock_cmp_fn, NULL);
+ #endif
+ 
++	INIT_LIST_HEAD(&net->ptype_all);
++	INIT_LIST_HEAD(&net->ptype_specific);
+ 	preinit_net_sysctl(net);
+ }
+ 
+-- 
+2.48.1
+
 
