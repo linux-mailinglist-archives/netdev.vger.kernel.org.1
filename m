@@ -1,94 +1,56 @@
-Return-Path: <netdev+bounces-176249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AD64A69812
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 19:31:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E73BA69823
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 19:37:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52FE93B25FD
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 18:31:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90876188835A
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 18:36:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 123A520AF7D;
-	Wed, 19 Mar 2025 18:31:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cluq2FFP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD2CE207DF9;
+	Wed, 19 Mar 2025 18:36:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from fgw21-7.mail.saunalahti.fi (fgw21-7.mail.saunalahti.fi [62.142.5.82])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1F8207DF1;
-	Wed, 19 Mar 2025 18:31:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 263C81ACECF
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 18:36:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.142.5.82
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742409108; cv=none; b=k1EiJYY877N4u6MS2JTr1yPA8ZcQusEv0fOfFMNiXOHI66I8AxEnWg2QoOsDR4HYaSdfhIX86nrIGw63/tHNtDYndNEDlq4zKtEBnJjn9WEaKcOlN//O8P2UreXXKu3GhhIgg1Xwizx0CDsDkZagAU5mjU1B452Ebo6xAtFmOo4=
+	t=1742409391; cv=none; b=rxzSlun7/03QjQ68a6WEaf0eWFNyYy/aurVAFn8u5yi6STasoobQ2O8+pe3MFyopbI7GePzCKEFHP+l/+thLXlWnjkt6np/FAaHBBlvGSx0bSoY09TUhel7YFb2uPwqwYSNRYpfCqBd4Eu7zZOymPsCmWQklcuaSefJ+xkuB2Dk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742409108; c=relaxed/simple;
-	bh=L5Iwrj7nj39EP2MOSWzeT/LiVK4+eFVjy5gDzPEekZA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZYy2w34o9rxSlcCNK7XuvEIWxfDRc9OBeijLL7LKJkhU4FeKog6OV1SHyf88GSplbFwmENb6ujjGzTZeDvJiC0DW7lBENVA3xw62yAM/xY/7boJuCM7445Vi4hDOeAT0dIobEdBVt0TDCaq3FxQWploCclVgoOD4nfAkf2NJ3bQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cluq2FFP; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1742409107; x=1773945107;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=L5Iwrj7nj39EP2MOSWzeT/LiVK4+eFVjy5gDzPEekZA=;
-  b=cluq2FFPVFLTkmXx3CeP/npT0ZQzBUN5BmlPixiWaUqL4RjkTgXicvjM
-   y10vUmcpJklP+U/5swrbiiQHaP4aQvCExEsa/rxwcFgiqLYC46foNzT1z
-   kRRDHdvc0ZiULgo2c7NPvEDjZUE/ihZjMAik+H4kzNwfPNlWKMbpPtCKO
-   6SQA7GNytX2pWi3UZHhTAXlLhJLmVoL6SpJ0OyiYcLotYG54lTQzVWcDy
-   5otUbvoEUsaCzc2W2n0ltLCNWFBYdJs7HdUjaT2zIffmKqVrpF/hn/57L
-   VlFd9Fh/zeV1TGb/elTFcLmctqKyF/tGCKY1R2u97uwlk1R+YfwSBpqwx
-   w==;
-X-CSE-ConnectionGUID: vz+W3ZtnQZugAkNBYCHBqQ==
-X-CSE-MsgGUID: ze4I27ahTt2hYG9ctZaNUg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11378"; a="61010918"
-X-IronPort-AV: E=Sophos;i="6.14,259,1736841600"; 
-   d="scan'208";a="61010918"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2025 11:31:46 -0700
-X-CSE-ConnectionGUID: XVHcttv8QLqk6z57OW9imw==
-X-CSE-MsgGUID: AiYHT9Z9SCyG0TQ4vG67kg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,259,1736841600"; 
-   d="scan'208";a="127824689"
-Received: from lkp-server02.sh.intel.com (HELO a4747d147074) ([10.239.97.151])
-  by fmviesa004.fm.intel.com with ESMTP; 19 Mar 2025 11:31:40 -0700
-Received: from kbuild by a4747d147074 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tuyCY-000FbC-15;
-	Wed, 19 Mar 2025 18:31:38 +0000
-Date: Thu, 20 Mar 2025 02:30:45 +0800
-From: kernel test robot <lkp@intel.com>
-To: Prabhakar <prabhakar.csengg@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1742409391; c=relaxed/simple;
+	bh=5ymoAD0W77hJjvYqA3owbEmEAUulXBHS2ozPUfQ05zw=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c3P1GiN42KeUWkmLHqtdtE/3cbN2leQ9x/m2lg2DjrauiZKS2phOmo7eyHQ5/dWA6QxRU1RWaMEAEQA88T0KTVQfq8cB/6OmAp3n2YVDnWrY5AM/7YGPoUpySojp0S+jeoQQUEvOVyd4kn1B964ZA5QyVt7mIPCblO10fd8LDyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=fail smtp.mailfrom=gmail.com; arc=none smtp.client-ip=62.142.5.82
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=gmail.com
+Received: from localhost (88-113-26-232.elisa-laajakaista.fi [88.113.26.232])
+	by fgw20.mail.saunalahti.fi (Halon) with ESMTP
+	id 0770a905-04f1-11f0-ab8e-005056bd6ce9;
+	Wed, 19 Mar 2025 20:36:12 +0200 (EET)
+From: Andy Shevchenko <andy.shevchenko@gmail.com>
+Date: Wed, 19 Mar 2025 20:36:10 +0200
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	Prabhakar <prabhakar.csengg@gmail.com>,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH net-next v4 3/3] net: stmmac: Add DWMAC glue layer for
- Renesas GBETH
-Message-ID: <202503200200.WXMnn3Kq-lkp@intel.com>
-References: <20250318205735.122590-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Re: [PATCH net v2 2/2] net: usb: asix: ax88772: Increase phy_name
+ size
+Message-ID: <Z9sOmllizdg79UvL@surfacebook.localdomain>
+References: <20250319105813.3102076-1-andriy.shevchenko@linux.intel.com>
+ <20250319105813.3102076-3-andriy.shevchenko@linux.intel.com>
+ <Z9rYHDL3dNbaK9jZ@shell.armlinux.org.uk>
+ <Z9rvXilnPCblbfIv@smile.fi.intel.com>
+ <Z9r7UPJUJ_Ds6n-6@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,108 +59,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250318205735.122590-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
+In-Reply-To: <Z9r7UPJUJ_Ds6n-6@shell.armlinux.org.uk>
 
-Hi Prabhakar,
+Wed, Mar 19, 2025 at 05:13:52PM +0000, Russell King (Oracle) kirjoitti:
+> On Wed, Mar 19, 2025 at 06:22:54PM +0200, Andy Shevchenko wrote:
+> > On Wed, Mar 19, 2025 at 02:43:40PM +0000, Russell King (Oracle) wrote:
+> > > On Wed, Mar 19, 2025 at 12:54:34PM +0200, Andy Shevchenko wrote:
+> > > > -	char phy_name[20];
+> > > > +	char phy_name[MII_BUS_ID_SIZE + 3];
+> > > 
+> > > MII_BUS_ID_SIZE is sized to 61, and is what is used in struct
+> > > mii_bus::id. Why there a +3 here, which seems like a random constant to
+> > > make it 64-bit aligned in size. If we have need to increase
+> > > MII_BUS_ID_SIZE in the future, this kind of alignment then goes
+> > > wrong...
+> > > 
+> > > If the intention is to align it to 64-bit then there's surely a better
+> > > and future-proof ways to do that.
+> > 
+> > Nope, intention is to cover the rest after %s.
+> 
+> Oops, I had missed that MII_BUS_ID_SIZE is the size of the "%s" part.
+> I think linux/phy.h should declare:
+> 
+> #define PHY_ID_SIZE (MII_BUS_ID_SIZE + 3)
+> 
+> to cater for the ":XX" that PHY_ID_FMT adds.
+> 
+> So the above would become:
+> 
+> 	char phy_name[PHY_ID_SIZE];
+> 
+> I wonder whether keeping PHY_ID_FMT as-is, but casting the argument
+> to a u8 would solve the issue?
+> 
+> Maybe something like:
+> 
+> static inline void
+> phy_format_id(char *dst, size_t n, const char *mii_bus_id, u8 phy_dev_id)
+> {
+> 	BUILD_BUG_ON_MSG(n < PHY_ID_SIZE, "PHY ID destination too small");
+> 	snprintf(dat, n, PHY_ID_FMT, mii_bus_id, phy_dev_id);
+> }
+> 
+> would solve it?
 
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Prabhakar/dt-bindings-net-dwmac-Increase-maxItems-for-interrupts-and-interrupt-names/20250319-050021
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250318205735.122590-4-prabhakar.mahadev-lad.rj%40bp.renesas.com
-patch subject: [PATCH net-next v4 3/3] net: stmmac: Add DWMAC glue layer for Renesas GBETH
-config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20250320/202503200200.WXMnn3Kq-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 8.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250320/202503200200.WXMnn3Kq-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202503200200.WXMnn3Kq-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c: In function 'renesas_gbeth_probe':
->> drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c:125:7: error: 'STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP' undeclared (first use in this function); did you mean 'STMMAC_FLAG_EN_TX_LPI_CLOCKGATING'?
-          STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP |
-          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-          STMMAC_FLAG_EN_TX_LPI_CLOCKGATING
-   drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c:125:7: note: each undeclared identifier is reported only once for each function it appears in
-
-
-vim +125 drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
-
-    72	
-    73	static int renesas_gbeth_probe(struct platform_device *pdev)
-    74	{
-    75		struct plat_stmmacenet_data *plat_dat;
-    76		struct stmmac_resources stmmac_res;
-    77		struct device *dev = &pdev->dev;
-    78		struct renesas_gbeth *gbeth;
-    79		unsigned int i;
-    80		int err;
-    81	
-    82		err = stmmac_get_platform_resources(pdev, &stmmac_res);
-    83		if (err)
-    84			return dev_err_probe(dev, err,
-    85					     "failed to get resources\n");
-    86	
-    87		plat_dat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
-    88		if (IS_ERR(plat_dat))
-    89			return dev_err_probe(dev, PTR_ERR(plat_dat),
-    90					     "dt configuration failed\n");
-    91	
-    92		gbeth = devm_kzalloc(dev, sizeof(*gbeth), GFP_KERNEL);
-    93		if (!gbeth)
-    94			return -ENOMEM;
-    95	
-    96		plat_dat->num_clks = ARRAY_SIZE(renesas_gbeth_clks);
-    97		plat_dat->clks = devm_kcalloc(dev, plat_dat->num_clks,
-    98					      sizeof(*plat_dat->clks), GFP_KERNEL);
-    99		if (!plat_dat->clks)
-   100			return -ENOMEM;
-   101	
-   102		for (i = 0; i < plat_dat->num_clks; i++)
-   103			plat_dat->clks[i].id = renesas_gbeth_clks[i];
-   104	
-   105		err = devm_clk_bulk_get(dev, plat_dat->num_clks, plat_dat->clks);
-   106		if (err < 0)
-   107			return err;
-   108	
-   109		plat_dat->clk_tx_i = renesas_gbeth_find_clk(plat_dat, "tx");
-   110		if (!plat_dat->clk_tx_i)
-   111			return dev_err_probe(dev, -EINVAL,
-   112					     "error finding tx clock\n");
-   113	
-   114		gbeth->rstc = devm_reset_control_get_exclusive(dev, NULL);
-   115		if (IS_ERR(gbeth->rstc))
-   116			return PTR_ERR(gbeth->rstc);
-   117	
-   118		gbeth->dev = dev;
-   119		gbeth->regs = stmmac_res.addr;
-   120		gbeth->plat_dat = plat_dat;
-   121		plat_dat->bsp_priv = gbeth;
-   122		plat_dat->set_clk_tx_rate = stmmac_set_clk_tx_rate;
-   123		plat_dat->clks_config = renesas_gbeth_clks_config;
-   124		plat_dat->flags |= STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY |
- > 125				   STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP |
-   126				   STMMAC_FLAG_SPH_DISABLE;
-   127	
-   128		err = renesas_gbeth_clks_config(gbeth, true);
-   129		if (err)
-   130			return err;
-   131	
-   132		err = stmmac_dvr_probe(dev, plat_dat, &stmmac_res);
-   133		if (err)
-   134			renesas_gbeth_clks_config(gbeth, false);
-   135	
-   136		return err;
-   137	}
-   138	
+Would you like to send a formal patch? I will base my fix on top of it and test
+that in my case.
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+With Best Regards,
+Andy Shevchenko
+
+
 
