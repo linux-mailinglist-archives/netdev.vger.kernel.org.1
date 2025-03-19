@@ -1,191 +1,178 @@
-Return-Path: <netdev+bounces-175972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D556A68177
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 01:28:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13365A68181
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 01:31:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B120917FAC7
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 00:28:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEC263BEA7C
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 00:30:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 359E31C6B4;
-	Wed, 19 Mar 2025 00:28:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7A2318E25;
+	Wed, 19 Mar 2025 00:30:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="abhxtknv"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XqcUU2eZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3161B95B;
-	Wed, 19 Mar 2025 00:28:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6E5414F70
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 00:30:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742344090; cv=none; b=AaJtoisglRicA8tV10WFgwxDrntLjgjrS6C43xWGswQEgvYaIensRip69YzD4As0p4wYH/WTBFWWQthK/Y7dRuhtGQPIijiz9u+2CDyE7xlgYkKcoPjCXrO/fXWvotTkS0EVcnXL4ZT5REaaUCfNcL2vP6/n3a2L6AeD95mOnFU=
+	t=1742344256; cv=none; b=gGnD0rfZEM56djxJK317Ur8eOypvyFDUL0Zm3Cn+rCbRsDHw49qVQAd/9pIYan78wBxqyKzX7AvOlOgx4E2Cgmezwb3jgutX/3grQCjQbrAjgZ1YhXYdN9MVJ5a7WpL1qLF/fECoM8PCe16oIwfFQAoyDCG/n7oPZx0u9p1AFBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742344090; c=relaxed/simple;
-	bh=m0Zz9gxVif1U4ymWLXs8jG0OQ1KBLhLy2E/YTmAsNR8=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=S/GDSOntwVCKwC0iN5L1TRpAdjWfRh8dCS3n0mdaH+qI9cxMnJEMLcldnJ+7zVoRC58owTCCmXuqISq9e1ai5GGFGCXtMQ97sl+FDU8qk0uzjJ8ie5Pjn/U6i1oE0O5ritRd+iY3lyUtT8hMIwXIbyohoPHEYuwpLKlMIuo3ntg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=abhxtknv; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tuhHo-001bZs-4O; Wed, 19 Mar 2025 01:27:56 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
-	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
-	bh=YqOpd7H4mqMcldHN5Q5/K00SxC1j9Za4w+dyTwnLJtI=; b=abhxtknvG7Nj/ksGOPnNThzz2M
-	YCf5dzpKvGraTfhZrsADYE6/4hh7CC3MNqmN3qtaq7+/WBqNooANT58rW6Iw8I8yxNr7ZsnNRJdyv
-	KLwZToNs5VYCBMgL76JdtlcrMBNkJl1PcHf/0MyrnjTCf7vZh8mg3EsqXPgIOGDYl3+qq7GqgffQQ
-	KzoumfKfGNOLsM2R2XlHBK3jx4lJr8nP2ik2tR9TwaeQ3MxOKs9lWOlbJitPqyOwpWLukrj2sBk5I
-	XZZEsLrbNbVQePXd6w+cxMoSbe1fTqvsVBvjjqsyJCCB+hWu6Wrt5DA0rlkVx++LzS1oFmvOUOIxi
-	O/oKGr0Q==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tuhHn-000887-NH; Wed, 19 Mar 2025 01:27:55 +0100
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tuhHU-0053Vx-FG; Wed, 19 Mar 2025 01:27:36 +0100
-Message-ID: <85a034b7-a22d-438f-802e-ac193099dbe7@rbox.co>
-Date: Wed, 19 Mar 2025 01:27:35 +0100
+	s=arc-20240116; t=1742344256; c=relaxed/simple;
+	bh=luqF2jHLmKY+RLPKMJq4IPHVW4NXlzeIe2MDHG50KrM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=F5YhmJfNNJeL+5sPcv/uACnAfTE8ESnDz1yCws7gyLPd0UVfLNplf950dAenM/MVPaU/BhdUOu6ivkaUPNBlDBUHy3ylxWcOVV/7TYi4SmMB76vrqrfd093pQW0uXbuOcL5NMDYBIRq1VYF3niANKc7bKBrRz1+GBW1IcDoqToM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XqcUU2eZ; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <c53cee32-02c0-4c5a-a57d-910b12e73afd@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1742344241;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FdBbxEuv4+gUW7POTDlbc6n4VZ75Yi4SjW3g8RB7MsI=;
+	b=XqcUU2eZwMe7spWbuYWmle2eW2p5HVyYXx0LHrnkxSTJ5ZPByYv0HIRdlmtfmkXqXYUFQs
+	SiuJ+qZHlx9ET/U/9yduoVxBB3sfj9m+oSb4FZo23/9ArSe9UOS6p2ROSq/F42KBtM6mXE
+	0itvpPNaXtcqXb9YThqVfJq3+b/GAvQ=
+Date: Tue, 18 Mar 2025 17:30:37 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Michal Luczaj <mhal@rbox.co>
-Subject: Re: [PATCH net-next v2] vsock/test: Add test for null ptr deref when
- transport changes
-To: Luigi Leonardi <leonardi@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>
-Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Hyunwoo Kim <v4bel@theori.io>
-References: <20250314-test_vsock-v2-1-3c0a1d878a6d@redhat.com>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <20250314-test_vsock-v2-1-3c0a1d878a6d@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [RFC PATCH bpf-next 0/3] Avoid skipping sockets with socket
+ iterators
+To: Jordan Rife <jrife@google.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ Aditi Ghag <aditi.ghag@isovalent.com>
+References: <20250313233615.2329869-1-jrife@google.com>
+ <384c31a4-f0d7-449b-a7a4-2994f936d049@linux.dev>
+ <CADKFtnQk+Ve57h0mMY1o2u=ZDaqNuyjx=vtE8fzy0q-9QK52tw@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CADKFtnQk+Ve57h0mMY1o2u=ZDaqNuyjx=vtE8fzy0q-9QK52tw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On 3/14/25 10:27, Luigi Leonardi wrote:
-> Add a new test to ensure that when the transport changes a null pointer
-> dereference does not occur[1].
+On 3/17/25 6:45 PM, Jordan Rife wrote:
+> Hi Martin,
 > 
-> Note that this test does not fail, but it may hang on the client side if
-> it triggers a kernel oops.
+> Thanks a lot for taking a look.
 > 
-> This works by creating a socket, trying to connect to a server, and then
-> executing a second connect operation on the same socket but to a
-> different CID (0). This triggers a transport change. If the connect
-> operation is interrupted by a signal, this could cause a null-ptr-deref.
+>> The batch should have a snapshot of the bucket. Practically, it should not have
+>> the "repeating" or "missing" a sk issue as long as seq->stop() is not called in
+>> the middle of the iteration of that batch.
+>>
+>> I think this guarantee is enough for the bpf_sock_destroy() and the
+>> bpf_setsockopt() use case if the bpf prog ends up not seq_write()-ing anything.
+> 
+> Yeah, I realized shortly after sending this out that in the case that
+> you're purely using the iterator to call bpf_sock_destroy() or
+> bpf_setsockopt() without any seq_write()s, you would likely never have
+> to process a bucket in multiple "chunks". Possibly a poor example on
+> my part :). Although, I have a possibly dumb question even in this
+> case. Focusing in on just bpf_iter_udp_batch for a second,
+> 
+>>     if (!resized && !bpf_iter_udp_realloc_batch(iter, batch_sks * 3 / 2)) {
+>>         resized = true;
+>>         /* After allocating a larger batch, retry one more time to grab
+>>          * the whole bucket.
+>>          */
+>>         goto again;
+>>     }
+> 
+> Barring the possibility that bpf_iter_udp_realloc_batch() fails to
+> grab more memory (should this basically never happen?), this should
+> ensure that we always grab the full contents of the bucket on the
+> second go around. However, the spin lock on hslot2->lock is released
+> before doing this. Would it not be more accurate to hold onto the lock
+> until after the second attempt, so we know the size isn't changing
+> between the time where we release the lock and the time when we
+> reacquire it post-batch-resize. The bucket size would have to grow by
+> more than 1.5x for the new size to be insufficient, so I may be
+> splitting hairs here, but just something I noticed.
 
-Just to be clear: that's the splat, right?
+It is a very corner case.
 
-Oops: general protection fault, probably for non-canonical address 0xdffffc000000000c: 0000 [#1] PREEMPT SMP KASAN NOPTI
-KASAN: null-ptr-deref in range [0x0000000000000060-0x0000000000000067]
-CPU: 2 UID: 0 PID: 463 Comm: kworker/2:3 Not tainted
-Workqueue: vsock-loopback vsock_loopback_work
-RIP: 0010:vsock_stream_has_data+0x44/0x70
-Call Trace:
- virtio_transport_do_close+0x68/0x1a0
- virtio_transport_recv_pkt+0x1045/0x2ae4
- vsock_loopback_work+0x27d/0x3f0
- process_one_work+0x846/0x1420
- worker_thread+0x5b3/0xf80
- kthread+0x35a/0x700
- ret_from_fork+0x2d/0x70
- ret_from_fork_asm+0x1a/0x30
+I guess it can with GFP_ATOMIC. I just didn't think it was needed considering 
+the key of the hash is addresses+ports. If we have many socks collided on the 
+same addresses+ports bucket, that would be a better hashtable problem to solve 
+first.
 
-> ...
-> +static void test_stream_transport_change_client(const struct test_opts *opts)
-> +{
-> +	__sighandler_t old_handler;
-> +	pid_t pid = getpid();
-> +	pthread_t thread_id;
-> +	time_t tout;
-> +
-> +	old_handler = signal(SIGUSR1, test_transport_change_signal_handler);
-> +	if (old_handler == SIG_ERR) {
-> +		perror("signal");
-> +		exit(EXIT_FAILURE);
-> +	}
-> +
-> +	if (pthread_create(&thread_id, NULL, test_stream_transport_change_thread, &pid)) {
-> +		perror("pthread_create");
+The default batch size is 16 now. On the listening hashtable + SO_REUSEPORT, 
+userspace may have one listen sk binding on the same address+port for each 
+thread. It is not uncommon to have hundreds of CPU cores now, so it may actually 
+need to hit the realloc_batch() path once and then likely will stay at that size 
+for the whole hashtable iteration.
 
-Does pthread_create() set errno on failure?
+> 
+> But yeah, iterators that also print/dump are the main concern.
+> 
+>> One thought is to avoid seq->stop() which will require to do batching again next
+>> time, in particular, when the user has provided large buf to read() to ensure it
+>> is large enough for one bucket. May be we can return whatever seq->buf has to
+>> the userspace whenever a bucket/batch is done. This will have perf tradeoff
+>> though and not sure how the userspace can optin.
+> 
+> Hmmm, not sure if I understand here. As you say below, don't we have
+> to use stop to deref the sk between reads?
 
-> +		exit(EXIT_FAILURE);
-> +	}
-> +
-> +	tout = current_nsec() + TIMEOUT * NSEC_PER_SEC;
+I was thinking the case that, e.g. the userspace's buf may be large enough for 
+ >1 bucket but <2 buckets. Then the 2nd bucket is only half done and requires a 
+stop().
 
-Isn't 10 seconds a bit excessive? I see the oops pretty much immediately.
+> 
+>> Another random thought is in seq->stop (bpf_iter_{tcp,udp}_seq_stop). It has to
+>> release the sk refcnt because we don't know when will the userspace come back to
+>> read(). Will it be useful if it stores the cookies of the sk(s) that have not
+>> yet seq->show?
+> 
+> Keeping track of all the cookies we've seen or haven't seen in the
+> current bucket would indeed allow us to avoid skipping any we haven't
+> seen or repeating those we have on subsequent reads. I had considered
 
-> +	do {
-> +		struct sockaddr_vm sa = {
-> +			.svm_family = AF_VSOCK,
-> +			.svm_cid = opts->peer_cid,
-> +			.svm_port = opts->peer_port,
-> +		};
-> +		int s;
-> +
-> +		s = socket(AF_VSOCK, SOCK_STREAM, 0);
-> +		if (s < 0) {
-> +			perror("socket");
-> +			exit(EXIT_FAILURE);
-> +		}
-> +
-> +		connect(s, (struct sockaddr *)&sa, sizeof(sa));
-> +
-> +		/* Set CID to 0 cause a transport change. */
-> +		sa.svm_cid = 0;
-> +		connect(s, (struct sockaddr *)&sa, sizeof(sa));
-> +
-> +		close(s);
-> +	} while (current_nsec() < tout);
-> +
-> +	if (pthread_cancel(thread_id)) {
-> +		perror("pthread_cancel");
+I don't think we need to worry about the newly added sk after the iteration 
+started. This chase on newly added sk may not end.
 
-And errno here.
+Only need to avoid iterating the same sk.
 
-> +		exit(EXIT_FAILURE);
-> +	}
-> +
-> +	/* Wait for the thread to terminate */
-> +	if (pthread_join(thread_id, NULL)) {
-> +		perror("pthread_join");
+> something like this, but had initially avoided it, since I didn't want
+> to dynamically allocate (and reallocate) additional memory to keep
+> track of cookies. I also wasn't sure if this would be acceptable
+> performance-wise, and of course the allocation can fail in which case
+> you're back to square one. Although, I may be imagining a different
+> implementation than you. In fact, this line of thinking led me to the
+> approach proposed in the RFC which basically tries to
+> accurately/efficiently track everything that's already seen without
+> remembering all the cookies or allocating any additional buffers. This
+> might make a good alternative if the concerns I listed aren't a big
+> deal.
 
-And here.
-Aaand I've realized I've made exactly the same mistake elsewhere :)
+I don't think memory will be a concern if we are talking about another array 
+(for one bucket) is needed for storing cookies. This may actually be the right 
+tradeoff instead of modifying the common networking code path or adding fields 
+to struct sock.
 
-> ...
-> +static void test_stream_transport_change_server(const struct test_opts *opts)
-> +{
-> +	time_t tout = current_nsec() + TIMEOUT * NSEC_PER_SEC;
-> +
-> +	do {
-> +		int s = vsock_stream_listen(VMADDR_CID_ANY, opts->peer_port);
-> +
-> +		close(s);
-> +	} while (current_nsec() < tout);
-> +}
+We can also consider if the same sk batch array can be reused to store cookies 
+during stop(). If the array can reuse, it would be nice but not a blocker imo.
 
-I'm not certain you need to re-create the listener or measure the time
-here. What about something like
+In term of slowness, the worst will be all the previous stored cookies cannot be 
+found in the updated bucket? Not sure how often a socket is gone and how often 
+there is a very large bucket (as mentioned at the hashtable's key earlier), so 
+should not be an issue for iteration use case? I guess it may need some rough 
+PoC code to judge if it is feasible.
 
-	int s = vsock_stream_listen(VMADDR_CID_ANY, opts->peer_port);
-	control_expectln("DONE");
-	close(s);
-
-Thanks,
-Michal
 
