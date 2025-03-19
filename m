@@ -1,156 +1,115 @@
-Return-Path: <netdev+bounces-175976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA4DCA682B2
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 02:22:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C0D4A682D1
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 02:43:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BEFE42220E
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 01:22:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE0CE178425
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 01:43:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1A2E3595B;
-	Wed, 19 Mar 2025 01:22:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05A3424E4A8;
+	Wed, 19 Mar 2025 01:43:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JT1atJyy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568D98C0B;
-	Wed, 19 Mar 2025 01:22:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56E5824DFF8
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 01:43:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742347375; cv=none; b=qwCWEaQpdvCNhhLwr0AnF5tfi0sxwDVkcDVXWepSNoF7y7tISCDFHaepWMQltLrnNhptcHFyEZuzJP5gl6DSYN1JF1032eHvMIIJ1o+uYfDpCJ47nzrvSP4boXr12tXJovR7K1BOKEwSFFllW0ozo+nwSJovSgSLhk/BCSjAiZc=
+	t=1742348599; cv=none; b=KU+SFsf+EPSWIw4irI5ICPRyMvCyBLIZN8xoYM/eTc4Z6m0FFNMrBDMAOWbCSkiuVUwKhdNsB9/acPsedXwPait+smQrwM5tY6H+OvUE+DbEVmwUC35mbMYnmVYHJfmNKwbD0AEYRqVbVpdEtcsPKUWFt1GkozU4WhdyvuwyV9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742347375; c=relaxed/simple;
-	bh=DEBFMxwAsJn6rC1BPqAY1aUJxtEqZ7s0Q0rSJs6fekQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Cs7/qZpiOyy9mjT52hwf4Th0K1RrnVYH09GvFP58koNpcjLhYI0e3wckBK2bvhemMbU5XkgA0IC4cxaYfAn3E55xF14L4Qq5ouLeEkDzlFz8DNMr7tsf7hM01FcX2YFRte74Ny2gOYn611DP2ZkvRHQIfLqL/I4rUztwk444Sb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.166.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52J1LiKQ002371;
-	Tue, 18 Mar 2025 18:22:30 -0700
-Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [147.11.82.252])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 45eprr9s5a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Tue, 18 Mar 2025 18:22:29 -0700 (PDT)
-Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
- ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.43; Tue, 18 Mar 2025 18:22:29 -0700
-Received: from pek-lpg-core1.wrs.com (147.11.136.210) by
- ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
- 15.1.2507.43 via Frontend Transport; Tue, 18 Mar 2025 18:22:26 -0700
-From: <jianqi.ren.cn@windriver.com>
-To: <stable@vger.kernel.org>
-CC: <patches@lists.linux.dev>, <gregkh@linuxfoundation.org>,
-        <linux-kernel@vger.kernel.org>, <jhs@mojatatu.com>,
-        <xiyou.wangcong@gmail.com>, <jiri@resnulli.us>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <netdev@vger.kernel.org>, <michal.swiatkowski@linux.intel.com>
-Subject: [RFC PATCH 6.1.y] net/sched: act_mirred: don't override retval if we already lost the skb
-Date: Wed, 19 Mar 2025 09:22:25 +0800
-Message-ID: <20250319012225.821278-1-jianqi.ren.cn@windriver.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1742348599; c=relaxed/simple;
+	bh=GV92ClXjvz4/MTW4YP/XSUB8BPHIDGjT8AUblei2M/Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iGl4SoiGskdOQtxl/yms0VWsOpnrb7RHw99ci5Diute9uBAnkXVQSzfnp+nBqwFMPNrOti4FZJd//rbQRhGV7VSGtHyeQbsFZyGt+WoM5uiak/ZDKG8ClR/1vc7Tp9U2LS0YQnOS5OI6iwOwDUCf5cU59mOhyGKWuTzZBgEGGno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JT1atJyy; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742348596;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GV92ClXjvz4/MTW4YP/XSUB8BPHIDGjT8AUblei2M/Q=;
+	b=JT1atJyytt/MCz6/T+MoDyP65z2G31eFIJ/g330bDJr5oLl5jAGPIM3OMBb+E5rtX5sTgQ
+	uIrvG/FGA5WV+UsEHdqTw839n6mGuPalHc850/88e0Ou6g1slZ1zxf0KeYQuD9o00uS4xq
+	UB6s8yBtX7hEbyaz0G9bmb1uUbxMZsE=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-588-jkTTNH8DM8ep4jcngO6tmA-1; Tue, 18 Mar 2025 21:43:13 -0400
+X-MC-Unique: jkTTNH8DM8ep4jcngO6tmA-1
+X-Mimecast-MFC-AGG-ID: jkTTNH8DM8ep4jcngO6tmA_1742348592
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2fec3e38c2dso10359821a91.2
+        for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 18:43:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742348592; x=1742953392;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GV92ClXjvz4/MTW4YP/XSUB8BPHIDGjT8AUblei2M/Q=;
+        b=VLt0k1RhB58T2mwu8MoXoyQx8h3qDm1mMazNjLEIbg/SMnufukH1JwdUMwvgULRsTf
+         R+xQsjkdoV8LRx6Keqi5sBULLyZ4MrQpfrkqgdz2QSUstasSiIYGpb+80F+/c4j1UPE0
+         o3TEJerK1JaXKiLnxfw546TiNUA/v46FToaJZ88UW9Qusx3ycxazWqeECPD2TWKb1iBD
+         Z0bnivgmxxgRyh1N9PVgifpn3UjzTSju5+ssv0pZVJbfKqGpnvPArGLGfFQFIF0Lpfpf
+         gizP73kIcs6rxpYGnPjQb6zTq8JewVrA7BeD9WDbH6WnxrNy3JURuY9y+j9z5AcvIAbP
+         8MRg==
+X-Forwarded-Encrypted: i=1; AJvYcCVFO7YTILN5mUDeUaFzJTC8bqArnX13kh3HF06Qjzuz4BSWjW2uKYOGr+ZULd0tMTSmW0R4Ebw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7/wjVNsG/2duGA//RWf7rDeOSC8IhM8CUTEJQohu0E74cJZqD
+	vsxnBbgfsQ31LmSflN0Fvy09plf4pYrSki55szvOkFwS7eGRTMgZj3OJRXklGrz4vpwHtRZ5bdE
+	ZmA8JjlzlmZt/NzoXXyUHTgO89Ok1sQFaQbNTTnkuoQSf6DZcKR894ff+1FuAuqx1c6qNwxJDvY
+	hbZBb3V5OFUNuYsJlS+zupvy9Pz0SZ
+X-Gm-Gg: ASbGncttLa06VRs3zkQV19CurdKv5aLg2rcLyKSuWMLq4nuAzwduY6bKWAXUu44IP3D
+	g8FfnbcCHWLeWGdvwjsckSZPTyB/WG1k2nis0B6HRnhP5uFd/SIsRJHpuwZ5Np5W2H8b9vbFs
+X-Received: by 2002:a17:90b:1811:b0:2ff:5ed8:83d1 with SMTP id 98e67ed59e1d1-301bdf8fe6dmr1172322a91.19.1742348592282;
+        Tue, 18 Mar 2025 18:43:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF3xUKmc/HaZKbY2Dl8pCa58A8bYMdk6rBE8YTKkC3nogLq+BbetaOi+Z7lREjD84lMdYnVJXjJq88sniZ07Ns=
+X-Received: by 2002:a17:90b:1811:b0:2ff:5ed8:83d1 with SMTP id
+ 98e67ed59e1d1-301bdf8fe6dmr1172297a91.19.1742348591933; Tue, 18 Mar 2025
+ 18:43:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=LZw86ifi c=1 sm=1 tr=0 ts=67da1c55 cx=c_pps a=/ZJR302f846pc/tyiSlYyQ==:117 a=/ZJR302f846pc/tyiSlYyQ==:17 a=Vs1iUdzkB0EA:10 a=VwQbUJbxAAAA:8 a=QyXUC8HyAAAA:8 a=A7XncKjpAAAA:8 a=J1Y8HTJGAAAA:8 a=t7CeM3EgAAAA:8
- a=z6SZLS2PjRZJ6NiNSX0A:9 a=R9rPLQDAdC6-Ub70kJmZ:22 a=y1Q9-5lHfBjTkpIzbSAN:22 a=FdTzh2GWekK77mhwV6Dw:22
-X-Proofpoint-GUID: m1nnqcQeXG37wuuTHI20t1um596iVOkQ
-X-Proofpoint-ORIG-GUID: m1nnqcQeXG37wuuTHI20t1um596iVOkQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-18_10,2025-03-17_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
- priorityscore=1501 impostorscore=0 lowpriorityscore=0 malwarescore=0
- bulkscore=0 clxscore=1011 adultscore=0 spamscore=0 phishscore=0
- suspectscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.21.0-2502280000
- definitions=main-2503190008
+References: <20250318-virtio-v1-0-344caf336ddd@daynix.com> <20250318-virtio-v1-1-344caf336ddd@daynix.com>
+In-Reply-To: <20250318-virtio-v1-1-344caf336ddd@daynix.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 19 Mar 2025 09:42:59 +0800
+X-Gm-Features: AQ5f1JotJK4za7GHDUjLaHu15ZgN8MdATNrjp2GqHsHDNV3hc5BHA8yY_muRp9w
+Message-ID: <CACGkMEv4EXUcZ68SZ7RzKnJ1+etf4jvqLLUG9-dXUDc9jSsOiw@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/4] virtio_net: Split struct virtio_net_rss_config
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Andrew Melnychenko <andrew@daynix.com>, Joe Damato <jdamato@fastly.com>, 
+	Philo Lu <lulie@linux.alibaba.com>, virtualization@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, devel@daynix.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jakub Kicinski <kuba@kernel.org>
+On Tue, Mar 18, 2025 at 5:57=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix=
+.com> wrote:
+>
+> struct virtio_net_rss_config was less useful in actual code because of a
+> flexible array placed in the middle. Add new structures that split it
+> into two to avoid having a flexible array in the middle.
+>
+> Suggested-by: Jason Wang <jasowang@redhat.com>
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 
-[ Upstream commit 166c2c8a6a4dc2e4ceba9e10cfe81c3e469e3210 ]
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-If we're redirecting the skb, and haven't called tcf_mirred_forward(),
-yet, we need to tell the core to drop the skb by setting the retcode
-to SHOT. If we have called tcf_mirred_forward(), however, the skb
-is out of our hands and returning SHOT will lead to UaF.
-
-Move the retval override to the error path which actually need it.
-
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Fixes: e5cf1baf92cb ("act_mirred: use TC_ACT_REINSERT when possible")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
-Signed-off-by: Jianqi Ren <jianqi.ren.cn@windriver.com>
-Signed-off-by: He Zhe <zhe.he@windriver.com>
----
-Verified the build test
----
- net/sched/act_mirred.c | 20 ++++++++++++--------
- 1 file changed, 12 insertions(+), 8 deletions(-)
-
-diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
-index 36395e5db3b4..24c70ba6eebc 100644
---- a/net/sched/act_mirred.c
-+++ b/net/sched/act_mirred.c
-@@ -259,13 +259,13 @@ static int tcf_mirred_act(struct sk_buff *skb, const struct tc_action *a,
- 	dev = rcu_dereference_bh(m->tcfm_dev);
- 	if (unlikely(!dev)) {
- 		pr_notice_once("tc mirred: target device is gone\n");
--		goto out;
-+		goto err_cant_do;
- 	}
- 
- 	if (unlikely(!(dev->flags & IFF_UP)) || !netif_carrier_ok(dev)) {
- 		net_notice_ratelimited("tc mirred to Houston: device %s is down\n",
- 				       dev->name);
--		goto out;
-+		goto err_cant_do;
- 	}
- 
- 	/* we could easily avoid the clone only if called by ingress and clsact;
-@@ -279,7 +279,7 @@ static int tcf_mirred_act(struct sk_buff *skb, const struct tc_action *a,
- 	if (!use_reinsert) {
- 		skb2 = skb_clone(skb, GFP_ATOMIC);
- 		if (!skb2)
--			goto out;
-+			goto err_cant_do;
- 	}
- 
- 	want_ingress = tcf_mirred_act_wants_ingress(m_eaction);
-@@ -321,12 +321,16 @@ static int tcf_mirred_act(struct sk_buff *skb, const struct tc_action *a,
- 	}
- 
- 	err = tcf_mirred_forward(want_ingress, skb2);
--	if (err) {
--out:
-+	if (err)
- 		tcf_action_inc_overlimit_qstats(&m->common);
--		if (tcf_mirred_is_act_redirect(m_eaction))
--			retval = TC_ACT_SHOT;
--	}
-+	__this_cpu_dec(mirred_nest_level);
-+
-+	return retval;
-+
-+err_cant_do:
-+	if (tcf_mirred_is_act_redirect(m_eaction))
-+		retval = TC_ACT_SHOT;
-+	tcf_action_inc_overlimit_qstats(&m->common);
- 	__this_cpu_dec(mirred_nest_level);
- 
- 	return retval;
--- 
-2.25.1
+Thanks
 
 
