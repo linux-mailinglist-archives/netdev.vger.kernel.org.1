@@ -1,112 +1,183 @@
-Return-Path: <netdev+bounces-176349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67AE2A69CC6
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 00:36:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8738EA69CCD
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 00:42:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4A2D7AFC20
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 23:35:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA055189C3F3
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 23:42:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E65AC224230;
-	Wed, 19 Mar 2025 23:36:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807242236FA;
+	Wed, 19 Mar 2025 23:42:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QnBImN/V"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FI4VIG28"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10D79223711
-	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 23:36:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED85C1991CB;
+	Wed, 19 Mar 2025 23:42:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742427389; cv=none; b=BKoRUmLmiOQaCTL6n4hoToX+vpuQbS61GXWg5W5zDcUjHSyYeDtmlajVmIKO1LgHZlrmXWa+NVD0gveLMj4JhB2BYMQT5j5CBQzr0bxodHjG9fv4nouL3Z5C0NoaEb1AcyHL4Ztm+EvWCX5UoRhG5ajcdba5XOgP9/PfbCG8H+c=
+	t=1742427752; cv=none; b=SJD3djSRLl814vmS2LoaVhTGnXiIfZs0Vy+NBelZrqTMORsMZ7a1YQF2kpBWPqxJNH98270CgRxHSWmrhNWpWPMofOA7QXn8TOPU09uioYXRo7GIKxKPHK6Bh0qVRekCd4hrWBIGKEuAV6+zarPEaaXou9o8TXHGESKyZljNaoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742427389; c=relaxed/simple;
-	bh=YaRk1s+zKGq0iW53na4lPbKXthAEJqUr5Yf1QKrfQcg=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=oerwYUnLQKPRgJ/fIyI6V2AOMq74BsRwOxdzW2sgu+ZwK8OPMeZkv3I+zIxkdJk+1NA1RIJ3PDj8n7fsJ/qpoIy9alm4H7KVUpQra/+neOhpGT00Uk3ZIw7hhyXePnqWgeFYd643iAqx+bxhLf+hi1hg3U0joom2pkCwhUFElpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QnBImN/V; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1742427752; c=relaxed/simple;
+	bh=bt2ba/1aateD273zMpuBKHwx+vhYxn5LVtt6VAQmzEM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hOH9jid9NHqo1D+t0wiHGmti95WThzE8EiWuMVNz30XtCESURtFTlnY9V6NJSNksxHDIuJyS2teI+XBCaVQnVnfY7rYI1jPOgbWfyz5WnkjuyhcC2LSZ19uK5omIhv55rPC5WCWAaKmfdOO18x2UiZJpa5wL3/N6qcKjDbWfjU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FI4VIG28; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-225d66a4839so21223945ad.1;
+        Wed, 19 Mar 2025 16:42:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742427750; x=1743032550; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=s4BUXiAbtxDoW0HPX6dtOJ7c0QK5dcGl/NHAwfEJTQg=;
+        b=FI4VIG28NlWxmr5B9Y73i6MrI92zVpSD4FHSKgGXXcYMpWAiOI1E3eHLHOMZoVO1qK
+         97uf7XVNR3UZQgVjmaTMi1csJVlLTin3WcNpU/PxxrMW6rWIJQk0zrkcO7sDfHRO+kud
+         OpBtNOl/o4826zkn/y6sPohqaEzrz0W8drGizdGP5undjAJoCHMUzGQFJuVV/hhYA/8V
+         riTyirizMMm54soOnnvMTt7gZvlfnSm/g2v1hYGW9/CoEJzjVg7enLS2yP1l2s2+0D0g
+         fNY/6E0Gnis4t16c5sTpu6gqZzW1pWwVM0pI6WD62uZu1eR3X5dO8VB03tkVYdb041g+
+         zyGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742427750; x=1743032550;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=s4BUXiAbtxDoW0HPX6dtOJ7c0QK5dcGl/NHAwfEJTQg=;
+        b=jjn+ZwOOxBi8op1qBZKEb2m3AMw/zpGNAdcF152BQGwa5ruK962SzG3VPX7pNTIp+3
+         4LZJvtLinIZvpVUK/i2dATtLjE5jvarFvOolBE8+AV3R/QqkL78YoIIG8Ar03fKODLPE
+         YDe78AQCKbEUaSMLDpJT/ZmG+HUk+V/qyq2dYK79v5XNUYB2VWTxNY0OZI5/5rKQzr90
+         VCHHXSzhKJ6uGZh9cSl3jrbwDCStOWYc7PoClqZtgLq0jkoPNgvmCarm7vEKYkkW3BLj
+         /AftfiOqt8BJd9yL8PhU7S/dbUFBNVlBGeC/sjBJ6ilOwlO2N973LPDlT4Wh1I1Cw8UG
+         Q/Mw==
+X-Forwarded-Encrypted: i=1; AJvYcCWH68VjR5YrBqnv+TEBwvYUd93NgecupP6TLulK37cskNPb9uuiVkJT54PCsESj/TgnJDIYugpy@vger.kernel.org, AJvYcCWOtcCrrG735kpg/2Yb8BK6SK9xLmPxJXVeuPZsPFvZ7+aUyXvPk4yPIzEDgqCpNwqh52I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbfBgfz3zdWoUrKHvk6hiNoTDTeRLL2F1d1Qd8pNXJ+fJzBblf
+	Id9O2MmRDEqnnw+KF+04nCkoZjztRM4X58RQ3ALxXVxV9pnCqFED
+X-Gm-Gg: ASbGncuzj5bK16A84IweeFsQ3+1Xu57aN+QOsFYKbIbjmZzIZBiRI7U6ooFJbOdP6rh
+	fwJaBpK+P8swN9sRjxr1R1iqzesyI+1RrPy8Prd38Xawnx8oo1Foz1610vFIFzJ9A6P8FfbfoCW
+	BJuHTdFTWVoCvDCgOnsFI799fO/JnI41w4/59fNpl7jltRatSOwa/SpEhQPT5hnZ7ONTpeVrwEH
+	0LAjRsaPU7yJaHEsa+eERTlU5aD12fihXdcpYriSDJH2p+VNgmMuUOuzWBS7lTHjcP1UmLSX6+x
+	tsqaVOWYUf9cC2FFINM1RlXopMcH2XKzu8WIUb9JCfOtveNm
+X-Google-Smtp-Source: AGHT+IEw/4vULxTa1ySDtMivMJt2yRxJKSRbEdiqkxcYBqX3FVNtAkwNisew4VKeeY2ibmcOqngY8A==
+X-Received: by 2002:a05:6a21:2d87:b0:1e1:a789:1b4d with SMTP id adf61e73a8af0-1fd09c2c36bmr1867343637.15.1742427750144;
+        Wed, 19 Mar 2025 16:42:30 -0700 (PDT)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af56e9ddf4fsm11526155a12.21.2025.03.19.16.42.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Mar 2025 16:42:29 -0700 (PDT)
+Date: Wed, 19 Mar 2025 16:42:28 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Dong Chenchen <dongchenchen2@huawei.com>
+Cc: edumazet@google.com, kuniyu@amazon.com, pabeni@redhat.com,
+	willemb@google.com, john.fastabend@gmail.com, jakub@cloudflare.com,
+	davem@davemloft.net, kuba@kernel.org, horms@kernel.org,
+	daniel@iogearbox.net, netdev@vger.kernel.org, bpf@vger.kernel.org,
+	stfomichev@gmail.com, mrpre@163.com, zhangchangzhong@huawei.com,
+	weiyongjun1@huawei.com
+Subject: Re: [PATCH net 1/2] bpf, sockmap: Avoid sk_prot reset on sockmap
+ unlink with ULP set
+Message-ID: <Z9tWZPaidMB4uvQu@pop-os.localdomain>
+References: <20250314082004.2369712-1-dongchenchen2@huawei.com>
+ <20250314082004.2369712-2-dongchenchen2@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742427375;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=844+bFvi6TAU7lUIUgTQSz2iWfzhmszHPEf60+qFp+8=;
-	b=QnBImN/VO449dDkv3U3QRL7hRSidSmJ8OHba+RK799rWcGmbaMKw2XD/9Oj6KYDCfc4YQr
-	FnBO9EhNIaUm63vbjR1/lAtuuh/t3yG6wgq52jwVX+5KSaGysf8LdyzFi6ERlpxo+HotTe
-	v5LXpOst8ccObU+5LSs8LqvdmGB6Fvg=
-Date: Wed, 19 Mar 2025 23:36:13 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Message-ID: <48068a86ea99dffe1e7849fb544eac1746364afb@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH bpf-next v3 1/3] bpf, sockmap: avoid using sk_socket
- after free when sending
-To: "Cong Wang" <xiyou.wangcong@gmail.com>
-Cc: john.fastabend@gmail.com, jakub@cloudflare.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, andrii@kernel.org, eddyz87@gmail.com, mykolal@fb.com,
- ast@kernel.org, daniel@iogearbox.net, martin.lau@linux.dev,
- song@kernel.org, yonghong.song@linux.dev, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, shuah@kernel.org,
- mhal@rbox.co, sgarzare@redhat.com, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-In-Reply-To: <Z9tNAhMV1Y5znONo@pop-os.localdomain>
-References: <20250317092257.68760-1-jiayuan.chen@linux.dev>
- <20250317092257.68760-2-jiayuan.chen@linux.dev>
- <Z9tNAhMV1Y5znONo@pop-os.localdomain>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250314082004.2369712-2-dongchenchen2@huawei.com>
 
-2025/3/20 07:02, "Cong Wang" <xiyou.wangcong@gmail.com> wrote:
+On Fri, Mar 14, 2025 at 04:20:03PM +0800, Dong Chenchen wrote:
+> WARNING: CPU: 0 PID: 6558 at net/core/sock_map.c:1703 sock_map_close+0x3c4/0x480
+> Modules linked in:
+> CPU: 0 UID: 0 PID: 6558 Comm: syz-executor.14 Not tainted 6.14.0-rc5+ #238
+> RIP: 0010:sock_map_close+0x3c4/0x480
+> Call Trace:
+>  <TASK>
+>  inet_release+0x144/0x280
+>  __sock_release+0xb8/0x270
+>  sock_close+0x1e/0x30
+>  __fput+0x3c6/0xb30
+>  __fput_sync+0x7b/0x90
+>  __x64_sys_close+0x90/0x120
+>  do_syscall_64+0x5d/0x170
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> 
+> The root cause is:
+> bpf_prog_attach(BPF_SK_SKB_STREAM_VERDICT)
+> tcp_set_ulp //set ulp after sockmap add
+> 	icsk->icsk_ulp_ops = ulp_ops;
+> sock_hash_update_common
+>   sock_map_unref
+>     sock_map_del_link
+>       psock->psock_update_sk_prot(sk, psock, false);
+> 	sk->sk_prot->close = sock_map_close
+> sk_psock_drop
+>   sk_psock_restore_proto
+>     tcp_bpf_update_proto
+>        tls_update //not redo sk_prot to tcp prot
+> inet_release
+>   sk->sk_prot->close
+>     sock_map_close
+>       WARN(sk->sk_prot->close == sock_map_close)
 
->=20
->=20On Mon, Mar 17, 2025 at 05:22:54PM +0800, Jiayuan Chen wrote:
->=20
->=20>=20
->=20> The sk->sk_socket is not locked or referenced, and during the call =
-to
-> >=20
->=20
-> Hm? We should have a reference in socket map, whether directly or
->=20
->=20indirectly, right? When we add a socket to a socket map, we do call
->=20
->=20sock_map_psock_get_checked() to obtain a reference.
->=20
+This makes sense now. Please see my comment below.
 
-Yes,=20but we remove psock from sockmap when sock_map_close() was called
-'''
-sock_map_close
-	lock_sock(sk);
-	rcu_read_lock();
-	psock =3D sk_psock(sk);
-        // here we remove psock and the reference of psock become 0
-	sock_map_remove_links(sk, psock)
-        psock =3D sk_psock_get(sk);
-        if (unlikely(!psock))
-            goto no_psock;     <=3D=3D=3D jmp to no_psock
-        rcu_read_unlock();
-        release_sock(sk);
-        cancel_delayed_work_sync(&psock->work); <=3D=3D no chance to run =
-cancel
-'''
+> 
+> commit e34a07c0ae39 ("sock: redo the psock vs ULP protection check")
+> has moved ulp check from tcp_bpf_update_proto() to psock init.
+> If sk sets ulp after being added to sockmap, it will reset sk_prot to
+> BPF_BASE when removed from sockmap. After the psock is dropped, it will
+> not reset sk_prot back to the tcp prot, only tls context update is
+> performed. This can trigger a warning in sock_map_close() due to
+> recursion of sk->sk_prot->close.
+> 
+> To fix this issue, skip the sk_prot operations redo when deleting link
+> from sockmap if ULP is set.
+> 
+> Fixes: e34a07c0ae39 ("sock: redo the psock vs ULP protection check")
+> Fixes: c0d95d3380ee ("bpf, sockmap: Re-evaluate proto ops when psock is removed from sockmap")
+> Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
+> ---
+>  net/core/sock_map.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/core/sock_map.c b/net/core/sock_map.c
+> index 82a14f131d00..a3ed1f2cf8a2 100644
+> --- a/net/core/sock_map.c
+> +++ b/net/core/sock_map.c
+> @@ -170,7 +170,7 @@ static void sock_map_del_link(struct sock *sk,
+>  		if (verdict_stop)
+>  			sk_psock_stop_verdict(sk, psock);
+>  
+> -		if (psock->psock_update_sk_prot)
+> +		if (!(sk_is_inet(sk) && inet_csk_has_ulp(sk)) && psock->psock_update_sk_prot)
+>  			psock->psock_update_sk_prot(sk, psock, false);
 
-So I think we should hold the psock when backlog running
+Can we put this TCP-specific logic into tcp_bpf_update_proto() instead?
 
-Thanks,
+Something like this...
+
+diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
+index ba581785adb4..0bb363447fc7 100644
+--- a/net/ipv4/tcp_bpf.c
++++ b/net/ipv4/tcp_bpf.c
+@@ -708,6 +708,8 @@ int tcp_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore)
+                return 0;
+        }
+
++       if (inet_csk_has_ulp(sk))
++               return 0;
+        if (sk->sk_family == AF_INET6) {
+                if (tcp_bpf_assert_proto_ops(psock->sk_proto))
+                        return -EINVAL;
+
 
