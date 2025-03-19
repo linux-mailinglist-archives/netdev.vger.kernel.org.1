@@ -1,103 +1,70 @@
-Return-Path: <netdev+bounces-176347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEE44A69CAF
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 00:23:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 075CAA69CB8
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 00:27:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAF638A06DD
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 23:22:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8CFE47A24A6
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 23:26:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3431224895;
-	Wed, 19 Mar 2025 23:22:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D1BE2236FA;
+	Wed, 19 Mar 2025 23:27:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Uo/gT6UL"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Eod0avKE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291DB224888
-	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 23:22:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ACA51F8BB0;
+	Wed, 19 Mar 2025 23:27:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742426575; cv=none; b=DIxyulRGu9gj+w5kEoAIralD7wYoyGHa+8EEiuFYuJ/VPlezng5qiwloElkwUKJe8ws+RWl4d0GuBvkOdNuXUI2yE99Kf07xI7m5KHmg/Po0xkHidZqRh4Y1DMkegMJLKQxpSeY8U5fTahxAzLSxb6Lq8uQ10yuKrwl6A4wTPYQ=
+	t=1742426857; cv=none; b=EjuDSjAHrp5OhK+8Eo3hxNGJXfD0CcSYBO83145ksnyWAYZUIgtaKA/KcSFA7kmxPiQXIJ3svmQ9oYEz6Q8ngJGR+77Dt7R39dPbje+dVTxRQVoHslI2p4RoPt9RPqohEFM9+oWMoHdLtOslCBwzUyzGXCvwEuHlpnyTHK9i64g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742426575; c=relaxed/simple;
-	bh=ae9rlx1whGDKhagXiRxttetS8FA+ejbtaGjxWFoZyII=;
+	s=arc-20240116; t=1742426857; c=relaxed/simple;
+	bh=hvq1bTUMlwX5m405oo0xg2qg3AaUFF6dySymH2ofkcU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oJdIT+HvmkHwn9/J+Q5Ji3L9NKO2Y3oasru7DU0pTXKnVISTAilxwcKQOwQdwJHjD6+2Ndh26tUZofWNWq8L8lFZKgOAT5dSKYJrVJn/U3lTUixzoHI92+/VRtPUKpBZyLk6wW2W4GrlxrgCnCzdWiP316kRGsQPFrBLiJdsGx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Uo/gT6UL; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2ff85fec403so2862317a91.1
-        for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 16:22:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1742426573; x=1743031373; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MdI4ujE7yE0oblUwCTVz2MCgqM4I0uuI2fAs3f/OjUM=;
-        b=Uo/gT6ULuEnl2Z1/uveAtfRoE1fVAdSTR7KNfg02NzJUBuCk69NwWNTuYTYY4EEoKA
-         1i4bd9slFzeLwmYXw10WHJ+sEiU+HbtqhowLEd32PTO2z2fKTJ4uJHB2Vt2cpZXSfuRW
-         C70f8WGQP8dEdzGscD9E98qyq9JXa1iS+deRE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742426573; x=1743031373;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MdI4ujE7yE0oblUwCTVz2MCgqM4I0uuI2fAs3f/OjUM=;
-        b=V6R5ARmW/mP5YsjXX3U3ZujjjGKWXLxSwQwHcCOpN5cMLRhLIOvLT7VeZ1drZrO67h
-         mdfezH7Cggqx2sC6jrGPzmkabmoWn1mZ60Thj7gDvQP77HXzVlMGL/FgCtrvm6tjUbEc
-         Byl9diPuMGDUl7TiDHf5wvEqJ7bM6klH+wnlr8DlWKDDk0rFH3Wu1BkAu0qW3CCaRarx
-         FUAurPGRbKRuz7O5UsRGAzOMkeeHvS6ODjPxGEg99RHqKK/qvExfn/qdwMYhVZKFb4yR
-         R75CVF51sG+ag0uSUnfKLIvjnjL8iYvalFdwVlZJLxN/ELUgR/5xfRSCfVfi0yEziyLW
-         DylA==
-X-Forwarded-Encrypted: i=1; AJvYcCWIUsw7ADLWQPEMXE4gJyyFVnSkxTDDA/2TivPHE7PDw1rKk99fnrStFxAPs9hsdrmAfzqnFRc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvdTmC8zEglFgIQweg6sVGTBX71qtRNmD99SMAc7i4oTwGsZB4
-	tBY7QjIxm5xBFTplakQJpB+5P4l0Jrjva6WwR4chXmViKlqD//bj8Dw6YAP9ADE=
-X-Gm-Gg: ASbGncvXWTEeEsnX2WkuVDF6CecXmsfroyt3LpQuyFM4F3MKEd1Ry4YhIZtu0ugu2G1
-	c25zEy5WZzj3/JJhalwsrP5LcXWy29nchXDQMkqbGvDmHkyCQdJjWsuslfNvVYm+VeR16hfTP22
-	RmZOOgTkPQEGwqTkzGYj0MX15LJXdRNZpg4cmcN6dBwdxLh535gghgPwJpSGcCsBc/w4EwcrROH
-	D0WiCHtI0Tj7/mTZ2aKUZiwB8mBWzOq2o7mcJFX3AZq/U2qVPb0lPC1ZNwbYJd125xBrK36xxja
-	3ckb+Ki3Q1Ev+EIRffZzR9GINw8otDbfcU+Uclgw0PHUuGOnBSgtVt5C2D5nDV1WIVyUck31WDS
-	EFfGWVv4Mm+FGeE8U
-X-Google-Smtp-Source: AGHT+IG2dHorZURvsBe8FbIvm9Ot+bVszEXfqj6y7gPkK29Cdkho8rVqZj3wc8miFsa8O6743/+MAw==
-X-Received: by 2002:a17:90b:38d0:b0:2fa:30e9:2051 with SMTP id 98e67ed59e1d1-301d42b3a2dmr1795842a91.5.1742426573223;
-        Wed, 19 Mar 2025 16:22:53 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-301a39f1073sm3930726a91.0.2025.03.19.16.22.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Mar 2025 16:22:52 -0700 (PDT)
-Date: Wed, 19 Mar 2025 16:22:49 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, asml.silence@gmail.com,
-	linux-fsdevel@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, horms@kernel.org, linux-api@vger.kernel.org,
-	linux-arch@vger.kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
-	kuba@kernel.org, shuah@kernel.org, sdf@fomichev.me,
-	mingo@redhat.com, arnd@arndb.de, brauner@kernel.org,
-	akpm@linux-foundation.org, tglx@linutronix.de, jolsa@kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [RFC -next 00/10] Add ZC notifications to splice and sendfile
-Message-ID: <Z9tRyeJE5uKDJAdo@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	asml.silence@gmail.com, linux-fsdevel@vger.kernel.org,
-	edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
-	linux-api@vger.kernel.org, linux-arch@vger.kernel.org,
-	viro@zeniv.linux.org.uk, jack@suse.cz, kuba@kernel.org,
-	shuah@kernel.org, sdf@fomichev.me, mingo@redhat.com, arnd@arndb.de,
-	brauner@kernel.org, akpm@linux-foundation.org, tglx@linutronix.de,
-	jolsa@kernel.org, linux-kselftest@vger.kernel.org
-References: <20250319001521.53249-1-jdamato@fastly.com>
- <Z9p6oFlHxkYvUA8N@infradead.org>
- <Z9rjgyl7_61Ddzrq@LQ3V64L9R2>
- <2d68bc91-c22c-4b48-a06d-fa9ec06dfb25@kernel.dk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=m/YgcFJQa+Ldw0kmexiTJVLbBon37WYb5+nPJkWFfrL498LHuaahY9tpMFkoirzqdPhCb3WVwilKcRujRbgrqgyieTOmV/gafng/0vcTaOtoYQw8MvTjlK7zkMx11NiW/V5UJSxNORluLb6x8MIemMQ4LxJzGX9NvYRu/5Kd2cE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Eod0avKE; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=FdSpIzyf+llrdg8XcPEMUxKcgtQ++dr3cdEiEfiZOjg=; b=Eod0avKETzyIpe3Cfd2VNwFXlJ
+	muknsdw7nPJPkCBV6TgBw/dsbXbWdLUk8keX24+2KO+Qr876Y+nqlK/aLJGR+vF1vkRPf4xHgKkWD
+	AhI4/qN9GmvXwbPbsCIhjySMmUZiJ3rWeohuNMm5DzT7jkQhCNGPp6zStRJZ8AWHjgTk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tv2og-006QMr-97; Thu, 20 Mar 2025 00:27:18 +0100
+Date: Thu, 20 Mar 2025 00:27:18 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jonas Karlman <jonas@kwiboo.se>
+Cc: Heiko Stuebner <heiko@sntech.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	David Wu <david.wu@rock-chips.com>, Yao Zi <ziyao@disroot.org>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-rockchip@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [PATCH net-next v3 5/5] net: stmmac: dwmac-rk: Add initial
+ support for RK3528 integrated PHY
+Message-ID: <d53a2119-2650-4a87-af94-1b9c2297cf72@lunn.ch>
+References: <20250319214415.3086027-1-jonas@kwiboo.se>
+ <20250319214415.3086027-6-jonas@kwiboo.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -106,73 +73,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2d68bc91-c22c-4b48-a06d-fa9ec06dfb25@kernel.dk>
+In-Reply-To: <20250319214415.3086027-6-jonas@kwiboo.se>
 
-On Wed, Mar 19, 2025 at 10:07:27AM -0600, Jens Axboe wrote:
-> On 3/19/25 9:32 AM, Joe Damato wrote:
-> > On Wed, Mar 19, 2025 at 01:04:48AM -0700, Christoph Hellwig wrote:
-> >> On Wed, Mar 19, 2025 at 12:15:11AM +0000, Joe Damato wrote:
-> >>> One way to fix this is to add zerocopy notifications to sendfile similar
-> >>> to how MSG_ZEROCOPY works with sendmsg. This is possible thanks to the
-> >>> extensive work done by Pavel [1].
-> >>
-> >> What is a "zerocopy notification" 
-> > 
-> > See the docs on MSG_ZEROCOPY [1], but in short when a user app calls
-> > sendmsg and passes MSG_ZEROCOPY a completion notification is added
-> > to the error queue. The user app can poll for these to find out when
-> > the TX has completed and the buffer it passed to the kernel can be
-> > overwritten.
-> > 
-> > My series provides the same functionality via splice and sendfile2.
-> > 
-> > [1]: https://www.kernel.org/doc/html/v6.13/networking/msg_zerocopy.html
-> > 
-> >> and why aren't you simply plugging this into io_uring and generate
-> >> a CQE so that it works like all other asynchronous operations?
-> > 
-> > I linked to the iouring work that Pavel did in the cover letter.
-> > Please take a look.
-> > 
-> > That work refactored the internals of how zerocopy completion
-> > notifications are wired up, allowing other pieces of code to use the
-> > same infrastructure and extend it, if needed.
-> > 
-> > My series is using the same internals that iouring (and others) use
-> > to generate zerocopy completion notifications. Unlike iouring,
-> > though, I don't need a fully customized implementation with a new
-> > user API for harvesting completion events; I can use the existing
-> > mechanism already in the kernel that user apps already use for
-> > sendmsg (the error queue, as explained above and in the
-> > MSG_ZEROCOPY documentation).
-> 
-> The error queue is arguably a work-around for _not_ having a delivery
-> mechanism that works with a sync syscall in the first place. The main
-> question here imho would be "why add a whole new syscall etc when
-> there's already an existing way to do accomplish this, with
-> free-to-reuse notifications". If the answer is "because splice", then it
-> would seem saner to plumb up those bits only. Would be much simpler
-> too...
+On Wed, Mar 19, 2025 at 09:44:09PM +0000, Jonas Karlman wrote:
+> Rockchip RK3528 (and RV1106) has a different integrated PHY compared to
+> the integrated PHY on RK3228/RK3328.
 
-OK, I reworked the patches to drop all the sendfile2 stuff so no new
-system call is added. Only a flag for splice, SPLICE_F_ZC.
+What ID does this PHY have? Is it just the reset which is different,
+or is it actually a different PHY, and the rockchip PHY driver needs
+additions?
 
-It feels weird to add this to the splice path but not the path that
-sendfile takes through splice.
-
-I understand and agree with you: if we are adding a new system
-call, like sendfile2, it should probably be done as you've
-described in your other messages.
-
-What about an alternative?
-
-Would you be open to the idea that sendfile could be extended to
-generate error queue completions if the network socket has
-SO_ZEROCOPY set?
-
-If so, that would solve the original problem without introducing a
-new system call and still leaves the door open for a more efficient
-sendfile2 based on iouring internals later.
-
-What do you think?
+	Andrew
 
