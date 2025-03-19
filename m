@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-176223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9ADE8A69674
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 18:30:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00C40A69678
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 18:30:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1117816F275
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:30:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9D6F88022F
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:30:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C464205AA5;
-	Wed, 19 Mar 2025 17:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 354D7207DF1;
+	Wed, 19 Mar 2025 17:30:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sh533+lW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YTUB2Byd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12D641E8322;
-	Wed, 19 Mar 2025 17:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08ED1207A2A;
+	Wed, 19 Mar 2025 17:30:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742405399; cv=none; b=BQjmoiPW78CW+KPMkDiRKL0VN4T43XK3sjiCmFnq+qk/xJPhkEGSdaLuYaXwQl6Zk3x2kk55VJeUv2nXjkfR/vRWo9HGdi5U9385YudfRwnxa+J0m5ewoN7gdDni4rHKNFmBxtWJwdq2OrNJj2XjRx5TDRrtgF2bMzJTju1LEHQ=
+	t=1742405403; cv=none; b=cx4dSrUDxu4x5izvTKLrPSKwwgV+ehvXvVUpjZcqqN87rg1R2JNEIi03iOWRkwO42MqLEcnedEWHQOg5nOHyyw6hm0vYjzDGKXAYh67+nc+wdMjMJxqFOhnRCpCnmAkODbxI7eRWPFjx+wFchkcjrkRzdxakJoax7esEHvOSL7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742405399; c=relaxed/simple;
-	bh=c9786C236wd96FDG6PlRHsJbJsyVfXc5lTtHTImEIxY=;
+	s=arc-20240116; t=1742405403; c=relaxed/simple;
+	bh=t+CillHKE7HGhniDsHyI1yEiCWnxfgZ07vdfTmwzvRg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jWYjKlg5WlCthgKtO7vLNKh+zCBja233/pW2v4kTsuL1wFk+G4tEtz5hlPSYFH3DE0ty4LocVrDi8H4Uy5VlHGm5k1ESmqMihub8lRAOukifd4BwceTGyg9MAx+hq3iCfRm4KfnGuBlfvrUKRIo5myQdVnC0q9YeInpdmNt8uAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sh533+lW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88E1AC4CEE4;
-	Wed, 19 Mar 2025 17:29:58 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=aQYaE3Unu5cDEFbTCR7MpDHToXpMvtyTBJLg/XfL3FhuWFJmG0debKrVx4v6T2Eism2HfbxVecNKGwoBr2Y6s0l54bYYiksHw9cNsZJWwK/xAA0NrvKOtoXGNblPxp/FWTJhwwYK454BYV0XUY+O1zCgS4ZT2O5C6oaHnwANW3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YTUB2Byd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEC96C4CEE4;
+	Wed, 19 Mar 2025 17:30:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742405398;
-	bh=c9786C236wd96FDG6PlRHsJbJsyVfXc5lTtHTImEIxY=;
+	s=k20201202; t=1742405402;
+	bh=t+CillHKE7HGhniDsHyI1yEiCWnxfgZ07vdfTmwzvRg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sh533+lWPpVsVWTfvXE0wMapJclMXNOnlB0Rh3XG+gD9zKPCzVQaXk9ulXxqB+gSo
-	 HoVlXR4q67DncnnxolvYZgZ+E5hlnlPku+kVBG0uXLpY1AREzdt8sBUAnUzDPLDMbo
-	 +fik1n+Gmnf554zOx2LWabE6nkHoJIi1YYvc76cIOOzezOaP8ACas5b08KM9ussqz/
-	 7nSxX8r+/WOmGPbspt7JsDPe2sE9IiwldzpJ4GjaUrVFiXq2E/AhQHpNSVKWCOgI2Z
-	 sWW+krZaMwdP8SjPxAEosR6IBWOff5KUEpVLCKActJwnqwzXLBkWFmKzeBlyOdEvL5
-	 ijntBwNX1UYBA==
+	b=YTUB2BydQnZLwmztqELVEZAQjhOkGS7optwHDyzpxsxZHHstP5YjkYfyTblp4LJHN
+	 PPb5jksp+UUopAJVAlFYu08/scVdB9gvpKa5FZUesJ8e99QdlnicjP5nvwI90bbj0g
+	 96MMaIZVMh+6xc3Zn0UOH14/nep8j1KQ9Bgx1Ozyn3H8cP3ZrNAckaXeXULEKNaxbG
+	 g0XnZwdk/MwfuL2UKoEfr0UeqBndHocUL2i34auwXeLc1YMooLehICZsRw6TFg/xqC
+	 vKOZvGVqAGIOQ1uV2jBCMTJu2ziH52V9Q4gksYda3Jb/YLUJmTF3DZVYMGXIakoJgr
+	 HOfQVu7TYMuxg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F37380CFFE;
-	Wed, 19 Mar 2025 17:30:35 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE176380CFFE;
+	Wed, 19 Mar 2025 17:30:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] selftests: drv-net: use defer in the ping test
+Subject: Re: [PATCH net-next 0/3] net/mlx5: HW Steering cleanups
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174240543425.1125754.2555688406612172851.git-patchwork-notify@kernel.org>
-Date: Wed, 19 Mar 2025 17:30:34 +0000
-References: <20250312131040.660386-1-kuba@kernel.org>
-In-Reply-To: <20250312131040.660386-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
- ap420073@gmail.com, linux-kselftest@vger.kernel.org
+ <174240543853.1125754.1009178782663226932.git-patchwork-notify@kernel.org>
+Date: Wed, 19 Mar 2025 17:30:38 +0000
+References: <1741780194-137519-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1741780194-137519-1-git-send-email-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, gal@nvidia.com, mbloch@nvidia.com,
+ moshe@nvidia.com, saeedm@nvidia.com, leon@kernel.org, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Wed, 12 Mar 2025 14:10:40 +0100 you wrote:
-> Make sure the test cleans up after itself. The XDP off statements
-> at the end of the test may not be reached.
+On Wed, 12 Mar 2025 13:49:51 +0200 you wrote:
+> This short series by Yevgeny contains several small HW Steering cleanups:
 > 
-> Fixes: 75cc19c8ff89 ("selftests: drv-net: add xdp cases for ping.py")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: shuah@kernel.org
-> CC: ap420073@gmail.com
-> CC: linux-kselftest@vger.kernel.org
+> - Patch 1: removing unused FW commands
+> - Patch 2: using list_move() instead of list_del/add
+> - Patch 3: printing the unsupported combination of match fields
+> 
+> Regards,
+> Tariq
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] selftests: drv-net: use defer in the ping test
-    https://git.kernel.org/netdev/net/c/acf10a8c0b3a
+  - [net-next,1/3] net/mlx5: HWS, remove unused code for alias flow tables
+    https://git.kernel.org/netdev/net-next/c/eae1389ab2f5
+  - [net-next,2/3] net/mlx5: HWS, use list_move() instead of del/add
+    https://git.kernel.org/netdev/net-next/c/1a403ad383ab
+  - [net-next,3/3] net/mlx5: HWS, log the unsupported mask in definer
+    https://git.kernel.org/netdev/net-next/c/8389f2de903c
 
 You are awesome, thank you!
 -- 
