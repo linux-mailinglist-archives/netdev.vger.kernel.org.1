@@ -1,387 +1,163 @@
-Return-Path: <netdev+bounces-176199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E266A694CF
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:26:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB596A694D9
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:26:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA492881EA1
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 16:24:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0914E17C71B
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 16:26:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFAC41DE3AE;
-	Wed, 19 Mar 2025 16:24:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65F711DED54;
+	Wed, 19 Mar 2025 16:26:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CTcs9CAj"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="un9zBFfe"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D95AA1D54FA
-	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 16:24:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E08F9DA;
+	Wed, 19 Mar 2025 16:26:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742401470; cv=none; b=PRjTfCPNqL+0p/GBUn8mQlkJtOxoFMRNK7EN/HvjhYBN6sETLe92OG8rDdVyZ9f65y5giKtHxhOaPWYqNDrSIwwGp12DS/pAB6iLoGMtVstV+acB8TcsBTcnUYaCh/wCkBPtqOfabXP+9jCIW85kfwzniXRo9Qv3QLLSmO4Kj44=
+	t=1742401598; cv=none; b=uwvBcaZgXEAT5TZpHP/3fqBpLxKJWCzO51zGvb6q7X/JcZEa4vvv75RNc6n+JG/w1HMS46KrJzbq8t96TGo1wzdy5hEj9vkCRiS92nURC9CuFDRdxnZhmpLbRKlqVNW6n8Xe1Vo9/RatrOg2p6UGSjbcN3/W9F9hVrQhSdWxPzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742401470; c=relaxed/simple;
-	bh=RtszS+UIQrfv7NxRWmrGRHVkcrm7T2OsSIXFlHCta8E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lokOKServGu5XmU/7j8qQvjmTfl/vU4mJATVavOQeWzITtThicfZksLKwzQiAb8XFMy3HanZzMWNP/T4pvK6NUpmITJ0TEzndvmHfR8QwAS0g66gkzJVJ6XLqfvwHWc7XdXKkXJM6D9QQ+RGJYE2+DazNZ+146wP6hukZzjq3aU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CTcs9CAj; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742401467;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=neNEJzvXoA99628OTR+7ZmFM0cWFx8/s3tGsPirtn5s=;
-	b=CTcs9CAjw8nOxEhIr3yKxZuBtY5whMetC+XytCdppyOdJWz5A9YWhhrOBi6CmkJn8e165G
-	SP5Qfdm2EaLFnBQrYQac66LXu2n6chyvFRxrVnSehm+JD9nJlZOL/XvaDlToQRB4q08Dt5
-	uqoQK3ISPtuAhQfhObcFrV0YSfGt3jE=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-325-AKP4HoKWNP-C30u36qwf6Q-1; Wed,
- 19 Mar 2025 12:24:21 -0400
-X-MC-Unique: AKP4HoKWNP-C30u36qwf6Q-1
-X-Mimecast-MFC-AGG-ID: AKP4HoKWNP-C30u36qwf6Q_1742401460
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 718A919560A1;
-	Wed, 19 Mar 2025 16:24:19 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.139])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 989B718001D4;
-	Wed, 19 Mar 2025 16:24:16 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
+	s=arc-20240116; t=1742401598; c=relaxed/simple;
+	bh=60lYz6yjO7YLU9zDDPbJr7qEQycANq2vlfp5CxfCljc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h63Yf5I1HPK1vsIFke6Ody9rY1BJ71b29cFHqmNiccA/MdXSKtzoWx3iDuNIXW/JNFljU0PSwAU1Rwqp/fhmoJkZQiMbcEoRQZGlp/ykTTMDF+Q6PBBKH9XCkKdXuK1QiTYec8ljF3AqHZR6UFelWYnohECByeMUDtYI9bOJXt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=un9zBFfe; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=B2YI5dem3RGg1TkB0pW2+3ClFRfM27ppeEKf2F4PHwE=; b=un9zBFfesiq6EY0chgd8Ucso+T
+	hzL7YSHVC83EKoOAibh57hqgqrrftkh8NbyquaNrKerdQG6Wp3/eaqrk1jdj/QOm7Z8BIllUL4pc8
+	o/xW7bu0mJT7+xzRJoqWkpmk/Y/lbiVE038+uCPy4zDUK7HUojPxOvi8512maSjf3n+C1uIH6bpNB
+	EAqtYKnKGY+egNA8AWtFUu3zRM+1z+jAHlxmgoRaqm22SCyBPfmtJQEfKdTyAF/gwjblgjGTPmNqf
+	0sFDx46JBD8SPtx1JRxiZoeD7n5xduNbqZdsiZ5OJOeiiz5wMBY8Dwv//ReIAdnjeJETGnTPJJ1H3
+	IeKSkGrw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39522)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tuwFL-0006fO-1h;
+	Wed, 19 Mar 2025 16:26:23 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tuwFG-0005km-1Z;
+	Wed, 19 Mar 2025 16:26:18 +0000
+Date: Wed, 19 Mar 2025 16:26:18 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Christian Marangi <ansuelsmth@gmail.com>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Sabrina Dubroca <sd@queasysnail.net>
-Subject: [PATCH net-next v3] net: introduce per netns packet chains
-Date: Wed, 19 Mar 2025 17:24:03 +0100
-Message-ID: <2b6ce88cb7da4d74853cc36d7de4b1b11a7362e5.1742401226.git.pabeni@redhat.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	upstream@airoha.com
+Subject: Re: [net-next PATCH 2/6] net: pcs: Implement OF support for PCS
+ driver
+Message-ID: <Z9rwKglOA411lYu5@shell.armlinux.org.uk>
+References: <20250318235850.6411-1-ansuelsmth@gmail.com>
+ <20250318235850.6411-3-ansuelsmth@gmail.com>
+ <Z9rgB1Ko_xAj44zS@shell.armlinux.org.uk>
+ <67daeac5.050a0220.3179c5.ce19@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <67daeac5.050a0220.3179c5.ce19@mx.google.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Currently network taps unbound to any interface are linked in the
-global ptype_all list, affecting the performance in all the network
-namespaces.
+On Wed, Mar 19, 2025 at 05:03:15PM +0100, Christian Marangi wrote:
+> On Wed, Mar 19, 2025 at 03:17:27PM +0000, Russell King (Oracle) wrote:
+> > On Wed, Mar 19, 2025 at 12:58:38AM +0100, Christian Marangi wrote:
+> > > Implement the foundation of OF support for PCS driver.
+> > > 
+> > > To support this, implement a simple Provider API where a PCS driver can
+> > > expose multiple PCS with an xlate .get function.
+> > > 
+> > > PCS driver will have to call of_pcs_add_provider() and pass the device
+> > > node pointer and a xlate function to return the correct PCS for the
+> > > requested interface and the passed #pcs-cells.
+> > > 
+> > > This will register the PCS in a global list of providers so that
+> > > consumer can access it.
+> > > 
+> > > Consumer will then use of_pcs_get() to get the actual PCS by passing the
+> > > device_node pointer, the index for #pcs-cells and the requested
+> > > interface.
+> > > 
+> > > For simple implementation where #pcs-cells is 0 and the PCS driver
+> > > expose a single PCS, the xlate function of_pcs_simple_get() is
+> > > provided. In such case the passed interface is ignored and is expected
+> > > that the PCS supports any interface mode supported by the MAC.
+> > > 
+> > > For advanced implementation a custom xlate function is required. Such
+> > > function should return an error if the PCS is not supported for the
+> > > requested interface type.
+> > > 
+> > > This is needed for the correct function of of_phylink_mac_select_pcs()
+> > > later described.
+> > > 
+> > > PCS driver on removal should first call phylink_pcs_release() on every
+> > > PCS the driver provides and then correctly delete as a provider with
+> > > the usage of of_pcs_del_provider().
+> > > 
+> > > A generic function for .mac_select_pcs is provided for any MAC driver
+> > > that will declare PCS in DT, of_phylink_mac_select_pcs().
+> > > This function will parse "pcs-handle" property and will try every PCS
+> > > declared in DT until one that supports the requested interface type is
+> > > found. This works by leveraging the return value of the xlate function
+> > > returned by of_pcs_get() and checking if it's an ERROR or NULL, in such
+> > > case the next PCS in the phandle array is tested.
+> > > 
+> > > Some additional helper are provided for xlate functions,
+> > > pcs_supports_interface() as a simple function to check if the requested
+> > > interface is supported by the PCS and phylink_pcs_release() to release a
+> > > PCS from a phylink instance.
+> > > 
+> > > Co-developed-by: Daniel Golle <daniel@makrotopia.org>
+> > > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> > > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> > 
+> > As a general comment, should we be developing stuff that is DT-centric
+> > or fwnode-centric. We already have users of phylink using swnodes, and
+> > it seems bad to design something today that is centred around just one
+> > method of describing something.
+> >
+> 
+> Honestly, at least for me testing scenario different than DT is quite
+> difficult, we can make changes to also support swnodes but we won't have
+> anything to test them. Given the bad situation PCS is currently I feel
+> we should first focus on DT or at least model something workable first
+> than put even more complex stuff on the table.
 
-Add per netns ptypes chains, so that in the mentioned case only
-the netns owning the packet socket(s) is affected.
+The problem I have is that once we invent DT specific interfaces, we
+seem to endlessly persist with them even when we have corresponding
+fwnode interfaces, even when it's easy to convert.
 
-While at that drop the global ptype_all list: no in kernel user
-registers a tap on "any" type without specifying either the target
-device or the target namespace (and IMHO doing that would not make
-any sense).
+So, my opinion today is that we should avoid single-firmware specific
+interfaces.
 
-Note that this adds a conditional in the fast path (to check for
-per netns ptype_specific list) and increases the dataset size by
-a cacheline (owing the per netns lists).
-
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
-v2 -> v3:
- - optimized dev_queue_xmit_nit() loop
- - fixed RCU splat false positive
- - clarified (?) a ptype_specific comment
-
-v1 -> v2:
- - fix comment typo
- - drop the doubtful RCU optimization
-
-rfc -> v1
- - fix procfs dump
- - fix dev->ptype_specific -> dev->ptype_all type in ptype_head()
- - dev_net() -> dev_net_rcu
- - add dev_nit_active_rcu  variant
- - ptype specific netns deliver uses dev_net_rcu(skb->dev)) instead
-   of dev_net(orig_dev)
----
- include/linux/netdevice.h   | 12 +++++++-
- include/net/hotdata.h       |  1 -
- include/net/net_namespace.h |  3 ++
- net/core/dev.c              | 55 ++++++++++++++++++++++++++++---------
- net/core/hotdata.c          |  1 -
- net/core/net-procfs.c       | 28 ++++++++++++++-----
- net/core/net_namespace.c    |  2 ++
- 7 files changed, 79 insertions(+), 23 deletions(-)
-
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 67527243459b3..c51a99f24800d 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -4276,7 +4276,17 @@ static __always_inline int ____dev_forward_skb(struct net_device *dev,
- 	return 0;
- }
- 
--bool dev_nit_active(struct net_device *dev);
-+bool dev_nit_active_rcu(struct net_device *dev);
-+static inline bool dev_nit_active(struct net_device *dev)
-+{
-+	bool ret;
-+
-+	rcu_read_lock();
-+	ret = dev_nit_active_rcu(dev);
-+	rcu_read_unlock();
-+	return ret;
-+}
-+
- void dev_queue_xmit_nit(struct sk_buff *skb, struct net_device *dev);
- 
- static inline void __dev_put(struct net_device *dev)
-diff --git a/include/net/hotdata.h b/include/net/hotdata.h
-index 30e9570beb2af..fda94b2647ffa 100644
---- a/include/net/hotdata.h
-+++ b/include/net/hotdata.h
-@@ -23,7 +23,6 @@ struct net_hotdata {
- 	struct net_offload	udpv6_offload;
- #endif
- 	struct list_head	offload_base;
--	struct list_head	ptype_all;
- 	struct kmem_cache	*skbuff_cache;
- 	struct kmem_cache	*skbuff_fclone_cache;
- 	struct kmem_cache	*skb_small_head_cache;
-diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
-index f467a66abc6b1..bd57d8fb54f14 100644
---- a/include/net/net_namespace.h
-+++ b/include/net/net_namespace.h
-@@ -83,6 +83,9 @@ struct net {
- 	struct llist_node	defer_free_list;
- 	struct llist_node	cleanup_list;	/* namespaces on death row */
- 
-+	struct list_head ptype_all;
-+	struct list_head ptype_specific;
-+
- #ifdef CONFIG_KEYS
- 	struct key_tag		*key_domain;	/* Key domain of operation tag */
- #endif
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 6fa6ed5b57987..90cc05bb74a7c 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -572,11 +572,19 @@ static inline void netdev_set_addr_lockdep_class(struct net_device *dev)
- 
- static inline struct list_head *ptype_head(const struct packet_type *pt)
- {
--	if (pt->type == htons(ETH_P_ALL))
--		return pt->dev ? &pt->dev->ptype_all : &net_hotdata.ptype_all;
--	else
--		return pt->dev ? &pt->dev->ptype_specific :
--				 &ptype_base[ntohs(pt->type) & PTYPE_HASH_MASK];
-+	if (pt->type == htons(ETH_P_ALL)) {
-+		if (!pt->af_packet_net && !pt->dev)
-+			return NULL;
-+
-+		return pt->dev ? &pt->dev->ptype_all :
-+				 &pt->af_packet_net->ptype_all;
-+	}
-+
-+	if (pt->dev)
-+		return &pt->dev->ptype_specific;
-+
-+	return pt->af_packet_net ? &pt->af_packet_net->ptype_specific :
-+				   &ptype_base[ntohs(pt->type) & PTYPE_HASH_MASK];
- }
- 
- /**
-@@ -596,6 +604,9 @@ void dev_add_pack(struct packet_type *pt)
- {
- 	struct list_head *head = ptype_head(pt);
- 
-+	if (WARN_ON_ONCE(!head))
-+		return;
-+
- 	spin_lock(&ptype_lock);
- 	list_add_rcu(&pt->list, head);
- 	spin_unlock(&ptype_lock);
-@@ -620,6 +631,9 @@ void __dev_remove_pack(struct packet_type *pt)
- 	struct list_head *head = ptype_head(pt);
- 	struct packet_type *pt1;
- 
-+	if (!head)
-+		return;
-+
- 	spin_lock(&ptype_lock);
- 
- 	list_for_each_entry(pt1, head, list) {
-@@ -2463,16 +2477,21 @@ static inline bool skb_loop_sk(struct packet_type *ptype, struct sk_buff *skb)
- }
- 
- /**
-- * dev_nit_active - return true if any network interface taps are in use
-+ * dev_nit_active_rcu - return true if any network interface taps are in use
-+ *
-+ * The caller must hold the RCU lock
-  *
-  * @dev: network device to check for the presence of taps
-  */
--bool dev_nit_active(struct net_device *dev)
-+bool dev_nit_active_rcu(struct net_device *dev)
- {
--	return !list_empty(&net_hotdata.ptype_all) ||
-+	/* Callers may hold either RCU or RCU BH lock */
-+	WARN_ON_ONCE(!rcu_read_lock_held() && !rcu_read_lock_bh_held());
-+
-+	return !list_empty(&dev_net(dev)->ptype_all) ||
- 	       !list_empty(&dev->ptype_all);
- }
--EXPORT_SYMBOL_GPL(dev_nit_active);
-+EXPORT_SYMBOL_GPL(dev_nit_active_rcu);
- 
- /*
-  *	Support routine. Sends outgoing frames to any network
-@@ -2481,11 +2500,12 @@ EXPORT_SYMBOL_GPL(dev_nit_active);
- 
- void dev_queue_xmit_nit(struct sk_buff *skb, struct net_device *dev)
- {
--	struct list_head *ptype_list = &net_hotdata.ptype_all;
- 	struct packet_type *ptype, *pt_prev = NULL;
-+	struct list_head *ptype_list;
- 	struct sk_buff *skb2 = NULL;
- 
- 	rcu_read_lock();
-+	ptype_list = &dev_net_rcu(dev)->ptype_all;
- again:
- 	list_for_each_entry_rcu(ptype, ptype_list, list) {
- 		if (READ_ONCE(ptype->ignore_outgoing))
-@@ -2529,7 +2549,7 @@ void dev_queue_xmit_nit(struct sk_buff *skb, struct net_device *dev)
- 		pt_prev = ptype;
- 	}
- 
--	if (ptype_list == &net_hotdata.ptype_all) {
-+	if (ptype_list != &dev->ptype_all) {
- 		ptype_list = &dev->ptype_all;
- 		goto again;
- 	}
-@@ -3774,7 +3794,7 @@ static int xmit_one(struct sk_buff *skb, struct net_device *dev,
- 	unsigned int len;
- 	int rc;
- 
--	if (dev_nit_active(dev))
-+	if (dev_nit_active_rcu(dev))
- 		dev_queue_xmit_nit(skb, dev);
- 
- 	len = skb->len;
-@@ -5718,7 +5738,8 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
- 	if (pfmemalloc)
- 		goto skip_taps;
- 
--	list_for_each_entry_rcu(ptype, &net_hotdata.ptype_all, list) {
-+	list_for_each_entry_rcu(ptype, &dev_net_rcu(skb->dev)->ptype_all,
-+				list) {
- 		if (pt_prev)
- 			ret = deliver_skb(skb, pt_prev, orig_dev);
- 		pt_prev = ptype;
-@@ -5830,6 +5851,14 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
- 		deliver_ptype_list_skb(skb, &pt_prev, orig_dev, type,
- 				       &ptype_base[ntohs(type) &
- 						   PTYPE_HASH_MASK]);
-+
-+		/* orig_dev and skb->dev could belong to different netns;
-+		 * Even is such case we need to traverse only the list
-+		 * coming from skb->dev, as the ptype owner (packet socket)
-+		 * will use dev_net(skb->dev) to do namespace filtering.
-+		 */
-+		deliver_ptype_list_skb(skb, &pt_prev, orig_dev, type,
-+				       &dev_net_rcu(skb->dev)->ptype_specific);
- 	}
- 
- 	deliver_ptype_list_skb(skb, &pt_prev, orig_dev, type,
-diff --git a/net/core/hotdata.c b/net/core/hotdata.c
-index d0aaaaa556f22..0bc893d5f07b0 100644
---- a/net/core/hotdata.c
-+++ b/net/core/hotdata.c
-@@ -7,7 +7,6 @@
- 
- struct net_hotdata net_hotdata __cacheline_aligned = {
- 	.offload_base = LIST_HEAD_INIT(net_hotdata.offload_base),
--	.ptype_all = LIST_HEAD_INIT(net_hotdata.ptype_all),
- 	.gro_normal_batch = 8,
- 
- 	.netdev_budget = 300,
-diff --git a/net/core/net-procfs.c b/net/core/net-procfs.c
-index fa6d3969734a6..3e92bf0f9060b 100644
---- a/net/core/net-procfs.c
-+++ b/net/core/net-procfs.c
-@@ -185,7 +185,13 @@ static void *ptype_get_idx(struct seq_file *seq, loff_t pos)
- 		}
- 	}
- 
--	list_for_each_entry_rcu(pt, &net_hotdata.ptype_all, list) {
-+	list_for_each_entry_rcu(pt, &seq_file_net(seq)->ptype_all, list) {
-+		if (i == pos)
-+			return pt;
-+		++i;
-+	}
-+
-+	list_for_each_entry_rcu(pt, &seq_file_net(seq)->ptype_specific, list) {
- 		if (i == pos)
- 			return pt;
- 		++i;
-@@ -210,6 +216,7 @@ static void *ptype_seq_start(struct seq_file *seq, loff_t *pos)
- 
- static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- {
-+	struct net *net = seq_file_net(seq);
- 	struct net_device *dev;
- 	struct packet_type *pt;
- 	struct list_head *nxt;
-@@ -232,15 +239,22 @@ static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- 				goto found;
- 			}
- 		}
--
--		nxt = net_hotdata.ptype_all.next;
--		goto ptype_all;
-+		nxt = net->ptype_all.next;
-+		goto net_ptype_all;
- 	}
- 
--	if (pt->type == htons(ETH_P_ALL)) {
--ptype_all:
--		if (nxt != &net_hotdata.ptype_all)
-+	if (pt->af_packet_net) {
-+net_ptype_all:
-+		if (nxt != &net->ptype_all && nxt != &net->ptype_specific)
- 			goto found;
-+
-+		if (nxt == &net->ptype_all) {
-+			/* continue with ->ptype_specific if it's not empty */
-+			nxt = net->ptype_specific.next;
-+			if (nxt != &net->ptype_specific)
-+				goto found;
-+		}
-+
- 		hash = 0;
- 		nxt = ptype_base[0].next;
- 	} else
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index 4303f2a492624..b0dfdf791ece5 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -340,6 +340,8 @@ static __net_init void preinit_net(struct net *net, struct user_namespace *user_
- 	lock_set_cmp_fn(&net->rtnl_mutex, rtnl_net_lock_cmp_fn, NULL);
- #endif
- 
-+	INIT_LIST_HEAD(&net->ptype_all);
-+	INIT_LIST_HEAD(&net->ptype_specific);
- 	preinit_net_sysctl(net);
- }
- 
 -- 
-2.48.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
