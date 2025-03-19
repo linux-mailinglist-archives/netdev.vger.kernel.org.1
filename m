@@ -1,201 +1,148 @@
-Return-Path: <netdev+bounces-176129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77A41A68E22
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 14:46:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E0DEA68E42
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 14:52:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3EAF427178
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 13:45:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E0713BE71A
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 13:52:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E38258CE3;
-	Wed, 19 Mar 2025 13:44:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q64Fv0po"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 536A2374EA;
+	Wed, 19 Mar 2025 13:52:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f68.google.com (mail-ed1-f68.google.com [209.85.208.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE321257AE8;
-	Wed, 19 Mar 2025 13:44:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.68
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 836642FC23;
+	Wed, 19 Mar 2025 13:52:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742391869; cv=none; b=EJoQ/CUVq7vj9X+G79SOSYlWZw0FTli3HNLlJC9o1B7+PXLyTzslmuqnDYtePijz5gAy3gvO1rLpZYmBNPH5/+DamTx7n5XifKNwc9qKXHQrlNVC5BYhWBUK5ICZhXhCuB6Yzuu927CP2zy5ll1fdHweEgXePNYe9mM9l+hIoJ8=
+	t=1742392335; cv=none; b=LONua3vVB/D6At6zL9ir3L0pt9Rlp0Y/nBS+vUriZSOfYAsQ1XZ1HygjpZQ7oxU6aN95cORKT2GNWx25S+lkhW7LOyOsBgM0uHi+IxtzlsHeeJZ4cJTYHd0vVZjlsgHy0MmkbiFy7w6W9R+ByPBWZ0ZEeffuzicdyjXCOrwgaRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742391869; c=relaxed/simple;
-	bh=TDb86smUbcuAHzkojHnX5nlb7Pmx7GHlODr8IaE8ksw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kA43nqXlHDxEcy2KWQ3QbbGvmw0ad53F3zaNQvQo7dipiqAj4skbpI3kry73f1iyYbHfee9EaO4Dg2qikyiv9eTo2SyrOivsaY/970DIKmWsYS/US7xuA4KZNOWrcpoWGQidsZNsd48/lpqrT6rwSJbLOJC1ULHaZdCm+is4+ns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q64Fv0po; arc=none smtp.client-ip=209.85.208.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f68.google.com with SMTP id 4fb4d7f45d1cf-5e5c7d6b96fso3309516a12.3;
-        Wed, 19 Mar 2025 06:44:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742391866; x=1742996666; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0mXlb6a7wFUcGS5/U6F0ptMpwT27VxURkPFmORF1m1s=;
-        b=Q64Fv0po/yLHRaODmyUKVuYmmyWdFHC7tm0mi0Mmh1kTpSeW/PdkFwY/kYd1rWFQOF
-         xTAtE2QSXGQpf1xvQ9Zz+dqhs1GroKkpvKqdPQ2RWP0o8OBfveBACxUG521ap9HH+EPk
-         o29kfT8psPZJwpncJi1OhUa20LtmLaQWG+TLBgwO/3lN/YToK3CMmK/i8brcnDlHKTkC
-         721WZkf5VQTVEOSOKlu1h7xDugsnWe06CByHZK9eOdycDR+ItYEk2r14jSMFgJLPvkfQ
-         0aDEeqO9O311vJO07NmRiinupr7WrYlx3g9jW9dhqD6OVaoKOQst1Om4ESPX5aziGhfA
-         eR3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742391866; x=1742996666;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0mXlb6a7wFUcGS5/U6F0ptMpwT27VxURkPFmORF1m1s=;
-        b=GGuqReUFqrDVXcUvj0zDiT5C7ikwLencBQKn5F0vnbs/t6arf67U28BbeuvTpRpXTz
-         iHmdc+hkpUX0TfKH6QPcwSwgCI9LPmrIqXuj/H+qQQgD0drK8z/ZkdDuLbypPpOffyj2
-         U+A40/EEDqpnSw0rIuN4kcqhWup8u+gn5Y2HcSaOMFWJwZNu/KdA+NeLgLSdqbPDZthe
-         v53WG8lweRsLKapW6gWKIA2C6o9sEeOhYmyak9FKMhFa/TdzQEU7jW0feXUWBRB4XZ8g
-         lYkUvcpUMhEQxFOapX7NDfm9Vr5p4LdmKRb2+LJRIoaMN1H5dDNVrZ4ENaeFjDS1FKmd
-         36Pw==
-X-Forwarded-Encrypted: i=1; AJvYcCUwWVQdpTfhcY7Mq2cdCCpSSa7wSa+d0SrYsMj8YKO9RSGEZvGRGWbyufk8iNNOFGc6mY5nFf4Z1kKZrQ==@vger.kernel.org, AJvYcCVhWPdmZWoYCcBftcI+/ZX2wmgREKKwDuToAiwTWcQOj8YTZD/2Ts9Gzm8NjFMdft2WJhHgr/EP0yHGEKk4@vger.kernel.org, AJvYcCX6MsQTp1u00EqJuam1IE4rbqlkHX9CwvJ5OU4VzrCtYAetFXekYHgjAaxFgnNdc/w5E+5fMZbu@vger.kernel.org, AJvYcCXcYFfRgPKOUEfYRIuQy5tKJeH8A/A2UNkfbrQSyfg5G8UYxtCLZUVAQ39otQQXiSNUtbI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZHh/ucw7YxSSDhFvxwydVRZuj1Y2vCuDYeZzOHGWT5wkW627l
-	UHRH7cmib8w56uEsvZiXvXbKJdGcp1YVILffwssoBzbTZs5LVQRfnrBIE80IKt0LnOKkSzr8iYE
-	Pr/zUZK7a2JyKDH93u1bZm5ama/o=
-X-Gm-Gg: ASbGnctNe5mbLKsIKto+RHO/XxTzxdzPlShqIuacFzqFoeC926UAH5jry7X5gzCUBFY
-	9omwuw68D3t5n0zyz9VkXbs9OIDdXSVBoCZeu6qqIz88MPoZCBYdVWZ7m5Z8RkrwOwMupemXgJZ
-	v1r0eQ49pClArMeEa7HUZo6L2+gdb6ULUOkXsuxGIB+OuaHiROOk2wMtwlSA==
-X-Google-Smtp-Source: AGHT+IFvLDrujM4yKAhdVi/UGZ4FMBVm3U5A8tMGhKLXP+Vn0Nro60u/TCHTRqq54AuMeJ85qLrOfDUFmFrSFEmOtec=
-X-Received: by 2002:a05:6402:27d1:b0:5e0:9269:f54e with SMTP id
- 4fb4d7f45d1cf-5eb80d445aemr2559225a12.14.1742391865910; Wed, 19 Mar 2025
- 06:44:25 -0700 (PDT)
+	s=arc-20240116; t=1742392335; c=relaxed/simple;
+	bh=fblOU5XQsvkux3RLhPLmC/pFbQsmjwoFmqRLPXIxi64=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CbNtrQbEYKHo37oSQK09HUWvssgYzrEoMbeZ3+K1mIDJqUuH6NSnJui0n5TpW2S8gvfb2mL9Y2b1CgzjgiFBghD5wB0xRJk7veqmieLkPjFIg5WQgjLIhjwT8/sxSY3iTetuTGvhuFM4eoKP+oHC1hAcijdTHgq0N7T17QX64BQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com; spf=none smtp.mailfrom=foss.arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=foss.arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1B360113E;
+	Wed, 19 Mar 2025 06:52:21 -0700 (PDT)
+Received: from usa.arm.com (e133711.arm.com [10.1.196.55])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id C3AE93F673;
+	Wed, 19 Mar 2025 06:52:11 -0700 (PDT)
+From: Sudeep Holla <sudeep.holla@arm.com>
+To: linux-kernel@vger.kernel.org
+Cc: Sudeep Holla <sudeep.holla@arm.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	netdev@vger.kernel.org
+Subject: [RESEND PATCH] net: phy: fixed_phy: transition to the faux device interface
+Date: Wed, 19 Mar 2025 13:52:09 +0000
+Message-Id: <20250319135209.2734594-1-sudeep.holla@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250319133309.6fce6404@canb.auug.org.au> <CAADnVQKotSrp8CkVpFw-y800NJ_R7An-iw-twrQZaOdYUeRtqQ@mail.gmail.com>
- <CAP01T76CqOxzEiMLKJ2y_YD=qDgWq+Fq5Zy-fnKP4AAyS30Dwg@mail.gmail.com>
-In-Reply-To: <CAP01T76CqOxzEiMLKJ2y_YD=qDgWq+Fq5Zy-fnKP4AAyS30Dwg@mail.gmail.com>
-From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
-Date: Wed, 19 Mar 2025 14:43:48 +0100
-X-Gm-Features: AQ5f1Jpd6YH1vfPNEBHTXM5D-u_8RSvaQE7lO7NTwVB3SOWOBMMLAPn6u9zE8xY
-Message-ID: <CAP01T77_qMiMmyeyizud=-sbBH5q1jvY_Jkj-QLZqM1zh0a2hg@mail.gmail.com>
-Subject: Re: linux-next: build failure after merge of the bpf-next tree
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Uros Bizjak <ubizjak@gmail.com>, bpf <bpf@vger.kernel.org>, 
-	Networking <netdev@vger.kernel.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, 19 Mar 2025 at 14:37, Kumar Kartikeya Dwivedi <memxor@gmail.com> wr=
-ote:
->
-> On Wed, 19 Mar 2025 at 03:47, Alexei Starovoitov
-> <alexei.starovoitov@gmail.com> wrote:
-> >
-> > On Tue, Mar 18, 2025 at 7:33=E2=80=AFPM Stephen Rothwell <sfr@canb.auug=
-.org.au> wrote:
-> > >
-> > > Hi all,
-> > >
-> > > After merging the bpf-next tree, today's linux-next build (x86_64
-> > > allmodconfig) failed like this:
-> > >
-> > > In file included from include/asm-generic/percpu.h:7,
-> > >                  from arch/x86/include/asm/percpu.h:630,
-> > >                  from arch/x86/include/asm/preempt.h:6,
-> > >                  from include/linux/preempt.h:79,
-> > >                  from include/linux/smp.h:116,
-> > >                  from kernel/locking/qspinlock.c:16:
-> > > kernel/locking/qspinlock.h: In function 'decode_tail':
-> > > include/linux/percpu-defs.h:219:45: error: initialization from pointe=
-r to non-enclosed address space
-> > >   219 |         const void __percpu *__vpp_verify =3D (typeof((ptr) +=
- 0))NULL;    \
-> > >       |                                             ^
-> > > include/linux/percpu-defs.h:237:9: note: in expansion of macro '__ver=
-ify_pcpu_ptr'
-> > >   237 |         __verify_pcpu_ptr(ptr);                              =
-           \
-> > >       |         ^~~~~~~~~~~~~~~~~
-> > > kernel/locking/qspinlock.h:67:16: note: in expansion of macro 'per_cp=
-u_ptr'
-> > >    67 |         return per_cpu_ptr(&qnodes[idx].mcs, cpu);
-> > >       |                ^~~~~~~~~~~
-> > > include/linux/percpu-defs.h:219:45: note: expected 'const __seg_gs vo=
-id *' but pointer is of type 'struct mcs_spinlock *'
-> > >   219 |         const void __percpu *__vpp_verify =3D (typeof((ptr) +=
- 0))NULL;    \
-> > >       |                                             ^
-> > > include/linux/percpu-defs.h:237:9: note: in expansion of macro '__ver=
-ify_pcpu_ptr'
-> > >   237 |         __verify_pcpu_ptr(ptr);                              =
-           \
-> > >       |         ^~~~~~~~~~~~~~~~~
-> > > kernel/locking/qspinlock.h:67:16: note: in expansion of macro 'per_cp=
-u_ptr'
-> > >    67 |         return per_cpu_ptr(&qnodes[idx].mcs, cpu);
-> > >       |                ^~~~~~~~~~~
-> > > kernel/locking/qspinlock.c: In function 'native_queued_spin_lock_slow=
-path':
-> > > kernel/locking/qspinlock.c:285:41: error: passing argument 2 of 'deco=
-de_tail' from pointer to non-enclosed address space
-> > >   285 |                 prev =3D decode_tail(old, qnodes);
-> > >       |                                         ^~~~~~
-> > > In file included from kernel/locking/qspinlock.c:30:
-> > > kernel/locking/qspinlock.h:62:79: note: expected 'struct qnode *' but=
- argument is of type '__seg_gs struct qnode *'
-> > >    62 | static inline __pure struct mcs_spinlock *decode_tail(u32 tai=
-l, struct qnode *qnodes)
-> > >       |                                                              =
-   ~~~~~~~~~~~~~~^~~~~~
-> > > In file included from kernel/locking/qspinlock.c:401:
-> > > kernel/locking/qspinlock.c: In function '__pv_queued_spin_lock_slowpa=
-th':
-> > > kernel/locking/qspinlock.c:285:41: error: passing argument 2 of 'deco=
-de_tail' from pointer to non-enclosed address space
-> > >   285 |                 prev =3D decode_tail(old, qnodes);
-> > >       |                                         ^~~~~~
-> > > kernel/locking/qspinlock.h:62:79: note: expected 'struct qnode *' but=
- argument is of type '__seg_gs struct qnode *'
-> > >    62 | static inline __pure struct mcs_spinlock *decode_tail(u32 tai=
-l, struct qnode *qnodes)
-> > >       |                                                              =
-   ~~~~~~~~~~~~~~^~~~~~
-> > >
-> > > Caused by the resilient-queued-spin-lock branch of the bpf-next tree
-> > > interacting with the "Enable strict percpu address space checks" seri=
-es
-> > > form the mm-stable tree.
-> >
-> > Do you mean this set:
-> > https://lore.kernel.org/all/20250127160709.80604-1-ubizjak@gmail.com/
-> >
-> > >
-> > > I don't know why this happens, but reverting that branch inf the bpf-=
-next
-> > > tree makes the failure go away, so I have done that for today.
-> >
-> > Kumar,
-> >
-> > pls take a look.
->
-> I've sent a fix [0], but unfortunately I was unable to reproduce the
-> problem with an LLVM >=3D 19 build, idk why. I will try with GCC >=3D 14
-> as the patches require to confirm, but based on the error I am 99%
-> sure it will fix the problem.
+The net fixed phy driver does not require the creation of a platform
+device. Originally, this approach was chosen for simplicity when the
+driver was first implemented.
 
-Probably because __seg_gs has CC_HAS_NAMED_AS depends on CC_IS_GCC.
-Let me give it a go with GCC.
+With the introduction of the lightweight faux device interface, we now
+have a more appropriate alternative. Migrate the device to utilize the
+faux bus, given that the platform device it previously created was not
+a real one anyway. This will get rid of the fake platform device.
 
->
-> [0] https://lore.kernel.org/bpf/20250319133523.641009-1-memxor@gmail.com
->
-> Feel free to cherry-pick or squash into the fixed commit, whatever is bes=
-t.
+Cc: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: netdev@vger.kernel.org
+Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+---
+ drivers/net/phy/fixed_phy.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+Hi,
+
+This is just a resend of [1][2] independent of the series as there are
+no dependency.
+
+Regards,
+Sudeep
+
+[1] https://lore.kernel.org/all/20250317-plat2faux_dev-v1-7-5fe67c085ad5@arm.com/
+[2] https://lore.kernel.org/all/20250318-plat2faux_dev-v2-8-e6cc73f78478@arm.com/
+
+
+diff --git a/drivers/net/phy/fixed_phy.c b/drivers/net/phy/fixed_phy.c
+index aef739c20ac4..ee7831a9849b 100644
+--- a/drivers/net/phy/fixed_phy.c
++++ b/drivers/net/phy/fixed_phy.c
+@@ -10,7 +10,7 @@
+ 
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+-#include <linux/platform_device.h>
++#include <linux/device/faux.h>
+ #include <linux/list.h>
+ #include <linux/mii.h>
+ #include <linux/phy.h>
+@@ -40,7 +40,7 @@ struct fixed_phy {
+ 	struct gpio_desc *link_gpiod;
+ };
+ 
+-static struct platform_device *pdev;
++static struct faux_device *fdev;
+ static struct fixed_mdio_bus platform_fmb = {
+ 	.phys = LIST_HEAD_INIT(platform_fmb.phys),
+ };
+@@ -337,9 +337,9 @@ static int __init fixed_mdio_bus_init(void)
+ 	struct fixed_mdio_bus *fmb = &platform_fmb;
+ 	int ret;
+ 
+-	pdev = platform_device_register_simple("Fixed MDIO bus", 0, NULL, 0);
+-	if (IS_ERR(pdev))
+-		return PTR_ERR(pdev);
++	fdev = faux_device_create("Fixed MDIO bus", NULL, NULL);
++	if (!fdev)
++		return -ENODEV;
+ 
+ 	fmb->mii_bus = mdiobus_alloc();
+ 	if (fmb->mii_bus == NULL) {
+@@ -350,7 +350,7 @@ static int __init fixed_mdio_bus_init(void)
+ 	snprintf(fmb->mii_bus->id, MII_BUS_ID_SIZE, "fixed-0");
+ 	fmb->mii_bus->name = "Fixed MDIO Bus";
+ 	fmb->mii_bus->priv = fmb;
+-	fmb->mii_bus->parent = &pdev->dev;
++	fmb->mii_bus->parent = &fdev->dev;
+ 	fmb->mii_bus->read = &fixed_mdio_read;
+ 	fmb->mii_bus->write = &fixed_mdio_write;
+ 	fmb->mii_bus->phy_mask = ~0;
+@@ -364,7 +364,7 @@ static int __init fixed_mdio_bus_init(void)
+ err_mdiobus_alloc:
+ 	mdiobus_free(fmb->mii_bus);
+ err_mdiobus_reg:
+-	platform_device_unregister(pdev);
++	faux_device_destroy(fdev);
+ 	return ret;
+ }
+ module_init(fixed_mdio_bus_init);
+@@ -376,7 +376,7 @@ static void __exit fixed_mdio_bus_exit(void)
+ 
+ 	mdiobus_unregister(fmb->mii_bus);
+ 	mdiobus_free(fmb->mii_bus);
+-	platform_device_unregister(pdev);
++	faux_device_destroy(fdev);
+ 
+ 	list_for_each_entry_safe(fp, tmp, &fmb->phys, node) {
+ 		list_del(&fp->node);
+-- 
+2.34.1
+
 
