@@ -1,344 +1,93 @@
-Return-Path: <netdev+bounces-176059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14F54A68880
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 10:46:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A267A68881
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 10:46:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F86F18880FB
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 09:45:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 534E819C1760
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 09:45:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E6C025485E;
-	Wed, 19 Mar 2025 09:39:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E381C25487E;
+	Wed, 19 Mar 2025 09:40:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 149F0253B65;
-	Wed, 19 Mar 2025 09:39:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52465253B76
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 09:40:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742377169; cv=none; b=Yr/6OG+ezUy7ClP87EJLdKSu9SwY2QWCTKIe5rjRZFIh73E5Pg+Zjy3pWGqV6o3EvxebefmDYHD896GHsk6WSzdcQjIr7UIAumbLJCAoi+zdQAz2txDiQxacO63fBUW6gAikY7V1WweOgKKWvk5oVWZJ18OQss98N1fiwAE216g=
+	t=1742377205; cv=none; b=YCoO1gH7QiZmFA83sml74Vu3FHM3Zc6MZK6GmVYAYPGEYqZ/6NFKnICboyQyYpovwxu+JY0y2A3wKnyA/eMszNynCk6rVT42877Ie9Zs/YmskwwBgkfgS8Ze9xHDWZNAmNXCUyCKpZkKGruWjHW0NnUz96ub9BmZLyLE5Mwcw/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742377169; c=relaxed/simple;
-	bh=O5m4J2uazvVon6VrejWT7QbkzPd8R8Ka6P+/dKxYqY8=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=FPqyeSEO8sfPgmtpKi0Z1HFOIDT/BkEFIBNL5V1wBimfA2bWGVU2i7P0Rxzfe5Bxpk+qQR5Sny8UHBVtKs9UfKux/jS4MKXe8I6lzkcVcoX2xlE7hoJBjs3O6ekwNUfHtsH7Qamnb4bSVtRFSgeZAk3PBH8RzZQSt2yqKEZMF5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4ZHk9H6zmDzpg72;
-	Wed, 19 Mar 2025 17:36:03 +0800 (CST)
-Received: from kwepemk500005.china.huawei.com (unknown [7.202.194.90])
-	by mail.maildlp.com (Postfix) with ESMTPS id D8A7F14033A;
-	Wed, 19 Mar 2025 17:39:17 +0800 (CST)
-Received: from [10.174.178.46] (10.174.178.46) by
- kwepemk500005.china.huawei.com (7.202.194.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 19 Mar 2025 17:39:16 +0800
-Subject: Re: [v5 PATCH 13/14] ubifs: Use crypto_acomp interface
-To: Herbert Xu <herbert@gondor.apana.org.au>, Linux Crypto Mailing List
-	<linux-crypto@vger.kernel.org>
-CC: Richard Weinberger <richard@nod.at>, <linux-mtd@lists.infradead.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@ucw.cz>,
-	<linux-pm@vger.kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>,
-	<netdev@vger.kernel.org>
-References: <cover.1742034499.git.herbert@gondor.apana.org.au>
- <434ca0f270b1e76f2abb222ddb0d68d7f1e0831a.1742034499.git.herbert@gondor.apana.org.au>
-From: Zhihao Cheng <chengzhihao1@huawei.com>
-Message-ID: <d81b956d-8d08-8ddd-9746-5b0262a4e68e@huawei.com>
-Date: Wed, 19 Mar 2025 17:39:16 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+	s=arc-20240116; t=1742377205; c=relaxed/simple;
+	bh=MUIdGfHqdt7bgez4R5hVp0jGJaNO3W5wLDchdmLq48M=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=PWU5TrtRm+Yp+6mSME4Lq/DbzUT0zhO5n4QAC6xt09UPWkGz5mC/Jg3tMuG3SfvVMcc8sQI6evojInbQFtaBeIKTpNDjzCWaZccpCOKs23xvFYDqb40VcINRTWw9IVveHV1jZptOItzgNKPEjwUwme4tXye2yyz+hTVEn6NLnuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3d458e61faaso5133045ab.0
+        for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 02:40:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742377203; x=1742982003;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kjBe+XHI3ciJhsIHuXrQ+GA2Y7SNLmT3NwnpfP+m5c0=;
+        b=SMirRI7Y8lrVyimQzt0SwsNjgxQ/yWrsUzSUAuQv3T45DfIdXeeLUzZVdedbsXED6Z
+         CEM3JQjS2TWGWavy3uumN+pXXPOPtp8CAjYuBLHP4d19xrl+GwpATWYeNWORAlQWbkQR
+         0a30I1gugwOkDo6Dgx3Y8QhhAjk/NACKh7tWNjEjJJjWOvWvXzt5uywQg3W8hFHCkDzq
+         86rsqpCjpytJ5/KZ9PCsUQhkeKOGBX3U5fWyITGqJQAjCbqEDV/VJ6du3G9joYdEkhL4
+         tYlSN6UO6H+yKEpKjW+ssuwdniPJ/6iu44J+kVJ79JmjFLROuSpmzjCeZ7l1BidoqmiH
+         9XuA==
+X-Forwarded-Encrypted: i=1; AJvYcCWmSc2jfY9hU23Ap9oj0Kc2RAHeXdEwkheKMCqhZnGH9f9+3r5U2Grgl6ptRXL43prIqJueimo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoYPbozkylJXrlGdnab2s7rUM0aZTH5PHJy/hYYq+9C2XrPASM
+	jemls7xTT0Vko8cWENd/Gvfre3TeJ00mF62y3CDBDjPQ4J0rHYjtpYpU5vtjwG/mosKNGVvZwJe
+	Um0TlUJYDelW5CahkQB3T0N0+XK3M4X8MtG6HKWs44fCo+FHoasyui+g=
+X-Google-Smtp-Source: AGHT+IGEbYzJWOz86GSJH3d+H/uesMTKCNrZ4yEyh/GDkdwj2Kg7c34kkrPiiVjmgyRe5xz43NyJttqmOUCx3cgB3iWPOfUr81YW
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <434ca0f270b1e76f2abb222ddb0d68d7f1e0831a.1742034499.git.herbert@gondor.apana.org.au>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemk500005.china.huawei.com (7.202.194.90)
+X-Received: by 2002:a05:6e02:3388:b0:3d0:26a5:b2c with SMTP id
+ e9e14a558f8ab-3d586ec873cmr16492115ab.8.1742377203511; Wed, 19 Mar 2025
+ 02:40:03 -0700 (PDT)
+Date: Wed, 19 Mar 2025 02:40:03 -0700
+In-Reply-To: <67afa09f.050a0220.21dd3.0054.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67da90f3.050a0220.2ca2c6.0194.GAE@google.com>
+Subject: Re: [syzbot] [bcachefs?] [kernfs?] UBSAN: shift-out-of-bounds in radix_tree_delete_item
+From: syzbot <syzbot+b581c7106aa616bb522c@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	gregkh@linuxfoundation.org, horms@kernel.org, kent.overstreet@linux.dev, 
+	kuba@kernel.org, linux-bcachefs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	mmpgouride@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com, tj@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-ÔÚ 2025/3/15 18:30, Herbert Xu Ð´µÀ:
-> Replace the legacy crypto compression interface with the new acomp
-> interface.
-> 
-> Remove the compression mutexes and the overallocation for memory
-> (the offender LZO has been fixed).
-> 
-> Cap the output buffer length for compression to eliminate the
-> post-compression check for UBIFS_MIN_COMPRESS_DIFF.
-> 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> ---
->   fs/ubifs/compress.c | 106 ++++++++++++++++++++++++++------------------
->   fs/ubifs/journal.c  |   2 +-
->   fs/ubifs/ubifs.h    |  15 +------
->   3 files changed, 67 insertions(+), 56 deletions(-)
-> 
+syzbot suspects this issue was fixed by commit:
 
-Tested-by: Zhihao Cheng <chengzhihao1@huawei.com> # For xfstests
-Reviewed-by: Zhihao Cheng <chengzhihao1@huawei.com>
-> diff --git a/fs/ubifs/compress.c b/fs/ubifs/compress.c
-> index 0b48cbab8a3d..a241ba01c9a8 100644
-> --- a/fs/ubifs/compress.c
-> +++ b/fs/ubifs/compress.c
-> @@ -15,7 +15,7 @@
->    * decompression.
->    */
->   
-> -#include <linux/crypto.h>
-> +#include <crypto/acompress.h>
->   #include "ubifs.h"
->   
->   /* Fake description object for the "none" compressor */
-> @@ -26,11 +26,8 @@ static struct ubifs_compressor none_compr = {
->   };
->   
->   #ifdef CONFIG_UBIFS_FS_LZO
-> -static DEFINE_MUTEX(lzo_mutex);
-> -
->   static struct ubifs_compressor lzo_compr = {
->   	.compr_type = UBIFS_COMPR_LZO,
-> -	.comp_mutex = &lzo_mutex,
->   	.name = "lzo",
->   	.capi_name = "lzo",
->   };
-> @@ -42,13 +39,8 @@ static struct ubifs_compressor lzo_compr = {
->   #endif
->   
->   #ifdef CONFIG_UBIFS_FS_ZLIB
-> -static DEFINE_MUTEX(deflate_mutex);
-> -static DEFINE_MUTEX(inflate_mutex);
-> -
->   static struct ubifs_compressor zlib_compr = {
->   	.compr_type = UBIFS_COMPR_ZLIB,
-> -	.comp_mutex = &deflate_mutex,
-> -	.decomp_mutex = &inflate_mutex,
->   	.name = "zlib",
->   	.capi_name = "deflate",
->   };
-> @@ -60,13 +52,8 @@ static struct ubifs_compressor zlib_compr = {
->   #endif
->   
->   #ifdef CONFIG_UBIFS_FS_ZSTD
-> -static DEFINE_MUTEX(zstd_enc_mutex);
-> -static DEFINE_MUTEX(zstd_dec_mutex);
-> -
->   static struct ubifs_compressor zstd_compr = {
->   	.compr_type = UBIFS_COMPR_ZSTD,
-> -	.comp_mutex = &zstd_enc_mutex,
-> -	.decomp_mutex = &zstd_dec_mutex,
->   	.name = "zstd",
->   	.capi_name = "zstd",
->   };
-> @@ -80,6 +67,30 @@ static struct ubifs_compressor zstd_compr = {
->   /* All UBIFS compressors */
->   struct ubifs_compressor *ubifs_compressors[UBIFS_COMPR_TYPES_CNT];
->   
-> +static int ubifs_compress_req(const struct ubifs_info *c,
-> +			      struct acomp_req *req,
-> +			      void *out_buf, int *out_len,
-> +			      const char *compr_name)
-> +{
-> +	struct crypto_wait wait;
-> +	int in_len = req->slen;
-> +	int dlen = *out_len;
-> +	int err;
-> +
-> +	dlen = min(dlen, in_len - UBIFS_MIN_COMPRESS_DIFF);
-> +
-> +	crypto_init_wait(&wait);
-> +	acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-> +				   crypto_req_done, &wait);
-> +	acomp_request_set_dst_dma(req, out_buf, dlen);
-> +	err = crypto_acomp_compress(req);
-> +	err = crypto_wait_req(err, &wait);
-> +	*out_len = req->dlen;
-> +	acomp_request_free(req);
-> +
-> +	return err;
-> +}
-> +
->   /**
->    * ubifs_compress - compress data.
->    * @c: UBIFS file-system description object
-> @@ -112,23 +123,14 @@ void ubifs_compress(const struct ubifs_info *c, const void *in_buf,
->   	if (in_len < UBIFS_MIN_COMPR_LEN)
->   		goto no_compr;
->   
-> -	if (compr->comp_mutex)
-> -		mutex_lock(compr->comp_mutex);
-> -	err = crypto_comp_compress(compr->cc, in_buf, in_len, out_buf,
-> -				   (unsigned int *)out_len);
-> -	if (compr->comp_mutex)
-> -		mutex_unlock(compr->comp_mutex);
-> -	if (unlikely(err)) {
-> -		ubifs_warn(c, "cannot compress %d bytes, compressor %s, error %d, leave data uncompressed",
-> -			   in_len, compr->name, err);
-> -		goto no_compr;
-> +	{
-> +		ACOMP_REQUEST_ALLOC(req, compr->cc, GFP_NOFS | __GFP_NOWARN);
-> +
-> +		acomp_request_set_src_nondma(req, in_buf, in_len);
-> +		err = ubifs_compress_req(c, req, out_buf, out_len, compr->name);
->   	}
->   
-> -	/*
-> -	 * If the data compressed only slightly, it is better to leave it
-> -	 * uncompressed to improve read speed.
-> -	 */
-> -	if (in_len - *out_len < UBIFS_MIN_COMPRESS_DIFF)
-> +	if (err)
->   		goto no_compr;
->   
->   	return;
-> @@ -139,6 +141,31 @@ void ubifs_compress(const struct ubifs_info *c, const void *in_buf,
->   	*compr_type = UBIFS_COMPR_NONE;
->   }
->   
-> +static int ubifs_decompress_req(const struct ubifs_info *c,
-> +				struct acomp_req *req,
-> +				const void *in_buf, int in_len, int *out_len,
-> +				const char *compr_name)
-> +{
-> +	struct crypto_wait wait;
-> +	int err;
-> +
-> +	crypto_init_wait(&wait);
-> +	acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-> +				   crypto_req_done, &wait);
-> +	acomp_request_set_src_dma(req, in_buf, in_len);
-> +	err = crypto_acomp_decompress(req);
-> +	err = crypto_wait_req(err, &wait);
-> +	*out_len = req->dlen;
-> +
-> +	if (err)
-> +		ubifs_err(c, "cannot decompress %d bytes, compressor %s, error %d",
-> +			  in_len, compr_name, err);
-> +
-> +	acomp_request_free(req);
-> +
-> +	return err;
-> +}
-> +
->   /**
->    * ubifs_decompress - decompress data.
->    * @c: UBIFS file-system description object
-> @@ -155,7 +182,6 @@ void ubifs_compress(const struct ubifs_info *c, const void *in_buf,
->   int ubifs_decompress(const struct ubifs_info *c, const void *in_buf,
->   		     int in_len, void *out_buf, int *out_len, int compr_type)
->   {
-> -	int err;
->   	struct ubifs_compressor *compr;
->   
->   	if (unlikely(compr_type < 0 || compr_type >= UBIFS_COMPR_TYPES_CNT)) {
-> @@ -176,17 +202,13 @@ int ubifs_decompress(const struct ubifs_info *c, const void *in_buf,
->   		return 0;
->   	}
->   
-> -	if (compr->decomp_mutex)
-> -		mutex_lock(compr->decomp_mutex);
-> -	err = crypto_comp_decompress(compr->cc, in_buf, in_len, out_buf,
-> -				     (unsigned int *)out_len);
-> -	if (compr->decomp_mutex)
-> -		mutex_unlock(compr->decomp_mutex);
-> -	if (err)
-> -		ubifs_err(c, "cannot decompress %d bytes, compressor %s, error %d",
-> -			  in_len, compr->name, err);
-> +	{
-> +		ACOMP_REQUEST_ALLOC(req, compr->cc, GFP_NOFS | __GFP_NOWARN);
->   
-> -	return err;
-> +		acomp_request_set_dst_nondma(req, out_buf, *out_len);
-> +		return ubifs_decompress_req(c, req, in_buf, in_len, out_len,
-> +					    compr->name);
-> +	}
->   }
->   
->   /**
-> @@ -199,7 +221,7 @@ int ubifs_decompress(const struct ubifs_info *c, const void *in_buf,
->   static int __init compr_init(struct ubifs_compressor *compr)
->   {
->   	if (compr->capi_name) {
-> -		compr->cc = crypto_alloc_comp(compr->capi_name, 0, 0);
-> +		compr->cc = crypto_alloc_acomp(compr->capi_name, 0, 0);
->   		if (IS_ERR(compr->cc)) {
->   			pr_err("UBIFS error (pid %d): cannot initialize compressor %s, error %ld",
->   			       current->pid, compr->name, PTR_ERR(compr->cc));
-> @@ -218,7 +240,7 @@ static int __init compr_init(struct ubifs_compressor *compr)
->   static void compr_exit(struct ubifs_compressor *compr)
->   {
->   	if (compr->capi_name)
-> -		crypto_free_comp(compr->cc);
-> +		crypto_free_acomp(compr->cc);
->   }
->   
->   /**
-> diff --git a/fs/ubifs/journal.c b/fs/ubifs/journal.c
-> index 36ba79fbd2ff..7629ca9ecfe8 100644
-> --- a/fs/ubifs/journal.c
-> +++ b/fs/ubifs/journal.c
-> @@ -1625,7 +1625,7 @@ static int truncate_data_node(const struct ubifs_info *c, const struct inode *in
->   	int err, dlen, compr_type, out_len, data_size;
->   
->   	out_len = le32_to_cpu(dn->size);
-> -	buf = kmalloc_array(out_len, WORST_COMPR_FACTOR, GFP_NOFS);
-> +	buf = kmalloc(out_len, GFP_NOFS);
->   	if (!buf)
->   		return -ENOMEM;
->   
-> diff --git a/fs/ubifs/ubifs.h b/fs/ubifs/ubifs.h
-> index 3375bbe0508c..7d0aaf5d2e23 100644
-> --- a/fs/ubifs/ubifs.h
-> +++ b/fs/ubifs/ubifs.h
-> @@ -124,13 +124,6 @@
->   #define OLD_ZNODE_AGE 20
->   #define YOUNG_ZNODE_AGE 5
->   
-> -/*
-> - * Some compressors, like LZO, may end up with more data then the input buffer.
-> - * So UBIFS always allocates larger output buffer, to be sure the compressor
-> - * will not corrupt memory in case of worst case compression.
-> - */
-> -#define WORST_COMPR_FACTOR 2
-> -
->   #ifdef CONFIG_FS_ENCRYPTION
->   #define UBIFS_CIPHER_BLOCK_SIZE FSCRYPT_CONTENTS_ALIGNMENT
->   #else
-> @@ -141,7 +134,7 @@
->    * How much memory is needed for a buffer where we compress a data node.
->    */
->   #define COMPRESSED_DATA_NODE_BUF_SZ \
-> -	(UBIFS_DATA_NODE_SZ + UBIFS_BLOCK_SIZE * WORST_COMPR_FACTOR)
-> +	(UBIFS_DATA_NODE_SZ + UBIFS_BLOCK_SIZE)
->   
->   /* Maximum expected tree height for use by bottom_up_buf */
->   #define BOTTOM_UP_HEIGHT 64
-> @@ -835,16 +828,12 @@ struct ubifs_node_range {
->    * struct ubifs_compressor - UBIFS compressor description structure.
->    * @compr_type: compressor type (%UBIFS_COMPR_LZO, etc)
->    * @cc: cryptoapi compressor handle
-> - * @comp_mutex: mutex used during compression
-> - * @decomp_mutex: mutex used during decompression
->    * @name: compressor name
->    * @capi_name: cryptoapi compressor name
->    */
->   struct ubifs_compressor {
->   	int compr_type;
-> -	struct crypto_comp *cc;
-> -	struct mutex *comp_mutex;
-> -	struct mutex *decomp_mutex;
-> +	struct crypto_acomp *cc;
->   	const char *name;
->   	const char *capi_name;
->   };
-> 
+commit 3a04334d6282d08fbdd6201e374db17d31927ba3
+Author: Alan Huang <mmpgouride@gmail.com>
+Date:   Fri Mar 7 16:58:27 2025 +0000
 
+    bcachefs: Fix b->written overflow
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=176e8e98580000
+start commit:   09fbf3d50205 Merge tag 'tomoyo-pr-20250211' of git://git.c..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c516b1c112a81e77
+dashboard link: https://syzkaller.appspot.com/bug?extid=b581c7106aa616bb522c
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11e449b0580000
+
+If the result looks correct, please mark the issue as fixed by replying with:
+
+#syz fix: bcachefs: Fix b->written overflow
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
