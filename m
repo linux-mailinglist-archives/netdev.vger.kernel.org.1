@@ -1,275 +1,242 @@
-Return-Path: <netdev+bounces-176160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B33A0A69393
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 16:34:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D7ECA69369
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 16:30:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8844D19C26B9
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 15:24:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 608E316A569
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 15:27:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDF681C82F4;
-	Wed, 19 Mar 2025 15:23:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E7FE1CCEF0;
+	Wed, 19 Mar 2025 15:26:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eAsOR6BA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ckfDbRGA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92D711AF0BC;
-	Wed, 19 Mar 2025 15:23:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742397833; cv=none; b=iVtcfBR/h3vOG5ZhpfE4PG7G8AdxXIcZd6XgADzZv8btEy/wJEcqIYgRHeFiQOpEiL5F+QWprVrPAePLbe+tlSpS5Zvf3tYHHVDZBXZMOm3QS04u9HcRM42mhmzDWXc2I2SnGDdLPIt2wkJvUmFxOi2JSAXCm6zjmyq0H/JXrfc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742397833; c=relaxed/simple;
-	bh=+ND2GQ1ucjL2Fbj/gHU8rnxTiLp8tL39vHpjDRl8G5A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZLyj+tpYoWp+pv/JeVzRtKcA1HPWa3NgTm8b4+TjaSsfhO3YW+pIxMALKVlfzcocOg8PpFeIhvmHI1D7ToPV6hae6RCDxRmJI7J/k7wflT+6FJyUM38tRW1KoCnyx7ACaiET83PY8S66iAzPRbTCD1vkAx+Wv+zGY9pWcVesnjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eAsOR6BA; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E101C726D
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 15:26:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742398005; cv=fail; b=tqteN5+2tnppeYUg6DTftW6skDFoZ1YgJKA45lmZsSbCw6y4UhKtPzaKeoMTxXsOuE8EOfU1rYXpNH88fyofecEwOyW4uXyaOGr+EOL/DIb2I7R4AsEeTjEZKSCQ9pgE4/aJmqsnURvPnEVxHfLUZY7dvZgCw1IXT90aFvzRnOo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742398005; c=relaxed/simple;
+	bh=ReSFiik3aHz6PHumEZgTUTgjVEk1AguUMUvYLtIJCCs=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Ns04ymPww3vROAbXaYqoSvd0S2pAiDGq8Jx0gRWHDsjQgl1vP8i3k3xWOcEGMnnIDrXlRYlcQ3tO1CEbAhCWdlFbCtLucS96111NeL0NptSMx6FXNklc8hD1tMfSgGEaRkjrn7tkBk5Y4IwgRu0lrRSSY13Y2rzszTvZ6s7gI7A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ckfDbRGA; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1742397832; x=1773933832;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=+ND2GQ1ucjL2Fbj/gHU8rnxTiLp8tL39vHpjDRl8G5A=;
-  b=eAsOR6BAWppqkOMXNXLsbA4C/Jn/nP33uZFU67qC0+VZtmufHdiaNXBc
-   /4ImQGuriHjwy/AAz0az7uk6VUO1wCIHyYmVPrCWpHx528T9aCyyRzBu0
-   lYoiKEx1N4KixKyNjH1aQ7ZF0p+I3wK8S6GhI/zHwNVv1nblmoxX6d49h
-   s2M65DAlv46bWHosW4DZ8kU/d5kt6c18ie2MDiCbrJZVfl1CuZVzZD4wX
-   8dpc0KqI1DrjLchMTKkYg7/3lWEKGqsgv2sI+AgXiOsYjTdNpY1f8x8TQ
-   OZTjCQRqaBrJIAXxW8YETgf5cH5XZRfgl+t4O7uoeQ3mqn5LvbI7H9bGh
-   A==;
-X-CSE-ConnectionGUID: KBFwm3yhRfK8Lt0TtqUqFQ==
-X-CSE-MsgGUID: F8LdNn8fS66zhmF+LDD3tA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11378"; a="31174872"
+  t=1742398003; x=1773934003;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ReSFiik3aHz6PHumEZgTUTgjVEk1AguUMUvYLtIJCCs=;
+  b=ckfDbRGANo9oUUYcAUZdHGxbVE41NYVrYAiT7SM/vFOPn5zov4NoMr9C
+   rrG/a+xkw7L+5fUq8wr1xcUwTrb0qAIKb32A1SzlDfU5zyNQaDt+VEeWT
+   I3uynZwp4hAuSnUYVaim19nKbVq9Igvai1GI9YofcYPP7GS/ZCncrHxzI
+   MYUBlKOauzQn80W4V2Qy/AMLfnO50ve+sGLxgZE7gVynuV1pIr45w0Vz0
+   lYZ2gtFzZrKUK8nxshJohZZY6IfqKSJviMoRlBkHy4wBc42uu7g7yKpcE
+   DE2+lNTe8Fl7yCqvpPCOd+14Qli8Mz5Xg3SultpgpEpDNniVw95XMhSn0
+   w==;
+X-CSE-ConnectionGUID: aWkjtdOoQMa9A7RCcTNBrw==
+X-CSE-MsgGUID: rxTlxxq1RoS22e6Rgw57EA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11378"; a="53807617"
 X-IronPort-AV: E=Sophos;i="6.14,259,1736841600"; 
-   d="scan'208";a="31174872"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2025 08:23:51 -0700
-X-CSE-ConnectionGUID: 1KhLNtoLQ4eE7Zyd8ixR4w==
-X-CSE-MsgGUID: 6RmOKgCuQwGgjoIUotAsvQ==
+   d="scan'208";a="53807617"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2025 08:26:43 -0700
+X-CSE-ConnectionGUID: 0XMVQQiKTC+aCG6+1Jksgg==
+X-CSE-MsgGUID: okPrlMxWTGKB7nujKkj9iA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.14,259,1736841600"; 
-   d="scan'208";a="153527828"
-Received: from turnipsi.fi.intel.com (HELO kekkonen.fi.intel.com) ([10.237.72.44])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2025 08:23:45 -0700
-Received: from kekkonen.localdomain (localhost [127.0.0.1])
-	by kekkonen.fi.intel.com (Postfix) with SMTP id 5A9F811F998;
-	Wed, 19 Mar 2025 17:23:40 +0200 (EET)
-Date: Wed, 19 Mar 2025 15:23:40 +0000
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-From: Sakari Ailus <sakari.ailus@linux.intel.com>
-To: Matti Vaittinen <mazziesaccount@gmail.com>
-Cc: Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>,
-	Jonathan Cameron <jic23@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Daniel Scally <djrscally@gmail.com>,
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-iio@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-Subject: Re: [PATCH v8 02/10] property: Add functions to iterate named child
-Message-ID: <Z9rhfJUlCbi7kA2m@kekkonen.localdomain>
-References: <cover.1742225817.git.mazziesaccount@gmail.com>
- <9c3880f74476436f39d796b5c10c540ae50b722c.1742225817.git.mazziesaccount@gmail.com>
- <Z9mQPJwnKAkPHriT@kekkonen.localdomain>
- <b6b62ddd-ab59-4112-8f6e-c72618c45910@gmail.com>
+   d="scan'208";a="127356236"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2025 08:26:42 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1544.14; Wed, 19 Mar 2025 08:26:41 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Wed, 19 Mar 2025 08:26:41 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.170)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Wed, 19 Mar 2025 08:26:39 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=yVhbhj+bOruYX10w8xmyfzaVpTSTvvVKs1aL6QnQW2PeJXFxLtrL424hHNqxIzuuGWR+shVAsRKV0gaET3kZyQh4N0BhdEAc8g0wJds1zilNGxslFt5UW9wQppBuYGU82GfRKoQctkbyCmTCZDAt8X3J42HvQ5yJ7WUMDKobWLQPExFP9pyykQ41BUmTwjtvthfsYx0QN+KcuVtCKaOIJd/P+0YGZDgB4uQGjYGZpZBP78YZ1iyOqGUBw87tfGTNWYLtchAsAkkqEUOYQldO1X2SBTaTBvSUwc44HE/S1EpsPDunAo+glpUBXYGGxbWeB7RJij9Ck7zOIpfxfnFiAA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=18r/U3qPxWt0/K2MEw0Y6VOY6RfQjzH3EhBhWQ4fTI8=;
+ b=CMhRsJ3RRMGaPy27LhZkhoJjOlASV9hgdTjgnYW4mjA4/kwknGMVa8CMQCTWLQHZK2tQ1WFrCCinQXtPtNo3Of4uZYKc/UVQ2OwkIMF5XHD1ohgYBpSxDuPRQbTzKbvGQXJVFCa96vkyBrqHnGUMVN/RQsmQgsv/XNRyjrHsUk41RHzVS/OMgQaMrBmANAyg3orkANnRQZjCftjSTbACTo9/vDV+hERGfrsqQUx9oMYyhI9OYXCXK19t1tzvihPcqER8Ns9Wrd0d79a39vMl4uaujSVrrPrySMxNwNmCSxnkPxj3TA/TcLdbE0Fa5Ks7Gc9iDyIc0NRUumraofGGyw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH8PR11MB7965.namprd11.prod.outlook.com (2603:10b6:510:25c::13)
+ by SJ0PR11MB5769.namprd11.prod.outlook.com (2603:10b6:a03:420::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.27; Wed, 19 Mar
+ 2025 15:25:50 +0000
+Received: from PH8PR11MB7965.namprd11.prod.outlook.com
+ ([fe80::ad6c:cf56:3c3d:4739]) by PH8PR11MB7965.namprd11.prod.outlook.com
+ ([fe80::ad6c:cf56:3c3d:4739%7]) with mapi id 15.20.8534.031; Wed, 19 Mar 2025
+ 15:25:50 +0000
+From: "R, Bharath" <bharath.r@intel.com>
+To: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "horms@kernel.org" <horms@kernel.org>,
+	"Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>, "Polchlopek, Mateusz"
+	<mateusz.polchlopek@intel.com>, "Kwapulinski, Piotr"
+	<piotr.kwapulinski@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v8 13/15] ixgbe: add FW API
+ version check
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v8 13/15] ixgbe: add FW API
+ version check
+Thread-Index: AQHblCtAtQmCWckhNEizc9WdGcyACLN6ncLg
+Date: Wed, 19 Mar 2025 15:25:50 +0000
+Message-ID: <PH8PR11MB796535F9D4EF68F547CA4FCCF7D92@PH8PR11MB7965.namprd11.prod.outlook.com>
+References: <20250313150346.356612-1-jedrzej.jagielski@intel.com>
+ <20250313150346.356612-14-jedrzej.jagielski@intel.com>
+In-Reply-To: <20250313150346.356612-14-jedrzej.jagielski@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH8PR11MB7965:EE_|SJ0PR11MB5769:EE_
+x-ms-office365-filtering-correlation-id: f2ad2432-6728-47f2-a134-08dd66fa549b
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018|7053199007;
+x-microsoft-antispam-message-info: =?us-ascii?Q?hSV9ohyphTSvmnsM5SM+KIoDspg0z48jBohGgdCE71E9KhvWJnJIIcI1GXOM?=
+ =?us-ascii?Q?wV90mHu36rMng+PNd8CirFF9tKJ2CUkCshqbaDjlwk/d8QIjAIlDvgsF/Dnw?=
+ =?us-ascii?Q?DpXzQ0Zbgqi/YOr8hnTbN/LR+FJAhcUfIJDKKXWC3Tut9uNYLS0pyavNWJ48?=
+ =?us-ascii?Q?eosJMJaG7pORvqkfW4tagESQXcFee8Xex4h8M5cLH+T5vLZ6CJY7RN+N1DiU?=
+ =?us-ascii?Q?QXv0AAcrihaUrhFahM7K0VwvNcsc0iaR4f8r2vsQU/WxQ45R16GnsY+HwrSh?=
+ =?us-ascii?Q?gMnFis4sDv1tm//6DU64cnoD0hRWGHqIZxJMzuRzlH89WMpjw6SsBu7CxZCv?=
+ =?us-ascii?Q?I1wyBBdy31lEYmI1OhAxsryNgqzOmmQ/eKiLQvfNu2gLgGQB7K3GTL/BVezp?=
+ =?us-ascii?Q?fnXSBNxUH83meoeD7WW2A0qgsXusiHDgjDHopNpn25L1OqKX4vNCja64hoBv?=
+ =?us-ascii?Q?Mtj1IDjmgeJEZLEbyNpDJSQOEpybR0/2U/Ik+9nW0LbbNyES9tevxmiQtxOa?=
+ =?us-ascii?Q?jGWX/FmXcB8z7n13MBcx9dkhx9DbtLA37p9YQ5SxpJuhiyPzbRfohPPGex/p?=
+ =?us-ascii?Q?ugjE42BskM47DwwP2Is3/RC9QeiuSyUA8u9xmgDqMHsk+c97JOIlDuMgXr1b?=
+ =?us-ascii?Q?krxQpq5PYovmQx1HczqsLjyfe7qQmKvHBbWpBDMycTLD3d8yXcihCNLZv/W5?=
+ =?us-ascii?Q?Oc8ZtbAXJi+4X7nWRAYB0nBkdC2HYU8lUhWZrhXU0Uvxbb1Y9J2E5WURcMc0?=
+ =?us-ascii?Q?ooP1j/JlRB0yE8pcogv3rcO/Xdpo+ebAvGSMyzxiI2kUhJHCEh84NB+CrdPV?=
+ =?us-ascii?Q?8akk7pYwbMksyXvGiGt8zWWAvuaO9zfNpk2njUE1qwOKUBE0IQ2/YJUZKlhd?=
+ =?us-ascii?Q?EvmSFjkC6FxWqMr7zCloiN4yUA77FbmzJ/JsRu/Xk4H4OiGsZXYQyTJkftco?=
+ =?us-ascii?Q?9mnEyNSSYO1/M9g8SaqQyRCgh3IGScfv7RX/MJznZMiYRoaNaeqdG/2YA6KU?=
+ =?us-ascii?Q?3MzRScvk3Wo0zO/EASHn2BPIwkGnDSNbcE81O/WNPnkTzPrmj9xX6PZQDNsj?=
+ =?us-ascii?Q?iXe95Z2n9lntvXu2zhNZeeRDPfx2XmTbpRxPkIPUwWUxNpLrdxVF0CdZ6m4e?=
+ =?us-ascii?Q?HG7eKRilv9YQHqCEfpl/vF4wPpFGaTTEec5T9MjjA2cni+ViTYa8u0K59BU/?=
+ =?us-ascii?Q?ySHX8MKcBBgplrjBg9mZpbA7Gz0ry1gcQZEnUeK2T1PkjbkJctk8qlp4H6wp?=
+ =?us-ascii?Q?bJX++sxavM8/9Kwy84qANYAwp5XIR6Eju9gtdwJNZokQ45V2py/E001io8wX?=
+ =?us-ascii?Q?RSCq67xa8KBkvQ3Rl/mVvZp6LlcyUL5RjYsbmzWz5jH8jPZQwFQpxPOdlV95?=
+ =?us-ascii?Q?CncNuHEtAol9T2dHKBnHbh4w3ckdB2XT2aK0YiDL++tUgfonnlRORwc+rcil?=
+ =?us-ascii?Q?6y/PR6W+EpoKpe7vz2fKQIw+1+PYiNLv?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB7965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018)(7053199007);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?RN8WADXKj5DzROMC/ivVBgOXIkJjsIFIkpYrW0BAmyZa6KcCCVvPiMM/Xe7u?=
+ =?us-ascii?Q?8zKag1eKm3Jw6DEeXF67zsWTFY/O+qq+r4GWgDzG2OGSvy/KMOsKf1bdzpu7?=
+ =?us-ascii?Q?zgKPNpcP5x/ZbZI/S1c648T+uhYA2REHA+V8odWR21RWl/ZcL5WfLa4k6syn?=
+ =?us-ascii?Q?7Jklo6nQYtR/DOPuCB2acBEblBW6RjB0F69FlXAaxWTkhcnchbih+zpmkExF?=
+ =?us-ascii?Q?hPVYVc8QXxES4Q5Vned7rjpKCnwMM6SLbjFIhbyKA3r80rrBopzYbBQY8JJl?=
+ =?us-ascii?Q?+Mh/j89NOJ2ZyWBub7tPD7UUSdya3oQ5ElGvKWH7zZidLYk3fMX2ejKwvUos?=
+ =?us-ascii?Q?kmjHmQXZv8miiqr5ISJWDLygtYXwdgwP2yHGSlZTqNdJu+1eelUQ6tUb3gSt?=
+ =?us-ascii?Q?n7Sb+6CYSgU50gQsEOD86oprGYUZoThrEsYEhFoQhLC+IhC/9VSuSfuzH23X?=
+ =?us-ascii?Q?hHW7kxuiaCdAtl2MYAcs+EKJuLQhBmO8CxK2OcEvVDpq9LAhselXBlad9/je?=
+ =?us-ascii?Q?+j/PkDXKLAUroIaUfm55VmjFMInU8UN8xezrrnjwXFXF1Vv0X9MMTKGXHGC+?=
+ =?us-ascii?Q?uwpvV0erqpjdy3LIsPTz+4gB7GBIqltcfuxOukRX5uNHgVOFd0nilJWogSlj?=
+ =?us-ascii?Q?ow0P3MBXR4nGifJsrgrYwaY1wLMpoeATMGmexpHsGl3/JHN/pq9iNlcMR+M6?=
+ =?us-ascii?Q?F7ArlT2FpL+/zOgmn2SZBLAHWsy8P29j32Tc8dTEQwVSB4VaS4w4hFPz7ap/?=
+ =?us-ascii?Q?LpeLCedw8p5/jvZ5nizTaeFEtaTrHQ/mIpEUFEsNIL65Dv31mrLBCT+K9mCe?=
+ =?us-ascii?Q?mGc1BUysoUmQi5or1oUDHSiLR4J1mBriXIaMM6RGR6P1wEpW+zmXHrHp3h98?=
+ =?us-ascii?Q?a0xHEwHkWGAMcyQTLzjTrz40pUIrHsKcyHxBdE7VeQqbGR4b4nOTy2fFtOVN?=
+ =?us-ascii?Q?lHNbuuixTtBwuEimKRwKYVVo/EgijC6m7KozoEBzLFWF6MyqJ+FK778K78Nb?=
+ =?us-ascii?Q?YbLAmltb/ueGIaWm6GkkFd8HUdMBxhT6zd5KkLiriZBvd+9jmPBU6inE5YU9?=
+ =?us-ascii?Q?n+MVyyjFk/zFKKoqiH3RV32uDoLlYlIYA7CwQbwdsk4bOTxM3XFeDTkpeEtL?=
+ =?us-ascii?Q?b5GVpuIqbuJuFlI40whQk/eG+6lIZp3Uk41E+LXUhSgAiiJL+STNJf3mHd3w?=
+ =?us-ascii?Q?x4uDbFECgZSdZSFmJ+pJ1knQx1HhD/tcLcdBCLZsmrCcyIoU2xYW/Rl98/hh?=
+ =?us-ascii?Q?ntUQj3QeP15suKEWhaA8Nnwck8VCunUiFmK6ZYJDOaOnDMisTDlRfw64bz5k?=
+ =?us-ascii?Q?z+MgW+qY9OtHPNGKFf3z+88iEbpjG4zy626L78hEDWT2LigDkY45os98dsy+?=
+ =?us-ascii?Q?bjufP2A4x0udVQNg6CExDBegS3oFepkPJCQIApk7PGHybtsf0ZatgHVvAUhO?=
+ =?us-ascii?Q?bAS2LEUsc3q1EoDvpUBEFTiQz9HOY17QGUUM8Lam6VAa8oqUpXq4KCrPJV+9?=
+ =?us-ascii?Q?VUi3lwZr0b2qgTHySWa6vbr/zVUuteRBprdRyKEHnQezULeaFwFhXFSeo0vt?=
+ =?us-ascii?Q?qp9P23wbpJuRSZ7ykbMMJGjBiheMP4A2CFSFORKF?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b6b62ddd-ab59-4112-8f6e-c72618c45910@gmail.com>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB7965.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f2ad2432-6728-47f2-a134-08dd66fa549b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Mar 2025 15:25:50.3287
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 7Rk1wpBu9/EaS8FcTOIFQw6Yf2T/6H3Eo1COwzm0yJsTkGzbFGGf/3Kgzmc/B8sF/te7vjLbWHvNX2ZOjOdwZQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5769
+X-OriginatorOrg: intel.com
 
-Hei Matti,
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Jedrzej Jagielski
+> Sent: Thursday, March 13, 2025 8:34 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>;
+> netdev@vger.kernel.org; Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com=
+>;
+> horms@kernel.org; Jagielski, Jedrzej <jedrzej.jagielski@intel.com>;
+> Polchlopek, Mateusz <mateusz.polchlopek@intel.com>; Kwapulinski, Piotr
+> <piotr.kwapulinski@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-next v8 13/15] ixgbe: add FW API ve=
+rsion
+> check
+>=20
+> Add E610 specific function checking whether the FW API version is compati=
+ble
+> with the driver expectations.
+>=20
+> The major API version should be less than or equal to the expected API
+> version. If not the driver won't be fully operational.
+>=20
+> Check the minor version, and if it is more than two versions lesser or gr=
+eater
+> than the expected version, print a message indicating that the NVM or dri=
+ver
+> should be updated respectively.
+>=20
+> Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+> Co-developed-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+> Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+> ---
+> v5: add get_fw_ver
+> ---
+>  .../ethernet/intel/ixgbe/devlink/devlink.c    |  2 ++
+>  drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  1 +
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c |  1 +
+> drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 34 +++++++++++++++++++
+> drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |  1 +
+>  .../ethernet/intel/ixgbe/ixgbe_type_e610.h    |  4 +++
+>  6 files changed, 43 insertions(+)
+>=20
 
-On Wed, Mar 19, 2025 at 08:02:24AM +0200, Matti Vaittinen wrote:
-> Moro Sakari,
-> 
-> Thanks for the review.
-> 
-> On 18/03/2025 17:24, Sakari Ailus wrote:
-> > Moi,
-> > 
-> > On Mon, Mar 17, 2025 at 05:50:38PM +0200, Matti Vaittinen wrote:
-> > > There are a few use-cases where child nodes with a specific name need to
-> > > be parsed. Code like:
-> > > 
-> > > fwnode_for_each_child_node()
-> > > 	if (fwnode_name_eq())
-> > > 		...
-> > > 
-> > > can be found from a various drivers/subsystems. Adding a macro for this
-> > > can simplify things a bit.
-> > > 
-> > > In a few cases the data from the found nodes is later added to an array,
-> > > which is allocated based on the number of found nodes. One example of
-> > > such use is the IIO subsystem's ADC channel nodes, where the relevant
-> > > nodes are named as channel[@N].
-> > > 
-> > > Add helpers for iterating and counting device's sub-nodes with certain
-> > > name instead of open-coding this in every user.
-> > > 
-> > > Suggested-by: Jonathan Cameron <jic23@kernel.org>
-> > > Signed-off-by: Matti Vaittinen <mazziesaccount@gmail.com>
-> > > Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> > > Reviewed-by: Marcelo Schmitt <marcelo.schmitt1@gmail.com>
-> > > ---
-> > > Revision history:
-> > > v7 => v8:
-> > >   - Fix the example in fwnode_get_named_child_node_count() documentation
-> > >     to use the fwnode_get_named_child_node_count() and not the
-> > >     device_get_named_child_node_count()
-> > >   - Fix the rest of the new macro's indentiations
-> > > v6 => v7:
-> > >   - Improve kerneldoc
-> > >   - Inline device_get_named_child_node_count() and change it to call
-> > >     fwnode_get_named_child_node_count() inside
-> > >   - Fix indentiation of the new macros
-> > > v5 => v6:
-> > >   - Add helpers to also iterate through the nodes.
-> > > v4 => v5:
-> > >   - Use given name instead of string 'channel' when counting the nodes
-> > >   - Add also fwnode_get_child_node_count_named() as suggested by Rob.
-> > > v3 => v4:
-> > >   - New patch as suggested by Jonathan, see discussion in:
-> > > https://lore.kernel.org/lkml/20250223161338.5c896280@jic23-huawei/
-> > > ---
-> > >   drivers/base/property.c  | 27 +++++++++++++++++++++++++++
-> > >   include/linux/property.h | 24 ++++++++++++++++++++++++
-> > >   2 files changed, 51 insertions(+)
-> > > 
-> > > diff --git a/drivers/base/property.c b/drivers/base/property.c
-> > > index c1392743df9c..f42f32ff45fc 100644
-> > > --- a/drivers/base/property.c
-> > > +++ b/drivers/base/property.c
-> > > @@ -945,6 +945,33 @@ unsigned int device_get_child_node_count(const struct device *dev)
-> > >   }
-> > >   EXPORT_SYMBOL_GPL(device_get_child_node_count);
-> > > +/**
-> > > + * fwnode_get_named_child_node_count - number of child nodes with given name
-> > > + * @fwnode: Node which child nodes are counted.
-> > > + * @name: String to match child node name against.
-> > > + *
-> > > + * Scan child nodes and count all the nodes with a specific name. Potential
-> > > + * 'number' -ending after the 'at sign' for scanned names is ignored.
-> > > + * E.g.::
-> > > + *   fwnode_get_named_child_node_count(fwnode, "channel");
-> > > + * would match all the nodes::
-> > > + *   channel { }, channel@0 {}, channel@0xabba {}...
-> > > + *
-> > > + * Return: the number of child nodes with a matching name for a given device.
-> > > + */
-> > > +unsigned int fwnode_get_named_child_node_count(const struct fwnode_handle *fwnode,
-> > > +					       const char *name)
-> > > +{
-> > > +	struct fwnode_handle *child;
-> > > +	unsigned int count = 0;
-> > > +
-> > > +	fwnode_for_each_named_child_node(fwnode, child, name)
-> > > +		count++;
-> > > +
-> > > +	return count;
-> > > +}
-> > > +EXPORT_SYMBOL_GPL(fwnode_get_named_child_node_count);
-> > > +
-> > >   bool device_dma_supported(const struct device *dev)
-> > >   {
-> > >   	return fwnode_call_bool_op(dev_fwnode(dev), device_dma_supported);
-> > > diff --git a/include/linux/property.h b/include/linux/property.h
-> > > index e214ecd241eb..a1856e6b714c 100644
-> > > --- a/include/linux/property.h
-> > > +++ b/include/linux/property.h
-> > > @@ -167,10 +167,18 @@ struct fwnode_handle *fwnode_get_next_available_child_node(
-> > >   	for (child = fwnode_get_next_child_node(fwnode, NULL); child;	\
-> > >   	     child = fwnode_get_next_child_node(fwnode, child))
-> > > +#define fwnode_for_each_named_child_node(fwnode, child, name)		\
-> > > +	fwnode_for_each_child_node(fwnode, child)			\
-> > > +		if (!fwnode_name_eq(child, name)) { } else
-> > > +
-> > >   #define fwnode_for_each_available_child_node(fwnode, child)		       \
-> > >   	for (child = fwnode_get_next_available_child_node(fwnode, NULL); child;\
-> > >   	     child = fwnode_get_next_available_child_node(fwnode, child))
-> > > +#define fwnode_for_each_available_named_child_node(fwnode, child, name)	\
-> > > +	fwnode_for_each_available_child_node(fwnode, child)		\
-> > > +		if (!fwnode_name_eq(child, name)) { } else
-> > > +
-> > 
-> > OF only enumerates available nodes via the fwnode API, software nodes don't
-> > have the concept but on ACPI I guess you could have a difference in nodes
-> > where you have device sub-nodes that aren't available. Still, these ACPI
-> > device nodes don't have meaningful names in this context (they're
-> > 4-character object names) so you wouldn't use them like this anyway.
-> 
-> I believe you have far better understanding on these concepts than I do. The
-> reason behind adding fwnode_for_each_available_child_node() was the patch
-> 10/10:
-> 
-> -	fwnode_for_each_available_child_node(sensors, node) {
-> -		if (fwnode_name_eq(node, "sensor")) {
-> -			if (!thp7312_sensor_parse_dt(thp7312, node))
-> -				num_sensors++;
-> -		}
-> +	fwnode_for_each_available_named_child_node(sensors, node, "sensor") {
-> +		if (!thp7312_sensor_parse_dt(thp7312, node))
-> +			num_sensors++;
->  	}
-> 
-> 
-> > So my question is: is it useful to provide this besides
-> > fwnode_for_each_named_child_node(), given that both are effectively the
-> > same?
-> 
-> So, I suppose you're saying the existing thp7312 -driver has no real reason
-> to use the 'fwnode_for_each_available_child_node()', but it could be using
-> fwnode_for_each_child_node() instead?
-> 
-> If so, I am Ok with dropping the
-> 'fwnode_for_each_available_named_child_node()' and changing the 10/10 to:
-> 
-> -	fwnode_for_each_available_child_node(sensors, node) {
-> -		if (fwnode_name_eq(node, "sensor")) {
-> -			if (!thp7312_sensor_parse_dt(thp7312, node))
-> -				num_sensors++;
-> -		}
-> +	fwnode_for_each_named_child_node(sensors, node, "sensor") {
-> +		if (!thp7312_sensor_parse_dt(thp7312, node))
-> +			num_sensors++;
->  	}
-> 
-> Do you think that'd be correct?
-
-I'd say so. Feel free to cc me to the last patch as well.
-
-I guess one way to make this clearer is to switch to
-fwnode_for_each_child_node() in a separate patch before
-fwnode_for_each_named_child_node() conversion.
-
-There are also just a handful of users of
-fwnode_for_each_available_child_node() and I guess these could be
-converted, too, but I think it's outside the scope of the set.
-
--- 
-Terveisin,
-
-Sakari Ailus
+Tested-by: Bharath R <bharath.r@intel.com>
 
