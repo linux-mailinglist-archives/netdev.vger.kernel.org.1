@@ -1,107 +1,82 @@
-Return-Path: <netdev+bounces-176203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19F1DA6952B
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:41:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E87FA6954E
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:48:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AA2B3BCF8B
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 16:38:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0450D16933A
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 16:48:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F0CD1DEFC5;
-	Wed, 19 Mar 2025 16:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 819C61DF248;
+	Wed, 19 Mar 2025 16:48:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="UlxlPSd4";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="C40nnx2n"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="g79i4LnW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2069.outbound.protection.outlook.com [40.107.236.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60190170A11;
-	Wed, 19 Mar 2025 16:38:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72CC3257D;
+	Wed, 19 Mar 2025 16:48:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.69
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742402313; cv=fail; b=smL9hRaEoWInw/drumN+U8fpjNXxuyEmldLMBU/dX3g9+LHDJS/D9POw1xB/BEHsNVSmFRIivO+5+92nCrZ+OJi0X6NGJlSSvcuTYQRQNLbLulLY+wp0ePExrznteNv2NEF6zZFgIIIGMDHQv9akVsYR3ncraqU8cf/wICbPUTs=
+	t=1742402890; cv=fail; b=f+NzJ4QqGsmU5JWQaFinj8lntrupbVYCe7/b9kdV345aMKLu8pMxQvBQ43mB1LRp9M9iPajDMeQTmpL6iQdxbvj7u7DCWRn3bbfYymQCT3Nf15AxmDTRk/EjtIi0RC1B3NgpddiHJ/XWx2Jol7yaBloqc0ZcKTBUgBZ5rFsTyW0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742402313; c=relaxed/simple;
-	bh=1lEJhpuItdXZGMldiihGJ8NQx2WFje0AqwxETgOqvFw=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=K1nhJCL/ISOLtA3s2Se5CwQb6rSDv70+g/BTaQryaBhtsFUefgyE4jAe+It7Yq8qlvxdhkRCbq3rHiQ/7dU2+/01hczYzx/F2/1G1VWi/a/BdN8MpdlSh3faioNXRF9ngOVIZn2MTvuA8DKAhaXyCRGTyM59QtzMeAQauRt6/DE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=UlxlPSd4; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=C40nnx2n; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52JGBmGc030843;
-	Wed, 19 Mar 2025 16:38:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2023-11-20; bh=8zwjbmUnakMjqoXxDlQeaSVYzbRJsOmCCaCuOl4pqos=; b=
-	UlxlPSd4V8zMy66Fd9oHN7JrXLcBt8NGHV+rm3HBsBK9OMAAavD1sDnvZEPMRqlw
-	dw3zg8hTar3giXb0YbR9YFUvMwdrQAiWs/WvEILeQcBJdxHawVMgCVJy7dJnSAv4
-	KstVf7O/S+KhCqglcFwh4jaAdbvE2rtgCixUzv82iNcCCNeH42bu71/xx5G4rzrF
-	G7H7UkugexNCW0U76Aukd8V4jQvw91YJ87+cpUGZyprlojAfnH6jsj2EVPsFUm8m
-	NqcYlESQGGEpYM7kEW93SfTiq9UlFL0NdE3tFsmqO63/+/szjVGVIqfJb7Wqh2Nc
-	7LOrPVSeye899pGA/G0Tnw==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 45d1s8uxnk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 19 Mar 2025 16:38:25 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 52JG30M0024466;
-	Wed, 19 Mar 2025 16:38:24 GMT
-Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2177.outbound.protection.outlook.com [104.47.56.177])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 45dxbk5xpp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 19 Mar 2025 16:38:24 +0000
+	s=arc-20240116; t=1742402890; c=relaxed/simple;
+	bh=pbs74ebCPKE1ue0U3FJfUz3Tom9zBH55h8Km5Zk0gQo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=m6jJdCfpZBB5zPFnCtYXjDqkk30JJzc5XwAYOq2e8ozC3YfgVO7x4TziMjne1pBvTM3JEUi0EQQn1UdjFOgqxP9779HLggl4Pto22R2TFMOAoCfiWZ3sr0VHkiXcqAiCDjWXm8x/iDYXxTtJhrdB8KXzIqB1juRpHwkkXZjoJFY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=g79i4LnW; arc=fail smtp.client-ip=40.107.236.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cWLpENIcL8T0L7eTv3BdmqzK6zGGuWU2nmO72VxeYcjeu3do7USjYqY0e7F9QeLp+IvvUgHuD6Ae/uc1Ou8fpHnT/5smrCUIt+9KTB4bQYp0OZU8qV5GAV7VrNJLDJNGfbpMv5OHBxutv/NbCVDz+u8/zpdZ9MCHA789XT2qPHANGMsoTtwtYxT/ZPulFJgXyThUDAaXf8ol2Xf7sradL/rCq1NTfNnHmBIpsI64YdrKbtw4TnbRRmZg3sIh1ak815VTNEjdDZuEw+QkfHID7o+uTCPXYcCGCAuvWKxGHjx/tDZ8j2kMIAKnVIh6mkJSICt0gTxI8Qk0gl8adXv9RA==
+ b=iHBMS0QcORbKeHvulWglpiJe+fDRaL1qFwInPqM1/auk+m3AtlTaHb5TaSQ51SXVJUXTi76bML8vGLyRj/VcSdLt9y5OeSsw2Hx8VQo7a3xiHxCmvM6xkhenWyvKcM8IH9U2LngvybH3nVVTHh65Sym/kOh6F5/z78qRJlE0a+lKOh75oW7CSpe5Pd1Fj1Moe3EuPPWszQ+/0cn5QFoC/SMH9GpXgE7MnaxHuXON0bKKmsiiZpUaXF/B7bC5Fy0mFxL3UyZZZT5BAfFSW0GC83X7wstluBLrcDrt2eQTvP3HMoyZr/p0Wh6GaO7eI5SWAoCirarWsPtr5AkeR6bUHg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8zwjbmUnakMjqoXxDlQeaSVYzbRJsOmCCaCuOl4pqos=;
- b=Uz4WA6sTZKQGPR2vTmjzZ9tYIbj/XYDeLGsPN3EAdYK9dl043g80tfkLpDvfdtC2mPa2JIPf/8+GFIdvcGPmpTTjk7i3M2iq5Gm5+Nm6tMflSU44WkANz/N/+cRj6yEKRHE16LR8oOlnWdzIhTPC/TK1/oc6iEmNlNf3sVg0D16YFrSvW4xtzFU5TXRlwin5Kzhue/vFL7rrmxxriKi9ZHDylZqCblCzgbFXjDNi4nWK3vMMiFv+wfSsxgSXl6nWE1zQBplCvgG+/t9vktGp++1WoJlSkdXsS+iHnq5CK/koT1NYkzuFZjKO7l6HuAWFrNQXFjdHP9rg+Z3fwY9QCg==
+ bh=WvEBDhW5qXJownfkSnqAV3JJvm9TxhCAlS/FOH0w/mo=;
+ b=kGmzSi5Pdo9DSPVaSo7tfH8SiwV2pX/wM8ebQRH5IPCNHKs4IElNXQvH1ujljBJBAjd+jG5OVpcL84Bmlc06bPK8opxLbaA2pJewUwPZMmBsGXYNuyE7vDEt6ZjgrH7uUhPrLoc8K9kQS0MG2oioF3q284HjLh10QPagp669EFlpbgYUUA5rn9OMmLHTqKBoE4Bs2YAVFkX0PcX49THR5mLVxrV7+Mo88u/o3d8PSld88fX8cpiLJjtZfStQpv3adMFjutOSlSnQCbcT2T4xiGWbyWFNgC3kprnCoi8KYGtEAkNNZE7wus1cAgHZ0KuT8Ymb+GGWiTyvQNMjPCUBWQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8zwjbmUnakMjqoXxDlQeaSVYzbRJsOmCCaCuOl4pqos=;
- b=C40nnx2ni9i9YWxsXx2c0zqtvnqokn/FUIM5eggg3nPuYdkFnYvSotYLLzpSWYep0LftzOF9fY6Kc7U5BzbsXUd1JkfaODpSqy3oRY0Jc1MeYs3FAOoX7ytSxNR0O8vMC7evayItWOi8MHIEFcc9CGw0LtngJm7sde1vWQV6PNE=
-Received: from MWHPR1001MB2079.namprd10.prod.outlook.com
- (2603:10b6:301:2b::27) by CH3PR10MB7713.namprd10.prod.outlook.com
- (2603:10b6:610:1bc::6) with Microsoft SMTP Server (version=TLS1_2,
+ bh=WvEBDhW5qXJownfkSnqAV3JJvm9TxhCAlS/FOH0w/mo=;
+ b=g79i4LnWoT8CNmAiSmxu9AkRaeNOzI8rIzy2YcajUiSpT14zgxwaThjkW9qqT25xKtFZz9uHssRsbmQ1jfbnmLyDqrGx/qvR6N5WFt3r9gTQQBsH9dgzD7YwBAH7eek0S1Kc00hTmp3LQM0acz2dqBtYC/ZRPyklROMoOL129jNLU8JEyyGxPFk+zWrc2ySsvwxihyYNz5w1ovekawdtK0bOZ/IrXB2E6SoErbQKbu9ISRsJzcOc1GV8brMXW5c2HzWC6SiHpSLpSOZosKz1ZfzfIJQ0uwp9oiI6aU8zRzQcnndlZJOD+k0zCeQoQageYUUoPQLh4LVhvhL39aK/4Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by MW4PR12MB7192.namprd12.prod.outlook.com (2603:10b6:303:22a::15) with
+ Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.34; Wed, 19 Mar
- 2025 16:38:21 +0000
-Received: from MWHPR1001MB2079.namprd10.prod.outlook.com
- ([fe80::6977:3987:8e08:831b]) by MWHPR1001MB2079.namprd10.prod.outlook.com
- ([fe80::6977:3987:8e08:831b%6]) with mapi id 15.20.8511.031; Wed, 19 Mar 2025
- 16:38:21 +0000
-Message-ID: <93797957-b23c-4861-a755-28bfc506051f@oracle.com>
-Date: Wed, 19 Mar 2025 09:38:17 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 04/10] vhost: modify vhost_log_write() for broader
- users
-To: Jason Wang <jasowang@redhat.com>
-Cc: virtualization@lists.linux.dev, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, mst@redhat.com, michael.christie@oracle.com,
-        pbonzini@redhat.com, stefanha@redhat.com, eperezma@redhat.com,
-        joao.m.martins@oracle.com, joe.jin@oracle.com, si-wei.liu@oracle.com,
-        linux-kernel@vger.kernel.org
-References: <20250317235546.4546-1-dongli.zhang@oracle.com>
- <20250317235546.4546-5-dongli.zhang@oracle.com>
- <CACGkMEtOsQg68O+Nqo9ycLSq7sN4AMZ92ZvLLMEF7xYDCA5Ycw@mail.gmail.com>
-Content-Language: en-US
-From: Dongli Zhang <dongli.zhang@oracle.com>
-In-Reply-To: <CACGkMEtOsQg68O+Nqo9ycLSq7sN4AMZ92ZvLLMEF7xYDCA5Ycw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BN9PR03CA0877.namprd03.prod.outlook.com
- (2603:10b6:408:13c::12) To MWHPR1001MB2079.namprd10.prod.outlook.com
- (2603:10b6:301:2b::27)
+ 2025 16:48:03 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.8534.034; Wed, 19 Mar 2025
+ 16:48:03 +0000
+Date: Wed, 19 Mar 2025 13:48:02 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Nikolay Aleksandrov <nikolay@enfabrica.net>
+Cc: netdev@vger.kernel.org, shrijeet@enfabrica.net, alex.badea@keysight.com,
+	eric.davis@broadcom.com, rip.sohan@amd.com, dsahern@kernel.org,
+	bmt@zurich.ibm.com, roland@enfabrica.net, winston.liu@keysight.com,
+	dan.mihailescu@keysight.com, kheib@redhat.com,
+	parth.v.parikh@keysight.com, davem@redhat.com, ian.ziemba@hpe.com,
+	andrew.tauferner@cornelisnetworks.com, welch@hpe.com,
+	rakhahari.bhunia@keysight.com, kingshuk.mandal@keysight.com,
+	linux-rdma@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [RFC PATCH 00/13] Ultra Ethernet driver introduction
+Message-ID: <20250319164802.GA116657@nvidia.com>
+References: <20250306230203.1550314-1-nikolay@enfabrica.net>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250306230203.1550314-1-nikolay@enfabrica.net>
+X-ClientProxiedBy: BL1PR13CA0415.namprd13.prod.outlook.com
+ (2603:10b6:208:2c2::30) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -109,235 +84,243 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWHPR1001MB2079:EE_|CH3PR10MB7713:EE_
-X-MS-Office365-Filtering-Correlation-Id: 316c9641-4b41-47e8-74e3-08dd670475fd
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|MW4PR12MB7192:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6db3b53b-11ee-4d4b-5a10-08dd6705d0a7
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?RXQxMGRablpsMmFsaUdKZ1hUaDhPeUlUSDF4YjdTeDFyOEFsVTNIWG1xVXZo?=
- =?utf-8?B?blZiSmRuLzAzU3h0V2V3eEVXckU0ZjBHekMyYnB1N2p4NEtqMVdjeHdPNFZw?=
- =?utf-8?B?aG5GQzZ6QkxTakc2bStxMG9KSFlBTG5mUGhSYVlVTGt0OWJBakdqc2FHUlJQ?=
- =?utf-8?B?aDk2aTAzVW95NXRaWUxQTU1CQzZNQkJtenJRNEgxNU1qU04ydkdPZUdLc2pV?=
- =?utf-8?B?eUttMEtyU3RMMEhxa3dKL0JHcU5NY0U3bVRmaERRUXZKYWJoUVBEUGo4Vmhq?=
- =?utf-8?B?dmxBcmhYeFVYTTJxNVlEc2IrdmJzclpMNG9YVnFzdU5BSVQ1dnlMT0plckFS?=
- =?utf-8?B?bW9HYXRWVVJ0YlorTWdWaVE2dmlObnlNMmtrUDI0WnExa0lJSThFbEV6U1p3?=
- =?utf-8?B?RjJ1TlRyRXpYOHQ0UmdTV3IyR0FoUXE0WnNsc3ArS05sYTg2b0w1MXhudjVs?=
- =?utf-8?B?UXJWQkg5T1lZVjJ0ODlNVDUzQUdVMkF2d0d1RStlUi9KR3J0RzVWWjhjcjN4?=
- =?utf-8?B?NThiNzlmd0MralVyeEtYRDZid0lnOEJwRWNzOGhlQmhOU0N3RktSSmVOMVNl?=
- =?utf-8?B?STNlNE1hMDk3L1F1N3ZmMGY4YVo2R0k4UHNCWHV5bUlrVy9DcDdEejNsaDVh?=
- =?utf-8?B?bVVsa1BKdXZmVmg2Y3MxdG1Yd082Y1hHalhXVG55YWdkZlJxd3VEd0FzQkM3?=
- =?utf-8?B?R1FZSU5QU3Bjam95SFR3UXhxWlpFWDh2dFNXUU03OHBGY3c5c1lSM3lZbFdV?=
- =?utf-8?B?OWpWNUNidityRStYUnl6Ky9HUEt3aVVmVzZSTnJZa3IvUTBqWHo1NDhnNitR?=
- =?utf-8?B?OTJsa3duUU5RNUVyMCtrckJReFpDSmpxUkZJMkI1Vnc0R2lNSWtvNnpQcEkr?=
- =?utf-8?B?dFB2bThyWTJmaGgxSXhsYVlVb2czN0FzYitOc2JycE9jM0ZvelNWMXVjdTMr?=
- =?utf-8?B?RVFEVEZQcWNtOXRDVms4NUdVUHByWmVWRXR4QzJMcUR6a051ZGFORjRpSU5t?=
- =?utf-8?B?bENUYnlwNFNyK2crcGkzVklmZUR6eWJnMW9HQVhaVVhIWTFYTCtVZTMwUEJS?=
- =?utf-8?B?N042ZGxtMXFobHdKMk1raWtZSDBRcVpUT2cwa1RuQXB0dGVvMndpOE1kMFo4?=
- =?utf-8?B?MlM1QXlHNGk0Zlg3Mm1sZEFlZFdyOEZpLzR5OEFEV050UFdDV2xmSm9Hc0o1?=
- =?utf-8?B?ODR2WWZHd1Z1TnpXZzRsSkNyZG53d2lFeUU4a09xMVFvMnpGZHF0Y29HWVN3?=
- =?utf-8?B?b0pRcEtxUC84ejVxcDVjRm1ubXlIN0tnWDZQQ3RYUE1aKzdGQU15N0FUNFNa?=
- =?utf-8?B?aHJFdnRqR3A2QzJLZU50VjNZWU5jUFFHUXpVb2g5MHRzWDdhSHhkWDk2WXNL?=
- =?utf-8?B?NFIveHNnNUJ0NGJnMFV2MHV6UEhXMnFmMDF5U0c2Nno5NFIvWGJGc294aUNk?=
- =?utf-8?B?Q0JzRmNqSGRWOW1UTEl0aG1aak5NRjh1QTh3UmxFbFMrQnVtdkJ3SmZTcnln?=
- =?utf-8?B?dVc4L3ByOXdXNHd6RC9ULzlkcHZoYXgrNlJFTWo3SHBFYnJFOW9mVXFXYmx3?=
- =?utf-8?B?MUNEdTQxY0liQWIybWNxV2krRXBEb1dtYlhxMEtyVUtYNUZMOW4xcjJYRWcw?=
- =?utf-8?B?K2VmVWNPSUVsb01LSUZwNUhKR09vOWpWMm9aYXZlSzZXaEdlNEszdnR6UmFP?=
- =?utf-8?B?T3o0VTk4U0hCUEJ0eW5kQ3hRcjdjYXlKMmhIVjVaRWNDRjRGeFF3OU9IU1pi?=
- =?utf-8?B?SGJEaEZnWjFIVUtRaStwMmwxZ2dSYkYxV09lSmhnQ3hyd2RjNk9ZNTRlMnBk?=
- =?utf-8?B?SXkwQ0M5SXI0Zit3Mk1vcTUyamV2S1VaejdpRkZnYlpLUkpNOGgvR1phOEVm?=
- =?utf-8?Q?t052ALMSpzgdj?=
+	=?us-ascii?Q?92LmK00/TA7YdKNoVRtgt4QbQTpYfdN5+hUsQwM/1M/pt/vMEm8XHEetg7vB?=
+ =?us-ascii?Q?nzEzitzwk0DUIZ2FHUxpXVF1B0VgHi+aaV0vJ0/h3Ug8jbHUvKvDrkii5Ei5?=
+ =?us-ascii?Q?Fk3EEDS9WC6W478XnVLx79qsojENy2fm0Cp4EnS16Q/7JJacpLN/Y/+bqkHm?=
+ =?us-ascii?Q?JwbGhuWdTu8dZmKkbFVyA4xOpd7VduvylQQlgfthPUoaYR7QOVxlO8G4WRFD?=
+ =?us-ascii?Q?5RvoQ9qY5rg3D1wLRJQbmtQzBJoVfh+gz9mze7oIxc+OfhDrxV6EdivDIWX6?=
+ =?us-ascii?Q?3ZwSmqmOj2iXcvreIIeMvQ7CgTupiIOkEzQfuoEbgXWEUSGpr4o/m1GYbKpg?=
+ =?us-ascii?Q?WnkcFbu2UR3r3S+c5UWrvHQRglqBVA2NKN8Vn41OH+HrODhtPN0ZEws4Kmf5?=
+ =?us-ascii?Q?vDxALr8pUDDhVGXh9A4dn9ns3ArA0naeNVsBOA0/W5EICO+v1cymGIRu1Sui?=
+ =?us-ascii?Q?YG2J/cJlxXDfPiBqGhEiaYBeHrhYJPl/rg9BdDcQXPl9lDJwj58AFhSOAVEq?=
+ =?us-ascii?Q?4tjGrog4gyF2ih+Sjl5/c0rxmiv26oB4FvYMU/01CAQI2bPYgc22WPli6dgO?=
+ =?us-ascii?Q?8wE3EX9LyNM8mF53l5yobH8scpWGTe2kpQmtPtEd/V466wAU+7ueHi1Akb/m?=
+ =?us-ascii?Q?NIz2p3qwmH2ZnM1mjskF6CjeJ6p/oUjyIvEIkE6QfV/mkg/8ETu7fcxFDGK9?=
+ =?us-ascii?Q?S6Oio06c3/Ln6a37b9xF6xFBNzc0mOIzaQ3KCN+51XVXqkjgby/X1/qDUgAL?=
+ =?us-ascii?Q?9BlaBSxkN9x3hrpDkLSG2PeK+v/RSBcz1PVQoKJYWnHGzBJ+atZeIP8pESB/?=
+ =?us-ascii?Q?/Fp4RXaFO+6zGgAKT+6b+KaGF6MkueP/uAgP7K0foxSKrvKdq+OH/+r0nOvs?=
+ =?us-ascii?Q?rqiRr0KIKq/Dxf2uKUSfPeLuvHD+flgt2h/2lQFyz+X7l57gz4XmNPDtOJv7?=
+ =?us-ascii?Q?ZD1+EEMnr8bekK6EiBSHznhWYWPOVJHuOapTG5jaiV7bF1yZdnG0BClF3arl?=
+ =?us-ascii?Q?csoo3cTUmaR3lSI5ooJ/sLQKnhVKKExHMo1zBuXTgZ9OQ0SPIVSUfW/99w3S?=
+ =?us-ascii?Q?ZIBp+1gWT3CpMvCcmHnixgMk7BeAbLPWevZSUy/h2uJENhDS5HVCvFZgSyP5?=
+ =?us-ascii?Q?Qdo7K/G7OeYlkGTxaJstAJnw+a27SrruACfw0jPQCU7n2QXdfnj55WsvPEaV?=
+ =?us-ascii?Q?M3cJq4m6WSnKJhUplzxLLgfG+fbOo/BdAPDZ0rRVN1CJ0j9dyR+apBnED9S9?=
+ =?us-ascii?Q?K5VZGxyJEyoIV1HMbmdKTsrTvLCXwZ6wFhRBgI3uNtRA0W3H6eGLpspHetgd?=
+ =?us-ascii?Q?rcRRbQxC2J8NuvaLRVLYWg2EoBLc65mw2sRKKfzc27lDrJIxhDyM86EiGesh?=
+ =?us-ascii?Q?OD2Z5UY04W3XBQ1XlLF3BNV0VBY8?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1001MB2079.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TTNaUEVFQjM0dVFydHFyZVVNdU9RcTZnT3NZNzV1ZkZVUXhvOTlFWlRqOWVm?=
- =?utf-8?B?T3ZoblFxRTFyOWpoemVKek1QRVNncEFuQWxnMDZZMktRL25Rb2NBaHlPa1po?=
- =?utf-8?B?OHlJL20wMllsWGVuYlZueXhNeEVkZE9DTlRCM1FmaVo5bS93d2pqbU05WnE2?=
- =?utf-8?B?UkoxVjhmUG9TSHhjUngvUnBqd0tUbnNqb2sybjhhNkFZYVVReVlVVlBwQ1pR?=
- =?utf-8?B?MDlweWZSeVdQTnRTRENvWnFIbDZBMkpEMWFBTGdzSmVJOWI4b0pFSjd6YUkv?=
- =?utf-8?B?eUp2YXNJNSs4cEZtT2d5L1R3cUtHSWtrTDdCVTFkNTRXOW1TRDhzd3NZR2Vv?=
- =?utf-8?B?MFUza3Bob2UwYTJnMmVYZkY5NzJIZVJ3bXdGSGJDbEl2Y3BCeXB2NVF4Tmcr?=
- =?utf-8?B?M0s5NVMvOGdMdWljVm40aXE2a2ZQejlHZ2g2bldXYmk1NTVBSWhkYkFlV1JO?=
- =?utf-8?B?K2d3V0E4L2ZQSmZCR1RBTHR0WGNpZ2JGTHJ2VkJva1V0dVEyWDZsRHVmWWox?=
- =?utf-8?B?UEFVaWJrZjEwZFlIbkVBa09RdnlUYXFVQy8wNnpWU2pvNHZJQUdDaVZVYXVC?=
- =?utf-8?B?VTZ5OGxDd3NBTXJlR1g1bVRXMjhWanUwenBSS1lJM1FNemZUSWM1ZE80YlNQ?=
- =?utf-8?B?bVJZa2VFWUZNek9Db3JLS2tLSUpGUnF2UkxlTVBPWjA1QjNFT3ArV1E2RHlq?=
- =?utf-8?B?bXB2SHI5QnBYTG9ITHZhVXFTVEE2OUFZYkpUckIvQjNYODlXM0tYRTNTU0Nk?=
- =?utf-8?B?dHZuTFNzbTUwcEUxdG9QMkFKSEZlN1k2ekdEZ2lZbitKakVwTHlLQ0kvMVVP?=
- =?utf-8?B?NXY4aGJnR3JPQ21malI5bnlmQlRmZ1U0dFBVS285TTZlUjVLMXB4T083Nnpz?=
- =?utf-8?B?Vk1nV0dzTXhrVjFvRzhCb0ZaZ3BySnhod1M0WHlkUUdiOUpnN3ZhMVAwSDBz?=
- =?utf-8?B?UVBraGtRMWpCci9YdUM1bTdJUm5pRFc3SmYzUzkxanVrUSsyb3dLVUtUVW43?=
- =?utf-8?B?NHRHWjhjdFZkYzFxMHlITWtaODl5YzRuSDV6MWpVbHVVeSs1QUc4QzI5cWhF?=
- =?utf-8?B?K2REaUk3MG1POWh0L3pnVmJVOFlBalNCT1c2TDJxR0k0L1QycnhaRjRrR291?=
- =?utf-8?B?Q3g5L0N2b1VRcktJdzRDbit1WnFkd0RrenlLMXJxVWxYUkNVN1FnVVlBZVF5?=
- =?utf-8?B?UnhrbXNjd0NKVDk5NjBTYU1zRm1PQlpya1RZMW9iNHpFdCtBSCtGdTQyaVFj?=
- =?utf-8?B?VGJSMEVCbDMxMDQyajJyMnpnVElXSXIzY3o1K1NYSG9oN2twRWpWR2NtQWRX?=
- =?utf-8?B?dW5BME1xLzVEQ1VJVHFnbGMyTlk0WmhwTStZNVhtcWorSWNtbm1Vd1JiU3By?=
- =?utf-8?B?RmhxWllFSGw3M0dNRVVOencxVnVHYW4yK1owZmRrcmtPZzFSL0ZwUk91WjJa?=
- =?utf-8?B?bFVRQzQ3RFhPaDRiWlNSeGo5WVp5WWhwWlRlZ1lrT2FkbXVEbzBySWUrUlhN?=
- =?utf-8?B?RDNDQ0FPWWFQVDR0Y05NVzdiOWdmYysra0Vya3ZPNU9tTWc0R0VudDJkZDRU?=
- =?utf-8?B?TTJSNm4zZUFSSW1waXBjLzJCRnN6aEM1eTN0SlZVeGt1Um8wdjBNOTVhUkRS?=
- =?utf-8?B?enY3Z0lzNVE3ZVc4blpLWW1salRiV1JHK09sRkpVYU1OU0FKMktNT2pHT2d2?=
- =?utf-8?B?dllrOE5kQzhEdmtodzFEV1FDQTNqdGo2L2UrTmdzTFgwOTlSR1Q1cGUwMmZ4?=
- =?utf-8?B?d2JtenZMV1dqWmI1dTRGSEQ3NmtFL2dFQlFpcFdLTzFwL0F1d0dzYWNjK0NZ?=
- =?utf-8?B?Y2RTOTJjeldyYXJJWFRoV0Zkb1NHQXQ1MkNGRTZQaUV6REM2TkpqK0NyRzUz?=
- =?utf-8?B?WXQvNFVyQllkVmd1ZGVuK280am0zQlRGVW5zWkFOcEZORTNiVStBam8vRXFj?=
- =?utf-8?B?MFRENGdqbjJ0LzRmOTNNWDRqWDR6L08vZ1RXRHJtZ3J1NWdieng3Q09TZnVm?=
- =?utf-8?B?eEYxUHFMZ3RoRkRiaHcxN3llWnpVbmR3WU84S1R2T0RYaGhpU25HbUd0RkFl?=
- =?utf-8?B?blRBZjRUellLNm5SOHhjSWJtMEppRkMrMVhtc1dBWCs5UlE3SVVyc2FjWkE5?=
- =?utf-8?B?cTBwMEVFOVlmV3gxT3pqdS80SjQ3SXBtR09XcG53WW4yU0FtY3M5K1BncGY3?=
- =?utf-8?B?QkE9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	viRFLLsTc5NykRaCqL0jkMUjI1uu8FnaQeUcYauVnmI9nWkHna34ZcfrU8DKw2J/y3vMNZ8oDXCyDokWpjZW48pX/xU7mlq+dv/fSyVVK/nBMrhdZwG553rxfoMY01SNfZKVIa8pXR+A6yxmYxXSiXhEUCIrdl0sf3p6aJzqHvZH0KqL8BH+9qTDkBrsMn4Csz2Tt3m7sa6eSsKfbh9oP1IAQzmYgEqcyDB7v8wp5mWe34DCpvGzrYVC3NZ5cIKPCY3C37yj3UVaBYN7+xjt/WbI2F+xhmpkaGHUlRgLCrDu8qlypa2jAtd2nL3PBtWpLsKmT144IMLM4jBX0Clok+uvQVJfynt1g4jG4Zn2RbwwNJTZkoB8V1wUB6OQZOeHOnaDgNPxaQ2z+cksVl3pWx1uHRVkBOd/8OUwvFi27OAxCzVgF7MRxSeMRl3tDcXKpSCLyi0jw5YE4he7BadguGmlfzW0LLSourOgj824xm+/1blMk6oZxEEw4rpU/3JeYg2YQc+a8ZiwhQWu+afeK58F2UV/uv/1rFHidEp42HAgflrx42wpzZufbSIVp8h3cU0TvefdmK0CtSrQUuSc0FwO28jI1jPCMm8nK+/nJa0=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 316c9641-4b41-47e8-74e3-08dd670475fd
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR1001MB2079.namprd10.prod.outlook.com
+	=?us-ascii?Q?5A6P/MlxaiPWrBAjM1J71A4WNo+2CWN05sS7LXzULSTqXAL3ZEgZ8OAgoEDX?=
+ =?us-ascii?Q?G+YbP4A3UNHFeC1ByuZIhglG/5NxwM433nmG+AGYcyFE8F8s+W9a5i7ebfdR?=
+ =?us-ascii?Q?V/YNoNUXtYRnrs1SkKLptL2iht+igG8Bzxs/3zvtQ9yr0x7HP3Y2/Z0Ijtp5?=
+ =?us-ascii?Q?C6Kvr2P2VRo7m9v10Xf3QnLjTwyFF2bDiPj9RtkeMpLHlDiJ8WMtzFqWHsl2?=
+ =?us-ascii?Q?ilOtcrWNlQcXriBwEcuc8TuEW1iX8sB1B+eSAB2JOKrhJfCISG6ZhnAqB74k?=
+ =?us-ascii?Q?1knTYow1WhcXGlzzxVSsLwC2goLgnEDY2Dd+asTsl8tAy2W9M0F3Z8Xwvdeb?=
+ =?us-ascii?Q?g1RPlA6YWKu1nETEMYA73f4YbtTLx37GP8FmH6WkOr09IJ7NCPXf4Jb7T6Mv?=
+ =?us-ascii?Q?e+1TRXD2comSi8QVeBjZWryJEIGgqdPTsO5QGHc/0mBG4SCREg9FBZ8Hadyy?=
+ =?us-ascii?Q?QKqlAZqgeuPZN9RwJG1AOsiDFFh6l4JVuFZhy4jl2VrKyXgBJ7Sa4u3Lm/17?=
+ =?us-ascii?Q?6KUlzjt0IEKvNce40vw3ifz3XZvjXSV8a2kC6HLuYsGqDkZk3Ff/mcleNV2O?=
+ =?us-ascii?Q?uGnqWBV5ISE7cKYzYrVafND/fERL//Y3yUmeGpaqcIpTKlI8o12k4vkPieKM?=
+ =?us-ascii?Q?QCMMFG9ZWL5yhfcsUV0ZnT7T/gsWmLQ683NJlzwAfSORbcftXO8YwPqpi4f8?=
+ =?us-ascii?Q?wlK9h88m8i7DKAODoQFe0xjLSF05sVDcvbFDRZxSuIeys4qqn45xkzsn8DjX?=
+ =?us-ascii?Q?cDiub66YmBUwU6AcunO2teQxNzRAtfohFJBiQIUnDmBI9gMdWdh2a9yHDF+6?=
+ =?us-ascii?Q?/YxbvGI7ceNOOfluvp0LRgznr7/X9H6lIVF4ZT+InHuI249r7WVaVd2Eaw6/?=
+ =?us-ascii?Q?2S6IuW9MOOxQZAN1Gaf9LS5OxDc6mWDu2oAagVm/dXjeKFEK2HGeMLL7vPBJ?=
+ =?us-ascii?Q?0dTusHIcfmkgpMsaTa88E+tc/j3omJNxKrN/Hza1XXlutsoNSgELGPVwKZZq?=
+ =?us-ascii?Q?jN5izaa2+VVU4PwS/N3IsdgwciTZcP53BihH+i0tNI5rWc4y8/rslMT7ZPOc?=
+ =?us-ascii?Q?UBqbdfNupoHHMrPD+afuIns7bHKix3HceCImfZfmzSVew+g+UKtDA1Wz9yDq?=
+ =?us-ascii?Q?ymhQI6pVnvV/n9I9/hnpRI6sBbx49ABFTUl3PfcySAQjSRZX4/GNpR9EBYqK?=
+ =?us-ascii?Q?lZBq6F2MCgAisfZQP3QiiJqjJWeRrzc4x8n0RsfVsk863EHjB+Rb1MwfP742?=
+ =?us-ascii?Q?chq3fHq5tsxUlJLldfATQV9C59H7dqK/JAqqxDUOjPvKWl+88nJfRNASrGHe?=
+ =?us-ascii?Q?rAuOsWtLrkp4QXjvs+vpHGGf+v+Nm3qvJ4G9kCHI7QQXolhBC6jyo8R97rxU?=
+ =?us-ascii?Q?oDAwt2bXZsx8dhn8ys0Ff1A5vPoogeMvJm3914PPbst1JHgcTyvFppIoPd0V?=
+ =?us-ascii?Q?zrtyJu/ojBOPkspVtzKmFrY/IYbhk0jL9mQI6kJGkWLSR5UC1pxpfw6CKSrR?=
+ =?us-ascii?Q?SgzUut8SVOQcAMEAYStt/VSyt9hIigyTMxPBJWgU+5zD1BoL07xMY1rtSX/W?=
+ =?us-ascii?Q?yl5rTVVntVddMQZsyUw=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6db3b53b-11ee-4d4b-5a10-08dd6705d0a7
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2025 16:38:21.5847
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2025 16:48:03.3394
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: phvWPegGXT8AdfMrnDJ0UdTNCTwXr85URYYyvOOyTFd1qhWl10w5lFAQ36z1SYk542MTJYwCaYEJWiy+45/1uA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR10MB7713
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-19_06,2025-03-19_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulkscore=0 mlxscore=0
- adultscore=0 mlxlogscore=999 malwarescore=0 spamscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2502280000
- definitions=main-2503190112
-X-Proofpoint-ORIG-GUID: nNtz54NM1dhPcA-HIZ9oqTcqnWivrcAk
-X-Proofpoint-GUID: nNtz54NM1dhPcA-HIZ9oqTcqnWivrcAk
+X-MS-Exchange-CrossTenant-UserPrincipalName: vu1pxrXlUmXfQEo03qOYwr2gydeXewxyLEzI2dhO1hJwOwLWdkK2ue+KRSsTsZGu
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7192
 
-Hi Jason,
+On Fri, Mar 07, 2025 at 01:01:50AM +0200, Nikolay Aleksandrov wrote:
+> Hi all,
+> This patch-set introduces minimal Ultra Ethernet driver infrastructure and
+> the lowest Ultra Ethernet sublayer - the Packet Delivery Sublayer (PDS),
+> which underpins the entire communication model of the Ultra Ethernet
+> Transport[1] (UET). Ultra Ethernet is a new RDMA transport designed for
+> efficient AI and HPC communication.
 
-On 3/17/25 6:12 PM, Jason Wang wrote:
-> On Tue, Mar 18, 2025 at 7:51 AM Dongli Zhang <dongli.zhang@oracle.com> wrote:
->>
->> Currently, the only user of vhost_log_write() is vhost-net. The 'len'
->> argument prevents logging of pages that are not tainted by the RX path.
->>
->> Adjustments are needed since more drivers (i.e. vhost-scsi) begin using
->> vhost_log_write(). So far vhost-net RX path may only partially use pages
->> shared by the last vring descriptor. Unlike vhost-net, vhost-scsi always
->> logs all pages shared via vring descriptors. To accommodate this, a new
->> argument 'partial' is introduced. This argument works alongside 'len' to
->> indicate whether the driver should log all pages of a vring descriptor, or
->> only pages that are tainted by the driver.
->>
->> In addition, removes BUG().
->>
->> Suggested-by: Joao Martins <joao.m.martins@oracle.com>
->> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
->> ---
->>  drivers/vhost/net.c   |  2 +-
->>  drivers/vhost/vhost.c | 28 +++++++++++++++++-----------
->>  drivers/vhost/vhost.h |  2 +-
->>  3 files changed, 19 insertions(+), 13 deletions(-)
->>
->> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
->> index b9b9e9d40951..0e5d82bfde76 100644
->> --- a/drivers/vhost/net.c
->> +++ b/drivers/vhost/net.c
->> @@ -1219,7 +1219,7 @@ static void handle_rx(struct vhost_net *net)
->>                 if (nvq->done_idx > VHOST_NET_BATCH)
->>                         vhost_net_signal_used(nvq);
->>                 if (unlikely(vq_log))
->> -                       vhost_log_write(vq, vq_log, log, vhost_len,
->> +                       vhost_log_write(vq, vq_log, log, vhost_len, true,
->>                                         vq->iov, in);
->>                 total_len += vhost_len;
->>         } while (likely(!vhost_exceeds_weight(vq, ++recv_pkts, total_len)));
->> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
->> index 9ac25d08f473..db3b30aba940 100644
->> --- a/drivers/vhost/vhost.c
->> +++ b/drivers/vhost/vhost.c
->> @@ -2304,8 +2304,14 @@ static int log_used(struct vhost_virtqueue *vq, u64 used_offset, u64 len)
->>         return 0;
->>  }
->>
->> -int vhost_log_write(struct vhost_virtqueue *vq, struct vhost_log *log,
->> -                   unsigned int log_num, u64 len, struct iovec *iov, int count)
->> +/*
->> + * 'len' is used only when 'partial' is true, to indicate whether the
->> + * entire length of each descriptor is logged.
->> + */
-> 
-> While at it, let's document all the parameters here.
+I was away while this discussion happened so I've gone through and
+read the threads, looked at the patches and I don't think I've changed
+my view since I talked to Enfabrica privately on this topic almost a
+year ago.
 
-Sure.
+I do not agree with creating a new subsystem (or whatever you are
+calling drivers/ultraeth) for a single RDMA protocol and see nothing
+new here to change my mind. I would likely NAK the direction I see in
+this RFC, as I have other past attempts to build RDMA HW interfaces
+outside of the RDMA subystem.
 
-> 
->> +int vhost_log_write(struct vhost_virtqueue *vq,
->> +                   struct vhost_log *log, unsigned int log_num,
->> +                   u64 len, bool partial,
->> +                   struct iovec *iov, int count)
->>  {
->>         int i, r;
->>
->> @@ -2323,19 +2329,19 @@ int vhost_log_write(struct vhost_virtqueue *vq, struct vhost_log *log,
->>         }
->>
->>         for (i = 0; i < log_num; ++i) {
->> -               u64 l = min(log[i].len, len);
->> +               u64 l = partial ? min(log[i].len, len) : log[i].len;
->> +
->>                 r = log_write(vq->log_base, log[i].addr, l);
->>                 if (r < 0)
->>                         return r;
->> -               len -= l;
->> -               if (!len) {
->> -                       if (vq->log_ctx)
->> -                               eventfd_signal(vq->log_ctx);
->> -                       return 0;
->> -               }
->> +
->> +               if (partial)
->> +                       len -= l;
-> 
-> I wonder if it's simpler to just tweak the caller to call with the
-> correct len (or probably U64_MAX) in this case?
+Since none of that past discussion seems to have been acknowledged or
+rebutted in this series I will repeat the main points:
 
-To "tweak the caller to call with the correct len" may need to sum the length
-of all log[i].
+1) I'm aware of something like 5-7 new protocols that are competing
+   for the same market as Ultra Ethernet. We can't give everyone and
+   their dog a new subsystem (or whatever) and all the maintainability
+   negatives that come with that. As a matter of maintainability we
+   need to see consolidation here, not fragmentation!
 
-Regarding U64_MAX, would you like something below? That is, only use 'len'
-when it isn't U64_MAX.
+   Yes, UE is a consortium driven standard, which is unique and a big
+   positive, but I don't believe anyone can say for certain what
+   direction the industry is going to go in. Many consortium standards
+   have failed to get adoption in the past even with a large number of
+   member companies.
 
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index 9ac25d08f473..5b49de05e752 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -2327,15 +2327,14 @@ int vhost_log_write(struct vhost_virtqueue *vq, struct vhost_log *log,
- 		r = log_write(vq->log_base, log[i].addr, l);
- 		if (r < 0)
- 			return r;
--		len -= l;
--		if (!len) {
--			if (vq->log_ctx)
--				eventfd_signal(vq->log_ctx);
--			return 0;
--		}
-+
-+		if (len != U64_MAX) ---> It is impossible to have len = U64_MAX from vhost-net
-+			len -= l;        How about keeping those two lines?
- 	}
--	/* Length written exceeds what we have stored. This is a bug. */
--	BUG();
-+
-+	if (vq->log_ctx)
-+		eventfd_signal(vq->log_ctx);
-+
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(vhost_log_write);
+   Nor can we know what concepts in UE are going to be copied into
+   other competing RDMA transports. See my other remarks on job key
+   for an example. Prematurely siloing stuff in drivers/ultraeth is
+   very much the wrong technical direction for maintainability.
 
+   That said, I think UE should be in the kernel and have a fair
+   chance to compete for market share. Just in a maintainable and
+   appropriate way while the industry evolves.
 
-Thank you very much!
+2) Due to the above, I'm pretty confident we will see RDMA NICs
+   supporting a lot of different protocols. In fact they already do.
 
-Dongli Zhang
+   From a kernel maintainability perspective we really want one RDMA
+   driver leveraging as much common infrastructure between the
+   protocols as possible. We do not want to see a single HW driver
+   further split up needlessly to other subsystems, that would be a
+   big maintainability downside.
 
+   To put a clear point on this, mlx5 has been gaining new protocols
+   and fitting into the existing driver model for a number of years
+   now. In fact there is speculation that UE could be implemented in
+   mlx5 RDMA with minimal kernel changes. There would be no reason to
+   try to mess up the driver to also interact with this stuff in
+   drivers/ultraeth as seems to be proposed here.
+
+   I think other HW will be similar. UE isn't so radically different
+   that every HW path will need to diverge from classical RDMA. Nor is
+   is so dissimilar to other competing proposals. We don't want
+   artificial differences we want to create things that can be re-used
+   when appropriate.
+
+   Leon's response to Bart is correct, we already have similar
+   examples of almost everything UE does. Bart is also correct that
+   verbs would be a PITA, but RDMA userspace has moved beyond verbs
+   limitations years ago now. Alot of mlx5 stuff is not using verbs
+   today, for instance. EFA and other examples use extensive stuff
+   beyond verbs.
+
+3) Building a user/kernel split HW driver model is very hard. RDMA has
+   spent 20 years learning how to do this and making alot of mistakes
+   along the way. I think we are in a good place now as alot of new
+   functionality has been rolled out with very little stress in the
+   past few years. I see no reason to believe UE would not follow that
+   same pattern.
+
+   Frankly, I see no evidence in this RFC of any of that learning.
+
+   Probably because it doesn't actually show any HW or even seem to
+   contemplate what HW would even look like. There isn't even a call
+   to pin_user_pages() in this RFC. You can't call yourself *RDMA* if
+   you are not doing direct access to userspace memory!
+
+   So, this RFC is woefully incomplete. I think you greatly underestimate
+   how much work you are looking at to duplicate and re-invent the
+   existing RDMA infrastructure. Frankly I'm not even sure why you
+   sent this RFC when it doesn't show enough to even evaluate..
+
+4) For example, I get the feeling this RFC is repeating the original
+   cardinal sin of RDMA by biasing the UAPI design toward a single
+   philosophy.
+
+   Ie you said:
+
+    > I should've been more specific - it is not an issue for UEC and the way
+    > our driver's netlink API is designed. We fully understand the pros and
+    > cons of our approach.
+
+   Which is exactly the kind of narrow thinking that creates long term
+   trouble in uAPI design. Do your choices actually work for *ALL*
+   future HW designs and others drivers not just "our drivers
+   netlink"? I think not.
+
+   Given UE spec doesn't even have something pretending to be a
+   kernel/user interface standard I think we will see an extreme
+   variety of HW implementations here.
+
+   The proven modern RDMA approach to uAPI design is the right way to
+   solve this problem. It is shown to work. It already implements
+   multi-protocol RDMA and has alot of drivers demonstrating it now.
+
+5) RDMA actually has pretty good infrastructure. It has alot of
+   complex infrastructure features, for example see the long threads I
+   recently wrote on how it's hot plug architecture works.
+
+   Even "basic" things like mmaping a doorbell page have thousands of
+   lines of support infrastructure to make the drivers work well and
+   support enterprise level HA features.
+
+   You get to have these features if you write a RDMA
+   driver. Otherwise you have to clone them all.
+
+   From what I can tell in this RFC the implementations of basic
+   things like the object model are worse that what we have in RDMA
+   already. Things like a device model don't even exist. Let alone
+   advanced stuff like hot plug, namespace, crgoups, DMA operations
+   and all the stuff needed for HW bindings.
+
+   It has a *long* way to go to even reach feature parity in terms of
+   what the core RDMA device model and object model provides a HW
+   driver, let alone complex things like uverbs :\
+
+   This whole RFC reeks of NIH: it is more fun to go off and do
+   something greenfield than do the maintenance work to evolve an
+   existing code base.
+
+6) I offered many things, including not having to use libibverbs,
+   adding someone to maintain the UE specific portions, and helping to
+   architect the solution within RDMA. So it is not like there is some
+   blocker that is forcing a drivers/ultraeth, or that someone has
+   even said no to any proposal made.
+
+   For instance I spent alot of time with the Habana labs guys to work
+   out how to fit their almost-RDMA stuff into RDMA. It required some
+   careful thinking to accommodate their limited HW, but in the end it
+   did manage to fit in fine.
+
+   They also started as you did here with some weird thing. In the end
+   we all agreed that RDMA HW support belongs in the RDMA subsystem,
+   using normal RDMA APIs. We are trying not to proliferate these
+   things.
+
+I feel like this is repeating the drivers/accel vs DRM debate from a
+few years ago. All the points DaveA made apply here just as well,
+arguably even more so as RDMA has even more robust shared
+infrastructure that should be used instead of re-invented. At least
+Habana had a reason for accel - they wanted to skip some DRM
+rules. This RFC doesn't even have that.
+
+Thus, I don't expect you will get support for something like this to
+be merged, you should change directions.
+
+Jason
 
