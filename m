@@ -1,89 +1,128 @@
-Return-Path: <netdev+bounces-176217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEF2CA6961C
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 18:15:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 11238A69620
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 18:15:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D691178A5F
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:13:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DC04165BBB
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:14:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CBDC1EDA00;
-	Wed, 19 Mar 2025 17:13:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FB1D1E8323;
+	Wed, 19 Mar 2025 17:14:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="V9hZbCuI"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="BnEE45AP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F2C41F4C8F;
-	Wed, 19 Mar 2025 17:13:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19DE71DDC36;
+	Wed, 19 Mar 2025 17:13:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742404417; cv=none; b=AVNrNquRiSevD3OsqEu/nxR23Wnb/XwUjNZeClfxeS6gSwytGC4bEfQpMeiWOYxEuKlmKZRuGj6YteWG5MGRuk+QALQyNulcMAFayph6SqCOhh0mwKw0nO5yxsUl0LObd48YUDoffQI6bdM0MlLQHj1F5RoGNbH5e9tvpiM8xig=
+	t=1742404440; cv=none; b=p66ZKlbeNZWvbMp+Mk6jDESL6czC/AEe+VjonMjys91jje7e2SHGOcqN0/0EhAJHsGKdPJ+ThfXKsrSloRG73hjbm28TBwwrh4fY9aw6vE5zXy4Us2+exTch2Aa8wIqELHxG6oP9CiHK67cztHKdFUQgQr8iQJ8g1g4iCRO0ePY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742404417; c=relaxed/simple;
-	bh=30oTOjJkUh8xHQT9ze5OgXmT+0f3Fe1IsJfzjTzic7s=;
+	s=arc-20240116; t=1742404440; c=relaxed/simple;
+	bh=wAQQse1JJ2NrTswaol+dHctLRt+H6YYb1Y+zzArtGvk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KseWjoe4JF4dbDQ0DrZNv+Z8ZvIBcoQX0zNFNR1SHcwf8xFyQIuH5RXbyAe3DbK1j5JrTb1WNvVO6khaqtYHDp7uqQhcRab+7tRn1SYIw4h8L6H+9NieppSaIRRmfZk8WOF+hNGQ0V/qqH4fQgwdaDFiE35R34+ZfqBSSUfn4GE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=V9hZbCuI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2540C4CEE9;
-	Wed, 19 Mar 2025 17:13:35 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="V9hZbCuI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1742404414;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ezPW8Ofll5jcvPOM6XGPTr1u1TQa1b4BIgp62sYV2Oo=;
-	b=V9hZbCuIKbNh2yo4Rio59GzMwMrTXLGYBYQenS3/BjJcent7rcxiADyKHRY1TBhfNbN4xD
-	lQvl3aDfhRCsnB87O19jWcftG8jD09Nx5fK7wQsxNQth0OO/Jps3aZEpX5VniaiGSr56xl
-	BmZM3I+d4zomsVUol/OMthurcaTEUYU=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 1495fefb (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Wed, 19 Mar 2025 17:13:33 +0000 (UTC)
-Date: Wed, 19 Mar 2025 18:13:29 +0100
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Andi Shyti <andi.shyti@linux.intel.com>
-Cc: Markus Theil <theil.markus@gmail.com>, linux-kernel@vger.kernel.org,
-	intel-gfx@lists.freedesktop.org, netdev@vger.kernel.org,
-	tytso@mit.edu
-Subject: Re: [PATCH v2 1/3] drm/i915/selftests: use prandom in selftest
-Message-ID: <Z9r7ORwztMxsNyF4@zx2c4.com>
-References: <CAHmME9oqvWp_Nd1Gwgyw52qy8wxztMyCpNsjByH=VnRaXqczww@mail.gmail.com>
- <20250211063332.16542-1-theil.markus@gmail.com>
- <20250211063332.16542-2-theil.markus@gmail.com>
- <Z64pkN7eU6yHPifn@ashyti-mobl2.lan>
+	 Content-Type:Content-Disposition:In-Reply-To; b=kpEWGwiy+dfWh+s9gTe3+vCHw7Ape/1rBaKbg9QE4KMpuoQmprey++0yXMtqCYYsxorcIzS0N7c8lxeVHVTzB6huO2fFYvBIHzxaVI/JEl0URvu/Gn9jXnLjyKBgLnpO3pUKjMoi3qCeB/9ghUgGxjfL9TFciISNyJIRuh+vAPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=BnEE45AP; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=pI17Q4nNlTm+hhSsaQohyNStV7Ae92pJPOoQhC5orr0=; b=BnEE45APQwPLklTv+eKyR7FAA5
+	SJ57khjn79weVrVU4W/lIe3bRI0hAvSAbRq7iVDDWS3KFOB0MjyTaZAM9Ethxj469sFl4RufLdg2l
+	2b/CI/yCV9l8zRP1ZrVS2MM7Q7Tg0ii47AoLbDoOT2tC02xhMfXQahO4PcTQvvCS/NRU2BsWM+//c
+	HUI3CspJkIi2cmi/vBQ+7o/Ka0NCKKFI+SEOYMWRjFVtP8jrlxh7VGpo/NxmXp2mWvCC0DWAWoPxR
+	X0ls9cAn/VSSor4/NuQrdg0LLj4zRqyEs7G74SKFRhADDBMX+N1zjcU2g3AXVDZHKCpPNp+HzL1yk
+	norqMC9w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59960)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tuwzL-0006ih-03;
+	Wed, 19 Mar 2025 17:13:55 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tuwzJ-0005n7-0O;
+	Wed, 19 Mar 2025 17:13:53 +0000
+Date: Wed, 19 Mar 2025 17:13:52 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Re: [PATCH net v2 2/2] net: usb: asix: ax88772: Increase phy_name
+ size
+Message-ID: <Z9r7UPJUJ_Ds6n-6@shell.armlinux.org.uk>
+References: <20250319105813.3102076-1-andriy.shevchenko@linux.intel.com>
+ <20250319105813.3102076-3-andriy.shevchenko@linux.intel.com>
+ <Z9rYHDL3dNbaK9jZ@shell.armlinux.org.uk>
+ <Z9rvXilnPCblbfIv@smile.fi.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z64pkN7eU6yHPifn@ashyti-mobl2.lan>
+In-Reply-To: <Z9rvXilnPCblbfIv@smile.fi.intel.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hi Andi,
-
-On Thu, Feb 13, 2025 at 06:19:12PM +0100, Andi Shyti wrote:
-> Hi Markus,
-> 
-> On Tue, Feb 11, 2025 at 07:33:30AM +0100, Markus Theil wrote:
-> > This is part of a prandom cleanup, which removes
-> > next_pseudo_random32 and replaces it with the standard PRNG.
+On Wed, Mar 19, 2025 at 06:22:54PM +0200, Andy Shevchenko wrote:
+> On Wed, Mar 19, 2025 at 02:43:40PM +0000, Russell King (Oracle) wrote:
+> > On Wed, Mar 19, 2025 at 12:54:34PM +0200, Andy Shevchenko wrote:
+> > > -	char phy_name[20];
+> > > +	char phy_name[MII_BUS_ID_SIZE + 3];
 > > 
-> > Signed-off-by: Markus Theil <theil.markus@gmail.com>
+> > MII_BUS_ID_SIZE is sized to 61, and is what is used in struct
+> > mii_bus::id. Why there a +3 here, which seems like a random constant to
+> > make it 64-bit aligned in size. If we have need to increase
+> > MII_BUS_ID_SIZE in the future, this kind of alignment then goes
+> > wrong...
+> > 
+> > If the intention is to align it to 64-bit then there's surely a better
+> > and future-proof ways to do that.
 > 
-> I merged just this patch in drm-intel-gt-next.
+> Nope, intention is to cover the rest after %s.
 
-This is minorly annoying for me... What am I supposed to do with patches
-2 and 3? Take them through my tree for 6.16 in like half a year? Can I
-just take the v1 into my tree and we can get this done with straight
-forwardly? Or do you have a different suggestion for me?
+Oops, I had missed that MII_BUS_ID_SIZE is the size of the "%s" part.
+I think linux/phy.h should declare:
 
-Jason
+#define PHY_ID_SIZE (MII_BUS_ID_SIZE + 3)
+
+to cater for the ":XX" that PHY_ID_FMT adds.
+
+So the above would become:
+
+	char phy_name[PHY_ID_SIZE];
+
+I wonder whether keeping PHY_ID_FMT as-is, but casting the argument
+to a u8 would solve the issue?
+
+Maybe something like:
+
+static inline void
+phy_format_id(char *dst, size_t n, const char *mii_bus_id, u8 phy_dev_id)
+{
+	BUILD_BUG_ON_MSG(n < PHY_ID_SIZE, "PHY ID destination too small");
+	snprintf(dat, n, PHY_ID_FMT, mii_bus_id, phy_dev_id);
+}
+
+would solve it?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
