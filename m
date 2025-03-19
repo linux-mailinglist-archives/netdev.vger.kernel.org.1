@@ -1,270 +1,215 @@
-Return-Path: <netdev+bounces-175959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FB9CA68119
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 01:14:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BDFEA68121
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 01:15:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77CFA188E3B1
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 00:14:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 44FA4188E9B8
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 00:15:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 408EC801;
-	Wed, 19 Mar 2025 00:14:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AACD1BC4E;
+	Wed, 19 Mar 2025 00:15:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f7uE20AQ"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="nk345Hev"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 858138F6D;
-	Wed, 19 Mar 2025 00:14:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A128BA3D
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 00:15:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742343246; cv=none; b=oC8CQrpgH5rK0yuj6lKSBkj9QYSnhEE2XpykBsDzLz3mu4WngwMFI6KB5jTxNv6GHO3QQghOChXdvUeAJRs+FZwK/GTb66lL+rWZC8Bv8it5+GjKbwLQT5ifwx36UemH++WTirzcAo3Kll/DBfgLutiMPQH5PigYqyQHLkf327U=
+	t=1742343339; cv=none; b=X6FyTNlo1sMR66K0ErO30v+J3D5WqqS4ym0CYackKckxypbDaI1U3OufgwQC0SiEPDMDs3U5ImFszXdjn1xI+HzR2Q2cBhVITKIhPy6Jd3cnZKFhGYxHeywaHCgFQmv+5BhkFhLx/Zs4fwR2NI5UIbZjrMkc3RlTfbgg5fH3iqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742343246; c=relaxed/simple;
-	bh=MKV9mldf0+4FyDmj8o9yUY5iaNVxvWM0Ed5a/roJW7Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ct/22OmGuyP0DnmYAFdm7OB8yoBXgGIvW80QKpN4j93b6htSkWvxZAjH/98H59D8NK0DkRodC9nMouZ5cemZepEb2bNEXYIkZ6dK+LG9gcmPuRvTbPHP5EIfF5dMxM2l9jYSLZAzt583XE8rq+wS7mfa9hJaOKpVZ0VDAtia08o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f7uE20AQ; arc=none smtp.client-ip=209.85.166.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3d450154245so47113685ab.2;
-        Tue, 18 Mar 2025 17:14:04 -0700 (PDT)
+	s=arc-20240116; t=1742343339; c=relaxed/simple;
+	bh=pHQtgKFyhe1UEM5H1CkXAkQ9ckxP7iar9/3rqYLA8vg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mtrX08YoUVG8Gx/+3cZTTHBcl/wFwWFjHQmtgFj5hiY+a/rdAKSF4147BGN0NTlAlIRJ95nq3fCc1pDM8ubAZyxCWJSCosZvxCyFMXpsyH0UjofllQ4Or02QBMV+Y3I0wrbKO/K72qVnAZpX91up9ijQPfp3X+sBgE3SiszJ4Xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=nk345Hev; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-22359001f1aso7640155ad.3
+        for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 17:15:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742343243; x=1742948043; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X2fi7e9XAXBy8lWgbII5AXZTyL4VEd07+VXnYBp5Ecs=;
-        b=f7uE20AQ8t9+DDB9yseKAaVl9gOfrJtrcV5fbYMKKhDxNswAohxuE4cFvEsz/UzRKm
-         VkK6lWntzYOFooPbbf+l84IGwQ5eZpQ6AqrKxrJuRINFKe8fuTmTDRj/MaxgQWRs0fIx
-         ZOoUpjKKFffVMOO5gWTJzS3BF5KxpzahqCC8e6TWqlS094+HcjUuqacDFIuWcCvsAFrJ
-         x1ilW2GoaJVx69/ZcVUHrHvJkwSVN9UHPBVBU8DHvHF0C/2gEe4Y8cRS31UzUUiNEy1T
-         LuaEE4JAECbjWeBFf75TOSILmPrdNoKdKGtD5TNCIIHgPp4ucTxzDm2Pd2UtlUathUgI
-         yQEg==
+        d=fastly.com; s=google; t=1742343336; x=1742948136; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=D+sBSgchPHWEySP2bfLrt8df0wwyowAu2mvbj20TByA=;
+        b=nk345HevUR7Q//BQX4OH2ApWTTxQWu7RzOO4UWTlq6Z+7yBat+zUay0hQOo3Xq9cUS
+         tr5tXyf2nFLDLxF3AWvhvuxljTtoNpPXFx5wJv+rdsQUjMXb9wlz/ap314zIRJTxT0wc
+         guhhaJT2dEcojI086aYopFnWAV51/HgX8zp+k=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742343243; x=1742948043;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=X2fi7e9XAXBy8lWgbII5AXZTyL4VEd07+VXnYBp5Ecs=;
-        b=K83NCOojLlK60oq5tFzc22kX+CGmcyYHzYZ1FCoBuBvrftDvdhmy+75KjuHFFxMFT4
-         ASJ5/iPdcGAtPHIlz2cSFj+hryGKa1ZR5AEwJV8ZtBDCbpsIfoVPH0ZdmdDzboT55KUG
-         zqlSUMF8vki1rUXITasD+lHYakS2ttubWU7PfuHxjVIywgAhj521rCqWVdwZFZSaYqma
-         Mgw5ZELvUGqkS/k89tnUp3RkWiYGlIOwtrTx9mrQLbZSXhL29gF0iZHyDam4K0w6meaV
-         YQsjxmwxTyIzLxat2OqoBOXgVwHlk1KbbmathWbST5QVvsMju4vMXMC+gxocljHziFQ5
-         jC3g==
-X-Forwarded-Encrypted: i=1; AJvYcCUjloUGEOlgXWvkAnrtY0j6k5hgtO9yjJgqN+ZOfInxIxcRaf+ahIyxV6jYiof/sEMspmJT6I0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwuzFJwGNpqkVNEpQrr//rwnGg2aUAXld9vyjrwbkyzUxC6llOh
-	YnilcRtdddwOcIykbVKNqUn80ok+yyGkmHRMo9hVHz2NtJ3Nmr1h2BT3iRLsVhriR36AGyEA5KC
-	UHCt2nZPsZ/nBtqE/X8ZWUQFpVzNb9qMw
-X-Gm-Gg: ASbGncuk8NmuMuutYKjMO7xK1kw4yGvZkFcxXuhIzStfb6BbYKqvOgWjfc3yjJrt/St
-	MW+E1diZ2aLctw8AyDCWRbfhr8RVTr3Tf7IwYVUqqa2ezUbzvQYdOELtPxdMYwQDRaqKnbAB4y2
-	wCcsxpaUZwFpmPRCwXfjXGH7oe8QICDqQFOtA=
-X-Google-Smtp-Source: AGHT+IE3gSCH9UrTcfxJRC0OGpuf/+vx1CqPVrvnShQCtYDOtQq48MC7EjkJveX0rCxuXIiH9HKa5jX0znahwJbSs2A=
-X-Received: by 2002:a05:6e02:1a47:b0:3d1:92fc:fb45 with SMTP id
- e9e14a558f8ab-3d586b243e3mr7670635ab.5.1742343243477; Tue, 18 Mar 2025
- 17:14:03 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1742343336; x=1742948136;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=D+sBSgchPHWEySP2bfLrt8df0wwyowAu2mvbj20TByA=;
+        b=t/qaGecHEcABuZegPqldmBbGrGqN8SzQMtGqwrO4dbQjFaeRbk293hFqwILjPkqthc
+         ccQ/aTRuMC+R1A9qWXQVn3A2VTjc/JSTOiB3GlFRCgjUE5svpcT7e+0IpvzdMeh5J3lQ
+         UUY1QwilRPTvI1lFmk7tEhx0hiuoPf0C7ppz/SfKIfxO5wJmNPc9ouMj82d+A5HZuCsg
+         uqr1r7wfBGGhA1H99EeV7ZlE0TDWmEvv0etInQJAMEHfCcOZnwR67dpKZcsc9G6a5yi+
+         zH7dZKIH+I6v4Yg5qAQlF2VIM+g8airmHdWc4b53YP+ulaq7yzEQ/bfljbbhmyrPy64a
+         wvAw==
+X-Gm-Message-State: AOJu0YwEDL6l1gNZzfc7JZQRy371xxwBqewD6RaJA8zCWP5nrfD2Tu9v
+	7oPhg4vjOY1buNytZFBY2t7bwh2gfpZXj7qqx9BRHM83jCZh2+KjHIPFaviB3BcwzdB3sXnRs0o
+	myjEhXe+iVmbthwtlswp+jLRMTxAHEBKv1Z3y1Frxo5hufsT8rzGxvXjnyRG8NCrcgrcZ4+0ePg
+	tOtR7Vq/B9XbQLtnq5L+jCQCfGNk/drFganb4=
+X-Gm-Gg: ASbGncu6xmSzYcv0T2Xe+VPE3MnwHCwFiTPZRInM+8Fi2H1YJTLOVtPVoj3829Jchkk
+	1+q2X54H0R1VSeRfzKUMNBEA4Z13l9C0Or7DgzWBHVnr0t1Q5u/OaHQZ+n2Xrzmmnok6yXrWmz9
+	ISlAQfCozjYUhtgYKeO48Zez++WUQ2noQVqa4laQNbzebvqNaDtK8RC651BlaH7t+xHohSYS1Jp
+	W9MG21q5qGBYhfH/92mdEJpFdImiKWNBCGU4EmGnj+suBwpTLgHAJhsuyQBRZodX+wUrlp/a+Zf
+	s7ZLuj+p9S0qgBrj9wB0/W/K+/GXzuO7+pETT/YwKkIYvWdBBvSb
+X-Google-Smtp-Source: AGHT+IFUgmcp5ziiDMwrHetBewK21buOCfSn83hSdnwL6/awTXwLICTCoy55xovATS5hzbKk/tpnkQ==
+X-Received: by 2002:a17:902:f646:b0:223:90ec:80f0 with SMTP id d9443c01a7336-22649a3170emr9678415ad.22.1742343336040;
+        Tue, 18 Mar 2025 17:15:36 -0700 (PDT)
+Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-225c68a4876sm101281375ad.70.2025.03.18.17.15.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Mar 2025 17:15:35 -0700 (PDT)
+From: Joe Damato <jdamato@fastly.com>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	asml.silence@gmail.com,
+	linux-fsdevel@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-api@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	viro@zeniv.linux.org.uk,
+	jack@suse.cz,
+	kuba@kernel.org,
+	shuah@kernel.org,
+	sdf@fomichev.me,
+	mingo@redhat.com,
+	arnd@arndb.de,
+	brauner@kernel.org,
+	akpm@linux-foundation.org,
+	tglx@linutronix.de,
+	jolsa@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Joe Damato <jdamato@fastly.com>
+Subject: [RFC -next 00/10] Add ZC notifications to splice and sendfile
+Date: Wed, 19 Mar 2025 00:15:11 +0000
+Message-ID: <20250319001521.53249-1-jdamato@fastly.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1742324341.git.pav@iki.fi> <0dfb22ec3c9d9ed796ba8edc919a690ca2fb1fdd.1742324341.git.pav@iki.fi>
-In-Reply-To: <0dfb22ec3c9d9ed796ba8edc919a690ca2fb1fdd.1742324341.git.pav@iki.fi>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 19 Mar 2025 08:13:27 +0800
-X-Gm-Features: AQ5f1JoIE7st4RKueBH-_TmpE1yFcPtsvt5-6nt7lNOw2_qPUkbl84LiibMF_hY
-Message-ID: <CAL+tcoDL0FwC6i_3q46HrKA0Sua-KKXxTpWpR94ev9RovdHgWQ@mail.gmail.com>
-Subject: Re: [PATCH v5 1/5] net-timestamp: COMPLETION timestamp on packet tx completion
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, netdev@vger.kernel.org, davem@davemloft.net, 
-	kuba@kernel.org, willemdebruijn.kernel@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Mar 19, 2025 at 3:08=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
->
-> Add SOF_TIMESTAMPING_TX_COMPLETION, for requesting a software timestamp
-> when hardware reports a packet completed.
->
-> Completion tstamp is useful for Bluetooth, as hardware timestamps do not
-> exist in the HCI specification except for ISO packets, and the hardware
-> has a queue where packets may wait.  In this case the software SND
-> timestamp only reflects the kernel-side part of the total latency
-> (usually small) and queue length (usually 0 unless HW buffers
-> congested), whereas the completion report time is more informative of
-> the true latency.
->
-> It may also be useful in other cases where HW TX timestamps cannot be
-> obtained and user wants to estimate an upper bound to when the TX
-> probably happened.
->
-> Signed-off-by: Pauli Virtanen <pav@iki.fi>
+Greetings:
 
-Hi Pauli,
+Welcome to the RFC.
 
-This patch overall looks good to me but it depends on the small
-question in another patch that is relevant to how we use this new flag
-in reality. Let's discuss a bit there.
+Currently, when a user app uses sendfile the user app has no way to know
+if the bytes were transmit; sendfile simply returns, but it is possible
+that a slow client on the other side may take time to receive and ACK
+the bytes. In the meantime, the user app which called sendfile has no
+way to know whether it can overwrite the data on disk that it just
+sendfile'd.
+
+One way to fix this is to add zerocopy notifications to sendfile similar
+to how MSG_ZEROCOPY works with sendmsg. This is possible thanks to the
+extensive work done by Pavel [1].
+
+To support this, two important user ABI changes are proposed:
+
+  - A new splice flag, SPLICE_F_ZC, which allows users to signal that
+    splice should generate zerocopy notifications if possible.
+
+  - A new system call, sendfile2, which is similar to sendfile64 except
+    that it takes an additional argument, flags, which allows the user
+    to specify either a "regular" sendfile or a sendfile with zerocopy
+    notifications enabled.
+
+In either case, user apps can read notifications from the error queue
+(like they would with MSG_ZEROCOPY) to determine when their call to
+sendfile has completed.
+
+I tested this RFC using the selftest modified in the last patch and also
+by using the selftest between two different physical hosts:
+
+# server
+./msg_zerocopy -4 -i eth0 -t 2 -v -r tcp
+
+# client (does the sendfiling)
+dd if=/dev/zero of=sendfile_data bs=1M count=8
+./msg_zerocopy -4 -i eth0 -D $SERVER_IP -v -l 1 -t 2 -z -f sendfile_data tcp
+
+I would love to get high level feedback from folks on a few things:
+
+  - Is this functionality, at a high level, something that would be
+    desirable / useful? I think so, but I'm of course I am biased ;)
+
+  - Is this approach generally headed in the right direction? Are the
+    proposed user ABI changes reasonable?
+
+If the above two points are generally agreed upon then I'd welcome
+feedback on the patches themselves :)
+
+This is kind of a net thing, but also kind of a splice thing so hope I
+am sending this to right places to get appropriate feedback. I based my
+code on the vfs/for-next tree, but am happy to rebase on another tree if
+desired. The cc-list got a little out of control, so I manually trimmed
+it down quite a bit; sorry if I missed anyone I should have CC'd in the
+process.
 
 Thanks,
-Jason
+Joe
 
-> ---
->
-> Notes:
->     v5:
->     - back to decoupled COMPLETION & SND, like in v3
->     - BPF reporting not implemented here
->
->  Documentation/networking/timestamping.rst | 8 ++++++++
->  include/linux/skbuff.h                    | 7 ++++---
->  include/uapi/linux/errqueue.h             | 1 +
->  include/uapi/linux/net_tstamp.h           | 6 ++++--
->  net/core/skbuff.c                         | 2 ++
->  net/ethtool/common.c                      | 1 +
->  net/socket.c                              | 3 +++
->  7 files changed, 23 insertions(+), 5 deletions(-)
->
-> diff --git a/Documentation/networking/timestamping.rst b/Documentation/ne=
-tworking/timestamping.rst
-> index 61ef9da10e28..b8fef8101176 100644
-> --- a/Documentation/networking/timestamping.rst
-> +++ b/Documentation/networking/timestamping.rst
-> @@ -140,6 +140,14 @@ SOF_TIMESTAMPING_TX_ACK:
->    cumulative acknowledgment. The mechanism ignores SACK and FACK.
->    This flag can be enabled via both socket options and control messages.
->
-> +SOF_TIMESTAMPING_TX_COMPLETION:
-> +  Request tx timestamps on packet tx completion.  The completion
-> +  timestamp is generated by the kernel when it receives packet a
-> +  completion report from the hardware. Hardware may report multiple
-> +  packets at once, and completion timestamps reflect the timing of the
-> +  report and not actual tx time. This flag can be enabled via both
-> +  socket options and control messages.
-> +
->
->  1.3.2 Timestamp Reporting
->  ^^^^^^^^^^^^^^^^^^^^^^^^^
-> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index cd8294cdc249..b974a277975a 100644
-> --- a/include/linux/skbuff.h
-> +++ b/include/linux/skbuff.h
-> @@ -478,8 +478,8 @@ enum {
->         /* device driver is going to provide hardware time stamp */
->         SKBTX_IN_PROGRESS =3D 1 << 2,
->
-> -       /* reserved */
-> -       SKBTX_RESERVED =3D 1 << 3,
-> +       /* generate software time stamp on packet tx completion */
-> +       SKBTX_COMPLETION_TSTAMP =3D 1 << 3,
->
->         /* generate wifi status information (where possible) */
->         SKBTX_WIFI_STATUS =3D 1 << 4,
-> @@ -498,7 +498,8 @@ enum {
->
->  #define SKBTX_ANY_SW_TSTAMP    (SKBTX_SW_TSTAMP    | \
->                                  SKBTX_SCHED_TSTAMP | \
-> -                                SKBTX_BPF)
-> +                                SKBTX_BPF          | \
-> +                                SKBTX_COMPLETION_TSTAMP)
->  #define SKBTX_ANY_TSTAMP       (SKBTX_HW_TSTAMP | \
->                                  SKBTX_ANY_SW_TSTAMP)
->
-> diff --git a/include/uapi/linux/errqueue.h b/include/uapi/linux/errqueue.=
-h
-> index 3c70e8ac14b8..1ea47309d772 100644
-> --- a/include/uapi/linux/errqueue.h
-> +++ b/include/uapi/linux/errqueue.h
-> @@ -73,6 +73,7 @@ enum {
->         SCM_TSTAMP_SND,         /* driver passed skb to NIC, or HW */
->         SCM_TSTAMP_SCHED,       /* data entered the packet scheduler */
->         SCM_TSTAMP_ACK,         /* data acknowledged by peer */
-> +       SCM_TSTAMP_COMPLETION,  /* packet tx completion */
->  };
->
->  #endif /* _UAPI_LINUX_ERRQUEUE_H */
-> diff --git a/include/uapi/linux/net_tstamp.h b/include/uapi/linux/net_tst=
-amp.h
-> index 55b0ab51096c..383213de612a 100644
-> --- a/include/uapi/linux/net_tstamp.h
-> +++ b/include/uapi/linux/net_tstamp.h
-> @@ -44,8 +44,9 @@ enum {
->         SOF_TIMESTAMPING_BIND_PHC =3D (1 << 15),
->         SOF_TIMESTAMPING_OPT_ID_TCP =3D (1 << 16),
->         SOF_TIMESTAMPING_OPT_RX_FILTER =3D (1 << 17),
-> +       SOF_TIMESTAMPING_TX_COMPLETION =3D (1 << 18),
->
-> -       SOF_TIMESTAMPING_LAST =3D SOF_TIMESTAMPING_OPT_RX_FILTER,
-> +       SOF_TIMESTAMPING_LAST =3D SOF_TIMESTAMPING_TX_COMPLETION,
->         SOF_TIMESTAMPING_MASK =3D (SOF_TIMESTAMPING_LAST - 1) |
->                                  SOF_TIMESTAMPING_LAST
->  };
-> @@ -58,7 +59,8 @@ enum {
->  #define SOF_TIMESTAMPING_TX_RECORD_MASK        (SOF_TIMESTAMPING_TX_HARD=
-WARE | \
->                                          SOF_TIMESTAMPING_TX_SOFTWARE | \
->                                          SOF_TIMESTAMPING_TX_SCHED | \
-> -                                        SOF_TIMESTAMPING_TX_ACK)
-> +                                        SOF_TIMESTAMPING_TX_ACK | \
-> +                                        SOF_TIMESTAMPING_TX_COMPLETION)
->
->  /**
->   * struct so_timestamping - SO_TIMESTAMPING parameter
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index ab8acb737b93..6cbf77bc61fc 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -5523,6 +5523,8 @@ static bool skb_tstamp_tx_report_so_timestamping(st=
-ruct sk_buff *skb,
->                                                     SKBTX_SW_TSTAMP);
->         case SCM_TSTAMP_ACK:
->                 return TCP_SKB_CB(skb)->txstamp_ack & TSTAMP_ACK_SK;
-> +       case SCM_TSTAMP_COMPLETION:
-> +               return skb_shinfo(skb)->tx_flags & SKBTX_COMPLETION_TSTAM=
-P;
->         }
->
->         return false;
-> diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-> index 7e3c16856c1a..0cb6da1f692a 100644
-> --- a/net/ethtool/common.c
-> +++ b/net/ethtool/common.c
-> @@ -476,6 +476,7 @@ const char sof_timestamping_names[][ETH_GSTRING_LEN] =
-=3D {
->         [const_ilog2(SOF_TIMESTAMPING_BIND_PHC)]     =3D "bind-phc",
->         [const_ilog2(SOF_TIMESTAMPING_OPT_ID_TCP)]   =3D "option-id-tcp",
->         [const_ilog2(SOF_TIMESTAMPING_OPT_RX_FILTER)] =3D "option-rx-filt=
-er",
-> +       [const_ilog2(SOF_TIMESTAMPING_TX_COMPLETION)] =3D "tx-completion"=
-,
->  };
->  static_assert(ARRAY_SIZE(sof_timestamping_names) =3D=3D __SOF_TIMESTAMPI=
-NG_CNT);
->
-> diff --git a/net/socket.c b/net/socket.c
-> index b64ecf2722e7..e3d879b53278 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -689,6 +689,9 @@ void __sock_tx_timestamp(__u32 tsflags, __u8 *tx_flag=
-s)
->         if (tsflags & SOF_TIMESTAMPING_TX_SCHED)
->                 flags |=3D SKBTX_SCHED_TSTAMP;
->
-> +       if (tsflags & SOF_TIMESTAMPING_TX_COMPLETION)
-> +               flags |=3D SKBTX_COMPLETION_TSTAMP;
-> +
->         *tx_flags =3D flags;
->  }
->  EXPORT_SYMBOL(__sock_tx_timestamp);
-> --
-> 2.48.1
->
->
+[1]: https://lore.kernel.org/netdev/cover.1657643355.git.asml.silence@gmail.com/
+
+Joe Damato (10):
+  splice: Add ubuf_info to prepare for ZC
+  splice: Add helper that passes through splice_desc
+  splice: Factor splice_socket into a helper
+  splice: Add SPLICE_F_ZC and attach ubuf
+  fs: Add splice_write_sd to file operations
+  fs: Extend do_sendfile to take a flags argument
+  fs: Add sendfile2 which accepts a flags argument
+  fs: Add sendfile flags for sendfile2
+  fs: Add sendfile2 syscall
+  selftests: Add sendfile zerocopy notification test
+
+ arch/alpha/kernel/syscalls/syscall.tbl      |  1 +
+ arch/arm/tools/syscall.tbl                  |  1 +
+ arch/arm64/tools/syscall_32.tbl             |  1 +
+ arch/m68k/kernel/syscalls/syscall.tbl       |  1 +
+ arch/microblaze/kernel/syscalls/syscall.tbl |  1 +
+ arch/mips/kernel/syscalls/syscall_n32.tbl   |  1 +
+ arch/mips/kernel/syscalls/syscall_n64.tbl   |  1 +
+ arch/mips/kernel/syscalls/syscall_o32.tbl   |  1 +
+ arch/parisc/kernel/syscalls/syscall.tbl     |  1 +
+ arch/powerpc/kernel/syscalls/syscall.tbl    |  1 +
+ arch/s390/kernel/syscalls/syscall.tbl       |  1 +
+ arch/sh/kernel/syscalls/syscall.tbl         |  1 +
+ arch/sparc/kernel/syscalls/syscall.tbl      |  1 +
+ arch/x86/entry/syscalls/syscall_32.tbl      |  1 +
+ arch/x86/entry/syscalls/syscall_64.tbl      |  1 +
+ arch/xtensa/kernel/syscalls/syscall.tbl     |  1 +
+ fs/read_write.c                             | 40 +++++++---
+ fs/splice.c                                 | 87 +++++++++++++++++----
+ include/linux/fs.h                          |  2 +
+ include/linux/sendfile.h                    | 10 +++
+ include/linux/splice.h                      |  7 +-
+ include/linux/syscalls.h                    |  2 +
+ include/uapi/asm-generic/unistd.h           |  4 +-
+ net/socket.c                                |  1 +
+ scripts/syscall.tbl                         |  1 +
+ tools/testing/selftests/net/msg_zerocopy.c  | 54 ++++++++++++-
+ tools/testing/selftests/net/msg_zerocopy.sh |  5 ++
+ 27 files changed, 200 insertions(+), 29 deletions(-)
+ create mode 100644 include/linux/sendfile.h
+
+
+base-commit: 2e72b1e0aac24a12f3bf3eec620efaca7ab7d4de
+-- 
+2.43.0
+
 
