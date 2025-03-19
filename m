@@ -1,133 +1,154 @@
-Return-Path: <netdev+bounces-176180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4FE1A6943D
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:00:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57589A69436
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 16:59:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA1961895EF9
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 15:57:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B45D81674AC
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 15:59:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 123902FC23;
-	Wed, 19 Mar 2025 15:57:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76DBE1D7999;
+	Wed, 19 Mar 2025 15:59:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="lG8/MyUj"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="oeGIezsX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64811F9DA
-	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 15:57:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1B7A1FB3
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 15:59:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742399822; cv=none; b=GhE0R4PRzbEz9jTSeCTENNzclLk+4jxCvT4W1vVqzgckjwDZMloi5jL84xxtdqVJMlzNRCWgDK9/jL8E1U/EvRDGdHPAk3SQBxfSYV6yeOedEml7DX7J+olJzzZ7wTyTD+YiQuEYjsOXvSssJRfig1VxQWAXJzBBkd98UmcC8RE=
+	t=1742399963; cv=none; b=EP+kH4sJuNssI8Q8FJV3RIfay+MTYQZ5AAmbyOGHH2pJyxWn1EH6cMZDFH8fxdcvKqZW+r+5gek9ZsQdXAUNkQ2U7+eLYyVBw0nqzorNhYR8K/dSua6yFD07xbSlUxJKjiIXajRNs9syt1IIKtNbqYtNjnkrSIYfs8m+wGtqFxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742399822; c=relaxed/simple;
-	bh=f+9eQvUdIVyplo97+8h5Gnyx9GiJPqVnK2N7PiScMhM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ljfzAo/sy+9bxyFjlnm53mzdA+JscasDw4Yxks2z7bust5SkY/ihJPlmSOnwekEJhHdf2DH/oHvHZmiJ3fY7e1e9vg1Ogcs6m4ZWca1fMKV5vKRF8byDEThj6E7i28WCkKUBGyLz3P6NILvUZAzS1CbCMTFUaD8kt32P36XSVX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=lG8/MyUj; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-224171d6826so48657325ad.3
-        for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 08:57:00 -0700 (PDT)
+	s=arc-20240116; t=1742399963; c=relaxed/simple;
+	bh=ZZCXbt8B5xOrX2o5sjYnXgndpKycIvWGlW8Z4kWBSn0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=r2LIkBLrcYUkPvP1D89WHb3ppaEjcvsTDCqka4Jgx0C2LoH+0kARVaDTS+NpDEefgORNeNOaBCIkNoDDZ0emAPzAIwYZo6K4PYj2KRRTlQ+1fLzEWTzNxRF+cVC/rYjs+VjxTqJhFHdoL2fFXCIdaigIIKdfQ8D2QbIwBenTqrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=oeGIezsX; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1742399819; x=1743004619; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vH+Ne/GeJpiV7zojk6DlYEVxyrcSW023NyPjhVX8Uqo=;
-        b=lG8/MyUjvbjICR42S3jPEfvVSjnCBfg844F9Qea9piJ2N19iDkF2XJrW4sdnEXgScP
-         6MboNEjMiolWJ1dVNDen6DOy/CRRnh0HE5A9h/7YXapxGfK5Y++XmHBzkB24vy2XxaXu
-         mu0Ku+BqhB5HNfZZ9Mn6CG3m253JN+3t7zZNM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742399819; x=1743004619;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vH+Ne/GeJpiV7zojk6DlYEVxyrcSW023NyPjhVX8Uqo=;
-        b=iI8K/3QijL5zZGh5Sxy731hIrTTZpUIMtOHSdADPVBASFU86OusaxUp+0SpG+mRrsF
-         6YL0a852t5RJkJz4CZZB/A3vyfNHm6LWA9L0d9w5XoymJxNeP0doBT5lFvPW8NsHYxNm
-         5C/K3cLok8zdG52jPO+ixuVH2IRAuu1edEJ+03Wl4NUPWzZMNnmhN/qEvm2J+UDSTZvy
-         Mqjw2rl97fe+gWaeCdssiSwCHy/nsM8T1sYnaD1j33xJllYBGEndOxSMuLMAg2XzlEix
-         2ibZHC+sw0gu04MA3I7iWOrNmietDfVDyg8Aidx5+YoIf9z0rMFt4Awd48j+FAhfIwHK
-         jjKg==
-X-Forwarded-Encrypted: i=1; AJvYcCVyaQht/VA4hulwXlmHBZHbJKA1WZ9gcN612zHdGLn9g2wYspps+Oq1AjXtQMXVJLIYbQ6arWk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZhAQucjCLB8OnoX6GjvsuCPMWdOVKJKFdQiflzetN32n4tDkd
-	nJT05IGy443rEBvunw+Q3W83rrQaDIA6i9azm0IOiXvp2SNvKZ2VkA8yyE0GojigQ0Yafa8R8Zf
-	G
-X-Gm-Gg: ASbGncuxxPYlVe7gxVx8xDSljS9BKdqFYYmBS5FL441zCYOuSvEgIdAOichz6viIALo
-	wgagK7RHzJMHdK+NdUEH4bK7Q44QEQBbw7gKRPkwHogBpYuG/2WWsYYRQ1MQBuf3jwdkXg9Zoz1
-	7+AviIbmrDEw1eMcyy/W1WXbx4itM0Ejos4x8/SlicJ/iKapzaFQZjsIqzG0PvYHyiTAHPHdskg
-	sdta03ADfBFGpoOA0AVwI8V+f6/JjeEEenuTkrjVjFf/Meh1d7Rxi+s70MkCL8fwB0B7B9J/YtT
-	5i7nJd1/d6UZ+EYGqZZ6/Z4S5dJpAfGYATrDO2WIUhWiC9shN/u89CxjEOEIqHjHs0DWcwK+afz
-	UXomcgKJ3ZgC5w5ti
-X-Google-Smtp-Source: AGHT+IGZKa6DjH1sSbKETfBrAx2FPuAUauFFga5rakOTfFmzrNpyGQ0tTt9LHuAP/z4HS1NhFvfzbg==
-X-Received: by 2002:a17:902:c950:b0:223:f9a4:3fb6 with SMTP id d9443c01a7336-2264981dc7bmr46750195ad.11.1742399819573;
-        Wed, 19 Mar 2025 08:56:59 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-225c6bbfb4fsm116134265ad.208.2025.03.19.08.56.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Mar 2025 08:56:59 -0700 (PDT)
-Date: Wed, 19 Mar 2025 08:56:56 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
-	kuba@kernel.org, kuni1840@gmail.com, netdev@vger.kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH v1 net-next 1/4] af_unix: Sort headers.
-Message-ID: <Z9rpSFrBxOfIVRNb@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>, davem@davemloft.net,
-	edumazet@google.com, horms@kernel.org, kuba@kernel.org,
-	kuni1840@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com
-References: <Z9n8w-6nXiBUI20T@LQ3V64L9R2>
- <20250318235208.57089-1-kuniyu@amazon.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1742399962; x=1773935962;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=1yfk4Fng/95l4CEZWXTYHgr6RaTeUUQlZtjkcGxUrsg=;
+  b=oeGIezsXhsN4SKaYMaTiz3TwZ5puD+DANQaU2Ai6gKgCBO6jVezMW+AM
+   FGIoznL96n+d2oNMCu89StmEdSsD04zKqEKaU4QOp6QeUIzM28+XYFM4j
+   KyqI2XDh4os4C1X6omj1wUN2oqymqdzR4by4bwGR9DOWAkIErlDsuuXkM
+   k=;
+X-IronPort-AV: E=Sophos;i="6.14,259,1736812800"; 
+   d="scan'208";a="75780464"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2025 15:59:18 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:18236]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.18.34:2525] with esmtp (Farcaster)
+ id ba51a66a-6a4d-4c3f-8ff8-44b4ad26bc2c; Wed, 19 Mar 2025 15:59:17 +0000 (UTC)
+X-Farcaster-Flow-ID: ba51a66a-6a4d-4c3f-8ff8-44b4ad26bc2c
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 19 Mar 2025 15:59:16 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.106.100.42) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 19 Mar 2025 15:59:13 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <pabeni@redhat.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<horms@kernel.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH v1 net-next 0/7] nexthop: Convert RTM_{NEW,DEL}NEXTHOP to per-netns RTNL.
+Date: Wed, 19 Mar 2025 08:57:46 -0700
+Message-ID: <20250319155904.6616-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <70ca4d5c-90c3-4a96-b47b-fbf5034c7450@redhat.com>
+References: <70ca4d5c-90c3-4a96-b47b-fbf5034c7450@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250318235208.57089-1-kuniyu@amazon.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D046UWB003.ant.amazon.com (10.13.139.174) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Tue, Mar 18, 2025 at 04:50:00PM -0700, Kuniyuki Iwashima wrote:
-> From: Joe Damato <jdamato@fastly.com>
-> Date: Tue, 18 Mar 2025 16:07:47 -0700
-> > > +#include <linux/in.h>
-> > >  #include <linux/init.h>
-> > > +#include <linux/kernel.h>
-> > > +#include <linux/module.h>
-> > > +#include <linux/mount.h>
-> > > +#include <linux/namei.h>
-> > > +#include <linux/net.h>
-> > > +#include <linux/netdevice.h>
-> > >  #include <linux/poll.h>
-> > > +#include <linux/proc_fs.h>
-> > >  #include <linux/rtnetlink.h>
-> > > -#include <linux/mount.h>
-> > > -#include <net/checksum.h>
-> > > +#include <linux/sched/signal.h>
+From: Paolo Abeni <pabeni@redhat.com>
+Date: Wed, 19 Mar 2025 08:57:52 +0100
+> Hi,
+> 
+> On 3/19/25 12:31 AM, Kuniyuki Iwashima wrote:
+> > Patch 1 - 5 move some validation for RTM_NEWNEXTHOP so that it can be
+> > done without RTNL.
 > > 
-> > Not sure what the sorting rules are, but I was wondering if maybe
-> > "linux/sched/*.h" should come after linux/*.h and not sorted within
-> > linux/s*.h ?
+> > Patch 6 & 7 converts RTM_NEWNEXTHOP and RTM_DELNEXTHOP to per-netns RTNL.
+> > 
+> > Note that RTM_GETNEXTHOP and RTM_GETNEXTHOPBUCKET are not touched in
+> > this series.
+> > 
+> > rtm_get_nexthop() can be easily converted to RCU, but rtm_dump_nexthop()
+> > needs more work due to the left-to-right rbtree walk, which looks prone
+> > to node deletion and tree rotation without a retry mechanism.
+> > 
+> > 
+> > Kuniyuki Iwashima (7):
+> >   nexthop: Move nlmsg_parse() in rtm_to_nh_config() to
+> >     rtm_new_nexthop().
+> >   nexthop: Split nh_check_attr_group().
+> >   nexthop: Move NHA_OIF validation to rtm_to_nh_config_rtnl().
+> >   nexthop: Check NLM_F_REPLACE and NHA_ID in rtm_new_nexthop().
+> >   nexthop: Remove redundant group len check in nexthop_create_group().
+> >   nexthop: Convert RTM_NEWNEXTHOP to per-netns RTNL.
+> >   nexthop: Convert RTM_DELNEXTHOP to per-netns RTNL.
+> > 
+> >  net/ipv4/nexthop.c | 183 +++++++++++++++++++++++++++------------------
+> >  1 file changed, 112 insertions(+), 71 deletions(-)
 > 
-> It's simply sorted in the alphabetial order.
+> This series is apparently causing NULL ptr deref in the nexthop.sh
+> netdevsim selftests. Unfortunately, due to a transient nipa infra
+> outage, a lot of stuff landed into the same batch, so I'm not 110% this
+> series is the real curprit but looks like a reasonable suspect.
+> 
+> Kuniyuki, could you please have a look?
+> 
+> ---
+> [    1.653896] BUG: kernel NULL pointer dereference, address:
+> 0000000000000068
+> [    1.653963] #PF: supervisor read access in kernel mode
+> [    1.654003] #PF: error_code(0x0000) - not-present page
+> [    1.654037] PGD 7828067 P4D 7828067 PUD 782a067 PMD 0
+> [    1.654077] Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
+> [    1.654119] CPU: 0 UID: 0 PID: 303 Comm: ip Not tainted
+> 6.14.0-rc6-virtme #1
+> [    1.654176] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+> [    1.654219] RIP: 0010:rtm_new_nexthop+0x645/0x2260
 
-Yea, I understand that - just wasn't sure if subdirectories should
-be sorted separately.
+Sorry, I failed to resolve conflict during the last minute rebase,
+and the normal test bailed out here...
+
+---8<---
+@@ -3245,7 +3248,7 @@ static int rtm_new_nexthop(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 		goto out;
  
-> Actually I haven't cared about the / level, so I grepped the
-> linux/sched/signal.h users and it looks like most didn't care.
-> 
->   grep -rnI --include=*.c --include=*.h "linux/sched/signal.h" -C 3
+ 	err = rtm_to_nh_config_rtnl(net, tb, extack);
+-	if (!err)
++	if (err)
+ 		goto out;
+ 
+ 	nh = nexthop_add(net, &cfg, extack);
+---8<---
 
-OK, fair enough.
+The failed test case created a nexthop group with an invalid ID,
+and nexthop_get() for nh by nexthop_find_by_id() assumes nh is not
+NULL because it's checked in advance.
 
-Reviewed-by: Joe Damato <jdamato@fastly.com>
+Will squash the diff above in v2.
+
+Thanks!
 
