@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-176007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ED6DA6854F
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 07:55:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73CCBA68550
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 07:56:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0626E7A2C2F
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 06:54:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBEAF42530D
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 06:55:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4501324EAAA;
-	Wed, 19 Mar 2025 06:55:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B20EA20FA90;
+	Wed, 19 Mar 2025 06:55:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="d7vJPxnQ"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="fz6Yx9B2"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E3A120FA90
-	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 06:55:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A8ECE552
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 06:55:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742367328; cv=none; b=Ua4zQboePLGzl23hu5twStik8Tsz01Hsj/CcHDrRtzN2ordJz7f/b4dMASuvyzTjp0U/3Mg0ech+hTO8QWTTOUuXLGAGnuWZnL973nNVDncrCuqQchnc1Chh9WCTohNmbVSu+Fv18EA241r7bQfKypW1kN6xkGmio7H5jcmPK5A=
+	t=1742367329; cv=none; b=HU3THYQ54Gq/6qud++67aWWrJ/YIzyYNic4zbrzjBb7xrmRpgXmn2V7Q63LKtqequFCQlcyTgT/Yea230ngOHRl+y59AxGaRBf7+OEpNPMGNlrL289e4LeNlPi17SXMmRxryI09ZPiZenSHMGrPmWa6OwRJv3Wt9l98EL1B48cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742367328; c=relaxed/simple;
-	bh=K9xSVEIWiV0+Ujss7ZOEGeGTspG7LRS/sXjM7lJxcSA=;
+	s=arc-20240116; t=1742367329; c=relaxed/simple;
+	bh=SaX9mvWH70Pgffvmq1Ko52mtxTR3MvtOAtsYuiqyXXA=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uougCRH8OwDh762oxh4YbGwRqN9/RlG3DrKtoj5RrabHdGXlE94NTlOsnQGMyUbvWj16DYswF1UtfZZCJ0PXQfBt8W0yaI6GX0eHSJF2gdAULAQw2uAXTMC9ANwGn15GwKh9ZPpTh+jAcpuFLw7ir4h6MCPXs8K9wekCKqtw0TE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=d7vJPxnQ; arc=none smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=AShzLy2ZuC/LEwfyI6hWA/WRLYIXSw/alsTPjuRP+8O6pqSBU/CkT29m5OkheOP/426Lkojqc1tMFyfAONSVPwrW8QuxLdmHyJPYfNe2FVFpwEjaptWnuyoLF8aHpug+YnvJejhkrIGIBmEs3s8A962ELPoEN2NjC5tpzIpWrac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=fz6Yx9B2; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id CD65F2074F;
+	by mx1.secunet.com (Postfix) with ESMTP id 84F0D200BC;
 	Wed, 19 Mar 2025 07:55:18 +0100 (CET)
 X-Virus-Scanned: by secunet
 Received: from mx1.secunet.com ([127.0.0.1])
  by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pXLZT1TGDowx; Wed, 19 Mar 2025 07:55:18 +0100 (CET)
+ with ESMTP id t-2OhT0jiive; Wed, 19 Mar 2025 07:55:17 +0100 (CET)
 Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id F159920799;
+	by mx1.secunet.com (Postfix) with ESMTPS id CDF3D2074F;
 	Wed, 19 Mar 2025 07:55:17 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com F159920799
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com CDF3D2074F
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1742367318;
-	bh=XrrHiCyGspXyA8sFeE6fH2IaOPiLw6ufIafJA1eYEOg=;
+	s=202301; t=1742367317;
+	bh=KQGMTtxSZ6uy3VL0V/ocqUeQRBx+oc+8e3IHvGV5iuQ=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=d7vJPxnQ+DecUAmhwz7U2XyLWpkYS/XYHmhomPHtJzouX0uk8mLp9eLppSfm6kdsa
-	 G1fVt7ABsre0TsLZxvevzjmaHveiE95+Xz5GjlFiwH64zWkYcC6XxcKGT3JqVXljhH
-	 +9wxUyo6G+UI5/zF4KsMhgH5r2VzTByJljcIiImNlyr2tyo2BWq8ReA7ifhX8WH+ij
-	 F4b0POVH5jD0PGPVaeU+3rH7e7u5IRcylg50eV2BYobw9Imoz1DR3VoNzKW8DQDLGU
-	 jwe3NGeWbOfT5FahbwocIUBHAaMNL5qiRxXqXP3UHZ45dvOvpH5mKX+ZD5KVYRRbf7
-	 fzNcpdH0ribaw==
+	b=fz6Yx9B2jf3IpvHA9gQW072OOzGfZVPj72jyMsvJUWUMRP42LhSY8y2TlER/ebQML
+	 exa54QSgSvQg9bL0PPWQDgvxjXuD4joYsM15hh3uOuvwHSefMKMpzC8+3fkZcFJFyh
+	 M8wxhxv/UY1FMKdjuP9aOTmuwSAefpT0PbWqUTdlsSzhRWcJ9inCW+P9l6ibRVTaF8
+	 Os688b2QdC0oI2gQNShbgnA7BuhTweqR0Ysp9WWKHFT2zmavyS4wYAzhqW9h2FgsIu
+	 CvSPxMI524GaQNJBN7Neh5/UxUZ/IsHEUo5QsKBtq0gQXgo8/6wdekqvXEupMpz51Z
+	 HOSYwmIKoRAfg==
 Received: from mbx-essen-02.secunet.de (10.53.40.198) by
  cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
@@ -63,14 +63,14 @@ Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 19 Mar
  2025 07:55:17 +0100
 Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id B549F31805E4; Wed, 19 Mar 2025 07:55:16 +0100 (CET)
+	id C25123182C15; Wed, 19 Mar 2025 07:55:16 +0100 (CET)
 From: Steffen Klassert <steffen.klassert@secunet.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
 	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 1/2] xfrm: fix tunnel mode TX datapath in packet offload mode
-Date: Wed, 19 Mar 2025 07:55:12 +0100
-Message-ID: <20250319065513.987135-2-steffen.klassert@secunet.com>
+Subject: [PATCH 2/2] xfrm_output: Force software GSO only in tunnel mode
+Date: Wed, 19 Mar 2025 07:55:13 +0100
+Message-ID: <20250319065513.987135-3-steffen.klassert@secunet.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250319065513.987135-1-steffen.klassert@secunet.com>
 References: <20250319065513.987135-1-steffen.klassert@secunet.com>
@@ -86,86 +86,72 @@ X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
  mbx-essen-02.secunet.de (10.53.40.198)
 X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-From: Alexandre Cassen <acassen@corp.free.fr>
+From: Cosmin Ratiu <cratiu@nvidia.com>
 
-Packets that match the output xfrm policy are delivered to the netstack.
-In IPsec packet mode for tunnel mode, the HW is responsible for building
-the hard header and outer IP header. In such a situation, the inner
-header may refer to a network that is not directly reachable by the host,
-resulting in a failed neighbor resolution. The packet is then dropped.
-xfrm policy defines the netdevice to use for xmit so we can send packets
-directly to it.
+The cited commit fixed a software GSO bug with VXLAN + IPSec in tunnel
+mode. Unfortunately, it is slightly broader than necessary, as it also
+severely affects performance for Geneve + IPSec transport mode over a
+device capable of both HW GSO and IPSec crypto offload. In this case,
+xfrm_output unnecessarily triggers software GSO instead of letting the
+HW do it. In simple iperf3 tests over Geneve + IPSec transport mode over
+a back-2-back pair of NICs with MTU 1500, the performance was observed
+to be up to 6x worse when doing software GSO compared to leaving it to
+the hardware.
 
-Makes direct xmit exclusive to tunnel mode, since some rules may apply
-in transport mode.
+This commit makes xfrm_output only trigger software GSO in crypto
+offload cases for already encapsulated packets in tunnel mode, as not
+doing so would then cause the inner tunnel skb->inner_networking_header
+to be overwritten and break software GSO for that packet later if the
+device turns out to not be capable of HW GSO.
 
-Fixes: f8a70afafc17 ("xfrm: add TX datapath support for IPsec packet offload mode")
-Signed-off-by: Alexandre Cassen <acassen@corp.free.fr>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+Taking a closer look at the conditions for the original bug, to better
+understand the reasons for this change:
+- vxlan_build_skb -> iptunnel_handle_offloads sets inner_protocol and
+  inner network header.
+- then, udp_tunnel_xmit_skb -> ip_tunnel_xmit adds outer transport and
+  network headers.
+- later in the xmit path, xfrm_output -> xfrm_outer_mode_output ->
+  xfrm4_prepare_output -> xfrm4_tunnel_encap_add overwrites the inner
+  network header with the one set in ip_tunnel_xmit before adding the
+  second outer header.
+- __dev_queue_xmit -> validate_xmit_skb checks whether GSO segmentation
+  needs to happen based on dev features. In the original bug, the hw
+  couldn't segment the packets, so skb_gso_segment was invoked.
+- deep in the .gso_segment callback machinery, __skb_udp_tunnel_segment
+  tries to use the wrong inner network header, expecting the one set in
+  iptunnel_handle_offloads but getting the one set by xfrm instead.
+- a bit later, ipv6_gso_segment accesses the wrong memory based on that
+  wrong inner network header.
+
+With the new change, the original bug (or similar ones) cannot happen
+again, as xfrm will now trigger software GSO before applying a tunnel.
+This concern doesn't exist in packet offload mode, when the HW adds
+encapsulation headers. For the non-offloaded packets (crypto in SW),
+software GSO is still done unconditionally in the else branch.
+
+Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+Reviewed-by: Yael Chemla <ychemla@nvidia.com>
+Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+Fixes: a204aef9fd77 ("xfrm: call xfrm_output_gso when inner_protocol is set in xfrm_output")
+Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- net/xfrm/xfrm_output.c | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+ net/xfrm/xfrm_output.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
-index f7abd42c077d..e5b3e343a5ec 100644
+index e5b3e343a5ec..3cabc87978dd 100644
 --- a/net/xfrm/xfrm_output.c
 +++ b/net/xfrm/xfrm_output.c
-@@ -612,6 +612,40 @@ int xfrm_output_resume(struct sock *sk, struct sk_buff *skb, int err)
- }
- EXPORT_SYMBOL_GPL(xfrm_output_resume);
+@@ -799,7 +799,7 @@ int xfrm_output(struct sock *sk, struct sk_buff *skb)
+ 		skb->encapsulation = 1;
  
-+static int xfrm_dev_direct_output(struct sock *sk, struct xfrm_state *x,
-+				  struct sk_buff *skb)
-+{
-+	struct dst_entry *dst = skb_dst(skb);
-+	struct net *net = xs_net(x);
-+	int err;
-+
-+	dst = skb_dst_pop(skb);
-+	if (!dst) {
-+		XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
-+		kfree_skb(skb);
-+		return -EHOSTUNREACH;
-+	}
-+	skb_dst_set(skb, dst);
-+	nf_reset_ct(skb);
-+
-+	err = skb_dst(skb)->ops->local_out(net, sk, skb);
-+	if (unlikely(err != 1)) {
-+		kfree_skb(skb);
-+		return err;
-+	}
-+
-+	/* In transport mode, network destination is
-+	 * directly reachable, while in tunnel mode,
-+	 * inner packet network may not be. In packet
-+	 * offload type, HW is responsible for hard
-+	 * header packet mangling so directly xmit skb
-+	 * to netdevice.
-+	 */
-+	skb->dev = x->xso.dev;
-+	__skb_push(skb, skb->dev->hard_header_len);
-+	return dev_queue_xmit(skb);
-+}
-+
- static int xfrm_output2(struct net *net, struct sock *sk, struct sk_buff *skb)
- {
- 	return xfrm_output_resume(sk, skb, 1);
-@@ -735,6 +769,13 @@ int xfrm_output(struct sock *sk, struct sk_buff *skb)
- 			return -EHOSTUNREACH;
- 		}
+ 		if (skb_is_gso(skb)) {
+-			if (skb->inner_protocol)
++			if (skb->inner_protocol && x->props.mode == XFRM_MODE_TUNNEL)
+ 				return xfrm_output_gso(net, sk, skb);
  
-+		/* Exclusive direct xmit for tunnel mode, as
-+		 * some filtering or matching rules may apply
-+		 * in transport mode.
-+		 */
-+		if (x->props.mode == XFRM_MODE_TUNNEL)
-+			return xfrm_dev_direct_output(sk, x, skb);
-+
- 		return xfrm_output_resume(sk, skb, 0);
- 	}
- 
+ 			skb_shinfo(skb)->gso_type |= SKB_GSO_ESP;
 -- 
 2.34.1
 
