@@ -1,193 +1,165 @@
-Return-Path: <netdev+bounces-176152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E2C9A691C7
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 15:57:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5649A6925A
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 16:08:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B15E7AEC1B
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 14:54:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1AAD1B65F75
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 14:51:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CA231C84C1;
-	Wed, 19 Mar 2025 14:49:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BDE7221F38;
+	Wed, 19 Mar 2025 14:40:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FybiXmq4"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="cta2hvLK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7608F1C4A24;
-	Wed, 19 Mar 2025 14:49:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3415018BC36
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 14:40:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742395755; cv=none; b=Fti/gKfu66lSYLl/T/9sAaY5ibFi70jkgMfb/ggm19kF/v3GuxCDxTHeUPGcexDKduSUmqDp0xaHoKh1lHfDAUUKVdLELoAW3HCK9hqqbrDi5JRFqLjWdXWcy/2VUruU0QNYn8c2PHQYUSwfokM7LXbewfi0o6SrJenVjpEi7JY=
+	t=1742395248; cv=none; b=cN9UHAcPtSuIpVWjoP2Aud0Rt76ayM4ICtHvR6kI7AFiT7Rw65qri2hil54DxBABWiCZTMyDpGMNpyGZ/A2+5H57csajsvtxFEs+7qZj5BSJ91NDv2sF2DNKkYFbyyzbtccMVXPy6jEV6ErsJajOdkGNjmM4yxTuCYvrqpug/ss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742395755; c=relaxed/simple;
-	bh=IgqdygoDFkNgkx3Pd8VQh6/rq2Y3/f/9Yb1pi8jeRks=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=JbZ5YadqFmTw/ws3njDJgwgBc01pRAR5eHC3klpM5fl4s6frc4F4UWiQAQ30SyIH/gHexsvv+wPWi1+ji89ltU8jxzo9vZ11O0qfYlmhKYKb/556SV0iEPWQ6Fb6NUDM2Oys4dRRORGo1xxo+U2cfOp603L9JtTkgsTtP0eDJo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FybiXmq4; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6e8fd49b85eso16972746d6.0;
-        Wed, 19 Mar 2025 07:49:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742395752; x=1743000552; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SQTPTxM0JT11SSMTW8cQivSj7lB8UZ8KUBStzQyLTrk=;
-        b=FybiXmq4RO9e+/ka1N/Ar74nYb9uGf30FHZaP3tbLSlQGPTUR8QE1opnoZgnnU0RNN
-         VBwLGd4Sb+0q4nIzxAPyXcVDbEp3zMB0YLXS8QmkyM65hnr+2ncWVRugWa7MxTjTaEc9
-         OmRpp/nvyRppjoTX/D+iLZeOgs6IdWXm/wKguZ5F6XwSxnHk9V09Gf5/JbVN1owklIiH
-         AGZDX9Y7rNvgSSw5HYdMSXCxSjAx+9lSV+uEc1Y5ZEXMIkiSnVt9updudjnfGTW68IiH
-         xAvTCz4ofqbiNG/CCXdHxv/t/EQqEnW0Ka5k+ND2RnA/ditKyfsbbyKJLTXTvql3lExT
-         C4aA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742395752; x=1743000552;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=SQTPTxM0JT11SSMTW8cQivSj7lB8UZ8KUBStzQyLTrk=;
-        b=Dw/uDrbEau66stRz2Q2qViBNAThv7jum0G3U1C4eAmMZue5SLhSe6KlVUiO/M+DqCK
-         jJ6uh1WY3aprTeTYw8io+jlDkkhcgW6IAqcmJKg7dppNZd+iblbgItIJn0K4jVnMzsvv
-         7Tct2hRtOgDHUlKNJqkxpyVwBYxska7RSuDI23rsvrbj7V15SM9q89v1hekJmfCf7c7q
-         9Ncrnx3ESPQTTSUyvn0+fo1iWyTj/Eh1gB1IiZN1KEFnf/hls8ZUOIILc9whQNJu7aBM
-         zLUz+Rakpj7UL7qfgAwdUziuWnB/Gbjdh+R/plVVA0aTKFNeJSmPqMQMojiwITi1zafc
-         XChg==
-X-Forwarded-Encrypted: i=1; AJvYcCUh4/zTuSnv9aq+zzDIChFhK1dQwSQK6AvR2PUm8sIF3lvVvNaMtwaxXEenPZcXTwz9stGV+AZ9KdJB1zOfUFU=@vger.kernel.org, AJvYcCV/frI6a8qNsmsa/6qEggAoBqBOMpDByhu74En6yJ0QLVqS/XMLi7biHPhtFbMr4sXyFXCKHW40@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxy1hKAF1zePyBeRtDHcSrBaw7oIRn4i0GP3NreRgeAjfUGQFRb
-	lM9OlLquPuIddaR5o74jhOyxv2tUveGm1LknmBB81M2NJSuxu7+Jw3Bn2w==
-X-Gm-Gg: ASbGncvOpproZxV8UZZ0VX6QzePd7qcpl1mhGi49FXXswWpIW6TMpfBRsXO+28FU5Yu
-	5rw3g62IAhDBnDAW9xy+Jh6PEOKN8gXQFgbLCe+q1JyxpcwklVqxLj1udpOLarXqTujQyaHb/oL
-	akwmiWDLPTd/Zb6L6EiwS1JZu4/P0+WgAFSXXOp+xS+iFyqh0wEIEQ06Bz6oR9QyG0vS9wE5RVb
-	DVXr0X/ImC9v1W3WREQ4Rm66D+kadLbcs+K2iDGqu2cUwX1U0XfKzItDKqam2PQIVO6qPxmYQzJ
-	LE1PEcSPk5MiNZVZeCN5CrYYBSE+rcC+reuMhMOgK+C4Hihp9WR8wlITyz1X2B7dDAJMi7Ujx7O
-	2W+Y+tFM1hadAHincEfd9Kw==
-X-Google-Smtp-Source: AGHT+IECNHCRRJCTPE5ymJeNjONA3wR4/ZXwaHa5hu3l6CGS1uSHgFotC5xcZKcHUyoF2AHdSp7/HA==
-X-Received: by 2002:a05:6214:27e4:b0:6e8:fb7e:d33a with SMTP id 6a1803df08f44-6eb293a9a0dmr40013316d6.22.1742395752111;
-        Wed, 19 Mar 2025 07:49:12 -0700 (PDT)
-Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6eade330cf4sm81407196d6.77.2025.03.19.07.49.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Mar 2025 07:49:11 -0700 (PDT)
-Date: Wed, 19 Mar 2025 10:49:11 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Pauli Virtanen <pav@iki.fi>, 
- linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- netdev@vger.kernel.org, 
- davem@davemloft.net, 
- kuba@kernel.org, 
- willemdebruijn.kernel@gmail.com
-Message-ID: <67dad9672e000_5948294b6@willemb.c.googlers.com.notmuch>
-In-Reply-To: <af69c75a4d38e42bb11b344defc96adc5f703357.1742324341.git.pav@iki.fi>
-References: <cover.1742324341.git.pav@iki.fi>
- <af69c75a4d38e42bb11b344defc96adc5f703357.1742324341.git.pav@iki.fi>
-Subject: Re: [PATCH v5 3/5] Bluetooth: ISO: add TX timestamping
+	s=arc-20240116; t=1742395248; c=relaxed/simple;
+	bh=5+MdBONT2Z86+wRNgyVp5i4U5Io3huGwrljcG1qfHME=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZjYYxXjdrz2sgzSYoQkNW8uMRg6V3sdzgslKps1dwhiBUVIsam5FPU1HBA9iuVMQap37t5z9Gm/dvsVJ4SGD3YgxtDrRpatcHxvRgYcoT4N85j5kLoX/106QKiN2Mf2gHHkXUR3MgTeNirKijvxIqxGQ18QPWyCTOSbuL76bx34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=cta2hvLK; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=t/+U/hbAbb/POoeMUCupIg+jDDe7uDYkjKNPuQ5v79k=; b=cta2hvLK5Xjd0hhLsR3PNr/fA4
+	3qByGjrfy+Efj3Pic7IcbhMmuVXnUfwi28praEtyxK0g42ruaRyVctlPYR/I5+LUgDG9VabBEclgn
+	detFw5IrKD19tBQUEXrY/rlJF1do4/idtw6n2CgpOWyLPVIKMQ6FLXZl4tOjruOV6cvxAxIFoVlai
+	CNe6D77R3RgdwbnG8Un6K/EHSZWyhDlBgEWGHCVbUyFj2CO5p0G4JwBWQuSJE21C+FpIQn5vaG0eM
+	gUqs0yqoMDd6ogg3bucgPV8Tqev2j02W+G9kdZvuw9mQW2R4YIY4WNuXw7tl8EC1jH3UU1bfIY+4C
+	gv6cutpw==;
+Received: from sslproxy04.your-server.de ([78.46.152.42])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1tuuLJ-00069D-12;
+	Wed, 19 Mar 2025 15:24:25 +0100
+Received: from [178.197.248.12] (helo=[192.168.1.114])
+	by sslproxy04.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1tuuLI-000Apu-16;
+	Wed, 19 Mar 2025 15:24:24 +0100
+Message-ID: <9b1a6360-7228-4310-b000-0273a50ab38d@iogearbox.net>
+Date: Wed, 19 Mar 2025 15:24:23 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/mlx5e: Fix ethtool -N flow-type ip4 to RSS
+ context
+To: Maxim Mikityanskiy <maxtram95@gmail.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, Maxim Mikityanskiy <maxim@isovalent.com>
+References: <20250319124508.3979818-1-maxim@isovalent.com>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <20250319124508.3979818-1-maxim@isovalent.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 1.0.7/27582/Wed Mar 19 10:41:59 2025)
 
-Pauli Virtanen wrote:
-> Add BT_SCM_ERROR socket CMSG type.
+On 3/19/25 1:45 PM, Maxim Mikityanskiy wrote:
+> There commands can be used to add an RSS context and steer some traffic
+> into it:
 > 
-> Support TX timestamping in ISO sockets.
+>      # ethtool -X eth0 context new
+>      New RSS context is 1
+>      # ethtool -N eth0 flow-type ip4 dst-ip 1.1.1.1 context 1
+>      Added rule with ID 1023
 > 
-> Support MSG_ERRQUEUE in ISO recvmsg.
+> However, the second command fails with EINVAL on mlx5e:
 > 
-> If a packet from sendmsg() is fragmented, only the first ACL fragment is
-> timestamped.
+>      # ethtool -N eth0 flow-type ip4 dst-ip 1.1.1.1 context 1
+>      rmgr: Cannot insert RX class rule: Invalid argument
+>      Cannot insert classification rule
 > 
-> Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> ---
+> It happens when flow_get_tirn calls flow_type_to_traffic_type with
+> flow_type = IP_USER_FLOW or IPV6_USER_FLOW. That function only handles
+> IPV4_FLOW and IPV6_FLOW cases, but unlike all other cases which are
+> common for hash and spec, IPv4 and IPv6 defines different contants for
+> hash and for spec:
 > 
-> Notes:
->     v5:
->     - use sockcm_init -> hci_sockcm_init
+>      #define	TCP_V4_FLOW	0x01	/* hash or spec (tcp_ip4_spec) */
+>      #define	UDP_V4_FLOW	0x02	/* hash or spec (udp_ip4_spec) */
+>      ...
+>      #define	IPV4_USER_FLOW	0x0d	/* spec only (usr_ip4_spec) */
+>      #define	IP_USER_FLOW	IPV4_USER_FLOW
+>      #define	IPV6_USER_FLOW	0x0e	/* spec only (usr_ip6_spec; nfc only) */
+>      #define	IPV4_FLOW	0x10	/* hash only */
+>      #define	IPV6_FLOW	0x11	/* hash only */
 > 
->  include/net/bluetooth/bluetooth.h |  1 +
->  net/bluetooth/iso.c               | 24 ++++++++++++++++++++----
->  2 files changed, 21 insertions(+), 4 deletions(-)
+> Extend the switch in flow_type_to_traffic_type to support both, which
+> fixes the failing ethtool -N command with flow-type ip4 or ip6.
 > 
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index 435250c72d56..bbefde319f95 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -156,6 +156,7 @@ struct bt_voice {
->  #define BT_PKT_STATUS           16
->  
->  #define BT_SCM_PKT_STATUS	0x03
-> +#define BT_SCM_ERROR		0x04
->  
->  #define BT_ISO_QOS		17
->  
-> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-> index 0cb52a3308ba..3501a991f1c6 100644
-> --- a/net/bluetooth/iso.c
-> +++ b/net/bluetooth/iso.c
-> @@ -518,7 +518,8 @@ static struct bt_iso_qos *iso_sock_get_qos(struct sock *sk)
->  	return &iso_pi(sk)->qos;
->  }
->  
-> -static int iso_send_frame(struct sock *sk, struct sk_buff *skb)
-> +static int iso_send_frame(struct sock *sk, struct sk_buff *skb,
-> +			  const struct sockcm_cookie *sockc)
->  {
->  	struct iso_conn *conn = iso_pi(sk)->conn;
->  	struct bt_iso_qos *qos = iso_sock_get_qos(sk);
-> @@ -538,10 +539,12 @@ static int iso_send_frame(struct sock *sk, struct sk_buff *skb)
->  	hdr->slen = cpu_to_le16(hci_iso_data_len_pack(len,
->  						      HCI_ISO_STATUS_VALID));
->  
-> -	if (sk->sk_state == BT_CONNECTED)
-> +	if (sk->sk_state == BT_CONNECTED) {
-> +		hci_setup_tx_timestamp(skb, 1, sockc);
->  		hci_send_iso(conn->hcon, skb);
-> -	else
-> +	} else {
->  		len = -ENOTCONN;
-> +	}
->  
->  	return len;
->  }
-> @@ -1348,6 +1351,7 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
->  {
->  	struct sock *sk = sock->sk;
->  	struct sk_buff *skb, **frag;
-> +	struct sockcm_cookie sockc;
->  	size_t mtu;
->  	int err;
->  
-> @@ -1360,6 +1364,14 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
->  	if (msg->msg_flags & MSG_OOB)
->  		return -EOPNOTSUPP;
->  
-> +	hci_sockcm_init(&sockc, sk);
-> +
-> +	if (msg->msg_controllen) {
-> +		err = sock_cmsg_send(sk, msg, &sockc);
-> +		if (err)
-> +			return err;
-> +	}
-> +
+> Fixes: 248d3b4c9a39 ("net/mlx5e: Support flow classification into RSS contexts")
+> Signed-off-by: Maxim Mikityanskiy <maxim@isovalent.com>
 
-Minor: do you want to return an error if the process set unexpected
-sockc fields?
+Awesome, thanks Max!
 
-If allowing to set them now, but ignoring them, it will be harder to
-support them later. As then it will result in a kernel behavioral
-change for the same sendmsg() call.
-
-Though I suppose that is already the case if all cmsg are ignored
-currently. So fine to keep if you don't care.
+Tested-by: Daniel Borkmann <daniel@iogearbox.net>
 
