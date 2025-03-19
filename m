@@ -1,95 +1,126 @@
-Return-Path: <netdev+bounces-176176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73F56A69417
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 16:52:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 309A1A69423
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 16:55:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57EEC3B81BD
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 15:46:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 322B53BD636
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 15:49:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 827901DC9A7;
-	Wed, 19 Mar 2025 15:46:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="MOuzlnOG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B08D5195811;
+	Wed, 19 Mar 2025 15:49:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FDE21D5142;
-	Wed, 19 Mar 2025 15:46:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 151B81AA1C9;
+	Wed, 19 Mar 2025 15:49:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742399218; cv=none; b=KDnLfzBgxsy+lsEKrWmGHsVh9bNgcEDUXwGKWYx4CW0rGD+LclqXAfbXSg8DQn8WiStXEvsj5v55rX0kt9rLKxWAmAzJQgEb6RnwYZjyEpvwt54OWItE0szqkjUQ485yHDkv0XhQcSfwQmhuwfUpiefj+Hwh4a4yq7xaiP76PMc=
+	t=1742399351; cv=none; b=BqZilodVd4YCq2cUusE1Nnqqkv8YMsZGXcG5GXOs5tFba9b5VF61LYFHTO4uUlZEPaGKD27JTZ8p1USvkIgkpDWgWqmiqKmw8t78r4s296uMbG9Zqw+muwt/ZYhC+MdG7Ab0UO01SyOq0Y1q99XpSbR2XWzEVEuEuq4Xp8xNyYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742399218; c=relaxed/simple;
-	bh=aMbtdvd7lPx3VzMWnSDe0in/nBa9AF22jEaDljtoGGk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qWapF54HiL/psog7VJ/rIHAqzD8pvFEoxDUqtUS8oIcfoYSO9x244NILuIgb0MpkhaAWILSsnPhZW2elZ7twhYy1ndw9kjgTra+uQqA1Sp4C9upr4ubRXZ95/eMKAugA595QAa0e59zFN3e7AED9t6Oe7X7Dh9jggrzJHJD643A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=MOuzlnOG; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=+qJlruxx2j9t0DthHj7xMEyCL4PZ6YK/QOIB1zY+fZU=; b=MOuzlnOGG9bQxnE4Akg9HZDLH5
-	UqqFWBcRCRju3nH/550uQUvRg1vX2x2OGFbtTBF6+7x+7ubiH1qxPcrg2G1FejbBIL7u1af12v1+d
-	r4jRG8FDkfhUsDEWLtG9VvpRrxqceGKjREXnpov970GJ8f67/fRcmrKxawr3qZ1bwJ507rEmiQg8Y
-	0vuKw8NFmj2eW1tbwS6kqcWGXr/w8Lr+po1/UMZE9MGE3uuDIDSSlFZDETzCGoJBU9HTGQqVSNKqF
-	BzuCwWPdr35ELcPl1/8Qm8qWuSFtagsHmrAzu05mLFZpB955kAUhZ1nsBqDd1XmgR7/Jv0k1B8Wjy
-	Ck8W0+QQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38252)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tuvd5-0006cu-11;
-	Wed, 19 Mar 2025 15:46:51 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tuvd2-0005jS-1G;
-	Wed, 19 Mar 2025 15:46:48 +0000
-Date: Wed, 19 Mar 2025 15:46:48 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [PATCH net v2 1/2] net: phy: Fix formatting specifier to avoid
- potential string cuts
-Message-ID: <Z9rm6NYEQpbo4-pz@shell.armlinux.org.uk>
-References: <20250319105813.3102076-1-andriy.shevchenko@linux.intel.com>
- <20250319105813.3102076-2-andriy.shevchenko@linux.intel.com>
+	s=arc-20240116; t=1742399351; c=relaxed/simple;
+	bh=CcImMfT7vEa1FvA1efo7PNdGOeWk31nKJQpHEzFDTYM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mUWjMqo6Rnbbmrt8gg4MKIU007/fvJfpTjl7jG5V5FVUqllP3XMSG1pCG4jzh2n1m/43h/gtXHTejQn++0WNysCYkIlpf8HxUO3tR5VmHeeK4fwzr4GLxcuCAo4+RqXR7qj0bsl80TJAMyDHH63UdJdm60ePZYLvisfBrqeTpKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.43] (g43.guest.molgen.mpg.de [141.14.220.43])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 1CE1561E647AE;
+	Wed, 19 Mar 2025 16:48:27 +0100 (CET)
+Message-ID: <6cf69a7e-da5d-49da-ab05-4523f2914254@molgen.mpg.de>
+Date: Wed, 19 Mar 2025 16:48:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250319105813.3102076-2-andriy.shevchenko@linux.intel.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 1/5] net-timestamp: COMPLETION timestamp on packet tx
+ completion
+To: Pauli Virtanen <pav@iki.fi>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ davem@davemloft.net, kuba@kernel.org, willemdebruijn.kernel@gmail.com
+References: <cover.1742324341.git.pav@iki.fi>
+ <0dfb22ec3c9d9ed796ba8edc919a690ca2fb1fdd.1742324341.git.pav@iki.fi>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <0dfb22ec3c9d9ed796ba8edc919a690ca2fb1fdd.1742324341.git.pav@iki.fi>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Mar 19, 2025 at 12:54:33PM +0200, Andy Shevchenko wrote:
-> -#define PHY_ID_FMT "%s:%02x"
-> +#define PHY_ID_FMT "%s:%02hhx"
+Dear Pauli,
 
-I was going to state whether it is correct to use hh with an "int"
-argument, as printf() suggests its only for use with arguments of
-type 'signed char' and 'unsigned char'. My suspicion has been
-confirmed by the warning the kbuild bot has just reported.
 
-It seems this is not a correct fix for the problem you report.
+Thank you for your patch. Two minor comments, should you resend.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+You could make the summary/title a statement:
+
+Add COMPLETION timestamp on packet tx completion
+
+Am 18.03.25 um 20:06 schrieb Pauli Virtanen:
+> Add SOF_TIMESTAMPING_TX_COMPLETION, for requesting a software timestamp
+> when hardware reports a packet completed.
+> 
+> Completion tstamp is useful for Bluetooth, as hardware timestamps do not
+> exist in the HCI specification except for ISO packets, and the hardware
+> has a queue where packets may wait.  In this case the software SND
+> timestamp only reflects the kernel-side part of the total latency
+> (usually small) and queue length (usually 0 unless HW buffers
+> congested), whereas the completion report time is more informative of
+> the true latency.
+> 
+> It may also be useful in other cases where HW TX timestamps cannot be
+> obtained and user wants to estimate an upper bound to when the TX
+> probably happened.
+> 
+> Signed-off-by: Pauli Virtanen <pav@iki.fi>
+> ---
+> 
+> Notes:
+>      v5:
+>      - back to decoupled COMPLETION & SND, like in v3
+>      - BPF reporting not implemented here
+> 
+>   Documentation/networking/timestamping.rst | 8 ++++++++
+>   include/linux/skbuff.h                    | 7 ++++---
+>   include/uapi/linux/errqueue.h             | 1 +
+>   include/uapi/linux/net_tstamp.h           | 6 ++++--
+>   net/core/skbuff.c                         | 2 ++
+>   net/ethtool/common.c                      | 1 +
+>   net/socket.c                              | 3 +++
+>   7 files changed, 23 insertions(+), 5 deletions(-)
+> 
+> diff --git a/Documentation/networking/timestamping.rst b/Documentation/networking/timestamping.rst
+> index 61ef9da10e28..b8fef8101176 100644
+> --- a/Documentation/networking/timestamping.rst
+> +++ b/Documentation/networking/timestamping.rst
+> @@ -140,6 +140,14 @@ SOF_TIMESTAMPING_TX_ACK:
+>     cumulative acknowledgment. The mechanism ignores SACK and FACK.
+>     This flag can be enabled via both socket options and control messages.
+>   
+> +SOF_TIMESTAMPING_TX_COMPLETION:
+> +  Request tx timestamps on packet tx completion.  The completion
+> +  timestamp is generated by the kernel when it receives packet a
+> +  completion report from the hardware. Hardware may report multiple
+
+… receives packate a completion … sounds strange to me, but I am a 
+non-native speaker.
+
+[…]
+
+
+Kind regards,
+
+Paul
 
