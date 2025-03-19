@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-176309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C74F9A69B23
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 22:46:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24E74A69B1D
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 22:45:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F98919C14FB
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 21:45:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C40A8A7D8E
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 21:45:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F7DB21C183;
-	Wed, 19 Mar 2025 21:44:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C10321CA0E;
+	Wed, 19 Mar 2025 21:44:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b="VcuNJrRL"
+	dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b="byfZ3iuX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.forwardemail.net (smtp.forwardemail.net [121.127.44.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CBD921B9D3
-	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 21:44:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67D4321C9FE
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 21:44:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=121.127.44.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742420683; cv=none; b=m82jV14u5OgYU5GbgsIDFvsgE3H5BKDeosgh2AoPwHomqGSffACNg4DfV9IP16gXlleB+AyqBljrrojbPesg0lXf+LiG/VC36xn5QPTE2h5HYQd9D+zhmyUmE9UtQPKa+XOSv28stMtB178/wO94QqHQtUVIcPv1Su/vFk1OgiU=
+	t=1742420688; cv=none; b=fxr/aj4xsY6m2W2d203q805kjlSs1bya9gSWKjj15R5ElpwkuvsFDWv64eLAZrnPOsOPFMSsRd1/DPzHzBGvJ1BxgB19rtUQvIzYvX3ztT15rWHB0X4ICZUjJHZzQ/aQMWv7jF4YMgwMs3yeC0MWiugGxpsBdfgj529p640k3Gc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742420683; c=relaxed/simple;
-	bh=Fl+aq8Mvjz3ooxv6suCHqop8ABQ0qBZjZCJn1N/hRp8=;
+	s=arc-20240116; t=1742420688; c=relaxed/simple;
+	bh=TtiUhFgUWksInvX29g3OQnmN5thhE+ROS7QR3501kDk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=roQ4LLDGouRKANK4EWj9Azm0UeBREzx5qXlbL+mx3/FXgn2e+SHRghSAGEXg7uVos+MJvLbejStqWvRf4zAKngVMx8x4tGQdPo0AbJ7XGv5ovjpCM1yXOF8QR4m1TcSWPMQ0/sga3OHz/rYFt6CTPftX0KGBQHJkEbiTBhhDPK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se; dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b=VcuNJrRL; arc=none smtp.client-ip=121.127.44.73
+	 MIME-Version; b=MAbwUNPKYnR1Gn0Iat7Xh/efD6Sh9tmWQIm9v7Y0vACx1NH5vAjlvChQb02l9YV+f2ZmW9lq/kTBB7IpRK3c+v7m0kBEUmfOTE6XI6BY5KWuRxZhl+eQAhHAxALGhZHT8Nrlq64ducSAIv4bBGYxSSV7OkynpmCU+Mnbouz96HY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se; dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b=byfZ3iuX; arc=none smtp.client-ip=121.127.44.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kwiboo.se;
  h=Content-Transfer-Encoding: MIME-Version: References: In-Reply-To:
  Message-ID: Date: Subject: Cc: To: From; q=dns/txt; s=fe-e1b5cab7be;
- t=1742420675; bh=e4NFTOlsV5jxXvuEThm27uRM0DY7QOxKSuqXbD4r5/4=;
- b=VcuNJrRLKjIKhYebjeJ019v3Ynai3BH1wc/3pSWoAI0BDEuU4ZsbotHIc4Uxejd0Rf6moQEag
- pRmFu7YiWG18TPlBxazz6BxTULyxSnCQMKlECO6eW0I30qfR3VKOZST8OIqm7xijcF7Nfk5OMaK
- SS0MfMGYBeDBoXTfWWS8A4mBOGsPCDlN1+xv8unl+GBiScnaM3qIW3LSlRoEAtP5Y3/mu+klBn+
- lhkx/KYH3zp8TXocZkIIV+PjgqUX0Q+G+FNViLSs6qhlmpnlwfgWv5cYElPMyCy+9YxZRro6VFo
- Y/WP9oOfzUD3pT5c5OayJx/dZ4r1NyOQurnwTXiEzVOQ==
-X-Forward-Email-ID: 67db3abfcf4d592372b99403
+ t=1742420680; bh=q4UCKRVSyCJCBN+wBNBmcB6bnhnKAJdDekZIqRUmYkM=;
+ b=byfZ3iuXMncdhO1BgXzjcvfPoxOItvMd1H32aimGeiozT7F1weat1WJBKd2Yf+Jk876Hm6Ab/
+ 0wVkEERbrWcTZtg/QHHusEAzoirhxnRDGIwXTsbwbFiCJX1CaYkTdytuIfkAejgD2a2S8WL8QCG
+ vKQd1Dr7waHnZDAluGcDLdD7AezkkwOUk9HhedjPpNMc7aOifCfkPj4DhAFL8F6iZsixbf4FK0P
+ alDharWShKn5DQrWO8WJFL2FVUa6DhxLfsOXxzYKgKxIa4ylXDFgD+ZvgzTcyQdK10Ivn1RP8sC
+ EDJ97jkErcAvsW4aU6OPG/mX60hrUWTO1TXyvvmPBPMA==
+X-Forward-Email-ID: 67db3ac4cf4d592372b99418
 X-Forward-Email-Sender: rfc822; jonas@kwiboo.se, smtp.forwardemail.net,
  121.127.44.73
 X-Forward-Email-Version: 0.4.40
@@ -56,7 +56,8 @@ To: Heiko Stuebner <heiko@sntech.de>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>
 Cc: Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
@@ -69,9 +70,9 @@ Cc: Rob Herring <robh@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	Jonas Karlman <jonas@kwiboo.se>,
 	linux-stm32@st-md-mailman.stormreply.com
-Subject: [PATCH net-next v3 2/5] net: stmmac: dwmac-rk: Add GMAC support for RK3528
-Date: Wed, 19 Mar 2025 21:44:06 +0000
-Message-ID: <20250319214415.3086027-3-jonas@kwiboo.se>
+Subject: [PATCH net-next v3 3/5] net: stmmac: dwmac-rk: Move integrated_phy_powerup/down functions
+Date: Wed, 19 Mar 2025 21:44:07 +0000
+Message-ID: <20250319214415.3086027-4-jonas@kwiboo.se>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250319214415.3086027-1-jonas@kwiboo.se>
 References: <20250319214415.3086027-1-jonas@kwiboo.se>
@@ -83,176 +84,130 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: David Wu <david.wu@rock-chips.com>
+Rockchip RK3528 (and RV1106) has a different integrated PHY compared to
+the integrated PHY on RK3228/RK3328. Current powerup/down operation is
+not compatible with the integrated PHY found in these SoCs.
 
-Rockchip RK3528 has two Ethernet controllers based on Synopsys DWC
-Ethernet QoS IP.
+Move the rk_gmac_integrated_phy_powerup/down functions to top of the
+file to prepare for them to be called directly by a GMAC variant
+specific powerup/down operation.
 
-Add initial support for the RK3528 GMAC variant.
-
-Signed-off-by: David Wu <david.wu@rock-chips.com>
 Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
 ---
 Changes in v3:
 - No change
 Changes in v2:
-- No change
-
-Power up/down of the integrated PHY is added in a separate patch.
+- New patch
 ---
- .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 132 ++++++++++++++++++
- 1 file changed, 132 insertions(+)
+ .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 88 +++++++++----------
+ 1 file changed, 44 insertions(+), 44 deletions(-)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-index c404017bc1da..dfb4668db4ee 100644
+index dfb4668db4ee..0321befed0d3 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-@@ -828,6 +828,137 @@ static const struct rk_gmac_ops rk3399_ops = {
- 	.set_rmii_speed = rk3399_set_rmii_speed,
+@@ -92,6 +92,50 @@ struct rk_priv_data {
+ 	(((tx) ? soc##_GMAC_TXCLK_DLY_ENABLE : soc##_GMAC_TXCLK_DLY_DISABLE) | \
+ 	 ((rx) ? soc##_GMAC_RXCLK_DLY_ENABLE : soc##_GMAC_RXCLK_DLY_DISABLE))
+ 
++#define RK_GRF_MACPHY_CON0		0xb00
++#define RK_GRF_MACPHY_CON1		0xb04
++#define RK_GRF_MACPHY_CON2		0xb08
++#define RK_GRF_MACPHY_CON3		0xb0c
++
++#define RK_MACPHY_ENABLE		GRF_BIT(0)
++#define RK_MACPHY_DISABLE		GRF_CLR_BIT(0)
++#define RK_MACPHY_CFG_CLK_50M		GRF_BIT(14)
++#define RK_GMAC2PHY_RMII_MODE		(GRF_BIT(6) | GRF_CLR_BIT(7))
++#define RK_GRF_CON2_MACPHY_ID		HIWORD_UPDATE(0x1234, 0xffff, 0)
++#define RK_GRF_CON3_MACPHY_ID		HIWORD_UPDATE(0x35, 0x3f, 0)
++
++static void rk_gmac_integrated_phy_powerup(struct rk_priv_data *priv)
++{
++	if (priv->ops->integrated_phy_powerup)
++		priv->ops->integrated_phy_powerup(priv);
++
++	regmap_write(priv->grf, RK_GRF_MACPHY_CON0, RK_MACPHY_CFG_CLK_50M);
++	regmap_write(priv->grf, RK_GRF_MACPHY_CON0, RK_GMAC2PHY_RMII_MODE);
++
++	regmap_write(priv->grf, RK_GRF_MACPHY_CON2, RK_GRF_CON2_MACPHY_ID);
++	regmap_write(priv->grf, RK_GRF_MACPHY_CON3, RK_GRF_CON3_MACPHY_ID);
++
++	if (priv->phy_reset) {
++		/* PHY needs to be disabled before trying to reset it */
++		regmap_write(priv->grf, RK_GRF_MACPHY_CON0, RK_MACPHY_DISABLE);
++		if (priv->phy_reset)
++			reset_control_assert(priv->phy_reset);
++		usleep_range(10, 20);
++		if (priv->phy_reset)
++			reset_control_deassert(priv->phy_reset);
++		usleep_range(10, 20);
++		regmap_write(priv->grf, RK_GRF_MACPHY_CON0, RK_MACPHY_ENABLE);
++		msleep(30);
++	}
++}
++
++static void rk_gmac_integrated_phy_powerdown(struct rk_priv_data *priv)
++{
++	regmap_write(priv->grf, RK_GRF_MACPHY_CON0, RK_MACPHY_DISABLE);
++	if (priv->phy_reset)
++		reset_control_assert(priv->phy_reset);
++}
++
+ #define PX30_GRF_GMAC_CON1		0x0904
+ 
+ /* PX30_GRF_GMAC_CON1 */
+@@ -1463,50 +1507,6 @@ static const struct rk_gmac_ops rv1126_ops = {
+ 	.set_rmii_speed = rv1126_set_rmii_speed,
  };
  
-+#define RK3528_VO_GRF_GMAC_CON		0x0018
-+#define RK3528_VO_GRF_MACPHY_CON0	0x001c
-+#define RK3528_VO_GRF_MACPHY_CON1	0x0020
-+#define RK3528_VPU_GRF_GMAC_CON5	0x0018
-+#define RK3528_VPU_GRF_GMAC_CON6	0x001c
-+
-+#define RK3528_GMAC_RXCLK_DLY_ENABLE	GRF_BIT(15)
-+#define RK3528_GMAC_RXCLK_DLY_DISABLE	GRF_CLR_BIT(15)
-+#define RK3528_GMAC_TXCLK_DLY_ENABLE	GRF_BIT(14)
-+#define RK3528_GMAC_TXCLK_DLY_DISABLE	GRF_CLR_BIT(14)
-+
-+#define RK3528_GMAC_CLK_RX_DL_CFG(val)	HIWORD_UPDATE(val, 0xFF, 8)
-+#define RK3528_GMAC_CLK_TX_DL_CFG(val)	HIWORD_UPDATE(val, 0xFF, 0)
-+
-+#define RK3528_GMAC0_PHY_INTF_SEL_RMII	GRF_BIT(1)
-+#define RK3528_GMAC1_PHY_INTF_SEL_RGMII	GRF_CLR_BIT(8)
-+#define RK3528_GMAC1_PHY_INTF_SEL_RMII	GRF_BIT(8)
-+
-+#define RK3528_GMAC1_CLK_SELECT_CRU	GRF_CLR_BIT(12)
-+#define RK3528_GMAC1_CLK_SELECT_IO	GRF_BIT(12)
-+
-+#define RK3528_GMAC0_CLK_RMII_DIV2	GRF_BIT(3)
-+#define RK3528_GMAC0_CLK_RMII_DIV20	GRF_CLR_BIT(3)
-+#define RK3528_GMAC1_CLK_RMII_DIV2	GRF_BIT(10)
-+#define RK3528_GMAC1_CLK_RMII_DIV20	GRF_CLR_BIT(10)
-+
-+#define RK3528_GMAC1_CLK_RGMII_DIV1	(GRF_CLR_BIT(11) | GRF_CLR_BIT(10))
-+#define RK3528_GMAC1_CLK_RGMII_DIV5	(GRF_BIT(11) | GRF_BIT(10))
-+#define RK3528_GMAC1_CLK_RGMII_DIV50	(GRF_BIT(11) | GRF_CLR_BIT(10))
-+
-+#define RK3528_GMAC0_CLK_RMII_GATE	GRF_BIT(2)
-+#define RK3528_GMAC0_CLK_RMII_NOGATE	GRF_CLR_BIT(2)
-+#define RK3528_GMAC1_CLK_RMII_GATE	GRF_BIT(9)
-+#define RK3528_GMAC1_CLK_RMII_NOGATE	GRF_CLR_BIT(9)
-+
-+static void rk3528_set_to_rgmii(struct rk_priv_data *bsp_priv,
-+				int tx_delay, int rx_delay)
-+{
-+	regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5,
-+		     RK3528_GMAC1_PHY_INTF_SEL_RGMII);
-+
-+	regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5,
-+		     DELAY_ENABLE(RK3528, tx_delay, rx_delay));
-+
-+	regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON6,
-+		     RK3528_GMAC_CLK_RX_DL_CFG(rx_delay) |
-+		     RK3528_GMAC_CLK_TX_DL_CFG(tx_delay));
-+}
-+
-+static void rk3528_set_to_rmii(struct rk_priv_data *bsp_priv)
-+{
-+	if (bsp_priv->id == 1)
-+		regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5,
-+			     RK3528_GMAC1_PHY_INTF_SEL_RMII);
-+	else
-+		regmap_write(bsp_priv->grf, RK3528_VO_GRF_GMAC_CON,
-+			     RK3528_GMAC0_PHY_INTF_SEL_RMII |
-+			     RK3528_GMAC0_CLK_RMII_DIV2);
-+}
-+
-+static void rk3528_set_rgmii_speed(struct rk_priv_data *bsp_priv, int speed)
-+{
-+	struct device *dev = &bsp_priv->pdev->dev;
-+
-+	if (speed == 10)
-+		regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5,
-+			     RK3528_GMAC1_CLK_RGMII_DIV50);
-+	else if (speed == 100)
-+		regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5,
-+			     RK3528_GMAC1_CLK_RGMII_DIV5);
-+	else if (speed == 1000)
-+		regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5,
-+			     RK3528_GMAC1_CLK_RGMII_DIV1);
-+	else
-+		dev_err(dev, "unknown speed value for RGMII! speed=%d", speed);
-+}
-+
-+static void rk3528_set_rmii_speed(struct rk_priv_data *bsp_priv, int speed)
-+{
-+	struct device *dev = &bsp_priv->pdev->dev;
-+	unsigned int reg, val;
-+
-+	if (speed == 10)
-+		val = bsp_priv->id == 1 ? RK3528_GMAC1_CLK_RMII_DIV20 :
-+					  RK3528_GMAC0_CLK_RMII_DIV20;
-+	else if (speed == 100)
-+		val = bsp_priv->id == 1 ? RK3528_GMAC1_CLK_RMII_DIV2 :
-+					  RK3528_GMAC0_CLK_RMII_DIV2;
-+	else {
-+		dev_err(dev, "unknown speed value for RMII! speed=%d", speed);
-+		return;
-+	}
-+
-+	reg = bsp_priv->id == 1 ? RK3528_VPU_GRF_GMAC_CON5 :
-+				  RK3528_VO_GRF_GMAC_CON;
-+
-+	regmap_write(bsp_priv->grf, reg, val);
-+}
-+
-+static void rk3528_set_clock_selection(struct rk_priv_data *bsp_priv,
-+				       bool input, bool enable)
-+{
-+	unsigned int val;
-+
-+	if (bsp_priv->id == 1) {
-+		val = input ? RK3528_GMAC1_CLK_SELECT_IO :
-+			      RK3528_GMAC1_CLK_SELECT_CRU;
-+		val |= enable ? RK3528_GMAC1_CLK_RMII_NOGATE :
-+				RK3528_GMAC1_CLK_RMII_GATE;
-+		regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5, val);
-+	} else {
-+		val = enable ? RK3528_GMAC0_CLK_RMII_NOGATE :
-+			       RK3528_GMAC0_CLK_RMII_GATE;
-+		regmap_write(bsp_priv->grf, RK3528_VO_GRF_GMAC_CON, val);
-+	}
-+}
-+
-+static const struct rk_gmac_ops rk3528_ops = {
-+	.set_to_rgmii = rk3528_set_to_rgmii,
-+	.set_to_rmii = rk3528_set_to_rmii,
-+	.set_rgmii_speed = rk3528_set_rgmii_speed,
-+	.set_rmii_speed = rk3528_set_rmii_speed,
-+	.set_clock_selection = rk3528_set_clock_selection,
-+	.regs_valid = true,
-+	.regs = {
-+		0xffbd0000, /* gmac0 */
-+		0xffbe0000, /* gmac1 */
-+		0x0, /* sentinel */
-+	},
-+};
-+
- #define RK3568_GRF_GMAC0_CON0		0x0380
- #define RK3568_GRF_GMAC0_CON1		0x0384
- #define RK3568_GRF_GMAC1_CON0		0x0388
-@@ -1819,6 +1950,7 @@ static const struct of_device_id rk_gmac_dwmac_match[] = {
- 	{ .compatible = "rockchip,rk3366-gmac", .data = &rk3366_ops },
- 	{ .compatible = "rockchip,rk3368-gmac", .data = &rk3368_ops },
- 	{ .compatible = "rockchip,rk3399-gmac", .data = &rk3399_ops },
-+	{ .compatible = "rockchip,rk3528-gmac", .data = &rk3528_ops },
- 	{ .compatible = "rockchip,rk3568-gmac", .data = &rk3568_ops },
- 	{ .compatible = "rockchip,rk3576-gmac", .data = &rk3576_ops },
- 	{ .compatible = "rockchip,rk3588-gmac", .data = &rk3588_ops },
+-#define RK_GRF_MACPHY_CON0		0xb00
+-#define RK_GRF_MACPHY_CON1		0xb04
+-#define RK_GRF_MACPHY_CON2		0xb08
+-#define RK_GRF_MACPHY_CON3		0xb0c
+-
+-#define RK_MACPHY_ENABLE		GRF_BIT(0)
+-#define RK_MACPHY_DISABLE		GRF_CLR_BIT(0)
+-#define RK_MACPHY_CFG_CLK_50M		GRF_BIT(14)
+-#define RK_GMAC2PHY_RMII_MODE		(GRF_BIT(6) | GRF_CLR_BIT(7))
+-#define RK_GRF_CON2_MACPHY_ID		HIWORD_UPDATE(0x1234, 0xffff, 0)
+-#define RK_GRF_CON3_MACPHY_ID		HIWORD_UPDATE(0x35, 0x3f, 0)
+-
+-static void rk_gmac_integrated_phy_powerup(struct rk_priv_data *priv)
+-{
+-	if (priv->ops->integrated_phy_powerup)
+-		priv->ops->integrated_phy_powerup(priv);
+-
+-	regmap_write(priv->grf, RK_GRF_MACPHY_CON0, RK_MACPHY_CFG_CLK_50M);
+-	regmap_write(priv->grf, RK_GRF_MACPHY_CON0, RK_GMAC2PHY_RMII_MODE);
+-
+-	regmap_write(priv->grf, RK_GRF_MACPHY_CON2, RK_GRF_CON2_MACPHY_ID);
+-	regmap_write(priv->grf, RK_GRF_MACPHY_CON3, RK_GRF_CON3_MACPHY_ID);
+-
+-	if (priv->phy_reset) {
+-		/* PHY needs to be disabled before trying to reset it */
+-		regmap_write(priv->grf, RK_GRF_MACPHY_CON0, RK_MACPHY_DISABLE);
+-		if (priv->phy_reset)
+-			reset_control_assert(priv->phy_reset);
+-		usleep_range(10, 20);
+-		if (priv->phy_reset)
+-			reset_control_deassert(priv->phy_reset);
+-		usleep_range(10, 20);
+-		regmap_write(priv->grf, RK_GRF_MACPHY_CON0, RK_MACPHY_ENABLE);
+-		msleep(30);
+-	}
+-}
+-
+-static void rk_gmac_integrated_phy_powerdown(struct rk_priv_data *priv)
+-{
+-	regmap_write(priv->grf, RK_GRF_MACPHY_CON0, RK_MACPHY_DISABLE);
+-	if (priv->phy_reset)
+-		reset_control_assert(priv->phy_reset);
+-}
+-
+ static int rk_gmac_clk_init(struct plat_stmmacenet_data *plat)
+ {
+ 	struct rk_priv_data *bsp_priv = plat->bsp_priv;
 -- 
 2.49.0
 
