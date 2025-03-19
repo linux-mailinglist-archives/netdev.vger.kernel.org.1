@@ -1,111 +1,195 @@
-Return-Path: <netdev+bounces-176332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03FAFA69C2F
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 23:40:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D0D8A69C40
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 23:45:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD39E884FD8
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 22:39:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06C1E427B4F
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 22:45:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8395621C9F2;
-	Wed, 19 Mar 2025 22:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D97A221DB5;
+	Wed, 19 Mar 2025 22:45:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="awaNfGbp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BAWlRwpc"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 433F81D514B;
-	Wed, 19 Mar 2025 22:40:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5840E221DB2
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 22:45:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742424008; cv=none; b=mBi6PVyh5wCWDdBmSq3AUWSE2ZNG3llnzqLwYNIm50o4FAubOoTO9WvFC9/ttvByIY+6IpOWyNlWAgMvv5wtEyRuC7MlQk8B3ZfP/jbDFYSboMMdY3l15JLaJtqsk6zkXsSWvl4G0TMHPv4isbeXUz5Renwc//OKRRugd2CoCdg=
+	t=1742424338; cv=none; b=RdKWfeyu4+TgiapRnrrBEHYklkEdGDabMLcjIbymIP++Et2WHNBlaWt7W7IBkw9yaJk9epZLJlXUUNhLnDgNdi3k2DiPv8U1WK3x98SCLC4VHBICVqpGT6LfokLXtFWaG9ltArZH6/TAtTytpPW4czuZUlv+B9iWYREGjJtPtR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742424008; c=relaxed/simple;
-	bh=2uXPjstuKd5ETSY4ZLOwCzlCbA+Q99mIAJvMpF7vxsU=;
+	s=arc-20240116; t=1742424338; c=relaxed/simple;
+	bh=KZIjRBeYKCvqoZEHqvc9rJFfyPirsVK5LfzVOx0k8SQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=acO0qHOyGYd5Dz5vvToeiRovJl7/KJEjXSiVRYHNYVu2csrl1RA5OL/Phkb40ZI+TRkbK6hwSqIlvlK9ikBnny+FxNliVtA/t80KZs0y4altnljE0E01pgV8bIyTJc4htQSi2/xe44DMB8Mm0NxwrLs9vzLupojvso7nwsjXEYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=awaNfGbp; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=jTG3WnDFAfRFQDs0cUx1kwKiOP6BmpOLg7RMMJcqr7s=; b=awaNfGbpagVPUyFCmBEgPJBmul
-	e9tPJGuvyQX/cvhie0Gzen6w0UIqucPHwRQq7lqNasTTazFhe+DK60szAbKolzU3XYaHFyzt0or44
-	01eTmdmeu014tYZJcfTanw14k5yoqvo9Fh+IUWcXPUAuQyz34EHR/nWevIkioAIety70=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tv24e-006Q5Z-KP; Wed, 19 Mar 2025 23:39:44 +0100
-Date: Wed, 19 Mar 2025 23:39:44 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jonas Karlman <jonas@kwiboo.se>
-Cc: Heiko Stuebner <heiko@sntech.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=aiHKLzpswGdy7pFGeMSU98Tg2ai+DjQWb4b+kSN+exJmFxBoqc3T1vTVn+BLL/ypcIDT6AXN4boU9GDd5TWCN0UPVNE5B3R+j/4z/9LhNGXCvnHld/WPePnO2J1O//cZsV8BShPuAHD8JcEc+5YhjfrLRrMLX7/hsaLgELZSi0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BAWlRwpc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA651C4CEEA;
+	Wed, 19 Mar 2025 22:45:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742424337;
+	bh=KZIjRBeYKCvqoZEHqvc9rJFfyPirsVK5LfzVOx0k8SQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BAWlRwpc1WmhewpsgyV+RjCmko3tLFSE4Q6jYEkuFnmhA9LpclRzzOgdR5sil6gGD
+	 df9lPmd0p7EeJj/LCl5wha85Wp30W23LFL1p2LEdAUPeazsb5Uqif689epGxKTvgdb
+	 bGYX+9qRp8NZnxBH3fELYbyvz9xuutjGPWn2eLcOGDtawRB1JuZKWwjN4DnDpiysvn
+	 ppj1hiOFVYo1cLBJ+aPEXlf32h9Zzvu5GscU2cHPVv6evsE2EglynjWOTVbOJcS+AB
+	 9R5pDGfIV402gMa0NEOzDvkGTAv337x78SQxwGABk9zEQVVww5I7i5WI9IGJFa8bkR
+	 +nApQkGl4M25g==
+Date: Wed, 19 Mar 2025 15:45:36 -0700
+From: Saeed Mahameed <saeed@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	David Wu <david.wu@rock-chips.com>, Yao Zi <ziyao@disroot.org>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-rockchip@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH net-next v3 3/5] net: stmmac: dwmac-rk: Move
- integrated_phy_powerup/down functions
-Message-ID: <d7b3ec5c-2d74-4409-9894-8f2cb3e055f6@lunn.ch>
-References: <20250319214415.3086027-1-jonas@kwiboo.se>
- <20250319214415.3086027-4-jonas@kwiboo.se>
+	Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH net-next 01/14] devlink: define enum for attr types of
+ dynamic attributes
+Message-ID: <Z9tJEDfPK0HecSR5@x130>
+References: <20250228021227.871993-1-saeed@kernel.org>
+ <20250228021227.871993-2-saeed@kernel.org>
+ <20250306120545.GY3666230@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20250319214415.3086027-4-jonas@kwiboo.se>
+In-Reply-To: <20250306120545.GY3666230@kernel.org>
 
-On Wed, Mar 19, 2025 at 09:44:07PM +0000, Jonas Karlman wrote:
-> Rockchip RK3528 (and RV1106) has a different integrated PHY compared to
-> the integrated PHY on RK3228/RK3328. Current powerup/down operation is
-> not compatible with the integrated PHY found in these SoCs.
-> 
-> Move the rk_gmac_integrated_phy_powerup/down functions to top of the
-> file to prepare for them to be called directly by a GMAC variant
-> specific powerup/down operation.
-> 
-> Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
+On 06 Mar 12:05, Simon Horman wrote:
+>On Thu, Feb 27, 2025 at 06:12:14PM -0800, Saeed Mahameed wrote:
+>> From: Jiri Pirko <jiri@nvidia.com>
+>>
+>> Devlink param and health reporter fmsg use attributes with dynamic type
+>> which is determined according to a different type. Currently used values
+>> are NLA_*. The problem is, they are not part of UAPI. They may change
+>> which would cause a break.
+>>
+>> To make this future safe, introduce a enum that shadows NLA_* values in
+>> it and is part of UAPI.
+>>
+>> Also, this allows to possibly carry types that are unrelated to NLA_*
+>> values.
+>>
+>> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+>> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+>> ---
+>>  Documentation/netlink/specs/devlink.yaml | 23 ++++++++++++++++++
+>>  include/uapi/linux/devlink.h             | 17 ++++++++++++++
+>>  net/devlink/health.c                     | 17 ++++++++++++--
+>>  net/devlink/param.c                      | 30 ++++++++++++------------
+>>  4 files changed, 70 insertions(+), 17 deletions(-)
+>>
+>> diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
+>> index 09fbb4c03fc8..e99fc51856c5 100644
+>> --- a/Documentation/netlink/specs/devlink.yaml
+>> +++ b/Documentation/netlink/specs/devlink.yaml
+>> @@ -202,6 +202,29 @@ definitions:
+>>          name: exception
+>>        -
+>>          name: control
+>> +  -
+>> +    type: enum
+>> +    name: dyn_attr_type
+>> +    entries:
+>> +      -
+>> +        name: u8
+>> +        value: 1
+>> +      -
+>> +        name: u16
+>> +      -
+>> +        name: u32
+>> +      -
+>> +        name: u64
+>> +      -
+>> +        name: string
+>> +      -
+>> +        name: flag
+>> +      -
+>> +        name: nul_string
+>> +        value: 10
+>> +      -
+>> +        name: binary
+>> +  -
+^^^^^^^ extra empty type.. 
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+>
+>Hi Saeed,
+>
+>Thanks for these patches.
+>
+>Unfortunately the above seems to cause ynl-regen to blow up.
 
-> +#define RK_GRF_CON2_MACPHY_ID		HIWORD_UPDATE(0x1234, 0xffff, 0)
-> +#define RK_GRF_CON3_MACPHY_ID		HIWORD_UPDATE(0x35, 0x3f, 0)
-> +
-> +static void rk_gmac_integrated_phy_powerup(struct rk_priv_data *priv)
-> +{
-> +	if (priv->ops->integrated_phy_powerup)
-> +		priv->ops->integrated_phy_powerup(priv);
-> +
-> +	regmap_write(priv->grf, RK_GRF_MACPHY_CON0, RK_MACPHY_CFG_CLK_50M);
-> +	regmap_write(priv->grf, RK_GRF_MACPHY_CON0, RK_GMAC2PHY_RMII_MODE);
-> +
-> +	regmap_write(priv->grf, RK_GRF_MACPHY_CON2, RK_GRF_CON2_MACPHY_ID);
-> +	regmap_write(priv->grf, RK_GRF_MACPHY_CON3, RK_GRF_CON3_MACPHY_ID);
+Thanks Simon, good catch, there was an extra empty type added by mistake,
+see above, will remove in V2.
 
-I know you are just moving code around....
-
-Do you know what these MACPHY_ID are? I hope it is not what you get
-when you read PHY registers 2 and 3?
-
-	Andrew
+>I don't know why, but I see:
+>
+>  $ ./tools/net/ynl/ynl-regen.sh
+>  Traceback (most recent call last):
+>    File "/home/nipa/net-next/wt-1/tools/net/ynl/pyynl/ynl_gen_c.py", line 3074, in <module>
+>      main()
+>      ~~~~^^
+>    File "/home/nipa/net-next/wt-1/tools/net/ynl/pyynl/ynl_gen_c.py", line 2783, in main
+>      parsed = Family(args.spec, exclude_ops)
+>    File "/home/nipa/net-next/wt-1/tools/net/ynl/pyynl/ynl_gen_c.py", line 954, in __init__
+>      super().__init__(file_name, exclude_ops=exclude_ops)
+>      ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>    File "/home/nipa/net-next/wt-1/tools/net/ynl/pyynl/lib/nlspec.py", line 462, in __init__
+>      jsonschema.validate(self.yaml, schema)
+>      ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+>    File "/usr/lib/python3.13/site-packages/jsonschema/validators.py", line 1307, in validate
+>      raise error
+>  jsonschema.exceptions.ValidationError: None is not of type 'object'
+>
+>  ...
+>
+>Perhaps I need a newer version of jsonschema?
+>
+>
+>> diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
+>> index 9401aa343673..8cdd60eb3c43 100644
+>> --- a/include/uapi/linux/devlink.h
+>> +++ b/include/uapi/linux/devlink.h
+>> @@ -385,6 +385,23 @@ enum devlink_linecard_state {
+>>  	DEVLINK_LINECARD_STATE_MAX = __DEVLINK_LINECARD_STATE_MAX - 1
+>>  };
+>>
+>> +/**
+>> + * enum devlink_dyn_attr_type - Dynamic attribute type type.
+>
+>Perhaps this relates to auto-generation.
+>But I think the Kernel doc should also document the enum values:
+>DEVLINK_DYN_ATTR_TYPE_U8, ...
+>
+>> + */
+>> +enum devlink_dyn_attr_type {
+>> +	/* Following values relate to the internal NLA_* values */
+>> +	DEVLINK_DYN_ATTR_TYPE_U8 = 1,
+>> +	DEVLINK_DYN_ATTR_TYPE_U16,
+>> +	DEVLINK_DYN_ATTR_TYPE_U32,
+>> +	DEVLINK_DYN_ATTR_TYPE_U64,
+>> +	DEVLINK_DYN_ATTR_TYPE_STRING,
+>> +	DEVLINK_DYN_ATTR_TYPE_FLAG,
+>> +	DEVLINK_DYN_ATTR_TYPE_NUL_STRING = 10,
+>> +	DEVLINK_DYN_ATTR_TYPE_BINARY,
+>> +	__DEVLINK_DYN_ATTR_TYPE_CUSTOM_BASE = 0x80,
+>> +	/* Any possible custom types, unrelated to NLA_* values go below */
+>> +};
+>> +
+>>  enum devlink_attr {
+>>  	/* don't change the order or add anything between, this is ABI! */
+>>  	DEVLINK_ATTR_UNSPEC,
+>
+>...
 
