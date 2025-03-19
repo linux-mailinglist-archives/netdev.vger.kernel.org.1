@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-175964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 593C6A6813A
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 01:17:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6FC5A6813C
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 01:17:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6428C189624B
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 00:17:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23A3642525D
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 00:17:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3754194A44;
-	Wed, 19 Mar 2025 00:15:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B45F8195811;
+	Wed, 19 Mar 2025 00:15:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="gIVpTV15"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="TEXnBMMg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 116561494D9
-	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 00:15:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF048199223
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 00:15:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742343345; cv=none; b=JJYZYHIz0k/Bwu0pnVkGcMzyrJoGWMK9sBOAX7MPNWThYcfeE7z/wr4+EOtRAoBMiy5xpyVfY8L8hfRGiuXI4tbxXmu9fEgJMntO3aMl15Qo/pZteebYPi+fYFec4/ZHIJpjproj+cX/Mba1YCTPjVfqz/8bsaKVhhgNQTBfhtg=
+	t=1742343347; cv=none; b=VQNhAWgO7sKcFFhEjkt2udu7qOchn37pkJfXFXrtY9nU5yAUHe4y/clpRIV00l25pIAwrHKuixb82FrsYXjqoEGO9eBAk+t6DTlkloS1LQW2ns3wD5NET54OSC0HXF+zDr/jaedlf281stERqwq68mqeqq64qYQLl3+nIa+N8gc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742343345; c=relaxed/simple;
-	bh=SowAWf3suxdJmhbIj/+rpT/CNsAYNCCACOuR5s/3LGE=;
+	s=arc-20240116; t=1742343347; c=relaxed/simple;
+	bh=Fj2ZLr2NuM8eVI7Uv7KChJMeytj/MaTnY6KtSJCMWGg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cgCd0DEr7npH688DR6JwUCmbcxkJmOZPZnWHfpFESIVf0XIuJRczXrHxhf6FOYuT4l3dSnpiLJjltjuOk1IqShrP/Nx96+7JM7U/6vAxvOONShHkqFj8YDZgEO7E89r2HFwflOdEY48gBMhGCiJlYZngzh0hmPGVWn2DjJk6wEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=gIVpTV15; arc=none smtp.client-ip=209.85.214.179
+	 MIME-Version; b=VpEvhn3vrDO9xEpKGtMdKkKXNlJHOX8Mz7ODtJZ3px7U4v+g6G1gzpOPOWy1EIlqwPKTW9MsRrR8k57bRHH5tBwA/juBGV23UFHjG4ZuBqT2cLDkdZGwZyREzTSdrEX4uelu1UrQIeiTCu2FwzWs4d03xjOpXh38rppyMduhwu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=TEXnBMMg; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-22548a28d0cso18569675ad.3
-        for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 17:15:44 -0700 (PDT)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-22403cbb47fso118237835ad.0
+        for <netdev@vger.kernel.org>; Tue, 18 Mar 2025 17:15:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1742343343; x=1742948143; darn=vger.kernel.org;
+        d=fastly.com; s=google; t=1742343345; x=1742948145; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0BqxlSUPLPLK+n0IEZ/na32d+xFXeCa925E/NE7WMKY=;
-        b=gIVpTV15hhkkYilj5BypVWGWlzUL3CqQ72S1nz2FWsVuUY16SNpf5KQkU11mnaTAKn
-         1WaoeJcNBjDgCS32IwIWKfkUfCs3oFZs0wmmQtBRsXJzqoJr4KgKFKcmXmUWyDSv1UL4
-         BoqqJF1llr2ptP6/5CELh0Zkw4SLxiefAIwMU=
+        bh=AZik9d5yBmYj5s2FfgR/QYgFrjABkp7Ts2fZAz7VStI=;
+        b=TEXnBMMg1yHzHRSdTyjQ4M5eMSAi4cm6TcUSzBE4v7T1aqMx+wOwTc6oUD0kcfSZNL
+         VOJK8MM3qhNyS6dcx/4/9GrwYPJewhpfQwpVTCu/Ze7UO/jFMU8c9KVklQf7I6DLAnX1
+         spB1gN/5SZKx0xAUSD3s1COypqv7dwxz8dYBk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742343343; x=1742948143;
+        d=1e100.net; s=20230601; t=1742343345; x=1742948145;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0BqxlSUPLPLK+n0IEZ/na32d+xFXeCa925E/NE7WMKY=;
-        b=jTte6LrOgwdB+S77CT/Xlt9P2fAW9YD5Zt22dOAZ//hsXAm8sfeqfjmnAL+pxJDiqO
-         bVKMVuaU9rDvsYFYksLyKwjPsTP7vBWmth8c90SPHX3z2mPkBUsNDmSo5PpPaH/S97EV
-         12GUB6eNKLHA9fMB53ujGRykn0+hsgt2y+9TIlklwzenZMZsLajqSIhSFiPoAaWS0a5I
-         7cIDyVx+Vy8xwqcf9R4vj6hOtVeZ33j3QyTCByc9Puk+Ycxr4z40ZQnilc/YHOeSvyTf
-         szUNbQlVgrCOH5QergqAGevsTgZB0E2lyBTL8Lds/svgpGkTaGnwJtxE5Zm1CTV4mm2a
-         Y59g==
-X-Gm-Message-State: AOJu0YxwL0mX40Ec3kx9bvNKhyP2CrnOh1suM2Exct/g/dgA6oZfYTdP
-	kIpAdSYnlq2LEXYYmvWorIHx+zGCTygDjr6qWzd+V/m0pfZTerNafCAElE1FsYjFxo//+I8XuXp
-	fWcjD/jElkzRGLCcuh3N6YmotUp5GEaeOjvGimzKD0BxX8rHq5san4I4OIK8kgUNEmXAlsbiAWQ
-	cLT8111JXouUdI/tufcHXAExFozqKjgLo4qwM=
-X-Gm-Gg: ASbGncv2n50OtWnUt9W6aUM7bPiu4FIsdMrwEWzU0VrnD9E5hZl9rfK8N9gIebA56/S
-	wo+xIc3DvPliUX2EINEdCiPojMfzcQWbWZuH6wQ7uElFM7BUHVSq9mFEH9CU3WyQ8SsBrziJy6Z
-	KWCURWrcT+jhyhMpEH2s6dPHvDRts+IWiOOWSV9yp8xgM80GAIoAShW1T+1B5eM3SXHmDXZD9YO
-	gheIKTrfEAJlwAXEM5H318XW+Q84uufQQcCa7blo+xKizme3ABYzhWY9Wu53RqzhRoUJJGbuoAo
-	2UaCRJGn5niGlSMkdUz0gOJj54ty+aOn/900TgXtg89fNwt3PIaa
-X-Google-Smtp-Source: AGHT+IFxyw3nvWmVaD9tl0lJBbbnI8q3NC7K/P2umCsKr9U07OgWwl21w/NuymcNKusQI296uT0O6g==
-X-Received: by 2002:a17:903:1cb:b0:224:76f:9e45 with SMTP id d9443c01a7336-22649a3476fmr9616615ad.21.1742343343024;
-        Tue, 18 Mar 2025 17:15:43 -0700 (PDT)
+        bh=AZik9d5yBmYj5s2FfgR/QYgFrjABkp7Ts2fZAz7VStI=;
+        b=PUxHTVROMyB5QzfHWJf6vDEzxa42aNvrR8MooQw9qk73BzOm6TWnw3SlAsdVy5r2/W
+         GT0ATKLJus77i68/lD2NrHa/+fxU5fDngb3eMie60hfBdUE/wSfJxv9sSkDQ64lkx2rJ
+         SeHTX1u2XTrtx8dmbTK7CEm11wUvwDtJ5LuRZLattNuyeNsAksfgDVnYlUDqCoU4tH6T
+         hssljESq/d5bQuPZxH0bXoV71l9uIAtU/fe54FseUtJlIIQuhr/9g8mjB7Cp79RNorOD
+         fsNOG54k28KrYcmpE4wJnRLbIK004zdm51nzTFBSZsHBOHXiVhgKGYFwbhwmL5V2wPU9
+         zHxw==
+X-Gm-Message-State: AOJu0YznigD4qt5mpB3ey+lAmJYHDjF1c7zJhsk1k7uALquutQtQFhAy
+	TEBl3Z4v9oa3Q1+aclyQUEdb6zxrvl2pjc6CSH0ZAvHSGNmrY98PLvDTgBLH52KTRoYwHNRvly3
+	HD2o28EXv/Ropn4ewtVNiqqsDXJdywYkogcZHe8s1tTU1rQRkqheG4G1su9A3t1TzdrfvMJ3S+Z
+	iMZn3RcMhfYD59N1me6X5AD3RQ56pu2PravJw=
+X-Gm-Gg: ASbGncsv7uxXJzkgrV5BHcK4j9xTzjmpA+QeURnE7Fw6MCeR9AJVSXm6iTy4+YHYw6s
+	rr2K5ofgoqTUhRZboQlUIBsiQRwxDppSgUV13gvCyP8syuSoW2DdGqPUxOJa1B6BNpaIdzET4M/
+	Zifj0XeSGrKJGWRhS1cS8dTi4Dci7uey0is4rP+SPNVxRLBDDT6yYUcePbyQP+3xIEFzQIYrrf8
+	Bl4VMDeK2NOgcxznHp2107t5E3tKlXCIjIpx5rxNPnj6uU8Y3+exgAyl8knLBE4h89xZKpoTtGI
+	VERkzushJRbuuWsdjkWbEJRVsiV01HKZqbisOTzjsinbKzxddt6b
+X-Google-Smtp-Source: AGHT+IHOPH7tlvaKSgwzc5NrClMTJfkFBSLl86NoVpY2lwDOnHY3Yjh4FQI06/JOfl0Mx53H9CjTVw==
+X-Received: by 2002:a17:902:d4c9:b0:223:3bf6:7e64 with SMTP id d9443c01a7336-22649a33d25mr10033275ad.24.1742343344716;
+        Tue, 18 Mar 2025 17:15:44 -0700 (PDT)
 Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-225c68a4876sm101281375ad.70.2025.03.18.17.15.41
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-225c68a4876sm101281375ad.70.2025.03.18.17.15.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Mar 2025 17:15:42 -0700 (PDT)
+        Tue, 18 Mar 2025 17:15:44 -0700 (PDT)
 From: Joe Damato <jdamato@fastly.com>
 To: netdev@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -93,9 +93,9 @@ Cc: linux-kernel@vger.kernel.org,
 	jolsa@kernel.org,
 	linux-kselftest@vger.kernel.org,
 	Joe Damato <jdamato@fastly.com>
-Subject: [RFC -next 04/10] splice: Add SPLICE_F_ZC and attach ubuf
-Date: Wed, 19 Mar 2025 00:15:15 +0000
-Message-ID: <20250319001521.53249-5-jdamato@fastly.com>
+Subject: [RFC -next 05/10] fs: Add splice_write_sd to file operations
+Date: Wed, 19 Mar 2025 00:15:16 +0000
+Message-ID: <20250319001521.53249-6-jdamato@fastly.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250319001521.53249-1-jdamato@fastly.com>
 References: <20250319001521.53249-1-jdamato@fastly.com>
@@ -107,74 +107,103 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add the SPLICE_F_ZC flag and when it is set, allocate a ubuf and attach
-it to generate zerocopy notifications.
+Introduce splice_write_sd to file operations and export a new helper for
+sockets splice_to_socket_sd to pass through the splice_desc context
+allowing the allocated ubuf to be attached.
 
 Signed-off-by: Joe Damato <jdamato@fastly.com>
 ---
- fs/splice.c            | 20 ++++++++++++++++++++
- include/linux/splice.h |  3 ++-
- 2 files changed, 22 insertions(+), 1 deletion(-)
+ fs/splice.c            | 22 ++++++++++++++++++----
+ include/linux/fs.h     |  2 ++
+ include/linux/splice.h |  2 ++
+ net/socket.c           |  1 +
+ 4 files changed, 23 insertions(+), 4 deletions(-)
 
 diff --git a/fs/splice.c b/fs/splice.c
-index 1f27ce6d1c34..6dc60f47f84e 100644
+index 6dc60f47f84e..d08fa2a6d930 100644
 --- a/fs/splice.c
 +++ b/fs/splice.c
-@@ -875,6 +875,11 @@ static ssize_t splice_socket_generic(struct pipe_inode_info *pipe,
- 		if (out->f_flags & O_NONBLOCK)
- 			msg.msg_flags |= MSG_DONTWAIT;
- 
-+		if (unlikely(flags & SPLICE_F_ZC) && ubuf_info) {
-+			msg.msg_flags = MSG_ZEROCOPY;
-+			msg.msg_ubuf = ubuf_info;
-+		}
-+
- 		iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, bvec, bc,
- 			      len - remain);
- 		ret = sock_sendmsg(sock, &msg);
-@@ -1223,12 +1228,27 @@ static ssize_t do_splice_direct_actor(struct file *in, loff_t *ppos,
- 	if (unlikely(out->f_flags & O_APPEND))
- 		return -EINVAL;
- 
-+	if (unlikely(flags & SPLICE_F_ZC)) {
-+		struct socket *sock = sock_from_file(out);
-+		struct sock *sk = sock->sk;
-+		struct ubuf_info *ubuf_info;
-+
-+		ubuf_info = msg_zerocopy_realloc(sk, len, NULL);
-+		if (!ubuf_info)
-+			return -ENOMEM;
-+		sd.ubuf_info = ubuf_info;
-+	}
-+
- 	ret = splice_direct_to_actor(in, &sd, actor);
- 	if (ret > 0)
- 		*ppos = sd.pos;
- 
-+	if (unlikely(flags & SPLICE_F_ZC))
-+		refcount_dec(&sd.ubuf_info->refcnt);
-+
- 	return ret;
+@@ -935,6 +935,16 @@ ssize_t splice_to_socket(struct pipe_inode_info *pipe, struct file *out,
+ {
+ 	return splice_socket_generic(pipe, out, ppos, len, flags, NULL);
  }
 +
- /**
-  * do_splice_direct - splices data directly between two files
-  * @in:		file to splice from
-diff --git a/include/linux/splice.h b/include/linux/splice.h
-index 7477df3916e2..a88588cf2754 100644
---- a/include/linux/splice.h
-+++ b/include/linux/splice.h
-@@ -21,8 +21,9 @@
- 				 /* from/to, of course */
- #define SPLICE_F_MORE	(0x04)	/* expect more data */
- #define SPLICE_F_GIFT	(0x08)	/* pages passed in are a gift */
-+#define SPLICE_F_ZC	(0x10)  /* generate zero copy notifications */
++ssize_t splice_to_socket_sd(struct pipe_inode_info *pipe,
++			    struct file *out, struct splice_desc *sd)
++{
++	ssize_t ret;
++
++	ret = splice_socket_generic(pipe, out, sd->opos, sd->total_len,
++				    sd->flags, sd->ubuf_info);
++	return ret;
++}
+ #endif
  
--#define SPLICE_F_ALL (SPLICE_F_MOVE|SPLICE_F_NONBLOCK|SPLICE_F_MORE|SPLICE_F_GIFT)
-+#define SPLICE_F_ALL (SPLICE_F_MOVE|SPLICE_F_NONBLOCK|SPLICE_F_MORE|SPLICE_F_GIFT|SPLICE_F_ZC)
+ static int warn_unsupported(struct file *file, const char *op)
+@@ -959,10 +969,14 @@ static ssize_t do_splice_from(struct pipe_inode_info *pipe, struct file *out,
+ static ssize_t do_splice_from_sd(struct pipe_inode_info *pipe, struct file *out,
+ 				 struct splice_desc *sd)
+ {
+-	if (unlikely(!out->f_op->splice_write))
+-		return warn_unsupported(out, "write");
+-	return out->f_op->splice_write(pipe, out, sd->opos, sd->total_len,
+-				       sd->flags);
++	if (likely(!(sd->flags & SPLICE_F_ZC))) {
++		if (unlikely(!out->f_op->splice_write))
++			return warn_unsupported(out, "write");
++		return out->f_op->splice_write(pipe, out, sd->opos,
++					       sd->total_len, sd->flags);
++	} else {
++		return out->f_op->splice_write_sd(pipe, out, sd);
++	}
+ }
  
  /*
-  * Passed to the actors
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 7e29433c5ecc..843e8b8a1d4d 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -2065,6 +2065,7 @@ struct dir_context {
+ struct iov_iter;
+ struct io_uring_cmd;
+ struct offset_ctx;
++struct splice_desc;
+ 
+ typedef unsigned int __bitwise fop_flags_t;
+ 
+@@ -2093,6 +2094,7 @@ struct file_operations {
+ 	int (*check_flags)(int);
+ 	int (*flock) (struct file *, int, struct file_lock *);
+ 	ssize_t (*splice_write)(struct pipe_inode_info *, struct file *, loff_t *, size_t, unsigned int);
++	ssize_t (*splice_write_sd)(struct pipe_inode_info *, struct file *, struct splice_desc *);
+ 	ssize_t (*splice_read)(struct file *, loff_t *, struct pipe_inode_info *, size_t, unsigned int);
+ 	void (*splice_eof)(struct file *file);
+ 	int (*setlease)(struct file *, int, struct file_lease **, void **);
+diff --git a/include/linux/splice.h b/include/linux/splice.h
+index a88588cf2754..356b8cae4818 100644
+--- a/include/linux/splice.h
++++ b/include/linux/splice.h
+@@ -100,6 +100,8 @@ static inline long splice_copy_file_range(struct file *in, loff_t pos_in,
+ 
+ ssize_t do_tee(struct file *in, struct file *out, size_t len,
+ 	       unsigned int flags);
++ssize_t splice_to_socket_sd(struct pipe_inode_info *pipe, struct file *out,
++			    struct splice_desc *sd);
+ ssize_t splice_to_socket(struct pipe_inode_info *pipe, struct file *out,
+ 			 loff_t *ppos, size_t len, unsigned int flags);
+ 
+diff --git a/net/socket.c b/net/socket.c
+index 9a117248f18f..4baf26a36477 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -165,6 +165,7 @@ static const struct file_operations socket_file_ops = {
+ 	.release =	sock_close,
+ 	.fasync =	sock_fasync,
+ 	.splice_write = splice_to_socket,
++	.splice_write_sd = splice_to_socket_sd,
+ 	.splice_read =	sock_splice_read,
+ 	.splice_eof =	sock_splice_eof,
+ 	.show_fdinfo =	sock_show_fdinfo,
 -- 
 2.43.0
 
