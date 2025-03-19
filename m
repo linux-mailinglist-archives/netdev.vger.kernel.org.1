@@ -1,378 +1,72 @@
-Return-Path: <netdev+bounces-176111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C18CA68D58
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 14:03:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29356A68D91
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 14:18:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDA40165967
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 13:03:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D68F03BFF14
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 13:18:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A898B251799;
-	Wed, 19 Mar 2025 13:03:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39CEA2561CD;
+	Wed, 19 Mar 2025 13:18:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q5T/Cdcj"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Mu7JLya9"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB6181AAC4
-	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 13:03:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CAA82517A9;
+	Wed, 19 Mar 2025 13:18:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742389391; cv=none; b=JhioDLE+/Y1LvEx6hk7M+8+1lmvJO6LAiteN7StPV8s4L4IV03MLuDhEkq/80eq9my5bYpZkKfiCwCPB0m3PcxKS49v64IxwQj4kDaE//Nq5mWzerxIJ8nynCisdeDfU8/WfruAROPN0zsH0A14VmTZrC0SkmZ5Q4LXQlVKK4ck=
+	t=1742390319; cv=none; b=X3AVvJcBZULTTxtIjjwawfpcRP/M11cTxrhBNs4fsrxl7Nx53vMnKFrs99e50DGTVBMUVMu3ykvGvd+dfS7dZdR3LVIhKpAmX/HIMcz2fmLDTmsMRdJ97BIxm7DoOO6zVDOjUhMt+MOBnMVZykGR2pkV3XA7SD37o1dU8fY+OdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742389391; c=relaxed/simple;
-	bh=yAzx0c228WGA/nr3V4BYObbrF98vgjmkRWrSf0j3H8A=;
+	s=arc-20240116; t=1742390319; c=relaxed/simple;
+	bh=u8h+soXGFlqYrV3lXjgfXVhn6iFX9vUvTicEqeZ/BSU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SGMGyk1c7HG6Wp+xa6aVXkUMqCsjmKCI6PVp8hAsAxynZ5qezcDAO8a9Ffqpb02be/ABw+AgjgkTvBGODGjwpnjPPMkort+NUgk5dvVjwDOkAeDSSkUpBoqIbVbhOyYEZQvsZSA2HjwoLz/O7ZgvK4bXcSR0Mfq6MIRCBQxAYNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q5T/Cdcj; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742389389;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=L5KvoLvfCO2GqePbpG++oDUZVlLR8Oc0vObG3V7PZYI=;
-	b=Q5T/CdcjnxRXNFtRa27A4mQjBx9XiDgyL0lOTpXSP1cGCi+CBdwFv7DdZCpnhxNKp/9ReL
-	w1890pAtklPZqgu6PxT5LeA8E85qHJ6ic1oQnObQtFPRZZrlDUkj3s6QP9mrMrdmHn2Ogf
-	SxCn3dsKP0hWsUf0PIo/FoP0Dnon3HQ=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-685-UL0U9PhFMM2Z23ESHDcYjg-1; Wed, 19 Mar 2025 09:03:07 -0400
-X-MC-Unique: UL0U9PhFMM2Z23ESHDcYjg-1
-X-Mimecast-MFC-AGG-ID: UL0U9PhFMM2Z23ESHDcYjg_1742389387
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-ac316d639d2so642760266b.3
-        for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 06:03:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742389386; x=1742994186;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L5KvoLvfCO2GqePbpG++oDUZVlLR8Oc0vObG3V7PZYI=;
-        b=TsOTg1a0S7ueadXE18V9fLLvXSdAMd9L8m3aJujWbtpzTGRDw2GfQoEkLRFwx5qeaN
-         kbvR0cqmH3QvRxy/GdVweYfa3Q0Lgo4qbRtTUGatrsqkYN48lE9nM0aHA/4jYBCTOkRn
-         3EN89h5XiIL/P3eK64AX3f/+5bO+XNZUZilyR0AldWsZFkBqaKsr74mGYMrMMOEGh3nL
-         GKseLd+Tj7uSKAAeqxVg3iAL73DcDYO6sVESlQwY+c9mV9t4BBifcGOyfNGpPsGRir5M
-         ScE3CEDSjH+B/fkEupx7d77ILFld28ONKvSsawYyOLGirMP4Pyj7OMjXx1XqC3Bh19cd
-         fUng==
-X-Forwarded-Encrypted: i=1; AJvYcCX7PkI0WrsldyQTYoApjzEg2S1DF4pp7Q0AzKGB9HDhP5nzfFz0+VbQRkl3/c1wRvaAFyOO9BA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkiFn7d29JnjM9Q3qbMBxx8c5tcU0fPiGJBZiuXPe5Yovswznf
-	53pIrNGPD9pQ7uVUW9xIRdqcssOI8OqUtkFt0nxuLWrc23x5hz5fvs85biSw7G04j8kty2JC38a
-	vIYywOFZcVp1d1bClyxhEQilyL2cTBPrTCbBPuYznWSo1DFcqoD6xvA==
-X-Gm-Gg: ASbGncu93TN8c/zTsUsRtWt9wWAoNawpSM3bJevrLxPiT/iUlmAclyAokkM+c4bKOaQ
-	fGCJgVzRq+1M7m1P7opzuRqMzQK0ebMacFDQpH8z7Lu8IFHcLXJukNlq9VE0BjhgxSVyng7zXfJ
-	Bd37NzGaAeXyWCBeJ/twXuY6J1Q6koNT6oKfxnzmeZpwkLhMP3F1XUgiznVYcROx8OdkUuXzOWK
-	SzflAma1/bi4QbtXhccCcV5arJ/S/K9PF8arL2mUDSTiMmjjQ6Vn0BcoD9RfPpRy7GzcEII9sNM
-	sfYCamoltqlfz1pag/LvoQbFzhnV0Tzg02OoDhAKmgRYEVmuzKmbrHdHIfMwkg==
-X-Received: by 2002:a17:907:94c5:b0:ac3:50b:b810 with SMTP id a640c23a62f3a-ac3b7e81331mr283801066b.33.1742389385889;
-        Wed, 19 Mar 2025 06:03:05 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHX8tsi7utsUzXyDOLGgGqVSjOZ0FllgK/3DLytjT5YpmEthJZMbrdByXJvSa+B6nX/bHrLOA==
-X-Received: by 2002:a17:907:94c5:b0:ac3:50b:b810 with SMTP id a640c23a62f3a-ac3b7e81331mr283614366b.33.1742389362916;
-        Wed, 19 Mar 2025 06:02:42 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-53-30-53.retail.telecomitalia.it. [79.53.30.53])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3b2b94da0sm133809866b.148.2025.03.19.06.02.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Mar 2025 06:02:42 -0700 (PDT)
-Date: Wed, 19 Mar 2025 14:02:32 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, 
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Bryan Tan <bryan-bt.tan@broadcom.com>, 
-	Vishnu Dasa <vishnu.dasa@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, "David S. Miller" <davem@davemloft.net>, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] vsock: add network namespace support
-Message-ID: <sqvqvlovlxpfo2tlkazugkocwmlhc7iay2kvq7b75bgwk7vhfw@tvgfe5fj3mw6>
-References: <20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com>
- <20250312-vsock-netns-v2-1-84bffa1aa97a@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qNBQz9gwcUfU4C5ZuwITObVh5ICT+rz/kzfbJXfZ1U6G1lzl06G/rPtb/X7Y0LFTDhZfMC6tprkqj2j/nW0qNtYYPaPXtZyvodD51YNs+UUQ60jHa2ZB0AT6gmZyOp2oSZ2RxufYi2SSSenVFqMGUz000uaa9O/qvg0pZp2/qAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Mu7JLya9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 556B8C4CEE9;
+	Wed, 19 Mar 2025 13:18:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1742390318;
+	bh=u8h+soXGFlqYrV3lXjgfXVhn6iFX9vUvTicEqeZ/BSU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Mu7JLya9CmwgBcDj/jhViKgJnindBWIKQFzZUzTXX9A/VRDb1iO94lQWhqOF1wX+H
+	 MqeCWP0Rt34WimLRI52IZIwKXOX8WrY1GepZgIOA8b80VT51vD7wm4C856/WFU+GoZ
+	 2cSIdMmWX84jqgRwMoIAt/M5o1eFWMD5kxoMYshg=
+Date: Wed, 19 Mar 2025 09:18:37 -0400
+From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+To: Dmitry Safonov <0x7f454c46@gmail.com>, helpdesk@kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 0/7] selftests/net: Mixed select()+polling mode for
+ TCP-AO tests
+Message-ID: <20250319-abstract-classic-woodlouse-66eef5@lemur>
+References: <20250312-tcp-ao-selftests-polling-v1-0-72a642b855d5@gmail.com>
+ <CAJwJo6bkdeGh0j1ABfrMQ3dRD7frEsNnJERWP8-jJs8dSYFwYA@mail.gmail.com>
+ <CAJwJo6Y9g0JYiLY-taxtj7bo=Jy+U7bqTFsQjhgu2Re7BgaLsA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250312-vsock-netns-v2-1-84bffa1aa97a@gmail.com>
+In-Reply-To: <CAJwJo6Y9g0JYiLY-taxtj7bo=Jy+U7bqTFsQjhgu2Re7BgaLsA@mail.gmail.com>
 
-On Wed, Mar 12, 2025 at 01:59:35PM -0700, Bobby Eshleman wrote:
->From: Stefano Garzarella <sgarzare@redhat.com>
->
->This patch adds a check of the "net" assigned to a socket during
->the vsock_find_bound_socket() and vsock_find_connected_socket()
->to support network namespace, allowing to share the same address
->(cid, port) across different network namespaces.
->
->This patch preserves old behavior, and does not yet bring up namespace
->support fully.
->
->Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+On Wed, Mar 19, 2025 at 03:26:27AM +0000, Dmitry Safonov wrote:
+> However, as I sent the patches with b4 relay, it seems patchwork is
+> unable to authorise me as the author of the series. Ugh :(
 
-I'd describe here a bit the new behaviour related to `fallback` that you 
-developed.
+Oops. We should definitely properly handle this.
+Sending a note to self via the helpdesk.
 
-Or we can split this patch in two patches, one with my changes without 
-fallback, and another with fallback as you as author.
-
-WDYT?
-
-
->Signed-off-by: Bobby Eshleman <bobbyeshleman@gmail.com>
->---
->v1 -> v2:
->* remove 'netns' module param
->* remove vsock_net_eq()
->* use vsock_global_net() for "global" namespace
->* use fallback logic in socket lookup functions, giving precedence to
->  non-global vsock namespaces
->
->RFC -> v1
->* added 'netns' module param
->* added 'vsock_net_eq()' to check the "net" assigned to a socket
->  only when 'netns' support is enabled
->---
-> include/net/af_vsock.h                  |  7 +++--
-> net/vmw_vsock/af_vsock.c                | 55 ++++++++++++++++++++++++---------
-> net/vmw_vsock/hyperv_transport.c        |  2 +-
-> net/vmw_vsock/virtio_transport_common.c |  5 +--
-> net/vmw_vsock/vmci_transport.c          |  4 +--
-> 5 files changed, 51 insertions(+), 22 deletions(-)
->
->diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->index 9e85424c834353d016a527070dd62e15ff3bfce1..41afbc18648c953da27a93571d408de968aa7668 100644
->--- a/include/net/af_vsock.h
->+++ b/include/net/af_vsock.h
->@@ -213,9 +213,10 @@ void vsock_enqueue_accept(struct sock *listener, struct sock *connected);
-> void vsock_insert_connected(struct vsock_sock *vsk);
-> void vsock_remove_bound(struct vsock_sock *vsk);
-> void vsock_remove_connected(struct vsock_sock *vsk);
->-struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr);
->+struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr, struct net *net);
-> struct sock *vsock_find_connected_socket(struct sockaddr_vm *src,
->-					 struct sockaddr_vm *dst);
->+					 struct sockaddr_vm *dst,
->+					 struct net *net);
-> void vsock_remove_sock(struct vsock_sock *vsk);
-> void vsock_for_each_connected_socket(struct vsock_transport *transport,
-> 				     void (*fn)(struct sock *sk));
->@@ -255,4 +256,6 @@ static inline bool vsock_msgzerocopy_allow(const struct vsock_transport *t)
-> {
-> 	return t->msgzerocopy_allow && t->msgzerocopy_allow();
-> }
->+
->+struct net *vsock_global_net(void);
-
-If it just returns null, maybe we can make it inline here.
-
-> #endif /* __AF_VSOCK_H__ */
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 7e3db87ae4333cf63327ec105ca99253569bb9fe..d206489bf0a81cf989387c7c8063be91a7c21a7d 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -235,37 +235,60 @@ static void __vsock_remove_connected(struct vsock_sock *vsk)
-> 	sock_put(&vsk->sk);
-> }
->
->-static struct sock *__vsock_find_bound_socket(struct sockaddr_vm *addr)
->+struct net *vsock_global_net(void)
-> {
->+	return NULL;
->+}
->+EXPORT_SYMBOL_GPL(vsock_global_net);
->+
->+static struct sock *__vsock_find_bound_socket(struct sockaddr_vm *addr,
->+					      struct net *net)
->+{
-
-Please add a comment here to describe what fallback is used for.
-And I would suggest also something on top of this file to explain a bit
-how netns are handled in AF_VSOCK.
-
->+	struct sock *fallback = NULL;
-> 	struct vsock_sock *vsk;
->
-> 	list_for_each_entry(vsk, vsock_bound_sockets(addr), bound_table) {
->-		if (vsock_addr_equals_addr(addr, &vsk->local_addr))
->-			return sk_vsock(vsk);
->+		if (vsock_addr_equals_addr(addr, &vsk->local_addr)) {
->+			if (net_eq(net, sock_net(sk_vsock(vsk))))
->+				return sk_vsock(vsk);
->
->+			if (net_eq(net, vsock_global_net()))
->+				fallback = sk_vsock(vsk);
->+		}
-> 		if (addr->svm_port == vsk->local_addr.svm_port &&
-> 		    (vsk->local_addr.svm_cid == VMADDR_CID_ANY ||
->-		     addr->svm_cid == VMADDR_CID_ANY))
->-			return sk_vsock(vsk);
->+		     addr->svm_cid == VMADDR_CID_ANY)) {
->+			if (net_eq(net, sock_net(sk_vsock(vsk))))
->+				return sk_vsock(vsk);
->+
->+			if (net_eq(net, vsock_global_net()))
->+				fallback = sk_vsock(vsk);
->+		}
-> 	}
->
->-	return NULL;
->+	return fallback;
-> }
->
-> static struct sock *__vsock_find_connected_socket(struct sockaddr_vm *src,
->-						  struct sockaddr_vm *dst)
->+						  struct sockaddr_vm *dst,
->+						  struct net *net)
-> {
->+	struct sock *fallback = NULL;
-> 	struct vsock_sock *vsk;
->
-> 	list_for_each_entry(vsk, vsock_connected_sockets(src, dst),
-> 			    connected_table) {
-> 		if (vsock_addr_equals_addr(src, &vsk->remote_addr) &&
-> 		    dst->svm_port == vsk->local_addr.svm_port) {
->-			return sk_vsock(vsk);
->+			if (net_eq(net, sock_net(sk_vsock(vsk))))
->+				return sk_vsock(vsk);
->+
->+			if (net_eq(net, vsock_global_net()))
->+				fallback = sk_vsock(vsk);
-
-This pattern seems to be repeated 3 times, can we make a function/macro?
-
-> 		}
-> 	}
->
->-	return NULL;
->+	return fallback;
-> }
->
-> static void vsock_insert_unbound(struct vsock_sock *vsk)
->@@ -304,12 +327,12 @@ void vsock_remove_connected(struct vsock_sock *vsk)
-> }
-> EXPORT_SYMBOL_GPL(vsock_remove_connected);
->
->-struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr)
->+struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr, struct net *net)
-> {
-> 	struct sock *sk;
->
-> 	spin_lock_bh(&vsock_table_lock);
->-	sk = __vsock_find_bound_socket(addr);
->+	sk = __vsock_find_bound_socket(addr, net);
-> 	if (sk)
-> 		sock_hold(sk);
->
->@@ -320,12 +343,13 @@ struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr)
-> EXPORT_SYMBOL_GPL(vsock_find_bound_socket);
->
-> struct sock *vsock_find_connected_socket(struct sockaddr_vm *src,
->-					 struct sockaddr_vm *dst)
->+					 struct sockaddr_vm *dst,
->+					 struct net *net)
-> {
-> 	struct sock *sk;
->
-> 	spin_lock_bh(&vsock_table_lock);
->-	sk = __vsock_find_connected_socket(src, dst);
->+	sk = __vsock_find_connected_socket(src, dst, net);
-> 	if (sk)
-> 		sock_hold(sk);
->
->@@ -644,6 +668,7 @@ static int __vsock_bind_connectible(struct vsock_sock *vsk,
-> {
-> 	static u32 port;
-> 	struct sockaddr_vm new_addr;
->+	struct net *net = sock_net(sk_vsock(vsk));
->
-> 	if (!port)
-> 		port = get_random_u32_above(LAST_RESERVED_PORT);
->@@ -660,7 +685,7 @@ static int __vsock_bind_connectible(struct vsock_sock *vsk,
->
-> 			new_addr.svm_port = port++;
->
->-			if (!__vsock_find_bound_socket(&new_addr)) {
->+			if (!__vsock_find_bound_socket(&new_addr, net)) {
-> 				found = true;
-> 				break;
-> 			}
->@@ -677,7 +702,7 @@ static int __vsock_bind_connectible(struct vsock_sock *vsk,
-> 			return -EACCES;
-> 		}
->
->-		if (__vsock_find_bound_socket(&new_addr))
->+		if (__vsock_find_bound_socket(&new_addr, net))
-> 			return -EADDRINUSE;
-> 	}
->
->diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
->index 31342ab502b4fc35feb812d2c94e0e35ded73771..253609898d24f8a484fcfc3296011c6f501a72a8 100644
->--- a/net/vmw_vsock/hyperv_transport.c
->+++ b/net/vmw_vsock/hyperv_transport.c
->@@ -313,7 +313,7 @@ static void hvs_open_connection(struct vmbus_channel *chan)
-> 		return;
->
-> 	hvs_addr_init(&addr, conn_from_host ? if_type : if_instance);
->-	sk = vsock_find_bound_socket(&addr);
->+	sk = vsock_find_bound_socket(&addr, NULL);
-> 	if (!sk)
-> 		return;
->
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index 7f7de6d8809655fe522749fbbc9025df71f071bd..256d2a4fe482b3cb938a681b6924be69b2065616 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -1590,6 +1590,7 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
-> 			       struct sk_buff *skb)
-> {
-> 	struct virtio_vsock_hdr *hdr = virtio_vsock_hdr(skb);
->+	struct net *net = vsock_global_net();
-
-Why using vsock_global_net() in virtio and directly NULL in the others 
-transports?
-
-> 	struct sockaddr_vm src, dst;
-> 	struct vsock_sock *vsk;
-> 	struct sock *sk;
->@@ -1617,9 +1618,9 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
-> 	/* The socket must be in connected or bound table
-> 	 * otherwise send reset back
-> 	 */
->-	sk = vsock_find_connected_socket(&src, &dst);
->+	sk = vsock_find_connected_socket(&src, &dst, net);
-> 	if (!sk) {
->-		sk = vsock_find_bound_socket(&dst);
->+		sk = vsock_find_bound_socket(&dst, net);
-> 		if (!sk) {
-> 			(void)virtio_transport_reset_no_sock(t, skb);
-> 			goto free_pkt;
->diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
->index b370070194fa4ac0df45a073d389ffccf69a0029..373b9fe30a26c18aaa181fbc16db840d8f839b13 100644
->--- a/net/vmw_vsock/vmci_transport.c
->+++ b/net/vmw_vsock/vmci_transport.c
->@@ -703,9 +703,9 @@ static int vmci_transport_recv_stream_cb(void *data, struct vmci_datagram *dg)
-> 	vsock_addr_init(&src, pkt->dg.src.context, pkt->src_port);
-> 	vsock_addr_init(&dst, pkt->dg.dst.context, pkt->dst_port);
->
->-	sk = vsock_find_connected_socket(&src, &dst);
->+	sk = vsock_find_connected_socket(&src, &dst, NULL);
-> 	if (!sk) {
->-		sk = vsock_find_bound_socket(&dst);
->+		sk = vsock_find_bound_socket(&dst, NULL);
-> 		if (!sk) {
-> 			/* We could not find a socket for this specified
-> 			 * address.  If this packet is a RST, we just drop it.
->
->-- 2.47.1
->
-
+-K
 
