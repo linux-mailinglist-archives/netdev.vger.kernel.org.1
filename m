@@ -1,173 +1,176 @@
-Return-Path: <netdev+bounces-175985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A65EA6833F
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 03:42:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B800A6834C
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 03:47:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E8417A5C2D
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 02:41:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FC8A422C34
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 02:47:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A0E124E4B4;
-	Wed, 19 Mar 2025 02:42:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B33DF20DD74;
+	Wed, 19 Mar 2025 02:47:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C4k6JwYU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M5VTP6pH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0896B209674;
-	Wed, 19 Mar 2025 02:42:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E129BAD2F;
+	Wed, 19 Mar 2025 02:47:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742352143; cv=none; b=gyiEeb8ZeoQkQ5rCwL/aP/fegSP7M/tw4vwuHAVF6aKhW284N5GuE27YC1bRdFyU8OW09+gzkHfgtUXiiwvHgDVbS6V7m2ymjzpUIqzEABzUIOd8G8ZRS6E76aqqm2ihP4Q3aKQZunVQnKi8Nl2S+3zyonMQi92RndgkZGQKldI=
+	t=1742352426; cv=none; b=egoHkG4oZBWq0LpYzls4rs0y+GP/f+2+dBL6R1d5ZkvJ8M0fnmrKsGlridFNLac1UZMU4jJU0661fBfqnI683Tj9vSMepOH6set8OS/XWyG4ps7MVlM9WYDOAqwB3Huq0cHW36CjWjx3LCc7j3Z+xHGkD/jMxZer1u8/Mkn0nnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742352143; c=relaxed/simple;
-	bh=Yj6T0X/2HCiSmRuSpotaTytF5PjAW7Yi0axKCWTjt/I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rQBirkUnfVeViUiT+X+YpxztE6Ct5FYC55URWo6WDxdfZbixN5XfAgJXUWnrlGCMmLJU326vv/Oyl6Re+rACMDR/7H+CcJC1ydsIqZepPVCTcIohwkCT+vtOd9Bo3RvCWLx4OuXNqaHHii/YjiIH3u6ULjL7JeJJ3oHBr3PZeK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C4k6JwYU; arc=none smtp.client-ip=209.85.214.174
+	s=arc-20240116; t=1742352426; c=relaxed/simple;
+	bh=Dn3PWelJFddmp3s83Ht4bxxUTBHLl1iUXwTZRYpRWiI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dk9ABRgKWxE54dXUV7psATLqTA/Sa5UAWshmuxz1GHVFOHl3SnYxzQNjLcDfVpmMfkync004OsG+SCj1Pyc2scN/b/oHPJqzR1MY3b1Ft3Xdne06eFRop6QeT9EuSUqNs8t9saxEonztibAYZrGeEQRcrWkQL+5gQ3TJ3HrOt7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M5VTP6pH; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-225b5448519so121705365ad.0;
-        Tue, 18 Mar 2025 19:42:21 -0700 (PDT)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43948f77f1aso29143755e9.0;
+        Tue, 18 Mar 2025 19:47:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742352141; x=1742956941; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=5LIIm36cccYbao7TAk4Hq5YU6PWgxen0Sg9TmOOAtlo=;
-        b=C4k6JwYUPbj4aijyOvNmBFMXiNILY+Sj79QvIQbvW9I3AFYdfLlhdbRXiKJ20Gw276
-         5vMufkXBNvk6JKceIEt9NPlDmUOxNmkHUQm09DlSQhM8BmxlvB2CUkAQXG/Jy6VHj9MG
-         fv3GPxREiJRQBFzEAqJO0gtZyiZmYl9cR1KSgSiFL1d0mNeARsjUeyHqjWvro9ICdIF2
-         SiqMgStNRuSXJgMcNE8rq6sKVSqoINemQdwI4RyDYiYbKz44JZmRTL+U8S9cEhCalm7m
-         jUUuHc28JieNPIBTADYqnZuAdRFYQh3A1WK0EtAcQGo/oYmBDuygcwaALeril8LyvFu3
-         7hQQ==
+        d=gmail.com; s=20230601; t=1742352423; x=1742957223; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pNwRjgTV5vyjSkK1YIBebLoMJzNTyzSDJ2Cwgi8wBxA=;
+        b=M5VTP6pHbzhXijA6lBHfmeJ7unhrvniUrpOn5jEmbkGU5CpGY6B/c2/XX6zjysXQob
+         AtfQ/H/1UqGzVB7sqzwJY5znLKTTH7JMRFrYfVZOyzpanIu4qo3mBSuTiOVs1hBtfaZL
+         EUB+fSVYUkzuZJ+OkcVWOgyYkL0o83ymEnk7QED7lE31mICr5MXIpuqywALA6EjKuPlL
+         +YhP6Hi/UM7+Ulqjipqp/QtkZEjhNmivR1LAYgGeGcNewIakrxEoZWfQ6TRrrAo7Ey8s
+         SeL9D2IOPyoByL/tyWszsZcFlVvX0oeF7LAyqJt+A+B38zUbVhgYsLNg6JLXc0FWtG3Z
+         yOgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742352141; x=1742956941;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5LIIm36cccYbao7TAk4Hq5YU6PWgxen0Sg9TmOOAtlo=;
-        b=dfK0k0wyF6ErvQAEI7beYO1mZJQl0rp8ZdlYEg2VAI2/JM9wkAQPRTOMSwTAoDUT+K
-         YyLE3rNY6W0XhqxrXGsRdHFif9jvbpMTPjZLw0z34lB7A5BcZ2B0yEZ7nQhqvskG5LSU
-         JTjoURrG6EVNHPfvXI//Py2KorUKU503vqS1IBQie+dtMhZAOYe5Y+TgMgNAMOJsIcCY
-         6E1Nu9xwkXi36tC4IQhPv1+Da/TIKgeD1w7ZZTLzPsCbMq5ECHRFAnwVF6OxIggk6BtJ
-         2OfKyf3cwJoppYc0NPu+rX7/rW0wD7H7+7zS/d8DSDxR4+D5DGua7Pwwc/+Ae0qQfvGU
-         J/fw==
-X-Forwarded-Encrypted: i=1; AJvYcCUL8ND8NFvDhJK5H6W0cBEeLjJW2/EtJyqYPz4G2WYrcOfPjnWU2sOv+BZHwHLyvNGIc8RQ4K5WM+jyRg==@vger.kernel.org, AJvYcCUqRgZy5C6HHt1WG4ku0hYsT4QM6gM9RT5x+ROKBQml5zmlw74mLSDiHqF0n/EsQgXNzcg14oR5W8E2aA==@vger.kernel.org, AJvYcCVHyKMexvtNEQ+uCup3nMzD4Cf3OKBKpdhzoIXr4freCJK3n8tFhCOXUjqfyvTOismAXrN3PoJdV8K8z/I=@vger.kernel.org, AJvYcCVgmA7WHVTsJ596pU4D3yKFIab7PBdmFVrfxTBDNiicI6bfaTbfZjvUsWoXe4sLRKiyUPlNsXto@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0DlTxGF74OHfn2L2GXTpU1CcZNtzBE36yjsW9z5A0ruSKxdQy
-	qoKRhKT0RKqEHlGsAsZ4SeSaO9OgH4ORH7JQ0XpgbauqJIHUOFDo
-X-Gm-Gg: ASbGncubJLF8oJJD+Acy5/7d643+eJoiVKb+WM02hPDtYG+w29FL/1aeu92ZRAXUuwM
-	l74V8KeEmEu3kwDqGvjdMAPkoQf95OzeAHDZfxWmwBYaaIijNWn0QZsUAVZaGaLkuicFn037UGC
-	kf1x+U+ZJWo+dcGbG0z/Und74fLQhAw5dCxe0AlK4hYkOFmAnlCWML06t9g2QRFoqYldVPN0eyi
-	qvmk7uUeKZ7e2yI+anH/CtU39NZTORKYFsMaapCP2mXe42ikjjgzE19sj5gBeImVC35M7FpHYiS
-	OKRhDBitb4UMMllE0ggnXa8P/RCILR73iQ7QYRhJHyLMwWPWg2C00RtyPPfwtQ==
-X-Google-Smtp-Source: AGHT+IFMTPVzGmKOB0374Xwm8ymMGdht9WZf9KthbF99f4vKTy64/tyWlMgtJ/3VRoo6H4DyUbtn7w==
-X-Received: by 2002:a17:902:d54a:b0:223:6657:5001 with SMTP id d9443c01a7336-22649c8fe35mr18839615ad.40.1742352141212;
-        Tue, 18 Mar 2025 19:42:21 -0700 (PDT)
-Received: from vaxr-BM6660-BM6360 ([2001:288:7001:2703:2ccc:91ef:96dd:9ad9])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-225c6bbfdfesm102855595ad.203.2025.03.18.19.42.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Mar 2025 19:42:20 -0700 (PDT)
-Date: Wed, 19 Mar 2025 10:42:09 +0800
-From: I Hsin Cheng <richard120310@gmail.com>
-To: Wenjia Zhang <wenjia@linux.ibm.com>
-Cc: Heiko Carstens <hca@linux.ibm.com>, alibuda@linux.alibaba.com,
-	jaka@linux.ibm.com, mjambigi@linux.ibm.com, sidraya@linux.ibm.com,
-	tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
-	jserv@ccns.ncku.edu.tw, linux-kernel-mentees@lists.linux.dev
-Subject: Re: [PATCH] net/smc: Reduce size of smc_wr_tx_tasklet_fn
-Message-ID: <Z9ovAYqk8lESCug2@vaxr-BM6660-BM6360>
-References: <20250315062516.788528-1-richard120310@gmail.com>
- <66ce34a0-b79d-4ef0-bdd5-982e139571f1@linux.ibm.com>
- <20250317135631.21754E85-hca@linux.ibm.com>
- <6191739c-93db-4a7d-8e83-3168909315cd@linux.ibm.com>
+        d=1e100.net; s=20230601; t=1742352423; x=1742957223;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pNwRjgTV5vyjSkK1YIBebLoMJzNTyzSDJ2Cwgi8wBxA=;
+        b=Hv9WY1qkTv1z3RpzzLJvnyUaewWR4OmzcpCHVwrZJdFlOqGpttux1DWYZBT06p6Uu4
+         UI1ijJMeQQ1Kvxmhfpvfc1VZnMy2j9UrWD2An7DNMFrqkbIM2knqs2GRovjQe/lSqnCV
+         4oGkuWJTi3KGUqTODAOulOH30Wzz6b48B5a1cwYTY6lw93J+cHZppLlGr8o8vJQgdloO
+         tn4wGpFt9eLQBThktRm9oKmnFRAcd7fTzxu/atHyEryfpbQu2mCotnhyxtIdvvb+fBzD
+         X5kTK2vbpusxDumr49DJwTJD/+AzwemlPyIFQ9z8IPI3nqaZ6LrUn8yj+ZCn89V9LE77
+         /Lsw==
+X-Forwarded-Encrypted: i=1; AJvYcCVlZ7Q2c8Xm9ZhdX4r/wtPXE04x3ds+m004MFOL0XUB62uLm1b7h7bSf6np0YPGRDLfxnM=@vger.kernel.org, AJvYcCVwQ0exN2p8IGVcoPhqLHsBNjPcNDjGyKhAklCo1OrzLT7P1JawLwKdMO/qcQPQHGdlTaA4cjBY@vger.kernel.org, AJvYcCXII6ztW8Jt7vTpSsZF8oNyQKynpgQ7KxRtCFulN7COtAIzomAoGpxmOGzUE6Wa+hSDptzTi2fCnu/C48iM@vger.kernel.org, AJvYcCXqUf6H7/4MyLgJz1NpNh9dL9hwHN+iTh7fSarOFf8JVH4V0Fk4Gqpg9ZTjRqctg7aeMmtsGcM5bYLghw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSEJR0AE2Qbt/shLNJLSAc/Yd1gxYTYCL/0RP+EQSbwnqOMl0b
+	yW4YyzFhU62V28NLGjv/M9Ou/+6gdrLFIvl/24qB/kUqNM8uDQs24v1z71NnpRyNV0xZCIDckiv
+	YcA7++G11KxELGfbtX9eNDgjdySUytO5z
+X-Gm-Gg: ASbGnctvbBUinsiC2jOQ4rCTS3WbDYfhZa9Xp5GD3VIrcxk7mMiE3SOtSRhTAGAQfSf
+	ijYZJLCKumLjT4gIiHGSi8DkwD+mptOE6oVgV4cvTSlRYLsqFXqmKyDn9vCHd9vgI1N2pQkx8iM
+	W8s4sZ1K9u0H1zsx13yv5Ds0WXwiIWRPy3gRmZ933QyMyuDTa9p9wH
+X-Google-Smtp-Source: AGHT+IE6MFlMuJtugrViJVg66D6og8DYJPY2VbtA0lQZ4r7b8uYfAxYuEvDGrs357PIC6nGVQardy/0Uda7JcMYyTAs=
+X-Received: by 2002:a5d:5982:0:b0:399:71d4:a2 with SMTP id ffacd0b85a97d-399739c1524mr816039f8f.14.1742352423079;
+ Tue, 18 Mar 2025 19:47:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <6191739c-93db-4a7d-8e83-3168909315cd@linux.ibm.com>
+References: <20250319133309.6fce6404@canb.auug.org.au>
+In-Reply-To: <20250319133309.6fce6404@canb.auug.org.au>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Tue, 18 Mar 2025 19:46:52 -0700
+X-Gm-Features: AQ5f1JqdE91XzIdfoDPQyyQUyj5uA6okIPHz4NL_DcBD8mOsI7c3nyOiy4dAGww
+Message-ID: <CAADnVQKotSrp8CkVpFw-y800NJ_R7An-iw-twrQZaOdYUeRtqQ@mail.gmail.com>
+Subject: Re: linux-next: build failure after merge of the bpf-next tree
+To: Stephen Rothwell <sfr@canb.auug.org.au>, Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Uros Bizjak <ubizjak@gmail.com>, bpf <bpf@vger.kernel.org>, 
+	Networking <netdev@vger.kernel.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 18, 2025 at 09:43:07AM +0100, Wenjia Zhang wrote:
-> 
-> 
-> On 17.03.25 14:56, Heiko Carstens wrote:
-> > On Mon, Mar 17, 2025 at 12:22:46PM +0100, Wenjia Zhang wrote:
-> > > 
-> > > 
-> > > On 15.03.25 07:25, I Hsin Cheng wrote:
-> > > > The variable "polled" in smc_wr_tx_tasklet_fn is a counter to determine
-> > > > whether the loop has been executed for the first time. Refactor the type
-> > > > of "polled" from "int" to "bool" can reduce the size of generated code
-> > > > size by 12 bytes shown with the test below
-> > > > 
-> > > > $ ./scripts/bloat-o-meter vmlinux_old vmlinux_new
-> > > > add/remove: 0/0 grow/shrink: 0/1 up/down: 0/-12 (-12)
-> > > > Function                                     old     new   delta
-> > > > smc_wr_tx_tasklet_fn                        1076    1064     -12
-> > > > Total: Before=24795091, After=24795079, chg -0.00%
-> > > > 
-> > > > In some configuration, the compiler will complain this function for
-> > > > exceeding 1024 bytes for function stack, this change can at least reduce
-> > > > the size by 12 bytes within manner.
-> > > > 
-> > > The code itself looks good. However, I’m curious about the specific
-> > > situation where the compiler complained. Also, compared to exceeding the
-> > > function stack limit by 1024 bytes, I don’t see how saving 12 bytes would
-> > > bring any significant benefit.
-> > 
-> > The patch description doesn't make sense: bloat-a-meter prints the _text
-> > size_ difference of two kernels, which really has nothing to do with
-> > potential stack size savings.
-> > 
-> > If there are any changes in stack size with this patch is unknown; at least
-> > if you rely only on the patch description.
-> > 
-> > You may want to have a look at scripts/stackusage and scripts/stackdelta.
-> 
-> @Heiko, thank you for pointing it out!
-> 
-> Even if the potential stack size saving of 12 bytes were true, I still don’t
-> see how it would benefit our code, let alone justify the incorrect argument.
+On Tue, Mar 18, 2025 at 7:33=E2=80=AFPM Stephen Rothwell <sfr@canb.auug.org=
+.au> wrote:
 >
+> Hi all,
+>
+> After merging the bpf-next tree, today's linux-next build (x86_64
+> allmodconfig) failed like this:
+>
+> In file included from include/asm-generic/percpu.h:7,
+>                  from arch/x86/include/asm/percpu.h:630,
+>                  from arch/x86/include/asm/preempt.h:6,
+>                  from include/linux/preempt.h:79,
+>                  from include/linux/smp.h:116,
+>                  from kernel/locking/qspinlock.c:16:
+> kernel/locking/qspinlock.h: In function 'decode_tail':
+> include/linux/percpu-defs.h:219:45: error: initialization from pointer to=
+ non-enclosed address space
+>   219 |         const void __percpu *__vpp_verify =3D (typeof((ptr) + 0))=
+NULL;    \
+>       |                                             ^
+> include/linux/percpu-defs.h:237:9: note: in expansion of macro '__verify_=
+pcpu_ptr'
+>   237 |         __verify_pcpu_ptr(ptr);                                  =
+       \
+>       |         ^~~~~~~~~~~~~~~~~
+> kernel/locking/qspinlock.h:67:16: note: in expansion of macro 'per_cpu_pt=
+r'
+>    67 |         return per_cpu_ptr(&qnodes[idx].mcs, cpu);
+>       |                ^~~~~~~~~~~
+> include/linux/percpu-defs.h:219:45: note: expected 'const __seg_gs void *=
+' but pointer is of type 'struct mcs_spinlock *'
+>   219 |         const void __percpu *__vpp_verify =3D (typeof((ptr) + 0))=
+NULL;    \
+>       |                                             ^
+> include/linux/percpu-defs.h:237:9: note: in expansion of macro '__verify_=
+pcpu_ptr'
+>   237 |         __verify_pcpu_ptr(ptr);                                  =
+       \
+>       |         ^~~~~~~~~~~~~~~~~
+> kernel/locking/qspinlock.h:67:16: note: in expansion of macro 'per_cpu_pt=
+r'
+>    67 |         return per_cpu_ptr(&qnodes[idx].mcs, cpu);
+>       |                ^~~~~~~~~~~
+> kernel/locking/qspinlock.c: In function 'native_queued_spin_lock_slowpath=
+':
+> kernel/locking/qspinlock.c:285:41: error: passing argument 2 of 'decode_t=
+ail' from pointer to non-enclosed address space
+>   285 |                 prev =3D decode_tail(old, qnodes);
+>       |                                         ^~~~~~
+> In file included from kernel/locking/qspinlock.c:30:
+> kernel/locking/qspinlock.h:62:79: note: expected 'struct qnode *' but arg=
+ument is of type '__seg_gs struct qnode *'
+>    62 | static inline __pure struct mcs_spinlock *decode_tail(u32 tail, s=
+truct qnode *qnodes)
+>       |                                                                 ~=
+~~~~~~~~~~~~~^~~~~~
+> In file included from kernel/locking/qspinlock.c:401:
+> kernel/locking/qspinlock.c: In function '__pv_queued_spin_lock_slowpath':
+> kernel/locking/qspinlock.c:285:41: error: passing argument 2 of 'decode_t=
+ail' from pointer to non-enclosed address space
+>   285 |                 prev =3D decode_tail(old, qnodes);
+>       |                                         ^~~~~~
+> kernel/locking/qspinlock.h:62:79: note: expected 'struct qnode *' but arg=
+ument is of type '__seg_gs struct qnode *'
+>    62 | static inline __pure struct mcs_spinlock *decode_tail(u32 tail, s=
+truct qnode *qnodes)
+>       |                                                                 ~=
+~~~~~~~~~~~~~^~~~~~
+>
+> Caused by the resilient-queued-spin-lock branch of the bpf-next tree
+> interacting with the "Enable strict percpu address space checks" series
+> form the mm-stable tree.
 
-Hi Heiko, Wenjia,
+Do you mean this set:
+https://lore.kernel.org/all/20250127160709.80604-1-ubizjak@gmail.com/
 
-Thanks for your kindly review!
+>
+> I don't know why this happens, but reverting that branch inf the bpf-next
+> tree makes the failure go away, so I have done that for today.
 
-> > If there are any changes in stack size with this patch is unknown; at least
-> > if you rely only on the patch description.
-> >
-> > You may want to have a look at scripts/stackusage and scripts/stackdelta.
+Kumar,
 
-Thanks for this, really appreciate! I'll try it out and see is there
-anything different.
-
-> Even if the potential stack size saving of 12 bytes were true, I still don’t
-> see how it would benefit our code, let alone justify the incorrect argument.
-
-Hmm I suppose smaller memory footprint can benefit the performace,
-though I agree it won't be significant. I'm not sure how to do
-performance test on this function, would you be so kind to suggest some
-ideas for me to test out.
-
-And I want to ask why's the argument incorrect? since I only change the
-type of "polled", maybe you mean "polled" itself should be an integer
-type?
-
-Best regards,
-I Hsin Cheng
-
+pls take a look.
 
