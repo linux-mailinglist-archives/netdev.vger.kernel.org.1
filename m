@@ -1,116 +1,120 @@
-Return-Path: <netdev+bounces-175996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC334A683B2
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 04:26:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C8C3A683B5
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 04:29:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 720A088081F
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 03:26:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 247AC882A22
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 03:29:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9608724E4A6;
-	Wed, 19 Mar 2025 03:26:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3810E24E4B0;
+	Wed, 19 Mar 2025 03:29:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AY9kafSk"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="GPnbqtPC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B3E83208;
-	Wed, 19 Mar 2025 03:26:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F952C9A;
+	Wed, 19 Mar 2025 03:29:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742354800; cv=none; b=dbXyztZzriaFomitCJ7RIqbNor5Tzw7ocGY4bNWa2tG4oqUdHdYsF7i0pmGjh2EAq2cJbMxjfGyFD/27xZ8ggKIYCVg6Uf6bNstHJbLBxrpcYyl++NXx0abnCPJwvLsc/g5g+OkgBoVyWx1IIA2KjcJ4KJcAggN9egbzuOCE3ds=
+	t=1742354962; cv=none; b=EPqOgWcQ2AgKV8h9y5WVEvzybnSpIkJfY7gwOM29yklNFyBgJV5cRVJVx3jjqgHBsmirSpJqkII+cYxxMqGQUnCVYZossR+epmjSG8pqP4onY8fKG1cf4vf+sNpJf8MntmHji5IMvvGMYnMSbdd6iihtENne8NMqxsY6B9GQHWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742354800; c=relaxed/simple;
-	bh=P/ehgbpk+5vA88XB2CClLC1viuSC34YTkdQTnDE5P2Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IsjJsmGRBRZFqxoj3PGGYeJTlszTImjLZkqmAVRFGXQDlSGKesVHwCIjn4QfO6NAmWtwEtlzaOrHPXi83N5QxxYbKr8TyQcHF/S25BYjLucSzSS4xVQhHXn5ChPS7KBplJC638jnR6k6Okrbq61/hpV+r1H9cN0BNfkaS5y30o0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AY9kafSk; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-3018e2d042bso3716262a91.2;
-        Tue, 18 Mar 2025 20:26:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742354798; x=1742959598; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ONc2NKKA9rxhBuj8Dk0LD4YRO1Z4JZeeX+A7dNlQ7iU=;
-        b=AY9kafSksyNzOMNr5R4uxgZoBqu+dOlRsBj7JZXxmy46gI1q7qm15GXU4INY3hRdOo
-         bnHObEOEy8+SaiJnpKvAbTv3XRPtAUWFAmdcNDEURH4wvQ8AzoYHN9RVw/ZdqiUG//eG
-         l6o4vGLZfCNmUrQbYKMSYgYSMsFU3Gbluw+os7//70A0/2R4DC90NSh0lgHu4PtujPsc
-         PzAxnokbllAdvxpoiHLdYNmxtqjwW2SDpsvbcVQOaSePSUGD+WHi3yxAB4FLBtju9UX1
-         86hm1+d4ExVs1xDdB2WPgblNOjQCyICcoGdxVZwx343Dc3ZKgtjfE40I0xt/1HRwCNDf
-         ocAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742354798; x=1742959598;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ONc2NKKA9rxhBuj8Dk0LD4YRO1Z4JZeeX+A7dNlQ7iU=;
-        b=AgYQ9Ssp8l8hOC7qjbnXUFYaDTkklTvWKmjO1bB/sWIp49Frm0RnNMALvZM5FGhl5T
-         fzyisv+Pw3MfBjDbirN/l5jEwyLYohpEKnSokFY0HjHgoLd9I8aSWRKLLpBSANdvC1yu
-         7jhPdHQb8v3XAM1ArSjqgj/2k7gWeZIwU+lccX6sCRMyjcB7qizNlUrby95q1TFNhE11
-         KjbHfpkpbSUj00IpClollPLiX+64gIjpKHWqFo2c3l6miHi0hpGCwPB5JeYT/xQtxUT1
-         QbXVxH67hknPa3VzBwk5UvRMIcbI062w77B7MTxZe1JmCNGTkUi1xuSsDA7kR67iauZ7
-         DOjA==
-X-Forwarded-Encrypted: i=1; AJvYcCUiiD8AjW5u2tON+cjnNmZrjfNm0kXR7ngrV6sER5HsBBbluccdYT897mJZIlfn7Jt4TQEXCBxp@vger.kernel.org, AJvYcCVZt7s9M99n9APzZKLwUrBRX2Ju7aGNrwISK9AaugstMY6eGMUT+ipAmbBB8ISjGVh4QaT/QDJBwj6t45f99qOj@vger.kernel.org, AJvYcCVgji7N6oTutv4ENkHncZTfBRWHpRCxaPQ+Gj8tBTnjCjO+uhPl5PsjzRMRCRUnvsXtDpqduC6nmkYkslY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyM2j+cb0NEpt3iSE06IAilKRf2pl/+NwwRMlt4SPIlQ8t2C1v3
-	fdXdCuAAfSKbqlJR8b/aVIrPTdHPFcs1rhSBGEj3xFsdteT46mCZE9tlNltJyB/kSWmtyupA/0b
-	7dZSnlYr0IGcFtEh155+dwLtH28A=
-X-Gm-Gg: ASbGncuXxmZPJZmoITSU4DHNTjCWTn6rV3KE5as6XpDP3X2zNzhdYYKtffawH8hvdtz
-	uaIQRHugDZzkab75qlgPGTJeG822LWT/B6bnHIWdCHI6nW4nfLdYwoe8ExOCwiXrFCT98Jtvjat
-	88Gqk+AlnwXfFVxa8eH89AQakhwA==
-X-Google-Smtp-Source: AGHT+IEhh9je53mlU+YNfo/E+s5+DZiahqCtS/UeM+2c5VO6wETPeDDOp5McEZW/rZaZIbcob8g2Isw+8odAftssVBU=
-X-Received: by 2002:a17:90b:4fc5:b0:2f6:d266:f462 with SMTP id
- 98e67ed59e1d1-301be20750dmr1899287a91.35.1742354798394; Tue, 18 Mar 2025
- 20:26:38 -0700 (PDT)
+	s=arc-20240116; t=1742354962; c=relaxed/simple;
+	bh=yixH79nzV5SukJr4oLn6BIm0JyYNUponYIuxik4xeAM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=u8cvdMs9EeVv/GX6igOEnc2ks2XYBsbeLuDd+mId4NwBrdZaJJJP6AhRe0Hr0lsxpFIpxDwITD9+435urv4slOeD7eD8qaFTlsU77lQUjENb+vLti7YRs+mDJukrXp9zdUSgZ24+YK4nDF/qtDS4HqB6dlAdUm3PkYpe4gLiuJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=GPnbqtPC; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1742354954;
+	bh=dznLdSdOJ6Kn7aI90N3XVX6/Rk2l5EKH8sSqpI3uMuE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GPnbqtPCz+mhNnmnD7SIn4Xu+hQEQWkLLReQGoVmoPG0ANvK6gq/GUYMWd2O3/8rQ
+	 BvtfUclUnHxbKMoiC1FqtSN0bfF+HFnvlI7pssySC+zp0FwpNoNbEKDeRNLtnnZqZv
+	 sN+Ghoe7NW2FvUg1KSAkYB3P8nBpdcwLFwdfrOWlByuERxbxhJRmUWGHalf51ba853
+	 bX8dsppac1DQDD0QziF1yZgE3fd7uYKcLIe+oizXUDRay9ANSeIkTOZuxGOoCHy+0S
+	 dmCwlbMjME3xvOivRFcEv1O46531ESBG0KMpoBTGLIrM5E/V4s5EndZy1X/OIeJRas
+	 oOF3DcWxRwjyA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4ZHZ223xt6z4wcT;
+	Wed, 19 Mar 2025 14:29:14 +1100 (AEDT)
+Date: Wed, 19 Mar 2025 14:28:29 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Kumar Kartikeya Dwivedi <memxor@gmail.com>, Daniel Borkmann
+ <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, Andrii
+ Nakryiko <andrii@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
+ Uros Bizjak <ubizjak@gmail.com>, bpf <bpf@vger.kernel.org>, Networking
+ <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: Re: linux-next: build failure after merge of the bpf-next tree
+Message-ID: <20250319142829.1dabd7b9@canb.auug.org.au>
+In-Reply-To: <CAADnVQKotSrp8CkVpFw-y800NJ_R7An-iw-twrQZaOdYUeRtqQ@mail.gmail.com>
+References: <20250319133309.6fce6404@canb.auug.org.au>
+	<CAADnVQKotSrp8CkVpFw-y800NJ_R7An-iw-twrQZaOdYUeRtqQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250312-tcp-ao-selftests-polling-v1-0-72a642b855d5@gmail.com> <CAJwJo6bkdeGh0j1ABfrMQ3dRD7frEsNnJERWP8-jJs8dSYFwYA@mail.gmail.com>
-In-Reply-To: <CAJwJo6bkdeGh0j1ABfrMQ3dRD7frEsNnJERWP8-jJs8dSYFwYA@mail.gmail.com>
-From: Dmitry Safonov <0x7f454c46@gmail.com>
-Date: Wed, 19 Mar 2025 03:26:27 +0000
-X-Gm-Features: AQ5f1JqMFkj02AZydIrEhT-StmOCueqFdL_RVZCS15cegHVwZB6ib4jq5FwdKqA
-Message-ID: <CAJwJo6Y9g0JYiLY-taxtj7bo=Jy+U7bqTFsQjhgu2Re7BgaLsA@mail.gmail.com>
-Subject: Re: [PATCH net 0/7] selftests/net: Mixed select()+polling mode for
- TCP-AO tests
-To: 0x7f454c46@gmail.com
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/IDNOidSBs28tcVU.pAzxLe1";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Wed, 19 Mar 2025 at 03:20, Dmitry Safonov <0x7f454c46@gmail.com> wrote:
+--Sig_/IDNOidSBs28tcVU.pAzxLe1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+Hi Alexei,
+
+On Tue, 18 Mar 2025 19:46:52 -0700 Alexei Starovoitov <alexei.starovoitov@g=
+mail.com> wrote:
 >
-> On Wed, 12 Mar 2025 at 09:11, Dmitry Safonov via B4 Relay
-> <devnull+0x7f454c46.gmail.com@kernel.org> wrote:
-> >
-> > Should fix flaky tcp-ao/connect-deny-ipv6 test.
-> > Begging pardon for the delay since the report and for sending it this
-> > late in the release cycle.
-> >
-> > Signed-off-by: Dmitry Safonov <0x7f454c46@gmail.com>
->
-> I think patchwork can't detect v2 to be the same series, so doing it
-> manually here:
-> pw-bot: changes-requested
+> > Caused by the resilient-queued-spin-lock branch of the bpf-next tree
+> > interacting with the "Enable strict percpu address space checks" series
+> > form the mm-stable tree. =20
+>=20
+> Do you mean this set:
+> https://lore.kernel.org/all/20250127160709.80604-1-ubizjak@gmail.com/
 
-* potentially because of the -net vs -net-next subject.
+Yes.  Also available as commits up to commit
 
-However, as I sent the patches with b4 relay, it seems patchwork is
-unable to authorise me as the author of the series. Ugh :(
+ 6a367577153a ("percpu/x86: enable strict percpu checks via named AS qualif=
+iers")
 
-> Just in case, v2 link:
-> https://lore.kernel.org/netdev/20250319-tcp-ao-selftests-polling-v2-0-da48040153d1@gmail.com/
+in the mm-stable branch of the mm tree
+(git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm#mm-stable) and
+yesterday's linux-next tree.
 
--- 
-             Dmitry
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/IDNOidSBs28tcVU.pAzxLe1
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmfaOd0ACgkQAVBC80lX
+0GxC9ggAozjI+xDE1SXkYAXd+bUykzAfIdlk55eVdb8K48i53hMnUTOrCwDHAvhT
+rt0/gy69ZajdxHM/c4lMvbJtbja+vRRtLQ0JVkd0tTAmDbGk2mUXsOuFfM7QclEn
+HTSAZ0cS9LEKYD/edWW1W+8PQfa/dA4Y3EuqeBRFVkpDuBBG4Ud1x30YqEBRL8Kd
+NXCBTEI6ShTtqiifKGfyFR8R7lcaifV4d02JfQs69jYI/SelCGwueOQ20cnIBr7d
+pHNtowms/7bGk2sMcy3gJ2IHOLBIarZfR7HYEucJhZsd/6MNyvVaq4j0xG93p/8h
+7ixXXIqWn1yjQx2yvdKxxJyF1TGt0Q==
+=KO9M
+-----END PGP SIGNATURE-----
+
+--Sig_/IDNOidSBs28tcVU.pAzxLe1--
 
