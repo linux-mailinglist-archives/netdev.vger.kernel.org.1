@@ -1,235 +1,393 @@
-Return-Path: <netdev+bounces-176303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA1ECA69AF2
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 22:34:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3BC2A69AFD
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 22:36:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEAB046783B
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 21:33:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F3527B20D5
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 21:35:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2110321C165;
-	Wed, 19 Mar 2025 21:33:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1446C214A92;
+	Wed, 19 Mar 2025 21:36:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="UNylvA1A"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kFGOF/e1"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2054.outbound.protection.outlook.com [40.107.92.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E0D321B9DF;
-	Wed, 19 Mar 2025 21:33:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742419991; cv=fail; b=iXMT9tYmU2nhnC3B9KEksfVL1jUkgNNheCettTC34SenxWOfZUyRhCLMLfMBscGQt+yddKoZ/Q7eiy5L5HV/WuD3GEXSVSjq2DZUPmHZY9dxvmJUKoXNBkP6JPa4c9S6ohlPhJY9woqQ93PC6iMSfaFJ4nZzMA748XqCwheB7PY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742419991; c=relaxed/simple;
-	bh=g0Luo8zaYjKqX2gsxywM8Yk7U2zl4Ttp8ccn8vYoM1k=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F9M8okaystOUjFZBFYi9/6wQGEVPg22iBmfGkecx+E0R0qAPQ6AT9Rnfhyj4zJpAYjUdmzpD1gsjhZSjwVOctMlZIHqPvsrxmxf+oNIjvBi2mt1Fwm6LlkoXmPzYio/Pg2wJend0sJuM4jsrOptJxFVbzDavOgaCSUHLWWaMnDM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=UNylvA1A; arc=fail smtp.client-ip=40.107.92.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=W/t5V8L9P47ZzdK10curRHUs7ZVpdxEbh/oZYkXKjunYHIkqAKy2G86IwL7/8s9CAPYRxwj+l6eza/y/NLuAIZT4dp+yGFk9iLJ4LwayIrnbc37+wP98ku/lQviFIc65xwHANXaajBtpnX3GCUWOnHJkPKeUVVHhvVNPGK3hVWxzN1vz+CVKq4WR06h4+EoWCxKb3b0FzynPl4AhX7fbU5i6BnZNYuVn32PFmCje+ktm7sJd4sipXz7pfwBLMlJSZZW36VWDmYzTn5JWOJct18z20og8954F/WlaHqREtrs0ceNMY0JrxGvVDeeKhZwbJr3R5Mkz7Ug9uvYUrxs3MA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BG5ufIbuDBQIhKZ8CIO8JjDuhmXdpx1UBDhOQpk9/3k=;
- b=ZZlqHIOQO+2E1p0PUFXLfqTkNsDk2uxiki4tNo+mbLJTmkyzYoZm/amepeHcGE+xQJlFvk0o0Y+i4WpG16KLFDO1bT2ttreeC7kT0TWStMHKQlBE982o7DYV8jW/9eu9OIuRjkPPAqRXTAzm7kQISYqiehuOtPVvLFMWBLcpHDD9rMCvoRyWEKSN2wVDIRSMutnzVj1KRCq1rnRvaGP5Jh3QJcITMo5KErgHKPSPs+61hnW7/29fMu0lgMVAW9DdbaUFm4ikg2a+WEuB2DoY0+m8YaYm6osidU0Kq5rOx1PKVozGrUwHKH87UQp74w+nijTqxNueEBkPjnAwWbxMWw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=nvidia.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BG5ufIbuDBQIhKZ8CIO8JjDuhmXdpx1UBDhOQpk9/3k=;
- b=UNylvA1AnhSQlUnnQejMQ2eYEltGHS9oW984PCbxSiEUTaOZ5X3Owk7fZPyfIZAYhemanhVm5hFXfuH+ejNwrC4PcJrx6qCxZPFIbvEPNc/UQl0tKgMEo8zkzqfdnC0QtWZ9xg6LGIQMbtKZGurl9dN0NFN4p90Y3nC8HLJ7rKc=
-Received: from PH0P220CA0030.NAMP220.PROD.OUTLOOK.COM (2603:10b6:510:d3::30)
- by SJ2PR12MB7822.namprd12.prod.outlook.com (2603:10b6:a03:4ca::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.33; Wed, 19 Mar
- 2025 21:33:04 +0000
-Received: from SJ1PEPF000023D7.namprd21.prod.outlook.com
- (2603:10b6:510:d3:cafe::3) by PH0P220CA0030.outlook.office365.com
- (2603:10b6:510:d3::30) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8534.34 via Frontend Transport; Wed,
- 19 Mar 2025 21:33:03 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ1PEPF000023D7.mail.protection.outlook.com (10.167.244.72) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8583.3 via Frontend Transport; Wed, 19 Mar 2025 21:33:03 +0000
-Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 19 Mar
- 2025 16:33:01 -0500
-From: Shannon Nelson <shannon.nelson@amd.com>
-To: <jgg@nvidia.com>, <andrew.gospodarek@broadcom.com>,
-	<aron.silverton@oracle.com>, <dan.j.williams@intel.com>,
-	<daniel.vetter@ffwll.ch>, <dave.jiang@intel.com>, <dsahern@kernel.org>,
-	<gregkh@linuxfoundation.org>, <hch@infradead.org>, <itayavr@nvidia.com>,
-	<jiri@nvidia.com>, <Jonathan.Cameron@huawei.com>, <kuba@kernel.org>,
-	<lbloch@nvidia.com>, <leonro@nvidia.com>, <linux-cxl@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>, <saeedm@nvidia.com>
-CC: <brett.creeley@amd.com>, Shannon Nelson <shannon.nelson@amd.com>
-Subject: [PATCH v4 6/6] pds_fwctl: add Documentation entries
-Date: Wed, 19 Mar 2025 14:32:37 -0700
-Message-ID: <20250319213237.63463-7-shannon.nelson@amd.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20250319213237.63463-1-shannon.nelson@amd.com>
-References: <20250319213237.63463-1-shannon.nelson@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FA6C20CCDB;
+	Wed, 19 Mar 2025 21:35:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742420161; cv=none; b=awRGZi9MZC4Yk0vj4Se8gABMCGvVN1G34lo0upUxJkX2y0NOX9KmoHkkkoU9CrFqGYmrvpHN3HhMt2OixbfLpglICgBvSu58BOA1ScqG5LOpaEXR24V2zAjpLosP8Oy4KYtpFxqWabegS21RNnIzkgJssyjmzOBIQOWANPeQooA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742420161; c=relaxed/simple;
+	bh=7bGYc57GEzZuisEL2JDhNw+Qr3E4pyQxa5hVpalJuCw=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=YtElliDD2rS5L7CO/sIJVhTcefsMLEL2/17ql4sHMpKMpDhb+y4VuY0r2Waw/goHD1/MQBU6CC7V9RBE9SAbKSr4fpuACpCFeRO4IruBTFTCkwhlMBynyaH96D87wlLIDCBE02WYp7/IkYbb/ZQFTTCcXnOtZpjPLullBF/z6eo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kFGOF/e1; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-47663aeff1bso1785131cf.0;
+        Wed, 19 Mar 2025 14:35:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742420158; x=1743024958; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pqRmhdrZMBqRj5pKWcdYVhUXAfKNmYPuGgU4Iy10MO8=;
+        b=kFGOF/e1Hux5RjfzFNI+5y2FZYrdS1LwnGUGbxSlf7RcHv2/ki/FCxiXWQdRAAc9tL
+         JAYmw1HTrvHoFF6+peb7PDlgkbvi/ct2xz2WTSU0AHdTRm8645KfS8uEXXwNbfNkj3hR
+         uraMzQqZloNp62dkPbRvchmBWHoPWJtyEulERujfiR1wqCXk+wTi52L8OHtEsL9aHU4u
+         E8pJ/Rhy9Ov0HpBUrBLndB4NILDxIU87dY09QjA1odUulSPEfeQgsrvZLEDscokXYHO0
+         kUqJqV1YEp2KaEzFWiP5qRz7Pci3+lWBFM/nLmd7q63iTHmsVYQOB2ssI+GlSbNy8z+M
+         SyLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742420158; x=1743024958;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=pqRmhdrZMBqRj5pKWcdYVhUXAfKNmYPuGgU4Iy10MO8=;
+        b=oLYvkDIb2OEZiuH+IPzd79praUoMxwdbyGOCCE5p7pxnKHAZCe6kkfYZavenedENli
+         rdiaBbgdEOcCErPmhMnUvwMidUuhQ/u/+aVWaWmn5Md8hnKGw7bUSDd7BieaPlVRF426
+         ThEQOgR3fYKzQplxVFw2PA2xfshabCUMOZAl38XBf1O4HWGnIqCin8jo8Aka3n7neRzV
+         O5VLoFP1f0oyBufSNCn/+fi71QX9R2dXWVP3EZjcWUBUhtwwoRmuBL9xbPKQJbdeJh+J
+         MwGuISOipYyY2Sc7cwkkare5bpyKxQFwn1JrMIM7i6CWUJDsPaWzv0fStJ+zJRB9SwJp
+         Iwzw==
+X-Forwarded-Encrypted: i=1; AJvYcCV1r+9T2HtIqA9lwlwqQfKuyK8nvCgplZI87uTObEM/SyR6Q9YMqb6459Rll8SRZPmvGB48TOw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwN/GsVJLIBf7mKerwa2a3NId7rNTWGlJWfWlLQGRcnpjzvmr/k
+	nsaIXWAffypjw4jbaZSCDtjf3eb+YxwGssJkfEdVNrgIIalACRDe
+X-Gm-Gg: ASbGncss2i4Q/okC9I1Nobt0mQ0/H8Smari6FUahlPaDMX5eD0PV2tNZurhQfLJDwlN
+	rav06t6EIomzhvQ3CbmJhKbiwVEJsR+PeZR0i3EP9PCfKBsPnaG9gOJZ6kN1t31NFIRDmkzPCdA
+	WqMwM+B3npaJYDqaHGyY8obVq/SzdFAJ1iJE4CBrh+rwDJn0ZyOX3A+3QGu4yNSOmUNZUNmXjcG
+	xIO2e5evd1SE4zCWpYIx7QkMF8UUqK53fMEltFG7JfYQWUiNJuw9nqW/lk5b6+iP3BLIUzfVdfb
+	yAeE6cdN6cxHPtET/yuW5ySdPNqAGRDTt4uNECWFIpZvWCuFp6KLUhhxQg8cpazctWWDA0VGIHQ
+	cw2dLMS8C1bk/t21LCP92pcu+luDCXoZa
+X-Google-Smtp-Source: AGHT+IHg4+ltsJocMH30bqK9fm3JPGL39cUSEjbekwHRM6g1z8OmtfXuQ7kU+eMAIvpkkg1euy42Fw==
+X-Received: by 2002:a05:622a:907:b0:476:7112:4add with SMTP id d75a77b69052e-4770830d865mr81255721cf.18.1742420158001;
+        Wed, 19 Mar 2025 14:35:58 -0700 (PDT)
+Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-476bb7f3d6asm84333151cf.55.2025.03.19.14.35.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Mar 2025 14:35:57 -0700 (PDT)
+Date: Wed, 19 Mar 2025 17:35:56 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Pauli Virtanen <pav@iki.fi>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jason Xing <kerneljasonxing@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ kuba@kernel.org
+Message-ID: <67db38bcbfc23_369fe2947@willemb.c.googlers.com.notmuch>
+In-Reply-To: <c49167b08b7af73bc633e1b195a30e0dd23735d7.camel@iki.fi>
+References: <cover.1742324341.git.pav@iki.fi>
+ <a5c1b2110e567f499e17a4a67f1cc7c2036566c4.1742324341.git.pav@iki.fi>
+ <CAL+tcoCr-Z_PrWMsERtsm98Q4f-RXkMVzTW3S1gnNY6cFQM0Sg@mail.gmail.com>
+ <67dad8635c22c_5948294ac@willemb.c.googlers.com.notmuch>
+ <5882af942ef8cf5c9b4ce36a348f959807a387b0.camel@iki.fi>
+ <67db224a5412b_2a13f29418@willemb.c.googlers.com.notmuch>
+ <c49167b08b7af73bc633e1b195a30e0dd23735d7.camel@iki.fi>
+Subject: Re: [PATCH v5 2/5] Bluetooth: add support for skb TX SND/COMPLETION
+ timestamping
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF000023D7:EE_|SJ2PR12MB7822:EE_
-X-MS-Office365-Filtering-Correlation-Id: bd681626-f3b1-4801-8655-08dd672da18c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|1800799024|82310400026|36860700013|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?RbEeyw39cjK/Ld6cYdMfXKW2VGQz2Yri0XFRsirtSZCHe9aah+Kzwes99UFQ?=
- =?us-ascii?Q?z86zSuT1EKYSdqdTpS94A8r0QO+uGE9ZF7MpXu2jWgNVuyAMXUxcSAhopv5P?=
- =?us-ascii?Q?7T222A3loHltLOeTU0pXAz0HWW2enPuBIi5p8DcIp+ZEn81pB8yPMepa7zOR?=
- =?us-ascii?Q?/q17fw5/pJIOCg7PTIuUVnSImVjMhfvJ48h5fuChne5GOro6cw5ypDqOufoH?=
- =?us-ascii?Q?eDF5s8a3RVwjihshrAlktyKFcLB6nCGe+Jk5U0nFh2LBb2Li8wvlYUy5dxeK?=
- =?us-ascii?Q?t5SwCkAnLdYsi0m2VeOsugmcYbAWzcWqoBSnU+8E32yk3PD84+MIq65qf+6B?=
- =?us-ascii?Q?P1a7hCqr1hWBXnG92+An0+ssXgxMqaXYio3oG/MTKlq5FXQ76P4W/93Lc8GF?=
- =?us-ascii?Q?1EoTrYdp4o14xQYpU9ZENToSZdmfJa1hdompbuHMNnHoqv0P7n7uHUq0DPko?=
- =?us-ascii?Q?5rNuRvxEAt6hws7i3Lc6fm1C817vExq22+mfTFMLNpDp5Ux1lkA/g+60gRGF?=
- =?us-ascii?Q?+Y83IYBp4YSC5SEkqRquHr22EeD7HFIJC6LBHYhgL9A6Z2sAeExOplPi6tfg?=
- =?us-ascii?Q?BTnPzTfo97/GreE3kcAdA3TPXjF2EJKE6rIAzVK+MSXMxANGsC5DpPiXNJOq?=
- =?us-ascii?Q?3eBuuwYeqB77l16AhdUJxa3V4+kUUkTRXBFkdH/qfgCYVTne1Y1GZ/mH9rgX?=
- =?us-ascii?Q?jE4WaYpx7pd/B3QH4nZWEZed/tsdVgHDNI92SssHN2HzoD7kvbNbs3U/9D4w?=
- =?us-ascii?Q?q/QZuumLGednOBadgAQm5sUHCT2XV7ZN5tHOXyBMqCcZ5j4UBrYFEdciWj9w?=
- =?us-ascii?Q?aKvtqqiEk+J77EhYQ2z1AgIJSQbXzmiNkZkrEDUD/tsRKVWKcB+PaTFcvnKD?=
- =?us-ascii?Q?jT6xvQ2P3qmhZbW9j1QPaeZq/KEboFrPiRcKZMUxUoMu0uiWGTx59fsvQbBM?=
- =?us-ascii?Q?+64FhiOgTcleFG/X/PVezQDkEiAEMQFsLYd1ZYqP0wgnjP1i59C9Wzm5M0Fi?=
- =?us-ascii?Q?7tXfoYBSu1T4h3Z0kqiuOPsILrMub0uFkawDaF/z9GpC1fLuKfjgDt7MF2KY?=
- =?us-ascii?Q?nCwyUpzvmuvSiVf2OW3M8IdYtQj1FUEkW53WIkgR8b7YW7UF1RfMIZqnb9AN?=
- =?us-ascii?Q?YWwyJ8MurzVJ9lss9EUltQhXTifjrd+UxDKos/GRz5JdFQ8ftWBkCUIUll7i?=
- =?us-ascii?Q?n4OKNLk9oFqfy2meIuKRWiZ/YFbus5woWVgO/5d3SeUw7bux9idG6bP3mGI7?=
- =?us-ascii?Q?kVDnq1Lx695r+jZwob0+qQSDqtt0nO07uHSWjLsP2fU3yX0Iw9Xg9D+wMEiE?=
- =?us-ascii?Q?qfcPFKZIxgwJbWckvwYbYK2eCcKo6hgP5RFtXUcpdZEEiN48a2D4q7yJAJph?=
- =?us-ascii?Q?fSxsFaT7aokGVvMJhMAqdqrWjQghjDftb8WjAnBWCJ/K41S+lAfKAz6wwhQW?=
- =?us-ascii?Q?o1wzVq8l6txNhmRHox2CSRCIL/sSn5rR/1ZJHqrlmD5EAwZLGLuIR/bO9J8c?=
- =?us-ascii?Q?KcXJ6p0y2F8k4DrPzG3N0TbtybwanNtDPwUe?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(82310400026)(36860700013)(921020);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2025 21:33:03.6602
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bd681626-f3b1-4801-8655-08dd672da18c
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF000023D7.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB7822
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Add pds_fwctl to the driver and fwctl documentation pages.
+Pauli Virtanen wrote:
+> Hi,
+> =
 
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
-Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
----
- Documentation/userspace-api/fwctl/fwctl.rst   |  1 +
- Documentation/userspace-api/fwctl/index.rst   |  1 +
- .../userspace-api/fwctl/pds_fwctl.rst         | 48 +++++++++++++++++++
- 3 files changed, 50 insertions(+)
- create mode 100644 Documentation/userspace-api/fwctl/pds_fwctl.rst
+> ke, 2025-03-19 kello 16:00 -0400, Willem de Bruijn kirjoitti:
+> > Pauli Virtanen wrote:
+> > > ke, 2025-03-19 kello 10:44 -0400, Willem de Bruijn kirjoitti:
+> > > > Jason Xing wrote:
+> > > > > On Wed, Mar 19, 2025 at 3:10=E2=80=AFAM Pauli Virtanen <pav@iki=
+.fi> wrote:
+> > > > > > =
 
-diff --git a/Documentation/userspace-api/fwctl/fwctl.rst b/Documentation/userspace-api/fwctl/fwctl.rst
-index 04ad78a7cd48..fdcfe418a83f 100644
---- a/Documentation/userspace-api/fwctl/fwctl.rst
-+++ b/Documentation/userspace-api/fwctl/fwctl.rst
-@@ -150,6 +150,7 @@ fwctl User API
- 
- .. kernel-doc:: include/uapi/fwctl/fwctl.h
- .. kernel-doc:: include/uapi/fwctl/mlx5.h
-+.. kernel-doc:: include/uapi/fwctl/pds.h
- 
- sysfs Class
- -----------
-diff --git a/Documentation/userspace-api/fwctl/index.rst b/Documentation/userspace-api/fwctl/index.rst
-index d9d40a468a31..316ac456ad3b 100644
---- a/Documentation/userspace-api/fwctl/index.rst
-+++ b/Documentation/userspace-api/fwctl/index.rst
-@@ -11,3 +11,4 @@ to securely construct and execute RPCs inside device firmware.
- 
-    fwctl
-    fwctl-cxl
-+   pds_fwctl
-diff --git a/Documentation/userspace-api/fwctl/pds_fwctl.rst b/Documentation/userspace-api/fwctl/pds_fwctl.rst
-new file mode 100644
-index 000000000000..a8f5a457ba0f
---- /dev/null
-+++ b/Documentation/userspace-api/fwctl/pds_fwctl.rst
-@@ -0,0 +1,48 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+================
-+fwctl pds driver
-+================
-+
-+:Author: Shannon Nelson
-+
-+Overview
-+========
-+
-+The PDS Core device makes a fwctl service available through an
-+auxiliary_device named pds_core.fwctl.N.  The pds_fwctl driver binds to
-+this device and registers itself with the fwctl subsystem.  The resulting
-+userspace interface is used by an application that is a part of the
-+AMD Pensando software package for the Distributed Service Card (DSC).
-+
-+The pds_fwctl driver has little knowledge of the firmware's internals.
-+It only knows how to send commands through pds_core's message queue to the
-+firmware for fwctl requests.  The set of fwctl operations available
-+depends on the firmware in the DSC, and the userspace application
-+version must match the firmware so that they can talk to each other.
-+
-+When a connection is created the pds_fwctl driver requests from the
-+firmware a list of firmware object endpoints, and for each endpoint the
-+driver requests a list of operations for that endpoint.
-+
-+Each operation description includes a firmware defined command attribute
-+that maps to the FWCTL scope levels.  The driver translates those firmware
-+values into the FWCTL scope values which can then be used for filtering the
-+scoped user requests.
-+
-+pds_fwctl User API
-+==================
-+
-+.. kernel-doc:: include/uapi/fwctl/pds.h
-+
-+Each RPC request includes the target endpoint and the operation id, and in
-+and out buffer lengths and pointers.  The driver verifies the existence
-+of the requested endpoint and operations, then checks the request scope
-+against the required scope of the operation.  The request is then put
-+together with the request data and sent through pds_core's message queue
-+to the firmware, and the results are returned to the caller.
-+
-+The RPC endpoints, operations, and buffer contents are defined by the
-+particular firmware package in the device, which varies across the
-+available product configurations.  The details are available in the
-+specific product SDK documentation.
--- 
-2.17.1
+> > > > > > Support enabling TX timestamping for some skbs, and track the=
+m until
+> > > > > > packet completion. Generate software SCM_TSTAMP_COMPLETION wh=
+en getting
+> > > > > > completion report from hardware.
+> > > > > > =
+
+> > > > > > Generate software SCM_TSTAMP_SND before sending to driver. Se=
+nding from
+> > > > > > driver requires changes in the driver API, and drivers mostly=
+ are going
+> > > > > > to send the skb immediately.
+> > > > > > =
+
+> > > > > > Make the default situation with no COMPLETION TX timestamping=
+ more
+> > > > > > efficient by only counting packets in the queue when there is=
+ nothing to
+> > > > > > track.  When there is something to track, we need to make clo=
+nes, since
+> > > > > > the driver may modify sent skbs.
+> > > > =
+
+> > > > Why count packets at all? And if useful separate from completions=
+,
+> > > > should that be a separate patch?
+> > > =
+
+> > > This paragraph was commenting on the implementation of struct tx_qu=
+eue,
+> > > and maybe how it works should be explicitly explained somewhere (co=
+de
+> > > comment?). Here's some explanation of it:
+> > > =
+
+> > > 1) We have to hang on (clones of) skbs until completion reports for=
+
+> > > them arrive, in order to emit COMPLETION timestamps. There's no
+> > > existing queue that does this in net/bluetooth (drivers may just co=
+py
+> > > data & discard skbs, and they don't know about completion reports),=
+ so
+> > > something new needs to be added.
+> > > =
+
+> > > 2) It is only needed for emitting COMPLETION timestamps. So it's be=
+tter
+> > > to not do any extra work (clones etc.) when there are no such
+> > > timestamps to be emitted.
+> > > =
+
+> > > 3) The new queue should work correctly when timestamping is turned =
+on
+> > > or off, or only some packets are timestamped. It should also eventu=
+ally
+> > > return to a state where no extra work is done, when new skbs don't
+> > > request COMPLETION timestamps.
+> > =
+
+> > So far, fully understood.
+> > =
+
+> > > struct tx_queue implements such queue that only "tracks" some skbs.=
+
+> > > Logical structure:
+> > > =
+
+> > > HEAD
+> > > <no stored skb>  }
+> > > <no stored skb>  }  tx_queue::extra is the number of non-tracked
+> > > ...              }  logical items at queue head
+> > > <no stored skb>  }
+> > > <tracked skb>		} tx_queue::queue contains mixture of
+> > > <non-tracked skb>	} tracked items  (skb->sk !=3D NULL) and
+> > > <non-tracked skb>	} non-tracked items  (skb->sk =3D=3D NULL).
+> > > <tracked skb>		} These are ordered after the "extra" items.
+> > > TAIL
+> > > =
+
+> > > tx_queue::tracked is the number of tracked skbs in tx_queue::queue.=
+
+> > > =
+
+> > > hci_conn_tx_queue() determines whether skb is tracked (=3D COMPLETI=
+ON
+> > > timestamp shall be emitted for it) and pushes a logical item to TAI=
+L.
+> > > =
+
+> > > hci_conn_tx_dequeue() pops a logical item from HEAD, and emits
+> > > timestamp if it corresponds to a tracked skb.
+> > > =
+
+> > > When tracked =3D=3D 0, queue() can just increment tx_queue::extra, =
+and
+> > > dequeue() can remove any skb from tx_queue::queue, or if empty then=
+
+> > > decrement tx_queue::extra. This allows it to return to a state with=
+
+> > > empty tx_queue::queue when new skbs no longer request timestamps.
+> > > =
+
+> > > When tracked !=3D 0, the ordering of items in the queue needs to be=
+
+> > > respected strictly, so queue() always pushes real skb (tracked or n=
+ot)
+> > > to TAIL, and dequeue() has to decrement extra to zero, before it ca=
+n
+> > > pop skb from queue head.
+> > =
+
+> > Thanks. I did not understand why you need to queue or track any
+> > sbs aside from those that have SKBTX_COMPLETION_TSTAMP.
+> > =
+
+> > If I follow correctly this is to be able to associate the tx
+> > completion with the right skb on the queue.
+> =
+
+> Yes, it was done to maintain the queue/dequeue ordering.
+> =
+
+> > The usual model in Ethernet drivers is that every tx descriptor (and
+> > completion descriptor) in the ring is associated with a pure software=
+
+> > ring of metadata structures, which can point to an skb (or NULL).
+> > =
+
+> > In a pinch, instead the skb on the queue itself could record the
+> > descriptor id that it is associated with. But hci_conn_tx_queue is
+> > too far removed from the HW, so has no direct access to that. And
+> > similarly hci_conn_tx_dequeue has no such low level details.
+> > =
+
+> > So long story short you indeed have to track this out of band with
+> > a separate counter. I also don't immediately see a simpler way.
+> > =
+
+> > Though you can perhaps replace the skb_clone (not the skb_clone_sk!)
+> > with some sentinel value that just helps count?
+> =
+
+> It probably could be done a bit smarter, it could eg. use something
+> else than skb_queue. Or, I think we can clobber cb here as the clones
+> are only used for timestamping, so:
+> =
+
+> =
+
+> struct tx_queue {
+> 	unsigned int pre_items;
+> 	struct sk_buff_head queue;
+> };
+> =
+
+> struct tx_queue_cb {
+> 	unsigned int post_items;
+> };
+> =
+
+> static void hci_tx_queue_push(struct tx_queue *q, struct sk_buff *skb)
+> {
+> 	struct tx_queue_cb *cb;
+> =
+
+> 	/* HEAD
+> 	 * <non-tracked item>  }
+> 	 * ...                 } tx_queue::pre_items of these
+> 	 * <non-tracked item>  }
+> 	 * <tracked skb1>     <- tx_queue::queue first item
+> 	 * <non-tracked item>  }
+> 	 * ...                 } ((struct tx_queue_cb *)skb1->cb)->post_items
+> 	 * <non-tracked item>  }
+> 	 * ...
+> 	 * <tracked skbn>     <- tx_queue::queue n-th item
+> 	 * <non-tracked item>  }
+> 	 * ...                 } ((struct tx_queue_cb *)skbn->cb)->post_items
+> 	 * <non-tracked item>  }
+> 	 * TAIL
+> 	 */
+> 	if (skb) {
+> 		cb =3D (struct tx_queue_cb *)skb->cb;
+> 		cb->post_items =3D 0;
+> 		skb_queue_tail(&q->queue, skb);
+> 	} else {
+> 		skb =3D skb_peek_tail(&q->queue);
+> 		if (skb) {
+> 			cb =3D (struct tx_queue_cb *)skb->cb;
+> 			cb->post_items++;
+> 		} else {
+> 			q->pre_items++;
+> 		}
+> 	}
+> }
+> =
+
+> static struct sk_buff *hci_tx_queue_pop(struct tx_queue *q)
+> {
+> 	struct sk_buff *skb;
+> 	struct tx_queue_cb *cb;
+> =
+
+> 	if (q->pre_items) {
+> 		q->pre_items--;
+> 		return NULL;
+> 	}
+> =
+
+> 	skb =3D skb_dequeue(&q->queue);
+> 	if (skb) {
+> 		cb =3D (struct tx_queue_cb *)skb->cb;
+> 		q->pre_items +=3D cb->post_items;
+> 	}
+> =
+
+> 	return skb;
+> }
+> =
+
+> void hci_conn_tx_queue(struct hci_conn *conn, struct sk_buff *skb)
+> {
+> 	/* Emit SND now, ie. just before sending to driver */
+> 	if (skb_shinfo(skb)->tx_flags & SKBTX_SW_TSTAMP)
+> 		__skb_tstamp_tx(skb, NULL, NULL, skb->sk, SCM_TSTAMP_SND);
+> =
+
+> 	/* COMPLETION tstamp is emitted for tracked skb later in Number of
+> 	 * Completed Packets event. Available only for flow controlled cases.
+> 	 *
+> 	 * TODO: SCO support without flowctl (needs to be done in drivers)
+> 	 */
+> 	switch (conn->type) {
+> 	case ISO_LINK:
+> 	case ACL_LINK:
+> 	case LE_LINK:
+> 		break;
+> 	case SCO_LINK:
+> 	case ESCO_LINK:
+> 		if (!hci_dev_test_flag(conn->hdev, HCI_SCO_FLOWCTL))
+> 			return;
+> 		break;
+> 	default:
+> 		return;
+> 	}
+> =
+
+> 	if (skb->sk && (skb_shinfo(skb)->tx_flags & SKBTX_COMPLETION_TSTAMP))
+> 		skb =3D skb_clone_sk(skb);
+> 	else
+> 		skb =3D NULL;
+> =
+
+> 	hci_tx_queue_push(&conn->tx_q, skb);
+> 	return;
+> }
+> =
+
+> void hci_conn_tx_dequeue(struct hci_conn *conn)
+> {
+> 	struct sk_buff *skb =3D hci_tx_queue_pop(&conn->tx_q);
+> =
+
+> 	if (skb) {
+> 		__skb_tstamp_tx(skb, NULL, NULL, skb->sk,
+> 				SCM_TSTAMP_COMPLETION);
+> 		kfree_skb(skb);
+> 	}
+> }
+
+Neat. To be clear, your call. Just if the expectation is that
+timestamped packets are rare even when enabled (e.g., due to
+sampling, or enabling only for one of many sockets), then avoiding
+the skb_clone in the common case may be worthwhile.
 
 
