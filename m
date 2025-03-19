@@ -1,177 +1,171 @@
-Return-Path: <netdev+bounces-176312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E02EFA69B25
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 22:46:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F761A69B3C
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 22:51:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BF398A7D5B
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 21:46:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23DA219C10AF
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 21:51:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C0C21A95D;
-	Wed, 19 Mar 2025 21:45:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b="K9+4n9q1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11D21215171;
+	Wed, 19 Mar 2025 21:51:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.forwardemail.net (smtp.forwardemail.net [149.28.215.223])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from maynard.decadent.org.uk (maynard.decadent.org.uk [65.21.191.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ACD221CC60
-	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 21:45:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=149.28.215.223
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B31722135C1
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 21:51:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.21.191.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742420703; cv=none; b=kpAN3IFDGt1UJnbNQk8XSmhJvEuVi9vxiCT9/FlMm/p87RLLoIHYypLa4PS4IKHipGjxEv9AUu+15WcyZ9NENvf1QPGigfEGVfJxOBYELuQUqBQTgVAJYM/gNKCNEwvtyI5Pk+Sp/0CqPZ8OyQ9rnFWGPzXAPfF7KxWKQWrMm/g=
+	t=1742421072; cv=none; b=YZ6Wy9EYQpNbeu8Ax+7BwEVBcoc/CgMXb4QBalCueKqKEQ2Sdbw1StGLeorV0v0ZHl5q1hMja+DuBRiTRwvMJuVVzQ0vgxX/4M6P10tWtSa4TQaELdQJsNzuybygnsLbiJToV913TehxK4lM28bb1SwKNDzCpzZ/aBQ7qBokoTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742420703; c=relaxed/simple;
-	bh=dN+pwhVdQxGnPZ4Ij+k3V0Q3kuFSFJryhHg84F0atnk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UmWVSMXv50cEXHQj0QKyaxbfRDPeUwFYdn1MjGADAKW0mm/SC/OyG4axmc47eDOLhI1VepreXAE/wWXmmyljGuc1vI5sRt0lE0aB0FuMi87C5JicSvR1EEVEqdkX2DghGxhx9Sybl8WhtyZ9OvdKksDjI0tsyInpvrwBNBoeD/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se; dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b=K9+4n9q1; arc=none smtp.client-ip=149.28.215.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kwiboo.se;
- h=Content-Transfer-Encoding: MIME-Version: References: In-Reply-To:
- Message-ID: Date: Subject: Cc: To: From; q=dns/txt; s=fe-e1b5cab7be;
- t=1742420696; bh=L6J1WZQlQ4jkkHrsEJmiDwnkEgm0ftZ58Eh+fnNyjbU=;
- b=K9+4n9q1ChypiRueS528bu2xwIPhaWYAx60wMiXwqiz2KaeCGmZ7NCg3T67b8LmszxrJCl70h
- c2sxYOssZbajXvgB6TsQw3xrYIuRiyGOtfLRVgqqvr5kI53knUcRUOfsQjtYJPJAhq5NcxoyDAS
- PkNViH2TPcfsP4bZfgwRPCssUSzQAsNcauTbAcrODZHwoR10wA5ex+nMgM2UgrmUTohQUzKki4G
- iNBLKadOIFo6x4RjF2ui5rGUxhp8PtlToGunCdAcif69fpcZE7goP+FpaY07HWnd+F3n4zzmoPD
- VEe70hlnI8ko2dZQnD1OmY/BR5SXe5vRocxCVziWAF2g==
-X-Forward-Email-ID: 67db3acecf4d592372b99442
-X-Forward-Email-Sender: rfc822; jonas@kwiboo.se, smtp.forwardemail.net,
- 149.28.215.223
-X-Forward-Email-Version: 0.4.40
-X-Forward-Email-Website: https://forwardemail.net
-X-Complaints-To: abuse@forwardemail.net
-X-Report-Abuse: abuse@forwardemail.net
-X-Report-Abuse-To: abuse@forwardemail.net
-From: Jonas Karlman <jonas@kwiboo.se>
-To: Heiko Stuebner <heiko@sntech.de>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>
-Cc: Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	David Wu <david.wu@rock-chips.com>,
-	Yao Zi <ziyao@disroot.org>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-rockchip@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Jonas Karlman <jonas@kwiboo.se>,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: [PATCH net-next v3 5/5] net: stmmac: dwmac-rk: Add initial support for RK3528 integrated PHY
-Date: Wed, 19 Mar 2025 21:44:09 +0000
-Message-ID: <20250319214415.3086027-6-jonas@kwiboo.se>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250319214415.3086027-1-jonas@kwiboo.se>
-References: <20250319214415.3086027-1-jonas@kwiboo.se>
+	s=arc-20240116; t=1742421072; c=relaxed/simple;
+	bh=tzIoAGCH1Y1W7YZr8XV1x/E0ijK83jlaKqCdA8ijs98=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=NNYiC1tMgUAPJvxR3dYIItHlaqMKCM0evrKsrRjUCsR5kSl0OWpvV9RTVN2o36M8PuDdS6eN4fPLkTYaFSL4AJX/MwNjfY1QaDK5UbqSzb6vdEZbLtDqJZueGfcExmIcDhTc5inXu5FFf6NC/Fynf57fSnlWk1vpVvD7ysUl6Cw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=decadent.org.uk; arc=none smtp.client-ip=65.21.191.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=decadent.org.uk
+Received: from [2a02:578:851f:1502:391e:c5f5:10e2:b9a3] (helo=deadeye)
+	by maynard with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ben@decadent.org.uk>)
+	id 1tv1JW-009oef-1X;
+	Wed, 19 Mar 2025 21:51:02 +0000
+Received: from ben by deadeye with local (Exim 4.98)
+	(envelope-from <ben@decadent.org.uk>)
+	id 1tv1JV-00000002bKa-0ivC;
+	Wed, 19 Mar 2025 22:51:01 +0100
+Date: Wed, 19 Mar 2025 22:51:01 +0100
+From: Ben Hutchings <benh@debian.org>
+To: netdev@vger.kernel.org
+Cc: 1088739@bugs.debian.org
+Subject: [PATCH iproute2 1/2] color: Introduce and use default_color_opt()
+ function
+Message-ID: <Z9s8RSix3wtE8QPf@decadent.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="IGA8HJnxP42oWw4V"
+Content-Disposition: inline
+X-SA-Exim-Connect-IP: 2a02:578:851f:1502:391e:c5f5:10e2:b9a3
+X-SA-Exim-Mail-From: ben@decadent.org.uk
+X-SA-Exim-Scanned: No (on maynard); SAEximRunCond expanded to false
 
-Rockchip RK3528 (and RV1106) has a different integrated PHY compared to
-the integrated PHY on RK3228/RK3328. Current powerup/down operation is
-not compatible with the integrated PHY found in these newer SoCs.
 
-Add operations to powerup/down the integrated PHY found in RK3528.
-Use helpers that can be used by other GMAC variants in the future.
+--IGA8HJnxP42oWw4V
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
+As a preparatory step for supporting the NO_COLOR environment
+variable, replace the direct use of CONF_COLOR with a
+default_color_opt() function which initially returns CONF_COLOR.
+
+Signed-off-by: Ben Hutchings <benh@debian.org>
 ---
-Changes in v3:
-- No change
-Changes in v2:
-- New patch
+ bridge/bridge.c | 2 +-
+ include/color.h | 1 +
+ ip/ip.c         | 2 +-
+ lib/color.c     | 5 +++++
+ tc/tc.c         | 2 +-
+ 5 files changed, 9 insertions(+), 3 deletions(-)
 
-This is enough to power up the integrated PHY on RK3528 for MDIO/MII.
-However, a PHY driver is still missing and I do not have any RK3528
-board that make use of this MAC and PHY, so something that can be
-improved upon in the future.
----
- .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 41 +++++++++++++++++++
- 1 file changed, 41 insertions(+)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-index 3673abd65302..700858ff6f7c 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-@@ -134,6 +134,35 @@ static void rk_gmac_integrated_ephy_powerdown(struct rk_priv_data *priv)
- 		reset_control_assert(priv->phy_reset);
+diff --git a/bridge/bridge.c b/bridge/bridge.c
+index f8b5646a..d993ba19 100644
+--- a/bridge/bridge.c
++++ b/bridge/bridge.c
+@@ -103,7 +103,7 @@ static int batch(const char *name)
+ int
+ main(int argc, char **argv)
+ {
+-	int color =3D CONF_COLOR;
++	int color =3D default_color_opt();
+=20
+ 	while (argc > 1) {
+ 		const char *opt =3D argv[1];
+diff --git a/include/color.h b/include/color.h
+index 17ec56f3..b543c267 100644
+--- a/include/color.h
++++ b/include/color.h
+@@ -20,6 +20,7 @@ enum color_opt {
+ 	COLOR_OPT_ALWAYS =3D 2
+ };
+=20
++int default_color_opt(void);
+ bool check_enable_color(int color, int json);
+ bool matches_color(const char *arg, int *val);
+ int color_fprintf(FILE *fp, enum color_attr attr, const char *fmt, ...);
+diff --git a/ip/ip.c b/ip/ip.c
+index c7151fbd..e4b71bde 100644
+--- a/ip/ip.c
++++ b/ip/ip.c
+@@ -166,7 +166,7 @@ int main(int argc, char **argv)
+ 	const char *libbpf_version;
+ 	char *batch_file =3D NULL;
+ 	char *basename;
+-	int color =3D CONF_COLOR;
++	int color =3D default_color_opt();
+=20
+ 	/* to run vrf exec without root, capabilities might be set, drop them
+ 	 * if not needed as the first thing.
+diff --git a/lib/color.c b/lib/color.c
+index cd0f9f75..5c4cc329 100644
+--- a/lib/color.c
++++ b/lib/color.c
+@@ -81,6 +81,11 @@ static void enable_color(void)
+ 	set_color_palette();
  }
- 
-+#define RK_FEPHY_SHUTDOWN		GRF_BIT(1)
-+#define RK_FEPHY_POWERUP		GRF_CLR_BIT(1)
-+#define RK_FEPHY_INTERNAL_RMII_SEL	GRF_BIT(6)
-+#define RK_FEPHY_24M_CLK_SEL		(GRF_BIT(8) | GRF_BIT(9))
-+#define RK_FEPHY_PHY_ID			GRF_BIT(11)
-+
-+static void rk_gmac_integrated_fephy_powerup(struct rk_priv_data *priv,
-+					     unsigned int reg)
+=20
++int default_color_opt(void)
 +{
-+	reset_control_assert(priv->phy_reset);
-+	usleep_range(20, 30);
-+
-+	regmap_write(priv->grf, reg,
-+		     RK_FEPHY_POWERUP |
-+		     RK_FEPHY_INTERNAL_RMII_SEL |
-+		     RK_FEPHY_24M_CLK_SEL |
-+		     RK_FEPHY_PHY_ID);
-+	usleep_range(10000, 12000);
-+
-+	reset_control_deassert(priv->phy_reset);
-+	usleep_range(50000, 60000);
++	return CONF_COLOR;
 +}
 +
-+static void rk_gmac_integrated_fephy_powerdown(struct rk_priv_data *priv,
-+					       unsigned int reg)
-+{
-+	regmap_write(priv->grf, reg, RK_FEPHY_SHUTDOWN);
-+}
-+
- #define PX30_GRF_GMAC_CON1		0x0904
- 
- /* PX30_GRF_GMAC_CON1 */
-@@ -993,12 +1022,24 @@ static void rk3528_set_clock_selection(struct rk_priv_data *bsp_priv,
- 	}
- }
- 
-+static void rk3528_integrated_phy_powerup(struct rk_priv_data *bsp_priv)
-+{
-+	rk_gmac_integrated_fephy_powerup(bsp_priv, RK3528_VO_GRF_MACPHY_CON0);
-+}
-+
-+static void rk3528_integrated_phy_powerdown(struct rk_priv_data *bsp_priv)
-+{
-+	rk_gmac_integrated_fephy_powerdown(bsp_priv, RK3528_VO_GRF_MACPHY_CON0);
-+}
-+
- static const struct rk_gmac_ops rk3528_ops = {
- 	.set_to_rgmii = rk3528_set_to_rgmii,
- 	.set_to_rmii = rk3528_set_to_rmii,
- 	.set_rgmii_speed = rk3528_set_rgmii_speed,
- 	.set_rmii_speed = rk3528_set_rmii_speed,
- 	.set_clock_selection = rk3528_set_clock_selection,
-+	.integrated_phy_powerup = rk3528_integrated_phy_powerup,
-+	.integrated_phy_powerdown = rk3528_integrated_phy_powerdown,
- 	.regs_valid = true,
- 	.regs = {
- 		0xffbd0000, /* gmac0 */
--- 
-2.49.0
+ bool check_enable_color(int color, int json)
+ {
+ 	if (json || color =3D=3D COLOR_OPT_NEVER)
+diff --git a/tc/tc.c b/tc/tc.c
+index beb88111..0fc658c8 100644
+--- a/tc/tc.c
++++ b/tc/tc.c
+@@ -254,7 +254,7 @@ int main(int argc, char **argv)
+ {
+ 	const char *libbpf_version;
+ 	char *batch_file =3D NULL;
+-	int color =3D CONF_COLOR;
++	int color =3D default_color_opt();
+ 	int ret;
+=20
+ 	while (argc > 1) {
 
+
+--IGA8HJnxP42oWw4V
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAmfbPEAACgkQ57/I7JWG
+EQkkrBAAoo9d7QqJWKzLHUY7MW2dbqH6PMkQn9RxVhL+kwcRxJFOw6aSCB/wwz/T
+66s9PCEmST0fJakN4NPhNllkhGe/g71RRLs5k9WroRNPuKLOQKkDflyYnxDerWbm
+iKy9CZAtyqZ6BueYCqKYZ9QyWwAvxnc3juLzd21te1b71ZS+jwRr56fdnITjIf9f
+1YaMIOpBsrjEy5MRtoQ3HztCMRxdZXPs6Xkv4+6hhPulz06RUUW4TjTT/unPhxzm
+3xDkHNeFbkkJ++B/a3uXxY6PyH03DewaHNpIGtIwCYDmndzsZFX1vdGkGI8LvhD8
+KkMl++sEzw8TzqgjFs4aBTwrwdZ+q814M5l6NzMyCj2VHRNpMladmRbVDs8piAmF
+3drtbWOvCRYj+ukbjzGG69FSyt+LCM6JTmV2W+LQz0U+7AwkShCpmclKEMOPut+t
+lUtg8AZnYHfsADtvHr0Tc21McJ9WRLClSU4YTCohL/8usBsPB3m9wRWUyGoi2KR2
+4GxiVJ35eiyAI4eD76WaCj6m9HQVDWNa5SXA+15l0cw6qloIStrl1kIwK0SBoHJO
+3Na1c5P4YlPGzjoc/tfJjxtUUlR29DyRnGQ0s7RmsILiuiwXEuPmk3aBpQUQCtwz
+Gar3FkWl/92/YzKzgPOjqI5QQMJQj1byoiMTmgJhvc+1roTe6QY=
+=UrRu
+-----END PGP SIGNATURE-----
+
+--IGA8HJnxP42oWw4V--
 
