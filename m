@@ -1,191 +1,161 @@
-Return-Path: <netdev+bounces-176117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6045A68E0C
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 14:43:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 45C18A68E15
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 14:45:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B79B189C1A8
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 13:38:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 850301888E11
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 13:41:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 404582566CC;
-	Wed, 19 Mar 2025 13:38:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F40352566FB;
+	Wed, 19 Mar 2025 13:41:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a2QwVYVL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eEYeT+qc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f65.google.com (mail-ed1-f65.google.com [209.85.208.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72DC3A29;
-	Wed, 19 Mar 2025 13:38:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7B95212B02;
+	Wed, 19 Mar 2025 13:41:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742391504; cv=none; b=CmVJ/9+lL1CsjNCyLBuohN5JLAKuD8Bx/kCcC0aPOKj+p8LJfiXO/QUJdzdphcyUO/NFxgOorDWUkPPGfkoyESqQR/n9+RaKrEk9ey/w8WFzGvdXtxIhlD/eZSoryd+wWXB44Ankjeq+m2M8m9+kafykh6mOPE+RjhocietW4So=
+	t=1742391670; cv=none; b=rMdLo0XkdwW5qA4vsT2bDyhU8pAJYSOOXOq+LTXmfCNwWjofbFHeUedU2xM6LCoV8IdcIrNJMKWYUlAk66asSd/zOmzKswDuim5o1hb/W0OeUJ6JEwlLxyq6+Gawi+RI5d+Uv9/YRGDkglhScQaiA41iRcPhNA/DN0S+HbB32uk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742391504; c=relaxed/simple;
-	bh=MVYifdB7XOuUZcXrnEyxQSRe1sXNhjSse7qEoJppzFg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=K6fH4avC/8RSAN/ebwmtm7CoF3SKjiVGDEDC925O8288Hjwyk1T2CZLO1LHvKo+OQEVBWIiAD5UjBG44dmouuQsuBsqroOTpOF1IBbMO9u/xwB87WpZWkONO7bZCWTobzWTFu/gRLamJTKYQEdhjNwapta6fez6lXURT3aqAf+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a2QwVYVL; arc=none smtp.client-ip=209.85.208.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f65.google.com with SMTP id 4fb4d7f45d1cf-5e5bc066283so9661974a12.0;
-        Wed, 19 Mar 2025 06:38:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742391501; x=1742996301; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HqOX5J/2aBI9WMJbR7g5ITJy8xJzcYpINmhYecXAw4A=;
-        b=a2QwVYVLB29oiyJIcmoKjwgPzb8LOfAxACk8wDOjmmN9y97Cy/VnqPkAOW9iPJXjiG
-         xJibqAwgAfvA9wyvwJfN8OXYY/BihvyCuhX8wSllqsnoqcsNM7UeIgCnGeBHMOaQge9A
-         pQ3zWaAyajUHX1Q9S2lE3kzlB6Ag1DnJVCn4L2k+MVzmj4VDFCsQfSI8h7kdAlBF6UKa
-         JekLoQD0eEd9yUqIoUXrmhopOXLC+jG8GlnNlB861hRyyATndmKqSI9jC4Y9M65x3b68
-         IodLu3KXvd6ykxk7P92RrtfLDVGb1thzKcGd2RHFNWSo/6v3E07/Elc0ACHIMCTgnfnX
-         Qwmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742391501; x=1742996301;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HqOX5J/2aBI9WMJbR7g5ITJy8xJzcYpINmhYecXAw4A=;
-        b=rIpKH457mVGZp/H+aAWPJyvysAzRHYtCEuJyiuGOOovLgeRaldWAiS4toYc1rDq+PL
-         rU3qvWEKcd1wmwKn5V7aQR+mZ2YGGnNU76rVC5c0CXGFhUgDw2lSMJKa8Bgu8ZigH7eY
-         QVXdFlQd5+cCkEMNUBm2Ia/Jdk3t3IMZXGYQes/L8UUyiX7dq8VOd/xQjHApfOSXlYEw
-         hkutOHOcdT8x38kdakFJjXpIaBFNXRET+QBgrp772KTdoebUQ//7jKVzsTmIztAvMzN3
-         JSTFXrS/iMiiRY2VwGiu+tRmgoG3xddjfOMkfg5yYV3sIYBYShfrlSUYfxAUAMQ0XaEc
-         nJQA==
-X-Forwarded-Encrypted: i=1; AJvYcCVZEupuAufl/eR0sHVmhqaNMC4ZWf8DtbX0iO4rPnq9HP0raD3YuHyoFlnXrPqClD+HJqc=@vger.kernel.org, AJvYcCX3Aur9YlzORo8L0oPAfTPDnssA7C49Tg27YJKrau47wcifgabZwsaTvkYZ0jDs0D9ZXHCoU8L+@vger.kernel.org, AJvYcCXVMeZmWvwZA5k2sNIFGSyehq7T9Kimh8q3fqKOgKYDOiT3zMNbN9CMzKDslmB86sP/rmmcVO5eicEmI0po@vger.kernel.org, AJvYcCXZLVrxzPAAHi3H7fKBILdt5UChYnDD3v9mcuu3rnBaXTtuEWifhhq5vRQjCBjLhY9X3v07etr4Y7oY7Q==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwosIKg6f+KZjMY5cWOFHKuDWd44nCb6AjD2qv76/MNS2EBxIC/
-	XU+bvZaj6lBTaF+vqyi7fRpuhpsQS+Qnr2+cpae4Iboa3Wen94Kuyq7aSUJuUTPYQbCvKDo09r5
-	JITPZ5rspKiBr4u651wwBRZMhObs=
-X-Gm-Gg: ASbGncvTIadj65t1SV4JfhNbCKwekcFaJ9ymaZ/f5U88xH+IiS3iaKcnuiSOFjTulWE
-	ED3gXv7DaEqUXkKs3NFJTeWLrhgQeBMjqRiJV7lEhp/xuj6kzV1L9rxcKmwAa0TJTSCaIpzNvD6
-	KKJUQ8DPG3Kqgl9VhZEG4ZyprhP6s0MXSNT634HQ70wA4VxDE=
-X-Google-Smtp-Source: AGHT+IEopwlgS/uGtIuW38Wt1GbJxJdW6CbLjbQidRV3omH5LwTommPvAkrNEru76Gt4bFdCp+qRaShE72Bi/4KSqA0=
-X-Received: by 2002:a05:6402:5245:b0:5e7:c438:83ec with SMTP id
- 4fb4d7f45d1cf-5eb80ca9a18mr3269824a12.6.1742391500245; Wed, 19 Mar 2025
- 06:38:20 -0700 (PDT)
+	s=arc-20240116; t=1742391670; c=relaxed/simple;
+	bh=cnlVr9ebe/wVCwlbNuUwa26VuO6b4XUGv9lN+d+DHtY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=RG8KTzAhGOTpLA2lkxYU778yj3mbx4CvXrnV+GMAYZ+5ZnieLlW/7e+l8+BnyIV4DqI5jTMDK+K64bcvcn9Dsj3uQyroColeNX3J/xfn9fXPLYQID555Cna5spswH9df9HS9vMXR8isYpbQ+x8y3iiN0YVED2OU5OZGE/HALzoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eEYeT+qc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E237C4CEE9;
+	Wed, 19 Mar 2025 13:41:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742391670;
+	bh=cnlVr9ebe/wVCwlbNuUwa26VuO6b4XUGv9lN+d+DHtY=;
+	h=From:Subject:Date:To:Cc:From;
+	b=eEYeT+qcfd4uvezcRWIjLe+o9miRa24DnCspF5gb0r9Nis+WxpC1eQUTRNjdKGIzJ
+	 LdpnOPB1UGc/1szYyYgGSLLflN8zGB0ytY5XyLoc9hsGFKhlJx5dzAuPGRirDGtjK4
+	 Uo67Vb29HxS7tmxYncjGDc8CLpNdMRKayoZIh0IOKnf20zBPmzwtlE+WujHjuFZIS+
+	 HatGyMshr/T6Yjvgoi1vEXtwfLn1eq12e3YpvEmyt5XIbmob78EZhOqE0q64cjehkD
+	 3T1CH1u9ku0xtqd0Hxw1UUf4VE3tos/FVQPkbLoQQRDY0s/JL9xZQbrl6cLJsPpjjo
+	 JQmaCCAC+vAiw==
+From: Roger Quadros <rogerq@kernel.org>
+Subject: [PATCH net-next 0/9] net: ethernet: ti: am65-cpsw: add network
+ flow classification support
+Date: Wed, 19 Mar 2025 15:38:26 +0200
+Message-Id: <20250319-am65-cpsw-rx-class-v1-0-2bfded07490e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250319133309.6fce6404@canb.auug.org.au> <CAADnVQKotSrp8CkVpFw-y800NJ_R7An-iw-twrQZaOdYUeRtqQ@mail.gmail.com>
-In-Reply-To: <CAADnVQKotSrp8CkVpFw-y800NJ_R7An-iw-twrQZaOdYUeRtqQ@mail.gmail.com>
-From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
-Date: Wed, 19 Mar 2025 14:37:44 +0100
-X-Gm-Features: AQ5f1JpjZkB8zJ9kdtnAIEXxqGeb9vv4mNqsW9hZ-9htSXwm37U6oY9UIAC0GQU
-Message-ID: <CAP01T76CqOxzEiMLKJ2y_YD=qDgWq+Fq5Zy-fnKP4AAyS30Dwg@mail.gmail.com>
-Subject: Re: linux-next: build failure after merge of the bpf-next tree
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Uros Bizjak <ubizjak@gmail.com>, bpf <bpf@vger.kernel.org>, 
-	Networking <netdev@vger.kernel.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIANTI2mcC/x3MwQqDMAyA4VeRnBfIlAbcq4wdujZqQDtpxBXEd
+ 7d4/A7/f4BJVjF4NQdk2dX0lyqejwbC5NMoqLEaWmoddeTQL+wwrPbHXDDM3gyZmYgH/+1jhBq
+ uWQYt9/QNSTZMUjb4nOcF84ja624AAAA=
+To: Siddharth Vadapalli <s-vadapalli@ti.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Russell King <linux@armlinux.org.uk>, danishanwar@ti.com
+Cc: srk@ti.com, linux-omap@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Roger Quadros <rogerq@kernel.org>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2954; i=rogerq@kernel.org;
+ h=from:subject:message-id; bh=cnlVr9ebe/wVCwlbNuUwa26VuO6b4XUGv9lN+d+DHtY=;
+ b=owEBbQKS/ZANAwAIAdJaa9O+djCTAcsmYgBn2slvwVxmRCQ3frCx1k2HBzsf4mqIzoYZp8KWX
+ 3mcTHmr9lqJAjMEAAEIAB0WIQRBIWXUTJ9SeA+rEFjSWmvTvnYwkwUCZ9rJbwAKCRDSWmvTvnYw
+ kwp/D/9IG17RvJG56TYva7/akiHCu6fxevUOlzC7AdyLuq91ev6Np4by+dGe0Durm3XoVpuI+lK
+ KQE99ChNiltKbd6kXffFBclipZSZ8eh2hrMrqS5saxlEY5uCU2MWI5MLcuEP/eHWIU3fhqgQxuy
+ 2+DcjzWuxEsDWXFf41aPYwkwzMR+vZ/hYR8/x0+UtaPeI6iSrEjkLIjmi8XMX+2iSgCZAkwTpqw
+ MhZFo2vQlnDNAfJSi5qvfRVBkdWFb2KiT3yn+SPbiLd0HANy0yO6EIjfQ8+nrtVWJctPvlIVALn
+ VJOZQ0HZFBUuYxDZ3Qba6gwcVETIhUjqsHkN7qUAu5E6lLSCAby4nol81ANaG4hLhmGun2jPWTF
+ IfbhdLbG7FgqBkss4+bp6PWhd2XXul4oj4YAf0wcWbhv+Mn9u7Q1+zPhlBHqgo5wAQBKN9YKiAw
+ m2gxfwWiozlW7ppeVxh9RmsgzltJON2zQqtn6A4yCAEwjiPG5ri0doe0GwnUzGIfyO5cR1RpAwd
+ 1DJPNzRXxMHMQ3i6JqvUH/4Mjlwk713IJNdCU+XG1a+u04BBSG9v95I1uVb6WUIVdci8hbUqilg
+ zPGf5U3Iz2FLHLTDUvp9iQlpaXVT+Ye6muq5s6wiM0FD4Qx+emsjTHEzxLv7YIWP6hrv+HMONkG
+ +kccwIyZ7NGZYEQ==
+X-Developer-Key: i=rogerq@kernel.org; a=openpgp;
+ fpr=412165D44C9F52780FAB1058D25A6BD3BE763093
 
-On Wed, 19 Mar 2025 at 03:47, Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Tue, Mar 18, 2025 at 7:33=E2=80=AFPM Stephen Rothwell <sfr@canb.auug.o=
-rg.au> wrote:
-> >
-> > Hi all,
-> >
-> > After merging the bpf-next tree, today's linux-next build (x86_64
-> > allmodconfig) failed like this:
-> >
-> > In file included from include/asm-generic/percpu.h:7,
-> >                  from arch/x86/include/asm/percpu.h:630,
-> >                  from arch/x86/include/asm/preempt.h:6,
-> >                  from include/linux/preempt.h:79,
-> >                  from include/linux/smp.h:116,
-> >                  from kernel/locking/qspinlock.c:16:
-> > kernel/locking/qspinlock.h: In function 'decode_tail':
-> > include/linux/percpu-defs.h:219:45: error: initialization from pointer =
-to non-enclosed address space
-> >   219 |         const void __percpu *__vpp_verify =3D (typeof((ptr) + 0=
-))NULL;    \
-> >       |                                             ^
-> > include/linux/percpu-defs.h:237:9: note: in expansion of macro '__verif=
-y_pcpu_ptr'
-> >   237 |         __verify_pcpu_ptr(ptr);                                =
-         \
-> >       |         ^~~~~~~~~~~~~~~~~
-> > kernel/locking/qspinlock.h:67:16: note: in expansion of macro 'per_cpu_=
-ptr'
-> >    67 |         return per_cpu_ptr(&qnodes[idx].mcs, cpu);
-> >       |                ^~~~~~~~~~~
-> > include/linux/percpu-defs.h:219:45: note: expected 'const __seg_gs void=
- *' but pointer is of type 'struct mcs_spinlock *'
-> >   219 |         const void __percpu *__vpp_verify =3D (typeof((ptr) + 0=
-))NULL;    \
-> >       |                                             ^
-> > include/linux/percpu-defs.h:237:9: note: in expansion of macro '__verif=
-y_pcpu_ptr'
-> >   237 |         __verify_pcpu_ptr(ptr);                                =
-         \
-> >       |         ^~~~~~~~~~~~~~~~~
-> > kernel/locking/qspinlock.h:67:16: note: in expansion of macro 'per_cpu_=
-ptr'
-> >    67 |         return per_cpu_ptr(&qnodes[idx].mcs, cpu);
-> >       |                ^~~~~~~~~~~
-> > kernel/locking/qspinlock.c: In function 'native_queued_spin_lock_slowpa=
-th':
-> > kernel/locking/qspinlock.c:285:41: error: passing argument 2 of 'decode=
-_tail' from pointer to non-enclosed address space
-> >   285 |                 prev =3D decode_tail(old, qnodes);
-> >       |                                         ^~~~~~
-> > In file included from kernel/locking/qspinlock.c:30:
-> > kernel/locking/qspinlock.h:62:79: note: expected 'struct qnode *' but a=
-rgument is of type '__seg_gs struct qnode *'
-> >    62 | static inline __pure struct mcs_spinlock *decode_tail(u32 tail,=
- struct qnode *qnodes)
-> >       |                                                                =
- ~~~~~~~~~~~~~~^~~~~~
-> > In file included from kernel/locking/qspinlock.c:401:
-> > kernel/locking/qspinlock.c: In function '__pv_queued_spin_lock_slowpath=
-':
-> > kernel/locking/qspinlock.c:285:41: error: passing argument 2 of 'decode=
-_tail' from pointer to non-enclosed address space
-> >   285 |                 prev =3D decode_tail(old, qnodes);
-> >       |                                         ^~~~~~
-> > kernel/locking/qspinlock.h:62:79: note: expected 'struct qnode *' but a=
-rgument is of type '__seg_gs struct qnode *'
-> >    62 | static inline __pure struct mcs_spinlock *decode_tail(u32 tail,=
- struct qnode *qnodes)
-> >       |                                                                =
- ~~~~~~~~~~~~~~^~~~~~
-> >
-> > Caused by the resilient-queued-spin-lock branch of the bpf-next tree
-> > interacting with the "Enable strict percpu address space checks" series
-> > form the mm-stable tree.
->
-> Do you mean this set:
-> https://lore.kernel.org/all/20250127160709.80604-1-ubizjak@gmail.com/
->
-> >
-> > I don't know why this happens, but reverting that branch inf the bpf-ne=
-xt
-> > tree makes the failure go away, so I have done that for today.
->
-> Kumar,
->
-> pls take a look.
+Adds support for -N/--config-nfc ethtool command for
+configuring RX classfiers.
 
-I've sent a fix [0], but unfortunately I was unable to reproduce the
-problem with an LLVM >=3D 19 build, idk why. I will try with GCC >=3D 14
-as the patches require to confirm, but based on the error I am 99%
-sure it will fix the problem.
+Currently only raw Ethernet (flow-type ether) matching is added
+based on source/destination addresses and VLAN Priority (PCP).
 
-[0] https://lore.kernel.org/bpf/20250319133523.641009-1-memxor@gmail.com
+The ALE policer engine is used to perform the matching and routing to
+a specific RX channel.
 
-Feel free to cherry-pick or squash into the fixed commit, whatever is best.
+Test cases:
+
+Increase number of RX channels to 8
+ip link set eth1 down
+ip link set eth0 down
+ethtool -L eth0 rx 8
+
+1) Ether source address test
+	ethtool -N eth0 flow-type ether src xx:yy:zz:aa:bb:cc action 5
+
+  Traffic from that address should route to channel 5
+
+2) Ether destination address test
+	ethtool -N eth0 flow-type ether src yy:zz:aa:bb:cc:dd action 4
+
+  Traffic to that address should route to channel 4
+
+3) Drop test
+	ethtool -N end0 flow-type ether src xx:yy:zz:aa:bb:cc action -1
+
+  Traffic from that address should be dropped
+
+4) VLAN PCP test
+
+on Remote create VLAN with ID 5 and all traffic mapping to required priority to test. e.g. 7
+	sudo ip link add link eno1 name eno1.5 type vlan id 5 egress-qos-map 0:7 1:7 2:7 3:7 4:7 5:7 6:7 7:7
+	sudo ifconfig eno1.5 192.168.10.1
+
+on DUT create VLAN with id 5
+	ip link add link end0 name end0.5 type vlan id 5
+	ifconfig end0.5 192.168.10.5
+
+VLAN pcp 7 vid 5 route to RX channel 6
+	ethtool -N end0 flow-type ether vlan 0xe005 action 6
+
+  Traffic from that VLAN with PCP 7 should route to channel 6
+
+Signed-off-by: Roger Quadros <rogerq@kernel.org>
+---
+Roger Quadros (9):
+      net: ethernet: ti: cpsw_ale: Update Policer fields for more ALE size/ports
+      net: ethernet: ti: cpsw_ale: return ALE index in cpsw_ale_add_vlan()
+      net: ethernet: ti: cpsw_ale: return ALE index in cpsw_ale_vlan_add_modify()
+      net: ethernet: ti: cpsw_ale: return ALE index in cpsw_ale_add_ucast()
+      net: ethernet: ti: cpsw_ale: add cpsw_ale_policer_reset_entry()
+      net: ethernet: ti: cpsw_ale: add cpsw_ale_policer_set/clr_entry()
+      net: ethernet: ti: cpsw_ale: add policer save restore for PM sleep
+      net: ethernet: ti: am65-cpsw: add network flow classification support
+      net: ethernet: ti: am65-cpsw: remove cpsw_ale_classifier_setup_default()
+
+ drivers/net/ethernet/ti/am65-cpsw-ethtool.c   | 348 ++++++++++++++++++++++++++
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c      |  31 ++-
+ drivers/net/ethernet/ti/am65-cpsw-nuss.h      |  16 ++
+ drivers/net/ethernet/ti/am65-cpsw-switchdev.c |   6 +-
+ drivers/net/ethernet/ti/cpsw.c                |   4 +-
+ drivers/net/ethernet/ti/cpsw_ale.c            | 221 ++++++++++------
+ drivers/net/ethernet/ti/cpsw_ale.h            |  37 ++-
+ drivers/net/ethernet/ti/cpsw_new.c            |   4 +-
+ drivers/net/ethernet/ti/cpsw_switchdev.c      |   6 +-
+ 9 files changed, 580 insertions(+), 93 deletions(-)
+---
+base-commit: 23c9ff659140f97d44bf6fb59f89526a168f2b86
+change-id: 20250305-am65-cpsw-rx-class-666006fab9dd
+
+Best regards,
+-- 
+Roger Quadros <rogerq@kernel.org>
+
 
