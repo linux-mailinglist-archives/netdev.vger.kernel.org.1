@@ -1,160 +1,211 @@
-Return-Path: <netdev+bounces-176145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8157EA68FBC
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 15:40:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E9D6A69002
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 15:43:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C71916AA29
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 14:38:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D3494632D2
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 14:41:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 936911E8354;
-	Wed, 19 Mar 2025 14:35:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D307820DD67;
+	Wed, 19 Mar 2025 14:36:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nJXv2r2F"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bxbhWbZh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+Received: from mail-ed1-f68.google.com (mail-ed1-f68.google.com [209.85.208.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE50A1E7C23
-	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 14:35:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE67F1DF986;
+	Wed, 19 Mar 2025 14:36:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742394948; cv=none; b=gS9pGZfAMgdFh2eWTwDpOMbCYPZ33wwOvbb9eZUox8js723rKiz+Mz6Bi0E9jNRb2WsLPiK5/8sARGudrk1l3VTWfM50j3TKODDmJ4CueTWULHOrbgMH2zDF9aR90WLnSWI/OmQhB8qFRZyqN3K38P7x4GhrFY8jVqi8/D21Gfw=
+	t=1742395012; cv=none; b=iRpYe+fsvIvGFcOhEuAepbvHwQBBE5v/u6qh48zXd6IU3UOghWJV/fsCdVPObf/cyerxLh0cGvsS31HB6Kpc7Rv/VkC1cMF/g3sBsNDNdxx9EH+E1kpyInHrhbcHbbagNA0M9WsXhZCtrUWBstU3YeKLVpj08y4Lwh25ILqGOhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742394948; c=relaxed/simple;
-	bh=58hfUgeFGYKebnry7lE5WhCrKcbrFsKcSNdaBwthSDY=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=hbfTOJYqXWccFXZCx//OTQ7k5lsNBLOgOjpPy3jGGGgVjwfuPfH87Whb7BEzFZ4vXxiIxTzg0dgfRg76SI+y5XhA5wuz8T1mu7bapcDrISUkdyNo1Ij5pF7RS//kqngeN82E8VjRPWkhA8mOYn8Uyqj8AjnqIt9hdwmoIrd+4ds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nJXv2r2F; arc=none smtp.client-ip=209.85.160.180
+	s=arc-20240116; t=1742395012; c=relaxed/simple;
+	bh=5ISoKMGoKTb252HA9x5/Q6Db9PC9eaXgdj9Ru45RcW8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oInPlQ1ySUMszumAeXuJGO2F7wvnJJuDXZczmpe2akjsZNorOWfv5lnNjIMQgPKKzcnbjPVghMHKUmKboALz3Y7ooCgS/6IWfsAZC/xWDO5OFYJVBTr7XD+4oDO9OXFaDNGIVpW0YOkbIQt1kyubWLJHaVIpnlZBb7WezpgnYUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bxbhWbZh; arc=none smtp.client-ip=209.85.208.68
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4767e969b94so56873461cf.2
-        for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 07:35:46 -0700 (PDT)
+Received: by mail-ed1-f68.google.com with SMTP id 4fb4d7f45d1cf-5e66407963fso3323786a12.2;
+        Wed, 19 Mar 2025 07:36:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742394946; x=1742999746; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1742395009; x=1742999809; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=09Hcees1eYi+FVMmt5I7+YEyCDq2mEmTvqZcxgO2f0M=;
-        b=nJXv2r2FBblmxiLKlDsz7FKGHoAcRaGX5W6lPsszUJ7s5YaQxvrjFB3ii64mH7pxlO
-         dFYeex7vlDv4Vu4IcazdfhkZy2jrMC20ZGOV6HoQVotTKIHrll7eNnWdxFfsNgtTt7SJ
-         5p45G8UE6+SaNk0XVwUjDoz+CXiEpHUdcUP7FY7Igs+byyJhYtyGuwi4OOqjREw/by74
-         K7a75WZ8CCjtMZd2oyDEkprpnhe3jGBJI9ujJ+AtrUZ+PWgC+qgLOemL7T9w7R1c8d7X
-         05Eg5gxDN0cKLv/AoNnbFzWXNx3XM5iodZkwia9vLqAesFt9xdeNfDqs2ja3Le7HusiV
-         pDhg==
+        bh=rn15IXFR4OT4laOzRpofJZURwq8wYjIMrKFVK1LfAeE=;
+        b=bxbhWbZhLud51fDQxkhmEM7g+kkAEgk6xcGnFA5tGW4nbyvMDaAqyXJdcbyI1xWi55
+         ngcRMuOz7EATTUMSgSC1sFZWD0sE3r2XJbzeey83IIMXCyCyc9VHV/tCx/8ubQWe3jCh
+         Bhec06x/AU++TkP37nk+6jy8IoYml5EB/p3ij35x5uEAozvJzLaUjaeDkr/kv8BgyYqW
+         mBxWd/xTkOKAjjihKeUE2DhDjMHPVPgjH+GbDWuGBHJyxJvcYsUmAQNXfNBeutydSrJ6
+         agwPynggwkja/3Xes5jxTO3Dk6LswkEQGwhQahIT8Lz3J4XpBqE+x9s6UYgf5aMWsdaT
+         4EOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742394946; x=1742999746;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=09Hcees1eYi+FVMmt5I7+YEyCDq2mEmTvqZcxgO2f0M=;
-        b=I+F1f4Yn3QTDCFYrfFvnp2EzyL8fo6ExyGxcKROOo77TIHQ7dUMtUObr6l1p0CvPfh
-         /CEQbfXWeqiKteSqtYL5kyRIvMvjR/BaRx8q/zILHzk/5UT6+gkX4FeXHtqtmdySIZ80
-         DXSKG9r72odO4M4MUiylIwdRT9+TxlMFObCi1JlnHCubPz05dAka2RDk97Mv5/gVIfhq
-         jANJAJy04/upuYS1C/8/38dn5FLzPls/CIDyza8ikQ0LvoH3aCpng74o9P2b1ajptxq9
-         bNBKaNXOED2oHGgPDb7E+AxNtPjv/dX1C/l+dMcsKJ1HrlnT+RMrSOow86DKxpuxk2VS
-         dQcw==
-X-Forwarded-Encrypted: i=1; AJvYcCU9j8uCsL7M7Ybst0O+PHyK8VEXj+4TCzf4qnwYX7Cqwt2XFgdOBj4CrolQVMTA3d1nN0zNyPA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUSRA9zGkUuqHbCrB+PIIagQac8AL/9b37OAjsowdKa7ktCF7J
-	O2p2C6mquxRfrbufgu2nOybRUtceB8EHUH6wNFXJ65UocYlPFg1h
-X-Gm-Gg: ASbGncsGxO3fD0DAgtjwSjHjm0g3j+OjY87RZqmG4gWZT3/HhGhPjJhwiGtMsPW7Fc+
-	aa0k9SNnezB1ZSaVZjMkVzem2mIBVu22oscHEkPUWgJgloQ9n/C1sphV6ZvtuFpbY+EPct6tyXZ
-	GEah27W4WhLtHCM8rgqpq2p6HnlkdnLvy2mSzQ4RidKvs2Js70iNr4RVH66LmwnE6ymlFyN8u3C
-	7ZkYDK0C35oX1OHHt+CfmUJKLxeYdj+2pCx8kkgZP1oaL3mT0F7LD8tTInES3eXt/Fm3u8XVY3q
-	bkt0KrORnJr2dUkTLvP3WTxAR+4ahj5plABaKMY6uSpYeh5QcLHI2RRz3ish6vVK+APLV7fnY9H
-	NoRBfodUema2u8yghSzkaEg==
-X-Google-Smtp-Source: AGHT+IHHbj0lFVpOPNMsr/oVCiHlyt1lf8nBgkwBnr+6UeqCqDWz15X2xlpbjACPMcOzLoWd4/498Q==
-X-Received: by 2002:a05:622a:2514:b0:476:97d3:54f with SMTP id d75a77b69052e-47708375328mr52148541cf.14.1742394945700;
-        Wed, 19 Mar 2025 07:35:45 -0700 (PDT)
-Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-476bb7f3d5fsm80468331cf.62.2025.03.19.07.35.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Mar 2025 07:35:44 -0700 (PDT)
-Date: Wed, 19 Mar 2025 10:35:44 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, 
- David Ahern <dsahern@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Simon Horman <horms@kernel.org>, 
- Willem de Bruijn <willemb@google.com>, 
- steffen.klassert@secunet.com
-Message-ID: <67dad64082fc5_594829474@willemb.c.googlers.com.notmuch>
-In-Reply-To: <6001185ace17e7d7d2ed176c20aef2461b60c613.1742323321.git.pabeni@redhat.com>
-References: <6001185ace17e7d7d2ed176c20aef2461b60c613.1742323321.git.pabeni@redhat.com>
-Subject: Re: [PATCH net-next] udp_tunnel: properly deal with xfrm gro encap.
+        d=1e100.net; s=20230601; t=1742395009; x=1742999809;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rn15IXFR4OT4laOzRpofJZURwq8wYjIMrKFVK1LfAeE=;
+        b=fKqlljcdxweopxgOE6QKYohnWispzZbfcrE+qH4SiW7AZO5bZzC90/Vq4EfLMQhF+z
+         xJk9/6whk8sio3K7TyRG5+J/5ycprdwiOx6mh/zR87TCHXnZ+fiGaIEm1ijkI+58/lqG
+         OqKLHQ7WBJOiLF6/JTqctklSA0nf3jj/KbJue+9irH2S9kWjc0qQmvj4bqfW7PagIZTI
+         KGmVdWSpktzXXg02E9/8uaxcqCSk9C4lexcLPh/ZDa07q+ABX87LJzbJuT7CSLOzYOby
+         kRlIJ/A1HXvrBrvK/LrrcOCaKX44BTkMo+YjTmQ55mkM28gKVfLEtBmD4qL1SLP9ZReR
+         WIFw==
+X-Forwarded-Encrypted: i=1; AJvYcCUijNnaw/6SFCQKHzmcmbWq6E8pOjZ8+sJ53s8UK8JyPYc3d7lQUVBv9LXmvMYaA5jLet8=@vger.kernel.org, AJvYcCUwKgxWJkOc9A20E6ENaM+pF2mqKxIJDbX0uCSAE9QQrndpW5YNnlbDj2YLC8Cr1mwTgFC90KDZ@vger.kernel.org, AJvYcCV+Ma8hFHwnFV89ElsqRpODvpGSDInV1ShmogyJNw81YOeFSUyVACe390H8uMUiB8aWA0UYQrR+8rHk6Mq+@vger.kernel.org, AJvYcCXoqD3p53XtAJQa3413jr3tbBDr/GtxZVoRlG1unaTctDQ/YsCF38cHx3bxd8ep/66MVB1m62mBApUenw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyfj/io7vKURqwQbzqtqvYPOcQE0ZIX468byFqP819FX+PW9DZ9
+	3ONF0L1JfLpmNt0mmL2eMJfOsbOcU34sOrz7agAaAUsFr2tMteTpNSsA+UDGiwocDDIWJs2XOjx
+	HOsjds2jiAOVTZSiKxshKGGjGSao=
+X-Gm-Gg: ASbGncsCyL9UenJg6F0Dv93f9RHoWg9ZKAa1YYS7ChMYkifC9yIqEhrIeRESzJUT7zL
+	dqHdeunY6EmBiEmz2ykcKjNgluzv+Y4a3fYUVzCMCF3wd707R6lVJMV07B5Komt3teh9mZnKVk5
+	HBFTKkwzWGWVEvnyNDm/mv8yLSC5K85GX9anberSeq66H+oIA=
+X-Google-Smtp-Source: AGHT+IHddeeN8mNv5+1bh6K/hWSllyearFYtBv5DfrBko/3PysyR4w2SEgYrLjtzsAgB9isOZOWnbqqYZLZ+z7mV+mg=
+X-Received: by 2002:a05:6402:2355:b0:5d3:cff5:634f with SMTP id
+ 4fb4d7f45d1cf-5eb80fcbf36mr2823694a12.24.1742395008833; Wed, 19 Mar 2025
+ 07:36:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20250319133309.6fce6404@canb.auug.org.au> <CAADnVQKotSrp8CkVpFw-y800NJ_R7An-iw-twrQZaOdYUeRtqQ@mail.gmail.com>
+ <CAP01T76CqOxzEiMLKJ2y_YD=qDgWq+Fq5Zy-fnKP4AAyS30Dwg@mail.gmail.com> <CAP01T77_qMiMmyeyizud=-sbBH5q1jvY_Jkj-QLZqM1zh0a2hg@mail.gmail.com>
+In-Reply-To: <CAP01T77_qMiMmyeyizud=-sbBH5q1jvY_Jkj-QLZqM1zh0a2hg@mail.gmail.com>
+From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Date: Wed, 19 Mar 2025 15:36:11 +0100
+X-Gm-Features: AQ5f1JqDGcJXFW4K4PXGlZ9V0tVmeXaDpiwZKjz6iIM3cSHrVyoJtVhkAXXcnaA
+Message-ID: <CAP01T77St7cpkvJ7w+5d3Ji-ULdz04QhZDxQWdNSBX9W7vXJCw@mail.gmail.com>
+Subject: Re: linux-next: build failure after merge of the bpf-next tree
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Uros Bizjak <ubizjak@gmail.com>, bpf <bpf@vger.kernel.org>, 
+	Networking <netdev@vger.kernel.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Paolo Abeni wrote:
-> The blamed commit below does not take in account that xfrm
-> can enable GRO over UDP encapsulation without going through
-> setup_udp_tunnel_sock().
-> 
-> At deletion time such socket will still go through
-> udp_tunnel_cleanup_gro(), and the failed GRO type lookup will
-> trigger the reported warning.
-> 
-> We can safely remove such warning, simply performing no action
-> on failed GRO type lookup at deletion time.
-> 
-> Reported-by: syzbot+8c469a2260132cd095c1@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=8c469a2260132cd095c1
-> Fixes: 311b36574ceac ("udp_tunnel: use static call for GRO hooks when possible")
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+On Wed, 19 Mar 2025 at 14:43, Kumar Kartikeya Dwivedi <memxor@gmail.com> wr=
+ote:
+>
+> On Wed, 19 Mar 2025 at 14:37, Kumar Kartikeya Dwivedi <memxor@gmail.com> =
+wrote:
+> >
+> > On Wed, 19 Mar 2025 at 03:47, Alexei Starovoitov
+> > <alexei.starovoitov@gmail.com> wrote:
+> > >
+> > > On Tue, Mar 18, 2025 at 7:33=E2=80=AFPM Stephen Rothwell <sfr@canb.au=
+ug.org.au> wrote:
+> > > >
+> > > > Hi all,
+> > > >
+> > > > After merging the bpf-next tree, today's linux-next build (x86_64
+> > > > allmodconfig) failed like this:
+> > > >
+> > > > In file included from include/asm-generic/percpu.h:7,
+> > > >                  from arch/x86/include/asm/percpu.h:630,
+> > > >                  from arch/x86/include/asm/preempt.h:6,
+> > > >                  from include/linux/preempt.h:79,
+> > > >                  from include/linux/smp.h:116,
+> > > >                  from kernel/locking/qspinlock.c:16:
+> > > > kernel/locking/qspinlock.h: In function 'decode_tail':
+> > > > include/linux/percpu-defs.h:219:45: error: initialization from poin=
+ter to non-enclosed address space
+> > > >   219 |         const void __percpu *__vpp_verify =3D (typeof((ptr)=
+ + 0))NULL;    \
+> > > >       |                                             ^
+> > > > include/linux/percpu-defs.h:237:9: note: in expansion of macro '__v=
+erify_pcpu_ptr'
+> > > >   237 |         __verify_pcpu_ptr(ptr);                            =
+             \
+> > > >       |         ^~~~~~~~~~~~~~~~~
+> > > > kernel/locking/qspinlock.h:67:16: note: in expansion of macro 'per_=
+cpu_ptr'
+> > > >    67 |         return per_cpu_ptr(&qnodes[idx].mcs, cpu);
+> > > >       |                ^~~~~~~~~~~
+> > > > include/linux/percpu-defs.h:219:45: note: expected 'const __seg_gs =
+void *' but pointer is of type 'struct mcs_spinlock *'
+> > > >   219 |         const void __percpu *__vpp_verify =3D (typeof((ptr)=
+ + 0))NULL;    \
+> > > >       |                                             ^
+> > > > include/linux/percpu-defs.h:237:9: note: in expansion of macro '__v=
+erify_pcpu_ptr'
+> > > >   237 |         __verify_pcpu_ptr(ptr);                            =
+             \
+> > > >       |         ^~~~~~~~~~~~~~~~~
+> > > > kernel/locking/qspinlock.h:67:16: note: in expansion of macro 'per_=
+cpu_ptr'
+> > > >    67 |         return per_cpu_ptr(&qnodes[idx].mcs, cpu);
+> > > >       |                ^~~~~~~~~~~
+> > > > kernel/locking/qspinlock.c: In function 'native_queued_spin_lock_sl=
+owpath':
+> > > > kernel/locking/qspinlock.c:285:41: error: passing argument 2 of 'de=
+code_tail' from pointer to non-enclosed address space
+> > > >   285 |                 prev =3D decode_tail(old, qnodes);
+> > > >       |                                         ^~~~~~
+> > > > In file included from kernel/locking/qspinlock.c:30:
+> > > > kernel/locking/qspinlock.h:62:79: note: expected 'struct qnode *' b=
+ut argument is of type '__seg_gs struct qnode *'
+> > > >    62 | static inline __pure struct mcs_spinlock *decode_tail(u32 t=
+ail, struct qnode *qnodes)
+> > > >       |                                                            =
+     ~~~~~~~~~~~~~~^~~~~~
+> > > > In file included from kernel/locking/qspinlock.c:401:
+> > > > kernel/locking/qspinlock.c: In function '__pv_queued_spin_lock_slow=
+path':
+> > > > kernel/locking/qspinlock.c:285:41: error: passing argument 2 of 'de=
+code_tail' from pointer to non-enclosed address space
+> > > >   285 |                 prev =3D decode_tail(old, qnodes);
+> > > >       |                                         ^~~~~~
+> > > > kernel/locking/qspinlock.h:62:79: note: expected 'struct qnode *' b=
+ut argument is of type '__seg_gs struct qnode *'
+> > > >    62 | static inline __pure struct mcs_spinlock *decode_tail(u32 t=
+ail, struct qnode *qnodes)
+> > > >       |                                                            =
+     ~~~~~~~~~~~~~~^~~~~~
+> > > >
+> > > > Caused by the resilient-queued-spin-lock branch of the bpf-next tre=
+e
+> > > > interacting with the "Enable strict percpu address space checks" se=
+ries
+> > > > form the mm-stable tree.
+> > >
+> > > Do you mean this set:
+> > > https://lore.kernel.org/all/20250127160709.80604-1-ubizjak@gmail.com/
+> > >
+> > > >
+> > > > I don't know why this happens, but reverting that branch inf the bp=
+f-next
+> > > > tree makes the failure go away, so I have done that for today.
+> > >
+> > > Kumar,
+> > >
+> > > pls take a look.
+> >
+> > I've sent a fix [0], but unfortunately I was unable to reproduce the
+> > problem with an LLVM >=3D 19 build, idk why. I will try with GCC >=3D 1=
+4
+> > as the patches require to confirm, but based on the error I am 99%
+> > sure it will fix the problem.
+>
+> Probably because __seg_gs has CC_HAS_NAMED_AS depends on CC_IS_GCC.
+> Let me give it a go with GCC.
+>
 
-Because XFRM does not call udp_tunnel_update_gro_rcv when enabling its
-UDP GRO offload, from set_xfrm_gro_udp_encap_rcv. But it does call it
-when disabling the offload, as called for all udp sockest from
-udp(v6)_destroy_sock. (Just to verify my understanding.)
+Can confirm now that this fixes it, I just did a build with GCC 14
+where Uros's __percpu checks kick in.
 
-Not calling udp_tunnel_update_gro_rcv on add will have the unintended
-side effect of enabling the static call if one other tunnel is also
-active, breaking UDP GRO for XFRM socket, right? Not a significant
-consequence. But eventually XFRM would want to be counted, I suppose.
-
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-
-
-> ---
->  net/ipv4/udp_offload.c | 9 +--------
->  1 file changed, 1 insertion(+), 8 deletions(-)
-> 
-> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-> index 088aa8cb8ac0c..2e0b52ae665bc 100644
-> --- a/net/ipv4/udp_offload.c
-> +++ b/net/ipv4/udp_offload.c
-> @@ -110,14 +110,7 @@ void udp_tunnel_update_gro_rcv(struct sock *sk, bool add)
->  		cur = &udp_tunnel_gro_types[udp_tunnel_gro_type_nr++];
->  		refcount_set(&cur->count, 1);
->  		cur->gro_receive = up->gro_receive;
-> -	} else {
-> -		/*
-> -		 * The stack cleanups only successfully added tunnel, the
-> -		 * lookup on removal should never fail.
-> -		 */
-> -		if (WARN_ON_ONCE(!cur))
-> -			goto out;
-> -
-> +	} else if (cur) {
->  		if (!refcount_dec_and_test(&cur->count))
->  			goto out;
->  
-> -- 
-> 2.48.1
-> 
-
-
+> >
+> > [0] https://lore.kernel.org/bpf/20250319133523.641009-1-memxor@gmail.co=
+m
+> >
+> > Feel free to cherry-pick or squash into the fixed commit, whatever is b=
+est.
 
