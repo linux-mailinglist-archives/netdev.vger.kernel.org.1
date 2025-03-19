@@ -1,211 +1,308 @@
-Return-Path: <netdev+bounces-176147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E9D6A69002
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 15:43:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17E2DA69006
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 15:43:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D3494632D2
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 14:41:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E982E3BDCC3
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 14:40:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D307820DD67;
-	Wed, 19 Mar 2025 14:36:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bxbhWbZh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E6620A5DD;
+	Wed, 19 Mar 2025 14:36:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f68.google.com (mail-ed1-f68.google.com [209.85.208.68])
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE67F1DF986;
-	Wed, 19 Mar 2025 14:36:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8948B1C862A
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 14:36:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742395012; cv=none; b=iRpYe+fsvIvGFcOhEuAepbvHwQBBE5v/u6qh48zXd6IU3UOghWJV/fsCdVPObf/cyerxLh0cGvsS31HB6Kpc7Rv/VkC1cMF/g3sBsNDNdxx9EH+E1kpyInHrhbcHbbagNA0M9WsXhZCtrUWBstU3YeKLVpj08y4Lwh25ILqGOhI=
+	t=1742394996; cv=none; b=r/40Ke3GpA4c36v4H+mmfubsybN1U8TiZvqxq5oWJZzIRWx6l82iaI/h+JN0zMGtAu++146TM4DndkkQnbSwBQL8DcVkRo2+Ny3nDAbtbdE7mAkCeOQkgyQ0dD1Mb2YVClQsDDAxa1UReXVOAdq7xXFVoX4Yhy6KjY1z9Ru/CNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742395012; c=relaxed/simple;
-	bh=5ISoKMGoKTb252HA9x5/Q6Db9PC9eaXgdj9Ru45RcW8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oInPlQ1ySUMszumAeXuJGO2F7wvnJJuDXZczmpe2akjsZNorOWfv5lnNjIMQgPKKzcnbjPVghMHKUmKboALz3Y7ooCgS/6IWfsAZC/xWDO5OFYJVBTr7XD+4oDO9OXFaDNGIVpW0YOkbIQt1kyubWLJHaVIpnlZBb7WezpgnYUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bxbhWbZh; arc=none smtp.client-ip=209.85.208.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f68.google.com with SMTP id 4fb4d7f45d1cf-5e66407963fso3323786a12.2;
-        Wed, 19 Mar 2025 07:36:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742395009; x=1742999809; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rn15IXFR4OT4laOzRpofJZURwq8wYjIMrKFVK1LfAeE=;
-        b=bxbhWbZhLud51fDQxkhmEM7g+kkAEgk6xcGnFA5tGW4nbyvMDaAqyXJdcbyI1xWi55
-         ngcRMuOz7EATTUMSgSC1sFZWD0sE3r2XJbzeey83IIMXCyCyc9VHV/tCx/8ubQWe3jCh
-         Bhec06x/AU++TkP37nk+6jy8IoYml5EB/p3ij35x5uEAozvJzLaUjaeDkr/kv8BgyYqW
-         mBxWd/xTkOKAjjihKeUE2DhDjMHPVPgjH+GbDWuGBHJyxJvcYsUmAQNXfNBeutydSrJ6
-         agwPynggwkja/3Xes5jxTO3Dk6LswkEQGwhQahIT8Lz3J4XpBqE+x9s6UYgf5aMWsdaT
-         4EOQ==
+	s=arc-20240116; t=1742394996; c=relaxed/simple;
+	bh=VwkRyNTB6AopmwgvSZOhy+xymyGdInnvRqU5ZcdFhTk=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=KmTAl92HwDMyZX69vPnIU5gfFpLx2tZeKAPYDq8lAwjmuKeWc+u4AyCZoO6sKD8lsYrhcBUDRnJZOQnDIL0z1prCcdzcltQ2jElStDrl8LcRSTQyyPLzA6ElH/0RlrUpXxc6Lbj9LzKfk91AJzK79DBKWC4Ik/TcKgSfoxMe77U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3d438be189bso77671155ab.3
+        for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 07:36:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742395009; x=1742999809;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rn15IXFR4OT4laOzRpofJZURwq8wYjIMrKFVK1LfAeE=;
-        b=fKqlljcdxweopxgOE6QKYohnWispzZbfcrE+qH4SiW7AZO5bZzC90/Vq4EfLMQhF+z
-         xJk9/6whk8sio3K7TyRG5+J/5ycprdwiOx6mh/zR87TCHXnZ+fiGaIEm1ijkI+58/lqG
-         OqKLHQ7WBJOiLF6/JTqctklSA0nf3jj/KbJue+9irH2S9kWjc0qQmvj4bqfW7PagIZTI
-         KGmVdWSpktzXXg02E9/8uaxcqCSk9C4lexcLPh/ZDa07q+ABX87LJzbJuT7CSLOzYOby
-         kRlIJ/A1HXvrBrvK/LrrcOCaKX44BTkMo+YjTmQ55mkM28gKVfLEtBmD4qL1SLP9ZReR
-         WIFw==
-X-Forwarded-Encrypted: i=1; AJvYcCUijNnaw/6SFCQKHzmcmbWq6E8pOjZ8+sJ53s8UK8JyPYc3d7lQUVBv9LXmvMYaA5jLet8=@vger.kernel.org, AJvYcCUwKgxWJkOc9A20E6ENaM+pF2mqKxIJDbX0uCSAE9QQrndpW5YNnlbDj2YLC8Cr1mwTgFC90KDZ@vger.kernel.org, AJvYcCV+Ma8hFHwnFV89ElsqRpODvpGSDInV1ShmogyJNw81YOeFSUyVACe390H8uMUiB8aWA0UYQrR+8rHk6Mq+@vger.kernel.org, AJvYcCXoqD3p53XtAJQa3413jr3tbBDr/GtxZVoRlG1unaTctDQ/YsCF38cHx3bxd8ep/66MVB1m62mBApUenw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyfj/io7vKURqwQbzqtqvYPOcQE0ZIX468byFqP819FX+PW9DZ9
-	3ONF0L1JfLpmNt0mmL2eMJfOsbOcU34sOrz7agAaAUsFr2tMteTpNSsA+UDGiwocDDIWJs2XOjx
-	HOsjds2jiAOVTZSiKxshKGGjGSao=
-X-Gm-Gg: ASbGncsCyL9UenJg6F0Dv93f9RHoWg9ZKAa1YYS7ChMYkifC9yIqEhrIeRESzJUT7zL
-	dqHdeunY6EmBiEmz2ykcKjNgluzv+Y4a3fYUVzCMCF3wd707R6lVJMV07B5Komt3teh9mZnKVk5
-	HBFTKkwzWGWVEvnyNDm/mv8yLSC5K85GX9anberSeq66H+oIA=
-X-Google-Smtp-Source: AGHT+IHddeeN8mNv5+1bh6K/hWSllyearFYtBv5DfrBko/3PysyR4w2SEgYrLjtzsAgB9isOZOWnbqqYZLZ+z7mV+mg=
-X-Received: by 2002:a05:6402:2355:b0:5d3:cff5:634f with SMTP id
- 4fb4d7f45d1cf-5eb80fcbf36mr2823694a12.24.1742395008833; Wed, 19 Mar 2025
- 07:36:48 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1742394993; x=1742999793;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ddYPRAkcr9Xsvyo/22R1ypzYpm49+Ib8p/kw8Jc6QS8=;
+        b=mFHPNa47BwH4rKCo2rybE8X3qSt0hAcc1kNB0G5nhzHFh+o7BZ8cS/YkFpLLnMpiSY
+         AETksF72cPJcE0vnGUc2ZeoO4B5l4cZrjV5J38IvGxt1JeArg8hzuQMtSuqLgoK7Kk3B
+         nTJoLQm8++J2tPUt0Su8IXGYemWJW4e3u6lef6JjnQ8Qg7+8Nkpcp0bkiXmz1piJ9qKD
+         GB7e1A34Q4y2eF+4cuS5s9pQjtlbFBPs6q6ge/jt6DBg1iHTFuNI1qfcnB8FFtQ8nO7k
+         7nWtRRzX3D1KbZ8Hzw5iraqrF4SxwVtN1DwW06LHp+X4Cprrj5jlRF173c7vNZ/AkJL1
+         vF/A==
+X-Forwarded-Encrypted: i=1; AJvYcCU0/LTN8G4O2srLROlSePS2yEPJLr/tAeH51tPAvK8/VNK5/ot4aXGzfeRRYcVyfG7tcmlVyUU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAIH520MB7YCvMY0DndWWDP9eRVTde28qklo3VqP/6DaJzgxfZ
+	UZ4r9gpZEeGbqWOzQj+Vt8k+wfO9AFPnR2Nngfxx96Bt+D6cX/fdTv5IKPLMjrXxrSHcHNik2m2
+	0c34c96RgCnL4JqC3DbuRDVBwf3smDud82fkxNMPb99VLnsVXyrTUR+c=
+X-Google-Smtp-Source: AGHT+IGprIEtIHLk6p9Ioilh5RwFLooi2qk4hDHIrEmV5gHppwIXFz1EFbMUCvUv1cR8876DqjduO14ooUH9s91iqTQBZ1B16VaQ
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250319133309.6fce6404@canb.auug.org.au> <CAADnVQKotSrp8CkVpFw-y800NJ_R7An-iw-twrQZaOdYUeRtqQ@mail.gmail.com>
- <CAP01T76CqOxzEiMLKJ2y_YD=qDgWq+Fq5Zy-fnKP4AAyS30Dwg@mail.gmail.com> <CAP01T77_qMiMmyeyizud=-sbBH5q1jvY_Jkj-QLZqM1zh0a2hg@mail.gmail.com>
-In-Reply-To: <CAP01T77_qMiMmyeyizud=-sbBH5q1jvY_Jkj-QLZqM1zh0a2hg@mail.gmail.com>
-From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
-Date: Wed, 19 Mar 2025 15:36:11 +0100
-X-Gm-Features: AQ5f1JqDGcJXFW4K4PXGlZ9V0tVmeXaDpiwZKjz6iIM3cSHrVyoJtVhkAXXcnaA
-Message-ID: <CAP01T77St7cpkvJ7w+5d3Ji-ULdz04QhZDxQWdNSBX9W7vXJCw@mail.gmail.com>
-Subject: Re: linux-next: build failure after merge of the bpf-next tree
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, Uros Bizjak <ubizjak@gmail.com>, bpf <bpf@vger.kernel.org>, 
-	Networking <netdev@vger.kernel.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Next Mailing List <linux-next@vger.kernel.org>
+X-Received: by 2002:a05:6e02:3193:b0:3d4:28c0:1692 with SMTP id
+ e9e14a558f8ab-3d586b29777mr35171185ab.5.1742394993648; Wed, 19 Mar 2025
+ 07:36:33 -0700 (PDT)
+Date: Wed, 19 Mar 2025 07:36:33 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67dad671.050a0220.2ca2c6.0197.GAE@google.com>
+Subject: [syzbot] [isdn4linux?] [nilfs?] INFO: task hung in mISDN_ioctl
+From: syzbot <syzbot+5d83cecd003a369a9965@syzkaller.appspotmail.com>
+To: akpm@linux-foundation.org, eadavis@qq.com, 
+	isdn4linux@listserv.isdn4linux.de, isdn@linux-pingi.de, 
+	konishi.ryusuke@gmail.com, linux-kernel@vger.kernel.org, 
+	linux-nilfs@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, 19 Mar 2025 at 14:43, Kumar Kartikeya Dwivedi <memxor@gmail.com> wr=
-ote:
->
-> On Wed, 19 Mar 2025 at 14:37, Kumar Kartikeya Dwivedi <memxor@gmail.com> =
-wrote:
-> >
-> > On Wed, 19 Mar 2025 at 03:47, Alexei Starovoitov
-> > <alexei.starovoitov@gmail.com> wrote:
-> > >
-> > > On Tue, Mar 18, 2025 at 7:33=E2=80=AFPM Stephen Rothwell <sfr@canb.au=
-ug.org.au> wrote:
-> > > >
-> > > > Hi all,
-> > > >
-> > > > After merging the bpf-next tree, today's linux-next build (x86_64
-> > > > allmodconfig) failed like this:
-> > > >
-> > > > In file included from include/asm-generic/percpu.h:7,
-> > > >                  from arch/x86/include/asm/percpu.h:630,
-> > > >                  from arch/x86/include/asm/preempt.h:6,
-> > > >                  from include/linux/preempt.h:79,
-> > > >                  from include/linux/smp.h:116,
-> > > >                  from kernel/locking/qspinlock.c:16:
-> > > > kernel/locking/qspinlock.h: In function 'decode_tail':
-> > > > include/linux/percpu-defs.h:219:45: error: initialization from poin=
-ter to non-enclosed address space
-> > > >   219 |         const void __percpu *__vpp_verify =3D (typeof((ptr)=
- + 0))NULL;    \
-> > > >       |                                             ^
-> > > > include/linux/percpu-defs.h:237:9: note: in expansion of macro '__v=
-erify_pcpu_ptr'
-> > > >   237 |         __verify_pcpu_ptr(ptr);                            =
-             \
-> > > >       |         ^~~~~~~~~~~~~~~~~
-> > > > kernel/locking/qspinlock.h:67:16: note: in expansion of macro 'per_=
-cpu_ptr'
-> > > >    67 |         return per_cpu_ptr(&qnodes[idx].mcs, cpu);
-> > > >       |                ^~~~~~~~~~~
-> > > > include/linux/percpu-defs.h:219:45: note: expected 'const __seg_gs =
-void *' but pointer is of type 'struct mcs_spinlock *'
-> > > >   219 |         const void __percpu *__vpp_verify =3D (typeof((ptr)=
- + 0))NULL;    \
-> > > >       |                                             ^
-> > > > include/linux/percpu-defs.h:237:9: note: in expansion of macro '__v=
-erify_pcpu_ptr'
-> > > >   237 |         __verify_pcpu_ptr(ptr);                            =
-             \
-> > > >       |         ^~~~~~~~~~~~~~~~~
-> > > > kernel/locking/qspinlock.h:67:16: note: in expansion of macro 'per_=
-cpu_ptr'
-> > > >    67 |         return per_cpu_ptr(&qnodes[idx].mcs, cpu);
-> > > >       |                ^~~~~~~~~~~
-> > > > kernel/locking/qspinlock.c: In function 'native_queued_spin_lock_sl=
-owpath':
-> > > > kernel/locking/qspinlock.c:285:41: error: passing argument 2 of 'de=
-code_tail' from pointer to non-enclosed address space
-> > > >   285 |                 prev =3D decode_tail(old, qnodes);
-> > > >       |                                         ^~~~~~
-> > > > In file included from kernel/locking/qspinlock.c:30:
-> > > > kernel/locking/qspinlock.h:62:79: note: expected 'struct qnode *' b=
-ut argument is of type '__seg_gs struct qnode *'
-> > > >    62 | static inline __pure struct mcs_spinlock *decode_tail(u32 t=
-ail, struct qnode *qnodes)
-> > > >       |                                                            =
-     ~~~~~~~~~~~~~~^~~~~~
-> > > > In file included from kernel/locking/qspinlock.c:401:
-> > > > kernel/locking/qspinlock.c: In function '__pv_queued_spin_lock_slow=
-path':
-> > > > kernel/locking/qspinlock.c:285:41: error: passing argument 2 of 'de=
-code_tail' from pointer to non-enclosed address space
-> > > >   285 |                 prev =3D decode_tail(old, qnodes);
-> > > >       |                                         ^~~~~~
-> > > > kernel/locking/qspinlock.h:62:79: note: expected 'struct qnode *' b=
-ut argument is of type '__seg_gs struct qnode *'
-> > > >    62 | static inline __pure struct mcs_spinlock *decode_tail(u32 t=
-ail, struct qnode *qnodes)
-> > > >       |                                                            =
-     ~~~~~~~~~~~~~~^~~~~~
-> > > >
-> > > > Caused by the resilient-queued-spin-lock branch of the bpf-next tre=
-e
-> > > > interacting with the "Enable strict percpu address space checks" se=
-ries
-> > > > form the mm-stable tree.
-> > >
-> > > Do you mean this set:
-> > > https://lore.kernel.org/all/20250127160709.80604-1-ubizjak@gmail.com/
-> > >
-> > > >
-> > > > I don't know why this happens, but reverting that branch inf the bp=
-f-next
-> > > > tree makes the failure go away, so I have done that for today.
-> > >
-> > > Kumar,
-> > >
-> > > pls take a look.
-> >
-> > I've sent a fix [0], but unfortunately I was unable to reproduce the
-> > problem with an LLVM >=3D 19 build, idk why. I will try with GCC >=3D 1=
-4
-> > as the patches require to confirm, but based on the error I am 99%
-> > sure it will fix the problem.
->
-> Probably because __seg_gs has CC_HAS_NAMED_AS depends on CC_IS_GCC.
-> Let me give it a go with GCC.
->
+Hello,
 
-Can confirm now that this fixes it, I just did a build with GCC 14
-where Uros's __percpu checks kick in.
+syzbot found the following issue on:
 
-> >
-> > [0] https://lore.kernel.org/bpf/20250319133523.641009-1-memxor@gmail.co=
-m
-> >
-> > Feel free to cherry-pick or squash into the fixed commit, whatever is b=
-est.
+HEAD commit:    a29967be967e Merge tag 'v6.14-rc6-smb3-client-fixes' of gi..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=13ebae54580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=67fb5d057adc2bbe
+dashboard link: https://syzkaller.appspot.com/bug?extid=5d83cecd003a369a9965
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=154f0278580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1093f874580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/ba9ee368ed83/disk-a29967be.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/1c4f0d6b1a0d/vmlinux-a29967be.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/74eba4ba6f62/bzImage-a29967be.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/c035da738a55/mount_0.gz
+
+The issue was bisected to:
+
+commit 901ce9705fbb9f330ff1f19600e5daf9770b0175
+Author: Edward Adam Davis <eadavis@qq.com>
+Date:   Mon Dec 9 06:56:52 2024 +0000
+
+    nilfs2: prevent use of deleted inode
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15e9bff8580000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=17e9bff8580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=13e9bff8580000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+5d83cecd003a369a9965@syzkaller.appspotmail.com
+Fixes: 901ce9705fbb ("nilfs2: prevent use of deleted inode")
+
+INFO: task syz-executor371:5847 blocked for more than 143 seconds.
+      Not tainted 6.14.0-rc6-syzkaller-00202-ga29967be967e #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor371 state:D stack:22288 pid:5847  tgid:5847  ppid:5844   task_flags:0x400140 flags:0x00004006
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5378 [inline]
+ __schedule+0x18bc/0x4c40 kernel/sched/core.c:6765
+ __schedule_loop kernel/sched/core.c:6842 [inline]
+ schedule+0x14b/0x320 kernel/sched/core.c:6857
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6914
+ __mutex_lock_common kernel/locking/mutex.c:662 [inline]
+ __mutex_lock+0x817/0x1010 kernel/locking/mutex.c:730
+ mISDN_ioctl+0x96/0x810 drivers/isdn/mISDN/timerdev.c:226
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:906 [inline]
+ __se_sys_ioctl+0xf5/0x170 fs/ioctl.c:892
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f250416fd09
+RSP: 002b:00007fff88981fd8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 0000400000000040 RCX: 00007f250416fd09
+RDX: 0000400000001f00 RSI: 0000000080044940 RDI: 0000000000000005
+RBP: 00000000000f4240 R08: 0000000000000000 R09: 0000555585b92378
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+R13: 00007fff88982010 R14: 00007fff88981ffc R15: 00007f25041b801d
+ </TASK>
+INFO: task syz-executor371:5848 blocked for more than 143 seconds.
+      Not tainted 6.14.0-rc6-syzkaller-00202-ga29967be967e #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor371 state:D stack:22224 pid:5848  tgid:5848  ppid:5843   task_flags:0x400140 flags:0x00004006
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5378 [inline]
+ __schedule+0x18bc/0x4c40 kernel/sched/core.c:6765
+ __schedule_loop kernel/sched/core.c:6842 [inline]
+ schedule+0x14b/0x320 kernel/sched/core.c:6857
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6914
+ __mutex_lock_common kernel/locking/mutex.c:662 [inline]
+ __mutex_lock+0x817/0x1010 kernel/locking/mutex.c:730
+ mISDN_ioctl+0x96/0x810 drivers/isdn/mISDN/timerdev.c:226
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:906 [inline]
+ __se_sys_ioctl+0xf5/0x170 fs/ioctl.c:892
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f250416fd09
+RSP: 002b:00007fff88981fd8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 0000400000000040 RCX: 00007f250416fd09
+RDX: 0000400000001f00 RSI: 0000000080044940 RDI: 0000000000000005
+RBP: 00000000000f4240 R08: 0000000000000000 R09: 0000555585b92378
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+R13: 00007fff88982010 R14: 00007fff88981ffc R15: 00007f25041b801d
+ </TASK>
+INFO: task syz-executor371:5851 blocked for more than 143 seconds.
+      Not tainted 6.14.0-rc6-syzkaller-00202-ga29967be967e #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor371 state:D stack:22368 pid:5851  tgid:5851  ppid:5849   task_flags:0x400140 flags:0x00004006
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5378 [inline]
+ __schedule+0x18bc/0x4c40 kernel/sched/core.c:6765
+ __schedule_loop kernel/sched/core.c:6842 [inline]
+ schedule+0x14b/0x320 kernel/sched/core.c:6857
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6914
+ __mutex_lock_common kernel/locking/mutex.c:662 [inline]
+ __mutex_lock+0x817/0x1010 kernel/locking/mutex.c:730
+ mISDN_ioctl+0x96/0x810 drivers/isdn/mISDN/timerdev.c:226
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:906 [inline]
+ __se_sys_ioctl+0xf5/0x170 fs/ioctl.c:892
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f250416fd09
+RSP: 002b:00007fff88981fd8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 0000400000000040 RCX: 00007f250416fd09
+RDX: 0000400000001f00 RSI: 0000000080044940 RDI: 0000000000000005
+RBP: 00000000000f4240 R08: 0000000000000000 R09: 0000555585b92378
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+R13: 00007fff88982010 R14: 00007fff88981ffc R15: 00007f25041b801d
+ </TASK>
+
+Showing all locks held in the system:
+1 lock held by khungtaskd/31:
+ #0: ffffffff8eb393e0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
+ #0: ffffffff8eb393e0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
+ #0: ffffffff8eb393e0 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x55/0x2a0 kernel/locking/lockdep.c:6746
+2 locks held by getty/5582:
+ #0: ffff8880318030a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
+ #1: ffffc90002fde2f0 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x616/0x1770 drivers/tty/n_tty.c:2211
+3 locks held by syz-executor371/5845:
+1 lock held by syz-executor371/5847:
+ #0: ffffffff8fbf9fe8 (mISDN_mutex){+.+.}-{4:4}, at: mISDN_ioctl+0x96/0x810 drivers/isdn/mISDN/timerdev.c:226
+1 lock held by syz-executor371/5848:
+ #0: ffffffff8fbf9fe8 (mISDN_mutex){+.+.}-{4:4}, at: mISDN_ioctl+0x96/0x810 drivers/isdn/mISDN/timerdev.c:226
+1 lock held by syz-executor371/5851:
+ #0: ffffffff8fbf9fe8 (mISDN_mutex){+.+.}-{4:4}, at: mISDN_ioctl+0x96/0x810 drivers/isdn/mISDN/timerdev.c:226
+
+=============================================
+
+NMI backtrace for cpu 0
+CPU: 0 UID: 0 PID: 31 Comm: khungtaskd Not tainted 6.14.0-rc6-syzkaller-00202-ga29967be967e #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ nmi_cpu_backtrace+0x49c/0x4d0 lib/nmi_backtrace.c:113
+ nmi_trigger_cpumask_backtrace+0x198/0x320 lib/nmi_backtrace.c:62
+ trigger_all_cpu_backtrace include/linux/nmi.h:162 [inline]
+ check_hung_uninterruptible_tasks kernel/hung_task.c:236 [inline]
+ watchdog+0x1058/0x10a0 kernel/hung_task.c:399
+ kthread+0x7a9/0x920 kernel/kthread.c:464
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+Sending NMI from CPU 0 to CPUs 1:
+NMI backtrace for cpu 1
+CPU: 1 UID: 0 PID: 5845 Comm: syz-executor371 Not tainted 6.14.0-rc6-syzkaller-00202-ga29967be967e #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
+RIP: 0010:__sanitizer_cov_trace_pc+0x0/0x70 kernel/kcov.c:210
+Code: 89 fb e8 23 00 00 00 48 8b 3d f4 03 92 0c 48 89 de 5b e9 f3 66 59 00 0f 1f 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 <f3> 0f 1e fa 48 8b 04 24 65 48 8b 0c 25 00 d5 03 00 65 8b 15 80 f5
+RSP: 0018:ffffc9000400fa50 EFLAGS: 00000246
+RAX: 0000000000000000 RBX: ffff88807f697418 RCX: ffff88806ffd8000
+RDX: 0000000000000004 RSI: ffffffff9022d040 RDI: 0000000000000001
+RBP: 0000000000000001 R08: 0000000000000005 R09: ffffffff8bf84d8b
+R10: 0000000000000004 R11: ffff88806ffd8000 R12: dffffc0000000000
+R13: 0000400000001fff R14: ffff88807f697408 R15: 0000400000001000
+FS:  0000555585b91380(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000400000001f00 CR3: 000000003177c000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <NMI>
+ </NMI>
+ <TASK>
+ ma_slots lib/maple_tree.c:775 [inline]
+ mtree_range_walk+0x3fe/0x8e0 lib/maple_tree.c:2790
+ mas_state_walk lib/maple_tree.c:3609 [inline]
+ mt_find+0x3a8/0x920 lib/maple_tree.c:6889
+ find_vma+0xf9/0x170 mm/mmap.c:913
+ lock_mm_and_find_vma+0x5f/0x2f0 mm/memory.c:6319
+ do_user_addr_fault arch/x86/mm/fault.c:1360 [inline]
+ handle_page_fault arch/x86/mm/fault.c:1480 [inline]
+ exc_page_fault+0x1bf/0x8b0 arch/x86/mm/fault.c:1538
+ asm_exc_page_fault+0x26/0x30 arch/x86/include/asm/idtentry.h:623
+RIP: 0010:__put_user_4+0x11/0x20 arch/x86/lib/putuser.S:88
+Code: 1f 84 00 00 00 00 00 66 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 48 89 cb 48 c1 fb 3f 48 09 d9 0f 01 cb <89> 01 31 c9 0f 01 ca c3 cc cc cc cc 0f 1f 00 90 90 90 90 90 90 90
+RSP: 0018:ffffc9000400fe68 EFLAGS: 00050206
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000400000001f00
+RDX: 0000000000000001 RSI: ffffffff8c2ac600 RDI: ffffffff8c802e60
+RBP: 0000000000000000 R08: ffffffff903bd077 R09: 1ffffffff2077a0e
+R10: dffffc0000000000 R11: fffffbfff2077a0f R12: 0000400000001f00
+R13: ffff88801dae7d28 R14: dffffc0000000000 R15: 0000000000000000
+ mISDN_ioctl+0x694/0x810 drivers/isdn/mISDN/timerdev.c:241
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:906 [inline]
+ __se_sys_ioctl+0xf5/0x170 fs/ioctl.c:892
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f250416fd09
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 f1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fff88981fd8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 0000400000000040 RCX: 00007f250416fd09
+RDX: 0000400000001f00 RSI: 0000000080044940 RDI: 0000000000000005
+RBP: 00000000000f4240 R08: 0000000000000000 R09: 0000555585b92378
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+R13: 00007fff88982010 R14: 00007fff88981ffc R15: 00007f25041b801d
+ </TASK>
+INFO: NMI handler (nmi_cpu_backtrace_handler) took too long to run: 1.247 msecs
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
