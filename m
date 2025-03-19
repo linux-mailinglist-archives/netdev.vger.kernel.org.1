@@ -1,136 +1,140 @@
-Return-Path: <netdev+bounces-176207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D556A6959E
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:59:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EACBEA695C1
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 18:05:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C60143BAAC3
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 16:59:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CE8042208A
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:03:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9132B1E22E6;
-	Wed, 19 Mar 2025 16:59:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3B401F8751;
+	Wed, 19 Mar 2025 17:03:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Tq66VM76"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G1Hm0lqv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E5114D70E;
-	Wed, 19 Mar 2025 16:59:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 940881E8323;
+	Wed, 19 Mar 2025 17:03:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742403563; cv=none; b=KLgKKWdgJWxoea6VhfPBkgbZtq9maat6H5VXK/Llk1CeRYjCkmSw+kGLgcUJemGreYWs3/XlYw0SD7M7ujLbCv9yuijU7i9GzXtBnZx3KWwDHzrP4LiKx0b6eeosT1Giqakm3IVki61x7gX43xk2007zP2umDoJ/tOJWL9Q+rzs=
+	t=1742403795; cv=none; b=C6j+wAgUKAjWQIb/8Tj0y0XkOUWizGit2NknZSvzNbsBYwSSDvVu5P7rme69SXOeN11d6Okvi9NIN/OoEYywWmgeW2xKfWBnybQXxTK9Lda99lYZczE3BxTjCnF38V5e5qAYeg+Oibe69BICPbg9ebN3vLk0XyMYVp/qynxMOm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742403563; c=relaxed/simple;
-	bh=C/oLQqGLGQ9DX0nwXmSdMgfjgHP3EaILZb0W8jEkeYk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uBojvTw3Y69xNiB22AqWQKFyxqcA9KJIYwdqHO1JUYoU1QhU00PYj2vDJ1v40DQx1FQWFLVLkRlDMphcJQXfNasf69tXblYr2XnbiusMbBa5Mdr8GPa2HQjRc31Th4C87R0lvmsKDksH50FozoMcdurpvjryJQgToA0BqUS900o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=Tq66VM76; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A4FAC4CEE4;
-	Wed, 19 Mar 2025 16:59:22 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Tq66VM76"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1742403561;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uf/p7VlVNzQ814HdQ3t8Ub9K7Z0QRnEkUpNVCIzegLU=;
-	b=Tq66VM76yopfaCOE3UPF1qlAPt1DsX2zUYDHrSNummG1xYmOUI7d8Ewg8pRwES15HaorQh
-	bAv7+5B4aGoERuQIVOXGVzyCehOPPd1G3/XdxZzpA0ux+Kqg6s8VIUj2UF3RS5Dwklc4og
-	pWkNWnxxVysrGgrmfc8P7GhTYzMigRg=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7a205e8a (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Wed, 19 Mar 2025 16:59:20 +0000 (UTC)
-Date: Wed, 19 Mar 2025 17:59:16 +0100
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Dmitrii Ermakov <demonihin@gmail.com>
-Cc: wireguard@lists.zx2c4.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] wireguard: use rhashtables instead of hashtables
-Message-ID: <Z9r35H2rfLV8m5iW@zx2c4.com>
-References: <20250105110036.70720-2-demonihin@gmail.com>
+	s=arc-20240116; t=1742403795; c=relaxed/simple;
+	bh=aEenN2rtAVG/y027IH9IeDfb7ILU1h7EudrieTStR2Y=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=OyyroKmehIkr+UM1JzaMcTT4hlIvXERc2gUN1xSni6uvcQm/XC4eO2RwVzODcvmRjdVmgCNLjA77ryGvbMitDrZWE5RHO6liuSOzbcE0qfJaGzzuOlDDGOcQQCdBrmrw+1RLjDE8KSTu2FSQW+7VzC9xcO0uYI7Q+/CFM62AQrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G1Hm0lqv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id F0DA9C4CEE8;
+	Wed, 19 Mar 2025 17:03:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742403795;
+	bh=aEenN2rtAVG/y027IH9IeDfb7ILU1h7EudrieTStR2Y=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=G1Hm0lqvzcrldNm8t0q8Yyp1HHlcXN+LswnBSDG+goqXb3oDNX+2DSsueT6K1ebSd
+	 0bqX4igggEjCsykDiLk+6IufR1JE7uhfHauet1xoRdvQKW88zY4zIlvJ23GbqYMZqT
+	 qjpQGmYSzGajgpTgYv4he/dXb1RzlhssK7Z5yb3IEH90304sS/X5+2q1galfInLKxo
+	 e4tzYU4/4EBYOsdVS1r9a7iZUhNmTtQXFOqBtNe4p+THxsXsLTeJOnzT6HZCN1tLb3
+	 0+pI1+bBAUKxaPP0pt3Ro7U5C7V8Syuq82xzuqfmD7iK8RuQu29lc7WgExVvHQ8Ugb
+	 jMUlewwp0FhrQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0FA7C35FFC;
+	Wed, 19 Mar 2025 17:03:14 +0000 (UTC)
+From: Nikhil Jha via B4 Relay <devnull+njha.janestreet.com@kernel.org>
+Subject: [PATCH v2 0/2] fix gss seqno handling to be more rfc-compliant
+Date: Wed, 19 Mar 2025 13:02:38 -0400
+Message-Id: <20250319-rfc2203-seqnum-cache-v2-0-2c98b859f2dd@janestreet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250105110036.70720-2-demonihin@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAK742mcC/x3MTQ5AMBBA4avIrE1SU/V3FbGQmjILRRsiEXfXW
+ H6L9x6IHIQjdNkDgS+JsvkEyjOwy+hnRpmSgRQZpYsSg7NESmPkw58r2tEujIZ0005F6UxVQ0r
+ 3wE7uf9sP7/sBx9CHy2YAAAA=
+X-Change-ID: 20250314-rfc2203-seqnum-cache-52389d14f567
+To: Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
+ Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+ Neil Brown <neilb@suse.de>, Olga Kornievskaia <okorniev@redhat.com>, 
+ Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
+ Masami Hiramatsu <mhiramat@kernel.org>, 
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Cc: linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+ Nikhil Jha <njha@janestreet.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1742403794; l=2309;
+ i=njha@janestreet.com; s=20250314; h=from:subject:message-id;
+ bh=aEenN2rtAVG/y027IH9IeDfb7ILU1h7EudrieTStR2Y=;
+ b=G5nQT809qbEmXwOvoaSrMtCSMogF7ODItEYkYescwgV3YjoixFzV6RzTnGWdsI8AjlXkLzyJq
+ FZ0MZHZGAuwBJf4+nCLEaL8KvzVKIsmuwHkHlGD4X1DapwUl28dpjkT
+X-Developer-Key: i=njha@janestreet.com; a=ed25519;
+ pk=92gWYi0ImmcatlW+pFEFh9viqpRf/PE8phYeWuNeGaA=
+X-Endpoint-Received: by B4 Relay for njha@janestreet.com/20250314 with
+ auth_id=360
+X-Original-From: Nikhil Jha <njha@janestreet.com>
+Reply-To: njha@janestreet.com
 
-On Sun, Jan 05, 2025 at 12:00:17PM +0100, Dmitrii Ermakov wrote:
-> @@ -74,7 +75,6 @@ struct noise_handshake {
->  	u8 remote_static[NOISE_PUBLIC_KEY_LEN];
->  	u8 remote_ephemeral[NOISE_PUBLIC_KEY_LEN];
->  	u8 precomputed_static_static[NOISE_PUBLIC_KEY_LEN];
-> -
->  	u8 preshared_key[NOISE_SYMMETRIC_KEY_LEN];
->  
->  	u8 hash[NOISE_HASH_LEN];
-> @@ -83,6 +83,8 @@ struct noise_handshake {
->  	u8 latest_timestamp[NOISE_TIMESTAMP_LEN];
->  	__le32 remote_index;
->  
-> +	siphash_key_t hash_seed;
+When the client retransmits an operation (for example, because the
+server is slow to respond), a new GSS sequence number is associated with
+the XID. In the current kernel code the original sequence number is
+discarded. Subsequently, if a response to the original request is
+received there will be a GSS sequence number mismatch. A mismatch will
+trigger another retransmit, possibly repeating the cycle, and after some
+number of failed retries EACCES is returned.
 
-Why?
+RFC2203, section 5.3.3.1 suggests a possible solution... “cache the
+RPCSEC_GSS sequence number of each request it sends” and "compute the
+checksum of each sequence number in the cache to try to match the
+checksum in the reply's verifier." This is what FreeBSD’s implementation
+does (rpc_gss_validate in sys/rpc/rpcsec_gss/rpcsec_gss.c).
 
-> +#include "linux/printk.h"
-> +#include "linux/rcupdate.h"
-> +#include "linux/rhashtable-types.h"
-> +#include "linux/rhashtable.h"
-> +#include "linux/siphash.h"
+However, even with this cache, retransmits directly caused by a seqno
+mismatch can still cause a bad message interleaving that results in this
+bug. The RFC already suggests ignoring incorrect seqnos on the server
+side, and this seems symmetric, so this patchset also applies that
+behavior to the client.
 
-Seems wrong.
+These two patches are *not* dependent on each other. I tested them by
+delaying packets with a Python script hooked up to NFQUEUE. If it would
+be helpful I can send this script along as well.
 
-> +#include "messages.h"
->  #include "peer.h"
->  #include "noise.h"
-> +#include "linux/memory.h"
+Signed-off-by: Nikhil Jha <njha@janestreet.com>
+---
+Changes since v1:
+ * Maintain the invariant that the first seqno is always first in
+   rq_seqnos, so that it doesn't need to be stored twice.
+ * Minor formatting, and resending with proper mailing-list headers so the
+   patches are easier to work with.
 
-Ditto.
+---
+Nikhil Jha (2):
+      sunrpc: implement rfc2203 rpcsec_gss seqnum cache
+      sunrpc: don't immediately retransmit on seqno miss
 
->  
-> -static struct hlist_head *pubkey_bucket(struct pubkey_hashtable *table,
-> -					const u8 pubkey[NOISE_PUBLIC_KEY_LEN])
-> +static inline u32 index_hashfn(const void *data, u32 len, u32 seed)
->  {
-> -	/* siphash gives us a secure 64bit number based on a random key. Since
-> -	 * the bits are uniformly distributed, we can then mask off to get the
-> -	 * bits we need.
-> -	 */
-> -	const u64 hash = siphash(pubkey, NOISE_PUBLIC_KEY_LEN, &table->key);
-> +	const u32 *index = data;
-> +	return *index;
-> +}
+ include/linux/sunrpc/xprt.h    | 17 +++++++++++-
+ include/trace/events/rpcgss.h  |  4 +--
+ include/trace/events/sunrpc.h  |  2 +-
+ net/sunrpc/auth_gss/auth_gss.c | 59 ++++++++++++++++++++++++++----------------
+ net/sunrpc/clnt.c              |  9 +++++--
+ net/sunrpc/xprt.c              |  3 ++-
+ 6 files changed, 64 insertions(+), 30 deletions(-)
+---
+base-commit: 7eb172143d5508b4da468ed59ee857c6e5e01da6
+change-id: 20250314-rfc2203-seqnum-cache-52389d14f567
 
-But shouldn't this actually use siphash? What's happening here?
+Best regards,
+-- 
+Nikhil Jha <njha@janestreet.com>
 
-> +struct peer_hash_pubkey {
-> +	siphash_key_t key;
-> +	u8 pubkey[NOISE_PUBLIC_KEY_LEN];
-> +};
-> +
-> +static inline u32 wg_peer_obj_hashfn(const void *data, u32 len, u32 seed)
-> +{
-> +	const struct wg_peer *peer = data;
-> +	struct peer_hash_pubkey key;
-> +	u64 hash;
-> +
-> +	memcpy(&key.key, &peer->handshake.hash_seed, sizeof(key.key));
-> +	memcpy(&key.pubkey, &peer->handshake.remote_static, NOISE_PUBLIC_KEY_LEN);
-> +
-> +	hash = siphash(&key.pubkey, NOISE_PUBLIC_KEY_LEN, &key.key);
 
-Why this weird construction with this other struct?
-
-I'll stop reading here. There's a lot of strangeness with this patch.
-Maybe it's workable with enough care, but I think to review this into
-shape, in its current state, would be about the same as just rewriting
-it.
 
