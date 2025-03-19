@@ -1,120 +1,175 @@
-Return-Path: <netdev+bounces-175997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-175998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C8C3A683B5
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 04:29:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53E7DA683D4
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 04:37:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 247AC882A22
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 03:29:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB9BA16BACE
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 03:37:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3810E24E4B0;
-	Wed, 19 Mar 2025 03:29:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E16B22489F;
+	Wed, 19 Mar 2025 03:36:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="GPnbqtPC"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="j/L84cUU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F952C9A;
-	Wed, 19 Mar 2025 03:29:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F20088BE7;
+	Wed, 19 Mar 2025 03:36:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742354962; cv=none; b=EPqOgWcQ2AgKV8h9y5WVEvzybnSpIkJfY7gwOM29yklNFyBgJV5cRVJVx3jjqgHBsmirSpJqkII+cYxxMqGQUnCVYZossR+epmjSG8pqP4onY8fKG1cf4vf+sNpJf8MntmHji5IMvvGMYnMSbdd6iihtENne8NMqxsY6B9GQHWA=
+	t=1742355418; cv=none; b=NKS+mEoixZirJiCG+o00+hESAdaO4iUXhiM5dFt/rFBSrag5uY7/Rw5bPAkthb4FKXERZMZCTRwDrwMkSIuHXkLrzrhHEcw3zOJSuhTRN1wCat0W8Pgl5xt45bQw3E9dy5CH86O+dO36n8R3CrxSrABWWxp6ipyonnG1gC13IP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742354962; c=relaxed/simple;
-	bh=yixH79nzV5SukJr4oLn6BIm0JyYNUponYIuxik4xeAM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u8cvdMs9EeVv/GX6igOEnc2ks2XYBsbeLuDd+mId4NwBrdZaJJJP6AhRe0Hr0lsxpFIpxDwITD9+435urv4slOeD7eD8qaFTlsU77lQUjENb+vLti7YRs+mDJukrXp9zdUSgZ24+YK4nDF/qtDS4HqB6dlAdUm3PkYpe4gLiuJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=GPnbqtPC; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1742354954;
-	bh=dznLdSdOJ6Kn7aI90N3XVX6/Rk2l5EKH8sSqpI3uMuE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GPnbqtPCz+mhNnmnD7SIn4Xu+hQEQWkLLReQGoVmoPG0ANvK6gq/GUYMWd2O3/8rQ
-	 BvtfUclUnHxbKMoiC1FqtSN0bfF+HFnvlI7pssySC+zp0FwpNoNbEKDeRNLtnnZqZv
-	 sN+Ghoe7NW2FvUg1KSAkYB3P8nBpdcwLFwdfrOWlByuERxbxhJRmUWGHalf51ba853
-	 bX8dsppac1DQDD0QziF1yZgE3fd7uYKcLIe+oizXUDRay9ANSeIkTOZuxGOoCHy+0S
-	 dmCwlbMjME3xvOivRFcEv1O46531ESBG0KMpoBTGLIrM5E/V4s5EndZy1X/OIeJRas
-	 oOF3DcWxRwjyA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4ZHZ223xt6z4wcT;
-	Wed, 19 Mar 2025 14:29:14 +1100 (AEDT)
-Date: Wed, 19 Mar 2025 14:28:29 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Kumar Kartikeya Dwivedi <memxor@gmail.com>, Daniel Borkmann
- <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, Andrii
- Nakryiko <andrii@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
- Uros Bizjak <ubizjak@gmail.com>, bpf <bpf@vger.kernel.org>, Networking
- <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: Re: linux-next: build failure after merge of the bpf-next tree
-Message-ID: <20250319142829.1dabd7b9@canb.auug.org.au>
-In-Reply-To: <CAADnVQKotSrp8CkVpFw-y800NJ_R7An-iw-twrQZaOdYUeRtqQ@mail.gmail.com>
-References: <20250319133309.6fce6404@canb.auug.org.au>
-	<CAADnVQKotSrp8CkVpFw-y800NJ_R7An-iw-twrQZaOdYUeRtqQ@mail.gmail.com>
+	s=arc-20240116; t=1742355418; c=relaxed/simple;
+	bh=pp1RgEz7+tlhRwSDDrL3qiowlEkFNLLCkbpWMHxeC2c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MmcA7+9ZpIdSI0Dy7J0WofAblYgbcJfC7EfpCWvkSmke3G0zZVClW6MBdzplXFzvbrxC6RI3J/P1oqKebT2ht3Ce+qxT5/w6EXqM1Q8/mwpNztb6CHWFopyhuyTm/BgafVZI9vOxwLyz0m7GnOKUh5QP51lg5oGYN7v/DcCYCgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=j/L84cUU; arc=none smtp.client-ip=18.194.254.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1742355399;
+	bh=fmRqY+JDZY5i3/fjqLE27xJ4JDCC12QtNnBz4AnHDpg=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=j/L84cUUyWGc6D3zBDR+vOXtzEPEKXN959iy1w3io6P1/snUD4F29ZYbELrU7cHLA
+	 vIXKtSpU3L3KFH05zVvNSTkl323iIbVh9z+4dCt+dvw2rQyMWyWCns+PiyiOxBASjN
+	 xDXdlZthTMg0obwKc37hlpaE+sr3FrdNUbHLta5w=
+X-QQ-mid: bizesmtpip4t1742355351tcmig4x
+X-QQ-Originating-IP: X9j/ZIBSIzwYhFiwIBBO/UOkuXEkV9sWk1tNamg6tvE=
+Received: from localhost.localdomain ( [localhost])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 19 Mar 2025 11:35:49 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 17725562205952502162
+From: WangYuli <wangyuli@uniontech.com>
+To: pablo@netfilter.org,
+	kadlec@netfilter.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	eric.dumazet@gmail.com,
+	fw@strlen.de,
+	zhanjun@uniontech.com,
+	niecheng1@uniontech.com,
+	WangYuli <wangyuli@uniontech.com>,
+	Wentao Guan <guanwentao@uniontech.com>
+Subject: [PATCH net] netfilter: nf_tables: Only use nf_skip_indirect_calls() when MITIGATION_RETPOLINE
+Date: Wed, 19 Mar 2025 11:34:44 +0800
+Message-ID: <91A1F82B6B7D6AC2+20250319033444.1135201-1-wangyuli@uniontech.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/IDNOidSBs28tcVU.pAzxLe1";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: Mv+tyGIfil93X88bSXqjV4CVQrPFfvyx0qbbQdKtpXRIfY6Mc/IfpdeE
+	xrBf9XJ9A7vpNiYNBPIwHie4Y9HsukmxIf6uADEVC0xkmnGZbhvbpofBs1KVyeeQfUpn1Q2
+	/g3qhTKmNvhT1xQT/TK9rNsGr1Uv4NndOqMvsELK4TblVux2MJSQpYmEuPN6hIfJNKfcpg6
+	cXOl0zNoFJ3sYUCm3oz9AdhvSMHFephIrBiZQyL9a0rFGvpvswzAWDOi0RCmct1kxcWUAKN
+	cff21e/lM72Jyf9dvIE5yr+J2jgQpofiNWNQMiGjYUvfPuDYm4SBxJgW5dJhWrFy61pKbdi
+	2A5nGf0VT4mg5+cBWs4ejzV/UayON3RSIYA4LehV8QtFQf+fCAr2WL41DsPOZcY/0Cyr9SN
+	HYwCiI8US9nAjzLsHLYz872L+k532fZna7enOISjQ8Jf/S1TEzcpcQAETyPMHT7tFO4yV9P
+	inlojxhCjmIEy7/QF2g+CNury5CzX1DlxtwJTA70AEFEtri1Q92adtH3GoOcqS0RSE77Feh
+	nH2eJlCXEz7XL9H52/BL79XYTDdJ4SF1xqtrvPQ4nb7Xyyn+Ud+KqGRh5ooDv41cNz1yzWS
+	2uI+xq9yV2QlGLfK9tHAuEv+ROPx2GkmzVeCQoJLTm5J4e0klHVv5DEyFkm+wmPuhTefsZl
+	hctMqg/0CC52kkv29bUyhmcZZzaYxvw9Oy4SFZJrCU6J8V2L+IpwGmG51ODZDyjf7WLoFX0
+	XFbqu6VyNKPIvLfWVYdTx7ZiPNqCvoGbonTpZGiWZaenPRaBzJVnA5OdxHuUwK04/ztx3dJ
+	RcooLxSBBTxTvuC8SSPQ/+AgHADuvHTAA+BLofzs1gFmxU7yGB0N67ely/Ex27iLNwznYSU
+	GINhZUN+lfrMhq6V7AmfzB4T/RTpHok20apgXPeaKnazvYOmSnYaVrRvvG1VfJtQ5iOSXxL
+	t2BT7tH/y8vgcd+sCPZFaEyl3Wr4GbHCBTAkTSbxb+XVKKO/KIFvgzJ501Vv4Gmk8cWU=
+X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+X-QQ-RECHKSPAM: 0
 
---Sig_/IDNOidSBs28tcVU.pAzxLe1
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+1. MITIGATION_RETPOLINE is x86-only (defined in arch/x86/Kconfig),
+so no need to AND with CONFIG_X86 when checking if enabled.
 
-Hi Alexei,
+2. Remove unused declaration of nf_skip_indirect_calls() when
+MITIGATION_RETPOLINE is disabled to avoid warnings.
 
-On Tue, 18 Mar 2025 19:46:52 -0700 Alexei Starovoitov <alexei.starovoitov@g=
-mail.com> wrote:
->
-> > Caused by the resilient-queued-spin-lock branch of the bpf-next tree
-> > interacting with the "Enable strict percpu address space checks" series
-> > form the mm-stable tree. =20
->=20
-> Do you mean this set:
-> https://lore.kernel.org/all/20250127160709.80604-1-ubizjak@gmail.com/
+3. Declare nf_skip_indirect_calls() and nf_skip_indirect_calls_enable()
+as inline when MITIGATION_RETPOLINE is enabled, as they are called
+only once and have simple logic.
 
-Yes.  Also available as commits up to commit
+4. Following that, there's no need to define an empty
+nf_skip_indirect_calls_enable function. Just simply add the same macro
+condition around its sole call site.
 
- 6a367577153a ("percpu/x86: enable strict percpu checks via named AS qualif=
-iers")
+Fix follow error with clang-21 when W=1e:
+  net/netfilter/nf_tables_core.c:39:20: error: unused function 'nf_skip_indirect_calls' [-Werror,-Wunused-function]
+     39 | static inline bool nf_skip_indirect_calls(void) { return false; }
+        |                    ^~~~~~~~~~~~~~~~~~~~~~
+  1 error generated.
+  make[4]: *** [scripts/Makefile.build:207: net/netfilter/nf_tables_core.o] Error 1
+  make[3]: *** [scripts/Makefile.build:465: net/netfilter] Error 2
+  make[3]: *** Waiting for unfinished jobs....
 
-in the mm-stable branch of the mm tree
-(git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm#mm-stable) and
-yesterday's linux-next tree.
+Fixes: d8d760627855 ("netfilter: nf_tables: add static key to skip retpoline workarounds")
+Co-developed-by: Wentao Guan <guanwentao@uniontech.com>
+Signed-off-by: Wentao Guan <guanwentao@uniontech.com>
+Signed-off-by: WangYuli <wangyuli@uniontech.com>
+---
+ net/netfilter/nf_tables_core.c | 15 ++++++---------
+ 1 file changed, 6 insertions(+), 9 deletions(-)
 
---=20
-Cheers,
-Stephen Rothwell
+diff --git a/net/netfilter/nf_tables_core.c b/net/netfilter/nf_tables_core.c
+index 75598520b0fa..48b8d2406d4e 100644
+--- a/net/netfilter/nf_tables_core.c
++++ b/net/netfilter/nf_tables_core.c
+@@ -21,25 +21,20 @@
+ #include <net/netfilter/nf_log.h>
+ #include <net/netfilter/nft_meta.h>
+ 
+-#if defined(CONFIG_MITIGATION_RETPOLINE) && defined(CONFIG_X86)
+-
++#ifdef CONFIG_MITIGATION_RETPOLINE
+ static struct static_key_false nf_tables_skip_direct_calls;
+ 
+-static bool nf_skip_indirect_calls(void)
++static inline bool nf_skip_indirect_calls(void)
+ {
+ 	return static_branch_likely(&nf_tables_skip_direct_calls);
+ }
+ 
+-static void __init nf_skip_indirect_calls_enable(void)
++static inline void __init nf_skip_indirect_calls_enable(void)
+ {
+ 	if (!cpu_feature_enabled(X86_FEATURE_RETPOLINE))
+ 		static_branch_enable(&nf_tables_skip_direct_calls);
+ }
+-#else
+-static inline bool nf_skip_indirect_calls(void) { return false; }
+-
+-static inline void nf_skip_indirect_calls_enable(void) { }
+-#endif
++#endif /* CONFIG_MITIGATION_RETPOLINE */
+ 
+ static noinline void __nft_trace_packet(const struct nft_pktinfo *pkt,
+ 					const struct nft_verdict *verdict,
+@@ -393,7 +388,9 @@ int __init nf_tables_core_module_init(void)
+ 			goto err;
+ 	}
+ 
++#ifdef CONFIG_MITIGATION_RETPOLINE
+ 	nf_skip_indirect_calls_enable();
++#endif /* CONFIG_MITIGATION_RETPOLINE */
+ 
+ 	return 0;
+ 
+-- 
+2.49.0
 
---Sig_/IDNOidSBs28tcVU.pAzxLe1
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmfaOd0ACgkQAVBC80lX
-0GxC9ggAozjI+xDE1SXkYAXd+bUykzAfIdlk55eVdb8K48i53hMnUTOrCwDHAvhT
-rt0/gy69ZajdxHM/c4lMvbJtbja+vRRtLQ0JVkd0tTAmDbGk2mUXsOuFfM7QclEn
-HTSAZ0cS9LEKYD/edWW1W+8PQfa/dA4Y3EuqeBRFVkpDuBBG4Ud1x30YqEBRL8Kd
-NXCBTEI6ShTtqiifKGfyFR8R7lcaifV4d02JfQs69jYI/SelCGwueOQ20cnIBr7d
-pHNtowms/7bGk2sMcy3gJ2IHOLBIarZfR7HYEucJhZsd/6MNyvVaq4j0xG93p/8h
-7ixXXIqWn1yjQx2yvdKxxJyF1TGt0Q==
-=KO9M
------END PGP SIGNATURE-----
-
---Sig_/IDNOidSBs28tcVU.pAzxLe1--
 
