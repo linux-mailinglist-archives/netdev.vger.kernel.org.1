@@ -1,131 +1,148 @@
-Return-Path: <netdev+bounces-176186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 382C7A69461
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:09:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F10AA6945B
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:08:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38109189875D
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 16:07:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDA04884A2D
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 16:07:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7147F1DE3AE;
-	Wed, 19 Mar 2025 16:06:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D90901DED4B;
+	Wed, 19 Mar 2025 16:07:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eisGPEEM"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="y+r2+hEf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B15271CB337;
-	Wed, 19 Mar 2025 16:06:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2DF019B3CB
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 16:07:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742400413; cv=none; b=ZMLbzydh40dgqN97t/nitdhOndBZoDJL8VNLbOIUdvo9ThntgGjQWwXs2S/6EAy6AOHprCIJo57olbVd/O5jSdgehkZhwfOrH9Ds3S336HH0kD8TK6pKgDLUpWL5yNAN6kTNm+3oMdZneH+/RnEJCKfoZz0KyN2G1ZrvgCeJE8Y=
+	t=1742400452; cv=none; b=NQc8B8lr8z2FfzCwLmI+u2TYWwqh8yGIv76hOwFnWKlsHZ7+hqatwX119TZAkO8B2FGh6xpW6ZaiTQGRFSFalIRQrt/7KrbtXH3gapqYpzyasg4h3V1wzUMxTdJQbhCQF4aXQUt/higANWYCxXIKMMzEuZYGAIqG1gh75tzvoqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742400413; c=relaxed/simple;
-	bh=GIegq0oT6qB1JtJRey7NbwCdp+CUQJQWDDvFEpMnnUs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ACff3LvgVucDRRqllsDFt8ZF5CCxCi+Xzh09eqER9uL+A9/U9mmR8iCv0gfUz15mDArT408UgcdDwMyMlULopeKD4ZtRU8JRiSyC53JjzHlBYNbR6EHN+vHPHTTBqREAqiG/2vAN2TjJBseYuAlLwq69rRNgNRadTY6qrgqdn5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eisGPEEM; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5499c5d9691so7523583e87.2;
-        Wed, 19 Mar 2025 09:06:51 -0700 (PDT)
+	s=arc-20240116; t=1742400452; c=relaxed/simple;
+	bh=n24KzPzMfIDbuu7S5CaFyw0UePwN7haHff4RjRQuRy4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=tm9DxORHnGN56Ifr1PwyE6NvdhOlp7lpX+AlwTw+99jl649uZAICSmQU5snjMAPeMKbiIm6iY4hovwpz8cLqmYh3037VGKPzWvC/nkNFTkNnes5acY+603GSh3Qxq4hP2hIIDuNTEekzx5Rdu0fdJQh2WAnpwNeuLxHAaM6U/4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=y+r2+hEf; arc=none smtp.client-ip=209.85.166.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3d46fddf43aso48860155ab.3
+        for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 09:07:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742400410; x=1743005210; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GIegq0oT6qB1JtJRey7NbwCdp+CUQJQWDDvFEpMnnUs=;
-        b=eisGPEEMV3CypfbbqyfWUJ/2ly/FXL6QsoFEqckkgtm8sdIPUtasAHpkb9WvmZjQVl
-         zf9x2kAx6tuDghtOInC8GgADMBGWPDFxWgHRaBy98XECNsbUwFrc5mcuPrOZgK4A6yG5
-         rVRa0otoLfDDmVN7osxb7bCGBhUkI+6sE/63m2oFn6rnbNuFAmubW8M9aIWM5wG1cP+3
-         yV/aBtARbQ7uiYEA9OqbeKUlcHmfLjVWzpFuK2y1cKXaXRapnDstPyMFfU0eQf2I3N1h
-         LvvDzWZImpqBAkl1QstxNhZK7EZ7OsgXq87Vr9Cy8NKJ8uQNS/nN8OimUUa2iBPjeviF
-         84VA==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1742400450; x=1743005250; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Ija8XGDNXdwDWcF7Obpxn5AkOPtI89VS3WVbcU/kpys=;
+        b=y+r2+hEfjU2Zz7ALNOq5svFqzJiE9cuXQdmJA+P20x3ThNxa4mu8TtLObqNVlmroGR
+         OlmZyYGQuf90qEw4W3uFuM+qnOHzzxc8ucTo7UpOKYtNKkyBbOReAsQhAQo3E/IP7leE
+         E9wx4qFx45Oa2aV/2THQw+dab2TirOSA0A+EQ6K560wTR4bka8wphawWRyI/d1vJFHr+
+         qzQXF+jXmP7T7oWdIYtu4AfbRAkJbRlbzJRgprCtUulnirrdugfhtvRDW6HS5GWmBfRc
+         krNJStKgc3sx9SLXZLXnd0wZOcaGEL7gXh4wuw7XqjLN2dft+wd5LxMmSpHgutBnovf3
+         PLfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742400410; x=1743005210;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GIegq0oT6qB1JtJRey7NbwCdp+CUQJQWDDvFEpMnnUs=;
-        b=qnEw7WsnLXsLYjAqbJFOOVuH/HXTVuy2PgKVsraGde9CI+BdaVdUqrKrSbqj99DSwi
-         bnWxpSnb1Fop18FkDHkl0sfZsbk682vRCLp6ApaYLM7qdLvwT6lGx7dDZ4qYq9QMzBbI
-         9YIqNV+zKSLxLF/IARQUzLQt4MRQhexDzk8vEKUcY3D+cs3QAUSSN3wf60r9IuD0WKnJ
-         ODJwwBxH+geqzwHJ3O5c0eGQ7VOAe+8hVftmvnj7NO71IF5utw8tDt3Sbm7tkhGuBZ6N
-         OckXF+Va6xYzTnMSHme5C9TUSePZUStLcOZS7IYbqfX7uZbK34WgGQzs4XkI9h8Cb+ov
-         J34g==
-X-Forwarded-Encrypted: i=1; AJvYcCUCAC/EzvItOV/v5R9L8zARj1Fod4jrNpLIZDjtwBfZAj9ua8UXabpXA0piNJmJQqxzeKAeb4/xjXOOzA==@vger.kernel.org, AJvYcCUlWuPv4drDk/fBkzxTwmvdiSCT8atjOMHDMN4TPwI3q5kok8TOQnBSs8JIFTIOKV3pkPU=@vger.kernel.org, AJvYcCWFMhC6J2XKof28CmebTggvnfUW+ytYph7bGIfSlO1p9I8xY7IcL8Nzn5QAemanJKOSQIZDmYJwp+cJGdX/@vger.kernel.org, AJvYcCX98xLW1LTGIme1Nd4RYrLfkKZcXLe9HGNwY+Ku12ypBPjUGkgyepN+o8IcvpATj65X7NFz4sv6@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywezc7I8bWteMn+fZY8U7JytK7nPYP/QbVxAohdamVSP4vzeavk
-	F/RDNA3QV0zr5pfQ7hSx7hAIsphvNlFNWQzwLFciw/LLRhaJVAEPKOUuZdsc4Fh5yJegyAPW280
-	pz0b/e0JCgrJWeiLk7nB6ocr4kOEfhqVM/YxC6Q==
-X-Gm-Gg: ASbGncvyQHwUxyoagxtH2Q9RvAu4QXQzcuXnbWkKmhva44C6z2mHU+je8+1EPsBeJUv
-	bG9KuczZ3n2sAOsuGpxrxe3xW6LD0BJl9iMLabaDMYzfTtJceiPqa8eY2qSjQwU3HUf+v7Zrkjf
-	VxR/weiJUcgOy/V3J3r2a2ae4+7g==
-X-Google-Smtp-Source: AGHT+IHmMFBxgWTdhY8PJN51uSi03KQFkFqruTJL/3AzgzUJ2KoIhJ4kJd2FL5HM00A/MVSkbE9sDGmCM2sChyyPNxA=
-X-Received: by 2002:a05:6512:a90:b0:549:4a13:3a82 with SMTP id
- 2adb3069b0e04-54acb1bf76fmr1334884e87.21.1742400409265; Wed, 19 Mar 2025
- 09:06:49 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1742400450; x=1743005250;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ija8XGDNXdwDWcF7Obpxn5AkOPtI89VS3WVbcU/kpys=;
+        b=DGhalq+RZUKykgWkp1UQefQ+H3a9+sU5AWD8zpUOh/ebODG0cOtaYyz/TtRkTETnr3
+         zR/DOdT3h5iDc/D5vbzpj/8zgCszXvQ+LP9poKHUcSBJ+JBQcW53WN86ONch1u2sW7C7
+         qWpa6QZiSa5cuihlaEIFbPWpwf4ayZzsQimXTPQ3r24UN+4CGSr6CX1pzfyk6yquLVNF
+         ZuoLTZfxCdZVFYqCU3etgIS4XOnkQJ3+Ty282g8KXsNTmnsO7Pt3UEa+2wNroicpl7bz
+         lyS8nxLjBq90T7Ov7JMWDFAeBGw6o31lmQSY3YN2Uwj9PeYqEnxkUr5Oy/kO31G3hk/O
+         d0Bg==
+X-Forwarded-Encrypted: i=1; AJvYcCUyUtvkJzvRS4acpTLrql32xfmQ7xEgj4YApo/RNJBlq2i20HgOH11R25rAK0h5QTr/hXRV9X8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YznF7guBkYRhxkxSLLYBxrzD252jFK1aKviMmtTbZg3gEgQ7+Z8
+	I3EnaHHKnYiyP39BCaemoaHNW3LswEOGZkqwqZUyP/GgbSrThBOmGa+LBg36HUc=
+X-Gm-Gg: ASbGncv2Dnf6m/D706yo/Grv5YO2V2AZLLBxS2yvVZzbyLRK9iyKsGX15QsF4AqNJ28
+	GVMCbMwQphSBpwJRirvgOvXrk/jDZ9lveeSoUPZRI5J1Gp/ONHCbcg2ggb/5OgMXvkdlw0COOVr
+	Ru49SolqlrzW8my4OGkgmAfxt9XYgrMjMC5u2pQsjAkvSOsIsaiz4HiwsnSU9tUHDHEyGLYJHAf
+	zVcOrnmMie+cCeeazu1qHjTzJhoj7bqAsv2Mp2+Rp8CMvwymsq1gnPVZXI13zrMhslcwe4bjHy3
+	EOkXBChfVzaz5OhAuxjPSfpKPii4x8KDF9MKcdsl36tHRn9PJfs=
+X-Google-Smtp-Source: AGHT+IFDBCFWtf4DEWZHOAZhQMfKg6BVxtB70LM/11gT5po4hUy91hL9GfbCfrY2dAmweb9btJ2fRg==
+X-Received: by 2002:a05:6e02:1d1d:b0:3d4:3aba:e5ce with SMTP id e9e14a558f8ab-3d586bb9f32mr38295495ab.20.1742400449657;
+        Wed, 19 Mar 2025 09:07:29 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f263719730sm3269768173.36.2025.03.19.09.07.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Mar 2025 09:07:29 -0700 (PDT)
+Message-ID: <2d68bc91-c22c-4b48-a06d-fa9ec06dfb25@kernel.dk>
+Date: Wed, 19 Mar 2025 10:07:27 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250319133309.6fce6404@canb.auug.org.au> <CAADnVQKotSrp8CkVpFw-y800NJ_R7An-iw-twrQZaOdYUeRtqQ@mail.gmail.com>
- <CAP01T76CqOxzEiMLKJ2y_YD=qDgWq+Fq5Zy-fnKP4AAyS30Dwg@mail.gmail.com>
- <CAP01T77_qMiMmyeyizud=-sbBH5q1jvY_Jkj-QLZqM1zh0a2hg@mail.gmail.com>
- <CAP01T77St7cpkvJ7w+5d3Ji-ULdz04QhZDxQWdNSBX9W7vXJCw@mail.gmail.com> <CAADnVQ+8apdQtyvMO=SKXCE_HWpQEo3CaTUwd39ekYEj-D4TQA@mail.gmail.com>
-In-Reply-To: <CAADnVQ+8apdQtyvMO=SKXCE_HWpQEo3CaTUwd39ekYEj-D4TQA@mail.gmail.com>
-From: Uros Bizjak <ubizjak@gmail.com>
-Date: Wed, 19 Mar 2025 17:06:37 +0100
-X-Gm-Features: AQ5f1JqZYR9VPu0HjinWzHMC5L1Scq9q3VwTd7PzyM-8Rfg9zsp8PFtqKud26SI
-Message-ID: <CAFULd4brsMuNX3-jJ44JyyRZqN1PO9FwJX7N3mvMwRzi8XYLag@mail.gmail.com>
-Subject: Re: linux-next: build failure after merge of the bpf-next tree
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Kumar Kartikeya Dwivedi <memxor@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, bpf <bpf@vger.kernel.org>, 
-	Networking <netdev@vger.kernel.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC -next 00/10] Add ZC notifications to splice and sendfile
+To: Joe Damato <jdamato@fastly.com>, Christoph Hellwig <hch@infradead.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ asml.silence@gmail.com, linux-fsdevel@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, linux-api@vger.kernel.org,
+ linux-arch@vger.kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
+ kuba@kernel.org, shuah@kernel.org, sdf@fomichev.me, mingo@redhat.com,
+ arnd@arndb.de, brauner@kernel.org, akpm@linux-foundation.org,
+ tglx@linutronix.de, jolsa@kernel.org, linux-kselftest@vger.kernel.org
+References: <20250319001521.53249-1-jdamato@fastly.com>
+ <Z9p6oFlHxkYvUA8N@infradead.org> <Z9rjgyl7_61Ddzrq@LQ3V64L9R2>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <Z9rjgyl7_61Ddzrq@LQ3V64L9R2>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 19, 2025 at 3:55=E2=80=AFPM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Wed, Mar 19, 2025 at 7:36=E2=80=AFAM Kumar Kartikeya Dwivedi
-> <memxor@gmail.com> wrote:
-> >
-> > > >
-> > > > I've sent a fix [0], but unfortunately I was unable to reproduce th=
-e
-> > > > problem with an LLVM >=3D 19 build, idk why. I will try with GCC >=
-=3D 14
-> > > > as the patches require to confirm, but based on the error I am 99%
-> > > > sure it will fix the problem.
-> > >
-> > > Probably because __seg_gs has CC_HAS_NAMED_AS depends on CC_IS_GCC.
-> > > Let me give it a go with GCC.
-> > >
-> >
-> > Can confirm now that this fixes it, I just did a build with GCC 14
-> > where Uros's __percpu checks kick in.
->
-> Great. Thanks for checking and quick fix.
->
-> btw clang supports it with __attribute__((address_space(256))),
-> so CC_IS_GCC probably should be relaxed.
+On 3/19/25 9:32 AM, Joe Damato wrote:
+> On Wed, Mar 19, 2025 at 01:04:48AM -0700, Christoph Hellwig wrote:
+>> On Wed, Mar 19, 2025 at 12:15:11AM +0000, Joe Damato wrote:
+>>> One way to fix this is to add zerocopy notifications to sendfile similar
+>>> to how MSG_ZEROCOPY works with sendmsg. This is possible thanks to the
+>>> extensive work done by Pavel [1].
+>>
+>> What is a "zerocopy notification" 
+> 
+> See the docs on MSG_ZEROCOPY [1], but in short when a user app calls
+> sendmsg and passes MSG_ZEROCOPY a completion notification is added
+> to the error queue. The user app can poll for these to find out when
+> the TX has completed and the buffer it passed to the kernel can be
+> overwritten.
+> 
+> My series provides the same functionality via splice and sendfile2.
+> 
+> [1]: https://www.kernel.org/doc/html/v6.13/networking/msg_zerocopy.html
+> 
+>> and why aren't you simply plugging this into io_uring and generate
+>> a CQE so that it works like all other asynchronous operations?
+> 
+> I linked to the iouring work that Pavel did in the cover letter.
+> Please take a look.
+> 
+> That work refactored the internals of how zerocopy completion
+> notifications are wired up, allowing other pieces of code to use the
+> same infrastructure and extend it, if needed.
+> 
+> My series is using the same internals that iouring (and others) use
+> to generate zerocopy completion notifications. Unlike iouring,
+> though, I don't need a fully customized implementation with a new
+> user API for harvesting completion events; I can use the existing
+> mechanism already in the kernel that user apps already use for
+> sendmsg (the error queue, as explained above and in the
+> MSG_ZEROCOPY documentation).
 
-https://github.com/llvm/llvm-project/issues/93449
+The error queue is arguably a work-around for _not_ having a delivery
+mechanism that works with a sync syscall in the first place. The main
+question here imho would be "why add a whole new syscall etc when
+there's already an existing way to do accomplish this, with
+free-to-reuse notifications". If the answer is "because splice", then it
+would seem saner to plumb up those bits only. Would be much simpler
+too...
 
-needs to be fixed first. Also, the feature has to be thoroughly tested
-(preferably by someone having a deep knowledge of clang) before it is
-enabled by default.
-
-Thanks,
-Uros.
+-- 
+Jens Axboe
 
