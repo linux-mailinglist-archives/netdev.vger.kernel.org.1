@@ -1,388 +1,167 @@
-Return-Path: <netdev+bounces-176113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B20CA68DA2
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 14:21:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07A55A68DA3
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 14:22:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADDBC17BF3A
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 13:21:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3AE33BFC87
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 13:21:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F51E2561CD;
-	Wed, 19 Mar 2025 13:21:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F4892561A9;
+	Wed, 19 Mar 2025 13:21:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bfBvOcKU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dSUaJR/S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51F82255250
-	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 13:21:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742390474; cv=fail; b=Ruudi0Efz9rYJcnB598506wF7M2l3DcUBcsN+Ba8Ij9aitbZz/7lejsG15d/QeCZF/8XSEwC5+l1eEITUCbzPpJ1Lzay9q7Hc0XeBYqUEyTsHu42n3CO9nNV/UTxkicHZ1kl4QanU2dStFjfMqRbf7eAx1c4VSJlJg2OJYB8kms=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742390474; c=relaxed/simple;
-	bh=ZJz2J+sHbsqd+WioRrmeOjFgK6yRPtRmJr8RDUEB3E4=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Z8K+rkD6S1DqWjRKpLZ6ugBIbZUjanw0+kwojzUQuJ4iznyTApzB5i+Nd371GUejP5jfkoc/Gw6gObhpzIfdUlN7Rb9emvHr7JH6dsqUlXax+Mo2vjUI4sdXtE4wLqHOaY51lKwzD7N9tTd3UVGVamY03gVV7vzHm2P4awmz3BQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bfBvOcKU; arc=fail smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1742390472; x=1773926472;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ZJz2J+sHbsqd+WioRrmeOjFgK6yRPtRmJr8RDUEB3E4=;
-  b=bfBvOcKU+4xLc2B8lwBtue+A+95GF+UWYCLVCxmMXRBjLkqmDMmFmLL7
-   NJkA8nUk3XoBaa0LSEnUVCGYO9gF/G6l8Z0zIbJ6u4MPKpDaTEJ+jQ05k
-   VHXwPIYxLdheGv5TFoo37d2UyKBqk+n2ORe6re4WGfiUcNZP4Wonn69oK
-   sl++ujYVadPk4va+bzv29jZdQh5oQdw+rRYHria7uKOgbcSi0rxZVSHz0
-   fNY05YeaMXEC5LFN5cYG/y6mq3P8twVmIHULx9UxeDMqKElHXoMgSU1l7
-   IB+0LdAGOB5ZgTfei0Cxj+/ereFgDs5TFzSaTEjyFNaVBj7fqOSBA0oXR
-   Q==;
-X-CSE-ConnectionGUID: sZbNZssNQAyWlUKYNrZx8w==
-X-CSE-MsgGUID: UG0TL2lkTjaecSkbyz1HJg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11378"; a="43764255"
-X-IronPort-AV: E=Sophos;i="6.14,259,1736841600"; 
-   d="scan'208";a="43764255"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2025 06:21:10 -0700
-X-CSE-ConnectionGUID: /A5qbFwrSPm40ZGHKiTakw==
-X-CSE-MsgGUID: I0AsRCkEQBqMtrbWhIkp8w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,259,1736841600"; 
-   d="scan'208";a="123109134"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2025 06:21:10 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Wed, 19 Mar 2025 06:21:09 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Wed, 19 Mar 2025 06:21:09 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.171)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Wed, 19 Mar 2025 06:21:07 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qlFr4xQL/ad5R7E0ZbPrtsxkwFDqQo2RVJX07XhGqdqlcepBgl3Jt4pgXu+BALVbWg155g0Z0Y8S2DlAGCpiKM8KG5Sf+ljRp1P6l1ofY2seKMM9ixThvDT+GI7ZmEhwewJh1I0VlMxcJvFPbvCvyIHLn0v3SqSt895EMEj9cO+BQ5zZqcdW/HH9Q0x0rX+iH4leI/Kz/z/oMIdsew9UAOCUCnl+VAjHEFt97R78HCkl+rXuq7tsVhbMjIgYBS+jxGrV7uL83HBt+k0I0DlwUS6OLcWz07elbrai///VcN1qeIhEmEPxF5Fq+UXzyzvXkMS40xAPO6sfWKgSnFk+oQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uUCYdw6AN3Kxcrtp1rVS6FrHup9GHI2j4foMRfn/FTc=;
- b=bzjh2jlqJNjfYzv+dB+1VJ28+3hFIjY8WC2LIldaVFEbRdGgOeCkRZkBPnwmlRBCXYA9DrGlKhx/3O3O2UJQlzFxjyLkGP/QwRV8dUBU2G7Nc5d7HPpD9luqt5XBs+QUEhZ95HM87T5Ef+nEovYjPogrmHVQod/hgLxedLD6kNOAlbXE8U/dWVElzCuZW3eCTQfgPZJp6xjnMtQMlgNKJ3JwnANKHVQz6uISv22MnRmQd1MM7onaQPuzqHRZP9jMwWKfrkzlqE3TUAr2FEOU0ZS1VeShwq6vUlR6n9wgOPJtxfi4EkFbcJy7B+O2SETb2oERmsRjYNXQSYW061xL5Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by SA1PR11MB5777.namprd11.prod.outlook.com (2603:10b6:806:23d::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.27; Wed, 19 Mar
- 2025 13:21:05 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6%5]) with mapi id 15.20.8534.031; Wed, 19 Mar 2025
- 13:21:04 +0000
-Message-ID: <23f21648-d788-40fd-a148-49766b078a4c@intel.com>
-Date: Wed, 19 Mar 2025 14:20:56 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next RFC 2/3] net/mlx5: Introduce shared devlink
- instance for PFs on same chip
-To: Jiri Pirko <jiri@resnulli.us>
-CC: "Keller, Jacob E" <jacob.e.keller@intel.com>, "gregkh@linuxfoundation.org"
-	<gregkh@linuxfoundation.org>, "davem@davemloft.net" <davem@davemloft.net>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Dumazet, Eric"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "saeedm@nvidia.com"
-	<saeedm@nvidia.com>, "leon@kernel.org" <leon@kernel.org>, "tariqt@nvidia.com"
-	<tariqt@nvidia.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"dakr@kernel.org" <dakr@kernel.org>, "rafael@kernel.org" <rafael@kernel.org>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "cratiu@nvidia.com"
-	<cratiu@nvidia.com>, "Knitter, Konrad" <konrad.knitter@intel.com>,
-	"cjubran@nvidia.com" <cjubran@nvidia.com>
-References: <20250318124706.94156-1-jiri@resnulli.us>
- <20250318124706.94156-3-jiri@resnulli.us>
- <CO1PR11MB5089BDFAF1B498FE9FDDA3FCD6DE2@CO1PR11MB5089.namprd11.prod.outlook.com>
- <3be26dca-3230-4fd6-8421-652f95c72163@intel.com>
- <emj5f7xfdcnkemdairmpyiqmq5aoj2uqr7bxhfiezqm4zeuchu@wuplknrtviud>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-In-Reply-To: <emj5f7xfdcnkemdairmpyiqmq5aoj2uqr7bxhfiezqm4zeuchu@wuplknrtviud>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: VI1PR03CA0049.eurprd03.prod.outlook.com
- (2603:10a6:803:50::20) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9003020FABC;
+	Wed, 19 Mar 2025 13:21:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742390518; cv=none; b=NjaAufFVHIlutlFA04u/fwXLdtP6NiNsKf6ky0mGmukMrhrIWt6mQdtSRXkHQuJrDMOoE/iv0fY1uxUYvv2EnndnGKJoE7fjOv53lqNEJgs3BDVt9ri45s/v+mri7/KYxcQbNPB5i1VTuiUM5AwZE/sCxKDmLC6hQYebQCTkNuA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742390518; c=relaxed/simple;
+	bh=7do4dHbDSsCUtXU65wPSmJayj7/Ivkk9Ya9bwGX/z5E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ntc+4N5Bnm00deu9gEksnBPXdHUTmdH8aPFhiZ5V08ee/fxZqiHS/FJnllk9R4at6ZVXf0SJwL0wCbxdrmEy7sxiw1GDgaNb2dv29HmdmpOSMDxCMZcpbkcYsMUHMoVwMn7STpTJS5JsM/TklpYbHVhuLxTXY5/1/o2QrebW3VA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dSUaJR/S; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-22622ddcc35so21047115ad.2;
+        Wed, 19 Mar 2025 06:21:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742390516; x=1742995316; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tAyfH6kqswLWsr6KnxovBzjKHKjRDDiHqO/1jpHfBtY=;
+        b=dSUaJR/SZyXLz5S7hrXUZjnaPs0U92L1BVgBDG4y0BTT05YVDEjfE1lj/lqYJ8fVyD
+         K/SM0Z1+OwZbs4nvynv7byUBwErfG06f+g+5lFRUSLFgjgowk9oeelnsxVJtM0fYOuMY
+         Ll+lusnQTM64DQu4SxcYASLewHodzC4kpti4WxTK5lzg2T7lNKtO40UcDRrcXPhrKF1K
+         U6XkI48+8daycuRU8kH0P23rAGAOwp254bgjpcR1zasEtJ0btJyreYXGJq/201FDUWXN
+         42/QlVvVSYoV20rTay6zyCBYjSMRKymsVzOQNby5TKB7rDhlM84HR2Bm2JVvr4xMxsk1
+         8f8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742390516; x=1742995316;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tAyfH6kqswLWsr6KnxovBzjKHKjRDDiHqO/1jpHfBtY=;
+        b=fHYTW55uDGEunxf5ZA27sxd5KVxVq9XCeimn2Q10ghvq7j6cgTh+g8af62IXASeiSa
+         mj8qTExDscJQK3ERtv4FwZubpiM3ZqyfgV0kYHFYMUeyCdBtkSSa86allvd6dvaE6F6F
+         jSX2N7jQxsxcEU5bG2H62kde7nddzG/SDAhxmM8LfrpVS8m1pwIEeLFknk2B9PwiPl7n
+         loiZlWobT60y/gy4zZ36JU/6v0U9b/orhtVqI56TQFWquB+yqSWvYELXD+UExmCahTbC
+         hCybMEsmzL3w6oyoKGxThziFNgE12VpuwcDqf5IhWOzIWpXU4+2cme5i2MXN37sw9Hhf
+         hHTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUtGtYPP70dlyhl/89mPHEH3x8Nm9svupPtj961JKw3ErEUNBijSiiehwU6huBGJtU3ogJjdM8HP0WVLYZphw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDNrhYTOyXPbFvpGWRw2tOsedhgGj7sW0i/YjXZy514JUwY6d2
+	ck8QWqhYD4xpgSenP/WFIgVLjFFRx3AT2fbkf9BFHllGW9mhipoC
+X-Gm-Gg: ASbGncvpyEizpm9w488Sq8r6BORDPDoiirVabUjkuXOBOUYSf0u90SI68+y1BC66h5B
+	P8cB3+kuofxCJIgniybV9mqjhac3/L7mt2FhHaJ3Vjj/QNZ/lBa9fFE5dCqn8uQrPfm3XGumeq+
+	4JeYknxD5730AjKnJjgnA/TjkyXhsO0EP6W5qQEPoCjfZNW9j1vZjWpmQgqCS7bOn1DGgdfLYLj
+	lLNhvz4EIFuCbQ9TZv+VmfFZ6/MFY+naNFB9Xsb2RC9+vmvAy13NdQb2tLThP1+Sr2oFaPxOFbE
+	sKg9oEmocNqsz3TuQQH3MM0fQgypP6Rhu+cXC2xnbbMkmvDS
+X-Google-Smtp-Source: AGHT+IHRycCa0/R8HPIzD00TI8PYaiGAbqcuw7nzqP7PTLjp8g9kUh2PAbj+uLvhvMDgivEreZFslg==
+X-Received: by 2002:a05:6a00:17a7:b0:72d:9cbc:730d with SMTP id d2e1a72fcca58-7376d619c6cmr4925512b3a.11.1742390515740;
+        Wed, 19 Mar 2025 06:21:55 -0700 (PDT)
+Received: from [10.100.121.195] ([152.193.78.90])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7371167e0b1sm11862295b3a.97.2025.03.19.06.21.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Mar 2025 06:21:55 -0700 (PDT)
+Message-ID: <1560b292-6366-4588-ad4d-654377613b84@gmail.com>
+Date: Wed, 19 Mar 2025 06:21:51 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|SA1PR11MB5777:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0736455f-8bd5-49c1-a4db-08dd66e8e6ad
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|366016|1800799024|376014|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?T1NNVG9QSlpDOWNXWWxxSlJoaUdKK045SGIydDExeHJHYmMzT1ZjL1ZzUzBX?=
- =?utf-8?B?RlZtcDZjR3R6Vlpxb2UvTm1YNzkybGdVL2sycnQ1Tmh6TVBjWVF1ZjhGbitB?=
- =?utf-8?B?TVJBZnAxaWIxWlhsZmZqUEZyNjFoSDVxZGxJM0VvdERRdk9WRzFyVEFOeXJ6?=
- =?utf-8?B?WjVsdGxQUzVCdWNNeWplYm5Ud0NTazhTa2hTdncyVGZZWGIrRExSbFlqMjhO?=
- =?utf-8?B?REw1Yjl2M25YWkorV2dMbDFmOUZBaCtqdGxQZElpNVhPZHF6V0tUWFNGYU45?=
- =?utf-8?B?RG11b01OOGJRSzQ2T3MxY0NCYUdZakF4SkVrYVBCZ2pvVmlOdjA0UEtXMlBQ?=
- =?utf-8?B?d3c0NmxOaVpuQysyQWdOQUdvY0g5VTIweklHUlozdTlZT2pCUkM4cElVQ2FQ?=
- =?utf-8?B?aEhkZzJBbUs3ZUV6NzhTTW5OdXBSNElwNTFud0RQQi80U3Rxa3ZyRzlGamJn?=
- =?utf-8?B?T3MwVkVKQ1hhVW9ZV25EdmJCS3lXaWZHcDVINXlFNzdGVEhRdmFJSFJwQU9F?=
- =?utf-8?B?bm91NlRydnUwWXJqaXZjWG5MNWdUU1RqcGtUZ2F0d0xhNEVVVmErWEpnbEFi?=
- =?utf-8?B?ZHRZTnM1eUIxbnQ0K2lLRTE4VzRRakdPRE9PbVV1UzVCTG9BT1pjL0hrTHI3?=
- =?utf-8?B?QXp0YU96Zjd1aFlNVlp0NWgxNjlTbDM3OXBBby93YmJ1ZmNLWWYrUXFZY1Zh?=
- =?utf-8?B?Y1lUMDVMcy9YVHZ3NW5qb2tnZ28vUFowcnV5ZUcvT1RMSElTQlNWUE5oV1pX?=
- =?utf-8?B?TkRzbGhGUitzY0JWUHJVcEVvdWNCM3Rtc0FaM1h2RlZzbnRUaFRXWkpPZTRC?=
- =?utf-8?B?Umg5elB2Mi9ucC9GRytiazVBbjdManhtZlVhVzNaTkxPOUg2dTBoc25hcmpP?=
- =?utf-8?B?V0tuWjNXUnFUNWljbjh6MGhuWlNURjVHMzE0K1NEaHBFVUx3cmpVQVJKSDlE?=
- =?utf-8?B?bnpiOVpWbWliNHVra0pHNVh6aVpsd243b2pmaFFtZ2NycnV0T3hlRXZ0cmRy?=
- =?utf-8?B?TG5idUZIRks2YWVKTXB0OUJqdEpKUU1nb004cEo5alAwRnlpaVVlMXdPNy9O?=
- =?utf-8?B?a0lCRDVGSDJjOU85d0EyZG55Wk9nQUtFTWphY2VHQTlPWVd0cVY0UnZzUTM3?=
- =?utf-8?B?Z0xVdmdpNFVvbjZoUS9BT0VTbGZiOE1ZeW14VE00QzhrZWU4Qm5NeCtKOWZo?=
- =?utf-8?B?QUV6RGhIQ2tQb3h6WUZYM2lpREd2cy9SOW53b2dIRnU3NEFRcmYxM2hPR0Uz?=
- =?utf-8?B?VzZ3Z0owT2tSTTlTaXFockdhamNmQVBQa2IxcFZOREc4U1dDc1NraVpKR2RM?=
- =?utf-8?B?NGszeXhEeVdhaDRaYVJnQ0c1aGtjQWFaSzVuUW54YmlwWWhQWUJnN0RWQnNn?=
- =?utf-8?B?TnpabU9leHFMWHZYZUpNWVBGTXFFSEZUVzg3OUI5dVlJL1lvb2krd1JGR2Fj?=
- =?utf-8?B?NWRDSnBkMjJPc3BlY3NBeGdtQzFlR3RjU3NWbjh3d3BWYVlISjVockdUV0g5?=
- =?utf-8?B?TGdsNFZxa3lnbktWSUpNbjB5ZldzQzQxR0FERDZSME0xNy9VOCthVEdZbity?=
- =?utf-8?B?MENWWVloK3Y3aEhLRHBzU0Mzd0g1NTVLbUM5UnBYRXh1NDJPamZJMm5lN1JU?=
- =?utf-8?B?b2JrUEtUQ3hoclBoRVpGNHJnK0UxTFZQWWd3V2RBK2huM0dFalRlM250YjRi?=
- =?utf-8?B?SE1jZ1ZzdkNrNW4rUTNXbjR2SEJjLzFPY3pqYWFHdXpMOWE4MS9XVHAveEtD?=
- =?utf-8?B?SzN2WHFyOWxKaDh6QUgyNVdkZ1NCQ2VWSVFjN0pQeTNRVzZpNG9jRTVhdnBX?=
- =?utf-8?B?em1tY0FSZ0x3WFZzYnExWFltL1pVTEgxWFo2RVNEQkNGZmpuNWV2bzhnWkN0?=
- =?utf-8?Q?3hKwPRwknPA2C?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(1800799024)(376014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ek5pL3FkYlU3NzcvMUhhVDdUSkp4Unc3M0VuSnRzMGFtOU9pUE4yZlBlb3U2?=
- =?utf-8?B?MnB6c25QekR1VTNpOW9COWk4WFl1V29vN2dkcWZvVEJIWXlKdTI1OTl2ajY4?=
- =?utf-8?B?TFRjMFB0djNlclpxVkU1VWhqOEkxRUtFbXlFZVZWL0lTSCtiZ250VFdxQlQv?=
- =?utf-8?B?UklHRzhXL3J6cjJlVStaNXl6MkpqamRwRzdad3AyZElydUUremlZc1puUDd6?=
- =?utf-8?B?RUNpTHBJenFUc0ZrUXhENUZNbTFTRWIzeHVzaGVWYnd2SythNCtXZG9kQ00v?=
- =?utf-8?B?NUpCZzJPQVRMa3Z1NGhjQ2Y1KzlqTVNGc2hOb0RTVFI2bGEwQmhLY3RUZDJP?=
- =?utf-8?B?UXJrYlY2TzZxV3hFWVVveUtOS2xPT0hpdWpiOFhudHh4R2U2VElKVGY1aEFO?=
- =?utf-8?B?QUVJQjJ0U1Y0NHhFWGNDblZlb201Y3p4S2kyT2xDaUVTa0Ztbnkvbjl3NmNy?=
- =?utf-8?B?bzF4V0tZWmxRZDY0dmlITU83NTVGNDVrS1dqYmF0U0RIK0RGNkpBQ2xzdW1p?=
- =?utf-8?B?aVNHd2JjUWlOc1NRNEd1YVpOZ0UyWlBrZlBsQ1Y4NDMrU2s1NW5xMTF1eEk3?=
- =?utf-8?B?QTlCbTRCVDd6ZzM3aG5rZUdET2Zjc3BtUzhaTjd4QzlmMElxRTU2N0JBSGRV?=
- =?utf-8?B?SVN4SENvZVBmWU1pdU9tM2RDYmpaSElRZTFVN3JJR2ZvVEpnNDdpTEtMcDAz?=
- =?utf-8?B?Rm1TUWZMVDkxajJ6YlFIZVdPTmNVZlVmeWFPMlJHQ2FlbzFhMDkzNndPZDMw?=
- =?utf-8?B?QWZXU2ZWdlVZUElmemQ1azA0by9ablAvRkt0SDhyRU9qMFRGdXF5V3BnZmpZ?=
- =?utf-8?B?MmtYT245ZWlIVmtJdWs4dHZKWlhwRXZVL1pBOXJEcmlhZVpOLzZJS0htUHM1?=
- =?utf-8?B?dnR6Ni95VDJJeWhnRUM5aFdFdmxMb3FoYXQ2ZDYwUjZjME1FMDNKMHVxbGVB?=
- =?utf-8?B?ZnIwZTZ6VVRrSXh0bjZDM3E1b1FrUTJpN0Z1c1A0Tmtsb1ZtMUd6aUI2RlRT?=
- =?utf-8?B?ZlFCL0dQT3JVUWE4QVUyQ2pIQ0hnMUFPQ1FOMk9aOVNoWVp4V3RjdSsxYnRh?=
- =?utf-8?B?Sk9PckF1M2RnNG9kbjduR24wZjl0ancwSlp4dUJ0VTVlRkYvVlplZk9WRzFJ?=
- =?utf-8?B?Uy9KRExZNU5wZWM2M3dkRWN0TlFvQ2VSbkxoZWZsRVpoR1NDY1JBNFlsbDdS?=
- =?utf-8?B?RnRqRGlmNjMxb3pHQXFOaGpMUTc3dFZwa1kwSFdiazQ1Qi9ucms5dE9ZRmkw?=
- =?utf-8?B?MnFvaStRN2JoNEk4NkNnS2VzSTZJT2E4ODR0UFkzMTJBSXpQVjMvQjNyYTBM?=
- =?utf-8?B?RTdJYlRDZExHcTNKbCtYMHdqOUJibCtZTFIvQm9jbklxZTRnMG1ianR1Z1Nm?=
- =?utf-8?B?OEtYMG5QeHN5Zjhla1lsekRKd0ljOFVHbnNlSnAvSDJmbjh2UnI5UEo5aWV5?=
- =?utf-8?B?K01xMCtwdENDUSt5YmMwS2RkWmVDeVlMQlhDRFdtUE85d0VyMUNCMEYrWk1I?=
- =?utf-8?B?NytJamxrZ1FTWDlHbUEwMHFvQy9CS0pQeVg4dEFkKzZKOGxidDFaU0hYdkdr?=
- =?utf-8?B?S2w2ZGVzVUJ0RWtBV01vQnRZOSs3cGYzb0hVa2pxOVErQjR6OHdJR2VCVUxM?=
- =?utf-8?B?TTc2NDEzUHRwbThvUWUzdmlxZVZnbGRNMzBoRFdiVm5qekFaWXdCdkZkOFp1?=
- =?utf-8?B?MTZ4U3hKS1hoZkxrVjZsd1pCdUVTSmMxSTNOSmRxeEdCRXhNNTNQcFFhNDhC?=
- =?utf-8?B?cXpici9ZTWlHWWtGOU43Mllad1pCVmJnbmo5RXFwVk5hWTNCUG9xTTNCNVhi?=
- =?utf-8?B?VU1lWXd5K09oZVFSdm03NlVnWG5BaHo2Vjg3SEo3RHZINmllMXZnbjg5bHJB?=
- =?utf-8?B?bEUxWXRqTWM4T2VhdHVuS0c1azA0d3JyYUd4QnFUMnBOTGpBTE1JeHhUMG9Q?=
- =?utf-8?B?dlhwZXU4RUlrV3Z4eUZWWXp3bWFLMUM1Nk5WN1A5b2d1TVNCVjNTVVV3LzZQ?=
- =?utf-8?B?ZWpDbFFFVzlhUGRKSVpPUk9OMnp1M3VBakVrWXpEZmxheHZjd2N3Nkcyako2?=
- =?utf-8?B?Q29oaXFIWjg2RytYL08rbmc5aWpWK1ZDQ01NSmFjZVlIZXNzNjdWRjg0Q1ZI?=
- =?utf-8?B?VGN5SmhMVWU5OStQY2JNaVZIU1dUU0x6NnVYbGp3Rmp2a0dRUXgwdVYxRmow?=
- =?utf-8?B?eEE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0736455f-8bd5-49c1-a4db-08dd66e8e6ad
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2025 13:21:04.8230
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NeluaK+Fxa0DtEYjj1/6TdQPRMuVTnHPon6vd/ca/wnekBZS9RmobgWtZWBko9whgENJELr3o+by1B8CHDzMUtt8kc5kIVXgquhvpjzzWbA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB5777
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH] mac80211: clip ADDBA instead of bailing out
+To: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>,
+ linux-wireless@vger.kernel.org
+Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>,
+ Johannes Berg <johannes@sipsolutions.net>
+References: <20250317163902.1893378-1-sashal@kernel.org>
+ <20250317163902.1893378-2-sashal@kernel.org>
+ <69c63a19-5419-4bbe-858f-6ca100345a28@orange.com>
+Content-Language: en-US
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <69c63a19-5419-4bbe-858f-6ca100345a28@orange.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 3/19/25 12:56, Jiri Pirko wrote:
-> Wed, Mar 19, 2025 at 09:21:52AM +0100, przemyslaw.kitszel@intel.com wrote:
->> On 3/18/25 23:05, Keller, Jacob E wrote:
->>>
->>>
->>>> -----Original Message-----
->>>> From: Jiri Pirko <jiri@resnulli.us>
->>
->>>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/sh_devlink.c
->>>> @@ -0,0 +1,150 @@
->>>> +// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
->>>> +/* Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved. */
->>>> +
->>>> +#include <linux/device/faux.h>
->>>> +#include <linux/mlx5/driver.h>
->>>> +#include <linux/mlx5/vport.h>
->>>> +
->>>> +#include "sh_devlink.h"
->>>> +
->>>> +static LIST_HEAD(shd_list);
->>>> +static DEFINE_MUTEX(shd_mutex); /* Protects shd_list and shd->list */
->>
->> I essentially agree that faux_device could be used as-is, without any
->> devlink changes, works for me.
->> That does not remove the need to invent the name at some point ;)
-> 
-> What name? Name of faux device? Sure. In case of ice it's probably PCI DSN
+Hi Alexandre,
 
-yes x2
-
-> 
->>
->> we have resolved this in similar manner, that's fine, given my
->> understanding that you cannot let faux to dispatch for you, like:
->> faux_get_instance(serial_number_equivalent)
-> 
-> Not sure what you are asking TBH.
-
-not asking, just noticing, with the hope that Greg will notice
-inconvenience for drivers and perhaps think of something even better
-
-anyway faux dev let's us resolve problems in rather elegant way,
-compared to what we have to do before (like this series is not even
-touching devlink/)
-
-> 
-> 
->>
->>>> +
->>>> +/* This structure represents a shared devlink instance,
->>>> + * there is one created for PF group of the same chip.
->>>> + */
->>>> +struct mlx5_shd {
->>>> +	/* Node in shd list */
->>>> +	struct list_head list;
->>>> +	/* Serial number of the chip */
->>>> +	const char *sn;
->>>> +	/* List of per-PF dev instances. */
->>>> +	struct list_head dev_list;
->>>> +	/* Related faux device */
->>>> +	struct faux_device *faux_dev;
->>>> +};
->>>> +
->>>
->>> For ice, the equivalent of this would essentially replace ice_adapter I imagine.
->>
->> or "ice_adapter will be the ice equivalent"
-> 
-> Oh yes, that makes sense.
-> 
-> 
->>
->>>
->>>> +static const struct devlink_ops mlx5_shd_ops = {
->>
->> please double check if there is no crash for:
->> $ devlink dev info the/faux/thing
-> 
-> Will do, but why do you think so?
-
-My local version of the ice equivalent crashes here, due to null ops
-pointers, despite all the checks in devlink core trying to prevent that.
-
-[...]
-
->>>> +	char *end;
->>>> +	int start;
->>>> +	int err;
->>>> +
->>>> +	if (!mlx5_core_is_pf(dev))
->>>> +		return 0;
->>>> +
->>>> +	vpd_data = pci_vpd_alloc(pdev, &vpd_size);
->>>> +	if (IS_ERR(vpd_data)) {
->>>> +		err = PTR_ERR(vpd_data);
->>>> +		return err == -ENODEV ? 0 : err;
->>
->> what? that means the shared devlink instance is something you will
->> work properly without?
-> 
-> Not sure. This is something that should not happen for any existing
-> device.
-
-then failing is a best option to notice that :)
-
-> 
-> 
->>
->>>> +	}
->>>> +	start = pci_vpd_find_ro_info_keyword(vpd_data, vpd_size, "V3",
->>>> &kw_len);
->>>> +	if (start < 0) {
->>>> +		/* Fall-back to SN for older devices. */
->>>> +		start = pci_vpd_find_ro_info_keyword(vpd_data, vpd_size,
->>>> +
->>>> PCI_VPD_RO_KEYWORD_SERIALNO, &kw_len);
->>>> +		if (start < 0)
->>>> +			return -ENOENT;
->>>> +	}
->>>> +	sn = kstrndup(vpd_data + start, kw_len, GFP_KERNEL);
->>>> +	if (!sn)
->>>> +		return -ENOMEM;
->>>> +	end = strchrnul(sn, ' ');
->>>> +	*end = '\0';
->>>> +
->>>> +	guard(mutex)(&shd_mutex);
->>
->> guard()() is a no-no too, per "discouraged by netdev maintainers",
->> and here I'm on board with discouraging ;)
-> 
-> That's a fight with windmills. It will happen sooner than later anyway.
-> It is just too conventient. I don't understand why netdev has to have
-> special treat comparing to the rest of the kernel all the time...
-> 
-> 
->>
->>>> +	list_for_each_entry(shd, &shd_list, list) {
->>>> +		if (!strcmp(shd->sn, sn)) {
->>>> +			kfree(sn);
->>>> +			goto found;
->>>> +		}
->>>> +	}
->>>> +	shd = mlx5_shd_create(sn);
->>>> +	if (!shd) {
->>>> +		kfree(sn);
->>>> +		return -ENOMEM;
->>>> +	}
->>>
->>> How is the faux device kept in memory? I guess its reference counted
->>> somewhere?
->>
->> get_device()/put_device() with faxu_dev->dev as argument
->>
->> But I don't see that reference being incremented in the list_for_each.
->>
->> Jiri keeps "the counter" as the implicit observation of shd list size :)
->> which is protected by mutex
-> 
-> Yep. Why isn't that enough? I need the list anyway. Plus, I'm using the
-> list to reference count shd, not the fauxdev. Fauxdev is explicitly
-> create/destroyed by calling appropriate function. I belive that is the
-> correct way (maybe the only way?) to instantiate/deinstantiate faux.
-
-I've just explained my reasoning why your code is correct :)
-
-The other correct design would be to have it in the faux/ to
-dispatch/de-duplicate given a string or numeric ID
-
+On 3/19/25 3:58 AM, Alexandre Ferrieux wrote:
+> When a Linux Wifi{4,5} device talks to a Wifi6 AP, if the AP proposes a Block
+> Acknowledgement aggregation size (ADDBA) exceeding its expectations, the code in
+> mac80211 just bails out, rejecting the aggregation. This yields a big
+> performance penalty on the ack path, which is observable in comparison with
+> other OSes (Windows and MacOS) which "play smarter" and accept the proposal with
+> a "clipped" size.
+Out of curiosity do you have any performance numbers for this, like 
+Linux vs Windows vs MacOS? We ran into a significant performance hit 
+after I added multicast RX support on ath10k (after ~30 clients were on 
+the same channel). After looking into the pcaps we saw many ADDBA 
+failures and ultimately had to disable multicast RX. I want to give this 
+patch a try either way, but I was curious if you had any data on 
+performance improvements.
+>
+> A typical scenario would be:
+>
+>    AP -> Device : ADDBA_request(size=256)
+>
+> Current Linux reaction:
+>
+>    Device -> AP : ADDBA_reply(failure)
+>
+> Other OSes reaction:
+>
+>    Device -> AP : ADDBA_reply(size=64)
+>
+> Note that the IEEE802.11 standard allows for both reactions, but it sounds
+> really suboptimal to be bailing out instead of clipping. The patch below does
+> the latter.
+>
+> Signed-off-by: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
+> ---
+>
+> diff --git a/net/mac80211/agg-rx.c b/net/mac80211/agg-rx.c
+> index f3fbe5a4395e..264dad847842 100644
+> --- a/net/mac80211/agg-rx.c
+> +++ b/net/mac80211/agg-rx.c
+> @@ -317,18 +317,20 @@ void __ieee80211_start_rx_ba_session(struct sta_info *sta,
+>                  max_buf_size = IEEE80211_MAX_AMPDU_BUF_HT;
+>
+>          /* sanity check for incoming parameters:
+> -        * check if configuration can support the BA policy
+> -        * and if buffer size does not exceeds max value */
+> +        * check if configuration can support the BA policy */
+>          /* XXX: check own ht delayed BA capability?? */
+>          if (((ba_policy != 1) &&
+> -            (!(sta->sta.deflink.ht_cap.cap & IEEE80211_HT_CAP_DELAY_BA))) ||
+> -           (buf_size > max_buf_size)) {
+> -               status = WLAN_STATUS_INVALID_QOS_PARAM;
+> +            (!(sta->sta.deflink.ht_cap.cap & IEEE80211_HT_CAP_DELAY_BA)))) {
+> +               status = WLAN_STATUS_INVALID_QOS_PARAM;
+>                  ht_dbg_ratelimited(sta->sdata,
+>                                     "AddBA Req with bad params from %pM on tid
+> %u. policy %d, buffer size %d\n",
+>                                     sta->sta.addr, tid, ba_policy, buf_size);
+>                  goto end;
+>          }
+> +       if (buf_size > max_buf_size) {
+> +         buf_size = max_buf_size ; // Clip instead of bailing out
+> +       }
+> +
+>          /* determine default buffer size */
+>          if (buf_size == 0)
+>                  buf_size = max_buf_size;
+>
+>
 
