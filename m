@@ -1,78 +1,95 @@
-Return-Path: <netdev+bounces-176159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAF27A692F9
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 16:19:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B33A0A69393
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 16:34:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8BE0F7AC3AE
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 15:17:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8844D19C26B9
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 15:24:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF781C4A16;
-	Wed, 19 Mar 2025 15:17:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDF681C82F4;
+	Wed, 19 Mar 2025 15:23:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="VZa5Npq6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eAsOR6BA"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A946D194A44;
-	Wed, 19 Mar 2025 15:17:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92D711AF0BC;
+	Wed, 19 Mar 2025 15:23:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742397470; cv=none; b=nWxMkkwfpy6rXQX3MxL8O18FNWZGo0POsYhzUKATgx2MFdfwSXTW4soLwXpwtUNRFRw+ay4OXp7hqCfnt12B6EEdiwOMXJqnCRgrRmtGi4MY3u9lQiLYtSEjygf7JotKCfgS9s4ymINtVbFRgptA8dkAsV5BDuVzhwv1uRzqNyI=
+	t=1742397833; cv=none; b=iVtcfBR/h3vOG5ZhpfE4PG7G8AdxXIcZd6XgADzZv8btEy/wJEcqIYgRHeFiQOpEiL5F+QWprVrPAePLbe+tlSpS5Zvf3tYHHVDZBXZMOm3QS04u9HcRM42mhmzDWXc2I2SnGDdLPIt2wkJvUmFxOi2JSAXCm6zjmyq0H/JXrfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742397470; c=relaxed/simple;
-	bh=A7YMN3C+lZUIIok5CKL1qnI0bleeWmqst3SnXTg9A2Q=;
+	s=arc-20240116; t=1742397833; c=relaxed/simple;
+	bh=+ND2GQ1ucjL2Fbj/gHU8rnxTiLp8tL39vHpjDRl8G5A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wln+34EiLqbtdRQspCJQ97hTEeyOXcdsHbcB3ydpO9ESEgnGtyeDiO68aM3eqF0NwL+8UK1f4JOLN4vuR9vgx7Xup/qO+8BbrwmlqduDdTy+bVknq0SgvtlCgS8+G+iOsxzEEa0l3vD0fsOD1Lk/gmOEYy9MSNUxUSE8bsoLL3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=VZa5Npq6; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=rcOcd6bo74EaRky7HF1JkNvP8cCX0oJBdVRtfi82gPs=; b=VZa5Npq6rPOsP2HiPNUu+MK1gV
-	2zgEhn1xDOjItZxFrBN1meL54AkdosNYRYbJCtWR14/xizXQmSHsuoYtri6+d2a+qmkQrtwoKYMgZ
-	klML9THf66p/Uy4WB/29ofyt0keObyIlPsL0UKOsDmzH5Q5zAHtPKCcDlp/7bZUklfanKQoA/chTC
-	J4sOSquH+kzr5p42AOhMxgFxc0Lk82K7zA2uFUi44SOl/VaCKmi/iJTMnUUNultd/Y1PIwRcW235+
-	JuWyWrh+22pB8wFr9NMD5scQ8apycG02Or0mdJ4LvowXwyEKnah4+igH4cSGJkWEak/hF1JgwEZT+
-	CbkfcxjQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59924)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tuvAh-0006af-2P;
-	Wed, 19 Mar 2025 15:17:31 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tuvAe-0005iE-03;
-	Wed, 19 Mar 2025 15:17:28 +0000
-Date: Wed, 19 Mar 2025 15:17:27 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZLyj+tpYoWp+pv/JeVzRtKcA1HPWa3NgTm8b4+TjaSsfhO3YW+pIxMALKVlfzcocOg8PpFeIhvmHI1D7ToPV6hae6RCDxRmJI7J/k7wflT+6FJyUM38tRW1KoCnyx7ACaiET83PY8S66iAzPRbTCD1vkAx+Wv+zGY9pWcVesnjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eAsOR6BA; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1742397832; x=1773933832;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=+ND2GQ1ucjL2Fbj/gHU8rnxTiLp8tL39vHpjDRl8G5A=;
+  b=eAsOR6BAWppqkOMXNXLsbA4C/Jn/nP33uZFU67qC0+VZtmufHdiaNXBc
+   /4ImQGuriHjwy/AAz0az7uk6VUO1wCIHyYmVPrCWpHx528T9aCyyRzBu0
+   lYoiKEx1N4KixKyNjH1aQ7ZF0p+I3wK8S6GhI/zHwNVv1nblmoxX6d49h
+   s2M65DAlv46bWHosW4DZ8kU/d5kt6c18ie2MDiCbrJZVfl1CuZVzZD4wX
+   8dpc0KqI1DrjLchMTKkYg7/3lWEKGqsgv2sI+AgXiOsYjTdNpY1f8x8TQ
+   OZTjCQRqaBrJIAXxW8YETgf5cH5XZRfgl+t4O7uoeQ3mqn5LvbI7H9bGh
+   A==;
+X-CSE-ConnectionGUID: KBFwm3yhRfK8Lt0TtqUqFQ==
+X-CSE-MsgGUID: F8LdNn8fS66zhmF+LDD3tA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11378"; a="31174872"
+X-IronPort-AV: E=Sophos;i="6.14,259,1736841600"; 
+   d="scan'208";a="31174872"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2025 08:23:51 -0700
+X-CSE-ConnectionGUID: 1KhLNtoLQ4eE7Zyd8ixR4w==
+X-CSE-MsgGUID: 6RmOKgCuQwGgjoIUotAsvQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,259,1736841600"; 
+   d="scan'208";a="153527828"
+Received: from turnipsi.fi.intel.com (HELO kekkonen.fi.intel.com) ([10.237.72.44])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2025 08:23:45 -0700
+Received: from kekkonen.localdomain (localhost [127.0.0.1])
+	by kekkonen.fi.intel.com (Postfix) with SMTP id 5A9F811F998;
+	Wed, 19 Mar 2025 17:23:40 +0200 (EET)
+Date: Wed, 19 Mar 2025 15:23:40 +0000
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+From: Sakari Ailus <sakari.ailus@linux.intel.com>
+To: Matti Vaittinen <mazziesaccount@gmail.com>
+Cc: Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>,
+	Jonathan Cameron <jic23@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Daniel Scally <djrscally@gmail.com>,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [net-next PATCH 2/6] net: pcs: Implement OF support for PCS
- driver
-Message-ID: <Z9rgB1Ko_xAj44zS@shell.armlinux.org.uk>
-References: <20250318235850.6411-1-ansuelsmth@gmail.com>
- <20250318235850.6411-3-ansuelsmth@gmail.com>
+	linux-iio@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+Subject: Re: [PATCH v8 02/10] property: Add functions to iterate named child
+Message-ID: <Z9rhfJUlCbi7kA2m@kekkonen.localdomain>
+References: <cover.1742225817.git.mazziesaccount@gmail.com>
+ <9c3880f74476436f39d796b5c10c540ae50b722c.1742225817.git.mazziesaccount@gmail.com>
+ <Z9mQPJwnKAkPHriT@kekkonen.localdomain>
+ <b6b62ddd-ab59-4112-8f6e-c72618c45910@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,65 +98,178 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250318235850.6411-3-ansuelsmth@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <b6b62ddd-ab59-4112-8f6e-c72618c45910@gmail.com>
 
-On Wed, Mar 19, 2025 at 12:58:38AM +0100, Christian Marangi wrote:
-> Implement the foundation of OF support for PCS driver.
-> 
-> To support this, implement a simple Provider API where a PCS driver can
-> expose multiple PCS with an xlate .get function.
-> 
-> PCS driver will have to call of_pcs_add_provider() and pass the device
-> node pointer and a xlate function to return the correct PCS for the
-> requested interface and the passed #pcs-cells.
-> 
-> This will register the PCS in a global list of providers so that
-> consumer can access it.
-> 
-> Consumer will then use of_pcs_get() to get the actual PCS by passing the
-> device_node pointer, the index for #pcs-cells and the requested
-> interface.
-> 
-> For simple implementation where #pcs-cells is 0 and the PCS driver
-> expose a single PCS, the xlate function of_pcs_simple_get() is
-> provided. In such case the passed interface is ignored and is expected
-> that the PCS supports any interface mode supported by the MAC.
-> 
-> For advanced implementation a custom xlate function is required. Such
-> function should return an error if the PCS is not supported for the
-> requested interface type.
-> 
-> This is needed for the correct function of of_phylink_mac_select_pcs()
-> later described.
-> 
-> PCS driver on removal should first call phylink_pcs_release() on every
-> PCS the driver provides and then correctly delete as a provider with
-> the usage of of_pcs_del_provider().
-> 
-> A generic function for .mac_select_pcs is provided for any MAC driver
-> that will declare PCS in DT, of_phylink_mac_select_pcs().
-> This function will parse "pcs-handle" property and will try every PCS
-> declared in DT until one that supports the requested interface type is
-> found. This works by leveraging the return value of the xlate function
-> returned by of_pcs_get() and checking if it's an ERROR or NULL, in such
-> case the next PCS in the phandle array is tested.
-> 
-> Some additional helper are provided for xlate functions,
-> pcs_supports_interface() as a simple function to check if the requested
-> interface is supported by the PCS and phylink_pcs_release() to release a
-> PCS from a phylink instance.
-> 
-> Co-developed-by: Daniel Golle <daniel@makrotopia.org>
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+Hei Matti,
 
-As a general comment, should we be developing stuff that is DT-centric
-or fwnode-centric. We already have users of phylink using swnodes, and
-it seems bad to design something today that is centred around just one
-method of describing something.
+On Wed, Mar 19, 2025 at 08:02:24AM +0200, Matti Vaittinen wrote:
+> Moro Sakari,
+> 
+> Thanks for the review.
+> 
+> On 18/03/2025 17:24, Sakari Ailus wrote:
+> > Moi,
+> > 
+> > On Mon, Mar 17, 2025 at 05:50:38PM +0200, Matti Vaittinen wrote:
+> > > There are a few use-cases where child nodes with a specific name need to
+> > > be parsed. Code like:
+> > > 
+> > > fwnode_for_each_child_node()
+> > > 	if (fwnode_name_eq())
+> > > 		...
+> > > 
+> > > can be found from a various drivers/subsystems. Adding a macro for this
+> > > can simplify things a bit.
+> > > 
+> > > In a few cases the data from the found nodes is later added to an array,
+> > > which is allocated based on the number of found nodes. One example of
+> > > such use is the IIO subsystem's ADC channel nodes, where the relevant
+> > > nodes are named as channel[@N].
+> > > 
+> > > Add helpers for iterating and counting device's sub-nodes with certain
+> > > name instead of open-coding this in every user.
+> > > 
+> > > Suggested-by: Jonathan Cameron <jic23@kernel.org>
+> > > Signed-off-by: Matti Vaittinen <mazziesaccount@gmail.com>
+> > > Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> > > Reviewed-by: Marcelo Schmitt <marcelo.schmitt1@gmail.com>
+> > > ---
+> > > Revision history:
+> > > v7 => v8:
+> > >   - Fix the example in fwnode_get_named_child_node_count() documentation
+> > >     to use the fwnode_get_named_child_node_count() and not the
+> > >     device_get_named_child_node_count()
+> > >   - Fix the rest of the new macro's indentiations
+> > > v6 => v7:
+> > >   - Improve kerneldoc
+> > >   - Inline device_get_named_child_node_count() and change it to call
+> > >     fwnode_get_named_child_node_count() inside
+> > >   - Fix indentiation of the new macros
+> > > v5 => v6:
+> > >   - Add helpers to also iterate through the nodes.
+> > > v4 => v5:
+> > >   - Use given name instead of string 'channel' when counting the nodes
+> > >   - Add also fwnode_get_child_node_count_named() as suggested by Rob.
+> > > v3 => v4:
+> > >   - New patch as suggested by Jonathan, see discussion in:
+> > > https://lore.kernel.org/lkml/20250223161338.5c896280@jic23-huawei/
+> > > ---
+> > >   drivers/base/property.c  | 27 +++++++++++++++++++++++++++
+> > >   include/linux/property.h | 24 ++++++++++++++++++++++++
+> > >   2 files changed, 51 insertions(+)
+> > > 
+> > > diff --git a/drivers/base/property.c b/drivers/base/property.c
+> > > index c1392743df9c..f42f32ff45fc 100644
+> > > --- a/drivers/base/property.c
+> > > +++ b/drivers/base/property.c
+> > > @@ -945,6 +945,33 @@ unsigned int device_get_child_node_count(const struct device *dev)
+> > >   }
+> > >   EXPORT_SYMBOL_GPL(device_get_child_node_count);
+> > > +/**
+> > > + * fwnode_get_named_child_node_count - number of child nodes with given name
+> > > + * @fwnode: Node which child nodes are counted.
+> > > + * @name: String to match child node name against.
+> > > + *
+> > > + * Scan child nodes and count all the nodes with a specific name. Potential
+> > > + * 'number' -ending after the 'at sign' for scanned names is ignored.
+> > > + * E.g.::
+> > > + *   fwnode_get_named_child_node_count(fwnode, "channel");
+> > > + * would match all the nodes::
+> > > + *   channel { }, channel@0 {}, channel@0xabba {}...
+> > > + *
+> > > + * Return: the number of child nodes with a matching name for a given device.
+> > > + */
+> > > +unsigned int fwnode_get_named_child_node_count(const struct fwnode_handle *fwnode,
+> > > +					       const char *name)
+> > > +{
+> > > +	struct fwnode_handle *child;
+> > > +	unsigned int count = 0;
+> > > +
+> > > +	fwnode_for_each_named_child_node(fwnode, child, name)
+> > > +		count++;
+> > > +
+> > > +	return count;
+> > > +}
+> > > +EXPORT_SYMBOL_GPL(fwnode_get_named_child_node_count);
+> > > +
+> > >   bool device_dma_supported(const struct device *dev)
+> > >   {
+> > >   	return fwnode_call_bool_op(dev_fwnode(dev), device_dma_supported);
+> > > diff --git a/include/linux/property.h b/include/linux/property.h
+> > > index e214ecd241eb..a1856e6b714c 100644
+> > > --- a/include/linux/property.h
+> > > +++ b/include/linux/property.h
+> > > @@ -167,10 +167,18 @@ struct fwnode_handle *fwnode_get_next_available_child_node(
+> > >   	for (child = fwnode_get_next_child_node(fwnode, NULL); child;	\
+> > >   	     child = fwnode_get_next_child_node(fwnode, child))
+> > > +#define fwnode_for_each_named_child_node(fwnode, child, name)		\
+> > > +	fwnode_for_each_child_node(fwnode, child)			\
+> > > +		if (!fwnode_name_eq(child, name)) { } else
+> > > +
+> > >   #define fwnode_for_each_available_child_node(fwnode, child)		       \
+> > >   	for (child = fwnode_get_next_available_child_node(fwnode, NULL); child;\
+> > >   	     child = fwnode_get_next_available_child_node(fwnode, child))
+> > > +#define fwnode_for_each_available_named_child_node(fwnode, child, name)	\
+> > > +	fwnode_for_each_available_child_node(fwnode, child)		\
+> > > +		if (!fwnode_name_eq(child, name)) { } else
+> > > +
+> > 
+> > OF only enumerates available nodes via the fwnode API, software nodes don't
+> > have the concept but on ACPI I guess you could have a difference in nodes
+> > where you have device sub-nodes that aren't available. Still, these ACPI
+> > device nodes don't have meaningful names in this context (they're
+> > 4-character object names) so you wouldn't use them like this anyway.
+> 
+> I believe you have far better understanding on these concepts than I do. The
+> reason behind adding fwnode_for_each_available_child_node() was the patch
+> 10/10:
+> 
+> -	fwnode_for_each_available_child_node(sensors, node) {
+> -		if (fwnode_name_eq(node, "sensor")) {
+> -			if (!thp7312_sensor_parse_dt(thp7312, node))
+> -				num_sensors++;
+> -		}
+> +	fwnode_for_each_available_named_child_node(sensors, node, "sensor") {
+> +		if (!thp7312_sensor_parse_dt(thp7312, node))
+> +			num_sensors++;
+>  	}
+> 
+> 
+> > So my question is: is it useful to provide this besides
+> > fwnode_for_each_named_child_node(), given that both are effectively the
+> > same?
+> 
+> So, I suppose you're saying the existing thp7312 -driver has no real reason
+> to use the 'fwnode_for_each_available_child_node()', but it could be using
+> fwnode_for_each_child_node() instead?
+> 
+> If so, I am Ok with dropping the
+> 'fwnode_for_each_available_named_child_node()' and changing the 10/10 to:
+> 
+> -	fwnode_for_each_available_child_node(sensors, node) {
+> -		if (fwnode_name_eq(node, "sensor")) {
+> -			if (!thp7312_sensor_parse_dt(thp7312, node))
+> -				num_sensors++;
+> -		}
+> +	fwnode_for_each_named_child_node(sensors, node, "sensor") {
+> +		if (!thp7312_sensor_parse_dt(thp7312, node))
+> +			num_sensors++;
+>  	}
+> 
+> Do you think that'd be correct?
+
+I'd say so. Feel free to cc me to the last patch as well.
+
+I guess one way to make this clearer is to switch to
+fwnode_for_each_child_node() in a separate patch before
+fwnode_for_each_named_child_node() conversion.
+
+There are also just a handful of users of
+fwnode_for_each_available_child_node() and I guess these could be
+converted, too, but I think it's outside the scope of the set.
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Terveisin,
+
+Sakari Ailus
 
