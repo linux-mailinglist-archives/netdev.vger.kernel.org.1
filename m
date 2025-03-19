@@ -1,292 +1,241 @@
-Return-Path: <netdev+bounces-176057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D31EA6883C
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 10:37:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66955A68894
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 10:48:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D984A3B306A
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 09:36:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFE543AF034
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 09:43:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CC8025A2C2;
-	Wed, 19 Mar 2025 09:32:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66564256C74;
+	Wed, 19 Mar 2025 09:34:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ea6p1KBN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="anYAiJ6M"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75FF8254AFC;
-	Wed, 19 Mar 2025 09:32:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6F372528E6
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 09:34:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742376733; cv=none; b=qYChm15u1r9VqRVJVz5Xy10Z9A6pd0S4l4na1x31IR0alCtx0cQ5UsAIyVspdA3oQMAA/wlGNtwcm8G0iYiTqC70uJqWThFTUyBx2YX8gcKFcJx45IjTlHuKWrjpqHwSUPuG2LOE76opQ8EtFnLIHp3Untj5I0djcyXkcWOLwec=
+	t=1742376893; cv=none; b=Tk55AAHhteL1r1suOmck4/h3PO2puyw0OvXkybsC1ts7YKKv/YHmXRc2PC6xEJ0OW3PWjgZ/zE1M3VYZX1W/T6vIYFN7vv6uq6xyfWu+fhn/47MGH+pZb/Q5oIFFtHLhFAsp3JxvtD1IYK3NviokwGBWosWvUuueoQEORIvQdts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742376733; c=relaxed/simple;
-	bh=IsSr0wX0D/RHalSLc13nA67slNDqv2KI4EP4GC8jN1o=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Wmg1wq/YNw1jrS5dQ7s0oEtRHv+cB+kcit9VD8JSKAA0EC63YwX5rPQX/yjwA0vPF3VbM2bIAzV1Pd6qbfh+iibhtqZKKwd94fGaPjbNQp1xoFCYCtljodZdh1T9hosVbmWPfLe1e3mCDqReLWDlPQbWYpoKeDza5YKFRSOwqE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ea6p1KBN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A1F2C4CEF2;
-	Wed, 19 Mar 2025 09:32:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742376733;
-	bh=IsSr0wX0D/RHalSLc13nA67slNDqv2KI4EP4GC8jN1o=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ea6p1KBNR8PESCP7Nup1708/++FB5ztSkIaPeEET1r7L7lIJvwXfbZkb7HwayAWyi
-	 T0+13+UD/YxOW/XIUE5nbXN3sgN6J2XDo01InETzr6VUK1pF6ysJ2UDKYAYlEfXK44
-	 uhAz82JsqfwuTW+p1WII3HEZFTimm+cHzgtqdwCzHYHTYgoqwsS+OdqGiCA6Fk6LIs
-	 JzIUfmKPNGVCMXUPW8VM870svvKoKa0FB/3MItg5hzoXxXPVfyAugOjQDfKtb8marP
-	 LJZTuOU0rMQ9Dfs7DNZiSaLAIfsXZNymajP/FNhjKXMwUTpr2IXuzK3Iwg3d8WWHGK
-	 9ODvGwO9v9Rog==
-From: "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
-To: tglx@linutronix.de
-Cc: maz@kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	=?UTF-8?q?Alvin=20=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Thangaraj Samynathan <Thangaraj.S@microchip.com>,
-	Rengarajan Sundararajan <Rengarajan.S@microchip.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH v2 27/57] irqdomain: net: Switch to irq_domain_create_*()
-Date: Wed, 19 Mar 2025 10:29:20 +0100
-Message-ID: <20250319092951.37667-28-jirislaby@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250319092951.37667-1-jirislaby@kernel.org>
-References: <20250319092951.37667-1-jirislaby@kernel.org>
+	s=arc-20240116; t=1742376893; c=relaxed/simple;
+	bh=C4DIv8oZS+qrJj6Zfs3h2Hvo2lW9ybZoY/34FlHHAto=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mBVIYgAKgFk+Teipud2ST1Aoz8msO5+vcaT+engXOsyO4F33itqwqw9DgGEStbBQPEp3Karxr1j2AElhz3OPONSpp5nEgMAs0uWdcijhqJtQFSp5NkKjlU32HFJJFs5sbYRDSeQeCaTZR6Sf5q0kDDELx246d5TSkPXzfj5lWTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=anYAiJ6M; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742376890;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QVNxeHhRg1FvNFhNzTz9ZRh7kCSoT0iwStWzKcnXSNQ=;
+	b=anYAiJ6MR0xYaV4x3y+vo3K7SyTpeevCiCjV7O00Xq0oxDnVzQjZX47GIzJ0TZf0ZW+kwZ
+	QFj8UlhCTZZro4Gzt62tUpKvs+nki343t2zsxyf3UkGlM6TkpWuVePw/oDRpoc7KIK6egR
+	xtC8Xs7PRci4s9zUnnkp/G3n5yU2624=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-393-QWPa8lJXMCmuG21Hfu0M8w-1; Wed, 19 Mar 2025 05:34:48 -0400
+X-MC-Unique: QWPa8lJXMCmuG21Hfu0M8w-1
+X-Mimecast-MFC-AGG-ID: QWPa8lJXMCmuG21Hfu0M8w_1742376887
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4394c747c72so21764005e9.1
+        for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 02:34:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742376887; x=1742981687;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QVNxeHhRg1FvNFhNzTz9ZRh7kCSoT0iwStWzKcnXSNQ=;
+        b=TDH3PrZnIjc5viC/P+/hKFH4pytgNxQyBu3vSzIW9JnLfl4FoJe6zeCyozTDE1D/jd
+         2z/+/+lVsD0NoY/cuvwGVQc2304By5Cl0pCKpRgbqhsFi9BOXu8Z2myYdnttpY/Pnu12
+         pFzD0ec12DKRRGG09COuzsCNoKY//yLkRl0XqjQr27kyIsbrdeWEJlPrnnxPysFQyKqS
+         HZr4bNw0EsKHum+uHEUF8gW/V00HssNFxQp5EZfGcq/EXfvgyJCC94+plsLAoNSNy+8t
+         1wrmsSRqtlJdA2CoOxn32tTPTFLlHWLo8l0Z54NWOZdp0gzELTMdRQasnInRIxILPkzP
+         YJ7w==
+X-Forwarded-Encrypted: i=1; AJvYcCXzL66bgg/ImcY+Zo+CULTSO1zdEiRNrv6XK4cjBd0RSqPGpxWhJsZTxvOwBqNLdFTmmO1UKyY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXEjswwIgt3V1pdcYYbvh8zDPhsqlbrK3ATZY5GPw0Qo7XQq3x
+	1swt5xgbWOTFT3xHa4SadBi3Fg1ITCiDBwOMn6hQiLD8XkXNkJDJgvQV4IbEzN1+QDnR/FATTAJ
+	jTRb87TNNNU78jZJjhDriULpte8Xjju8NPr4XySA4mq5dl41L5rQRQg==
+X-Gm-Gg: ASbGncvbnJ6uX3twFTy1uzr/cRBscB1ADCv9ca3PXbiubOZ8uaB9PuSeRl+AF9Qq11p
+	GloGlE8AiTWIQoXaAQmJKqvorz7+fNS5HX5Eti9xoGizmIOkC2wP+HD4E9smnqDT1OJkV8peOxi
+	00OONgRNWuuh8X50JQ03mcPAT+0t51VX3/K4oEQEixwD3Q9L9DuiiwMX6G+UonmLziJxlmCk+wb
+	O3whOQUF1z4thK5jncgvwh/yWJe+vzKLpzIPe0Hmtue+po81J/aUIuCHGnk/v562swgB83+tARl
+	WpRMFrVPjLx/Wz7TGGnGiePQ5hbMuGFyUzxYXWoo/uec4yVIAThJWf+CmrF2Dg==
+X-Received: by 2002:a05:600c:19d2:b0:43c:f050:fee8 with SMTP id 5b1f17b1804b1-43d437e1703mr13281715e9.20.1742376886680;
+        Wed, 19 Mar 2025 02:34:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHcyl7sGUVjNx0FRAWM2mYWonSXDfEE6kxjEilOIRFzREegrn0szutRfjLMxh2v3Cw/i/aPIQ==
+X-Received: by 2002:a05:600c:19d2:b0:43c:f050:fee8 with SMTP id 5b1f17b1804b1-43d437e1703mr13281295e9.20.1742376886002;
+        Wed, 19 Mar 2025 02:34:46 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-53-30-53.retail.telecomitalia.it. [79.53.30.53])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d43f5719dsm13432985e9.19.2025.03.19.02.34.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Mar 2025 02:34:45 -0700 (PDT)
+Date: Wed, 19 Mar 2025 10:34:39 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Mykola Lysenko <mykolal@fb.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
+	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net v4 3/3] vsock/bpf: Fix bpf recvmsg() racing transport
+ reassignment
+Message-ID: <c7nnbp3j57mnlcglvczyimdqpc2run5vqhtea4eesymv555du4@ekcyin54mcdn>
+References: <20250317-vsock-trans-signal-race-v4-0-fc8837f3f1d4@rbox.co>
+ <20250317-vsock-trans-signal-race-v4-3-fc8837f3f1d4@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250317-vsock-trans-signal-race-v4-3-fc8837f3f1d4@rbox.co>
 
-irq_domain_add_*() interfaces are going away as being obsolete now.
-Switch to the preferred irq_domain_create_*() ones. Those differ in the
-node parameter: They take more generic struct fwnode_handle instead of
-struct device_node. Therefore, of_fwnode_handle() is added around the
-original parameter.
+On Mon, Mar 17, 2025 at 10:52:25AM +0100, Michal Luczaj wrote:
+>Signal delivery during connect() may lead to a disconnect of an already
+>established socket. That involves removing socket from any sockmap and
+>resetting state to SS_UNCONNECTED. While it correctly restores socket's
+>proto, a call to vsock_bpf_recvmsg() might have been already under way in
+>another thread. If the connect()ing thread reassigns the vsock transport to
+>NULL, the recvmsg()ing thread may trigger a WARN_ON_ONCE.
+>
+>connect
+>  / state = SS_CONNECTED /
+>                                sock_map_update_elem
+>                                vsock_bpf_recvmsg
+>                                  psock = sk_psock_get()
+>  lock sk
+>  if signal_pending
+>    unhash
+>      sock_map_remove_links
+>    state = SS_UNCONNECTED
+>  release sk
+>
+>connect
+>  transport = NULL
+>                                  lock sk
+>                                  WARN_ON_ONCE(!vsk->transport)
+>
+>Protect recvmsg() from racing against transport reassignment. Enforce the
+>sockmap invariant that psock implies transport: lock socket before getting
+>psock.
+>
+>WARNING: CPU: 9 PID: 1222 at net/vmw_vsock/vsock_bpf.c:92 vsock_bpf_recvmsg+0xb55/0xe00
+>CPU: 9 UID: 0 PID: 1222 Comm: a.out Not tainted 6.14.0-rc5+
+>RIP: 0010:vsock_bpf_recvmsg+0xb55/0xe00
+> sock_recvmsg+0x1b2/0x220
+> __sys_recvfrom+0x190/0x270
+> __x64_sys_recvfrom+0xdc/0x1b0
+> do_syscall_64+0x93/0x1b0
+> entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>
+>Fixes: 634f1a7110b4 ("vsock: support sockmap")
+>Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>---
+> net/vmw_vsock/vsock_bpf.c | 23 +++++++++++++++--------
+> 1 file changed, 15 insertions(+), 8 deletions(-)
+>
+>diff --git a/net/vmw_vsock/vsock_bpf.c b/net/vmw_vsock/vsock_bpf.c
+>index c68fdaf09046b68254dac3ea70ffbe73dfa45cef..5138195d91fb258d4bc09b48e80e13651d62863a 100644
+>--- a/net/vmw_vsock/vsock_bpf.c
+>+++ b/net/vmw_vsock/vsock_bpf.c
+>@@ -73,28 +73,35 @@ static int __vsock_recvmsg(struct sock *sk, struct msghdr *msg, size_t len, int
+> 	return err;
+> }
+>
+>-static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
+>-			     size_t len, int flags, int *addr_len)
+>+static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+>+			     int flags, int *addr_len)
 
-Note some of the users can likely use dev->fwnode directly instead of
-indirect of_fwnode_handle(dev->of_node). But dev->fwnode is not
-guaranteed to be set for all, so this has to be investigated on case to
-case basis (by people who can actually test with the HW).
+I would avoid this change, especially in a patch with the Fixes tag then 
+to be backported.
 
-Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
-Cc: Woojung Huh <woojung.huh@microchip.com>
-Cc: UNGLinuxDriver@microchip.com
-Cc: Andrew Lunn <andrew@lunn.ch>
-Cc: Vladimir Oltean <olteanv@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: "Chester A. Unal" <chester.a.unal@arinc9.com>
-Cc: Daniel Golle <daniel@makrotopia.org>
-Cc: DENG Qingfang <dqfext@gmail.com>
-Cc: Sean Wang <sean.wang@mediatek.com>
-Cc: Matthias Brugger <matthias.bgg@gmail.com>
-Cc: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Linus Walleij <linus.walleij@linaro.org>
-Cc: "Alvin Šipraga" <alsi@bang-olufsen.dk>
-Cc: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: Mengyuan Lou <mengyuanlou@net-swift.com>
-Cc: Thangaraj Samynathan <Thangaraj.S@microchip.com>
-Cc: Rengarajan Sundararajan <Rengarajan.S@microchip.com>
-Cc: Richard Cochran <richardcochran@gmail.com>
-Cc: netdev@vger.kernel.org
----
- drivers/net/dsa/microchip/ksz_common.c         | 5 +++--
- drivers/net/dsa/microchip/ksz_ptp.c            | 4 ++--
- drivers/net/dsa/mv88e6xxx/chip.c               | 2 +-
- drivers/net/dsa/mv88e6xxx/global2.c            | 6 ++++--
- drivers/net/dsa/qca/ar9331.c                   | 4 ++--
- drivers/net/dsa/realtek/rtl8365mb.c            | 4 ++--
- drivers/net/dsa/realtek/rtl8366rb.c            | 6 ++----
- drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c | 6 ++++--
- drivers/net/usb/lan78xx.c                      | 9 ++++-----
- 9 files changed, 24 insertions(+), 22 deletions(-)
+> {
+> 	struct sk_psock *psock;
+> 	struct vsock_sock *vsk;
+> 	int copied;
+>
+>+	/* Since signal delivery during connect() may reset the state of socket
+>+	 * that's already in a sockmap, take the lock before checking on psock.
+>+	 * This serializes a possible transport reassignment, protecting this
+>+	 * function from running with NULL transport.
+>+	 */
+>+	lock_sock(sk);
+>+
+> 	psock = sk_psock_get(sk);
+>-	if (unlikely(!psock))
+>+	if (unlikely(!psock)) {
+>+		release_sock(sk);
+> 		return __vsock_recvmsg(sk, msg, len, flags);
+>+	}
+>
+>-	lock_sock(sk);
+> 	vsk = vsock_sk(sk);
+>-
+> 	if (WARN_ON_ONCE(!vsk->transport)) {
+> 		copied = -ENODEV;
+> 		goto out;
+> 	}
+>
+> 	if (vsock_has_data(sk, psock) && sk_psock_queue_empty(psock)) {
+>-		release_sock(sk);
+> 		sk_psock_put(sk, psock);
+>+		release_sock(sk);
 
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 89f0796894af..579ee504fed5 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -2697,8 +2697,9 @@ static int ksz_irq_common_setup(struct ksz_device *dev, struct ksz_irq *kirq)
- 	kirq->dev = dev;
- 	kirq->masked = ~0;
- 
--	kirq->domain = irq_domain_add_simple(dev->dev->of_node, kirq->nirqs, 0,
--					     &ksz_irq_domain_ops, kirq);
-+	kirq->domain = irq_domain_create_simple(of_fwnode_handle(dev->dev->of_node),
-+						kirq->nirqs, 0,
-+						&ksz_irq_domain_ops, kirq);
- 	if (!kirq->domain)
- 		return -ENOMEM;
- 
-diff --git a/drivers/net/dsa/microchip/ksz_ptp.c b/drivers/net/dsa/microchip/ksz_ptp.c
-index 22fb9ef4645c..992101e4bdee 100644
---- a/drivers/net/dsa/microchip/ksz_ptp.c
-+++ b/drivers/net/dsa/microchip/ksz_ptp.c
-@@ -1136,8 +1136,8 @@ int ksz_ptp_irq_setup(struct dsa_switch *ds, u8 p)
- 
- 	init_completion(&port->tstamp_msg_comp);
- 
--	ptpirq->domain = irq_domain_add_linear(dev->dev->of_node, ptpirq->nirqs,
--					       &ksz_ptp_irq_domain_ops, ptpirq);
-+	ptpirq->domain = irq_domain_create_linear(of_fwnode_handle(dev->dev->of_node),
-+						  ptpirq->nirqs, &ksz_ptp_irq_domain_ops, ptpirq);
- 	if (!ptpirq->domain)
- 		return -ENOMEM;
- 
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index 5db96ca52505..a39aab7cd606 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.c
-+++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -297,7 +297,7 @@ static int mv88e6xxx_g1_irq_setup_common(struct mv88e6xxx_chip *chip)
- 	u16 reg, mask;
- 
- 	chip->g1_irq.nirqs = chip->info->g1_irqs;
--	chip->g1_irq.domain = irq_domain_add_simple(
-+	chip->g1_irq.domain = irq_domain_create_simple(
- 		NULL, chip->g1_irq.nirqs, 0,
- 		&mv88e6xxx_g1_irq_domain_ops, chip);
- 	if (!chip->g1_irq.domain)
-diff --git a/drivers/net/dsa/mv88e6xxx/global2.c b/drivers/net/dsa/mv88e6xxx/global2.c
-index b2b5f6ba438f..aaf97c1e3167 100644
---- a/drivers/net/dsa/mv88e6xxx/global2.c
-+++ b/drivers/net/dsa/mv88e6xxx/global2.c
-@@ -1154,8 +1154,10 @@ int mv88e6xxx_g2_irq_setup(struct mv88e6xxx_chip *chip)
- 	if (err)
- 		return err;
- 
--	chip->g2_irq.domain = irq_domain_add_simple(
--		chip->dev->of_node, 16, 0, &mv88e6xxx_g2_irq_domain_ops, chip);
-+	chip->g2_irq.domain = irq_domain_create_simple(of_fwnode_handle(chip->dev->of_node),
-+						       16, 0,
-+						       &mv88e6xxx_g2_irq_domain_ops,
-+						       chip);
- 	if (!chip->g2_irq.domain)
- 		return -ENOMEM;
- 
-diff --git a/drivers/net/dsa/qca/ar9331.c b/drivers/net/dsa/qca/ar9331.c
-index e9f2c67bc15f..79a29676ca6f 100644
---- a/drivers/net/dsa/qca/ar9331.c
-+++ b/drivers/net/dsa/qca/ar9331.c
-@@ -821,8 +821,8 @@ static int ar9331_sw_irq_init(struct ar9331_sw_priv *priv)
- 		return ret;
- 	}
- 
--	priv->irqdomain = irq_domain_add_linear(np, 1, &ar9331_sw_irqdomain_ops,
--						priv);
-+	priv->irqdomain = irq_domain_create_linear(of_fwnode_handle(np), 1,
-+						   &ar9331_sw_irqdomain_ops, priv);
- 	if (!priv->irqdomain) {
- 		dev_err(dev, "failed to create IRQ domain\n");
- 		return -EINVAL;
-diff --git a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/rtl8365mb.c
-index 7e96355c28bd..964a56ee16cc 100644
---- a/drivers/net/dsa/realtek/rtl8365mb.c
-+++ b/drivers/net/dsa/realtek/rtl8365mb.c
-@@ -1719,8 +1719,8 @@ static int rtl8365mb_irq_setup(struct realtek_priv *priv)
- 		goto out_put_node;
- 	}
- 
--	priv->irqdomain = irq_domain_add_linear(intc, priv->num_ports,
--						&rtl8365mb_irqdomain_ops, priv);
-+	priv->irqdomain = irq_domain_create_linear(of_fwnode_handle(intc), priv->num_ports,
-+						   &rtl8365mb_irqdomain_ops, priv);
- 	if (!priv->irqdomain) {
- 		dev_err(priv->dev, "failed to add irq domain\n");
- 		ret = -ENOMEM;
-diff --git a/drivers/net/dsa/realtek/rtl8366rb.c b/drivers/net/dsa/realtek/rtl8366rb.c
-index f54771cab56d..8bdb52b5fdcb 100644
---- a/drivers/net/dsa/realtek/rtl8366rb.c
-+++ b/drivers/net/dsa/realtek/rtl8366rb.c
-@@ -550,10 +550,8 @@ static int rtl8366rb_setup_cascaded_irq(struct realtek_priv *priv)
- 		dev_err(priv->dev, "unable to request irq: %d\n", ret);
- 		goto out_put_node;
- 	}
--	priv->irqdomain = irq_domain_add_linear(intc,
--						RTL8366RB_NUM_INTERRUPT,
--						&rtl8366rb_irqdomain_ops,
--						priv);
-+	priv->irqdomain = irq_domain_create_linear(of_fwnode_handle(intc), RTL8366RB_NUM_INTERRUPT,
-+						   &rtl8366rb_irqdomain_ops, priv);
- 	if (!priv->irqdomain) {
- 		dev_err(priv->dev, "failed to create IRQ domain\n");
- 		ret = -EINVAL;
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-index 8658a51ee810..f60c8a73ddce 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-@@ -184,8 +184,10 @@ int txgbe_setup_misc_irq(struct txgbe *txgbe)
- 		goto skip_sp_irq;
- 
- 	txgbe->misc.nirqs = 1;
--	txgbe->misc.domain = irq_domain_add_simple(NULL, txgbe->misc.nirqs, 0,
--						   &txgbe_misc_irq_domain_ops, txgbe);
-+	txgbe->misc.domain = irq_domain_create_simple(NULL, txgbe->misc.nirqs,
-+						      0,
-+						      &txgbe_misc_irq_domain_ops,
-+						      txgbe);
- 	if (!txgbe->misc.domain)
- 		return -ENOMEM;
- 
-diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
-index 137adf6d5b08..9a5de0098ec0 100644
---- a/drivers/net/usb/lan78xx.c
-+++ b/drivers/net/usb/lan78xx.c
-@@ -2456,14 +2456,11 @@ static struct irq_chip lan78xx_irqchip = {
- 
- static int lan78xx_setup_irq_domain(struct lan78xx_net *dev)
- {
--	struct device_node *of_node;
- 	struct irq_domain *irqdomain;
- 	unsigned int irqmap = 0;
- 	u32 buf;
- 	int ret = 0;
- 
--	of_node = dev->udev->dev.parent->of_node;
--
- 	mutex_init(&dev->domain_data.irq_lock);
- 
- 	ret = lan78xx_read_reg(dev, INT_EP_CTL, &buf);
-@@ -2475,8 +2472,10 @@ static int lan78xx_setup_irq_domain(struct lan78xx_net *dev)
- 	dev->domain_data.irqchip = &lan78xx_irqchip;
- 	dev->domain_data.irq_handler = handle_simple_irq;
- 
--	irqdomain = irq_domain_add_simple(of_node, MAX_INT_EP, 0,
--					  &chip_domain_ops, &dev->domain_data);
-+	irqdomain = irq_domain_create_simple(of_fwnode_handle(dev->udev->dev.parent->of_node),
-+					     MAX_INT_EP, 0,
-+					     &chip_domain_ops,
-+					     &dev->domain_data);
- 	if (irqdomain) {
- 		/* create mapping for PHY interrupt */
- 		irqmap = irq_create_mapping(irqdomain, INT_EP_PHY);
--- 
-2.49.0
+But here we release it, so can still a reset happen at this point, 
+before calling __vsock_connectible_recvmsg().
+In there anyway we handle the case where transport is null, so there's 
+no problem, right?
+
+The rest LTGM.
+
+Thanks,
+Stefano
+
+> 		return __vsock_recvmsg(sk, msg, len, flags);
+> 	}
+>
+>@@ -108,8 +115,8 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
+> 		}
+>
+> 		if (sk_psock_queue_empty(psock)) {
+>-			release_sock(sk);
+> 			sk_psock_put(sk, psock);
+>+			release_sock(sk);
+> 			return __vsock_recvmsg(sk, msg, len, flags);
+> 		}
+>
+>@@ -117,8 +124,8 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
+> 	}
+>
+> out:
+>-	release_sock(sk);
+> 	sk_psock_put(sk, psock);
+>+	release_sock(sk);
+>
+> 	return copied;
+> }
+>
+>-- 
+>2.48.1
+>
 
 
