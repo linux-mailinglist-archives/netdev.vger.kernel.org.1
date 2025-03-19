@@ -1,154 +1,150 @@
-Return-Path: <netdev+bounces-176182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57589A69436
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 16:59:26 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAA62A69431
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 16:58:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B45D81674AC
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 15:59:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B7467A278F
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 15:57:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76DBE1D7999;
-	Wed, 19 Mar 2025 15:59:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 012DE1D7999;
+	Wed, 19 Mar 2025 15:58:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="oeGIezsX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="KiLpgID4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1B7A1FB3
-	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 15:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 450F542048;
+	Wed, 19 Mar 2025 15:58:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742399963; cv=none; b=EP+kH4sJuNssI8Q8FJV3RIfay+MTYQZ5AAmbyOGHH2pJyxWn1EH6cMZDFH8fxdcvKqZW+r+5gek9ZsQdXAUNkQ2U7+eLYyVBw0nqzorNhYR8K/dSua6yFD07xbSlUxJKjiIXajRNs9syt1IIKtNbqYtNjnkrSIYfs8m+wGtqFxA=
+	t=1742399910; cv=none; b=AlDv9FE2GGTk418gpcxlQs0EoIRax9w8WYzeTAy5hespVae9rtA7VaWMeRN5E8urKQa5OUkIfF/1gueMzoTBNGzAGSP+GQ5b7ldjr9yVhU3EO164BvVpQOCd0hS7W4vSlH9A/8Pqf3lCqpvRgFBnoUfeEOjnMU99oM9xK6xRWQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742399963; c=relaxed/simple;
-	bh=ZZCXbt8B5xOrX2o5sjYnXgndpKycIvWGlW8Z4kWBSn0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=r2LIkBLrcYUkPvP1D89WHb3ppaEjcvsTDCqka4Jgx0C2LoH+0kARVaDTS+NpDEefgORNeNOaBCIkNoDDZ0emAPzAIwYZo6K4PYj2KRRTlQ+1fLzEWTzNxRF+cVC/rYjs+VjxTqJhFHdoL2fFXCIdaigIIKdfQ8D2QbIwBenTqrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=oeGIezsX; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1742399962; x=1773935962;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=1yfk4Fng/95l4CEZWXTYHgr6RaTeUUQlZtjkcGxUrsg=;
-  b=oeGIezsXhsN4SKaYMaTiz3TwZ5puD+DANQaU2Ai6gKgCBO6jVezMW+AM
-   FGIoznL96n+d2oNMCu89StmEdSsD04zKqEKaU4QOp6QeUIzM28+XYFM4j
-   KyqI2XDh4os4C1X6omj1wUN2oqymqdzR4by4bwGR9DOWAkIErlDsuuXkM
-   k=;
-X-IronPort-AV: E=Sophos;i="6.14,259,1736812800"; 
-   d="scan'208";a="75780464"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2025 15:59:18 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:18236]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.18.34:2525] with esmtp (Farcaster)
- id ba51a66a-6a4d-4c3f-8ff8-44b4ad26bc2c; Wed, 19 Mar 2025 15:59:17 +0000 (UTC)
-X-Farcaster-Flow-ID: ba51a66a-6a4d-4c3f-8ff8-44b4ad26bc2c
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 19 Mar 2025 15:59:16 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.106.100.42) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 19 Mar 2025 15:59:13 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <pabeni@redhat.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<horms@kernel.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
-	<kuniyu@amazon.com>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH v1 net-next 0/7] nexthop: Convert RTM_{NEW,DEL}NEXTHOP to per-netns RTNL.
-Date: Wed, 19 Mar 2025 08:57:46 -0700
-Message-ID: <20250319155904.6616-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <70ca4d5c-90c3-4a96-b47b-fbf5034c7450@redhat.com>
-References: <70ca4d5c-90c3-4a96-b47b-fbf5034c7450@redhat.com>
+	s=arc-20240116; t=1742399910; c=relaxed/simple;
+	bh=gHPpYtCLpFpzgI6lWlHYyKI4j6MciQKQyMXmkFGAFpY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FBmMPlTfOYYxd758ftXG1fS0cYw9VfgYToIf0uLTZxYEISmzBSL36yHOT3Dtg7mvue8aNZhJDKqYsoaPt5PLR6k6SDfT6KWYNkp/B5Q50oYOSFUjmgmkFPy66FoS6FdnkwPnGTp+TeGnQXX1JGJDLss4/siDuHWI5l5vzbke/Ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=KiLpgID4; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Np/nX4RQYl76B3DOF+lcwAiFuD7qauib8soLH9wPPWM=; b=KiLpgID4bAWzCDTTHLQy5DyOFx
+	e9YZhVFbbCNPHk9Y+K7iv5Ba8sALmIR+fnXAyMCo+Z2Y/QwP8w5Zpl7GwHQsikQoreFDMBD0vPg5X
+	WKJhkazKbQD/2Gmc0kZ+tPcCJdtyKPEh1Dp0TpBmBgtpT27xLZApYWOlvB7vBcz7TpI1BGtg3L/4V
+	OEHcGNTtT+rOc98PsJjN/r8qYbSBlKbFaM3iYqX1Bg2zaQkAawe3uyhI5ugBnyeV3cdwZzJhbYNKB
+	xMfm7SES+tpphE/JcM3KEvV7a3fPfnaTK5e+nf5nHGliLSo2JpS10W0yxf2UgAzSCtAbe02eQ8PgK
+	XZxG9nHw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33446)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tuvo9-0006dc-20;
+	Wed, 19 Mar 2025 15:58:17 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tuvo6-0005jc-0l;
+	Wed, 19 Mar 2025 15:58:14 +0000
+Date: Wed, 19 Mar 2025 15:58:14 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	upstream@airoha.com
+Subject: Re: [net-next PATCH 3/6] net: phylink: Correctly handle PCS probe
+ defer from PCS provider
+Message-ID: <Z9rplhTelXb-oZdC@shell.armlinux.org.uk>
+References: <20250318235850.6411-1-ansuelsmth@gmail.com>
+ <20250318235850.6411-4-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWB003.ant.amazon.com (10.13.139.174) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250318235850.6411-4-ansuelsmth@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Paolo Abeni <pabeni@redhat.com>
-Date: Wed, 19 Mar 2025 08:57:52 +0100
-> Hi,
-> 
-> On 3/19/25 12:31 AM, Kuniyuki Iwashima wrote:
-> > Patch 1 - 5 move some validation for RTM_NEWNEXTHOP so that it can be
-> > done without RTNL.
-> > 
-> > Patch 6 & 7 converts RTM_NEWNEXTHOP and RTM_DELNEXTHOP to per-netns RTNL.
-> > 
-> > Note that RTM_GETNEXTHOP and RTM_GETNEXTHOPBUCKET are not touched in
-> > this series.
-> > 
-> > rtm_get_nexthop() can be easily converted to RCU, but rtm_dump_nexthop()
-> > needs more work due to the left-to-right rbtree walk, which looks prone
-> > to node deletion and tree rotation without a retry mechanism.
-> > 
-> > 
-> > Kuniyuki Iwashima (7):
-> >   nexthop: Move nlmsg_parse() in rtm_to_nh_config() to
-> >     rtm_new_nexthop().
-> >   nexthop: Split nh_check_attr_group().
-> >   nexthop: Move NHA_OIF validation to rtm_to_nh_config_rtnl().
-> >   nexthop: Check NLM_F_REPLACE and NHA_ID in rtm_new_nexthop().
-> >   nexthop: Remove redundant group len check in nexthop_create_group().
-> >   nexthop: Convert RTM_NEWNEXTHOP to per-netns RTNL.
-> >   nexthop: Convert RTM_DELNEXTHOP to per-netns RTNL.
-> > 
-> >  net/ipv4/nexthop.c | 183 +++++++++++++++++++++++++++------------------
-> >  1 file changed, 112 insertions(+), 71 deletions(-)
-> 
-> This series is apparently causing NULL ptr deref in the nexthop.sh
-> netdevsim selftests. Unfortunately, due to a transient nipa infra
-> outage, a lot of stuff landed into the same batch, so I'm not 110% this
-> series is the real curprit but looks like a reasonable suspect.
-> 
-> Kuniyuki, could you please have a look?
-> 
-> ---
-> [    1.653896] BUG: kernel NULL pointer dereference, address:
-> 0000000000000068
-> [    1.653963] #PF: supervisor read access in kernel mode
-> [    1.654003] #PF: error_code(0x0000) - not-present page
-> [    1.654037] PGD 7828067 P4D 7828067 PUD 782a067 PMD 0
-> [    1.654077] Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
-> [    1.654119] CPU: 0 UID: 0 PID: 303 Comm: ip Not tainted
-> 6.14.0-rc6-virtme #1
-> [    1.654176] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
-> [    1.654219] RIP: 0010:rtm_new_nexthop+0x645/0x2260
+On Wed, Mar 19, 2025 at 12:58:39AM +0100, Christian Marangi wrote:
+> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> index 7f71547e89fe..c6d9e4efed13 100644
+> --- a/drivers/net/phy/phylink.c
+> +++ b/drivers/net/phy/phylink.c
+> @@ -1395,6 +1395,15 @@ static void phylink_major_config(struct phylink *pl, bool restart,
+>  	if (pl->mac_ops->mac_select_pcs) {
+>  		pcs = pl->mac_ops->mac_select_pcs(pl->config, state->interface);
+>  		if (IS_ERR(pcs)) {
+> +			/* PCS can be removed unexpectedly and not available
+> +			 * anymore.
+> +			 * PCS provider will return probe defer as the PCS
+> +			 * can't be found in the global provider list.
+> +			 * In such case, return -ENOENT as a more symbolic name
+> +			 * for the error message.
+> +			 */
+> +			if (PTR_ERR(pcs) == -EPROBE_DEFER)
+> +				pcs = ERR_PTR(-ENOENT);
 
-Sorry, I failed to resolve conflict during the last minute rebase,
-and the normal test bailed out here...
+I don't particularly like the idea of returning -EPROBE_DEFER from
+mac_select_pcs()... there is no way *ever* that such an error code
+could be handled.
 
----8<---
-@@ -3245,7 +3248,7 @@ static int rtm_new_nexthop(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		goto out;
- 
- 	err = rtm_to_nh_config_rtnl(net, tb, extack);
--	if (!err)
-+	if (err)
- 		goto out;
- 
- 	nh = nexthop_add(net, &cfg, extack);
----8<---
+>  	linkmode_fill(pl->supported);
+>  	linkmode_copy(pl->link_config.advertising, pl->supported);
+> -	phylink_validate(pl, pl->supported, &pl->link_config);
+> +	ret = phylink_validate(pl, pl->supported, &pl->link_config);
+> +	/* The PCS might not available at the time phylink_create
+> +	 * is called. Check this and communicate to the MAC driver
+> +	 * that probe should be retried later.
+> +	 *
+> +	 * Notice that this can only happen in probe stage and PCS
+> +	 * is expected to be avaialble in phylink_major_config.
+> +	 */
+> +	if (ret == -EPROBE_DEFER) {
+> +		kfree(pl);
+> +		return ERR_PTR(ret);
+> +	}
 
-The failed test case created a nexthop group with an invalid ID,
-and nexthop_get() for nh by nexthop_find_by_id() assumes nh is not
-NULL because it's checked in advance.
+This does not solve the problem - what if the interface mode is
+currently not one that requires a PCS that may not yet be probed?
 
-Will squash the diff above in v2.
+I don't like the idea that mac_select_pcs() might be doing a complex
+lookup - that could make scanning the interface modes (as
+phylink_validate_mask() does) quite slow and unreliable, and phylink
+currently assumes that a PCS that is validated as present will remain
+present.
 
-Thanks!
+If it goes away by the time phylink_major_config() is called, then we
+leave the phylink state no longer reflecting how the hardware is
+programmed, but we still continue to call mac_link_up() - which should
+probably be fixed.
+
+Given that netdev is severely backlogged, I'm not inclined to add to
+the netdev maintainers workloads by trying to fix this until after
+the merge window - it looks like they're at least one week behind.
+Consequently, I'm expecting that most patches that have been
+submitted during this week will be dropped from patchwork, which
+means submitting patches this week is likely not useful.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
