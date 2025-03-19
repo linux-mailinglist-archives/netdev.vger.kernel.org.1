@@ -1,91 +1,100 @@
-Return-Path: <netdev+bounces-176260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 690DBA69889
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 20:00:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B429A69890
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 20:02:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9721B19C4F31
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 19:01:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C347A427956
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 19:01:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFFC3211A1D;
-	Wed, 19 Mar 2025 19:00:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BA33210F4D;
+	Wed, 19 Mar 2025 19:00:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eILa/PEG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dvp2WXO0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A919220C48E
-	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 19:00:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED7620C48E;
+	Wed, 19 Mar 2025 19:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742410846; cv=none; b=LAlvMvRKMJjISoZcCf8UPGGPQr7it9PszBxUthWMTMztgi4t6vRzJgvSAJDpk4Wod77luySQSZM6fE5oBGJwRnevNSDBkxQhQwEuO/loTn+FgDoMBE2v/MH9u5zht34/qREH5LkvbgyfjK9HLVQdZSMxPeZI4h2xOyvIitGwJ+w=
+	t=1742410854; cv=none; b=ErIAnC3LS0zzata/qGXz88/+U1jN9YZ/4IOBiOzgNRBHUxu9UpzA/Fy27OpsQ+5gKIUpKDOGmU/sTnWL/0qYWtJzh1A7NLIAe4cFTEfDCsLHLWVr0AE3t2neJkibts8xZPvXqmSvw/JmKhllyMFoH54+FmUZ4+Za/m4jeWlhFIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742410846; c=relaxed/simple;
-	bh=3sSkP2l2Uf1bIGM8mDACVKydgQ0cyMtdnMA7cfmVoi0=;
+	s=arc-20240116; t=1742410854; c=relaxed/simple;
+	bh=bQ81Fc55GF5vLNCh1KjcH+C7ekGu0HyxorM23JbvqCw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tYxvIwdneDGvYFlY7mPmWYul5+IYtpg2dvnIs4aD95RVjhoYrGFjr0AwE9lBYWLyWmfHxf9rIe8Fca6PBHb7UMbnvnF+qT1YjHNPEippv9QORsfN9X6cbVK7npxZR7LvlfYmndVpSR/6aXn49P4Mr6/wGGhPARQsGG3Uuj7Nd5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=eILa/PEG; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3912d2c89ecso6593983f8f.2
-        for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 12:00:43 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=RughQXQD9zsIDrysJJWs/kI3B1jcTcCITlEXQELSniJzt+Gvsm7Z/wk8RGgEGikbGPPJacLkg3aainXlio9sOV6bPAugctvXWqtII76xOjh/21chCW0ZlXOVM6QodvwpKxTgPtEzihM8X3DODnrKkfMsxF1MPF9WxQ2robCwHVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dvp2WXO0; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-3012a0c8496so6314376a91.2;
+        Wed, 19 Mar 2025 12:00:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1742410842; x=1743015642; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1742410852; x=1743015652; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7zgEL8Mx8/B7Q/0PZEH0TfrlyQlRsXZt3StXoAekBKo=;
-        b=eILa/PEGrsR7c8ge2emnKBgR4rkZmqxzLm2e3ldAlTTTislgIO2GSwQxiyT66KhukC
-         8hYgS6eJqd7BRDjfpwgSHslsxc44owHGn/x+DUUzpfzpHJFAhezxjeWrb5XNg+e6aGC2
-         Y0IM8xB3EuL9BFMAk57swISrJqLyrHzM6ZiRmiYDdYkI0/UF9YPGfel96Adwuc14WMaC
-         5kFvALTgfM3uVWbixM+2dZZqZNJIWeL7U4yh67kvqjJGua4OJqJsr1ZU0rhAH3u1BuuM
-         sXR/Q84Lf5rvWxdcQZfNyA2DmsXsZBj4wqp2orJCSmO1yxBtolPGXQe5l0FpcwR3w5xI
-         aFFw==
+        bh=biXjJdX1FFK2ilJDVmzGFQ2LcLuqE/zLttPI8Z+C5Dc=;
+        b=Dvp2WXO0pOBKXaMk9/jCrA50w8ja6VjmXoJgSpKe9lN2D3fk7wJleg19N8qbaAaKEP
+         EHRguW1Qb1HneGa7yf9HqLi5b14+oKcrOucLyDKb819/rWk8UGhqGexclMsRn5l/ORLy
+         ONNeaWgqc74OmvhlkASN1vXcGhCfwuYxKwmiCTUh7dUoimQsqjEF7SPZQLHNzf+iGYwh
+         qPAgPBKORu4y+8fOoPKxwenwF8pwyxWtWWxrikG/ICHUht6wEGhajsZkjrzDMbcuUpcP
+         kJRtTp1pdw7sknF57hLMEL2K5ivlRD1+egoGdE5KUMF1C+iR4Ls9XccHy03xW96xbfAp
+         udEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742410842; x=1743015642;
+        d=1e100.net; s=20230601; t=1742410852; x=1743015652;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7zgEL8Mx8/B7Q/0PZEH0TfrlyQlRsXZt3StXoAekBKo=;
-        b=QGzf3L6jlBQC3Oqigh9H8tJkF7JhVDj7dwBwKUnVHQEUT0A0LgawYvmOz0rvKCFc0s
-         x2wPvVPhHeec+t2DRQYTyrlxxf+djzAsIgvoD1uo9XjpIMUyPwgIz7EIbVbNl/w80U/p
-         28rqrMTAUlRso1l+SAjjPdI84cIkYXWs9QQ7RjWhG43ksm48xd2DnC+8UBrXEHwwzVNW
-         PffMDLxWp/k7vKl9xdaPs76yrZ7wIGbkMalNR7RFb9kpU28Yox8UfmO+6yJXVeKfAxcT
-         MsHPxB4qj8cWaQLYaTpFwNdOP1VuYs3BYb9GQCQD9Z/V8p81lKZz9DlNol7FfFH7+Shv
-         Jcjw==
-X-Forwarded-Encrypted: i=1; AJvYcCVMQ/bB8OYWS3/rOCrH8n2rJPMrl+J+11GoTYTZL77Az/3rMLv6GMVev5WcAX2jINy3uUDSVlc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyh5a/gJHcPz+wvSmOLDBcfwQHVg+kuoOZcTQ/uWua7m640Px3e
-	XlHuyFn0r7qvHmBVo9mXojtNsMe6Rp3qrbvFYl5ODu6RMiept0kmo6X6we2+zAc=
-X-Gm-Gg: ASbGncuWU+ExbMXfaTgBS1FaMZM4GUSiC8x7W+PvY5DKI25ienolvZPiYAdi2krJqTK
-	zdAs8QbSHNjfPhOLuPwmHv8J4AmZUDQis1Ylp4cQEVTrJCRudgt4XkZqrz+8KONCjd7XGEkBY4Z
-	ep6hX4lczY0epn4Wpesnzfq8JcYuqzeCxEIQITmNVQ7NE0/Melzt691OrXWMwfF2SxKkvFeCHHn
-	bawo2PWtThSQpwbQF1egIs4fBFdflLuN/ljw0Ngmayn76WT2dmyhwjnaB5Knv8alcFlGMwUhyEB
-	+fSUHR2g8jI+nKKm5KaKJpzj6ZYRmNWXLAkhgb9F44/SxEo4C183BlfXnwcj
-X-Google-Smtp-Source: AGHT+IGyMDvYfspCQT78uhsvlh24pX9FnXD8UzlfC9oEilO5QDfsmKkmRkCbD3pHrVgGuTpZmexMzA==
-X-Received: by 2002:a5d:6487:0:b0:38f:2a49:f6a5 with SMTP id ffacd0b85a97d-399795acc99mr630336f8f.15.1742410841802;
-        Wed, 19 Mar 2025 12:00:41 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-395cb40fab8sm22335475f8f.63.2025.03.19.12.00.40
+        bh=biXjJdX1FFK2ilJDVmzGFQ2LcLuqE/zLttPI8Z+C5Dc=;
+        b=Jd0BCy3uIih5HH9v+A3Nj0TmsTao2vB1nQ5dmmQbaojyVjIEWcPByK/mKlNHbJtNVT
+         v553VMg337liwR1uGbtvwypqkMJj6k0j6IdSxw+cJ1dyX1ymjl5wvbnaZ0y3Z53Pv7qY
+         k7V3LrwPshSIYUgPX5VduoCPhDMXZC2MNQsJ9FkcCKUWRMWZ7AQcw38T7Z5t4P0m7ZIL
+         ud1hXpW+hroTFpxWjWshSoGXkZ+PUnL2War7LJg8ZJGIblxGs2bsuTkdUEwsyfOyZzA4
+         0s4SEtKSA8T7bBchGlKNVaqn/0gp92eCcCnJqLueQwC01M+dnl1gIqQdmIYL7OQtI0+y
+         eSpw==
+X-Forwarded-Encrypted: i=1; AJvYcCUirSapKaIv5p3gHYyl+ADOCeccwVXOxqng/lOvQVYtpufuHfafQXO9uPySxci46zYCxhs=@vger.kernel.org, AJvYcCWa2HSddg3NH7/Aj35O9c8w4LdRqv8dCQ7mkG3TUF597lzEMqZfB/1xBdLhdbWAJVT+4YxCygoOjqgmWB0s@vger.kernel.org, AJvYcCWsbRRCvaci5U93FKWFBxqpnR23E6LpeG50r8ojSN/QwnmgVlqa0V4g2u9CjIi/oUnfiA5UxmMY5e6hwK6r@vger.kernel.org, AJvYcCWub422hB/9HLONkUCKnQ6XsnoQmgYzvch77iXjTjmeqGXUyH2Wpu1AYrQGkH5QDvSM2gTbbdIp@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjOBiHxA149bKHxx/uzUD7OjGwyQMLj8u/BR0m6tFRhpMWhoAJ
+	fAofJ2DT/i+YhdJGUQn8Y4208TLQmP/UGQ4v06RCFRRhLoC+804S
+X-Gm-Gg: ASbGncuU+6bH1QOAC+ixtY1IbJ8HwbEmk8WYksDOlpX4bzE/Q2/aFsSr2UaqFboPIKr
+	OSKIKrVzh8H8cUVxqNPQC55GW7d9AG6SK0byRXLNlJvVbKZ073DDIP+z9XBj2Qc7kSC5ypYEDEJ
+	77yS1e0EwRu9Oq5H/9sJheeHoTpGv/DWzUsikWLoFTCj6JZhMsbfeQuQYPlNc58ZqktPQFpvqD5
+	IBqK2XAXjvzrqgCZJwNxMPqGgIHePgTvtTSlegfmeHZP3bpV6REjlAFVxHaKjrfjYm7scswWi8v
+	dKwQcc8b4LbQv71P6GvTa2EwWlJk+eahrltrUvqvA0McKwVM4isAARn0BcKEoEIbIA==
+X-Google-Smtp-Source: AGHT+IExM0pI9/JU5Crfnd4d50aC7MIsk6BLw9VYIOpGl+RqOsh+7wpYyCT51g4e/BejE8WXLNDy4g==
+X-Received: by 2002:a17:90b:3c0f:b0:301:1d03:93cd with SMTP id 98e67ed59e1d1-301be201d9dmr6662434a91.24.1742410851540;
+        Wed, 19 Mar 2025 12:00:51 -0700 (PDT)
+Received: from devvm6277.cco0.facebook.com ([2a03:2880:2ff:1::])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-301bf589fbcsm2030123a91.12.2025.03.19.12.00.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Mar 2025 12:00:41 -0700 (PDT)
-Date: Wed, 19 Mar 2025 22:00:37 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+        Wed, 19 Mar 2025 12:00:50 -0700 (PDT)
+Date: Wed, 19 Mar 2025 12:00:38 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH net-next] xfrm: Remove unnecessary NULL check in
- xfrm_lookup_with_ifid()
-Message-ID: <81d101da-45a3-4e2d-8bb9-4401efe0c44e@stanley.mountain>
-References: <2eebea1e-5258-4bcb-9127-ca4d7c59e0e2@stanley.mountain>
- <6365c171-5550-4640-92bc-0151a4de61a1@redhat.com>
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v2 1/3] vsock: add network namespace support
+Message-ID: <Z9sUVs1Tq3SN83MQ@devvm6277.cco0.facebook.com>
+References: <20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com>
+ <20250312-vsock-netns-v2-1-84bffa1aa97a@gmail.com>
+ <sqvqvlovlxpfo2tlkazugkocwmlhc7iay2kvq7b75bgwk7vhfw@tvgfe5fj3mw6>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,62 +103,271 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6365c171-5550-4640-92bc-0151a4de61a1@redhat.com>
+In-Reply-To: <sqvqvlovlxpfo2tlkazugkocwmlhc7iay2kvq7b75bgwk7vhfw@tvgfe5fj3mw6>
 
-On Wed, Mar 19, 2025 at 06:38:49PM +0100, Paolo Abeni wrote:
-> On 3/12/25 6:21 PM, Dan Carpenter wrote:
-> > This NULL check is unnecessary and can be removed.  It confuses
-> > Smatch static analysis tool because it makes Smatch think that
-> > xfrm_lookup_with_ifid() can return a mix of NULL pointers and errors so
-> > it creates a lot of false positives.  Remove it.
+On Wed, Mar 19, 2025 at 02:02:32PM +0100, Stefano Garzarella wrote:
+> On Wed, Mar 12, 2025 at 01:59:35PM -0700, Bobby Eshleman wrote:
+> > From: Stefano Garzarella <sgarzare@redhat.com>
 > > 
-> > Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> > This patch adds a check of the "net" assigned to a socket during
+> > the vsock_find_bound_socket() and vsock_find_connected_socket()
+> > to support network namespace, allowing to share the same address
+> > (cid, port) across different network namespaces.
+> > 
+> > This patch preserves old behavior, and does not yet bring up namespace
+> > support fully.
+> > 
+> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> 
+> I'd describe here a bit the new behaviour related to `fallback` that you
+> developed.
+> 
+> Or we can split this patch in two patches, one with my changes without
+> fallback, and another with fallback as you as author.
+> 
+> WDYT?
+> 
+
+I like the idea of splitting it, that way any unforeseen issues in the
+new logic can be isolated to the one patch.
+
+> 
+> > Signed-off-by: Bobby Eshleman <bobbyeshleman@gmail.com>
 > > ---
-> > I have wanted to remove this NULL check for a long time.  Someone
-> > said it could be done safely.  But please, please, review this
-> > carefully.
+> > v1 -> v2:
+> > * remove 'netns' module param
+> > * remove vsock_net_eq()
+> > * use vsock_global_net() for "global" namespace
+> > * use fallback logic in socket lookup functions, giving precedence to
+> >  non-global vsock namespaces
+> > 
+> > RFC -> v1
+> > * added 'netns' module param
+> > * added 'vsock_net_eq()' to check the "net" assigned to a socket
+> >  only when 'netns' support is enabled
+> > ---
+> > include/net/af_vsock.h                  |  7 +++--
+> > net/vmw_vsock/af_vsock.c                | 55 ++++++++++++++++++++++++---------
+> > net/vmw_vsock/hyperv_transport.c        |  2 +-
+> > net/vmw_vsock/virtio_transport_common.c |  5 +--
+> > net/vmw_vsock/vmci_transport.c          |  4 +--
+> > 5 files changed, 51 insertions(+), 22 deletions(-)
+> > 
+> > diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+> > index 9e85424c834353d016a527070dd62e15ff3bfce1..41afbc18648c953da27a93571d408de968aa7668 100644
+> > --- a/include/net/af_vsock.h
+> > +++ b/include/net/af_vsock.h
+> > @@ -213,9 +213,10 @@ void vsock_enqueue_accept(struct sock *listener, struct sock *connected);
+> > void vsock_insert_connected(struct vsock_sock *vsk);
+> > void vsock_remove_bound(struct vsock_sock *vsk);
+> > void vsock_remove_connected(struct vsock_sock *vsk);
+> > -struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr);
+> > +struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr, struct net *net);
+> > struct sock *vsock_find_connected_socket(struct sockaddr_vm *src,
+> > -					 struct sockaddr_vm *dst);
+> > +					 struct sockaddr_vm *dst,
+> > +					 struct net *net);
+> > void vsock_remove_sock(struct vsock_sock *vsk);
+> > void vsock_for_each_connected_socket(struct vsock_transport *transport,
+> > 				     void (*fn)(struct sock *sk));
+> > @@ -255,4 +256,6 @@ static inline bool vsock_msgzerocopy_allow(const struct vsock_transport *t)
+> > {
+> > 	return t->msgzerocopy_allow && t->msgzerocopy_allow();
+> > }
+> > +
+> > +struct net *vsock_global_net(void);
 > 
-> I think it's better if this patch goes first into the ipsec/xfrm tree,
-> so that hopefully it gets some serious testing before landing into net-next.
-> 
-> @Steffen, @Herber: could you please take this in your tree?
+> If it just returns null, maybe we can make it inline here.
 > 
 
-Thanks.  The issue for me is that I've had a check which complains that
-the caller doesn't check for NULL but I've expanded the check and now
-there are 16 new warnings.
+Roger that.
 
-regards,
-dan carpenter
+> > #endif /* __AF_VSOCK_H__ */
+> > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+> > index 7e3db87ae4333cf63327ec105ca99253569bb9fe..d206489bf0a81cf989387c7c8063be91a7c21a7d 100644
+> > --- a/net/vmw_vsock/af_vsock.c
+> > +++ b/net/vmw_vsock/af_vsock.c
+> > @@ -235,37 +235,60 @@ static void __vsock_remove_connected(struct vsock_sock *vsk)
+> > 	sock_put(&vsk->sk);
+> > }
+> > 
+> > -static struct sock *__vsock_find_bound_socket(struct sockaddr_vm *addr)
+> > +struct net *vsock_global_net(void)
+> > {
+> > +	return NULL;
+> > +}
+> > +EXPORT_SYMBOL_GPL(vsock_global_net);
+> > +
+> > +static struct sock *__vsock_find_bound_socket(struct sockaddr_vm *addr,
+> > +					      struct net *net)
+> > +{
+> 
+> Please add a comment here to describe what fallback is used for.
+> And I would suggest also something on top of this file to explain a bit
+> how netns are handled in AF_VSOCK.
+> 
 
-net/mpls/af_mpls.c:633 inet6_fib_lookup_dev() warn: 'dst' can also be NULL
-net/xfrm/xfrm_policy.c:2926 xfrm_policy_queue_process() warn: 'dst' can also be NULL
-net/xfrm/xfrm_interface_core.c:463 xfrmi_xmit2() warn: 'dst' can also be NULL
-net/core/lwt_bpf.c:242 bpf_lwt_xmit_reroute() warn: 'dst' can also be NULL
-net/l2tp/l2tp_ip6.c:673 l2tp_ip6_sendmsg() warn: 'dst' can also be NULL
-net/l2tp/l2tp_ip6.c:673 l2tp_ip6_sendmsg() warn: 'dst' can also be NULL
-net/dccp/ipv6.c:949 dccp_v6_connect() warn: 'dst' can also be NULL
-net/ipv4/ip_vti.c:223 vti_xmit() warn: 'dst' can also be NULL
-net/ipv6/syncookies.c:249 cookie_v6_check() warn: 'dst' can also be NULL
-net/ipv6/syncookies.c:259 cookie_v6_check() warn: 'dst' can also be NULL
-net/ipv6/ip6_udp_tunnel.c:171 udp_tunnel6_dst_lookup() warn: 'dst' can also be NULL
-net/ipv6/ip6_tunnel.c:1182 ip6_tnl_xmit() warn: 'dst' can also be NULL
-net/ipv6/af_inet6.c:859 inet6_sk_rebuild_header() warn: 'dst' can also be NULL
-net/ipv6/ip6_vti.c:489 vti6_xmit() warn: 'dst' can also be NULL
-net/ipv6/ila/ila_lwt.c:92 ila_output() warn: 'dst' can also be NULL
-net/ipv6/ndisc.c:510 ndisc_send_skb() warn: 'dst' can also be NULL
-net/ipv6/inet6_connection_sock.c:109 inet6_csk_route_socket() warn: 'dst' can also be NULL
-net/ipv6/tcp_ipv6.c:283 tcp_v6_connect() warn: 'dst' can also be NULL
-net/ipv6/netfilter/nf_reject_ipv6.c:316 nf_send_reset6() warn: 'dst' can also be NULL
-net/ipv6/raw.c:929 rawv6_sendmsg() warn: 'dst' can also be NULL
-net/ipv6/raw.c:929 rawv6_sendmsg() warn: 'dst' can also be NULL
-net/ipv6/datagram.c:114 ip6_datagram_dst_update() warn: 'dst' can also be NULL
-drivers/net/vrf.c:447 vrf_process_v6_outbound() warn: 'dst' can also be NULL
-drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_cm.c:1156 chtls_recv_sock() warn: 'dst' can also be NULL
-drivers/net/ethernet/netronome/nfp/flower/action.c:475 nfp_fl_set_tun() warn: 'dst' can also be NULL
-drivers/net/ethernet/netronome/nfp/flower/tunnel_conf.c:826 nfp_tunnel_request_route_v6() warn: 'dst' can also be NULL
-drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun.c:464 mlx5e_route_lookup_ipv6_get() warn: 'dst' can also be NULL
-drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun.c:466 mlx5e_route_lookup_ipv6_get() warn: 'dst' can also be NULL
-drivers/net/wireguard/socket.c:153 send6() warn: 'dst' can also be NULL
-drivers/infiniband/core/addr.c:434 addr6_resolve() warn: 'dst' can also be NULL
+sgtm!
+
+> > +	struct sock *fallback = NULL;
+> > 	struct vsock_sock *vsk;
+> > 
+> > 	list_for_each_entry(vsk, vsock_bound_sockets(addr), bound_table) {
+> > -		if (vsock_addr_equals_addr(addr, &vsk->local_addr))
+> > -			return sk_vsock(vsk);
+> > +		if (vsock_addr_equals_addr(addr, &vsk->local_addr)) {
+> > +			if (net_eq(net, sock_net(sk_vsock(vsk))))
+> > +				return sk_vsock(vsk);
+> > 
+> > +			if (net_eq(net, vsock_global_net()))
+> > +				fallback = sk_vsock(vsk);
+> > +		}
+> > 		if (addr->svm_port == vsk->local_addr.svm_port &&
+> > 		    (vsk->local_addr.svm_cid == VMADDR_CID_ANY ||
+> > -		     addr->svm_cid == VMADDR_CID_ANY))
+> > -			return sk_vsock(vsk);
+> > +		     addr->svm_cid == VMADDR_CID_ANY)) {
+> > +			if (net_eq(net, sock_net(sk_vsock(vsk))))
+> > +				return sk_vsock(vsk);
+> > +
+> > +			if (net_eq(net, vsock_global_net()))
+> > +				fallback = sk_vsock(vsk);
+> > +		}
+> > 	}
+> > 
+> > -	return NULL;
+> > +	return fallback;
+> > }
+> > 
+> > static struct sock *__vsock_find_connected_socket(struct sockaddr_vm *src,
+> > -						  struct sockaddr_vm *dst)
+> > +						  struct sockaddr_vm *dst,
+> > +						  struct net *net)
+> > {
+> > +	struct sock *fallback = NULL;
+> > 	struct vsock_sock *vsk;
+> > 
+> > 	list_for_each_entry(vsk, vsock_connected_sockets(src, dst),
+> > 			    connected_table) {
+> > 		if (vsock_addr_equals_addr(src, &vsk->remote_addr) &&
+> > 		    dst->svm_port == vsk->local_addr.svm_port) {
+> > -			return sk_vsock(vsk);
+> > +			if (net_eq(net, sock_net(sk_vsock(vsk))))
+> > +				return sk_vsock(vsk);
+> > +
+> > +			if (net_eq(net, vsock_global_net()))
+> > +				fallback = sk_vsock(vsk);
+> 
+> This pattern seems to be repeated 3 times, can we make a function/macro?
+> 
+
+yep, no problem!
+
+> > 		}
+> > 	}
+> > 
+> > -	return NULL;
+> > +	return fallback;
+> > }
+> > 
+> > static void vsock_insert_unbound(struct vsock_sock *vsk)
+> > @@ -304,12 +327,12 @@ void vsock_remove_connected(struct vsock_sock *vsk)
+> > }
+> > EXPORT_SYMBOL_GPL(vsock_remove_connected);
+> > 
+> > -struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr)
+> > +struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr, struct net *net)
+> > {
+> > 	struct sock *sk;
+> > 
+> > 	spin_lock_bh(&vsock_table_lock);
+> > -	sk = __vsock_find_bound_socket(addr);
+> > +	sk = __vsock_find_bound_socket(addr, net);
+> > 	if (sk)
+> > 		sock_hold(sk);
+> > 
+> > @@ -320,12 +343,13 @@ struct sock *vsock_find_bound_socket(struct sockaddr_vm *addr)
+> > EXPORT_SYMBOL_GPL(vsock_find_bound_socket);
+> > 
+> > struct sock *vsock_find_connected_socket(struct sockaddr_vm *src,
+> > -					 struct sockaddr_vm *dst)
+> > +					 struct sockaddr_vm *dst,
+> > +					 struct net *net)
+> > {
+> > 	struct sock *sk;
+> > 
+> > 	spin_lock_bh(&vsock_table_lock);
+> > -	sk = __vsock_find_connected_socket(src, dst);
+> > +	sk = __vsock_find_connected_socket(src, dst, net);
+> > 	if (sk)
+> > 		sock_hold(sk);
+> > 
+> > @@ -644,6 +668,7 @@ static int __vsock_bind_connectible(struct vsock_sock *vsk,
+> > {
+> > 	static u32 port;
+> > 	struct sockaddr_vm new_addr;
+> > +	struct net *net = sock_net(sk_vsock(vsk));
+> > 
+> > 	if (!port)
+> > 		port = get_random_u32_above(LAST_RESERVED_PORT);
+> > @@ -660,7 +685,7 @@ static int __vsock_bind_connectible(struct vsock_sock *vsk,
+> > 
+> > 			new_addr.svm_port = port++;
+> > 
+> > -			if (!__vsock_find_bound_socket(&new_addr)) {
+> > +			if (!__vsock_find_bound_socket(&new_addr, net)) {
+> > 				found = true;
+> > 				break;
+> > 			}
+> > @@ -677,7 +702,7 @@ static int __vsock_bind_connectible(struct vsock_sock *vsk,
+> > 			return -EACCES;
+> > 		}
+> > 
+> > -		if (__vsock_find_bound_socket(&new_addr))
+> > +		if (__vsock_find_bound_socket(&new_addr, net))
+> > 			return -EADDRINUSE;
+> > 	}
+> > 
+> > diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
+> > index 31342ab502b4fc35feb812d2c94e0e35ded73771..253609898d24f8a484fcfc3296011c6f501a72a8 100644
+> > --- a/net/vmw_vsock/hyperv_transport.c
+> > +++ b/net/vmw_vsock/hyperv_transport.c
+> > @@ -313,7 +313,7 @@ static void hvs_open_connection(struct vmbus_channel *chan)
+> > 		return;
+> > 
+> > 	hvs_addr_init(&addr, conn_from_host ? if_type : if_instance);
+> > -	sk = vsock_find_bound_socket(&addr);
+> > +	sk = vsock_find_bound_socket(&addr, NULL);
+> > 	if (!sk)
+> > 		return;
+> > 
+> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> > index 7f7de6d8809655fe522749fbbc9025df71f071bd..256d2a4fe482b3cb938a681b6924be69b2065616 100644
+> > --- a/net/vmw_vsock/virtio_transport_common.c
+> > +++ b/net/vmw_vsock/virtio_transport_common.c
+> > @@ -1590,6 +1590,7 @@ void virtio_transport_recv_pkt(struct virtio_transport *t,
+> > 			       struct sk_buff *skb)
+> > {
+> > 	struct virtio_vsock_hdr *hdr = virtio_vsock_hdr(skb);
+> > +	struct net *net = vsock_global_net();
+> 
+> Why using vsock_global_net() in virtio and directly NULL in the others
+> transports?
+> 
+
+This was an oversight on my part, I found an unnamed NULL harder to
+reason about, switched to the func, but forgot to switch over the other
+transports.
+
+BTW, I was unsure about just making NULL a macro (e.g.,
+VIRTIO_VSOCK_GLOBAL_NET?) instead of a function. I just used a function
+because A) I noticed in the prior rev that the default net was a
+function instead of some macro to &init_net, and B) the function seemed
+a little more flexible for future changes. What are your thoughts here?
+
+
+Thanks for the review!
+
+Best,
+Bobby
 
