@@ -1,68 +1,131 @@
-Return-Path: <netdev+bounces-176291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66021A69AC6
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 22:22:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0285FA69ACB
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 22:25:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAEC1189CDCA
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 21:22:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B166189D6CE
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 21:25:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD2B0214A98;
-	Wed, 19 Mar 2025 21:22:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5033820E024;
+	Wed, 19 Mar 2025 21:25:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CE/JChWs"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (unknown [91.216.245.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738BE2135DE;
-	Wed, 19 Mar 2025 21:22:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA9284A1D
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 21:25:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742419349; cv=none; b=dgviAlluWfUMX52xq1wnlngt3F3l1px1WdGzHoXGqTlH3jM0SXOsiJh9n4pLiDDiJ33KTimPnrVwExuq1mN9M/zPYSZ43XA9hplvJWUCEvXupw02LSYtzfCnseCXU7a3flkUP25qFwFvCFNcRa6srRrP2JoBT770ye0OFaKTs3M=
+	t=1742419521; cv=none; b=OG4wttKjtfofJlMLKfdCH/TO2ow7VvTB+SAkYXEmA/cDwNm9Bayo6F+mviOQ6IxONcXiRirV/ylSZcgQLb6uxv68QBk7F5v+h9KKVQGo5qujnrMoxXjCqqz+VYArJDQuCjIegJadSRt2s08rICa3cE+FqX8GjsXq8HZDMl1mPhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742419349; c=relaxed/simple;
-	bh=mk6K1vRRWM2J2POoK0XsPQO8DsR1T0vh3kZyOR5gqf0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b0Lh2tKul06ig9ak59bmOwMas5+5iOizrJVEuZ57FhMNoFhROg/83N3k/se7tUMDAJ7DvLYy+w5rDTGuIZtkn6CFJvyKx4WdSnA5w6YDpDVS6jHQQn0jxNIuwG3Xo2Hcy7VT859aPwFI0/BFr/CSZZO4y+avoxp/c2nRco4IKWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1tv0rT-0004Ob-P7; Wed, 19 Mar 2025 22:22:03 +0100
-Date: Wed, 19 Mar 2025 22:22:03 +0100
-From: Florian Westphal <fw@strlen.de>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] netfilter: x_tables: Remove unnecessary
- strscpy() size arguments
-Message-ID: <20250319212203.GA16833@breakpoint.cc>
-References: <20250319194934.3801-1-thorsten.blum@linux.dev>
+	s=arc-20240116; t=1742419521; c=relaxed/simple;
+	bh=OV2Or2MRuOyczK2J99OF6kGebjbX+C764p1yBMBd3z8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=NPFEFOdmZiVHC3CA14ddm0X7tBHPa4SFx+9ilYreAoISZIHmqmmAgFsU/weszes0lr7XQ108+QQeVi8KcN35vKH6aJPShJ8g5hq6a/r7cRb7SvAfz64UuJCIq/d4T542t8gw/imKJgE5c45pKFKL2qTaYA+0Ut+goHHwp9LhRkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CE/JChWs; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-7c548e16909so15167685a.2
+        for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 14:25:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1742419518; x=1743024318; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=RxHpaOsvcvkOlLlrKja4PkNjzOLhmGsREHpqZ9nJpWo=;
+        b=CE/JChWsfxkoHXwKdyz/o1Bt0nU0/Y/CNp4z0XStrdxmbqn0odKqdEMFl8NqPnfR3a
+         1JNGm8A0Xg8UDn3n6K0txyZXKrEHwk98cozyw8y43WdFSsTKRvdwXsnzFkAmcbi+sE0I
+         naV4hHoFfCA+W4oJxegoclT85mRBALXmC64NtK5hxMc7XFvFvjpuFxI/XUw/MLah8d4I
+         MCHdKYipD79E/RxSaCcV+z8kRdy0c9L1hPRKaI/CLWH2tjmTc1GZXIvaIeuGe37xTwof
+         Ycgg913blKhYSzgKv5JMrmKcPzVG31SE3XJ/CUWJ/s8e6+6Exstu8aJxiJM6cK/CksKM
+         QxqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742419518; x=1743024318;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RxHpaOsvcvkOlLlrKja4PkNjzOLhmGsREHpqZ9nJpWo=;
+        b=hoDaahXMoVfUE1VADBqXGHzbLrMQW/vMJmgObCE5yJ+JAx3D1Yn+tDNNkM7zR1oYag
+         NqJBMgZ5njXb55qNTtvhf5MeJGm+29hG8ZjLZ13Xy4Mo+mOy4mQsEoPjzdo6EYgpOCQY
+         OviLd+Itt4KInrRpgMBXW8VbexBCYvMXDgeLQuwFqUfSKwSPqqNPCR+LAm6QMM0Pygu4
+         CmZdMuS2EKHj3akZf1hxxtCbBQQCqs3+1e+OJhdw29GBxSvFA/6wYaMcOo0pjmCSVxDj
+         FPosuAPfObJYZEnOq7sVNe/4aJPSzh+07AXI/DOAzV12YN+3L/JXnb8/eo+HDdooTddc
+         fO4A==
+X-Forwarded-Encrypted: i=1; AJvYcCWQzWcW9EC1eX9A/vxTthd54sDUL87Eblx4/5h2E8JQt4mz/Ci5KjIsRiNjBE/Pwb58+aExzVs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvQMSbLpKCqob3VgbQb7t6+4jsX5Z0jU/36/wbzaerPEG10m89
+	9SYw6c9XrbxlOmBVlZWGHribiZ/VWV8QWw9TrwNQombvYxUyMwK9WTClbqNhzCEmDkarRgBLHmn
+	rZzVX/A/vGQ==
+X-Google-Smtp-Source: AGHT+IHwmF5+ZHUO/UABocw1gn5GoH5ywswQTnigh8yOhe8KHVfNqrTePSAmWjThC+eAWAzjovZKJ4yvCpj/dg==
+X-Received: from qkbdw4.prod.google.com ([2002:a05:620a:6004:b0:7c5:7199:7f0])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:4047:b0:7c5:4a8e:b71 with SMTP id af79cd13be357-7c5b0d2115fmr118196085a.47.1742419518612;
+ Wed, 19 Mar 2025 14:25:18 -0700 (PDT)
+Date: Wed, 19 Mar 2025 21:25:16 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250319194934.3801-1-thorsten.blum@linux.dev>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.rc1.451.g8f38331e32-goog
+Message-ID: <20250319212516.2385451-1-edumazet@google.com>
+Subject: [PATCH net-next] ipv6: fix _DEVADD() and _DEVUPD() macros
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Thorsten Blum <thorsten.blum@linux.dev> wrote:
-> If the destination buffer has a fixed length, both strscpy_pad() and
-> strscpy() automatically determine its size using sizeof() when the
-> argument is omitted. This makes the explicit sizeof() calls unnecessary.
-> Remove them.
+ip6_rcv_core() is using:
 
-Sorry, not going to ack this, IMO this is just useless noise.
+	__IP6_ADD_STATS(net, idev,
+			IPSTATS_MIB_NOECTPKTS +
+				(ipv6_get_dsfield(hdr) & INET_ECN_MASK),
+			max_t(unsigned short, 1, skb_shinfo(skb)->gso_segs));
+
+This is currently evaluating both expressions twice.
+
+Fix _DEVADD() and _DEVUPD() macros to evaluate their arguments once.
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ include/net/ipv6.h | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+index 9614006f483c9700168c9734f71440980c09017f..2ccdf85f34f16404157b1cd551c874fdfb20f52a 100644
+--- a/include/net/ipv6.h
++++ b/include/net/ipv6.h
+@@ -246,17 +246,20 @@ extern int sysctl_mld_qrv;
+ #define _DEVADD(net, statname, mod, idev, field, val)			\
+ ({									\
+ 	struct inet6_dev *_idev = (idev);				\
++	unsigned long _field = (field);					\
++	unsigned long _val = (val);					\
+ 	if (likely(_idev != NULL))					\
+-		mod##SNMP_ADD_STATS((_idev)->stats.statname, (field), (val)); \
+-	mod##SNMP_ADD_STATS((net)->mib.statname##_statistics, (field), (val));\
++		mod##SNMP_ADD_STATS((_idev)->stats.statname, _field,  _val); \
++	mod##SNMP_ADD_STATS((net)->mib.statname##_statistics, _field, _val);\
+ })
+ 
+ #define _DEVUPD(net, statname, mod, idev, field, val)			\
+ ({									\
+ 	struct inet6_dev *_idev = (idev);				\
++	unsigned long _val = (val);					\
+ 	if (likely(_idev != NULL))					\
+-		mod##SNMP_UPD_PO_STATS((_idev)->stats.statname, field, (val)); \
+-	mod##SNMP_UPD_PO_STATS((net)->mib.statname##_statistics, field, (val));\
++		mod##SNMP_UPD_PO_STATS((_idev)->stats.statname, field, _val); \
++	mod##SNMP_UPD_PO_STATS((net)->mib.statname##_statistics, field, _val);\
+ })
+ 
+ /* MIBs */
+-- 
+2.49.0.rc1.451.g8f38331e32-goog
+
 
