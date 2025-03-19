@@ -1,125 +1,140 @@
-Return-Path: <netdev+bounces-176029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D24C8A6867F
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 09:17:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4E52A6868C
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 09:19:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D46C178DA8
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 08:17:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 422BC3BF7D5
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 08:18:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D113211484;
-	Wed, 19 Mar 2025 08:17:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79FA9250BF9;
+	Wed, 19 Mar 2025 08:18:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YTWQbU7l"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UqgBrrFM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0913242A93;
-	Wed, 19 Mar 2025 08:17:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C87632505CA
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 08:18:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742372230; cv=none; b=Ck0rDGBwnHIMgKlwIE1nV7whF8NKkbvNSFK2TdlLuKj5EYsI2cUUkkhvASl1J/U9raw/sSNJLr+n6zF/2burA76n2A2rr21YvnIYiNyfrGSTC+5eIn8Kwuli2Mzoo0y83DS58XFF/TeahoKD8B2jDDQEqTRkTg4TeIIxoIS0SG8=
+	t=1742372290; cv=none; b=XUl8aaDlMBgT3Z9HCFbz4Id3WF/k0PCpJUYggyqc3XPRThiNNWkla2AsiTzCre1UOL4Cwg8HFckgeAOPNTS65uCHbJNIl/khZwCGHnDaZgxoLrxiJ/8QCB8Wpxoe5GfTTK/ou9SPyYKmh8muU5wX62hfuoWMDoinfWJ/TuOa0iA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742372230; c=relaxed/simple;
-	bh=CNBPnFg8+WJfXuiHTuQ9PmtoNYVlC/qxt+ljvKbbvu8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t9b/ygpbRjC86Ue9Xpr1I2G2oN5p5HTI4yutS2JuWy3vo/QYu5dunrso6pTd4pPVqfmHq4d7Tmu10qFzeMvArRgtGw5kDrmgGmzmESm+9CkC2A7ZNjh7Ktnv6DKuyvZK4L475T0ueB5yOIEXJWX929ZdyIY8KCNNA2rkfpLDHCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YTWQbU7l; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1E23C4CEF2;
-	Wed, 19 Mar 2025 08:17:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742372229;
-	bh=CNBPnFg8+WJfXuiHTuQ9PmtoNYVlC/qxt+ljvKbbvu8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YTWQbU7lf68nAKkCHaqwEkr8uZMhORPYZ3GslyMaXNBBhOxLfkYM7DDPiDtvFE1LA
-	 bgZST/cL7XZRfDUr2i+SF3yXDBkEhCidC6okKsFW3wzZ2cB+gz2F3L6kyXMF/45vWy
-	 2WoNbIDvWq2BGjYEgQMyYFBUu7CLRLOZ+S67ao8n/WY7G7L+hylp2d0zJ6pz/X2cqv
-	 Lmfr2pHPpPkllXxPMxjA9WzhtQomS5zPlr7vRDz+DmQP605E2Tvbv9VZPCBeM93d8M
-	 +d2doCfLAO4ChIedP/v1bH6IidN2ehQe6Cp3mvWSmqOWMSqmuiTAt6y80klQMXzDHD
-	 tS3+tKjS8wDNg==
-Date: Wed, 19 Mar 2025 10:17:04 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Dave Jiang <dave.jiang@intel.com>, Jason Gunthorpe <jgg@nvidia.com>,
-	"Keller, Jacob E" <jacob.e.keller@intel.com>,
-	David Ahern <dsahern@kernel.org>,
-	"Nelson, Shannon" <shannon.nelson@amd.com>,
-	Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kuba@kernel.org>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	"Williams, Dan J" <dan.j.williams@intel.com>,
-	Daniel Vetter <daniel.vetter@ffwll.ch>,
-	Christoph Hellwig <hch@infradead.org>,
-	Itay Avraham <itayavr@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Leonid Bloch <lbloch@nvidia.com>,
-	"linux-cxl@vger.kernel.org" <linux-cxl@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	"Sinyuk, Konstantin" <konstantin.sinyuk@intel.com>
-Subject: Re: [PATCH v5 0/8] Introduce fwctl subystem
-Message-ID: <20250319081704.GF1322339@unreal>
-References: <20250313124847.GM1322339@unreal>
- <54781c0c-a1e7-4e97-acf1-1fc5a2ee548c@amd.com>
- <d0e95c47-c812-4aa8-812f-f5d7f6abbbb1@intel.com>
- <20250317123333.GB9311@nvidia.com>
- <1eae139c-f678-4b28-a466-5c47967b5d13@kernel.org>
- <CO1PR11MB5089AB36220DFEACBF7A5D1CD6DF2@CO1PR11MB5089.namprd11.prod.outlook.com>
- <2025031840-phrasing-rink-c7bb@gregkh>
- <20250318132528.GR9311@nvidia.com>
- <9e3019af-7817-49db-a293-3242e2962c22@intel.com>
- <2025031836-monastery-imaginary-7f5e@gregkh>
+	s=arc-20240116; t=1742372290; c=relaxed/simple;
+	bh=zKCGYClygELnOz5kUrSj+2y/YlS9cO2lSdiPcMiRq64=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=u7DQd5eI+gA+CWos4/tGz+ZuTcuBz+1eQB9qvGI2r7tS6sHRRcyJnooP/AwYZqLweh35A0OgcqTtL6dElPEM9Sk8z9gRoLTNw4K7/rwWkbLJzP7x30x9T3ZmVtH0TTDmAU61OJ1pzIBxXGgivFTfn37POU4d3KTKRMVEGFe/ykw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UqgBrrFM; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742372287;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=u4weFtyR8Vv/0WRgvwevHnBmwuMVQABx5dwojXYaS1A=;
+	b=UqgBrrFMCR7ZBlynjLSSLIFF3ZfrXMxtDq3PEplMwj7J/yNRPKYMTiAtT6E2VwNJwQgreh
+	rXXXpsjbDmZc2YK9RHPgkKYjEkJ0f9tMcJzt78h1b/TxSltQKhcHhf10mrrqwxt7GOeJQ6
+	sWs9ViRBpzraZzeo1Y7Wf8m5GVlgS44=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-475-vf3l3_SZNWehi18H0D8lNg-1; Wed, 19 Mar 2025 04:18:06 -0400
+X-MC-Unique: vf3l3_SZNWehi18H0D8lNg-1
+X-Mimecast-MFC-AGG-ID: vf3l3_SZNWehi18H0D8lNg_1742372285
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-5e5cd9f3f7aso6829810a12.2
+        for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 01:18:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742372285; x=1742977085;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=u4weFtyR8Vv/0WRgvwevHnBmwuMVQABx5dwojXYaS1A=;
+        b=GiItxTAvNsfpMfvfOuhg8EhO8dSMq90tzNatNO9y20aC9FNTDvAshs31r9+zIhf0SA
+         zPeFrMi573UB7SDaIqTJUNDHDyrtesWbOVxBcmQhCbKjL4ZWNCx4+JRvCmIqNYwhnYZr
+         aMqYlQyHSXH8ToPUiJNiPT6K5c28GQUrZqw7O0MTq0AXBcZww3A+q+ueST8T2Kk9pMj5
+         sAah9Tto0JEfKcychHfoTcZY0hEDDYQwb7p9DsDn+3XDhiEGk7CwYoV2H87P1ypxJ4H7
+         +XBUAx6177A/JGT8rPfqrG96VgHmSDWDdpQzhd96qndTqu9Qn9aLfJ/yFY53lhZ2/I07
+         sM/g==
+X-Forwarded-Encrypted: i=1; AJvYcCXbH/jDyKSZ3uA2yEPzTVLP3Hd/sbRskwoTCl/BV7sJ+bn1tkB/4kFzXC/dVBd9v9JkoyuMioQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxv1gbVI1XwzhWUb32h+8OmamRmpbR3QRoe2S2VfAH1PkF//QBP
+	qXLL3zihsediIcx1ixKeNTkaXL34SPdUTzZTtabAPQ66sdxs0j5Zpp0+8nVQVZB7x+1gcbWqQ30
+	Lm+9SN1uxkSISQEnz8TY6GY59IepkowVJrLDqPePGuiqgbYkTqdmJ+hgbSBJTpml2la5aX/ViL7
+	0CcG8nXKWnhtFpJHpD1p+rt9MKRVle
+X-Gm-Gg: ASbGnct+kNHMb+1J++Erasss8WldVtXNTHLvWvhJds3+d0M6Tz6AYWndPdc3pEpG0rs
+	Rg+rcC6UgHOBSovzO/e4xmp3lh4Nbhq++d2f/6ayx5evpClWlNf9aA/vvFo7hc6Fgc3LVhxQSsA
+	==
+X-Received: by 2002:a05:6402:84e:b0:5e6:13a0:2321 with SMTP id 4fb4d7f45d1cf-5eb80f98226mr1528286a12.32.1742372285021;
+        Wed, 19 Mar 2025 01:18:05 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEX9nz4PdJIYgHPcBf3jCqH7Zjv1u+6eHEgELtuPU+YClK9V5WOHBjYADD5j90Xk8f2xxcCVZPPvbntyja6ch4=
+X-Received: by 2002:a05:6402:84e:b0:5e6:13a0:2321 with SMTP id
+ 4fb4d7f45d1cf-5eb80f98226mr1528262a12.32.1742372284630; Wed, 19 Mar 2025
+ 01:18:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2025031836-monastery-imaginary-7f5e@gregkh>
+References: <20250318-virtio-v1-0-344caf336ddd@daynix.com>
+In-Reply-To: <20250318-virtio-v1-0-344caf336ddd@daynix.com>
+From: Lei Yang <leiyang@redhat.com>
+Date: Wed, 19 Mar 2025 16:17:27 +0800
+X-Gm-Features: AQ5f1JqtDok_bmysxOd31u7DWf9rtwBh16X9cCFBc9Txej8fP9FvAHet7aatDRA
+Message-ID: <CAPpAL=w6bNxmsqpK7TGKM_YkQOLPe_w=D8_rCA6NsQCJCbHktw@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/4] virtio_net: Fixes and improvements
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Andrew Melnychenko <andrew@daynix.com>, Joe Damato <jdamato@fastly.com>, 
+	Philo Lu <lulie@linux.alibaba.com>, virtualization@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, devel@daynix.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 18, 2025 at 05:06:17PM +0100, Greg Kroah-Hartman wrote:
-> On Tue, Mar 18, 2025 at 08:39:50AM -0700, Dave Jiang wrote:
-> > 
-> > 
-> > On 3/18/25 6:25 AM, Jason Gunthorpe wrote:
-> > > On Tue, Mar 18, 2025 at 02:20:45PM +0100, Greg Kroah-Hartman wrote:
-> > > 
-> > >> Yes, note, the issue came up in the 2.5.x kernel days, _WAY_ before we
-> > >> had git, so this wasn't a git issue.  I'm all for "drivers/core/" but
-> > >> note, that really looks like "the driver core" area of the kernel, so
-> > >> maybe pick a different name?
-> > > 
-> > > Yeah, +1. We have lots of places calling what is in drivers/base 'core'.
-> > 
-> > just throwing in my 2c
-> > 
-> > drivers/main
-> 
-> Implies the "driver core"
-> 
-> > drivers/common
-> 
-> lib/ maybe?
-> 
-> > drivers/primary
-> 
-> It's not going to be the primary drivers for my laptop :)
-> 
-> Naming is hard.  Let's see some code first...
+QE tested this series of patches with virtio_net regression tests,
+everything works fine.
 
-Yes, let's do name contest later when code will come. There are multiple
-companies already started to work on it and my hope that it will be ready
-for next merge cycle.
+Tested-by: Lei Yang <leiyang@redhat.com>
 
-Thanks
+On Tue, Mar 18, 2025 at 5:57=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix=
+.com> wrote:
+>
+> Jason Wang recently proposed an improvement to struct
+> virtio_net_rss_config:
+> https://lore.kernel.org/r/CACGkMEud0Ki8p=3Dz299Q7b4qEDONpYDzbVqhHxCNVk_vo=
+-KdP9A@mail.gmail.com
+>
+> This patch series implements it and also fixes a few minor bugs I found
+> when writing patches.
+>
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> ---
+> Akihiko Odaki (4):
+>       virtio_net: Split struct virtio_net_rss_config
+>       virtio_net: Fix endian with virtio_net_ctrl_rss
+>       virtio_net: Use new RSS config structs
+>       virtio_net: Allocate rss_hdr with devres
+>
+>  drivers/net/virtio_net.c        | 119 +++++++++++++++-------------------=
+------
+>  include/uapi/linux/virtio_net.h |  13 +++++
+>  2 files changed, 56 insertions(+), 76 deletions(-)
+> ---
+> base-commit: d082ecbc71e9e0bf49883ee4afd435a77a5101b6
+> change-id: 20250318-virtio-6559d69187db
+>
+> Best regards,
+> --
+> Akihiko Odaki <akihiko.odaki@daynix.com>
+>
+>
 
-> 
-> greg k-h
 
