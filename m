@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-176107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1005FA68CFF
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 13:34:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD09FA68D0C
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 13:39:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6255175956
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 12:34:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1877C18988E5
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 12:39:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8361255223;
-	Wed, 19 Mar 2025 12:34:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9F4B25522E;
+	Wed, 19 Mar 2025 12:39:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YDVyaULN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NE0nUbDm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FDCB212B02;
-	Wed, 19 Mar 2025 12:34:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB449207DE2;
+	Wed, 19 Mar 2025 12:39:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742387651; cv=none; b=AJiEDxEttXt2/2tIcRYOJukMx/DchpC57lPNLq2bfNMqermLG6qRKBcrVvtgQM1GSu+zel/XJRrrUHD3SKoDANPgG1L/Xj0mAhbzLTrVo75LxZ/bMK6sgV8tOzQJKfWjuIazTaTflDLALuyp4BTr3WM918sCmUjniu4wKCuUjtM=
+	t=1742387968; cv=none; b=f/SEitQ+Xv5udFMUxhD56+yiWVtPFQhBSy7lSGSctHhlx6XbJijnzOZvjeQ4LoJxm7aH9Md3HlObemU1zDNPilSvBGBsWqwXOnzS2/PX2EuWtQGUKuuYZ2vp4dLx7NN08wIFq4dhwC+z0xUt5rjLjaGj3ex6Lcfqy+wjVrUe8Y0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742387651; c=relaxed/simple;
-	bh=u4CvmzG+F/cEBCAy6e783SpWREAq0lot6p7ZqiX6RRY=;
+	s=arc-20240116; t=1742387968; c=relaxed/simple;
+	bh=+d6fawMch0I0q+4BQrYh7pBFqbseuDAWGqC2kSBQAdo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tHW+qIYg3yuKs2PndaTD1FgJzUD8aV1NT2XBG0zSD8WJsIC6cnRpM+fiJHjcKGSmMvjb7JCeGfyysTRQkWdpVLZAS8PIeG1ulftlKR7HA7WJDEpUlwEZjU1omB8VX8WyltLgfc/I1V6X42pFEajjlAxvCv+FoyBgxXJZKJuI/PY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YDVyaULN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CD32C4CEE9;
-	Wed, 19 Mar 2025 12:34:08 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=P4A5H9S9bNroLHN1GDVJbVJOlREp9+Cvk74WpUvEtN5pf+tetbY9DDNO0rjK9J/djjh6A5d+X8JBWQUl3d2t4gCJptv8chS1M+HveqrG6uL8REZJ1hmLVCTluOw3ZZqlLUEMfS4y2vJfzg3S3lIX7jmGvrbiO+s/aEr0Bb7J0ik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NE0nUbDm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82028C4CEE9;
+	Wed, 19 Mar 2025 12:39:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742387651;
-	bh=u4CvmzG+F/cEBCAy6e783SpWREAq0lot6p7ZqiX6RRY=;
+	s=k20201202; t=1742387968;
+	bh=+d6fawMch0I0q+4BQrYh7pBFqbseuDAWGqC2kSBQAdo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YDVyaULNiNHqe6vdv8o1kvhSbYiQYYwZoqi75nvqC1kSv42H+fmzZ2bCFd22ewHbI
-	 JKd3ihQMUUiokmvtp3XZs9WdX3aC4Lm1LjQGNsOEwMuBj3/vDlWk9INsT5q6fwGsE9
-	 O+bs+S3dmihmy1SqF9boAdNjmwFJc6FCWrYmJMLTriUPDHagd4tfRyiC/3TYQlNGpY
-	 kSrlM0LqrdFQchBpZeI9jNl4af9ej1uudHPYC4JWtcQtW9Uv3E+0xFs52pw/Psw/H8
-	 H/05r7Dg8pzD+90molK2zsTxPbWwaLaS34+6erFM96obKwQ1dR7Gfbh87KSeEhTRYx
-	 Z4zf7BcPIqBiQ==
-Date: Wed, 19 Mar 2025 12:34:07 +0000
+	b=NE0nUbDmBLZYYLcH/13NBkf1wuPc7SAURDVHx//Xbham/L0YjcI0+9IfKjs2JcTel
+	 EDJsCu5fdmTBqZB4H7PQgVRMeBjC/VrOXKAxH3IxHrEtLOQZG7je6oaS2xxFMjSpir
+	 37AtTTOx/aUumccx6RoEWNOWaTmJjJu1dI01hypXPB5c++wjqtOmLeD88QYn7WF/LP
+	 eR4O9ye4GQOxSz350i9HXokoS5Yjw6Bw1T7T/hpPz1fqdGhh5H//NvH3SE/5zaPwsI
+	 mSmdatwQTQSgiaE114pwDNsaa5M8FPGBJum3oEinJc7aRwx88dyLh9T1PdP8G7r3/k
+	 IYxjxPV5ZuHOA==
+Date: Wed, 19 Mar 2025 12:39:24 +0000
 From: Simon Horman <horms@kernel.org>
-To: Justin Lai <justinlai0215@realtek.com>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pkshih@realtek.com, larry.chiu@realtek.com
-Subject: Re: [PATCH net-next] rtase: Add ndo_setup_tc support for CBS offload
- in traffic control setup
-Message-ID: <20250319123407.GC280585@kernel.org>
-References: <20250314094021.10120-1-justinlai0215@realtek.com>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net] net: atm: fix use after free in lec_send()
+Message-ID: <20250319123924.GD280585@kernel.org>
+References: <c751531d-4af4-42fe-affe-6104b34b791d@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,84 +60,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250314094021.10120-1-justinlai0215@realtek.com>
+In-Reply-To: <c751531d-4af4-42fe-affe-6104b34b791d@stanley.mountain>
 
-On Fri, Mar 14, 2025 at 05:40:21PM +0800, Justin Lai wrote:
-> Add support for ndo_setup_tc to enable CBS offload functionality as
-> part of traffic control configuration for network devices.
+On Fri, Mar 14, 2025 at 01:10:57PM +0300, Dan Carpenter wrote:
+> The ->send() operation frees skb so save the length before calling
+> ->send() to avoid a use after free.
 > 
-> Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 
-...
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-> diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> index 2aacc1996796..2a61cd192026 100644
-> --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> @@ -1661,6 +1661,54 @@ static void rtase_get_stats64(struct net_device *dev,
->  	stats->rx_length_errors = tp->stats.rx_length_errors;
->  }
->  
-> +static void rtase_set_hw_cbs(const struct rtase_private *tp, u32 queue)
-> +{
-> +	u32 idle = tp->tx_qos[queue].idleslope * RTASE_1T_CLOCK;
-> +	u32 val, i;
-> +
-> +	val = u32_encode_bits(idle / RTASE_1T_POWER, RTASE_IDLESLOPE_INT_MASK);
-> +	idle %= RTASE_1T_POWER;
-> +
-> +	for (i = 1; i <= RTASE_IDLESLOPE_INT_SHIFT; i++) {
-> +		idle *= 2;
-> +		if ((idle / RTASE_1T_POWER) == 1)
-> +			val |= BIT(RTASE_IDLESLOPE_INT_SHIFT - i);
-> +
-> +		idle %= RTASE_1T_POWER;
-> +	}
-> +
-> +	rtase_w32(tp, RTASE_TXQCRDT_0 + queue * 4, val);
-> +}
-> +
-> +static void rtase_setup_tc_cbs(struct rtase_private *tp,
-> +			       const struct tc_cbs_qopt_offload *qopt)
-> +{
-> +	u32 queue = qopt->queue;
-
-Hi Justin,
-
-Does queue need to be checked somewhere to make sure it is in range?
-
-> +
-> +	tp->tx_qos[queue].hicredit = qopt->hicredit;
-> +	tp->tx_qos[queue].locredit = qopt->locredit;
-> +	tp->tx_qos[queue].idleslope = qopt->idleslope;
-> +	tp->tx_qos[queue].sendslope = qopt->sendslope;
-
-Does qopt->enable need to be honoured in order to allow
-the offload to be both enabled and disabled?
-
-> +
-> +	rtase_set_hw_cbs(tp, queue);
-> +}
-> +
-> +static int rtase_setup_tc(struct net_device *dev, enum tc_setup_type type,
-> +			  void *type_data)
-> +{
-> +	struct rtase_private *tp = netdev_priv(dev);
-> +
-> +	switch (type) {
-> +	case TC_SETUP_QDISC_CBS:
-> +		rtase_setup_tc_cbs(tp, type_data);
-> +		break;
-> +	default:
-> +		return -EOPNOTSUPP;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static netdev_features_t rtase_fix_features(struct net_device *dev,
->  					    netdev_features_t features)
->  {
-
-...
 
