@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-176211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 487DFA695C6
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 18:06:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74A33A695C2
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 18:05:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 211901885AC8
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:04:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCF6C422C91
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:03:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D08261FCF49;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED57B202981;
 	Wed, 19 Mar 2025 17:03:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QGiVpRW0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OtV/xx/H"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 940E31F0988;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B820C1F8730;
 	Wed, 19 Mar 2025 17:03:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742403795; cv=none; b=pXIcGhHlB+vwzpSfqp4eMbot1Kgrx4sCukA1T7F+/HHeaM9IkL1i3YLCaMP5z6grjcdaT6xVDkl5sHmOTPCbX5XACxxYpqbHUJ6DJmU9NfX9ERaxjmZW3gn3Df92V+JhklnBp2jBY555470UbwCvxpwYY/80ATNGSUc2n5j9xM4=
+	t=1742403795; cv=none; b=oEGB1kt5iVBsB7uczlicZyFz8reZpz2CxLsnGGw+8Rn40N4vfJryBYDRdGzi2KjHmtCDJp4SSs1H2pcFg2NKBeKXpHq09/cssdiILHgv+c9AwKT5Pzld3j3/+4sj0Dsfn3iiaDUfFZqOtfjZmVi73XevceEkzkO47jG9XLk6vIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1742403795; c=relaxed/simple;
-	bh=piqvvSFhPTUeHNVZEppHC6lSuIoy/6aG/BL2sFc+4uI=;
+	bh=c+f4b1ppS6dCDcnJUUtX6zpDtn8BdV+JApqNvx4B6dQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=WX3xIXLPhD1G5hqFfqEL3Cp2/7DG5QrgV3COXwNCPElModliRalpaARZxmb1UX6CRHKO0Yfdp4PSKrfnbpS+/ct+OFF7JjW9lx+/19TK7DO1iFQyODU9gdGhEZwM8jy6rpytkD0qG+Sl+vxeiIx6CWCmuU7XZwE4nrWynTPjF2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QGiVpRW0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 08AB2C4CEE9;
+	 In-Reply-To:To:Cc; b=gY/NikG5GbL+5J2E0AETrzkD8wgzAPexs0TBvtvgbfQog4SrlcpGqWbTRMNd5AF43UBNKuBrU8gy7gHjdtOwNvymBnf2Ug8nw1IXQIGclnR9L9nP/rXoMl7m5kh0XpLee7895s3YffKIxHaKhhrKk2YAqQwHKCE39zBH6xPWWHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OtV/xx/H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 297BDC4CEEE;
 	Wed, 19 Mar 2025 17:03:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1742403795;
-	bh=piqvvSFhPTUeHNVZEppHC6lSuIoy/6aG/BL2sFc+4uI=;
+	bh=c+f4b1ppS6dCDcnJUUtX6zpDtn8BdV+JApqNvx4B6dQ=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=QGiVpRW0B4NW9GlmltLDnvYuybsachrQD2Gvbem5RA9cTQ1AMceKGE2g3rIjhv60G
-	 RzKa8JE1UvzPp8pVaAZYeC3jprU10iixrx3qkmLvYbNJEDPaTgl53X+ua8qY/O2NBf
-	 HKDJUq+iy7MtKs708vvI0KSD5vzXIorWdFUDzDTXqMmn5e+yY0lpBPIeL4L6atkc4r
-	 7VUEiXvolOng7sUPAAmx7vIc49xhKsiUJH/ia7JeEr3VuavLnpxPqS1I7Dq3U+xwlk
-	 t4aulvyuKbd0na3BM7vgG5W1tcWyNzqCO99+ist3yUIkzSv2KCyOewlGeUCksTYGiJ
-	 6PjXwM5YLKYpA==
+	b=OtV/xx/HxjCdMBGo+gLm4nwrqbUpTw1q6g9W13lkGUBNC0PyuDMkI1Gc83301xGLZ
+	 Dp1ojGL0YeWc8Y6IS/cEy2qgzS+UXpGlouwpKPCFp31cDd76pu+NHGLOCVzhf9WGjE
+	 /1dSCWpFL6PxO/39CexNSq6R13lnGeyqom43YMxhAxXeM0kZsA0TQneAPi3hJG71oZ
+	 WCOt6lmNNDCB2FyWn93D2aB7J40O4JM/PZ88FSlXCMcCOkkhSc0iNG/xNRLB0SUOdB
+	 0ZHBsrQqmq/UetcQElPP6QhBGPIZ270ZKvk7YPO/Jv4H0j2R2+IYAzyAKx/P4BANJX
+	 p0YovzVezn+5Q==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED11DC36000;
-	Wed, 19 Mar 2025 17:03:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D001C35FFA;
+	Wed, 19 Mar 2025 17:03:15 +0000 (UTC)
 From: Nikhil Jha via B4 Relay <devnull+njha.janestreet.com@kernel.org>
-Date: Wed, 19 Mar 2025 13:02:39 -0400
-Subject: [PATCH v2 1/2] sunrpc: implement rfc2203 rpcsec_gss seqnum cache
+Date: Wed, 19 Mar 2025 13:02:40 -0400
+Subject: [PATCH v2 2/2] sunrpc: don't immediately retransmit on seqno miss
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,7 +55,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250319-rfc2203-seqnum-cache-v2-1-2c98b859f2dd@janestreet.com>
+Message-Id: <20250319-rfc2203-seqnum-cache-v2-2-2c98b859f2dd@janestreet.com>
 References: <20250319-rfc2203-seqnum-cache-v2-0-2c98b859f2dd@janestreet.com>
 In-Reply-To: <20250319-rfc2203-seqnum-cache-v2-0-2c98b859f2dd@janestreet.com>
 To: Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
@@ -71,11 +71,11 @@ Cc: linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org,
  netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
  Nikhil Jha <njha@janestreet.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1742403794; l=11122;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1742403794; l=1835;
  i=njha@janestreet.com; s=20250314; h=from:subject:message-id;
- bh=wnNrKiNzXXoyX4j3lxcMJOW3I2Fvt7gwTBW4nuDAdVo=;
- b=h/EXiI1s+SIj7RWtUnZKeIe2aa3haJ3Gs0Vt5M2OCmUrcdlMip0Yw4MLDE1vwDau0DPQwiRen
- Y4axgXdzRugDIctQbvkOih3ernKyN20DZGHLTitXejACpxAV0A8PliS
+ bh=BUY6rJprONjD4kvNKWmmzFeJCgyo6ppGGxibOm8/Kxc=;
+ b=xdX2yxAJ/6/gUy68y6Q9cvESRYHhyp5Lpb4S5e+WaYic8JxfVG7+vTuPjx6Py8ArM1tFBwawI
+ LNh8oa3AoLGCNQmi/ZEwy7FJYnAsDDey9LdNm+FHLGHn8/GiRCaQvPz
 X-Developer-Key: i=njha@janestreet.com; a=ed25519;
  pk=92gWYi0ImmcatlW+pFEFh9viqpRf/PE8phYeWuNeGaA=
 X-Endpoint-Received: by B4 Relay for njha@janestreet.com/20250314 with
@@ -85,298 +85,52 @@ Reply-To: njha@janestreet.com
 
 From: Nikhil Jha <njha@janestreet.com>
 
-This implements a sequence number cache of the last three (right now
-hardcoded) sent sequence numbers for a given XID, as suggested by the
-RFC.
+RFC2203 requires that retransmitted messages use a new gss sequence
+number, but the same XID. This means that if the server is just slow
+(e.x. overloaded), the client might receive a response using an older
+seqno than the one it has recorded.
 
-From RFC2203 5.3.3.1:
+Currently, Linux's client immediately retransmits in this case. However,
+this leads to a lot of wasted retransmits until the server eventually
+responds faster than the client can resend.
 
-"Note that the sequence number algorithm requires that the client
-increment the sequence number even if it is retrying a request with
-the same RPC transaction identifier.  It is not infrequent for
-clients to get into a situation where they send two or more attempts
-and a slow server sends the reply for the first attempt. With
-RPCSEC_GSS, each request and reply will have a unique sequence
-number. If the client wishes to improve turn around time on the RPC
-call, it can cache the RPCSEC_GSS sequence number of each request it
-sends. Then when it receives a response with a matching RPC
-transaction identifier, it can compute the checksum of each sequence
-number in the cache to try to match the checksum in the reply's
-verifier."
+Client -> SEQ 1 -> Server
+Client -> SEQ 2 -> Server
+Client <- SEQ 1 <- Server (misses, expecting seqno = 2)
+Client -> SEQ 3 -> Server (immediate retransmission on miss)
+Client <- SEQ 2 <- Server (misses, expecting seqno = 3)
+Client -> SEQ 4 -> Server (immediate retransmission on miss)
+... and so on ...
+
+This commit makes it so that we ignore messages with bad checksums
+due to seqnum mismatch, and rely on the usual timeout behavior for
+retransmission instead of doing so immediately.
 
 Signed-off-by: Nikhil Jha <njha@janestreet.com>
 ---
- include/linux/sunrpc/xprt.h    | 17 +++++++++++-
- include/trace/events/rpcgss.h  |  4 +--
- include/trace/events/sunrpc.h  |  2 +-
- net/sunrpc/auth_gss/auth_gss.c | 59 ++++++++++++++++++++++++++----------------
- net/sunrpc/xprt.c              |  3 ++-
- 5 files changed, 57 insertions(+), 28 deletions(-)
+ net/sunrpc/clnt.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/sunrpc/xprt.h b/include/linux/sunrpc/xprt.h
-index 81b952649d35e3ad4fa8c7e77388ac2ceb44ce60..f46d1fb8f71ae22233f15691b2cf312f73656d9d 100644
---- a/include/linux/sunrpc/xprt.h
-+++ b/include/linux/sunrpc/xprt.h
-@@ -30,6 +30,8 @@
- #define RPC_MAXCWND(xprt)	((xprt)->max_reqs << RPC_CWNDSHIFT)
- #define RPCXPRT_CONGESTED(xprt) ((xprt)->cong >= (xprt)->cwnd)
- 
-+#define RPC_GSS_SEQNO_ARRAY_SIZE 3U
-+
- enum rpc_display_format_t {
- 	RPC_DISPLAY_ADDR = 0,
- 	RPC_DISPLAY_PORT,
-@@ -66,7 +68,8 @@ struct rpc_rqst {
- 	struct rpc_cred *	rq_cred;	/* Bound cred */
- 	__be32			rq_xid;		/* request XID */
- 	int			rq_cong;	/* has incremented xprt->cong */
--	u32			rq_seqno;	/* gss seq no. used on req. */
-+	u32			rq_seqnos[RPC_GSS_SEQNO_ARRAY_SIZE];	/* past gss req seq nos. */
-+	unsigned int		rq_seqno_count;	/* number of entries in rq_seqnos */
- 	int			rq_enc_pages_num;
- 	struct page		**rq_enc_pages;	/* scratch pages for use by
- 						   gss privacy code */
-@@ -119,6 +122,18 @@ struct rpc_rqst {
- #define rq_svec			rq_snd_buf.head
- #define rq_slen			rq_snd_buf.len
- 
-+static inline int xprt_rqst_add_seqno(struct rpc_rqst *req, u32 seqno)
-+{
-+	if (likely(req->rq_seqno_count < RPC_GSS_SEQNO_ARRAY_SIZE))
-+		req->rq_seqno_count++;
-+
-+	/* Shift array to make room for the newest element at the beginning */
-+	memmove(&req->rq_seqnos[1], &req->rq_seqnos[0],
-+		(RPC_GSS_SEQNO_ARRAY_SIZE - 1) * sizeof(req->rq_seqnos[0]));
-+	req->rq_seqnos[0] = seqno;
-+	return 0;
-+}
-+
- /* RPC transport layer security policies */
- enum xprtsec_policies {
- 	RPC_XPRTSEC_NONE = 0,
-diff --git a/include/trace/events/rpcgss.h b/include/trace/events/rpcgss.h
-index b0b6300a0cabdbaf1c08460a474aaf092b548e53..8aeae06cf434d05547b4cffb14f01901cfba4142 100644
---- a/include/trace/events/rpcgss.h
-+++ b/include/trace/events/rpcgss.h
-@@ -409,7 +409,7 @@ TRACE_EVENT(rpcgss_seqno,
- 		__entry->task_id = task->tk_pid;
- 		__entry->client_id = task->tk_client->cl_clid;
- 		__entry->xid = be32_to_cpu(rqst->rq_xid);
--		__entry->seqno = rqst->rq_seqno;
-+		__entry->seqno = *rqst->rq_seqnos;
- 	),
- 
- 	TP_printk(SUNRPC_TRACE_TASK_SPECIFIER " xid=0x%08x seqno=%u",
-@@ -440,7 +440,7 @@ TRACE_EVENT(rpcgss_need_reencode,
- 		__entry->client_id = task->tk_client->cl_clid;
- 		__entry->xid = be32_to_cpu(task->tk_rqstp->rq_xid);
- 		__entry->seq_xmit = seq_xmit;
--		__entry->seqno = task->tk_rqstp->rq_seqno;
-+		__entry->seqno = *task->tk_rqstp->rq_seqnos;
- 		__entry->ret = ret;
- 	),
- 
-diff --git a/include/trace/events/sunrpc.h b/include/trace/events/sunrpc.h
-index 851841336ee65c1d03fc3565a96f5dbe409c1d64..bb01a0ca93aa72a310146bba97ca58b851a85653 100644
---- a/include/trace/events/sunrpc.h
-+++ b/include/trace/events/sunrpc.h
-@@ -1099,7 +1099,7 @@ TRACE_EVENT(xprt_transmit,
- 		__entry->client_id = rqst->rq_task->tk_client ?
- 			rqst->rq_task->tk_client->cl_clid : -1;
- 		__entry->xid = be32_to_cpu(rqst->rq_xid);
--		__entry->seqno = rqst->rq_seqno;
-+		__entry->seqno = *rqst->rq_seqnos;
- 		__entry->status = status;
- 	),
- 
-diff --git a/net/sunrpc/auth_gss/auth_gss.c b/net/sunrpc/auth_gss/auth_gss.c
-index 369310909fc98596c8a06db8ac3c976a719ca7b2..0fa244f16876f3c434fd507b4d53c5eefd748ce4 100644
---- a/net/sunrpc/auth_gss/auth_gss.c
-+++ b/net/sunrpc/auth_gss/auth_gss.c
-@@ -1545,6 +1545,7 @@ static int gss_marshal(struct rpc_task *task, struct xdr_stream *xdr)
- 	struct kvec	iov;
- 	struct xdr_buf	verf_buf;
- 	int status;
-+	u32 seqno;
- 
- 	/* Credential */
- 
-@@ -1556,15 +1557,16 @@ static int gss_marshal(struct rpc_task *task, struct xdr_stream *xdr)
- 	cred_len = p++;
- 
- 	spin_lock(&ctx->gc_seq_lock);
--	req->rq_seqno = (ctx->gc_seq < MAXSEQ) ? ctx->gc_seq++ : MAXSEQ;
-+	seqno = (ctx->gc_seq < MAXSEQ) ? ctx->gc_seq++ : MAXSEQ;
-+	xprt_rqst_add_seqno(req, seqno);
- 	spin_unlock(&ctx->gc_seq_lock);
--	if (req->rq_seqno == MAXSEQ)
-+	if (*req->rq_seqnos == MAXSEQ)
- 		goto expired;
- 	trace_rpcgss_seqno(task);
- 
- 	*p++ = cpu_to_be32(RPC_GSS_VERSION);
- 	*p++ = cpu_to_be32(ctx->gc_proc);
--	*p++ = cpu_to_be32(req->rq_seqno);
-+	*p++ = cpu_to_be32(*req->rq_seqnos);
- 	*p++ = cpu_to_be32(gss_cred->gc_service);
- 	p = xdr_encode_netobj(p, &ctx->gc_wire_ctx);
- 	*cred_len = cpu_to_be32((p - (cred_len + 1)) << 2);
-@@ -1678,17 +1680,31 @@ gss_refresh_null(struct rpc_task *task)
- 	return 0;
- }
- 
-+static u32
-+gss_validate_seqno_mic(struct gss_cl_ctx *ctx, u32 seqno, __be32 *seq, __be32 *p, u32 len)
-+{
-+	struct kvec iov;
-+	struct xdr_buf verf_buf;
-+	struct xdr_netobj mic;
-+
-+	*seq = cpu_to_be32(seqno);
-+	iov.iov_base = seq;
-+	iov.iov_len = 4;
-+	xdr_buf_from_iov(&iov, &verf_buf);
-+	mic.data = (u8 *)p;
-+	mic.len = len;
-+	return gss_verify_mic(ctx->gc_gss_ctx, &verf_buf, &mic);
-+}
-+
- static int
- gss_validate(struct rpc_task *task, struct xdr_stream *xdr)
- {
- 	struct rpc_cred *cred = task->tk_rqstp->rq_cred;
- 	struct gss_cl_ctx *ctx = gss_cred_get_ctx(cred);
- 	__be32		*p, *seq = NULL;
--	struct kvec	iov;
--	struct xdr_buf	verf_buf;
--	struct xdr_netobj mic;
- 	u32		len, maj_stat;
- 	int		status;
-+	int		i = 1; /* don't recheck the first item */
- 
- 	p = xdr_inline_decode(xdr, 2 * sizeof(*p));
- 	if (!p)
-@@ -1705,13 +1721,10 @@ gss_validate(struct rpc_task *task, struct xdr_stream *xdr)
- 	seq = kmalloc(4, GFP_KERNEL);
- 	if (!seq)
- 		goto validate_failed;
--	*seq = cpu_to_be32(task->tk_rqstp->rq_seqno);
--	iov.iov_base = seq;
--	iov.iov_len = 4;
--	xdr_buf_from_iov(&iov, &verf_buf);
--	mic.data = (u8 *)p;
--	mic.len = len;
--	maj_stat = gss_verify_mic(ctx->gc_gss_ctx, &verf_buf, &mic);
-+	maj_stat = gss_validate_seqno_mic(ctx, task->tk_rqstp->rq_seqnos[0], seq, p, len);
-+	/* RFC 2203 5.3.3.1 - compute the checksum of each sequence number in the cache */
-+	while (unlikely(maj_stat == GSS_S_BAD_SIG && i < task->tk_rqstp->rq_seqno_count))
-+		maj_stat = gss_validate_seqno_mic(ctx, task->tk_rqstp->rq_seqnos[i], seq, p, len);
- 	if (maj_stat == GSS_S_CONTEXT_EXPIRED)
- 		clear_bit(RPCAUTH_CRED_UPTODATE, &cred->cr_flags);
- 	if (maj_stat)
-@@ -1750,7 +1763,7 @@ gss_wrap_req_integ(struct rpc_cred *cred, struct gss_cl_ctx *ctx,
- 	if (!p)
- 		goto wrap_failed;
- 	integ_len = p++;
--	*p = cpu_to_be32(rqstp->rq_seqno);
-+	*p = cpu_to_be32(*rqstp->rq_seqnos);
- 
- 	if (rpcauth_wrap_req_encode(task, xdr))
- 		goto wrap_failed;
-@@ -1847,7 +1860,7 @@ gss_wrap_req_priv(struct rpc_cred *cred, struct gss_cl_ctx *ctx,
- 	if (!p)
- 		goto wrap_failed;
- 	opaque_len = p++;
--	*p = cpu_to_be32(rqstp->rq_seqno);
-+	*p = cpu_to_be32(*rqstp->rq_seqnos);
- 
- 	if (rpcauth_wrap_req_encode(task, xdr))
- 		goto wrap_failed;
-@@ -2001,7 +2014,7 @@ gss_unwrap_resp_integ(struct rpc_task *task, struct rpc_cred *cred,
- 	offset = rcv_buf->len - xdr_stream_remaining(xdr);
- 	if (xdr_stream_decode_u32(xdr, &seqno))
- 		goto unwrap_failed;
--	if (seqno != rqstp->rq_seqno)
-+	if (seqno != *rqstp->rq_seqnos)
- 		goto bad_seqno;
- 	if (xdr_buf_subsegment(rcv_buf, &gss_data, offset, len))
- 		goto unwrap_failed;
-@@ -2045,7 +2058,7 @@ gss_unwrap_resp_integ(struct rpc_task *task, struct rpc_cred *cred,
- 	trace_rpcgss_unwrap_failed(task);
- 	goto out;
- bad_seqno:
--	trace_rpcgss_bad_seqno(task, rqstp->rq_seqno, seqno);
-+	trace_rpcgss_bad_seqno(task, *rqstp->rq_seqnos, seqno);
- 	goto out;
- bad_mic:
- 	trace_rpcgss_verify_mic(task, maj_stat);
-@@ -2077,7 +2090,7 @@ gss_unwrap_resp_priv(struct rpc_task *task, struct rpc_cred *cred,
- 	if (maj_stat != GSS_S_COMPLETE)
- 		goto bad_unwrap;
- 	/* gss_unwrap decrypted the sequence number */
--	if (be32_to_cpup(p++) != rqstp->rq_seqno)
-+	if (be32_to_cpup(p++) != *rqstp->rq_seqnos)
- 		goto bad_seqno;
- 
- 	/* gss_unwrap redacts the opaque blob from the head iovec.
-@@ -2093,7 +2106,7 @@ gss_unwrap_resp_priv(struct rpc_task *task, struct rpc_cred *cred,
- 	trace_rpcgss_unwrap_failed(task);
- 	return -EIO;
- bad_seqno:
--	trace_rpcgss_bad_seqno(task, rqstp->rq_seqno, be32_to_cpup(--p));
-+	trace_rpcgss_bad_seqno(task, *rqstp->rq_seqnos, be32_to_cpup(--p));
- 	return -EIO;
- bad_unwrap:
- 	trace_rpcgss_unwrap(task, maj_stat);
-@@ -2118,14 +2131,14 @@ gss_xmit_need_reencode(struct rpc_task *task)
- 	if (!ctx)
- 		goto out;
- 
--	if (gss_seq_is_newer(req->rq_seqno, READ_ONCE(ctx->gc_seq)))
-+	if (gss_seq_is_newer(*req->rq_seqnos, READ_ONCE(ctx->gc_seq)))
- 		goto out_ctx;
- 
- 	seq_xmit = READ_ONCE(ctx->gc_seq_xmit);
--	while (gss_seq_is_newer(req->rq_seqno, seq_xmit)) {
-+	while (gss_seq_is_newer(*req->rq_seqnos, seq_xmit)) {
- 		u32 tmp = seq_xmit;
- 
--		seq_xmit = cmpxchg(&ctx->gc_seq_xmit, tmp, req->rq_seqno);
-+		seq_xmit = cmpxchg(&ctx->gc_seq_xmit, tmp, *req->rq_seqnos);
- 		if (seq_xmit == tmp) {
- 			ret = false;
- 			goto out_ctx;
-@@ -2134,7 +2147,7 @@ gss_xmit_need_reencode(struct rpc_task *task)
- 
- 	win = ctx->gc_win;
- 	if (win > 0)
--		ret = !gss_seq_is_newer(req->rq_seqno, seq_xmit - win);
-+		ret = !gss_seq_is_newer(*req->rq_seqnos, seq_xmit - win);
- 
- out_ctx:
- 	gss_put_ctx(ctx);
-diff --git a/net/sunrpc/xprt.c b/net/sunrpc/xprt.c
-index 09f245cda5262a572c450237419c80b183a83568..395bdfdaf4313eb85292f5a99bba818bbb268a76 100644
---- a/net/sunrpc/xprt.c
-+++ b/net/sunrpc/xprt.c
-@@ -1365,7 +1365,7 @@ xprt_request_enqueue_transmit(struct rpc_task *task)
- 				INIT_LIST_HEAD(&req->rq_xmit2);
- 				goto out;
- 			}
--		} else if (!req->rq_seqno) {
-+		} else if (req->rq_seqno_count == 0) {
- 			list_for_each_entry(pos, &xprt->xmit_queue, rq_xmit) {
- 				if (pos->rq_task->tk_owner != task->tk_owner)
- 					continue;
-@@ -1898,6 +1898,7 @@ xprt_request_init(struct rpc_task *task)
- 	req->rq_snd_buf.bvec = NULL;
- 	req->rq_rcv_buf.bvec = NULL;
- 	req->rq_release_snd_buf = NULL;
-+	req->rq_seqno_count = 0;
- 	xprt_init_majortimeo(task, req, task->tk_client->cl_timeout);
- 
- 	trace_xprt_reserve(req);
+diff --git a/net/sunrpc/clnt.c b/net/sunrpc/clnt.c
+index 2fe88ea79a70c134e58abfb03fca230883eddf1f..98c0880ec18a8b80371e20f65e7a57a8d9244f7f 100644
+--- a/net/sunrpc/clnt.c
++++ b/net/sunrpc/clnt.c
+@@ -2760,8 +2760,13 @@ rpc_decode_header(struct rpc_task *task, struct xdr_stream *xdr)
+ 	case -EPROTONOSUPPORT:
+ 		goto out_err;
+ 	case -EACCES:
+-		/* Re-encode with a fresh cred */
+-		fallthrough;
++		/* possible RPCSEC_GSS out-of-sequence event (RFC2203),
++		 * reset recv state and keep waiting, don't retransmit
++		 */
++		task->tk_rqstp->rq_reply_bytes_recvd = 0;
++		task->tk_status = xprt_request_enqueue_receive(task);
++		task->tk_action = call_transmit_status;
++		return -EBADMSG;
+ 	default:
+ 		goto out_garbage;
+ 	}
 
 -- 
 2.43.5
