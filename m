@@ -1,165 +1,157 @@
-Return-Path: <netdev+bounces-176278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2964A6998F
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 20:38:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B8ADA699A6
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 20:44:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C46601642A3
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 19:37:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA42B7AA2D8
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 19:43:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 083EB213E76;
-	Wed, 19 Mar 2025 19:37:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 818D12135D8;
+	Wed, 19 Mar 2025 19:44:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NDeFIrH5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lH6rwQhR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46994212FBD;
-	Wed, 19 Mar 2025 19:37:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 315561DE8BF;
+	Wed, 19 Mar 2025 19:44:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742413053; cv=none; b=HHItc+amCXk0Y+WFiuyutE/ulLL366pNK1I6fnCuVMF/1YAH3mCJJXl3yj3bs11LekC4gE/EyPZgDyWPAT1WoPbqFF/iyKL5TIgcqO0CMJKIfTfGVMyqSLwFXXRuO0t4y/XYooUV6NQ8v7G5pcYkS2Yaxoag04bP/rww5XBoGrU=
+	t=1742413450; cv=none; b=Ayd1GmVAvEuIJ4qGh7OwXy7rhoRKijqVXw1/pj/oQQn0rOrGeJAYv2Bmg5mCsUjmKowiwzsad52Y23JAZlpew7F/3AzLg7NrWdgXdfCwIcb/DWX1I6FO8vMjGvetqgyGch26iDvVIquYU55/kawBwQ5KLbQi0L7fZ7pJLsB2CMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742413053; c=relaxed/simple;
-	bh=NUjywNL79Bcz4+kco3+goMMB0g0EPgUwAxsOhv4kh1w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=poITFQ7AoQLaI8cy6xvgVseYZ4eM68DuWeT6I7mq5E9aaQ6mLDMrd+NN1yhTVrGCCki2q2q5Ggc9XcEU3pFdZCQROWqVox/4VpKLdXmW3iDKpu1eb4UhjjDC6zfvp0wVPhPK5ygNX57PeIvWrP77N8nN6PGxfhxDiHzHu/Z0seM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NDeFIrH5; arc=none smtp.client-ip=209.85.218.54
+	s=arc-20240116; t=1742413450; c=relaxed/simple;
+	bh=lLaat7az9MH7ezrPmTZOat/1ILwtVsbzCqb6WBBS0xo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=peEx9nBrcVl8cN+CeIFSO0A/Hx4P9M2U5RLDow0HkUbHPU/OAKBAZ/zlrKCOW0WMEXJ9gWX9ImhNq10FSkCLXGRwCtJcf3IV97/PKDEhTucAmJOXxiRMqLnXNMhYx1o3QgDdVCwa1I2UbbHGQtBQYnQF7uvrtbAKE9XHSl0dbMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lH6rwQhR; arc=none smtp.client-ip=209.85.208.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-ac2bfcd2a70so12556966b.0;
-        Wed, 19 Mar 2025 12:37:31 -0700 (PDT)
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-30761be8fcfso900111fa.0;
+        Wed, 19 Mar 2025 12:44:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742413050; x=1743017850; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/hWjp2lAOR+xlpu16vpG0lA3R8Vrfh8sFtASS1Glky4=;
-        b=NDeFIrH58b0as23jtqDnr6ZDqDruXPv0od6poETwRfviXoIu75d/zQ4+M5uj+gjP37
-         EmgLMV9jCQnYQ9SKVh0ikohlfKDGPsmUxJzK9VIEvOl97lFzffKGye38uBbNSRO44rBG
-         rLdVQLUiqw2+4/ARegu83pt6Gy8mtKZhte2ZKrkYMnT+FNhj8gaYqZGGDftaK8uWa368
-         3tNYCAX/9fOLBKqyPtMpGIy3XfLvUvMAu/m1TZjkOmU+ziLon7gxN2C/e0+V8k/EREWd
-         4ZbTvEVKhpvQwjj1qJ/KWVHIwtIqR+ceA/TPXLCutZ2gydsyPWilUU6PwhTP/YRFA7zp
-         F/hQ==
+        d=gmail.com; s=20230601; t=1742413446; x=1743018246; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dhYCmAWKpYLqMT/P3WekE89t5CCM6z3es1ZH5Zq+OZE=;
+        b=lH6rwQhRqerh4Is+DTiJ02aPWFisBvD6Qit2LeRTKMkx4DxS9tUvESarSidTFULtaa
+         KyDwPDm2EiQJvJ1TfYtGnjiS4+gIxjlP3FyyzmiyhFUecLSf4T8badx+oThL9q+NPhdv
+         4AM1TQVyouq7+CzeFablf0+klkhAIA75sWpFjM2vMsmXIjuj3V6QdhPef0FkvRCAvvwD
+         RVh8/dwpEpkupx9vlB7bycVzxsLxn/sG0y7KjzP7UtFzzfBHSTzHYomW1OwiNMft0N/G
+         YU7npD9BarQsXsl6wK+n3sobnYrOyUUKUzST2HW8JvartW16yWq7FNC0HjVxpMbROw31
+         rDdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742413050; x=1743017850;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/hWjp2lAOR+xlpu16vpG0lA3R8Vrfh8sFtASS1Glky4=;
-        b=FPgzz6rWMtFVzEVT+F3SbeA2eEK9nteall0Aac54a3zZ4WjB3esuGoCMvRd3knduxp
-         UfyOmjv47iHFuCMGB7paFXRwvSxpZLac6Gzu2x2j/zpyX0szmEETMhcL6pW7Ib1FKYZH
-         vXfaFc+SODPisFiQ/CdJN4lVFFjPZGxqtbONprKrrhUY474ZHaJX0B/h6lMO8dlJhmIS
-         an4cpMK3hXRFonMkpgmNiIvbRIdFc8MWifTH7EQMswRC2mMrVdicW6Q2ikRPdnENBmWZ
-         6ZHGmIW9pEisTY79bzUI3AWixNfSo+6TsGgR0zj9ZtGuUivq750uMPpdkvG9xkkGb23A
-         bofg==
-X-Forwarded-Encrypted: i=1; AJvYcCU9Wja1OMZDM9GnU19LVWlBJQ6pzTRo0OU3MMPLLl47EL5cijhHuEiDKQe9AHQZlPVkfplGqENF@vger.kernel.org, AJvYcCV96C3BA9uezoZFgwPP97NDWjHFcOrwZrIVvHyc8pNlccRXcBI9TAPOdu6TyhXvEwazbvjJtTDjgUogMysOvjHW@vger.kernel.org, AJvYcCWxRZVX6NdREPvMPpdZBBvqmobjkY3jiNJal264QosXEngUBoQsOOwmMhgdqCqYOfLj2C+15A4YY3pO7lBj+HI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3EYFPNZTmOG0P8ThioXTnxM2W5I/AOqA1cqRoPJ2DIzjGfD3E
-	VJRkDEgb1EySjvkxLBr0UFJw/DGGoOV9Sqaop2TnlSWl3CrOLQq/
-X-Gm-Gg: ASbGnct+R53EUevpzBP3c7Sc5Fyg5LO0cjrzmEQQ7ZQV4IL/kc1/mpHVyAv84fIHoyu
-	gi5hFp7ueePrVue+lfF7p74hd64UtqCCttUFbJvbQiHpPuSjk0yxHhXJiXAbwuuloLRkukI6OXL
-	do1yZKdnjgDdZOp3N30e7vty9S11kcojMimFitisQuYv+3OgIGBkbRmawD8FHOFPUunCgZgkQ14
-	xB4DJqMcYaOyuetwxwK0pX5R4YyIJmevjUr24qFWJtrb03DFcV90O9Xmy+C2Hon0QSKudmqBqd+
-	UjxO6WTLDRraBQUuKPAnqI9VQcydh63BqIB/ElehVwR4Uc5ZO8OrkFzeE0usI6zXMbrbI1mZWGi
-	cwIaN0SsP1Fa0fU8KRc9cL8frhjSWpQbcIuM4/eVZAeUyJ2giL7LVNFD3MZgAnLMSXdp/wIfg2n
-	fSdPaJPeV2goHWJZFYOss=
-X-Google-Smtp-Source: AGHT+IFxBYUpzqxGSZdBA0JubUlnSNecSwjgT24V4GH75JqqwyWr1waPwEMz8/JdpX6S2eAzwSPnRw==
-X-Received: by 2002:a17:907:ec0d:b0:ac2:dcb9:d2d7 with SMTP id a640c23a62f3a-ac3b7a97454mr522728466b.12.1742413050194;
-        Wed, 19 Mar 2025 12:37:30 -0700 (PDT)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3146aecbasm1039783166b.37.2025.03.19.12.37.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Mar 2025 12:37:29 -0700 (PDT)
-Message-ID: <eacbd4b8-b8dc-4402-9cbe-666c1ae112e2@gmail.com>
-Date: Wed, 19 Mar 2025 20:37:27 +0100
+        d=1e100.net; s=20230601; t=1742413446; x=1743018246;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dhYCmAWKpYLqMT/P3WekE89t5CCM6z3es1ZH5Zq+OZE=;
+        b=NF0IxbWIvukcAHg12Nlyuna6izgv6APFfW3WLq0Or28W9xpvYj0vTBh5xALUWZQGZ2
+         0NWEeHVmy3GtFNdSUoUJLslJFEn07Lz0oDjHJZuI44Y89E8WJPPPcFz4o/JamuBrerjq
+         JMHEJwUUtV+MU7glIs/MDv+VKgcDm7PSwCKD11foRfTH9u0gFwoLd/XdpeSazJmjCn5L
+         FwQWCH6HS5YfFDdtYZoH/YwYR8ek6nlXSIHlqta+fVMtFGF7G/qr/w1QrpvCIc3REIxG
+         +tloAK/sAZeJb7lxwqBKmjZgTyWtIqr+YG79MDGH7tCSwPOH9Cew70cIgh1hUl/nzl1w
+         CD4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWIp0FfPmrSkNSuuO8OL2jKMc0S9r4+jjmw7Dkk1toyeIWG6ajw7MiM6gTvSsOY88hhFcoRyb77D2jGPQ==@vger.kernel.org, AJvYcCXFVZGbhfXAXWqUTsQaPJjIOXgobe3iumRA1J+2qKboliW6CtslbCJHnVrpvjquRVLXXmE=@vger.kernel.org, AJvYcCXSVrfNdRR1+1EolQiV3Oly5PS2BM8bM9Qkq/4wLku9D76JdUcsK7ynSEgRm7VyNq5Ltx0wuHGG@vger.kernel.org, AJvYcCXfFlIRME9iJ02AwKQwodCbW6nhPzl+guzriAENLbBJVySI+fq3OUId44SyOmAXA/fwkB0vAFulvoPrXGCe@vger.kernel.org
+X-Gm-Message-State: AOJu0YyqBCN8RmWY4e33lXp8qxLR5ot3gRB/lBxgjmaWkBvrp0E4Q1pi
+	704lpiT/itP6msAJU3msIS1NJIoylFQ6/DDMFzI5s/XllZZ2g5i+lBgXYxsqF4sM1sw9bVmbMMa
+	aBPa5QDznTUIxkQReU3yhSf202+YhoeaJ2S7XpQ==
+X-Gm-Gg: ASbGncsoM4uuZtXAQ9c+ZXGdKdzWYKG76GrKQHh6sXV128rEjIvYCIVLcBkIyDtv4xa
+	P3mi07shB3dzrZMTMdziAxQq/1HGpsHfbftE0oXPi5oL+Yg1hLlGF1gml/KB5x/XooJEkmUCpMU
+	IFmR7YWaeN01QaAJNrv7rWFeEVug==
+X-Google-Smtp-Source: AGHT+IEqb8DYNNrbGP7rciW1niUuSjBxj6+DvYT/JveS26p0kxZ66Mnhoo+Sfd+hkXEbRXMLTPNGW4rQ78klTXJrpGI=
+X-Received: by 2002:a05:651c:2119:b0:30b:bf6f:66a3 with SMTP id
+ 38308e7fff4ca-30d6a40c9b2mr17799441fa.17.1742413445934; Wed, 19 Mar 2025
+ 12:44:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 nf-next 2/3] netfilter: nf_flow_table_offload: Add
- nf_flow_encap_push() for xmit direct
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Michal Ostrowski <mostrows@earthlink.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jozsef Kadlecsik <kadlec@netfilter.org>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
- linux-hardening@vger.kernel.org, Nikolay Aleksandrov <razor@blackwall.org>
-References: <20250315195910.17659-1-ericwouds@gmail.com>
- <20250315195910.17659-3-ericwouds@gmail.com> <Z9oAeJ5KifLxllEa@calendula>
-From: Eric Woudstra <ericwouds@gmail.com>
-Content-Language: en-US
-In-Reply-To: <Z9oAeJ5KifLxllEa@calendula>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250319133309.6fce6404@canb.auug.org.au> <CAADnVQKotSrp8CkVpFw-y800NJ_R7An-iw-twrQZaOdYUeRtqQ@mail.gmail.com>
+ <CAP01T76CqOxzEiMLKJ2y_YD=qDgWq+Fq5Zy-fnKP4AAyS30Dwg@mail.gmail.com>
+ <CAP01T77_qMiMmyeyizud=-sbBH5q1jvY_Jkj-QLZqM1zh0a2hg@mail.gmail.com>
+ <CAP01T77St7cpkvJ7w+5d3Ji-ULdz04QhZDxQWdNSBX9W7vXJCw@mail.gmail.com>
+ <CAADnVQ+8apdQtyvMO=SKXCE_HWpQEo3CaTUwd39ekYEj-D4TQA@mail.gmail.com>
+ <CAFULd4brsMuNX3-jJ44JyyRZqN1PO9FwJX7N3mvMwRzi8XYLag@mail.gmail.com> <CAADnVQ+7GTN0Tn_5XSZKGDwrjW=v3R6MyGrcDnos2QpkNSidAw@mail.gmail.com>
+In-Reply-To: <CAADnVQ+7GTN0Tn_5XSZKGDwrjW=v3R6MyGrcDnos2QpkNSidAw@mail.gmail.com>
+From: Uros Bizjak <ubizjak@gmail.com>
+Date: Wed, 19 Mar 2025 20:43:53 +0100
+X-Gm-Features: AQ5f1JoUJCMzHHENT_TDzaIDzJZhTJniayHR3OV_fr-rf4VmnbYHKYqMpdSbmXo
+Message-ID: <CAFULd4aHiEaJkJANNGwv1ae7T0oLd+r9_4+tozgAq0EZhS16Tw@mail.gmail.com>
+Subject: Re: linux-next: build failure after merge of the bpf-next tree
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Kumar Kartikeya Dwivedi <memxor@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, bpf <bpf@vger.kernel.org>, 
+	Networking <netdev@vger.kernel.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Mar 19, 2025 at 7:56=E2=80=AFPM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
+>
+> On Wed, Mar 19, 2025 at 9:06=E2=80=AFAM Uros Bizjak <ubizjak@gmail.com> w=
+rote:
+> >
+> > On Wed, Mar 19, 2025 at 3:55=E2=80=AFPM Alexei Starovoitov
+> > <alexei.starovoitov@gmail.com> wrote:
+> > >
+> > > On Wed, Mar 19, 2025 at 7:36=E2=80=AFAM Kumar Kartikeya Dwivedi
+> > > <memxor@gmail.com> wrote:
+> > > >
+> > > > > >
+> > > > > > I've sent a fix [0], but unfortunately I was unable to reproduc=
+e the
+> > > > > > problem with an LLVM >=3D 19 build, idk why. I will try with GC=
+C >=3D 14
+> > > > > > as the patches require to confirm, but based on the error I am =
+99%
+> > > > > > sure it will fix the problem.
+> > > > >
+> > > > > Probably because __seg_gs has CC_HAS_NAMED_AS depends on CC_IS_GC=
+C.
+> > > > > Let me give it a go with GCC.
+> > > > >
+> > > >
+> > > > Can confirm now that this fixes it, I just did a build with GCC 14
+> > > > where Uros's __percpu checks kick in.
+> > >
+> > > Great. Thanks for checking and quick fix.
+> > >
+> > > btw clang supports it with __attribute__((address_space(256))),
+> > > so CC_IS_GCC probably should be relaxed.
+> >
+> > https://github.com/llvm/llvm-project/issues/93449
+> >
+> > needs to be fixed first. Also, the feature has to be thoroughly tested
+> > (preferably by someone having a deep knowledge of clang) before it is
+> > enabled by default.
+>
+> clang error makes sense to me.
 
+It is not an error, but an internal compiler error. This should never happe=
+n.
 
-On 3/19/25 12:23 AM, Pablo Neira Ayuso wrote:
-> On Sat, Mar 15, 2025 at 08:59:09PM +0100, Eric Woudstra wrote:
->> Loosely based on wenxu's patches:
->>
->> "nf_flow_table_offload: offload the vlan/PPPoE encap in the flowtable".
-> 
-> I remember that patch.
-> 
->> Fixed double vlan and pppoe packets, almost entirely rewriting the patch.
->>
->> After this patch, it is possible to transmit packets in the fastpath with
->> outgoing encaps, without using vlan- and/or pppoe-devices.
->>
->> This makes it possible to use more different kinds of network setups.
->> For example, when bridge tagging is used to egress vlan tagged
->> packets using the forward fastpath. Another example is passing 802.1q
->> tagged packets through a bridge using the bridge fastpath.
->>
->> This also makes the software fastpath process more similar to the
->> hardware offloaded fastpath process, where encaps are also pushed.
-> 
-> I am not convinced that making the software flowtable more similar
-> hardware is the way the go, we already have to deal with issues with
-> flow teardown mechanism (races) to make it more suitable for hardware
-> offload.
-> 
-> I think the benefit for pppoe is that packets do not go to userspace
-> anymore, but probably pppoe driver can be modified push the header
-> itself?
-> 
-> As for vlan, this is saving an indirection?
-> 
-> Going in this direction means the flowtable datapath will get more
-> headers to be pushed in this path in the future, eg. mpls.
-> 
-> Is this also possibly breaking existing setups? eg. xfrm + vlan
-> devices, but maybe I'm wrong.
-> 
+> What does it even mean to do addr space cast from percpu to normal addres=
+s:
+>
+> __typeof__(int __seg_gs) const_pcpu_hot;
+> void *__attribute____UNIQUE_ID___addressable_const_pcpu_hot612 =3D
+>     (void *)(long)&const_pcpu_hot;
 
-If you do not want to touch the software fastpath, It should be possible
-to do it without.
+Please see [1] for an explanation.
 
-For bridged interfaces, only use the hardware fastpath, not installing a
-hook for the software fastpath at all.
+[1] https://gcc.gnu.org/onlinedocs/gcc/Named-Address-Spaces.html#x86-Named-=
+Address-Spaces
 
-Another option is installing the hook (matching the hash, updating
-counter and perhaps calling flow_offload_refresh() and so), but then
-letting traffic continue the normal path. That is, until the hardware
-offload takes over.
-
-In both cases only allow to add the flowtable if the offload flag is set.
-
-What do you think?
-
-But in all cases (including existing cases in existing code), I think we
-need the patches from "[PATCH v10 nf-next 0/3] netfilter: fastpath fixes".
-
-Could you look at these?
-
+Uros.
 
