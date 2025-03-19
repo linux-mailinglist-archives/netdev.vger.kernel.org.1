@@ -1,143 +1,155 @@
-Return-Path: <netdev+bounces-176080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4EAFA68A70
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 12:02:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0331AA68A74
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 12:03:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B730884188
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 11:00:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C66B883271
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 11:01:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FD13255E38;
-	Wed, 19 Mar 2025 10:58:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0B712566E1;
+	Wed, 19 Mar 2025 10:58:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Zo/O0EGe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WGOLw98S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5516254AE4;
-	Wed, 19 Mar 2025 10:58:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39EE253F07;
+	Wed, 19 Mar 2025 10:58:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742381904; cv=none; b=QHoxJG/CTJVVsh5Wmuwtcvg+iRa37blaFrlCtAyShsXGI03pqoHzJtMCGS303lDVB1h1wPTNb5P+GYttVRWE13QNpaewMwYzS3avdE6aaOwqGk4wlytmLx1fZEnNd8RY7dutmbWolEpNdzsHvsjIyhKJUeJo56zu9OdDhCrdsv4=
+	t=1742381924; cv=none; b=LiZo7U+Q62G86y8oHT2jgVcFSaorrgUiTI9ivEnJ2IX4xAcgztx7BJjLcL+G8uNJBiTIY/6xGOiYnXeWDkKmOk6B5TDQNnESpY20fDEM3r9f6Ds9YZXkbz0/engc9PJ84U2MwCHJBo4qJiyQUC0363NHYsugT9pFhwK42R2a7ps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742381904; c=relaxed/simple;
-	bh=GxnJ9WEx2Cn71o4Gu2M9LzY2aDcJeActAGo04ysFpJk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kXfuex7cBFd7tfTRqrH2qVreVRlU9l4SKC2hHm63P73oqgJng00cj/9QMetypr+V+OzPAaYLj3gH4xC7C8NDXI9J5jvBdf3XtJavHFhIWa14CU2AfVZ4/wLiK6qNgia/pTkfSKKjnPy8NFMa1yPIpKER/K83N7GwsK+fG5j9HYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Zo/O0EGe; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1742381903; x=1773917903;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=GxnJ9WEx2Cn71o4Gu2M9LzY2aDcJeActAGo04ysFpJk=;
-  b=Zo/O0EGelsGVeuMFQDhmU8gg1ejLv4ujNAj4nj4HRTSTiWoeJZvAGFLU
-   uo2uxkaiMTSOIjF6Ap2lFuIsUnkgr1pglRsTfROhdGQRodS7PqbXW1Ber
-   XyNxCvq1j3dKg81jICDTPgo6b//wuyt20AN1EBhLH9PLTShm1uO3chF4Q
-   DhV8j60vRMdi1RZIOiBGWxRoGbpVbt6sjA9e5pZbvLotRcaGWaHB0sD1G
-   38F2fgTj2eoHDQp5KiAa4OM/k3E42wayMrDA2+wJyIiY2bFANjdFymKx0
-   HhIzOCLxNt6D8gBBiYmYIEdKpgnKWauqI2LrvSqY0BMpWyLq0yng3Q6MZ
-   w==;
-X-CSE-ConnectionGUID: NqKNk5thQ8SVBTFLoZj6rQ==
-X-CSE-MsgGUID: NErVRCscQRWU0WZ8q2KGmQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11377"; a="43296782"
-X-IronPort-AV: E=Sophos;i="6.14,259,1736841600"; 
-   d="scan'208";a="43296782"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2025 03:58:20 -0700
-X-CSE-ConnectionGUID: Nn4CBZcdQ7KVrVQy2ijmwA==
-X-CSE-MsgGUID: snY9lz5mQii9MO9dqwRlJg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,259,1736841600"; 
-   d="scan'208";a="122593882"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by fmviesa007.fm.intel.com with ESMTP; 19 Mar 2025 03:58:17 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id AAFFF2A2; Wed, 19 Mar 2025 12:58:15 +0200 (EET)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>
-Subject: [PATCH net v2 2/2] net: usb: asix: ax88772: Increase phy_name size
-Date: Wed, 19 Mar 2025 12:54:34 +0200
-Message-ID: <20250319105813.3102076-3-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250319105813.3102076-1-andriy.shevchenko@linux.intel.com>
-References: <20250319105813.3102076-1-andriy.shevchenko@linux.intel.com>
+	s=arc-20240116; t=1742381924; c=relaxed/simple;
+	bh=GG69JLLoOuUL0wJ0ZzPJER+gIZp4fGEUyLdiv+8TA5o=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=m7pG0CGMorzEmd1AktEms54XvWoRKlxdronQpse2S0hHIDQzelLhLoa8bGJmyyJwdCZ/EQDiDClz8kW1IdzmdHa1sUF4DGcDkfLVDx568u9baJUS3KzEy2LhWOTdvwG7rKCrZohA9ePe9R2syDaEpjNvbdh2/f2PjNYBBKVBZZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WGOLw98S; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-ac27cb35309so1103056966b.2;
+        Wed, 19 Mar 2025 03:58:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742381920; x=1742986720; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0Ik3Mc4xzUUk7uaUjBM/0ZhWS7W+RmxrqI/uvK4A1d8=;
+        b=WGOLw98Su4r36pzHuUPbQriBiKEzZiFCDaGoHzxiKXnMgT8PxSTr5Z2f5BuKqO6cWE
+         QtMlQoFCsNfAP+t9zcDM7dROhg4P7khZMWSGaotjXQVYfRdHF44w9kNlfSu5v65/g+Rx
+         Is1fVoQUx/h0lH4mZBcENff/pJ4FVk/IM67CmLagb/990hTA9H1uIxKtrvmit0KXr/hg
+         8fphcaWMjeuveSu5eUyWo81fctvRYs4o+YrsjormJIKwdTtDWAOZic7LPmPLw70ZwjYU
+         AA9SNmG6qI1fgB+lDAylbjpzHIc/M7+VTC5mYS1h/pnLZ5Jm2WBbuR5oXvDLkoD6+/Wq
+         oemA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742381920; x=1742986720;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0Ik3Mc4xzUUk7uaUjBM/0ZhWS7W+RmxrqI/uvK4A1d8=;
+        b=f8hbQru30Nwj93GfJNXATP1A/8z01NaH6cit2QPiP1UVzGUeNe/3ouHckgxc0A/OAS
+         XbINC+mh2jebFWAyINAtrDvxyRxJyQnrQS/u+HXI8JrhWg2T15JRaYQWBLzh6cPTc+sj
+         nQaltwBk3LIGLQO9DLz3akaNyVsWibc6EjZiHyeF2d4TkdARfJAXO9IPePXY4B+f94kp
+         8Mv2RvDech1CwhqIP1eq3OMAKwIWckYg3AjlO27S0ptorgAwO4WHF5DIrItdMJuD47+g
+         SUv90vvE9UYEFr1Ux3+Q8D0HE6+25ueiQnyVGXHUj1RFEN95bMA/H1lO/O2rQHFa3Xqi
+         gMfQ==
+X-Gm-Message-State: AOJu0YxKQS47RcX/s5misaZ3+Hmt4rBeXMTJp7CM5AHD+9J0x6d7kMGx
+	2FMz1QczBeUvzPcErcL9YCuzidcMdwckFbC+qKGIR48eHdFJQw/CuC05qA==
+X-Gm-Gg: ASbGnct2ENC3KDcIiFNjVk5Pv2oGp3Cn06SgtKafO8xhsgIdeSAH1RCWiskcIFZqQKw
+	/0zQDi3h1hZWgNHEG6HR3JX3/Bv2IZgS5b2uTBN8ckU/vvgEBB6ZM01RC/RJ2jHJwIT8o4QIdwa
+	3B2Oc2kdztnBIN0al6n0/NK8WqC9qrxNPDkLlDwVlaEG8XvvD6WE7m/7JfZEgT62a7tfW+1MZ27
+	Juu6EhMhgRaFymMlIqmPpR5Nwoy0EoL8aFK0P9J2cf+i7IlWqeUTUASZ644RGPBTy9Fvo7Rov1c
+	tz0viWF0tNnaI9tanoYQzOaIl3qAHWl/1NzWDrTjNT37PITL/POXShXJ
+X-Google-Smtp-Source: AGHT+IEA4wGMOrfrFB28sPI1conHykoHDMtFe8KhhCBHyyVNl/gBla+annAxFEWF+pD79/nB8whX5g==
+X-Received: by 2002:a17:906:7953:b0:ac3:8896:416f with SMTP id a640c23a62f3a-ac3b7c377c7mr185093266b.15.1742381919525;
+        Wed, 19 Mar 2025 03:58:39 -0700 (PDT)
+Received: from [127.0.0.1] ([193.252.113.11])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3149cfa1fsm989613066b.87.2025.03.19.03.58.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Mar 2025 03:58:38 -0700 (PDT)
+From: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
+X-Google-Original-From: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
+Message-ID: <69c63a19-5419-4bbe-858f-6ca100345a28@orange.com>
+Date: Wed, 19 Mar 2025 11:58:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: [RFC PATCH] mac80211: clip ADDBA instead of bailing out
+To: linux-wireless@vger.kernel.org
+Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>,
+ Johannes Berg <johannes@sipsolutions.net>
+References: <20250317163902.1893378-1-sashal@kernel.org>
+ <20250317163902.1893378-2-sashal@kernel.org>
+Content-Language: fr, en-US
+Organization: Orange
+In-Reply-To: <20250317163902.1893378-2-sashal@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-GCC compiler (Debian 14.2.0-17) is not happy about printing
-into a short buffer (when build with `make W=1`):
+When a Linux Wifi{4,5} device talks to a Wifi6 AP, if the AP proposes a Block
+Acknowledgement aggregation size (ADDBA) exceeding its expectations, the code in
+mac80211 just bails out, rejecting the aggregation. This yields a big
+performance penalty on the ack path, which is observable in comparison with
+other OSes (Windows and MacOS) which "play smarter" and accept the proposal with
+a "clipped" size.
 
- drivers/net/usb/ax88172a.c: In function ‘ax88172a_reset’:
- include/linux/phy.h:312:20: error: ‘%s’ directive output may be truncated writing up to 60 bytes into a region of size 20 [-Werror=format-truncation=]
+A typical scenario would be:
 
-Indeed, the buffer size is chosen based on some assumptions, while
-in general the assigned name might not fit. Increase the buffer to
-cover maximum length of the parameters. With that, change snprintf()
-to use sizeof() instead of hard coded number.
+  AP -> Device : ADDBA_request(size=256)
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Current Linux reaction:
+
+  Device -> AP : ADDBA_reply(failure)
+
+Other OSes reaction:
+
+  Device -> AP : ADDBA_reply(size=64)
+
+Note that the IEEE802.11 standard allows for both reactions, but it sounds
+really suboptimal to be bailing out instead of clipping. The patch below does
+the latter.
+
+Signed-off-by: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
 ---
- drivers/net/usb/ax88172a.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/usb/ax88172a.c b/drivers/net/usb/ax88172a.c
-index e47bb125048d..df00c62dd538 100644
---- a/drivers/net/usb/ax88172a.c
-+++ b/drivers/net/usb/ax88172a.c
-@@ -18,7 +18,7 @@
- struct ax88172a_private {
- 	struct mii_bus *mdio;
- 	struct phy_device *phydev;
--	char phy_name[20];
-+	char phy_name[MII_BUS_ID_SIZE + 3];
- 	u16 phy_addr;
- 	u16 oldmode;
- 	int use_embdphy;
-@@ -210,7 +210,10 @@ static int ax88172a_bind(struct usbnet *dev, struct usb_interface *intf)
- 	ret = asix_read_phy_addr(dev, priv->use_embdphy);
- 	if (ret < 0)
- 		goto free;
--
-+	if (ret >= PHY_MAX_ADDR) {
-+		netdev_err(dev->net, "Invalid PHY ID %x\n", ret);
-+		return -ENODEV;
-+	}
- 	priv->phy_addr = ret;
- 
- 	ax88172a_reset_phy(dev, priv->use_embdphy);
-@@ -308,7 +311,7 @@ static int ax88172a_reset(struct usbnet *dev)
- 		   rx_ctl);
- 
- 	/* Connect to PHY */
--	snprintf(priv->phy_name, 20, PHY_ID_FMT,
-+	snprintf(priv->phy_name, sizeof(priv->phy_name), PHY_ID_FMT,
- 		 priv->mdio->id, priv->phy_addr);
- 
- 	priv->phydev = phy_connect(dev->net, priv->phy_name,
--- 
-2.47.2
+diff --git a/net/mac80211/agg-rx.c b/net/mac80211/agg-rx.c
+index f3fbe5a4395e..264dad847842 100644
+--- a/net/mac80211/agg-rx.c
++++ b/net/mac80211/agg-rx.c
+@@ -317,18 +317,20 @@ void __ieee80211_start_rx_ba_session(struct sta_info *sta,
+                max_buf_size = IEEE80211_MAX_AMPDU_BUF_HT;
+
+        /* sanity check for incoming parameters:
+-        * check if configuration can support the BA policy
+-        * and if buffer size does not exceeds max value */
++        * check if configuration can support the BA policy */
+        /* XXX: check own ht delayed BA capability?? */
+        if (((ba_policy != 1) &&
+-            (!(sta->sta.deflink.ht_cap.cap & IEEE80211_HT_CAP_DELAY_BA))) ||
+-           (buf_size > max_buf_size)) {
+-               status = WLAN_STATUS_INVALID_QOS_PARAM;
++            (!(sta->sta.deflink.ht_cap.cap & IEEE80211_HT_CAP_DELAY_BA)))) {
++               status = WLAN_STATUS_INVALID_QOS_PARAM;
+                ht_dbg_ratelimited(sta->sdata,
+                                   "AddBA Req with bad params from %pM on tid
+%u. policy %d, buffer size %d\n",
+                                   sta->sta.addr, tid, ba_policy, buf_size);
+                goto end;
+        }
++       if (buf_size > max_buf_size) {
++         buf_size = max_buf_size ; // Clip instead of bailing out
++       }
++
+        /* determine default buffer size */
+        if (buf_size == 0)
+                buf_size = max_buf_size;
 
 
