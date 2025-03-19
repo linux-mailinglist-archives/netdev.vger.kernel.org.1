@@ -1,87 +1,112 @@
-Return-Path: <netdev+bounces-176348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 075CAA69CB8
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 00:27:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 67AE2A69CC6
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 00:36:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8CFE47A24A6
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 23:26:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4A2D7AFC20
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 23:35:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D1BE2236FA;
-	Wed, 19 Mar 2025 23:27:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E65AC224230;
+	Wed, 19 Mar 2025 23:36:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Eod0avKE"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QnBImN/V"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ACA51F8BB0;
-	Wed, 19 Mar 2025 23:27:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10D79223711
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 23:36:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742426857; cv=none; b=EjuDSjAHrp5OhK+8Eo3hxNGJXfD0CcSYBO83145ksnyWAYZUIgtaKA/KcSFA7kmxPiQXIJ3svmQ9oYEz6Q8ngJGR+77Dt7R39dPbje+dVTxRQVoHslI2p4RoPt9RPqohEFM9+oWMoHdLtOslCBwzUyzGXCvwEuHlpnyTHK9i64g=
+	t=1742427389; cv=none; b=BKoRUmLmiOQaCTL6n4hoToX+vpuQbS61GXWg5W5zDcUjHSyYeDtmlajVmIKO1LgHZlrmXWa+NVD0gveLMj4JhB2BYMQT5j5CBQzr0bxodHjG9fv4nouL3Z5C0NoaEb1AcyHL4Ztm+EvWCX5UoRhG5ajcdba5XOgP9/PfbCG8H+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742426857; c=relaxed/simple;
-	bh=hvq1bTUMlwX5m405oo0xg2qg3AaUFF6dySymH2ofkcU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m/YgcFJQa+Ldw0kmexiTJVLbBon37WYb5+nPJkWFfrL498LHuaahY9tpMFkoirzqdPhCb3WVwilKcRujRbgrqgyieTOmV/gafng/0vcTaOtoYQw8MvTjlK7zkMx11NiW/V5UJSxNORluLb6x8MIemMQ4LxJzGX9NvYRu/5Kd2cE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Eod0avKE; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=FdSpIzyf+llrdg8XcPEMUxKcgtQ++dr3cdEiEfiZOjg=; b=Eod0avKETzyIpe3Cfd2VNwFXlJ
-	muknsdw7nPJPkCBV6TgBw/dsbXbWdLUk8keX24+2KO+Qr876Y+nqlK/aLJGR+vF1vkRPf4xHgKkWD
-	AhI4/qN9GmvXwbPbsCIhjySMmUZiJ3rWeohuNMm5DzT7jkQhCNGPp6zStRJZ8AWHjgTk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tv2og-006QMr-97; Thu, 20 Mar 2025 00:27:18 +0100
-Date: Thu, 20 Mar 2025 00:27:18 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jonas Karlman <jonas@kwiboo.se>
-Cc: Heiko Stuebner <heiko@sntech.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	David Wu <david.wu@rock-chips.com>, Yao Zi <ziyao@disroot.org>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-rockchip@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH net-next v3 5/5] net: stmmac: dwmac-rk: Add initial
- support for RK3528 integrated PHY
-Message-ID: <d53a2119-2650-4a87-af94-1b9c2297cf72@lunn.ch>
-References: <20250319214415.3086027-1-jonas@kwiboo.se>
- <20250319214415.3086027-6-jonas@kwiboo.se>
+	s=arc-20240116; t=1742427389; c=relaxed/simple;
+	bh=YaRk1s+zKGq0iW53na4lPbKXthAEJqUr5Yf1QKrfQcg=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=oerwYUnLQKPRgJ/fIyI6V2AOMq74BsRwOxdzW2sgu+ZwK8OPMeZkv3I+zIxkdJk+1NA1RIJ3PDj8n7fsJ/qpoIy9alm4H7KVUpQra/+neOhpGT00Uk3ZIw7hhyXePnqWgeFYd643iAqx+bxhLf+hi1hg3U0joom2pkCwhUFElpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QnBImN/V; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250319214415.3086027-6-jonas@kwiboo.se>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1742427375;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=844+bFvi6TAU7lUIUgTQSz2iWfzhmszHPEf60+qFp+8=;
+	b=QnBImN/VO449dDkv3U3QRL7hRSidSmJ8OHba+RK799rWcGmbaMKw2XD/9Oj6KYDCfc4YQr
+	FnBO9EhNIaUm63vbjR1/lAtuuh/t3yG6wgq52jwVX+5KSaGysf8LdyzFi6ERlpxo+HotTe
+	v5LXpOst8ccObU+5LSs8LqvdmGB6Fvg=
+Date: Wed, 19 Mar 2025 23:36:13 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
+Message-ID: <48068a86ea99dffe1e7849fb544eac1746364afb@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH bpf-next v3 1/3] bpf, sockmap: avoid using sk_socket
+ after free when sending
+To: "Cong Wang" <xiyou.wangcong@gmail.com>
+Cc: john.fastabend@gmail.com, jakub@cloudflare.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, andrii@kernel.org, eddyz87@gmail.com, mykolal@fb.com,
+ ast@kernel.org, daniel@iogearbox.net, martin.lau@linux.dev,
+ song@kernel.org, yonghong.song@linux.dev, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, shuah@kernel.org,
+ mhal@rbox.co, sgarzare@redhat.com, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+In-Reply-To: <Z9tNAhMV1Y5znONo@pop-os.localdomain>
+References: <20250317092257.68760-1-jiayuan.chen@linux.dev>
+ <20250317092257.68760-2-jiayuan.chen@linux.dev>
+ <Z9tNAhMV1Y5znONo@pop-os.localdomain>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Mar 19, 2025 at 09:44:09PM +0000, Jonas Karlman wrote:
-> Rockchip RK3528 (and RV1106) has a different integrated PHY compared to
-> the integrated PHY on RK3228/RK3328.
+2025/3/20 07:02, "Cong Wang" <xiyou.wangcong@gmail.com> wrote:
 
-What ID does this PHY have? Is it just the reset which is different,
-or is it actually a different PHY, and the rockchip PHY driver needs
-additions?
+>=20
+>=20On Mon, Mar 17, 2025 at 05:22:54PM +0800, Jiayuan Chen wrote:
+>=20
+>=20>=20
+>=20> The sk->sk_socket is not locked or referenced, and during the call =
+to
+> >=20
+>=20
+> Hm? We should have a reference in socket map, whether directly or
+>=20
+>=20indirectly, right? When we add a socket to a socket map, we do call
+>=20
+>=20sock_map_psock_get_checked() to obtain a reference.
+>=20
 
-	Andrew
+Yes,=20but we remove psock from sockmap when sock_map_close() was called
+'''
+sock_map_close
+	lock_sock(sk);
+	rcu_read_lock();
+	psock =3D sk_psock(sk);
+        // here we remove psock and the reference of psock become 0
+	sock_map_remove_links(sk, psock)
+        psock =3D sk_psock_get(sk);
+        if (unlikely(!psock))
+            goto no_psock;     <=3D=3D=3D jmp to no_psock
+        rcu_read_unlock();
+        release_sock(sk);
+        cancel_delayed_work_sync(&psock->work); <=3D=3D no chance to run =
+cancel
+'''
+
+So I think we should hold the psock when backlog running
+
+Thanks,
 
