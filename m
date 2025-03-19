@@ -1,128 +1,136 @@
-Return-Path: <netdev+bounces-176206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15DCCA69593
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:56:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D556A6959E
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:59:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEA7019C4094
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 16:56:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C60143BAAC3
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 16:59:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1E181DF74E;
-	Wed, 19 Mar 2025 16:56:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9132B1E22E6;
+	Wed, 19 Mar 2025 16:59:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="sHbyR/WS"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Tq66VM76"
 X-Original-To: netdev@vger.kernel.org
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD1F1E520D;
-	Wed, 19 Mar 2025 16:56:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E5114D70E;
+	Wed, 19 Mar 2025 16:59:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742403389; cv=none; b=Apb+2mnUM8LL1bBsmC+uzG6Tg5YMZnhHCKeiDKJVQaDlRNl6H8u542vNzJ9qkGDNNv71qVxK8M4KnrMFWZeHMaWFsDxJkZeJNH8qUvcb4OuZDVihLGplZ/0qpxPc3iU/Nwpzf+/NjlG5UHt9nOa+T4bjiWynDPDwWlMRqJ7RC/Q=
+	t=1742403563; cv=none; b=KLgKKWdgJWxoea6VhfPBkgbZtq9maat6H5VXK/Llk1CeRYjCkmSw+kGLgcUJemGreYWs3/XlYw0SD7M7ujLbCv9yuijU7i9GzXtBnZx3KWwDHzrP4LiKx0b6eeosT1Giqakm3IVki61x7gX43xk2007zP2umDoJ/tOJWL9Q+rzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742403389; c=relaxed/simple;
-	bh=RwMY2A6TE8KPkV9oIN0tHDRAPp0fPsCc52F7JIiKjW4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZpRHz5XWeJ+3oN35gropBwa9Ye9HFnAWaNipuZm2Ey87mW9PQq6EbGV70j8aK/UidjwZV91F+2ZfTcixVRhIqppsavOmbxgBZiVidbQNjhk0TF6i4PNbdaTps1izKdRk/aX1ZtgFvllkWD3sXUiUyF6a7P63zi7KB5PUu+LYvq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b=sHbyR/WS; arc=none smtp.client-ip=78.47.171.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
-Received: from [192.168.2.30] (unknown [45.118.184.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: stefan@datenfreihafen.org)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id C1E0AC05A4;
-	Wed, 19 Mar 2025 17:56:16 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-	s=2021; t=1742403377;
+	s=arc-20240116; t=1742403563; c=relaxed/simple;
+	bh=C/oLQqGLGQ9DX0nwXmSdMgfjgHP3EaILZb0W8jEkeYk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uBojvTw3Y69xNiB22AqWQKFyxqcA9KJIYwdqHO1JUYoU1QhU00PYj2vDJ1v40DQx1FQWFLVLkRlDMphcJQXfNasf69tXblYr2XnbiusMbBa5Mdr8GPa2HQjRc31Th4C87R0lvmsKDksH50FozoMcdurpvjryJQgToA0BqUS900o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=Tq66VM76; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A4FAC4CEE4;
+	Wed, 19 Mar 2025 16:59:22 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Tq66VM76"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1742403561;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=xcgptT5JlLGVr/LMQ37kerorcLQmJz9N3ply/i/XhCw=;
-	b=sHbyR/WSgOE4AJx5+jCEj7yNxufJN4XS+iQs/XCuQrWNFrLFyFD9DQNHQ5Yo49valJxwIj
-	TDS+gJ35A+YppuWfNb0FpsamYvm/LhhjVQrHINStskgqHDn9O9CzFZi0vKflYBFPPQmLZt
-	TRDUbx3WaXIQ9ClDp0rZ2lwEkH8NLyIa3fGFvqsFrS9vTnprQSTnj022R8LUnXJByhRCAC
-	Bxb6UbnbIDX2pkhenYUCb67eMPaTE/AEsSjxjNOQY3FGudFHJiGL8XgXxzRP8/nfQunwai
-	D6wnkM+4eV6bEP4+nDu3TTepvfmMLBiLveSBJUkoAUAq9qRsnmBUYAy/tr5ATw==
-Message-ID: <ca515b13-f48c-43fe-b1c4-3fd2d9506083@datenfreihafen.org>
-Date: Wed, 19 Mar 2025 17:56:16 +0100
+	bh=uf/p7VlVNzQ814HdQ3t8Ub9K7Z0QRnEkUpNVCIzegLU=;
+	b=Tq66VM76yopfaCOE3UPF1qlAPt1DsX2zUYDHrSNummG1xYmOUI7d8Ewg8pRwES15HaorQh
+	bAv7+5B4aGoERuQIVOXGVzyCehOPPd1G3/XdxZzpA0ux+Kqg6s8VIUj2UF3RS5Dwklc4og
+	pWkNWnxxVysrGgrmfc8P7GhTYzMigRg=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7a205e8a (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Wed, 19 Mar 2025 16:59:20 +0000 (UTC)
+Date: Wed, 19 Mar 2025 17:59:16 +0100
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Dmitrii Ermakov <demonihin@gmail.com>
+Cc: wireguard@lists.zx2c4.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] wireguard: use rhashtables instead of hashtables
+Message-ID: <Z9r35H2rfLV8m5iW@zx2c4.com>
+References: <20250105110036.70720-2-demonihin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: pull-request: ieee802154-next 2025-03-10
-To: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net, kuba@kernel.org
-Cc: linux-wpan@vger.kernel.org, alex.aring@gmail.com,
- miquel.raynal@bootlin.com, netdev@vger.kernel.org
-References: <20250310185752.2683890-1-stefan@datenfreihafen.org>
- <91648005-0bf9-4839-8b8f-5151056c9f9a@datenfreihafen.org>
- <ae626131-20e6-4d7b-b5ec-5a9804917e51@redhat.com>
-Content-Language: en-US
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <ae626131-20e6-4d7b-b5ec-5a9804917e51@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250105110036.70720-2-demonihin@gmail.com>
 
-Hello Paolo,
+On Sun, Jan 05, 2025 at 12:00:17PM +0100, Dmitrii Ermakov wrote:
+> @@ -74,7 +75,6 @@ struct noise_handshake {
+>  	u8 remote_static[NOISE_PUBLIC_KEY_LEN];
+>  	u8 remote_ephemeral[NOISE_PUBLIC_KEY_LEN];
+>  	u8 precomputed_static_static[NOISE_PUBLIC_KEY_LEN];
+> -
+>  	u8 preshared_key[NOISE_SYMMETRIC_KEY_LEN];
+>  
+>  	u8 hash[NOISE_HASH_LEN];
+> @@ -83,6 +83,8 @@ struct noise_handshake {
+>  	u8 latest_timestamp[NOISE_TIMESTAMP_LEN];
+>  	__le32 remote_index;
+>  
+> +	siphash_key_t hash_seed;
 
-On 19.03.25 17:53, Paolo Abeni wrote:
-> On 3/14/25 7:37 AM, Stefan Schmidt wrote:
->> On 10.03.25 19:57, Stefan Schmidt wrote:
->>> Hello Dave, Jakub, Paolo.
->>>
->>> An update from ieee802154 for your *net-next* tree:
->>>
->>> Andy Shevchenko reworked the ca8210 driver to use the gpiod API and fixed
->>> a few problems of the driver along the way.
->>>
->>> regards
->>> Stefan Schmidt
->>>
->>> The following changes since commit f130a0cc1b4ff1ef28a307428d40436032e2b66e:
->>>
->>>     inet: fix lwtunnel_valid_encap_type() lock imbalance (2025-03-05 19:16:56 -0800)
->>>
->>> are available in the Git repository at:
->>>
->>>     git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan-next.git tags/ieee802154-for-net-next-2025-03-10
->>>
->>> for you to fetch changes up to a5d4d993fac4925410991eac3b427ea6b86e4872:
->>>
->>>     dt-bindings: ieee802154: ca8210: Update polarity of the reset pin (2025-03-06 21:55:18 +0100)
->>>
->>> ----------------------------------------------------------------
->>> Andy Shevchenko (4):
->>>         ieee802154: ca8210: Use proper setters and getters for bitwise types
->>>         ieee802154: ca8210: Get platform data via dev_get_platdata()
->>>         ieee802154: ca8210: Switch to using gpiod API
->>>         dt-bindings: ieee802154: ca8210: Update polarity of the reset pin
->>>
->>>    .../devicetree/bindings/net/ieee802154/ca8210.txt  |  2 +-
->>>    drivers/gpio/gpiolib-of.c                          |  9 +++
->>>    drivers/net/ieee802154/ca8210.c                    | 78 +++++++++-------------
->>>    3 files changed, 41 insertions(+), 48 deletions(-)
->>>
->>
->> Friendly reminder on this pull request. If anything blocks you from
->> pulling this, please let me know.
-> 
-> I'm just lagging behind the PW backlog quite a bit. The PR should be
-> merged soon.
-> 
-> Thanks for your patience,
+Why?
 
-No worries. As long as I know its in the queue and not fallen through 
-the cracks I have all the time needed. :-)
+> +#include "linux/printk.h"
+> +#include "linux/rcupdate.h"
+> +#include "linux/rhashtable-types.h"
+> +#include "linux/rhashtable.h"
+> +#include "linux/siphash.h"
 
-regards
-StefanSchmidt
+Seems wrong.
+
+> +#include "messages.h"
+>  #include "peer.h"
+>  #include "noise.h"
+> +#include "linux/memory.h"
+
+Ditto.
+
+>  
+> -static struct hlist_head *pubkey_bucket(struct pubkey_hashtable *table,
+> -					const u8 pubkey[NOISE_PUBLIC_KEY_LEN])
+> +static inline u32 index_hashfn(const void *data, u32 len, u32 seed)
+>  {
+> -	/* siphash gives us a secure 64bit number based on a random key. Since
+> -	 * the bits are uniformly distributed, we can then mask off to get the
+> -	 * bits we need.
+> -	 */
+> -	const u64 hash = siphash(pubkey, NOISE_PUBLIC_KEY_LEN, &table->key);
+> +	const u32 *index = data;
+> +	return *index;
+> +}
+
+But shouldn't this actually use siphash? What's happening here?
+
+> +struct peer_hash_pubkey {
+> +	siphash_key_t key;
+> +	u8 pubkey[NOISE_PUBLIC_KEY_LEN];
+> +};
+> +
+> +static inline u32 wg_peer_obj_hashfn(const void *data, u32 len, u32 seed)
+> +{
+> +	const struct wg_peer *peer = data;
+> +	struct peer_hash_pubkey key;
+> +	u64 hash;
+> +
+> +	memcpy(&key.key, &peer->handshake.hash_seed, sizeof(key.key));
+> +	memcpy(&key.pubkey, &peer->handshake.remote_static, NOISE_PUBLIC_KEY_LEN);
+> +
+> +	hash = siphash(&key.pubkey, NOISE_PUBLIC_KEY_LEN, &key.key);
+
+Why this weird construction with this other struct?
+
+I'll stop reading here. There's a lot of strangeness with this patch.
+Maybe it's workable with enough care, but I think to review this into
+shape, in its current state, would be about the same as just rewriting
+it.
 
