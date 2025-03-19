@@ -1,157 +1,146 @@
-Return-Path: <netdev+bounces-176279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B8ADA699A6
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 20:44:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CCE7A699B6
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 20:48:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA42B7AA2D8
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 19:43:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00A451887CD7
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 19:48:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 818D12135D8;
-	Wed, 19 Mar 2025 19:44:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 344EC20AF62;
+	Wed, 19 Mar 2025 19:48:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lH6rwQhR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a8r30kjT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 315561DE8BF;
-	Wed, 19 Mar 2025 19:44:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A80D18FDAF
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 19:48:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742413450; cv=none; b=Ayd1GmVAvEuIJ4qGh7OwXy7rhoRKijqVXw1/pj/oQQn0rOrGeJAYv2Bmg5mCsUjmKowiwzsad52Y23JAZlpew7F/3AzLg7NrWdgXdfCwIcb/DWX1I6FO8vMjGvetqgyGch26iDvVIquYU55/kawBwQ5KLbQi0L7fZ7pJLsB2CMQ=
+	t=1742413715; cv=none; b=Ll4IRWj3DbyNEGQ2GKYQ4ssMH6wa700zK4PKQbDzHwcI348wZ2aFii3lMU9t4wetaThQ7SCPTKbMmJTrg2uWryjpJW96kMpsVFdNt4LkFPIu0TSOs+53zju2F0ixy7fFAWporDJ3T8yamL/ZE9WAG48I5ql7pTBstvrNbcV7+vo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742413450; c=relaxed/simple;
-	bh=lLaat7az9MH7ezrPmTZOat/1ILwtVsbzCqb6WBBS0xo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=peEx9nBrcVl8cN+CeIFSO0A/Hx4P9M2U5RLDow0HkUbHPU/OAKBAZ/zlrKCOW0WMEXJ9gWX9ImhNq10FSkCLXGRwCtJcf3IV97/PKDEhTucAmJOXxiRMqLnXNMhYx1o3QgDdVCwa1I2UbbHGQtBQYnQF7uvrtbAKE9XHSl0dbMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lH6rwQhR; arc=none smtp.client-ip=209.85.208.173
+	s=arc-20240116; t=1742413715; c=relaxed/simple;
+	bh=BLDKQdbpNYDW6IGLkGH/hrgaXJgs14nnBVaIssBihrA=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=WJK6j0vJWtfNelN95dlFnApMiKMmuHAGxEsJyuskyJsBfuSi1K72ZF0v6WKVUcWaJfCdj+a3ifipQ65yIDPilWQJ3bhMhWzwGZ59+weyT4aJaH1lwgzL6XBrT/eFQCuKo9qIS2eL5yo6Izm+S80mUv3z8lSyHucloF9BXdXFhus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a8r30kjT; arc=none smtp.client-ip=209.85.160.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-30761be8fcfso900111fa.0;
-        Wed, 19 Mar 2025 12:44:07 -0700 (PDT)
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-471fe5e0a80so601241cf.1
+        for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 12:48:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742413446; x=1743018246; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1742413712; x=1743018512; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dhYCmAWKpYLqMT/P3WekE89t5CCM6z3es1ZH5Zq+OZE=;
-        b=lH6rwQhRqerh4Is+DTiJ02aPWFisBvD6Qit2LeRTKMkx4DxS9tUvESarSidTFULtaa
-         KyDwPDm2EiQJvJ1TfYtGnjiS4+gIxjlP3FyyzmiyhFUecLSf4T8badx+oThL9q+NPhdv
-         4AM1TQVyouq7+CzeFablf0+klkhAIA75sWpFjM2vMsmXIjuj3V6QdhPef0FkvRCAvvwD
-         RVh8/dwpEpkupx9vlB7bycVzxsLxn/sG0y7KjzP7UtFzzfBHSTzHYomW1OwiNMft0N/G
-         YU7npD9BarQsXsl6wK+n3sobnYrOyUUKUzST2HW8JvartW16yWq7FNC0HjVxpMbROw31
-         rDdA==
+        bh=q5QSZ9nHTtWNGOMKfkz9T1LY+MnYeD1HP5JGKgXrC9k=;
+        b=a8r30kjTrppFFIO1ZvRg4sdzeHGG5l6ECFwNI28wwYlLPCEC1ZLC2i1Ssbx9CDC7fp
+         9+kyzcukHhTom3z5JeskLX90myqENcsjdi/8rtLG++ldgyFOs1ELiAnO3DLtIbo38+D5
+         AYgk0cb0E0MQIBlqvnjIcO/ZjegtSf2mYkqZTiQwBbKD1G0Iy88p6+Ca1cdzLUWWk3Ya
+         Ax4+1kkvP4HSgRqtw4oUTPIuF/+X+1fAHnCiKRIzGlXlbRwjY0qA5aEZ6OWyk/nHCjxn
+         NJ8gA0h/NZviV/M6Gs05BrvBpxiaKt6pLowyncMUwHwAOaZx5SvaZ1IuxZ2TgKBbC0cd
+         W0bA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742413446; x=1743018246;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dhYCmAWKpYLqMT/P3WekE89t5CCM6z3es1ZH5Zq+OZE=;
-        b=NF0IxbWIvukcAHg12Nlyuna6izgv6APFfW3WLq0Or28W9xpvYj0vTBh5xALUWZQGZ2
-         0NWEeHVmy3GtFNdSUoUJLslJFEn07Lz0oDjHJZuI44Y89E8WJPPPcFz4o/JamuBrerjq
-         JMHEJwUUtV+MU7glIs/MDv+VKgcDm7PSwCKD11foRfTH9u0gFwoLd/XdpeSazJmjCn5L
-         FwQWCH6HS5YfFDdtYZoH/YwYR8ek6nlXSIHlqta+fVMtFGF7G/qr/w1QrpvCIc3REIxG
-         +tloAK/sAZeJb7lxwqBKmjZgTyWtIqr+YG79MDGH7tCSwPOH9Cew70cIgh1hUl/nzl1w
-         CD4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWIp0FfPmrSkNSuuO8OL2jKMc0S9r4+jjmw7Dkk1toyeIWG6ajw7MiM6gTvSsOY88hhFcoRyb77D2jGPQ==@vger.kernel.org, AJvYcCXFVZGbhfXAXWqUTsQaPJjIOXgobe3iumRA1J+2qKboliW6CtslbCJHnVrpvjquRVLXXmE=@vger.kernel.org, AJvYcCXSVrfNdRR1+1EolQiV3Oly5PS2BM8bM9Qkq/4wLku9D76JdUcsK7ynSEgRm7VyNq5Ltx0wuHGG@vger.kernel.org, AJvYcCXfFlIRME9iJ02AwKQwodCbW6nhPzl+guzriAENLbBJVySI+fq3OUId44SyOmAXA/fwkB0vAFulvoPrXGCe@vger.kernel.org
-X-Gm-Message-State: AOJu0YyqBCN8RmWY4e33lXp8qxLR5ot3gRB/lBxgjmaWkBvrp0E4Q1pi
-	704lpiT/itP6msAJU3msIS1NJIoylFQ6/DDMFzI5s/XllZZ2g5i+lBgXYxsqF4sM1sw9bVmbMMa
-	aBPa5QDznTUIxkQReU3yhSf202+YhoeaJ2S7XpQ==
-X-Gm-Gg: ASbGncsoM4uuZtXAQ9c+ZXGdKdzWYKG76GrKQHh6sXV128rEjIvYCIVLcBkIyDtv4xa
-	P3mi07shB3dzrZMTMdziAxQq/1HGpsHfbftE0oXPi5oL+Yg1hLlGF1gml/KB5x/XooJEkmUCpMU
-	IFmR7YWaeN01QaAJNrv7rWFeEVug==
-X-Google-Smtp-Source: AGHT+IEqb8DYNNrbGP7rciW1niUuSjBxj6+DvYT/JveS26p0kxZ66Mnhoo+Sfd+hkXEbRXMLTPNGW4rQ78klTXJrpGI=
-X-Received: by 2002:a05:651c:2119:b0:30b:bf6f:66a3 with SMTP id
- 38308e7fff4ca-30d6a40c9b2mr17799441fa.17.1742413445934; Wed, 19 Mar 2025
- 12:44:05 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1742413712; x=1743018512;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=q5QSZ9nHTtWNGOMKfkz9T1LY+MnYeD1HP5JGKgXrC9k=;
+        b=nW47mEnbtB4Fj6/tY1rDNtjna+XQMsgMoblNArR0h52avlrZEZKKtookop8k69uP0+
+         PYM04jUldPKgHXSPimbtWGtr57zVQZ3dEkUhkIxDfyDxdhsLtmwpxcr7Hshi1ZzRBhm0
+         ydepNz528/Zh/JZ5z8f9zW9C79toMHNmoQ2RT0+1J1+VEdyER8FCUKAifbyYsS3Yj1aT
+         Do5JQyikiVVqnjhNPeZdCc8etbnat3cC/jhxCdJC+9vzOGWQW0tuT/8RNaHUZAcxcN8Q
+         vhSAJZ4PNXzWLBFa8k9JRkqnvujF2zbjFnqA1gf1LDkUIWmrQpmGfmV2eYoPo94TM6aP
+         AChg==
+X-Forwarded-Encrypted: i=1; AJvYcCURkz9TBQTeSaFRywVXGkJ3hVWjemN0sNYEmHr0pEyBQJ4cd1don2wH78QhnkA/H8Ff0S84oag=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTMFDUK0Dcl3nfolRM5n9pVV8SvpHu3sORFGuKSqV9J/59ef6t
+	7Qae6E4HWbkx6qEEVFh/ceBNbbxSV/e66O0sLvygt6k/8BxRdiUJ
+X-Gm-Gg: ASbGncsE0/2XXT6Qd1GuTdJd9TieJeeH4Tr40XoYvZod5QyC81PV0AimBRkl4sBfZRs
+	dag+iYOjHW0jUd8q0Dkbu78XfMZHyIU6NuUJ1uiJSup5DMiMJl9nN5/0XaFzPllbzxINCWhawqv
+	lJd53szgj72r9knJXRs9pfBVrT+1xt4Podu3YmsIMtDWfglvU2o1I/qTR6ht0ZTLKwvExkq/MGh
+	vhH6aADVJ87e9EXSiYoJ8s3EimnGzYW/LTXjSnVo/pXHSVwXDY18FgaPTcG7wkwvWNg0sugSMem
+	B6IBM2rreNGqMfAKauQcfBdOK8BlzvyqRM01TW8nE2TC/y60HZuUcmlfEn6iyWNVBLYSxo376Fz
+	pmSNeznfZ8dDHocWHVfXj2w==
+X-Google-Smtp-Source: AGHT+IFfLubXrxasbaPNkDiU7ay340aWHUf3USRGQyY1Pf4gvExVVI60BRr0qlgZpo4TyJnacp2wdg==
+X-Received: by 2002:a05:622a:598f:b0:476:8595:fa09 with SMTP id d75a77b69052e-47708378529mr60643091cf.40.1742413712452;
+        Wed, 19 Mar 2025 12:48:32 -0700 (PDT)
+Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-476bb60aac8sm83028341cf.15.2025.03.19.12.48.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Mar 2025 12:48:31 -0700 (PDT)
+Date: Wed, 19 Mar 2025 15:48:31 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, 
+ willemdebruijn.kernel@gmail.com
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ horms@kernel.org, 
+ kuba@kernel.org, 
+ kuni1840@gmail.com, 
+ kuniyu@amazon.com, 
+ netdev@vger.kernel.org, 
+ pabeni@redhat.com
+Message-ID: <67db1f8f1e49c_2a13f2941e@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250319181821.17223-1-kuniyu@amazon.com>
+References: <67db03aba87a1_1367b29420@willemb.c.googlers.com.notmuch>
+ <20250319181821.17223-1-kuniyu@amazon.com>
+Subject: Re: [PATCH v1 net-next 2/4] af_unix: Move internal definitions to
+ net/unix/.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250319133309.6fce6404@canb.auug.org.au> <CAADnVQKotSrp8CkVpFw-y800NJ_R7An-iw-twrQZaOdYUeRtqQ@mail.gmail.com>
- <CAP01T76CqOxzEiMLKJ2y_YD=qDgWq+Fq5Zy-fnKP4AAyS30Dwg@mail.gmail.com>
- <CAP01T77_qMiMmyeyizud=-sbBH5q1jvY_Jkj-QLZqM1zh0a2hg@mail.gmail.com>
- <CAP01T77St7cpkvJ7w+5d3Ji-ULdz04QhZDxQWdNSBX9W7vXJCw@mail.gmail.com>
- <CAADnVQ+8apdQtyvMO=SKXCE_HWpQEo3CaTUwd39ekYEj-D4TQA@mail.gmail.com>
- <CAFULd4brsMuNX3-jJ44JyyRZqN1PO9FwJX7N3mvMwRzi8XYLag@mail.gmail.com> <CAADnVQ+7GTN0Tn_5XSZKGDwrjW=v3R6MyGrcDnos2QpkNSidAw@mail.gmail.com>
-In-Reply-To: <CAADnVQ+7GTN0Tn_5XSZKGDwrjW=v3R6MyGrcDnos2QpkNSidAw@mail.gmail.com>
-From: Uros Bizjak <ubizjak@gmail.com>
-Date: Wed, 19 Mar 2025 20:43:53 +0100
-X-Gm-Features: AQ5f1JoUJCMzHHENT_TDzaIDzJZhTJniayHR3OV_fr-rf4VmnbYHKYqMpdSbmXo
-Message-ID: <CAFULd4aHiEaJkJANNGwv1ae7T0oLd+r9_4+tozgAq0EZhS16Tw@mail.gmail.com>
-Subject: Re: linux-next: build failure after merge of the bpf-next tree
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Kumar Kartikeya Dwivedi <memxor@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, bpf <bpf@vger.kernel.org>, 
-	Networking <netdev@vger.kernel.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 19, 2025 at 7:56=E2=80=AFPM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Wed, Mar 19, 2025 at 9:06=E2=80=AFAM Uros Bizjak <ubizjak@gmail.com> w=
-rote:
-> >
-> > On Wed, Mar 19, 2025 at 3:55=E2=80=AFPM Alexei Starovoitov
-> > <alexei.starovoitov@gmail.com> wrote:
-> > >
-> > > On Wed, Mar 19, 2025 at 7:36=E2=80=AFAM Kumar Kartikeya Dwivedi
-> > > <memxor@gmail.com> wrote:
-> > > >
-> > > > > >
-> > > > > > I've sent a fix [0], but unfortunately I was unable to reproduc=
-e the
-> > > > > > problem with an LLVM >=3D 19 build, idk why. I will try with GC=
-C >=3D 14
-> > > > > > as the patches require to confirm, but based on the error I am =
-99%
-> > > > > > sure it will fix the problem.
-> > > > >
-> > > > > Probably because __seg_gs has CC_HAS_NAMED_AS depends on CC_IS_GC=
-C.
-> > > > > Let me give it a go with GCC.
-> > > > >
-> > > >
-> > > > Can confirm now that this fixes it, I just did a build with GCC 14
-> > > > where Uros's __percpu checks kick in.
-> > >
-> > > Great. Thanks for checking and quick fix.
-> > >
-> > > btw clang supports it with __attribute__((address_space(256))),
-> > > so CC_IS_GCC probably should be relaxed.
-> >
-> > https://github.com/llvm/llvm-project/issues/93449
-> >
-> > needs to be fixed first. Also, the feature has to be thoroughly tested
-> > (preferably by someone having a deep knowledge of clang) before it is
-> > enabled by default.
->
-> clang error makes sense to me.
+Kuniyuki Iwashima wrote:
+> From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+> Date: Wed, 19 Mar 2025 13:49:31 -0400
+> > Kuniyuki Iwashima wrote:
+> > > net/af_unix.h is included by core and some LSMs, but most definitions
+> > > need not be.
+> > > 
+> > > Let's move struct unix_{vertex,edge} to net/unix/garbage.c and other
+> > > definitions to net/unix/af_unix.h.
+> > > 
+> > > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > 
+> > One trade-off with these kinds of refactors is that it adds an
+> > indirection in git history: a git blame on a line no longer points to
+> > the relevant commit.
+> 
+> Right, and git has a useful option for that.
+> 
+> 
+> > 
+> > Whether the trade-off is worth it is subjective, your call. Just
+> > making it explicit.
+> > 
+> > I still manually check out pre UDP/UDPLite split often to go back in
+> > udp history, for instance.
+> 
+> I often use -C5 (track 5 times for line/file moves) and hope this
+> helps you :)
+> 
+> $ git blame -C1 net/unix/af_unix.h 
+> Blaming lines: 100% (75/75), done.
+> b24413180f5600 include/net/af_unix.h               (Greg Kroah-Hartman       2017-11-01 15:07:57 +0100  1) /* SPDX-License-Identifier: GPL-2.0 */
+> d48846033064e3 net/unix/af_unix.h                  (Kuniyuki Iwashima        2025-03-15 00:54:46 +0000  2) #ifndef __AF_UNIX_H
+> d48846033064e3 net/unix/af_unix.h                  (Kuniyuki Iwashima        2025-03-15 00:54:46 +0000  3) #define __AF_UNIX_H
+> d48846033064e3 net/unix/af_unix.h                  (Kuniyuki Iwashima        2025-03-15 00:54:46 +0000  4) 
+> cae9910e73446c net/unix/diag.c                     (Felipe Gasper            2019-05-20 19:43:51 -0500  5) #include <linux/uidgid.h>
+> ^1da177e4c3f41 include/net/af_unix.h               (Linus Torvalds           2005-04-16 15:20:36 -0700  6) 
 
-It is not an error, but an internal compiler error. This should never happe=
-n.
+Thanks! I can't believe I did not know about this. That
+certainly mitigates the busywork around refactoring a bit.
 
-> What does it even mean to do addr space cast from percpu to normal addres=
-s:
->
-> __typeof__(int __seg_gs) const_pcpu_hot;
-> void *__attribute____UNIQUE_ID___addressable_const_pcpu_hot612 =3D
->     (void *)(long)&const_pcpu_hot;
 
-Please see [1] for an explanation.
-
-[1] https://gcc.gnu.org/onlinedocs/gcc/Named-Address-Spaces.html#x86-Named-=
-Address-Spaces
-
-Uros.
 
