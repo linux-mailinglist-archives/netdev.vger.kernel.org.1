@@ -1,162 +1,250 @@
-Return-Path: <netdev+bounces-176232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6236DA696C5
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 18:45:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E3DDA696C7
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 18:45:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1869919C47FB
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:45:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D514882AAE
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:45:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88004205E16;
-	Wed, 19 Mar 2025 17:44:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 713271FDA69;
+	Wed, 19 Mar 2025 17:45:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c536cHJd"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="biyyC0Ci"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45DA1E5B8A
-	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 17:44:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5731DF256
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 17:45:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742406297; cv=none; b=hNSAPWad3+MhvkuAPiIbDlOXhvithOSHqrvByj/MKkRki8Q2Wu+yUo+ZiKwUwu3sWC2VfpHiOJjffJh9H2Cl4G6dU34VXMAr3xMKSV3xF3kfq/i578hiNxaRi1m4uGwyMnp4PJLjAmydn3Z7TE1t2Mgnz4lX76abbTf5PWNToP4=
+	t=1742406329; cv=none; b=aZ8VcgoLAq2j1DZpsnzdw8aBk6pbjycXThBIGgPxZ7G4n2YiC/lo/a4ybVXp0zhuWPhji2ZE2Vnpn5jdZSTzoifZE2YEWmbCaJHcAqyOXlmW5astITXgjrFo3qE+1YVjgppKaQ/EQHUd0XMl16k7YigzzuWcYLgvzIGAZFW8bXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742406297; c=relaxed/simple;
-	bh=qgmBVv1+iO1zBtNLuGNVbOE7noKD+lcS9LJZdfGI2nU=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=aQwxdeloM1v3DrutBAm3T5jFNH3q8XIVhOH+X00B4+ObyXTG8vp+57WZwbJNlGq3K8Dt1aQ6X7qFxWxZ+eCZbdT3UjTEGdGk/yr4TRfbHcMWAp9XIST1v4zFBAoXUf3jgl3yN1ZQ8cbX4cXyfYj0DRAwsJXd5dcDmbTtVZEmBQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c536cHJd; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7c554d7dc2aso1113116185a.3
-        for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 10:44:55 -0700 (PDT)
+	s=arc-20240116; t=1742406329; c=relaxed/simple;
+	bh=Mja/DsqMC96aBenZikHbYJ7mmYRS4Gju4qJTnOUreFE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CcrwU/os7vFf6oaj04oQzZHWKcTgkq2gQWLt34i8B5nyUXZbdAOpt7gUVRFxu2ewL9HDpy8zFa6klAj8n5/ByM+A8NQZ7h8qpSK71sgMMUcsXeVbkEQLwI0xHFnuHlN04UY9W1++a3X+oTAdjrTC8aJWb7MbxI0GhnpOMxN8E2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=biyyC0Ci; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-223a7065ff8so60777835ad.0
+        for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 10:45:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742406295; x=1743011095; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M+o6ofympSPYwfyUQQxw/T2qMcpCmSc7tPx/FfKUNzg=;
-        b=c536cHJdbJQ9r0foGPBgzLuSfFGkTflDANNwIB7Xo3YtCQCnAT+8z4TBTmqNdVz5yK
-         ANf0sn3tFDgcFvOS3bzZEG2q12GLVoz48HTrBtAH8jJmasbdb26gW+JFASQPzthaza1E
-         v3zyUf5v46K6HUQ0Xh34yLXYdWM3CLjFKnXikTIgy7ZicWPwU/JzOl27yJv3VSjPjGaZ
-         vLCJoeLsPR6fFTSVJxBDzKRbMgQSnNpNcbI4jicOjeidwGH6HL6OlyRH8rT5zUYS/wgf
-         2qFhkrkpzigY6jcvBx4kKtztjwn579kbPi82G6VFdOZQ0kbqUoQAaOnxeBKwQh0G5OkA
-         Nj7A==
+        d=fastly.com; s=google; t=1742406327; x=1743011127; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=88yW33TrWIk/+/WaI5H9h1QmYyDkMe4Hu9deS8t+58M=;
+        b=biyyC0CidajeDa7Wg0pt7wfyYZZOZLbjQReMFZW/rVpEewIuWNO8Ax1CIz6Cw/iE8F
+         SutXvBmY8l5JfvXre1l+/hxuFPtHvxtQ+qUj+6vuz8fCrloLxxu7eFqzJyOoNJBmkkR2
+         K757qV5PZ9fzsIOXsHG1NnJom0T7GfETHUvy0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742406295; x=1743011095;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=M+o6ofympSPYwfyUQQxw/T2qMcpCmSc7tPx/FfKUNzg=;
-        b=OM6GSkHUsK6nqZYmcwmbBw7TAEfCtpgGeYzF+FMQFhn0WspKrVO6Rv3JrNqZZUl8fK
-         x1QXK4IodYGXdbbakM5XyYV81UAswBmHUBDUeAIwzDtOCacRpgprNhUTpt90misjjfmk
-         82uRbn2Y3SN3jGXYE9nDI1Ct17+GDTabmHbBhpKgm/2vLvIFIRSSuHFfdYnFS+WfoZjq
-         5wRc9b7H4Gn8nVTyuL3HyC6b+JICv3SvnulZpazrGpydgMUwrXlqtDKq2z0D8IgDCsl5
-         +8tQZN9Wo6t49RKfC9bnRNMExogWKrqigglhDpRoMq+0a1scMhq5SPbNd4rsXQLLDI/H
-         4YWA==
-X-Forwarded-Encrypted: i=1; AJvYcCXWFRoB7Mzhz70C3s/KkbJ7oS8D9MFEwDLwzwqx2fHa6IPJpcsmZ1sAPLuYMQNTwBWaCxJuLy8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxm6FD3RJ3NZvJRUYVXKyoDQ1+018NEqamqk7p6s3pcxR9G4U/t
-	3govEGULY5v9UJugE20rfPvA99kR9KU5BUHGKdL3kU6vd6xTCOmY
-X-Gm-Gg: ASbGnctftNUk+ax+EYSuPK57VOCD7W+vmIWqanOOI794vDMrVVpuBvqb1bSGcACoovT
-	ZdZGG4mpbyBp7C7ZkYpJfOaeLEVD102+G7itJ+HoRL/R35kdI5f9ER32k5xhwVBzutmtInYiIxE
-	ZMAcyDTCrKq2AsZvWI3ycFHfQXMRJ5UoVplTGZbhxV38FoctOB4Y5LBM57cKqGvyUkfxJ8HEO07
-	gdwZSdmu87OupI+rQm2gvZTH/JMUsv5/wUfhLl8bVypotzaqeC7J2MaXYuj15i7YyZNDAsSrVY8
-	NHsN7HK6+KyiKFMNt5Pz/bh9yXUysJUGUmkWUupxTQKY80zMUmjYJnh2UhhIKIoP9fDOOg2dQgF
-	IrkpiLJvaXKVfWjxttorOyg==
-X-Google-Smtp-Source: AGHT+IESPBgjo2/deVdlU1+KWDduu04TTHZz2JkBaZOTcFjRb5OkFlzzL+qc3wyeSVln7cfC2dXhIA==
-X-Received: by 2002:a05:620a:4550:b0:7c3:cde7:a685 with SMTP id af79cd13be357-7c5a8396ad0mr480743285a.13.1742406294526;
-        Wed, 19 Mar 2025 10:44:54 -0700 (PDT)
-Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c573c7859bsm883613985a.34.2025.03.19.10.44.53
+        d=1e100.net; s=20230601; t=1742406327; x=1743011127;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=88yW33TrWIk/+/WaI5H9h1QmYyDkMe4Hu9deS8t+58M=;
+        b=H8pk0sdWSnOajLhgC93rDIonAf+eclFjw/xHgbDXOK5aoMShKrEuBmbj9T1lj+QsQH
+         0clEfYSpfBSjcd72W5Z1pnlv0odExNS2T0vYSHdJQur4lfMNhGEcIWk5Xfy71Gl1yf/E
+         uy7h/Ju66XLB2ART/4HOH7f6UP0hwZeC8e9T78XiQkESPLWuw49JO8k4P/VlTTPKY9rc
+         uWtQ1QBBoGapuS/dx1NR5AELSMG62hGGjl3SpUgDHTBAmtuDXW5kuPQ24iYeGLVu3305
+         8WNt+hXFUsnJajHQrLD0lAB699V/NoqxWF9fNwpWViv7qqan08HgM/UopelmdG7Zn8vW
+         +0jg==
+X-Forwarded-Encrypted: i=1; AJvYcCWCynGNtcyD67tzqtKTY+7SBtC4EOuvWlQILe0bjjz1Cv4cqk/hLB2Xdw6Ux+umpz5pgJSuau8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy12DtbYzgw9E0zz0pg+SF015rz2ETlTdQdP5deOLZv/+zI7Gkn
+	6c7zBiPpdbKEKEOVvd7feOP5LHan7PPrjZq1o9ZQvcxvlqweSpc4l4zO5O7nfgQ=
+X-Gm-Gg: ASbGncsi2QFi4xZsqSMVfkf0nj+K3qc1xNwnTOM0Dq+J8svYzZe+sgbxU6QDPs62E48
+	nhDWSjLYBiwySV5WhUTdKdOwuLGYbJFrBpLvx3iJBLYYvwBCb6/sGBdTKTlVt8sfYflEYJenw38
+	6pM9WGUA+MdAlSNSozXNKNMfSE/o/k5neDipfhuwVka8P29BonM87UEFU08WsV7VswD9hHaFgmg
+	Dd13YMK9G275Bxi4PGmfIYhXCwgdjJZhvjedb6nGUNYFnQs+gVDJLl8GCqixJlm/Xjx2goSJgkA
+	XizgGBZSmIYn9P84bNv2Y7yeNzaPqXCQlqsosGMoSFVy3mdjbHowwKywrHs1ovJlPpK7PEXKoVu
+	Hf2Zkp8blXPOzDNa7
+X-Google-Smtp-Source: AGHT+IERFHHbx0A4wA9qJdQkKklw0ufeU3XYHswtvVKJOCpGkGhgwLEpUnI6jmKEfZkWMIg4V+8Kpw==
+X-Received: by 2002:a17:903:1790:b0:224:283f:a9ef with SMTP id d9443c01a7336-2264981d654mr49179945ad.6.1742406326748;
+        Wed, 19 Mar 2025 10:45:26 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22634aa7462sm36188005ad.224.2025.03.19.10.45.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Mar 2025 10:44:54 -0700 (PDT)
-Date: Wed, 19 Mar 2025 13:44:53 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, 
- David Ahern <dsahern@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Simon Horman <horms@kernel.org>, 
- Willem de Bruijn <willemb@google.com>, 
- steffen.klassert@secunet.com
-Message-ID: <67db0295aca11_1367b2949e@willemb.c.googlers.com.notmuch>
-In-Reply-To: <4619a067-6e54-47fd-aa8b-3397a032aae0@redhat.com>
-References: <6001185ace17e7d7d2ed176c20aef2461b60c613.1742323321.git.pabeni@redhat.com>
- <67dad64082fc5_594829474@willemb.c.googlers.com.notmuch>
- <4619a067-6e54-47fd-aa8b-3397a032aae0@redhat.com>
-Subject: Re: [PATCH net-next] udp_tunnel: properly deal with xfrm gro encap.
+        Wed, 19 Mar 2025 10:45:26 -0700 (PDT)
+Date: Wed, 19 Mar 2025 10:45:22 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, asml.silence@gmail.com,
+	linux-fsdevel@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, horms@kernel.org, linux-api@vger.kernel.org,
+	linux-arch@vger.kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
+	kuba@kernel.org, shuah@kernel.org, sdf@fomichev.me,
+	mingo@redhat.com, arnd@arndb.de, brauner@kernel.org,
+	akpm@linux-foundation.org, tglx@linutronix.de, jolsa@kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [RFC -next 00/10] Add ZC notifications to splice and sendfile
+Message-ID: <Z9sCsooW7OSTgyAk@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	asml.silence@gmail.com, linux-fsdevel@vger.kernel.org,
+	edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+	linux-api@vger.kernel.org, linux-arch@vger.kernel.org,
+	viro@zeniv.linux.org.uk, jack@suse.cz, kuba@kernel.org,
+	shuah@kernel.org, sdf@fomichev.me, mingo@redhat.com, arnd@arndb.de,
+	brauner@kernel.org, akpm@linux-foundation.org, tglx@linutronix.de,
+	jolsa@kernel.org, linux-kselftest@vger.kernel.org
+References: <20250319001521.53249-1-jdamato@fastly.com>
+ <Z9p6oFlHxkYvUA8N@infradead.org>
+ <Z9rjgyl7_61Ddzrq@LQ3V64L9R2>
+ <2d68bc91-c22c-4b48-a06d-fa9ec06dfb25@kernel.dk>
+ <Z9r5JE3AJdnsXy_u@LQ3V64L9R2>
+ <19e3056c-2f7b-4f41-9c40-98955c4a9ed3@kernel.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <19e3056c-2f7b-4f41-9c40-98955c4a9ed3@kernel.dk>
 
-Paolo Abeni wrote:
-> 
-> 
-> On 3/19/25 3:35 PM, Willem de Bruijn wrote:
-> > Paolo Abeni wrote:
-> >> The blamed commit below does not take in account that xfrm
-> >> can enable GRO over UDP encapsulation without going through
-> >> setup_udp_tunnel_sock().
+On Wed, Mar 19, 2025 at 11:20:50AM -0600, Jens Axboe wrote:
+> On 3/19/25 11:04 AM, Joe Damato wrote:
+> > On Wed, Mar 19, 2025 at 10:07:27AM -0600, Jens Axboe wrote:
+> >> On 3/19/25 9:32 AM, Joe Damato wrote:
+> >>> On Wed, Mar 19, 2025 at 01:04:48AM -0700, Christoph Hellwig wrote:
+> >>>> On Wed, Mar 19, 2025 at 12:15:11AM +0000, Joe Damato wrote:
+> >>>>> One way to fix this is to add zerocopy notifications to sendfile similar
+> >>>>> to how MSG_ZEROCOPY works with sendmsg. This is possible thanks to the
+> >>>>> extensive work done by Pavel [1].
+> >>>>
+> >>>> What is a "zerocopy notification" 
+> >>>
+> >>> See the docs on MSG_ZEROCOPY [1], but in short when a user app calls
+> >>> sendmsg and passes MSG_ZEROCOPY a completion notification is added
+> >>> to the error queue. The user app can poll for these to find out when
+> >>> the TX has completed and the buffer it passed to the kernel can be
+> >>> overwritten.
+> >>>
+> >>> My series provides the same functionality via splice and sendfile2.
+> >>>
+> >>> [1]: https://www.kernel.org/doc/html/v6.13/networking/msg_zerocopy.html
+> >>>
+> >>>> and why aren't you simply plugging this into io_uring and generate
+> >>>> a CQE so that it works like all other asynchronous operations?
+> >>>
+> >>> I linked to the iouring work that Pavel did in the cover letter.
+> >>> Please take a look.
+> >>>
+> >>> That work refactored the internals of how zerocopy completion
+> >>> notifications are wired up, allowing other pieces of code to use the
+> >>> same infrastructure and extend it, if needed.
+> >>>
+> >>> My series is using the same internals that iouring (and others) use
+> >>> to generate zerocopy completion notifications. Unlike iouring,
+> >>> though, I don't need a fully customized implementation with a new
+> >>> user API for harvesting completion events; I can use the existing
+> >>> mechanism already in the kernel that user apps already use for
+> >>> sendmsg (the error queue, as explained above and in the
+> >>> MSG_ZEROCOPY documentation).
 > >>
-> >> At deletion time such socket will still go through
-> >> udp_tunnel_cleanup_gro(), and the failed GRO type lookup will
-> >> trigger the reported warning.
-> >>
-> >> We can safely remove such warning, simply performing no action
-> >> on failed GRO type lookup at deletion time.
-> >>
-> >> Reported-by: syzbot+8c469a2260132cd095c1@syzkaller.appspotmail.com
-> >> Closes: https://syzkaller.appspot.com/bug?extid=8c469a2260132cd095c1
-> >> Fixes: 311b36574ceac ("udp_tunnel: use static call for GRO hooks when possible")
-> >> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> >> The error queue is arguably a work-around for _not_ having a delivery
+> >> mechanism that works with a sync syscall in the first place. The main
+> >> question here imho would be "why add a whole new syscall etc when
+> >> there's already an existing way to do accomplish this, with
+> >> free-to-reuse notifications". If the answer is "because splice", then it
+> >> would seem saner to plumb up those bits only. Would be much simpler
+> >> too...
 > > 
-> > Because XFRM does not call udp_tunnel_update_gro_rcv when enabling its
-> > UDP GRO offload, from set_xfrm_gro_udp_encap_rcv. But it does call it
-> > when disabling the offload, as called for all udp sockest from
-> > udp(v6)_destroy_sock. (Just to verify my understanding.)
+> > I may be misunderstanding your comment, but my response would be:
+> > 
+> >   There are existing apps which use sendfile today unsafely and
+> >   it would be very nice to have a safe sendfile equivalent. Converting
+> >   existing apps to using iouring (if I understood your suggestion?)
+> >   would be significantly more work compared to calling sendfile2 and
+> >   adding code to check the error queue.
 > 
-> Exactly.
-> 
-> > Not calling udp_tunnel_update_gro_rcv on add will have the unintended
-> > side effect of enabling the static call if one other tunnel is also
-> > active, breaking UDP GRO for XFRM socket, right?
-> 
-> Ouch, right again. I think we can/should do better.
-> 
-> Given syzkaller has found another splat with no reproducer on the other
-> UDP GRO change of mine [1] and we are almost at merge window time, I'm
-> considering reverting entirely such changes and re-submit later
-> (hopefully fixed). WDYT?
+> It's really not, if you just want to use it as a sync kind of thing. If
+> you want to have multiple things in flight etc, yeah it could be more
+> work, you'd also get better performance that way. And you could use
+> things like registered buffers for either of them, which again would
+> likely make it more efficient.
 
-Your call. I suspect that we can forward fix this. But yes, that is
-always the riskier approach. And from a first quick look at the
-report, the right fix is not immediately glaringly obvious indeed.
+I haven't argued that performance would be better using sendfile2
+compared to iouring, just that existing apps which already use
+sendfile (but do so unsafely) would probably be more likely to use a
+safe alternative with existing examples of how to harvest completion
+notifications vs something more complex, like wrapping iouring.
 
-> Thanks,
-> 
-> Paolo
-> 
-> [1] https://syzkaller.appspot.com/bug?extid=1fb3291cc1beeb3c315a
-> I *think* moving:
-> 
-> 	if (!up->tunnel_list.pprev)
-> 
-> from udp_tunnel_cleanup_gro() into udp_tunnel_update_gro_lookup(), under
-> the udp_tunnel_gro_lock spinlock should fix it, but without a repro it's
-> a bit risky,
-> 
+> If you just use it as a sync thing, it'd be pretty trivial to just wrap
+> a my_sendfile_foo() in a submit_and_wait operation, which issues and
+> waits on the completion in a single syscall. And if you want to wait on
+> the notification too, you could even do that in the same syscall and
+> wait on 2 CQEs. That'd be a downright trivial way to provide a sync way
+> of doing the same thing.
 
+I don't disagree; I just don't know if app developers:
+  a.) know that this is possible to do, and
+  b.) know how to do it
 
+In general: it does seem a bit odd to me that there isn't a safe
+sendfile syscall in Linux that uses existing completion notification
+mechanisms.
+
+> > I would also argue that there are likely user apps out there that
+> > use both sendmsg MSG_ZEROCOPY for certain writes (for data in
+> > memory) and also use sendfile (for data on disk). One example would
+> > be a reverse proxy that might write HTTP headers to clients via
+> > sendmsg but transmit the response body with sendfile.
+> > 
+> > For those apps, the code to check the error queue already exists for
+> > sendmsg + MSG_ZEROCOPY, so swapping in sendfile2 seems like an easy
+> > way to ensure safe sendfile usage.
+> 
+> Sure that is certainly possible. I didn't say that wasn't the case,
+> rather that the error queue approach is a work-around in the first place
+> for not having some kind of async notification mechanism for when it's
+> free to reuse.
+
+Of course, I certainly agree that the error queue is a work around.
+But it works, app use it, and its fairly well known. I don't see any
+reason, other than historical context, why sendmsg can use this
+mechanism, splice can, but sendfile shouldn't?
+
+> > As far as the bit about plumbing only the splice bits, sorry if I'm
+> > being dense here, do you mean plumbing the error queue through to
+> > splice only and dropping sendfile2?
+> > 
+> > That is an option. Then the apps currently using sendfile could use
+> > splice instead and get completion notifications on the error queue.
+> > That would probably work and be less work than rewriting to use
+> > iouring, but probably a bit more work than using a new syscall.
+> 
+> Yep
+
+I'm not opposed to dropping the sendfile2 part of the series for the
+official submission. I do think it is a bit odd to add the
+functionality to splice only, though, when probably many apps are
+using splice via calls to sendfile and there is no way to safely use
+sendfile.
+
+If you feel very strongly that this cannot be merged without
+dropping sendfile2 and only plumbing this through for splice, then
+I'll drop the sendfile2 syscall when I submit officially (probably
+next week?).
+
+I do feel pretty strongly that it's more likely apps would use
+sendfile2 and we'd have safer apps out in the wild. But, I could be
+wrong.
+
+That said: if the new syscsall is the blocker, I'll drop it and
+offer a change to the sendfile man page suggesting users swap it
+with calls to splice + error queue for safety.
+
+I greatly appreciate you taking a look and your feedback.
+
+Thanks,
+Joe
 
