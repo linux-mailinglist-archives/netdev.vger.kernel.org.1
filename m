@@ -1,100 +1,94 @@
-Return-Path: <netdev+bounces-176188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CF96A6945F
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:09:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8539A69466
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:10:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEABB8859D8
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 16:08:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E40D1172A80
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 16:10:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F1801DF98E;
-	Wed, 19 Mar 2025 16:07:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47F0F1DEFD4;
+	Wed, 19 Mar 2025 16:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GpFeec+x"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="EvtO6g37"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 457121DE89C;
-	Wed, 19 Mar 2025 16:07:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B301DE884;
+	Wed, 19 Mar 2025 16:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742400459; cv=none; b=IyqN47YnucwcuVcZTrmeR8CMO+H1OcY1gM6+bVmd1kjg3a2dOv/Is7OB8qc6O8QP5ChKH6BKqas8TJN3Lina1wkANtj+BkXpfTTHH2g+NqujRL3g9QJIj7lxGT0Y/SJ6qwFz3xDIJbzq4ErcWfdogprDgmxB8hH4RepVmwIybCk=
+	t=1742400627; cv=none; b=Npde9h/tdnkgZ5XdqwDHcdMmuGcZMrvQG4Lumteaw0KnQfLqMTSLWF+ksGCF3rNdrQOnzCwhQWR/dd3CaCNwqTSmnqH1vuC96ZZ640J1XEgWWki0I8Uq7kBnu0Zq2u3YhswBapt8lr7IQvgj4nMy3njQP0Gv5tPM7p24tj1vsIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742400459; c=relaxed/simple;
-	bh=aGHM62jgLSXEa+F+Tgt8kWVrUa52H5ydgZvLecuXoto=;
+	s=arc-20240116; t=1742400627; c=relaxed/simple;
+	bh=wQH1ImZR2MCOnMn7sAGHDKs6nYnyNfWPy4MNNVn3xUA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FmiVN3u4nr/MfIXYywTWWPIZ+EseyqihEy+dm92a957t1UUSwQ2gRFGlUG7RDIvPkTLc18etVRw/ON4Uh4B7KDQ481q+OnR8dFqp8KGl9NfHsRoELqMWXzDR3Ob41v8gG0XB5H6vHbs1K69I52ZMWoqCfCRdwp6UO11XWPZZ3ug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GpFeec+x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FE30C4CEE8;
-	Wed, 19 Mar 2025 16:07:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742400458;
-	bh=aGHM62jgLSXEa+F+Tgt8kWVrUa52H5ydgZvLecuXoto=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GpFeec+xj+3wBwxXkPqA1K1IPZZ3UadT8dSCWfg5GzCniZCZKAGLXS8kiv1dCqoIq
-	 HjHIM0XpqFzgSPx8lO6PYqyXFdygaShscQXpjzbiK3xbJKHiIPYlVWkLrE+107wkgI
-	 PFndQHpCSx1V7NHnsheGmW5bLh4IMOdm8xFJJ/TPuAjJHGVyZD78kj6sLSvqO3J2wj
-	 3wEP+6OCEomu8MfmWmwLzc5juMUtLi8PwvWZiItibRE5VBNAEFs3TI6Oo38kXgTU4s
-	 z9fzg8D2LOfCf4fT9zJIXXNMRMt8FcJjvEHxyXyTRyMmXKyesbVJ+XejT/w1brIkdu
-	 HawLUyhU3zgOA==
-Date: Wed, 19 Mar 2025 16:07:28 +0000
-From: Simon Horman <horms@kernel.org>
-To: Matti Vaittinen <mazziesaccount@gmail.com>
-Cc: Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>,
-	Jonathan Cameron <jic23@kernel.org>,
-	Lars-Peter Clausen <lars@metafoo.de>, Rob Herring <robh@kernel.org>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Daniel Scally <djrscally@gmail.com>,
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-	Sakari Ailus <sakari.ailus@linux.intel.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=QTZGBhz5Xsj/ROTtBxoQDaMgLjZotE3X4fpQuRGCaiC28LBzXjaTe8Kgom+iewUzksnS0gra+G78hP5VqtxHJe09iAo+gFT84tsgbES8L0fJ5TughFm/ua8oEdg1W1xxo1/I18xVdeFP74Pfak0QrHivmArUowdzQ23x6hY9pno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=EvtO6g37; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A10AC4CEE8;
+	Wed, 19 Mar 2025 16:10:25 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="EvtO6g37"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1742400624;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wQH1ImZR2MCOnMn7sAGHDKs6nYnyNfWPy4MNNVn3xUA=;
+	b=EvtO6g37q/AUhMihU3ZZhr8nyNKYB04s5LH3pE00D/ZDJWn2AlnDocX5gqs57ORoZ1qBoj
+	aJM3G3HoNkDsukKfPcNHpUMUmj0u3MYuOovAWW/Gpr1xt9K4mFL3HwPauGx0Zc0UYwL4rT
+	4nBaJX5BrKmAmzcVni46bwp4xpczM04=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id cabd55d4 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Wed, 19 Mar 2025 16:10:23 +0000 (UTC)
+Date: Wed, 19 Mar 2025 17:10:18 +0100
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v8 09/10] net: gianfar: Use
- device_get_child_node_count_named()
-Message-ID: <20250319160728.GA776230@kernel.org>
-References: <cover.1742225817.git.mazziesaccount@gmail.com>
- <95b6015cd5f6fcce535982118543d47504ed609f.1742225817.git.mazziesaccount@gmail.com>
+	Simon Horman <horms@kernel.org>, Phil Sutter <phil@nwl.cc>,
+	Florian Westphal <fw@strlen.de>, Petr Mladek <pmladek@suse.com>,
+	Yoann Congal <yoann.congal@smile.fr>, wireguard@lists.zx2c4.com,
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv4 RESEND net-next 1/2] selftests: wireguards: convert
+ iptables to nft
+Message-ID: <Z9rsahBCpwUkDTmf@zx2c4.com>
+References: <20250106081043.2073169-1-liuhangbin@gmail.com>
+ <20250106081043.2073169-2-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <95b6015cd5f6fcce535982118543d47504ed609f.1742225817.git.mazziesaccount@gmail.com>
+In-Reply-To: <20250106081043.2073169-2-liuhangbin@gmail.com>
 
-On Mon, Mar 17, 2025 at 05:52:25PM +0200, Matti Vaittinen wrote:
-> We can avoid open-coding the loop construct which counts firmware child
-> nodes with a specific name by using the newly added
-> device_get_child_node_count_named().
-> 
-> The gianfar driver has such open-coded loop. Replace it with the
-> device_get_child_node_count_named().
-> 
-> Suggested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> Signed-off-by: Matti Vaittinen <mazziesaccount@gmail.com>
-> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+On Mon, Jan 06, 2025 at 08:10:42AM +0000, Hangbin Liu wrote:
+> +n0 nft add rule ip wgtest INPUT meta length 1360 counter drop
 
-This patch looks good to me.
-But I think it would be best to resubmit it,
-as a standalone patch for net-next, once
-it's dependencies are present in net-next.
+What's the point of `counter` here? It's never read back.
 
--- 
-pw-bot: defer
+> +n0 nft add rule ip wgtest POSTROUTING ip saddr 192.168.1.0/24 ip daddr 10.0.0.0/24 counter snat to 10.0.0.1
 
+Ditto.
 
+> +n1 nft add rule ip wgtest OUTPUT counter meta mark set 0x1
+
+Ditto.
+
+> +n2 nft add rule ip wgtest POSTROUTING ip saddr 10.0.0.0/24 ip daddr 192.168.241.0/24 counter snat to 192.168.241.2
+
+Ditto.
+
+> +n0 nft add rule ip wgtest INPUT iifname "vethrs" ip saddr != 10.0.0.0/24 counter drop
+
+Ditto.
 
