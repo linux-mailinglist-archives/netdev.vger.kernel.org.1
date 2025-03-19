@@ -1,123 +1,145 @@
-Return-Path: <netdev+bounces-176076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F66EA689FB
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 11:48:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D465FA689FD
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 11:49:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63C113BE6ED
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 10:48:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1990819C2EC6
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 10:49:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 251692505B2;
-	Wed, 19 Mar 2025 10:48:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A857825335B;
+	Wed, 19 Mar 2025 10:49:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Qkco05SA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g+k6R8rZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E5BB157E99;
-	Wed, 19 Mar 2025 10:48:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 049BE1F4CBE;
+	Wed, 19 Mar 2025 10:49:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742381296; cv=none; b=s6cxo59wvgNoKGfEiFgEARay9YQER/G/27T1E7TJQFse2ifLX4zSqjOHY9sEli0+zwShsKsYMGEZDIKTEtCrHQlCHwV8jmr8fJokKB13RaQvdm+64bL0cpRdBn5heXbI1+TfUgiZgC+evH8sQayY860MSsQFc3GQ0SCnMnZbNJM=
+	t=1742381374; cv=none; b=VLrbkxcbi3EA5x4ZDPNeaArk3tEemPIrrc1SmuLPYMYkOmc5plTgSwB+TIL9ajtw6H1cBDh28hRCJP1Ul4lZCa9EnbVBf9KO9dXbce+yZYXJMZWVf6KRrx61WAemet7t/pamcHAlRc6DPwbvB3PK1jBjgksYqzAV23wmUyLcuiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742381296; c=relaxed/simple;
-	bh=jllMXrVcXsNGnx2TJKhvq7lN7ipa5KTwy5lutJvlubA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uKtde2uK/Vb0/9dwApIT7yyICqf9/UVOPCV++W78+xYkRgxVcx9tIuLiwtmJOKk7KV4g4tv1m6lV/5KghCFL/sVvN0MIFbUTjUskLHtHCgcbbGoL6YXP+9+S/92j/5+xyBerETWFZMszpSem71fcmeOyz4GFLkALA/+5ObnP5+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Qkco05SA; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 2055244292;
-	Wed, 19 Mar 2025 10:48:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1742381286;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O0VN1Fjl61TNtzzgu0qljQ1cxV5vW70ntadpK7WZDMQ=;
-	b=Qkco05SAh2DcOjV4dh6ffFgXUq28V9GBSdXffJgl17CrjWDOsVcY7dmaUIqeiqRmzhJ5/F
-	BKT5v+KdNxUBYNJUPrGmCmXmV6QGx4ZSykUKU4X+MyBs+LYN1EZL+duObIVt7YjyDRCxZZ
-	Ahzte25ayArKuoyvb6/b7BLmSoZiUEmExVOWSL1xMeA7EcV7aHqzaVHjbEttxbJkWJaVFU
-	EC2zID+Jt3etaq9HzwblCoyv5Jf+cOWJ0K4nRC56u4qpxHwZSg1wUmtKfxomg8AOQ/9smR
-	w0rlHc8MhInDfaAXWlnHsuHNxvg/96NxCGMqrIrnp5yGCAIpJC0czcf8cWZ0HA==
-Date: Wed, 19 Mar 2025 11:48:02 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Russell King <rmk+kernel@armlinux.org.uk>,
- Thangaraj Samynathan <Thangaraj.S@microchip.com>, Rengarajan Sundararajan
- <Rengarajan.S@microchip.com>, kernel@pengutronix.de,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- UNGLinuxDriver@microchip.com, Phil Elwell <phil@raspberrypi.org>, Simon
- Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next v5 2/6] net: usb: lan78xx: Convert to PHYlink
- for improved PHY and MAC management
-Message-ID: <20250319114802.4d470655@fedora.home>
-In-Reply-To: <20250319084952.419051-3-o.rempel@pengutronix.de>
-References: <20250319084952.419051-1-o.rempel@pengutronix.de>
-	<20250319084952.419051-3-o.rempel@pengutronix.de>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1742381374; c=relaxed/simple;
+	bh=Hya7auSVdyREqWERkbjgRLv4JYAV8mlJZeA4nf44CBM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EL5olORP4VHiy7EGHMuU+tGaoj3tWpKletJswSkQmCi7YsP7DDPqD7MvjLsy5UtODyUEknctUK4Su1MZquHIoFAvQCu8lx6md5QwACmeCFqyjIt4vHgI9pzyYL4bHjyilaNda4Ueq7Xzm8gBr5R3Jxoje8Ey92HZ/Px7UlIsyxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g+k6R8rZ; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1742381373; x=1773917373;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Hya7auSVdyREqWERkbjgRLv4JYAV8mlJZeA4nf44CBM=;
+  b=g+k6R8rZqSgF5dtysoT1d/Yj+BT1Qob0kRwPWE6MNQYgwZ0GZkrdIjVW
+   d6ejfSUFUgNVy09CsFp3MWYYFx+zE4lcbZVQMiQFH5mvz0UdVDfEF+QWY
+   UyQV0ugvcEmmklqA0LgxE1u9q7QjUQCCid2e/RTWo22vuHUtvDOIVJ/r/
+   4WaEck5+2wfvfT/mizCTY0lYxlYGwopSd1NzXUyso1p6KcofmdB+vGjLs
+   tHZbCLqWF4gvqsIT7cAPEZZgwaFvHROZ807ijWjGe5t/VQ/9evB4TawMI
+   SdJwENPeWAj/3zugDDWwcg7c0ohc4sd8MbrT8OrMWbITDMu6btxhWbNKp
+   w==;
+X-CSE-ConnectionGUID: aWiDWvyBRp62a92t1KayHg==
+X-CSE-MsgGUID: Cv7zvkEvTNa4mU4NTbAnZQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11377"; a="54233897"
+X-IronPort-AV: E=Sophos;i="6.14,259,1736841600"; 
+   d="scan'208";a="54233897"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2025 03:49:31 -0700
+X-CSE-ConnectionGUID: Ed/4ayEfQdukuG1A775k3Q==
+X-CSE-MsgGUID: iSXvO9gGSnSls3y7j6dXCg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,259,1736841600"; 
+   d="scan'208";a="145754588"
+Received: from smile.fi.intel.com ([10.237.72.58])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2025 03:49:30 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1tuqzG-00000003tVA-2pN4;
+	Wed, 19 Mar 2025 12:49:26 +0200
+Date: Wed, 19 Mar 2025 12:49:26 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net v1 1/1] net: usb: asix: ax88772: Increase phy_name
+ size
+Message-ID: <Z9qhNnnwkMaMCbI1@smile.fi.intel.com>
+References: <20250318161702.2982063-1-andriy.shevchenko@linux.intel.com>
+ <481268aa-c8e9-4475-bd5c-8d0f82a6652a@lunn.ch>
+ <Z9mlWNdvWXohc6aM@smile.fi.intel.com>
+ <f9640312-3641-4f32-9803-a76b2b010d7d@lunn.ch>
+ <Z9qd6HfmfE18Clxv@smile.fi.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddugeehudefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudeipdhrtghpthhtohepohdrrhgvmhhpvghlsehpvghnghhuthhrohhnihigrdguvgdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrt
- ghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeifohhojhhunhhgrdhhuhhhsehmihgtrhhotghhihhprdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopehrmhhkodhkvghrnhgvlhesrghrmhhlihhnuhigrdhorhhgrdhukh
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z9qd6HfmfE18Clxv@smile.fi.intel.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-Hi Oleksij,
+On Wed, Mar 19, 2025 at 12:35:21PM +0200, Andy Shevchenko wrote:
+> On Tue, Mar 18, 2025 at 06:09:12PM +0100, Andrew Lunn wrote:
+> > On Tue, Mar 18, 2025 at 06:54:48PM +0200, Andy Shevchenko wrote:
+> > > On Tue, Mar 18, 2025 at 05:49:05PM +0100, Andrew Lunn wrote:
 
-On Wed, 19 Mar 2025 09:49:48 +0100
-Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+...
 
-> Convert the LAN78xx driver to use the PHYlink framework for managing
-> PHY and MAC interactions.
+> > > > > -	char phy_name[20];
+> > > > > +	char phy_name[MII_BUS_ID_SIZE + 5];
+> > > > 
+> > > > Could you explain the + 5?
+> > > > 
+> > > > https://elixir.bootlin.com/linux/v6.13.7/source/drivers/net/ethernet/davicom/dm9051.c#L1156
+> > > > https://elixir.bootlin.com/linux/v6.13.7/source/drivers/net/ethernet/freescale/fec_main.c#L2454
+> > > > https://elixir.bootlin.com/linux/v6.13.7/source/drivers/net/ethernet/xilinx/ll_temac.h#L348
+> > > > 
+> > > > The consensus seems to be + 3.
 > 
-> Key changes include:
-> - Replace direct PHY operations with phylink equivalents (e.g.,
->   phylink_start, phylink_stop).
-> - Introduce lan78xx_phylink_setup for phylink initialization and
->   configuration.
-> - Add phylink MAC operations (lan78xx_mac_config,
->   lan78xx_mac_link_down, lan78xx_mac_link_up) for managing link
->   settings and flow control.
-> - Remove redundant and now phylink-managed functions like
->   `lan78xx_link_status_change`.
-> - update lan78xx_get/set_pause to use phylink helpers
+> And shouldn't it be 4 actually? %s [MII_BUS_ID_SIZE] + ':' + '%02x' + nul
 > 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> > > u16, gcc can't proove the range, it assumes 65536 is the maximum.
+> > > 
+> > > include/linux/phy.h:312:20: note: directive argument in the range [0, 65535]
+> > 
+> > How about after
+> > 
+> >         ret = asix_read_phy_addr(dev, priv->use_embdphy);
+> > 	if (ret < 0)
+> > 		goto free;
+> > 
+> > add
+> > 
+> >         if (ret > 31) {
+> > 	        netdev_err(dev->net, "Invalid PHY ID %d\n", ret);
+> > 	        return -ENODEV;
+> > 	}
+> > 
+> > and see if GCC can follow that?
+> 
+> No, with + 3 it doesn't work, need + 4.
+> 
+> Another possibility to change the _FMT to have %02hhx instead of %02x.
+> 
+> Tell me which one should I take?
+
+I'll make a series, because on the second though it seems that fixing
+formatting string will fix the other cases at the same time.
+
+-- 
+With Best Regards,
+Andy Shevchenko
 
 
-[...]
-
-> @@ -5158,7 +5137,7 @@ static int lan78xx_reset_resume(struct usb_interface *intf)
->  	if (ret < 0)
->  		return ret;
->  
-> -	phy_start(dev->net->phydev);
-> +	phylink_start(dev->phylink);
-
-You need RTNL to be held when calling this function.
-
-I'm not familiar with USB but from what I get, this function is part of
-the resume path (resume by resetting). I think you also need to
-address the suspend path, it still has calls to
-netif_carrier_off(dev->net), and you may need to use
-phylink_suspend() / phylink_resume() ? (not sure)
-
-Maxime
 
