@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-176338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176339-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9839AA69C8C
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 00:09:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B3EBA69C8D
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 00:09:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E07CC467BAC
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 23:08:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBD4A188792C
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 23:09:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3885F222573;
-	Wed, 19 Mar 2025 23:08:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CF53221F3E;
+	Wed, 19 Mar 2025 23:08:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="iYENdIdD"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="vdCpIsi1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CFF6221F3E
-	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 23:08:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2AF7222575
+	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 23:08:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742425717; cv=none; b=HMvyAXGKmg/6BCxRUsxiOqIZEDSKyRv6pvxOlBFh+GRK/22eE44oCQ/UJ1FYrH+7jjUFlWcbGeMAuTF0c6MNFB15/oqsTpfV1tOgucUkXiTcOmRbSkK7HjeDyrvgghyJWqyzcyecBBDTBfBRKBdcSSRRTfJQ7oYSq+X2pWygQ0U=
+	t=1742425739; cv=none; b=qj3pEMjFUQw+ryh1PusZYiMma/9kl6nl7oR0ymPu0Mw51PgAqkyXztN+5XPV3xzXMLeCEjesD0Yc9uo95J1t38YtfZDJ1LmGWcIcciIeeH32GIW8wxi8gNnk3GOwm6UyxO/9zQPsa8HviV16DI2t0YMMEUxwhSZv82jHX9AF7Y4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742425717; c=relaxed/simple;
-	bh=4i13R7Ze1ivTLzxG2CFzV2CD2mtQO9xvEdXP237qUUo=;
+	s=arc-20240116; t=1742425739; c=relaxed/simple;
+	bh=nMd/5681LAFMeYLNc2yAH9x6j8mq2hL0aLfLNKv5BwI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JrmgxZMzNbiPpOO5XYM1nbKpYizjSTLonh/Mvgjbp/3sXe8gePDUqhvJ9e2L7v4ARYRWAWoYOyrakFoBKtsPGp7bmV17sPhq9+Vc6+QwJW7W/Egb/8b0hWjx4sW5LnRN5UJ8axtL/WhgzOejBplQMRCGzH7gAVe/XAgoqeQMWoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=iYENdIdD; arc=none smtp.client-ip=52.119.213.152
+	 MIME-Version:Content-Type; b=jtGzx3ine1BYrQvjza3K39Y05zjz3/BjXqzBovUwSdL68B9d3Ju++DST45CBxQ552selKVJLaicXC3BAtG3FFaO44GHJYXoMjE/cS/tmWn8az8/mYa4OfzpPxrL3rOVRSFN7sNRWrouWYCDozHWfRvzKWYuEXZMWasOtV7NdSpw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=vdCpIsi1; arc=none smtp.client-ip=52.95.49.90
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1742425712; x=1773961712;
+  t=1742425738; x=1773961738;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=+ymCdQhgVdJVYK45xjx4+I3K0h7s+YUkZc2dbRPZ3uQ=;
-  b=iYENdIdDmRTiWQaQC3ngNJy9aVP7WurAe8S+nosD5fk3c9NDJL3vX16M
-   aaG9GAzwgEVmBuMSumBxKWZzH9IYQJRYQTvYThMY1IDc2CwC38lxcKp5z
-   f8iQn2AmnsWpd1ZBOX0b2kD6yr7bp4W6Njdix59lG/KvoyLojkmVvdjHm
-   w=;
+  bh=IaGgmgAhqQC/egdbM38LAu18R6w+1xZ1rBhFryQoRDc=;
+  b=vdCpIsi1BvEOCjm4Z6+DOGZ8gIirFKhphXxTTmFqpYOICXMrOUpklFel
+   PTsHlQY9pXIRPQiAieaafkJclAL5QRVy3jMdGNOmDxNwU6mL/ToKXJQZV
+   dqfAxqVTlmEsvDRBArXqg4ciUQ+47pBX7TAaYfHqKjOeSX/v+4JElCMNx
+   M=;
 X-IronPort-AV: E=Sophos;i="6.14,260,1736812800"; 
-   d="scan'208";a="75909516"
+   d="scan'208";a="481884128"
 Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2025 23:08:28 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:6300]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.38.37:2525] with esmtp (Farcaster)
- id 45c1f746-bb45-4f9a-8bd2-1575fcff1483; Wed, 19 Mar 2025 23:08:28 +0000 (UTC)
-X-Farcaster-Flow-ID: 45c1f746-bb45-4f9a-8bd2-1575fcff1483
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2025 23:08:54 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:47034]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.22.127:2525] with esmtp (Farcaster)
+ id b71a1b1e-b28f-4358-81ae-a25fca2fb40c; Wed, 19 Mar 2025 23:08:53 +0000 (UTC)
+X-Farcaster-Flow-ID: b71a1b1e-b28f-4358-81ae-a25fca2fb40c
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 19 Mar 2025 23:08:27 +0000
+ Wed, 19 Mar 2025 23:08:52 +0000
 Received: from 6c7e67bfbae3.amazon.com (10.106.100.42) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 19 Mar 2025 23:08:25 +0000
+ Wed, 19 Mar 2025 23:08:50 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: David Ahern <dsahern@kernel.org>, "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
  Abeni" <pabeni@redhat.com>
 CC: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v2 net-next 1/7] nexthop: Move nlmsg_parse() in rtm_to_nh_config() to rtm_new_nexthop().
-Date: Wed, 19 Mar 2025 16:06:46 -0700
-Message-ID: <20250319230743.65267-2-kuniyu@amazon.com>
+Subject: [PATCH v2 net-next 2/7] nexthop: Split nh_check_attr_group().
+Date: Wed, 19 Mar 2025 16:06:47 -0700
+Message-ID: <20250319230743.65267-3-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250319230743.65267-1-kuniyu@amazon.com>
 References: <20250319230743.65267-1-kuniyu@amazon.com>
@@ -77,88 +77,133 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D042UWB002.ant.amazon.com (10.13.139.175) To
+X-ClientProxiedBy: EX19D033UWC001.ant.amazon.com (10.13.139.218) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-We will split rtm_to_nh_config() into non-RTNL and RTNL parts,
-and then the latter also needs tb.
+We will push RTNL down to rtm_new_nexthop(), and then we
+want to move non-RTNL operations out of the scope.
 
-As a prep, let's move nlmsg_parse() to rtm_new_nexthop().
+nh_check_attr_group() validates NHA_GROUP attributes, and
+nexthop_find_by_id() and some validation requires RTNL.
+
+Let's factorise such parts as nh_check_attr_group_rtnl()
+and call it from rtm_to_nh_config_rtnl().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- net/ipv4/nexthop.c | 33 ++++++++++++++++++---------------
- 1 file changed, 18 insertions(+), 15 deletions(-)
+ net/ipv4/nexthop.c | 68 ++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 47 insertions(+), 21 deletions(-)
 
 diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-index 01df7dd795f0..487933ecdb68 100644
+index 487933ecdb68..d30edc14b039 100644
 --- a/net/ipv4/nexthop.c
 +++ b/net/ipv4/nexthop.c
-@@ -3016,19 +3016,13 @@ static int rtm_to_nh_config_grp_res(struct nlattr *res, struct nh_config *cfg,
- }
- 
- static int rtm_to_nh_config(struct net *net, struct sk_buff *skb,
--			    struct nlmsghdr *nlh, struct nh_config *cfg,
-+			    struct nlmsghdr *nlh, struct nlattr **tb,
-+			    struct nh_config *cfg,
- 			    struct netlink_ext_ack *extack)
+@@ -1272,10 +1272,8 @@ static int nh_check_attr_group(struct net *net,
+ 			       u16 nh_grp_type, struct netlink_ext_ack *extack)
  {
- 	struct nhmsg *nhm = nlmsg_data(nlh);
--	struct nlattr *tb[ARRAY_SIZE(rtm_nh_policy_new)];
- 	int err;
+ 	unsigned int len = nla_len(tb[NHA_GROUP]);
+-	u8 nh_family = AF_UNSPEC;
+ 	struct nexthop_grp *nhg;
+ 	unsigned int i, j;
+-	u8 nhg_fdb = 0;
  
--	err = nlmsg_parse(nlh, sizeof(*nhm), tb,
--			  ARRAY_SIZE(rtm_nh_policy_new) - 1,
--			  rtm_nh_policy_new, extack);
--	if (err < 0)
--		return err;
--
- 	err = -EINVAL;
- 	if (nhm->resvd || nhm->nh_scope) {
- 		NL_SET_ERR_MSG(extack, "Invalid values in ancillary header");
-@@ -3093,7 +3087,8 @@ static int rtm_to_nh_config(struct net *net, struct sk_buff *skb,
- 			NL_SET_ERR_MSG(extack, "Invalid group type");
- 			goto out;
+ 	if (!len || len & (sizeof(struct nexthop_grp) - 1)) {
+ 		NL_SET_ERR_MSG(extack,
+@@ -1307,10 +1305,41 @@ static int nh_check_attr_group(struct net *net,
  		}
--		err = nh_check_attr_group(net, tb, ARRAY_SIZE(tb),
-+
-+		err = nh_check_attr_group(net, tb, ARRAY_SIZE(rtm_nh_policy_new),
- 					  cfg->nh_grp_type, extack);
- 		if (err)
- 			goto out;
-@@ -3211,18 +3206,26 @@ static int rtm_to_nh_config(struct net *net, struct sk_buff *skb,
- static int rtm_new_nexthop(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			   struct netlink_ext_ack *extack)
- {
-+	struct nlattr *tb[ARRAY_SIZE(rtm_nh_policy_new)];
- 	struct net *net = sock_net(skb->sk);
- 	struct nh_config cfg;
- 	struct nexthop *nh;
- 	int err;
+ 	}
  
--	err = rtm_to_nh_config(net, skb, nlh, &cfg, extack);
--	if (!err) {
--		nh = nexthop_add(net, &cfg, extack);
--		if (IS_ERR(nh))
--			err = PTR_ERR(nh);
+-	if (tb[NHA_FDB])
+-		nhg_fdb = 1;
+ 	nhg = nla_data(tb[NHA_GROUP]);
+-	for (i = 0; i < len; ++i) {
++	for (i = NHA_GROUP_TYPE + 1; i < tb_size; ++i) {
++		if (!tb[i])
++			continue;
++		switch (i) {
++		case NHA_HW_STATS_ENABLE:
++		case NHA_FDB:
++			continue;
++		case NHA_RES_GROUP:
++			if (nh_grp_type == NEXTHOP_GRP_TYPE_RES)
++				continue;
++			break;
++		}
++		NL_SET_ERR_MSG(extack,
++			       "No other attributes can be set in nexthop groups");
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++static int nh_check_attr_group_rtnl(struct net *net, struct nlattr *tb[],
++				    struct netlink_ext_ack *extack)
++{
++	u8 nh_family = AF_UNSPEC;
++	struct nexthop_grp *nhg;
++	unsigned int len;
++	unsigned int i;
++	u8 nhg_fdb;
++
++	len = nla_len(tb[NHA_GROUP]) / sizeof(*nhg);
++	nhg = nla_data(tb[NHA_GROUP]);
++	nhg_fdb = !!tb[NHA_FDB];
++
++	for (i = 0; i < len; i++) {
+ 		struct nexthop *nh;
+ 		bool is_fdb_nh;
+ 
+@@ -1330,22 +1359,6 @@ static int nh_check_attr_group(struct net *net,
+ 			return -EINVAL;
+ 		}
+ 	}
+-	for (i = NHA_GROUP_TYPE + 1; i < tb_size; ++i) {
+-		if (!tb[i])
+-			continue;
+-		switch (i) {
+-		case NHA_HW_STATS_ENABLE:
+-		case NHA_FDB:
+-			continue;
+-		case NHA_RES_GROUP:
+-			if (nh_grp_type == NEXTHOP_GRP_TYPE_RES)
+-				continue;
+-			break;
+-		}
+-		NL_SET_ERR_MSG(extack,
+-			       "No other attributes can be set in nexthop groups");
+-		return -EINVAL;
 -	}
-+	err = nlmsg_parse(nlh, sizeof(struct nhmsg), tb,
-+			  ARRAY_SIZE(rtm_nh_policy_new) - 1,
-+			  rtm_nh_policy_new, extack);
-+	if (err < 0)
-+		goto out;
  
-+	err = rtm_to_nh_config(net, skb, nlh, tb, &cfg, extack);
-+	if (err)
-+		goto out;
-+
-+	nh = nexthop_add(net, &cfg, extack);
-+	if (IS_ERR(nh))
-+		err = PTR_ERR(nh);
-+out:
+ 	return 0;
+ }
+@@ -3202,6 +3215,15 @@ static int rtm_to_nh_config(struct net *net, struct sk_buff *skb,
  	return err;
  }
  
++static int rtm_to_nh_config_rtnl(struct net *net, struct nlattr **tb,
++				 struct netlink_ext_ack *extack)
++{
++	if (tb[NHA_GROUP])
++		return nh_check_attr_group_rtnl(net, tb, extack);
++
++	return 0;
++}
++
+ /* rtnl */
+ static int rtm_new_nexthop(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 			   struct netlink_ext_ack *extack)
+@@ -3222,6 +3244,10 @@ static int rtm_new_nexthop(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	if (err)
+ 		goto out;
+ 
++	err = rtm_to_nh_config_rtnl(net, tb, extack);
++	if (err)
++		goto out;
++
+ 	nh = nexthop_add(net, &cfg, extack);
+ 	if (IS_ERR(nh))
+ 		err = PTR_ERR(nh);
 -- 
 2.48.1
 
