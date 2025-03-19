@@ -1,199 +1,149 @@
-Return-Path: <netdev+bounces-176220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07616A6963F
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 18:21:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 941B4A69668
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 18:28:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8290D7A2650
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:20:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C8C217C43F
+	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 17:28:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE7A1F0986;
-	Wed, 19 Mar 2025 17:20:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 904861F09BB;
+	Wed, 19 Mar 2025 17:28:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="EkKF9eI+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZiSFuCYC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2444E1E47AE
-	for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 17:20:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F4081EF37B;
+	Wed, 19 Mar 2025 17:28:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742404855; cv=none; b=sKJt23TR1wIJL50H9lkZcD9XkhK9dVzZUkbCxaRKXbHgUimwLgyurDVscOupHKBIGDRSedeVs3auQvzDfGLXI+3rg5YHm4O1iGt1ZOMHdrWgESGZLZv80yNP+67IKW3I7fNrAO3jQJklty8iGYxtki7RTPShzP5FUx0pD/J1gYA=
+	t=1742405286; cv=none; b=u7E7nl1Ps9QH7xPBiYfC2+gnr5buddzkVt/z/SRUeoScmkd3qjh3xP0vjocBz/gpFJ5egNNtyPtne3CAaUej+z5VenAqg2HvhcUwXRH59e0e4iQBFsF1pKvNebYJOAbIvHjQBcIzCIClFn9DRYwnK/CXCwiD8foLqMhAv+kEoyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742404855; c=relaxed/simple;
-	bh=9eJhBp2CqpKw9RFoR2qkeJMFuZnpzDtvLg4WBOctADE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=GmMmpQfzxYmwT+xEOgM6kPb8ArCkU021CtjqhoGtveTsAFVjkfW9s2ptGDDCSOu7SIUZvp9yrO2xspxsDMknLLFWqckZlTgwmrZaNvW/Tlq1Mj6l65RkK04ouFqrZfrmtwRq9f9LhODvhCQHQUx0YWOyC9aRjzPVTCECdYgi4J8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=EkKF9eI+; arc=none smtp.client-ip=209.85.166.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-85b43b60b6bso31312439f.0
-        for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 10:20:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1742404852; x=1743009652; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=wG+6kvFgd9GzD5/DJZ7WjNvBAVnDvESE/TrYFKU/DtM=;
-        b=EkKF9eI+y7Iz2u4bunkNuL2n2kO4umohiZDOxeD42UlPcu7Qw/r65SDM2WEcpJz5XN
-         5gRmyzllXdKJ9nTvWurT6RShDZDLem2AxIfhtXvN7R7DkxflWk/990oy3B1Rx0vls9lm
-         mznNVcJsjqmgo7tVzN+31oaWV/kkFOWulIhcd+AxWaEcZr7BPyompZNmrPF1M1LWq2gl
-         6L5TfZ5y5rq2F15QWcJeY148AG86abEh5H6hER1Kx36ORPucCtRvbJxEbZfcP3m+G4OK
-         rZiP8ms7jq4RpSPCvrssuq+KdgexfEDTwdNI94dAkDpamo28+sYhHJuM33D57yDHJNNN
-         PrnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742404852; x=1743009652;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wG+6kvFgd9GzD5/DJZ7WjNvBAVnDvESE/TrYFKU/DtM=;
-        b=wHu34/hK/k9bD6oTz/g8NyAh4wwMAq3C4/+ruL/evnVKa59TsyyRqLebgfWeAN8EKY
-         T659GuOYiZsixE64Di6fMcZxqlO/EAnEiqT9JqvvN0JUWqD6iWFHDu/Kdigqg+OGW6pP
-         1R2EIcW7ixUomC7p0zOQpqvHcBAhPQTJvllUT2jIqxB/5O/op/s9EPxAUnITrYkprpEM
-         T5+3IdvKy8+712tArZUAmtHs1GJeX9vhQ8mUxi6EIUchdI9IzAUj+y0koDvtqDTTCXAp
-         kfATHG53TeWwxflelHGCY3kDlmLKObSrcajS/q5v2qVIa1m4k8DKIVaPGVQzQayX6kX9
-         ha0w==
-X-Forwarded-Encrypted: i=1; AJvYcCVi7hi8hdp1qBPp6eQ1smLyotAK6cZKNyEYWcEo1o/FhJrCOgQRSgDuhiVZr4/t7mckoZB3/1k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAg8mtA/RSVltMnfS95mn2XydhdZ9rofwZlTaPRUB1/d5XrwAm
-	LLyIcq8s1wfGPn11IdwFpC0kQ/pd2B0EA/PWdZo/CAq6cQ/ZuwsM8YkICRz/ALM=
-X-Gm-Gg: ASbGncsfXIRys3GfCUQ0QC0iKOUcehceFeGtTSHOnfCafuc7zfU7KufzABLoXHNs1BD
-	bKqe5kX7O+F5oQz2DuE/aW1OpyGKveXlB9lopFraDFcInUkXZMFmaPCtAvKyv9KwoHIPiD3IAq5
-	uZDVj7K4qilpFP/dso/rZNDyxhDMXdjhDp/2R5f77/EfmQqDdm6hRFZNCEQpB51nss05v3Et5ng
-	p4ym9oLyB3MgvzPnHoh+1HrnFwnrCbePCOuwedUv/HO2U0APfGSkO/ksJMyLFjK6NHZt/SXP7jz
-	aWPK8k1JrZ1khmblUcCfIqoixLd2J232RBXViao/
-X-Google-Smtp-Source: AGHT+IFRIJ25W/ogwqAxdqm65EV+PQrMqVK4nXcMHoehq/ZaLwlz8F6/y6C/Lr8EqUAPWpYpQs5DBA==
-X-Received: by 2002:a05:6602:3810:b0:85b:3874:6044 with SMTP id ca18e2360f4ac-85e1ef6c5d8mr27906239f.7.1742404852184;
-        Wed, 19 Mar 2025 10:20:52 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-85db879df59sm320382739f.21.2025.03.19.10.20.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Mar 2025 10:20:51 -0700 (PDT)
-Message-ID: <19e3056c-2f7b-4f41-9c40-98955c4a9ed3@kernel.dk>
-Date: Wed, 19 Mar 2025 11:20:50 -0600
+	s=arc-20240116; t=1742405286; c=relaxed/simple;
+	bh=aFLtsNGSrtVmzExFbH/dbtFNmYuS7QOyHpWRr4vHvQo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BnV6Cm46d1ALbkN+quiA7JOLcR2zlZMLWnr8dZLjUr1OhsfGEYKfZVZ03P2QNnWVX32Sas2crJZ8gnr3uX2FCg4xkIkAyCXxanuzuiMm7CtxH2yha/TVn+ujakzTM8GgerLb+1O2kN2U7654iaOPSOt8xjJUJ7bkdkTMJa5Whok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZiSFuCYC; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1742405283; x=1773941283;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=aFLtsNGSrtVmzExFbH/dbtFNmYuS7QOyHpWRr4vHvQo=;
+  b=ZiSFuCYChCjLg/yc6g9jV++36EAkHoXLbEUDvOEqi7ayQi1md43CwIt/
+   DJ13Ijr7G4zB/9Ixmco45NIXwOteyLUy32VDgNycxZJXOvIIbsF0TVS/a
+   yCZ3NcuLCdErYGpYCq4omxmSthsBZWjiDzgbs5oiXiLMgBeE7bZfzt6ol
+   5jqQ88QzKe4EbhVCh7PulCdRzbd7O27A7E+HDRftKqyPwtaTFv7QbXlj5
+   H7dzNHAEdX8eDZXhtxUYk8XexLmbvlzmNXfU6xCwylCOmsV6+V7MxOZvw
+   ck67pTk6rr8WB2zUbTa89yRAbIqwKGiph5lM0b52W342pakyAXI3utJZv
+   Q==;
+X-CSE-ConnectionGUID: 2tvCnqjNSvaCs0RcMZF0pw==
+X-CSE-MsgGUID: 3RzuXEBXSaK5aSOUtF0hdQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11378"; a="43714478"
+X-IronPort-AV: E=Sophos;i="6.14,259,1736841600"; 
+   d="scan'208";a="43714478"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2025 10:28:01 -0700
+X-CSE-ConnectionGUID: skn/x0DDTZqosT/FlJHvHg==
+X-CSE-MsgGUID: 0BwikP2CRMWgZSbI5GKuXw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,259,1736841600"; 
+   d="scan'208";a="122538433"
+Received: from lkp-server02.sh.intel.com (HELO a4747d147074) ([10.239.97.151])
+  by fmviesa006.fm.intel.com with ESMTP; 19 Mar 2025 10:27:57 -0700
+Received: from kbuild by a4747d147074 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tuxCt-000FYs-1b;
+	Wed, 19 Mar 2025 17:27:55 +0000
+Date: Thu, 20 Mar 2025 01:27:31 +0800
+From: kernel test robot <lkp@intel.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>
+Subject: Re: [PATCH net v2 1/2] net: phy: Fix formatting specifier to avoid
+ potential string cuts
+Message-ID: <202503200024.WkseT3sA-lkp@intel.com>
+References: <20250319105813.3102076-2-andriy.shevchenko@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC -next 00/10] Add ZC notifications to splice and sendfile
-To: Joe Damato <jdamato@fastly.com>, Christoph Hellwig <hch@infradead.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- asml.silence@gmail.com, linux-fsdevel@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, horms@kernel.org, linux-api@vger.kernel.org,
- linux-arch@vger.kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
- kuba@kernel.org, shuah@kernel.org, sdf@fomichev.me, mingo@redhat.com,
- arnd@arndb.de, brauner@kernel.org, akpm@linux-foundation.org,
- tglx@linutronix.de, jolsa@kernel.org, linux-kselftest@vger.kernel.org
-References: <20250319001521.53249-1-jdamato@fastly.com>
- <Z9p6oFlHxkYvUA8N@infradead.org> <Z9rjgyl7_61Ddzrq@LQ3V64L9R2>
- <2d68bc91-c22c-4b48-a06d-fa9ec06dfb25@kernel.dk>
- <Z9r5JE3AJdnsXy_u@LQ3V64L9R2>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Z9r5JE3AJdnsXy_u@LQ3V64L9R2>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250319105813.3102076-2-andriy.shevchenko@linux.intel.com>
 
-On 3/19/25 11:04 AM, Joe Damato wrote:
-> On Wed, Mar 19, 2025 at 10:07:27AM -0600, Jens Axboe wrote:
->> On 3/19/25 9:32 AM, Joe Damato wrote:
->>> On Wed, Mar 19, 2025 at 01:04:48AM -0700, Christoph Hellwig wrote:
->>>> On Wed, Mar 19, 2025 at 12:15:11AM +0000, Joe Damato wrote:
->>>>> One way to fix this is to add zerocopy notifications to sendfile similar
->>>>> to how MSG_ZEROCOPY works with sendmsg. This is possible thanks to the
->>>>> extensive work done by Pavel [1].
->>>>
->>>> What is a "zerocopy notification" 
->>>
->>> See the docs on MSG_ZEROCOPY [1], but in short when a user app calls
->>> sendmsg and passes MSG_ZEROCOPY a completion notification is added
->>> to the error queue. The user app can poll for these to find out when
->>> the TX has completed and the buffer it passed to the kernel can be
->>> overwritten.
->>>
->>> My series provides the same functionality via splice and sendfile2.
->>>
->>> [1]: https://www.kernel.org/doc/html/v6.13/networking/msg_zerocopy.html
->>>
->>>> and why aren't you simply plugging this into io_uring and generate
->>>> a CQE so that it works like all other asynchronous operations?
->>>
->>> I linked to the iouring work that Pavel did in the cover letter.
->>> Please take a look.
->>>
->>> That work refactored the internals of how zerocopy completion
->>> notifications are wired up, allowing other pieces of code to use the
->>> same infrastructure and extend it, if needed.
->>>
->>> My series is using the same internals that iouring (and others) use
->>> to generate zerocopy completion notifications. Unlike iouring,
->>> though, I don't need a fully customized implementation with a new
->>> user API for harvesting completion events; I can use the existing
->>> mechanism already in the kernel that user apps already use for
->>> sendmsg (the error queue, as explained above and in the
->>> MSG_ZEROCOPY documentation).
->>
->> The error queue is arguably a work-around for _not_ having a delivery
->> mechanism that works with a sync syscall in the first place. The main
->> question here imho would be "why add a whole new syscall etc when
->> there's already an existing way to do accomplish this, with
->> free-to-reuse notifications". If the answer is "because splice", then it
->> would seem saner to plumb up those bits only. Would be much simpler
->> too...
-> 
-> I may be misunderstanding your comment, but my response would be:
-> 
->   There are existing apps which use sendfile today unsafely and
->   it would be very nice to have a safe sendfile equivalent. Converting
->   existing apps to using iouring (if I understood your suggestion?)
->   would be significantly more work compared to calling sendfile2 and
->   adding code to check the error queue.
+Hi Andy,
 
-It's really not, if you just want to use it as a sync kind of thing. If
-you want to have multiple things in flight etc, yeah it could be more
-work, you'd also get better performance that way. And you could use
-things like registered buffers for either of them, which again would
-likely make it more efficient.
+kernel test robot noticed the following build errors:
 
-If you just use it as a sync thing, it'd be pretty trivial to just wrap
-a my_sendfile_foo() in a submit_and_wait operation, which issues and
-waits on the completion in a single syscall. And if you want to wait on
-the notification too, you could even do that in the same syscall and
-wait on 2 CQEs. That'd be a downright trivial way to provide a sync way
-of doing the same thing.
+[auto build test ERROR on net/main]
 
-> I would also argue that there are likely user apps out there that
-> use both sendmsg MSG_ZEROCOPY for certain writes (for data in
-> memory) and also use sendfile (for data on disk). One example would
-> be a reverse proxy that might write HTTP headers to clients via
-> sendmsg but transmit the response body with sendfile.
-> 
-> For those apps, the code to check the error queue already exists for
-> sendmsg + MSG_ZEROCOPY, so swapping in sendfile2 seems like an easy
-> way to ensure safe sendfile usage.
+url:    https://github.com/intel-lab-lkp/linux/commits/Andy-Shevchenko/net-phy-Fix-formatting-specifier-to-avoid-potential-string-cuts/20250319-190433
+base:   net/main
+patch link:    https://lore.kernel.org/r/20250319105813.3102076-2-andriy.shevchenko%40linux.intel.com
+patch subject: [PATCH net v2 1/2] net: phy: Fix formatting specifier to avoid potential string cuts
+config: loongarch-allyesconfig (https://download.01.org/0day-ci/archive/20250320/202503200024.WkseT3sA-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250320/202503200024.WkseT3sA-lkp@intel.com/reproduce)
 
-Sure that is certainly possible. I didn't say that wasn't the case,
-rather that the error queue approach is a work-around in the first place
-for not having some kind of async notification mechanism for when it's
-free to reuse.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202503200024.WkseT3sA-lkp@intel.com/
 
-> As far as the bit about plumbing only the splice bits, sorry if I'm
-> being dense here, do you mean plumbing the error queue through to
-> splice only and dropping sendfile2?
-> 
-> That is an option. Then the apps currently using sendfile could use
-> splice instead and get completion notifications on the error queue.
-> That would probably work and be less work than rewriting to use
-> iouring, but probably a bit more work than using a new syscall.
+All error/warnings (new ones prefixed by >>):
 
-Yep
+   In file included from drivers/net/ethernet/broadcom/genet/bcmmii.c:17:
+   drivers/net/ethernet/broadcom/genet/bcmmii.c: In function 'bcmgenet_mii_pd_init':
+>> include/linux/phy.h:312:20: warning: '%02hhx' directive output may be truncated writing 2 bytes into a region of size between 0 and 60 [-Wformat-truncation=]
+     312 | #define PHY_ID_FMT "%s:%02hhx"
+         |                    ^~~~~~~~~~~
+   drivers/net/ethernet/broadcom/genet/bcmmii.c:604:53: note: in expansion of macro 'PHY_ID_FMT'
+     604 |                 snprintf(phy_name, MII_BUS_ID_SIZE, PHY_ID_FMT,
+         |                                                     ^~~~~~~~~~
+   include/linux/phy.h:312:24: note: format string is defined here
+     312 | #define PHY_ID_FMT "%s:%02hhx"
+         |                        ^~~~~~
+   include/linux/phy.h:312:20: note: using the range [0, 255] for directive argument
+     312 | #define PHY_ID_FMT "%s:%02hhx"
+         |                    ^~~~~~~~~~~
+   drivers/net/ethernet/broadcom/genet/bcmmii.c:604:53: note: in expansion of macro 'PHY_ID_FMT'
+     604 |                 snprintf(phy_name, MII_BUS_ID_SIZE, PHY_ID_FMT,
+         |                                                     ^~~~~~~~~~
+   drivers/net/ethernet/broadcom/genet/bcmmii.c:604:17: note: 'snprintf' output between 4 and 64 bytes into a destination of size 61
+     604 |                 snprintf(phy_name, MII_BUS_ID_SIZE, PHY_ID_FMT,
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     605 |                          mdio_bus_id, pd->phy_address);
+         |                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--
+   loongarch64-linux-ld: arch/loongarch/kernel/head.o: relocation R_LARCH_B26 overflow 0xfffffffff3911f74
+   arch/loongarch/kernel/head.o: in function `smpboot_entry':
+>> (.ref.text+0x15c): relocation truncated to fit: R_LARCH_B26 against symbol `start_secondary' defined in .text section in arch/loongarch/kernel/smp.o
+   loongarch64-linux-ld: final link failed: bad value
+
+
+vim +312 include/linux/phy.h
+
+   310	
+   311	/* Used when trying to connect to a specific phy (mii bus id:phy device id) */
+ > 312	#define PHY_ID_FMT "%s:%02hhx"
+   313	
 
 -- 
-Jens Axboe
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
