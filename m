@@ -1,164 +1,185 @@
-Return-Path: <netdev+bounces-176590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4A55A6AF70
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 21:55:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 244F7A6AF6C
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 21:55:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1608E7AC907
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 20:54:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7FB167AA72F
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 20:54:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA771229B0D;
-	Thu, 20 Mar 2025 20:55:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E697622A1FA;
+	Thu, 20 Mar 2025 20:54:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="a3GJLttl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DLEjFnIN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082E41C68B6;
-	Thu, 20 Mar 2025 20:55:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52611229B02;
+	Thu, 20 Mar 2025 20:54:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742504148; cv=none; b=KhqKUJyixa2F9/jn3VHoVnt4Cuc1Apy+MS75YcN289CUkSDnhj8m2Nz4/vR0yzzgiXyn1FdwQW/cw0nVkNFKhrFobQvG1CAlglauJesDLhhsXjcFlObV4iK+yVhAXoQaMC/IJgzuV58BODcfhikqcaZrrEqtT3WqHLqK/b3DSZo=
+	t=1742504098; cv=none; b=FkeVkqRvCMRZt4EeiV+H21OfI6ZawemTDp48uydU3+ASZ2TPqAzL9gjGKhNfbdITY55V/G9palfkMf2xSipD8KIqJZ87aDui0ne7YWM7jLqVe0K2pmAR8tyKW/GnAX00aKIbqFhQot9KSAFmpTyvqX99/BX6LMrdPbkEyqS/9UQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742504148; c=relaxed/simple;
-	bh=4vjXiH0TWyBcMzjE/pO8RsYdnZX/LVEct70EIUmZKfE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AQEAxBfmUkGb/8Pq2wlEOAoAAYWwq701JsbZfMIizSrsqhdR7U3iY1E8BG7EB68juSa+Qt6lyjxNXih+uO1s5+No5xMVvNeCWJvOGwadr3h6dsIiNCSYR4kekbKxrx/FTaCDxnjkNfDrVEfz9ptX46WZ3g6LAioEWQLrKqJFam4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=a3GJLttl; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1742504098; c=relaxed/simple;
+	bh=iXQ18XPUgoYJiSFSxjhg3L0CNHDwv1VsQkAjlNWUKpI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QUnMqBlsQXYvuil6E+AqtE+OEZnbHCnw8b+3P8MDGEYT+eahfvrwCF+jY0519TL4XsebbiTXwtRiP16/WMLohuZq6+LS82Qx4Y7Qol7BRTFYriPpPF1yXg1dm7Tj1ioVdwVN/W1zoArOQR8nZfRVZs6zzzX1bGVeJAgNL6EeNJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DLEjFnIN; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-225fbdfc17dso21156205ad.3;
+        Thu, 20 Mar 2025 13:54:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1742504147; x=1774040147;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=PLtci6HNVFnoWpqyRfl0ED9P91Y7zsBKIaYQAKodKeI=;
-  b=a3GJLttlDtWQhGiKziZpDJOY6hVmORYbwKTspOGOv8UQ9itikoAMfLiq
-   e7XA6q21b495o6kUW3jG9/JKoiGdZGXpqzp5YFZyohac8jR+xj8Ko/ydM
-   TAQOsxGjTAIiqa2PJ8LwQsbZDK+yL54GP0jXWJ+wwlfOdzGUJXh6LiZIV
-   o=;
-X-IronPort-AV: E=Sophos;i="6.14,262,1736812800"; 
-   d="scan'208";a="180448497"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2025 20:55:45 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:39202]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.1.69:2525] with esmtp (Farcaster)
- id cae6fb19-d6b1-4da9-8de0-3ef89cb2c1f7; Thu, 20 Mar 2025 20:55:45 +0000 (UTC)
-X-Farcaster-Flow-ID: cae6fb19-d6b1-4da9-8de0-3ef89cb2c1f7
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 20 Mar 2025 20:55:44 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.187.170.63) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 20 Mar 2025 20:55:42 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <xnxc22xnxc22@qq.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
-	<kuba@kernel.org>, <kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: Linux6.14-rc5 Bug:    INFO: task hung in rtnl_dumpit
-Date: Thu, 20 Mar 2025 13:54:21 -0700
-Message-ID: <20250320205534.54874-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <tencent_E5D983AC5A7B056F07B32ED79BFBCA1E8005@qq.com>
-References: <tencent_E5D983AC5A7B056F07B32ED79BFBCA1E8005@qq.com>
+        d=gmail.com; s=20230601; t=1742504096; x=1743108896; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MmBASaW+GqNY/UJNZ84+vFK6yD9rkYMUDyMz4fd0U0A=;
+        b=DLEjFnINDmgSC+TQ7Mi/xe/NWdwJrurCOwPsQHo9DwJSwEbIndYD59AoFxTw/0j4aJ
+         xNVAFZOGCqa/kvfXmzzY3sRRqKtEr+SX+Jm/UlP9pv+n+/ZYcvNcG86KefqFTEkb/qC0
+         scyq6kvA6EDqIlVuAnqlUCi9jkbEgBssC0/bsngU015mfc5+cH1i3HVDQVYtfi+Qjap8
+         xcPo5HlEFBi5f8zP/Mep8XMTesdPy9/0voCEVeKkJG1Q3vmOBNOjFulSV4ajqOboLmxq
+         nLo5z5hZTaAp9s6oIrfhrLb2xSnMoLuGBENITPEFDjAD5GiZnCFibjhHnwSjVSYJ6spl
+         oyYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742504096; x=1743108896;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MmBASaW+GqNY/UJNZ84+vFK6yD9rkYMUDyMz4fd0U0A=;
+        b=o2sK+53lENmd+G9YqEhP2sJYteLqzu6jLWc7eU0q5AT5OaskCzoXzVVNZcoxnLEuUY
+         QW96iLhAO3g3t0e+Ihk/LUHqMyIPBwhjXEpkJyXVXHUZK0uCaH7Z8kEVkoWoJNof6ofF
+         haPI9ZDm0LQ6GXQ0MbMJ8x0cXrZi2+C5QXmleccHow8aMMxkQyv2mgFtW38wIxlwKQFp
+         GO9d48tbVLQICZsLiLdGGaKiRT9Yx+xSVtMB/btvCaxJ7s11xQ7jU1ynGgD/D5hsulDu
+         M6/jSblaq654lZuBg5LFyPv0tsZogyKoK3NIi2MiMb+YeLXL/8rlPi1yFQs2+ijburHz
+         nGJg==
+X-Forwarded-Encrypted: i=1; AJvYcCUe/FGdNQHOP0L+zI3dXVz6opYzBpLsGXRJEKBvqQfV2hjEZ44b1FprA18lh2zPD8r8VH1cLzK2tJiE4vPY4TcV@vger.kernel.org, AJvYcCUqHLKFr7XrgaaNYBBnJv09qu/UZsKfGMGGMaBFOClwgrPoVZ82Zrm5gSegQEmh7VZGhYE=@vger.kernel.org, AJvYcCVDDoOMD3s0QFbOk59XgbT/+t3hBDYdX1NBSRKvf38Ndkg2VRrJIn0sHiKOf8mJDZfAG1pfownV@vger.kernel.org, AJvYcCWLr7uCceM2Elj+AneH0Vcf2Hab7kKyH3SSFR0u5bVj596UFTVpMnzfSX2rmizNNL5xbxOy4GGIAaH5d0js@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiDzS4Zkm1FugLguwbXfzd6S2UF4XwTaV6gqw8TNCyZkYazQ8W
+	7FKhL0KX05AWuiiJa3UDPGlFDSi0ru4XckBCbQPL6uXnXCNvMUnc
+X-Gm-Gg: ASbGncuPX/yTL6dMWhsJQhi/O9BsWaw0xfW9bY1HGLj8MslRgdy2U6AkB5UXrcHqmTP
+	vOSf1MqKKvo4n8j1KyJ+6D1mTvDI5ZWlfTJuNksySHH36eeffszNrxpSS7rcrdHCoABdyRl+j6J
+	gXGINeYiQPJqTIxwD0bqPB30tXHTiU2m4BssIZb8pIo5ANAFMDD4tUSxEWWyL44nKWdfBt5iMhA
+	wDJDinOOd27jfmzMgd2NWfzpo6Dr6tmOHG+4Ttb8pxVxYQSOZtVHJ/1tNEVVaQBnAakpm+KTKLh
+	cdOtjxEq7A7Hekm0Oa64IoJKDdachDwXZBiBw5BisZzGsc74
+X-Google-Smtp-Source: AGHT+IGVYYQZcFd57VZXj1o+MK4h5npJo8HOGu2ixgfY4o0AjAyD4std72Wt6w9yNTxK+u0HMfnPJQ==
+X-Received: by 2002:a17:902:cec4:b0:219:e4b0:4286 with SMTP id d9443c01a7336-22780db462fmr12039995ad.29.1742504096349;
+        Thu, 20 Mar 2025 13:54:56 -0700 (PDT)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af8a2a24410sm340304a12.56.2025.03.20.13.54.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Mar 2025 13:54:55 -0700 (PDT)
+Date: Thu, 20 Mar 2025 13:54:54 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Bobby Eshleman <bobby.eshleman@bytedance.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Mykola Lysenko <mykolal@fb.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, virtualization@lists.linux.dev,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net v4 3/3] vsock/bpf: Fix bpf recvmsg() racing transport
+ reassignment
+Message-ID: <Z9yAnhMsupaaVCII@pop-os.localdomain>
+References: <20250317-vsock-trans-signal-race-v4-0-fc8837f3f1d4@rbox.co>
+ <20250317-vsock-trans-signal-race-v4-3-fc8837f3f1d4@rbox.co>
+ <Z9tCnq0rBw+nETfW@pop-os.localdomain>
+ <4de119d5-c9c7-4f66-9e31-91c44a92c773@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWB002.ant.amazon.com (10.13.139.181) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4de119d5-c9c7-4f66-9e31-91c44a92c773@rbox.co>
 
-From: ffhgfv <xnxc22xnxc22@qq.com>
-Date: Thu, 20 Mar 2025 08:26:01 -0400
-> Hello, I found a bug titled "  INFO: task hung in rtnl_dumpit " with
-> modified syzkaller in the Linux6.14-rc5.
-
-Please stop sending task hung reports unless you have a repro.
-
-
-> If you fix this issue, please add the following tag to the commit:
-> Reported-by: Jianzhou Zhao <xnxc22xnxc22@qq.com>,    xingwei lee
-> <xrivendell7@gmail.com>, Zhizhuo Tang <strforexctzzchange@foxmail.com>
+On Thu, Mar 20, 2025 at 01:05:27PM +0100, Michal Luczaj wrote:
+> On 3/19/25 23:18, Cong Wang wrote:
+> > On Mon, Mar 17, 2025 at 10:52:25AM +0100, Michal Luczaj wrote:
+> >> Signal delivery during connect() may lead to a disconnect of an already
+> >> established socket. That involves removing socket from any sockmap and
+> >> resetting state to SS_UNCONNECTED. While it correctly restores socket's
+> >> proto, a call to vsock_bpf_recvmsg() might have been already under way in
+> >> another thread. If the connect()ing thread reassigns the vsock transport to
+> >> NULL, the recvmsg()ing thread may trigger a WARN_ON_ONCE.
+> >>
 > 
-> I use the same kernel as syzbot instance upstream: 7eb172143d5508b4da468ed59ee857c6e5e01da6
-> kernel config: https://syzkaller.appspot.com/text?tag=KernelConfig&amp;x=da4b04ae798b7ef6
-> compiler: gcc version 11.4.0
-> ------------[ cut here ]-----------------------------------------
->  TITLE:   INFO: task hung in rtnl_dumpit 
-> ==================================================================
-> INFO: task ifquery:17951 blocked for more than 143 seconds.
->       Not tainted 6.14.0-rc5-dirty #17
+>    *THREAD 1*                      *THREAD 2*
+> 
+> >> connect
+> >>   / state = SS_CONNECTED /
+> >>                                 sock_map_update_elem
+> >>                                 vsock_bpf_recvmsg
+> >>                                   psock = sk_psock_get()
+> >>   lock sk
+> >>   if signal_pending
+> >>     unhash
+> >>       sock_map_remove_links
+> > 
+> > So vsock's ->recvmsg() should be restored after this, right? Then how is
+> > vsock_bpf_recvmsg() called afterward?
+> 
+> I'm not sure I understand the question, so I've added a header above: those
+> are 2 parallel flows of execution. vsock_bpf_recvmsg() wasn't called
+> afterwards. It was called before sock_map_remove_links(). Note that at the
+> time of sock_map_remove_links() (in T1), vsock_bpf_recvmsg() is still
+> executing (in T2).
 
-Also, please clarify what diff is applied on the upstream kernel.
+I thought the above vsock_bpf_recvmsg() on the right side completed
+before sock_map_remove_links(), sorry for the confusion.
 
+> 
+> >>     state = SS_UNCONNECTED
+> >>   release sk
+> >>
+> >> connect
+> >>   transport = NULL
+> >>                                   lock sk
+> >>                                   WARN_ON_ONCE(!vsk->transport)
+> >>
+> > 
+> > And I am wondering why we need to WARN here since we can handle this error
+> > case correctly?
+> 
+> The WARN and transport check are here for defensive measures, and to state
+> a contract.
+> 
+> But I think I get your point. If we accept for a fact of life that BPF code
+> should be able to handle transport disappearing - then WARN can be removed
+> (while keeping the check) and this patch can be dropped.
 
-> "echo 0 &gt; /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> task:ifquery         state:D stack:25008 pid:17951 tgid:17951 ppid:17950  task_flags:0x400000 flags:0x00000000
-> Call Trace:
->  <task>
->  context_switch kernel/sched/core.c:5378 [inline]
->  __schedule+0x1074/0x4d30 kernel/sched/core.c:6765
->  __schedule_loop kernel/sched/core.c:6842 [inline]
->  schedule+0xd4/0x210 kernel/sched/core.c:6857
->  schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6914
->  __mutex_lock_common kernel/locking/mutex.c:662 [inline]
->  __mutex_lock+0x1042/0x2020 kernel/locking/mutex.c:730
->  rtnl_lock net/core/rtnetlink.c:79 [inline]
+I am thinking whether we have more elegant way to handle this case,
+WARN looks not pretty.
 
-Even when you have a repro, if it's related to rtnl_lock() or its
-family, please make sure it's NOT triggered by too many threads
-trying to aquire to mutex.
+> 
+> My aim, instead, was to keep things consistent. By which I mean sticking to
+> the conditions expressed in vsock_bpf_update_proto() as invariants; so that
+> vsock with a psock is guaranteed to have transport assigned.
 
-For example, this report is a variant of one you sent few days ago,
-and you can find many rtnl_dumpit() there too.
+Other than the WARN, I am also concerned about locking vsock_bpf_recvmsg()
+because for example UDP is (almost) lockless, so enforcing the sock lock
+for all vsock types looks not flexible and may hurt performance.
 
-https://lore.kernel.org/netdev/tencent_A3FB41E607B2126D163C5D4C87DC196E0707@qq.com/
+Maybe it is time to let vsock_bpf_rebuild_protos() build different hooks
+for different struct proto (as we did for TCP/UDP)?
 
----8<---
-INFO: task ifquery:17618 blocked for more than 145 seconds.
-      Not tainted 6.14.0-rc5-dirty #11
-"echo 0 &gt; /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:ifquery         state:D stack:22632 pid:17618 tgid:17618 ppid:17610  task_flags:0x400000 flags:0x00000000
-Call Trace:
- <task>
- context_switch kernel/sched/core.c:5378 [inline]
- __schedule+0x1074/0x4d30 kernel/sched/core.c:6765
- __schedule_loop kernel/sched/core.c:6842 [inline]
- schedule+0xd4/0x210 kernel/sched/core.c:6857
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6914
- __mutex_lock_common kernel/locking/mutex.c:662 [inline]
- __mutex_lock+0x1042/0x2020 kernel/locking/mutex.c:730
- rtnl_lock net/core/rtnetlink.c:79 [inline]
- rtnl_dumpit+0x198/0x200 net/core/rtnetlink.c:6780
-...
-2 locks held by ifquery/17618:
- #0: ffff88800064a6c8 (nlk_cb_mutex-ROUTE){+.+.}-{4:4}, at: netlink_dump+0x6f3/0xc80 net/netlink/af_netlink.c:2254
- #1: ffffffff8fee5d68 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
- #1: ffffffff8fee5d68 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_dumpit+0x198/0x200 net/core/rtnetlink.c:6780
-2 locks held by syz-executor/17625:
- #0: ffffffff8fecfdd0 (pernet_ops_rwsem){++++}-{4:4}, at: copy_net_ns+0x2c3/0x640 net/core/net_namespace.c:512
- #1: ffffffff8fee5d68 (rtnl_mutex){+.+.}-{4:4}, at: ip_tunnel_init_net+0x30c/0xb10 net/ipv4/ip_tunnel.c:1159
-2 locks held by ifquery/17649:
- #0: ffff88805d5fc6c8 (nlk_cb_mutex-ROUTE){+.+.}-{4:4}, at: netlink_dump+0x6f3/0xc80 net/netlink/af_netlink.c:2254
- #1: ffffffff8fee5d68 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
- #1: ffffffff8fee5d68 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_dumpit+0x198/0x200 net/core/rtnetlink.c:6780
-1 lock held by systemd-rfkill/17664:
- #0: ffff888045e80f88 (mapping.invalidate_lock){++++}-{4:4}, at: filemap_invalidate_lock_shared include/linux/fs.h:932 [inline]
- #0: ffff888045e80f88 (mapping.invalidate_lock){++++}-{4:4}, at: filemap_fault+0xed2/0x2650 mm/filemap.c:3435
-2 locks held by ifquery/17698:
- #0: ffff8880417046c8 (nlk_cb_mutex-ROUTE){+.+.}-{4:4}, at: netlink_dump+0x6f3/0xc80 net/netlink/af_netlink.c:2254
- #1: ffffffff8fee5d68 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
- #1: ffffffff8fee5d68 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_dumpit+0x198/0x200 net/core/rtnetlink.c:6780
----8<---
+Thanks.
 
