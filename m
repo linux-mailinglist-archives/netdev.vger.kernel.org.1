@@ -1,285 +1,143 @@
-Return-Path: <netdev+bounces-176367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC4C2A69DCA
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 02:55:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E90A3A69E17
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 03:11:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF2D31899619
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 01:55:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FB2919C270B
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 02:10:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56E6A1D435F;
-	Thu, 20 Mar 2025 01:55:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D4E61EA7C2;
+	Thu, 20 Mar 2025 02:09:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SGpI18+q"
+	dkim=pass (2048-bit key) header.d=byte-forge-io.20230601.gappssmtp.com header.i=@byte-forge-io.20230601.gappssmtp.com header.b="ZE8HQpQc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6501F1B81DC;
-	Thu, 20 Mar 2025 01:55:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04CFC1DED46
+	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 02:09:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742435719; cv=none; b=DwKyL3tEzi+2J220jdWExncKdi/+zSkOiLJhdewNQCpcXRwI6KoNeVoncYWiLUZhbzPUS+uq0a0aCQMnYdT8tlyOHGNeBblhB3Tj6U1q7AkCS1pkbvl8j1tb5Vq8PasH9YltDet3aXrz/iptIjYFuZtPaA+JLZRc8mGA2pvS8CU=
+	t=1742436548; cv=none; b=TqVo9MYYkTwwgT71KHoMpWdb6RTYFAdOrRa/h67wP7hgf9t9R7X6uZbsm0zlXVHLQaf/xCOyleHORQfplZBNZG5aKxmkYLPCJ51Flpmo5EAijWQxxaezUVOCWFV+SpJ3zyfflg6x7Cmhua2VEeHnaMapBR7mWneOrJpHZnXl8k0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742435719; c=relaxed/simple;
-	bh=bhkj2LY+NFVBJwqfQ11YjE5f4cXbFEAgE+iqrONhw3w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KEIfPei02rDpE0uFfkDEo9kCmvJI5CO73JuLYW4mXYLluyuMeGUHy/7ay9RsZw85KPnWZ80+ykwInt2JBZrn1SvCpDzbKVV37aoZQHsgFP1cK9EI2p7JM5ZBeye/Sh8rjrgvSSUY9toZ9ieM1rnSeRaNuXyQ0lHmXyi3fe53GXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SGpI18+q; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1742435716; x=1773971716;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=bhkj2LY+NFVBJwqfQ11YjE5f4cXbFEAgE+iqrONhw3w=;
-  b=SGpI18+qhj4Jgor13fvqstf3AWztJS/HT2Ivl99pmBYJ8ldlHbDfi8y/
-   xTraiHTjjTp9F0RgLSnGzXTTA2AFkRLd80jpja/IcvwgNKzde5WOxwWgd
-   pstfkEzYyRQT47NYv6XJu8vp1L/Ainbat3Bt3WIDugK6u4ZtTjgvgL3Dc
-   0qSRO317zoCO6lPEYKON+/C82CXUKAtz99GyqmNlSi8Mra1p7j3wltK1k
-   H+pJbS8b/oRw7oBV33sy99WONQwJ580qrPpPAstMxthD4Mjz6WOjZKnzt
-   NEX8z6f100Z08IuMNLl5/aqhzI8UAbxd+28A+Y86l3ECU5kohJXWX68WH
-   Q==;
-X-CSE-ConnectionGUID: DNGhSbz9RxqsQ23LtKJVQA==
-X-CSE-MsgGUID: pEIhymEGR+uPLZ95jVGiRg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11378"; a="43665301"
-X-IronPort-AV: E=Sophos;i="6.14,260,1736841600"; 
-   d="scan'208";a="43665301"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2025 18:55:15 -0700
-X-CSE-ConnectionGUID: tZO+WAlaRcScjbsPOBPWaA==
-X-CSE-MsgGUID: JGReu0G3Q+SI0MZqGMcJfg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,260,1736841600"; 
-   d="scan'208";a="127967853"
-Received: from lkp-server02.sh.intel.com (HELO e98e3655d6d2) ([10.239.97.151])
-  by orviesa004.jf.intel.com with ESMTP; 19 Mar 2025 18:55:10 -0700
-Received: from kbuild by e98e3655d6d2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tv57k-00005b-2W;
-	Thu, 20 Mar 2025 01:55:08 +0000
-Date: Thu, 20 Mar 2025 09:54:10 +0800
-From: kernel test robot <lkp@intel.com>
-To: Christian Marangi <ansuelsmth@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Daniel Golle <daniel@makrotopia.org>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, upstream@airoha.com
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: [net-next PATCH 5/6] net: pcs: airoha: add PCS driver for Airoha
- SoC
-Message-ID: <202503200928.j6AEMrdf-lkp@intel.com>
-References: <20250318235850.6411-6-ansuelsmth@gmail.com>
+	s=arc-20240116; t=1742436548; c=relaxed/simple;
+	bh=vEpaWA68QW/xdk82Q0863rirqvUGKmQiDZcP3WFc19Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=TwWexqwWOg++4HScO8fzW5JuOeFU9b6Q6bOCP4x49L38Ek344rul6CyZuA+pj0GWK7pF3I14A9i6jSu/R3+J10ozEpvXvfuuSPJsk40f2fzgh4sElJSjILvrkodZocdM0kk4A23aJmtikeijPkDYIH5zHhRUoKUZxDVxb2b1BGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=antoniohickey.com; spf=pass smtp.mailfrom=byte-forge.io; dkim=pass (2048-bit key) header.d=byte-forge-io.20230601.gappssmtp.com header.i=@byte-forge-io.20230601.gappssmtp.com header.b=ZE8HQpQc; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=antoniohickey.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=byte-forge.io
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6fece18b3c8so2340017b3.3
+        for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 19:09:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=byte-forge-io.20230601.gappssmtp.com; s=20230601; t=1742436546; x=1743041346; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4SLgULB2utXQCUaKC6ocj9H9XNoQumEhcqg5bohf8SE=;
+        b=ZE8HQpQc0aRyaw2PZHQhBb1sKi+tzWRjx9Lg9CXzQRJ/b/boSFgeZFbms/bURJiulc
+         cvwHu7g7UIluLSGF5LibnU9CpvvR7Y45lZyZ+3Rak06qg350HVhZi6QpdSsrZWLZrd28
+         K51rR4opjwzQwAk6bqUjANNldSJLby9F5/8xJXgRFbFN76GHCLSyjh6f4RqTEWrJk7bs
+         N3XHeixVQgogaoGIu3wfs6SzobzjRTnwgmyM0+35PVA/8NI8ixC95Em7nLwxhkq+zWzJ
+         +VWI5GB9zNc9db1GT27ePW0KPeWwxps7Nuh+ffoIoNVR0iHJFCietPWH2ADuI4b3CLy+
+         8QWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742436546; x=1743041346;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4SLgULB2utXQCUaKC6ocj9H9XNoQumEhcqg5bohf8SE=;
+        b=OFV9ZozIo0am3f3YXidn6x3Uu3fyaZ4VCBn3TzKs+wSfdfmScFps9tL4C1xETGMUc9
+         KulnnYiN9121Ltn43XGrNKrYDtpQXNA29fW4rPErADIh3ElKhYFlhkq1c0FT8fzaHcno
+         AjthGhnZmG3BBq6z/dvrlTrgsONhRBKAMjwg/1AhGLRQ0HkBaXfiuxcRXBB+X5XKdcbi
+         clduULXe7SmF7DAkU/nUHTXCeSY0zD9krkbsGNXlTW9+9xxNQawf2scWVjuQo4jpDYkA
+         8rjuzW9WWraCywyI2PBqRfRjmE9Qk4SUNXEzBQ1jE668AC2VGa1Mi0bPMFcL7oOaSg2V
+         pJhg==
+X-Forwarded-Encrypted: i=1; AJvYcCXMiPUkDheLkE5xp3NhaB7LcZ4W1Il7BbPL2PNwcC4pg7jQczb01W5n8xEh2Sa0aRjz0+7Msy8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1gNDx35raQ3Is138xSrovwZa1oahqfttdR3qaFLJ7wb+L9HEd
+	nBwCFEl6suKEPwLgAg2VTssej8CFeDRi7GzSwsqzYLl9QHUuSYvlTRY3VYASyuk=
+X-Gm-Gg: ASbGncuj6O07ZUzRDqHSU1Gh5eXN1NEL/+0sVWPFg8/lqIbLMKm/6QsroP2JX46qDhB
+	uUfiFDIAyCBNjHFdOzYdWKL2/wUuG0JbJwvFymq+80RKDJ6Kn0Lqfz1XIR1ipYZPUDazD5lbd2p
+	BSsAc+Oe35rrwMp56rtoP2q/8NAKv9xOOOaelOXLb/bXGFZRx3cRa+jqMLoHZgZlTsB4JmzEgLW
+	KlFAKavxHHlzpq/4VI1HPCfmhkwim+63vg+u0jxaf89WJG+d0HP7TIRHf3ab3bqrCkitM0/PJ+A
+	cM3we7dY7XcAhxlxhhI/p0YsQWmPLORiNMvGAbx5iezXhQ4g/s2PL5jXghEWAml7f6piAMB6rUT
+	0a3a+Sspt4m0Ia12qmUv9fy0e9TLpew==
+X-Google-Smtp-Source: AGHT+IGxlIGpc01WyScw8Txp7o/tEVqqwrLLlhRzgrQzlCT/6WJlb/M0fwe2B7ib20G5lx/x8+EwKg==
+X-Received: by 2002:a05:690c:fd2:b0:6fe:c803:b48e with SMTP id 00721157ae682-700ac5f14f9mr17203407b3.22.1742436545995;
+        Wed, 19 Mar 2025 19:09:05 -0700 (PDT)
+Received: from Machine.lan (107-219-75-226.lightspeed.wepbfl.sbcglobal.net. [107.219.75.226])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6ff32cb598asm32826357b3.111.2025.03.19.19.09.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Mar 2025 19:09:05 -0700 (PDT)
+From: Antonio Hickey <contact@antoniohickey.com>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	Trevor Gross <tmgross@umich.edu>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Alex Gaynor <alex.gaynor@gmail.com>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Gary Guo <gary@garyguo.net>,
+	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+	Benno Lossin <benno.lossin@proton.me>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Danilo Krummrich <dakr@kernel.org>
+Cc: Antonio Hickey <contact@antoniohickey.com>,
+	netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v5 12/17] rust: net: phy: refactor to use `&raw [const|mut]`
+Date: Wed, 19 Mar 2025 22:07:31 -0400
+Message-ID: <20250320020740.1631171-13-contact@antoniohickey.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250320020740.1631171-1-contact@antoniohickey.com>
+References: <20250320020740.1631171-1-contact@antoniohickey.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250318235850.6411-6-ansuelsmth@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Christian,
+Replacing all occurrences of `addr_of_mut!(place)` with
+`&raw mut place`.
 
-kernel test robot noticed the following build warnings:
+This will allow us to reduce macro complexity, and improve consistency
+with existing reference syntax as `&raw mut` is similar to `&mut`
+making it fit more naturally with other existing code.
 
-[auto build test WARNING on net-next/main]
+Suggested-by: Benno Lossin <benno.lossin@proton.me>
+Link: https://github.com/Rust-for-Linux/linux/issues/1148
+Signed-off-by: Antonio Hickey <contact@antoniohickey.com>
+---
+ rust/kernel/net/phy.rs | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Christian-Marangi/net-phylink-reset-PCS-Phylink-double-reference-on-phylink_stop/20250319-080303
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250318235850.6411-6-ansuelsmth%40gmail.com
-patch subject: [net-next PATCH 5/6] net: pcs: airoha: add PCS driver for Airoha SoC
-config: arm64-randconfig-r132-20250320 (https://download.01.org/0day-ci/archive/20250320/202503200928.j6AEMrdf-lkp@intel.com/config)
-compiler: clang version 21.0.0git (https://github.com/llvm/llvm-project 87916f8c32ebd8e284091db9b70339df57fd1e90)
-reproduce: (https://download.01.org/0day-ci/archive/20250320/202503200928.j6AEMrdf-lkp@intel.com/reproduce)
+diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
+index a59469c785e3..757db052cc09 100644
+--- a/rust/kernel/net/phy.rs
++++ b/rust/kernel/net/phy.rs
+@@ -7,7 +7,7 @@
+ //! C headers: [`include/linux/phy.h`](srctree/include/linux/phy.h).
+ 
+ use crate::{error::*, prelude::*, types::Opaque};
+-use core::{marker::PhantomData, ptr::addr_of_mut};
++use core::marker::PhantomData;
+ 
+ pub mod reg;
+ 
+@@ -285,7 +285,7 @@ impl AsRef<kernel::device::Device> for Device {
+     fn as_ref(&self) -> &kernel::device::Device {
+         let phydev = self.0.get();
+         // SAFETY: The struct invariant ensures that `mdio.dev` is valid.
+-        unsafe { kernel::device::Device::as_ref(addr_of_mut!((*phydev).mdio.dev)) }
++        unsafe { kernel::device::Device::as_ref(&raw mut (*phydev).mdio.dev) }
+     }
+ }
+ 
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202503200928.j6AEMrdf-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
->> drivers/net/pcs/pcs-airoha.c:2723:14: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected void *base @@     got void [noderef] __iomem * @@
-   drivers/net/pcs/pcs-airoha.c:2723:14: sparse:     expected void *base
-   drivers/net/pcs/pcs-airoha.c:2723:14: sparse:     got void [noderef] __iomem *
->> drivers/net/pcs/pcs-airoha.c:2728:25: sparse: sparse: incorrect type in argument 3 (different address spaces) @@     expected void [noderef] __iomem *regs @@     got void *base @@
-   drivers/net/pcs/pcs-airoha.c:2728:25: sparse:     expected void [noderef] __iomem *regs
-   drivers/net/pcs/pcs-airoha.c:2728:25: sparse:     got void *base
-   drivers/net/pcs/pcs-airoha.c:2732:14: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected void *base @@     got void [noderef] __iomem * @@
-   drivers/net/pcs/pcs-airoha.c:2732:14: sparse:     expected void *base
-   drivers/net/pcs/pcs-airoha.c:2732:14: sparse:     got void [noderef] __iomem *
-   drivers/net/pcs/pcs-airoha.c:2737:27: sparse: sparse: incorrect type in argument 3 (different address spaces) @@     expected void [noderef] __iomem *regs @@     got void *base @@
-   drivers/net/pcs/pcs-airoha.c:2737:27: sparse:     expected void [noderef] __iomem *regs
-   drivers/net/pcs/pcs-airoha.c:2737:27: sparse:     got void *base
-   drivers/net/pcs/pcs-airoha.c:2741:14: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected void *base @@     got void [noderef] __iomem * @@
-   drivers/net/pcs/pcs-airoha.c:2741:14: sparse:     expected void *base
-   drivers/net/pcs/pcs-airoha.c:2741:14: sparse:     got void [noderef] __iomem *
-   drivers/net/pcs/pcs-airoha.c:2746:28: sparse: sparse: incorrect type in argument 3 (different address spaces) @@     expected void [noderef] __iomem *regs @@     got void *base @@
-   drivers/net/pcs/pcs-airoha.c:2746:28: sparse:     expected void [noderef] __iomem *regs
-   drivers/net/pcs/pcs-airoha.c:2746:28: sparse:     got void *base
-   drivers/net/pcs/pcs-airoha.c:2750:14: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected void *base @@     got void [noderef] __iomem * @@
-   drivers/net/pcs/pcs-airoha.c:2750:14: sparse:     expected void *base
-   drivers/net/pcs/pcs-airoha.c:2750:14: sparse:     got void [noderef] __iomem *
-   drivers/net/pcs/pcs-airoha.c:2755:33: sparse: sparse: incorrect type in argument 3 (different address spaces) @@     expected void [noderef] __iomem *regs @@     got void *base @@
-   drivers/net/pcs/pcs-airoha.c:2755:33: sparse:     expected void [noderef] __iomem *regs
-   drivers/net/pcs/pcs-airoha.c:2755:33: sparse:     got void *base
-   drivers/net/pcs/pcs-airoha.c:2759:14: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected void *base @@     got void [noderef] __iomem * @@
-   drivers/net/pcs/pcs-airoha.c:2759:14: sparse:     expected void *base
-   drivers/net/pcs/pcs-airoha.c:2759:14: sparse:     got void [noderef] __iomem *
-   drivers/net/pcs/pcs-airoha.c:2764:29: sparse: sparse: incorrect type in argument 3 (different address spaces) @@     expected void [noderef] __iomem *regs @@     got void *base @@
-   drivers/net/pcs/pcs-airoha.c:2764:29: sparse:     expected void [noderef] __iomem *regs
-   drivers/net/pcs/pcs-airoha.c:2764:29: sparse:     got void *base
-   drivers/net/pcs/pcs-airoha.c:2768:14: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected void *base @@     got void [noderef] __iomem * @@
-   drivers/net/pcs/pcs-airoha.c:2768:14: sparse:     expected void *base
-   drivers/net/pcs/pcs-airoha.c:2768:14: sparse:     got void [noderef] __iomem *
-   drivers/net/pcs/pcs-airoha.c:2773:29: sparse: sparse: incorrect type in argument 3 (different address spaces) @@     expected void [noderef] __iomem *regs @@     got void *base @@
-   drivers/net/pcs/pcs-airoha.c:2773:29: sparse:     expected void [noderef] __iomem *regs
-   drivers/net/pcs/pcs-airoha.c:2773:29: sparse:     got void *base
-   drivers/net/pcs/pcs-airoha.c:2777:14: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected void *base @@     got void [noderef] __iomem * @@
-   drivers/net/pcs/pcs-airoha.c:2777:14: sparse:     expected void *base
-   drivers/net/pcs/pcs-airoha.c:2777:14: sparse:     got void [noderef] __iomem *
-   drivers/net/pcs/pcs-airoha.c:2782:25: sparse: sparse: incorrect type in argument 3 (different address spaces) @@     expected void [noderef] __iomem *regs @@     got void *base @@
-   drivers/net/pcs/pcs-airoha.c:2782:25: sparse:     expected void [noderef] __iomem *regs
-   drivers/net/pcs/pcs-airoha.c:2782:25: sparse:     got void *base
-   drivers/net/pcs/pcs-airoha.c:2786:14: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected void *base @@     got void [noderef] __iomem * @@
-   drivers/net/pcs/pcs-airoha.c:2786:14: sparse:     expected void *base
-   drivers/net/pcs/pcs-airoha.c:2786:14: sparse:     got void [noderef] __iomem *
-   drivers/net/pcs/pcs-airoha.c:2791:25: sparse: sparse: incorrect type in argument 3 (different address spaces) @@     expected void [noderef] __iomem *regs @@     got void *base @@
-   drivers/net/pcs/pcs-airoha.c:2791:25: sparse:     expected void [noderef] __iomem *regs
-   drivers/net/pcs/pcs-airoha.c:2791:25: sparse:     got void *base
-
-vim +2723 drivers/net/pcs/pcs-airoha.c
-
-  2707	
-  2708	static int airoha_pcs_probe(struct platform_device *pdev)
-  2709	{
-  2710		struct regmap_config syscon_config = airoha_pcs_regmap_config;
-  2711		struct device *dev = &pdev->dev;
-  2712		struct airoha_pcs_priv *priv;
-  2713		void *base;
-  2714		int ret;
-  2715	
-  2716		priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-  2717		if (!priv)
-  2718			return -ENOMEM;
-  2719	
-  2720		priv->dev = dev;
-  2721		priv->data = of_device_get_match_data(dev);
-  2722	
-> 2723		base = devm_platform_ioremap_resource_byname(pdev, "xfi_mac");
-  2724		if (IS_ERR(base))
-  2725			return PTR_ERR(base);
-  2726	
-  2727		syscon_config.name = "xfi_mac";
-> 2728		priv->xfi_mac = devm_regmap_init_mmio(dev, base, &syscon_config);
-  2729		if (IS_ERR(priv->xfi_mac))
-  2730			return PTR_ERR(priv->xfi_mac);
-  2731	
-  2732		base = devm_platform_ioremap_resource_byname(pdev, "hsgmii_an");
-  2733		if (IS_ERR(base))
-  2734			return PTR_ERR(base);
-  2735	
-  2736		syscon_config.name = "hsgmii_an";
-  2737		priv->hsgmii_an = devm_regmap_init_mmio(dev, base, &syscon_config);
-  2738		if (IS_ERR(priv->hsgmii_an))
-  2739			return PTR_ERR(priv->hsgmii_an);
-  2740	
-  2741		base = devm_platform_ioremap_resource_byname(pdev, "hsgmii_pcs");
-  2742		if (IS_ERR(base))
-  2743			return PTR_ERR(base);
-  2744	
-  2745		syscon_config.name = "hsgmii_pcs";
-  2746		priv->hsgmii_pcs = devm_regmap_init_mmio(dev, base, &syscon_config);
-  2747		if (IS_ERR(priv->hsgmii_pcs))
-  2748			return PTR_ERR(priv->hsgmii_pcs);
-  2749	
-  2750		base = devm_platform_ioremap_resource_byname(pdev, "hsgmii_rate_adp");
-  2751		if (IS_ERR(base))
-  2752			return PTR_ERR(base);
-  2753	
-  2754		syscon_config.name = "hsgmii_rate_adp";
-  2755		priv->hsgmii_rate_adp = devm_regmap_init_mmio(dev, base, &syscon_config);
-  2756		if (IS_ERR(priv->hsgmii_rate_adp))
-  2757			return PTR_ERR(priv->hsgmii_rate_adp);
-  2758	
-  2759		base = devm_platform_ioremap_resource_byname(pdev, "multi_sgmii");
-  2760		if (IS_ERR(base))
-  2761			return PTR_ERR(base);
-  2762	
-  2763		syscon_config.name = "multi_sgmii";
-  2764		priv->multi_sgmii = devm_regmap_init_mmio(dev, base, &syscon_config);
-  2765		if (IS_ERR(priv->multi_sgmii))
-  2766			return PTR_ERR(priv->multi_sgmii);
-  2767	
-  2768		base = devm_platform_ioremap_resource_byname(pdev, "usxgmii");
-  2769		if (IS_ERR(base) && PTR_ERR(base) != -ENOENT)
-  2770			return PTR_ERR(base);
-  2771	
-  2772		syscon_config.name = "usxgmii";
-  2773		priv->usxgmii_pcs = devm_regmap_init_mmio(dev, base, &syscon_config);
-  2774		if (IS_ERR(priv->usxgmii_pcs))
-  2775			return PTR_ERR(priv->usxgmii_pcs);
-  2776	
-  2777		base = devm_platform_ioremap_resource_byname(pdev, "xfi_pma");
-  2778		if (IS_ERR(base) && PTR_ERR(base) != -ENOENT)
-  2779			return PTR_ERR(base);
-  2780	
-  2781		syscon_config.name = "xfi_pma";
-  2782		priv->xfi_pma = devm_regmap_init_mmio(dev, base, &syscon_config);
-  2783		if (IS_ERR(priv->xfi_pma))
-  2784			return PTR_ERR(priv->xfi_pma);
-  2785	
-  2786		base = devm_platform_ioremap_resource_byname(pdev, "xfi_ana");
-  2787		if (IS_ERR(base) && PTR_ERR(base) != -ENOENT)
-  2788			return PTR_ERR(base);
-  2789	
-  2790		syscon_config.name = "xfi_ana";
-  2791		priv->xfi_ana = devm_regmap_init_mmio(dev, base, &syscon_config);
-  2792		if (IS_ERR(priv->xfi_ana))
-  2793			return PTR_ERR(priv->xfi_ana);
-  2794	
-  2795		/* SCU is used to toggle XFI or HSGMII in global SoC registers */
-  2796		priv->scu = syscon_regmap_lookup_by_compatible("airoha,en7581-scu");
-  2797		if (IS_ERR(priv->scu))
-  2798			return PTR_ERR(priv->scu);
-  2799	
-  2800		priv->rsts[0].id = "mac";
-  2801		priv->rsts[1].id = "phy";
-  2802		ret = devm_reset_control_bulk_get_exclusive(dev, ARRAY_SIZE(priv->rsts),
-  2803							    priv->rsts);
-  2804		if (ret)
-  2805			return dev_err_probe(dev, ret, "failed to get bulk reset lines\n");
-  2806	
-  2807		platform_set_drvdata(pdev, priv);
-  2808	
-  2809		priv->pcs.ops = &airoha_pcs_ops;
-  2810		priv->pcs.poll = true;
-  2811	
-  2812		__set_bit(PHY_INTERFACE_MODE_SGMII, priv->pcs.supported_interfaces);
-  2813		__set_bit(PHY_INTERFACE_MODE_1000BASEX, priv->pcs.supported_interfaces);
-  2814		__set_bit(PHY_INTERFACE_MODE_2500BASEX, priv->pcs.supported_interfaces);
-  2815		__set_bit(PHY_INTERFACE_MODE_10GBASER, priv->pcs.supported_interfaces);
-  2816		__set_bit(PHY_INTERFACE_MODE_USXGMII, priv->pcs.supported_interfaces);
-  2817	
-  2818		return of_pcs_add_provider(dev->of_node, of_pcs_simple_get,
-  2819					   &priv->pcs);
-  2820	}
-  2821	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
