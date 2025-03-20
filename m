@@ -1,238 +1,275 @@
-Return-Path: <netdev+bounces-176575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 817C9A6AE67
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 20:17:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 36936A6AE85
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 20:30:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 454B14860FB
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 19:13:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95504480C51
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 19:29:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50B2F227E99;
-	Thu, 20 Mar 2025 19:13:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56A44227E89;
+	Thu, 20 Mar 2025 19:29:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="aT616jAP";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="bJzM14bF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O8jLQtF7"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b2-smtp.messagingengine.com (fout-b2-smtp.messagingengine.com [202.12.124.145])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7960B1E8339;
-	Thu, 20 Mar 2025 19:13:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80AF4221F24;
+	Thu, 20 Mar 2025 19:29:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742498001; cv=none; b=b+lAKSU7Hk0KHKxzq6vay6qc661HQnXPKbKDY9BSs/Iu0OABt6ZxBT1inbS8474toCT/iH0MzE2+cQtfOMc5Aqj9ZRJ3AaSq/z3XlLU9tstZvCjquEeAA2HlRHCrvKLcuULuMKuGDA6X1OFAP1X4aQ508sct5s2J1crfJVaOraU=
+	t=1742498976; cv=none; b=MY/FbXJOplCbibTKrW6ttIUMYu9uky2zXAN82FexkRH9xA3fYpb5Ayg0vsA/nnis5vYPhuYk87Db4F+FIOoSWJuobjXpoMZfyDhZME/nPviACt//1szIgcj4smJevaMvCe9aG6WswsMnycS2AshmT/z1CrS5wvRIOdV88SsQxmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742498001; c=relaxed/simple;
-	bh=w/1BLVeeR5mW230WGJrNA+NFTbyOHjTi05Pv0pOAJ1g=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=YVyff+D5a4wokl4Co7lNyaIcIHClvwzbI9hIsD77oIjg6cDGkMYvESWRcmq8DryJAarzibHn9BVd+0ZDiFFNltRZUZUUn5hoT9t/izgCbBl2tJSSlT2biCSecM0nSt7Ys7NTwc/eHVE/VgZHU/wNgY5qUKVh2tZQ3XaXVACLsC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=aT616jAP; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=bJzM14bF; arc=none smtp.client-ip=202.12.124.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfout.stl.internal (Postfix) with ESMTP id 29A0F11400CA;
-	Thu, 20 Mar 2025 15:13:16 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Thu, 20 Mar 2025 15:13:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm3;
-	 t=1742497996; x=1742584396; bh=IR0OXTd3Mv/VRatqgXGdaWOrIeWV/sLQ
-	QJTuLfYjzLw=; b=aT616jAPMrlWAxnfKkedGpJkDfJb1DxJMfWphu5UHCC5PfvM
-	pqB7cqm79krHFn+I39PTDENyTpkOfTOfG84/yPSTV3B9TnZxoX/hfAGDGt5JrdYD
-	GbqOvGJKx6PM4WLuFEnrR2l7AV6wpOovOZa3HpjoiEE4ljmaBs3orjzAEsXXg4DU
-	PHW0pMg+/n1WXMdY2eS7QPG+fHj1GOGzw3tTjjK36PmO7P4VGNMFcxnqlHHH3Q/v
-	S1gVgNlBvrP3P5V4Tzp0iirSXaRsIwwWHlVBklmDt/rfPA5W1aXzU842CipwHEBO
-	xAjaYSPLX4RFryZt08y3boX83gEHHGOZDKhKOw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1742497996; x=
-	1742584396; bh=IR0OXTd3Mv/VRatqgXGdaWOrIeWV/sLQQJTuLfYjzLw=; b=b
-	JzM14bF/3TePJ/3oTX5HMRKxuXa0o9RGUv1jh6o6cKkLWWqFpDHajoH0LprAtGqx
-	ciexdFnN+Y9qG8pN5gZTIOao/FuaRLa+1cfoBCiIsJnvvg8x7aCaQwRjtr65r+Wh
-	fFpI6+VlpUWjEQHMNOxqkqQUhrJGs8q5zT5XHu0F/LHPkQQ7lQqlbnb92Moo5Cl0
-	m1QCF+n0AX28xhvttONLiJWZ+bGsWCr6R9CuUW31ziot0Cjgp0raz7j9eUjayI5l
-	fMRXKXH60fFcF9H63Wbl0d2wO3j8UecllIbrrBd5IEtWfyO7iKrev7kN5ZG3CvYw
-	XrTa7VuSjnfoGDTR5f54w==
-X-ME-Sender: <xms:y2jcZ_5lCRQitctDFsBtHo0Noz8NQxgB8UgA_E4aV9UEvjAujS471Q>
-    <xme:y2jcZ069wItkakjpBn_iDngyEnMPX4rp1wDBwo6aoMu_SwmJYN-j_3uPkEu8Eo-ga
-    Nm0IiYV1IVN9XDsZxo>
-X-ME-Received: <xmr:y2jcZ2cGbcrWm4bWNNMAE4KRk3Ky1Cc1VTm_63gsSiaQN_ZAbfOlN2rUWR4VwKg6iQwqhw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddugeeltdefucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhephffvvefujghfofggtgfgfffksehtqhertder
-    tdejnecuhfhrohhmpeflrgihucggohhssghurhhghhcuoehjvhesjhhvohhssghurhhghh
-    drnhgvtheqnecuggftrfgrthhtvghrnhepgeefgffhgffhhfejgfevkefhueekvefftefh
-    gfdtuddtfeffueehleegleeiuefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
-    hmpehmrghilhhfrhhomhepjhhvsehjvhhoshgsuhhrghhhrdhnvghtpdhnsggprhgtphht
-    thhopeduvddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprhgriihorhessghlrg
-    gtkhifrghllhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhn
-    vghtpdhrtghpthhtoheplhhiuhhhrghnghgsihhnsehgmhgrihhlrdgtohhmpdhrtghpth
-    htohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehhohhrmhhs
-    sehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpd
-    hrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthho
-    pegtrhgrthhiuhesnhhvihguihgrrdgtohhmpdhrtghpthhtoheplhhirghlihesrhgvug
-    hhrghtrdgtohhm
-X-ME-Proxy: <xmx:y2jcZwKwA6JMSeVR8VAyAt4_DPAqXZbTvcm0Kaz73D26vRJcEEYPNA>
-    <xmx:y2jcZzKBz4VrZrhhZ_0CNrCJiwLHkcib3ZmL0lci2NWHeliMEuPzyw>
-    <xmx:y2jcZ5yKa147PyFblOVwWW_70K6ypQ7COYvOIxne4Ii8xBnLZEqk2w>
-    <xmx:y2jcZ_K9v1SsvGa8r4PyF5ibGRU9NXlPJcG5PPQYmzlMyTlZUm9qTQ>
-    <xmx:zGjcZ9Aef3wNq5BRxRpeSg1IhKx44YDjc0Bfo8ekGzANUm1-HY0CuqR_>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 20 Mar 2025 15:13:15 -0400 (EDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id 344A79FC4A; Thu, 20 Mar 2025 12:13:14 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id 318109FC46;
-	Thu, 20 Mar 2025 12:13:14 -0700 (PDT)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: Hangbin Liu <liuhangbin@gmail.com>
-cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>,
-    Nikolay Aleksandrov <razor@blackwall.org>,
-    Simon Horman <horms@kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>,
-    linux-kernel@vger.kernel.org, Liang Li <liali@redhat.com>
-Subject: Re: [PATCH net] bonding: use permanent address for MAC swapping if device address is same
-In-reply-to: <20250319080947.2001-1-liuhangbin@gmail.com>
-References: <20250319080947.2001-1-liuhangbin@gmail.com>
-Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
-   message dated "Wed, 19 Mar 2025 08:09:47 -0000."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1742498976; c=relaxed/simple;
+	bh=xA/L31AqH22YF+KwVqyZLZxhcULSKRtUepyMdBumU/A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XjSYhvPCeY97sQBnep2Lc7wvIjqVPaApmJOAyDaxJVxBrD3sTJILSZ13pNJwhf+9bdqwrKNLZSea55fe1UJ78OLn+BY1Q/xQ+DWTniepG2h2GIS6KEPgVSGAJv7lMLxFZXrFoXTjHt50pO6uhoETuLrRhsd/y5xnbz8BUSr5Ah4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O8jLQtF7; arc=none smtp.client-ip=209.85.222.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-86ba07fe7a4so898675241.2;
+        Thu, 20 Mar 2025 12:29:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742498973; x=1743103773; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MqYIDVSoXi4cOMiLK+CujjyxUYRDhFvgRYDKz8VXGi0=;
+        b=O8jLQtF7EPeWRyTHVSlAFzhpENsAPSgLvk943B/CISa+08wBNv8CEmK27gghscaps7
+         zcb0q9WR0346ECmret/6foA9WtVAGZaYhue15smZfcXBeT2PkqwrcsHXStg/3bQxeBsv
+         dxAFSeQt5aO0SOQluu4r75vNBZLSBThjxPMNCnW5vb3N/MwDIH1l1pFzur+ClAAbElQT
+         sRidYaO6iYTybabYmZaOf8w+6Xv6+ixt20u2idmzEYQM7+pY+j8boRJWy3afbmTYBAxy
+         GQLTCfmVPUJ6ch6rfYQPTaPog6P3Q60Ui84GvwFMEFOl9BYrBOZ7dU02INW6lkoanA6A
+         C0mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742498973; x=1743103773;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MqYIDVSoXi4cOMiLK+CujjyxUYRDhFvgRYDKz8VXGi0=;
+        b=BruhKP3sQMEYh3dfozbeW3imYt6YvRdjAR2Zc6+zR7dSnOz2uh1jgKcM+sv3xCIixc
+         Cs3ykuZXAypfpDT3rJg77hKz9qxb5xqytZcjilvYVdL7mrji9Zgntj6yD1xYWVwRvLwZ
+         UUvn8qeVyH+kDheQ/lTkDih5x28IFcq1sZKr2wCCObOy3t0hPO/u9f2pzVGs6/HiDCBO
+         B1wogbSuIaqt3tSbW9dIUYfd3FFkRqO/eeBQvRPOmyeeCHeoxPg8LFA3z+P8HPrm0S6u
+         zswaHij2TWjY5tzYXGI6chuxVl+H+V1b1TPw+7PceobEhf3oHPrp3m+uzvQ7/CZxhP00
+         /6UQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUghNO4gIjNcfYhf3JDJMDJD3+/EJdmkY52TAaesUdvutXwXPRX291gHqKAgfwBBjz/YRiesbg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyJh/Qau/E27sgVF0iCFzscuFOajBZig8y9ROA2uP6Uv2ooeZC
+	bp27nEBoxLUaL9+3NbWuvEO0xng3SlzXCeAuGX3wgXgXlcdywver
+X-Gm-Gg: ASbGncu83CH5VX97nC01S5919p3HorSJzyrQQ1v3TbKoVD+az2Rb6vs6qlPwWPdBq1R
+	IIlgDtut24SwRc348DUFnqQimjG6b/BrezwaaqWe4HxbqiNig4bjrFqIxO8F+ZhpDIyPVOtS4zs
+	c5cv6TVZWqs/t5zWgRL2vwgDZ4zKgztJAFy/FxcJ7HCzf+SBrt67DbZc2pijAxt0pKFsz4yEUBg
+	iYtqMyCLFs7dZ2kkTfRYB4xH0TWso3PTuJbmnBlovz7I7UNA4Eo/kUjuzVxFtwetDaGoNbm6ErJ
+	6zW+mNUIkMzBTWHDqMwPUjkcSawCebGapWe0FgGQTVjDeYcSF9hAU8AhwgrJ+BUbrZXlqbJkz4e
+	FDee+Y0zGxK36iw==
+X-Google-Smtp-Source: AGHT+IFCjwF3ss/OuoZ1XCLPQlAhf4wbIFaYrwB7ea5/FWFTb9SnwrgwR2WlxIwG5sxQBbhXquYaig==
+X-Received: by 2002:a05:6102:330a:b0:4bb:d394:46d7 with SMTP id ada2fe7eead31-4c50d4afbcfmr674812137.6.1742498973007;
+        Thu, 20 Mar 2025 12:29:33 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4c50bc55ad1sm99391137.18.2025.03.20.12.29.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Mar 2025 12:29:30 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [GIT PULL] bluetooth-next 2025-03-20
+Date: Thu, 20 Mar 2025 15:29:29 -0400
+Message-ID: <20250320192929.1557825-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 20 Mar 2025 12:13:14 -0700
-Message-ID: <2696885.1742497994@famine>
+Content-Transfer-Encoding: 8bit
 
-Hangbin Liu <liuhangbin@gmail.com> wrote:
+The following changes since commit 6855b9be9cf70d3fd4b4b9a00696eae65335320c:
 
->Similar with a951bc1e6ba5 ("bonding: correct the MAC address for "follow"
->fail_over_mac policy"). The fail_over_mac follow mode requires the formerly
->active slave to swap MAC addresses with the newly active slave during
->failover. However, the slave's MAC address can be same under certain
->conditions:
->
->1) ip link set eth0 master bond0
->   bond0 adopts eth0's MAC address (MAC0).
->
->1) ip link set eth1 master bond0
->   eth1 is added as a backup with its own MAC (MAC1).
->
->3) ip link set eth0 nomaster
->   eth0 is released and restores its MAC (MAC0).
->   eth1 becomes the active slave, and bond0 assigns MAC0 to eth1.
->
->4) ip link set eth0 master bond0
->   eth0 is re-added to bond0, but both eth0 and eth1 now have MAC0,
->   breaking the follow policy.
+  Merge branch 'mptcp-pm-prep-work-for-new-ops-and-sysctl-knobs' (2025-03-20 10:14:53 +0100)
 
-	Are all of these steps necessary, or does the issue happen if a
-new interface (not previously part of the bond) is added to the bond
-with its MAC set to whatever the bond's MAC is?
+are available in the Git repository at:
 
-	Did this come up in practise somewhere, or through inspection /
-testing?  I'm curious as I'd expect usage of this option today would be
-rare, as I hope that current hardware wouldn't have the "MAC assigned to
-multiple ports" issues that led to the "follow" logic.  If memory
-serves, the issue arose originally in the ehea network device (on IBM
-POWER), which I believe is out of production now for some years.
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2025-03-20
 
->To resolve this issue, we need to swap the new active slave=E2=80=99s perm=
-anent
->MAC address with the old one. The new active slave then uses the old
->dev_addr, ensuring that it matches the bond address. After the fix:
->
->5) ip link set bond0 type bond active_slave eth0
->   dev_addr is the same, swap old active eth1's MAC (MAC0) with eth0.
->   Swap new active eth0's permanent MAC (MAC0) to eth1.
->   MAC addresses remain unchanged.
->
->6) ip link set bond0 type bond active_slave eth1
->   dev_addr is the same, swap the old active eth0's MAC (MAC0) with eth1.
->   Swap new active eth1's permanent MAC (MAC1) to eth0.
->   The MAC addresses are now correctly differentiated.
+for you to fetch changes up to 1a6e1539e97303c60d82e3d5e163973e771a9d7f:
 
-	An alternative solution could be to disallow adding a new
-interface in "follow" mode if its MAC matches the active interface of
-the bond.  If this patch is more of an correctness exercise rather than
-something found out in the world impacting production deployments, it
-might be better to keep the MAC swapping logic in the failover code
-simpler.
+  Bluetooth: btnxpuart: Fix kernel panic during FW release (2025-03-20 14:59:07 -0400)
 
-	-J
+----------------------------------------------------------------
+bluetooth-next pull request for net-next:
 
->Fixes: 3915c1e8634a ("bonding: Add "follow" option to fail_over_mac")
->Reported-by: Liang Li <liali@redhat.com>
->Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
->---
-> drivers/net/bonding/bond_main.c | 9 +++++++--
-> include/net/bonding.h           | 8 ++++++++
-> 2 files changed, 15 insertions(+), 2 deletions(-)
->
->diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_ma=
-in.c
->index e45bba240cbc..9cc2348d4ee9 100644
->--- a/drivers/net/bonding/bond_main.c
->+++ b/drivers/net/bonding/bond_main.c
->@@ -1107,8 +1107,13 @@ static void bond_do_fail_over_mac(struct bonding *b=
-ond,
-> 			old_active =3D bond_get_old_active(bond, new_active);
->=20
-> 		if (old_active) {
->-			bond_hw_addr_copy(tmp_mac, new_active->dev->dev_addr,
->-					  new_active->dev->addr_len);
->+			if (bond_hw_addr_equal(old_active->dev->dev_addr, new_active->dev->dev=
-_addr,
->+					       new_active->dev->addr_len))
->+				bond_hw_addr_copy(tmp_mac, new_active->perm_hwaddr,
->+						  new_active->dev->addr_len);
->+			else
->+				bond_hw_addr_copy(tmp_mac, new_active->dev->dev_addr,
->+						  new_active->dev->addr_len);
-> 			bond_hw_addr_copy(ss.__data,
-> 					  old_active->dev->dev_addr,
-> 					  old_active->dev->addr_len);
->diff --git a/include/net/bonding.h b/include/net/bonding.h
->index 8bb5f016969f..de965c24dde0 100644
->--- a/include/net/bonding.h
->+++ b/include/net/bonding.h
->@@ -463,6 +463,14 @@ static inline void bond_hw_addr_copy(u8 *dst, const u=
-8 *src, unsigned int len)
-> 	memcpy(dst, src, len);
-> }
->=20
->+static inline bool bond_hw_addr_equal(const u8 *dst, const u8 *src, unsig=
-ned int len)
->+{
->+	if (len =3D=3D ETH_ALEN)
->+		return ether_addr_equal(dst, src);
->+	else
->+		return (memcmp(dst, src, len) =3D=3D 0);
->+}
->+
-> #define BOND_PRI_RESELECT_ALWAYS	0
-> #define BOND_PRI_RESELECT_BETTER	1
-> #define BOND_PRI_RESELECT_FAILURE	2
->--=20
->2.46.0
+core:
 
----
-	-Jay Vosburgh, jv@jvosburgh.net
+ - Add support for skb TX SND/COMPLETION timestamping
+ - hci_core: Enable buffer flow control for SCO/eSCO
+ - coredump: Log devcd dumps into the monitor
 
+ drivers:
+
+ - btusb: Add 2 HWIDs for MT7922
+ - btusb: Fix regression in the initialization of fake Bluetooth controllers
+ - btusb: Add 14 USB device IDs for Qualcomm WCN785x
+ - btintel: Add support for Intel Scorpius Peak
+ - btintel: Add support to configure TX power
+ - btintel: Add DSBR support for ScP
+ - btintel_pcie: Add device id of Whale Peak
+ - btintel_pcie: Setup buffers for firmware traces
+ - btintel_pcie: Read hardware exception data
+ - btintel_pcie: Add support for device coredump
+ - btintel_pcie: Trigger device coredump on hardware exception
+ - btnxpuart: Support for controller wakeup gpio config
+ - btnxpuart: Add support to set BD address
+ - btnxpuart: Add correct bootloader error codes
+ - btnxpuart: Handle bootloader error during cmd5 and cmd7
+ - btnxpuart: Fix kernel panic during FW release
+ - qca: add WCN3950 support
+ - hci_qca: use the power sequencer for wcn6750
+ - btmtksdio: Prevent enabling interrupts after IRQ handler removal
+
+----------------------------------------------------------------
+Arkadiusz Bokowy (1):
+      Bluetooth: hci_event: Fix connection regression between LE and non-LE adapters
+
+Arseniy Krasnov (2):
+      Bluetooth: hci_uart: fix race during initialization
+      Bluetooth: hci_uart: Fix another race during initialization
+
+Dan Carpenter (1):
+      Bluetooth: Fix error code in chan_alloc_skb_cb()
+
+Dmitry Baryshkov (3):
+      dt-bindings: net: bluetooth: qualcomm: document WCN3950
+      Bluetooth: qca: simplify WCN399x NVM loading
+      Bluetooth: qca: add WCN3950 support
+
+Dorian Cruveiller (1):
+      Bluetooth: btusb: Add new VID/PID for WCN785x
+
+Douglas Anderson (1):
+      Bluetooth: btusb: mediatek: Add err code to btusb claim iso printout
+
+Dr. David Alan Gilbert (2):
+      Bluetooth: MGMT: Remove unused mgmt_pending_find_data
+      Bluetooth: MGMT: Remove unused mgmt_*_discovery_complete
+
+Easwar Hariharan (4):
+      Bluetooth: hci_vhci: convert timeouts to secs_to_jiffies()
+      Bluetooth: MGMT: convert timeouts to secs_to_jiffies()
+      Bluetooth: SMP: convert timeouts to secs_to_jiffies()
+      Bluetooth: L2CAP: convert timeouts to secs_to_jiffies()
+
+Hao Qin (1):
+      Bluetooth: btmtk: Remove the resetting step before downloading the fw
+
+Janaki Ramaiah Thota (1):
+      Bluetooth: hci_qca: use the power sequencer for wcn6750
+
+Jeremy Clifton (1):
+      Bluetooth: Fix code style warning
+
+Jiande Lu (1):
+      Bluetooth: btusb: Add 2 HWIDs for MT7922
+
+Kiran K (8):
+      Bluetooth: btintel: Add support for Intel Scorpius Peak
+      Bluetooth: btintel_pcie: Add device id of Whale Peak
+      Bluetooth: btintel: Add DSBR support for ScP
+      Bluetooth: btintel_pcie: Setup buffers for firmware traces
+      Bluetooth: btintel_pcie: Read hardware exception data
+      Bluetooth: btintel_pcie: Add support for device coredump
+      Bluetooth: btintel_pcie: Trigger device coredump on hardware exception
+      Bluetooth: btintel: Fix leading white space
+
+Loic Poulain (2):
+      bluetooth: btnxpuart: Support for controller wakeup gpio config
+      dt-bindings: net: bluetooth: nxp: Add wakeup pin properties
+
+Luiz Augusto von Dentz (4):
+      Bluetooth: btintel_pci: Fix build warning
+      Bluetooth: hci_core: Enable buffer flow control for SCO/eSCO
+      Bluetooth: hci_vhci: Mark Sync Flow Control as supported
+      HCI: coredump: Log devcd dumps into the monitor
+
+Neeraj Sanjay Kale (7):
+      Bluetooth: btnxpuart: Move vendor specific initialization to .post_init
+      Bluetooth: btnxpuart: Add support for HCI coredump feature
+      dt-bindings: net: bluetooth: nxp: Add support to set BD address
+      Bluetooth: btnxpuart: Add support to set BD address
+      Bluetooth: btnxpuart: Add correct bootloader error codes
+      Bluetooth: btnxpuart: Handle bootloader error during cmd5 and cmd7
+      Bluetooth: btnxpuart: Fix kernel panic during FW release
+
+Pauli Virtanen (5):
+      net-timestamp: COMPLETION timestamp on packet tx completion
+      Bluetooth: add support for skb TX SND/COMPLETION timestamping
+      Bluetooth: ISO: add TX timestamping
+      Bluetooth: L2CAP: add TX timestamping
+      Bluetooth: SCO: add TX timestamping
+
+Pedro Nishiyama (4):
+      Bluetooth: Add quirk for broken READ_VOICE_SETTING
+      Bluetooth: Add quirk for broken READ_PAGE_SCAN_TYPE
+      Bluetooth: Disable SCO support if READ_VOICE_SETTING is unsupported/broken
+      Bluetooth: btusb: Fix regression in the initialization of fake Bluetooth controllers
+
+Sean Wang (1):
+      Bluetooth: btmtksdio: Prevent enabling interrupts after IRQ handler removal
+
+Vijay Satija (1):
+      Bluetooth: btintel: Add support to configure TX power
+
+Wentao Guan (1):
+      Bluetooth: HCI: Add definition of hci_rp_remote_name_req_cancel
+
+Zijun Hu (1):
+      Bluetooth: btusb: Add 13 USB device IDs for Qualcomm WCN785x
+
+ .../bindings/net/bluetooth/nxp,88w8987-bt.yaml     |  18 +-
+ .../bindings/net/bluetooth/qualcomm-bluetooth.yaml |   2 +
+ Documentation/networking/timestamping.rst          |   8 +
+ drivers/bluetooth/bfusb.c                          |   3 +-
+ drivers/bluetooth/btintel.c                        | 341 ++++++++++++
+ drivers/bluetooth/btintel.h                        |  24 +
+ drivers/bluetooth/btintel_pcie.c                   | 582 ++++++++++++++++++++-
+ drivers/bluetooth/btintel_pcie.h                   |  93 ++++
+ drivers/bluetooth/btmtk.c                          |  10 -
+ drivers/bluetooth/btmtksdio.c                      |   3 +-
+ drivers/bluetooth/btnxpuart.c                      | 407 +++++++++++---
+ drivers/bluetooth/btqca.c                          |  27 +-
+ drivers/bluetooth/btqca.h                          |   4 +
+ drivers/bluetooth/btusb.c                          |  36 +-
+ drivers/bluetooth/hci_ldisc.c                      |  19 +-
+ drivers/bluetooth/hci_qca.c                        |  27 +-
+ drivers/bluetooth/hci_uart.h                       |   1 +
+ drivers/bluetooth/hci_vhci.c                       |   5 +-
+ include/linux/skbuff.h                             |   7 +-
+ include/net/bluetooth/bluetooth.h                  |   1 +
+ include/net/bluetooth/hci.h                        |  36 +-
+ include/net/bluetooth/hci_core.h                   |  27 +-
+ include/net/bluetooth/l2cap.h                      |   7 +-
+ include/uapi/linux/errqueue.h                      |   1 +
+ include/uapi/linux/net_tstamp.h                    |   6 +-
+ net/bluetooth/6lowpan.c                            |   9 +-
+ net/bluetooth/coredump.c                           |  28 +-
+ net/bluetooth/hci_conn.c                           | 122 +++++
+ net/bluetooth/hci_core.c                           |  77 +--
+ net/bluetooth/hci_event.c                          |  15 +-
+ net/bluetooth/hci_sync.c                           |  32 +-
+ net/bluetooth/iso.c                                |  24 +-
+ net/bluetooth/l2cap_core.c                         |  45 +-
+ net/bluetooth/l2cap_sock.c                         |  15 +-
+ net/bluetooth/mgmt.c                               |  46 +-
+ net/bluetooth/mgmt_util.c                          |  17 -
+ net/bluetooth/mgmt_util.h                          |   4 -
+ net/bluetooth/sco.c                                |  19 +-
+ net/bluetooth/smp.c                                |   4 +-
+ net/core/skbuff.c                                  |   2 +
+ net/ethtool/common.c                               |   1 +
+ net/socket.c                                       |   3 +
+ 42 files changed, 1890 insertions(+), 268 deletions(-)
 
