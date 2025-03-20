@@ -1,143 +1,256 @@
-Return-Path: <netdev+bounces-176368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E90A3A69E17
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 03:11:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F4173A69E65
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 03:41:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FB2919C270B
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 02:10:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 66A2D7AE50F
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 02:40:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D4E61EA7C2;
-	Thu, 20 Mar 2025 02:09:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=byte-forge-io.20230601.gappssmtp.com header.i=@byte-forge-io.20230601.gappssmtp.com header.b="ZE8HQpQc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE3F21EB5CA;
+	Thu, 20 Mar 2025 02:41:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04CFC1DED46
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 02:09:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+Received: from second.openwall.net (second.openwall.net [193.110.157.125])
+	by smtp.subspace.kernel.org (Postfix) with SMTP id 54B881DF733
+	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 02:41:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.110.157.125
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742436548; cv=none; b=TqVo9MYYkTwwgT71KHoMpWdb6RTYFAdOrRa/h67wP7hgf9t9R7X6uZbsm0zlXVHLQaf/xCOyleHORQfplZBNZG5aKxmkYLPCJ51Flpmo5EAijWQxxaezUVOCWFV+SpJ3zyfflg6x7Cmhua2VEeHnaMapBR7mWneOrJpHZnXl8k0=
+	t=1742438475; cv=none; b=qJfs7t97nR1CaKOCH7j4pB8ommNNf48HeqDCsINKg0mAvUvTbP3kaEt51NIBqDj6OYQZ5VzM6TUv9OS5ZiAi1f430svyNQvd2EgF9wxIx5DpdjUmiBIcKERS+JHrdyz4tJ4PHNk5zhrB1rWYhRBe9Ei0sadqZQXWurZ0Q3ajOVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742436548; c=relaxed/simple;
-	bh=vEpaWA68QW/xdk82Q0863rirqvUGKmQiDZcP3WFc19Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TwWexqwWOg++4HScO8fzW5JuOeFU9b6Q6bOCP4x49L38Ek344rul6CyZuA+pj0GWK7pF3I14A9i6jSu/R3+J10ozEpvXvfuuSPJsk40f2fzgh4sElJSjILvrkodZocdM0kk4A23aJmtikeijPkDYIH5zHhRUoKUZxDVxb2b1BGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=antoniohickey.com; spf=pass smtp.mailfrom=byte-forge.io; dkim=pass (2048-bit key) header.d=byte-forge-io.20230601.gappssmtp.com header.i=@byte-forge-io.20230601.gappssmtp.com header.b=ZE8HQpQc; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=antoniohickey.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=byte-forge.io
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6fece18b3c8so2340017b3.3
-        for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 19:09:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=byte-forge-io.20230601.gappssmtp.com; s=20230601; t=1742436546; x=1743041346; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4SLgULB2utXQCUaKC6ocj9H9XNoQumEhcqg5bohf8SE=;
-        b=ZE8HQpQc0aRyaw2PZHQhBb1sKi+tzWRjx9Lg9CXzQRJ/b/boSFgeZFbms/bURJiulc
-         cvwHu7g7UIluLSGF5LibnU9CpvvR7Y45lZyZ+3Rak06qg350HVhZi6QpdSsrZWLZrd28
-         K51rR4opjwzQwAk6bqUjANNldSJLby9F5/8xJXgRFbFN76GHCLSyjh6f4RqTEWrJk7bs
-         N3XHeixVQgogaoGIu3wfs6SzobzjRTnwgmyM0+35PVA/8NI8ixC95Em7nLwxhkq+zWzJ
-         +VWI5GB9zNc9db1GT27ePW0KPeWwxps7Nuh+ffoIoNVR0iHJFCietPWH2ADuI4b3CLy+
-         8QWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742436546; x=1743041346;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4SLgULB2utXQCUaKC6ocj9H9XNoQumEhcqg5bohf8SE=;
-        b=OFV9ZozIo0am3f3YXidn6x3Uu3fyaZ4VCBn3TzKs+wSfdfmScFps9tL4C1xETGMUc9
-         KulnnYiN9121Ltn43XGrNKrYDtpQXNA29fW4rPErADIh3ElKhYFlhkq1c0FT8fzaHcno
-         AjthGhnZmG3BBq6z/dvrlTrgsONhRBKAMjwg/1AhGLRQ0HkBaXfiuxcRXBB+X5XKdcbi
-         clduULXe7SmF7DAkU/nUHTXCeSY0zD9krkbsGNXlTW9+9xxNQawf2scWVjuQo4jpDYkA
-         8rjuzW9WWraCywyI2PBqRfRjmE9Qk4SUNXEzBQ1jE668AC2VGa1Mi0bPMFcL7oOaSg2V
-         pJhg==
-X-Forwarded-Encrypted: i=1; AJvYcCXMiPUkDheLkE5xp3NhaB7LcZ4W1Il7BbPL2PNwcC4pg7jQczb01W5n8xEh2Sa0aRjz0+7Msy8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1gNDx35raQ3Is138xSrovwZa1oahqfttdR3qaFLJ7wb+L9HEd
-	nBwCFEl6suKEPwLgAg2VTssej8CFeDRi7GzSwsqzYLl9QHUuSYvlTRY3VYASyuk=
-X-Gm-Gg: ASbGncuj6O07ZUzRDqHSU1Gh5eXN1NEL/+0sVWPFg8/lqIbLMKm/6QsroP2JX46qDhB
-	uUfiFDIAyCBNjHFdOzYdWKL2/wUuG0JbJwvFymq+80RKDJ6Kn0Lqfz1XIR1ipYZPUDazD5lbd2p
-	BSsAc+Oe35rrwMp56rtoP2q/8NAKv9xOOOaelOXLb/bXGFZRx3cRa+jqMLoHZgZlTsB4JmzEgLW
-	KlFAKavxHHlzpq/4VI1HPCfmhkwim+63vg+u0jxaf89WJG+d0HP7TIRHf3ab3bqrCkitM0/PJ+A
-	cM3we7dY7XcAhxlxhhI/p0YsQWmPLORiNMvGAbx5iezXhQ4g/s2PL5jXghEWAml7f6piAMB6rUT
-	0a3a+Sspt4m0Ia12qmUv9fy0e9TLpew==
-X-Google-Smtp-Source: AGHT+IGxlIGpc01WyScw8Txp7o/tEVqqwrLLlhRzgrQzlCT/6WJlb/M0fwe2B7ib20G5lx/x8+EwKg==
-X-Received: by 2002:a05:690c:fd2:b0:6fe:c803:b48e with SMTP id 00721157ae682-700ac5f14f9mr17203407b3.22.1742436545995;
-        Wed, 19 Mar 2025 19:09:05 -0700 (PDT)
-Received: from Machine.lan (107-219-75-226.lightspeed.wepbfl.sbcglobal.net. [107.219.75.226])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6ff32cb598asm32826357b3.111.2025.03.19.19.09.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Mar 2025 19:09:05 -0700 (PDT)
-From: Antonio Hickey <contact@antoniohickey.com>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	Trevor Gross <tmgross@umich.edu>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Gary Guo <gary@garyguo.net>,
-	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
-	Benno Lossin <benno.lossin@proton.me>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Danilo Krummrich <dakr@kernel.org>
-Cc: Antonio Hickey <contact@antoniohickey.com>,
-	netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v5 12/17] rust: net: phy: refactor to use `&raw [const|mut]`
-Date: Wed, 19 Mar 2025 22:07:31 -0400
-Message-ID: <20250320020740.1631171-13-contact@antoniohickey.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250320020740.1631171-1-contact@antoniohickey.com>
-References: <20250320020740.1631171-1-contact@antoniohickey.com>
+	s=arc-20240116; t=1742438475; c=relaxed/simple;
+	bh=Ov12BHgQtJeYkVfTeLe4KkA/+7bFWMw8jGFJAJXzl3k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Mime-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FjaYD/dTOu4BkMTrk2qXlzBE8yHB6A/4pvQ+xvcXkapYCMJVaFodb/NeN/IrfTz+fOUfZwphOspqBGhFu86VcFsajKSJs4vQxb+123g8Vgn8Krmw9BeYZ1L8pZ45jM9QUM29ei8dpRSXmKp53gKkFyyw0+D9kzkKq8rTz8g5SnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openwall.com; spf=pass smtp.mailfrom=openwall.com; arc=none smtp.client-ip=193.110.157.125
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openwall.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openwall.com
+Received: (qmail 5897 invoked from network); 20 Mar 2025 02:34:28 -0000
+Received: from localhost (HELO pvt.openwall.com) (127.0.0.1)
+  by localhost with SMTP; 20 Mar 2025 02:34:28 -0000
+Received: by pvt.openwall.com (Postfix, from userid 503)
+	id E98CBA064E; Thu, 20 Mar 2025 03:32:02 +0100 (CET)
+Date: Thu, 20 Mar 2025 03:32:02 +0100
+From: Solar Designer <solar@openwall.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Yunsheng Lin <yunshenglin0825@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Simon Horman <horms@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Mina Almasry <almasrymina@google.com>,
+	Yonglong Liu <liuyonglong@huawei.com>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Robin Murphy <robin.murphy@arm.com>, IOMMU <iommu@lists.linux.dev>,
+	segoon@openwall.com, oss-security@lists.openwall.com,
+	kernel-hardening@lists.openwall.com, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, linux-rdma@vger.kernel.org, linux-mm@kvack.org,
+	Qiuling Ren <qren@redhat.com>, Yuying Ma <yuma@redhat.com>,
+	sultan@kerneltoast.com
+Subject: Re: [PATCH net-next 3/3] page_pool: Track DMA-mapped pages and unmap them when destroying the pool
+Message-ID: <20250320023202.GA25514@openwall.com>
+References: <20250314-page-pool-track-dma-v1-0-c212e57a74c2@redhat.com> <20250314-page-pool-track-dma-v1-3-c212e57a74c2@redhat.com> <db813035-fb38-4fc3-b91e-d1416959db13@gmail.com> <87jz8nhelh.fsf@toke.dk> <7a76908d-5be2-43f1-a8e2-03b104165a29@huawei.com> <87wmcmhxdz.fsf@toke.dk> <ce6ca18b-0eda-4d62-b1d3-e101fe6dcd4e@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <ce6ca18b-0eda-4d62-b1d3-e101fe6dcd4e@huawei.com>
+User-Agent: Mutt/1.4.2.3i
 
-Replacing all occurrences of `addr_of_mut!(place)` with
-`&raw mut place`.
+On Wed, Mar 19, 2025 at 07:06:57PM +0800, Yunsheng Lin wrote:
+> On 2025/3/19 4:55, Toke Høiland-Jørgensen wrote:
+> > Yunsheng Lin <linyunsheng@huawei.com> writes:
+> >> On 2025/3/17 23:16, Toke Høiland-Jørgensen wrote:
+> >>> Yunsheng Lin <yunshenglin0825@gmail.com> writes:
+> >>>> On 3/14/2025 6:10 PM, Toke Høiland-Jørgensen wrote:
+> >>>>
+> >>>> ...
+> >>>>
+> >>>>> To avoid having to walk the entire xarray on unmap to find the page
+> >>>>> reference, we stash the ID assigned by xa_alloc() into the page
+> >>>>> structure itself, using the upper bits of the pp_magic field. This
+> >>>>> requires a couple of defines to avoid conflicting with the
+> >>>>> POINTER_POISON_DELTA define, but this is all evaluated at compile-time,
+> >>>>> so does not affect run-time performance. The bitmap calculations in this
+> >>>>> patch gives the following number of bits for different architectures:
+> >>>>>
+> >>>>> - 24 bits on 32-bit architectures
+> >>>>> - 21 bits on PPC64 (because of the definition of ILLEGAL_POINTER_VALUE)
+> >>>>> - 32 bits on other 64-bit architectures
+> >>>>
+> >>>>  From commit c07aea3ef4d4 ("mm: add a signature in struct page"):
+> >>>> "The page->signature field is aliased to page->lru.next and
+> >>>> page->compound_head, but it can't be set by mistake because the
+> >>>> signature value is a bad pointer, and can't trigger a false positive
+> >>>> in PageTail() because the last bit is 0."
+> >>>>
+> >>>> And commit 8a5e5e02fc83 ("include/linux/poison.h: fix LIST_POISON{1,2} 
+> >>>> offset"):
+> >>>> "Poison pointer values should be small enough to find a room in
+> >>>> non-mmap'able/hardly-mmap'able space."
+> >>>>
+> >>>> So the question seems to be:
+> >>>> 1. Is stashing the ID causing page->pp_magic to be in the mmap'able/
+> >>>>     easier-mmap'able space? If yes, how can we make sure this will not
+> >>>>     cause any security problem?
+> >>>> 2. Is the masking the page->pp_magic causing a valid pionter for
+> >>>>     page->lru.next or page->compound_head to be treated as a vaild
+> >>>>     PP_SIGNATURE? which might cause page_pool to recycle a page not
+> >>>>     allocated via page_pool.
+> >>>
+> >>> Right, so my reasoning for why the defines in this patch works for this
+> >>> is as follows: in both cases we need to make sure that the ID stashed in
+> >>> that field never looks like a valid kernel pointer. For 64-bit arches
+> >>> (where CONFIG_ILLEGAL_POINTER_VALUE), we make sure of this by never
+> >>> writing to any bits that overlap with the illegal value (so that the
+> >>> PP_SIGNATURE written to the field keeps it as an illegal pointer value).
+> >>> For 32-bit arches, we make sure of this by making sure the top-most bit
+> >>> is always 0 (the -1 in the define for _PP_DMA_INDEX_BITS) in the patch,
+> >>> which puts it outside the range used for kernel pointers (AFAICT).
+> >>
+> >> Is there any season you think only kernel pointer is relevant here?
+> > 
+> > Yes. Any pointer stored in the same space as pp_magic by other users of
+> > the page will be kernel pointers (as they come from page->lru.next). The
+> > goal of PP_SIGNATURE is to be able to distinguish pages allocated by
+> > page_pool, so we don't accidentally recycle a page from somewhere else.
+> > That's the goal of the check in page_pool_page_is_pp():
+> > 
+> > (page->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE
+> > 
+> > To achieve this, we must ensure that the check above never returns true
+> > for any value another page user could have written into the same field
+> > (i.e., into page->lru.next). For 64-bit arches, POISON_POINTER_DELTA
+> 
+> POISON_POINTER_DELTA is defined according to CONFIG_ILLEGAL_POINTER_VALUE,
+> if CONFIG_ILLEGAL_POINTER_VALUE is not defined yet, POISON_POINTER_DELTA
+> is defined to zero.
+> 
+> It seems only the below 64-bit arches define CONFIG_ILLEGAL_POINTER_VALUE
+> through grepping:
+> a29815a333c6 core, x86: make LIST_POISON less deadly
+> 5c178472af24 riscv: define ILLEGAL_POINTER_VALUE for 64bit
+> f6853eb561fb powerpc/64: Define ILLEGAL_POINTER_VALUE for 64-bit
+> bf0c4e047324 arm64: kconfig: Move LIST_POISON to a safe value
+> 
+> The below 64-bit arches don't seems to define the above config yet:
+> MIPS64, SPARC64, System z(S390X),loongarch
+> 
+> Does ID stashing cause problem for the above arches?
+> 
+> > serves this purpose. For 32-bit arches, we can leave the top-most bits
+> > out of PP_MAGIC_MASK, to make sure that any valid pointer value will
+> > fail the check above.
+> 
+> The above mainly explained how to ensure page_pool_page_is_pp() will
+> not return false positive result from the page_pool perspective.
+> 
+> From MM/security perspective, most of the commits quoted above seem
+> to suggest that poison pointer should be in the non-mmap'able or
+> hardly-mmap'able space, otherwise userspace can arrange for those
+> pointers to actually be dereferencable, potentially turning an oops
+> to an expolit, more detailed example in the below paper, which explains
+> how to exploit a vulnerability which hardened by the 8a5e5e02fc83 commit:
+> https://www.usenix.org/system/files/conference/woot15/woot15-paper-xu.pdf
+> 
+> ID stashing seems to cause page->lru.next (aliased to page->pp_magic) to
+> be in the mmap'able space for some arches.
 
-This will allow us to reduce macro complexity, and improve consistency
-with existing reference syntax as `&raw mut` is similar to `&mut`
-making it fit more naturally with other existing code.
+...
 
-Suggested-by: Benno Lossin <benno.lossin@proton.me>
-Link: https://github.com/Rust-for-Linux/linux/issues/1148
-Signed-off-by: Antonio Hickey <contact@antoniohickey.com>
----
- rust/kernel/net/phy.rs | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> To be honest, I am not that familiar with the pointer poison mechanism.
+> But through some researching and analyzing, it makes sense to overstate
+> it a little as it seems to be security-related.
+> Cc'ed some security-related experts and ML to see if there is some
+> clarifying from them.
 
-diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
-index a59469c785e3..757db052cc09 100644
---- a/rust/kernel/net/phy.rs
-+++ b/rust/kernel/net/phy.rs
-@@ -7,7 +7,7 @@
- //! C headers: [`include/linux/phy.h`](srctree/include/linux/phy.h).
- 
- use crate::{error::*, prelude::*, types::Opaque};
--use core::{marker::PhantomData, ptr::addr_of_mut};
-+use core::marker::PhantomData;
- 
- pub mod reg;
- 
-@@ -285,7 +285,7 @@ impl AsRef<kernel::device::Device> for Device {
-     fn as_ref(&self) -> &kernel::device::Device {
-         let phydev = self.0.get();
-         // SAFETY: The struct invariant ensures that `mdio.dev` is valid.
--        unsafe { kernel::device::Device::as_ref(addr_of_mut!((*phydev).mdio.dev)) }
-+        unsafe { kernel::device::Device::as_ref(&raw mut (*phydev).mdio.dev) }
-     }
- }
- 
+You're correct that the pointer poison values should be in areas not
+mmap'able by userspace (at least with reasonable mmap_min_addr values).
 
+Looking at the union inside "struct page", I see pp_magic is aliased
+against multiple pointers in the union'ed anonymous structs.
+
+I'm not familiar with the uses of page->pp_magic and how likely or not
+we are to have a bug where its aliasing with pointers would be exposed
+as an attack vector, but this does look like a serious security concern.
+It looks like we would be seriously weakening the poisoning, except on
+archs where the new values with ID stashing are still not mmap'able.
+
+I just discussed the matter with my colleague at CIQ, Sultan Alsawaf,
+and he thinks the added risk is not that bad.  He wrote:
+
+> Toke's response here is fair:
+> 
+> > Right, okay, I see what you mean. So the risk is basically the
+> > following:
+> > 
+> > If some other part of the kernel ends up dereferencing the
+> > page->lru.next pointer of a page that is owned by page_pool, and which
+> > has an ID stashed into page->pp_magic, that dereference can end up being
+> > to a valid userspace mapping, which can lead to Bad Things(tm), cf the
+> > paper above.
+> > 
+> > This is mitigated by the fact that it can only happen on architectures
+> > that don't set ILLEGAL_POINTER_VALUE (which includes 32-bit arches, and
+> > the ones you listed above). In addition, this has to happen while the
+> > page is owned by page_pool, and while it is DMA-mapped - we already
+> > clear the pp_magic field when releasing the page from page_pool.
+> > 
+> > I am not sure to what extent the above is a risk we should take pains to
+> > avoid, TBH. It seems to me that for this to become a real problem, lots
+> > of other things will already have gone wrong. But happy to defer to the
+> > mm/security folks here.
+> 
+> For this to be a problem, there already needs to be a use-after-free on
+> a page, which arguably creates many other vectors for attack.
+> 
+> The lru field of struct page is already used as a generic list pointer
+> in several places in the kernel once ownership of the page is obtained.
+> Any risk of dereferencing lru.next in a use-after-free scenario would
+> technically apply to a bunch of other places in the kernel (grep for
+> page->lru).
+
+We also tried searching for existing exploitation techniques for "struct
+page" use-after-free.  We couldn't find any.  The closest (non-)match I
+found is this fine research (the same project presented differently):
+
+https://i.blackhat.com/BH-US-24/Presentations/US24-Qian-PageJack-A-Powerful-Exploit-Technique-With-Page-Level-UAF-Thursday.pdf page 33+
+https://arxiv.org/html/2401.17618v2#S4
+https://phrack.org/issues/71/13
+
+The arxiv paper includes this sentence: "To create a page-level UAF, the
+key is to cause a UAF of the struct page objects."  However, we do not
+see them actually do that, and this statement is not found in the slides
+nor in the Phrack article.  Confused.
+
+Thank you for CC'ing me and the kernel-hardening list.  However, please
+do not CC the oss-security list like that, where it's against content
+guidelines.  Only properly focused new postings/threads are acceptable
+there (not CC'ing from/to other lists where only part of the content is
+on-topic, and follow-ups might not be on-topic at all).  See:
+
+https://oss-security.openwall.org/wiki/mailing-lists/oss-security#list-content-guidelines
+
+As a moderator for oss-security, I'm going to remove these messages from
+the queue now.  Please drop Cc: oss-security from any further replies.
+
+If desired, we may bring these topics to oss-security separately, with a
+proper Subject line and clear description of what we're talking about.
+
+Alexander
 
