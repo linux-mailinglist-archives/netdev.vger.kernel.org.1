@@ -1,104 +1,138 @@
-Return-Path: <netdev+bounces-176528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3866A6AAC9
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 17:13:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0B2CA6AAE5
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 17:18:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0581189054F
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 16:10:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 595DB7A66BA
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 16:17:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54583157A72;
-	Thu, 20 Mar 2025 16:09:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B87E01E2853;
+	Thu, 20 Mar 2025 16:18:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u8EHpwqh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LXIRXZBC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C87A3597C;
-	Thu, 20 Mar 2025 16:09:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FD1017B402;
+	Thu, 20 Mar 2025 16:18:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742486998; cv=none; b=pwLGzMGiDjn0gQdrEEceLL75U5FGlIthBhvZRzxLNnk0DH6AiTF8FAgV+qZvZ5vL2Z9rTDjpa+SBZiug1JalGCnUt2ykvhk8/sb+m+kvelAuyjTDoSJ8fwo9SYMQgrgnetrfVtP9oEiDfHyhEux5KoaX0LiXbe2GDs/wcG7bO4s=
+	t=1742487532; cv=none; b=TRJdAHOKyVszYna9ZUyLbqAwphV14BsWcTJIszvBMpspYxdB7inudAIhAok/HjiRm5HRP2DL4izbOx+DHHWygJBI3OwvEBHEBmMS/yza5WEAWtiEDAkHvlOskqzwl37plam4uHuKgH9uVl/L3VRaO68I+SxYXsxbtvVDZWCAnJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742486998; c=relaxed/simple;
-	bh=hkuQQMjcS0eGfXLcE1H40vyvYEW5PoN7xdBcUNR6Ct0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PXRyL3cbSJ6p6IiafzKEx7qIWffSFTYPqnquQqcIbeA0kvYcSbaaiJORSi6EspV0hfhGpZdMdAy983VIuddeIddmFDg8jOdl95Ck9h3aM+PBWvizwKexfL2ba3qYYK4ayVq8jgZq54SOO2f9DvkJCQLGOPfPIbwbOOGjr+5laLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u8EHpwqh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A54D5C4CEDD;
-	Thu, 20 Mar 2025 16:09:57 +0000 (UTC)
+	s=arc-20240116; t=1742487532; c=relaxed/simple;
+	bh=43aNJV5MNYzkazpkxcqLf53/KEplAMSqtRgL10jyR/M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pf8Uz9z6zn6jJT4JPvyTF80czGabfSY/WtrN5W7wVHGiEx5CPXIf2z68QUchoAUOnssSW3XAl0Hae+eX9jh30tLRHxWjpL04948SfiJuwnIYa33DWHSlhaRMs7M6nTJeKNKvU8t/338HuROkQ7ax8Ey+hv8eSrRcRoK4ZvoyOTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LXIRXZBC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFC33C4CEDD;
+	Thu, 20 Mar 2025 16:18:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742486997;
-	bh=hkuQQMjcS0eGfXLcE1H40vyvYEW5PoN7xdBcUNR6Ct0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=u8EHpwqhWBmUIIbgCT9WcKrv2NE6hahLKPZWTgXOcho5sv6GAndRRUI5FKG66HRLs
-	 /woMHXvrPwQLve7hsCtcqasWjEBpDy1oL4Xh2+igj3cI783QudgsvXEjbp6rerMC2H
-	 HCbLlwmdaO6eU1cQURs8azq0ATPOg0PB+9rck38uXSzzSsSZpDCArU9Ql+BwHB/F1q
-	 BeV+DyT8clV4GgTRb64Q/yDCZDHA3yF9xEs22MeqSFbTD0T/XIn3RI2lQO9pcJwqMe
-	 ji4QyJP+cn5HxPYR/4GIBd2ddMqd5uCg2M1KGHapdlrLh+6x6/Mn/6LTZDSkO43RcA
-	 3fkcAR41G5hPA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AEEB93806654;
-	Thu, 20 Mar 2025 16:10:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1742487532;
+	bh=43aNJV5MNYzkazpkxcqLf53/KEplAMSqtRgL10jyR/M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LXIRXZBCbBuGyYIxC94ZF/bs+SebcH+9vtYa/MoyGQi+oKCff8fNOeFxO7u9aRHQF
+	 /7Lva1Z2iOA2pRk5ZE77emUC03Lsg9fwN8nuUT8/vCB43AztdX7q8ruoYoOTC3wuxO
+	 ZrPhCA6t/i+32O2NDSSSZJLVN6kcfmVQmFmu7q40HWCo0BYVg9nIA7eyB3hdOwh3tr
+	 pXboDyyUK4UKe1mx2yDH2OBJCPp4nqqPmPVOQr3UHbogeB9Kv1rCuixxVa/GN5+rbz
+	 r2XJB8Ky3Luwrsca/AEfwY3LSi4XxQnyUEx31QhFn/kFK1C/PMm/abBHX6sPC9EuY9
+	 VJLrYgrbyq0/A==
+Date: Thu, 20 Mar 2025 16:18:47 +0000
+From: Simon Horman <horms@kernel.org>
+To: alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+	dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	dave.jiang@intel.com, Alejandro Lucero <alucerop@amd.com>
+Subject: Re: [PATCH v11 13/23] cxl: define a driver interface for DPA
+ allocation
+Message-ID: <20250320161847.GA892515@horms.kernel.org>
+References: <20250310210340.3234884-1-alejandro.lucero-palau@amd.com>
+ <20250310210340.3234884-14-alejandro.lucero-palau@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v5 0/5] net: Bluetooth: add TX timestamping for ISO/L2CAP/SCO
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <174248703351.1823712.1290419889556181560.git-patchwork-notify@kernel.org>
-Date: Thu, 20 Mar 2025 16:10:33 +0000
-References: <cover.1742324341.git.pav@iki.fi>
-In-Reply-To: <cover.1742324341.git.pav@iki.fi>
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
- netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- willemdebruijn.kernel@gmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250310210340.3234884-14-alejandro.lucero-palau@amd.com>
 
-Hello:
-
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Tue, 18 Mar 2025 21:06:41 +0200 you wrote:
-> Add support for TX timestamping in Bluetooth ISO/L2CAP/SCO sockets.
+On Mon, Mar 10, 2025 at 09:03:30PM +0000, alejandro.lucero-palau@amd.com wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
 > 
-> Add new COMPLETION timestamp type, to report a software timestamp when
-> the hardware reports a packet completed. (Cc netdev for this)
+> Region creation involves finding available DPA (device-physical-address)
+> capacity to map into HPA (host-physical-address) space. Define an API,
+> cxl_request_dpa(), that tries to allocate the DPA memory the driver
+> requires to operate. The memory requested should not be bigger than the
+> max available HPA obtained previously with cxl_get_hpa_freespace.
 > 
-> Previous discussions:
-> https://lore.kernel.org/linux-bluetooth/cover.1739988644.git.pav@iki.fi/
-> https://lore.kernel.org/linux-bluetooth/cover.1739097311.git.pav@iki.fi/
-> https://lore.kernel.org/all/6642c7f3427b5_20539c2949a@willemb.c.googlers.com.notmuch/
-> https://lore.kernel.org/all/cover.1710440392.git.pav@iki.fi/
+> Based on https://lore.kernel.org/linux-cxl/168592158743.1948938.7622563891193802610.stgit@dwillia2-xfh.jf.intel.com/
 > 
-> [...]
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
 
-Here is the summary with links:
-  - [v5,1/5] net-timestamp: COMPLETION timestamp on packet tx completion
-    https://git.kernel.org/bluetooth/bluetooth-next/c/de4f56cf6cfd
-  - [v5,2/5] Bluetooth: add support for skb TX SND/COMPLETION timestamping
-    https://git.kernel.org/bluetooth/bluetooth-next/c/2a1b83b8a4b2
-  - [v5,3/5] Bluetooth: ISO: add TX timestamping
-    https://git.kernel.org/bluetooth/bluetooth-next/c/6a536085b5e1
-  - [v5,4/5] Bluetooth: L2CAP: add TX timestamping
-    https://git.kernel.org/bluetooth/bluetooth-next/c/f698693b9664
-  - [v5,5/5] Bluetooth: SCO: add TX timestamping
-    https://git.kernel.org/bluetooth/bluetooth-next/c/01172ed6ff82
+Hi Alejandro,
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+As reported by the Kernel Test Robot, in some circumstances this
+patch fails to build.
 
+I did not see this with x86_64 or arm64 allmodconfig.
+But I did see the problem on ARM and was able to reproduce it (quickly)
+like this using the toolchain here [*].
 
+$ PATH=.../gcc-12.3.0-nolibc/arm-linux-gnueabi/bin:$PATH
+
+$ ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- make allmodconfig
+$ echo CONFIG_GCC_PLUGINS=n >> .config
+$ ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- make oldconfig
+
+$ ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- make drivers/cxl/core/hdm.o
+...
+  CC [M]  drivers/cxl/core/hdm.o
+In file included from drivers/cxl/core/hdm.c:6:
+./include/cxl/cxl.h:150:22: error: field 'dpa_range' has incomplete type
+  150 |         struct range dpa_range;
+      |                      ^~~~~~~~~
+./include/cxl/cxl.h:221:30: error: field 'range' has incomplete type
+  221 |                 struct range range;
+      | 
+
+[*] https://mirrors.edge.kernel.org/pub/tools/crosstool/files/bin/x86_64/14.2.0/
+
+...
+
+> diff --git a/drivers/cxl/core/hdm.c b/drivers/cxl/core/hdm.c
+
+...
+
+> +/**
+> + * cxl_request_dpa - search and reserve DPA given input constraints
+> + * @cxlmd: memdev with an endpoint port with available decoders
+> + * @is_ram: DPA operation mode (ram vs pmem)
+> + * @min: the minimum amount of capacity the call needs
+
+nit: @alloc should be documented instead of @min
+
+> + *
+> + * Given that a region needs to allocate from limited HPA capacity it
+> + * may be the case that a device has more mappable DPA capacity than
+> + * available HPA. So, the expectation is that @min is a driver known
+> + * value for how much capacity is needed, and @max is the limit of
+> + * how much HPA space is available for a new region.
+> + *
+> + * Returns a pinned cxl_decoder with at least @min bytes of capacity
+> + * reserved, or an error pointer. The caller is also expected to own the
+> + * lifetime of the memdev registration associated with the endpoint to
+> + * pin the decoder registered as well.
+> + */
+> +struct cxl_endpoint_decoder *cxl_request_dpa(struct cxl_memdev *cxlmd,
+> +					     bool is_ram,
+> +					     resource_size_t alloc)
+
+...
 
