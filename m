@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-176429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A85FA6A3B8
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 11:32:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 05935A6A3B9
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 11:32:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E77784607BA
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 10:32:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC6CB174063
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 10:32:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2559E224888;
-	Thu, 20 Mar 2025 10:31:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1246121B9E3;
+	Thu, 20 Mar 2025 10:31:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="gQiV/y56"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="CGuXd1r+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A0C3222580
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 10:31:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA6521C184
+	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 10:31:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742466715; cv=none; b=C22zBJlM+xG9CkAEtm9tTHOqducvz4a0+JpIEtyye8wF6VUGhsqAlKbE3VAtl70/HerG1jMudomDwb6H+YIcY73Dpzhw9WDnkf4T2a9t3hxpfGCPsR5Zcgp0kllb+bMPTMh1TLPqvzxbLQwH21jFVV5PScYVt27WTgCJeX22bLc=
+	t=1742466719; cv=none; b=ac36Tmzdkux5nBDGX5E3sdgmhPN2EWjXEiAp8OaksyZGQo3AnZrWJWsmWWqABdBPocO/Ji5havC5QwCh2USqqgcCHHd/r1J+7uvivBzb4XincozggucLA2m5mht5Eo6bmMj1ELP93LGaRaFR1vnyxjf/bYDS/Md9i91GxjCxCd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742466715; c=relaxed/simple;
-	bh=PGlbXScemvaDyH4TxR4GSRe6Njs2b8zlIwIBZVQwo18=;
+	s=arc-20240116; t=1742466719; c=relaxed/simple;
+	bh=SqBYulgD3zE14pmiwW5PZY8FRu/f+vVUlZbzrgJj9ws=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DERItAuEY7npiLmew7vn1gamObd+jwphQF+cYV+d9OiLAJ+/yDa3CoSJFY9EBt7UyYyXVvEXAGRwDVD9nYUZJ4Dtfv13UlwKU29ujvzF7EMKyV+AIDUoWyqJ7OZQC1d6T4DX4CJHNUvEl3uJ6ZfQVR84blOtMiD3qf8bHXPhpLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=gQiV/y56; arc=none smtp.client-ip=209.85.128.52
+	 MIME-Version; b=S88BwYlO4w+N5E0cglQkBE2uij8tzlga5GhSPuyOR+Lttr4szq8j4V9HXcU4rc6LEKtYsANcyxJNwasowfKQV3QDCwQrmEqKIavhfREvEO/GyHM9vocuT+nKDcHs39XXARLL0gTDHcS8VZR9IAVkI4b01ZNrMZyvsRYZYIRd1Iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=CGuXd1r+; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43cfb6e9031so5653015e9.0
-        for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 03:31:53 -0700 (PDT)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4394a823036so5809285e9.0
+        for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 03:31:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1742466712; x=1743071512; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1742466715; x=1743071515; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=u8j6HJ/LXsaiiYYsFgCSAtpRLzT4odfs6A0txp6rEV8=;
-        b=gQiV/y56x6h8pOJfr/PZLdRlC+er9YD3/hu10L4KhguWvpwMHirfsVcdRliDM+I+hG
-         LQTPbQ/R5XIKP1EykwfzkccYbCKKaVvo/XPtVcf0RvxDWlWQE2faPCLf++Hw4rtLiTPt
-         +s427bH47TsxcPEbE+7wZe18rATDzig33frdPmSOXyBeXrA93FW5jYlmYL3fblKC12E/
-         aKOyYCklxinN7k6tqMi7eEzDMYanFrvErINx3c9amSH9W3O0CG4FiVbar/KcoqC4zXu0
-         OZojCLW6usJoW/cRP6cPoMYsa5eZB0kmjdFo+7rD9BkA25eScpG/3Zra3TJD7cfXjwDr
-         05QA==
+        bh=RF80fvmskExtSSTP2JVLL/xiNDY6eObNK36YmGv+lCU=;
+        b=CGuXd1r+8ehhDO1saV5byqySiQQ6BmDuIG2w2XMmFSotaQvYRdqdh+fyzrNX4rbYmE
+         oSSKfGsYMVczX5LXDsy5wCda1BXOLEuyEctDrwOh0qMrPY0j5BP4LPX2Bif5pR+Epyiu
+         gCbYE+7eOE4ZYKI8/X8IredgluDseZGIOaJRxBGoVNdx1x8LFfV50OlDMJbAwxW3YtsJ
+         Zsg6mj7IuPXlRlOGe0wnJhdVRVpJHFq9NQ2HpNYcAuKyxTNumJdEJYViPj4kJBDAbkuc
+         32iPHI9pYDk15Jb+hCIvwIs58odN0n/tB7IdeyWGZ442xz2Bp4zclIchJGYJhDbxOTqE
+         +0AQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742466712; x=1743071512;
+        d=1e100.net; s=20230601; t=1742466715; x=1743071515;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=u8j6HJ/LXsaiiYYsFgCSAtpRLzT4odfs6A0txp6rEV8=;
-        b=kmqMiSM34AaQpgm9MMNN8XwCycxW3NkLiQZ+uKpv5rE4JWHMOdHsKXbkcRoz1GsO5m
-         p0mDql82eRLHRn1pueoP70/ru6+xYCRsBye2k2IDyx3jkioifb3qBKTJQphi7zIDDszU
-         DjH5lj+RrkX7/IjjngZ2Rj4PnEBALEMuxfZ3l9qQu/qkcrjLPUC6az8ilSHb1c8twSDz
-         GECkQ1/BN3H3UhbkVbeYZ9TwlryJ61UX+1rjcewUpjkT9FFqbwzUEkwewFL/Q0SKplPL
-         /RInTubv+hLRQWq9RgmZXaXKJ4JumNMXDWSH6/x51w9OZDSlB/7n7ArywD/vdTzrs9at
-         Lvcg==
-X-Gm-Message-State: AOJu0YwjvYCQq1jjbNOU40zcdbKN+cqdexqK1XcAQI0UyPNmBM478Pyg
-	0qE4MOEBv/z3AoCehyMQ+Zv2w5Dna5JYjxr4U4e9Ac1vFMORkR/psxHXh0r90TFy1VwKge94BwN
-	X
-X-Gm-Gg: ASbGncudGQWU9knvpoSLBxPoVxn7+m2pcqZRSR6DXbTjHWGG9WyR+RRYarqHAfZZUJr
-	NwpMgpJP31u2+gvhaeSjMi0uwdUq6bfiEA8TOzHuAznl/ktbrkvWEehmSlyG1EwuVxu4u2elT+m
-	vyMFmYXEghfA6vZEaqUAX1cDyQhPuzbtTq+3KaQzXjrk8WnBSxVL8+CHNf4e6I3Rk2/+H1aah1e
-	pNCD8GGnQ3pwja1uhYBYkbyhIxC/zZp4BA99r/ZVR7syU2jwboa98gJ3dplgU8XFfZJpUxheN7L
-	hfOjZAdgPHo/IeWuipBHJz4snsEXE9D93/HfUg==
-X-Google-Smtp-Source: AGHT+IHbO9kWmKhlqULTvr15OdzXjzIOmpibMXW/gZ3PABwoRdfm5OKUIrPs+pmV23VHI2NMjljfMA==
-X-Received: by 2002:a05:600c:1e89:b0:43d:762:e0c4 with SMTP id 5b1f17b1804b1-43d4389954fmr47884335e9.27.1742466711439;
-        Thu, 20 Mar 2025 03:31:51 -0700 (PDT)
+        bh=RF80fvmskExtSSTP2JVLL/xiNDY6eObNK36YmGv+lCU=;
+        b=w6Cet5TUgr2r0Thvw6AC7OFbO6jDd9HBsVoIBU2vaewHMrmFeE1bGX9q3zr8/hsadN
+         EHsbNp5LiFXaXjsbl7EKRSHp2NAvUdFg5bvIhYdK4vuNW5AiI/Ef6YX5kJEvgOPC81WB
+         waqFUiD93JcMtaUFhy9JVt22kcjR0PeWTNiAUsAm5PJMI71VzV9xxUbbTKYSAvKVnr07
+         VuJ36Nxv6U2XKbIrXPQ62ZNEWg9aYic25ViaUYQ/l7wkVAgS7113Hwl12/iPbSYt6Khr
+         hGcvfS4jxhF3r0QUkdc7m7AqhqjB8OYUFyZSYErL7mexGPV9OsO5yJM5VgaDxLg0Y0W7
+         qZGw==
+X-Gm-Message-State: AOJu0YynOhDdbMRH222ltZsWiRP6HAyihZz7ypuaAKZ4izCD107F1Hoq
+	Dx3xxFQqoNb68VTunhBz24X6dQif/d8GGAozC+7Xhb9gVqZ5cy2O6mITnIbWRTnWiXT8+Z92IE6
+	k
+X-Gm-Gg: ASbGnctAawIzRn5RRy/72wRrcXTGrz/KueU9IQs+H8mKjtpsCbP9nbJPAuQQdxsNKNc
+	/vM6y5Hp3oxOitQAQhpb00Ki4KDa+iS9BirI8Dzc9Z2/eTi24eLqFwOz158Zr3/B7eIz0bol+fm
+	MT9FGj4YsjC2YKWz+t3dBy36hmwwh5ZeSjL6U41TeTnm7CK8CmU0hjfXsDD5yVJ59dErJz6NLsa
+	ZxejseHzr4619lZWk5xt4b4l1SK6kRraY000Nov1ETdNEXVGitjdpV4eZTTT2lsTC3HANVjFqqS
+	cq4CoFAgjL8xDisdmq+5nWWuh0wmsi38bqlvQQ==
+X-Google-Smtp-Source: AGHT+IFLBW09z02CEn7y8CSsXYcseAwOcpAsBdNJO+UZMzTHXoHjhDziyILk8soBi8isPAu173sWbA==
+X-Received: by 2002:a05:6000:1f83:b0:390:ea4b:ea9 with SMTP id ffacd0b85a97d-39973af8dd3mr7900787f8f.39.1742466715559;
+        Thu, 20 Mar 2025 03:31:55 -0700 (PDT)
 Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d43f4542dsm44087255e9.15.2025.03.20.03.31.49
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3997e3eb672sm207006f8f.95.2025.03.20.03.31.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Mar 2025 03:31:51 -0700 (PDT)
+        Thu, 20 Mar 2025 03:31:55 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -85,9 +85,9 @@ Cc: davem@davemloft.net,
 	horms@kernel.org,
 	donald.hunter@gmail.com,
 	parav@nvidia.com
-Subject: [PATCH net-next v2 3/4] devlink: add function unique identifier to devlink dev info
-Date: Thu, 20 Mar 2025 09:59:46 +0100
-Message-ID: <20250320085947.103419-4-jiri@resnulli.us>
+Subject: [PATCH net-next v2 4/4] net/mlx5: Expose function UID in devlink info
+Date: Thu, 20 Mar 2025 09:59:47 +0100
+Message-ID: <20250320085947.103419-5-jiri@resnulli.us>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250320085947.103419-1-jiri@resnulli.us>
 References: <20250320085947.103419-1-jiri@resnulli.us>
@@ -101,106 +101,73 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Presently, for multi-PF NIC each PF reports the same serial_number and
-board.serial_number.
+Devlink info allows to expose function UID.
+Get the value from PCI VPD and expose it.
 
-To universally identify a function, add function unique identifier (uid)
-to be obtained from the driver as a string of arbitrary length.
+$ devlink dev info
+pci/0000:08:00.0:
+  driver mlx5_core
+  serial_number e4397f872caeed218000846daa7d2f49
+  board.serial_number MT2314XZ00YA
+  function.uid MT2314XZ00YAMLNXS0D0F0
+  versions:
+      fixed:
+        fw.psid MT_0000000894
+      running:
+        fw.version 28.41.1000
+        fw 28.41.1000
+      stored:
+        fw.version 28.41.1000
+        fw 28.41.1000
+auxiliary/mlx5_core.eth.0:
+  driver mlx5_core.eth
+pci/0000:08:00.1:
+  driver mlx5_core
+  serial_number e4397f872caeed218000846daa7d2f49
+  board.serial_number MT2314XZ00YA
+  function.uid MT2314XZ00YAMLNXS0D0F1
+  versions:
+      fixed:
+        fw.psid MT_0000000894
+      running:
+        fw.version 28.41.1000
+        fw 28.41.1000
+      stored:
+        fw.version 28.41.1000
+        fw 28.41.1000
+auxiliary/mlx5_core.eth.1:
+  driver mlx5_core.eth
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 Reviewed-by: Parav Pandit <parav@nvidia.com>
 ---
- Documentation/netlink/specs/devlink.yaml          | 4 ++++
- Documentation/networking/devlink/devlink-info.rst | 5 +++++
- include/net/devlink.h                             | 2 ++
- include/uapi/linux/devlink.h                      | 2 ++
- net/devlink/dev.c                                 | 9 +++++++++
- 5 files changed, 22 insertions(+)
+ drivers/net/ethernet/mellanox/mlx5/core/devlink.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
-index bd9726269b4f..5d39eb68aefb 100644
---- a/Documentation/netlink/specs/devlink.yaml
-+++ b/Documentation/netlink/specs/devlink.yaml
-@@ -820,6 +820,9 @@ attribute-sets:
-       -
-         name: region-direct
-         type: flag
-+      -
-+        name: info-function-uid
-+        type: string
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/devlink.c b/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
+index ebe48f405379..97bde76af399 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
+@@ -75,6 +75,19 @@ static int mlx5_devlink_serial_numbers_put(struct mlx5_core_dev *dev,
+ 		kfree(str);
+ 	}
  
-   -
-     name: dl-dev-stats
-@@ -1869,6 +1872,7 @@ operations:
-             - info-version-running
-             - info-version-stored
-             - info-board-serial-number
-+            - info-function-uid
-       dump:
-         reply: *info-get-reply
- 
-diff --git a/Documentation/networking/devlink/devlink-info.rst b/Documentation/networking/devlink/devlink-info.rst
-index 23073bc219d8..04afceee0c03 100644
---- a/Documentation/networking/devlink/devlink-info.rst
-+++ b/Documentation/networking/devlink/devlink-info.rst
-@@ -50,6 +50,11 @@ versions is generally discouraged - here, and via any other Linux API.
-        This is usually the serial number of the board, often available in
-        PCI *Vital Product Data*.
- 
-+   * - ``function.uid``
-+     - Function uniqueue identifier.
++	start = pci_vpd_find_ro_info_keyword(vpd_data, vpd_size, "VU", &kw_len);
++	if (start >= 0) {
++		str = kstrndup(vpd_data + start, kw_len, GFP_KERNEL);
++		if (!str) {
++			err = -ENOMEM;
++			goto end;
++		}
++		end = strchrnul(str, ' ');
++		*end = '\0';
++		err = devlink_info_function_uid_put(req, str);
++		kfree(str);
++	}
 +
-+       Vendor defined uniqueue identifier of a function.
-+
-    * - ``fixed``
-      - Group for hardware identifiers, and versions of components
-        which are not field-updatable.
-diff --git a/include/net/devlink.h b/include/net/devlink.h
-index b8783126c1ed..a0b84efd4740 100644
---- a/include/net/devlink.h
-+++ b/include/net/devlink.h
-@@ -1846,6 +1846,8 @@ int devlink_info_serial_number_put(struct devlink_info_req *req,
- 				   const char *sn);
- int devlink_info_board_serial_number_put(struct devlink_info_req *req,
- 					 const char *bsn);
-+int devlink_info_function_uid_put(struct devlink_info_req *req,
-+				  const char *fuid);
- 
- enum devlink_info_version_type {
- 	DEVLINK_INFO_VERSION_TYPE_NONE,
-diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
-index 9401aa343673..816339790409 100644
---- a/include/uapi/linux/devlink.h
-+++ b/include/uapi/linux/devlink.h
-@@ -614,6 +614,8 @@ enum devlink_attr {
- 
- 	DEVLINK_ATTR_REGION_DIRECT,		/* flag */
- 
-+	DEVLINK_ATTR_INFO_FUNCTION_UID,		/* string */
-+
- 	/* Add new attributes above here, update the spec in
- 	 * Documentation/netlink/specs/devlink.yaml and re-generate
- 	 * net/devlink/netlink_gen.c.
-diff --git a/net/devlink/dev.c b/net/devlink/dev.c
-index d6e3db300acb..6c442549722c 100644
---- a/net/devlink/dev.c
-+++ b/net/devlink/dev.c
-@@ -763,6 +763,15 @@ int devlink_info_board_serial_number_put(struct devlink_info_req *req,
- }
- EXPORT_SYMBOL_GPL(devlink_info_board_serial_number_put);
- 
-+int devlink_info_function_uid_put(struct devlink_info_req *req,
-+				  const char *fuid)
-+{
-+	if (!req->msg)
-+		return 0;
-+	return nla_put_string(req->msg, DEVLINK_ATTR_INFO_FUNCTION_UID, fuid);
-+}
-+EXPORT_SYMBOL_GPL(devlink_info_function_uid_put);
-+
- static int devlink_info_version_put(struct devlink_info_req *req, int attr,
- 				    const char *version_name,
- 				    const char *version_value,
+ end:
+ 	kfree(vpd_data);
+ 	return err;
 -- 
 2.48.1
 
