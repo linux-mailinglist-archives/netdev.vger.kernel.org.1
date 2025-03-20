@@ -1,80 +1,161 @@
-Return-Path: <netdev+bounces-176557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CED30A6AC84
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 18:54:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CC9DA6AC8C
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 18:55:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CE378A6F68
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 17:53:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9405418961C9
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 17:55:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBB62225403;
-	Thu, 20 Mar 2025 17:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 593C8226173;
+	Thu, 20 Mar 2025 17:55:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kKem9jXc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FuKaMAk9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A39351D7E41;
-	Thu, 20 Mar 2025 17:53:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C022D225785;
+	Thu, 20 Mar 2025 17:55:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742493225; cv=none; b=AZCLPlH4YbyQwow8aMXvSeL3KU1OEwoV8sSwcwK5nUsK1Tk9scufVPKrjaOUArK7nyT180biMOrkvUP8pv3y2y/4WJGylisApTkB1O4YNxQN9V6bu8STXPPK3yeqkkVeR6sZO/zEYJ10oPWs4MusijpAr0vU5UQok8iK22cUZs0=
+	t=1742493312; cv=none; b=bw0NAOPQJziWnpodxH/QV/XOwvTZpuaCpKSKgbGbxm/lsvvQ72qvKy1Un/NRyGXwdJxRJhZDugHxrXqXLczOYVC4b9qWnzLgM4f0Dij8ubf3uzG1IV7uAfkodgT2X/FiR/uHKiIyHW8KNJsA1mrivXbOTJ3aGeF6p6i46639nHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742493225; c=relaxed/simple;
-	bh=NfejFgFMJmtw9Ssdd8VUUQ7M8kg22pFWLFzjgaEcklQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E+f/ZTXbSOIgv/ldTtdkPL9ID9DREZ0gZl4iE0rmN/J/cVS892KtSbVyBYPGsdaunzYN5cORRzz/WzKX+j0Axs2cXVyc2owT/jtFeLonUJbg83yyDfH18Uf7R7l07Tks/5t8RmMd9268a72upkl+MA8e3VFNca56hPyFvMvUpe4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kKem9jXc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E15BC4CEDD;
-	Thu, 20 Mar 2025 17:53:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742493225;
-	bh=NfejFgFMJmtw9Ssdd8VUUQ7M8kg22pFWLFzjgaEcklQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kKem9jXcKLxlSu4PNeq3u0UL86FmYQR9hDlXQUOerOBG7tjkc4pE4pZJgvIwtTsMU
-	 3qRacCn9NvwfZlPgsYAP+/GuHBVzOkZTueI1W53nPQNc0uisu2G1EswR11n+JRr8Iq
-	 vmXkdQ7KO+Yzz45HXByoYn0MyAGt0Ir8ivY+014Ra04uwxRXqVMMApbqjWT3n5NB4H
-	 UqRgqy2oOMQ82VbbBKROFIV5kQoTfn+/Cj4ss/mZZvmf8LIseIi1gVjF649YZ8wawa
-	 ddhqys6FPf4aGz1LpHDm1q754UM+RShWEYHF5LZ1b/Oq8WG1fN9cNKiL6cKRnpR3Ax
-	 5ocLV46oKpULQ==
-Date: Thu, 20 Mar 2025 17:53:41 +0000
-From: Simon Horman <horms@kernel.org>
-To: Yui Washizu <yui.washidu@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, corbet@lwn.net, almasrymina@google.com,
-	sdf@fomichev.me, linux-doc@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] docs: fix the path of example code and example
- commands for device memory TCP
-Message-ID: <20250320175341.GH892515@horms.kernel.org>
-References: <20250318061251.775191-1-yui.washidu@gmail.com>
+	s=arc-20240116; t=1742493312; c=relaxed/simple;
+	bh=1tHP3yvoRaMfGdgqMIapuAIJ8bRHb8wB2YvVk0UM2a4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EIBcv1IKHPDHGrqaYQn5vzSonGxphIvsDmH1tp7pKpA4Y3QYW0L3eVkjOwIr1SjWAn7RtJjbas2SpCSeCKfM3pSR5+Gl270cp0yY2Y1pjlwY0s+qdJwf1zpGt7oACeKPtgygcKjw9tPP91enjW57okQxjruwHO5bD30+L+rt8t0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FuKaMAk9; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3d46aaf36a2so9161705ab.3;
+        Thu, 20 Mar 2025 10:55:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742493310; x=1743098110; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=N8OWNr6NISgDNy1w3Ru5nNUSHta20LVgeQjr5h6nl+k=;
+        b=FuKaMAk9SFIDKca2Bh9OWSVDaMeRxMFXwhOVSNsPrtnCMy+UDYjs12oxOTQDugu3XZ
+         4I7DMv6cqyFNm/DZreX7nF2n9WQK51OQ7+u3DsgQOmsrh0KgyHgOfL6jLIO5YpNkZ2Ua
+         LTVgqkBIvlco2C3ddK2M5tXfgkzsND7nJf8Ng3VQUJDX3B9hfOPS9h2UVeJQ8gEOc3a8
+         xZ1jCctFpE0xaUrzIsa7z7Ad+pf+z+sKuUu2KJuEm6IH0DrTelmEzgS2aGCV0RabEHtb
+         BjBV3AlQaReWDOu3fHOYw2MFQJrLtFZDjWVuz0MkPwodpl0IatwpNHgoVbDlFzJifc8K
+         ylgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742493310; x=1743098110;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=N8OWNr6NISgDNy1w3Ru5nNUSHta20LVgeQjr5h6nl+k=;
+        b=dBl/mg6mXCglhU5p/CiOLYHUlUW5MQtB26FB/Y8DAYQ6dSIg8WRLAqk+sK8lLbp68u
+         hqS150n+fhbB5pP3d6Dc+iNLl038+rHEnJMB7JC0WUEetisy+gAFEP1prxIwrZW/bUV4
+         akkKKymFkdNufcRGxLXiEcRWYcRzYVIEfQsGJMlms5Pcff4KYcf0H76gPzYVlzGYzgg4
+         zmlG05/qNslzGzRh/Jn1Pa/uHGUwsiuWzV3k+pufdlVUffk91guZTD9txmYqI1E1+GYU
+         JtM4yhLR4f6ZAQNIDk+iCoMNl2Q48V6VufoPZknIqIwuDdpuFlVHuvHh/3l9Dn+a3ahz
+         NyNw==
+X-Forwarded-Encrypted: i=1; AJvYcCUquwcMYGoIdcAv/qypUeDRjW5u3oEzAcP4vPOrMvKzwTEC8OjYhOXJyIH4RxX4uNV+E/q9T1CT@vger.kernel.org, AJvYcCXtvsbJOj2/S9dyRfgPCf4FKPoigoTpbpez1kS3OPNBIxQ5K50qpRlIV4PhAWXvyTXyvTY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfQG69MYFhf6nvdFni6MWI/RS26E2r+ALD06rHAls9nk/9vR/k
+	sfiQPXCvsSPJJp1ctDGECpv4aC4hmzewWKvQgD0n2GU+EPYgG4LsTMfxk+OJ8SB/Zshhza57RVB
+	italeSaklISjwuTvrpR/7v8de0R8=
+X-Gm-Gg: ASbGncu5JBBBnklAX/J4L0+ECrik2z6Hv6xqUOjHJJqNVp1THxaj/p8T4t3LB5PMltS
+	LWayLlvzZt9QbhUFfcceKzNiJsE3B7SwzTc1qNDwEAQbr53aTNQ2wB5TqoLAilpWZJbfPB4er4u
+	SkOGFn8NeLWJLaG/VkxaaKYRdF1IVQv24kXZE=
+X-Google-Smtp-Source: AGHT+IF+Bf0fuBiZvKXA7lUowNg9xdB13QbYsRfi7HGunQo07YbRtyOOhbWPCimuma0qBGrX41rIS+zwxHz2T3dZUqg=
+X-Received: by 2002:a05:6e02:1525:b0:3d3:dfa2:4642 with SMTP id
+ e9e14a558f8ab-3d59611b1famr3292405ab.13.1742493309847; Thu, 20 Mar 2025
+ 10:55:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250318061251.775191-1-yui.washidu@gmail.com>
+References: <20250313221620.2512684-1-martin.lau@linux.dev>
+In-Reply-To: <20250313221620.2512684-1-martin.lau@linux.dev>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 21 Mar 2025 00:54:33 +0700
+X-Gm-Features: AQ5f1JrGW-_G-Xxgwex1RpY5dtZcM6QkfahZCjCJCzt1StCgnxgsZJW0SxZ_w3c
+Message-ID: <CAL+tcoDPMrw8yuajgCFmLTVhB65EUvH3WXXo6O70uyEapwFnXQ@mail.gmail.com>
+Subject: Re: pull-request: bpf-next 2025-03-13
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@kernel.org>, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 18, 2025 at 03:12:41PM +0900, Yui Washizu wrote:
-> This updates the old path and fixes the description of unavailable options.
-> 
-> Signed-off-by: Yui Washizu <yui.washidu@gmail.com>
+On Fri, Mar 14, 2025 at 5:16=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
+>
+> Hi David, hi Jakub, hi Paolo, hi Eric,
+>
+> The following pull-request contains BPF updates for your *net-next* tree.
+>
+> We've added 4 non-merge commits during the last 3 day(s) which contain
+> a total of 2 files changed, 35 insertions(+), 12 deletions(-).
+>
+> The main changes are:
+>
+> 1) bpf_getsockopt support for TCP_BPF_RTO_MIN and TCP_BPF_DELACK_MAX,
+>    from Jason Xing
+>
+> Please consider pulling these changes from:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for=
+-netdev
+>
+> Thanks a lot!
+>
+> ----------------------------------------------------------------
+>
+> The following changes since commit 6d99faf2541d519ec30a104d6b585484563e2c=
+45:
+>
+>   Merge branch 'net-ti-icssg-prueth-add-native-mode-xdp-support' (2025-03=
+-11 11:10:16 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/f=
+or-netdev
+>
+> for you to fetch changes up to c468c8d299341adf348f1d9cfaacca3cb4f91003:
+>
+>   Merge branch 'tcp-add-some-rto-min-and-delack-max-bpf_getsockopt-suppor=
+ts' (2025-03-13 14:43:15 -0700)
+>
+> ----------------------------------------------------------------
+> bpf-next-for-netdev
+>
+> ----------------------------------------------------------------
+> Jason Xing (4):
+>       tcp: bpf: Introduce bpf_sol_tcp_getsockopt to support TCP_BPF flags
+>       tcp: bpf: Support bpf_getsockopt for TCP_BPF_RTO_MIN
+>       tcp: bpf: Support bpf_getsockopt for TCP_BPF_DELACK_MAX
+>       selftests/bpf: Add bpf_getsockopt() for TCP_BPF_DELACK_MAX and TCP_=
+BPF_RTO_MIN
+>
+> Martin KaFai Lau (1):
+>       Merge branch 'tcp-add-some-rto-min-and-delack-max-bpf_getsockopt-su=
+pports'
+>
+>  net/core/filter.c                                  | 45 ++++++++++++++++=
+------
+>  tools/testing/selftests/bpf/progs/setget_sockopt.c |  2 +
+>  2 files changed, 35 insertions(+), 12 deletions(-)
+>
+
+Hi maintainers,
+
+No rush actually. I'm just noticing this patchset might be forgotten.
+(kindly reminder here.)
 
 Thanks,
-
-On inspection this patch looks good to me although
-I am unaware of the history of the -n and -d options.
-
-I suppose this could have been two patches as it does two things.
-But it seems simple enough to me in its current form.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
-
-...
+Jason
 
