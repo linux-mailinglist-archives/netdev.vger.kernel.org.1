@@ -1,183 +1,200 @@
-Return-Path: <netdev+bounces-176372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BBFAA69ED9
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 04:45:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A19D4A69F0A
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 05:29:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C7B3980239
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 03:44:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1AE3189665E
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 04:29:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14DB01EB9F9;
-	Thu, 20 Mar 2025 03:45:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE9BD1E3DF9;
+	Thu, 20 Mar 2025 04:29:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="VZxhZJKS"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FpNFd/wM"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A4C32F5E;
-	Thu, 20 Mar 2025 03:45:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 292A61B87F0
+	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 04:29:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742442303; cv=none; b=uxBleLeaDKodme7CkltOsfvQE2Gyis7FaKsd2p8tzClfVJoAx2ftQJSFKB08x8oMdK5Xab+45SnPVMdz5OOLxQi3wKVknyxNz69KOB0SxrQpHaXvZtM3PuV0K80Jmy1698pMH3wH39VYeeuvJ3wY3u+27eKDn9dNKyFSiZMX/yA=
+	t=1742444944; cv=none; b=KKzdH+UQa8uIEIvVAMMKFe3j12TF5IWi1n6VidHo11GoDxS+ZKxUDWGzzZUzGY93k0fve6BQdEvvH/52+IlRnYEF7oa2hepMfToOAtrTCoWYaRYkKkx+02HndVgMfH9imyviNnO7j3qcGz7G5Z5QzJr54oaFeId+S10pkIt19W4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742442303; c=relaxed/simple;
-	bh=OdAbk2LOFtDHMerSPge0nhSNgZt523e54gQmN39dbFg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=cwcPDjDNBfeoAZV0DdDybTqOcaN2jo+Vi+tZx6YDvo8uAKMObqc+KCEVGizzD5MGELg1Hut1I7Ycs4jWXfBbcdZwq8lZxqMUzbolB2HlXsGJ7uDwbFujRhMOBu6MtvXQC7orxbJ0tZ1kKJW6Eij82uDZh2TIUL5XEk2paFqEWR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=VZxhZJKS; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 52K3iXZQ11779596, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1742442273; bh=OdAbk2LOFtDHMerSPge0nhSNgZt523e54gQmN39dbFg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=VZxhZJKSp0QsZptwFc5eeXoPN2JOq5Zksctao1Pugl1zae2zemo2G1AV5x+XETme0
-	 EgLi7fmZlfINGkQTF41tYz/MCxbvCd5XWeft6bLLj2b7DfwGPku0Lp3FJecXbwWCKn
-	 iwQJiCNWUz99UWPE7C8O9yrtHLcxTxVezrkewyVwusLLBILDoytgXa8eaugkBJbJgd
-	 yEU4MZCyKb+prro+UvCCcA+3wUfKw8giUvjCl5NfBAheh7zT7n9xOSCbQf5eQ49u/v
-	 Ra0PW+fHQ/71ipOGos1uLVJXj+BC68zWtYQveJmnLZfbOdp+EMVe/5Zgx9QFPEEB01
-	 6HFrlo9UaUpYA==
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 52K3iXZQ11779596
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 20 Mar 2025 11:44:33 +0800
-Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 20 Mar 2025 11:44:33 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 20 Mar 2025 11:44:33 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622]) by
- RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622%5]) with mapi id
- 15.01.2507.035; Thu, 20 Mar 2025 11:44:33 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Simon Horman <horms@kernel.org>
-CC: "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        Ping-Ke Shih <pkshih@realtek.com>,
-        Larry Chiu
-	<larry.chiu@realtek.com>
-Subject: RE: [PATCH net-next] rtase: Add ndo_setup_tc support for CBS offload in traffic control setup
-Thread-Topic: [PATCH net-next] rtase: Add ndo_setup_tc support for CBS offload
- in traffic control setup
-Thread-Index: AQHblMVgEp2xobAex0KxC/GYOCg1TLN55sKAgAF+ZWA=
-Date: Thu, 20 Mar 2025 03:44:33 +0000
-Message-ID: <6824bd62f05644ec8d301457449eae19@realtek.com>
-References: <20250314094021.10120-1-justinlai0215@realtek.com>
- <20250319123407.GC280585@kernel.org>
-In-Reply-To: <20250319123407.GC280585@kernel.org>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1742444944; c=relaxed/simple;
+	bh=x4RcOZfc9EA9sEVnr9mYzKskv1UhzXLxefoPKL3rZ80=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JvuhW3vs3AzfniNagHR7n+9GEJCVWPT4GXPu0OOpG5j7mkohgAWDKrXrWQp46gfFZbRqw7HK5UiyA0EImlCerZoj7z7qw7UeP7fYtSZrLJJ/I5WVK/qln4iVknn2TUMqiF+DuTjeC0lEnZ9e1ZaQ1a8M2qzUYe6uCmmQFb6dv9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=FpNFd/wM; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2241053582dso5803765ad.1
+        for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 21:29:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1742444941; x=1743049741; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=L4Av8kRsBln7eEPZOfuV4FHy+Sb9w69LjHGXraLZtwk=;
+        b=FpNFd/wMHp8a4iWa4DJHhRTopBuVdcnuEaYWpefqofzWiicsmixM9Q4oYigFQrlj1K
+         I9t8la8MH/trbWu9Ozh+NA6jOphQKSKUHYB4T7LcwMJKMucNwnI0eb9LVTu77lIV8/a7
+         ou32bejJvSRAHslFALMEkZ0DaP29YShZBpalQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742444941; x=1743049741;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=L4Av8kRsBln7eEPZOfuV4FHy+Sb9w69LjHGXraLZtwk=;
+        b=O1fPLU5GTYUJRNSZ9KMlfByAYGSTHrY35rOB1r+hRLDeCcvG89PCZFpO9hEnu3sUzs
+         3oTwZLehAiyWWbo+N5dTZtYXhJDQLIV5IWAZfTsOcX31L5hmq5USZXD/VVrYIZJuVb7B
+         zPQb9cWqRZ49RpU9ZV4kzXJkuugJIGd7ThDkcpVDUbzCTk4Dgh+tOJ0+N/3EdhY/NG+d
+         swz+YtB22Y3YYJXbpMf1enWdhjlUHM8xYHDO1JJqwkVOI+19wi+Le+3umAaFgjAWyA/3
+         piWszJNwvoopeQFADyDipoe2CgUe51hRJLa0kf0/Sx7/WHprcNtabSmEtI8+vfCSR5pf
+         uJWg==
+X-Forwarded-Encrypted: i=1; AJvYcCV8yoZtlZs3A0o7KtnUHjw4sANUWTiW78vIs9OzXq2/wd3XyVEYi9B1Gq9JVfR7GG/bTQ+zK+g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx22cc445XS5oW79BpFiH+TbgyLWJkzahai2Xk3QwjV+pBbNwJY
+	nlw9aUoLADiKgwb0ebdt/bwmNVyYWh8hlGyHIvMmN1Mp7AoNPw2kheRKFQIZEodyOyrJB65PY62
+	UDb9ULopAC/gq/CaGd4tII/9xM7v5lFMLssU6
+X-Gm-Gg: ASbGncsSjkHBMgbDv8XH7Y2lXU1JjJUweMBtsHFBpmO57Q/ONUork5haPfYOvv34BMj
+	ubp1D4My5X+zjyTXZS8l8tdE/a+68WasG/6UAqn53SVnofJc6+fHzOdTBi+TPOjFy2RNsDOIwBE
+	+qIVLGytgjDkc8czUhHshGCitdQtE=
+X-Google-Smtp-Source: AGHT+IGO7F6d+S/aBVLLYG0OuU3XLDmBE33AHztpyDLkaCcLeR3liUvazLer9Ozmf9DF21TygWabODHjeZDtMreRxEk=
+X-Received: by 2002:a17:902:d487:b0:224:5a8:ba29 with SMTP id
+ d9443c01a7336-22649a7ff75mr67363965ad.43.1742444941412; Wed, 19 Mar 2025
+ 21:29:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <1742412199-159596-1-git-send-email-tariqt@nvidia.com> <1742412199-159596-3-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1742412199-159596-3-git-send-email-tariqt@nvidia.com>
+From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
+Date: Thu, 20 Mar 2025 09:58:50 +0530
+X-Gm-Features: AQ5f1Jr-veMPc9rh01a9q7KWJ_jiBXrvYBg7AmNxleEcwEwUL3EwOwxssaNgSCw
+Message-ID: <CAH-L+nME7jMSXqVuUqQosoQms7SmdoXdk0x3Re0qhLTS9FAUFw@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/3] net/mlx5e: Use right API to free bitmap memory
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Gal Pressman <gal@nvidia.com>, 
+	Leon Romanovsky <leonro@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Moshe Shemesh <moshe@nvidia.com>, 
+	Mark Bloch <mbloch@nvidia.com>, Mark Zhang <markzhang@nvidia.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000caee6b0630be9322"
 
-> On Fri, Mar 14, 2025 at 05:40:21PM +0800, Justin Lai wrote:
-> > Add support for ndo_setup_tc to enable CBS offload functionality as
-> > part of traffic control configuration for network devices.
-> >
-> > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
->=20
-> ...
->=20
-> > diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> > b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> > index 2aacc1996796..2a61cd192026 100644
-> > --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> > +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-> > @@ -1661,6 +1661,54 @@ static void rtase_get_stats64(struct net_device
-> *dev,
-> >       stats->rx_length_errors =3D tp->stats.rx_length_errors;  }
-> >
-> > +static void rtase_set_hw_cbs(const struct rtase_private *tp, u32
-> > +queue) {
-> > +     u32 idle =3D tp->tx_qos[queue].idleslope * RTASE_1T_CLOCK;
-> > +     u32 val, i;
-> > +
-> > +     val =3D u32_encode_bits(idle / RTASE_1T_POWER,
-> RTASE_IDLESLOPE_INT_MASK);
-> > +     idle %=3D RTASE_1T_POWER;
-> > +
-> > +     for (i =3D 1; i <=3D RTASE_IDLESLOPE_INT_SHIFT; i++) {
-> > +             idle *=3D 2;
-> > +             if ((idle / RTASE_1T_POWER) =3D=3D 1)
-> > +                     val |=3D BIT(RTASE_IDLESLOPE_INT_SHIFT - i);
-> > +
-> > +             idle %=3D RTASE_1T_POWER;
-> > +     }
-> > +
-> > +     rtase_w32(tp, RTASE_TXQCRDT_0 + queue * 4, val); }
-> > +
-> > +static void rtase_setup_tc_cbs(struct rtase_private *tp,
-> > +                            const struct tc_cbs_qopt_offload *qopt) {
-> > +     u32 queue =3D qopt->queue;
->=20
-> Hi Justin,
->=20
-> Does queue need to be checked somewhere to make sure it is in range?
+--000000000000caee6b0630be9322
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Simon,
+On Thu, Mar 20, 2025 at 12:56=E2=80=AFAM Tariq Toukan <tariqt@nvidia.com> w=
+rote:
+>
+> From: Mark Zhang <markzhang@nvidia.com>
+>
+> Use bitmap_free() to free memory allocated with bitmap_zalloc_node().
+> This fixes memtrack error:
+>   mtl rsc inconsistency: memtrack_free: .../drivers/net/ethernet/mellanox=
+/mlx5/core/en_main.c::466: kfree for unknown address=3D0xFFFF0000CA3619E8, =
+device=3D0x0
+>
+> Signed-off-by: Mark Zhang <markzhang@nvidia.com>
+> Reviewed-by: Maher Sanalla <msanalla@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
-Thank you for your response. I will add a check to ensure that the
-queue is within the specified range.
->=20
-> > +
-> > +     tp->tx_qos[queue].hicredit =3D qopt->hicredit;
-> > +     tp->tx_qos[queue].locredit =3D qopt->locredit;
-> > +     tp->tx_qos[queue].idleslope =3D qopt->idleslope;
-> > +     tp->tx_qos[queue].sendslope =3D qopt->sendslope;
->=20
-> Does qopt->enable need to be honoured in order to allow the offload to be
-> both enabled and disabled?
->=20
-Thank you for your suggestion. I will add a check for qopt->enable and
-handle it appropriately.
+LGTM,
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 
-> > +
-> > +     rtase_set_hw_cbs(tp, queue);
-> > +}
-> > +
-> > +static int rtase_setup_tc(struct net_device *dev, enum tc_setup_type t=
-ype,
-> > +                       void *type_data) {
-> > +     struct rtase_private *tp =3D netdev_priv(dev);
-> > +
-> > +     switch (type) {
-> > +     case TC_SETUP_QDISC_CBS:
-> > +             rtase_setup_tc_cbs(tp, type_data);
-> > +             break;
-> > +     default:
-> > +             return -EOPNOTSUPP;
-> > +     }
-> > +
-> > +     return 0;
-> > +}
-> > +
-> >  static netdev_features_t rtase_fix_features(struct net_device *dev,
-> >                                           netdev_features_t
-> features)
-> > {
->=20
-> ...
+
+--=20
+Regards,
+Kalesh AP
+
+--000000000000caee6b0630be9322
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
+BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
+hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
+JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
+aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
+FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
+T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
+o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
+aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
+YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
+cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
+ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
+HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
+Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
+LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
+zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
+4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
+cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
+u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
+a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
+x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJgMIICXAIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
+VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
+bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcN
+AQkEMSIEIH6Gq0xoAHeZRJmVE01WzlOXIR/YsADxzkHZ6ZtyxfwBMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDMyMDA0MjkwMVowXAYJKoZIhvcNAQkPMU8wTTAL
+BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
+9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBABS9g+bTeh6ih1pbAKodKVDKLPFk
+5hyKUjA+bM+CbrIGE6NKSLusvztmyXt1prWsAzsIY2UPUDPUnr65bC0bSJHTeq6C7mB3ESKD5bOW
+xc2uaWruYl7ITK6zVa+oQKdtH9ceaVt2WI3DREqhUObk7J/K6sauxjCHwVuwpIT2RTRkYXGj16TT
+px+IeB+pbLIjyzD+AtKBNMYNPY0LUivi+zrQu7v/zmmTcIkzbDlqp9kYRlwzybPUzYFJlSc9p73L
+QcM26/jc/OjfEfHTYfvIbQSnSfxK23FVdM0qKlhlWoXTqkY4uqkt5j83BEpmlS99PBvY+W02m0WH
+7aqzkPGTlek=
+--000000000000caee6b0630be9322--
 
