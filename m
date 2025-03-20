@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-176373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A19D4A69F0A
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 05:29:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94DFFA69F0D
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 05:31:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1AE3189665E
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 04:29:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFCEE42485E
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 04:29:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE9BD1E3DF9;
-	Thu, 20 Mar 2025 04:29:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E850A1CB9F0;
+	Thu, 20 Mar 2025 04:29:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FpNFd/wM"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="J2IclT7f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 292A61B87F0
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 04:29:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7625E26AF5
+	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 04:29:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742444944; cv=none; b=KKzdH+UQa8uIEIvVAMMKFe3j12TF5IWi1n6VidHo11GoDxS+ZKxUDWGzzZUzGY93k0fve6BQdEvvH/52+IlRnYEF7oa2hepMfToOAtrTCoWYaRYkKkx+02HndVgMfH9imyviNnO7j3qcGz7G5Z5QzJr54oaFeId+S10pkIt19W4=
+	t=1742444974; cv=none; b=Hplot8iem7WJ90aRhGrNIY9qadOPURcWWq7Cpug7XqhmyeH/BS2HdL7c02DV0pvuBG9G1OR6hNJmM8EPRCa7O1q/hG6Brzn/tfpyhuHB3pEDkSFidIqHTXKNrLX94I80/yeFsT4QAMfkFCbuuN8QxIiSEMPtP6l91hzlNJT68GQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742444944; c=relaxed/simple;
-	bh=x4RcOZfc9EA9sEVnr9mYzKskv1UhzXLxefoPKL3rZ80=;
+	s=arc-20240116; t=1742444974; c=relaxed/simple;
+	bh=RUwRw6zbzJyBAnMGGugyvG7q3XxcAtSqolXwDHEXY9Q=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JvuhW3vs3AzfniNagHR7n+9GEJCVWPT4GXPu0OOpG5j7mkohgAWDKrXrWQp46gfFZbRqw7HK5UiyA0EImlCerZoj7z7qw7UeP7fYtSZrLJJ/I5WVK/qln4iVknn2TUMqiF+DuTjeC0lEnZ9e1ZaQ1a8M2qzUYe6uCmmQFb6dv9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=FpNFd/wM; arc=none smtp.client-ip=209.85.214.181
+	 To:Cc:Content-Type; b=k0EtGvA+52Ye//Ar/vQMiz88V5vpWXvuqBnQlYI3euSu95hlJcY8o4JXuv87PJhZ/A4FaljucOYUVtG2zB4Zux4RZEShxMInc3PKTwLd/TFixfJ4KajAi5b8qoaaFCpg6JiuNEFzYZUEiTXLK8ToEMXsWTQJoYBnhQFIcaLzH2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=J2IclT7f; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2241053582dso5803765ad.1
-        for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 21:29:01 -0700 (PDT)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-225df540edcso30923445ad.0
+        for <netdev@vger.kernel.org>; Wed, 19 Mar 2025 21:29:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1742444941; x=1743049741; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1742444973; x=1743049773; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=L4Av8kRsBln7eEPZOfuV4FHy+Sb9w69LjHGXraLZtwk=;
-        b=FpNFd/wMHp8a4iWa4DJHhRTopBuVdcnuEaYWpefqofzWiicsmixM9Q4oYigFQrlj1K
-         I9t8la8MH/trbWu9Ozh+NA6jOphQKSKUHYB4T7LcwMJKMucNwnI0eb9LVTu77lIV8/a7
-         ou32bejJvSRAHslFALMEkZ0DaP29YShZBpalQ=
+        bh=RUwRw6zbzJyBAnMGGugyvG7q3XxcAtSqolXwDHEXY9Q=;
+        b=J2IclT7fDIjpgMn4daoaH40MGFV+C/Bxxg9wM0c8eqdOwvOuLouoU1hRAwjNGrzX4G
+         GAGpmuuIP5x2KqB8Q2izO2mzgS299wBynnQOpgjra5SCJJfr0OFXhDbzVAJC+Uuk8JSj
+         j5AinQVoUcPRq/xGW3Ki+nKoMCVs1oCcHuubo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742444941; x=1743049741;
+        d=1e100.net; s=20230601; t=1742444973; x=1743049773;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=L4Av8kRsBln7eEPZOfuV4FHy+Sb9w69LjHGXraLZtwk=;
-        b=O1fPLU5GTYUJRNSZ9KMlfByAYGSTHrY35rOB1r+hRLDeCcvG89PCZFpO9hEnu3sUzs
-         3oTwZLehAiyWWbo+N5dTZtYXhJDQLIV5IWAZfTsOcX31L5hmq5USZXD/VVrYIZJuVb7B
-         zPQb9cWqRZ49RpU9ZV4kzXJkuugJIGd7ThDkcpVDUbzCTk4Dgh+tOJ0+N/3EdhY/NG+d
-         swz+YtB22Y3YYJXbpMf1enWdhjlUHM8xYHDO1JJqwkVOI+19wi+Le+3umAaFgjAWyA/3
-         piWszJNwvoopeQFADyDipoe2CgUe51hRJLa0kf0/Sx7/WHprcNtabSmEtI8+vfCSR5pf
-         uJWg==
-X-Forwarded-Encrypted: i=1; AJvYcCV8yoZtlZs3A0o7KtnUHjw4sANUWTiW78vIs9OzXq2/wd3XyVEYi9B1Gq9JVfR7GG/bTQ+zK+g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx22cc445XS5oW79BpFiH+TbgyLWJkzahai2Xk3QwjV+pBbNwJY
-	nlw9aUoLADiKgwb0ebdt/bwmNVyYWh8hlGyHIvMmN1Mp7AoNPw2kheRKFQIZEodyOyrJB65PY62
-	UDb9ULopAC/gq/CaGd4tII/9xM7v5lFMLssU6
-X-Gm-Gg: ASbGncsSjkHBMgbDv8XH7Y2lXU1JjJUweMBtsHFBpmO57Q/ONUork5haPfYOvv34BMj
-	ubp1D4My5X+zjyTXZS8l8tdE/a+68WasG/6UAqn53SVnofJc6+fHzOdTBi+TPOjFy2RNsDOIwBE
-	+qIVLGytgjDkc8czUhHshGCitdQtE=
-X-Google-Smtp-Source: AGHT+IGO7F6d+S/aBVLLYG0OuU3XLDmBE33AHztpyDLkaCcLeR3liUvazLer9Ozmf9DF21TygWabODHjeZDtMreRxEk=
-X-Received: by 2002:a17:902:d487:b0:224:5a8:ba29 with SMTP id
- d9443c01a7336-22649a7ff75mr67363965ad.43.1742444941412; Wed, 19 Mar 2025
- 21:29:01 -0700 (PDT)
+        bh=RUwRw6zbzJyBAnMGGugyvG7q3XxcAtSqolXwDHEXY9Q=;
+        b=LivXSF7d/GpcKv10GtQNszWnFz6yPZ+9ic5gojL+kKUyilyWhetoCg822LaB4fiuCY
+         N/bZXXFpuA6Gy0ZBhs1SGDPpkBgNQVVfVywz+zWWaGcJ4hp1P7q8F0vjO72Y3c7MCJQj
+         XSMZFCeKTZV+OxofMpvyVI7AF1eP5onOMiAtM9AzIlb5wouKaybu9uZHIifFYcXbfi9H
+         OXR4O/vblS3qZ5BU6XfYH4jU9Q9h2fpTXa/CPRsgXjW3p9jFeDOAsRn/XP7mU7D3+Q0e
+         HOpndmcRfoslEBAyWJN5Wm/czJMlPYFKi5iUsR7BV+6x1NXnK1fLZfzjcJQ7Id9Es4Jo
+         BGMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUT3Eq3QtkiwbQXiGJbX4VyostX7ebqQrMvR6WblsA5tS+rQtypeNLSn0fDWWiCem3yelMJlT4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDQbZF4t4vdhDPKGN+Cw+0evYfKFp7qQQNDmPwZdwBj3kXJHtk
+	WUhHLglV/Obn4xEQqX3OrttGKpQn48sTSZSOdQ8E73Q+HjG5w9AFitxcOQm5UJrHMrYIDFXoIp8
+	4iurFndVlzeVSiXi0wV7X1HHJNs5ItkpB4q8L
+X-Gm-Gg: ASbGncs+UpHyUWHRlHP9+kGmCTGfaHT9UORaMsdc90co0NdSm2uiT/ei/FNgGO8ebm3
+	XQi2EbbQCqsCoEzxhVHo7F5GxDsJvD93OyAAUk4iSdgXvPEHLi0Ll31swLYv50KErC0lV99C/fq
+	XDC1XLAqlIW8Dn+V5bJV8V6p9/f06APTNVd9Q7Ag==
+X-Google-Smtp-Source: AGHT+IHFDOwXRdWeAPjpb3Mu/6MXUvlYeLSX88fvD+zUi/rBRjUg/wtA6+TlknmJjaOXLnSYwHz6lhWUNB1YlHvLQFE=
+X-Received: by 2002:a05:6a00:4c1b:b0:736:bced:f4cf with SMTP id
+ d2e1a72fcca58-73779f4a5c4mr3137536b3a.0.1742444972763; Wed, 19 Mar 2025
+ 21:29:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1742412199-159596-1-git-send-email-tariqt@nvidia.com> <1742412199-159596-3-git-send-email-tariqt@nvidia.com>
-In-Reply-To: <1742412199-159596-3-git-send-email-tariqt@nvidia.com>
+References: <1742412199-159596-1-git-send-email-tariqt@nvidia.com> <1742412199-159596-2-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1742412199-159596-2-git-send-email-tariqt@nvidia.com>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Thu, 20 Mar 2025 09:58:50 +0530
-X-Gm-Features: AQ5f1Jr-veMPc9rh01a9q7KWJ_jiBXrvYBg7AmNxleEcwEwUL3EwOwxssaNgSCw
-Message-ID: <CAH-L+nME7jMSXqVuUqQosoQms7SmdoXdk0x3Re0qhLTS9FAUFw@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/3] net/mlx5e: Use right API to free bitmap memory
+Date: Thu, 20 Mar 2025 09:59:21 +0530
+X-Gm-Features: AQ5f1JrYZj93cEggjV8BHXYQooJAaALaCmDwJK2B3y3s7i6LhIam25Ms0kfcK5k
+Message-ID: <CAH-L+nM_znoR7ydtkKoJdcYV=RVAnG2FDkKY1j0QdYMjtfnTaQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/3] net/mlx5: Remove NULL check before dev_{put, hold}
 To: Tariq Toukan <tariqt@nvidia.com>
 Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, 
@@ -84,27 +84,24 @@ Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	Leon Romanovsky <leonro@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
 	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, Moshe Shemesh <moshe@nvidia.com>, 
-	Mark Bloch <mbloch@nvidia.com>, Mark Zhang <markzhang@nvidia.com>
+	Mark Bloch <mbloch@nvidia.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000caee6b0630be9322"
+	boundary="000000000000aa42a90630be95b3"
 
---000000000000caee6b0630be9322
+--000000000000aa42a90630be95b3
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 20, 2025 at 12:56=E2=80=AFAM Tariq Toukan <tariqt@nvidia.com> w=
+On Thu, Mar 20, 2025 at 12:57=E2=80=AFAM Tariq Toukan <tariqt@nvidia.com> w=
 rote:
 >
-> From: Mark Zhang <markzhang@nvidia.com>
+> From: Gal Pressman <gal@nvidia.com>
 >
-> Use bitmap_free() to free memory allocated with bitmap_zalloc_node().
-> This fixes memtrack error:
->   mtl rsc inconsistency: memtrack_free: .../drivers/net/ethernet/mellanox=
-/mlx5/core/en_main.c::466: kfree for unknown address=3D0xFFFF0000CA3619E8, =
-device=3D0x0
+> Fix coccinelle warnings:
+> WARNING: NULL check before dev_{put, hold} functions is not needed.
 >
-> Signed-off-by: Mark Zhang <markzhang@nvidia.com>
-> Reviewed-by: Maher Sanalla <msanalla@nvidia.com>
+> Signed-off-by: Gal Pressman <gal@nvidia.com>
+> Reviewed-by: Jianbo Liu <jianbol@nvidia.com>
 > Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
 LGTM,
@@ -115,7 +112,7 @@ Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Regards,
 Kalesh AP
 
---000000000000caee6b0630be9322
+--000000000000aa42a90630be95b3
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -187,14 +184,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJgMIICXAIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcN
-AQkEMSIEIH6Gq0xoAHeZRJmVE01WzlOXIR/YsADxzkHZ6ZtyxfwBMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDMyMDA0MjkwMVowXAYJKoZIhvcNAQkPMU8wTTAL
+AQkEMSIEIPHOm8Z5mRCkdkiAzXU8qoSCxCJLdUUMlAPdywYcgiUXMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDMyMDA0MjkzM1owXAYJKoZIhvcNAQkPMU8wTTAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBABS9g+bTeh6ih1pbAKodKVDKLPFk
-5hyKUjA+bM+CbrIGE6NKSLusvztmyXt1prWsAzsIY2UPUDPUnr65bC0bSJHTeq6C7mB3ESKD5bOW
-xc2uaWruYl7ITK6zVa+oQKdtH9ceaVt2WI3DREqhUObk7J/K6sauxjCHwVuwpIT2RTRkYXGj16TT
-px+IeB+pbLIjyzD+AtKBNMYNPY0LUivi+zrQu7v/zmmTcIkzbDlqp9kYRlwzybPUzYFJlSc9p73L
-QcM26/jc/OjfEfHTYfvIbQSnSfxK23FVdM0qKlhlWoXTqkY4uqkt5j83BEpmlS99PBvY+W02m0WH
-7aqzkPGTlek=
---000000000000caee6b0630be9322--
+9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBADKpQkOkkUjMhKFy8vz6bOswJwS/
+l5R/S+Dd5Z2dMlJ8qLlhDh3gYIaJ2n3/8HaCYNel2ytiBsOw3Nk1q0DaSX27WoW32G59OZEh7XX5
+9ie2TdEXPA/SwB8U/FWKgDy7MXraxYGE3ZAhWzxovg67YMPOlCf+RR5U1cV54WCp+9FyQHa4LSG/
+Ea0933ni2iDkDx5N9C/HJKRIlT1j6scLP8Ka9+kAK31FfvV1Lpj62zD/urwfn4TQaI5BTmvQ8pPp
+z8zXgQKMnHGdBKS0eg3kQRWODz6+dplV6+ZZJwwAo0YMRefIICdsYuTnZLBB1dKALYrhGfFWRv/5
+6rxS6DTLhMo=
+--000000000000aa42a90630be95b3--
 
