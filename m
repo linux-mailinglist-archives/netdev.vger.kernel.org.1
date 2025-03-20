@@ -1,213 +1,168 @@
-Return-Path: <netdev+bounces-176599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F135CA6AFD6
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 22:30:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB2FAA6B089
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 23:13:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58E09982A70
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 21:29:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47FCB4A235C
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 22:12:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60703227586;
-	Thu, 20 Mar 2025 21:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D349A229B07;
+	Thu, 20 Mar 2025 22:11:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="r/n1YA0+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="zL/WnoNq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D4B220C477
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 21:29:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 017571EF388
+	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 22:11:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742506199; cv=none; b=KeQEHRL9kncMj5KVsQTDwC0U/ebaKKii9SxP61NS6Z7ACpwqlzpf0YIHxiqCvbrqzz/BEgLei0EE52/RLcrXPdZVTDLa4uriBl81RnIFaRf/N83s6kxLmIvNrIJ0uQhsVRi0SmgP42NShdrGQXPWkycVV3/ytjrF+GGTrp25emY=
+	t=1742508684; cv=none; b=FXnemnJRZuzUQ9k8EywviBwuacUpqfwjKK6CfpOZwiyA+maSUUA8UEhMjRVF6XmBiJQVsD10LEXRyUPxKgVcSpzVXTQ5yV9zMhmxBKb6OEe+UilAWx/usFpYiEwSsdXUKjFFDkGJ1HhuU+2QCSjSVnRcwXepNHUBzpmw2yLVvug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742506199; c=relaxed/simple;
-	bh=hc51Lkdct6uqqWV8pqMw9aQ62bLbeMIuUAQRVYD5USc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=amr5SAXIEAKp7AI0BskvCFcK4JX+9eUUxUPObsDIklEjK4/bq9VhW9XocPTVKpohTP6jfsnbR1Rf7Ysg3bLcFrDSXxmgbUmvNsW3zgcLRujRy/i5UiDEnOg7fTdq5yjwRdsXgQYO4S0iSxgD7zJxBpNw6cXQiLP4q7pfe97AjEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=r/n1YA0+; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52KKa3US027541
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 21:29:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=tju/xG/djID0g3mEBemfT6X1eXpwAaHq0v5fZEBnV
-	C0=; b=r/n1YA0+A8PGCozTF5EdgpSd6GwC1dYCitDk8JjRw722fSzM4epr2ojmI
-	W64lN2dbTCld67mCZLCkAbpDKyNre8CmDl9mjsjAo7wflVeMxGGMzY4RzbSlQ8l+
-	GJ/Uu2nDP16oIfVvR019T/xn1LqBKLG7m8zFWpNBOpBL+2TCwhwAbbykkV2hpQ4h
-	x3te536OS3+Hlg1iZg+3Y0/EWpn0sfTRZSqHACpQLXq+E/eNFTuAmsxjb2D0Ojch
-	rpVDevkKxK9i2LD9CWA0j3iebZcLSETFogUZkHmG/Euzz793/e+0/LzzryCZS8w/
-	hR+vzEoE7BV9Rj7jrtu5PIEtY7GEA==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45gt6q06rx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 21:29:56 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52KK5QeY023211
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 21:29:55 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 45dp3m210j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 21:29:55 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52KLTrmj33686046
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 20 Mar 2025 21:29:53 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 268DB5805A;
-	Thu, 20 Mar 2025 21:29:53 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 082155805C;
-	Thu, 20 Mar 2025 21:29:53 +0000 (GMT)
-Received: from li-4c4c4544-0047-5210-804b-b8c04f323634.lan (unknown [9.61.95.179])
-	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 20 Mar 2025 21:29:52 +0000 (GMT)
-From: Nick Child <nnac123@linux.ibm.com>
-To: netdev@vger.kernel.org
-Cc: davemarq@linux.ibm.com, haren@linux.ibm.com, ricklind@us.ibm.com,
-        Nick Child <nnac123@linux.ibm.com>
-Subject: [PATCH net] ibmvnic: Use kernel helpers for hex dumps
-Date: Thu, 20 Mar 2025 16:29:51 -0500
-Message-ID: <20250320212951.11142-1-nnac123@linux.ibm.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1742508684; c=relaxed/simple;
+	bh=wyluLI5Dw4OsjYJIZL78wM2OugHZ+5JNK+abGkOxhUQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=si3psnv9oCTTYNdN1u9dq77cia1kEPJci+4dGWMuOhVrPVYXZMbSUPVejgaipKbV5HOuRylMyuFI+DlyeCadGlFkvR5X1Log/G5faiKY2eH80p1FmprZK69yGt9iwCr2hAmkkCdxLPJG/2XhjXX1GsvSQsBgriOngue82FQ7Oow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=zL/WnoNq; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=o2gc0uIp20vFRrnjWwjQL7GVMAiQPOp+xknJd1vKRXg=; b=zL/WnoNqfYWh3Mti5728U+lclE
+	2m1aEpeUrW2f04ehkDtHsXEpjUzEhltqRDM5857u4bHpUaqps2fC02FG1C6QhAL23wyVfOeWfVQmq
+	dQC/Od8YASee8xAGz7FH9fG6OBKSDSRu7OsJsr54PW2LJDYuiD6AJJWGilAvZkyvMyXasQ8xAh6xW
+	H+KhiLVMAZurplAxKb+giGb+K6rlDPf15mSrZG/EA0x8GdBpDCBrUnMT64kd4ST4aNPrS+r8BPcM9
+	P369Zlx4RLutSYU+sZjkoa+1E8SqxiWfEQurT9icE5zxEjfPVWY6P0S4B/hZep4BP8+E6WlJURFkk
+	/5lLWd4w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56530)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tvO6Y-0008DL-1J;
+	Thu, 20 Mar 2025 22:11:10 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tvO6V-0006z8-0N;
+	Thu, 20 Mar 2025 22:11:07 +0000
+Date: Thu, 20 Mar 2025 22:11:06 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next 0/5] net: improve stmmac resume rx clocking
+Message-ID: <Z9ySeo61VYTClIJJ@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 5f4jf2IdoGs5vEMGO5hXHtjP0NPFBu4_
-X-Proofpoint-ORIG-GUID: 5f4jf2IdoGs5vEMGO5hXHtjP0NPFBu4_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-20_07,2025-03-20_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- impostorscore=0 phishscore=0 suspectscore=0 malwarescore=0 adultscore=0
- lowpriorityscore=0 bulkscore=0 mlxlogscore=899 clxscore=1015 mlxscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502280000 definitions=main-2503200139
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Previously, when the driver was printing hex dumps, the buffer was cast
-to an 8 byte long and printed using string formatters. If the buffer
-size was not a multiple of 8 then a read buffer overflow was possible.
+Hi,
 
-Therefore, create a new ibmvnic function that loops over a buffer and
-calls hex_dump_to_buffer instead.
+stmmac has had a long history of problems with resuming, illustrated by
+reset failure due to the receive clock not running.
 
-This patch address KASAN reports like the one below:
-  ibmvnic 30000003 env3: Login Buffer:
-  ibmvnic 30000003 env3: 01000000af000000
-  <...>
-  ibmvnic 30000003 env3: 2e6d62692e736261
-  ibmvnic 30000003 env3: 65050003006d6f63
-  ==================================================================
-  BUG: KASAN: slab-out-of-bounds in ibmvnic_login+0xacc/0xffc [ibmvnic]
-  Read of size 8 at addr c0000001331a9aa8 by task ip/17681
-  <...>
-  Allocated by task 17681:
-  <...>
-  ibmvnic_login+0x2f0/0xffc [ibmvnic]
-  ibmvnic_open+0x148/0x308 [ibmvnic]
-  __dev_open+0x1ac/0x304
-  <...>
-  The buggy address is located 168 bytes inside of
-                allocated 175-byte region [c0000001331a9a00, c0000001331a9aaf)
-  <...>
-  =================================================================
-  ibmvnic 30000003 env3: 000000000033766e
+Several attempts have been attempted over the years to address this
+issue, such as moving phylink_start() (now phylink_resume()) super
+early in stmmac_resume() in commit 90702dcd19c0 ("net: stmmac: fix MAC
+not working when system resume back with WoL a ctive.") However, this
+has the downside that stmmac_mac_link_up() can (and demonstrably is)
+called before or during the driver initialisation in another thread.
+This can cause issues as packets could begin to be queued, and the
+transmit/receive enable bits will be set before any initialisation has
+been done.
 
-Fixes: 032c5e82847a ("Driver for IBM System i/p VNIC protocol")
-Signed-off-by: Nick Child <nnac123@linux.ibm.com>
-Reviewed-by: Dave Marquardt <davemarq@linux.ibm.com>
----
-This patch obsoletes my work to define a for_each macro in printk.h [1]. It was
-determined the pitfalls outweighed the benefits of the code cleanup.
+Another attempt is used by dwmac-socfpga.c in commit 2d871aa07136 ("net:
+stmmac: add platform init/exit for Altera's ARM socfpga") which
+pre-dates the above commit.
 
-Side question, is net the correct mailing list even if the bug being addressed
-was introduced long before the current release? Or is net-next more appropriate?
-Does bug severity play any part in this or does anything with a Fixes tag go to
-net? netdev-FAQ implies all fixes go into net but previous mailing list entries
-seem to vary. Thanks
+Neither of these two approaches consider the effect of EEE with a PHY
+that supports receive clock-stop and has that feature enabled (which
+the stmmac driver does enable). If the link is up, then there is the
+possibility for the receive path to be in low-power mode, and the PHY
+may stop its receive clock.
 
-[1] https://lore.kernel.org/lkml/20250219211102.225324-1-nnac123@linux.ibm.com/
+This series addresses these issues by (each is not necessarily a
+separate patch):
 
- drivers/net/ethernet/ibm/ibmvnic.c | 30 ++++++++++++++++++------------
- 1 file changed, 18 insertions(+), 12 deletions(-)
+1) introducing phylink_prepare_resume(), which can be used by MAC
+   drivers to ensure that the PHY is resumed prior to doing any
+   re-initialisation work. This call is added to stmmac_resume().
 
-diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
-index 0676fc547b6f..480606d1245e 100644
---- a/drivers/net/ethernet/ibm/ibmvnic.c
-+++ b/drivers/net/ethernet/ibm/ibmvnic.c
-@@ -4829,6 +4829,18 @@ static void vnic_add_client_data(struct ibmvnic_adapter *adapter,
- 	strscpy(vlcd->name, adapter->netdev->name, len);
- }
- 
-+static void ibmvnic_print_hex_dump(struct net_device *dev, void *buf,
-+				   size_t len)
-+{
-+	unsigned char hex_str[16 * 3];
-+
-+	for (size_t i = 0; i < len; i += 16) {
-+		hex_dump_to_buffer((unsigned char *)buf + i, len - i, 16, 8,
-+				   hex_str, sizeof(hex_str), false);
-+		netdev_dbg(dev, "%s\n", hex_str);
-+	}
-+}
-+
- static int send_login(struct ibmvnic_adapter *adapter)
- {
- 	struct ibmvnic_login_rsp_buffer *login_rsp_buffer;
-@@ -4939,10 +4951,8 @@ static int send_login(struct ibmvnic_adapter *adapter)
- 	vnic_add_client_data(adapter, vlcd);
- 
- 	netdev_dbg(adapter->netdev, "Login Buffer:\n");
--	for (i = 0; i < (adapter->login_buf_sz - 1) / 8 + 1; i++) {
--		netdev_dbg(adapter->netdev, "%016lx\n",
--			   ((unsigned long *)(adapter->login_buf))[i]);
--	}
-+	ibmvnic_print_hex_dump(adapter->netdev, adapter->login_buf,
-+			       adapter->login_buf_sz);
- 
- 	memset(&crq, 0, sizeof(crq));
- 	crq.login.first = IBMVNIC_CRQ_CMD;
-@@ -5319,15 +5329,13 @@ static void handle_query_ip_offload_rsp(struct ibmvnic_adapter *adapter)
- {
- 	struct device *dev = &adapter->vdev->dev;
- 	struct ibmvnic_query_ip_offload_buffer *buf = &adapter->ip_offload_buf;
--	int i;
- 
- 	dma_unmap_single(dev, adapter->ip_offload_tok,
- 			 sizeof(adapter->ip_offload_buf), DMA_FROM_DEVICE);
- 
- 	netdev_dbg(adapter->netdev, "Query IP Offload Buffer:\n");
--	for (i = 0; i < (sizeof(adapter->ip_offload_buf) - 1) / 8 + 1; i++)
--		netdev_dbg(adapter->netdev, "%016lx\n",
--			   ((unsigned long *)(buf))[i]);
-+	ibmvnic_print_hex_dump(adapter->netdev, buf,
-+			       sizeof(adapter->ip_offload_buf));
- 
- 	netdev_dbg(adapter->netdev, "ipv4_chksum = %d\n", buf->ipv4_chksum);
- 	netdev_dbg(adapter->netdev, "ipv6_chksum = %d\n", buf->ipv6_chksum);
-@@ -5558,10 +5566,8 @@ static int handle_login_rsp(union ibmvnic_crq *login_rsp_crq,
- 	netdev->mtu = adapter->req_mtu - ETH_HLEN;
- 
- 	netdev_dbg(adapter->netdev, "Login Response Buffer:\n");
--	for (i = 0; i < (adapter->login_rsp_buf_sz - 1) / 8 + 1; i++) {
--		netdev_dbg(adapter->netdev, "%016lx\n",
--			   ((unsigned long *)(adapter->login_rsp_buf))[i]);
--	}
-+	ibmvnic_print_hex_dump(netdev, adapter->login_rsp_buf,
-+			       adapter->login_rsp_buf_sz);
- 
- 	/* Sanity checks */
- 	if (login->num_txcomp_subcrqs != login_rsp->num_txsubm_subcrqs ||
+2) moving phylink_resume() after all re-initialisation has completed,
+   thereby ensuring that the hardware is ready to be enabled for
+   packet reception/transmission.
+
+3) with (1) and (2) addressed, the need for socfpga to have a private
+   work-around is no longer necessary, so it is removed.
+
+4) introducing phylink functions to block/unblock the receive clock-
+   stop at the PHY. As these require PHY access over the MDIO bus,
+   they can sleep, so are not suitable for atomic access.
+
+5) the stmmac hardware requires the receive clock to be running for
+   reset to complete. Depending on synthesis options, this requirement
+   may also extend to writing various registers as well, e.g. setting
+   the MAC address, writing some of the vlan registers, etc. Full
+   details are in the databook.
+
+   We add blocking/unblocking of the PHY receive clock-stop around
+   parts of the main stmmac driver where we have a context that we
+   can sleep. These are wrapped with the new phylink functions.
+
+   However, depending on synthesis options, there could be other
+   places where the net core calls the driver with a BH-disabled
+   context where we can't sleep, and thus can't block the PHY from
+   disabling its receive clock. These are documented with FIXME
+   comments.
+
+Given the last paragraph above, I am wondering whether a better
+approach would be to ensure that receive clock-stop is always disabled
+at the PHY with stmmac. From what I can see, implementations do not
+document to this level of detail, which makes it difficult to tell
+which registers require the receive clock to be running to behave
+correctly.
+
+This patch series has been tested on the Tegra194 Jetson Xavier NX
+board kindly donated by NVidia, with two additional patches that are
+pending in patchwork - the first is required to have EEE's LPI mode
+passed through to the MAC on this platform to allow testing under
+PHY clock-stop scenarios. The second is a bug fix for PHYLIB and
+makes "eee off" functional, but should not affect this series.
+
+All patches on top of net-next commit f749448ce9f1 ("Merge branch
+'net-mlx5-hw-steering-cleanups'")
+
+https://patchwork.kernel.org/project/netdevbpf/patch/E1ttnHW-00785s-Uq@rmk-PC.armlinux.org.uk/
+https://patchwork.kernel.org/project/netdevbpf/patch/E1ttmWN-0077Mb-Q6@rmk-PC.armlinux.org.uk/
+
+ .../net/ethernet/stmicro/stmmac/dwmac-socfpga.c    | 18 -----
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  | 46 ++++++++++--
+ drivers/net/phy/phylink.c                          | 84 ++++++++++++++++++++++
+ include/linux/phylink.h                            |  4 ++
+ 4 files changed, 129 insertions(+), 23 deletions(-)
+
 -- 
-2.48.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
