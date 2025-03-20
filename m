@@ -1,148 +1,127 @@
-Return-Path: <netdev+bounces-176450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD295A6A655
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 13:37:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED994A6A668
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 13:46:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C4EF172739
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 12:37:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 113EE189CD34
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 12:46:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A02487A5;
-	Thu, 20 Mar 2025 12:37:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AA4229A5;
+	Thu, 20 Mar 2025 12:46:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MPaOo1Zs"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IjVijfH9"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 470031CA84
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 12:37:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64277282F5
+	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 12:46:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742474233; cv=none; b=YTDAtDLXUT7c2ROlGIKyVr+geO6Yg9j6xszvlbysK3uGBVUPnM80LOxM5zFEwEXFVW5xZFEtj3z6kWK1AmdmPNrHBYZMoMi6zPlO8M9s5d4lysLwKdqewSkY3ERwDDm9FwMng0S8FF3rue7G3TuaQb8fzJVb09eFQOwp4NZGBTU=
+	t=1742474776; cv=none; b=AquS0Oge0Fbc3mrsxtPbHUtvvEAmaBN55dz1CUtddD3+Lvoij5JZCa7fVZhgCEQH676K96vfyCMnPUzMHJaWGnObC6EuQiiNq3lC7xdg/ynuMHJDyZeyU6p7+pR54lINSStjMa+YrnRmy3TZlruo/0aei25eeGf/8p775/Kt6pE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742474233; c=relaxed/simple;
-	bh=qe76n7w8WG2/vcG8sw7IiSgCXf7eBBkZ60h0gIOTUNU=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=aokKKuICONdpsfljnU5XYepSZRtROIZYQ1qtuCWEJY4wTzlMFnOyyDzIzgh3ojNTKlVyM84xNC55nLlCDlwQ9LkE5zO3eO5Fkf6RIfWndN1lwRApM5UQ+S1Criju/zFKTDYhiWu434+q4evvrsA1MvYPvwd8Z49Xj1N5lGjZ8C8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MPaOo1Zs; arc=none smtp.client-ip=95.215.58.183
+	s=arc-20240116; t=1742474776; c=relaxed/simple;
+	bh=gUTj6pkXYtfCR7RG/DA4rREjr3XxfW+t91BATIMfZd0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CV0j/4pKyfh/2TagDBPNiSuew6KO7U28gDiBIjSBRZIh3swXhiO84I1exzWaS2CUaqO6NJqIXqXbyPERord/i8pkROwgoK/E+3IgXgbIr0sHuGyl0djK7MHoJ+w+AzFBJNgRUQZjup1U08YduTXr82V7uCbi9au5QHKPOU5Lxi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IjVijfH9; arc=none smtp.client-ip=95.215.58.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1742474762;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=0LwHn7dsELp2UKJ8EPQ1BTRVUwHXdy8XbS/H1ImBUVo=;
+	b=IjVijfH93XImSaPwMQYpAYbbETLE+xUAicRZ5Lk3RZUdPx3V86O31MdlrztSStsNUT56o4
+	2ITFe7XH35YAlEimxDY7s824od2i2z6RIA8UpSttTb2Wreq8dBzC5QRkRsx2yINMNph0zB
+	uMY5zXEnf1D5jyDfSLU+wLiDrtSdERE=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] xfrm: Remove unnecessary strscpy_pad() size arguments
+Date: Thu, 20 Mar 2025 13:44:51 +0100
+Message-ID: <20250320124450.32562-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742474219;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rw6wMIYMJ1AHQenbcEv56UwG8Bnbs4a/rZ4UNrxeeV8=;
-	b=MPaOo1ZsDBnhct6Qww0pUpr15rn8LiP3QJx1nKQ0zU/QdWuhVM8+FVRdqYV67YBjZBSTeV
-	o2wW4MDvUBkgTVF5B1tFIwjobCU/PXmWM5wV2or+Qio27JfXbbZLA6HM0AbJy7NWVyrORv
-	nI4ICnNjWxD7HmEplggQ4hDYzOQW29I=
-Date: Thu, 20 Mar 2025 12:36:53 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Message-ID: <b403d53317c0bd8125cecbc0651e54338ca11bfd@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH bpf-next v3 2/3] bpf, sockmap: avoid using sk_socket
- after free when reading
-To: "Cong Wang" <xiyou.wangcong@gmail.com>
-Cc: john.fastabend@gmail.com, jakub@cloudflare.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, andrii@kernel.org, eddyz87@gmail.com, mykolal@fb.com,
- ast@kernel.org, daniel@iogearbox.net, martin.lau@linux.dev,
- song@kernel.org, yonghong.song@linux.dev, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, shuah@kernel.org,
- mhal@rbox.co, sgarzare@redhat.com, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org,
- syzbot+dd90a702f518e0eac072@syzkaller.appspotmail.com
-In-Reply-To: <Z9tiqkSOH9vuOOJL@pop-os.localdomain>
-References: <20250317092257.68760-1-jiayuan.chen@linux.dev>
- <20250317092257.68760-3-jiayuan.chen@linux.dev>
- <Z9tiqkSOH9vuOOJL@pop-os.localdomain>
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-March 20, 2025 at 08:34, "Cong Wang" <xiyou.wangcong@gmail.com> wrote:
+If the destination buffer has a fixed length, strscpy_pad()
+automatically determines its size using sizeof() when the argument is
+omitted. This makes the explicit sizeof() calls unnecessary - remove
+them.
 
->=20
->=20On Mon, Mar 17, 2025 at 05:22:55PM +0800, Jiayuan Chen wrote:
->=20
->=20>=20
->=20> There are potential concurrency issues, as shown below.
-> >=20
->=20>  '''
-> >=20
->=20>  CPU0 CPU1
-> >=20
->=20>  sk_psock_verdict_data_ready:
-> >=20
->=20>  socket *sock =3D sk->sk_socket
-> >=20
->=20>  if (!sock) return
-> >=20
->=20>  close(fd):
-> >=20
->=20>  ...
-> >=20
->=20>  ops->release()
-> >=20
->=20>  if (!sock->ops) return
-> >=20
->=20>  sock->ops =3D NULL
-> >=20
->=20>  rcu_call(sock)
-> >=20
->=20>  free(sock)
-> >=20
->=20>  READ_ONCE(sock->ops)
-> >=20
->=20>  ^
-> >=20
->=20>  use 'sock' after free
-> >=20
->=20>  '''
-> >=20
->=20>=20=20
->=20>=20
->=20>  RCU is not applicable to Unix sockets read path, because the Unix =
-socket
-> >=20
->=20>  implementation itself assumes it's always in process context and h=
-eavily
-> >=20
->=20>  uses mutex_lock, so, we can't call read_skb within rcu lock.
-> >=20
->=20
-> Hm, I guess the RCU work in sk_psock_drop() does not work for Unix
->=20
->=20domain sockets either?
->=20
->=20Thanks.
->
+No functional changes intended.
 
-Although the Unix domain socket framework does not use RCU locks, the
-entire sockmap process protects access to psock via RCU:
-'''
-rcu_read_lock();
-psock =3D sk_psock(sk_other);
-if (psock) {
- ...
-}
-rcu_read_unlock(); // `sk_psock_drop` will not execute until the unlock
-'''
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ net/xfrm/xfrm_user.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Therefore, I believe there are no issues with the psock operations here.
-
-Thanks~
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index 08c6d6f0179f..a4d92ea43e3d 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -1161,7 +1161,7 @@ static int copy_to_user_auth(struct xfrm_algo_auth *auth, struct sk_buff *skb)
+ 	if (!nla)
+ 		return -EMSGSIZE;
+ 	algo = nla_data(nla);
+-	strscpy_pad(algo->alg_name, auth->alg_name, sizeof(algo->alg_name));
++	strscpy_pad(algo->alg_name, auth->alg_name);
+ 
+ 	if (redact_secret && auth->alg_key_len)
+ 		memset(algo->alg_key, 0, (auth->alg_key_len + 7) / 8);
+@@ -1174,7 +1174,7 @@ static int copy_to_user_auth(struct xfrm_algo_auth *auth, struct sk_buff *skb)
+ 	if (!nla)
+ 		return -EMSGSIZE;
+ 	ap = nla_data(nla);
+-	strscpy_pad(ap->alg_name, auth->alg_name, sizeof(ap->alg_name));
++	strscpy_pad(ap->alg_name, auth->alg_name);
+ 	ap->alg_key_len = auth->alg_key_len;
+ 	ap->alg_trunc_len = auth->alg_trunc_len;
+ 	if (redact_secret && auth->alg_key_len)
+@@ -1195,7 +1195,7 @@ static int copy_to_user_aead(struct xfrm_algo_aead *aead, struct sk_buff *skb)
+ 		return -EMSGSIZE;
+ 
+ 	ap = nla_data(nla);
+-	strscpy_pad(ap->alg_name, aead->alg_name, sizeof(ap->alg_name));
++	strscpy_pad(ap->alg_name, aead->alg_name);
+ 	ap->alg_key_len = aead->alg_key_len;
+ 	ap->alg_icv_len = aead->alg_icv_len;
+ 
+@@ -1217,7 +1217,7 @@ static int copy_to_user_ealg(struct xfrm_algo *ealg, struct sk_buff *skb)
+ 		return -EMSGSIZE;
+ 
+ 	ap = nla_data(nla);
+-	strscpy_pad(ap->alg_name, ealg->alg_name, sizeof(ap->alg_name));
++	strscpy_pad(ap->alg_name, ealg->alg_name);
+ 	ap->alg_key_len = ealg->alg_key_len;
+ 
+ 	if (redact_secret && ealg->alg_key_len)
+@@ -1238,7 +1238,7 @@ static int copy_to_user_calg(struct xfrm_algo *calg, struct sk_buff *skb)
+ 		return -EMSGSIZE;
+ 
+ 	ap = nla_data(nla);
+-	strscpy_pad(ap->alg_name, calg->alg_name, sizeof(ap->alg_name));
++	strscpy_pad(ap->alg_name, calg->alg_name);
+ 	ap->alg_key_len = 0;
+ 
+ 	return 0;
 
