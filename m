@@ -1,96 +1,259 @@
-Return-Path: <netdev+bounces-176504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB090A6A905
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 15:50:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09B0AA6A90A
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 15:51:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88F39884EDE
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 14:49:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 727A67AC70D
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 14:49:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFC061E3DF7;
-	Thu, 20 Mar 2025 14:49:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7FDC1E0E0D;
+	Thu, 20 Mar 2025 14:50:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B/9E01bF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nRPpkYlD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC9201E2845
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 14:49:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69AA01876;
+	Thu, 20 Mar 2025 14:50:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742482198; cv=none; b=dM5wQSRi1Gwc4q/dJVRsaZyeSJKgwa9jmqjKHFIuF758n16XgFCHc8A71i1qqU1N39j2xe9SNL/xI3Sg1RAD9qlydUDo4T8CAECIfB7WS8GBMOy8u1JfseoxG/qKGG7zRUhxvP8N2hRIU/ks4ryDxqNddfYfjeYXdIIcPRfA/kw=
+	t=1742482250; cv=none; b=up2lDjrIAJCtLBoWZ8e0GjNAfPgFQCQ4m+q4jitmx3YciWFDai+tyqZAlhq2EX2IOG1kLMB9I9JTkjFxV2Ria+gc34VMxfF/QYxvFeOymYsw90T/XJoHdAT1Zcypt8gCRZyyer1MsQkcW/JUi/JWWvRQSgpf8e6G8z5sMISixqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742482198; c=relaxed/simple;
-	bh=nclCvtPjp+bVvCl2moDMyXmZsWcmuCFcaAiLNBre3Eg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fkotLx11KU6gdokyMX5Fazqk30kxXyXiKichkOVL3Ye3TgDBHfEXngeoT5I1frE8brQjZOHM3sBV1hvzpaK2oZSpybd7x8txnL2XhVz9pHaIATp1mcisd9F0yAuxwNLJ+S9PX7L3e0/EQ7efib+Hc8xMlcBfsKvYZhXoM0XwD84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B/9E01bF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F79AC4CEE8;
-	Thu, 20 Mar 2025 14:49:58 +0000 (UTC)
+	s=arc-20240116; t=1742482250; c=relaxed/simple;
+	bh=VgHP2YZFJFqQDq6X1Enrko29eUy4PpuSIOCuvJw0JKI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JU23vf56yCSeynELKQGf7YpeU/z+eYk3tketxRSKHr/rVPQhhaaOyr5KVUbQpdEzCyu1PJDjdBs2QwpO8pEKOxmRlNvq4F7CffqBwP6Ib8lB3SFVBxktwzv0dQ444X/CS7n+3M00yR4ais1xB5Hm0dBmxLaMNZK0+nc0Ov51FKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nRPpkYlD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAE15C4CEDD;
+	Thu, 20 Mar 2025 14:50:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742482198;
-	bh=nclCvtPjp+bVvCl2moDMyXmZsWcmuCFcaAiLNBre3Eg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=B/9E01bF/hS6rFYHDmuXbK4DbCaRvVGJzX6v45jgwCAGCuUbfpy3OpR0wR47LTqFT
-	 qunHi1T2XzLoNPK7OvfRMGXiBbOGQIMMQu8Jjo9lthSh4SIw9T3AaUEWJ1fIn5RZTy
-	 /heSSTBjkfSppiMdx3TjzLU7gNR0cQj0i3gg2d/cePI8khT/QdL56PgmRz7DISsDxB
-	 805pLaKQ56qWBi6h9xfvbDuhFUrEf8PATG+P+BFyeDaYqclbfALyObBBrDAsdEbrJz
-	 IuTZ8V9ZlhNuJxd2PfHDLUV0u2oJ5JgNHJhodZ9v4vX50yMCf9J380GdMz/PpelaVI
-	 n+BiIEOGia2Dw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADFF73806654;
-	Thu, 20 Mar 2025 14:50:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1742482250;
+	bh=VgHP2YZFJFqQDq6X1Enrko29eUy4PpuSIOCuvJw0JKI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nRPpkYlDUBw1gjGtXjQDSei78Js5SiMhGUtyttvW9CgAqns2tTOPY8/wNVO3igUrp
+	 d9zHAHmBrA+CESjTE8Vd+xoH+NF8JxkVjkUXZY2rGxmW3pfhS8VkKdGG8xyARuj0FL
+	 gQHgAnh715xQCL8AM6m35smLKWm66L881RKbWs2YrcLzTdo+SZBv0gIAnBp529LrWk
+	 2TpFQUzC/HZ9ygyk+1qefsxhF1q9kjA4qEWPS0OL1ov41GqjdVgXiAkgQNedHqDO0I
+	 4AydkziQDb1uW2b3VKIQ3E28ix5DltoIbnT+ryX4BT5beobsVaihxlLPX0QJow5foT
+	 821ydGI3nYYkQ==
+Date: Thu, 20 Mar 2025 14:50:42 +0000
+From: Lee Jones <lee@kernel.org>
+To: Ming Yu <a0282524688@gmail.com>
+Cc: tmyu0@nuvoton.com, linus.walleij@linaro.org, brgl@bgdev.pl,
+	andi.shyti@kernel.org, mkl@pengutronix.de,
+	mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net,
+	jdelvare@suse.com, alexandre.belloni@bootlin.com,
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
+	linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH v8 1/7] mfd: Add core driver for Nuvoton NCT6694
+Message-ID: <20250320145042.GS3890718@google.com>
+References: <20250225081644.3524915-1-a0282524688@gmail.com>
+ <20250225081644.3524915-2-a0282524688@gmail.com>
+ <20250307011542.GE8350@google.com>
+ <CAOoeyxUgiTqtSksfHopEDhZHwNkUq9+d-ojo8ma3PX2dosuwyQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 1/2] xfrm: fix tunnel mode TX datapath in packet offload mode
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174248223427.1795325.9057916434131404700.git-patchwork-notify@kernel.org>
-Date: Thu, 20 Mar 2025 14:50:34 +0000
-References: <20250319065513.987135-2-steffen.klassert@secunet.com>
-In-Reply-To: <20250319065513.987135-2-steffen.klassert@secunet.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: davem@davemloft.net, kuba@kernel.org, herbert@gondor.apana.org.au,
- netdev@vger.kernel.org
+In-Reply-To: <CAOoeyxUgiTqtSksfHopEDhZHwNkUq9+d-ojo8ma3PX2dosuwyQ@mail.gmail.com>
 
-Hello:
+On Mon, 17 Mar 2025, Ming Yu wrote:
 
-This series was applied to netdev/net.git (main)
-by Steffen Klassert <steffen.klassert@secunet.com>:
-
-On Wed, 19 Mar 2025 07:55:12 +0100 you wrote:
-> From: Alexandre Cassen <acassen@corp.free.fr>
+> Dear Lee,
 > 
-> Packets that match the output xfrm policy are delivered to the netstack.
-> In IPsec packet mode for tunnel mode, the HW is responsible for building
-> the hard header and outer IP header. In such a situation, the inner
-> header may refer to a network that is not directly reachable by the host,
-> resulting in a failed neighbor resolution. The packet is then dropped.
-> xfrm policy defines the netdevice to use for xmit so we can send packets
-> directly to it.
+> Thank you for reviewing,
 > 
-> [...]
+> Lee Jones <lee@kernel.org> 於 2025年3月7日 週五 上午9:15寫道：
+> >
+> > On Tue, 25 Feb 2025, Ming Yu wrote:
+> >
+> > > The Nuvoton NCT6694 is a peripheral expander with 16 GPIO chips,
+> > > 6 I2C controllers, 2 CANfd controllers, 2 Watchdog timers, ADC,
+> > > PWM, and RTC.
+> >
+> > This needs to go into the Kconfig help passage.
+> >
+> 
+> Okay, I will move these to Kconfig in the next patch.
+> 
+> > > This driver implements USB device functionality and shares the
+> > > chip's peripherals as a child device.
+> >
+> > This driver doesn't implement USB functionality.
+> >
+> 
+> Fix it in v9.
+> 
+> > > Each child device can use the USB functions nct6694_read_msg()
+> > > and nct6694_write_msg() to issue a command. They can also request
+> > > interrupt that will be called when the USB device receives its
+> > > interrupt pipe.
+> > >
+> > > Signed-off-by: Ming Yu <a0282524688@gmail.com>
+> >
+> > Why aren't you signing off with your work address?
+> >
+> 
+> Fix it in v9.
+> 
+> > > ---
+> > >  MAINTAINERS                 |   7 +
+> > >  drivers/mfd/Kconfig         |  18 ++
+> > >  drivers/mfd/Makefile        |   2 +
+> > >  drivers/mfd/nct6694.c       | 378 ++++++++++++++++++++++++++++++++++++
+> > >  include/linux/mfd/nct6694.h | 102 ++++++++++
+> > >  5 files changed, 507 insertions(+)
+> > >  create mode 100644 drivers/mfd/nct6694.c
+> > >  create mode 100644 include/linux/mfd/nct6694.h
+> > >
+> > > diff --git a/MAINTAINERS b/MAINTAINERS
+> > > index 873aa2cce4d7..c700a0b96960 100644
+> > > --- a/MAINTAINERS
+> > > +++ b/MAINTAINERS
+> > > @@ -16918,6 +16918,13 @@ F:   drivers/nubus/
+> > >  F:   include/linux/nubus.h
+> > >  F:   include/uapi/linux/nubus.h
+> > >
+> > > +NUVOTON NCT6694 MFD DRIVER
+> > > +M:   Ming Yu <tmyu0@nuvoton.com>
+> > > +L:   linux-kernel@vger.kernel.org
+> >
+> > This is the default list.  You shouldn't need to add that here.
+> 
+> Remove it in v9.
 
-Here is the summary with links:
-  - [1/2] xfrm: fix tunnel mode TX datapath in packet offload mode
-    https://git.kernel.org/netdev/net/c/5eddd76ec2fd
-  - [2/2] xfrm_output: Force software GSO only in tunnel mode
-    https://git.kernel.org/netdev/net/c/0aae2867aa60
+Please snip everything that you agree with.
 
-You are awesome, thank you!
+> > > +S:   Supported
+> > > +F:   drivers/mfd/nct6694.c
+> > > +F:   include/linux/mfd/nct6694.h
+> > > +
+> > >  NVIDIA (rivafb and nvidiafb) FRAMEBUFFER DRIVER
+> > >  M:   Antonino Daplas <adaplas@gmail.com>
+> > >  L:   linux-fbdev@vger.kernel.org
+
+[...]
+
+> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x1),
+> >
+> > IDs are usually given in base-10.
+> >
+> 
+> Fix it in v9.
+> 
+> > Why are you manually adding the device IDs?
+> >
+> > PLATFORM_DEVID_AUTO doesn't work for you?
+> >
+> 
+> I need to manage these IDs to ensure that child devices can be
+> properly utilized within their respective modules.
+
+How?  Please explain.
+
+This numbering looks sequential and arbitrary.
+
+What does PLATFORM_DEVID_AUTO do differently such that it is not useful?
+
+> 
+> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x2),
+> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x3),
+> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x4),
+> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x5),
+> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x6),
+> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x7),
+> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x8),
+> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x9),
+> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0xA),
+> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0xB),
+> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0xC),
+> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0xD),
+> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0xE),
+> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0xF),
+
+> > > +
+> > > +     MFD_CELL_BASIC("i2c-nct6694", NULL, NULL, 0, 0x0),
+> > > +     MFD_CELL_BASIC("i2c-nct6694", NULL, NULL, 0, 0x1),
+> > > +     MFD_CELL_BASIC("i2c-nct6694", NULL, NULL, 0, 0x2),
+> > > +     MFD_CELL_BASIC("i2c-nct6694", NULL, NULL, 0, 0x3),
+> > > +     MFD_CELL_BASIC("i2c-nct6694", NULL, NULL, 0, 0x4),
+> > > +     MFD_CELL_BASIC("i2c-nct6694", NULL, NULL, 0, 0x5),
+> > > +
+> > > +     MFD_CELL_BASIC("nct6694_canfd", NULL, NULL, 0, 0x0),
+> >
+> > Why has the naming convention changed here?
+> >
+> 
+> I originally expected the child devices name to directly match its
+> driver name. Do you think it would be better to standardize the naming
+> as "nct6694-xxx" ?
+
+Yes, that is the usual procedure.
+
+> > > +     MFD_CELL_BASIC("nct6694_canfd", NULL, NULL, 0, 0x1),
+> > > +
+> > > +     MFD_CELL_BASIC("nct6694_wdt", NULL, NULL, 0, 0x0),
+> > > +     MFD_CELL_BASIC("nct6694_wdt", NULL, NULL, 0, 0x1),
+> > > +
+> > > +     MFD_CELL_NAME("nct6694-hwmon"),
+> > > +     MFD_CELL_NAME("rtc-nct6694"),
+> >
+> > There doesn't seem to be any consistency here.
+> >
+> 
+> Do you think these two should be changed to use MFD_CELL_BASIC()?
+
+No.  I mean with the device nomenclature.
+
+[...]
+
+> > > +static void usb_int_callback(struct urb *urb)
+> > > +{
+> > > +     struct nct6694 *nct6694 = urb->context;
+> > > +     unsigned int *int_status = urb->transfer_buffer;
+> > > +     int ret;
+> > > +
+> > > +     switch (urb->status) {
+> > > +     case 0:
+> > > +             break;
+> > > +     case -ECONNRESET:
+> > > +     case -ENOENT:
+> > > +     case -ESHUTDOWN:
+> > > +             return;
+> > > +     default:
+> > > +             generic_handle_irq_safe(irq_find_mapping(nct6694->domain, irq));
+> > > +             *int_status &= ~BIT(irq);
+> > > +     }
+> > > +
+> > > +resubmit:
+> > > +     ret = usb_submit_urb(urb, GFP_ATOMIC);
+> > > +     if (ret)
+> > > +             dev_dbg(nct6694->dev, "%s: Failed to resubmit urb, status %pe",
+> >
+> > Why debug?
+> >
+> 
+> Excuse me, do you think it should change to dev_err()?
+
+Probably a dev_warn() since you are not propagating the error.
+
+Is this okay by the way?  Is it okay to fail?
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Lee Jones [李琼斯]
 
