@@ -1,161 +1,134 @@
-Return-Path: <netdev+bounces-176492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE517A6A8A1
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 15:34:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1327A6A8B8
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 15:37:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF5C2884149
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 14:34:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B985F3B736C
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 14:36:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A10681D63E2;
-	Thu, 20 Mar 2025 14:34:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93A7E1DEFC6;
+	Thu, 20 Mar 2025 14:35:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O9RZUt1O"
+	dkim=pass (2048-bit key) header.d=avride-ai.20230601.gappssmtp.com header.i=@avride-ai.20230601.gappssmtp.com header.b="n+mlRouH"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F8B1B81DC
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 14:34:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E5E175D53
+	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 14:35:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742481255; cv=none; b=EU2ZuQVm0m2Vrt6rRyHPro0/D4nabMV6rPMF0CFiLDJiPfez1LIjoDPkyyvGE6/Yi+gdw1D3Wi/84YajItCi5hDxFbVRJx4YeLc57GvowwU8iCyk9kdhPiMhPSV5VqEUB0ciPnFpRWdeQsanVRMDdPsMDE29jGjbY/PxB5SCi6o=
+	t=1742481329; cv=none; b=rekrGVlI6Lp5ezxfnaAqZ+dTN9NCs9PdY8k2s8e6FbbdrDtIeotAkgCMSDbeyN/EC30LBH+gFrJcZeb03IYUJSABGKSC8kOODTRQCmfYK4ZsY68wQZmaClnnRKlH39QoDs4JXBhCKameJWKfWeEAluYtC4sLu1M27FEtLz6sPnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742481255; c=relaxed/simple;
-	bh=aLsT93dSweyrf+qk2uXM1EK4iaVizTPbN4c8paMt31M=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=bz12At3sJsTfypQVGEkp4RR8YMucj6hTZcU8F6L6L640NbAjKIrDS9Bd3hXEMlQ7JktqQHQQ072HU+i8LhWh922AKmi7WwQITDH7/I+O8AAfyE+x5RZrcor4MBdbBZvWPv2hoFYO796U2eR6HoQeyTqVnzZJ84phhBg4h8z+4mU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O9RZUt1O; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742481252;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aLsT93dSweyrf+qk2uXM1EK4iaVizTPbN4c8paMt31M=;
-	b=O9RZUt1ORTdQNvzZg6v1n+SlSFxmoLqrcrWZAj/395HhPClsxVOca8UoeDvm9hjcYbeT0H
-	B8kUyF0aXnKO2lNGNj6uiEyQx7lJfxQTHODf60e40ot7JBRuojjmYlWuB+YXi87zoNNwyR
-	wdZZ2mzqtXgcKtQtJh53YCTh8C+3eck=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-524-Ha5p5JoQMGKGQFLjd7r-bg-1; Thu, 20 Mar 2025 10:34:11 -0400
-X-MC-Unique: Ha5p5JoQMGKGQFLjd7r-bg-1
-X-Mimecast-MFC-AGG-ID: Ha5p5JoQMGKGQFLjd7r-bg_1742481250
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-5498f71580cso372603e87.3
-        for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 07:34:11 -0700 (PDT)
+	s=arc-20240116; t=1742481329; c=relaxed/simple;
+	bh=n3xFPwrJPtxclM7S8P+g/6TIgiGrvVfs9QqNnV00cOg=;
+	h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:To; b=NxV/pA5C6CZm3x3F+47H4+SVLrWgpPA/8CKfXN5CICursb6oWMp3Oqh5yADS/eaUi6zzg63W3QTGsQRr+cZ+1n4tzKY5C9O76e2B8uZi5Bu3AjKbkaY7IRlHWsEG/t5FKV9iYA5c9rwYVJrqrgjCoZU9ja/TJoyFSYBhZGcXgWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=avride.ai; spf=none smtp.mailfrom=avride.ai; dkim=pass (2048-bit key) header.d=avride-ai.20230601.gappssmtp.com header.i=@avride-ai.20230601.gappssmtp.com header.b=n+mlRouH; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=avride.ai
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=avride.ai
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4393dc02b78so5862655e9.3
+        for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 07:35:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=avride-ai.20230601.gappssmtp.com; s=20230601; t=1742481325; x=1743086125; darn=vger.kernel.org;
+        h=to:date:message-id:subject:mime-version:content-transfer-encoding
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=n3xFPwrJPtxclM7S8P+g/6TIgiGrvVfs9QqNnV00cOg=;
+        b=n+mlRouHx7fZnCFQz2S0IZRRi+yHI0uIt28ELJuI9XU7NBdoZrQUYaFXn9zGiCQQgI
+         qrnwj4i46oM/a3fu3ONzS6WW0sy+81QWo9LLTX21u4/RY3afUAGv2xnN3YC0QR0+TTS3
+         zl/VR0EHhCWq4eVfZ/oC24qd2f9HNMvbLmk32a80hZP1MQDBJZ5oyym7vmEixcbdHSc3
+         LpN4r6Udlzx7gR1+d/ACXkydAzV27mU5VU0xwc0rPuSa1Fy1q7bry8wUzU67nB+YWLyu
+         +RXA/u2My718jIrOvt6xCIVCfl5+en8hIDVbzT3B3rR5Oqb0oCGh4ftIiZUvhJKWvSEn
+         BoYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742481250; x=1743086050;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aLsT93dSweyrf+qk2uXM1EK4iaVizTPbN4c8paMt31M=;
-        b=UIsWDdKc5QFneGw2gHbDF6LbmHG+lps/042w0Gv9oAOf3TZdQT0rcXbfNSEf90WrGN
-         nR77QWCmOaRRJUfMu9VyeWd1K1QUU3FSwPyfG0UdN7wKccZt3K/d5AYrqI55dgbTma6Y
-         fiftm1bMlqhFAZai1+xfx7r0ODzP7YdzboBDyW3o/04SWEvD23Q7qGx5C6LW7giSEPx8
-         1OjsiuFIXm2BgDNg8hYZLOU9gPHTYMNkgy0TrmtHip9ACW2lG4zJ4tYS2ipn4wIxcWlA
-         ekObJgo5MxrVYXoF1f40+fGiSBK4hU4FqvTOzol90XSRNtjfg5vRJUVgd10f/y3GudpT
-         WSIA==
-X-Gm-Message-State: AOJu0YzAMoMY32n/BrTK+XWipDun9rTGjXEcJCPIYBhvqHQM4v1Xi/X5
-	MrFoYFx5X3GWOosyt3c1HCh6DP0ZYRvrncA0glUvhWZ0zBa8OabmJmX2mYHKIW1eYHvi8e+nbfX
-	SfZoczyaLzmyFtyZ+re3hxHbmax7Qs1fwr4380e54+NRbqamcL1+CQw==
-X-Gm-Gg: ASbGncvEwTSvK1zoCZy0C6mkCvnnKgZ6NXBTa4Eb+Jbl5EzE07gVgRVg6s+Y8VwAT74
-	166lAWApeFfYL5IFTPsJeNTAYsVyWzLlPC6YtU3K6XW2lgwMOx7MC7d3a/G3VLIQHiZMRLYxNlQ
-	p86NYiGNFVYtZ+htdeWjsAB/U702OyJ2kUMFrpHhBQKvlC5so+1LkV+rfHHMUNFk/1SrAOQ8I1O
-	B1jLP30QPTcxTHS6TZnYzgfsGjiyXzzI9uUj8Y8fYiRmbwDNqmF9GyUu5R+Ci2qZgEFgrbzooFo
-	IzB9WgOQ5Z3Y
-X-Received: by 2002:a05:6512:2392:b0:549:8e54:da9c with SMTP id 2adb3069b0e04-54ad0619d9cmr1163966e87.4.1742481249714;
-        Thu, 20 Mar 2025 07:34:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFP5MKiRxkFgKG3EdSlhgqaV6W6DjuZ/y68FT+nnGB1qw2EVv6jr9Oog18ux0YhIZ7JDKVH0g==
-X-Received: by 2002:a05:6512:2392:b0:549:8e54:da9c with SMTP id 2adb3069b0e04-54ad0619d9cmr1163951e87.4.1742481249052;
-        Thu, 20 Mar 2025 07:34:09 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-549ba8a9219sm2230109e87.249.2025.03.20.07.34.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Mar 2025 07:34:07 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 202DA18FC2E6; Thu, 20 Mar 2025 15:34:06 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>, Yunsheng Lin
- <yunshenglin0825@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
- <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Simon
- Horman <horms@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Mina
- Almasry <almasrymina@google.com>, Yonglong Liu <liuyonglong@huawei.com>,
- Pavel Begunkov <asml.silence@gmail.com>, Matthew Wilcox
- <willy@infradead.org>, Robin Murphy <robin.murphy@arm.com>, IOMMU
- <iommu@lists.linux.dev>, segoon@openwall.com, solar@openwall.com,
- kernel-hardening@lists.openwall.com
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-mm@kvack.org, Qiuling Ren <qren@redhat.com>, Yuying Ma
- <yuma@redhat.com>
-Subject: Re: [PATCH net-next 3/3] page_pool: Track DMA-mapped pages and
- unmap them when destroying the pool
-In-Reply-To: <7a604ae4-063f-48ff-a92f-014d1cf86adc@huawei.com>
-References: <20250314-page-pool-track-dma-v1-0-c212e57a74c2@redhat.com>
- <20250314-page-pool-track-dma-v1-3-c212e57a74c2@redhat.com>
- <db813035-fb38-4fc3-b91e-d1416959db13@gmail.com> <87jz8nhelh.fsf@toke.dk>
- <7a76908d-5be2-43f1-a8e2-03b104165a29@huawei.com> <87wmcmhxdz.fsf@toke.dk>
- <ce6ca18b-0eda-4d62-b1d3-e101fe6dcd4e@huawei.com> <87r02ti57p.fsf@toke.dk>
- <7a604ae4-063f-48ff-a92f-014d1cf86adc@huawei.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Thu, 20 Mar 2025 15:34:06 +0100
-Message-ID: <87o6xvixep.fsf@toke.dk>
+        d=1e100.net; s=20230601; t=1742481325; x=1743086125;
+        h=to:date:message-id:subject:mime-version:content-transfer-encoding
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=n3xFPwrJPtxclM7S8P+g/6TIgiGrvVfs9QqNnV00cOg=;
+        b=Z46hOaoYUkhi7ZjgOCd2DAdPNfdVopeO2yx/GAzx/atCUX6NqGcJCIicznEH0Ddsfv
+         NXwUfkOnaiRQqNJ6NVgYig76P34Xh5RjyrcKpqj0u2/g2Y/zWCPzzhz10G1z3oXouxzM
+         FnPzmPoHV4Jl70nENufnU6jtjZCrnnSty4QynI3xoI3oD30WSPxpb7pt2WegSmBo4Fhp
+         kYwbxdX0MEq8OZ0xw3x00o5zUGzyTWbMdhM0RFTDfuXw8hD1SHOPAo6kp7goaRVcHPcE
+         Vbyw1TYxpKsFaFSdR4imrSv6567Nf1iD8hRIf/SFjoLXXggDsD5Md4tUj4ecAv3QtU30
+         ct0Q==
+X-Gm-Message-State: AOJu0YzFsOpdlJ0MQm5CbvlFye+aLxoHEgbYtSw8/z1de54OspD1qNS8
+	kiX5kINl8DlVk6pjwKRZ/Nd3N8JrN6OmSxVKHpZlpQIkgWZLVQSCHN10dhc6SOsEKxnQkperdOo
+	D
+X-Gm-Gg: ASbGncufF3eDidHO1wQM1ziSjkaTYVy4yB+KW2C5F/dyoLZD/edUbCuWTpdjXOxDPCG
+	lx213cxao8gkAfUeJTfAtycxtVk7G+F++RpGParFRKxcQY6r2NhBihVhVGmM/8sTNr+gZTnpuep
+	UBEFekZTu2/oUHowdrpHTXjqEdJohmQQk0+pPnI8kSCt3mfgezTdV8Cpfgrk6D3w1Fe4sGWSjbe
+	s52XEKn9A5d+8QPyRV9T9u8k3j6xEecB6mFlZjtnjDapBK85ETm7HNoGEbVPrYUcgMzc6AgpBRQ
+	6cAruKqMCYq6HYWatSaDlsNkq6VFCAFcqDQmlA4FEHMW/ySpc5iLNpxiYLRBLIJ0GA4BvfhoQg=
+	=
+X-Google-Smtp-Source: AGHT+IFv3iJTO9xK48CGSCzrOzQH4tL5nbghMGiL2zrpFUd2w4j2sx7LMW7jwpE/xy7tSO84+HMEvQ==
+X-Received: by 2002:a05:600c:34cc:b0:43b:c95f:fd9 with SMTP id 5b1f17b1804b1-43d43780293mr65074335e9.5.1742481325270;
+        Thu, 20 Mar 2025 07:35:25 -0700 (PDT)
+Received: from smtpclient.apple ([2a02:14a:105:a03:dc00:625a:5dc3:5bc0])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395cbbc88f2sm24001313f8f.101.2025.03.20.07.35.24
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 20 Mar 2025 07:35:25 -0700 (PDT)
+From: Kamil Zaripov <zaripov-kamil@avride.ai>
+Content-Type: text/plain;
+	charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.600.62\))
+Subject: bnxt_en: Incorrect tx timestamp report
+Message-Id: <DE1DD9A1-3BB2-4AFB-AE3B-9389D3054875@avride.ai>
+Date: Thu, 20 Mar 2025 16:35:13 +0200
+To: netdev@vger.kernel.org
+X-Mailer: Apple Mail (2.3774.600.62)
 
-Yunsheng Lin <linyunsheng@huawei.com> writes:
+Hi all,
 
-> On 2025/3/19 20:18, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->>>
->>> All I asked is about moving PP_MAGIC_MASK macro into poison.h if you
->>> still want to proceed with reusing the page->pp_magic as the masking and
->>> the signature to be masked seems reasonable to be in the same file.
->>=20
->> Hmm, my thinking was that this would be a lot of irrelevant stuff to put
->> into poison.h, but I suppose we could do so if the mm folks don't object=
- :)
->
-> The masking and the signature to be masked is correlated, I am not sure
-> what you meant by 'irrelevant stuff' here.
+I've encountered a bug in the bnxt_en driver and I am unsure about the =
+correct approach to fix it. Every 2^48 nanoseconds (or roughly 78.19 =
+hours) there is a probability that the hardware timestamp for a sent =
+packet may deviate by either 2^48 nanoseconds less or 2^47 nanoseconds =
+more compared to the actual time.
 
-Well, looking at it again, mostly the XA_LIMIT define, I guess. But I
-can just leave that in the PP header.
+This issue likely occurs within the bnxt_async_event_process function =
+when handling the ASYNC_EVENT_CMPL_EVENT_ID_PHC_UPDATE event. It appears =
+that the payload of this event contains bits 48=E2=80=9363 of the PHC =
+timer counter. During event handling, this function reads bits 0=E2=80=934=
+7 of the same counter to combine them and subsequently updates the =
+cycle_last field within the struct timecounter. The relevant code can be =
+found here:
+=
+https://elixir.bootlin.com/linux/v6.13.7/source/drivers/net/ethernet/broad=
+com/bnxt/bnxt.c#L2829-L2833
 
-> As you seemed to have understood most of my concern about reusing
-> page->pp_magic, I am not going to argue with you about the uncertainty
-> of security and complexity of different address layout for different
-> arches again.
->
-> But I am still think it is not the way forward with the reusing of
-> page->pp_magic through doing some homework about the 'POISON_POINTER'.
-> If you still think my idea is complex and still want to proceed with
-> reusing the space of page->pp_magic, go ahead and let the maintainers
-> decide if it is worth the security risk and performance degradation.
+The issue arises if bits 48=E2=80=9363 of the PHC counter increment by 1 =
+between sending the ASYNC_EVENT_CMPL_EVENT_ID_PHC_UPDATE event and its =
+actual handling by the driver. In such a case, cycle_last becomes =
+approximately 2^48 nanoseconds behind the real-time value.
 
-Yeah, thanks for taking the time to go through the implications. On
-balance, I still believe reusing the bits is a better solution, but it
-will of course ultimately be up to the maintainers to decide.
+A possibly related issue involves the BCM57502 network card, which =
+seemingly possesses only a single PHC device. However, the bnxt_en =
+driver creates four PHC Linux devices when operating in quad-port mode. =
+Consequently, clock synchronization daemons like phc2sys attempt to =
+independently synchronize the system clock to each of these four PHC =
+clocks. This scenario can lead to unstable synchronization and might =
+also trigger additional ASYNC_EVENT_CMPL_EVENT_ID_PHC_UPDATE events.
 
-I will post a v2 of this series with the adjustments we've discussed,
-and try to outline the tradeoffs and risks involved in the description,
-and then leave it to the maintainers to decide which approach they want
-to move forward with.
+Given these issues, I have two questions:
 
--Toke
+1. Would it be beneficial to modify the bnxt_en driver to create only a =
+single PHC Linux device for network cards that physically have only one =
+PHC?
+
+2. Is there a method available to read the complete 64-bit PHC counter =
+to mitigate the observed problem of 2^48-nanosecond time jumps?
+
+Best regards,
+Zaripov Kamil
 
 
