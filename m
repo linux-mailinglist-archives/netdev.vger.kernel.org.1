@@ -1,119 +1,78 @@
-Return-Path: <netdev+bounces-176544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D811A6ABDF
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 18:24:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C63F5A6ABEC
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 18:27:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 679073AC1A2
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 17:22:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52B31462A30
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 17:25:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8A5A2236F6;
-	Thu, 20 Mar 2025 17:22:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40FEC2253BC;
+	Thu, 20 Mar 2025 17:25:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mGy2gam1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O0DI3by+"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FA9A2A1A4;
-	Thu, 20 Mar 2025 17:22:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B8B2253A7;
+	Thu, 20 Mar 2025 17:25:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742491369; cv=none; b=cTu88/HedbRvGzv9hYFKQLt0jhVMS6Egh+ndZGMwHbrKbRHxDx5k/VFKhhADy12s6EzPHEmvJxMGavoYzsDMYf7v1lJFUjhR1MLhM2CnB9h4C2Gf3c2o6F3sZqeEsFB1wcZzv3VT+cZBBTnjkt7EML0CxeipbriXHIHlyS3m15U=
+	t=1742491514; cv=none; b=JDAfoWhuMv+86C2YM9zhfuJbAdPVzrCQRMn+GEiqCdGCG/g2pqhbSMvUUK/kazy2kMF38z7p8jLqyNJrRo5AN+aFYrW4sea51Xk0uV77sJ5hpFYgAp//kXcxE9+GQgXuQsVyROC6z9VaLXiJ0T6c6GV3Q6TbtYlc2C97X1WlUos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742491369; c=relaxed/simple;
-	bh=o2g+aeF0m1ZtGAU6jmcbwumD06kUHya/WZT+ebSfW9I=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ji6abE3hGhrZNpZnswPhAIpI6II9HF8Q7sBuRV+8SxTemuTr5SLWwlZTyHLY6KiLNLZlFqSAwcCW64lZCU5OeKth0Lach4fUMwBFLqO+a2PpJPwkeBEs/xSFuSVyyVx7+re2JAybYpt9I4KVjXF9KiQ4wCbOHVS6U2jz01nCPGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mGy2gam1; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id ACD8644324;
-	Thu, 20 Mar 2025 17:22:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1742491365;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zr0LN2ywhctrz98g/ztt7BNk1UlMTcPiWZ2+H7lH0II=;
-	b=mGy2gam1GeJJoq6YqMrza7TyScT6M3R5gFR4vqTQxF3aVDSR9yJGzIQgytegJZRpcWJUpk
-	zbeab+OfyD+YZ/P8oletSCOWhTpZo3CK7j3MDU5nwj7Rw0sPaNnnPPhAIxr0XNynl5qpdT
-	+IFkpOfe+a2ri4Z8I6qYL1K709Rrvv++mMIBpuyz4bV0bDLk5+byvLviSZ7km276DNpQzH
-	P5YDvwZtVQgFUiqnGeHWd4UBmEVLrJA0o64p1nTpWCTe5UwJno91TnEcKTjLlzB5kwNB9u
-	8FfZFjjercF+XnWUyE2Kd4kTrNG3MX3bRlN3gN6BPrZ61ouGkgjd4bM6M3CznQ==
-Date: Thu, 20 Mar 2025 18:22:42 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Donald Hunter
- <donald.hunter@gmail.com>, Rob Herring <robh@kernel.org>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Liam
- Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, Dent
- Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, Maxime
- Chevallier <maxime.chevallier@bootlin.com>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v6 11/12] net: pse-pd: tps23881: Add support
- for static port priority feature
-Message-ID: <20250320182242.401fd6af@kmaincent-XPS-13-7390>
-In-Reply-To: <Z9gklcNz6wHU9cPC@pengutronix.de>
-References: <20250304-feature_poe_port_prio-v6-0-3dc0c5ebaf32@bootlin.com>
-	<20250304-feature_poe_port_prio-v6-11-3dc0c5ebaf32@bootlin.com>
-	<Z9gklcNz6wHU9cPC@pengutronix.de>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1742491514; c=relaxed/simple;
+	bh=l+5UGUfjGqgfaNep1dASsWVQz/pWBXRzNfhtgWL0xYE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kNiBwwQmrvMY+P2pkKRI7SrrLhWJamCqTgld0KyFvlzPczWfTmtDo183T/r51fj9oBUoY528bckDUUU2rza5yYKHKM8OvT7RidMtIT9dF9JobToJjDw34Aj6ZQSjBrPbL2h89SUezCzmXH/rrFtt8PH3J8HmwDqOSKKHjSiVmFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O0DI3by+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACACBC4CEDD;
+	Thu, 20 Mar 2025 17:25:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742491513;
+	bh=l+5UGUfjGqgfaNep1dASsWVQz/pWBXRzNfhtgWL0xYE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=O0DI3by+UNv+MqGTaN3ADT8Cq6vdP3mh9mt0PoPDCUQMg7cHN5Z0eFftbNttEFcYI
+	 1Gt905fCW25woJ6ZA/4go4sB+QxOYxHwIr7V0amWp+9CYyZBZOoI4fD1AexuCgRmGK
+	 YxjH9+Ln3U75nXbhaHVBp5Qp8Vixqb5k+hLvN81F1lPMFi/c7Yn6+XjGYmrxixQ5se
+	 WU1fLfjqsLTxVtCXy0uV0HWfLaiOJvP7EyE3fjWFnsIKbOb5sic4tgIOZiyv+O5Gnx
+	 hgW9ZYtIBeKjKOrianktg4Gu6698yq8S6lwUy3ddYEB/XOlJ8AiJWrDsCz5oiTVbfa
+	 KBjzyvT3huNJw==
+Date: Thu, 20 Mar 2025 17:25:08 +0000
+From: Simon Horman <horms@kernel.org>
+To: Harshitha Ramamurthy <hramamurthy@google.com>
+Cc: netdev@vger.kernel.org, jeroendb@google.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, pkaligineedi@google.com, shailend@google.com,
+	willemb@google.com, jacob.e.keller@intel.com, joshwash@google.com,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net] gve: unlink old napi only if page pool exists
+Message-ID: <20250320172508.GD892515@horms.kernel.org>
+References: <20250317214141.286854-1-hramamurthy@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddugeekkedtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgfdutdefvedtudegvefgvedtgfdvhfdtueeltefffefffffhgfetkedvfeduieeinecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdejpdhrtghpthhtohepohdrrhgvmhhpvghlsehpvghnghhuthhrohhnihigrdguvgdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehku
- hgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegtohhrsggvtheslhifnhdrnhgvthdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrsehgmhgrihhlrdgtohhm
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250317214141.286854-1-hramamurthy@google.com>
 
-On Mon, 17 Mar 2025 14:33:09 +0100
-Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+On Mon, Mar 17, 2025 at 09:41:41PM +0000, Harshitha Ramamurthy wrote:
+> Commit de70981f295e ("gve: unlink old napi when stopping a queue using
+> queue API") unlinks the old napi when stopping a queue. But this breaks
+> QPL mode of the driver which does not use page pool. Fix this by checking
+> that there's a page pool associated with the ring.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: de70981f295e ("gve: unlink old napi when stopping a queue using queue API")
+> Reviewed-by: Joshua Washington <joshwash@google.com>
+> Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
 
-> On Tue, Mar 04, 2025 at 11:19:00AM +0100, Kory Maincent wrote:
-> > From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
-...
-> > @@ -190,7 +201,22 @@ static int tps23881_pi_enable(struct
-> > pse_controller_dev *pcdev, int id) BIT(chan % 4));
-> >  	}
-> > =20
-> > -	return i2c_smbus_write_word_data(client, TPS23881_REG_PW_EN, val);
-> > +	ret =3D i2c_smbus_write_word_data(client, TPS23881_REG_PW_EN, val);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	/* Enable DC disconnect*/
-> > +	chan =3D priv->port[id].chan[0];
-> > +	ret =3D i2c_smbus_read_word_data(client, TPS23881_REG_DISC_EN);
-> > +	if (ret < 0)
-> > +		return ret; =20
->=20
-> Here we have RMW operation without lock on two paths: pi_enable and
-> pi_disable.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-I don't understand, pi_enable and pi_disable are called with pcdev->lock
-acquired thanks to the pse core.
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
 
