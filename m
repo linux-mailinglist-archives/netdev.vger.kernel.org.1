@@ -1,446 +1,276 @@
-Return-Path: <netdev+bounces-176464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CA8CA6A706
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 14:21:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94346A6A6EB
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 14:16:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D52D719C40F4
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 13:20:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B46F981570
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 13:16:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B3921ADC9B;
-	Thu, 20 Mar 2025 13:19:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 287CF1ADC9B;
+	Thu, 20 Mar 2025 13:16:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NyT3OP2d"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="DYRtV/3t";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="raAiz28Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54A1F21CA00
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 13:19:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742476783; cv=none; b=jKbvGzFTyqVNM7UbhN+vasR1WbMyVFlPEK/sowGhl15shTZ/7x8yeylIlVr5YYRjYV+JtIqPMLI5sdob+VVsKwi8+84qinJqp8Eq02+9bI5KgXPYi8yH8uuS6/aUNxexelAaM0BmwJ5iiHmbVQhIs512whAVS4YdsXL5DX9w0wI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742476783; c=relaxed/simple;
-	bh=8ffT4wfwhjfYNOtiauuUrX5hnXGvZM/ci3OQm4Rlezo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=TZtPqPN+4v4/nnhfrDyzch3qpzcVTYyRGAUBjBE3S8l9vpfLvA4wjjGchtVVAPEOHoWZHbPMbz6lMnzNGNJuDSX9LrOLDAxW6V/Ik687i2HlBzQKuflYF9QaugY18RQ8beHCopyb0iUo3j3czbrtGvX1msnlggEMDllS6no1XTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NyT3OP2d; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1742476782; x=1774012782;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=8ffT4wfwhjfYNOtiauuUrX5hnXGvZM/ci3OQm4Rlezo=;
-  b=NyT3OP2dNvDhaCnIAqGQ81VV52kLOBVCZdlVUum5rShxyZrr0vQPq5P5
-   oktV0eMEG+PYwcMU9WxVbdmHLwye2ofFwe6D2ffZUFWvN4NdvNmSUujz9
-   D5r0/XGrrfR5JIeN3n31zFQP9dQ0ifQc+HS4CfR7WlFD/WdXjVONR6AdW
-   eix/d5J8OV0McPZSVLlxhnm1o3X/DImSzgK3VI0OLESRDopJjh3AHE02+
-   hpf8ngRF0oz5dbiO6IR31kxQVgHHMznx7Hv3bCA/O4q/gb6lg02zfUS1n
-   RFTvhU9k+A2/mAtPvTWEn/2bYqtMExHuP9w/7qmkP2DDaSNWqz42zjYA2
-   Q==;
-X-CSE-ConnectionGUID: p338HgieQrmb3UfJXpYdsA==
-X-CSE-MsgGUID: mzupkeFiQnuEHBU04aHzpQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11379"; a="55083759"
-X-IronPort-AV: E=Sophos;i="6.14,261,1736841600"; 
-   d="scan'208";a="55083759"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2025 06:19:41 -0700
-X-CSE-ConnectionGUID: 8E1byLG+SC6w82Bfso3fBg==
-X-CSE-MsgGUID: 4X4tRuZ7TpKZcNN4Kwr3TA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,261,1736841600"; 
-   d="scan'208";a="160311402"
-Received: from gklab-003-001.igk.intel.com ([10.211.3.1])
-  by orviesa001.jf.intel.com with ESMTP; 20 Mar 2025 06:19:39 -0700
-From: Grzegorz Nitka <grzegorz.nitka@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	horms@kernel.org,
-	Karol Kolacinski <karol.kolacinski@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Grzegorz Nitka <grzegorz.nitka@intel.com>
-Subject: [PATCH iwl-next v3 3/3] ice: enable timesync operation on 2xNAC E825 devices
-Date: Thu, 20 Mar 2025 14:15:38 +0100
-Message-Id: <20250320131538.712326-4-grzegorz.nitka@intel.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20250320131538.712326-1-grzegorz.nitka@intel.com>
-References: <20250320131538.712326-1-grzegorz.nitka@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D7BF290F;
+	Thu, 20 Mar 2025 13:16:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742476611; cv=fail; b=gY9+BV9jxlDNjj3yzAtRVXWVIQ+6IM5xXaKenaJc7Xp0MFCUZShmWi9AHTRou41FFN4fBMCXcJ2IHX+5QvWGbS19sNh1wWD00sVtIYeQn3IICY92vVhbfOQWWa8l91w++4MHMF6WZnWSdT9WK9dQkjZErOFhtSNHL3EjFD0AsbM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742476611; c=relaxed/simple;
+	bh=zyp6rFL+ipvLCalFQrEk4BYdteyo9KhRv6oDJKPe1ZQ=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=UOOOT1iJWWIBnYoP80x5qdLVskMCnSx9VpONjsYo6gfW1eVNioDmD5W78du0uLKGzSR/WbbVg17v4lHQ8HHngwZ5tpQ8KZzR6dVJMTimK47RN7TtKSLUZIIAWLAlpGXNslCJbVWl+dNveE1f8d3KuEFAzuAQuR8WAHw2ZXO7AOY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=DYRtV/3t; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=raAiz28Y; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52KC3fue026771;
+	Thu, 20 Mar 2025 13:16:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2023-11-20; bh=FNbH7UJzeYaLEgrqpVLQFmQpH1n1zJtXKDVvP1npm70=; b=
+	DYRtV/3t0IRq6M99buNTFOwQLkwxzLx8wNItqr0d46JNL6SU0HPs3FpM3N06N+gV
+	/V9zNkmTumGsmWn+7dFn8q3lsj5QasEYwovAdO9Tw0Objyo/0KIu2fpcnZwu9dWL
+	0lHWYAfkT7dOQhSLMmHw2pL3bOgVR+BBPd7+ejDNfUWvRKHfy5vEqXtGaO8WBcYG
+	f7mRUEU/Wr4+xcScEDkfvbnNXVZ9OjjNL/jCWjucBh7Pp70w2FL6VOmzfQh+AC1h
+	ARmYwrheSEMn0m5anpFJfYVztEfQg2TcxMirZgaBinHkT5qtXKTCgfP2j5TJjUh+
+	14jzcAbnzk1i9iBxqNVKTg==
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 45d1n8nt8c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 20 Mar 2025 13:16:34 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 52KCDDi2018653;
+	Thu, 20 Mar 2025 13:16:21 GMT
+Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1nam02lp2047.outbound.protection.outlook.com [104.47.57.47])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 45dxdp2767-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 20 Mar 2025 13:16:20 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=q5w8wBUwDG6782cNqnhPs5RxpfdxuzReQjHdIl2FvojQb7+uDk0+tb/tsRqSYM3G1sipwBnxIUc2WCVpHn/7E+iaB53pCnxZzqwZmzL1ezyOucgrjDMiSq3m8/IgRJnO7mpuNuUANUyh7b/coMBsqvCyBoUURHzEUPo1qjyvuhz4LzT1VvLT+x2EEBPa+O4Y9Y3wkGIsPhudITLBBp2ouanoUaqEtDiWQMB9D7G/JWhSPqmkopJzazirQXsEyKMUyoY/q1knKVI3VbvYvOQHYEn38/Lm2Mlb2xX7V+jvSRnC0iIljoFwWOLcSTeO1Ri0ogCeYKK+yrgM8dlk9uRQ/A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FNbH7UJzeYaLEgrqpVLQFmQpH1n1zJtXKDVvP1npm70=;
+ b=trhASNIUOrVoJkEAQZI9Q56jPqtIGFmUtYYk4WPOel2hWBGLe3jNJYXIfNhIjX5GooQUwZuJTunKR/IZ7RV9QFqiVFbLYOGkWssPsc3FM97Tdj4ZCJwAhAn4UPm503QyK/IhznMVbxdzHEs5UQyB7BeG36sTXwYC/NHrrZXu1G6rymaHBpfT4d5stUriIqJ9UlaLVrr9U6Ay0boJ3K2uOJHKzO1KEoCGs6BmdrDZgkqmAaCiDFd5EEx5XTYmJrtONxW4ranim74Zd4sOZf67rmaPgwsVA5Mo0PT5ewjyM9lKP0mEEVdIM5gJMdKORFhn7g5VGcNy7qgw+qpDJm/uiw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FNbH7UJzeYaLEgrqpVLQFmQpH1n1zJtXKDVvP1npm70=;
+ b=raAiz28Y00Ngse8Y7+7UVhxhIyRXiDS14FN7Gucl+x/9De5VH3fLZYzjW1UFj4aGdPHfsQjT4cW6YmpTrh5b2ZKZwIUAOAstceOiW/EnO3h1bmOyGfxEOkI8VkOdtcaQFsToyKaeFe5IlhmsL7KvIfSwRUYOZ6GPzMVV0FePBTI=
+Received: from BN0PR10MB5128.namprd10.prod.outlook.com (2603:10b6:408:117::24)
+ by PH0PR10MB5626.namprd10.prod.outlook.com (2603:10b6:510:f9::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.34; Thu, 20 Mar
+ 2025 13:16:18 +0000
+Received: from BN0PR10MB5128.namprd10.prod.outlook.com
+ ([fe80::743a:3154:40da:cf90]) by BN0PR10MB5128.namprd10.prod.outlook.com
+ ([fe80::743a:3154:40da:cf90%4]) with mapi id 15.20.8534.036; Thu, 20 Mar 2025
+ 13:16:18 +0000
+Message-ID: <d78576c1-d743-4ec2-bf8c-d87603460ac1@oracle.com>
+Date: Thu, 20 Mar 2025 09:16:15 -0400
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/2] fix gss seqno handling to be more rfc-compliant
+To: njha@janestreet.com, Trond Myklebust <trondmy@kernel.org>,
+        Anna Schumaker <anna@kernel.org>, Jeff Layton <jlayton@kernel.org>,
+        Neil Brown <neilb@suse.de>, Olga Kornievskaia <okorniev@redhat.com>,
+        Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Cc: linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org
+References: <20250319-rfc2203-seqnum-cache-v2-0-2c98b859f2dd@janestreet.com>
+Content-Language: en-US
+From: Chuck Lever <chuck.lever@oracle.com>
+In-Reply-To: <20250319-rfc2203-seqnum-cache-v2-0-2c98b859f2dd@janestreet.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: CH0PR03CA0432.namprd03.prod.outlook.com
+ (2603:10b6:610:10e::20) To BN0PR10MB5128.namprd10.prod.outlook.com
+ (2603:10b6:408:117::24)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN0PR10MB5128:EE_|PH0PR10MB5626:EE_
+X-MS-Office365-Filtering-Correlation-Id: bd931d65-475d-49f2-844b-08dd67b1664e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|7053199007|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Zy9SaFUwcUlEK3k1eVVNZnZsMXYvbml2VjFsSEg3Y1BPSlQxNVlaQ2J2N3Rn?=
+ =?utf-8?B?WWI3bDNEMitZQm50SjhNbDJEbHNDOXZtQTBlRkMyR1hjQkV2VXEwOFpSc1lP?=
+ =?utf-8?B?TmF2T0hkcGxnZ1QvQ2NzemdqQjVVRXFvRWUyRWU5dmljcmlwTFBpWWxGNGJ4?=
+ =?utf-8?B?dDNEVEs0MVl0STVTbHpYL0tNRHYrd3NTTHEyZEl0T0QrdE5ML1pTNm1MS2lM?=
+ =?utf-8?B?YVN0UzRoRXlXUmlVZTVRa3ZqQ0xLTlM0eDZhNE5LK1JPbjVYMGtFZGN4MHpi?=
+ =?utf-8?B?Zng4SkNOSGpmK3NQL295ck4zQ0EyT3pQZUh1QU5ESVU3U2k0bEtjby9Lb3F5?=
+ =?utf-8?B?YndlUi9TSzVSN2RldStEU0I5aXZJKzJKTW1Cb0lQcjJVaU8xa0w0OHJPaXlZ?=
+ =?utf-8?B?akZNRUxKWW12QWc2WnVEL1ZZakpnUVNFTFRBMDNpVjZIUmZHbmNpLzNtYUtR?=
+ =?utf-8?B?bXVZdmNGS3ZmZHdLMzZQSnhIYUVNR2FheWhHajNRUUhkaFRrVFZodlJ6Y3hN?=
+ =?utf-8?B?bitZUjI3SWJ2dlBNZW1mWi9pb3l4bGZuS3JSclkyZHVkT3RocGZPS3FMdjZE?=
+ =?utf-8?B?MDRNWTFQdlYyYk9SMHpud0lMTUtMemFSNUlHUGNJQTFrTURTY2FPVENCRFpw?=
+ =?utf-8?B?bEVqMjNOSmRjelArMWVpVjhMQkxWQzhXaU5FcmpyVkNqc2xSSExpZ0ZSUFgr?=
+ =?utf-8?B?Z21QWjlqNDIzT082SkxYUmI0ME5SZVpLMzdXa1lrNzN6TVpOZTFZMUZGUjBF?=
+ =?utf-8?B?aWJXOHk1ZGFDeFFBUlFnNTM5RGk1cjltYzlBTnpYbTFYeDhNQThWWkpqT3NV?=
+ =?utf-8?B?cGphMWN6Nmc1R3RDVmRWN0pvVWR4VG16TjBjRjJGaTVlWHhDRnY5Qm1mdk1w?=
+ =?utf-8?B?Q1NGM29Id1VTYlcrU1A4RUdhVXpSVmFyNXRlakR2clhjS0lhL3RqbmFCdlNI?=
+ =?utf-8?B?WmNIYWI4MFJRMHNIVkg5bDBrZkkxUEc2czVFclNEa1NtaHJLdzJsSzAvbXlB?=
+ =?utf-8?B?YWlGNnc4aFZnaDhtUUdoVG9CaVdqbVIwaUZ1U0Vrd0o1U0Q4MWZQeU12dU12?=
+ =?utf-8?B?ZjdEZTRWbStaZk1VUm84V0pCcFJDZjBXQnQ1K0l0MVZUZmswL0FqOXVNSG14?=
+ =?utf-8?B?N29nNnZjNzFmVlRiRWlSWjBPSXpVdWFNRk5KMFVqUlpaME5SVk44M1ZkbjhW?=
+ =?utf-8?B?ZkFKckFackVCcmlDSkM4SThTa3RDRHRtamNydTdrK0RMT0FHNXo2L0hBRmU4?=
+ =?utf-8?B?eG1iQ0cxUEIwZW1jQzdUZnp6UFA5b0g1cmFHK0IxYXhmNlE2bHBHRnAwejQy?=
+ =?utf-8?B?MG5EeHdUWFBaa25abUJTYXBrUzBqVjFKcXJyT20wemprSENnSThCdVU5RVVK?=
+ =?utf-8?B?MkRheEovdWxqdld4aHZDL3ROOFVKL0RUWEx6eU9wUEI1Vmt5RjdwZmdLVmRZ?=
+ =?utf-8?B?VHovd0owbXhMbU9HNXNkVXZqRkp3S2RUSC9DZ25mdm0zd3lodXB3U0NDTk5j?=
+ =?utf-8?B?b2JZbHVWZUwwRUl0U01FQUVUdFFrQzdZRG92amFNblI2UitYVXpWTEZqTFJn?=
+ =?utf-8?B?MzNPQmdvMWJITVIwMlFvTVZXVVF2TmpySEhnWkFUalNtU29DNURobVBnSnRy?=
+ =?utf-8?B?S0tEWVNGamcraWJreWNqRDY0RUVTVHlVaTZKb1hUUjFNL2FYUU9zbzVBRkVu?=
+ =?utf-8?B?WEdtTmlYSGNMQ0JZSEtjK2ZjZjcrWlE1NlpSWXVscWhGMklsM0lRQ3pBdUNh?=
+ =?utf-8?B?SGhBZlpPSndTUVhCcklrSUFaRTVBektWSGRZQys2aitBZ085dXpnYW5XbEZw?=
+ =?utf-8?B?blNvVFBERE5tOWZ5MjBEdjI3YWRzSThGN0V0c3pPYTZIMVp4aTY0MVNhVkJo?=
+ =?utf-8?B?TVQraUNUOGtxcjF3dllaS3ZjaGRtbTExRFgyOUJvZm5DNzhOcWVEcHZkS0xL?=
+ =?utf-8?Q?DYWyTvVmlwQ=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5128.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(7053199007)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TTRxSHJxNlphVEpTb1Z0Tm5OOTdCOEFsRW5OTWlXbEgyQW44VkNJRm52MkJ4?=
+ =?utf-8?B?V3U1OWZTSzJpTGV4cmM4UVRKa0piWXpsblpjQURCaCtuUUhibGZIRlBBcmxZ?=
+ =?utf-8?B?dUU3eVFKQmo3K1BzczZ0ejFENDRJOFVVRHFCakJPT3EwV0tZa1l3OU9QSUNP?=
+ =?utf-8?B?QS91SDNJUDRGTmRCZTZTdnJUcFpRODZPR0JjUmNyUUxmUUhveUk1ZHhKdGp6?=
+ =?utf-8?B?cjBaTnJEWHpST1hPQ3l1RVc1NXhYMnJ3L0hXeEo5cWFvR0hXQ3l2MURFaUNG?=
+ =?utf-8?B?K2swcndNRklvRW5KSHBTU0pDREN6KzZiRWQrUXgydGd4R1pUMUw4eTV5QmFh?=
+ =?utf-8?B?d045RlpmUlNmTFhxRG5JSjlpTkZGaDJvdllOYXBLNVpwdDNBeE01d3ZQZjlT?=
+ =?utf-8?B?blhvZ1I2SlBZOVhYQnlzTEEvbXZrUjUwbXVmWFJodEk1cXRybTI4dG8rcTVO?=
+ =?utf-8?B?c2ZqM1AxamdTRGUxTHBQeldqZmtTRHVnM2VMOG1OdldSdkhxa1hwZnBKOFc1?=
+ =?utf-8?B?dURscmN5VTR5RDhkanpUOHJZQVdhZTNZRkZmN2dQYzRWcTEvYlFWM2V6RTRC?=
+ =?utf-8?B?UHBqRlVDeWtiSFpnR2F4dllrUzAwdmpvZStSbzlwY05RV2cwTitTQkZpOU83?=
+ =?utf-8?B?c0l0bnRYeDVTVWoycXplZWNXdEp6OHFjVll3L2dZTnBxNmFYZ0NjMnNPMEg2?=
+ =?utf-8?B?SG8xVGJqclc5K0YrUC9Id1dTRHg5Q3lIcFprKzhmMitDU3BFYTFodDZpblo3?=
+ =?utf-8?B?TDJIbXIzVm5TTnRuN1RFaDl4NXBVejhzL095OERyazNBcE1GM1o4WUZoMEdC?=
+ =?utf-8?B?TEN5Y3UwWFNBckFGcUlhWkN6YUgwZGc1OHVDNzJOdE9TRlN0NzJHeEdsZGw3?=
+ =?utf-8?B?cTVSYmMyRDIwS3V1UVc0RG1Jemw4NHgwNUJSQktBbW1zZVY0S2kxQytyQS9J?=
+ =?utf-8?B?YjFmRDlBczdrMVdMVE1EN1lka0pobER3cU0wUDdIQStjeTFkeUhZcnJUeUcy?=
+ =?utf-8?B?eUp6d3JIblFYQnhuWkx5cDRUMURYTkNvUGNWNXY5RVhYMXlaQmFUTk5JWHlM?=
+ =?utf-8?B?OHZEb3dyOXlkbW56NnhUNklHUHhZOVY1MWd2OU9DeTh6L3h1L1JrMzYwd3Vu?=
+ =?utf-8?B?VnJHS2F2NkRhZmtKYnpVSVI2eHJoZTk1KzdtRTkySmRZSXBqT3JuU09id0g4?=
+ =?utf-8?B?NDNLOUkxWEZ1K3VkRU9HQjk2QkY3ZHF4S0ZzUkM4UHozODlSYVRramNHTXUz?=
+ =?utf-8?B?YnhGQzk1dzNHWStWY2NaNVpxVDgzbmRKK3I0ZnRUa3dKNW5HSUFCdFh5SlNx?=
+ =?utf-8?B?eWJyb2JLelh0aXhHMDFXYUhXcW9LNWZIOFVGRHplMDFhYml2aHIraXd4Y09s?=
+ =?utf-8?B?T1RjalZFN3I2MmVRN0FNQ0U1eHA1ZEVzOTNGVWFBNXlVU3ppM29LcXZHeDZZ?=
+ =?utf-8?B?ZTl4RW9pNE8zRlQ3amJxb05rK1JZVUxZaW1STTdsWWpSSkN2a1hDaUIvQ2pE?=
+ =?utf-8?B?QUlGMXVJRHB6MVB4bVJ3ZHlUM0RPSEViQ203WFJSS2xnUTQ0R21oQnlrVGxF?=
+ =?utf-8?B?WjdEemkwckx2Q2I2aTlKT2V5dGxiM1dDcGpRZ04yTEU5c0dPS2xWRWQ0M3BU?=
+ =?utf-8?B?YTRCeCtXT0tQTGgvSnFLOUw2azY1YlR0SndiRWxZVXpOUEdOMnNLbVhsY2xC?=
+ =?utf-8?B?UXMrTjhlOExEbWlkaW5Eb0lJcDJ6Ni84N1ludzRqcG5Mc1dVbmVXTW02RGx3?=
+ =?utf-8?B?S3ZaMU44Vk1aNFJnTWlsd2liS3FIcWdZRnZtNG03OHFCdHJYckMrdlZwbGZE?=
+ =?utf-8?B?ZThjMWFpQ2RwY1NzZkEvazBoQWlKWm5WNTYvdFNxTVl3bHUzdXppRUk2aUw3?=
+ =?utf-8?B?cmtDSjlKbHhVNThjWG0vd3o4cTRhMm5BL2R3eDc5bzJkU2wrZ0xmaldKSElv?=
+ =?utf-8?B?QmE4T2ZycUdxaEEzMHJDcUhpdG1ueng2dUgzYU5GM0FvODhTQ29BNFBubkFH?=
+ =?utf-8?B?dVZvWi8yeXFhTllLQ3BJZWdydDkrMCtTdU02bkM3dDlSR1F1NFNOMStaYjQ5?=
+ =?utf-8?B?M2YyaTJHQklTVDJrV1FhZGtGT3J2UW9keTBMNzJ0UmRkYTdobWVkTTZOejRR?=
+ =?utf-8?Q?Jb8S2wf9L6O6tEj2uXQC6ZA4V?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	7KZFdcFXIbyRx3ryNathARvJiCTL6UCnib9URkzpy+Fjq92Kjo/QdPd6mNBkkjs3FT8cMWAp+IqoGUagkNvKlLDGfNYpDFkQhp8xU0vqnsSYIvCCz5VhXjC78cEk2j/fFU8udJRGgRE17Tsd4+k6RiGm5LQF6RzwLoLyka2jpWtL8/xqBtkRxLxQQXEWTlw1ipYzqkk1Y1DZ3dHxtsxxxbyJeNRt5x5WTuSquf5YAFQZbLogOcAVmieXEtOgmvJKJIwe/M1Owfve/M6KzCDAVknVkPletlgNfMOSClSJb60qvxqTa2Z41WeRuflR5gEvPoyKk+ZNRWAg0XoXFWpURFVbJ9m7B32rS+M+SiJn+qQDzn8Hsrloy9+PrD/BkoY3bv+XCogtDKyEk/ZuLaE03Ksz5+P4s7hF+/s0GJdqgxk7BYdlEWR1fCMe+6qk/AbC3n+rjGOgfTVrPnvbAhlq1L/vaHdNTRNesyGZ8rFlelt5F7YucJ3oJZL6HuHz1MCPNBg+ybc6AY9scNZrk7pySHAdVXdM5KQB4KY0VfK6W4IlZrY2GFpYmTnrG5plGGqHh4psMf6R1kMe7nzJ5iCkJk8ytHRFYdhuEFgm2XAB/gY=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bd931d65-475d-49f2-844b-08dd67b1664e
+X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5128.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2025 13:16:18.1942
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: s/gNd7szR0OY6v2oNxmW+ZC7X3S7gDNEdqIzWORVCebpqKGNQg+kzifxqNdfjby0RtDBR9QnCA7f7ndELI+Lgg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR10MB5626
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-20_03,2025-03-19_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 suspectscore=0
+ mlxlogscore=999 mlxscore=0 malwarescore=0 spamscore=0 adultscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2502280000 definitions=main-2503200081
+X-Proofpoint-ORIG-GUID: fVygn9nsWACeMQAyNLjY1O0-l8ZtSMdU
+X-Proofpoint-GUID: fVygn9nsWACeMQAyNLjY1O0-l8ZtSMdU
 
-From: Karol Kolacinski <karol.kolacinski@intel.com>
+On 3/19/25 1:02 PM, Nikhil Jha via B4 Relay wrote:
+> When the client retransmits an operation (for example, because the
+> server is slow to respond), a new GSS sequence number is associated with
+> the XID. In the current kernel code the original sequence number is
+> discarded. Subsequently, if a response to the original request is
+> received there will be a GSS sequence number mismatch. A mismatch will
+> trigger another retransmit, possibly repeating the cycle, and after some
+> number of failed retries EACCES is returned.
+> 
+> RFC2203, section 5.3.3.1 suggests a possible solution... “cache the
+> RPCSEC_GSS sequence number of each request it sends” and "compute the
+> checksum of each sequence number in the cache to try to match the
+> checksum in the reply's verifier." This is what FreeBSD’s implementation
+> does (rpc_gss_validate in sys/rpc/rpcsec_gss/rpcsec_gss.c).
+> 
+> However, even with this cache, retransmits directly caused by a seqno
+> mismatch can still cause a bad message interleaving that results in this
+> bug. The RFC already suggests ignoring incorrect seqnos on the server
+> side, and this seems symmetric, so this patchset also applies that
+> behavior to the client.
+> 
+> These two patches are *not* dependent on each other. I tested them by
+> delaying packets with a Python script hooked up to NFQUEUE. If it would
+> be helpful I can send this script along as well.
+> 
+> Signed-off-by: Nikhil Jha <njha@janestreet.com>
+> ---
+> Changes since v1:
+>  * Maintain the invariant that the first seqno is always first in
+>    rq_seqnos, so that it doesn't need to be stored twice.
+>  * Minor formatting, and resending with proper mailing-list headers so the
+>    patches are easier to work with.
+> 
+> ---
+> Nikhil Jha (2):
+>       sunrpc: implement rfc2203 rpcsec_gss seqnum cache
+>       sunrpc: don't immediately retransmit on seqno miss
+> 
+>  include/linux/sunrpc/xprt.h    | 17 +++++++++++-
+>  include/trace/events/rpcgss.h  |  4 +--
+>  include/trace/events/sunrpc.h  |  2 +-
+>  net/sunrpc/auth_gss/auth_gss.c | 59 ++++++++++++++++++++++++++----------------
+>  net/sunrpc/clnt.c              |  9 +++++--
+>  net/sunrpc/xprt.c              |  3 ++-
+>  6 files changed, 64 insertions(+), 30 deletions(-)
+> ---
+> base-commit: 7eb172143d5508b4da468ed59ee857c6e5e01da6
+> change-id: 20250314-rfc2203-seqnum-cache-52389d14f567
+> 
+> Best regards,
 
-According to the E825C specification, SBQ address for ports on a single
-complex is device 2 for PHY 0 and device 13 for PHY1.
-For accessing ports on a dual complex E825C (so called 2xNAC mode),
-the driver should use destination device 2 (referred as phy_0) for
-the current complex PHY and device 13 (referred as phy_0_peer) for
-peer complex PHY.
+This seems like a sensible thing to do to me.
 
-Differentiate SBQ destination device by checking if current PF port
-number is on the same PHY as target port number.
+Acked-by: Chuck Lever <chuck.lever@oracle.com>
 
-Adjust 'ice_get_lane_number' function to provide unique port number for
-ports from PHY1 in 'dual' mode config (by adding fixed offset for PHY1
-ports). Cache this value in ice_hw struct.
-
-Introduce ice_get_primary_hw wrapper to get access to timesync register
-not available from second NAC.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-Co-developed-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
----
- drivers/net/ethernet/intel/ice/ice.h        | 60 ++++++++++++++++++++-
- drivers/net/ethernet/intel/ice/ice_common.c |  6 ++-
- drivers/net/ethernet/intel/ice/ice_ptp.c    | 49 ++++++++++++-----
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 39 +++++++++++---
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h |  5 --
- drivers/net/ethernet/intel/ice/ice_type.h   |  1 +
- 6 files changed, 134 insertions(+), 26 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-index 43a34e3fa762..fc127c0f9d66 100644
---- a/drivers/net/ethernet/intel/ice/ice.h
-+++ b/drivers/net/ethernet/intel/ice/ice.h
-@@ -197,8 +197,6 @@
- 
- #define ice_pf_to_dev(pf) (&((pf)->pdev->dev))
- 
--#define ice_pf_src_tmr_owned(pf) ((pf)->hw.func_caps.ts_func_info.src_tmr_owned)
--
- enum ice_feature {
- 	ICE_F_DSCP,
- 	ICE_F_PHY_RCLK,
-@@ -1053,4 +1051,62 @@ static inline void ice_clear_rdma_cap(struct ice_pf *pf)
- }
- 
- extern const struct xdp_metadata_ops ice_xdp_md_ops;
-+
-+/**
-+ * ice_is_dual - Check if given config is multi-NAC
-+ * @hw: pointer to HW structure
-+ *
-+ * Return: true if the device is running in mutli-NAC (Network
-+ * Acceleration Complex) configuration variant, false otherwise
-+ * (always false for non-E825 devices).
-+ */
-+static inline bool ice_is_dual(struct ice_hw *hw)
-+{
-+	return hw->mac_type == ICE_MAC_GENERIC_3K_E825 &&
-+	       (hw->dev_caps.nac_topo.mode & ICE_NAC_TOPO_DUAL_M);
-+}
-+
-+/**
-+ * ice_is_primary - Check if given device belongs to the primary complex
-+ * @hw: pointer to HW structure
-+ *
-+ * Check if given PF/HW is running on primary complex in multi-NAC
-+ * configuration.
-+ *
-+ * Return: true if the device is dual, false otherwise (always true
-+ * for non-E825 devices).
-+ */
-+static inline bool ice_is_primary(struct ice_hw *hw)
-+{
-+	return hw->mac_type != ICE_MAC_GENERIC_3K_E825 ||
-+	       !ice_is_dual(hw) ||
-+	       (hw->dev_caps.nac_topo.mode & ICE_NAC_TOPO_PRIMARY_M);
-+}
-+
-+/**
-+ * ice_pf_src_tmr_owned - Check if a primary timer is owned by PF
-+ * @pf: pointer to PF structure
-+ *
-+ * Return: true if PF owns primary timer, false otherwise.
-+ */
-+static inline bool ice_pf_src_tmr_owned(struct ice_pf *pf)
-+{
-+	return pf->hw.func_caps.ts_func_info.src_tmr_owned &&
-+	       ice_is_primary(&pf->hw);
-+}
-+
-+/**
-+ * ice_get_primary_hw - Get pointer to primary ice_hw structure
-+ * @pf: pointer to PF structure
-+ *
-+ * Return: A pointer to ice_hw structure with access to timesync
-+ * register space.
-+ */
-+static inline struct ice_hw *ice_get_primary_hw(struct ice_pf *pf)
-+{
-+	if (!pf->adapter->ctrl_pf)
-+		return &pf->hw;
-+	else
-+		return &pf->adapter->ctrl_pf->hw;
-+}
- #endif /* _ICE_H_ */
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 63e4a0824548..f7fd0a2451de 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -1135,6 +1135,8 @@ int ice_init_hw(struct ice_hw *hw)
- 		}
- 	}
- 
-+	hw->lane_num = ice_get_phy_lane_number(hw);
-+
- 	return 0;
- err_unroll_fltr_mgmt_struct:
- 	ice_cleanup_fltr_mgmt_struct(hw);
-@@ -4130,10 +4132,12 @@ int ice_get_phy_lane_number(struct ice_hw *hw)
- 			continue;
- 
- 		if (hw->pf_id == lport) {
-+			if (hw->mac_type == ICE_MAC_GENERIC_3K_E825 &&
-+			    ice_is_dual(hw) && !ice_is_primary(hw))
-+				lane += ICE_PORTS_PER_QUAD;
- 			kfree(options);
- 			return lane;
- 		}
--
- 		lport++;
- 	}
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index cdd76ecb2196..85b614135694 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -208,6 +208,9 @@ u64 ice_ptp_read_src_clk_reg(struct ice_pf *pf,
- 	u32 hi, lo, lo2;
- 	u8 tmr_idx;
- 
-+	if (!ice_is_primary(hw))
-+		hw = ice_get_primary_hw(pf);
-+
- 	tmr_idx = ice_get_ptp_src_clock_index(hw);
- 	guard(spinlock)(&pf->adapter->ptp_gltsyn_time_lock);
- 	/* Read the system timestamp pre PHC read */
-@@ -2809,6 +2812,32 @@ static void ice_ptp_periodic_work(struct kthread_work *work)
- 				   msecs_to_jiffies(err ? 10 : 500));
- }
- 
-+/**
-+ * ice_ptp_prepare_rebuild_sec - Prepare second NAC for PTP reset or rebuild
-+ * @pf: Board private structure
-+ * @rebuild: rebuild if true, prepare if false
-+ * @reset_type: the reset type being performed
-+ */
-+static void ice_ptp_prepare_rebuild_sec(struct ice_pf *pf, bool rebuild,
-+					enum ice_reset_req reset_type)
-+{
-+	struct list_head *entry;
-+
-+	list_for_each(entry, &pf->adapter->ports.ports) {
-+		struct ice_ptp_port *port = list_entry(entry,
-+						       struct ice_ptp_port,
-+						       list_node);
-+		struct ice_pf *peer_pf = ptp_port_to_pf(port);
-+
-+		if (!ice_is_primary(&peer_pf->hw)) {
-+			if (rebuild)
-+				ice_ptp_rebuild(peer_pf, reset_type);
-+			else
-+				ice_ptp_prepare_for_reset(peer_pf, reset_type);
-+		}
-+	}
-+}
-+
- /**
-  * ice_ptp_prepare_for_reset - Prepare PTP for reset
-  * @pf: Board private structure
-@@ -2817,6 +2846,7 @@ static void ice_ptp_periodic_work(struct kthread_work *work)
- void ice_ptp_prepare_for_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
- {
- 	struct ice_ptp *ptp = &pf->ptp;
-+	struct ice_hw *hw = &pf->hw;
- 	u8 src_tmr;
- 
- 	if (ptp->state != ICE_PTP_READY)
-@@ -2832,6 +2862,9 @@ void ice_ptp_prepare_for_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
- 	if (reset_type == ICE_RESET_PFR)
- 		return;
- 
-+	if (ice_pf_src_tmr_owned(pf) && hw->mac_type == ICE_MAC_GENERIC_3K_E825)
-+		ice_ptp_prepare_rebuild_sec(pf, false, reset_type);
-+
- 	ice_ptp_release_tx_tracker(pf, &pf->ptp.port.tx);
- 
- 	/* Disable periodic outputs */
-@@ -2953,13 +2986,6 @@ void ice_ptp_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
- 	dev_err(ice_pf_to_dev(pf), "PTP reset failed %d\n", err);
- }
- 
--static bool ice_is_primary(struct ice_hw *hw)
--{
--	return hw->mac_type == ICE_MAC_GENERIC_3K_E825 && ice_is_dual(hw) ?
--		       !!(hw->dev_caps.nac_topo.mode & ICE_NAC_TOPO_PRIMARY_M) :
--		       true;
--}
--
- static int ice_ptp_setup_adapter(struct ice_pf *pf)
- {
- 	if (!ice_pf_src_tmr_owned(pf) || !ice_is_primary(&pf->hw))
-@@ -3179,17 +3205,16 @@ void ice_ptp_init(struct ice_pf *pf)
- {
- 	struct ice_ptp *ptp = &pf->ptp;
- 	struct ice_hw *hw = &pf->hw;
--	int lane_num, err;
-+	int err;
- 
- 	ptp->state = ICE_PTP_INITIALIZING;
- 
--	lane_num = ice_get_phy_lane_number(hw);
--	if (lane_num < 0) {
--		err = lane_num;
-+	if (hw->lane_num < 0) {
-+		err = hw->lane_num;
- 		goto err_exit;
- 	}
-+	ptp->port.port_num = hw->lane_num;
- 
--	ptp->port.port_num = (u8)lane_num;
- 	ice_ptp_init_hw(hw);
- 
- 	ice_ptp_init_tx_interrupt_mode(pf);
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index eb1893dd8979..ccac84eb34c9 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -874,8 +874,12 @@ static u32 ice_ptp_tmr_cmd_to_port_reg(struct ice_hw *hw,
-  */
- void ice_ptp_src_cmd(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
- {
-+	struct ice_pf *pf = container_of(hw, struct ice_pf, hw);
- 	u32 cmd_val = ice_ptp_tmr_cmd_to_src_reg(hw, cmd);
- 
-+	if (!ice_is_primary(hw))
-+		hw = ice_get_primary_hw(pf);
-+
- 	wr32(hw, GLTSYN_CMD, cmd_val);
- }
- 
-@@ -891,6 +895,9 @@ static void ice_ptp_exec_tmr_cmd(struct ice_hw *hw)
- {
- 	struct ice_pf *pf = container_of(hw, struct ice_pf, hw);
- 
-+	if (!ice_is_primary(hw))
-+		hw = ice_get_primary_hw(pf);
-+
- 	guard(spinlock)(&pf->adapter->ptp_gltsyn_time_lock);
- 	wr32(hw, GLTSYN_CMD_SYNC, SYNC_EXEC_CMD);
- 	ice_flush(hw);
-@@ -922,10 +929,18 @@ static void ice_ptp_cfg_sync_delay(const struct ice_hw *hw, u32 delay)
- static enum ice_sbq_dev_id ice_ptp_get_dest_dev_e825(struct ice_hw *hw,
- 						     u8 port)
- {
--	/* On a single complex E825, PHY 0 is always destination device phy_0
-+	u8 curr_phy, tgt_phy;
-+
-+	tgt_phy = port >= hw->ptp.ports_per_phy;
-+	curr_phy = hw->lane_num >= hw->ptp.ports_per_phy;
-+	/* In the driver, lanes 4..7 are in fact 0..3 on a second PHY.
-+	 * On a single complex E825C, PHY 0 is always destination device phy_0
- 	 * and PHY 1 is phy_0_peer.
-+	 * On dual complex E825C, device phy_0 points to PHY on a current
-+	 * complex and phy_0_peer to PHY on a different complex.
- 	 */
--	if (port >= hw->ptp.ports_per_phy)
-+	if ((!ice_is_dual(hw) && tgt_phy == 1) ||
-+	    (ice_is_dual(hw) && tgt_phy != curr_phy))
- 		return ice_sbq_dev_phy_0_peer;
- 	else
- 		return ice_sbq_dev_phy_0;
-@@ -2417,6 +2432,7 @@ int ice_phy_cfg_intr_eth56g(struct ice_hw *hw, u8 port, bool ena, u8 threshold)
- static int ice_read_phy_and_phc_time_eth56g(struct ice_hw *hw, u8 port,
- 					    u64 *phy_time, u64 *phc_time)
- {
-+	struct ice_pf *pf = container_of(hw, struct ice_pf, hw);
- 	u64 tx_time, rx_time;
- 	u32 zo, lo;
- 	u8 tmr_idx;
-@@ -2436,8 +2452,13 @@ static int ice_read_phy_and_phc_time_eth56g(struct ice_hw *hw, u8 port,
- 	ice_ptp_exec_tmr_cmd(hw);
- 
- 	/* Read the captured PHC time from the shadow time registers */
--	zo = rd32(hw, GLTSYN_SHTIME_0(tmr_idx));
--	lo = rd32(hw, GLTSYN_SHTIME_L(tmr_idx));
-+	if (ice_is_primary(hw)) {
-+		zo = rd32(hw, GLTSYN_SHTIME_0(tmr_idx));
-+		lo = rd32(hw, GLTSYN_SHTIME_L(tmr_idx));
-+	} else {
-+		zo = rd32(ice_get_primary_hw(pf), GLTSYN_SHTIME_0(tmr_idx));
-+		lo = rd32(ice_get_primary_hw(pf), GLTSYN_SHTIME_L(tmr_idx));
-+	}
- 	*phc_time = (u64)lo << 32 | zo;
- 
- 	/* Read the captured PHY time from the PHY shadow registers */
-@@ -2574,6 +2595,7 @@ int ice_stop_phy_timer_eth56g(struct ice_hw *hw, u8 port, bool soft_reset)
-  */
- int ice_start_phy_timer_eth56g(struct ice_hw *hw, u8 port)
- {
-+	struct ice_pf *pf = container_of(hw, struct ice_pf, hw);
- 	u32 lo, hi;
- 	u64 incval;
- 	u8 tmr_idx;
-@@ -2599,8 +2621,13 @@ int ice_start_phy_timer_eth56g(struct ice_hw *hw, u8 port)
- 	if (err)
- 		return err;
- 
--	lo = rd32(hw, GLTSYN_INCVAL_L(tmr_idx));
--	hi = rd32(hw, GLTSYN_INCVAL_H(tmr_idx));
-+	if (ice_is_primary(hw)) {
-+		lo = rd32(hw, GLTSYN_INCVAL_L(tmr_idx));
-+		hi = rd32(hw, GLTSYN_INCVAL_H(tmr_idx));
-+	} else {
-+		lo = rd32(ice_get_primary_hw(pf), GLTSYN_INCVAL_L(tmr_idx));
-+		hi = rd32(ice_get_primary_hw(pf), GLTSYN_INCVAL_H(tmr_idx));
-+	}
- 	incval = (u64)hi << 32 | lo;
- 
- 	err = ice_write_40b_ptp_reg_eth56g(hw, port, PHY_REG_TIMETUS_L, incval);
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index e5925ccc2613..83f20fa7ace7 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -444,11 +444,6 @@ static inline u64 ice_get_base_incval(struct ice_hw *hw)
- 	}
- }
- 
--static inline bool ice_is_dual(struct ice_hw *hw)
--{
--	return !!(hw->dev_caps.nac_topo.mode & ICE_NAC_TOPO_DUAL_M);
--}
--
- #define PFTSYN_SEM_BYTES	4
- 
- #define ICE_PTP_CLOCK_INDEX_0	0x00
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index 0aab21113cc4..ccf53cc6403e 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -970,6 +970,7 @@ struct ice_hw {
- 	u8 intrl_gran;
- 
- 	struct ice_ptp_hw ptp;
-+	s8 lane_num;
- 
- 	/* Active package version (currently active) */
- 	struct ice_pkg_ver active_pkg_ver;
 -- 
-2.39.3
-
+Chuck Lever
 
