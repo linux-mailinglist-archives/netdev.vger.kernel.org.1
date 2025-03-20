@@ -1,396 +1,218 @@
-Return-Path: <netdev+bounces-176566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22ECBA6AD09
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 19:23:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B15EBA6AD0D
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 19:24:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD8703AB882
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 18:22:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DDBC1899457
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 18:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 748C01E5203;
-	Thu, 20 Mar 2025 18:22:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F108F226D14;
+	Thu, 20 Mar 2025 18:24:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QOnfxSmH"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="WwBCTEms"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43B671F5F6
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 18:22:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 411E2225A59
+	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 18:24:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742494979; cv=none; b=Aq4KJDJmAXwzQaZ0qND0MnfG+rY/aw6t2Bj+CCGVpm49YeTnN5Eu8b3+OjWQOBc6LsYeNyyiyZAhOzjOo3n0LqgDy0ee8XgZJ/Ooe4SYXoivUyprotOquq9BhSmD2Fz/aZnORBeRs1EviLwA8E7PiRx9YhoT48OrFuo45yRnEQ4=
+	t=1742495043; cv=none; b=F14cAZUiUcF78hfGYLsNvUdH2s8Kft7BuxHev5jAeyqSYEiC7ykU95cLTG1Dshs6Upk9uK2EGYiYmhiPbJPVTLvYt5769Wf+V8pwtCVeA/HgpEXQ4b0Jp1wUXo/7vA9qBbdO/xBOKtDhFn9cHodF5sgDiPxdNDgvuuLmHh/afK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742494979; c=relaxed/simple;
-	bh=MUcFt1LRDWxhavjcBJyrH8WHn5ra76RYuzwt7ln+ZL0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Nvx1OwneYJinZQTd6dtBEw/jDJ5nKA0Fnr/yevaHZREZHi/F6asR9Odox0KsCcei4SGzcn/4NUw6yiHEo2zW6iu0vDR4fiYLQi3l7ExtDDZ0585wp86rjsxTsghvXAqnQpsBekHueX7rwXrM2hfUy3crhF+tcX6cjeYlbaXwlLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QOnfxSmH; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742494976;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=ZXCpuhgBj+VOj1YmUnEnfQPdndEVWSMDllWR2t2HZW0=;
-	b=QOnfxSmHhsOTkzzxEI1ZtooN6MJs2tFtbvilFHqJvRSFrxiPiipKo5VQQGhZ5FOteYfwKt
-	BowHmKzqKoSkx6YKEzPcCmG96fnmzL9SJu8zC5z1MRLSSUoVAA0ZO4GiNJTjRs/gbWXxEp
-	cs948//elVWt6haakuvTSrWiUZL9Mcc=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-184-CPdBOaK9OR6C6tHAuf1jxQ-1; Thu,
- 20 Mar 2025 14:22:52 -0400
-X-MC-Unique: CPdBOaK9OR6C6tHAuf1jxQ-1
-X-Mimecast-MFC-AGG-ID: CPdBOaK9OR6C6tHAuf1jxQ_1742494971
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D5BCD18EBE8A;
-	Thu, 20 Mar 2025 18:22:50 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.31])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 318DC180886C;
-	Thu, 20 Mar 2025 18:22:46 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	dsahern@kernel.org,
-	kuniyu@amazon.com
-Subject: [PATCH net-next v4] net: introduce per netns packet chains
-Date: Thu, 20 Mar 2025 19:22:38 +0100
-Message-ID: <ae405f98875ee87f8150c460ad162de7e466f8a7.1742494826.git.pabeni@redhat.com>
+	s=arc-20240116; t=1742495043; c=relaxed/simple;
+	bh=p5C7au6pn1wBtzZYZ4qP8jufg2hjU9r8Y3dB0+e4uZo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sEtq5kIGAgUxg/GEt0Kr7/v/pWAFCUabCppZBhXywuFp6ontzxOKZ1JK3AqWLlx15OL1WKQiLK/IJZCw23l8PgcVg5dd8fY5Fa7DqxKL/Wg7TV+V7Wq7t71JFq3dIu53dkOEJ+0vw95X9Suxq+4SaUSgJWn9pB7/E8j1OsHKeac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=WwBCTEms; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2ff784dc055so2133854a91.1
+        for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 11:24:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1742495041; x=1743099841; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=u4hqLDLaMuKQjfJXNLqiy/5jqelv39CVb9y2B7DStAE=;
+        b=WwBCTEmsZsE0u14w5+lel9PAQUo60ea3JFr9XutPnHRtSOArkey5lZs8L4WVD6XJsN
+         H6cqTFbJQcbGEOWQZsJOsnuUviSYfA1qIVQNWfltM+2DamzufJB+olTsVkz/pBdrznhA
+         ork0WIN/gbD1s4W2PsgM6+6+c4H/gbspynRv0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742495041; x=1743099841;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=u4hqLDLaMuKQjfJXNLqiy/5jqelv39CVb9y2B7DStAE=;
+        b=UpB+ZcV1Hf7WwBF8e9qH0O06BUbjbglW83Lw3OR3KS3maWJMLDCEjC6/2FLE76ztr2
+         dlmbQJeaoaJPvCpK7fyaKbUmE8/U3tYOU2FD9pOvfal/DtZ1ZOOrRPR6u2Cj9HrWo8ou
+         /jltFVBpI35zEBnm9jBcN+HhyCGKjzfSzmEzSvIAqLmxh5Z0ldF/UCOglcV1xSbSA+JC
+         uU91n1qcUDN2ma0qG+KrWissnrz4kXODwAxcmU53uWBEeDx2heoKxIEzbkBCI40t0yLJ
+         C7SJI/GHtZLvRXqTrm4IFOUaX4L6nxX5naTxDimMSmknAMEiLwsUQesEySTR//4s1Le9
+         lkZg==
+X-Forwarded-Encrypted: i=1; AJvYcCWvj/sKHfbTZVgvwKogrwDjecQ+UgL8UAbcWhKcSt368wosjBM0hpeZzPfjpwFTDjB2nb1Qk48=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxE98+yHLmNvkyoUK7EXJNHSzdgCxte/KALG6W2CTNf8XJu9Zgj
+	siOlmmsUu1XakSlzUZ/aBnBE5crxw2Ytal4UlSYYIC74RrU0ENXDnaFPlI9s6s4=
+X-Gm-Gg: ASbGncsjfjcZY3zwZaSW7GA09Ej8Sr16gvKrNxNiaxW4ZDlgHh+n7TL+jHdbU3rgHd3
+	1/AaK4UjmpzigjESbkyR9FjQHoN7f1P1a8YgsqVmHgnUe1mHO37vmxhIoZgrCGE0m7WgZgTohZL
+	GUPzfuLF5SYQZHjr8NQtByrBycf/s40TJzjXgggjs6PIGlWCT2Q5bMOzNK3N9Zz9vHcujRrnJ/l
+	qU0MzSOg7cYje4ei55DFaQyFEGklha48Pz3ph6RVLt1eTb+l5VXrbZ93gfIZ/l9xyzeHpeClCSe
+	YhAJ46rdA8bn/9pt9chcyr8PIRpflv0H+HCINn1+zrxAGhAdGfF+jcB0kG0605jQWw+GwO9LLnT
+	Sb2ZXNzxWeB0pHWCt
+X-Google-Smtp-Source: AGHT+IFjGyoj26a+mfA5sPrt2XYRA48FDA00r7QAzbLWG2KYNvo58GwB3aOzyQT77qllSS0qHLvptA==
+X-Received: by 2002:a17:90b:2fc7:b0:2f9:bcd8:da33 with SMTP id 98e67ed59e1d1-3030feaa56fmr348796a91.21.1742495041407;
+        Thu, 20 Mar 2025 11:24:01 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3030f5d4e46sm180311a91.14.2025.03.20.11.23.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Mar 2025 11:24:00 -0700 (PDT)
+Date: Thu, 20 Mar 2025 11:23:57 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, asml.silence@gmail.com,
+	linux-fsdevel@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, horms@kernel.org, linux-api@vger.kernel.org,
+	linux-arch@vger.kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
+	kuba@kernel.org, shuah@kernel.org, sdf@fomichev.me,
+	mingo@redhat.com, arnd@arndb.de, brauner@kernel.org,
+	akpm@linux-foundation.org, tglx@linutronix.de, jolsa@kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [RFC -next 00/10] Add ZC notifications to splice and sendfile
+Message-ID: <Z9xdPVQeLBrB-Anu@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	asml.silence@gmail.com, linux-fsdevel@vger.kernel.org,
+	edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+	linux-api@vger.kernel.org, linux-arch@vger.kernel.org,
+	viro@zeniv.linux.org.uk, jack@suse.cz, kuba@kernel.org,
+	shuah@kernel.org, sdf@fomichev.me, mingo@redhat.com, arnd@arndb.de,
+	brauner@kernel.org, akpm@linux-foundation.org, tglx@linutronix.de,
+	jolsa@kernel.org, linux-kselftest@vger.kernel.org
+References: <20250319001521.53249-1-jdamato@fastly.com>
+ <Z9p6oFlHxkYvUA8N@infradead.org>
+ <Z9rjgyl7_61Ddzrq@LQ3V64L9R2>
+ <2d68bc91-c22c-4b48-a06d-fa9ec06dfb25@kernel.dk>
+ <Z9r5JE3AJdnsXy_u@LQ3V64L9R2>
+ <19e3056c-2f7b-4f41-9c40-98955c4a9ed3@kernel.dk>
+ <Z9sCsooW7OSTgyAk@LQ3V64L9R2>
+ <Z9uuSQ7SrigAsLmt@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z9uuSQ7SrigAsLmt@infradead.org>
 
-Currently network taps unbound to any interface are linked in the
-global ptype_all list, affecting the performance in all the network
-namespaces.
+On Wed, Mar 19, 2025 at 10:57:29PM -0700, Christoph Hellwig wrote:
+> On Wed, Mar 19, 2025 at 10:45:22AM -0700, Joe Damato wrote:
+> > I don't disagree; I just don't know if app developers:
+> >   a.) know that this is possible to do, and
+> >   b.) know how to do it
+> 
+> So if you don't know that why do you even do the work?
 
-Add per netns ptypes chains, so that in the mentioned case only
-the netns owning the packet socket(s) is affected.
+I am doing the work because I use splice and sendfile and it seems
+relatively straightforward to make them safer using an existing
+mechanism, at least for network sockets.
 
-While at that drop the global ptype_all list: no in kernel user
-registers a tap on "any" type without specifying either the target
-device or the target namespace (and IMHO doing that would not make
-any sense).
+After dropping the sendfile2 patches completely, it looks like in my
+new set all of the code is within CONFIG_NET defines in fs/splice.c.
+ 
+> > In general: it does seem a bit odd to me that there isn't a safe
+> > sendfile syscall in Linux that uses existing completion notification
+> > mechanisms.
+> 
+> Agreed.  Where the existing notification mechanism is called io_uring.
 
-Note that this adds a conditional in the fast path (to check for
-per netns ptype_specific list) and increases the dataset size by
-a cacheline (owing the per netns lists).
+Sure. As I mentioned to Jens: I agree that any new system call
+should be built differently.
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
-v3 -> v4:
- - constify the dev_nit_active* helpers
- - fix comment typo
- v3: https://lore.kernel.org/netdev/2b6ce88cb7da4d74853cc36d7de4b1b11a7362e5.1742401226.git.pabeni@redhat.com/
+But does that mean we should leave splice and sendfile as-is when
+there is a way to potentially make them safer?
 
-v2 -> v3:
- - optimized dev_queue_xmit_nit() loop
- - fixed RCU splat false positive
- - clarified (?) a ptype_specific comment
- v2: https://lore.kernel.org/netdev/2a1893e924bd34f4f5b6124b568d1cdfc15573d5.1742320185.git.pabeni@redhat.com/
+In my other message to Jens I proposed:
+  - SPLICE_F_ZC for splice to generate zc completion notifications
+    to the error queue
+  - Modifying sendfile so that if SO_ZEROCOPY (which already exists)
+    is set on a network socket, zc completion notifications are
+    generated.
 
-v1 -> v2:
- - fix comment typo
- - drop the doubtful RCU optimization
- v1: https://lore.kernel.org/netdev/b931a4c9b78e282c143ab9455d4c65faa5f6de1c.1742228617.git.pabeni@redhat.com/
+In both cases no new system call is needed and both splice and
+sendfile become safer to use. 
 
-rfc -> v1
- - fix procfs dump
- - fix dev->ptype_specific -> dev->ptype_all type in ptype_head()
- - dev_net() -> dev_net_rcu
- - add dev_nit_active_rcu  variant
- - ptype specific netns deliver uses dev_net_rcu(skb->dev)) instead
-   of dev_net(orig_dev)
- rfc: https://lore.kernel.org/netdev/cover.1741957452.git.pabeni@redhat.com/
----
- include/linux/netdevice.h   | 12 ++++++++-
- include/net/hotdata.h       |  1 -
- include/net/net_namespace.h |  3 +++
- net/core/dev.c              | 53 ++++++++++++++++++++++++++++---------
- net/core/hotdata.c          |  1 -
- net/core/net-procfs.c       | 28 +++++++++++++++-----
- net/core/net_namespace.c    |  2 ++
- 7 files changed, 78 insertions(+), 22 deletions(-)
+At some point in the future a mechanism built on top of iouring
+introduced as new system calls (sendmsg2, sendfile2, splice2, etc)
+can be built.
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 0c5b1f7f8f3af..f22cca7c03add 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -4278,7 +4278,17 @@ static __always_inline int ____dev_forward_skb(struct net_device *dev,
- 	return 0;
- }
- 
--bool dev_nit_active(struct net_device *dev);
-+bool dev_nit_active_rcu(const struct net_device *dev);
-+static inline bool dev_nit_active(const struct net_device *dev)
-+{
-+	bool ret;
-+
-+	rcu_read_lock();
-+	ret = dev_nit_active_rcu(dev);
-+	rcu_read_unlock();
-+	return ret;
-+}
-+
- void dev_queue_xmit_nit(struct sk_buff *skb, struct net_device *dev);
- 
- static inline void __dev_put(struct net_device *dev)
-diff --git a/include/net/hotdata.h b/include/net/hotdata.h
-index 30e9570beb2af..fda94b2647ffa 100644
---- a/include/net/hotdata.h
-+++ b/include/net/hotdata.h
-@@ -23,7 +23,6 @@ struct net_hotdata {
- 	struct net_offload	udpv6_offload;
- #endif
- 	struct list_head	offload_base;
--	struct list_head	ptype_all;
- 	struct kmem_cache	*skbuff_cache;
- 	struct kmem_cache	*skbuff_fclone_cache;
- 	struct kmem_cache	*skb_small_head_cache;
-diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
-index f467a66abc6b1..bd57d8fb54f14 100644
---- a/include/net/net_namespace.h
-+++ b/include/net/net_namespace.h
-@@ -83,6 +83,9 @@ struct net {
- 	struct llist_node	defer_free_list;
- 	struct llist_node	cleanup_list;	/* namespaces on death row */
- 
-+	struct list_head ptype_all;
-+	struct list_head ptype_specific;
-+
- #ifdef CONFIG_KEYS
- 	struct key_tag		*key_domain;	/* Key domain of operation tag */
- #endif
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 2355603417650..bcf81c3ff6a32 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -572,10 +572,18 @@ static inline void netdev_set_addr_lockdep_class(struct net_device *dev)
- 
- static inline struct list_head *ptype_head(const struct packet_type *pt)
- {
--	if (pt->type == htons(ETH_P_ALL))
--		return pt->dev ? &pt->dev->ptype_all : &net_hotdata.ptype_all;
--	else
--		return pt->dev ? &pt->dev->ptype_specific :
-+	if (pt->type == htons(ETH_P_ALL)) {
-+		if (!pt->af_packet_net && !pt->dev)
-+			return NULL;
-+
-+		return pt->dev ? &pt->dev->ptype_all :
-+				 &pt->af_packet_net->ptype_all;
-+	}
-+
-+	if (pt->dev)
-+		return &pt->dev->ptype_specific;
-+
-+	return pt->af_packet_net ? &pt->af_packet_net->ptype_specific :
- 				 &ptype_base[ntohs(pt->type) & PTYPE_HASH_MASK];
- }
- 
-@@ -596,6 +604,9 @@ void dev_add_pack(struct packet_type *pt)
- {
- 	struct list_head *head = ptype_head(pt);
- 
-+	if (WARN_ON_ONCE(!head))
-+		return;
-+
- 	spin_lock(&ptype_lock);
- 	list_add_rcu(&pt->list, head);
- 	spin_unlock(&ptype_lock);
-@@ -620,6 +631,9 @@ void __dev_remove_pack(struct packet_type *pt)
- 	struct list_head *head = ptype_head(pt);
- 	struct packet_type *pt1;
- 
-+	if (!head)
-+		return;
-+
- 	spin_lock(&ptype_lock);
- 
- 	list_for_each_entry(pt1, head, list) {
-@@ -2441,16 +2455,21 @@ static inline bool skb_loop_sk(struct packet_type *ptype, struct sk_buff *skb)
- }
- 
- /**
-- * dev_nit_active - return true if any network interface taps are in use
-+ * dev_nit_active_rcu - return true if any network interface taps are in use
-+ *
-+ * The caller must hold the RCU lock
-  *
-  * @dev: network device to check for the presence of taps
-  */
--bool dev_nit_active(struct net_device *dev)
-+bool dev_nit_active_rcu(const struct net_device *dev)
- {
--	return !list_empty(&net_hotdata.ptype_all) ||
-+	/* Callers may hold either RCU or RCU BH lock */
-+	WARN_ON_ONCE(!rcu_read_lock_held() && !rcu_read_lock_bh_held());
-+
-+	return !list_empty(&dev_net(dev)->ptype_all) ||
- 	       !list_empty(&dev->ptype_all);
- }
--EXPORT_SYMBOL_GPL(dev_nit_active);
-+EXPORT_SYMBOL_GPL(dev_nit_active_rcu);
- 
- /*
-  *	Support routine. Sends outgoing frames to any network
-@@ -2459,11 +2478,12 @@ EXPORT_SYMBOL_GPL(dev_nit_active);
- 
- void dev_queue_xmit_nit(struct sk_buff *skb, struct net_device *dev)
- {
--	struct list_head *ptype_list = &net_hotdata.ptype_all;
- 	struct packet_type *ptype, *pt_prev = NULL;
-+	struct list_head *ptype_list;
- 	struct sk_buff *skb2 = NULL;
- 
- 	rcu_read_lock();
-+	ptype_list = &dev_net_rcu(dev)->ptype_all;
- again:
- 	list_for_each_entry_rcu(ptype, ptype_list, list) {
- 		if (READ_ONCE(ptype->ignore_outgoing))
-@@ -2507,7 +2527,7 @@ void dev_queue_xmit_nit(struct sk_buff *skb, struct net_device *dev)
- 		pt_prev = ptype;
- 	}
- 
--	if (ptype_list == &net_hotdata.ptype_all) {
-+	if (ptype_list != &dev->ptype_all) {
- 		ptype_list = &dev->ptype_all;
- 		goto again;
- 	}
-@@ -3752,7 +3772,7 @@ static int xmit_one(struct sk_buff *skb, struct net_device *dev,
- 	unsigned int len;
- 	int rc;
- 
--	if (dev_nit_active(dev))
-+	if (dev_nit_active_rcu(dev))
- 		dev_queue_xmit_nit(skb, dev);
- 
- 	len = skb->len;
-@@ -5696,7 +5716,8 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
- 	if (pfmemalloc)
- 		goto skip_taps;
- 
--	list_for_each_entry_rcu(ptype, &net_hotdata.ptype_all, list) {
-+	list_for_each_entry_rcu(ptype, &dev_net_rcu(skb->dev)->ptype_all,
-+				list) {
- 		if (pt_prev)
- 			ret = deliver_skb(skb, pt_prev, orig_dev);
- 		pt_prev = ptype;
-@@ -5808,6 +5829,14 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
- 		deliver_ptype_list_skb(skb, &pt_prev, orig_dev, type,
- 				       &ptype_base[ntohs(type) &
- 						   PTYPE_HASH_MASK]);
-+
-+		/* orig_dev and skb->dev could belong to different netns;
-+		 * Even in such case we need to traverse only the list
-+		 * coming from skb->dev, as the ptype owner (packet socket)
-+		 * will use dev_net(skb->dev) to do namespace filtering.
-+		 */
-+		deliver_ptype_list_skb(skb, &pt_prev, orig_dev, type,
-+				       &dev_net_rcu(skb->dev)->ptype_specific);
- 	}
- 
- 	deliver_ptype_list_skb(skb, &pt_prev, orig_dev, type,
-diff --git a/net/core/hotdata.c b/net/core/hotdata.c
-index d0aaaaa556f22..0bc893d5f07b0 100644
---- a/net/core/hotdata.c
-+++ b/net/core/hotdata.c
-@@ -7,7 +7,6 @@
- 
- struct net_hotdata net_hotdata __cacheline_aligned = {
- 	.offload_base = LIST_HEAD_INIT(net_hotdata.offload_base),
--	.ptype_all = LIST_HEAD_INIT(net_hotdata.ptype_all),
- 	.gro_normal_batch = 8,
- 
- 	.netdev_budget = 300,
-diff --git a/net/core/net-procfs.c b/net/core/net-procfs.c
-index fa6d3969734a6..3e92bf0f9060b 100644
---- a/net/core/net-procfs.c
-+++ b/net/core/net-procfs.c
-@@ -185,7 +185,13 @@ static void *ptype_get_idx(struct seq_file *seq, loff_t pos)
- 		}
- 	}
- 
--	list_for_each_entry_rcu(pt, &net_hotdata.ptype_all, list) {
-+	list_for_each_entry_rcu(pt, &seq_file_net(seq)->ptype_all, list) {
-+		if (i == pos)
-+			return pt;
-+		++i;
-+	}
-+
-+	list_for_each_entry_rcu(pt, &seq_file_net(seq)->ptype_specific, list) {
- 		if (i == pos)
- 			return pt;
- 		++i;
-@@ -210,6 +216,7 @@ static void *ptype_seq_start(struct seq_file *seq, loff_t *pos)
- 
- static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- {
-+	struct net *net = seq_file_net(seq);
- 	struct net_device *dev;
- 	struct packet_type *pt;
- 	struct list_head *nxt;
-@@ -232,15 +239,22 @@ static void *ptype_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- 				goto found;
- 			}
- 		}
--
--		nxt = net_hotdata.ptype_all.next;
--		goto ptype_all;
-+		nxt = net->ptype_all.next;
-+		goto net_ptype_all;
- 	}
- 
--	if (pt->type == htons(ETH_P_ALL)) {
--ptype_all:
--		if (nxt != &net_hotdata.ptype_all)
-+	if (pt->af_packet_net) {
-+net_ptype_all:
-+		if (nxt != &net->ptype_all && nxt != &net->ptype_specific)
- 			goto found;
-+
-+		if (nxt == &net->ptype_all) {
-+			/* continue with ->ptype_specific if it's not empty */
-+			nxt = net->ptype_specific.next;
-+			if (nxt != &net->ptype_specific)
-+				goto found;
-+		}
-+
- 		hash = 0;
- 		nxt = ptype_base[0].next;
- 	} else
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index 4303f2a492624..b0dfdf791ece5 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -340,6 +340,8 @@ static __net_init void preinit_net(struct net *net, struct user_namespace *user_
- 	lock_set_cmp_fn(&net->rtnl_mutex, rtnl_net_lock_cmp_fn, NULL);
- #endif
- 
-+	INIT_LIST_HEAD(&net->ptype_all);
-+	INIT_LIST_HEAD(&net->ptype_specific);
- 	preinit_net_sysctl(net);
- }
- 
--- 
-2.48.1
+> > Of course, I certainly agree that the error queue is a work around.
+> > But it works, app use it, and its fairly well known. I don't see any
+> > reason, other than historical context, why sendmsg can use this
+> > mechanism, splice can, but sendfile shouldn't?
+> 
+> Because sendmsg should never have done that it certainly should not
+> spread beyond purely socket specific syscalls.
 
+I don't know the entire historical context, but I presume sendmsg
+did that because there was no other mechanism at the time.
+
+I will explain it more clearly in the next cover letter, but the way
+I see the situation is:
+  - There are existing system calls which operate on network sockets
+    (splice and sendfile) that avoid copies
+  - There is a mechanism already in the kernel in the networking
+    stack for generating completion notifications
+  - Both splice and sendfile could be extended to support this for
+    network sockets so they can be used more safely, without
+    introducing a new system call
+
+> > If you feel very strongly that this cannot be merged without
+> > dropping sendfile2 and only plumbing this through for splice, then
+> > I'll drop the sendfile2 syscall when I submit officially (probably
+> > next week?).
+> 
+> Splice should also not do "error queue notifications".  Nothing
+> new and certainly nothing outside of net/ should.
+
+It seems like Jens suggested that plumbing this through for splice
+was a possibility, but sounds like you disagree.
+
+Not really sure how to proceed here?
+
+If code I am modifying is within CONFIG_NET defines, but lives in
+fs/splice.c ... is that within the realm of net or fs ?
+
+I am asking because I genuinely don't know.
+
+As mentioned above and in other messages, it seems like it is
+possible to improve the networking parts of splice (and therefore
+sendfile) to make them safer to use without introducing a new system
+call.
+
+Are you saying that you are against doing that, even if the code is
+network specific (but lives in fs/)?
+
+> > I do feel pretty strongly that it's more likely apps would use
+> > sendfile2 and we'd have safer apps out in the wild. But, I could be
+> > wrong.
+> 
+> A purely synchronous sendfile that is safe is a good thing.  Spreading
+> non-standard out of band notifications is not.  How to build that
+> safe sendmsg is a good question, and a sendmsg2 might be a sane
+> option for that.  The important thing is that the underlying code
+> should use iocbs and ki_complete to notify I/O completion so that
+> all the existing infrastucture like io_uring and in-kernel callers
+> can reuse this.
+
+I'm not currently planning to build sendmsg2 (and I've already
+mentioned to Jens and above I will drop sendfile2), but if I have the time
+it sounds like an interesting project.
 
