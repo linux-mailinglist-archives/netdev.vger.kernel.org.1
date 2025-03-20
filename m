@@ -1,134 +1,150 @@
-Return-Path: <netdev+bounces-176410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B6F6A6A1F3
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 09:58:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BFB8A6A200
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 10:00:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF1DD7A9792
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 08:57:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E07BF1664BD
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 09:00:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6C8821D5BE;
-	Thu, 20 Mar 2025 08:58:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D72B2206A9;
+	Thu, 20 Mar 2025 08:59:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ARET7j/C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KTvJsuwj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD9E9221DAD
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 08:58:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 045E5220687;
+	Thu, 20 Mar 2025 08:59:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742461098; cv=none; b=k4z+CWTXmDO/CiXzQXfqJkc7xzHQSCaSITc64br/AiHW6xs2itVX83tqSkuyfKHcs2yO004Wc7E0Az7kTjgjEG4866zFk8BOjyX/rIWN1b6wqZoqcHkIdygMg6eQzwVDMaihcYDiMohtskgHM5FrVKuS71IzpI2T+nf7qDBrHiw=
+	t=1742461197; cv=none; b=EAySInSYvnbXznn5/57CkbL4C0PZSlNfbJxysIFXleP1gBcDUpKZjpAsC1wse3BkCiPBKkxBBZhv0tCUcXHq/tbX7ZRocdEVwXu94KA+9gCF6LeyTiyVcMN0NtehivJrjFKtuMIg/CXKB5JtBnHNMx/CO3T5RAobcpb9lPBkjns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742461098; c=relaxed/simple;
-	bh=WceSDYxNlU0FESCDHE8rGDqf5WsdoRUSkTN7Y0d2Nd0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nKF+94AscisolJOqzDat2llxhfftPbXaV6fwoWRte8y/XvcIeWo3mzqqmW0xYtCosdU0KcGetM9P8yhM6CLxNuunlQ+wG3eRMSm/Q71e/D/aGIvF1Y+RpxY+AuTiTzZKt2i/ZCNZtsBzwdOBaAK742Zez7OVS5S4peYn7SCoffg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ARET7j/C; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3912d2c89ecso402905f8f.2
-        for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 01:58:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742461094; x=1743065894; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uzhZzxRpfuL0NmEgOtiWp7G29TdO9WjRAZeMuHJM+TU=;
-        b=ARET7j/C0UClaqONb+euqMHFVfdsnBNXeD/O6p7syIipNOad0/27itKPTU2QSzFsfV
-         8Wwv1QQeeTj379Pg7NaibdGFQI76vP+CMktb6cJUfmjG/GAfEyDoe9Wss7MFH+GKBpz8
-         tZRx3JQKkvIqQFvwuLc6HcUtJgtYUa/z8uW/57eee8ixqDaH0sjOxeReBqR2GIvsx9st
-         1Q4GSrts7R1VNu1+saLYjgj+H6hRgszpC2jW9AjsQcoTp8t+n5lpv2UTPRBQfXxyzQd9
-         uiZ+/AwDSdM8uanTyfKhR3P2ktXNvNgDouTLOWsdGrJlnbwKbFmi7EmG2qK1MF3MjFje
-         ejMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742461094; x=1743065894;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uzhZzxRpfuL0NmEgOtiWp7G29TdO9WjRAZeMuHJM+TU=;
-        b=VZq5yCJpLiCf0bOTu5DIqHeGz0dEPn1sfad4H7BiD1DolPoliDgSRFroWVquxd0jPF
-         uCw7GtmOGTPZ+8t0P3gMoNbVR5vW7ieE7VirCrnsqXSjN61ZwVvFd5bsogrrEDjurDPS
-         TTmd/0JNfM+fsptnJvIWiNS44b+cjji3EDzUgafNS+3rlrJYZKNUzpe4SIn6EdYFWbIW
-         X3AAobYMVnSJU2El5cvOlbgfNrdf5JPgBKEkbTOdbouNgaDNhjLFYSo115WRSYmVcZOx
-         aCpC1eSUkMppEItfK7Br8p1vvnm9az1o53vv+dQ4bOwKWKL/Sym9MyxxQOAz6c6x4GsU
-         wGEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUTQaVR78RmLdifPHfaDgl/XeryuYkNb+gLLJwSpqcKMFvNOiS8XBV990XVRmZF0FtKxafPCfU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywcz/I7d7SpmLXFNdHDnBOrIxBCi48owmnbTs/5W1QmwYTVKnrv
-	ozDiYcLvGzKtL5eYP8J9PAurUh5LxVPYIIYPH0iLBgWNv6Yo5gg8
-X-Gm-Gg: ASbGncuKgs1ZgXePYSP2CsuUPuhaQBq/0XvXXlKxZ4qQFESxmQke1HS58GtsRGeDdkg
-	t9koWQAhvZGLjQqDnt/K3PtLaCXzoCYvGlYyrXLae+zOOh6yn60v23b8JUrDLf1g0r2vdoM8DgH
-	lBhYgriSFJnp0hFXAJybxeEqDxZpbCtkfXxG2MvvfU0CJAMvniTbaKRRe0A/BdJoBlmpqcRanOR
-	Qkdudnic5ug0jRNt09z/dVZGktJ1fxrzgfb2uU909vybsS6X/p0+TtXhJp+LzMqBYgMYJDxYc5O
-	l4pS6D2W9IRTDnWUEVRrIQLDo5th/5/dVvVxo2Mq4XxImFIXnj9Q1uP/1LW5rDvVyljWkCP1K8R
-	l
-X-Google-Smtp-Source: AGHT+IGrvEDAdD9+Pjrdgu57WFE5aA2NwO6NLoWWRrsMe+ankvXLQ5ZC0/8+6bDJNmAPD1tqGL+EOQ==
-X-Received: by 2002:a05:6000:144b:b0:391:1473:336a with SMTP id ffacd0b85a97d-399795df893mr1513720f8f.36.1742461093671;
-        Thu, 20 Mar 2025 01:58:13 -0700 (PDT)
-Received: from [172.27.33.126] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d43f589b4sm41904525e9.24.2025.03.20.01.58.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Mar 2025 01:58:13 -0700 (PDT)
-Message-ID: <8a92051f-8169-44a1-a26d-85efa71a5e31@gmail.com>
-Date: Thu, 20 Mar 2025 10:58:10 +0200
+	s=arc-20240116; t=1742461197; c=relaxed/simple;
+	bh=KP5DLbCJulgRoFKv+2i9EXZEl0WABrzh7Q0EO7+EneM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Ti4G1gzszMoVfHONU57OHI6AWPX+Cf5A4b/E+/VCKEtUklckLrXndAPsUXTKt8yMkHhbLpaVJzQdWl62E5WjEp+x/b/ey8x7eMW8KLZ+z41qBslz+Dm1ZwNSxLyrniV1i4WZ39UOHqGWShVp+zV33+YiQlChxATR3h8sfJQqWFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KTvJsuwj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 718F9C4CEDD;
+	Thu, 20 Mar 2025 08:59:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742461196;
+	bh=KP5DLbCJulgRoFKv+2i9EXZEl0WABrzh7Q0EO7+EneM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=KTvJsuwjnICAWuspdkkvvwUIYzc2VB+/4X3uQNHQr/zeIJ+F8cgJSvHZi7sEJiqJO
+	 TTf3WEqw3zCVlF/YyXjEEBTn3OKuP2E5qTY6im/k3Bzy+egrZG16aSlwVoAokf0Y0b
+	 oTdiuTt1FygDVZMmbptJYLKHGWI9k+D1ZOP9QH0R5o0oU4iRDltHJsDiZUIoNtppBe
+	 jmleY1LW2Va45ZCbS3IWNGzuSa1vcv+rl39JDOY2okOi0MhB5hed7KtZLucZrOFMpx
+	 mP9Y1WzKP62E1Hz4oDhtjD2jDn0lhMQxo1Kz1v9CmCQLdYbE7IgOSbA0AAnXW1BPuM
+	 qUmoFCLXgxmfQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 712493806654;
+	Thu, 20 Mar 2025 09:00:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/mlx5e: Fix ethtool -N flow-type ip4 to RSS
- context
-To: Gal Pressman <gal@nvidia.com>, Maxim Mikityanskiy <maxtram95@gmail.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, Maxim Mikityanskiy <maxim@isovalent.com>
-References: <20250319124508.3979818-1-maxim@isovalent.com>
- <fadfb5af-afdf-43c3-bc1b-58d5b1eb0d70@nvidia.com>
- <CAKErNvrbdaEom1LQZd6W+4M-Vjfg+YRzgEz3F7YWoCXB_U+dug@mail.gmail.com>
- <fe4b2e7b-1704-426e-99e7-da55375b676d@nvidia.com>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <fe4b2e7b-1704-426e-99e7-da55375b676d@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: vlan: don't propagate flags on open
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174246123226.1357755.15672961348464906574.git-patchwork-notify@kernel.org>
+Date: Thu, 20 Mar 2025 09:00:32 +0000
+References: <20250313100657.2287455-1-sdf@fomichev.me>
+In-Reply-To: <20250313100657.2287455-1-sdf@fomichev.me>
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
+ horms@kernel.org, aleksander.lobakin@intel.com,
+ syzbot+b0c03d76056ef6cd12a6@syzkaller.appspotmail.com
 
+Hello:
 
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-On 20/03/2025 10:44, Gal Pressman wrote:
-> On 20/03/2025 10:28, Maxim Mikityanskiy wrote:
->> On Thu, 20 Mar 2025 at 10:25, Gal Pressman <gal@nvidia.com> wrote:
->>>
->>> Hey Maxim!
->>>
->>> On 19/03/2025 14:45, Maxim Mikityanskiy wrote:
->>>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c
->>>> index 773624bb2c5d..d68230a7b9f4 100644
->>>> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c
->>>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c
->>>> @@ -884,8 +884,10 @@ static int flow_type_to_traffic_type(u32 flow_type)
->>>>        case ESP_V6_FLOW:
->>>>                return MLX5_TT_IPV6_IPSEC_ESP;
->>>>        case IPV4_FLOW:
->>>> +     case IP_USER_FLOW:
->>>
->>> They're the same, but I think IPV4_USER_FLOW is the "modern" define that
->>> should be used.
->>
->> Yeah, I used IP_USER_FLOW for consistency with other places in this
->> file. If you prefer that, I can resubmit with IPV4_USER_FLOW.
+On Thu, 13 Mar 2025 03:06:57 -0700 you wrote:
+> With the device instance lock, there is now a possibility of a deadlock:
 > 
-> I don't mind, up to Tariq.
-> We can followup with a patch that converts all usages.
+> [    1.211455] ============================================
+> [    1.211571] WARNING: possible recursive locking detected
+> [    1.211687] 6.14.0-rc5-01215-g032756b4ca7a-dirty #5 Not tainted
+> [    1.211823] --------------------------------------------
+> [    1.211936] ip/184 is trying to acquire lock:
+> [    1.212032] ffff8881024a4c30 (&dev->lock){+.+.}-{4:4}, at: dev_set_allmulti+0x4e/0xb0
+> [    1.212207]
+> [    1.212207] but task is already holding lock:
+> [    1.212332] ffff8881024a4c30 (&dev->lock){+.+.}-{4:4}, at: dev_open+0x50/0xb0
+> [    1.212487]
+> [    1.212487] other info that might help us debug this:
+> [    1.212626]  Possible unsafe locking scenario:
+> [    1.212626]
+> [    1.212751]        CPU0
+> [    1.212815]        ----
+> [    1.212871]   lock(&dev->lock);
+> [    1.212944]   lock(&dev->lock);
+> [    1.213016]
+> [    1.213016]  *** DEADLOCK ***
+> [    1.213016]
+> [    1.213143]  May be due to missing lock nesting notation
+> [    1.213143]
+> [    1.213294] 3 locks held by ip/184:
+> [    1.213371]  #0: ffffffff838b53e0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock+0x1b/0xa0
+> [    1.213543]  #1: ffffffff84e5fc70 (&net->rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock+0x37/0xa0
+> [    1.213727]  #2: ffff8881024a4c30 (&dev->lock){+.+.}-{4:4}, at: dev_open+0x50/0xb0
+> [    1.213895]
+> [    1.213895] stack backtrace:
+> [    1.213991] CPU: 0 UID: 0 PID: 184 Comm: ip Not tainted 6.14.0-rc5-01215-g032756b4ca7a-dirty #5
+> [    1.213993] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.3-1-1 04/01/2014
+> [    1.213994] Call Trace:
+> [    1.213995]  <TASK>
+> [    1.213996]  dump_stack_lvl+0x8e/0xd0
+> [    1.214000]  print_deadlock_bug+0x28b/0x2a0
+> [    1.214020]  lock_acquire+0xea/0x2a0
+> [    1.214027]  __mutex_lock+0xbf/0xd40
+> [    1.214038]  dev_set_allmulti+0x4e/0xb0 # real_dev->flags & IFF_ALLMULTI
+> [    1.214040]  vlan_dev_open+0xa5/0x170 # ndo_open on vlandev
+> [    1.214042]  __dev_open+0x145/0x270
+> [    1.214046]  __dev_change_flags+0xb0/0x1e0
+> [    1.214051]  netif_change_flags+0x22/0x60 # IFF_UP vlandev
+> [    1.214053]  dev_change_flags+0x61/0xb0 # for each device in group from dev->vlan_info
+> [    1.214055]  vlan_device_event+0x766/0x7c0 # on netdevsim0
+> [    1.214058]  notifier_call_chain+0x78/0x120
+> [    1.214062]  netif_open+0x6d/0x90
+> [    1.214064]  dev_open+0x5b/0xb0 # locks netdevsim0
+> [    1.214066]  bond_enslave+0x64c/0x1230
+> [    1.214075]  do_set_master+0x175/0x1e0 # on netdevsim0
+> [    1.214077]  do_setlink+0x516/0x13b0
+> [    1.214094]  rtnl_newlink+0xaba/0xb80
+> [    1.214132]  rtnetlink_rcv_msg+0x440/0x490
+> [    1.214144]  netlink_rcv_skb+0xeb/0x120
+> [    1.214150]  netlink_unicast+0x1f9/0x320
+> [    1.214153]  netlink_sendmsg+0x346/0x3f0
+> [    1.214157]  __sock_sendmsg+0x86/0xb0
+> [    1.214160]  ____sys_sendmsg+0x1c8/0x220
+> [    1.214164]  ___sys_sendmsg+0x28f/0x2d0
+> [    1.214179]  __x64_sys_sendmsg+0xef/0x140
+> [    1.214184]  do_syscall_64+0xec/0x1d0
+> [    1.214190]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> [    1.214191] RIP: 0033:0x7f2d1b4a7e56
 > 
+> [...]
 
-Please keep using IP_USER_FLOW for consistency with existing code.
-We may converts them all together later.
+Here is the summary with links:
+  - [net-next] net: vlan: don't propagate flags on open
+    https://git.kernel.org/netdev/net-next/c/27b918007d96
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
