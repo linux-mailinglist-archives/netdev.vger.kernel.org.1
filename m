@@ -1,119 +1,143 @@
-Return-Path: <netdev+bounces-176405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAF9FA6A15A
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 09:29:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 391C1A6A17C
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 09:36:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E605C883358
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 08:29:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 396438A4AF0
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 08:35:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E69220D519;
-	Thu, 20 Mar 2025 08:29:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD5792163BD;
+	Thu, 20 Mar 2025 08:35:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mqGMKd+9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I7VOgy6t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05D11EE02A
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 08:29:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77CCB20FA90;
+	Thu, 20 Mar 2025 08:35:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742459347; cv=none; b=bLQ0j8XBjgbRyFU4QuySv+Ui2AW0w607YnfTBhuBlHE9jGB2CHjXU/0IQE9gNvzo89nbDgGdXzf5VJ/DeW0Rgi3wN7DNs7Axe5CstUETNFCb22JdrNkMxjRg+9iTNN0FiyCumqyIZmzYTqpvr7UUMz8CAF5qDioMtHrO0KTel3g=
+	t=1742459747; cv=none; b=hLfOPMWXk6UiY8Bu7G3OYX0LxvKpm+Spnl39s8IKXhMqE8fw8a/Al6y8gGbkWeqIIuPnRK2tTFmTZAXVxIQcdQlMH0ikz3I6ljiL2G/VktaQ2OL3Gb6igOpUSkszMh2ODn8j3oqUx5tLgwQ39+6l4VT6gUPxgtzPwVB9PiI2qFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742459347; c=relaxed/simple;
-	bh=5iLzZrp+LGOn/tFMRD8Tz+07XXtNhwK94xQ4Tc60hrY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=atbyKaX9KLUWyGbTEk0KerOC/tlBxiFUfGt8549VRK1Pz9SUNsN8iS6J1F15mzhwH3KUpYTH/wWD2zykCy12C/Z1DE6TjWKP+NTNL/Y2OPN/fOBFJonK0HcKQA7qnmpAJAEyoroR0edWdDCt0HUSrF7hlh20POPFjGsDqa+OPow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mqGMKd+9; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5e535e6739bso827350a12.1
-        for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 01:29:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742459344; x=1743064144; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+lLTsLRQvhX2lXLqcBPhks1XwWaY9iMJXIMC/StTmlg=;
-        b=mqGMKd+9u6J8SYJN37uuf2g7iSuASSNvvqOBNrUG5uefiE9iyEDhKD+YlcxKajITzz
-         hWs7RVBgT+3lxWjVQip75pB82lvQmqKBSn5tc2bbkebH3zvBXUlL8iySvJ5473jxffxl
-         GNqA6OI+2gpJOPUc81vsYNuc7gNZngPKBn8s0rZzaa0sJ+tywe+EWn2b9kn++ZfLcsrP
-         fSXJlMwZJaoXRFVIkcyA57tMbGAYo8jYz3PT3jqnwDybBEc95+cfGdpMy2BQ6duT4qu9
-         TV/qJ48+NPqbCkMHHnsb4qi12m7igJskWVfjoim4MZKS+EnaUuZSPVX4MAA6ckyDfsO+
-         z25g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742459344; x=1743064144;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+lLTsLRQvhX2lXLqcBPhks1XwWaY9iMJXIMC/StTmlg=;
-        b=BPvVcxLsJWY3v8SOLqbN7xZzN5U8z8VkCZ/n1NWOHUwptB7Qz1+5Hn+AtmYSAPWWOB
-         miXYh9FDEjIn/1NdYLWMUtoLQsTzPxyCLTYgRD+ROOVXFt1CaQ+OYbTbyXJHRGVCx0kW
-         hiSwMv2RGKOd6TGt4B27DWq/KnOD9622ba0gT55wvKm6bjSoNyoKG8Fwqbmh306ARSSm
-         GnvR4I7xlElPf1sXkctIUdExhsmg1XHmU8fNGWbSWuZdyE/POj3mt7a4sLYs14Xxo+Lk
-         jBlJl40xxJQzgFtSctIMRwwG+lA253oVouzjrx2FnQO+Cio2faZ5ah11WGQC577D8ayP
-         OwFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWFPii28VeKpWu6EJFsJUKu1ZJ0UN0gOHFOu3WM/CN+USUeSQjrKyThTSRtxm1NEyFXoG3G6Vo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxeUpX5TtdROladAGhGOYnEVEeuoEPAmxd9lxWYMDIP68jVqx2k
-	pif7PeUoQLZBytxtCMSOG/CeNGsh2YLF1FGCGol4xlgRX16rdRXGlfF3u0KdAD+GF+CZpShaq+b
-	TMWvtEx6Hu/SOGr+DTCunMeTl3Nc=
-X-Gm-Gg: ASbGncssa530vYWOciQafUa9BlZr4GbO12uCu6hw+P32vBoNKuesekHPP1YLjuPkuVe
-	YAxkDOLdeE6eLFR68ipGAyI4yY0GGSmtD8h7sjRF2uhJyS3Qnbj7gGjD3LV0VnXpl1RN1h8/QMr
-	z3fBZasfYQx20g/oe/Cpt/uOrKTZMQLcN5pQ3RnZcheh4xfVOTdtZCudCz+A==
-X-Google-Smtp-Source: AGHT+IEbn/7WlMXZrMmB/3c4ildBPTSbhz/QEyzGvCllWlokLp0//uiEtLv+zROXfEWR9VuYKWiQ26ZHzY9fZJriG3s=
-X-Received: by 2002:a05:6402:1ece:b0:5e5:b388:2a0e with SMTP id
- 4fb4d7f45d1cf-5eb80cdca41mr6226924a12.7.1742459343670; Thu, 20 Mar 2025
- 01:29:03 -0700 (PDT)
+	s=arc-20240116; t=1742459747; c=relaxed/simple;
+	bh=Fi+/sL/HB7rD5Vc5usDgoiW1Oe/Vw1Swp0WgOewHlmM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QwMIEP08vAPjD1IiaonSdjCQFkoHQBsk654j+tU8A2Y/cACVCPvhCz3Llhj+W+C4ys1+5xrTQx5lu6ytDHodEzmMSDfmWNz7G4oxJW5+sMqvaHkOVOaJVHWVFux+ugLQjrq2majocsB91FZXbtuiMZC4dU+NKMTaiuesSQEeRC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I7VOgy6t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B86DCC4CEEC;
+	Thu, 20 Mar 2025 08:35:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742459747;
+	bh=Fi+/sL/HB7rD5Vc5usDgoiW1Oe/Vw1Swp0WgOewHlmM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=I7VOgy6tfCHbABO0CGULJ8EYynSLFNdNXzP9fKTvU1m8bbJpGSB45IUuELwoiHAI4
+	 xano06wJvgouG9j4DOz/n3Ky9fWtqyk5OZhxDLsLQ57SkvKKKtHLdJIORsgn0aq8X/
+	 y8fGoAVEgz6Fm/HidSov+MV1J/ayJ/Mu83lIwfreV+QKmq7vicrjsVu1oJXxnxu0J/
+	 ZyM/H0tBOkXUANONwi15x+Jkp46/hgn//TEDiYetlfeM/4dhERsBPXDYKOPZEPc4rz
+	 0sKXXtevId7M+aiRNJPd/UVEibDBP5C6Qti1+czXqJKJTzvGz0D64CramVwLnUR4g/
+	 haA06zXU99XUA==
+Date: Thu, 20 Mar 2025 09:35:43 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: David Heidelberg <david@ixit.cz>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Mailing List <devicetree-spec-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Johannes Berg <johannes@sipsolutions.net>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, van Spriel <arend@broadcom.com>, 
+	=?utf-8?B?SsOpcsO0bWU=?= Pouiller <jerome.pouiller@silabs.com>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Andy Gross <agross@kernel.org>, 
+	Mailing List <devicetree-spec@vger.kernel.org>, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	Janne Grunau <j@jannau.net>
+Subject: Re: [PATCH v4 1/5] dt-bindings: net: Add network-class schema for
+ mac-address properties
+Message-ID: <20250320-cocky-proficient-alligator-5da8a2@krzk-bin>
+References: <20250319-dt-bindings-network-class-v4-0-2329336802b4@ixit.cz>
+ <20250319-dt-bindings-network-class-v4-1-2329336802b4@ixit.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250319124508.3979818-1-maxim@isovalent.com> <fadfb5af-afdf-43c3-bc1b-58d5b1eb0d70@nvidia.com>
-In-Reply-To: <fadfb5af-afdf-43c3-bc1b-58d5b1eb0d70@nvidia.com>
-From: Maxim Mikityanskiy <maxtram95@gmail.com>
-Date: Thu, 20 Mar 2025 10:28:37 +0200
-X-Gm-Features: AQ5f1JqEMLJvQx6YqiJna8_tPX19S2ZcuTw5wqFIBMph0mU8OzIiLgTMAXgTy-4
-Message-ID: <CAKErNvrbdaEom1LQZd6W+4M-Vjfg+YRzgEz3F7YWoCXB_U+dug@mail.gmail.com>
-Subject: Re: [PATCH net] net/mlx5e: Fix ethtool -N flow-type ip4 to RSS context
-To: Gal Pressman <gal@nvidia.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Maxim Mikityanskiy <maxim@isovalent.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250319-dt-bindings-network-class-v4-1-2329336802b4@ixit.cz>
 
-On Thu, 20 Mar 2025 at 10:25, Gal Pressman <gal@nvidia.com> wrote:
->
-> Hey Maxim!
->
-> On 19/03/2025 14:45, Maxim Mikityanskiy wrote:
-> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c
-> > index 773624bb2c5d..d68230a7b9f4 100644
-> > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c
-> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c
-> > @@ -884,8 +884,10 @@ static int flow_type_to_traffic_type(u32 flow_type)
-> >       case ESP_V6_FLOW:
-> >               return MLX5_TT_IPV6_IPSEC_ESP;
-> >       case IPV4_FLOW:
-> > +     case IP_USER_FLOW:
->
-> They're the same, but I think IPV4_USER_FLOW is the "modern" define that
-> should be used.
+On Wed, Mar 19, 2025 at 08:42:46AM +0100, David Heidelberg wrote:
+> From: Janne Grunau <j@jannau.net>
+> 
+> The ethernet-controller schema specifies "mac-address" and
+> "local-mac-address" but other network devices such as wireless network
+> adapters use mac addresses as well.
+> The Devicetree Specification, Release v0.3 specifies in section 4.3.1
+> a generic "Network Class Binding" with "address-bits", "mac-address",
+> "local-mac-address" and "max-frame-size". This schema specifies the
+> "address-bits" property and moves the remaining properties over from
+> the ethernet-controller.yaml schema.
+> 
+> The "max-frame-size" property is used to describe the maximal payload
+> size despite its name. Keep the description from ethernet-controller
+> specifying this property as MTU. The contradictory description in the
+> Devicetree Specification is ignored.
+> 
+> Signed-off-by: Janne Grunau <j@jannau.net>
 
-Yeah, I used IP_USER_FLOW for consistency with other places in this
-file. If you prefer that, I can resubmit with IPV4_USER_FLOW.
+Incorrect DCO chain, missing SoB.
 
->
-> >               return MLX5_TT_IPV4;
-> >       case IPV6_FLOW:
-> > +     case IPV6_USER_FLOW:
-> >               return MLX5_TT_IPV6;
-> >       default:
-> >               return -EINVAL;
+...
+
+> +  - Devicetree Specification Mailing List <devicetree-spec@vger.kernel.org>
+> +
+> +properties:
+> +  address-bits:
+> +    description:
+> +      Specifies number of address bits required to address the device described
+
+"Specifies number of address bits required to address the device
+described by this node, e.g. size of the MAC address."
+
+And drop the second sentence.
+
+> +      by this node. This property specifies number of bits in MAC address.
+> +    default: 48
+> +    const: 48
+> +
+
+...
+
+> +  mac-address:
+> +    description:
+> +      Specifies the MAC address that was last used by the boot program. This
+> +      property should be used in cases where the MAC address assigned to the
+> +      device by the boot program is different from the
+> +      local-mac-address property. This property shall be used only if the value
+> +      differs from local-mac-address property value.
+> +    $ref: /schemas/types.yaml#/definitions/uint8-array
+> +    minItems: 6
+> +    maxItems: 6
+> +
+> +  max-frame-size:
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    description:
+> +      Maximum transfer unit (IEEE defined MTU), rather than the
+> +      maximum frame size (there\'s contradiction in the Devicetree
+> +      Specification).
+> +
+> +
+
+Just one blank line
+
+> +additionalProperties: true
+> 
+
+Best regards,
+Krzysztof
+
 
