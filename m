@@ -1,92 +1,145 @@
-Return-Path: <netdev+bounces-176593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DA7EA6AF82
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 22:01:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C172A6AF8B
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 22:05:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CF531898A6E
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 21:00:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C61E3188A7B2
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 21:05:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA1BB227EBE;
-	Thu, 20 Mar 2025 21:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2748A22A4D1;
+	Thu, 20 Mar 2025 21:05:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X1Kkq/cT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f4hQz/hC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A272C2AE6A;
-	Thu, 20 Mar 2025 21:00:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB621BD01D;
+	Thu, 20 Mar 2025 21:05:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742504426; cv=none; b=hiqzdstttIqdB20C06RBIIpKbkIYmNEi3lovPcu7EoebGHyEGDrrdR/Alw5iLlBgkel4DJfi+n0mhbCDL5qR0W1WvbEEIh7aVKIk3sVtAE1LmpWrFm5YQt0609+VwLwQ6es32vpVY2rlsK8EwP24V9UqLcpl9zzhRm8V7HUKRnc=
+	t=1742504744; cv=none; b=B5UzY11c3DFs4O8rpVva3l8p+Z1gVpFYZkQxHJIGl6Ou7HXqmQZBKTs96eQVQfUYu4bl/Yj0iLoKZI0hzno3X94so3IiVUNMfsTuoWYLuEOPvENqocD9Zw57xnJiMyMMWntxAEEbmmcymiuzDMguh1HCHeqfLemcr1SXgr8o234=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742504426; c=relaxed/simple;
-	bh=ofQqhnsJ2xV2kT+e9NMewkJMTOTQ5E52sLjKskYl+Ww=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=VxNAaAFv/2OQ83Gj4WkXuPXjdZehC4jDmgHqoK7zX6hFu8angJ9V2N77yq+tnnZRboadyuff0Mxmbm6wIHwp0rqW5Tqpm9RlNV+OfL4a6sLSrF7O4yS6eHgjAn/xRoxbjkg7BOjg272bqrwIVdo8yBXTz/HT6gtUrgUhR7TCbTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X1Kkq/cT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17A99C4CEDD;
-	Thu, 20 Mar 2025 21:00:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742504426;
-	bh=ofQqhnsJ2xV2kT+e9NMewkJMTOTQ5E52sLjKskYl+Ww=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=X1Kkq/cTj466c8nwHv+J7k+Zw2GbCRiAd0NW599iqYx5nnCehMzApq5hq93VcFABP
-	 W+J35TzIrQAvdlFJomOrtErbkqU28L6HRmEWu1LfnrMWpcMDV87g4YLaJRA5AQ0sOJ
-	 k6Ofk7qnCCcWkIBTrwV9CBsO/NovBOcUtIMRiT6VlyqwdH2w15UdTABLhUReuClSOA
-	 WMs3gAJU1CZdLQ+wA2YUk8QkICR7Sn2/00itTAvsFYtdSVsRod4TKdJWeNilL6kopz
-	 aZKvj5wYa7Sv8vynOOEeY6MWJ6PPKZp9ZJ5LNPuSaWdj5gVo8bpmoJfQnR8W/dCHin
-	 /BuF9qi0nQzEg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E663806654;
-	Thu, 20 Mar 2025 21:01:03 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1742504744; c=relaxed/simple;
+	bh=YgdpRvORfQrJXyGjouHiXsPKxSh1pKbm6IQi0Z4fEqc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HUk2qYyZJ7mlvIrLD99CUFjnA9huYt8WKC+h4M4vj+WhrqOn4quQtLkC7WumW6GcBTHYopPOyIwUd0hJtweSt4BIum1ZJ8K1vr+PxT4OS4HSHwhSnIVxNNQSnLYoUJ3iFdmQJV6lo76RB3O96jBbVetGC88rlGQk6qFADMKgrxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f4hQz/hC; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-223fb0f619dso26686065ad.1;
+        Thu, 20 Mar 2025 14:05:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742504741; x=1743109541; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3jPDdAZsU2RRMMAuFebBCueBYeGg/JKuNefmjD9nyKY=;
+        b=f4hQz/hCoDzmcVqX69VzFkchC9WiShFUEsaTUZoSlXwWS2Cgi7rDvgzKeFY6vkAK1J
+         eSI9eb7+VlQzuxFEZ9KXV4aZj0lo96pMTTzyKr8oysl+B6sa1IwnotwTvki80bGvmKUQ
+         6QsKaqYfMNTJalmlfEqW+d6fwDHynj1VW3Qc+FCpQFr3br79eGkLGvw4WwPx55XFyaUX
+         Y7PrsrF2CVyjmmC1k7UsaORhOy/PXO/V0iYPhwTB4lmGVHKgT/fTJIeRUjDanvygbtS6
+         q5HZLqJPtRuVwzCaEXMM3I0XQ+zHsU0Gsh3WVdiY/xp6O+PFyK6llhfotXSodICrNpCE
+         BGTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742504741; x=1743109541;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3jPDdAZsU2RRMMAuFebBCueBYeGg/JKuNefmjD9nyKY=;
+        b=T9+Se1v/TXMjkDn+dgaokaxf2eY6PRKKWlyo+YWP4TPf8PngOi2QxTJRe9f/Dht22f
+         OMyGluEvRc/IKP9DWQILpZz40pHaCivGtNrdmudXXbx3tfTSG6h2S0jlbKIdZ9WweI1G
+         /YWz7eEvzStj72hKRVvVuBkofyGaOTGHA+2H5/BNWicCMa27Gc8O9dxwmsr4n/K6SMdx
+         43RYYWDdBZ+g3yzWD7laXiTA3PJuUcifU4E4rOgDxhe8aeXUoFbyr9XBbXmqa2zKqr+p
+         ebz5gN9Cy/8HprXBDvcXUs6HFPP+8aZas2Tha7J6juZQvL4A0QCq5ijexqGfDHXe47/T
+         DMJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUg/8t8XZBWS4RRRzPWxUubAL6PbGIIwbsyZQ7wTYYoGpWSQTxtuekFBd1BX4lWCaNzIHOowlyL@vger.kernel.org, AJvYcCVPuGR2HOTnttZz/iSvDg5OhODi9hSmsUGpyy/0dpsmUQrj0RUreVLJ8pJox9s7PtYRe8V62Gu81mjBHAf5@vger.kernel.org, AJvYcCVVdxJSR+YV6ugk70K+6HiL4KgULCfxUBrr62Cl4dvKU4n8H2iRsd6Phs4qMSIdyJgOP9g=@vger.kernel.org, AJvYcCWhRis8wexgLlWAMuKtce7lFZTHM98OZJaUxAhtE3fNPuV7AgCv/by1M8hepHEx8boSvs/Q5zRLPHKJK38r@vger.kernel.org
+X-Gm-Message-State: AOJu0YwL9RdsZjQ3geDm7+7Xap9RjKxF0EVm5VB8/J/YawUZWp33x+Z4
+	2eCKv2MgonsmHQh2IMgHx4rVAs24rhCVOf2B819kUFZmzZVtLsdc
+X-Gm-Gg: ASbGnctKQmgAnIyYMyi/ezzmnuqwML+jB6z7cVNo1/uNJV7UiMeTc5o+x03P7u1Shmo
+	ngu7aFjFchGvF+edZWVPYEDYvVKB3sI8shNcPmJrOPxpgZuvwNM1OpQ4VyHogv2YC28ma8wi8a3
+	z39fkMnFnXSE7nSYIV1KpNqKvDLv0rrfE5kN28ONFiiJ9jEoxho4LPTKBbYJjwOkMIGCnxmIRmR
+	1xk+B5cqH5xDqzBhUpFn6te4jM3iLiIp3yX9Mrd9i2kZ8vUZi45pGqZW19MF7Hsnf4jEvSRV2Zd
+	FiDeXL+FRAKihhGFXboFnd8cktZ0FNHqq9Sq7d1ZaUb/lmfWkeQXJwYPL0JGkcxQCQ==
+X-Google-Smtp-Source: AGHT+IGByHBrbBgXXk1MNKK8PoOJzGBZqACnvtAZVXwzJ5Mt98hUmINKtxNrRQVVmQU2iZkin8qKTA==
+X-Received: by 2002:a17:903:182:b0:223:653e:eb09 with SMTP id d9443c01a7336-22780c50a59mr11694335ad.7.1742504740770;
+        Thu, 20 Mar 2025 14:05:40 -0700 (PDT)
+Received: from devvm6277.cco0.facebook.com ([2a03:2880:2ff:7::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2278120981fsm2458075ad.250.2025.03.20.14.05.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Mar 2025 14:05:40 -0700 (PDT)
+Date: Thu, 20 Mar 2025 14:05:38 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v2 3/3] vhost/vsock: use netns of process that opens the
+ vhost-vsock-netns device
+Message-ID: <Z9yDIl8taTAmG873@devvm6277.cco0.facebook.com>
+References: <20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com>
+ <20250312-vsock-netns-v2-3-84bffa1aa97a@gmail.com>
+ <09c84a94-85f3-4e28-8e7d-bdc227bf99ab@redhat.com>
+ <nwksousz7f4pkzwefvrpbgmmq6bt5kimv4icdkvm7n2nlom6yu@e62c5gdzmamg>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: bpf-next 2025-03-13
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174250446202.1908117.17348935964987648902.git-patchwork-notify@kernel.org>
-Date: Thu, 20 Mar 2025 21:01:02 +0000
-References: <20250313221620.2512684-1-martin.lau@linux.dev>
-In-Reply-To: <20250313221620.2512684-1-martin.lau@linux.dev>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
- pabeni@redhat.com, ast@kernel.org, andrii@kernel.org, daniel@iogearbox.net,
- martin.lau@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <nwksousz7f4pkzwefvrpbgmmq6bt5kimv4icdkvm7n2nlom6yu@e62c5gdzmamg>
 
-Hello:
-
-This pull request was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Thu, 13 Mar 2025 15:16:20 -0700 you wrote:
-> Hi David, hi Jakub, hi Paolo, hi Eric,
+On Thu, Mar 20, 2025 at 10:08:02AM +0100, Stefano Garzarella wrote:
+> On Wed, Mar 19, 2025 at 10:09:44PM +0100, Paolo Abeni wrote:
+> > On 3/12/25 9:59 PM, Bobby Eshleman wrote:
+> > > @@ -753,6 +783,8 @@ static int vhost_vsock_dev_release(struct inode *inode, struct file *file)
+> > >  	virtio_vsock_skb_queue_purge(&vsock->send_pkt_queue);
+> > > 
+> > >  	vhost_dev_cleanup(&vsock->dev);
+> > > +	if (vsock->net)
+> > > +		put_net(vsock->net);
+> > 
+> > put_net() is a deprecated API, you should use put_net_track() instead.
+> > 
+> > >  	kfree(vsock->dev.vqs);
+> > >  	vhost_vsock_free(vsock);
+> > >  	return 0;
+> > 
+> > Also series introducing new features should also include the related
+> > self-tests.
 > 
-> The following pull-request contains BPF updates for your *net-next* tree.
+> Yes, I was thinking about testing as well, but to test this I think we need
+> to run QEMU with Linux in it, is this feasible in self-tests?
 > 
-> We've added 4 non-merge commits during the last 3 day(s) which contain
-> a total of 2 files changed, 35 insertions(+), 12 deletions(-).
+> We should start looking at that, because for now I have my own ansible
+> script that runs tests (tools/testing/vsock/vsock_test) in nested VMs to
+> test both host (vhost-vsock) and guest (virtio-vsock).
 > 
-> [...]
 
-Here is the summary with links:
-  - pull-request: bpf-next 2025-03-13
-    https://git.kernel.org/netdev/net-next/c/6f13bec53a48
+Maybe as a baseline we could follow the model of
+tools/testing/selftests/bpf/vmtest.sh and start by reusing your
+vsock_test parameters from your Ansible script?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+I don't mind writing the patches.
 
-
+Best,
+Bobby
 
