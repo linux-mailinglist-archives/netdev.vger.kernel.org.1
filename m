@@ -1,127 +1,102 @@
-Return-Path: <netdev+bounces-176451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED994A6A668
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 13:46:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B71EA6A67C
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 13:54:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 113EE189CD34
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 12:46:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80A0C484877
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 12:54:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AA4229A5;
-	Thu, 20 Mar 2025 12:46:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C93217BD3;
+	Thu, 20 Mar 2025 12:53:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IjVijfH9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OSEaEywe"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64277282F5
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 12:46:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ED32F9EC;
+	Thu, 20 Mar 2025 12:53:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742474776; cv=none; b=AquS0Oge0Fbc3mrsxtPbHUtvvEAmaBN55dz1CUtddD3+Lvoij5JZCa7fVZhgCEQH676K96vfyCMnPUzMHJaWGnObC6EuQiiNq3lC7xdg/ynuMHJDyZeyU6p7+pR54lINSStjMa+YrnRmy3TZlruo/0aei25eeGf/8p775/Kt6pE=
+	t=1742475236; cv=none; b=qHTBWclWRE1MNvFg/RDy0PIL8MkciDarRYb4yEqj8cuDe1ZZ9MxoPBB+GTTe84/r/wz2mEQda88BAiGqGM9vEqbrxKYes6dG1n+xpo35AYpyJmwfQTtpaiNUHuMKGZH8NJc/zee357a6HhyQWqun2g6V+MBBkAn7WaDjqsl5VJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742474776; c=relaxed/simple;
-	bh=gUTj6pkXYtfCR7RG/DA4rREjr3XxfW+t91BATIMfZd0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CV0j/4pKyfh/2TagDBPNiSuew6KO7U28gDiBIjSBRZIh3swXhiO84I1exzWaS2CUaqO6NJqIXqXbyPERord/i8pkROwgoK/E+3IgXgbIr0sHuGyl0djK7MHoJ+w+AzFBJNgRUQZjup1U08YduTXr82V7uCbi9au5QHKPOU5Lxi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IjVijfH9; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742474762;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=0LwHn7dsELp2UKJ8EPQ1BTRVUwHXdy8XbS/H1ImBUVo=;
-	b=IjVijfH93XImSaPwMQYpAYbbETLE+xUAicRZ5Lk3RZUdPx3V86O31MdlrztSStsNUT56o4
-	2ITFe7XH35YAlEimxDY7s824od2i2z6RIA8UpSttTb2Wreq8dBzC5QRkRsx2yINMNph0zB
-	uMY5zXEnf1D5jyDfSLU+wLiDrtSdERE=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] xfrm: Remove unnecessary strscpy_pad() size arguments
-Date: Thu, 20 Mar 2025 13:44:51 +0100
-Message-ID: <20250320124450.32562-2-thorsten.blum@linux.dev>
+	s=arc-20240116; t=1742475236; c=relaxed/simple;
+	bh=qz7MeaPR8fOUUQcZ6yj6cjFnFISOPaxEsa/PQ0ftEok=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ju0xaMAfrsXT13/3bFmozirK+B3b+ILZfT46/22xMcdXqoV9tm3PSl0smqEPkyvuve98DJeAnDo6kaxGZZCGiwTNcs6i+UhNZyT64qmtIk3KDSlvMXgj3gr3ozeirCeV28M9gl6h7F6zZXT9dG3bL01xgqSwpB5CFIrbP3UuJBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OSEaEywe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADDDBC4CEDD;
+	Thu, 20 Mar 2025 12:53:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742475235;
+	bh=qz7MeaPR8fOUUQcZ6yj6cjFnFISOPaxEsa/PQ0ftEok=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OSEaEyweNzA4Glaku9/kxFiZYPTRlTzqNWNKbcpiVt/T0M7WrzFY/xXDcutG7k5+u
+	 uHHjzBC581oQo4wIvbP1SEszyEzB1856/ZDv9NriIotrP4CF5GrlZ5psV42voERfr4
+	 Ry42mOocCkwIBXO99fp9JpMdoSBFOglm9n4ZYiuyu08kYdyzcSgWv5nYUXfvl9JAim
+	 6/o3gNfm+Nd/BuOtWDP54RdRLSi9n08t5BY+Dq2+Zpj2mxxcRQozAOFtFHLDBKiSdz
+	 2+5DGh2sJPOchXiUFxqv97zueJDS01w781OpmO9C61jXvCcvhi0cXCJ3Krgz7gGHGJ
+	 vgccg7ifdK5XQ==
+Date: Thu, 20 Mar 2025 12:53:49 +0000
+From: Simon Horman <horms@kernel.org>
+To: Meghana Malladi <m-malladi@ti.com>
+Cc: pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+	davem@davemloft.net, andrew+netdev@lunn.ch, bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kory.maincent@bootlin.com,
+	javier.carrasco.cruz@gmail.com, diogo.ivo@siemens.com,
+	jacob.e.keller@intel.com, john.fastabend@gmail.com, hawk@kernel.org,
+	daniel@iogearbox.net, ast@kernel.org, srk@ti.com,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Roger Quadros <rogerq@kernel.org>, danishanwar@ti.com
+Subject: Re: [PATCH net-next 1/3] net: ti: prueth: Fix kernel warning while
+ bringing down network interface
+Message-ID: <20250320125349.GN280585@kernel.org>
+References: <20250317101551.1005706-1-m-malladi@ti.com>
+ <20250317101551.1005706-2-m-malladi@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250317101551.1005706-2-m-malladi@ti.com>
 
-If the destination buffer has a fixed length, strscpy_pad()
-automatically determines its size using sizeof() when the argument is
-omitted. This makes the explicit sizeof() calls unnecessary - remove
-them.
+On Mon, Mar 17, 2025 at 03:45:48PM +0530, Meghana Malladi wrote:
+> During network interface initialization, the NIC driver needs to register
+> its Rx queue with the XDP, to ensure the incoming XDP buffer carries a
+> pointer reference to this info and is stored inside xdp_rxq_info.
+> 
+> While this struct isn't tied to XDP prog, if there are any changes in
+> Rx queue, the NIC driver needs to stop the Rx queue by unregistering
+> with XDP before purging and reallocating memory. Drop page_pool destroy
+> during Rx channel reset and this is already handled by XDP during
+> xdp_rxq_info_unreg (Rx queue unregister), failing to do will cause the
+> following warning:
+> 
+> [  271.494611] ------------[ cut here ]------------
+> [  271.494629] WARNING: CPU: 0 PID: 2453 at /net/core/page_pool.c:1108 0xffff8000808d5f60
 
-No functional changes intended.
+I think it would be nice to include a bit more of the stack trace here.
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- net/xfrm/xfrm_user.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> Fixes: 46eeb90f03e0 ("net: ti: icssg-prueth: Use page_pool API for RX buffer allocation")
+> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
 
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index 08c6d6f0179f..a4d92ea43e3d 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -1161,7 +1161,7 @@ static int copy_to_user_auth(struct xfrm_algo_auth *auth, struct sk_buff *skb)
- 	if (!nla)
- 		return -EMSGSIZE;
- 	algo = nla_data(nla);
--	strscpy_pad(algo->alg_name, auth->alg_name, sizeof(algo->alg_name));
-+	strscpy_pad(algo->alg_name, auth->alg_name);
- 
- 	if (redact_secret && auth->alg_key_len)
- 		memset(algo->alg_key, 0, (auth->alg_key_len + 7) / 8);
-@@ -1174,7 +1174,7 @@ static int copy_to_user_auth(struct xfrm_algo_auth *auth, struct sk_buff *skb)
- 	if (!nla)
- 		return -EMSGSIZE;
- 	ap = nla_data(nla);
--	strscpy_pad(ap->alg_name, auth->alg_name, sizeof(ap->alg_name));
-+	strscpy_pad(ap->alg_name, auth->alg_name);
- 	ap->alg_key_len = auth->alg_key_len;
- 	ap->alg_trunc_len = auth->alg_trunc_len;
- 	if (redact_secret && auth->alg_key_len)
-@@ -1195,7 +1195,7 @@ static int copy_to_user_aead(struct xfrm_algo_aead *aead, struct sk_buff *skb)
- 		return -EMSGSIZE;
- 
- 	ap = nla_data(nla);
--	strscpy_pad(ap->alg_name, aead->alg_name, sizeof(ap->alg_name));
-+	strscpy_pad(ap->alg_name, aead->alg_name);
- 	ap->alg_key_len = aead->alg_key_len;
- 	ap->alg_icv_len = aead->alg_icv_len;
- 
-@@ -1217,7 +1217,7 @@ static int copy_to_user_ealg(struct xfrm_algo *ealg, struct sk_buff *skb)
- 		return -EMSGSIZE;
- 
- 	ap = nla_data(nla);
--	strscpy_pad(ap->alg_name, ealg->alg_name, sizeof(ap->alg_name));
-+	strscpy_pad(ap->alg_name, ealg->alg_name);
- 	ap->alg_key_len = ealg->alg_key_len;
- 
- 	if (redact_secret && ealg->alg_key_len)
-@@ -1238,7 +1238,7 @@ static int copy_to_user_calg(struct xfrm_algo *calg, struct sk_buff *skb)
- 		return -EMSGSIZE;
- 
- 	ap = nla_data(nla);
--	strscpy_pad(ap->alg_name, calg->alg_name, sizeof(ap->alg_name));
-+	strscpy_pad(ap->alg_name, calg->alg_name);
- 	ap->alg_key_len = 0;
- 
- 	return 0;
+It is a shame that we now have more asymmetry regarding
+the allocation of the pool and unwind on error prueth_prepare_rx_chan().
+
+But if I see things correctly the freeing of the pool via
+xdp_rxq_info_unreg() is unconditional. And with that in mind
+I agree the approach taken by this patch makes sense.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+...
 
