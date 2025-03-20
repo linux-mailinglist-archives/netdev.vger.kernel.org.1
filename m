@@ -1,113 +1,181 @@
-Return-Path: <netdev+bounces-176394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBEC4A6A099
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 08:41:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E28BA6A0A9
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 08:44:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37F2F425714
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 07:41:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C340017C83D
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 07:44:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A73B1F869E;
-	Thu, 20 Mar 2025 07:41:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CDAC1E3769;
+	Thu, 20 Mar 2025 07:44:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V1lAK67G"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jl7ON9Ij"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD2B31E3769;
-	Thu, 20 Mar 2025 07:41:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6897C1C3BF1
+	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 07:44:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742456466; cv=none; b=m2MUr1xshysFlle4cpT61ggrDuQ1JaUGyPj/0aGVZhhj+cAuAYM6O5Tr3yFDo6Y+bjzAxFr6cD4H5xxrA6FW45rXsNzZOEgEtAnzLRNN9jwqwiwA+ujiYaAuUgOZM/do6VFdwc95ZzvwaYDXkqEqLN9NtZQO16V/sTQSxZYyw8o=
+	t=1742456650; cv=none; b=KkpfY4R2QoyKWCF+iQRE9CJ0WunmDx8YsmR72Yo2rdQzriyItLK6KWREnAVyOq8sFFzPP+uaNH3CEgIjSKxIijnu0T4ljAJlsI6Z2nWBUDOPH6UJMZ/H2qoWkvZ+jYtC4w0qLpXqCWN5/rbG2eVyc300F/VBIdb3VhYJS4IPYHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742456466; c=relaxed/simple;
-	bh=4sXeiqOIXgRkPqJvfQ595TU3AC9+kIhH7Vxw4P7Zfvk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sX7KNn0wONRtOGkNFn403xLFs2ahdG750TtQX7r0ngQWOUGeT8v0U/F8LrCwkL0jjkQWmCDHahrsfCsHUCKjFOPjFJm5eYyGrbFYuiupWZ5sbo648yz1sQAlXdLXAonJOc8EL4enE1eHBs2dnk4zwmFBWthMeLXYIrUMUBuaVMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V1lAK67G; arc=none smtp.client-ip=209.85.214.176
+	s=arc-20240116; t=1742456650; c=relaxed/simple;
+	bh=MeU5zki0DsbzQ822JYCKt94NM17uJkO5B1I6KwJdr3s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nDTA5DeHLwNf6lo7cOw3zEhW3f5vRhjPYvic+icqd699y2DdaVtsGBKg+qR/07fJP3jSi9H6/T2fOiLCUHh6IC1FCtAZl9OLrnSD9uAQwyM7Xudas0z8vDz1ezMQVE7oA6pEM5NifXucZQ5mh44RZqO74SvkWKQFVNpq4hVhB8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jl7ON9Ij; arc=none smtp.client-ip=209.85.208.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2241053582dso8498275ad.1;
-        Thu, 20 Mar 2025 00:41:04 -0700 (PDT)
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5e033c2f106so683584a12.3
+        for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 00:44:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742456464; x=1743061264; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=S+9rATyUbEgbSLtbUz3EQuHc/4v8uBGhvmxcbw9HTp0=;
-        b=V1lAK67GLhO5Cc0s/AuYQwjUGy6jq3PH463TwhvlHQ4RseSMXzpZXphof5KUGwsLo3
-         ABLBBw1drKrTQZk1OyHNFVjJxPd43DsQ+xPpv55M62MxnSXf51+lqq+jktIOlKCDIHxQ
-         rPgp+3ipSZz44mfEsygM5rc5+knBXWOAhp32ptr/JKFQSKf4vnRCpIyhf6cL8eTPOsmT
-         KLcBxfa7kPDtY1q9RguvEqXxurgDlqL+ycImga7gUdHBN9LwoW7O+CD1nvSkczVhSD6W
-         O3icatngjJ4wqqakF0FzY6oSYKtHW66zbEbx/vEAs7/4UBSe6buYPdozfCBoK+CGRMSP
-         qvxQ==
+        d=gmail.com; s=20230601; t=1742456647; x=1743061447; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ow/3xqwBK5KieARUhFcvXt4TAstS2rn0fmKi8gJYFGc=;
+        b=Jl7ON9Ij0/qu4yfA/TURIkrkULrVWYLeAt+XyhiAw/dp0SWhXAVtrU2KoSaKnlYKcW
+         3aD2rX/0Xi7K9WLFEdWmnbb/d32yg8tjGkXLz4FK3lsYYlLguvmhJD9Qv9uctj2tEDV7
+         RG05ZrIqcBJGkdwtxEytWHOuV/pW4T0ufcsYHQCRMjAuBEccNoXCk8EEwUJDynqVrQLp
+         zqCJVXAPj5cpaXG3g4xGTHc62HcTANDU2QwwldmuQZdj7R1ZTLCgLx4sq35PPhR6lKrX
+         iqr5ZwKh7LChsVMmOI4prXnDsnUJhZSAwTZWHNWHQeixYwaTmf73vuTRmu91I2yRm2kH
+         6ySQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742456464; x=1743061264;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S+9rATyUbEgbSLtbUz3EQuHc/4v8uBGhvmxcbw9HTp0=;
-        b=B4FbfVX8reW64mac7JUsnB3ofCBhvtZLhAMee7eeSrON7QNUawnc1oKWj73oDUMbfD
-         FwOUDzECeGhX6xip5s9nCJBmjF/g4aJMxRvwi1Y8nArrj8/YvjmDj17zxLeWbg5hYm8U
-         A8rJFqedaZT2efDrSpU9Wk9qdkNUGutFPZUXB9VwmxFdS5ws9UySQw6M6/UvSk5udB9x
-         dM8NT/G5VAskue01VKPoVsPklCCSOUkurEbKm322YvUsxRoRBWC2d5rT20FFqZlM70i4
-         FrEEvjj4T/sgBtUG712UGQEvKUfsITbq9exaUjfGeE6bPKzK8jRIQ2tu6wP14nj5mkOW
-         EVjg==
-X-Forwarded-Encrypted: i=1; AJvYcCUVTSaunyd2Ul5aoOVu5Uq1wkgXX37jm0N9wIx13KH04rWmB2VudGTUHhS3W+8Yvo1Dx4T+f4eFIIwZH+U4@vger.kernel.org, AJvYcCVhYsmF4ATnzEWhTRnV/9AhsfZvQ7o2UVT4PoN/MkBO0Wgb+b6llw72NwlUTkcLpIkuxmPTqXkc8P+AblxDSFck@vger.kernel.org, AJvYcCVqV8Tk6ap6L/xJ19Ba0+p6+gxYHojBh/65CapSRxq/sQ4xBsODoOa4/CGTWXKyp3Gu26A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXTDvEo3b1yQL6DxvlX3EP8FDqAzeI4buQn/DXXBi4aFuYNEjk
-	37iqmxO8y94Prt+YnQz8HDxpV/5HavnBqvMp4yLsDhXMDtypOOiR
-X-Gm-Gg: ASbGncvNMyFuvN7f+NR6SpyqQOr0ipd9ox5SUtBLPjm3uWkyr9jdqeRYcYh4qpIuY/v
-	Kogs7RacltjovyMa0pDyZz/ZIR00i8V89EBY4x4r8ylMCq9VCqo7phXNRzmel8FCyj5st+ptOqP
-	RqgNl8yxqn1k8xZuhe6nFf4ARXCYqHj6DlV8t6wvlkQwp4iMYQyp0bWU85wwrwUfyVqUkezI4RH
-	dDhKPoSW24pflBTHtiJEI6996m4SCJGvYquuGAy6Irors9JjcIzA8Z4iNKVcZRsnwyj1aE4x/Wa
-	yPpJObM0UD7irPZ7rwMik8wzR82K2dzQlY9x/rEPsh4/KI5oQ0waHAYiiaHxeeErIw==
-X-Google-Smtp-Source: AGHT+IFEvvOq/4NLQ23MHF6FNa/FiH21cHYco1EVNW+1BRuvD/pJTZLz+96cxRxci0zjnwX0L+gRcQ==
-X-Received: by 2002:a05:6a21:3a4a:b0:1f3:47d6:aa05 with SMTP id adf61e73a8af0-1fbe87272d0mr11208399637.0.1742456463841;
-        Thu, 20 Mar 2025 00:41:03 -0700 (PDT)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af56e9fe51asm12244697a12.36.2025.03.20.00.40.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Mar 2025 00:41:03 -0700 (PDT)
-Date: Thu, 20 Mar 2025 07:40:56 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Simon Horman <horms@kernel.org>, Phil Sutter <phil@nwl.cc>,
-	Florian Westphal <fw@strlen.de>, Petr Mladek <pmladek@suse.com>,
-	Yoann Congal <yoann.congal@smile.fr>, wireguard@lists.zx2c4.com,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCHv4 RESEND net-next 0/2] selftests: wireguards: use
- nftables for testing
-Message-ID: <Z9vGiL1KkO5x8I-j@fedora>
-References: <20250106081043.2073169-1-liuhangbin@gmail.com>
- <Z9lJ6PXHeL7tfhUf@fedora>
- <Z9rso2MXYBFGnJYl@zx2c4.com>
+        d=1e100.net; s=20230601; t=1742456647; x=1743061447;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ow/3xqwBK5KieARUhFcvXt4TAstS2rn0fmKi8gJYFGc=;
+        b=AyJdE1aHMnfi9t5qKr5J2rqewaLL7su5AyNj57MTgM5JUA2mp7iA/P2LlC/8AOhm0l
+         bc5LxeU5gGlssG9lFMZi9zf051yGFZT+AuNCAGIQHUz0y3Xytd95PTwv12C8RIdVc8mn
+         fozPYsHcvsWP9XZI6bTRPuTEumRtNI+guPLGZLTBBrwwOfzeHahaY0G45dPZNuyJVY2I
+         mz7+Vvp+u9617QHVwryNYr3TW7BlBS114Lq4kpIaXhwM4KCk9owCnmADiwEdnaqHtQe1
+         N/Su+XudhzSTuwnk8xJZ/iNIIU2v25NUH1zZtljBHjp12GQISmK0ilOfvVL7eQ6g6zRD
+         ItCA==
+X-Forwarded-Encrypted: i=1; AJvYcCU7en3l4L9nL3i17WfK13apNUR02xyQpKlZoZ2UgrOo8nKOdS3yzja3X1v9w/6LwmYDiIdZBV4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YygvGhOvAzbCT1JwZh5ZpkvDYCIXjGmZsORykqQdXH/ZcJfwMEY
+	kExPmM/GRjdsRC52FGputfMAykd5ZjNrJ42ILvG9zL37dA8tSeIgc6dHD8MsnuwH7oMpbeKmUr9
+	xKGduGbbID6+RCex9N41t8cd33VgMNsEJauphkw==
+X-Gm-Gg: ASbGncvTmlBM/mmTTQMhuCzTKMoY/Qk/T3S+jaJTc0ulZ0AdgNSgVo3EdH0HUT1iTOC
+	ji28EX9n+M0wmbDNH2VTKyXtBd01bquQLnVthie0zKlMykKUvY8JfCawSXejbcED11rfvqGOPev
+	8SfaZuIYDd/EljV3L8txmcHZW6rj/jBAcWCUXxLA+yIQ+GCE2TPO+gOebITw==
+X-Google-Smtp-Source: AGHT+IFv68Nd9py9Eo6ObQJB3NRfD+4jc1LmrEovpBjqLsUI1YpHv/1Le/bwpRNU36/D/GWLCi/LV7XmNiYJ3y3BHEs=
+X-Received: by 2002:a05:6402:13d3:b0:5e0:8c55:50d with SMTP id
+ 4fb4d7f45d1cf-5eb80d29dc8mr5591443a12.14.1742456646354; Thu, 20 Mar 2025
+ 00:44:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z9rso2MXYBFGnJYl@zx2c4.com>
+References: <20250319124508.3979818-1-maxim@isovalent.com> <0fa82602-3b4c-46a7-bdfc-e8a9535e74c1@gmail.com>
+In-Reply-To: <0fa82602-3b4c-46a7-bdfc-e8a9535e74c1@gmail.com>
+From: Maxim Mikityanskiy <maxtram95@gmail.com>
+Date: Thu, 20 Mar 2025 09:43:39 +0200
+X-Gm-Features: AQ5f1JptQOxFyaHBL_6whC1SLRV81O3E-muzaaTZA6TvBU9tdbJmm6wpfjbfMu4
+Message-ID: <CAKErNvrfirDasvmDDbGDu=301tOE43RaTW9jVjBL8=pngPH6YQ@mail.gmail.com>
+Subject: Re: [PATCH net] net/mlx5e: Fix ethtool -N flow-type ip4 to RSS context
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, Maxim Mikityanskiy <maxim@isovalent.com>, 
+	Tariq Toukan <tariqt@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Mar 19, 2025 at 05:11:15PM +0100, Jason A. Donenfeld wrote:
-> On Tue, Mar 18, 2025 at 10:24:40AM +0000, Hangbin Liu wrote:
-> > I saw the patch status[1] is still "Awaiting Upstream".
-> > Is there anything I need to do?
-> 
-> I'm looking at it now, but the subject line of your series says,
-> "selftests: wireguards: " which is really not the same as all the other
-> patches that touch these files.
+On Thu, 20 Mar 2025 at 09:32, Tariq Toukan <ttoukan.linux@gmail.com> wrote:
+>
+>
+>
+> On 19/03/2025 14:45, Maxim Mikityanskiy wrote:
+> > There commands can be used to add an RSS context and steer some traffic
+> > into it:
+> >
+> >      # ethtool -X eth0 context new
+> >      New RSS context is 1
+> >      # ethtool -N eth0 flow-type ip4 dst-ip 1.1.1.1 context 1
+> >      Added rule with ID 1023
+> >
+> > However, the second command fails with EINVAL on mlx5e:
+> >
+> >      # ethtool -N eth0 flow-type ip4 dst-ip 1.1.1.1 context 1
+> >      rmgr: Cannot insert RX class rule: Invalid argument
+> >      Cannot insert classification rule
+> >
+> > It happens when flow_get_tirn calls flow_type_to_traffic_type with
+> > flow_type = IP_USER_FLOW or IPV6_USER_FLOW. That function only handles
+> > IPV4_FLOW and IPV6_FLOW cases, but unlike all other cases which are
+> > common for hash and spec, IPv4 and IPv6 defines different contants for
+> > hash and for spec:
+> >
+> >      #define  TCP_V4_FLOW     0x01    /* hash or spec (tcp_ip4_spec) */
+> >      #define  UDP_V4_FLOW     0x02    /* hash or spec (udp_ip4_spec) */
+> >      ...
+> >      #define  IPV4_USER_FLOW  0x0d    /* spec only (usr_ip4_spec) */
+> >      #define  IP_USER_FLOW    IPV4_USER_FLOW
+> >      #define  IPV6_USER_FLOW  0x0e    /* spec only (usr_ip6_spec; nfc only) */
+> >      #define  IPV4_FLOW       0x10    /* hash only */
+> >      #define  IPV6_FLOW       0x11    /* hash only */
+> >
+> > Extend the switch in flow_type_to_traffic_type to support both, which
+> > fixes the failing ethtool -N command with flow-type ip4 or ip6.
+> >
+>
+> Hi Maxim,
+> Thanks for your patch!
+>
+> > Fixes: 248d3b4c9a39 ("net/mlx5e: Support flow classification into RSS contexts")
+>
+> Seems that the issue originates in commit 756c41603a18 ("net/mlx5e:
+> ethtool, Support user configuration for RX hash fields"),
 
-Oh, I will fix the name in next patch.
+Not really; commit 756c41603a18 configures the hash (not flow
+direction), and IPV4_FLOW/IPV6_FLOW are already correct constants for
+IP-based hashes. Moreover, we don't support them anyway, see
+mlx5e_set_rss_hash_opt:
 
-Hangbin
+    /*  RSS does not support anything other than hashing to queues
+     *  on src IP, dest IP, TCP/UDP src port and TCP/UDP dest
+     *  port.
+     */
+    if (flow_type != TCP_V4_FLOW &&
+        flow_type != TCP_V6_FLOW &&
+        flow_type != UDP_V4_FLOW &&
+        flow_type != UDP_V6_FLOW)
+        return -EOPNOTSUPP;
+
+> when directly
+> classifying into an RQ, before the multi RSS context support.
+
+Direct classification into an RQ actually works before my fix, because
+it goes to another branch in flow_get_tirn, that doesn't call
+flow_type_to_traffic_type. It's only steering to an RSS context that
+was broken for flow-type ip4/ip6.
+
+> > Signed-off-by: Maxim Mikityanskiy <maxim@isovalent.com>
+> > ---
+> >   drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c | 2 ++
+> >   1 file changed, 2 insertions(+)
+> >
+> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c
+> > index 773624bb2c5d..d68230a7b9f4 100644
+> > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c
+> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c
+> > @@ -884,8 +884,10 @@ static int flow_type_to_traffic_type(u32 flow_type)
+> >       case ESP_V6_FLOW:
+> >               return MLX5_TT_IPV6_IPSEC_ESP;
+> >       case IPV4_FLOW:
+> > +     case IP_USER_FLOW:
+> >               return MLX5_TT_IPV4;
+> >       case IPV6_FLOW:
+> > +     case IPV6_USER_FLOW:
+> >               return MLX5_TT_IPV6;
+> >       default:
+> >               return -EINVAL;
+>
 
