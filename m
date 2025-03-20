@@ -1,103 +1,166 @@
-Return-Path: <netdev+bounces-176391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BE45A6A03D
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 08:13:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AD6AA6A078
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 08:32:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17FD946442D
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 07:13:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 175F33AE8ED
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 07:32:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E1F21EC00D;
-	Thu, 20 Mar 2025 07:13:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 040BA1EBA03;
+	Thu, 20 Mar 2025 07:32:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2gwzWLa9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NfWPdF2I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F090E1EE01A
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 07:13:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 407A51E231D
+	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 07:32:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742454786; cv=none; b=Nd87yCYCetGjqF5boJ+KbweqUw9tLeMxeFStK/8Ec+HgvI37Wu0pg2AmprCkA+XmrAHLtiUnEoUuyPBVubc2mQkcHkBSyiiCeYJJnszLGYfFjHuTEQxUM6lYVj02bZsWZ5TCVg0wMe44KCc5PAACHFZaLUE/AIWS98G6DqN6Gw8=
+	t=1742455953; cv=none; b=GlJxmZYVl64rG4eS64eeRk+QFD0XRrfYgEki6ziy6h6x8OvcYPLgDDdwpeHJOc1i3xulkc18kbfSCgmetrr7zyK5hVXaEVq0rJBTZoOFLnPQhpqpw7OS43CI/WTu5a+RGmsMVXcKLtiWY/KmiEsJur1kO4RjtPPGs8bC+O7YHUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742454786; c=relaxed/simple;
-	bh=GxEvHcu3T8Ssa8QJ1BUwPIlWomAxJwa3czX8v0IqZi0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jZZjmiPOKZQfCiHKOByKKtXyFNV7eBpqxdAJxs7x2i5YtcjtJr/oCjmaTtY5aNifw8YRAn9w5ZFHNfRxpEO2kn5xHbTTwbDBSMREz/G2L5fvgtrAkwpgY8n8aQ5F3UhdcQh0nVeGjcOLE+j/lIIlACeTcmnKD+W7tEbSwfI9Yzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2gwzWLa9; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7c597760323so44424585a.3
-        for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 00:13:04 -0700 (PDT)
+	s=arc-20240116; t=1742455953; c=relaxed/simple;
+	bh=VaUCyFjoBbXD5p47bnIKiSYiWY4qk7r1NZVAZDTS35Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Hk4+GpgJpi8mIYQDqYRvrraMca82K5uNAewIFvVd/KReTzO16nI/G30XYMBPLJVIje+hzYPuOMRGdpwjno43t6D2sYIkxTlxrTK88itdXSwPiD/cLs6XKBqzVqDJtwVVEMilWuf5iV70yKsnRMRa2XWoOK4riToOhy5vRwa0FcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NfWPdF2I; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-390f5f48eafso182603f8f.0
+        for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 00:32:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742454784; x=1743059584; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GxEvHcu3T8Ssa8QJ1BUwPIlWomAxJwa3czX8v0IqZi0=;
-        b=2gwzWLa91N0wBU6KoKW7N+S4snp0uP1kTm0EUJcqtdkeQcDgbMW8wEpV73/Jajqt2w
-         hgOxC2UsxFLSNpBnQxjFeze7CqIfzRLMtCeKd9+OnSqcJeyyNzVg35KKEFVdh6ulm36b
-         TIWGzJW4e77a3m4eywzCylN37/Gf82bcqVvK7Dxm2EpyxDhuS90pAJUypfaJQ5tuiSMa
-         J/ONq2fzf5jCvSFgnoCZFzc5VTTiybyUl52euvWQ9pbVbHM2PaCzHHemwkG22FxsZzBr
-         WsJ4AAZT0rgI4x+SYzyUfhzeXlReeUhjyg2lGzlN4KY28q/AJM6zobqbDaViRAQH6p4Q
-         ENLg==
+        d=gmail.com; s=20230601; t=1742455950; x=1743060750; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QPyhiARCFu253Fa1rlUSfBlVmPJhFTKavSMh2Tb9NyU=;
+        b=NfWPdF2In+aeLxi5EO2XnCcMWqnKIRwyxrrHpadprQyjd6Z6WGy+gdKcZOL23mrRkY
+         QaEbQOlhaInT2dq90sLmEIoTwpcG8hQvs6AQNuo3N55X0JPXKtrSLokDJZ2rn5djsABR
+         3/4L4+tc90J187jVIZDfAHO3g3R2crKI546+EpFUsfMrizBaa8ozQObcziuSLDdiJTEu
+         bWZ9mUOUBzmF/LnmaeYlyk4Q7zSGvlrURqxVY2VoeQkJwUXF9nGT4atY9drNgsDXKYd7
+         5Y5tSpfLScK2+8oux/pLZqlmpH3KRKwadHYqEagsZuwVU+dUKcCHxKQBhco5YMkY3kMg
+         PCsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742454784; x=1743059584;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GxEvHcu3T8Ssa8QJ1BUwPIlWomAxJwa3czX8v0IqZi0=;
-        b=ikMAffDpBdk9WC3/En/p9CGr81sf7zrgEwi3b4BYE69uNOTRaDwe/gxJz5tCp87LtW
-         1MbJ5ro12WAMrUALe4IZxCZjw2Lu3pw02fMAbu0akryVTgXWGPsrc4wr2v67aFyhQP7g
-         zsCXNNyB3xBV4WDPbZApVPZVqBSt+YaOj4XlrF5liALsav/s50GStZgkdB4cSbusVakL
-         EDzUteHqZ4dQOl5W9AhmslRlTHNJzhYPqWC0VdpGo7idYAikQC4KuziqkE2cvifesHWK
-         XdmzeEkM2CcFm2vJIHlBQlpv9RNZge0BazDWwv0D8KF16NP900OHugK0dMDQfG95JQU4
-         pSwA==
-X-Forwarded-Encrypted: i=1; AJvYcCUQPQ7FVDNlligF4BJ6jn/80lFwQ+uO6QRZz7znbeEb/jo8++Mz9AStlt9DA6POSXqabaA0kBQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/jSlebQCdW6UbZ+C5G4Yj0nWL/OsqNi7MeQn9QkZV0HPKMjsD
-	0KI5+fKHOxug0Z+lHJzD/FPpt3j8I38puGcctUz9K2NTlcGqqvnaTpB5FswCu3Mr7w1MZrU3guk
-	i9FZn2bTMX974lHwOo3m/Nqh2Ak7R8lf+WgoY
-X-Gm-Gg: ASbGncukIDXQpOoCKtjm+Y4XHSoCL2TslEgADzpiF2vd0y2bWJvCXoEF6Kf36N9ymuk
-	ugdGIPrU5+fnjzgkCKexBaDDdfTU5CxLEmTzUjGbLL4AfT5F7JCgqzr71h6tclEiJa8ABLoS82e
-	uY7zZ+9/jIIdEDOPwPk6FFl31U61pIwkqYAa8=
-X-Google-Smtp-Source: AGHT+IGYW7EjSo6DPSpXEPx0qQOhqoO15O54Cw9+WTlfnOQO6h9pmIzz8HpMNGfuOQzI0GCoCL0VfzB2b32hSDjqAmc=
-X-Received: by 2002:a05:620a:3915:b0:7c5:4be5:b0b9 with SMTP id
- af79cd13be357-7c5a83d100bmr730637685a.28.1742454783611; Thu, 20 Mar 2025
- 00:13:03 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1742455950; x=1743060750;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QPyhiARCFu253Fa1rlUSfBlVmPJhFTKavSMh2Tb9NyU=;
+        b=n0MTxte/3zeOoc+eFiDwvBVwcrUdvryUg3/E42M2qPjZgly49xyzMAa/6XDu0u7XjA
+         D9qpobLkw7BsB0QizrjMGZzQXsNyZW3VEs53qrbj4s0732OEEcOfDzVJSnveH+/61wL7
+         zYW4faUt/zPpzBI21417DK43Qc6CPyX9COB7Aq0RXebXevyrvNJ3ewCjhlJWe/g7lFyw
+         u+ViwJ2RBdI/468+/URRUaATyepislhLRp8Qn75cpkEVfbaDPev5x3zecrIJgaarH52L
+         aIweFSHyLTa/2HwcEYqStGBcgQttl3x0dPntds/UxCcTKELPVh2Sa5h4zk4Zo6CJR7l+
+         /Juw==
+X-Forwarded-Encrypted: i=1; AJvYcCUsZk4mrWObdJEwFE/yO4MOon0sjZ7XT4rnMZdBVMxrVhaj97m1viqQXJPOAXihCEEnTVSVvsI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5wqmAgVre6x012UhYFwWKsKqRiiN/yh5lIjKahCPS1U8QX2N0
+	w0uLDTQ9HHnqooEx4ydbP7BnQWvLh8vZfIOckRNZS477wWJI/8we
+X-Gm-Gg: ASbGncuTMh+hVEJEN8+rYOnJffC6xzl3wHVEL0K3VJOhN71Rwxsm/jM8CSQblIhLegN
+	8SzarXwb/Q0e8aomZSBUwYUjEmMh9FaPi3HKSvVn3xI3HN+5Q2UyhqsE4H0H3XnKoY+56++p2O/
+	RcGVfoEuRCI/OaRcsaD3XV4ZWr0+7oqoSbt2qLbhk1FkXpplQZqAOFWorqC7j9YIVWP5qlMZnfo
+	F7sPWgnLxgufdl0wgybNGhIo+0d8lLy9SuSZ99ysG8BHS1OpnOYOfToS97pnRc9mD0NzBepdm4W
+	L8pA8vKCmF9wx7fNSlinjc9JEwfvScgIMlIpbbF9h0li5Vvu6gKgQLGS15IHY1huLQ==
+X-Google-Smtp-Source: AGHT+IF+4zRnQp0FH6NSLzDNIoIwp/BaZuO2NR5FPpGqw9aarCVpCUBC/NIP0oWcAWBYhqmoF6QXrg==
+X-Received: by 2002:a05:6000:186b:b0:38f:28a1:501e with SMTP id ffacd0b85a97d-399739bc288mr4776790f8f.8.1742455949983;
+        Thu, 20 Mar 2025 00:32:29 -0700 (PDT)
+Received: from [172.27.33.126] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395cb318aa1sm23578718f8f.64.2025.03.20.00.32.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Mar 2025 00:32:29 -0700 (PDT)
+Message-ID: <0fa82602-3b4c-46a7-bdfc-e8a9535e74c1@gmail.com>
+Date: Thu, 20 Mar 2025 09:32:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250319230743.65267-1-kuniyu@amazon.com> <20250319230743.65267-8-kuniyu@amazon.com>
-In-Reply-To: <20250319230743.65267-8-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 20 Mar 2025 08:12:52 +0100
-X-Gm-Features: AQ5f1Jp1uvkLDXxmpo9Z3LAL4UP_DOqT_1FjICyGN0f1b68UymJX_UEeUqXYPUs
-Message-ID: <CANn89i+ERKCKkkA_=-t_MekgUUmzXyEMe9hmss=Q9RgAMxit+g@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 7/7] nexthop: Convert RTM_DELNEXTHOP to
- per-netns RTNL.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: David Ahern <dsahern@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/mlx5e: Fix ethtool -N flow-type ip4 to RSS
+ context
+To: Maxim Mikityanskiy <maxtram95@gmail.com>,
+ Saeed Mahameed <saeedm@nvidia.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, Maxim Mikityanskiy <maxim@isovalent.com>,
+ Tariq Toukan <tariqt@nvidia.com>
+References: <20250319124508.3979818-1-maxim@isovalent.com>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20250319124508.3979818-1-maxim@isovalent.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 20, 2025 at 12:11=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.c=
-om> wrote:
->
-> In rtm_del_nexthop(), only nexthop_find_by_id() and remove_nexthop()
-> require RTNL as they touch net->nexthop.rb_root.
->
-> Let's move RTNL down as rtnl_net_lock() before nexthop_find_by_id().
->
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+
+On 19/03/2025 14:45, Maxim Mikityanskiy wrote:
+> There commands can be used to add an RSS context and steer some traffic
+> into it:
+> 
+>      # ethtool -X eth0 context new
+>      New RSS context is 1
+>      # ethtool -N eth0 flow-type ip4 dst-ip 1.1.1.1 context 1
+>      Added rule with ID 1023
+> 
+> However, the second command fails with EINVAL on mlx5e:
+> 
+>      # ethtool -N eth0 flow-type ip4 dst-ip 1.1.1.1 context 1
+>      rmgr: Cannot insert RX class rule: Invalid argument
+>      Cannot insert classification rule
+> 
+> It happens when flow_get_tirn calls flow_type_to_traffic_type with
+> flow_type = IP_USER_FLOW or IPV6_USER_FLOW. That function only handles
+> IPV4_FLOW and IPV6_FLOW cases, but unlike all other cases which are
+> common for hash and spec, IPv4 and IPv6 defines different contants for
+> hash and for spec:
+> 
+>      #define	TCP_V4_FLOW	0x01	/* hash or spec (tcp_ip4_spec) */
+>      #define	UDP_V4_FLOW	0x02	/* hash or spec (udp_ip4_spec) */
+>      ...
+>      #define	IPV4_USER_FLOW	0x0d	/* spec only (usr_ip4_spec) */
+>      #define	IP_USER_FLOW	IPV4_USER_FLOW
+>      #define	IPV6_USER_FLOW	0x0e	/* spec only (usr_ip6_spec; nfc only) */
+>      #define	IPV4_FLOW	0x10	/* hash only */
+>      #define	IPV6_FLOW	0x11	/* hash only */
+> 
+> Extend the switch in flow_type_to_traffic_type to support both, which
+> fixes the failing ethtool -N command with flow-type ip4 or ip6.
+> 
+
+Hi Maxim,
+Thanks for your patch!
+
+> Fixes: 248d3b4c9a39 ("net/mlx5e: Support flow classification into RSS contexts")
+
+Seems that the issue originates in commit 756c41603a18 ("net/mlx5e: 
+ethtool, Support user configuration for RX hash fields"), when directly 
+classifying into an RQ, before the multi RSS context support.
+
+> Signed-off-by: Maxim Mikityanskiy <maxim@isovalent.com>
+> ---
+>   drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c
+> index 773624bb2c5d..d68230a7b9f4 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c
+> @@ -884,8 +884,10 @@ static int flow_type_to_traffic_type(u32 flow_type)
+>   	case ESP_V6_FLOW:
+>   		return MLX5_TT_IPV6_IPSEC_ESP;
+>   	case IPV4_FLOW:
+> +	case IP_USER_FLOW:
+>   		return MLX5_TT_IPV4;
+>   	case IPV6_FLOW:
+> +	case IPV6_USER_FLOW:
+>   		return MLX5_TT_IPV6;
+>   	default:
+>   		return -EINVAL;
+
 
