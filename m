@@ -1,148 +1,169 @@
-Return-Path: <netdev+bounces-176432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EAACA6A40C
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 11:48:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16E5FA6A48E
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 12:13:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 100B33BCD81
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 10:47:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8479A481A7F
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 11:13:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CF842147F2;
-	Thu, 20 Mar 2025 10:47:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="JstFlWui"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1697E21CA0E;
+	Thu, 20 Mar 2025 11:13:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B9FB2144BB
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 10:47:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07F1821C9EE;
+	Thu, 20 Mar 2025 11:13:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742467670; cv=none; b=shTXjXh4dO7CpBB74YN/bE3Q/fFZh3p+L2+vkcFu/PF9aeE8xb2/PZka5Y5QlePkNIMRLjAmr6zbEIrlMtFJhfzywAb1yfmSoabqDHn1bK/ZvOZciXi6yGFniTONnFjsbjDa8a0SzgWAWFRg2REwslO8L0kc4M1Vj9L9on5CCU0=
+	t=1742469189; cv=none; b=JdvFRPh6SUI0to1jHm0gTZGmzRurl/0qK+C88YTCFyRe6K420UO/fccz2NSuSb7Bimb2pXrCPvQlfaXD6HqIpa+XkE0bain+2BkQgP3HsEWLRiAOGPlUV5b261tmNCqaKhQ88EdgHzG3oHlHQAYl6T0KNlKoF8ywXREdLXL7VTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742467670; c=relaxed/simple;
-	bh=GGj0jOGN22ztBZhaMn/7v+LbyaRgZVijRKfdioC35oo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Qr/GsyzVMssxSbgnVkpGi81+tr7dqe5EXNQk7eBSuk/eBFsbsKyNRdz/BfxGUgF41EuxlHZdN7XWLBJI23EZcdKBrw01mLwvCAsGuIlA38FVNlPHB5B1oT5If3EFppG2FXUitbW3G43CGF6t9gyzfvbKHHcZs4UqJg5fkuuVg+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=JstFlWui; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-ab78e6edb99so103749666b.2
-        for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 03:47:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1742467666; x=1743072466; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zHBxNIjHPQ2U+7TMy5Fzaa3ioPAl2tBzm/GfSmCJAVQ=;
-        b=JstFlWuiVe2vqamZl1Eod+3+7SrZ5tEtvUXICbq9U3fIvioop0fNsxr8Iv7f+w+l/A
-         jzpVFBRtoOmIVTLysM3E08Y8lHBmL60un+U5RIxK2A/9anwbsROe/V7csO6ulXL8FPA1
-         +48K95JsqF9yhDeCTgnAzvbYDnKine93PxQOmoTYczAOJReT0sVmv8XbZWczMHyYY/7r
-         hbuHi3IZsq36UL96PQFhZ/ZFbzHlohx1qSMg0Zl0ONFtLlqviGQEMLDJT86KSGD6tnqR
-         3rcjYsNgcSUra864TzX6vfinjb0trNM8y99kq8HSTVeEajxHD527bs7Xp2MXXTJ/OgkY
-         NYjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742467666; x=1743072466;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zHBxNIjHPQ2U+7TMy5Fzaa3ioPAl2tBzm/GfSmCJAVQ=;
-        b=lpIqZOfzHVSl2xVWUAfkhvAvtxF3bq/4thXpICmTx/N5cUJLd6mTvZxJ2iSRQtDEZf
-         2wMKpt0gn/eLi/Qf6Yu8E/CwqYsOhDB0PaD6UCFzMTuSWylN+XQ+mMsh4ojOr0iM21/p
-         O/vIuPop9PVd2+QJxrHgq3xWtizd6elVqadpZg7yUmv+sHzhWSUX70SV6/TxdQNVnSC4
-         PEVf6F3lg6wypaRhbXg5PApwdAIWeE4WwjrHBVB5JnOMLaRkk3VdQNLbcTWXg9bYenru
-         RbhZY+6/PdslFq3EzT8QqZEq9D5SCjQ6fzES1g9wMUgiury+TfgjYac7gG7AAx0Hjcv3
-         37Xg==
-X-Forwarded-Encrypted: i=1; AJvYcCXM1P5ntQAxluTYKA7SqfWQ8rXI4lko7ERAiQz5ugO0gH/NFug/xx3MyT0rX7YYQNr0b2FYuXs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGvlQXKB7j52ZffsZ9XDh8R58CDgF1Aywapyyhedoe/JMYrUiW
-	tqS5PcTjgpAzajoy1gDMcfPlGm7PByHrfF8aq0Wz+eBAfrvClN/C8HUSr8zwwKpsAQZK0k8s1k+
-	R
-X-Gm-Gg: ASbGncv90fBY037OkxxvtQ6pLRpXKSCURXZYbt2D1MfgheH9KIb+jfCZQZxhlllwX40
-	4pU7a71DOj8YMvQ4/mAmgKFV7S2MTlYoDA8D8st1wK+Wy9YTxbiG+A99ATFRZEiRvy5HbhamHdL
-	of9qdFVgx3HJ22avwVla+rKZF+wbSJeh3FNLlhUbD2yy2RUEsaq/KKlYD44mYDtkxNIXCJ2wrUI
-	vjMu6vEGHQzmZR/6PMMFKGjZSKMhiFMN+vfleKYeO0oNOARMaqNm1kGPx1YxWMysAY6OwYX/7cp
-	KdyQkOMFqcEH5kxYb9y5s0302rMEG9WvW3HbnhrqyOsB6JMvK4bz99SO0nyEXzuNjsF/WQf0s1M
-	=
-X-Google-Smtp-Source: AGHT+IF5fyldpIKMBMPMoVyMOWjlkG0DwrJGbCQsMu9+8kEjtcBAnNh58BISDr7wLImUlFOOv39CeA==
-X-Received: by 2002:a17:907:1c11:b0:abf:69e6:438b with SMTP id a640c23a62f3a-ac3cdf76c77mr277715566b.9.1742467665838;
-        Thu, 20 Mar 2025 03:47:45 -0700 (PDT)
-Received: from wkz-x13 (h-79-136-22-50.NA.cust.bahnhof.se. [79.136.22.50])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3147ec3bcsm1161029066b.62.2025.03.20.03.47.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Mar 2025 03:47:45 -0700 (PDT)
-From: Tobias Waldekranz <tobias@waldekranz.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, kuba@kernel.org, marcin.s.wojtas@gmail.com,
- linux@armlinux.org.uk, andrew@lunn.ch, edumazet@google.com,
- pabeni@redhat.com, ezequiel.garcia@free-electrons.com,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: mvpp2: Prevent parser TCAM memory corruption
-In-Reply-To: <20250320105747.6f271fff@fedora.home>
-References: <20250320092315.1936114-1-tobias@waldekranz.com>
- <20250320105747.6f271fff@fedora.home>
-Date: Thu, 20 Mar 2025 11:47:43 +0100
-Message-ID: <87zfhg9dww.fsf@waldekranz.com>
+	s=arc-20240116; t=1742469189; c=relaxed/simple;
+	bh=VmlerhMtRQKB8S8Gb3WmVadG8dq5nBAyHNvyZcexTUE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Ik33ZcBsSJ+9I6Y5P1IbpvLmE2nyM3S/czFQl8EiNg0wFR90hUJfLQnjeFEBDbb8h8FK/exkFvM819Trmj6eOvyfPQKy8/qOVFXjXWWjehF21HwSPikqml8lfAgyRbHPof5aNaKcelYDlzEojrFi8gpn0VSbLaU/+kjpmZU+2KY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4ZJN9T4wPVz1f1Km;
+	Thu, 20 Mar 2025 19:08:29 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 15F82140135;
+	Thu, 20 Mar 2025 19:13:02 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 20 Mar 2025 19:13:01 +0800
+Message-ID: <e798b650-dd61-4176-a7d6-b04c2e9ddd80@huawei.com>
+Date: Thu, 20 Mar 2025 19:13:01 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 00/13] Ultra Ethernet driver introduction
+To: Jason Gunthorpe <jgg@nvidia.com>, Nikolay Aleksandrov
+	<nikolay@enfabrica.net>
+CC: <netdev@vger.kernel.org>, <shrijeet@enfabrica.net>,
+	<alex.badea@keysight.com>, <eric.davis@broadcom.com>, <rip.sohan@amd.com>,
+	<dsahern@kernel.org>, <bmt@zurich.ibm.com>, <roland@enfabrica.net>,
+	<winston.liu@keysight.com>, <dan.mihailescu@keysight.com>,
+	<kheib@redhat.com>, <parth.v.parikh@keysight.com>, <davem@redhat.com>,
+	<ian.ziemba@hpe.com>, <andrew.tauferner@cornelisnetworks.com>,
+	<welch@hpe.com>, <rakhahari.bhunia@keysight.com>,
+	<kingshuk.mandal@keysight.com>, <linux-rdma@vger.kernel.org>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, huchunzhi <huchunzhi@huawei.com>,
+	<jerry.lilijun@huawei.com>, <zhangkun09@huawei.com>,
+	<wang.chihyung@huawei.com>
+References: <20250306230203.1550314-1-nikolay@enfabrica.net>
+ <20250319164802.GA116657@nvidia.com>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <20250319164802.GA116657@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On tor, mar 20, 2025 at 10:57, Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
-> Hi Tobias,
->
-> On Thu, 20 Mar 2025 10:17:00 +0100
-> Tobias Waldekranz <tobias@waldekranz.com> wrote:
->
->> Protect the parser TCAM/SRAM memory, and the cached (shadow) SRAM
->> information, from concurrent modifications.
->> 
->> Both the TCAM and SRAM tables are indirectly accessed by configuring
->> an index register that selects the row to read or write to. This means
->> that operations must be atomic in order to, e.g., avoid spreading
->> writes across multiple rows. Since the shadow SRAM array is used to
->> find free rows in the hardware table, it must also be protected in
->> order to avoid TOCTOU errors where multiple cores allocate the same
->> row.
->> 
->> This issue was detected in a situation where `mvpp2_set_rx_mode()` ran
->> concurrently on two CPUs. In this particular case the
->> MVPP2_PE_MAC_UC_PROMISCUOUS entry was corrupted, causing the
->> classifier unit to drop all incoming unicast - indicated by the
->> `rx_classifier_drops` counter.
->> 
->> Fixes: 3f518509dedc ("ethernet: Add new driver for Marvell Armada 375 network unit")
->> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
->> ---
->
-> [...]
->
->> +int mvpp2_prs_init_from_hw(struct mvpp2 *priv, struct mvpp2_prs_entry *pe,
->> +			   int tid)
->> +{
->> +	unsigned long flags;
->> +	int err;
->> +
->> +	spin_lock_irqsave(&priv->prs_spinlock, flags);
->> +	err = mvpp2_prs_init_from_hw_unlocked(priv, pe, tid);
->> +	spin_unlock_irqrestore(&priv->prs_spinlock, flags);
->
-> That's indeed an issue, I'm wondering however if you really need to
-> irqsave/irqrestore everytime you protect the accesses to the Parser.
->
-> From what I remember we don't touch the Parser in the interrupt path,
-> it's mostly a consequence to netdev ops being called (promisc, vlan
-> add/kill, mc/uc filtering and a lot in the init path).
+On 2025/3/20 0:48, Jason Gunthorpe wrote:
+> On Fri, Mar 07, 2025 at 01:01:50AM +0200, Nikolay Aleksandrov wrote:
+>> Hi all,
+>> This patch-set introduces minimal Ultra Ethernet driver infrastructure and
+>> the lowest Ultra Ethernet sublayer - the Packet Delivery Sublayer (PDS),
+>> which underpins the entire communication model of the Ultra Ethernet
+>> Transport[1] (UET). Ultra Ethernet is a new RDMA transport designed for
+>> efficient AI and HPC communication.
+> 
+> I was away while this discussion happened so I've gone through and
+> read the threads, looked at the patches and I don't think I've changed
+> my view since I talked to Enfabrica privately on this topic almost a
+> year ago.
+> 
+> I do not agree with creating a new subsystem (or whatever you are
+> calling drivers/ultraeth) for a single RDMA protocol and see nothing
+> new here to change my mind. I would likely NAK the direction I see in
+> this RFC, as I have other past attempts to build RDMA HW interfaces
+> outside of the RDMA subystem.
+> 
+> Since none of that past discussion seems to have been acknowledged or
+> rebutted in this series I will repeat the main points:
+> 
+> 1) I'm aware of something like 5-7 new protocols that are competing
+>    for the same market as Ultra Ethernet. We can't give everyone and
+>    their dog a new subsystem (or whatever) and all the maintainability
+>    negatives that come with that. As a matter of maintainability we
+>    need to see consolidation here, not fragmentation!
+> 
+>    Yes, UE is a consortium driven standard, which is unique and a big
+>    positive, but I don't believe anyone can say for certain what
+>    direction the industry is going to go in. Many consortium standards
+>    have failed to get adoption in the past even with a large number of
+>    member companies.
+> 
+>    Nor can we know what concepts in UE are going to be copied into
+>    other competing RDMA transports. See my other remarks on job key
+>    for an example. Prematurely siloing stuff in drivers/ultraeth is
+>    very much the wrong technical direction for maintainability.
+> 
+>    That said, I think UE should be in the kernel and have a fair
+>    chance to compete for market share. Just in a maintainable and
+>    appropriate way while the industry evolves.
+> 
+> 2) Due to the above, I'm pretty confident we will see RDMA NICs
+>    supporting a lot of different protocols. In fact they already do.
+> 
+>    From a kernel maintainability perspective we really want one RDMA
+>    driver leveraging as much common infrastructure between the
+>    protocols as possible. We do not want to see a single HW driver
+>    further split up needlessly to other subsystems, that would be a
+>    big maintainability downside.
+> 
+>    To put a clear point on this, mlx5 has been gaining new protocols
+>    and fitting into the existing driver model for a number of years
+>    now. In fact there is speculation that UE could be implemented in
+>    mlx5 RDMA with minimal kernel changes. There would be no reason to
+>    try to mess up the driver to also interact with this stuff in
+>    drivers/ultraeth as seems to be proposed here.
+> 
+>    I think other HW will be similar. UE isn't so radically different
+>    that every HW path will need to diverge from classical RDMA. Nor is
+>    is so dissimilar to other competing proposals. We don't want
+>    artificial differences we want to create things that can be re-used
+>    when appropriate.
+> 
+>    Leon's response to Bart is correct, we already have similar
+>    examples of almost everything UE does. Bart is also correct that
+>    verbs would be a PITA, but RDMA userspace has moved beyond verbs
+>    limitations years ago now. Alot of mlx5 stuff is not using verbs
+>    today, for instance. EFA and other examples use extensive stuff
+>    beyond verbs.
 
-Good point!  Indeed, I can not find any access to the parser in IRQ
-context.
+Regarding to reuse the existing rdma subsystem for a new protocol:
+Currently EFA seems to be layering a RDM layer on top of the SRD
+transport layer, see [1], and RDM layer is implemented by software in
+the libfabric while SRD seems to be implemented by hardware, which
+provides 'Scalable Reliable Datagram' service through the QP type
+of EFA_QP_DRIVER_TYPE_SRD.
 
-We still need to disable bottom halves though, right?  Because otherwise
-we could reach mvpp2_set_rx_mode() from net-rx by processing an IGMP/MLD
-frame, for example.
+I am not sure if layers like SRD and RDM are clean layering from
+protocol design perspective.
+But if the hardware implement both SRD and RDM layer in hardware,
+then there might be two types of object need managing, SRD object
+might be shared between different applications, and RDM object
+need to be created based on a SRD object.
 
+As the existing rdma subsystem doesn't seems to support the above
+use case yet and as we are discussing a possible new subsystem or
+updating existing subsystem to support new protocol here, it would
+be good to discuss if it is possible to support the above case or
+another new subsystem is needed for that use case too.
+
+1. https://github.com/ofiwg/libfabric/blob/main/prov/efa/docs/efa_rdm_protocol_v4.md
 
