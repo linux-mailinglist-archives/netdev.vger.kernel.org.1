@@ -1,101 +1,131 @@
-Return-Path: <netdev+bounces-176572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D560EA6AE2E
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 20:10:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F4B1A6AE2D
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 20:10:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EB434A35C1
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 19:05:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5C6B985AE2
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 19:05:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7424227E99;
-	Thu, 20 Mar 2025 19:04:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1902227E9B;
+	Thu, 20 Mar 2025 19:05:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ToEbkYPY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jGY7EJDh"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B590D221573
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 19:04:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4951B227BB9;
+	Thu, 20 Mar 2025 19:04:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742497477; cv=none; b=JSA/yNOKlKOcfz7i5asBzXgpEgZpApBaCK1OoIMFbr2Py04GSE8DlhD7Q31w4wTk/aq/wQbFZWM2E0x7XU78UfONp1ArVP/OtiDVVeww5DDciQTgR5zU7bd/oPvTWsawvQb26aXyCTStmPuHr2VEg2OZBMXpWuHpXQsJbn0HApY=
+	t=1742497501; cv=none; b=Egiyd+NKnoN4/B+siqsGBLdhWp4VVDFU3Zouq4yMdwGW3CER2EqqPcM77fsRMwRNGQeHOFlpGR4Dr91cFOxw37qODf8uULscSPoceTTY+lppC69ZmxP5SF0iWJJryvmLxT5rpf2GKx13VEVb2qWlHwGzIGoYAEu6iA0oqljdd/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742497477; c=relaxed/simple;
-	bh=iG16bjxs7d6TyghUHZRRP9yXNf8yiCyLFEmfzoLFtSs=;
+	s=arc-20240116; t=1742497501; c=relaxed/simple;
+	bh=CVbbd+cYujo/HQFTA+yCNZUnKEdWS7yOFoI9/resuns=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m3LqZ3rmZ9ZTYasFLadopeaD4Q4ISaXqA4qb4fKovE+oK+Vtn4V9jR7ZgICHKHdtHcgp5k88hX17HqAnmeWj/+rcDUQb5bQxCBX+Kkf4zA71QC7IEwjqWtYgu3e+8M3pfuRVGJQssDxSmN/PVwYlw7Z5b83/NXnAx/9anKf1WEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ToEbkYPY; arc=none smtp.client-ip=103.168.172.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-07.internal (phl-compute-07.phl.internal [10.202.2.47])
-	by mailfout.phl.internal (Postfix) with ESMTP id 9523E138368E;
-	Thu, 20 Mar 2025 15:04:33 -0400 (EDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=S3w7Qkz7vaNbyEinhCzXA/74chXk7a6+FlFQRI8jGVHbJRjRcgUEw8AAPDSb+JYmfabPMCxnDLE3qMm3YeAJx5OZ/4IZQfSBfv4mHqQB8fp1+jz0jz3P0PlryIonOQs7Uds7CPYhUpGAe9eiGzzKUd12urJBkfxcWMxsXP2aIYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jGY7EJDh; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6e41e17645dso10830796d6.2;
+        Thu, 20 Mar 2025 12:04:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742497499; x=1743102299; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=W6236jTl6DuIp7A1JdgVx90Xr9cNxSpV50bUQ02Q8PM=;
+        b=jGY7EJDh6Sw5fplFYgCi+NvAkSu0pL7QyvGCVE3SLKtQqlvpTYoA2UN5fvs0NmaJYa
+         nbJk54Sqn3h1lg1/vHga0gSlazbVaBW88ThUzMV8KPAahxWqMxz26YSC1NDMhMPFi6TD
+         UfMi8pfYd8t4WkxFFqkNil8gWsnAhy5Iao81Rsa1HcZaxvprhzy7k3J8yBt358ntiX09
+         wBmmGl7yOXyY9UNW1JO4tHcSHdYXfPb1At4Fgmr3Eoon+Z0YHjStZFs65sfR21+M86pA
+         VVEYctZfuL49oiBhiEnlp/lvYEsf+JFkSeQRfa7gvRvwEaS53G5oTRzs0PnBHlqdCb3s
+         2oqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742497499; x=1743102299;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=W6236jTl6DuIp7A1JdgVx90Xr9cNxSpV50bUQ02Q8PM=;
+        b=nVNHov/Kpwh6WHnerDIpLnxlMZLccm4hY8yioIOLYZq8XrxTq0zvMFom8ieB0nAzvW
+         OakgLIwTDPsBM/M50s/oosZkoSFpdpnHI4+y2kuTD/0sNQj91r4tdZiSfcRqr41gkTBW
+         5A+AfH2v3//rlHOsfTUIVgiOgAmbdFbr7bEml9unaEk3yTwSvHzFuyD4/k/OhNMquv5k
+         NOP/W8PNDx1lslm1VIiWIF4v7UwedI3Zw4bEt2Ti7hDakVVl2H260K0Qb9SN6KqU4dMD
+         X7M7FEiHI/rrZ2sPhiizWR0x7mKAXRKOBKw1zvibZX294RT45fq7+nFXUD7S2r3VUVkf
+         Xn0w==
+X-Forwarded-Encrypted: i=1; AJvYcCWvZBTb5g4Xpn/Vj7m9hDlHn4OxAr7ZXQyDKIudvn9uF+BZsG4Jfr6P3/0m0DZkaf9fSQTp6/KP24nCKeke1DY=@vger.kernel.org, AJvYcCXwktwPpOnvmKnTCjhnJojUZ/RL64vfwo+CHzA0PtlC2oNBFPeZoKhEJnvf9VhtkrEO2QtVS5A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZp7151FlOYSQ7Y6afxDH1kdKUQ/HlHmbqUaCzYrhwp9cEiD0Z
+	TEbi+ZKyQ9f4jOayGHv5yhOrLzPHxW0fooAvUECPywHBUY3GJ1C2
+X-Gm-Gg: ASbGncvpCgvO1skc5GNekCZIF/lDZmenh4q03idFc+vqIy03Hg79stXB/N+M8VrSCOY
+	yJGWzDSXid7WABJsL9/a5v/aF2kDjEPozyGgglfAN+JSnGgCBvqVLIRVuTp7yoLyY15yAJRRCIl
+	ZsTtnwV/b1yhtOfxQo8+KdnuY7QUBG7oINTSREI4vhR/G17EtIKFGJu2Qk0tKQb1Qz4HBESq6Qo
+	JTorq7rsgRqwZJb3DVlzEmuLu/WwEAB8lrwNHeYt4cA1O6pIJw+K5cbayMaCISQHCotOds32cRW
+	AX7+/MeO072rKWz3AOfjA1EFp39HEowjLlDSh5m6x8Ime0zmp7B9tXNmpBmZlngwpUTjr1SFfPJ
+	OdBoxGpPWkKgoZrzvBeeD6jLQ0SNA8S3oBC8=
+X-Google-Smtp-Source: AGHT+IG4hDMaXvGrwZrlWKwMWBhVv38rTo7D7ZJoPKycn9E2N9eBslynixjxVjpdJwjV2gah2WLLLg==
+X-Received: by 2002:a05:6214:258f:b0:6e6:6a6e:7596 with SMTP id 6a1803df08f44-6eb3f34eda5mr5594226d6.39.1742497498824;
+        Thu, 20 Mar 2025 12:04:58 -0700 (PDT)
+Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6eb3f0005a1sm1600756d6.121.2025.03.20.12.04.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Mar 2025 12:04:58 -0700 (PDT)
+Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 93F251200068;
+	Thu, 20 Mar 2025 15:04:57 -0400 (EDT)
 Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-07.internal (MEProxy); Thu, 20 Mar 2025 15:04:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1742497473; x=1742583873; bh=599oiV4CJAxx6GrSflMdnR1WZw8fqN1xMgu
-	PBDmiax0=; b=ToEbkYPYYI20ERBS8rRV4zIjp3ytGJarp1FtmN6vi/aIU9J3tMA
-	ZdbhKrFwjtMOeQUNRG2b0U8MvNr1iL/K2CLKvpBOw2wmlrQIUQ9MCeaRh41poqK/
-	/FsNcGbnjK8BleJJzBAv+6I46WcYwTMb5i7iEAw6uL0aqgijfrFLclLBhZdpvrH8
-	V5puAkK/cv1ntzWXfONfvBoRRQ5gfcz8uh2MS+0uiBJoNeaaZtsk3KpfPAL0a26h
-	+Pp3qUz4yXLaBB3kZ8j/2z9nNGqZk8WEy6MpoKmZ4vKU76tDk30DTiQxo4GegpDb
-	034MJ1tMWNt1pDd/JuRLVssQsOqmtpxKfXg==
-X-ME-Sender: <xms:wGbcZ3jauPxFMtiOjAnOar5Amh7oYii2SCLF0CzqyyhBdC9Pf5kq2w>
-    <xme:wGbcZ0Dxkm04iLxEk0h0R6q4214ti0NyYWb_sN6Kguo92toc6XuK6iO_kEiOAQrGj
-    7NXiXEen0iMYV0>
-X-ME-Received: <xmr:wGbcZ3GQsIqrpWEmmpXT_X3qLi5Uuu8AVcfxrdJcSLXTO3ZMo9UGvKHE3GBDYGcb19rw3HElmhDQ_IKbLkfF89SxadB5aA>
+  by phl-compute-11.internal (MEProxy); Thu, 20 Mar 2025 15:04:57 -0400
+X-ME-Sender: <xms:2WbcZ0ZXOC43MKEYfKHh6xaI7C7xr_CuFQpX9BUzYd3-zBWdthT31g>
+    <xme:2WbcZ_Yo5LwwJnJJO6ZnAdvrFPrUiMvAbtIP1LuX3a7QtmIBxV8W1OVuTXsN5a91Z
+    VbM8r1CEORW8uyVyA>
+X-ME-Received: <xmr:2WbcZ-_MGngpsMCQ4eExE7gJ3MNBYqduxoKQrC3iLuCIMUooYq7wkg69zh8>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddugeeltddtucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
     pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
     gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
-    vdenucfhrhhomhepkfguohcuufgthhhimhhmvghluceoihguohhstghhsehiughoshgthh
-    drohhrgheqnecuggftrfgrthhtvghrnhepieehffeivddtheejjeffkefftdeiheeujeev
-    gfetieeugeekleelfefgleetudeinecuffhomhgrihhnpehlihhnuhigrdguvghvnecuve
-    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepihguohhstghh
-    sehiughoshgthhdrohhrghdpnhgspghrtghpthhtohepuddupdhmohguvgepshhmthhpoh
-    huthdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehg
-    nhgruhhlthesrhgvughhrghtrdgtohhmpdhrtghpthhtohepshhtfhhomhhitghhvghvse
-    hgmhgrihhlrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgv
-    thdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsg
-    gvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhg
-    lhgvrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorh
-    hgpdhrtghpthhtohepughsrghhvghrnheskhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:wGbcZ0RyAhpimooa-dzzUtX6Wl-HxZCA1ZsBtIt-Z4FRvoPTrXWOGA>
-    <xmx:wGbcZ0yDp9CE3Pl5KyxEIZC8nYRuaQ7ha0B-lSc1Ldd7rzT4X27PNw>
-    <xmx:wGbcZ67LP8q3L-FVtspJi3eQwK_9Vd60S5vlUMWDM1DGp0BTcF8mIQ>
-    <xmx:wGbcZ5yeLYndZQgI9KV6E1DdQR-F0MqdymlItiVUAwY_g0uvY_6aHw>
-    <xmx:wWbcZ5qAZdhyCPLbBZv9raCZAn7mXq3mFYQo5lb9TUts1f2VqEW7PKQZ>
-Feedback-ID: i494840e7:Fastmail
+    vdenucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrih
+    hlrdgtohhmqeenucggtffrrghtthgvrhhnpeehudfgudffffetuedtvdehueevledvhfel
+    leeivedtgeeuhfegueevieduffeivdenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
+    grmhepmhgrihhlfhhrohhmpegsohhquhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgr
+    lhhithihqdeiledvgeehtdeigedqudejjeekheehhedvqdgsohhquhhnrdhfvghngheppe
+    hgmhgrihhlrdgtohhmsehfihigmhgvrdhnrghmvgdpnhgspghrtghpthhtohepfeefpdhm
+    ohguvgepshhmthhpohhuthdprhgtphhtthhopehfuhhjihhtrgdrthhomhhonhhorhhise
+    hgmhgrihhlrdgtohhmpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdr
+    khgvrhhnvghlrdhorhhgpdhrtghpthhtoheprhhushhtqdhfohhrqdhlihhnuhigsehvgh
+    gvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgv
+    rhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpth
+    htohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepthhmghhr
+    ohhsshesuhhmihgthhdrvgguuhdprhgtphhtthhopehojhgvuggrsehkvghrnhgvlhdroh
+    hrghdprhgtphhtthhopegrlhgvgidrghgrhihnohhrsehgmhgrihhlrdgtohhm
+X-ME-Proxy: <xmx:2WbcZ-pnv6pYGsXx5ihY_wDmEJ752y-25l9eK0CXZo2O_jXauBJqnw>
+    <xmx:2WbcZ_o-1543d9PaUSfUbT1c-VX-udKPclBpubA5xRwF0cCTuHTOYA>
+    <xmx:2WbcZ8QImV8nCPlxX-4MzszRX_nEXC5xirF-VomC5x0l6WIyrOdR_Q>
+    <xmx:2WbcZ_pkVrGyWODqYW3bsoc3gkkZFnmyVCQo_xGaARLoRHhMRQAEUA>
+    <xmx:2WbcZ05nqgub6RWDluvSHPh2pOZqytAXWRCS6003FVJdCm3Fk2D-EYzM>
+Feedback-ID: iad51458e:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 20 Mar 2025 15:04:31 -0400 (EDT)
-Date: Thu, 20 Mar 2025 21:04:29 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Simon Horman <horms@kernel.org>, gnault@redhat.com
-Cc: Stanislav Fomichev <stfomichev@gmail.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	David Ahern <dsahern@kernel.org>,
-	Antonio Quartulli <antonio@mandelbit.com>,
-	Petr Machata <petrm@nvidia.com>
-Subject: Re: [PATCH net v4 1/2] gre: Fix IPv6 link-local address generation.
-Message-ID: <Z9xmvRX_g_ZifayA@shredder>
-References: <cover.1741375285.git.gnault@redhat.com>
- <559c32ce5c9976b269e6337ac9abb6a96abe5096.1741375285.git.gnault@redhat.com>
- <Z9RIyKZDNoka53EO@mini-arch>
- <Z9SB87QzBbod1t7R@debian>
- <Z9SPDT9_M_nH9JiM@mini-arch>
- <Z9bNYPX165yxdoId@shredder>
- <Z9iP1anwinOHhjjm@debian>
- <20250320162646.GC892515@horms.kernel.org>
+ 20 Mar 2025 15:04:56 -0400 (EDT)
+Date: Thu, 20 Mar 2025 12:04:30 -0700
+From: Boqun Feng <boqun.feng@gmail.com>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
+	netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
+	gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+	a.hindborg@samsung.com, aliceryhl@google.com,
+	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de,
+	arnd@arndb.de, jstultz@google.com, sboyd@kernel.org,
+	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
+	vschneid@redhat.com, tgunders@redhat.com, me@kloenk.dev,
+	david.laight.linux@gmail.com
+Subject: Re: [PATCH v11 0/8] rust: Add IO polling
+Message-ID: <Z9xmvjIZgkYUAU1a@boqun-archlinux>
+References: <20250220070611.214262-1-fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,193 +134,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250320162646.GC892515@horms.kernel.org>
+In-Reply-To: <20250220070611.214262-1-fujita.tomonori@gmail.com>
 
-On Thu, Mar 20, 2025 at 04:26:46PM +0000, Simon Horman wrote:
-> On Mon, Mar 17, 2025 at 10:10:45PM +0100, Guillaume Nault wrote:
-> > On Sun, Mar 16, 2025 at 03:08:48PM +0200, Ido Schimmel wrote:
-> > > On Fri, Mar 14, 2025 at 01:18:21PM -0700, Stanislav Fomichev wrote:
-> > > > On 03/14, Guillaume Nault wrote:
-> > > > > On Fri, Mar 14, 2025 at 08:18:32AM -0700, Stanislav Fomichev wrote:
-> > > > > > 
-> > > > > > Could you please double check net/forwarding/ip6gre_custom_multipath_hash.sh ?
-> > > > > > It seems like it started falling after this series has been pulled:
-> > > > > > https://netdev-3.bots.linux.dev/vmksft-forwarding-dbg/results/31301/2-ip6gre-custom-multipath-hash-sh/stdout
-> > > > > 
-> > > > > Hum, net/forwarding/ip6gre_custom_multipath_hash.sh works for me on the
-> > > > > current net tree (I'm at commit 4003c9e78778). I have only one failure,
-> > > > > but it already happened before 183185a18ff9 ("gre: Fix IPv6 link-local
-> > > > > address generation.") was applied.
-> > > > 
-> > > > On my side I see the following (ignore ping6 FAILs):
-> > > > 
-> > > > bfc6c67ec2d6 - (net-next/main, net-next/HEAD) net/smc: use the correct ndev to find pnetid by pnetid table (7 hours ago) <Guangguan Wang>
-> > > > 
-> > > > TAP version 13
-> > > > 1..1
-> > > > # timeout set to 0
-> > > > # selftests: net/forwarding: ip6gre_custom_multipath_hash.sh
-> > > > [    9.275735][  T167] ip (167) used greatest stack depth: 23536 bytes left
-> > > > [   13.769300][  T255] gre: GRE over IPv4 demultiplexor driver
-> > > > [   13.838185][  T255] ip6_gre: GRE over IPv6 tunneling driver
-> > > > [   13.951780][   T12] ip6_tunnel: g1 xmit: Local address not yet configured!
-> > > > [   14.038101][   T12] ip6_tunnel: g1 xmit: Local address not yet configured!
-> > > > [   15.148469][  T281] 8021q: 802.1Q VLAN Support v1.8
-> > > > [   17.559477][  T321] GACT probability NOT on
-> > > > [   18.551876][   T12] ip6_tunnel: g2 xmit: Local address not yet configured!
-> > > > [   18.633656][   T12] ip6_tunnel: g2 xmit: Local address not yet configured!
-> > > > # TEST: ping                                                          [ OK ]
-> > > > # TEST: ping6                                                         [FAIL]
-> > > > # INFO: Running IPv4 overlay custom multipath hash tests
-> > > > # TEST: Multipath hash field: Inner source IP (balanced)              [FAIL]
-> > > > #       Expected traffic to be balanced, but it is not
-> > > > # INFO: Packets sent on path1 / path2: 1 / 12602
-> > > > # TEST: Multipath hash field: Inner source IP (unbalanced)            [ OK ]
-> > > > # INFO: Packets sent on path1 / path2: 0 / 12601
-> > > > # TEST: Multipath hash field: Inner destination IP (balanced)         [FAIL]
-> > > > #       Expected traffic to be balanced, but it is not
-> > > > # INFO: Packets sent on path1 / path2: 1 / 12600
-> > > > # TEST: Multipath hash field: Inner destination IP (unbalanced)       [ OK ]
-> > > > # INFO: Packets sent on path1 / path2: 0 / 12600
-> > > > ...
-> > > > 
-> > > > 8ecea691e844 - (HEAD -> upstream/net-next/main) Revert "gre: Fix IPv6 link-local address generation." (2 minutes ago) <Stanislav Fomichev>
-> > > > 
-> > > > TAP version 13
-> > > > 1..1
-> > > > # timeout set to 0
-> > > > # selftests: net/forwarding: ip6gre_custom_multipath_hash.sh
-> > > > [   13.863060][  T252] gre: GRE over IPv4 demultiplexor driver
-> > > > [   13.911551][  T252] ip6_gre: GRE over IPv6 tunneling driver
-> > > > [   15.226124][  T277] 8021q: 802.1Q VLAN Support v1.8
-> > > > [   17.629460][  T317] GACT probability NOT on
-> > > > [   17.645781][  T315] tc (315) used greatest stack depth: 23040 bytes left
-> > > > # TEST: ping                                                          [ OK ]
-> > > > # TEST: ping6                                                         [FAIL]
-> > > > # INFO: Running IPv4 overlay custom multipath hash tests
-> > > > # TEST: Multipath hash field: Inner source IP (balanced)              [ OK ]
-> > > > # INFO: Packets sent on path1 / path2: 5552 / 7052
-> > > > # TEST: Multipath hash field: Inner source IP (unbalanced)            [ OK ]
-> > > > # INFO: Packets sent on path1 / path2: 12600 / 2
-> > > > [   36.278056][    C2] clocksource: Long readout interval, skipping watchdog check: cs_nsec: 1078005296 wd_nsec: 1078004682
-> > > > # TEST: Multipath hash field: Inner destination IP (balanced)         [ OK ]
-> > > > # INFO: Packets sent on path1 / path2: 6650 / 5950
-> > > > # TEST: Multipath hash field: Inner destination IP (unbalanced)       [ OK ]
-> > > > # INFO: Packets sent on path1 / path2: 0 / 12600
-> > > > ...
-> > > > 
-> > > > And I also see the failures on 4003c9e78778. Not sure why we see
-> > > > different results. And the NIPAs fails as well:
-> > > > 
-> > > > https://netdev-3.bots.linux.dev/vmksft-forwarding-dbg/results/32922/1-ip6gre-custom-multipath-hash-sh/stdout
-> > > 
-> > > I can reproduce this locally and I'm getting the exact same result as
-> > > the CI. All the balanced tests fail because the traffic is forwarded via
-> > > a single nexthop. No failures after reverting 183185a18ff9.
-> > > 
-> > > I'm still not sure what happens, but for some reason a neighbour is not
-> > > created on one of the nexthop devices which causes rt6_check_neigh() to
-> > > skip over this path (returning RT6_NUD_FAIL_DO_RR). Enabling
-> > > CONFIG_IPV6_ROUTER_PREF fixes the issue because then RT6_NUD_SUCCEED is
-> > > returned.
-> > > 
-> > > I can continue looking into this on Tuesday (mostly AFK tomorrow).
-> > 
-> > I finally managed to reproduce the problem using vng. Still no problem
-> > on my regular VM, no matter if I enable CONFIG_IPV6_ROUTER_PREF or not.
-> > I'll continue investigating this problem...
+On Thu, Feb 20, 2025 at 04:06:02PM +0900, FUJITA Tomonori wrote:
+> Add a helper function to poll periodically until a condition is met or
+> a timeout is reached. By using the function, the 8th patch fixes
+> QT2025 PHY driver to sleep until the hardware becomes ready.
 > 
-> FWIIW, I have tried much, but am unable to _reliably_ reproduce this problem.
+> The first patch is for sched/core, which adds
+> __might_sleep_precision(), rust friendly version of __might_sleep(),
+> which takes a pointer to a string with the length instead of a
+> null-terminated string. Rust's core::panic::Location::file(), which
+> gives the file name of a caller, doesn't provide a null-terminated
+> string. __might_sleep_precision() uses a precision specifier in the
+> printk format, which specifies the length of a string; a string
+> doesn't need to be a null-terminated.
+> 
+> The remaining patches are for the Rust portion and updates to the
+> MAINTAINERS file.
+> 
+> This introduces two new types, Instant and Delta, which represent a
+> specific point in time and a span of time, respectively.
+> 
 
-Sorry for the delay. Busy with other tasks at the moment, but I found
-some time to look into this. I believe I understand the issue and have a
-fix. Guillaume's patch is fine. It simply exposed a bug elsewhere.
+I propose we should make forward-progress by merging patch #2 to #6 in
+mainline first. These are relatively trivial and only affect Rust side,
+and the whole patchest does show that they have potential users.
 
-The test is failing because all the packets are forwarded via a single
-path instead of being load balanced between both paths.
-fib6_select_path() chooses the path according to the hash-threshold
-algorithm. If the function is called with the last nexthop in a
-multipath route, it will always choose this nexthop because the
-calculated hash will always be smaller than the upper bound of this
-nexthop.
+Thomas, John, Stephen, Anna-Maria and Frederic, does this sound good to
+you? If so, could any of you provide Acked-by/Reviewed-by and suggest
+how should we route these patches? Thanks a lot!
 
-Fix is to find the first nexthop (sibling route) and choose the first
-matching nexthop according to hash-threshold. Given Guillaume and you
-can reproduce the issue, can you please test the fix [1]?
+Regards,
+Boqun
 
-I think Guillaume's patch exposed the issue because it caused the ip6gre
-device to transmit a packet (Router Solicitation as part of the DAD
-process for the IPv6 link-local address) as soon as the device is
-brought up. With debug kernels this might happen while forwarding is
-still disabled as the test enables forwarding at the end of the setup.
+> Unlike the old rust branch, This adds a wrapper for fsleep() instead
+> of msleep(). fsleep() automatically chooses the best sleep method
+> based on a duration.
 
-When forwarding is disabled the nexthop's neighbour state is taken into
-account when choosing a route in rt6_select() and round-robin will be
-performed between the two sibling routes. It is possible to end up in a
-situation where rt6_select() always returns the second sibling route
-which fib6_select_path() will then always select due to its upper bound.
-
-[1]
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index fb2e99a56529..afcd66b73a92 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -412,11 +412,35 @@ static bool rt6_check_expired(const struct rt6_info *rt)
- 	return false;
- }
- 
-+static struct fib6_info *
-+rt6_multipath_first_sibling_rcu(const struct fib6_info *rt)
-+{
-+	struct fib6_info *iter;
-+	struct fib6_node *fn;
-+
-+	fn = rcu_dereference(rt->fib6_node);
-+	if (!fn)
-+		goto out;
-+	iter = rcu_dereference(fn->leaf);
-+	if (!iter)
-+		goto out;
-+
-+	while (iter) {
-+		if (iter->fib6_metric == rt->fib6_metric &&
-+		    rt6_qualify_for_ecmp(iter))
-+			return iter;
-+		iter = rcu_dereference(iter->fib6_next);
-+	}
-+
-+out:
-+	return NULL;
-+}
-+
- void fib6_select_path(const struct net *net, struct fib6_result *res,
- 		      struct flowi6 *fl6, int oif, bool have_oif_match,
- 		      const struct sk_buff *skb, int strict)
- {
--	struct fib6_info *match = res->f6i;
-+	struct fib6_info *first, *match = res->f6i;
- 	struct fib6_info *sibling;
- 
- 	if (!match->nh && (!match->fib6_nsiblings || have_oif_match))
-@@ -440,10 +464,18 @@ void fib6_select_path(const struct net *net, struct fib6_result *res,
- 		return;
- 	}
- 
--	if (fl6->mp_hash <= atomic_read(&match->fib6_nh->fib_nh_upper_bound))
-+	first = rt6_multipath_first_sibling_rcu(match);
-+	if (!first)
- 		goto out;
- 
--	list_for_each_entry_rcu(sibling, &match->fib6_siblings,
-+	if (fl6->mp_hash <= atomic_read(&first->fib6_nh->fib_nh_upper_bound) &&
-+	    rt6_score_route(first->fib6_nh, first->fib6_flags, oif,
-+			    strict) >= 0) {
-+		match = first;
-+		goto out;
-+	}
-+
-+	list_for_each_entry_rcu(sibling, &first->fib6_siblings,
- 				fib6_siblings) {
- 		const struct fib6_nh *nh = sibling->fib6_nh;
- 		int nh_upper_bound;
+[...]
 
