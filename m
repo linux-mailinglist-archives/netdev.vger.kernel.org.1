@@ -1,144 +1,149 @@
-Return-Path: <netdev+bounces-176563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F2A5A6AC99
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 19:00:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B01E3A6ACC2
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 19:06:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 247D2487D81
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 18:00:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D44C1483CA9
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 18:06:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44BC722759D;
-	Thu, 20 Mar 2025 18:00:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 790A322A1D5;
+	Thu, 20 Mar 2025 18:05:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LLqs93Zz"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ajRjGUQX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F3E22758F
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 18:00:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EC0F229B12
+	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 18:05:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742493606; cv=none; b=ESIMBrzz/yO/ah3UWsoVtb6zqr+WoxOQ64D5uipLNG3bNjZnMZAetZFMw437FKoir2G5dVDeIILcWbc4qGq24fkt9elWcPygHnMoq7M8daFoBECOAlJs0at06a2LJqNExbX0RwXII27qBmKeF0iVuVOuCpDePjwpye8YyBr9xfg=
+	t=1742493948; cv=none; b=BMoBnZ2Dvf2wYSa5EBw/rEXJMc1zhSO3NxCLPIMSKhYNy5j5YFeKFZbsQPJHu9Zow8XPqbJeDJsvvGJykckPKFZoj6PegN7aGLsrx6YCXZYHAnjR+/t9+7On1fR5L6lhuxu1BqS8BDG4ifE9OGyYhyAs9xymo6nTg+e57zoMLO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742493606; c=relaxed/simple;
-	bh=VeEeR469sj7L4GRpXvMt19V8ohmjM3e2pvyA2tz/Sh8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qRiPy9C9P1O5IQtpH5yj/9JGzoJkNySl1M6unSnlok7LATeZj2IKNhuKw2H8zOAgH2ghjHtfeMp/trIFGZ7EsbwYk34jXoo/hrisJ5IBtndBdmnUAJXoGC8iEDKBbtu1JFAHOaf8Yc4BIlNckwW5XVbvjDIBYZA69IbfXmo+rWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LLqs93Zz; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2240aad70f2so27315ad.0
-        for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 11:00:04 -0700 (PDT)
+	s=arc-20240116; t=1742493948; c=relaxed/simple;
+	bh=eSRjWYWO4yxvYztB0ncS8vovMEhY+BbOB3dCMJ7BgSw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o/EQQSuL6uwkNqB7MH5/J+c4ceFn1/MVwGGwWAwsXd0CEV9K50A/noqkfSHTTVDtGWbDmvA+vCFsXyogWPvqKHlW9a7IKcBfcoEQP+5gRW2VQ7ou+N2e4QbK+UWMKJZMMlwkqP1ZvFGIV+R6qIeOonfQHz+6YWyZzGNPBtpdZhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ajRjGUQX; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-22359001f1aso27958435ad.3
+        for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 11:05:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742493604; x=1743098404; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FXL0k0DZqQ07N/e8NPA/s/pW9MUWCeBqdqXSku9l8Os=;
-        b=LLqs93Zz5A7ZJimmaaJEUs+BFqbrFrbjGibWW+LC3rwt0n0aExNuZEQ30mdySNkGSr
-         TSevtd3x2v4qDhIjSEV0XE96lR8EkavwZ+tCpZmpcEwtT6pxYl+4usrdPwOy0Iq/MK8V
-         B4e4JnM/Rz7TnNNiK8S4dOOCtJKNyC1za4C0+f28uR1xYTcjnevN/pgUuXbvpRg6QdOm
-         lOmarRTfCgn3DMmvdShyU1/vxbO6UmIvGY8VQKevuz7INwZHhppmHp3/vODDNCzT0odZ
-         wDYVPzBFvGzJIbxVXFLpxX4JVejlXeccqzkR0eSvpGRemRoYIx+YBFIdV2slEhGY8MQ9
-         vopw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742493604; x=1743098404;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=fastly.com; s=google; t=1742493946; x=1743098746; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FXL0k0DZqQ07N/e8NPA/s/pW9MUWCeBqdqXSku9l8Os=;
-        b=UjfSLesy+G2kmZVphAC8PdmgUUjjzjapI1ScWSDAxbnCujOo6GbDwhK35jthSdn5RM
-         54FilGkUxeIjgtjPJWVaqiJ2vJdtLM5GGFFIz+vebfD9RIkVb7K22hWQJh5ni6YKH1ad
-         sO8iU4WKJXIzOTQjfLj6VxJTrcJb6P//YYbLiXq7ydBUNHP6KZOlne3ia3oG0z7QIuq5
-         ENPITBAwjOtD59wOtLEAKa/8Z42JxarbBMkjFORJMba7srbJerYrmMdYDmmUX+9irTcr
-         efn4Yh4QHCctGgiKVZWFeWOaAD7RI0UQ6j8c6g++sl/ylHKmylNlNsNkndTesOAxbtHz
-         7d+w==
-X-Forwarded-Encrypted: i=1; AJvYcCUw3wiF+lbS1bx8Vz+cH6QonarwwmJUGwZeonLSzNHp0f8map8sTQsI12nYC6gOsRTy+4jzMZg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwEa/4TSRcHemxLZ6WOpIIHMJnoUGzdUt0CRd/nie1zZiD5Xdu2
-	CtMNkdlyiIAtYyLOuEnDfAF5ZkhHSP/QtymMw0fu5ZQmWCG2mAxXH5yA0tXRUOQd6IrHX5hIj6E
-	W+p6RFqPZOLlOF3qUAbfRXgQXVBui/G27aqHU
-X-Gm-Gg: ASbGnct/jo9Tn49qKcUAqzpC4y5dL1v3RPtSQRii1YWhLmbnX+XkwScH9uL5ULTwflW
-	DDMnpUQL52zSzoJQBkghLLHEShhinotLMl4s1DPEfP/bYpN04VRCw9zhcJtjthA+qRi/hgXuUqe
-	oB3lO63nwbgf8nlga9lImBUV5eSeI=
-X-Google-Smtp-Source: AGHT+IH57DH0GSZzyJh8T8Bgi35URSrHKvYal863TDyoHEw3Y8lB3ymGrCjzzE1JAKvOQ2Uv5lZf9PKiuo8MDKtuodU=
-X-Received: by 2002:a17:903:1744:b0:21d:dca4:21ac with SMTP id
- d9443c01a7336-227819e9b92mr168015ad.6.1742493603418; Thu, 20 Mar 2025
- 11:00:03 -0700 (PDT)
+        bh=JM/OqN7Oy0ivRWEL6tEbo+CUHh5BBsQYtWvf3MvSx6w=;
+        b=ajRjGUQXyGVvsgtPaeQJmQu+Wsg70IKSHxrTMYZBn6eRX1UAm6V2gHcmTuZTV9REPV
+         1up0vNoQjtiVlGu4f207Mfv9yyryEWL08XFDtXjT9e/BencAUtujgH9hRlNWy7QpdhtN
+         dLPMa/+rqjHN+huFyT6bpvFUP2OUnRGCi/5Po=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742493946; x=1743098746;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JM/OqN7Oy0ivRWEL6tEbo+CUHh5BBsQYtWvf3MvSx6w=;
+        b=EJpPLx24SonRlgulrx2pT5lRFJ8mYiKo5RxUlGLtpuw5qaZJN+CCPotGoZkR9/bRRG
+         MfStHktmexpEsWwOJr8qmYYfkRcUkBfS9AE328SYz5k4v4+pTs6PWPvDP7sbl+LYptRB
+         BfykFoil8/i02tC8AUm7hG9gyquIAkXLufuZytpXABn5eP1mBCQ3wcS51NvIUBJUDFwH
+         ZP0Srs0V6w9G6JB0VgX9hC5WsvqpE96hM6JdKxuk+K0GsRwT75W17Rb87Qc+J0C4n7pu
+         qO+LQWjO4UHtwgUkRImXCY1WKvEicvOM84EnknxpfAnNV6EM7KNbjgGJ43iId/BMCf9L
+         mIsA==
+X-Gm-Message-State: AOJu0YwBQAO6SzE5FYTW7m4NdUd49Z6ZtM3uJpSgKQz0jNGnd3l6C9Un
+	1cnF8r5HTnpKqMUKEXLIDUcYP9NlKLn1Lf80aY6J7VoMgnTk2ZuVVRiq5IwdaBY=
+X-Gm-Gg: ASbGncsuXzzrRQ4hQpp2C5sLOtq83oDjEEVU2+uGaHl5ua8wSXLu+wr2QKQn31FcaAm
+	TEs4pXR1qrV/r9twFum6osPS1uBHtURceWcFlk7G3HYJcWFs7xTs/cEieknLDRNKDTaRsHCCrZ0
+	oa3bnHM9rnyRB5RIMw5e/aMihKNFMRfukjidyJ/IBRapjI+7CV59aBe8o6JzY6yLPOpUs/nQdyH
+	m9BGnIa7BQ1w0GGvfGjrpPXFM41i/6ws8WLbUCgttWOT3yENRkRPp172qftGk2xZUzIalpCKe5M
+	5h5EYlicVhTRl4OXxE+6fQsd8Hr+bw6i5P5ZSIP5rPA52ohkoTP58h71DGygKdMIvE3En+mOYrN
+	CiODKYgSeVVKSXH0b
+X-Google-Smtp-Source: AGHT+IFkG9txbev4JCYggmYZhNgAMBuFDffjPJdvIx8M6hPHeRaY1eSW3KdhJ6WDYT270hXE0myOaQ==
+X-Received: by 2002:a05:6a00:2d84:b0:736:4e02:c543 with SMTP id d2e1a72fcca58-739059a3471mr465905b3a.9.1742493945615;
+        Thu, 20 Mar 2025 11:05:45 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7390618f1d1sm87958b3a.173.2025.03.20.11.05.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Mar 2025 11:05:45 -0700 (PDT)
+Date: Thu, 20 Mar 2025 11:05:41 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	asml.silence@gmail.com, linux-fsdevel@vger.kernel.org,
+	edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+	linux-api@vger.kernel.org, linux-arch@vger.kernel.org,
+	viro@zeniv.linux.org.uk, jack@suse.cz, kuba@kernel.org,
+	shuah@kernel.org, sdf@fomichev.me, mingo@redhat.com, arnd@arndb.de,
+	brauner@kernel.org, akpm@linux-foundation.org, tglx@linutronix.de,
+	jolsa@kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [RFC -next 00/10] Add ZC notifications to splice and sendfile
+Message-ID: <Z9xY9d2hOc6hOlda@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Christoph Hellwig <hch@infradead.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, asml.silence@gmail.com,
+	linux-fsdevel@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, horms@kernel.org, linux-api@vger.kernel.org,
+	linux-arch@vger.kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
+	kuba@kernel.org, shuah@kernel.org, sdf@fomichev.me,
+	mingo@redhat.com, arnd@arndb.de, brauner@kernel.org,
+	akpm@linux-foundation.org, tglx@linutronix.de, jolsa@kernel.org,
+	linux-kselftest@vger.kernel.org
+References: <20250319001521.53249-1-jdamato@fastly.com>
+ <Z9p6oFlHxkYvUA8N@infradead.org>
+ <Z9rjgyl7_61Ddzrq@LQ3V64L9R2>
+ <Z9usmpFw7y75eOhk@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250318061251.775191-1-yui.washidu@gmail.com>
-In-Reply-To: <20250318061251.775191-1-yui.washidu@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 20 Mar 2025 10:59:50 -0700
-X-Gm-Features: AQ5f1Jpx5oaTubkkaiHB-p1nUhcKkWHhsLFCwXVsZ7-aKeMv73KpkrWBcKG-6qY
-Message-ID: <CAHS8izNn+D=E0E2y5-gCGyyKSJgxTq63K-kthjFCwhQd_Tw0tA@mail.gmail.com>
-Subject: Re: [PATCH net-next] docs: fix the path of example code and example
- commands for device memory TCP
-To: Yui Washizu <yui.washidu@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net, sdf@fomichev.me, 
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z9usmpFw7y75eOhk@infradead.org>
 
-On Mon, Mar 17, 2025 at 11:14=E2=80=AFPM Yui Washizu <yui.washidu@gmail.com=
-> wrote:
->
-> This updates the old path and fixes the description of unavailable option=
-s.
->
-> Signed-off-by: Yui Washizu <yui.washidu@gmail.com>
+On Wed, Mar 19, 2025 at 10:50:18PM -0700, Christoph Hellwig wrote:
+> On Wed, Mar 19, 2025 at 08:32:19AM -0700, Joe Damato wrote:
+> > See the docs on MSG_ZEROCOPY [1], but in short when a user app calls
+> > sendmsg and passes MSG_ZEROCOPY a completion notification is added
+> > to the error queue. The user app can poll for these to find out when
+> > the TX has completed and the buffer it passed to the kernel can be
+> > overwritten.
+> 
+> Yikes.  That's not just an ugly interface, but something entirely
+> specific to sockets and incompatible with all other asynchronous I/O
+> interfaces.
 
-Thank you, I think when I updated some of the implementations of
-ncdevmem I didn't update the docs:
+I don't really know but I would assume it was introduced, as Jens
+said, as a work-around long before other completion mechanisms
+existed.
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
+> > > and why aren't you simply plugging this into io_uring and generate
+> > > a CQE so that it works like all other asynchronous operations?
+> > 
+> > I linked to the iouring work that Pavel did in the cover letter.
+> > Please take a look.
+> 
+> Please write down what matters in the cover letter, including all the
+> important tradeoffs.
 
-> ---
->  Documentation/networking/devmem.rst | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
->
-> diff --git a/Documentation/networking/devmem.rst b/Documentation/networki=
-ng/devmem.rst
-> index d95363645331..eb678ca45496 100644
-> --- a/Documentation/networking/devmem.rst
-> +++ b/Documentation/networking/devmem.rst
-> @@ -256,7 +256,7 @@ Testing
->  =3D=3D=3D=3D=3D=3D=3D
->
->  More realistic example code can be found in the kernel source under
-> -``tools/testing/selftests/net/ncdevmem.c``
-> +``tools/testing/selftests/drivers/net/hw/ncdevmem.c``
->
->  ncdevmem is a devmem TCP netcat. It works very similarly to netcat, but
->  receives data directly into a udmabuf.
-> @@ -268,8 +268,7 @@ ncdevmem has a validation mode as well that expects a=
- repeating pattern of
->  incoming data and validates it as such. For example, you can launch
->  ncdevmem on the server by::
->
-> -       ncdevmem -s <server IP> -c <client IP> -f eth1 -d 3 -n 0000:06:00=
-.0 -l \
-> -                -p 5201 -v 7
-> +       ncdevmem -s <server IP> -c <client IP> -f <ifname> -l -p 5201 -v =
-7
->
->  On client side, use regular netcat to send TX data to ncdevmem process
->  on the server::
-> --
-> 2.43.5
->
+OK, I will enhance the cover letter for the next submission. I had
+originally thought I'd submit something officially, but I think I'll
+probably submit another RFC with some of the changes I've made based
+on the discussion with Jens.
 
+Namely: dropping sendfile2 completely and plumbing the bits through
+for splice. I'll wait a bit to hear what Jens thinks about the
+SO_ZEROCOPY thing (basically: if a network socket has that option
+set, maybe the existing sendfile can generate error queue
+completions without needing a separate system call?).
 
---=20
-Thanks,
-Mina
+I agree overall that sendfile2 or sendmsg2 or whatever else could
+likely be built differently now that better interfaces and
+mechanisms exist in the kernel - but I still think there's room to
+improve existing system calls so they can be used safely.
 
