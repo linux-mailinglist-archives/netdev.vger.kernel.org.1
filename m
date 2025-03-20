@@ -1,61 +1,95 @@
-Return-Path: <netdev+bounces-176355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF5AEA69CFF
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 00:59:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A4BFA69D06
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 01:06:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E809884558
-	for <lists+netdev@lfdr.de>; Wed, 19 Mar 2025 23:58:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8194919C077E
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 00:06:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95B982248B3;
-	Wed, 19 Mar 2025 23:58:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A083C10E5;
+	Thu, 20 Mar 2025 00:06:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aEs3QJCh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OLlYOU9J"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4034F1DE3A9;
-	Wed, 19 Mar 2025 23:58:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26EFA191;
+	Thu, 20 Mar 2025 00:06:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742428693; cv=none; b=Ndoj6luz0+1V47TvDMU8A9SAhUnYbgXrpXC19oLWh9GppfgWp5VrRNgheaQhZuf9tOGi9jxFAa0HPGJisqeDTLXSGpHJztfgCo67nL91WwwLMYVyOuGNLFCUUZn781S2EEPaxJ6NWN+Mi7BgGsMtAJIE5RKenp32LrKBodwB+bc=
+	t=1742429180; cv=none; b=As0M1LQktixPzZWB2f0OkFRmKqpFLQkjCUlIyoRMerY8fQH/4qHqiTCJcXGLiGNG3R9Oobi5U6Jx076Yu56JZFscZ4GQZDNvPa8TmfqjbXtp8M8kl28F9LSiluESVyGLjmC0GlKcYjw1niEaZzbn9BvgXj7awj8GCBczwmiqgSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742428693; c=relaxed/simple;
-	bh=ZZKfA84RzRDEAliz95nfjz5QwDog7cyZVSrWYTw/zI8=;
+	s=arc-20240116; t=1742429180; c=relaxed/simple;
+	bh=BO+//tcXorx2kbUfYowaXvsu4SDU++zC1eH8TyB6buM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nXLJj2x84gKvXdTOhljDJhSM5yr7bzeu76svY0Y1Q2dmiB6q9DJqFoC+K5wFpieUB20t80s0PX4Cg8cnWTxkCn76rYVsxjdcbCoXQQ32Ps/0IjVz5w39AWPna44nrdh4cPP9c1i4c+fEM439NUGZozmDZtzA808PA8yManRo5D0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aEs3QJCh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 458ACC4CEE4;
-	Wed, 19 Mar 2025 23:58:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742428692;
-	bh=ZZKfA84RzRDEAliz95nfjz5QwDog7cyZVSrWYTw/zI8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aEs3QJChJFcdnPOHTauCmOrZ6IULAT7ZHAPKR4zUQKWpU4fVfq9xjjqMYvsI+BjnY
-	 tGhOwI9ScxsMy66k/+abaRY04I7+m9j1tjEdH9fAhcXCSi4LivrGhOBfVFXXTzlwMI
-	 p6De/RCvhON6CzIS0tGTyTbJuvO/FmRVGYyS9qC2+lu2dN/kngG4jI+E5IYPUo5gkM
-	 HheOzDF+CuZXuwayiJHFY7XfsiLvcbIecQPzGP0Uq9g85V4ym5K4eDIuM35vhUNiP3
-	 c/51O56HdxpGl/vDaGjSfPHxwvJ+8zacziTn2x/482i+A/8y3atJDVk6Ur1lsSqNve
-	 C0gP39TapTPrQ==
-Date: Thu, 20 Mar 2025 00:58:09 +0100
-From: Andi Shyti <andi.shyti@kernel.org>
-To: Ming Yu <a0282524688@gmail.com>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
-	brgl@bgdev.pl, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org, 
-	linux-usb@vger.kernel.org
-Subject: Re: [PATCH v8 3/7] i2c: Add Nuvoton NCT6694 I2C support
-Message-ID: <jpaqx2z5io2bvtluexnzrkz4zcvea7qqgpa6bdhm4yzby2rjgb@izncuolmv7tl>
-References: <20250225081644.3524915-1-a0282524688@gmail.com>
- <20250225081644.3524915-4-a0282524688@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=IgRnSsi8OGfyNWYKFn42dyYGJWb5cuoIAM8DJDtzndW+DUH9HJbAfR82AD6Qa8bp+p0kV8jOCrJBy9/cEehRMtxdYCJp+OD0nKRe1136bfRdVB/QFamLIl4ySd8fRb3ZGMrOMO+HqoDUVmQzlwzmEPbWf9+iIQwLwwPaQSo7PTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OLlYOU9J; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2255003f4c6so2025525ad.0;
+        Wed, 19 Mar 2025 17:06:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742429178; x=1743033978; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=i67nHSXMn9wyesYVZ73ubzS5KypW1HRAz0KQwH13Rm0=;
+        b=OLlYOU9J9XriKEAb1kXq3MV7uemWz44X/P+d9MS2IVNeu3mTTzbDC5DxeGgvc1CbfS
+         UhEGJIkDFcfYdmjhTI/59VphgHxxU1J8v760LtT2VQh6PTRzJg82sJm789uMXn+sJozY
+         v7/0vd0Om7JPKIruiC9gngCQsGWL3n01BowLhewtKFZ6ZjlNKDhgH586q9zsKTyiFn8s
+         rjvI6etZ7NTZJbUs7Fh8cPWJgxuKpvqomWcoBmI+Je0W6fHOeVd5DNWv1I8tL4t4NhmV
+         WYjzzQis3azkHLpQOKBDLiiEgDXOvFWI0H5HTOAORXrXDteAB5NR6+yy05Hed8hzWwOD
+         wg5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742429178; x=1743033978;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i67nHSXMn9wyesYVZ73ubzS5KypW1HRAz0KQwH13Rm0=;
+        b=VXyC4sYrV9WWNa5ssHdv2kPoyUcrq4DOh+P5loHB8LeMfmGoo60vp9ZKjYzj8DYPEF
+         o5CCCnpEtr3/JNQvAvw+YNeI7pps1IIoD9lazx2gcsXRpcvyKWwrPWLfwbhLWnl5teL0
+         NC8nz4Qb1vaDn51DR7Ruu0zhDFFwYubuEF+0XSD3MDR70F4KgNZbURLVR3sKppqraakG
+         ImjFRSZDc0e/koEo5CtjZECAHXn9zUuwVgI2XJssltIlBNl9JliF+oluUFFVnJ3/TcfZ
+         IO2WQGSo5rxBj9shvwDox8CRDkYxpDAuxb+9umKJyJKSz9N/BLB1boWAqlBnSIjZ1Ghd
+         bCyg==
+X-Forwarded-Encrypted: i=1; AJvYcCUt1J/48KIrDNIICEE2MI3AxPmrczFBKlE9FHVJIY78LgqxJXQSgfw8jOjrXpMgQV8APCG63ElL@vger.kernel.org, AJvYcCVKJJH4E8m+6GHLF/eySqM3NuiCfJVjI51gIcMwwvC4PqGmoR09MMoZFg4oZobFMI4fYkeyJBS6SRgbo+cPqnTG@vger.kernel.org, AJvYcCVPlcDHX2rYnfPbljLZEfyVzjyqPtrGovB26bPefpouBtjPrRyxxMPVvmAFw6oZ/pmMl3vrP1+SdYYGYfYT@vger.kernel.org, AJvYcCW0pae/rLXPU1tHlSyZWiWl5H+K/mM3urzT3TmUPyYTgMplunVNzdjNlxqc0e+sbEPUZug=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkqiUXQZOoPRL/OZIo9KcimFPRr13fBCHiiismBrymRi5lcwzz
+	baucdXxi8A1g9kk+6uMXHjZN6dQGWqUkYEJrP+BMx0hZrEubI6OU
+X-Gm-Gg: ASbGncumkx3om8W2gFUjnINjyTZ+bnhLTSViqgKt+B3+cfGcFWLh3gTA73fm79FYqJF
+	3Qww3O6YeysU5MVApkl35JyR9IVyfeSvEhg3ysOEgE+7LD0qyiu1d1ChSTPmK4eep+EN/Dvc7b5
+	yzwduKULeCcbYv1fwkvRTaSxbufrtEctwN+ONv5mAC/HxzYKDqhzCg/eXiTwE4ycRnCWeoQWoOJ
+	M82fwlvCchgGHxyoiyQ+2Qu/44wMsxR4e/QCOsCCfu1Os/Z848ulF4I+KWg1/jsEDW9vX/ytikj
+	kwigckVBXbo7CZmrdUrskrsleosZ6cHSZ1qHtqRjnPgvzJuk
+X-Google-Smtp-Source: AGHT+IEqQiEdBN18NzeCzATzPCdMYX7OSqKrz7WWXs+VpGIlSI/RD/m5riIAffmbr4BZka1MHDXYYw==
+X-Received: by 2002:a05:6a21:3a4a:b0:1ee:dcd3:80d7 with SMTP id adf61e73a8af0-1fbe862d8ddmr9179408637.0.1742429178363;
+        Wed, 19 Mar 2025 17:06:18 -0700 (PDT)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af56e9e2f45sm11619719a12.29.2025.03.19.17.06.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Mar 2025 17:06:17 -0700 (PDT)
+Date: Wed, 19 Mar 2025 17:06:17 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: john.fastabend@gmail.com, jakub@cloudflare.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, andrii@kernel.org, eddyz87@gmail.com,
+	mykolal@fb.com, ast@kernel.org, daniel@iogearbox.net,
+	martin.lau@linux.dev, song@kernel.org, yonghong.song@linux.dev,
+	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com,
+	jolsa@kernel.org, shuah@kernel.org, mhal@rbox.co,
+	sgarzare@redhat.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH bpf-next v3 1/3] bpf, sockmap: avoid using sk_socket
+ after free when sending
+Message-ID: <Z9tb+Y+w/gcqSnCo@pop-os.localdomain>
+References: <20250317092257.68760-1-jiayuan.chen@linux.dev>
+ <20250317092257.68760-2-jiayuan.chen@linux.dev>
+ <Z9tNAhMV1Y5znONo@pop-os.localdomain>
+ <48068a86ea99dffe1e7849fb544eac1746364afb@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,26 +98,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250225081644.3524915-4-a0282524688@gmail.com>
+In-Reply-To: <48068a86ea99dffe1e7849fb544eac1746364afb@linux.dev>
 
-Hi Ming,
+On Wed, Mar 19, 2025 at 11:36:13PM +0000, Jiayuan Chen wrote:
+> 2025/3/20 07:02, "Cong Wang" <xiyou.wangcong@gmail.com> wrote:
+> 
+> > 
+> > On Mon, Mar 17, 2025 at 05:22:54PM +0800, Jiayuan Chen wrote:
+> > 
+> > > 
+> > > The sk->sk_socket is not locked or referenced, and during the call to
+> > > 
+> > 
+> > Hm? We should have a reference in socket map, whether directly or
+> > 
+> > indirectly, right? When we add a socket to a socket map, we do call
+> > 
+> > sock_map_psock_get_checked() to obtain a reference.
+> > 
+> 
+> Yes, but we remove psock from sockmap when sock_map_close() was called
+> '''
+> sock_map_close
+> 	lock_sock(sk);
+> 	rcu_read_lock();
+> 	psock = sk_psock(sk);
+>         // here we remove psock and the reference of psock become 0
+> 	sock_map_remove_links(sk, psock)
 
-...
+sk_psock_drop() also calls cancel_delayed_work_sync(&psock->work),
+althrough in yet another work. Is this also a contribution to this bug?
 
-> +enum i2c_baudrate {
-> +	I2C_BR_25K = 0,
-> +	I2C_BR_50K,
-> +	I2C_BR_100K,
-> +	I2C_BR_200K,
-> +	I2C_BR_400K,
-> +	I2C_BR_800K,
-> +	I2C_BR_1M
-> +};
+>         psock = sk_psock_get(sk);
+>         if (unlikely(!psock))
+>             goto no_psock;     <=== jmp to no_psock
+>         rcu_read_unlock();
+>         release_sock(sk);
+>         cancel_delayed_work_sync(&psock->work); <== no chance to run cancel
+> '''
+> 
 
-do we need all these frequencies? I don't see them use anywhere.
+I have to say sock_map_close() becomes harder and harder to understand
+now. And I am feeling we may have more bugs since we have two flying
+work's here: psock->rwork and psock->work.
 
-Besides, can you please use a proper prefix? I2C_BR_* prefix
-doesn't belong to this driver.
-
-Andi
+Thanks.
 
