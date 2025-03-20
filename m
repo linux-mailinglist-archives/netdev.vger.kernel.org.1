@@ -1,218 +1,230 @@
-Return-Path: <netdev+bounces-176567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B15EBA6AD0D
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 19:24:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE3D6A6AD2D
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 19:37:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DDBC1899457
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 18:24:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0037B4614F5
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 18:37:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F108F226D14;
-	Thu, 20 Mar 2025 18:24:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 513BC2066DC;
+	Thu, 20 Mar 2025 18:37:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="WwBCTEms"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZtxWr9a7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 411E2225A59
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 18:24:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12CE1C69D
+	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 18:37:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742495043; cv=none; b=F14cAZUiUcF78hfGYLsNvUdH2s8Kft7BuxHev5jAeyqSYEiC7ykU95cLTG1Dshs6Upk9uK2EGYiYmhiPbJPVTLvYt5769Wf+V8pwtCVeA/HgpEXQ4b0Jp1wUXo/7vA9qBbdO/xBOKtDhFn9cHodF5sgDiPxdNDgvuuLmHh/afK8=
+	t=1742495835; cv=none; b=RD+Abs8fSdIwnYtJSZp68TyhKjmLNz1MVyqnq/TTC2jvp3gBLDtY+ljoZaHkNkS4R/AyHqvpMPDfWG9LXyXX6IgysxbHxNBSBm1RKALkMdaMcQBeCsbP+WuADQYnGTem876QLpx3QEfFVX20TMo9jhZ/tP0Zlate3zFReEeMwLY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742495043; c=relaxed/simple;
-	bh=p5C7au6pn1wBtzZYZ4qP8jufg2hjU9r8Y3dB0+e4uZo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sEtq5kIGAgUxg/GEt0Kr7/v/pWAFCUabCppZBhXywuFp6ontzxOKZ1JK3AqWLlx15OL1WKQiLK/IJZCw23l8PgcVg5dd8fY5Fa7DqxKL/Wg7TV+V7Wq7t71JFq3dIu53dkOEJ+0vw95X9Suxq+4SaUSgJWn9pB7/E8j1OsHKeac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=WwBCTEms; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2ff784dc055so2133854a91.1
-        for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 11:24:02 -0700 (PDT)
+	s=arc-20240116; t=1742495835; c=relaxed/simple;
+	bh=TmBV50KkxQtVcRvyH7IjkJggwz3UO5OOKF4h1zj5wzc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mtMC2gahVhPp8+UTpt2PYOGwKq6gncfSI6cM5ZZhrhvyrMw7E0MkluVUxUG5+Gf1Kq0SkCeiJrAVF1WdsamxF+sC5oJFl1dLTCc38wUUKjiCfTXWot6O60wCeeqKPcScLBh9+Om71OB3RU6faZLG3OrZxjkpsrrRpkirZeLxTJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZtxWr9a7; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3d3db3b68a7so12103625ab.0
+        for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 11:37:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1742495041; x=1743099841; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=u4hqLDLaMuKQjfJXNLqiy/5jqelv39CVb9y2B7DStAE=;
-        b=WwBCTEmsZsE0u14w5+lel9PAQUo60ea3JFr9XutPnHRtSOArkey5lZs8L4WVD6XJsN
-         H6cqTFbJQcbGEOWQZsJOsnuUviSYfA1qIVQNWfltM+2DamzufJB+olTsVkz/pBdrznhA
-         ork0WIN/gbD1s4W2PsgM6+6+c4H/gbspynRv0=
+        d=gmail.com; s=20230601; t=1742495832; x=1743100632; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cxBm6xRTf2k7aP/WF+TbgkK/L1fEW0JfxJ3WXvzjDpc=;
+        b=ZtxWr9a7wG+OEpXKs0vW2u5Vvj6QD17u6NtaKzmtTD+Dk8FBpniAZC/tDGlX6iGXyw
+         kjHa5t8V2vDx/hQbXpv96/SNCBZ46tPNPw7clo4ToRMhiIXrBHlQMzgELAde4czvTOXd
+         a4NCg3hrWrxKA8yB1xtjq0MJGo0BPKpqblYm5CueYS8p+P3eBvZESegMpb0Di27S2Zz2
+         UdhupUNL6iEmdVmcLWzc2WwQPcbX+ioAAs7HfE03GsnkEMYc7Kypwu+jMNpb14xP6Brm
+         LXZmBaWgfe3VsIAwIfpLzOpJxSQbRdfOsdMGBjcMZeKG2SVYshVi1bgF1NDlDHcTZf6L
+         riJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742495041; x=1743099841;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=u4hqLDLaMuKQjfJXNLqiy/5jqelv39CVb9y2B7DStAE=;
-        b=UpB+ZcV1Hf7WwBF8e9qH0O06BUbjbglW83Lw3OR3KS3maWJMLDCEjC6/2FLE76ztr2
-         dlmbQJeaoaJPvCpK7fyaKbUmE8/U3tYOU2FD9pOvfal/DtZ1ZOOrRPR6u2Cj9HrWo8ou
-         /jltFVBpI35zEBnm9jBcN+HhyCGKjzfSzmEzSvIAqLmxh5Z0ldF/UCOglcV1xSbSA+JC
-         uU91n1qcUDN2ma0qG+KrWissnrz4kXODwAxcmU53uWBEeDx2heoKxIEzbkBCI40t0yLJ
-         C7SJI/GHtZLvRXqTrm4IFOUaX4L6nxX5naTxDimMSmknAMEiLwsUQesEySTR//4s1Le9
-         lkZg==
-X-Forwarded-Encrypted: i=1; AJvYcCWvj/sKHfbTZVgvwKogrwDjecQ+UgL8UAbcWhKcSt368wosjBM0hpeZzPfjpwFTDjB2nb1Qk48=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxE98+yHLmNvkyoUK7EXJNHSzdgCxte/KALG6W2CTNf8XJu9Zgj
-	siOlmmsUu1XakSlzUZ/aBnBE5crxw2Ytal4UlSYYIC74RrU0ENXDnaFPlI9s6s4=
-X-Gm-Gg: ASbGncsjfjcZY3zwZaSW7GA09Ej8Sr16gvKrNxNiaxW4ZDlgHh+n7TL+jHdbU3rgHd3
-	1/AaK4UjmpzigjESbkyR9FjQHoN7f1P1a8YgsqVmHgnUe1mHO37vmxhIoZgrCGE0m7WgZgTohZL
-	GUPzfuLF5SYQZHjr8NQtByrBycf/s40TJzjXgggjs6PIGlWCT2Q5bMOzNK3N9Zz9vHcujRrnJ/l
-	qU0MzSOg7cYje4ei55DFaQyFEGklha48Pz3ph6RVLt1eTb+l5VXrbZ93gfIZ/l9xyzeHpeClCSe
-	YhAJ46rdA8bn/9pt9chcyr8PIRpflv0H+HCINn1+zrxAGhAdGfF+jcB0kG0605jQWw+GwO9LLnT
-	Sb2ZXNzxWeB0pHWCt
-X-Google-Smtp-Source: AGHT+IFjGyoj26a+mfA5sPrt2XYRA48FDA00r7QAzbLWG2KYNvo58GwB3aOzyQT77qllSS0qHLvptA==
-X-Received: by 2002:a17:90b:2fc7:b0:2f9:bcd8:da33 with SMTP id 98e67ed59e1d1-3030feaa56fmr348796a91.21.1742495041407;
-        Thu, 20 Mar 2025 11:24:01 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3030f5d4e46sm180311a91.14.2025.03.20.11.23.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Mar 2025 11:24:00 -0700 (PDT)
-Date: Thu, 20 Mar 2025 11:23:57 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, asml.silence@gmail.com,
-	linux-fsdevel@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, horms@kernel.org, linux-api@vger.kernel.org,
-	linux-arch@vger.kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
-	kuba@kernel.org, shuah@kernel.org, sdf@fomichev.me,
-	mingo@redhat.com, arnd@arndb.de, brauner@kernel.org,
-	akpm@linux-foundation.org, tglx@linutronix.de, jolsa@kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [RFC -next 00/10] Add ZC notifications to splice and sendfile
-Message-ID: <Z9xdPVQeLBrB-Anu@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	asml.silence@gmail.com, linux-fsdevel@vger.kernel.org,
-	edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
-	linux-api@vger.kernel.org, linux-arch@vger.kernel.org,
-	viro@zeniv.linux.org.uk, jack@suse.cz, kuba@kernel.org,
-	shuah@kernel.org, sdf@fomichev.me, mingo@redhat.com, arnd@arndb.de,
-	brauner@kernel.org, akpm@linux-foundation.org, tglx@linutronix.de,
-	jolsa@kernel.org, linux-kselftest@vger.kernel.org
-References: <20250319001521.53249-1-jdamato@fastly.com>
- <Z9p6oFlHxkYvUA8N@infradead.org>
- <Z9rjgyl7_61Ddzrq@LQ3V64L9R2>
- <2d68bc91-c22c-4b48-a06d-fa9ec06dfb25@kernel.dk>
- <Z9r5JE3AJdnsXy_u@LQ3V64L9R2>
- <19e3056c-2f7b-4f41-9c40-98955c4a9ed3@kernel.dk>
- <Z9sCsooW7OSTgyAk@LQ3V64L9R2>
- <Z9uuSQ7SrigAsLmt@infradead.org>
+        d=1e100.net; s=20230601; t=1742495832; x=1743100632;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cxBm6xRTf2k7aP/WF+TbgkK/L1fEW0JfxJ3WXvzjDpc=;
+        b=CYfZXB/q3+bTJsY4jsYnrSgQ2b3SEDdb1z0lZ+/x/xHzr/nwsocBq9GtfpDHlYfWwo
+         n8DNUbwpDW+0xSdnOT38f9SISd9ErG33DJWnIFdqcU1S3qg5FQKGyeCRNcezyzVTTDc4
+         U00FX6veLtTjjnXKOtI2Ascv68PWPbNXz7guL3uuf5YS3qGzo4BCP6RPTjq2jKEyFAzD
+         kO/6hXT3Q/FL8JQHt7807unw3Vq0sTBcio7LzdNrEOiuNunbA47440yRIAd0D9WMjTTH
+         GOrKrMJ9Sw7ca6jxsyqLh3TazxCfCI28+yjOMLof4PjZJ9JHz8KKGrpmhkCw+xCti6RB
+         5EcA==
+X-Forwarded-Encrypted: i=1; AJvYcCXqLD4zZz6iozTlElwGS4t3QSDKOQkB2kH4d9HOr07KjMjoCyzuPWn+1PYKdZQezrzFf5cOq3U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgaYJbkDgfK4AuNs+HmvNDuabUeljCf8xxWtMVBXjsHRNWoU+a
+	dEQHdw0mNVf+bPj3OYTV6HHjf0iTdFJO9STWjiB0jUaOfayMD3P9E3eagxvszxrVuyDt0JWMzZp
+	LE18fHOd8oAMtkk3jN0zu8LxwXarFsmDN
+X-Gm-Gg: ASbGncvW1EgrN/550XSGdpcZX0aTw6DQw4k0awFxfwCv9HtEROFXZNaa7U2MbzPkNg3
+	WRzVFwLNUHAnY2/3oynaJyo/qZzNeupTOAJc0Zmmy00SQGeq5rNa/U/OzOVy2tvh9FmjrWTgtuG
+	4hAXv3Me/9wgQ4zJOn55yAybploiDn
+X-Google-Smtp-Source: AGHT+IG39Yzaa9qnsDfoJKWi6OY/kn4aWl3eE48CKFRY462nZQvEneubzPW7iWjfQEiese4XCREWi2SSwQEl+1kwZTQ=
+X-Received: by 2002:a05:6e02:260b:b0:3d0:10a6:99aa with SMTP id
+ e9e14a558f8ab-3d5960d256cmr8337045ab.4.1742495832542; Thu, 20 Mar 2025
+ 11:37:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z9uuSQ7SrigAsLmt@infradead.org>
+References: <20250317103205.573927-1-mbloch@nvidia.com> <CADvbK_ftLCTfmj=Z5yhuatt5eOvxuf=sxbduwdjK4mfuw=4wVw@mail.gmail.com>
+ <305606b805fa2bb4725bcbd8c5ee88b88dfff7c5.camel@nvidia.com>
+In-Reply-To: <305606b805fa2bb4725bcbd8c5ee88b88dfff7c5.camel@nvidia.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Thu, 20 Mar 2025 14:37:01 -0400
+X-Gm-Features: AQ5f1JrHRdpAdcg9QnOHmsA-vP9kCanxJvVa72taMlGfJz63e-b-POeobPzzTko
+Message-ID: <CADvbK_dQ6kUamSW8zxKgydYpZxesHPcqKo+2eV7DZiGU4Vazng@mail.gmail.com>
+Subject: Re: [PATCH net] xfrm: Force software GSO only in tunnel mode
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: Mark Bloch <mbloch@nvidia.com>, "chopps@labn.net" <chopps@labn.net>, 
+	"davem@davemloft.net" <davem@davemloft.net>, 
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, Dragos Tatulea <dtatulea@nvidia.com>, 
+	"steffen.klassert@secunet.com" <steffen.klassert@secunet.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, 
+	"horms@kernel.org" <horms@kernel.org>, "edumazet@google.com" <edumazet@google.com>, 
+	"kuba@kernel.org" <kuba@kernel.org>, Yael Chemla <ychemla@nvidia.com>, 
+	"wangfe@google.com" <wangfe@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 19, 2025 at 10:57:29PM -0700, Christoph Hellwig wrote:
-> On Wed, Mar 19, 2025 at 10:45:22AM -0700, Joe Damato wrote:
-> > I don't disagree; I just don't know if app developers:
-> >   a.) know that this is possible to do, and
-> >   b.) know how to do it
-> 
-> So if you don't know that why do you even do the work?
+On Thu, Mar 20, 2025 at 11:24=E2=80=AFAM Cosmin Ratiu <cratiu@nvidia.com> w=
+rote:
+>
+> On Mon, 2025-03-17 at 15:30 -0400, Xin Long wrote:
+> > For UDP tunnels, there are two types:
+> >
+> > - ENCAP_TYPE_ETHER encaps an ether packet (e.g., VXLAN, Geneve).
+> > - ENCAP_TYPE_IPPROTO encaps an ipproto packet (e.g., SCTP over UDP).
+> >
+> > When performing GSO via skb_udp_tunnel_segment():
+> >
+> > - ENCAP_TYPE_ETHER relies on inner_network_header to locate the
+> >   network header.
+> > - ENCAP_TYPE_IPPROTO relies on inner_transport_header to locate
+> >   the transport header.
+> >
+> > However, both IPsec transport and tunnel modes modify
+> > inner_transport_header. This patch raises a concern that GSO may
+> > not work correctly for ENCAP_TYPE_IPPROTO UDP tunnels over IPsec
+> > in transport mode.
+>
+> skb_udp_tunnel_segment -> __skb_udp_tunnel_segment does:
+>
+> tnl_hlen =3D skb_inner_mac_header(skb) - skb_transport_header(skb);
+> __skb_pull(skb, tnl_hlen);
+> skb_reset_mac_header(skb);
+> skb_set_network_header(skb, skb_inner_network_offset(skb));
+> skb_set_transport_header(skb, skb_inner_transport_offset(skb));
+>
+> As a concrete example, in case of TCP over Geneve over IPsec in
+> transport mode, this is the sequence of header manipulations done:
+> geneve_build_skb: mh 190 nh 204 th 224 imh 190 inh 204 ith 224 data 182
+> iptunnel_xmit: mh 190 nh 154 th 174 imh 190 inh 204 ith 224 data 154
+> xfrm4_transport_output: mh 147 nh 138 th 158 imh 190 inh 204 ith 174
+> data 174
+> skb_mac_gso_segment: mh 124 nh 138 th 158 imh 190 inh 204 ith 174 data
+> 124
+> inet_gso_segment: mh 124 nh 138 th 158 imh 190 inh 204 ith 174 data 138
+> esp4_gso_segment: mh 124 nh 138 th 158 imh 190 inh 204 ith 174 data 158
+> __skb_udp_tunnel_segment: mh 124 nh 138 th 174 imh 190 inh 204 ith 174
+> data 174
+> __skb_udp_tunnel_segment: tnl_hlen 16
+> __skb_udp_tunnel_segment: inner skb mh 190 nh 204 th 174 imh 190 inh
+> 204 ith 174 data 190
+> skb_mac_gso_segment: mh 190 nh 204 th 174 imh 190 inh 204 ith 174 data
+> 190
+> inet_gso_segment: mh 190 nh 204 th 174 imh 190 inh 204 ith 174 data 204
+> tcp_gso_segment: mh 190 nh 204 th 224 imh 190 inh 204 ith 174 data 224
+>
+> All numbers are offsets from skb->head printed at function start
+> (except for '__skb_udp_tunnel_segment: inner', printed after the code
+> block mentioned above).
+> I see that xfrm4_transport_output moves the inner transport header
+> forward (to 174) and that __skb_udp_tunnel_segment incorrectly sets
+> transport header to it, but fortunately inet_gso_segment resets it to
+> the correct value after pulling the ip header.
+>
 
-I am doing the work because I use splice and sendfile and it seems
-relatively straightforward to make them safer using an existing
-mechanism, at least for network sockets.
+I agree that it works for ENCAP_TYPE_ETHER tunnels in transport mode
+since they do not rely on the incorrect transport header set in
+__skb_udp_tunnel_segment().
 
-After dropping the sendfile2 patches completely, it looks like in my
-new set all of the code is within CONFIG_NET defines in fs/splice.c.
- 
-> > In general: it does seem a bit odd to me that there isn't a safe
-> > sendfile syscall in Linux that uses existing completion notification
-> > mechanisms.
-> 
-> Agreed.  Where the existing notification mechanism is called io_uring.
+> In case of ENCAP_TYPE_IPPROTO, inet_gso_segment/ipv6_gso_segment would
+> be invoked directly by __skb_udp_tunnel_segment and it would see the
+> network header set correctly. But both compute nhoff like this:
+> nhoff =3D skb_network_header(skb) - skb_mac_header(skb);
+> Which would be 0 given mac_header is set to the same offset as the ip
+> header.
+> But that only makes the pskb_may_pull check & the skb_pull not do
+> anything. The functions then proceed to set up the transport header
+> correctly
+> I think the code might still work but I haven't verified with a
+> ENCAP_TYPE_IPPROTO protocol.
 
-Sure. As I mentioned to Jens: I agree that any new system call
-should be built differently.
+For ENCAP_TYPE_IPPROTO, I believe it does not invoke inet_gso_segment()
+or ipv6_gso_segment(). Instead, it directly calls the transport layer's
+.gso_segment function, such as sctp_gso_segment() for SCTP over a UDP
+tunnel. This behavior can be seen in skb_udp_tunnel_segment():
 
-But does that mean we should leave splice and sendfile as-is when
-there is a way to potentially make them safer?
+  case ENCAP_TYPE_IPPROTO:
+      offloads =3D is_ipv6 ? inet6_offloads : inet_offloads;
+      ops =3D rcu_dereference(offloads[skb->inner_ipproto]);
 
-In my other message to Jens I proposed:
-  - SPLICE_F_ZC for splice to generate zc completion notifications
-    to the error queue
-  - Modifying sendfile so that if SO_ZEROCOPY (which already exists)
-    is set on a network socket, zc completion notifications are
-    generated.
+skb->inner_ipproto =3D=3D IPPROTO_SCTP and
+inet(6)_offloads[IPPROTO_SCTP] =3D=3D sctp_gso_segment
 
-In both cases no new system call is needed and both splice and
-sendfile become safer to use. 
+sctp_gso_segment() assumes the transport header is correctly set and
+retrieves the SCTP header using skb_transport_header(skb). However,
+the transport header is incorrectly set earlier in the code:
 
-At some point in the future a mechanism built on top of iouring
-introduced as new system calls (sendmsg2, sendfile2, splice2, etc)
-can be built.
+  skb_set_network_header(skb, skb_inner_network_offset(skb));
+  skb_set_transport_header(skb, skb_inner_transport_offset(skb));  <---
+  ...
+  segs =3D gso_inner_segment(skb, features);
 
-> > Of course, I certainly agree that the error queue is a work around.
-> > But it works, app use it, and its fairly well known. I don't see any
-> > reason, other than historical context, why sendmsg can use this
-> > mechanism, splice can, but sendfile shouldn't?
-> 
-> Because sendmsg should never have done that it certainly should not
-> spread beyond purely socket specific syscalls.
+With an incorrect sctphdr, this could lead to unexpected behavior or
+even a crash.
 
-I don't know the entire historical context, but I presume sendmsg
-did that because there was no other mechanism at the time.
+I haven't had time to verify it either, but there are perhaps other
+ENCAP_TYPE_IPPROTO tunnels easier to set up for testing.
 
-I will explain it more clearly in the next cover letter, but the way
-I see the situation is:
-  - There are existing system calls which operate on network sockets
-    (splice and sendfile) that avoid copies
-  - There is a mechanism already in the kernel in the networking
-    stack for generating completion notifications
-  - Both splice and sendfile could be extended to support this for
-    network sockets so they can be used more safely, without
-    introducing a new system call
+>
+> In general, while staring at this code, I got the impression that these
+> functions are brittle, relying on assumptions made in completely
+> different areas that might easily be broken given a different
+> combination of protocols.
+>
+> I think that the code block in __skb_udp_tunnel_segment could be made
+> less brittle if it stops relying on the saved inner headers (which
+> might not be set to the actual inner protocols about to be handled),
+> and instead parse the mac or network headers and set the next headers
+> accordingly. This might even allow back HW GSO for XFRM in tunnel mode
+> with crypto offload, like before your original 2020 patch. WDYT?
+>
 
-> > If you feel very strongly that this cannot be merged without
-> > dropping sendfile2 and only plumbing this through for splice, then
-> > I'll drop the sendfile2 syscall when I submit officially (probably
-> > next week?).
-> 
-> Splice should also not do "error queue notifications".  Nothing
-> new and certainly nothing outside of net/ should.
+The inner_network_header and inner_transport_header were introduced
+to support hardware-offloaded encapsulation. skb_udp_tunnel_segment()
+may be just simply mimicking the hardware behavior and wasn=E2=80=99t
+designed to handle nested encapsulation.
 
-It seems like Jens suggested that plumbing this through for splice
-was a possibility, but sounds like you disagree.
+From what I can see:
 
-Not really sure how to proceed here?
+For ENCAP_TYPE_ETHER, these headers help avoid extra CPU work by
+skipping link-layer parsing to locate the network header, making
+the link layer transparent to tunnel segmentation.
 
-If code I am modifying is within CONFIG_NET defines, but lives in
-fs/splice.c ... is that within the realm of net or fs ?
+For ENCAP_TYPE_IPPROTO, without inner_transport_header, identifying
+the transport header solely by parsing the inner packet may not be
+possible. For example, distinguishing between these two UDP tunnels
+in tunnel segmentation:
 
-I am asking because I genuinely don't know.
-
-As mentioned above and in other messages, it seems like it is
-possible to improve the networking parts of splice (and therefore
-sendfile) to make them safer to use without introducing a new system
-call.
-
-Are you saying that you are against doing that, even if the code is
-network specific (but lives in fs/)?
-
-> > I do feel pretty strongly that it's more likely apps would use
-> > sendfile2 and we'd have safer apps out in the wild. But, I could be
-> > wrong.
-> 
-> A purely synchronous sendfile that is safe is a good thing.  Spreading
-> non-standard out of band notifications is not.  How to build that
-> safe sendmsg is a good question, and a sendmsg2 might be a sane
-> option for that.  The important thing is that the underlying code
-> should use iocbs and ki_complete to notify I/O completion so that
-> all the existing infrastucture like io_uring and in-kernel callers
-> can reuse this.
-
-I'm not currently planning to build sendmsg2 (and I've already
-mentioned to Jens and above I will drop sendfile2), but if I have the time
-it sounds like an interesting project.
+  FOU: ETH | IP | UDP | IPPROTO_XXX
+  GUE: ETH | IP | UDP | GUE HDR | IPPROTO_XXX
 
