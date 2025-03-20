@@ -1,181 +1,262 @@
-Return-Path: <netdev+bounces-176395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E28BA6A0A9
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 08:44:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B66EA6A0BA
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 08:49:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C340017C83D
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 07:44:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0554F17C787
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 07:49:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CDAC1E3769;
-	Thu, 20 Mar 2025 07:44:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63C781F874E;
+	Thu, 20 Mar 2025 07:49:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jl7ON9Ij"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H1YQ9oJQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6897C1C3BF1
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 07:44:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FF361DE2CD;
+	Thu, 20 Mar 2025 07:49:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742456650; cv=none; b=KkpfY4R2QoyKWCF+iQRE9CJ0WunmDx8YsmR72Yo2rdQzriyItLK6KWREnAVyOq8sFFzPP+uaNH3CEgIjSKxIijnu0T4ljAJlsI6Z2nWBUDOPH6UJMZ/H2qoWkvZ+jYtC4w0qLpXqCWN5/rbG2eVyc300F/VBIdb3VhYJS4IPYHM=
+	t=1742456957; cv=none; b=fS+2vMKtGASHhjeTZPmfFVJzdeoLTr0o/kGLYAod7npRpPmgQ2l8ReqoQxZ1Hz2HvNfozygwmGcRpNDiqkzbLsDdtNA2e5hB/mpt2UN78e1qy/x0UvWeUf6xxr3WRgJUIZL7OJ4/F9pFR7jsUZMSHq08H6FgysZk/ibtjOkZ+gc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742456650; c=relaxed/simple;
-	bh=MeU5zki0DsbzQ822JYCKt94NM17uJkO5B1I6KwJdr3s=;
+	s=arc-20240116; t=1742456957; c=relaxed/simple;
+	bh=0RrGvjKxlH6hlqBET7Q0+kXe0Pv6c8EGXoyCElqwIsE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nDTA5DeHLwNf6lo7cOw3zEhW3f5vRhjPYvic+icqd699y2DdaVtsGBKg+qR/07fJP3jSi9H6/T2fOiLCUHh6IC1FCtAZl9OLrnSD9uAQwyM7Xudas0z8vDz1ezMQVE7oA6pEM5NifXucZQ5mh44RZqO74SvkWKQFVNpq4hVhB8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jl7ON9Ij; arc=none smtp.client-ip=209.85.208.45
+	 To:Cc:Content-Type; b=rMAUxQ7qCyGqQeFPhyYlcQ9+imfT+uSkpwit0Y3yxUIdPo3obqKquagO8XwxN+Gt9sFMH3HO3IQOAupI/I5z+rK2BwaYRE8HGYfAc1MkvCSuXPhRHksGJ3krwBNyqG0PzvxCpKG10maFlcOPa9dREhCap5LlNAvoVFE/P/V4Hz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H1YQ9oJQ; arc=none smtp.client-ip=209.85.167.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5e033c2f106so683584a12.3
-        for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 00:44:08 -0700 (PDT)
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-54957f0c657so533164e87.0;
+        Thu, 20 Mar 2025 00:49:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742456647; x=1743061447; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ow/3xqwBK5KieARUhFcvXt4TAstS2rn0fmKi8gJYFGc=;
-        b=Jl7ON9Ij0/qu4yfA/TURIkrkULrVWYLeAt+XyhiAw/dp0SWhXAVtrU2KoSaKnlYKcW
-         3aD2rX/0Xi7K9WLFEdWmnbb/d32yg8tjGkXLz4FK3lsYYlLguvmhJD9Qv9uctj2tEDV7
-         RG05ZrIqcBJGkdwtxEytWHOuV/pW4T0ufcsYHQCRMjAuBEccNoXCk8EEwUJDynqVrQLp
-         zqCJVXAPj5cpaXG3g4xGTHc62HcTANDU2QwwldmuQZdj7R1ZTLCgLx4sq35PPhR6lKrX
-         iqr5ZwKh7LChsVMmOI4prXnDsnUJhZSAwTZWHNWHQeixYwaTmf73vuTRmu91I2yRm2kH
-         6ySQ==
+        d=gmail.com; s=20230601; t=1742456953; x=1743061753; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A7M2zzbCtkmPcGj+EqyLxf8UcIQIKY7mVZ0w/cIUdaM=;
+        b=H1YQ9oJQZ2NZ7Gg0wz5RwBXs3GAZLynggINn83sZXS9mWHqZaAa8PlogNvTlMNFkPG
+         sLC+jTRT9BEiOlbDVDS7w4WZEklpB2+S2FvZb8uvTU9bHLojIJMvqV54i0tn6p+Mma3P
+         3LfP1jgXUIwOVzps2Y3OA2jAYtVOs/dXqMDCgdTDCzj2BdVh6UD08DgR74c3QOPq53W0
+         IcS1nDnK2eiB0DuvdEVhm72r5ecxer8B8Iaxjk0uZSx7wn+n4htF25vIi4JizbKlChj/
+         ZhBS/zzldlNurbbfSm4vat+R/PFecQrV1PxXFQfYzcfiKNEozbxfPiybxQtNCpNz5qu/
+         Z3ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742456647; x=1743061447;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ow/3xqwBK5KieARUhFcvXt4TAstS2rn0fmKi8gJYFGc=;
-        b=AyJdE1aHMnfi9t5qKr5J2rqewaLL7su5AyNj57MTgM5JUA2mp7iA/P2LlC/8AOhm0l
-         bc5LxeU5gGlssG9lFMZi9zf051yGFZT+AuNCAGIQHUz0y3Xytd95PTwv12C8RIdVc8mn
-         fozPYsHcvsWP9XZI6bTRPuTEumRtNI+guPLGZLTBBrwwOfzeHahaY0G45dPZNuyJVY2I
-         mz7+Vvp+u9617QHVwryNYr3TW7BlBS114Lq4kpIaXhwM4KCk9owCnmADiwEdnaqHtQe1
-         N/Su+XudhzSTuwnk8xJZ/iNIIU2v25NUH1zZtljBHjp12GQISmK0ilOfvVL7eQ6g6zRD
-         ItCA==
-X-Forwarded-Encrypted: i=1; AJvYcCU7en3l4L9nL3i17WfK13apNUR02xyQpKlZoZ2UgrOo8nKOdS3yzja3X1v9w/6LwmYDiIdZBV4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YygvGhOvAzbCT1JwZh5ZpkvDYCIXjGmZsORykqQdXH/ZcJfwMEY
-	kExPmM/GRjdsRC52FGputfMAykd5ZjNrJ42ILvG9zL37dA8tSeIgc6dHD8MsnuwH7oMpbeKmUr9
-	xKGduGbbID6+RCex9N41t8cd33VgMNsEJauphkw==
-X-Gm-Gg: ASbGncvTmlBM/mmTTQMhuCzTKMoY/Qk/T3S+jaJTc0ulZ0AdgNSgVo3EdH0HUT1iTOC
-	ji28EX9n+M0wmbDNH2VTKyXtBd01bquQLnVthie0zKlMykKUvY8JfCawSXejbcED11rfvqGOPev
-	8SfaZuIYDd/EljV3L8txmcHZW6rj/jBAcWCUXxLA+yIQ+GCE2TPO+gOebITw==
-X-Google-Smtp-Source: AGHT+IFv68Nd9py9Eo6ObQJB3NRfD+4jc1LmrEovpBjqLsUI1YpHv/1Le/bwpRNU36/D/GWLCi/LV7XmNiYJ3y3BHEs=
-X-Received: by 2002:a05:6402:13d3:b0:5e0:8c55:50d with SMTP id
- 4fb4d7f45d1cf-5eb80d29dc8mr5591443a12.14.1742456646354; Thu, 20 Mar 2025
- 00:44:06 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1742456953; x=1743061753;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=A7M2zzbCtkmPcGj+EqyLxf8UcIQIKY7mVZ0w/cIUdaM=;
+        b=wyEo/deoqZBUNbPBYhHPArr7G+jj7PNHISNGGhk6BfK0uko9epjthQWNNONty0CooD
+         +FCpOWZq2PoosOv+jVXGMeEuo6foY9y4G+cQzo/YjHZOT+9ISjiXPqPBK+gDweCjPz3i
+         EU5ml6nLV/b/BLFN47iMRk9VYOzDGp5oFjtDeuY3lnhXy0waBzXYLA9Ce63dnv8TJaEr
+         o75fvmnHOM/Gpqmc/oiX+3jI5kgmTdI5Ow5yeuENueC7tA5VqvbOjn6w1Z29y3LJ3g6x
+         AiKoyKwTogIZ/S0UBZ7uE3s9Fn1U7fZ3Cd5N3Cvv2aXfL0cHP1x82AukfsWwvQ11Yeaq
+         nQfw==
+X-Forwarded-Encrypted: i=1; AJvYcCUV/LoCvHPFhnN0dfxnSytvu7QAiUbWqZsP/RZwVy7AFrxkylGeTYo7ELqBGsurKpaChO83Vqqd2pjvLA==@vger.kernel.org, AJvYcCVuPPhMPu4EpCy2gfhWU5ouExiOisYR+Xy6uYGMd5pVhAaeP4ii72DxhXeFrpqQ3YqGZnxahM40XApv96ec@vger.kernel.org, AJvYcCW5IwE/Retgxbfk/ZLBLvEkQCACA+oaPzYbQQbkCrdb2KG05HipLzkoBVFtKL1l1Y6rOuI=@vger.kernel.org, AJvYcCXNfdG2G1/u+lpRMyPKmoeZg/WgJOF5js49TYJZbxuXDVYSg6vbcgRaquFIdrIZTjKvcJUTFcHl@vger.kernel.org
+X-Gm-Message-State: AOJu0YwuR49e3yeTVViUVPl0dqNN2I2wIFvHR+c335zAFjEwyIH+C0js
+	XXu3G7YX7BcQ7sxlUCd/IgKtEd5nSEbYUGxKFqcxLlnEFmaDwNzF9FvdvOnI2y+BGz3u93IVku2
+	jfuan/zR8APD6hCjEhmGMNOmaIdQ=
+X-Gm-Gg: ASbGncvGFRi7PIjgRdsCYsogptS9nW0ad8SQrBo8BV5UgICjm4zFklvbYHInxhbLu0d
+	ET6HeBt1A7rJhM6jSKeLWbaGrGdzMg8bayd7ZBfr6K/ye1OWr5IARlpvcqXXqR2tOhdhtScAbax
+	poeK1IyKhhRFe1hBY+vBgfwjULrg==
+X-Google-Smtp-Source: AGHT+IFFZQy3AHVTx+IsMUaBmexS/4SASeO8Aozq7/AJe3sTuHDO5KP/I3zD07SptzmaqDtxm6V6w8i17N3wM1R3vOQ=
+X-Received: by 2002:a05:6512:3da2:b0:549:8d2f:86dd with SMTP id
+ 2adb3069b0e04-54acfadce20mr813459e87.20.1742456952969; Thu, 20 Mar 2025
+ 00:49:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250319124508.3979818-1-maxim@isovalent.com> <0fa82602-3b4c-46a7-bdfc-e8a9535e74c1@gmail.com>
-In-Reply-To: <0fa82602-3b4c-46a7-bdfc-e8a9535e74c1@gmail.com>
-From: Maxim Mikityanskiy <maxtram95@gmail.com>
-Date: Thu, 20 Mar 2025 09:43:39 +0200
-X-Gm-Features: AQ5f1JptQOxFyaHBL_6whC1SLRV81O3E-muzaaTZA6TvBU9tdbJmm6wpfjbfMu4
-Message-ID: <CAKErNvrfirDasvmDDbGDu=301tOE43RaTW9jVjBL8=pngPH6YQ@mail.gmail.com>
-Subject: Re: [PATCH net] net/mlx5e: Fix ethtool -N flow-type ip4 to RSS context
-To: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, Maxim Mikityanskiy <maxim@isovalent.com>, 
-	Tariq Toukan <tariqt@nvidia.com>
+References: <20250319133309.6fce6404@canb.auug.org.au> <CAADnVQKotSrp8CkVpFw-y800NJ_R7An-iw-twrQZaOdYUeRtqQ@mail.gmail.com>
+ <CAP01T76CqOxzEiMLKJ2y_YD=qDgWq+Fq5Zy-fnKP4AAyS30Dwg@mail.gmail.com>
+ <CAP01T77_qMiMmyeyizud=-sbBH5q1jvY_Jkj-QLZqM1zh0a2hg@mail.gmail.com>
+ <CAP01T77St7cpkvJ7w+5d3Ji-ULdz04QhZDxQWdNSBX9W7vXJCw@mail.gmail.com>
+ <CAADnVQ+8apdQtyvMO=SKXCE_HWpQEo3CaTUwd39ekYEj-D4TQA@mail.gmail.com>
+ <CAFULd4brsMuNX3-jJ44JyyRZqN1PO9FwJX7N3mvMwRzi8XYLag@mail.gmail.com>
+ <CAADnVQ+7GTN0Tn_5XSZKGDwrjW=v3R6MyGrcDnos2QpkNSidAw@mail.gmail.com>
+ <CAFULd4aHiEaJkJANNGwv1ae7T0oLd+r9_4+tozgAq0EZhS16Tw@mail.gmail.com> <CAADnVQJ56-W--rdeRyRSXVjy5beQpt5scuRuTK9nDUPqdjMQ=w@mail.gmail.com>
+In-Reply-To: <CAADnVQJ56-W--rdeRyRSXVjy5beQpt5scuRuTK9nDUPqdjMQ=w@mail.gmail.com>
+From: Uros Bizjak <ubizjak@gmail.com>
+Date: Thu, 20 Mar 2025 08:49:01 +0100
+X-Gm-Features: AQ5f1Jqxqm5B7f7TpFiD7n5nwUaU8XWL3GsG2zcD6bFVc5Tjvi5UBm5bGSVzTYE
+Message-ID: <CAFULd4bv+j8qomULWzcU_SV8zPtvxefFN6NgPu-WQiHaTR8HCg@mail.gmail.com>
+Subject: Re: linux-next: build failure after merge of the bpf-next tree
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Kumar Kartikeya Dwivedi <memxor@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, bpf <bpf@vger.kernel.org>, 
+	Networking <netdev@vger.kernel.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux Next Mailing List <linux-next@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 20 Mar 2025 at 09:32, Tariq Toukan <ttoukan.linux@gmail.com> wrote:
+On Thu, Mar 20, 2025 at 12:17=E2=80=AFAM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
 >
+> On Wed, Mar 19, 2025 at 12:44=E2=80=AFPM Uros Bizjak <ubizjak@gmail.com> =
+wrote:
+> >
+> > On Wed, Mar 19, 2025 at 7:56=E2=80=AFPM Alexei Starovoitov
+> > <alexei.starovoitov@gmail.com> wrote:
+> > >
+> > > On Wed, Mar 19, 2025 at 9:06=E2=80=AFAM Uros Bizjak <ubizjak@gmail.co=
+m> wrote:
+> > > >
+> > > > On Wed, Mar 19, 2025 at 3:55=E2=80=AFPM Alexei Starovoitov
+> > > > <alexei.starovoitov@gmail.com> wrote:
+> > > > >
+> > > > > On Wed, Mar 19, 2025 at 7:36=E2=80=AFAM Kumar Kartikeya Dwivedi
+> > > > > <memxor@gmail.com> wrote:
+> > > > > >
+> > > > > > > >
+> > > > > > > > I've sent a fix [0], but unfortunately I was unable to repr=
+oduce the
+> > > > > > > > problem with an LLVM >=3D 19 build, idk why. I will try wit=
+h GCC >=3D 14
+> > > > > > > > as the patches require to confirm, but based on the error I=
+ am 99%
+> > > > > > > > sure it will fix the problem.
+> > > > > > >
+> > > > > > > Probably because __seg_gs has CC_HAS_NAMED_AS depends on CC_I=
+S_GCC.
+> > > > > > > Let me give it a go with GCC.
+> > > > > > >
+> > > > > >
+> > > > > > Can confirm now that this fixes it, I just did a build with GCC=
+ 14
+> > > > > > where Uros's __percpu checks kick in.
+> > > > >
+> > > > > Great. Thanks for checking and quick fix.
+> > > > >
+> > > > > btw clang supports it with __attribute__((address_space(256))),
+> > > > > so CC_IS_GCC probably should be relaxed.
+> > > >
+> > > > https://github.com/llvm/llvm-project/issues/93449
+> > > >
+> > > > needs to be fixed first. Also, the feature has to be thoroughly tes=
+ted
+> > > > (preferably by someone having a deep knowledge of clang) before it =
+is
+> > > > enabled by default.
+> > >
+> > > clang error makes sense to me.
+> >
+> > It is not an error, but an internal compiler error. This should never h=
+appen.
 >
+> Not quite. llvm backends don't have a good way to explain the error,
+> but this is invalid condition.
+> Arguably llvm should do a better job in such cases instead of
+> printing stack trace.
 >
-> On 19/03/2025 14:45, Maxim Mikityanskiy wrote:
-> > There commands can be used to add an RSS context and steer some traffic
-> > into it:
 > >
-> >      # ethtool -X eth0 context new
-> >      New RSS context is 1
-> >      # ethtool -N eth0 flow-type ip4 dst-ip 1.1.1.1 context 1
-> >      Added rule with ID 1023
+> > > What does it even mean to do addr space cast from percpu to normal ad=
+dress:
+> > >
+> > > __typeof__(int __seg_gs) const_pcpu_hot;
+> > > void *__attribute____UNIQUE_ID___addressable_const_pcpu_hot612 =3D
+> > >     (void *)(long)&const_pcpu_hot;
 > >
-> > However, the second command fails with EINVAL on mlx5e:
+> > Please see [1] for an explanation.
 > >
-> >      # ethtool -N eth0 flow-type ip4 dst-ip 1.1.1.1 context 1
-> >      rmgr: Cannot insert RX class rule: Invalid argument
-> >      Cannot insert classification rule
-> >
-> > It happens when flow_get_tirn calls flow_type_to_traffic_type with
-> > flow_type = IP_USER_FLOW or IPV6_USER_FLOW. That function only handles
-> > IPV4_FLOW and IPV6_FLOW cases, but unlike all other cases which are
-> > common for hash and spec, IPv4 and IPv6 defines different contants for
-> > hash and for spec:
-> >
-> >      #define  TCP_V4_FLOW     0x01    /* hash or spec (tcp_ip4_spec) */
-> >      #define  UDP_V4_FLOW     0x02    /* hash or spec (udp_ip4_spec) */
-> >      ...
-> >      #define  IPV4_USER_FLOW  0x0d    /* spec only (usr_ip4_spec) */
-> >      #define  IP_USER_FLOW    IPV4_USER_FLOW
-> >      #define  IPV6_USER_FLOW  0x0e    /* spec only (usr_ip6_spec; nfc only) */
-> >      #define  IPV4_FLOW       0x10    /* hash only */
-> >      #define  IPV6_FLOW       0x11    /* hash only */
-> >
-> > Extend the switch in flow_type_to_traffic_type to support both, which
-> > fixes the failing ethtool -N command with flow-type ip4 or ip6.
-> >
+> > [1] https://gcc.gnu.org/onlinedocs/gcc/Named-Address-Spaces.html#x86-Na=
+med-Address-Spaces
 >
-> Hi Maxim,
-> Thanks for your patch!
->
-> > Fixes: 248d3b4c9a39 ("net/mlx5e: Support flow classification into RSS contexts")
->
-> Seems that the issue originates in commit 756c41603a18 ("net/mlx5e:
-> ethtool, Support user configuration for RX hash fields"),
+> You didn't answer my question.
 
-Not really; commit 756c41603a18 configures the hash (not flow
-direction), and IPV4_FLOW/IPV6_FLOW are already correct constants for
-IP-based hashes. Moreover, we don't support them anyway, see
-mlx5e_set_rss_hash_opt:
+Actually, the above link explains and documents the issue:
 
-    /*  RSS does not support anything other than hashing to queues
-     *  on src IP, dest IP, TCP/UDP src port and TCP/UDP dest
-     *  port.
-     */
-    if (flow_type != TCP_V4_FLOW &&
-        flow_type != TCP_V6_FLOW &&
-        flow_type != UDP_V4_FLOW &&
-        flow_type != UDP_V6_FLOW)
-        return -EOPNOTSUPP;
+"... these address spaces are not considered to be subspaces of the
+generic (flat) address space. This means that explicit casts are
+required to convert pointers between these address spaces and the
+generic address space. In practice the application should cast to
+uintptr_t and apply the segment base offset that it installed
+previously."
 
-> when directly
-> classifying into an RQ, before the multi RSS context support.
+IOW, for __seg_gs address space, there exists no (known) offset that
+would define it as a subspace of the generic space. It is gs: prefix
+that results in segment override that "switches" to __seg_gs address
+space. So, to convert the pointer from __seg_gs to (nonsensical!)
+generic address space, GCC allows explicit (void *)(uintptr_t) cast
+that in effect just strips gs: prefix from the address. You can then
+use the pointer as a pointer to a generic space, but you can't use it
+to dereference data from __seg_gs address space - this would be
+nonsensical, so (__seg_gs void *)(uintptr_t) cast is needed to convert
+pointer back to __seg_gs AS.
 
-Direct classification into an RQ actually works before my fix, because
-it goes to another branch in flow_get_tirn, that doesn't call
-flow_type_to_traffic_type. It's only steering to an RSS context that
-was broken for flow-type ip4/ip6.
+> As suspected, gcc is producing garbage code.
 
-> > Signed-off-by: Maxim Mikityanskiy <maxim@isovalent.com>
-> > ---
-> >   drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c | 2 ++
-> >   1 file changed, 2 insertions(+)
-> >
-> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c
-> > index 773624bb2c5d..d68230a7b9f4 100644
-> > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c
-> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c
-> > @@ -884,8 +884,10 @@ static int flow_type_to_traffic_type(u32 flow_type)
-> >       case ESP_V6_FLOW:
-> >               return MLX5_TT_IPV6_IPSEC_ESP;
-> >       case IPV4_FLOW:
-> > +     case IP_USER_FLOW:
-> >               return MLX5_TT_IPV4;
-> >       case IPV6_FLOW:
-> > +     case IPV6_USER_FLOW:
-> >               return MLX5_TT_IPV6;
-> >       default:
-> >               return -EINVAL;
+Nope, this is expected and well documented behavior.
+
+> See:
+> https://godbolt.org/z/ozozYY3nv
 >
+> For
+> void *ptr =3D (void *)(long)&pcpu_hot;
+>
+> gcc emits
+> .quad pcpu_hot
+> which is nonsensical, while clang refuses to produce garbage
+> and dumps stack.
+>
+> Sadly, both compilers produce garbage for ret_addr()
+
+No, they are correct. The pointer is explicitly cast to generic
+address space and this is what you get.
+
+> and both compilers produce correct code for ret_value().
+> At least something.
+>
+> Uros,
+> your percpu code is broken.
+> you shouldn't rely on gcc producing garbage.
+> Sooner or later gcc will start erroring on it just as clang.
+
+It won't. It is well documented behavior, as documented in [1].
+Regarding linux code, you "should not" pass a pointer to generic
+address space to dereference percpu data. Currently,
+__verify_percpu_ptr() only triggers a warning when sparse checking is
+used, but my patchset will now enforce this as a compile-time error
+(this was a much sought feature, and it was possible to implement only
+recently by using the newly introduced typeof_unqual() operator). Rest
+assured, before enabling this feature in linux, plenty of people
+unsuccessfully tried to poke a hole in this functionality and long
+threads are archived where address space functionality was discussed
+to death. ;)
+
+BTW: You can use:
+
+--cut here--
+diff --git a/arch/x86/include/asm/percpu.h b/arch/x86/include/asm/percpu.h
+index 474d648bca9a..e6a7525c9db9 100644
+--- a/arch/x86/include/asm/percpu.h
++++ b/arch/x86/include/asm/percpu.h
+@@ -105,6 +105,10 @@
+ # define __my_cpu_type(var)    typeof(var) __percpu_seg_override
+ # define __my_cpu_ptr(ptr)    (__my_cpu_type(*(ptr))*)(__force uintptr_t)(=
+ptr)
+ # define __my_cpu_var(var)    (*__my_cpu_ptr(&(var)))
++
++# if __has_attribute(address_space) && defined(USE_TYPEOF_UNQUAL)
++#  define __percpu_qual        __attribute__((address_space(3)))
++# endif
+ #endif
+
+ #define __percpu_arg(x)        __percpu_prefix "%" #x
+--cut here--
+
+to also see clang's address space checks in action on x86 even without
+working __seg_gs support (You will need to disable
+Wduplicate-decl-specifier warning).
+
+HTH,
+Uros.
 
