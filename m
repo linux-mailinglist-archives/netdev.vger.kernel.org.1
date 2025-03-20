@@ -1,203 +1,161 @@
-Return-Path: <netdev+bounces-176497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7032CA6A8E8
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 15:46:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1609A6A8E0
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 15:44:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A74216FD76
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 14:44:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60DCF8A0127
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 14:44:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D74BD1DE4C5;
-	Thu, 20 Mar 2025 14:44:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BED71DE3A9;
+	Thu, 20 Mar 2025 14:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cK0M5big"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="ZB9YkaC0";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="LhKiJafH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A4EE1DE8B4
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 14:44:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70E6D1DEFFC
+	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 14:44:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742481845; cv=none; b=rzCtnfR0mSB2VNlYRtS2XSwAJ241YhfEEbDgwEi6kXfw2EsZlGW1aFggqiRzWCmd8xM7uwI6m17DHL97hkP4O4/5wJrWSjhovJzbwkGc88O5yKvZmV6B8/8EdIznRGuctc6V2yztRFHCztUFF4dl3pTlnthDTIhAN/L/okEDw5o=
+	t=1742481851; cv=none; b=BrhXc4LVf/cLrkBga6gj3pySHkKJtMtW5ErWI5mLGgP/zNKU6sZAuBNtNpuUEISCJiEWAd23bO/yQ1ThSl2Tz10YLKUxl/wKGSqJ33G65FJFaji5O7WkC5P/Nm+KzVYgChxlb72d3ILf3Af7Drv7QRmAng3IDBmZE7qi0t1NEnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742481845; c=relaxed/simple;
-	bh=JHzUZoR8lq5MFSvoKkJNi3J/mT9YLstA4OxDQT4tD40=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Yvd5/Fd+BFh8PbJL2xN9YH7oof2HJM1rfgj4Etb4zNKNMnW0F6AoNaJSyP18F2o5tjY6Lr+3O52UNLWL6qgkuv5Wm20CGY8UtvN4ik1DwTxEDaXhpkxAOf6BtjhzLtRQNw8bH2f76NpEmKhTDXcA/dQ8gZRopLIzm9XJfxA4sQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cK0M5big; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-47666573242so462091cf.0
-        for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 07:44:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742481843; x=1743086643; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J9ZTqmYe/Y7irwKFbdto8vqvrOFTVnp0VvvLxz2X3Aw=;
-        b=cK0M5bigQcmD9ie/nsWoj/J90Q0bUH2YkQPUTzGbtMLdHnmC62WSbFJDXzdN+Fknx4
-         m/U7otAPb0BnftYF6ATrd2C1sNw+kEQemqwkK3c9OCGIcFQLAhtPIY5TN7Wnc3aUvBdt
-         iTzwc1HVdco9uEDfW4SAc/+r6C/2Q5cvO5jEoj+ON0Sax/dnx06HvU5Cznuw4QBzWZdB
-         flIHgFTHYJbPJiCWuaSRhZ5Mmo5zB9rCrzGwULm1km7GBFjglK22HLAYppLyqBxF3cK6
-         OS/JDyEMA9zpFguK1vMXRjmMNXiikUaHbt33xDCru2Bzvq3Qt6Oe8AsdsH7IVQQqi0Fu
-         ICZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742481843; x=1743086643;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=J9ZTqmYe/Y7irwKFbdto8vqvrOFTVnp0VvvLxz2X3Aw=;
-        b=XjF/ErdeOjadvWzLPMbuevYZ25j10A8+x1WMFAywQ3GVFjpjoUFNGv1IVWPW94llLO
-         Av1OJ4Y4Oh7WINYNJuTXdslqpa8agqGMi35TATJ/yX1vHqKWIUpXayNeU1QeN5Ek1wZW
-         uLknLM40Z2V4I7pbESR8NXU4H8VHm180WEwA3lp437EvCOyzdyF1RpCOssrP+/q0Qb6S
-         xMakXQhb8OvzmmMjXIvOAupkr0u8cFZcjjsSVcHDx/MgHNMKKj+H8c0cbUqxxYIKZgFE
-         G9RQt0ejsTqptpvdMo4EwfPRo7mg6jGABtq2D9zHnGJrE+2+XW+GTJb0cHCWNyAoA3dj
-         SxJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWeWNX9P2DCDXl5Rvw4/Ic8fw7VCNLGYvlpkMupbTkukLkwQk2AoJg+IKOK3maNU3UqCHVR2YI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZ7wfso5EcYiw6N7ZZFCJ60iZWAld/BVatyIlPXdUWwTmGu2/J
-	OR+mIzwc2krZlCCRBhoNs2rJkx+2aCviYplH1Gi6x5DJP3zfS/nhghcrCVn29rIsoiOUzMbu1Z4
-	MRAXL8T0hx+2NZDczxiyVl6vuQ3IpL/rs6Xr5A1nLK2DbiWfQszxAD6g=
-X-Gm-Gg: ASbGncust9mpwOfdzvYgkZc+Z3CdPUAAMkLC9O1S8pLTQdrjW0XxpF5IAHlZYZWIJhi
-	+7N/EiHyB9gBNl4T2E2kCSkdonrQG8ZeEQReGdnQpy5uv0BHfpOVe6T8/g7w+/DzK2uQ6gb7hVk
-	s1q+e/NSGDD8j3NibY2T2eJHbiOaoZ2JQjTUpIDYQ4GzeX1GQi/BIBGYhg3cE=
-X-Google-Smtp-Source: AGHT+IEjL/Nj9shSfsPtRGjxxQtsoecGvydKBFwrnQD20drHw527kXYtD+oUIxpBw+bu1SgmPT5+B2GB85HeCppN5kY=
-X-Received: by 2002:a05:622a:1149:b0:472:538:b795 with SMTP id
- d75a77b69052e-4771162b279mr3888411cf.22.1742481842707; Thu, 20 Mar 2025
- 07:44:02 -0700 (PDT)
+	s=arc-20240116; t=1742481851; c=relaxed/simple;
+	bh=njoQx6qpC6FxQritPAnKD+HRl2wCL+8HDybLAhG1W9c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E5UsLwMTx1D5VWdcPz8YhuQHW9pqRTCFqfmXQFWHbA/TtruJvmR94B/WN9IVOLVQl4wVZ2x4BXaf6mehhcD8uKvU7V5IYmABefTjcrISdAY8kM1LW2Jjgz8yR6vzs+Uuf0rO88GnkW5brPVOEy1PlkQXK9/jXknYSBFEkdsMLno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=ZB9YkaC0; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=LhKiJafH; arc=none smtp.client-ip=103.168.172.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
+	by mailfout.phl.internal (Postfix) with ESMTP id 4188013834BC;
+	Thu, 20 Mar 2025 10:44:07 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-11.internal (MEProxy); Thu, 20 Mar 2025 10:44:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1742481847; x=
+	1742568247; bh=wRGIcTtEAi63fSKwrWewyC7+lRdsxKDMeOLm2hLaq2M=; b=Z
+	B9YkaC0mrF9jm0dwLTlI1rVNc7qbXBEj+nSKjNbTjKLNoTfMmA5Q0NvCQLQwGAqZ
+	0w5H8A0ii6/DpHZesk/JneVf8I5G1way3riKRD+G35R6rAEmJgL3lXOmq4qIBTvq
+	BKP8VBmTBIJaLAUqTFHl9KVwRnxsqJAXozYdM6fO4W94aLr5t9Aol0wKG3UB/0iU
+	OkrJPtdBwBAwLVeaJCswCK78dj0LeK+zSXQ8dhFzpa5sIvLlt7z+xP/qMS3/EkgW
+	ekpSdPNjocX7xgP/yaDP39YtNzMQpOfOLh8nki0NPkrn8Gv4lObnI9pD2GVr0tV+
+	rnut/ZBkhA9H/1bLyTeow==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1742481847; x=1742568247; bh=wRGIcTtEAi63fSKwrWewyC7+lRdsxKDMeOL
+	m2hLaq2M=; b=LhKiJafHAdIs3UqBlzZtvkyId9ROJi7JbY3qNZ3124cQv+quxZa
+	EJTntCjvgdqztGyHKKo+zX2JaXhJ3VZNTEciOYyJ9ZyZrTSG10q7p2dFHXRdj03r
+	91JtKDG/C4pL3RXrMZDHCWLlQq/dkKzDW33kGoNyFzZPuiPER3RT6m9pRqSa+M61
+	COP2iMWOiWAo0tNZa4mH4hw6vdPCdc9ZaEOKIyJ2HkCx6xzmSgf7hYaQsyAaTYbI
+	fUTmHuA5Lgj1bW+Pk7EwPtt/nzw55MIKGbdPLlY6X3mwjHiBt2VKgykdz221mfBs
+	EBDKBx+PghHkGSRJ1qkJf3l0NypuG8wtRxw==
+X-ME-Sender: <xms:tincZ-SQk22L4WG84i15P3i6lZcuRNWfSPdxRXWUa9ULaC1O8SD-7A>
+    <xme:tincZzylJ85OWT8VJppDn-5HMUGhfGy_U4Qux2ACyodTbp2IhZ5Bv0d61LbHS3JTi
+    BGNmNcM6-3YQKClfA8>
+X-ME-Received: <xmr:tincZ72aBbgndpLt5BGleNNPQ7L1vK32sYUIhmUbNJvA0RJoikb9abwKAL84>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddugeekgeekucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
+    jeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihsh
+    hnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhephffggeeivedthffgudffveegheeg
+    vedvteetvedvieffuddvleeuueegueeggeehnecuffhomhgrihhnpehshiiikhgrlhhlvg
+    hrrdgrphhpshhpohhtrdgtohhmnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghm
+    pehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtph
+    htthhopedutddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepphgrsggvnhhisehr
+    vgguhhgrthdrtghomhdprhgtphhtthhopeifihhllhgvmhguvggsrhhuihhjnhdrkhgvrh
+    hnvghlsehgmhgrihhlrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgv
+    rhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvth
+    dprhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegv
+    ughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnh
+    gvlhdrohhrghdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphht
+    thhopeifihhllhgvmhgssehgohhoghhlvgdrtghomh
+X-ME-Proxy: <xmx:tincZ6AciDT6kJPp8pm_msZp67JMjNDyj8rsAsRH3wrsclUPsyY3iw>
+    <xmx:tincZ3i0bwcaDQtTStekscvwqp_Hgv6fvHQY2TBdfpJMww7uxF9TvA>
+    <xmx:tincZ2pDOnZWerYnzZJjXVNkvniMhUOuVJ4ZS7tAvC3lvT4gjaFTSg>
+    <xmx:tincZ6iBtTNe1aNCPr5ZPy2wDkyWmEVmuwQunmdZzBnSbM8HPN2TjQ>
+    <xmx:tyncZ8ZUjBnK9-WhyZGy1nbgggvok-MgNVw0NmndjIw5QbDFk3tTbkVO>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 20 Mar 2025 10:44:06 -0400 (EDT)
+Date: Thu, 20 Mar 2025 15:44:04 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+	Willem de Bruijn <willemb@google.com>, steffen.klassert@secunet.com
+Subject: Re: [PATCH net-next] udp_tunnel: properly deal with xfrm gro encap.
+Message-ID: <Z9wptMoWONs0FAFo@krikkit>
+References: <6001185ace17e7d7d2ed176c20aef2461b60c613.1742323321.git.pabeni@redhat.com>
+ <67dad64082fc5_594829474@willemb.c.googlers.com.notmuch>
+ <4619a067-6e54-47fd-aa8b-3397a032aae0@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250320121604.3342831-1-edumazet@google.com>
-In-Reply-To: <20250320121604.3342831-1-edumazet@google.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Thu, 20 Mar 2025 10:43:46 -0400
-X-Gm-Features: AQ5f1Jpa66LWn7DMpn05zoGgHtOGYBB81EiVgQ4DVJwC5ysn9OenzEB7XaRBmus
-Message-ID: <CADVnQykt=1rFCBJgSu1b2sm4VQ3t=gdwZ=7cPXMFJ245dhAm4A@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: avoid atomic operations on sk->sk_rmem_alloc
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <4619a067-6e54-47fd-aa8b-3397a032aae0@redhat.com>
 
-On Thu, Mar 20, 2025 at 8:16=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> TCP uses generic skb_set_owner_r() and sock_rfree()
-> for received packets, with socket lock being owned.
->
-> Switch to private versions, avoiding two atomic operations
-> per packet.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->  include/net/tcp.h       | 15 +++++++++++++++
->  net/ipv4/tcp.c          | 18 ++++++++++++++++--
->  net/ipv4/tcp_fastopen.c |  2 +-
->  net/ipv4/tcp_input.c    |  6 +++---
->  4 files changed, 35 insertions(+), 6 deletions(-)
->
-> diff --git a/include/net/tcp.h b/include/net/tcp.h
-> index d08fbf90495de69b157d3c87c50e82d781a365df..dd6d63a6f42b99774e9461b69=
-d3e7932cf629082 100644
-> --- a/include/net/tcp.h
-> +++ b/include/net/tcp.h
+2025-03-19, 16:49:21 +0100, Paolo Abeni wrote:
+> 
+> 
+> On 3/19/25 3:35 PM, Willem de Bruijn wrote:
+> > Paolo Abeni wrote:
+> >> The blamed commit below does not take in account that xfrm
+> >> can enable GRO over UDP encapsulation without going through
+> >> setup_udp_tunnel_sock().
+> >>
+> >> At deletion time such socket will still go through
+> >> udp_tunnel_cleanup_gro(), and the failed GRO type lookup will
+> >> trigger the reported warning.
+> >>
+> >> We can safely remove such warning, simply performing no action
+> >> on failed GRO type lookup at deletion time.
+> >>
+> >> Reported-by: syzbot+8c469a2260132cd095c1@syzkaller.appspotmail.com
+> >> Closes: https://syzkaller.appspot.com/bug?extid=8c469a2260132cd095c1
+> >> Fixes: 311b36574ceac ("udp_tunnel: use static call for GRO hooks when possible")
+> >> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> > 
+> > Because XFRM does not call udp_tunnel_update_gro_rcv when enabling its
+> > UDP GRO offload, from set_xfrm_gro_udp_encap_rcv. But it does call it
+> > when disabling the offload, as called for all udp sockest from
+> > udp(v6)_destroy_sock. (Just to verify my understanding.)
+> 
+> Exactly.
+> 
+> > Not calling udp_tunnel_update_gro_rcv on add will have the unintended
+> > side effect of enabling the static call if one other tunnel is also
+> > active, breaking UDP GRO for XFRM socket, right?
+> 
+> Ouch, right again. I think we can/should do better.
 
-Very nice. Thanks!
+We should be able to adapt xfrm to use setup_udp_tunnel_sock, but it's
+not a simple conversion because GRO could be enabled separately from
+the encap itself. I'm not sure there's much benefit except for a bit
+more consistency when we enable the encap with GRO at once (but we'd
+still have that odd set_xfrm_gro_udp_encap_rcv to enable GRO after
+ESPINUDP has been set up). A few of the UDP encaps that precede
+setup_udp_tunnel_sock have been converted, I don't know why ipsec was
+left.
 
-Reviewed-by: Neal Cardwell <ncardwell@google.com>
-
-A couple quick thoughts:
-
-> @@ -779,6 +779,7 @@ static inline int tcp_bound_to_half_wnd(struct tcp_so=
-ck *tp, int pktsize)
->
->  /* tcp.c */
->  void tcp_get_info(struct sock *, struct tcp_info *);
-> +void tcp_sock_rfree(struct sk_buff *skb);
->
->  /* Read 'sendfile()'-style from a TCP socket */
->  int tcp_read_sock(struct sock *sk, read_descriptor_t *desc,
-> @@ -2898,4 +2899,18 @@ enum skb_drop_reason tcp_inbound_hash(struct sock =
-*sk,
->                 const void *saddr, const void *daddr,
->                 int family, int dif, int sdif);
->
-> +/* version of skb_set_owner_r() avoiding one atomic_add() */
-> +static inline void tcp_skb_set_owner_r(struct sk_buff *skb, struct sock =
-*sk)
-> +{
-> +       skb_orphan(skb);
-> +       skb->sk =3D sk;
-> +       skb->destructor =3D tcp_sock_rfree;
-> +
-> +       sock_owned_by_me(sk);
-> +       atomic_set(&sk->sk_rmem_alloc,
-> +                  atomic_read(&sk->sk_rmem_alloc) + skb->truesize);
-> +
-> +       sk_forward_alloc_add(sk, -skb->truesize);
-> +}
-> +
->  #endif /* _TCP_H */
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index 989c3c3d8e757361a0ac4a9f039a3cfca10d9612..b1306038b8e6e8c55fd1b4803=
-c5d8ca626491aae 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -1525,11 +1525,25 @@ void tcp_cleanup_rbuf(struct sock *sk, int copied=
-)
->         __tcp_cleanup_rbuf(sk, copied);
->  }
->
-> +/* private version of sock_rfree() avoiding one atomic_sub() */
-> +void tcp_sock_rfree(struct sk_buff *skb)
-> +{
-> +       struct sock *sk =3D skb->sk;
-> +       unsigned int len =3D skb->truesize;
-> +
-> +       sock_owned_by_me(sk);
-> +       atomic_set(&sk->sk_rmem_alloc,
-> +                  atomic_read(&sk->sk_rmem_alloc) - len);
-> +
-> +       sk_forward_alloc_add(sk, len);
-> +       sk_mem_reclaim(sk);
-
-One thought on readability: it might be nice to make these functions
-both use skb->truesize rather than having one use skb->truesize and
-one use len (particularly since "len" in the skb context often refers
-to the payload length). I realize the "len" helper variable was
-inherited from sock_rfree() but it might be nice to make the TCP
-versions easier to read and audit?
-
-Also, it might be nice to have the comments above
-tcp_skb_set_owner_r() and tcp_sock_rfree() reference the other
-function, so maintainers can be reminded of the fact that the
-arithmetic in the two functions needs to be kept exactly in sync?
-Perhaps something like:
-
-/* A version of skb_set_owner_r() avoiding one atomic_add().
- * These adjustments are later inverted by tcp_sock_rfree().
- */
-static inline void tcp_skb_set_owner_r(struct sk_buff *skb, struct sock *sk=
-)
-...
-
-/* A private version of sock_rfree() avoiding one atomic_sub().
- * Inverts the earlier adjustments made by tcp_skb_set_owner_r().
- */
-void tcp_sock_rfree(struct sk_buff *skb)
-
-Anyway, the patches LGTM. Those were just some thoughts. :-)
-
-Thanks!
-
-neal
+-- 
+Sabrina
 
