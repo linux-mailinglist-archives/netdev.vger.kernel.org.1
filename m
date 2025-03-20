@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-176503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50211A6A904
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 15:50:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AB090A6A905
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 15:50:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 106D1882BA2
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 14:49:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88F39884EDE
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 14:49:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E78101E0E13;
-	Thu, 20 Mar 2025 14:49:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFC061E3DF7;
+	Thu, 20 Mar 2025 14:49:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LaBHsUhv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B/9E01bF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F8A1E1022
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 14:49:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC9201E2845
+	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 14:49:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742482197; cv=none; b=nTxzwZxux2TGB/jZnJdykdKt07yD4ZR2ezydUcX84+QV2l92NED1jLs0Hdkt2Jp/E1CZ63EVkkEA8KtumF/AMaaRSedgM5nSOBsR1jky+B7gVics5ije8k0t50XI9X3iWvEuf8TrPPGneDNkxPaJLE7AhzTRbgph7MlF/BmKBKA=
+	t=1742482198; cv=none; b=dM5wQSRi1Gwc4q/dJVRsaZyeSJKgwa9jmqjKHFIuF758n16XgFCHc8A71i1qqU1N39j2xe9SNL/xI3Sg1RAD9qlydUDo4T8CAECIfB7WS8GBMOy8u1JfseoxG/qKGG7zRUhxvP8N2hRIU/ks4ryDxqNddfYfjeYXdIIcPRfA/kw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742482197; c=relaxed/simple;
-	bh=Y0LxBADVh1kt5S1VOwHmRSScAbXtln83ebdC8HTyHp8=;
+	s=arc-20240116; t=1742482198; c=relaxed/simple;
+	bh=nclCvtPjp+bVvCl2moDMyXmZsWcmuCFcaAiLNBre3Eg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=sD65tcbKFNbJmS+geK1Iv6UqTiZRSabuXA5gWsfrflqmeY3J07vsWlohqiLixXgbZom8bwFc8KlHIS6azPPaA5rU0EI8mgjRy59z3ndhETsJNg28EmigATEnZvYu5YCt//XN9Za3l43UjEpLy1NGu+TdmUF6PwWf1MgUORk556Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LaBHsUhv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F948C4CEDD;
-	Thu, 20 Mar 2025 14:49:57 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=fkotLx11KU6gdokyMX5Fazqk30kxXyXiKichkOVL3Ye3TgDBHfEXngeoT5I1frE8brQjZOHM3sBV1hvzpaK2oZSpybd7x8txnL2XhVz9pHaIATp1mcisd9F0yAuxwNLJ+S9PX7L3e0/EQ7efib+Hc8xMlcBfsKvYZhXoM0XwD84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B/9E01bF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F79AC4CEE8;
+	Thu, 20 Mar 2025 14:49:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742482197;
-	bh=Y0LxBADVh1kt5S1VOwHmRSScAbXtln83ebdC8HTyHp8=;
+	s=k20201202; t=1742482198;
+	bh=nclCvtPjp+bVvCl2moDMyXmZsWcmuCFcaAiLNBre3Eg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LaBHsUhvk1B8aDoGmOzsgiFSdCRaJzJs106goQu8BnfzWkceFtEs7GBSzKXtJzbTN
-	 pXXPCWdy/We3fEHdHxzbDoOhPSrHv/BsHzQK19IgIbVjRlLkFVoqdkWwtRsaYAFYbG
-	 ZUcDuPM/8A4BwfURh3n617q9KapTfTM5WoCuNmc+zz5bYLkr2tQ5oubs/OkUOe1knA
-	 pEBrGuU67h+7/GPXRrfzpG+Fdhn8cfsKbFzoYemy41RrrU5t6XNejDhB5NoEtXaf8D
-	 xP+dap8d9SIkrPv/LupmJek/7qKoDcmtl3gX+zW7keEWlw963559PdweuYScssGP9L
-	 CFqg9XHtNYeJQ==
+	b=B/9E01bF/hS6rFYHDmuXbK4DbCaRvVGJzX6v45jgwCAGCuUbfpy3OpR0wR47LTqFT
+	 qunHi1T2XzLoNPK7OvfRMGXiBbOGQIMMQu8Jjo9lthSh4SIw9T3AaUEWJ1fIn5RZTy
+	 /heSSTBjkfSppiMdx3TjzLU7gNR0cQj0i3gg2d/cePI8khT/QdL56PgmRz7DISsDxB
+	 805pLaKQ56qWBi6h9xfvbDuhFUrEf8PATG+P+BFyeDaYqclbfALyObBBrDAsdEbrJz
+	 IuTZ8V9ZlhNuJxd2PfHDLUV0u2oJ5JgNHJhodZ9v4vX50yMCf9J380GdMz/PpelaVI
+	 n+BiIEOGia2Dw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 343763806654;
-	Thu, 20 Mar 2025 14:50:34 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADFF73806654;
+	Thu, 20 Mar 2025 14:50:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] xfrm: Force software GSO only in tunnel mode
+Subject: Re: [PATCH 1/2] xfrm: fix tunnel mode TX datapath in packet offload mode
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174248223302.1795325.5848574485105137769.git-patchwork-notify@kernel.org>
-Date: Thu, 20 Mar 2025 14:50:33 +0000
-References: <20250317103205.573927-1-mbloch@nvidia.com>
-In-Reply-To: <20250317103205.573927-1-mbloch@nvidia.com>
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, chopps@labn.net, cratiu@nvidia.com, ychemla@nvidia.com,
- wangfe@google.com, lucien.xin@gmail.com, dtatulea@nvidia.com,
+ <174248223427.1795325.9057916434131404700.git-patchwork-notify@kernel.org>
+Date: Thu, 20 Mar 2025 14:50:34 +0000
+References: <20250319065513.987135-2-steffen.klassert@secunet.com>
+In-Reply-To: <20250319065513.987135-2-steffen.klassert@secunet.com>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: davem@davemloft.net, kuba@kernel.org, herbert@gondor.apana.org.au,
  netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Steffen Klassert <steffen.klassert@secunet.com>:
 
-On Mon, 17 Mar 2025 12:32:05 +0200 you wrote:
-> From: Cosmin Ratiu <cratiu@nvidia.com>
+On Wed, 19 Mar 2025 07:55:12 +0100 you wrote:
+> From: Alexandre Cassen <acassen@corp.free.fr>
 > 
-> The cited commit fixed a software GSO bug with VXLAN + IPSec in tunnel
-> mode. Unfortunately, it is slightly broader than necessary, as it also
-> severely affects performance for Geneve + IPSec transport mode over a
-> device capable of both HW GSO and IPSec crypto offload. In this case,
-> xfrm_output unnecessarily triggers software GSO instead of letting the
-> HW do it. In simple iperf3 tests over Geneve + IPSec transport mode over
-> a back-2-back pair of NICs with MTU 1500, the performance was observed
-> to be up to 6x worse when doing software GSO compared to leaving it to
-> the hardware.
+> Packets that match the output xfrm policy are delivered to the netstack.
+> In IPsec packet mode for tunnel mode, the HW is responsible for building
+> the hard header and outer IP header. In such a situation, the inner
+> header may refer to a network that is not directly reachable by the host,
+> resulting in a failed neighbor resolution. The packet is then dropped.
+> xfrm policy defines the netdevice to use for xmit so we can send packets
+> directly to it.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] xfrm: Force software GSO only in tunnel mode
+  - [1/2] xfrm: fix tunnel mode TX datapath in packet offload mode
+    https://git.kernel.org/netdev/net/c/5eddd76ec2fd
+  - [2/2] xfrm_output: Force software GSO only in tunnel mode
     https://git.kernel.org/netdev/net/c/0aae2867aa60
 
 You are awesome, thank you!
