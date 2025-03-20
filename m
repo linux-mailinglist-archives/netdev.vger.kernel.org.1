@@ -1,157 +1,113 @@
-Return-Path: <netdev+bounces-176393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7EBEA6A07A
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 08:32:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBEC4A6A099
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 08:41:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48FAE3B61B5
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 07:32:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37F2F425714
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 07:41:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03FAE1EBA03;
-	Thu, 20 Mar 2025 07:32:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A73B1F869E;
+	Thu, 20 Mar 2025 07:41:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZuHbQ5Z5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V1lAK67G"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AB041E231D
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 07:32:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD2B31E3769;
+	Thu, 20 Mar 2025 07:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742455961; cv=none; b=C/jtSg19oQpn7RYp2qVrKkMcNahg4SokFpw29qbmDw6hd0ICQzvH0ChRECmxOqz9GC8n1A3FSxEvB7pa/ssbcUbpvmJre3WABoQ3qB2O9cb8+VSOys1xhFK9aE27//N9vwvvsqBXw2vwZGmdieH3lEiKd6qOFtMiHzp4m8Cscfk=
+	t=1742456466; cv=none; b=m2MUr1xshysFlle4cpT61ggrDuQ1JaUGyPj/0aGVZhhj+cAuAYM6O5Tr3yFDo6Y+bjzAxFr6cD4H5xxrA6FW45rXsNzZOEgEtAnzLRNN9jwqwiwA+ujiYaAuUgOZM/do6VFdwc95ZzvwaYDXkqEqLN9NtZQO16V/sTQSxZYyw8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742455961; c=relaxed/simple;
-	bh=daCIASolwaniAtlLhEH0RTBjEHd2HnK/n/ru5jYx7p0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KfAI1s9+SCFR4v+0SX4DcrZi7Pam3R8fou80D2dVYXt48o1zjlBFNPBUMiiP9L1kGWLL4qSXvMcUJBZCd0aeu5fg79pucdbMqA101CK4SCnWhPJzbSC6VvYbvzBVWkT88Cv3BY1vajWS2RdzAPwhKjnq8YgSmociR1XNbQ8QGHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZuHbQ5Z5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742455958;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=i8IycAQW9i+7nWsPxtTuBjKHqYQioy6WPT76GyNxAUE=;
-	b=ZuHbQ5Z5hBpMbc9d5Ixq+EiUK0m5lnl9fvIeWirKwstQkyhQTFYaWGflsMtSw+9QSZ7mYF
-	FLZlTJV1Z/9ib57EFlzyLoi7zWyDk93G93x08P+FRNRjTRZconldAV+VKtXyEnzMRKa1e5
-	lga9GJhgTuUfloRE+ivX9SATLpe9WyQ=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-689-8JEsqd-ZNTaa3DmJiNVgXA-1; Thu, 20 Mar 2025 03:32:35 -0400
-X-MC-Unique: 8JEsqd-ZNTaa3DmJiNVgXA-1
-X-Mimecast-MFC-AGG-ID: 8JEsqd-ZNTaa3DmJiNVgXA_1742455955
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3912d9848a7so781991f8f.0
-        for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 00:32:35 -0700 (PDT)
+	s=arc-20240116; t=1742456466; c=relaxed/simple;
+	bh=4sXeiqOIXgRkPqJvfQ595TU3AC9+kIhH7Vxw4P7Zfvk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sX7KNn0wONRtOGkNFn403xLFs2ahdG750TtQX7r0ngQWOUGeT8v0U/F8LrCwkL0jjkQWmCDHahrsfCsHUCKjFOPjFJm5eYyGrbFYuiupWZ5sbo648yz1sQAlXdLXAonJOc8EL4enE1eHBs2dnk4zwmFBWthMeLXYIrUMUBuaVMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V1lAK67G; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2241053582dso8498275ad.1;
+        Thu, 20 Mar 2025 00:41:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742456464; x=1743061264; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=S+9rATyUbEgbSLtbUz3EQuHc/4v8uBGhvmxcbw9HTp0=;
+        b=V1lAK67GLhO5Cc0s/AuYQwjUGy6jq3PH463TwhvlHQ4RseSMXzpZXphof5KUGwsLo3
+         ABLBBw1drKrTQZk1OyHNFVjJxPd43DsQ+xPpv55M62MxnSXf51+lqq+jktIOlKCDIHxQ
+         rPgp+3ipSZz44mfEsygM5rc5+knBXWOAhp32ptr/JKFQSKf4vnRCpIyhf6cL8eTPOsmT
+         KLcBxfa7kPDtY1q9RguvEqXxurgDlqL+ycImga7gUdHBN9LwoW7O+CD1nvSkczVhSD6W
+         O3icatngjJ4wqqakF0FzY6oSYKtHW66zbEbx/vEAs7/4UBSe6buYPdozfCBoK+CGRMSP
+         qvxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742455954; x=1743060754;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=i8IycAQW9i+7nWsPxtTuBjKHqYQioy6WPT76GyNxAUE=;
-        b=mi87W3fz7OUD5AP212aX/2NihSiNHIq2xb56P5BDY2s1wdff525kSX/feqxntbq//r
-         JEJ84FDhKGf3U83gDNdFZzcq218Dta/4mx4hf7SXy10ht78xn+ayWkWZZqdHxRxOinQU
-         cdAEZVehwW1xpP54X1tAR97WdKZi8DD6YRhQVFxMA4gmzuXLceCi/bQFC3jAL0WDR3Yw
-         9/OvKh1C0MM2l+ChzEeBLEe8b5UqlmADGIJmU4j5QmUGJVqINd1U0h55bvq4Rv4qpmdW
-         2wNJwMXIkD+MMDHmnhSH1P+dv0TwKk61+riXwDXEBNvvB+EFswjFA9o3dl0LnuP3AEE+
-         amlg==
-X-Gm-Message-State: AOJu0Yxyqiq0SWXKxR0rcv8E3DKou9FBw8NN0M+CiHgMDhBe9pAT08ag
-	dkUV4lm7FpjVw/MLmyXNMSvAbIN3FYLG07s4KQ4F9X3Keqp30ICe6JnfGCz8hda4M4/+0+l2sAY
-	lUA3PunxtzS9gEUed2VYneTTgoU23Ww2oTaz8DYY4KPpfoXNuA0adEg==
-X-Gm-Gg: ASbGncs2btCWbXbnXNDEEjKbuX5Q/KHgPHsvKdsFR3C6OTbGq4sBnBGtqXWeDgM25tI
-	4eotRlexwWdw3LdQ1FX6iU/NMvK2JEKAYfvL+w5IJjfOgsq23t1S877hh6mKh/U8YrWe2mDXUn/
-	adlDrTVaXqMjA1MfU1s8p7y9Vw0+lDnm1iJQTul01EJJJadtVsnk6TtBRNqRR8Mhc9uoTOnDt5S
-	+9D+8mn2SJqaVyVeyAPcX6OC0LZ8IQerMe/cySgjI9BJuMId4plD8pCQZHzN6cJxa8ri/ZbERZx
-	J6dPOOxaZViWYdvca1769CleiVni3Km8W4PpQc0gklrd5Q==
-X-Received: by 2002:a5d:59ab:0:b0:391:2884:9dfa with SMTP id ffacd0b85a97d-39979575675mr2027695f8f.13.1742455954529;
-        Thu, 20 Mar 2025 00:32:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHes9FMepiTYsK7aF5+u8D4vg7gko5a63whfVo02JMIIfCg1WVHhXudNJPsojMmvl2UsjsWkQ==
-X-Received: by 2002:a5d:59ab:0:b0:391:2884:9dfa with SMTP id ffacd0b85a97d-39979575675mr2027664f8f.13.1742455954106;
-        Thu, 20 Mar 2025 00:32:34 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-10-172.dyn.eolo.it. [146.241.10.172])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-395c7df33aasm22593068f8f.2.2025.03.20.00.32.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Mar 2025 00:32:33 -0700 (PDT)
-Message-ID: <e90db88f-05d6-4389-b5bd-5e4146bdfbe8@redhat.com>
-Date: Thu, 20 Mar 2025 08:32:32 +0100
+        d=1e100.net; s=20230601; t=1742456464; x=1743061264;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=S+9rATyUbEgbSLtbUz3EQuHc/4v8uBGhvmxcbw9HTp0=;
+        b=B4FbfVX8reW64mac7JUsnB3ofCBhvtZLhAMee7eeSrON7QNUawnc1oKWj73oDUMbfD
+         FwOUDzECeGhX6xip5s9nCJBmjF/g4aJMxRvwi1Y8nArrj8/YvjmDj17zxLeWbg5hYm8U
+         A8rJFqedaZT2efDrSpU9Wk9qdkNUGutFPZUXB9VwmxFdS5ws9UySQw6M6/UvSk5udB9x
+         dM8NT/G5VAskue01VKPoVsPklCCSOUkurEbKm322YvUsxRoRBWC2d5rT20FFqZlM70i4
+         FrEEvjj4T/sgBtUG712UGQEvKUfsITbq9exaUjfGeE6bPKzK8jRIQ2tu6wP14nj5mkOW
+         EVjg==
+X-Forwarded-Encrypted: i=1; AJvYcCUVTSaunyd2Ul5aoOVu5Uq1wkgXX37jm0N9wIx13KH04rWmB2VudGTUHhS3W+8Yvo1Dx4T+f4eFIIwZH+U4@vger.kernel.org, AJvYcCVhYsmF4ATnzEWhTRnV/9AhsfZvQ7o2UVT4PoN/MkBO0Wgb+b6llw72NwlUTkcLpIkuxmPTqXkc8P+AblxDSFck@vger.kernel.org, AJvYcCVqV8Tk6ap6L/xJ19Ba0+p6+gxYHojBh/65CapSRxq/sQ4xBsODoOa4/CGTWXKyp3Gu26A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXTDvEo3b1yQL6DxvlX3EP8FDqAzeI4buQn/DXXBi4aFuYNEjk
+	37iqmxO8y94Prt+YnQz8HDxpV/5HavnBqvMp4yLsDhXMDtypOOiR
+X-Gm-Gg: ASbGncvNMyFuvN7f+NR6SpyqQOr0ipd9ox5SUtBLPjm3uWkyr9jdqeRYcYh4qpIuY/v
+	Kogs7RacltjovyMa0pDyZz/ZIR00i8V89EBY4x4r8ylMCq9VCqo7phXNRzmel8FCyj5st+ptOqP
+	RqgNl8yxqn1k8xZuhe6nFf4ARXCYqHj6DlV8t6wvlkQwp4iMYQyp0bWU85wwrwUfyVqUkezI4RH
+	dDhKPoSW24pflBTHtiJEI6996m4SCJGvYquuGAy6Irors9JjcIzA8Z4iNKVcZRsnwyj1aE4x/Wa
+	yPpJObM0UD7irPZ7rwMik8wzR82K2dzQlY9x/rEPsh4/KI5oQ0waHAYiiaHxeeErIw==
+X-Google-Smtp-Source: AGHT+IFEvvOq/4NLQ23MHF6FNa/FiH21cHYco1EVNW+1BRuvD/pJTZLz+96cxRxci0zjnwX0L+gRcQ==
+X-Received: by 2002:a05:6a21:3a4a:b0:1f3:47d6:aa05 with SMTP id adf61e73a8af0-1fbe87272d0mr11208399637.0.1742456463841;
+        Thu, 20 Mar 2025 00:41:03 -0700 (PDT)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af56e9fe51asm12244697a12.36.2025.03.20.00.40.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Mar 2025 00:41:03 -0700 (PDT)
+Date: Thu, 20 Mar 2025 07:40:56 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>, Phil Sutter <phil@nwl.cc>,
+	Florian Westphal <fw@strlen.de>, Petr Mladek <pmladek@suse.com>,
+	Yoann Congal <yoann.congal@smile.fr>, wireguard@lists.zx2c4.com,
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv4 RESEND net-next 0/2] selftests: wireguards: use
+ nftables for testing
+Message-ID: <Z9vGiL1KkO5x8I-j@fedora>
+References: <20250106081043.2073169-1-liuhangbin@gmail.com>
+ <Z9lJ6PXHeL7tfhUf@fedora>
+ <Z9rso2MXYBFGnJYl@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v10 0/5] Support loopback mode speed selection
-To: Gerhard Engleder <gerhard@engleder-embedded.com>, andrew@lunn.ch
-Cc: netdev@vger.kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, ltrager@meta.com,
- Jijie Shao <shaojijie@huawei.com>
-References: <20250312203010.47429-1-gerhard@engleder-embedded.com>
- <ab02f08f-d294-462e-bbda-bb6909781ce6@engleder-embedded.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <ab02f08f-d294-462e-bbda-bb6909781ce6@engleder-embedded.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z9rso2MXYBFGnJYl@zx2c4.com>
 
-On 3/20/25 7:26 AM, Gerhard Engleder wrote:
-> On 12.03.25 21:30, Gerhard Engleder wrote:
->> Previously to commit 6ff3cddc365b ("net: phylib: do not disable autoneg
->> for fixed speeds >= 1G") it was possible to select the speed of the
->> loopback mode by configuring a fixed speed before enabling the loopback
->> mode. Now autoneg is always enabled for >= 1G and a fixed speed of >= 1G
->> requires successful autoneg. Thus, the speed of the loopback mode depends
->> on the link partner for >= 1G. There is no technical reason to depend on
->> the link partner for loopback mode. With this behavior the loopback mode
->> is less useful for testing.
->>
->> Allow PHYs to support optional speed selection for the loopback mode.
->> This support is implemented for the generic loopback support and for PHY
->> drivers, which obviously support speed selection for loopback mode.
->> Additionally, loopback support according to the data sheet is added to
->> the KSZ9031 PHY.
->>
->> Extend phy_loopback() to signal link up and down if speed changes,
->> because a new link speed requires link up signalling.
->>
->> Use this loopback speed selection in the tsnep driver to select the
->> loopback mode speed depending the previously active speed. User space
->> tests with 100 Mbps and 1 Gbps loopback are possible again.
->>
->> v10:
->> - remove selftests, because Anrew Lunn expects a new netlink API for
->>    selftests and the selftest patches should wait for it
->>
+On Wed, Mar 19, 2025 at 05:11:15PM +0100, Jason A. Donenfeld wrote:
+> On Tue, Mar 18, 2025 at 10:24:40AM +0000, Hangbin Liu wrote:
+> > I saw the patch status[1] is still "Awaiting Upstream".
+> > Is there anything I need to do?
 > 
-> Hello Andrew,
-> 
-> The patchset now does not touch any selftest code anymore. It now only
-> fixes the 1Gbps loopback, which requires a link partner since
-> 6ff3cddc365b. tsnep is using the extended phy_loopback() interface
-> to select the loopback speed. Also the phy_loopback() usage in tsnep
-> could be simplified, because thanks to your review comments link speed
-> changes are now signaled correctly by phy_loopback().
-> 
-> I'm curious about the work of Lee Trager and I will definitely take a
-> look on it. I will take a look to the netdev 0x19 talk as soon as the
-> slides or the recording is available.
-> 
-> I did not get an answer from you to my last reply of v9. That's the
-> reason why I decided to post v10 without selftests. How to proceed
-> with this changes? The development cycle is near the end, so maybe
-> you want to delay this change to the beginning of the next development
-> cycle?
+> I'm looking at it now, but the subject line of your series says,
+> "selftests: wireguards: " which is really not the same as all the other
+> patches that touch these files.
 
-FTR, I reached for Andrew off-list and he is ok with v10. Given the
-large PW backlog and the upcoming merge window, I'm going to apply the
-patches possibly before his explicit ack on the ML.
+Oh, I will fix the name in next patch.
 
-/P
-
+Hangbin
 
