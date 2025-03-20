@@ -1,82 +1,117 @@
-Return-Path: <netdev+bounces-176458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 826C3A6A6EA
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 14:16:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B915AA6A6FE
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 14:20:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 94679188DAFA
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 13:14:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DD8046848F
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 13:19:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DD001BD014;
-	Thu, 20 Mar 2025 13:14:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 005F819D067;
+	Thu, 20 Mar 2025 13:19:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eupG+15v"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SD/aXfu+"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CE4C33CA
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 13:14:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFDB31CA84
+	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 13:19:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742476469; cv=none; b=bLf0BakBOIwqoERv+R2fdQ7jApNR0wOclRdsowKSO0UEbkNazlseWnwuh6MSXBFOQxm1s42LppLNDLTnbI5dexaShldQ7g6r8lbAWIY6tICS+qkonAWLaLHyfPbi7yQE+srUGEqq7sQhihbZGvsWIzFKGzMD//ht1bWH2dx5OwE=
+	t=1742476773; cv=none; b=UlG/r8F4epl2K91cF/fvTl8Mu1DBmQfBbPm8xGR4YQVDGh/3v0AVqXbNRebL5/IGy+LJ5L9wotn7iR/6MCMqQT6L8ijqeDmhtDfmAvSztoRAbQfFqu1jlUN+gEDsQWEmPjn9FIUE0j1GPcJubaUJ2GeznFWjadhXN7lGrv+gq0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742476469; c=relaxed/simple;
-	bh=StIqtI3oxvpeIa7pmInY5NC6S4dHA9bnkvhXjmUsquc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gLn8aXbewGLvzY3Tfvb+n5d661ntC7eO7mvYLv0TcA5slvRNbLBJiQ++VsGeFE/3CQJ1nBtFU25O8AxkEEX0tYtZxSJoVnEIfUk4/5oOP5FRbtV9UDCHTOaaRvVwIRvoBA3RW0W/NHeMOvPOFH+10LNqpYKc1KJKToSIHzxVo1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eupG+15v; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=sz2sSkH1ong3fjmxmo3nFV30+W3gGqWoxCEg1bDnGJo=; b=eupG+15vHW65M4kVPTUeh6BlO3
-	VrfWA1vOfA1YgZz9yb3Nyoj5CxG5rBjlYcz5jlsC5qPRA1qo70UzBesQTs0uOEPjYGicK7Af0sg+0
-	HowE/ulx5MXm3yaDYNa1QvzoZLbpHcxpEpB6c3oIoKv5BHa7ufMVc1vhcppb3RwDcNsA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tvFiy-006Tg3-EQ; Thu, 20 Mar 2025 14:14:16 +0100
-Date: Thu, 20 Mar 2025 14:14:16 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Tobias Waldekranz <tobias@waldekranz.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
-	kuba@kernel.org, marcin.s.wojtas@gmail.com, linux@armlinux.org.uk,
-	edumazet@google.com, pabeni@redhat.com,
-	ezequiel.garcia@free-electrons.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: mvpp2: Prevent parser TCAM memory corruption
-Message-ID: <16143c70-de5a-4f30-ad29-eae33d2e5b0b@lunn.ch>
-References: <20250320092315.1936114-1-tobias@waldekranz.com>
- <20250320105747.6f271fff@fedora.home>
- <87zfhg9dww.fsf@waldekranz.com>
+	s=arc-20240116; t=1742476773; c=relaxed/simple;
+	bh=8v2IlNO/kUlcnwT83q5ZXsTX+JsEa2epR2YhLXfU0YQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tudiMa4Q3OGc+QgAwDaXPaaNX5UaJ6i8MLCddO+q0NzDcIKRj4bAkcolH32hVzx0pAIt0vs9RjREXMgbtgxSm2f5V/8oRjh9nQKZk8HOC7yDwb9BrqpeYKWg+J8rmEDeZdI8f/eaSD/yef/QmkVHb5e5T+HzvwfY5e6Sa4xszGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SD/aXfu+; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1742476772; x=1774012772;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=8v2IlNO/kUlcnwT83q5ZXsTX+JsEa2epR2YhLXfU0YQ=;
+  b=SD/aXfu+RP84XlGGsUrsMimX12JnO1P+h9mxWBZKdgzMyMLrt9VMutYm
+   SzD6Rx1VB9vCBkb8iHbvcO/IGVJBhlVlYfgCUMdhnDfgBM1U2bZPEFROp
+   +1ib3NkQ/5iY3ZCbVxB4m1tf7q7RyrgHiWRXduTr7WO/ucSvjbmRxUG6B
+   PiSkFO8VlBzbPGw2Jqs9DRvAjeOgg/XwBFfLqsBRiJn0s5UMDThEpTEqy
+   K4IZLV8RlJmw1pyjJEpASq1Q7qYyY6AROwgnDm1TP3b+0QYHIB31EUoFc
+   PUY8KGwfbXcw42wB7L/RMXSIWnZWN9o8ds3sX58AerYCz46nhbn1GPXcu
+   A==;
+X-CSE-ConnectionGUID: h94hOUYdRMyeB5Au7MeNpw==
+X-CSE-MsgGUID: el+JXPMdQyyeijk8ZFPA+A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11379"; a="55083732"
+X-IronPort-AV: E=Sophos;i="6.14,261,1736841600"; 
+   d="scan'208";a="55083732"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2025 06:19:31 -0700
+X-CSE-ConnectionGUID: KOJKTDjzQV2xkHAHfocs7A==
+X-CSE-MsgGUID: 08z3xn/GS0uv/VR5PmleUA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,261,1736841600"; 
+   d="scan'208";a="160311374"
+Received: from gklab-003-001.igk.intel.com ([10.211.3.1])
+  by orviesa001.jf.intel.com with ESMTP; 20 Mar 2025 06:19:30 -0700
+From: Grzegorz Nitka <grzegorz.nitka@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	horms@kernel.org,
+	Grzegorz Nitka <grzegorz.nitka@intel.com>
+Subject: [PATCH iwl-next v3 0/3] E825C timesync dual NAC support
+Date: Thu, 20 Mar 2025 14:15:35 +0100
+Message-Id: <20250320131538.712326-1-grzegorz.nitka@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87zfhg9dww.fsf@waldekranz.com>
+Content-Transfer-Encoding: 8bit
 
-> We still need to disable bottom halves though, right?  Because otherwise
-> we could reach mvpp2_set_rx_mode() from net-rx by processing an IGMP/MLD
-> frame, for example.
+This patch series adds full support for timesync operations for E8225C
+devices which are configured in so called 2xNAC mode (Network
+Acceleration Complex). 2xNAC mode is the mode in which IO die
+is housing two complexes and each of them has its own PHY connected
+to it. The complex which controls time transmitter is referred as
+primary complex.
 
-Ah, that answers the question i was asking myself. Why does RTNL not
-cover this...
+The series solves known configuration issues in dual config mode:
+- side-band queue (SBQ) addressing when configuring the ports on the PHY
+  on secondary NAC
+- access to timesync config from the second NAC as only one PF in
+  primary NAC controls time transmitter clock
 
-Maybe the design was that RTNL is supposed to protect this, but things
-are happening outside of it? It would of helped if the code had put in
-some ASSERT_RTNL() calls to both indicate this was the idea, and to
-find cases where it was not actually true.
+v2->v3:
+- update commit message (1/3) about regression risk after removing the
+  workaround (no risk expected) 
+ 
+v1->v2:
+- fixed ice_pf_src_tmr_owned function doc
+- fixed type for lane_num field in ice_hw struct 
 
-	Andrew
+Karol Kolacinski (3):
+  ice: remove SW side band access workaround for E825
+  ice: refactor ice_sbq_msg_dev enum
+  ice: enable timesync operation on 2xNAC E825 devices
 
+ drivers/net/ethernet/intel/ice/ice.h         | 60 +++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_common.c  |  8 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c     | 49 +++++++++---
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c  | 82 ++++++++++----------
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h  |  5 --
+ drivers/net/ethernet/intel/ice/ice_sbq_cmd.h | 11 +--
+ drivers/net/ethernet/intel/ice/ice_type.h    |  1 +
+ 7 files changed, 149 insertions(+), 67 deletions(-)
+
+
+base-commit: 410597c085b1ab697bd40cc8cd532eb337a5405e
+-- 
+2.39.3
 
 
