@@ -1,312 +1,203 @@
-Return-Path: <netdev+bounces-176407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6512FA6A198
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 09:41:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3999A6A1A8
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 09:45:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83905188D3A3
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 08:41:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 119A51891857
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 08:44:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACA0621481B;
-	Thu, 20 Mar 2025 08:41:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F300521481B;
+	Thu, 20 Mar 2025 08:44:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Iz7Oyd/1"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="TKa+pj+d"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2085.outbound.protection.outlook.com [40.107.220.85])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B4920B7F9
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 08:41:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742460092; cv=none; b=Mv/NqQoHU1UylkH3q9buNvi8CYnpuTPsC1SdDu9lHrZvqoOzIGMFerUBaAc2y5lRQV/mZsQ+TteOBXk+DlqhVHR6fGS7Ve+Owv4l9uhhDJTH25Ztvzo4jZnPUzYCCasf0t9R9TYAPXwZ4lqJP79tNzqclCDWFA8e3uHwE47kbHo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742460092; c=relaxed/simple;
-	bh=Xl0sN9nXKyD7XwlQ3LKCTHRWE2oPfn/jUJqZWIlcH54=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Ax34MBlB4prFqHHDMa0redDVlKuhXMB4b2VeToxvNYZ6R76XU2NsFOQ5RWxEOhijsOo3zh27s3t2FfiEF0K19L3T0XyRQBekoVRjXkhkgkqPplobW5lWg9cboNCCNxHQa4vTapEaCtwz6rLU317egxZwcxvdPYCmwqaQf/BWoMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Iz7Oyd/1; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <c7ddbc01-f526-44dd-a7bd-69b9a38a040a@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742460086;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zi1iaGlhfR+TaozLS52j8nqEXg7xPT6xox5yrHMs700=;
-	b=Iz7Oyd/1BoO3jnxOu5a4VU/oU80VEa69kyjdz+fDWsaZOYsSJid6vUfpZIfqofRCpWLXjs
-	MfOYBeRe9eyVJRSoMYCDpO+GHnnWaXC7GcdlNErLtJdiQU9TiCtJCKZDecCE1W/yj9tDHT
-	O1HpJKx9AU1ZNZKltrGbA7FL+/C8rxE=
-Date: Thu, 20 Mar 2025 09:41:23 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C5C21519BE
+	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 08:44:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.85
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742460251; cv=fail; b=tF6yVcpR1HucZrMzDit/vhYs5SRaKJBHkC3FIg8n3pWxQ7HQKcXICLfETblLO3hsg0gQ/aXzJq5VbMLqTpvmLmtao4rNcixEXEpIYZJfKGDlfBDwJ4z5rWPN/Rzz5T8SG70JRmZTVRMW1fIB6vwZXLfCB7m7nxE/FqHVLM6By4A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742460251; c=relaxed/simple;
+	bh=7RzlZ1u/9i3RiYCwACUwRnWAeDSiwnYiO3HstpS7Yig=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=BTOJQ8n4T3aDRPkY/PBBC5uE0NTpI8z3x3XNvLRaO+2YoZypcO5fhsIDLZLmMdG/+/L1H4Z0UvWQBBta7CwukNZrdVh+WY4cPyM7ZnuzjvDyK+9kTg7G/TKf3l0gcCgHcnV7Z49XlxDSAN0HA/OCiL9zQUWVJwurqqpJFHrIpyg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=TKa+pj+d; arc=fail smtp.client-ip=40.107.220.85
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=E6uZWXbhQbduQedDaMQFPEYnrAKtfqlDpXWt/8pig7pxfIN1aNnTV8iJ71rqWsYspIhTs6dzTR0QeqaBTj5haRGGkuXAfoq25pg3BUZA2jK/0Bgg0uZiSDhCLaWiS23W3pSSnYPzU26+xv7vFZTFyfE1DtxKl4sw1uSIW4gS62vUCmSrbWPo7RAD4f6V0n7MCg/WITHTobwIC/E8dhS+Yqt5tVw81pj8372NnxuJvqEZNm5IE7EKElgIaeCB8jOI/DF75Rxlbvsr5rwT3o+h9Pf7iN/m4r8owaF/nYd7LeRD92iEHMTjCazEZh7v8k9lDqja5y7xIIWv22JuPB/Rpg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7rFg9xf/oN+qjiFL6hokwFBaW+kfJZ9X0gruG7OBWM4=;
+ b=KCl2d8AceYFBBdCJZiOGm2Dxl39dPjxvX9KYi9STtqlTbyGn7b1Neb2O0lJYCq6Si6HnbDGZl/QAOG5sPya/K7+k34vVXBWK+xnaaV8y5NZdFX3cKTYFK6Cy5irmJTuWNziBgVIdbhBCPYNT5Cn9OwJtZc9k45jxsB3746DDPUpYYZRGFgcW8O+Rk9hbOmZXqJJR8XxqhmbXN2M6yn2sZ4d20pzRny+AGyhX9BaSKh4eGrpK8qQusEgzRDSejiJqdm8hlxfZuBOdMB7ul/8Z96b6LBPeNiv4HUtD0ffedeTTaJawaMqVW9gFc91w+MJklYLf68oXhdOKmwofn9cYwg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7rFg9xf/oN+qjiFL6hokwFBaW+kfJZ9X0gruG7OBWM4=;
+ b=TKa+pj+dK86O6cqUjkskx+xJpQBrs0nkIwX9QhIGIVTYA0K4XoOOqZ+hVPCg4sfxFyvTfaID19G+uOuq5DaFk/B9j07dCVd9dB+hUHWUAg4ugaXa58hPuMZRUTthZUVNtIPMgm6Ggf2Nhl8joELE7JiCbTAss/t6NXYw3qtI6cnTG3paG7e5zOmVvNn6caaPWotlwcWtIoAb0thsgLPRU1TdmrbjhsF8Qxkm2EVF0yvlEH0+SISJU9Eqc2fX/AtCALG/3u3V7idbQgPV99IEFn+P54hGxZyKN35CxaXFUNfhKSn9cfL11v6wbDbuuGzq8zUACaoal8+6VEg8GB51nw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB7500.namprd12.prod.outlook.com (2603:10b6:610:148::17)
+ by PH0PR12MB5606.namprd12.prod.outlook.com (2603:10b6:510:141::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.34; Thu, 20 Mar
+ 2025 08:44:06 +0000
+Received: from CH3PR12MB7500.namprd12.prod.outlook.com
+ ([fe80::7470:5626:d269:2bf2]) by CH3PR12MB7500.namprd12.prod.outlook.com
+ ([fe80::7470:5626:d269:2bf2%6]) with mapi id 15.20.8534.034; Thu, 20 Mar 2025
+ 08:44:06 +0000
+Message-ID: <fe4b2e7b-1704-426e-99e7-da55375b676d@nvidia.com>
+Date: Thu, 20 Mar 2025 10:44:00 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/mlx5e: Fix ethtool -N flow-type ip4 to RSS
+ context
+To: Maxim Mikityanskiy <maxtram95@gmail.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, Maxim Mikityanskiy <maxim@isovalent.com>
+References: <20250319124508.3979818-1-maxim@isovalent.com>
+ <fadfb5af-afdf-43c3-bc1b-58d5b1eb0d70@nvidia.com>
+ <CAKErNvrbdaEom1LQZd6W+4M-Vjfg+YRzgEz3F7YWoCXB_U+dug@mail.gmail.com>
+Content-Language: en-US
+From: Gal Pressman <gal@nvidia.com>
+In-Reply-To: <CAKErNvrbdaEom1LQZd6W+4M-Vjfg+YRzgEz3F7YWoCXB_U+dug@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: GV2PEPF00004531.SWEP280.PROD.OUTLOOK.COM
+ (2603:10a6:158:401::35a) To CH3PR12MB7500.namprd12.prod.outlook.com
+ (2603:10b6:610:148::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [syzbot] [rdma?] KASAN: slab-use-after-free Read in
- ib_device_uevent (2)
-To: syzbot <syzbot+17fb1664c4f5a2eeb36f@syzkaller.appspotmail.com>,
- jgg@ziepe.ca, leon@kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
- syzkaller-bugs@googlegroups.com
-References: <67b25ec8.050a0220.54b41.000d.GAE@google.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <67b25ec8.050a0220.54b41.000d.GAE@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB7500:EE_|PH0PR12MB5606:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5c14cdb5-cfbe-4802-9cf0-08dd678b5f9e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?STdrYWE3TmJ6S2pteExWSUNBL0hSV3pyenZrdTFGaThjUmRNOVU1S0xCcFlD?=
+ =?utf-8?B?Wkt4RnpYTGF2a2ltKzdEUXg2cGdWLzhhR2RvOXRHYk4xVFZyRWluWmlYTHhU?=
+ =?utf-8?B?Y2FtUTJsNmM2M3ZtRVRJOG8vUGVFK2RpK1dsVDJqazlkTW1FMGtleDJJdVps?=
+ =?utf-8?B?OHlqSXRjaGlTU1IwenRuUlFZV0wzTUFiQnYybW5pRmtsMW9odVc2aCtldkJL?=
+ =?utf-8?B?UURJcHV2cmQ4bFZnM3BqSXpiaXB0OU4yM3YwQm82T2VRSFJTTXpiR1MxR1hF?=
+ =?utf-8?B?dE9MeG96eG9pOUIzM0VmOCtsZkU5RW96MWNxVVprMUZzZUdzV3ErQ3ZaT2JC?=
+ =?utf-8?B?Z3EyUTg4OThESnNxSVYzbDRhREFiZlI0dXBMdDNxNllzRjdjYnpRQTN5YUJZ?=
+ =?utf-8?B?bWNmS29kOEVPUWFUUE5NaThMZkxZN3JkdmFMMklVeHE0c2pweGlmWW9OcERi?=
+ =?utf-8?B?cUxDUSs1RDg4dDgxZFVKV3JHN0JaQytJWDMzQXB6VUlnVDQ5WWlIZHVKQ1NJ?=
+ =?utf-8?B?QURrMUQ2UTF4bG1lNWxxaEZ2cm96a0ZUdmNSYkIzYVFVNUl2MnA0QWFZeExS?=
+ =?utf-8?B?UnF5K1dIZytaYXlMMW1CMjk1dEs4YTR0R1BKSnlVUHRqK0VTeUg3dTY2RWxE?=
+ =?utf-8?B?cUlDYk1Yd2RjUUJXSUV0citpQkwvSG9POUZha2V4STlISnltWDh3RjZVT3Ja?=
+ =?utf-8?B?OER2aGJteFluclNIUFVxNzhMb3hCdmtyL3pROEMvUlYwM1dKeHFOcWpBT3F1?=
+ =?utf-8?B?ZFNJbncybWQ4SkRMZ1Z1dUJ6S0Fxb1dpRk1XczBha2tYZkNGSWg5MGEzaEQ5?=
+ =?utf-8?B?bVRNUE95cERVNmNhbDczaTQ1Mm5qWmRkRlhoNjZxOVFGc2UzMFlYdjN2dXhi?=
+ =?utf-8?B?MmxjVXNMRmxxRmNqeTAxUGloVHZmdkdyQkxuYUkxMUFkYWJEaUJtR1VZNEgx?=
+ =?utf-8?B?UHV1RGpWbzllVmFRYVdSdzBMaitnUHYySy9LWm51Y0F2bEVLbUhlNWkzN1hX?=
+ =?utf-8?B?Q3FVaHpDRTlYVzNreHNLL2hFM2RTbGl2VGFLR2RLaVFvVlBPVGt6WUZINnIz?=
+ =?utf-8?B?SDU5SklTTDJEMjU3SGR6S2ZBeTQ4cnVpWFRoZkYvQldNcWpoMStGY2FSbERU?=
+ =?utf-8?B?cUFqOFlEVXExNW9EM0xWTlB6ZHBSZ0Q3Vm1WSmhMTmtLUHNBRjZuVjJCK0I1?=
+ =?utf-8?B?S25mbHcxbjVPU0JieFFRKzIxS1pkRDY0WFVhNUIwelA4RFZzZVQxeXlIeElS?=
+ =?utf-8?B?Skt6N051RDNPakRsMzl1U0s2YTRWUUpPVDZxQ3hEN2wyMkl0ZWFrQUJQb0M4?=
+ =?utf-8?B?RHRuOUJvUytXWVFlaDg3NmFMV0UxdlppYUR6cUZLSXVhN0hEb1l2dFJiL082?=
+ =?utf-8?B?a2xiMEpqTWJPMHdRR2FVMWJrNUlXdmI2Vm1mQzc1L056Ui9TeGxrOUNFYnJm?=
+ =?utf-8?B?NW5rUytjOGt4eHFQa2pLdUt6dXRSMWhReWNjZWpueVdBSWVocXRibEJlaWQr?=
+ =?utf-8?B?bDJMc1pySHpONWZXR1E0NUtLdGRvZGFYdFBmdkhNMHUvV0YyMDV3MTJyM1Nx?=
+ =?utf-8?B?eXkzS0FTYjlPYStDUFJXZTZTUEdmODhtKzdndDhZem1uY0wzdElJdmFWeGZH?=
+ =?utf-8?B?K3FZQjBscENOZkQrYmtDRlVYMXpoUU0zaEIxcDc4RUg5S1p5UVUwRGlVbU9C?=
+ =?utf-8?B?VHk2bmpuUkd6akE1OThIMVY1L1B2QXJVWmJoUlVMSGFjSkNuMy9hUUhRRG9x?=
+ =?utf-8?B?Q28wUHoyWXMzWm9LVzl0WjQ3WXZYZVFzR1ZaZzk3SjdsWmpuZEYrNWtVV0ZD?=
+ =?utf-8?B?aytZSCtlalBuaHhrRnhFOWlsTGR6M3NrRHF0b1Rhd2x3Uzlqdklic2NUZkQ5?=
+ =?utf-8?Q?WzHSl0fEsr/Eo?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7500.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?eTBpVnptRUg1Y1FEbmljNktQd1VCS3VrRnBacEVtUXMxRGJscUIxbC9DZ2gy?=
+ =?utf-8?B?QUw0S0htNjNYNGVodmlyT0ZBTlpvS0dRRnVqUlVaZjhtQkxKSW1VWTFhczJn?=
+ =?utf-8?B?UVpmMkIxc3Z6dEJ2R2wrc3hoM0VjRnZRVEtReWdtSW5POW5ZREpnWERxTjFN?=
+ =?utf-8?B?YXhNZFVVZmRXN3VWVlRvNmZlVmo0SXM4LzlIc1hEOFF2YUE0dDJjZHhlS3Bm?=
+ =?utf-8?B?bWlsSVF1UkRRU2Z6RWtvckZsYWhUR3hKWklQR1Axck9zRk9lYUdiOUw5TXNJ?=
+ =?utf-8?B?THk5enRFQWkrRFdJNDhWeFhvZThvT3BPcFgxOFB0UFdDZ0pleVVSa0hmUVhE?=
+ =?utf-8?B?Tkl1K1hVdkJ0Wmcvc1VkeEZkR2V1SFRXVkpYQmFOc2NWTTFIZUZWQjVNQ3hW?=
+ =?utf-8?B?bDM3eVB3M1NzTk4zWWFwdWhQS21XaWtVRW96SjQwdzE4dXUrUGFGTytkeVlh?=
+ =?utf-8?B?TkVxRmVTbnN0VGNwZE5jRWd5V2xUYWZ6SnB0SU4rcC8zZVdmb25CcFZLVkY3?=
+ =?utf-8?B?cXAyZW5oMWdOQWkvdW53cTFod1dBK0J3L1lndC94MUl6TFZEVkxDYmZpdVJu?=
+ =?utf-8?B?eEZJR0h6WFVGc3R3U1orOC9hdFJja0Z3aHFpc1RKalZabXZUci9lNnFrcUYy?=
+ =?utf-8?B?S3ZyNGw5WmZDRWg5M3pFZHg5UERXeDVYbHVOYVVELzFlc056YTUvZGtWYXdt?=
+ =?utf-8?B?cGJEU3BOcnpNS1lYVDQ5R3dYamNqd2J5V0dOajJnN1FOZ1QxWHFwZkc0cllt?=
+ =?utf-8?B?K2E0WWUwS1BZdXN1cGFVcDcxOVY3dmtUVERKaHVFTm13dTFkSlpZMTNaZ1la?=
+ =?utf-8?B?UFgraEREZ0RhNXBGL0RTY2pjdVVGUFdKdnB1SHZscndOaWtNU1J6b1prK1dW?=
+ =?utf-8?B?WXhBclRYM3d6TTFwNFlFL0dKVXRaY2JGUmVHTzFmSC9Hd0pxa1puN3I0QnZW?=
+ =?utf-8?B?bVdnM0dQY1VQdk95UmJ0d3JWMkVwUEJQeWhQRWY0L0FQZ3hZWTVONzJzZXNP?=
+ =?utf-8?B?emdOa1JrM041eVFJUmZjNGVPQjFqMUMrVFhhOGdyejNTbzV1SlNqZkQ5bmxs?=
+ =?utf-8?B?dGZsdUpMSnhDaUdqbjRQNk1UemlyV3dLZGEzdWRaSkdBTkdIY2hqZTNXaEo3?=
+ =?utf-8?B?UDlubGRId1VzU2wzVndIWm1TSTNCdExjZXp5aFAxZ3YzMy9PZWlkaC9hSXEr?=
+ =?utf-8?B?NlBWc1BwYmNDY2ZScVhxejdqamN2VXlnUDZISE1yZGJxSlFFSUlWV1gzMmF6?=
+ =?utf-8?B?bjF2d2xqMTQ1MGtCNFRUZ3FhUThZc25mVUFMVG5hZ0d5bWdDQjAvWFcxSC9D?=
+ =?utf-8?B?dmcvTFIyS0JQWm9VU3JjQkIxV2JkaXdVNGRNUVE5RWpXTmljOEt0WFNiWnFM?=
+ =?utf-8?B?RVh5NHNRalc5NXJKSWI3aDJoR0FsSThqSzBIdDRRcndFTmJRRGNBODFVY3F6?=
+ =?utf-8?B?ZjdYbjR2eEJjdjNzMTJzT1Vwem9ZWDJpTzdLRjh2SHE4dEovUzZiaUJWZElG?=
+ =?utf-8?B?Tm5SZmwzZHVuWXJXTGR1RHFCU2tCeUY1d1pYQXJpUG1ha09tZG1HOStBS0d4?=
+ =?utf-8?B?QUFjUFpiT0RTeTVhOENZQXhSYWFGam93T1o1WHg1aHBLNy9lUkgwQlNqODNW?=
+ =?utf-8?B?UnlTdE9tR2lyenpSUHJIQU0rNkpQYjBGVmVFRlRWU3lBVlZxS09QdjNuWjQ5?=
+ =?utf-8?B?SlBxR1VRNU9GdzN2Mlo1VEcrWFV6S1dHSld1WGh5TXc1aGhSbXI3U1JjZ2Ux?=
+ =?utf-8?B?Tk5NQ1BZeE5QTEIyM25oa1N6UWhtS3hUWWI5UmVCcFFURzlqYUg1RzVtQlNT?=
+ =?utf-8?B?TEVKOXNCNVpISnY2NTFubGhHSXhQR01WUEdxeFZERU1QQmlCa2hXWFhZQTVu?=
+ =?utf-8?B?QzREVDRLc1dtM3B5Ym1lWTRaUmFnYlk2L1dxREpmWkZsbXZmaXdwTVFQNmpN?=
+ =?utf-8?B?Ry8yQ1VUREI5R2ZuTlhwMFJBeENXQXRFeitRajJIb0RBRy9QYjdRY3IvNlMy?=
+ =?utf-8?B?SG9RWld1TmJWMDBKZ2VrTGJmRkRIdEhmQUFzVitjWkFFVG5jbTBpS3ROR0Yr?=
+ =?utf-8?B?bE1sZHpnUXNYdWt3WGt1dmJQelk3ZnIrWU9XWndmQkk3N3VyMEFEMTNQcG1i?=
+ =?utf-8?Q?Ltx2FkfWFG+tKzrlwWwNNSWjR?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5c14cdb5-cfbe-4802-9cf0-08dd678b5f9e
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7500.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2025 08:44:06.1318
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wD5oc2MvGImcgXmonVXvlON3hBRSebteGBYvGpZIvf3PrySO3hGjhBc63wMLVhq3
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB5606
 
-On 16.02.25 22:55, syzbot wrote:
-> Hello,
+On 20/03/2025 10:28, Maxim Mikityanskiy wrote:
+> On Thu, 20 Mar 2025 at 10:25, Gal Pressman <gal@nvidia.com> wrote:
+>>
+>> Hey Maxim!
+>>
+>> On 19/03/2025 14:45, Maxim Mikityanskiy wrote:
+>>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c
+>>> index 773624bb2c5d..d68230a7b9f4 100644
+>>> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c
+>>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_fs_ethtool.c
+>>> @@ -884,8 +884,10 @@ static int flow_type_to_traffic_type(u32 flow_type)
+>>>       case ESP_V6_FLOW:
+>>>               return MLX5_TT_IPV6_IPSEC_ESP;
+>>>       case IPV4_FLOW:
+>>> +     case IP_USER_FLOW:
+>>
+>> They're the same, but I think IPV4_USER_FLOW is the "modern" define that
+>> should be used.
 > 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    09fbf3d50205 Merge tag 'tomoyo-pr-20250211' of git://git.c..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=140563f8580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=641fe3e3cfee64bb
-> dashboard link: https://syzkaller.appspot.com/bug?extid=17fb1664c4f5a2eeb36f
-> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> 
-> Unfortunately, I don't have any reproducer for this issue yet.
-> 
-> Downloadable assets:
-> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-09fbf3d5.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/31b409a4b675/vmlinux-09fbf3d5.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/27f349d4d8cb/bzImage-09fbf3d5.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+17fb1664c4f5a2eeb36f@syzkaller.appspotmail.com
+> Yeah, I used IP_USER_FLOW for consistency with other places in this
+> file. If you prefer that, I can resubmit with IPV4_USER_FLOW.
 
-To this problem, I just looked through this problem which occurred on 
-iwarp. I remember a similar problem which occurred on rxe.
-To the problem on rxe, the solution 
-https://patchwork.kernel.org/project/linux-rdma/patch/20250313092421.944658-1-wangliang74@huawei.com/ 
-seems to be able to fix it.
-
-I am not sure if this problem can also be fixed by the above solution or 
-not.
-
-Best Regards,
-Zhu Yanjun
-
-> 
-> ==================================================================
-> BUG: KASAN: slab-use-after-free in string_nocheck lib/vsprintf.c:632 [inline]
-> BUG: KASAN: slab-use-after-free in string+0x4a6/0x4f0 lib/vsprintf.c:714
-> Read of size 1 at addr ffff88803e895ea0 by task udevd/6903
-> 
-> CPU: 1 UID: 0 PID: 6903 Comm: udevd Not tainted 6.14.0-rc2-syzkaller-00039-g09fbf3d50205 #0
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-> Call Trace:
->   <TASK>
->   __dump_stack lib/dump_stack.c:94 [inline]
->   dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
->   print_address_description mm/kasan/report.c:378 [inline]
->   print_report+0xc3/0x620 mm/kasan/report.c:489
->   kasan_report+0xd9/0x110 mm/kasan/report.c:602
->   string_nocheck lib/vsprintf.c:632 [inline]
->   string+0x4a6/0x4f0 lib/vsprintf.c:714
->   vsnprintf+0x4c8/0x1180 lib/vsprintf.c:2843
->   add_uevent_var+0x17c/0x3a0 lib/kobject_uevent.c:679
->   ib_device_uevent+0x4e/0xb0 drivers/infiniband/core/device.c:502
->   dev_uevent+0x28b/0x770 drivers/base/core.c:2673
->   uevent_show+0x1d8/0x3b0 drivers/base/core.c:2731
->   dev_attr_show+0x53/0xe0 drivers/base/core.c:2423
->   sysfs_kf_seq_show+0x23e/0x410 fs/sysfs/file.c:59
->   seq_read_iter+0x4f4/0x12b0 fs/seq_file.c:230
->   kernfs_fop_read_iter+0x414/0x580 fs/kernfs/file.c:279
->   new_sync_read fs/read_write.c:484 [inline]
->   vfs_read+0x886/0xbf0 fs/read_write.c:565
->   ksys_read+0x12b/0x250 fs/read_write.c:708
->   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->   do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
->   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7f7681378b6a
-> Code: 00 3d 00 00 41 00 75 0d 50 48 8d 3d 2d 08 0a 00 e8 ea 7d 01 00 31 c0 e9 07 ff ff ff 64 8b 04 25 18 00 00 00 85 c0 75 1b 0f 05 <48> 3d 00 f0 ff ff 76 6c 48 8b 15 8f a2 0d 00 f7 d8 64 89 02 48 83
-> RSP: 002b:00007ffcbdf9d038 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
-> RAX: ffffffffffffffda RBX: 000055efbec7de20 RCX: 00007f7681378b6a
-> RDX: 0000000000001000 RSI: 000055efbeca9490 RDI: 0000000000000008
-> RBP: 000055efbec7de20 R08: 0000000000000008 R09: 0000000000020000
-> R10: 000000000000010f R11: 0000000000000246 R12: 0000000000000000
-> R13: 0000000000003fff R14: 00007ffcbdf9d518 R15: 000000000000000a
->   </TASK>
-> 
-> Allocated by task 12483:
->   kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
->   kasan_save_track+0x14/0x30 mm/kasan/common.c:68
->   poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
->   __kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:394
->   kasan_kmalloc include/linux/kasan.h:260 [inline]
->   __do_kmalloc_node mm/slub.c:4294 [inline]
->   __kmalloc_node_track_caller_noprof+0x222/0x510 mm/slub.c:4313
->   __kmemdup_nul mm/util.c:61 [inline]
->   kstrdup+0x53/0x100 mm/util.c:81
->   kstrdup_const+0x63/0x80 mm/util.c:101
->   kvasprintf_const+0x164/0x1a0 lib/kasprintf.c:46
->   kobject_set_name_vargs+0x5a/0x140 lib/kobject.c:274
->   dev_set_name+0xc8/0x100 drivers/base/core.c:3468
->   assign_name drivers/infiniband/core/device.c:1202 [inline]
->   ib_register_device+0x7e0/0xdf0 drivers/infiniband/core/device.c:1384
->   siw_device_register drivers/infiniband/sw/siw/siw_main.c:72 [inline]
->   siw_newlink drivers/infiniband/sw/siw/siw_main.c:431 [inline]
->   siw_newlink+0xb60/0xd70 drivers/infiniband/sw/siw/siw_main.c:413
->   nldev_newlink+0x38e/0x660 drivers/infiniband/core/nldev.c:1795
->   rdma_nl_rcv_msg+0x388/0x6e0 drivers/infiniband/core/netlink.c:195
->   rdma_nl_rcv_skb.constprop.0.isra.0+0x2e6/0x450 drivers/infiniband/core/netlink.c:239
->   netlink_unicast_kernel net/netlink/af_netlink.c:1322 [inline]
->   netlink_unicast+0x53c/0x7f0 net/netlink/af_netlink.c:1348
->   netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1892
->   sock_sendmsg_nosec net/socket.c:718 [inline]
->   __sock_sendmsg net/socket.c:733 [inline]
->   ____sys_sendmsg+0xaaf/0xc90 net/socket.c:2573
->   ___sys_sendmsg+0x135/0x1e0 net/socket.c:2627
->   __sys_sendmsg+0x16e/0x220 net/socket.c:2659
->   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->   do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
->   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> Freed by task 12485:
->   kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
->   kasan_save_track+0x14/0x30 mm/kasan/common.c:68
->   kasan_save_free_info+0x3b/0x60 mm/kasan/generic.c:576
->   poison_slab_object mm/kasan/common.c:247 [inline]
->   __kasan_slab_free+0x51/0x70 mm/kasan/common.c:264
->   kasan_slab_free include/linux/kasan.h:233 [inline]
->   slab_free_hook mm/slub.c:2353 [inline]
->   slab_free mm/slub.c:4609 [inline]
->   kfree+0x2c4/0x4d0 mm/slub.c:4757
->   kfree_const+0x55/0x60 mm/util.c:43
->   kobject_rename+0x179/0x260 lib/kobject.c:524
->   device_rename+0x130/0x230 drivers/base/core.c:4525
->   ib_device_rename+0x114/0x5c0 drivers/infiniband/core/device.c:402
->   nldev_set_doit+0x3be/0x4c0 drivers/infiniband/core/nldev.c:1146
->   rdma_nl_rcv_msg+0x388/0x6e0 drivers/infiniband/core/netlink.c:195
->   rdma_nl_rcv_skb.constprop.0.isra.0+0x2e6/0x450 drivers/infiniband/core/netlink.c:239
->   netlink_unicast_kernel net/netlink/af_netlink.c:1322 [inline]
->   netlink_unicast+0x53c/0x7f0 net/netlink/af_netlink.c:1348
->   netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1892
->   sock_sendmsg_nosec net/socket.c:718 [inline]
->   __sock_sendmsg net/socket.c:733 [inline]
->   ____sys_sendmsg+0xaaf/0xc90 net/socket.c:2573
->   ___sys_sendmsg+0x135/0x1e0 net/socket.c:2627
->   __sys_sendmsg+0x16e/0x220 net/socket.c:2659
->   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->   do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
->   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> The buggy address belongs to the object at ffff88803e895ea0
->   which belongs to the cache kmalloc-8 of size 8
-> The buggy address is located 0 bytes inside of
->   freed 8-byte region [ffff88803e895ea0, ffff88803e895ea8)
-> 
-> The buggy address belongs to the physical page:
-> page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x3e895
-> flags: 0xfff00000000000(node=0|zone=1|lastcpupid=0x7ff)
-> page_type: f5(slab)
-> raw: 00fff00000000000 ffff88801b042500 ffffea0000a05a00 dead000000000002
-> raw: 0000000000000000 0000000000800080 00000000f5000000 0000000000000000
-> page dumped because: kasan: bad access detected
-> page_owner tracks the page as allocated
-> page last allocated via order 0, migratetype Unmovable, gfp_mask 0x52cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP), pid 11986, tgid 11985 (syz.1.1513), ts 150711065425, free_ts 150704805794
->   set_page_owner include/linux/page_owner.h:32 [inline]
->   post_alloc_hook+0x181/0x1b0 mm/page_alloc.c:1551
->   prep_new_page mm/page_alloc.c:1559 [inline]
->   get_page_from_freelist+0xfce/0x2f80 mm/page_alloc.c:3477
->   __alloc_frozen_pages_noprof+0x221/0x2470 mm/page_alloc.c:4739
->   alloc_pages_mpol+0x1fc/0x540 mm/mempolicy.c:2270
->   alloc_slab_page mm/slub.c:2423 [inline]
->   allocate_slab mm/slub.c:2587 [inline]
->   new_slab+0x23d/0x330 mm/slub.c:2640
->   ___slab_alloc+0xc5d/0x1720 mm/slub.c:3826
->   __slab_alloc.constprop.0+0x56/0xb0 mm/slub.c:3916
->   __slab_alloc_node mm/slub.c:3991 [inline]
->   slab_alloc_node mm/slub.c:4152 [inline]
->   __do_kmalloc_node mm/slub.c:4293 [inline]
->   __kmalloc_node_noprof+0x2f0/0x510 mm/slub.c:4300
->   __kvmalloc_node_noprof+0xad/0x1a0 mm/util.c:662
->   kvmalloc_array_node_noprof include/linux/slab.h:1063 [inline]
->   __ptr_ring_init_queue_alloc_noprof include/linux/ptr_ring.h:471 [inline]
->   ptr_ring_resize_multiple_bh_noprof include/linux/ptr_ring.h:634 [inline]
->   skb_array_resize_multiple_bh_noprof include/linux/skb_array.h:208 [inline]
->   pfifo_fast_change_tx_queue_len+0x157/0xbb0 net/sched/sch_generic.c:909
->   qdisc_change_tx_queue_len net/sched/sch_generic.c:1410 [inline]
->   dev_qdisc_change_tx_queue_len+0x166/0x380 net/sched/sch_generic.c:1457
->   dev_change_tx_queue_len+0x1a3/0x1e0 net/core/dev.c:9362
->   dev_ifsioc+0xdfe/0x10d0 net/core/dev_ioctl.c:608
->   dev_ioctl+0x224/0x10c0 net/core/dev_ioctl.c:826
->   sock_do_ioctl+0x19e/0x280 net/socket.c:1213
->   sock_ioctl+0x228/0x6c0 net/socket.c:1318
-> page last free pid 11986 tgid 11985 stack trace:
->   reset_page_owner include/linux/page_owner.h:25 [inline]
->   free_pages_prepare mm/page_alloc.c:1127 [inline]
->   free_frozen_pages+0x6db/0xfb0 mm/page_alloc.c:2660
->   __put_partials+0x14c/0x170 mm/slub.c:3153
->   qlink_free mm/kasan/quarantine.c:163 [inline]
->   qlist_free_all+0x4e/0x120 mm/kasan/quarantine.c:179
->   kasan_quarantine_reduce+0x195/0x1e0 mm/kasan/quarantine.c:286
->   __kasan_slab_alloc+0x69/0x90 mm/kasan/common.c:329
->   kasan_slab_alloc include/linux/kasan.h:250 [inline]
->   slab_post_alloc_hook mm/slub.c:4115 [inline]
->   slab_alloc_node mm/slub.c:4164 [inline]
->   __kmalloc_cache_noprof+0x243/0x410 mm/slub.c:4320
->   kmalloc_noprof include/linux/slab.h:901 [inline]
->   kmalloc_array_noprof include/linux/slab.h:945 [inline]
->   ptr_ring_resize_multiple_bh_noprof include/linux/ptr_ring.h:629 [inline]
->   skb_array_resize_multiple_bh_noprof include/linux/skb_array.h:208 [inline]
->   pfifo_fast_change_tx_queue_len+0xe1/0xbb0 net/sched/sch_generic.c:909
->   qdisc_change_tx_queue_len net/sched/sch_generic.c:1410 [inline]
->   dev_qdisc_change_tx_queue_len+0x166/0x380 net/sched/sch_generic.c:1457
->   dev_change_tx_queue_len+0x1a3/0x1e0 net/core/dev.c:9362
->   dev_ifsioc+0xdfe/0x10d0 net/core/dev_ioctl.c:608
->   dev_ioctl+0x224/0x10c0 net/core/dev_ioctl.c:826
->   sock_do_ioctl+0x19e/0x280 net/socket.c:1213
->   sock_ioctl+0x228/0x6c0 net/socket.c:1318
->   vfs_ioctl fs/ioctl.c:51 [inline]
->   __do_sys_ioctl fs/ioctl.c:906 [inline]
->   __se_sys_ioctl fs/ioctl.c:892 [inline]
->   __x64_sys_ioctl+0x190/0x200 fs/ioctl.c:892
->   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->   do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
->   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> Memory state around the buggy address:
->   ffff88803e895d80: 05 fc fc fc fa fc fc fc 05 fc fc fc fa fc fc fc
->   ffff88803e895e00: 05 fc fc fc 00 fc fc fc 05 fc fc fc fa fc fc fc
->> ffff88803e895e80: 05 fc fc fc fa fc fc fc 05 fc fc fc 00 fc fc fc
->                                 ^
->   ffff88803e895f00: 05 fc fc fc 05 fc fc fc 05 fc fc fc fa fc fc fc
->   ffff88803e895f80: 05 fc fc fc 00 fc fc fc 05 fc fc fc fa fc fc fc
-> ==================================================================
-> 
-> 
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
-> 
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> 
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
-> 
-> If you want to overwrite report's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
-> 
-> If the report is a duplicate of another one, reply with:
-> #syz dup: exact-subject-of-another-report
-> 
-> If you want to undo deduplication, reply with:
-> #syz undup
-
+I don't mind, up to Tariq.
+We can followup with a patch that converts all usages.
 
