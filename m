@@ -1,145 +1,199 @@
-Return-Path: <netdev+bounces-176594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C172A6AF8B
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 22:05:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F3C43A6AFB3
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 22:14:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C61E3188A7B2
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 21:05:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4679E1892082
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 21:14:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2748A22A4D1;
-	Thu, 20 Mar 2025 21:05:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EF3722A4E5;
+	Thu, 20 Mar 2025 21:14:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f4hQz/hC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d0LCjV9m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-yw1-f196.google.com (mail-yw1-f196.google.com [209.85.128.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB621BD01D;
-	Thu, 20 Mar 2025 21:05:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EB961E5205;
+	Thu, 20 Mar 2025 21:14:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742504744; cv=none; b=B5UzY11c3DFs4O8rpVva3l8p+Z1gVpFYZkQxHJIGl6Ou7HXqmQZBKTs96eQVQfUYu4bl/Yj0iLoKZI0hzno3X94so3IiVUNMfsTuoWYLuEOPvENqocD9Zw57xnJiMyMMWntxAEEbmmcymiuzDMguh1HCHeqfLemcr1SXgr8o234=
+	t=1742505263; cv=none; b=O1ZtwqFzNE9N9Z0ECDbuAARn2Y2cf0w5GcHiOt7fNvWrQd7GDS9R1J8koI4cAMtJ4A+CfchUnJlvrco9E8ov3WR2gWwrVuNhCrCUmVF5fOvAkeOmakr7fB6VL5jXT6k+6gI3PulLlNihr21pdYA6aU8v4epAoTQgaPHJyNwZTi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742504744; c=relaxed/simple;
-	bh=YgdpRvORfQrJXyGjouHiXsPKxSh1pKbm6IQi0Z4fEqc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HUk2qYyZJ7mlvIrLD99CUFjnA9huYt8WKC+h4M4vj+WhrqOn4quQtLkC7WumW6GcBTHYopPOyIwUd0hJtweSt4BIum1ZJ8K1vr+PxT4OS4HSHwhSnIVxNNQSnLYoUJ3iFdmQJV6lo76RB3O96jBbVetGC88rlGQk6qFADMKgrxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f4hQz/hC; arc=none smtp.client-ip=209.85.214.172
+	s=arc-20240116; t=1742505263; c=relaxed/simple;
+	bh=rDnOAA4lucrldV/uOPZAcMt+11QMeVvynKOYtUfZiVw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uYt0AalbpmelyfNCC/LQjcbqomedZToB6B7gPt5svKos9qoT/w0kdxIQ3mtVAcUgWFP7e8gW01K7Nd1WUpQT75mXkdfwoep3La9IJu6AsVyk7M+m4q/9ZzqFkFu1FTHsoW0RQox9me7r5uy3mGE5dr0Bh1/qwhCX1OuGCLSz1FQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d0LCjV9m; arc=none smtp.client-ip=209.85.128.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-223fb0f619dso26686065ad.1;
-        Thu, 20 Mar 2025 14:05:41 -0700 (PDT)
+Received: by mail-yw1-f196.google.com with SMTP id 00721157ae682-6ff2adbba3fso10914507b3.2;
+        Thu, 20 Mar 2025 14:14:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742504741; x=1743109541; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3jPDdAZsU2RRMMAuFebBCueBYeGg/JKuNefmjD9nyKY=;
-        b=f4hQz/hCoDzmcVqX69VzFkchC9WiShFUEsaTUZoSlXwWS2Cgi7rDvgzKeFY6vkAK1J
-         eSI9eb7+VlQzuxFEZ9KXV4aZj0lo96pMTTzyKr8oysl+B6sa1IwnotwTvki80bGvmKUQ
-         6QsKaqYfMNTJalmlfEqW+d6fwDHynj1VW3Qc+FCpQFr3br79eGkLGvw4WwPx55XFyaUX
-         Y7PrsrF2CVyjmmC1k7UsaORhOy/PXO/V0iYPhwTB4lmGVHKgT/fTJIeRUjDanvygbtS6
-         q5HZLqJPtRuVwzCaEXMM3I0XQ+zHsU0Gsh3WVdiY/xp6O+PFyK6llhfotXSodICrNpCE
-         BGTA==
+        d=gmail.com; s=20230601; t=1742505260; x=1743110060; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vR0a3RR/t05HfQIX2qz1HHcu0hel3X1oYKiWEBUqDO8=;
+        b=d0LCjV9mj5PvVbrFuiWIklOvo8xwGWBqVKCpbu5dpgET880kwDmv1b8DX8w5Yj54iJ
+         RiqF6gvGmSs0aunJmv+GnzVTMzkTrwu8U6ef9AAwsM9eLgeA2rDixGrXBfkIuS7z7VAi
+         vqOkRM/+JwVTn6nqjLNEQSGOoRQEFEbjtnu7HY8aPy+XqfYsSxHnYPFuBwV/q/acQihH
+         I2v0VttbyQL12qU7bJmOpCLRz2Ja9Txf9DT3Pg9H3TFA+/NXB41aJyvjDCjTuHh16g1a
+         wmAPOqk4qCgMq8BKjJ+omSovDRpBXikWc51mCeySKHbMlh2UO2a+RzJM37JGI+6DjjV4
+         rOGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742504741; x=1743109541;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3jPDdAZsU2RRMMAuFebBCueBYeGg/JKuNefmjD9nyKY=;
-        b=T9+Se1v/TXMjkDn+dgaokaxf2eY6PRKKWlyo+YWP4TPf8PngOi2QxTJRe9f/Dht22f
-         OMyGluEvRc/IKP9DWQILpZz40pHaCivGtNrdmudXXbx3tfTSG6h2S0jlbKIdZ9WweI1G
-         /YWz7eEvzStj72hKRVvVuBkofyGaOTGHA+2H5/BNWicCMa27Gc8O9dxwmsr4n/K6SMdx
-         43RYYWDdBZ+g3yzWD7laXiTA3PJuUcifU4E4rOgDxhe8aeXUoFbyr9XBbXmqa2zKqr+p
-         ebz5gN9Cy/8HprXBDvcXUs6HFPP+8aZas2Tha7J6juZQvL4A0QCq5ijexqGfDHXe47/T
-         DMJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUg/8t8XZBWS4RRRzPWxUubAL6PbGIIwbsyZQ7wTYYoGpWSQTxtuekFBd1BX4lWCaNzIHOowlyL@vger.kernel.org, AJvYcCVPuGR2HOTnttZz/iSvDg5OhODi9hSmsUGpyy/0dpsmUQrj0RUreVLJ8pJox9s7PtYRe8V62Gu81mjBHAf5@vger.kernel.org, AJvYcCVVdxJSR+YV6ugk70K+6HiL4KgULCfxUBrr62Cl4dvKU4n8H2iRsd6Phs4qMSIdyJgOP9g=@vger.kernel.org, AJvYcCWhRis8wexgLlWAMuKtce7lFZTHM98OZJaUxAhtE3fNPuV7AgCv/by1M8hepHEx8boSvs/Q5zRLPHKJK38r@vger.kernel.org
-X-Gm-Message-State: AOJu0YwL9RdsZjQ3geDm7+7Xap9RjKxF0EVm5VB8/J/YawUZWp33x+Z4
-	2eCKv2MgonsmHQh2IMgHx4rVAs24rhCVOf2B819kUFZmzZVtLsdc
-X-Gm-Gg: ASbGnctKQmgAnIyYMyi/ezzmnuqwML+jB6z7cVNo1/uNJV7UiMeTc5o+x03P7u1Shmo
-	ngu7aFjFchGvF+edZWVPYEDYvVKB3sI8shNcPmJrOPxpgZuvwNM1OpQ4VyHogv2YC28ma8wi8a3
-	z39fkMnFnXSE7nSYIV1KpNqKvDLv0rrfE5kN28ONFiiJ9jEoxho4LPTKBbYJjwOkMIGCnxmIRmR
-	1xk+B5cqH5xDqzBhUpFn6te4jM3iLiIp3yX9Mrd9i2kZ8vUZi45pGqZW19MF7Hsnf4jEvSRV2Zd
-	FiDeXL+FRAKihhGFXboFnd8cktZ0FNHqq9Sq7d1ZaUb/lmfWkeQXJwYPL0JGkcxQCQ==
-X-Google-Smtp-Source: AGHT+IGByHBrbBgXXk1MNKK8PoOJzGBZqACnvtAZVXwzJ5Mt98hUmINKtxNrRQVVmQU2iZkin8qKTA==
-X-Received: by 2002:a17:903:182:b0:223:653e:eb09 with SMTP id d9443c01a7336-22780c50a59mr11694335ad.7.1742504740770;
-        Thu, 20 Mar 2025 14:05:40 -0700 (PDT)
-Received: from devvm6277.cco0.facebook.com ([2a03:2880:2ff:7::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2278120981fsm2458075ad.250.2025.03.20.14.05.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Mar 2025 14:05:40 -0700 (PDT)
-Date: Thu, 20 Mar 2025 14:05:38 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] vhost/vsock: use netns of process that opens the
- vhost-vsock-netns device
-Message-ID: <Z9yDIl8taTAmG873@devvm6277.cco0.facebook.com>
-References: <20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com>
- <20250312-vsock-netns-v2-3-84bffa1aa97a@gmail.com>
- <09c84a94-85f3-4e28-8e7d-bdc227bf99ab@redhat.com>
- <nwksousz7f4pkzwefvrpbgmmq6bt5kimv4icdkvm7n2nlom6yu@e62c5gdzmamg>
+        d=1e100.net; s=20230601; t=1742505260; x=1743110060;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vR0a3RR/t05HfQIX2qz1HHcu0hel3X1oYKiWEBUqDO8=;
+        b=A/K478fsGPUONrU6hdEXfLZoo2rIqqzSkh3+hDDUurkCOfXnP61ER2paj18imfuD0O
+         5Ix8x4jeo/yj541ptRCrST7pAOXg0Pw+y9yuxe1I0KtPpst5uXujvNPlOPghgZaM/N3d
+         w0hXw3JFaE4nd5fPx0YHjI4zrtWJ5I5RCIfcV7RXcVSK5fIwfwDIgOT42lNJMMXQMYbS
+         Hs4MGtCOD9PJ446wNuVhYl7EP5pUF4gWRhwu+iGzw3Gz9uZdvpr/C8fjcnhvkJYyYg1c
+         b4HeoGKjHKO0gQWqYweUB8QuydWC5Ps+/OWBpciYo0PmnHOQcubSAgkWGvJA8W/7FTMu
+         kYWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVgFLyxp9Exs78+Kpj+wQh3/mW2sbPnUMwb48aIlZamxwJOJKzxFs6H91e21g8f0PxcCG8LjqvO@vger.kernel.org, AJvYcCWoXsiQ+oMq0FQxrMYs8BAAoCnKWQcG0JX+u+w9JoUy7LbfqeOxEL/Qnie3wVS4uWtkUAepoaxYvfS1fD4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzH3F/jEnMLi8kLnaFqTjgoct4Hs/l4ZyJFjy7NT4jhtDPG8fcN
+	CueagAwZ+8FBRBmHqNjQKX8jHFo8hzkiIp3yGIC67HSnzUv4DFcy
+X-Gm-Gg: ASbGnct5JGYIFNwb369KGfBIDxEFEaLwioUFaFajHUk744phrQPZ5DdkXhR3Wxfpc52
+	DQB9z9xUbDlhStbrs/lRTv4xvkkA9KUSMY13wPGMTBBT+FG4EUaL0wtj7NrRLdqYxvy8X4FOrHe
+	HE8lkqV5UrXl8tiHOWPxNHA0nF8FE2dN7+D4JJkwfQaV8tCKt9Bx1VHUbuxbBQc9TWGpT7BEi3S
+	ShtaSDoJ5LHBVyMQ5oaytP3xuhJRbbgI9Md6xv4vEut9aRb55XV9tasaO1IMLVmB9U99fcYfhPA
+	8GnwbKy/2SR1BOkxG10kjvou6JEwzGBCluLscKSQEMYCxt+0xsdJWTswWgJB7q3U04EgS4ebB0S
+	GTg==
+X-Google-Smtp-Source: AGHT+IE3vy33qwuh10B1jPT96uPQFPJ0L0/5fq+sJdaJhhmDghj5RFArk99tKxN3tnEQGZjxTVWlEg==
+X-Received: by 2002:a05:690c:3806:b0:6fb:9b19:ab49 with SMTP id 00721157ae682-700babfd37amr13100057b3.6.1742505260028;
+        Thu, 20 Mar 2025 14:14:20 -0700 (PDT)
+Received: from [10.102.6.66] ([208.97.243.82])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-700ba8c6b86sm980607b3.121.2025.03.20.14.14.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Mar 2025 14:14:19 -0700 (PDT)
+Message-ID: <52b437bc-3f0e-4a5e-ae18-aea6576eb1ad@gmail.com>
+Date: Thu, 20 Mar 2025 17:14:19 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <nwksousz7f4pkzwefvrpbgmmq6bt5kimv4icdkvm7n2nlom6yu@e62c5gdzmamg>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Patch net-next 0/3] Add support for mdb offload failure
+ notification
+To: Nikolay Aleksandrov <razor@blackwall.org>,
+ Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Roopa Prabhu <roopa@nvidia.com>, Simon Horman <horms@kernel.org>,
+ linux-kernel@vger.kernel.org, bridge@lists.linux.dev
+References: <20250318224255.143683-1-Joseph.Huang@garmin.com>
+ <039a0673-6254-45a0-b511-69d2a15aa96d@blackwall.org>
+Content-Language: en-US
+From: Joseph Huang <joseph.huang.2024@gmail.com>
+In-Reply-To: <039a0673-6254-45a0-b511-69d2a15aa96d@blackwall.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 20, 2025 at 10:08:02AM +0100, Stefano Garzarella wrote:
-> On Wed, Mar 19, 2025 at 10:09:44PM +0100, Paolo Abeni wrote:
-> > On 3/12/25 9:59 PM, Bobby Eshleman wrote:
-> > > @@ -753,6 +783,8 @@ static int vhost_vsock_dev_release(struct inode *inode, struct file *file)
-> > >  	virtio_vsock_skb_queue_purge(&vsock->send_pkt_queue);
-> > > 
-> > >  	vhost_dev_cleanup(&vsock->dev);
-> > > +	if (vsock->net)
-> > > +		put_net(vsock->net);
-> > 
-> > put_net() is a deprecated API, you should use put_net_track() instead.
-> > 
-> > >  	kfree(vsock->dev.vqs);
-> > >  	vhost_vsock_free(vsock);
-> > >  	return 0;
-> > 
-> > Also series introducing new features should also include the related
-> > self-tests.
+On 3/20/2025 2:17 AM, Nikolay Aleksandrov wrote:
+> On 3/19/25 00:42, Joseph Huang wrote:
+>> Currently the bridge does not provide real-time feedback to user space
+>> on whether or not an attempt to offload an mdb entry was successful.
+>>
+>> This patch set adds support to notify user space about successful and
+>> failed offload attempts, and the behavior is controlled by a new knob
+>> mdb_notify_on_flag_change:
+>>
+>> 0 - the bridge will not notify user space about MDB flag change
+>> 1 - the bridge will notify user space about flag change if either
+>>      MDB_PG_FLAGS_OFFLOAD or MDB_PG_FLAGS_OFFLOAD_FAILED has changed
+>> 2 - the bridge will notify user space about flag change only if
+>>      MDB_PG_FLAGS_OFFLOAD_FAILED has changed
+>>
+>> The default value is 0.
+>>
+>> A break-down of the patches in the series:
+>>
+>> Patch 1 adds offload failed flag to indicate that the offload attempt
+>> has failed. The flag is reflected in netlink mdb entry flags.
+>>
+>> Patch 2 adds the knob mdb_notify_on_flag_change, and notify user space
+>> accordingly in br_switchdev_mdb_complete() when the result is known.
+>>
+>> Patch 3 adds netlink interface to manipulate mdb_notify_on_flag_change
+>> knob.
+>>
+>> This patch set was inspired by the patch series "Add support for route
+>> offload failure notifications" discussed here:
+>> https://lore.kernel.org/all/20210207082258.3872086-1-idosch@idosch.org/
+>>
+>> Joseph Huang (3):
+>>    net: bridge: mcast: Add offload failed mdb flag
+>>    net: bridge: mcast: Notify on offload flag change
+>>    net: bridge: Add notify on flag change netlink i/f
+>>
+>>   include/uapi/linux/if_bridge.h |  9 +++++----
+>>   include/uapi/linux/if_link.h   | 14 ++++++++++++++
+>>   net/bridge/br_mdb.c            | 30 +++++++++++++++++++++++++-----
+>>   net/bridge/br_multicast.c      | 25 +++++++++++++++++++++++++
+>>   net/bridge/br_netlink.c        | 21 +++++++++++++++++++++
+>>   net/bridge/br_private.h        | 26 +++++++++++++++++++++-----
+>>   net/bridge/br_switchdev.c      | 31 ++++++++++++++++++++++++++-----
+>>   7 files changed, 137 insertions(+), 19 deletions(-)
+>>
 > 
-> Yes, I was thinking about testing as well, but to test this I think we need
-> to run QEMU with Linux in it, is this feasible in self-tests?
+> Hi,
+> Could you please share more about the motivation - why do you need this and
+> what will be using it? 
+
+Hi Nik,
+
+The API for a user space application to join a multicast group is 
+write-only (and really best-efforts only), meaning that after an 
+application calls setsockopt(), the application has no way to know 
+whether the operation actually succeeded or not. Normally for soft 
+bridges this is not an issue; however for switchdev-backed bridges, due 
+to limited hardware resources, the failure rate is meaningfully higher.
+
+With this patch set, the user space application will now get a 
+notification about a failed attempt to join a multicast group. The user 
+space application can then have the opportunity to mitigate the failure 
+[1][2].
+
+> Also why do you need an option with 3 different modes
+> instead of just an on/off switch for these notifications?
 > 
-> We should start looking at that, because for now I have my own ansible
-> script that runs tests (tools/testing/vsock/vsock_test) in nested VMs to
-> test both host (vhost-vsock) and guest (virtio-vsock).
+> Thanks,
+>   Nik
 > 
 
-Maybe as a baseline we could follow the model of
-tools/testing/selftests/bpf/vmtest.sh and start by reusing your
-vsock_test parameters from your Ansible script?
+Some user space application might be interested in both successful and 
+failed offload attempts (for example the application might want to keep 
+an mdb database which is perfectly in sync with the hardware), while 
+some other user space application might only be interested in failed 
+attempts (so that it can retry the operation or choose a different group 
+for example).
 
-I don't mind writing the patches.
+This knob is modeled after fib_notify_on_flag_change knob on route 
+offload failure notification (see 
+https://lore.kernel.org/all/20210207082258.3872086-4-idosch@idosch.org/). 
+The rationale is that "Separate value (read: 2) is added for such 
+notifications because there are less of them, so they do not impact 
+performance and some users will find them more important."
 
-Best,
-Bobby
+Thanks,
+Joseph
+
+--
+
+[1] 
+https://datatracker.ietf.org/doc/draft-ietf-pim-zeroconf-mcast-addr-alloc-ps/, 
+section 2, the last paragraph
+[2] 
+https://datatracker.ietf.org/doc/draft-ietf-pim-ipv6-zeroconf-assignment/, 
+section 2.1, the first paragraph
 
