@@ -1,65 +1,58 @@
-Return-Path: <netdev+bounces-176472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6779A6A77F
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 14:46:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BFEFA6A78B
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 14:49:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B78816B47A
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 13:43:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E452916E293
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 13:48:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D363121CA0E;
-	Thu, 20 Mar 2025 13:43:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0E8B221F00;
+	Thu, 20 Mar 2025 13:48:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5VD7rya8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sg3jlpiP"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 461D71388;
-	Thu, 20 Mar 2025 13:43:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB6C51EDA38;
+	Thu, 20 Mar 2025 13:48:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742478231; cv=none; b=U7G2rpscPD8kOefAn/Kk00w2o+BaPyxoAXNbr8PhsJpZs5Wjt2y6jwL7J/gGE+WbpqkqcyLQ7DDJKrretkqtY6o6LbFzUEDU9h7rH0eOhpTQt+gT2h0cGax5hSR6mVTV/J1ouvtRoPq/xr2bBbGp/mualqMTRan4ETmvVGA9nV4=
+	t=1742478526; cv=none; b=MCFEIN2weO3bj0pmdYULI5F/6nRCRY3+iBEiC+D0IhAZdaxfuGu3LKH+IrJkIB+RlD4UmFoo75bXjOOSeYZCcrtavsedLRadMJbg3XQWt4yVGKGJ/GSQDeoW5BwWbO1eqjWk2EO1tRqE/6anYqx2YNTKTZ5rtQEzTEFIKRM2hM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742478231; c=relaxed/simple;
-	bh=b4cTidJvouqptWZq5fAiNydMxKtEIOLp8tYqG4ChrVI=;
+	s=arc-20240116; t=1742478526; c=relaxed/simple;
+	bh=n2Aa2LlLF6Pk+aaptQYR87WXXsYSLb/Oa2nEIcU7Lb4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SL1dN3eW251SgCr3drQyNlv5ndUg7MctFVV1UuYSFmjVEOB8TP3+FTTV3MJsTUI/kHfvwYgCxV2P45JXA++W0TK0Bgbeq8lW9wHHo1gynRo7tE/HCHgSGAwORX4gnCPyzTs8qSIA00jsH8gSw8SBjjj1q2m12oDqWY8c2jrFCNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5VD7rya8; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=NgVqHdjA9pYmontvEBdSsrxCMOmEBCXPf7WJM2DVg2A=; b=5VD7rya8JapCJWxbWY8JHVYOdA
-	6EKxRp59hA52a1F0YFeo6w3hkxULTWVLGeBtJd0QXcsnNwueMl3vW2nYq3KTeKUd8euZx5/gKuAaw
-	bk/UvOO+6PYkMnzx7j0RpqXdn6wop4WIjogMTkgCfUGCCOkKOwhD7PmY3HXVGk/R3/Qo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tvGBK-006Tux-Tv; Thu, 20 Mar 2025 14:43:34 +0100
-Date: Thu, 20 Mar 2025 14:43:34 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
-	brett.creeley@amd.com, surenb@google.com,
-	schakrabarti@linux.microsoft.com, kent.overstreet@linux.dev,
-	shradhagupta@linux.microsoft.com, erick.archer@outlook.com,
-	rosenp@gmail.com, linux-hyperv@vger.kernel.org,
+	 Content-Type:Content-Disposition:In-Reply-To; b=tZDPOAM4nBfi8Kb34Kn6Rj6/ydw+8Hj6GzIxfC6lgsmuM/akQNRV96qwaGE4OKihGNEYmPCoQDR3JvSLqFFRfHlnaR+A7ZBpjorZCEc31beMMfKVoGV2r2MGUEf2/U51gN86xMhi1X5LDs6EplgQ7z1KW6bBUePD2rs3juBG66w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sg3jlpiP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3550C4CEDD;
+	Thu, 20 Mar 2025 13:48:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742478526;
+	bh=n2Aa2LlLF6Pk+aaptQYR87WXXsYSLb/Oa2nEIcU7Lb4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Sg3jlpiPx/dB5BNvXf0tThzs8u8gi3vrNWyciwwY5xslP5x65VURw3KYxskp+PSzN
+	 nv78QPsVVJjC6f6Hvmi6HVs+I70VB0bquL0V0Yx9zJO8abjCQSfLSZJxVSs76TSC4N
+	 yAy8fDudb7VqkMgt0l73bHllyh4/G+WwkkItX1FszsyLpdilq+sznRW6I+E3Ff8Q/3
+	 36X4K3Q1QuPEQf5hJ+Hp8ASKgEsLtWWZlNTUppo48fb8jpt062iRwcdJ6VpBMT/8av
+	 IN6YtSuRvlzmg3iQciKCx9MvQBEwhtl98eJPNbIDalEwnVkN74cvm5CxHIIsu1K3t6
+	 5mc8aOp3kcLKw==
+Date: Thu, 20 Mar 2025 13:48:42 +0000
+From: Simon Horman <horms@kernel.org>
+To: Qasim Ijaz <qasdev00@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux-usb@vger.kernel.org,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: Re: [PATCH 2/3] net: mana: Implement set_link_ksettings in ethtool
- for speed
-Message-ID: <fb6b544f-f683-4307-8adf-82d37540c556@lunn.ch>
-References: <1742473341-15262-1-git-send-email-ernis@linux.microsoft.com>
- <1742473341-15262-3-git-send-email-ernis@linux.microsoft.com>
+	syzbot <syzbot+3361c2d6f78a3e0892f9@syzkaller.appspotmail.com>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH 1/4] net: fix uninitialised access in mii_nway_restart()
+Message-ID: <20250320134842.GS280585@kernel.org>
+References: <20250319112156.48312-1-qasdev00@gmail.com>
+ <20250319112156.48312-2-qasdev00@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,35 +61,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1742473341-15262-3-git-send-email-ernis@linux.microsoft.com>
+In-Reply-To: <20250319112156.48312-2-qasdev00@gmail.com>
 
-On Thu, Mar 20, 2025 at 05:22:20AM -0700, Erni Sri Satya Vennela wrote:
-> Add support for ethtool_set_link_ksettings for mana.
-> Set speed information of the port using ethtool. This
-> feature is not supported by all hardware.
+On Wed, Mar 19, 2025 at 11:21:53AM +0000, Qasim Ijaz wrote:
+> In mii_nway_restart() during the line:
 > 
-> Before the change:
-> $ethtool -s enP30832s1 speed 100
-> >netlink error: Operation not supported
-> $ethtool enP30832s1
-> >Settings for enP30832s1:
->         Supported ports: [  ]
->         Supported link modes:   Not reported
+>         bmcr = mii->mdio_read(mii->dev, mii->phy_id, MII_BMCR);
+> 
+> The code attempts to call mii->mdio_read which is ch9200_mdio_read().
+> 
+> ch9200_mdio_read() utilises a local buffer, which is initialised
+> with control_read():
+> 
+>         unsigned char buff[2];
+> 
+> However buff is conditionally initialised inside control_read():
+> 
+>         if (err == size) {
+>                 memcpy(data, buf, size);
+>         }
+> 
+> If the condition of "err == size" is not met, then buff remains
+> uninitialised. Once this happens the uninitialised buff is accessed
+> and returned during ch9200_mdio_read():
+> 
+>         return (buff[0] | buff[1] << 8);
+> 
+> The problem stems from the fact that ch9200_mdio_read() ignores the
+> return value of control_read(), leading to uinit-access of buff.
+> 
+> To fix this we should check the return value of control_read()
+> and return early on error.
+> 
+> Reported-by: syzbot <syzbot+3361c2d6f78a3e0892f9@syzkaller.appspotmail.com>
+> Closes: https://syzkaller.appspot.com/bug?extid=3361c2d6f78a3e0892f9
+> Tested-by: syzbot <syzbot+3361c2d6f78a3e0892f9@syzkaller.appspotmail.com>
+> Fixes: 4a476bd6d1d9 ("usbnet: New driver for QinHeng CH9200 devices")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Qasim Ijaz <qasdev00@gmail.com>
 
-Since there are no link modes, what does this speed actually mean?
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-> After the change:
-> $ethtool -s enP30832s1 speed 100
-
-Is 
-
-$ethtool -s enP30832s1 speed 42
-
-permitted? 
-
-or
-
-$ethtool -s enP30832s1 speed -1
-
-	Andrew
 
