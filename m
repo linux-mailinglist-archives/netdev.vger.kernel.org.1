@@ -1,259 +1,108 @@
-Return-Path: <netdev+bounces-176505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09B0AA6A90A
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 15:51:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98080A6A929
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 15:56:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 727A67AC70D
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 14:49:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1023B17CB0A
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 14:56:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7FDC1E0E0D;
-	Thu, 20 Mar 2025 14:50:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 941311E1022;
+	Thu, 20 Mar 2025 14:56:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nRPpkYlD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YSVMFLXy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69AA01876;
-	Thu, 20 Mar 2025 14:50:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6766A8BF8;
+	Thu, 20 Mar 2025 14:56:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742482250; cv=none; b=up2lDjrIAJCtLBoWZ8e0GjNAfPgFQCQ4m+q4jitmx3YciWFDai+tyqZAlhq2EX2IOG1kLMB9I9JTkjFxV2Ria+gc34VMxfF/QYxvFeOymYsw90T/XJoHdAT1Zcypt8gCRZyyer1MsQkcW/JUi/JWWvRQSgpf8e6G8z5sMISixqM=
+	t=1742482566; cv=none; b=mh1ve5cv2flho31P+ityFIuaZD02Lg5LS5NARLEBtkTLZq779i9CbrWiPFdjpvseyNYdezbv90Jt8yX4+NKeQ8ifyBX0WNPOmQv0oCNlC0OODHj4UyF+PM3QPtIvaHTqK7foMTEJJcaFBeLKkT6fNomgMqoctLUDL2oPYQtqOac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742482250; c=relaxed/simple;
-	bh=VgHP2YZFJFqQDq6X1Enrko29eUy4PpuSIOCuvJw0JKI=;
+	s=arc-20240116; t=1742482566; c=relaxed/simple;
+	bh=DEQ4SQovtGJhf5I7qm+v1bo7YXqeiuODFmBSdVBmv4k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JU23vf56yCSeynELKQGf7YpeU/z+eYk3tketxRSKHr/rVPQhhaaOyr5KVUbQpdEzCyu1PJDjdBs2QwpO8pEKOxmRlNvq4F7CffqBwP6Ib8lB3SFVBxktwzv0dQ444X/CS7n+3M00yR4ais1xB5Hm0dBmxLaMNZK0+nc0Ov51FKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nRPpkYlD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAE15C4CEDD;
-	Thu, 20 Mar 2025 14:50:45 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=T5XME/LgeFq9Z9/Aq9fTw/3G/2AwLZdgeKHwu00nRzPafU9jsL85tgWEjdedAbYFZSbIMg7bnAm6t7r8cZz32rwdT++5VzJcj+VOVmlBYAY1nnVajYl0VUGsyulkKbp4v8E/5a/AblfSWyOfgBVzI20Scc31VoY12fQo9Xt7/kY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YSVMFLXy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 909BBC4CEDD;
+	Thu, 20 Mar 2025 14:56:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742482250;
-	bh=VgHP2YZFJFqQDq6X1Enrko29eUy4PpuSIOCuvJw0JKI=;
+	s=k20201202; t=1742482565;
+	bh=DEQ4SQovtGJhf5I7qm+v1bo7YXqeiuODFmBSdVBmv4k=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nRPpkYlDUBw1gjGtXjQDSei78Js5SiMhGUtyttvW9CgAqns2tTOPY8/wNVO3igUrp
-	 d9zHAHmBrA+CESjTE8Vd+xoH+NF8JxkVjkUXZY2rGxmW3pfhS8VkKdGG8xyARuj0FL
-	 gQHgAnh715xQCL8AM6m35smLKWm66L881RKbWs2YrcLzTdo+SZBv0gIAnBp529LrWk
-	 2TpFQUzC/HZ9ygyk+1qefsxhF1q9kjA4qEWPS0OL1ov41GqjdVgXiAkgQNedHqDO0I
-	 4AydkziQDb1uW2b3VKIQ3E28ix5DltoIbnT+ryX4BT5beobsVaihxlLPX0QJow5foT
-	 821ydGI3nYYkQ==
-Date: Thu, 20 Mar 2025 14:50:42 +0000
-From: Lee Jones <lee@kernel.org>
-To: Ming Yu <a0282524688@gmail.com>
-Cc: tmyu0@nuvoton.com, linus.walleij@linaro.org, brgl@bgdev.pl,
-	andi.shyti@kernel.org, mkl@pengutronix.de,
-	mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net,
-	jdelvare@suse.com, alexandre.belloni@bootlin.com,
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
-	linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org,
-	linux-usb@vger.kernel.org
-Subject: Re: [PATCH v8 1/7] mfd: Add core driver for Nuvoton NCT6694
-Message-ID: <20250320145042.GS3890718@google.com>
-References: <20250225081644.3524915-1-a0282524688@gmail.com>
- <20250225081644.3524915-2-a0282524688@gmail.com>
- <20250307011542.GE8350@google.com>
- <CAOoeyxUgiTqtSksfHopEDhZHwNkUq9+d-ojo8ma3PX2dosuwyQ@mail.gmail.com>
+	b=YSVMFLXyFzPJI+hkOQlOLu+y4DXUt2bDNDNburzDNwR9viykexwmdG3Jdp0RaYwSH
+	 +ZFT/SrMHPUxZyhpjyrx/+Py3pUnIqWDEUQVtfwjDTgGt8QEWFkeTLD6Xx0DW5xqN5
+	 I4zBCSuzfgrNP3RZa9GPa7Pc3fjcgvoFxp2MiSjsSahfg90jCvZnlH+pqkUW3J96TH
+	 pMIyyVQ/2xtap+g/qlVnh3opT3GX8psMTBXvIfD4J3/N/DFnXiUmsFlFmMw0s9UyOd
+	 VT/IvIle3SPNmPK6GZF2A/CNEbwt0JfPV/i5zCxTtajyykItR9uTSkUOrUrRfDwUYA
+	 7ytacpmnvrw/A==
+Date: Thu, 20 Mar 2025 14:55:59 +0000
+From: Simon Horman <horms@kernel.org>
+To: Gur Stavi <gur.stavi@huawei.com>
+Cc: Fan Gong <gongfan1@huawei.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, Lee Trager <lee@trager.us>,
+	linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+	Bjorn Helgaas <helgaas@kernel.org>,
+	Cai Huoqing <cai.huoqing@linux.dev>, luosifu <luosifu@huawei.com>,
+	Xin Guo <guoxin09@huawei.com>,
+	Shen Chenyang <shenchenyang1@hisilicon.com>,
+	Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
+	Shi Jing <shijing34@huawei.com>,
+	Meny Yossefi <meny.yossefi@huawei.com>,
+	Suman Ghosh <sumang@marvell.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Joe Damato <jdamato@fastly.com>
+Subject: Re: [PATCH net-next v09 1/1] hinic3: module initialization and tx/rx
+ logic
+Message-ID: <20250320145559.GB889584@horms.kernel.org>
+References: <cover.1742202778.git.gur.stavi@huawei.com>
+ <60a3c7b146920eee8b15464e0b0d1ea35db0b30e.1742202778.git.gur.stavi@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOoeyxUgiTqtSksfHopEDhZHwNkUq9+d-ojo8ma3PX2dosuwyQ@mail.gmail.com>
+In-Reply-To: <60a3c7b146920eee8b15464e0b0d1ea35db0b30e.1742202778.git.gur.stavi@huawei.com>
 
-On Mon, 17 Mar 2025, Ming Yu wrote:
-
-> Dear Lee,
+On Mon, Mar 17, 2025 at 11:40:39AM +0200, Gur Stavi wrote:
+> From: Fan Gong <gongfan1@huawei.com>
 > 
-> Thank you for reviewing,
+> This is [1/3] part of hinic3 Ethernet driver initial submission.
+> With this patch hinic3 is a valid kernel module but non-functional
+> driver.
 > 
-> Lee Jones <lee@kernel.org> 於 2025年3月7日 週五 上午9:15寫道：
-> >
-> > On Tue, 25 Feb 2025, Ming Yu wrote:
-> >
-> > > The Nuvoton NCT6694 is a peripheral expander with 16 GPIO chips,
-> > > 6 I2C controllers, 2 CANfd controllers, 2 Watchdog timers, ADC,
-> > > PWM, and RTC.
-> >
-> > This needs to go into the Kconfig help passage.
-> >
+> The driver parts contained in this patch:
+> Module initialization.
+> PCI driver registration but with empty id_table.
+> Auxiliary driver registration.
+> Net device_ops registration but open/stop are empty stubs.
+> tx/rx logic.
 > 
-> Okay, I will move these to Kconfig in the next patch.
+> All major data structures of the driver are fully introduced with the
+> code that uses them but without their initialization code that requires
+> management interface with the hw.
 > 
-> > > This driver implements USB device functionality and shares the
-> > > chip's peripherals as a child device.
-> >
-> > This driver doesn't implement USB functionality.
-> >
-> 
-> Fix it in v9.
-> 
-> > > Each child device can use the USB functions nct6694_read_msg()
-> > > and nct6694_write_msg() to issue a command. They can also request
-> > > interrupt that will be called when the USB device receives its
-> > > interrupt pipe.
-> > >
-> > > Signed-off-by: Ming Yu <a0282524688@gmail.com>
-> >
-> > Why aren't you signing off with your work address?
-> >
-> 
-> Fix it in v9.
-> 
-> > > ---
-> > >  MAINTAINERS                 |   7 +
-> > >  drivers/mfd/Kconfig         |  18 ++
-> > >  drivers/mfd/Makefile        |   2 +
-> > >  drivers/mfd/nct6694.c       | 378 ++++++++++++++++++++++++++++++++++++
-> > >  include/linux/mfd/nct6694.h | 102 ++++++++++
-> > >  5 files changed, 507 insertions(+)
-> > >  create mode 100644 drivers/mfd/nct6694.c
-> > >  create mode 100644 include/linux/mfd/nct6694.h
-> > >
-> > > diff --git a/MAINTAINERS b/MAINTAINERS
-> > > index 873aa2cce4d7..c700a0b96960 100644
-> > > --- a/MAINTAINERS
-> > > +++ b/MAINTAINERS
-> > > @@ -16918,6 +16918,13 @@ F:   drivers/nubus/
-> > >  F:   include/linux/nubus.h
-> > >  F:   include/uapi/linux/nubus.h
-> > >
-> > > +NUVOTON NCT6694 MFD DRIVER
-> > > +M:   Ming Yu <tmyu0@nuvoton.com>
-> > > +L:   linux-kernel@vger.kernel.org
-> >
-> > This is the default list.  You shouldn't need to add that here.
-> 
-> Remove it in v9.
+> Co-developed-by: Xin Guo <guoxin09@huawei.com>
+> Signed-off-by: Xin Guo <guoxin09@huawei.com>
+> Signed-off-by: Fan Gong <gongfan1@huawei.com>
+> Co-developed-by: Gur Stavi <gur.stavi@huawei.com>
+> Signed-off-by: Gur Stavi <gur.stavi@huawei.com>
 
-Please snip everything that you agree with.
 
-> > > +S:   Supported
-> > > +F:   drivers/mfd/nct6694.c
-> > > +F:   include/linux/mfd/nct6694.h
-> > > +
-> > >  NVIDIA (rivafb and nvidiafb) FRAMEBUFFER DRIVER
-> > >  M:   Antonino Daplas <adaplas@gmail.com>
-> > >  L:   linux-fbdev@vger.kernel.org
+Thanks for addressing my feedback on v8.
 
-[...]
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x1),
-> >
-> > IDs are usually given in base-10.
-> >
-> 
-> Fix it in v9.
-> 
-> > Why are you manually adding the device IDs?
-> >
-> > PLATFORM_DEVID_AUTO doesn't work for you?
-> >
-> 
-> I need to manage these IDs to ensure that child devices can be
-> properly utilized within their respective modules.
-
-How?  Please explain.
-
-This numbering looks sequential and arbitrary.
-
-What does PLATFORM_DEVID_AUTO do differently such that it is not useful?
-
-> 
-> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x2),
-> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x3),
-> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x4),
-> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x5),
-> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x6),
-> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x7),
-> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x8),
-> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x9),
-> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0xA),
-> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0xB),
-> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0xC),
-> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0xD),
-> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0xE),
-> > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0xF),
-
-> > > +
-> > > +     MFD_CELL_BASIC("i2c-nct6694", NULL, NULL, 0, 0x0),
-> > > +     MFD_CELL_BASIC("i2c-nct6694", NULL, NULL, 0, 0x1),
-> > > +     MFD_CELL_BASIC("i2c-nct6694", NULL, NULL, 0, 0x2),
-> > > +     MFD_CELL_BASIC("i2c-nct6694", NULL, NULL, 0, 0x3),
-> > > +     MFD_CELL_BASIC("i2c-nct6694", NULL, NULL, 0, 0x4),
-> > > +     MFD_CELL_BASIC("i2c-nct6694", NULL, NULL, 0, 0x5),
-> > > +
-> > > +     MFD_CELL_BASIC("nct6694_canfd", NULL, NULL, 0, 0x0),
-> >
-> > Why has the naming convention changed here?
-> >
-> 
-> I originally expected the child devices name to directly match its
-> driver name. Do you think it would be better to standardize the naming
-> as "nct6694-xxx" ?
-
-Yes, that is the usual procedure.
-
-> > > +     MFD_CELL_BASIC("nct6694_canfd", NULL, NULL, 0, 0x1),
-> > > +
-> > > +     MFD_CELL_BASIC("nct6694_wdt", NULL, NULL, 0, 0x0),
-> > > +     MFD_CELL_BASIC("nct6694_wdt", NULL, NULL, 0, 0x1),
-> > > +
-> > > +     MFD_CELL_NAME("nct6694-hwmon"),
-> > > +     MFD_CELL_NAME("rtc-nct6694"),
-> >
-> > There doesn't seem to be any consistency here.
-> >
-> 
-> Do you think these two should be changed to use MFD_CELL_BASIC()?
-
-No.  I mean with the device nomenclature.
-
-[...]
-
-> > > +static void usb_int_callback(struct urb *urb)
-> > > +{
-> > > +     struct nct6694 *nct6694 = urb->context;
-> > > +     unsigned int *int_status = urb->transfer_buffer;
-> > > +     int ret;
-> > > +
-> > > +     switch (urb->status) {
-> > > +     case 0:
-> > > +             break;
-> > > +     case -ECONNRESET:
-> > > +     case -ENOENT:
-> > > +     case -ESHUTDOWN:
-> > > +             return;
-> > > +     default:
-> > > +             generic_handle_irq_safe(irq_find_mapping(nct6694->domain, irq));
-> > > +             *int_status &= ~BIT(irq);
-> > > +     }
-> > > +
-> > > +resubmit:
-> > > +     ret = usb_submit_urb(urb, GFP_ATOMIC);
-> > > +     if (ret)
-> > > +             dev_dbg(nct6694->dev, "%s: Failed to resubmit urb, status %pe",
-> >
-> > Why debug?
-> >
-> 
-> Excuse me, do you think it should change to dev_err()?
-
-Probably a dev_warn() since you are not propagating the error.
-
-Is this okay by the way?  Is it okay to fail?
-
--- 
-Lee Jones [李琼斯]
 
