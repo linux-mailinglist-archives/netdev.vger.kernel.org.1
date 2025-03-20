@@ -1,98 +1,124 @@
-Return-Path: <netdev+bounces-176530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05974A6AAEF
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 17:21:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C829A6AAF4
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 17:22:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FA293B96BA
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 16:20:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E22318859F6
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 16:22:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F7F21E3DEF;
-	Thu, 20 Mar 2025 16:21:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1B4221D5B0;
+	Thu, 20 Mar 2025 16:21:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mR0ISiwA"
+	dkim=pass (2048-bit key) header.d=avride-ai.20230601.gappssmtp.com header.i=@avride-ai.20230601.gappssmtp.com header.b="Z96tCWwg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 682E31E3DD3;
-	Thu, 20 Mar 2025 16:21:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B451EE035
+	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 16:21:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742487665; cv=none; b=cpYTe0akHx+/30sthR9mmZK0IqbshQLas2ur5LWrQ1RlRXmnxrB/FnBzaNV25gHLtqPGpq1pSkUrAOZQCzDeQNbyQBYW8qdYtskzShRQ/fpIBFdTLSzQzC0IIDbaa0z3KOJw5jn3XKVYM1cg3+3sss4IE9m2d3aW5I6aOU2l2IM=
+	t=1742487717; cv=none; b=kM2KbXqvmQtcDJMF44KntEJPkyeu2k8HyX5H+oXBaUcFghsDp1OUO9dwlk68Bwg1QbSiQF5t70isHWc3uelkmlTeedG2lxkdkQQXveQ4Wmnf8Sy/k5dIkIty0o844G2NmlNhBwBrfBSwnQTMZQfOhgDqW7Dw9GUttzuPLPtwNhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742487665; c=relaxed/simple;
-	bh=7i9rmtaPpA46pX+L8EJTadcvZ1WTRJEf3zTx7Hkk6EI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SkOhCxe5vmYyuZiBqU59r8KKoYe5snRN6A6VDRwctRgOIJURzqLt9acEt+XIeSlAVrXJHgDq+Z48+4WsHcnblWsHsBcXrqTDMFlb5XuumaOKgsnUZ6HpJb6efv96omYdJfjvfPVqiytKaljRLq7AToBrUZfhQfw8RjyaWxtpj5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mR0ISiwA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23A0DC4CEDD;
-	Thu, 20 Mar 2025 16:21:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742487665;
-	bh=7i9rmtaPpA46pX+L8EJTadcvZ1WTRJEf3zTx7Hkk6EI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mR0ISiwA5H8svSINnZBRYlALikGjp5mkEw100CyQVLOALrgcwyn1I1L+d7I4Y/Cz+
-	 I6BDxKdSQIM7PkutX3cb37d8KVP0H+n3wK355w8MpMky1/NxSDb3P625TwVqnAa2sy
-	 DosMTQDdGo3G7tpzE6BzTuG/4xi/87xbKEiQ9vmg4U3nNDIwPkPJQvfhNFhFhIB8pZ
-	 kinObXvq01GxNE/3I2cvXFzpIbotAAhlv7VOPMvYhm0zNYfHeUW5i+T33115qSkoNm
-	 ur19OrpE+IrSv0Dssq+F140JJOibP3acVfYfYwUe+g6QQxm7cxoxrwk1Oo8H1Vvfb5
-	 ujfPiQvRyHD2g==
-Date: Thu, 20 Mar 2025 16:21:01 +0000
-From: Simon Horman <horms@kernel.org>
-To: alejandro.lucero-palau@amd.com
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
-	dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	dave.jiang@intel.com, Alejandro Lucero <alucerop@amd.com>
-Subject: Re: [PATCH v11 18/23] cxl: allow region creation by type2 drivers
-Message-ID: <20250320162101.GB892515@horms.kernel.org>
-References: <20250310210340.3234884-1-alejandro.lucero-palau@amd.com>
- <20250310210340.3234884-19-alejandro.lucero-palau@amd.com>
+	s=arc-20240116; t=1742487717; c=relaxed/simple;
+	bh=p8LyDmgqzEDannv7f+gsDTDfaHcnYVeESBD6JdTUnKc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jJ8c6AuagW7aZbdIHr2Ecrz3cho6ourr3bmh3ys6d0RaCLOaVkK/RIknXC/tVAha3c0TS1JNGGdB5jADMJ8FQ/uiEA26/uSaZFzZmcuZ3Dbt1/DyEsp2BWKDzcat2TIEYQyfa0ke7bWtBylLI/O8TdNg51X/azLAgi1J5cPboKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=avride.ai; spf=none smtp.mailfrom=avride.ai; dkim=pass (2048-bit key) header.d=avride-ai.20230601.gappssmtp.com header.i=@avride-ai.20230601.gappssmtp.com header.b=Z96tCWwg; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=avride.ai
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=avride.ai
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5e6f4b3ebe5so1791524a12.0
+        for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 09:21:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=avride-ai.20230601.gappssmtp.com; s=20230601; t=1742487714; x=1743092514; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=5tYXZFdDi8NRvBgGzlFquPzq73p+Oxb/2573EY/J83Y=;
+        b=Z96tCWwgkLuHlGIyPiKS7fzXMNL2JEQcLIi8+zLyCV3oeGT8dG/sWz9dTd5c1/TQFH
+         9ARmqQE57B0NeIOyDvQjiDuz4eBx0f/s9e28KcUkIKN1g9la6IKa6z+6hSXviSE1SFgD
+         w1+hRiEprke9bBDogHh94sBBfnZnBO2DoI/9t3g0q2M5xIrcMxrHmoH3dNGcDr/OrLz5
+         Rmyc5xPfX8h8w3RtEhEVT2is4Yw7X4aZaDVfgY6AqfLvk/HgLaIOGjfqv/5eWJLtqQML
+         HYlnMXIR9mSZt5cTut1QCYJvBw+Adr8niuoe4IX5qzcDFjgdjThuWM7eQZT0uUG1CG1i
+         fJYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742487714; x=1743092514;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5tYXZFdDi8NRvBgGzlFquPzq73p+Oxb/2573EY/J83Y=;
+        b=rMOuRBzU1guekmNdAomlJ84bt/X6cBiPhB2HbHZabcCRSsQt3pOdSKIHfNoguG/ftU
+         nwux7BaS6HTrMSGIo3GcArrsnran4RL90oYCDsL7av22sep4S22v7XJXCy6G0MKo9Dgf
+         SYqRwgFHwdwk1I0a5W814J6mILBCh0xZ4OGAasKQGAQ2VLB9OH+vtAga8qx7z3lm4va9
+         CEJ9Cdrm8c+jLrdK0Urqm7MHODvvXLBTZR/E7MgxRBhzp8EMEo9xudXGR0c6gLw/oN6q
+         KDVBGUBBtRXhJWN+mN4JKz7jl9yD+WTQOnTJI03594ZZCblsn31T+s5qx6iLIRexX+NG
+         PEPw==
+X-Gm-Message-State: AOJu0YyMnCTc6ZKaY1LuERGrHCYUiUdoQHpR6EMKe1ylXP2qvYv5QlJY
+	sBUmbfVe176gzLiYJfLfFtgLWzU04inxwPwBNBfSkhl62eCKQ/wbsEZ+TsY6Hp6ZC1+S1MaxY4+
+	NQwKLN3HUCyspmr8U3SX4TxYQQQf/CRRYjeAD1Q==
+X-Gm-Gg: ASbGnct+NznVoFLax0jbp5NDb682T0pWKO6LjqEAdqiOTxL8P6cwMWbi3PkCYz6TiIO
+	z9lGhxKG970do0N2sb9wHabrA/I0FlMHgx2nyZ66UmX+Q5hUrt8xs9qeKDA5alhXYxikoZGLllL
+	Z34sWpFpfrDQz3vxu3vIa/x0U3sw/74vSV+NiJfX3cnXYnr4gSUy+tj+ME
+X-Google-Smtp-Source: AGHT+IHvsphPUygP5q4+bf4z9XcOUXnuqcPIg6QZZmBc6kHBCohYRjLTwXKmMibh6g6meeMzVgNyA4w3xojfCGBF/k0=
+X-Received: by 2002:a05:6402:524a:b0:5e6:e842:f9d2 with SMTP id
+ 4fb4d7f45d1cf-5eb80fcde4amr6944155a12.29.1742487714224; Thu, 20 Mar 2025
+ 09:21:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250310210340.3234884-19-alejandro.lucero-palau@amd.com>
+References: <DE1DD9A1-3BB2-4AFB-AE3B-9389D3054875@avride.ai> <CALs4sv3DtyBSqx0v_FHFUPrB+w7GOsheNOEa0pm6N4xNf-4JUA@mail.gmail.com>
+In-Reply-To: <CALs4sv3DtyBSqx0v_FHFUPrB+w7GOsheNOEa0pm6N4xNf-4JUA@mail.gmail.com>
+From: Kamil Zaripov <zaripov-kamil@avride.ai>
+Date: Thu, 20 Mar 2025 18:21:43 +0200
+X-Gm-Features: AQ5f1JqWmzJJzxLwuSB2m1YSHS0ON3ueDGu1UQr5DkEWKI4NCDQawaHPSNHqqgM
+Message-ID: <CAGtf3iaH3+QQBvU2Po3DMCGd2tUeYzqhHR-SGBbH8_1u1LRAmw@mail.gmail.com>
+Subject: Re: bnxt_en: Incorrect tx timestamp report
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Cc: netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>, 
+	Andrew Gospodarek <andrew.gospodarek@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Mar 10, 2025 at 09:03:35PM +0000, alejandro.lucero-palau@amd.com wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
-> Creating a CXL region requires userspace intervention through the cxl
-> sysfs files. Type2 support should allow accelerator drivers to create
-> such cxl region from kernel code.
-> 
-> Adding that functionality and integrating it with current support for
-> memory expanders.
-> 
-> Based on https://lore.kernel.org/linux-cxl/168592159835.1948938.1647215579839222774.stgit@dwillia2-xfh.jf.intel.com/
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> It's not clear to me if you are facing this issue when the PHC is
+> shared between multiple hosts or if you are running a single host NIC.
 
-...
+I think that BCM57502 works in single host mode but I'm not sure: it
+is ADLINK's Ampere Altra Developer Platform and maybe BMC can see this
+NIC as well. But all actions over PHC are performed from CPU only.
 
-> +/**
-> + * cxl_create_region - Establish a region given an endpoint decoder
-> + * @cxlrd: root decoder to allocate HPA
-> + * @cxled: endpoint decoder with reserved DPA capacity
+> In the cases where a PHC is shared across multiple hosts, the driver
+> identifies such a configuration and switches to non-real time PHC
+> access mode.
 
-nit: @ways should also be documented here.
+Is it possible to understand in which access mode the driver works with PHC?
 
-     Flagged by W=1 builds.
+> https://web.git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/drivers/net/ethernet/broadcom/bnxt?id=85036aee1938d65da4be6ae1bc7e5e7e30b567b9
+> If you are using a configuration like the multi host, can you please
+> make sure you have this patch?
 
-> + *
-> + * Returns a fully formed region in the commit state and attached to the
-> + * cxl_region driver.
-> + */
-> +struct cxl_region *cxl_create_region(struct cxl_root_decoder *cxlrd,
-> +				     struct cxl_endpoint_decoder *cxled, int ways)
+We are using upstream Linux v6.6.39 which includes
+85036aee1938d65da4be6ae1bc7e5e7e30b567b9 commit.
 
-...
+
+> Let me know if you are not in the multi-host config. Do post the
+> ethtool -i output to help know the firmware version.
+
+Here is output of this command for the first port of this NIC:
+
+    $ ethtool -i enP2s1f0np0
+    driver: bnxt_en
+    version: 6.6.39
+    firmware-version: 224.0.110.0/pkg 224.1.60.0
+    expansion-rom-version:
+    bus-info: 0002:01:00.0
+    supports-statistics: yes
+    supports-test: yes
+    supports-eeprom-access: yes
+    supports-register-dump: yes
+    supports-priv-flags: no
 
