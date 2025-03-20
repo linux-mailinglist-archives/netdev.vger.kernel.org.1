@@ -1,169 +1,109 @@
-Return-Path: <netdev+bounces-176433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16E5FA6A48E
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 12:13:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2963DA6A4B1
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 12:17:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8479A481A7F
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 11:13:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C7E6170251
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 11:17:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1697E21CA0E;
-	Thu, 20 Mar 2025 11:13:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5313521859F;
+	Thu, 20 Mar 2025 11:17:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cYyj9p6g"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07F1821C9EE;
-	Thu, 20 Mar 2025 11:13:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29B2B27701;
+	Thu, 20 Mar 2025 11:17:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742469189; cv=none; b=JdvFRPh6SUI0to1jHm0gTZGmzRurl/0qK+C88YTCFyRe6K420UO/fccz2NSuSb7Bimb2pXrCPvQlfaXD6HqIpa+XkE0bain+2BkQgP3HsEWLRiAOGPlUV5b261tmNCqaKhQ88EdgHzG3oHlHQAYl6T0KNlKoF8ywXREdLXL7VTc=
+	t=1742469426; cv=none; b=qQZvRvZalFOmj24arciQZsq0dDa7o9Vgz36G9lXbevSB3r+ukQ9AUCHjPySapMBPO84pHs/jFre1z5hQSuU+aIEGrfwEWh26/oc2MAXD/HjDJKEhBCuhNqnQxPkVJcCSVrTqWBOYX2/46RfBLUvX+1BYcQpVAULIfyIg6SqXIgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742469189; c=relaxed/simple;
-	bh=VmlerhMtRQKB8S8Gb3WmVadG8dq5nBAyHNvyZcexTUE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Ik33ZcBsSJ+9I6Y5P1IbpvLmE2nyM3S/czFQl8EiNg0wFR90hUJfLQnjeFEBDbb8h8FK/exkFvM819Trmj6eOvyfPQKy8/qOVFXjXWWjehF21HwSPikqml8lfAgyRbHPof5aNaKcelYDlzEojrFi8gpn0VSbLaU/+kjpmZU+2KY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4ZJN9T4wPVz1f1Km;
-	Thu, 20 Mar 2025 19:08:29 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 15F82140135;
-	Thu, 20 Mar 2025 19:13:02 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 20 Mar 2025 19:13:01 +0800
-Message-ID: <e798b650-dd61-4176-a7d6-b04c2e9ddd80@huawei.com>
-Date: Thu, 20 Mar 2025 19:13:01 +0800
+	s=arc-20240116; t=1742469426; c=relaxed/simple;
+	bh=/7u+gDUcP5o2rJ8pXOfKWcA25Zzww9gy+RHc9UH0fxs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a9HP9uzloWihw3DcGaFfyheNgEY4LSv3AAUVz1odi+v2YmJvTFoY6ptUZXY341qaT8NR6vA6T1qDojXLJORAl+va4q7ythW9RAMrYE06q4TF/q7e8eljDCL4BJoDLpetpuDSDaG+tH+qobWCaipVbIG5CSkahnGmyZleE0uA7ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cYyj9p6g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7E27C4CEDD;
+	Thu, 20 Mar 2025 11:17:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742469425;
+	bh=/7u+gDUcP5o2rJ8pXOfKWcA25Zzww9gy+RHc9UH0fxs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cYyj9p6g/zjks6iCfVzP7tHULnFlR+z8bMqS9F9Pe7E0YR4AHw5a6tkVLOj0eIR9a
+	 wAl7LduM9Hm2hX2t0LKcHc9mT+95kUFupQ07vUs1ZW/fHczkO95AgVfiLGtCIWNyPM
+	 wmoPOvU1kMrZcUyeXD0ASyQkaUbSxLwuIuxLGKMZD0jPUSWm8xZEgiWmWqEv7L2HlK
+	 k0vCLJfKaeXIABIuf8NDg+4WHlIYeXKjPqCci70sSu4lsTtYlsSLfxEn0x7r6PqBgx
+	 jkRSDki1RktIvTlCCh9Hfpe6mRJ4wBGD+guKhwM+awGTBDGAQirdYtarQmBMkovzvF
+	 YMoMh0Fl3FPoQ==
+Date: Thu, 20 Mar 2025 11:17:01 +0000
+From: Simon Horman <horms@kernel.org>
+To: "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
+Cc: gregkh@linuxfoundation.org, linux-serial@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2 03/31] tty: caif: do not use N_TTY_BUF_SIZE
+Message-ID: <20250320111701.GI280585@kernel.org>
+References: <20250317070046.24386-1-jirislaby@kernel.org>
+ <20250317070046.24386-4-jirislaby@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 00/13] Ultra Ethernet driver introduction
-To: Jason Gunthorpe <jgg@nvidia.com>, Nikolay Aleksandrov
-	<nikolay@enfabrica.net>
-CC: <netdev@vger.kernel.org>, <shrijeet@enfabrica.net>,
-	<alex.badea@keysight.com>, <eric.davis@broadcom.com>, <rip.sohan@amd.com>,
-	<dsahern@kernel.org>, <bmt@zurich.ibm.com>, <roland@enfabrica.net>,
-	<winston.liu@keysight.com>, <dan.mihailescu@keysight.com>,
-	<kheib@redhat.com>, <parth.v.parikh@keysight.com>, <davem@redhat.com>,
-	<ian.ziemba@hpe.com>, <andrew.tauferner@cornelisnetworks.com>,
-	<welch@hpe.com>, <rakhahari.bhunia@keysight.com>,
-	<kingshuk.mandal@keysight.com>, <linux-rdma@vger.kernel.org>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, huchunzhi <huchunzhi@huawei.com>,
-	<jerry.lilijun@huawei.com>, <zhangkun09@huawei.com>,
-	<wang.chihyung@huawei.com>
-References: <20250306230203.1550314-1-nikolay@enfabrica.net>
- <20250319164802.GA116657@nvidia.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <20250319164802.GA116657@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250317070046.24386-4-jirislaby@kernel.org>
 
-On 2025/3/20 0:48, Jason Gunthorpe wrote:
-> On Fri, Mar 07, 2025 at 01:01:50AM +0200, Nikolay Aleksandrov wrote:
->> Hi all,
->> This patch-set introduces minimal Ultra Ethernet driver infrastructure and
->> the lowest Ultra Ethernet sublayer - the Packet Delivery Sublayer (PDS),
->> which underpins the entire communication model of the Ultra Ethernet
->> Transport[1] (UET). Ultra Ethernet is a new RDMA transport designed for
->> efficient AI and HPC communication.
-> 
-> I was away while this discussion happened so I've gone through and
-> read the threads, looked at the patches and I don't think I've changed
-> my view since I talked to Enfabrica privately on this topic almost a
-> year ago.
-> 
-> I do not agree with creating a new subsystem (or whatever you are
-> calling drivers/ultraeth) for a single RDMA protocol and see nothing
-> new here to change my mind. I would likely NAK the direction I see in
-> this RFC, as I have other past attempts to build RDMA HW interfaces
-> outside of the RDMA subystem.
-> 
-> Since none of that past discussion seems to have been acknowledged or
-> rebutted in this series I will repeat the main points:
-> 
-> 1) I'm aware of something like 5-7 new protocols that are competing
->    for the same market as Ultra Ethernet. We can't give everyone and
->    their dog a new subsystem (or whatever) and all the maintainability
->    negatives that come with that. As a matter of maintainability we
->    need to see consolidation here, not fragmentation!
-> 
->    Yes, UE is a consortium driven standard, which is unique and a big
->    positive, but I don't believe anyone can say for certain what
->    direction the industry is going to go in. Many consortium standards
->    have failed to get adoption in the past even with a large number of
->    member companies.
-> 
->    Nor can we know what concepts in UE are going to be copied into
->    other competing RDMA transports. See my other remarks on job key
->    for an example. Prematurely siloing stuff in drivers/ultraeth is
->    very much the wrong technical direction for maintainability.
-> 
->    That said, I think UE should be in the kernel and have a fair
->    chance to compete for market share. Just in a maintainable and
->    appropriate way while the industry evolves.
-> 
-> 2) Due to the above, I'm pretty confident we will see RDMA NICs
->    supporting a lot of different protocols. In fact they already do.
-> 
->    From a kernel maintainability perspective we really want one RDMA
->    driver leveraging as much common infrastructure between the
->    protocols as possible. We do not want to see a single HW driver
->    further split up needlessly to other subsystems, that would be a
->    big maintainability downside.
-> 
->    To put a clear point on this, mlx5 has been gaining new protocols
->    and fitting into the existing driver model for a number of years
->    now. In fact there is speculation that UE could be implemented in
->    mlx5 RDMA with minimal kernel changes. There would be no reason to
->    try to mess up the driver to also interact with this stuff in
->    drivers/ultraeth as seems to be proposed here.
-> 
->    I think other HW will be similar. UE isn't so radically different
->    that every HW path will need to diverge from classical RDMA. Nor is
->    is so dissimilar to other competing proposals. We don't want
->    artificial differences we want to create things that can be re-used
->    when appropriate.
-> 
->    Leon's response to Bart is correct, we already have similar
->    examples of almost everything UE does. Bart is also correct that
->    verbs would be a PITA, but RDMA userspace has moved beyond verbs
->    limitations years ago now. Alot of mlx5 stuff is not using verbs
->    today, for instance. EFA and other examples use extensive stuff
->    beyond verbs.
+On Mon, Mar 17, 2025 at 08:00:18AM +0100, Jiri Slaby (SUSE) wrote:
+> N_TTY_BUF_SIZE -- as the name suggests -- is the N_TTY's buffer size.
+> There is no reason to couple that to caif's tty->receive_room. Use 4096
+> directly -- even though, it should be some sort of "SKB_MAX_ALLOC" or
+> alike. But definitely not N_TTY_BUF_SIZE.
 
-Regarding to reuse the existing rdma subsystem for a new protocol:
-Currently EFA seems to be layering a RDM layer on top of the SRD
-transport layer, see [1], and RDM layer is implemented by software in
-the libfabric while SRD seems to be implemented by hardware, which
-provides 'Scalable Reliable Datagram' service through the QP type
-of EFA_QP_DRIVER_TYPE_SRD.
+Hi Jiri,
 
-I am not sure if layers like SRD and RDM are clean layering from
-protocol design perspective.
-But if the hardware implement both SRD and RDM layer in hardware,
-then there might be two types of object need managing, SRD object
-might be shared between different applications, and RDM object
-need to be created based on a SRD object.
+My 2c worth is that 4096 seems like an arbitrary value.
+Which is fine, but perhaps a comment is warranted.
 
-As the existing rdma subsystem doesn't seems to support the above
-use case yet and as we are discussing a possible new subsystem or
-updating existing subsystem to support new protocol here, it would
-be good to discuss if it is possible to support the above case or
-another new subsystem is needed for that use case too.
-
-1. https://github.com/ofiwg/libfabric/blob/main/prov/efa/docs/efa_rdm_protocol_v4.md
+> 
+> N_TTY_BUF_SIZE is private and will be moved to n_tty.c later.
+> 
+> Signed-off-by: Jiri Slaby (SUSE) <jirislaby@kernel.org>
+> Acked-by: Jakub Kicinski <kuba@kernel.org>
+> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: netdev@vger.kernel.org
+> ---
+>  drivers/net/caif/caif_serial.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/caif/caif_serial.c b/drivers/net/caif/caif_serial.c
+> index ed3a589def6b..e7d1b9301fde 100644
+> --- a/drivers/net/caif/caif_serial.c
+> +++ b/drivers/net/caif/caif_serial.c
+> @@ -344,7 +344,7 @@ static int ldisc_open(struct tty_struct *tty)
+>  	ser->tty = tty_kref_get(tty);
+>  	ser->dev = dev;
+>  	debugfs_init(ser, tty);
+> -	tty->receive_room = N_TTY_BUF_SIZE;
+> +	tty->receive_room = 4096;
+>  	tty->disc_data = ser;
+>  	set_bit(TTY_DO_WRITE_WAKEUP, &tty->flags);
+>  	rtnl_lock();
+> -- 
+> 2.49.0
+> 
+> 
 
