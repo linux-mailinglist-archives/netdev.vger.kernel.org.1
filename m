@@ -1,241 +1,74 @@
-Return-Path: <netdev+bounces-176500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A214CA6A8FE
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 15:48:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97C41A6A932
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 15:59:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98C58167A21
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 14:48:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF666189DB3D
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 14:49:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F21E61DF985;
-	Thu, 20 Mar 2025 14:48:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 450F01DF25C;
+	Thu, 20 Mar 2025 14:48:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EnkjezDc"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="H6+jpIUM"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C61251C3BE0
-	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 14:48:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A00A23594B
+	for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 14:48:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742482101; cv=none; b=jgTDTWtGg/uGHhnxBNlPPRk7VIWz1lwX7gPIsXC0VioUCmv/Kxnlo997xN3goPJLXRbdpZkyaozbcvkcwxQgoekWZ9/zqcOYz3SF8lb7w8CUXVIljY91c1gYU7jB2sGsixgYvurUdnnzVrBsQz2t9LTlMHmZDK7XZFkNh+1yNpQ=
+	t=1742482135; cv=none; b=bZGKwF4TsWrYujnexDjfTcHdG9PeYytUE74uXXChoCWs4MeNsIAHSr3RR8CdLTw1o5bSANNp6rjw7bsM4CnmY+f+IZKn/zoyyPDW2C6etXs/RxNrE9mA1KKL9dlCkZ1Yu0ptP6lcNFM9HCE65ckOiJs4I8DzVWiv/Z1fpFVUb1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742482101; c=relaxed/simple;
-	bh=WJ070vkc9pvl3EedyR6k/ajws5zd59U5a2Diu/Qubms=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=FXhsSznpHAV1JpuAOrDXNhv87r4YFZmiZkN7gK+5OZhzf3Cjooy6aetKTDKcN26E60xtvFsRFHNxlLH/1k4nAE2TO11IGZjD8wwBZSO9pJM1PNnzyzMYNSFdKUK6/nyqg81j6zNdt93Ybht90HwFcdmU3fzUxodDqS5oY30Lkz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EnkjezDc; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1742482135; c=relaxed/simple;
+	bh=+4kPbbjvV6rDXsDSzMzTyp2Sh0b64f/AhsG5op57k/k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R4PIm3UOYkiqAt8WrlT27U1eUXqqv+fb1LuLvvsgAa6Jo6fnTLnQuP1tb0Dlo4ViZ/1RQ1xX2TPzLPh2iRFV+Oz1UVXsFfjwXbRhj95i0HYlN4bfey9fn3kOQLq9abZ7xaJ2LM0SSCN15Aqh+WDILL4tAz1HuXYVUk0G1Bzsc6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=H6+jpIUM; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=pMbFCcPtCjAfomdlcgLmFe4GD9FK21pPCdV92hW/w98=; b=H6+jpIUMaERhVNQWljoqCxX7HB
+	JyO6C/GTl6D4qaeSZnyORP8v56K2GcAg0wi2/oVu6G/lstTSvkWv1rvMu1i/KFGaq/BN7JlZF8U9u
+	lTlLLbrC1qDHH8nHhyIDBewWYXeLDoXf5c6h89X8VOGRq4L9oOsWzzZBzgASDo18Dk/M=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tvHCV-006UG2-8Y; Thu, 20 Mar 2025 15:48:51 +0100
+Date: Thu, 20 Mar 2025 15:48:51 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Kamil Zaripov <zaripov-kamil@avride.ai>
+Cc: netdev@vger.kernel.org
+Subject: Re: bnxt_en: Incorrect tx timestamp report
+Message-ID: <6c63cb1a-ba98-47d8-a06a-e8bacf32f45a@lunn.ch>
+References: <DE1DD9A1-3BB2-4AFB-AE3B-9389D3054875@avride.ai>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742482087;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AGPSkGX7UwV9BGhBv1TQ2kKav1LFAHSe1DoGva65c3k=;
-	b=EnkjezDcXHj/gATbfqdkfs25Bqrpm0w00SWpQzToKkB4R+pmXe62IEvrSERDZmi86mUHUn
-	exFoKK55wTEgBC9iRtE+ze8P7M5xQ/FhZ5y5dqCt//NBP3oFTc6utcbXDLwd96IpNU1M5h
-	Ky06AvtFqzAiTwt7e2uGvczUcIgMSVg=
-Date: Thu, 20 Mar 2025 14:48:05 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Message-ID: <f2bd7e45b327d7b190edef4916d5b9e6dc83e87a@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH bpf-next v3 1/3] bpf, sockmap: avoid using sk_socket
- after free when sending
-To: "Michal Luczaj" <mhal@rbox.co>, xiyou.wangcong@gmail.com,
- john.fastabend@gmail.com, jakub@cloudflare.com
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, andrii@kernel.org,
- eddyz87@gmail.com, mykolal@fb.com, ast@kernel.org, daniel@iogearbox.net,
- martin.lau@linux.dev, song@kernel.org, yonghong.song@linux.dev,
- kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
- shuah@kernel.org, sgarzare@redhat.com, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-In-Reply-To: <1e8c8e7a-23d9-4ed3-902a-8a4ba06f1f69@rbox.co>
-References: <20250317092257.68760-1-jiayuan.chen@linux.dev>
- <20250317092257.68760-2-jiayuan.chen@linux.dev>
- <1e8c8e7a-23d9-4ed3-902a-8a4ba06f1f69@rbox.co>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DE1DD9A1-3BB2-4AFB-AE3B-9389D3054875@avride.ai>
 
-March 20, 2025 at 20:32, "Michal Luczaj" <mhal@rbox.co> wrote:
+> 2. Is there a method available to read the complete 64-bit PHC
+> counter to mitigate the observed problem of 2^48-nanosecond time
+> jumps?
 
->=20
->=20On 3/17/25 10:22, Jiayuan Chen wrote:
->=20
->=20>=20
->=20> The sk->sk_socket is not locked or referenced, and during the call =
-to
-> >=20
->=20>  skb_send_sock(), there is a race condition with the release of sk_=
-socket.
-> >=20
->=20>  All types of sockets(tcp/udp/unix/vsock) will be affected.
-> >=20
->=20>  ...
-> >=20
->=20>  Some approach I tried
-> >=20
->=20>  ...
-> >=20
->=20>  2. Increased the reference of sk_socket->file:
-> >=20
->=20>  - If the user calls close(fd), we will do nothing because the refe=
-rence
-> >=20
->=20>  count is not set to 0. It's unexpected.
-> >=20
->=20
-> Have you considered bumping file's refcnt only for the time of
->=20
->=20send/callback? Along the lines of:
->=20
->=20static struct file *sock_get_file(struct sock *sk)
->=20
->=20{
->=20
->=20 struct file *file =3D NULL;
->=20
->=20 struct socket *sock;
->=20
->=20 rcu_read_lock();
->=20
->=20 sock =3D sk->sk_socket;
->=20
->=20 if (sock)
->=20
->=20 file =3D get_file_active(&sock->file);
->=20
->=20 rcu_read_unlock();
->=20
->=20 return file;
->=20
->=20}
->=20
->=20static int sk_psock_handle_skb(struct sk_psock *psock, struct sk_buff=
- *skb,
->=20
->=20 u32 off, u32 len, bool ingress)
->=20
->=20{
->=20
->=20 int err;
->=20
->=20 if (!ingress) {
->=20
->=20 struct sock *sk =3D psock->sk;
->=20
->=20 struct file *file;
->=20
->=20 ...
->=20
->=20 file =3D sock_get_file(sk);
->=20
->=20 if (!file)
->=20
->=20 return -EIO;
->=20
->=20 err =3D skb_send_sock(sk, skb, off, len);
->=20
->=20 fput(file);
->=20
->=20 return err;
->=20
->=20 }
->=20
->=20 ...
->=20
->=20}
->=20
->=20static void sk_psock_verdict_data_ready(struct sock *sk)
->=20
->=20{
->=20
->=20 struct file *file;
->=20
->=20 ...
->=20
->=20 file =3D sock_get_file(sk);
->=20
->=20 if (!file)
->=20
->=20 return;
->=20
->=20 copied =3D sk->sk_socket->ops->read_skb(sk, sk_psock_verdict_recv);
->=20
->=20 fput(file);
->=20
->=20 ...
->=20
->=20}
->
+The usual workaround is to read the upper part, the lower part, and
+the upper part again. If you get two different values for the upper
+part, do it all again, until you get consistent values.
 
-Thank you for your suggestions.
+Look around other PTP drivers, there is probably code you can
+copy/paste.
 
-I previously attempted a similar approach in another version, but
-felt that manipulating the file layer within sockmap was quite odd.
-
-Moreover, the actual process flow is more complex than we initially
-imagined.
-
-The current overall close process looks roughly like this:
-'''
-close(fd):
-    file_ref_put(file):
-        __sock_release(sock)
-            sock_map_close()
-            saved_close()
-               sk->sk_socket =3D NULL
-            sock->ops =3D NULL
-            sock->file =3D NULL
-'''
-
-We can observe that while sk->sk_socket might not be NULL, it doesn=E2=80=
-=99t
-guarantee that sock->file is not NULL. This means the following code
-is problematic:
-'''
-sock =3D sk->sk_socket;
-if (sock)
-    sock->file->xx <=3D=3D sock->file may be set to NULL
-'''
-
-Of course, we might try something like:
-'''
-try_hold_sock() {
-    rcu_read_lock();
-=20=20=20=20
-=20   sock =3D sk->sk_socket;
-    if (!sock)
-        unlock_return;
-=20=20=20=20
-=20   file =3D sock->file;
-    if (!file)
-        unlock_return;
-=20=20=20=20
-=20   file =3D get_file_active(&file);
-    rcu_read_unlock();
-    return file;
-}
-'''
-
-Acquiring the socket's reference count requires significant effort,
-and we need to pay special attention to the socket's own release
-process to ensure correctness. Ultimately, this led me to decide to
-operate on psock instead of directly manipulating the file layer to
-avoid this issue.
+	Andrew
 
