@@ -1,116 +1,132 @@
-Return-Path: <netdev+bounces-176480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3D8EA6A7D5
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 15:02:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6161DA6A822
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 15:15:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 015203BC99B
-	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 14:00:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E1DC1886BAD
+	for <lists+netdev@lfdr.de>; Thu, 20 Mar 2025 14:10:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D8B21CC6A;
-	Thu, 20 Mar 2025 14:00:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5960321CC6A;
+	Thu, 20 Mar 2025 14:09:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="bfA6Lsdg"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="RnjYKOkT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.3])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63FB57FBD6;
-	Thu, 20 Mar 2025 14:00:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 959B6EEBA;
+	Thu, 20 Mar 2025 14:09:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742479252; cv=none; b=mXfRANI9vjeoK1097HBjo1iKIROo6jXnPWaJFPWPBw6xvHfuoXn8+aeGQ7Tfo/eil9v1E5EPgGJCbRYb8GmCR9xPA8JunjPwVuBCIarMfFW5EavUNUcXKkVWjtNPsFd3TXJA4rK/zof56LlzfIhny+QdQtcc13D7cOFSNtZAl0o=
+	t=1742479792; cv=none; b=uNrBhCDEcwVdRg3FKrjE5P576O5OxTDcazAMNjyzqC0w2y1tU5ABkmRTaIAxQgPjWbR7+s7EXT9OGBSPt0MbBrHWFB196mYRrvOtS4ngN54ZHchL1FIyNgT60SD0bQCPsevgCmb3HKTF+W2xupZamPapptjPKjJSAdAxVwb04Zw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742479252; c=relaxed/simple;
-	bh=Yed3L98sf2achdA6mINQRH7piijS/m3TD77kPOKAHcA=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=mKTT6xGpXEy8UReZ6w8Hdc4AH2tGMtgN/RIfr+rux89NX77xRbomlsYE30du0Le7xeJVEVPxfybCdqh6khkjSf0c4rz+pSqNc/R6r58uLSi1FDK64HQP54aKlXbrOl8tP+5cotagm8iZwAYNrXkbSiENBOKWRgX4TEq7mu+1qnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=bfA6Lsdg; arc=none smtp.client-ip=212.227.15.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1742479240; x=1743084040; i=markus.elfring@web.de;
-	bh=Yed3L98sf2achdA6mINQRH7piijS/m3TD77kPOKAHcA=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=bfA6LsdgjBtvI2DizTswuNxrVMsFRa++NKotRjV5lCLEoYbVx5wCOUBO5L+u3VC9
-	 LYYBqMAPRn9jZ856vm6Fs5j06Ov7EmbZSx5IWvkU5tZv0HnBlAzoRSowQdKEJLZqR
-	 Zyam0lR+kwOzpq4dZ3mGzI3gImy6jNeKGUJxhCiZSX61Jm4HrcHFODX7KFOJ5Av3G
-	 ny1wqZFB35gp/OK/5j0XDmy7sfgX9KNAleaYS1vI9KB6BF7t5j8IC+VDkIf4utwWX
-	 T74GwfleYlraLPEdcpFvgWVbI/DV/ShtNWziViyByEt+FJJfCSuIRJMnShTrBdRwB
-	 PvOm2bj0f+hEZRL5Cg==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.70.46]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MhWop-1tIbmd0OHL-00hojO; Thu, 20
- Mar 2025 15:00:40 +0100
-Message-ID: <fe81f330-c4bc-4321-bd07-c03ee2cbebd4@web.de>
-Date: Thu, 20 Mar 2025 15:00:38 +0100
+	s=arc-20240116; t=1742479792; c=relaxed/simple;
+	bh=3gUsqaE7mUufKOG+8Ij0UulGdSKP7dyRB6jukOjry5w=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=j4dK9tmiBtTp6InsfuPnLSryiHUlotFM1WFhkHhRSC1+XK2pRWOntJpWyaWUiS7X1mSxOchuZvfnFjhJbSPHukt4SMLZ3LxWPc0yqnZrGrwcx0S8+z5HHJ+K6smazNI1EfoI0xxdixi5c2v/KZ9jKEQm83Y9WtQnDxiMmAH7ybY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=RnjYKOkT; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9A3AB444F5;
+	Thu, 20 Mar 2025 14:09:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1742479787;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+k1WKBS8wmBGYzs9sr3LXVqLTZJWa/ILl+XBNscDrbY=;
+	b=RnjYKOkToOruA8gtWMfVJQ2lVzosiERg2s/F0lfOMsW+ruPaTOwSBxJrVEsbEBOUHf/zsi
+	Taf0zisRRm7yXvuh9Y9N/mcLcRLWcp9ghxNIIYxEdy4JgNKmvIzry06R7k4pdux4r+kp3/
+	Jc8HCqJe+bRnGbNoYJ7/HbDSLXy8gId8hxT7K3adtc9V9+q7l8sWWqbpXywAuhYgDoFbLW
+	XxgGGb4+afw6A+479MukdQiPptRg7ekdm1cE33XeQWAMLG2GpfHYuROX5G5njn2M6xixjx
+	uCjG68LJ3GXjQQhXjXUpVGe1Yppmn19/s3b/4tpGVIw1gaJFCZLHvOOs+TeVfw==
+Date: Thu, 20 Mar 2025 15:09:44 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Donald Hunter
+ <donald.hunter@gmail.com>, Rob Herring <robh@kernel.org>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Liam
+ Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, Dent
+ Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, Maxime
+ Chevallier <maxime.chevallier@bootlin.com>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v6 03/12] net: pse-pd: tps23881: Add support
+ for PSE events and interrupts
+Message-ID: <20250320150944.6ee054c3@kmaincent-XPS-13-7390>
+In-Reply-To: <Z9fu3u34K3-OeDis@pengutronix.de>
+References: <20250304-feature_poe_port_prio-v6-0-3dc0c5ebaf32@bootlin.com>
+	<20250304-feature_poe_port_prio-v6-3-3dc0c5ebaf32@bootlin.com>
+	<Z9fu3u34K3-OeDis@pengutronix.de>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Qasim Ijaz <qasdev00@gmail.com>, netdev@vger.kernel.org,
- linux-usb@vger.kernel.org
-Cc: LKML <linux-kernel@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>
-References: <20250319112156.48312-5-qasdev00@gmail.com>
-Subject: Re: [PATCH 4/4] net: ch9200: add error handling in ch9200_bind()
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20250319112156.48312-5-qasdev00@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:R8RapO+hNRgOyLi4zpg/YqbLfVBEDLfPXqAZEbs4abDg3tW39pq
- 1t5qbJB6W7kHa278b97hrkQOJGDo3NJsjeC8l2siT+tudCruh1/d47vLCZev40ExwHU7qwM
- iXivpgR4tyzafgQzi2upu1/SnYr5NC+Q6KcpNv3swgOcAheC29FtJzPU9JzehOUvSiZkYmb
- Rni8Ksy5O8f0Pe52mu5yQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:PTvn4IV07MI=;Uvsg1VKPY3fDn6aA6d9j1C1+4ak
- ZH0x9dI5L9MfbVdkK3+pqDlqdkK4gAESik3JLt4ZUvFj8A0VNic7SVt7C82ovoV1lEfdOTK3X
- r6MV+eLaMbuoer/r6zDi/Zno8OmMDsSs6fzUZ0b2mDyS9U6hCeGjQbVhlLDgc47RHv4Bz5Cvc
- MVPlO8ZZHESI3Y2KquPDie2/4luQiK1rzhD5K8SXEgoVUv40vv+2qpEvmJZ2Bk7W/o4CmyKSi
- 5uD7lIPywDQ3jJ+lwqdUZaWIyc712+DzUxZ2MemLJA6/fR/zNiYpfuptKoquTvu2+pfFasQPt
- FgnH9EuTULs4vUje/joV7TgzrGzRjMp8sbkG0G3JuxHDQ+4HXj6LV5pZ6P6ALzBQG4tzyBuFI
- rerfLqa05xiM4ymnBmxTPzCfoQVC6LIJrSR0MoaAWi+mxvIUJnHh1A6fNqEmNga4WCwKjNh4K
- pn4gRmOYixsT2poHzsH5ZLC+/hoOjATQYcguN40kLwbBD8dtrYvS26sjSEITDs7oLs+miVpuA
- DHpJ2g4ol0JqRDHeOUjMO9P3XEkm1wPZJxqcXEhMlUE85lq/la+YAUGpW7ghAfG/JWq670t8K
- YEGwKU9N/dux6xsHT7AyLC2HaD73fxVYgVsEI61aJ54izdPqomr1CiU6W2kklQf3W9BoT2zd+
- HjBsWMg/CHiPsGt/+nI9Mt7xYLFblDUxZjORgyEzqfRAQSQI7d98t2lrOHqf7D5Mye8AN1krX
- LhkMUFOcjPPXVJ4HnTfrNgcWF9LDNln2ehzOXz1iOKknAma29JK5q5vrXujW0/aVjz9yZWeZm
- kAd5IXCf1ucUpyVLmtGSOOVuIudg4B3iH6/KuNQbolJgg9siSQBluqmSnlxMVVTrE0CW13m3e
- KP4v6Y2rlqSHBRD49rzGpy4/CCkItjDAdM61qvr63ABxGh5X+4lxJh4WZxK9VXzpnblIxMzWD
- XxggMgSXKhRz35vapUH1uug2djaUJQGiXpY12V9Rw8e22fgbwRgHEqfgy4aK+GpvamE383Dxy
- i6BtKLUJXAXXuB1x5OaD2zuZXzVVOHjDUcc2RxgWJ65eq31uXmV6n16ptdwmZSwuQNWCKFLwC
- D9gZno1PcG98heDjnboPptNJQxR7Vc+MbaZNd0/shzfm+jTy8T2Bw1OyhnSRQKgl2vf50OrTL
- LxOkaepZKC/qITkN/gPdNtIJKVd5l8IigKcIJzdb+uYNHOb4YYzOG99CzVBhwUb3dLI+kWyRZ
- ioIGp8Nj+i8DsfSffamSkiC5FAgrb8aiA0CEwPPWNnVnestc88LiLFQlKEh8HpvYxW/aYbc7M
- +Mq/kh3Omp+tNSwrNqzdI6mR4bvgOhF+9GkY81QYyH8f83qSsrQHC4zbr4/u8601kGvSXNEAR
- A+Vr+iURm0jKwr6CkoNevncM+Y0UEvIByF/ONB6FjQrLQOueGCfeG1xu7nns+wW58aVLBU8sp
- B/w8J1YOH7AoDvBbKTPYQBkZlL3hCC0ebgkG0u2Ji/dVE+qQq
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddugeekgedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgfdutdefvedtudegvefgvedtgfdvhfdtueeltefffefffffhgfetkedvfeduieeinecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdejpdhrtghpthhtohepohdrrhgvmhhpvghlsehpvghnghhuthhrohhnihigrdguvgdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehku
+ hgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegtohhrsggvtheslhifnhdrnhgvthdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrsehgmhgrihhlrdgtohhm
+X-GND-Sasl: kory.maincent@bootlin.com
 
-=E2=80=A6
-> Fix this by checking if any control_write() call fails and
-> propagate the error to the caller.
+On Mon, 17 Mar 2025 10:43:58 +0100
+Oleksij Rempel <o.rempel@pengutronix.de> wrote:
 
-Another wording suggestion:
-Thus check if any control_write() call failed and propagate the error
-to the caller.
+> On Tue, Mar 04, 2025 at 11:18:52AM +0100, Kory Maincent wrote:
+> > +static int tps23881_irq_handler(int irq, struct pse_controller_dev *pc=
+dev,
+> > +				unsigned long *notifs,
+> > +				unsigned long *notifs_mask)
+> > +{
+> > +	struct tps23881_priv *priv =3D to_tps23881_priv(pcdev);
+> > +	struct i2c_client *client =3D priv->client;
+> > +	int ret, it_mask;
+> > +
+> > +	/* Get interruption mask */
+> > +	ret =3D i2c_smbus_read_word_data(client, TPS23881_REG_IT_MASK);
+> > +	if (ret < 0)
+> > +		return ret;
+> > +	it_mask =3D ret;
+> > +
+> > +	/* Read interrupt register until it frees the interruption pin. */
+> > +	while (true) { =20
+>=20
+> If the hardware has a stuck interrupt, this could result in an infinite
+> loop. max_retries with some sane value would be good.
 
+Ack I will. Do you have a value in mind as a sane value?
 
+> > +
+> > +static int tps23881_setup_irq(struct tps23881_priv *priv, int irq)
+> > +{
+> > +	struct i2c_client *client =3D priv->client;
+> > +	struct pse_irq_desc irq_desc =3D {
+> > +		.name =3D "tps23881-irq", =20
+>=20
+> here or in devm_pse_irq_helper() it would be good to add intex suffix to
+> the irq handler name.
 
-Can it eventually be helpful to transform six control_write() calls
-into a loop?
+You mean index? Like the PSE index?
+So I will need to add back the support of the PSE index in the series.
 
 Regards,
-Markus
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
