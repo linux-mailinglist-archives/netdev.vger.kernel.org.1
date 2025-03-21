@@ -1,101 +1,107 @@
-Return-Path: <netdev+bounces-176732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6404BA6BB3D
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 13:53:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D0D6A6BBA2
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 14:20:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C375119C35DB
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 12:52:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2EB4189C8B0
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 13:19:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE0F5227EBD;
-	Fri, 21 Mar 2025 12:52:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E72D521D018;
+	Fri, 21 Mar 2025 13:19:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="SWEnqRYe"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5Eb89Ufj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93BEC225387;
-	Fri, 21 Mar 2025 12:52:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E5A1CAA81
+	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 13:19:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742561544; cv=none; b=MA0goZYBY17/a08BemP/fuIVP8evD7KIz0ExLx7hvMWiA4MTOa9JswODQfyAtmho4bQ0I4+j5jLtSti8xIhbqzufRcdvlQKBS15chPyj7GxarK7kC3q4lVN61Zkam3zY1z+pm0if8nuLKbgqxNj80a6UwZ0PZDTaIe0YESUJZg4=
+	t=1742563146; cv=none; b=Ol7ssmdLKlkeOVC0w7D4lOyYL1XwvtxILAUR7iSwS9ea+FDh9Xk351s1o66ZS6wGOZEv1ee8JAS76dQgqy3kQBMUy1Aozons79L4VReg/YSeqmfot5kLnJ+COtLlKCcP24+AVTafxrbjq7D4yoJ+UByMYQ93NVmITXFPNpiuai4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742561544; c=relaxed/simple;
-	bh=SUKhHUcxhL0l5xhcTWSK8TZ43wGOHoBGsqPnsArUmlw=;
+	s=arc-20240116; t=1742563146; c=relaxed/simple;
+	bh=pcrmZe9/gRg6TM77YDiMNcIuJFQsFNtQifULH5Cfd18=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oNZYxFOfmBFiC+uWFnjWPXeFFkNh97/wxCC1c/sDCaNBC0zdN1Icr0jazRpP5hLv1mkxfiQ/++S/SXmjDju7YrOGAEKaJFLv4X3Xp3O6FHAihrxJbh5yK9ieQ9GGE0Ay1t3M3DYONQnFpIBbaFtG57+aBD1Xg7ak9/2Hrti53Y8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=SWEnqRYe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66E8DC4CEE3;
-	Fri, 21 Mar 2025 12:52:23 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="SWEnqRYe"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1742561541;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iBEsa6g1RBoSR0J0Kh1JDeWbWAeUk9HC8KUOCLyfPJc=;
-	b=SWEnqRYezPlf1E+iZomGlmtJq8Gz+rfAumlre6h7c18OJEcuJ4KtkGml//SFMb2XME2nNm
-	HSXdKIdcS9scfPpO1trtdon3a+KYMkSIlGNj04dk46QWfMuxFyMAfKQJTfmoLjvl4vEAjU
-	DRtuBxODEY438a851a6a+dzfHYMp1cI=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 991796b3 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Fri, 21 Mar 2025 12:52:21 +0000 (UTC)
-Date: Fri, 21 Mar 2025 13:52:19 +0100
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Jani Nikula <jani.nikula@linux.intel.com>
-Cc: Andi Shyti <andi.shyti@linux.intel.com>,
-	Markus Theil <theil.markus@gmail.com>, linux-kernel@vger.kernel.org,
-	intel-gfx@lists.freedesktop.org, netdev@vger.kernel.org,
-	tytso@mit.edu
-Subject: Re: [PATCH v2 1/3] drm/i915/selftests: use prandom in selftest
-Message-ID: <Z91hA0q-uC04asw2@zx2c4.com>
-References: <CAHmME9oqvWp_Nd1Gwgyw52qy8wxztMyCpNsjByH=VnRaXqczww@mail.gmail.com>
- <20250211063332.16542-1-theil.markus@gmail.com>
- <20250211063332.16542-2-theil.markus@gmail.com>
- <Z64pkN7eU6yHPifn@ashyti-mobl2.lan>
- <Z9r7ORwztMxsNyF4@zx2c4.com>
- <874izmd0g4.fsf@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=AiQXN8GfLR6l7d8TLYmPnXE2ZrnZ8JqjhNBOZhf3X0tmyTwmCb56W1yPdVska2d8rGfCllT0k05Oubl3aAewBH2E3MuX2MSYLPPlka4HF8ILcI5kudCTxjSWxUZlQfdkBcM11oD/eyjy9aXOJTNEa/TF7XCH/2WUnH8Q+HZgvX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5Eb89Ufj; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Ylp2ewKTO4Xpw5CgGsFkeUugyN1SmwInETdNUP3OlFo=; b=5Eb89Ufjc7O0i6603/gAlBwYK7
+	3lrOjX9J5QY5AI5mXhs7i19wE+EFKElJAHlylikL4HbUKJirdxIlnQUNI+uI0F961lw2bNs9lPcLg
+	dRXj1Zd9rj10Z5KXaLL3k0u+B9PChQtqbsIs7XtfEQz7WhZUi+m1zCSImJcJeYSClDqc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tvcGz-006Zg0-N4; Fri, 21 Mar 2025 14:18:53 +0100
+Date: Fri, 21 Mar 2025 14:18:53 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Tobias Waldekranz <tobias@waldekranz.com>
+Cc: davem@davemloft.net, kuba@kernel.org, maxime.chevallier@bootlin.com,
+	marcin.s.wojtas@gmail.com, linux@armlinux.org.uk,
+	edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 net] net: mvpp2: Prevent parser TCAM memory corruption
+Message-ID: <1eac57a5-eae6-4e2b-99d1-2b06c8628b1e@lunn.ch>
+References: <20250321090510.2914252-1-tobias@waldekranz.com>
+ <3f2f66ae-b1ac-4c87-9215-c1b6949d62c4@lunn.ch>
+ <87pliaa73x.fsf@waldekranz.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <874izmd0g4.fsf@intel.com>
+In-Reply-To: <87pliaa73x.fsf@waldekranz.com>
 
-On Fri, Mar 21, 2025 at 02:37:15PM +0200, Jani Nikula wrote:
-> On Wed, 19 Mar 2025, "Jason A. Donenfeld" <Jason@zx2c4.com> wrote:
-> > Hi Andi,
+On Fri, Mar 21, 2025 at 01:41:38PM +0100, Tobias Waldekranz wrote:
+> On fre, mar 21, 2025 at 13:12, Andrew Lunn <andrew@lunn.ch> wrote:
+> >> +static int mvpp2_prs_init_from_hw_unlocked(struct mvpp2 *priv,
+> >> +					   struct mvpp2_prs_entry *pe, int tid)
+> >>  {
+> >>  	int i;
+> >>  
 > >
-> > On Thu, Feb 13, 2025 at 06:19:12PM +0100, Andi Shyti wrote:
-> >> Hi Markus,
-> >> 
-> >> On Tue, Feb 11, 2025 at 07:33:30AM +0100, Markus Theil wrote:
-> >> > This is part of a prandom cleanup, which removes
-> >> > next_pseudo_random32 and replaces it with the standard PRNG.
-> >> > 
-> >> > Signed-off-by: Markus Theil <theil.markus@gmail.com>
-> >> 
-> >> I merged just this patch in drm-intel-gt-next.
+> > This is called from quite a few places, and the locking is not always
+> > obvious. Maybe add
+> 
+> Agreed, that was why i chose the _unlocked suffix vs. just prefixing
+> with _ or something. For sure I can add it, I just want to run something
+> by you first:
+> 
+> Originally, my idea was to just protect mvpp2_prs_init_from_hw() and
+> mvpp2_prs_hw_write(). Then I realized that the software shadow of the
+> SRAM table must also be protected, which is why locking had to be
+> hoisted up to the current scope.
+> 
+> > __must_hold(&priv->prs_spinlock)
 > >
-> > This is minorly annoying for me... What am I supposed to do with patches
-> > 2 and 3? Take them through my tree for 6.16 in like half a year? Can I
-> > just take the v1 into my tree and we can get this done with straight
-> > forwardly? Or do you have a different suggestion for me?
+> > so sparse can verify the call paths ?
 > 
-> Feel free to apply it to your tree too. It's not ideal to have two
-> commits for the same thing, but oh well.
-> 
-> Acked-by: Jani Nikula <jani.nikula@intel.com>
+> So if we add these asserts only to the hardware access leaf functions,
+> do we risk inadvertently signaling to future readers that the lock is
+> only there to protect the hardware tables?
 
-Oh that's a good idea. Thanks!
+You can scatter __must_hold() anywhere you want, to indicate the lock
+must be held. It has no runtime overhead.
 
-Jason
+And you can expand the comment where the mutex is defined to say what
+it is expected to cover.
+
+FYI: i've never personally used __must_hold(), but i reviewed a patch
+recently using it, which made me think it might be useful here. I
+don't know if you need additional markup, __acquires() & __releases()
+?? You might want to deliberately break the locking and see if sparse
+reports it.
+
+	Andrew
 
