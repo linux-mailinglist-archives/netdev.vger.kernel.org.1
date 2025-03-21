@@ -1,151 +1,163 @@
-Return-Path: <netdev+bounces-176821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F12BA6C49A
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 21:52:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38158A6C4A0
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 21:53:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8507E1B61C05
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 20:51:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E6C91890928
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 20:52:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABD40230BDC;
-	Fri, 21 Mar 2025 20:50:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GYk8PV1U"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1839F1D5174;
+	Fri, 21 Mar 2025 20:52:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B26FA1E9B32;
-	Fri, 21 Mar 2025 20:50:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693711EB184
+	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 20:52:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742590253; cv=none; b=QrFL3P7tiQy8CQ187FvGR49YHt4iI4UvRd29F0104pBLS8wgSfHYR1iGcEH59bgit+hNzkQYX1J1Kfzxf1q03YQ3ZMLyxogVUyNRPJHNc6LMUoJKh6/hTY18C9ZCElVPwSkPI7AtnDEzu3HzIJShUWsiCp88ZAx69iwnO/TVhMg=
+	t=1742590356; cv=none; b=tiP/V4lFfSY6ue2y6CyaOuwYXTInrdpp7IAzSzi+1Nxs39avG7O+R7eOcRzqpcdtSBgQGxoBlweyaDbWYDy3P+DjudqCz9lLp4V4Yw7bpYGoXO9F8uT3rrkTlA3miM2m2TsyCHP8IeXOpVsKO6HU03sB7kqv0OzBFD9O0eBtaC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742590253; c=relaxed/simple;
-	bh=fvyqCqDcCaEX4mI7phytQuw5UOBiV1RnJVgwLEE5YY4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cne4Pgm5KORLInBRRmiyPHgWS7ltjRTk40yCIxNkLzQUveLZppksRh7MMpCC8uZkDnTiFR4i2qub6sYpP1rOyeiWLgdfqU0h2kcQiRQJPyFnWmqbS8gQLx362fKqGmFLHq8JciKyg1rl6NQdIcWTKjDkmAlXmXdW3tRVkpZIidI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GYk8PV1U; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-ac2c663a3daso481684766b.2;
-        Fri, 21 Mar 2025 13:50:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742590250; x=1743195050; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JEdzPwVO0oWNN0wAc8zMe+O8cay5/vcOYcIsMyGQbi4=;
-        b=GYk8PV1UK2TdMhedUDB6F0q0vxX4SLyPLCfdY4Z2wL3aqqBmyX48qNfmMbdf/XN0jf
-         IJGJUm5TjWugDm/2E9EHMySYSR1Ry4yDUM4hjG99FUrUi/it5XwNmGqr5TZroEzbiQPC
-         P7wlkU33o78BnPrhSXJX1CQxpX/3Znf47T7SfOsUc7C19+oM8vDlDaI7LIIPNjZtS1s9
-         SKagdYwsUXxFhkEOnotvGT6bvEHBjpWJnJC2wKs5ZxfkJrb5zmXHCx70+B5gigqjDPVp
-         Z95BHgqkVm/puSDaGo/0psT76NROHWsjoTNBfOkj71wclwvM3z0D55SgW+yXN8ZiCobw
-         WlFA==
+	s=arc-20240116; t=1742590356; c=relaxed/simple;
+	bh=1ruPwAFTSeUmwnybrPUf8yknRn5ZwG4995iMw4N1hEs=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=YZOWWxz5RWIhcNFfKyXbDjl4MzKec0j6GT/AuvlBnvlim+LnSzf4QhtXXkb8aBDF9DWhM4pj6DCyi+JeAWd0xmWZsuNGUYhfweLcRHcE6UPwxPthNa3Unelov96gUKDjOiPql0D9ubZj+kK2tXOXeF3tK1x7b2OilPlbarMGWcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3d2b3a2f2d4so41023175ab.0
+        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 13:52:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742590250; x=1743195050;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JEdzPwVO0oWNN0wAc8zMe+O8cay5/vcOYcIsMyGQbi4=;
-        b=KDsx7xFkF+jwrO+LKlMovabfzZED/JO/D7bRI/do+kqFonbmf5ggvzAmgdzSzpTdmP
-         yYNc/Qs1XJm9rfkA+pd0QMzI9tCGRkaWb7vSC5nmBhGV5GOyLVmw8HtNXrjZ2CupK9xj
-         1b+yJhhRTnd/3nvNbMkWw8UPSI27SiuHuw36SAL3TPn2ZLuBCqrr5bzdelGDjaBA0nqy
-         kv0GHC1HIPhGISqO2ZLJTmk+jliFtGPtR3FwrYt23uPS8e7S9afNhzmkNnnYZ3/WNUEB
-         sG7Tq/WZM3IPpStVDzLRJZWg9+MtVLQ0jwgCNJ62m7mjj1WV6Lz/0YbmAeQ/zJO4cjJp
-         qCWA==
-X-Forwarded-Encrypted: i=1; AJvYcCUO2vFSc9qJB3YB3KWwNWy0xwL+ABoEHQFZohEY6M00kIjbUU65wz1KMVIQ5nIGRMrh2Cy0aComS/eHLqOR@vger.kernel.org, AJvYcCUkkfrg5NQ260XxSytz8LJUP7H7vCE91Bh1wHPw0YKLta/EuFPZH3wQKLl0wv/nFhwiylXPJmTc@vger.kernel.org, AJvYcCVG4WmbyQKcrHo+8Rz42xv/+JjoZF5N9hAvXfEwpb/RrwtezWWPDXETAhoCKq9GLbvJbsGseXLPY714CQ==@vger.kernel.org, AJvYcCVP8P8V2drOUAOnnnyXCzGAfQ9jTU3MA6p151JqWwRoMsys+3fmwsICVDGrLtTCT4aDRkJAHWapZ+6DhmLj6Q==@vger.kernel.org, AJvYcCW55ufPwODavjErm0kf4aWFWeb/4NLlOwbdmiYVam4zGlf2gHMobKqD4TqaZSlR2Ow9fTSw05W1lg9UhciUKrXw@vger.kernel.org, AJvYcCWIFc9/3RHrpDKgNN6dNYeh/ar4WHBj7/nJLOn0j+UyjlGvSP1R+vol9pzH2jgm8Q8Y+/lTxqreJ5s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKctUmZ7TJnD/805WILrckjv5l3Tspsj94Bw8xVN4iHelThGxZ
-	4UwakOQgQSYZK6CBBvbqVITJlsmr3as+ERSCMyO/xfCQjNhEWOPs
-X-Gm-Gg: ASbGncuokCnw8Dd7FkPt3FUimGmMRImVi3ED3mgyZuCgjZX577UOybCrPpcGRLHrnwW
-	MQopRMaebFpizgZ0pf04Cq6JEG2dL4Tk/oFvJbKo2qFjABoLPxJv4n2kvpw7O9VJDOExcwjm17w
-	WnaSxoahNJDeWKwsGUCfPBAtiVHETVFJ49V9YqqPaDwsIv8oofTKkQ8CWigqlEGqapuOt0OVSUj
-	REnZATjLiYB9pU1kv+xvk8VRRtDloIKbVxdjwnqPnlscqMr3SXlrdPNqHdu8fasMqLpICnacSTo
-	hvPo8p/oFk/c4XpkqzXzb77yls4npRS8uj6D4jzNtn7nEu8HllFYQg==
-X-Google-Smtp-Source: AGHT+IFnVEhxSIgWde7XpMHbJeBcjFQtRapjJMQGPcFXYnPNvOU7oIf092XK7zlewafDkwDIpcyxag==
-X-Received: by 2002:a17:907:7ea7:b0:ac4:4c9:c044 with SMTP id a640c23a62f3a-ac404c9c637mr147567866b.15.1742590249590;
-        Fri, 21 Mar 2025 13:50:49 -0700 (PDT)
-Received: from [192.168.8.100] ([85.255.236.254])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3efbd3d3esm211035166b.130.2025.03.21.13.50.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Mar 2025 13:50:48 -0700 (PDT)
-Message-ID: <f7c5a71e-b935-4e87-aa9a-e404b9a0bca0@gmail.com>
-Date: Fri, 21 Mar 2025 20:51:41 +0000
+        d=1e100.net; s=20230601; t=1742590353; x=1743195153;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9gwT2TdvYZPN5Kmw5jr9jSQgzyp4IWD+53j2MRRZdwc=;
+        b=DeFLN1jYnsBBZRirUQAaH4wzIE7QP+/VoeFHDp5/TzDUSu+LmfjrN2ZJwcCESDgyPw
+         bHx4YN4y1Qyj8h/tE2922F1hqBc6e25az/fPTjYPSwGUulUxtn5w3bTML9Y2lT8AnYkL
+         HXaxN2Gi2skk4RoGvheCOH5Wu7zFIqPGaAOoTu95xOxJCy257KwslInYG4e2ScRAR8mv
+         fsvWzAqKAQ409Ja+vlTv2fi0nc5VcWKTg23tN2KSYgYzyCN3Q3OgMAnSTlaM446rmg4j
+         a/v+0er38JTokPeehYU0xAUu6NPdCMO039Lnn7n8AQx4nvJiPpBDhhMZj8vAq4N/0WLW
+         /LSg==
+X-Forwarded-Encrypted: i=1; AJvYcCXOVDDqNRADFDY+EblbsWdhpCeM6D5zbTQKioQvpH/SClklDL26Ot23G1MOV3xILwScNK162Zo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2J+f8IzoDMl+vKDeqgTQ5UQ1QMpI5NXbCFePiM3hqeCOv6BjC
+	iJJyrqpJ6kXeMJhLf/iRfN9rwvHNkGoKeZOn1CDj0BHjcm7Pu0DRhhEshypFByhm7Cmxy56VQBK
+	HkAjG6SB4faYMxioxaPM9OVPR+wlS/a9k1n0hgDFLOR3FlAI1ZaQXNws=
+X-Google-Smtp-Source: AGHT+IHaH1Ps1Rt7vrvTvnJ199mORjTipCRHpKAnDXnM4imxujSV3NkJ1x05d7QXkE8C+uzx0OICZj2w/kTnJazY4An85doOzUIb
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC -next 00/10] Add ZC notifications to splice and sendfile
-To: Stefan Metzmacher <metze@samba.org>, Jens Axboe <axboe@kernel.dk>,
- Joe Damato <jdamato@fastly.com>, Christoph Hellwig <hch@infradead.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org, linux-api@vger.kernel.org, linux-arch@vger.kernel.org,
- viro@zeniv.linux.org.uk, jack@suse.cz, kuba@kernel.org, shuah@kernel.org,
- sdf@fomichev.me, mingo@redhat.com, arnd@arndb.de, brauner@kernel.org,
- akpm@linux-foundation.org, tglx@linutronix.de, jolsa@kernel.org,
- linux-kselftest@vger.kernel.org
-Cc: David Wei <dw@davidwei.uk>
-References: <20250319001521.53249-1-jdamato@fastly.com>
- <Z9p6oFlHxkYvUA8N@infradead.org> <Z9rjgyl7_61Ddzrq@LQ3V64L9R2>
- <2d68bc91-c22c-4b48-a06d-fa9ec06dfb25@kernel.dk>
- <Z9r5JE3AJdnsXy_u@LQ3V64L9R2>
- <19e3056c-2f7b-4f41-9c40-98955c4a9ed3@kernel.dk>
- <Z9sCsooW7OSTgyAk@LQ3V64L9R2>
- <dc3ebb86-f4b2-443a-9b0d-f5470fd773f1@kernel.dk>
- <356ce660-fc2e-4016-a0d9-6896936669c2@samba.org>
- <fbcd759e-2453-4570-a2a0-c9ad67ae9277@gmail.com>
- <0fc1032f-908c-4e59-8f64-f22b380ae639@samba.org>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <0fc1032f-908c-4e59-8f64-f22b380ae639@samba.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:3a0b:b0:3d4:2306:6d6 with SMTP id
+ e9e14a558f8ab-3d5961944f1mr68484135ab.21.1742590353565; Fri, 21 Mar 2025
+ 13:52:33 -0700 (PDT)
+Date: Fri, 21 Mar 2025 13:52:33 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67ddd191.050a0220.25ae54.006b.GAE@google.com>
+Subject: [syzbot] [mptcp?] WARNING in mptcp_do_fallback
+From: syzbot <syzbot+5cf807c20386d699b524@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, geliang@kernel.org, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	martineau@kernel.org, matttbe@kernel.org, mptcp@lists.linux.dev, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 3/21/25 07:55, Stefan Metzmacher wrote:
-> Am 20.03.25 um 11:46 schrieb Pavel Begunkov:
->> On 3/19/25 19:15, Stefan Metzmacher wrote:
->>> Am 19.03.25 um 19:37 schrieb Jens Axboe:
->>>> On 3/19/25 11:45 AM, Joe Damato wrote:
->>>>> On Wed, Mar 19, 2025 at 11:20:50AM -0600, Jens Axboe wrote:
->> ...
->>>> My argument would be the same as for other features - if you can do it
->>>> simpler this other way, why not consider that? The end result would be
->>>> the same, you can do fast sendfile() with sane buffer reuse. But the
->>>> kernel side would be simpler, which is always a kernel main goal for
->>>> those of us that have to maintain it.
->>>>
->>>> Just adding sendfile2() works in the sense that it's an easier drop in
->>>> replacement for an app, though the error queue side does mean it needs
->>>> to change anyway - it's not just replacing one syscall with another. And
->>>> if we want to be lazy, sure that's fine. I just don't think it's the
->>>> best way to do it when we literally have a mechanism that's designed for
->>>> this and works with reuse already with normal send zc (and receive side
->>>> too, in the next kernel).
->>>
->>> A few month (or even years) back, Pavel came up with an idea
->>> to implement some kind of splice into a fixed buffer, if that
->>> would be implemented I guess it would help me in Samba too.
->>> My first usage was on the receive side (from the network).
->>
->> I did it as a testing ground for infra needed for ublk zerocopy,
->> but if that's of interest I can resurrect the patches and see
->> where it goes, especially since the aforementioned infra just got
->> queued.
-> 
-> Would be great!
-> 
-> Have you posted the work in progress somewhere?
+Hello,
 
-Nope apart from a dirty hack I believe I posted back then.
+syzbot found the following issue on:
 
--- 
-Pavel Begunkov
+HEAD commit:    a7f2e10ecd8f Merge tag 'hwmon-fixes-for-v6.14-rc8/6.14' of..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=101d1e98580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=27515cfdbafbb90d
+dashboard link: https://syzkaller.appspot.com/bug?extid=5cf807c20386d699b524
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-a7f2e10e.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/d3ebf10742dc/vmlinux-a7f2e10e.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/ec059da4f420/bzImage-a7f2e10e.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+5cf807c20386d699b524@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 5347 at net/mptcp/protocol.h:1202 __mptcp_do_fallback net/mptcp/protocol.h:1202 [inline]
+WARNING: CPU: 0 PID: 5347 at net/mptcp/protocol.h:1202 mptcp_do_fallback+0x244/0x360 net/mptcp/protocol.h:1223
+Modules linked in:
+CPU: 0 UID: 0 PID: 5347 Comm: syz.0.0 Not tainted 6.14.0-rc7-syzkaller-00074-ga7f2e10ecd8f #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+RIP: 0010:__mptcp_do_fallback net/mptcp/protocol.h:1202 [inline]
+RIP: 0010:mptcp_do_fallback+0x244/0x360 net/mptcp/protocol.h:1223
+Code: 1c cd f5 48 83 c4 10 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc e8 cb 1c cd f5 90 0f 0b 90 e9 5b fe ff ff e8 bd 1c cd f5 90 <0f> 0b 90 e9 e1 fe ff ff 89 d9 80 e1 07 fe c1 38 c1 0f 8c 1e fe ff
+RSP: 0018:ffffc9000d4b75b8 EFLAGS: 00010293
+RAX: ffffffff8bf4c3c3 RBX: ffff888053250930 RCX: ffff888000d7a440
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000000000000 R08: ffffffff8bf4c283 R09: 1ffff1100a64a126
+R10: dffffc0000000000 R11: ffffed100a64a127 R12: ffff888053250948
+R13: dffffc0000000000 R14: ffff888042efd940 R15: ffff888053250000
+FS:  00007f03895756c0(0000) GS:ffff88801fc00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f0389574fe0 CR3: 0000000042c44000 CR4: 0000000000352ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ subflow_finish_connect+0x462/0x14e0 net/mptcp/subflow.c:548
+ tcp_finish_connect+0xc4/0x620 net/ipv4/tcp_input.c:6343
+ tcp_rcv_synsent_state_process net/ipv4/tcp_input.c:6573 [inline]
+ tcp_rcv_state_process+0x26aa/0x44e0 net/ipv4/tcp_input.c:6794
+ tcp_v4_do_rcv+0x77d/0xc70 net/ipv4/tcp_ipv4.c:1941
+ sk_backlog_rcv include/net/sock.h:1122 [inline]
+ __release_sock+0x214/0x350 net/core/sock.c:3123
+ release_sock+0x61/0x1f0 net/core/sock.c:3677
+ mptcp_connect+0x86b/0xc30 net/mptcp/protocol.c:3810
+ __inet_stream_connect+0x262/0xf30 net/ipv4/af_inet.c:677
+ inet_stream_connect+0x65/0xa0 net/ipv4/af_inet.c:748
+ __sys_connect_file net/socket.c:2045 [inline]
+ __sys_connect+0x288/0x2d0 net/socket.c:2064
+ __do_sys_connect net/socket.c:2070 [inline]
+ __se_sys_connect net/socket.c:2067 [inline]
+ __x64_sys_connect+0x7a/0x90 net/socket.c:2067
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f038878d169
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f0389575038 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
+RAX: ffffffffffffffda RBX: 00007f03889a6160 RCX: 00007f038878d169
+RDX: 0000000000000010 RSI: 0000200000000000 RDI: 0000000000000005
+RBP: 00007f038880e2a0 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000001 R14: 00007f03889a6160 R15: 00007ffcae617168
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
