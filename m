@@ -1,122 +1,96 @@
-Return-Path: <netdev+bounces-176816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2912A6C45B
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 21:38:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F05EA6C460
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 21:39:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A85CA1B60F54
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 20:38:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 778783A8C53
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 20:38:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF384230997;
-	Fri, 21 Mar 2025 20:37:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAE30230277;
+	Fri, 21 Mar 2025 20:38:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ImfJjb51"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="0y4gIFM5";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="/+d3Xmy7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BABA137C37;
-	Fri, 21 Mar 2025 20:37:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 323541D5AD4;
+	Fri, 21 Mar 2025 20:38:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742589469; cv=none; b=qNmRsTPzaOhBUyCdUgLWjjdMYzxcfkCWO2U1+MA1dmB8m7PWbB1HsJALfSC22gT8fmvgnQu94fz8YO0GfUTrZBpwF6ClTvwtX9AszGTOxPhATD53t/5zeH/N8EB1Et+EzU3wweikWYQnYP1gPBOVSwlkpLbOJkhgNhUBtuz/l00=
+	t=1742589530; cv=none; b=pYxfL1cnVdckPYT/Ept+Ce9J20eidCzJbvGfmllcMrzQVeRMbPgTZL9MEJmndLNHy6jb63dWcP0Z5ULXTKJ5UE+0KrdlLUpIAFF9cot7VUEXSXJCMkFT1951lvg4TmcsnJoqsWdPuL9Q1Js9zV+yjOQmpaBUmwuzyZo2w3LhK/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742589469; c=relaxed/simple;
-	bh=HO7nlKXbMubdBKs5dA8F12zWcr0vHn01ammSIHUzW1E=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=gHgrGJZ3IwGBHZbVNlkGziOeUrFEcAOKejXN2Lr+vxFrZrp6eOJ+fkNq4FfACTkYizUPjuqRYhEcUVRxLJDZbwpmselVuAXwDfChexriSgeLQi321BEuQI3Tr5VITPKsUkpDnNzs0EPqFPh02BBw02eMpTsLxccrulyOoX9NJDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ImfJjb51; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE6B7C4CEE3;
-	Fri, 21 Mar 2025 20:37:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742589468;
-	bh=HO7nlKXbMubdBKs5dA8F12zWcr0vHn01ammSIHUzW1E=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=ImfJjb51Y/I05j7ropG1vHwEmVkLdCHI/NDFhBHgDVkZ4Pj14dzRN/qxXjF42bUml
-	 BEFmXzbwqaUdb97JSLUTfP72S1rEy7dSG4d5KLyojowobIln3NrY/gA+ANtdqBttC5
-	 SWY7+IvvjgDva+PkzhY9Q4ulm3xoik68NkZuGi1Q3hrOPX9WoeyU7I1Am2j9LNQEiJ
-	 vDk6sz/JoXErERhcL6NXKA6lcD9NQZj9eRn2W2neaYeEZ0Y7T0fCFaDreTlkCDNNOl
-	 LcjwQ82/8oqpEN7zYt0bm7P72VQ4G+8v/tt/RtqzH77B97DzAwIJ2KzOJXoiH1pOOf
-	 EIBNR+1YXHG7Q==
-Date: Fri, 21 Mar 2025 15:37:47 -0500
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1742589530; c=relaxed/simple;
+	bh=8RjxbWDW/i69LK0w659MT1nZJrKwlwIZ1efwQ7T5VSA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=nNWAS26yndwold1g6unzzcZZeKWIw85f+5+YKVzxdr9P8Yl7aMHzJMxBGcZAYgD7dwljmFG1qdIkLBIbbPGbUk/SfuWehVMZzeNkJrU912hFlELRjw3o8osK/2GoZf/R51l0umIGOANpmZDefWoardHsvtDiLcOx/Tl7u+/BF54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=0y4gIFM5; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=/+d3Xmy7; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1742589527;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WOtohB+AKI748h04VvFfjvO0Ky51rTdztfJFNReMd6c=;
+	b=0y4gIFM5b1fRGq5GX5LD0gY6UEsfjqARtLJwS8pVDLjOwM8eSkp8Ih792VnsDCu2wyRxyz
+	V6ivFe/h8F0eeNSQ4a++gAh36rYF1V6XhjWTLYRsAs8G9xUi1zF55ZnEJEWcmxUyNTq5ES
+	dGWExdsAq9Mw+GXsIw6qg1XnibFCnM4PEmMj56JtVtEmYSAVm1X6gtugapg8uPifIKPvJm
+	ZJLVPqlQu3gs8B9iZLONLzUf0i4GNpEUBB+SaNSdCMkpuFymCGrOMXbfga2vIF0XJsmeMU
+	zSJmlohRq2t/43pVgBuaHYO+uxpbktDXD9cUaLCiLrUn5ZGgtxP+FbxHBRJAIg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1742589527;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WOtohB+AKI748h04VvFfjvO0Ky51rTdztfJFNReMd6c=;
+	b=/+d3Xmy7DvWBVqozBJgQVFKEFutX8Ih9amWjVC5+vZUnAZ6C7M+qacJIfmlR13zf9ANe8I
+	CNw5JQAVw25dxbDg==
+To: Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun.feng@gmail.com>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>,
+ linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
+ gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+ a.hindborg@samsung.com, aliceryhl@google.com, anna-maria@linutronix.de,
+ frederic@kernel.org, arnd@arndb.de, jstultz@google.com, sboyd@kernel.org,
+ mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
+ vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org,
+ bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
+ tgunders@redhat.com, me@kloenk.dev, david.laight.linux@gmail.com
+Subject: Re: [PATCH v11 6/8] MAINTAINERS: rust: Add new sections for
+ DELAY/SLEEP and TIMEKEEPING API
+In-Reply-To: <87jz8ichv5.fsf@kernel.org>
+References: <20250220070611.214262-1-fujita.tomonori@gmail.com>
+ <20250220070611.214262-7-fujita.tomonori@gmail.com>
+ <Z9xnDzwixCbbBm0o@boqun-archlinux> <87jz8ichv5.fsf@kernel.org>
+Date: Fri, 21 Mar 2025 21:38:46 +0100
+Message-ID: <87o6xu15m1.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Richard Cochran <richardcochran@gmail.com>, 
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
- Palmer Dabbelt <palmer@dabbelt.com>, 
- Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>, 
- Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org, 
- Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, 
- Samuel Holland <samuel.holland@sifive.com>, linux-riscv@lists.infradead.org, 
- Nicolas Ferre <nicolas.ferre@microchip.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Paul Walmsley <paul.walmsley@sifive.com>, 
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, 
- Alexandre Ghiti <alex@ghiti.fr>, 
- Gregory CLEMENT <gregory.clement@bootlin.com>, linux-kernel@vger.kernel.org, 
- Tawfik Bayouk <tawfik.bayouk@mobileye.com>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, linux-mips@vger.kernel.org, 
- Albert Ou <aou@eecs.berkeley.edu>, Jakub Kicinski <kuba@kernel.org>, 
- devicetree@vger.kernel.org
-To: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-In-Reply-To: <20250321-macb-v1-1-537b7e37971d@bootlin.com>
-References: <20250321-macb-v1-0-537b7e37971d@bootlin.com>
- <20250321-macb-v1-1-537b7e37971d@bootlin.com>
-Message-Id: <174258946794.3905655.14862807255896065162.robh@kernel.org>
-Subject: Re: [PATCH net-next 01/13] dt-bindings: net: cdns,macb: add
- Mobileye EyeQ5 ethernet interface
+Content-Type: text/plain
 
+On Fri, Mar 21 2025 at 20:18, Andreas Hindborg wrote:
+>> Could you add me as a reviewer in these entries?
+>>
+>
+> I would like to be added as well.
 
-On Fri, 21 Mar 2025 20:09:32 +0100, Théo Lebrun wrote:
-> Add cdns,eyeq5-gem as compatible for the integrated GEM block inside
-> Mobileye EyeQ5 SoCs. Add a phandle (and two offset arguments) for
-> accessing syscon registers.
-> 
-> Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
-> ---
->  .../devicetree/bindings/net/cdns,macb.yaml          | 21 +++++++++++++++++++++
->  1 file changed, 21 insertions(+)
-> 
+Please add the relevant core code maintainers (Anna-Maria, Frederic,
+John Stultz and myself) as well to the reviewers list, so that this does
+not end up with changes going in opposite directions.
 
-My bot found errors running 'make dt_binding_check' on your patch:
+Thanks,
 
-yamllint warnings/errors:
-
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/cdns,macb.yaml: properties:mobileye,olb: 'anyOf' conditional failed, one must be fixed:
-	'description' is a dependency of '$ref'
-	'/schemas/types.yaml#/definitions/phandle-array' does not match '^#/(definitions|\\$defs)/'
-		hint: A vendor property can have a $ref to a a $defs schema
-	hint: Vendor specific properties must have a type and description unless they have a defined, common suffix.
-	from schema $id: http://devicetree.org/meta-schemas/vendor-props.yaml#
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250321-macb-v1-1-537b7e37971d@bootlin.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+        tglx
 
