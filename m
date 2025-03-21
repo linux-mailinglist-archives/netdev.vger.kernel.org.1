@@ -1,181 +1,177 @@
-Return-Path: <netdev+bounces-176777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBA7EA6C1B8
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 18:40:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DAE1A6C1C1
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 18:41:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31229189340B
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 17:40:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 820321695DF
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 17:41:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E176C22DF97;
-	Fri, 21 Mar 2025 17:39:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5FDC22DF86;
+	Fri, 21 Mar 2025 17:41:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="g4BlFBJq"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="crSaDCX2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FA5222DF86
-	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 17:39:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAFF122D7B8;
+	Fri, 21 Mar 2025 17:41:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742578762; cv=none; b=VdvEBwXr7p+71Z+uzVoKA2PZO8IO2HGBBaGxHFFN7HXxtZqEw/XyYDIKW1XvsMoRarmCtWUVlDQ5S8YqBq4qtaTHbUj+DXt7q+F73TgnCP4MuXIbjr3izzCseUjL8vXr5O8b/Xtz8Ils0038vYOeSxmb7JmmrDtT9imZUiKlu+o=
+	t=1742578906; cv=none; b=iGURbq95mTrk3pN+MAL8+NIjHLMDjgEff01ufAZVyZhBWfGJze57I0Z3Bw4XIE7nC83tMgilWln+yq/nWHqdU0CDAv7HmIzaAyNaY0CBFjxksBCoRQd5iAxujqkCswemWzhG9BPlXdpsk/6w7tv0PMTLFOniIkL7/tnRi4BeV5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742578762; c=relaxed/simple;
-	bh=Z24ZkfQTkO2qsqkG+prpvqFeOLYUgl0Q5C/iST2VvRg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JkYSwU+AOb4FW43hGYhILBIAXxqfE9Kmi3dEHNXH0pZMl839t61KTW1f8fCU4b0XWQdLhseAPq3FfhBE6URIGZ5yNUhHSEQsqfy8xb9oWW/15haa1zz2TIyvms/hR4oYCRqctL9ZbKonK/74lHIhyV/wYtk7M9EKP1EhudXdaeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=g4BlFBJq; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-22438c356c8so47108585ad.1
-        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 10:39:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1742578760; x=1743183560; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6wYIYbVK16NXRYkveWo4gR1XApiz8O5iEB75f7LsBck=;
-        b=g4BlFBJqGkcsAMeVyq2s67n5gYA+6kKX1fr7oBB0OWIRxlT1opCY8i9c/rRJfrKbrB
-         WdeiaoJF4tyeRc7xTkbJnBPyFhTeNJQxlzpGStysHCdyKDZ6fscS5ffpmW0NP4g0eA5S
-         Ajd50sqXOE4zCaMB/nvidcysbV6/S0m9HhjtQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742578760; x=1743183560;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6wYIYbVK16NXRYkveWo4gR1XApiz8O5iEB75f7LsBck=;
-        b=oqnHcNPTLcOucurADSScK13QDG7thDRC8AxXNy3+rrHDh8TnT5e20d7DTVbHUl4JoG
-         EVTNrbUeyRj6wErBEqi6bJ7IIA/C4pORMdh9bMlghu6WWhhXoCCqTVErwHI0TPLpqYVf
-         zRUkThGfkFywtVqEn8KecR/Pd5EfWnclQIuzQCqnd1CAaRLWEuH6b2QDRH89ZKq2WT2U
-         uuwZ4N8CdANt3r2ZGMXHDoEWgaQ7+2oGdZ0mXmkp0faD9JnI7uZIrUxBQu4uanY63y2Y
-         uwUebRlW4x1YALv0z1b1iy5UBqYO733xwjSdXp6KxWpI0Jd/rdHdtp2axYpUnLUnnZ3z
-         rWjw==
-X-Forwarded-Encrypted: i=1; AJvYcCUyhs+oXLIbyT/8O7rC7n29l0oA/+MAEPJTis4AKHGvMNR5T027Wrk7/nepbWvSmMPwtzhcj5c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykTI95Pj9BVqnrL2xi9fd5TvBFMXjPXSakHPfSBhnWTm35pS2Y
-	s/uvquunnr87tfNcrmYBMDrZWBvqtP3MDrqiL/J/sVFGTB5Y55hvXozFLjVRXRY=
-X-Gm-Gg: ASbGnctiGUpCOXPaq02usouJBLePwELqWnIrcznlcSgssTy3Vj3akOyW+JQLRpridMF
-	KEXx8OedZWu1ibeqeK4P+ay6hWiBk6hTAC4RsNTM22P7HfakFVlIOvPctDGt1vCEE1875+oLvKX
-	GhPhyA3nVN1PC+8cp36nXv4ptJNEHfvI8DpNiMpcEv5AQgcxs/mQaSl2+QSi8kKnv/ZgRj6eh6C
-	/BCREv1VIYzJUTmTDB4KJKyimdmHN9g8hqqdlu7Pfvb0/RQrT3tlLCaRZKqeqvE4J8RdccHKhIZ
-	XxNgiOqxjJ19imQhINbzVIIM3MCuU349v1aiDNVSqe0Vr8jH8QnURfmssLFDYxs1m4M3Tx3JCIU
-	Ji8yTopwgAmESjHcA
-X-Google-Smtp-Source: AGHT+IEhlItaj2pC9Wf82CLdmLgdITwlz2p+d7lIz2Le5i+dk9F2Qi4DXLQbsiyL+XPB1IxdTxRq7w==
-X-Received: by 2002:a17:902:d549:b0:223:5a6e:b20 with SMTP id d9443c01a7336-22780c55215mr71050115ad.7.1742578760339;
-        Fri, 21 Mar 2025 10:39:20 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-227811d968asm19847205ad.162.2025.03.21.10.39.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Mar 2025 10:39:19 -0700 (PDT)
-Date: Fri, 21 Mar 2025 10:39:16 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Samiullah Khawaja <skhawaja@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller " <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	almasrymina@google.com, willemb@google.com, mkarsten@uwaterloo.ca,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v4 3/4] Extend napi threaded polling to allow
- kthread based busy polling
-Message-ID: <Z92kRKwkDmcRbc41@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Samiullah Khawaja <skhawaja@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller " <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	almasrymina@google.com, willemb@google.com, mkarsten@uwaterloo.ca,
-	netdev@vger.kernel.org
-References: <20250321021521.849856-1-skhawaja@google.com>
- <20250321021521.849856-4-skhawaja@google.com>
+	s=arc-20240116; t=1742578906; c=relaxed/simple;
+	bh=NocGHNwr7fbaBa9vD5pCQ2EV241hP5rGhMzIIHbSghg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VY4RRfOjIwwKq2KxXU7DA3YiY/Df0xtDWsMnal6ux1poiMq3pNRVB862IPEsGVe4kFXJDeWqLn17WNA87UFxRI4SWcGe4Vu1J4xLiO9MX4tOS84zdYwlRelagsWAGwx6MDi5POcVYNT0oYmozmYGwyFKulWj5TdruI8dSgQFTwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=crSaDCX2; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 48191442A0;
+	Fri, 21 Mar 2025 17:41:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1742578897;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zgcTJTisVN3vy6/bL+F8k2WTg0zNvDoQ8oR2IntnOkc=;
+	b=crSaDCX2QS/A8fp3+lpQfUl7fQ2tuBed4GX0wjlD9hs0nk0U4UOiKv9Vw9eaOp1e4jaPpl
+	vLAywACT9j/hM4KxHSbOIfiNJ5P3AdQqq+ni1fOlYTRqLYdFCfg38LQT2R6BBMuyVGaJ8k
+	657j3Jmk93EORXSYAWQ8UM+EjiJ+7NCWb6ctfOAAg1XroZokb3J5khrYGG+dKh+hHi168u
+	/org5gOdXv5VkqPrScb3W6f+BHKWTE9sY56ZsSmd05xKa/lqqaH++Kvhl/UXoIBiB5roSs
+	akJLMWzHgRsYK6wjPzoLTWvzmw+o7LhCI4GO8yjxj+oN363e07AoZPOfBDi98g==
+Date: Fri, 21 Mar 2025 18:41:34 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, Simon Horman <horms@kernel.org>, Romain Gantois
+ <romain.gantois@bootlin.com>, Piergiorgio Beruto
+ <piergiorgio.beruto@gmail.com>
+Subject: Re: [PATCH net-next v3 1/7] net: ethtool: netlink: Allow
+ per-netdevice DUMP operations
+Message-ID: <20250321184134.22311370@fedora.home>
+In-Reply-To: <c4e5bd2f-6216-4f74-b677-46c79343eb21@redhat.com>
+References: <20250313182647.250007-1-maxime.chevallier@bootlin.com>
+	<20250313182647.250007-2-maxime.chevallier@bootlin.com>
+	<c4e5bd2f-6216-4f74-b677-46c79343eb21@redhat.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250321021521.849856-4-skhawaja@google.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduhedujedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeeftdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepheetveefiedvkeejfeekkefffefgtdduteejheekgeeileehkefgfefgveevfffhnecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvddtpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepk
+ hhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Fri, Mar 21, 2025 at 02:15:20AM +0000, Samiullah Khawaja wrote:
-> Add a new state to napi state enum:
+On Fri, 21 Mar 2025 17:31:17 +0100
+Paolo Abeni <pabeni@redhat.com> wrote:
+
+> On 3/13/25 7:26 PM, Maxime Chevallier wrote:
+> > We have a number of netlink commands in the ethnl family that may have
+> > multiple objects to dump even for a single net_device, including :
+> > 
+> >  - PLCA, PSE-PD, phy: one message per PHY device
+> >  - tsinfo: one message per timestamp source (netdev + phys)
+> >  - rss: One per RSS context
+> > 
+> > To get this behaviour, these netlink commands need to roll a custom  
+> > ->dumpit().  
+> > 
+> > To prepare making per-netdev DUMP more generic in ethnl, introduce a
+> > member in the ethnl ops to indicate if a given command may allow
+> > pernetdev DUMPs (also referred to as filtered DUMPs).
+> > 
+> > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> > ---
+> >  net/ethtool/netlink.c | 45 +++++++++++++++++++++++++++++--------------
+> >  net/ethtool/netlink.h |  2 ++
+> >  2 files changed, 33 insertions(+), 14 deletions(-)
+> > 
+> > diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
+> > index a163d40c6431..7adede5e4ff1 100644
+> > --- a/net/ethtool/netlink.c
+> > +++ b/net/ethtool/netlink.c
+> > @@ -587,21 +587,38 @@ static int ethnl_default_dumpit(struct sk_buff *skb,
+> >  	int ret = 0;
+> >  
+> >  	rcu_read_lock();  
 > 
-> - STATE_THREADED_BUSY_POLL
->   Threaded busy poll is enabled/running for this napi.
+> Maintain the RCU read lock here is IMHO confusing...
 > 
-> Following changes are introduced in the napi scheduling and state logic:
+> > -	for_each_netdev_dump(net, dev, ctx->pos_ifindex) {
+> > -		dev_hold(dev);
+> > +	if (ctx->req_info->dev) {
+> > +		dev = ctx->req_info->dev;  
 > 
-> - When threaded busy poll is enabled through sysfs it also enables
->   NAPI_STATE_THREADED so a kthread is created per napi. It also sets
->   NAPI_STATE_THREADED_BUSY_POLL bit on each napi to indicate that we are
->   supposed to busy poll for each napi.
+> .. as this is refcounted.
 > 
-> - When napi is scheduled with STATE_SCHED_THREADED and associated
->   kthread is woken up, the kthread owns the context. If
->   NAPI_STATE_THREADED_BUSY_POLL and NAPI_SCHED_THREADED both are set
->   then it means that we can busy poll.
+> I suggest to move the rcu_read_lock inside the if.
+
+Indeed, maybe not the best place indeed. I'll address that, thanks for
+pointing this out
+
 > 
-> - To keep busy polling and to avoid scheduling of the interrupts, the
->   napi_complete_done returns false when both SCHED_THREADED and
->   THREADED_BUSY_POLL flags are set. Also napi_complete_done returns
->   early to avoid the STATE_SCHED_THREADED being unset.
+> >  		rcu_read_unlock();
+> > +		/* Filtered DUMP request targeted to a single netdev. We already
+> > +		 * hold a ref to the netdev from ->start()
+> > +		 */
+> > +		ret = ethnl_default_dump_one(skb, dev, ctx,
+> > +					     genl_info_dump(cb));
+> > +		rcu_read_lock();
+> > +		netdev_put(ctx->req_info->dev, &ctx->req_info->dev_tracker);
+> >  
+> > -		ret = ethnl_default_dump_one(skb, dev, ctx, genl_info_dump(cb));
+> > +		if (ret < 0 && ret != -EOPNOTSUPP && likely(skb->len))
+> > +			ret = skb->len;
+> >  
+> > -		rcu_read_lock();
+> > -		dev_put(dev);
+> > +	} else {
+> > +		for_each_netdev_dump(net, dev, ctx->pos_ifindex) {
+> > +			dev_hold(dev);
+> > +			rcu_read_unlock();
+> > +
+> > +			ret = ethnl_default_dump_one(skb, dev, ctx,
+> > +						     genl_info_dump(cb));
+> > +
+> > +			rcu_read_lock();
+> > +			dev_put(dev);
+> >  
+> > -		if (ret < 0 && ret != -EOPNOTSUPP) {
+> > -			if (likely(skb->len))
+> > -				ret = skb->len;
+> > -			break;
+> > +			if (ret < 0 && ret != -EOPNOTSUPP) {
+> > +				if (likely(skb->len))
+> > +					ret = skb->len;  
 > 
-> - If at any point STATE_THREADED_BUSY_POLL is unset, the
->   napi_complete_done will run and unset the SCHED_THREADED bit also.
->   This will make the associated kthread go to sleep as per existing
->   logic.
-> 
-> Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
-> ---
->  Documentation/ABI/testing/sysfs-class-net     |  3 +-
->  Documentation/netlink/specs/netdev.yaml       | 12 ++-
->  Documentation/networking/napi.rst             | 67 ++++++++++++-
->  .../net/ethernet/atheros/atl1c/atl1c_main.c   |  2 +-
->  drivers/net/ethernet/mellanox/mlxsw/pci.c     |  2 +-
->  drivers/net/ethernet/renesas/ravb_main.c      |  2 +-
->  drivers/net/wireless/ath/ath10k/snoc.c        |  2 +-
->  include/linux/netdevice.h                     | 20 +++-
->  include/uapi/linux/netdev.h                   |  6 ++
->  net/core/dev.c                                | 93 ++++++++++++++++---
->  net/core/net-sysfs.c                          |  2 +-
->  net/core/netdev-genl-gen.c                    |  2 +-
->  net/core/netdev-genl.c                        |  2 +-
->  tools/include/uapi/linux/netdev.h             |  6 ++
->  14 files changed, 188 insertions(+), 33 deletions(-)
-  
-I think this should be split into two patches which would ease
-review and bisection:
+> IMHO a bit too many levels of indentation. It's possibly better to move
+> this code in a separate helper.
 
-  - First patch: introduce enum netdev_napi_threaded and
-    NETDEV_NAPI_THREADED_ENABLE and the associated driver changes.
+That's true, not the prettiest piece of that patch. I'll refactor this
+better then.
 
-  - Second patch: introduce NETDEV_NAPI_THREADED_BUSY_POLL_ENABLE
+Thanks for the review,
 
-I'll have to take a closer look at all the changes here after I've
-read the cover letter and have reproduced the results, but one issue
-stands out:
-
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index 3c244fd9ae6d..b990cbe76f86 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-
-[...]
-
-> @@ -2432,7 +2442,7 @@ struct net_device {
->  	struct sfp_bus		*sfp_bus;
->  	struct lock_class_key	*qdisc_tx_busylock;
->  	bool			proto_down;
-> -	bool			threaded;
-> +	u8			threaded;
-
-Doesn't
-
-Documentation/networking/net_cachelines/net_device.rst
-
-Also need to be updated if you are changing the width of this field
-from bool to u8?
+Maxime
 
