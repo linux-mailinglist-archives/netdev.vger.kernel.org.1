@@ -1,96 +1,219 @@
-Return-Path: <netdev+bounces-176751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5C9DA6BFA4
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 17:20:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0692EA6BFD0
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 17:26:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05A4517E955
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 16:19:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E250188D4E7
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 16:22:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 711CD1DEFC5;
-	Fri, 21 Mar 2025 16:19:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28BAC1E3774;
+	Fri, 21 Mar 2025 16:22:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Liw89G9J"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L9hAxhUj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F98414601C;
-	Fri, 21 Mar 2025 16:19:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F044414601C;
+	Fri, 21 Mar 2025 16:22:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742573996; cv=none; b=XCS1h5ADTBo870vlHoKdO3GQ/jrQTSU+eyN7nznyRynRiC4WBvH9fKmmwLuhcPgKiU2BKip5OFKba21eFrlkeSCCjK11NCbB7WPhke9LhaxfzJ3dEemMKnRjS/gizmkYar07RB9qiHXyb+VPp4Ji+J+8xPFRSLYe9idpH81RTgY=
+	t=1742574148; cv=none; b=lnm+EyNpvuaSqwkdXpLkAhYbEQlK/ndakE9PmJwz8pcSl3djz5ImWTmYvgwDtVFSizh89OBWsxD86vcSrYZ11PKUTHr/RTMbnhoADJKa85cVT/Nn0cY1h+E/V3klDhdt/1KBlGNEbXQdUD0J7FRWyE8HktbdipgYim7NDZ1O0g4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742573996; c=relaxed/simple;
-	bh=XI2f7SgbQyb+AjtyGj/tTNrFlGkFGsaPs29m6a6WOvg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=h7iFtDZH8RlD/HZR2ICu6BU/TL6LKEoXeg+QQnG3ppQxKSwZVby7vBkHHgb/yK9Lp5PiXCczIJhbfi5WjSLRVR3taMYFDu1ygXu4dLdYaQwg0I+JcqikvHuny4qQOPvqF+1O495NfNP6/wt3+q1P7L0Q70owyatT1I0FtPWCOK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Liw89G9J; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3447C4CEE3;
-	Fri, 21 Mar 2025 16:19:55 +0000 (UTC)
+	s=arc-20240116; t=1742574148; c=relaxed/simple;
+	bh=BVHJeIjPOcoptXmVK10MS67GAYq8d6EXNUvf5ugsuhY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ObVdtFvi1U7Y2zOrcYnii2GUIbd5hzd/vc9trYFHG30kSXIDnjuCAKhejbgX6H1+BgillcZaxW9HEdHl8u0NHWPHyXOjsAjD6BZ4hqckpjI0K2QLFfX+pa1JdF8iwzXAhd7UyPwAK3z3w0VKQHMjMvJzIJtkNMvbZbMWUzrgfO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L9hAxhUj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D31EC4CEE3;
+	Fri, 21 Mar 2025 16:22:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742573995;
-	bh=XI2f7SgbQyb+AjtyGj/tTNrFlGkFGsaPs29m6a6WOvg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Liw89G9JebAAheTFGPYolng/r/+euxjKQK+sJFI4TrqTrKYLQRHVbvcRQ/cBk+UVz
-	 5nhfYLQHDxA+gubhPIX/1xxcAZ7mt/hNfftQON3JbzzwBeE3g8oGNTS+bKrhNsh8QI
-	 ZHbtZoZ+aMGmkJRNMypGw1p3Gf92SK3ZSEmv4S65j6IY9IQtQTpWa4ZJ/OFUsXhmXH
-	 DFxXrfg96Zi7aDVu/DBm1R3ssg6ut6k52DxOERAQWd2qPMLTXBmAsJQr9eSykde5hY
-	 bp2Rev6o3RCi4m78rkwZAMcMxqxJDPV7/raGRMQfAYLU75KhLqFmmnYpqmfaysku+2
-	 djJW8iK6RmiWQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EBF0A3806659;
-	Fri, 21 Mar 2025 16:20:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1742574147;
+	bh=BVHJeIjPOcoptXmVK10MS67GAYq8d6EXNUvf5ugsuhY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=L9hAxhUjN9aDKSnmf4Un/E/lfR6d/emDNCb3yMIGSlnOyBHUwpYdgEQKZ4JrMkUK7
+	 hY5f1SGmmNYj3N0kFSb9D9Pb/vVNrssUiASF0rxN/lQ35PJVFtOjNfG7H/ktLXNFy/
+	 toJAMTtrh0rTQR9Nvk+uk2VdTq1qAtZ5jSqWL05KHZXG+5xMZsAjuTvnS1FHJrZnEn
+	 K1yZNDvGst8NeuSVD2Xnx+3Nnx3mj+eIWjsnC5bmkG6XWrjK9xKgqbL/CS0jY5dgzp
+	 /Rl1aCqRK0J6AGqa+BGzkoVIB5qinrf8Deg9wVJvrg7DSDvljhdkue9CM4kwZwx3QB
+	 xQLpge/W2cp2w==
+Date: Fri, 21 Mar 2025 11:22:26 -0500
+From: Rob Herring <robh@kernel.org>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	upstream@airoha.com
+Subject: Re: [net-next PATCH 6/6] dt-bindings: net: pcs: Document support for
+ Airoha Ethernet PCS
+Message-ID: <20250321162226.GA3472739-robh@kernel.org>
+References: <20250318235850.6411-1-ansuelsmth@gmail.com>
+ <20250318235850.6411-7-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: remove sb1000 cable modem driver
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174257403177.2538209.5678698281791174462.git-patchwork-notify@kernel.org>
-Date: Fri, 21 Mar 2025 16:20:31 +0000
-References: <20250312085236.2531870-1-arnd@kernel.org>
-In-Reply-To: <20250312085236.2531870-1-arnd@kernel.org>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew+netdev@lunn.ch, arnd@arndb.de, horms@kernel.org,
- corbet@lwn.net, christophe.leroy@csgroup.eu, rafael@kernel.org,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- linux-acpi@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250318235850.6411-7-ansuelsmth@gmail.com>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Wed, 12 Mar 2025 09:51:19 +0100 you wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
+On Wed, Mar 19, 2025 at 12:58:42AM +0100, Christian Marangi wrote:
+> Document support for Airoha Ethernet PCS for AN7581 SoC.
 > 
-> This one is hilariously outdated, it provided a faster downlink over
-> TV cable for users of analog modems in the 1990s, through an ISA card.
+> Airoha AN7581 SoC expose multiple Physical Coding Sublayer (PCS) for
+> the various Serdes port supporting different Media Independent Interface
+> (10BASE-R, USXGMII, 2500BASE-X, 1000BASE-X, SGMII).
 > 
-> The web page for the userspace tools has been broken for 25 years, and
-> the driver has only ever seen mechanical updates.
+> This follow the new PCS provider with the use of #pcs-cells property.
 > 
-> [...]
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
+>  .../bindings/net/pcs/airoha,pcs.yaml          | 112 ++++++++++++++++++
+>  1 file changed, 112 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/pcs/airoha,pcs.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/pcs/airoha,pcs.yaml b/Documentation/devicetree/bindings/net/pcs/airoha,pcs.yaml
+> new file mode 100644
+> index 000000000000..8bcf7757c728
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/pcs/airoha,pcs.yaml
+> @@ -0,0 +1,112 @@
+> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/pcs/airoha,pcs.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Airoha Ethernet PCS and Serdes
+> +
+> +maintainers:
+> +  - Christian Marangi <ansuelsmth@gmail.com>
+> +
+> +description:
+> +  Airoha AN7581 SoC expose multiple Physical Coding Sublayer (PCS) for
+> +  the various Serdes port supporting different Media Independent Interface
+> +  (10BASE-R, USXGMII, 2500BASE-X, 1000BASE-X, SGMII).
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - airoha,an7581-pcs-eth
+> +      - airoha,an7581-pcs-pon
+> +
+> +  reg:
+> +    items:
+> +      - description: XFI MAC reg
+> +      - description: HSGMII AN reg
+> +      - description: HSGMII PCS reg
+> +      - description: MULTI SGMII reg
+> +      - description: USXGMII reg
+> +      - description: HSGMII rate adaption reg
+> +      - description: XFI Analog register
 
-Here is the summary with links:
-  - net: remove sb1000 cable modem driver
-    https://git.kernel.org/netdev/net-next/c/3fed9fda150d
+Is that just 1 register? Or should be 'registers'?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Please be consistent with reg and register.
 
+> +      - description: XFI PMA (Physical Medium Attachment) register
+> +
+> +  reg-names:
+> +    items:
+> +      - const: xfi_mac
+> +      - const: hsgmii_an
+> +      - const: hsgmii_pcs
+> +      - const: multi_sgmii
+> +      - const: usxgmii
+> +      - const: hsgmii_rate_adp
+> +      - const: xfi_ana
+> +      - const: xfi_pma
+> +
+> +  resets:
+> +    items:
+> +      - description: MAC reset
+> +      - description: PHY reset
+> +
+> +  reset-names:
+> +    items:
+> +      - const: mac
+> +      - const: phy
+> +
+> +  "#pcs-cells":
+> +    const: 0
 
+So you did add something. But why if you only need 0 cells? That was 
+what was already supported.
+
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - reg-names
+> +  - resets
+> +  - reset-names
+> +  - "#pcs-cells"
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/reset/airoha,en7581-reset.h>
+> +
+> +    pcs@1fa08000 {
+> +        compatible = "airoha,an7581-pcs-pon";
+> +        reg = <0x1fa08000 0x1000>,
+> +              <0x1fa80000 0x60>,
+> +              <0x1fa80a00 0x164>,
+> +              <0x1fa84000 0x450>,
+> +              <0x1fa85900 0x338>,
+> +              <0x1fa86000 0x300>,
+> +              <0x1fa8a000 0x1000>,
+> +              <0x1fa8b000 0x1000>;
+> +        reg-names = "xfi_mac", "hsgmii_an", "hsgmii_pcs",
+> +                    "multi_sgmii", "usxgmii",
+> +                    "hsgmii_rate_adp", "xfi_ana", "xfi_pma";
+> +
+> +        resets = <&scuclk EN7581_XPON_MAC_RST>,
+> +                 <&scuclk EN7581_XPON_PHY_RST>;
+> +        reset-names = "mac", "phy";
+> +
+> +        #pcs-cells = <0>;
+> +    };
+> +
+> +    pcs@1fa09000 {
+> +        compatible = "airoha,an7581-pcs-eth";
+> +        reg = <0x1fa09000 0x1000>,
+> +              <0x1fa70000 0x60>,
+> +              <0x1fa70a00 0x164>,
+> +              <0x1fa74000 0x450>,
+> +              <0x1fa75900 0x338>,
+> +              <0x1fa76000 0x300>,
+> +              <0x1fa7a000 0x1000>,
+> +              <0x1fa7b000 0x1000>;
+> +        reg-names = "xfi_mac", "hsgmii_an", "hsgmii_pcs",
+> +                    "multi_sgmii", "usxgmii",
+> +                    "hsgmii_rate_adp", "xfi_ana", "xfi_pma";
+> +
+> +        resets = <&scuclk EN7581_XSI_MAC_RST>,
+> +                 <&scuclk EN7581_XSI_PHY_RST>;
+> +        reset-names = "mac", "phy";
+> +
+> +        #pcs-cells = <0>;
+> +    };
+> -- 
+> 2.48.1
+> 
 
