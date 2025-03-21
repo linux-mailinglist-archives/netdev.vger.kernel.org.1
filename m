@@ -1,77 +1,88 @@
-Return-Path: <netdev+bounces-176728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C90F8A6BAC9
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 13:37:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34D09A6BAE9
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 13:42:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE4523AA1DB
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 12:37:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2AD7B7A9733
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 12:41:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A99FD225797;
-	Fri, 21 Mar 2025 12:37:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09239CA5A;
+	Fri, 21 Mar 2025 12:41:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dCNvmiro"
+	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="d37SEBEi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F070CA5A;
-	Fri, 21 Mar 2025 12:37:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC005229B16
+	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 12:41:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742560644; cv=none; b=VRc8HUS5AQgIaWERgxI3IfMtP+Npzr8QvCczsPuyh28stqT/iKqCsga7YaE84IdhpRMfSQhXzgv2t8RAsVo83szQGIwjXqSI0Q+t5qcT3BEYLgOUBzs2aR2JGImGGyCXL3jV8nsEPphKiI6P0+M/qajBOES607xcs5hvJUd4O6A=
+	t=1742560904; cv=none; b=Bp40N9T7WEiaIRqRxG2ZXs0XvTPNcXIoVUoiKtHUt+rsVkfdhE2h3fXpshMZGt58m1NjOyhrGsfEC5auVKbrrsMdcSU5xs42ZKUiaRmQsjMoQcNxUWDIqMUyzbDDu445sWOapFzyqrgKHLqFy9Zs+1Qo1fWnyQNvCzUUdgYireI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742560644; c=relaxed/simple;
-	bh=oQyGiV78LEK+tbLWGXm5etpWS3sUCPu5H0kZTYpo8lU=;
+	s=arc-20240116; t=1742560904; c=relaxed/simple;
+	bh=7iwcahJKh8X7Dx8pwOCze4hLBZiB6f2TqSPt5+3rpEQ=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=rRL0rAwAYJa0F5cFSzEqmuTI36+st0l5DSPDKidMrP6AvUNbhLgr6S8S4n9lvKTv+hXkvz0Aet1C8RpVX4UmdIyRsVaGWufuIfqemnbIbtX+L27xrIymi4WNVqW5xIjLE5QiaTaUDfOP4ZedC0r6EJhYZMMBQ6W54BX0V+SV+Nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dCNvmiro; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1742560642; x=1774096642;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=oQyGiV78LEK+tbLWGXm5etpWS3sUCPu5H0kZTYpo8lU=;
-  b=dCNvmiroThBVGoOb5HAHbwY7cdtXwCg98vfZGyuHs6iCsgk9oeMCC3ia
-   WhmGyA8339Wx3RFhhQByG+6q63S3PBd9Mem2E095UBBHeYMxjDo18d5zt
-   A+YbbODCnA3uOCHG+0XCj3J9wrhz5dY/B/rBwXxSrqfaetIUBW14dPYSw
-   L7MCO/eUpJ0BkjcANuYJf60Hc03e89Yc1mQoPFT3Sj2OdZmpN0SSJ237T
-   ZrQoGxzbDOVa79Muf5+k+oGdQZ7WAvhLLR6S6ri8jh6rYmQN7GT5adqIE
-   o3uic+0WKfHDqF2SL3QEszsswieXVhMDNXsrdmKW/ieEQynN3NmCvGEEC
-   w==;
-X-CSE-ConnectionGUID: szUApg3OTk6hqvKKhRI7lw==
-X-CSE-MsgGUID: b4z1f3PHRg2/70jDYHPYew==
-X-IronPort-AV: E=McAfee;i="6700,10204,11380"; a="31415835"
-X-IronPort-AV: E=Sophos;i="6.14,264,1736841600"; 
-   d="scan'208";a="31415835"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2025 05:37:21 -0700
-X-CSE-ConnectionGUID: fN2LIwPEQj+XS2avHEyG7g==
-X-CSE-MsgGUID: kaLgaq4RTxebwSNATqk6Qg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,264,1736841600"; 
-   d="scan'208";a="127535785"
-Received: from kniemiec-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.246.201])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2025 05:37:19 -0700
-From: Jani Nikula <jani.nikula@linux.intel.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>, Andi Shyti
- <andi.shyti@linux.intel.com>
-Cc: Markus Theil <theil.markus@gmail.com>, linux-kernel@vger.kernel.org,
- intel-gfx@lists.freedesktop.org, netdev@vger.kernel.org, tytso@mit.edu
-Subject: Re: [PATCH v2 1/3] drm/i915/selftests: use prandom in selftest
-In-Reply-To: <Z9r7ORwztMxsNyF4@zx2c4.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-References: <CAHmME9oqvWp_Nd1Gwgyw52qy8wxztMyCpNsjByH=VnRaXqczww@mail.gmail.com>
- <20250211063332.16542-1-theil.markus@gmail.com>
- <20250211063332.16542-2-theil.markus@gmail.com>
- <Z64pkN7eU6yHPifn@ashyti-mobl2.lan> <Z9r7ORwztMxsNyF4@zx2c4.com>
-Date: Fri, 21 Mar 2025 14:37:15 +0200
-Message-ID: <874izmd0g4.fsf@intel.com>
+	 MIME-Version:Content-Type; b=PC2OhpTVK921OZzatCpGgcV+IFRiNpy7wghqS002ZBeSciEkH1EMTN7MF+mNZbiaEX1p8q/5AwNJ3uexYlYQakNqsuP/jIPnIL96smYl9lSlj2OAC1yKBrzvf5Yr9OMB6C8+OPBkiHYb0PXY31D3ZF/XrqR/5E+IugHy4ha9MOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=d37SEBEi; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-ac345bd8e13so346111666b.0
+        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 05:41:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1742560901; x=1743165701; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=B4jrOkgKaZGtp4YuQru8PRgkCQ8xkKX6XJlRryj/uOw=;
+        b=d37SEBEivapZ5mAGmhDUql9y1PfbcmTXSywYaaUaWysTbYUqGctlaARPCzsU2rEHcq
+         27smEO7qXgFVEXsBm6U9sDBTcQXraRcwZ8yBctiNzmF5e6Mu+GKuV8fKxzqHJ82fXtyc
+         jiAlQ4Fk9DfN+QKnZ++UkshAVwkfxsW/8+oZ/Od/J7jv0OdKeq0JjasHAEjBwPBPO0gk
+         zjR3Whp/SQhG5xshnwiAKmZ+ZIpGDXIpImcyn88lGQjDkOqDHHLg94Tgpic9NYI4Bzol
+         NKQOI39HQu5AlPuv+PZLMEOBdgP7v7zA/he2MA6PfL4UR53JInP3NE0GDGMxT1AvmUYE
+         q5zw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742560901; x=1743165701;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=B4jrOkgKaZGtp4YuQru8PRgkCQ8xkKX6XJlRryj/uOw=;
+        b=d9muV9iBrmKty+pc1U69iVci8kAIs66MgpVCohomVTSJkNJqwcknhuRUOiGLOqV+DW
+         fFJ8dPwrGafUs/Ian/sum2z9NyRz9M1kApt/HOC+N7/sKtZe7Q+5jdtrNY8KUc2GsEPI
+         wa8xDMSfiIlWJAAv4X3Kjzqvi6fO18CCnvc24/QP35TdKJyshU+YK8DS8Mgr9LYS5PeP
+         rdunu1rw2i1njdb/VF2mSGlUvcwqFz0+9jxq9pVWvCMRB77DsH29OhyowcQD6d903Yrt
+         lojc6R04fZ8MrceLENzhPgdCNJLpBKPsb/w4M6z7MHMvUUP6JWUhvEHjC+waQe7ZV9i9
+         E5lA==
+X-Forwarded-Encrypted: i=1; AJvYcCWUoVgmyJg9Z//WwIXL7L0P9WmGnhVqhkA6fNAwtP4b2Yg20EkGU+rPWc9FXwrBTQI0uvknT0k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0gT1osdoP4r/bBoBTvVmI2cQjemH4Sdwe2PoZ3dxYSIG8JQaK
+	4TQflGXrUTLZbNhxFDH/+3g9omc8MlqvR3a/bHuZU3Q6N+Mo2PS9X5vUT6XjlF2a1dthtRA98sO
+	3
+X-Gm-Gg: ASbGnct5h3mIsNPRaYUCojBJYajIMyxQNZQbiViLaTrt1D9fZAdrOzQGH9U+cEi3vyZ
+	cioe3o1qIzxpilv8pKs967k90zd4E8d5467sQ3gFz7bjYBqFCL8gZfDBehVgiQC26XOT8W2oStQ
+	EukWjBdIEllcv7bx5isbxnjp86UomKdG37ZeYLRNELWqygUs0qVaSIUPbpPbxuKVI3sV1pq69ka
+	DCW+K+kWNsOuN4N5GCT73oaMYKSMrqnqZY49GJv9ysetqjoQSTw/AysvkH/eOZ34nA68r8euSP7
+	I2WLVRb60WQ6ZbqlsM59CkRHRDwfDWGP0y8umXynfiIjUl5EFL/gliwrprhE4Kfiz4rLQRiulqw
+	=
+X-Google-Smtp-Source: AGHT+IFVsYMS0of3s7CrCm8+CjqSExmmbbmfa3VkBFfs8N9PagGiYbvHzqCZbcRz2Ad9bCgPJuly0A==
+X-Received: by 2002:a17:907:e841:b0:ac3:c7c6:3c97 with SMTP id a640c23a62f3a-ac3f1e16b61mr328496166b.0.1742560900617;
+        Fri, 21 Mar 2025 05:41:40 -0700 (PDT)
+Received: from wkz-x13 (h-79-136-22-50.NA.cust.bahnhof.se. [79.136.22.50])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3efb65871sm149047466b.96.2025.03.21.05.41.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Mar 2025 05:41:39 -0700 (PDT)
+From: Tobias Waldekranz <tobias@waldekranz.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: davem@davemloft.net, kuba@kernel.org, maxime.chevallier@bootlin.com,
+ marcin.s.wojtas@gmail.com, linux@armlinux.org.uk, edumazet@google.com,
+ pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 net] net: mvpp2: Prevent parser TCAM memory corruption
+In-Reply-To: <3f2f66ae-b1ac-4c87-9215-c1b6949d62c4@lunn.ch>
+References: <20250321090510.2914252-1-tobias@waldekranz.com>
+ <3f2f66ae-b1ac-4c87-9215-c1b6949d62c4@lunn.ch>
+Date: Fri, 21 Mar 2025 13:41:38 +0100
+Message-ID: <87pliaa73x.fsf@waldekranz.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,30 +91,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 
-On Wed, 19 Mar 2025, "Jason A. Donenfeld" <Jason@zx2c4.com> wrote:
-> Hi Andi,
+On fre, mar 21, 2025 at 13:12, Andrew Lunn <andrew@lunn.ch> wrote:
+>> +static int mvpp2_prs_init_from_hw_unlocked(struct mvpp2 *priv,
+>> +					   struct mvpp2_prs_entry *pe, int tid)
+>>  {
+>>  	int i;
+>>  
 >
-> On Thu, Feb 13, 2025 at 06:19:12PM +0100, Andi Shyti wrote:
->> Hi Markus,
->> 
->> On Tue, Feb 11, 2025 at 07:33:30AM +0100, Markus Theil wrote:
->> > This is part of a prandom cleanup, which removes
->> > next_pseudo_random32 and replaces it with the standard PRNG.
->> > 
->> > Signed-off-by: Markus Theil <theil.markus@gmail.com>
->> 
->> I merged just this patch in drm-intel-gt-next.
+> This is called from quite a few places, and the locking is not always
+> obvious. Maybe add
+
+Agreed, that was why i chose the _unlocked suffix vs. just prefixing
+with _ or something. For sure I can add it, I just want to run something
+by you first:
+
+Originally, my idea was to just protect mvpp2_prs_init_from_hw() and
+mvpp2_prs_hw_write(). Then I realized that the software shadow of the
+SRAM table must also be protected, which is why locking had to be
+hoisted up to the current scope.
+
+> __must_hold(&priv->prs_spinlock)
 >
-> This is minorly annoying for me... What am I supposed to do with patches
-> 2 and 3? Take them through my tree for 6.16 in like half a year? Can I
-> just take the v1 into my tree and we can get this done with straight
-> forwardly? Or do you have a different suggestion for me?
+> so sparse can verify the call paths ?
 
-Feel free to apply it to your tree too. It's not ideal to have two
-commits for the same thing, but oh well.
-
-Acked-by: Jani Nikula <jani.nikula@intel.com>
-
--- 
-Jani Nikula, Intel
+So if we add these asserts only to the hardware access leaf functions,
+do we risk inadvertently signaling to future readers that the lock is
+only there to protect the hardware tables?
 
