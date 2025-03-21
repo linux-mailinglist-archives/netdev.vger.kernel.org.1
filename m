@@ -1,96 +1,97 @@
-Return-Path: <netdev+bounces-176817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F05EA6C460
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 21:39:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D537A6C487
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 21:51:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 778783A8C53
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 20:38:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55A10484A86
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 20:50:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAE30230277;
-	Fri, 21 Mar 2025 20:38:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE347232376;
+	Fri, 21 Mar 2025 20:50:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="0y4gIFM5";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="/+d3Xmy7"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="TGFtRI8s"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 323541D5AD4;
-	Fri, 21 Mar 2025 20:38:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9BF6221DA2;
+	Fri, 21 Mar 2025 20:50:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742589530; cv=none; b=pYxfL1cnVdckPYT/Ept+Ce9J20eidCzJbvGfmllcMrzQVeRMbPgTZL9MEJmndLNHy6jb63dWcP0Z5ULXTKJ5UE+0KrdlLUpIAFF9cot7VUEXSXJCMkFT1951lvg4TmcsnJoqsWdPuL9Q1Js9zV+yjOQmpaBUmwuzyZo2w3LhK/I=
+	t=1742590212; cv=none; b=DdhCldJhg3x88lL6s4PHIafYqcw9584S0Hn5ZQEE1zukYWdhBJhI4Xe1bsf41s1Fb9L+cvgTcb5XAgHbtmUSMnDMazQKmRH+uSaEEdYZ8nxGVsrGg42IM/vTXZkUb/MO9hQQL/6jhA61hTugmZw4eweqrUnLUE31qCoBNWJ62bE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742589530; c=relaxed/simple;
-	bh=8RjxbWDW/i69LK0w659MT1nZJrKwlwIZ1efwQ7T5VSA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=nNWAS26yndwold1g6unzzcZZeKWIw85f+5+YKVzxdr9P8Yl7aMHzJMxBGcZAYgD7dwljmFG1qdIkLBIbbPGbUk/SfuWehVMZzeNkJrU912hFlELRjw3o8osK/2GoZf/R51l0umIGOANpmZDefWoardHsvtDiLcOx/Tl7u+/BF54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=0y4gIFM5; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=/+d3Xmy7; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1742589527;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WOtohB+AKI748h04VvFfjvO0Ky51rTdztfJFNReMd6c=;
-	b=0y4gIFM5b1fRGq5GX5LD0gY6UEsfjqARtLJwS8pVDLjOwM8eSkp8Ih792VnsDCu2wyRxyz
-	V6ivFe/h8F0eeNSQ4a++gAh36rYF1V6XhjWTLYRsAs8G9xUi1zF55ZnEJEWcmxUyNTq5ES
-	dGWExdsAq9Mw+GXsIw6qg1XnibFCnM4PEmMj56JtVtEmYSAVm1X6gtugapg8uPifIKPvJm
-	ZJLVPqlQu3gs8B9iZLONLzUf0i4GNpEUBB+SaNSdCMkpuFymCGrOMXbfga2vIF0XJsmeMU
-	zSJmlohRq2t/43pVgBuaHYO+uxpbktDXD9cUaLCiLrUn5ZGgtxP+FbxHBRJAIg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1742589527;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WOtohB+AKI748h04VvFfjvO0Ky51rTdztfJFNReMd6c=;
-	b=/+d3Xmy7DvWBVqozBJgQVFKEFutX8Ih9amWjVC5+vZUnAZ6C7M+qacJIfmlR13zf9ANe8I
-	CNw5JQAVw25dxbDg==
-To: Andreas Hindborg <a.hindborg@kernel.org>, Boqun Feng <boqun.feng@gmail.com>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>,
- linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
- netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
- tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
- gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
- a.hindborg@samsung.com, aliceryhl@google.com, anna-maria@linutronix.de,
- frederic@kernel.org, arnd@arndb.de, jstultz@google.com, sboyd@kernel.org,
- mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
- vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org,
- bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
- tgunders@redhat.com, me@kloenk.dev, david.laight.linux@gmail.com
-Subject: Re: [PATCH v11 6/8] MAINTAINERS: rust: Add new sections for
- DELAY/SLEEP and TIMEKEEPING API
-In-Reply-To: <87jz8ichv5.fsf@kernel.org>
-References: <20250220070611.214262-1-fujita.tomonori@gmail.com>
- <20250220070611.214262-7-fujita.tomonori@gmail.com>
- <Z9xnDzwixCbbBm0o@boqun-archlinux> <87jz8ichv5.fsf@kernel.org>
-Date: Fri, 21 Mar 2025 21:38:46 +0100
-Message-ID: <87o6xu15m1.ffs@tglx>
+	s=arc-20240116; t=1742590212; c=relaxed/simple;
+	bh=NYDV0AH6VMybj+/Wwpfj6w3HLv/oqsj2RU5ib1yXgO8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RgCFdOv3/FjSXBRCeFRimXq6nzQ1g+PXYrL13JPJL4NYM44ySieUYIUFK8wq40r9qi4y+XYLIDxz1m1JyvKmA7ABgeQJyDhT8+vXIEZlodCxy8cHFxgkNGZ9gTx6Hzw5NSGl4bREFUsfZn3tJkzvJzm1QMNCQGvQ/T7Rxyq1Y+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=TGFtRI8s; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=yFzOysCPLuMjK3qzNNnYKx7eqzyb8A3svd4W9fSzPuQ=; b=TGFtRI8spN1abBT9KlSGFueqQh
+	6/YP2EDo6BjswLesT6nGpeMQ9l84PUNmOlDHSQO43O70iL0m5u383PDralyj13qYDcr5D7CjO2NAZ
+	RltzmllqpVOG9toqHbT8+tzjdJcPirCbfOYaqh9GGwj5dM49R26FCx00XWpFfKRnRsoQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tvjJA-006eT6-Hj; Fri, 21 Mar 2025 21:49:36 +0100
+Date: Fri, 21 Mar 2025 21:49:36 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?Q?Th=E9o?= Lebrun <theo.lebrun@bootlin.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Samuel Holland <samuel.holland@sifive.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>,
+	Gregory CLEMENT <gregory.clement@bootlin.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-mips@vger.kernel.org,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	Tawfik Bayouk <tawfik.bayouk@mobileye.com>
+Subject: Re: [PATCH net-next 01/13] dt-bindings: net: cdns,macb: add Mobileye
+ EyeQ5 ethernet interface
+Message-ID: <2dbbd6c0-84d0-4846-a48d-31891f395c7c@lunn.ch>
+References: <20250321-macb-v1-0-537b7e37971d@bootlin.com>
+ <20250321-macb-v1-1-537b7e37971d@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250321-macb-v1-1-537b7e37971d@bootlin.com>
 
-On Fri, Mar 21 2025 at 20:18, Andreas Hindborg wrote:
->> Could you add me as a reviewer in these entries?
->>
->
-> I would like to be added as well.
+>            - atmel,sama5d2-gem         # GEM IP (10/100) on Atmel sama5d2 SoCs
+>            - atmel,sama5d3-gem         # Gigabit IP on Atmel sama5d3 SoCs
+>            - atmel,sama5d4-gem         # GEM IP (10/100) on Atmel sama5d4 SoCs
+> +          - mobileye,eyeq5-gem        # Mobileye EyeQ5 SoCs
+>            - cdns,np4-macb             # NP4 SoC devices
+>            - microchip,sama7g5-emac    # Microchip SAMA7G5 ethernet interface
+>            - microchip,sama7g5-gem     # Microchip SAMA7G5 gigabit ethernet interface
 
-Please add the relevant core code maintainers (Anna-Maria, Frederic,
-John Stultz and myself) as well to the reviewers list, so that this does
-not end up with changes going in opposite directions.
+These are kind of sorted. Maybe put mobileye after microchip?
 
-Thanks,
-
-        tglx
+	Andrew
 
