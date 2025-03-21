@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-176677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03053A6B497
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 07:49:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D666A6B49C
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 07:50:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFF7E462633
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 06:49:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A61D8189B876
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 06:49:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2ED61EDA09;
-	Fri, 21 Mar 2025 06:49:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD57B1E0E15;
+	Fri, 21 Mar 2025 06:49:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="MwHkEHTi"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="sqp+oveO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C93F1EBFFC
-	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 06:49:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E7E21E5707
+	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 06:49:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742539742; cv=none; b=ZyG+LJnYvphUTGMB45dIgQ+eFwj6kGEB+8vAya0wgpt1ckz9mVNJ6lIZD6upM+bAyo9Y0UHk06fa42vAwg2rj8BtHnPvbVCUp1b7UkJzffJj02onHWj7+sRrFif5YAp1MrRe7U0cF7E0gcIKyZhfchgukpRBDJy4HQF88hzJt8U=
+	t=1742539748; cv=none; b=F7q2tTh9M9EFkxpgYOq86v8Z13WlWAjQk8EN9M+Yvmo7yBI6HPqgHml1zR2Qtsez97Jgz4WYzq8mHNjnHfa/v/QvFjWkJZAancTu+FcZywqBbPqXctAt5cqc94Jo6wUeY/qIRAfxiP5SlOsBz3G75vf01pNUPcDwGwKENx7gZqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742539742; c=relaxed/simple;
-	bh=JjapcMVDGbOLgMkpCmBgvZCv2tls7EkMlHjM4nzx7nc=;
+	s=arc-20240116; t=1742539748; c=relaxed/simple;
+	bh=JA5lB20OwEFvfOBpIlszUUf1X9ZmjUyWnEr7Zb3EhmE=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=VG2aukyeSvOWxY3yQzfkB33zmbAIJaHp943lwReiW7cyyPg4rY/C4fdQPWFyU7FUCZ8xQ1wRqCWZtVbLmo4YS0mXZualt5gatlwPkWotY1j59XN2Ws0NBzXxVu+DhABJzHgn9u/a3glxqDOmiyMm2fcfOrdKEEiAeR170CxAIYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=MwHkEHTi; arc=none smtp.client-ip=209.85.214.182
+	 In-Reply-To:To:Cc; b=Ryl+ZyfBJyjqYgMpxdw4gMW2vX8P8XwSf4IBjRIasXqOpbULYVbTeXND7NrbqFsMFp84ATZt9+c3nmTM0EL84KbxBh+3ANozLM7fkO+lrTbaVl+PHxqSvKhsAk/DP7DPjUzxPrPh84EsdtE0xKNUenbRaTq3xMjRweluXuYpEFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=sqp+oveO; arc=none smtp.client-ip=209.85.214.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-224100e9a5cso30843405ad.2
-        for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 23:49:01 -0700 (PDT)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-22423adf751so32434875ad.2
+        for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 23:49:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1742539741; x=1743144541; darn=vger.kernel.org;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1742539746; x=1743144546; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=b/ZmhDXoFm25C2TQibSTkJHDcTfVUeG1ViV6OOg3xRE=;
-        b=MwHkEHTiKDEeNOyho//Cj5YIGbXiWDHlEToCwMMiDc2SD8naWH/fH4SDgNS5AAY8T+
-         P/EyId5Hfo3xy8SErJuDVF9ZgtnNknJFku/xi3AjbFigt3TL4i9LVxHtUnQMOvMLgcIt
-         lVgwWpwOh1TQq6S4mNPb9r5HrW7JrH125qjS0mSw2tmIPUZF6bT76P30avhXsTrd03/g
-         NRqryO0lzBfd1DoT0FwkqwvAPxwUpwCJltSw0y49QUkwQsThND73sOTRXoBOjC1zDkbm
-         bH7/fuXin9V7nGY6t0we4DqpW5j6+gPP6fuPm2fFuQz+b9V87rXrHc1w6RxaH42UUbH8
-         lRWQ==
+        bh=elvR4miFALyu5FnLIhwEFH5pLlJ21X8V+zrz+RJ4D2Y=;
+        b=sqp+oveO2TR9XMcK0UCJya39il7L5DjpK/PBE+aWxCM1016qS/LXQ4+Rx6t3hLkhG7
+         /IBvw7ve5m27emOOv3RxK4ENO0kyfbwk+Y2Fx3DVEvLwH7dpmoXfdxaos1WUEUOch0sB
+         x/RXW4vad+rhTM+oWRGPZ1+GZIeA73JM5NBHLW+j5mqs5hn+9FqlIrLoj4Fb95npAQ3Y
+         mWLp2rfPattN6/n3xNMYch2LyhPz4RgDkkOtyCW21vxCOI7qN4/DUQEwS7vObhybmrNX
+         ayl46JpIMkJjzfmkA3IY/3p/eMRbZ5sF/eKNm5w+HnzW6RRKpllzYRKoWUuiDBDgTBtc
+         ZzTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742539741; x=1743144541;
+        d=1e100.net; s=20230601; t=1742539746; x=1743144546;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=b/ZmhDXoFm25C2TQibSTkJHDcTfVUeG1ViV6OOg3xRE=;
-        b=BykGLbywo9EP1LuJwuj+3/KYSZ7X18asQaLt/Oszr1zgu0Qw/zrBfB7wd9gqoFAud5
-         te8Fmj5Qg3ni2JQdzuRvJTTrVkGOyMxgqAmSIWTOxv5+HyP5lDZ3y/fJnM6W+AEO/6gP
-         wcpaWxqnPoh48Qb5RmctgnShyJgQrea5Q3DYWitWuk5QqwR5ylMSO8hp6W95ZXfiY1jC
-         wVp1z1ji8A0IZoBHz1Cczni6jx5fyU7tJxDBEocPMpa8IY3h/L9ak1vhffco5XXTZ5G3
-         SiJILyDlBRMB1TCffaxoXCbUip7E+qry/eS+GMDQJU7u4QtIAxpZy420e4AJsBX6DYyN
-         vtNw==
-X-Forwarded-Encrypted: i=1; AJvYcCVlE9/1vRH2UGqViYZQe/D2mH7wrdF1dEkjbI2X0HoswejFpJmjbeKfp8Sxm1cZjAIOC83ApHY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzkXofuuCelaQD2mUQBhFYbEpa46vq4ta9NRyMbAOEKAK0usOE4
-	sGy8PYT2Qhz/SoAxyhUhejZgpvysW77pQ8n1s4l/0Bl3T8fRL2oK2YTY0Xgo1xM=
-X-Gm-Gg: ASbGnct5u22CGVB1daFnNR1dkKXBFfhB1eqEJuSeHt/zBAzjm5B//AZB4jRUgJdTHBo
-	ieLqERw5IHeQA42T0a1KHSzfu/yZcQeFLlt69UqBqWiiHqjE/OnaKi0aWM316jqHkF9bzDVPZgp
-	dBSDKToP97puD8yJzY03qKENRNJn+OzYrclPWpGTCld6T1GtKYWX8+p0xsErr6lvE2tgUKopUrr
-	t/kOjsh4mHMHkX1SXJJIB1UHP0+EEcehSa/Xe1oiKXz+K2EhF9RWXiIyQLNFbGfWM7AsSlJFXrO
-	eQzLKhPwhi4ZX2Hvcio7pxz8ps25dCh5lQIDVM2VPVgaXhH3
-X-Google-Smtp-Source: AGHT+IFY57i8l2zIDhAAWUOoYbKyLPQPPGn+mWn2Fuj0WlYT5jMKi+NUy5SRU1dEXrfFRpylN+S9vg==
-X-Received: by 2002:a17:903:22c4:b0:224:2715:bf44 with SMTP id d9443c01a7336-22780c7b0d9mr33833585ad.19.1742539740663;
-        Thu, 20 Mar 2025 23:49:00 -0700 (PDT)
+        bh=elvR4miFALyu5FnLIhwEFH5pLlJ21X8V+zrz+RJ4D2Y=;
+        b=jZ5OVYMaX8gsValsDHjuBI/IHsCXwq4OYNUavTdXzuinoIfrBLC33DexGFmC1yoiJw
+         JHDFH2z9u/IV2ZLfYJ5MTHOrU1Hs1YygOEFYz4dwu1TeuTlHna+xS6+QG/odlCFxHFwj
+         Sbr1r+1EDiP2Vk7Wwhv4AQD4lb9VoBzyXovv1Yb/+RAgcSmF3el3lh+9w9Fl6GC716vE
+         KizAOH34JUW6dYnoi3hyVUP2U52uHG7aYcbRiOd/4Yy6lyHCnIDyMY31u1tU6lb3eEMx
+         BaMT0KbnVUrl1qOBvuClpDRTU7Jzjxtk6xQrrLfkzaF7hCE+UJmsKjQCruqXcyJlRRfG
+         EpGg==
+X-Forwarded-Encrypted: i=1; AJvYcCXg1vIp21ryb3sFgm4dUwowem7ewNrIXSCvqPzLoz7KX10YMUMUG6WHGIWAAbj2rE63wvnTS74=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCpGPbb3mhBRIvg5DlNlZfANobMTnFAWF423qS1ebgsMBgUCad
+	izD1LBm4EaH0Y5bMOciPYFt7PqJjuKwJg748FeFYDv52nd1vRp5Z01WBXEFtyQA=
+X-Gm-Gg: ASbGncupkoXfjXTUcsn6n5AwGHgWVYrtr2WUG5NxdLc3vlCEvqXfsr+TdgiUEa1uKvd
+	7FELlLcuTkC3uEo8/ygS0QWXshbiPYugV1ZJ5Ac0NvywxjHMNhShf5bvs9TbsAk3cfc25yFlawA
+	Im7XLvH5MSjeAdtqYoa6BKVEBhkIQKHcNexbN0aeVp8GyvtROsPKE65TTkEWx8PSTTlincqD9en
+	+OD+Yj8RoI6+WMQYUdngux0LE/JW66ajSIYXWIJ0pBI6R6eJyjBqQ/gQAx1tDznPJTTCOnnwxYC
+	Y8NWeV3Ar1+bXDrem8vuFXC0nOJghzhZNR64hS7qGuqH8rBU
+X-Google-Smtp-Source: AGHT+IGfOuNa5fyjN/141rJ7V6SWVAs5O/iHkELWdhBTVf3wR+4vSaQY0IPj0EQaRSWQrfYKVie/Dw==
+X-Received: by 2002:a05:6a21:2d84:b0:1f3:293b:7aa with SMTP id adf61e73a8af0-1fe42f090f2mr4079673637.4.1742539746583;
+        Thu, 20 Mar 2025 23:49:06 -0700 (PDT)
 Received: from localhost ([157.82.207.107])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22780f3977fsm9212645ad.14.2025.03.20.23.48.57
+        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-af8a2803d8csm999480a12.26.2025.03.20.23.49.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Mar 2025 23:49:00 -0700 (PDT)
+        Thu, 20 Mar 2025 23:49:06 -0700 (PDT)
 From: Akihiko Odaki <akihiko.odaki@daynix.com>
-Date: Fri, 21 Mar 2025 15:48:32 +0900
-Subject: [PATCH net-next v2 1/4] virtio_net: Split struct
- virtio_net_rss_config
+Date: Fri, 21 Mar 2025 15:48:33 +0900
+Subject: [PATCH net-next v2 2/4] virtio_net: Fix endian with
+ virtio_net_ctrl_rss
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,7 +84,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250321-virtio-v2-1-33afb8f4640b@daynix.com>
+Message-Id: <20250321-virtio-v2-2-33afb8f4640b@daynix.com>
 References: <20250321-virtio-v2-0-33afb8f4640b@daynix.com>
 In-Reply-To: <20250321-virtio-v2-0-33afb8f4640b@daynix.com>
 To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
@@ -100,43 +100,108 @@ Cc: virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
  Akihiko Odaki <akihiko.odaki@daynix.com>, Lei Yang <leiyang@redhat.com>
 X-Mailer: b4 0.15-dev-edae6
 
-struct virtio_net_rss_config was less useful in actual code because of a
-flexible array placed in the middle. Add new structures that split it
-into two to avoid having a flexible array in the middle.
+Mark the fields of struct virtio_net_ctrl_rss as little endian as
+they are in struct virtio_net_rss_config, which it follows.
 
-Suggested-by: Jason Wang <jasowang@redhat.com>
+Fixes: c7114b1249fa ("drivers/net/virtio_net: Added basic RSS support.")
 Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 Acked-by: Jason Wang <jasowang@redhat.com>
 Tested-by: Lei Yang <leiyang@redhat.com>
 Acked-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/uapi/linux/virtio_net.h | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ drivers/net/virtio_net.c | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
 
-diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
-index ac9174717ef1..963540deae66 100644
---- a/include/uapi/linux/virtio_net.h
-+++ b/include/uapi/linux/virtio_net.h
-@@ -327,6 +327,19 @@ struct virtio_net_rss_config {
- 	__u8 hash_key_data[/* hash_key_length */];
- };
- 
-+struct virtio_net_rss_config_hdr {
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 7646ddd9bef7..d1ed544ba03a 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -368,15 +368,15 @@ struct receive_queue {
+  */
+ #define VIRTIO_NET_RSS_MAX_KEY_SIZE     40
+ struct virtio_net_ctrl_rss {
+-	u32 hash_types;
+-	u16 indirection_table_mask;
+-	u16 unclassified_queue;
+-	u16 hash_cfg_reserved; /* for HASH_CONFIG (see virtio_net_hash_config for details) */
+-	u16 max_tx_vq;
 +	__le32 hash_types;
 +	__le16 indirection_table_mask;
 +	__le16 unclassified_queue;
-+	__le16 indirection_table[/* 1 + indirection_table_mask */];
-+};
-+
-+struct virtio_net_rss_config_trailer {
++	__le16 hash_cfg_reserved; /* for HASH_CONFIG (see virtio_net_hash_config for details) */
 +	__le16 max_tx_vq;
-+	__u8 hash_key_length;
-+	__u8 hash_key_data[/* hash_key_length */];
-+};
-+
-  #define VIRTIO_NET_CTRL_MQ_RSS_CONFIG          1
+ 	u8 hash_key_length;
+ 	u8 key[VIRTIO_NET_RSS_MAX_KEY_SIZE];
  
- /*
+-	u16 *indirection_table;
++	__le16 *indirection_table;
+ };
+ 
+ /* Control VQ buffers: protected by the rtnl lock */
+@@ -3576,9 +3576,9 @@ static void virtnet_rss_update_by_qpairs(struct virtnet_info *vi, u16 queue_pair
+ 
+ 	for (; i < vi->rss_indir_table_size; ++i) {
+ 		indir_val = ethtool_rxfh_indir_default(i, queue_pairs);
+-		vi->rss.indirection_table[i] = indir_val;
++		vi->rss.indirection_table[i] = cpu_to_le16(indir_val);
+ 	}
+-	vi->rss.max_tx_vq = queue_pairs;
++	vi->rss.max_tx_vq = cpu_to_le16(queue_pairs);
+ }
+ 
+ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
+@@ -4097,10 +4097,10 @@ static bool virtnet_commit_rss_command(struct virtnet_info *vi)
+ 
+ static void virtnet_init_default_rss(struct virtnet_info *vi)
+ {
+-	vi->rss.hash_types = vi->rss_hash_types_supported;
++	vi->rss.hash_types = cpu_to_le32(vi->rss_hash_types_supported);
+ 	vi->rss_hash_types_saved = vi->rss_hash_types_supported;
+ 	vi->rss.indirection_table_mask = vi->rss_indir_table_size
+-						? vi->rss_indir_table_size - 1 : 0;
++						? cpu_to_le16(vi->rss_indir_table_size - 1) : 0;
+ 	vi->rss.unclassified_queue = 0;
+ 
+ 	virtnet_rss_update_by_qpairs(vi, vi->curr_queue_pairs);
+@@ -4218,7 +4218,7 @@ static bool virtnet_set_hashflow(struct virtnet_info *vi, struct ethtool_rxnfc *
+ 
+ 	if (new_hashtypes != vi->rss_hash_types_saved) {
+ 		vi->rss_hash_types_saved = new_hashtypes;
+-		vi->rss.hash_types = vi->rss_hash_types_saved;
++		vi->rss.hash_types = cpu_to_le32(vi->rss_hash_types_saved);
+ 		if (vi->dev->features & NETIF_F_RXHASH)
+ 			return virtnet_commit_rss_command(vi);
+ 	}
+@@ -5398,7 +5398,7 @@ static int virtnet_get_rxfh(struct net_device *dev,
+ 
+ 	if (rxfh->indir) {
+ 		for (i = 0; i < vi->rss_indir_table_size; ++i)
+-			rxfh->indir[i] = vi->rss.indirection_table[i];
++			rxfh->indir[i] = le16_to_cpu(vi->rss.indirection_table[i]);
+ 	}
+ 
+ 	if (rxfh->key)
+@@ -5426,7 +5426,7 @@ static int virtnet_set_rxfh(struct net_device *dev,
+ 			return -EOPNOTSUPP;
+ 
+ 		for (i = 0; i < vi->rss_indir_table_size; ++i)
+-			vi->rss.indirection_table[i] = rxfh->indir[i];
++			vi->rss.indirection_table[i] = cpu_to_le16(rxfh->indir[i]);
+ 		update = true;
+ 	}
+ 
+@@ -6044,9 +6044,9 @@ static int virtnet_set_features(struct net_device *dev,
+ 
+ 	if ((dev->features ^ features) & NETIF_F_RXHASH) {
+ 		if (features & NETIF_F_RXHASH)
+-			vi->rss.hash_types = vi->rss_hash_types_saved;
++			vi->rss.hash_types = cpu_to_le32(vi->rss_hash_types_saved);
+ 		else
+-			vi->rss.hash_types = VIRTIO_NET_HASH_REPORT_NONE;
++			vi->rss.hash_types = cpu_to_le32(VIRTIO_NET_HASH_REPORT_NONE);
+ 
+ 		if (!virtnet_commit_rss_command(vi))
+ 			return -EINVAL;
 
 -- 
 2.48.1
