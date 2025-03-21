@@ -1,153 +1,178 @@
-Return-Path: <netdev+bounces-176791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8780A6C2B2
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 19:42:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E59B3A6C31F
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 20:15:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 500733AC982
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 18:42:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B46F16BD89
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 19:14:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82E5C22E3E9;
-	Fri, 21 Mar 2025 18:42:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CF1D22FF21;
+	Fri, 21 Mar 2025 19:14:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nq24M0oc"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="AYdMzyoi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C009A1EB9E1;
-	Fri, 21 Mar 2025 18:42:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA0C13C914;
+	Fri, 21 Mar 2025 19:14:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742582573; cv=none; b=Mc5UatcKKPijPio1mdbclbNiyivYIUF9Jbnf2yxE2dZDwYV53e3K8bU0U2cPlhZcwEGGb8WZD6b3CiYuTpd+fWPGj1a7HyhEq1fskVTxR8WfMN5siBh6tqe25KORCphjXPQjIivB3hv+YvOCUymoYqnm16mjg6RyvO6IZ611HOE=
+	t=1742584446; cv=none; b=VgYpNHIW+8ttU4BeFSQgI/b7hAyHg5HlKlqyU0fWB9530ZaZCiEPeUswIfkyEgyJ/9X+IQFMnQdW0TRbCrSTnuCKsUxe3CScVfWClHcHza3tT16u/ZUxnVCqg7hnusAK5v6tTXtAKiCtasuemjUBFdRWIFxqMkOCtg7VVSPpm2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742582573; c=relaxed/simple;
-	bh=AvEOBE0yE4qY/KJuGrAgKI7WyCIkAClu4X50DJgTsGU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oqbthlB7DeIyeC9d4q76nKcTPCzO5q+4iDyTRND0iiid2CUFsz70cE0w56xY1rEyNwpSccHjUiZCZfmBAwfHL5AoCHh5lFyhqslAzxBK9soSbTXTXq/xtQUfnPk3QIAzaoRWkFU2FnpaCGQ4uz4LGodaQz4moak8ArK4+ssygls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nq24M0oc; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43cfebc343dso17301005e9.2;
-        Fri, 21 Mar 2025 11:42:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742582570; x=1743187370; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=xkhJhb5KibJG7wvOxcyqZnnmJEX4g1WLn+kx+Q0rQIc=;
-        b=nq24M0ocWqoTMEXWBryGosTY0Xs3SksHcWyElQAb0S1EY/qnYkC2L/lQyeBRc9PEdY
-         N4+dMAu73k5EhZWIqawbK4MJHurI19uaQR6uk3Nl2vYQoGLpd98kTcNYYAHfUSdrujfC
-         aN17brEbVwOf50flAqu0Ef8Y//7DxrnEWRzoHBo1HlR0xKXFjfwS8rLInVYOdDHGah5H
-         htzTgZv9mniHJnS0/sPx9mx+YmFmcFH5kRTcGJRFvrRhL9E9bAHySz8z6Ffn2EDrkRYv
-         YlzC4mln+CY80NupaL318fwewkpn3piRB756Fve/OqI6uMcrIrrrAzgw5Bm0CSAgGGXo
-         DSXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742582570; x=1743187370;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xkhJhb5KibJG7wvOxcyqZnnmJEX4g1WLn+kx+Q0rQIc=;
-        b=Fbu67JN3b6b3/5w/0mv71pS5/6QIl9FO69HqGOH8zpxEf0vR1Kwisua7xDiox5mmaC
-         eY3RYXdUkUK0qRtD8WqRCjKYq77on3MtFVyQ8LjGKkouNOhrrtbfChybMsMRVfALPPo0
-         88SptTtBglKkRtoTAOZrVTKAi+coKKkLE2aqRSmvpnF7CTOxBdbpsKTrxWhFTSYHYs9t
-         HjoHtwT9/kVqXdsUgJBn8YETfQJH40LvcnhvJhkPl1UKC3Z/EZfA4ZOIVMtDs4CS+Mx8
-         M2EgyCYBV+6Tcmta5k1VkXfmHsPedmJpaXPLUG6NgayG1OvEkghEVdovrkhw7gd1fXAE
-         wccw==
-X-Forwarded-Encrypted: i=1; AJvYcCUwLaZ4JybShP8g5mQkmygwvMJ5vj3xB2HOoVXWfy3zOmop6+guehEjLgkKmPJGam3xhbuGfw5X@vger.kernel.org, AJvYcCVNOPbq9GxNH2B7X4JrjDGvViXJB8T2uxAa0CO7Yj8q7OsLsNQRGsJdefACe1C+14ghQzp/FXolAGUZ2rg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzfrMiOET9b9kp9s3X4wv01zDvgZiJkETdJDfn3r+ESaO4YAxBY
-	vdHoHXrS3gYMDYXzIbviKe3tiBEUqYnUqvVPYKYdXTNyHGy0mL4m
-X-Gm-Gg: ASbGncvgUJz+GEpBN6dhFDmvTyIuCNE201qcJqUALaH9z7JNI6QIoo++LOVRfI2CvwD
-	V2ImK3Iy7pi1gbpdLw6J6YCHgixxrWY6iPJsqxUu8dxhkNQy9MsekydE/MRU9u1yTUc4QcblxEw
-	D0IEflFxteiWLaGJmkGAqNYgfCYaDibUOJUWq5MN2OsBzhn1EZwe38T2cFq9fsUc7RymZpRI8+8
-	jmX9HOCSfHPrVUnjxwzfeEwpLe9cAgSVT+T/ylRxksqZtGA2yTEVK53pBO80r14JXANg3xVQnPh
-	Yux95zc4JDDwiHD4LBjGgbavoA2i3eG6Y9ia2ynqMJ7tL+dn
-X-Google-Smtp-Source: AGHT+IGHShP8TZ93bUmoxG59VBXZdzCleXOrrS+vMNkLwHzO8GRb2ahF5afjhB9vdhw2gYbmgvOcbg==
-X-Received: by 2002:a05:6000:42c4:b0:390:de66:cc0c with SMTP id ffacd0b85a97d-3997f93c452mr2860509f8f.46.1742582569592;
-        Fri, 21 Mar 2025 11:42:49 -0700 (PDT)
-Received: from qasdev.system ([2a02:c7c:6696:8300:de5d:afa9:bb95:3f19])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3997f9b25c9sm3022597f8f.42.2025.03.21.11.42.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Mar 2025 11:42:48 -0700 (PDT)
-Date: Fri, 21 Mar 2025 18:42:32 +0000
-From: Qasim Ijaz <qasdev00@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, yyyynoom@gmail.com, horms@kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: dl2k: fix potential null deref in receive_packet()
-Message-ID: <Z92zGMsCPHCIbx62@qasdev.system>
-References: <20250321121352.29750-1-qasdev00@gmail.com>
- <CANn89iJ+VtuyB1tRLeNqVzx3ZpxEiusyfAJv855B90P2XcpDag@mail.gmail.com>
+	s=arc-20240116; t=1742584446; c=relaxed/simple;
+	bh=k/PBgt4a9h5ig/uH/xMlB6D72uDmaauMvOmb7yre5Sg=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=lsi5pE1hkN33fxss25OA+MwF4SpCHJnRwBFDGcrzjRARY1VLciQ8sZLKOAXK5A8bPQEzT/hhaSPWcRTRX90TgomMeaUmOxDQuFGcsF+iwqLfEW8OHDt6fnCypJkV4V93xNoPzaQIAPD2OvMhThSpULSbkolOulvgb1yaFta260g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=AYdMzyoi; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E6F2C4454F;
+	Fri, 21 Mar 2025 19:13:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1742584435;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=xcBqvduohD6gqiPxLsI52qzDZm7lLSAqNmPHQXXkRpY=;
+	b=AYdMzyoiVaWwgmUgyFKnzDYw3VV+1Z1ETfmA/Jc1sDbVffVb3a68IIos9v9ZoKZEEfFg1y
+	1oW2QtSxBMdBjhoyGg0p4RLJ3cxxMUq/QqcAmxhOYAAzBcsGb7w99o+OSFRzEqpkehBjFV
+	cASIaOo/2KB48KY1claSJKPEmoJVh42BKfySynrQausAa7xni8kFKJDy8juoeGXEanW2Ud
+	SlLqvcZ6ouv9GojEVqYEbRsNxi+zAB/SIcYTHlYYOWkgVqiyqFnqmLWftMrClX/650Fcq0
+	AVuFBRDRLl9GxBudXpfkTQtJX3yM8NAAvlvxNDQ6Oipwyd22/d/u/jLiANRb4g==
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Subject: [PATCH net-next 00/13] Support the Cadence MACB/GEM instances on
+ Mobileye EyeQ5 SoCs
+Date: Fri, 21 Mar 2025 20:09:31 +0100
+Message-Id: <20250321-macb-v1-0-537b7e37971d@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iJ+VtuyB1tRLeNqVzx3ZpxEiusyfAJv855B90P2XcpDag@mail.gmail.com>
+X-B4-Tracking: v=1; b=H4sIAGu53WcC/x3MQQqAIBBA0avErBPU0KKrRIvJxppFFhohhHdPW
+ j74/BcSRaYEY/NCpIcTn6FCtQ24HcNGgtdq0FIb2SklDnSLsAZ7j4NFr1ao6RXJc/43EwS6RaB
+ 8w1zKB0b7cctgAAAA
+X-Change-ID: 20250311-macb-65a7fa86af1d
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+ Paul Walmsley <paul.walmsley@sifive.com>, 
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+ Alexandre Ghiti <alex@ghiti.fr>, Samuel Holland <samuel.holland@sifive.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+ Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>, 
+ Gregory CLEMENT <gregory.clement@bootlin.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+ linux-mips@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ Tawfik Bayouk <tawfik.bayouk@mobileye.com>, 
+ =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+X-Mailer: b4 0.14.2
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduheduledtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhufffkfggtgfgvfevofesthekredtredtjeenucfhrhhomhepvfhhrohoucfnvggsrhhunhcuoehthhgvohdrlhgvsghruhhnsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeefgeevheeiveffieegudduieefgfejueegvedtgfelffevgfejheekveffudekueenucfkphepjeejrddufeehrdekuddrieehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepjeejrddufeehrdekuddrieehpdhhvghloheplgduledvrdduieekrddurdeftdgnpdhmrghilhhfrhhomhepthhhvghordhlvggsrhhunhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdekpdhrtghpthhtohepghhrvghgohhrhidrtghlvghmvghnthessghoohhtlhhinhdrtghomhdprhgtphhtthhopehlihhnuhigqdhrihhstghvsehlihhsthhsrdhinhhfrhgruggvrggurdhorhhgpdhrtghpthhtohepphgruhhlrdifrghlmhhslhgvhiesshhifhhivhgvrdgtohhmpdhrtghpthhtohepthhssghoghgvnhgusegrlhhphhgrrdhfrhgrnhhkvghnrdguvgdprhgtphhtthhopehkuhgsrgeskhgvr
+ hhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhhitgholhgrshdrfhgvrhhrvgesmhhitghrohgthhhiphdrtghomhdprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomh
+X-GND-Sasl: theo.lebrun@bootlin.com
 
-On Fri, Mar 21, 2025 at 04:13:04PM +0100, Eric Dumazet wrote:
-> On Fri, Mar 21, 2025 at 1:15 PM Qasim Ijaz <qasdev00@gmail.com> wrote:
-> >
-> > If the pkt_len is less than the copy_thresh the netdev_alloc_skb_ip_align()
-> > is called to allocate an skbuff, on failure it can return NULL. Since
-> > there is no NULL check a NULL deref can occur when setting
-> > skb->protocol.
-> >
-> > Fix this by introducing a NULL check to handle allocation failure.
-> >
-> > Fixes: 89d71a66c40d ("net: Use netdev_alloc_skb_ip_align()")
-> 
-> This commit has not changed the behavior in case of memory alloc error.
-> 
+Mobileye EyeQ5 SoCs provides two GEM IP blocks. The end result is
+working networking on the EyeQ5 eval board. It isn't just a new
+macb_config & compatible, here are each commit with a brief note:
 
-Hi Eric,
+ - Let's get the cleanup patches out of the way first:
 
-Thanks for pointing this out, I referenced this commit because it 
-added the netdev_alloc_skb_ip_align() call without ensuring the 
-result of it succeeds or not. Before this change the code used 
-netdev_alloc_skb(), so I now see that there is no functional
-difference since an allocation occurs in both versions.
+   [PATCH net-next 04/13] net: macb: use BIT() macro for capability definitions
+   [PATCH net-next 06/13] net: macb: simplify macb_probe() code touching match data
+   [PATCH net-next 08/13] net: macb: introduce DMA descriptor helpers (is 64bit? is PTP?)
+   [PATCH net-next 09/13] net: macb: sort #includes
 
-> > Signed-off-by: Qasim Ijaz <qasdev00@gmail.com>
-> > ---
-> >  drivers/net/ethernet/dlink/dl2k.c | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> >
-> > diff --git a/drivers/net/ethernet/dlink/dl2k.c b/drivers/net/ethernet/dlink/dl2k.c
-> > index d0ea92607870..22e9432adea0 100644
-> > --- a/drivers/net/ethernet/dlink/dl2k.c
-> > +++ b/drivers/net/ethernet/dlink/dl2k.c
-> > @@ -968,6 +968,11 @@ receive_packet (struct net_device *dev)
-> >                                                            np->rx_buf_sz,
-> >                                                            DMA_FROM_DEVICE);
-> >                         }
-> > +
-> > +                       if (unlikely(!skb)) {
-> > +                               np->rx_ring[entry].fraginfo = 0;
-> 
-> Not sure how this was tested...
-> 
-> I think this would leak memory.
+ - LSO has been observed to be buggy, even though HW reports it is
+   supported. We add a capability to force-disable it:
 
-Could you please elaborate on where you think this may arise so I can
-investigate further and try to amend it?
+   [PATCH net-next 05/13] net: macb: add no LSO capability (MACB_CAPS_NO_LSO)
 
-Thanks
-Qasim
-> 
-> > +                               break;
-> > +                       }
-> >                         skb->protocol = eth_type_trans (skb, dev);
-> >  #if 0
-> >                         /* Checksum done by hw, but csum value unavailable. */
-> > --
-> > 2.39.5
+ - The MACB driver code has an issue: the HW inserts two dummy bytes at
+   the start of Rx buffers, for IP header alignment (ie skb_reserve is
+   done AFTER writing the addr in DMA descriptors). But the driver
+   assumes that alignment is NET_IP_ALIGN. We appear to be facing the
+   first SoC where that isn't the case.
+
+   Happy to get comments & discuss the approach proposed.
+
+   [PATCH net-next 07/13] net: macb: move HW IP alignment value to macb_config
+
+ - We want cache coherent memory through a CM3 IO Coherency Unit (IOCU).
+   To route through that, DMA addresses must have BIT(36) enabled.
+
+   We do that in platform-specific code and hook our dma_map_ops through
+   a notifier block.
+
+   [PATCH net-next 11/13] MIPS: mobileye: add EyeQ5 DMA IOCU support
+
+ - dt-bindings improvements:
+
+   [PATCH net-next 02/13] dt-bindings: net: cdns,macb: allow tsu_clk without tx_clk
+   [PATCH net-next 03/13] dt-bindings: net: cdns,macb: allow dma-coherent
+
+ - Add the hardware to:
+    - dt-bindings: new compatible, new phandle property,
+    - the driver: macb_config, compatible and a custom init callback
+      (that needs a regmap to the system-controller),
+    - the DTS: both the SoC GEM instances and the eval board PHYs.
+
+   [PATCH net-next 01/13] dt-bindings: net: cdns,macb: add Mobileye EyeQ5 ethernet interface
+   [PATCH net-next 10/13] net: macb: Add "mobileye,eyeq5-gem" compatible
+   [PATCH net-next 12/13] MIPS: mobileye: eyeq5: add two Cadence GEM Ethernet controllers
+   [PATCH net-next 13/13] MIPS: mobileye: eyeq5-epm: add two Cadence GEM Ethernet PHYs
+
+Have a nice day,
+Théo
+
+Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
+---
+Théo Lebrun (13):
+      dt-bindings: net: cdns,macb: add Mobileye EyeQ5 ethernet interface
+      dt-bindings: net: cdns,macb: allow tsu_clk without tx_clk
+      dt-bindings: net: cdns,macb: allow dma-coherent
+      net: macb: use BIT() macro for capability definitions
+      net: macb: add no LSO capability (MACB_CAPS_NO_LSO)
+      net: macb: simplify macb_probe() code touching match data
+      net: macb: move HW IP alignment value to macb_config
+      net: macb: introduce DMA descriptor helpers (is 64bit? is PTP?)
+      net: macb: sort #includes
+      net: macb: Add "mobileye,eyeq5-gem" compatible
+      MIPS: mobileye: add EyeQ5 DMA IOCU support
+      MIPS: mobileye: eyeq5: add two Cadence GEM Ethernet controllers
+      MIPS: mobileye: eyeq5-epm: add two Cadence GEM Ethernet PHYs
+
+ .../devicetree/bindings/net/cdns,macb.yaml         |  25 +-
+ MAINTAINERS                                        |   2 +-
+ arch/mips/boot/dts/mobileye/eyeq5-epm5.dts         |  26 ++
+ arch/mips/boot/dts/mobileye/eyeq5.dtsi             |  34 +++
+ arch/mips/mobileye/Kconfig                         |   1 +
+ arch/mips/mobileye/Makefile                        |   2 +
+ arch/mips/mobileye/eyeq5-iocu-dma.c                | 160 +++++++++++
+ drivers/net/ethernet/cadence/macb.h                |  51 ++--
+ drivers/net/ethernet/cadence/macb_main.c           | 309 +++++++++++++--------
+ 9 files changed, 470 insertions(+), 140 deletions(-)
+---
+base-commit: ddf9c6d982ae7472a4da982e0497be2a140a194b
+change-id: 20250311-macb-65a7fa86af1d
+
+Best regards,
+-- 
+Théo Lebrun <theo.lebrun@bootlin.com>
+
 
