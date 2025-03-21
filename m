@@ -1,255 +1,232 @@
-Return-Path: <netdev+bounces-176839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE31EA6C619
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 23:52:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6340FA6C646
+	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 00:13:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE144189E9DC
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 22:52:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 535F61B60D23
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 23:13:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06EE91F3B8F;
-	Fri, 21 Mar 2025 22:52:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FB441F0980;
+	Fri, 21 Mar 2025 23:13:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C0KStnWk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hRNc6Zr+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CCB028E7
-	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 22:52:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742597526; cv=fail; b=MJDP3dWZw9llV4W1O53OhoofNQRnPVBOxw3qeBDZUJesMBkKgjw5oz4Ku5zcbGa3qXQeUIWmWYCRGn0q2XogzmBMP/Gr+lORNlroYtWG/PanML0nQlRZMjsAJvG21zmi/0pWqS97PTYDqRKLkpsWInbfXzFj/3VA3bAVI1uuXGA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742597526; c=relaxed/simple;
-	bh=IiXK/iDfqrqi4RlbuTVGYeQPYHFmw2csO20rweaT5LA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=arCXGfLUKrjegqlWpAqmkzwBfJHz2V+TjctgGPf+kRAm4DQpSlXYkM4dzB8wjU5zZ9vmYLytjMZ9qRkiD//M9vJIUfbJSEdmYea4REMhNczxpRc3ENMdehDeiHQtSrcZtsW6mvIm0YfEV2bjKXtFQ5XIEQKp1VtUQ/lqtwnSjYc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C0KStnWk; arc=fail smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1742597525; x=1774133525;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=IiXK/iDfqrqi4RlbuTVGYeQPYHFmw2csO20rweaT5LA=;
-  b=C0KStnWkzEkraEznHzKoRjxpMIzookS1Z+rAqh/AaQACWfwCC++Ov0UQ
-   tGzOU1ML3jGHZcscLtL47Mnr2J2yYRoHpOGUpTB7P5bI2cF0wz0ZUlRVQ
-   VYcBHjxeA1ndouDZRnpv4t879SdJDVoSUMqchhYtv38Zsf4PsHckigpEy
-   Ezuq0i4tRM+STHSkf7+ajY1kkKxAZt9KxbOyuTEOqhEV+/ZVvXoTYBW+h
-   aGEJENOrwPOpMTThIoVMsY1LA7Q7Qny/Y5XUFt/XkPnknXFvyVQQHpziA
-   m8/Gs2JVBGxHWNPkuYi/ikttqbyB8N0zB5efpyLkm0VtkKf4ydPH6zLno
-   A==;
-X-CSE-ConnectionGUID: 5AUkn+7cTbqIuxLE72TMeg==
-X-CSE-MsgGUID: 8eHLbzFBRs2KH8KtfwigCg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11380"; a="44037935"
-X-IronPort-AV: E=Sophos;i="6.14,266,1736841600"; 
-   d="scan'208";a="44037935"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2025 15:52:05 -0700
-X-CSE-ConnectionGUID: huTF3Vu9T4GFoi3+D2zkyQ==
-X-CSE-MsgGUID: 33znW3rDQ96WhvGISPnz5A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,266,1736841600"; 
-   d="scan'208";a="154420674"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2025 15:52:05 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Fri, 21 Mar 2025 15:52:04 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Fri, 21 Mar 2025 15:52:04 -0700
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.47) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Fri, 21 Mar 2025 15:52:04 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cOjn1XddmLyh4JQLm3hXE/FOsDh4dokwml4uJHNBDBCNSUQnItamm8oT0L6kYstyDWDaMoy4XRwDs4q6mX2MC/m7/mqH7kV0nVV2Xr2MBm0KO5ywftFI9mPcdW9lTZFltSVOjpQp12nrF9yY+DdD+WujtxS78K2nH3XmoQf4inl971HzpQ+atE4dXJ4N95tYB9enhBEqaPnE01W84CwoBSLMa1X16g6xEJLoLVI/MaUopZd4uvVDd/m9dqGveGC963b18vTLTAkpdiFlmvf8O6JnO6Dtyc4PXPEeCPwhTn3mKLbKZGstrxX8l+/9SN5IQ2Ya2BYV/4gej91YU0LQFw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Q3QD+BHj2MtWOgylbYdhSTqwdqKZTMua+A7Zlovxp60=;
- b=PCZ8vM9fmnpOflu5JtK7zNBpHojPvRxPEvMAP8kLkWpUf6CVR80WYrKHXalqmLEyzOGyw4B0/gZCSv5WVPHTXrEJ7aw4XBO5PE2ZXGTr1r11cdf4kNOMoEvKNpsyP3s/EidP44HxUC/IXV4BRf7qftOwEA2bChC1t477uZ+Zvz8n8fK5Kw6eQyGbE7TjTGOdw4gRd42MWV74tAval4xFcZgSEl2w/YsMd0eLYDfpjWBhL+UI7ESM3rOPfrWrg16eOMqlwA5hH1V9TXnIyUw7eTqt0T+ZCcVey6+VCTO6tEnQvqRszKvuVrL12som52q054vWiqjyfBC+cuDBRUm4Qg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH0PR11MB5095.namprd11.prod.outlook.com (2603:10b6:510:3b::14)
- by DS7PR11MB6103.namprd11.prod.outlook.com (2603:10b6:8:84::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.37; Fri, 21 Mar
- 2025 22:52:00 +0000
-Received: from PH0PR11MB5095.namprd11.prod.outlook.com
- ([fe80::215b:e85e:1973:8189]) by PH0PR11MB5095.namprd11.prod.outlook.com
- ([fe80::215b:e85e:1973:8189%6]) with mapi id 15.20.8534.036; Fri, 21 Mar 2025
- 22:52:00 +0000
-From: "Keller, Jacob E" <jacob.e.keller@intel.com>
-To: "Kubiak, Michal" <michal.kubiak@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "Kubiak, Michal" <michal.kubiak@intel.com>,
-	"Swiatkowski, Michal" <michal.swiatkowski@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next] ice: add a separate Rx handler
- for flow director commands
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next] ice: add a separate Rx
- handler for flow director commands
-Thread-Index: AQHbmnPzxWwYq5cBOk6SoJiHvT4k5LN+Mp4A
-Date: Fri, 21 Mar 2025 22:52:00 +0000
-Message-ID: <PH0PR11MB50951C507DD78731384B7A25D6DB2@PH0PR11MB5095.namprd11.prod.outlook.com>
-References: <20250321151357.28540-1-michal.kubiak@intel.com>
-In-Reply-To: <20250321151357.28540-1-michal.kubiak@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR11MB5095:EE_|DS7PR11MB6103:EE_
-x-ms-office365-filtering-correlation-id: 86ed5905-c598-4c97-ebab-08dd68cafd9a
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7053199007|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?qrnuF79pwN6g3+LEo6DUYxxezJAqFQQrS/zgr4upukfs0JL0xLWA9Co5lAw7?=
- =?us-ascii?Q?HwK06F6yvOmCV1YH0zStic4l1FqtPHDlKfLCy3EwMZydHyYIZjyCtDcqm+vi?=
- =?us-ascii?Q?yX0toYm2IiI02p6hPm1lEjKpNMjwh1mFmD1OUcfrn8uakN7PnOiKlBkXsb85?=
- =?us-ascii?Q?d93aLtXuDAhfGyPbVNRCJG242pdRejQQmG4l7qUDGQs5Ne5Ehkd/TT3W1M/R?=
- =?us-ascii?Q?HSDvEzyVXA1sV9zDbGI0qgeZdTYQSBzX6IJ6mkP8CluN/w07diYfITJ+3Pjr?=
- =?us-ascii?Q?xRu7xOeV7pHgjwPdAyvXS+jXUIkBKtXMXm5mzsrjQ1kvVigpime+k5VzN2A4?=
- =?us-ascii?Q?AvwCgBfkohaGN04ri8JxjTF06aLB8g7M5plq2wiH74CtncUI8vdESATjzcuQ?=
- =?us-ascii?Q?RZx4M2XH4YQbwqXzD1L20FKYixTeF5Wy5mKPZOtg158+V4St0/opkvmgnqTc?=
- =?us-ascii?Q?9lvrL00PouFGOfBMcLCzhMOVvLEHGrKTa6jOoW05T7DjMhHvAeVrUl1Y3oVV?=
- =?us-ascii?Q?Z6hhLmtN+b/SwR4g9S9VPJ4yWCibMDmrCM8QGSPP2pBCeB5AJZ9djb3yF22W?=
- =?us-ascii?Q?G+VfA8NzgrTA9YymUwDm1o6gZUEUrQcR5beIeZ6J5ClwQ3DjlLQZEPep4z6V?=
- =?us-ascii?Q?nhAJwtd5Clf240eUHpHYnSpCmsUM9ncp5TIPVqvMgU49efBwaGPsXFTxtmKr?=
- =?us-ascii?Q?lWNc51mADs380Nh3Re/r1LHMQQhsrMyts6hMGv93ZUXkDmdz875vReErdzy3?=
- =?us-ascii?Q?nR8EomwIdBA6v0XApO9MGY1VRuL/EPXBL5s0LitfnzNil1uE29qKJ2dZ+aDL?=
- =?us-ascii?Q?9lL3Tftt7yulm63e+sSdbQEKkxuEDY6Xx8XYWdLTmsPzxB/1GmfnfHP18upd?=
- =?us-ascii?Q?lwEZvz7iW7UBZ6XBLp1tO/ajET5rSINROYs6ybtT2KQIdEy0h19hvBEOe5hz?=
- =?us-ascii?Q?RcT5dGCuJd0qcMaEmAoiWET5bgnYeBXIdTF8z4Gjz0kJGQvoFVbBLEHN+Ezd?=
- =?us-ascii?Q?FjXzJFyhnXXCWBZpzSHKD2nyLlnRESa/iRW8pI5+XcqQL8Oi7CC5nujbK34H?=
- =?us-ascii?Q?2fJAiX3yYV1GKEopxzBccgCNP4q6N9icJPJdmEsIzJ6xl530qpj8cYJaoX1z?=
- =?us-ascii?Q?TOq77XyJfx0E1ZIlT8SRyadhpuBLAHzM6t4W5RhigqsS/o9fgBx37XpN/m5r?=
- =?us-ascii?Q?uPp7HEo8LDol9hio7J6PUxto+TOuHq0K4QhbU5YHaBngUDsPqYq2ueS0o5ou?=
- =?us-ascii?Q?OXwXnE+l4GNQq2MWg/gevcTG9SBjZhaTG8sEPqzKAp4X6bPi09d70xj5tQfT?=
- =?us-ascii?Q?+Ar2tDPloXVA+hoNZv7+Ycrzp03OBXQDsNT/BuyCazK/XBTTzX81AUaFl0Ul?=
- =?us-ascii?Q?Dtg1Tl0WCqnPccR1ftFI51DOxDmDcDpwUClR8pTWLsz1N6qUjMHGUibs/+2e?=
- =?us-ascii?Q?eGKHAo9QJ35Lrl3FwdpKBdB1iZIN93OQ?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5095.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7053199007)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?nInbLU5pSbUq9KakKcn3PjwkMxvze+AOq8V6U0N9fYYC/jOX88etLPdrl5Eh?=
- =?us-ascii?Q?AhU0HaE0DoBMZWIPQgcyZ3/744vthlY9s/3xKKjhtAr2uB7TvEk8JEUaGV25?=
- =?us-ascii?Q?Y+bYrawLRAtJtUTqNm1a0H/z8ru/5YEm69+Ft0Cagld2gfUju6ZuPnNs2SGB?=
- =?us-ascii?Q?tiRvd3msbcydOEM0mwJsA1otYe9MwCeBoC57k6wlY3Q7Uygv8ggGyfXd7utg?=
- =?us-ascii?Q?O0yPwla7pTtZAY5tBFKlK7r8MeGEDap+CmhpWXbfsCwx0DOpY1Rkxxis0Uxg?=
- =?us-ascii?Q?Yq86X3B8XrEqB5/Jn+DEyI3tHeX55eZQ5XZW3hSprllrXCBt8wyS7ayYZbTv?=
- =?us-ascii?Q?Fk4mTkg0k9k6V+ycF7pW6gWbM4LeurmusRsgN/JWeFGQmPRQIvznavq4Fflq?=
- =?us-ascii?Q?G+xA0Mnt3yw5cd4D9+5vBi1cG5uf5MZjnlnsb+UDTQCKnrv1J+11ERykRMJk?=
- =?us-ascii?Q?/WbQtfRCkD/oFSxBYKhtSm96xlXEioAqyNli3kHsqhUL9nDC+LvzoPBeotEN?=
- =?us-ascii?Q?4Xz44nsn1I9J85J9dY0vRtkAasV3hnJLGsNwBxzo4Rzf/c63d7VlOVlQOo1z?=
- =?us-ascii?Q?iJlQ9GrrSoQwUj+Yh6e8hp8eIOQell0NhwZiKp9jVbac3y5MfwpIu6I23IeB?=
- =?us-ascii?Q?WfeNUvGbJUy/J+Cggl36ecVRm2aTpEPFPMSGemXZTQ9jsCytI7hd9QyDkmkE?=
- =?us-ascii?Q?JFHbU5uBBg7I+oqHN0bF+VD8rlEJuVXLWXUt3rA36Oa9q8Fc1CysGVx/mFYu?=
- =?us-ascii?Q?HUc8ZO8ZMHXJyqiMVJStZH48ZmtAKRxs5uzPQCuoKb1ghnnwOueFWKlsNYje?=
- =?us-ascii?Q?gbiXF2GMq1bDt8qLXrF0CZS2BwP6qv2iwmxay1lShSNb+E+qILZyA2hJ8REQ?=
- =?us-ascii?Q?2kfe+9ZkNarHtRlOZsaAqnkjlUX7xOTtE8i84iXvxsn1bACvtJGdqLSZttOc?=
- =?us-ascii?Q?c3D1ikdXFF98rDDYsA7cQQHshszOuNKzQzW5RS6w8rdtngLwgi6NhtIPpzsK?=
- =?us-ascii?Q?tJPf1A6gXgSgdj4gvVX1JMYMLOPU4dXWKF7LL3G3y3lj+QIWYSIzemqo+59g?=
- =?us-ascii?Q?5vwMxaSysKu7wVqV+UEMjS6rmwZoLJsXJH70mLPxFgWR/t22xfqcB9Ul6XKu?=
- =?us-ascii?Q?d62cRgYQfPU1UvGs3oW1533Ojmya+OWROpELWfJ/f/MNxvWT0NR2GwEaXpzL?=
- =?us-ascii?Q?y5s6RQ3fXg38f5BtgIeUkMac5IUFyTtwGrLme5cK8NwQplgG3NrQy5dXbzfE?=
- =?us-ascii?Q?YMx4z8zdMMYTDf1s+j3h3uLju5xrRY5DLgXgGOHISX+aUNbJ9cG0oFxHrIJP?=
- =?us-ascii?Q?7pdnIa4keDfFX/CZNqcWFGYzyq7/wnZK7lWwz9Tq6MkVaV3j32D1G7nvVTaF?=
- =?us-ascii?Q?5G/rP2GUeH4pLKlz8U9N8A5yATZdA5MMzEwHsZPk1N1SlOhFNKjpZd+OYLnf?=
- =?us-ascii?Q?ZdZAcWM+VqRJyq/MfycD+fmXtwobyCSjukYmxA+pSSkI6bKNanww/5af/bzv?=
- =?us-ascii?Q?uOG9qPyQpoJQfP5n/A2RIH28cRvd8Zh1bUXTYC4k1iVJ5kwib3ePc/vvSFgm?=
- =?us-ascii?Q?ZHEc00dhFmZbqLHt1BfQmRVTyJD+Vdyd2kXBuj6a?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8C3E1A841F
+	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 23:13:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742598812; cv=none; b=Sltu4h1jGxuMysZspPqevfPWOa8fCycxcBF1KCaYrmBE8Sj+biLkduuxOYfDp8mToJdrI9ljVEbV4bMgMSgJTqsRahq7Uuhg8wIsMAquLip6tjHnmXJaqzUSZaPmxv8qhxkXBmeGTYbrNFh2Ls4+HwxYX7IwN4sXcNcRyh65Lr8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742598812; c=relaxed/simple;
+	bh=uFn9cls7wPw1ExWDyl25jEWNwCiGXwygOKPkcriR1wU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SJqUE7PJ0RYzx8kHRo/8/fZ+6SqXWuZov2Uqb1Iku5M++Z/EFmMmrio1+q498FUrrtfEHjW4Tw8iOSe4cMm+eIAI0dD6tjRQgjSEkXyaNbmiCNXmqgXemhCM068bF3ttAc3l3fRf/zIiv+6VrNmi/BHo/HwtvSEjj2Kwv02QNe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hRNc6Zr+; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2240aad70f2so83285ad.0
+        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 16:13:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1742598810; x=1743203610; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FbvnD5haxTLytS47gBGUy0pWnlYckQ3OAvL7U1cwfUA=;
+        b=hRNc6Zr+J2FR/l+FdbH6+wHqEmNWj1AgvX/7VCBHNbn6TGlNtqjMPswbjvaENJvuHe
+         w5jQYuTqbMdCOJiNti3cDrUjdn7D83i+2oOfkNjKywerYNoNElg8oIgapMu18DnvEoYh
+         ik48aJHTiRvWDl4dkN25gIuEq0qK1ccIqolUEopL8p+I2usOgXRdCkHIxEjPbuawhr2a
+         pz9TnUnCkpyMV/p9TcnfYNTx5xLIqhYdigOkDZnTGqe7FGisvadvpRuqsH4kQ7xHx6eq
+         aHZS5DmkRQWwdaDn4pZaVu50h13iOoLteyObxOY/ytQOco4otttVVZx5lYMm/h9lBvn6
+         OR9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742598810; x=1743203610;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FbvnD5haxTLytS47gBGUy0pWnlYckQ3OAvL7U1cwfUA=;
+        b=VqohXlf1H/Xi6BGi3l3aqaIkWrHwUooqOIfXImBEL7TDFXlqiWhlKdU+9z/iLdBsH/
+         SAlYBsLVmQF1dbBix61GbJYacJvEsX/UWjnmQ5svmiJ2sDCq6UahjrnhI9YY9e15NoYq
+         DcI8Eh9qyLLMVqI0bQ9zEEoyR0vWVTdOOIMFPeKOTvA4c0y++CBkLr5zb1dC3jqAHz5Q
+         DtLxM/y3jqWJn6TJwXn5v6cW36PNYw0zWgw0NhYs/QN83u5+ZQmaN52G+yyl/9dr/ckO
+         SV1gErZN+hHqHY/9bXN8jUoVuSjUyJw27JCQxau3UuejpE1lxDF4CtJ/EW4u6jivVXDF
+         /Nag==
+X-Forwarded-Encrypted: i=1; AJvYcCV8VULt5sL9beAL8O/y/6ipFDGFXDiIi00Pq2fpSEWvWlZsQjBLk9WwVnupabgb2MtTjRn+62w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1ojrd4CKTaiVagCeQOJ/btC/N71JoMkRtGOhUYjYfVFR08Xsj
+	FjkEDG7V2etFqys3yBz1S7Db1pi/z8mE1dznoafrVp3SJ7PewQXaC9lBBTeVC457nY3bHjrq64X
+	7uVkp1I6yMvdXG1tm2ufY69F9h9vYMql60S07
+X-Gm-Gg: ASbGncuVh4wQP4LemhZjhu3jgoqqXYMOdRO/w6SURfDvfP5B3TFM16eehIBz9CSi3Yx
+	ao1uacITTxZtcaO7KSk7KSFtGU2Id9Rs6CzdD5tyDoNsYPb0cewNiVntAWupTR6vnAo8R0fl+hP
+	lSuDmXoRgx227h/sPNUOVD72SlhTKKCDE4ghN+3nRbeXoETbqpLhs2QCQ=
+X-Google-Smtp-Source: AGHT+IGJfNj+BTaeUb7CmreHUKO1/d5/Yp0KjN22BdNR7eOnswfJOKqQxGDzzhLFJBXAju2i6SyYA+NISPX0wGE5064=
+X-Received: by 2002:a17:903:234f:b0:21f:465d:c588 with SMTP id
+ d9443c01a7336-227982bcf17mr1141275ad.14.1742598809765; Fri, 21 Mar 2025
+ 16:13:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5095.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 86ed5905-c598-4c97-ebab-08dd68cafd9a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Mar 2025 22:52:00.3803
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: LNl0s8c24Re+SxcbTURZ1Tdrz+a530oYShEHWFFvE9j769DZNzfNJXxyZjhywJuB100TSXTFw0IgE3CPmR9pqhzpkoKMAgfq/Esmh64Hgig=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6103
-X-OriginatorOrg: intel.com
+References: <20250314-page-pool-track-dma-v1-0-c212e57a74c2@redhat.com> <20250314-page-pool-track-dma-v1-2-c212e57a74c2@redhat.com>
+In-Reply-To: <20250314-page-pool-track-dma-v1-2-c212e57a74c2@redhat.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 21 Mar 2025 16:13:17 -0700
+X-Gm-Features: AQ5f1Jr3pNjB7nwYsq0njhmiKzooW96U1O7ADhvC9S4zs33ypykXN0QQc-_3wro
+Message-ID: <CAHS8izNPLnbZ-M=367k7H6OYts7RXbcDpbrWy_p37=62LsYYcg@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/3] page_pool: Turn dma_sync and dma_sync_cpu
+ fields into a bitmap
+To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+	Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Simon Horman <horms@kernel.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Yonglong Liu <liuyonglong@huawei.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Pavel Begunkov <asml.silence@gmail.com>, 
+	Matthew Wilcox <willy@infradead.org>, netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Mar 14, 2025 at 3:12=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen <t=
+oke@redhat.com> wrote:
+>
+> Change the single-bit booleans for dma_sync into an unsigned long with
+> BIT() definitions so that a subsequent patch can write them both with a
+> singe WRITE_ONCE() on teardown. Also move the check for the sync_cpu
+> side into __page_pool_dma_sync_for_cpu() so it can be disabled for
+> non-netmem providers as well.
+>
+> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+
+> ---
+>  include/net/page_pool/helpers.h | 6 +++---
+>  include/net/page_pool/types.h   | 8 ++++++--
+>  net/core/devmem.c               | 3 +--
+>  net/core/page_pool.c            | 9 +++++----
+>  4 files changed, 15 insertions(+), 11 deletions(-)
+>
+> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/help=
+ers.h
+> index 582a3d00cbe2315edeb92850b6a42ab21e509e45..7ed32bde4b8944deb7fb22e29=
+1e95b8487be681a 100644
+> --- a/include/net/page_pool/helpers.h
+> +++ b/include/net/page_pool/helpers.h
+> @@ -443,6 +443,9 @@ static inline void __page_pool_dma_sync_for_cpu(const=
+ struct page_pool *pool,
+>                                                 const dma_addr_t dma_addr=
+,
+>                                                 u32 offset, u32 dma_sync_=
+size)
+>  {
+> +       if (!(READ_ONCE(pool->dma_sync) & PP_DMA_SYNC_CPU))
+> +               return;
+> +
+>         dma_sync_single_range_for_cpu(pool->p.dev, dma_addr,
+>                                       offset + pool->p.offset, dma_sync_s=
+ize,
+>                                       page_pool_get_dma_dir(pool));
+> @@ -473,9 +476,6 @@ page_pool_dma_sync_netmem_for_cpu(const struct page_p=
+ool *pool,
+>                                   const netmem_ref netmem, u32 offset,
+>                                   u32 dma_sync_size)
+>  {
+> -       if (!pool->dma_sync_for_cpu)
+> -               return;
+> -
+>         __page_pool_dma_sync_for_cpu(pool,
+>                                      page_pool_get_dma_addr_netmem(netmem=
+),
+>                                      offset, dma_sync_size);
+
+I think moving the check to __page_pool_dma_sync_for_cpu is fine, but
+I would have preferred to keep it as-is actually.
+
+I think if we're syncing netmem we should check dma_sync_for_cpu,
+because the netmem may not be dma-syncable. But for pages, they will
+likely always be dma-syncable. Some driver may have opted to do a perf
+optimizations by calling __page_pool_dma_sync_for_cpu on a dma-addr
+that it knows came from a page to save some cycles of netmem checking.
+
+> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.=
+h
+> index df0d3c1608929605224feb26173135ff37951ef8..fbe34024b20061e8bcd1d4474=
+f6ebfc70992f1eb 100644
+> --- a/include/net/page_pool/types.h
+> +++ b/include/net/page_pool/types.h
+> @@ -33,6 +33,10 @@
+>  #define PP_FLAG_ALL            (PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV |=
+ \
+>                                  PP_FLAG_SYSTEM_POOL | PP_FLAG_ALLOW_UNRE=
+ADABLE_NETMEM)
+>
+> +/* bit values used in pp->dma_sync */
+> +#define PP_DMA_SYNC_DEV        BIT(0)
+> +#define PP_DMA_SYNC_CPU        BIT(1)
+> +
+>  /*
+>   * Fast allocation side cache array/stack
+>   *
+> @@ -175,12 +179,12 @@ struct page_pool {
+>
+>         bool has_init_callback:1;       /* slow::init_callback is set */
+>         bool dma_map:1;                 /* Perform DMA mapping */
+> -       bool dma_sync:1;                /* Perform DMA sync for device */
+> -       bool dma_sync_for_cpu:1;        /* Perform DMA sync for cpu */
+>  #ifdef CONFIG_PAGE_POOL_STATS
+>         bool system:1;                  /* This is a global percpu pool *=
+/
+>  #endif
+>
+> +       unsigned long dma_sync;
+> +
+>         __cacheline_group_begin_aligned(frag, PAGE_POOL_FRAG_GROUP_ALIGN)=
+;
+>         long frag_users;
+>         netmem_ref frag_page;
+> diff --git a/net/core/devmem.c b/net/core/devmem.c
+> index 7c6e0b5b6acb55f376ec725dfb71d1f70a4320c3..16e43752566feb510b3e47fbe=
+c2d8da0f26a6adc 100644
+> --- a/net/core/devmem.c
+> +++ b/net/core/devmem.c
+> @@ -337,8 +337,7 @@ int mp_dmabuf_devmem_init(struct page_pool *pool)
+>         /* dma-buf dma addresses do not need and should not be used with
+>          * dma_sync_for_cpu/device. Force disable dma_sync.
+>          */
+> -       pool->dma_sync =3D false;
+> -       pool->dma_sync_for_cpu =3D false;
+> +       pool->dma_sync =3D 0;
+>
+>         if (pool->p.order !=3D 0)
+>                 return -E2BIG;
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index acef1fcd8ddcfd1853a6f2055c1f1820ab248e8d..d51ca4389dd62d8bc266a9a2b=
+792838257173535 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -203,7 +203,7 @@ static int page_pool_init(struct page_pool *pool,
+>         memcpy(&pool->slow, &params->slow, sizeof(pool->slow));
+>
+>         pool->cpuid =3D cpuid;
+> -       pool->dma_sync_for_cpu =3D true;
+> +       pool->dma_sync =3D PP_DMA_SYNC_CPU;
+>
+
+More pedantically this should have been pool->dma_sync |=3D
+PP_DMA_SYNC_CPU, but it doesn't matter since this variable is 0
+initialized I think.
 
 
-
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of M=
-ichal
-> Kubiak
-> Sent: Friday, March 21, 2025 8:14 AM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: Fijalkowski, Maciej <maciej.fijalkowski@intel.com>; netdev@vger.kerne=
-l.org;
-> Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>; Kubiak, Michal
-> <michal.kubiak@intel.com>; Swiatkowski, Michal
-> <michal.swiatkowski@intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-next] ice: add a separate Rx handle=
-r for flow
-> director commands
->=20
-> The "ice" driver implementation uses the control VSI to handle
-> the flow director configuration for PFs and VFs.
->=20
-> Unfortunately, although a separate VSI type was created to handle flow
-> director queues, the Rx queue handler was shared between the flow
-> director and a standard NAPI Rx handler.
->=20
-> Such a design approach was not very flexible. First, it mixed hotpath
-> and slowpath code, blocking their further optimization. It also created
-> a huge overkill for the flow director command processing, which is
-> descriptor-based only, so there is no need to allocate Rx data buffers.
->=20
-> For the above reasons, implement a separate Rx handler for the control
-> VSI. Also, remove from the NAPI handler the code dedicated to
-> configuring the flow director rules on VFs.
-> Do not allocate Rx data buffers to the flow director queues because
-> their processing is descriptor-based only.
-> Finally, allow Rx data queues to be allocated only for VSIs that have
-> netdev assigned to them.
->=20
-> This handler splitting approach is the first step in converting the
-> driver to use the Page Pool (which can only be used for data queues).
->=20
-> Test hints:
->   1. Create a VF for any PF managed by the ice driver.
->   2. In a loop, add and delete flow director rules for the VF, e.g.:
->=20
->        for i in {1..128}; do
->            q=3D$(( i % 16 ))
->            ethtool -N ens802f0v0 flow-type tcp4 dst-port "$i" action "$q"
->        done
->=20
->        for i in {0..127}; do
->            ethtool -N ens802f0v0 delete "$i"
->        done
->=20
-> Suggested-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> Suggested-by: Michal Swiatkowski <michal.swiatkowski@intel.com>
-> Acked-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
-
-This is a much cleaner approach!
-
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+--
+Thanks,
+Mina
 
