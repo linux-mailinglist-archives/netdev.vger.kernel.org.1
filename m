@@ -1,206 +1,116 @@
-Return-Path: <netdev+bounces-176693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC9B6A6B5F9
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 09:19:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A82EA6B603
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 09:22:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58D483A4A45
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 08:19:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA63246096C
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 08:22:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D23BB1EEA39;
-	Fri, 21 Mar 2025 08:19:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62AF91EEA39;
+	Fri, 21 Mar 2025 08:22:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="aLPVoWd3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lzRxNW1P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F30AC1EB19D
-	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 08:19:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97C408BEE;
+	Fri, 21 Mar 2025 08:22:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742545187; cv=none; b=hzi9GwApIKij/GSTvyi03s0uNyzzUceCgJHfqmcAHFr/vEJ0TF4Yhxf4TstNmQhTLp6UGe8dGhXKmaKswiWxifko+exSPU+dkU+LMnFil/t4yAiTtB0wa3Lj5e62RMjVOznufHVXXuq/NejkhITy5RcL60UXlHW3NbL+c3fM1yM=
+	t=1742545374; cv=none; b=mcSr5l4MpOsslFhyBioyabcsowSeibzTQ6MiM4lMWy72/htueO4sXwrxH614+b/XuRIvXmhezCAHrgnHzehKI9/rx/tjIuk5L3XZGkVH5Y+Ps7CMa2wgkm1yUDL+3f7D2WhF+Qd32J4y/55v1164qA4wxCye4qgURMUh44SpyWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742545187; c=relaxed/simple;
-	bh=nBV0rhKS0xwWV81nt7VVhHciBFvCdsWmzY+TP+fKKGg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ISjId2zoefmtetlMjeBGZtWR5XrLiovQPUdRcCP3vfFtjiz8FFpnSzY0ibGIQ0TGxOoFRmiyW153wbBH6u3N3fr7ISRvKlBpjGq0LlDchD6FZCiu30v6NM/17yjGw/CbLmxUZYqsbi/+H+nV3RS6WhmUVP+ALnb8+VXuTbl99Oo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=aLPVoWd3; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3965c995151so851299f8f.1
-        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 01:19:45 -0700 (PDT)
+	s=arc-20240116; t=1742545374; c=relaxed/simple;
+	bh=FiR8bNoSbo2/6XqM1Ojy1oJbP3xb2ESxDx0nOMrezt8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fFxrXlLrXp7RZ2bd5kjQIZ9SRYscxNVJZK8M+1HVa/3WF4+z401kCPskD0ArKK0gxImiaQ8uCin0kG3jtBMFbBFGRz16jgtrOq78msRgAc3yv1dINzVYK0MFBCftsBq3zYeZa9ssUV1Cvdr/vo4fGs1f1T9XUGeRKZ8eNXGgNOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lzRxNW1P; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5e5bc066283so2512292a12.0;
+        Fri, 21 Mar 2025 01:22:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1742545184; x=1743149984; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=S1AzRi6eHoS6ZWFDX/LO1TVYvjTJRBljJTiN5ZXvzYc=;
-        b=aLPVoWd3U6p009QWrN5VlVRC40GWsvhuuXrXpFQYPompGgcukrKZHCL90ju7QPLyCe
-         npjoDtE4tczYioJKPoNY2xqbNjnA3P4iGdreET956cU4VTDtiFelLCr4Pjbu7Pl8l/zL
-         jc97tgo9KrniWcj6Ky7hXfabwJRrQ3MKv+ZyfBSJXPzlTLet2o6lxe2E2eYauKixTer4
-         ELHmjqlXFWhfTW2Zu7zLbaJ1oW5JG5mdtwvmOlSw8x4+UxLfJD1nNgxSwvVadLE3c/8X
-         bv/KtCq105pWKivkbWOd87lCYYnkdBBCs5GqO/tPmrJTIro4NT7iM4rPOp39vMuAsgGe
-         +3CQ==
+        d=gmail.com; s=20230601; t=1742545371; x=1743150171; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V5EB1Q/bNPzxlpAWO7o5BWpROZju3sVEZNDvgPYV2Tc=;
+        b=lzRxNW1PsVaZYqzVxu2S+PVvkyRmGOwQpd2uLl0S+Zb7HZljiWgTKSUcb1+LQeU/Ce
+         4wtBoU6yValehH5TVcpcECyPzPLwH86GqEDRPipl1en0kTJh/Uo3Y2mOVweEYs90XI88
+         fr6SbF6dZ23r/OLFrCBpgHhBYdYAsu1AJYwGKx34cNijWFw28Hkr6Kgyuq8UusFMa1qs
+         Tp6aV+0zCGZKtmu9ZvqJD5p9r8aecfa387fMgUKsEpPRwxkJ+xTBVjugQDje905mH2iq
+         aaFr6goNkXitjGEFRGG++o2oeZf84gUW10tIzU+A3Q1vOZ381nTDqKrsXIDs4otX/FrR
+         IFpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742545184; x=1743149984;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S1AzRi6eHoS6ZWFDX/LO1TVYvjTJRBljJTiN5ZXvzYc=;
-        b=HP/vVnVSFH0EteHJmhbfP2xyeU7y/woWsYvgw60MB7EKNHWZ+akzZFJbSKG8nLHSWk
-         j3b5dcjiXjV6LqZgmCu9TWxJEd6YsPs7pp3a3U9wzfXKIz/pqBF7MeglNR27hTj5k0ul
-         sUWDSIE52YA/HLw75Unp+8ZXDRgdQWyi2DuQDBuXdCab+C9glP0Ddz9y7sL6n1o1cH+m
-         Moqp3N3pKXAnbn4KaCny19x9Rxv5RFs02iHTvTZX2XJLxFxE29x1hV3fsCXaqRB0F8EQ
-         b/KLA1mg2FHRna8rk2+Ieui8gLj1PBiYIoPsFzn9WMdJzP6Po1jTuEsix+3ShztRIjo+
-         EiTw==
-X-Forwarded-Encrypted: i=1; AJvYcCUZZIMxPyBnKEiAkivLf8ZpXr1AVTvCHDUP3d/MSqp2XjGYYzesRdvD2900DeFBJUVVmZSWF0A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwntP90sFo5boFvuNh2wMVjF153lRs3BkUBSL+kzWrME0KkpmYf
-	CM7PySGJKHZ6ovg7B5vvYy8oyRpB37wqb0RoYqPy7lhrJwl+tUmg8O+Lw+TAyVs=
-X-Gm-Gg: ASbGnct2wzXIhlrUWnMR75AIDfOf2WOgOzNRfG0WOsQOI3JzOkgXXacOBtIriPjxysi
-	bsWhKPjUxYxbzryzRov0J/2CErVwT1za7Y0tntqnFmwDQM0XC7Eh34+zYBGw15WqSjhAAn3zxCJ
-	yt2UeTmqUnRDSXfXKUBNyPNaOlNEy35Ue9cog0oFpoCD/ykOuAMYEgbYJvnfWooATPCGn0HLn84
-	vPsICsu+JT8ZLFG0S9ma0ixLak2g2lFzLhhfofX1ljJvedPQUEEJQDIMeC2HyvSjujHtBgSUtRI
-	QsER75oKB7/O06YSQtyQQKhAI/TebX24GAHk9Rl97jTe+tvISxFUmApGxtlmvGrbcscu4LqNRHO
-	a
-X-Google-Smtp-Source: AGHT+IE0vn5XmRw18AJGFhtJXtjIWLR4HgtKdHsBoT+HKQO/7WMl2yfPtRbZKEhKlsvQrsE1URNu0A==
-X-Received: by 2002:a05:6000:1a87:b0:391:23e6:f08c with SMTP id ffacd0b85a97d-3997f941973mr2350929f8f.47.1742545183874;
-        Fri, 21 Mar 2025 01:19:43 -0700 (PDT)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d43f43ed6sm70133835e9.13.2025.03.21.01.19.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Mar 2025 01:19:43 -0700 (PDT)
-Message-ID: <c90151bc-a529-4f4e-a0b9-5831a6b803f7@blackwall.org>
-Date: Fri, 21 Mar 2025 10:19:42 +0200
+        d=1e100.net; s=20230601; t=1742545371; x=1743150171;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=V5EB1Q/bNPzxlpAWO7o5BWpROZju3sVEZNDvgPYV2Tc=;
+        b=i7lIsgOXwFsiTQP2cIDXsG7VF4lJcxGmDBTPVdvgKJ9TOKJYzXGj3n5lKC6wVHslSg
+         Ji3Wx+JwOjpjqNMDubbmcxWaJ2QD7PSa7YzrAnruUddrhejZlIUP+B86K1M/zUoze5Fy
+         dFe9N0+AcPDAcoIdYRxHEABw6/X7QT0fx6lt9f6HkmGTx6bug/u1C4FT9p7FLGs1HpNj
+         F60Ib1zsFcAY1wEEjC2fgCvtFBQaJ+QFu3EF4TUx+3Eb9Zq4xqRPe+nDbdQyL/BzeP4z
+         ApCHONtmY0eLLwAJA/DQAmvF/9XhNy5qqdVBwiMVwTn4aN2uSeyWl5qkVWWPPEQ0W4Yv
+         TjRg==
+X-Forwarded-Encrypted: i=1; AJvYcCWI48fWrxjGLmmQH83hamZzd5gxcVExdWgTfXC748SLuOxtV3rEoEJoE97RFDiLrFgsYUU=@vger.kernel.org, AJvYcCXNa0uLoMWPN74YnmS8dgFSMYiEiuzLfCQi3VTCiqrtm9zVbSnkNcoE8f59MKqHhHvQWVWe+ypN@vger.kernel.org, AJvYcCXxDJ79cC9zI4e4Chs/53sV9+UuRCmC0kltAi65uI0vLcqiJJcGLej5RRGTngEosolaFUOZbJB9+BwKHXGv@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDpiSoOiBpYaN8uA7ChsFzdRdkiZGPSslmSkQwxL3WbVn9UTg4
+	g+yR9sY64/Tmzcu92wBCd8RugPC1Pk9XKi1fW9KZ51g1bGjJU0r62vBwHhEhaqTOYop/p2rwJle
+	e9VndcYUb/hydYCM++pLgA4lWkg==
+X-Gm-Gg: ASbGncvxIKZu3S491x+Ad+PRlj3FTy4XGvhYpAAWnsZfESex7LvFLDctzSUtkOsJ0cS
+	CnR2Lj/fmTaZitcWmfr/eghEBy9M6l6j/wVphpLGf3Tgr3Vi5JFqy9YxBBQ4jGTlhE5gsNUOzr1
+	kCxzBKSghW8NKt2drcrOvJGuzr
+X-Google-Smtp-Source: AGHT+IFEj/clJ4TiD6lGeA9BIgIOoeq6FF3j6z0VANP7q0h73cH/pg3o0wIJqdcZ0fz0/auTBsdCPP+fwMJapTyfpYg=
+X-Received: by 2002:a05:6402:84d:b0:5e7:8503:1a4b with SMTP id
+ 4fb4d7f45d1cf-5ebcd468e7amr2124222a12.18.1742545370560; Fri, 21 Mar 2025
+ 01:22:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Patch net-next 1/3] net: bridge: mcast: Add offload failed mdb
- flag
-To: Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org
-Cc: Joseph Huang <joseph.huang.2024@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Roopa Prabhu <roopa@nvidia.com>, Simon Horman <horms@kernel.org>,
- linux-kernel@vger.kernel.org, bridge@lists.linux.dev
-References: <20250318224255.143683-1-Joseph.Huang@garmin.com>
- <20250318224255.143683-2-Joseph.Huang@garmin.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20250318224255.143683-2-Joseph.Huang@garmin.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250321044852.1086551-1-wangliang74@huawei.com>
+In-Reply-To: <20250321044852.1086551-1-wangliang74@huawei.com>
+From: Jussi Maki <joamaki@gmail.com>
+Date: Fri, 21 Mar 2025 09:22:14 +0100
+X-Gm-Features: AQ5f1Jpv_KM5n370YdSx-cz5z0JMIcFja6d3n9EusYyhjwq8Mqv_ErrLR2MAkSg
+Message-ID: <CAHn8xc=UeFzCybi199grR8To9yQjDyA1dMypFBMe1QCCD5S3vw@mail.gmail.com>
+Subject: Re: [PATCH net v2] bonding: check xdp prog when set bond mode
+To: Wang Liang <wangliang74@huawei.com>
+Cc: jv@jvosburgh.net, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, yuehaibing@huawei.com, zhangchangzhong@huawei.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 3/19/25 00:42, Joseph Huang wrote:
-> Add MDB_FLAGS_OFFLOAD_FAILED and MDB_PG_FLAGS_OFFLOAD_FAILED to indicate
-> that an attempt to offload the MDB entry to switchdev has failed.
-> 
-> Signed-off-by: Joseph Huang <Joseph.Huang@garmin.com>
-> ---
->  include/uapi/linux/if_bridge.h |  9 +++++----
->  net/bridge/br_mdb.c            |  2 ++
->  net/bridge/br_private.h        | 11 ++++++-----
->  net/bridge/br_switchdev.c      | 10 +++++-----
->  4 files changed, 18 insertions(+), 14 deletions(-)
-> 
-> diff --git a/include/uapi/linux/if_bridge.h b/include/uapi/linux/if_bridge.h
-> index a5b743a2f775..f2a6de424f3f 100644
-> --- a/include/uapi/linux/if_bridge.h
-> +++ b/include/uapi/linux/if_bridge.h
-> @@ -699,10 +699,11 @@ struct br_mdb_entry {
->  #define MDB_TEMPORARY 0
->  #define MDB_PERMANENT 1
->  	__u8 state;
-> -#define MDB_FLAGS_OFFLOAD	(1 << 0)
-> -#define MDB_FLAGS_FAST_LEAVE	(1 << 1)
-> -#define MDB_FLAGS_STAR_EXCL	(1 << 2)
-> -#define MDB_FLAGS_BLOCKED	(1 << 3)
-> +#define MDB_FLAGS_OFFLOAD		(1 << 0)
-> +#define MDB_FLAGS_FAST_LEAVE		(1 << 1)
-> +#define MDB_FLAGS_STAR_EXCL		(1 << 2)
-> +#define MDB_FLAGS_BLOCKED		(1 << 3)
-> +#define MDB_FLAGS_OFFLOAD_FAILED	(1 << 4)
->  	__u8 flags;
->  	__u16 vid;
->  	struct {
-> diff --git a/net/bridge/br_mdb.c b/net/bridge/br_mdb.c
-> index 1a52a0bca086..0639691cd19b 100644
-> --- a/net/bridge/br_mdb.c
-> +++ b/net/bridge/br_mdb.c
-> @@ -144,6 +144,8 @@ static void __mdb_entry_fill_flags(struct br_mdb_entry *e, unsigned char flags)
->  		e->flags |= MDB_FLAGS_STAR_EXCL;
->  	if (flags & MDB_PG_FLAGS_BLOCKED)
->  		e->flags |= MDB_FLAGS_BLOCKED;
-> +	if (flags & MDB_PG_FLAGS_OFFLOAD_FAILED)
-> +		e->flags |= MDB_FLAGS_OFFLOAD_FAILED;
->  }
->  
->  static void __mdb_entry_to_br_ip(struct br_mdb_entry *entry, struct br_ip *ip,
-> diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
-> index 1054b8a88edc..cd6b4e91e7d6 100644
-> --- a/net/bridge/br_private.h
-> +++ b/net/bridge/br_private.h
-> @@ -306,11 +306,12 @@ struct net_bridge_fdb_flush_desc {
->  	u16				vlan_id;
->  };
->  
-> -#define MDB_PG_FLAGS_PERMANENT	BIT(0)
-> -#define MDB_PG_FLAGS_OFFLOAD	BIT(1)
-> -#define MDB_PG_FLAGS_FAST_LEAVE	BIT(2)
-> -#define MDB_PG_FLAGS_STAR_EXCL	BIT(3)
-> -#define MDB_PG_FLAGS_BLOCKED	BIT(4)
-> +#define MDB_PG_FLAGS_PERMANENT		BIT(0)
-> +#define MDB_PG_FLAGS_OFFLOAD		BIT(1)
-> +#define MDB_PG_FLAGS_FAST_LEAVE		BIT(2)
-> +#define MDB_PG_FLAGS_STAR_EXCL		BIT(3)
-> +#define MDB_PG_FLAGS_BLOCKED		BIT(4)
-> +#define MDB_PG_FLAGS_OFFLOAD_FAILED	BIT(5)
->  
->  #define PG_SRC_ENT_LIMIT	32
->  
-> diff --git a/net/bridge/br_switchdev.c b/net/bridge/br_switchdev.c
-> index 7b41ee8740cb..68dccc2ff7b1 100644
-> --- a/net/bridge/br_switchdev.c
-> +++ b/net/bridge/br_switchdev.c
-> @@ -505,9 +505,6 @@ static void br_switchdev_mdb_complete(struct net_device *dev, int err, void *pri
->  	struct net_bridge_port *port = data->port;
->  	struct net_bridge *br = port->br;
->  
-> -	if (err)
-> -		goto err;
-> -
->  	spin_lock_bh(&br->multicast_lock);
->  	mp = br_mdb_ip_get(br, &data->ip);
->  	if (!mp)
-> @@ -516,11 +513,14 @@ static void br_switchdev_mdb_complete(struct net_device *dev, int err, void *pri
->  	     pp = &p->next) {
->  		if (p->key.port != port)
->  			continue;
-> -		p->flags |= MDB_PG_FLAGS_OFFLOAD;
-> +
-> +		if (err)
-> +			p->flags |= MDB_PG_FLAGS_OFFLOAD_FAILED;
-> +		else
-> +			p->flags |= MDB_PG_FLAGS_OFFLOAD;
+On Fri, Mar 21, 2025 at 5:38=E2=80=AFAM Wang Liang <wangliang74@huawei.com>=
+ wrote:
+>
+> Following operations can trigger a warning[1]:
+>
+>     ip netns add ns1
+>     ip netns exec ns1 ip link add bond0 type bond mode balance-rr
+>     ip netns exec ns1 ip link set dev bond0 xdp obj af_xdp_kern.o sec xdp
+>     ip netns exec ns1 ip link set bond0 type bond mode broadcast
+>     ip netns del ns1
+>
+> When delete the namespace, dev_xdp_uninstall() is called to remove xdp
+> program on bond dev, and bond_xdp_set() will check the bond mode. If bond
+> mode is changed after attaching xdp program, the warning may occur.
+>
+> Some bond modes (broadcast, etc.) do not support native xdp. Set bond mod=
+e
+> with xdp program attached is not good. Add check for xdp program when set
+> bond mode.
 
-These two should be mutually exclusive, either it's offloaded or it failed an offload,
-shouldn't be possible to have both set. I'd recommend adding some helper that takes
-care of that.
+Looks reasonable to me. Thanks!
 
->  	}
->  out:
->  	spin_unlock_bh(&br->multicast_lock);
-> -err:
->  	kfree(priv);
->  }
->  
-
+Acked-by: Jussi Maki <joamaki@gmail.com>
 
