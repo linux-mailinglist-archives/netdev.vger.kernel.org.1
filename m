@@ -1,132 +1,133 @@
-Return-Path: <netdev+bounces-176675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176676-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02286A6B47D
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 07:36:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 728AAA6B495
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 07:49:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8199E3B890A
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 06:36:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1401172BFF
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 06:49:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BE741EB184;
-	Fri, 21 Mar 2025 06:36:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D36101EA7D7;
+	Fri, 21 Mar 2025 06:48:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TsOwUOPV"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="UfLd++u3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C735184F;
-	Fri, 21 Mar 2025 06:36:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF531E0E0D
+	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 06:48:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742538972; cv=none; b=o3I3MeGr9YMZ/dSB+2AK5E+sdbODl+7zuPlAsSeES6c5oB/nsOkG5MXyneBrqggWx36E1b5UcinvnInX5dUxg1NnTKUkiXdVcsc2NDfPqoJtA3hKMZybto7/LZOrWxsTM0IN3C1dP6igM+kCDhyPlBE6+SUJp/0KoVzcfs39jtA=
+	t=1742539737; cv=none; b=IGm8R0qW5B0ae+LOg9T/jQyydUL+Qe0PA/HqtCP8E+tqZSHA9tMD7mLpCwCLN1dahogyMdO9cTK0e0bfXoZrbv3CxK4dtBAkyxCATge0MguRxDRnLGQdcNJfdYujWx0eTjTseiv6XUOI9k935V3guMQN1lvgenFTTuilukA8JT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742538972; c=relaxed/simple;
-	bh=HaWvwtYJ/oU8MJuWlBp9GYIsMVjPAUFk2f+KucFWzzI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S3ooDmtCYgvWHyAJIPKh4eXz5bIIcyolO01y5lJSfDIeN79Mr+yF88SFx2nxM8S+fVZ5BGkXXbGfrtivARybusfLWAWJtGoL3jao0yc6GcmiKyZ2rrwPbQ1iFm8+8lPADtuZpqjepp0deof9d27ueTsaZEEGD8BcqAjSLERbW1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TsOwUOPV; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1742538970; x=1774074970;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=HaWvwtYJ/oU8MJuWlBp9GYIsMVjPAUFk2f+KucFWzzI=;
-  b=TsOwUOPVbJm6EL7zw9ZjdVBlo4UDIrrI0/a5OIbfwJyYebBGkfOXx0NQ
-   puB2nsiAwMXrUh7miIX89QTuGv6OobbzH2zYWRpYomQChgaeTf6T6+qxC
-   k2kyEJ4D1OwQ78oGWoj2osi5VVhQkHTlT0wwojGcRLbPZER3SyC197cL/
-   ynThNNfXBV9djq1Q61W5uZFE9A2kdXNXyaLnzwMsmmVzoF3paPTcyNSMU
-   EL9/YosGN1Bd5rgEp8BCLeKFRnPgzMPyUw/Ycp44ANMRicAKFx5JzfX8s
-   TZYeDCoebSChl+egmz4t1UMEfWKRZSS6vo4BI3om/Ts945Gf/EwwOgsQZ
-   A==;
-X-CSE-ConnectionGUID: 8nqMfzwXTha8XWxGp/6l7A==
-X-CSE-MsgGUID: pXGu5vz+SsGfhY6sIFUHew==
-X-IronPort-AV: E=McAfee;i="6700,10204,11379"; a="43985016"
-X-IronPort-AV: E=Sophos;i="6.14,263,1736841600"; 
-   d="scan'208";a="43985016"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2025 23:36:09 -0700
-X-CSE-ConnectionGUID: YaSh7HXlQ+OnX5jNfa5gzA==
-X-CSE-MsgGUID: h72+9HCnRUyhlf7lh60ncg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,263,1736841600"; 
-   d="scan'208";a="123830796"
-Received: from lkp-server02.sh.intel.com (HELO e98e3655d6d2) ([10.239.97.151])
-  by orviesa007.jf.intel.com with ESMTP; 20 Mar 2025 23:36:05 -0700
-Received: from kbuild by e98e3655d6d2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tvVz8-00016A-2R;
-	Fri, 21 Mar 2025 06:36:02 +0000
-Date: Fri, 21 Mar 2025 14:35:16 +0800
-From: kernel test robot <lkp@intel.com>
-To: Christian Marangi <ansuelsmth@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Daniel Golle <daniel@makrotopia.org>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, upstream@airoha.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: Re: [net-next PATCH 5/6] net: pcs: airoha: add PCS driver for Airoha
- SoC
-Message-ID: <202503211416.eZCW1LF6-lkp@intel.com>
-References: <20250318235850.6411-6-ansuelsmth@gmail.com>
+	s=arc-20240116; t=1742539737; c=relaxed/simple;
+	bh=6ooNQLxhxbt4lgKABXvAXiZ/H/pTs90ea2703VP/jEE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ZYYf+THHZ44WHynnrLOuOWn7TL4zP3pKbWq3/OvK7fCTwLsHgDWcSF7ym6UsyF+f6rWMJlU+SA9fb+krLTLgtfCaQyBgFGO9QcjkICNI2i622iWnlm5lXNUbkbe3aH+RvME94qIXeHjUDEPxK0VZfKPt62tgx5BFwwRweHjrTG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=UfLd++u3; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-22580c9ee0aso32858025ad.2
+        for <netdev@vger.kernel.org>; Thu, 20 Mar 2025 23:48:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1742539735; x=1743144535; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hvaePu+Lf34WSmuwJtyngfui9U5LFP1ldzJala5s8u4=;
+        b=UfLd++u3KFCW1OG0LMVFa1+OocMHSHLcwT+RzjnhoYVhhpkYycmisFsJwTxZ3yfdbe
+         sDxZqJAXlddyW/5LgoY3ByY4G+x01pdce0wfl3OCNR3lFOC0HzJMEPi4SsAQUV9EkKzR
+         Sa5ERn8CVdE1IkbfgvaOWyoAQL00AozNbZ6gdlB3T8wNFb9NHKGDrogxw3Dn15Iswdeh
+         ci2TIGAzZDjx0y5hMC89DE0s6eIYOfMPwxHTxpmr3UpH8gQ2m5A7CI89Q48bmoRb2kUF
+         afaQ3nT80reOM5DTL6h+mZPCo0XxtGI14x8X1lnTbnTjGGgwMabWwq0H+fFAv7CiOE4X
+         gxAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742539735; x=1743144535;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hvaePu+Lf34WSmuwJtyngfui9U5LFP1ldzJala5s8u4=;
+        b=h/bYrqNi8tPwN0d1pNjeC/3vEG1CDiSVk94mT9GDkdlgZMo55ItS3+C8L4Qs+Yw6Fp
+         eY40cSOoCz6OCL/nTC0McunKK1gAwMmieAOewoGgB/Sc0y8lDcEZ6xtgJNdB8vhgW6h1
+         Gk/2SIt/ZBxD9lIX9OsfXhBx8DKJJzljgI5AOwpyU5kBQ9Y+nx8DkG0BC91Nv9Ms7q6r
+         2zSFpLi5CMWO0i+uKbJs4vpbnX8F1d9IBdvY4MXzh/k/SvTItE/BNVhPDqt2KF6xu437
+         NFF/Odp+gw9IoxkjbMygMZh11+uHw46qoRmhfyOHv6ZZM4t6a63J300oriXrWuzS0WIw
+         KlGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXXKOls6lY74me2nE50t/2gqxiIkup6EVWCAk3qj3RrYcLIhNk5l2mydIatnnuaZJT7nzeGwo8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkjHBlitU7Y1FOJrpW/M/nQ+FM1dd6GXAYLIills0Xs5/eX/Af
+	lMCuIlQ+XuRt9JXirqyia48Zcwn0OuCCNECaG1DMXphtKQMFBw/7PtfObPDDbG8=
+X-Gm-Gg: ASbGnctEz5AuLYuAbMMzHYKCJBie7486eH2G65Qk4HcnESklZuVLJv6z/EIfxCIUlCD
+	bX0EWT+eX/lt3mP5yoB8e/BgQm3r5unQcLF4pN3dC/1RbIUbexUfjytnOO0q/s8e6bnfVTM0Z+N
+	PH89+ZqnAqrb8AYDq/sKhFSfDI4KXBXB9ueRqtssy5xrwg/Siwdtg5/WyeFqX50iU5zJQaOT3j8
+	WZLsrYsxDH9gIaqztGzY0Kudi4GUqmf+eA1ZoZvfMPSpXq7W82OUNt6w6Hk8SHmNb05Lc7gyrVv
+	Ms1UXbhoO2PtdU+mG01bVYiETBhArqyYsFJ4/Q5LMKxnqBf7
+X-Google-Smtp-Source: AGHT+IEyVWiZuBU3HVprj4u07XVS4jJc8dBw9lWctyOdahYf8tAomFSkVNJplBNroBXKEAuEtsPI3A==
+X-Received: by 2002:a05:6a00:2e90:b0:730:75b1:7219 with SMTP id d2e1a72fcca58-7390599eb4emr3733783b3a.12.1742539735464;
+        Thu, 20 Mar 2025 23:48:55 -0700 (PDT)
+Received: from localhost ([157.82.207.107])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-73905faa5d3sm1087092b3a.15.2025.03.20.23.48.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Mar 2025 23:48:54 -0700 (PDT)
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+Subject: [PATCH net-next v2 0/4] virtio_net: Fixes and improvements
+Date: Fri, 21 Mar 2025 15:48:31 +0900
+Message-Id: <20250321-virtio-v2-0-33afb8f4640b@daynix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250318235850.6411-6-ansuelsmth@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAL8L3WcC/12NOw6DMBAFr4K2jiN/wIFUuUdEQdglbBE7si0Lh
+ Hz3WJQpR/M074BIgSnCvTkgUObI3lXQlwbmdXJvEoyVQUvdSaN6kTkk9sJ23YB2UP0NX1DH30A
+ Lb2foCY6ScLQlGKtZOSYf9vMhq9P/x7ISUpi2nafFGIuID5x2x9t19h8YSyk/X5p7iacAAAA=
+X-Change-ID: 20250318-virtio-6559d69187db
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Andrew Melnychenko <andrew@daynix.com>, Joe Damato <jdamato@fastly.com>, 
+ Philo Lu <lulie@linux.alibaba.com>
+Cc: virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, devel@daynix.com, 
+ Akihiko Odaki <akihiko.odaki@daynix.com>, Lei Yang <leiyang@redhat.com>
+X-Mailer: b4 0.15-dev-edae6
 
-Hi Christian,
+Jason Wang recently proposed an improvement to struct
+virtio_net_rss_config:
+https://lore.kernel.org/r/CACGkMEud0Ki8p=z299Q7b4qEDONpYDzbVqhHxCNVk_vo-KdP9A@mail.gmail.com
 
-kernel test robot noticed the following build errors:
+This patch series implements it and also fixes a few minor bugs I found
+when writing patches.
 
-[auto build test ERROR on net-next/main]
+Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+---
+Changes in v2:
+- Replaced kmalloc() with kzalloc() to initialize the reserved fields.
+- Link to v1: https://lore.kernel.org/r/20250318-virtio-v1-0-344caf336ddd@daynix.com
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Christian-Marangi/net-phylink-reset-PCS-Phylink-double-reference-on-phylink_stop/20250319-080303
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250318235850.6411-6-ansuelsmth%40gmail.com
-patch subject: [net-next PATCH 5/6] net: pcs: airoha: add PCS driver for Airoha SoC
-config: i386-randconfig-007-20250321 (https://download.01.org/0day-ci/archive/20250321/202503211416.eZCW1LF6-lkp@intel.com/config)
-compiler: clang version 20.1.1 (https://github.com/llvm/llvm-project 424c2d9b7e4de40d0804dd374721e6411c27d1d1)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250321/202503211416.eZCW1LF6-lkp@intel.com/reproduce)
+---
+Akihiko Odaki (4):
+      virtio_net: Split struct virtio_net_rss_config
+      virtio_net: Fix endian with virtio_net_ctrl_rss
+      virtio_net: Use new RSS config structs
+      virtio_net: Allocate rss_hdr with devres
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202503211416.eZCW1LF6-lkp@intel.com/
+ drivers/net/virtio_net.c        | 119 +++++++++++++++-------------------------
+ include/uapi/linux/virtio_net.h |  13 +++++
+ 2 files changed, 56 insertions(+), 76 deletions(-)
+---
+base-commit: d082ecbc71e9e0bf49883ee4afd435a77a5101b6
+change-id: 20250318-virtio-6559d69187db
 
-All errors (new ones prefixed by >>):
-
->> ld.lld: error: undefined symbol: of_pcs_simple_get
-   >>> referenced by pcs-airoha.c:2818 (drivers/net/pcs/pcs-airoha.c:2818)
-   >>>               drivers/net/pcs/pcs-airoha.o:(airoha_pcs_probe) in archive vmlinux.a
---
->> ld.lld: error: undefined symbol: of_pcs_add_provider
-   >>> referenced by pcs-airoha.c:2818 (drivers/net/pcs/pcs-airoha.c:2818)
-   >>>               drivers/net/pcs/pcs-airoha.o:(airoha_pcs_probe) in archive vmlinux.a
---
->> ld.lld: error: undefined symbol: of_pcs_del_provider
-   >>> referenced by pcs-airoha.c:2828 (drivers/net/pcs/pcs-airoha.c:2828)
-   >>>               drivers/net/pcs/pcs-airoha.o:(airoha_pcs_remove) in archive vmlinux.a
-
+Best regards,
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Akihiko Odaki <akihiko.odaki@daynix.com>
+
 
