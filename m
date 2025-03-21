@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-176735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBE9EA6BC18
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 14:53:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A98DEA6BC19
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 14:53:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94FEF3B71A8
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 13:53:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19F493B80F4
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 13:53:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73D087DA6D;
-	Fri, 21 Mar 2025 13:53:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50E4E1482F5;
+	Fri, 21 Mar 2025 13:53:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="MVMYUaG7";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ytO7aKlW"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="CxY12khI";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="w4fG0ik5"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8050880034
-	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 13:52:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79A2C142659
+	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 13:52:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742565180; cv=none; b=tsSTZY/kzIRA6hfcdRwl5rYz0vTV5ILfTHJXi4PoT9oozszn0r2RuTChKk+XrGQNF+unPzVrlxoPUr7fFA7Q1nGd7WB90MvGWQik1/11p1d2DlPLxJK+72pkafwosdf4rgCzjKoHPq4/3cN4ztKwSeBFClJe9HWK99gvdl3vCEE=
+	t=1742565181; cv=none; b=tr+fcpHE/tuhEGJFXW/kblrzqH2SQJliEHaJbr3fD3AIJ/0fiv6gd408zRiLK96/GX/y2WGCNzH0b8/r8GZuaqxXZGcozPRwvRIFpAYViCWwQolPalvGYxGh+axb4xjCAE2IFGr/YxZ+4XrZmFPREewipqesrOg4D8Ct9YUhrTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742565180; c=relaxed/simple;
-	bh=Mi0rryupyIg+Ek+caxe+dUWD65hl0wPxeJInFp2E39g=;
+	s=arc-20240116; t=1742565181; c=relaxed/simple;
+	bh=OBqa7ZPlM/9BNeSZs0Zqe0m3DXXtZrpZd939GnwK/QQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=FGIMtozLCL6fWyiidw0aRMjrQNC0bv/1ASR7RfBUL6134Gfq6PMibe8SDJeC+ESqyzD5N/wVlTHmAgWASmxFSDH569KQKdysxjiImuvgdW+14N1R7T5gTeOwnPNJlD0YSz4Z2cZ7QQppnzCdmhY1azhZVvNqJPhKTrhsZzr+jTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=MVMYUaG7; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ytO7aKlW; arc=none smtp.client-ip=193.142.43.55
+	 In-Reply-To:To:Cc; b=IDn4c8wFMMt7c6qDz3+WfTaCoAU5WHZsM+lijWDbN/hppmNAmvSXON1leq7inV949Ypxs4aS/jDHR6Mel5geHNc+phvsbKG+IZ45b5IW2fjR/Tp9QgFKRBN3yL7p4fSfjeywU3GIs3y7JE1Q1uWK5xCURnWRYsADDnYpxZw4o+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=CxY12khI; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=w4fG0ik5; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 From: Kurt Kanzenbach <kurt@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1742565176;
+	s=2020; t=1742565177;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+TwLPL7+wu7qtFoyl7UjkKjJVR4f77AtlojDOBKhpHg=;
-	b=MVMYUaG7ovDtLDQVdBOkLxmQs6nw2NOg0Qt9xOnxOv4Jo97AomPHNAQJmM7mIpq5KOGHTv
-	1MEW+JfjV2Lw0cdzXFE6O0Br7K7BjlUTiu2EgWiuQWIDZnvuiTl+CSiEyEC6K2jDpY5QVn
-	l8PpE3PuYUe54Hn6YaHM3MPG7T2bnUYGrqCCpAUavwhK5VOoStsFZRCt9XVKG795LhUt1C
-	9iOp6kakojG7+BhGS2t/zbw2LvLkDV+sisBGF4im+fY4kLwRFaqqLg7RR6jSnovjkQZ+6k
-	dAE1nDulGluvr8N2O42d6Qg1ynfEdpOgAOciQteG6fBEdqG7+bwkbFyXm6/hkg==
+	bh=m95qou3jMu2nip29BsHc7wsZbSBUImNGgt+uAyGTygs=;
+	b=CxY12khI6Xy7J7amlSM3+k7ZAWdQpmfU+uQ7uhVG+TSOnx67TpgzaIOEBJSUf0AaQE9i+4
+	mKFhrH/11IvmpvLbXQCKB0HhvYwAS3mhuVdH9OlQnCfwf2qGizIEVU59fgfIdbLOJ4o5zT
+	OgYLvoi235E87B1N3idNNinWXS4MlFXnhvxliUdKBICjQSj2bn0LM33vIBk+In8QrYwYQI
+	J6U8Q/cciHQHA3/GH1RygNP0gkSdHQAkD3dVot72q66/DY0OczF8/O6Lj8HavSlOIglPlA
+	0++B25zR4FzcoZ9haKs2zxvpvy0RPq45D/TaMdqP7SCiqOqFiUOLOmc6MmEZiA==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1742565176;
+	s=2020e; t=1742565177;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+TwLPL7+wu7qtFoyl7UjkKjJVR4f77AtlojDOBKhpHg=;
-	b=ytO7aKlWvkQoPeidzKNNyLIsmTUJk7Mqkd1UvmjQm35OAhUFl6j4IZ0w3ejsHvgsu5k3Ju
-	PNrC3Ny3U8WT5uDQ==
-Date: Fri, 21 Mar 2025 14:52:38 +0100
-Subject: [PATCH iwl-next v4 1/2] igc: Limit netdev_tc calls to MQPRIO
+	bh=m95qou3jMu2nip29BsHc7wsZbSBUImNGgt+uAyGTygs=;
+	b=w4fG0ik5+tDhnv6lygvDwegPVjeAhQFvxPeSgaLJYvnAZXe0bDA62V/xprZg59BG71HN2O
+	piNcvnjJYBLS0mCg==
+Date: Fri, 21 Mar 2025 14:52:39 +0100
+Subject: [PATCH iwl-next v4 2/2] igc: Change Tx mode for MQPRIO offloading
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,7 +64,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250321-igc_mqprio_tx_mode-v4-1-4571abb6714e@linutronix.de>
+Message-Id: <20250321-igc_mqprio_tx_mode-v4-2-4571abb6714e@linutronix.de>
 References: <20250321-igc_mqprio_tx_mode-v4-0-4571abb6714e@linutronix.de>
 In-Reply-To: <20250321-igc_mqprio_tx_mode-v4-0-4571abb6714e@linutronix.de>
 To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
@@ -76,113 +76,113 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
  Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
  Simon Horman <horms@kernel.org>, intel-wired-lan@lists.osuosl.org, 
  netdev@vger.kernel.org, Kurt Kanzenbach <kurt@linutronix.de>
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3188; i=kurt@linutronix.de;
- h=from:subject:message-id; bh=Mi0rryupyIg+Ek+caxe+dUWD65hl0wPxeJInFp2E39g=;
- b=owEBbQKS/ZANAwAKAcGT0fKqRnOCAcsmYgBn3W82Srb2yvsW2qVbZOXOh6fo+xxGhME4zlDjR
- 9XngiFbbNWJAjMEAAEKAB0WIQS8ub+yyMN909/bWZLBk9HyqkZzggUCZ91vNgAKCRDBk9HyqkZz
- ggu1D/9F4USsSAQ4W9TYb88+dOw+NcpCv9xfJqWTNn23HrfKg2eEDDp6KO05Akk9HdHYc1kNbVG
- pp6l8Q4klOpVZgrV9j2fjzsj9YtqSBP0o/IkqaiQNeg2QRVxFO/oGi9c/eQChlTgunhvCRS40jZ
- /Q2Z2+deBJfqBRko/isuSnpYgcc0Sa0MBwT2TuF62Yq7siUzJVm4ErnrCqIldw+61kTMmFEYiar
- YOa08EzJQdqStEllm89SWoHCOvVE9cWA19RdbwTKX1dBaiaajYnZu7BpZNleVXlF4sksI1+7k8s
- h6dRsa29AHuG7HGez6PUcvLz3T2ICojPmtTDHb6Q1OP3xg+v34/XUSFPlgJHi3vLx8pyDBTk7Xy
- z4nlGtv0FX40KR0JqGKAJsjntUr6PzDgzPFjysBD2j0wKZ6eG75XSkOOyjSFkwu2ods0PzBI9m5
- iXJwMN14Ng1s72Zw6Lwy5j4KQoFOnq58CqYHwE0RQdjrNZlZTpNx9g+BiP3r48eBePyPISeVVaT
- wgqgwv50S2JtX0OTJvJcWzQWYvnwaNf3/sBPrF/u7JU1l6HXfHtbzHYg3LGPY/jEqnOnWYFuqpE
- Myy4NwvGbRTSoYk0eOq6WFIcx6P2y+92Sta6UCFouw3TGKVeHWa65oYn3kuHE9+lMIX4QS8pWMd
- 3Wer0UIKri9qzBQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3530; i=kurt@linutronix.de;
+ h=from:subject:message-id; bh=OBqa7ZPlM/9BNeSZs0Zqe0m3DXXtZrpZd939GnwK/QQ=;
+ b=owEBbQKS/ZANAwAKAcGT0fKqRnOCAcsmYgBn3W82/KlIPAPJHGWdcOkqyLJjtq993YhXzz5ZG
+ nSbMu7P49WJAjMEAAEKAB0WIQS8ub+yyMN909/bWZLBk9HyqkZzggUCZ91vNgAKCRDBk9HyqkZz
+ grZDEACT2LUVLVxbWnhyGeY9O5vlbJr48vsEpn7vkB37UQA6Ka1KFXFtCeAUzKp2XC8W3GEM37D
+ DdZKryiL6WY8leQITIKnGBDXbbeQrfVsANl9+WWitn6WH3af/+H7oCDa4pQFm2O9nnNa7Wegiql
+ TSX6e8XJHIgeX4iAQ/8PBOVpEcpgmv2Da5jQwsaBf4r5ZTu1Ji7a5Tt173eFOPKgZYQEzYlIGED
+ zmPh/DSVNpixmlMXy3jqbP+S4Afhh9ug+J3loaSP2zkuTPjJM/m/3sNeMMlWSFwosg9W2GPr/3O
+ qrZzDM9bkCP5jhVnQqHzbI/bvHqyx2WuWERYZ7/WsgtiBZsDk9Z9LsjPRb+BFZdLXPhdTVVvdny
+ fQ5tZnmMu8/kuQpd84sdk/cquThaEniwOaxhV+NX9AGyUQpVGwD1bXwdDuB5azHkIZjLti84U/V
+ dR4d5Q8EEJ2EIHnv4Eq0xTMsP+PT5kNQS8XeRLzR3RpNYmQaOssX9F4uMGWHG/Lo44zF3xyxHt3
+ P9vlv5k3hHxHp73x3iXeuS/OO2erDQzkg7fUFgPLE/xDdNvx2oLDAYZtvdE0mI3iHzqwrD1nB/F
+ 9NOGZQ3DjyGaF2YszZwqFqOf5EQx4D5Op4OEqW7pugHW4Xl66SICnj3NXdMNN4/zwWXCk4sAiIP
+ P1a8eYj1jcQGc0g==
 X-Developer-Key: i=kurt@linutronix.de; a=openpgp;
  fpr=BCB9BFB2C8C37DD3DFDB5992C193D1F2AA467382
 
-Limit netdev_tc calls to MQPRIO. Currently these calls are made in
-igc_tsn_enable_offload() and igc_tsn_disable_offload() which are used by
-TAPRIO and ETF as well. However, these are only required for MQPRIO.
+The current MQPRIO offload implementation uses the legacy TSN Tx mode. In
+this mode the hardware uses four packet buffers and considers queue
+priorities.
 
+In order to harmonize the TAPRIO implementation with MQPRIO, switch to the
+regular TSN Tx mode. This mode also uses four packet buffers and considers
+queue priorities. In addition to the legacy mode, transmission is always
+coupled to Qbv. The driver already has mechanisms to use a dummy schedule
+of 1 second with all gates open for ETF. Simply use this for MQPRIO too.
+
+This reduces code and makes it easier to add support for frame preemption
+later.
+
+Tested on i225 with real time application using high priority queue, iperf3
+using low priority queue and network TAP device.
+
+Acked-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
 Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
 ---
- drivers/net/ethernet/intel/igc/igc_main.c | 18 +++++++++++++++++-
- drivers/net/ethernet/intel/igc/igc_tsn.c  | 20 --------------------
- 2 files changed, 17 insertions(+), 21 deletions(-)
+ drivers/net/ethernet/intel/igc/igc.h     |  4 +---
+ drivers/net/ethernet/intel/igc/igc_tsn.c | 20 ++------------------
+ 2 files changed, 3 insertions(+), 21 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 472f009630c98e60c7166ceb8d05cb094f6c837b..240b6075197fb1e61077a736ddf8f9e67c1ed5cd 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -6679,13 +6679,14 @@ static int igc_tsn_enable_mqprio(struct igc_adapter *adapter,
- 				 struct tc_mqprio_qopt_offload *mqprio)
- {
- 	struct igc_hw *hw = &adapter->hw;
--	int i;
-+	int err, i;
+diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
+index cd1d7b6c1782352094f6867a31b6958c929bbbf4..16d85bdf55a7e9c412c47acf727bca6bc7154c61 100644
+--- a/drivers/net/ethernet/intel/igc/igc.h
++++ b/drivers/net/ethernet/intel/igc/igc.h
+@@ -388,11 +388,9 @@ extern char igc_driver_name[];
+ #define IGC_FLAG_RX_LEGACY		BIT(16)
+ #define IGC_FLAG_TSN_QBV_ENABLED	BIT(17)
+ #define IGC_FLAG_TSN_QAV_ENABLED	BIT(18)
+-#define IGC_FLAG_TSN_LEGACY_ENABLED	BIT(19)
  
- 	if (hw->mac.type != igc_i225)
- 		return -EOPNOTSUPP;
+ #define IGC_FLAG_TSN_ANY_ENABLED				\
+-	(IGC_FLAG_TSN_QBV_ENABLED | IGC_FLAG_TSN_QAV_ENABLED |	\
+-	 IGC_FLAG_TSN_LEGACY_ENABLED)
++	(IGC_FLAG_TSN_QBV_ENABLED | IGC_FLAG_TSN_QAV_ENABLED)
  
- 	if (!mqprio->qopt.num_tc) {
- 		adapter->strict_priority_enable = false;
-+		netdev_reset_tc(adapter->netdev);
- 		goto apply;
- 	}
- 
-@@ -6716,6 +6717,21 @@ static int igc_tsn_enable_mqprio(struct igc_adapter *adapter,
- 	igc_save_mqprio_params(adapter, mqprio->qopt.num_tc,
- 			       mqprio->qopt.offset);
- 
-+	err = netdev_set_num_tc(adapter->netdev, adapter->num_tc);
-+	if (err)
-+		return err;
-+
-+	for (i = 0; i < adapter->num_tc; i++) {
-+		err = netdev_set_tc_queue(adapter->netdev, i, 1,
-+					  adapter->queue_per_tc[i]);
-+		if (err)
-+			return err;
-+	}
-+
-+	/* In case the card is configured with less than four queues. */
-+	for (; i < IGC_MAX_TX_QUEUES; i++)
-+		adapter->queue_per_tc[i] = i;
-+
- 	mqprio->qopt.hw = TC_MQPRIO_HW_OFFLOAD_TCS;
- 
- apply:
+ #define IGC_FLAG_RSS_FIELD_IPV4_UDP	BIT(6)
+ #define IGC_FLAG_RSS_FIELD_IPV6_UDP	BIT(7)
 diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
-index 1e44374ca1ffbb86e9893266c590f318984ef574..67632356083708f82a099141a4b68ba10e06f952 100644
+index 67632356083708f82a099141a4b68ba10e06f952..7c28f3e7bb576f0e6a21c883e934ede4d53096f4 100644
 --- a/drivers/net/ethernet/intel/igc/igc_tsn.c
 +++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
-@@ -157,9 +157,6 @@ static int igc_tsn_disable_offload(struct igc_adapter *adapter)
- 	wr32(IGC_QBVCYCLET_S, 0);
- 	wr32(IGC_QBVCYCLET, NSEC_PER_SEC);
+@@ -37,18 +37,13 @@ static unsigned int igc_tsn_new_flags(struct igc_adapter *adapter)
+ {
+ 	unsigned int new_flags = adapter->flags & ~IGC_FLAG_TSN_ANY_ENABLED;
  
--	/* Reset mqprio TC configuration. */
--	netdev_reset_tc(adapter->netdev);
+-	if (adapter->taprio_offload_enable)
+-		new_flags |= IGC_FLAG_TSN_QBV_ENABLED;
 -
- 	/* Restore the default Tx arbitration: Priority 0 has the highest
- 	 * priority and is assigned to queue 0 and so on and so forth.
- 	 */
-@@ -206,23 +203,6 @@ static int igc_tsn_enable_offload(struct igc_adapter *adapter)
- 		igc_tsn_set_retx_qbvfullthreshold(adapter);
+-	if (is_any_launchtime(adapter))
++	if (adapter->taprio_offload_enable || is_any_launchtime(adapter) ||
++	    adapter->strict_priority_enable)
+ 		new_flags |= IGC_FLAG_TSN_QBV_ENABLED;
  
- 	if (adapter->strict_priority_enable) {
--		int err;
+ 	if (is_cbs_enabled(adapter))
+ 		new_flags |= IGC_FLAG_TSN_QAV_ENABLED;
+ 
+-	if (adapter->strict_priority_enable)
+-		new_flags |= IGC_FLAG_TSN_LEGACY_ENABLED;
 -
--		err = netdev_set_num_tc(adapter->netdev, adapter->num_tc);
--		if (err)
--			return err;
--
--		for (i = 0; i < adapter->num_tc; i++) {
--			err = netdev_set_tc_queue(adapter->netdev, i, 1,
--						  adapter->queue_per_tc[i]);
--			if (err)
--				return err;
--		}
--
--		/* In case the card is configured with less than four queues. */
--		for (; i < IGC_MAX_TX_QUEUES; i++)
--			adapter->queue_per_tc[i] = i;
--
- 		/* Configure queue priorities according to the user provided
+ 	return new_flags;
+ }
+ 
+@@ -163,7 +158,6 @@ static int igc_tsn_disable_offload(struct igc_adapter *adapter)
+ 	igc_tsn_tx_arb(adapter, queue_per_tc);
+ 
+ 	adapter->flags &= ~IGC_FLAG_TSN_QBV_ENABLED;
+-	adapter->flags &= ~IGC_FLAG_TSN_LEGACY_ENABLED;
+ 
+ 	return 0;
+ }
+@@ -207,16 +201,6 @@ static int igc_tsn_enable_offload(struct igc_adapter *adapter)
  		 * mapping.
  		 */
+ 		igc_tsn_tx_arb(adapter, adapter->queue_per_tc);
+-
+-		/* Enable legacy TSN mode which will do strict priority without
+-		 * any other TSN features.
+-		 */
+-		tqavctrl = rd32(IGC_TQAVCTRL);
+-		tqavctrl |= IGC_TQAVCTRL_TRANSMIT_MODE_TSN;
+-		tqavctrl &= ~IGC_TQAVCTRL_ENHANCED_QAV;
+-		wr32(IGC_TQAVCTRL, tqavctrl);
+-
+-		return 0;
+ 	}
+ 
+ 	for (i = 0; i < adapter->num_tx_queues; i++) {
 
 -- 
 2.39.5
