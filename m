@@ -1,121 +1,127 @@
-Return-Path: <netdev+bounces-176746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E92CDA6BE1E
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 16:17:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54A03A6BEE0
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 16:57:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E5A77A1119
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 15:16:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7DB23B88D9
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 15:55:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA62618DF6D;
-	Fri, 21 Mar 2025 15:17:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 438C61F1511;
+	Fri, 21 Mar 2025 15:55:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=avride-ai.20230601.gappssmtp.com header.i=@avride-ai.20230601.gappssmtp.com header.b="myleGmuv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B35U4dZF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC5764A8F
-	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 15:17:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE5542A94;
+	Fri, 21 Mar 2025 15:55:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742570267; cv=none; b=txvjoV5oE3t2Ax0sLxcjkGRDinji1OuCGWHUvyCZ2NdNQH+yFERJXY1SUVdCS0CzatqJ2kWhd+wQaaVKJ9cxLAh3OssbyURMUM40QcJf9OSM60DyRloLnqBmpkoPlospd0Iofo4VeNEW+I0NqAUjvneH/9QJFpOMYSonW9XiXNY=
+	t=1742572530; cv=none; b=l6jzQlilHQ0ayEMADocZvwL3C1+8TVVAaKXNIQt3iGB8Gnue2hfXPv/53TC4J4FwyRYw6xA6qYbLLH/DTU4CAkaSy3BpEuzusy62YsWhCRBbltUCfRRoUNt0QaXKYbV4VCiDJcY3xJkJ1QRurBVZZ5CtRKwC0ucHu313n8V/Lb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742570267; c=relaxed/simple;
-	bh=6+bQ9CwVbhlWVgx4LSJrTNYpNBkzWeozgzLCHdjBxWM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E3QhNLeSc9pJjRETzKpQeEx9h4MTtnDvjGBxbKlt72SozvPHCAzi7Wr3E8ckPbelTxWcuDUKRxwM8OjiF98sQrF6eKYQXF4ezS1I/pqn5wlKgOSlRdqAn6mh1LppkCR/jpcxmQH3B4vH+L1FmXCvAXp3j7G0hO/AN4LPWIYy8eM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=avride.ai; spf=none smtp.mailfrom=avride.ai; dkim=pass (2048-bit key) header.d=avride-ai.20230601.gappssmtp.com header.i=@avride-ai.20230601.gappssmtp.com header.b=myleGmuv; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=avride.ai
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=avride.ai
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5dca468c5e4so3622242a12.1
-        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 08:17:45 -0700 (PDT)
+	s=arc-20240116; t=1742572530; c=relaxed/simple;
+	bh=AIjDplhk7wchit7yazvFfxh+y7x80Sg5IxVpq7O6yWI=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Dll1GYTzMXKwIDqk2WQ2t6oesVcccQ7yhGHsXWOB/mktcm89H8NRx8EWffPlwJsc/DRsOm8q/zRh2CMdbb590UGiHYJQy5Z8bPUq1eVyi8WJou7nFUu8P+6tDdEGT/6Jonsy7fUADR8LugcWb4qioYEIvbqn3Kz3HFe50qR2kKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B35U4dZF; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6e86b92d3b0so17515686d6.2;
+        Fri, 21 Mar 2025 08:55:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=avride-ai.20230601.gappssmtp.com; s=20230601; t=1742570264; x=1743175064; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=6+bQ9CwVbhlWVgx4LSJrTNYpNBkzWeozgzLCHdjBxWM=;
-        b=myleGmuvwx19fD+aHFZHBogMyI+sVSjyegtRv67AaychwK25kDGIXhI3Bg2q8lxa0Y
-         MEwEGmeOs//KwyBX4vrkm9XzP5AVmilRo3NJSD3J5+7O7LtzTEaxV5+kVzReirB27MOz
-         XkJaqAf3LlLmWjyhKJdVjRBXBT8kKYjMq1x0QvheUfO8BMitJv5OCul/CJMyTGo4TUmR
-         aa12hJjqRwFzJfs6SFqGno84S4/npEkBS9p/8ri90LoV+aF2kepepVzYKrgsVNxjPTF6
-         WhhVe4CR1x8IqhtCBTZtXN04LQBrxA0gqHiVP/q4m7Y8vrkh69NPpQUrjyrtx5GiCxCm
-         hGDg==
+        d=gmail.com; s=20230601; t=1742572527; x=1743177327; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Z+koC8KnJGIb6PxjCwp2vUv/FTPsB/nBErjP42zRihk=;
+        b=B35U4dZF5MawUuVm7hK2Tvy2B/7qxEXNbF11nA9OuGeO5eNzzkJWef6/qLbphgMgsn
+         j4rs9W2PUTvZ/InhlaCd5JwM02YitcV2EKMq0osewIZD9D1zd7/iyqLU7TrtmaoxqMmi
+         jfcqLsF3OKtAr9QuqJJkzc9F2oL2Ctz2DNioACZfdEfT7+uhByykXaiQSCDEuZ4Whb3q
+         brHsbiBGEQ1cDCuJfB9XuvKxZX+1Qt4qg3qv6D5PA8yaZhjZ01nCa49BtDBsPgOgMWk4
+         yLMl5ZGA6P+TtKh2lk1ZHyDIF2zjtP6t53oCVTvDlTaLaiZvc/WfF/0iufwEj+haU0Hs
+         5KKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742570264; x=1743175064;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6+bQ9CwVbhlWVgx4LSJrTNYpNBkzWeozgzLCHdjBxWM=;
-        b=u7d6/PxqxKVnesfq9Vh4KPqmVgLZM3MusTsgjKUZF0D+VQCgPdezUtUeA735AYL5Fi
-         AbJa4lKbm8WBDUr5UBvKBRMLzWJbei5lZ2ClBI58kSkgHZsYR3KHVvt6HvTQyMsWH9QZ
-         t5uEBWurdwMByMNp6jqc6UuHgoxLsZk66WJ++mKbO//XQcI2pGrgsY57v02Z6bC+ZbUJ
-         B0JI1LN5NA/HuCiVa0hYGqEaWisI11e0vpyc8Og7205n17EmNpeog5+dLlJC5gJUc5sb
-         ADHN2UhfZVXBD3W/EhJa5IkVUgz/AbLunx5uuBYRwQEwMKw0BJxQYS3nCeK7Qa0eJemh
-         JGjA==
-X-Gm-Message-State: AOJu0YwqFP7B2cmOFNQjZKyKoYrpqPicWAtFjwzjYl055eACEr7dLTJH
-	T6x3vNSEIKTB+BebHv/1W0jea2iiT+2Njp73Vn3dpUn7oXeGLUTT7aDPditzEj06aq1VMh+kRjG
-	xqlBIn61OaMlPr3VK++arcelvKn/J87jyusV6Gw==
-X-Gm-Gg: ASbGncsA+0+LOIhkipgc03D/Ukf033B/hz+Ubn1EX4bFcRw84w5Pgo4lt/12zBKl1+e
-	uW0Bh6uOPDs87t30d4RH2OWNfX43woBE9ZR5r5ayS2y3F3ewqxbA8Ubm99pu0py0XSH0HJKStVJ
-	qWKy70yIN7ppm25V/PGoNyTnwg6P1tawRKmtHbn78lzQaNij/sodvRy7TQ
-X-Google-Smtp-Source: AGHT+IFiCXMmchJZic09GP3CXTdT4ktUpCCWCtdA19Sv0/Pfq1+6FVhqMHB1XYRPpPXFjZrWmuU93W2u5slFkxqiHzY=
-X-Received: by 2002:a05:6402:354a:b0:5e7:b015:c636 with SMTP id
- 4fb4d7f45d1cf-5ebcd406bb2mr3452656a12.6.1742570263869; Fri, 21 Mar 2025
- 08:17:43 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1742572527; x=1743177327;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Z+koC8KnJGIb6PxjCwp2vUv/FTPsB/nBErjP42zRihk=;
+        b=IeMWPwZmR22J+hYVuGsL/oxfejwsc8iSeU6AI+QP2xK4yHmAHYVOipoaUfGBIANwal
+         Zs5pJ+xFVT6DOoOMKsbVcO6HGAjI68WmCWc5wNOvkQp0sA+hNB9iIWEY2yphA5wKuvY2
+         4NKQAly1ussGbZphCJxnOlLpSh5pClbbfDmBHVV2RXLCNxfg527nj/Eu6sA8W43C0JaG
+         Aq2qdqpgelo0L308cCtJyu1iY2wYFxh4uOrRYmlOwEl78Ri8/GKnQkKm1RbHBI5IxLE4
+         kBtQR2Nq4j8SoUkz/5dFUJQ0izXvDNIJ42NsiGAx3u1VhWlAABIg7mONFCUzXKrpUbY2
+         5WHA==
+X-Forwarded-Encrypted: i=1; AJvYcCWdSGhaRwnzoJ+7HCUoBcYZ9299KVkRAvvtsUFxf84E5B+sLq5Xi8OzJN2+9IZsGJzNl0RgGH/HgVakI/Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyENBcW2bItIj/lyROeSLraQjjYTUGxhDZb/5gZznUjc42CFLps
+	AD5zJgXrlyGWnrhLpZnavSCB1YkdvObfeTJQxjpwUbzT4Zgv7aGurc0ffA==
+X-Gm-Gg: ASbGncvS4pU5XNvybyhk9XrPFzL1lSgT2IuYGR3UDYA0wavhS2f1Nn2XfT9C+MXTX3B
+	P8CyZEo9D9wqT9HUFKZTk4NFHdt7dwh72ccBvb5ckizc3QkqmWBRRxs8ts2Ee7ehNJ0EjjcFU75
+	KsNezo1yk8naWaJ1IKbd5bq6ctF8vawYqsmILQUWsCgUCgfzUKKHJ/mc9wDWWAXsY2lMjA0NQ51
+	5mTKvTZEtE2i/7hsJsqt+1MCwkyVQQwx6bom8os2QWi1feHOeoR/wfHyN342kMnXaVrXFCAEcXU
+	3LJB2RrmTOAiBZexF8XC1TDiro/iFQnVI6KTODezZ02kcK1ecmQoVHIKjbkPYLUBl4m5dmNrsWl
+	fPHqoI+JB8fnEpXE5w2h8CA==
+X-Google-Smtp-Source: AGHT+IFR2d1Q5glgHdLf/N5JMUFj+919MSQwMdXHPW3MrHechQBbpRE0MTU9+5K5UHOo/ce1JR1LBQ==
+X-Received: by 2002:ad4:5cad:0:b0:6d4:19a0:202 with SMTP id 6a1803df08f44-6eb3f339763mr63530006d6.33.1742572527254;
+        Fri, 21 Mar 2025 08:55:27 -0700 (PDT)
+Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6eb3ef1f81dsm12471996d6.38.2025.03.21.08.55.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Mar 2025 08:55:26 -0700 (PDT)
+Date: Fri, 21 Mar 2025 11:55:26 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Pranjal Shrivastava <praan@google.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, 
+ linux-parisc@vger.kernel.org, 
+ Willem de Bruijn <willemb@google.com>, 
+ Mina Almasry <almasrymina@google.com>, 
+ Pranjal Shrivastava <praan@google.com>
+Message-ID: <67dd8beeeff3_14b14029476@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250321103848.550689-1-praan@google.com>
+References: <20250321103848.550689-1-praan@google.com>
+Subject: Re: [PATCH] net: Fix the devmem sock opts and msgs for parisc
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <DE1DD9A1-3BB2-4AFB-AE3B-9389D3054875@avride.ai> <8f128d86-a39c-4699-800a-67084671e853@intel.com>
-In-Reply-To: <8f128d86-a39c-4699-800a-67084671e853@intel.com>
-From: Kamil Zaripov <zaripov-kamil@avride.ai>
-Date: Fri, 21 Mar 2025 17:17:33 +0200
-X-Gm-Features: AQ5f1Jq8Ne56mXh6cAI8VAGlKFID3gt7gYWzKc2HJVmP0bvEgKTanWSh0e8DRbY
-Message-ID: <CAGtf3iaO+Q=He7xyCCfzfPQDH_dHYYG1rHbpaUe-oBo90JBtjA@mail.gmail.com>
-Subject: Re: bnxt_en: Incorrect tx timestamp report
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-> That depends. If it has only one underlying clock, but each PF has its
-> own register space, it may functionally be independent clocks in
-> practice. I don't know the bnxt_en driver or hardware well enough to
-> know if that is the case.
+Pranjal Shrivastava wrote:
+> The devmem socket options and socket control message definitions
+> introduced in the TCP devmem series[1] incorrectly continued the socket
+> definitions for arch/parisc.
+> 
+> The UAPI change seems safe as there are currently no drivers that
+> declare support for devmem TCP RX via PP_FLAG_ALLOW_UNREADABLE_NETMEM.
+> Hence, fixing this UAPI should be safe.
+> 
+> Fix the devmem socket options and socket control message definitions to
+> reflect the series followed by arch/parisc.
+> 
+> [1]
+> https://lore.kernel.org/lkml/20240910171458.219195-10-almasrymina@google.com/
+> 
+> Fixes: 8f0b3cc9a4c10 ("tcp: RX path for devmem TCP")
+> Signed-off-by: Pranjal Shrivastava <praan@google.com>
 
-> If it really is one clock with one set of registers to control it, then
-> it should only expose one PHC. This may be tricky depending on the
-> driver design. (See ice as an example where we've had a lot of
-> challenges in this space because of the multiple PFs)
+This patch is already marked in patchwork as not applicable.
 
-I can only guess, from looking at the __bnxt_hwrm_ptp_qcfg function,
-that it depends on hardware and/or firmware (see
-https://elixir.bootlin.com/linux/v6.13.7/source/drivers/net/ethernet/broadcom/bnxt/bnxt.c#L9427-L9431).
-I hope that broadcom folks can clarify this.
+Because it is not correctly marked as [PATCH net]?
 
-> This part of the driver is tricky. ASYNC_EVENT_CMPL_EVENT_ID_PHC_UPDATE
-> reports only 16 bits of 64 bits timestamp, 48-63 range, which doesn't
-> overlap with anything else. The assumption is that when the driver
-> processes this event, the register which reports bits of range 0-47 has
-> already overflowed and holds new value. Unfortunately, there is a time
-> gap between register overflow and update of MSB of the cached timestamp.
+Patchwork interpreted it as not a local patch.
 
-Indeed, PHC counter reading is pretty complex in the case of the
-bnxt_en driver. Final timestamp that is sent to the userspace is
-combined from 3 parts which are stored in different places and updated
-using different mechanics. Apparently in some corner cases the driver
-fails to produce the correct result.
-
-> There is no easy way to solve this problem, but we may add additional
-> check on every read, probably... Not sure, though
-
-Right now I've just added an extra check into
-bnxt_ptp_rtc_timecounter_init function, it should work in some cases
-but I do not believe that it is the right way to fix the original
-issue.
+It affects parisc, but the patch referenced in Fixes also went in
+through net-next. So I think this should go through net.
 
