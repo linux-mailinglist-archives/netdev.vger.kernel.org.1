@@ -1,148 +1,166 @@
-Return-Path: <netdev+bounces-176836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02FF3A6C59A
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 23:05:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 97398A6C5BF
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 23:17:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B20E480F0B
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 22:05:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76C6D481C46
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 22:16:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFD3C1F12F3;
-	Fri, 21 Mar 2025 22:05:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DE6E2356AB;
+	Fri, 21 Mar 2025 22:15:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c5VzMwiJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yGwrJnrw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A058D1EB9E1;
-	Fri, 21 Mar 2025 22:05:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC9323371B
+	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 22:15:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742594726; cv=none; b=CWnNe3es2WPEPZluOBvIJoWE1XgbIH1ulObuHlboHr7sLWFH/ElsSMu7vP8FIdNfmFurTeFlmRJWdV+OCiWoSgV9ciWMxnmpOW5WM+u9YHZNymfOCVB3WpvVoupQc+PbbrwTTbIXlWjrPapTJYdusri3FSWYpHgbBnYwpGowXzk=
+	t=1742595331; cv=none; b=h42awbO3CBXzHFX9k2S0LshZrOItAkdsSV0jmGR3fb6XwgpU5EcYrjfUw9r6HAJY0TRP4FdlG/8Z4lP36N7rHR7miO791dj+UUs//yqS1uozs9j9iQ4t1ffuVr3ktesKWSEl62asfQBsa+krGj6IU9wdjB2M74wV+SG9ofP7aR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742594726; c=relaxed/simple;
-	bh=9N9lKIA4T37ajX0PCeM9ksT3ycwji09uQfEuJmjCJLk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rx21SwZuDmvqzyv4F3J0tqqz1u6572S2JwnKySLW3VitTCEo9uCYtn/UImGMLLBzrNr1oME6nfp3yMeuiuY6VD6ea7mQp4N7abQFMN9zphT+syBX8EXecJctc/K1IZ/zrmPwBV6K2/VOATFbR5HYvHITupoeoG7cicBIZDSDv4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c5VzMwiJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 971E4C4CEE3;
-	Fri, 21 Mar 2025 22:05:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742594726;
-	bh=9N9lKIA4T37ajX0PCeM9ksT3ycwji09uQfEuJmjCJLk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=c5VzMwiJJAAuof1zp8qtJWpsyDichBCO/8ItWHCQPanliBaA4Sz3+HB0m8WE0QYIa
-	 MoKUOpzwrcTtrHfDX7RAYkLMHK8JgwVJKf4kRzJee6/eAllb8wH+H0wj6YPy3LJrgE
-	 10gqDYNE7dG3TTGOVwnWY+MiPFOOWW9bdbK4EJBv/5ZrVMZlhS7k+jxcNOFF3TnLY7
-	 1drf9huoOFTsr5c2xGywVCzWJAP3ISN1iTT6xCYntE6CXKC+Ctd2h+V07mgQ0Ec+Bp
-	 1x4uo7CTf29h0+WCRvcOis1lMqGFVIOEiuu5GqftEUR81gfZ4lCzvjNwOUVn6yQdhJ
-	 obo+zHGwq7K3g==
-Date: Fri, 21 Mar 2025 23:05:23 +0100
-From: Frederic Weisbecker <frederic@kernel.org>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: linux-kernel@vger.kernel.org,
-	Daniel Almeida <daniel.almeida@collabora.com>,
-	Gary Guo <gary@garyguo.net>, Alice Ryhl <aliceryhl@google.com>,
-	Fiona Behrens <me@kloenk.dev>, rust-for-linux@vger.kernel.org,
-	netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
-	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
-	bjorn3_gh@protonmail.com, benno.lossin@proton.me,
-	a.hindborg@samsung.com, anna-maria@linutronix.de,
-	tglx@linutronix.de, arnd@arndb.de, jstultz@google.com,
-	sboyd@kernel.org, mingo@redhat.com, peterz@infradead.org,
-	juri.lelli@redhat.com, vincent.guittot@linaro.org,
-	dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
-	mgorman@suse.de, vschneid@redhat.com, tgunders@redhat.com,
-	david.laight.linux@gmail.com
-Subject: Re: [PATCH v11 5/8] rust: time: Add wrapper for fsleep() function
-Message-ID: <Z93io9rkpRMiXEKi@pavilion.home>
-References: <20250220070611.214262-1-fujita.tomonori@gmail.com>
- <20250220070611.214262-6-fujita.tomonori@gmail.com>
+	s=arc-20240116; t=1742595331; c=relaxed/simple;
+	bh=BCN5JQqGHPfZWzsKH88CAQez5y3gRKn+dXSiBfdgsw0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SNj4ijHrgvUhJDzIYYF1oIKJXrh/Y6eNwuFQRCdTITV50CP833dsdtYTje7XTDOyyLaueHRELBoAtwf4xIADpWnajr0na3byHiz/vtE3mlmYqYiwSGVKPKRgHCt0GIj2qfp2IOzmnKateyN4NfSZUOKX7BkFee9yv2HmHdKMgNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yGwrJnrw; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2263428c8baso29105ad.1
+        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 15:15:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1742595328; x=1743200128; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hz7SI+MRITJdDDcuu+iapQr7TxDqFp3vr+TXoSWWGCE=;
+        b=yGwrJnrws2TIW3WCiFSxSiW6Pn6RwuwNoYEqwQcBBG7kAkt4qFmivjkPzEJH4wleZX
+         ByZdWBJw30nvL0XpIOT0XM7P52U6W286S2YiIQX/PvQcvcu3XcNZIGbQx3Bkb55iTHX3
+         MQbnzR9JR6Shu6TQTJmhoRbby1Z8QLNUQg0tGT2Zz3qIfyIt899AEde6OkJJ1Q081c2B
+         hl1vHRnjZV57Qy9/yQFUdMDKD8/QqJw7+NHfOgI0ly/jeQ9uOs8j2dBqDk64N9Fs/SHe
+         +6Z5NgcgvfZ9Qq4Rbad/h1qAETS9vCDuvE4t8x0kDJu6cnn/Io3SBNFIV/VOBWThm52z
+         1JIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742595328; x=1743200128;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hz7SI+MRITJdDDcuu+iapQr7TxDqFp3vr+TXoSWWGCE=;
+        b=QUgVntqVb+NL3mcLOgJ2AJxB25az+7voamJvp6JROX+bdoypSUP8g6dXjM2vi96Eqf
+         JFcnuemvaQEnyS/kRKJFDXToCWcfmMGctlpK6dXPFxqstBbDacQKNX6Rxh60qzTjT4Eb
+         xtOZmw7w0idng5IKLvf7nnuahdqbs5T2Qy+xKgZZP4FBm6R1ZhmdWjXqxOYPcAKMaJ9i
+         4M0Z9o6/G5myFjQ9+Zo7jZHPa8FftsbpsuLEG6lILuOfgmrbvPzZY784dMb2v9Fw4lpd
+         XhzN+HG1SXs6q6dF+hRp5qGK3Mt6LRyHJ3bl0vZ4bT2/D4pUXloizxSsb1+PJADD8byd
+         KVcA==
+X-Gm-Message-State: AOJu0YxDNTRuebrgFX0IYdnjp4JB31n2I3BcS1f/r8Dvqi43do5mWqvK
+	KAc3gu4VrQLS2Eprv08ugEAREyBMRG9+3IaVEWKdEqdgEheWmBsBTGrwhWHVDbuzLzFv6rcJMW9
+	XOOv+MyZIMQceWn2S2lQ3GalnTT3LmOkbMm4X
+X-Gm-Gg: ASbGncskja9IkjYzS8GlpRj6+q5lzI3SJuyi93vyP2dwSJOnQ87O6etGQcS755hE67L
+	vJ5s3wroSKb/K6rIGZLYezRSnEe2xdhEINlJdWiue0jDceor3girBHBcEtkqJu0R+WtQZQzoZAu
+	4NqbxKE5cPq/YHNVeG3m48nqnFob1NIF/SqHwlYlE1D7ptgWty0/2XzFI=
+X-Google-Smtp-Source: AGHT+IGBoa3JmICUjXYWbIuZG1QnxGwt2v2Pxt/ddhpOPWc2le0JOM4R9EEoSgO2H5EsypXp8nLSfXGBeIbvxdvRzAY=
+X-Received: by 2002:a17:902:d4cf:b0:215:f0c6:4dbf with SMTP id
+ d9443c01a7336-227982bd0e7mr778235ad.14.1742595327611; Fri, 21 Mar 2025
+ 15:15:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250220070611.214262-6-fujita.tomonori@gmail.com>
+References: <20250308214045.1160445-1-almasrymina@google.com>
+ <20250308214045.1160445-5-almasrymina@google.com> <5de5943b-5527-49f6-a454-b3c7358cff56@redhat.com>
+In-Reply-To: <5de5943b-5527-49f6-a454-b3c7358cff56@redhat.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 21 Mar 2025 15:15:14 -0700
+X-Gm-Features: AQ5f1Jp_bSaJYceldtfK0dIdQEXx63Idm2vF7CtmSVJ_E1ycJl8iObtXRhrS3vg
+Message-ID: <CAHS8izNfyfVhMj0wBvP0qa=7E4xL+eo9wn_Fi4o2PT8piwACWA@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 4/9] net: devmem: Implement TX path
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Donald Hunter <donald.hunter@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Jeroen de Borst <jeroendb@google.com>, 
+	Harshitha Ramamurthy <hramamurthy@google.com>, Willem de Bruijn <willemb@google.com>, 
+	David Ahern <dsahern@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Le Thu, Feb 20, 2025 at 04:06:07PM +0900, FUJITA Tomonori a écrit :
-> Add a wrapper for fsleep(), flexible sleep functions in
-> include/linux/delay.h which typically deals with hardware delays.
-> 
-> The kernel supports several sleep functions to handle various lengths
-> of delay. This adds fsleep(), automatically chooses the best sleep
-> method based on a duration.
-> 
-> sleep functions including fsleep() belongs to TIMERS, not
-> TIMEKEEPING. They are maintained separately. rust/kernel/time.rs is an
-> abstraction for TIMEKEEPING. To make Rust abstractions match the C
-> side, add rust/kernel/time/delay.rs for this wrapper.
-> 
-> fsleep() can only be used in a nonatomic context. This requirement is
-> not checked by these abstractions, but it is intended that klint [1]
-> or a similar tool will be used to check it in the future.
-> 
-> Link: https://rust-for-linux.com/klint [1]
-> Tested-by: Daniel Almeida <daniel.almeida@collabora.com>
-> Reviewed-by: Gary Guo <gary@garyguo.net>
-> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
-> Reviewed-by: Fiona Behrens <me@kloenk.dev>
-> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+On Tue, Mar 18, 2025 at 1:53=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> Adding Kuniyuki.
+>
+> On 3/8/25 10:40 PM, Mina Almasry wrote:
+> > @@ -931,10 +932,67 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, s=
+truct genl_info *info)
+> >       return err;
+> >  }
+> >
+> > -/* stub */
+> >  int netdev_nl_bind_tx_doit(struct sk_buff *skb, struct genl_info *info=
+)
+> >  {
+> > -     return 0;
+> > +     struct net_devmem_dmabuf_binding *binding;
+> > +     struct list_head *sock_binding_list;
+> > +     struct net_device *netdev;
+> > +     u32 ifindex, dmabuf_fd;
+> > +     struct sk_buff *rsp;
+> > +     int err =3D 0;
+> > +     void *hdr;
+> > +
+> > +     if (GENL_REQ_ATTR_CHECK(info, NETDEV_A_DEV_IFINDEX) ||
+> > +         GENL_REQ_ATTR_CHECK(info, NETDEV_A_DMABUF_FD))
+> > +             return -EINVAL;
+> > +
+> > +     ifindex =3D nla_get_u32(info->attrs[NETDEV_A_DEV_IFINDEX]);
+> > +     dmabuf_fd =3D nla_get_u32(info->attrs[NETDEV_A_DMABUF_FD]);
+> > +
+> > +     sock_binding_list =3D genl_sk_priv_get(&netdev_nl_family,
+> > +                                          NETLINK_CB(skb).sk);
+> > +     if (IS_ERR(sock_binding_list))
+> > +             return PTR_ERR(sock_binding_list);
+> > +
+> > +     rsp =3D genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
+> > +     if (!rsp)
+> > +             return -ENOMEM;
+> > +
+> > +     hdr =3D genlmsg_iput(rsp, info);
+> > +     if (!hdr) {
+> > +             err =3D -EMSGSIZE;
+> > +             goto err_genlmsg_free;
+> > +     }
+> > +
+> > +     rtnl_lock();
+>
+> The above could possibly be a rtnl_net_lock(), right?
+>
+> (not strictily related to this series) The same for the existing
+> rtnl_lock() call in netdev-genl.c, right?
+>
 
-Sorry to make a late review. I don't mean to delay that any further
-but:
+Actually I think this can follow the example set in commit
+1d22d3060b9b ("net: drop rtnl_lock for queue_mgmt operations") and
+take the netdev_get_by_index_lock().
 
-> +/// `delta` must be within `[0, i32::MAX]` microseconds;
-> +/// otherwise, it is erroneous behavior. That is, it is considered a bug
-> +/// to call this function with an out-of-range value, in which case the function
-> +/// will sleep for at least the maximum value in the range and may warn
-> +/// in the future.
-> +///
-> +/// The behavior above differs from the C side [`fsleep()`] for which out-of-range
-> +/// values mean "infinite timeout" instead.
 
-And very important: the behaviour also differ in that the C side takes
-usecs while this takes nsecs. We should really disambiguate the situation
-as that might create confusion or misusage.
-
-Either this should be renamed to fsleep_ns() or fsleep_nsecs(), or this should
-take microseconds directly.
-
-Thanks.
-
-> +///
-> +/// This function can only be used in a nonatomic context.
-> +///
-> +/// [`fsleep`]: https://docs.kernel.org/timers/delay_sleep_functions.html#c.fsleep
-> +pub fn fsleep(delta: Delta) {
-> +    // The maximum value is set to `i32::MAX` microseconds to prevent integer
-> +    // overflow inside fsleep, which could lead to unintentional infinite sleep.
-> +    const MAX_DELTA: Delta = Delta::from_micros(i32::MAX as i64);
-> +
-> +    let delta = if (Delta::ZERO..=MAX_DELTA).contains(&delta) {
-> +        delta
-> +    } else {
-> +        // TODO: Add WARN_ONCE() when it's supported.
-> +        MAX_DELTA
-> +    };
-> +
-> +    // SAFETY: It is always safe to call `fsleep()` with any duration.
-> +    unsafe {
-> +        // Convert the duration to microseconds and round up to preserve
-> +        // the guarantee; `fsleep()` sleeps for at least the provided duration,
-> +        // but that it may sleep for longer under some circumstances.
-> +        bindings::fsleep(delta.as_micros_ceil() as c_ulong)
-> +    }
-> +}
-> -- 
-> 2.43.0
-> 
+--=20
+Thanks,
+Mina
 
