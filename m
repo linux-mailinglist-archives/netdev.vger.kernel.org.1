@@ -1,145 +1,144 @@
-Return-Path: <netdev+bounces-176788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AEB3A6C238
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 19:18:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC9DFA6C257
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 19:27:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59B1F3B3052
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 18:18:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 620351899162
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 18:27:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B10522D4C0;
-	Fri, 21 Mar 2025 18:18:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E2D122F15E;
+	Fri, 21 Mar 2025 18:27:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MwDjxEiW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eAxy/fYc"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3B161E7C25
-	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 18:18:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 825581E5B83
+	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 18:27:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742581102; cv=none; b=dzmHlllN1W0VuqrtifpPldiocZfZeItgVFSCpFVM++tHZ5cib7XHuzdMrAgQwR9xz5/iTXiOun4FYe4f0hCeDa/9MKv1PwwgbCw/1kzXIPhUdZLZ/cUb002hQxE8x6kKLjAunsGuatFr+huByLR0wpMeyIdEdn+I43cWOfaNcuA=
+	t=1742581631; cv=none; b=HFV49hGD1FnKekZ4wifYqmCuaHNghcZMnMTeDjOjgFAwP79bO51LPeXyhuWk/KKafyi+Ja9iXGc9IJIL82PpmJX44p3RviiO5DTg9FZIc4+PJee5E6G366HOrCWCDLDVn2sPtThivA2Fmgxi0Q+iPDle+wvHnlAc969qyTuqiX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742581102; c=relaxed/simple;
-	bh=vOHWoxiw2xdMs3GmEHCxHidgceg+4sXbAb8ZxPba/Rw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=thNkKMp55qclNEaFyXqyUt9Tc733xTndf/l452NP7pj4i2C1uxVDDQGgNkx7PDuUb2pWDq1n98FlKfPkXPPqgc62H6mtkE35oFgDL9z3taG/IlvIOf4uB7uBtjMhkmIOlzUqI2gRual6UxAUritIhW0y7RiQgY753SJu7z8KQHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MwDjxEiW; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1742581631; c=relaxed/simple;
+	bh=bTQZl+jKYwsLzl4vfj4ptDXiTWI3OAMPApOYg8CTBCI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VCriqDJ+7BsoUOx1bzbydwtS3TeRmm8FU0tqphqhFC0uj4DUIm1Mk0Z3KqCy0Uu/UqvRK/SrSnq5zQE8UmnkTRKJyzYNxxJ3uBfkZ1VzJLdyWlnFzeQ8Im1pC2NOfLfi6bsunz9O9kPBX5zFYSu/NInezvf5Py/PKImbhmqmvVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eAxy/fYc; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742581099;
+	s=mimecast20190719; t=1742581628;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=iRqBZ0OkMQP4BzSiooVfIumzyiQnM11f1AZ/zH2IWSk=;
-	b=MwDjxEiWgSNCqW7Ka+LWh3iVQrcNjYxlz3zROsyv6YAJKFX/0L53Zk1Nv6obO61cZ7czXo
-	UK/aJ7TBfm/mD9QFiq0k40+n/uQcAujYj8105FQ/R/VAcVavFPtq86cWsGn/64NbI1pKk9
-	7AqdHvxsNT0Opldt2S/8cullj6qvf+U=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=CBvAZI44TSwYckHNoPIjidtJUdEM1gfFKOJZR81EuoM=;
+	b=eAxy/fYcv1uI6yp2ZVhJYjHcw71zxa5Q/uxmLU3aOfHj7t4F5BW0AiVmd7LmRHDdPpPXjr
+	UmIefqwb8Np0Ep6oYgpSnijf840d8n+mh/+HkxNTnx/mO6PP4JbttBDFddDwOcPXNDom15
+	frEPDPt90JSfFmb3RhcX89CynrMUQ6w=
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
+ [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-262-gQ8wvRy5PguSC3B9lHnYDg-1; Fri, 21 Mar 2025 14:18:18 -0400
-X-MC-Unique: gQ8wvRy5PguSC3B9lHnYDg-1
-X-Mimecast-MFC-AGG-ID: gQ8wvRy5PguSC3B9lHnYDg_1742581097
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43cf5196c25so11046485e9.0
-        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 11:18:18 -0700 (PDT)
+ us-mta-695-7eDfEMYuNXavtAA0UnaSlg-1; Fri, 21 Mar 2025 14:27:07 -0400
+X-MC-Unique: 7eDfEMYuNXavtAA0UnaSlg-1
+X-Mimecast-MFC-AGG-ID: 7eDfEMYuNXavtAA0UnaSlg_1742581626
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2262051205aso24381385ad.3
+        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 11:27:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742581097; x=1743185897;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iRqBZ0OkMQP4BzSiooVfIumzyiQnM11f1AZ/zH2IWSk=;
-        b=ZabhcIaXI70OpmptFW4P5sDAVKy38X/6j4GwCqyx4gqaAIKMpZ/PNUV3dMMP/oOas1
-         tBZpMF/p9QSEzrwlfx1u3ja3CMA6Xr5/zGQ4ALls62O31m1u77fJBHK3y9dAAczLGuAK
-         yQVrphBLx4dzes2K3UnhKm7UtanPzFCqG3uK8UJfULJG+s9+0uAaLZ5WNNLADT9l1dg9
-         y+m2qI/FV8TVRii/9IuOJcL8LYBF+mrlt/lQ/0BZ21RMpl3zZEm51YNWa/cgMFoPBCCj
-         Z+4jN9IS0eDgVzJ+KFQfcy9oGt6yQwzX0OOIGB6al+OIX3/BdLQGQmjC9wzoRJ7NQZoy
-         r/Xw==
-X-Forwarded-Encrypted: i=1; AJvYcCW+gjrhWOxfIaw1+6c057/DMzEGSXmh60IFZ0cAJzdrQsmMByEtuctvBqI30lu//01JIQ1rtYI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyszJLFNpb8ElOO1W2sOlFunPvcR5cMTvlAWAKUgUhrOt0qiIfG
-	g64dAxK4sM/p/nno4kBC3XaIiyip7TT8suCWqulCzHNm/3ZH/OPYId9L0hVWtAeVGnMVFLW9/tn
-	1H/xzCE2txPU/zhGgKGXU9w7rIKlsRnLLgdugs5YVPiLInEalRJKi+A==
-X-Gm-Gg: ASbGncuk3lbELkHpFF5HITRvCpi2mlfeQ8mWIARV6XBCd9utXiDNHut2Q47tNAXinUD
-	Q37WXxPDoEz9vbnJvSfMSSsX3rFJLHP+he3tNZj1JjpD6FW4qcDze7Fwa6pWsz2GfSN8+DbrUW2
-	ZRqD5qSk4HQgtU3lK8rxTf7j1WE9vznzjserO9So/dcpKP7Q9g3/lud2ckfeh71Cqr1id4KwIZ+
-	2mIidknL711JCLj7cFc11ZaDn1g5LDLV0ZEEI7Z3Z90E+E9gHo5T79PjU0w2vKaCl+35VZKBpps
-	5k8VhH0NIbYiLh3W+HDsswUpajFtLsWngJ/mv3KqiggpTw==
-X-Received: by 2002:a05:600c:5488:b0:43d:db5:7af8 with SMTP id 5b1f17b1804b1-43d50a31981mr32999205e9.21.1742581096863;
-        Fri, 21 Mar 2025 11:18:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH4hjspn7nFbirV1vOF+PWolmKka8uULS32ZeHXEmfN9pXrlTOZAy5VVuhKwl33XEm7itFSrQ==
-X-Received: by 2002:a05:600c:5488:b0:43d:db5:7af8 with SMTP id 5b1f17b1804b1-43d50a31981mr32999005e9.21.1742581096493;
-        Fri, 21 Mar 2025 11:18:16 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-77-210.dyn.eolo.it. [146.241.77.210])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d43f3328bsm84371215e9.1.2025.03.21.11.18.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Mar 2025 11:18:16 -0700 (PDT)
-Message-ID: <2d39033d-0303-48d0-98d3-49d63fba5563@redhat.com>
-Date: Fri, 21 Mar 2025 19:18:15 +0100
+        d=1e100.net; s=20230601; t=1742581626; x=1743186426;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CBvAZI44TSwYckHNoPIjidtJUdEM1gfFKOJZR81EuoM=;
+        b=M6Tp9vN0nPjWYfDFfYzANdkRMfX+rjFdk6n+roRm1MqCzH+yzKpzLkvO9o13aLIPrG
+         2lxPkDjLRo4qS/Kf6bOJ4jKvsEcKW/43f18z0jUBJ2utC41GQ584MhPL2qWTbrJy6dYm
+         T4b1liboln9N/3ptBT0d6EeP24MR1atQH8dsoNrFlv3PO1CnDuO/i7rPZlh69Twbfprq
+         lXoUQSKEdx/r4giqffus6gTKQZsg/Ak08DOOwxl/pMPXnvX7/Gdm9hgh5MmvsnZxeTaG
+         nRK9xsCpPagY69BlIWMPBcSWpKnYMdSHGS+OuNvBYZlBNrPT9x/O9fYIzsrXzlkjTd29
+         8pcA==
+X-Forwarded-Encrypted: i=1; AJvYcCXLyb1QjTWayjwwd+IKWeYLcH7/X7ROKgatf+TjpQz9recuAOhUdWdKSlrAPotXDbzFazvMnNw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyH3WadgP3UtsRbbsC4zeJeoxmIondJx2GdZHVZ2r2pLIAumnpV
+	fNVb6uKqjtiJVIOti0mcf1G3vQl6vKCgRti3DUogAcEgwAXBzA65vWjZKrZRRq4LgJdzCPBrOK8
+	MHUJS84lY599AN42Q058YEpRxJXUwOFbV4zMbx4AZ0jKZVbdjMgDefA==
+X-Gm-Gg: ASbGncuxDLU4G1hzjlvdpweO8nD99IJXpP+S5NOFV0lnQaTY6KbnVi9RyBjSAbIWtQC
+	9zzBzB8bECnwzh1/Z6alpGsHj6r1LeAAuwvP67f2yuNAZ+5epxSC5Vw8i2jE9klHXaKDTlvNWvz
+	LFJ2oPOgF5sPPb6YtScSVFHpDAnXeDpRSzuDCo3+KOD75RM5Vf9/Tye1Zh83rd1UtQ7J1DB9nWH
+	v53DayZdzZUqRyHDjh59osMKMAo+y44Dk/9AImi0zxTxP9SV3FQ2SRRL2sgiyReHmtkD7sk46pc
+	zUuOjxs9
+X-Received: by 2002:a17:902:d4c5:b0:224:e2a:9ff5 with SMTP id d9443c01a7336-22780c68927mr63231025ad.9.1742581626017;
+        Fri, 21 Mar 2025 11:27:06 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEHESOlmKUv4omuiIQXNajC9s1OooXjFczUMnufBWcD/XHD7P+eP9u2TgzZG1Ni8l4wIF+1XA==
+X-Received: by 2002:a17:902:d4c5:b0:224:e2a:9ff5 with SMTP id d9443c01a7336-22780c68927mr63230655ad.9.1742581625648;
+        Fri, 21 Mar 2025 11:27:05 -0700 (PDT)
+Received: from redhat.com ([195.133.138.172])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22780f3b242sm20686155ad.41.2025.03.21.11.27.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Mar 2025 11:27:04 -0700 (PDT)
+Date: Fri, 21 Mar 2025 14:26:59 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Melnychenko <andrew@daynix.com>,
+	Joe Damato <jdamato@fastly.com>, Philo Lu <lulie@linux.alibaba.com>,
+	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, devel@daynix.com,
+	Lei Yang <leiyang@redhat.com>
+Subject: Re: [PATCH net-next v2 0/4] virtio_net: Fixes and improvements
+Message-ID: <20250321142648-mutt-send-email-mst@kernel.org>
+References: <20250321-virtio-v2-0-33afb8f4640b@daynix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net: airoha: Validate egress gdm port in
- airoha_ppe_foe_entry_prepare()
-To: Lorenzo Bianconi <lorenzo@kernel.org>, Andrew Lunn <andrew@lunn.ch>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-References: <20250315-airoha-flowtable-null-ptr-fix-v2-1-94b923d30234@kernel.org>
- <b647d3c2-171e-43ea-9329-ea37093f5dec@lunn.ch> <Z9WV4mNwG04JRbZg@lore-desk>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <Z9WV4mNwG04JRbZg@lore-desk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250321-virtio-v2-0-33afb8f4640b@daynix.com>
 
-On 3/15/25 3:59 PM, Lorenzo Bianconi wrote:
->>> Fix the issue validating egress gdm port in airoha_ppe_foe_entry_prepare
->>> routine.
->>
->> A more interesting question is, why do you see an invalid port? Is the
->> hardware broken? Something not correctly configured? Are you just
->> papering over the crack?
->>
->>> -static int airoha_ppe_foe_entry_prepare(struct airoha_foe_entry *hwe,
->>> +static int airoha_ppe_foe_entry_prepare(struct airoha_eth *eth,
->>> +					struct airoha_foe_entry *hwe,
->>>  					struct net_device *dev, int type,
->>>  					struct airoha_flow_data *data,
->>>  					int l4proto)
->>> @@ -224,6 +225,11 @@ static int airoha_ppe_foe_entry_prepare(struct airoha_foe_entry *hwe,
->>>  	if (dev) {
->>>  		struct airoha_gdm_port *port = netdev_priv(dev);
->>
->> If port is invalid, is dev also invalid? And if dev is invalid, could
->> dereferencing it to get priv cause an opps?
+On Fri, Mar 21, 2025 at 03:48:31PM +0900, Akihiko Odaki wrote:
+> Jason Wang recently proposed an improvement to struct
+> virtio_net_rss_config:
+> https://lore.kernel.org/r/CACGkMEud0Ki8p=z299Q7b4qEDONpYDzbVqhHxCNVk_vo-KdP9A@mail.gmail.com
 > 
-> I do not think this is a hw problem. Running bidirectional high load traffic,
-> I got the sporadic crash reported above. In particular, netfilter runs
-> airoha_ppe_flow_offload_replace() providing the egress net_device pointer used
-> in airoha_ppe_foe_entry_prepare(). Debugging with gdb, I discovered the system
-> crashes dereferencing port pointer in airoha_ppe_foe_entry_prepare() (even if
-> dev pointer is not NULL). Adding this sanity check makes the system stable.
-> Please note a similar check is available even in mtk driver [0].
+> This patch series implements it and also fixes a few minor bugs I found
+> when writing patches.
+> 
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 
-I agree with Andrew, you need a better understanding of the root cause.
-This really looks like papering over some deeper issue.
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-AFAICS 'dev' is fetched from the airoha driver itself a few lines
-before. Possibly you should double check that code.
-
-Thanks,
-
-Paolo
+> ---
+> Changes in v2:
+> - Replaced kmalloc() with kzalloc() to initialize the reserved fields.
+> - Link to v1: https://lore.kernel.org/r/20250318-virtio-v1-0-344caf336ddd@daynix.com
+> 
+> ---
+> Akihiko Odaki (4):
+>       virtio_net: Split struct virtio_net_rss_config
+>       virtio_net: Fix endian with virtio_net_ctrl_rss
+>       virtio_net: Use new RSS config structs
+>       virtio_net: Allocate rss_hdr with devres
+> 
+>  drivers/net/virtio_net.c        | 119 +++++++++++++++-------------------------
+>  include/uapi/linux/virtio_net.h |  13 +++++
+>  2 files changed, 56 insertions(+), 76 deletions(-)
+> ---
+> base-commit: d082ecbc71e9e0bf49883ee4afd435a77a5101b6
+> change-id: 20250318-virtio-6559d69187db
+> 
+> Best regards,
+> -- 
+> Akihiko Odaki <akihiko.odaki@daynix.com>
 
 
