@@ -1,113 +1,166 @@
-Return-Path: <netdev+bounces-176758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED3C5A6C03D
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 17:42:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B65D1A6C04F
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 17:45:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B10E7ABAC5
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 16:39:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 442007A3476
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 16:42:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D365C22D7AD;
-	Fri, 21 Mar 2025 16:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADF621EBA1E;
+	Fri, 21 Mar 2025 16:43:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RKD4ARu5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eUiTPsUZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2401B22D4FA
-	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 16:40:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 386EC13B59B;
+	Fri, 21 Mar 2025 16:43:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742575202; cv=none; b=ebnVxvVfnseSPcWyfuTJYqhjg1U5zJR5g0ufACYpXxEjclRbK9DZTTAHWXxg1tcFppa0YseeZrpSY/g4XMZPKN2YrueDlxN5jCJ9wzRnnlcbxV6qus+Ej7gagtnRK88qexDHdjPrhl0XRFV9kBGEwK37Tzkb6gGNiBCU25IBC8E=
+	t=1742575411; cv=none; b=WCfHRVCzS37zQ0shW/6HtmocQg32bxIZhsx+WqrVH2LX3uoVQRuBlPbUftTagvkJMkG2TIy5e8qW2nhIyiTnaygY4WN3lGJY+NWGhLjy13nrQBakLDHHY3JsWllccVbxn3xrgr0TEqgHplx3vkDMyozpXlDa6W2cyxTLpwWUVjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742575202; c=relaxed/simple;
-	bh=7GKGBLWguxSB17GISMNCbY0yjLuLuhHIMMX5WpM26y0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=bNMyZDtxmrUIyWKML06FMl7uiV3G+UwTLqDYV+C2FKy8QHKiy20KSdYeVPzkDR2XCLWwuOjiZIeU2nK12zI9+k7UUK5xtEr6NMOQ91CuzZgE0YXu9W3D7mjnL2IGIbEz57d0gpl+b29WXRNDHX5aTydehwK/3SD+9FCyAG/8e3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RKD4ARu5; arc=none smtp.client-ip=209.85.222.174
+	s=arc-20240116; t=1742575411; c=relaxed/simple;
+	bh=q8gY0EHYv1f0SNCN1IiS93/JbkcsovraFqehXvDUYac=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p0w379Fa5utKDQb+/69y+Ut8tVJD8lmvvqKnY/rs6ZGo+eV6+0YOyGZLUwZWsG1auCwB7vjxCAY0e8DeNp4ZfuNnVFkcXcXQrIx7y1ky+B62BC11NcA1wCAo5HVw0XmrboFUlCjQ1iHH/oFZ9thARvuoB4YGO7yDroE30C8OxBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eUiTPsUZ; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7c07cd527e4so211977185a.3
-        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 09:40:00 -0700 (PDT)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-224191d92e4so45204215ad.3;
+        Fri, 21 Mar 2025 09:43:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742575200; x=1743180000; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LKpzgUXaxOJWe5jGFINlc0e7HYmDagFpwzbJE7PXMrw=;
-        b=RKD4ARu5v7pPd0ei08Zn2agCBdc4Q4P/kL0GbvqTDmY1XEd/oIB/q9iX0b7wXOFNo0
-         8+z5iJ1YZMB04kUN/eL137zMucL6dekaBrgzxOMopu3nGiL6DSYj7bj+vEq3LshChyVF
-         ywxY8GBhFfKsHl9jneNE7e7ubSBAU4/lec56dfi/azcPkqYvLJTyx32yFUqDcXq8bYbJ
-         iMbs0kr3SnUdBkv9+gqRusKGGXHv5Tq8DHIQkHsnrfiq+LgWmEidXN6+S1VloMiy8t4Q
-         2+bVAtHk97aPkeDJbclevgSiW6enIQTG5E+COyW+w4jSqnXmLivk0myBPPkvAHXZzXze
-         foKg==
+        d=gmail.com; s=20230601; t=1742575409; x=1743180209; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/aJTPH+1xMkR4Zaf05Ht/L3jxae3E9cyEnH7B1bM0G0=;
+        b=eUiTPsUZkHShvkqy8DZjZw7ydtXi4IwkuItp2YZoqtfGTPdaoDyxQSJCJFdrNMzsGD
+         05ReMpVzdYwIoiVpxIXq0vX1u2gHVOWtevaycGa1wQ5aS3n+AYlwHeRXoHR+8YQIaGUa
+         8L6aH/QzASDWQtJjAAyHzMMsNj1B4SOSefaXRFf736CFya3+pKnsQgNPKkQilEkt1BDB
+         UJrpH8+U1GmRbTh4644rmu2PWbWZE80a0kfWjEw4DgT2rYumBF6sjm5SZwmjdpHF0Hq0
+         GTHYrQEpTmYN5xkT7ZcYGp3Ub/7w60Syws4MsqNZPc7QUifN6XRITXBAt/IVH31/v/vg
+         0ddg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742575200; x=1743180000;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=LKpzgUXaxOJWe5jGFINlc0e7HYmDagFpwzbJE7PXMrw=;
-        b=gnLpOwShXMwUYPn8N570K8ONVWlEyKz0B+MZU37B05zbX9VNTH7xE/AgvjiIEihv96
-         AQPsJ3IR+XfzUjcEGsTFulIndJatCmpIobkjXhsHGk55ABd7rqEp0MlVqqNvLz/4j+jc
-         MfGlQDBAyGdU2B440hDvfFqfgCbQm5IUAA2iy07eTL2Hvw5ZN/0oRsHlnV3YSmMd6mI4
-         cq8OPIIyNGgZpceKsxmL05R7NN/DJoNZFFhk6ynSwR3vhHRD6USmp4IO+wUgMMHY+/+s
-         +l41TOAO5u5VILCdNu3hUFvTa/adNszHTXWQTZKBYlal4KhQIFyfSPgp4FTuwswhwk1T
-         +pnw==
-X-Forwarded-Encrypted: i=1; AJvYcCUOgwCsNMuhd5rESAKy2DvFPuEREBpElgsoul/+9b4UWC7yU/sGjms7PzXZG4/hWD7FFN2eum8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2NUXeIBmLpsH8KhGpgdxp8QNfhSo7XVlS2b3c67wJXrbVUpkI
-	a42+geUHbxGYJHOYXntZL7iUIFbLQuu1RCtccs8xpn3GbznS9npn
-X-Gm-Gg: ASbGnctY/MZfUCCy46snPv0oWgZOoqQpFrpxNTIdrXJ1U+hWCNU3sXswnSqlCphyLDP
-	7fMkNOAQkC7KaGCCSYjw+06UTP0wpKHO9lo7EcinPbhpLM7xk0+v2WlI/Mh+T/frrOIxJYnnqCx
-	JnFAhk0qpdM0vgaWE5LHfJr5v5HbMVbi+GuTfgleQYLm6M8wHNPK0tJQYofd6aahM8vFjE9mGQC
-	4ghOw4MW1TKBRl6ZN6FeogV3YrJqwNkgtMJY0NFac0Qs0pZR+Hm9vMnxJXHmoFr7XxKflGmm/yv
-	Sg7NB5NT1LDI29ixe69HdCI5ja3/lUt62uVRursKza8vVZYY7WAXpGBQ17nfOyJAwLRjlbWAzjz
-	c/GrFAY4j3eKHj35vJgOZ9w==
-X-Google-Smtp-Source: AGHT+IHIzZAK2/RUdYe/JbrgklF8qyQFDcvWkBTVM8m6+h6zdwyYwshwSbI6W6qzzlXGqrBqz5t0lQ==
-X-Received: by 2002:a05:620a:2685:b0:7c5:3cf6:7838 with SMTP id af79cd13be357-7c5ba1fdea8mr653425485a.49.1742575198924;
-        Fri, 21 Mar 2025 09:39:58 -0700 (PDT)
-Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c5b935596dsm147557885a.107.2025.03.21.09.39.58
+        d=1e100.net; s=20230601; t=1742575409; x=1743180209;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/aJTPH+1xMkR4Zaf05Ht/L3jxae3E9cyEnH7B1bM0G0=;
+        b=DNSrtFmABSyin2NAkI1yJuQRF0Zc9BzqjTv83emUFoWivAfjO4Q0asjquIAIdVMWzX
+         cTNwBqIvDxpi83zWvryaCyzsJWk0oqcYTrmlkfi4lR6FsG4hWq1rlOO5DXq/g1S52aCs
+         xNArZKas7N/tQqhxqMmLJFBdf5q09HWCic//YXLieFEYQDJa/wt0NkgS0wPMfrNPZQoa
+         hUp51wrau2t5vsxcu50noY0+H5iOHGXjYiIbmyxYwpFMrgQbqrfBTy5QhtkAtdGcshEw
+         CoYwcRSzPvxhDlqU4KXYlqgPq4bINHV4rjDmEsEIIxOigWoIiiqkTWfO5+jzaSFWvLle
+         CmNw==
+X-Forwarded-Encrypted: i=1; AJvYcCVjFvXseNAMvMOKF23X+KAz9Q7l3Dm3fmNvwPmMXkw8WDL1wW7n0ImsFv0mHrWHgeX8oFE5w4Fq@vger.kernel.org, AJvYcCWavUzQf0ScOa4Lim14Z5jc7hMowBVg+3B4zoikj/3qYap01W+wPBFD86L1VGoTJ4jSA9E/t1tAwKx5g2UK@vger.kernel.org, AJvYcCWiKfmd0cj7w75y8uLxn5OckP352yRLGVEE4ml/NKJe9F1Rff1+Ef7mwfxR2PKI1DpdWi+P0x29SYVnHSsO@vger.kernel.org, AJvYcCWwI1B+L5FqqajL8l7J2fX50QDyWhmBCCGaUd/rfpmC0zQYUmuJ4JnBEi0ZfoWF7CpfNiY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBOvTQcjZqlT+fY+S3GJ5QyhMDYKls+Y94iwAhOrNAt6RM83sT
+	Bi8EbW9fS0/oRwC7gXDNjn2W+O5vKmRsmB/oS6FGRbOj+tlAvqb4
+X-Gm-Gg: ASbGnctITVPqzc1muvI01+Qkd8acKfoW7N8uAKY//0Q940fFRyc+VGxt5gZLhhAUmr1
+	PFKNnJAUDibDhZ+vuoOqytA8N2fdYxkyu8YRgSD4Ol6x31SbQJPeWroywOSCuyVk5EKLTlbO9GO
+	XNh+NRf3trIh0h+tQEch0o57Tu5+cmnDlCpTAEz3Wjt2Ow1pMINEnD5S9VPwn6hZ8v7UoEG05Z+
+	BEuMnjE3FzwQCURl3iiCoY9nurDEy/EpSobsqllcnKqPrHQl1CjnL+EfDL0vQiutY80wu3AzikI
+	7PjhRGaEf1lMS6qCQvlourzC8P30ZCyvcyTMasaWxoOIAPj622KU5m/9ClH9YOqWkA==
+X-Google-Smtp-Source: AGHT+IENp6UIAwlpkbF6We8IKTNIq+1iFjd3EWQYgWjKi8R9GSQ9a0yFuxD7FT/yHfceTqi0iUTpuw==
+X-Received: by 2002:a17:902:ef12:b0:223:88af:2c30 with SMTP id d9443c01a7336-22780d8cfeemr57519585ad.16.1742575409441;
+        Fri, 21 Mar 2025 09:43:29 -0700 (PDT)
+Received: from devvm6277.cco0.facebook.com ([2a03:2880:2ff:3::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-227811b2b30sm19212985ad.120.2025.03.21.09.43.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Mar 2025 09:39:58 -0700 (PDT)
-Date: Fri, 21 Mar 2025 12:39:58 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Simon Horman <horms@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- David Ahern <dsahern@kernel.org>, 
- Nathan Chancellor <nathan@kernel.org>
-Message-ID: <67dd965e2d986_14b1402942d@willemb.c.googlers.com.notmuch>
-In-Reply-To: <0d33ffb4f809093d56f3ebdffd599050136f316a.1742557254.git.pabeni@redhat.com>
-References: <cover.1742557254.git.pabeni@redhat.com>
- <0d33ffb4f809093d56f3ebdffd599050136f316a.1742557254.git.pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2 4/5] udp_tunnel: avoid inconsistent local
- variables usage
+        Fri, 21 Mar 2025 09:43:28 -0700 (PDT)
+Date: Fri, 21 Mar 2025 09:43:26 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v2 3/3] vhost/vsock: use netns of process that opens the
+ vhost-vsock-netns device
+Message-ID: <Z92XLufHveVjpI43@devvm6277.cco0.facebook.com>
+References: <20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com>
+ <20250312-vsock-netns-v2-3-84bffa1aa97a@gmail.com>
+ <09c84a94-85f3-4e28-8e7d-bdc227bf99ab@redhat.com>
+ <nwksousz7f4pkzwefvrpbgmmq6bt5kimv4icdkvm7n2nlom6yu@e62c5gdzmamg>
+ <Z9yDIl8taTAmG873@devvm6277.cco0.facebook.com>
+ <aqkgzoo2yswmb52x72fwmch2k7qh2vzq42rju7l5puxc775jjj@duqqm4h3rmlh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aqkgzoo2yswmb52x72fwmch2k7qh2vzq42rju7l5puxc775jjj@duqqm4h3rmlh>
 
-Paolo Abeni wrote:
-> In setup_udp_tunnel_sock() 'sk' and 'sock->sk' are alias. The code
-> I introduced there uses alternatively both variables, for no good
-> reasons.
+On Fri, Mar 21, 2025 at 11:02:34AM +0100, Stefano Garzarella wrote:
+> On Thu, Mar 20, 2025 at 02:05:38PM -0700, Bobby Eshleman wrote:
+> > On Thu, Mar 20, 2025 at 10:08:02AM +0100, Stefano Garzarella wrote:
+> > > On Wed, Mar 19, 2025 at 10:09:44PM +0100, Paolo Abeni wrote:
+> > > > On 3/12/25 9:59 PM, Bobby Eshleman wrote:
+> > > > > @@ -753,6 +783,8 @@ static int vhost_vsock_dev_release(struct inode *inode, struct file *file)
+> > > > >  	virtio_vsock_skb_queue_purge(&vsock->send_pkt_queue);
+> > > > >
+> > > > >  	vhost_dev_cleanup(&vsock->dev);
+> > > > > +	if (vsock->net)
+> > > > > +		put_net(vsock->net);
+> > > >
+> > > > put_net() is a deprecated API, you should use put_net_track() instead.
+> > > >
+> > > > >  	kfree(vsock->dev.vqs);
+> > > > >  	vhost_vsock_free(vsock);
+> > > > >  	return 0;
+> > > >
+> > > > Also series introducing new features should also include the related
+> > > > self-tests.
+> > > 
+> > > Yes, I was thinking about testing as well, but to test this I think we need
+> > > to run QEMU with Linux in it, is this feasible in self-tests?
+> > > 
+> > > We should start looking at that, because for now I have my own ansible
+> > > script that runs tests (tools/testing/vsock/vsock_test) in nested VMs to
+> > > test both host (vhost-vsock) and guest (virtio-vsock).
+> > > 
+> > 
+> > Maybe as a baseline we could follow the model of
+> > tools/testing/selftests/bpf/vmtest.sh and start by reusing your
+> > vsock_test parameters from your Ansible script?
 > 
-> Stick to 'sk' usage, to be consistent with the prior code.
+> Yeah, my playbooks are here:
+> https://github.com/stefano-garzarella/ansible-vsock
 > 
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> Note: they are heavily customized on my env, I wrote some notes on how to
+> change various wired path.
+> 
+> > 
+> > I don't mind writing the patches.
+> 
+> That would be great and very much appreciated.
+> Maybe you can do it in a separate series and then here add just the
+> configuration we need.
+> 
+> Thanks,
+> Stefano
+> 
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Sounds like a plan. Thanks!
+
+Best,
+Bobby
 
