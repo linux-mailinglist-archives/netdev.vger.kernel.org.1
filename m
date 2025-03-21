@@ -1,127 +1,109 @@
-Return-Path: <netdev+bounces-176727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71AF3A6BA83
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 13:18:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C90F8A6BAC9
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 13:37:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1E543BCC7B
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 12:16:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE4523AA1DB
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 12:37:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E419227EB6;
-	Fri, 21 Mar 2025 12:15:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A99FD225797;
+	Fri, 21 Mar 2025 12:37:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fs8B3OgP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dCNvmiro"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EBB1227B9E;
-	Fri, 21 Mar 2025 12:15:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F070CA5A;
+	Fri, 21 Mar 2025 12:37:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742559307; cv=none; b=VKmnwhZI9BmftMadWHzb0l8l/QqYt++fwMQIg4IgeXUIO71MhQefo6zm1+tIy8K5IGXYhKuTjkfSYutUFGBbCEEhkiVirhDRM4RxZn+R0LWWdX28mX+e6HZxwoBSbWjCivRz77GC2Sg19V4lIOSuD8CbC8KO4Ch1L2otACJkiWE=
+	t=1742560644; cv=none; b=VRc8HUS5AQgIaWERgxI3IfMtP+Npzr8QvCczsPuyh28stqT/iKqCsga7YaE84IdhpRMfSQhXzgv2t8RAsVo83szQGIwjXqSI0Q+t5qcT3BEYLgOUBzs2aR2JGImGGyCXL3jV8nsEPphKiI6P0+M/qajBOES607xcs5hvJUd4O6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742559307; c=relaxed/simple;
-	bh=e1THXeYInf9OC/0StrfPWjyovL28/PraOHgkB4d5imo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=I87OSyzqkbUwhRAKZmiUkSLc9PlajPXHGynb7X8so8ThAlMuypw1xkb0/yuhBvzee8rClFqdHBT/LhJr/FKmWBjEMg3/JhBnWakoqSMctibm/y0MoRO1Vqj3XwCPvdJqfEhGT2DAxWiSDpbZ+Oek9YeTHt4+8SfRbOWheBQPfpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fs8B3OgP; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3912baafc58so1559713f8f.1;
-        Fri, 21 Mar 2025 05:15:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742559304; x=1743164104; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=pXzU2WWyujDA3yR+efjM2p5MZNyfZHM31uPBCFVA36E=;
-        b=Fs8B3OgPn73KtCx6mShExIdrTNEN9binW7EeVsmBc9SdEMdc2TREWZgJV7w3fnh7Pi
-         bAib40lm20Ado5d4Lrb+zNng8CIeNVxG2GVlhmZLUKmVp7owD+HuEGfr8ctNsr+njoPh
-         oJs2R10o6ezbz2BRuXhS9c1mZMFv9c6AfHrJ0XYxRkIlFimsXPoiSYt8eRGmBXxI/ShK
-         QnWdYpWIyKsWLnTKZgxAVNaaPNI3MHTYbJy36Qo14zKJip48F3GTy/fU+jrJkvaOHe2g
-         ErrWojo6nanQnhh57wC6FeMNnd7zQQcWKaM/APXxb8Wy7H2gtSv8Ge8BJMRHW1tVd+At
-         GD6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742559304; x=1743164104;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pXzU2WWyujDA3yR+efjM2p5MZNyfZHM31uPBCFVA36E=;
-        b=WXLGy6M6q+5I/lTO9Fr0mw8JfgD0vF6KD3BsIvRFWx5X0YtJiUbBE77qw1nSVfsQ7c
-         cw3yDUrU3GGoku9/Rmyv/EvztytfeMVFX5RW+NCNyfsE7Fe6hoHH8wOQBL/x1LOHJY+u
-         pFrMgCJ+8IAIUM0u2G3JYr6lvc70UWgP3aHFAGixZ74fUYunegOT3PBUozgAdtnEvz2S
-         0/A4DdsxaV32or3ZujfWkzKZUXU+RfuUQi9TsUTOlHxRXZD/WtUZJX6t53Jk18VIpiep
-         QegTo7qfrT/CbN1AYyJ0wchXxy0tTymwqlzwpitUqKnMzYIOZIsxsPSm1O/2Qs4+ibf4
-         KRhQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVL91mWzEdJpEfp2wQ3VSlcdPQCCnW6SVtJ9/+JVrA8nu3JUL/gfjd+Wzc41fIfSQ3H7r0Oft3DPCB8OHs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxC7lkoRCkauExSb+no8kW6G3rWqFkJEXxSh4OqDI2+kgq+nTg+
-	U6d0i4ysmicVkDHw9ysjyodZSHo8hWXGlDRjKitgJuKaAjOjruxO
-X-Gm-Gg: ASbGncsOevoMjSSEVdX5t0D/50L7tVRyNZUYoxJyIDcqNz7pT9Yt/ZW1tAjEclyqZsP
-	mYdy0bQ8SYC3x2gZMLyq+fBStLG0tM9VtI/XWp6KHq4UfVXHcWWpNOYB9pebTXDIRcFOUAmKpK1
-	zjJHT5JatSZgteFA0UQiU1ARvCb4N3v+dUIKRK8R9ut25AkYivzTT+IGndjY6OcsN2S8RL28Sby
-	XnpnsfC96YOR4VQWFUmIP3B3H2qka5otG+EgGFjDp6UcRwefUozgHHwP7VarT5IVyRkDy/X/DaI
-	JoE205WqWHnv/iDyYeGCuLy1BAQp05NjqmPhST8kbIGW2JYH6i4/8XZB
-X-Google-Smtp-Source: AGHT+IGpzvLxwbDVM+nwZxJxWqsz5xaoc4OkxCbdyWeU0adQyGAfRVNCvqF6KSCQQo/SxgJLGiYoMA==
-X-Received: by 2002:a05:6000:418a:b0:391:3fa7:bf77 with SMTP id ffacd0b85a97d-3997f9148eemr2422104f8f.31.1742559304211;
-        Fri, 21 Mar 2025 05:15:04 -0700 (PDT)
-Received: from qasdev.Home ([2a02:c7c:6696:8300:9cfd:1254:7b85:f3f7])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3997f9957c3sm2286186f8f.18.2025.03.21.05.15.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Mar 2025 05:15:03 -0700 (PDT)
-From: Qasim Ijaz <qasdev00@gmail.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	yyyynoom@gmail.com,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: dl2k: fix potential null deref in receive_packet()
-Date: Fri, 21 Mar 2025 12:13:52 +0000
-Message-Id: <20250321121352.29750-1-qasdev00@gmail.com>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1742560644; c=relaxed/simple;
+	bh=oQyGiV78LEK+tbLWGXm5etpWS3sUCPu5H0kZTYpo8lU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=rRL0rAwAYJa0F5cFSzEqmuTI36+st0l5DSPDKidMrP6AvUNbhLgr6S8S4n9lvKTv+hXkvz0Aet1C8RpVX4UmdIyRsVaGWufuIfqemnbIbtX+L27xrIymi4WNVqW5xIjLE5QiaTaUDfOP4ZedC0r6EJhYZMMBQ6W54BX0V+SV+Nk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dCNvmiro; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1742560642; x=1774096642;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=oQyGiV78LEK+tbLWGXm5etpWS3sUCPu5H0kZTYpo8lU=;
+  b=dCNvmiroThBVGoOb5HAHbwY7cdtXwCg98vfZGyuHs6iCsgk9oeMCC3ia
+   WhmGyA8339Wx3RFhhQByG+6q63S3PBd9Mem2E095UBBHeYMxjDo18d5zt
+   A+YbbODCnA3uOCHG+0XCj3J9wrhz5dY/B/rBwXxSrqfaetIUBW14dPYSw
+   L7MCO/eUpJ0BkjcANuYJf60Hc03e89Yc1mQoPFT3Sj2OdZmpN0SSJ237T
+   ZrQoGxzbDOVa79Muf5+k+oGdQZ7WAvhLLR6S6ri8jh6rYmQN7GT5adqIE
+   o3uic+0WKfHDqF2SL3QEszsswieXVhMDNXsrdmKW/ieEQynN3NmCvGEEC
+   w==;
+X-CSE-ConnectionGUID: szUApg3OTk6hqvKKhRI7lw==
+X-CSE-MsgGUID: b4z1f3PHRg2/70jDYHPYew==
+X-IronPort-AV: E=McAfee;i="6700,10204,11380"; a="31415835"
+X-IronPort-AV: E=Sophos;i="6.14,264,1736841600"; 
+   d="scan'208";a="31415835"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2025 05:37:21 -0700
+X-CSE-ConnectionGUID: fN2LIwPEQj+XS2avHEyG7g==
+X-CSE-MsgGUID: kaLgaq4RTxebwSNATqk6Qg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,264,1736841600"; 
+   d="scan'208";a="127535785"
+Received: from kniemiec-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.246.201])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2025 05:37:19 -0700
+From: Jani Nikula <jani.nikula@linux.intel.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>, Andi Shyti
+ <andi.shyti@linux.intel.com>
+Cc: Markus Theil <theil.markus@gmail.com>, linux-kernel@vger.kernel.org,
+ intel-gfx@lists.freedesktop.org, netdev@vger.kernel.org, tytso@mit.edu
+Subject: Re: [PATCH v2 1/3] drm/i915/selftests: use prandom in selftest
+In-Reply-To: <Z9r7ORwztMxsNyF4@zx2c4.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+References: <CAHmME9oqvWp_Nd1Gwgyw52qy8wxztMyCpNsjByH=VnRaXqczww@mail.gmail.com>
+ <20250211063332.16542-1-theil.markus@gmail.com>
+ <20250211063332.16542-2-theil.markus@gmail.com>
+ <Z64pkN7eU6yHPifn@ashyti-mobl2.lan> <Z9r7ORwztMxsNyF4@zx2c4.com>
+Date: Fri, 21 Mar 2025 14:37:15 +0200
+Message-ID: <874izmd0g4.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-If the pkt_len is less than the copy_thresh the netdev_alloc_skb_ip_align()
-is called to allocate an skbuff, on failure it can return NULL. Since
-there is no NULL check a NULL deref can occur when setting
-skb->protocol.
+On Wed, 19 Mar 2025, "Jason A. Donenfeld" <Jason@zx2c4.com> wrote:
+> Hi Andi,
+>
+> On Thu, Feb 13, 2025 at 06:19:12PM +0100, Andi Shyti wrote:
+>> Hi Markus,
+>> 
+>> On Tue, Feb 11, 2025 at 07:33:30AM +0100, Markus Theil wrote:
+>> > This is part of a prandom cleanup, which removes
+>> > next_pseudo_random32 and replaces it with the standard PRNG.
+>> > 
+>> > Signed-off-by: Markus Theil <theil.markus@gmail.com>
+>> 
+>> I merged just this patch in drm-intel-gt-next.
+>
+> This is minorly annoying for me... What am I supposed to do with patches
+> 2 and 3? Take them through my tree for 6.16 in like half a year? Can I
+> just take the v1 into my tree and we can get this done with straight
+> forwardly? Or do you have a different suggestion for me?
 
-Fix this by introducing a NULL check to handle allocation failure.
+Feel free to apply it to your tree too. It's not ideal to have two
+commits for the same thing, but oh well.
 
-Fixes: 89d71a66c40d ("net: Use netdev_alloc_skb_ip_align()")
-Signed-off-by: Qasim Ijaz <qasdev00@gmail.com>
----
- drivers/net/ethernet/dlink/dl2k.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Acked-by: Jani Nikula <jani.nikula@intel.com>
 
-diff --git a/drivers/net/ethernet/dlink/dl2k.c b/drivers/net/ethernet/dlink/dl2k.c
-index d0ea92607870..22e9432adea0 100644
---- a/drivers/net/ethernet/dlink/dl2k.c
-+++ b/drivers/net/ethernet/dlink/dl2k.c
-@@ -968,6 +968,11 @@ receive_packet (struct net_device *dev)
- 							   np->rx_buf_sz,
- 							   DMA_FROM_DEVICE);
- 			}
-+
-+			if (unlikely(!skb)) {
-+				np->rx_ring[entry].fraginfo = 0;
-+				break;
-+			}
- 			skb->protocol = eth_type_trans (skb, dev);
- #if 0
- 			/* Checksum done by hw, but csum value unavailable. */
 -- 
-2.39.5
-
+Jani Nikula, Intel
 
