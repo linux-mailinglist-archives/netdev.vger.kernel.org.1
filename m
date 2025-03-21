@@ -1,118 +1,181 @@
-Return-Path: <netdev+bounces-176760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8DE7A6C060
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 17:47:26 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1683A6C050
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 17:45:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9626116D7F7
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 16:43:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27C0A7A5805
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 16:43:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ADB622CBC8;
-	Fri, 21 Mar 2025 16:43:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C28622CBF1;
+	Fri, 21 Mar 2025 16:44:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AUDyL3K2"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="HZyv9eYa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C68231E7C0B
-	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 16:43:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98BEE22B8CF
+	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 16:44:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742575428; cv=none; b=Y1u9bNymeTTeKywgGEebI/ucc9R/Fu29Xt/vPJ4ashFEZ5jX/CsGw/0+df9awv35Vl8wv+yt8sU3benH6KkDKrRdIEJZ1C/n1eAmdJhtZmgvHZWqINNfSiqhvUNDFjz59XAAAKMqO5XEz2cyhts6kWpCaCIiEhZaVVBNnZEDqbY=
+	t=1742575459; cv=none; b=Xl04RSWnnef6/s2Jo3cPLL2OnG1uAwKTmhFbKZ2zMPy1a/rWvtHXCCNC3sNKgwHPWVMo9+bYxE6H84iwBtVZr2YuW29j8nBCxigbNT+rdlvicYuwlUyz0D+RlGA7gYSpTUAR0U8O/ET8wcigtsM0yXKem5bVfbjID4Zya+EHYls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742575428; c=relaxed/simple;
-	bh=XT5DxnksYMON6KghdJyaLyC1a/cr8sHIeTev0jvqA/4=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=nJO/ISR1UKhBkrZi16KQcA8boNr7lylDviaBfzVyKriDJ+VDslKLLM76MQT9plEwNHyn1j2OQkx8nnI4jPIA7cMgzFdfYhxxdh9s3ZC8+PVHiLL5tx5AuMUJO/sONfk9Wjbv4SCBgX48L5e3vugKfeHmM4Qkz+kfQQs62VeO5Jk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AUDyL3K2; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7c56321b22cso237265885a.1
-        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 09:43:46 -0700 (PDT)
+	s=arc-20240116; t=1742575459; c=relaxed/simple;
+	bh=IMeArOMSvV+SAUlYdgzoqB6lsnXPfljvOmj84MN0ick=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MXtAGLgS0s0vkWzBRt5wK8i9Jxr4pOz3OHUEhsTLViVgt0MTCNGLoyrT+MjzIHzHA6YNEm1AMc7ycrF6vWbnyzPw8vczOjosEsGHPxUQ+SIU3Utx5t1PMevPM4SKL+IZ/nEv44oTlUiws6PatQAj2jLSJTLoV+gkDVWSj7v+8rg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=HZyv9eYa; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-225a28a511eso49907405ad.1
+        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 09:44:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742575425; x=1743180225; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PMa3/uT/Ntt+EN4CVXCw+6vZ7uhbSud2tfcKhXDYJjU=;
-        b=AUDyL3K2g3kyt/KhI+nt56+xuqR2bo7BA1JZ+tVMlkKvzWAr0UP7b2t7BU9lHfP5gu
-         A3xYgX0Q5o9OWVstip2PRlEuZAsG5FjLqROZhvWjq/Mgq362IRQU2S10x4T9s1MFohDd
-         /adluBeytYs0o/RGLW5pj7ZiIVN6Pol6IQW5Bv5RDQGS+5K3rbVQI6bCHYI5ekmS2N2s
-         0cbYJEJgw8kX3jcXu9P6kg5nc658XLN90EWzjiS5me4u9DZ+5JXDmB7JfTsV0wzPStW0
-         Qcn3AyD+4qWK2gzMD/V1sTSjWG+SnHUZtAnJy67GClV6wMeqe8+o7aex/kMHOGYq0DSu
-         8ErQ==
+        d=fastly.com; s=google; t=1742575457; x=1743180257; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mdus/fJVv5Uld6yn8oFMkQzJNe6dHC2w9XvJ773goNA=;
+        b=HZyv9eYaGfAfS5TzyiAfne7e+Cj6w6knyN1bsuK0l23BH6/C2KhX2L3GiLz0dennJB
+         kK9slfnRaJ27l+T8IPNdM9DXo4h6Vj3Dth4GDHOzj+mBDaBhwYD0bkt3x8Lk51JO66uA
+         pgCNI/yZ0ZQ4pfX/PqXQ5YgmYZvQHpiDE/zXA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742575425; x=1743180225;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=PMa3/uT/Ntt+EN4CVXCw+6vZ7uhbSud2tfcKhXDYJjU=;
-        b=PI8B/CJa1lYD9L+j0qxAwYdShhvx4+JHuMLphos7cyb7msRcc5EnXuNeH21i7sGnCA
-         yFk6ljNUb7luHHLbbM5q6VrD5gWhWjwYk91gvn1Uh/0ItwbyNhzcFuglAcFAICtL0Tgc
-         ULh4VbLOrJpGR9fs3rtE5mqBOqT21DmlMWZ7OXnXIdFp4aqoNGZsRooH+ZGyN3LdNUEu
-         nJlLxkXGGk+Nj2C+av+aAA9Rl1Tk4qIbgoGhWbsZ4Sqsg8I9TaPq5YXqAt61Ojl2g1iK
-         iWmBj7LWJijSTDTj9qHIIxXLn6JICGWBvG4ZxyGgYx1Ux7VkeC+4qCBCsGCi7f122CE2
-         coRw==
-X-Forwarded-Encrypted: i=1; AJvYcCUNhaEfGUfkD/b4D747WP0S9qX/kwIkp5A/VGUWpQC9jMJUT1Tl0EnCRGLuOrWeIIhWq+T2y4k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjwH7UBzV29dZBtzxePk+FkURX4rV5mUDO0KoijzixFKRyZrpH
-	Ri1d8AED4JuaJuaFtP8ie7YUIaO4v/khuDhA2hsPyyTZ/0jG2gjP
-X-Gm-Gg: ASbGncua2fAmUqygxdXp+K6o1fwNRgvfmcRMlufU+Pm0jwAhaRZF76aXE8AMwhblvvf
-	FvMl/Rsja0M6D8/MFStGcKNN8b72BTodYYE6OCryauJVahxHpEdhYWykjjPHm6x73Amo7U6EGt5
-	gzRKf0IdDAC8eBescXvAdU5yyj9352REZWtXfakADCV/9fLSlKYJqVOq0gVrGX4Es/8RiR2K9aP
-	evuhYdYRHN0fjYzZBdP1F/IFhhmNN0zgKNPU0aaJhg58mVWadP3gGEXYbTlVVFqyLhlhqKRyCkG
-	U3iuYTO3UXXEXhfWoJnQkkYgSQ+YVFWUL6sYU4vvAo7olG4ldahubyrDdz17tOiZoNYB/wdGYgh
-	SWVy2YGgr/WrxH6WbOu1X5g==
-X-Google-Smtp-Source: AGHT+IF1YNVKrhs8XJ6rzBpGRx3qH/9WGHvrKDv6RxKWWFgEBdLznA/yM9jlN+Fap0Cw14Y+FaGYTg==
-X-Received: by 2002:a05:620a:3941:b0:7c5:9480:7cb4 with SMTP id af79cd13be357-7c5b9add3b3mr541653885a.9.1742575425629;
-        Fri, 21 Mar 2025 09:43:45 -0700 (PDT)
-Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c5b92d68f3sm149256785a.40.2025.03.21.09.43.45
+        d=1e100.net; s=20230601; t=1742575457; x=1743180257;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mdus/fJVv5Uld6yn8oFMkQzJNe6dHC2w9XvJ773goNA=;
+        b=pgl/Br4M4Md5WJ3mt3WfknbybewshqePpOYb2JOETMf+Hen0O80F5jhdHptkxiVccj
+         lOPxq8HBW8O5rqT0ZNysUelRDt24yyi92tzA6GreCLGscf3tImyBjDietYo5Ct7VLJkr
+         smmFzOoRSOj5NLjkiFk7HSGUXLNvH5zRAubkWJZIvjJ+JRISzT71sizNokWGGAy1mlbT
+         8W20zc4vEL4bk7pIF29ma0J5jFLqYt2Cf8QNaNkpX5ccB6m4TxgSozpDXl6IAz9wIfD6
+         rUNofkM6JVgmpgZIPAMOePdPhcFAKCwl7+ThKnvtma5ahwcM3h2CDorb42nWww1PjLhZ
+         f7MA==
+X-Forwarded-Encrypted: i=1; AJvYcCVhlXEor18bwd3mToSbOJzf9DbJViMl8xz7lpWNVgGN8IbSm4RBafTB8PiRigfx5PZeIXNpZZM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzec1Vs7k2xs5Ly4uNFq7kNbtd+xD6zgJWhor/NRNeQB0GlLI9a
+	F9NICI5B/th63Py2QdXkkhzKiP/OeXEtnvXBXk9n1L85bV9HEV4cYiKsCW3g8XU=
+X-Gm-Gg: ASbGncuQMJjq7iZ7g54XuF8A7J90FZZ5444BtS88OVnQ26Il5OVFQglz/30boN99Qq3
+	eL8rlsdMvX2DWUectSkUUFu55xXWBE84l6mxdzxbdDel7yR4b1MnOVFULBpU3EDsbV+NYJoP1fn
+	8FeSfLaFS8W1xRQt0TW5RPf2Rq3iITdSBAwpfo07lOCI0UuIxvSReZu+RAV801l0L8zXi7q046/
+	b/tW7E6ef8csKDkK8n34oX09IzRvEjKMu4T1gkUZYzHuEUNTn15ATzOcAvpO1A/NDLxqprOqBB4
+	6awJVFhTIX6dtXppVvCegIhiYkQ3vKU8uHqYj7NkYZuyFpE6LosUQNa5W/Wa3duHMABjUrrl0eo
+	8XSHXZGDQxRuAwAKP
+X-Google-Smtp-Source: AGHT+IHNkHo8pQiFISfzkg8EmthIVkGNH6DyH204b4LoCrS28DjOE/rXN+w3HTspHp5hcO8dxdqoWw==
+X-Received: by 2002:a05:6a21:998b:b0:1f5:839e:ece8 with SMTP id adf61e73a8af0-1fe42f090e7mr7044509637.2.1742575456784;
+        Fri, 21 Mar 2025 09:44:16 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af8a2843af9sm1984943a12.38.2025.03.21.09.44.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Mar 2025 09:43:45 -0700 (PDT)
-Date: Fri, 21 Mar 2025 12:43:44 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Simon Horman <horms@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- David Ahern <dsahern@kernel.org>, 
- Nathan Chancellor <nathan@kernel.org>
-Message-ID: <67dd9740d9bb5_14b14029445@willemb.c.googlers.com.notmuch>
-In-Reply-To: <e22492f139a67c34c639737cc54b3a57a8c78ef3.1742557254.git.pabeni@redhat.com>
-References: <cover.1742557254.git.pabeni@redhat.com>
- <e22492f139a67c34c639737cc54b3a57a8c78ef3.1742557254.git.pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2 5/5] udp_tunnel: prevent GRO lookup
- optimization for user-space sockets
+        Fri, 21 Mar 2025 09:44:16 -0700 (PDT)
+Date: Fri, 21 Mar 2025 09:44:12 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, asml.silence@gmail.com,
+	linux-fsdevel@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, horms@kernel.org, linux-api@vger.kernel.org,
+	linux-arch@vger.kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
+	kuba@kernel.org, shuah@kernel.org, sdf@fomichev.me,
+	mingo@redhat.com, arnd@arndb.de, brauner@kernel.org,
+	akpm@linux-foundation.org, tglx@linutronix.de, jolsa@kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [RFC -next 00/10] Add ZC notifications to splice and sendfile
+Message-ID: <Z92XXFDVz_5fU2YQ@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	asml.silence@gmail.com, linux-fsdevel@vger.kernel.org,
+	edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+	linux-api@vger.kernel.org, linux-arch@vger.kernel.org,
+	viro@zeniv.linux.org.uk, jack@suse.cz, kuba@kernel.org,
+	shuah@kernel.org, sdf@fomichev.me, mingo@redhat.com, arnd@arndb.de,
+	brauner@kernel.org, akpm@linux-foundation.org, tglx@linutronix.de,
+	jolsa@kernel.org, linux-kselftest@vger.kernel.org
+References: <20250319001521.53249-1-jdamato@fastly.com>
+ <Z9p6oFlHxkYvUA8N@infradead.org>
+ <Z9rjgyl7_61Ddzrq@LQ3V64L9R2>
+ <2d68bc91-c22c-4b48-a06d-fa9ec06dfb25@kernel.dk>
+ <Z9r5JE3AJdnsXy_u@LQ3V64L9R2>
+ <19e3056c-2f7b-4f41-9c40-98955c4a9ed3@kernel.dk>
+ <Z9sCsooW7OSTgyAk@LQ3V64L9R2>
+ <Z9uuSQ7SrigAsLmt@infradead.org>
+ <Z9xdPVQeLBrB-Anu@LQ3V64L9R2>
+ <Z9z_f-kR0lBx8P_9@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z9z_f-kR0lBx8P_9@infradead.org>
 
-Paolo Abeni wrote:
-> UDP tunnel sockets owned by the kernel are never disconnected/rebound
-> after setup_udp_tunnel_sock(), but sockets owned by the user-space could
-> go through such changes after being matching the criteria to enable
-> the GRO lookup optimization, breaking them.
+On Thu, Mar 20, 2025 at 10:56:15PM -0700, Christoph Hellwig wrote:
+> On Thu, Mar 20, 2025 at 11:23:57AM -0700, Joe Damato wrote:
+> > In my other message to Jens I proposed:
+> >   - SPLICE_F_ZC for splice to generate zc completion notifications
+> >     to the error queue
+> >   - Modifying sendfile so that if SO_ZEROCOPY (which already exists)
+> >     is set on a network socket, zc completion notifications are
+> >     generated.
+> > 
+> > In both cases no new system call is needed and both splice and
+> > sendfile become safer to use. 
+> > 
+> > At some point in the future a mechanism built on top of iouring
+> > introduced as new system calls (sendmsg2, sendfile2, splice2, etc)
+> > can be built.
 > 
-> Explicitly prevent user-space owned sockets from leveraging such
-> optimization.
+> I strongly disagree with this.  This is spreading the broken
+> SO_ZEROCOPY to futher places outside the pure networking realm.  Don't
+> do that.
 
-UDP tunnel sockets are generally initialized with udp_sock_create,
-which calls sock_create_kern.
+OK. I won't proceed down that path. Thank you for the feedback.
+ 
+> > > Because sendmsg should never have done that it certainly should not
+> > > spread beyond purely socket specific syscalls.
+> > 
+> > I don't know the entire historical context, but I presume sendmsg
+> > did that because there was no other mechanism at the time.
+> 
+> At least aio had been around for about 15 years at the point, but
+> networking folks tend to be pretty insular and reinvent things.
 
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Sorry, but whatever issue there is between networking and other
+folks is well beyond my understanding and historical context. I'm
+not a reviewer or maintainer or anything like that; I'm just a
+developer who saw a problem and wanted a solution.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+I've read your message loud and clear, though, and I won't proceed
+down the path I've proposed.
+
+I appreciate your feedback; this is precisely why I sent the RFC -
+to get comments - so thank you for taking a look and letting me
+know.
+
+> > As mentioned above and in other messages, it seems like it is
+> > possible to improve the networking parts of splice (and therefore
+> > sendfile) to make them safer to use without introducing a new system
+> > call.
+> > 
+> > Are you saying that you are against doing that, even if the code is
+> > network specific (but lives in fs/)?
+> 
+> Yes.
+> 
+> Please take the work and integrate it with the kiocb-based system
+> we use for all other in-kernel I/O that needs completion notifications
+> and which makes it trivial to integate with io_uring instead of
+> spreading an imcompatible and inferior event system.
+
+If you have any suggestions or pointers to code I should look at for
+inspiration I would very much appreciate the guidance.
+
+Thanks for your time and energy in reviewing my RFC and responding.
+
+- Joe
 
