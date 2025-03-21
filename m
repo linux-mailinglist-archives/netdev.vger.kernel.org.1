@@ -1,103 +1,131 @@
-Return-Path: <netdev+bounces-176670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E00E3A6B420
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 06:47:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89DB6A6B429
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 06:56:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AD624861B9
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 05:47:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19A203B1A1F
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 05:56:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D77F1E8824;
-	Fri, 21 Mar 2025 05:47:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D7761E9B2C;
+	Fri, 21 Mar 2025 05:56:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Is8WS9WC"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="rtEvPPct"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8101DE4CC
-	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 05:47:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360E033F6;
+	Fri, 21 Mar 2025 05:56:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742536034; cv=none; b=fwzEThCIcPKtPsvE5Gu50XrrqWPInpceDvCtnPvwjWkFYK5ru19pp2cEpJnxGL6XPxR2LNdHV8sQmd1fBwBtbaedNHgWXXjQSNePFFwed3T4G/gIzJLUp1ABtVsRn5A5/i1UDbvHWWJH22I05sBpIHH/9q3T6Uey8cHsixx0yhg=
+	t=1742536579; cv=none; b=femxJQwuo224gZ5Jh+5Hot2pMlbfM76x+pQPMO8I7yJTaPmD+Wzes3ZQNdgH6eSVYXyY/tiLJmRMoqjk9vywP2Fom0Zm8C3eQj7Pe/RL2XpkBLhhDSUijher4mhmo3Sfs8NUOOuQ2I5gnGHBh5dxABih8l6D/nsrNKjLl4XSKsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742536034; c=relaxed/simple;
-	bh=zWaWLv8mZZ3c0OlGokbpvPezMRC2fFlQi9qpRM7VBoY=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=qGun2XeT723L+4bromrjV3XpZlHzpB/+OIL3Ud7RWN7Cw9uTiA2wNQKhsNUD2YaG8glvXAJNRchwRzAwiS6hDbPN35mOv7UDj00SWEqp3+4/avpVEN1zyoljRXS95OvrQW8EDG8exjIKgpwGOkjFX9zA2UN3GcEzvgilqMNR0BM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Is8WS9WC; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <1974322e-8c30-4c01-a566-642ed2bc7086@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742536020;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jkcFP/O+Z3B/eFBZgX9t3W8dn1rxY/BeKgw+K5HzFRc=;
-	b=Is8WS9WCS7cpn+ZW8U8Ztirrs8LiXCARvLZTKBqwCREJjjVO106Y/obwqU8jG8i+jVcbc0
-	NYJXxiklNi+3KK5PO6x6x7f8hlvq0np5te/MH4cjlVVfZush77E5Q7V42GtBskAhF2ssG8
-	ljyo1OCA41BDNLGzwROgZTNgVRaHmUo=
-Date: Thu, 20 Mar 2025 22:46:55 -0700
+	s=arc-20240116; t=1742536579; c=relaxed/simple;
+	bh=rakOtM9qjCQHkqBpgJGi83hrWXwvmBdKuX7OU7VwvKc=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GZ/Ccn8/O9uv7IU02iD+qjogQmEdhn8WJUj6Y73LcALGTBhVRsF1fjCImRd0cGe2vqJSGqwNQRWcMbJAJX+9fVaYo1c7UoslmgIypLlckSUUKGonTcteUAgACJ5rT3P/EOAsrdpVVNPI2HBykVWltHL+uhU6qCk6dh4ILrAGamg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=rtEvPPct; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:To:From:Date:Sender:Reply-To:Cc:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=4b1rZoFjUmC82SICohDGJF5TYEnTu/ZO1nB8POqr7Q0=; b=rtEvPPctHs4DFbvPx/CFLoyoym
+	6shRxW1IEni3BZVrGEpigNTI4fFOotZtAwTzg7t3/heKPPgWop8SQgg8ayjoSHdZKuc21WHScvUlY
+	DOacoBbESG0gjX1w9ySCeVX/fRv+0YXIMtQuzFUuMVT6y1NsbK59hYbVFFnS2R6/X7kEAgNbnAm8M
+	d/qjZun2Kfpxi/TWhJTu30swVFU8UXKiZnDH5cib3qyqPaKVZETBMKR6mnUr5+7AzzkVtS0Jghu4y
+	9e8GMKlGu1NoqqmHBw4RFC1Hn+f33autaSrS+5JkBAmynbDc8GF3PNeIvCwxJSJH4ffQ8CzqDDv9C
+	Lw+g9dEA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tvVMd-0000000DvYO-33Wf;
+	Fri, 21 Mar 2025 05:56:15 +0000
+Date: Thu, 20 Mar 2025 22:56:15 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Joe Damato <jdamato@fastly.com>, Christoph Hellwig <hch@infradead.org>,
+	Jens Axboe <axboe@kernel.dk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, asml.silence@gmail.com,
+	linux-fsdevel@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, horms@kernel.org, linux-api@vger.kernel.org,
+	linux-arch@vger.kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
+	kuba@kernel.org, shuah@kernel.org, sdf@fomichev.me,
+	mingo@redhat.com, arnd@arndb.de, brauner@kernel.org,
+	akpm@linux-foundation.org, tglx@linutronix.de, jolsa@kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [RFC -next 00/10] Add ZC notifications to splice and sendfile
+Message-ID: <Z9z_f-kR0lBx8P_9@infradead.org>
+References: <20250319001521.53249-1-jdamato@fastly.com>
+ <Z9p6oFlHxkYvUA8N@infradead.org>
+ <Z9rjgyl7_61Ddzrq@LQ3V64L9R2>
+ <2d68bc91-c22c-4b48-a06d-fa9ec06dfb25@kernel.dk>
+ <Z9r5JE3AJdnsXy_u@LQ3V64L9R2>
+ <19e3056c-2f7b-4f41-9c40-98955c4a9ed3@kernel.dk>
+ <Z9sCsooW7OSTgyAk@LQ3V64L9R2>
+ <Z9uuSQ7SrigAsLmt@infradead.org>
+ <Z9xdPVQeLBrB-Anu@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Subject: Re: [RFC PATCH bpf-next 0/3] Avoid skipping sockets with socket
- iterators
-To: Jordan Rife <jrife@google.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
- Daniel Borkmann <daniel@iogearbox.net>,
- Yonghong Song <yonghong.song@linux.dev>,
- Aditi Ghag <aditi.ghag@isovalent.com>
-References: <20250313233615.2329869-1-jrife@google.com>
- <384c31a4-f0d7-449b-a7a4-2994f936d049@linux.dev>
- <CADKFtnQk+Ve57h0mMY1o2u=ZDaqNuyjx=vtE8fzy0q-9QK52tw@mail.gmail.com>
- <CADKFtnQyiz_r_vfyYfTvzi3MvNpRt62mDrNyEvp9tm82UcSFjQ@mail.gmail.com>
- <08387a7e-55b0-4499-a225-07207453c8d5@linux.dev>
- <CADKFtnThYT4Jp1Nio8iW+uEdj8+khGmAYaLxW-w5LO4tnLZdkA@mail.gmail.com>
-Content-Language: en-US
-In-Reply-To: <CADKFtnThYT4Jp1Nio8iW+uEdj8+khGmAYaLxW-w5LO4tnLZdkA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z9xdPVQeLBrB-Anu@LQ3V64L9R2>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On 3/18/25 5:23 PM, Jordan Rife wrote:
->> imo, this is not a problem for bpf. The bpf prog has access to many fields of a
->> udp_sock (ip addresses, ports, state...etc) to make the right decision. The bpf
->> prog can decide if that rehashed socket needs to be bpf_sock_destroy(), e.g. the
->> saddr in this case because of inet_reset_saddr(sk) before the rehash. From the
->> bpf prog's pov, the rehashed udp_sock is not much different from a new udp_sock
->> getting added from the userspace into the later bucket.
+On Thu, Mar 20, 2025 at 11:23:57AM -0700, Joe Damato wrote:
+> In my other message to Jens I proposed:
+>   - SPLICE_F_ZC for splice to generate zc completion notifications
+>     to the error queue
+>   - Modifying sendfile so that if SO_ZEROCOPY (which already exists)
+>     is set on a network socket, zc completion notifications are
+>     generated.
 > 
-> As a user of BPF iterators, I would, and did, find this behavior quite
-> surprising. If BPF iterators make no promises about visiting each
-> thing exactly once, then should that be made explicit somewhere (maybe
-> it already is?)? I think the natural thing for a user is to assume
-> that an iterator will only visit each "thing" once and to write their
+> In both cases no new system call is needed and both splice and
+> sendfile become safer to use. 
+> 
+> At some point in the future a mechanism built on top of iouring
+> introduced as new system calls (sendmsg2, sendfile2, splice2, etc)
+> can be built.
 
-I can see the argument that the bpf_sock_destroy() kfunc does not work as 
-expected if the expectation is the sk will not be rehashed. Is it your use case? 
-I am open to have another bpf_sock_destroy() kfunc to disallow the rehash but 
-that will be different from the current udp_disconnect() behavior which will 
-need a separate discussion. I currently don't have this use case though.
+I strongly disagree with this.  This is spreading the broken
+SO_ZEROCOPY to futher places outside the pure networking realm.  Don't
+do that.
 
-> code accordingly. Using my example from before, counting the number of
-> sockets I destroyed, needs to be implemented differently if I might
-> revisit the same socket during iteration by explicitly filtering for
-> duplicates inside the BPF program (possibly by filtering out sockets
-> where the state is TCP_CLOSE, for example) or userspace. While in this
-> particular example it isn't all that important if I get the count
-> wrong, how do we know other users of BPF iterators won't make the same
-> assumption where repeats matter more? I still think it would be nice
-> if iterators themselves guaranteed exactly-once semantics but
-> understand if this isn't the direction you want BPF iterators to go.
+It also doesn't help that more than 7 years after adding it,
+SO_ZEROCOPY is still completely undocumented.
+
+> > Because sendmsg should never have done that it certainly should not
+> > spread beyond purely socket specific syscalls.
+> 
+> I don't know the entire historical context, but I presume sendmsg
+> did that because there was no other mechanism at the time.
+
+At least aio had been around for about 15 years at the point, but
+networking folks tend to be pretty insular and reinvent things.
+
+> It seems like Jens suggested that plumbing this through for splice
+> was a possibility, but sounds like you disagree.
+
+Yes, very strongly.
+
+> As mentioned above and in other messages, it seems like it is
+> possible to improve the networking parts of splice (and therefore
+> sendfile) to make them safer to use without introducing a new system
+> call.
+> 
+> Are you saying that you are against doing that, even if the code is
+> network specific (but lives in fs/)?
+
+Yes.
+
+Please take the work and integrate it with the kiocb-based system
+we use for all other in-kernel I/O that needs completion notifications
+and which makes it trivial to integate with io_uring instead of
+spreading an imcompatible and inferior event system.
 
