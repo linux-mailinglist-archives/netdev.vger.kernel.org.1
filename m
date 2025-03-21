@@ -1,120 +1,139 @@
-Return-Path: <netdev+bounces-176729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34D09A6BAE9
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 13:42:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E678A6BAFD
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 13:45:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2AD7B7A9733
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 12:41:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 946FA484034
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 12:45:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09239CA5A;
-	Fri, 21 Mar 2025 12:41:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBB29228CA5;
+	Fri, 21 Mar 2025 12:45:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="d37SEBEi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XOYvqTnE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC005229B16
-	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 12:41:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0EBCA5A;
+	Fri, 21 Mar 2025 12:45:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742560904; cv=none; b=Bp40N9T7WEiaIRqRxG2ZXs0XvTPNcXIoVUoiKtHUt+rsVkfdhE2h3fXpshMZGt58m1NjOyhrGsfEC5auVKbrrsMdcSU5xs42ZKUiaRmQsjMoQcNxUWDIqMUyzbDDu445sWOapFzyqrgKHLqFy9Zs+1Qo1fWnyQNvCzUUdgYireI=
+	t=1742561127; cv=none; b=b7ylh6ePwPBW5ix9RBRUQscVcmv8GqXlH6ecm7iJ5iGepdnrF+BYnlo7llWuuTTUnAW9jvLqgQsm2jnC2smGu8vQpeRNZDQsNMFdyAI0HE+mnXML/BsHAKJsroOntkOzkfyZMpOFCB63fqAAl0BQVSaJk7FogvT+qUeN8+C3jBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742560904; c=relaxed/simple;
-	bh=7iwcahJKh8X7Dx8pwOCze4hLBZiB6f2TqSPt5+3rpEQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=PC2OhpTVK921OZzatCpGgcV+IFRiNpy7wghqS002ZBeSciEkH1EMTN7MF+mNZbiaEX1p8q/5AwNJ3uexYlYQakNqsuP/jIPnIL96smYl9lSlj2OAC1yKBrzvf5Yr9OMB6C8+OPBkiHYb0PXY31D3ZF/XrqR/5E+IugHy4ha9MOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=d37SEBEi; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-ac345bd8e13so346111666b.0
-        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 05:41:42 -0700 (PDT)
+	s=arc-20240116; t=1742561127; c=relaxed/simple;
+	bh=owd4qIVO9vgaRMbapG447WdJfLBcEtmkQ1F85L/faoc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e3xDQL5tIhMA/flghCJCoGz17U30/0BSoBJRCnITXY6F+pWj3uJgdQ1NdtV1rkkHJOeNs4WSE6NRKJbIUG80QKYcosF1MMzQiK0k1NCgzV8KEcQoUP8AejgntmQdSf4ARqj+o2pWkgQRsTfKkwAuAdSXq8teCrHWDY6chBK08Jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XOYvqTnE; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-225b5448519so36244105ad.0;
+        Fri, 21 Mar 2025 05:45:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1742560901; x=1743165701; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=B4jrOkgKaZGtp4YuQru8PRgkCQ8xkKX6XJlRryj/uOw=;
-        b=d37SEBEivapZ5mAGmhDUql9y1PfbcmTXSywYaaUaWysTbYUqGctlaARPCzsU2rEHcq
-         27smEO7qXgFVEXsBm6U9sDBTcQXraRcwZ8yBctiNzmF5e6Mu+GKuV8fKxzqHJ82fXtyc
-         jiAlQ4Fk9DfN+QKnZ++UkshAVwkfxsW/8+oZ/Od/J7jv0OdKeq0JjasHAEjBwPBPO0gk
-         zjR3Whp/SQhG5xshnwiAKmZ+ZIpGDXIpImcyn88lGQjDkOqDHHLg94Tgpic9NYI4Bzol
-         NKQOI39HQu5AlPuv+PZLMEOBdgP7v7zA/he2MA6PfL4UR53JInP3NE0GDGMxT1AvmUYE
-         q5zw==
+        d=gmail.com; s=20230601; t=1742561125; x=1743165925; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ri8DrHl9V+VnfdvMXOIXJllITyYvJjqgNAio1XrDnKs=;
+        b=XOYvqTnEjp0Stkk3i4LDMpRrzIE2yepkbbVyg5Ktzag2pw8NnWwYVtIqRzWxPVX6+M
+         gU0EbXf8u1b9lKhRRR7MoRlw67HLmdnFQhYjj6V87LeDF0LvEmt7on0H5wx0mN7KF16D
+         1ZDgb6mkV8sFb4zqtGHiTMjOfZHqQHziSDhglTMArNVceKBbj9LYDkD2XNJpfO6pUZnv
+         jfVZpmHMa6cfwDlwJ9/pIpCOx5XMF02pqmnQWFscFKm7TJGpW+df+ceXatiG89yz7D5U
+         sm10kZlPE7yycxrp9BgYrG4RRRXdB/xaS1UFwbigsd/lBkHBTGYxGyZJqIi4cT5d2O2J
+         h2vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742560901; x=1743165701;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B4jrOkgKaZGtp4YuQru8PRgkCQ8xkKX6XJlRryj/uOw=;
-        b=d9muV9iBrmKty+pc1U69iVci8kAIs66MgpVCohomVTSJkNJqwcknhuRUOiGLOqV+DW
-         fFJ8dPwrGafUs/Ian/sum2z9NyRz9M1kApt/HOC+N7/sKtZe7Q+5jdtrNY8KUc2GsEPI
-         wa8xDMSfiIlWJAAv4X3Kjzqvi6fO18CCnvc24/QP35TdKJyshU+YK8DS8Mgr9LYS5PeP
-         rdunu1rw2i1njdb/VF2mSGlUvcwqFz0+9jxq9pVWvCMRB77DsH29OhyowcQD6d903Yrt
-         lojc6R04fZ8MrceLENzhPgdCNJLpBKPsb/w4M6z7MHMvUUP6JWUhvEHjC+waQe7ZV9i9
-         E5lA==
-X-Forwarded-Encrypted: i=1; AJvYcCWUoVgmyJg9Z//WwIXL7L0P9WmGnhVqhkA6fNAwtP4b2Yg20EkGU+rPWc9FXwrBTQI0uvknT0k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0gT1osdoP4r/bBoBTvVmI2cQjemH4Sdwe2PoZ3dxYSIG8JQaK
-	4TQflGXrUTLZbNhxFDH/+3g9omc8MlqvR3a/bHuZU3Q6N+Mo2PS9X5vUT6XjlF2a1dthtRA98sO
-	3
-X-Gm-Gg: ASbGnct5h3mIsNPRaYUCojBJYajIMyxQNZQbiViLaTrt1D9fZAdrOzQGH9U+cEi3vyZ
-	cioe3o1qIzxpilv8pKs967k90zd4E8d5467sQ3gFz7bjYBqFCL8gZfDBehVgiQC26XOT8W2oStQ
-	EukWjBdIEllcv7bx5isbxnjp86UomKdG37ZeYLRNELWqygUs0qVaSIUPbpPbxuKVI3sV1pq69ka
-	DCW+K+kWNsOuN4N5GCT73oaMYKSMrqnqZY49GJv9ysetqjoQSTw/AysvkH/eOZ34nA68r8euSP7
-	I2WLVRb60WQ6ZbqlsM59CkRHRDwfDWGP0y8umXynfiIjUl5EFL/gliwrprhE4Kfiz4rLQRiulqw
-	=
-X-Google-Smtp-Source: AGHT+IFVsYMS0of3s7CrCm8+CjqSExmmbbmfa3VkBFfs8N9PagGiYbvHzqCZbcRz2Ad9bCgPJuly0A==
-X-Received: by 2002:a17:907:e841:b0:ac3:c7c6:3c97 with SMTP id a640c23a62f3a-ac3f1e16b61mr328496166b.0.1742560900617;
-        Fri, 21 Mar 2025 05:41:40 -0700 (PDT)
-Received: from wkz-x13 (h-79-136-22-50.NA.cust.bahnhof.se. [79.136.22.50])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3efb65871sm149047466b.96.2025.03.21.05.41.39
+        d=1e100.net; s=20230601; t=1742561125; x=1743165925;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ri8DrHl9V+VnfdvMXOIXJllITyYvJjqgNAio1XrDnKs=;
+        b=RqkvNxS1DuppDO3XLrctclqu1YE80K86xjdsNYOZxXmH8Qk9C/9io9xzRPg5AtHDy7
+         b1w3BidQqg6qtybuKSZwS7mrTpTRbdGi3dOFfLOWzZ7pRvYbDExjasiOrKP7QVB8bjwA
+         wA9LwNNCKFhvBdUisyFWPJYrogbaebqJLf2K/7o0JIPLGb0+r9SaYhCuoI5UVdUJ1zkb
+         Oxv6KanaSEF4w4CeXdWDVzPsgcJFIgWuQhsAu0dnAf3U5UYc3cFTpqKdGrwrqzoq4oyX
+         tCgzMe+Lc4/uE+qSf8mQMqlceY5/GKnM7axkrUT+NTGYSRdVW5KvYuIqkfoG8Pu3j+lk
+         oFeA==
+X-Forwarded-Encrypted: i=1; AJvYcCUP047vsNyz+TJxofNFpgsv2pAUzZM/VmsRi7qUI9P+buU3nXu7bW4gEBvce7Auc56ZAv0=@vger.kernel.org, AJvYcCVvSY+fWBYQ5j0GBjIJ7jrAkIFo84704Ko5ZYzxG+An1FwUXG7rdkETMKwLtfkVqlMu7oGxB+b8FWvSAiZu@vger.kernel.org, AJvYcCX4393e417JSqnO29WmOaWXNONpEqJLGHESPMzGTsNlILGirGhLvVg098k+hoVj6nHUjnLr1dqMUOCkYV+HtJPD@vger.kernel.org, AJvYcCXCeG5XKV/8vTTBI31vf5BuFJI9avoYcvVbZ7KvDJMbjLhySDrOUdyRc3WtRquvtUL8GiwHVZJ0@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNuIA1/oafZoK5XgmmPJAUMJS4q/eAvacw31f31ciWxkK1YcM+
+	3AxewEN44gloRJlroH5dl2s5Wei2mJpgqFgSKexkDuRJLR+fOhtq
+X-Gm-Gg: ASbGncva8VQ9aPmMrqvxvm2auKXMP6Ank7sPBtKzpNqUG9EbUvA+Cty2HX1WWywczyU
+	AOV5qeAj34Nfe5VPpGOMYp/bzV4sYAwOlwjexs+QJfi0053d7J1sHM6Hiyz5UJZ9ORR8M4GdZ6U
+	zRqQ9kJLW426qBXB5RXBNm2dy+nsyXemcCxSpF1KKAupJj988RFrmYyvJFuLQtWikSHEx66B+Hb
+	vUdI3vcqBdCplIaWYMLm8+Q2V081YvBDWhYemYEQvRw1TPSVdTDdNP4y2ts3BZ7Pp48S9KoBnfE
+	JT6kAOBzL2l2bXvdmhauDoYGZx9aSI7f1bqsHA40BVRGvGEVZQ==
+X-Google-Smtp-Source: AGHT+IELvK3I72iTUDDcO1O4UKhcvpwpm33sVFuK5wBfJpG1DU5drkzjkeA85Qr9LNOrEFCR0OcThg==
+X-Received: by 2002:a17:902:c411:b0:224:1780:c1ec with SMTP id d9443c01a7336-22780e07b2dmr52456085ad.35.1742561125406;
+        Fri, 21 Mar 2025 05:45:25 -0700 (PDT)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-227811d9f0dsm15294545ad.165.2025.03.21.05.45.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Mar 2025 05:41:39 -0700 (PDT)
-From: Tobias Waldekranz <tobias@waldekranz.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: davem@davemloft.net, kuba@kernel.org, maxime.chevallier@bootlin.com,
- marcin.s.wojtas@gmail.com, linux@armlinux.org.uk, edumazet@google.com,
- pabeni@redhat.com, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 net] net: mvpp2: Prevent parser TCAM memory corruption
-In-Reply-To: <3f2f66ae-b1ac-4c87-9215-c1b6949d62c4@lunn.ch>
-References: <20250321090510.2914252-1-tobias@waldekranz.com>
- <3f2f66ae-b1ac-4c87-9215-c1b6949d62c4@lunn.ch>
-Date: Fri, 21 Mar 2025 13:41:38 +0100
-Message-ID: <87pliaa73x.fsf@waldekranz.com>
+        Fri, 21 Mar 2025 05:45:24 -0700 (PDT)
+Date: Fri, 21 Mar 2025 12:45:17 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Phil Sutter <phil@nwl.cc>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>,
+	Petr Mladek <pmladek@suse.com>,
+	Yoann Congal <yoann.congal@smile.fr>, wireguard@lists.zx2c4.com,
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv4 RESEND net-next 2/2] selftests: wireguard: update to
+ using nft for qemu test
+Message-ID: <Z91fXURX3BQFDaq9@fedora>
+References: <20250106081043.2073169-1-liuhangbin@gmail.com>
+ <20250106081043.2073169-3-liuhangbin@gmail.com>
+ <Z9rtrVk-15Ts_BNp@zx2c4.com>
+ <Z91CGRP9QLdZONiZ@fedora>
+ <Z91QshzKRlmPdpv7@orbyte.nwl.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z91QshzKRlmPdpv7@orbyte.nwl.cc>
 
-On fre, mar 21, 2025 at 13:12, Andrew Lunn <andrew@lunn.ch> wrote:
->> +static int mvpp2_prs_init_from_hw_unlocked(struct mvpp2 *priv,
->> +					   struct mvpp2_prs_entry *pe, int tid)
->>  {
->>  	int i;
->>  
->
-> This is called from quite a few places, and the locking is not always
-> obvious. Maybe add
+On Fri, Mar 21, 2025 at 12:42:42PM +0100, Phil Sutter wrote:
+> Hi Hangbin,
+> 
+> On Fri, Mar 21, 2025 at 10:40:25AM +0000, Hangbin Liu wrote:
+> > Hi Jason, Phil,
+> > On Wed, Mar 19, 2025 at 05:15:41PM +0100, Jason A. Donenfeld wrote:
+> > > On Mon, Jan 06, 2025 at 08:10:43AM +0000, Hangbin Liu wrote:
+> > > > +	echo "file /bin/nft $(NFTABLES_PATH)/src/nft 755 0 0" >> $@
+> > > > +	echo "file /lib/libmnl.so.0 $(TOOLCHAIN_PATH)/lib/libmnl.so.0 755 0 0" >> $@
+> > > > +	echo "file /lib/libnftnl.so.11 $(TOOLCHAIN_PATH)/lib/libnftnl.so.11 755 0 0" >> $@
+> > > 
+> > > Can't these be statically linked into the nft binary?
+> > 
+> > If I omit these, I will got error like
+> > 
+> > mnl_attr_put: symbol not found
+> > 
+> > Even though I set `--enable-static` in nft build.
+> > 
+> > Do you know what's the reason?
+> 
+> I was able to have nft linked statically against built libmnl and
+> libnftnl by passing '--disable-shared --enable-static' to configure
+> calls of all three build systems. With --enable-shared in library
+> configure calls, nftables build preferred to link against the DSOs and I
+> did not find a way to change this.
 
-Agreed, that was why i chose the _unlocked suffix vs. just prefixing
-with _ or something. For sure I can add it, I just want to run something
-by you first:
+The patch is using
+"./configure --prefix=/ $(CROSS_COMPILE_FLAG) --enable-static \
+--disable-shared --disable-debug --disable-man-doc --with-mini-gmp --without-cli"
+to build nft.
 
-Originally, my idea was to just protect mvpp2_prs_init_from_hw() and
-mvpp2_prs_hw_write(). Then I realized that the software shadow of the
-SRAM table must also be protected, which is why locking had to be
-hoisted up to the current scope.
+I don't know why it's not linked static.
 
-> __must_hold(&priv->prs_spinlock)
->
-> so sparse can verify the call paths ?
-
-So if we add these asserts only to the hardware access leaf functions,
-do we risk inadvertently signaling to future readers that the lock is
-only there to protect the hardware tables?
+Thanks
+Hangbin
 
