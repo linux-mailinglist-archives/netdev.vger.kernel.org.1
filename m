@@ -1,129 +1,95 @@
-Return-Path: <netdev+bounces-176830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F984A6C4EE
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 22:17:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1FEBA6C503
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 22:21:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F8293AE6DB
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 21:16:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F9C54825FF
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 21:21:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C1D6230BE4;
-	Fri, 21 Mar 2025 21:17:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F0B8231A24;
+	Fri, 21 Mar 2025 21:21:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PL4SZiXh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JolPQkvl"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 111731E9B34;
-	Fri, 21 Mar 2025 21:17:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 345421E9B34;
+	Fri, 21 Mar 2025 21:21:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742591828; cv=none; b=Dm9SZSRvviOXIeQ+dx1ISRAB07ZjYVHmlco6F+d5oOFvLK9Vp8hcaYdAprhtdgC/Qd3JzRloE0lek5Hv7smJa3R9r8FLFYA4uVFZ/5Oy0dWdFe+wpMe87Bz8x4iM0FoXz/VONbE4tUpxdcpZLJ8mEu82fK81hppZglCS1ddMc8c=
+	t=1742592104; cv=none; b=LHWimVzy9ivrDwLojhF7PM9e7xklVRiDPj4jfDlVJ5wbX2wSIcykUSfYUMN329L5b/DPdbiA/opCZhaOrLUaPkNmlh9XPlKs69iMmWkkmrE3SjOMrrL36DCLJumttU/YE6uJ2VpM68nNIjYLpoz5YhddyuWcZOOZvDa+KR8zJK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742591828; c=relaxed/simple;
-	bh=1FhOQ8K+GLTJrHZH020JuhGD9vw3YFls8XQrZwgxKRY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HQhwrf4cXgar/grNt8162/75bINMDfg/kjPYLGona1VgYRNBJN/DhpLWMFWigXgUoo0ZQuijWRrH2S6mldSCfCztltaSPo9UClyJYvNcav2AsLxGxXvPEr2HPxd9273pAWyyDKLvfoh69yqj4X4GBmWyL9XTcVHpBT3H+Xikqpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PL4SZiXh; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=9I1UFRdpTQORdgr7JFOGekbkH0vyOzdoO/6a82DByUk=; b=PL
-	4SZiXhSRtaDXCa/X5vPcQA+OKp1MG594XOOAMZye6xybAFFrxnFUBJOSlyGV4ZQ06509oIl6JrUGB
-	kWm8bptJMhaxP64fxjvOFZ0oQkzLr0CAqMrGb0lFt3NSVkkz/xH3/Je14iIPgMncOosy6yuNNGG57
-	4r22yXvEXLxjNvw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tvjja-006em6-2R; Fri, 21 Mar 2025 22:16:54 +0100
-Date: Fri, 21 Mar 2025 22:16:54 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: =?iso-8859-1?Q?Th=E9o?= Lebrun <theo.lebrun@bootlin.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	Samuel Holland <samuel.holland@sifive.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>,
-	Gregory CLEMENT <gregory.clement@bootlin.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
-	linux-mips@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Tawfik Bayouk <tawfik.bayouk@mobileye.com>
-Subject: Re: [PATCH net-next 13/13] MIPS: mobileye: eyeq5-epm: add two
- Cadence GEM Ethernet PHYs
-Message-ID: <905d367f-ff06-4a3b-b410-1e3c65e31f54@lunn.ch>
-References: <20250321-macb-v1-0-537b7e37971d@bootlin.com>
- <20250321-macb-v1-13-537b7e37971d@bootlin.com>
+	s=arc-20240116; t=1742592104; c=relaxed/simple;
+	bh=zqK3TJ1qeq7m01Nky2ep9+l1h8be9dxtswR9/vVTKUY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=L6ggBnxtml1N5D9A4rjPRxcXG0RPJqqZ854E7MzgOA+J20cbwvmlzjwbPAtFPiOCAusCkJuQ0nRfwEvlx7HDegKe1m5O25gkDyJUDkhVCG3Z85rPnE0Fxutu5ozeFcx0gkydbxiAJhBx5yMX2NNyliTLz2MExu1DQ27tkjQ35Uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JolPQkvl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB213C4CEE3;
+	Fri, 21 Mar 2025 21:21:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742592102;
+	bh=zqK3TJ1qeq7m01Nky2ep9+l1h8be9dxtswR9/vVTKUY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=JolPQkvlWSyP2HrT8QFSIfqfGJNgHSfviTlUhi9/tgFcsOC5rIoMpaoox+ZKgDCtS
+	 kBqrtaTiDemPIVBb4dYOpHNvW+GQSsnBo6eaxR4m/ErDCOjWa8enDmhug8NYlG5tQ3
+	 tuLULqyz6In/SAtdaR2ztDeZ8p0w1pskJv8+dNy+Bu5SwheoE6i1MN3ZAZ7neeptDZ
+	 5XfEbR8JzVmbZnECxHjPjCQYPZUonq8DTUCmZYkG6dMiqV7iBLN2st0KqMr1D+OXHa
+	 j07dy+5T243I5yaDWu9w9fpz40IVybGnL4UXwhzVGTsLMHcg9F/U3hm4KYAnqpvvXz
+	 notZR/4qdNOGA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD083806659;
+	Fri, 21 Mar 2025 21:22:19 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250321-macb-v1-13-537b7e37971d@bootlin.com>
+Subject: Re: [PATCH v2 net] net: Remove RTNL dance for SIOCBRADDIF and
+ SIOCBRDELIF.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174259213876.2627311.3307708570431277417.git-patchwork-notify@kernel.org>
+Date: Fri, 21 Mar 2025 21:22:18 +0000
+References: <20250316192851.19781-1-kuniyu@amazon.com>
+In-Reply-To: <20250316192851.19781-1-kuniyu@amazon.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, roopa@nvidia.com, razor@blackwall.org,
+ willemb@google.com, horms@kernel.org, idosch@idosch.org, sdf@fomichev.me,
+ kuni1840@gmail.com, netdev@vger.kernel.org, bridge@lists.linux.dev,
+ syzkaller@googlegroups.com, kangyan91@outlook.com, samsun1006219@gmail.com
 
-On Fri, Mar 21, 2025 at 08:09:44PM +0100, Théo Lebrun wrote:
-> The Mobileye EyeQ5 eval board (EPM) embeds two MDIO PHYs.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Sun, 16 Mar 2025 12:28:37 -0700 you wrote:
+> SIOCBRDELIF is passed to dev_ioctl() first and later forwarded to
+> br_ioctl_call(), which causes unnecessary RTNL dance and the splat
+> below [0] under RTNL pressure.
 > 
-> Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
-> ---
->  arch/mips/boot/dts/mobileye/eyeq5-epm5.dts | 26 ++++++++++++++++++++++++++
->  1 file changed, 26 insertions(+)
+> Let's say Thread A is trying to detach a device from a bridge and
+> Thread B is trying to remove the bridge.
 > 
-> diff --git a/arch/mips/boot/dts/mobileye/eyeq5-epm5.dts b/arch/mips/boot/dts/mobileye/eyeq5-epm5.dts
-> index 6898b2d8267dfadeea511a84d1df3f70744f17bb..20dfc85681bb03330981ca0f11b2edfff3fa57bc 100644
-> --- a/arch/mips/boot/dts/mobileye/eyeq5-epm5.dts
-> +++ b/arch/mips/boot/dts/mobileye/eyeq5-epm5.dts
-> @@ -21,3 +21,29 @@ memory@0 {
->  		      <0x8 0x02000000 0x0 0x7E000000>;
->  	};
->  };
-> +
-> +&macb0 {
-> +	phy-mode = "sgmii";
-> +	phy-handle = <&macb0_phy>;
-> +
-> +	mdio {
-> +		#address-cells = <1>;
-> +		#size-cells = <0>;
-> +		macb0_phy: ethernet-phy@e {
-> +			reg = <0xE>;
+> [...]
 
-The DT coding style might say this should be lower case?
+Here is the summary with links:
+  - [v2,net] net: Remove RTNL dance for SIOCBRADDIF and SIOCBRDELIF.
+    https://git.kernel.org/netdev/net/c/ed3ba9b6e280
 
-> +		};
-> +	};
-> +};
-> +
-> +&macb1 {
-> +	phy-mode = "rgmii-id";
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Hurrah.  A correct rgmii phy-mode.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
 
