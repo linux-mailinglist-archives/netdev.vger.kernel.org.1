@@ -1,106 +1,121 @@
-Return-Path: <netdev+bounces-176683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24B0FA6B4C8
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 08:18:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57BB2A6B591
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 08:56:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 229403B38BB
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 07:17:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E30833B5044
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 07:56:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA7A61EBFE3;
-	Fri, 21 Mar 2025 07:18:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C8901EE7BC;
+	Fri, 21 Mar 2025 07:56:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="tLL7xxjV"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="wH9jo+0c"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEC141E8336;
-	Fri, 21 Mar 2025 07:18:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FE8526ACB;
+	Fri, 21 Mar 2025 07:56:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742541485; cv=none; b=OYtz/sXo1htdzYB7kv/4ygSLJVCjPDUbwk0hCZeq299XY13EZ6bBf1uaSbYU8ueOyiyXkjbinSb8KWhWXXZwAyBsM9INvC1GYQQ/Lzwa9t57rO/Qk4UY40jZIyjUPxWc1kx8UtD7Mtmv127mB0xRTdIVzRcnPC4a3AOuyUmmMt0=
+	t=1742543772; cv=none; b=BGUxTCqXOuzWT2k4rHjXIfGkuBBHq8clpy7QPKW8PpDnAQEuIKhvHfFhoHKD4yn5KgXgiDLhVxu9KMDlGUpq2qiLFooTXocvopHqTZhUUnn3OTnNkEzW0ygm5D7HKKnreYJQXh/kqH0RB5npjwWRU1nAtOoiFDjN+eePBQVsMf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742541485; c=relaxed/simple;
-	bh=Az2iaCs6AjpNK8WuURbopULbdHBFksgSv8kK2V+xfCc=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=gF1okmylwDK6o5WLCZdTP5JiYH1fsZjvCiXHYkRB7e4EzpaqIdmBf+FfHlSKLIiJbqcS0qpwsuI4dT3PQo5wYUqViCLX8npkL0qgzqhTLeRdpy6Zjls+gMXFtWLfSNpdZMFo2pyoIxEHDeJ323xQmAYX311LKYiHNUz1h+lHzqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=tLL7xxjV; arc=none smtp.client-ip=115.124.30.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1742541472; h=Message-ID:Subject:Date:From:To;
-	bh=QpT6TAhfiuDwI7Ss07pa7dcarLeE0EOAXbWNZWyjt7s=;
-	b=tLL7xxjVUbxaM7JE4KEZ5IltykrscCzkNp9MNES2W3CdeYEgs79qDXIbpUfeKsC3fd6Qp3H5XMDOSnL4ugGUcbmRP7UVX4p3MGpQpU7iUtYoHqLSiL3aWgqelzyaA+GriEJa/50UME8hPFd9Muvufy97wN2Ye3/1K+tAigVSwZU=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WSGdsj9_1742541471 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 21 Mar 2025 15:17:52 +0800
-Message-ID: <1742541465.8308454-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v2 0/4] virtio_net: Fixes and improvements
-Date: Fri, 21 Mar 2025 15:17:45 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org,
- devel@daynix.com,
- Akihiko Odaki <akihiko.odaki@daynix.com>,
- Lei Yang <leiyang@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Andrew Melnychenko <andrew@daynix.com>,
- Joe Damato <jdamato@fastly.com>,
- Philo Lu <lulie@linux.alibaba.com>
-References: <20250321-virtio-v2-0-33afb8f4640b@daynix.com>
-In-Reply-To: <20250321-virtio-v2-0-33afb8f4640b@daynix.com>
+	s=arc-20240116; t=1742543772; c=relaxed/simple;
+	bh=O7zthI6xGCKRlOvN8fVyhphd8wmtwfCyQyQcqNnGvs0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IN3/5NJrHtbm489kkT8/ODgOa6SKdCFpehVKFlW9QZK9m5FpxdEUhftY0pY5grVRBlXKcG7ZO6OiDv8BPl7P4OeKzt2YV0leEx7LH3gsqSJPtaBG50cLe0Kn8/OUuPrscSTgVinjhQcM6gFhdx2iJufmoAPQOpyEw6eSrDg2/SI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=wH9jo+0c; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=OBxjNrd6hcTR//R8RH8pAAyEucot3xHc00neUSfAF80=; b=wH9jo+0cwMrmdpUrnXDCQ5ITTj
+	yjTLD0wJIEocyiU8G8rBT5DSf6LNGU23XiCTmqAq4ByfrxBPvuxy62xWcxcuG0BJhjOTLUP3NZ01c
+	1JTSMWdGpfkBlXE+W99xrSaNKb6Gp/Hs3UIqZH5dqQaUGru5Kf7XFINYc9uCKGJTJG+UQbIdtiTNT
+	QQjZeQ6qTGmUQL2Sb5SokCso6Czee3noq3LtJFeixQB/XdmAFEJAEX/KgKwhvQbYDvnrWNmZMM/x7
+	qQ3WV7ynXq97fTB3wOx6JMjNJiLjotKHHrE3E+8RAcFXA1yDGGdvRyRU5VYW/JJ7RMsdmqb/aXbbP
+	1tiHFC9Rp3cY/Pr9lHU1JAGEWK/3Tk649NllVAZTuFimvIe5N0orFOtR7Mls2KplAPQ82ZQiMZ3GQ
+	0VJv8Rn6Dt+pJ8654iR+HrWOI5w70sr9xp6lhmdQKSoR8ih+HlGJBo2wTFcfGKAYFpfbQQ1rdjyj4
+	HkjdYz357PbFXitr0VHtgWVm;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1tvXEV-0062FN-2N;
+	Fri, 21 Mar 2025 07:55:59 +0000
+Message-ID: <0fc1032f-908c-4e59-8f64-f22b380ae639@samba.org>
+Date: Fri, 21 Mar 2025 08:55:58 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC -next 00/10] Add ZC notifications to splice and sendfile
+To: Pavel Begunkov <asml.silence@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+ Joe Damato <jdamato@fastly.com>, Christoph Hellwig <hch@infradead.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ horms@kernel.org, linux-api@vger.kernel.org, linux-arch@vger.kernel.org,
+ viro@zeniv.linux.org.uk, jack@suse.cz, kuba@kernel.org, shuah@kernel.org,
+ sdf@fomichev.me, mingo@redhat.com, arnd@arndb.de, brauner@kernel.org,
+ akpm@linux-foundation.org, tglx@linutronix.de, jolsa@kernel.org,
+ linux-kselftest@vger.kernel.org
+Cc: David Wei <dw@davidwei.uk>
+References: <20250319001521.53249-1-jdamato@fastly.com>
+ <Z9p6oFlHxkYvUA8N@infradead.org> <Z9rjgyl7_61Ddzrq@LQ3V64L9R2>
+ <2d68bc91-c22c-4b48-a06d-fa9ec06dfb25@kernel.dk>
+ <Z9r5JE3AJdnsXy_u@LQ3V64L9R2>
+ <19e3056c-2f7b-4f41-9c40-98955c4a9ed3@kernel.dk>
+ <Z9sCsooW7OSTgyAk@LQ3V64L9R2>
+ <dc3ebb86-f4b2-443a-9b0d-f5470fd773f1@kernel.dk>
+ <356ce660-fc2e-4016-a0d9-6896936669c2@samba.org>
+ <fbcd759e-2453-4570-a2a0-c9ad67ae9277@gmail.com>
+Content-Language: en-US, de-DE
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <fbcd759e-2453-4570-a2a0-c9ad67ae9277@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, 21 Mar 2025 15:48:31 +0900, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
-> Jason Wang recently proposed an improvement to struct
-> virtio_net_rss_config:
-> https://lore.kernel.org/r/CACGkMEud0Ki8p=z299Q7b4qEDONpYDzbVqhHxCNVk_vo-KdP9A@mail.gmail.com
->
-> This patch series implements it and also fixes a few minor bugs I found
-> when writing patches.
->
-> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+Am 20.03.25 um 11:46 schrieb Pavel Begunkov:
+> On 3/19/25 19:15, Stefan Metzmacher wrote:
+>> Am 19.03.25 um 19:37 schrieb Jens Axboe:
+>>> On 3/19/25 11:45 AM, Joe Damato wrote:
+>>>> On Wed, Mar 19, 2025 at 11:20:50AM -0600, Jens Axboe wrote:
+> ...
+>>> My argument would be the same as for other features - if you can do it
+>>> simpler this other way, why not consider that? The end result would be
+>>> the same, you can do fast sendfile() with sane buffer reuse. But the
+>>> kernel side would be simpler, which is always a kernel main goal for
+>>> those of us that have to maintain it.
+>>>
+>>> Just adding sendfile2() works in the sense that it's an easier drop in
+>>> replacement for an app, though the error queue side does mean it needs
+>>> to change anyway - it's not just replacing one syscall with another. And
+>>> if we want to be lazy, sure that's fine. I just don't think it's the
+>>> best way to do it when we literally have a mechanism that's designed for
+>>> this and works with reuse already with normal send zc (and receive side
+>>> too, in the next kernel).
+>>
+>> A few month (or even years) back, Pavel came up with an idea
+>> to implement some kind of splice into a fixed buffer, if that
+>> would be implemented I guess it would help me in Samba too.
+>> My first usage was on the receive side (from the network).
+> 
+> I did it as a testing ground for infra needed for ublk zerocopy,
+> but if that's of interest I can resurrect the patches and see
+> where it goes, especially since the aforementioned infra just got
+> queued.
 
-Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Would be great!
 
-> ---
-> Changes in v2:
-> - Replaced kmalloc() with kzalloc() to initialize the reserved fields.
-> - Link to v1: https://lore.kernel.org/r/20250318-virtio-v1-0-344caf336ddd@daynix.com
->
-> ---
-> Akihiko Odaki (4):
->       virtio_net: Split struct virtio_net_rss_config
->       virtio_net: Fix endian with virtio_net_ctrl_rss
->       virtio_net: Use new RSS config structs
->       virtio_net: Allocate rss_hdr with devres
->
->  drivers/net/virtio_net.c        | 119 +++++++++++++++-------------------------
->  include/uapi/linux/virtio_net.h |  13 +++++
->  2 files changed, 56 insertions(+), 76 deletions(-)
-> ---
-> base-commit: d082ecbc71e9e0bf49883ee4afd435a77a5101b6
-> change-id: 20250318-virtio-6559d69187db
->
-> Best regards,
-> --
-> Akihiko Odaki <akihiko.odaki@daynix.com>
->
+Have you posted the work in progress somewhere?
+
+Thanks!
+metze
+
 
