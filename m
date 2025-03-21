@@ -1,102 +1,164 @@
-Return-Path: <netdev+bounces-176811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D8CFA6C426
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 21:30:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB15AA6C439
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 21:31:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF0E41890F8E
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 20:30:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41313464768
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 20:31:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36E9E230268;
-	Fri, 21 Mar 2025 20:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15C11230BEB;
+	Fri, 21 Mar 2025 20:30:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MCN0azzy"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="l5o0kxHw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0255D4A00;
-	Fri, 21 Mar 2025 20:29:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 374BD230996
+	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 20:30:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742588999; cv=none; b=umQdNM4NeWZMz9w6ddYTtbTuJrNz7XIycnPArKVrnRf0tIq2wHsXKRkIXqIX/ei7uCPR1unB/d6PuiNxmxFUEUpU4HslAy95C6ZYpD56EMggESX6r9/pzjOGiSgD9F6FIUcRrGTvKoifNYkAexgcn6hHThteleqc0LWHU3e3x+g=
+	t=1742589050; cv=none; b=bThN3cAAJl45Wjv93YJ/xa6sBWK8/HI8gzEQngi9alb2uPtvsKjdOg5lqabHnSaswL7NsH21skuL+x2hq6nQsAMwiKYz1mRtp88ame2C9AN3lI/oTCZkjbWmElhUwt6+2ileTOJGol5gaKOCkYLBFOv2dhQjVA8pGzo+I6Zfv7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742588999; c=relaxed/simple;
-	bh=ZZLmMZ289rqQhcr8NBJny5fTTa8Eof8bLWxFOCYlhbk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ItfqXLo65RWV5M7d+3zRxPm60IJh6S0HcHU7fC6zpVrQBF0P86K2+yKLfY4F5eKiSvRut+l53MqG5RRvbrPPW+U4WJn+dYh5+fK4F80JnCqEOqgpjKcflbu7OIp097q0bnBR0TQH1Ga1DbVGczAq/klQeq8d3x6pqdNklADY4ro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MCN0azzy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74D0FC4CEE3;
-	Fri, 21 Mar 2025 20:29:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742588997;
-	bh=ZZLmMZ289rqQhcr8NBJny5fTTa8Eof8bLWxFOCYlhbk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MCN0azzyrqFhyjlSjdnAvdsMtpD4lNBu9VbwIFxtdXCBamCC4AFQj0VCPr/4EJFVm
-	 mnUnlZgemakyQq3+pvW5F/01Bfl2Qg3u49OT0Eb/zwThTy2j/LmrlXBA8eclFoS5nP
-	 wHiydX3EyeqcmKOKN5Gt3zZc0WahQq0Vo1BEtxuMoYd7Ae2R5sPJDFyj+/TlJsBm/X
-	 ZKQqZXTVu5V21d0ChRTgzOOLgZBNVHzoW/MNVi934TsnSHmgRoo63Q7TTeoKlXXARO
-	 1NgCCZrmpn41L5yQCBUo6z55GrCAq9/AV+TYzfcgd5Xmb5uZ9GFdwGzfZrwtXBnp5J
-	 g4+AjfQXr3e/A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AEAF03806659;
-	Fri, 21 Mar 2025 20:30:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1742589050; c=relaxed/simple;
+	bh=kufjJ7ROxUIeeWBTf87pHaUYN0P9yN6f9l3gagdcYI0=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LRXGjBZ+T8eja/6tA9EmVZOJFI6XYt3gW6V1B6afk2IxmJjRCpKTjvihsBHAB5IBk76uBScBfecincPzbiC4ytU8Nu8LZfffz78VhQgTYvX3PB0YZZUcrhOBKuYh7iymYQoWRd2kAVvubUe8i9jrSAFDQRVeegN5lccYU+26DjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=l5o0kxHw; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2239c066347so58101795ad.2
+        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 13:30:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1742589047; x=1743193847; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=R/gNIM+yOS6xUSJi/6mY04tkW5DVweXdgmtDBLblehc=;
+        b=l5o0kxHwz56/APvSz0yxxES3DtKjkGRzP3aHJgNtqfsPTeXBNyJqn9VNgMK3W6VEgd
+         C3QYN/SUg1QAF8O7bGci/PkW/6tvRBw+3iE/xpWr29FsLghzQGbm9S5Ud3iooTfeENXt
+         V1W51rg8ZwyivdKhNuOGhhAQIyBNtmn8MsF/I=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742589047; x=1743193847;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=R/gNIM+yOS6xUSJi/6mY04tkW5DVweXdgmtDBLblehc=;
+        b=VHC5374p6PelT2HSeFKN9u0fr3DQqABdu/f078bxOyAXCU73zLGqPi1L+Q603BzbQe
+         /sSvoaaowllWneUnjC2E0lnMzFRF/NDMXibESoBIb1YwHSI4ahvVCDT9DdJ1bZUg0axT
+         cJUte9fNDF9AG/J4RjjLqockbsVesQsJD5TT3JRpGJRhCg1EyO+I5ilNONj9MMahaqF0
+         9RNOoQ/Q/jq2PYG5bq9GBsoKuB7SC9CSCiRsPkLYS39e2werqRqtW2eMX798yReDI0yn
+         Wr6oQlvm23pOQbpEsRQGjqlXe0Zeo/oN39GhRuuoje1xk47rh9fY7xi3Qi8fB1LY63gF
+         XqSA==
+X-Forwarded-Encrypted: i=1; AJvYcCWBtL4l/l6ncMFIDhdZoBnkR5VBYEAIA0IDViccGwLfgECkLeo0d2Fwkw0EF6MdtcrGQVrVbqY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzT5J8egZMmhpgkKnwztdKtGyE+3hIxHjwv7ZHehYbFxwQzvEu/
+	SrQTxj8I7hCSEDUQjB3/dmjDDVSvQtEno5Zy9PKzyaxFgf8PM2hxP592UXT5HAs=
+X-Gm-Gg: ASbGncvGITRHIUSbVgK7IR8KIT0agcASwHdv8Mc9WSsu4r7qHP2HPGKegYN99hIweEd
+	t32dBHKcQYDFQ/K8KYzMOiZQdjvMyz/FTNjsUrX0p+9Vql4ygSVj3kJ4+ijR2w5LYGR7VRL7fqc
+	YzIT37qFgTrsLrPUXEQF4XI3yK8Qu6t96B8hiAGxDvacBG8vEwzyPgCKbk5qawebUJ2gWnjxH6Q
+	0+7Zh4KWkRD7FzIfh6c3S6DiebPF9i6A0N9Zj2oVTGk1HQ9pNeYSnKp/GFd2bvdaugM1BVfPbyK
+	9dNISrf8k9g22KjFa4RvKt5pKwCvRfkACJhpMcSCiQHghExJ2ofsUf/h+J1JYEhX9K76rW/wJvS
+	bnP0OiqiAY9VO8+6A
+X-Google-Smtp-Source: AGHT+IE/0vRvWUIrCU9TpLfmE4aooUPQeYEWA/MrsW2UXdaB42a9j/XwGhSTptf5SM5XxL22FRt0Ug==
+X-Received: by 2002:a17:903:41ce:b0:224:10b9:357a with SMTP id d9443c01a7336-22780e3fbabmr64649685ad.32.1742589047213;
+        Fri, 21 Mar 2025 13:30:47 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-227811b2aefsm21875045ad.109.2025.03.21.13.30.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Mar 2025 13:30:46 -0700 (PDT)
+Date: Fri, 21 Mar 2025 13:30:43 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	asml.silence@gmail.com, linux-fsdevel@vger.kernel.org,
+	edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+	linux-api@vger.kernel.org, linux-arch@vger.kernel.org,
+	viro@zeniv.linux.org.uk, jack@suse.cz, kuba@kernel.org,
+	shuah@kernel.org, sdf@fomichev.me, mingo@redhat.com, arnd@arndb.de,
+	brauner@kernel.org, akpm@linux-foundation.org, tglx@linutronix.de,
+	jolsa@kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [RFC -next 00/10] Add ZC notifications to splice and sendfile
+Message-ID: <Z93Mc27xaz5sAo5m@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	asml.silence@gmail.com, linux-fsdevel@vger.kernel.org,
+	edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+	linux-api@vger.kernel.org, linux-arch@vger.kernel.org,
+	viro@zeniv.linux.org.uk, jack@suse.cz, kuba@kernel.org,
+	shuah@kernel.org, sdf@fomichev.me, mingo@redhat.com, arnd@arndb.de,
+	brauner@kernel.org, akpm@linux-foundation.org, tglx@linutronix.de,
+	jolsa@kernel.org, linux-kselftest@vger.kernel.org
+References: <Z9rjgyl7_61Ddzrq@LQ3V64L9R2>
+ <2d68bc91-c22c-4b48-a06d-fa9ec06dfb25@kernel.dk>
+ <Z9r5JE3AJdnsXy_u@LQ3V64L9R2>
+ <19e3056c-2f7b-4f41-9c40-98955c4a9ed3@kernel.dk>
+ <Z9sCsooW7OSTgyAk@LQ3V64L9R2>
+ <Z9uuSQ7SrigAsLmt@infradead.org>
+ <Z9xdPVQeLBrB-Anu@LQ3V64L9R2>
+ <Z9z_f-kR0lBx8P_9@infradead.org>
+ <ca1fbeba-b749-4c34-b4be-c80056eccc3a@kernel.dk>
+ <Z92VkgwS1SAaad2Q@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next V2 0/4] mlx5e: Support recovery counter in reset
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174258903353.2613064.2638906472683771245.git-patchwork-notify@kernel.org>
-Date: Fri, 21 Mar 2025 20:30:33 +0000
-References: <1742112876-2890-1-git-send-email-tariqt@nvidia.com>
-In-Reply-To: <1742112876-2890-1-git-send-email-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, gal@nvidia.com,
- leonro@nvidia.com, ychemla@nvidia.com, saeedm@nvidia.com, leon@kernel.org,
- corbet@lwn.net, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- kalesh-anakkur.purayil@broadcom.com, jacob.e.keller@intel.com,
- stfomichev@gmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z92VkgwS1SAaad2Q@LQ3V64L9R2>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Sun, 16 Mar 2025 10:14:32 +0200 you wrote:
-> Hi,
+On Fri, Mar 21, 2025 at 09:36:34AM -0700, Joe Damato wrote:
+> On Fri, Mar 21, 2025 at 05:14:59AM -0600, Jens Axboe wrote:
+> > On 3/20/25 11:56 PM, Christoph Hellwig wrote:
+> > >> I don't know the entire historical context, but I presume sendmsg
+> > >> did that because there was no other mechanism at the time.
+> > > 
+> > > At least aio had been around for about 15 years at the point, but
+> > > networking folks tend to be pretty insular and reinvent things.
+> > 
+> > Yep...
+> > 
+> > >> It seems like Jens suggested that plumbing this through for splice
+> > >> was a possibility, but sounds like you disagree.
+> > > 
+> > > Yes, very strongly.
+> > 
+> > And that is very much not what I suggested, fwiw.
 > 
-> This series by Yael adds a recovery counter in ethtool, for any recovery
-> type during port reset cycle.
-> Series starts with some cleanup and refactoring patches.
-> New counter is added and exposed to ethtool stats in patch #4.
+> Your earlier message said:
 > 
-> [...]
+>   If the answer is "because splice", then it would seem saner to
+>   plumb up those bits only. Would be much simpler too...
+> 
+> wherein I interpreted "plumb those bits" to mean plumbing the error
+> queue notifications on TX completions.
+> 
+> My sincere apologies that I misunderstood your prior message and/or
+> misconstrued what you said -- it was not clear to me what you meant.
 
-Here is the summary with links:
-  - [net-next,V2,1/4] net/mlx5e: Ensure each counter group uses its PCAM bit
-    https://git.kernel.org/netdev/net-next/c/8e6f6e92d3fe
-  - [net-next,V2,2/4] net/mlx5e: Access PHY layer counter group as other counter groups
-    https://git.kernel.org/netdev/net-next/c/da4fa5d8817d
-  - [net-next,V2,3/4] net/mlx5e: Get counter group size by FW capability
-    https://git.kernel.org/netdev/net-next/c/4c737ceb690c
-  - [net-next,V2,4/4] net/mlx5e: Expose port reset cycle recovery counter via ethtool
-    https://git.kernel.org/netdev/net-next/c/c3b999cad7ec
+I think what added to my confusion here was this bit, Jens:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+  > > As far as the bit about plumbing only the splice bits, sorry if I'm
+  > > being dense here, do you mean plumbing the error queue through to
+  > > splice only and dropping sendfile2?
+  > >
+  > > That is an option. Then the apps currently using sendfile could use
+  > > splice instead and get completion notifications on the error queue.
+  > > That would probably work and be less work than rewriting to use
+  > > iouring, but probably a bit more work than using a new syscall.
+  > 
+  > Yep
 
+I thought I was explicitly asking if adding SPLICE_F_ZC and plumbing
+through the error queue notifications was OK and your response here
+("Yep") suggested to me that it would be a suitable path to
+consider.
 
+I take it from your other responses, though, that I was mistaken.
 
