@@ -1,140 +1,122 @@
-Return-Path: <netdev+bounces-176708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 244BEA6B8C3
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 11:27:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46B29A6B8D7
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 11:36:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41F3B3B2661
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 10:27:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAB1418983D6
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 10:35:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BE8E1E47C2;
-	Fri, 21 Mar 2025 10:27:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BDE021B9C5;
+	Fri, 21 Mar 2025 10:35:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="IonKT/Ot"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CeSI6YTZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0D2215078
-	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 10:27:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA46B1FC7D9;
+	Fri, 21 Mar 2025 10:35:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742552830; cv=none; b=AONI0WmN9DFW5/ih+1O0i7n60He7y3PgFPxk5uLhL5OqdOFNvRMx+eFFfOPr+/gHmxvCjJqDKUTKhHqfdDdGsQVctTyPGvK7hodgTDpW4Ak6+1ILAP89mmB1cutXO4VYTVJyY6b9dcFcmzfKumgsAzqAZGoPxWJei2MnqDELQnM=
+	t=1742553318; cv=none; b=JAv/f1+k50vZLOjiZM/P+hSUkfgUw6C0DiZ0wU/z6TFn8wJlHj0+ogva/OVdRwGMfQ7nhWVBC6qv7K0eslq9qhkveZpBdnbbmGyy+8YadEEi9NcDy0ZE0CgtXcXqcwGXPtHn/4VsOxZSDCxOD1+Xl8o1IA6FEcNEDaDbP/iUrsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742552830; c=relaxed/simple;
-	bh=UZmFI/DyutG1aepD1inleyURUrFKq5azemtKpxgftZY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=DPaAZ3uytPmduJM+rlTR4308zx4Uf/JWjA6LAkpvsk+eQNzxPLo2gSinhDQVcx7JeLY5HqvAniL36SnwTTSFUXyHu4nYjW39abcW3wFH3zW/8T6/t+oZcaVVamo5rh2BaxbxjJ46QxIp3mFgUuXWeFkS2u9uUu9yV9oNNSz1/rQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=IonKT/Ot; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-ac2c663a3daso366439866b.2
-        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 03:27:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1742552826; x=1743157626; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wu4i5eqjru7PimQLCqcGFqR9RCZeXfEVJLVFfQmDF3Y=;
-        b=IonKT/OtpEdWpbkzs1EI9+6CDy4cJ6cYKyAlzSrU+oYAXsV5Sj9ruOqlANmcbdMpNq
-         tHu94qKsPpaFdG9kDzKFkjTiM1JNtNOk1yq/tHUMZeGVseBpZa2RSnU/3V4qt8jCAjvN
-         LRc6seUenvHGpzbQeXklDhNPPVrgjf8s6y7Umggngm48vw0e5EtgNAuX+7+Ui1A2/lCo
-         QPlTbIBEnrVJdeAdB8wLw24pl5JY1aW677f3Rguqh703rnE38qIauIz/bqCZfMprVWMp
-         SCiTz4uOhpwYfVqO8mbQBfkl8U4JW58Fhn7Ot98RI7Z6saFSBxeklylREA1+N5k3MPOD
-         aPaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742552826; x=1743157626;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wu4i5eqjru7PimQLCqcGFqR9RCZeXfEVJLVFfQmDF3Y=;
-        b=V8CweilkM1rOx5Al8YSdA/2klai+95g4w4kPnqex02XvQhQNpJIDWYn5rGppuUKVkT
-         CZX7UVc70b6NAEmyLQ/ZIHhuoc3K/cRIYLCPV0F5XdFAQ9hLx5nxBlSYaOSCVldMY5lg
-         MLNYLpIUIMyAWQ/0FlqpiuEhm2OOpFnTqZa1sBQXjUYS3mnY0qouH6XYPkiM9nvcnWCJ
-         DjAior360+jGcD7FDs2KMqFtrkCOUrS9V16EMSIjBaTZvbORqirEbD1AgiiR8PLjGUNo
-         6e/udYhng5ays/+YDulAjeUJHz0n0OZVv4bvAfRwKNz2zl36G4DqiDT+IfnHU/gcVx4J
-         a3gQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXW4QbTwuq2PT5Wv2tvL417Pjc06h4buUm5keRgCzTi1XJs/c1EdNyPWB6JBlMJpuJf3XTdVt0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwY+z1BQvkg02QgtGLfFIV1lFLuA46d1E07u9Tq+edz4hBwk63e
-	H8/axjXsbzuKCKv4bK2XgFagNLWs51snYnvEb+q+pyhqeRVhaTgCtrso1voi6voEXah/OAkUISG
-	L
-X-Gm-Gg: ASbGncujRCmaxULVEM8VMYLP63GzbG0qVZ5nqnHcQskqcdp+vVgVeTpMCmBp2aQYRDW
-	96iGHyL7FQB2vEUkWWJxM0tXVF2W18oZ7U7ByT5lKG8lfFbDxrzQZjqB0bCcFcom9KpOJPZ/aCv
-	UDWkwH5LRbtWNzqH2kUFN5nGx7kbSfSM2PFpakeZ0U25meIgx5kaDDpKFh1DN1v92PUL8OvJxOy
-	XhzWR9Yl1hR/h6dRPLwOeq4P/q6ycGX3eEdlj+WqlmdaInvfljPBHCrpXGpaNBNJz2ddGRQGjKr
-	mB51nLKmjaZ16W0pmdg9oY7WtfsmweB0uvAjGn0BDA4cnAJ10hCZmTvGF69fP+GTYWuCL1hYYYE
-	=
-X-Google-Smtp-Source: AGHT+IFUV57GRhkoiFK2QLz02CVKRzzXrPOpX1CQUTZ3dFxIy7zKzGTfXLxUvljPSVlo/c/udERyuQ==
-X-Received: by 2002:a17:907:3f9b:b0:abf:5266:6542 with SMTP id a640c23a62f3a-ac3f2539879mr199078566b.55.1742552825817;
-        Fri, 21 Mar 2025 03:27:05 -0700 (PDT)
-Received: from wkz-x13 (h-79-136-22-50.NA.cust.bahnhof.se. [79.136.22.50])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3efd4d36csm128037766b.170.2025.03.21.03.27.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Mar 2025 03:27:04 -0700 (PDT)
-From: Tobias Waldekranz <tobias@waldekranz.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, kuba@kernel.org, marcin.s.wojtas@gmail.com,
- linux@armlinux.org.uk, andrew@lunn.ch, edumazet@google.com,
- pabeni@redhat.com, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 net] net: mvpp2: Prevent parser TCAM memory corruption
-In-Reply-To: <20250321111028.709e6b0f@fedora.home>
-References: <20250321090510.2914252-1-tobias@waldekranz.com>
- <20250321111028.709e6b0f@fedora.home>
-Date: Fri, 21 Mar 2025 11:27:03 +0100
-Message-ID: <87sen6adc8.fsf@waldekranz.com>
+	s=arc-20240116; t=1742553318; c=relaxed/simple;
+	bh=MVSVPmZLeZXiQYxzzG8ovcZb+UVA+GGalY06rOu+Kfs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TlRiYDntXyTasRjYlVxyb9WiSXcgqxwP7oyZXOiqj/KT9IYw6OLvmLwgIp3EAUPCh0JYv1nxUeijD1Yb+syAARgaeEhAwJ0pMrJZQgSFb28sy5Ru+AyjZAHYkdWyZq7WJRxNCcJbSmEecglKtY6vAdIbfPryMQnChDVqXDmddU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=CeSI6YTZ; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 05FAD432C1;
+	Fri, 21 Mar 2025 10:35:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1742553307;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=co8JDmZx4HmArnDvcnRVxtXy60X141/SmNungt+YCYA=;
+	b=CeSI6YTZlyjSoGnwVyaPrxNXGMcD0MVY7JCZqknxbNudjZRVwShUwplGqX/Rc6KTLWyad/
+	PeMmQE67B3ZVIvVmQkFb/eOeRRoCq+GGLkA1CDqgb+O5VYFg7SVQ3HSfFHIIsetfiZnCwS
+	DR0nW7NmN63AbrL/Lc57umqyo4KL4buT+yzTd+/gj5+agAZP66mSZKO6JbN+k83dzse054
+	+5JbjHRIDf8xbmvB5IjrGyBCPK8bKqvyuEl9kp6Qt9Otz6uZl9IBvX3R3yX07HBtTHxnPd
+	4EHidxqS7qsPpAVfmuE4YL7vMk5XKkIZEmANEoyjRWsSiPIS/ejCrC56+RLvjA==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	alexis.lothore@bootlin.com,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>
+Subject: [PATCH net-next] net: stmmac: Call xpcs_config_eee_mult_fact() only when xpcs is present
+Date: Fri, 21 Mar 2025 11:35:01 +0100
+Message-ID: <20250321103502.1303539-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduhedtkeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhephedtheeufeeutdekudelfedvfefgieduveetveeuhffgffekkeehueffueehhfeunecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudekpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiiv
+ ghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhm
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On fre, mar 21, 2025 at 11:10, Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
-> Hi Tobias,
->
-> On Fri, 21 Mar 2025 10:03:23 +0100
-> Tobias Waldekranz <tobias@waldekranz.com> wrote:
->
->> Protect the parser TCAM/SRAM memory, and the cached (shadow) SRAM
->> information, from concurrent modifications.
->> 
->> Both the TCAM and SRAM tables are indirectly accessed by configuring
->> an index register that selects the row to read or write to. This means
->> that operations must be atomic in order to, e.g., avoid spreading
->> writes across multiple rows. Since the shadow SRAM array is used to
->> find free rows in the hardware table, it must also be protected in
->> order to avoid TOCTOU errors where multiple cores allocate the same
->> row.
->> 
->> This issue was detected in a situation where `mvpp2_set_rx_mode()` ran
->> concurrently on two CPUs. In this particular case the
->> MVPP2_PE_MAC_UC_PROMISCUOUS entry was corrupted, causing the
->> classifier unit to drop all incoming unicast - indicated by the
->> `rx_classifier_drops` counter.
->> 
->> Fixes: 3f518509dedc ("ethernet: Add new driver for Marvell Armada 375 network unit")
->> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
->
-> I gave it a quick test with simple tcam-based vlan filtering and uc/mc
-> filtering, it looks and behaves fine but I probably didn't stress it
-> enough to hit the races you encountered. Still, the features that used
-> to work still work :)
+Some dwmac variants such as dwmac_socfpga don't use xpcs but lynx_pcs.
 
-Good to hear! :)
+Don't call xpcs_config_eee_mult_fact() in this case, as this causes a
+crash at init :
 
-I have tried to stress it by concurrently hammering on the promisc
-setting on multiple ports, while adding/removing MDB entries without any
-issues.
+ Unable to handle kernel NULL pointer dereference at virtual address 00000039 when write
 
-I've also ran the original reproducer about 10-20x the number of
-iterations it usually took to trigger the issue.
+ [...]
 
-> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
->
-> Thanks a lot,
+ Call trace:
+  xpcs_config_eee_mult_fact from stmmac_pcs_setup+0x40/0x10c
+  stmmac_pcs_setup from stmmac_dvr_probe+0xc0c/0x1244
+  stmmac_dvr_probe from socfpga_dwmac_probe+0x130/0x1bc
+  socfpga_dwmac_probe from platform_probe+0x5c/0xb0
 
-Thanks for reviewing and testing!
+Fixes: 060fb27060e8 ("net: stmmac: call xpcs_config_eee_mult_fact()")
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+---
+This targets net-next as the blamed commit is also still in net-next.
+
+ drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
+index 7c0a4046bbe3..836f2848dfeb 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
+@@ -524,7 +524,8 @@ int stmmac_pcs_setup(struct net_device *ndev)
+ 	if (ret)
+ 		return dev_err_probe(priv->device, ret, "No xPCS found\n");
+ 
+-	xpcs_config_eee_mult_fact(xpcs, priv->plat->mult_fact_100ns);
++	if (xpcs)
++		xpcs_config_eee_mult_fact(xpcs, priv->plat->mult_fact_100ns);
+ 
+ 	priv->hw->xpcs = xpcs;
+ 
+-- 
+2.48.1
+
 
