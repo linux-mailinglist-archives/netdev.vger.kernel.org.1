@@ -1,176 +1,115 @@
-Return-Path: <netdev+bounces-176768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C8F2A6C109
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 18:15:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EF84A6C10B
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 18:16:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE3A73B4420
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 17:14:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA7223AA4F8
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 17:16:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABE771DE884;
-	Fri, 21 Mar 2025 17:15:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D38A41CAA80;
+	Fri, 21 Mar 2025 17:16:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rvrk2R3A"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="I20DCq8V"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9B4022D7AB
-	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 17:15:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63ACB1494C3
+	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 17:16:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742577307; cv=none; b=X2EqrXOKoLshenij2ILdyMBzJeklYy71nYdpXfCO4d2YJ0vs9f3H/y4drGpOXsUlHRH7g23kngp8eOV0wU+v89bGUBYHX9Wk5R7V+tEeuvwBQDLsjn/F9kZqZYGCZPF7ygLj7BkaraCH9UHQFB6/yuQ1HJChHizrojehZsDip+I=
+	t=1742577375; cv=none; b=LIfgseMP01EMmEdmyScqpHK7TIc0eNyF0n8e/N29izHvlk8IR/lO47PSiII77aGvkzP4LePIAOBLpOGzsWn5hrFqnin2CzyNvOj+MUYFvBhWoTF3yTuTB/T9Lvnh767hp0JYaBh6wlruBhWQr9rvxxJkRgcfpo0a+XJQBjEmCgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742577307; c=relaxed/simple;
-	bh=/Pc6ln3sJ2kspyKjYFBc1b865couGgE0dagD/dAEJGg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=s7eMgnrmzNgka0ABVkkUqppR1aHVR/tMq1ZNGWJCQF1X2mbCHik6n3fmns5i7UQGJ1ep9Bxznz9pR295RY1IJaD/7kwKzv2HfLTm+KH1MjwVtIiQ0cL90DmWcXqv4tckZz2H8fCHk0VI5MQNpWbjDlpNs7rGZwVXRc+zxgLrBJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Rvrk2R3A; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742577304;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=34iI9dINlmG5alUqqmmlTwB9Vbf82RIIZH6tCAXcPqQ=;
-	b=Rvrk2R3ABVuVo2B2IyigM0AtkZBOIhp0x8Iwg7UUM3dD4UBffAZl6TgwfC0fhayU8FW58/
-	K7aDfmHUce9H9so83inbuFtRK0cGmArgnQB1J97cDVwjfheS5xxs4xoKb3kWSAix0cW6K0
-	Ouvq8XVDd5R3SAncrJKxv5Pu7SOmRCE=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-97-Joeg1BlqORmnSYxxIcYkoQ-1; Fri, 21 Mar 2025 13:15:03 -0400
-X-MC-Unique: Joeg1BlqORmnSYxxIcYkoQ-1
-X-Mimecast-MFC-AGG-ID: Joeg1BlqORmnSYxxIcYkoQ_1742577302
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-301bbe9e084so6353413a91.0
-        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 10:15:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742577302; x=1743182102;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+	s=arc-20240116; t=1742577375; c=relaxed/simple;
+	bh=EPVbbd0HYaZV3z8eTgXCC6yGuewsSygT/Fx8Ues+2uM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oZcIZT3HgR8yfRkW39ObnPW5LwsEPqD5Id38+iJADjHk/tncd90R7XPx23JY1qG2/EXwvbpdK4/UYk2F/Ano87OMlGy0HaIUjqrRjj5ImC+xKrPqXhW1AazAqaeH1Imy/QX3NHHo/zvWkljEo73NYg8HD81DJ/ReawM0yqFvoLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=I20DCq8V; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-223594b3c6dso53756965ad.2
+        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 10:16:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1742577373; x=1743182173; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=34iI9dINlmG5alUqqmmlTwB9Vbf82RIIZH6tCAXcPqQ=;
-        b=lOzw5uUs4C0FCLHiBZCfcBWccBH+FpBLKB81UchpHKvzFp0VLynjvmP3Wn+8KJhgeZ
-         wCJfr8iQUyw8HbLjoVmtiVcDcllb/BjoH9gwwaAZCmPYujbwVUYrfwM9aJ2N8CNf1rlx
-         H28oMnFyJz8ZZGU6h4kTqdaZ68iQ0S3bUQ7FuuO6eTAuh72vCql7ZFBqHPjgREI2J2Kl
-         IwFyN4ihm8uLgowYdXQ2eRZaSrjmzN25iY2AbE3T9UeDuPwZHrXfhe/gqmmq7/41Ei3c
-         dtoLLcDWg9redcaI+ahP4hkrFnjOYxyJEn9si+CBfSb3gcBOFUlwdmA1f/SQ33/s7jUc
-         9jZg==
-X-Gm-Message-State: AOJu0YwqhoeA4Q6DzoDiepJRgQ5qFElD45p/VGFZ9x6lLhB2gHMCz9Eg
-	LggAOsvASwzKkF9ynUhXpf9gglwsi3YWSjljQLo1IeuwEROwH7+kFTQOkrMGF1G6PDJbQvEXjKR
-	UoV7HhjrM+XzUqeK3IHWwNWZPZuF3cWXsyqlML4pwUsOzGoRKsKQF5mtMR9rp7wSXt0TW+zw/2g
-	zTMJ98fLlaAZQ4V1p80Y/UFNXUBMhW
-X-Gm-Gg: ASbGncvYGL+LiWOliwrWQhmIJyKH7c6OxcPMp+l8qbS9lAwV8rQ9QOgtsoY5nTnUEEs
-	+sbergD9G0leRiqCSXSZVdHEC3KAqDEbRtVpxeB4DtjaR1GIyie3dpbSgHQxJZIf5UL1aDbS7pU
-	4luJ1ZyhHZAvQF0z9nHKom075PJJFR
-X-Received: by 2002:a17:90b:4c0a:b0:2ee:ad18:b309 with SMTP id 98e67ed59e1d1-3030fe6e1fdmr4926138a91.3.1742577302019;
-        Fri, 21 Mar 2025 10:15:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGg3SVWAv3wa5Cimyz9NjCggOs6jOlufExU13jLuWFRr+Ocyg7ZpHzQTOedv7DHDxaLe7mpmWE5V/Yo8m5Hi9U=
-X-Received: by 2002:a17:90b:4c0a:b0:2ee:ad18:b309 with SMTP id
- 98e67ed59e1d1-3030fe6e1fdmr4926108a91.3.1742577301535; Fri, 21 Mar 2025
- 10:15:01 -0700 (PDT)
+        bh=ZldbUtl5x/fPMH33kujZlc8V6fuAG7YPToo76T6Ho5M=;
+        b=I20DCq8ViJPYA5uVcf8bAden+wb9xmJeqCd1tPXTQC9P0x4/g8cuENmyC6v+i9xUL+
+         0Zcy7EmASzPUddxG0uP5QJRMsGT81tfRzM7Bz9lzBK+dSTsJtVBP8MDIGs1Q7Rwcl76Q
+         /jJpt6/whSrEbStTt+vX5i3FfElzuk2aIYxJE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742577373; x=1743182173;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZldbUtl5x/fPMH33kujZlc8V6fuAG7YPToo76T6Ho5M=;
+        b=FwVCoXneY0nL8rqqS8q35pVkytbVN0ofCjRsS7GmgkLSnwdl5xsirjsKkaOn1ZFMvT
+         YNvFUw00NyM1iopc6DiJOV83gA590m9KiFzlA19Lq+Edo/eyRer3PN5JNhakxyp+ZpwS
+         JkHvsPtFqoVGJcEKIGTw2FGRxDZsEARHm8VfkB3FUuNgTeM9vOAecIlGGNkdCvvBNVJ9
+         vnlEVdqj8GS//6dZQD7FqI0PM86DgIpRcvFm4KbJaqZLr4GHhAzEH369X4G1/X53H3yZ
+         k10nD0sQNJz/G8ILpZsU2X+wQIjPqpn2tshVUCr+UFqyrw3/+G6Ag1MXzf4KMRdLx+Om
+         UK5g==
+X-Forwarded-Encrypted: i=1; AJvYcCXhl9bOyeZKi6Iy9iuprGBJiIyImz6t1WRYulKxpvElFRQk/d6QTM2KfxZwOplAdQPbofR6j6E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwiPuhs33WJgwTyVyMoHlbCMd2uGy23HNxeT50pPk76z0CEeKmp
+	ZlMs2jSOknWjuUjccVpSr6JWw67XO9tagDEqRWMytETRGisn5IR/ipJoEm2QF4A=
+X-Gm-Gg: ASbGncuvj1NmEkLJGxfqi4GmXiRBMJEyb858EPPJlVEFsAal+5l4xXELrWkphUltzO5
+	RHE2lHczSAPipTI7uY6BjG3G2/xzpcRb4kOQybfLuOx+2aKEV3NlzXinBzR/trqgkmACDWwz9C/
+	H6BsOYXowelRdF11G8TmNlO5t5Q9JPfb3zmfNGIdnaL47RP9wUJMnHGi/dJPkf76x9Rh7lW+Tkt
+	6p3YY/moWFlMtoAteePY6JVjJ1Vb2YzqIH8yeuDV8eBCDdYQ8WVOeZVvDCkS07Bh0h4s/XNEVDN
+	dAMEnUM4z5JEM5DfsCzJwQvkKpwkJPFXkDCx6kbPRwd2CrrY//zlz98pm4FpRdRoVXrV3SqebSp
+	2u54KErrjPYvxj0+s
+X-Google-Smtp-Source: AGHT+IGw/IZ0z87rJOk8mgq5NY9Yvo9/1o+0CdR3saluY+v18vu0MxYlCD/NFLZtzvWTa6qO9agjDw==
+X-Received: by 2002:a05:6a00:3927:b0:736:ab1e:7775 with SMTP id d2e1a72fcca58-7390562ad7fmr7949203b3a.0.1742577373397;
+        Fri, 21 Mar 2025 10:16:13 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73905fd66d6sm2290477b3a.61.2025.03.21.10.16.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Mar 2025 10:16:13 -0700 (PDT)
+Date: Fri, 21 Mar 2025 10:16:10 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Samiullah Khawaja <skhawaja@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller " <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	almasrymina@google.com, willemb@google.com, mkarsten@uwaterloo.ca,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v4 2/4] net: Create separate gro_flush helper
+ function
+Message-ID: <Z92e2kCYXQ_RsrJh@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller " <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	almasrymina@google.com, willemb@google.com, mkarsten@uwaterloo.ca,
+	netdev@vger.kernel.org
+References: <20250321021521.849856-1-skhawaja@google.com>
+ <20250321021521.849856-3-skhawaja@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250309144653.825351-1-bigeasy@linutronix.de> <20250309144653.825351-14-bigeasy@linutronix.de>
-In-Reply-To: <20250309144653.825351-14-bigeasy@linutronix.de>
-From: Davide Caratti <dcaratti@redhat.com>
-Date: Fri, 21 Mar 2025 18:14:50 +0100
-X-Gm-Features: AQ5f1JrsOBRY2D38k93U5tBRuv9FGKS8iQOFZBJI6uqBXasiujr5D92i-Wcqb7s
-Message-ID: <CAKa-r6s69JbQX7ZuGiz37bbfQYWs+r6odhVB7Ygct8DYN=ApJQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 13/18] net/sched: act_mirred: Move the recursion
- counter struct netdev_xmit.
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, linux-rt-devel@lists.linux.dev, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250321021521.849856-3-skhawaja@google.com>
 
-hi,
+On Fri, Mar 21, 2025 at 02:15:19AM +0000, Samiullah Khawaja wrote:
+> Move multiple copies of same code snippet doing `gro_flush` and
+> `gro_normal_list` into a separate helper function.
+> 
+> Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
 
-On Sun, Mar 9, 2025 at 3:48=E2=80=AFPM Sebastian Andrzej Siewior
-<bigeasy@linutronix.de> wrote:
->
-> mirred_nest_level is a per-CPU variable and relies on disabled BH for its
-> locking. Without per-CPU locking in local_bh_disable() on PREEMPT_RT
-> this data structure requires explicit locking.
->
-> Move mirred_nest_level to struct netdev_xmit as u8, provide wrappers.
->
-> Cc: Jamal Hadi Salim <jhs@mojatatu.com>
-> Cc: Cong Wang <xiyou.wangcong@gmail.com>
-> Cc: Jiri Pirko <jiri@resnulli.us>
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> ---
->  include/linux/netdevice_xmit.h |  3 +++
->  net/sched/act_mirred.c         | 28 +++++++++++++++++++++++++---
->  2 files changed, 28 insertions(+), 3 deletions(-)
->
-> diff --git a/include/linux/netdevice_xmit.h b/include/linux/netdevice_xmi=
-t.h
-> index 3bbbc1a9860a3..4793ec42b1faa 100644
-> --- a/include/linux/netdevice_xmit.h
-> +++ b/include/linux/netdevice_xmit.h
-> @@ -11,6 +11,9 @@ struct netdev_xmit {
->  #if IS_ENABLED(CONFIG_NF_DUP_NETDEV)
->         u8 nf_dup_skb_recursion;
->  #endif
-> +#if IS_ENABLED(CONFIG_NET_ACT_MIRRED)
-> +       u8 sched_mirred_nest;
-> +#endif
->  };
->
->  #endif
-> diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
-> index 5b38143659249..8d8cfac6cc6af 100644
-> --- a/net/sched/act_mirred.c
-> +++ b/net/sched/act_mirred.c
-> @@ -30,7 +30,29 @@ static LIST_HEAD(mirred_list);
->  static DEFINE_SPINLOCK(mirred_list_lock);
->
->  #define MIRRED_NEST_LIMIT    4
-> -static DEFINE_PER_CPU(unsigned int, mirred_nest_level);
-> +
-> +#ifndef CONFIG_PREEMPT_RT
-> +static u8 tcf_mirred_nest_level_inc_return(void)
-> +{
-> +       return __this_cpu_inc_return(softnet_data.xmit.sched_mirred_nest)=
-;
-> +}
-> +
-> +static void tcf_mirred_nest_level_dec(void)
-> +{
-> +       __this_cpu_dec(softnet_data.xmit.sched_mirred_nest);
-> +}
-> +
-> +#else
-> +static u8 tcf_mirred_nest_level_inc_return(void)
-> +{
-> +       return current->net_xmit.nf_dup_skb_recursion++;
-> +}
-> +
-> +static void tcf_mirred_nest_level_dec(void)
-> +{
-> +       current->net_xmit.nf_dup_skb_recursion--;
-> +}
-> +#endif
+As mentioned in the previous review, I think this is missing a spot.
+the instance in napi_complete_done was not addressed as suggested
+previously.
 
-sorry for reviewing this late - but shouldn't we use sched_mirred_nest
-instead of nf_dup_skb_recursion in case CONFIG_PREEMPT_RT is set?
-
-thanks,
---=20
-davide
-
+Is there any particular reason why that feedback was not addressed
+in this revision?
 
