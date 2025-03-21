@@ -1,125 +1,186 @@
-Return-Path: <netdev+bounces-176714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27528A6B968
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 12:02:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 171E5A6B99B
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 12:11:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA0D83A72E7
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 11:01:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 698B3189EC82
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 11:11:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD979221F1A;
-	Fri, 21 Mar 2025 11:01:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E2B9221F1A;
+	Fri, 21 Mar 2025 11:11:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DgKBqOMi"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="iRtkMVFZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96A7921D3F9
-	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 11:00:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F3F522157E
+	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 11:11:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742554862; cv=none; b=rDpdVgo6L121eEZmmpX//snejCb/wfRAWpKaerMmqUZvpZlbm+C9+MCTdFPZPYHFH9n+wRKSAHf2Sd+6vmZc9uuDkxVE7F/dAccYqYRVsbtw7rh3jAQNaPKsJI8/fjLk+r3SpR6wU0qCEC5SVL7ap49CV3o/oU0on1zmEoLqdmo=
+	t=1742555465; cv=none; b=ok+y7lo9xx2REhmavf9wgphgdrCR679vg05iFvL8vuUl60XHDgtk8V0m3YZFbFc0KOeJboHxkct3AVXbZ13BGK7SX+JphDuNoLmRJ68VFT9+/B72mJnu71pY/B8AXyklUolDJVZjAxlCDwYV4iRFWIBpl7FbuVRGBND8AA6AHd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742554862; c=relaxed/simple;
-	bh=MClhHYdDYbfSs0X8oLGlhpUPZfPqb+p3CJs/tABView=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=E2FijNFevTiTxNqZCEV7G+WjAjMc9AWkopNsfH55Qlah9PwNTPWI/+QT7fI5v32lisS6jJp2FCkVeWuvdkzy93edoR3wzl+2/tLyEhv+Xey5jEX2p79nzCpRLreZCZoMADfmE8TlHMEsKYMVo33Urb8yQiDY73Q8ZhJnV3emk2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DgKBqOMi; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742554857;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kR92x38MaPIUcSwwuTEs6+JYl/zG4hCrnKTSGKNxEmY=;
-	b=DgKBqOMiH2FVqKxz1Dd7St4oJYKQgm4/4mOE14oGvylDG6pPmx8Ts68lfeyInDVwEPvJ7C
-	5J4SmGJ1CTZPn/ZagCD75aFu+ScBn5UqgXKEIAijZ1+BF5n3j//wjPtCSRYwtbdZ24AmyK
-	v+ZlN/wpECYEqaE1DRS4UQHPQHrRyK8=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-492-mTF1tTljNOaFqWdAEVoigQ-1; Fri, 21 Mar 2025 07:00:55 -0400
-X-MC-Unique: mTF1tTljNOaFqWdAEVoigQ-1
-X-Mimecast-MFC-AGG-ID: mTF1tTljNOaFqWdAEVoigQ_1742554853
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-ac3a9c3a8f7so182469266b.1
-        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 04:00:54 -0700 (PDT)
+	s=arc-20240116; t=1742555465; c=relaxed/simple;
+	bh=Xl5oeEHOaLoSBAmpxOjl3jAqNjOQaFTyIpVFbbJdV6U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=PbkC9Jr8EmRnCD21SYlaK82lIng8yJB2/QfVD2BZksW5adxqxvKHv2XBwcnj9ilmJm08EasLYdXg8Q0HwGiu0dFSjiKwfcrnzdQeoL5uwEumE8YKnexdT/O81T2YO4EN3ob5M/jXolHnbdTMaiu4FfL81IspfYJD7xGplfBcs2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=iRtkMVFZ; arc=none smtp.client-ip=209.85.166.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-85ae4dc67e5so93373039f.2
+        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 04:11:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1742555462; x=1743160262; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=sA3xfU5eNSi4gl7Hxg/W8KumQ2nnI6nlMXWqCtTodbQ=;
+        b=iRtkMVFZMTRKf+upcfDpu7YAYHNXlaVFWfUbaWIBBZOd+emomPpzL9uic9cU38jgBD
+         3Sc38L8AUe0r4klVumDPED3THsG+gTffRYTV9eLzzdPZeICYdDW4LSljmPnVi1hjxiMk
+         1sijCJ3baGaduYK+6IyEh/6F6bKyrJHrJzGWGVWUNmUoIbnNl8nsH0AH4hiKH2BtmHyp
+         cUI139EiYXUGnTvZkNHjboSbEZwDENzbNQsBzGYHNe6zVZdhDYjECXss1eZmALHTmZe4
+         CY/+uJwVyMw2qKhrUSULbg5KjJe7HC9heND+NVTJPOuBesC3bZBsO3sh5F1eWutnSQwJ
+         a4GA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742554853; x=1743159653;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kR92x38MaPIUcSwwuTEs6+JYl/zG4hCrnKTSGKNxEmY=;
-        b=NP+Q/NTvqFfwdUOMmvS009o9/YRuG5BbWBSug1CcWWM8I6fox548L3RVO3lHIhU39/
-         KgoiLXxPmzpec86nNNHCkVvV8GMOIT4NwPZsr9hRXLbXYE2UDdDbNs+jvTML04cWJSnO
-         XrGIwUxb7Bjd2enGbr3B3+MLPqu7BX1SLMf0O1ldaTHYNvcb+zkaTeFlaECQGU+FQ1wS
-         BkDcqVYbgs0AJEk4Ou6XHJfkgZhh4RYvLoR7NGSdGTEq87w0DFAnOMM3hjecGpYbh3RO
-         YM1tO4xtQDv6SxA/tlZI+cgBpznbCKAty/NVEFNhj0F8+Ctr0//sVkyvDO8lxwRnFTTd
-         pnkg==
-X-Gm-Message-State: AOJu0Yz+HmDTYLdgJs5mqRSd0ZshvpadvRD9ZXQn8TPHZ3Nn/lY+N4Oy
-	5+YpS5awgsW74W5CsufH3vCJnN0/rpl3A7c8v2MuK5SGmw2seXwwSlFEKKzPCFnW8ZXv3NR4XrL
-	AAY0TfSmth/XPihWxTYN8o0TqQJlhc34mirIJFsUPlvI/9LRT9WSXUQ==
-X-Gm-Gg: ASbGnctspJCgiieK0tzUZUx6HVBZrV00r3yEnleke8Xdu1Lm3Gt3m7RYRm8nQw/2tOd
-	Vij9taVh9nVf0PxyuyGku8F8LUC3btxZwnbIUm15XjvcNa5e+8CGirDmgR6TVU6mfGeP43Uxrs1
-	ypuDiy5PfhOju75u3eD828B//O1P+KmFIhCy8kPx/FPwGe1B1WTVKQeFQpXtoZJcaLGzbeiTLHR
-	552CXlraJNCX47BjlHRYRMhw22+elJ7mpqhRtV+wyOYTfXgYo6XQqc1RuJo/7VMYorzOu1BMyEU
-	sabl6Q3Wg2VCN33llMqzk3+icjBI5g/jhTzT/7lcqHwXW3qL2/mYc9tbG7OR
-X-Received: by 2002:a17:907:7ba8:b0:abf:6ec7:65e9 with SMTP id a640c23a62f3a-ac3f24d7921mr264857166b.43.1742554852929;
-        Fri, 21 Mar 2025 04:00:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEUELeIFk2iV4bJhmhlsWZybhpWr1ETkAjOnrpXoDFpNR4vvFc6TbQxKArtqciFKT2yl++k2A==
-X-Received: by 2002:a17:907:7ba8:b0:abf:6ec7:65e9 with SMTP id a640c23a62f3a-ac3f24d7921mr264852566b.43.1742554852498;
-        Fri, 21 Mar 2025 04:00:52 -0700 (PDT)
-Received: from [10.44.34.122] (5920ab7b.static.cust.trined.nl. [89.32.171.123])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3ef93e1bbsm129520966b.81.2025.03.21.04.00.51
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 21 Mar 2025 04:00:52 -0700 (PDT)
-From: Eelco Chaudron <echaudro@redhat.com>
-To: Ilya Maximets <i.maximets@ovn.org>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- dev@openvswitch.org, linux-kernel@vger.kernel.org,
- Pravin B Shelar <pshelar@ovn.org>, Aaron Conole <aconole@redhat.com>
-Subject: Re: [PATCH net-next] net: openvswitch: fix kernel-doc warnings in
- internal headers
-Date: Fri, 21 Mar 2025 12:00:51 +0100
-X-Mailer: MailMate (2.0r6239)
-Message-ID: <1FAE19BE-E1F9-4836-9AF5-5EFB7FD291AD@redhat.com>
-In-Reply-To: <20250320224431.252489-1-i.maximets@ovn.org>
-References: <20250320224431.252489-1-i.maximets@ovn.org>
+        d=1e100.net; s=20230601; t=1742555462; x=1743160262;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sA3xfU5eNSi4gl7Hxg/W8KumQ2nnI6nlMXWqCtTodbQ=;
+        b=nwUK6vQUpcAhs+tf3NjaKh3kGcim6eyqKOPM5aVGezmtpheftcmHd4rhmwfo6pZ5WI
+         uwWGGNCaVYIaXgACycbX6hCciJDlKkAOCzjLUMpkSmwVRcU0j2dC40Oqjo8zMLWJbiGs
+         UiThQW9/nPgYLu0sCrSt1ABIUOmz4NRJXEVtdH/BNBR4yMINlhJzQZ47aaCPlEtT5hez
+         OzaC95En6ItmTnyBUpI27l8ccZ+v/g8VbG5VcWOpnuNEK7tFeeYVj+iUcfTH9FWtMt7T
+         A4EPk8TVaS5O2OpcFFDFV3sIfNrkWuHYJGC70D0uEkrHQTQxJ/VkFuTZLi79WbEG5P+E
+         n19Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXJvgW2ny0YyKvOEefk7bwyH4EgmXe55Gf+TqjCjsUtVi/ZFMd++dhe7CyQ43MKVy39SOZZ1qc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3meYVtdbNGSLgK97sr3LigioDxvqzi110YnwPkJ8eOvhM3Wn0
+	itV30pS6jdBi38VKoTHQFTXZOi9IyL00eggWj+mluEm27+qqv13uQFlH9vIMfhg=
+X-Gm-Gg: ASbGncuiO2EjMTdGUhCfmUMIVI3Ayrz7P51VwtLOsSs6GJvB7ms1x7ToO4Msph0PViE
+	Xeg4Jy3HxG2UGgzrqBapBxU0MhQyIiXGqz+UimsQolXdZ0y1dgn4lOoMzDw1voeNlphiuOKA5CW
+	3jaQ0PVQsEL1bFJ1E7iqlOkbJ1xoO+xfZzl/442IwnlV1XXWaP1wRIO4tm/InVY/jcWBDPbNXQM
+	F5bHZCIkFtEMRXVpVWU9ntUhtvJ4kxPAG6hJynW3YYrru0z7U/Brzt3djpDXCVuwVDgQejgfo8H
+	P0MqM7tNrX36dM9Fj/CflzQNkvr28KX1T6q01hMVSg==
+X-Google-Smtp-Source: AGHT+IFSJ3hxrf4+/3xiQwLVqMWpjH/GflgYxZ/+tadwi+N40CzqBAwFYJHfcNgOer76GMlKsVK58Q==
+X-Received: by 2002:a05:6602:368d:b0:85b:6118:db67 with SMTP id ca18e2360f4ac-85e2ca2d202mr297241339f.2.1742555462376;
+        Fri, 21 Mar 2025 04:11:02 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f2cbe80a54sm372041173.82.2025.03.21.04.11.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Mar 2025 04:11:01 -0700 (PDT)
+Message-ID: <d458a42e-f9b4-4075-af0d-f715c15e3566@kernel.dk>
+Date: Fri, 21 Mar 2025 05:11:00 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC -next 00/10] Add ZC notifications to splice and sendfile
+To: Joe Damato <jdamato@fastly.com>, Christoph Hellwig <hch@infradead.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ asml.silence@gmail.com, linux-fsdevel@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, linux-api@vger.kernel.org,
+ linux-arch@vger.kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
+ kuba@kernel.org, shuah@kernel.org, sdf@fomichev.me, mingo@redhat.com,
+ arnd@arndb.de, brauner@kernel.org, akpm@linux-foundation.org,
+ tglx@linutronix.de, jolsa@kernel.org, linux-kselftest@vger.kernel.org
+References: <20250319001521.53249-1-jdamato@fastly.com>
+ <Z9p6oFlHxkYvUA8N@infradead.org> <Z9rjgyl7_61Ddzrq@LQ3V64L9R2>
+ <2d68bc91-c22c-4b48-a06d-fa9ec06dfb25@kernel.dk>
+ <Z9r5JE3AJdnsXy_u@LQ3V64L9R2>
+ <19e3056c-2f7b-4f41-9c40-98955c4a9ed3@kernel.dk>
+ <Z9sCsooW7OSTgyAk@LQ3V64L9R2>
+ <dc3ebb86-f4b2-443a-9b0d-f5470fd773f1@kernel.dk>
+ <Z9sX98Y0Xy9-Vzqf@LQ3V64L9R2>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <Z9sX98Y0Xy9-Vzqf@LQ3V64L9R2>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 3/19/25 1:16 PM, Joe Damato wrote:
+>>> In general: it does seem a bit odd to me that there isn't a safe
+>>> sendfile syscall in Linux that uses existing completion notification
+>>> mechanisms.
+>>
+>> Pretty natural, I think. sendfile(2) predates that by quite a bit, and
+>> the last real change to sendfile was using splice underneath. Which I
+>> did, and that was probably almost 20 years ago at this point...
+>>
+>> I do think it makes sense to have a sendfile that's both fast and
+>> efficient, and can be used sanely with buffer reuse without relying on
+>> odd heuristics.
+> 
+> Just trying to tie this together in my head -- are you saying that
+> you think the kernel internals of sendfile could be changed in a
+> different way or that this a userland problem (and they should use
+> the io_uring wrapper you suggested above) ?
 
+I'm saying that it of course makes sense to have a way to do sendfile
+where you know when reuse is safe, and that we have an API that provides
+that very nicely already without needing to add syscalls. If you used
+io_uring for this, then the "tx is done, reuse is fine" notification is
+just another notification, not anything special that needs new plumbing.
 
-On 20 Mar 2025, at 23:42, Ilya Maximets wrote:
+>>>>> I would also argue that there are likely user apps out there that
+>>>>> use both sendmsg MSG_ZEROCOPY for certain writes (for data in
+>>>>> memory) and also use sendfile (for data on disk). One example would
+>>>>> be a reverse proxy that might write HTTP headers to clients via
+>>>>> sendmsg but transmit the response body with sendfile.
+>>>>>
+>>>>> For those apps, the code to check the error queue already exists for
+>>>>> sendmsg + MSG_ZEROCOPY, so swapping in sendfile2 seems like an easy
+>>>>> way to ensure safe sendfile usage.
+>>>>
+>>>> Sure that is certainly possible. I didn't say that wasn't the case,
+>>>> rather that the error queue approach is a work-around in the first place
+>>>> for not having some kind of async notification mechanism for when it's
+>>>> free to reuse.
+>>>
+>>> Of course, I certainly agree that the error queue is a work around.
+>>> But it works, app use it, and its fairly well known. I don't see any
+>>> reason, other than historical context, why sendmsg can use this
+>>> mechanism, splice can, but sendfile shouldn't?
+>>
+>> My argument would be the same as for other features - if you can do it
+>> simpler this other way, why not consider that? The end result would be
+>> the same, you can do fast sendfile() with sane buffer reuse. But the
+>> kernel side would be simpler, which is always a kernel main goal for
+>> those of us that have to maintain it.
+>>
+>> Just adding sendfile2() works in the sense that it's an easier drop in
+>> replacement for an app, though the error queue side does mean it needs
+>> to change anyway - it's not just replacing one syscall with another. And
+>> if we want to be lazy, sure that's fine. I just don't think it's the
+>> best way to do it when we literally have a mechanism that's designed for
+>> this and works with reuse already with normal send zc (and receive side
+>> too, in the next kernel).
+> 
+> It seems like you've answered the question I asked above and that
+> you are suggesting there might be a better and simpler sendfile2
+> kernel-side implementation that doesn't rely on splice internals at
+> all.
+> 
+> Am I following you? If so, I'll drop the sendfile2 stuff from this
+> series and stick with the splice changes only, if you are (at a high
+> level) OK with the idea of adding a flag for this to splice.
+> 
+> In the meantime, I'll take a few more reads through the iouring code
+> to see if I can work out how sendfile2 might be built on top of that
+> instead of splice in the kernel.
 
-> Some field descriptions were missing, some were not very accurate.
-> Not touching the uAPI header or .c files for now.
->
-> Formatting of those comments isn't great in general, but at least
-> they are not missing anything now.
->
-> Before:
->   $ ./scripts/kernel-doc -none -Wall net/openvswitch/*.h 2>&1 | wc -l
->   16
->
-> After:
->   $ ./scripts/kernel-doc -none -Wall net/openvswitch/*.h 2>&1 | wc -l
->   0
->
-> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
+Heh I don't know how you jumped to that conclusion based on my feedback,
+and seems like it's solidified through other replies. No I'm not saying
+that the approach makes sense for the kernel, it makes some vague amount
+of sense only on the premise of "oh but this is easy for applications as
+they already know how to use sendfile(2)".
 
-Thanks for taking the time to fix this. The changes look good to me.
-
-Acked-by: Eelco Chaudron <echaudro@redhat.com>
-
+-- 
+Jens Axboe
 
