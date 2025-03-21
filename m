@@ -1,190 +1,204 @@
-Return-Path: <netdev+bounces-176736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A98DEA6BC19
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 14:53:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6885DA6BC92
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 15:08:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19F493B80F4
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 13:53:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3658E465D56
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 14:07:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50E4E1482F5;
-	Fri, 21 Mar 2025 13:53:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90CEF13FD86;
+	Fri, 21 Mar 2025 14:07:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="CxY12khI";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="w4fG0ik5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GSI2+I6I"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79A2C142659
-	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 13:52:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A9EF80C02
+	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 14:07:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742565181; cv=none; b=tr+fcpHE/tuhEGJFXW/kblrzqH2SQJliEHaJbr3fD3AIJ/0fiv6gd408zRiLK96/GX/y2WGCNzH0b8/r8GZuaqxXZGcozPRwvRIFpAYViCWwQolPalvGYxGh+axb4xjCAE2IFGr/YxZ+4XrZmFPREewipqesrOg4D8Ct9YUhrTI=
+	t=1742566040; cv=none; b=VkGZhKq7rzPqZgt9oGu829RpEPmd2H1psZuXcNfRGWaOKWslT+TwjJRQQppit7vF4ig6AEu6AVaBbAlxKqL3UKj+lAcDobRFM2OSTWDcPdhyCYysOor5w743na3KVUaaVDbZ7gAgiUkMHNBj/SY3Qva3w/bGd/HBkhiNgYN6XXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742565181; c=relaxed/simple;
-	bh=OBqa7ZPlM/9BNeSZs0Zqe0m3DXXtZrpZd939GnwK/QQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=IDn4c8wFMMt7c6qDz3+WfTaCoAU5WHZsM+lijWDbN/hppmNAmvSXON1leq7inV949Ypxs4aS/jDHR6Mel5geHNc+phvsbKG+IZ45b5IW2fjR/Tp9QgFKRBN3yL7p4fSfjeywU3GIs3y7JE1Q1uWK5xCURnWRYsADDnYpxZw4o+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=CxY12khI; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=w4fG0ik5; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1742565177;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=m95qou3jMu2nip29BsHc7wsZbSBUImNGgt+uAyGTygs=;
-	b=CxY12khI6Xy7J7amlSM3+k7ZAWdQpmfU+uQ7uhVG+TSOnx67TpgzaIOEBJSUf0AaQE9i+4
-	mKFhrH/11IvmpvLbXQCKB0HhvYwAS3mhuVdH9OlQnCfwf2qGizIEVU59fgfIdbLOJ4o5zT
-	OgYLvoi235E87B1N3idNNinWXS4MlFXnhvxliUdKBICjQSj2bn0LM33vIBk+In8QrYwYQI
-	J6U8Q/cciHQHA3/GH1RygNP0gkSdHQAkD3dVot72q66/DY0OczF8/O6Lj8HavSlOIglPlA
-	0++B25zR4FzcoZ9haKs2zxvpvy0RPq45D/TaMdqP7SCiqOqFiUOLOmc6MmEZiA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1742565177;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=m95qou3jMu2nip29BsHc7wsZbSBUImNGgt+uAyGTygs=;
-	b=w4fG0ik5+tDhnv6lygvDwegPVjeAhQFvxPeSgaLJYvnAZXe0bDA62V/xprZg59BG71HN2O
-	piNcvnjJYBLS0mCg==
-Date: Fri, 21 Mar 2025 14:52:39 +0100
-Subject: [PATCH iwl-next v4 2/2] igc: Change Tx mode for MQPRIO offloading
+	s=arc-20240116; t=1742566040; c=relaxed/simple;
+	bh=l5ESA26GelRvhWO6G47s8ua3/q1jtOz/xphduj4QCtw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=upFyIHPUfLGLWnBgANodlgBlbtNO+FPoe7h4Wq8YXyIBxSTu47NG88vxhQ80EcJmn2QK2KDsG6Azr/13Tf0ybnGNa2yvML6UDBfXQGcXaGP5uMBdSoA8Dmfc4HxY4z35OO8D3lDjDeh28qBVddN4E8VnZjnTXMznmy2M/tqq57s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GSI2+I6I; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-223594b3c6dso45883505ad.2
+        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 07:07:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742566037; x=1743170837; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HNNXIW8gMu0VEMnhx6zhE5dagRgi71mEjEQZX+11Te4=;
+        b=GSI2+I6IRuuFBnlCxz4ElPW1dQOdhKfc4GxR047cnt0IdxSVgs1B6TTJkiLFik7zDg
+         jMHdxtdU13eeqqlc/Vq0VBYItPaTwBw0uLzdTOLjFuGCVCxKVMvpBYKLV5H+UCFMLo5Z
+         IrA1iK7HTfVr8JoCJSj7Lxo1TfPDJz9atgEwICmaHjUwFo7Kk9yAx9hs8GECYEC2XAVj
+         Lk5fUxWCkuBnocWtx4mWj2zmgb4nHMK+jDQq/EUFd1dI2/dST0TrIshLNEJov/K5IxwP
+         rjxVWBMUyORj7KE1pwv0Sedb3oymv8wRIno1NhtBIxYqeVQS/yKGtXPm+Cj7zM6pktf+
+         RUgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742566037; x=1743170837;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HNNXIW8gMu0VEMnhx6zhE5dagRgi71mEjEQZX+11Te4=;
+        b=EaYwGN8XCM9tWayOyqL39ThAZnepFKMvQMybxwxAe2BL9rNDphYbzWKhvQPrchfwk1
+         U4oEPkGzPdIf/AVIXCLKXRXUOSHpbAImGRipGfrjfdQjHbUw2E211dCwkQh8HnpS5atT
+         YBMzBEdUgJ6UU3w3DKGBR0icFpUr7ehMWjJeRbV1FuMA1HbvdWSQhf6VXz7jltXkpga9
+         JfGRalzPQlT6FXsrbJrf8T/dO7TOf41QnKzcHyw2nY7hjQRAJrdubD5RB4bl38gi6wES
+         Rs2nmsn2TQiomo0EFxvrN8c0nS4jBm1JONNToR75ZCUYJgoSAxaFm2GwXJLQ3NGFJ3Q8
+         hVhw==
+X-Forwarded-Encrypted: i=1; AJvYcCWPoE6x+R/jyEXy+h8gqLqWQrGRUjP+p5LZb0/qWrLUAR4AleM3vZp5SRWdeRGxCzuSuvHMe1g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyr7Y1CxsiTewMn2B06s7aK/BN+l4sEu7Pr04CLvgv8PVEj2XHA
+	TsHwhSvu6YkcxNccAsD+VC7K2spnv10MANvaXJCAdjKcEut08x+9i25c
+X-Gm-Gg: ASbGncs9ICfZgq2GofhPmmS0Nt+4vdIcTqqCnOaSiSzUZtXrU8Z1m9b6R0Qea7ITqAN
+	9FSBTNpLf48LZYHCy/TYnJ125LJut040qQDrfYB8BY64RA4qGlLBbP7W6/DSX2BEj11fdxgrtGA
+	FeTnKE2TSYyxAkJY7k+rQaAWkTc1hK8JBPdmNgvK8nZOaX6YFFqgScQ6D+ro7rTSU5W02lYETVG
+	/DXSVnV6gtYDE0D2IJ0g7xszsIR8EI9JGykFX0+uxuUVPmD/uuPYnUVzlNdTC9GSnVGPnU4KJKa
+	pwhPZhd4/hkbTWhUvOYlxF9K+DSXpFaea/n/PXbotWbk
+X-Google-Smtp-Source: AGHT+IF0ySEVJZP4cTFIo5F4VDYA6Ro+TxOj+9WTCfnl4nkl8iwOsJuBXdFTs+hZ61tHx3cE+N+SUw==
+X-Received: by 2002:a05:6a21:108c:b0:1f5:a3e8:64d9 with SMTP id adf61e73a8af0-1fe42f55b0amr6710939637.19.1742566036813;
+        Fri, 21 Mar 2025 07:07:16 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-af8a2a4da80sm1715222a12.74.2025.03.21.07.07.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Mar 2025 07:07:16 -0700 (PDT)
+Date: Fri, 21 Mar 2025 07:07:15 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v1 net-next 00/13] ipv6: No RTNL for IPv6 routing table.
+Message-ID: <Z91yk90LZy9yJexG@mini-arch>
+References: <20250321040131.21057-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250321-igc_mqprio_tx_mode-v4-2-4571abb6714e@linutronix.de>
-References: <20250321-igc_mqprio_tx_mode-v4-0-4571abb6714e@linutronix.de>
-In-Reply-To: <20250321-igc_mqprio_tx_mode-v4-0-4571abb6714e@linutronix.de>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
- Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
- Simon Horman <horms@kernel.org>, intel-wired-lan@lists.osuosl.org, 
- netdev@vger.kernel.org, Kurt Kanzenbach <kurt@linutronix.de>
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3530; i=kurt@linutronix.de;
- h=from:subject:message-id; bh=OBqa7ZPlM/9BNeSZs0Zqe0m3DXXtZrpZd939GnwK/QQ=;
- b=owEBbQKS/ZANAwAKAcGT0fKqRnOCAcsmYgBn3W82/KlIPAPJHGWdcOkqyLJjtq993YhXzz5ZG
- nSbMu7P49WJAjMEAAEKAB0WIQS8ub+yyMN909/bWZLBk9HyqkZzggUCZ91vNgAKCRDBk9HyqkZz
- grZDEACT2LUVLVxbWnhyGeY9O5vlbJr48vsEpn7vkB37UQA6Ka1KFXFtCeAUzKp2XC8W3GEM37D
- DdZKryiL6WY8leQITIKnGBDXbbeQrfVsANl9+WWitn6WH3af/+H7oCDa4pQFm2O9nnNa7Wegiql
- TSX6e8XJHIgeX4iAQ/8PBOVpEcpgmv2Da5jQwsaBf4r5ZTu1Ji7a5Tt173eFOPKgZYQEzYlIGED
- zmPh/DSVNpixmlMXy3jqbP+S4Afhh9ug+J3loaSP2zkuTPjJM/m/3sNeMMlWSFwosg9W2GPr/3O
- qrZzDM9bkCP5jhVnQqHzbI/bvHqyx2WuWERYZ7/WsgtiBZsDk9Z9LsjPRb+BFZdLXPhdTVVvdny
- fQ5tZnmMu8/kuQpd84sdk/cquThaEniwOaxhV+NX9AGyUQpVGwD1bXwdDuB5azHkIZjLti84U/V
- dR4d5Q8EEJ2EIHnv4Eq0xTMsP+PT5kNQS8XeRLzR3RpNYmQaOssX9F4uMGWHG/Lo44zF3xyxHt3
- P9vlv5k3hHxHp73x3iXeuS/OO2erDQzkg7fUFgPLE/xDdNvx2oLDAYZtvdE0mI3iHzqwrD1nB/F
- 9NOGZQ3DjyGaF2YszZwqFqOf5EQx4D5Op4OEqW7pugHW4Xl66SICnj3NXdMNN4/zwWXCk4sAiIP
- P1a8eYj1jcQGc0g==
-X-Developer-Key: i=kurt@linutronix.de; a=openpgp;
- fpr=BCB9BFB2C8C37DD3DFDB5992C193D1F2AA467382
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250321040131.21057-1-kuniyu@amazon.com>
 
-The current MQPRIO offload implementation uses the legacy TSN Tx mode. In
-this mode the hardware uses four packet buffers and considers queue
-priorities.
+On 03/20, Kuniyuki Iwashima wrote:
+> IPv6 routing tables are protected by each table's lock and work in
+> the interrupt context, which means we basically don't need RTNL to
+> modify an IPv6 routing table itself.
+> 
+> Currently, the control paths require RTNL because we may need to
+> perform device and nexthop lookups; we must prevent dev/nexthop from
+> going away from the netns.
+> 
+> This, however, can be achieved by RCU as well.
+> 
+> If we are in the RCU critical section while adding an IPv6 route,
+> synchronize_net() in netif_change_net_namespace() and
+> unregister_netdevice_many_notify() guarantee that the dev will not be
+> moved to another netns or removed.
+> 
+> Also, nexthop is guaranteed not to be freed during the RCU grace period.
+> 
+> If we care about a race between nexthop removal and IPv6 route addition,
+> we can get rid of RTNL from the control paths.
+> 
+> Patch 1 moves a validation for RTA_MULTIPATH earlier.
+> Patch 2 removes RTNL for SIOCDELRT and RTM_DELROUTE.
+> Patch 3 ~ 10 move validation and memory allocation earlier.
+> Patch 11 prevents a race between two requests for the same table.
+> Patch 12 prevents the race mentioned above.
+> Patch 13 removes RTNL for SIOCADDRT and RTM_NEWROUTE.
+> 
+> 
+> Test:
+> 
+> The script [0] lets each CPU-X create 100000 routes on table-X in a
+> batch.
+> 
+> On c7a.metal-48xl EC2 instance with 192 CPUs,
+> 
+> With this series:
+> 
+>   $ sudo ./route_test.sh
+>   start adding routes
+>   added 19200000 routes (100000 routes * 192 tables).
+>   Time elapsed: 189154 milliseconds.
+> 
+> Without series:
+> 
+>   $ sudo ./route_test.sh
+>   start adding routes
+>   added 19200000 routes (100000 routes * 192 tables).
+>   Time elapsed: 62531 milliseconds.
+> 
+> I changed the number of routes (1000 ~ 100000 per CPU/table) and
+> constantly saw it complete 3x faster with this series.
+> 
+> 
+> [0]
+> #!/bin/bash
+> 
+> mkdir tmp
+> 
+> NS="test"
+> ip netns add $NS
+> ip -n $NS link add veth0 type veth peer veth1
+> ip -n $NS link set veth0 up
+> ip -n $NS link set veth1 up
+> 
+> TABLES=()
+> for i in $(seq $(nproc)); do
+>     TABLES+=("$i")
+> done
+> 
+> ROUTES=()
+> for i in {1..100}; do
+>     for j in {1..1000}; do
+> 	ROUTES+=("2001:$i:$j::/64")
+>     done
+> done
+> 
+> for TABLE in "${TABLES[@]}"; do
+>     FILE="./tmp/batch-table-$TABLE.txt"
+>     > $FILE
+>     for ROUTE in "${ROUTES[@]}"; do
+>         echo "route add $ROUTE dev veth0 table $TABLE" >> $FILE
+>     done
+> done
+> 
+> echo "start adding routes"
+> 
+> START_TIME=$(date +%s%3N)
+> for TABLE in "${TABLES[@]}"; do
+>     ip -n $NS -6 -batch "./tmp/batch-table-$TABLE.txt" &
+> done
+> 
+> wait
+> END_TIME=$(date +%s%3N)
+> ELAPSED_TIME=$((END_TIME - START_TIME))
+> 
+> echo "added $((${#ROUTES[@]} * ${#TABLES[@]})) routes (${#ROUTES[@]} routes * ${#TABLES[@]} tables)."
+> echo "Time elapsed: ${ELAPSED_TIME} milliseconds."
+> echo $(ip -n $NS -6 route show table all | wc -l)  # Just for debug
+> 
+> ip netns del $NS
+> rm -fr ./tmp/
 
-In order to harmonize the TAPRIO implementation with MQPRIO, switch to the
-regular TSN Tx mode. This mode also uses four packet buffers and considers
-queue priorities. In addition to the legacy mode, transmission is always
-coupled to Qbv. The driver already has mechanisms to use a dummy schedule
-of 1 second with all gates open for ETF. Simply use this for MQPRIO too.
+Lockdep is not supper happy about some patch:
+https://netdev-3.bots.linux.dev/vmksft-forwarding-dbg/results/42463/38-gre-multipath-nh-res-sh/stderr
 
-This reduces code and makes it easier to add support for frame preemption
-later.
-
-Tested on i225 with real time application using high priority queue, iperf3
-using low priority queue and network TAP device.
-
-Acked-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
 ---
- drivers/net/ethernet/intel/igc/igc.h     |  4 +---
- drivers/net/ethernet/intel/igc/igc_tsn.c | 20 ++------------------
- 2 files changed, 3 insertions(+), 21 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
-index cd1d7b6c1782352094f6867a31b6958c929bbbf4..16d85bdf55a7e9c412c47acf727bca6bc7154c61 100644
---- a/drivers/net/ethernet/intel/igc/igc.h
-+++ b/drivers/net/ethernet/intel/igc/igc.h
-@@ -388,11 +388,9 @@ extern char igc_driver_name[];
- #define IGC_FLAG_RX_LEGACY		BIT(16)
- #define IGC_FLAG_TSN_QBV_ENABLED	BIT(17)
- #define IGC_FLAG_TSN_QAV_ENABLED	BIT(18)
--#define IGC_FLAG_TSN_LEGACY_ENABLED	BIT(19)
- 
- #define IGC_FLAG_TSN_ANY_ENABLED				\
--	(IGC_FLAG_TSN_QBV_ENABLED | IGC_FLAG_TSN_QAV_ENABLED |	\
--	 IGC_FLAG_TSN_LEGACY_ENABLED)
-+	(IGC_FLAG_TSN_QBV_ENABLED | IGC_FLAG_TSN_QAV_ENABLED)
- 
- #define IGC_FLAG_RSS_FIELD_IPV4_UDP	BIT(6)
- #define IGC_FLAG_RSS_FIELD_IPV6_UDP	BIT(7)
-diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
-index 67632356083708f82a099141a4b68ba10e06f952..7c28f3e7bb576f0e6a21c883e934ede4d53096f4 100644
---- a/drivers/net/ethernet/intel/igc/igc_tsn.c
-+++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
-@@ -37,18 +37,13 @@ static unsigned int igc_tsn_new_flags(struct igc_adapter *adapter)
- {
- 	unsigned int new_flags = adapter->flags & ~IGC_FLAG_TSN_ANY_ENABLED;
- 
--	if (adapter->taprio_offload_enable)
--		new_flags |= IGC_FLAG_TSN_QBV_ENABLED;
--
--	if (is_any_launchtime(adapter))
-+	if (adapter->taprio_offload_enable || is_any_launchtime(adapter) ||
-+	    adapter->strict_priority_enable)
- 		new_flags |= IGC_FLAG_TSN_QBV_ENABLED;
- 
- 	if (is_cbs_enabled(adapter))
- 		new_flags |= IGC_FLAG_TSN_QAV_ENABLED;
- 
--	if (adapter->strict_priority_enable)
--		new_flags |= IGC_FLAG_TSN_LEGACY_ENABLED;
--
- 	return new_flags;
- }
- 
-@@ -163,7 +158,6 @@ static int igc_tsn_disable_offload(struct igc_adapter *adapter)
- 	igc_tsn_tx_arb(adapter, queue_per_tc);
- 
- 	adapter->flags &= ~IGC_FLAG_TSN_QBV_ENABLED;
--	adapter->flags &= ~IGC_FLAG_TSN_LEGACY_ENABLED;
- 
- 	return 0;
- }
-@@ -207,16 +201,6 @@ static int igc_tsn_enable_offload(struct igc_adapter *adapter)
- 		 * mapping.
- 		 */
- 		igc_tsn_tx_arb(adapter, adapter->queue_per_tc);
--
--		/* Enable legacy TSN mode which will do strict priority without
--		 * any other TSN features.
--		 */
--		tqavctrl = rd32(IGC_TQAVCTRL);
--		tqavctrl |= IGC_TQAVCTRL_TRANSMIT_MODE_TSN;
--		tqavctrl &= ~IGC_TQAVCTRL_ENHANCED_QAV;
--		wr32(IGC_TQAVCTRL, tqavctrl);
--
--		return 0;
- 	}
- 
- 	for (i = 0; i < adapter->num_tx_queues; i++) {
-
--- 
-2.39.5
-
+pw-bot: cr
 
