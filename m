@@ -1,181 +1,231 @@
-Return-Path: <netdev+bounces-176761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1683A6C050
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 17:45:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB263A6C09C
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 17:52:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27C0A7A5805
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 16:43:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98FB0167C3A
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 16:52:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C28622CBF1;
-	Fri, 21 Mar 2025 16:44:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5B5722CBF4;
+	Fri, 21 Mar 2025 16:52:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="HZyv9eYa"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="L5SItdLI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98BEE22B8CF
-	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 16:44:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEB1D22424E
+	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 16:52:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742575459; cv=none; b=Xl04RSWnnef6/s2Jo3cPLL2OnG1uAwKTmhFbKZ2zMPy1a/rWvtHXCCNC3sNKgwHPWVMo9+bYxE6H84iwBtVZr2YuW29j8nBCxigbNT+rdlvicYuwlUyz0D+RlGA7gYSpTUAR0U8O/ET8wcigtsM0yXKem5bVfbjID4Zya+EHYls=
+	t=1742575935; cv=none; b=C2QTE69X3+4YpRsMH5LcCxN80D846c7SfMfAQOVstJNKtXVg2CALBnbQaidma0ubt00qR7yvj2mj0XVxINxC5wpSkL1es+a2p9PvjksVCvesvGzDQIzwujrUboT/8batrrZR+JGLK3vokTAZyzW0XIWHTA3jyJdRwZRaHqRLa6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742575459; c=relaxed/simple;
-	bh=IMeArOMSvV+SAUlYdgzoqB6lsnXPfljvOmj84MN0ick=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MXtAGLgS0s0vkWzBRt5wK8i9Jxr4pOz3OHUEhsTLViVgt0MTCNGLoyrT+MjzIHzHA6YNEm1AMc7ycrF6vWbnyzPw8vczOjosEsGHPxUQ+SIU3Utx5t1PMevPM4SKL+IZ/nEv44oTlUiws6PatQAj2jLSJTLoV+gkDVWSj7v+8rg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=HZyv9eYa; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-225a28a511eso49907405ad.1
-        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 09:44:17 -0700 (PDT)
+	s=arc-20240116; t=1742575935; c=relaxed/simple;
+	bh=r+nweYBW6eW6OpU9BM9mPc05EN/S/gTp8zfu//ZPplc=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=N9dp/fPN611gptfzk96yo8g7facJfiXoClF4HK+Yucc7mR4bf7+W0bNrwr2PL85pJ/wniXvVFrAwIrXWEbsInQNmi+S+8ZmiKQHzNgEGZCvga7AuW3xZZPoIvckixnLNSRNKwwSo9SRDqWBqn8vI9EcNPF6FXc9njcw/7hsd7/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=L5SItdLI; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1742575457; x=1743180257; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mdus/fJVv5Uld6yn8oFMkQzJNe6dHC2w9XvJ773goNA=;
-        b=HZyv9eYaGfAfS5TzyiAfne7e+Cj6w6knyN1bsuK0l23BH6/C2KhX2L3GiLz0dennJB
-         kK9slfnRaJ27l+T8IPNdM9DXo4h6Vj3Dth4GDHOzj+mBDaBhwYD0bkt3x8Lk51JO66uA
-         pgCNI/yZ0ZQ4pfX/PqXQ5YgmYZvQHpiDE/zXA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742575457; x=1743180257;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mdus/fJVv5Uld6yn8oFMkQzJNe6dHC2w9XvJ773goNA=;
-        b=pgl/Br4M4Md5WJ3mt3WfknbybewshqePpOYb2JOETMf+Hen0O80F5jhdHptkxiVccj
-         lOPxq8HBW8O5rqT0ZNysUelRDt24yyi92tzA6GreCLGscf3tImyBjDietYo5Ct7VLJkr
-         smmFzOoRSOj5NLjkiFk7HSGUXLNvH5zRAubkWJZIvjJ+JRISzT71sizNokWGGAy1mlbT
-         8W20zc4vEL4bk7pIF29ma0J5jFLqYt2Cf8QNaNkpX5ccB6m4TxgSozpDXl6IAz9wIfD6
-         rUNofkM6JVgmpgZIPAMOePdPhcFAKCwl7+ThKnvtma5ahwcM3h2CDorb42nWww1PjLhZ
-         f7MA==
-X-Forwarded-Encrypted: i=1; AJvYcCVhlXEor18bwd3mToSbOJzf9DbJViMl8xz7lpWNVgGN8IbSm4RBafTB8PiRigfx5PZeIXNpZZM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzec1Vs7k2xs5Ly4uNFq7kNbtd+xD6zgJWhor/NRNeQB0GlLI9a
-	F9NICI5B/th63Py2QdXkkhzKiP/OeXEtnvXBXk9n1L85bV9HEV4cYiKsCW3g8XU=
-X-Gm-Gg: ASbGncuQMJjq7iZ7g54XuF8A7J90FZZ5444BtS88OVnQ26Il5OVFQglz/30boN99Qq3
-	eL8rlsdMvX2DWUectSkUUFu55xXWBE84l6mxdzxbdDel7yR4b1MnOVFULBpU3EDsbV+NYJoP1fn
-	8FeSfLaFS8W1xRQt0TW5RPf2Rq3iITdSBAwpfo07lOCI0UuIxvSReZu+RAV801l0L8zXi7q046/
-	b/tW7E6ef8csKDkK8n34oX09IzRvEjKMu4T1gkUZYzHuEUNTn15ATzOcAvpO1A/NDLxqprOqBB4
-	6awJVFhTIX6dtXppVvCegIhiYkQ3vKU8uHqYj7NkYZuyFpE6LosUQNa5W/Wa3duHMABjUrrl0eo
-	8XSHXZGDQxRuAwAKP
-X-Google-Smtp-Source: AGHT+IHNkHo8pQiFISfzkg8EmthIVkGNH6DyH204b4LoCrS28DjOE/rXN+w3HTspHp5hcO8dxdqoWw==
-X-Received: by 2002:a05:6a21:998b:b0:1f5:839e:ece8 with SMTP id adf61e73a8af0-1fe42f090e7mr7044509637.2.1742575456784;
-        Fri, 21 Mar 2025 09:44:16 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af8a2843af9sm1984943a12.38.2025.03.21.09.44.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Mar 2025 09:44:16 -0700 (PDT)
-Date: Fri, 21 Mar 2025 09:44:12 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Jens Axboe <axboe@kernel.dk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, asml.silence@gmail.com,
-	linux-fsdevel@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, horms@kernel.org, linux-api@vger.kernel.org,
-	linux-arch@vger.kernel.org, viro@zeniv.linux.org.uk, jack@suse.cz,
-	kuba@kernel.org, shuah@kernel.org, sdf@fomichev.me,
-	mingo@redhat.com, arnd@arndb.de, brauner@kernel.org,
-	akpm@linux-foundation.org, tglx@linutronix.de, jolsa@kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [RFC -next 00/10] Add ZC notifications to splice and sendfile
-Message-ID: <Z92XXFDVz_5fU2YQ@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	asml.silence@gmail.com, linux-fsdevel@vger.kernel.org,
-	edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
-	linux-api@vger.kernel.org, linux-arch@vger.kernel.org,
-	viro@zeniv.linux.org.uk, jack@suse.cz, kuba@kernel.org,
-	shuah@kernel.org, sdf@fomichev.me, mingo@redhat.com, arnd@arndb.de,
-	brauner@kernel.org, akpm@linux-foundation.org, tglx@linutronix.de,
-	jolsa@kernel.org, linux-kselftest@vger.kernel.org
-References: <20250319001521.53249-1-jdamato@fastly.com>
- <Z9p6oFlHxkYvUA8N@infradead.org>
- <Z9rjgyl7_61Ddzrq@LQ3V64L9R2>
- <2d68bc91-c22c-4b48-a06d-fa9ec06dfb25@kernel.dk>
- <Z9r5JE3AJdnsXy_u@LQ3V64L9R2>
- <19e3056c-2f7b-4f41-9c40-98955c4a9ed3@kernel.dk>
- <Z9sCsooW7OSTgyAk@LQ3V64L9R2>
- <Z9uuSQ7SrigAsLmt@infradead.org>
- <Z9xdPVQeLBrB-Anu@LQ3V64L9R2>
- <Z9z_f-kR0lBx8P_9@infradead.org>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1742575934; x=1774111934;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=O7QUs5oUJLPU9CXByWhpFn+l4ChMNPx92TwGG+CoNWg=;
+  b=L5SItdLItG/pzB7y8IKqb7/nkwCZQme9zlWPWW0N8cEc+mVXHVhx/Lsu
+   5Q2Ahb/ZgDa1aJ6CclcrMh6T4/XP1/4IJPkNnh77jpAhopxc2aid9mTfe
+   VaOqZqyHO8x+pbSflkffFIAqiI3w1UkdSyNpgP8eY9ExlQ6oY0N72SLe7
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.14,265,1736812800"; 
+   d="scan'208";a="388815080"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2025 16:52:11 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:39228]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.7.105:2525] with esmtp (Farcaster)
+ id 053bc724-8908-46d4-936d-c8cdbc380bfc; Fri, 21 Mar 2025 16:52:10 +0000 (UTC)
+X-Farcaster-Flow-ID: 053bc724-8908-46d4-936d-c8cdbc380bfc
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 21 Mar 2025 16:52:04 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.171.20) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 21 Mar 2025 16:52:02 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <stfomichev@gmail.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<horms@kernel.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH v1 net-next 00/13] ipv6: No RTNL for IPv6 routing table.
+Date: Fri, 21 Mar 2025 09:50:40 -0700
+Message-ID: <20250321165154.17497-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <Z91yk90LZy9yJexG@mini-arch>
+References: <Z91yk90LZy9yJexG@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z9z_f-kR0lBx8P_9@infradead.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D041UWA002.ant.amazon.com (10.13.139.121) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, Mar 20, 2025 at 10:56:15PM -0700, Christoph Hellwig wrote:
-> On Thu, Mar 20, 2025 at 11:23:57AM -0700, Joe Damato wrote:
-> > In my other message to Jens I proposed:
-> >   - SPLICE_F_ZC for splice to generate zc completion notifications
-> >     to the error queue
-> >   - Modifying sendfile so that if SO_ZEROCOPY (which already exists)
-> >     is set on a network socket, zc completion notifications are
-> >     generated.
+From: Stanislav Fomichev <stfomichev@gmail.com>
+Date: Fri, 21 Mar 2025 07:07:15 -0700
+> On 03/20, Kuniyuki Iwashima wrote:
+> > IPv6 routing tables are protected by each table's lock and work in
+> > the interrupt context, which means we basically don't need RTNL to
+> > modify an IPv6 routing table itself.
 > > 
-> > In both cases no new system call is needed and both splice and
-> > sendfile become safer to use. 
+> > Currently, the control paths require RTNL because we may need to
+> > perform device and nexthop lookups; we must prevent dev/nexthop from
+> > going away from the netns.
 > > 
-> > At some point in the future a mechanism built on top of iouring
-> > introduced as new system calls (sendmsg2, sendfile2, splice2, etc)
-> > can be built.
+> > This, however, can be achieved by RCU as well.
+> > 
+> > If we are in the RCU critical section while adding an IPv6 route,
+> > synchronize_net() in netif_change_net_namespace() and
+> > unregister_netdevice_many_notify() guarantee that the dev will not be
+> > moved to another netns or removed.
+> > 
+> > Also, nexthop is guaranteed not to be freed during the RCU grace period.
+> > 
+> > If we care about a race between nexthop removal and IPv6 route addition,
+> > we can get rid of RTNL from the control paths.
+> > 
+> > Patch 1 moves a validation for RTA_MULTIPATH earlier.
+> > Patch 2 removes RTNL for SIOCDELRT and RTM_DELROUTE.
+> > Patch 3 ~ 10 move validation and memory allocation earlier.
+> > Patch 11 prevents a race between two requests for the same table.
+> > Patch 12 prevents the race mentioned above.
+> > Patch 13 removes RTNL for SIOCADDRT and RTM_NEWROUTE.
+> > 
+> > 
+> > Test:
+> > 
+> > The script [0] lets each CPU-X create 100000 routes on table-X in a
+> > batch.
+> > 
+> > On c7a.metal-48xl EC2 instance with 192 CPUs,
+> > 
+> > With this series:
+> > 
+> >   $ sudo ./route_test.sh
+> >   start adding routes
+> >   added 19200000 routes (100000 routes * 192 tables).
+> >   Time elapsed: 189154 milliseconds.
+> > 
+> > Without series:
+> > 
+> >   $ sudo ./route_test.sh
+> >   start adding routes
+> >   added 19200000 routes (100000 routes * 192 tables).
+> >   Time elapsed: 62531 milliseconds.
+> > 
+> > I changed the number of routes (1000 ~ 100000 per CPU/table) and
+> > constantly saw it complete 3x faster with this series.
+> > 
+> > 
+> > [0]
+> > #!/bin/bash
+> > 
+> > mkdir tmp
+> > 
+> > NS="test"
+> > ip netns add $NS
+> > ip -n $NS link add veth0 type veth peer veth1
+> > ip -n $NS link set veth0 up
+> > ip -n $NS link set veth1 up
+> > 
+> > TABLES=()
+> > for i in $(seq $(nproc)); do
+> >     TABLES+=("$i")
+> > done
+> > 
+> > ROUTES=()
+> > for i in {1..100}; do
+> >     for j in {1..1000}; do
+> > 	ROUTES+=("2001:$i:$j::/64")
+> >     done
+> > done
+> > 
+> > for TABLE in "${TABLES[@]}"; do
+> >     FILE="./tmp/batch-table-$TABLE.txt"
+> >     > $FILE
+> >     for ROUTE in "${ROUTES[@]}"; do
+> >         echo "route add $ROUTE dev veth0 table $TABLE" >> $FILE
+> >     done
+> > done
+> > 
+> > echo "start adding routes"
+> > 
+> > START_TIME=$(date +%s%3N)
+> > for TABLE in "${TABLES[@]}"; do
+> >     ip -n $NS -6 -batch "./tmp/batch-table-$TABLE.txt" &
+> > done
+> > 
+> > wait
+> > END_TIME=$(date +%s%3N)
+> > ELAPSED_TIME=$((END_TIME - START_TIME))
+> > 
+> > echo "added $((${#ROUTES[@]} * ${#TABLES[@]})) routes (${#ROUTES[@]} routes * ${#TABLES[@]} tables)."
+> > echo "Time elapsed: ${ELAPSED_TIME} milliseconds."
+> > echo $(ip -n $NS -6 route show table all | wc -l)  # Just for debug
+> > 
+> > ip netns del $NS
+> > rm -fr ./tmp/
 > 
-> I strongly disagree with this.  This is spreading the broken
-> SO_ZEROCOPY to futher places outside the pure networking realm.  Don't
-> do that.
+> Lockdep is not supper happy about some patch:
+> https://netdev-3.bots.linux.dev/vmksft-forwarding-dbg/results/42463/38-gre-multipath-nh-res-sh/stderr
 
-OK. I won't proceed down that path. Thank you for the feedback.
+Looks like I need to extend the RCU critical section in
+ip6_route_del() in patch 2:
+
+---8<---
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index d1d60415d1aa..b6434532858f 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -4104,9 +4104,9 @@ static int ip6_route_del(struct fib6_config *cfg,
+ 			if (rt->nh) {
+ 				if (!fib6_info_hold_safe(rt))
+ 					continue;
+-				rcu_read_unlock();
  
-> > > Because sendmsg should never have done that it certainly should not
-> > > spread beyond purely socket specific syscalls.
-> > 
-> > I don't know the entire historical context, but I presume sendmsg
-> > did that because there was no other mechanism at the time.
-> 
-> At least aio had been around for about 15 years at the point, but
-> networking folks tend to be pretty insular and reinvent things.
+-				return __ip6_del_rt(rt, &cfg->fc_nlinfo);
++				err =  __ip6_del_rt(rt, &cfg->fc_nlinfo);
++				break;
+ 			}
+ 			if (cfg->fc_nh_id)
+ 				continue;
+@@ -4121,13 +4121,13 @@ static int ip6_route_del(struct fib6_config *cfg,
+ 				continue;
+ 			if (!fib6_info_hold_safe(rt))
+ 				continue;
+-			rcu_read_unlock();
+ 
+ 			/* if gateway was specified only delete the one hop */
+ 			if (cfg->fc_flags & RTF_GATEWAY)
+-				return __ip6_del_rt(rt, &cfg->fc_nlinfo);
+-
+-			return __ip6_del_rt_siblings(rt, cfg);
++				err = __ip6_del_rt(rt, &cfg->fc_nlinfo);
++			else
++				err = __ip6_del_rt_siblings(rt, cfg);
++			break;
+ 		}
+ 	}
+ 	rcu_read_unlock();
+---8<---
 
-Sorry, but whatever issue there is between networking and other
-folks is well beyond my understanding and historical context. I'm
-not a reviewer or maintainer or anything like that; I'm just a
-developer who saw a problem and wanted a solution.
-
-I've read your message loud and clear, though, and I won't proceed
-down the path I've proposed.
-
-I appreciate your feedback; this is precisely why I sent the RFC -
-to get comments - so thank you for taking a look and letting me
-know.
-
-> > As mentioned above and in other messages, it seems like it is
-> > possible to improve the networking parts of splice (and therefore
-> > sendfile) to make them safer to use without introducing a new system
-> > call.
-> > 
-> > Are you saying that you are against doing that, even if the code is
-> > network specific (but lives in fs/)?
-> 
-> Yes.
-> 
-> Please take the work and integrate it with the kiocb-based system
-> we use for all other in-kernel I/O that needs completion notifications
-> and which makes it trivial to integate with io_uring instead of
-> spreading an imcompatible and inferior event system.
-
-If you have any suggestions or pointers to code I should look at for
-inspiration I would very much appreciate the guidance.
-
-Thanks for your time and energy in reviewing my RFC and responding.
-
-- Joe
+Thanks!
 
