@@ -1,145 +1,165 @@
-Return-Path: <netdev+bounces-176702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7A87A6B6C6
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 10:13:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E59C9A6B768
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 10:31:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF0723B7624
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 09:11:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 595CE17CAAB
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 09:31:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6AD91F12F4;
-	Fri, 21 Mar 2025 09:11:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="akfmIdv4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAB641EFFAF;
+	Fri, 21 Mar 2025 09:31:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE3A31F12F1
-	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 09:11:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D07A71E5707;
+	Fri, 21 Mar 2025 09:31:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742548278; cv=none; b=qolAnCpzduOsQZYoSwbedWapXYfUNNQfDEcnAyft4cKB1xaAAbEz6IM6rvsIhxIw9rys1+Q9GFbYsiawRHAxz4dKWCBnObfL+lyGGVKk79oJjsWSoQaKrXFTcbyKRXsrcive2gdw5WGu8jM7BIWiTiAYN1yCX0uFUlFILpDtqEk=
+	t=1742549472; cv=none; b=KBSo9UN9UWgCpYNB1aQykVyJepJ4Gp/5seSfYOrRg7qv0UQH/o9DRUh6mviXK+RDTC67fXHGTk+WqysLJ/cKS5FJ9bKg41nNFpE7d7ZKAa5a/SwA3eQV5Gg42LmX2pCm66FzSnQin+9ZYIHlCYCbdrCvlRZw8LBy0DepLc/bb5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742548278; c=relaxed/simple;
-	bh=QG0ZmrsilwyjlJMAPb2rBe6fSZkKkH0QT6tEA11dogk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=irkVIUf5s5s++gh4uLvbu+Y4bNYOxsntQe0KilVMkEnbUKBb+WSys5YQe/ghqXDQhCJSC+rDKaV7BsX2QfNYyuduSKHY0MpC8A39wAtxLEQa/pcAhDNe/PPakkxokcqIRFRqSSeCIXbdaIN3gyGA+t33HWbYr/Ki76IEQFc5Mfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=akfmIdv4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742548274;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qTmsG+4cdD/C6rW0RtbzJpphvMzCRykPisO3lshPB84=;
-	b=akfmIdv4Tvr6MuwNWPswT/1suyBieUtVhpvVGJrCHYexN9ZoxBVZzoPikN0MLh3RrgiwpU
-	xi6XO+IaOxyvEnR9HHQHZ6Mx7NzhZw8CL73L9Lxe5eoCsp2GTH1cc/c04fdWpKPwn13AFS
-	5mMwcBuwNxAE+4/Zv5+FOq5N7Imy9nc=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-329-VuPN_3JzNP6CNR-RfkoBuA-1; Fri, 21 Mar 2025 05:11:10 -0400
-X-MC-Unique: VuPN_3JzNP6CNR-RfkoBuA-1
-X-Mimecast-MFC-AGG-ID: VuPN_3JzNP6CNR-RfkoBuA_1742548267
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-39979ad285bso1019769f8f.2
-        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 02:11:08 -0700 (PDT)
+	s=arc-20240116; t=1742549472; c=relaxed/simple;
+	bh=Y6I/8vVmdfk6sGCvQTPk4i11HKqhHcWpJd91MnYDdOk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=TXHGY79XJCnR8mot8lCY2mkUNNwwjM/ELK/mzijUUV5jtW6SSwQjvHpPMpFVGwiQ4r3Ld8+T4CcHNd8e3PhRMBFMfNi1AxqwTjK18QLzs9ULR6v/ospfSnYcTQfYN0+0JKx8+wme0pMf02KnH8AF6YyUQaDOwrmgsqSjzp1agVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-aaecf50578eso349084866b.2;
+        Fri, 21 Mar 2025 02:31:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742548267; x=1743153067;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qTmsG+4cdD/C6rW0RtbzJpphvMzCRykPisO3lshPB84=;
-        b=W/uzUE4MMi8B5PjWz7QwxdiGUx6x3o9NivNwpQb1unZ9Xu04xJmDrEciO2MfdKM0F3
-         1e6r80awUmcy8bzpO9UxJicuixLv+YzqHp93OSOwVat87DIAQmYuh3nwGkPdGrjFWyYB
-         lfHfR7E3GIPhrijS9mZOazub25oeAfdxjoLjjZmNzAk38zxCVFvY0Iml6LYdV/9ActxU
-         N/SFb9iWL4Mf4r2U03eLRpMExcQ/95WyQI14FnSXw8SBwiicQviU/3/+iOmHV2iSQc/8
-         v1/SAE5+OTW5lAPAM5r7iG4DSB4XDJOBMfdToj9sFbYmEgkd7UdwPGrc+X78F6sPQsX7
-         Z7ug==
-X-Gm-Message-State: AOJu0Yx7e1pH+FN0/wlLTrSPQG3HXJ00Ft3kwOAubZYT7cZ/mYD8lx7X
-	1/72W9xAIg2J79IhYUs2jaMfFoOgjcOnXqWF4CsK7AqkzTQWRsWveRHnd/J56sP2Pl2Az9YoAtY
-	sWSwA9bf4LgTDGjHWSiFXxN2zXh+IND/JGO+D+9cCncK13SF46gNTJg==
-X-Gm-Gg: ASbGncs9GhZ4bxOpdhILlULzG4CPHe4zkHtbRApiiGEu0cNJFD8tXqhQ1bqL2cpQAZa
-	F2IetsDyVOQAPiU8okQV7NBT7RZ5n3PuhU75Xc4oPQSYGqwOY6nyYv1yaG3aL9lldT+EArKfqEU
-	CZDB9bDZFBp/xJhPvP+VsUS/mNdN5pHbHIo5xqfmHp8pGk45pMXisSeSwQpxBlbBvaL7K+Wfr67
-	mgD5KoNYFdeaayrX+VmV4DozSEOqMk2ChnU5uUrqGe6WM0KFmewpmTp1XdnFLa/qOT+GO0NAksN
-	oZweWbYZj7fX5vt1zgO31y+kGAKczWXaXuxaf9FbX7an+aqtf924ZCMP7g==
-X-Received: by 2002:a05:6000:1543:b0:390:f987:26a1 with SMTP id ffacd0b85a97d-3997f911531mr2384800f8f.29.1742548267325;
-        Fri, 21 Mar 2025 02:11:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFul8g/cxbwUHc7Ngy+sXegi0wooX8mgew9f2PDG/zp0tBNHzPm0pXKzSgLovtHHsJVo27ATg==
-X-Received: by 2002:a05:6000:1543:b0:390:f987:26a1 with SMTP id ffacd0b85a97d-3997f911531mr2384764f8f.29.1742548266923;
-        Fri, 21 Mar 2025 02:11:06 -0700 (PDT)
-Received: from [192.168.1.14] (host-87-11-8-182.retail.telecomitalia.it. [87.11.8.182])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d4fd26cecsm20857965e9.17.2025.03.21.02.11.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Mar 2025 02:11:06 -0700 (PDT)
-Message-ID: <758dcdea-a75e-4888-891e-9f0b0f8481c1@redhat.com>
-Date: Fri, 21 Mar 2025 10:11:04 +0100
+        d=1e100.net; s=20230601; t=1742549469; x=1743154269;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=W/NPUaREURJ6mCKVAccGEeQmvtTeXxq8+4zuow6YaFw=;
+        b=rWHQlOigmqcksMmd1Gbrl0B7d/55p5uwBnHKhy9SV39PV+i5Llax5CuoeuwaHF0QhZ
+         sZj5gzynWzZi8vjaTpP2rH5cZxgi6aPNb6Vrbo6xJo/uzRl5iTUYRktuD77L2e/AQ7IE
+         JFyiLxrhSHrxVXNMTheREcKp0FXUYo2n7s0jeY/oKIxCqU/jHsL1XO6FDsoRmnGIJ3qE
+         HnjyPAs6u574s5ZvxX3GEBmgnxN57GViuqUhRxHkZNVzONpcoaQj5afn5tGzvkhZ6e2J
+         quvqrlvzE8DW3sB7nRysXVkG86jlBzdX8zE1CXSFbQabkYaDWUjoaIvQkVlFJhty3DHB
+         EoaA==
+X-Forwarded-Encrypted: i=1; AJvYcCU5I3icIdbl5MheYRmxDu+l+LIWssVeC6DJwxrtmWV+vG13WQhX4fBo0iipQ6Kr/4z4Ft2nI+8+@vger.kernel.org, AJvYcCV5Nq7CybI/pRQykVZWMTedsPnzJ2onDzcDCMShtMCieedE1LbfsF9uq75OT8t8RqQogjHUrt2PEsxjCXs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YztochO7roMXzCMpTtbJ7WDbTzczTwlZPrhJfpuaxpJQ0sJUKWn
+	+zZnxt4Zux+vPCCUnM0g5T+TYvGGm99HoD5PAlAygR8zVtnWXF8q
+X-Gm-Gg: ASbGncsQs/Yo+5jtwtnpjJT3yRr3SoBb+gPC6U8uIdbZPVq5g16CTKOU51OsLKpuhsp
+	d1dZe7G0lOlbHqfpfstMKtnxSmKg8bJklrsMGeFiMgW2Ah1eOBoC1Ek331ITHZ/hlnypF9eHIZx
+	8JmHDNPornsBvKYUsfSTEez1NOkXkTvpmK7VYNkS7EBffCLjR/35dB8XpwB4XJQ2LtRqHsLCh+0
+	oWNr5DHSocWPE/9JHcmDEfy6fMhzI5YyYH1ZS2Lpu2vfex9N5TxdZHCGANFISp95uNTWwyCtg20
+	Eo3QIvuzFwEh2/2rA0iELGfspHnzWrtVmrw=
+X-Google-Smtp-Source: AGHT+IF8f1GC7wbrCO3eXH1B7reEeFIOUHS0zx+PYz/rKNz+5eov4VmNDk0rBsgjC169SJCW/K90hw==
+X-Received: by 2002:a17:907:6e87:b0:ac3:2d47:f6af with SMTP id a640c23a62f3a-ac3f212b833mr201431266b.20.1742549468664;
+        Fri, 21 Mar 2025 02:31:08 -0700 (PDT)
+Received: from localhost ([2a03:2880:30ff:8::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3ef8676c2sm116468566b.9.2025.03.21.02.31.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Mar 2025 02:31:07 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+Date: Fri, 21 Mar 2025 02:30:49 -0700
+Subject: [PATCH] lockdep: Speed up lockdep_unregister_key() with expedited
+ RCU synchronization
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 net-next 2/2] udp_tunnel: use static call for GRO hooks
- when possible
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: netdev@vger.kernel.org, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
- kuniyu@amazon.com
-References: <cover.1741718157.git.pabeni@redhat.com>
- <6fd1f9c7651151493ecab174e7b8386a1534170d.1741718157.git.pabeni@redhat.com>
- <20250321041612.GA2679131@ax162>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250321041612.GA2679131@ax162>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20250321-lockdep-v1-1-78b732d195fb@debian.org>
+X-B4-Tracking: v=1; b=H4sIAMgx3WcC/x3M4QpAMBQG0Fe5fb+tNmyyV5EfMxc3QltJybsr5
+ wHOg8xJOMPTg8SXZDl2eDIFIS5hn1nJCE8odWl1ZVq1HXEd+VSD4Rh03bTOWRSEM/Ek9z91/ft
+ +5JbwcFkAAAA=
+X-Change-ID: 20250319-lockdep-b1eca0479665
+To: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+ Will Deacon <will@kernel.org>, Boqun Feng <boqun.feng@gmail.com>, 
+ Waiman Long <longman@redhat.com>
+Cc: aeh@meta.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ edumazet@google.com, jhs@mojatatu.com, kernel-team@meta.com, 
+ Erik Lundgren <elundgren@meta.com>, Breno Leitao <leitao@debian.org>, 
+ "Paul E. McKenney" <paulmck@kernel.org>
+X-Mailer: b4 0.15-dev-42535
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2142; i=leitao@debian.org;
+ h=from:subject:message-id; bh=Y6I/8vVmdfk6sGCvQTPk4i11HKqhHcWpJd91MnYDdOk=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBn3THacqvxp5klqqqxekE7OYBsb7EMCXA8usIVX
+ OhVJnYS046JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ90x2gAKCRA1o5Of/Hh3
+ bWszEACxTC+Ie5buHGAr7rv5ihfTYSdVtFYTgDBg7vdatWsfs39+6AdMD/p3O4eqUWs/e/TTGRy
+ sTIMHuNC6FbfEfqY/2J6+OGybKh0B7GIZhCnos3xAAst7oR1knZ0PsYqEWVZK7dkkWLlTCYycAQ
+ J5FIn816Grs4G8L2hEZk/VLuSxSlCDe1XSBOfSF79ltHk7DqUgcIzc0O8y+S/kkgfDVvJFzxgfE
+ GEHclgsI/bZv71856R5aSS1Z0tF7IpfJV7I6TShhjquYYjFnuTu/4VgBK16lG8gPfx79cIO4lMg
+ pcj74c6Wt/UhSONLbTz267UgUhCmA6uzmaq/mIRwD/z91enQmqJG6T0lPMWrA9m3BVFgA1hDaIo
+ vSu9xrMtCkiGRtXwLuaIPbkFRp6U5D+YVHhhRwwzAiPnevFrfs4lye5dfpQtdybiqW6VAByfpfC
+ RLemQxsdOrixHpjQen9hWl894MFOJWq2kp+uWSRb8UdYt4rBIc/GAo5r/pFRktxtEtOH5S3d2Gc
+ GpvMGss3Y2ELlcj4/6AndV6OwYKEUiLLupkxPC1gTc2eNjaOPokDj6gafjH7fcYtnL+AZ43Yk9G
+ k9IvikeSZhkX1uf5QozaaHOxlRf39WYHB8CuuMJ6nmi4mxs7IYs8IxC1ZUHRGmJA9Q54mXxsCW9
+ dqp8+dNwrQU7qOA==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-On 3/21/25 5:16 AM, Nathan Chancellor wrote:
-[...]
->> +#define UDP_MAX_TUNNEL_TYPES (IS_ENABLED(CONFIG_GENEVE) + \
->> +			      IS_ENABLED(CONFIG_VXLAN) * 2 + \
->> +			      IS_ENABLED(CONFIG_NET_FOU) * 2)
-> 
-> I am seeing a warning in one particular configuration in my matrix when
-> building with clang:
-> 
->   $ make -skj"$(nproc)" ARCH=mips LLVM=1 mrproper malta_defconfig net/ipv4/udp_offload.o
->   net/ipv4/udp_offload.c:130:8: warning: array index 0 is past the end of the array (that has type 'struct udp_tunnel_type_entry[0]') [-Warray-bounds]
->     130 |                                    udp_tunnel_gro_types[0].gro_receive);
+lockdep_unregister_key() is called from critical code paths, including
+sections where rtnl_lock() is held. For example, when replacing a qdisc
+in a network device, network egress traffic is disabled while
+__qdisc_destroy() is called for every network queue.
 
-[...]
+If lockdep is enabled, __qdisc_destroy() calls lockdep_unregister_key(),
+which gets blocked waiting for synchronize_rcu() to complete.
 
-> GCC is more noisy but -Warray-bounds is not on by default yet.
-> 
->   $ make -skj"$(nproc)" ARCH=mips CROSS_COMPILE=mips-linux- KCFLAGS=-Warray-bounds mrproper malta_defconfig net/ipv4/udp_offload.o
->   In function 'udp_tunnel_update_gro_rcv',
->       inlined from 'udp_tunnel_update_gro_rcv' at net/ipv4/udp_offload.c:78:6:
->   net/ipv4/udp_offload.c:125:44: warning: array subscript <unknown> is outside array bounds of 'struct udp_tunnel_type_entry[0]' [-Warray-bounds=]
->     125 |                 *cur = udp_tunnel_gro_types[--udp_tunnel_gro_type_nr];
->         |                        ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+For example, a simple tc command to replace a qdisc could take 13
+seconds:
 
-[...]
+  # time /usr/sbin/tc qdisc replace dev eth0 root handle 0x1: mq
+    real    0m13.195s
+    user    0m0.001s
+    sys     0m2.746s
 
-> Should UDP_MAX_TUNNEL_TYPES be at least 1?
+During this time, network egress is completely frozen while waiting for
+RCU synchronization.
 
-Indeed! thank you for reporting.
+Use synchronize_rcu_expedited() instead to minimize the impact on
+critical operations like network connectivity changes.
 
-I'll send a patch soon. I must admit I did not expect NET_UDP_TUNNEL
-enabled without any of vxlan, geneve and xfrm, but such configuration is
-indeed possible.
+This improves 10x the function call to tc, when replacing the qdisc for
+a network card.
 
-Thanks,
+   # time /usr/sbin/tc qdisc replace dev eth0 root handle 0x1: mq
+     real     0m1.789s
+     user     0m0.000s
+     sys      0m1.613s
 
-Paolo
+Reported-by: Erik Lundgren <elundgren@meta.com>
+Signed-off-by: Breno Leitao <leitao@debian.org>
+Reviewed-by: "Paul E. McKenney" <paulmck@kernel.org>
+---
+ kernel/locking/lockdep.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
+index 4470680f02269..a79030ac36dd4 100644
+--- a/kernel/locking/lockdep.c
++++ b/kernel/locking/lockdep.c
+@@ -6595,8 +6595,10 @@ void lockdep_unregister_key(struct lock_class_key *key)
+ 	if (need_callback)
+ 		call_rcu(&delayed_free.rcu_head, free_zapped_rcu);
+ 
+-	/* Wait until is_dynamic_key() has finished accessing k->hash_entry. */
+-	synchronize_rcu();
++	/* Wait until is_dynamic_key() has finished accessing k->hash_entry.
++	 * This needs to be quick, since it is called in critical sections
++	 */
++	synchronize_rcu_expedited();
+ }
+ EXPORT_SYMBOL_GPL(lockdep_unregister_key);
+ 
+
+---
+base-commit: 81e4f8d68c66da301bb881862735bd74c6241a19
+change-id: 20250319-lockdep-b1eca0479665
+
+Best regards,
+-- 
+Breno Leitao <leitao@debian.org>
 
 
