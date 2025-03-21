@@ -1,119 +1,159 @@
-Return-Path: <netdev+bounces-176748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF585A6BF09
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 17:06:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7F8CA6BFA8
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 17:20:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 796AB3B8D42
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 16:05:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A413D1B6090A
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 16:18:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8BF822A1FA;
-	Fri, 21 Mar 2025 16:05:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2591722C324;
+	Fri, 21 Mar 2025 16:17:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MqYVSEqj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ag7J/jkj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25C2A1DE4C2
-	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 16:05:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 836D022CBDC;
+	Fri, 21 Mar 2025 16:17:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742573117; cv=none; b=SmuCObfGoU8MzcjqwgPt13OrBbFtwOXIP+0vArlkY16wCG+8H6aBDgWw5Q8bEb2S5Ce2UsJDTij7sr2FY7SNHUj1xf+FgIV7FkGrAxaiM8hAOzQsb2yGebeTyOpOPKMFv9xjqtkI6dSF1x8Bk+EP911cmOmtExpW2T3aRR0M+fI=
+	t=1742573859; cv=none; b=q4JZ3YUJLWdoGc+Bd1tTZX2PEcD1tnHBYCx2I9yoC9yrgCo1yQqfyZpTjuyQ4qnEyGvi6n6CODQInGiGfp6Hw4hL1hLTfth2WfcUzK21fg0e5nU8gqwlfUDnqqckuEhFAyLp1WRDp9B8vQeFbqBbltGhjF71tFFZ9ivVGi7O7p0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742573117; c=relaxed/simple;
-	bh=jwkfakE1DANkUqJuTwsNFFdjoRqqoxIpJ6eThYSheqo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I9bLWd+tMOHK1BsaGSMSCloqlqKN7jGoWZQHI5AOZ6VlIGAsUh729G2GeQ5yW4kfR6Px/4aguj5t5YHSfTVJi1HeElrZt+pbhfaG+sUdC2FL7FST5MYSh8tUDT72au5WJ537KRUeQ55PH9kb7YDdDUkM71Ync8izTbesVpNwI90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MqYVSEqj; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742573115;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oQs45VA5fWWnDDs/npKdUUvsMmoPlZhByWdxbH6ndSA=;
-	b=MqYVSEqjcxKVoNbA52gqLb0fqsgI6POUIqXa8/sRVVVLDATJuFOGFvghhcu+aRsM06v/kb
-	iMzSJea+cYsBr100Hp/opvUfOM1QKtl7DG6/24AZk+CcVC+EHSx0FjKJigrG2y1TOFb/yv
-	D8rcNzkS/Yn5xqVIH5eu52qERcmvJns=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-580-Qte9no2tPIC9HVI6l-JzCw-1; Fri, 21 Mar 2025 12:05:13 -0400
-X-MC-Unique: Qte9no2tPIC9HVI6l-JzCw-1
-X-Mimecast-MFC-AGG-ID: Qte9no2tPIC9HVI6l-JzCw_1742573112
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3912fe32a30so888640f8f.1
-        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 09:05:13 -0700 (PDT)
+	s=arc-20240116; t=1742573859; c=relaxed/simple;
+	bh=K7QVaDnAGXLmGEUEBzanuOP8h9JUI6CUFV+cdqqmN/o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mT6rsutZgiQ5fHKLBUJYT6C38W3alafnZN+YVU0kkfSIa354VN/xKiYsl/fUgXBAS/mWJo4Kg/pxttLsx/MdGwdUVhRTMc8yjw7uNCeiKppwRiHzs6DPZWFdw+oiVPnDS9UImV3OCPquT6JQbmXZi2kHIX6ZplBYEbr9zuU16Gg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ag7J/jkj; arc=none smtp.client-ip=209.85.166.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3d445a722b9so10883155ab.3;
+        Fri, 21 Mar 2025 09:17:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742573856; x=1743178656; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JB2LddsMl//YUnKCjcOJrbsbuFk6pwEh4cQ45Dr5HRc=;
+        b=ag7J/jkjRpZNwaooJCx7zfI3uEEtOn7/IPcDFfF8Xkok2UMZu1cm/2RDmi/86syeTk
+         EanM2338tqRw42MalzuthMKegV4ERonWtWLZn3HZBPkr0ozzVlUF+lxArbYHWWrqfp/T
+         0xyDX3C4ghduSnUO0XKQCET+zEp2h5vtycLyuKo9WvmkCtuOz8fhOxco4G+DOg6Ga9Gr
+         t3fOzxpRY4AguesHhQgE/FPOA6d/j2DW7HabLzMk530urFSx95ekX49WcILF1x8hUL5y
+         QqexIF2kMAntdmPFmzZ4WZrNyYlccx7Q/q7o100zu9En6EAQgt4glwSMJ2/Ut5CHI3e8
+         jXNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742573112; x=1743177912;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oQs45VA5fWWnDDs/npKdUUvsMmoPlZhByWdxbH6ndSA=;
-        b=ouOEaQmW1B1fG1TsNkQP6AFOFCNa9w09xFFFCuMM+EXbSNTrFLvgQpS/WnYRSZC59n
-         V5n9PlyFsbp9LoqBC8rXHOVg8YWFumIbKhomb5cMUAHgXPs7VfMLlm/Apdv7q4nkgCIC
-         MARhKBQNTZipDVmj9rfTFr+RhVvLTe1d3Oq1005ERygncPvZqC2knCgdx4ZyoMHo3f6D
-         nWj2Atqhx00x6QiFzAoh+LfU08Mc/b8P3pzPUTOpJZe5bcp+Bt5I6E5/O0rW1EimBm04
-         8tFtlSu1FiYOwxkieyVRO7p9MBQEohY7QDHXwTmhjkWkRK0Wda/qIPrkEqm0WWc1Gg+n
-         /+hw==
-X-Gm-Message-State: AOJu0YxzjXXqs4tJzG8X03HBcSYDppOxTznFbFHAFGec9Uxw+XKYdX/g
-	3D21Zga/yaq2JsXjLLVSJf+CGOauxeHHSMgIvYbGG4+Q5HumAlzb+YPNh1/65SHJzG9MuLhLmfB
-	zZoAR8MLK8MuWKB+NM2srcLCURbcNEt7cN+dAiuZQeQcUyy3PKc2M1w==
-X-Gm-Gg: ASbGncv4v0KIDBurYSjMdNsEeizhMY94vZ8yrAl+w8Lt35RWCP/fmKA357Xp+gtuaNT
-	lCiO0v1BbmJmE3saKGlG4FdlcJEkyf+RPF89Kbhvrqg0iVy97lD3gMY1v35QjYdZpPydjbyXbMC
-	n4yPfcBnwgMms6Is/qrKgbmo5at/5ABQ3sTCGxNrCrf5FI1+IzapGlqsYcElMtRexpgVxVPWLZ7
-	Ioc0FBkH9RQ9eVZDMIlzgEMeeBtW9Qru6CNjFrv0gEhtDNyhm8n+0zbNwKIfjBbAR7teqwdLesk
-	5xgkp9vKjTk0SDDcy3m/7+xU8KEuv4JYjBSBvFzu3dggsA==
-X-Received: by 2002:a05:6000:210b:b0:390:df02:47f0 with SMTP id ffacd0b85a97d-3997f9336fdmr2910931f8f.42.1742573110944;
-        Fri, 21 Mar 2025 09:05:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFv3TecOdXmFWBmFPlb9ypBRevwbrid5djH7Ctu3Ye4XmZRGvPpKB+zPMx70FJNmpZ1uxRAAg==
-X-Received: by 2002:a05:6000:210b:b0:390:df02:47f0 with SMTP id ffacd0b85a97d-3997f9336fdmr2910895f8f.42.1742573110537;
-        Fri, 21 Mar 2025 09:05:10 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-77-210.dyn.eolo.it. [146.241.77.210])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d440ed4d9sm81992925e9.33.2025.03.21.09.05.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Mar 2025 09:05:10 -0700 (PDT)
-Message-ID: <08d9509a-3291-4856-8129-1e440df10b29@redhat.com>
-Date: Fri, 21 Mar 2025 17:05:08 +0100
+        d=1e100.net; s=20230601; t=1742573856; x=1743178656;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JB2LddsMl//YUnKCjcOJrbsbuFk6pwEh4cQ45Dr5HRc=;
+        b=sJmqu1xIi+4WWkSkcwddLjUhfLnSv7PkGM9dot4EaMlculE5LzAgG/nDqm0MOQ9sud
+         473qnlwRPbx8EHvPYzZMz9e7F0YLg9qn/I7NMLOoLOtVH6YKdpqrr43TLuKgHvYTlI1Y
+         e8WvyFCrEKkAaT4NUkWmPnrQJFdPZW/Au5SXK1CbAs3QccvygzHrSsT65ApVbr121iqh
+         z/96eTFVcD6v1/5eI2nTmqS1wqBr657NPF3Q5SvbZzTQOBXEsdWexwHCIkyRurPXpUzT
+         r5CiEHswTZc5JXuZKsLEPexRLUjf0YEIRkD0FuLEk/gJ6JBC5JDUJDdYneemJqfDEzs0
+         HqWg==
+X-Forwarded-Encrypted: i=1; AJvYcCUEDzZIaNkvahXth2HjX8qzR245VW3Dj8VHIbkOe1npA4NQOQI468BXMtzwjVcZMOUTU9qiHX/08Abzm94=@vger.kernel.org, AJvYcCX3rpP/VhrSrMwMYOTzswppBoffzvEI4/QGn8uJfQRV9we8kk87IrCbSr5+HdLywQKg+DO7ShjU@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywq1mJiFk0prlnzMBilhLwvBMY0v1g5i2c9pn3U3dLvpNdD4FYI
+	xzqCBw9fgs89cuOgwQf7QnnAwnh3oI3vz8xl03Hs8Hz4nWPXJ6+Z+BbxwSeR5zh/d5pQRaWwX7r
+	/MY2gIhPHuULCtJCVM24AnvsuXro=
+X-Gm-Gg: ASbGncuwuxDDZveHCJfoqDEys2vvSkVm+MojPbIQ+g0vSFrumcOHKidyOhv38iM2f26
+	X6ug/QGRNFsLbzYbycS0CVi0OQLI71ZNnHCjxkK1oXU7fwFx54ysckkzJi3NkWR+UvUaO87vP7K
+	LhLIcxuNmDgElEDUcP9yLsHHq8Z/coUC1RnXIl5A==
+X-Google-Smtp-Source: AGHT+IF/cTwa/Ayq5CoNHqC35AhWyYP5kDowB9jCEl7LGxlA43AUsug/c0VuT+er56UZPSwPE7unIoT/6An3lvz8EGw=
+X-Received: by 2002:a05:6e02:1fe2:b0:3d3:faad:7c6f with SMTP id
+ e9e14a558f8ab-3d5960cd064mr37698385ab.5.1742573856023; Fri, 21 Mar 2025
+ 09:17:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] MAINTAINERS: Add dedicated entries for
- phy_link_topology
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
- Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Russell King <linux@armlinux.org.uk>,
- Simon Horman <horms@kernel.org>
-References: <20250313153008.112069-1-maxime.chevallier@bootlin.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250313153008.112069-1-maxime.chevallier@bootlin.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250321103848.550689-1-praan@google.com>
+In-Reply-To: <20250321103848.550689-1-praan@google.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 21 Mar 2025 23:16:59 +0700
+X-Gm-Features: AQ5f1JqjM4GK6CzHqw2vIfkX6OSsc016A653q3dy7QXb9gXqPTROO7S1fob5YLM
+Message-ID: <CAL+tcoBhKBhXxN0H0dmZVuD5x=cnUaZH0ZMhb2WM9ndDsqJsuQ@mail.gmail.com>
+Subject: Re: [PATCH] net: Fix the devmem sock opts and msgs for parisc
+To: Pranjal Shrivastava <praan@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, linux-parisc@vger.kernel.org, 
+	Willem de Bruijn <willemb@google.com>, Mina Almasry <almasrymina@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 3/13/25 4:30 PM, Maxime Chevallier wrote:
-> The infrastructure to handle multi-phy devices is fairly standalone.
-> Add myself as maintainer for that part as well as the netlink uAPI
-> that exposes it.
-> 
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+On Fri, Mar 21, 2025 at 5:39=E2=80=AFPM Pranjal Shrivastava <praan@google.c=
+om> wrote:
+>
+> The devmem socket options and socket control message definitions
+> introduced in the TCP devmem series[1] incorrectly continued the socket
+> definitions for arch/parisc.
+>
+> The UAPI change seems safe as there are currently no drivers that
+> declare support for devmem TCP RX via PP_FLAG_ALLOW_UNREADABLE_NETMEM.
+> Hence, fixing this UAPI should be safe.
+>
+> Fix the devmem socket options and socket control message definitions to
+> reflect the series followed by arch/parisc.
+>
+> [1]
+> https://lore.kernel.org/lkml/20240910171458.219195-10-almasrymina@google.=
+com/
+>
+> Fixes: 8f0b3cc9a4c10 ("tcp: RX path for devmem TCP")
+> Signed-off-by: Pranjal Shrivastava <praan@google.com>
 
-I'd like to have Jakub on-board here. He should be back soonish, so
-let's keep this patch around a little more
+When I did the review for [1], I noticed that. Regarding to the patch
+itself, feel free to add my tag in the next revision:
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
 
-Note that MAINTAINER changes go via the 'net' tree.
+[1]: https://web.git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/com=
+mit/?id=3D23b763302ce0
 
-/P
+Thanks,
+Jason
 
+
+> ---
+>  arch/parisc/include/uapi/asm/socket.h | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/arch/parisc/include/uapi/asm/socket.h b/arch/parisc/include/=
+uapi/asm/socket.h
+> index aa9cd4b951fe..96831c988606 100644
+> --- a/arch/parisc/include/uapi/asm/socket.h
+> +++ b/arch/parisc/include/uapi/asm/socket.h
+> @@ -132,16 +132,16 @@
+>  #define SO_PASSPIDFD           0x404A
+>  #define SO_PEERPIDFD           0x404B
+>
+> -#define SO_DEVMEM_LINEAR       78
+> -#define SCM_DEVMEM_LINEAR      SO_DEVMEM_LINEAR
+> -#define SO_DEVMEM_DMABUF       79
+> -#define SCM_DEVMEM_DMABUF      SO_DEVMEM_DMABUF
+> -#define SO_DEVMEM_DONTNEED     80
+> -
+>  #define SCM_TS_OPT_ID          0x404C
+>
+>  #define SO_RCVPRIORITY         0x404D
+>
+> +#define SO_DEVMEM_LINEAR       0x404E
+> +#define SCM_DEVMEM_LINEAR      SO_DEVMEM_LINEAR
+> +#define SO_DEVMEM_DMABUF       0x404F
+> +#define SCM_DEVMEM_DMABUF      SO_DEVMEM_DMABUF
+> +#define SO_DEVMEM_DONTNEED     0x4050
+> +
+>  #if !defined(__KERNEL__)
+>
+>  #if __BITS_PER_LONG =3D=3D 64
+> --
+> 2.49.0.395.g12beb8f557-goog
+>
+>
 
