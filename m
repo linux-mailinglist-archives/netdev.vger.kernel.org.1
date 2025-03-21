@@ -1,115 +1,145 @@
-Return-Path: <netdev+bounces-176787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AAD0A6C22D
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 19:15:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AEB3A6C238
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 19:18:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7BE84827D9
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 18:15:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59B1F3B3052
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 18:18:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A95041E7C25;
-	Fri, 21 Mar 2025 18:15:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B10522D4C0;
+	Fri, 21 Mar 2025 18:18:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="UDGkLwOJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MwDjxEiW"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CABF113C695;
-	Fri, 21 Mar 2025 18:15:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3B161E7C25
+	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 18:18:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742580940; cv=none; b=RhO0DwKpUGuzSK7j2V3d5x8jmWJwxmAxl7Wjb+GZpuDfP9Xk4BFocl6rfjsv47uTFt3zLFM862SogQdiazseyFw5o/ILaW6Q65ifX2+XgarENgOSv5q+SgXaFQeFYdYsjCWTPmCBJ01Q55Wt0UEcJnIFjKQEExr/Th/KBdQzLoY=
+	t=1742581102; cv=none; b=dzmHlllN1W0VuqrtifpPldiocZfZeItgVFSCpFVM++tHZ5cib7XHuzdMrAgQwR9xz5/iTXiOun4FYe4f0hCeDa/9MKv1PwwgbCw/1kzXIPhUdZLZ/cUb002hQxE8x6kKLjAunsGuatFr+huByLR0wpMeyIdEdn+I43cWOfaNcuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742580940; c=relaxed/simple;
-	bh=iAq4y/BTk/MAEwUl7X+7XcMLVXDWQGMRVeU3Cnms5Pc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l1Bb3Wa2GvjYTyaxbMwZvdAaTL4DRftjpyHHLNnydl0uuQQ3VRcOqkpQ+uMlS29m1ZaRe+b9ppi6sw88Uw4dgF4uCnR0J0iXseoh2bvnxH9VXd2/Ifr0h0bmiIBE4o8OBRKfrtOGXtp+nDsYV8i4PNrejMNPbPSA4rW2VvKiFC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=UDGkLwOJ; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 309B2442C9;
-	Fri, 21 Mar 2025 18:15:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1742580936;
+	s=arc-20240116; t=1742581102; c=relaxed/simple;
+	bh=vOHWoxiw2xdMs3GmEHCxHidgceg+4sXbAb8ZxPba/Rw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=thNkKMp55qclNEaFyXqyUt9Tc733xTndf/l452NP7pj4i2C1uxVDDQGgNkx7PDuUb2pWDq1n98FlKfPkXPPqgc62H6mtkE35oFgDL9z3taG/IlvIOf4uB7uBtjMhkmIOlzUqI2gRual6UxAUritIhW0y7RiQgY753SJu7z8KQHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MwDjxEiW; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742581099;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9i89mOUewMbia4ZPRxR3kcufVYyKXRfB/Vul82O5Bbs=;
-	b=UDGkLwOJHkLDgxwCxRitwd7kkWi0RaDTLb3Wx9JrIe3eq/TKlDlSjMKhD2YIy4ELuc1bDi
-	kahWsSTPhwb0wN3kZx25zZMrOVEPyxh0Ob6lvnXGLVPYIOR6V9pnA76Gs87c6PgAmb4mwK
-	bz7s8VdunP4FdVY0Xc8+tmZExUrjhcbZcW2VB7bSUX+w4yuhhhonl0P92IQxef9a7ogUqf
-	StLBBBPbPzls3iVnNjaf/uIKcIK6aqUQGEhV7uWJmFxhbe+7mzXqg0jzQvuN8Yr2/I2PJa
-	dUB8qBoKnNcEDVSyg6sd9mhb3tEbno4v1juAC9pzm48t5BQwodhph9xwy/0SGw==
-Date: Fri, 21 Mar 2025 19:15:34 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, Heiner Kallweit
- <hkallweit1@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Florian Fainelli <f.fainelli@gmail.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Simon Horman
- <horms@kernel.org>, Romain Gantois <romain.gantois@bootlin.com>, Antoine
- Tenart <atenart@kernel.org>, Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>,
- Sean Anderson <sean.anderson@linux.dev>, =?UTF-8?B?QmrDuHJu?= Mork
- <bjorn@mork.no>
-Subject: Re: [PATCH net-next v3 2/2] net: mdio: mdio-i2c: Add support for
- single-byte SMBus operations
-Message-ID: <20250321191534.39e00de3@fedora.home>
-In-Reply-To: <20250314162319.516163-3-maxime.chevallier@bootlin.com>
-References: <20250314162319.516163-1-maxime.chevallier@bootlin.com>
-	<20250314162319.516163-3-maxime.chevallier@bootlin.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	bh=iRqBZ0OkMQP4BzSiooVfIumzyiQnM11f1AZ/zH2IWSk=;
+	b=MwDjxEiWgSNCqW7Ka+LWh3iVQrcNjYxlz3zROsyv6YAJKFX/0L53Zk1Nv6obO61cZ7czXo
+	UK/aJ7TBfm/mD9QFiq0k40+n/uQcAujYj8105FQ/R/VAcVavFPtq86cWsGn/64NbI1pKk9
+	7AqdHvxsNT0Opldt2S/8cullj6qvf+U=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-262-gQ8wvRy5PguSC3B9lHnYDg-1; Fri, 21 Mar 2025 14:18:18 -0400
+X-MC-Unique: gQ8wvRy5PguSC3B9lHnYDg-1
+X-Mimecast-MFC-AGG-ID: gQ8wvRy5PguSC3B9lHnYDg_1742581097
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43cf5196c25so11046485e9.0
+        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 11:18:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742581097; x=1743185897;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iRqBZ0OkMQP4BzSiooVfIumzyiQnM11f1AZ/zH2IWSk=;
+        b=ZabhcIaXI70OpmptFW4P5sDAVKy38X/6j4GwCqyx4gqaAIKMpZ/PNUV3dMMP/oOas1
+         tBZpMF/p9QSEzrwlfx1u3ja3CMA6Xr5/zGQ4ALls62O31m1u77fJBHK3y9dAAczLGuAK
+         yQVrphBLx4dzes2K3UnhKm7UtanPzFCqG3uK8UJfULJG+s9+0uAaLZ5WNNLADT9l1dg9
+         y+m2qI/FV8TVRii/9IuOJcL8LYBF+mrlt/lQ/0BZ21RMpl3zZEm51YNWa/cgMFoPBCCj
+         Z+4jN9IS0eDgVzJ+KFQfcy9oGt6yQwzX0OOIGB6al+OIX3/BdLQGQmjC9wzoRJ7NQZoy
+         r/Xw==
+X-Forwarded-Encrypted: i=1; AJvYcCW+gjrhWOxfIaw1+6c057/DMzEGSXmh60IFZ0cAJzdrQsmMByEtuctvBqI30lu//01JIQ1rtYI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyszJLFNpb8ElOO1W2sOlFunPvcR5cMTvlAWAKUgUhrOt0qiIfG
+	g64dAxK4sM/p/nno4kBC3XaIiyip7TT8suCWqulCzHNm/3ZH/OPYId9L0hVWtAeVGnMVFLW9/tn
+	1H/xzCE2txPU/zhGgKGXU9w7rIKlsRnLLgdugs5YVPiLInEalRJKi+A==
+X-Gm-Gg: ASbGncuk3lbELkHpFF5HITRvCpi2mlfeQ8mWIARV6XBCd9utXiDNHut2Q47tNAXinUD
+	Q37WXxPDoEz9vbnJvSfMSSsX3rFJLHP+he3tNZj1JjpD6FW4qcDze7Fwa6pWsz2GfSN8+DbrUW2
+	ZRqD5qSk4HQgtU3lK8rxTf7j1WE9vznzjserO9So/dcpKP7Q9g3/lud2ckfeh71Cqr1id4KwIZ+
+	2mIidknL711JCLj7cFc11ZaDn1g5LDLV0ZEEI7Z3Z90E+E9gHo5T79PjU0w2vKaCl+35VZKBpps
+	5k8VhH0NIbYiLh3W+HDsswUpajFtLsWngJ/mv3KqiggpTw==
+X-Received: by 2002:a05:600c:5488:b0:43d:db5:7af8 with SMTP id 5b1f17b1804b1-43d50a31981mr32999205e9.21.1742581096863;
+        Fri, 21 Mar 2025 11:18:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH4hjspn7nFbirV1vOF+PWolmKka8uULS32ZeHXEmfN9pXrlTOZAy5VVuhKwl33XEm7itFSrQ==
+X-Received: by 2002:a05:600c:5488:b0:43d:db5:7af8 with SMTP id 5b1f17b1804b1-43d50a31981mr32999005e9.21.1742581096493;
+        Fri, 21 Mar 2025 11:18:16 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-77-210.dyn.eolo.it. [146.241.77.210])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d43f3328bsm84371215e9.1.2025.03.21.11.18.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Mar 2025 11:18:16 -0700 (PDT)
+Message-ID: <2d39033d-0303-48d0-98d3-49d63fba5563@redhat.com>
+Date: Fri, 21 Mar 2025 19:18:15 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] net: airoha: Validate egress gdm port in
+ airoha_ppe_foe_entry_prepare()
+To: Lorenzo Bianconi <lorenzo@kernel.org>, Andrew Lunn <andrew@lunn.ch>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+References: <20250315-airoha-flowtable-null-ptr-fix-v2-1-94b923d30234@kernel.org>
+ <b647d3c2-171e-43ea-9329-ea37093f5dec@lunn.ch> <Z9WV4mNwG04JRbZg@lore-desk>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <Z9WV4mNwG04JRbZg@lore-desk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduhedujeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudekpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguu
- hhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Fri, 14 Mar 2025 17:23:18 +0100
-Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
-
-> PHYs that are within copper SFP modules have their MDIO bus accessible
-> through address 0x56 (usually) on the i2c bus. The MDIO-I2C bridge is
-> desgned for 16 bits accesses, but we can also perform 8bits accesses by
-> reading/writing the high and low bytes sequentially.
+On 3/15/25 3:59 PM, Lorenzo Bianconi wrote:
+>>> Fix the issue validating egress gdm port in airoha_ppe_foe_entry_prepare
+>>> routine.
+>>
+>> A more interesting question is, why do you see an invalid port? Is the
+>> hardware broken? Something not correctly configured? Are you just
+>> papering over the crack?
+>>
+>>> -static int airoha_ppe_foe_entry_prepare(struct airoha_foe_entry *hwe,
+>>> +static int airoha_ppe_foe_entry_prepare(struct airoha_eth *eth,
+>>> +					struct airoha_foe_entry *hwe,
+>>>  					struct net_device *dev, int type,
+>>>  					struct airoha_flow_data *data,
+>>>  					int l4proto)
+>>> @@ -224,6 +225,11 @@ static int airoha_ppe_foe_entry_prepare(struct airoha_foe_entry *hwe,
+>>>  	if (dev) {
+>>>  		struct airoha_gdm_port *port = netdev_priv(dev);
+>>
+>> If port is invalid, is dev also invalid? And if dev is invalid, could
+>> dereferencing it to get priv cause an opps?
 > 
-> This commit adds support for this type of accesses, thus supporting
-> smbus controllers such as the one in the VSC8552.
-> 
-> This was only tested on Copper SFP modules that embed a Marvell 88e1111
-> PHY.
+> I do not think this is a hw problem. Running bidirectional high load traffic,
+> I got the sporadic crash reported above. In particular, netfilter runs
+> airoha_ppe_flow_offload_replace() providing the egress net_device pointer used
+> in airoha_ppe_foe_entry_prepare(). Debugging with gdb, I discovered the system
+> crashes dereferencing port pointer in airoha_ppe_foe_entry_prepare() (even if
+> dev pointer is not NULL). Adding this sanity check makes the system stable.
+> Please note a similar check is available even in mtk driver [0].
 
-As a side note, it's kind of a strange coincidence but I just had
-access to a weird SGMII to 100BaseFX module (so with a PHY), and from
-my tests the PHY only responds to single-byte MDIO accesses !
+I agree with Andrew, you need a better understanding of the root cause.
+This really looks like papering over some deeper issue.
 
-Trying to access the PHY with word transactions on 0x56 actually causes
-the i2c bus to lock-up...
+AFAICS 'dev' is fetched from the airoha driver itself a few lines
+before. Possibly you should double check that code.
 
-For the curious the module is a CISCO-PROLABS   GLC-GE-100FX-C, and the
-PHY id indicates it embeds a Broadcom BCM5461, probably strapped in
-SGMII to 100FX mode.
+Thanks,
 
-The EEPROM reports strange things though, and I can't get that module to
-work at all, the SGMII autoneg appears to go wrong and I get link
-up/down events all over the place without anything ever going through,
-so I don't think I'll upstream the fixups for the module. Still it
-may be another use-case for single-byte mdio-smbus.
+Paolo
 
-Maxime
 
