@@ -1,124 +1,87 @@
-Return-Path: <netdev+bounces-176687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176690-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C89EFA6B5DB
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 09:14:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44E1EA6B5F2
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 09:17:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC9C1189D8A8
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 08:14:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4802046507B
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 08:17:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92DF01F03C4;
-	Fri, 21 Mar 2025 08:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2377F1EEA39;
+	Fri, 21 Mar 2025 08:17:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Ss5XFq8L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fls2TqWs"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7B401EFFB0;
-	Fri, 21 Mar 2025 08:13:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2DD61EE02F
+	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 08:17:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742544837; cv=none; b=Txta0gbh5WjAmBvs/z95LuHY5QvO/HPqYbXKPYxKc8ff7p/iLffDeXupNDZVETcgHXD6VmP7EBZIuT8OZeY98NeAflitr6GbY+wBIoQBndk0lbp2FQaPJDVjPJSavWAPx0jbxuv/rfxAj88lhQ77HyzbwJFmCPQBIus06xlTTw0=
+	t=1742545032; cv=none; b=ZHRiE43zWf3iIVT9dGu592RQ3SE5KVPQMndnDlaUtYmDlMjuSMaCKZDZjYcBkdq+0hPAcSnb42IWzhivTuLs0x4q+ezkFkelkqvD66fzep4BzyPbfLMrU6gDpQo7gjmW/hTHIJdj4AEIXKp/Y3AQrH7teeVl51o79oXbZuOMqbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742544837; c=relaxed/simple;
-	bh=iQ3f1Uo9PBRmeOIRNc3lzhLy3Ycu/Zb+R/wdm0l71M4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PAxe9tgTcpcp2PeJvrEKFmyl7ej/bSAoOXNyPbh+4FqpFazo7/UL9rh/eGwXCctnALbzcO2P+Y9a6hzj9wQP+zHP/fCNFOL4TJ86jdbHDW4kCGsv3YsW88x6t2IPGP5/SY01dN52b/f4BQLyQ4n+Y0F00Y1cK42V4WMBd8rnWQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Ss5XFq8L; arc=none smtp.client-ip=198.47.19.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 52L8DSub262220
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 21 Mar 2025 03:13:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1742544808;
-	bh=zBkFyFej/LjUcEirj4ZJVbw1Q5NfS6rUgggc1XPBP10=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=Ss5XFq8LA0mUPPXeTRbGotDm6AdtwmosmwCG78Ii6kaD27XwhznnIYw8cVOGAJai0
-	 R41m/8h7bQYy2ZkQEDEZtHOKNDy27ikNZDCJpob/7VBZC8HcsbNAeT6gze6wdXOtQY
-	 51FxIdjWVmhBi2M+vQM5DI493skyDJclkwtYuZ2k=
-Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 52L8DSl1127629;
-	Fri, 21 Mar 2025 03:13:28 -0500
-Received: from DLEE105.ent.ti.com (157.170.170.35) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 21
- Mar 2025 03:13:28 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE105.ent.ti.com
- (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 21 Mar 2025 03:13:28 -0500
-Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 52L8DShA130300;
-	Fri, 21 Mar 2025 03:13:28 -0500
-Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
-	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 52L8DQSt032443;
-	Fri, 21 Mar 2025 03:13:27 -0500
-From: Meghana Malladi <m-malladi@ti.com>
-To: <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
-        <davem@davemloft.net>, <andrew+netdev@lunn.ch>
-CC: <bpf@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <kory.maincent@bootlin.com>, <dan.carpenter@linaro.org>,
-        <javier.carrasco.cruz@gmail.com>, <diogo.ivo@siemens.com>,
-        <jacob.e.keller@intel.com>, <horms@kernel.org>, <m-malladi@ti.com>,
-        <john.fastabend@gmail.com>, <hawk@kernel.org>, <daniel@iogearbox.net>,
-        <ast@kernel.org>, <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
-        Roger
- Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
-Subject: [PATCH net-next v2 3/3] net: ti: icss-iep: Fix possible NULL pointer dereference for perout request
-Date: Fri, 21 Mar 2025 13:43:13 +0530
-Message-ID: <20250321081313.37112-4-m-malladi@ti.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250321081313.37112-1-m-malladi@ti.com>
-References: <20250321081313.37112-1-m-malladi@ti.com>
+	s=arc-20240116; t=1742545032; c=relaxed/simple;
+	bh=I6TBOGMG1VaLCmMd8p5mAIbd3Ka8wLm635EByw3igFM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FRhp20eXSdggAftwY4vWZzU63+b5iWDirfS25wadtDyyDUr9mGV5ZY6L7yntuwHMR6Dyl2Xb6F5cCJQKPcEndylYuih5GhoB39h5sfFikC0pKrrnMslfHCfxXlIrwdzk7g6H0N9dPuEW7Q8ql4BG0dgLooMAZnNrm7Q74bLvs0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fls2TqWs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A066CC4CEE8;
+	Fri, 21 Mar 2025 08:17:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742545031;
+	bh=I6TBOGMG1VaLCmMd8p5mAIbd3Ka8wLm635EByw3igFM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fls2TqWsk9/NK/Y7GPxYu4cYuPktcf3gNfxfZi5Rj+oc81v2YgZmKYShcmCIEJxpe
+	 YOLtXCEM7Xc7etfItJrXfNMDj7Rci0/BB+y/9L9L5iAixCj/YKPifwVECEoht17n+D
+	 S+zfQ7UtuA5PBC/UDKffcYLdyqUgIT+t5j7a0YbbY663aI0+UrCTQWg0fRQZ9PpOCJ
+	 Fe1+qkGiW1WVvggKgqY/8GYxhgR6EurpD3Je8nE9eN8xXuA164Eg+WUw7pM/PYKrf6
+	 02XndYmBHhUnUlNEO/EV058d5wgXvEP9aisFDhG/XARAYKMPc8UbN/y/j9yWOxxEdL
+	 RpP4xZGiG13tg==
+Date: Fri, 21 Mar 2025 08:17:07 +0000
+From: Simon Horman <horms@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>
+Subject: Re: [PATCH net 1/3] net: dsa: sja1105: fix displaced ethtool
+ statistics counters
+Message-ID: <20250321081707.GM892515@horms.kernel.org>
+References: <20250318115716.2124395-1-vladimir.oltean@nxp.com>
+ <20250318115716.2124395-2-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250318115716.2124395-2-vladimir.oltean@nxp.com>
 
-Whenever there is a perout request from the user application,
-kernel receives req structure containing the configuration info
-for that req. Add NULL pointer handling for perout request if
-that req struct points to NULL.
+On Tue, Mar 18, 2025 at 01:57:14PM +0200, Vladimir Oltean wrote:
+> Port counters with no name (aka
+> sja1105_port_counters[__SJA1105_COUNTER_UNUSED]) are skipped when
+> reporting sja1105_get_sset_count(), but are not skipped during
+> sja1105_get_strings() and sja1105_get_ethtool_stats().
+> 
+> As a consequence, the first reported counter has an empty name and a
+> bogus value (reads from area 0, aka MAC, from offset 0, bits start:end
+> 0:0). Also, the last counter (N_NOT_REACH on E/T, N_RX_BCAST on P/Q/R/S)
+> gets pushed out of the statistics counters that get shown.
+> 
+> Skip __SJA1105_COUNTER_UNUSED consistently, so that the bogus counter
+> with an empty name disappears, and in its place appears a valid counter.
+> 
+> Fixes: 039b167d68a3 ("net: dsa: sja1105: don't use burst SPI reads for port statistics")
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-Fixes: e5b456a14215 ("net: ti: icss-iep: Add pwidth configuration for perout signal")
-Signed-off-by: Meghana Malladi <m-malladi@ti.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
----
-
-Changes from v1(v2-v1):
-- Collected RB tag from Simon Horman <horms@kernel.org>
-
- drivers/net/ethernet/ti/icssg/icss_iep.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.c b/drivers/net/ethernet/ti/icssg/icss_iep.c
-index b4a34c57b7b4..aeebdc4c121e 100644
---- a/drivers/net/ethernet/ti/icssg/icss_iep.c
-+++ b/drivers/net/ethernet/ti/icssg/icss_iep.c
-@@ -498,6 +498,10 @@ static int icss_iep_perout_enable(struct icss_iep *iep,
- {
- 	int ret = 0;
- 
-+	/* Return error if the req is NULL */
-+	if (!req)
-+		return -EINVAL;
-+
- 	/* Reject requests with unsupported flags */
- 	if (req->flags & ~(PTP_PEROUT_DUTY_CYCLE |
- 			  PTP_PEROUT_PHASE))
--- 
-2.43.0
 
 
