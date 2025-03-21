@@ -1,101 +1,117 @@
-Return-Path: <netdev+bounces-176647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A708A6B311
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 03:46:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 529B3A6B31A
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 03:59:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E37519C0B8A
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 02:46:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF03B3AAAF0
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 02:57:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0B291E5B9B;
-	Fri, 21 Mar 2025 02:46:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A80041E1A31;
+	Fri, 21 Mar 2025 02:57:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="e0AOYVyK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SW/4OWyx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19B4B2C181;
-	Fri, 21 Mar 2025 02:46:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742525197; cv=none; b=qmXAt5bx33iCFrrEvGEx0ZcAL89CPGMTiZgBapUKq9nMPBsXYnoqPI7IKCh1oNzCl8YtAl6f0HXTe4nxBBtRRvqPmnvbtE7GIyHQinC6dpP4AqW3RUKsjMgy5IR8afZjTo4ia+FKgv/IkbauTGAz0XbQJtxeXRDipGDyyciZYyQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742525197; c=relaxed/simple;
-	bh=5YFJ4sppFasaMWh5wwmJ+8tCZ1UMVZfTqS2zO2n+C7U=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oHhU5WP3xsx8aEj9p6LZpwPMoTgvkbZ7A4xWfaHtkj69o1v3062aYDnblRJZ5fZT0afNsMXeqEn+qpw/M/5RLQnhV00ziMZbhCZI+NZ4neQlr7ocpbexMtygeRoqegdrFYJSEBlLUWjb5RrGiz5a+9nmymVeeBqwT7T7DPgPNaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=e0AOYVyK; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 46ABC2080B;
-	Fri, 21 Mar 2025 03:46:26 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id s33V_ZTdOBfI; Fri, 21 Mar 2025 03:46:22 +0100 (CET)
-Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id F258A206BC;
-	Fri, 21 Mar 2025 03:46:21 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com F258A206BC
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1742525182;
-	bh=B5J9/6SKPE0aNLeeNrIjy//GiyE0yPhks94Qv1Dw1fI=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=e0AOYVyKCVjeFxSit+/Dta/0OqbwtDrLGopMxtLH86E9GsYj2L+4hg15zw5VrNHIx
-	 T7QMhZdLb8IRHbg7XnAuL+Q1jy0PKLVfH/nPEPCw9h9CafWGXzIQtN4KWZvVH4BgVv
-	 0A+41B92txTHi0NeT+fDsU1jabdQM35A22nSixxlpS1TZ6WikJRa3EYzToGiqpUuxf
-	 e0g4vyz3J0RdAFfbP3xdn/WhUiLNexPvDhdJG/94TEd28UUEkw1SDzLfoBuUrKoQi+
-	 nQg7pYJT71/1wSMsM7s9olVB2czTxYlo6r5U0ASD/cDw88YXW/4xmuXPS7OK5g5Oas
-	 7TuQVL+HPi53A==
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 21 Mar 2025 03:46:21 +0100
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 21 Mar
- 2025 03:46:21 +0100
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 99DDD3180202; Fri, 21 Mar 2025 03:46:20 +0100 (CET)
-Date: Fri, 21 Mar 2025 03:46:20 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<kernel-janitors@vger.kernel.org>
-Subject: Re: [PATCH net-next] xfrm: Remove unnecessary NULL check in
- xfrm_lookup_with_ifid()
-Message-ID: <Z9zS/HL/5o+Yd7t3@gauss3.secunet.de>
-References: <2eebea1e-5258-4bcb-9127-ca4d7c59e0e2@stanley.mountain>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94BA1876;
+	Fri, 21 Mar 2025 02:57:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742525855; cv=none; b=Sr8Vqb+hzgyEhslxfktcXSiq3H4a26YaI3a8Yu8Mt9VG1r+JecP6+JX1+x0Nrve6Xocrh7kLyRq8rQEiizhEoOUQjfqR9ZXje5ztTfaDlRPcVkslBET84F9lbPzSSdTcSeoyVUmjrTb6EEyHmBPbOvUimFCCi3BsTxTukYcg/fo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742525855; c=relaxed/simple;
+	bh=z00h5ZccuBaL/+cbY4BTvFWBuLSy7a3O8PySg1+sgEo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=In4+0n1uHiqmr6sNRW+z2WzUVCtnwPWxSj0Q7kkP4fgjy/7kI06aduDyNQ07b08DPyKsN/otgm1oMWhqGMq7qSbTM71nMbHU7WTOzJqxjVtSAgvM5VYye6Er7ofUa4ec+AdwVXNAo5UOHl5xFYbLLbmUijOuShNXahTyFvgiMIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SW/4OWyx; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-225b5448519so28584025ad.0;
+        Thu, 20 Mar 2025 19:57:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742525852; x=1743130652; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=8EHp5t0i20unF9PUlSCsvUF3XIGotNl9hAodY6Jg+Tg=;
+        b=SW/4OWyx1gBx/5xHYJq5sp5dUI+YLHfa3P143gjf1zJXBJK/FmE2qhcVlWr2xcO7rq
+         KtImvZFgWCi5Gk9n+qYi2ZLQ1Uvr4xtWTf4IjDJDeaJ4nw5UagwYizc6U+sAx4wvo6w0
+         LglNgYmsEwIi28f0RwwHAVhIuu75OHRN/LOfrLHPopf2JE2uUJg+ZBnq3JmAnYBk6az7
+         a4f+raFVSeqxXbxj8aC1Nny1jUPDSvUDkkBSmpng0zw4LLCT7Cq2q7HXJW3/6ZuuEqUG
+         WRWSqourOOFVUlZJVL0dUagx/QQHw/jyawHuFs+yQkfnpfIEybkfBG/lXbkBs/Ek+5Tc
+         k1Pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742525852; x=1743130652;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8EHp5t0i20unF9PUlSCsvUF3XIGotNl9hAodY6Jg+Tg=;
+        b=EqnSp4IiT/s6LoX0QRV13+LVeiGQOSzdadcRGVkT/DKKBlWRCcgr/Pkk6BzEbYIaKc
+         9AXWNZNCILmhrzmsN7yY3Q1httkahpN2I7rOsY/WlZ+REmpeSIoR6ksQielfKPXmqYqJ
+         /hNn3b3Q31OEx6lGm7FJYGt6tC3CoMLkElPs6sef9c1fbf0A24M3tiRZN6XLaIm7cIls
+         AW6rLzJ1PtIO/Z7+atj5Qll2lQFB7FofMqXchHXYCN/wPB/7MwA81DbpXEO1CcKOww6M
+         YplgLE56oWUweu7LTbRCu95mSe4Yj7WZfh865C8jdCWrjl5OKpXnkbLH9eo8wuHhOz7+
+         J1lQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWnDGdeNzp9cRvS7MLfWsedP9e3WxpkcYOqeWNpeLtpHx+h59gFD7ulWunPoYQhu5NvyACc3o7j@vger.kernel.org, AJvYcCXDMMh+eaArU9zFe+KQ3b/tUcRWRdcMGNgPg3mQViFnE2Z+PwmJkerA504x+KYc4+NbkseuYJLwcoBygl4pHjjS@vger.kernel.org, AJvYcCXbHBz/GzBPFPw+tCFCz/IcaTxfgtDg6GmCQFRogp2fo/avB8Bs/kle+vWundlpMSxhZGgY9CCKR8sVmks=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxX2Thi5QQY/Rrwh9mPm8hc+/7ccBsbHLo5KFpeOr18rCrLNp1b
+	NQNzTWei40qkCHMc9+EJj31V2PqxLgUew9hyKRuDmnV2Aa+RVjcTys4q9OgL0O4bIfp9gtLi63R
+	oOtKGuPT0ZOMJw2zBEBO0ugcPrEQ=
+X-Gm-Gg: ASbGncsn88hEsCcDstz/K+lJJF13ZMMyBfZd3optzrXMNliUegBthy+cIdWXcVzCsLo
+	Q3mhbVKAVyJt4SGpItoY3/nmlgya5AtJyOmGwjhnlDDZ7gxVCR7ZzWcCAa5Veh0UZ2zBBi9JYiT
+	PeIT7RuCMs9O2Jmw6HP2ltDEYEvw==
+X-Google-Smtp-Source: AGHT+IHqqWN6+ajO1aoK/OwTZYrxuIYCCIBXPSEsBEaXovcRuW0fTstyDicQ8DJu92TyLEAfFg+Jw2lhddhMiCHkQt0=
+X-Received: by 2002:a17:90b:380e:b0:2ff:4f04:4266 with SMTP id
+ 98e67ed59e1d1-3030ff0da00mr2142555a91.23.1742525851890; Thu, 20 Mar 2025
+ 19:57:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <2eebea1e-5258-4bcb-9127-ca4d7c59e0e2@stanley.mountain>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+References: <20250312-tcp-ao-selftests-polling-v1-0-72a642b855d5@gmail.com>
+ <CAJwJo6bkdeGh0j1ABfrMQ3dRD7frEsNnJERWP8-jJs8dSYFwYA@mail.gmail.com>
+ <CAJwJo6Y9g0JYiLY-taxtj7bo=Jy+U7bqTFsQjhgu2Re7BgaLsA@mail.gmail.com>
+ <20250319-abstract-classic-woodlouse-66eef5@lemur> <20250320-fancy-chital-of-attraction-c7a096@lemur>
+In-Reply-To: <20250320-fancy-chital-of-attraction-c7a096@lemur>
+From: Dmitry Safonov <0x7f454c46@gmail.com>
+Date: Fri, 21 Mar 2025 02:57:20 +0000
+X-Gm-Features: AQ5f1Jr_MpnVghd8h5FM2vWxMUtRq4g3LttZUr_Z6sAGSLtIeZGZ_tXFITcrlMA
+Message-ID: <CAJwJo6bQq1vWr+xQDnHK1aVzdXXSoh0QHuv9ue-OOutCt5epWA@mail.gmail.com>
+Subject: Re: [PATCH net 0/7] selftests/net: Mixed select()+polling mode for
+ TCP-AO tests
+To: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+Cc: helpdesk@kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Mar 12, 2025 at 08:21:13PM +0300, Dan Carpenter wrote:
-> This NULL check is unnecessary and can be removed.  It confuses
-> Smatch static analysis tool because it makes Smatch think that
-> xfrm_lookup_with_ifid() can return a mix of NULL pointers and errors so
-> it creates a lot of false positives.  Remove it.
-> 
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+On Thu, 20 Mar 2025 at 13:51, Konstantin Ryabitsev
+<konstantin@linuxfoundation.org> wrote:
+>
+> On Wed, Mar 19, 2025 at 09:18:37AM -0400, Konstantin Ryabitsev wrote:
+> > On Wed, Mar 19, 2025 at 03:26:27AM +0000, Dmitry Safonov wrote:
+> > > However, as I sent the patches with b4 relay, it seems patchwork is
+> > > unable to authorise me as the author of the series. Ugh :(
+> >
+> > Oops. We should definitely properly handle this.
+> > Sending a note to self via the helpdesk.
+>
+> This should be handled correctly now, e.g. see this series sent via the relay
+> yesterday:
+>
+> https://patchwork.kernel.org/project/netdevbpf/patch/20250319-rfc2203-seqnum-cache-v2-2-2c98b859f2dd@janestreet.com/
+> vs.
+> https://lore.kernel.org/netdev/20250319-rfc2203-seqnum-cache-v2-2-2c98b859f2dd@janestreet.com/
 
-Applied, thanks a lot Dan!
+Thank you, Konstantin!
+I appreciate your fixes and b4 development.
+
+Thanks,
+             Dmitry
 
