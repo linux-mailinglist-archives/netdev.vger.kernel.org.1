@@ -1,99 +1,115 @@
-Return-Path: <netdev+bounces-176786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60AAAA6C226
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 19:10:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AAD0A6C22D
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 19:15:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C90EB7A9055
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 18:09:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7BE84827D9
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 18:15:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BAE222FE03;
-	Fri, 21 Mar 2025 18:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A95041E7C25;
+	Fri, 21 Mar 2025 18:15:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KzBEiM9Z"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="UDGkLwOJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B8A322FDE8;
-	Fri, 21 Mar 2025 18:09:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CABF113C695;
+	Fri, 21 Mar 2025 18:15:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742580599; cv=none; b=J+xwIscMS7giXQADDDz4l/WV+rj09lsbBS3XTZ1X828hQwoQkFZT92UZAqLvSbbW+2qpcgjEKryKm0rRbwWTTx9+mCOYT1blT0xVtxZ/cTCelQuebr+g1uVUPnIhHOTnksOBTUU+aMEUys3W9pXtdXMvpalu9UJpmcydNqwifRw=
+	t=1742580940; cv=none; b=RhO0DwKpUGuzSK7j2V3d5x8jmWJwxmAxl7Wjb+GZpuDfP9Xk4BFocl6rfjsv47uTFt3zLFM862SogQdiazseyFw5o/ILaW6Q65ifX2+XgarENgOSv5q+SgXaFQeFYdYsjCWTPmCBJ01Q55Wt0UEcJnIFjKQEExr/Th/KBdQzLoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742580599; c=relaxed/simple;
-	bh=+wBfr9S9cNjj8/xFM+HmotmhdevX1l4hpYUE3G4YEOM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=EsqG/a4t7B0v8xabyP15e1R5VjGIZFU8tH1e70zwfDwUEoA8hNvHktDbiU4vQ3Pj5Tuf9iQfsWkmo5Lo2oL1xPj60G67k6BcPYUvVUhHEo7kRrBHAqrUbldIY9HU9RXYhca+m9PcnUbd2BneBgJn1E0YPNKlQJtkBVvED0EqMBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KzBEiM9Z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4A85C4CEED;
-	Fri, 21 Mar 2025 18:09:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742580598;
-	bh=+wBfr9S9cNjj8/xFM+HmotmhdevX1l4hpYUE3G4YEOM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KzBEiM9ZwGFcuvdU8Q5SycJo3tqJYbPresmAZC8RiVG/POZMUUhMRnLHk/DfzVaOJ
-	 9tv6LSdry3FusqSnhQuF481sTXsSWzryzv1y0cNQ7qKNj+pkl3EcXLt3AvRYUXbchS
-	 2kvvE1Xb4ccl1HYMeIP4U+DYKnkyXNnLoe3FwksjfXa8GE7PzBy/F0v6j3feuzh8vO
-	 brtX3X7LP2rdoZtKVm6BXBfSndbvcabp3M2QaxaU2Y2H38cMAwUaRuaq5I6JxYEczU
-	 uLTIt28raJ6hM1CLWP3e29hGQGpV6gzc/u8FDI8DjaPKWoN5fJlVg417iUlXJuX8f8
-	 3J5mxQOZcphHw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE163806659;
-	Fri, 21 Mar 2025 18:10:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1742580940; c=relaxed/simple;
+	bh=iAq4y/BTk/MAEwUl7X+7XcMLVXDWQGMRVeU3Cnms5Pc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=l1Bb3Wa2GvjYTyaxbMwZvdAaTL4DRftjpyHHLNnydl0uuQQ3VRcOqkpQ+uMlS29m1ZaRe+b9ppi6sw88Uw4dgF4uCnR0J0iXseoh2bvnxH9VXd2/Ifr0h0bmiIBE4o8OBRKfrtOGXtp+nDsYV8i4PNrejMNPbPSA4rW2VvKiFC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=UDGkLwOJ; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 309B2442C9;
+	Fri, 21 Mar 2025 18:15:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1742580936;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9i89mOUewMbia4ZPRxR3kcufVYyKXRfB/Vul82O5Bbs=;
+	b=UDGkLwOJHkLDgxwCxRitwd7kkWi0RaDTLb3Wx9JrIe3eq/TKlDlSjMKhD2YIy4ELuc1bDi
+	kahWsSTPhwb0wN3kZx25zZMrOVEPyxh0Ob6lvnXGLVPYIOR6V9pnA76Gs87c6PgAmb4mwK
+	bz7s8VdunP4FdVY0Xc8+tmZExUrjhcbZcW2VB7bSUX+w4yuhhhonl0P92IQxef9a7ogUqf
+	StLBBBPbPzls3iVnNjaf/uIKcIK6aqUQGEhV7uWJmFxhbe+7mzXqg0jzQvuN8Yr2/I2PJa
+	dUB8qBoKnNcEDVSyg6sd9mhb3tEbno4v1juAC9pzm48t5BQwodhph9xwy/0SGw==
+Date: Fri, 21 Mar 2025 19:15:34 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, Heiner Kallweit
+ <hkallweit1@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Florian Fainelli <f.fainelli@gmail.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Simon Horman
+ <horms@kernel.org>, Romain Gantois <romain.gantois@bootlin.com>, Antoine
+ Tenart <atenart@kernel.org>, Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>,
+ Sean Anderson <sean.anderson@linux.dev>, =?UTF-8?B?QmrDuHJu?= Mork
+ <bjorn@mork.no>
+Subject: Re: [PATCH net-next v3 2/2] net: mdio: mdio-i2c: Add support for
+ single-byte SMBus operations
+Message-ID: <20250321191534.39e00de3@fedora.home>
+In-Reply-To: <20250314162319.516163-3-maxime.chevallier@bootlin.com>
+References: <20250314162319.516163-1-maxime.chevallier@bootlin.com>
+	<20250314162319.516163-3-maxime.chevallier@bootlin.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/3] mptcp: fix data stream corruption and missing
- sockopts
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174258063476.2577757.8120263638217782204.git-patchwork-notify@kernel.org>
-Date: Fri, 21 Mar 2025 18:10:34 +0000
-References: <20250314-net-mptcp-fix-data-stream-corr-sockopt-v1-0-122dbb249db3@kernel.org>
-In-Reply-To: <20250314-net-mptcp-fix-data-stream-corr-sockopt-v1-0-122dbb249db3@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, fw@strlen.de, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, amongodin@randorisec.fr, stable@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduhedujeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudekpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguu
+ hhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hello:
+On Fri, 14 Mar 2025 17:23:18 +0100
+Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 14 Mar 2025 21:11:30 +0100 you wrote:
-> Here are 3 unrelated fixes for the net tree.
+> PHYs that are within copper SFP modules have their MDIO bus accessible
+> through address 0x56 (usually) on the i2c bus. The MDIO-I2C bridge is
+> desgned for 16 bits accesses, but we can also perform 8bits accesses by
+> reading/writing the high and low bytes sequentially.
 > 
-> - Patch 1: fix data stream corruption when ending up not sending an
->   ADD_ADDR.
+> This commit adds support for this type of accesses, thus supporting
+> smbus controllers such as the one in the VSC8552.
 > 
-> - Patch 2: fix missing getsockopt(IPV6_V6ONLY) support -- the set part
->   is supported.
-> 
-> [...]
+> This was only tested on Copper SFP modules that embed a Marvell 88e1111
+> PHY.
 
-Here is the summary with links:
-  - [net,1/3] mptcp: Fix data stream corruption in the address announcement
-    (no matching commit)
-  - [net,2/3] mptcp: sockopt: fix getting IPV6_V6ONLY
-    https://git.kernel.org/netdev/net-next/c/8c3963375988
-  - [net,3/3] mptcp: sockopt: fix getting freebind & transparent
-    https://git.kernel.org/netdev/net-next/c/e2f4ac7bab22
+As a side note, it's kind of a strange coincidence but I just had
+access to a weird SGMII to 100BaseFX module (so with a PHY), and from
+my tests the PHY only responds to single-byte MDIO accesses !
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Trying to access the PHY with word transactions on 0x56 actually causes
+the i2c bus to lock-up...
 
+For the curious the module is a CISCO-PROLABS   GLC-GE-100FX-C, and the
+PHY id indicates it embeds a Broadcom BCM5461, probably strapped in
+SGMII to 100FX mode.
 
+The EEPROM reports strange things though, and I can't get that module to
+work at all, the SGMII autoneg appears to go wrong and I get link
+up/down events all over the place without anything ever going through,
+so I don't think I'll upstream the fixups for the module. Still it
+may be another use-case for single-byte mdio-smbus.
+
+Maxime
 
