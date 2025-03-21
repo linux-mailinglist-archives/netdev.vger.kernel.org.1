@@ -1,115 +1,125 @@
-Return-Path: <netdev+bounces-176713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88089A6B8EF
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 11:41:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27528A6B968
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 12:02:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B2863B6B47
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 10:40:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA0D83A72E7
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 11:01:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7ED521C9EE;
-	Fri, 21 Mar 2025 10:40:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD979221F1A;
+	Fri, 21 Mar 2025 11:01:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="GGV8D1vt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DgKBqOMi"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B6251F2BA7;
-	Fri, 21 Mar 2025 10:40:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96A7921D3F9
+	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 11:00:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742553644; cv=none; b=jekqsqWrzsGrhwJopUfcAA/uEX6rShPg14bcxtJq+3nZ+Bcy957srVp480nxd8eKFA6Kal0yhPOqI8MfRVBr1GPyNqoLI77wZoDioVVTGlUaWLiYlVuoF3MKvE3mUT+h8CdVIqrAEL/NRYaDaVqscg6bW/64ngAhCfoGtoSOu54=
+	t=1742554862; cv=none; b=rDpdVgo6L121eEZmmpX//snejCb/wfRAWpKaerMmqUZvpZlbm+C9+MCTdFPZPYHFH9n+wRKSAHf2Sd+6vmZc9uuDkxVE7F/dAccYqYRVsbtw7rh3jAQNaPKsJI8/fjLk+r3SpR6wU0qCEC5SVL7ap49CV3o/oU0on1zmEoLqdmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742553644; c=relaxed/simple;
-	bh=HuRp+OgfKMnOdWEmJ1aMEoPxU4od8JYcXA6lcrR/l1w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kcxxVNKKx75lCiW8kBVDM4fps/RUqY791RWXj+V8DoHHjJ9R2WV4fV/t9GVFC5ukYDKgs3YF/h6zb2du8by1eebA6YPpunsgxONRPxk/B5QB4Ie0DUc2GoAHqfJ/RudwtKAT9Oqn9xs4yhG4I0YPFPGiWgdg4mc2dChK8Wx0MeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=GGV8D1vt; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=w0LKCPTWLqOz0v0nFE+m771YyCcWhP2oMeKQU76uMec=; b=GGV8D1vtw9RNsDDh0sGL/X/tYv
-	usnovAyelwqv0yDopXgbrW6cYz0L5Bs2S/E+Jvo0w1H4nbClisHkcSex6ceeD2aFDLNUM89EsFqwQ
-	SshPS4xhujhu9WQoDE4SPoLqgs439O+PNOqOi52YnQPZdANuRf0qw/qYJMCBFJl7PqhOVA8r8h6Fo
-	U2dF4m6s2JfRh4TID8XKCVac42mgFPDV5+Lhfn9BHz81vR+Cavkl29IrFUlVaC8MV5muLolcvTdiU
-	j7bMAEnNwvpO/teQRE1uVsJcENho2xqr1OFywzPafJ2+6938uJNVoqeSkquEb4KH/rXI7cy/9FFvz
-	J4VVLEeQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53034)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tvZnm-0000S9-0C;
-	Fri, 21 Mar 2025 10:40:34 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tvZni-0007aA-1A;
-	Fri, 21 Mar 2025 10:40:30 +0000
-Date: Fri, 21 Mar 2025 10:40:30 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Simon Horman <horms@kernel.org>, alexis.lothore@bootlin.com,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Subject: Re: [PATCH net-next] net: stmmac: Call xpcs_config_eee_mult_fact()
- only when xpcs is present
-Message-ID: <Z91CHjqVc0-BmTPX@shell.armlinux.org.uk>
-References: <20250321103502.1303539-1-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1742554862; c=relaxed/simple;
+	bh=MClhHYdDYbfSs0X8oLGlhpUPZfPqb+p3CJs/tABView=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=E2FijNFevTiTxNqZCEV7G+WjAjMc9AWkopNsfH55Qlah9PwNTPWI/+QT7fI5v32lisS6jJp2FCkVeWuvdkzy93edoR3wzl+2/tLyEhv+Xey5jEX2p79nzCpRLreZCZoMADfmE8TlHMEsKYMVo33Urb8yQiDY73Q8ZhJnV3emk2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DgKBqOMi; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742554857;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kR92x38MaPIUcSwwuTEs6+JYl/zG4hCrnKTSGKNxEmY=;
+	b=DgKBqOMiH2FVqKxz1Dd7St4oJYKQgm4/4mOE14oGvylDG6pPmx8Ts68lfeyInDVwEPvJ7C
+	5J4SmGJ1CTZPn/ZagCD75aFu+ScBn5UqgXKEIAijZ1+BF5n3j//wjPtCSRYwtbdZ24AmyK
+	v+ZlN/wpECYEqaE1DRS4UQHPQHrRyK8=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-492-mTF1tTljNOaFqWdAEVoigQ-1; Fri, 21 Mar 2025 07:00:55 -0400
+X-MC-Unique: mTF1tTljNOaFqWdAEVoigQ-1
+X-Mimecast-MFC-AGG-ID: mTF1tTljNOaFqWdAEVoigQ_1742554853
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-ac3a9c3a8f7so182469266b.1
+        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 04:00:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742554853; x=1743159653;
+        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kR92x38MaPIUcSwwuTEs6+JYl/zG4hCrnKTSGKNxEmY=;
+        b=NP+Q/NTvqFfwdUOMmvS009o9/YRuG5BbWBSug1CcWWM8I6fox548L3RVO3lHIhU39/
+         KgoiLXxPmzpec86nNNHCkVvV8GMOIT4NwPZsr9hRXLbXYE2UDdDbNs+jvTML04cWJSnO
+         XrGIwUxb7Bjd2enGbr3B3+MLPqu7BX1SLMf0O1ldaTHYNvcb+zkaTeFlaECQGU+FQ1wS
+         BkDcqVYbgs0AJEk4Ou6XHJfkgZhh4RYvLoR7NGSdGTEq87w0DFAnOMM3hjecGpYbh3RO
+         YM1tO4xtQDv6SxA/tlZI+cgBpznbCKAty/NVEFNhj0F8+Ctr0//sVkyvDO8lxwRnFTTd
+         pnkg==
+X-Gm-Message-State: AOJu0Yz+HmDTYLdgJs5mqRSd0ZshvpadvRD9ZXQn8TPHZ3Nn/lY+N4Oy
+	5+YpS5awgsW74W5CsufH3vCJnN0/rpl3A7c8v2MuK5SGmw2seXwwSlFEKKzPCFnW8ZXv3NR4XrL
+	AAY0TfSmth/XPihWxTYN8o0TqQJlhc34mirIJFsUPlvI/9LRT9WSXUQ==
+X-Gm-Gg: ASbGnctspJCgiieK0tzUZUx6HVBZrV00r3yEnleke8Xdu1Lm3Gt3m7RYRm8nQw/2tOd
+	Vij9taVh9nVf0PxyuyGku8F8LUC3btxZwnbIUm15XjvcNa5e+8CGirDmgR6TVU6mfGeP43Uxrs1
+	ypuDiy5PfhOju75u3eD828B//O1P+KmFIhCy8kPx/FPwGe1B1WTVKQeFQpXtoZJcaLGzbeiTLHR
+	552CXlraJNCX47BjlHRYRMhw22+elJ7mpqhRtV+wyOYTfXgYo6XQqc1RuJo/7VMYorzOu1BMyEU
+	sabl6Q3Wg2VCN33llMqzk3+icjBI5g/jhTzT/7lcqHwXW3qL2/mYc9tbG7OR
+X-Received: by 2002:a17:907:7ba8:b0:abf:6ec7:65e9 with SMTP id a640c23a62f3a-ac3f24d7921mr264857166b.43.1742554852929;
+        Fri, 21 Mar 2025 04:00:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEUELeIFk2iV4bJhmhlsWZybhpWr1ETkAjOnrpXoDFpNR4vvFc6TbQxKArtqciFKT2yl++k2A==
+X-Received: by 2002:a17:907:7ba8:b0:abf:6ec7:65e9 with SMTP id a640c23a62f3a-ac3f24d7921mr264852566b.43.1742554852498;
+        Fri, 21 Mar 2025 04:00:52 -0700 (PDT)
+Received: from [10.44.34.122] (5920ab7b.static.cust.trined.nl. [89.32.171.123])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3ef93e1bbsm129520966b.81.2025.03.21.04.00.51
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 21 Mar 2025 04:00:52 -0700 (PDT)
+From: Eelco Chaudron <echaudro@redhat.com>
+To: Ilya Maximets <i.maximets@ovn.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ dev@openvswitch.org, linux-kernel@vger.kernel.org,
+ Pravin B Shelar <pshelar@ovn.org>, Aaron Conole <aconole@redhat.com>
+Subject: Re: [PATCH net-next] net: openvswitch: fix kernel-doc warnings in
+ internal headers
+Date: Fri, 21 Mar 2025 12:00:51 +0100
+X-Mailer: MailMate (2.0r6239)
+Message-ID: <1FAE19BE-E1F9-4836-9AF5-5EFB7FD291AD@redhat.com>
+In-Reply-To: <20250320224431.252489-1-i.maximets@ovn.org>
+References: <20250320224431.252489-1-i.maximets@ovn.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250321103502.1303539-1-maxime.chevallier@bootlin.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain
 
-On Fri, Mar 21, 2025 at 11:35:01AM +0100, Maxime Chevallier wrote:
-> Some dwmac variants such as dwmac_socfpga don't use xpcs but lynx_pcs.
-> 
-> Don't call xpcs_config_eee_mult_fact() in this case, as this causes a
-> crash at init :
-> 
->  Unable to handle kernel NULL pointer dereference at virtual address 00000039 when write
-> 
->  [...]
-> 
->  Call trace:
->   xpcs_config_eee_mult_fact from stmmac_pcs_setup+0x40/0x10c
->   stmmac_pcs_setup from stmmac_dvr_probe+0xc0c/0x1244
->   stmmac_dvr_probe from socfpga_dwmac_probe+0x130/0x1bc
->   socfpga_dwmac_probe from platform_probe+0x5c/0xb0
-> 
-> Fixes: 060fb27060e8 ("net: stmmac: call xpcs_config_eee_mult_fact()")
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-Yes, I had noticed that but haven't had time to patch it, so thanks for
-submitting the patch. However, I think the code structure could be
-better in this function. Let's get the bug fixed, so:
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+On 20 Mar 2025, at 23:42, Ilya Maximets wrote:
 
-Thanks!
+> Some field descriptions were missing, some were not very accurate.
+> Not touching the uAPI header or .c files for now.
+>
+> Formatting of those comments isn't great in general, but at least
+> they are not missing anything now.
+>
+> Before:
+>   $ ./scripts/kernel-doc -none -Wall net/openvswitch/*.h 2>&1 | wc -l
+>   16
+>
+> After:
+>   $ ./scripts/kernel-doc -none -Wall net/openvswitch/*.h 2>&1 | wc -l
+>   0
+>
+> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks for taking the time to fix this. The changes look good to me.
+
+Acked-by: Eelco Chaudron <echaudro@redhat.com>
+
 
