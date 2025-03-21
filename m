@@ -1,127 +1,152 @@
-Return-Path: <netdev+bounces-176740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9634A6BCD9
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 15:22:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFEF7A6BD04
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 15:34:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CDE81678A0
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 14:22:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 195AC1888CDA
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 14:34:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 291BD154426;
-	Fri, 21 Mar 2025 14:22:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B42C519CC20;
+	Fri, 21 Mar 2025 14:34:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lnBN/dqm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4682178F51;
-	Fri, 21 Mar 2025 14:22:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAB4315530C
+	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 14:34:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742566955; cv=none; b=XEQqvlsEGXacZRpwA3BujO5Y7CoJIX4P3jPbAtpn6ocydiK96hv+H9nzKhEo2Q6x4VUMdwM4siU04JRidoP4i6DPy0drgq83U9HeNV1nYaHSc58FtB2BvFenKyw16CIEDql4IPuTJ8NpGK6/73kpHKwPdKhmqMuFpTP1Uf9emmA=
+	t=1742567642; cv=none; b=rwVGUkyCfTkbpLJ1imT4W+g3wslnQ1x1hj8mxxrGxLNuENfiRBXOU7ANZEn54GUVnhSnEELkd94XX363YZfZRJIIHD8Fxpt4yJ8Qw3I3xuJT/Or+rszsYvSEcgehq36tTZYRvHeOPQUe6R509NRcpZ7X+9zFvp9aZe7vk8tcQ0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742566955; c=relaxed/simple;
-	bh=CQZ8kkNl63C+QjvQ7gFi/96yZTVOu/ee44z80daZagQ=;
+	s=arc-20240116; t=1742567642; c=relaxed/simple;
+	bh=W/Choe4F+HesM2Ag6P961vQ3ByStwVx0DvebiOSt3yU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cNllpnTIPSnvoL9euGGIW2stKMOW+Y+HtglRvInJPpbfnLhyBrR0BFtd1oVqYQ+phMOljNQwKT8CSq7XeshFyY/oBINnkKevc9cvJPw6wnrFnLSPlRIVF76UBPfAy7RJkUoZaqHSSe1ieo02TRr4DMrI2crA5RldMcrGDYCeLUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5e61375c108so2685759a12.1;
-        Fri, 21 Mar 2025 07:22:32 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=nFYYXzmi9X+8L445gLwUWnPHPloLBNXveRV2gfmkBA7+1gFoWb5IaDwyngc0CRZxZja0YWfmTB44N4BWHhRGhq+j0zL49oe8+9IzD4ZN9ctsoGHvJdwhXaH05HvhMWrWgxt8BKhDhsnqIXqKHwJZo5vNI6j0CdU0BZRVbJNoQd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=lnBN/dqm; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-43690d4605dso14118735e9.0
+        for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 07:34:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1742567639; x=1743172439; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=NDFTE8hJf664+Rg33pEXoWr+oi9/NElSsovpV+SufLc=;
+        b=lnBN/dqmCG9KLRNN7TjFxXnJ4osjn0+J8HisZMucyrceDREhNgD9JUFntlly8LcoVe
+         m2p1FXFtK6rVb18gv+UY37j1orj/lYrA1f8N0iRveW7B0QljT9FndvGlkSyoYcx5Hnae
+         ISAIxwV+/1SN/ybvYkqY6K/oTfXa8tgCvGzVUXgWe9PjM09yBURISsmRLCAc1IiugdJy
+         uhItJKrwcR1G6bpT2qkCHCjjOL05LNcCYrL43zxTI2ikrlLyt/+VNp6SHpV/AsRBKgtu
+         orU7GxSUZy28C1wJipaOmXwpxcMWOTFq4oKRVlYj+MSxka+NUYT5wMEE0l54Rlj9Ak36
+         oyRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742566951; x=1743171751;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6zrlrukzDiw4iVxK9TyD29phGrqtRDGCavFyioGRMQs=;
-        b=rVEid82MnirIcLyn2qFt2u8IjUMq1GMBSBMYKVBf918JGeUuMuVvatbFrMwxOwIJWX
-         2qaRCapmjbecr+ekIZoI92g3jsmw4dLrbi7jDDeeiqxuNMmISW1Q81Fow44vwgBqGgJv
-         1n3M8n5147td2XlPsU3pb4tvcTCmEN3OfDkOwkbbqU1n74ELPpb7e83+MEVFMrwt71rS
-         nlWGUwVUE9SqjluxtABmfKZ84wV7boQRFnphlgRlYar4FDIR+9Gr9V87jBa/y+VKCrvS
-         zKAevY9VspjtYQ9SA/tzO+uCAKxflbOWbmha0ig1WT7kPJbtExzoiRmYlEQuRCuNWGBv
-         I8vw==
-X-Forwarded-Encrypted: i=1; AJvYcCUjP43zGJtcz7S576ylxYwVnZU3pJZ55eH+gID1VYS/UyoReuc8tlIrOy1VC/q/RGm6MuCxxnTgNj+LHIc=@vger.kernel.org, AJvYcCXl2owR/NwNQVn39b+2NaKAGhrehj3C1vUbwTUv+wdMdBdqllzTH7HqRokkwF0Oybodyi9nliWT@vger.kernel.org
-X-Gm-Message-State: AOJu0YwphPRRAqL+VTim4nUFWf+Mmlo5NHV6UsT3CJD29eBxN8qDhCcA
-	eiDyKyqZbQk40SEPebzlM1wz772gbSvGQRumTeR/1va+AeIwLMgD
-X-Gm-Gg: ASbGncs7Oe9fWiQCfLoNN/IVD3z7oGbOR8wzSbQvxpbVFsbCKe3Fw2mxYy8Z2sQCuv+
-	0oxSmRmlghwWg6jVgHG/fKstabdysrlLNXpp3O5i77h7XHN5Jt9sCMNtcb9FbASCp2IMhwletcn
-	mRbLvJbLlU6+vrcri97ObBdNrWH8ng5c43oNnAo3DD0JSbnYnH/PU759pSGSbj6NGHxjlzU1lE2
-	pnsvIVsw0YUg2wMeUAucb4YcR8mM5pMUrgw8nW3t7V/6C5/R+nG9PsTGEGDbAt+CQBh2/0VwtLj
-	b4fuOdbM/n46xs0OI71Eh8OpOBZSH6Xkk6M=
-X-Google-Smtp-Source: AGHT+IHxkoIcgQxBbj0ciatdL7H4EBGHVSGfFVFHwRZVnlMCWlyOVBnZV3aq1Br4MZ+u1VewNyVCmQ==
-X-Received: by 2002:a05:6402:234e:b0:5e7:b092:3114 with SMTP id 4fb4d7f45d1cf-5ebcd4337e2mr3314190a12.9.1742566951167;
-        Fri, 21 Mar 2025 07:22:31 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff:2::])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5ebcd0df302sm1468638a12.66.2025.03.21.07.22.29
+        d=1e100.net; s=20230601; t=1742567639; x=1743172439;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NDFTE8hJf664+Rg33pEXoWr+oi9/NElSsovpV+SufLc=;
+        b=h9Gbk4VLIX2IByRGS5tNhkYvWhqpom2XM2VdWtp1kYunwPSnSwNU7tdIsZ0B14AdDO
+         PVEB2+hLEGrarhEiNvbIN+cdjsk9CnH9SEbziVyFfW9pn+Psa7q6PO3SncCrRn7oxIay
+         2YhRYGPwd6m4sF7tpxIC9LS+LMUUWLJuHlk2cRTUbU8ZFcC4BSUDU1X+ACpJ96Dmz/+i
+         pK3OcNf4jNbG1BpYET7up6AiFv3RqrgJDkNq+/8OYYAHxv8K3FQEgquLp2OdXPOauzR/
+         P2iJnIKwD50uetL1o/0tAIOi4WkqG+NurqmX1rcQfA/FNJdXd6IGK5IUzOl6gxZl2utW
+         x12w==
+X-Forwarded-Encrypted: i=1; AJvYcCU/4hQf3XM7qXhog01rxKuwfMcFlTUN4A3BcjfNbbN8p7GWw88Cdwj0If+lwBqAuYVV8Z5PnYM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzSe3ewI6QKxONBKNmPUcN5RL/UqbtuEcQU2OHXbjVioiEiT1W
+	/C5nGhZ3yVloO72cH4Tzpd6EefJxxkWLkG6M5fEb6ScRYPKxd/zWtfStS0gqSrU=
+X-Gm-Gg: ASbGncsfp4kcf6UeWg1buL6VBnH1q5eFxH8raNeMajwenAJVpvTwL7ztJ729RfchMva
+	nyOsmmZvdU+KtVyRTraXGyuKbougSQ/yPjN2ULpvQWTHzBHcJeQDQ5F8NWFemg0N3HkGWtloKG9
+	95G4i8FJQOxkGY1s3WtFkyigskic+7SKmFvuzYjMkru75AM8TIzfMn8DvyJO0ZliHXZElIU+xrS
+	aLYXXE6ucuRrAQpPMYUkAQ0fcrBBr0rRi56UrVgiYgDBUtl2zLcw3Xwj0SiJkyqSH6TqWtOohDl
+	IUADHofufiBe82GeDN5s0SJyCJU5zf2H01yOQh9SrO6/xQQTLA==
+X-Google-Smtp-Source: AGHT+IFdpuTjxTrv9Kov/yypsxqXIzm2gi8coNYKu88l+fHfLHxSWJRuscLkjzJoa+yqv+J8xaYecw==
+X-Received: by 2002:a7b:c049:0:b0:43c:eeee:b70a with SMTP id 5b1f17b1804b1-43d5100a2camr26453555e9.22.1742567639045;
+        Fri, 21 Mar 2025 07:33:59 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-43d4fd18365sm28619185e9.13.2025.03.21.07.33.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Mar 2025 07:22:30 -0700 (PDT)
-Date: Fri, 21 Mar 2025 07:22:28 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
-	Will Deacon <will@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
-	Waiman Long <longman@redhat.com>, aeh@meta.com,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	jhs@mojatatu.com, kernel-team@meta.com,
-	Erik Lundgren <elundgren@meta.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>
-Subject: Re: [PATCH] lockdep: Speed up lockdep_unregister_key() with
- expedited RCU synchronization
-Message-ID: <20250321-olivine-harrier-of-cubism-f2ad98@leitao>
-References: <20250321-lockdep-v1-1-78b732d195fb@debian.org>
- <CANn89iLpON7eV9rHvErsoEu+GqDz18uYMv6M_4TLsh+WX9VQeg@mail.gmail.com>
+        Fri, 21 Mar 2025 07:33:58 -0700 (PDT)
+Date: Fri, 21 Mar 2025 17:33:56 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Shannon Nelson <shannon.nelson@amd.com>
+Cc: jgg@nvidia.com, andrew.gospodarek@broadcom.com,
+	aron.silverton@oracle.com, dan.j.williams@intel.com,
+	daniel.vetter@ffwll.ch, dave.jiang@intel.com, dsahern@kernel.org,
+	gregkh@linuxfoundation.org, hch@infradead.org, itayavr@nvidia.com,
+	jiri@nvidia.com, Jonathan.Cameron@huawei.com, kuba@kernel.org,
+	lbloch@nvidia.com, leonro@nvidia.com, linux-cxl@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	saeedm@nvidia.com, brett.creeley@amd.com
+Subject: Re: [PATCH v4 5/6] pds_fwctl: add rpc and query support
+Message-ID: <ac2b001d-68eb-46c4-ac38-5207161ff104@stanley.mountain>
+References: <20250319213237.63463-1-shannon.nelson@amd.com>
+ <20250319213237.63463-6-shannon.nelson@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iLpON7eV9rHvErsoEu+GqDz18uYMv6M_4TLsh+WX9VQeg@mail.gmail.com>
+In-Reply-To: <20250319213237.63463-6-shannon.nelson@amd.com>
 
-On Fri, Mar 21, 2025 at 11:37:31AM +0100, Eric Dumazet wrote:
-> On Fri, Mar 21, 2025 at 10:31 AM Breno Leitao <leitao@debian.org> wrote:
-> >
-> > lockdep_unregister_key() is called from critical code paths, including
-> > sections where rtnl_lock() is held. For example, when replacing a qdisc
-> > in a network device, network egress traffic is disabled while
-> > __qdisc_destroy() is called for every network queue.
-> >
-> > If lockdep is enabled, __qdisc_destroy() calls lockdep_unregister_key(),
-> > which gets blocked waiting for synchronize_rcu() to complete.
-> >
-> > For example, a simple tc command to replace a qdisc could take 13
-> > seconds:
-> >
-> >   # time /usr/sbin/tc qdisc replace dev eth0 root handle 0x1: mq
-> >     real    0m13.195s
-> >     user    0m0.001s
-> >     sys     0m2.746s
-> >
-> > During this time, network egress is completely frozen while waiting for
-> > RCU synchronization.
-> >
-> > Use synchronize_rcu_expedited() instead to minimize the impact on
-> > critical operations like network connectivity changes.
-> 
-> Running 'critical operations' with LOCKDEP enabled kernels seems a bit
-> strange :)
+On Wed, Mar 19, 2025 at 02:32:36PM -0700, Shannon Nelson wrote:
+> +static struct pds_fwctl_query_data *pdsfc_get_endpoints(struct pdsfc_dev *pdsfc,
+> +							dma_addr_t *pa)
+> +{
+> +	struct device *dev = &pdsfc->fwctl.dev;
+> +	union pds_core_adminq_comp comp = {0};
+> +	struct pds_fwctl_query_data *data;
+> +	union pds_core_adminq_cmd cmd;
+> +	dma_addr_t data_pa;
+> +	int err;
+> +
+> +	data = dma_alloc_coherent(dev->parent, PAGE_SIZE, &data_pa, GFP_KERNEL);
+> +	err = dma_mapping_error(dev, data_pa);
+> +	if (err) {
+> +		dev_err(dev, "Failed to map endpoint list\n");
+> +		return ERR_PTR(err);
+> +	}
 
-Apologies, I meant to say that at Meta, we have certain service tiers
-that can accommodate the performance trade-offs of running a "debug"
-kernel. This kernel provides valuable feedback about its operations.
+This doesn't work.  The dma_alloc_coherent() function doesn't necessarily
+initialize data_pa.  I don't know very much about DMA but can't we just
+check:
 
-The aim is to identify any significant issues early on, rather than
-having to debug "hard issues" (such as deadlocks, out-of-memory access,
-etc) once the kernel is in production.
+	data = dma_alloc_coherent(dev->parent, PAGE_SIZE, &data_pa, GFP_KERNEL);
+	if (!data)
+		return ERR_PTR(-ENOMEM);
 
-> Reviewed-by: Eric Dumazet <edumazet@google.com>
+regards,
+dan carpenter
 
-Thanks for your support during this investigation,
---breno
+> +
+> +	cmd = (union pds_core_adminq_cmd) {
+> +		.fwctl_query = {
+> +			.opcode = PDS_FWCTL_CMD_QUERY,
+> +			.entity = PDS_FWCTL_RPC_ROOT,
+> +			.version = 0,
+> +			.query_data_buf_len = cpu_to_le32(PAGE_SIZE),
+> +			.query_data_buf_pa = cpu_to_le64(data_pa),
+> +		}
+> +	};
+> +
+> +	err = pds_client_adminq_cmd(pdsfc->padev, &cmd, sizeof(cmd), &comp, 0);
+> +	if (err) {
+> +		dev_err(dev, "Failed to send adminq cmd opcode: %u entity: %u err: %d\n",
+> +			cmd.fwctl_query.opcode, cmd.fwctl_query.entity, err);
+> +		dma_free_coherent(dev->parent, PAGE_SIZE, data, data_pa);
+> +		return ERR_PTR(err);
+> +	}
+> +
+> +	*pa = data_pa;
+> +
+> +	return data;
+> +}
+
 
