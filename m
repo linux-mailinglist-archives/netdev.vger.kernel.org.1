@@ -1,115 +1,104 @@
-Return-Path: <netdev+bounces-176718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35404A6BA17
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 12:43:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96F2CA6BA2A
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 12:54:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0297219C02E9
-	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 11:43:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC7B2188FAC5
+	for <lists+netdev@lfdr.de>; Fri, 21 Mar 2025 11:54:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E701D224B1C;
-	Fri, 21 Mar 2025 11:42:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 789C021C9F4;
+	Fri, 21 Mar 2025 11:54:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b="Fp6eyCEn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RbAHt5Rf"
 X-Original-To: netdev@vger.kernel.org
-Received: from orbyte.nwl.cc (orbyte.nwl.cc [151.80.46.58])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE2D2253EA;
-	Fri, 21 Mar 2025 11:42:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=151.80.46.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E83BF1F91CD
+	for <netdev@vger.kernel.org>; Fri, 21 Mar 2025 11:53:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742557370; cv=none; b=CGTx4HbevyH55y0QdxRQ6Saxq5mwGW7vM/9OnnCdXhZnov4pJrYFy4F+HMO3sZxak75uRY6uTsp7/xeeh8OH+wIUovSyX2ICdra/Zr0kKt/WbZvAVgoWUx8NWOPkxBbpb5GQ27hOvfwCxLx1t/21MWg5dKRN1m90Wr8st+UY73k=
+	t=1742558040; cv=none; b=bthtjmgXRb3QdwhPEeDikzO64fhR4MqL8E8ob0vCUQS/yYjDHkpHy8KRoU/MWdoicrdZkrNSXDDRsx/+aPooW4WTG+Shkkf8IwBbv9ldflzqPudMXBmobeG5H40YsBsVERyAE6NhlhP68r36i+Gj2nzuxmNG6LuCA6IB5Hp+jZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742557370; c=relaxed/simple;
-	bh=FL7z4Ub9L6PGWrEEBQ4gbd4eCJTb6x5v6pCL30EeyoQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CiULCpHWdY0iY6GRcXy5+a5aphAqpcpLVjjUGqXtyaGptT2Dsiy84ylYQeRupdigvFZD8Z4auIHpL4DQh2UGgWfIJn9OzMDFtsdx/e+3ieV5geoa5ZCI3BHcTBHT3n1FND0RlxFPYh4TVKg0zVDPSRHow1N8sDVI5r35EUkfHzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc; spf=pass smtp.mailfrom=nwl.cc; dkim=pass (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b=Fp6eyCEn; arc=none smtp.client-ip=151.80.46.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nwl.cc
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nwl.cc;
-	s=mail2022; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=SUatzUQOETLhyGOv5BeLJaiThxY9I/fVLvbux0oPWl4=; b=Fp6eyCEn+kDEMEmPcxnB+sYMTk
-	GvmbJdhOOPpfrsHFIDcPJcNOwBj04mwOH13z2F7r06DT+NYoDV+e+2024/qY9cX/XkQzj/oXit1NU
-	8B9LMAd67NghAhQ8AwWojqsRKNXJQLiBE2lJ7lI4oreusm0e+akEp7fh7A6agov+192p051BMckMg
-	kGsnJf5YE8W1Sk2VSs8QmInKyKKXtUcEWZ35CpfswcHdfB4PlbzMoq6IuH/gfZHB5Hg8Jizr1Cli/
-	6m2gY2UEOjjwUWbAo8aIXSrg05K+PgIDspLu8mHU3eks1XvDjk+joBTMzWOO01KF3s0dmRi6E7YAs
-	DafGgLdQ==;
-Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.97.1)
-	(envelope-from <phil@nwl.cc>)
-	id 1tvalu-000000001kr-4BEA;
-	Fri, 21 Mar 2025 12:42:43 +0100
-Date: Fri, 21 Mar 2025 12:42:42 +0100
-From: Phil Sutter <phil@nwl.cc>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>,
-	Petr Mladek <pmladek@suse.com>,
-	Yoann Congal <yoann.congal@smile.fr>, wireguard@lists.zx2c4.com,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCHv4 RESEND net-next 2/2] selftests: wireguard: update to
- using nft for qemu test
-Message-ID: <Z91QshzKRlmPdpv7@orbyte.nwl.cc>
-Mail-Followup-To: Phil Sutter <phil@nwl.cc>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>,
-	Petr Mladek <pmladek@suse.com>,
-	Yoann Congal <yoann.congal@smile.fr>, wireguard@lists.zx2c4.com,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-References: <20250106081043.2073169-1-liuhangbin@gmail.com>
- <20250106081043.2073169-3-liuhangbin@gmail.com>
- <Z9rtrVk-15Ts_BNp@zx2c4.com>
- <Z91CGRP9QLdZONiZ@fedora>
+	s=arc-20240116; t=1742558040; c=relaxed/simple;
+	bh=C4DfuplG+QaUBoCfJtWluPTSb9soa9lq/2rOv6Z7LHs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sSlEwIlRWuiDG3kpoqLn8GsX/4ifNztBHhqiowJQGsWGQMU1pYo/jSVSMo0Ir8mnRzT2FJ+y57e3WP9+WP2msGRrzgUdHh7N3fhxHgRWOmhoPXnZxzeC1yGSB8MeSg38hOaSzVZPDlrumFSP93xk826QOkaV/QtaLd6ga1bHl64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RbAHt5Rf; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742558037;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=jbWKOwn3ua+s5q0HkslFl9YIXMKQietnctinFs1CPS0=;
+	b=RbAHt5RfIyqSBFzVAkS0AgSq24ZrQwDcSSAiym4YqHTwvmWD+tCYcml/hxOj2ounOjrsMR
+	dFEcuA+OpKEbKy7U7Nt0/iqmXRAJ0kiQNa+I5xgBXcVF/SUCVoiqM3ZESRbXp6FnYuRghY
+	GDFygofXV942eDTSdxkDnMinEG+ig2A=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-138-Op_KIcOxP_68wZZxn0MWkQ-1; Fri,
+ 21 Mar 2025 07:53:52 -0400
+X-MC-Unique: Op_KIcOxP_68wZZxn0MWkQ-1
+X-Mimecast-MFC-AGG-ID: Op_KIcOxP_68wZZxn0MWkQ_1742558031
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EDE6919560AF;
+	Fri, 21 Mar 2025 11:53:50 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.225.31])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 86A43180175A;
+	Fri, 21 Mar 2025 11:53:47 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	David Ahern <dsahern@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>
+Subject: [PATCH net-next v2 0/5] udp_tunnel: GRO optimization follow-up
+Date: Fri, 21 Mar 2025 12:52:51 +0100
+Message-ID: <cover.1742557254.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z91CGRP9QLdZONiZ@fedora>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Hi Hangbin,
+Syzkaller and Nathan reported a few issues on the reference changeset.
+This series tries to address them all and additionally does some little
+cleanup.
 
-On Fri, Mar 21, 2025 at 10:40:25AM +0000, Hangbin Liu wrote:
-> Hi Jason, Phil,
-> On Wed, Mar 19, 2025 at 05:15:41PM +0100, Jason A. Donenfeld wrote:
-> > On Mon, Jan 06, 2025 at 08:10:43AM +0000, Hangbin Liu wrote:
-> > > +	echo "file /bin/nft $(NFTABLES_PATH)/src/nft 755 0 0" >> $@
-> > > +	echo "file /lib/libmnl.so.0 $(TOOLCHAIN_PATH)/lib/libmnl.so.0 755 0 0" >> $@
-> > > +	echo "file /lib/libnftnl.so.11 $(TOOLCHAIN_PATH)/lib/libnftnl.so.11 755 0 0" >> $@
-> > 
-> > Can't these be statically linked into the nft binary?
-> 
-> If I omit these, I will got error like
-> 
-> mnl_attr_put: symbol not found
-> 
-> Even though I set `--enable-static` in nft build.
-> 
-> Do you know what's the reason?
+See the individual patches for the details.
+---
+Should this prove to be too invasive, too late or ineffective, I'll be
+ok with a revert before the upcoming net-next PR.
 
-I was able to have nft linked statically against built libmnl and
-libnftnl by passing '--disable-shared --enable-static' to configure
-calls of all three build systems. With --enable-shared in library
-configure calls, nftables build preferred to link against the DSOs and I
-did not find a way to change this.
+Paolo Abeni (5):
+  udp_tunnel: properly deal with xfrm gro encap.
+  udp_tunnel: fix compile warning
+  udp_tunnel: fix UaF in GRO accounting
+  udp_tunnel: avoid inconsistent local variables usage
+  udp_tunnel: prevent GRO lookup optimization for user-space sockets
 
-Cheers, Phil
+ include/net/udp_tunnel.h   | 4 ----
+ net/ipv4/udp.c             | 5 +++++
+ net/ipv4/udp_offload.c     | 9 ++++++---
+ net/ipv4/udp_tunnel_core.c | 7 ++++---
+ 4 files changed, 15 insertions(+), 10 deletions(-)
+
+-- 
+2.48.1
+
 
