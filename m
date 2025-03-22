@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-176885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15E95A6CABD
-	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 15:43:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F888A6CABE
+	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 15:44:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03C9688649C
-	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 14:41:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CD9A1B811ED
+	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 14:42:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9354D23237F;
-	Sat, 22 Mar 2025 14:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BCF9233152;
+	Sat, 22 Mar 2025 14:40:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b="lTMuiEw4"
+	dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b="MuqzYvNu"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward101b.mail.yandex.net (forward101b.mail.yandex.net [178.154.239.148])
+Received: from forward100d.mail.yandex.net (forward100d.mail.yandex.net [178.154.239.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE7322B8BF;
-	Sat, 22 Mar 2025 14:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8904D22F3BD;
+	Sat, 22 Mar 2025 14:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742654430; cv=none; b=fP2QBLuUv5X4PWcx5Ods6TvabRgcCeQGxcEpvZEFrTXpTfXBVS4RE/ICqyYlmaFUC9oSxNKWisk0TFfFppK1rJlkafrezC7yMzhVI76Q9eEc/gOTO1tiuouKZ6cu8+ISIhyj6F8piV9iG5lr5YwIOKw3634FZh3x4ySis7J/tzs=
+	t=1742654438; cv=none; b=AGuNae9FTyZ9JItduu8KbWXR6LUGIMkjofjFVW1u8aUSrblARFdPtaFFnFe24GC2cAr8eN1KGh0vtXEYb4pc0fQi4VDpbwe5QWWiTOiRBnvQtNZdUEfbNnNb2PYd1JLNpKZaHseScrIgWgtvQL7pFmrrijiWvStJWJUegjzBZI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742654430; c=relaxed/simple;
-	bh=UfruNF5FwUbGBei/+sHU4w+skEWvZIm+WkpciT1iF+M=;
+	s=arc-20240116; t=1742654438; c=relaxed/simple;
+	bh=1JAKVhC2/dgWoNGKbvRbxzscFcKZeKD8PshBhJA/V7Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bU0sFJcY+UffvbjRi4mK0ZXAzLsl7bOPH6+njt7VJ0Q1pmgmsvRLXv9shGYydAkTkhiaYxwMxYp0bB87iPoDWmyIhFMfc8oEO3lKH2Uh4YUc0HlzyT7j2hXoPqRAj7RxGFEK+/kZe70qGQuAv3QpKlg8iMdVj9mCHNVxuOHr/n4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ya.ru; spf=pass smtp.mailfrom=ya.ru; dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b=lTMuiEw4; arc=none smtp.client-ip=178.154.239.148
+	 MIME-Version:Content-Type; b=PqgPPblk4psFsIQk2Wymb8eelAhCINK7UC/XnBez/gGU3Nf8hHSBfHRVDta8jQy4IvtVFc7kY63Di5E3/ktcZKx0T40C0SIgAv3OY1OZ7RDsq0tNc2RsfQEDHrINrzAdRDgLFSQTVhe3Fkq6rlklZu/+Oi1JnPYGak1gubFS3dM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ya.ru; spf=pass smtp.mailfrom=ya.ru; dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b=MuqzYvNu; arc=none smtp.client-ip=178.154.239.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ya.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ya.ru
-Received: from mail-nwsmtp-smtp-production-main-63.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-63.sas.yp-c.yandex.net [IPv6:2a02:6b8:c37:7da2:0:640:6456:0])
-	by forward101b.mail.yandex.net (Yandex) with ESMTPS id F3E6260B61;
-	Sat, 22 Mar 2025 17:40:26 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-63.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id PeNn0TXLcqM0-LQ5ejRF8;
-	Sat, 22 Mar 2025 17:40:26 +0300
+Received: from mail-nwsmtp-smtp-production-main-80.klg.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-80.klg.yp-c.yandex.net [IPv6:2a02:6b8:c43:2f04:0:640:303a:0])
+	by forward100d.mail.yandex.net (Yandex) with ESMTPS id 6A59360AFB;
+	Sat, 22 Mar 2025 17:40:34 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-80.klg.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id WeN9JgULe8c0-XDovRmO3;
+	Sat, 22 Mar 2025 17:40:34 +0300
 X-Yandex-Fwd: 1
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ya.ru; s=mail;
-	t=1742654426; bh=vDTcIXqH3zbQY4VtgV7ekd33VsvdjbJpOFHuSveAfF4=;
+	t=1742654434; bh=22v+fB8YIwTLC/56HYEhnJJXVWUSKXSrmHhOiSQ3Qjc=;
 	h=Cc:Message-ID:References:Date:In-Reply-To:Subject:To:From;
-	b=lTMuiEw4gEAX040YAayGfEHwHSGwPTLAe2kpdQLpl33/DVFOKmCmx8x1oDEgBriAu
-	 OZq5maOsprfklqu5oXYfR44ioCdj5JFtNnSASLjYqNYExfkaUubps9wdHchB4RtEMP
-	 gyE84p2raqkf7C/8cGVvcz+ZSkFJQZL/6pBf8jOI=
-Authentication-Results: mail-nwsmtp-smtp-production-main-63.sas.yp-c.yandex.net; dkim=pass header.i=@ya.ru
+	b=MuqzYvNuRKhnTfX4fK1XBKLwL0JB7k6j9KFQ6UlY0P5cgsJ6scdM9IRSFXQf/tJjh
+	 oDZEC/KK/YchVARhQFSkYiXXI6KDQut76aojdPoEvmZ4kQA4mlfNR1bX9C3NWH8IsE
+	 +848HlXjla1aEGS+T6Ad89NOst4HgzSMhg4/bvpw=
+Authentication-Results: mail-nwsmtp-smtp-production-main-80.klg.yp-c.yandex.net; dkim=pass header.i=@ya.ru
 From: Kirill Tkhai <tkhai@ya.ru>
 To: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: tkhai@ya.ru
-Subject: [PATCH NET-PREV 20/51] ppp: Use __register_netdevice in .newlink
-Date: Sat, 22 Mar 2025 17:40:24 +0300
-Message-ID: <174265442494.356712.9873938655056545587.stgit@pro.pro>
+Subject: [PATCH NET-PREV 21/51] veth: Use __register_netdevice in .newlink
+Date: Sat, 22 Mar 2025 17:40:32 +0300
+Message-ID: <174265443211.356712.15428609220770550870.stgit@pro.pro>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <174265415457.356712.10472727127735290090.stgit@pro.pro>
 References: <174265415457.356712.10472727127735290090.stgit@pro.pro>
@@ -68,62 +68,55 @@ The objective is to conform .newlink with its callers,
 which already assign nd_lock (and matches master nd_lock
 if there is one).
 
+Also, use __unregister_netdevice() since we know
+there is held lock in that path.
+
 Signed-off-by: Kirill Tkhai <tkhai@ya.ru>
 ---
- drivers/net/ppp/ppp_generic.c |   13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ drivers/net/veth.c |   11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
-index eb9acfcaeb09..c094bc5e6d8f 100644
---- a/drivers/net/ppp/ppp_generic.c
-+++ b/drivers/net/ppp/ppp_generic.c
-@@ -1216,7 +1216,7 @@ static int ppp_unit_register(struct ppp *ppp, int unit, bool ifname_is_set)
+diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+index 34499b91a8bd..7a502dbed5b9 100644
+--- a/drivers/net/veth.c
++++ b/drivers/net/veth.c
+@@ -1827,7 +1827,9 @@ static int veth_newlink(struct net *src_net, struct net_device *dev,
  
- 	mutex_unlock(&pn->all_ppp_mutex);
+ 	netif_inherit_tso_max(peer, dev);
  
--	ret = register_netdevice(ppp->dev);
-+	ret = __register_netdevice(ppp->dev);
- 	if (ret < 0)
- 		goto err_unit;
- 
-@@ -3331,6 +3331,7 @@ static int ppp_create_interface(struct net *net, struct file *file, int *unit)
- 		.unit = *unit,
- 		.ifname_is_set = false,
- 	};
-+	struct nd_lock *nd_lock;
- 	struct net_device *dev;
- 	struct ppp *ppp;
- 	int err;
-@@ -3343,7 +3344,13 @@ static int ppp_create_interface(struct net *net, struct file *file, int *unit)
- 	dev_net_set(dev, net);
- 	dev->rtnl_link_ops = &ppp_link_ops;
- 
-+	if (!attach_new_nd_lock(dev)) {
-+		err = -ENOMEM;
-+		goto err_free;
-+	}
+-	err = register_netdevice(peer);
++	attach_nd_lock(peer, rcu_dereference_protected(dev->nd_lock, true));
 +
- 	rtnl_lock();
-+	lock_netdev(dev, &nd_lock);
- 
- 	err = ppp_dev_configure(net, dev, &conf);
++	err = __register_netdevice(peer);
+ 	put_net(net);
+ 	net = NULL;
  	if (err < 0)
-@@ -3351,12 +3358,16 @@ static int ppp_create_interface(struct net *net, struct file *file, int *unit)
- 	ppp = netdev_priv(dev);
- 	*unit = ppp->file.index;
+@@ -1858,7 +1860,7 @@ static int veth_newlink(struct net *src_net, struct net_device *dev,
+ 	else
+ 		snprintf(dev->name, IFNAMSIZ, DRV_NAME "%%d");
  
-+	unlock_netdev(nd_lock);
- 	rtnl_unlock();
+-	err = register_netdevice(dev);
++	err = __register_netdevice(dev);
+ 	if (err < 0)
+ 		goto err_register_dev;
  
+@@ -1888,14 +1890,15 @@ static int veth_newlink(struct net *src_net, struct net_device *dev,
  	return 0;
  
- err_dev:
-+	detach_nd_lock(dev);
-+	unlock_netdev(nd_lock);
- 	rtnl_unlock();
-+err_free:
- 	free_netdev(dev);
- err:
+ err_queues:
+-	unregister_netdevice(dev);
++	__unregister_netdevice(dev);
+ err_register_dev:
+ 	/* nothing to do */
+ err_configure_peer:
+-	unregister_netdevice(peer);
++	__unregister_netdevice(peer);
  	return err;
+ 
+ err_register_peer:
++	detach_nd_lock(peer);
+ 	free_netdev(peer);
+ 	return err;
+ }
 
 
