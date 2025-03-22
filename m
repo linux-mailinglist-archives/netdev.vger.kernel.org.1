@@ -1,290 +1,135 @@
-Return-Path: <netdev+bounces-176932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51C1CA6CBC9
-	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 19:26:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E018DA6CC61
+	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 21:38:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0F2A188B19C
-	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 18:25:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 83B397A2DB8
+	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 20:37:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44DED86329;
-	Sat, 22 Mar 2025 18:25:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AC3723372B;
+	Sat, 22 Mar 2025 20:36:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KIrq97fU"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="tel4EGsR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 626659443;
-	Sat, 22 Mar 2025 18:25:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2C0175A5
+	for <netdev@vger.kernel.org>; Sat, 22 Mar 2025 20:36:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742667904; cv=none; b=hXQqqze+JQYiY/TPKGcUzplOvk37imvNmU3WdDAbiiI1zXeh3Q5lPnygNyVYShNIlBgc85IKsqUFiJmH7Pw35t6lLiYuUYE96jSYPSZxE6z+rfCZElwLgRJWg/ggElQHI+8ppFmbbAH/WW0RipUAcPWSSd4qpNa3phoATbJwC3c=
+	t=1742675780; cv=none; b=q9jOOVTrueaHLe7B3GVomHNWnd516ROQF7X2X6F10S9o3v1TbGC6FHZ7KseIGphPudCIlzYaYKYL2ZQgLqaLSHpDcZIdtT4zNcb+jO0w5uC2NHzYs3Gx3EMSnFQ0eadl7OP0ieEeNpcbEcaXjhAIUfrkSE59SXa830tkiVzObHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742667904; c=relaxed/simple;
-	bh=AB6eqa6YfKi5G3b5ZN2NOcYKZyPR8BbRtQUz7L6unIM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Pw62zqocY4OiLt0Tl30SMOKONS5EFHAj/xvlJTXaKCprt5V0oo/M8Zz33OaAJZvsUyMEOqjSIAkMfyqSVX72yA/+eaEqBQHlOIsCYbCm6g92QH5pU+8d1gnHyFQFUmTqSJ8a9r2nMKUCoH18DsAWFmQh7Om5RYhcTYjvcEIt8cE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KIrq97fU; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ac3eb3fdd2eso412108266b.0;
-        Sat, 22 Mar 2025 11:25:02 -0700 (PDT)
+	s=arc-20240116; t=1742675780; c=relaxed/simple;
+	bh=/zm0caTFpa5mQQPIid8qQMt0SVoU13C1ydN1hUjgYNk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=d1yX+V3w4gDVS1oRxRJx+6pj7mUdgXtne3yTUBw7fENi4Ab8dPU7oYvuBLqQcZ5S2u9JzH7T6lg6xsaTytFV9Gq4kZA61yVqQs3ZtS9RYqyWnKeBcex54yi89gxr769sVi6B2ny6pQJ2tT/jVQtpMq7H11sNdtYPuF4x3Yl2O9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=tel4EGsR; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-3014678689aso4396769a91.0
+        for <netdev@vger.kernel.org>; Sat, 22 Mar 2025 13:36:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742667900; x=1743272700; darn=vger.kernel.org;
-        h=in-reply-to:autocrypt:from:content-language:references:cc:to
-         :subject:user-agent:mime-version:date:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=AB6eqa6YfKi5G3b5ZN2NOcYKZyPR8BbRtQUz7L6unIM=;
-        b=KIrq97fUWiehEZPTGAaVJtBBgpHHSFrsRoOkOjkO3fIEFm1mWJY+U+2ybeeHNrbqp0
-         LoUrlCGRuw73MoASiRt2uftOKv+NAnfxRiit+wi+bMIRVUIRHYlYJN4/36XlHnZ1GLme
-         VbubdDlQR0JYQgjeiht8PuQb8tnkMswDqvRwIaJEiJcnEAMfftAlGdljV4cMijpim/eY
-         7oohXw/pGGPFKvqJtQFhVg63ua9OMqaKvdI3s941NVsvkga37mX29+KKA5p2E0Wejrw9
-         LlKjYgmx8c5NjX5dD2ehYUqZi4RmNL4dzhbGL1mcQ+yA8gEWWaoDMMCLFmEXPEJq0DGP
-         S2wQ==
+        d=fastly.com; s=google; t=1742675778; x=1743280578; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RBCRJIfeoI4+hYoyENJ+XtmGOK3o3ECSkLKYl4KE6xM=;
+        b=tel4EGsRZ9i0Mp5lyCT2l7sHMN8qBGw4+M31Xa0xkDQ+MbR0Zq/7ldE15b6VMKOSA9
+         cvxrbjEZD0+3cV8XJwRroptZPoeFkcE2ggo2nEiZI2orL+MyyHj7TZs7D1qfi84bZJIM
+         4Dxen3IrC12Si3RWJw+8bKQ8M4KP1iFajXpEE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742667900; x=1743272700;
-        h=in-reply-to:autocrypt:from:content-language:references:cc:to
-         :subject:user-agent:mime-version:date:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AB6eqa6YfKi5G3b5ZN2NOcYKZyPR8BbRtQUz7L6unIM=;
-        b=k1PqXNLBvNdZBSv5uMLbGg7EF1KoA2hYDtXt24EDtE7KHFB+79rGVizsP9gvL3pf16
-         V0fOlnKYMthCTVX7Mn5TgNqy/g0xdrQzwSYSrUw2tWqmL0c2llHaeCy7PMZoh7QTsHeF
-         m97M/pVEjYqFKKC7j2mf67s+crijXxD+8cQwXp5xRINzZMHzXR1w2oTmayHTq3N150Gj
-         JfIoJaIbwsaqYZwtBcw9R0lgxFuVLvFhvXArINx/GvHeiiFrYTf9vb6AF3Z+UA9D+gjc
-         544rS3rTMf/AF5NQR5jjNwZSRPNeMSBTo38azLKfef8r82c9bVYTbWb4c0Q0VNTXHzA7
-         m2TA==
-X-Forwarded-Encrypted: i=1; AJvYcCWMJMF/V6rj6LbOStgMI+9UawnSDmjjecAuMedFgg+nXdFXvQ4x7DurH9n8UAt324KeW8H8Spg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNPKUPS9Tht6rO7NwiAk2zeVujKe8jbvuDtO1y9fKOIHSLg8Wt
-	mngg6g/KHKzkUDTqEFyV+jpJ5GcUEs6ET2riBdkdqJVE+KPOh3Sv
-X-Gm-Gg: ASbGncsFIiqRKuu/W/qm2Yao1mfHrRDCJbXdDL8nOO/RVXIomj6igf6mVOJ6EdTfEHE
-	6SlUQIcHTaMWNJSSc+yZJVGChX25vege/5iLUaCP7sHSRIunr7TpRE4ajWRf+R/NHSP4sWjL5Hz
-	S6JN03GLbcqXCK/Tv2rL8W+8ksKyXO+lpZVsLpCoHQu1teEcdS7cY4lSmV0CjR8CsumVcEDtl1i
-	Ytu07pFF7RAA/snVd9ZkEs1gm21Sex3OIpkupmHya3dr4EGP6j2h749+vX2Vz+i62xAZniEe39M
-	fGbCRg+7o+BS0bbPK9srtRPT/Hur/ldR4xB3So3kn1IEJO4A5yxhcWS1n7c99eHmxOpWSQ/2Cw4
-	KOawcgeFy6w==
-X-Google-Smtp-Source: AGHT+IFWB+6mea7hYGLXQtSZdB4Di32YVFmAH5RM683PcmHmiehwcZRGAQ88qX2IogmRJwfc5lhmlQ==
-X-Received: by 2002:a17:907:3d94:b0:abf:5fa3:cf96 with SMTP id a640c23a62f3a-ac3f226e548mr608444066b.14.1742667900134;
-        Sat, 22 Mar 2025 11:25:00 -0700 (PDT)
-Received: from [10.53.15.220] (tuc-211-215.hrz.tu-chemnitz.de. [134.109.211.215])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5ebccf687fbsm3503562a12.4.2025.03.22.11.24.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 22 Mar 2025 11:24:59 -0700 (PDT)
-Message-ID: <8db53465-381f-428a-8fea-7386b4a97557@gmail.com>
-Date: Sat, 22 Mar 2025 19:24:57 +0100
+        d=1e100.net; s=20230601; t=1742675778; x=1743280578;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RBCRJIfeoI4+hYoyENJ+XtmGOK3o3ECSkLKYl4KE6xM=;
+        b=WFqUjYgmJxuxoAfntniPEjDgwGSWhC1vBYwNhD2OKPPu8pvyNno5j7ES979JzDDkTW
+         lgwRPrFNqXBw/oRFhgdn+HMd0l2cmnGlRwZm8tsLaGkzoZS8H4fQbYXsNXhKRfYBzE5t
+         CIW/0Bu3cOGKGOIwL3ZDO0flk99Pt/czBvUgvOpyGe6kwLQZGY2cMwqeImA5t0lzxzy6
+         9Az8iO/MZizVB7z2TkT1bMJ71uv8iZ+PkDJ/6CX7ETIWUMa9RFjt0gWvL/ALRpXjL2lD
+         nsQDOhAzfI1FZTp937mOI41eX0rBEuRW9/RJPfCUk5GMbOMf6z8jEEHkJVly8sGqDlTZ
+         foxg==
+X-Gm-Message-State: AOJu0YxqxeiBflachldXuup3mDo7t2CQl4QGC9c27ghw3wbVKOuK8Jwr
+	j61E5zkYNbXFD/9gKLL/hB0U3ABa7U5C/lU9Dyloeo8edwd0aeA5c+qynyf2tLo=
+X-Gm-Gg: ASbGnctiIDbcCXZYx1dyjlFzCZw3VFKTGgJ2FEKjVmKnQGBg8tBfsKA0q2WzPfVTz7R
+	R3EksL3QB7M8J0aoxhI9wvh0lbW/dkziP/s2YNMeROMPu+OIjEUzP+xkc2Fs4nC4ZC33rPvGqgE
+	NroqG7OBRHTcGZJDSazTzFt99exWlJJphm9NVgYgkM06UIEcDnsPxPh1hos662JR9jnB54smiHE
+	0UnhT9AQxXROSb8wM7yhu1DR5wWfGvB5QuMjYk47J3DRrp06vdxyv5Z/79IzKvxMmcT1tdxOF7e
+	RIOVIIj4qv4AqQ7MPQ6ZLdHVFhonoIlNiSOerYkD10lLS1G3j3vmvRSnWp+T+0c=
+X-Google-Smtp-Source: AGHT+IE37OrujyxGFgxAEo8ctQ3AWaU9G2PByR+MB79aOMDqG+16a9oIBZcx1WW8S9MeG/hspBAWTA==
+X-Received: by 2002:a17:90b:4ccf:b0:2ff:64a0:4a57 with SMTP id 98e67ed59e1d1-3030feeb744mr10822043a91.26.1742675777943;
+        Sat, 22 Mar 2025 13:36:17 -0700 (PDT)
+Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-301bf61a579sm8711798a91.32.2025.03.22.13.36.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 22 Mar 2025 13:36:17 -0700 (PDT)
+From: Joe Damato <jdamato@fastly.com>
+To: linux-fsdevel@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	brauner@kernel.org,
+	asml.silence@gmail.com,
+	hch@infradead.org,
+	axboe@kernel.dk,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	Joe Damato <jdamato@fastly.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jan Kara <jack@suse.cz>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH vfs/for-next 0/3] Move splice_to_socket to net/socket.c
+Date: Sat, 22 Mar 2025 20:35:43 +0000
+Message-ID: <20250322203558.206411-1-jdamato@fastly.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] prandom/random32: switch to Xoshiro256++
-To: Simon Horman <horms@kernel.org>
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, akpm@linux-foundation.org, Jason@zx2c4.com
-References: <20250214081840.47229-1-theil.markus@gmail.com>
- <20250214081840.47229-3-theil.markus@gmail.com>
- <20250217111806.GJ1615191@kernel.org>
-Content-Language: en-US
-From: Markus Theil <theil.markus@gmail.com>
-Autocrypt: addr=theil.markus@gmail.com; keydata=
- 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
- EjwE9Q==
-In-Reply-To: <20250217111806.GJ1615191@kernel.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------jQPmiHFUesImpFohiY00irMN"
+Content-Transfer-Encoding: 8bit
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------jQPmiHFUesImpFohiY00irMN
-Content-Type: multipart/mixed; boundary="------------vUv60RjUVgzNkEtRqS4htxae";
- protected-headers="v1"
-From: Markus Theil <theil.markus@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, akpm@linux-foundation.org, Jason@zx2c4.com
-Message-ID: <8db53465-381f-428a-8fea-7386b4a97557@gmail.com>
-Subject: Re: [PATCH 2/2] prandom/random32: switch to Xoshiro256++
-References: <20250214081840.47229-1-theil.markus@gmail.com>
- <20250214081840.47229-3-theil.markus@gmail.com>
- <20250217111806.GJ1615191@kernel.org>
-In-Reply-To: <20250217111806.GJ1615191@kernel.org>
+Greetings:
 
---------------vUv60RjUVgzNkEtRqS4htxae
-Content-Type: multipart/mixed; boundary="------------aE5eggJc89LW0MoqnFqZjnoK"
+While reading through the splice and socket code I noticed that some
+splice helpers (like sock_splice_read and sock_splice_eof) live in
+net/socket.c, but splice_to_socket does not.
 
---------------aE5eggJc89LW0MoqnFqZjnoK
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+I am not sure if there is a reason for this, but it seems like moving
+this code provides some advantages:
+  - Eliminates the #ifdef CONFIG_NET from fs/splice.c
+  - Keeps the socket related splice helpers together in net/socket.c
+    where it seems (IMHO) more logical for them to live
 
-T24gMi8xNy8yNSAxMjoxOCwgU2ltb24gSG9ybWFuIHdyb3RlOg0KPiBPbiBGcmksIEZlYiAx
-NCwgMjAyNSBhdCAwOToxODo0MEFNICswMTAwLCBNYXJrdXMgVGhlaWwgd3JvdGU6DQo+PiBU
-aGUgY3VycmVudCBMaW51eCBQUk5HIGlzIGJhc2VkIG9uIExGU1IxMTMsIHdoaWNoIG1lYW5z
-Og0KPj4gLSBuZWVkcyBzb21lIHdhcm11cCByb3VuZHMgdG8geWllbGQgYmV0dGVyIHN0YXRp
-c3RpY2FsIHByb3BlcnRpZXMNCj4+IC0gc2VlZHMvaW5pdGlhbCBzdGF0ZXMgbXVzdCBiZSBv
-ZiBjZXJ0YWluIHN0cnVjdHVyZQ0KPj4gLSBkb2VzIG5vdCBwYXNzIEzigJlFY3V5ZXIncyBC
-aWdDcnVzaCBpbiBUZXN0VTAxDQo+Pg0KPj4gV2hpbGUgb2YgY291cnNlLCB0aGVyZSBpcyBu
-byBjbGVhciAiYmVzdCIgUFJORywgcmVwbGFjZSB3aXRoDQo+PiBYb3NoaXJvMjU2KyssIHdo
-aWNoIHNlYW1zIHRvIGJlIGEgc2Vuc2libGUgcmVwbGFjZW1lbnQsIGZyb20NCj4+IHRvZGF5
-cyBwb2ludCBvZiB2aWV3Og0KPj4gLSBvbmx5IG5lZWRzIG9uZSBiaXQgc2V0IHRvIDEgaW4g
-dGhlIHNlZWQsIG5lZWRzIG5vIHdhcm11cCwgd2hlbg0KPj4gICAgc2VlZGVkIHdpdGggc3Bs
-aXRtaXg2NC4NCj4+IC0gQWxzbyBoYXMgc3RhdGlzdGljYWwgZXZhbHVhdGlvbiwgbGlrZSBM
-RlNSMTEzLg0KPj4gLSBQYXNzZXMgQmlnQ3J1c2ggaW4gVGVzdFUwMS4NCj4+DQo+PiBUaGUg
-Y29kZSBnb3Qgc21hbGxlciwgYmVjYXVzZSBzb21lIGVkZ2UgY2FzZXMgYXJlIHJ1bGVkIG91
-dCBub3cuDQo+PiBJIGtlcHQgdGhlIHRlc3QgdmVjdG9ycyBhbmQgYWRhcHRlZCB0aGVtIHRv
-IHRoaXMgUk5HLg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IE1hcmt1cyBUaGVpbCA8dGhlaWwu
-bWFya3VzQGdtYWlsLmNvbT4NCj4gLi4uDQo+DQo+PiBkaWZmIC0tZ2l0IGEvbGliL3JhbmRv
-bTMyLmMgYi9saWIvcmFuZG9tMzIuYw0KPiAuLi4NCj4NCj4+ICsvKioNCj4+ICsgKiBwcmFu
-ZG9tX3NlZWRfc3RhdGUgLSBzZXQgc2VlZCBmb3IgcHJhbmRvbV91MzJfc3RhdGUoKS4NCj4+
-ICsgKiBAc3RhdGU6IHBvaW50ZXIgdG8gc3RhdGUgc3RydWN0dXJlIHRvIHJlY2VpdmUgdGhl
-IHNlZWQuDQo+PiArICogQHNlZWQ6IGFyYml0cmFyeSA2NC1iaXQgdmFsdWUgdG8gdXNlIGFz
-IGEgc2VlZC4NCj4+ICsgKg0KPj4gKyAqIHNwbGl0bWl4NjQgaW5pdCBhcyBzdWdnZXN0ZWQg
-Zm9yIHhvc2hpcm8yNTYrKw0KPj4gKyAqIFNlZTogaHR0cHM6Ly9wcm5nLmRpLnVuaW1pLml0
-L3NwbGl0bWl4NjQuYw0KPj4gKyAqLw0KPj4gK3ZvaWQgcHJhbmRvbV9zZWVkX3N0YXRlKHN0
-cnVjdCBybmRfc3RhdGUgKnN0YXRlLCB1NjQgc2VlZCkNCj4+ICAgew0KPj4gLQkvKiBDYWxs
-aW5nIFJORyB0ZW4gdGltZXMgdG8gc2F0aXNmeSByZWN1cnJlbmNlIGNvbmRpdGlvbiAqLw0K
-Pj4gLQlwcmFuZG9tX3UzMl9zdGF0ZShzdGF0ZSk7DQo+PiAtCXByYW5kb21fdTMyX3N0YXRl
-KHN0YXRlKTsNCj4+IC0JcHJhbmRvbV91MzJfc3RhdGUoc3RhdGUpOw0KPj4gLQlwcmFuZG9t
-X3UzMl9zdGF0ZShzdGF0ZSk7DQo+PiAtCXByYW5kb21fdTMyX3N0YXRlKHN0YXRlKTsNCj4+
-IC0JcHJhbmRvbV91MzJfc3RhdGUoc3RhdGUpOw0KPj4gLQlwcmFuZG9tX3UzMl9zdGF0ZShz
-dGF0ZSk7DQo+PiAtCXByYW5kb21fdTMyX3N0YXRlKHN0YXRlKTsNCj4+IC0JcHJhbmRvbV91
-MzJfc3RhdGUoc3RhdGUpOw0KPj4gLQlwcmFuZG9tX3UzMl9zdGF0ZShzdGF0ZSk7DQo+PiAr
-CWludCBpOw0KPj4gKw0KPj4gKwlmb3IgKGkgPSAwOyBpIDwgQVJSQVlfU0laRShzdGF0ZS0+
-cyk7ICsraSkgew0KPj4gKwkJc2VlZCArPSAweDllMzc3OWI5N2Y0YTdjMTU7DQo+PiArCQl1
-NjQgeiA9IHNlZWQ7DQo+PiArCQl6ID0gKHogXiAoeiA+PiAzMCkpICogMHhiZjU4NDc2ZDFj
-ZTRlNWI5Ow0KPj4gKwkJeiA9ICh6IF4gKHogPj4gMjcpKSAqIDB4OTRkMDQ5YmIxMzMxMTFl
-YjsNCj4+ICsgICAgICAgIHN0YXRlLT5zW2ldID0geiBeICh6ID4+IDMxKTsNCj4gbml0OiBU
-aGUgaW5kZW50YXRpb24gc2VlbXMgb2ZmIGhlcmUuDQpTaGFsbCBJIHJlc2VuZCBmb3IgdGhp
-cyBsaW5lPw0KPj4gKwl9DQo+PiAgIH0NCj4+ICtFWFBPUlRfU1lNQk9MKHByYW5kb21fc2Vl
-ZF9zdGF0ZSk7DQo+IC4uLg0K
---------------aE5eggJc89LW0MoqnFqZjnoK
-Content-Type: application/pgp-keys; name="OpenPGP_0xFEE64346C8BF92AE.asc"
-Content-Disposition: attachment; filename="OpenPGP_0xFEE64346C8BF92AE.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
+This change is essentially cleanup; no functional changes to splice are
+introduced.
 
------BEGIN PGP PUBLIC KEY BLOCK-----
+I based this change on vfs/for-next since 2 of the 3 patches are vfs,
+but I am happy to rebase this on another tree if necessary.
 
-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
-1gXx4DiU9RItUZKqEjwE9Q=3D=3D
-=3DBp87
------END PGP PUBLIC KEY BLOCK-----
+Thanks,
+Joe
 
---------------aE5eggJc89LW0MoqnFqZjnoK--
+Joe Damato (3):
+  pipe: Move pipe wakeup helpers out of splice
+  splice: Move splice_to_socket to net/socket.c
+  net: splice_to_socket: RCT declaration cleanup
 
---------------vUv60RjUVgzNkEtRqS4htxae--
+ fs/pipe.c                 |  16 ++++
+ fs/splice.c               | 170 ++------------------------------------
+ include/linux/pipe_fs_i.h |   4 +
+ include/linux/splice.h    |   3 -
+ net/socket.c              | 140 +++++++++++++++++++++++++++++++
+ 5 files changed, 167 insertions(+), 166 deletions(-)
 
---------------jQPmiHFUesImpFohiY00irMN
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
------BEGIN PGP SIGNATURE-----
+base-commit: 2e72b1e0aac24a12f3bf3eec620efaca7ab7d4de
+-- 
+2.43.0
 
-wsF5BAABCAAjFiEEhApWCu7803jVjNDD/uZDRsi/kq4FAmffAHoFAwAAAAAACgkQ/uZDRsi/kq69
-zRAA2a4FXk3mCMe6GeEGMjmQpKFlWa9pzG0TDxW7gHwOMs+Fav7wCbE7h5DVAl/i8yN+4d7aQgBk
-Hy1uC3PeFikSSqWsyE8KOP1Bghehuc7uqqgx+Y2RGGbrdIHdvC5hR0WP7XBLFc9ZvKwD+Cg7bnDA
-At6rbh4hBNkArZDCm+H2Rx2wDJLJpItNmISqMKRo4tCJHg2DjlO7tHSByV+GOBG4OX7SFxPsrMR+
-2nk4alrJJgtEqYgHWXTebn31KCBb7SDU54n5FAsCVps5i9eB/otqR6VyfWLXXduGfxG+l/U+2HjM
-GpB99MWXVJb7ICnCUenxj7nA9JUuqXUw8k4CnrwNrPA08smOA/eZ2d73P5aPwSj3AMpeHB5D4qi9
-DW6lofX8cocjINy58Wn/Uw3ZIINFoevab70UfMn2jQsS5ZH/39vI+Z9mo1oZhHuHTAEXuLa9Kkk/
-XzRh6wujdIjJKo4rBJNs7gh4rHcsIiym7n01r9HB8vk0T2R5dp2AEckiRQl4zIVpouhxrkcvqRor
-68xvHquD3Cx/acaP68CJVQ491S9mlxkBqDnO5ycZPkmo8GQTrnGATULSGd+/kN9j6D/X53YvTaSG
-XEsJeetyrCqU5sBCJsU4xbtsDjmLIJIMStTPg7jYaJVyTM0FKPR6wVAGnGPlxLU9a91mDwhEL5zg
-yAs=
-=PBgs
------END PGP SIGNATURE-----
-
---------------jQPmiHFUesImpFohiY00irMN--
 
