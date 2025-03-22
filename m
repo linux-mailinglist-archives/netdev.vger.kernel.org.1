@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-176891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38B0DA6CAC5
-	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 15:45:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4CAEA6CAD1
+	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 15:48:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D703C4A03C1
-	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 14:43:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A274B885B47
+	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 14:43:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEAA022DFB1;
-	Sat, 22 Mar 2025 14:41:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D132F22FF2B;
+	Sat, 22 Mar 2025 14:41:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b="us/STQWC"
+	dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b="Zs6NuusP"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward100a.mail.yandex.net (forward100a.mail.yandex.net [178.154.239.83])
+Received: from forward103a.mail.yandex.net (forward103a.mail.yandex.net [178.154.239.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC81F22DFA7;
-	Sat, 22 Mar 2025 14:41:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.83
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C795422E3F1;
+	Sat, 22 Mar 2025 14:41:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.86
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742654481; cv=none; b=N3Yz6/KeodzxIaAo6InQSIIXrF1LctW4s+TIC98UfhsqO8H9kYiPAstyiJPfX65yelBAj5gmsRlRGiJIY0T/hym4jIdTLyTECk22Ix9FVKo9WIC+hTJa0FzWAxLdpz7zCQv3prm3GdEusn5eNz3+NCfWVKSlb5iu7p5zoVXRo74=
+	t=1742654488; cv=none; b=CJI6X7FUUbPW9Db3ttQetZEtu4NycNxxgFZyoio/ZnEeXq3Qaloyq+fEDfl6V/I5lq0wIIAoC7nA0ksRk2Udx+Y5qAHnOTtsGT4oiXwsRc+4skbS7/T1Kl0z5NRXqQ7Hk027+riT1NmWxwyoFtTSESxoD7iSOpdTABVngt90UqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742654481; c=relaxed/simple;
-	bh=cUH4m0E9VYIdrHtq+5/rgL6Jvb27PmBVrhsY2I+txe4=;
+	s=arc-20240116; t=1742654488; c=relaxed/simple;
+	bh=4oqRBsh8PAS/72J5Xb8EK5WJXYuynRrsDY2X1QRTxWI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lGM2x/U0MQ9ZbDP1HPa11zN+CgWTFfNjYJvdot5c1Eh98oxyK2lpdO3pDVCgPPg4Zn88FQnOk90ed0fbMB/YqviHBH7EqBWXFf0N3S42SUwoTcQMSK3j5jdZHPjqZZvNMqDfrBnmssE07Sc69UQwkC3LApZY23dge7Ytm0AEpKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ya.ru; spf=pass smtp.mailfrom=ya.ru; dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b=us/STQWC; arc=none smtp.client-ip=178.154.239.83
+	 MIME-Version:Content-Type; b=s6Hnx1ZlNDypbruGHBoRi6jFT5Nl2S3onKUSFjs/Wy2g+n7z/S4nUh1MoCLG1qz9F/aLcTqAI3FxO4qvrQNR/12lW147oR6RTlHw5bjNiYR+t/i28lQl89TXA7s3GH07DEpwGFFnNnmlOpw/o0UwinPp7nhvtXmn7NggN5iphho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ya.ru; spf=pass smtp.mailfrom=ya.ru; dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b=Zs6NuusP; arc=none smtp.client-ip=178.154.239.86
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ya.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ya.ru
-Received: from mail-nwsmtp-smtp-production-main-73.iva.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-73.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:bca8:0:640:45be:0])
-	by forward100a.mail.yandex.net (Yandex) with ESMTPS id C9C3B471E3;
-	Sat, 22 Mar 2025 17:41:17 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-73.iva.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id FfNf4WKLgGk0-QORfZy24;
-	Sat, 22 Mar 2025 17:41:17 +0300
+Received: from mail-nwsmtp-smtp-production-main-64.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-64.vla.yp-c.yandex.net [IPv6:2a02:6b8:c1f:1984:0:640:94c0:0])
+	by forward103a.mail.yandex.net (Yandex) with ESMTPS id EF36160901;
+	Sat, 22 Mar 2025 17:41:24 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-64.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id MfNQQmXLbqM0-d0Bncm3D;
+	Sat, 22 Mar 2025 17:41:24 +0300
 X-Yandex-Fwd: 1
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ya.ru; s=mail;
-	t=1742654477; bh=XDIjSdTy3oyjIvSB4Y5LkfpIYsqqqqTCYHMcrrprAc8=;
+	t=1742654484; bh=9gZzFKDCFYzS9NYBBHssUj1R3BkShyNd5B0H8PIPmuk=;
 	h=Cc:Message-ID:References:Date:In-Reply-To:Subject:To:From;
-	b=us/STQWC0SFNavEKNWWf39HivM9d4WM6Mlz/IDYU4ZqCXuP17FzTMxegsGXhW8IEB
-	 SFMPrsyKKZnANkjkmYXHA01/7lxu5FU2QE2CQCNnAVF2MJLYn41EpuuGwpqP1FN9zn
-	 zPDGSK/l7H8pYbr5+qeJLoZO9tTeQ8kEjCWDuitM=
-Authentication-Results: mail-nwsmtp-smtp-production-main-73.iva.yp-c.yandex.net; dkim=pass header.i=@ya.ru
+	b=Zs6NuusP1ZczUi+BdQmblcR0P99yHsUrumUFNaQbtwfIql2CyM52pb+c5UrKmX8on
+	 2f/feE1sz5BJuebCtOkj6htVeK13BtefquTA4ZR/YSXynsyXo07cT79clH5/ZH0fg1
+	 UgHvLIe4cAiU6Ai7fiuQBs7V6LqylmcObCaWRAsU=
+Authentication-Results: mail-nwsmtp-smtp-production-main-64.vla.yp-c.yandex.net; dkim=pass header.i=@ya.ru
 From: Kirill Tkhai <tkhai@ya.ru>
 To: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: tkhai@ya.ru
-Subject: [PATCH NET-PREV 27/51] vlan: Use __register_netdevice in .newlink
-Date: Sat, 22 Mar 2025 17:41:15 +0300
-Message-ID: <174265447583.356712.9463037666035942909.stgit@pro.pro>
+Subject: [PATCH NET-PREV 28/51] dsa: Use __register_netdevice()
+Date: Sat, 22 Mar 2025 17:41:22 +0300
+Message-ID: <174265448285.356712.5884355786188119373.stgit@pro.pro>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <174265415457.356712.10472727127735290090.stgit@pro.pro>
 References: <174265415457.356712.10472727127735290090.stgit@pro.pro>
@@ -64,61 +64,78 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-The objective is to conform .newlink with its callers,
-which already assign nd_lock (and matches master nd_lock
-if there is one).
-
-Also, use __unregister_netdevice() since we know
-there is held lock in that path.
+Inherit nd_lock from conduit during registration
+of a new device.
 
 Signed-off-by: Kirill Tkhai <tkhai@ya.ru>
 ---
- net/8021q/vlan.c |   11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ net/dsa/user.c |   25 +++++++++++++++----------
+ 1 file changed, 15 insertions(+), 10 deletions(-)
 
-diff --git a/net/8021q/vlan.c b/net/8021q/vlan.c
-index e45187b88220..ca3ba251a145 100644
---- a/net/8021q/vlan.c
-+++ b/net/8021q/vlan.c
-@@ -176,7 +176,7 @@ int register_vlan_dev(struct net_device *dev, struct netlink_ext_ack *extack)
- 	if (err < 0)
- 		goto out_uninit_mvrp;
+diff --git a/net/dsa/user.c b/net/dsa/user.c
+index f5adfa1d978a..cc3e0006f953 100644
+--- a/net/dsa/user.c
++++ b/net/dsa/user.c
+@@ -2686,6 +2686,7 @@ int dsa_user_create(struct dsa_port *port)
+ 	struct net_device *conduit = dsa_port_to_conduit(port);
+ 	struct dsa_switch *ds = port->ds;
+ 	struct net_device *user_dev;
++	struct nd_lock *nd_lock;
+ 	struct dsa_user_priv *p;
+ 	const char *name;
+ 	int assign_type;
+@@ -2759,38 +2760,42 @@ int dsa_user_create(struct dsa_port *port)
+ 		dev_warn(ds->dev, "nonfatal error %d setting MTU to %d on port %d\n",
+ 			 ret, ETH_DATA_LEN, port->index);
  
--	err = register_netdevice(dev);
-+	err = __register_netdevice(dev);
- 	if (err < 0)
- 		goto out_uninit_mvrp;
+-	ret = register_netdevice(user_dev);
++	lock_netdev(conduit, &nd_lock);
++	attach_nd_lock(user_dev, nd_lock);
++	ret = __register_netdevice(user_dev);
+ 	if (ret) {
+ 		netdev_err(conduit, "error %d registering interface %s\n",
+ 			   ret, user_dev->name);
+-		rtnl_unlock();
++		detach_nd_lock(user_dev);
++		unlock_netdev(nd_lock);
+ 		goto out_phy;
+ 	}
  
-@@ -196,7 +196,7 @@ int register_vlan_dev(struct net_device *dev, struct netlink_ext_ack *extack)
++	ret = netdev_upper_dev_link(conduit, user_dev, NULL);
++	unlock_netdev(nd_lock);
++
++	if (ret)
++		goto out_unregister;
++
+ 	if (IS_ENABLED(CONFIG_DCB)) {
+ 		ret = dsa_user_dcbnl_init(user_dev);
+ 		if (ret) {
+ 			netdev_err(user_dev,
+ 				   "failed to initialize DCB: %pe\n",
+ 				   ERR_PTR(ret));
+-			rtnl_unlock();
+ 			goto out_unregister;
+ 		}
+ 	}
+ 
+-	ret = netdev_upper_dev_link(conduit, user_dev, NULL);
+-
+ 	rtnl_unlock();
+ 
+-	if (ret)
+-		goto out_unregister;
+-
  	return 0;
  
- out_unregister_netdev:
--	unregister_netdevice(dev);
-+	__unregister_netdevice(dev);
- out_uninit_mvrp:
- 	if (grp->nr_vlan_devs == 0)
- 		vlan_mvrp_uninit_applicant(real_dev);
-@@ -217,6 +217,7 @@ static int register_vlan_device(struct net_device *real_dev, u16 vlan_id)
- 	struct vlan_dev_priv *vlan;
- 	struct net *net = dev_net(real_dev);
- 	struct vlan_net *vn = net_generic(net, vlan_net_id);
-+	struct nd_lock *nd_lock;
- 	char name[IFNAMSIZ];
- 	int err;
- 
-@@ -274,7 +275,13 @@ static int register_vlan_device(struct net_device *real_dev, u16 vlan_id)
- 	vlan->flags = VLAN_FLAG_REORDER_HDR;
- 
- 	new_dev->rtnl_link_ops = &vlan_link_ops;
-+
-+	lock_netdev(real_dev, &nd_lock);
-+	attach_nd_lock(new_dev, nd_lock);
- 	err = register_vlan_dev(new_dev, NULL);
-+	if (err)
-+		detach_nd_lock(new_dev);
+ out_unregister:
+-	unregister_netdev(user_dev);
++	lock_netdev(user_dev, &nd_lock);
++	__unregister_netdevice(user_dev);
 +	unlock_netdev(nd_lock);
- 	if (err < 0)
- 		goto out_free_newdev;
- 
+ out_phy:
+-	rtnl_lock();
+ 	phylink_disconnect_phy(p->dp->pl);
+ 	rtnl_unlock();
+ 	dsa_port_phylink_destroy(p->dp);
 
 
