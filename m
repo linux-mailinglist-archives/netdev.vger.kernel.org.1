@@ -1,209 +1,190 @@
-Return-Path: <netdev+bounces-176855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E21AA6C8C1
-	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 10:31:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70AC1A6C9BF
+	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 11:46:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEEE2461D23
-	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 09:31:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3AA116C512
+	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 10:46:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03F1F1EFF83;
-	Sat, 22 Mar 2025 09:30:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 301561F9F70;
+	Sat, 22 Mar 2025 10:46:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H1ZkGkOC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LQ8tuJcN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C671EF37D;
-	Sat, 22 Mar 2025 09:30:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0146D78F32;
+	Sat, 22 Mar 2025 10:46:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742635845; cv=none; b=ARMg/0hxSZyPCdKNk/57db9Kf+zHwemlM0EgbN4Ugo4rlY5/1YMP0fh7p0HabPdfzPQdW7FbL+hHb0KbNl8xjO0/SgkKXRQOA1dItAsg2FauM+pYzk0E6IKBcYMzRc+BI7/nBmHDt92zQQ3MPNwVWuWAQFpoTKArv9tzwzeM0W8=
+	t=1742640369; cv=none; b=UxuHClYsfd9PcXLB3eWvzNNej21UvflC8j2R+KB1Hh8a8qpWPQfQHGaWD9piXwm0EvsEsAMpGXp+b/cX/e8yWFVT7/8FNFt2D5TZuYHOWYWyl1k65HAdQMPz3fFkBiiVCDnWyoINVEPQ3S99/t0MZjorD9lTg6K2WmBAxveLfIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742635845; c=relaxed/simple;
-	bh=25kfwZWrJCdg3wZt8cA0jm1AToacY98iZoqDX4a/Ij0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EdDYfoF1Xt7J0LlkL2X6qAtbTzuX2C/eetNVXjuSpN/6H+MlW6kbZwWvLnOmieJDzw11HN+ZDt6A+Akn9nwOhazkHSxVjnW4ah2MwCEr0TDJ07ZSwcDV+G9W9mAuM5fDDSS0yjKI2IBpO8XOckzQWFKJ7q6m2wNXBVhdZjPZJW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H1ZkGkOC; arc=none smtp.client-ip=209.85.216.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-3031354f134so2200220a91.3;
-        Sat, 22 Mar 2025 02:30:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742635843; x=1743240643; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0d3Ceii2JHd7DdtO/Jyc5PB50s2tl91HKnoWaWMWAkc=;
-        b=H1ZkGkOCZU20FphlYFoFFkV7jS0FiSum2Q/e9z6E94y+kycYlPGjr4ky91hX/R9JOf
-         rbUN9iNv+1YZv6m2LJaRzfzvFcNA1CTOjKRhvBryXa5OeMx1JvFG89pWNMAfquU0aT7f
-         Q9Svr9LBTsQuV+I4QvJ5C8H9gNmcTRWkUP0WrqNxH0fk3UruDeexWTkcrrPHu9F9U0Od
-         ivQM8KbWLfBc0NkwVGcBGcbeV8VSJk1QyE4EK/nYX+x+ghBuEnMX7jB1MF0xUhzeiDxK
-         6RsAXRRQdPt2mda8JAXKIfugYVuA2pzKSfObwhF/W45+iH1/g1KAxUCSVtdCVS1s9upu
-         USmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742635843; x=1743240643;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0d3Ceii2JHd7DdtO/Jyc5PB50s2tl91HKnoWaWMWAkc=;
-        b=cMbmZI4St4NxPdaoHdfl+ka80Tgg7+E1u7xBfY1VhlzZecejr/z8+61KNmxtnildRQ
-         IcZ+dDQ4/kioKNXpF6sAlEVlhQQs8JHcQvDV5/8Du7lrLt/aATYrmPdkdYMN33l1tFyB
-         QO9MQ45heJNv638eDksjynJEKAnlGU2l4bfoTmBfXFg8zNDROj8IhCbA/iSBl6jOuPQJ
-         E7u8Dimc26zNQSKFK4LQ2nBJZd06VtwJB/8vgcrxINpS5mrBqLBBHxV/x1fEDU8V3vFW
-         SxlYy06JoKpAyZeKfCHqfZnQV6ZY3/nKC+m7ymTUcNvdCahhPVo6SqxkuHtgCQuoK9kj
-         EUXg==
-X-Forwarded-Encrypted: i=1; AJvYcCUNjIMYBnGBqtkBLEhdZw6xmX6mfNM5QlIEg1dwCtT9qBUdve+UlbCzrIABa/tiVnu4bfduL2IFChbxhPr+SPfK@vger.kernel.org, AJvYcCXs6KksImq2dlqd3kbMs5FZFeMYTqZNTElINJuWks53SPahQC7FgMNg5+veYvNzpRs16rbvO/epNJuIGag=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlHrTCRSh9QdmmQUxwZIYYHirnHQ2BoRZyAYvSJeZV/PK+OnRQ
-	5nSaaGxInc6o4D4H8lzz1oH+KZTCZZA/oBa063U0OSsEAdrX/BvntrglM+ZQ6DQ=
-X-Gm-Gg: ASbGnct3QoS/HumD/coxo2zhEyAgazZ4e3WZkdVzCoOTUAGHoc7REv4ykv4zaPyOwjY
-	eB/y6AUcBvJEofeCYAW21n9gs04jw2/Xl5dzVfI4UcuPJuBJjPQ44PPbAPhpF2mI9Bt73JfVC8q
-	mnx37fvsPdJYAAgzDwWzGhs/cX9yUMt+SZ7851tbhykRgs/tVoHajSlh9CWIjGpBHOwV5F+5Cj+
-	KSEj2SvigPhSdxRXX8RcQ1lDWvmzK8UlN4kxJw47CfONiwMbE7HWY5vGfUKvYHdcfa3cJ4rOSbL
-	iiOxGwEG91NrSYSrtOMGbnB/0nyzz6wt1G6WhB8zRH8o9M4G2q97jmHzUhYfet/7/erfKk2XEsY
-	=
-X-Google-Smtp-Source: AGHT+IG/7yVykg/s10+7Q5snEsr3slz39etoxQAorTxcFSAQYsXRWehD5oFue64Zue3LaV8CqDe3xg==
-X-Received: by 2002:a17:90a:d2c7:b0:2fe:b9be:216 with SMTP id 98e67ed59e1d1-3030fefd795mr9942671a91.31.1742635843095;
-        Sat, 22 Mar 2025 02:30:43 -0700 (PDT)
-Received: from fedora.dns.podman ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-301bf58c24esm8452440a91.20.2025.03.22.02.30.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Mar 2025 02:30:42 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Simon Horman <horms@kernel.org>,
-	Phil Sutter <phil@nwl.cc>,
-	Florian Westphal <fw@strlen.de>,
-	Petr Mladek <pmladek@suse.com>,
-	Yoann Congal <yoann.congal@smile.fr>,
-	wireguard@lists.zx2c4.com,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv5 net-next 2/2] wireguard: selftests: update to using nft for qemu test
-Date: Sat, 22 Mar 2025 09:30:16 +0000
-Message-ID: <20250322093016.16631-3-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20250322093016.16631-1-liuhangbin@gmail.com>
-References: <20250322093016.16631-1-liuhangbin@gmail.com>
+	s=arc-20240116; t=1742640369; c=relaxed/simple;
+	bh=dy7hnpEpmljpvnmL7VUaERJFKqdCMUh00qJI84ZH+hY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=XpeQJOAEfrvnfKZWzpGKhfmM4JvA0Rgw4SgfogMigg+cUOYmh1Yhh4xAeF5RO9BAOsXntvza8LedunaDXEX5Azf8vZnVgQuTOAwJiowrFchMsZUAt5l7XA8hY9fUEqlMD5ncgQ7W2JZGCYOVzpK2m9bUMBxsjOjSH+8cJoixzrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LQ8tuJcN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 70EDCC4CEDD;
+	Sat, 22 Mar 2025 10:46:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742640368;
+	bh=dy7hnpEpmljpvnmL7VUaERJFKqdCMUh00qJI84ZH+hY=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=LQ8tuJcNcRoakCH+5YNtfGQ22Wn5A0UfA5vBvDxjJMieBP7sa6UqVY0QwFc1AaVdq
+	 Ow0yE4mic34YRXq8DA6rLgZQCwIINe5fG4rkVNvqokt9bsJzQow3YrrmUs1PzAsj7a
+	 v2zQynJ327MNH+yn/GgcQuqJNHHNd+I/ALKV00V1pRV0UR2H8T8Yd209t5j+kXMjjW
+	 DtPIA/RMIIFSu0zBZPBL5U+6cR9GcnrepUjX1CVjTznp0ubz3mHIMVFKz85JZLhspO
+	 9Od5S2n8mBd/ehx0Ox8izUAkl86VEbL8rMsLkqc8ZQcZISGjbHYqGUDhgKS4xqlanN
+	 NUk9vueWQxfRA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B836C35FFC;
+	Sat, 22 Mar 2025 10:46:08 +0000 (UTC)
+From: Hans-Frieder Vogt via B4 Relay <devnull+hfdevel.gmx.net@kernel.org>
+Subject: [PATCH net-next v7 0/7] net: tn40xx: add support for AQR105 based
+ cards
+Date: Sat, 22 Mar 2025 11:45:51 +0100
+Message-Id: <20250322-tn9510-v3a-v7-0-672a9a3d8628@gmx.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAN+U3mcC/1XNTW7DIBCG4atErEs1/ENXvUfVBTZDzCIkAgu5i
+ nz3EqtVwnI0er73TiqWhJV8nO6kYEs1XXM/zNuJzIvPZ6Qp9Jtw4JJxpumanWJAm/CUz3FmVgV
+ tIZIObgVj2o6xL5JxpRm3lXz3z+Qr0qn4PC+PsYtP+QGWVNdr+TniTRzsr2NeO01QoDIojDpqq
+ xE+z5ftvQeO7SZfIGcDlB0GH2O0bvLGmxGqf6iAcz5A1aFzQiuQBgW4EeonFMwOUHdowXoH1gU
+ upyfc9/0XHJhj424BAAA=
+X-Change-ID: 20241216-tn9510-v3a-2cfc185d680f
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Hans-Frieder Vogt <hfdevel@gmx.net>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1742640367; l=5168;
+ i=hfdevel@gmx.net; s=20240915; h=from:subject:message-id;
+ bh=dy7hnpEpmljpvnmL7VUaERJFKqdCMUh00qJI84ZH+hY=;
+ b=b2krxJvHp5+OhOArQcSFecb2wM4Tk2k+Uo9UyRO0v0MSxwvczVKs3kSNbk9Ca0NsfM92qR9W9
+ GKlKin1KN6KCkD+DvT0F4xxh7/XCpQt1kg5DOeoRxzh5xqybcUkUiok
+X-Developer-Key: i=hfdevel@gmx.net; a=ed25519;
+ pk=s3DJ3DFe6BJDRAcnd7VGvvwPXcLgV8mrfbpt8B9coRc=
+X-Endpoint-Received: by B4 Relay for hfdevel@gmx.net/20240915 with
+ auth_id=209
+X-Original-From: Hans-Frieder Vogt <hfdevel@gmx.net>
+Reply-To: hfdevel@gmx.net
 
-Since we will replace iptables with nft for wireguard netns testing,
-let's also convert the qemu test to use nft at the same time.
+This patch series adds support to the Tehuti tn40xx driver for TN9510 cards
+which combine a TN4010 MAC with an Aquantia AQR105.
+It is an update of the patch series "net: tn40xx: add support for AQR105
+based cards", addressing review comments and generally cleaning up the series.
 
-Co-developed-by: Phil Sutter <phil@nwl.cc>
-Signed-off-by: Phil Sutter <phil@nwl.cc>
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+The patch was tested on a Tehuti TN9510 card (1fc9:4025:1fc9:3015).
+
 ---
- .../testing/selftests/wireguard/qemu/Makefile | 36 ++++++++++++++-----
- .../selftests/wireguard/qemu/kernel.config    |  7 ++--
- 2 files changed, 30 insertions(+), 13 deletions(-)
+Changes in v7:
+- change function name aqr105_config_speed to aqr105_setup_forced, in line with
+  naming of generic functions
+  (suggested by Andrew Lunn <andrew@lunn.ch>)
+- replace device id 0x4025 with symbolic name PCI_DEVICE_ID_TEHUTI_TN9510
+  (suggested by Andrew Lunn <andrew@lunn.ch>)
+- because of last change, remove the Reviewed-by: entries for PATCH 7/7
+- Link to v6: https://lore.kernel.org/r/20250318-tn9510-v3a-v6-0-808a9089d24b@gmx.net
 
-diff --git a/tools/testing/selftests/wireguard/qemu/Makefile b/tools/testing/selftests/wireguard/qemu/Makefile
-index 35856b11c143..2442ae99f007 100644
---- a/tools/testing/selftests/wireguard/qemu/Makefile
-+++ b/tools/testing/selftests/wireguard/qemu/Makefile
-@@ -40,7 +40,9 @@ endef
- $(eval $(call tar_download,IPERF,iperf,3.11,.tar.gz,https://downloads.es.net/pub/iperf/,de8cb409fad61a0574f4cb07eb19ce1159707403ac2dc01b5d175e91240b7e5f))
- $(eval $(call tar_download,BASH,bash,5.1.16,.tar.gz,https://ftp.gnu.org/gnu/bash/,5bac17218d3911834520dad13cd1f85ab944e1c09ae1aba55906be1f8192f558))
- $(eval $(call tar_download,IPROUTE2,iproute2,5.17.0,.tar.gz,https://www.kernel.org/pub/linux/utils/net/iproute2/,bda331d5c4606138892f23a565d78fca18919b4d508a0b7ca8391c2da2db68b9))
--$(eval $(call tar_download,IPTABLES,iptables,1.8.7,.tar.bz2,https://www.netfilter.org/projects/iptables/files/,c109c96bb04998cd44156622d36f8e04b140701ec60531a10668cfdff5e8d8f0))
-+$(eval $(call tar_download,LIBMNL,libmnl,1.0.5,.tar.bz2,https://www.netfilter.org/projects/libmnl/files/,274b9b919ef3152bfb3da3a13c950dd60d6e2bcd54230ffeca298d03b40d0525))
-+$(eval $(call tar_download,LIBNFTNL,libnftnl,1.2.8,.tar.xz,https://www.netfilter.org/projects/libnftnl/files/,37fea5d6b5c9b08de7920d298de3cdc942e7ae64b1a3e8b880b2d390ae67ad95))
-+$(eval $(call tar_download,NFTABLES,nftables,1.1.1,.tar.xz,https://www.netfilter.org/projects/nftables/files/,6358830f3a64f31e39b0ad421d7dadcd240b72343ded48d8ef13b8faf204865a))
- $(eval $(call tar_download,NMAP,nmap,7.92,.tgz,https://nmap.org/dist/,064183ea642dc4c12b1ab3b5358ce1cef7d2e7e11ffa2849f16d339f5b717117))
- $(eval $(call tar_download,IPUTILS,iputils,s20190709,.tar.gz,https://github.com/iputils/iputils/archive/s20190709.tar.gz/#,a15720dd741d7538dd2645f9f516d193636ae4300ff7dbc8bfca757bf166490a))
- $(eval $(call tar_download,WIREGUARD_TOOLS,wireguard-tools,1.0.20210914,.tar.xz,https://git.zx2c4.com/wireguard-tools/snapshot/,97ff31489217bb265b7ae850d3d0f335ab07d2652ba1feec88b734bc96bd05ac))
-@@ -322,8 +324,7 @@ $(BUILD_PATH)/init-cpio-spec.txt: $(TOOLCHAIN_PATH)/.installed $(BUILD_PATH)/ini
- 	echo "file /bin/ss $(IPROUTE2_PATH)/misc/ss 755 0 0" >> $@
- 	echo "file /bin/ping $(IPUTILS_PATH)/ping 755 0 0" >> $@
- 	echo "file /bin/ncat $(NMAP_PATH)/ncat/ncat 755 0 0" >> $@
--	echo "file /bin/xtables-legacy-multi $(IPTABLES_PATH)/iptables/xtables-legacy-multi 755 0 0" >> $@
--	echo "slink /bin/iptables xtables-legacy-multi 777 0 0" >> $@
-+	echo "file /bin/nft $(NFTABLES_PATH)/src/nft 755 0 0" >> $@
- 	echo "slink /bin/ping6 ping 777 0 0" >> $@
- 	echo "dir /lib 755 0 0" >> $@
- 	echo "file /lib/libc.so $(TOOLCHAIN_PATH)/$(CHOST)/lib/libc.so 755 0 0" >> $@
-@@ -338,7 +339,7 @@ $(KERNEL_BUILD_PATH)/.config: $(TOOLCHAIN_PATH)/.installed kernel.config arch/$(
- 	cd $(KERNEL_BUILD_PATH) && ARCH=$(KERNEL_ARCH) $(KERNEL_PATH)/scripts/kconfig/merge_config.sh -n $(KERNEL_BUILD_PATH)/.config $(KERNEL_BUILD_PATH)/minimal.config
- 	$(if $(findstring yes,$(DEBUG_KERNEL)),cp debug.config $(KERNEL_BUILD_PATH) && cd $(KERNEL_BUILD_PATH) && ARCH=$(KERNEL_ARCH) $(KERNEL_PATH)/scripts/kconfig/merge_config.sh -n $(KERNEL_BUILD_PATH)/.config debug.config,)
- 
--$(KERNEL_BZIMAGE): $(TOOLCHAIN_PATH)/.installed $(KERNEL_BUILD_PATH)/.config $(BUILD_PATH)/init-cpio-spec.txt $(IPERF_PATH)/src/iperf3 $(IPUTILS_PATH)/ping $(BASH_PATH)/bash $(IPROUTE2_PATH)/misc/ss $(IPROUTE2_PATH)/ip/ip $(IPTABLES_PATH)/iptables/xtables-legacy-multi $(NMAP_PATH)/ncat/ncat $(WIREGUARD_TOOLS_PATH)/src/wg $(BUILD_PATH)/init
-+$(KERNEL_BZIMAGE): $(TOOLCHAIN_PATH)/.installed $(KERNEL_BUILD_PATH)/.config $(BUILD_PATH)/init-cpio-spec.txt $(IPERF_PATH)/src/iperf3 $(IPUTILS_PATH)/ping $(BASH_PATH)/bash $(IPROUTE2_PATH)/misc/ss $(IPROUTE2_PATH)/ip/ip $(LIBMNL_PATH)/libmnl $(LIBNFTNL_PATH)/libnftnl $(NFTABLES_PATH)/src/nft $(NMAP_PATH)/ncat/ncat $(WIREGUARD_TOOLS_PATH)/src/wg $(BUILD_PATH)/init
- 	$(MAKE) -C $(KERNEL_PATH) O=$(KERNEL_BUILD_PATH) ARCH=$(KERNEL_ARCH) CROSS_COMPILE=$(CROSS_COMPILE)
- .PHONY: $(KERNEL_BZIMAGE)
- 
-@@ -421,15 +422,32 @@ $(IPROUTE2_PATH)/misc/ss: | $(IPROUTE2_PATH)/.installed $(USERSPACE_DEPS)
- 	$(MAKE) -C $(IPROUTE2_PATH) PREFIX=/ misc/ss
- 	$(STRIP) -s $@
- 
--$(IPTABLES_PATH)/.installed: $(IPTABLES_TAR)
-+$(LIBMNL_PATH)/.installed: $(LIBMNL_TAR)
- 	mkdir -p $(BUILD_PATH)
- 	flock -s $<.lock tar -C $(BUILD_PATH) -xf $<
--	sed -i -e "/nfnetlink=[01]/s:=[01]:=0:" -e "/nfconntrack=[01]/s:=[01]:=0:" $(IPTABLES_PATH)/configure
- 	touch $@
- 
--$(IPTABLES_PATH)/iptables/xtables-legacy-multi: | $(IPTABLES_PATH)/.installed $(USERSPACE_DEPS)
--	cd $(IPTABLES_PATH) && ./configure --prefix=/ $(CROSS_COMPILE_FLAG) --enable-static --disable-shared --disable-nftables --disable-bpf-compiler --disable-nfsynproxy --disable-libipq --disable-connlabel --with-kernel=$(BUILD_PATH)/include
--	$(MAKE) -C $(IPTABLES_PATH)
-+$(LIBMNL_PATH)/libmnl: | $(LIBMNL_PATH)/.installed $(USERSPACE_DEPS)
-+	cd $(LIBMNL_PATH) && ./configure --prefix=$(TOOLCHAIN_PATH) $(CROSS_COMPILE_FLAG) --enable-static --disable-shared
-+	$(MAKE) -C $(LIBMNL_PATH) install
-+
-+$(LIBNFTNL_PATH)/.installed: $(LIBNFTNL_TAR)
-+	mkdir -p $(BUILD_PATH)
-+	flock -s $<.lock tar -C $(BUILD_PATH) -xf $<
-+	touch $@
-+
-+$(LIBNFTNL_PATH)/libnftnl: | $(LIBNFTNL_PATH)/.installed $(USERSPACE_DEPS)
-+	cd $(LIBNFTNL_PATH) && PKG_CONFIG_PATH="$(TOOLCHAIN_PATH)/lib/pkgconfig" ./configure --prefix=$(TOOLCHAIN_PATH) $(CROSS_COMPILE_FLAG) --enable-static --disable-shared
-+	$(MAKE) -C $(LIBNFTNL_PATH) install
-+
-+$(NFTABLES_PATH)/.installed: $(NFTABLES_TAR)
-+	mkdir -p $(BUILD_PATH)
-+	flock -s $<.lock tar -C $(BUILD_PATH) -xf $<
-+	touch $@
-+
-+$(NFTABLES_PATH)/src/nft: | $(NFTABLES_PATH)/.installed $(USERSPACE_DEPS)
-+	cd $(NFTABLES_PATH) && PKG_CONFIG_PATH="$(TOOLCHAIN_PATH)/lib/pkgconfig" ./configure --prefix=/ $(CROSS_COMPILE_FLAG) --enable-static --disable-shared --disable-debug --disable-man-doc --with-mini-gmp --without-cli
-+	$(MAKE) -C $(NFTABLES_PATH) PREFIX=/
- 	$(STRIP) -s $@
- 
- $(NMAP_PATH)/.installed: $(NMAP_TAR)
-diff --git a/tools/testing/selftests/wireguard/qemu/kernel.config b/tools/testing/selftests/wireguard/qemu/kernel.config
-index f314d3789f17..9930116ecd81 100644
---- a/tools/testing/selftests/wireguard/qemu/kernel.config
-+++ b/tools/testing/selftests/wireguard/qemu/kernel.config
-@@ -19,10 +19,9 @@ CONFIG_NETFILTER_XTABLES=y
- CONFIG_NETFILTER_XT_NAT=y
- CONFIG_NETFILTER_XT_MATCH_LENGTH=y
- CONFIG_NETFILTER_XT_MARK=y
--CONFIG_IP_NF_IPTABLES=y
--CONFIG_IP_NF_FILTER=y
--CONFIG_IP_NF_MANGLE=y
--CONFIG_IP_NF_NAT=y
-+CONFIG_NF_TABLES=m
-+CONFIG_NF_TABLES_INET=y
-+CONFIG_NFT_NAT=y
- CONFIG_IP_ADVANCED_ROUTER=y
- CONFIG_IP_MULTIPLE_TABLES=y
- CONFIG_IPV6_MULTIPLE_TABLES=y
+Changes in v6:
+- rebaseline to net-next
+- remove unneeded loop timing ability advertisment in aquantia_main.c
+  (highlighted by Maxime Chevallier <maxime.chevallier@bootlin.com>)
+- add failure path in tn40_mdio.c if device_add_software_node fails
+  (suggested by Ratheesh Kannoth <rkannoth@marvell.com>)
+- Link to v5: https://lore.kernel.org/r/20250222-tn9510-v3a-v5-0-99365047e309@gmx.net
+
+Changes in v5:
+- changed version because "b4 send --resend v4" did not succeed
+- used opportunity to rebaseline to net-next
+- only source code change is merging a split string in tn40_mdio.c, removing
+  a warning from b4 prep --check
+- changed format of cover letter in line with b4 (sequence of changes from
+  latest to oldest)
+- Link to v4: https://lore.kernel.org/r/20241221-tn9510-v3a-v4-0-dafff89ba7a7@gmx.net
+
+Changes in v4:
+- use separate aqr105 specific functions instead of adding aqr105 functionality
+  in common functions, with need of "chip generation" parameter
+  (suggested by Andrew Lunn <andrew@lunn.ch>)
+- make generation and cleanup of swnodes more symmetric
+  (suggested by Andrew Lunn <andrew@lunn.ch>)
+- add MDIO/PHY software nodes only for devices that have an aqr105 PHY
+  (suggested by FUJITA Tomonori <fujita.tomonori@gmail.com>)
+- Link to v3: https://lore.kernel.org/r/20241217-tn9510-v3a-v3-0-4d5ef6f686e0@gmx.net
+
+Changes in v3:
+- aquantia_firmware: remove call to of_property_read_string. It should be
+  called from the more generic function device_property_read_string
+- add more AQR105-specific function, to support proper advertising and auto-
+  negotiation
+- re-organize the patches about the mdio speed and TN40_REG_MDIO_CMD_STAT,
+  skipping the 1MHz intermediate speed step
+- re-organized the sequence of the patches:
+    1. changes to the general support functions (net/phy/mdio_bus.c)
+    2. changes to the aquantia PHY driver
+    3. changes to the tn40xx MAC driver, required to support the TN9510 cards
+- Link to v2: https://lore.kernel.org/netdev/trinity-602c050f-bc76-4557-9824-252b0de48659-1726429697171@3c-app-gmx-bap07/
+
+Changes in v2:
+- simplify the check for a firmware-name in a swnode in the aquantia PHY driver
+(comment from Andrew Lunn)
+- changed the software node definition to an mdio node with phy child nodes, to
+be more in line with a typical device tree definition (also comment from
+Andrew Lunn)
+This also solves the problem with several TN4010-based cards that FUJITA
+Tomonori reported
+- clarified the cleanup calls, now calling fwnode_handle_put instead of
+software_node_unregister (comment by FUJITA Tomonori)
+- updated the function mdiobus_scan to support swnodes (following hint of
+Andrew Lunn)
+- remove the small patch to avoid failing after aqr_wait_reset_complete, now
+that a proper patch by Vladimir Oltean is available
+- replace setting of bit 3 in TN40_REG_MDIO_CMD_STAT by calling of
+tn40_mdio_set_speed (suggestion by FUJITA Tomonori)
+- cleaning up the distributed calls to set the MDIO speed in the tn40xx driver
+- define supported PCI-IDs including subvendor IDs to prevent loading on
+unsupported card
+- Link to v1: https://lore.kernel.org/netdev/trinity-33332a4a-1c44-46b7-8526-b53b1a94ffc2-1726082106356@3c-app-gmx-bs04/
+
+---
+Hans-Frieder Vogt (7):
+      net: phy: Add swnode support to mdiobus_scan
+      net: phy: aquantia: add probe function to aqr105 for firmware loading
+      net: phy: aquantia: search for firmware-name in fwnode
+      net: phy: aquantia: add essential functions to aqr105 driver
+      net: tn40xx: create swnode for mdio and aqr105 phy and add to mdiobus
+      net: tn40xx: prepare tn40xx driver to find phy of the TN9510 card
+      net: tn40xx: add pci-id of the aqr105-based Tehuti TN4010 cards
+
+ drivers/net/ethernet/tehuti/tn40.c           |   9 +-
+ drivers/net/ethernet/tehuti/tn40.h           |  33 ++++
+ drivers/net/ethernet/tehuti/tn40_mdio.c      |  84 +++++++++-
+ drivers/net/phy/aquantia/aquantia_firmware.c |   7 +-
+ drivers/net/phy/aquantia/aquantia_main.c     | 240 ++++++++++++++++++++++++++-
+ drivers/net/phy/mdio_bus.c                   |  14 ++
+ 6 files changed, 378 insertions(+), 9 deletions(-)
+---
+base-commit: 23c9ff659140f97d44bf6fb59f89526a168f2b86
+change-id: 20241216-tn9510-v3a-2cfc185d680f
+
+Best regards,
 -- 
-2.46.0
+Hans-Frieder Vogt <hfdevel@gmx.net>
+
 
 
