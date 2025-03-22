@@ -1,160 +1,174 @@
-Return-Path: <netdev+bounces-176845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9DB4A6C6E0
-	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 02:25:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EEBCA6C712
+	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 03:07:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1ECF7189AE6E
-	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 01:25:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7E8947A9387
+	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 02:06:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A0341F5F6;
-	Sat, 22 Mar 2025 01:25:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC31B3E47B;
+	Sat, 22 Mar 2025 02:07:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mvb0h8dX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ULavpZtf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B271173;
-	Sat, 22 Mar 2025 01:24:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E82DA70813;
+	Sat, 22 Mar 2025 02:07:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742606700; cv=none; b=WAFI6KGi5XgoUxOU2YwxVGrlbCGM3wFrr7aIBko57T7vuKnEqUG4uh8ozA9ibgrcfCPkITQuuo3nYuQB+E9XlGOJ1rqmrjzwSegLX1gc5vbP7VZYfaNWIFMuw8JDspJMBKu0grpnCM8UA93kyosThHuIrb/EjWuS64uMPgoRKUU=
+	t=1742609241; cv=none; b=M4z7pZzyxIIsKLUwUW0STvUnOjUvqBDiK6AnrdK1Lcbne8+xb7bqMxrh5YrrfgyVgLesggH4cvbxv1D8zqcZS6W8t8IGCykDdbSUes8jXdCcmHmpnhsZqXMAdSMIoZpIxl7cePGV+OQFUeF0D4Fu65v2gqNFjFvyyZvZq/YXFXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742606700; c=relaxed/simple;
-	bh=bZI2WcaPPjMe4WlNfTFDih3vqy+KHHXblGdZAs/TyK0=;
+	s=arc-20240116; t=1742609241; c=relaxed/simple;
+	bh=o+3A0+n4HCzWRjzZsDtvzIcEBqGn5AvcKHAl64U86Yw=;
 	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=W54pBCz+iYFq5N0oaQbsRu7CIrtl82uYjMNZZKVtkKA192aq+7lLqr3mrP03cL9vknkpWLPULljTmEaSa8DC7qLvNGmgRFOnjurCdEl1VTfARIQQQAUfnXeVdUof+guJbdU6Q5kR2kKfLeaoIBcSASxurOmSfAprYBZGws8D+18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mvb0h8dX; arc=none smtp.client-ip=209.85.214.180
+	 Mime-Version:Content-Type; b=sQsVtpJZZCtGr1nRTjv5lblWL3JKF8F+BTTLMlEgNIRI48DSaRBUF/tmAHtG7udsNL5h0ezm/mjzHx3FSEnFhpShToq+4r6RLc2GV6YAqHnbkfGm0khQTsl6RLLjO80NIqCsg5lHWdOw1mo0Kif1l8kExPFhbSnru4/v2Ud1ipM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ULavpZtf; arc=none smtp.client-ip=209.85.214.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-22409077c06so34826845ad.1;
-        Fri, 21 Mar 2025 18:24:58 -0700 (PDT)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-225477548e1so49806085ad.0;
+        Fri, 21 Mar 2025 19:07:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742606698; x=1743211498; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1742609239; x=1743214039; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to:from
          :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=bZI2WcaPPjMe4WlNfTFDih3vqy+KHHXblGdZAs/TyK0=;
-        b=mvb0h8dX5nhLGxPpKeLPdb+vt9mBYIS0ZsPg07j8HnzeB10lMzVgU3myoekEt2Wth6
-         JQPFAnnZN5nHtkcmXtsZcyx6euvv59E/sINWrxHOFFPedWz7J9/nP9/U6+fH6htufGCS
-         4AeVWvwkFz6PtyjGVinPQPmBO4BILEbEG1o4avM9Qntz4z7w6Uv4yFgLjPBITrRW6n5S
-         mMxYpHf97mc+g5IiOPOEiYqRKX16rX3JCuidaHN4vxSTskwngeg6ZZGH7PY7xKNyIr/n
-         lhfHkmkPh+OrYRFGGWrjwv/NqRH/6fRS7+wcZLr3RF5tY3A9NKuz6CmwPG1ZxWLlQvzu
-         oKGQ==
+        bh=cgUGa8Zy4HnL9nENKrVNGHly8oBEx0+3uIbx2Khl3+4=;
+        b=ULavpZtfYLzdal2RFrk1moqYZVRw8Qepg0Z++totlPLJAmJUr2hwlebFIuE/1SATHE
+         9pLRLPPKAO7sKNLeGd+3/wuh6UJ1pAIlvaJhTZfKDWxbseFo55cAoLwscAPLYCI8mdF3
+         MvAUEYonqo+nnHddSaUYGNjvUBPa1f5+iHSPh6QHS4+QNwR+uO218Sq4pNTdPeuEUH+H
+         byf+YH9ehX54UImSr/ox4ERrB9bqDSRUjX/AVt8ga1L1gM8u/XOgGy6KylD5cR7OsfJg
+         sldlXSgJvS7Tu3jVGPEJhBPGXOL4vzRqgW9qUcy5G+VlbcwBQShNtV7BWx3TZyuNn4nR
+         CQ5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742606698; x=1743211498;
+        d=1e100.net; s=20230601; t=1742609239; x=1743214039;
         h=content-transfer-encoding:mime-version:references:in-reply-to:from
          :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=bZI2WcaPPjMe4WlNfTFDih3vqy+KHHXblGdZAs/TyK0=;
-        b=YHjHyT55af7OFqggEy7ZxH6JkPKW+AxBhpAImzHlPRX/NeQeOPSSjJoIBRNX0GtmpA
-         n5JmQWI5rSw6ydP1ARddNLf64rTivi6SK7fG+LhPquc+CPKy/IhTXvjoSZmw0eWVH/xK
-         BF3GWURTvQYP0Lgq99G2Nf0G1MievJ3/kTFmXlcL5UCrFBu7qG2BWErOYKRkgXDrWv6b
-         3n7iCSf8BODSrQpOr72aFYAXYXaIB7SAs3ibHjtlGQyzXrw9c/nOOas6a7a+IwvsLhDR
-         8FUEvkgzAxn02yW3DY9+Cwpp3vViQNENp+maToqR23Rcn3v60Op4Zok01gWPDY84ovm4
-         Hwwg==
-X-Forwarded-Encrypted: i=1; AJvYcCV8PSPEkZyPZPe3jg3ohYocVo3AzpZfIq2zbxJ2XoFRNMjY8vamOyxtBCoE+Ja9cM9Bdpq7HTWd@vger.kernel.org, AJvYcCVYRx0ShYlFg4osDlvQu0O8NUwLrrNzDgvH0WqNFa7g168SBcCGRmn6C0kLJSB1zRX0pA//oWnJrOaR7N7LfIg=@vger.kernel.org, AJvYcCXmJIxDWFEVIRKfsxLZHH0Soms62ALbmBAjZ/RrZr2dbzPcAyTLhWrdF3cKlVAoJiXNVQ4gdqVUoqgV/8Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9kgSQaNQaX67/nRMAT6whbuhx+dVZyVpx+xDjCtdgnWGYSelB
-	pmmi3eawF+0Q8R2TP4SbIFdTaXQB1vbVIoBLoJA9Bu4EaXFhyhT2
-X-Gm-Gg: ASbGncuGQXR+AUt3CbISumOYflboZhksOJHD/KRePGMwsyP2t7VmT+USXSPwtpiOXjv
-	DQ+SRpci8Nn2qTnAzW1Nx14yNoUR/s567IdKRf5CoTS9XnwLMCbinEbeHl4keLkakMJ2QbnaRJB
-	FD5P+pDb1pbgaI4TzLREBzQ0qVH+L5gDMcNFrZrXxbDvDetBBqyir2G5McPt881HrSRNJm3xZ/2
-	THpcl8vGIEar+Mp+iQFKvUSKog2ZJyUxBiCNe29DJyHV/ESRGWWymEk93DRnyZQLzuXPzPiqGxg
-	KGoEErr5uhFo+cwSeefU4aZEvBgcvWfJWEoRJkgv4LfVwg/1Mr4nQgd05eYY+P2AVireKaEYdyU
-	2fCSHOXlgzxGSu7kB7WP+yEk2Pg0=
-X-Google-Smtp-Source: AGHT+IG+KGbqcApHBMLseQN6Ms7E0RNkF5fm0apwIKTM6zyD46K6uqb2NA3RjCl67LPHQjaxn66Bqg==
-X-Received: by 2002:a17:902:da8f:b0:224:1219:934b with SMTP id d9443c01a7336-22780e23677mr76423335ad.50.1742606697560;
-        Fri, 21 Mar 2025 18:24:57 -0700 (PDT)
+        bh=cgUGa8Zy4HnL9nENKrVNGHly8oBEx0+3uIbx2Khl3+4=;
+        b=tPQFdtY4CZt1ygEaXq6RuEhGAZQW8uC4lrmLdssZd86LOFP4D4ZuZteJdroO3Erj1N
+         R/NHExbiqNN82+/LrTpiVPnUGrWq4UIasqUjCaqqAjV3UkLT6kQRf7khUYl8EpD5/PsI
+         EaViLc5hgzSfUhMexyLIDtLcTOn6VdCeHzMqp5zppTIhfrdjb2jXfV2OIpAqnBUs9fso
+         111FH7deGwTirvyyOIENPo7ftrDqhBlJ2ddr+2ks1HJnPB1P7wU//bUC70UpyunboTOZ
+         Lc9OWYGuNNZes/dsvhSftC2lufnYmYcBrP1a+F9Z4Or763Sooo+EYA9DrUfjAVkx040U
+         1cQA==
+X-Forwarded-Encrypted: i=1; AJvYcCU8CoaksI61q5574KfJEBCyFmusEHzjzW4NeQ3s7ynp7lgJilUO3SQ3K6egwTE+gW/dY1Iev/zZq0UWro4=@vger.kernel.org, AJvYcCWcafuFfo+7MuqA23XHlIRoV4+V0x9IugOWM4KZgfV5yYFfR3w3vqdomMkjuZ46pKgueGHssYxm@vger.kernel.org, AJvYcCWo7PUOrP5JLpa2pLGjVTuHpL7G0J8olXv+UhtUgfUdTBu4yfh03PIv6r2JHnlBMdJlY2Yz/+VlLml0cUHjHeQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymPxZz4VBPlaBfAOU9GPVWj//xuHtTVMmZy02u86+AW6obkPHe
+	cqUli4rZJHTJwoe0O9W2YBc6HkK+bkHAvKq3qCt9M3oaOfEy49bv
+X-Gm-Gg: ASbGncsciM8fIsBWTiquBTZsLiO8S4HCSjXTrGKSg6fWgOVpUl4mSDQBiK5nXCi4CDz
+	5BrVaLKzDGCmMlaXakZF2uySKEFNPJOcHw+6/7l0pSHAHk9vILJAScZCe+yOWXBx0NNnx5PwfX4
+	tIQcKGQAhoCDQvSCcYta2TDPgrQI6jyQKP/Dox4eZkM0TrDAAYBEfLR/ZVowqtbCj02oLHL6+x5
+	+YDjMENIEAK7AAsXUcAL/N5G+axm1rmbkTndv8/ZBxYSvCrAVzp2joOzsqhwFNEDBrt3P5hdbpk
+	dg9zLZLKcd92RG443pgKOI0jn+CbyLiCLIfifNKM5xv6pSHC/A7oiGSqOHYI+51Av2nbo5DL/ZE
+	i23cy9bpBUuW5sEo4M50Q5MVp/Lw=
+X-Google-Smtp-Source: AGHT+IGLVg32rMmKIzPpVWs9HZPMlOJIabBOGSAsw0vabqJF4egHETEku6hjipIWKkKg6BlmY1UAzw==
+X-Received: by 2002:a05:6a20:d809:b0:1f5:709d:e0b7 with SMTP id adf61e73a8af0-1fe42f08f6amr10162334637.6.1742609239106;
+        Fri, 21 Mar 2025 19:07:19 -0700 (PDT)
 Received: from localhost (p4204131-ipxg22701hodogaya.kanagawa.ocn.ne.jp. [153.160.176.131])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22780f3a2e0sm24866285ad.39.2025.03.21.18.24.51
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af8a27db8e5sm2612747a12.14.2025.03.21.19.07.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Mar 2025 18:24:57 -0700 (PDT)
-Date: Sat, 22 Mar 2025 10:24:49 +0900 (JST)
-Message-Id: <20250322.102449.895174336060649075.fujita.tomonori@gmail.com>
-To: frederic@kernel.org
-Cc: fujita.tomonori@gmail.com, linux-kernel@vger.kernel.org,
- daniel.almeida@collabora.com, gary@garyguo.net, aliceryhl@google.com,
- me@kloenk.dev, rust-for-linux@vger.kernel.org, netdev@vger.kernel.org,
- andrew@lunn.ch, hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
- alex.gaynor@gmail.com, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
- a.hindborg@samsung.com, anna-maria@linutronix.de, tglx@linutronix.de,
- arnd@arndb.de, jstultz@google.com, sboyd@kernel.org, mingo@redhat.com,
- peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
- dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
- mgorman@suse.de, vschneid@redhat.com, tgunders@redhat.com,
- david.laight.linux@gmail.com
-Subject: Re: [PATCH v11 5/8] rust: time: Add wrapper for fsleep() function
+        Fri, 21 Mar 2025 19:07:18 -0700 (PDT)
+Date: Sat, 22 Mar 2025 11:07:03 +0900 (JST)
+Message-Id: <20250322.110703.1794086613370193338.fujita.tomonori@gmail.com>
+To: boqun.feng@gmail.com
+Cc: tglx@linutronix.de, a.hindborg@kernel.org, fujita.tomonori@gmail.com,
+ linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
+ gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+ a.hindborg@samsung.com, aliceryhl@google.com, anna-maria@linutronix.de,
+ frederic@kernel.org, arnd@arndb.de, jstultz@google.com, sboyd@kernel.org,
+ mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
+ vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org,
+ bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
+ tgunders@redhat.com, me@kloenk.dev, david.laight.linux@gmail.com
+Subject: Re: [PATCH v11 6/8] MAINTAINERS: rust: Add new sections for
+ DELAY/SLEEP and TIMEKEEPING API
 From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <Z93io9rkpRMiXEKi@pavilion.home>
-References: <20250220070611.214262-1-fujita.tomonori@gmail.com>
-	<20250220070611.214262-6-fujita.tomonori@gmail.com>
-	<Z93io9rkpRMiXEKi@pavilion.home>
+In-Reply-To: <67ddd387.050a0220.3229ca.921c@mx.google.com>
+References: <87jz8ichv5.fsf@kernel.org>
+	<87o6xu15m1.ffs@tglx>
+	<67ddd387.050a0220.3229ca.921c@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=utf-8
-Content-Transfer-Encoding: base64
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-T24gRnJpLCAyMSBNYXIgMjAyNSAyMzowNToyMyArMDEwMA0KRnJlZGVyaWMgV2Vpc2JlY2tlciA8
-ZnJlZGVyaWNAa2VybmVsLm9yZz4gd3JvdGU6DQoNCj4gTGUgVGh1LCBGZWIgMjAsIDIwMjUgYXQg
-MDQ6MDY6MDdQTSArMDkwMCwgRlVKSVRBIFRvbW9ub3JpIGEgw6ljcml0IDoNCj4+IEFkZCBhIHdy
-YXBwZXIgZm9yIGZzbGVlcCgpLCBmbGV4aWJsZSBzbGVlcCBmdW5jdGlvbnMgaW4NCj4+IGluY2x1
-ZGUvbGludXgvZGVsYXkuaCB3aGljaCB0eXBpY2FsbHkgZGVhbHMgd2l0aCBoYXJkd2FyZSBkZWxh
-eXMuDQo+PiANCj4+IFRoZSBrZXJuZWwgc3VwcG9ydHMgc2V2ZXJhbCBzbGVlcCBmdW5jdGlvbnMg
-dG8gaGFuZGxlIHZhcmlvdXMgbGVuZ3Rocw0KPj4gb2YgZGVsYXkuIFRoaXMgYWRkcyBmc2xlZXAo
-KSwgYXV0b21hdGljYWxseSBjaG9vc2VzIHRoZSBiZXN0IHNsZWVwDQo+PiBtZXRob2QgYmFzZWQg
-b24gYSBkdXJhdGlvbi4NCj4+IA0KPj4gc2xlZXAgZnVuY3Rpb25zIGluY2x1ZGluZyBmc2xlZXAo
-KSBiZWxvbmdzIHRvIFRJTUVSUywgbm90DQo+PiBUSU1FS0VFUElORy4gVGhleSBhcmUgbWFpbnRh
-aW5lZCBzZXBhcmF0ZWx5LiBydXN0L2tlcm5lbC90aW1lLnJzIGlzIGFuDQo+PiBhYnN0cmFjdGlv
-biBmb3IgVElNRUtFRVBJTkcuIFRvIG1ha2UgUnVzdCBhYnN0cmFjdGlvbnMgbWF0Y2ggdGhlIEMN
-Cj4+IHNpZGUsIGFkZCBydXN0L2tlcm5lbC90aW1lL2RlbGF5LnJzIGZvciB0aGlzIHdyYXBwZXIu
-DQo+PiANCj4+IGZzbGVlcCgpIGNhbiBvbmx5IGJlIHVzZWQgaW4gYSBub25hdG9taWMgY29udGV4
-dC4gVGhpcyByZXF1aXJlbWVudCBpcw0KPj4gbm90IGNoZWNrZWQgYnkgdGhlc2UgYWJzdHJhY3Rp
-b25zLCBidXQgaXQgaXMgaW50ZW5kZWQgdGhhdCBrbGludCBbMV0NCj4+IG9yIGEgc2ltaWxhciB0
-b29sIHdpbGwgYmUgdXNlZCB0byBjaGVjayBpdCBpbiB0aGUgZnV0dXJlLg0KPj4gDQo+PiBMaW5r
-OiBodHRwczovL3J1c3QtZm9yLWxpbnV4LmNvbS9rbGludCBbMV0NCj4+IFRlc3RlZC1ieTogRGFu
-aWVsIEFsbWVpZGEgPGRhbmllbC5hbG1laWRhQGNvbGxhYm9yYS5jb20+DQo+PiBSZXZpZXdlZC1i
-eTogR2FyeSBHdW8gPGdhcnlAZ2FyeWd1by5uZXQ+DQo+PiBSZXZpZXdlZC1ieTogQWxpY2UgUnlo
-bCA8YWxpY2VyeWhsQGdvb2dsZS5jb20+DQo+PiBSZXZpZXdlZC1ieTogRmlvbmEgQmVocmVucyA8
-bWVAa2xvZW5rLmRldj4NCj4+IFNpZ25lZC1vZmYtYnk6IEZVSklUQSBUb21vbm9yaSA8ZnVqaXRh
-LnRvbW9ub3JpQGdtYWlsLmNvbT4NCj4gDQo+IFNvcnJ5IHRvIG1ha2UgYSBsYXRlIHJldmlldy4g
-SSBkb24ndCBtZWFuIHRvIGRlbGF5IHRoYXQgYW55IGZ1cnRoZXINCj4gYnV0Og0KDQpObyBwcm9i
-bGVtIGF0IGFsbC4gVGhhbmtzIGZvciByZXZpZXdpbmchDQoNCg0KPj4gKy8vLyBgZGVsdGFgIG11
-c3QgYmUgd2l0aGluIGBbMCwgaTMyOjpNQVhdYCBtaWNyb3NlY29uZHM7DQo+PiArLy8vIG90aGVy
-d2lzZSwgaXQgaXMgZXJyb25lb3VzIGJlaGF2aW9yLiBUaGF0IGlzLCBpdCBpcyBjb25zaWRlcmVk
-IGEgYnVnDQo+PiArLy8vIHRvIGNhbGwgdGhpcyBmdW5jdGlvbiB3aXRoIGFuIG91dC1vZi1yYW5n
-ZSB2YWx1ZSwgaW4gd2hpY2ggY2FzZSB0aGUgZnVuY3Rpb24NCj4+ICsvLy8gd2lsbCBzbGVlcCBm
-b3IgYXQgbGVhc3QgdGhlIG1heGltdW0gdmFsdWUgaW4gdGhlIHJhbmdlIGFuZCBtYXkgd2Fybg0K
-Pj4gKy8vLyBpbiB0aGUgZnV0dXJlLg0KPj4gKy8vLw0KPj4gKy8vLyBUaGUgYmVoYXZpb3IgYWJv
-dmUgZGlmZmVycyBmcm9tIHRoZSBDIHNpZGUgW2Bmc2xlZXAoKWBdIGZvciB3aGljaCBvdXQtb2Yt
-cmFuZ2UNCj4+ICsvLy8gdmFsdWVzIG1lYW4gImluZmluaXRlIHRpbWVvdXQiIGluc3RlYWQuDQo+
-IA0KPiBBbmQgdmVyeSBpbXBvcnRhbnQ6IHRoZSBiZWhhdmlvdXIgYWxzbyBkaWZmZXIgaW4gdGhh
-dCB0aGUgQyBzaWRlIHRha2VzDQo+IHVzZWNzIHdoaWxlIHRoaXMgdGFrZXMgbnNlY3MuIFdlIHNo
-b3VsZCByZWFsbHkgZGlzYW1iaWd1YXRlIHRoZSBzaXR1YXRpb24NCj4gYXMgdGhhdCBtaWdodCBj
-cmVhdGUgY29uZnVzaW9uIG9yIG1pc3VzYWdlLg0KPiANCj4gRWl0aGVyIHRoaXMgc2hvdWxkIGJl
-IHJlbmFtZWQgdG8gZnNsZWVwX25zKCkgb3IgZnNsZWVwX25zZWNzKCksIG9yIHRoaXMgc2hvdWxk
-DQo+IHRha2UgbWljcm9zZWNvbmRzIGRpcmVjdGx5Lg0KDQpZb3UgbWVhbnQgdGhhdCBgRGVsdGFg
-IHR5cGUgaW50ZXJuYWxseSB0cmFja3MgdGltZSBpbiBuYW5vc2Vjb25kcz8NCg0KSXQncyB0cnVl
-IGJ1dCBEZWx0YSB0eXBlIGlzIGEgdW5pdC1hZ25vc3RpYyB0aW1lIGFic3RyYWN0aW9uLCBkZXNp
-Z25lZA0KdG8gcmVwcmVzZW50IGR1cmF0aW9ucyBhY3Jvc3MgZGlmZmVyZW50IGdyYW51bGFyaXRp
-ZXMg4oCUIHNlY29uZHMsDQptaWxsaXNlY29uZHMsIG1pY3Jvc2Vjb25kcywgbmFub3NlY29uZHMu
-IFRoZSBSdXN0IGFic3RyYWN0aW9uIGFsd2F5cw0KdHJpZXMgdG8gdXMgRGVsdGEgdHlwZSB0byBy
-ZXByZXNlbnQgZHVyYXRpb25zLg0KDQpSdXN0J3MgZnNsZWVwIHRha2VzIERlbHRhLCBpbnRlcm5h
-bGx5IGNvbnZlcnRzIGl0IGluIHVzZWNzLCBhbmQgY2FsbHMNCkMncyBmc2xlZXAuDQoNClVzdWFs
-bHksIGRyaXZlcnMgY29udmVydCBmcm9tIGEgY2VydGFpbiB0aW1lIHVuaXQgdG8gRGVsdGEgYmVm
-b3JlDQpjYWxsaW5nIGZzbGVlcCBsaWtlIHRoZSBmb2xsb3dpbmcsIHNvIG1pc3VzZSBvciBjb25m
-dXNpb24gaXMgdW5saWtlbHkNCnRvIG9jY3VyLCBJIHRoaW5rLg0KDQpmc2xlZXAoRGVsdGE6OmZy
-b21fbWljcm9zKDUwKSk7DQoNCkhvd2V2ZXIsIGFzIHlvdSBwb2ludGVkIG91dCwgdGhlcmUgaXMg
-YSBkaWZmZXJlbmNlOyBDJ3MgZnNsZWVwIHRha2VzDQp1c2VjcyB3aGlsZSBSdXN0J3MgZnNsZWVw
-IHRha2VzIGEgdW5pdC1hZ25vc3RpYyB0aW1lIHR5cGUuIFRha2luZyB0aGlzDQpkaWZmZXJlbmNl
-IGludG8gYWNjb3VudCwgaWYgd2Ugd2VyZSB0byByZW5hbWUgZnNsZWVwIGZvciBSdXN0LCBJIHRo
-aW5rDQp0aGF0IGEgbmFtZSB0aGF0IGlzIGFnbm9zdGljIHRvIHRoZSB0aW1lIHVuaXQgd291bGQg
-c2VlbSBtb3JlDQphcHByb3ByaWF0ZS4gU2ltcGx5IHNsZWVwKCksIHBlcmhhcHM/DQo=
+Thank you all!
+
+On Fri, 21 Mar 2025 14:00:52 -0700
+Boqun Feng <boqun.feng@gmail.com> wrote:
+
+> On Fri, Mar 21, 2025 at 09:38:46PM +0100, Thomas Gleixner wrote:
+>> On Fri, Mar 21 2025 at 20:18, Andreas Hindborg wrote:
+>> >> Could you add me as a reviewer in these entries?
+>> >>
+>> >
+>> > I would like to be added as well.
+>> 
+>> Please add the relevant core code maintainers (Anna-Maria, Frederic,
+>> John Stultz and myself) as well to the reviewers list, so that this does
+>> not end up with changes going in opposite directions.
+>> 
+> 
+> Make sense, I assume you want this to go via rust then (althought we
+> would like it to go via your tree if possible ;-))?
+
+Once the following review regarding fsleep() is complete, I will submit
+patches #2 through #6 as v12 for rust-next:
+
+https://lore.kernel.org/linux-kernel/20250322.102449.895174336060649075.fujita.tomonori@gmail.com/
+
+The updated MAINTAINERS file will look like the following.
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index cbf84690c495..858e0b34422f 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -10370,6 +10370,18 @@ F:	kernel/time/timer_list.c
+ F:	kernel/time/timer_migration.*
+ F:	tools/testing/selftests/timers/
+ 
++DELAY AND SLEEP API [RUST]
++M:	FUJITA Tomonori <fujita.tomonori@gmail.com>
++R:	Boqun Feng <boqun.feng@gmail.com>
++R:	Andreas Hindborg <a.hindborg@kernel.org>
++R:	Anna-Maria Behnsen <anna-maria@linutronix.de>
++R:	Frederic Weisbecker <frederic@kernel.org>
++R:	Thomas Gleixner <tglx@linutronix.de>
++L:	rust-for-linux@vger.kernel.org
++L:	linux-kernel@vger.kernel.org
++S:	Maintained
++F:	rust/kernel/time/delay.rs
++
+ HIGH-SPEED SCC DRIVER FOR AX.25
+ L:	linux-hams@vger.kernel.org
+ S:	Orphan
+@@ -23944,6 +23956,17 @@ F:	kernel/time/timekeeping*
+ F:	kernel/time/time_test.c
+ F:	tools/testing/selftests/timers/
+ 
++TIMEKEEPING API [RUST]
++M:	FUJITA Tomonori <fujita.tomonori@gmail.com>
++R:	Boqun Feng <boqun.feng@gmail.com>
++R:	Andreas Hindborg <a.hindborg@kernel.org>
++R:	John Stultz <jstultz@google.com>
++R:	Thomas Gleixner <tglx@linutronix.de>
++L:	rust-for-linux@vger.kernel.org
++L:	linux-kernel@vger.kernel.org
++S:	Maintained
++F:	rust/kernel/time.rs
++
+ TIPC NETWORK LAYER
+ M:	Jon Maloy <jmaloy@redhat.com>
+ L:	netdev@vger.kernel.org (core kernel code)
 
