@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-176925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28BEEA6CB2A
-	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 16:30:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D0C8A6CB3D
+	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 16:43:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E63F01887C53
-	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 15:29:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2D3B188C0FF
+	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 15:43:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95BBA22F3B8;
-	Sat, 22 Mar 2025 15:29:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEDEB22A81F;
+	Sat, 22 Mar 2025 15:43:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GSwE/MeU"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KuxLY5IH"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073F61531C8;
-	Sat, 22 Mar 2025 15:29:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFA341DAC95;
+	Sat, 22 Mar 2025 15:43:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742657349; cv=none; b=ByW7aK3mZH90YciP83qvAu/h1HjC8ceILTJcf5QTKeL6cleQ3mWW6TEMleoXwe/SYY/OlMcuc/ffyaJ+ycRYJjroKYS8bCONETOnOzcbTcgEZ/WqkEJOOCbOifZKUJ0K2nTKKMpIjGgGZUMg9xLUHZ6N/JbNwcvvMrbssdfIMC0=
+	t=1742658192; cv=none; b=BhOzV04YLoUdo86IyN4NHWSMIe9ZkSdsuLpG+OKh2yztqRnUtYlWy3D+d04viLbXFfDgFxPyyIQDxSrD3s+Yo4NXMxWqQ1nenH1oG3Poh2e4U1DLcoC7yGahWMcH+PRhWMlPN6v9ufBPLsjYBILuTtkQ5nPFMexzdxMYIvEhgd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742657349; c=relaxed/simple;
-	bh=LX1DsUp4v2j/eiwibU3yVN9Ap65ACr+CkNOOgJvvI80=;
+	s=arc-20240116; t=1742658192; c=relaxed/simple;
+	bh=CWWe4PstEF4d9tne4DiFX6uP4PFTSFPxDhi2YS6OAUw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u4NmjFPs/snAbfW6bA4JuERY7wulb/1TRuaDwICNBJ0NPpg7ZSs9vPxN2KcDTAshIMwDvOwRNCFlDQXZKO2l3hylY6vwQ9av3ha4wR6txRa1Taa7vzjnlpMsdXILIHE0vXwn8oNOLRBhisl4n65LLMceVQvNdmHSLiceh+keJco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GSwE/MeU; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=bCnLOISdvIzmGvyYmCzHqsR0i6+QedLcXmbsakMUU83HvWspUoSjS8tMEBLqL0AKsK1YaG78pohdneBF6V/vMxkoldAIY/b1GMcTmStGBMQCQH4N+0Ku58e9eMcKSZL8mSGodx7b2XxornuriOyCL0IEm6N8qz9UKXA4Ih5RooU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KuxLY5IH; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=F6DnPCoCwNoNSr0FXhPtLlu4rkM00mEhuf5ucwx1PcY=; b=GSwE/MeU9A3ANNnVLNzEWtwzhe
-	b/US4Gz2qoOEuOy10s1SViRbA3OhvDr19oHsqR2y7mI6B/gnMYG3mu8t9ZtgWRpPPthhRYjo0A34k
-	fLgiLW01Ma/T1LavEHLFlsuuO5ESVCH8KGv4ZuKYKdQ0NiW4SgYvSVnJdi6j2t/jex/8=;
+	bh=N0HV37I62AuU/oXEFaKF0jaHXmJrWxfQnCxCHmR/Kuk=; b=KuxLY5IHQmDc6wRqAcP1v9Qo4F
+	h0DnzaNAlR9s53B3tKz19V0AOKFis8h+VkomO91CRj5qJZILgKteRpibtf9u1HVmkpVcvkPUaGTGO
+	SB5UNQwst4KzKVR++5SEU4eVTjwm25TQe6rdEwRRfNiLf6N5kTKfdGF1lWbwkRiM3pCo=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tw0mN-006jYL-MG; Sat, 22 Mar 2025 16:28:55 +0100
-Date: Sat, 22 Mar 2025 16:28:55 +0100
+	id 1tw104-006jac-DL; Sat, 22 Mar 2025 16:43:04 +0100
+Date: Sat, 22 Mar 2025 16:43:04 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Cc: davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
@@ -58,11 +58,11 @@ Cc: davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
 	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
 	Sean Anderson <sean.anderson@linux.dev>,
 	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>
-Subject: Re: [PATCH net-next v4 1/2] net: phy: sfp: Add support for SMBus
- module access
-Message-ID: <24cff763-8312-4502-9e86-b20883ad616b@lunn.ch>
+Subject: Re: [PATCH net-next v4 2/2] net: mdio: mdio-i2c: Add support for
+ single-byte SMBus operations
+Message-ID: <78b99da9-1e0e-4024-a4cb-b649caf0a5d2@lunn.ch>
 References: <20250322075745.120831-1-maxime.chevallier@bootlin.com>
- <20250322075745.120831-2-maxime.chevallier@bootlin.com>
+ <20250322075745.120831-3-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,29 +71,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250322075745.120831-2-maxime.chevallier@bootlin.com>
+In-Reply-To: <20250322075745.120831-3-maxime.chevallier@bootlin.com>
 
-On Sat, Mar 22, 2025 at 08:57:44AM +0100, Maxime Chevallier wrote:
-> The SFP module's eeprom and internals are accessible through an i2c bus.
+On Sat, Mar 22, 2025 at 08:57:45AM +0100, Maxime Chevallier wrote:
+> PHYs that are within copper SFP modules have their MDIO bus accessible
+> through address 0x56 (usually) on the i2c bus. The MDIO-I2C bridge is
+> desgned for 16 bits accesses, but we can also perform 8bits accesses by
+> reading/writing the high and low bytes sequentially.
 > 
-> It is possible that the SFP might be connected to an SMBus-only
-> controller, such as the one found in some PHY devices in the VSC85xx
-> family.
+> This commit adds support for this type of accesses, thus supporting
+> smbus controllers such as the one in the VSC8552.
 > 
-> Introduce a set of sfp read/write ops that are going to be used if the
-> i2c bus is only capable of doing smbus byte accesses.
+> This was only tested on Copper SFP modules that embed a Marvell 88e1111
+> PHY.
 > 
-> As Single-byte SMBus transaction go against SFF-8472 and breaks the
-> atomicity for diagnostics data access, hwmon is disabled in the case
-> of SMBus access.
-> 
-> Moreover, as this may cause other instabilities, print a warning at
-> probe time to indicate that the setup may be unreliable because of the
-> hardware design.
-> 
-> As hwmon may be disabled for both broken EEPROM and smbus, the warnings
-> are udpated accordingly.
-> 
+> Tested-by: Sean Anderson <sean.anderson@linux.dev>
 > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
