@@ -1,59 +1,56 @@
-Return-Path: <netdev+bounces-176924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7529A6CB0D
-	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 15:59:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FB58A6CABA
+	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 15:43:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D3384A3283
-	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 14:52:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C7151B80BC4
+	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 14:41:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFB3C231A24;
-	Sat, 22 Mar 2025 14:48:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CE7322F150;
+	Sat, 22 Mar 2025 14:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b="RrF8tCT2"
+	dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b="pTFNzhVR"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward205a.mail.yandex.net (forward205a.mail.yandex.net [178.154.239.88])
+Received: from forward101a.mail.yandex.net (forward101a.mail.yandex.net [178.154.239.84])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E623230BFE;
-	Sat, 22 Mar 2025 14:48:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.88
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B712F22B8BF;
+	Sat, 22 Mar 2025 14:40:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742654899; cv=none; b=HLY6MXVjJKKSFzCS0rdmsx5vVNi1NYmej0LnKmRYhc0vxowaGQ7LoQPSvb678RGxibXNeMp1ky6hDo0t3DiPznC7N00qtfWGH3Mq7u6v+GpUSlGWmTIVe8ocJI4Y8JWGJT5k6kdQLCuJxiqBOfV5auTmRireLXzZz6Ypf5qXELA=
+	t=1742654423; cv=none; b=ElR7DFy1N9tH5IcI8IuL+6H36hT2B+ENW4UEQ1qnkqQ/oRl3ILh/0ED4h6kJc3SvEEKWqSrJPtTVuuyUJyqGfYsS/bWGQ8ufvKwKK7mxVDM8ChkYtYk2moZfWIdAWXr31aSzyiu6ofn/kJBnTAtXNCYE+l3h48rHqC26G0dVPxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742654899; c=relaxed/simple;
-	bh=BZ6b5ix0yW4k4uUo1bfPj64RMujkEgkmbMn8X2sy9oY=;
+	s=arc-20240116; t=1742654423; c=relaxed/simple;
+	bh=nHGJlEQdH8+nFQ4glKV5f5AgfedIHEAiUpdohiEc7yM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dOzy5mjLjHwrw5YDwJhmwlrdbjTw38d12nZj+9VqKBvvNufeK+yigmErKrzTG2WcYCMxmq9xJP5QC9usauFnKZhWo5Qmo5HILoEs3ZjlWH8NZygvviq8n+69HoQPyKasW7rChOstQYsXN71++z06bvCsg0XLrZhmztNiwQAGB+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ya.ru; spf=pass smtp.mailfrom=ya.ru; dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b=RrF8tCT2; arc=none smtp.client-ip=178.154.239.88
+	 MIME-Version:Content-Type; b=Tcl+m9S000cuSR8iixyAx29ScSCKU+04Jl1w38AdrrHmY3M6Y7KN87P0nArOymDe7JTTNbPrXwdXQ6PO4Trk8RrzwxxhgBgFUNyXuz5dHNuGMrSa+4dF/iIOJ1PdkZqOYRm2sxdiw4tOPdDRTXcTqYH7RYM6/UYioQR4wUFB/6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ya.ru; spf=pass smtp.mailfrom=ya.ru; dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b=pTFNzhVR; arc=none smtp.client-ip=178.154.239.84
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ya.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ya.ru
-Received: from forward100a.mail.yandex.net (forward100a.mail.yandex.net [IPv6:2a02:6b8:c0e:500:1:45:d181:d100])
-	by forward205a.mail.yandex.net (Yandex) with ESMTPS id E444266699;
+Received: from mail-nwsmtp-smtp-production-main-64.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-64.vla.yp-c.yandex.net [IPv6:2a02:6b8:c1f:1984:0:640:94c0:0])
+	by forward101a.mail.yandex.net (Yandex) with ESMTPS id C6A5660D6F;
 	Sat, 22 Mar 2025 17:40:19 +0300 (MSK)
-Received: from mail-nwsmtp-smtp-production-main-88.iva.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-88.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:12a5:0:640:7a62:0])
-	by forward100a.mail.yandex.net (Yandex) with ESMTPS id 41D2647275;
-	Sat, 22 Mar 2025 17:40:12 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-88.iva.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id AeNPUSKLcW20-IxkrtWBG;
-	Sat, 22 Mar 2025 17:40:11 +0300
+Received: by mail-nwsmtp-smtp-production-main-64.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id HeN1ilXLiSw0-jKRi7hpq;
+	Sat, 22 Mar 2025 17:40:19 +0300
 X-Yandex-Fwd: 1
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ya.ru; s=mail;
-	t=1742654411; bh=ihOqdVJ7xLtJJSTxOo94QY2KJsfJPmwm6+SFx40nNuY=;
+	t=1742654419; bh=ejvf7QLPyUV70Z5tPiTQwx4iyU8DNz6lXofSDZvxYu0=;
 	h=Cc:Message-ID:References:Date:In-Reply-To:Subject:To:From;
-	b=RrF8tCT2geWojla1qGohD8ENjoyqLiZDZHQkZs850lCK4R31RioyjjXAek+jYlGLN
-	 xGuuzvExKKrm2pErzjmtfO2n6Ky0h5erBl/Bamt0W7DP9D7ivZ5manoRCwgUHn+j1I
-	 OyIDg2VAW5xBN8M0Q+FqVFQTm7QIUKo+Na9twCwU=
-Authentication-Results: mail-nwsmtp-smtp-production-main-88.iva.yp-c.yandex.net; dkim=pass header.i=@ya.ru
+	b=pTFNzhVRNlZUoqEdzW3JYIrd3Vd4yEWA0mZnKBOaRYYo/DrK1DFWm+mMquXqedkuU
+	 qyftPfEZXNv5leZ54ce/3E4rh/I+ixYwCPAytARwRDdXJsH7v45Jfe2JfoBotv8H0/
+	 XQC+NpzJvJ1FKrtltixEoF0IgtgEnYBUG9X0WbNA=
+Authentication-Results: mail-nwsmtp-smtp-production-main-64.vla.yp-c.yandex.net; dkim=pass header.i=@ya.ru
 From: Kirill Tkhai <tkhai@ya.ru>
 To: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: tkhai@ya.ru
-Subject: [PATCH NET-PREV 18/51] qmi_wwan: Use __register_netdevice in .newlink
-Date: Sat, 22 Mar 2025 17:40:10 +0300
-Message-ID: <174265441009.356712.14099994401904581590.stgit@pro.pro>
+Subject: [PATCH NET-PREV 19/51] bpqether: Provide determined context in __register_netdevice()
+Date: Sat, 22 Mar 2025 17:40:17 +0300
+Message-ID: <174265441736.356712.5536182528670424751.stgit@pro.pro>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <174265415457.356712.10472727127735290090.stgit@pro.pro>
 References: <174265415457.356712.10472727127735290090.stgit@pro.pro>
@@ -67,52 +64,84 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-The objective is to conform .newlink with its callers,
-which already assign nd_lock (and matches master nd_lock
-if there is one).
+In case of caller already owns nd_lock, there is
+nesting without underlying that to lockdep.
+
+So we use trylock and __register_netdevice() here.
+
+XXX: after callers of netdevice notifyiers are converted,
+we will inherit @edev nd_lock instead.
 
 Signed-off-by: Kirill Tkhai <tkhai@ya.ru>
 ---
- drivers/net/usb/qmi_wwan.c |   14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ drivers/net/hamradio/bpqether.c |   33 +++++++++++++++++++++++++++------
+ 1 file changed, 27 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
-index 4823dbdf5465..beec69580978 100644
---- a/drivers/net/usb/qmi_wwan.c
-+++ b/drivers/net/usb/qmi_wwan.c
-@@ -246,6 +246,7 @@ static int qmimux_register_device(struct net_device *real_dev, u8 mux_id)
+diff --git a/drivers/net/hamradio/bpqether.c b/drivers/net/hamradio/bpqether.c
+index 83a16d10eedb..bf2792f98afe 100644
+--- a/drivers/net/hamradio/bpqether.c
++++ b/drivers/net/hamradio/bpqether.c
+@@ -480,6 +480,7 @@ static int bpq_new_device(struct net_device *edev)
  {
- 	struct net_device *new_dev;
- 	struct qmimux_priv *priv;
-+	struct nd_lock *nd_lock;
  	int err;
+ 	struct net_device *ndev;
++	struct nd_lock *nd_lock;
+ 	struct bpqdev *bpq;
  
- 	new_dev = alloc_netdev(sizeof(struct qmimux_priv),
-@@ -260,14 +261,23 @@ static int qmimux_register_device(struct net_device *real_dev, u8 mux_id)
+ 	ndev = alloc_netdev(sizeof(struct bpqdev), "bpq%d", NET_NAME_UNKNOWN,
+@@ -487,7 +488,23 @@ static int bpq_new_device(struct net_device *edev)
+ 	if (!ndev)
+ 		return -ENOMEM;
  
- 	new_dev->sysfs_groups[0] = &qmi_wwan_sysfs_qmimux_attr_group;
- 
--	err = register_netdevice(new_dev);
--	if (err < 0)
+-		
 +	err = -ENOMEM;
++	nd_lock = alloc_nd_lock();
++	if (!nd_lock)
++		goto err_free;
 +
-+	lock_netdev(real_dev, &nd_lock);
-+	attach_nd_lock(new_dev, nd_lock);
-+	err = __register_netdevice(new_dev);
-+	if (err < 0) {
-+		detach_nd_lock(new_dev);
-+		unlock_netdev(nd_lock);
- 		goto out_free_newdev;
-+	}
- 
- 	/* Account for reference in struct qmimux_priv_priv */
- 	dev_hold(real_dev);
- 
- 	err = netdev_upper_dev_link(real_dev, new_dev, NULL);
-+	unlock_netdev(nd_lock);
++	/* This is called from netdevice notifier, which is not converted yet.
++	 * The context is unknown: either some nd_lock is locked or not. Since
++	 * @ndev is undependent of @edev (on this stage of convertation we don't
++	 * require that, we will require when we convert unregister_netdev()).
++	 * So, a new nd_lock is used for @ndev for now.
++	 * Q: Why is trylock, despite it can't fail?
++	 * A: Caller may own some other nd_lock, so lockdep will unhappy seeing
++	 * there is nested lock without mutex_lock_nested() prefix.
++	 */
++	BUG_ON(!mutex_trylock(&nd_lock->mutex));
++	attach_nd_lock(ndev, nd_lock);
 +
+ 	bpq = netdev_priv(ndev);
+ 	dev_hold(edev);
+ 	bpq->ethdev = edev;
+@@ -496,19 +513,23 @@ static int bpq_new_device(struct net_device *edev)
+ 	eth_broadcast_addr(bpq->dest_addr);
+ 	eth_broadcast_addr(bpq->acpt_addr);
+ 
+-	err = register_netdevice(ndev);
++	err = __register_netdevice(ndev);
  	if (err)
- 		goto out_unregister_netdev;
+-		goto error;
++		goto err_detach;
+ 	bpq_set_lockdep_class(ndev);
+ 
+ 	/* List protected by RTNL */
+ 	list_add_rcu(&bpq->bpq_list, &bpq_devices);
+-	return 0;
++unlock:
++	unlock_netdev(nd_lock);
++	return err;
+ 
+- error:
++err_detach:
++	detach_nd_lock(ndev);
+ 	dev_put(edev);
++err_free:
+ 	free_netdev(ndev);
+-	return err;
++	goto unlock;
+ 	
+ }
  
 
 
