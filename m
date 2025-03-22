@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-176909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4189EA6CAEB
-	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 15:53:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D19FEA6CAEE
+	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 15:53:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5850D1B85A4C
-	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 14:48:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A0391B85E28
+	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 14:48:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A166F236A68;
-	Sat, 22 Mar 2025 14:43:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FAF7230BEE;
+	Sat, 22 Mar 2025 14:43:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b="FMTweVLP"
+	dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b="G6UITqIl"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward100b.mail.yandex.net (forward100b.mail.yandex.net [178.154.239.147])
+Received: from forward101a.mail.yandex.net (forward101a.mail.yandex.net [178.154.239.84])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A47CA22DFAC;
-	Sat, 22 Mar 2025 14:43:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FEA922DFA7;
+	Sat, 22 Mar 2025 14:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742654612; cv=none; b=s5YVOvqGho95ALRcCEz1TLPplIuqp34i3FisQDZnYiNCe4UWjlD3bXsNq8+pXWnm4eUQJP+FNTkaUVmgkIioPPwD94ADYL5TiXfWeWnzsbnIZj39dAa7RXXmki9h9kRVkn3zG5JKXzD7nT4CAdjaXLpSxjoLT8fZAxJu3KzJmbU=
+	t=1742654620; cv=none; b=TDiOmaZpzBOfrBjfB0pJSUpUO4TZp53zZu1W+r64vQ1ccQsSDREEreR0237ambGIV9D6/jCKTMzl32NvsDVwpGclwTWY1FCIlv4mD5cmtQPsjkxk/u1bciBL9eNX4qHaB38owNF9E8wZo0PW5mjl/wcF7AHvSbdX2DOgdXIa4hk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742654612; c=relaxed/simple;
-	bh=fRmxLISM24PcDa9GcPt6sly/axM70hSMai3hQhRmypM=;
+	s=arc-20240116; t=1742654620; c=relaxed/simple;
+	bh=7yG/PXfDqwyI4cGBCoEIAcdeDS7CWAFlIQcXhywI514=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NXzjmpA9YzpIlBZ2nid7P6ZpVsH/sCTPoDZal7+6SI55JzNby6aW6fkmMJYe/wSV8FABSr2o4xL5QFlk9w/BZ0OYecDFGHRmtpCUC14hBpHwgv/6Hq0SETbBlul9C9rcgZtct1lRFzxJtPJrBsHNjFOh8gxRRTISR3PelOd1TbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ya.ru; spf=pass smtp.mailfrom=ya.ru; dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b=FMTweVLP; arc=none smtp.client-ip=178.154.239.147
+	 MIME-Version:Content-Type; b=ruwGtdvOxugpHg5JHWNQ0Gc7k4uS7B4baxAj/8BEZi0uz6nb9eD17ZDptQT+U6mBB/GEtLjoQy++Z+fa/luPKi/Uo0aPVDCIb3ruoF77+QIvxN/faeoaUcq+oKVUHdrWnG3e1xUoe0ITAwY2P7A2vcjatZLap1hhzGCm4fT0EuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ya.ru; spf=pass smtp.mailfrom=ya.ru; dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b=G6UITqIl; arc=none smtp.client-ip=178.154.239.84
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ya.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ya.ru
-Received: from mail-nwsmtp-smtp-production-main-89.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-89.sas.yp-c.yandex.net [IPv6:2a02:6b8:c23:3b11:0:640:80c7:0])
-	by forward100b.mail.yandex.net (Yandex) with ESMTPS id E88F4608DE;
-	Sat, 22 Mar 2025 17:43:28 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-89.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id QhNwM4XLdSw0-wekjyk61;
-	Sat, 22 Mar 2025 17:43:28 +0300
+Received: from mail-nwsmtp-smtp-production-main-81.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-81.vla.yp-c.yandex.net [IPv6:2a02:6b8:c1d:4795:0:640:c576:0])
+	by forward101a.mail.yandex.net (Yandex) with ESMTPS id C1D9360C65;
+	Sat, 22 Mar 2025 17:43:36 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-81.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id YhN37KXLaqM0-YnNXQIWB;
+	Sat, 22 Mar 2025 17:43:36 +0300
 X-Yandex-Fwd: 1
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ya.ru; s=mail;
-	t=1742654608; bh=Dn7PDLsQkLFwaE45fe0ztE0W7Abo6nChVxtHG051Jj4=;
+	t=1742654616; bh=rxAS9CPftJgSLLRDAiW0KeAGjWyu0a/SCLO12hf8k7Q=;
 	h=Cc:Message-ID:References:Date:In-Reply-To:Subject:To:From;
-	b=FMTweVLPvarkami1BZp7bCgl7E/11az6JRMIeCnp6F8ZB5fsT0735eViAv4okMHgg
-	 idx05umuAuVz2rm5gD8Q5Ou2myXn+MR3wcuLldsb3asNFRA9A8fbJHK9dCPkUxwnAR
-	 x63XC5pi4wzWpTtTd9qhrc8cUzz/0+ft7bS2dG2U=
-Authentication-Results: mail-nwsmtp-smtp-production-main-89.sas.yp-c.yandex.net; dkim=pass header.i=@ya.ru
+	b=G6UITqIlY3O+MyMTpCbanCqEmM6UaTdmp8FF7f3RLuhTlyK7EJAq0168xiDCF/Aet
+	 +SgMYR4CMP/37sbcd9yCDLHsjaXFURKDvq5ll519VC9tPWbxXF6HJpYNL7n83sWYCg
+	 nzisc2pgCDHzckuAw6NL8XinYi0Y17SNBPF9AGdU=
+Authentication-Results: mail-nwsmtp-smtp-production-main-81.vla.yp-c.yandex.net; dkim=pass header.i=@ya.ru
 From: Kirill Tkhai <tkhai@ya.ru>
 To: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: tkhai@ya.ru
-Subject: [PATCH NET-PREV 45/51] t7xx: Use __unregister_netdevice()
-Date: Sat, 22 Mar 2025 17:43:26 +0300
-Message-ID: <174265460641.356712.12475969887740228690.stgit@pro.pro>
+Subject: [PATCH NET-PREV 46/51] 6lowpan: Use __unregister_netdevice()
+Date: Sat, 22 Mar 2025 17:43:34 +0300
+Message-ID: <174265461407.356712.9206164277601393221.stgit@pro.pro>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <174265415457.356712.10472727127735290090.stgit@pro.pro>
 References: <174265415457.356712.10472727127735290090.stgit@pro.pro>
@@ -68,21 +68,33 @@ Content-Transfer-Encoding: 8bit
 
 Signed-off-by: Kirill Tkhai <tkhai@ya.ru>
 ---
- drivers/net/wwan/t7xx/t7xx_netdev.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/6lowpan/core.c |    6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/wwan/t7xx/t7xx_netdev.c b/drivers/net/wwan/t7xx/t7xx_netdev.c
-index 3bde38147930..d3da299a59ff 100644
---- a/drivers/net/wwan/t7xx/t7xx_netdev.c
-+++ b/drivers/net/wwan/t7xx/t7xx_netdev.c
-@@ -324,7 +324,7 @@ static void t7xx_ccmni_wwan_dellink(void *ctxt, struct net_device *dev, struct l
- 	if (WARN_ON(ctlb->ccmni_inst[if_id] != ccmni))
- 		return;
+diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
+index b5cbf85b291c..bd77076b125e 100644
+--- a/net/6lowpan/core.c
++++ b/net/6lowpan/core.c
+@@ -71,15 +71,19 @@ EXPORT_SYMBOL(lowpan_register_netdev);
  
+ void lowpan_unregister_netdevice(struct net_device *dev)
+ {
 -	unregister_netdevice(dev);
 +	__unregister_netdevice(dev);
+ 	lowpan_dev_debugfs_exit(dev);
  }
+ EXPORT_SYMBOL(lowpan_unregister_netdevice);
  
- static const struct wwan_ops ccmni_wwan_ops = {
+ void lowpan_unregister_netdev(struct net_device *dev)
+ {
++	struct nd_lock *nd_lock;
++
+ 	rtnl_lock();
++	lock_netdev(dev, &nd_lock);
+ 	lowpan_unregister_netdevice(dev);
++	unlock_netdev(nd_lock);
+ 	rtnl_unlock();
+ }
+ EXPORT_SYMBOL(lowpan_unregister_netdev);
 
 
