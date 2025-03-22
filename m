@@ -1,56 +1,59 @@
-Return-Path: <netdev+bounces-176873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC084A6CAA2
-	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 15:38:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C223FA6CADD
+	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 15:51:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 756BA1B65E37
-	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 14:38:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A9DC7B0405
+	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 14:48:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4B191C84D6;
-	Sat, 22 Mar 2025 14:38:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03C8C221738;
+	Sat, 22 Mar 2025 14:45:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b="pfAFb6yh"
+	dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b="lfFIyEI0"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward101a.mail.yandex.net (forward101a.mail.yandex.net [178.154.239.84])
+Received: from forward204a.mail.yandex.net (forward204a.mail.yandex.net [178.154.239.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49C2F9443;
-	Sat, 22 Mar 2025 14:38:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D54E5234966;
+	Sat, 22 Mar 2025 14:45:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.89
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742654296; cv=none; b=oNSvTvMZBEjfVG4C4nER1cxV0Ykdk5UkRs5xm/xjZEz/04ehQSx6jASYUAy+fLKx5VMzbPr2+6pjGZKdUyBkXePpOofOs8GUaH55rel1Pj4HbcLUCBcgmW6wwboskTPT9ZiF1qA1aocRjziBEsuJKwKQz+yKWGAO2n7l/I22bVI=
+	t=1742654715; cv=none; b=f0zOOCYA3o0qvTCIzE6nGBVGji+gJibqraBCICsj+GzMo3G6bU+OKE/+uZmH3EB4ZeJ5oAn8cdJYpeLQTGWIa1nhj6mlzhsghD2L2VhnFzpSZgy9PYNUmuWSjeGSeMBa8Dt13ZxHBDQq51NkQWO89b3C/xBQ3iSX3b3stYhSgRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742654296; c=relaxed/simple;
-	bh=VgPGIbSSoaBSzoh5zDVNCloMZQ5wiuzBJLeCCPHPIIQ=;
+	s=arc-20240116; t=1742654715; c=relaxed/simple;
+	bh=r83oXkDwjm6cPhBNItb7W87iX4UWsgDCb65xZ/iP1tI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QbvFBJWwwaljM4JO8TZxsAftpgOmsjwarBymlC0+OEk6SnWWRDPuAnNgj7M6rSEF6YiMlmSM0G9ZfztWYwnKgDNmAo+DGDmQa0ARYhxAvI/vSlQzv1SXunBTBEvYmIgCvs2/0FvqLCltdLlj6hu7hxGh5mrrBo9l41XW8rdwfi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ya.ru; spf=pass smtp.mailfrom=ya.ru; dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b=pfAFb6yh; arc=none smtp.client-ip=178.154.239.84
+	 MIME-Version:Content-Type; b=pkJRM46YToBh+h9t6PC4cztQPsDnAgQm7abC9GrfVHqXDCc1l8ASoqcAd1sW+g/7a9myuw3ZROpaV+4KMWUPsK6bKB2hLESKHgPvDJNDliKrB7XlBhFQlTl+VTu1rsV/beelKf7eDB1sp7rjTrJQcb3AuctLDkU/iqO9T06gf9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ya.ru; spf=pass smtp.mailfrom=ya.ru; dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b=lfFIyEI0; arc=none smtp.client-ip=178.154.239.89
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ya.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ya.ru
-Received: from mail-nwsmtp-smtp-production-main-59.iva.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-59.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:ba8:0:640:2318:0])
-	by forward101a.mail.yandex.net (Yandex) with ESMTPS id DBEB160C65;
-	Sat, 22 Mar 2025 17:38:02 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-59.iva.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id xbNK2aKLd4Y0-AbiTQcuM;
-	Sat, 22 Mar 2025 17:38:02 +0300
+Received: from forward103a.mail.yandex.net (forward103a.mail.yandex.net [IPv6:2a02:6b8:c0e:500:1:45:d181:d103])
+	by forward204a.mail.yandex.net (Yandex) with ESMTPS id 256C1668EA;
+	Sat, 22 Mar 2025 17:38:18 +0300 (MSK)
+Received: from mail-nwsmtp-smtp-production-main-74.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-74.vla.yp-c.yandex.net [IPv6:2a02:6b8:c1f:1a98:0:640:f7e1:0])
+	by forward103a.mail.yandex.net (Yandex) with ESMTPS id 3998060D40;
+	Sat, 22 Mar 2025 17:38:10 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-74.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id 8cNgSTXLe0U0-UE0nrEQU;
+	Sat, 22 Mar 2025 17:38:09 +0300
 X-Yandex-Fwd: 1
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ya.ru; s=mail;
-	t=1742654282; bh=ppU99Pvz0ISJXPXOgf/4+zV/jSa/NBw7iZfBFYsLYEc=;
+	t=1742654289; bh=/AcLQT1UDMkihd8CbkVJcYZwUKXPIgVgM64Mf44dsTI=;
 	h=Cc:Message-ID:References:Date:In-Reply-To:Subject:To:From;
-	b=pfAFb6yhLqBZjavONpyi11K+0C7ssr5r0aFHQxhIAfskcbxM0HohGjQ5cuxKTG1d8
-	 2SPMjZ019aVbCTwgjFeiiIM3rBdLNv8vCxfje2T4jic/YA0+b5rLs+0FdcLkN+yd9N
-	 boGts8RTORltCzMxEHfaQvILRrwiY0sLWtROeQZQ=
-Authentication-Results: mail-nwsmtp-smtp-production-main-59.iva.yp-c.yandex.net; dkim=pass header.i=@ya.ru
+	b=lfFIyEI0KnbUUPmC5B2ivgdRB98Vkeo0ABGODrhzp/99Aq51atJFL6L/FIlp8HfbL
+	 U7eO+aCS03371xEqvxsrxA7IXVPhIrMzp1BjVVaA0c7/E14Hl6VtNfzxjALXz+68sV
+	 V47Zje3IjcwgW0k6yQFAylV692Z0PGgehtvfpt+I=
+Authentication-Results: mail-nwsmtp-smtp-production-main-74.vla.yp-c.yandex.net; dkim=pass header.i=@ya.ru
 From: Kirill Tkhai <tkhai@ya.ru>
 To: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: tkhai@ya.ru
-Subject: [PATCH NET-PREV 01/51] net: Move some checks from __rtnl_newlink() to caller
-Date: Sat, 22 Mar 2025 17:37:59 +0300
-Message-ID: <174265427912.356712.232014691192934956.stgit@pro.pro>
+Subject: [PATCH NET-PREV 02/51] net: Add nlaattr check to rtnl_link_get_net_capable()
+Date: Sat, 22 Mar 2025 17:38:08 +0300
+Message-ID: <174265428803.356712.5393035417908731217.stgit@pro.pro>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <174265415457.356712.10472727127735290090.stgit@pro.pro>
 References: <174265415457.356712.10472727127735290090.stgit@pro.pro>
@@ -70,54 +73,30 @@ to where main dev is dereferenced by ifi_index.
 
 Signed-off-by: Kirill Tkhai <tkhai@ya.ru>
 ---
- net/core/rtnetlink.c |   21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+ net/core/rtnetlink.c |    4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index 73fd7f543fd0..b33a7e86c534 100644
+index b33a7e86c534..34e35b81cfa6 100644
 --- a/net/core/rtnetlink.c
 +++ b/net/core/rtnetlink.c
-@@ -3572,15 +3572,6 @@ static int __rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- #ifdef CONFIG_MODULES
- replay:
- #endif
--	err = nlmsg_parse_deprecated(nlh, sizeof(*ifm), tb, IFLA_MAX,
--				     ifla_policy, extack);
--	if (err < 0)
--		return err;
--
--	err = rtnl_ensure_unique_netns(tb, extack, false);
--	if (err < 0)
--		return err;
--
- 	ifm = nlmsg_data(nlh);
- 	if (ifm->ifi_index > 0) {
- 		link_specified = true;
-@@ -3734,13 +3725,25 @@ static int rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			struct netlink_ext_ack *extack)
+@@ -2363,6 +2363,9 @@ static struct net *rtnl_link_get_net_capable(const struct sk_buff *skb,
  {
- 	struct rtnl_newlink_tbs *tbs;
-+	struct nlattr **tb;
- 	int ret;
+ 	struct net *net;
  
- 	tbs = kmalloc(sizeof(*tbs), GFP_KERNEL);
- 	if (!tbs)
- 		return -ENOMEM;
-+	tb = tbs->tb;
++	if (!tb[IFLA_NET_NS_PID] && !tb[IFLA_NET_NS_FD] && !tb[IFLA_TARGET_NETNSID])
++		return NULL;
 +
-+	ret = nlmsg_parse_deprecated(nlh, sizeof(struct ifinfomsg), tb,
-+				     IFLA_MAX, ifla_policy, extack);
-+	if (ret < 0)
-+		goto out;
-+
-+	ret = rtnl_ensure_unique_netns(tb, extack, false);
-+	if (ret < 0)
-+		goto out;
+ 	net = rtnl_link_get_net_by_nlattr(src_net, tb);
+ 	if (IS_ERR(net))
+ 		return net;
+@@ -3480,6 +3483,7 @@ static int rtnl_newlink_create(struct sk_buff *skb, struct ifinfomsg *ifm,
+ 	dest_net = rtnl_link_get_net_capable(skb, net, tb, CAP_NET_ADMIN);
+ 	if (IS_ERR(dest_net))
+ 		return PTR_ERR(dest_net);
++	dest_net = dest_net ? : get_net(net);
  
- 	ret = __rtnl_newlink(skb, nlh, tbs, extack);
-+out:
- 	kfree(tbs);
- 	return ret;
- }
+ 	if (tb[IFLA_LINK_NETNSID]) {
+ 		int id = nla_get_s32(tb[IFLA_LINK_NETNSID]);
 
 
