@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-176887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3FEFA6CABF
-	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 15:44:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D34AA6CAC1
+	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 15:44:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6713A188C936
-	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 14:42:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A87961B8185D
+	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 14:42:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7885C22F3BD;
-	Sat, 22 Mar 2025 14:40:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1A3122FF20;
+	Sat, 22 Mar 2025 14:40:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b="OT7Ceuma"
+	dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b="HTEpk2Ky"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward103d.mail.yandex.net (forward103d.mail.yandex.net [178.154.239.214])
+Received: from forward102b.mail.yandex.net (forward102b.mail.yandex.net [178.154.239.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 694FE233716;
-	Sat, 22 Mar 2025 14:40:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.214
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2DA122FE07;
+	Sat, 22 Mar 2025 14:40:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742654445; cv=none; b=trfQPDb21GqdXiTz6wDtAucn0r9OgiIVfBzV+TB6SivIKCsT8/CmvTg7YCODufTtdRzu6hAQXcJ/4P6V2TK2P5kt/Q+h/v5Jv8WqSYXj7Az/9n8C2S2skrl+1qhg/tMi1JbD+m4W2Qg/F8HMeZaivWGLxATT/B7fbAzUj82a/S0=
+	t=1742654452; cv=none; b=LdPZf/FKQOPYVjmTLVujr5fsRGobDTcRAHxfHI5elgCCdSdcTCKxJwt/QNBI8Eu7yfmiWN4yQ92Jobjd3/HeUfXOdsANh77rtsqFJygk7WKTA39ihUv/TFkiuOPmy90VamBMQ5dOkU4E1H7H3qje86e62NdxnolfNYzYyTnhRAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742654445; c=relaxed/simple;
-	bh=n3nw6y3jd4EC1ONLmfDDyrYL3H002XI/IGhaFMDDWyA=;
+	s=arc-20240116; t=1742654452; c=relaxed/simple;
+	bh=UbaU2Yq8pWWAB2+Sv7dghfP6ZsjOYUmwtm9fTAxyYtg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qW6PTon/llDIGzHz6V9sE5hLbGKIfCz2xj7KixHUPjzDCx+QHsnmBRO7IfMFtnpiIg5SN2zGmweiRq5z1QsjhUUDHlhdscTie5YUTlA1/8SvJKW1IfEPJkDTmjvwlYmkHpITlRTKtIiatTKY2V9/9xfkZdsZSuhEJ9qMkutRKLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ya.ru; spf=pass smtp.mailfrom=ya.ru; dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b=OT7Ceuma; arc=none smtp.client-ip=178.154.239.214
+	 MIME-Version:Content-Type; b=NOQ2Dps9wmrECyZYHok+pLbL8oxTqqsbJUng0emHGFdqGbUaUV0Sy4ORPLeKejKuVxhIBINus9/aCcFsh+rpygMDPa8lJkzPytfXdPikrRPdLDl1EE0Z7DKTS5dlp51sLHz6QOtvth+GlZqYdG2gxi8Qrerq0op7OuNeKU1G9PY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ya.ru; spf=pass smtp.mailfrom=ya.ru; dkim=pass (1024-bit key) header.d=ya.ru header.i=@ya.ru header.b=HTEpk2Ky; arc=none smtp.client-ip=178.154.239.149
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ya.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ya.ru
-Received: from mail-nwsmtp-smtp-production-main-59.klg.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-59.klg.yp-c.yandex.net [IPv6:2a02:6b8:c43:c14:0:640:86a6:0])
-	by forward103d.mail.yandex.net (Yandex) with ESMTPS id B63E36005A;
-	Sat, 22 Mar 2025 17:40:41 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-59.klg.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id deNsNoULfKo0-9LMVm9yK;
-	Sat, 22 Mar 2025 17:40:41 +0300
+Received: from mail-nwsmtp-smtp-production-main-73.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-73.sas.yp-c.yandex.net [IPv6:2a02:6b8:c37:f37c:0:640:1e45:0])
+	by forward102b.mail.yandex.net (Yandex) with ESMTPS id F095160B49;
+	Sat, 22 Mar 2025 17:40:48 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-73.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id keNKkuWLaeA0-4lIQk6Vj;
+	Sat, 22 Mar 2025 17:40:48 +0300
 X-Yandex-Fwd: 1
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ya.ru; s=mail;
-	t=1742654441; bh=ADx6FD1fjJQbRt3TIQRIVkg0GLSu2rrgGxf4Ud1Wy2Y=;
+	t=1742654448; bh=z/NR5H2N5ep07HsGrGNuf9TDnQNmA80l0yERkvqeWAg=;
 	h=Cc:Message-ID:References:Date:In-Reply-To:Subject:To:From;
-	b=OT7CeumaxJhhhnPfXfNSk30lAq0aMYCx3A6laBYYvjtvYEgscJ6PdYUkWokUkimQ1
-	 hz8YhXLHoL+tG077n9Xr/a09R+g2KEXPuYU1pw3epY6rGdLSsCn5A5+44a1IXh7n4e
-	 HGtwGtjxEMCClZ3i6CK8XXWi7YNnqo9e1MXzwikY=
-Authentication-Results: mail-nwsmtp-smtp-production-main-59.klg.yp-c.yandex.net; dkim=pass header.i=@ya.ru
+	b=HTEpk2KyVfT8XYsohGgJbmo+HyKDP/u/ggUbb6eCUhrJXE2l/kTgf5kpPaSlC3Phd
+	 Jtbz5AOV6GPiIsNFobz/1/NKXTeO3QAyyaOSjnteECrTzBiBI6eguVcGY45UEJaa1M
+	 yEwQ2MPpUazOHKDvhNk9sKQykeEuRwhK7bk0aHlk=
+Authentication-Results: mail-nwsmtp-smtp-production-main-73.sas.yp-c.yandex.net; dkim=pass header.i=@ya.ru
 From: Kirill Tkhai <tkhai@ya.ru>
 To: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: tkhai@ya.ru
-Subject: [PATCH NET-PREV 22/51] vxlan: Use __register_netdevice in .newlink
-Date: Sat, 22 Mar 2025 17:40:39 +0300
-Message-ID: <174265443958.356712.14220813717462792006.stgit@pro.pro>
+Subject: [PATCH NET-PREV 23/51] hdlc_fr: Use __register_netdevice
+Date: Sat, 22 Mar 2025 17:40:46 +0300
+Message-ID: <174265444685.356712.759621883553836976.stgit@pro.pro>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <174265415457.356712.10472727127735290090.stgit@pro.pro>
 References: <174265415457.356712.10472727127735290090.stgit@pro.pro>
@@ -64,96 +64,74 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-The objective is to conform .newlink with its callers,
-which already assign nd_lock (and matches master nd_lock
-if there is one).
+The objective is to make dependent devices share
+the same nd_lock.
 
-Also, use __unregister_netdevice() since we know
-there is held lock in that path.
+Finaly, taking nd_lock should be moved to ioctl
+caller, but now we can't do this at least because
+netdevice notifiers are not converted.
 
 Signed-off-by: Kirill Tkhai <tkhai@ya.ru>
 ---
- drivers/net/vxlan/vxlan_core.c |   36 +++++++++++++++++++++++++++++-------
- 1 file changed, 29 insertions(+), 7 deletions(-)
+ drivers/net/wan/hdlc_fr.c |   18 ++++++++++++------
+ net/core/dev_ioctl.c      |    1 +
+ 2 files changed, 13 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index b041ddc2ab34..369f7b667424 100644
---- a/drivers/net/vxlan/vxlan_core.c
-+++ b/drivers/net/vxlan/vxlan_core.c
-@@ -3950,7 +3950,7 @@ static int __vxlan_dev_create(struct net *net, struct net_device *dev,
- 			return err;
- 	}
+diff --git a/drivers/net/wan/hdlc_fr.c b/drivers/net/wan/hdlc_fr.c
+index 81e72bc1891f..93c61083de76 100644
+--- a/drivers/net/wan/hdlc_fr.c
++++ b/drivers/net/wan/hdlc_fr.c
+@@ -1106,7 +1106,9 @@ static int fr_add_pvc(struct net_device *frad, unsigned int dlci, int type)
+ 	dev->priv_flags |= IFF_NO_QUEUE;
+ 	dev->ml_priv = pvc;
  
--	err = register_netdevice(dev);
-+	err = __register_netdevice(dev);
- 	if (err)
- 		goto errout;
- 	unregister = true;
-@@ -4001,7 +4001,7 @@ static int __vxlan_dev_create(struct net *net, struct net_device *dev,
- 		__vxlan_fdb_free(f);
- unregister:
- 	if (unregister)
--		unregister_netdevice(dev);
-+		__unregister_netdevice(dev);
- 	return err;
- }
- 
-@@ -4604,22 +4604,37 @@ struct net_device *vxlan_dev_create(struct net *net, const char *name,
- 				    u8 name_assign_type,
- 				    struct vxlan_config *conf)
- {
-+	struct net_device *dev, *lowerdev = NULL;
- 	struct nlattr *tb[IFLA_MAX + 1];
--	struct net_device *dev;
+-	if (register_netdevice(dev) != 0) {
++	attach_nd_lock(dev, rcu_dereference_protected(frad->nd_lock, true));
++	if (__register_netdevice(dev) != 0) {
++		detach_nd_lock(dev);
+ 		free_netdev(dev);
+ 		delete_unused_pvcs(hdlc);
+ 		return -EIO;
+@@ -1187,8 +1189,9 @@ static int fr_ioctl(struct net_device *dev, struct if_settings *ifs)
+ 	const size_t size = sizeof(fr_proto);
+ 	fr_proto new_settings;
+ 	hdlc_device *hdlc = dev_to_hdlc(dev);
 +	struct nd_lock *nd_lock;
- 	int err;
+ 	fr_proto_pvc pvc;
+-	int result;
++	int result, err;
  
- 	memset(&tb, 0, sizeof(tb));
+ 	switch (ifs->type) {
+ 	case IF_GET_PROTO:
+@@ -1272,10 +1275,13 @@ static int fr_ioctl(struct net_device *dev, struct if_settings *ifs)
+ 			result = ARPHRD_DLCI;
  
-+	if (conf->remote_ifindex) {
-+		lowerdev = __dev_get_by_index(net, conf->remote_ifindex);
-+		if (!lowerdev)
-+			return ERR_PTR(-ENODEV);
-+	}
-+
- 	dev = rtnl_create_link(net, name, name_assign_type,
- 			       &vxlan_link_ops, tb, NULL);
- 	if (IS_ERR(dev))
- 		return dev;
- 
--	err = __vxlan_dev_create(net, dev, conf, NULL);
--	if (err < 0) {
--		free_netdev(dev);
--		return ERR_PTR(err);
-+	if (lowerdev) {
-+		lock_netdev(lowerdev, &nd_lock);
-+		attach_nd_lock(dev, nd_lock);
-+	} else {
-+		err = -ENOMEM;
-+		if (!attach_new_nd_lock(dev))
-+			goto err_free;
-+		lock_netdev(dev, &nd_lock);
- 	}
-+	err = __vxlan_dev_create(net, dev, conf, NULL);
-+	if (err < 0)
-+		goto err_detach;
-+	unlock_netdev(nd_lock);
- 
- 	err = rtnl_configure_link(dev, NULL, 0, NULL);
- 	if (err < 0) {
-@@ -4631,6 +4646,13 @@ struct net_device *vxlan_dev_create(struct net *net, const char *name,
+ 		if (ifs->type == IF_PROTO_FR_ADD_PVC ||
+-		    ifs->type == IF_PROTO_FR_ADD_ETH_PVC)
+-			return fr_add_pvc(dev, pvc.dlci, result);
+-		else
+-			return fr_del_pvc(hdlc, pvc.dlci, result);
++		    ifs->type == IF_PROTO_FR_ADD_ETH_PVC) {
++			lock_netdev(dev, &nd_lock);
++			err = fr_add_pvc(dev, pvc.dlci, result);
++			unlock_netdev(nd_lock);
++		} else {
++			err = fr_del_pvc(hdlc, pvc.dlci, result);
++		}
  	}
  
- 	return dev;
-+
-+err_detach:
-+	detach_nd_lock(dev);
-+	unlock_netdev(nd_lock);
-+err_free:
-+	free_netdev(dev);
-+	return ERR_PTR(err);
- }
- EXPORT_SYMBOL_GPL(vxlan_dev_create);
+ 	return -EINVAL;
+diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
+index 8592c052c0f4..dc2a0f513bac 100644
+--- a/net/core/dev_ioctl.c
++++ b/net/core/dev_ioctl.c
+@@ -496,6 +496,7 @@ static int dev_siocwandev(struct net_device *dev, struct if_settings *ifs)
+ {
+ 	const struct net_device_ops *ops = dev->netdev_ops;
  
++	/* This may take nd_lock. See fr_add_pvc() */
+ 	if (ops->ndo_siocwandev) {
+ 		if (netif_device_present(dev))
+ 			return ops->ndo_siocwandev(dev, ifs);
 
 
