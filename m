@@ -1,220 +1,306 @@
-Return-Path: <netdev+bounces-176959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 362EDA6CF29
-	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 13:29:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11979A6CFDB
+	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 16:16:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5031618859AC
-	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 12:29:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45FE63AC030
+	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 15:16:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F30F82046BE;
-	Sun, 23 Mar 2025 12:28:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDD3720EB;
+	Sun, 23 Mar 2025 15:16:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="DSAo9m9L"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QSKErXam"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2066.outbound.protection.outlook.com [40.107.212.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 344C51FFC7D;
-	Sun, 23 Mar 2025 12:28:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742732935; cv=fail; b=OY4Wvqh6Ql2zh7mee8Rt0ufmDCQfJBx1HdoSbOz3uAmanvskVY4Oag3zcbbLotj9n4Ol8TdSsXU+3mwPEZhCdNJ26Vkhbu42T3mT6n4VTMerk37fN2i1T+mhphUtukitFpoNwichGMei9FcOZ2BgpC+5D+eK2T2ljpc/otYXFok=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742732935; c=relaxed/simple;
-	bh=861Zjf+V7n478Lat0TazM21IbBhbVWbEawXBH2wW/1Q=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LdqeMAmvMJ1IlGvAGTs+jtIVH16tmdFqW6xl1RguzmENT5bJ01TR28s36SMKw/Ecb5lwJNrIVQ9VHHGjmr9G8I+/Si5mqdMb+Jd0LLf6uulP96wFX27OQh8zAssu/tp31C6GLRwf4fueqFmSJrTEHKocTK9GE/y8S9kRXdZwN/I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=DSAo9m9L; arc=fail smtp.client-ip=40.107.212.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Lqz2k1LZlrVvwYuYdt5XWzL7408QrIBRwHguPSm13ljjqnUZEywZqfJgJKmECqnORQ351rkTvCY2LuRpLGcXzBnv319jA2avJBszQMRg2MG0keOWEd3Bn+zZoQe+rwt8uukjg9/TTLcG9EOkm4IWCwzN79QQYcMORXrwrCg1yty9BmMirk5md+PTylYZ+Wh6KHVuUX5wSr8P4Ab6V8Am4eQPATsLZrY6s9rWbOV+9WAA0nY7GyUerz4egjcPt+dn7Qb85Z8U3Mdz/mx8N3CQ6wf4Jtppag/BXHihiCZ9e6qtyTnaMf6mM0yvnnM1PUyC7CBgCT/tK2VUF1SM6etuXg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=M/S/Aiq/ZuKW24/H/0SWOEq2gNSdc6HXBCm23U/z1Ek=;
- b=ReUmTvLo8OOAYxfwZKVNVMB6WL4Z5mpGOhECepHli1WNiUB/MRTwdBJ7JvlyMt9PfZDTIqpQ/4qQuaSmOF2fFjpLjRJP2RNAKr/hi6umZpOzkvlgnivzUJLOmtpFparUjZV0Izt+tUdXt8dH1Krmw67unBhpnCZPhrAvksiouDNh0vgEwCnszTmzKMcNRftc9pUtm8a9QtbAVlQ2E+6T29ft89/M+GjqF8WXKvG5DNTyRW0SmAtoHOoXcf3JQuI8FL64QwAM72ST5DF68G41MOcOvyNYg6Z/xDGEb5QcbPgoyoIcWTPW+uhfzrWmMNOkosblUE7jzRyFClBXJKDowg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=M/S/Aiq/ZuKW24/H/0SWOEq2gNSdc6HXBCm23U/z1Ek=;
- b=DSAo9m9LXWOgt3PIp6XxPax+14FYGBC4HIym9vI/GvlzGAergCGbRZ/F9Qu7UvMZtuM6pi+veAo4JHV8ojW2nP8AkSYtc45cqnGrWiMW0MO0mPcq7L+WF1K5nYf2XOf5w91w9dAbg8LIJuB6mfyxwND0h5Dh05pBeCOHShBTryooenUOV/dLivS/CCHGk1g3lm5J0oo4NokAFGCyojS08TnTjREaa5QY8p5u/xE15c6SoGYR2gqqZrm2Wv6KoPLc6xwZ+G81E6lWvCiczQ106LyStqXl2bbsC+Afz0+KO/XgY3oK8Ul4wEh1H0zrZJ39SzRnquSyD2Ag8kEunH86AA==
-Received: from CH0PR03CA0364.namprd03.prod.outlook.com (2603:10b6:610:119::15)
- by IA1PR12MB6305.namprd12.prod.outlook.com (2603:10b6:208:3e7::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.42; Sun, 23 Mar
- 2025 12:28:48 +0000
-Received: from DS2PEPF0000343E.namprd02.prod.outlook.com
- (2603:10b6:610:119:cafe::ac) by CH0PR03CA0364.outlook.office365.com
- (2603:10b6:610:119::15) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8534.38 via Frontend Transport; Sun,
- 23 Mar 2025 12:28:48 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- DS2PEPF0000343E.mail.protection.outlook.com (10.167.18.41) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8534.20 via Frontend Transport; Sun, 23 Mar 2025 12:28:47 +0000
-Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 23 Mar
- 2025 05:28:47 -0700
-Received: from drhqmail203.nvidia.com (10.126.190.182) by
- drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Sun, 23 Mar 2025 05:28:46 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
- (10.126.190.182) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
- Transport; Sun, 23 Mar 2025 05:28:43 -0700
-From: Tariq Toukan <tariqt@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
- Lunn" <andrew+netdev@lunn.ch>
-CC: Gal Pressman <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, "Saeed
- Mahameed" <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq
- Toukan <tariqt@nvidia.com>, <netdev@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Moshe Shemesh
-	<moshe@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Lama Kayal
-	<lkayal@nvidia.com>
-Subject: [PATCH net] net/mlx5e: SHAMPO, Make reserved size independent of page size
-Date: Sun, 23 Mar 2025 14:28:26 +0200
-Message-ID: <1742732906-166564-1-git-send-email-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.8.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A9F6EEA8;
+	Sun, 23 Mar 2025 15:16:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742742997; cv=none; b=h8j6FEDi/DkOYrc4A6WbistRwRtUZwFZ6uT4oZD8iROn0syU6tcbQPCTLczhCo9OGW3lYod0iSR3WAtQM61Vj+HJAjPKNuu7PbKK5bPvLES+uYPAMXhLOTEXdgHvSM76fJYClcSyEgu2hhsgoGk25CAHsZE4zb77AoWNVngd2jY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742742997; c=relaxed/simple;
+	bh=z1iry3Q+ZuonlJJ0TwlMVAFT0se2HxhIpoPnsRsnLsc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QsC9avdn5V7N5OgzT8CTEP6aiIhHlKTSSf/2JUctaWs3+FJtTqrvuiNBRgTBVzgLWdUtCnZy/SbQ1MNAuzeFPudle/friGxj8oeC0KLJ1LlIjw6l3hz3pFV5xgEDyr+FzaU/BfW6zzbJewI6htLS7IxszzoSrxgdjxrBV76Jh88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QSKErXam; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-224019ad9edso86857995ad.1;
+        Sun, 23 Mar 2025 08:16:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742742995; x=1743347795; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=8HAFSGGoHUlB/P//y8CRGPMxIiz2cZBE9oAiPUoftnU=;
+        b=QSKErXam2M/O3L3qT9hiT/LG33negg+IlgrywqMrof0yVzQPGEO8pMXP5NBg9zKyNB
+         5aQ5/axR7fELGSwcGzqs4Ls6A+MHtdFVxn41ScblbZgdJkRUKtsevNQO8AlqCu4yOUkB
+         IKOadC2A3ssnQ+qnuk6Hkd4cxOFkt7zTCfwJKyl9E2Mb8/R68s9igYXSguHsJgaUse0J
+         W70NvOTkGlTJFbH10x3O/LS2t1uJmBR/sLdMt9h7Zq2mX/t3C82wT4NSCfQSqxZbMbTS
+         bHLWM38cBHkpsrin3WcCBS5LjsZIhJkMMq9fimWdSNXK/gHIo9nvkrK1tQR668tLLUZy
+         GVrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742742995; x=1743347795;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8HAFSGGoHUlB/P//y8CRGPMxIiz2cZBE9oAiPUoftnU=;
+        b=IGeAD/cEFZTJXKjOtR4ucO07a3mkpPnft3u9FJua22FVRuRSE2h5ZH/y6M1bX+aBVh
+         V1jTNR9jEINon2X05IY2iQ9bfBk4eszjStGiYtYRqeaAczkDGxXJSJ7Q/G97jI8bgurv
+         9K6OSjSF3X0o5sIk+sxrmEyCiljC6qYIVuIK7SxoSERlDAJ8R6L6XoZiQMeoNWbSEQ2W
+         4uMz6NJyHEvBeRKERdYFR32pVXJdfZ/7XJe7AcX6TgIzQDLyL+cHdPWe8tpaD4lwuMTV
+         aKzscHDd4k7LYE9QmcGwZ8BqCnQ43IazbqX+UR8x7mH5yNJryEGK6d4xAqLxDOFZBrkW
+         mtKA==
+X-Forwarded-Encrypted: i=1; AJvYcCU2Xw0v9ojtIYehIb2kR/2XB9VwSSJsLzXDj5gLrE8/5Gdm38qEalMQBrKVMHyVBdzEdUpK9kjd@vger.kernel.org, AJvYcCVU+Of6USSioyxNuo5IdCIWATJYaooAenKr4eb9H0FJ2qkOJEy/j8NXeJUNoXxS6Gpb6kY1jKwMxNdOGTZh@vger.kernel.org, AJvYcCVpkkFUxqc/wuVqnvhZXtviLd4ZE5eXQw0DqeSGHbZhfPd5MzdqS2XrV35lOfv84UsWVHEDuNE5lI117kM=@vger.kernel.org, AJvYcCVydyj1nXFQDpP9SNTvjtwjhBDF9aVFoNHTtiboBvJfW0yhCm6zP3RpYb0ePJ3FTFSDn2XqsKm4cLJcR4xv@vger.kernel.org, AJvYcCWEZcxqia3gXCYnh/A1uKylw8vzZ7zRJgLi9od+59xx2q7aFI8H84T10Urx2+X9CK+IzZNqpXnl/0XJpe0=@vger.kernel.org, AJvYcCX4RCUaVzTmys5wL9bRAr8L4SMjYRJVLKojuHhZUcH1pP2lcfDv2U4VObBvCtxA+GxIWis=@vger.kernel.org, AJvYcCXBSVsKoSCWAz5VyiJBiroGSLFolKjHw/il9YFZB8T5a4g0K3X2Sl/7DErVEGvnzCpVXOVWw4glANRaOyAFeTo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2RtgMAPbYx6CnzlH8PsLPdxnWweF5gwOI3Fng/WImvzT0UhV1
+	YN4bf23XjMEEg1ODqXhb/5KDQcCCd+c2ZbIzTBKkKU0R6CFSbQmC
+X-Gm-Gg: ASbGnct2vr76XZkQJBvEoyPRw4a1ebYFUw5JGCw939jmiNz5BBQXXNWkBw+llyb6X8u
+	pOttVrNqsgECm1y1EibdqpevRNh/DjXvBsZpstVpabNiYLxaVfmnbLPHYF3B/uRSPI6iSLAwgs3
+	5SGQXjo22U96msYWio4ChHviJ8lgJKrmMKVTTEs2DqIYL1jGcU6pSdq2kA+o+RNOgOBRGCP3m74
+	e/wdpRda0YTUUDYqhWjh4lJixJ4a7nhJHKZcpcnZRZxrm/Ey1OHks4ssGA+9dh/te5fd8n8qxKq
+	/pt98mOAfF+61MmM766RVzD3WYrQmsRCjGi9tya794eqm0yNvLXtjyFCsz+xGomPlq3fn4WI
+X-Google-Smtp-Source: AGHT+IFu7aSko21Sw2wxa8CSJ3BoLCLGU4XDLggoCqJDcaLIBubWzqHl2YbchxgGWLxoXzaA2oGt1A==
+X-Received: by 2002:a17:902:db12:b0:216:3d72:1712 with SMTP id d9443c01a7336-22780e1a30emr184600615ad.48.1742742994925;
+        Sun, 23 Mar 2025 08:16:34 -0700 (PDT)
+Received: from visitorckw-System-Product-Name ([140.113.216.168])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22781207f3csm52440875ad.247.2025.03.23.08.16.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 23 Mar 2025 08:16:34 -0700 (PDT)
+Date: Sun, 23 Mar 2025 23:16:24 +0800
+From: Kuan-Wei Chiu <visitorckw@gmail.com>
+To: Yury Norov <yury.norov@gmail.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>,
+	David Laight <david.laight.linux@gmail.com>,
+	Andrew Cooper <andrew.cooper3@citrix.com>,
+	Laurent.pinchart@ideasonboard.com, airlied@gmail.com,
+	akpm@linux-foundation.org, alistair@popple.id.au,
+	andrew+netdev@lunn.ch, andrzej.hajda@intel.com,
+	arend.vanspriel@broadcom.com, awalls@md.metrocast.net, bp@alien8.de,
+	bpf@vger.kernel.org, brcm80211-dev-list.pdl@broadcom.com,
+	brcm80211@lists.linux.dev, dave.hansen@linux.intel.com,
+	davem@davemloft.net, dmitry.torokhov@gmail.com,
+	dri-devel@lists.freedesktop.org, eajames@linux.ibm.com,
+	edumazet@google.com, eleanor15x@gmail.com,
+	gregkh@linuxfoundation.org, hverkuil@xs4all.nl,
+	jernej.skrabec@gmail.com, jirislaby@kernel.org, jk@ozlabs.org,
+	joel@jms.id.au, johannes@sipsolutions.net, jonas@kwiboo.se,
+	jserv@ccns.ncku.edu.tw, kuba@kernel.org, linux-fsi@lists.ozlabs.org,
+	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
+	linux-serial@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linux@rasmusvillemoes.dk, louis.peens@corigine.com,
+	maarten.lankhorst@linux.intel.com, mchehab@kernel.org,
+	mingo@redhat.com, miquel.raynal@bootlin.com, mripard@kernel.org,
+	neil.armstrong@linaro.org, netdev@vger.kernel.org,
+	oss-drivers@corigine.com, pabeni@redhat.com,
+	parthiban.veerasooran@microchip.com, rfoss@kernel.org,
+	richard@nod.at, simona@ffwll.ch, tglx@linutronix.de,
+	tzimmermann@suse.de, vigneshr@ti.com, x86@kernel.org
+Subject: Re: [PATCH v3 00/16] Introduce and use generic parity16/32/64 helper
+Message-ID: <Z+AlyB461xwMxMtG@visitorckw-System-Product-Name>
+References: <efc2ee9d-5382-457f-b471-f3c44b81a190@citrix.com>
+ <5A790652-1B22-4D13-AAC5-5D9931E90903@zytor.com>
+ <20250307195310.58abff8c@pumpkin>
+ <EB85C3C1-8A0D-4CB9-B501-BFEABDF3E977@zytor.com>
+ <Z824SgB9Dt5zdWYc@visitorckw-System-Product-Name>
+ <Z9CyuowYsZyez36c@thinkpad>
+ <80771542-476C-493E-858A-D2AF6A355CC1@zytor.com>
+ <Z9GtcNJie8TRKywZ@thinkpad>
+ <Z9G2Tyypb3iLoBjn@visitorckw-System-Product-Name>
+ <Z9KMKwnZXA2mkD2s@visitorckw-System-Product-Name>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-NV-OnPremToCloud: AnonymousSubmission
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS2PEPF0000343E:EE_|IA1PR12MB6305:EE_
-X-MS-Office365-Filtering-Correlation-Id: f91d1100-1817-4523-675a-08dd6a0642df
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|36860700013|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?W5BDBqUE9PvOl2j46ATKcuF/v+2g+uneqpk+mS/OY0pr2Bj9PZT/i4eOMubW?=
- =?us-ascii?Q?XXKoQile+avuEZWcM+7EILja4b+RD7yj0wO6qddEP1oMWScET/Z6Rif2Uve+?=
- =?us-ascii?Q?21DzCjFmzSODbVmjHmnjUIH86AXChOVMr62MOPe2SvccdbWjkvZIF2opH9Im?=
- =?us-ascii?Q?rIheyCfBUbIAhwk/uXzQeSTV3slibhbmhXfQt8yYgR8dowYK1SZq1dwFjbQY?=
- =?us-ascii?Q?LR+GIM7NlDMX9bZGE4ZENVgQqajpXoweEhqzucaQH0qiL+BDwUhLm2tA2CmE?=
- =?us-ascii?Q?ahb6YWxOEPaL6m5u4lJub7BVxlRUxRVvSKY6QLA0pLUHhavIGYt6wMzv8DXV?=
- =?us-ascii?Q?YajyUnPv5ZExgAVH4/wOYEyUxd4lVGkzqH8fc/mMtLiSGVV7RljcEG+KyKQB?=
- =?us-ascii?Q?91l06gO8y3bOQRmBIkFO5OkqW4Guf36RwCrgIuv/O9Um6oFgHErNCIT8rSoY?=
- =?us-ascii?Q?gJPOBBbqPFbKL1ajqDN+zWkNnySMLCklOJXlugfSgaNm/+cTCQaG2FaLMzIw?=
- =?us-ascii?Q?IacQX1sGdH2OQDAd61dN04gr6OuFxBcIKMAs6pofBy4SnNVhXEU+CVHT7oVE?=
- =?us-ascii?Q?taSN9oR2ngt31TtQ9YO+9CPtUfv4mr62hUDReZsj4yYoKhJE9GNYjqNDx9xQ?=
- =?us-ascii?Q?LJyO9Fy/Da+v2Va7X1551j48OPeFhyJgn10pNX8vXeXZ2+Sz9gPXY7ZAligJ?=
- =?us-ascii?Q?Nywcb8m28joUhb3goLULdNAP42E3R83GACNDCVXfavt+4MtB/nZgdQ4zM+8m?=
- =?us-ascii?Q?xr8LIb7PHhlH/7B2IyHvg90X7tjDNgD/sPEc3WE4ZjQ7dgNaAkFyKgWDLL1K?=
- =?us-ascii?Q?ZJFCt+vy/tWYjFNeEnMFB5BzkD8HUdjTk4ll26SwEd99a7j/GzVhscwrkk32?=
- =?us-ascii?Q?0a5RGsKiq+1LtUNSVQPRij9Yf36pvDMUKAtj9AI8eQMkW6FBdWeOs2uY06IS?=
- =?us-ascii?Q?x0aG0JYGOMiIJnwFRNpuFaU0HoZ+SGCaWbhbMuWzUn5OqSe6CYb3a1RidZo+?=
- =?us-ascii?Q?9XsEgFNbMM/O3+3ZG27PunOOru3+Mk6p1ZjluOe9IQZT1B3++F/UEKWGwDjC?=
- =?us-ascii?Q?aYNazbZddOj21GwZ8I0c34A3VQAzPj2hX5+6MnbS0fl06rYkMKVJ4+hkVqIa?=
- =?us-ascii?Q?TOqPnag+IshhphfAywe2Z6FcBAiBMSKBa12EiuGpykJ2HtzB9Va2VOaSIW4t?=
- =?us-ascii?Q?98EuZc2t+nLiCO8vg5brBsxvBPOBvRJxEwh3R2+dtL0p03ALYlfv2NL7xq3t?=
- =?us-ascii?Q?sGBDU0M4+lo9w/WL1RncGPPTXoRwNRNdA4vTBM9KKIFHDnYS/ELXG+DeEXVz?=
- =?us-ascii?Q?KacaupWf03LrRdautPiixy0bdumYwaXKJ2H454uAYtkUVVFIUs6Iq0uJJqYW?=
- =?us-ascii?Q?f4Icp9mdYuJyGdM6KaXU1SKy/iUCQwo8bLOOLUDYj0snQ6/cVtWuxbrOend3?=
- =?us-ascii?Q?Sk4slZQNsL8KBvGQZiZZqFWTbOZcdTn8Oqp8uFcQzp92YTYWtjaUSWMiPZ7B?=
- =?us-ascii?Q?5IVdlJlEsIgYzGo=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Mar 2025 12:28:47.9357
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f91d1100-1817-4523-675a-08dd6a0642df
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS2PEPF0000343E.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6305
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z9KMKwnZXA2mkD2s@visitorckw-System-Product-Name>
 
-From: Lama Kayal <lkayal@nvidia.com>
+On Thu, Mar 13, 2025 at 03:41:49PM +0800, Kuan-Wei Chiu wrote:
+> On Thu, Mar 13, 2025 at 12:29:13AM +0800, Kuan-Wei Chiu wrote:
+> > On Wed, Mar 12, 2025 at 11:51:12AM -0400, Yury Norov wrote:
+> > > On Tue, Mar 11, 2025 at 03:24:14PM -0700, H. Peter Anvin wrote:
+> > > > On March 11, 2025 3:01:30 PM PDT, Yury Norov <yury.norov@gmail.com> wrote:
+> > > > >On Sun, Mar 09, 2025 at 11:48:26PM +0800, Kuan-Wei Chiu wrote:
+> > > > >> On Fri, Mar 07, 2025 at 12:07:02PM -0800, H. Peter Anvin wrote:
+> > > > >> > On March 7, 2025 11:53:10 AM PST, David Laight <david.laight.linux@gmail.com> wrote:
+> > > > >> > >On Fri, 07 Mar 2025 11:30:35 -0800
+> > > > >> > >"H. Peter Anvin" <hpa@zytor.com> wrote:
+> > > > >> > >
+> > > > >> > >> On March 7, 2025 10:49:56 AM PST, Andrew Cooper <andrew.cooper3@citrix.com> wrote:
+> > > > >> > >> >> (int)true most definitely is guaranteed to be 1.  
+> > > > >> > >> >
+> > > > >> > >> >That's not technically correct any more.
+> > > > >> > >> >
+> > > > >> > >> >GCC has introduced hardened bools that intentionally have bit patterns
+> > > > >> > >> >other than 0 and 1.
+> > > > >> > >> >
+> > > > >> > >> >https://gcc.gnu.org/gcc-14/changes.html
+> > > > >> > >> >
+> > > > >> > >> >~Andrew  
+> > > > >> > >> 
+> > > > >> > >> Bit patterns in memory maybe (not that I can see the Linux kernel using them) but
+> > > > >> > >> for compiler-generated conversations that's still a given, or the manager isn't C
+> > > > >> > >> or anything even remotely like it.
+> > > > >> > >> 
+> > > > >> > >
+> > > > >> > >The whole idea of 'bool' is pretty much broken by design.
+> > > > >> > >The underlying problem is that values other than 'true' and 'false' can
+> > > > >> > >always get into 'bool' variables.
+> > > > >> > >
+> > > > >> > >Once that has happened it is all fubar.
+> > > > >> > >
+> > > > >> > >Trying to sanitise a value with (say):
+> > > > >> > >int f(bool v)
+> > > > >> > >{
+> > > > >> > >	return (int)v & 1;
+> > > > >> > >}    
+> > > > >> > >just doesn't work (see https://www.godbolt.org/z/MEndP3q9j)
+> > > > >> > >
+> > > > >> > >I really don't see how using (say) 0xaa and 0x55 helps.
+> > > > >> > >What happens if the value is wrong? a trap or exception?, good luck recovering
+> > > > >> > >from that.
+> > > > >> > >
+> > > > >> > >	David
+> > > > >> > 
+> > > > >> > Did you just discover GIGO?
+> > > > >> 
+> > > > >> Thanks for all the suggestions.
+> > > > >> 
+> > > > >> I don't have a strong opinion on the naming or return type. I'm still a
+> > > > >> bit confused about whether I can assume that casting bool to int always
+> > > > >> results in 0 or 1.
+> > > > >> 
+> > > > >> If that's the case, since most people prefer bool over int as the
+> > > > >> return type and some are against introducing u1, my current plan is to
+> > > > >> use the following in the next version:
+> > > > >> 
+> > > > >> bool parity_odd(u64 val);
+> > > > >> 
+> > > > >> This keeps the bool return type, renames the function for better
+> > > > >> clarity, and avoids extra maintenance burden by having just one
+> > > > >> function.
+> > > > >> 
+> > > > >> If I can't assume that casting bool to int always results in 0 or 1,
+> > > > >> would it be acceptable to keep the return type as int?
+> > > > >> 
+> > > > >> Would this work for everyone?
+> > > > >
+> > > > >Alright, it's clearly a split opinion. So what I would do myself in
+> > > > >such case is to look at existing code and see what people who really
+> > > > >need parity invent in their drivers:
+> > > > >
+> > > > >                                     bool      parity_odd
+> > > > >static inline int parity8(u8 val)       -               -
+> > > > >static u8 calc_parity(u8 val)           -               -
+> > > > >static int odd_parity(u8 c)             -               +
+> > > > >static int saa711x_odd_parity           -               +
+> > > > >static int max3100_do_parity            -               -
+> > > > >static inline int parity(unsigned x)    -               -
+> > > > >static int bit_parity(u32 pkt)          -               -
+> > > > >static int oa_tc6_get_parity(u32 p)     -               -
+> > > > >static u32 parity32(__le32 data)        -               -
+> > > > >static u32 parity(u32 sample)           -               -
+> > > > >static int get_parity(int number,       -               -
+> > > > >                      int size)
+> > > > >static bool i2cr_check_parity32(u32 v,  +               -
+> > > > >                        bool parity)
+> > > > >static bool i2cr_check_parity64(u64 v)  +               -
+> > > > >static int sw_parity(__u64 t)           -               -
+> > > > >static bool parity(u64 value)           +               -
+> > > > >
+> > > > >Now you can refer to that table say that int parity(uXX) is what
+> > > > >people want to see in their drivers.
+> > > > >
+> > > > >Whichever interface you choose, please discuss it's pros and cons.
+> > > > >What bloat-o-meter says for each option? What's maintenance burden?
+> > > > >Perf test? Look at generated code?
+> > > > >
+> > > > >I personally for a macro returning boolean, something like I
+> > > > >proposed at the very beginning.
+> > > > >
+> > > > >Thanks,
+> > > > >Yury
+> > > > 
+> > > > Also, please at least provide a way for an arch to opt in to using the builtins, which seem to produce as good results or better at least on some architectures like x86 and probably with CPU options that imply fast popcnt is available.
+> > > 
+> > > Yeah. And because linux/bitops.h already includes asm/bitops.h
+> > > the simplest way would be wrapping generic implementation with
+> > > the #ifndef parity, similarly to how we handle find_next_bit case.
+> > > 
+> > > So:
+> > > 1. Kuan-Wei, please don't invent something like ARCH_HAS_PARITY;
+> > > 2. This may, and probably should, be a separate follow-up series,
+> > >    likely created by corresponding arch experts.
+> > > 
+> > I saw discussions in the previous email thread about both
+> > __builtin_parity and x86-specific implementations. However, from the
+> > discussion, I learned that before considering any optimization, we
+> > should first ask: which driver or subsystem actually cares about parity
+> > efficiency? If someone does, I can help with a micro-benchmark to
+> > provide performance numbers, but I don't have enough domain knowledge
+> > to identify hot paths where parity efficiency matters.
+> > 
+> IMHO,
+> 
+> If parity is never used in any hot path and we don't care about parity:
+> 
+> Then benchmarking its performance seems meaningless. In this case, a
+> function with a u64 argument would suffice, and we might not even need
+> a macro to optimize for different types—especially since the macro
+> requires special hacks to avoid compiler warnings. Also, I don't think
+> code size matters here. If it does, we should first consider making
+> parity a non-inline function in a .c file rather than an inline
+> function/macro in a header.
+> 
+> If parity is used in a hot path:
+> 
+> We need different handling for different type sizes. As previously
+> discussed, x86 assembly might use different instructions for u8 and
+> u16. This may sound stubborn, but I want to ask again: should we
+> consider using parity8/16/32/64 interfaces? Like in the i3c driver
+> example, if we only have a single parity macro that selects an
+> implementation based on type size, users must explicitly cast types.
+> If future users also need parity in a hot path, they might not be aware
+> of this requirement and end up generating suboptimal code. Since we
+> care about efficiency and generated code, why not follow hweight() and
+> provide separate implementations for different sizes?
+> 
+It seems no one will reply to my two emails. So, I have summarized
+different interface approaches. If there is a next version, I will send
+it after the merge window closes.
 
-When hw-gro is enabled, the maximum number of header entries that are
-needed per wqe (hd_per_wqe) is calculated based on the size of the
-reservations among other parameters.
+Interface 1: Single Function
+Description: bool parity_odd(u64)
+Pros: Minimal maintenance cost
+Cons: Difficult to integrate with architecture-specific implementations
+      due to the inability to optimize for different argument sizes
+Opinions: Jiri supports this approach
 
-Miscalculation of the size of reservations leads to incorrect
-calculation of hd_per_wqe as 0, particularly in the case of large page
-size like in aarch64, this prevents the SHAMPO header from being
-correctly initialized in the device, ultimately causing the following
-cqe err that indicates a violation of PD.
+Interface 2: Single Macro
+Description: parity_odd() macro
+Pros: Allows type-specific implementation
+Cons: Requires hacks to avoid warnings; users may need explicit
+      casting; potential sub-optimal code on 32-bit x86
+Opinions: Yury supports this approach
 
- mlx5_core 0000:00:08.0 eth2: ERR CQE on RQ: 0x1180
- mlx5_core 0000:00:08.0 eth2: Error cqe on cqn 0x510, ci 0x0, qn 0x1180, opcode 0xe, syndrome  0x4, vendor syndrome 0x32
- 00000000: 00 00 00 00 04 4a 00 00 00 00 00 00 20 00 93 32
- 00000010: 55 00 00 00 fb cc 00 00 00 00 00 00 07 18 00 00
- 00000020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 4a
- 00000030: 00 00 00 9a 93 00 32 04 00 00 00 00 00 00 da e1
+Interface 3: Multiple Functions
+Description: bool parity_odd8/16/32/64()
+Pros: No need for explicit casting; easy to integrate
+      architecture-specific optimizations; except for parity8(), all
+      functions are one-liners with no significant code duplication
+Cons: More functions may increase maintenance burden
+Opinions: Only I support this approach
 
-Use the correct formula for calculating the size of reservations,
-precisely it shouldn't be dependent on page size, instead use the
-correct multiply of MLX5E_SHAMPO_WQ_BASE_RESRV_SIZE.
-
-Fixes: e5ca8fb08ab2 ("net/mlx5e: Add control path for SHAMPO feature")
-Signed-off-by: Lama Kayal <lkayal@nvidia.com>
-Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/en/params.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
-index 64b62ed17b07..31eb99f09c63 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
-@@ -423,7 +423,7 @@ u8 mlx5e_shampo_get_log_pkt_per_rsrv(struct mlx5_core_dev *mdev,
- 				     struct mlx5e_params *params)
- {
- 	u32 resrv_size = BIT(mlx5e_shampo_get_log_rsrv_size(mdev, params)) *
--			 PAGE_SIZE;
-+			 MLX5E_SHAMPO_WQ_BASE_RESRV_SIZE;
- 
- 	return order_base_2(DIV_ROUND_UP(resrv_size, params->sw_mtu));
- }
-@@ -827,7 +827,8 @@ static u32 mlx5e_shampo_get_log_cq_size(struct mlx5_core_dev *mdev,
- 					struct mlx5e_params *params,
- 					struct mlx5e_xsk_param *xsk)
- {
--	int rsrv_size = BIT(mlx5e_shampo_get_log_rsrv_size(mdev, params)) * PAGE_SIZE;
-+	int rsrv_size = BIT(mlx5e_shampo_get_log_rsrv_size(mdev, params)) *
-+		MLX5E_SHAMPO_WQ_BASE_RESRV_SIZE;
- 	u16 num_strides = BIT(mlx5e_mpwqe_get_log_num_strides(mdev, params, xsk));
- 	int pkt_per_rsrv = BIT(mlx5e_shampo_get_log_pkt_per_rsrv(mdev, params));
- 	u8 log_stride_sz = mlx5e_mpwqe_get_log_stride_size(mdev, params, xsk);
-@@ -1036,7 +1037,8 @@ u32 mlx5e_shampo_hd_per_wqe(struct mlx5_core_dev *mdev,
- 			    struct mlx5e_params *params,
- 			    struct mlx5e_rq_param *rq_param)
- {
--	int resv_size = BIT(mlx5e_shampo_get_log_rsrv_size(mdev, params)) * PAGE_SIZE;
-+	int resv_size = BIT(mlx5e_shampo_get_log_rsrv_size(mdev, params)) *
-+		MLX5E_SHAMPO_WQ_BASE_RESRV_SIZE;
- 	u16 num_strides = BIT(mlx5e_mpwqe_get_log_num_strides(mdev, params, NULL));
- 	int pkt_per_resv = BIT(mlx5e_shampo_get_log_pkt_per_rsrv(mdev, params));
- 	u8 log_stride_sz = mlx5e_mpwqe_get_log_stride_size(mdev, params, NULL);
-
-base-commit: ed3ba9b6e280e14cc3148c1b226ba453f02fa76c
--- 
-2.31.1
-
+Regards,
+Kuan-Wei
 
