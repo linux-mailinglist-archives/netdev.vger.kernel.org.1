@@ -1,96 +1,122 @@
-Return-Path: <netdev+bounces-176945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC25DA6CE1C
-	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 07:53:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C906A6CE45
+	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 08:19:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B01617A2CCE
-	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 06:52:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1B2F3B0648
+	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 07:19:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A55C52010E8;
-	Sun, 23 Mar 2025 06:53:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C5E11FFC53;
+	Sun, 23 Mar 2025 07:19:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hEhKP6Gb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD471B532F
-	for <netdev@vger.kernel.org>; Sun, 23 Mar 2025 06:53:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 163081E990D
+	for <netdev@vger.kernel.org>; Sun, 23 Mar 2025 07:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742712785; cv=none; b=RlUdFf36fz2vEUHb2jcVmtBTehND+C6wk7H6bFfulicakaeTNgyChHxGR1Wd//ZTmoIo53QVBQyBJ0FYgWIEHgdjaNdonA9frOP3Kztavu4IDsOyWFNlDaIhWepKP1Kn2agZZeEgjtHIowbyhhF3cGO87zfgDFul+wOybMqWD2I=
+	t=1742714381; cv=none; b=GGXQ+cmW9wcDLUsBqH19DRI12cQm4Eph0Nm0Scw5dipa3kwGxKxGPvXYCh3esgakVG+RosKz/dG9JpAw9nP30smakpMiUJP89ADSlo7tRllD8O6svvK/PLu7pXpcvhUYPKK/kWxP/QN+r8RgWq/FSxhzCzS3wq+Oa3zufIrDdtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742712785; c=relaxed/simple;
-	bh=Bf7yka2w1VVpUuX6J7h+vWCKWalB2ArNcjPpVEqVGZc=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=eKiW2cSTnmxxjZ+Q+E/HmFl0MyEYx4NhdB96XA44Y25mHNXFXbTKevoG4r+39fHdA7eiPA6IpEMMdyWJ7u9orEKf6UyyFqaWu30ekh5Y4qrxp7qmDwxdU76U4R5epbbX9AVJOw3PQOfYpgcee7jbL6cQon2qzOTP2Ky5PwnzW4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3d2a40e470fso26251975ab.3
-        for <netdev@vger.kernel.org>; Sat, 22 Mar 2025 23:53:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742712783; x=1743317583;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uuTtDdQllfqVQdTnY1GFjo08/XepPL02PHTKNSl5Nyk=;
-        b=CiuOIxRqzo+7MOrRrudTTDRgeniABGQv0asAEzPjtRxzrit9ypAy5Ybhu7opX1g5Rs
-         w/aDQfmIEaa6veM1xE//5bmBlkBn+LmLnLT1w3XiGG5hO6qBuyF5rD+jVw5DklL5vFTS
-         yz8MNfdJ+VEoDrOooW1yT8o4lO5OFzMkBmCrFZTTcC6lfEmiVlY2ZnqL44wyRYUv+StP
-         r6gheOxRabGKOCn/T9p4iqo/WOUALpg6nx1nh2TOBrGdIyAxxZHjGH83zwa9FyhCJgJ4
-         Ti8DBNk1kzJ4ggfQtPbnH5HUmN0MyjWVvntEjEfyE2Hea2BX61Of6ok0Or/kp+4muvkY
-         IPqg==
-X-Forwarded-Encrypted: i=1; AJvYcCXOg2yJAgP6fLEWnbFGf3iqgk0OHmcybX6lVTaorin6Q7Tk3fbHloKWaUuj+F/2ObaHHf//7BQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyrnej+0xruYDRipZzYGeWh2AIQTBGRFOTpLfAIvzYQSgr6HTeV
-	CxIGDYk702TdoC06LoXMEkdigkOjrTW4f0fEiQOTP6w7Zv/0WysptDBR3Zhyfu7tTduakoivuxx
-	PfVKXN8Vs2JiIGygJWbr74bVwdFCjD2FpEo4i5McK3+k3wNMEzPoCFXg=
-X-Google-Smtp-Source: AGHT+IFomXej1RrN6WELV4Qii9/yxfjxlWnmlmMb+ysYA1j31F3Z04e+3d3vMyCUXzjVvvz9y1wv7XB/R6rxL+wT2R6HvXmksUMF
+	s=arc-20240116; t=1742714381; c=relaxed/simple;
+	bh=gQAfyPttVXntUtud3yIQYXlBGsUs73eCw26eQOKmrII=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cF/Vuk3Xceb5Xc6wbQ7+LoC9k9ESG24MmOUwUC/ErgIOPeZybV1HgkFHCU8uyEFhSU3+LJPAJizuP3h27AewbqdD0CACZrvJtBzoGffmNaxcs+sofsB5rjGQ/fQbHogDmnpUi2Dn1+/kz43Ps6VKkrcl16PJNDNoLC906IJY0jA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hEhKP6Gb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C490C4CEE2;
+	Sun, 23 Mar 2025 07:19:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742714379;
+	bh=gQAfyPttVXntUtud3yIQYXlBGsUs73eCw26eQOKmrII=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=hEhKP6GbfhOSPo4Ely7KxSIuxE++7aIgjfLShgNMj8f8YE8kIwNRhHs+P1Ym6S/8J
+	 vPECDTcLpblihZ3pcpoPVjyyVXM0MO18PMEnJbsAgi6bb9lZbR4ehxaGmAMtANG9iB
+	 dL4m8zD0TMk/hbq5yadwCkj/rQ2dm54v1qP9MV6RDZX6M9qhpX6F38UKvSSSpRa6GX
+	 tqA3gUDQ2ZOOEeIly0PiHPxkPGsN8gSU8ktN7cuqqlam00lpHiNTXRE5Ej92Z4kSPN
+	 owSaa6ssy8ZzX+xMuxCKnc7b89y4m9ozOeOqajazTTuworgaZJsENlifU7j06II/3o
+	 pU+/Fz62bLIhg==
+Message-ID: <89f81b99-b505-48ad-b717-99e5d4d8e87b@kernel.org>
+Date: Sun, 23 Mar 2025 09:19:35 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:378c:b0:3d3:cdb0:a227 with SMTP id
- e9e14a558f8ab-3d5960f4d68mr77368565ab.9.1742712783188; Sat, 22 Mar 2025
- 23:53:03 -0700 (PDT)
-Date: Sat, 22 Mar 2025 23:53:03 -0700
-In-Reply-To: <6707499c.050a0220.1139e6.0017.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67dfafcf.050a0220.31a16b.0058.GAE@google.com>
-Subject: Re: [syzbot] [net] INFO: rcu detected stall in sys_getdents64
-From: syzbot <syzbot+17bc8c5157022e18da8b@syzkaller.appspotmail.com>
-To: apparmor-owner@lists.ubuntu.com, apparmor@lists.ubuntu.com, 
-	edumazet@google.com, jmorris@namei.org, john.johansen@canonical.com, 
-	john@apparmor.net, kuba@kernel.org, kuniyu@amazon.com, 
-	linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
-	paul@paul-moore.com, penguin-kernel@i-love.sakura.ne.jp, razor@blackwall.org, 
-	serge@hallyn.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: ti: icssg-prueth: Check return value to avoid a
+ kernel oops
+To: Benedikt Spranger <b.spranger@linutronix.de>, netdev@vger.kernel.org
+Cc: MD Danish Anwar <danishanwar@ti.com>, Andrew Lunn <andrew+netdev@lunn.ch>
+References: <20250322143314.1806893-1-b.spranger@linutronix.de>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20250322143314.1806893-1-b.spranger@linutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-syzbot suspects this issue was fixed by commit:
+Hi,
 
-commit e759e1e4a4bd2926d082afe56046a90224433a31
-Author: Eric Dumazet <edumazet@google.com>
-Date:   Wed Jan 29 14:27:26 2025 +0000
+Did you actually get a kernel oops? If yes, which part of code produces the oops.
 
-    net: revert RTNL changes in unregister_netdevice_many_notify()
+On 22/03/2025 16:33, Benedikt Spranger wrote:
+> of_get_ethdev_address() may fail, do not set a MAC address and return
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1084f004580000
-start commit:   fc20a3e57247 Merge tag 'for-linus-6.12a-rc2-tag' of git://..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ba92623fdea824c9
-dashboard link: https://syzkaller.appspot.com/bug?extid=17bc8c5157022e18da8b
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=135f7d27980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1483b380580000
+Even if it fails we do set a random MAC address and do not return error.
+So above statement is false.
 
-If the result looks correct, please mark the issue as fixed by replying with:
 
-#syz fix: net: revert RTNL changes in unregister_netdevice_many_notify()
+> an error. The icssg-prueth driver ignores that failure and try to validate
+> the MAC address. This let to a NULL pointer dereference in this case.
+> 
+> Check the return value of of_get_ethdev_address() before validating the
+> MAC address.
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+If of_get_ethdev_address() fails the netdev address will remain zero (as it was
+zero initialized during allocation) so is_valid_ether_addr() will fail as well.
+
+> 
+> Signed-off-by: Benedikt Spranger <b.spranger@linutronix.de>
+> ---
+>  drivers/net/ethernet/ti/icssg/icssg_prueth.c     | 2 +-
+>  drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> index 9a75733e3f8f..273615c8923c 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> @@ -1152,7 +1152,7 @@ static int prueth_netdev_init(struct prueth *prueth,
+>  
+>  	/* get mac address from DT and set private and netdev addr */
+>  	ret = of_get_ethdev_address(eth_node, ndev);
+> -	if (!is_valid_ether_addr(ndev->dev_addr)) {
+> +	if (ret || !is_valid_ether_addr(ndev->dev_addr)) {
+>  		eth_hw_addr_random(ndev);
+>  		dev_warn(prueth->dev, "port %d: using random MAC addr: %pM\n",
+>  			 port, ndev->dev_addr);
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c b/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
+> index 64a19ff39562..61c5e10e7077 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
+> @@ -862,7 +862,7 @@ static int prueth_netdev_init(struct prueth *prueth,
+>  
+>  	/* get mac address from DT and set private and netdev addr */
+>  	ret = of_get_ethdev_address(eth_node, ndev);
+> -	if (!is_valid_ether_addr(ndev->dev_addr)) {
+> +	if (ret || !is_valid_ether_addr(ndev->dev_addr)) {
+>  		eth_hw_addr_random(ndev);
+>  		dev_warn(prueth->dev, "port %d: using random MAC addr: %pM\n",
+>  			 port, ndev->dev_addr);
+
+-- 
+cheers,
+-roger
+
 
