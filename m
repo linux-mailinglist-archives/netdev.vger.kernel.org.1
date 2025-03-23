@@ -1,112 +1,109 @@
-Return-Path: <netdev+bounces-176961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD809A6CFE0
-	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 16:17:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0CBAA6CFEE
+	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 17:03:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 157783B6612
-	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 15:16:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1E9F7A3069
+	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 16:01:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE71586334;
-	Sun, 23 Mar 2025 15:16:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFBFA78C9C;
+	Sun, 23 Mar 2025 16:02:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="BvQ9J25h";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="xryv/1Ce"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JZ0yj1vC"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B553142E86
-	for <netdev@vger.kernel.org>; Sun, 23 Mar 2025 15:16:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C007F13AC1;
+	Sun, 23 Mar 2025 16:02:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742743012; cv=none; b=oIY6KyYwLLzqsSk5iO39CW/QVl1iCWySEQVzVKic9zEokVSmOwpXj/h56BoWu7KCYp3qiRvzxsAwmKOTZBzg2P5QJw95DwsIfB6YJ5Xgj2yytlSg2GlFyjzHIryEYBOwujfjNbIzohoitQQPP8dQC+ynQVm3a4y9MN6A0E5YEmw=
+	t=1742745777; cv=none; b=aNngXnqraNp1xcgYP9xJKqp+/mkWfLFxS2EcAdsjOr9Fqy3N9EgztyqwZtSguj4o4PXfdrETAxQ5MF1hCwckcCUbn2gjf5tilfjCUCjtoMfSQmqoC87A4ee/6o7w8SAd7cQDJycxcpNbNFp7S8Gg9yyHdaHcYaqIdo3KtkQtgCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742743012; c=relaxed/simple;
-	bh=yTaZuF2SKjwiuSa8tVuZaUeR+hG4o2SHnFxN09PN2CY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R+mFeEKvaIdcu0al1/4asEf5Cm0vuMAjU75J09hG2lz17M/zDGIoN0U/yC5W09wVQNdIYtM/Drj5XHByzkfObShl5g/rdLRjWNZ4CWermixebg3h7RUm3o1pFwxMqb/uuEL8J7mkwEcdP4sofyARp7rhXGqRfQ6J6Em2fDnkA0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=BvQ9J25h; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=xryv/1Ce; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Sun, 23 Mar 2025 16:18:26 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1742743003;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=T98q9jFnzzbdUQ7bdurg+XMNJJpY9e5JsxNKazKdTkc=;
-	b=BvQ9J25hyefsSG8FiI5X3oKYKTAhCvRC7CngpM9UsdbNZn0ielpRq5cuQvt1NNV3amgTjX
-	P1PVKlREXXqDoaF8/qADXc0t3ILuOC0PRMccXUWl6iGw3Doo9CSJ/PQhiOcYqLj8vjwW0I
-	tVoBWsdM8X6Nqnb7HhRSHYUjjCKvnySLUAelkONYADHvEnmKGpjL5gB/T8i8CFiBYmqslK
-	hL9k8ia7+zO0Zqr30nk5HMhl4iBJfMIB00Yts5K/QPb9GotQ5CxMwJOTWTl9mR8ODAb40C
-	eN7x0AiBJdrj19HOQFBwaFw5IsRIjjBw0PuyIivZa5rlRuryoxTx6Et6mSKPRg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1742743003;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=T98q9jFnzzbdUQ7bdurg+XMNJJpY9e5JsxNKazKdTkc=;
-	b=xryv/1CevWwzYVZNKZXOgZNHjG170HSlpYNgMV/P67J8LcL/zRB13l32jgRBqjDo/xqyzk
-	Qnsef+w9r+u70QCg==
-From: Benedikt Spranger <b.spranger@linutronix.de>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: netdev@vger.kernel.org, MD Danish Anwar <danishanwar@ti.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>
-Subject: Re: [PATCH] net: ti: icssg-prueth: Check return value to avoid a
- kernel oops
-Message-ID: <20250323161826.5bcd9cf8@mitra>
-In-Reply-To: <89f81b99-b505-48ad-b717-99e5d4d8e87b@kernel.org>
-References: <20250322143314.1806893-1-b.spranger@linutronix.de>
-	<89f81b99-b505-48ad-b717-99e5d4d8e87b@kernel.org>
-Organization: Linutronix GmbH
+	s=arc-20240116; t=1742745777; c=relaxed/simple;
+	bh=H7w/BjMPnYgmMenGfqzBfq/qcAtJzqu15o6ToUZvRwI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QQtkQwcTZQET8Grdyg/ugKICggdqkDH9mzHZlVux5X2lmJfYzDHQZemQhtlkKJliUb7J4QRUdSrElp9+BhChdjps4dnpMaOsqEqHHkIuByNECLcp6Nor2N5Wsij5ELkpixt9jpOV5yOjRuab2WKH1ZTlHl3QRhkqV8ozmh70Rdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JZ0yj1vC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E268C4CEE2;
+	Sun, 23 Mar 2025 16:02:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742745777;
+	bh=H7w/BjMPnYgmMenGfqzBfq/qcAtJzqu15o6ToUZvRwI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JZ0yj1vC8haewJgaec1HBq77BTW0SfsoME8Nmw+oPpG0g/E9dN9E6quj2rSlYPq34
+	 g1PyXkA8HvH+OyoK9oEzDptSNP+WO1rE2ttaq4h+P9iofLaAY9VGx9z+vtWmQJfjml
+	 r0tzSzqEAgNE7f8e0SwdzUCdi2w2bOd2cdoxyhwyxLDRQTgKEbHaItQCJcjHqISJep
+	 0BSzd0purxOWnl/2teRAlqIqtJiUsFZf2cQRRrs9VFH0IVng4Shv/WC+1JWWOBgD8Q
+	 yi6EGq9W39IO8yZNz63pv4B2K5w4318tgt99lZyZggTouUgN5sQbnW0huCaKm8nK2e
+	 hF2ISgb/DeOSQ==
+Date: Sun, 23 Mar 2025 16:02:50 +0000
+From: Simon Horman <horms@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Moshe Shemesh <moshe@nvidia.com>, Mark Bloch <mbloch@nvidia.com>
+Subject: Re: [PATCH net-next] net/mlx5e: TX, Utilize WQ fragments edge for
+ multi-packet WQEs
+Message-ID: <20250323160250.GQ892515@horms.kernel.org>
+References: <1742391746-118647-1-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1742391746-118647-1-git-send-email-tariqt@nvidia.com>
 
-On Sun, 23 Mar 2025 09:19:35 +0200
-Roger Quadros <rogerq@kernel.org> wrote:
-
-> Did you actually get a kernel oops?
-Yes. And I would like to attach the kernel output, but I do not have
-access to the board ATM.
-
-> If yes, which part of code produces the oops.
-I get an NULL pointer dereference in is_multicast_ether_addr().
-It happens here:
-
-    u32 a = *(const u32 *)addr;
-
-> Even if it fails we do set a random MAC address and do not return
-> error. So above statement is false.
-I doubt that. of_get_ethdev_address() do not set a random MAC address
-in case of a failure. It simply returns -ENODEV. Since
-is_valid_ether_addr() fails with a NULL pointer dereference in
-is_multicast_ether_addr() on the other hand, no random MAC address is
-set. 
-
-> > Check the return value of of_get_ethdev_address() before validating
-> > the MAC address.  
+On Wed, Mar 19, 2025 at 03:42:26PM +0200, Tariq Toukan wrote:
+> For simplicity reasons, the driver avoids crossing work queue fragment
+> boundaries within the same TX WQE (Work-Queue Element). Until today, as
+> the number of packets in a TX MPWQE (Multi-Packet WQE) descriptor is not
+> known in advance, the driver pre-prepared contiguous memory for the
+> largest possible WQE. For this, when getting too close to the fragment
+> edge, having no room for the largest WQE possible, the driver was
+> filling the fragment remainder with NOP descriptors, aligning the next
+> descriptor to the beginning of the next fragment.
 > 
-> If of_get_ethdev_address() fails the netdev address will remain zero
-> (as it was zero initialized during allocation) so
-> is_valid_ether_addr() will fail as well.
-Yes. It will fail to. But is_valid_ether_addr() is not called any more.
+> Generating and handling these NOPs wastes resources, like: CPU cycles,
+> work-queue entries fetched to the device, and PCI bandwidth.
+> 
+> In this patch, we replace this NOPs filling mechanism in the TX MPWQE
+> flow. Instead, we utilize the remaining entries of the fragment with a
+> TX MPWQE. If this room turns out to be too small, we simply open an
+> additional descriptor starting at the beginning of the next fragment.
+> 
+> Performance benchmark:
+> uperf test, single server against 3 clients.
+> TCP multi-stream, bidir, traffic profile "2x350B read, 1400B write".
+> Bottleneck is in inbound PCI bandwidth (device POV).
+> 
+> +---------------+------------+------------+--------+
+> |               | Before     | After      |        |
+> +---------------+------------+------------+--------+
+> | BW            | 117.4 Gbps | 121.1 Gbps | +3.1%  |
+> +---------------+------------+------------+--------+
+> | tx_packets    | 15 M/sec   | 15.5 M/sec | +3.3%  |
+> +---------------+------------+------------+--------+
+> | tx_nops       | 3  M/sec   | 0          | -100%  |
+> +---------------+------------+------------+--------+
+> 
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
 
-Due to the if statement is_valid_ether_addr() is only called, if
-of_get_ethdev_address() exits with 0 aka success. In case of a failure
-the if statement is true and there is no call to is_valid_ether_addr().
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Regards
-    Bene
 
