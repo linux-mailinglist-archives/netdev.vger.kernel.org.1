@@ -1,208 +1,183 @@
-Return-Path: <netdev+bounces-176942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C471A6CD02
-	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 23:40:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97BCBA6CD56
+	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 01:01:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A853B1894256
-	for <lists+netdev@lfdr.de>; Sat, 22 Mar 2025 22:41:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC4F53B07B1
+	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 00:01:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF8561E9B3E;
-	Sat, 22 Mar 2025 22:40:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="csIFGbR7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9A8E80B;
+	Sun, 23 Mar 2025 00:01:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E0711DF72C;
-	Sat, 22 Mar 2025 22:40:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3A94647
+	for <netdev@vger.kernel.org>; Sun, 23 Mar 2025 00:01:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742683249; cv=none; b=R7mfpxN0U8BxeMtSl7RbphCywXmxqw71CyaUsHmwhZxvGX1IrzpnSW/XXCyopMU7ffuvHZXshhqad0B+lEos5wyhzgxFiMakvsE79bd2rC0X6kLKfy6QXwkZmEXfjJVosgImrFJAGTSgNT670nxXfo9eCXSUCZnSRX+Ch7C6VP0=
+	t=1742688090; cv=none; b=UBd1tBg88Mxq25vj05C1P64azdANVoLSbzlkPJXWqs+JgtRtNSyPY627Zm+Sa3SKsB2Pu9/hyWRA0aAyMuwCLSsz61ifaIk4oi1VTtFrGLq7uTmyKzKcHiDkscBqgMnxsFspgw7h86pPClOGOTrlSelcPW5uNla0RE5xbpx2Khs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742683249; c=relaxed/simple;
-	bh=kaGJw1UN+eBP3ZezlrS616HN8vMDvS2SbeAfdkGtfyU=;
-	h=From:To:Cc:Subject:In-Reply-To:Message-ID:References:Date:
-	 MIME-Version:Content-Type; b=LuIHcScY216tyLn/oBSSWPSqIBOA8F2P2zMdkmCIciHpybXtM4r//2LWv73C9KvBQXNpdbcS65YifpmwmhbgyU6RuFfEB5xS6iKJg3LWLWWjfv6A6fR14qsMJrgdo/M6sgkB6Befqo+PwhY8ZmGFVDuIMy4p56YqkqI8QaJGJrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=csIFGbR7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2FB5C4CEDD;
-	Sat, 22 Mar 2025 22:40:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742683249;
-	bh=kaGJw1UN+eBP3ZezlrS616HN8vMDvS2SbeAfdkGtfyU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=csIFGbR7M0A7dEy3uy8Zts0U0jDb7wD8qDsOFpPkH50/PQTuuwjSY7kJZMN3T2pyL
-	 E0D2fMGpS2rWoof3KuDQ6RS1f3EEW46SRVzlMS/+inRzr/YP4nvB6rmnWfvQlMq60d
-	 MfbRqTh0+npCq73qO34o11jfTqCOBUqAdNbEK5B+C7u4H2gnWyMBRqIYNwyNYOIzBr
-	 b2SpMf2adOKXJeKykbxZFTVXbiRv0DbJdsNY98YBXygcRCGG+VVuLY2Tl3cNvbtR3w
-	 tfcgOEGULR7X5vFaS2ur/nLyGaJ9e26wUOFo6nekS0J9FWOR9347KxZzyHkb3B5JH3
-	 c09h0y3klkTxA==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: "Boqun Feng" <boqun.feng@gmail.com>
-Cc: "FUJITA Tomonori" <fujita.tomonori@gmail.com>,  <tglx@linutronix.de>,
-  <linux-kernel@vger.kernel.org>,  <rust-for-linux@vger.kernel.org>,
-  <netdev@vger.kernel.org>,  <andrew@lunn.ch>,  <hkallweit1@gmail.com>,
-  <tmgross@umich.edu>,  <ojeda@kernel.org>,  <alex.gaynor@gmail.com>,
-  <gary@garyguo.net>,  <bjorn3_gh@protonmail.com>,
-  <benno.lossin@proton.me>,  <a.hindborg@samsung.com>,
-  <aliceryhl@google.com>,  <anna-maria@linutronix.de>,
-  <frederic@kernel.org>,  <arnd@arndb.de>,  <jstultz@google.com>,
-  <sboyd@kernel.org>,  <mingo@redhat.com>,  <peterz@infradead.org>,
-  <juri.lelli@redhat.com>,  <vincent.guittot@linaro.org>,
-  <dietmar.eggemann@arm.com>,  <rostedt@goodmis.org>,
-  <bsegall@google.com>,  <mgorman@suse.de>,  <vschneid@redhat.com>,
-  <tgunders@redhat.com>,  <me@kloenk.dev>,  <david.laight.linux@gmail.com>
-Subject: Re: [PATCH v11 6/8] MAINTAINERS: rust: Add new sections for
- DELAY/SLEEP and TIMEKEEPING API
-In-Reply-To: <Z96zstZIiPsP4mSF@Mac.home> (Boqun Feng's message of "Sat, 22 Mar
-	2025 05:57:22 -0700")
-Message-ID: <871puoelnj.fsf@kernel.org>
-References: <87jz8ichv5.fsf@kernel.org> <87o6xu15m1.ffs@tglx>
-	<67ddd387.050a0220.3229ca.921c@mx.google.com>
-	<20250322.110703.1794086613370193338.fujita.tomonori@gmail.com>
-	<8n9Iwb8Z00ljHvj7jIWUybn9zwN_JLhLSWrljBKG9RE7qQx4MTMqUkTJeVeBZtexynIlqH1Lgt6g0ofLLwnoyQ==@protonmail.internalid>
-	<Z96zstZIiPsP4mSF@Mac.home>
-User-Agent: mu4e 1.12.7; emacs 29.4
-Date: Sat, 22 Mar 2025 23:40:21 +0100
+	s=arc-20240116; t=1742688090; c=relaxed/simple;
+	bh=clZyGx7FyTaNY0b31ckgOs2WG5cQqvhILoUFei9JS7U=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=W7b1ctAW/OTJ2Cz9p6JWJME15k8JOMKQBYDEYyjon4ZLxtbmpsAk1M3rlsAxa7sSB/BXCjs2cWBFeQGBXrErRAd75IIdHwhW9J550plNfiB7qWwKszGKqOSabMFCD+nDb1nfAb9tiXTB6inX4dNYProlMSgSUT9z9wF9fs0r1ms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=18.132.163.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
+X-QQ-mid: bizesmtpip2t1742688041tmaqloa
+X-QQ-Originating-IP: 0JhvJIdo/rU5lLpqCfRwlvWFJFzbxiNqHyoIj2qImPY=
+Received: from smtpclient.apple ( [localhost])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Sun, 23 Mar 2025 08:00:40 +0800 (CST)
+X-QQ-SSF: 0001000000000000000000000000000
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 2458011106060878887
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.400.131.1.6\))
+Subject: Re: [PATCH net-next v9 0/6] add sriov support for wangxun NICs
+From: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
+In-Reply-To: <203E2DE385ACD88C+20250319073356.55085-1-mengyuanlou@net-swift.com>
+Date: Sun, 23 Mar 2025 08:00:29 +0800
+Cc: kuba@kernel.org,
+ horms@kernel.org,
+ jiawenwu@trustnetic.com,
+ duanqiangwen@net-swift.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <A4FB01EA-0BF0-41C1-9596-03D0EDA00E4C@net-swift.com>
+References: <203E2DE385ACD88C+20250319073356.55085-1-mengyuanlou@net-swift.com>
+To: netdev@vger.kernel.org
+X-Mailer: Apple Mail (2.3826.400.131.1.6)
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpip:net-swift.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+X-QQ-XMAILINFO: ONeCszOCk2GVVvOoWHku3pOQlJ7dyyBb7TmacmYvqt4lRU5KoGKuSryo
+	UIVnKq4IvGCaQDaCBwtafSIICaMt7XlA1QRp/47TrqDiv2tpac6l/9nPF/S9JYNlVYTMhGD
+	0DAT0JMtb36aCb+taho/Ai3wuiiCbCIZ6MmXVYssgH3ORdDuaOUYeZ7u/e7KQ66TDATIFEn
+	KcRkIXuMsidd/+hLy3KSvBklcfkIKQ7pxVwBfXcyI7TrAouVIsnU71JPbLhhIrik0V33yy7
+	GKvrd4b0nlTTTYNXK4skeCAmLWn+JoQdD0zvPTzE7FjwPsh4kaUG6La4yRYeDt+T1ynaFim
+	LwjILhLmgEgChK1MWBEEYQ0kQ+UzBLg/Tib/mSbOoUwYZv8IdcaOmBYg7fF0/+hhvTsEJl7
+	RyYMvURILkbXwV3Lrb/hIs7l1P2euCiH+658vUlRJO9BMYpz2ZUlhNOaksM+ARnyF3vMCKt
+	zgD6rtDOGk0p1dJ4RuaeIDtYoN2vcROAexwGdvx8wUzPGdQRBlBRaiJ8SMagtaKlSNrLiXS
+	9qCAfK9uHuR+jdedjL+fSePprg+lCzylIV6mg0nibySfBO+ATccDrlYY2rmd1y7gQJQWxZE
+	PzZAw8IYVrYnXShtDCt8gJLdWXVE9o/TB8kqB7fSAOuwBJdMcOhLw/5bb26Cv8SaB/n1yXR
+	Nb1lMNrcBLyu0MNs91g53Y/ifsZ15z7V/jkAXT+frQVEackN5Q6VDj51STNCpGR8De5FGza
+	8wUZc2u0KeDZJW4yNXM9dvC0tQbUeAJNpiU+/RYG1C4drlbci15H15Ktc35zPUzX5rzXliQ
+	H0KcI5Wg5lXQ4GGLUR4n9G4gIb1sJF1vh4mhaIqTnpDjNLJ9pNgu68po6RYYWgfBIJ90Qsu
+	3PbkQ4DtvIj4Fz5J1/u4t9royV4sV8zCrcvPMNUwgEc46Flp1ufe0m8jgBhjjeWjWi9a34t
+	xizj9Hzf18nmN6GiqFmnhtHEjnJR24wcTeNz2m3yv+vpB1WaXGnXE3DK3aujQQZRGHxF50W
+	vHLo96e/yd/Nl4MJB7vseep6jPrItaGcgzEjl7yg==
+X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
+X-QQ-RECHKSPAM: 0
 
-Hi All,
+Hi
 
-"Boqun Feng" <boqun.feng@gmail.com> writes:
-
-> On Sat, Mar 22, 2025 at 11:07:03AM +0900, FUJITA Tomonori wrote:
->> Thank you all!
->>
->> On Fri, 21 Mar 2025 14:00:52 -0700
->> Boqun Feng <boqun.feng@gmail.com> wrote:
->>
->> > On Fri, Mar 21, 2025 at 09:38:46PM +0100, Thomas Gleixner wrote:
->> >> On Fri, Mar 21 2025 at 20:18, Andreas Hindborg wrote:
->> >> >> Could you add me as a reviewer in these entries?
->> >> >>
->> >> >
->> >> > I would like to be added as well.
->> >>
->> >> Please add the relevant core code maintainers (Anna-Maria, Frederic,
->> >> John Stultz and myself) as well to the reviewers list, so that this does
->> >> not end up with changes going in opposite directions.
->> >>
->> >
->> > Make sense, I assume you want this to go via rust then (althought we
->> > would like it to go via your tree if possible ;-))?
->>
->
-> Given Andreas is already preparing the pull request of the hrtimer
-> abstraction to Miguel, and delay, timekeeping and hrtimer are related,
-> these timekeeping/delay patches should go via Andreas (i.e.
-> rust/hrtimer-next into rust/rust-next) if Thomas and Miguel are OK with
-> it. Works for you, Andreas? If so...
->
->> Once the following review regarding fsleep() is complete, I will submit
->> patches #2 through #6 as v12 for rust-next:
->>
->> https://lore.kernel.org/linux-kernel/20250322.102449.895174336060649075.fujita.tomonori@gmail.com/
->>
->> The updated MAINTAINERS file will look like the following.
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index cbf84690c495..858e0b34422f 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -10370,6 +10370,18 @@ F:	kernel/time/timer_list.c
->>  F:	kernel/time/timer_migration.*
->>  F:	tools/testing/selftests/timers/
->>
->> +DELAY AND SLEEP API [RUST]
->> +M:	FUJITA Tomonori <fujita.tomonori@gmail.com>
->> +R:	Boqun Feng <boqun.feng@gmail.com>
->> +R:	Andreas Hindborg <a.hindborg@kernel.org>
->
-> ... this "R:" entry would be "M:",
->
->> +R:	Anna-Maria Behnsen <anna-maria@linutronix.de>
->> +R:	Frederic Weisbecker <frederic@kernel.org>
->> +R:	Thomas Gleixner <tglx@linutronix.de>
->> +L:	rust-for-linux@vger.kernel.org
->> +L:	linux-kernel@vger.kernel.org
->
-> +T:	git https://github.com/Rust-for-Linux/linux.git hrtimer-next
->
->> +S:	Maintained
->
-> I will let Andreas decide whether this is a "Supported" entry ;-)
->
->> +F:	rust/kernel/time/delay.rs
->> +
->>  HIGH-SPEED SCC DRIVER FOR AX.25
->>  L:	linux-hams@vger.kernel.org
->>  S:	Orphan
->> @@ -23944,6 +23956,17 @@ F:	kernel/time/timekeeping*
->>  F:	kernel/time/time_test.c
->>  F:	tools/testing/selftests/timers/
->>
->> +TIMEKEEPING API [RUST]
->
-> and similar things for this entry as well.
->
->> +M:	FUJITA Tomonori <fujita.tomonori@gmail.com>
->> +R:	Boqun Feng <boqun.feng@gmail.com>
->> +R:	Andreas Hindborg <a.hindborg@kernel.org>
->> +R:	John Stultz <jstultz@google.com>
->> +R:	Thomas Gleixner <tglx@linutronix.de>
->
-> +R:      Stephen Boyd <sboyd@kernel.org>
->
-> ?
->
->> +L:	rust-for-linux@vger.kernel.org
->> +L:	linux-kernel@vger.kernel.org
->> +S:	Maintained
->> +F:	rust/kernel/time.rs
->> +
->
-> Tomo, let's wait for Andreas' rely and decide how to change these
-> entries. Thanks!
-
-My recommendation would be to take all of `rust/kernel/time` under one
-entry for now. I suggest the following, folding in the hrtimer entry as
-well:
-
-DELAY, SLEEP, TIMEKEEPING, TIMERS [RUST]
-M:	Andreas Hindborg <a.hindborg@kernel.org>
-R:	Boqun Feng <boqun.feng@gmail.com>
-R:	FUJITA Tomonori <fujita.tomonori@gmail.com>
-R:	Lyude Paul <lyude@redhat.com>
-R:	Frederic Weisbecker <frederic@kernel.org>
-R:	Thomas Gleixner <tglx@linutronix.de>
-R:	Anna-Maria Behnsen <anna-maria@linutronix.de>
-R:	John Stultz <jstultz@google.com>
-L:	rust-for-linux@vger.kernel.org
-S:	Supported
-W:	https://rust-for-linux.com
-B:	https://github.com/Rust-for-Linux/linux/issues
-T:	git https://github.com/Rust-for-Linux/linux.git rust-timekeeping-next
-F:	rust/kernel/time.rs
-F:	rust/kernel/time/
-
-If that is acceptable to everyone, it is very likely that I can pick 2-6
-for v6.16.
-
-I assume patch 1 will go through the sched/core tree, and then Miguel
-can pick 7.
-
-Best regards,
-Andreas Hindborg
-
+> 2025=E5=B9=B43=E6=9C=8819=E6=97=A5 15:33=EF=BC=8CMengyuan Lou =
+<mengyuanlou@net-swift.com> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> Add sriov_configure for ngbe and txgbe drivers.
+> Reallocate queue and irq resources when sriov is enabled.
+> Add wx_msg_task in interrupts handler, which is used to process the
+> configuration sent by vfs.
+> Add ping_vf for wx_pf to tell vfs about pf link change.
+> Do not add uAPIs for in these patches, since the legacy APIs =
+ndo_set_vf_*
+> callbacks are considered frozen. And new apis are being replanned.
+>=20
+> v9:
+> - Using FIELD_{GET,PREP} macros makes the code more readable.
+> - Add support for the new mac_type aml in the configuration flow.
+> v8: =
+https://lore.kernel.org/netdev/20250309154252.79234-1-mengyuanlou@net-swif=
+t.com/
+> - Request a separate processing function when ngbe num_vfs is equal to =
+7.
+> - Add the comment explains why pf needs to reuse interrupt 0 when the =
+ngbe
+> num_vfs equals 7.
+> - Remove some useless api version checks because vf will not send =
+commands
+> higher than its own api version.
+> - Fix some code syntax and logic errors.
+> v7: =
+https://lore.kernel.org/netdev/20250206103750.36064-1-mengyuanlou@net-swif=
+t.com/
+> - Use pci_sriov_set_totalvfs instead of checking the limit manually.
+> v6: =
+https://lore.kernel.org/netdev/20250110102705.21846-1-mengyuanlou@net-swif=
+t.com/
+> - Remove devlink allocation and PF/VF devlink port creation in these =
+patches.
+> v5: =
+https://lore.kernel.org/netdev/598334BC407FB6F6+20240804124841.71177-1-men=
+gyuanlou@net-swift.com/
+> - Add devlink allocation which will be used to add uAPI.
+> - Remove unused EXPORT_SYMBOL.
+> - Unify some functions return styles in patch 1/4.
+> - Make the code line less than 80 columns.
+> v4: =
+https://lore.kernel.org/netdev/3601E5DE87D2BC4F+20240604155850.51983-1-men=
+gyuanlou@net-swift.com/
+> - Move wx_ping_vf to patch 6.
+> - Modify return section format in Kernel docs.
+> v3: =
+https://lore.kernel.org/netdev/587FAB7876D85676+20240415110225.75132-1-men=
+gyuanlou@net-swift.com/
+> - Do not accept any new implementations of the old SR-IOV API.
+> - So remove ndo_vf_xxx in these patches. Switch mode ops will be added
+> - in vf driver which will be submitted later.
+> v2: =
+https://lore.kernel.org/netdev/EF19E603F7CCA7B9+20240403092714.3027-1-meng=
+yuanlou@net-swift.com/
+> - Fix some used uninitialised.
+> - Use poll + yield with delay instead of busy poll of 10 times in =
+mbx_lock obtain.
+> - Split msg_task and flow into separate patches.
+> v1: =
+https://lore.kernel.org/netdev/DA3033FE3CCBBB84+20240307095755.7130-1-meng=
+yuanlou@net-swift.com/
+>=20
+> Mengyuan Lou (6):
+>  net: libwx: Add mailbox api for wangxun pf drivers
+>  net: libwx: Add sriov api for wangxun nics
+>  net: libwx: Redesign flow when sriov is enabled
+>  net: libwx: Add msg task func
+>  net: ngbe: add sriov function support
+>  net: txgbe: add sriov function support
+>=20
+> drivers/net/ethernet/wangxun/libwx/Makefile   |   2 +-
+> drivers/net/ethernet/wangxun/libwx/wx_hw.c    | 302 +++++-
+> drivers/net/ethernet/wangxun/libwx/wx_hw.h    |   4 +
+> drivers/net/ethernet/wangxun/libwx/wx_lib.c   | 128 ++-
+> drivers/net/ethernet/wangxun/libwx/wx_mbx.c   | 176 ++++
+> drivers/net/ethernet/wangxun/libwx/wx_mbx.h   |  77 ++
+> drivers/net/ethernet/wangxun/libwx/wx_sriov.c | 909 ++++++++++++++++++
+> drivers/net/ethernet/wangxun/libwx/wx_sriov.h |  18 +
+> drivers/net/ethernet/wangxun/libwx/wx_type.h  |  93 +-
+> drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  93 +-
+> drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c |   5 +
+> drivers/net/ethernet/wangxun/ngbe/ngbe_type.h |   3 +
+> .../net/ethernet/wangxun/txgbe/txgbe_irq.c    |  21 +-
+> .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  27 +
+> .../net/ethernet/wangxun/txgbe/txgbe_phy.c    |   6 +
+> .../net/ethernet/wangxun/txgbe/txgbe_type.h   |   7 +-
+> 16 files changed, 1837 insertions(+), 34 deletions(-)
+> create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_mbx.c
+> create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_mbx.h
+> create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_sriov.c
+> create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_sriov.h
+>=20
+> --=20
+> 2.48.1
+>=20
 
 
