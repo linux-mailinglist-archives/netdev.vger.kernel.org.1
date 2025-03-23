@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-176962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0CBAA6CFEE
-	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 17:03:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1621CA6D00C
+	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 17:48:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1E9F7A3069
-	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 16:01:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EF3187A2FFD
+	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 16:47:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFBFA78C9C;
-	Sun, 23 Mar 2025 16:02:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EAA1137930;
+	Sun, 23 Mar 2025 16:48:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JZ0yj1vC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o9Tn8Cbp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C007F13AC1;
-	Sun, 23 Mar 2025 16:02:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0883EF510;
+	Sun, 23 Mar 2025 16:48:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742745777; cv=none; b=aNngXnqraNp1xcgYP9xJKqp+/mkWfLFxS2EcAdsjOr9Fqy3N9EgztyqwZtSguj4o4PXfdrETAxQ5MF1hCwckcCUbn2gjf5tilfjCUCjtoMfSQmqoC87A4ee/6o7w8SAd7cQDJycxcpNbNFp7S8Gg9yyHdaHcYaqIdo3KtkQtgCQ=
+	t=1742748488; cv=none; b=LkNFg1apeKwiaootVzZHLmSXN+Ldt8hETYGN8zLhsX2mdkrRb377rqFICk2PPEQFQqD2fEZNvkCrtY3DomUteamNqL+gve5O3Af249lEtENKh+ccw/Vo8pDAYfh0pxRKrvTO2XQJDH5+Njz5BTRSBwnFwm84vawi8gfya65sKH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742745777; c=relaxed/simple;
-	bh=H7w/BjMPnYgmMenGfqzBfq/qcAtJzqu15o6ToUZvRwI=;
+	s=arc-20240116; t=1742748488; c=relaxed/simple;
+	bh=NEy6S0p5xzIfy6ODr1lpmVmlv6zgmNVtot/sei4opx0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QQtkQwcTZQET8Grdyg/ugKICggdqkDH9mzHZlVux5X2lmJfYzDHQZemQhtlkKJliUb7J4QRUdSrElp9+BhChdjps4dnpMaOsqEqHHkIuByNECLcp6Nor2N5Wsij5ELkpixt9jpOV5yOjRuab2WKH1ZTlHl3QRhkqV8ozmh70Rdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JZ0yj1vC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E268C4CEE2;
-	Sun, 23 Mar 2025 16:02:53 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=rUkFK2z/yQYqecDfXNPc3yEr965SJkAVKcKTiEw6+wbfcTNPgdDoKoTjD0Y3VP28Sum+DsKbnnItkxBzvg43e2PacGbPusHVLkno/oAynJwTabfjwoEeT8U1VzzNNdXPR0Z4ncg+MdybEAlEho+1KIVeELtWYCaZOSGZnESiri0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o9Tn8Cbp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 519BBC4CEE2;
+	Sun, 23 Mar 2025 16:48:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742745777;
-	bh=H7w/BjMPnYgmMenGfqzBfq/qcAtJzqu15o6ToUZvRwI=;
+	s=k20201202; t=1742748486;
+	bh=NEy6S0p5xzIfy6ODr1lpmVmlv6zgmNVtot/sei4opx0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JZ0yj1vC8haewJgaec1HBq77BTW0SfsoME8Nmw+oPpG0g/E9dN9E6quj2rSlYPq34
-	 g1PyXkA8HvH+OyoK9oEzDptSNP+WO1rE2ttaq4h+P9iofLaAY9VGx9z+vtWmQJfjml
-	 r0tzSzqEAgNE7f8e0SwdzUCdi2w2bOd2cdoxyhwyxLDRQTgKEbHaItQCJcjHqISJep
-	 0BSzd0purxOWnl/2teRAlqIqtJiUsFZf2cQRRrs9VFH0IVng4Shv/WC+1JWWOBgD8Q
-	 yi6EGq9W39IO8yZNz63pv4B2K5w4318tgt99lZyZggTouUgN5sQbnW0huCaKm8nK2e
-	 hF2ISgb/DeOSQ==
-Date: Sun, 23 Mar 2025 16:02:50 +0000
+	b=o9Tn8CbpqNwKSsIdobFS00lNUgLtMSC6ZjE/0//uCGvnE9NY3xf4iF9fmkLXxjVwz
+	 7sQcyfN9Vu4CyGSgjSDAxtk4UpSU4A1N2XM5Fx3EUAjMODnecPaZ6KdRJ+dtYMsfYt
+	 wCnGiLKYGio4S+wENJcETL5x947S9jSTPp/BudWtNU5kO3Plce8XSkoXN5iDu0PUBp
+	 6/Ubzbb8ABqMRqxLoFZ4CT0DU35Wto6KE4pJDFg1S4HRPBWBeZoSIoNkIST401gjX6
+	 LWbPskvt//DXxfTSa7BM9Ih7TLe43DOAx0SM+vil6PeB/wxNL8R2cAGJbo7bkn3/mQ
+	 /Njwiv6/YdojA==
+Date: Sun, 23 Mar 2025 16:48:00 +0000
 From: Simon Horman <horms@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Michal Ostrowski <mostrows@earthlink.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Moshe Shemesh <moshe@nvidia.com>, Mark Bloch <mbloch@nvidia.com>
-Subject: Re: [PATCH net-next] net/mlx5e: TX, Utilize WQ fragments edge for
- multi-packet WQEs
-Message-ID: <20250323160250.GQ892515@horms.kernel.org>
-References: <1742391746-118647-1-git-send-email-tariqt@nvidia.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, linux-hardening@vger.kernel.org,
+	Nikolay Aleksandrov <razor@blackwall.org>
+Subject: Re: [PATCH v10 nf-next 1/3] net: pppoe: avoid zero-length arrays in
+ struct pppoe_hdr
+Message-ID: <20250323164800.GR892515@horms.kernel.org>
+References: <20250315195910.17659-1-ericwouds@gmail.com>
+ <20250315195910.17659-2-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,44 +66,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1742391746-118647-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <20250315195910.17659-2-ericwouds@gmail.com>
 
-On Wed, Mar 19, 2025 at 03:42:26PM +0200, Tariq Toukan wrote:
-> For simplicity reasons, the driver avoids crossing work queue fragment
-> boundaries within the same TX WQE (Work-Queue Element). Until today, as
-> the number of packets in a TX MPWQE (Multi-Packet WQE) descriptor is not
-> known in advance, the driver pre-prepared contiguous memory for the
-> largest possible WQE. For this, when getting too close to the fragment
-> edge, having no room for the largest WQE possible, the driver was
-> filling the fragment remainder with NOP descriptors, aligning the next
-> descriptor to the beginning of the next fragment.
+On Sat, Mar 15, 2025 at 08:59:08PM +0100, Eric Woudstra wrote:
+> Jakub Kicinski suggested following patch:
 > 
-> Generating and handling these NOPs wastes resources, like: CPU cycles,
-> work-queue entries fetched to the device, and PCI bandwidth.
+> W=1 C=1 GCC build gives us:
 > 
-> In this patch, we replace this NOPs filling mechanism in the TX MPWQE
-> flow. Instead, we utilize the remaining entries of the fragment with a
-> TX MPWQE. If this room turns out to be too small, we simply open an
-> additional descriptor starting at the beginning of the next fragment.
+> net/bridge/netfilter/nf_conntrack_bridge.c: note: in included file (through
+> ../include/linux/if_pppox.h, ../include/uapi/linux/netfilter_bridge.h,
+> ../include/linux/netfilter_bridge.h): include/uapi/linux/if_pppox.h:
+> 153:29: warning: array of flexible structures
 > 
-> Performance benchmark:
-> uperf test, single server against 3 clients.
-> TCP multi-stream, bidir, traffic profile "2x350B read, 1400B write".
-> Bottleneck is in inbound PCI bandwidth (device POV).
+> It doesn't like that hdr has a zero-length array which overlaps proto.
+> The kernel code doesn't currently need those arrays.
 > 
-> +---------------+------------+------------+--------+
-> |               | Before     | After      |        |
-> +---------------+------------+------------+--------+
-> | BW            | 117.4 Gbps | 121.1 Gbps | +3.1%  |
-> +---------------+------------+------------+--------+
-> | tx_packets    | 15 M/sec   | 15.5 M/sec | +3.3%  |
-> +---------------+------------+------------+--------+
-> | tx_nops       | 3  M/sec   | 0          | -100%  |
-> +---------------+------------+------------+--------+
+> PPPoE connection is functional after applying this patch.
 > 
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+> 
+> ---
+> 
+> Split from patch-set: bridge-fastpath and related improvements v9
+> 
+> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Hi Eric,
 
+Perhaps this is due to tooling, but your Signed-off-by line should
+appear immediately after the Reviewed-by line. No blank line in between.
+
+And, in particular, the Signed-off-by line should appear above the (first)
+scissors ("---"), as if git am is used to apply your patch then the
+commit message will be truncated at that point. Which results
+in a commit with no signed-off-by line.
+
+FWIIW, putting the note about splitting the patch-set below the scissors
+looks good to me.
+
+...
 
