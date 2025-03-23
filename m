@@ -1,72 +1,73 @@
-Return-Path: <netdev+bounces-176984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3F81A6D274
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 00:11:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A709A6D275
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 00:11:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CC5E3B0DA3
-	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 23:10:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D1893B0DC8
+	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 23:11:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61DD21A257D;
-	Sun, 23 Mar 2025 23:11:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 657C01A5B8F;
+	Sun, 23 Mar 2025 23:11:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="CclVB/OF"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="vEsS/g+R"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27500291E
-	for <netdev@vger.kernel.org>; Sun, 23 Mar 2025 23:11:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A8F01C8FBA
+	for <netdev@vger.kernel.org>; Sun, 23 Mar 2025 23:11:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742771467; cv=none; b=m+ESIVTYsCjJ07sh7VMXV7hFCl4iZBBhNoiLg2TNWhGm1tfs44pYHSQs+6R5/ITic37ZiFSiTC+U3FFXNK0B/gMbQN0h/XhWRLCrMzKMytJZPCSN1Y2Hx8hpOOKzqGwrq9M5eLIkIqmk1l0uK2gMXK0iTqEzd6piJ/AqwTNhTMY=
+	t=1742771488; cv=none; b=AJwYsYzUAt7Acl7xE0nzR7GQAg12TUSQwwqT80sIDUCteU+7bj/56Nn+cGkNgCw65ed3nnuA+GVdcvX+4FaXRa+CTEQUPKJ3PGrGp86f+57keytTEnTHS1qAuVtT/xrv2PCU2A6GOfmDlmgf78Y44w50mlAF00G24+cGewyoRBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742771467; c=relaxed/simple;
-	bh=YO0y6qkTAi1GNwLTfKFcl8ReSX/2erhY2bXykImWRA0=;
+	s=arc-20240116; t=1742771488; c=relaxed/simple;
+	bh=FfqzMYtMNCzz8ygUuaYG8/qtd9siHrxp8qn4R8thXLU=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QsC+qYFTM9sumhOOb+tZkjeqFyLjZKNsKYVwf3WpuR7rSBMw9Ua2QdEjVcTdqTK2iY3LpIU29+k/CWXms4SfbhCgzg0AR6eSbdb+VVktsVAh3fSHkqNBRyypJdAcImE4gZccLvdkZCAIm2h6i9EvhEiX6+bT/uWxC+jus5+l7A4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=CclVB/OF; arc=none smtp.client-ip=207.171.184.29
+	 MIME-Version:Content-Type; b=KrWZIFVWgAFi/PrUtuKuwpgCha5P4L+K31DaorjGBHOb051RkrPospcOQjyDv33FZ3wHvRisAOLyT0cknP4mqwgfhYlHiuobmskMORqoAOLp09oKtDwgxfwyGVa96g7XstcTI+7POCp8a8ab/WGZc0QYwfdLLWpU42pafs/ZoYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=vEsS/g+R; arc=none smtp.client-ip=52.119.213.156
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1742771465; x=1774307465;
+  t=1742771487; x=1774307487;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=hsIhYnowrU82A2CA7uOolNoHygEqtcXHbcb39q+Ad1w=;
-  b=CclVB/OFSjaRrJgWf41KhJyEeVELgCcHxzRyXaDw+bkgbGwhKRSrhnQ4
-   Rsphcin/c7W3dQw1cL8mZpfP/n5V+Yghff2NiJbUVsAhU5poRtiRA4+Zb
-   DqmBlW0lD+Sqrz/qPwrT1v+kAoCGT3MpmcWkODOpIU6b4NpYzur4bucCL
-   U=;
+  bh=s+h53nG9sbkecLazHw1rw68uzrL0eRe8rabFNg7Kz2k=;
+  b=vEsS/g+RdA+oiyODTP0ikNzM5Ru0+32KPvslB8swuWg3SiAUpckVYt/X
+   5gCvQ8ZgUc3zTCctWWdJLZ+DWUodndDjfTLnUmoO1bpRWflFICaydAztw
+   GhwEpIJTDjiMZp7pZxSkrj4klRfE3g13V6PJKFJTeZIwZnlYK7UnMdmOD
+   0=;
 X-IronPort-AV: E=Sophos;i="6.14,271,1736812800"; 
-   d="scan'208";a="505236508"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2025 23:10:59 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:61874]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.43.118:2525] with esmtp (Farcaster)
- id 79ade085-9d1d-42f8-b89e-74ca1dc40abe; Sun, 23 Mar 2025 23:10:57 +0000 (UTC)
-X-Farcaster-Flow-ID: 79ade085-9d1d-42f8-b89e-74ca1dc40abe
+   d="scan'208";a="729241809"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2025 23:11:23 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:24035]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.7.105:2525] with esmtp (Farcaster)
+ id 2911427b-725f-4766-86a2-760740704897; Sun, 23 Mar 2025 23:11:22 +0000 (UTC)
+X-Farcaster-Flow-ID: 2911427b-725f-4766-86a2-760740704897
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Sun, 23 Mar 2025 23:10:56 +0000
+ Sun, 23 Mar 2025 23:11:22 +0000
 Received: from 6c7e67bfbae3.amazon.com (10.106.100.57) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Sun, 23 Mar 2025 23:10:53 +0000
+ Sun, 23 Mar 2025 23:11:18 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller"
 	<davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net 1/3] udp: Fix multiple wraparounds of sk->sk_rmem_alloc.
-Date: Sun, 23 Mar 2025 16:09:50 -0700
-Message-ID: <20250323231016.74813-2-kuniyu@amazon.com>
+	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>, "Matt
+ Dowling" <madowlin@amazon.com>
+Subject: [PATCH v1 net 2/3] udp: Fix memory accounting leak.
+Date: Sun, 23 Mar 2025 16:09:51 -0700
+Message-ID: <20250323231016.74813-3-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250323231016.74813-1-kuniyu@amazon.com>
 References: <20250323231016.74813-1-kuniyu@amazon.com>
@@ -78,88 +79,164 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWB002.ant.amazon.com (10.13.139.181) To
+X-ClientProxiedBy: EX19D042UWA003.ant.amazon.com (10.13.139.44) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-__udp_enqueue_schedule_skb() has the following condition:
+Matt Dowling reported a weird UDP memory usage issue.
 
-  if (atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf)
-          goto drop;
+Under normal operation, the UDP memory usage reported in /proc/net/sockstat
+remains close to zero.  However, it occasionally spiked to 524,288 pages
+and never dropped.  Moreover, the value doubled when the application was
+terminated.  Finally, it caused intermittent packet drops.
 
-sk->sk_rcvbuf is initialised by net.core.rmem_default and later can
-be configured by SO_RCVBUF, which is limited by net.core.rmem_max,
-or SO_RCVBUFFORCE.
+We can reproduce the issue with the script below [0]:
 
-If we set INT_MAX to sk->sk_rcvbuf, the condition is always false
-as sk->sk_rmem_alloc is also signed int.
+  1. /proc/net/sockstat reports 0 pages
 
-Then, the size of the incoming skb is added to sk->sk_rmem_alloc
-unconditionally.
+    # cat /proc/net/sockstat | grep UDP:
+    UDP: inuse 1 mem 0
 
-This results in integer overflow (possibly multiple times) on
-sk->sk_rmem_alloc and allows a single socket to have skb up to
-net.core.udp_mem[1].
+  2. Run the script till the report reaches 524,288
 
-For example, if we set a large value to udp_mem[1] and INT_MAX to
-sk->sk_rcvbuf and flood packets to the socket, we can see multiple
-overflows:
+    # python3 test.py & sleep 5
+    # cat /proc/net/sockstat | grep UDP:
+    UDP: inuse 3 mem 524288  <-- (INT_MAX + 1) >> PAGE_SHIFT
 
-  # cat /proc/net/sockstat | grep UDP:
-  UDP: inuse 3 mem 7956736  <-- (7956736 << 12) bytes > INT_MAX * 15
-                                             ^- PAGE_SHIFT
-  # ss -uam
-  State  Recv-Q      ...
-  UNCONN -1757018048 ...    <-- flipping the sign repeatedly
-         skmem:(r2537949248,rb2147483646,t0,tb212992,f1984,w0,o0,bl0,d0)
+  3. Kill the socket and confirm the number never drops
 
-Previously, we had a boundary check for INT_MAX, which was removed by
-commit 6a1f12dd85a8 ("udp: relax atomic operation on sk->sk_rmem_alloc").
+    # pkill python3 && sleep 5
+    # cat /proc/net/sockstat | grep UDP:
+    UDP: inuse 1 mem 524288
 
-A complete fix would be to revert it and cap the right operand by
-INT_MAX:
+  4. (necessary since v6.0) Trigger proto_memory_pcpu_drain()
 
-  rmem = atomic_add_return(size, &sk->sk_rmem_alloc);
-  if (rmem > min(size + (unsigned int)sk->sk_rcvbuf, INT_MAX))
-          goto uncharge_drop;
+    # python3 test.py & sleep 1 && pkill python3
 
-but we do not want to add the expensive atomic_add_return() back just
-for the corner case.
+  5. The number doubles
 
-So, let's perform the first check as unsigned int to detect the
-integer overflow.
+    # cat /proc/net/sockstat | grep UDP:
+    UDP: inuse 1 mem 1048577
 
-Note that we still allow a single wraparound, which can be observed
-from userspace, but it's acceptable considering it's unlikely that
-no recv() is called for a long period, and the negative value will
-soon flip back to positive after a few recv() calls.
+The application set INT_MAX to SO_RCVBUF, which triggered an integer
+overflow in udp_rmem_release().
 
-  # cat /proc/net/sockstat | grep UDP:
-  UDP: inuse 3 mem 524288  <-- (INT_MAX + 1) >> 12
+When a socket is close()d, udp_destruct_common() purges its receive
+queue and sums up skb->truesize in the queue.  This total is calculated
+and stored in a local unsigned integer variable.
 
-  # ss -uam
-  State  Recv-Q      ...
-  UNCONN -2147482816 ...   <-- INT_MAX + 831 bytes
-         skmem:(r2147484480,rb2147483646,t0,tb212992,f3264,w0,o0,bl0,d14468947)
+The total size is then passed to udp_rmem_release() to adjust memory
+accounting.  However, because the function takes a signed integer
+argument, the total size can wrap around, causing an overflow.
 
-Fixes: 6a1f12dd85a8 ("udp: relax atomic operation on sk->sk_rmem_alloc")
+Then, the released amount is calculated as follows:
+
+  1) Add size to sk->sk_forward_alloc.
+  2) Round down sk->sk_forward_alloc to the nearest lower multiple of
+      PAGE_SIZE and assign it to amount.
+  3) Subtract amount from sk->sk_forward_alloc.
+  4) Pass amount >> PAGE_SHIFT to __sk_mem_reduce_allocated().
+
+When the issue occurred, the total in udp_destruct_common() was 2147484480
+(INT_MAX + 833), which was cast to -2147482816 in udp_rmem_release().
+
+At 1) sk->sk_forward_alloc is changed from 3264 to -2147479552, and
+2) sets -2147479552 to amount.  3) reverts the wraparound, so we don't
+see a warning in inet_sock_destruct().  However, udp_memory_allocated
+ends up doubling at 4).
+
+Since commit 3cd3399dd7a8 ("net: implement per-cpu reserves for
+memory_allocated"), memory usage no longer doubles immediately after
+a socket is close()d because __sk_mem_reduce_allocated() caches the
+amount in udp_memory_per_cpu_fw_alloc.  However, the next time a UDP
+socket receives a packet, the subtraction takes effect, causing UDP
+memory usage to double.
+
+This issue makes further memory allocation fail once the socket's
+sk->sk_rmem_alloc exceeds net.ipv4.udp_rmem_min, resulting in packet
+drops.
+
+To prevent this issue, let's use unsigned int for the calculation and
+call sk_forward_alloc_add() only once for the small delta.
+
+Note that first_packet_length() also potentially has the same problem.
+
+[0]:
+from socket import *
+
+SO_RCVBUFFORCE = 33
+INT_MAX = (2 ** 31) - 1
+
+s = socket(AF_INET, SOCK_DGRAM)
+s.bind(('', 0))
+s.setsockopt(SOL_SOCKET, SO_RCVBUFFORCE, INT_MAX)
+
+c = socket(AF_INET, SOCK_DGRAM)
+c.connect(s.getsockname())
+
+data = b'a' * 100
+
+while True:
+    c.send(data)
+
+Fixes: f970bd9e3a06 ("udp: implement memory accounting helpers")
+Reported-by: Matt Dowling <madowlin@amazon.com>
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- net/ipv4/udp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/ipv4/udp.c | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
 diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index a9bb9ce5438e..a1e60aab29b5 100644
+index a1e60aab29b5..ca6a5eb0ddac 100644
 --- a/net/ipv4/udp.c
 +++ b/net/ipv4/udp.c
-@@ -1735,7 +1735,7 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
- 	 */
- 	rmem = atomic_read(&sk->sk_rmem_alloc);
- 	rcvbuf = READ_ONCE(sk->sk_rcvbuf);
--	if (rmem > rcvbuf)
-+	if ((unsigned int)rmem > rcvbuf)
- 		goto drop;
+@@ -1626,12 +1626,12 @@ static bool udp_skb_has_head_state(struct sk_buff *skb)
+ }
  
- 	/* Under mem pressure, it might be helpful to help udp_recvmsg()
+ /* fully reclaim rmem/fwd memory allocated for skb */
+-static void udp_rmem_release(struct sock *sk, int size, int partial,
+-			     bool rx_queue_lock_held)
++static void udp_rmem_release(struct sock *sk, unsigned int size,
++			     int partial, bool rx_queue_lock_held)
+ {
+ 	struct udp_sock *up = udp_sk(sk);
+ 	struct sk_buff_head *sk_queue;
+-	int amt;
++	unsigned int amt;
+ 
+ 	if (likely(partial)) {
+ 		up->forward_deficit += size;
+@@ -1651,10 +1651,8 @@ static void udp_rmem_release(struct sock *sk, int size, int partial,
+ 	if (!rx_queue_lock_held)
+ 		spin_lock(&sk_queue->lock);
+ 
+-
+-	sk_forward_alloc_add(sk, size);
+-	amt = (sk->sk_forward_alloc - partial) & ~(PAGE_SIZE - 1);
+-	sk_forward_alloc_add(sk, -amt);
++	amt = (size + sk->sk_forward_alloc - partial) & ~(PAGE_SIZE - 1);
++	sk_forward_alloc_add(sk, size - amt);
+ 
+ 	if (amt)
+ 		__sk_mem_reduce_allocated(sk, amt >> PAGE_SHIFT);
+@@ -1836,7 +1834,7 @@ EXPORT_SYMBOL_GPL(skb_consume_udp);
+ 
+ static struct sk_buff *__first_packet_length(struct sock *sk,
+ 					     struct sk_buff_head *rcvq,
+-					     int *total)
++					     unsigned int *total)
+ {
+ 	struct sk_buff *skb;
+ 
+@@ -1869,8 +1867,8 @@ static int first_packet_length(struct sock *sk)
+ {
+ 	struct sk_buff_head *rcvq = &udp_sk(sk)->reader_queue;
+ 	struct sk_buff_head *sk_queue = &sk->sk_receive_queue;
++	unsigned int total = 0;
+ 	struct sk_buff *skb;
+-	int total = 0;
+ 	int res;
+ 
+ 	spin_lock_bh(&rcvq->lock);
 -- 
 2.48.1
 
