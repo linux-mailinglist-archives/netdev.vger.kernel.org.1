@@ -1,376 +1,305 @@
-Return-Path: <netdev+bounces-176978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F836A6D16F
-	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 23:29:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3490AA6D238
+	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 23:48:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 403093B29EB
-	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 22:29:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9295E7A5094
+	for <lists+netdev@lfdr.de>; Sun, 23 Mar 2025 22:47:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA80A1519B8;
-	Sun, 23 Mar 2025 22:29:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38E781DD877;
+	Sun, 23 Mar 2025 22:45:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="gpzvbk1/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8F5913635E
-	for <netdev@vger.kernel.org>; Sun, 23 Mar 2025 22:29:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0CDBA53;
+	Sun, 23 Mar 2025 22:45:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742768967; cv=none; b=W0lOswsWOaaHLXOy2qDNi60LxPyrvyIw9VP6Dxr0jOXVLqLsAhJr0AOLmfRRRFXEZI6sBtqgFBWDSyf7+/pglSID1Frtqh6EAZ8Nw8RAhPWnY96JwTRQSUJLxbA88Qw+BHAhVeqtkEERrVWntDPbwXoUgOd9pa1drfMS9FRfJT8=
+	t=1742769903; cv=none; b=EXQx/mtzicbN0ZghknNutBiLy8FVlBmTE/XEVT5137UaZKQ1fRH3GjNNGzJ7VNlHe1Alnh2cDj6VxeARYkpzZTWq9G5W5340NZrvs3GGb1J8M01KFdprSVuMTPS3lIcErqnyeuNBM0qcmFzG33xFPH0kceBFvHWHVBU067+YINI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742768967; c=relaxed/simple;
-	bh=+jUYh885OfbSaYN0gkGWBrklf3NLx4kXWR01nBncUe4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=jqxUe6A/JiIVT1UI3zxZi5zd/gLbmpZYLHzUfDZRrrmx/87ww2dF0b+n59r4fyJsHAD5exOMCwWho7KhsF/3wERp7Z6aUbJ5pd80FXarT5nD/mxJE4CZBw6eqfZzYLOXim3O3/ZHw14gwSS/FXv4cK6Ih9LDUP8Pak6TDQnXg4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3d43d3338d7so78944055ab.0
-        for <netdev@vger.kernel.org>; Sun, 23 Mar 2025 15:29:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742768965; x=1743373765;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0whirQfEp/HnVFS0TQ/d/sx4gZ3rbACrSb0zJJASSF4=;
-        b=doIT7dLIzH9CzYCz6KbZ2crCTVTKN+lRW+rBC0nmjnMOIDJ4wpvPIakkKEe9/t2ypk
-         C3q/ndeCDWOGCxcHGZm1WijXNgwvAA6GFJ1s1k2U2+HQ1spNK1nX0BlYf2Lts/T9aGUD
-         KgctKruyK2HxyKikgT3AG7Ec3NZM1e54xaZ2LWeE2pvGaQTE9mAhVb3Q+UpLy3Fo0kFo
-         BkH5Ujq+acF94vKMB3xYo3JVUSkX+fWN3ve50OZbQi+3SeiDpZeRDokaFY0Rj3fcEtBd
-         erP5ciojYIpqxwnbhAmoD9HBAezpYJdRjg4oxI46u9Ss39wKj9zHn0PSd3uJzBUO+xti
-         stHg==
-X-Forwarded-Encrypted: i=1; AJvYcCVCqO8Gok3L0Q0K7yklF70SwllGEOM/iup1urrG8lsfMD4sK87KZK0arJciX++LIgPIBMEGIHM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxggvX8jjEdNVefQAsToqujix85UkyMpj+LlljrqutwgcUVMMBL
-	49vITl4lHyK7jzinXea3u8fyDlFT5Ye19BRVPet1xLHDwcJ/hJ2NUryp0jzGnjJVs8nMo0SJQ+0
-	J7Rw2WVTKGiq6pDE/yAgV6WJXyP+X+5AYZABu2nscVMTVHH2zLy+3bKU=
-X-Google-Smtp-Source: AGHT+IHAFJbuIBndlkn8IzYxZyDwiVqSuXQZ53H3v0TdCZixhQBcJm0kyq7mImD8cTWCYLWjIMvpnLMiqlJXbkTcogWT+krpEMmc
+	s=arc-20240116; t=1742769903; c=relaxed/simple;
+	bh=xCqn5FiTDlk8VfRuuwEImn8dGmxcyVuO1Zhr3g0tNGI=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=e8wi+EwgAHPs2NSVtg4tAi5ws9ZdNv8lBxzcWwLmIhZvrgeV7swU95Crq5nj2CZBXbJ2HlM5LHHiOisvl2cHT9OANsW9yjTPML+7qqtTRkJSx+fBx6nDScLx9uWx6NFe1Tfl/sZI3m2OqFNE075ZPuE/lH08SpcCFjShtL3Pwdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=gpzvbk1/; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [127.0.0.1] ([76.133.66.138])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 52NMeKdo3968387
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Sun, 23 Mar 2025 15:40:20 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 52NMeKdo3968387
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025032001; t=1742769629;
+	bh=jX8qvOcg5sHOYMzS8O1ZeFoLDzr4b9fAXnawD1sDsAQ=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=gpzvbk1/xbueYaRDkNUQItniaCPabNWQpBYkbzyWYtmr70CkFDr1QjiA+EEsvKZvw
+	 x+NlI2wYpRq9XIxDM3W6qyI4muMLrm74m6hk9SQZhj6u/678GeAxC2aHNwRAd8Fz02
+	 eaUD2juyAsarROcyXcOXSBJeY7WSazHhunwmvS0uaYtHesKXlr5cVrOSTOXia+d9ur
+	 x0GW78E2/YRSCfLq+CgCW5Ss3gdvaEyZxBcb+3QJlbHUizJ8HRUBm+f0VKsMTTNTOb
+	 biBm8UgyfdkV3Cldwh9ks4o9ztz33Hpie/nEjLEaxfg2nLmHMgLWNzA/75tuDFoxiX
+	 JvvTdqoR1VRZA==
+Date: Sun, 23 Mar 2025 15:40:20 -0700
+From: "H. Peter Anvin" <hpa@zytor.com>
+To: Kuan-Wei Chiu <visitorckw@gmail.com>, Yury Norov <yury.norov@gmail.com>
+CC: David Laight <david.laight.linux@gmail.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        Laurent.pinchart@ideasonboard.com, airlied@gmail.com,
+        akpm@linux-foundation.org, alistair@popple.id.au,
+        andrew+netdev@lunn.ch, andrzej.hajda@intel.com,
+        arend.vanspriel@broadcom.com, awalls@md.metrocast.net, bp@alien8.de,
+        bpf@vger.kernel.org, brcm80211-dev-list.pdl@broadcom.com,
+        brcm80211@lists.linux.dev, dave.hansen@linux.intel.com,
+        davem@davemloft.net, dmitry.torokhov@gmail.com,
+        dri-devel@lists.freedesktop.org, eajames@linux.ibm.com,
+        edumazet@google.com, eleanor15x@gmail.com, gregkh@linuxfoundation.org,
+        hverkuil@xs4all.nl, jernej.skrabec@gmail.com, jirislaby@kernel.org,
+        jk@ozlabs.org, joel@jms.id.au, johannes@sipsolutions.net,
+        jonas@kwiboo.se, jserv@ccns.ncku.edu.tw, kuba@kernel.org,
+        linux-fsi@lists.ozlabs.org, linux-input@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-serial@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linux@rasmusvillemoes.dk,
+        louis.peens@corigine.com, maarten.lankhorst@linux.intel.com,
+        mchehab@kernel.org, mingo@redhat.com, miquel.raynal@bootlin.com,
+        mripard@kernel.org, neil.armstrong@linaro.org, netdev@vger.kernel.org,
+        oss-drivers@corigine.com, pabeni@redhat.com,
+        parthiban.veerasooran@microchip.com, rfoss@kernel.org, richard@nod.at,
+        simona@ffwll.ch, tglx@linutronix.de, tzimmermann@suse.de,
+        vigneshr@ti.com, x86@kernel.org
+Subject: Re: [PATCH v3 00/16] Introduce and use generic parity16/32/64 helper
+User-Agent: K-9 Mail for Android
+In-Reply-To: <Z+AlyB461xwMxMtG@visitorckw-System-Product-Name>
+References: <efc2ee9d-5382-457f-b471-f3c44b81a190@citrix.com> <5A790652-1B22-4D13-AAC5-5D9931E90903@zytor.com> <20250307195310.58abff8c@pumpkin> <EB85C3C1-8A0D-4CB9-B501-BFEABDF3E977@zytor.com> <Z824SgB9Dt5zdWYc@visitorckw-System-Product-Name> <Z9CyuowYsZyez36c@thinkpad> <80771542-476C-493E-858A-D2AF6A355CC1@zytor.com> <Z9GtcNJie8TRKywZ@thinkpad> <Z9G2Tyypb3iLoBjn@visitorckw-System-Product-Name> <Z9KMKwnZXA2mkD2s@visitorckw-System-Product-Name> <Z+AlyB461xwMxMtG@visitorckw-System-Product-Name>
+Message-ID: <05F7AC70-E8E7-4D14-A4EB-880D92A96534@zytor.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:188d:b0:3d3:dfc2:912f with SMTP id
- e9e14a558f8ab-3d59613ad08mr121544195ab.7.1742768964778; Sun, 23 Mar 2025
- 15:29:24 -0700 (PDT)
-Date: Sun, 23 Mar 2025 15:29:24 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67e08b44.050a0220.21942d.0008.GAE@google.com>
-Subject: [syzbot] [net?] BUG: stack guard page was hit in worker_thread
-From: syzbot <syzbot+b6d2e10bf4503ebcd631@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On March 23, 2025 8:16:24 AM PDT, Kuan-Wei Chiu <visitorckw@gmail=2Ecom> wr=
+ote:
+>On Thu, Mar 13, 2025 at 03:41:49PM +0800, Kuan-Wei Chiu wrote:
+>> On Thu, Mar 13, 2025 at 12:29:13AM +0800, Kuan-Wei Chiu wrote:
+>> > On Wed, Mar 12, 2025 at 11:51:12AM -0400, Yury Norov wrote:
+>> > > On Tue, Mar 11, 2025 at 03:24:14PM -0700, H=2E Peter Anvin wrote:
+>> > > > On March 11, 2025 3:01:30 PM PDT, Yury Norov <yury=2Enorov@gmail=
+=2Ecom> wrote:
+>> > > > >On Sun, Mar 09, 2025 at 11:48:26PM +0800, Kuan-Wei Chiu wrote:
+>> > > > >> On Fri, Mar 07, 2025 at 12:07:02PM -0800, H=2E Peter Anvin wro=
+te:
+>> > > > >> > On March 7, 2025 11:53:10 AM PST, David Laight <david=2Elaig=
+ht=2Elinux@gmail=2Ecom> wrote:
+>> > > > >> > >On Fri, 07 Mar 2025 11:30:35 -0800
+>> > > > >> > >"H=2E Peter Anvin" <hpa@zytor=2Ecom> wrote:
+>> > > > >> > >
+>> > > > >> > >> On March 7, 2025 10:49:56 AM PST, Andrew Cooper <andrew=
+=2Ecooper3@citrix=2Ecom> wrote:
+>> > > > >> > >> >> (int)true most definitely is guaranteed to be 1=2E =20
+>> > > > >> > >> >
+>> > > > >> > >> >That's not technically correct any more=2E
+>> > > > >> > >> >
+>> > > > >> > >> >GCC has introduced hardened bools that intentionally hav=
+e bit patterns
+>> > > > >> > >> >other than 0 and 1=2E
+>> > > > >> > >> >
+>> > > > >> > >> >https://gcc=2Egnu=2Eorg/gcc-14/changes=2Ehtml
+>> > > > >> > >> >
+>> > > > >> > >> >~Andrew =20
+>> > > > >> > >>=20
+>> > > > >> > >> Bit patterns in memory maybe (not that I can see the Linu=
+x kernel using them) but
+>> > > > >> > >> for compiler-generated conversations that's still a given=
+, or the manager isn't C
+>> > > > >> > >> or anything even remotely like it=2E
+>> > > > >> > >>=20
+>> > > > >> > >
+>> > > > >> > >The whole idea of 'bool' is pretty much broken by design=2E
+>> > > > >> > >The underlying problem is that values other than 'true' and=
+ 'false' can
+>> > > > >> > >always get into 'bool' variables=2E
+>> > > > >> > >
+>> > > > >> > >Once that has happened it is all fubar=2E
+>> > > > >> > >
+>> > > > >> > >Trying to sanitise a value with (say):
+>> > > > >> > >int f(bool v)
+>> > > > >> > >{
+>> > > > >> > >	return (int)v & 1;
+>> > > > >> > >}   =20
+>> > > > >> > >just doesn't work (see https://www=2Egodbolt=2Eorg/z/MEndP3=
+q9j)
+>> > > > >> > >
+>> > > > >> > >I really don't see how using (say) 0xaa and 0x55 helps=2E
+>> > > > >> > >What happens if the value is wrong? a trap or exception?, g=
+ood luck recovering
+>> > > > >> > >from that=2E
+>> > > > >> > >
+>> > > > >> > >	David
+>> > > > >> >=20
+>> > > > >> > Did you just discover GIGO?
+>> > > > >>=20
+>> > > > >> Thanks for all the suggestions=2E
+>> > > > >>=20
+>> > > > >> I don't have a strong opinion on the naming or return type=2E =
+I'm still a
+>> > > > >> bit confused about whether I can assume that casting bool to i=
+nt always
+>> > > > >> results in 0 or 1=2E
+>> > > > >>=20
+>> > > > >> If that's the case, since most people prefer bool over int as =
+the
+>> > > > >> return type and some are against introducing u1, my current pl=
+an is to
+>> > > > >> use the following in the next version:
+>> > > > >>=20
+>> > > > >> bool parity_odd(u64 val);
+>> > > > >>=20
+>> > > > >> This keeps the bool return type, renames the function for bett=
+er
+>> > > > >> clarity, and avoids extra maintenance burden by having just on=
+e
+>> > > > >> function=2E
+>> > > > >>=20
+>> > > > >> If I can't assume that casting bool to int always results in 0=
+ or 1,
+>> > > > >> would it be acceptable to keep the return type as int?
+>> > > > >>=20
+>> > > > >> Would this work for everyone?
+>> > > > >
+>> > > > >Alright, it's clearly a split opinion=2E So what I would do myse=
+lf in
+>> > > > >such case is to look at existing code and see what people who re=
+ally
+>> > > > >need parity invent in their drivers:
+>> > > > >
+>> > > > >                                     bool      parity_odd
+>> > > > >static inline int parity8(u8 val)       -               -
+>> > > > >static u8 calc_parity(u8 val)           -               -
+>> > > > >static int odd_parity(u8 c)             -               +
+>> > > > >static int saa711x_odd_parity           -               +
+>> > > > >static int max3100_do_parity            -               -
+>> > > > >static inline int parity(unsigned x)    -               -
+>> > > > >static int bit_parity(u32 pkt)          -               -
+>> > > > >static int oa_tc6_get_parity(u32 p)     -               -
+>> > > > >static u32 parity32(__le32 data)        -               -
+>> > > > >static u32 parity(u32 sample)           -               -
+>> > > > >static int get_parity(int number,       -               -
+>> > > > >                      int size)
+>> > > > >static bool i2cr_check_parity32(u32 v,  +               -
+>> > > > >                        bool parity)
+>> > > > >static bool i2cr_check_parity64(u64 v)  +               -
+>> > > > >static int sw_parity(__u64 t)           -               -
+>> > > > >static bool parity(u64 value)           +               -
+>> > > > >
+>> > > > >Now you can refer to that table say that int parity(uXX) is what
+>> > > > >people want to see in their drivers=2E
+>> > > > >
+>> > > > >Whichever interface you choose, please discuss it's pros and con=
+s=2E
+>> > > > >What bloat-o-meter says for each option? What's maintenance burd=
+en?
+>> > > > >Perf test? Look at generated code?
+>> > > > >
+>> > > > >I personally for a macro returning boolean, something like I
+>> > > > >proposed at the very beginning=2E
+>> > > > >
+>> > > > >Thanks,
+>> > > > >Yury
+>> > > >=20
+>> > > > Also, please at least provide a way for an arch to opt in to usin=
+g the builtins, which seem to produce as good results or better at least on=
+ some architectures like x86 and probably with CPU options that imply fast =
+popcnt is available=2E
+>> > >=20
+>> > > Yeah=2E And because linux/bitops=2Eh already includes asm/bitops=2E=
+h
+>> > > the simplest way would be wrapping generic implementation with
+>> > > the #ifndef parity, similarly to how we handle find_next_bit case=
+=2E
+>> > >=20
+>> > > So:
+>> > > 1=2E Kuan-Wei, please don't invent something like ARCH_HAS_PARITY;
+>> > > 2=2E This may, and probably should, be a separate follow-up series,
+>> > >    likely created by corresponding arch experts=2E
+>> > >=20
+>> > I saw discussions in the previous email thread about both
+>> > __builtin_parity and x86-specific implementations=2E However, from th=
+e
+>> > discussion, I learned that before considering any optimization, we
+>> > should first ask: which driver or subsystem actually cares about pari=
+ty
+>> > efficiency? If someone does, I can help with a micro-benchmark to
+>> > provide performance numbers, but I don't have enough domain knowledge
+>> > to identify hot paths where parity efficiency matters=2E
+>> >=20
+>> IMHO,
+>>=20
+>> If parity is never used in any hot path and we don't care about parity:
+>>=20
+>> Then benchmarking its performance seems meaningless=2E In this case, a
+>> function with a u64 argument would suffice, and we might not even need
+>> a macro to optimize for different types=E2=80=94especially since the ma=
+cro
+>> requires special hacks to avoid compiler warnings=2E Also, I don't thin=
+k
+>> code size matters here=2E If it does, we should first consider making
+>> parity a non-inline function in a =2Ec file rather than an inline
+>> function/macro in a header=2E
+>>=20
+>> If parity is used in a hot path:
+>>=20
+>> We need different handling for different type sizes=2E As previously
+>> discussed, x86 assembly might use different instructions for u8 and
+>> u16=2E This may sound stubborn, but I want to ask again: should we
+>> consider using parity8/16/32/64 interfaces? Like in the i3c driver
+>> example, if we only have a single parity macro that selects an
+>> implementation based on type size, users must explicitly cast types=2E
+>> If future users also need parity in a hot path, they might not be aware
+>> of this requirement and end up generating suboptimal code=2E Since we
+>> care about efficiency and generated code, why not follow hweight() and
+>> provide separate implementations for different sizes?
+>>=20
+>It seems no one will reply to my two emails=2E So, I have summarized
+>different interface approaches=2E If there is a next version, I will send
+>it after the merge window closes=2E
+>
+>Interface 1: Single Function
+>Description: bool parity_odd(u64)
+>Pros: Minimal maintenance cost
+>Cons: Difficult to integrate with architecture-specific implementations
+>      due to the inability to optimize for different argument sizes
+>Opinions: Jiri supports this approach
+>
+>Interface 2: Single Macro
+>Description: parity_odd() macro
+>Pros: Allows type-specific implementation
+>Cons: Requires hacks to avoid warnings; users may need explicit
+>      casting; potential sub-optimal code on 32-bit x86
+>Opinions: Yury supports this approach
+>
+>Interface 3: Multiple Functions
+>Description: bool parity_odd8/16/32/64()
+>Pros: No need for explicit casting; easy to integrate
+>      architecture-specific optimizations; except for parity8(), all
+>      functions are one-liners with no significant code duplication
+>Cons: More functions may increase maintenance burden
+>Opinions: Only I support this approach
+>
+>Regards,
+>Kuan-Wei
 
-syzbot found the following issue on:
-
-HEAD commit:    f653b608f783 MAINTAINERS: update bridge entry
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=166615e4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=27515cfdbafbb90d
-dashboard link: https://syzkaller.appspot.com/bug?extid=b6d2e10bf4503ebcd631
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/5dcec1e5d2c5/disk-f653b608.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/18edc4cdc334/vmlinux-f653b608.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/55ff98409132/bzImage-f653b608.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b6d2e10bf4503ebcd631@syzkaller.appspotmail.com
-
-BUG: TASK stack guard page was hit at ffffc9000c1bff18 (stack is ffffc9000c1c0000..ffffc9000c1c8000)
-Oops: stack guard page: 0000 [#1] PREEMPT SMP KASAN PTI
-CPU: 0 UID: 0 PID: 7350 Comm: kworker/u8:22 Not tainted 6.14.0-rc7-syzkaller-00138-gf653b608f783 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-Workqueue: bond2 bond_resend_igmp_join_requests_delayed
-RIP: 0010:lock_acquire+0x1c/0x550 kernel/locking/lockdep.c:5819
-Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 55 48 89 e5 41 57 41 56 41 55 41 54 53 48 83 e4 e0 48 81 ec 20 01 00 00 <4c> 89 4c 24 28 4c 89 44 24 38 48 89 4c 24 30 89 54 24 1c 41 89 f6
-RSP: 0018:ffffc9000c1bff20 EFLAGS: 00010082
-RAX: 0000000000001c08 RBX: 1ffff92001838014 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff88813fffc298
-RBP: ffffc9000c1c0068 R08: 0000000000000001 R09: 0000000000000000
-R10: dffffc0000000000 R11: fffffbfff2079f6f R12: 0000000000000246
-R13: 1ffff92001838010 R14: ffff88813fffc280 R15: dffffc0000000000
-FS:  0000000000000000(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffc9000c1bff18 CR3: 000000002a12a000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <#DF>
- </#DF>
- <TASK>
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
- _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
- rmqueue_buddy mm/page_alloc.c:2910 [inline]
- rmqueue mm/page_alloc.c:3083 [inline]
- get_page_from_freelist+0xb3d/0x37a0 mm/page_alloc.c:3474
- __alloc_frozen_pages_noprof+0x292/0x710 mm/page_alloc.c:4740
- __alloc_pages_noprof+0xa/0x30 mm/page_alloc.c:4774
- __alloc_pages_node_noprof include/linux/gfp.h:265 [inline]
- alloc_pages_node_noprof include/linux/gfp.h:292 [inline]
- ___kmalloc_large_node+0x8b/0x1d0 mm/slub.c:4239
- __kmalloc_large_node_noprof+0x1a/0x80 mm/slub.c:4266
- __do_kmalloc_node mm/slub.c:4282 [inline]
- __kmalloc_node_track_caller_noprof+0x335/0x4c0 mm/slub.c:4313
- kmalloc_reserve+0x111/0x2a0 net/core/skbuff.c:537
- pskb_expand_head+0x1ee/0x1470 net/core/skbuff.c:2185
- __skb_cow include/linux/skbuff.h:3769 [inline]
- skb_cow_head include/linux/skbuff.h:3803 [inline]
- gre_tap_xmit+0x4aa/0x800 net/ipv4/ip_gre.c:769
- __netdev_start_xmit include/linux/netdevice.h:5151 [inline]
- netdev_start_xmit include/linux/netdevice.h:5160 [inline]
- xmit_one net/core/dev.c:3800 [inline]
- dev_hard_start_xmit+0x27a/0x7d0 net/core/dev.c:3816
- sch_direct_xmit+0x29c/0x5d0 net/sched/sch_generic.c:343
- __dev_xmit_skb net/core/dev.c:4042 [inline]
- __dev_queue_xmit+0x1a8f/0x3f50 net/core/dev.c:4618
- dev_queue_xmit include/linux/netdevice.h:3313 [inline]
- bond_dev_queue_xmit+0x147/0x250 drivers/net/bonding/bond_main.c:309
- __bond_start_xmit drivers/net/bonding/bond_main.c:5583 [inline]
- bond_start_xmit+0xcb0/0x1c40 drivers/net/bonding/bond_main.c:5605
- __netdev_start_xmit include/linux/netdevice.h:5151 [inline]
- netdev_start_xmit include/linux/netdevice.h:5160 [inline]
- xmit_one net/core/dev.c:3800 [inline]
- dev_hard_start_xmit+0x27a/0x7d0 net/core/dev.c:3816
- __dev_queue_xmit+0x1b73/0x3f50 net/core/dev.c:4652
- dev_queue_xmit include/linux/netdevice.h:3313 [inline]
- neigh_hh_output include/net/neighbour.h:523 [inline]
- neigh_output include/net/neighbour.h:537 [inline]
- ip_finish_output2+0xcd3/0x12e0 net/ipv4/ip_output.c:236
- iptunnel_xmit+0x55d/0x9b0 net/ipv4/ip_tunnel_core.c:82
- ip_tunnel_xmit+0x1dbf/0x2560 net/ipv4/ip_tunnel.c:858
- __gre_xmit net/ipv4/ip_gre.c:484 [inline]
- gre_tap_xmit+0x641/0x800 net/ipv4/ip_gre.c:772
- __netdev_start_xmit include/linux/netdevice.h:5151 [inline]
- netdev_start_xmit include/linux/netdevice.h:5160 [inline]
- xmit_one net/core/dev.c:3800 [inline]
- dev_hard_start_xmit+0x27a/0x7d0 net/core/dev.c:3816
- sch_direct_xmit+0x29c/0x5d0 net/sched/sch_generic.c:343
- __dev_xmit_skb net/core/dev.c:4042 [inline]
- __dev_queue_xmit+0x1a8f/0x3f50 net/core/dev.c:4618
- dev_queue_xmit include/linux/netdevice.h:3313 [inline]
- bond_dev_queue_xmit+0x147/0x250 drivers/net/bonding/bond_main.c:309
- __bond_start_xmit drivers/net/bonding/bond_main.c:5583 [inline]
- bond_start_xmit+0xcb0/0x1c40 drivers/net/bonding/bond_main.c:5605
- __netdev_start_xmit include/linux/netdevice.h:5151 [inline]
- netdev_start_xmit include/linux/netdevice.h:5160 [inline]
- xmit_one net/core/dev.c:3800 [inline]
- dev_hard_start_xmit+0x27a/0x7d0 net/core/dev.c:3816
- __dev_queue_xmit+0x1b73/0x3f50 net/core/dev.c:4652
- dev_queue_xmit include/linux/netdevice.h:3313 [inline]
- neigh_hh_output include/net/neighbour.h:523 [inline]
- neigh_output include/net/neighbour.h:537 [inline]
- ip_finish_output2+0xcd3/0x12e0 net/ipv4/ip_output.c:236
- iptunnel_xmit+0x55d/0x9b0 net/ipv4/ip_tunnel_core.c:82
- ip_tunnel_xmit+0x1dbf/0x2560 net/ipv4/ip_tunnel.c:858
- __gre_xmit net/ipv4/ip_gre.c:484 [inline]
- gre_tap_xmit+0x641/0x800 net/ipv4/ip_gre.c:772
- __netdev_start_xmit include/linux/netdevice.h:5151 [inline]
- netdev_start_xmit include/linux/netdevice.h:5160 [inline]
- xmit_one net/core/dev.c:3800 [inline]
- dev_hard_start_xmit+0x27a/0x7d0 net/core/dev.c:3816
- sch_direct_xmit+0x29c/0x5d0 net/sched/sch_generic.c:343
- __dev_xmit_skb net/core/dev.c:4042 [inline]
- __dev_queue_xmit+0x1a8f/0x3f50 net/core/dev.c:4618
- dev_queue_xmit include/linux/netdevice.h:3313 [inline]
- bond_dev_queue_xmit+0x147/0x250 drivers/net/bonding/bond_main.c:309
- __bond_start_xmit drivers/net/bonding/bond_main.c:5583 [inline]
- bond_start_xmit+0xcb0/0x1c40 drivers/net/bonding/bond_main.c:5605
- __netdev_start_xmit include/linux/netdevice.h:5151 [inline]
- netdev_start_xmit include/linux/netdevice.h:5160 [inline]
- xmit_one net/core/dev.c:3800 [inline]
- dev_hard_start_xmit+0x27a/0x7d0 net/core/dev.c:3816
- __dev_queue_xmit+0x1b73/0x3f50 net/core/dev.c:4652
- dev_queue_xmit include/linux/netdevice.h:3313 [inline]
- neigh_hh_output include/net/neighbour.h:523 [inline]
- neigh_output include/net/neighbour.h:537 [inline]
- ip_finish_output2+0xcd3/0x12e0 net/ipv4/ip_output.c:236
- iptunnel_xmit+0x55d/0x9b0 net/ipv4/ip_tunnel_core.c:82
- ip_tunnel_xmit+0x1dbf/0x2560 net/ipv4/ip_tunnel.c:858
- __gre_xmit net/ipv4/ip_gre.c:484 [inline]
- gre_tap_xmit+0x641/0x800 net/ipv4/ip_gre.c:772
- __netdev_start_xmit include/linux/netdevice.h:5151 [inline]
- netdev_start_xmit include/linux/netdevice.h:5160 [inline]
- xmit_one net/core/dev.c:3800 [inline]
- dev_hard_start_xmit+0x27a/0x7d0 net/core/dev.c:3816
- sch_direct_xmit+0x29c/0x5d0 net/sched/sch_generic.c:343
- __dev_xmit_skb net/core/dev.c:4042 [inline]
- __dev_queue_xmit+0x1a8f/0x3f50 net/core/dev.c:4618
- dev_queue_xmit include/linux/netdevice.h:3313 [inline]
- bond_dev_queue_xmit+0x147/0x250 drivers/net/bonding/bond_main.c:309
- __bond_start_xmit drivers/net/bonding/bond_main.c:5583 [inline]
- bond_start_xmit+0xcb0/0x1c40 drivers/net/bonding/bond_main.c:5605
- __netdev_start_xmit include/linux/netdevice.h:5151 [inline]
- netdev_start_xmit include/linux/netdevice.h:5160 [inline]
- xmit_one net/core/dev.c:3800 [inline]
- dev_hard_start_xmit+0x27a/0x7d0 net/core/dev.c:3816
- __dev_queue_xmit+0x1b73/0x3f50 net/core/dev.c:4652
- dev_queue_xmit include/linux/netdevice.h:3313 [inline]
- neigh_hh_output include/net/neighbour.h:523 [inline]
- neigh_output include/net/neighbour.h:537 [inline]
- ip_finish_output2+0xcd3/0x12e0 net/ipv4/ip_output.c:236
- iptunnel_xmit+0x55d/0x9b0 net/ipv4/ip_tunnel_core.c:82
- ip_tunnel_xmit+0x1dbf/0x2560 net/ipv4/ip_tunnel.c:858
- __gre_xmit net/ipv4/ip_gre.c:484 [inline]
- gre_tap_xmit+0x641/0x800 net/ipv4/ip_gre.c:772
- __netdev_start_xmit include/linux/netdevice.h:5151 [inline]
- netdev_start_xmit include/linux/netdevice.h:5160 [inline]
- xmit_one net/core/dev.c:3800 [inline]
- dev_hard_start_xmit+0x27a/0x7d0 net/core/dev.c:3816
- sch_direct_xmit+0x29c/0x5d0 net/sched/sch_generic.c:343
- __dev_xmit_skb net/core/dev.c:4042 [inline]
- __dev_queue_xmit+0x1a8f/0x3f50 net/core/dev.c:4618
- dev_queue_xmit include/linux/netdevice.h:3313 [inline]
- bond_dev_queue_xmit+0x147/0x250 drivers/net/bonding/bond_main.c:309
- __bond_start_xmit drivers/net/bonding/bond_main.c:5583 [inline]
- bond_start_xmit+0xcb0/0x1c40 drivers/net/bonding/bond_main.c:5605
- __netdev_start_xmit include/linux/netdevice.h:5151 [inline]
- netdev_start_xmit include/linux/netdevice.h:5160 [inline]
- xmit_one net/core/dev.c:3800 [inline]
- dev_hard_start_xmit+0x27a/0x7d0 net/core/dev.c:3816
- __dev_queue_xmit+0x1b73/0x3f50 net/core/dev.c:4652
- dev_queue_xmit include/linux/netdevice.h:3313 [inline]
- neigh_hh_output include/net/neighbour.h:523 [inline]
- neigh_output include/net/neighbour.h:537 [inline]
- ip_finish_output2+0xcd3/0x12e0 net/ipv4/ip_output.c:236
- iptunnel_xmit+0x55d/0x9b0 net/ipv4/ip_tunnel_core.c:82
- ip_tunnel_xmit+0x1dbf/0x2560 net/ipv4/ip_tunnel.c:858
- __gre_xmit net/ipv4/ip_gre.c:484 [inline]
- gre_tap_xmit+0x641/0x800 net/ipv4/ip_gre.c:772
- __netdev_start_xmit include/linux/netdevice.h:5151 [inline]
- netdev_start_xmit include/linux/netdevice.h:5160 [inline]
- xmit_one net/core/dev.c:3800 [inline]
- dev_hard_start_xmit+0x27a/0x7d0 net/core/dev.c:3816
- sch_direct_xmit+0x29c/0x5d0 net/sched/sch_generic.c:343
- __dev_xmit_skb net/core/dev.c:4042 [inline]
- __dev_queue_xmit+0x1a8f/0x3f50 net/core/dev.c:4618
- dev_queue_xmit include/linux/netdevice.h:3313 [inline]
- bond_dev_queue_xmit+0x147/0x250 drivers/net/bonding/bond_main.c:309
- __bond_start_xmit drivers/net/bonding/bond_main.c:5583 [inline]
- bond_start_xmit+0xcb0/0x1c40 drivers/net/bonding/bond_main.c:5605
- __netdev_start_xmit include/linux/netdevice.h:5151 [inline]
- netdev_start_xmit include/linux/netdevice.h:5160 [inline]
- xmit_one net/core/dev.c:3800 [inline]
- dev_hard_start_xmit+0x27a/0x7d0 net/core/dev.c:3816
- __dev_queue_xmit+0x1b73/0x3f50 net/core/dev.c:4652
- dev_queue_xmit include/linux/netdevice.h:3313 [inline]
- neigh_hh_output include/net/neighbour.h:523 [inline]
- neigh_output include/net/neighbour.h:537 [inline]
- ip_finish_output2+0xcd3/0x12e0 net/ipv4/ip_output.c:236
- iptunnel_xmit+0x55d/0x9b0 net/ipv4/ip_tunnel_core.c:82
- ip_tunnel_xmit+0x1dbf/0x2560 net/ipv4/ip_tunnel.c:858
- __gre_xmit net/ipv4/ip_gre.c:484 [inline]
- gre_tap_xmit+0x641/0x800 net/ipv4/ip_gre.c:772
- __netdev_start_xmit include/linux/netdevice.h:5151 [inline]
- netdev_start_xmit include/linux/netdevice.h:5160 [inline]
- xmit_one net/core/dev.c:3800 [inline]
- dev_hard_start_xmit+0x27a/0x7d0 net/core/dev.c:3816
- sch_direct_xmit+0x29c/0x5d0 net/sched/sch_generic.c:343
- __dev_xmit_skb net/core/dev.c:4042 [inline]
- __dev_queue_xmit+0x1a8f/0x3f50 net/core/dev.c:4618
- dev_queue_xmit include/linux/netdevice.h:3313 [inline]
- bond_dev_queue_xmit+0x147/0x250 drivers/net/bonding/bond_main.c:309
- __bond_start_xmit drivers/net/bonding/bond_main.c:5583 [inline]
- bond_start_xmit+0xcb0/0x1c40 drivers/net/bonding/bond_main.c:5605
- __netdev_start_xmit include/linux/netdevice.h:5151 [inline]
- netdev_start_xmit include/linux/netdevice.h:5160 [inline]
- xmit_one net/core/dev.c:3800 [inline]
- dev_hard_start_xmit+0x27a/0x7d0 net/core/dev.c:3816
- __dev_queue_xmit+0x1b73/0x3f50 net/core/dev.c:4652
- neigh_output include/net/neighbour.h:539 [inline]
- ip6_finish_output2+0x12bc/0x17c0 net/ipv6/ip6_output.c:141
- ip6_finish_output+0x41e/0x840 net/ipv6/ip6_output.c:226
- NF_HOOK+0x9e/0x430 include/linux/netfilter.h:314
- mld_sendpack+0x843/0xdb0 net/ipv6/mcast.c:1868
- ipv6_mc_rejoin_groups net/ipv6/mcast.c:2878 [inline]
- ipv6_mc_netdev_event+0x1cf/0x5d0 net/ipv6/mcast.c:2893
- notifier_call_chain+0x1a5/0x3f0 kernel/notifier.c:85
- call_netdevice_notifiers_extack net/core/dev.c:2244 [inline]
- call_netdevice_notifiers+0xb6/0xf0 net/core/dev.c:2258
- bond_resend_igmp_join_requests_delayed+0x63/0x180 drivers/net/bonding/bond_main.c:970
- process_one_work kernel/workqueue.c:3238 [inline]
- process_scheduled_works+0xabe/0x18e0 kernel/workqueue.c:3319
- worker_thread+0x870/0xd30 kernel/workqueue.c:3400
- kthread+0x7a9/0x920 kernel/kthread.c:464
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:lock_acquire+0x1c/0x550 kernel/locking/lockdep.c:5819
-Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 55 48 89 e5 41 57 41 56 41 55 41 54 53 48 83 e4 e0 48 81 ec 20 01 00 00 <4c> 89 4c 24 28 4c 89 44 24 38 48 89 4c 24 30 89 54 24 1c 41 89 f6
-RSP: 0018:ffffc9000c1bff20 EFLAGS: 00010082
-RAX: 0000000000001c08 RBX: 1ffff92001838014 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff88813fffc298
-RBP: ffffc9000c1c0068 R08: 0000000000000001 R09: 0000000000000000
-R10: dffffc0000000000 R11: fffffbfff2079f6f R12: 0000000000000246
-R13: 1ffff92001838010 R14: ffff88813fffc280 R15: dffffc0000000000
-FS:  0000000000000000(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffc9000c1bff18 CR3: 000000002a12a000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	90                   	nop
-   1:	90                   	nop
-   2:	90                   	nop
-   3:	90                   	nop
-   4:	90                   	nop
-   5:	90                   	nop
-   6:	90                   	nop
-   7:	90                   	nop
-   8:	90                   	nop
-   9:	90                   	nop
-   a:	90                   	nop
-   b:	90                   	nop
-   c:	90                   	nop
-   d:	90                   	nop
-   e:	f3 0f 1e fa          	endbr64
-  12:	55                   	push   %rbp
-  13:	48 89 e5             	mov    %rsp,%rbp
-  16:	41 57                	push   %r15
-  18:	41 56                	push   %r14
-  1a:	41 55                	push   %r13
-  1c:	41 54                	push   %r12
-  1e:	53                   	push   %rbx
-  1f:	48 83 e4 e0          	and    $0xffffffffffffffe0,%rsp
-  23:	48 81 ec 20 01 00 00 	sub    $0x120,%rsp
-* 2a:	4c 89 4c 24 28       	mov    %r9,0x28(%rsp) <-- trapping instruction
-  2f:	4c 89 44 24 38       	mov    %r8,0x38(%rsp)
-  34:	48 89 4c 24 30       	mov    %rcx,0x30(%rsp)
-  39:	89 54 24 1c          	mov    %edx,0x1c(%rsp)
-  3d:	41 89 f6             	mov    %esi,%r14d
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+You can add me to the final option=2E I think it makes most sense 
 
