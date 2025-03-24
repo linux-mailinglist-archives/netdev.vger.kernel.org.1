@@ -1,93 +1,92 @@
-Return-Path: <netdev+bounces-177069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72C41A6DA66
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 13:53:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32FDCA6DA8C
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 13:57:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B7593AECE6
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 12:53:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D9787A6313
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 12:56:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2972B25FA0A;
-	Mon, 24 Mar 2025 12:52:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02C1C25F7AF;
+	Mon, 24 Mar 2025 12:56:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XlmsQXd0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hnGdIw95"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F06625FA03
-	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 12:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62FC625E47C;
+	Mon, 24 Mar 2025 12:56:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742820750; cv=none; b=O+IBLI2/z3nKmY0YX3psCWr/+zGMgv9lEZpasweRPbg4FZP7IOGAo1Y2Z9uYUpJU8oJKkIFLE5lVlUa/O4d1Bli+t1mIcVpFd2SgsEBaPF/Lg1HPNofHk2WEh7TEspcjl3yrrTFRWuZm+S+ppr8Mcj5qH2f6foRMRAuXyDMbb6c=
+	t=1742820991; cv=none; b=KFssJdKOhi3HUkwIxNszVRBamSW/vMzRaOqso1WECHW/3XjLLIXx+ZhugHW9G6Ete2Mx4vEIrDO2FVzr2hGkGBcigr5JP9KHBiB1jOeJQhHqcS6MWGZRKIagnFQ+g2jkDTrSZxNMmkFuO4j3jf65qGjEb018PDMhp0nrn17qE8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742820750; c=relaxed/simple;
-	bh=chitrqrnSa6cJWsoZBuUNvscJvUlLOoj3Yo6FWLqkkY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WYmZpY89XOH+l06opskq5LxRJFYy53kpf21myGDNe+wh1KMZ6vDlUFH2oqnYLVUlgyK+EMvkXRdtEhONQNP0QpVkmDoWi8Jujj9SlD18w4169FRAmjHUszdOIeSrgL76jIS6CwwC5Cg/xDzzsuQFfwE/UQknyrDrag1HliF/ZYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=XlmsQXd0; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-43ce4e47a85so4998145e9.0
-        for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 05:52:28 -0700 (PDT)
+	s=arc-20240116; t=1742820991; c=relaxed/simple;
+	bh=ezGvbO1wqUoNHwv+PN6VCungnRScJm/t4mGyq5mDsTE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aMlPdksYyy21972xDZ1u6bF0bZTs+5nKE5GI2azvJtfqyr8u6w2cgyq9ilITIcNYeeekD0pSTgABUV4iitSaOX9IQwY0w3heMwc87qD81EWpyrJ71xMsv3OKDnRXIYtjMH8lJwkI/eGcCb2MemYyJZTFGi5UpVMxgto4Vt5ogJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hnGdIw95; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2240d930f13so7846015ad.3;
+        Mon, 24 Mar 2025 05:56:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1742820746; x=1743425546; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1742820989; x=1743425789; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LzQkT2/vQ7md+WCBkEBxd0za9gJ+1+dJS4YU8fFuils=;
-        b=XlmsQXd0Wz8I4pY28KoUIEZVjuQWPht89M9yhZJWoiSOrQfNeCq6o2Ud458tOG0gFy
-         joJFaZ22O432JwXVbvpUevrP0qAaInsUOgflWn3vFNO69sprFJuyJTBBhM/auan/W7GG
-         MbuT+0aDtE5+RlKEeu2hocC4zw4tLPCr+NmjmU7CaxS5FYjynOrW5vwytgz1aKZqgHhR
-         HmX13ziOEtf7N5pG0pNmrLaCN5SC+arCQhuaaS3rajzmJRN1wkZVzl1WdYRpnZu8jQqb
-         79qTUm8Qc6wAJHqcqwI/5XUylUoS1mOlX+fTnvV20/uigUhLXO+RLGQ9D2hhKH5C+ExF
-         oabg==
+        bh=zxh53Yydk3txbsGDbkvLklPCWbXYfybueW5aMTdDXaw=;
+        b=hnGdIw95IZgqiH/s4AcEJvoPUUlzx7Xmxgq1wetjzxivoqFQSjHCL4AjWqcDbqJob/
+         nILRTbKyYN6Mlc95VBFXdw9mvTGuM0tIzk1EcHhbaRed1z1ERCvoyfQ/iPd+Ubnzj4CN
+         D39oqjyMck9WYbQpnqTp08699xQzcqjFQ0oGOyHPVJqPyRz5X7QVXh1+DNaA0rkLUvjV
+         NkpAZQsPDxABnsMxQguon9C6loIBDyAuQIEvFxiNtu9ciYqQJMKg/7IjJ9D3nMGdIbGa
+         Qr1SiVCXeYHpGsSzxiEWACnU3AcEbotJsVIXWOKZv9dDDPXJTYbcoS9o5YpwImBK0OH4
+         84QQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742820746; x=1743425546;
+        d=1e100.net; s=20230601; t=1742820989; x=1743425789;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=LzQkT2/vQ7md+WCBkEBxd0za9gJ+1+dJS4YU8fFuils=;
-        b=Gb9CJc0qMtzuQQVBRgpCxDcm/bkb7tZ+46+HQ23xLtzwJDvCczOgLuHkGps29lDypl
-         HlLx/HrB4ytfXwh5e5FwXBzEzSXnXsfeNRPFKctZJvukwHbAJvNM0AnH+59Lqo20nEjQ
-         NdCtrJHxPEdCysiSsOY93/QsaPXLg/1Q213Sh2HQ6dh+7s3u6KKKMRDeNpE+KHRoPb8o
-         jTZgPFs5LDNI+TUIxoJdfLDwCpjZpUeIcFxEw9ExywUA6THC+lVSTIqNCAy1srhTj2sw
-         m19rFTXICvVv7cr0msLxrqoGwp0d7Un9SXc3klXzBlKb+hdPaYIlxzBbz/mXmIJYih4N
-         SUuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXwV/vNoyQuN3T2SXFdvjJwy+YNl4U2Mv74/glWq8usonkE9JUQK9E1BRbpcGOOYN1fqsQsD/8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoVze4JYaCWKklvFNn25/EaBKJFgaUSGYrgjAK5FdJEHtpz0Sv
-	SKQEYOLt+8gYDG3NMR/cuyQgg4uk2F01pUtifDII4gi5psJP49DF0n3Jb5a1hXc=
-X-Gm-Gg: ASbGncuaNfzkKwVBcSwOgUzlMAVqdaM0dWj5MYiUQQxZPkAm8RcAD5/6LYed7FnGmwG
-	i76Dr+SO0tzEiPlmwZDgQhl6eIX670GxtKyIueSCicsfNQ96CfWJH9sVqkNMf6aMAbpl/+v5D8L
-	Y8Mez/6vraOp8ybimqCNcNg5rLL6EDdOU/9RQYmHz6ttNm6kYLryOk7vKQBTVD8aAl+UxW98zmV
-	eCHVCd+v+ms/rW0NrOa1PQMZ3qxwYELq/T10+ZTxzOrDIDOi5G/eH6Bww1nNmCzTJpGv4EW5rSH
-	3/1dlPaoWnRPCa+7IxW/9rHTYXf5AP/wxniJrs5P+h1kGDwov9VRNKxdFA==
-X-Google-Smtp-Source: AGHT+IHigrY3PHOFldlCzJ8vlwnInEATFLh/99kGQvln1Q9qBXvO1GQ8JqQwrXTWTD0MPZYBaFhJrw==
-X-Received: by 2002:a05:600c:c08:b0:43b:bbb9:e25f with SMTP id 5b1f17b1804b1-43d50a526bfmr48046505e9.6.1742820746484;
-        Mon, 24 Mar 2025 05:52:26 -0700 (PDT)
-Received: from krzk-bin.. ([178.197.198.86])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d4fd277d5sm120614535e9.19.2025.03.24.05.52.25
+        bh=zxh53Yydk3txbsGDbkvLklPCWbXYfybueW5aMTdDXaw=;
+        b=HXlHAxkIYTeYRVCM0ipa5vQnU0d9knFFj4U0STsDrnwDabrbmghDe5umgFZo3zD70V
+         rm2k1g3gY7juxCtTR2Kq/yYivAYJMAMBEGWHvnC09i8lo8McZhzxBR/6W2aOOxtIIJq5
+         y287HwKerJbyWmffHh9PzdG5YglcnJgaFWPY0Anoiklq5Dwp4z8PnETNcY+YrwiPJ8E4
+         ZFpykqG2Rst1FV/6Pe/nWXZy3zo2N68YhqFSjgaqk/2cDgov2cFCJEE1f5CVHoFJx5VC
+         MqtYD6pAJh8uhodFoPGKXN9PU4mTmK6FDv1ptIoHpbPsJlcmQ7R/eYTVGkIplqNJPztO
+         Bv3w==
+X-Forwarded-Encrypted: i=1; AJvYcCWN/1ntPsARgJ8GVIZf1tp3/ZEmkzGLeW+gprB1ETN6JdLA2scu/sdhx8vZOh3vC6LnvpVj/1KH@vger.kernel.org, AJvYcCXom/unPKpLgZo7Mn2GhX+XIumcXtzF8H2gy6UBKXcq6iNSb5+mtFim5Cwl+Qs2OI8NFNMVihZT+ioRDvE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnLefX4bC0FD4rkoWpf8TNs8SCJ72YNFYL8PXMeiUbvJRM3eOy
+	esCuAOVWVly6v90EMHMy1rn4NIca4db1xlWICKNIAVIPh11Sg75AzDJIuRUo
+X-Gm-Gg: ASbGnctojP7KKjs4aF+R+vkQtKIXvX2PMAJpEIg3+5rsJePcST9bz4LGm1VR2OYAkyp
+	yyEcRtJL4Yf64wGFvBddIXvLEBczOL+6OGtdzkedfBkNEdDYp5a9KrWsBhNnOB/CxloIXbdUn8y
+	G0gJPqF7XG3vFq8VbVjqGL9bMu/4wE8rz/0PKCkzm387X8t5tdr6dnwThPXaEzoovtYbIzWYzZ0
+	F9wMLZJeW8fWy3TbUCHFkM+WF28JPxR1YKpGcMLVx+o0+SPXuvVQ6DRmS04cKq8XSH7NhkDvdVV
+	tYTKrLSgUnQcil5SFb/DNosdsl4MAl2R88HcXKJ/e3I8nACAPJ5PmfwqtyDC/XQZdbJXe1cBWTC
+	0D9juSwNZ
+X-Google-Smtp-Source: AGHT+IELD3OXpCg41ArCduhKMvNWj039uDftBpiIIy4uFbX+0C/gGjBEXV3FiTVRks/a2rOSsAVzJg==
+X-Received: by 2002:a17:903:2306:b0:223:49ce:67a2 with SMTP id d9443c01a7336-22780def8e7mr75066035ad.9.1742820989397;
+        Mon, 24 Mar 2025 05:56:29 -0700 (PDT)
+Received: from crabo-Latitude-7350.. (1-34-73-169.hinet-ip.hinet.net. [1.34.73.169])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-227811bafabsm69308745ad.139.2025.03.24.05.56.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Mar 2025 05:52:25 -0700 (PDT)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
+        Mon, 24 Mar 2025 05:56:29 -0700 (PDT)
+From: Crag Wang <crag0715@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>,
+	nic_swsd@realtek.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Alex Elder <elder@kernel.org>,
-	linux-arm-msm@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: crag.wang@dell.com,
+	dell.client.kernel@dell.com,
+	Crag Wang <crag0715@gmail.com>,
 	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH] dt-bindings: net: qcom,ipa: Correct indentation and style in DTS example
-Date: Mon, 24 Mar 2025 13:52:22 +0100
-Message-ID: <20250324125222.82057-1-krzysztof.kozlowski@linaro.org>
+Subject: [PATCH 1/1] r8169: add module parameter aspm_en_force
+Date: Mon, 24 Mar 2025 20:55:19 +0800
+Message-ID: <20250324125543.6723-1-crag0715@gmail.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -97,155 +96,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-DTS example in the bindings should be indented with 2- or 4-spaces and
-aligned with opening '- |', so correct any differences like 3-spaces or
-mixtures 2- and 4-spaces in one binding.
+ASPM is disabled by default and is enabled if the chip register is
+pre-configured, as explained in #c217ab7.
 
-No functional changes here, but saves some comments during reviews of
-new patches built on existing code.
+A module parameter is being added to the driver to allow users to
+override the default setting. This allows users to opt in and forcefully
+enable or disable ASPM power-saving mode.
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+-1: default unset
+ 0: ASPM disabled forcefully
+ 1: ASPM enabled forcefully
+
+Signed-off-by: Crag Wang <crag0715@gmail.com>
 ---
- .../devicetree/bindings/net/qcom,ipa.yaml     | 124 +++++++++---------
- 1 file changed, 62 insertions(+), 62 deletions(-)
+ drivers/net/ethernet/realtek/r8169_main.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/qcom,ipa.yaml b/Documentation/devicetree/bindings/net/qcom,ipa.yaml
-index 1a46d80a66e8..b4a79912d473 100644
---- a/Documentation/devicetree/bindings/net/qcom,ipa.yaml
-+++ b/Documentation/devicetree/bindings/net/qcom,ipa.yaml
-@@ -210,70 +210,70 @@ additionalProperties: false
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 53e541ddb439..161b2f2edf52 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -35,6 +35,10 @@
+ #include "r8169.h"
+ #include "r8169_firmware.h"
  
- examples:
-   - |
--        #include <dt-bindings/interrupt-controller/arm-gic.h>
--        #include <dt-bindings/clock/qcom,rpmh.h>
--        #include <dt-bindings/interconnect/qcom,sdm845.h>
-+    #include <dt-bindings/interrupt-controller/arm-gic.h>
-+    #include <dt-bindings/clock/qcom,rpmh.h>
-+    #include <dt-bindings/interconnect/qcom,sdm845.h>
- 
--        smp2p-mpss {
--                compatible = "qcom,smp2p";
--                interrupts = <GIC_SPI 576 IRQ_TYPE_EDGE_RISING>;
--                mboxes = <&apss_shared 6>;
--                qcom,smem = <94>, <432>;
--                qcom,local-pid = <0>;
--                qcom,remote-pid = <5>;
-+    smp2p-mpss {
-+        compatible = "qcom,smp2p";
-+        interrupts = <GIC_SPI 576 IRQ_TYPE_EDGE_RISING>;
-+        mboxes = <&apss_shared 6>;
-+        qcom,smem = <94>, <432>;
-+        qcom,local-pid = <0>;
-+        qcom,remote-pid = <5>;
- 
--                ipa_smp2p_out: ipa-ap-to-modem {
--                        qcom,entry-name = "ipa";
--                        #qcom,smem-state-cells = <1>;
--                };
--
--                ipa_smp2p_in: ipa-modem-to-ap {
--                        qcom,entry-name = "ipa";
--                        interrupt-controller;
--                        #interrupt-cells = <2>;
--                };
-+        ipa_smp2p_out: ipa-ap-to-modem {
-+                qcom,entry-name = "ipa";
-+                #qcom,smem-state-cells = <1>;
-         };
- 
--        ipa@1e40000 {
--                compatible = "qcom,sc7180-ipa";
--
--                qcom,gsi-loader = "self";
--                memory-region = <&ipa_fw_mem>;
--                firmware-name = "qcom/sc7180-trogdor/modem/modem.mbn";
--
--                iommus = <&apps_smmu 0x440 0x0>,
--                         <&apps_smmu 0x442 0x0>;
--                reg = <0x1e40000 0x7000>,
--                      <0x1e47000 0x2000>,
--                      <0x1e04000 0x2c000>;
--                reg-names = "ipa-reg",
--                            "ipa-shared",
--                            "gsi";
--
--                interrupts-extended = <&intc GIC_SPI 311 IRQ_TYPE_EDGE_RISING>,
--                                      <&intc GIC_SPI 432 IRQ_TYPE_LEVEL_HIGH>,
--                                      <&ipa_smp2p_in 0 IRQ_TYPE_EDGE_RISING>,
--                                      <&ipa_smp2p_in 1 IRQ_TYPE_EDGE_RISING>;
--                interrupt-names = "ipa",
--                                  "gsi",
--                                  "ipa-clock-query",
--                                  "ipa-setup-ready";
--
--                clocks = <&rpmhcc RPMH_IPA_CLK>;
--                clock-names = "core";
--
--                interconnects =
--                        <&aggre2_noc MASTER_IPA 0 &mc_virt SLAVE_EBI1 0>,
--                        <&aggre2_noc MASTER_IPA 0 &system_noc SLAVE_IMEM 0>,
--                        <&gem_noc MASTER_APPSS_PROC 0 &config_noc SLAVE_IPA_CFG 0>;
--                interconnect-names = "memory",
--                                     "imem",
--                                     "config";
--
--                qcom,qmp = <&aoss_qmp>;
--
--                qcom,smem-states = <&ipa_smp2p_out 0>,
--                                   <&ipa_smp2p_out 1>;
--                qcom,smem-state-names = "ipa-clock-enabled-valid",
--                                        "ipa-clock-enabled";
-+        ipa_smp2p_in: ipa-modem-to-ap {
-+                qcom,entry-name = "ipa";
-+                interrupt-controller;
-+                #interrupt-cells = <2>;
-         };
-+    };
++static int aspm_en_force = -1;
++module_param(aspm_en_force, int, 0444);
++MODULE_PARM_DESC(aspm_en_force, "r8169: An integer, set 1 to force enable link ASPM");
 +
-+    ipa@1e40000 {
-+        compatible = "qcom,sc7180-ipa";
+ #define FIRMWARE_8168D_1	"rtl_nic/rtl8168d-1.fw"
+ #define FIRMWARE_8168D_2	"rtl_nic/rtl8168d-2.fw"
+ #define FIRMWARE_8168E_1	"rtl_nic/rtl8168e-1.fw"
+@@ -5398,6 +5402,14 @@ static void rtl_init_mac_address(struct rtl8169_private *tp)
+ /* register is set if system vendor successfully tested ASPM 1.2 */
+ static bool rtl_aspm_is_safe(struct rtl8169_private *tp)
+ {
++	if (aspm_en_force == 0) {
++		dev_info(tp_to_dev(tp), "ASPM disabled forcefully");
++		return false;
++	} else if (aspm_en_force > 0) {
++		dev_info(tp_to_dev(tp), "ASPM enabled forcefully");
++		return true;
++	}
 +
-+        qcom,gsi-loader = "self";
-+        memory-region = <&ipa_fw_mem>;
-+        firmware-name = "qcom/sc7180-trogdor/modem/modem.mbn";
-+
-+        iommus = <&apps_smmu 0x440 0x0>,
-+                 <&apps_smmu 0x442 0x0>;
-+        reg = <0x1e40000 0x7000>,
-+              <0x1e47000 0x2000>,
-+              <0x1e04000 0x2c000>;
-+        reg-names = "ipa-reg",
-+                    "ipa-shared",
-+                    "gsi";
-+
-+        interrupts-extended = <&intc GIC_SPI 311 IRQ_TYPE_EDGE_RISING>,
-+                              <&intc GIC_SPI 432 IRQ_TYPE_LEVEL_HIGH>,
-+                              <&ipa_smp2p_in 0 IRQ_TYPE_EDGE_RISING>,
-+                              <&ipa_smp2p_in 1 IRQ_TYPE_EDGE_RISING>;
-+        interrupt-names = "ipa",
-+                          "gsi",
-+                          "ipa-clock-query",
-+                          "ipa-setup-ready";
-+
-+        clocks = <&rpmhcc RPMH_IPA_CLK>;
-+        clock-names = "core";
-+
-+        interconnects =
-+                <&aggre2_noc MASTER_IPA 0 &mc_virt SLAVE_EBI1 0>,
-+                <&aggre2_noc MASTER_IPA 0 &system_noc SLAVE_IMEM 0>,
-+                <&gem_noc MASTER_APPSS_PROC 0 &config_noc SLAVE_IPA_CFG 0>;
-+        interconnect-names = "memory",
-+                             "imem",
-+                             "config";
-+
-+        qcom,qmp = <&aoss_qmp>;
-+
-+        qcom,smem-states = <&ipa_smp2p_out 0>,
-+                           <&ipa_smp2p_out 1>;
-+        qcom,smem-state-names = "ipa-clock-enabled-valid",
-+                                "ipa-clock-enabled";
-+    };
+ 	if (tp->mac_version >= RTL_GIGA_MAC_VER_61 &&
+ 	    r8168_mac_ocp_read(tp, 0xc0b2) & 0xf)
+ 		return true;
 -- 
 2.43.0
 
