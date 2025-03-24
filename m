@@ -1,203 +1,303 @@
-Return-Path: <netdev+bounces-177101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 627DAA6DDAD
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 16:02:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 80C5FA6DDBF
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 16:06:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E595C171AD2
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 15:00:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76C9616AC80
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 15:04:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2905261364;
-	Mon, 24 Mar 2025 14:59:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F404D25E45A;
+	Mon, 24 Mar 2025 15:04:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kGr5x1R1"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="NU+NgxxL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F03D025D916
-	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 14:59:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 322FB25EF8E
+	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 15:04:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742828393; cv=none; b=FXsEDQwxWlpG85GlPg8S1e61sdAELn+AXWe+GPM5BjdqDbMnwnmMPIw+sBoZPWTheaQsgb8umtgNOkU7ddpN6iKRaaw1Yk4pT1gh0tHpzOP82UV9ppMBB3Uc8NahAQdOLmGoKjyOAMzVtDg9pE0JSSHA3F1wnGaR2eogJ8LUvBU=
+	t=1742828673; cv=none; b=L30W5vMi8014ykXTc+9daiz9Qwodj+Uyg5AkRCYKUsyNiAi5qsNoEIYZ5/MVWC+xVu2SGh/Pu8aEUCTSVIiF4m6h5Jj0R8x5FyFliFoMNSPtG4N15CerRxN+lwDXK6j3KHOi/PbvK4HSDl5aRy5FD+y/hbCx5VlgVa2XYziupNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742828393; c=relaxed/simple;
-	bh=+OlXnEkFs9bPKuvWlYHUF11x8BX+W/o03qOmV8HOIiw=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=fcrYlpn+lvt2R5aUBKzL/HIa6/8WpYJyvIFS7N70ozTDZGvdRwv4CRNpHNbPKS4CZUGvByrE8VBZqBefGfKXqgPrIGgmYfvq5tkr6qB0h50WDyzxb/coRuZiNmUj9xeOcm+voQf39iyYAfsxNdBDSjO1ML+lfhG3B0ncv5e6h3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kGr5x1R1; arc=none smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6df83fd01cbso20411086d6.2
-        for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 07:59:51 -0700 (PDT)
+	s=arc-20240116; t=1742828673; c=relaxed/simple;
+	bh=U+psBP5MNEUMkO3yW8MWBYHandIg+hGRs1+aKgXoCTc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RqyCh4yMbhxmrea+NlzxiM6CW/bgRLXvtxmkH0WN4AStSyOVc7AKdtmstYBwlcOCoGrVbGb3fRtcwiyAowzF+OzlTH6J0QUo9JIdzdAfXR82jZBClCcFMmOQw6YYZuMaL7KlhVLklOqMEcF0gKuYKcZ7LrW1WKucRXGQP5UCYgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=NU+NgxxL; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-224191d92e4so85354545ad.3
+        for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 08:04:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742828391; x=1743433191; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8g0RDdxcyMsOSeNmZH/DuNwL4lbiAB9DosVoQUk8rNo=;
-        b=kGr5x1R1q9HA1Y7l93sI37sj0hctvm9Gk7FJ5i0kzzbxoXKc9Dal+/QzT7IltUIQoc
-         ylmw4HZ2EJTHgNlAiHwwXgKMRp1OgqHDBXZO6oJ+SbJuudrGE0kh9BE7hvHtHh5LWPXj
-         WXOs2FxR7BmAcwxRLq6lK72j02TEXqAdAHwKAyaU7KvG/njlINU94GiARbzUEuZ2gbc4
-         6bFPhhLMvQ1a1KEY3PTPIPLRybPAxQBwlxiDGoC2dlMnSqQ/3n6Cn+XjbC8PpN2qk/Ju
-         7weUEeZ8g7QK+0Stz0FyDbQg9f6zK1vvxaUf6dUXOiwWbZpZru0G6F6Li73QuukyvzCJ
-         vReg==
+        d=broadcom.com; s=google; t=1742828671; x=1743433471; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=nsWSzFSgzFUGqnS2HAk2LiFAzLMIzrNuok5qPb2hqv0=;
+        b=NU+NgxxLYLmdExGst0FNWxC/dxPZQwJR4r+llsXZK+xVNmkPUnYIbsaNIqopCRBE9Z
+         i5SZi9tPiOzQOGz9yLT14LSlxGcPMS/Bdjnf2YOcWU99wRbYdNkGlvKVhg8V/GT4D6rP
+         LdRB/P7rAEQazdZcam52syXCRdmhDeZvcPN8s=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742828391; x=1743433191;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=8g0RDdxcyMsOSeNmZH/DuNwL4lbiAB9DosVoQUk8rNo=;
-        b=tjILgd5XgdIOKPfEFVdvslmSXJwPQNbhGQoOb05ET5vPxu3YOLHDiLmBt2R4fpHljg
-         FcKitOkDJY9X0fNutwmfsQKdyLQF5bhu9ARB8KfH/epdwtUfM8er4MAt4wOPwL8tGUCh
-         MiWU+DV7w1+gG56RIv4EI2wsIZw5fxdAX/p18XSFpzl7v/idgDu7dQ9kMdjPwrA7UQmG
-         pfRU6DeJXdGoPGmaTRbDCutps3uFYBiSz74QfARnoEZ4eF32RMrmF0LOaI0XLWkplxMr
-         LXT+PNo8Kqev1zO1sENkC8M35Hjfwk1dKHBMnlHhfsic0ttO56yTrZRKbRapQ/y2xYTQ
-         30Pw==
-X-Forwarded-Encrypted: i=1; AJvYcCU8frKycNATZdvNoi9GrLwKWXoUDrOpPry+Q0qt07K42wXRT69V7PHAW9NAJ5261iK/YXtYAt4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmqabTv7qww6DcFkHQjEKsS/2Ya1SUP4R9XjPBp1S1oRXRr7EN
-	tHwxM4Ak4hkyzMVtOIMuUU5QnSZbsFT8LgRtyZB8jPnYl9RxEFw3
-X-Gm-Gg: ASbGnct2zBlX9b+HCn2PTk67C+CGx+br9xCFseJ+3Fy/Da4eCX7yeYIyrn0HmIaGDXI
-	ApMENF6jxhD2UGL3phMFwxvLHEusw4LByGS7adABpfo+Vw5o5LJSKYhrLpctDbPxH7SrOnFvsNi
-	ndRmxlD7FGZG8k4PrVOLPWBlUakIAaG25//qiYJ3WbDiA4FvPPxAMzd1PDeHdPbz3UFzZI7BBSg
-	EiIBg68h0WjxNfJS9Kj7MD/Al0A4fY9GeHMmoYaDhQq0D/Cp5/nsCTp+kXmLR7JUHxGKKohsfNZ
-	AMjB0Wk7xRA5B5vihv97EJoPdEaQU88ZTgEsrHuvwkaRG3ittj7DqCGOlULhsenpicL7/IMJswW
-	BFlUiyH2s3pmjEGEYkEMzvw==
-X-Google-Smtp-Source: AGHT+IHU+LZmmrPyrrGjlSiyS6WtiUN/u6kRFV1pDWFYgNai2y15Be5WFHjjv7MCAoy7+Gz4xVoarA==
-X-Received: by 2002:a05:6214:5297:b0:6e8:f3af:ed44 with SMTP id 6a1803df08f44-6eb3f287f89mr136683866d6.12.1742828390584;
-        Mon, 24 Mar 2025 07:59:50 -0700 (PDT)
-Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6eb3ef31810sm45558956d6.64.2025.03.24.07.59.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Mar 2025 07:59:49 -0700 (PDT)
-Date: Mon, 24 Mar 2025 10:59:49 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- David Ahern <dsahern@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, 
- Kuniyuki Iwashima <kuniyu@amazon.com>, 
- Kuniyuki Iwashima <kuni1840@gmail.com>, 
- netdev@vger.kernel.org
-Message-ID: <67e17365461e3_2f6623294ea@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250323231016.74813-2-kuniyu@amazon.com>
-References: <20250323231016.74813-1-kuniyu@amazon.com>
- <20250323231016.74813-2-kuniyu@amazon.com>
-Subject: Re: [PATCH v1 net 1/3] udp: Fix multiple wraparounds of
- sk->sk_rmem_alloc.
+        d=1e100.net; s=20230601; t=1742828671; x=1743433471;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nsWSzFSgzFUGqnS2HAk2LiFAzLMIzrNuok5qPb2hqv0=;
+        b=CXouH8yhs0vjrDHvKuaLE5n2rfYS4JaBog9hlpDcYmmx4fccmj+AWLMM6MxU7zSCiX
+         NUN1/fIsocT4Oif6Kz3TjkuyDvN0Cb0C/srtfJzk0XYS3QMvRhIAJhAWMh5HlpbpaK0S
+         qUhMdYpwcGSSWNbVB8HGvR6mSUt4mY3G97ZEPLYHZXc5eDmi0Dg9+mNJDqVAyjIL54zn
+         Ui3vAWZMzLJev6yhZEYDaGPIKAHQ6oHgORG2OdIzQ6jxfJsfuHlcWEk9tEIqbUw4zd3o
+         CczQyF7o4WqcVOaOii9HIGIPO8nh98wjZjNM8IiIYU1wbsaOQtuRYSc2gkHVC4+D5quV
+         BnVA==
+X-Forwarded-Encrypted: i=1; AJvYcCVwAjx5tzbb3iPrlyRa9nXyecjdco5DJOwjqoYnhKZ3+aLJRmozlNKdzKOZa59wtV04SFXIHW8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwDefMFQkB0DF6r4NAZw9y9XMGMKis01UabHOFq10MA/15Rq/S
+	3GVw+ddFEFlxGpfZ1+rj037ufqta3C3jjsPi5D+1EUUMaqihp8oqqztpv9gyWAORHBA/AT/SKml
+	z2Erkw4Yk30s3M6Vbu0yql5u+BlFuO4Lz0LrLZXVIxoeFlqo=
+X-Gm-Gg: ASbGnctZIYCJGfHmjyd5i4Ej+NAhvAi1JhO1KCo6p8Dwmi3stBwvzhkhaG8jGolGehM
+	whDrz51fdnsVptR4ghygp86HPctHxfPALrOT6qVSCjs/vXW2+XaCWcqPfl03nFQGj7etS2QVZm9
+	pf/sTslQCjP71eghZebGyNWpS4S85Ksie7+Jd2/Jv6+nTxiS1tl5IMwlBBujg=
+X-Google-Smtp-Source: AGHT+IFEdu+Wy39sOvTIwFNXKUrPdctGYkCVfZDy5K57Q/jLUU68otOrTk7uw5Xek/I7hYZAQTNuVXsi5n2S2txBL1U=
+X-Received: by 2002:a17:902:cccb:b0:224:18bb:44c2 with SMTP id
+ d9443c01a7336-22780c7e14dmr188814335ad.6.1742828671248; Mon, 24 Mar 2025
+ 08:04:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <DE1DD9A1-3BB2-4AFB-AE3B-9389D3054875@avride.ai>
+ <8f128d86-a39c-4699-800a-67084671e853@intel.com> <CAGtf3iaO+Q=He7xyCCfzfPQDH_dHYYG1rHbpaUe-oBo90JBtjA@mail.gmail.com>
+ <CACKFLinG2s5HVisa7YoWAZByty0AyCqO-gixAE8FSwVHKK8cjQ@mail.gmail.com>
+In-Reply-To: <CACKFLinG2s5HVisa7YoWAZByty0AyCqO-gixAE8FSwVHKK8cjQ@mail.gmail.com>
+From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Date: Mon, 24 Mar 2025 20:34:18 +0530
+X-Gm-Features: AQ5f1Jo-Faer9iRE0hxe3x54datJgP0gVILB9H8u-4UQFtZP6qW5nFmXvO9Xu9A
+Message-ID: <CALs4sv1H=rS96Jq_4i=S0kL57uR6v-sEKbZcqm2VgY6UXbVeMA@mail.gmail.com>
+Subject: Re: bnxt_en: Incorrect tx timestamp report
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: Kamil Zaripov <zaripov-kamil@avride.ai>, Jacob Keller <jacob.e.keller@intel.com>, 
+	Linux Netdev List <netdev@vger.kernel.org>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000e33fe9063117ebea"
 
-Kuniyuki Iwashima wrote:
-> __udp_enqueue_schedule_skb() has the following condition:
-> 
->   if (atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf)
->           goto drop;
-> 
-> sk->sk_rcvbuf is initialised by net.core.rmem_default and later can
-> be configured by SO_RCVBUF, which is limited by net.core.rmem_max,
-> or SO_RCVBUFFORCE.
-> 
-> If we set INT_MAX to sk->sk_rcvbuf, the condition is always false
-> as sk->sk_rmem_alloc is also signed int.
-> 
-> Then, the size of the incoming skb is added to sk->sk_rmem_alloc
-> unconditionally.
-> 
-> This results in integer overflow (possibly multiple times) on
-> sk->sk_rmem_alloc and allows a single socket to have skb up to
-> net.core.udp_mem[1].
-> 
-> For example, if we set a large value to udp_mem[1] and INT_MAX to
-> sk->sk_rcvbuf and flood packets to the socket, we can see multiple
-> overflows:
-> 
->   # cat /proc/net/sockstat | grep UDP:
->   UDP: inuse 3 mem 7956736  <-- (7956736 << 12) bytes > INT_MAX * 15
->                                              ^- PAGE_SHIFT
->   # ss -uam
->   State  Recv-Q      ...
->   UNCONN -1757018048 ...    <-- flipping the sign repeatedly
->          skmem:(r2537949248,rb2147483646,t0,tb212992,f1984,w0,o0,bl0,d0)
-> 
-> Previously, we had a boundary check for INT_MAX, which was removed by
-> commit 6a1f12dd85a8 ("udp: relax atomic operation on sk->sk_rmem_alloc").
-> 
-> A complete fix would be to revert it and cap the right operand by
-> INT_MAX:
-> 
->   rmem = atomic_add_return(size, &sk->sk_rmem_alloc);
->   if (rmem > min(size + (unsigned int)sk->sk_rcvbuf, INT_MAX))
->           goto uncharge_drop;
-> 
-> but we do not want to add the expensive atomic_add_return() back just
-> for the corner case.
-> 
-> So, let's perform the first check as unsigned int to detect the
-> integer overflow.
-> 
-> Note that we still allow a single wraparound, which can be observed
-> from userspace, but it's acceptable considering it's unlikely that
-> no recv() is called for a long period, and the negative value will
-> soon flip back to positive after a few recv() calls.
+--000000000000e33fe9063117ebea
+Content-Type: multipart/alternative; boundary="000000000000dad400063117eb88"
 
-Can we do better than this?
-Is this because of the "Always allow at least one packet" below, and
-due to testing the value of the counter without skb->truesize added?
+--000000000000dad400063117eb88
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-        /* Immediately drop when the receive queue is full.
-         * Always allow at least one packet.
-         */
-        rmem = atomic_read(&sk->sk_rmem_alloc);
-        rcvbuf = READ_ONCE(sk->sk_rcvbuf);
-        if (rmem > rcvbuf)
-                goto drop;
+On Fri, 21 Mar, 2025, 11:03=E2=80=AFpm Michael Chan, <michael.chan@broadcom=
+.com>
+wrote:
 
-> 
->   # cat /proc/net/sockstat | grep UDP:
->   UDP: inuse 3 mem 524288  <-- (INT_MAX + 1) >> 12
-> 
->   # ss -uam
->   State  Recv-Q      ...
->   UNCONN -2147482816 ...   <-- INT_MAX + 831 bytes
->          skmem:(r2147484480,rb2147483646,t0,tb212992,f3264,w0,o0,bl0,d14468947)
-> 
-> Fixes: 6a1f12dd85a8 ("udp: relax atomic operation on sk->sk_rmem_alloc")
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
->  net/ipv4/udp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> index a9bb9ce5438e..a1e60aab29b5 100644
-> --- a/net/ipv4/udp.c
-> +++ b/net/ipv4/udp.c
-> @@ -1735,7 +1735,7 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
->  	 */
->  	rmem = atomic_read(&sk->sk_rmem_alloc);
->  	rcvbuf = READ_ONCE(sk->sk_rcvbuf);
-> -	if (rmem > rcvbuf)
-> +	if ((unsigned int)rmem > rcvbuf)
->  		goto drop;
->  
->  	/* Under mem pressure, it might be helpful to help udp_recvmsg()
-> -- 
-> 2.48.1
-> 
+> On Fri, Mar 21, 2025 at 8:17=E2=80=AFAM Kamil Zaripov <zaripov-kamil@avri=
+de.ai>
+> wrote:
+> >
+> > > That depends. If it has only one underlying clock, but each PF has it=
+s
+> > > own register space, it may functionally be independent clocks in
+> > > practice. I don't know the bnxt_en driver or hardware well enough to
+> > > know if that is the case.
+> >
+> > > If it really is one clock with one set of registers to control it, th=
+en
+> > > it should only expose one PHC. This may be tricky depending on the
+> > > driver design. (See ice as an example where we've had a lot of
+> > > challenges in this space because of the multiple PFs)
+> >
+> > I can only guess, from looking at the __bnxt_hwrm_ptp_qcfg function,
+> > that it depends on hardware and/or firmware (see
+> >
+> https://elixir.bootlin.com/linux/v6.13.7/source/drivers/net/ethernet/broa=
+dcom/bnxt/bnxt.c#L9427-L9431
+> ).
+> > I hope that broadcom folks can clarify this.
+> >
+>
+> It is one physical PHC per chip.  Each function has access to the
+> shared PHC.   It won't work properly when multiple functions try to
+> adjust the PHC independently.  That's why we use the non-RTC mode when
+> the PHC is shared in multi-function mode.  Pavan can add more details
+> on this.
+>
 
+Yes, that's correct. It's one PHC shared across functions. The way we
+handle multiple
+functions accessing the shared PHC is by firmware allowing only one
+function to adjust
+the frequency. All the other functions' adjustments are ignored. However,
+needless to say,
+they all still receive the latest timestamps. As I recall, this event
+design was an earlier
+version of our multi host support implementation where the rollover was
+being tracked in
+the firmware.
 
+The latest driver handles the rollover on its own and we don't need the
+firmware to tell us.
+I checked with the firmware team and I gather that the version you are
+using is very old.
+Firmware version 230.x onwards, you should not receive this event for
+rollovers.
+Is it possible for you to update the firmware? Do you have access to a more
+recent (230+) firmware?
+
+--000000000000dad400063117eb88
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"auto"><div dir=3D"ltr"><div dir=3D"auto"><div><br><br><div clas=
+s=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Fri, 21 Mar, 202=
+5, 11:03=E2=80=AFpm Michael Chan, &lt;<a href=3D"mailto:michael.chan@broadc=
+om.com" target=3D"_blank" rel=3D"noreferrer">michael.chan@broadcom.com</a>&=
+gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0=
+ .8ex;border-left:1px #ccc solid;padding-left:1ex">On Fri, Mar 21, 2025 at =
+8:17=E2=80=AFAM Kamil Zaripov &lt;<a href=3D"mailto:zaripov-kamil@avride.ai=
+" rel=3D"noreferrer noreferrer" target=3D"_blank">zaripov-kamil@avride.ai</=
+a>&gt; wrote:<br>
+&gt;<br>
+&gt; &gt; That depends. If it has only one underlying clock, but each PF ha=
+s its<br>
+&gt; &gt; own register space, it may functionally be independent clocks in<=
+br>
+&gt; &gt; practice. I don&#39;t know the bnxt_en driver or hardware well en=
+ough to<br>
+&gt; &gt; know if that is the case.<br>
+&gt;<br>
+&gt; &gt; If it really is one clock with one set of registers to control it=
+, then<br>
+&gt; &gt; it should only expose one PHC. This may be tricky depending on th=
+e<br>
+&gt; &gt; driver design. (See ice as an example where we&#39;ve had a lot o=
+f<br>
+&gt; &gt; challenges in this space because of the multiple PFs)<br>
+&gt;<br>
+&gt; I can only guess, from looking at the __bnxt_hwrm_ptp_qcfg function,<b=
+r>
+&gt; that it depends on hardware and/or firmware (see<br>
+&gt; <a href=3D"https://elixir.bootlin.com/linux/v6.13.7/source/drivers/net=
+/ethernet/broadcom/bnxt/bnxt.c#L9427-L9431" rel=3D"noreferrer noreferrer no=
+referrer" target=3D"_blank">https://elixir.bootlin.com/linux/v6.13.7/source=
+/drivers/net/ethernet/broadcom/bnxt/bnxt.c#L9427-L9431</a>).<br>
+&gt; I hope that broadcom folks can clarify this.<br>
+&gt;<br>
+<br>
+It is one physical PHC per chip.=C2=A0 Each function has access to the<br>
+shared PHC.=C2=A0 =C2=A0It won&#39;t work properly when multiple functions =
+try to<br>
+adjust the PHC independently.=C2=A0 That&#39;s why we use the non-RTC mode =
+when<br>
+the PHC is shared in multi-function mode.=C2=A0 Pavan can add more details<=
+br>
+on this.<br></blockquote><div>=C2=A0</div></div></div><div dir=3D"auto"><di=
+v dir=3D"auto">Yes, that&#39;s correct. It&#39;s one PHC shared across func=
+tions. The way we handle multiple</div><div dir=3D"auto">functions accessin=
+g the shared PHC is by firmware allowing only one function to adjust</div><=
+div dir=3D"auto">the frequency. All the other functions&#39; adjustments ar=
+e ignored. However, needless to say,</div><div dir=3D"auto">they all still =
+receive the latest timestamps. As I recall, this event design was an earlie=
+r</div><div dir=3D"auto">version of our multi host support implementation w=
+here the rollover was being tracked in</div><div dir=3D"auto">the firmware.=
+=C2=A0</div><div><br></div><div>The latest driver handles the rollover on i=
+ts own and we don&#39;t need the firmware to tell us.</div><div>I checked w=
+ith the firmware team and I gather that the version you are using is very o=
+ld.=C2=A0</div><div>Firmware version 230.x onwards, you should not receive =
+this event for rollovers.</div><div>Is it possible for you to update the fi=
+rmware? Do you have access to a more recent (230+) firmware?</div><div><br>=
+</div></div><div dir=3D"auto"><div class=3D"gmail_quote"><blockquote class=
+=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
+ing-left:1ex">
+</blockquote></div></div></div>
+</div></div>
+
+--000000000000dad400063117eb88--
+
+--000000000000e33fe9063117ebea
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+OltyqaGBuzv+bJTUL+bmV7E4QBLIqGt4jVr1R9hJdH6KxXwJdyfHZ9C6qXmoe2NQhiFUyBOJ0wgk
+dB9Z1IU7nCwvNKYg2JMoJs93tIgbhPJg/D7pqW8gabkCAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUEV6y/89alKPoFbKUaJXsvWu5
+fdowDQYJKoZIhvcNAQELBQADggEBAEHSIB6g652wVb+r2YCmfHW47Jo+5TuCBD99Hla8PYhaWGkd
+9HIyD3NPhb6Vb6vtMWJW4MFGQF42xYRrAS4LZj072DuMotr79rI09pbOiWg0FlRRFt6R9vgUgebu
+pWSH7kmwVXcPtY94XSMMak4b7RSKig2mKbHDpD4bC7eGlwl5RxzYkgrHtMNRmHmQor5Nvqe52cFJ
+25Azqtwvjt5nbrEd81iBmboNTEnLaKuxbbCtLaMEP8xKeDjAKnNOqHUMps0AsQT8c0EGq39YHpjp
+Wn1l67VU0rMShbEFsiUf9WYgE677oinpdm0t2mdCjxr35tryxptoTZXKHDxr/Yy6l6ExggJgMIIC
+XAIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwV/XkICjVscn4SNZMw
+DQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEIMn7g8YN022QjLO/7RCFwMbmovO97IVh
+BEXSKcoqFEwyMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDMy
+NDE1MDQzMVowXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEB
+AQUABIIBAIPy5nkUoua1NSzVjYpnssU/9lDcINA/Z2RaB6nYXSlFZw2eB63dCe9wDKhxL8ZK4vuB
+u/SpRN/uYHXgCeeeYkPzxxSb6PCSLyyo4KWKFhYuXEPW4sHy5eHrPnvBsAzRIDwMPLhPoZiRw+t/
+TRhWvW83fRQh6H4aBdGJnZlpFTq5x5ZvOBB2MqHkTf8DF8n4tg7mEA6idVowtucn+00B6RB0uNqy
+bfoS6mChMC2lIf/QngZlicKjTH/+xRK251XnqZE0vJHfnPW4UbPoWNzhOKKJTObBMzm4YeJdR62K
+o/5qiH3ghURjG0WDfLOSy9j2nkGISi5l40ANjKavEmrfzRs=
+--000000000000e33fe9063117ebea--
 
