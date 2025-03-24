@@ -1,132 +1,95 @@
-Return-Path: <netdev+bounces-176997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85EB4A6D31D
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 03:40:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8838A6D32A
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 03:50:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D0A93ACF45
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 02:39:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 383823AE292
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 02:49:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BFBA13C3F2;
-	Mon, 24 Mar 2025 02:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B23612629F;
+	Mon, 24 Mar 2025 02:49:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WExvZ7HO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b5oP1tWd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AAE115E96
-	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 02:39:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A382E3392;
+	Mon, 24 Mar 2025 02:49:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742783995; cv=none; b=gTFvAuEosZgKyVszz16fFLAonCW4ep7NYasOjhwPwAGowot0Sek27rQ0RvmqiJyWBhNfG5krHDCUKX/+IEg/7T0by6tv0EL4FR0IcQ88yr29/95Ef7ssM3FNOKa0pOkChdOXpdq6vLFhEyqbCFcoayQgLLIo4SwaRnKTBHNRDh8=
+	t=1742784598; cv=none; b=Jb5nVb2A1RYatEW3/AmaNmA1JvTQoJ3thRTaF2DP5fUUotV7htI+WHxsP98w+o6mXeMRmhQeAytLtu/oxBgVF0sb77lxAEiAViQx6SBOU4xE3yx/EnrANNGeecfC1rIU7H+3KSplndCtKrZIplH1yWp1N6lIQGe1Eh/LHgv1CLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742783995; c=relaxed/simple;
-	bh=fy75JpqMftDy+evC81AOqEt2qZ4fikc2qckd3bueMIY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XfEfnpHPrmpdFxXc4uNjtwutYtAHoWdx2ezz+no2uDXrKHa9mqzVRvbvMgapnA0ZTuxAaWBRaP15ku2+VYQju5ZzVVo1gW3VDZBLDQ7bUyVZJp1gAnacpY/kNJ0dXcFEkFRRsUirH/ebd+EcCt+euKY4OtV35IW30g2gD+ZNU+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WExvZ7HO; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2260c91576aso63655105ad.3
-        for <netdev@vger.kernel.org>; Sun, 23 Mar 2025 19:39:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742783993; x=1743388793; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3YSuSRh5wYbbvql8ON+ETrhvLOcGuoDUIZcRVeNxLM4=;
-        b=WExvZ7HOeeHSTQ2GYJiHhbvzaYOT3YE/IlNz6xlJnuz58Ze90uSN9V6uzliZ/+Pxr0
-         Wg48oFxRCIxqXvQlxy8MXJHBCjyt2zsuP0i/6vMDXNWlYudDHj0Ku8To0WNVYnzw3XIA
-         G1MEos7D530shiygguOnJpzvuBBZwnNoKh3mLkKTTvUVPGlXZ6Sty4PfmsjW8lbzs/cZ
-         x4ixnEMWtxtQ7NXEJTAwvDAwJ/ZWefusXB3dCPEP732xuZRBc+ywPCc66yFQftVVcDLF
-         FqjNPxLuWNEsUvt7EbE7YEheeGPMjiNxhCbgvJqO7zwPN9vPLSdnmgfkO+eYKDj/fuDQ
-         PxqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742783993; x=1743388793;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3YSuSRh5wYbbvql8ON+ETrhvLOcGuoDUIZcRVeNxLM4=;
-        b=tQBGbFP9kcwo7k1+PgFMQnt8/5CDpqF5Uv+ZBIMvVG++sCsI1/PIB9TifR4kuaqP4c
-         qMJv4LBJQGw48Lri1q8JsQVtcUujvRR0JYECCEheWqVdIV19DuYW4fq/cIvOw/x2nHNL
-         gpa1JcN5ASswlftZtT3jXXYUWQ8D3fePRk7YW5Nt3WZ6SVRuPHzh1SYT9TDc7L4T7xnN
-         XGqfwZ5a4ofPoKUU9+7vl444nReRIsKCNtHDzR5VBZ5E4jPaZqisMSEJdOTsh2CIYwcd
-         Eru+l+CIvZHsw1iuVGz5iEwlSaMYDYCaxbxw5MUZ+TSr0X3+8Zyc9gDmBKMAH7CR2K8W
-         4YSg==
-X-Gm-Message-State: AOJu0YxqdgWaDa51Up0wveLgURdzyF/GiK4VP5//FTMYN+eVn3xLn+Px
-	suKnf4qb/XvfYWMVUf6BHtcymL5iyJGBbosP/GaSiQqu9VNwCck=
-X-Gm-Gg: ASbGncviU0B+uuvfcUrBOwXQo4wVxifGePDVMiGA6nfFRG1jnTmhbsxmAYqTJdPLHqY
-	/1tGB8pS/DChXUY47f6qnIiKA2HgZiVVsQykJZlsN8gLSRkKo3n0SD6DbgJh2kTeQnZZKWhPILs
-	ochYI5PRZqaBFaw3Nb4ky4dZQB3LDyjtK9vdJoG6BVzCTfhYYa0VMH/d0h6y7FQgOmc1R8oxbk+
-	THtB3MQwjjmcDKMgpe5UEdozrGM6aUUTzBm9b7IIvBOtWRNghSQAulKyGiWUjn5fCOClOYsC0BS
-	P1/p8maScTJ9vX8JbbfluWY0whCsjSbibiHnsiRsBkhQ
-X-Google-Smtp-Source: AGHT+IHWiF9nWynpyqaJdEYQGTTJBqX0DekUPjONEK4gAYoaUANbpJ+MgfOu6TIAgFpi69hF0uLS+g==
-X-Received: by 2002:a05:6a20:2d12:b0:1f5:97c3:41b9 with SMTP id adf61e73a8af0-1fe42f08f5fmr17410493637.5.1742783992565;
-        Sun, 23 Mar 2025 19:39:52 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-af8a27dec60sm6049428a12.4.2025.03.23.19.39.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 23 Mar 2025 19:39:52 -0700 (PDT)
-Date: Sun, 23 Mar 2025 19:39:51 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>
-Subject: Re: [PATCH net] net: page_pool: replace ASSERT_RTNL() in
- page_pool_init()
-Message-ID: <Z-DF95BDIYF2h_k0@mini-arch>
-References: <20250324014639.4105332-1-dw@davidwei.uk>
+	s=arc-20240116; t=1742784598; c=relaxed/simple;
+	bh=XyOiq3hanwj9nMEp9GtsG2uBm/cuEPJnvsDsrn23lbA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=IJZtI9hf7xboykICtv10go2Ka/1Ij3pExbZVLnNCAk4fDLRbm9vWeADXhcvibaasssGhf9azL++mqFURB0+yDJ3++S7oHr5yHHQvG2D5KigNvmqBJULvTwxhWS1Bhv/ACyudyJp38tzBt30BDNa3+Ssb6du+Z2w2M+LLIit7fe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b5oP1tWd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F6D9C4CEE2;
+	Mon, 24 Mar 2025 02:49:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742784597;
+	bh=XyOiq3hanwj9nMEp9GtsG2uBm/cuEPJnvsDsrn23lbA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=b5oP1tWdpUQDy17vIfG7d8xtX8RVwrjRsZjknHu0yYcjIi56/4AC75NoY8vZIOyX1
+	 iSUskfbtzByBcMLBtbImCUrlPUjxtTFYFgFL2QdeubxKJ6dovIxU9e/hXNSPvEO4mU
+	 Nf1EE816amgqT0eNL7mQsMtopB+JH1jldWtxLdLHDxdLBuFe18rVfo/Et/PfIe6z//
+	 PdQN7zLF4Hr/+Al0kFCVlmjE4L6ZyR2JFaO/4kbZRnyF7o1NG+gMiVUPfHUCiYDT4K
+	 n/cJII5GZE2UmoT6SsH3TaA07e4WW1Zq/oyvRLdWy8sOnwsymTPTGlmqKDGF2LywdP
+	 QCnr8GpOAIIZw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 714DA380AA70;
+	Mon, 24 Mar 2025 02:50:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250324014639.4105332-1-dw@davidwei.uk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH iproute2-next 0/2] Add optional-counters binding support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174278463329.3212931.9680954634489028299.git-patchwork-notify@kernel.org>
+Date: Mon, 24 Mar 2025 02:50:33 +0000
+References: <20250319082529.287168-1-phaddad@nvidia.com>
+In-Reply-To: <20250319082529.287168-1-phaddad@nvidia.com>
+To: Patrisious Haddad <phaddad@nvidia.com>
+Cc: leon@kernel.org, dsahern@gmail.com, stephen@networkplumber.org,
+ netdev@vger.kernel.org, jgg@nvidia.com, linux-rdma@vger.kernel.org
 
-On 03/23, David Wei wrote:
-> Replace a stray ASSERT_RTNL() in page_pool_init() with
-> netdev_assert_locked().
+Hello:
+
+This series was applied to iproute2/iproute2-next.git (main)
+by David Ahern <dsahern@kernel.org>:
+
+On Wed, 19 Mar 2025 10:25:24 +0200 you wrote:
+> Add optional-counters binding support together with new packets/bytes
+> counters. Previously optional-counters were on a per link basis, this
+> series allows users to bind optional-counters to a specific counter,
+> which allows tracking optional-counter over a specific QP group.
 > 
-> Fixes: 1d22d3060b9b ("net: drop rtnl_lock for queue_mgmt operations")
-> Signed-off-by: David Wei <dw@davidwei.uk>
-> ---
->  net/core/page_pool.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> The support is added for both binding modes, automatic and manual,
+> in both cases the bound optional counters are those that are currently
+> configured over the link when trying to bind the QP.
 > 
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index f5e908c9e7ad..2f469b02ea31 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -281,7 +281,7 @@ static int page_pool_init(struct page_pool *pool,
->  		 * configuration doesn't change while we're initializing
->  		 * the page_pool.
->  		 */
-> -		ASSERT_RTNL();
-> +		netdev_assert_locked(params->netdev);
->  		rxq = __netif_get_rx_queue(pool->slow.netdev,
->  					   pool->slow.queue_idx);
->  		pool->mp_priv = rxq->mp_params.mp_priv;
+> [...]
 
-Not sure we can do this unconditionally. Since we still have plenty of
-drivers that might not use netdev instance lock (yet). Probably should
-be something like the following?
+Here is the summary with links:
+  - [iproute2-next,1/2] rdma: update uapi headers
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=85860c7dce2c
+  - [iproute2-next,2/2] rdma: Add optional-counter option to rdma stat bind commands
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=a03f40534f6c
 
-if (netdev_need_ops_lock(params->netdev))
-	netdev_assert_locked(params->netdev);
-else
-	ASSERT_RTNL();
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-?
 
-We should probably wait for https://lore.kernel.org/netdev/20250312223507.805719-11-kuba@kernel.org/T/#m2053ac617759a9005806e56a7df97c378b76ec77
-to land and use netdev_ops_assert_locked instead?
 
