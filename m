@@ -1,144 +1,90 @@
-Return-Path: <netdev+bounces-177132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CBB4A6E028
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 17:50:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 905DEA6E030
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 17:50:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65070171334
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 16:49:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D17D03AB230
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 16:50:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58AB42641C7;
-	Mon, 24 Mar 2025 16:49:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6C87263F20;
+	Mon, 24 Mar 2025 16:50:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="wTRGOOI5";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="DCPnz+Gj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hxh3QdHT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7BB3261586;
-	Mon, 24 Mar 2025 16:49:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98CEC263C91
+	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 16:50:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742834967; cv=none; b=XXHwurOEwX7+LzM/HRtFoENrtbaL1kOvU0ktGu30ybLNc6ePubDQy90vavh7IQRps5mIx7wyQUbsQrWEH8O4Id7Qf6g3xgPVZbPKKYfFOb1GEKSjvzqcDTcvLAdNf5VAXcHVgfBDHll+9v8hw3Kl38AbGpB+dTHk99Xh61OYNI8=
+	t=1742835054; cv=none; b=UZn1aFxZoCdPWMbauX+WRDakr2Qo8RePjzK+9j81jFIk/KSYvtCLqIa5jkGXZwFnKp1PZLdwTDpvY+HD4iHgPTd2he2ihyZEBKC0u30BlepCqoas1FMI7oIBfksbWXQcsLLOAPKAeawI2zlWyiuWkFoFDoODsn7Mibigsrzf6EI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742834967; c=relaxed/simple;
-	bh=5fRaRRqoLXk9VvHYdcvASGdB+1Jt16QfeJgofkT4YqM=;
+	s=arc-20240116; t=1742835054; c=relaxed/simple;
+	bh=HabEANQWI7CUOsbqrsvgFJXj9BRdlzz/K5yIdcHjB7s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RxN6Yyy6iext76ZYR5VWb8JhNm4yZXDxk1QLBI5YUqznYZyp7GvTcVoQ8UkYSCIqXBKvCoix6WsU7K1/Sv8wXZcU2Nl50TJ7xfjrpKrHYPyrFg/vi3+VMJI+Zbrg9D+DtwCEDUBwvLuWufE3NVdXc6xdDi2QDhICZU6rFImYd9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=wTRGOOI5; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=DCPnz+Gj; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id 7E48860390; Mon, 24 Mar 2025 17:49:15 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1742834955;
-	bh=GGDJ9ToJtDJw+S47TSdM9cpM1oN2wQQEXFzOumVzNjU=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=fVz9u+OcVm+v1rvasr6URTVRK4cLLV9f5w9NI0mG/flnod1uX52wquQ6Bk71Prlo7ov66YSrRRCriZ5ZO0QigisTzCgUotWepocu/a4aawvzGMQQi3pqDXYvgoIKGtbx9P4EPG2Ckfyykk9kNQKr6lVuBweIzXd2fwnukkAMbjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hxh3QdHT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92859C4CEDD;
+	Mon, 24 Mar 2025 16:50:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742835053;
+	bh=HabEANQWI7CUOsbqrsvgFJXj9BRdlzz/K5yIdcHjB7s=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=wTRGOOI5j5ondXNwLDawdD4j82Ru2vOHGWWppgQwjHax3kidJsU01JPVyWMvJWUuo
-	 mTlzALu2ndA/PN1/PV3qbS1jtE0gIN4MZn9Px+MTY3f1ooPuHrejXseAm98hsak18I
-	 0ILH2j9IWbHG2oFFPSGwrTcaTurXdJLWbXKXQfInp8slWtBuf4gkUm1Ew72dTEhXBa
-	 mKrOPVtkR5ATvo3p/FZHS+q1ji+LyRr5TGNJKBCTM3gWAH0U6soNJVcMjgv2eJhA+m
-	 +aTajPruzLQkeBcZLdm0gHq9G1Ipv+72SP/3qZgQJ3KpiidC7bHjO+0Et/bjpTUOR9
-	 S1H1zkeyaSRPQ==
-X-Spam-Level: 
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id DB85C6034A;
-	Mon, 24 Mar 2025 17:49:11 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1742834952;
-	bh=GGDJ9ToJtDJw+S47TSdM9cpM1oN2wQQEXFzOumVzNjU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DCPnz+GjATTwDRX3cEAXYvzpHMgEbhxo+Um4+G4iZp77oga/M9H5MquqVeX/BV9IY
-	 KBZNU0v6OevhOTNQ3Zt+sPKh3MbwtFLMevwQc7cFBfhhymq0TR+bZ2u+knkWHspR4D
-	 FjNxNetEur4h+TmKXvzrUWhyyFKZ99Fcf0W3w6sTMgrrEbNKJEl3X4rhs+VPAEEigu
-	 NhJNR9cQ37cusjxHiPxAqgV2ODW4wl3GVVmq/ey9BgQAWCOgrALHDvsz87SUcheLH2
-	 6ZOb5qYNROVcBaoqnRK5zV1FTYqtwHgPv5JjHiun/ZZ6xcOvlRS4hnOlzdsn3c215i
-	 ncHJcpfKEceYw==
-Date: Mon, 24 Mar 2025 17:49:09 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, cgroups@vger.kernel.org,
-	Jan Engelhardt <ej@inai.de>, Florian Westphal <fw@strlen.de>
-Subject: Re: [PATCH v2] netfilter: Make xt_cgroup independent from net_cls
-Message-ID: <Z-GNBeCX0dg-rxgQ@calendula>
-References: <20250305170935.80558-1-mkoutny@suse.com>
- <Z9_SSuPu2TXeN2TD@calendula>
- <rpu5hl3jyvwhbvamjykjpxdxdvfmqllj4zyh7vygwdxhkpblbz@5i2abljyp2ts>
+	b=Hxh3QdHT5lGrfegiiY3gO68vnWne8KMHe6ib8RswohJzCcL1xbIT8W3oBRdaQlKci
+	 aRxuyVj+M5k+C3uSgPyhjBWtA+5Wt2qM62GatxXL91HxexuDN/oaytlXu8ddrKKtx/
+	 n0rPETwF0AClLxL8azSFpOrbLPpZkAskq6f5bFzdCFA7aJpewB00SV/D1diuV4waU+
+	 QXxi+pkmB/zR2PSjm2MrLhAdV2iJkS/CJOmPOTElWRjK31KGQTigfbsWyIstguz3JE
+	 KozBWBQl2bRSLrkIi2KKD7K8SJRXR5S1FCKq9mfCMLAXGuo/73I2z2WCfIcNYNSTHa
+	 5E1MBw6mbrS3g==
+Date: Mon, 24 Mar 2025 16:50:49 +0000
+From: Simon Horman <horms@kernel.org>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com,
+	osk@google.com, Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
+	Somnath Kotur <somnath.kotur@broadcom.com>
+Subject: Re: [PATCH net 1/2] bnxt_en: Mask the bd_cnt field in the TX BD
+ properly
+Message-ID: <20250324165049.GG892515@horms.kernel.org>
+References: <20250321211639.3812992-1-michael.chan@broadcom.com>
+ <20250321211639.3812992-2-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <rpu5hl3jyvwhbvamjykjpxdxdvfmqllj4zyh7vygwdxhkpblbz@5i2abljyp2ts>
+In-Reply-To: <20250321211639.3812992-2-michael.chan@broadcom.com>
 
-On Mon, Mar 24, 2025 at 01:56:07PM +0100, Michal Koutný wrote:
-> Hello Pablo.
+On Fri, Mar 21, 2025 at 02:16:38PM -0700, Michael Chan wrote:
+> The bd_cnt field in the TX BD specifies the total number of BDs for
+> the TX packet.  The bd_cnt field has 5 bits and the maximum number
+> supported is 32 with the value 0.
 > 
-> On Sun, Mar 23, 2025 at 10:20:10AM +0100, Pablo Neira Ayuso <pablo@netfilter.org> wrote:
-> > why classid != 0 is accepted for cgroup_mt_check_v0()?
+> CONFIG_MAX_SKB_FRAGS can be modified and the total number of SKB
+> fragments can approach or exceed the maximum supported by the chip.
+> Add a macro to properly mask the bd_cnt field so that the value 32
+> will be properly masked and set to 0 in the bd_cnd field.
 > 
-> It is opposite, only classid == 0 is accepted (that should be same for
-> all of v0..v2). (OTOH, there should be no change in validation with
-> CONFIG_CGROUP_NET_CLASSID.)
-
-Thanks for clarifying this, more questions below.
-
-> > cgroup_mt_check_v0 represents revision 0 of this match, and this match
-> > only supports for clsid (groupsv1).
-> > 
-> > History of revisions of cgroupsv2:
-> > 
-> > - cgroup_mt_check_v0 added to match on clsid (initial version of this match)
-> > - cgroup_mt_check_v1 is added to support cgroupsv2 matching 
-> > - cgroup_mt_check_v2 is added to make cgroupsv2 matching more flexible
->  
-> > I mean, if !IS_ENABLED(CONFIG_CGROUP_NET_CLASSID) then xt_cgroup
-> > should fail for cgroup_mt_check_v0.
+> Without this patch, the out-of-range bd_cnt value will corrupt the
+> TX BD and may cause TX timeout.
 > 
+> The next patch will check for values exceeding 32.
 > 
-> I considered classid == 0 valid (regardless of CONFIG_*) as counterpart
-> to implementation of sock_cgroup_classid() that collapses to 0 when
-> !CONFIG_CGROUP_NET_CLASSID (thus at least rules with classid=0 remain
-> acceptable).
+> Fixes: 3948b05950fd ("net: introduce a config option to tweak MAX_SKB_FRAGS")
+> Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+> Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 
-That is, 0 is the default value when !CONFIG_CGROUP_NET_CLASSID.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-> > But a more general question: why this check for classid == 0 in
-> > cgroup_mt_check_v1 and cgroup_mt_check_v2?
-> 
-> cgroup_mt_check_v1 is for cgroupv2 OR classid matching. Similar with
-> cgroup_mt_check_v2.
-
-Yes, and cgroup_mt_check_v0 only supports for classid matching.
-
-> IOW, all three versions accept classid=0 with !CONFIG_CGROUP_NET_CLASSID
-> equally because that is the value that sockets reported classid falls
-> back to.
-
-If !CONFIG_CGROUP_NET_CLASSID, then no classid matching is possible.
-
-So why allow a rule to match on cgroup with classid == 0?
-
-Maybe simply do this instead?
-
-static bool possible_classid(u32 classid)
-{
-       return IS_ENABLED(CONFIG_CGROUP_NET_CLASSID);
-}
-
-Thanks.
 
