@@ -1,112 +1,223 @@
-Return-Path: <netdev+bounces-177268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F38EDA6E6F4
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 23:59:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45BBCA6E72A
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 00:15:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D54AC16ABEB
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 22:59:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBC2E1898829
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 23:16:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EF7A1DE4D6;
-	Mon, 24 Mar 2025 22:59:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 852FC1DDC3E;
+	Mon, 24 Mar 2025 23:15:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kvgPWPRc"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="XFNswi0h"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C391198A34;
-	Mon, 24 Mar 2025 22:59:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 537E719C55E
+	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 23:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742857193; cv=none; b=FaPSe23ou30lB53ANY0e/FJYIZ4k4sf7JemGs34N6arH0aOnbCAcApYae43pPE+vfKoxkVn4AjNEFsE+gC7ZFmMxsCNrfY+c1OoEub9AfoWdkD6Eu0GRHrOg2SNY3jH01VnL3tFMbxpfYW/AY4A4hZ9rBHm2SJ1wPkIOYIDoJwI=
+	t=1742858155; cv=none; b=IXT7ZSNkfY2Nno3IBprJXGrF7G+59hKB2gGtm9SQK3nhcu+m5tSLEUK51f+bU6dZccduvO36x+pJ90DliN576K5vNrQ/o4MWS4aoLBre+8kHE6RQwL9WiG7+FW9pap01IkcIle2e60WuOSMMwY+SQ+f94RB0FaLSyFsw681CY9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742857193; c=relaxed/simple;
-	bh=Lw1mP4qAeaD2JWWbT/o7f/jVHtDLVrGkTT7I1/dyG1A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QbD3CNdzw42mLaz/rAvA4hUm0fva3wA1OORWSUzUlNkZwrrONIscvAYQG0bp6hqJxIFgF61CZqKQCS3dugEgNhfgQhmKbqM73+qoxk3jShgqJMrsaFE6Tc2khme5z2+LYhnCV6KJ14Yynft40wO0evrH4a4suAhNJVFGnWY7CEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kvgPWPRc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1063C4CEF0;
-	Mon, 24 Mar 2025 22:59:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742857192;
-	bh=Lw1mP4qAeaD2JWWbT/o7f/jVHtDLVrGkTT7I1/dyG1A=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=kvgPWPRcCAwczrYTg8HGdP9ePFv0PUMVMuiEiNTNBR6BagvCuXvhR8IwKaWnDyueA
-	 CqOQ1FAfY3znCDXqVmMxVTcDf+Mj9r7oXP9qIuQSq6ODFViw6fyqqQFZlBq3Wk84ML
-	 GuH4WqrqCKcMF1hItKbNJFHn+nHfkfVnzgWCEuugSG38PzZx1DlMck2TXf57CvyKZ7
-	 48uUi/LbipSHxBT8JK4fsqHZoIr07kjWT/oQx2VZWXeVtJQrrnvlK8U77ikuZPPrw2
-	 crgLVAI1xUj1LZSTa+7vX3QKEszseKJH9lDTsus8JdombMXir9gX7udJSBWXy0OZiX
-	 GTWYCU8z8BZAA==
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5e60cfef9cfso7384943a12.2;
-        Mon, 24 Mar 2025 15:59:52 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUjLK1QykkOH1bBS4H+3eJS35Bt20MTXB11UqwUeXj3Cu6bowEG2Xa+TwGLY+wlGawJ135fyXHEJw6tl2My@vger.kernel.org, AJvYcCVqGio8g587gbSRl8K9TBoXMwO3itOgl7bbak4t/+VYq0znrwe0pYGBNfZwiQfyzzEnsRI5QxeWctquiVHUcw4=@vger.kernel.org, AJvYcCW20IMCF++9h1mR3/jDPQaE/jqCRilwOK+OpuvQLYurwYGb98BjjdH7kauqnlgULrjpUSuRTSLBrOmEZjZtkQ==@vger.kernel.org, AJvYcCWMnE4qHNf07O2pPvt7FZYEGalkhCqoXcYMlIp6nR1b1oCG7mzRWTbU4MYWTRvtVy5PxKD+84XD@vger.kernel.org, AJvYcCWSYXFVHEWLNXUkfupe65Plc3GK7fLsivBoA0POroTTqxekuk7BTP1HYGcHZ4W5IfXCAohZA1yexo8XuvZIBuY=@vger.kernel.org, AJvYcCWel3+sfxmz1ZwITc674B/3zkEod87Kzou5qpIGIfUriNvUjHLoiAlaHEVgQZQWslQf1NGr0/DtIpB+kw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yze+TPpx4XP5yO/9BzmRuaKTVBBrTwTS5z25DpkUZdEu+78bMwH
-	WE8mDdsNpjVhdVXXHkpqVJ7e6Y+8idm+TVrSd47+LQdWvWuhRcVQdXYkaTFTH7ezOU+sRadf2hV
-	ek1yGG57glbtLoguKCd2Z9fcEsw==
-X-Google-Smtp-Source: AGHT+IGMI1Cl7DYidw+DSHuEV1LN/O9iU02wqw1tml5Iu5KEnu3G+HWexYp+f0u6TjbJC81n8Ym/RO+LHqMzqmOjC8w=
-X-Received: by 2002:a05:6402:13d0:b0:5eb:9673:feb with SMTP id
- 4fb4d7f45d1cf-5ebcd4f8250mr12537192a12.25.1742857191292; Mon, 24 Mar 2025
- 15:59:51 -0700 (PDT)
+	s=arc-20240116; t=1742858155; c=relaxed/simple;
+	bh=GO1ebrwdo1FSnwAlc77xXljzTyj9DumIqG0Jkgk/tts=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JRzQdfv0V42u5b9V6DTI8CLU+ZWEVVYAdfrOYHG1Ur1VvmInM7fJs60608NhZJ7BpqiosARz7MOskfMF8/g9RMskHiJWrvEkNnIrqWjk8EYIBxeqxsxacrKjHoxkap3dfwBQ7pYTtwCC0S7NdjXHVgBbtuGAHofG/kA/dn4LNTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=XFNswi0h; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5e5c7d6b96fso8910166a12.3
+        for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 16:15:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1742858151; x=1743462951; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=AgmGWXv0jfr3GGGkNjNS9jTuUghBVCf1z+AneBJm0qw=;
+        b=XFNswi0hf96Tq8rtuwMpIDOv6lUZUk4nDhOm+EsRRaYPRlWs0nuuvHj5IHpug8kYcm
+         0R2xZOH4zU0IzHP+wTCmpOo0RWV1DZa/TTvJh6/Ni3o8sg6NA9vRNq3aNDQY9zcvdqrg
+         oCx5HGOd93n62bEUMp+fdA6EViq3rm6b/IXHPAc4FgMERza4wHDDYUbc8L7XUEiRMfb/
+         EdyQRrih9lS35T8s12imovs3HY55rfx7RI7emSk5a2ax3/JWw4F8yEArMMhqNZ3adj95
+         ssqKQBw7mwCVutDvh8rdK1BrpelPyFoPW9e3QyWkpBdDXNdAmGBkV0VTV1wn1BE4fU6t
+         qJ0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742858151; x=1743462951;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AgmGWXv0jfr3GGGkNjNS9jTuUghBVCf1z+AneBJm0qw=;
+        b=aD2sq8p6GRSs/SOfpaSHFV4YkUqQQBFi2hu97XLki+PcZlnV3FyYjr6x6L+AWBcyhb
+         cwF2npJVDAnfctcvDZgI161nZFDlInPfCI5+VZ/SwNx5klKNFRoRW7Pg12StIfeCszxM
+         m/DJjh3nrYS4CR6QulWuoXc6m6w3wQObVCd8D6yWbbSQxrIhmJeM2X7ztbLmjsyURNZG
+         mNwLG5H/NuQjVbnTD6LrQBR8uC+nWNYP6W0p8POd4AffMynLyKpH2xvr1yY8bZ0AHmK2
+         6Lw3xC0Bw6E050yZDGG/KDzJNKzS3E1sNegB6udDkIlLxdMe0woy0qn0L3jCWPi9iu7t
+         SiZA==
+X-Gm-Message-State: AOJu0Yz9jUsylk9YeAkdtY9QVusCiljv/3MSATRAuf4PrxWPGvVDlq7b
+	QEBIahsh2/T4jzSKiMKiL2RD9wOO7M0LAr5r/SnM85GnhRrmysbI6Bj7j+bpToMw904ePQN7r4/
+	BXlZwH8QpqOBmV+F5bly5wmBEjx4wOouisPSCyJ4szEaYZ7A=
+X-Gm-Gg: ASbGncvcJcwG7aYpj9VN8yWMPu1RB8PbkBxGIcbGagZJI9X53uSGNBKXGBUBhQ4odU5
+	XCE71Yr216bbUte05wXBMMpvIdSHywbjCN5m5nO/G5mz/OD74WBapHFk93aBOSpUey5TbUEueoB
+	3JTrjiULr2b9P0yqCBMRBpsWqOxc8jVn4FdsBQxcRTaB33JMdZE6jdmTMLZ78S5lQ4VYofr+I2u
+	msHzxM5FwZ8hBO1mZnJDvEtBrbBHIiXZDQyXE5eUYJe5qMLjbbptvT9tjkxbyMfiC7fTu/LhKRR
+	n3wcfy/ok4N/dNadlygPvbVVYxgadG9/uyUEZJeO7symgJiT8htLfn5M1TDO1caQIxSHTDty/8F
+	3LTuWtjvQCNCr9CrRRA==
+X-Google-Smtp-Source: AGHT+IEt17iZNpdcR6SgMxLlZ4A8lGTl/ZXe0zo6nF6crB1UEU2qqCrAEPEV0yeB8qVk2vqUoQE1qw==
+X-Received: by 2002:a05:6402:2355:b0:5e5:bdfe:6bfb with SMTP id 4fb4d7f45d1cf-5ebcd467233mr13717191a12.16.1742858151435;
+        Mon, 24 Mar 2025 16:15:51 -0700 (PDT)
+Received: from ?IPV6:2001:67c:2fbc:1:a58e:e6d3:e372:ec08? ([2001:67c:2fbc:1:a58e:e6d3:e372:ec08])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5ebcd0e040dsm6680087a12.72.2025.03.24.16.15.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Mar 2025 16:15:51 -0700 (PDT)
+Message-ID: <86fea40c-6b8b-4ac3-bb14-4a24c63cf167@openvpn.net>
+Date: Tue, 25 Mar 2025 00:15:48 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250324-dt-bindings-network-class-v5-0-f5c3fe00e8f0@ixit.cz> <20250324-dt-bindings-network-class-v5-1-f5c3fe00e8f0@ixit.cz>
-In-Reply-To: <20250324-dt-bindings-network-class-v5-1-f5c3fe00e8f0@ixit.cz>
-From: Rob Herring <robh@kernel.org>
-Date: Mon, 24 Mar 2025 17:59:40 -0500
-X-Gmail-Original-Message-ID: <CAL_JsqJt-3mA4mnfMkS10pbPoAPKJ=Q4P3r0P0fzTZDLX+H5NA@mail.gmail.com>
-X-Gm-Features: AQ5f1Jol00ghFWSCxCHKge5D28bVFmC4YsOFGlu-gViPVE2B_vZ9pKfwkJkFqNk
-Message-ID: <CAL_JsqJt-3mA4mnfMkS10pbPoAPKJ=Q4P3r0P0fzTZDLX+H5NA@mail.gmail.com>
-Subject: Re: [PATCH v5 1/5] dt-bindings: net: Add network-class schema for
- mac-address properties
-To: david@ixit.cz
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Mailing List <devicetree-spec-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, 
-	Johannes Berg <johannes@sipsolutions.net>, Lorenzo Bianconi <lorenzo@kernel.org>, 
-	van Spriel <arend@broadcom.com>, =?UTF-8?B?SsOpcsO0bWUgUG91aWxsZXI=?= <jerome.pouiller@silabs.com>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Andy Gross <agross@kernel.org>, Mailing List <devicetree-spec@vger.kernel.org>, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, Janne Grunau <j@jannau.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v24 18/23] ovpn: implement peer
+ add/get/dump/delete via netlink
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
+References: <20250318-b4-ovpn-v24-0-3ec4ab5c4a77@openvpn.net>
+ <20250318-b4-ovpn-v24-18-3ec4ab5c4a77@openvpn.net> <Z-E4i587M54Os5Yo@krikkit>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <Z-E4i587M54Os5Yo@krikkit>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 24, 2025 at 12:41=E2=80=AFPM David Heidelberg via B4 Relay
-<devnull+david.ixit.cz@kernel.org> wrote:
->
-> From: Janne Grunau <j@jannau.net>
->
-> The ethernet-controller schema specifies "mac-address" and
-> "local-mac-address" but other network devices such as wireless network
-> adapters use mac addresses as well.
-> The Devicetree Specification, Release v0.3 specifies in section 4.3.1
-> a generic "Network Class Binding" with "address-bits", "mac-address",
-> "local-mac-address" and "max-frame-size". This schema specifies the
-> "address-bits" property and moves the remaining properties over from
-> the ethernet-controller.yaml schema.
->
-> The "max-frame-size" property is used to describe the maximal payload
-> size despite its name. Keep the description from ethernet-controller
-> specifying this property as MTU. The contradictory description in the
-> Devicetree Specification is ignored.
->
-> Signed-off-by: Janne Grunau <j@jannau.net>
-> Signed-off-by: David Heidelberg <david@ixit.cz>
-> ---
->  .../bindings/net/ethernet-controller.yaml          | 25 +-----------
->  .../devicetree/bindings/net/network-class.yaml     | 46 ++++++++++++++++=
-++++++
->  2 files changed, 47 insertions(+), 24 deletions(-)
+On 24/03/2025 11:48, Sabrina Dubroca wrote:
+> Hello Antonio,
+> 
+> A few questions wrt the API:
+> 
+> 2025-03-18, 02:40:53 +0100, Antonio Quartulli wrote:
+>> +static bool ovpn_nl_attr_sockaddr_remote(struct nlattr **attrs,
+>> +					 struct sockaddr_storage *ss)
+>> +{
+>> +	struct sockaddr_in6 *sin6;
+>> +	struct sockaddr_in *sin;
+>> +	struct in6_addr *in6;
+>> +	__be16 port = 0;
+>> +	__be32 *in;
+>> +
+>> +	ss->ss_family = AF_UNSPEC;
+>> +
+>> +	if (attrs[OVPN_A_PEER_REMOTE_PORT])
+>> +		port = nla_get_be16(attrs[OVPN_A_PEER_REMOTE_PORT]);
+> 
+> What's the expected behavior if REMOTE_PORT isn't provided? We'll send
+> packets do port 0 (which I'm guessing will get dropped on the other
+> side) until we get a message from the peer and float sets the correct
+> port/address?
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+I have never seen a packet going out with port 0 :)
+But being dropped is most likely what's going to happen.
+
+I'd say this is not something that we expect the user to do:
+if the remote address if specified, the user should specify a non-zero 
+port too.
+
+We could add a check to ensure that a port is always specified if the 
+remote address is there too, just to avoid the user to shoot himself in 
+the foot.
+But we expect the user to pass an addr:port where the peer is listening 
+to (and that can't be a 0 port).
+
+> 
+> 
+>> +static int ovpn_nl_peer_modify(struct ovpn_peer *peer, struct genl_info *info,
+>> +			       struct nlattr **attrs)
+>> +{
+> [...]
+>> +	/* when setting the keepalive, both parameters have to be configured */
+>> +	if (attrs[OVPN_A_PEER_KEEPALIVE_INTERVAL] &&
+>> +	    attrs[OVPN_A_PEER_KEEPALIVE_TIMEOUT]) {
+>> +		interv = nla_get_u32(attrs[OVPN_A_PEER_KEEPALIVE_INTERVAL]);
+>> +		timeout = nla_get_u32(attrs[OVPN_A_PEER_KEEPALIVE_TIMEOUT]);
+>> +		ovpn_peer_keepalive_set(peer, interv, timeout);
+> 
+> Should we interpret OVPN_A_PEER_KEEPALIVE_INTERVAL = 0 &&
+> OVPN_A_PEER_KEEPALIVE_TIMEOUT == 0 as "disable keepalive/timeout" on
+> an active peer?  And maybe "one set to 0, the other set to some
+> non-zero value" as invalid?  Setting either value to 0 doesn't seem
+> very useful (timeout = 0 will probably kill the peer immediately, and
+> I suspect interval = 0 would be quite spammy).
+> 
+
+Considering "0" as "disable keepalive" is the current intention.
+
+In ovpn_peer_keepalive_work_single() you can see that if either one if 
+0, we just skip the peer:
+
+1217         /* we expect both timers to be configured at the same time,
+1218          * therefore bail out if either is not set
+1219          */
+1220         if (!peer->keepalive_timeout || !peer->keepalive_interval) {
+1221                 spin_unlock_bh(&peer->lock);
+1222                 return 0;
+1223         }
+
+does it make sense?
+
+Regards,
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
+
 
