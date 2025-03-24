@@ -1,126 +1,216 @@
-Return-Path: <netdev+bounces-177197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BA9DA6E3C1
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 20:42:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B630A6E3C4
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 20:44:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 618633AD205
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 19:42:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D98D3ADAB4
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 19:44:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0C1B19E96B;
-	Mon, 24 Mar 2025 19:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB3FD19F135;
+	Mon, 24 Mar 2025 19:44:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A6Jd7D40"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BjlEZubb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 381F77E110;
-	Mon, 24 Mar 2025 19:42:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ADB619CCEA
+	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 19:44:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742845334; cv=none; b=SMua+zPGRcEZ8Zd05kt25i8tlG+QISfU+z8K4StQeTnYKsodJfI/rV5ha6ateIeXbHvOaXQVIZq0sfSf0v/CkbREI3giYGs3XCdLuxf/uLVcSMqAM6NCVmkWuObrs/e7201BPdiHR83kKtAAxvDlZN1aL5YRVuYCW3oQf/XeuJs=
+	t=1742845485; cv=none; b=lHoDDIxL7wu2/l1outrtn6gBxnBmbbx1z4u0160haAxhCDaDM5P+835HYpSkqOlyurvEGxLgEtvOCkboNlq562zRKGy6E+xX0Xd7Dywn07xgaWmC1wfqcxo4wbycjJ7Cp6yAOq9EbAsEcSU3P+tNHdK1mtOHhPzPYt0lfIGd2Ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742845334; c=relaxed/simple;
-	bh=wjvf7dpV0ebRUz1x1lkf8kGSLRI6M0ozndN0RBxrfqE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aQto7IEmzeHO4KchtaSl700sZOCs4yKVzP/gW9We7b2JQC6IZ31p97318Hzo+1K7yCrTI0jXglD2sAqMvOAxcTKxP248m9TwlIsKJGtT58z+TkFI3G4JTzEBHSN5z+ToA3AabZnMDkCpQku/NKRcSgyRd7vnykfKRFo5d2BCLY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A6Jd7D40; arc=none smtp.client-ip=209.85.128.54
+	s=arc-20240116; t=1742845485; c=relaxed/simple;
+	bh=gqxJ+QmzECqRBwn1dO9QjOKCRVypeRIQvkx8F5ivx9U=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=lfEA//kPMkCPfQb1f8DIdml9nNZ73VOII0Ux6KDx5fvFkglx7t/6yYVnyWPLrBa5OlCsU5y8xFZw9jWPhtnmuiLxC/Lr9fgHajJKMu+LEbMKR0YbQs7Mt7+6uCNHdDT0SJ3zpGsqEy2iPBAM6zQMGXY0ZuEyQn5vvddxKfT8gaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BjlEZubb; arc=none smtp.client-ip=209.85.222.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-43d0618746bso32631025e9.2;
-        Mon, 24 Mar 2025 12:42:12 -0700 (PDT)
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7c5b2472969so472862185a.1
+        for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 12:44:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742845331; x=1743450131; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=suij/OW43K54OojlDmuIhXYtdE6GSs8v7t7ioZFap+o=;
-        b=A6Jd7D40ft/DTFaj3CFwgKpPJUBy3lSvDHeDnzFrl5WcbM/5iaTOy20iH363xXPApt
-         owW1tlBspvQw/YPlLW44WpMWWi5n7ZNy3CQVQXaJQDsSKyBUqj69akpJ4mmwBQNsLvvK
-         wXHV0h0F5o3tGuGw9ynszQqJQLzWvergKJLXZTeUL2/H94tJ0JrTWH4MCqWA/7UOj39c
-         yzFjRskpU+tURvELeeGTaFQissF23AK++wGuznDKENp2Q89pRDASDoTXytQHXTR4Z8nl
-         TEI4cA1AYk1xUzxR4C+zd8ECJuTqiYrGuXYM6jnYDGBhtf33Ll+IiRdu1G00FTgbx3S1
-         XL1Q==
+        d=gmail.com; s=20230601; t=1742845482; x=1743450282; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ie6E7R0W1nBrr9w7OifJk+9t+CtBR1LofPT/C5n78X0=;
+        b=BjlEZubboheC3QQf9m9OMA4AHMWdCrSUo426ku7rnJb9T3hT2/YQOQbjor6fYk/yYI
+         k/GNcjhkMjcKRA784NdHrgOt1P+/0SZNOsb0xopk97y/3yKnJfSCuizrfQiIvbXQSpa0
+         gHbdMePd7qLaqxrjYDVlkSbnF9IZ/1R/M/aPYL+xKNVlvZ0O3MX6SM2a7lN/ZSLw68BE
+         fKyDsqvt6XaTEa1tMdFJR77dcmDYLC235kPLHwhll3yXToW2vuzsevvUmvpfQla+kVGC
+         +GYVTMVtqWvA2XErjmuCyal+rlxiF62NvL850ggg0n13hdEZVwjVhsxXAFDPG9/YIIhg
+         o4Rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742845331; x=1743450131;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=suij/OW43K54OojlDmuIhXYtdE6GSs8v7t7ioZFap+o=;
-        b=huWyF7/XfupKXVHUWLXkqkBHoOERefiLyUyotZJpF3aKehGH+TtTGNu1k1QGjj0fe4
-         7Y5rYUuq4w4E+PQ1U84AkmxQh/VNQGLA8Z6giNZnuGEt3oKreSZf4EbOFxaeq0S/dNbZ
-         lFQTGvyqQ1hqUxqIxiNmJeRZpEmITObKam7/sgaNZ2SATqZU2rzmqB8UUKunEyFlps8h
-         7DWR3Y67EVIqENaI16eLAcrtlMb8RbwdpW5MMZlsk8SysiR9IZm7DvSAP+py0z1Od6PG
-         Av4XeJwqyiwOjmXJzk9imjgZ0zphsSvfvF0lTAl1epELAXTfK0yNn9bp1OiMGFCm3QmA
-         vyTg==
-X-Forwarded-Encrypted: i=1; AJvYcCUOAl7VVyPgtsh4DpO4ZDtI8YG7EV1mhpRqkWiAFHWpOXKdqG7U0s0g3ZFmTYA1UlkAxjermzL3DJwoHA==@vger.kernel.org, AJvYcCUnWgNvBAp/TnXu/goDAetLWXb4MQFw1LPBV58iIfdgQigBIZPiqUx/QlghhuNWapppM3nTWTYuRNbHK6w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwEgqmaPcPjwvNvyEdGwERkqu8VFWDNhpuNwesmpMoNk2E5TQzh
-	sCNansNqFwrsSvb37jsm+DzqwKceCQk9g807VyPUaQ0bIBjGc01v
-X-Gm-Gg: ASbGnct7hl7rCjXOfgb1t2N/jFsjO/Qn/2so0Xi/WDsiwm5MEi9/y3e4sd8jmo9WoXu
-	liWBt7Vvl2bpngAzIrM2HNXHX1SkuiLNX1iGeYMZBJ06/h9Rz7Kogy8b/z0L9eHfGS5EfBhFrlc
-	ASvhKVleGUxUnFMb8KrxBcY0cc7px6Mz3r2Be7e1K4BYBi9ovUN8lVtZGt3ytW9yujWHsGe6hoK
-	IaAHe9Ck+Z9Bge+WQFQCouMK2PSA0863R98EuC5maAbEGya9LcrhGRJWGFfodqOqnj+CwfjqFY3
-	43+WeUbpPRMQg9mbA1BVKOBEpwA530xWz4/haBYavBcQHQ==
-X-Google-Smtp-Source: AGHT+IGwh4Xj+BnReKWNtaT8HPJvDc560oL7zLXsu6bA2+6nz0kEmOB+OTqSGwkolim1qSAmJPkItg==
-X-Received: by 2002:a05:600c:1e18:b0:43c:eea9:f45d with SMTP id 5b1f17b1804b1-43d509f64b8mr151515275e9.18.1742845331105;
-        Mon, 24 Mar 2025 12:42:11 -0700 (PDT)
-Received: from qasdev.Home ([2a02:c7c:6696:8300:7409:fa18:11fe:ba2a])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d4fdbcfaasm128315005e9.35.2025.03.24.12.42.10
+        d=1e100.net; s=20230601; t=1742845482; x=1743450282;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ie6E7R0W1nBrr9w7OifJk+9t+CtBR1LofPT/C5n78X0=;
+        b=S5UGGCoC/ABkDMgheo4KF1zL8HKIr+HkgRWAXDd5U5tYAofSpxnzSGoLWMsBRH3gpc
+         GBPF86zPaewCNf4U3xMVLEkD0glsxZdjC2De7+4oVya+N1IEJTsn3y1F2YWUeZwT8+p/
+         LfJqG7D1r4vdM0MtKxrQuxa5f8FQ5o91BYSyNx8v6QqKe0myfOilDeEctrkwiaRCvM0g
+         bm6OEEurseumQdrc7MLCG/VeMspOt/4N9ZMFM57qdfNGuk81phyvim5B/VeH9CVpWZOy
+         dMKL8YJj+GpktMigGbvguh3p646SafUvdKng2umfduKs8orezHrUnS5zGrpiILw6AJw+
+         sy7w==
+X-Forwarded-Encrypted: i=1; AJvYcCVulZK7A9sB7JhkQwlnu1pZ7dpp6ey2QUetqWhk3jO6ZJxeMLBONd5eemM85x71iJKF0c+RreA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPY6zImB3nhUgfk6asRfOy77VBnP6kVbEssd6FM62pcfZCpRxm
+	dwPaI6mkYEFMnH12Tbzc40V/WhMVqe1ZtCPZacly47MpyjWOKm1k
+X-Gm-Gg: ASbGnctUA6cWnCANhyRDvc3M//fYLT2nbXOG5majSyIPKH5O32T5bG9KMroLGRfId5g
+	JCJDjjYj+kVG2KnIouiO1cHebFBEKhDe8vFrj8bXN70s4vHqku8KwydJIixo2B6RFgbgaYuvlwS
+	yhaJwvRy3hku7oTn+uqui8GmEEh3iPtg2440sbUG1cR1rStejezlwBXKdweSYvRIkZXJ/ecrOgo
+	4s32IAswhpyeX2WhskEX3x73FAY5+/3eSjNorX8dFZoKLBf66wDmvq5OftKJlzBzG8at0OZ1/p+
+	3taZm6G3O9S88suloOy18vo/Vu724+d2YwoMIkydmg3UjgA/YAs4cwyC/vJ3mYgqtviCaeEjgW5
+	yweC6fzIvJsP42s7INpQLdg==
+X-Google-Smtp-Source: AGHT+IHTtnhHjWjwx7nDp6zGotRmxgdnhPDtobQU5M6dYPzdHSQ5evgOUetbG1cOwmGZdJjYffyhxg==
+X-Received: by 2002:a05:620a:1b94:b0:7c5:4bb7:8e45 with SMTP id af79cd13be357-7c5ba1ee8f9mr2107211185a.40.1742845481724;
+        Mon, 24 Mar 2025 12:44:41 -0700 (PDT)
+Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4771d17ef03sm50696751cf.32.2025.03.24.12.44.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Mar 2025 12:42:10 -0700 (PDT)
-From: Qasim Ijaz <qasdev00@gmail.com>
-To: saeedm@nvidia.com,
-	leon@kernel.org,
-	tariqt@nvidia.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kliteyn@nvidia.com
-Cc: netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net/mlx5: DR, remove redundant object_range assignment
-Date: Mon, 24 Mar 2025 19:41:59 +0000
-Message-Id: <20250324194159.24282-1-qasdev00@gmail.com>
-X-Mailer: git-send-email 2.39.5
+        Mon, 24 Mar 2025 12:44:41 -0700 (PDT)
+Date: Mon, 24 Mar 2025 15:44:40 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, 
+ willemdebruijn.kernel@gmail.com
+Cc: davem@davemloft.net, 
+ dsahern@kernel.org, 
+ edumazet@google.com, 
+ horms@kernel.org, 
+ kuba@kernel.org, 
+ kuni1840@gmail.com, 
+ kuniyu@amazon.com, 
+ netdev@vger.kernel.org, 
+ pabeni@redhat.com
+Message-ID: <67e1b628df780_35010c2948d@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250324181116.45359-1-kuniyu@amazon.com>
+References: <67e17365461e3_2f6623294ea@willemb.c.googlers.com.notmuch>
+ <20250324181116.45359-1-kuniyu@amazon.com>
+Subject: Re: [PATCH v1 net 1/3] udp: Fix multiple wraparounds of
+ sk->sk_rmem_alloc.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-The initial assignment of object_range from
-pool->dmn->info.caps.log_header_modify_argument_granularity is
-redundant because it is immediately overwritten by the max_t() call. 
+Kuniyuki Iwashima wrote:
+> From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+> Date: Mon, 24 Mar 2025 10:59:49 -0400
+> > Kuniyuki Iwashima wrote:
+> > > __udp_enqueue_schedule_skb() has the following condition:
+> > > 
+> > >   if (atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf)
+> > >           goto drop;
+> > > 
+> > > sk->sk_rcvbuf is initialised by net.core.rmem_default and later can
+> > > be configured by SO_RCVBUF, which is limited by net.core.rmem_max,
+> > > or SO_RCVBUFFORCE.
+> > > 
+> > > If we set INT_MAX to sk->sk_rcvbuf, the condition is always false
+> > > as sk->sk_rmem_alloc is also signed int.
+> > > 
+> > > Then, the size of the incoming skb is added to sk->sk_rmem_alloc
+> > > unconditionally.
+> > > 
+> > > This results in integer overflow (possibly multiple times) on
+> > > sk->sk_rmem_alloc and allows a single socket to have skb up to
+> > > net.core.udp_mem[1].
+> > > 
+> > > For example, if we set a large value to udp_mem[1] and INT_MAX to
+> > > sk->sk_rcvbuf and flood packets to the socket, we can see multiple
+> > > overflows:
+> > > 
+> > >   # cat /proc/net/sockstat | grep UDP:
+> > >   UDP: inuse 3 mem 7956736  <-- (7956736 << 12) bytes > INT_MAX * 15
+> > >                                              ^- PAGE_SHIFT
+> > >   # ss -uam
+> > >   State  Recv-Q      ...
+> > >   UNCONN -1757018048 ...    <-- flipping the sign repeatedly
+> > >          skmem:(r2537949248,rb2147483646,t0,tb212992,f1984,w0,o0,bl0,d0)
+> > > 
+> > > Previously, we had a boundary check for INT_MAX, which was removed by
+> > > commit 6a1f12dd85a8 ("udp: relax atomic operation on sk->sk_rmem_alloc").
+> > > 
+> > > A complete fix would be to revert it and cap the right operand by
+> > > INT_MAX:
+> > > 
+> > >   rmem = atomic_add_return(size, &sk->sk_rmem_alloc);
+> > >   if (rmem > min(size + (unsigned int)sk->sk_rcvbuf, INT_MAX))
+> > >           goto uncharge_drop;
+> > > 
+> > > but we do not want to add the expensive atomic_add_return() back just
+> > > for the corner case.
+> > > 
+> > > So, let's perform the first check as unsigned int to detect the
+> > > integer overflow.
+> > > 
+> > > Note that we still allow a single wraparound, which can be observed
+> > > from userspace, but it's acceptable considering it's unlikely that
+> > > no recv() is called for a long period, and the negative value will
+> > > soon flip back to positive after a few recv() calls.
+> > 
+> > Can we do better than this?
+> 
+> Another approach I had in mind was to restore the original validation
+> under the recvq lock but without atomic ops like
+> 
+>   1. add another u32 as union of sk_rmem_alloc (only for UDP)
+>   2. access it with READ_ONCE() or under the recvq lock
+>   3. perform the validation under the lock
+> 
+> But it requires more changes around the error queue handling and
+> the general socket impl, so will be too invasive for net.git but
+> maybe worth a try for net-next ?
 
-Remove the unnecessary assignment.
+Definitely not net material. Adding more complexity here
+would also need some convincing benchmark data probably.
 
-Signed-off-by: Qasim Ijaz <qasdev00@gmail.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_arg.c | 3 ---
- 1 file changed, 3 deletions(-)
+> 
+> > Is this because of the "Always allow at least one packet" below, and
+> > due to testing the value of the counter without skb->truesize added?
+> 
+> Yes, that's the reason although we don't receive a single >INT_MAX
+> packet.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_arg.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_arg.c
-index 01ed6442095d..c2218dc556c7 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_arg.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_arg.c
-@@ -39,9 +39,6 @@ static int dr_arg_pool_alloc_objs(struct dr_arg_pool *pool)
- 
- 	INIT_LIST_HEAD(&cur_list);
- 
--	object_range =
--		pool->dmn->info.caps.log_header_modify_argument_granularity;
--
- 	object_range =
- 		max_t(u32, pool->dmn->info.caps.log_header_modify_argument_granularity,
- 		      DR_ICM_MODIFY_HDR_GRANULARITY_4K);
--- 
-2.39.5
+I was surprised that we don't take the current skb size into
+account when doing this calculation.
+
+Turns out that this code used to do that.
+
+commit 363dc73acacb ("udp: be less conservative with sock rmem
+accounting") made this change:
+
+-       if (rmem && (rmem + size > sk->sk_rcvbuf))
++       if (rmem > sk->sk_rcvbuf)
+                goto drop;
+
+The special consideration to allow one packet is to avoid starvation
+with small rcvbuf, judging also from this review comment:
+
+https://lore.kernel.org/netdev/1476938622.5650.111.camel@edumazet-glaptop3.roam.corp.google.com/
+
+That clearly doesn't apply when rcvbuf is near INT_MAX.
+Can we separate the tiny budget case and hard drop including the
+skb->truesize for normal buffer sizes?
+
+> 
+> > 
+> >         /* Immediately drop when the receive queue is full.
+> >          * Always allow at least one packet.
+> >          */
+> >         rmem = atomic_read(&sk->sk_rmem_alloc);
+> >         rcvbuf = READ_ONCE(sk->sk_rcvbuf);
+> >         if (rmem > rcvbuf)
+> >                 goto drop;
+
 
 
