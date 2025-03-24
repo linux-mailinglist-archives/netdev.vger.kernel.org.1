@@ -1,80 +1,165 @@
-Return-Path: <netdev+bounces-177172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 180BFA6E277
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 19:36:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17E65A6E27E
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 19:37:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF97916DE06
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 18:35:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C825E188E095
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 18:36:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1760D264F8B;
-	Mon, 24 Mar 2025 18:34:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BC95264FA9;
+	Mon, 24 Mar 2025 18:36:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C1ndWjuC"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="O1ktSCBf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE09F26136E;
-	Mon, 24 Mar 2025 18:34:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63B2C264F84;
+	Mon, 24 Mar 2025 18:36:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742841294; cv=none; b=eT9qutuFfltrTkCOEiAD3fZod6C7vFJoGN6BQ9Qbq/XK/toXgc6byUqb/a1+NQLZ21reHrYmXnWrAB6Xay4WBgD1xQ8odgjmihXZxtUq5j2JjkpTmj2rFhtxnLwSxnrjIg73DL9IUr85hv8DTddpeGvWQMIAU14gEd5YxtOQLGg=
+	t=1742841390; cv=none; b=W0BvPYv0eF76wl6ZzrIdQE+6iyyv6jUgulSk6ODvl3jg6pcVjFnY9d+lm+f0jPQePtwTDcDq1pt4/HT9YrjxK6B59tiO3PsSmSXR8DieSjnFDb+FHh/rJ7FRfP/ZHLpRFP9psrBoKL2slx5KMv+24EKGGQOxhv9hcrLAA047P2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742841294; c=relaxed/simple;
-	bh=y0BX7r8ryEWjMxOOO9xrdurEHkOyQxtBaLfq3+2msBM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ye8WxbRUsLL+cLokncJrgwgM6WA0QWITeYGIj8E1FKZNkbgIU/5OzRSzMZ0sA0SavqIaqN+KD3zeJI/fyusEmWwNibjO3Heq752JbUxm5EMT6xFA5iWd1f488noSuZCjzp/LDOtqVRQkwlD5gGhguPvnAi5XgffDShrTOu5Kh8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C1ndWjuC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7E7DC4CEDD;
-	Mon, 24 Mar 2025 18:34:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742841292;
-	bh=y0BX7r8ryEWjMxOOO9xrdurEHkOyQxtBaLfq3+2msBM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=C1ndWjuCBM1XTyGk+PbUv3bAeqUBsI3f24qAxf75F3b2S0gBLd/gxLK1M8CTwycGR
-	 EGEq+rV4FcPUlMjmWU4JOpNtB3XdC+BC5Jqn9AAWoZ5lDVqq8C96oFOiv6LAfclzM5
-	 Z2EopyxqpZmamZ0gLvM6yuMsAzi8tCP7HkvlvRs9ytQICu82Vq+ySL3Sd7/Xzemijt
-	 qMHfgbc0K18Rxf7iYK4nD0HtFXlIfQcqfY4OUCdg3e006ueekYleJb46lZO21O9bY0
-	 Kv7yZS3Qa03m826wLjqxcA2B7ONVeKA16uJ7ok2OJ6CqFsdByI733foISPHls3XQqG
-	 Sj0nP2/SznzyQ==
-Date: Mon, 24 Mar 2025 11:34:43 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre
- Torgue <alexandre.torgue@foss.st.com>, Ong Boon Leong
- <boon.leong.ong@intel.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-Subject: Re: [PATCH net v2] net: stmmac: Fix accessing freed irq
- affinity_hint
-Message-ID: <20250324113443.215c036f@kernel.org>
-In-Reply-To: <20250318032424.112067-1-dqfext@gmail.com>
-References: <20250318032424.112067-1-dqfext@gmail.com>
+	s=arc-20240116; t=1742841390; c=relaxed/simple;
+	bh=+tHTwQCl+rKNDLbsUQWAeB9cYvBtkmAj1qT/QM8FuTM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hUZnkyZ9Qh2oQ2ctxKJfGtfU+IWZ4wV4KNQHPaTutFVMV4zvTThmZ4756VCpc4yvNcAPKH4xl9PPFn3EwRaKd3OBa1Y/A3GYgXP3p5b7r0yVSzo8Nvgo13/KHGjNv6l2SQpEzFWT4PZfcz9IkMeiPkjcEN1x3niMJOtrxM16ZE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=O1ktSCBf; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=X4F3sqvTWUFr3hm2OdD/nyNotX8RIX6/b7P9siq4rRk=; b=O1
+	ktSCBftk6ilHFHI8FsPU/AMeKO4wrvczxzcGq4nXakKm9e7dUZrW2uwOeycO6IoajlOuCHcT9ITm1
+	CT7GrwHUOAwCtujspynPvj2k6kGpmUDJSLQxtiygO89/y9H7VqqA6JkRwAMraFHOi6pFGb0hgYqCg
+	guyfF9TnKcsQ75s=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1twmec-006y0k-WC; Mon, 24 Mar 2025 19:36:07 +0100
+Date: Mon, 24 Mar 2025 19:36:06 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?Q?Th=E9o?= Lebrun <theo.lebrun@bootlin.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Samuel Holland <samuel.holland@sifive.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>,
+	Gregory CLEMENT <gregory.clement@bootlin.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-mips@vger.kernel.org,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	Tawfik Bayouk <tawfik.bayouk@mobileye.com>
+Subject: Re: [PATCH net-next 07/13] net: macb: move HW IP alignment value to
+ macb_config
+Message-ID: <967fcb66-6a64-4e97-8293-a38b0ef1bc01@lunn.ch>
+References: <20250321-macb-v1-0-537b7e37971d@bootlin.com>
+ <20250321-macb-v1-7-537b7e37971d@bootlin.com>
+ <45b3e613-90c6-4499-b50b-383106172184@lunn.ch>
+ <D8OOPAXK16CI.3TE75O760JRSL@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <D8OOPAXK16CI.3TE75O760JRSL@bootlin.com>
 
-On Tue, 18 Mar 2025 11:24:23 +0800 Qingfang Deng wrote:
-> -		cpumask_clear(&cpu_mask);
-> -		cpumask_set_cpu(i % num_online_cpus(), &cpu_mask);
-> -		irq_set_affinity_hint(priv->rx_irq[i], &cpu_mask);
-> +		irq_set_affinity_hint(priv->rx_irq[i],
-> +				      cpumask_of(i % num_online_cpus()));
+On Mon, Mar 24, 2025 at 06:49:05PM +0100, Théo Lebrun wrote:
+> Hello Andrew,
+> 
+> On Fri Mar 21, 2025 at 10:06 PM CET, Andrew Lunn wrote:
+> > On Fri, Mar 21, 2025 at 08:09:38PM +0100, Théo Lebrun wrote:
+> >> The controller does IP alignment (two bytes).
+> >
+> > I'm a bit confused here. Is this hard coded, baked into the silicon?
+> > It will always do IP alignment? It cannot be turned off?
+> 
+> Yes, the alignment is baked inside the silicon.
+> I looked but haven't seen any register to configure the alignment.
+> 
+> Sorry the commit message isn't clear, it needs improvements.
+> 
+> >> 	skb_reserve(skb, NET_IP_ALIGN);
+> >
+> > Why not just replace this with
+> >
+> >         skb_reserve(skb, 2);
+> 
+> On arm64, NET_IP_ALIGN=0. I don't have HW to test, but the current code
+> is telling us that the silicon doesn't do alignment on those:
 
-This does fix the bug you're targeting, but FWIW num_online_cpus() 
-is not great in general. The online CPU mask can be sparse.
-You may want to look into finding 'nth' online CPU instead of the naive
-modulo as a follow up.
+This is part of the confusion. You say the hardware does alignment,
+and then say it does not....
+
+>    skb = netdev_alloc_skb(...);
+>    paddr = dma_map_single(..., skb->data, ...);
+>    macb_set_addr(..., paddr);
+> 
+>    // arm   => NET_IP_ALIGN=2 => silicon does alignment
+>    // arm64 => NET_IP_ALIGN=0 => silicon doesn't do alignment
+>    skb_reserve(skb, NET_IP_ALIGN);
+> 
+> The platform we introduce is the first one where the silicon alignment
+> (0 bytes) is different from the NET_IP_ALIGN value (MIPS, 2 bytes).
+
+This is starting to make it clearer. So the first statement that the
+controller does IP alignment (two bytes) is not the full story. I
+would start there, explain the full story, otherwise readers get the
+wrong idea.
+
+> >>     Compatible             |  DTS folders              |  hw_ip_align
+> >>    ------------------------|---------------------------|----------------
+> >>    cdns,at91sam9260-macb   | arch/arm/                 | 2
+> >>    cdns,macb               | arch/{arm,riscv}/         | NET_IP_ALIGN
+> >>    cdns,np4-macb           | NULL                      | NET_IP_ALIGN
+> >>    cdns,pc302-gem          | NULL                      | NET_IP_ALIGN
+> >>    cdns,gem                | arch/{arm,arm64}/         | NET_IP_ALIGN
+> >>    cdns,sam9x60-macb       | arch/arm/                 | 2
+> >>    atmel,sama5d2-gem       | arch/arm/                 | 2
+> >>    atmel,sama5d29-gem      | arch/arm/                 | 2
+> >>    atmel,sama5d3-gem       | arch/arm/                 | 2
+> >>    atmel,sama5d3-macb      | arch/arm/                 | 2
+> >>    atmel,sama5d4-gem       | arch/arm/                 | 2
+> >>    cdns,at91rm9200-emac    | arch/arm/                 | 2
+> >>    cdns,emac               | arch/arm/                 | 2
+> >>    cdns,zynqmp-gem         | *same as xlnx,zynqmp-gem* | 0
+> >>    cdns,zynq-gem           | *same as xlnx,zynq-gem*   | 2
+> >>    sifive,fu540-c000-gem   | arch/riscv/               | 2
+> >>    microchip,mpfs-macb     | arch/riscv/               | 2
+> >>    microchip,sama7g5-gem   | arch/arm/                 | 2
+> >>    microchip,sama7g5-emac  | arch/arm/                 | 2
+> >>    xlnx,zynqmp-gem         | arch/arm64/               | 0
+> >>    xlnx,zynq-gem           | arch/arm/                 | 2
+> >>    xlnx,versal-gem         | NULL                      | NET_IP_ALIGN
+
+I'm not sure this table is useful. What might be more interesting is
+
+     Compatible             |  architecture |  hw_ip_align | value of NET_IP_ALIGN
+
+We can then see if there are cases when the 3rd and 4th column differ.
+
+	Andrew
 
