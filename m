@@ -1,160 +1,200 @@
-Return-Path: <netdev+bounces-177127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C603EA6DFED
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 17:39:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CC696A6E004
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 17:41:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91BCD1889353
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 16:39:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86289188F346
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 16:41:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0680262813;
-	Mon, 24 Mar 2025 16:39:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A9E5263C91;
+	Mon, 24 Mar 2025 16:40:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="bS72eUr3"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="juF2w3fy"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC7993FBA7;
-	Mon, 24 Mar 2025 16:39:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 159112638B0
+	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 16:40:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742834354; cv=none; b=BBQAj4bev+8URjmPQBaoMOjkjxxd9WNrg0mxSs2TaEqj3CVVx6ya8hMpesXQLJdsAd0GEIMYrMhOVqqYfRW/tIVL/1+1zXNf4bdXKwSV/a74vqpdWEMMDICQq5FmjlfOQlqlXpXd3V/9tiAlFXzZrZcldXfZDBVZD6hEkFQSpN4=
+	t=1742834446; cv=none; b=RRMM4e5270/zrJuj855roMjZiBnklHoSQxkLg5qOjeKvtiVRmQCA6986akXsaY4XMqNKsxaSWJjhczI941gU4KuXCxJ21Fk2ldUl/mw6+FT0r8Xh6aLgic0qt5CIWmJwLG4rOUibEF/EhbBRTRAeN2/SRBaEiknZ7Ut7PGKL1qg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742834354; c=relaxed/simple;
-	bh=pC30NeT45FvNA5LE4RaH+c4FzFm/glTDXwn8/9BQoV4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MKrmSqFfZybzYoOcoyN3LacuvRLAUo0Ay6+tTol4xFqSDOD9MiKO29nk9yIKspWjaBqLaVh1N00sTyTXoG2lnm6R+cbw88eEeOU2DQmXvWz36aRHV3unauv27whGkuSJJLpFQdwaUUgOAp9XlvGWnFoGFxsEj1UHwOMsDqzeSEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=bS72eUr3; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 049F744522;
-	Mon, 24 Mar 2025 16:39:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1742834350;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Km2Teq2UiJ9T6r73JTHC/jGo8ahaVTtGZ9g3CgWRt0E=;
-	b=bS72eUr3nnbQpQbfzMQBNxFYZccIuCQhDx0EsUxkBzj9+Oe7dKoJnZWibu400zOn1o86pk
-	nyqVjjoqcmPjVtRMA45FPNM52z4IBfN8uLf4JJ2+Sqa5AnyaHsiBj+0dsjWsfJdVLNoRJc
-	2JaadQAkl5iz8LAgSgrRs/73AWW5y+XGPK400mVCDDP1cp2HSWk4dCu79et/+4f2z9BgMm
-	lhzea9bF4ABiBAL6KdP2aFBV4NvJuhKlv0VhZ513S3VYhEyMFj9WflNI45E/SYVJcMqMiw
-	IlOsNsw3BnnGwXf1WgMJE8qjnZpEowCj1uWH5YKR0dD2GH1GwSXBcFCl3c206w==
-Date: Mon, 24 Mar 2025 17:39:07 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Donald Hunter
- <donald.hunter@gmail.com>, Rob Herring <robh@kernel.org>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Liam
- Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, Dent
- Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, Maxime
- Chevallier <maxime.chevallier@bootlin.com>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v6 06/12] net: pse-pd: Add support for budget
- evaluation strategies
-Message-ID: <20250324173907.3afa58d2@kmaincent-XPS-13-7390>
-In-Reply-To: <20250320173535.75e6419e@kmaincent-XPS-13-7390>
-References: <20250304-feature_poe_port_prio-v6-0-3dc0c5ebaf32@bootlin.com>
-	<20250304-feature_poe_port_prio-v6-6-3dc0c5ebaf32@bootlin.com>
-	<Z9gYTRgH-b1fXJRQ@pengutronix.de>
-	<20250320173535.75e6419e@kmaincent-XPS-13-7390>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1742834446; c=relaxed/simple;
+	bh=CoaoaItT6ngOPjWLeVv8s3EE4bnrFax4CzzAt1jbklQ=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=UcnAanB5A+h7XFeRViNFQC1pBTTpowdDG4Qn8V/k+y4oSGc6Nwb72RzpoU2oHSIt9GNsWRAU7ZdUEruHrY0mrthfhD/X/hFLRY82V7774LgJEIBH840ihjeaASNm71LlC6UXx1lSKKpMbRZ8dDXfM3lmC1NFsly3tE2BDt56q/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=juF2w3fy; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=MYyp8xOp5CqL3tk5cl2ZZNgAxtFYffkmMs1CgaTsZaI=; b=juF2w3fyLqp3ZtLtNWSF24YWo2
+	9c1cnybZkIV3Zq+CUyzDjFyj4op7Q25sVIK5/TFjENPEX/7A46imXV9tpDhoCs9LEg/s2hDVx0yIC
+	1wP4PIjfcNYikyWnjRI5rAg1AGbGLmDSN1zNTDjXnT8JRHTnv/4oebfevEWTq4nR0BwKC97zAiBH5
+	0R5rFqU/KjPDtTPRLo15571uoRFCY/NC0c8awKYMPN8hJvja/QW3KVUmjMJxi9vYxVMayY3eaNqcr
+	YtMO5oTKPSWAsn6LQKmeZSAnOycxZZTKlajXpKf9dSZUoShyWC5DvIjyBgkYW8RCACJxwfyq3tUWM
+	abxqCd2g==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:53274 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1twkqu-0003oP-09;
+	Mon, 24 Mar 2025 16:40:40 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1twkqO-0006FI-Gm; Mon, 24 Mar 2025 16:40:08 +0000
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next] net: phylink: force link down on major_config
+ failure
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduiedtvdekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgfdutdefvedtudegvefgvedtgfdvhfdtueeltefffefffffhgfetkedvfeduieeinecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppedvrgdtudemtggsudelmeekheekjeemjedutddtmegvheejsgemudejkeelmeeljeegugemudejheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekheekjeemjedutddtmegvheejsgemudejkeelmeeljeegugemudejhedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdejpdhrtghpthhtohepohdrrhgvmhhpvghlsehpvghnghhuthhrohhnihigrdguvgdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopegurghvvghms
- egurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegtohhrsggvtheslhifnhdrnhgvthdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrsehgmhgrihhlrdgtohhm
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1twkqO-0006FI-Gm@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Mon, 24 Mar 2025 16:40:08 +0000
 
-Hello Kyle, Oleksij,
+If we fail to configure the MAC or PCS according to the desired mode,
+do not allow the network link to come up until we have successfully
+configured the MAC and PCS. This improves phylink's behaviour when an
+error occurs.
 
-On Thu, 20 Mar 2025 17:35:35 +0100
-Kory Maincent <kory.maincent@bootlin.com> wrote:
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/phy/phylink.c | 42 +++++++++++++++++++++++++++++++--------
+ 1 file changed, 34 insertions(+), 8 deletions(-)
 
-> On Mon, 17 Mar 2025 13:40:45 +0100
-> Oleksij Rempel <o.rempel@pengutronix.de> wrote:
->=20
-> > On Tue, Mar 04, 2025 at 11:18:55AM +0100, Kory Maincent wrote: =20
-> > > From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 0f70a7f3dfcc..047ebb5d5f8c 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -83,6 +83,7 @@ struct phylink {
+ 	unsigned int pcs_state;
+ 
+ 	bool link_failed;
++	bool major_config_failed;
+ 	bool mac_supports_eee_ops;
+ 	bool mac_supports_eee;
+ 	bool phy_enable_tx_lpi;
+@@ -1217,12 +1218,16 @@ static void phylink_major_config(struct phylink *pl, bool restart,
+ 		    phylink_an_mode_str(pl->req_link_an_mode),
+ 		    phy_modes(state->interface));
+ 
++	pl->major_config_failed = false;
++
+ 	if (pl->mac_ops->mac_select_pcs) {
+ 		pcs = pl->mac_ops->mac_select_pcs(pl->config, state->interface);
+ 		if (IS_ERR(pcs)) {
+ 			phylink_err(pl,
+ 				    "mac_select_pcs unexpectedly failed: %pe\n",
+ 				    pcs);
++
++			pl->major_config_failed = true;
+ 			return;
+ 		}
+ 
+@@ -1244,6 +1249,7 @@ static void phylink_major_config(struct phylink *pl, bool restart,
+ 		if (err < 0) {
+ 			phylink_err(pl, "mac_prepare failed: %pe\n",
+ 				    ERR_PTR(err));
++			pl->major_config_failed = true;
+ 			return;
+ 		}
+ 	}
+@@ -1267,19 +1273,27 @@ static void phylink_major_config(struct phylink *pl, bool restart,
+ 
+ 	phylink_mac_config(pl, state);
+ 
+-	if (pl->pcs)
+-		phylink_pcs_post_config(pl->pcs, state->interface);
++	if (pl->pcs) {
++		err = phylink_pcs_post_config(pl->pcs, state->interface);
++		if (err < 0) {
++			phylink_err(pl, "pcs_post_config failed: %pe\n",
++				    ERR_PTR(err));
++
++			pl->major_config_failed = true;
++		}
++	}
+ 
+ 	if (pl->pcs_state == PCS_STATE_STARTING || pcs_changed)
+ 		phylink_pcs_enable(pl->pcs);
+ 
+ 	err = phylink_pcs_config(pl->pcs, pl->pcs_neg_mode, state,
+ 				 !!(pl->link_config.pause & MLO_PAUSE_AN));
+-	if (err < 0)
+-		phylink_err(pl, "pcs_config failed: %pe\n",
+-			    ERR_PTR(err));
+-	else if (err > 0)
++	if (err < 0) {
++		phylink_err(pl, "pcs_config failed: %pe\n", ERR_PTR(err));
++		pl->major_config_failed = true;
++	} else if (err > 0) {
+ 		restart = true;
++	}
+ 
+ 	if (restart)
+ 		phylink_pcs_an_restart(pl);
+@@ -1287,16 +1301,22 @@ static void phylink_major_config(struct phylink *pl, bool restart,
+ 	if (pl->mac_ops->mac_finish) {
+ 		err = pl->mac_ops->mac_finish(pl->config, pl->act_link_an_mode,
+ 					      state->interface);
+-		if (err < 0)
++		if (err < 0) {
+ 			phylink_err(pl, "mac_finish failed: %pe\n",
+ 				    ERR_PTR(err));
++
++			pl->major_config_failed = true;
++		}
+ 	}
+ 
+ 	if (pl->phydev && pl->phy_ib_mode) {
+ 		err = phy_config_inband(pl->phydev, pl->phy_ib_mode);
+-		if (err < 0)
++		if (err < 0) {
+ 			phylink_err(pl, "phy_config_inband: %pe\n",
+ 				    ERR_PTR(err));
++
++			pl->major_config_failed = true;
++		}
+ 	}
+ 
+ 	if (pl->sfp_bus) {
+@@ -1640,6 +1660,12 @@ static void phylink_resolve(struct work_struct *w)
+ 		}
+ 	}
+ 
++	/* If configuration of the interface failed, force the link down
++	 * until we get a successful configuration.
++	 */
++	if (pl->major_config_failed)
++		link_state.link = false;
++
+ 	if (link_state.link != cur_link_state) {
+ 		pl->old_link_state = link_state.link;
+ 		if (!link_state.link)
+-- 
+2.30.2
 
-> > > +int pse_ethtool_set_prio(struct pse_control *psec,
-> > > +			 struct netlink_ext_ack *extack,
-> > > +			 unsigned int prio)
-> > > +{
-> > > +	struct pse_controller_dev *pcdev =3D psec->pcdev;
-> > > +	const struct pse_controller_ops *ops;
-> > > +	int ret =3D 0;
-> > > +
-> > > +	if (!pcdev->pi[psec->id].pw_d) {
-> > > +		NL_SET_ERR_MSG(extack, "no power domain attached");
-> > > +		return -EOPNOTSUPP;
-> > > +	}
-> > > +
-> > > +	/* We don't want priority change in the middle of an
-> > > +	 * enable/disable call or a priority mode change
-> > > +	 */
-> > > +	mutex_lock(&pcdev->lock);
-> > > +	switch (pcdev->pi[psec->id].pw_d->budget_eval_strategy) {
-> > > +	case ETHTOOL_PSE_BUDGET_EVAL_STRAT_STATIC:
-> > > +		if (prio > pcdev->nr_lines) {
-> > > +			NL_SET_ERR_MSG_FMT(extack,
-> > > +					   "priority %d exceed priority
-> > > max %d",
-> > > +					   prio, pcdev->nr_lines);
-> > > +			ret =3D -ERANGE;
-> > > +			goto out;
-> > > +		}
-> > > +
-> > > +		pcdev->pi[psec->id].prio =3D prio;   =20
-> >=20
-> > In case we already out of the budget, we will need to re-evaluate the
-> > prios. New configuration may affect state of ports.
-> >
-> > Potentially we may need a bulk interface to assign prios, to speed-up
-> > reconfiguration. But it is not needed right now. =20
->=20
-> Oh indeed, I missed that. /o\
-> I will try to add something but lets keep it not too complex! ^^ Don't ad=
-d me
-> more work!! ;)
-
-Small question on PSE core behavior for PoE users.
-
-If we want to enable a port but we can't due to over budget.
-Should we :
-- Report an error (or not) and save the enable action from userspace. On th=
-at
-  case, if enough budget is available later due to priority change or port
-  disconnected the PSE core will try automatically to re enable the PoE por=
-t.
-  The port will then be enabled without any action from the user.
-- Report an error but do nothing. The user will need to rerun the enable
-  command later to try to enable the port again.
-
-How is it currently managed in PoE poprietary userspace tools?
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
 
