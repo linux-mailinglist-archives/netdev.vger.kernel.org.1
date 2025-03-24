@@ -1,92 +1,85 @@
-Return-Path: <netdev+bounces-177000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5DABA6D345
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 04:15:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17CE0A6D34E
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 04:20:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 967E8188CF8F
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 03:16:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 885F21664A6
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 03:20:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F6FA17C98;
-	Mon, 24 Mar 2025 03:15:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AABC17084F;
+	Mon, 24 Mar 2025 03:20:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FAlnpQjo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fs4RMN9x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2B812E3393;
-	Mon, 24 Mar 2025 03:15:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F46A17C98;
+	Mon, 24 Mar 2025 03:20:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742786153; cv=none; b=CzLlYOlnwFJnZA5Klyrfh+b1z93SFLA1u+T9Zev2Hjiq8tpB4AeQ25WfMUE2efxaCoIExeAxa/ZGFnrR0I11KVsDovhciX4t7e3W/zEwRNjPr9UYEjVk2j8DaFftueitvgkQtkq5Ye7g7eY0AKPZ3Pzx7S2DLHSLc8aWjanPNJ0=
+	t=1742786416; cv=none; b=D1QLK/HkaANeCgufnkgT91PHBfePVSWFEJJpmmA7UiQx8H4SJK8SJBGAKLOWSzlZ2t3wQt8cnFBjZpfSD95rx157JArHzXReKYht2i8IGbOYhDWhwAzKRnjS8EJrdeDflt+C9mJZSpR/+mncl5tWUHPzsq5HqOXk/UcpEYVUry8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742786153; c=relaxed/simple;
-	bh=vJXjiPQclcKJr94KhBV2/PvWFdooNrk6foq0Ulyl4HE=;
+	s=arc-20240116; t=1742786416; c=relaxed/simple;
+	bh=5U2hz6Ps5Y0/LkUJRaC8iNmpBLjaBL4x57nl2s22ReE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qo/omXiEa9a4UfohqCskvopWMvWxAoRKOoHWicLWV6D4Q5z5RoXZpllblOzjyke87+GC8IATQJlyc1OsDL5VRi8noHYeCEg1ynXOze2Ru5MlDbjAxvEnkb0D5AE/2tjPh3rpb7umJCNTu7c2JtqlGNyKhwOd9oxUo4isTpozTXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FAlnpQjo; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2254e0b4b79so56982055ad.2;
-        Sun, 23 Mar 2025 20:15:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742786151; x=1743390951; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nbPO7g2pp562SD8YE2yC6B6rGfgGkiRuF9xabS6hR30=;
-        b=FAlnpQjouTqnKiOCTOK/pdQQCXO1v+yomLdtReHHWDMzLLCwGOiSpl8zskmiPvC9gj
-         WlcqnDQWQvqmWAeMvhbPKRLnxZryDOszwx/canwDFv5tJtGWqIbvXM5k87oQM9DxKaJp
-         ZaztpAivrgk9+fAH9ggnIUh2rIatwKFbCiem/VVbO+2fd5byYvwlyHgcog001mHo+BgX
-         7EwRLS9Lu5s57QqZYC79+6xpdKMM+UQb1NuhblqYif4CPEQDjgZR9CgmeNviCxvUK06e
-         u/0htlJ60a7KOCuFysy0MmAUw+Ok/rF2PUt5/7ssNjHgojtsj+vVdzB3yAajq0fbURN+
-         vOZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742786151; x=1743390951;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nbPO7g2pp562SD8YE2yC6B6rGfgGkiRuF9xabS6hR30=;
-        b=llUPbuAkk6VUTUt3VSSfi8JfuEB+O/bAA8tZmQarkQ4Nk1l8wsSMCxVc0pejuxJ0At
-         13Y2PBU42arJtGNuIoOzWy2l8zaOVGpeivp+EEbt2os+f2ih6LbC14UMN42d9Pz9TAEp
-         VTdLA9qWWXFWDexIj/sllP/Tf5Hzsqvo9+uIZOk7PQyPxUiwilxqcy3AavEqLCl0w4iQ
-         91aVWg5zzfgvbHrAFW/JduCXtoAbzbcQheJNSafQVi3HmwyrcyMwU8aFnVFWlO86vJ7P
-         CWsnT7+NzbzrVH6NvJ+fJxvXydTkAQwyrV4rZFiIddkhYr7wyacLjsx61q9Sc55WV078
-         zIdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVKy+2rru8rxSxp5BDVV7ZbNRvXMjeEp3bxMzG+PmHnAQmxN9+D89BxfOSGlHOufJiaSD4fBPvyXdTEQ10hpccS@vger.kernel.org, AJvYcCXGdQdr7hLXnGkPxSdlr0pezQouBye8OJ0IqEG0K7pezLnUQ2b7Y6FKa6q3D5CivRZJHmMge5ucP87gtu8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YywUjZdikTaju6ToLgHuS/bhRMXn2ZvUZsUAKmtVDR+V/5QLSSk
-	6QNVWF+052w4RQbSOjdI1G+NaNaADw0wMrJjLrbaZcldOhftD+A0GOATgsiBzIM=
-X-Gm-Gg: ASbGncs+Gr/Ipv+SZ51wvEJGBfyzKLBwJry3vpHTB/0fuWI3l0t3/0eCJOauaK4+xGZ
-	7phNBeieiCBslygEA+ejAPgsWI0Iwe22752MnuOVJ8DTMKQ/PwhmFtYMVlOL8yJwpQ9c5IdVdsD
-	9Cti+da1YNYnpMKc6VtEFiYmrOzU1bRn7PvZDdy4bMYjeKB2wha/dYp+pH2D7YgYTUBdzhp0zgk
-	9Uzv7hHh9Z4Kp00oMBaBLI3HyxuTfrXckLkvyLSPNpoilfc/u3n9RGuzPrVTFp17vJjh34YAvkI
-	I/+MUB7s8A482Wo5KCldaDvwoXptXHcvn1jYtTtCpD7IXnypdg==
-X-Google-Smtp-Source: AGHT+IGaaYhWfHcEkvaSBr0W/VndL8LcxHEFgy/XsRLyxKQzY/wjBZcbB9qTsOYo1wE24M5XjEBsWw==
-X-Received: by 2002:a17:903:2f47:b0:224:376:7a21 with SMTP id d9443c01a7336-22780e0969cmr174217795ad.42.1742786150821;
-        Sun, 23 Mar 2025 20:15:50 -0700 (PDT)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-227811f44bbsm59159555ad.232.2025.03.23.20.15.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 23 Mar 2025 20:15:50 -0700 (PDT)
-Date: Mon, 24 Mar 2025 03:15:42 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Phil Sutter <phil@nwl.cc>, "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=CC361PA49VEKWABdMobNa1Oaefj8HS8TS2X24f3yeIlbYtfW5JiqudTSC6zVaQqMZIdSt0sHt5Cd7dR3P8KXkE3D7iajG4ziRkXKwlawO58WrXqEROrblfrIpGxQ+g8I9UbiB684wOIaZ4y29SC3CO5BgkILDDl8JJI1vb5HVTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fs4RMN9x; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1742786415; x=1774322415;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=5U2hz6Ps5Y0/LkUJRaC8iNmpBLjaBL4x57nl2s22ReE=;
+  b=fs4RMN9xF0hzCcCt/oXiKsL+hjZ0Od5vaVqQLUM0RlSGr101uBy8Q6im
+   3KjKCsi/8RcFEx9Gkvh0OpoG9ykDXDOYXpbY7T9skqw7cl974Xmax0d4i
+   anqUXobzAAJGOUia3M9sEeN1r3PqexVLFMh4aJtrNVhmuCfYRps5SIm3h
+   gH1B9vT/GcTor0/ykKCezHLguf8H2ajXqBVx4Ft+PBsgI9PKKn42YxGRN
+   FoJoFxS/GwicIQAvFebAWoRY4oRdxNLujq3kNit1+iuNOXRcpc4TdmVGX
+   TsETdNbcxIKHU7RBx3RX+gen1LzoOqyZ9NTJ8nHCHoNmtFyEjxp3jNFsL
+   w==;
+X-CSE-ConnectionGUID: i9T5vOsUQNiXFI9a/Yf1ew==
+X-CSE-MsgGUID: vMf8u7v2SJuxkM10rJsnwQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11382"; a="43701678"
+X-IronPort-AV: E=Sophos;i="6.14,271,1736841600"; 
+   d="scan'208";a="43701678"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2025 20:20:14 -0700
+X-CSE-ConnectionGUID: Ctcp6A7VTQi+FQAgva4eWQ==
+X-CSE-MsgGUID: z3XqtjwiRLaLcbzzETLP3A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,271,1736841600"; 
+   d="scan'208";a="124700753"
+Received: from lkp-server02.sh.intel.com (HELO e98e3655d6d2) ([10.239.97.151])
+  by fmviesa009.fm.intel.com with ESMTP; 23 Mar 2025 20:20:10 -0700
+Received: from kbuild by e98e3655d6d2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1twYMC-0003Cy-0j;
+	Mon, 24 Mar 2025 03:20:08 +0000
+Date: Mon, 24 Mar 2025 11:19:42 +0800
+From: kernel test robot <lkp@intel.com>
+To: Christian Marangi <ansuelsmth@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>,
-	Petr Mladek <pmladek@suse.com>,
-	Yoann Congal <yoann.congal@smile.fr>, wireguard@lists.zx2c4.com,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCHv5 net-next 1/2] wireguard: selftests: convert iptables to
- nft
-Message-ID: <Z-DOXpknpAn-yC_P@fedora>
-References: <20250322093016.16631-1-liuhangbin@gmail.com>
- <20250322093016.16631-2-liuhangbin@gmail.com>
- <Z-B4yfBvm2aXW_Ar@orbyte.nwl.cc>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org
+Subject: Re: [net-next PATCH 1/2] net: phy: Add support for new Aeonsemi PHYs
+Message-ID: <202503241125.KKDZ7C9F-lkp@intel.com>
+References: <20250323225439.32400-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,52 +88,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z-B4yfBvm2aXW_Ar@orbyte.nwl.cc>
+In-Reply-To: <20250323225439.32400-1-ansuelsmth@gmail.com>
 
-On Sun, Mar 23, 2025 at 10:10:33PM +0100, Phil Sutter wrote:
-> On Sat, Mar 22, 2025 at 09:30:15AM +0000, Hangbin Liu wrote:
-> > Convert iptabels to nft as it is the replacement for iptables, which is used
->           ~~~~~~~~
-> 
-> Typo, but I would write "Convert the selftest to nft ..." instead since
-> that is what you're converting, iptables is just replaced. :)
-> 
-> > by default in most releases.
-> > 
-> > Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> > ---
-> >  tools/testing/selftests/wireguard/netns.sh | 29 ++++++++++++++--------
-> >  1 file changed, 19 insertions(+), 10 deletions(-)
-> > 
-> > diff --git a/tools/testing/selftests/wireguard/netns.sh b/tools/testing/selftests/wireguard/netns.sh
-> > index 55500f901fbc..8b840fef90af 100755
-> > --- a/tools/testing/selftests/wireguard/netns.sh
-> > +++ b/tools/testing/selftests/wireguard/netns.sh
-> > @@ -75,6 +75,11 @@ pp ip netns add $netns1
-> >  pp ip netns add $netns2
-> >  ip0 link set up dev lo
-> >  
-> > +# init nft tables
-> > +n0 nft add table ip wgtest
-> > +n1 nft add table ip wgtest
-> > +n2 nft add table ip wgtest
-> > +
-> >  ip0 link add dev wg0 type wireguard
-> >  ip0 link set wg0 netns $netns1
-> >  ip0 link add dev wg0 type wireguard
-> > @@ -196,13 +201,14 @@ ip1 link set wg0 mtu 1300
-> >  ip2 link set wg0 mtu 1300
-> >  n1 wg set wg0 peer "$pub2" endpoint 127.0.0.1:2
-> >  n2 wg set wg0 peer "$pub1" endpoint 127.0.0.1:1
-> > -n0 iptables -A INPUT -m length --length 1360 -j DROP
-> > +n0 nft add chain ip wgtest INPUT { type filter hook input priority filter \; policy accept \; }
-> 
-> You may skip the 'policy accept \;' part in all 'add chain' commands as
-> this is the default for all chains. Unless you prefer to explicitly
-> state the chain policy, of course.
+Hi Christian,
 
-Yes, I would prefer to keep the "policy accept" unless Jason has objects.
+kernel test robot noticed the following build warnings:
 
-Thanks
-Hangbin
+[auto build test WARNING on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Christian-Marangi/dt-bindings-net-Document-support-for-Aeonsemi-PHYs/20250324-065920
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250323225439.32400-1-ansuelsmth%40gmail.com
+patch subject: [net-next PATCH 1/2] net: phy: Add support for new Aeonsemi PHYs
+config: hexagon-allyesconfig (https://download.01.org/0day-ci/archive/20250324/202503241125.KKDZ7C9F-lkp@intel.com/config)
+compiler: clang version 21.0.0git (https://github.com/llvm/llvm-project c2692afc0a92cd5da140dfcdfff7818a5b8ce997)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250324/202503241125.KKDZ7C9F-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202503241125.KKDZ7C9F-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/phy/as21xxx.c:767:14: warning: variable 'val' is used uninitialized whenever 'for' loop exits because its condition is false [-Wsometimes-uninitialized]
+     767 |         for (i = 0; i < ARRAY_SIZE(as21xxx_led_supported_pattern); i++)
+         |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/phy/as21xxx.c:775:33: note: uninitialized use occurs here
+     775 |                               VEND1_LED_REG_A_EVENT, val);
+         |                                                      ^~~
+   drivers/net/phy/as21xxx.c:767:14: note: remove the condition if it is always true
+     767 |         for (i = 0; i < ARRAY_SIZE(as21xxx_led_supported_pattern); i++)
+         |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/phy/as21xxx.c:761:9: note: initialize the variable 'val' to silence this warning
+     761 |         u16 val;
+         |                ^
+         |                 = 0
+   1 warning generated.
+
+
+vim +767 drivers/net/phy/as21xxx.c
+
+   757	
+   758	static int as21xxx_led_hw_control_set(struct phy_device *phydev, u8 index,
+   759					      unsigned long rules)
+   760	{
+   761		u16 val;
+   762		int i;
+   763	
+   764		if (index > AEON_MAX_LDES)
+   765			return -EINVAL;
+   766	
+ > 767		for (i = 0; i < ARRAY_SIZE(as21xxx_led_supported_pattern); i++)
+   768			if (rules == as21xxx_led_supported_pattern[i].pattern) {
+   769				val = as21xxx_led_supported_pattern[i].val;
+   770				break;
+   771			}
+   772	
+   773		return phy_modify_mmd(phydev, MDIO_MMD_VEND1,
+   774				      VEND1_LED_REG(index),
+   775				      VEND1_LED_REG_A_EVENT, val);
+   776	}
+   777	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
