@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-177016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3326BA6D419
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 07:19:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AEB0A6D41B
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 07:20:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1DF916B600
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 06:19:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6CB2B7A59DB
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 06:18:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47223194AC7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2491A194A59;
 	Mon, 24 Mar 2025 06:19:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="mGQwOcbn"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="dJtilWl4"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFD8E191F75
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFDD7191F91
 	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 06:19:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742797152; cv=none; b=DRHFSJze1ov22IzrNRIexAmDQu4VKFgN+O5tifSWVujT6Omv4rBXw7nJgC4L3Fs0cJZD4rTRg6fzI+98lFeH12nxSGD0YNcs6gUgOgYdJZpSMlkzBwtEJTSCUuZ2CDcsLAKX5syNrbGP4VWb6Wl9c+4epSqegFjq9wTvIchKRP4=
+	t=1742797152; cv=none; b=nURAR4VcCTGL0O55TeCePjCuT6vuU6mY0YCjRiatuFvyRqzbBdn7rtBLKUdqc5NE+GVZrJ2OG0WF5+f2+Tl4SLpIqgnlSTk8MntD5iU5CVYdOsXvTsxMaj7w0uoEKavwCVDlH8F74K9IQngxluyTgyKJQMCObYrP4BA/dqH4ZBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1742797152; c=relaxed/simple;
-	bh=XLSzQfS2Rcd/otv1pVZavoZHtBojKQsA5AhJ2FvaTfY=;
+	bh=ZORXetLAv3Pu50j8KqGNskN+PEJrY1tX6LhTilyN/So=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iiJVwp3864StI3JO4wZLBjAuWRsFj3+AewTIS4SUNrCse5ClQHqi+AXLeb7m7xU5eF/QS2/+UQr4dyBrSPASH6K9uOls4iGO9TYPIILwdBKKPWm7vY5yebVfokh5B8xR1QjzfvRxirk2tuRwrla7PAG9NmsuS0sV1IRNk6c4S04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=mGQwOcbn; arc=none smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=reyBmkRl4jCwead8YreN5vF30JW0mm1z4sxGN0/0k2qwPACtoKIQnGCGFaIq+Agfix8VHWjgHwDTjdORzqeupposKcx/Da4DSkPhi9K/XIvC00sxvHWWHsvmDtidfQVqa5RO/70WKpTXS5Z/RzML4zGNxF0uRVDNBRXCiPeyPCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=dJtilWl4; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 4748E2076B;
-	Mon, 24 Mar 2025 07:19:01 +0100 (CET)
+	by mx1.secunet.com (Postfix) with ESMTP id B5F5520764;
+	Mon, 24 Mar 2025 07:19:00 +0100 (CET)
 X-Virus-Scanned: by secunet
 Received: from mx1.secunet.com ([127.0.0.1])
  by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VFtA59ojw02D; Mon, 24 Mar 2025 07:19:00 +0100 (CET)
+ with ESMTP id 0AReqygrZSZy; Mon, 24 Mar 2025 07:19:00 +0100 (CET)
 Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 52002207D1;
-	Mon, 24 Mar 2025 07:18:59 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 52002207D1
+	by mx1.secunet.com (Postfix) with ESMTPS id F0DA9207BB;
+	Mon, 24 Mar 2025 07:18:58 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com F0DA9207BB
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
 	s=202301; t=1742797139;
-	bh=GAPeqGdRLwLyY1/zyUmvSnpTQ3Eh9TE9Ah+31zrEIJs=;
+	bh=r3sLdMxNlW+yZKmEZI7ZektX8tJ1YwQixiNg40VVu9w=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=mGQwOcbnQ65B2JxLyFwT8VUDNoA0olwy+GARUauxQCTIhyxUgxaESzqgmMQJGzZ6s
-	 lgWG5Jspq0T/YEhO7tEwOjgFreJT9KFP1+EpePamOixFceq5JhdHMD467BWLZbHRLc
-	 oVRWmKnPX2+NmPPrioJrIX0uhg3/o9RL++s8HVbuCWS+0fOui2TmctdZCyxQ3YdjFG
-	 lZRZsK8L0mSS8+nHGXU6Xl7cv5Eg3M1VXkvRj+hXOH2FrhXW6MlC0sjtuYX+C8Cjff
-	 UA4KM4RL6SGjx6BrO2Iib9yWDiFmvRHD3qqMrDwlWK4VAIto54l7d5bVlGvLGTCn1i
-	 7zAsBRgNLEXXA==
+	b=dJtilWl4ueKtNlGJuSRm/kuUgJv1jAJUiIMmcPhJ5OLcxoroXuxwOUuz1ZmLcdlOM
+	 azsV40ZxMYApV0Qh8/OayRjcRQI6Aua6DoOKj3cvt/m2mDr+fDC4SORHP1ds80nsJ2
+	 lkHkhlX5U4bkQ0tCMctBC9+DIOytRJeiuzHhAHTiK0R9geEUT/r/oBW8kZBwsRRLb4
+	 ctCCt/+gmhUJwZbqgjguaD3MKTz/B2RRpT16bKrcoCiXpzGNeQt4mINPiTg/75v66n
+	 YazwhFgHMyIKDieeeEXkEoG1oBxqLxSKbl57OInPOSwoscka5GLfhjBHq0FWXSZpX7
+	 i/uxTyNPXy2Iw==
 Received: from mbx-essen-02.secunet.de (10.53.40.198) by
  cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 24 Mar 2025 07:18:59 +0100
+ 15.1.2507.39; Mon, 24 Mar 2025 07:18:58 +0100
 Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
  (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 24 Mar
  2025 07:18:58 +0100
 Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 8DD483183C55; Mon, 24 Mar 2025 07:18:57 +0100 (CET)
+	id 916563183E89; Mon, 24 Mar 2025 07:18:57 +0100 (CET)
 From: Steffen Klassert <steffen.klassert@secunet.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
 	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 7/8] xfrm: state: make xfrm_state_lookup_byaddr lockless
-Date: Mon, 24 Mar 2025 07:18:54 +0100
-Message-ID: <20250324061855.4116819-8-steffen.klassert@secunet.com>
+Subject: [PATCH 8/8] xfrm: Remove unnecessary NULL check in xfrm_lookup_with_ifid()
+Date: Mon, 24 Mar 2025 07:18:55 +0100
+Message-ID: <20250324061855.4116819-9-steffen.klassert@secunet.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250324061855.4116819-1-steffen.klassert@secunet.com>
 References: <20250324061855.4116819-1-steffen.klassert@secunet.com>
@@ -86,41 +86,33 @@ X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
  mbx-essen-02.secunet.de (10.53.40.198)
 X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-From: Florian Westphal <fw@strlen.de>
+From: Dan Carpenter <dan.carpenter@linaro.org>
 
-This appears to be an oversight back when the state lookup
-was converted to RCU, I see no reason why we need to hold the
-state lock here.
+This NULL check is unnecessary and can be removed.  It confuses
+Smatch static analysis tool because it makes Smatch think that
+xfrm_lookup_with_ifid() can return a mix of NULL pointers and errors so
+it creates a lot of false positives.  Remove it.
 
-__xfrm_state_lookup_byaddr already uses xfrm_state_hold_rcu
-helper to obtain a reference, so just replace the state
-lock with rcu.
-
-Signed-off-by: Florian Westphal <fw@strlen.de>
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- net/xfrm/xfrm_state.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/xfrm/xfrm_policy.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 7b1028671144..07545944a536 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -2313,12 +2313,12 @@ xfrm_state_lookup_byaddr(struct net *net, u32 mark,
- 	struct xfrm_hash_state_ptrs state_ptrs;
- 	struct xfrm_state *x;
+diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+index 6551e588fe52..30970d40a454 100644
+--- a/net/xfrm/xfrm_policy.c
++++ b/net/xfrm/xfrm_policy.c
+@@ -3294,7 +3294,7 @@ struct dst_entry *xfrm_lookup_with_ifid(struct net *net,
  
--	spin_lock_bh(&net->xfrm.xfrm_state_lock);
-+	rcu_read_lock();
- 
- 	xfrm_hash_ptrs_get(net, &state_ptrs);
- 
- 	x = __xfrm_state_lookup_byaddr(&state_ptrs, mark, daddr, saddr, proto, family);
--	spin_unlock_bh(&net->xfrm.xfrm_state_lock);
-+	rcu_read_unlock();
- 	return x;
- }
- EXPORT_SYMBOL(xfrm_state_lookup_byaddr);
+ ok:
+ 	xfrm_pols_put(pols, drop_pols);
+-	if (dst && dst->xfrm &&
++	if (dst->xfrm &&
+ 	    (dst->xfrm->props.mode == XFRM_MODE_TUNNEL ||
+ 	     dst->xfrm->props.mode == XFRM_MODE_IPTFS))
+ 		dst->flags |= DST_XFRM_TUNNEL;
 -- 
 2.34.1
 
