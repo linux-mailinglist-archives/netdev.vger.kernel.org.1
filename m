@@ -1,79 +1,78 @@
-Return-Path: <netdev+bounces-177015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AEB0A6D41B
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 07:20:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62C82A6D445
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 07:28:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6CB2B7A59DB
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 06:18:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2126F1681D4
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 06:28:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2491A194A59;
-	Mon, 24 Mar 2025 06:19:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4A7318DB20;
+	Mon, 24 Mar 2025 06:27:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="dJtilWl4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Kz1c6gg+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFDD7191F91
-	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 06:19:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2BA33981;
+	Mon, 24 Mar 2025 06:27:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742797152; cv=none; b=nURAR4VcCTGL0O55TeCePjCuT6vuU6mY0YCjRiatuFvyRqzbBdn7rtBLKUdqc5NE+GVZrJ2OG0WF5+f2+Tl4SLpIqgnlSTk8MntD5iU5CVYdOsXvTsxMaj7w0uoEKavwCVDlH8F74K9IQngxluyTgyKJQMCObYrP4BA/dqH4ZBI=
+	t=1742797679; cv=none; b=qM/wd0/iTmYVlly1zHM623l8W/7QQuZ7y1tJynDhxQkFvoICiQDjDk80ZhpXrYacn5CY8K77vEIkCNJYWTcm6hm+/R2XRWFR5APX5z4cZdzZ7/7e37DlUShrcllyAFtJTkhnP55U30RpKfnPiX+GxhhsFxazCmTplKEuAU/x2Tw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742797152; c=relaxed/simple;
-	bh=ZORXetLAv3Pu50j8KqGNskN+PEJrY1tX6LhTilyN/So=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=reyBmkRl4jCwead8YreN5vF30JW0mm1z4sxGN0/0k2qwPACtoKIQnGCGFaIq+Agfix8VHWjgHwDTjdORzqeupposKcx/Da4DSkPhi9K/XIvC00sxvHWWHsvmDtidfQVqa5RO/70WKpTXS5Z/RzML4zGNxF0uRVDNBRXCiPeyPCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=dJtilWl4; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id B5F5520764;
-	Mon, 24 Mar 2025 07:19:00 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0AReqygrZSZy; Mon, 24 Mar 2025 07:19:00 +0100 (CET)
-Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id F0DA9207BB;
-	Mon, 24 Mar 2025 07:18:58 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com F0DA9207BB
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1742797139;
-	bh=r3sLdMxNlW+yZKmEZI7ZektX8tJ1YwQixiNg40VVu9w=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=dJtilWl4ueKtNlGJuSRm/kuUgJv1jAJUiIMmcPhJ5OLcxoroXuxwOUuz1ZmLcdlOM
-	 azsV40ZxMYApV0Qh8/OayRjcRQI6Aua6DoOKj3cvt/m2mDr+fDC4SORHP1ds80nsJ2
-	 lkHkhlX5U4bkQ0tCMctBC9+DIOytRJeiuzHhAHTiK0R9geEUT/r/oBW8kZBwsRRLb4
-	 ctCCt/+gmhUJwZbqgjguaD3MKTz/B2RRpT16bKrcoCiXpzGNeQt4mINPiTg/75v66n
-	 YazwhFgHMyIKDieeeEXkEoG1oBxqLxSKbl57OInPOSwoscka5GLfhjBHq0FWXSZpX7
-	 i/uxTyNPXy2Iw==
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 24 Mar 2025 07:18:58 +0100
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 24 Mar
- 2025 07:18:58 +0100
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 916563183E89; Mon, 24 Mar 2025 07:18:57 +0100 (CET)
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
-	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 8/8] xfrm: Remove unnecessary NULL check in xfrm_lookup_with_ifid()
-Date: Mon, 24 Mar 2025 07:18:55 +0100
-Message-ID: <20250324061855.4116819-9-steffen.klassert@secunet.com>
+	s=arc-20240116; t=1742797679; c=relaxed/simple;
+	bh=eITHe9O29qurQr+w4lnf9ce6r8QgdKu3VSz+sAB0QJc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=G7kJ0Ky0orW5+PwkGxMp0VsoF9LbBgzMuyw6l/ZlXsixaEJEUnmlXJUp+APdpcSj4AMawpvOxmXIK7a+7XyqTcwd0KhvztruWxcuazJUgoIancuyxrwZmiYNdpALGNE5vcourfR6Z5pe8LT2D6NyhbnoQmv/4EZNyz4z/fffMDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Kz1c6gg+; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1742797677; x=1774333677;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=eITHe9O29qurQr+w4lnf9ce6r8QgdKu3VSz+sAB0QJc=;
+  b=Kz1c6gg+Ias6OFknNF5dyEMfUNnD3OsOmHWhm0ZpymJk8xrV1UTYyD1J
+   Kd2vlnW1hff7ekdCF1jVu6VNYXKL6DrkbJ/SCRiCRBTyCltZGvGBcz4BR
+   rj0ZBqo/WvG4KMoDbbZlGHpOSgay6enaiUzdpWaYa+55GjfdGJa44eJ9d
+   oeh8fw6A6luUz+Y7Go7EJpD9X6jtOHqfA6SYwKGwAWRlRoU+kr7t5tyIw
+   tiX8T7Y5Ggxem0GvZhBCEbMJIQa1TBBKluV3PeACyORHCrzk3up374RJ9
+   HdaJ1rz1uUr7VWGNl9RVXaIvFpFqZurnormgU3LhPHCn2TeXedpKBa2ao
+   w==;
+X-CSE-ConnectionGUID: tryT+XEiTIqul8/xoTrLVw==
+X-CSE-MsgGUID: 8ifJC+9wTNujKU9dtpjuPA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11382"; a="47638762"
+X-IronPort-AV: E=Sophos;i="6.14,271,1736841600"; 
+   d="scan'208";a="47638762"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2025 23:27:56 -0700
+X-CSE-ConnectionGUID: B48+T+GRQwqiLpAT4hNPdA==
+X-CSE-MsgGUID: BDisJXbXTsSeVaZTCIRHpw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,271,1736841600"; 
+   d="scan'208";a="124901989"
+Received: from yongliang-ubuntu20-ilbpg12.png.intel.com ([10.88.227.39])
+  by orviesa008.jf.intel.com with ESMTP; 23 Mar 2025 23:27:54 -0700
+From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v1 1/1] stmmac: intel: interface switching support for RPL-P platform
+Date: Mon, 24 Mar 2025 14:27:42 +0800
+Message-Id: <20250324062742.462771-1-yong.liang.choong@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250324061855.4116819-1-steffen.klassert@secunet.com>
-References: <20250324061855.4116819-1-steffen.klassert@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,38 +80,30 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-From: Dan Carpenter <dan.carpenter@linaro.org>
+Based on the patch series [1], the enablement of interface switching for
+RPL-P will use the same handling as ADL-N.
 
-This NULL check is unnecessary and can be removed.  It confuses
-Smatch static analysis tool because it makes Smatch think that
-xfrm_lookup_with_ifid() can return a mix of NULL pointers and errors so
-it creates a lot of false positives.  Remove it.
+Link: https://patchwork.kernel.org/project/netdevbpf/cover/20250227121522.1802832-1-yong.liang.choong@linux.intel.com/ [1]
 
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
 ---
- net/xfrm/xfrm_policy.c | 2 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index 6551e588fe52..30970d40a454 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -3294,7 +3294,7 @@ struct dst_entry *xfrm_lookup_with_ifid(struct net *net,
- 
- ok:
- 	xfrm_pols_put(pols, drop_pols);
--	if (dst && dst->xfrm &&
-+	if (dst->xfrm &&
- 	    (dst->xfrm->props.mode == XFRM_MODE_TUNNEL ||
- 	     dst->xfrm->props.mode == XFRM_MODE_IPTFS))
- 		dst->flags |= DST_XFRM_TUNNEL;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+index 5910571a954f..c8bb9265bbb4 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+@@ -1437,7 +1437,7 @@ static const struct pci_device_id intel_eth_pci_id_table[] = {
+ 	{ PCI_DEVICE_DATA(INTEL, ADLS_SGMII1G_0, &adls_sgmii1g_phy0_info) },
+ 	{ PCI_DEVICE_DATA(INTEL, ADLS_SGMII1G_1, &adls_sgmii1g_phy1_info) },
+ 	{ PCI_DEVICE_DATA(INTEL, ADLN_SGMII1G, &adln_sgmii1g_phy0_info) },
+-	{ PCI_DEVICE_DATA(INTEL, RPLP_SGMII1G, &tgl_sgmii1g_phy0_info) },
++	{ PCI_DEVICE_DATA(INTEL, RPLP_SGMII1G, &adln_sgmii1g_phy0_info) },
+ 	{}
+ };
+ MODULE_DEVICE_TABLE(pci, intel_eth_pci_id_table);
 -- 
 2.34.1
 
