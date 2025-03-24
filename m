@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-177260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FBAEA6E6BE
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 23:46:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABA4DA6E6C3
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 23:46:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00AB37A5ADD
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 22:45:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 641CC1898D3D
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 22:46:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE9C01F0E33;
-	Mon, 24 Mar 2025 22:46:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF8E61EFF85;
+	Mon, 24 Mar 2025 22:46:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IbC99N45"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hQgKJW+p"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA4121EF092
-	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 22:46:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA05C1EF092
+	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 22:46:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742856371; cv=none; b=VYAEOZqV2s6RLoy5Cs0+W/sTV5gC5ybksUHuviLtcMiqwJf2asMaNr5Aa96A/Fawe0t/bbWN50lgeCsiYJNfL8qj+1SWzCrHZLpDyINHPtxfnDIBd4Bm2cvJiICWlD1G4sMDTsQxulNuo81JZ4qdT9BD6ym7jjNMCcZqMm8RDAk=
+	t=1742856378; cv=none; b=Ez/PjE/zxmgXfKtERZJ3budcpS2QKbEXLzRD4ZgukQpFbO5h/PGvfn21Cw7arH9bUtJsn0TEwbzKbPE52QJzmYBoCmVN4nrI7WySbWW+xjVf8MDKbs2Zt2C0sPtszS+xkZw89W9mQCSsyQifK39dJKSAp4bK+zGno5vxCXAnneY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742856371; c=relaxed/simple;
-	bh=z/I/BtRF99v+TA+ww7AuEtVGtX1QLInv2akaA9X0L/g=;
+	s=arc-20240116; t=1742856378; c=relaxed/simple;
+	bh=xRv1UD8qVJqW/FKNvUkdOCzK4lkqrdz8hvC31IgcWE4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=A54StCDMiYtUufiw7MqK3flub3MXiDvnn2sP4e0PTPugLpHodHwcTNDhLJ2Qe28BlwTfA+491cky9Zma7jxwMr/Jv3RFNr/rCf+fRkV4D+q8ufw6SiLL9f4Dve9nTBOGrSDyIGqIQEKntc/uRuQVlYOypxryRkct3DBkY9fVsf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IbC99N45; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9BD2C4CEED;
-	Mon, 24 Mar 2025 22:46:08 +0000 (UTC)
+	 MIME-Version; b=QenxENuF2Aq+rO17Rujnr/iJRd0qBK3JzVrHkOqC6PGIcpmCSgElNlB25Oq06as8OYTmE+I/TVrpUQu/i+MfSBIVtxG5uFgN4M33A3GGuCsXw9FoEY4w0u0tTOwbb9gR0MDB+J883Muuyfug4qhBx67GMQgMQaxQO7G3qQyc59E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hQgKJW+p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FF19C4CEE4;
+	Mon, 24 Mar 2025 22:46:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742856371;
-	bh=z/I/BtRF99v+TA+ww7AuEtVGtX1QLInv2akaA9X0L/g=;
+	s=k20201202; t=1742856375;
+	bh=xRv1UD8qVJqW/FKNvUkdOCzK4lkqrdz8hvC31IgcWE4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IbC99N45j4OuT6mnu8Voug9bJTB9MVLbcvvuU2o8MRGrDa2PzuKUQoeQu7ey9zc7A
-	 hEnjIu6DRbHqAtiq0xPSQtpt416EOb/cYTeCxfUCp0hpVpGBK4qMnja2Qj/J3vMJlH
-	 h8YXA/XJhndkJEJNeRXRS79K6jU7IiuWpZ5tdl6yTJKFAh/VFRDjkrZn/R6k2aUT3c
-	 O6UF088d7dvha2Sbia4MgEx0gt+vJ/xgZVYvJMVA87OVHKukfKVBa3EfrPuA1gFumV
-	 iG/C//VrcLvjTahOPonADEm3gaBcU0dlJVO6XP9yH3ILs4OXxqk0uxjgmCykDxVsGU
-	 9SbnZwiSxdBwQ==
+	b=hQgKJW+pzX5B/IQpCDgVDgVliI55yQcTIZv/rqUBuS+L+qW76WRM9jysMNfTnL0LF
+	 zNfOE9j8KFG++mCkEvmN3tCZcHz5YveWErMdQHH6qHEtWF3JQyFVpkKWKYM12MVgFA
+	 WygJNAu22Wdco81uMELj/UKFLTI932SQ8omEA3NKhh6ZQToxRk8kYlpB1lMJCVh/qc
+	 W2OcVGdIyTIPYyIrr4NQX8U+v0nqggiYziByl/yDku4GG0skupmE9AUoXRh44relJZ
+	 SCCp4H0EcPfULS631PyDw39PZcpxaDAnQPCm6gzFvVz5NsZA1KdmpTW8FvP4bE9bp4
+	 +J3sopQeZOd4g==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -50,9 +50,9 @@ Cc: netdev@vger.kernel.org,
 	horms@kernel.org,
 	sdf@fomichev.me,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 06/11] net: designate queue -> napi linking as "ops protected"
-Date: Mon, 24 Mar 2025 15:45:32 -0700
-Message-ID: <20250324224537.248800-7-kuba@kernel.org>
+Subject: [PATCH net-next v2 07/11] net: protect rxq->mp_params with the instance lock
+Date: Mon, 24 Mar 2025 15:45:33 -0700
+Message-ID: <20250324224537.248800-8-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250324224537.248800-1-kuba@kernel.org>
 References: <20250324224537.248800-1-kuba@kernel.org>
@@ -64,97 +64,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-netdev netlink is the only reader of netdev_{,rx_}queue->napi,
-and it already holds netdev->lock. Switch protection of
-the writes to netdev->lock to "ops protected".
+Ensure that all accesses to mp_params are under the netdev
+instance lock. The only change we need is to move
+dev_memory_provider_uninstall() under the lock.
 
-The expectation will be now that accessing queue->napi
-will require netdev->lock for "ops locked" drivers, and
-rtnl_lock for all other drivers.
-
-Current "ops locked" drivers don't require any changes.
-gve and netdevsim use _locked() helpers right next to
-netif_queue_set_napi() so they must be holding the instance
-lock. iavf doesn't call it. bnxt is a bit messy but all paths
-seem locked.
+Appropriately swap the asserts.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- include/linux/netdevice.h     | 5 +++--
- include/net/netdev_lock.h     | 8 ++++++++
- include/net/netdev_rx_queue.h | 2 +-
- net/core/dev.c                | 3 +--
- 4 files changed, 13 insertions(+), 5 deletions(-)
+ net/core/dev.c       | 4 ++--
+ net/core/page_pool.c | 7 ++-----
+ 2 files changed, 4 insertions(+), 7 deletions(-)
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 3dbce9cd3f5a..fd508e9f148c 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -710,7 +710,7 @@ struct netdev_queue {
-  * slow- / control-path part
-  */
- 	/* NAPI instance for the queue
--	 * Readers and writers must hold RTNL
-+	 * "ops protected", see comment about net_device::lock
- 	 */
- 	struct napi_struct	*napi;
- 
-@@ -2522,7 +2522,8 @@ struct net_device {
- 	 * Double ops protects:
- 	 *	@real_num_rx_queues, @real_num_tx_queues
- 	 *
--	 * Also protects some fields in struct napi_struct.
-+	 * Also protects some fields in:
-+	 *	struct napi_struct, struct netdev_queue, struct netdev_rx_queue
- 	 *
- 	 * Ordering: take after rtnl_lock.
- 	 */
-diff --git a/include/net/netdev_lock.h b/include/net/netdev_lock.h
-index efd302375ef2..1c0c9a94cc22 100644
---- a/include/net/netdev_lock.h
-+++ b/include/net/netdev_lock.h
-@@ -56,6 +56,14 @@ static inline void netdev_ops_assert_locked(const struct net_device *dev)
- 		ASSERT_RTNL();
- }
- 
-+static inline void
-+netdev_ops_assert_locked_or_invisible(const struct net_device *dev)
-+{
-+	if (dev->reg_state == NETREG_REGISTERED ||
-+	    dev->reg_state == NETREG_UNREGISTERING)
-+		netdev_ops_assert_locked(dev);
-+}
-+
- static inline int netdev_lock_cmp_fn(const struct lockdep_map *a,
- 				     const struct lockdep_map *b)
- {
-diff --git a/include/net/netdev_rx_queue.h b/include/net/netdev_rx_queue.h
-index af40842f229d..b2238b551dce 100644
---- a/include/net/netdev_rx_queue.h
-+++ b/include/net/netdev_rx_queue.h
-@@ -24,7 +24,7 @@ struct netdev_rx_queue {
- 	struct xsk_buff_pool            *pool;
- #endif
- 	/* NAPI instance for the queue
--	 * Readers and writers must hold RTNL
-+	 * "ops protected", see comment about net_device::lock
- 	 */
- 	struct napi_struct		*napi;
- 	struct pp_memory_provider_params mp_params;
 diff --git a/net/core/dev.c b/net/core/dev.c
-index aa99c91fd68f..690d46497b2f 100644
+index 690d46497b2f..652f2c6f5674 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
-@@ -6896,8 +6896,7 @@ void netif_queue_set_napi(struct net_device *dev, unsigned int queue_index,
+@@ -10353,7 +10353,7 @@ u32 dev_get_min_mp_channel_count(const struct net_device *dev)
+ {
+ 	int i;
  
- 	if (WARN_ON_ONCE(napi && !napi->dev))
- 		return;
--	if (dev->reg_state >= NETREG_REGISTERED)
+-	ASSERT_RTNL();
++	netdev_ops_assert_locked(dev);
+ 
+ 	for (i = dev->real_num_rx_queues - 1; i >= 0; i--)
+ 		if (dev->_rx[i].mp_params.mp_priv)
+@@ -11957,9 +11957,9 @@ void unregister_netdevice_many_notify(struct list_head *head,
+ 		dev_tcx_uninstall(dev);
+ 		netdev_lock_ops(dev);
+ 		dev_xdp_uninstall(dev);
++		dev_memory_provider_uninstall(dev);
+ 		netdev_unlock_ops(dev);
+ 		bpf_dev_bound_netdev_unregister(dev);
+-		dev_memory_provider_uninstall(dev);
+ 
+ 		netdev_offload_xstats_disable_all(dev);
+ 
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index acef1fcd8ddc..7745ad924ae2 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -11,6 +11,7 @@
+ #include <linux/slab.h>
+ #include <linux/device.h>
+ 
++#include <net/netdev_lock.h>
+ #include <net/netdev_rx_queue.h>
+ #include <net/page_pool/helpers.h>
+ #include <net/page_pool/memory_provider.h>
+@@ -279,11 +280,7 @@ static int page_pool_init(struct page_pool *pool,
+ 		get_device(pool->p.dev);
+ 
+ 	if (pool->slow.flags & PP_FLAG_ALLOW_UNREADABLE_NETMEM) {
+-		/* We rely on rtnl_lock()ing to make sure netdev_rx_queue
+-		 * configuration doesn't change while we're initializing
+-		 * the page_pool.
+-		 */
 -		ASSERT_RTNL();
-+	netdev_ops_assert_locked_or_invisible(dev);
- 
- 	switch (type) {
- 	case NETDEV_QUEUE_TYPE_RX:
++		netdev_assert_locked(pool->slow.netdev);
+ 		rxq = __netif_get_rx_queue(pool->slow.netdev,
+ 					   pool->slow.queue_idx);
+ 		pool->mp_priv = rxq->mp_params.mp_priv;
 -- 
 2.49.0
 
