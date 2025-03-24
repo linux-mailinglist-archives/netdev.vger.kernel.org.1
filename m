@@ -1,149 +1,83 @@
-Return-Path: <netdev+bounces-177097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D811DA6DD61
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 15:49:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C3C6A6DD31
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 15:40:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CC313AF8B7
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 14:48:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F8D3188BF70
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 14:40:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36E0426157B;
-	Mon, 24 Mar 2025 14:48:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5296E25F988;
+	Mon, 24 Mar 2025 14:39:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Fcj2sh+c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TG9M6SQ1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 802D825F963;
-	Mon, 24 Mar 2025 14:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28E0B10F1;
+	Mon, 24 Mar 2025 14:39:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742827686; cv=none; b=f60dmhrLs1I1q75ZK70hjCA28Ikuim66CplwVaj54oGORYiXoofODqJi8wi7dVqJhiDPowK+k9jPucGpyOYlgkqAOia/cjjywLO6spjoyFDAFiVfDYH61S4c4VFkCP6kk7Sg7P6BPjv+QfaWzzn99pOFbqtQQq3ysC86KmkWLeQ=
+	t=1742827195; cv=none; b=nVXuwXsOq3b2LNp6oPlT7U5Mkaf3KUYzVMQrBaxDMOuwGJcKmR0/8+4Eq+gq5r5MjflmG/9pizQRrUP1CgfemaQ0SwyKcBEb1Gx5EBoVSTr7YnNz2PTLB1mwmpzBdXicDZWhqPUj3dx/bcgdGr3x2VaSiWGdDRfFeKCTodE5vOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742827686; c=relaxed/simple;
-	bh=3AoBMuDjV81vhPG3ltHHMg8tIknPaFrOKcZl2GSjRig=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hpss/M/2nmrKFskSU9M+nGn+c684/rSx4h7fagJiiCo3vhovVJJKLbiXngGJePpWqZxqN20nnL3oH3RATqX+CgXzngJX/WWqtsnwKNl1tcXjPKbea7m2xS3YcB8i1x4BXSzhMf7T7OA9XjidSydqZWZ80lHi26KXhby4IonnRu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Fcj2sh+c; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1742827685; x=1774363685;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=3AoBMuDjV81vhPG3ltHHMg8tIknPaFrOKcZl2GSjRig=;
-  b=Fcj2sh+cyesTyP4OJkuwF1ducDDIemDjFHzMSQeaGi8WblghF5eeBT2F
-   v8qJrytBKZY9o5Jb2OUNJwHtZOf5Wqhfb+Dcc4RB1fc6LFbUUO10K9V7r
-   jRThSoqACXWAeyg0hbmnuozCtmFw9vkh92P2M0mzCHVTLiXvuYqQkoucr
-   AVjI54oh/KM4HyZnl3U8/Fk3kkFicnkUj5U5pzjdDWG8YMTqgOGYSNgCq
-   dvrYmVP0Z3b3orkJR/D0rQOgOu7oJ6yFhO6DMs+JNZ16SMlTIKYzVpYDx
-   b5CvCwGhk/FUXVEjhK6LoYk3EgR7ZEPbdg2IOGeM8JZMgkEvG6qsW6pqI
-   g==;
-X-CSE-ConnectionGUID: 094Xe7flRWOHX1565XYHeg==
-X-CSE-MsgGUID: 8H4ssAWyQOuAI9tom9yZxg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11383"; a="43911857"
-X-IronPort-AV: E=Sophos;i="6.14,272,1736841600"; 
-   d="scan'208";a="43911857"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2025 07:47:57 -0700
-X-CSE-ConnectionGUID: zYUpcwEhTdS6aMIWWkSheg==
-X-CSE-MsgGUID: NM4llLpORbmPADcLAwli/A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,272,1736841600"; 
-   d="scan'208";a="124057064"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by fmviesa007.fm.intel.com with ESMTP; 24 Mar 2025 07:47:54 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id 012DF2A7; Mon, 24 Mar 2025 16:47:52 +0200 (EET)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>
-Subject: [PATCH net v3 2/2] net: usb: asix: ax88772: Increase phy_name size
-Date: Mon, 24 Mar 2025 16:39:30 +0200
-Message-ID: <20250324144751.1271761-3-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250324144751.1271761-1-andriy.shevchenko@linux.intel.com>
-References: <20250324144751.1271761-1-andriy.shevchenko@linux.intel.com>
+	s=arc-20240116; t=1742827195; c=relaxed/simple;
+	bh=3lXO4OPAJR68/q4fbUETtcYDiWzIV3gLjNKEwnazdrs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kgtPuh98PBWzoOAf/o+NovCXlD+CgfD5Bh/EXZgiT9iUDWuNuMZAE7IHVS2uKbEP4pCdi5WfqXCYDIf5OfRB5xVLtiX3+MOSBpCfy0VB/uKuPe0DUFw5uyvSRktxN1ert0FGFuvx+Il1thI2l8WkCW203FCBZ3Xe0i24K8Maz00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TG9M6SQ1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AE51C4CEE9;
+	Mon, 24 Mar 2025 14:39:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742827194;
+	bh=3lXO4OPAJR68/q4fbUETtcYDiWzIV3gLjNKEwnazdrs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TG9M6SQ14DpAyW1qmtpbS0GPeMoJ1n04QLU5AeWtP93ShwbDKW7JYmuieZDYRojfJ
+	 0WQ0kN5yWgT2PmEwBMSbjQKUyb1o6A/9kLUMTRkvHzQhMxvIwQWq7MGPSfdIfwBrJP
+	 eqiC5NNJWmBmTXyBmUE5gwvAw7gHmw4lvallzJXRkX6EEQpuWQpWt3KEBj8wJmQfsj
+	 k60F6xmWMWRvhhuRP8fB+j6quuvs9eWV7v4pDM9nZpnsbYk8IAl21lWz9YtIbRoV5B
+	 RDClcVl2EqTWx0BasWfWCzc2MOfApNkXLUSwkb6IKjSB/a7UVigF4KGVPtIuGtDn3S
+	 cpldF3/BW6q0A==
+Date: Mon, 24 Mar 2025 09:39:53 -0500
+From: Rob Herring <robh@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Rasmus Villemoes <ravi@prevas.dk>,
+	Colin Foster <colin.foster@in-advantage.com>,
+	devicetree@vger.kernel.org,
+	Felix Blix Everberg <felix.blix@prevas.dk>, netdev@vger.kernel.org
+Subject: Re: [PATCH 2/2] dt-bindings: net: mscc,vsc7514-switch: allow
+ specifying 'phys' for switch ports
+Message-ID: <20250324143953.GA11614-robh@kernel.org>
+References: <20250324085506.55916-1-ravi@prevas.dk>
+ <20250324085506.55916-3-ravi@prevas.dk>
+ <20250324100055.rqx4rle6fdtn7dg2@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250324100055.rqx4rle6fdtn7dg2@skbuf>
 
-GCC compiler (Debian 14.2.0-17) is not happy about printing
-into a too short buffer (when build with `make W=1`):
+On Mon, Mar 24, 2025 at 12:00:55PM +0200, Vladimir Oltean wrote:
+> On Mon, Mar 24, 2025 at 09:55:06AM +0100, Rasmus Villemoes wrote:
+> > Ports that use SGMII / QSGMII to interface to external phys (or as
+> > fixed-link to a cpu mac) need to configure the internal SerDes
+> > interface appropriately. Allow an optional 'phys' property to describe
+> > those relationships.
+> > 
+> > Signed-off-by: Rasmus Villemoes <ravi@prevas.dk>
+> > ---
+> 
+> Oops... I had thought 'phys' and 'phy-names' would be part of
+> Documentation/devicetree/bindings/net/ethernet-controller.yaml...
+> 
+> By the way, should you also accept 'phy-names' in the binding?
 
- drivers/net/usb/ax88172a.c:311:9: note: ‘snprintf’ output between 4 and 66 bytes into a destination of size 20
-
-Indeed, the buffer size is chosen based on some assumptions,
-while in general the assigned name might not fit. Increase
-the buffer size to cover the minimum required one. With that,
-change snprintf() to use sizeof() instead of the hard coded
-value.
-
-While at it, make sure that the PHY address is not bigger than
-the allowed maximum.
-
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- drivers/net/usb/ax88172a.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/usb/ax88172a.c b/drivers/net/usb/ax88172a.c
-index e47bb125048d..f613e4bc68c8 100644
---- a/drivers/net/usb/ax88172a.c
-+++ b/drivers/net/usb/ax88172a.c
-@@ -18,8 +18,8 @@
- struct ax88172a_private {
- 	struct mii_bus *mdio;
- 	struct phy_device *phydev;
--	char phy_name[20];
--	u16 phy_addr;
-+	char phy_name[PHY_ID_SIZE];
-+	u8 phy_addr;
- 	u16 oldmode;
- 	int use_embdphy;
- 	struct asix_rx_fixup_info rx_fixup_info;
-@@ -210,7 +210,11 @@ static int ax88172a_bind(struct usbnet *dev, struct usb_interface *intf)
- 	ret = asix_read_phy_addr(dev, priv->use_embdphy);
- 	if (ret < 0)
- 		goto free;
--
-+	if (ret >= PHY_MAX_ADDR) {
-+		netdev_err(dev->net, "Invalid PHY address %#x\n", ret);
-+		ret = -ENODEV;
-+		goto free;
-+	}
- 	priv->phy_addr = ret;
- 
- 	ax88172a_reset_phy(dev, priv->use_embdphy);
-@@ -308,7 +312,7 @@ static int ax88172a_reset(struct usbnet *dev)
- 		   rx_ctl);
- 
- 	/* Connect to PHY */
--	snprintf(priv->phy_name, 20, PHY_ID_FMT,
-+	snprintf(priv->phy_name, sizeof(priv->phy_name), PHY_ID_FMT,
- 		 priv->mdio->id, priv->phy_addr);
- 
- 	priv->phydev = phy_connect(dev->net, priv->phy_name,
--- 
-2.47.2
-
+No. There's only 1 phy, so not needed.
 
