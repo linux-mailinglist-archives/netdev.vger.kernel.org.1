@@ -1,262 +1,209 @@
-Return-Path: <netdev+bounces-177210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C839FA6E48D
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 21:36:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B821A6E49B
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 21:47:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3E5D3A7DA1
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 20:36:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D58316B563
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 20:47:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7AA31DB34C;
-	Mon, 24 Mar 2025 20:36:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17F101DC998;
+	Mon, 24 Mar 2025 20:47:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s9W1qJ/W"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="N6RroDFE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E3371DB127
-	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 20:36:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09B2E1B0406
+	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 20:47:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742848582; cv=none; b=ekgShLYGXyIjnnIsxkAiveQnWks9bY5r+5G55VagVD+WXxcoqbkNbtykBIRsB7Kvpe/mupVAfFJQiNPWvlzasQZCIA02MQqBuCvouDTibv9ajrPCVP1WhMoYkzYbX9LPlZVkd6pAbPAZL5wmOBaxT37lENDhtuhy2T+m/QnaGkU=
+	t=1742849241; cv=none; b=QvQ5wyknGlIKhvBlCHbn5Ttuku/b1YWkMi4PH+yWERCS2pJD5AqeRCT/qgsc/ZXLgHJ4QpePmTW2tOjDOLZnvX1TKJ0yANdzdL8lwV2KBwMudnZ1Z8oRz4fdgzuHZleAMh4IoIkHbu1SLYW7+P/EFzOyAh8iXehZvY9Tv12xKkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742848582; c=relaxed/simple;
-	bh=0S47eo2U6y8wfyvoreMicDR4R4XoeCQRc+kQUDsahqQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=grhBm0cMRjWs/rZqb27NehB9LVojlt4EzpT0yLv/Pl3JeVYObvDGCU75qp3lS0HjlBe7bSw1Dia1CCw2Rov1YWFKSu4tzbwU8nuO4CdTOwTXumUQJcCvyMugR4Vq1Y9HtpZlHcRPwQIqE4xIOYV3VYapFgVKlwudGyOmGhjKtBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s9W1qJ/W; arc=none smtp.client-ip=209.85.160.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4766e03b92bso83029161cf.2
-        for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 13:36:20 -0700 (PDT)
+	s=arc-20240116; t=1742849241; c=relaxed/simple;
+	bh=2ewnxVEGUfPsMZJJwJSin6l6tQAzJeo5ydHn0lCITwA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Pjx3SyusAiT8844l1s7pqR0WqEqexIwGCRaTgxT2JRokc2K5fhsa/lBA9WA4MPkA/aELPJWzyYpmzAMmPLsW643zPy8JDF7K36lxYtiR/g+LR+TgANe/GfSn+gakyHtyHIn1hZGNkupvCed8/2hugQTmW/650e578I8D4Q+mQgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=N6RroDFE; arc=none smtp.client-ip=52.95.48.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742848580; x=1743453380; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=K45qXyuC8+T4ImgoY3b8Gag6Bf97dsn4RbIlR6t2s1U=;
-        b=s9W1qJ/WgKJuss9oiiXkierCPNczePBAGZbxPbSREXVBC4Ppzx7GjSZuUywZGNnuhi
-         sPUk2eEPbta4EFzNMjpr3Xb/28j80LqVf3iBbdHi6C1KbfLp68WQVDAfCLWk1OMIMqaH
-         g/hZTTpAsWdNLvbAugh1VFmmwiDYvyu+SWKEgvTDpNXdjEILeHt2lHwglbPtVOWQHhha
-         yFUR/AyjkPaMkyaECaGgD7PQrggwYPFmlxdqA1b8OoM3mCYBwVYMhgsN8BfO+ZB2GEwA
-         P+fbEfph4DmgEnWJx7WkoLw/qKzgLC7s4/BgLckGIp4Vzn3EB3Jnq84wNXD9gJpOCEbh
-         ym6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742848580; x=1743453380;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=K45qXyuC8+T4ImgoY3b8Gag6Bf97dsn4RbIlR6t2s1U=;
-        b=r+h7/Yr9qt6Q4E6kfRVZzQguNNbQIIfLl5SfpUdRy6LaZKaGUVdCxH7HrqblQNhE26
-         fjOU0OzfhvdNDmyncizxIC3K+USRxm/KABwMbngQ5skcfZ2E2O0hLB9Ipq+tqLIQ5BW3
-         PutrmVd88p7uwNSzuOhtTUBjEtGWTnnnQje1fF+CG2llYEDgs+sVrrEBi7jBkmT2lC9u
-         OhdE1TlYjUGYLi7iUMIvVkydnZgbAbwqQbqzjsI4KgOl4Y2NYsAg/PK9+rIpYi1UWk6k
-         31ey4Cgnuc4wFVtnvSJFY9hRVLxvx8ctxnNishSzotS6U2EzfPYi2bXzmGTPosdIuTh5
-         cgZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUAR5QHrGAxEwfPfLdjwoa9ewxrzFpEFyc/BgsOHluhx5UFKOya1tXfWatgQrSRAQGYUqcs4Cs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLw4/Wy1mXkgjZE1vjDYejO41fwOGIFxEx1+go8KlV4XzwTArb
-	2LMxozO1t++LCcDsmPnXfs0bWG5AUGv8Xc8woPajGk4bkQ+p02l5I34s8421J0RTqgo8XyvntRf
-	xwnt9IRTEPQ==
-X-Google-Smtp-Source: AGHT+IF124JS2MdhpZjf1TMYrsPH257VrjQkig6YeV8oLbH0gwsCZ9JZh80WwMIDBpQqEXJxo2HcOZfsgGodRA==
-X-Received: from qtbfh14.prod.google.com ([2002:a05:622a:588e:b0:476:dfe4:e68a])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:5e17:b0:477:cb9:13b0 with SMTP id d75a77b69052e-4771dd5c6cemr198135111cf.7.1742848579865;
- Mon, 24 Mar 2025 13:36:19 -0700 (PDT)
-Date: Mon, 24 Mar 2025 20:36:07 +0000
-In-Reply-To: <20250324203607.703850-1-edumazet@google.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1742849240; x=1774385240;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=pIysevyEJkEZYcgLNKlc1FMb0T+Yy75/Pdlz1NC/vak=;
+  b=N6RroDFEQzjOvZ97l7GO2d1GakMQ2IO/BDHQICy6ViUusBIQnV++eCeZ
+   a5q6xGAp3hS+cdzNpvIH4VvfI7Mr8vdgKfBxPNM8E2vU/3jS3XODiSKdr
+   rxtkYGtIJLJK01pTgs/oXEE82/D2D6CW9vpU0uC+eAEPCqPJrtbscOxzV
+   k=;
+X-IronPort-AV: E=Sophos;i="6.14,272,1736812800"; 
+   d="scan'208";a="473963804"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2025 20:47:14 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:32429]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.0.51:2525] with esmtp (Farcaster)
+ id 9a8ba20b-6798-4c86-b8f0-7fa9808291da; Mon, 24 Mar 2025 20:47:12 +0000 (UTC)
+X-Farcaster-Flow-ID: 9a8ba20b-6798-4c86-b8f0-7fa9808291da
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 24 Mar 2025 20:47:10 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.106.100.20) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 24 Mar 2025 20:47:06 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <willemdebruijn.kernel@gmail.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<horms@kernel.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH v1 net 1/3] udp: Fix multiple wraparounds of sk->sk_rmem_alloc.
+Date: Mon, 24 Mar 2025 13:46:50 -0700
+Message-ID: <20250324204653.63879-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <67e1b628df780_35010c2948d@willemb.c.googlers.com.notmuch>
+References: <67e1b628df780_35010c2948d@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250324203607.703850-1-edumazet@google.com>
-X-Mailer: git-send-email 2.49.0.395.g12beb8f557-goog
-Message-ID: <20250324203607.703850-3-edumazet@google.com>
-Subject: [PATCH v3 net-next 2/2] tcp/dccp: remove icsk->icsk_ack.timeout
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Neal Cardwell <ncardwell@google.com>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D042UWA002.ant.amazon.com (10.13.139.17) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-icsk->icsk_ack.timeout can be replaced by icsk->csk_delack_timer.expires
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Mon, 24 Mar 2025 15:44:40 -0400
+> Kuniyuki Iwashima wrote:
+> > From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+> > Date: Mon, 24 Mar 2025 10:59:49 -0400
+> > > Kuniyuki Iwashima wrote:
+> > > > __udp_enqueue_schedule_skb() has the following condition:
+> > > > 
+> > > >   if (atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf)
+> > > >           goto drop;
+> > > > 
+> > > > sk->sk_rcvbuf is initialised by net.core.rmem_default and later can
+> > > > be configured by SO_RCVBUF, which is limited by net.core.rmem_max,
+> > > > or SO_RCVBUFFORCE.
+> > > > 
+> > > > If we set INT_MAX to sk->sk_rcvbuf, the condition is always false
+> > > > as sk->sk_rmem_alloc is also signed int.
+> > > > 
+> > > > Then, the size of the incoming skb is added to sk->sk_rmem_alloc
+> > > > unconditionally.
+> > > > 
+> > > > This results in integer overflow (possibly multiple times) on
+> > > > sk->sk_rmem_alloc and allows a single socket to have skb up to
+> > > > net.core.udp_mem[1].
+> > > > 
+> > > > For example, if we set a large value to udp_mem[1] and INT_MAX to
+> > > > sk->sk_rcvbuf and flood packets to the socket, we can see multiple
+> > > > overflows:
+> > > > 
+> > > >   # cat /proc/net/sockstat | grep UDP:
+> > > >   UDP: inuse 3 mem 7956736  <-- (7956736 << 12) bytes > INT_MAX * 15
+> > > >                                              ^- PAGE_SHIFT
+> > > >   # ss -uam
+> > > >   State  Recv-Q      ...
+> > > >   UNCONN -1757018048 ...    <-- flipping the sign repeatedly
+> > > >          skmem:(r2537949248,rb2147483646,t0,tb212992,f1984,w0,o0,bl0,d0)
+> > > > 
+> > > > Previously, we had a boundary check for INT_MAX, which was removed by
+> > > > commit 6a1f12dd85a8 ("udp: relax atomic operation on sk->sk_rmem_alloc").
+> > > > 
+> > > > A complete fix would be to revert it and cap the right operand by
+> > > > INT_MAX:
+> > > > 
+> > > >   rmem = atomic_add_return(size, &sk->sk_rmem_alloc);
+> > > >   if (rmem > min(size + (unsigned int)sk->sk_rcvbuf, INT_MAX))
+> > > >           goto uncharge_drop;
+> > > > 
+> > > > but we do not want to add the expensive atomic_add_return() back just
+> > > > for the corner case.
+> > > > 
+> > > > So, let's perform the first check as unsigned int to detect the
+> > > > integer overflow.
+> > > > 
+> > > > Note that we still allow a single wraparound, which can be observed
+> > > > from userspace, but it's acceptable considering it's unlikely that
+> > > > no recv() is called for a long period, and the negative value will
+> > > > soon flip back to positive after a few recv() calls.
+> > > 
+> > > Can we do better than this?
+> > 
+> > Another approach I had in mind was to restore the original validation
+> > under the recvq lock but without atomic ops like
+> > 
+> >   1. add another u32 as union of sk_rmem_alloc (only for UDP)
+> >   2. access it with READ_ONCE() or under the recvq lock
+> >   3. perform the validation under the lock
+> > 
+> > But it requires more changes around the error queue handling and
+> > the general socket impl, so will be too invasive for net.git but
+> > maybe worth a try for net-next ?
+> 
+> Definitely not net material. Adding more complexity here
+> would also need some convincing benchmark data probably.
+> 
+> > 
+> > > Is this because of the "Always allow at least one packet" below, and
+> > > due to testing the value of the counter without skb->truesize added?
+> > 
+> > Yes, that's the reason although we don't receive a single >INT_MAX
+> > packet.
+> 
+> I was surprised that we don't take the current skb size into
+> account when doing this calculation.
+> 
+> Turns out that this code used to do that.
+> 
+> commit 363dc73acacb ("udp: be less conservative with sock rmem
+> accounting") made this change:
+> 
+> -       if (rmem && (rmem + size > sk->sk_rcvbuf))
+> +       if (rmem > sk->sk_rcvbuf)
+>                 goto drop;
+> 
+> The special consideration to allow one packet is to avoid starvation
+> with small rcvbuf, judging also from this review comment:
+> 
+> https://lore.kernel.org/netdev/1476938622.5650.111.camel@edumazet-glaptop3.roam.corp.google.com/
 
-This saves 8 bytes in TCP/DCCP sockets and helps for better cache locality.
+Interesting, thanks for the info !
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- .../net_cachelines/inet_connection_sock.rst          |  1 -
- include/net/inet_connection_sock.h                   | 12 ++++++++----
- net/dccp/output.c                                    |  5 ++---
- net/dccp/timer.c                                     |  4 ++--
- net/ipv4/tcp_output.c                                |  7 +++----
- net/ipv4/tcp_timer.c                                 |  5 +++--
- net/mptcp/options.c                                  |  1 -
- net/mptcp/protocol.c                                 |  1 -
- 8 files changed, 18 insertions(+), 18 deletions(-)
+Now it's allowed to exceed by the total size of the incoming skb
+on every CPUs, and a user may notice that rmem > rcvbuf via ss,
+but I guess it's allowed because the fast recovery is expected.
 
-diff --git a/Documentation/networking/net_cachelines/inet_connection_sock.rst b/Documentation/networking/net_cachelines/inet_connection_sock.rst
-index 5fb0dd70c9af76ca68b3406ce76d4b61957c7da9..8fae85ebb773085b249c606ce37872e0566b70b4 100644
---- a/Documentation/networking/net_cachelines/inet_connection_sock.rst
-+++ b/Documentation/networking/net_cachelines/inet_connection_sock.rst
-@@ -38,7 +38,6 @@ struct icsk_ack_u8                  quick                  read_write          w
- struct icsk_ack_u8                  pingpong
- struct icsk_ack_u8                  retry                  write_mostly        read_write          inet_csk_clear_xmit_timer,tcp_rearm_rto,tcp_event_new_data_sent,tcp_write_xmit,__tcp_send_ack,tcp_send_ack,
- struct icsk_ack_u8                  ato                    read_mostly         write_mostly        tcp_dec_quickack_mode,tcp_event_ack_sent,__tcp_transmit_skb,__tcp_send_ack,tcp_send_ack
--struct icsk_ack_unsigned_long       timeout                read_write          read_write          inet_csk_reset_xmit_timer,tcp_connect
- struct icsk_ack_u32                 lrcvtime               read_write                              tcp_finish_connect,tcp_connect,tcp_event_data_sent,__tcp_transmit_skb
- struct icsk_ack_u16                 rcv_mss                write_mostly        read_mostly         __tcp_select_window,__tcp_cleanup_rbuf,tcp_initialize_rcv_mss,tcp_connect_init
- struct icsk_mtup_int                search_high            read_write                              tcp_mtup_init,tcp_sync_mss,tcp_connect_init,tcp_mtu_check_reprobe,tcp_write_xmit
-diff --git a/include/net/inet_connection_sock.h b/include/net/inet_connection_sock.h
-index 6dca0ac6fbc6f50be447e2a554593c77bd9cf1b6..1735db332aab56173e45e8754c8d17b21e7e77c5 100644
---- a/include/net/inet_connection_sock.h
-+++ b/include/net/inet_connection_sock.h
-@@ -113,7 +113,6 @@ struct inet_connection_sock {
- 				  lrcv_flowlabel:20, /* last received ipv6 flowlabel	   */
- 				  dst_quick_ack:1, /* cache dst RTAX_QUICKACK		   */
- 				  unused:3;
--		unsigned long	  timeout;	 /* Currently scheduled timeout		   */
- 		__u32		  lrcvtime;	 /* timestamp of last received data packet */
- 		__u16		  last_seg_size; /* Size of last incoming segment	   */
- 		__u16		  rcv_mss;	 /* MSS used for delayed ACK decisions	   */
-@@ -191,6 +190,12 @@ icsk_timeout(const struct inet_connection_sock *icsk)
- 	return READ_ONCE(icsk->icsk_retransmit_timer.expires);
- }
- 
-+static inline unsigned long
-+icsk_delack_timeout(const struct inet_connection_sock *icsk)
-+{
-+	return READ_ONCE(icsk->icsk_delack_timer.expires);
-+}
-+
- static inline void inet_csk_clear_xmit_timer(struct sock *sk, const int what)
- {
- 	struct inet_connection_sock *icsk = inet_csk(sk);
-@@ -226,16 +231,15 @@ static inline void inet_csk_reset_xmit_timer(struct sock *sk, const int what,
- 		when = max_when;
- 	}
- 
-+	when += jiffies;
- 	if (what == ICSK_TIME_RETRANS || what == ICSK_TIME_PROBE0 ||
- 	    what == ICSK_TIME_LOSS_PROBE || what == ICSK_TIME_REO_TIMEOUT) {
- 		smp_store_release(&icsk->icsk_pending, what);
--		when += jiffies;
- 		sk_reset_timer(sk, &icsk->icsk_retransmit_timer, when);
- 	} else if (what == ICSK_TIME_DACK) {
- 		smp_store_release(&icsk->icsk_ack.pending,
- 				  icsk->icsk_ack.pending | ICSK_ACK_TIMER);
--		icsk->icsk_ack.timeout = jiffies + when;
--		sk_reset_timer(sk, &icsk->icsk_delack_timer, icsk->icsk_ack.timeout);
-+		sk_reset_timer(sk, &icsk->icsk_delack_timer, when);
- 	} else {
- 		pr_debug("inet_csk BUG: unknown timer value\n");
- 	}
-diff --git a/net/dccp/output.c b/net/dccp/output.c
-index 5c2e24f3c39b7ff4ee1d5d96d5e406c96609a022..39cf3430177ac597b0a9fd40bf0d8dfbff5fd92d 100644
---- a/net/dccp/output.c
-+++ b/net/dccp/output.c
-@@ -627,11 +627,10 @@ void dccp_send_delayed_ack(struct sock *sk)
- 			return;
- 		}
- 
--		if (!time_before(timeout, icsk->icsk_ack.timeout))
--			timeout = icsk->icsk_ack.timeout;
-+		if (!time_before(timeout, icsk_delack_timeout(icsk)))
-+			timeout = icsk_delack_timeout(icsk);
- 	}
- 	icsk->icsk_ack.pending |= ICSK_ACK_SCHED | ICSK_ACK_TIMER;
--	icsk->icsk_ack.timeout = timeout;
- 	sk_reset_timer(sk, &icsk->icsk_delack_timer, timeout);
- }
- #endif
-diff --git a/net/dccp/timer.c b/net/dccp/timer.c
-index 9fd14a3361893d5f2d9f0ad18a65cff963cc7e22..232ac4ae0a73ff31beca730c14d8b02107aeb926 100644
---- a/net/dccp/timer.c
-+++ b/net/dccp/timer.c
-@@ -185,9 +185,9 @@ static void dccp_delack_timer(struct timer_list *t)
- 	if (sk->sk_state == DCCP_CLOSED ||
- 	    !(icsk->icsk_ack.pending & ICSK_ACK_TIMER))
- 		goto out;
--	if (time_after(icsk->icsk_ack.timeout, jiffies)) {
-+	if (time_after(icsk_delack_timeout(icsk), jiffies)) {
- 		sk_reset_timer(sk, &icsk->icsk_delack_timer,
--			       icsk->icsk_ack.timeout);
-+			       icsk_delack_timeout(icsk));
- 		goto out;
- 	}
- 
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index e0a4e5432399a3874e471f2d908bf976350f2696..c29e689d966097fabb83876f21d54201989b444d 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -4225,17 +4225,16 @@ void tcp_send_delayed_ack(struct sock *sk)
- 	/* Use new timeout only if there wasn't a older one earlier. */
- 	if (icsk->icsk_ack.pending & ICSK_ACK_TIMER) {
- 		/* If delack timer is about to expire, send ACK now. */
--		if (time_before_eq(icsk->icsk_ack.timeout, jiffies + (ato >> 2))) {
-+		if (time_before_eq(icsk_delack_timeout(icsk), jiffies + (ato >> 2))) {
- 			tcp_send_ack(sk);
- 			return;
- 		}
- 
--		if (!time_before(timeout, icsk->icsk_ack.timeout))
--			timeout = icsk->icsk_ack.timeout;
-+		if (!time_before(timeout, icsk_delack_timeout(icsk)))
-+			timeout = icsk_delack_timeout(icsk);
- 	}
- 	smp_store_release(&icsk->icsk_ack.pending,
- 			  icsk->icsk_ack.pending | ICSK_ACK_SCHED | ICSK_ACK_TIMER);
--	icsk->icsk_ack.timeout = timeout;
- 	sk_reset_timer(sk, &icsk->icsk_delack_timer, timeout);
- }
- 
-diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
-index d828b74c3e73d75cdae777645e8e8856c0751201..d64383b06a295affb735f60edd4dfd64ad5fb1c8 100644
---- a/net/ipv4/tcp_timer.c
-+++ b/net/ipv4/tcp_timer.c
-@@ -322,8 +322,9 @@ void tcp_delack_timer_handler(struct sock *sk)
- 	if (!(icsk->icsk_ack.pending & ICSK_ACK_TIMER))
- 		return;
- 
--	if (time_after(icsk->icsk_ack.timeout, jiffies)) {
--		sk_reset_timer(sk, &icsk->icsk_delack_timer, icsk->icsk_ack.timeout);
-+	if (time_after(icsk_delack_timeout(icsk), jiffies)) {
-+		sk_reset_timer(sk, &icsk->icsk_delack_timer,
-+			       icsk_delack_timeout(icsk));
- 		return;
- 	}
- 	icsk->icsk_ack.pending &= ~ICSK_ACK_TIMER;
-diff --git a/net/mptcp/options.c b/net/mptcp/options.c
-index 23949ae2a3a8db19d05c5c8373f45c885c3523ad..421ced0312890b98dde560932b5f9437a15c4030 100644
---- a/net/mptcp/options.c
-+++ b/net/mptcp/options.c
-@@ -432,7 +432,6 @@ static void clear_3rdack_retransmission(struct sock *sk)
- 	struct inet_connection_sock *icsk = inet_csk(sk);
- 
- 	sk_stop_timer(sk, &icsk->icsk_delack_timer);
--	icsk->icsk_ack.timeout = 0;
- 	icsk->icsk_ack.ato = 0;
- 	icsk->icsk_ack.pending &= ~(ICSK_ACK_SCHED | ICSK_ACK_TIMER);
- }
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index 1ac378ba1d67cd17449ab6c4b4793b65d520ec44..44f7ab463d7550ad728651bad2b1aeb4cd4dea05 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -3420,7 +3420,6 @@ static void schedule_3rdack_retransmission(struct sock *ssk)
- 	WARN_ON_ONCE(icsk->icsk_ack.pending & ICSK_ACK_TIMER);
- 	smp_store_release(&icsk->icsk_ack.pending,
- 			  icsk->icsk_ack.pending | ICSK_ACK_SCHED | ICSK_ACK_TIMER);
--	icsk->icsk_ack.timeout = timeout;
- 	sk_reset_timer(ssk, &icsk->icsk_delack_timer, timeout);
- }
- 
--- 
-2.49.0.395.g12beb8f557-goog
 
+> 
+> That clearly doesn't apply when rcvbuf is near INT_MAX.
+> Can we separate the tiny budget case and hard drop including the
+> skb->truesize for normal buffer sizes?
+
+Maybe like this ?
+
+        if (rcvbuf < UDP_MIN_RCVBUF) {
+                if (rmem > rcvbuf)
+                        goto drop;
+        } else {
+                if (rmem + size > rcvbuf)
+                        goto drop;
+        }
+
+SOCK_MIN_RCVBUF is 2K + skb since 2013, but the regression was
+reported after that in 2016, so UDP_MIN_RCVBUF would be more ?
+
+But I wonder if adding new branches in the fast path is worth for
+the corner case, and that's why I chose integrating the cast into
+the exisintg branch, allowing a small overflow, which is observable
+only when no thread calls recv() and skbs are queued more than INT_MAX.
 
