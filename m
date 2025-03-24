@@ -1,131 +1,94 @@
-Return-Path: <netdev+bounces-177142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA640A6E068
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 18:01:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 225B4A6E061
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 18:00:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71902188B639
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 17:00:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8E9A188B2B6
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 17:00:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87118262D1D;
-	Mon, 24 Mar 2025 17:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29DAD26280C;
+	Mon, 24 Mar 2025 16:59:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PesrHXDy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XHe5Zm5b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E2826158D;
-	Mon, 24 Mar 2025 17:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 014A11D514A;
+	Mon, 24 Mar 2025 16:59:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742835629; cv=none; b=KK8395dQdRXPTWU6kijUCr0EKdQnkkYAtSwtcamt+sJfSE0CeRTrxTHvu+qYhkBwliZ2eozJSx58/jc7SY6NfMSZoI8cDiR7qNe3NYNOjucZz0PWFp+SAopzUMWU0NOt2peURaHRxNgfbahP3x/aDZJC8Gx9Ivc0sEh3kF8qb80=
+	t=1742835599; cv=none; b=cl59fO7yFUTbqjQnkg0Gq3g3WAHr0ucLxqRuEPm0lI4sjKaz/5mWq8Q/KElWHcQjcMb7nUHwpMWad8MU442IGbuwKFbuAFvxHxLMi9k7Zyd+xwddHhME7DAVLI/Owab2J5ZH0ozs0fBNJ8fFwdKtLjo572HthTzqNSx3tHATlbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742835629; c=relaxed/simple;
-	bh=QZ+ADSPlR4WN2OpqtNqLf9bC//Y4z9l5vR66G7an/rM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bTLPSueC6EriTXAmWZFHugE+D6azMdNTx9gf7Nt2E4TEJdlb5gJ07KNQEhns9hf3FFiuIL4r1ePSP15Zg9LHzns7BzgW2p4tO/SB9k25XNMsECVrt1a8m7jD6PLVQ/sjMwhFEhY7k+mKF5fwTXtHk9v8PtfqIRStPPvJVQgiIk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PesrHXDy; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-85e15dc801aso398341139f.2;
-        Mon, 24 Mar 2025 10:00:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742835627; x=1743440427; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XiK+XbItIIUrna1hCKyECwMMmXpIkkNG/K+3Wgt4kIY=;
-        b=PesrHXDyc2egOW3Yng5HB3nWuusGNns8nwmnrO1/I+aeD2jBUgJjM92xtalZNq2is2
-         bRNoUIc6FFmtzSZ/QaA/wCc7Y7OZTwimXWTOZYL6Y6+kjrFLJ+Lnf8GF0wu4ZDFpgJvo
-         MhdZxeEjHWJYhdF9ifCEVaGyjzImcne+TMYfdPWy4P4ra/ElCerxRvA9T5AAAajSJCms
-         dzUXDXPz+N6tl5VLyWBc8fxPbQ0dJsRmYh614DgRgnfN7tMOysfvmrQn2aacpeahK3O/
-         zQ0lY9/rMLhS92XzTDhVUc3M6ngxMNMTs1sfoy8Y4oHkri3I7BUk2GI9jWmad/BLmv4l
-         fvWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742835627; x=1743440427;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XiK+XbItIIUrna1hCKyECwMMmXpIkkNG/K+3Wgt4kIY=;
-        b=qTPoduoHGYxjCZKPno7uVckoCuL+07fJn7VCJ5Gf3Emvq+I/ZGGbgUQ+4E+4QLp1zq
-         SaYTp1opnO9zH+BEqrSd3BUj7pBy79gIeYPWA/m+VLyj+ue1wZNsxXXN27kxNxCpeaPw
-         QWJHMtASt73iXFuWExRYDwuB9MAQj8ExiE4Xn59lFbqJ6nNhuedjWxbds+nVwQzmdjgB
-         XZLhUjgFqh0SPTJWVzB+cy2snnrN4/YKyJYftSqTlX6Sx0TqvSj3E5J63DBHPYYX1qye
-         2cZgKESVH75uugncY1rq75jZ96O6qoFgYLDUg1LUjYVCCs6PbaOxrdHeXYtao0xKOXHc
-         Ot2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUTWNtpaynrCPPNZNQsQVNLdbcg/jGzDyVR2YnxqMI/jFn+QqVXIHO6GFxeNzF0rwnW9+tMFYU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEHCqUej0nVyPAsCVdezl1QLMMYh2UtMICZ+sYyBglEBmRpIHD
-	HQZpBiz8zaN4Jj9Hyu1+wvbP5eNonZul9XOuhUYxPVSS0cYAmMl6rEkB6zpo40wtIZ9e79kcKRD
-	hKvCg266jFKvGdfxBGsXDs3aMuks=
-X-Gm-Gg: ASbGncvi2Px1UpyA7GThXKGjS6cOYSIKczdtQOyDhB9f+4D/o2FoghtjoH65raO6xcg
-	fNt/4JtW8/94KSSXPbFaFqFMfnlPPv1Cxx7qFC4qAj6bxfbd9KtctQjEpTyAEgqi77sQ/rgJVA4
-	aBOKPRXnWoMyMSGZYPAHi9Sahdow==
-X-Google-Smtp-Source: AGHT+IHMCuHkLI+ZDUJnWpVX+8/mF1/t8QEJVpvny4ENE1co6tCTIr4wVdurMNYnEssqNhr49BHxYweG0qiMZKPx//w=
-X-Received: by 2002:a05:6e02:3207:b0:3d4:712e:29eb with SMTP id
- e9e14a558f8ab-3d5960ccfacmr148634145ab.5.1742835626661; Mon, 24 Mar 2025
- 10:00:26 -0700 (PDT)
+	s=arc-20240116; t=1742835599; c=relaxed/simple;
+	bh=R8Y139KSJEoEMPvzdoIiX04zKRPgVlk+9dHVzsRpa/g=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Yd/RXIgLaZYvofg7SZtctuW/9cL9U8waWuxz7ou5q0RvcnTe/drsvK/Y9NlMvkrwiHNZ3NrdqTp4Yk4EiQK3JoznMYOU9CniOlYR6jrL2o8MlngjJUaaPEDJZ7OjMYGAeUdfQPsqog8qs6LsOxTPI4/1TqhZZaP7SP9dHBiSjgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XHe5Zm5b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BDEDC4CEDD;
+	Mon, 24 Mar 2025 16:59:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742835598;
+	bh=R8Y139KSJEoEMPvzdoIiX04zKRPgVlk+9dHVzsRpa/g=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XHe5Zm5bjWlwo07Trq4d3uRndKyy3KfqnkClIbTO0O1F00/DBxfEZdjaQq9f26Njq
+	 bxMDb8sXKqefMVVJIDxTW3QbPNSy4ZqokpyT+Mx89zqOEI0HTW0UGftGuZmVjz0CdI
+	 jrbIi06xLkbkgyzb6uGxAQydqtOfk/LqjUTlspEoiSRd7Z7a3e9LlQPoxnr5e5K4ll
+	 MGn4R8BcsR80i7DapKderb/OP1aVmtOvL1Oo6gOaxOuRt6BhU8l0IoEuoW2+3lAtC/
+	 mrtaOV87FfINouhgI88jGMu3zOCRsKcIzVP9aPx1LcDSVnqTjYz+TVP5tdUjyMfw3w
+	 MwP0RkOkF31Ig==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE886380664D;
+	Mon, 24 Mar 2025 17:00:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250313134942.52ff54a140ec.If390bbdc46904cf451256ba989d7a056c457af6e@changeid>
- <CAL+tcoB3zku2EtLT2yJ9qPCSuN2=x-T-avqcZ-LJ2Q-mU5xLVg@mail.gmail.com> <db7a40f500c0b595bc2ee0f9524bacbc592dc72d.camel@sipsolutions.net>
-In-Reply-To: <db7a40f500c0b595bc2ee0f9524bacbc592dc72d.camel@sipsolutions.net>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 25 Mar 2025 00:59:48 +0800
-X-Gm-Features: AQ5f1Jq5vlEVgzazVwvL-JDorvj_Ino1GgoGhgWzAbm9431-nmRADWw-ma4jpww
-Message-ID: <CAL+tcoBHbK=xDEp7RHqUHxSZqNOcd7kxAEdPC7aZq8RaWtDa0Q@mail.gmail.com>
-Subject: Re: [RFC PATCH] wifi: free SKBTX_WIFI_STATUS skb tx_flags flag
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] net: phy: dp83822: fix transmit amplitude if
+ CONFIG_OF_MDIO not defined
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174283563452.4097226.5621496775450844248.git-patchwork-notify@kernel.org>
+Date: Mon, 24 Mar 2025 17:00:34 +0000
+References: <20250317-dp83822-fix-transceiver-mdio-v2-1-fb09454099a4@liebherr.com>
+In-Reply-To: <20250317-dp83822-fix-transceiver-mdio-v2-1-fb09454099a4@liebherr.com>
+To: Dimitri Fedrau via B4 Relay <devnull+dimitri.fedrau.liebherr.com@kernel.org>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, dima.fedrau@gmail.com,
+ gerhard@engleder-embedded.com, dimitri.fedrau@liebherr.com
 
-On Tue, Mar 25, 2025 at 12:56=E2=80=AFAM Johannes Berg
-<johannes@sipsolutions.net> wrote:
->
-> On Tue, 2025-03-25 at 00:53 +0800, Jason Xing wrote:
-> >
-> > Thanks for working on this. After net-next is open, I will use this
-> > bit to finish the bpf timestamping in the rx path :)
->
-> :)
->
-> > > --- a/include/linux/skbuff.h
-> > > +++ b/include/linux/skbuff.h
-> > > @@ -481,9 +481,6 @@ enum {
-> > >         /* reserved */
-> > >         SKBTX_RESERVED =3D 1 << 3,
-> >
-> > It might conflict with the bluetooth commit [1], I presume.
-> >
-> > [1]: https://web.git.kernel.org/pub/scm/linux/kernel/git/bluetooth/blue=
-tooth-next.git/commit/?id=3Dc6c3dc495a6ce5b9dfed4df08c3220207e7103bd
->
-> True, just context though, we can deal with that.
->
-> > >
-> > > -       /* generate wifi status information (where possible) */
-> > > -       SKBTX_WIFI_STATUS =3D 1 << 4,
-> > > -
-> >
-> > Better use SKBTX_RESERVED. No strong preference here since I'm going to=
- use it.
->
-> I can't have two called SKBTX_RESERVED, but I'm not sure it's worth
-> renaming it rather than removing? No strong opinion though. The context
-> conflict will happen either way ;)
+Hello:
 
-Sure, we can ignore it. As I mentioned, this released bit will be used soon=
- :)
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
->
-> johannes
->
+On Mon, 17 Mar 2025 08:48:34 +0100 you wrote:
+> From: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+> 
+> When CONFIG_OF_MDIO is not defined the index for selecting the transmit
+> amplitude voltage for 100BASE-TX is set to 0, but it should be -1, if there
+> is no need to modify the transmit amplitude voltage. Move initialization of
+> the index from dp83822_of_init to dp8382x_probe.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2] net: phy: dp83822: fix transmit amplitude if CONFIG_OF_MDIO not defined
+    https://git.kernel.org/netdev/net-next/c/8fa649fd7d30
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
