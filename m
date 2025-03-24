@@ -1,137 +1,108 @@
-Return-Path: <netdev+bounces-177241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FA98A6E66A
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 23:12:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA332A6E66E
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 23:13:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 863A116C674
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 22:11:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83FB3188CE2D
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 22:13:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F91D1EA7C7;
-	Mon, 24 Mar 2025 22:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D22C1EC00B;
+	Mon, 24 Mar 2025 22:13:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KFHQFc7F"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="EvyuXIeA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63EFD1A2C06;
-	Mon, 24 Mar 2025 22:11:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B3C189520;
+	Mon, 24 Mar 2025 22:13:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742854287; cv=none; b=HSULr29UcEQgS0+jxa2AaGuHvElwnSh9b0+G1xv4fl3jxsOzjidP1hpkJx1YMXnhnsVSoX2qe25zfOtknq/GffuFU3WKbHg4gWdGU2vv2lxBNH12w6aTXug7TJHJV521kXf0R73Z/+/LsDtp5x+51pooJLDTyGnFiLfKkiHYOBE=
+	t=1742854384; cv=none; b=dLmGOaPkXqfjB7xYzSbvaLO84TeDbTZMfjlM42gsLI85PlFd+Erz/wKkXd+41b9XPBdmcyV002lUO1BbK48YMBTKw7H/oN0basFZuzmcEBUjQAI88vk+gD9u8GPdH5qoRgLlQ5+THnAfJIGelIAFsr/IScGx+v80TkDZgjuhRZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742854287; c=relaxed/simple;
-	bh=25ILf6T8x7Jzl8pp4Bv2f1/2BtN7CZRZip4Sn4QcCqE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WusKFGWSs1d0Twn2yulHJp8EiUT2sHZN4gjwuPbmo0hUivcJ2gcbj1cBxxGWKE8axQDHZ626WjjYOC5ZcMvbBJgxZ9uXC2y9KAD6FZ1ZW4ZzyPwZxojyG20DeG5weM631gJxJqmhSHhqdtSEdzQ69cV9BfDueNWzLl+4GjoRVCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KFHQFc7F; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CED17C4CEDD;
-	Mon, 24 Mar 2025 22:11:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742854286;
-	bh=25ILf6T8x7Jzl8pp4Bv2f1/2BtN7CZRZip4Sn4QcCqE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=KFHQFc7FbLfKKyS5Y1xzC7nGw/2aP7HgxzbODNUpLKwPjyAY0yf16jmMaxb5H+SVQ
-	 r1JhIYDkFXVEYLybyDCTgZduivEnzPrsCgd72j9BpgbBGKKRPy+5rspV8+ggI2t05J
-	 bFLqhCjOj06Sc+XTlAWGUjmAFBviSYooQor+VlMyZXGlBISP2ZfsJAKI0N3oJYbzww
-	 tnugCe+cOk0vQCvJomiOBCXLBqRn4B794gEFZgrvugqX/Cqmc6qbt2gxSdnxqhanMq
-	 6+So3tP9wPXIQNjqyXg0NNf2C1n0OTQD+ogvloGMnzNA/9JR9lCQ1H1LxiwlfI40TU
-	 mpXgDFNjkqisQ==
-Message-ID: <4bb08c33-eac5-46e1-8d59-acc125946654@kernel.org>
-Date: Mon, 24 Mar 2025 23:11:22 +0100
+	s=arc-20240116; t=1742854384; c=relaxed/simple;
+	bh=pxZV0lCq63K2Xm8Qxzn2wrfkO5sFjrmTs+gHDwFzjd0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JNkv4bM0icsjHU4roghQN1o1qH6YIKEaFo7GB2++lHr5+63m9jeRiIYJmrXaqiMW3pRyZqLqKJ6D4XQWmD+smWdHIOl7tnFg+VI/TpzQUqeswOlUSbMrbNwmzqQ3/j+sGMC1vJ0AVo+bKvlJABRJ2rqmP2UTyUmhIPH3a4J3UNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=EvyuXIeA; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1742854383; x=1774390383;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=k60Gai7cX/McVhIUIlEfUcNBi1wmCrikip+HM5lWowk=;
+  b=EvyuXIeAXU+eSeQMsFdRwVNmjT+wKJGQ8Flff797+GmSTYGL5Ko3KlLk
+   lfrK+VF9ZLySqFQtAy0p7nQyLkEOjLY8/RBmskMp7eUpis1g9/jnhl8bW
+   mGyB0gyKhogl/gwy/SEuhN2w5YjYUt/gMU6e6tw5LqhLt1MCAghcWDzht
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.14,273,1736812800"; 
+   d="scan'208";a="810194261"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2025 22:12:38 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:35727]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.41.16:2525] with esmtp (Farcaster)
+ id b69190ba-5547-4800-ac46-7b9b581386b6; Mon, 24 Mar 2025 22:12:37 +0000 (UTC)
+X-Farcaster-Flow-ID: b69190ba-5547-4800-ac46-7b9b581386b6
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 24 Mar 2025 22:12:36 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.106.100.20) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 24 Mar 2025 22:12:33 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <chenxiaosong@chenxiaosong.com>
+CC: <david.laight.linux@gmail.com>, <chenxiaosong@kylinos.cn>,
+	<linkinjeon@kernel.org>, <linux-cifs@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<senozhatsky@chromium.org>, <sfrench@samba.org>, <tom@talpey.com>
+Subject: Re: [PATCH] smb/server: use sock_create_kern() in create_socket()
+Date: Mon, 24 Mar 2025 15:11:36 -0700
+Message-ID: <20250324221225.73511-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250324210747.3dc899b9@pumpkin>
+References: <20250324210747.3dc899b9@pumpkin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net-next v1] page_pool: import Jesper's page_pool
- benchmark
-To: Mina Almasry <almasrymina@google.com>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Andrew Morton <akpm@linux-foundation.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Jakub Kicinski <kuba@kernel.org>
-References: <20250309084118.3080950-1-almasrymina@google.com>
- <87a59txn3v.fsf@toke.dk>
- <CAHS8izM30jZ+bKkpeKQLKk3BGj8nBFLpUFgS2qM7x8EPMV7KOQ@mail.gmail.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <CAHS8izM30jZ+bKkpeKQLKk3BGj8nBFLpUFgS2qM7x8EPMV7KOQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D044UWB004.ant.amazon.com (10.13.139.134) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-
-
-On 24/03/2025 21.23, Mina Almasry wrote:
-> On Mon, Mar 10, 2025 at 2:15 AM Toke Høiland-Jørgensen <toke@toke.dk> wrote:
->>
->> Mina Almasry <almasrymina@google.com> writes:
->>
->>> From: Jesper Dangaard Brouer <hawk@kernel.org>
->>>
->>> We frequently consult with Jesper's out-of-tree page_pool benchmark to
->>> evaluate page_pool changes.
->>>
->>> Consider importing the benchmark into the upstream linux kernel tree so
->>> that (a) we're all running the same version, (b) pave the way for shared
->>> improvements, and (c) maybe one day integrate it with nipa, if possible.
->>>
->>> I imported the bench_page_pool_simple from commit 35b1716d0c30 ("Add
->>> page_bench06_walk_all"), from this repository:
->>> https://github.com/netoptimizer/prototype-kernel.git
->>>
->>> I imported the benchmark, largely as-is. I only fixed build or
->>> checkpatch issues.
->>>
->>> Cc: Jesper Dangaard Brouer <hawk@kernel.org>
->>> Cc: Ilias Apalodimas <ilias.apalodimas@linaro.org>
->>> Cc: Jakub Kicinski <kuba@kernel.org>
->>> Cc: Toke Høiland-Jørgensen <toke@toke.dk>
->>> Cc: netdev@vger.kernel.org
->>> Signed-off-by: Mina Almasry <almasrymina@google.com>
->>>
->>> ---
->>>
->>> RFC discussion points:
->>> - Desirable to import it?
->>
->> I think so, yeah.
->>
->>> - Can the benchmark be imported as-is for an initial version? Or needs
->>>    lots of modifications?
->>
->> One thing that I was discussing with Jesper the other day is that the
->> current version allocates the page_pool itself in softirq context, which
->> leads to some "may sleep" warning. I think we should fix that before
->> upstreaming.
->>
+From: David Laight <david.laight.linux@gmail.com>
+Date: Mon, 24 Mar 2025 21:07:47 +0000
+> On Mon, 24 Mar 2025 06:51:55 +0000
+> chenxiaosong@chenxiaosong.com wrote:
 > 
-> I don't think I saw that warning for whatever reason. Do you by any
-> chance have a fix that I can squash? Or do you think it is very
-> critical to fix this before upstreaming? I.e. not follow up with a
-> fix?
+> > From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+> > 
+> > The socket resides in kernel space, so use sock_create_kern()
+> > instead of sock_create().
+> 
+> As in the other patches you need to worry about whether the socket
+> holds a reference to the network namespace.
 
-The tasklet trick in the benchmark module is to fake that code is
-running in softirq context, which avoids taking the _bh lock variants.
+Right, and if you don't see any real issue, I recommend leaving
+it as is for now because we have seen many refcount issues for
+kernel TCP sockets.
 
-In the past the performance was really different between the two
-execution contexts, but in all of my recent experiments [1][2], the
-performance differences are gone. So, I think we can simply drop the
-ugly tasklet setup tricks.
+And I totally forgot to respin my series after holiday to clean
+up such callers.
+https://lore.kernel.org/netdev/20241213092152.14057-1-kuniyu@amazon.com/
 
-  [1] 
-https://github.com/xdp-project/xdp-project/blob/main/areas/mem/page_pool07_bench_DMA_fix.org
-  [2] 
-https://github.com/xdp-project/xdp-project/blob/main/areas/mem/page_pool08_bench_AMD.org
+I'll repost v4 after the merge window with some modification
 
-BTW it is awesome that you are pushing this to get upstreamed.
-
---Jesper
+  1. be less invasive as suggested by Paolo
+  2. use sk_net_refcnt_upgrade()
 
