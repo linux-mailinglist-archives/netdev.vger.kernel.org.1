@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-176994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-176991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73E57A6D2EC
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 03:01:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3256A6D2EA
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 03:01:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 088E0188E3B0
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 02:02:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 091773B3EBE
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 02:01:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ABFE1E521;
-	Mon, 24 Mar 2025 02:01:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B105E15E96;
+	Mon, 24 Mar 2025 02:01:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D38FC17555
-	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 02:01:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC891E521
+	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 02:01:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742781713; cv=none; b=MbnG9k7KcLdikgGs7NN/ctRPEW5XmwRkuGDQ+nSTlgyNUZMDXMIHT3/U3xkeh0lvvEPrAscw6Z+czIMz5dDeM4QS6N45gajBDR9fU9cVjLgnyhevO/kxVrOua9Ojp5EwExDJre6vOy0jNbV0+tSac1KjoYvJl/5uo23t9rH1dUM=
+	t=1742781691; cv=none; b=BS58lUxlg5qxREj1XsfyLTwFFDPN/BQlrbxMvhCTq7xDfPFfU1jMXeeXTnqGMvMugUGzcTbIYbEjzpeJkc0YI76spC7dABws0+Z3A8qNJraImqY3E51iH6YuuirTA4wTKKPcivDauEwpbcWD8RnqsW2ndSgQwZxZvvaig8goBJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742781713; c=relaxed/simple;
-	bh=Jzttg+/1ybN5U6lwfzGW6+yZT2z2es7vNYa7c7TCYa8=;
+	s=arc-20240116; t=1742781691; c=relaxed/simple;
+	bh=cjz+Njn/Q6iLLNpHA7OjaNaCafUa9yIGWe/cLLn+L70=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MUXYWtic+Yl5YsZ6Es/Tsyn5LcM4HZgUWtPer+PcNqLSdTmnIFzDQ3SgTSjgYFj367YWANkLH0orypxSTr+h5qPGIo4DjJmZO1ZsKWCjxT7Uo+LCyM4hTceKwmy6uiM+cekXQMHhyHdUjN9Ribqb4/6HiAY6+t35OMU0SaTtye4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=18.132.163.193
+	 MIME-Version; b=iwq9FXc7frjEANG6SlUncS3o+0ZgCa+OOG0nHmMYTfH1XdILxS6EpOFK9Lc3eF1j9oR3865To8Z3d8n/VA7brKOoQxx6d8Qr9XLDYxGGwjn87P4SDGsWeGKwUgZgjuYxpityXZrRoqKg+XT3SNjsbFw08BgLSsofdkNCQw3gvDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.206.34.216
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
-X-QQ-mid: bizesmtpsz6t1742781661t3lpnvm
-X-QQ-Originating-IP: 3JpRkCE6J8Kf2oYVhtNdRq0EQpUaypx6hZj57zi94Po=
+X-QQ-mid: bizesmtpsz6t1742781665t00aisr
+X-QQ-Originating-IP: 4X0HNPqsQY0aId5tz9waVrNU7e8ywy1Iwm661WfYxLI=
 Received: from localhost.localdomain ( [60.186.241.229])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 24 Mar 2025 10:01:00 +0800 (CST)
+	id ; Mon, 24 Mar 2025 10:01:03 +0800 (CST)
 X-QQ-SSF: 0001000000000000000000000000000
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 8230435162170857582
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 8107421278965892175
 From: Mengyuan Lou <mengyuanlou@net-swift.com>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -44,9 +44,9 @@ Cc: kuba@kernel.org,
 	jiawenwu@trustnetic.com,
 	duanqiangwen@net-swift.com,
 	Mengyuan Lou <mengyuanlou@net-swift.com>
-Subject: [RESEND,PATCH net-next v9 5/6] net: ngbe: add sriov function support
-Date: Mon, 24 Mar 2025 10:00:32 +0800
-Message-ID: <9B4D34D65A81485C+20250324020033.36225-6-mengyuanlou@net-swift.com>
+Subject: [RESEND,PATCH net-next v9 6/6] net: txgbe: add sriov function support
+Date: Mon, 24 Mar 2025 10:00:33 +0800
+Message-ID: <212BF3F0A2A3F362+20250324020033.36225-7-mengyuanlou@net-swift.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250324020033.36225-1-mengyuanlou@net-swift.com>
 References: <20250324020033.36225-1-mengyuanlou@net-swift.com>
@@ -59,304 +59,280 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: bizesmtpsz:net-swift.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: OQhZ3T0tjf0a2u+GkbXeezS4rf4J4DplaT7ZsyIQ2FHcoz69KjWhy42k
-	DKSKe6RdpgLFhQ3Xyb9T3DG9GbcANSzF/rKlboF5SnUqEuMLtGSglRUwLmNEgWDs3+sMvsM
-	z/G+8Rxtf8K26fAgW+t2GUQLwUkdz/5UPRJhhCCNMmOVqruQpgDIrFnqBjxOOlEK0bfJx8N
-	K0xs7tCrD36dQfGXQYRVUpewZPBtKWAOyeSrVRD0J6BOfE26gwmbu0of4oIwYsxgqj+gsj3
-	dJc9pxPdmMoW6cQK/o1aN/4SIAxo9trjqP2gEvZ8ojBfi4GAJAe/wN3XwLaMAAbGGw988Vs
-	eJ1p24AmS2vMEXhZiWH4xTDunb/dQC/DDgLHvQuPot6OWKXWVYksvoaIRNl1t97hj85Jjks
-	HIWIzsHZ56zZ0r+9RZc0xP+zGC/Bp9AD+n9mEwDSUJMCZ1B4otmmJraLYVX/UDqbWSsQHaf
-	yKtfDV0QbGdHCnaiYpCj98QrsBrPSL3W+2qF1zTZSJRGGFVuZXstKHvCeUh0QnUKaOoXVxz
-	Nh8k22d392OTLsvW/1PO6OZiy5OygnTwNYADyJBuuVdFknBey8zgqPje5h9cDyPiICI2ROi
-	X6w0Jq0OgfHOs6QOsppBzHbpbRV5M9wyJVZ8xoejKTvlbXeWA1hBE3+UB2bhCXCbgGNB08+
-	SSRrIyRjjFfOabqzBfe3BFlYoB4W4lDWTjmxPYJn7VT5aPu8/sZLz2VGaKzDb1F34BHObmR
-	GaMEc+em4E+XsHUrRIxq0l9MG1OoYDYlxaRyVXaMUasjCYa+2I1ZuiYZmfT2ZId8oxEDZvY
-	kRU9YbPdv9b4ZEzD20XY2awHU4ZmPKAKGgEIlbPoRQk/zQDnBg4rUUIUjZQ9vJuf+zByPda
-	PrI1xUwJY+N1w/mDI+cc8/et37Z/t+CPGMYd6v8+hZ/u3PDW6+eO5fqlPBhDMtNt0Z4hgez
-	zlyAd5VjPfYMbRufS5j/pt+M2JrDqw8zVS9B07YI794YF4WwOe51yUFfSOp5mpNrMJLjGg3
-	gFGY5bzONubyVnp+XjvlhqDG9kIZHXsM9PcdV8rBNCxJhtdPlnpYjZU3zmXoB0GT7PexiP1
-	A==
-X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+X-QQ-XMAILINFO: NvH2zBBgt3uT4hHMIR7Brw/f++5JLBowjWBb0eFAUynG9eAm4k4ldkRn
+	NONOhB0UTEHl0X+FgJuhcq/72Bp8+anEWqbNH9wS1ZmJhKg5yhDw3lySPjN0kYNVh1ElFng
+	QG3VFNbG3Xr7y4V4VeFEyt6CaUsEx7a3y/dUc2L0am8WFcHni/3vcV+bvvlfPfnxP9UlOCC
+	9MFLPesmVKv7J1JWxwpZgDrGnwhv1o45T24hC8dElF8mSHbVWhRTyZ9JmVT4uSiTLQUODnQ
+	a9MCoxtmLyybVbgdXDsBPfFBvKxb4cSmfnnZg166G7aFzK+6ASPnrZq+11owKLyHo0eMAOb
+	v6LBasEc6CEvzk4NpEUA21wh6MN+aqDmVqJfydA4JeuIWw26blKSow/7wR32ModezGH2ywA
+	y1P+aEtZ1P3Bz+G0RT/gZ50b80ERCYeCyKMada42YjAkxOP7UcbC6Sz0QJp1NzNasF/i1lX
+	yvRl/CKMR3GsJ3l3Hfsq0uLzRJ/8YzK9ywnO4acdYKPkDu0gVNQ4JrODHDKxdqMn0GRYmWQ
+	q/wVnfTK5zKgU65nVpWPSm3ebxIlD/uXBjHjeYTKjxKoCizI9gsDczVSF4eW3Ij9T/rCsB3
+	q1E//ZqtAbQtMlB/EHy/d6DOKnJXhPdp8+3eyRMFy2W/NY/AUxuqhj5A5qCnZZHISbj1FMH
+	qPJ04PRw3JFeOKPgOVMkdcq/RvIbT4ZO9MHyenROzDg3tQGE1c5eH5KJ1Q9eo1Hz3/24MHX
+	woVLD2Typ3siKfE3CbSaPYizGuJNQYTXF0vNhosWjmd4jiroBaTyfw10Yv6crOI+oY94kId
+	hSne+CxzmzWwb/PeZ2XRGM8KwEW1UHMjSdHfnGY9lipsgpiWBN+KVVCKBCSV0bJ/mPJIYdm
+	VzuwmRTBg3aps23WTLuU8wxCpgoh8tF1RSFpCOePAPGbHZsTypTdNkwdeQMo7lULbJeTM1z
+	zIVZueOIAtC+J4eIVu3DzYs9PaS5M/uIVIh/vtt7pf6FStILDwhjyhDqipp4LnTPbBwyzW7
+	IBYmfieRVl7cEV3QMH3JtRPYfGEeqLuy7poRtlb7Vzd2fMwzB2yA1hWXykcGw=
+X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
 X-QQ-RECHKSPAM: 0
 
 Add sriov_configure for driver ops.
-Add mailbox handler wx_msg_task for ngbe in
-the interrupt handler.
-Add the notification flow when the vfs exist.
+Add mailbox handler wx_msg_task for txgbe.
 
 Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
 ---
- drivers/net/ethernet/wangxun/libwx/wx_sriov.c | 31 +++++++
- drivers/net/ethernet/wangxun/libwx/wx_sriov.h |  2 +
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |  2 +
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c | 93 +++++++++++++++++--
- drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c |  5 +
- drivers/net/ethernet/wangxun/ngbe/ngbe_type.h |  3 +
- 6 files changed, 127 insertions(+), 9 deletions(-)
+ drivers/net/ethernet/wangxun/libwx/wx_sriov.c | 42 +++++++++++++++++++
+ drivers/net/ethernet/wangxun/libwx/wx_sriov.h |  1 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |  1 +
+ .../net/ethernet/wangxun/txgbe/txgbe_irq.c    | 21 ++++++++--
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   | 27 ++++++++++++
+ .../net/ethernet/wangxun/txgbe/txgbe_phy.c    |  6 +++
+ .../net/ethernet/wangxun/txgbe/txgbe_type.h   |  7 +++-
+ 7 files changed, 101 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-index 1a7cadbf7234..a31b574a343e 100644
+index a31b574a343e..52e6a6faf715 100644
 --- a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
 +++ b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-@@ -834,3 +834,34 @@ void wx_msg_task(struct wx *wx)
+@@ -282,6 +282,15 @@ static void wx_clear_vmvir(struct wx *wx, u32 vf)
+ 	wr32(wx, WX_TDM_VLAN_INS(vf), 0);
+ }
+ 
++static void wx_ping_vf(struct wx *wx, int vf)
++{
++	u32 ping = WX_PF_CONTROL_MSG;
++
++	if (wx->vfinfo[vf].clear_to_send)
++		ping |= WX_VT_MSGTYPE_CTS;
++	wx_write_mbx_pf(wx, &ping, 1, vf);
++}
++
+ static void wx_set_vf_rx_tx(struct wx *wx, int vf)
+ {
+ 	u32 index = WX_VF_REG_OFFSET(vf), vf_bit = WX_VF_IND_SHIFT(vf);
+@@ -865,3 +874,36 @@ void wx_ping_all_vfs_with_link_status(struct wx *wx, bool link_up)
  	}
  }
- EXPORT_SYMBOL(wx_msg_task);
+ EXPORT_SYMBOL(wx_ping_all_vfs_with_link_status);
 +
-+void wx_disable_vf_rx_tx(struct wx *wx)
++static void wx_set_vf_link_state(struct wx *wx, int vf, int state)
 +{
-+	wr32(wx, WX_TDM_VFTE_CLR(0), U32_MAX);
-+	wr32(wx, WX_RDM_VFRE_CLR(0), U32_MAX);
-+	if (wx->mac.type != wx_mac_em) {
-+		wr32(wx, WX_TDM_VFTE_CLR(1), U32_MAX);
-+		wr32(wx, WX_RDM_VFRE_CLR(1), U32_MAX);
++	wx->vfinfo[vf].link_state = state;
++	switch (state) {
++	case IFLA_VF_LINK_STATE_AUTO:
++		if (netif_running(wx->netdev))
++			wx->vfinfo[vf].link_enable = true;
++		else
++			wx->vfinfo[vf].link_enable = false;
++		break;
++	case IFLA_VF_LINK_STATE_ENABLE:
++		wx->vfinfo[vf].link_enable = true;
++		break;
++	case IFLA_VF_LINK_STATE_DISABLE:
++		wx->vfinfo[vf].link_enable = false;
++		break;
 +	}
-+}
-+EXPORT_SYMBOL(wx_disable_vf_rx_tx);
++	/* restart the VF */
++	wx->vfinfo[vf].clear_to_send = false;
++	wx_ping_vf(wx, vf);
 +
-+void wx_ping_all_vfs_with_link_status(struct wx *wx, bool link_up)
++	wx_set_vf_rx_tx(wx, vf);
++}
++
++void wx_set_all_vfs(struct wx *wx)
 +{
-+	u32 msgbuf[2] = {0, 0};
-+	u16 i;
++	int i;
 +
-+	if (!wx->num_vfs)
-+		return;
-+	msgbuf[0] = WX_PF_NOFITY_VF_LINK_STATUS | WX_PF_CONTROL_MSG;
-+	if (link_up)
-+		msgbuf[1] = FIELD_PREP(GENMASK(31, 1), wx->speed) | link_up;
-+	if (wx->notify_down)
-+		msgbuf[1] |= WX_PF_NOFITY_VF_NET_NOT_RUNNING;
-+	for (i = 0; i < wx->num_vfs; i++) {
-+		if (wx->vfinfo[i].clear_to_send)
-+			msgbuf[0] |= WX_VT_MSGTYPE_CTS;
-+		wx_write_mbx_pf(wx, msgbuf, 2, i);
-+	}
++	for (i = 0; i < wx->num_vfs; i++)
++		wx_set_vf_link_state(wx, i, wx->vfinfo[i].link_state);
 +}
-+EXPORT_SYMBOL(wx_ping_all_vfs_with_link_status);
++EXPORT_SYMBOL(wx_set_all_vfs);
 diff --git a/drivers/net/ethernet/wangxun/libwx/wx_sriov.h b/drivers/net/ethernet/wangxun/libwx/wx_sriov.h
-index d3f29617c7d3..376d8e0e49f3 100644
+index 376d8e0e49f3..8a3a47bb5815 100644
 --- a/drivers/net/ethernet/wangxun/libwx/wx_sriov.h
 +++ b/drivers/net/ethernet/wangxun/libwx/wx_sriov.h
-@@ -11,5 +11,7 @@
- void wx_disable_sriov(struct wx *wx);
- int wx_pci_sriov_configure(struct pci_dev *pdev, int num_vfs);
+@@ -13,5 +13,6 @@ int wx_pci_sriov_configure(struct pci_dev *pdev, int num_vfs);
  void wx_msg_task(struct wx *wx);
-+void wx_disable_vf_rx_tx(struct wx *wx);
-+void wx_ping_all_vfs_with_link_status(struct wx *wx, bool link_up);
+ void wx_disable_vf_rx_tx(struct wx *wx);
+ void wx_ping_all_vfs_with_link_status(struct wx *wx, bool link_up);
++void wx_set_all_vfs(struct wx *wx);
  
  #endif /* _WX_SRIOV_H_ */
 diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index a5ca2ca0aba7..9b9345290594 100644
+index 9b9345290594..e13172c9eeed 100644
 --- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
 +++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -92,6 +92,7 @@
- /************************* Port Registers ************************************/
- /* port cfg Registers */
- #define WX_CFG_PORT_CTL              0x14400
-+#define WX_CFG_PORT_CTL_PFRSTD       BIT(14)
- #define WX_CFG_PORT_CTL_DRV_LOAD     BIT(3)
- #define WX_CFG_PORT_CTL_QINQ         BIT(2)
- #define WX_CFG_PORT_CTL_D_VLAN       BIT(0) /* double vlan*/
-@@ -1231,6 +1232,7 @@ struct wx {
- 	u8 swfw_index;
+@@ -1173,6 +1173,7 @@ struct vf_data_storage {
+ 	u16 vf_mc_hashes[WX_MAX_VF_MC_ENTRIES];
+ 	u16 num_vf_mc_hashes;
+ 	u16 vlan_count;
++	int link_state;
+ };
  
- 	/* PHY stuff */
-+	bool notify_down;
- 	unsigned int link;
- 	int speed;
- 	int duplex;
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-index a6159214ec0a..d321c7f23b0b 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-@@ -15,6 +15,8 @@
+ struct vf_macvlans {
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
+index 8658a51ee810..280c74a57f6e 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
+@@ -7,6 +7,7 @@
+ #include "../libwx/wx_type.h"
+ #include "../libwx/wx_lib.h"
  #include "../libwx/wx_hw.h"
++#include "../libwx/wx_sriov.h"
+ #include "txgbe_type.h"
+ #include "txgbe_phy.h"
+ #include "txgbe_irq.h"
+@@ -109,8 +110,17 @@ static irqreturn_t txgbe_misc_irq_handle(int irq, void *data)
+ 	struct wx *wx = txgbe->wx;
+ 	u32 eicr;
+ 
+-	if (wx->pdev->msix_enabled)
++	if (wx->pdev->msix_enabled) {
++		eicr = wx_misc_isb(wx, WX_ISB_MISC) & TXGBE_PX_MISC_IEN_MASK;
++		if (!eicr)
++			return IRQ_NONE;
++		txgbe->eicr = eicr;
++		if (eicr & TXGBE_PX_MISC_IC_VF_MBOX) {
++			wx_msg_task(txgbe->wx);
++			wx_intr_enable(wx, TXGBE_INTR_MISC);
++		}
+ 		return IRQ_WAKE_THREAD;
++	}
+ 
+ 	eicr = wx_misc_isb(wx, WX_ISB_VEC0);
+ 	if (!eicr) {
+@@ -129,6 +139,11 @@ static irqreturn_t txgbe_misc_irq_handle(int irq, void *data)
+ 	q_vector = wx->q_vector[0];
+ 	napi_schedule_irqoff(&q_vector->napi);
+ 
++	eicr = wx_misc_isb(wx, WX_ISB_MISC) & TXGBE_PX_MISC_IEN_MASK;
++	if (!eicr)
++		return IRQ_NONE;
++	txgbe->eicr = eicr;
++
+ 	return IRQ_WAKE_THREAD;
+ }
+ 
+@@ -140,7 +155,7 @@ static irqreturn_t txgbe_misc_irq_thread_fn(int irq, void *data)
+ 	unsigned int sub_irq;
+ 	u32 eicr;
+ 
+-	eicr = wx_misc_isb(wx, WX_ISB_MISC);
++	eicr = txgbe->eicr;
+ 	if (eicr & (TXGBE_PX_MISC_ETH_LK | TXGBE_PX_MISC_ETH_LKDN |
+ 		    TXGBE_PX_MISC_ETH_AN)) {
+ 		sub_irq = irq_find_mapping(txgbe->misc.domain, TXGBE_IRQ_LINK);
+@@ -183,7 +198,7 @@ int txgbe_setup_misc_irq(struct txgbe *txgbe)
+ 	if (wx->mac.type == wx_mac_aml)
+ 		goto skip_sp_irq;
+ 
+-	txgbe->misc.nirqs = 1;
++	txgbe->misc.nirqs = TXGBE_IRQ_MAX;
+ 	txgbe->misc.domain = irq_domain_add_simple(NULL, txgbe->misc.nirqs, 0,
+ 						   &txgbe_misc_irq_domain_ops, txgbe);
+ 	if (!txgbe->misc.domain)
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+index a2e245e3b016..239270c28a89 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+@@ -15,6 +15,8 @@
  #include "../libwx/wx_lib.h"
  #include "../libwx/wx_ptp.h"
+ #include "../libwx/wx_hw.h"
 +#include "../libwx/wx_mbx.h"
 +#include "../libwx/wx_sriov.h"
- #include "ngbe_type.h"
- #include "ngbe_mdio.h"
- #include "ngbe_hw.h"
-@@ -129,6 +131,10 @@ static int ngbe_sw_init(struct wx *wx)
- 	wx->tx_work_limit = NGBE_DEFAULT_TX_WORK;
- 	wx->rx_work_limit = NGBE_DEFAULT_RX_WORK;
+ #include "txgbe_type.h"
+ #include "txgbe_hw.h"
+ #include "txgbe_phy.h"
+@@ -117,6 +119,12 @@ static void txgbe_up_complete(struct wx *wx)
  
-+	wx->mbx.size = WX_VXMAILBOX_SIZE;
-+	wx->setup_tc = ngbe_setup_tc;
-+	set_bit(0, &wx->fwd_bitmask);
+ 	/* enable transmits */
+ 	netif_tx_start_all_queues(netdev);
 +
- 	return 0;
++	/* Set PF Reset Done bit so PF/VF Mail Ops can work */
++	wr32m(wx, WX_CFG_PORT_CTL, WX_CFG_PORT_CTL_PFRSTD,
++	      WX_CFG_PORT_CTL_PFRSTD);
++	/* update setting rx tx for all active vfs */
++	wx_set_all_vfs(wx);
  }
  
-@@ -200,12 +206,10 @@ static irqreturn_t ngbe_intr(int __always_unused irq, void *data)
- 	return IRQ_HANDLED;
- }
- 
--static irqreturn_t ngbe_msix_other(int __always_unused irq, void *data)
-+static irqreturn_t ngbe_msix_common(struct wx *wx, u32 eicr)
- {
--	struct wx *wx = data;
--	u32 eicr;
--
--	eicr = wx_misc_isb(wx, WX_ISB_MISC);
-+	if (eicr & NGBE_PX_MISC_IC_VF_MBOX)
-+		wx_msg_task(wx);
- 
- 	if (unlikely(eicr & NGBE_PX_MISC_IC_TIMESYNC))
- 		wx_ptp_check_pps_event(wx);
-@@ -217,6 +221,35 @@ static irqreturn_t ngbe_msix_other(int __always_unused irq, void *data)
- 	return IRQ_HANDLED;
- }
- 
-+static irqreturn_t ngbe_msix_other(int __always_unused irq, void *data)
-+{
-+	struct wx *wx = data;
-+	u32 eicr;
-+
-+	eicr = wx_misc_isb(wx, WX_ISB_MISC);
-+
-+	return ngbe_msix_common(wx, eicr);
-+}
-+
-+static irqreturn_t ngbe_msic_and_queue(int __always_unused irq, void *data)
-+{
-+	struct wx_q_vector *q_vector;
-+	struct wx *wx = data;
-+	u32 eicr;
-+
-+	eicr = wx_misc_isb(wx, WX_ISB_MISC);
-+	if (!eicr) {
-+		/* queue */
-+		q_vector = wx->q_vector[0];
-+		napi_schedule_irqoff(&q_vector->napi);
-+		if (netif_running(wx->netdev))
-+			ngbe_irq_enable(wx, true);
-+		return IRQ_HANDLED;
-+	}
-+
-+	return ngbe_msix_common(wx, eicr);
-+}
-+
- /**
-  * ngbe_request_msix_irqs - Initialize MSI-X interrupts
-  * @wx: board private structure
-@@ -249,8 +282,16 @@ static int ngbe_request_msix_irqs(struct wx *wx)
- 		}
- 	}
- 
--	err = request_irq(wx->msix_entry->vector,
--			  ngbe_msix_other, 0, netdev->name, wx);
-+	/* Due to hardware design, when num_vfs < 7, pf can use 0 for misc and 1
-+	 * for queue. But when num_vfs == 7, vector[1] is assigned to vf6.
-+	 * Misc and queue should reuse interrupt vector[0].
-+	 */
-+	if (wx->num_vfs == 7)
-+		err = request_irq(wx->msix_entry->vector,
-+				  ngbe_msic_and_queue, 0, netdev->name, wx);
-+	else
-+		err = request_irq(wx->msix_entry->vector,
-+				  ngbe_msix_other, 0, netdev->name, wx);
- 
- 	if (err) {
- 		wx_err(wx, "request_irq for msix_other failed: %d\n", err);
-@@ -302,6 +343,22 @@ static void ngbe_disable_device(struct wx *wx)
- 	struct net_device *netdev = wx->netdev;
- 	u32 i;
+ static void txgbe_reset(struct wx *wx)
+@@ -165,6 +173,16 @@ static void txgbe_disable_device(struct wx *wx)
+ 		wx_err(wx, "%s: invalid bus lan id %d\n",
+ 		       __func__, wx->bus.func);
  
 +	if (wx->num_vfs) {
 +		/* Clear EITR Select mapping */
 +		wr32(wx, WX_PX_ITRSEL, 0);
-+
 +		/* Mark all the VFs as inactive */
-+		for (i = 0; i < wx->num_vfs; i++)
++		for (i = 0 ; i < wx->num_vfs; i++)
 +			wx->vfinfo[i].clear_to_send = 0;
-+		wx->notify_down = true;
-+		/* ping all the active vfs to let them know we are going down */
-+		wx_ping_all_vfs_with_link_status(wx, false);
-+		wx->notify_down = false;
-+
-+		/* Disable all VFTE/VFRE TX/RX */
-+		wx_disable_vf_rx_tx(wx);
++		/* update setting rx tx for all active vfs */
++		wx_set_all_vfs(wx);
 +	}
 +
- 	/* disable all enabled rx queues */
- 	for (i = 0; i < wx->num_rx_queues; i++)
- 		/* this call also flushes the previous write */
-@@ -324,12 +381,19 @@ static void ngbe_disable_device(struct wx *wx)
- 	wx_update_stats(wx);
- }
+ 	if (!(((wx->subsystem_device_id & WX_NCSI_MASK) == WX_NCSI_SUP) ||
+ 	      ((wx->subsystem_device_id & WX_WOL_MASK) == WX_WOL_SUP))) {
+ 		/* disable mac transmiter */
+@@ -307,12 +325,15 @@ static int txgbe_sw_init(struct wx *wx)
+ 	/* set default ring sizes */
+ 	wx->tx_ring_count = TXGBE_DEFAULT_TXD;
+ 	wx->rx_ring_count = TXGBE_DEFAULT_RXD;
++	wx->mbx.size = WX_VXMAILBOX_SIZE;
  
-+static void ngbe_reset(struct wx *wx)
-+{
-+	wx_flush_sw_mac_table(wx);
-+	wx_mac_set_default_filter(wx, wx->mac.addr);
-+	if (test_bit(WX_STATE_PTP_RUNNING, wx->state))
-+		wx_ptp_reset(wx);
-+}
-+
- void ngbe_down(struct wx *wx)
- {
- 	phylink_stop(wx->phylink);
- 	ngbe_disable_device(wx);
--	if (test_bit(WX_STATE_PTP_RUNNING, wx->state))
--		wx_ptp_reset(wx);
-+	ngbe_reset(wx);
- 	wx_clean_all_tx_rings(wx);
- 	wx_clean_all_rx_rings(wx);
- }
-@@ -352,6 +416,11 @@ void ngbe_up(struct wx *wx)
- 		ngbe_sfp_modules_txrx_powerctl(wx, true);
+ 	/* set default work limits */
+ 	wx->tx_work_limit = TXGBE_DEFAULT_TX_WORK;
+ 	wx->rx_work_limit = TXGBE_DEFAULT_RX_WORK;
  
- 	phylink_start(wx->phylink);
-+	/* Set PF Reset Done bit so PF/VF Mail Ops can work */
-+	wr32m(wx, WX_CFG_PORT_CTL,
-+	      WX_CFG_PORT_CTL_PFRSTD, WX_CFG_PORT_CTL_PFRSTD);
-+	if (wx->num_vfs)
-+		wx_ping_all_vfs_with_link_status(wx, false);
- }
++	wx->setup_tc = txgbe_setup_tc;
+ 	wx->do_reset = txgbe_do_reset;
++	set_bit(0, &wx->fwd_bitmask);
  
- /**
-@@ -596,6 +665,10 @@ static int ngbe_probe(struct pci_dev *pdev,
+ 	switch (wx->mac.type) {
+ 	case wx_mac_sp:
+@@ -604,6 +625,10 @@ static int txgbe_probe(struct pci_dev *pdev,
  		goto err_pci_release_regions;
  	}
  
-+	/* The emerald supports up to 8 VFs per pf, but physical
++	/* The sapphire supports up to 63 VFs per pf, but physical
 +	 * function also need one pool for basic networking.
 +	 */
-+	pci_sriov_set_totalvfs(pdev, NGBE_MAX_VFS_DRV_LIMIT);
- 	wx->driver_name = ngbe_driver_name;
- 	ngbe_set_ethtool_ops(netdev);
- 	netdev->netdev_ops = &ngbe_netdev_ops;
-@@ -743,6 +816,7 @@ static void ngbe_remove(struct pci_dev *pdev)
++	pci_sriov_set_totalvfs(pdev, TXGBE_MAX_VFS_DRV_LIMIT);
+ 	wx->driver_name = txgbe_driver_name;
+ 	txgbe_set_ethtool_ops(netdev);
+ 	netdev->netdev_ops = &txgbe_netdev_ops;
+@@ -794,6 +819,7 @@ static void txgbe_remove(struct pci_dev *pdev)
  	struct net_device *netdev;
  
  	netdev = wx->netdev;
 +	wx_disable_sriov(wx);
  	unregister_netdev(netdev);
- 	phylink_destroy(wx->phylink);
- 	pci_release_selected_regions(pdev,
-@@ -802,6 +876,7 @@ static struct pci_driver ngbe_driver = {
- 	.suspend  = ngbe_suspend,
- 	.resume   = ngbe_resume,
- 	.shutdown = ngbe_shutdown,
+ 
+ 	txgbe_remove_phy(txgbe);
+@@ -816,6 +842,7 @@ static struct pci_driver txgbe_driver = {
+ 	.probe    = txgbe_probe,
+ 	.remove   = txgbe_remove,
+ 	.shutdown = txgbe_shutdown,
 +	.sriov_configure = wx_pci_sriov_configure,
  };
  
- module_pci_driver(ngbe_driver);
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
-index ea1d7e9a91f3..c63bb6e6f405 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
-@@ -9,6 +9,7 @@
+ module_pci_driver(txgbe_driver);
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+index 85f022ceef4f..1863cfd27ee7 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+@@ -16,6 +16,8 @@
  #include "../libwx/wx_type.h"
+ #include "../libwx/wx_lib.h"
  #include "../libwx/wx_ptp.h"
- #include "../libwx/wx_hw.h"
 +#include "../libwx/wx_sriov.h"
- #include "ngbe_type.h"
- #include "ngbe_mdio.h"
- 
-@@ -70,6 +71,8 @@ static void ngbe_mac_link_down(struct phylink_config *config,
++#include "../libwx/wx_mbx.h"
+ #include "../libwx/wx_hw.h"
+ #include "txgbe_type.h"
+ #include "txgbe_phy.h"
+@@ -184,6 +186,8 @@ static void txgbe_mac_link_down(struct phylink_config *config,
  	wx->speed = SPEED_UNKNOWN;
  	if (test_bit(WX_STATE_PTP_RUNNING, wx->state))
  		wx_ptp_reset_cyclecounter(wx);
@@ -364,8 +340,8 @@ index ea1d7e9a91f3..c63bb6e6f405 100644
 +	wx_ping_all_vfs_with_link_status(wx, false);
  }
  
- static void ngbe_mac_link_up(struct phylink_config *config,
-@@ -114,6 +117,8 @@ static void ngbe_mac_link_up(struct phylink_config *config,
+ static void txgbe_mac_link_up(struct phylink_config *config,
+@@ -225,6 +229,8 @@ static void txgbe_mac_link_up(struct phylink_config *config,
  	wx->last_rx_ptp_check = jiffies;
  	if (test_bit(WX_STATE_PTP_RUNNING, wx->state))
  		wx_ptp_reset_cyclecounter(wx);
@@ -373,34 +349,43 @@ index ea1d7e9a91f3..c63bb6e6f405 100644
 +	wx_ping_all_vfs_with_link_status(wx, true);
  }
  
- static const struct phylink_mac_ops ngbe_mac_ops = {
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h b/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-index 992adbb98c7d..bb74263f0498 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-@@ -73,12 +73,14 @@
- #define NGBE_PX_MISC_IEN_TIMESYNC		BIT(11)
- #define NGBE_PX_MISC_IEN_ETH_LK			BIT(18)
- #define NGBE_PX_MISC_IEN_INT_ERR		BIT(20)
-+#define NGBE_PX_MISC_IC_VF_MBOX			BIT(23)
- #define NGBE_PX_MISC_IEN_GPIO			BIT(26)
- #define NGBE_PX_MISC_IEN_MASK ( \
- 				NGBE_PX_MISC_IEN_DEV_RST | \
- 				NGBE_PX_MISC_IEN_TIMESYNC | \
- 				NGBE_PX_MISC_IEN_ETH_LK | \
- 				NGBE_PX_MISC_IEN_INT_ERR | \
-+				NGBE_PX_MISC_IC_VF_MBOX | \
- 				NGBE_PX_MISC_IEN_GPIO)
+ static int txgbe_mac_prepare(struct phylink_config *config, unsigned int mode,
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
+index 9c1c26234cad..5937cbc6bd05 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
+@@ -77,11 +77,13 @@
+ #define TXGBE_PX_MISC_ETH_LK                    BIT(18)
+ #define TXGBE_PX_MISC_ETH_AN                    BIT(19)
+ #define TXGBE_PX_MISC_INT_ERR                   BIT(20)
++#define TXGBE_PX_MISC_IC_VF_MBOX                BIT(23)
+ #define TXGBE_PX_MISC_GPIO                      BIT(26)
+ #define TXGBE_PX_MISC_IEN_MASK                            \
+ 	(TXGBE_PX_MISC_ETH_LKDN | TXGBE_PX_MISC_DEV_RST | \
+ 	 TXGBE_PX_MISC_ETH_EVENT | TXGBE_PX_MISC_ETH_LK | \
+-	 TXGBE_PX_MISC_ETH_AN | TXGBE_PX_MISC_INT_ERR)
++	 TXGBE_PX_MISC_ETH_AN | TXGBE_PX_MISC_INT_ERR | \
++	 TXGBE_PX_MISC_IC_VF_MBOX)
  
- /* Extended Interrupt Cause Read */
-@@ -134,6 +136,7 @@
- #define NGBE_MAX_RXD				8192
- #define NGBE_MIN_RXD				128
+ /* Port cfg registers */
+ #define TXGBE_CFG_PORT_ST                       0x14404
+@@ -174,6 +176,8 @@
+ #define TXGBE_SP_RX_PB_SIZE     512
+ #define TXGBE_SP_TDB_PB_SZ      (160 * 1024) /* 160KB Packet Buffer */
  
-+#define NGBE_MAX_VFS_DRV_LIMIT			7
- extern char ngbe_driver_name[];
++#define TXGBE_MAX_VFS_DRV_LIMIT                 63
++
+ #define TXGBE_DEFAULT_ATR_SAMPLE_RATE           20
  
- void ngbe_down(struct wx *wx);
+ /* Software ATR hash keys */
+@@ -348,6 +352,7 @@ struct txgbe {
+ 	struct clk *clk;
+ 	struct gpio_chip *gpio;
+ 	unsigned int link_irq;
++	u32 eicr;
+ 
+ 	/* flow director */
+ 	struct hlist_head fdir_filter_list;
 -- 
 2.48.1
 
