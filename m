@@ -1,95 +1,74 @@
-Return-Path: <netdev+bounces-177188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8FE6A6E38E
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 20:30:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26796A6E393
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 20:31:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BD953AE121
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 19:30:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9FF13A763B
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 19:31:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 324FC1A83E7;
-	Mon, 24 Mar 2025 19:30:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56E927E110;
+	Mon, 24 Mar 2025 19:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ilZ8o2cv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZgWAAjYl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B43A1A5B8B;
-	Mon, 24 Mar 2025 19:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 311A310E9
+	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 19:31:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742844602; cv=none; b=PzKyWBXG5NZmce/cQwfPaz5hXqIILKBK8BSdxREViEnSHaVjW+kkMnEDRuC36KIA5jAF30usd3lMNEUwPhyNAqce2XAPuhOmkV26X8eadwBvOz1eld4vSNikcJHKw8Jle7u1jw9cS4Vir4ncrEou2Flcd8l9QBpORZm7A9WjDjg=
+	t=1742844672; cv=none; b=ttJiDyE1C/Y3iI9dFlGKSFHQzl0lLeSKRARWxp1pSKnUj//HuTYwRZJiJl6WiI4lfpsk+hc+XjJHQn8CTikTv/WhFm8Di4x+Sb9znXA9aHtfolK9Y3+8IK5VA49XHkFcL0rg11s88ch2wb/QNy51jVA01BV+q8PwYT6SNznf1CU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742844602; c=relaxed/simple;
-	bh=TbSqYbCYGbS4Mj9Mnrm/o9gdU4W3fvZqouwvEPGgNZ4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=R5gYa0k95SyfgTCdoTpEa6bUA7oOMR/Vmn5VNBjUk3FW3bMbquMXfFjS5J6At3qZSJwwf8GudxJ2VTZz3yDUwyDkY0HaZuNJsZwHnBxnaYhTco5OLuQNAXNyR3K9gZXYq5DRxMgM/X4WjN9cV+e+HnaUGNmhPUvvyA6a6FqXJLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ilZ8o2cv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81147C4CEDD;
-	Mon, 24 Mar 2025 19:30:01 +0000 (UTC)
+	s=arc-20240116; t=1742844672; c=relaxed/simple;
+	bh=m10oppKyEgXQ5SfK3CD6amo/nIpUczGIsM39RH4O3U8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p0XY1sQICBYzH8CRKnIchCLaej4FE1gspmU7D4LKlNKobzB7X9EEObGyDTv3A7qPZ2OFqcxd88TMgk64WyhiAOo1KtCfOGvty/JhWYgj+zzm9GIlRTrC+iy6X2dNQ1znShVSnpOCl5gpAGg3x4SvmE4TH+WfQXu92P6RqCTjAak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZgWAAjYl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78E7AC4CEDD;
+	Mon, 24 Mar 2025 19:31:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742844601;
-	bh=TbSqYbCYGbS4Mj9Mnrm/o9gdU4W3fvZqouwvEPGgNZ4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ilZ8o2cv4ov5XDEhv8P27LSkg5BWPM+PlfUmjXB1UEhK/tUqNGKH5vk7BvnxsWWOb
-	 58Q7c45LIWfFKL/gYnNvILwKWQZA2c/zL7Mj0YNRzROg9x5s0wKHSLgwIEmTzQZMxo
-	 94/aNAysNXn52HC4nf1fV/wIYpr1jumX9sqUWQJ+WD+68VHoVqhnbXvtWsOiIgpGI3
-	 qDhyg5se43eypB66X+5QBhhpTR7HqvYHmDzshFeluLJYzxea5oeTLX5LcCNCNHa5Pv
-	 dYZB8xxQBdV6Kwypf3gmVEbPk9p8ti1Jr0sX/aFKjrI3vXCXkoy0nzIbCfnr0hfAeu
-	 RgLI3SOTX4HAw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF0D380664D;
-	Mon, 24 Mar 2025 19:30:38 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1742844670;
+	bh=m10oppKyEgXQ5SfK3CD6amo/nIpUczGIsM39RH4O3U8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZgWAAjYllKa9JR65G3LiJl8rRaB7q70h/80pCB1/R7GFnmW97r9+fJ/iJk7Tzedq0
+	 qqpaXBbze9vMEYfBMP/xNWrWpJRtzHYQTXPyNnaL8X6X/lOaG8yxRyVtIAXdIAGA7B
+	 bSaHOAg+D4f76dNTPO3JiyF1xJKsi2giUANsebCEh7diUhNDiKxEUvx7OG1SuPGIyf
+	 5rDGdiuFjKeTzklJEafwEsIOwFMEfR8QVOfj94LmK/lIcGkUzAFdbt7qSS1AjANqtX
+	 xmF5ctCWrsW/pY6VLe+0aIY31Y3piWhxn280UCLDqhPp9eGNsiaj7trlkImeMjwnFy
+	 fyZC0EI5H+6Eg==
+Date: Mon, 24 Mar 2025 19:31:07 +0000
+From: Simon Horman <horms@kernel.org>
+To: Mengyuan Lou <mengyuanlou@net-swift.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, jiawenwu@trustnetic.com,
+	duanqiangwen@net-swift.com
+Subject: Re: [RESEND,PATCH net-next v9 2/6] net: libwx: Add sriov api for
+ wangxun nics
+Message-ID: <20250324193107.GM892515@horms.kernel.org>
+References: <20250324020033.36225-1-mengyuanlou@net-swift.com>
+ <BB5F8D8A58D935D7+20250324020033.36225-3-mengyuanlou@net-swift.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] selftests: drv-net: rss_ctx: Don't assume
- indirection table is present
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174284463777.4144910.15829984579184745582.git-patchwork-notify@kernel.org>
-Date: Mon, 24 Mar 2025 19:30:37 +0000
-References: <20250318112426.386651-1-gal@nvidia.com>
-In-Reply-To: <20250318112426.386651-1-gal@nvidia.com>
-To: Gal Pressman <gal@nvidia.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
- shuah@kernel.org, linux-kselftest@vger.kernel.org, noren@nvidia.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BB5F8D8A58D935D7+20250324020033.36225-3-mengyuanlou@net-swift.com>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 18 Mar 2025 13:24:26 +0200 you wrote:
-> The test_rss_context_dump() test assumes the indirection table is always
-> supported, which is not true for all drivers, e.g., virtio_net when
-> VIRTIO_NET_F_RSS is disabled.
+On Mon, Mar 24, 2025 at 10:00:29AM +0800, Mengyuan Lou wrote:
+> Implement sriov_configure interface for wangxun nics in libwx.
+> Enable VT mode and initialize vf control structure, when sriov
+> is enabled. Do not be allowed to disable sriov when vfs are
+> assigned.
 > 
-> Skip the check if 'indir' is not present.
-> 
-> Reviewed-by: Nimrod Oren <noren@nvidia.com>
-> Signed-off-by: Gal Pressman <gal@nvidia.com>
-> 
-> [...]
+> Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
 
-Here is the summary with links:
-  - [net-next] selftests: drv-net: rss_ctx: Don't assume indirection table is present
-    https://git.kernel.org/netdev/net-next/c/c61209eeb0b3
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
