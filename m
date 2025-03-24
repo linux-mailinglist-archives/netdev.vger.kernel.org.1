@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-177243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09715A6E674
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 23:14:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 80A2DA6E676
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 23:15:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE53E18879A1
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 22:14:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25A0918960EB
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 22:16:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 721F81EDA1E;
-	Mon, 24 Mar 2025 22:14:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47AC81EB9E2;
+	Mon, 24 Mar 2025 22:15:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="jUG8Hgmu"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="jUG+VDmU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7901615575B
-	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 22:14:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CFF918B464
+	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 22:15:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742854452; cv=none; b=fQcMesMZUbdb6bi18VcNbZVCXlDK34aN136NnGsrXm1WiDpSA9Vy6wf/X+shxBGu1q0SPwpPdVIbrH8jhJ+KbYUXLyXJ+LMvJfsx40ftNksjYcrKFdGrzhVtzim0ZEq9tOe12C3PXU+DTTqPD34voLHTQJ6X9Px2GaUnjBQruZ8=
+	t=1742854550; cv=none; b=XmY0tnYs0GcoztFqibjfsGcmX1tMszulUor9bbh21ywOOdZ9E/P1o6j/Ie4Z4RNGQNuCiYda9lxLYaWRKhcw5o4Rlvx8uCmYNX1MONLyHIaLB5bxvwtgKattVTO+Jrymct1Z4dMNjoGZ/Ly80iHeRnHLecHZE4FuY9UiXApJTIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742854452; c=relaxed/simple;
-	bh=MBZ1W6CapH5d1usBknnCkjHBOxHiRymKU3jB4IbXVKY=;
+	s=arc-20240116; t=1742854550; c=relaxed/simple;
+	bh=e/r4Zlp/KHSwdvwEkIA042d1FAjKutPhBALAVYylnJc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cLClQBVpNcU2xLv2zuy5gvlAhLCJtFCYPa3T5xDQYt9FDGAll0fkKVFzAkOZNI7EuOKVIZB7jX53nPO6hM+ANl5aqBNxFxGsNJi1i7IiOjQWHbp2Yb84uVwReFpiubtIZJTinbljZOmjIIlW3rhQpVRIlu1TXp5VdE4QeWItQ34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=jUG8Hgmu; arc=none smtp.client-ip=209.85.160.170
+	 In-Reply-To:Content-Type; b=Kh1bJPZ2Hpuif7t+S4uc+L1Xizn3pcMAM6e2HZwJ2pb9Vb1po9p4pOwFdDP1CIEAU1qPdSeAsOFzC15elLWwz6sGGev5HuCrRlBwrh/xALhed3hRgBXEOwFBnRZ/Qsg4bc9TKCvg1IGVHCDmy+oOYVcCYmaE52ZpIoMU+fyUJsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=jUG+VDmU; arc=none smtp.client-ip=209.85.219.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-476964b2c1dso93943761cf.3
-        for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 15:14:09 -0700 (PDT)
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6e8fd49b85eso78175416d6.0
+        for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 15:15:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1742854449; x=1743459249; darn=vger.kernel.org;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1742854547; x=1743459347; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=vKFno+iOMuHuHC6FIOmkLIKhwtvzDp4MmUu/eD7g6UQ=;
-        b=jUG8Hgmu3qbb0PUAtX51m+gsWwDcG/c8BMyntGjDGcVqwhbY4tQ15Sk/plH8BRZSIe
-         E33ZvDqLTsFI/KhsqjMtzp2K81cT//cCwxee55Tsw22JHn6BEfuArCDj9qLHehscyL0O
-         UvNz6zIqViCPCM8+kA5GfWrRVVmivTldAWxnSNSdLpJTA6qugzcLhnzyTOnGpSMPj3aC
-         033yJalopafgkcYN08WdlJlvlDctqNal8PV4nOtQCiIYa8AXyscICQVi2qqzbbIEnfa8
-         iopsytAoeLhVg2ljGYo6NpH84vDMpsJuwjRJeXKFC9Kcay3n6B+N+/4qlSjK4fusvXXj
-         7ASw==
+        bh=LqCK4xrieYy8rHSMdxk0HMnzbYnnEsVe7CVfVt5N210=;
+        b=jUG+VDmUNoV0CH8XZxglb+ZpiOmq6NTrnjn+9mGZk00XjGehUgWMMLN+rYUWvYx6NP
+         l1kPyDiDtgYgjAW4sUcyJ3caT0rHiDGn8RnmDz1dUvUqqP5ju7kFmVHCstGnWI3FmmKT
+         NMFuXGPjwDhRL6/+YQ4cMEQkFghCjC9vpI1kY7omXtgKRck8SuW52gdq/wydMlsyJBJs
+         6LM6SMGIXqKJjJGCosKlBwNNTBHM9fSw91zKT0V6Rl+wpnTzal9Cz0xfpB+T7RLG76+Q
+         Q5bUxTO1kDqkIuXYubFDC8b20zipg2RXfzctIMfshfQJ9bPxJKdKfm5tAw/UsykCwE3I
+         2Ikg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742854449; x=1743459249;
+        d=1e100.net; s=20230601; t=1742854547; x=1743459347;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vKFno+iOMuHuHC6FIOmkLIKhwtvzDp4MmUu/eD7g6UQ=;
-        b=SrN0FazzJNE+4VU65Mv6SYENiM72VpuzDQtbec7R8fMuI7+/6nzwwPDlF+0pscwX0l
-         u8G7lPRqD6cmfuFyryqKp9wwixcPgMtqkQcpOml3BAErMSL/GUPcsPEmiqPlxvFfwFxx
-         TyJFAR1iTDG6sD9bAX+cioSfqFrc5Tch+tKDdlT6bVube/04FqXbsFockAkr/gCUysgy
-         6C6YZ0cxxFbPSF8WeoP+IBRX0mnmWkZRqjDBiAhjvwilfvHhUqrnyRh+0yV/5LTgbo3t
-         jYPHmSrcOyf4r0ocskXeH4MhGqGa472Zq75CnjMLIG11l0qdEdbbtAgAMCqs9mwRbjVp
-         3qzg==
-X-Gm-Message-State: AOJu0Yx0Bka15568xvMZCnBxJE2WWTanKQkdgQnEOwDxYp9+NX4vwoc5
-	71gWi0HekBzikvx5vBGhVezHy5CdJu1W2wlY2keIZqirRx1HjjOFgGKRbuU5Xt0=
-X-Gm-Gg: ASbGncu0VcQUGxgcMrxPdaPsSrFK/59B7dmvhi9khxs1mYXXPp3v35+pz6iv59cqrkq
-	L8dkY5B8ZSYtWGSVUkI1MeMxb7De6QV93YZu9e7sMmqeXNYk2aK0Zms6oPcaFup66n/sFROP06y
-	tJpsAe7ONQdUDH+0pMR3P+0q8utuSWfJ4nZNKtQ+i7gVa0d2frDdelJLjVmMB3lQvGV9IaZtsFH
-	Q4d7QsxrJ3c3tNChOouwTN2brDR09UkoHS3TP1asb6s2eiUms/xHdzdwIoUjoPibMShOzMunOET
-	Pv5KwWFfUreWxt7AHhVSWruGSEt+Pzgw8C+tdNk=
-X-Google-Smtp-Source: AGHT+IEN6pbLUjK4t/MwdNJ+7x4g+/K+DOAyn8HeIcLki0j6zcILdxKCHHj5sT36bGH6QAwdA1QJyA==
-X-Received: by 2002:a05:622a:59c5:b0:476:6f90:395e with SMTP id d75a77b69052e-4771dd94fcbmr237673821cf.21.1742854448967;
-        Mon, 24 Mar 2025 15:14:08 -0700 (PDT)
+        bh=LqCK4xrieYy8rHSMdxk0HMnzbYnnEsVe7CVfVt5N210=;
+        b=JtbrsUcCoaqLAXyepkyYBbwiLVhMBaJ3BhErzUzP33JplGsgpDYtydvr7IuTWdpC2R
+         U1rJH3LU7ZToqrQqeVCEzr3ZSx/KNKIs/+zxHhI3JtnemNmY1ipmQ50fooCrCbrlKxD2
+         12K8/eMhUVlj7OedZcyNsnKgE3hV/MgPKHCYiG0IRKmjFSkaqvjFzNzsXaELMbMWbpqU
+         HoIJXWxA693oExksRzb96b/wxWzHrW01sXVLVYfiRkf9PW+X6ekK5oOxUJcC8qfHj63f
+         U0+FUvtgY1laLRs+2NeER91B1yEN8CmXGf2XTbFEa6toop74nV0RfAO8ddB0WSL/XZPv
+         v+DA==
+X-Gm-Message-State: AOJu0YzsPU7ViFJRGBJFriYd7qVe1E5tmslmmb7LAU2tX+t4kHYFEeQA
+	s2Y6qV9RGB+WWi8hELKwHq/V/Qd0gaiJ3ekXzQwCI3lAR5vBagFMXC+I34hobUA=
+X-Gm-Gg: ASbGnctsMjuik6rlpTn1IRXv5LwY4PT/ckW8NWjT9S60MIDr18EYOkzm+b3QxNz1d8D
+	ByWvCBiLrFcAj1Jj1S8r4bt0UUuxQOWWY0aLTEEnD2+1gxM9Qkvsw1+MR9YdIHuNJjHhDz4Nc4+
+	A/JE+B6h+Ubn9QgOAcrrFzbjdE7Ct3lCZ84ZwyNo4QCu6xySFx8zU3SNPkU8ppiOGMLbRKP5Dr+
+	XbGHpG/73oAainRUONrPBNiOFk/SWf/B+1QFjFrEwjA2xLODElHrmZJNX1ogEX1Ovm6MNZamDs1
+	SyXPuGjgC5L/UHvE3vMIHS8vdPcdBDCW5jzNKB/E77eL/5Bs+A==
+X-Google-Smtp-Source: AGHT+IEQMqkj+FtpcZxgGtU488+dXoq+VgOKiN+59B24M1O2EfiLKvd38B84Qx7Els7TCQbDEjBbUQ==
+X-Received: by 2002:a05:6214:f65:b0:6ea:face:e33f with SMTP id 6a1803df08f44-6eb3f2bad2emr231217546d6.3.1742854547178;
+        Mon, 24 Mar 2025 15:15:47 -0700 (PDT)
 Received: from [172.20.6.96] ([99.209.85.25])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4771d51fe11sm51891581cf.50.2025.03.24.15.14.07
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6eb3ef1f51esm49592736d6.26.2025.03.24.15.15.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Mar 2025 15:14:08 -0700 (PDT)
-Message-ID: <80835395-d43d-46de-8ed6-2cc5c2268b19@kernel.dk>
-Date: Mon, 24 Mar 2025 16:14:06 -0600
+        Mon, 24 Mar 2025 15:15:46 -0700 (PDT)
+Message-ID: <fc0f1f19-f7e6-45d8-abff-a98305ce5bb7@kernel.dk>
+Date: Mon, 24 Mar 2025 16:15:45 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,37 +80,51 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH vfs/for-next 0/3] Move splice_to_socket to net/socket.c
+Subject: Re: [PATCH vfs/for-next 1/3] pipe: Move pipe wakeup helpers out of
+ splice
 To: Joe Damato <jdamato@fastly.com>, linux-fsdevel@vger.kernel.org
 Cc: netdev@vger.kernel.org, brauner@kernel.org, asml.silence@gmail.com,
  hch@infradead.org, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
  horms@kernel.org, Alexander Viro <viro@zeniv.linux.org.uk>,
- "David S. Miller" <davem@davemloft.net>, Jan Kara <jack@suse.cz>,
- open list <linux-kernel@vger.kernel.org>
+ Jan Kara <jack@suse.cz>, open list <linux-kernel@vger.kernel.org>
 References: <20250322203558.206411-1-jdamato@fastly.com>
+ <20250322203558.206411-2-jdamato@fastly.com>
 Content-Language: en-US
 From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20250322203558.206411-1-jdamato@fastly.com>
+In-Reply-To: <20250322203558.206411-2-jdamato@fastly.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 3/22/25 2:35 PM, Joe Damato wrote:
-> Greetings:
-> 
-> While reading through the splice and socket code I noticed that some
-> splice helpers (like sock_splice_read and sock_splice_eof) live in
-> net/socket.c, but splice_to_socket does not.
-> 
-> I am not sure if there is a reason for this, but it seems like moving
-> this code provides some advantages:
->   - Eliminates the #ifdef CONFIG_NET from fs/splice.c
->   - Keeps the socket related splice helpers together in net/socket.c
->     where it seems (IMHO) more logical for them to live
+> Splice code has helpers to wakeup pipe readers and writers. Move these
+> helpers out of splice, rename them from "wakeup_pipe_*" to
+> "pipe_wakeup_*" and update call sites in splice.
 
-Not sure I think this is a good idea. Always nice to get rid of some
-ifdefs, but the code really should be where it's mostly related to, and
-the socket splice helpers have very little to do with the networking
-code, it's mostly just pure splice code.
+This looks good to me, as it's moving the code to where it belongs.
+One minor note:
+
+> +void pipe_wakeup_readers(struct pipe_inode_info *pipe)
+> +{
+> +	smp_mb();
+> +	if (waitqueue_active(&pipe->rd_wait))
+> +		wake_up_interruptible(&pipe->rd_wait);
+> +	kill_fasync(&pipe->fasync_readers, SIGIO, POLL_IN);
+> +}
+> +
+> +void pipe_wakeup_writers(struct pipe_inode_info *pipe)
+> +{
+> +	smp_mb();
+> +	if (waitqueue_active(&pipe->wr_wait))
+> +		wake_up_interruptible(&pipe->wr_wait);
+> +	kill_fasync(&pipe->fasync_writers, SIGIO, POLL_OUT);
+> +}
+
+Both of these really should use wq_has_sleeper() - not related to your
+change, as it makes more sense to keep the code while moving it. But
+just spotted it while looking at it, just a note for the future... In
+any case:
+
+Reviewed-by: Jens Axboe <axboe@kernel.dk>
 
 -- 
 Jens Axboe
