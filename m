@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-177214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDB26A6E4A9
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 21:50:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5835DA6E4AB
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 21:50:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CEC9D7A5B84
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 20:49:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A6F03ACD33
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 20:50:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78C301DED5F;
-	Mon, 24 Mar 2025 20:50:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4EEE1E3761;
+	Mon, 24 Mar 2025 20:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Myg7TDV1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N01p2f8g"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EA6B1DE8A5;
-	Mon, 24 Mar 2025 20:50:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0AF21DE2DB
+	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 20:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742849405; cv=none; b=Jxp+VgNsn6YEoddIHwjNDUuHY0A3xtTIEBzuBsfe+x9msbG5sFIJNfgVYFb43OsWrks6B1552q3C2n3K8hCK2ktUsofEpx9DopCA7Vr8uq+EUQvB4JZSggutzhbO9Drr894SuzSfnmE8P9UXwOcH8H9LVfJm8Y4jYpP1pNsctM0=
+	t=1742849406; cv=none; b=TgZdEL2yMmobq7hdAfwDDytP19B9rBOkx190VeJZc8F/84qt3l6V7lDuYqNO/ga/rBMEDpRhj02HV6IiGU/S14BJ1taIKSBsWoGMaBCgHSa/u19c7+ImF3JPn4XnP5BY+KuOjwjY9DJ4pbKIeAhwAbTJuS3rdUun0wagKexni2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742849405; c=relaxed/simple;
-	bh=i3yR7/aQnyPCzPAMyNJ2Vo5LYwTuvCRJQRv23NRhFXo=;
+	s=arc-20240116; t=1742849406; c=relaxed/simple;
+	bh=suFtJW/on6fChnthGDeTGhYQaK+TtDShm+FGPVQ9V7I=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=BTxHgWA890pBqIdfLUbGKItYJNExGb7nCLcz8QlIWxfw9dkjV0DibziwepK3zp+9FSz65XNHgrdRcjDRPGtxtZuj/LHVAhaahqxfDKafa87nXR464+PKfz91EWm+TtDkeCLZi8rwwsyPRyyJ84Yj73RMfjMnWmCP/uwozDZxYBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Myg7TDV1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B64DEC4CEDD;
-	Mon, 24 Mar 2025 20:50:04 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=JoyiQVGAZSybZUEOM8fJFnNnHqynTzyW47xS6zCg05TYXTozuUTsSFlICG/fWEwQF0rl/mHb3bRZkrhHHBHTtvNkhLx/tbLxLirzy2CGUCw6marxenvWo5/S1GWhsZkm7QTXLGvtD5KokqWWUlOArUl6NT0tX/0Kt5ns+3YB1ME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N01p2f8g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B980C4CEE4;
+	Mon, 24 Mar 2025 20:50:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742849404;
-	bh=i3yR7/aQnyPCzPAMyNJ2Vo5LYwTuvCRJQRv23NRhFXo=;
+	s=k20201202; t=1742849406;
+	bh=suFtJW/on6fChnthGDeTGhYQaK+TtDShm+FGPVQ9V7I=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Myg7TDV1vcxabQTQpRqpZi44fjbL2wLwALffG1Fl43pyaX7MqVVh3e/bPtMw4h8ka
-	 tAdsxEO7kxKkXdSgjeAj7Qqeq6LYhKF0TLchcXcANnzkL4x6/8EunJJ8c/OGGwG3vj
-	 UhaRCUo3u06+ZJC9ODPucpgvoNVIA7qkVDKpVghLv9D3YC8Fh6cdDeszynrCcs7ONV
-	 qllfLJWTBCXzQhBu8zdIa4jCrwtgO9es5kmUuoM0QjYXNLJ3wwU6Hy7BTEmb7J9odn
-	 T1aDzRRXSOFzdW66K3IqWwvVjPyuLGrBrk7zJLkVFZCJJqmHTuRSLPJE+OK4U/COv/
-	 GA3laGS+5lYdA==
+	b=N01p2f8gkALi1bDfmbEkFrYMg8PU00sHj4Do5EqkXYaJzoReBuenTetz7orIeEjAp
+	 hO0IBk1Qm/JZrRwy11OM9LkFMJwh9kCkCHFSXByumC7ZPYfpaKJENoGm6SvnUuJjIJ
+	 VqXFNhkRhWUNPG44Lvwg3oceHqVxG3uiYy5uF8diOvti+nGJLfLKZ+HXSwn6Zw4U3L
+	 4TpJdkRQOn2X+Hpi+opmGUenqJby/WoqZVOUYfppn/LVgei1gXmeWsUnKDX/fDhwI6
+	 gZ0Y/WdVXoWUULR+1bHjLOJaMjbApqav5CdH8ZK/1tcaVkPLqb1dU2ZkfS19sIWi+m
+	 e3b2ARVfzrJDA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 345C9380664D;
-	Mon, 24 Mar 2025 20:50:42 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE1A5380664D;
+	Mon, 24 Mar 2025 20:50:43 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] netpoll: Eliminate redundant assignment
+Subject: Re: [net-next PATCH] net: phylink: Remove unused function pointer from
+ phylink structure
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174284944101.4167801.12244877601133663895.git-patchwork-notify@kernel.org>
-Date: Mon, 24 Mar 2025 20:50:41 +0000
-References: <20250319-netpoll_nit-v1-1-a7faac5cbd92@debian.org>
-In-Reply-To: <20250319-netpoll_nit-v1-1-a7faac5cbd92@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ <174284944225.4167801.6955287752589570922.git-patchwork-notify@kernel.org>
+Date: Mon, 24 Mar 2025 20:50:42 +0000
+References: <174240634772.1745174.5690351737682751849.stgit@ahduyck-xeon-server.home.arpa>
+In-Reply-To: <174240634772.1745174.5690351737682751849.stgit@ahduyck-xeon-server.home.arpa>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: netdev@vger.kernel.org, linux@armlinux.org.uk, andrew@lunn.ch,
+ hkallweit1@gmail.com, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 19 Mar 2025 10:02:44 -0700 you wrote:
-> The assignment of zero to udph->check is unnecessary as it is
-> immediately overwritten in the subsequent line. Remove the redundant
-> assignment.
+On Wed, 19 Mar 2025 10:46:25 -0700 you wrote:
+> From: Alexander Duyck <alexanderduyck@fb.com>
 > 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
->  net/core/netpoll.c | 1 -
->  1 file changed, 1 deletion(-)
+> From what I can tell the get_fixed_state pointer in the phylink structure
+> hasn't been used since commit <5c05c1dbb177> ("net: phylink, dsa: eliminate
+> phylink_fixed_state_cb()") . Since I can't find any users for it we might
+> as well just drop the pointer.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] netpoll: Eliminate redundant assignment
-    https://git.kernel.org/netdev/net-next/c/f1fce08e63fe
+  - [net-next] net: phylink: Remove unused function pointer from phylink structure
+    https://git.kernel.org/netdev/net-next/c/c3ad9d9e7da8
 
 You are awesome, thank you!
 -- 
