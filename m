@@ -1,142 +1,197 @@
-Return-Path: <netdev+bounces-177061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58D87A6D8D2
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 12:03:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D057A6D9CD
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 13:06:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EFF267A5E87
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 11:01:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B10983A1925
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 12:06:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 783F818FC80;
-	Mon, 24 Mar 2025 11:02:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDF0D25E454;
+	Mon, 24 Mar 2025 12:06:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="d5wk2Bnp";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="lIu38uaB"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="PqGb2ED8"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF5402C80;
-	Mon, 24 Mar 2025 11:02:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ACDF1E633C;
+	Mon, 24 Mar 2025 12:06:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742814168; cv=none; b=CQkpgTQevKcKEnQboEYDvOdd6abO696xLJ2Nj0xyLbEdW72s/1qx+setYWOEarKx0m0c37dV0FGjrND1iWaWgUhanYXLMjf2e+B1Y0tBe9xCnJGesogec3qsF+tefoqoXjjwfI3xfUT6ShoZDkIuLenhcGv9rU24ZsufVCXJFME=
+	t=1742818011; cv=none; b=JC4kqkAZy9oEb2g2yOtpapDA9Q5CAwzls9KhbscOVTesZAqAWlU6DOvDAQ9lqMgDhBC2XxGyDkFOfQgQi0eqJ2jnlle4VhLv4QLedY7W3Ssb0ckJSZac2P62MgStgs/MmeoUCvnzuxmVcB+8wqDfht51hFqlWkKlLDlg4rhCS6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742814168; c=relaxed/simple;
-	bh=VI/QlYUCAaTIIpXrXll+ObIf2vvUK8jQbyoXVdBsOiU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cp1p3Qm/kRXiJqHY4bPZA61bd9nxa5RCZiiyp39e/laNDfffhQ6WwzDCGWqb2yOrwTI0Aw0AfoqAdPhsLCiflMv1IzTxKwvEZ/ufI00n83pUSNvGuZ0ZReHYTAfxkb9JSJNe8kVoCyLy1webFgvzyvPAO6WyhPbyuGA/Sl50bnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=d5wk2Bnp; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=lIu38uaB; arc=none smtp.client-ip=103.168.172.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfout.phl.internal (Postfix) with ESMTP id AA3BF1382C51;
-	Mon, 24 Mar 2025 07:02:44 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Mon, 24 Mar 2025 07:02:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1742814164; x=
-	1742900564; bh=1GVyjF+cNaK2a06PURQAqI3y445XU6p/QCUMWiHbhbo=; b=d
-	5wk2BnpTz5X25NvlwevUNay0dltJ+FFvhGLrDwhA7SbD7b+MvpflpluDer2dmhFI
-	5yyXB+hK6dgpX3t/wl9GEp2GuJmYjtPYy8QZaxI/EwhqM8cfBGSow2D11MuQtes6
-	zv7OD1UGSR4ut6lRPCcqBTEgAMW0A32b0j4qifjRn/gwkmooyTuubLPZEnsTPdu0
-	mPoYWXc0L7k9f2/gIyDWWHP3vNtSNMqbF/MnVFokXPOztnI43yY1rNCI+DaOBH6w
-	bgtHclXyCZYoBVZZ4oVPeIDPMKvcf7yFqlvid1yM76abFs5HYIj1gQRAqGafVnib
-	ZvmCIP4SdgcDlDykF/lfA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1742814164; x=1742900564; bh=1GVyjF+cNaK2a06PURQAqI3y445XU6p/QCU
-	MWiHbhbo=; b=lIu38uaBFHX0MD8YVZPmymdDQ5nm82hH1+hygQkL8ljmtd7zl9l
-	JwSzzFC3PIasKLgFmXMFs/d3v/npOotk0SVwP9xmA4rJGNrYcMtKDnxH42ESKjeM
-	M4HiWO3YlkZVRQwpupOzLMn/SMagkNrq+OF4Bwvap35AKdJCNso16r9Cy1saoXdK
-	9UNtw7EWbqOgGPLZRDeYekpVit0AAUdoenbiLrerZMF0/b5dtYvnDTvJmBocS36I
-	LIrAYQbD6+HSFP/E1zKpCyKBhClguBpklC8x8Qym93/oq8hnkelT8SRM3XOe5SGG
-	/pV/I+4OfZbXsH6cErpISa9rnr93pLXuo/Q==
-X-ME-Sender: <xms:1DvhZypm_hsm_tmGgrJDraeIM5qMGyraOsqrtVP_QIXI_fEHFIORYw>
-    <xme:1DvhZwpYyV3zxPHOk_dUf0FWC0H0SwntVcovZTHq0m3y8t792BT_WGC8hRe2GzSim
-    91lJBp0xjSJy-6yb4Q>
-X-ME-Received: <xmr:1DvhZ3PQa6DmFzusnE0ece4DzKI2Icf3Hu8biNvIo7_xRpAWQYMAbFP1XCXa>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduheelheelucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
-    jeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihsh
-    hnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdef
-    hfekgeetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenuc
-    frrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhn
-    sggprhgtphhtthhopedufedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnth
-    honhhiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghr
-    rdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrd
-    gtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehp
-    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepughonhgrlhgurdhhuhhnth
-    gvrhesghhmrghilhdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhr
-    ghdprhgtphhtthhopehrhigriigrnhhovhdrshdrrgesghhmrghilhdrtghomhdprhgtph
-    htthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghh
-X-ME-Proxy: <xmx:1DvhZx5_FlQIkINyk4uEb_pU0xy_a0Y4D9DIStB5_4bwCZMvq9Y1-A>
-    <xmx:1DvhZx7YtHO3AD3zyukaiNn2Ou8mTW_G1vWeFT-vXd7sbjBJPGs60Q>
-    <xmx:1DvhZxiVuX7b_bM0P5R5EPrQOzDQ9N-DVwab0uQJVtRqMGjajLv42A>
-    <xmx:1DvhZ76ctWUyquiOwhCFe6DCUc7XRnS3T7uS8HXwk2f5NH79h098Lg>
-    <xmx:1DvhZwKOnpmyQTByuHlWE2tlOwHPGIwF5dNuvd0gg4sAD3L38X68NZq_>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 24 Mar 2025 07:02:43 -0400 (EDT)
-Date: Mon, 24 Mar 2025 12:02:42 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
-Subject: Re: [PATCH net-next v24 09/23] ovpn: implement packet processing
-Message-ID: <Z-E70n1tkzKdepTo@krikkit>
-References: <20250318-b4-ovpn-v24-0-3ec4ab5c4a77@openvpn.net>
- <20250318-b4-ovpn-v24-9-3ec4ab5c4a77@openvpn.net>
+	s=arc-20240116; t=1742818011; c=relaxed/simple;
+	bh=wYgu0yj4rAcgBybWVgJbgK5SX6ir9b4d3V82SGy23m0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Qj7eu9GmqPpY/9R/pGNHnGpg8uMSuhUrtSA3QKkX/rkW14leVeAmrHRfj2s/TlW5XucUasYemjF43jjShzdDr9tJtDwSNMxOM/Lh8NywmP9o5LbHITbrLw+QAJWCKyWe9VvzpV6ozDeeBunBDgfuaf+lsy7DCaEGgfLCOZcWQJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=PqGb2ED8; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 52OC6A8Z01884390, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1742817970; bh=wYgu0yj4rAcgBybWVgJbgK5SX6ir9b4d3V82SGy23m0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=PqGb2ED8JSe5J6HaWpH11lbkh46DXsYWOIKwMo1TQiSoIuZEnXf7B4LO0Gl4w3cvP
+	 fBVXEGiaHL/Xx5Zkql+4TNaEiTsmUazaS18ioIQsAe8KwoevtT1eYGTQN4GeaX+vIG
+	 xP0MeN4sK+uKxEICV/PLqOEv0PV1Pqdd/7yAMh/V13pOC05/kuQs0mf94aLWJCIlWI
+	 8dbzjh+xfommns88bS6km3stkmgeY5Hyb88sPoI35k7/JJl7lUQ47xwZ+d2o4TE7kG
+	 V5CkZVZsIj6rk8V69UOt47v/SZ3a87owWti0DE9vJobmOs7tcu+3iL8bw+gRva8267
+	 TWf9DFTKRsMVQ==
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 52OC6A8Z01884390
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 24 Mar 2025 20:06:10 +0800
+Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 24 Mar 2025 20:06:11 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 24 Mar 2025 20:06:09 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622]) by
+ RTEXMBS04.realtek.com.tw ([fe80::4c19:b586:6e71:3622%5]) with mapi id
+ 15.01.2507.035; Mon, 24 Mar 2025 20:06:09 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Justin Lai <justinlai0215@realtek.com>, Simon Horman <horms@kernel.org>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        Ping-Ke Shih <pkshih@realtek.com>,
+        Larry Chiu
+	<larry.chiu@realtek.com>
+Subject: RE: [PATCH net-next] rtase: Add ndo_setup_tc support for CBS offload in traffic control setup
+Thread-Topic: [PATCH net-next] rtase: Add ndo_setup_tc support for CBS offload
+ in traffic control setup
+Thread-Index: AQHblMVgEp2xobAex0KxC/GYOCg1TLN55sKAgAF+ZWCABtq8AA==
+Date: Mon, 24 Mar 2025 12:06:09 +0000
+Message-ID: <ab27fd1a1e9d40759e090346eafb5881@realtek.com>
+References: <20250314094021.10120-1-justinlai0215@realtek.com>
+ <20250319123407.GC280585@kernel.org>
+ <6824bd62f05644ec8d301457449eae19@realtek.com>
+In-Reply-To: <6824bd62f05644ec8d301457449eae19@realtek.com>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250318-b4-ovpn-v24-9-3ec4ab5c4a77@openvpn.net>
 
-2025-03-18, 02:40:44 +0100, Antonio Quartulli wrote:
-> +int ovpn_crypto_state_reset(struct ovpn_crypto_state *cs,
-> +			    const struct ovpn_peer_key_reset *pkr)
-> +{
-> +	struct ovpn_crypto_key_slot *old = NULL, *new;
-> +	u8 idx;
-> +
-> +	if (pkr->slot != OVPN_KEY_SLOT_PRIMARY &&
-> +	    pkr->slot != OVPN_KEY_SLOT_SECONDARY)
-> +		return -EINVAL;
-> +
-> +	new = ovpn_aead_crypto_key_slot_new(&pkr->key);
-> +	if (IS_ERR(new))
-> +		return PTR_ERR(new);
-> +
-> +	spin_lock_bh(&cs->lock);
+>=20
+> > On Fri, Mar 14, 2025 at 05:40:21PM +0800, Justin Lai wrote:
+> > > Add support for ndo_setup_tc to enable CBS offload functionality as
+> > > part of traffic control configuration for network devices.
+> > >
+> > > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+> >
+> > ...
+> >
+> > > diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > index 2aacc1996796..2a61cd192026 100644
+> > > --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > @@ -1661,6 +1661,54 @@ static void rtase_get_stats64(struct
+> > > net_device
+> > *dev,
+> > >       stats->rx_length_errors =3D tp->stats.rx_length_errors;  }
+> > >
+> > > +static void rtase_set_hw_cbs(const struct rtase_private *tp, u32
+> > > +queue) {
+> > > +     u32 idle =3D tp->tx_qos[queue].idleslope * RTASE_1T_CLOCK;
+> > > +     u32 val, i;
+> > > +
+> > > +     val =3D u32_encode_bits(idle / RTASE_1T_POWER,
+> > RTASE_IDLESLOPE_INT_MASK);
+> > > +     idle %=3D RTASE_1T_POWER;
+> > > +
+> > > +     for (i =3D 1; i <=3D RTASE_IDLESLOPE_INT_SHIFT; i++) {
+> > > +             idle *=3D 2;
+> > > +             if ((idle / RTASE_1T_POWER) =3D=3D 1)
+> > > +                     val |=3D BIT(RTASE_IDLESLOPE_INT_SHIFT - i);
+> > > +
+> > > +             idle %=3D RTASE_1T_POWER;
+> > > +     }
+> > > +
+> > > +     rtase_w32(tp, RTASE_TXQCRDT_0 + queue * 4, val); }
+> > > +
+> > > +static void rtase_setup_tc_cbs(struct rtase_private *tp,
+> > > +                            const struct tc_cbs_qopt_offload *qopt)
+> {
+> > > +     u32 queue =3D qopt->queue;
+> >
+> > Hi Justin,
+> >
+> > Does queue need to be checked somewhere to make sure it is in range?
+>=20
+> Hi Simon,
+>=20
+> Thank you for your response. I will add a check to ensure that the queue =
+is
+> within the specified range.
 
-At this point, should there be a check that we're not installing 2
-keys with the same key_id at the same time? I expect a well-behaved
-userspace never does that, but it would confuse
-ovpn_crypto_key_id_to_slot if it ever happened.
+Hi Simon,
 
-["well, then the tunnel is broken. if userspace sets up a broken
-config that's not the kernel's problem." is an acceptable answer]
+Given that our hardware supports CBS offload on each queue, could it
+be possible that checking the range of qopt->queue might not be
+necessary?
 
--- 
-Sabrina
+> >
+> > > +
+> > > +     tp->tx_qos[queue].hicredit =3D qopt->hicredit;
+> > > +     tp->tx_qos[queue].locredit =3D qopt->locredit;
+> > > +     tp->tx_qos[queue].idleslope =3D qopt->idleslope;
+> > > +     tp->tx_qos[queue].sendslope =3D qopt->sendslope;
+> >
+> > Does qopt->enable need to be honoured in order to allow the offload to
+> > be both enabled and disabled?
+> >
+> Thank you for your suggestion. I will add a check for qopt->enable and ha=
+ndle
+> it appropriately.
+>=20
+> > > +
+> > > +     rtase_set_hw_cbs(tp, queue);
+> > > +}
+> > > +
+> > > +static int rtase_setup_tc(struct net_device *dev, enum tc_setup_type
+> type,
+> > > +                       void *type_data) {
+> > > +     struct rtase_private *tp =3D netdev_priv(dev);
+> > > +
+> > > +     switch (type) {
+> > > +     case TC_SETUP_QDISC_CBS:
+> > > +             rtase_setup_tc_cbs(tp, type_data);
+> > > +             break;
+> > > +     default:
+> > > +             return -EOPNOTSUPP;
+> > > +     }
+> > > +
+> > > +     return 0;
+> > > +}
+> > > +
+> > >  static netdev_features_t rtase_fix_features(struct net_device *dev,
+> > >                                           netdev_features_t
+> > features)
+> > > {
+> >
+> > ...
+
 
