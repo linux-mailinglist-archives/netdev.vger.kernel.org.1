@@ -1,216 +1,121 @@
-Return-Path: <netdev+bounces-177198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B630A6E3C4
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 20:44:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF9A8A6E3C5
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 20:45:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D98D3ADAB4
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 19:44:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5714816E7E1
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 19:45:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB3FD19F135;
-	Mon, 24 Mar 2025 19:44:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70CEEEAD7;
+	Mon, 24 Mar 2025 19:45:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BjlEZubb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mWNRA0J4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ADB619CCEA
-	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 19:44:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C269D27452
+	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 19:45:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742845485; cv=none; b=lHoDDIxL7wu2/l1outrtn6gBxnBmbbx1z4u0160haAxhCDaDM5P+835HYpSkqOlyurvEGxLgEtvOCkboNlq562zRKGy6E+xX0Xd7Dywn07xgaWmC1wfqcxo4wbycjJ7Cp6yAOq9EbAsEcSU3P+tNHdK1mtOHhPzPYt0lfIGd2Ns=
+	t=1742845511; cv=none; b=bVOIw8t0E684XladmDAkvvzbCMZcrTI2AMhnk8ib0LIIUDHUbVq0VExhvVIz646QdFY+brkZGbAO0Y+31fpb+mDFuLwQ/otCGrHYfqECt53BuRJ1VmwYHlPdz+uwlofHlz/BkMXWSKj+VYJFk8KllvxWvtGy3LXXrTovoFa2vUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742845485; c=relaxed/simple;
-	bh=gqxJ+QmzECqRBwn1dO9QjOKCRVypeRIQvkx8F5ivx9U=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=lfEA//kPMkCPfQb1f8DIdml9nNZ73VOII0Ux6KDx5fvFkglx7t/6yYVnyWPLrBa5OlCsU5y8xFZw9jWPhtnmuiLxC/Lr9fgHajJKMu+LEbMKR0YbQs7Mt7+6uCNHdDT0SJ3zpGsqEy2iPBAM6zQMGXY0ZuEyQn5vvddxKfT8gaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BjlEZubb; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7c5b2472969so472862185a.1
-        for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 12:44:42 -0700 (PDT)
+	s=arc-20240116; t=1742845511; c=relaxed/simple;
+	bh=wy7kYBNZkAF5J3w+c4Y6DHKRttq0sksxFdsmGhTPXiU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iUR3V84+WlcgR436rJCLxHNtr/ciMH0Gq/0SXUfd9SUqVPC5ZkGwTcTcLErAxrmwtHoXcnY/aE6Ens1mnVJWhn4NrW0Had6S47Skv1sE6xwqSRUASY1GIBwLgaVe7pDigBcCWUmNObP/7yKmc8TChoKe/9CWqTOcPQxtovpIwp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mWNRA0J4; arc=none smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4767b3f8899so58291411cf.0
+        for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 12:45:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742845482; x=1743450282; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1742845508; x=1743450308; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ie6E7R0W1nBrr9w7OifJk+9t+CtBR1LofPT/C5n78X0=;
-        b=BjlEZubboheC3QQf9m9OMA4AHMWdCrSUo426ku7rnJb9T3hT2/YQOQbjor6fYk/yYI
-         k/GNcjhkMjcKRA784NdHrgOt1P+/0SZNOsb0xopk97y/3yKnJfSCuizrfQiIvbXQSpa0
-         gHbdMePd7qLaqxrjYDVlkSbnF9IZ/1R/M/aPYL+xKNVlvZ0O3MX6SM2a7lN/ZSLw68BE
-         fKyDsqvt6XaTEa1tMdFJR77dcmDYLC235kPLHwhll3yXToW2vuzsevvUmvpfQla+kVGC
-         +GYVTMVtqWvA2XErjmuCyal+rlxiF62NvL850ggg0n13hdEZVwjVhsxXAFDPG9/YIIhg
-         o4Rg==
+        bh=iey5W7qkYykRrTe8NRjbn5B3DBL4Qdh8Gv2ZmoYjOa0=;
+        b=mWNRA0J4jcNd+s6HZTd2UJ9idhHEQ44mlnocYjN20jhV8mnAD9Ezsj584+s3lPHL1s
+         pKjkFME7ZcbIkyOvYIVs9Evwhzq2vAFVJ7sc2ukmQW8m1pk4d4efm5qbsFYUkb667Evp
+         zXYhFGBzNoMlrMnuigx7jQLpj/ZrLIWrsbIk7NH5ngPoZ580kqibO/8K0lqmlkRxody2
+         Rl7AnXyqH46nMzi7/tfDeZk32awJOSFfCABBaJitZjxtpVzIu/3fe1fUBykSvQPYwX4F
+         JeHChOVdrkM+mkqF5jWBXQln//k0iXhbKIFvsk818T5c2mDsALeLNCwf3LKCEqMBK8tc
+         B8sA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742845482; x=1743450282;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ie6E7R0W1nBrr9w7OifJk+9t+CtBR1LofPT/C5n78X0=;
-        b=S5UGGCoC/ABkDMgheo4KF1zL8HKIr+HkgRWAXDd5U5tYAofSpxnzSGoLWMsBRH3gpc
-         GBPF86zPaewCNf4U3xMVLEkD0glsxZdjC2De7+4oVya+N1IEJTsn3y1F2YWUeZwT8+p/
-         LfJqG7D1r4vdM0MtKxrQuxa5f8FQ5o91BYSyNx8v6QqKe0myfOilDeEctrkwiaRCvM0g
-         bm6OEEurseumQdrc7MLCG/VeMspOt/4N9ZMFM57qdfNGuk81phyvim5B/VeH9CVpWZOy
-         dMKL8YJj+GpktMigGbvguh3p646SafUvdKng2umfduKs8orezHrUnS5zGrpiILw6AJw+
-         sy7w==
-X-Forwarded-Encrypted: i=1; AJvYcCVulZK7A9sB7JhkQwlnu1pZ7dpp6ey2QUetqWhk3jO6ZJxeMLBONd5eemM85x71iJKF0c+RreA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPY6zImB3nhUgfk6asRfOy77VBnP6kVbEssd6FM62pcfZCpRxm
-	dwPaI6mkYEFMnH12Tbzc40V/WhMVqe1ZtCPZacly47MpyjWOKm1k
-X-Gm-Gg: ASbGnctUA6cWnCANhyRDvc3M//fYLT2nbXOG5majSyIPKH5O32T5bG9KMroLGRfId5g
-	JCJDjjYj+kVG2KnIouiO1cHebFBEKhDe8vFrj8bXN70s4vHqku8KwydJIixo2B6RFgbgaYuvlwS
-	yhaJwvRy3hku7oTn+uqui8GmEEh3iPtg2440sbUG1cR1rStejezlwBXKdweSYvRIkZXJ/ecrOgo
-	4s32IAswhpyeX2WhskEX3x73FAY5+/3eSjNorX8dFZoKLBf66wDmvq5OftKJlzBzG8at0OZ1/p+
-	3taZm6G3O9S88suloOy18vo/Vu724+d2YwoMIkydmg3UjgA/YAs4cwyC/vJ3mYgqtviCaeEjgW5
-	yweC6fzIvJsP42s7INpQLdg==
-X-Google-Smtp-Source: AGHT+IHTtnhHjWjwx7nDp6zGotRmxgdnhPDtobQU5M6dYPzdHSQ5evgOUetbG1cOwmGZdJjYffyhxg==
-X-Received: by 2002:a05:620a:1b94:b0:7c5:4bb7:8e45 with SMTP id af79cd13be357-7c5ba1ee8f9mr2107211185a.40.1742845481724;
-        Mon, 24 Mar 2025 12:44:41 -0700 (PDT)
-Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4771d17ef03sm50696751cf.32.2025.03.24.12.44.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Mar 2025 12:44:41 -0700 (PDT)
-Date: Mon, 24 Mar 2025 15:44:40 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>, 
- willemdebruijn.kernel@gmail.com
-Cc: davem@davemloft.net, 
- dsahern@kernel.org, 
- edumazet@google.com, 
- horms@kernel.org, 
- kuba@kernel.org, 
- kuni1840@gmail.com, 
- kuniyu@amazon.com, 
- netdev@vger.kernel.org, 
- pabeni@redhat.com
-Message-ID: <67e1b628df780_35010c2948d@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250324181116.45359-1-kuniyu@amazon.com>
-References: <67e17365461e3_2f6623294ea@willemb.c.googlers.com.notmuch>
- <20250324181116.45359-1-kuniyu@amazon.com>
-Subject: Re: [PATCH v1 net 1/3] udp: Fix multiple wraparounds of
- sk->sk_rmem_alloc.
+        d=1e100.net; s=20230601; t=1742845508; x=1743450308;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iey5W7qkYykRrTe8NRjbn5B3DBL4Qdh8Gv2ZmoYjOa0=;
+        b=mnoVVefO2M1hI2MuDdb6RDnemmHkbe1FiPF/l7K+6Zc4S5PuLzUdxs9O4s2Ux5Dyk7
+         i2zWQFJKF3vUP8/gaJqIx2ibd9O10xxDUjMdR9ZigJqL1oJDHDlpvlbymITTkG9Ork3D
+         v0McnTC/NpFzENvdCn6HTcYT4RZr7OJczn1ca77It8iZ8iL3mhwSUTYxsfHpBjKybiqq
+         kH4A1gxlQU1vD4gWRzBzRAVJFTN05OXrz86zoV9VUC+LBvSxSrtfUd7ZoscTqPgQ908D
+         VUN9qmtIe70LIBROHA24FzsPOLk4zuoUUOY22qhzJeCUFztA1mtzqujiTcwqJmxpy/FM
+         xu8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXHkMAbwTmJ4tA43FAVADO5XWZiukW+HtCrounU4g10dypE8mjNBIQo0YXCgPQfs9lCWf1oEs0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYT6HRFjBEaxBCrVSGEfTubCjVpv7fBsPB3jqTibE19MIxfdi4
+	gVHwvWVJtRoiKmo1FKikgE8fKqzWBePJ69xzL0ZyfbZsRmexseDcsPEZB46RTL55ZvrpD8xuTjB
+	g1pVAgwew6OrHLN06Gwme/tHZV97jkNwLO1a8
+X-Gm-Gg: ASbGnctG40nNbuh2MEgrTDKYECIHWOizrm2fohs6wBkM5HDErl2gHOJaJrW0fRtZoCC
+	xCboY7E1tJKum/nJNetzdLHJko7fRIF4v0Bj6S8cTUovsBhJ16yCNdQ41Hs4ekrCfbrTKsmbRY5
+	3G6s4IGFvTHFNjV+VxNYqF3ulYiw==
+X-Google-Smtp-Source: AGHT+IGiEDqWtZaqXAbV3fPkXChVhIvLt9hDe42nQt4+6rscC7VptTEcKy2FrH/zc0KslU/BSCxHxPBE9nA2kXyeaZM=
+X-Received: by 2002:a05:622a:4d8b:b0:471:b544:e6fc with SMTP id
+ d75a77b69052e-4771d9c9823mr239019061cf.26.1742845508261; Mon, 24 Mar 2025
+ 12:45:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20250318154359.778438-1-edumazet@google.com> <20250318154359.778438-3-edumazet@google.com>
+ <20250324123841.58ece0e8@kernel.org>
+In-Reply-To: <20250324123841.58ece0e8@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 24 Mar 2025 20:44:56 +0100
+X-Gm-Features: AQ5f1JqR2c4pRewgsYLooPMBDnIimEp3n53Alvf9qmHJe3UnsQEfW1pWVJ47buI
+Message-ID: <CANn89i+Cjm+EEmtw_GF3UsgHt1_0zrjTBvSv_baqn6yH0x0feg@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 2/2] tcp/dccp: remove icsk->icsk_ack.timeout
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Kuniyuki Iwashima wrote:
-> From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> Date: Mon, 24 Mar 2025 10:59:49 -0400
-> > Kuniyuki Iwashima wrote:
-> > > __udp_enqueue_schedule_skb() has the following condition:
-> > > 
-> > >   if (atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf)
-> > >           goto drop;
-> > > 
-> > > sk->sk_rcvbuf is initialised by net.core.rmem_default and later can
-> > > be configured by SO_RCVBUF, which is limited by net.core.rmem_max,
-> > > or SO_RCVBUFFORCE.
-> > > 
-> > > If we set INT_MAX to sk->sk_rcvbuf, the condition is always false
-> > > as sk->sk_rmem_alloc is also signed int.
-> > > 
-> > > Then, the size of the incoming skb is added to sk->sk_rmem_alloc
-> > > unconditionally.
-> > > 
-> > > This results in integer overflow (possibly multiple times) on
-> > > sk->sk_rmem_alloc and allows a single socket to have skb up to
-> > > net.core.udp_mem[1].
-> > > 
-> > > For example, if we set a large value to udp_mem[1] and INT_MAX to
-> > > sk->sk_rcvbuf and flood packets to the socket, we can see multiple
-> > > overflows:
-> > > 
-> > >   # cat /proc/net/sockstat | grep UDP:
-> > >   UDP: inuse 3 mem 7956736  <-- (7956736 << 12) bytes > INT_MAX * 15
-> > >                                              ^- PAGE_SHIFT
-> > >   # ss -uam
-> > >   State  Recv-Q      ...
-> > >   UNCONN -1757018048 ...    <-- flipping the sign repeatedly
-> > >          skmem:(r2537949248,rb2147483646,t0,tb212992,f1984,w0,o0,bl0,d0)
-> > > 
-> > > Previously, we had a boundary check for INT_MAX, which was removed by
-> > > commit 6a1f12dd85a8 ("udp: relax atomic operation on sk->sk_rmem_alloc").
-> > > 
-> > > A complete fix would be to revert it and cap the right operand by
-> > > INT_MAX:
-> > > 
-> > >   rmem = atomic_add_return(size, &sk->sk_rmem_alloc);
-> > >   if (rmem > min(size + (unsigned int)sk->sk_rcvbuf, INT_MAX))
-> > >           goto uncharge_drop;
-> > > 
-> > > but we do not want to add the expensive atomic_add_return() back just
-> > > for the corner case.
-> > > 
-> > > So, let's perform the first check as unsigned int to detect the
-> > > integer overflow.
-> > > 
-> > > Note that we still allow a single wraparound, which can be observed
-> > > from userspace, but it's acceptable considering it's unlikely that
-> > > no recv() is called for a long period, and the negative value will
-> > > soon flip back to positive after a few recv() calls.
-> > 
-> > Can we do better than this?
-> 
-> Another approach I had in mind was to restore the original validation
-> under the recvq lock but without atomic ops like
-> 
->   1. add another u32 as union of sk_rmem_alloc (only for UDP)
->   2. access it with READ_ONCE() or under the recvq lock
->   3. perform the validation under the lock
-> 
-> But it requires more changes around the error queue handling and
-> the general socket impl, so will be too invasive for net.git but
-> maybe worth a try for net-next ?
+On Mon, Mar 24, 2025 at 8:38=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Tue, 18 Mar 2025 15:43:59 +0000 Eric Dumazet wrote:
+> > diff --git a/include/net/inet_connection_sock.h b/include/net/inet_conn=
+ection_sock.h
+> > index 018118da0ce15c5ba5e3b7fcc1b36425794ec9a1..597f2b98dcf565a8512e815=
+d9eae2b521bac7807 100644
+> > --- a/include/net/inet_connection_sock.h
+> > +++ b/include/net/inet_connection_sock.h
+> > @@ -117,7 +117,6 @@ struct inet_connection_sock {
+> >                                 lrcv_flowlabel:20, /* last received ipv=
+6 flowlabel       */
+> >                                 dst_quick_ack:1, /* cache dst RTAX_QUIC=
+KACK              */
+> >                                 unused:3;
+> > -             unsigned long     timeout;       /* Currently scheduled t=
+imeout            */
+> >               __u32             lrcvtime;      /* timestamp of last rec=
+eived data packet */
+> >               __u16             last_seg_size; /* Size of last incoming=
+ segment          */
+> >               __u16             rcv_mss;       /* MSS used for delayed =
+ACK decisions     */
+>
+> I get the same errors as Simon, something ate the leading spaces
+> in the patch.
 
-Definitely not net material. Adding more complexity here
-would also need some convincing benchmark data probably.
-
-> 
-> > Is this because of the "Always allow at least one packet" below, and
-> > due to testing the value of the counter without skb->truesize added?
-> 
-> Yes, that's the reason although we don't receive a single >INT_MAX
-> packet.
-
-I was surprised that we don't take the current skb size into
-account when doing this calculation.
-
-Turns out that this code used to do that.
-
-commit 363dc73acacb ("udp: be less conservative with sock rmem
-accounting") made this change:
-
--       if (rmem && (rmem + size > sk->sk_rcvbuf))
-+       if (rmem > sk->sk_rcvbuf)
-                goto drop;
-
-The special consideration to allow one packet is to avoid starvation
-with small rcvbuf, judging also from this review comment:
-
-https://lore.kernel.org/netdev/1476938622.5650.111.camel@edumazet-glaptop3.roam.corp.google.com/
-
-That clearly doesn't apply when rcvbuf is near INT_MAX.
-Can we separate the tiny budget case and hard drop including the
-skb->truesize for normal buffer sizes?
-
-> 
-> > 
-> >         /* Immediately drop when the receive queue is full.
-> >          * Always allow at least one packet.
-> >          */
-> >         rmem = atomic_read(&sk->sk_rmem_alloc);
-> >         rcvbuf = READ_ONCE(sk->sk_rcvbuf);
-> >         if (rmem > rcvbuf)
-> >                 goto drop;
-
-
+OK, I will resend.
 
