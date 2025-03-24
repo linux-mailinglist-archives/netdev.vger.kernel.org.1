@@ -1,135 +1,96 @@
-Return-Path: <netdev+bounces-177174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAAA6A6E29F
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 19:46:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE3BBA6E2AE
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 19:50:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEED416714B
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 18:45:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D32B1891753
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 18:50:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE253264F88;
-	Mon, 24 Mar 2025 18:44:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BC03266EF9;
+	Mon, 24 Mar 2025 18:49:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="46pIIM0o"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tibyIlAm"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1F53C17;
-	Mon, 24 Mar 2025 18:44:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5563D1FCFDC;
+	Mon, 24 Mar 2025 18:49:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742841899; cv=none; b=PGNA2oZA87a/0eftsgfDIIcj1pfYO1hE3rNybSTLTnAX1kBUJsEW3l8rgeycWz7qTssvG8wI05DCebU6tv/0vrpYlojK+JaN56iJ3dsEbhWCPF1hEPjG0RD9Cq6JoZ42OXDg+8nsxUJwIP6ukpad5ENhNZcqExcFi6sbCssDiVU=
+	t=1742842196; cv=none; b=t/P6hZQPOxYFuK6kXbK7K8OpdDQ5xiRHj2Y6g7m1EOt4cZxTbs08Qvcl9NpdredaR5aKUk+R987Sb2jw6eF8DMfaesmLIC2fna9gPJgSGeuVIy5eyoF+EWGNAJWtMpiKWN4FUhIVQyiW7obXFfD3sFwBz4c5xfBtYKRbPENxX6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742841899; c=relaxed/simple;
-	bh=K3laK/m5RtpxHsNbwje5ZG8P4i6IVDET2aF6Q5FXpEg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y4BNAWXbK41P0Ax8vaf+XFlYbEOSH5zJp7yq6MlcHGttBfwHwjCqMQe3YbGZ12KFG+NN2/E5ILIXeTRgrZQRwq4cS8FPmh8jEHyNwnk0qkE+Av0cXuH0tR2Nm5qWScCvsiiCBkSgy98bCzgNWKNdfCXfX8Sp/V1mEKMJYicFYIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=46pIIM0o; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=n7jWwqiuO3K1ioFA/FuzqDBCH2NO8F0ORU/xJjFa8QI=; b=46pIIM0oB91fzxEQ7VIVH19kOq
-	wiKFCzriYDxg1lMpvLVGyzW+vQlAvJt/BehpI1Nl8IDUUXZgvHyVjiYbjIV9G+rrI8dXY0rAGH01h
-	hC6ZEq4bDaiBnySSvqfceQELYDTQ5wvBsa6GiRW1PImqxVG4Di7g2uy6y1TmwujfY+/I=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1twmmt-006y43-RD; Mon, 24 Mar 2025 19:44:39 +0100
-Date: Mon, 24 Mar 2025 19:44:39 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
-	brett.creeley@amd.com, surenb@google.com,
-	schakrabarti@linux.microsoft.com, kent.overstreet@linux.dev,
-	shradhagupta@linux.microsoft.com, erick.archer@outlook.com,
-	rosenp@gmail.com, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: Re: [PATCH 1/3] net: mana: Add speed support in
- mana_get_link_ksettings
-Message-ID: <909eae34-02ac-4acd-8f0e-1194f0049a21@lunn.ch>
-References: <1742473341-15262-1-git-send-email-ernis@linux.microsoft.com>
- <1742473341-15262-2-git-send-email-ernis@linux.microsoft.com>
- <f4e84b99-53b5-455d-bad2-ef638cafdeae@lunn.ch>
- <20250324174339.GA29274@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	s=arc-20240116; t=1742842196; c=relaxed/simple;
+	bh=5mJQMRQsVibHd/5bNNk88AKE105YGw+TZJNqXyev8w8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Uqwmoor/yyzXRM2GTDTtSnwiD/ArUvzA6QxOiGwyHJyNlVeX0cqEmn3r7WyUo/fx2fhgcpuBzZQsm2iFTbqtCsmVG/hcjBAh0bdw+PgrYXMeUxQ7QMB0rx1gghBYD16Wg0zdk6DrR4h5DkGuqQfaAYoM1aD6D+pc5KhxmkL/IOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tibyIlAm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4A05C4CEDD;
+	Mon, 24 Mar 2025 18:49:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742842195;
+	bh=5mJQMRQsVibHd/5bNNk88AKE105YGw+TZJNqXyev8w8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=tibyIlAmKi10TBcgbcIfgj80LnAb4flQKSfrvR1TlD9mnGZeWL4PZYsgPbx2KnR0O
+	 6zd8HM5WMjab+2rO9OChcJ9P41fkPpUxwkFRTwHsECxFZGLv22XJdmJThYzAg55vPK
+	 eM3zjMsh8hJ0L3rdO1jnvr0rUdjBW3w7ECFYPsRHsT4zoVRHXatIMzYGYh95WptVre
+	 1oy2h/Hz518+fR09MfIC3YiKDY/uWhLnsW02dhOoWL+oY3smD1Dy9MX448t7Z7GEsf
+	 gY6IzC2OFGUIyJE4ytBCzBax8rybCKIUVaT0O5k/ugiPlaqWMFyibgvrbLEnX1oEAy
+	 oVeTsCjDPeszw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34660380664D;
+	Mon, 24 Mar 2025 18:50:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250324174339.GA29274@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] net: stmmac: Fix accessing freed irq affinity_hint
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174284223202.4131627.8031895461636997073.git-patchwork-notify@kernel.org>
+Date: Mon, 24 Mar 2025 18:50:32 +0000
+References: <20250318032424.112067-1-dqfext@gmail.com>
+In-Reply-To: <20250318032424.112067-1-dqfext@gmail.com>
+To: Qingfang Deng <dqfext@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+ alexandre.torgue@foss.st.com, boon.leong.ong@intel.com,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
 
-On Mon, Mar 24, 2025 at 10:43:39AM -0700, Erni Sri Satya Vennela wrote:
-> On Thu, Mar 20, 2025 at 02:37:47PM +0100, Andrew Lunn wrote:
-> > > +int mana_query_link_cfg(struct mana_port_context *apc)
-> > > +{
-> > > +	struct net_device *ndev = apc->ndev;
-> > > +	struct mana_query_link_config_req req = {};
-> > > +	struct mana_query_link_config_resp resp = {};
-> > > +	int err;
-> > > +
-> > > +	mana_gd_init_req_hdr(&req.hdr, MANA_QUERY_LINK_CONFIG,
-> > > +			     sizeof(req), sizeof(resp));
-> > > +
-> > > +	req.vport = apc->port_handle;
-> > > +
-> > > +	err = mana_send_request(apc->ac, &req, sizeof(req), &resp,
-> > > +				sizeof(resp));
-> > > +
-> > > +	if (err) {
-> > > +		netdev_err(ndev, "Failed to query link config: %d\n", err);
-> > > +		goto out;
-> > > +	}
-> > > +
-> > > +	err = mana_verify_resp_hdr(&resp.hdr, MANA_QUERY_LINK_CONFIG,
-> > > +				   sizeof(resp));
-> > > +
-> > > +	if (err || resp.hdr.status) {
-> > > +		netdev_err(ndev, "Failed to query link config: %d, 0x%x\n", err,
-> > > +			   resp.hdr.status);
-> > > +		if (!err)
-> > > +			err = -EPROTO;
-> > > +		goto out;
-> > > +	}
-> > > +
-> > > +	if (resp.qos_unconfigured) {
-> > > +		err = -EINVAL;
-> > > +		goto out;
-> > > +	}
-> > > +	apc->speed = resp.link_speed;
-> > 
-> > Might be worth adding a comment that the firmware is returning speed
-> > in Mbps.
-> > 
-> > Or name the struct member link_speed_mbps.
-> > 
-> Thank you for your suggestion. I'll make this change for the next
-> version of this patchset.
+Hello:
 
-Please answer my other questions before posting the next version of
-the patch. I'm really questioning if this is the correct uAPI to be
-using. You have a very poor description of what you are trying to
-do. Maybe TC is the better fit? Does this speed apply to ingress and
-egress? If so, there are two leaky buckets, so why only one
-configuration value? Or can you only configure ingress?
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Also, if i understand correctly MANA is a virtual device and this is
-the VM side of it. If this is used for bandwidth limitation, why is
-the VM controlling this, not the hypervisor? What is the security
-model?
+On Tue, 18 Mar 2025 11:24:23 +0800 you wrote:
+> The cpumask should not be a local variable, since its pointer is saved
+> to irq_desc and may be accessed from procfs.
+> To fix it, use the persistent mask cpumask_of(cpu#).
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: 8deec94c6040 ("net: stmmac: set IRQ affinity hint for multi MSI vectors")
+> Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+> 
+> [...]
 
-	Andrew
+Here is the summary with links:
+  - [net,v2] net: stmmac: Fix accessing freed irq affinity_hint
+    https://git.kernel.org/netdev/net/c/c60d101a226f
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
