@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-177026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C58EA6D602
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 09:19:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 68CACA6D606
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 09:20:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA43416695F
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 08:19:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA7CD1680EF
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 08:20:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C78E25D20C;
-	Mon, 24 Mar 2025 08:18:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7495F25D203;
+	Mon, 24 Mar 2025 08:20:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="ozkfcmcL"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="dVcEfcQN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3855525D1F4
-	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 08:18:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E9425D1E8
+	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 08:20:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742804332; cv=none; b=ksZggYgdvbfjPy/kecowd2yvLJmav9VxBoiQjW8hVvOw1qaIhRaAToFYQrkyFj1tnnRdJeg12Mu4U/Vt0Od+9V6cffjiEdwiv8KAhln8mqWtwFR6KfFLIXah2N4195SKf3mAtgbhZVQVvJ3XBMCVxuK8WMQNkb+CdxR0cTUhb7Y=
+	t=1742804417; cv=none; b=J1db5ascdd79C8/1HSnfK0vUbmoR/xhAE9PgPNVrexfkPg0AQX8MgUPSj75fdhrzMLyMOPnX+fVES4mmyIgDrWCF0x7iocnGqp5PtP/NN3tG8fOspZXzVK/1yOkJeOd7LZDn0RJu8EwICwiE8VzHstf6/9f2qgbbLjlr/zKuWBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742804332; c=relaxed/simple;
-	bh=6/FGJEt1RK3xrrnf30jQkcciY1Tncfe7Lc4lNDrYdyw=;
+	s=arc-20240116; t=1742804417; c=relaxed/simple;
+	bh=M4+k6YD1mCXTwas5eL+hsY8I+hzUqzWAWG8iyXWAySg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=di+SiKY8T1F7YGOoV9CvZgaQoL3FUrZXBrwrx7gfxpX+kRTSe6CI35ZGmqmnSoKdYmJFu/spuCWkW6499IOqOMl1dI+xM0ETgPgSolkiZwMz7aGVY4PehXBFv0HeSGVZIn6uqMJFlHw9P8DwhHaIezEF13fHu0/dVMZUTipypr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=ozkfcmcL; arc=none smtp.client-ip=209.85.128.51
+	 In-Reply-To:Content-Type; b=JQ1KD8dJcERJ33KbrUGbdohm11bkypYoKc9Rzn6ZWyt6IwBwwPBE5rEsHafszHpQ5mUpps8vWkdAx0Wdlt4asMcYZzFmzmkza7URhmICJTnJHsU/9url4iRgTLuVl+Kdm6ZRoCmLHUMeUMFWPTV31yWjU11ZNuq/txnrP0Ql9n4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=dVcEfcQN; arc=none smtp.client-ip=209.85.221.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43d04dc73b7so43275905e9.3
-        for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 01:18:48 -0700 (PDT)
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3913d129c1aso2846145f8f.0
+        for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 01:20:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1742804327; x=1743409127; darn=vger.kernel.org;
+        d=tuxon.dev; s=google; t=1742804413; x=1743409213; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:content-language:from
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=wUV72th4YLID8Yi5m5TOOfAU6k/l5ItTBGhCs4wlkd4=;
-        b=ozkfcmcLabBiV8WInbkjifw8S9L2Zi6QGtbu159iGGTj1dk7e1flwO+DjVqdbp6L8a
-         AFClaxAiVkc37l0akScbEVeDUuI3j7I/VPJmH9oOCp7D2AhSsKWVk7C3Bqs4g7wbRnqS
-         /QGUR5J2gvmx70juqkZK+UnsjsCMQu8kg/PmjsnOcK0RL6tB68lPPiMHN9dZG46etYcq
-         xa4ypLHNRirSpL/i5sNb6L7Aja5PPgVUPgynSPsnO9oHgbCpG87bm97cSFoq1QVcEz3U
-         dqzNLUIPP50q5eSOp53alb0lPiSAp504dZMQ1ddZqxRZQGXshjFVXNVlcJnrPtH+9Qn1
-         uODQ==
+        bh=X5KNi5vv+WwUHgiOiAE1zT6bKqb5UxIw1xZcRyktkIE=;
+        b=dVcEfcQNMPXouD0q0BpB4ThpSHYpMCJhVEpJx7bGecKDgtxWyZfxVQnC10XOI2tdLK
+         LlYuY/dTTHvePypS+csW3lF6uBhou/xAxSmYdmkVDcdk9S3CmW+zuORU8X0K4Eji7Tcg
+         Ax8A697eKrVVzoBc+TwxOK6btMciCbOXeDnOv/A4Ucq+LdrbyvxxRCAswuH/r8a2MjMZ
+         S43+imhKk1AGgVUtQyTUCmHrtWP/WXL077B8Mz414HUp25KVZ4j/IbzSw/LA/tNkVZOC
+         kmiwc2GuZFguEj6qf+5M2lkEfNBl/n7NsSJQt7CQc2xjsq81njWMbK65WL1G+a5mEiYV
+         KiSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742804327; x=1743409127;
+        d=1e100.net; s=20230601; t=1742804413; x=1743409213;
         h=content-transfer-encoding:in-reply-to:content-language:from
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wUV72th4YLID8Yi5m5TOOfAU6k/l5ItTBGhCs4wlkd4=;
-        b=VuUclSFOsQn6Tr0D59P9D9LlqROVNK2G8lnFk5tWpsqaWKshvM7z6ZoCBDBGHTFx9N
-         7izR1PWWL7Z+5ChmnUZY1h8al15UsN2NcYAY7VP2st2by0Q8Up4eb+onMmiBS6cBJzrs
-         vjJZDczKzuz6FKjZY6WdsccKTT0OYAeqObNBix9+NETBoYfpEuKR1VdJQ7HyAC45VEH/
-         PIMAvqL6uGeZKfdwJ7qPezRnId1uFx7lCAuNDcIf4OugqliZlHhsIfKA3Pl5A4/IRC0O
-         K6c+JGIsknjlUe7Jo9qWIdRSUMquFxE7alyDt9x2FsYyAilVzGmI37h4soYiDUOqF8fO
-         Xe5A==
-X-Gm-Message-State: AOJu0Yz4RrN/6jlJ6rL7v46rphpiiEpU+oOzZg6OL5xtfeZiDWjt0pw5
-	YsEcDaDTAQGdCfqpQYkxKDEN6o0m0VhVWfl8bDb3m6jhE/bn57e6aWKN2UqfzJU=
-X-Gm-Gg: ASbGncsL9Qn1WO55FvU3VR1sN/ur1P2nXvg8W10QJZ0ODzNFYBWhn+ELI7uLp/UBkvi
-	cpci+XSruK7rBUgkDhAfC2jAA9Pj2/0Otr70nM4S0nCqAKV7pS8nVZXtNrV1oFPHwN2H1fp84xI
-	LLnMK3Yefdayixl+rjKaQfIH3NcQwY8aHZe3c0fZaDyaCfaM1n2V4ETHOUUogFb7i6fvPPn2zwy
-	m8153OuDUjoSynF+GaPfH4AQXWXGokC65iosftfrs0nSL1KpHGofg0Q9/tskRBvMeHQ/gmqmdr6
-	ExlHOD1TUUDYuA4TxCNzig3N4OYRZX1ToZYhJ/yWlhipUvg8iIgh
-X-Google-Smtp-Source: AGHT+IGsHxYn5Ee/W35yKht21ggLacnLCdw5GuAkDQDpS+0jTcweaq4u/g3gFV75Q5DOsSvSYrtVtQ==
-X-Received: by 2002:a05:600c:1d16:b0:43d:ac5:11e8 with SMTP id 5b1f17b1804b1-43d58db52e1mr44341605e9.21.1742804327367;
-        Mon, 24 Mar 2025 01:18:47 -0700 (PDT)
+        bh=X5KNi5vv+WwUHgiOiAE1zT6bKqb5UxIw1xZcRyktkIE=;
+        b=WD1WauTyWVVtOGXL5c9WA7mB1KbNCJgFtLBVD5xk/2mnJ/K9C6u6+GpfROSoz8ikTf
+         WeG5/Zp/cvS01HsGJxAIipZ2WUVkZvUV4JLlgjqyNbbY+1gEQBOxqddoQMDIy4FjXJhk
+         LfVy4q4jchGZtyZcyEE+8N3ShKZwJiLFQsCFjdMSrW1P9fsY2SqgUiQF4jJ5LD+xpMnR
+         7bvZ7WnTd/iMOv7+QMiOv4AELTDR4eqr3rgL4U6chaGmxR3F34y5yzOGnmILoCoqx8nO
+         MY5BFzZhrJKR+89D82lc12LkPiW2zb/1IX/QrKSv5uUGST2YrQ836si/4LDOlkwk6co6
+         J5jg==
+X-Gm-Message-State: AOJu0YwYKXMgNh19W19hWAfyHX5eQ7/Chyu5cBdAdYKQ7klWd84tivOx
+	R8agtJwCztVuG4wbVEyvnwDCIoqAd/FS28uTks0sWP+VpDppn0i6jw7RCyAnv10=
+X-Gm-Gg: ASbGncsrX2JYXlJSOD7lwXtOTODxFX1zg7x8T5lmuERKrUeytPp3zmqNzFUT2JXYemu
+	z9sAQMLmv5RP7IcfJ7Pg2Ru6PRL1/8B0wt8AvtO/DSbUME5yAOsM9mOjmMm45Gv++culWfCn8Bn
+	aldk3RoKnYYHo3ut/FYKbzgKRAMXQu2fJsR3CPftXWdiH4+68IXwN65pls9nO92pVxL6wJUmX5u
+	tq0HqWZkw5uLu7hsAurqRT8xOvuOO2S6eanmOOg1ABCD2igfDGpr5xRrwLfA1rjDSk6sTmw7v99
+	tc8KXkC5AGptfFDN/JjpQClgVHReA59H658elig3862A1X8JJWsQLMkHa97SiMA=
+X-Google-Smtp-Source: AGHT+IHieGvYY9xYsJ+hRcTxELd3WHjGIze3RgAfmcczbmeULThLVKV6pyFoFLcvCmypyhY+f3n/4w==
+X-Received: by 2002:a5d:584f:0:b0:38d:e0a9:7e5e with SMTP id ffacd0b85a97d-399795567ebmr13722154f8f.6.1742804413383;
+        Mon, 24 Mar 2025 01:20:13 -0700 (PDT)
 Received: from [192.168.50.4] ([82.78.167.46])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d43fdab7asm163827855e9.29.2025.03.24.01.18.45
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3997f9efc90sm10337434f8f.98.2025.03.24.01.20.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Mar 2025 01:18:46 -0700 (PDT)
-Message-ID: <3e6cb322-bc8d-471c-87c8-286b98f12ad9@tuxon.dev>
-Date: Mon, 24 Mar 2025 10:18:44 +0200
+        Mon, 24 Mar 2025 01:20:12 -0700 (PDT)
+Message-ID: <1f5b71d6-872f-486d-9b06-7b5e407f8482@tuxon.dev>
+Date: Mon, 24 Mar 2025 10:20:10 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,8 +80,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 05/13] net: macb: add no LSO capability
- (MACB_CAPS_NO_LSO)
+Subject: Re: [PATCH net-next 08/13] net: macb: introduce DMA descriptor
+ helpers (is 64bit? is PTP?)
 To: =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>,
  Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
  <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
@@ -102,57 +102,323 @@ Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
  linux-mips@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
  Tawfik Bayouk <tawfik.bayouk@mobileye.com>
 References: <20250321-macb-v1-0-537b7e37971d@bootlin.com>
- <20250321-macb-v1-5-537b7e37971d@bootlin.com>
+ <20250321-macb-v1-8-537b7e37971d@bootlin.com>
 From: Claudiu Beznea <claudiu.beznea@tuxon.dev>
 Content-Language: en-US
-In-Reply-To: <20250321-macb-v1-5-537b7e37971d@bootlin.com>
+In-Reply-To: <20250321-macb-v1-8-537b7e37971d@bootlin.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi, Theo,
+I think the "(is 64bit? is PTP?)" from title could be dropped.
 
 On 21.03.2025 21:09, Théo Lebrun wrote:
-> LSO is runtime-detected using the PBUF_LSO field inside register
-> designcfg_debug6/GEM_DCFG6. Allow disabling that feature if it is
-> broken by using struct macb_config->caps.
+> Introduce macb_dma_is_64b() and macb_dma_is_ptp() helper functions.
+> Many codepaths are made simpler by dropping conditional compilation.
+> 
+> This implies three changes:
+>  - Always compile related structure definitions inside <macb.h>.
+>  - Make the field hw_dma_cap in struct macb always present.
+>  - MACB_EXT_DESC can be dropped as it is useless now.
+> 
+> The common case is:
+> 
+> 	#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+> 		struct macb_dma_desc_64 *desc_64;
+> 		if (bp->hw_dma_cap & HW_DMA_CAP_64B) {
+> 			desc_64 = macb_64b_desc(bp, desc);
+> 			// ...
+> 		}
+> 	#endif
+> 
+> And replaced by:
+> 
+> 	struct macb_dma_desc_64 *desc_64;
+> 	if (macb_dma_is_64b(bp)) {
+> 		desc_64 = macb_64b_desc(bp, desc);
+> 		// ...
+> 	}
 > 
 > Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
 > ---
->  drivers/net/ethernet/cadence/macb.h      | 1 +
->  drivers/net/ethernet/cadence/macb_main.c | 5 +++--
->  2 files changed, 4 insertions(+), 2 deletions(-)
+>  drivers/net/ethernet/cadence/macb.h      |   8 ---
+>  drivers/net/ethernet/cadence/macb_main.c | 110 +++++++++++--------------------
+>  2 files changed, 38 insertions(+), 80 deletions(-)
 > 
 > diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
-> index 3b43cb9468e3618754ff2bc6c5f360447bdeeed0..e9da6e3b869fc772613a0d6b86308917c9bff7fe 100644
+> index 5bf7e7ff70490cdb068bfdbe7cfd5bb8e1db7f86..26e0af44a45926c782cf0f72184332ab3605a178 100644
 > --- a/drivers/net/ethernet/cadence/macb.h
 > +++ b/drivers/net/ethernet/cadence/macb.h
-> @@ -739,6 +739,7 @@
->  #define MACB_CAPS_MIIONRGMII			BIT(9)
->  #define MACB_CAPS_NEED_TSUCLK			BIT(10)
->  #define MACB_CAPS_QUEUE_DISABLE			BIT(11)
-> +#define MACB_CAPS_NO_LSO			BIT(12)
->  #define MACB_CAPS_PCS				BIT(24)
->  #define MACB_CAPS_HIGH_SPEED			BIT(25)
->  #define MACB_CAPS_CLK_HW_CHG			BIT(26)
+> @@ -15,10 +15,6 @@
+>  #include <linux/phy/phy.h>
+>  #include <linux/workqueue.h>
+>  
+> -#if defined(CONFIG_ARCH_DMA_ADDR_T_64BIT) || defined(CONFIG_MACB_USE_HWSTAMP)
+> -#define MACB_EXT_DESC
+> -#endif
+> -
+>  #define MACB_GREGS_NBR 16
+>  #define MACB_GREGS_VERSION 2
+>  #define MACB_MAX_QUEUES 8
+> @@ -824,7 +820,6 @@ struct macb_dma_desc {
+>  	u32	ctrl;
+>  };
+>  
+> -#ifdef MACB_EXT_DESC
+>  #define HW_DMA_CAP_32B		0
+>  #define HW_DMA_CAP_64B		(1 << 0)
+>  #define HW_DMA_CAP_PTP		(1 << 1)
+> @@ -839,7 +834,6 @@ struct macb_dma_desc_ptp {
+>  	u32	ts_1;
+>  	u32	ts_2;
+>  };
+> -#endif
+>  
+>  /* DMA descriptor bitfields */
+>  #define MACB_RX_USED_OFFSET			0
+> @@ -1319,9 +1313,7 @@ struct macb {
+>  
+>  	struct phy		*sgmii_phy;	/* for ZynqMP SGMII mode */
+>  
+> -#ifdef MACB_EXT_DESC
+>  	uint8_t hw_dma_cap;
+> -#endif
+>  	spinlock_t tsu_clk_lock; /* gem tsu clock locking */
+>  	unsigned int tsu_rate;
+>  	struct ptp_clock *ptp_clock;
 > diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-> index b5797c1ac0a41e9472883b013c1e44a01092f257..807f7abbd9941bf624f14a5ddead68dad1c8deb2 100644
+> index b32363ba1ec3be0fc42866c8585f0b465d178220..ad154cfe29106f642b32922fd4a03ca63112f4a7 100644
 > --- a/drivers/net/ethernet/cadence/macb_main.c
 > +++ b/drivers/net/ethernet/cadence/macb_main.c
-> @@ -4373,8 +4373,9 @@ static int macb_init(struct platform_device *pdev)
->  	/* Set features */
->  	dev->hw_features = NETIF_F_SG;
+> @@ -98,6 +98,18 @@ struct sifive_fu540_macb_mgmt {
 >  
-> -	/* Check LSO capability */
-> -	if (GEM_BFEXT(PBUF_LSO, gem_readl(bp, DCFG6)))
-> +	/* Check LSO capability; capability is for buggy HW */
-
-The comment here is a bit confusing to me.
-
-> +	if (!(bp->caps & MACB_CAPS_NO_LSO) &&
-> +	    GEM_BFEXT(PBUF_LSO, gem_readl(bp, DCFG6)))
->  		dev->hw_features |= MACB_NETIF_LSO;
+>  #define MACB_MDIO_TIMEOUT	1000000 /* in usecs */
 >  
->  	/* Checksum offload is only available on gem with packet buffer */
+> +static bool macb_dma_is_64b(struct macb *bp)
+> +{
+> +	return IS_ENABLED(CONFIG_ARCH_DMA_ADDR_T_64BIT) &&
+> +	       bp->hw_dma_cap & HW_DMA_CAP_64B;
+> +}
+> +
+> +static bool macb_dma_is_ptp(struct macb *bp)
+> +{
+> +	return IS_ENABLED(CONFIG_MACB_USE_HWSTAMP) &&
+> +	       bp->hw_dma_cap & HW_DMA_CAP_PTP;
+> +}
+> +
+>  /* DMA buffer descriptor might be different size
+>   * depends on hardware configuration:
+>   *
+> @@ -127,56 +139,31 @@ struct sifive_fu540_macb_mgmt {
+>   */
+>  static unsigned int macb_dma_desc_get_size(struct macb *bp)
+>  {
+> -#ifdef MACB_EXT_DESC
+> -	unsigned int desc_size;
+> +	unsigned int desc_size = sizeof(struct macb_dma_desc);
+> +
+> +	if (macb_dma_is_64b(bp))
+> +		desc_size += sizeof(struct macb_dma_desc_64);
+> +	if (macb_dma_is_ptp(bp))
+> +		desc_size += sizeof(struct macb_dma_desc_ptp);
+>  
+> -	switch (bp->hw_dma_cap) {
+> -	case HW_DMA_CAP_64B:
+> -		desc_size = sizeof(struct macb_dma_desc)
+> -			+ sizeof(struct macb_dma_desc_64);
+> -		break;
+> -	case HW_DMA_CAP_PTP:
+> -		desc_size = sizeof(struct macb_dma_desc)
+> -			+ sizeof(struct macb_dma_desc_ptp);
+> -		break;
+> -	case HW_DMA_CAP_64B_PTP:
+> -		desc_size = sizeof(struct macb_dma_desc)
+> -			+ sizeof(struct macb_dma_desc_64)
+> -			+ sizeof(struct macb_dma_desc_ptp);
+> -		break;
+> -	default:
+> -		desc_size = sizeof(struct macb_dma_desc);
+> -	}
+>  	return desc_size;
+> -#endif
+> -	return sizeof(struct macb_dma_desc);
+>  }
+>  
+>  static unsigned int macb_adj_dma_desc_idx(struct macb *bp, unsigned int desc_idx)
+>  {
+> -#ifdef MACB_EXT_DESC
+> -	switch (bp->hw_dma_cap) {
+> -	case HW_DMA_CAP_64B:
+> -	case HW_DMA_CAP_PTP:
+> -		desc_idx <<= 1;
+> -		break;
+> -	case HW_DMA_CAP_64B_PTP:
+> -		desc_idx *= 3;
+> -		break;
+> -	default:
+> -		break;
+> -	}
+> -#endif
+> -	return desc_idx;
+> +	if (macb_dma_is_64b(bp) && macb_dma_is_ptp(bp))
+> +		return desc_idx * 3;
+> +	else if (macb_dma_is_64b(bp) || macb_dma_is_ptp(bp))
+> +		return desc_idx << 1;
+> +	else
+> +		return desc_idx;
+>  }
+>  
+> -#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+>  static struct macb_dma_desc_64 *macb_64b_desc(struct macb *bp, struct macb_dma_desc *desc)
+>  {
+>  	return (struct macb_dma_desc_64 *)((void *)desc
+>  		+ sizeof(struct macb_dma_desc));
+>  }
+> -#endif
+>  
+>  /* Ring buffer accessors */
+>  static unsigned int macb_tx_ring_wrap(struct macb *bp, unsigned int index)
+> @@ -500,17 +487,13 @@ static void macb_init_buffers(struct macb *bp)
+>  
+>  	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
+>  		queue_writel(queue, RBQP, lower_32_bits(queue->rx_ring_dma));
+> -#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+> -		if (bp->hw_dma_cap & HW_DMA_CAP_64B)
+> +		if (macb_dma_is_64b(bp))
+>  			queue_writel(queue, RBQPH,
+>  				     upper_32_bits(queue->rx_ring_dma));
+> -#endif
+>  		queue_writel(queue, TBQP, lower_32_bits(queue->tx_ring_dma));
+> -#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+> -		if (bp->hw_dma_cap & HW_DMA_CAP_64B)
+> +		if (macb_dma_is_64b(bp))
+>  			queue_writel(queue, TBQPH,
+>  				     upper_32_bits(queue->tx_ring_dma));
+> -#endif
+>  	}
+>  }
+>  
+> @@ -1038,10 +1021,9 @@ static void macb_tx_unmap(struct macb *bp, struct macb_tx_skb *tx_skb, int budge
+>  
+>  static void macb_set_addr(struct macb *bp, struct macb_dma_desc *desc, dma_addr_t addr)
+>  {
+> -#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+>  	struct macb_dma_desc_64 *desc_64;
+
+This can be moved
+>  
+> -	if (bp->hw_dma_cap & HW_DMA_CAP_64B) {
+> +	if (macb_dma_is_64b(bp)) {
+
+here.
+
+>  		desc_64 = macb_64b_desc(bp, desc);
+>  		desc_64->addrh = upper_32_bits(addr);
+>  		/* The low bits of RX address contain the RX_USED bit, clearing
+> @@ -1050,26 +1032,22 @@ static void macb_set_addr(struct macb *bp, struct macb_dma_desc *desc, dma_addr_
+>  		 */
+>  		dma_wmb();
+>  	}
+> -#endif
+> +
+>  	desc->addr = lower_32_bits(addr);
+>  }
+>  
+>  static dma_addr_t macb_get_addr(struct macb *bp, struct macb_dma_desc *desc)
+>  {
+> -	dma_addr_t addr = 0;
+> -#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+>  	struct macb_dma_desc_64 *desc_64;
+
+Same for this one.
+
+> +	dma_addr_t addr = 0;
+>  
+> -	if (bp->hw_dma_cap & HW_DMA_CAP_64B) {
+> +	if (macb_dma_is_64b(bp)) {
+>  		desc_64 = macb_64b_desc(bp, desc);
+>  		addr = ((u64)(desc_64->addrh) << 32);
+>  	}
+> -#endif
+>  	addr |= MACB_BF(RX_WADDR, MACB_BFEXT(RX_WADDR, desc->addr));
+> -#ifdef CONFIG_MACB_USE_HWSTAMP
+> -	if (bp->hw_dma_cap & HW_DMA_CAP_PTP)
+> +	if (macb_dma_is_ptp(bp))
+>  		addr &= ~GEM_BIT(DMA_RXVALID);
+> -#endif
+>  	return addr;
+>  }
+>  
+> @@ -1176,10 +1154,8 @@ static void macb_tx_error_task(struct work_struct *work)
+>  
+>  	/* Reinitialize the TX desc queue */
+>  	queue_writel(queue, TBQP, lower_32_bits(queue->tx_ring_dma));
+> -#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+> -	if (bp->hw_dma_cap & HW_DMA_CAP_64B)
+> +	if (macb_dma_is_64b(bp))
+>  		queue_writel(queue, TBQPH, upper_32_bits(queue->tx_ring_dma));
+> -#endif
+>  	/* Make TX ring reflect state of hardware */
+>  	queue->tx_head = 0;
+>  	queue->tx_tail = 0;
+> @@ -2349,11 +2325,9 @@ static netdev_tx_t macb_start_xmit(struct sk_buff *skb, struct net_device *dev)
+>  		return ret;
+>  	}
+>  
+> -#ifdef CONFIG_MACB_USE_HWSTAMP
+> -	if ((skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP) &&
+> -	    (bp->hw_dma_cap & HW_DMA_CAP_PTP))
+> +	if (macb_dma_is_ptp(bp) &&
+> +	    (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP))
+>  		skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
+> -#endif
+>  
+>  	is_lso = (skb_shinfo(skb)->gso_size != 0);
+>  
+> @@ -2813,14 +2787,10 @@ static void macb_configure_dma(struct macb *bp)
+>  			dmacfg &= ~GEM_BIT(TXCOEN);
+>  
+>  		dmacfg &= ~GEM_BIT(ADDR64);
+> -#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+> -		if (bp->hw_dma_cap & HW_DMA_CAP_64B)
+> +		if (macb_dma_is_64b(bp))
+>  			dmacfg |= GEM_BIT(ADDR64);
+> -#endif
+> -#ifdef CONFIG_MACB_USE_HWSTAMP
+> -		if (bp->hw_dma_cap & HW_DMA_CAP_PTP)
+> +		if (macb_dma_is_ptp(bp))
+>  			dmacfg |= GEM_BIT(RXEXT) | GEM_BIT(TXEXT);
+> -#endif
+>  		netdev_dbg(bp->dev, "Cadence configure DMA with 0x%08x\n",
+>  			   dmacfg);
+>  		gem_writel(bp, DMACFG, dmacfg);
+> @@ -4326,12 +4296,10 @@ static int macb_init(struct platform_device *pdev)
+>  			queue->TBQP = GEM_TBQP(hw_q - 1);
+>  			queue->RBQP = GEM_RBQP(hw_q - 1);
+>  			queue->RBQS = GEM_RBQS(hw_q - 1);
+> -#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+> -			if (bp->hw_dma_cap & HW_DMA_CAP_64B) {
+> +			if (macb_dma_is_64b(bp)) {
+>  				queue->TBQPH = GEM_TBQPH(hw_q - 1);
+>  				queue->RBQPH = GEM_RBQPH(hw_q - 1);
+>  			}
+> -#endif
+>  		} else {
+>  			/* queue0 uses legacy registers */
+>  			queue->ISR  = MACB_ISR;
+> @@ -4340,12 +4308,10 @@ static int macb_init(struct platform_device *pdev)
+>  			queue->IMR  = MACB_IMR;
+>  			queue->TBQP = MACB_TBQP;
+>  			queue->RBQP = MACB_RBQP;
+> -#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+> -			if (bp->hw_dma_cap & HW_DMA_CAP_64B) {
+> +			if (macb_dma_is_64b(bp)) {
+>  				queue->TBQPH = MACB_TBQPH;
+>  				queue->RBQPH = MACB_RBQPH;
+>  			}
+> -#endif
+>  		}
+>  
+>  		/* get irq: here we use the linux queue index, not the hardware
 > 
 
 
