@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-177056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67F07A6D879
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 11:42:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DE6FA6D87B
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 11:43:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56FDA1892D21
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 10:42:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 602993A4E81
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 10:42:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C69D25EFBE;
-	Mon, 24 Mar 2025 10:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79CF625F7B9;
+	Mon, 24 Mar 2025 10:40:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="DMnA8mFB"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="L6qI3QDx"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3213F25E832;
-	Mon, 24 Mar 2025 10:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67FEF25EFA3;
+	Mon, 24 Mar 2025 10:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742812831; cv=none; b=h4wm5nmsVoc5n8AzTTLRqfn2g/TLtrC5qaM2jJsHXgh+cV+K0xt/efOjQtW6lvmKTIeG+xXtLid6yOP94XsyTw5R/QpwicX1uWSd6flTeFm0wO9nKf5ii1LfEtNR+fMyuRD6gbe+WaHditY6mhz1Ha1Nd/9pmyfryTbjjbE4Yb8=
+	t=1742812832; cv=none; b=l4gfeR1BeauXeMkS0rSATFz2qxPHFWYV48SkR8IP+wnEvebsTyfVaIg3KEhRv+LZIEImeMIOgUAC95/rUC+OrZevv7iaq17y+7+dntTtfZUErP6o5OVnax+kuePYKpzsWqrBA9MYE+AXHjCheQTpQ/pDxGG6YcmAWsChH4znqVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742812831; c=relaxed/simple;
-	bh=lvoZIj3Ttr2ApMuZRkpIAFN5T5NJbXw2a1xVlHodTMM=;
+	s=arc-20240116; t=1742812832; c=relaxed/simple;
+	bh=TaPD5/dPnWpVkNtGCqMUjTbM27OobuoCHFPMwHJFAjM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UR/7Lj4S0Hw9dbvAa6Qdgqncf+JeOqt/65ci00ldriHeXB1MMageL9ftI4jIOl3j27ySmReOB0Agcu4pEMPFR/peqsEbFmYcVh2sji5V4Zwt0K7dseYGhSrRbSKbYJtSrzzlYVuwmQG66M2SuFuhT0gY2ShFRKujTxcWWfzJ48k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=DMnA8mFB; arc=none smtp.client-ip=217.70.183.197
+	 MIME-Version; b=rz/xRkXrOgFaQUnD23Hj7jiyzUZpZQSn2CPQiI7td8NpEVLL3BcyleF1alLmBtQkKwvvLLR32/E+/N+w3UkXehQut9ZrDMrJX/F92zyztuI2uapSKupaELO1XtnnrxWbTS5oWllhWN7Swzv2p+OLosmEhK4yM9mA2O2q2UU4yL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=L6qI3QDx; arc=none smtp.client-ip=217.70.183.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 5A483442F0;
-	Mon, 24 Mar 2025 10:40:26 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A1E49432FD;
+	Mon, 24 Mar 2025 10:40:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1742812827;
+	t=1742812828;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=crxwshCi6/gIzDkqvmX43AHE+I9xHsMFw6dKDZ/wTv4=;
-	b=DMnA8mFBZJleF0Q20q3rSS9gcUyavMVWvycfbFy5xqPg5b4Tl8pa0N/t+zHwyeKDSugbHk
-	8o6qCDxriJ/FHEPW2G8dko1PUChTWkGpKpqRbxdSq1HDkreJwhI+TJexIEoNfcAoGQaj+F
-	zwJzEa+Fy9JxmHSYYdvOgzyoOP0ZxIeI57oMwz0ivnb7QR2AdGv/K4lGZ9A9m+RWV/p4IO
-	3OqtwkNRqTM1qP21twkzaSxI0e1sfhmb7MMVoov+EcvQ3HdXI0Dw5HbdWa01E07jy0NCEi
-	WsD96jAR2a7Rkbk66uzESNOLiq5wGDzl9ZfdqNFeR0uga2yDhx770YysXqk0ww==
+	bh=aFvrnBRSvdhgzn2vQzbKBQ8kFQcjj0Zp4PCnrL3E5wc=;
+	b=L6qI3QDxwz3/yvShHrOw2xKvE532sXFABNxbj8UcCbP3VwI6Ep/kqm4RfDsntHFY3xK8pG
+	F72ZdDJJsdjrvQiuqYkVK2lMvWktODrrgjkbhX4++5cWQOZHUYtJCO8tfOkUxg7l8WOtiD
+	xMe/riNLSIe4h+auwtaFEfinMnryvIB5UjbHKV2n0fX3W3Nduq6hRdl7Qe6pBH8qjE8q/j
+	Be4+T5kYGYvalDJ5SvsSgpbgMOfygv8bd6HuMdfemFmb+8bkmTKga8p0q+UXNdxsQm2Pqr
+	PQJI0yZeWiRb7RXbR+Q7KhbreMyCcp5XfhGjksMmuvdBV1zaLdIfZykt3hft6w==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -67,9 +67,9 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Simon Horman <horms@kernel.org>,
 	Romain Gantois <romain.gantois@bootlin.com>,
 	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>
-Subject: [PATCH net-next v4 7/8] net: ethtool: plca: Use per-PHY DUMP operations
-Date: Mon, 24 Mar 2025 11:40:09 +0100
-Message-ID: <20250324104012.367366-8-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next v4 8/8] net: ethtool: pse-pd: Use per-PHY DUMP operations
+Date: Mon, 24 Mar 2025 11:40:10 +0100
+Message-ID: <20250324104012.367366-9-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250324104012.367366-1-maxime.chevallier@bootlin.com>
 References: <20250324104012.367366-1-maxime.chevallier@bootlin.com>
@@ -87,38 +87,23 @@ X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduheelheehucetufdoteggode
 X-GND-Sasl: maxime.chevallier@bootlin.com
 
 Leverage the per-phy ethnl DUMP helpers in case we have more that one
-PLCA-able PHY on the link.
-
-This is done for both PLCA status and PLCA config.
+PSE PHY on the link.
 
 Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
 V4 : No changes
 
- net/ethtool/plca.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ net/ethtool/pse-pd.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/net/ethtool/plca.c b/net/ethtool/plca.c
-index e1f7820a6158..2148ff607561 100644
---- a/net/ethtool/plca.c
-+++ b/net/ethtool/plca.c
-@@ -191,6 +191,12 @@ const struct ethnl_request_ops ethnl_plca_cfg_request_ops = {
+diff --git a/net/ethtool/pse-pd.c b/net/ethtool/pse-pd.c
+index 4f6b99eab2a6..f3d14be8bdd9 100644
+--- a/net/ethtool/pse-pd.c
++++ b/net/ethtool/pse-pd.c
+@@ -314,4 +314,10 @@ const struct ethnl_request_ops ethnl_pse_request_ops = {
  
- 	.set			= ethnl_set_plca,
- 	.set_ntf_cmd		= ETHTOOL_MSG_PLCA_NTF,
-+
-+	.dump_start		= ethnl_dump_start_perphy,
-+	.dump_one_dev		= ethnl_dump_one_dev_perphy,
-+	.dump_done		= ethnl_dump_done_perphy,
-+
-+	.allow_pernetdev_dump	= true,
- };
- 
- // PLCA get status message -------------------------------------------------- //
-@@ -268,4 +274,10 @@ const struct ethnl_request_ops ethnl_plca_status_request_ops = {
- 	.prepare_data		= plca_get_status_prepare_data,
- 	.reply_size		= plca_get_status_reply_size,
- 	.fill_reply		= plca_get_status_fill_reply,
+ 	.set			= ethnl_set_pse,
+ 	/* PSE has no notification */
 +
 +	.dump_start		= ethnl_dump_start_perphy,
 +	.dump_one_dev		= ethnl_dump_one_dev_perphy,
