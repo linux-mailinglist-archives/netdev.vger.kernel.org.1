@@ -1,107 +1,132 @@
-Return-Path: <netdev+bounces-177137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76929A6E059
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 17:57:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A0BF5A6E05D
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 17:58:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7C58188A09D
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 16:58:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51A9818897DD
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 16:58:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C0AC2641DC;
-	Mon, 24 Mar 2025 16:57:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C006A263F38;
+	Mon, 24 Mar 2025 16:58:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="gdz8rqnf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ms24x6lj"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D415263F32;
-	Mon, 24 Mar 2025 16:57:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DF67263F42
+	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 16:58:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742835458; cv=none; b=DPefcdEypyhNRu8stkThVrxUw0WV0BH1/1Psk1HjDw7pnvJpvr1xoULTqQduj2kNj8w1NvQA4AhTwr6F18WeLxV5g7f5AZpS2xCtoaKn/CG3myZaAdKk9l4K98MxEoQjjzWAAaBYdH4wEHGqthyLlaftpDtYp/bepWxz4mYkLVg=
+	t=1742835487; cv=none; b=i45ToLzBJpWZnfwD4CS+mhhTzZRDEOVFA2ngIOuWfPukm+kVdnIPcJDxEAN7iNQUAQO3A6SNi1cusjXxKMWatacVV5R/Yq/UnipMEsvtbD4GQbEdDed0AndZ5PqXRld6kqhxbQqzXuImfiHTVaCIvrcnKGKjskl9bw3FLP2Uhj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742835458; c=relaxed/simple;
-	bh=jq6KD5dap90lJjDbFAXTSsraPhA8AgZwRfwkBkYFXd4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q2zbPoiM/rBdJ60wSZ3MvNbTjt0vuoIeUYk6BeqiC67uCf3oJOrISk4CG7Z18dSCwJowj+oNJCSwMopmbQ1HqAHDi1mZga8XtNlXSsMyo2X0swIAhi2GTfmLoiPQe76eIm29y6UjF2IgoRCxeZifGGxkIArhFQsnxCIxttGLzwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=gdz8rqnf; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=uZpqntUszdnsbmO2CLvPIRMBPHQt2FjCDjhNfY3enx8=; b=gdz8rqnflfUQmNqlW8cugrADyx
-	tR0ieqeTXjdBctwFTHy6WtN9lCNOB/Q2ykM7uh3n0xFCfTcaDUK6MJBXp24tl5CvfAPK1r6CfTNpZ
-	IWH3u5184nub6oajbyn2fHFVZZ0xcXYO8KLDfUFoAvg5mdL6mf/btK38yCAusTk5QGT56Wcu2XsQH
-	p9KUyUW1uSrloC02ZEwL1LHPwhJnH73GQKO2Sc9SpSWX61MAQTDQSP94Qy9SQsQogCq/n6GyhbfJJ
-	dSNydzi/EnFXdSsjz0mIARU+rbisaTNIHfhaX2Xt9GXR6nWe9iXSf4gPu77KF8KR2ScYmqgRXvAhc
-	01ol2dsw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55898)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1twl77-0003ph-2z;
-	Mon, 24 Mar 2025 16:57:26 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1twl74-0002PR-18;
-	Mon, 24 Mar 2025 16:57:22 +0000
-Date: Mon, 24 Mar 2025 16:57:22 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jim Liu <jim.t90615@gmail.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>, JJLIU0@nuvoton.com,
-	andrew@lunn.ch, hkallweit1@gmail.com, kuba@kernel.org,
-	edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
-	giulio.benetti+tekvox@benettiengineering.com,
-	bcm-kernel-feedback-list@broadcom.com, linux-kernel@vger.kernel.org
-Subject: Re: [v2,net] net: phy: broadcom: Correct BCM5221 PHY model detection
- failure
-Message-ID: <Z-GO8iFP7TRPPdql@shell.armlinux.org.uk>
-References: <20250317063452.3072784-1-JJLIU0@nuvoton.com>
- <Z9f4W86z90PgtkBc@shell.armlinux.org.uk>
- <9391fb55-11c4-4fa9-b38f-500cb1ae325c@broadcom.com>
- <Z9gjylMFV5zFG-i5@shell.armlinux.org.uk>
- <CAKUZ0+GV1J0VxU8Eycv2eCNs2yKvJ9YTob27n+G4Jy-TJhhLZQ@mail.gmail.com>
+	s=arc-20240116; t=1742835487; c=relaxed/simple;
+	bh=WnPwaB35oqXsP80002Pjpx9cPs2BAejUoSsuThEW0qU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BWBz4hocabqbTnlGnYnMlxf+9b5++hIzd7Pzl0vMLVK3bafk2FQ1/C6IKyd1v045gswTQbZELuv2gAi8py78WG4Rjq1+hUMqjQgzLUi1cIMuTa23iy9u2YAma1AGeBI398Fa1/QsW1iBVaKF+6Xg/W5q5LFWP0tjdbtmXIvUtKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ms24x6lj; arc=none smtp.client-ip=209.85.166.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3d2a869d016so12522245ab.0
+        for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 09:58:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742835485; x=1743440285; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dN/jHxt/H1z9pfytvHl7h9kDce47kQxmXsLuB10CBtY=;
+        b=Ms24x6ljpAH8tZqADDM9lw4tngg8Q/skqif45aUABLlH2IT5xpU0Ho/BvM1uaHhGME
+         nc7vLlrSeM1pW9ugunZ4StiShe4aX7MtessIYhQ5SvETgYXaeQjzt5C96Rbgs2EVdZW1
+         rWa9WTzHb23Fre2622EkA4QV3yXpvPoOQeuF4qNhdvr4cRXyM1u4OHFlQbDfsuAIUv/d
+         FcjVvS4Wg1x+QrJtPHSoNhJwESKjBLzYzQfICcfFfVgSfX9/iuI8SH0AZhg2iuMQ1Nr+
+         uGyhaYg7vCDO+RFxW7CEGrsmnmw4H/XSopPz1zkaUwVEWk3OVZ7nMxlQ8pmSXGrJF5Or
+         t8dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742835485; x=1743440285;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dN/jHxt/H1z9pfytvHl7h9kDce47kQxmXsLuB10CBtY=;
+        b=rST7+qj5aFPGnWMbVUm0XlVoGHbNW9mAPmDjU8Nv/E551qrVhRiYq4T+kzw9x/VhLl
+         r3X/ZFbjmsKF57EMkcBqBk8MwLwVczAjDzzkS/AiTTBBLSOf0XPLWmjL845Mt5lDd+3A
+         dwILKjt9UfCBXVdEfbPhJyyDRJ+e+bdpOOlaCtzEdNROtAq+UL9wJFYoTsSViR7zK8/A
+         V8f+1jpNAOOS6/FGD88PPSItBE5CXcIWDSI2hfb1tCNQvitdio5feItOMkDTDgtX7875
+         Ld+kBgY/o/xj+4epZUz1QJG4O99/YBnHUWPcXPFVgsrw3uOmqWKOc+JdyjWRRq7nOtwl
+         CGJg==
+X-Gm-Message-State: AOJu0Yw2QVYBVRO/v4AVAvH8MRYS/9iP89an9wmV5zG/4NLi1sCOg/iH
+	RKupLy0BT1w+JB9FpkXtQVkzvNlh484aflDkkHaewSrp9xfGD22quLgUKm5PHhmhxXt0iMBMuq9
+	+x2fYOfTtL2eRZAnnLPqtuGkv89k=
+X-Gm-Gg: ASbGncuWY1bWMtVnO4rISn+jHUshKFRuk0iVm7jRzZYCUK5tDU5tPE6urfLzpqUJebk
+	ndHJ1r914yDg9AjcGW+VJwruHa+2rCi3of2XABFpQ0T5CUXboxJplhybyyhp60i1r9EmCCAWgRq
+	aJ0B0jsCwHTWysL+2CEK/4/l6nQw==
+X-Google-Smtp-Source: AGHT+IGHdrwQWTcETTkUJDk/9vaT3Df4cLT/Mk8eCYR3Df8s3smu3YLy0TYY1SXNdR8auf+H2jA8LNXEqSVFU64+XnY=
+X-Received: by 2002:a05:6e02:3f0a:b0:3d5:81aa:4d0a with SMTP id
+ e9e14a558f8ab-3d5960f2b57mr139921775ab.6.1742835485198; Mon, 24 Mar 2025
+ 09:58:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKUZ0+GV1J0VxU8Eycv2eCNs2yKvJ9YTob27n+G4Jy-TJhhLZQ@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20250317120314.41404-1-kerneljasonxing@gmail.com> <CAL+tcoA6uawe99jrkRugrPmgEOsnCAgcqak-2uBO80jMDB+SHg@mail.gmail.com>
+In-Reply-To: <CAL+tcoA6uawe99jrkRugrPmgEOsnCAgcqak-2uBO80jMDB+SHg@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 25 Mar 2025 00:57:29 +0800
+X-Gm-Features: AQ5f1Jp5-aHp-ycaqgv2FYYTviJkNk62jt8umm6jowvGG9HtRJet3CW2qEkSPiU
+Message-ID: <CAL+tcoDD-byX4hNWUpDTv6aPPzt3AMHbgZp30V2abADphf7JbQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 0/2] support TCP_RTO_MIN_US and
+ TCP_DELACK_MAX_US for set/getsockopt
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, ncardwell@google.com, kuniyu@amazon.com, 
+	dsahern@kernel.org
+Cc: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 18, 2025 at 11:15:09AM +0800, Jim Liu wrote:
-> Maybe i can add this modify in patch
-> 
-> #define BRCM_PHY_MODEL(phydev) \
-> -       ((phydev)->drv->phy_id & (phydev)->drv->phy_id_mask)
-> +       ((phydev)->phy_id & (phydev)->drv->phy_id_mask)
+On Tue, Mar 25, 2025 at 12:35=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
+com> wrote:
+>
+> On Mon, Mar 17, 2025 at 8:03=E2=80=AFPM Jason Xing <kerneljasonxing@gmail=
+.com> wrote:
+> >
+> > Add set/getsockopt supports for TCP_RTO_MIN_US and TCP_DELACK_MAX_US.
+> >
+> > v4
+> > 1. add more detailed information into commit log (Eric)
+> > 2. use val directly in do_tcp_getsockopt (Eric)
+> >
+> > Jason Xing (2):
+> >   tcp: support TCP_RTO_MIN_US for set/getsockopt use
+> >   tcp: support TCP_DELACK_MAX_US for set/getsockopt use
+>
+> Gentle ping here :) I noticed that net-next is closed, so I decided to
+> reply to this thread.
 
-I would suggest that this becomes merely:
+Oh, I should have noticed that most of the core maintainers are absent
+these days. Sorry, I don't expect to add more burden so I can resend
+after net-next is open. Anyway, either way is fine with me. Just
+please let me know :)
 
-#define BRCM_PHY_MODEL(phydev)	((phydev))->drv->phy_id)
+Thank you.
 
-because the constants that are being used to check against this are the
-constants used to initialise that member.
-
-Or even get rid of BRCM_PHY_MODEL() altogether, thus the tests become
-(e.g.):
-
-        /* Unmask events we are interested in and mask interrupts globally. */
--       if (phydev->phy_id == PHY_ID_BCM5221)
-+       if (phydev->drv->phy_id == PHY_ID_BCM5221)
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+>
+> Thanks,
+> Jason
+>
+> >
+> >  Documentation/networking/ip-sysctl.rst |  4 ++--
+> >  include/net/tcp.h                      |  2 +-
+> >  include/uapi/linux/tcp.h               |  2 ++
+> >  net/ipv4/tcp.c                         | 26 ++++++++++++++++++++++++--
+> >  net/ipv4/tcp_output.c                  |  2 +-
+> >  5 files changed, 30 insertions(+), 6 deletions(-)
+> >
+> > --
+> > 2.43.5
+> >
 
