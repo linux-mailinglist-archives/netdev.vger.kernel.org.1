@@ -1,60 +1,56 @@
-Return-Path: <netdev+bounces-177084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F4FFA6DCC4
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 15:18:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F72CA6DCD3
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 15:22:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 275EF1890FEC
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 14:18:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29128188C646
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 14:22:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C4DC25F7BE;
-	Mon, 24 Mar 2025 14:18:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B04A52620CD;
+	Mon, 24 Mar 2025 14:21:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="p5LtoI5q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VJ6J91Zr"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C2A125DAF7
-	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 14:18:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88FEF2620C7;
+	Mon, 24 Mar 2025 14:21:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742825900; cv=none; b=tlBojHMEMPaEfzekfv27Mj+Nsx2daAiDdrMm26SD3d2Zp3N6aE1HZXOqjBkQoYzsCpgyXTcl3Wr/WCf58glxAttgxDmQlYn32Gxi7OtR5IWE1uwBdvqUdXkyjE0m6JonlKMqA6u9LAPuVZJNCi5C7BRH1okpT9i4na4x894EBxw=
+	t=1742826079; cv=none; b=KpM7hsc/66Oba/ssKrHQYZdR85Wsww6mfz39f7qb5DzBMp4qq5uONKQBhwEOXjy79vIfpnawDWNC+aver8lPubtaBMPYMUjZb+o+HkIS+Jt0/bhOdmz1/2WKwEm/zEnjN6l0LYplr1d3EuQuwdH+xrFm59vt2vhIVSBo+UpyAjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742825900; c=relaxed/simple;
-	bh=w7AiCJEovNS51vP+s/ylXjk8R6u4vH6S2IHQoxU+3z8=;
+	s=arc-20240116; t=1742826079; c=relaxed/simple;
+	bh=draAG8GfDmHMcX/XsjGWjVRvTRUqqLXrGbpf2rsAgKM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B6XJN2heNgSxwnMRro4yDdH5KMWn2DQ2YcdjX2rR7PagWESsCB99vyy7Vm3IUzCykuFgMvN9JpVwA6GwVDunakZwiI/se6ltA0rJAhJ1lYAPm6FeVGkBnVL5YKW1hxJSl8hXPqrqOLg4W3B9B76DX8YuM6eMgkCV6/2TYzfde+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=p5LtoI5q; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Wr61wG5gGFMP0iMfqIz9bScXDKcyIXQbv3cGXrGFgxM=; b=p5LtoI5qvVS9dmRTJnpArEH8nU
-	CXhqCkAuTGSIpAERlm40hcpR+CaemeKieTXGUnacJtZv8tWIeNCxmXVqMXxvjNqEjim1b1INlmGVN
-	kptyaXF2rFACaDnnjMmJEEJyJB/aRwsatm+fn3CSYq8yiRX32nhrGU+nkl/3USCDNAeE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1twid5-006wYz-Lq; Mon, 24 Mar 2025 15:18:15 +0100
-Date: Mon, 24 Mar 2025 15:18:15 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Stanislav Fomichev <stfomichev@gmail.com>
-Subject: Re: [PATCH net] net: page_pool: replace ASSERT_RTNL() in
- page_pool_init()
-Message-ID: <85f2a226-4dd3-4ad0-afb4-351ce2487961@lunn.ch>
-References: <20250324014639.4105332-1-dw@davidwei.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FyUi8PsLPnk7hqh8ATjIY922h80MY8d8KY+YuyfVoXLm2DdvuoXP0LLdt8J9Uf2uSxW7bsBsE2yQmY2ehreDnd9js9Ndlg/w71V+DKkzo3o5EoaXw0O18OYD/D0/VptYG3kAbPmfGdN2skhO2bcn2iE0zFm3nhwTuS9shN1TkoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VJ6J91Zr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 709E4C4CEED;
+	Mon, 24 Mar 2025 14:21:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742826078;
+	bh=draAG8GfDmHMcX/XsjGWjVRvTRUqqLXrGbpf2rsAgKM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VJ6J91ZrC7VMso5isoQYexPCAtmWubRMPoZ2XoMsY1K4/ECauDAJEaqaC5x7CU2y6
+	 6uarbJdeb5/I1FmI0Ihgw7UYkWIo/GIcrAMVGY82NNMN/AxbbF8oLbC9qAepQjGZzS
+	 4d647UfRupWxdRElE/XO8LDpVz5w/av5GS/feeIaTwN2iOBirv61tEdpv407mDYgvz
+	 VkQTh8UdItcA3Fn4OLXbgm9C8cit22LxI6MXjKdVZg5YMkCtBPoJsu7zY2uXLDNRbM
+	 ThePL59Oc+9lAJI67zGJoepVtQrmz+CI0j7fRwcqE3RvDFJ1XdmhZ2QzwM/zGJRneK
+	 cruSOO9Gblk8A==
+Date: Mon, 24 Mar 2025 14:21:15 +0000
+From: Simon Horman <horms@kernel.org>
+To: Yu-Chun Lin <eleanor15x@gmail.com>
+Cc: isdn@linux-pingi.de, kuba@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, jserv@ccns.ncku.edu.tw,
+	visitorckw@gmail.com
+Subject: Re: [PATCH] mISDN: hfcsusb: Optimize performance by replacing
+ rw_lock with spinlock
+Message-ID: <20250324142115.GF892515@horms.kernel.org>
+References: <20250321172024.3372381-1-eleanor15x@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,39 +59,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250324014639.4105332-1-dw@davidwei.uk>
+In-Reply-To: <20250321172024.3372381-1-eleanor15x@gmail.com>
 
-On Sun, Mar 23, 2025 at 06:46:39PM -0700, David Wei wrote:
-> Replace a stray ASSERT_RTNL() in page_pool_init() with
-> netdev_assert_locked().
+On Sat, Mar 22, 2025 at 01:20:24AM +0800, Yu-Chun Lin wrote:
+> The 'HFClock', an rwlock, is only used by writers, making it functionally
+> equivalent to a spinlock.
 > 
-> Fixes: 1d22d3060b9b ("net: drop rtnl_lock for queue_mgmt operations")
-> Signed-off-by: David Wei <dw@davidwei.uk>
+> According to Documentation/locking/spinlocks.rst:
+> 
+> "Reader-writer locks require more atomic memory operations than simple
+> spinlocks. Unless the reader critical section is long, you are better
+> off just using spinlocks."
+> 
+> Since read_lock() is never called, switching to a spinlock reduces
+> overhead and improves efficiency.
+> 
+> Signed-off-by: Yu-Chun Lin <eleanor15x@gmail.com>
 > ---
->  net/core/page_pool.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Build tested only, as I don't have the hardware. 
+> Ensured all rw_lock -> spinlock conversions are complete, and replacing
+> rw_lock with spinlock should always be safe.
 > 
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index f5e908c9e7ad..2f469b02ea31 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -281,7 +281,7 @@ static int page_pool_init(struct page_pool *pool,
->  		 * configuration doesn't change while we're initializing
->  		 * the page_pool.
->  		 */
-> -		ASSERT_RTNL();
-> +		netdev_assert_locked(params->netdev);
+>  drivers/isdn/hardware/mISDN/hfcsusb.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 
-Adding a bit more context:
+Hi Yu-Chun Lin,
 
-        if (pool->slow.flags & PP_FLAG_ALLOW_UNREADABLE_NETMEM) {
-                /* We rely on rtnl_lock()ing to make sure netdev_rx_queue
-                 * configuration doesn't change while we're initializing
-                 * the page_pool.
-                 */
-                ASSERT_RTNL();
+Thanks for your patch.
 
-If ASSERT_RTNL() is now wrong, you also need to update the comment.
+Unfortunately I think it would be best to leave this rather old
+and probably little used driver as-is in this regard unless there
+is a demonstrable improvement on real hardware.
 
-	Andrew
+Otherwise the small risk of regression and overhead of driver
+changes seems to outweigh the theoretical benefit.
+
+-- 
+pw-bot: deferred
 
