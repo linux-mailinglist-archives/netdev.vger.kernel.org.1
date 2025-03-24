@@ -1,121 +1,160 @@
-Return-Path: <netdev+bounces-177126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 665D2A6DFE0
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 17:37:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C603EA6DFED
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 17:39:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 646FD170DFF
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 16:36:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91BCD1889353
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 16:39:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C490263F29;
-	Mon, 24 Mar 2025 16:35:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0680262813;
+	Mon, 24 Mar 2025 16:39:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DsXr2DdW"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="bS72eUr3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84D1263F57
-	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 16:35:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC7993FBA7;
+	Mon, 24 Mar 2025 16:39:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742834149; cv=none; b=ZxHsPeaiLBDFWKCwwbEah2cA4wd46XiI2lkfLGathyu4+epbzoR/TIBXmcCPf/b2SxMwzIvGlwR83dH91EDe/6zMSQmRcU0Uq7APEJCvnzcqn5A9IPLaX/Dea2bCfvJ4URcMR/CagpHoTna2qy4nb7u1b3lsUKg1Sr0yJLmVzS0=
+	t=1742834354; cv=none; b=BBQAj4bev+8URjmPQBaoMOjkjxxd9WNrg0mxSs2TaEqj3CVVx6ya8hMpesXQLJdsAd0GEIMYrMhOVqqYfRW/tIVL/1+1zXNf4bdXKwSV/a74vqpdWEMMDICQq5FmjlfOQlqlXpXd3V/9tiAlFXzZrZcldXfZDBVZD6hEkFQSpN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742834149; c=relaxed/simple;
-	bh=/FSAwxDYQOB36xF1oqNtj7/ZKJBk1mFbz2iaPAw7vEI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MYfPt2C1QM7l3ZFQcQSly+vrwlXldUObxAfL2N8/x/fqzGE9IO8MZGPqpSbnConNHrNJ5bfKG46lIxT+WHmgXz+x2T6KxkPQHbgIMy5OO7c+9wqpfFGOxmZuSiawOpYPjoBrBeJEdediCISDO8n939vHw/CXeMSsECZLGPhCHOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DsXr2DdW; arc=none smtp.client-ip=209.85.166.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3d589ed2b63so40458245ab.0
-        for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 09:35:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742834147; x=1743438947; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g1Sw4E7+YNbyefFANGYO/HcxRdT3tzbDRYMfL1qwqZc=;
-        b=DsXr2DdWPrNqnH2XGdK9M/WZQGyS7hmVpST3sImgCnRK4Ijgy7B8yinek+Tjyahk23
-         12fSo1D15ehbhV+Bgh9YimhEl2wKlY6n8M3SNtllq+2Hvbs9b3P1G8gDHeCJN4F8fYKW
-         WuoDEFCozW27h6iJNMr3zouCp+JADO0XQRlKpTK6ZxnG7tuGo3kxU0Kohgo4x64RH/tr
-         uT0ObG8Ngk5JVpcw4ysNRApdYBd9g3a0hShIeAsfk1O/0hdpD5KBQUqUnowU+Mr2S3Kr
-         ZLOQfUDHVIXwanKapgUNvlynu+CxeUywRN6Bwjk7XdWRUPI1bDkA6vZ4j6+HIP3Z8A5S
-         36Jg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742834147; x=1743438947;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=g1Sw4E7+YNbyefFANGYO/HcxRdT3tzbDRYMfL1qwqZc=;
-        b=OtLb0FJE3HwQ5vdmMpqdNad5o3bVSFL3j/O7usN70UhmsgXpNNFkUhCsUqP3K6wIOO
-         gC+gs/0Yli3tDDnUzync2E70qj8x53LoO3W9psS6u45jMKneBLqhfK/r7vc9gu0XBB8D
-         kWChj28XWsP+AcmlPEAdJjxj54m9RcV2kHoiT86uPUZxG0C6O8II1HnFf4ruu9wQkRIO
-         qnJWOsmdGMMxEuIvoG0eH7Vzp+OS2UNHx5wCFGOFG/aKWP7mu96dELbh/dCa/kIXFvvM
-         X3v0+SkbF+UY3DOUoUHKHN+XPJR4lc6wJjmjgvkM8Jp6tuCR2USwWH1560DQXyl9Z/3e
-         rVFw==
-X-Gm-Message-State: AOJu0YyJjaaeWTCEVIw+jg4Ff+FFBgtBMiqr5hhdP8jNKLs14BV/I6Ss
-	0XqstBeNdvlrfARax9Y5G4oui8PWykuAENlMSAriplgOCO5Mz+7mueznMiQsYHSK6WPcMk9za/e
-	pDAx9Kx6VM7Af27LdFYydYtJnh7M=
-X-Gm-Gg: ASbGncuPby9zMJtVM9154UGhz0nuQB3lnx5327g1SZFxnqIrEYF3VFNO/M/0N8QzHMB
-	t+WAz+cjdPwWyTsXSOyZVoOYaLDPWbH3WZN5XFf/pACmRkqvnqkluGgyhKCI5f1HF8BnN5j0RBS
-	gP0rDLLU7rbfWYOw8Sz967B7gN
-X-Google-Smtp-Source: AGHT+IGuUGO72I24EaqpnFeF+Axnck/Tt4r0LyK5vzAnZzN/y4djRAWE2jGACDtt4egrjh4V43zVVlxl6aBqyT9iRMw=
-X-Received: by 2002:a05:6e02:3d43:b0:3d3:d28e:eae9 with SMTP id
- e9e14a558f8ab-3d5960f2de6mr135935725ab.7.1742834146660; Mon, 24 Mar 2025
- 09:35:46 -0700 (PDT)
+	s=arc-20240116; t=1742834354; c=relaxed/simple;
+	bh=pC30NeT45FvNA5LE4RaH+c4FzFm/glTDXwn8/9BQoV4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MKrmSqFfZybzYoOcoyN3LacuvRLAUo0Ay6+tTol4xFqSDOD9MiKO29nk9yIKspWjaBqLaVh1N00sTyTXoG2lnm6R+cbw88eEeOU2DQmXvWz36aRHV3unauv27whGkuSJJLpFQdwaUUgOAp9XlvGWnFoGFxsEj1UHwOMsDqzeSEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=bS72eUr3; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 049F744522;
+	Mon, 24 Mar 2025 16:39:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1742834350;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Km2Teq2UiJ9T6r73JTHC/jGo8ahaVTtGZ9g3CgWRt0E=;
+	b=bS72eUr3nnbQpQbfzMQBNxFYZccIuCQhDx0EsUxkBzj9+Oe7dKoJnZWibu400zOn1o86pk
+	nyqVjjoqcmPjVtRMA45FPNM52z4IBfN8uLf4JJ2+Sqa5AnyaHsiBj+0dsjWsfJdVLNoRJc
+	2JaadQAkl5iz8LAgSgrRs/73AWW5y+XGPK400mVCDDP1cp2HSWk4dCu79et/+4f2z9BgMm
+	lhzea9bF4ABiBAL6KdP2aFBV4NvJuhKlv0VhZ513S3VYhEyMFj9WflNI45E/SYVJcMqMiw
+	IlOsNsw3BnnGwXf1WgMJE8qjnZpEowCj1uWH5YKR0dD2GH1GwSXBcFCl3c206w==
+Date: Mon, 24 Mar 2025 17:39:07 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Donald Hunter
+ <donald.hunter@gmail.com>, Rob Herring <robh@kernel.org>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Liam
+ Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, Dent
+ Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, Maxime
+ Chevallier <maxime.chevallier@bootlin.com>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v6 06/12] net: pse-pd: Add support for budget
+ evaluation strategies
+Message-ID: <20250324173907.3afa58d2@kmaincent-XPS-13-7390>
+In-Reply-To: <20250320173535.75e6419e@kmaincent-XPS-13-7390>
+References: <20250304-feature_poe_port_prio-v6-0-3dc0c5ebaf32@bootlin.com>
+	<20250304-feature_poe_port_prio-v6-6-3dc0c5ebaf32@bootlin.com>
+	<Z9gYTRgH-b1fXJRQ@pengutronix.de>
+	<20250320173535.75e6419e@kmaincent-XPS-13-7390>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250317120314.41404-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20250317120314.41404-1-kerneljasonxing@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 25 Mar 2025 00:35:10 +0800
-X-Gm-Features: AQ5f1Jp77oLVOfgqNYBhz_h98uLdq-6pemQsTslK0lTkmm-L39vOpoeaCTATx70
-Message-ID: <CAL+tcoA6uawe99jrkRugrPmgEOsnCAgcqak-2uBO80jMDB+SHg@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 0/2] support TCP_RTO_MIN_US and
- TCP_DELACK_MAX_US for set/getsockopt
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, ncardwell@google.com, kuniyu@amazon.com, 
-	dsahern@kernel.org
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduiedtvdekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgfdutdefvedtudegvefgvedtgfdvhfdtueeltefffefffffhgfetkedvfeduieeinecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppedvrgdtudemtggsudelmeekheekjeemjedutddtmegvheejsgemudejkeelmeeljeegugemudejheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekheekjeemjedutddtmegvheejsgemudejkeelmeeljeegugemudejhedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdejpdhrtghpthhtohepohdrrhgvmhhpvghlsehpvghnghhuthhrohhnihigrdguvgdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopegurghvvghms
+ egurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegtohhrsggvtheslhifnhdrnhgvthdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrsehgmhgrihhlrdgtohhm
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Mon, Mar 17, 2025 at 8:03=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> Add set/getsockopt supports for TCP_RTO_MIN_US and TCP_DELACK_MAX_US.
->
-> v4
-> 1. add more detailed information into commit log (Eric)
-> 2. use val directly in do_tcp_getsockopt (Eric)
->
-> Jason Xing (2):
->   tcp: support TCP_RTO_MIN_US for set/getsockopt use
->   tcp: support TCP_DELACK_MAX_US for set/getsockopt use
+Hello Kyle, Oleksij,
 
-Gentle ping here :) I noticed that net-next is closed, so I decided to
-reply to this thread.
+On Thu, 20 Mar 2025 17:35:35 +0100
+Kory Maincent <kory.maincent@bootlin.com> wrote:
 
-Thanks,
-Jason
+> On Mon, 17 Mar 2025 13:40:45 +0100
+> Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+>=20
+> > On Tue, Mar 04, 2025 at 11:18:55AM +0100, Kory Maincent wrote: =20
+> > > From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
->
->  Documentation/networking/ip-sysctl.rst |  4 ++--
->  include/net/tcp.h                      |  2 +-
->  include/uapi/linux/tcp.h               |  2 ++
->  net/ipv4/tcp.c                         | 26 ++++++++++++++++++++++++--
->  net/ipv4/tcp_output.c                  |  2 +-
->  5 files changed, 30 insertions(+), 6 deletions(-)
->
-> --
-> 2.43.5
->
+> > > +int pse_ethtool_set_prio(struct pse_control *psec,
+> > > +			 struct netlink_ext_ack *extack,
+> > > +			 unsigned int prio)
+> > > +{
+> > > +	struct pse_controller_dev *pcdev =3D psec->pcdev;
+> > > +	const struct pse_controller_ops *ops;
+> > > +	int ret =3D 0;
+> > > +
+> > > +	if (!pcdev->pi[psec->id].pw_d) {
+> > > +		NL_SET_ERR_MSG(extack, "no power domain attached");
+> > > +		return -EOPNOTSUPP;
+> > > +	}
+> > > +
+> > > +	/* We don't want priority change in the middle of an
+> > > +	 * enable/disable call or a priority mode change
+> > > +	 */
+> > > +	mutex_lock(&pcdev->lock);
+> > > +	switch (pcdev->pi[psec->id].pw_d->budget_eval_strategy) {
+> > > +	case ETHTOOL_PSE_BUDGET_EVAL_STRAT_STATIC:
+> > > +		if (prio > pcdev->nr_lines) {
+> > > +			NL_SET_ERR_MSG_FMT(extack,
+> > > +					   "priority %d exceed priority
+> > > max %d",
+> > > +					   prio, pcdev->nr_lines);
+> > > +			ret =3D -ERANGE;
+> > > +			goto out;
+> > > +		}
+> > > +
+> > > +		pcdev->pi[psec->id].prio =3D prio;   =20
+> >=20
+> > In case we already out of the budget, we will need to re-evaluate the
+> > prios. New configuration may affect state of ports.
+> >
+> > Potentially we may need a bulk interface to assign prios, to speed-up
+> > reconfiguration. But it is not needed right now. =20
+>=20
+> Oh indeed, I missed that. /o\
+> I will try to add something but lets keep it not too complex! ^^ Don't ad=
+d me
+> more work!! ;)
+
+Small question on PSE core behavior for PoE users.
+
+If we want to enable a port but we can't due to over budget.
+Should we :
+- Report an error (or not) and save the enable action from userspace. On th=
+at
+  case, if enough budget is available later due to priority change or port
+  disconnected the PSE core will try automatically to re enable the PoE por=
+t.
+  The port will then be enabled without any action from the user.
+- Report an error but do nothing. The user will need to rerun the enable
+  command later to try to enable the port again.
+
+How is it currently managed in PoE poprietary userspace tools?
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
