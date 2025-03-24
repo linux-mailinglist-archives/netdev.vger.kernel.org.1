@@ -1,136 +1,113 @@
-Return-Path: <netdev+bounces-177022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E726A6D551
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 08:42:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BED5AA6D5EC
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 09:10:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C332B165794
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 07:42:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7DC916921D
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 08:10:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5115257448;
-	Mon, 24 Mar 2025 07:42:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Jn23FPAy"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8EDA25D206;
+	Mon, 24 Mar 2025 08:09:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE3119ADBA
-	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 07:42:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7A814F9FB;
+	Mon, 24 Mar 2025 08:09:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742802161; cv=none; b=qx7aoMhzpDpJHP3WhiHJcVFilqqwhoDrO9fES3XbJCM5O1z6IoVAuu5vdlDNPhthLIl2WmnwBglsM0k/7lRV+mj0W9s1JQBJe9hd7kB7ShamkEwjAxnvFc3MLpSppU5Lu8hhqDr8S8EgMpHgTp8RPJ+o6AkbqoYI1GnsOyRdwKA=
+	t=1742803791; cv=none; b=EgxrwYH0d2WEZ1fGKi4IGLzULjyzoEGl1gd6K99ACq8/FVqmDRbIzJno+KxVheDDQzhsLFH50VD+apAXk/4tbanYzzM/71S2UaUR5xJED0+g5bzECnXesJkBcbTMmW6UQubE5V7mjdLZKaB+P3B493uUgAh93OLkuNXYqQGnlYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742802161; c=relaxed/simple;
-	bh=nPjFw42nWYI2qOoFSaiSkfs/KiLKvsGF0sxhO9j9fw4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=PC8o1aL2O4YFW/8IhrE47LhzsbzuQh2SpSJsNSYtqDBcTXSh//0mPETD1nOyG8tPypjs6PEy276YR9o9jf7AF4FfUwVcvzC+uwlzbq5//EqjmxEtZg2uRwdWIKBxDafu++kseQMPvTlHEGU1cGCheUcHx3fvO9MGCU96kNJjMrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--praan.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Jn23FPAy; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--praan.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-225429696a9so106887215ad.1
-        for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 00:42:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742802159; x=1743406959; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=RoA2MiKiselm3nDF8hTntAC3AxrhdDHHbHna77xh+q0=;
-        b=Jn23FPAyWEo6fYS4aTj5TGl2BG0C7tmaDSx5A/JYnsnAi4Rj4CnAgiOGZkX2LD3izO
-         0xEzp4QUiYy5b3omD0PtkY2VOPW82B4XuPEjIurW0+Vx2cXf9EAPGeOAAY/XUPdEpvE/
-         L+DgkZLaIdX4oRIW639+L/mc5dXojaGnRssHYcX2uoqGfk6S8cJIONOtei6FWUhmbth4
-         ch07wY/DB0JJtCedOV8ZOetsnLnkIV4tUhTEKrnOlIodTmtEPZOQpB14APVwUIVEfoTN
-         oqm5N5InMYe49ZN8+cW/Qu/ZrlsqlspdqKdSyh5xZOBnHidTCkGZEHW2V5ycokEJkJQ5
-         LAeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742802159; x=1743406959;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RoA2MiKiselm3nDF8hTntAC3AxrhdDHHbHna77xh+q0=;
-        b=aVqDaRln/fmEnhW+gwYydxAfN+NEa4mmbSkD9nORBG5Z2dygtN7Xr6ovhPNEMnDwtC
-         iMUFOVSjh461O5X8VwR9I4dEH9n9Xxm4oC0z3TCR1TLT7xu/OjTHfXF0kO+YtomjNCU6
-         6HUedd2eu9GPzXk/56WLnC/GpKAuTA6631EhwvNh+W+HxThXjSpPXHkzYKrwFQf8ciO4
-         GHRlKD8XkiEyYXJSmZaBINeL11EeFhviT6sNBQzHP3N6HdZ7zhZoG4tUdcRNjUe0vbp9
-         Nnz0RPE8F2btpIQzabmzh1zcCiU93pnfD43jYLFspR38Ege2seFmNTkRSNBNsI5zIvpQ
-         /xQQ==
-X-Gm-Message-State: AOJu0YzfHQHEhv5ob5v5chjnWWUkvfu2ojrh3kzLjCKJKppwt2sZVBou
-	9PNRmzD26ySVVgSjJ5968CrBD6BzVqxRsJJKb3wEesJM5CPJbvYBcNC/jYoXC4wfbzadCEH+fA=
-	=
-X-Google-Smtp-Source: AGHT+IFfTT6303wR/U98GKW4lIvj3fB0IWhVPILnwINYi04ZQTFPBYtzKLrvl5S3naxN8O8cJWPCwRaC2A==
-X-Received: from plsu3.prod.google.com ([2002:a17:902:bf43:b0:223:8233:a96c])
- (user=praan job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:f685:b0:220:c178:b2e
- with SMTP id d9443c01a7336-22780c7dafamr157239495ad.17.1742802159568; Mon, 24
- Mar 2025 00:42:39 -0700 (PDT)
-Date: Mon, 24 Mar 2025 07:42:27 +0000
+	s=arc-20240116; t=1742803791; c=relaxed/simple;
+	bh=LxyAG+jv31r9lDUslY+U9YetCa+3KgJVCFi0GfXD0UM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DyFuBhT/BZaZ5d4rcHTPJgJqUfdeCYoNoj5KKLArNmksI3czEmnBKyqXIlgHQlOxuHjoh+m785vwn1Vv9lIQJPXI49dHXE/UCGdAp/i2TJC329eAQvA6tkIfWcfOIgTOWhbRTvpRzVAiKafIdHvKhVVSCzQIoCocETC1tEsil9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost (unknown [124.16.138.129])
+	by APP-03 (Coremail) with SMTP id rQCowAA35UE5E+FntoPTAA--.3846S2;
+	Mon, 24 Mar 2025 16:09:29 +0800 (CST)
+From: Chen Ni <nichen@iscas.ac.cn>
+To: sgoutham@marvell.com,
+	lcherian@marvell.com,
+	gakula@marvell.com,
+	jerinj@marvell.com,
+	hkelam@marvell.com,
+	sbhatta@marvell.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Chen Ni <nichen@iscas.ac.cn>
+Subject: [PATCH net-next] octeontx2-af: mcs: Remove redundant 'flush_workqueue()' calls
+Date: Mon, 24 Mar 2025 16:08:54 +0800
+Message-Id: <20250324080854.408188-1-nichen@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.49.0.395.g12beb8f557-goog
-Message-ID: <20250324074228.3139088-1-praan@google.com>
-Subject: [PATCH net v2] net: Fix the devmem sock opts and msgs for parisc
-From: Pranjal Shrivastava <praan@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	Willem de Bruijn <willemb@google.com>, Mina Almasry <almasrymina@google.com>, 
-	Pranjal Shrivastava <praan@google.com>, Jason Xing <kerneljasonxing@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowAA35UE5E+FntoPTAA--.3846S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrKF1xZFy7tr1DuryrtFyxZrb_yoWDJFc_Kr
+	W2qF4fJa1DGryUK34UtrZ8CFy0kw1kZF4vvF43trW5KayDJw4Yyr1kGrs3XrWUW3yFqasr
+	urn2gayxZwnrJjkaLaAFLSUrUUUUbb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbf8FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+	Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r1q6rW5McIj6I8E87Iv67AKxVW8Jr0_Cr1UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67AK6r43MxAIw28IcxkI7VAKI4
+	8JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xv
+	wVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjx
+	v20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20E
+	Y4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267
+	AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbUGYJUUUUU==
+X-CM-SenderInfo: xqlfxv3q6l2u1dvotugofq/
 
-The devmem socket options and socket control message definitions
-introduced in the TCP devmem series[1] incorrectly continued the socket
-definitions for arch/parisc.
+'destroy_workqueue()' already drains the queue before destroying it, so
+there is no need to flush it explicitly.
 
-The UAPI change seems safe as there are currently no drivers that
-declare support for devmem TCP RX via PP_FLAG_ALLOW_UNREADABLE_NETMEM.
-Hence, fixing this UAPI should be safe.
+Remove the redundant 'flush_workqueue()' calls.
 
-Fix the devmem socket options and socket control message definitions to
-reflect the series followed by arch/parisc.
+This was generated with coccinelle:
 
-[1]
-https://lore.kernel.org/lkml/20240910171458.219195-10-almasrymina@google.com/
+@@
+expression E;
+@@
 
-Fixes: 8f0b3cc9a4c10 ("tcp: RX path for devmem TCP")
-Signed-off-by: Pranjal Shrivastava <praan@google.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
-Reviewed-by: Mina Almasry <almasrymina@google.com>
+- flush_workqueue(E);
+  destroy_workqueue(E);
+
+Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
 ---
- arch/parisc/include/uapi/asm/socket.h | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/arch/parisc/include/uapi/asm/socket.h b/arch/parisc/include/uapi/asm/socket.h
-index aa9cd4b951fe..96831c988606 100644
---- a/arch/parisc/include/uapi/asm/socket.h
-+++ b/arch/parisc/include/uapi/asm/socket.h
-@@ -132,16 +132,16 @@
- #define SO_PASSPIDFD		0x404A
- #define SO_PEERPIDFD		0x404B
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c b/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c
+index d39d86e694cc..655dd4726d36 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c
+@@ -925,7 +925,6 @@ void rvu_mcs_exit(struct rvu *rvu)
+ 	if (!rvu->mcs_intr_wq)
+ 		return;
  
--#define SO_DEVMEM_LINEAR	78
--#define SCM_DEVMEM_LINEAR	SO_DEVMEM_LINEAR
--#define SO_DEVMEM_DMABUF	79
--#define SCM_DEVMEM_DMABUF	SO_DEVMEM_DMABUF
--#define SO_DEVMEM_DONTNEED	80
--
- #define SCM_TS_OPT_ID		0x404C
- 
- #define SO_RCVPRIORITY		0x404D
- 
-+#define SO_DEVMEM_LINEAR	0x404E
-+#define SCM_DEVMEM_LINEAR	SO_DEVMEM_LINEAR
-+#define SO_DEVMEM_DMABUF	0x404F
-+#define SCM_DEVMEM_DMABUF	SO_DEVMEM_DMABUF
-+#define SO_DEVMEM_DONTNEED	0x4050
-+
- #if !defined(__KERNEL__)
- 
- #if __BITS_PER_LONG == 64
+-	flush_workqueue(rvu->mcs_intr_wq);
+ 	destroy_workqueue(rvu->mcs_intr_wq);
+ 	rvu->mcs_intr_wq = NULL;
+ }
 -- 
-2.49.0.395.g12beb8f557-goog
+2.25.1
 
 
