@@ -1,198 +1,77 @@
-Return-Path: <netdev+bounces-177145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7351A6E09F
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 18:09:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47D9CA6E0B9
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 18:19:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C13687A5D4F
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 17:08:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A7A83ABACE
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 17:19:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52ECD263F3E;
-	Mon, 24 Mar 2025 17:09:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD6DD263C82;
+	Mon, 24 Mar 2025 17:19:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MDt5jIm/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tqm7vVEp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 263E02638AD;
-	Mon, 24 Mar 2025 17:09:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4F2E25E461;
+	Mon, 24 Mar 2025 17:19:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742836178; cv=none; b=F5WJGDJSNxsXsMehXGAc9WQKjJXRYT4YyZ1BuahgAYRhdZp+oynOI36rn3HC7ss3hsYz7iRR2P/1hY5ocVszN49wwe3WGwTW1NPPa+90UeXL7H/3Nz1gnoS+5sJMy69mVI8tMGQW3a6B1FYseHFuH993qydrRAcVbRSUibBLV+M=
+	t=1742836751; cv=none; b=oOwjxGHzZ44SjJCE1R5hLSK4Gj1L8A89R6WpwJ6gJH/nNLwXXh6OnuK1+JUcYy0dbPxiFxrHZlUBjblDr18YpR6klwnDcCRHRgSdPqcoT8bh2j+GDjlph/imf83WKkSDBT++yD6kP5RUGHmi0kIdm5QS57hSn7hdFi2nPkQamcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742836178; c=relaxed/simple;
-	bh=oS/jVNiBr+Qb2HZtLsR6LBU3TK7KODsBV2+Ozy0ozVY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BFOQlRHHUU3VPq5xZH1vDyw0waBuVI1NrlFaIr8QXMKYTcrAoiXLvmZPHaBHz6KCLdlZ1yN6lEbZCXA84o0CJHPanobPWfOH/IMsE7sbu7L0z93isryOlyH5kFhlEgXf2uZ2Vs6Tg5CQa3N32dFsjBd/BWxeK2NzMxO+cT+9OQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MDt5jIm/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B52BC4CEDD;
-	Mon, 24 Mar 2025 17:09:37 +0000 (UTC)
+	s=arc-20240116; t=1742836751; c=relaxed/simple;
+	bh=Dy/UCvaE4gBf65zlOMTd6hN0vb+l2MNhetesfySCf74=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=J54SZy0a2Yq6niaByeSYWsTTsK2dwN3fuOn3AYGWQXcfJiusj70UoEjo+yd9qDEELwOrRHdzCljb14Fg7FPfBSZX1UzkQzPOwwTxPKKl0DT50B4rIJmnehtovpV1xzLJkuIpiXuQVQzMGA0L0Nyx4IR13n1tvV+eEeMMBsiHKEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tqm7vVEp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB055C4CEDD;
+	Mon, 24 Mar 2025 17:19:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742836177;
-	bh=oS/jVNiBr+Qb2HZtLsR6LBU3TK7KODsBV2+Ozy0ozVY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MDt5jIm/fSyr45MFjY+aw3XjhcUNk6TRMOuOfey2/9+sRdJ3QD0bhFAiNUi02mMc5
-	 ZbGSHNncsx7pctqwGTQwHyrum7EYESiq/lrkP+I67l4iJvwOUGQW2/ONEFlEBNJxb+
-	 WpKlm8IOtR0r6URfwrsVcwAir6X8fWPBPzBLB7TaOMQ4pY6x3BtuVkT1fFwGkNLwnW
-	 +pdtWamuMT+1G1wg5cXBhDM/tsCBe5tRWwLG92bbycPTXpAhy0pp99Sn2eiLp/ojck
-	 rTixPqR1BRonNMBVnpwu1awZQgIUhTQ0rmsl+AH10E1ussO74fCJdR+Ic0RNXDAKpk
-	 OKDEgEuj9ELWA==
-Date: Mon, 24 Mar 2025 12:09:36 -0500
-From: Rob Herring <robh@kernel.org>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH 2/2] dt-bindings: net: Document support for
- Aeonsemi PHYs
-Message-ID: <20250324170936.GA584083-robh@kernel.org>
-References: <20250323225439.32400-1-ansuelsmth@gmail.com>
- <20250323225439.32400-2-ansuelsmth@gmail.com>
+	s=k20201202; t=1742836751;
+	bh=Dy/UCvaE4gBf65zlOMTd6hN0vb+l2MNhetesfySCf74=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Tqm7vVEp4E/UMIS2BIyUTJu3D7t+kfCT53NPdW76vDc/CWboJbFm/ZYlcHMu8FE2V
+	 VzRGF3aMX8WlSOFfUzYz+ODxoFSbbWNskdKJHnhpkytM/cL3n/lhRFuV24PtZBa4Gz
+	 FBBCw58pqkhDTunixxv1Cm3q7cvUr7sx/D32vIU2NoHHlIcwy8qSVGYukbay7zUCzd
+	 dphA3sIXY0MaFOup4XxvcrowswXVs1/kS6P0CmLs50zjwQGbdl9i03c6cFO5fbYWTa
+	 Ct//wBOwhUwiGT8izWtYnDb4LtNdTnhjxXy6JcuighP5X894ziS/Npdac30X6Kd+U5
+	 n6XjBSju0bRWA==
+Date: Mon, 24 Mar 2025 10:19:03 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Gal Pressman <gal@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, <netdev@vger.kernel.org>, Shuah Khan
+ <shuah@kernel.org>, <linux-kselftest@vger.kernel.org>, Nimrod Oren
+ <noren@nvidia.com>
+Subject: Re: [PATCH net-next] selftests: drv-net: rss_input_xfrm: Check test
+ prerequisites before running
+Message-ID: <20250324101903.05e5ceeb@kernel.org>
+In-Reply-To: <20250317123149.364565-1-gal@nvidia.com>
+References: <20250317123149.364565-1-gal@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250323225439.32400-2-ansuelsmth@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sun, Mar 23, 2025 at 11:54:27PM +0100, Christian Marangi wrote:
-> Document support for Aeonsemi PHYs and the requirement of a firmware to
-> correctly work. Also document the max number of LEDs supported and what
-> PHY ID expose when no firmware is loaded.
-> 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
->  .../bindings/net/aeonsemi,as21xxx.yaml        | 87 +++++++++++++++++++
->  MAINTAINERS                                   |  1 +
->  2 files changed, 88 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/aeonsemi,as21xxx.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/net/aeonsemi,as21xxx.yaml b/Documentation/devicetree/bindings/net/aeonsemi,as21xxx.yaml
-> new file mode 100644
-> index 000000000000..0549abcd3929
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/aeonsemi,as21xxx.yaml
-> @@ -0,0 +1,87 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/aeonsemi,as21xxx.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Aeonsemi AS21XXX Ethernet PHY
-> +
-> +maintainers:
-> +  - Christian Marangi <ansuelsmth@gmail.com>
-> +
-> +description: |
-> +  Aeonsemi AS21xxx Ethernet PHYs requires a firmware to be loaded to actually
-> +  work. The same firmware is compatible with various PHYs of the same family.
-> +
-> +  A PHY with not firmware loaded will be exposed on the MDIO bus with ID
-> +  0x7500 0x7500
-> +
-> +  This can be done and is implemented by OEM in 2 different way:
-> +    - Attached SPI flash directly to the PHY with the firmware. The PHY
-> +      will self load the firmware in the presence of this configuration.
-> +    - Manually provided firmware loaded from a file in the filesystem.
-> +
-> +  Each PHY can support up to 5 LEDs.
-> +
-> +allOf:
-> +  - $ref: ethernet-phy.yaml#
-> +
-> +select:
-> +  properties:
-> +    compatible:
-> +      contains:
-> +        enum:
-> +          - ethernet-phy-id7500.7500
-> +  required:
-> +    - compatible
-> +
-> +properties:
-> +  reg:
-> +    maxItems: 1
-> +
-> +  firmware-name:
-> +    description: specify the name of PHY firmware to load
+On Mon, 17 Mar 2025 14:31:49 +0200 Gal Pressman wrote:
+> +    try:
+> +        cmd("hash socat", host=cfg.remote)
+> +    except CmdExitFailure:
+> +        raise KsftSkipEx("socat not installed on remote")
 
-maxItems: 1
+I'm not familiar with "hash", would using
 
-as I think we allow more than 1. 
+	cfg.require_cmd("socat", remote=True)
 
-Not required? Then what is the default name (default: ???)?
-
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +
-> +unevaluatedProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/leds/common.h>
-> +
-> +    mdio {
-> +        #address-cells = <1>;
-> +        #size-cells = <0>;
-> +
-> +        ethernet-phy@1f {
-> +            compatible = "ethernet-phy-id7500.7500",
-> +                         "ethernet-phy-ieee802.3-c45";
-> +
-> +            reg = <31>;
-> +            firmware-name = "as21x1x_fw.bin";
-> +
-> +            leds {
-> +                #address-cells = <1>;
-> +                #size-cells = <0>;
-> +
-> +                led@0 {
-> +                    reg = <0>;
-> +                    color = <LED_COLOR_ID_GREEN>;
-> +                    function = LED_FUNCTION_LAN;
-> +                    function-enumerator = <0>;
-> +                    default-state = "keep";
-> +                };
-> +
-> +                led@1 {
-> +                    reg = <1>;
-> +                    color = <LED_COLOR_ID_GREEN>;
-> +                    function = LED_FUNCTION_LAN;
-> +                    function-enumerator = <1>;
-> +                    default-state = "keep";
-> +                };
-> +            };
-> +        };
-> +    };
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 9a2df6d221bd..59a863dd3b70 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -649,6 +649,7 @@ AEONSEMI PHY DRIVER
->  M:	Christian Marangi <ansuelsmth@gmail.com>
->  L:	netdev@vger.kernel.org
->  S:	Maintained
-> +F:	Documentation/devicetree/bindings/net/aeonsemi,as21xxx.yaml
->  F:	drivers/net/phy/as21xxx.c
->  
->  AF8133J THREE-AXIS MAGNETOMETER DRIVER
-> -- 
-> 2.48.1
-> 
+work? IOW we do have a helper for this sort of checking.
 
