@@ -1,135 +1,130 @@
-Return-Path: <netdev+bounces-177265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3EA4A6E6C7
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 23:47:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD970A6E6DF
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 23:51:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E98991752F3
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 22:46:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C88AB3A4821
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 22:51:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8DAA1F0E43;
-	Mon, 24 Mar 2025 22:46:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09B1F1F03D1;
+	Mon, 24 Mar 2025 22:51:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z+N7hCwp"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="R5ZQXgFH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 848551F0E33
-	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 22:46:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86169198A34
+	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 22:51:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742856390; cv=none; b=uIz7ZXHaP3ier6lwfgMh+1DCBWEoB6Oo2O+Wt4ImqgYY8tUddvv1wmCQ8jpeaB5eWxZs6+by4JJBY710RsQUQEN7mJWBdosHDrEXHd6NlW/vKMjNWI6UoMW0TchNq7j+QYEROlYP/SsGEDZw+7PI9XhqR9/vW7ZVP7ROA87n0pw=
+	t=1742856707; cv=none; b=SeYd5dZtu2umI+I/jtRVjH6IC31ChYCUln47J+jFB+8NqrMRJLAfbbOrRpmXEY0EALnPExAadPhv14hRJAXHVExspzrkUrXO+8jkHZgPTdOPo6zUyKE3XeBfUd9/X0x/JKoLJRGqRbzTdwOKZ6LIQ6XSVr93Bbmzjul5xChAhUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742856390; c=relaxed/simple;
-	bh=ZMamlOjj30l+91Ix7h1ymxQ9VxErzprFR5DvNK34rEk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=s5DDJCvg9MkvdZ3QM4RTnI2xPPSwu1dMlvd1k5pln6KkIpH2LAMjy+KOBiWus9ob/7IQuxRgiGCXARjyVpsV2tWR1l6gHQ6G1tYyqyPXtyBe0zQW/nZI6/QVYCYqy9ROupqRhIrCST3OXescVf9Ce3KErdmlmzyGksTn/RHGtxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z+N7hCwp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B987C4CEDD;
-	Mon, 24 Mar 2025 22:46:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742856390;
-	bh=ZMamlOjj30l+91Ix7h1ymxQ9VxErzprFR5DvNK34rEk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Z+N7hCwpMak8UhPhPmlmeo8ILxLEBfIzDgiion2oc9fR+wRKD2T/Re6D74XZg716Z
-	 CR4v2K+4yYnu+zzEY4tun+No/D8zINE6HhX1fHItoAfU6dt1lGydlhrCvykU23uRSE
-	 mi6mBkmkBrun1Y3n1fQkft8iogojEg3URAKxPftO8jevQ/DCGEiycdcI2CaNl8dZTN
-	 6EeZCKyxLku4j/fYsKRAyC1GYX7EVsVMKftY5+u0KExGQ5g5tk/5J4zi27GPFrWhmI
-	 r0qYump9BWNZ+fHAXBTYUEnfvtAebYl5/kOXkrpOOEHFCGBi2T1V6oHQhDPctwLHMt
-	 nLcd78PldAoDQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	sdf@fomichev.me,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 11/11] netdev: don't hold rtnl_lock over nl queue info get when possible
-Date: Mon, 24 Mar 2025 15:45:37 -0700
-Message-ID: <20250324224537.248800-12-kuba@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250324224537.248800-1-kuba@kernel.org>
-References: <20250324224537.248800-1-kuba@kernel.org>
+	s=arc-20240116; t=1742856707; c=relaxed/simple;
+	bh=sINURG8TPjWTJ6BG4UIC+MEa4u8qbkJLpUIbNvmW9/w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uoxGtKqiJSic9QGj+HEbUNh5Pfp6VFq75wioNugM2SLr3tFF7iBDqBW1IC82uoF7dYAfqk8HVDeylJG+bI+j4AI2fl4oIFSXNikx7+ThJZwodYk85Rxx5zU5h5gf0CqW2PE0IW/Pwuw68xKaN2TJNLBrdZwyIcHkfNe3LnlFHnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=R5ZQXgFH; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-227cf12df27so20597905ad.0
+        for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 15:51:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1742856706; x=1743461506; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SNZIAuzYTTeAort3nrknmAePklLNuzFFtDGjptmIzOM=;
+        b=R5ZQXgFH/IDyjy3UBj0w19mK5ZDC+DjlVjMwDSIHJyS6F4GLejnOuNfJ1SZn0Iwe5T
+         GaAOHiiP2uu/0y7hhQOqecYdko/krtPlGRXY/xCuhiZ1JYdgLq7GH40kJtJql6Tqt1Lx
+         96wdRclw007Mg07QOD4qOZk0jmp59eIa6DpNA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742856706; x=1743461506;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SNZIAuzYTTeAort3nrknmAePklLNuzFFtDGjptmIzOM=;
+        b=vpz1KVSksDyxFMRQR0jH2vv51LjWPy7GzSgfSShsduxgrzRRGhwvlg8gSGsTGp2uK3
+         NMPYnyqBzqhHrj1OMyImEGMlRjjpb5zMFhAI0mBmIul9cmbGNuLmvlxrpXSxSiHNvRJy
+         fASkWx9ZRxPN0YqIVt3mvKuvXhuWRI7b6YYu0dNi5AIu2drm5rABML6JhCAHsbTXzYr2
+         Y8SyAVqrlu8MwrgI1B2HBMOzz/4Ibh7K+mhD/x8yiVMB5IrvpkHWPFNumeGc0GmfwmTu
+         C+oFDQyArYiESKe1ahavr2Rq9b/kPuQgw4aliWJM6Rc85N0KgpDtcvFYVykac2JBQvEF
+         jhKg==
+X-Forwarded-Encrypted: i=1; AJvYcCVGyNL8TLs3ctW88nweWexfdHKMDTCqrd67vqPApYZrZTGmyG5/57fXM8TZrB6aw2cuwHYJhQw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcBHiOUXulhaCLsSFwjDDr7q5QiGnSsBwVCxv2PQUyzPb+LaKm
+	FbpIVnFKaNl8LrfiBx4cRfUg/r7bK+UywqNQtbu1C3kIVYnI5KlrWmty3f4cy0g=
+X-Gm-Gg: ASbGnctmZOI+rbEaA0XOyrB6Su++G2JbstdaikQGNIid/khFlcRbT8I2Iyetrwknknq
+	hrhPOGhL498b3kdG3DU32W54VyktyY9mn5tg6GXruHe2wjdS1ZEQL4JU8ZSPuDm5lmzkkZseBnj
+	jIvviz89dCt9Gg4y5J6BswWJx471Jl/xOpuGyXMS6ELiRxmWulOR907MjfOvxB0h7vKIlmGsMwG
+	i2pHz8jl/IQRggEaTZ9SchxyOjuxb2hydTvTvC0EjpiCfMpOft6MU30fSBYc5DQsahnwZk9TFFH
+	onEvhReY+oJ5pY1BKPYaoB9hi+lZ63Y829c8X8MUFmBQtAYFvRaJd7YKhCu8edJpnBmNMBImosn
+	KT4GxiazgWHPipz7Q
+X-Google-Smtp-Source: AGHT+IGqXWgEabyAByCjIRB2NF7rK0U6Sarr7ZTc0iSTwNsAGyxmm1uJ7rzIH0GnCtZReoLi/YLCHg==
+X-Received: by 2002:a17:903:41d2:b0:223:607c:1d99 with SMTP id d9443c01a7336-227805b73d3mr264042385ad.0.1742856705650;
+        Mon, 24 Mar 2025 15:51:45 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22780f4597csm77237325ad.75.2025.03.24.15.51.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Mar 2025 15:51:45 -0700 (PDT)
+Date: Mon, 24 Mar 2025 15:51:42 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+	brauner@kernel.org, asml.silence@gmail.com, hch@infradead.org,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, Alexander Viro <viro@zeniv.linux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>, Jan Kara <jack@suse.cz>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH vfs/for-next 0/3] Move splice_to_socket to net/socket.c
+Message-ID: <Z-Hh_rUT1LgBbzZ8@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
+	netdev@vger.kernel.org, brauner@kernel.org, asml.silence@gmail.com,
+	hch@infradead.org, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>, Jan Kara <jack@suse.cz>,
+	open list <linux-kernel@vger.kernel.org>
+References: <20250322203558.206411-1-jdamato@fastly.com>
+ <80835395-d43d-46de-8ed6-2cc5c2268b19@kernel.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <80835395-d43d-46de-8ed6-2cc5c2268b19@kernel.dk>
 
-Netdev queue dump accesses: NAPI, memory providers, XSk pointers.
-All three are "ops protected" now, switch to the op compat locking.
-rtnl lock does not have to be taken for "ops locked" devices.
+On Mon, Mar 24, 2025 at 04:14:06PM -0600, Jens Axboe wrote:
+> On 3/22/25 2:35 PM, Joe Damato wrote:
+> > Greetings:
+> > 
+> > While reading through the splice and socket code I noticed that some
+> > splice helpers (like sock_splice_read and sock_splice_eof) live in
+> > net/socket.c, but splice_to_socket does not.
+> > 
+> > I am not sure if there is a reason for this, but it seems like moving
+> > this code provides some advantages:
+> >   - Eliminates the #ifdef CONFIG_NET from fs/splice.c
+> >   - Keeps the socket related splice helpers together in net/socket.c
+> >     where it seems (IMHO) more logical for them to live
+> 
+> Not sure I think this is a good idea. Always nice to get rid of some
+> ifdefs, but the code really should be where it's mostly related to, and
+> the socket splice helpers have very little to do with the networking
+> code, it's mostly just pure splice code.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- net/core/netdev-genl.c | 18 +++++++-----------
- 1 file changed, 7 insertions(+), 11 deletions(-)
+OK, if you prefer not to merge this I totally understand.
 
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index fd1cfa9707dc..39f52a311f07 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -481,18 +481,15 @@ int netdev_nl_queue_get_doit(struct sk_buff *skb, struct genl_info *info)
- 	if (!rsp)
- 		return -ENOMEM;
- 
--	rtnl_lock();
--
--	netdev = netdev_get_by_index_lock(genl_info_net(info), ifindex);
-+	netdev = netdev_get_by_index_lock_ops_compat(genl_info_net(info),
-+						     ifindex);
- 	if (netdev) {
- 		err = netdev_nl_queue_fill(rsp, netdev, q_id, q_type, info);
--		netdev_unlock(netdev);
-+		netdev_unlock_ops_compat(netdev);
- 	} else {
- 		err = -ENODEV;
- 	}
- 
--	rtnl_unlock();
--
- 	if (err)
- 		goto err_free_msg;
- 
-@@ -541,17 +538,17 @@ int netdev_nl_queue_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
- 	if (info->attrs[NETDEV_A_QUEUE_IFINDEX])
- 		ifindex = nla_get_u32(info->attrs[NETDEV_A_QUEUE_IFINDEX]);
- 
--	rtnl_lock();
- 	if (ifindex) {
--		netdev = netdev_get_by_index_lock(net, ifindex);
-+		netdev = netdev_get_by_index_lock_ops_compat(net, ifindex);
- 		if (netdev) {
- 			err = netdev_nl_queue_dump_one(netdev, skb, info, ctx);
--			netdev_unlock(netdev);
-+			netdev_unlock_ops_compat(netdev);
- 		} else {
- 			err = -ENODEV;
- 		}
- 	} else {
--		for_each_netdev_lock_scoped(net, netdev, ctx->ifindex) {
-+		for_each_netdev_lock_ops_compat_scoped(net, netdev,
-+						       ctx->ifindex) {
- 			err = netdev_nl_queue_dump_one(netdev, skb, info, ctx);
- 			if (err < 0)
- 				break;
-@@ -559,7 +556,6 @@ int netdev_nl_queue_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
- 			ctx->txq_idx = 0;
- 		}
- 	}
--	rtnl_unlock();
- 
- 	return err;
- }
--- 
-2.49.0
+I am not aware of the history behind it all and I can definitely see
+the argument for leaving it as is because the code might be more
+"splice-related" than networking.
 
+In which case: sorry for the noise.
 
