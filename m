@@ -1,103 +1,75 @@
-Return-Path: <netdev+bounces-177079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4537CA6DC24
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 14:53:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79A14A6DC34
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 14:56:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A0E4C16B394
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 13:53:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34DF1188EF22
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 13:56:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BF311EDA31;
-	Mon, 24 Mar 2025 13:53:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3700125E81C;
+	Mon, 24 Mar 2025 13:56:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UAHXGi5C"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6421825EF8E
-	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 13:53:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D7E92AD14;
+	Mon, 24 Mar 2025 13:56:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742824394; cv=none; b=pI2wRD19MG2FYWKKaL6jROO7WEkO1xLPbhF1KkCM18kK2lUAYQARmLQhqai6pq0F+BWB9t3WanjRNuDhl2cKRrvF0btcHwaG4kLqXT+uO9guiyJ4wbBUKG3eyVpCnkRZEsWc+paqTw2JbiDXt2FPVPFS2lTXGjMo8bBplMUnv8U=
+	t=1742824567; cv=none; b=dw+CO53bvyqRU2svkJ+gwZ7OPYVpnXvDHikpYCjdwZM1ovljKk5HA+HOF3IxwPk6drFB9tZpXwdDS00c1mhqD4bfT7V6wFgslu8xw63BEFazSeMO195wlC7SCWNT1JJaHRvQpX5FQpKD8M+HiYH9ZXAC4y7kDsGFWO7KEp58wbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742824394; c=relaxed/simple;
-	bh=WyxQ9gw43wcho1e1q+Al5XR4eH4uzvOGoWTo5UWHN+Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CsBpjtxGHjbV5W1UmKuBKeeOdOoHSEmOWFm+HcxE8zCOGfxEa8GbM2QuBrmJCCX6vAz0ARIDM4x89X4E7ePBF2vBxkssubO0Ihu6a9AG45WqQLvNgjiP8Ygpwl2HKNcq6HxJmBJPY6WWx7n3GG9sl9I/zM8aQma2Co/DNcLELhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1twiEp-0007ny-JP; Mon, 24 Mar 2025 14:53:11 +0100
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1twiEo-001Q7D-2w;
-	Mon, 24 Mar 2025 14:53:11 +0100
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1twiEp-000TcX-0t;
-	Mon, 24 Mar 2025 14:53:11 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Michal Kubecek <mkubecek@suse.cz>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	netdev@vger.kernel.org
-Subject: [PATCH ethtool v1 1/1] ethtool: fix incorrect MDI-X "Unknown" output for MDI mode
-Date: Mon, 24 Mar 2025 14:53:10 +0100
-Message-Id: <20250324135310.113824-1-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1742824567; c=relaxed/simple;
+	bh=Bk+llUkPLzsHMJNfH7OsrFnkGNMUvHDNZlJwjw0gq1o=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bIjKgQE6LABXe6Jl+iIX+9KkAmpNkFEeMxd3wr0rfPlK0YIf1bfl+ph/KXzHAT2iI53w9w0cUiTlsLI3558lRGW9wT70rvUHI5U7SOFutmOh4eLq+CNQdUmwUF3mgXIbld4b73R12NAdRU2bwPaXsIfmrhKD39sFB327RsjzP5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UAHXGi5C; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D10F2C4CEDD;
+	Mon, 24 Mar 2025 13:56:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742824565;
+	bh=Bk+llUkPLzsHMJNfH7OsrFnkGNMUvHDNZlJwjw0gq1o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UAHXGi5CBznaEVgugAZORdfUHpOhmPsS+egkBQHiadtlXum/621kVBU9q3EytGFF4
+	 x9icbiTw/JbGk5TQzopb5e1RIi6jlRMyhFZSkozWNnrZ3dYaKcpU48S2QblKlc03aE
+	 E2rUrZ8eoieGgZ/QdlT87HrsKxJHx0IwK3HzH/qHkk6k2V94Kl4hGeAhI4MuV5Ddb/
+	 SWvq4hmsh7iJFfx7R3HhOgg/o3fAo2wkJF8IY8RUvYYA/F1p9dMTMtXp/EdClHnQ02
+	 ordkrLiKgqsNUx8A+kMDC8IIiAWUPntQ8vt1BL/DZQ1J/Jmhzcj4L4sJkuftogE4lR
+	 dFW/L0mpE2wtw==
+Date: Mon, 24 Mar 2025 06:55:58 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Jesper Dangaard
+ Brouer <hawk@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Ilias
+ Apalodimas <ilias.apalodimas@linaro.org>, "Toke =?UTF-8?B?SMO4aWxhbmQt?=
+ =?UTF-8?B?SsO4cmdlbnNlbg==?=" <toke@toke.dk>
+Subject: Re: [PATCH RFC net-next v1] page_pool: import Jesper's page_pool
+ benchmark
+Message-ID: <20250324065558.6b8854f1@kernel.org>
+In-Reply-To: <20250309084118.3080950-1-almasrymina@google.com>
+References: <20250309084118.3080950-1-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Add a missing case to handle the MDI mode correctly when showing the
-current MDI/MDI-X status. Without this, the code may show "Unknown" even
-when the status is valid. This regression was introduced in commit
-bd1341cd2146 ("add json support for base command").
+On Sun,  9 Mar 2025 08:41:18 +0000 Mina Almasry wrote:
+>  lib/Kconfig                        |   2 +
+>  lib/Makefile                       |   2 +
+>  lib/bench/Kconfig                  |   4 +
+>  lib/bench/Makefile                 |   3 +
+>  lib/bench/bench_page_pool_simple.c | 328 ++++++++++++++++++++++
+>  lib/bench/time_bench.c             | 426 +++++++++++++++++++++++++++++
+>  lib/bench/time_bench.h             | 259 ++++++++++++++++++
 
-The logic assumed that `mdi_x = false` was already set at function start
-and omitted the `case ETH_TP_MDI:` branch in the switch statement. However,
-without an explicit `break`, the code continued into the default case,
-resulting in "Unknown" being printed even when the mode was valid.
-
-This patch adds a missing `case ETH_TP_MDI:` with an explicit `break` to
-avoid falling into the default case. As a result, users will now correctly
-see `MDI-X: off` instead of `Unknown` when the resolved state is MDI.
-
-Fixes: bd1341cd2146 ("add json support for base command")
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- common.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/common.c b/common.c
-index 4fda4b49d2fd..1ba27e7577b4 100644
---- a/common.c
-+++ b/common.c
-@@ -171,6 +171,8 @@ void dump_mdix(u8 mdix, u8 mdix_ctrl)
- 		mdi_x_forced = true;
- 	} else {
- 		switch (mdix) {
-+		case ETH_TP_MDI:
-+			break;
- 		case ETH_TP_MDI_X:
- 			mdi_x = true;
- 			break;
---
-2.39.5
-
+Why not in tools/testing? I thought selftest infra supported modules.
 
