@@ -1,232 +1,192 @@
-Return-Path: <netdev+bounces-177160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A66D3A6E1CB
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 18:57:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C91E4A6E1D6
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 18:58:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B9FD1893B3B
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 17:53:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F00C017256A
+	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 17:55:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 098FE264A88;
-	Mon, 24 Mar 2025 17:49:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6624263F45;
+	Mon, 24 Mar 2025 17:54:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ILdBPfBw"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KrtQrW1u"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2050.outbound.protection.outlook.com [40.107.223.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0F0A264A7C;
-	Mon, 24 Mar 2025 17:49:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742838554; cv=none; b=FrsLiaFnQ7/6UAlyEE10ssk614KPGXYE3slrBtEL+yyz0vfPtwRzj6l+ID9cHqVQ/iCLay2PbRPejYpFyr9UYT5IZbVtX6zFs1GW3VTXBkiWnno1Bs3taL3JuD/VQIcOXg89/sOzcKZ1JvvikDZF4FWIPwYvd9/3bKuSsl2v4QM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742838554; c=relaxed/simple;
-	bh=zehG0hVjOYg1/tDV+yvNPZobIUe5t9ArdAqwSYUqvIE=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:To:From:Subject:
-	 References:In-Reply-To; b=h+gBB2xMitY8I7/dwAfPSQV1In4yvIddHxpN5CLtPZofurrz1ET7ZcAqj10efseLrrMQ1SOkSC+aVoSjRtNXUY18KPfMzzTZnDQWElwHUOWWVA6jU4VD9ndwqFk2zSjlgXVmyLTLO6QGcClfQoAqBXqYy93OfcCVgxzeT0JHdJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ILdBPfBw; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 763A944346;
-	Mon, 24 Mar 2025 17:49:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1742838549;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N1co+hewvkHIAplFR3edQapFDqNXgn6Qh8Bh0s6Wls8=;
-	b=ILdBPfBwjDB6/i9FTF9i30HeNSmixqDNKdGblbcS4i9t2sLXeOp5FG+QgyOU32qSB1+F5F
-	7G9rkeO90zADgQ+rnU1dOgtm8+YfOPYu9jpY0t+YCXHScFmZ0BH/4JrjrLQ3LmKwidjHId
-	HR4OZKF6V00ajD3rHljdQxoMe5mlenxUy2lZfuefwBTKvp0fcmf1kg3ufCziKCgCnpSYGj
-	8U1BbgfQ9S3DEQNsyS42/gkGUXtf8M2dsl5l8DEesVi2FDdIuJbnqVm30On3W4Yn12maU9
-	L3BKaUnAld55T2YJog8v6Ui8vpsf+mfvkvXMu29AdhG8qNA4Jbz3o3Gh5QDDNw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18232157A46;
+	Mon, 24 Mar 2025 17:54:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742838845; cv=fail; b=UF07syGAKWaFB1JT2MMDfMsA0nNKpI0nI1PAdBCsN9I9/2v9aUFiXCmeoYWv98aYZIl9F9PRlaZ0y8G5HF/lZa1KCY8LckcROQFZnjk5EjcKixH7fGI+I+LVtHourN/gEcn3U5nLV+Rh/DyTUQHagQo1oYsG99IHjxo+oVkPWjs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742838845; c=relaxed/simple;
+	bh=xPRlwqp3HWj+qghn3OvQ6mHkaMPxn4UvoqvkaCfEjmg=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=QdBJEta8WWoGyQQQl8UUIS9S7loQdEevfPnBNOGVdUaoCFswLYzZjSs7qrcdcpTW4yLkGb2jNctE2FLL164Lpt4EpyTOCW+4WdglyIBYK3Jh2cEvPjNWKRaoWzY+9mewT4RQvR6pXnUkUvq34KS1isu7T8/v7eTeN/52IKn4aKw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=KrtQrW1u; arc=fail smtp.client-ip=40.107.223.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=SYAoTXVX7/nthcg0L/bar3hxqJA44DS2gY9x2QaOiQwjLc72ZcBVbUVXw0GSP7sprEV++S0PadK2mAL35MxObWkAlo0dLXr3TZRhkg1hYZDZcfi8IyIYuSuJjILJn/0OTssLDvallIPf9Y5OHKejL0osPkQ2TKvWAYnlrFw5W1X4Sefydcjx0GCtbXKdsbGh4PllXQCQeM0b8eCyK7l5brpknfHxg1O4V9GfEMmlDBlNp4xPsBpQHfRDUOPBDxYoetCmgyVddeBJly7LAAiIMx2IBVi/tIlamX7QngaDj6DqTlrpvbsG74eIaBLjepLrWdBCnNOb/SJg/8p6Y14W6g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=IxO5Gtrb2DFpZOqVi6nEW3JnkiOGlc0GqG0rIddEmFc=;
+ b=ymt3u//WywkgkzrrGV1qfFXQzxnK1bI/OwmLccfEAOQbi0C8S3Gr5hcvo3MdWKlKWcdvUbBOli4QMGtnjVxJkqClFEuBu8D5I8Uk0JCg0BPq3KAz9MdFE1atnOPUIg0uQLAyThFa9wtu80mGSB7g/MYIgn9PmqRId6wocT6H0lRz9nAIIdKGyp5vNry5N5oLeLXk/BR0pJBivm/KbYbndU5RlQRy/MaAsUu1AhCKEKEyn4Rtf8dGLEPjtziZ53D9RENTcnaVPp9ike72nZLEa+fTKQrc67VecysXtPGZm1Xyhg3A8cAp4FH4jqsmz0JXGu8IJUi6GfefHdKVTYF36w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IxO5Gtrb2DFpZOqVi6nEW3JnkiOGlc0GqG0rIddEmFc=;
+ b=KrtQrW1ujaKKVTvYiMApgmfeSvVKmpN9vKvw1NDAJQoSpvN9FmmKlkCxhxqr7uiz9QN+/i8fxfjI1eCAPTfNG/2HYV2eaDkgS32BtgeKh76ZlZr2dotkwDfmMglLY52TZ9CgU7tCGvNupEbAvePYSNafavvXWiaKwQHVV0y1JGyrY/wH5vMr3AqmKJ9nt3EnPcUzpK2m4dcKw6Iot9S1QL8x/P6USygPm8pthJLdh5KoJOnka+rM5gfZxPGpgbwww6/GdUnu41JrY/X/B3KK567qhVfsaP2nNliGJtzKz2cXMsaW/H1arcWnnqsPE0xbdnlkDqjrhP5H/Ikg5s4lHQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB7500.namprd12.prod.outlook.com (2603:10b6:610:148::17)
+ by LV3PR12MB9234.namprd12.prod.outlook.com (2603:10b6:408:1a0::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.42; Mon, 24 Mar
+ 2025 17:54:00 +0000
+Received: from CH3PR12MB7500.namprd12.prod.outlook.com
+ ([fe80::7470:5626:d269:2bf2]) by CH3PR12MB7500.namprd12.prod.outlook.com
+ ([fe80::7470:5626:d269:2bf2%6]) with mapi id 15.20.8534.040; Mon, 24 Mar 2025
+ 17:54:00 +0000
+Message-ID: <f2e6f293-9f93-4d07-9ba8-9f1891c68162@nvidia.com>
+Date: Mon, 24 Mar 2025 19:53:54 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] selftests: drv-net: rss_input_xfrm: Check test
+ prerequisites before running
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
+ Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+ Nimrod Oren <noren@nvidia.com>
+References: <20250317123149.364565-1-gal@nvidia.com>
+ <20250324101903.05e5ceeb@kernel.org>
+Content-Language: en-US
+From: Gal Pressman <gal@nvidia.com>
+In-Reply-To: <20250324101903.05e5ceeb@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MM0P280CA0075.SWEP280.PROD.OUTLOOK.COM
+ (2603:10a6:190:8::14) To CH3PR12MB7500.namprd12.prod.outlook.com
+ (2603:10b6:610:148::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 24 Mar 2025 18:49:05 +0100
-Message-Id: <D8OOPAXK16CI.3TE75O760JRSL@bootlin.com>
-Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Rob
- Herring" <robh@kernel.org>, "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
- "Conor Dooley" <conor+dt@kernel.org>, "Nicolas Ferre"
- <nicolas.ferre@microchip.com>, "Claudiu Beznea" <claudiu.beznea@tuxon.dev>,
- "Paul Walmsley" <paul.walmsley@sifive.com>, "Palmer Dabbelt"
- <palmer@dabbelt.com>, "Albert Ou" <aou@eecs.berkeley.edu>, "Alexandre
- Ghiti" <alex@ghiti.fr>, "Samuel Holland" <samuel.holland@sifive.com>,
- "Richard Cochran" <richardcochran@gmail.com>, "Russell King"
- <linux@armlinux.org.uk>, "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>,
- "Vladimir Kondratiev" <vladimir.kondratiev@mobileye.com>, "Gregory CLEMENT"
- <gregory.clement@bootlin.com>, <netdev@vger.kernel.org>,
- <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <linux-riscv@lists.infradead.org>, <linux-mips@vger.kernel.org>, "Thomas
- Petazzoni" <thomas.petazzoni@bootlin.com>, "Tawfik Bayouk"
- <tawfik.bayouk@mobileye.com>
-To: "Andrew Lunn" <andrew@lunn.ch>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Subject: Re: [PATCH net-next 07/13] net: macb: move HW IP alignment value to
- macb_config
-X-Mailer: aerc 0.20.1-0-g2ecb8770224a
-References: <20250321-macb-v1-0-537b7e37971d@bootlin.com>
- <20250321-macb-v1-7-537b7e37971d@bootlin.com>
- <45b3e613-90c6-4499-b50b-383106172184@lunn.ch>
-In-Reply-To: <45b3e613-90c6-4499-b50b-383106172184@lunn.ch>
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduiedtgeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpegggfgtfffkvefvhffuofhfjgesthhqredtredtjeenucfhrhhomhepvfhhrohoucfnvggsrhhunhcuoehthhgvohdrlhgvsghruhhnsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeeigfelffeuffetteetuddufffghefhudeuteeigeekteevgeeileejgfdvffelheenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepjeejrddufeehrdekuddrieehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepjeejrddufeehrdekuddrieehpdhhvghloheplhhotggrlhhhohhsthdpmhgrihhlfhhrohhmpehthhgvohdrlhgvsghruhhnsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvkedprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehpr
- ggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheprhhosghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkrhiikhdoughtsehkvghrnhgvlhdrohhrgh
-X-GND-Sasl: theo.lebrun@bootlin.com
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB7500:EE_|LV3PR12MB9234:EE_
+X-MS-Office365-Filtering-Correlation-Id: 905c9d2b-6435-4777-2d4b-08dd6afcdb28
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?UWkzMnluZEt0dUVFazY0aWpsK0tiTWlLMC9vZVcvdkp5bHdiRWt4RTliRFpS?=
+ =?utf-8?B?cDlXMlB4Mlltb1h4aHJnOVVOekpUWWZkem5KMW9TTUg1NlMvNDd6V2FKNUt6?=
+ =?utf-8?B?MXA3Mk8xck5wK1pLYjc3WENuMzRQSC9LYU9uNkptdzJ2VmR6UzNWRjdub25U?=
+ =?utf-8?B?VFFReEJkSnA5ZGt5NFJnRXZNRlZWdGdteENUSTNDclhpM1ZSNUVvUDM5djh4?=
+ =?utf-8?B?WFFOdzVGcTAyUEk4OS9ERmJKN2dJN0tsVEVBNFlGSmlUaEhoVTZjc0NadjFi?=
+ =?utf-8?B?dUxDL2gva1g1TGlGVXVPRXFCb0RIbnB3TlBZTkcvdEk2QTVOUEJvaVlOdXNj?=
+ =?utf-8?B?ZWI0NWUrOEswd0plbldIKzN6K3lOWUdLdWVaOTZkVkQzSk5BQmZTRUN0TkZ3?=
+ =?utf-8?B?OHNtUzNnVFNRQW9jWUFJeE5SVStMMFVCT0RyVVozTTNOdnZ1bGdHWDhoNmdJ?=
+ =?utf-8?B?SlNKSlNaVFRhd2hUc3M4dTBsU2ZhbXA4aFoxeEZONlN1eTZqdlFxK3pXUHl6?=
+ =?utf-8?B?M1pWNU9BSURSdkhNb01xMHRFR1VLN2hXdVpBbGNTWWNVMlBLVHR4emRCM3hO?=
+ =?utf-8?B?VS81d1R4N05CMk5EWjFRSGgvYTZEOFFKd0FuRk9sT3UyRzhad1dodW9yMGNW?=
+ =?utf-8?B?bW9zcHViNmdGdVBhaTFLZzk5REl1RDBqYzNDR09OOWxVUDVVRnpXSGlIT0Vh?=
+ =?utf-8?B?T0t4VU1NM3RwendxODZqUHM2M3RQS2gwR2tFYkNiLzI1S1ZDLy9zWnRjb0dZ?=
+ =?utf-8?B?VGZZdHhTS0k2ZUxMSmdHTGk4d00zRnhnMGpPa1FnRGF1eWNKZ2lMNkNRcUtj?=
+ =?utf-8?B?Y3BIWU4zWGkvRndpL3duZTgzeG9iY25qTFpRdDZxS0pva0lFTGtxZi9ETm0v?=
+ =?utf-8?B?ZHV5RzRaUVRVYStESmNxUHJLSm9IZzNqNVhHL3lSSE5vWTZpaFplVnZKaXlZ?=
+ =?utf-8?B?VU5wRlBZYjR1RkFjSFhrSEJSc2FiQkVnV0JCaGQ5SGY5WGIveHRra2oxeFhV?=
+ =?utf-8?B?cTA4SEFhTXQ1S1p6NGk2OVVIdmlkRC9KL2xpMzJNZWo5cFFZbTA5ZU91dWdY?=
+ =?utf-8?B?NDYwNExDRThpM0UyY1NSYXFMWk15cXZPcWJzQTUxMUsycEpYK3FMMzFuN1FE?=
+ =?utf-8?B?ZkswMFhraGNZOHRCZjNMdW0yYUx3aDBlR2cyWGRnZ2JPaU1aWkFXbmljMWhk?=
+ =?utf-8?B?dVpvOFh3c1pnZ3hINjYvU2hXSm1uYnhKbDZuVE9nWW9GeTM0NzloU0p1elQ3?=
+ =?utf-8?B?YU5yMG5FU2xZaEZOY0JTVTl2NUZiZUdYTHUzWDVpV3FnQnNxUER2dEUyVmpv?=
+ =?utf-8?B?dWFVOEFzYkVEZW1qMHptMzg3RmIzYmc0cWJKYkxUWVM5MXZlUW4vczc5UGdr?=
+ =?utf-8?B?WEdCMk5HaVoxNlNxaTJyd2RHbmdYU0tjZ0wwenlhaVpyMnJFNGNpT2FSU21s?=
+ =?utf-8?B?Z1ZXNzBmTml6UytNYkhkOHRKSDZmaXFjWnc3TVBqQ2xoNjJlSWs2aE0vUjht?=
+ =?utf-8?B?R0JqSlAwNGxQdVUrWEFMVkgvWGdUVm5HVU03OWZrUjM4T2VPbmhXZ1VOTEVl?=
+ =?utf-8?B?dUJvT1VzZnVhb3UzOVdySnJ2U2IwMlRtcTVqdDJ1bFQ1VmViVXNCUlBxckZk?=
+ =?utf-8?B?YXB1YWFZYWNkVy8wZVdTREhkZ0hEU21CVnlXRzdCMnhDOC9pRHJkUGw3MkpI?=
+ =?utf-8?B?MEVEbjdrM0RaS0hCOWs0QzBHVGVJUlh2RTlXNXZLNnQvVUdxRWxEdnpMa0l3?=
+ =?utf-8?B?VEZydFlFYWlWMmlVMkZDNytiRkRHK1RNU3lnYXErTTZlYjVMR242K1BtS1RL?=
+ =?utf-8?B?WGJiK2JoRGpKM0R1RjFsZ1FaQTg4OGo4eHA3K01Va1d3cCsxV3Z0Z1Uwd1hi?=
+ =?utf-8?Q?p9GEMHaSuh7TM?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7500.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TnV1bVp5R3RDa0ZTTGYvTEk0S3VLblNVRHkwekZBZW5PZGRQcGdOZmR1aStH?=
+ =?utf-8?B?ZFFxbzdQMXVLWVVURkhDczFBQkZuZkRnQVpBdUpUK1Z0OHA2NndUQXd1N0Rr?=
+ =?utf-8?B?My9wZDFPcGd3RWR5MzNQaUxHbVp5dlo4c3JQdEpjbW9IMWpFU1dyZ1RBa1FO?=
+ =?utf-8?B?TzFlV2NSWVpHbUFKcVVkZkEwQ3FheExlKzRpUkZtejgzcHBuMEN0a0xoTWFO?=
+ =?utf-8?B?b2VQVXYzTUZnQUcyamZNeDF3Q29JNkpNeUlSbWlvWVVwZEZHczQxUWFxWEVl?=
+ =?utf-8?B?dXJ2STVkMFArakdhVVRtaEFEOGJCMDlFTlo5Y1RRZjFsS0ZlVjl2Y0pLM1lw?=
+ =?utf-8?B?TEtKOWIyL1crNmEvcThTOERFSlg5QzhvQnlCOTVqTVJqSjFGYnJtUDBOMVFX?=
+ =?utf-8?B?dEtDOFRjYmROeTVOTjhDVVgvYWt3M0xYQVkwdVpnam9PaUVTNmt3bENRbGVh?=
+ =?utf-8?B?T3dXZlZ3TDAxMFBva2VuQVUxN0JhNnVQdFlpaGdNSVljNXA1YUZuM1RiWnpU?=
+ =?utf-8?B?RWI1VWR3enhNVGxRcVpxZEhSMmYrb2V3WlBQbGYvOGpwVXhMbG9XVS9paTNx?=
+ =?utf-8?B?cW9wSzd3SmZlenhqTnIrWFAxeEFidnN5V3E4N1JpMnZXRUlFenJkazZwaWM2?=
+ =?utf-8?B?M09xSlU4QjMzdDRNK3JOQWZ0a3NSaEgreVFSOXNGZmxRalJHQ2ZUN29IekVs?=
+ =?utf-8?B?bHUzNE1RZ3F4dU9BKzl6eWk0OTlFbkZBM0JBM2JKdEYvVVVLRjA0cEdwRWZD?=
+ =?utf-8?B?WndqbHk4cko5NXY2Qkp0UmF1QkRsNWhKSGFBTzkxRG5NTTIvdkNsOU1xNFdZ?=
+ =?utf-8?B?MjJ3cmdoUVhFM2dGdXQ2RXZFZnlsaXdFNVRINTRyQ0VkbXhhM055VnpuR29S?=
+ =?utf-8?B?d2xNbFV6MmMwN2FlQ2VFQm5CMHFONlQ3VzVxV0s2Nm4waGphTk8rY2pScXFx?=
+ =?utf-8?B?Uy9nL3JKMkN0Tkk4V3JYa1E1NzY3VGQ1Vm53NzF0cGtDWjNzVG9TSU1jMzF3?=
+ =?utf-8?B?U01UUmpQeXYzV3NML2phcHZiRDgrUjlzU3k2SC9nR296aE9zdlRiM2FHVy9l?=
+ =?utf-8?B?OWtxOVN1ZFBkY21EWUpXUjV1UWJjd292ajNHMGtWekd5dDJxNlI2WExIcXlY?=
+ =?utf-8?B?TDl3NVM5RnVpU3RBWkVOQjVCTFBabE1HYVZRekdEMW9LTitHZTBmVVhxajht?=
+ =?utf-8?B?ZkUraVArUHkva0ZrR29YSXptYTNZVkQrQmZpbHZ3MisrLzFnRHM2cmZXUENZ?=
+ =?utf-8?B?d2txNXNKVTRPdkVMVTVCZ2x1NmZaZ2hBTEN3MFZha2FaMEJPbWZkem8veHNl?=
+ =?utf-8?B?VVIveGgwQUFhRzFNeUk2S2lQNklBaksxckRWeFYrcmRKRit1NG1jREkxTzFw?=
+ =?utf-8?B?bk9oZVp6VzROaVQwTHBrTW1SUGtzSGd5TW1ocHpFc2UrU1p5bWp1cTcvRy91?=
+ =?utf-8?B?WFYwRzFORDBpb1hobFVSMTY5RzVaUVVwOTRGbHgwbEEyNDEzUkhjQVNJZUxT?=
+ =?utf-8?B?UVpJRXd6RFRVMXVsQ043NStxdWtPZTNpZDdDczYwMVZzQjJQZG1malZFTG9F?=
+ =?utf-8?B?V2p1K3AxUUE3QnVISndpMU5TRStrQkxjQ0o5dVgrV0ljTWpoZWNENmM1cHQv?=
+ =?utf-8?B?STVQUjVqZE5zUDNSKy9kS3VqMlBoa3dqL25oT2NEOFBkNG5HaThzR1lPMUdX?=
+ =?utf-8?B?V2ZlRGk1S1pZWlE1K3VvUktiVU5jVXR2SjZXZzltc01mUnpRSEt0SU1NalEr?=
+ =?utf-8?B?S2t6MDFFdEdEZDlsM3pEUGJrWlg2eU1ROTlZTlhlblJ4elk0dWdsRVVrMjFK?=
+ =?utf-8?B?NEFYRThlRWJ3TFNKSGZaTnErQld3TWJSM01VOFYzcmJhTFdRc1NnRWJ2Qk4w?=
+ =?utf-8?B?MEVTT0lZbTV0NTh2em9ndXREajM4YWxKQy84eHZCYjdVRGpITU9WUjFWRzNa?=
+ =?utf-8?B?TFVsTkloMWJGMlQ5b1hWbnp4RDJMSUpUT1pIdDBUdS9nalpvM2NOcjViOFI1?=
+ =?utf-8?B?WVhoRUo5VTBLakRVK0JXc0hYNndtaVNLbm5OaFF1MjNzT1Rhem8yaHF6RU1O?=
+ =?utf-8?B?SmRmV0FtT1lHV040ODY0Ymowdmpxc3VwTitGQ1FTNWZuaDdSbXo2a1lXelRV?=
+ =?utf-8?Q?VI8WZ1DOOlwLniG+UbeSJx2o0?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 905c9d2b-6435-4777-2d4b-08dd6afcdb28
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7500.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Mar 2025 17:54:00.1080
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +RwXx1l0F9nwZmrlOpmek+I4Coc4uzCBWV4B1UDIWuBh+Zsp1MIoP9JrvGMcrwFK
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9234
 
-Hello Andrew,
+On 24/03/2025 19:19, Jakub Kicinski wrote:
+> On Mon, 17 Mar 2025 14:31:49 +0200 Gal Pressman wrote:
+>> +    try:
+>> +        cmd("hash socat", host=cfg.remote)
+>> +    except CmdExitFailure:
+>> +        raise KsftSkipEx("socat not installed on remote")
+> 
+> I'm not familiar with "hash", would using
+> 
+> 	cfg.require_cmd("socat", remote=True)
+> 
+> work? IOW we do have a helper for this sort of checking.
 
-On Fri Mar 21, 2025 at 10:06 PM CET, Andrew Lunn wrote:
-> On Fri, Mar 21, 2025 at 08:09:38PM +0100, Th=C3=A9o Lebrun wrote:
->> The controller does IP alignment (two bytes).
->
-> I'm a bit confused here. Is this hard coded, baked into the silicon?
-> It will always do IP alignment? It cannot be turned off?
-
-Yes, the alignment is baked inside the silicon.
-I looked but haven't seen any register to configure the alignment.
-
-Sorry the commit message isn't clear, it needs improvements.
-
->> 	skb_reserve(skb, NET_IP_ALIGN);
->
-> Why not just replace this with
->
->         skb_reserve(skb, 2);
-
-On arm64, NET_IP_ALIGN=3D0. I don't have HW to test, but the current code
-is telling us that the silicon doesn't do alignment on those:
-
-   skb =3D netdev_alloc_skb(...);
-   paddr =3D dma_map_single(..., skb->data, ...);
-   macb_set_addr(..., paddr);
-
-   // arm   =3D> NET_IP_ALIGN=3D2 =3D> silicon does alignment
-   // arm64 =3D> NET_IP_ALIGN=3D0 =3D> silicon doesn't do alignment
-   skb_reserve(skb, NET_IP_ALIGN);
-
-The platform we introduce is the first one where the silicon alignment
-(0 bytes) is different from the NET_IP_ALIGN value (MIPS, 2 bytes).
-
-Does that clarify things?
-
->> The NET_IP_ALIGN value is arch-dependent and picked based on unaligned
->> CPU access performance. The hardware alignment value should be
->> compatible-specific rather than arch-specific. Offer a path forward by
->> adding a hw_ip_align field inside macb_config.
->>=20
->> Values for macb_config->hw_ip_align are picked based on upstream
->> devicetrees:
->>=20
->>     Compatible             |  DTS folders              |  hw_ip_align
->>    ------------------------|---------------------------|----------------
->>    cdns,at91sam9260-macb   | arch/arm/                 | 2
->>    cdns,macb               | arch/{arm,riscv}/         | NET_IP_ALIGN
->>    cdns,np4-macb           | NULL                      | NET_IP_ALIGN
->>    cdns,pc302-gem          | NULL                      | NET_IP_ALIGN
->>    cdns,gem                | arch/{arm,arm64}/         | NET_IP_ALIGN
->>    cdns,sam9x60-macb       | arch/arm/                 | 2
->>    atmel,sama5d2-gem       | arch/arm/                 | 2
->>    atmel,sama5d29-gem      | arch/arm/                 | 2
->>    atmel,sama5d3-gem       | arch/arm/                 | 2
->>    atmel,sama5d3-macb      | arch/arm/                 | 2
->>    atmel,sama5d4-gem       | arch/arm/                 | 2
->>    cdns,at91rm9200-emac    | arch/arm/                 | 2
->>    cdns,emac               | arch/arm/                 | 2
->>    cdns,zynqmp-gem         | *same as xlnx,zynqmp-gem* | 0
->>    cdns,zynq-gem           | *same as xlnx,zynq-gem*   | 2
->>    sifive,fu540-c000-gem   | arch/riscv/               | 2
->>    microchip,mpfs-macb     | arch/riscv/               | 2
->>    microchip,sama7g5-gem   | arch/arm/                 | 2
->>    microchip,sama7g5-emac  | arch/arm/                 | 2
->>    xlnx,zynqmp-gem         | arch/arm64/               | 0
->>    xlnx,zynq-gem           | arch/arm/                 | 2
->>    xlnx,versal-gem         | NULL                      | NET_IP_ALIGN
->
-> I don't remember seeing any other driver doing anything like
-> this. That often means it is wrong....
-
-Good question, let's look at skb_reserve() that follow dma_map_single():
-
-   =E2=9F=A9 git grep -A20 dma_map_single drivers/net/ethernet/ | \
-      rg skb_reserve | grep -v macb_main
-   drivers/net/ethernet/sun/sunbmac.c:          skb_reserve(copy_skb, 2);
-   drivers/net/ethernet/sun/sunhme.c:           skb_reserve(skb, RX_OFFSET)=
-;
-   drivers/net/ethernet/sun/sunhme.c:           skb_reserve(new_skb, RX_OFF=
-SET);
-   drivers/net/ethernet/sgi/ioc3-eth.c:         skb_reserve(new_skb, RX_OFF=
-SET);
-   drivers/net/ethernet/chelsio/cxgb/sge.c:     skb_reserve(skb, sge->rx_pk=
-t_pad);
-   drivers/net/ethernet/marvell/mv643xx_eth.c:  skb_reserve(skb, 2);
-   drivers/net/ethernet/dec/tulip/de2104x.c:    skb_reserve(copy_skb, RX_OF=
-FSET);
-   drivers/net/ethernet/marvell/pxa168_eth.c:   skb_reserve(skb, ETH_HW_IP_=
-ALIGN);
-   drivers/net/ethernet/alacritech/slicoss.c:   skb_reserve(skb, offset);
-   drivers/net/ethernet/toshiba/tc35815.c:      skb_reserve(skb, 2); /* mak=
-e IP header 4byte aligned */
-   drivers/net/ethernet/lantiq_etop.c:          skb_reserve(ch->skb[ch->dma=
-.desc], NET_IP_ALIGN);
-
-Out of those, two are using dynamic values:
-
-   // In drivers/net/ethernet/chelsio/cxgb/sge.c
-   // The value comes from [0]:
-   sge->rx_pkt_pad =3D t1_is_T1B(adapter) ? 0 : 2;
-   // The macro resolves to something like [1]:
-   adap->params.chip_version =3D=3D CHBT_TERM_T1 && adap->params.chip_revis=
-ion =3D=3D TERM_T1B
-
-   // In drivers/net/ethernet/alacritech/slicoss.c
-   // In slic_refill_rx_queue() [2]
-   /* ensure head buffer descriptors are 256 byte aligned */
-   offset =3D 0;
-   misalign =3D paddr & ALIGN_MASK;
-   if (misalign) {
-      offset =3D SLIC_RX_BUFF_ALIGN - misalign;
-      skb_reserve(skb, offset);
-   }
-
-Conclusion:
- - one is HW revision dependent,
- - the other knows that HW always aligns its buffer to 256.
-
-We aren't alone, but pretty lonely.
-
-Maybe I missed a common denominator that could be used to identify
-compatibles that do or do not have hardcoded alignemnt. Without such
-info, the approach taken (have alignment stored inside match data)
-sounds reasonable to me.
-
-Do you agree?
-
-Thanks,
-
-[0]: https://elixir.bootlin.com/linux/v6.13.7/source/drivers/net/ethernet/c=
-helsio/cxgb/sge.c#L2106
-[1]: https://elixir.bootlin.com/linux/v6.13.7/source/drivers/net/ethernet/c=
-helsio/cxgb/common.h#L292-L299
-[2]: https://elixir.bootlin.com/linux/v6.13.7/source/drivers/net/ethernet/a=
-lacritech/slicoss.c#L418-L424
-
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+Nice, I should've seen this helper, will change, thanks.
 
