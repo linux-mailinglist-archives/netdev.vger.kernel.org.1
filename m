@@ -1,232 +1,578 @@
-Return-Path: <netdev+bounces-177600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36FFDA70B79
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 21:28:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23E14A70B90
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 21:33:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6D6A16893E
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 20:28:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA3543B53C9
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 20:32:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 220522641E6;
-	Tue, 25 Mar 2025 20:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="MuNmNpdW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 908332676D0;
+	Tue, 25 Mar 2025 20:31:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from SJ2PR03CU002.outbound.protection.outlook.com (mail-westusazon11023136.outbound.protection.outlook.com [52.101.44.136])
+Received: from a3.inai.de (a3.inai.de [144.76.212.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CFE91A0BF8;
-	Tue, 25 Mar 2025 20:28:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.44.136
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742934520; cv=fail; b=e268aQortrOqgTK3Avj+fom0xopcX5IRhkTwjO4uQmkK9QyvDfe4NXPIUsQxHKn46Ll+qGuCjMZtQUXef4OxmE9o34XPFW73NRMOKp74WTVHPU3d1Q0udBuFSSpdPpIquGdl3f64P4I+fcpRofmu+3tdqhvgMEYUbsapLLLRIuo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742934520; c=relaxed/simple;
-	bh=CBHg9WFqHp/R/csgFKeGFKujmmMqCL/sGcqyT19Mf68=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=pWJBQKFjahHuz7e/Wt4CvBJrQeBm21kmi6I6W3PMtGoZpg5A81PLF5DO2s0m1AvQR4SChEtC16Y0ppaGITQQmZgUSDGZhFFr9ksnDeoyaCvDKyYDgQitrisUpShz+7unU3MEoTaHKogpMHT4fcPxHKtR32lzXixBE9dAfzqk7Dw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=MuNmNpdW; arc=fail smtp.client-ip=52.101.44.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=R1qz0CYywOqSZkk+AXIafaUsijISwRtWBbmN1OWz5Iy6JIwNk7FNX4aZZTe7yhfCrF0JdrN08A34cIp8GV3OD0REHumoPE/HTSmF+TVdOSKcv97Koqh3mahn2uPP7DH2VXFUClu18itkCauykaaAhKFE6/y6M6Hu2ckK5eg1AV+wrFgftUY+GIX3tw64qd3dJAadTdktHpzn6iNjk2CC2hBb/J8vjTBvCnugZUpmMR3N0t6DzqAk8AmL5nOef2mcPWM/0EF9m06RBHWxhp5ggbwi5ft500YCImTgxUa2H9NjbztIt6cDKCAmI6fT9WROcXIrAhtEWtbYq9Prqodu4w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CBHg9WFqHp/R/csgFKeGFKujmmMqCL/sGcqyT19Mf68=;
- b=rn5ofkqsA6Cgij84CVc3ProdwRfwlIaf/9G4HvbGoKHw5n+7coIY3fll3CJeZ4N9VIbWpqzBkOvLd64rRxdK8QX4OBIFP5ZppTfuGFEPJp9LE01TW/e9x6R6/Lxy+R/YNS3mP5W17ptjfzu8mFI+dYn5zOHryaKjeq/UrW0nA/KEuvzQpgRoikQQxdWBhGITNsHeMqHuCOwjBdGO+w7Ckr0NlY72j+uaEPg8xYZTcscDrw5JtaHvrIojrt1xPtE8M602UvMUUMVm92IO9RNDV7gsiAH3LWyFu5l7nDoqt+4hgk1YRff0ZXaPo7H8gQe1jQQK7+98h6C+nrxc17SWtA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CBHg9WFqHp/R/csgFKeGFKujmmMqCL/sGcqyT19Mf68=;
- b=MuNmNpdWoc2HZ8lnq/1yLL3M7cpEYYfdFLhXYhZUInnqjA1TwTFc/0WgprvSzGp/XBI+7L5MzIcdki16J41eJTHCmz/HTKHMLpqOv2bL/AJXDQCr743UW0VMWqSKioGwxDCV0C0FNDx0eZq2PTqNa9Pg3NoaerYYkCQaSt3rHg4=
-Received: from MN0PR21MB3437.namprd21.prod.outlook.com (2603:10b6:208:3d2::17)
- by BL6PEPF0002E785.namprd21.prod.outlook.com (2603:10b6:20f:fc04::c7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8583.24; Tue, 25 Mar
- 2025 20:28:35 +0000
-Received: from MN0PR21MB3437.namprd21.prod.outlook.com
- ([fe80::19f:96c4:be9a:c684]) by MN0PR21MB3437.namprd21.prod.outlook.com
- ([fe80::19f:96c4:be9a:c684%5]) with mapi id 15.20.8583.023; Tue, 25 Mar 2025
- 20:28:35 +0000
-From: Haiyang Zhang <haiyangz@microsoft.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Jakub Kicinski <kuba@kernel.org>, Erni Sri Satya Vennela
-	<ernis@linux.microsoft.com>, KY Srinivasan <kys@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, Long Li <longli@microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>, "horms@kernel.org"
-	<horms@kernel.org>, "brett.creeley@amd.com" <brett.creeley@amd.com>,
-	"surenb@google.com" <surenb@google.com>, "schakrabarti@linux.microsoft.com"
-	<schakrabarti@linux.microsoft.com>, "kent.overstreet@linux.dev"
-	<kent.overstreet@linux.dev>, "shradhagupta@linux.microsoft.com"
-	<shradhagupta@linux.microsoft.com>, "erick.archer@outlook.com"
-	<erick.archer@outlook.com>, "rosenp@gmail.com" <rosenp@gmail.com>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, Paul Rosswurm
-	<paulros@microsoft.com>
-Subject: RE: [EXTERNAL] Re: [PATCH 2/3] net: mana: Implement
- set_link_ksettings in ethtool for speed
-Thread-Topic: [EXTERNAL] Re: [PATCH 2/3] net: mana: Implement
- set_link_ksettings in ethtool for speed
-Thread-Index: AQHbnai9kkA9WGlPSUyCoOvnIZFl4rOEIhUAgAAY2ICAAAdYwIAAAxUAgAAHb3A=
-Date: Tue, 25 Mar 2025 20:28:35 +0000
-Message-ID:
- <MN0PR21MB34376199FAFAE4901EF18E75CAA72@MN0PR21MB3437.namprd21.prod.outlook.com>
-References: <1742473341-15262-1-git-send-email-ernis@linux.microsoft.com>
- <1742473341-15262-3-git-send-email-ernis@linux.microsoft.com>
- <fb6b544f-f683-4307-8adf-82d37540c556@lunn.ch>
- <20250325170955.GB23398@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <adaaa2b0-c161-4d4f-8199-921002355d05@lunn.ch>
- <20250325122135.14ffa389@kernel.org>
- <MN0PR21MB3437DA2C43930B08036BB146CAA72@MN0PR21MB3437.namprd21.prod.outlook.com>
- <6396c1f7-756d-476a-833e-7ea35ae41da8@lunn.ch>
-In-Reply-To: <6396c1f7-756d-476a-833e-7ea35ae41da8@lunn.ch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=9b36c230-8568-4ad1-9510-e2f5ccdd9c22;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-03-25T20:25:30Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
- 3, 0, 1;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR21MB3437:EE_|BL6PEPF0002E785:EE_
-x-ms-office365-filtering-correlation-id: 0c4630c7-ffd3-49a0-f7c4-08dd6bdb9e4c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?FBKZGEhAt0yDV8TRF+2LoOdpDlHD+XjMQw/kPg9hzpiGl/arp3GfEFipIm1X?=
- =?us-ascii?Q?F97Ib4OvEFzTMCkHmE2zs5ksaXw4p3xtTzXv7y/mWJ0aQVVB3ssVR+oeJotM?=
- =?us-ascii?Q?8J1gl4WnCB7wgke+elm9DI8RpNNJHa8ZDLPV0kQbs9MITULojjWO1dn1b8WM?=
- =?us-ascii?Q?kryGcO6NInKRmECU0Z4INTSvZPFHkErcxf6C1cBDf6bNRawYrWH0G7bN3w1a?=
- =?us-ascii?Q?CjazmGKxU+65uTaDdirMhIcV9u49ru17wTuhkZ4Z9u2kS7+oOrwPiGmJcVz1?=
- =?us-ascii?Q?FD+F+FZ07DtciuNhhEUdZ/feu2vjne6u30XI+rath0Ico9L+mklrEctz/VeR?=
- =?us-ascii?Q?X3lJ2ty4JjsKwLlHgJDOC8wuRxKS1cs8/2c23DkY6igVriGH7y41vQnAzzsB?=
- =?us-ascii?Q?KRE1sdLtR8sBx17TsUGOVywrTXbN37kjzm8Ro5HOKJH3KoaGdh0B+6Luc5ew?=
- =?us-ascii?Q?gbFDX4/njAdVW47Kd2bxAb8pBmJJyBb+cTALfkexsn1jobSuJOEcDlKzx1po?=
- =?us-ascii?Q?hFq0U8TNC/k1tgHVXYBF5CvjCl/aIv3PDiFagoYTZ9pCGY39YhjyiZxszt4M?=
- =?us-ascii?Q?pRQ0HLRtcGPhTH1voj16VvXbXNJ4IRx2RN4lzIY2ePm9ZIjuqX2zHqrm2Z1w?=
- =?us-ascii?Q?zSXGRmEt2vDrni16HxVQeuOC4JcZOu1z2s0WGUvASJITDD1lLZCUayOKQsEM?=
- =?us-ascii?Q?IF0dKRUpx1yCBhpHU5SC9Wt+LphE+TzpY0OC6DjzYi1Ioz2FWXI4NCDNl86L?=
- =?us-ascii?Q?JXtLcXYBfIwZDBsz8wO+XZolMairSvRo4hnmRT93Unf46bfM+Fgm4uBZdnhU?=
- =?us-ascii?Q?9yXve+IwfABQq2Y1m/Lvch47uh8Uf2jldsoZAwLtndDUZu6mYBOSDdi4tEn0?=
- =?us-ascii?Q?XpAD6ngKXqAxGS/Dk//0o57yK0tdu2Gp8btQr5K4YSKxorArQqz8oHtEca+n?=
- =?us-ascii?Q?SQpBmRfNQHue2EA6WW/PqA5hj6b1m+fm8DknNXLHDG2XudILlEZ6NZ4qBxgo?=
- =?us-ascii?Q?GMBYMJBWiLbF89y7+7R230ShBg4fNa917LJUsALoBqzg4an8ZrwcJaEqaUwg?=
- =?us-ascii?Q?gnRAr0UhYVBJsQdxFqhGTOUFUudBI9KJuxQvVCj9euKtwHV1+BSm4APxuyZ3?=
- =?us-ascii?Q?vDoIevSPkjgW4FjXbgISSsCKzfEsck0PKejTx+SgLCvt6f+GLfiWASNIpfKc?=
- =?us-ascii?Q?5UZh/d4GmFAI9NQ4XMX5AEd6bsEJ42FkoFxHqKobpPbLOKIGIjcHwuhgXXqt?=
- =?us-ascii?Q?ozkfHtgTtkhP9dKL0QLXTyHF6rwVPKGyvtqG0jpQ44qPY6lnDascH0NSW4Dl?=
- =?us-ascii?Q?zYk8pQ79ZOFJOgOd93Re9aZa4B7b6FBnISTqsX9MugyXp3HU48btRAGYtIes?=
- =?us-ascii?Q?ioBFvB9f4FwRfakDmbRf00Y5yrxIGUcBsop6BQPLsd+2HYN3PlElhxPjXeaU?=
- =?us-ascii?Q?DzIcday4eHOv/Y6knecWywPAiuifCJ7AMra87S6WQrmtJcIcZajYuoe7qPLG?=
- =?us-ascii?Q?BKQl07FZH1q/Hfs=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR21MB3437.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?iwWKPD4prEwJtqQL4QS8cHsOg5r8i4Jx2aCHtLl5TsXm/2Ta+UBZUMBm4Q0P?=
- =?us-ascii?Q?uXesdVKKb1urvyM7jWtkfhPdU1+RPqxl+DRTbrFTKIrXBtPjRyWtV7OZ6Mn5?=
- =?us-ascii?Q?HYJpqOb19vCA07XafXLk+PL2VYuy++x/UmKASfAWhWMBEb5g2VC8AaexYVH8?=
- =?us-ascii?Q?MVlZ92DgirB5fGXG5x/uIGb+cKj/2EROxB5HLoGB2HYI4QnPTVx9i4TNTLyR?=
- =?us-ascii?Q?DB4JhshIJqwfpW/EejrcGtP2athw9yVlnZIhK3NUxJOkE9K4nIUi6If5BYmf?=
- =?us-ascii?Q?x4WPUqB0W2oDFB6WMiyWt3Rz4RozgUx7sQDkz8PhE1ongg8jEDiOYfbjVc2D?=
- =?us-ascii?Q?BLWZ6bIC+rLmLA4GtmRDKUocUd55Ok+wnXwoCBUJg/RjQnUIxJfet4D+liQY?=
- =?us-ascii?Q?ToiW+LZZ0fdWqJ2WReCWohQ34K7YzqQsNq0bnRUos/MhnuOU3vnYnUYqBesI?=
- =?us-ascii?Q?wIfUOD3RwQBN/PyF7BWObUwQOS0MpRH2Xj2C3NZWjuiX7EVyXAdg6f8G2s2Y?=
- =?us-ascii?Q?+SFfAhF/2rtVzSuEaGnWYJVJHPeHquIItAco9oDkdj7HhOd8huS9Y4VLlb6J?=
- =?us-ascii?Q?EoJcrvkd1PsNMpXxMXk71wF+/p1s4GIPrV9S2JNSATvIOrxJrPm/bEnUwBIH?=
- =?us-ascii?Q?sUH7NcxFm8Qz5H0KR2YQtl4oc/fJZLTxTjNPk9wbwqnJTk8ujZG3O1Fkyx3m?=
- =?us-ascii?Q?wdAUSY3yHAY8aY5Arb6/ImvFFFRNvxn5L6HaxgdYnNf/KkTZW/SmZHHIf4Qk?=
- =?us-ascii?Q?F6gEEcyCVeFMXxtiar6Do9mgOGDOZQsM5GJWurn41/8hcLImA0oIRv/GcSMU?=
- =?us-ascii?Q?kmyPSn33gvAU3CnJhL+I24iAGy8vqZg5x5WUZcAvWcjpfn5LgU6mGXHIf29D?=
- =?us-ascii?Q?hzOeE5l9WTXcdVdvBWSz8urw43BSVej1hXApFBo6lJqglyeP0Ung/L+rJY9Y?=
- =?us-ascii?Q?vElja5WPM1DEuY0Q+iq06GBYOPQ2XBOMXeGC39fLsdu+7ggPqYKwuMKWnm5D?=
- =?us-ascii?Q?YJdrfgfNFR7IGqOSjM92uXdpiQunVm5VZjRs5EUq/qtcq7REmWu00SN27yaN?=
- =?us-ascii?Q?poeD4/stjQYFTW45QDJRiwn2Ck25c3YCWGBUd0GjCMk3qchuYhfF6t557oFY?=
- =?us-ascii?Q?NpkBRT+MNwYpBUUchI5RCTPZ+9mlDmjpRHl2TT3GCuipZ6q/v4jAw7ar6/yu?=
- =?us-ascii?Q?HYV/9sV6iIc3OiXD0CqsiauIrvFfb6SyOtacELVAOj46vTDDzt8v2kc4d6lS?=
- =?us-ascii?Q?VVa/pjg7NgaVwo1WPrgEt+jfQdb/Bb/etWN6gU966eXIq4PXfQ+38j3VNzBO?=
- =?us-ascii?Q?C6O8vYXUFHnRQBEe07CWRR+lR7ko5eVEZWidfOXYoR/8Km2t4cvvsI3aGHFU?=
- =?us-ascii?Q?Xe5NvMY5CUss2ORkqQDirrvjGavYD2D1xc2IyA5HwKsIdei+0wRxZM0kC5OM?=
- =?us-ascii?Q?Km/n/jlu2gb5ylsdXZyD5H5ZWqQxhydsxQB0W03DKwzuWfGD87x1OjDVeyJn?=
- =?us-ascii?Q?sTYYKCAgC08br8ZCnjKnzSArBckSyadvjM9CYZVPrenFuGNM4dfKoYhuO4ie?=
- =?us-ascii?Q?r4Elux4S+KcGBbMkRW4SVOHi7oKKA23dcb9pA9kl?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D19D2676C0;
+	Tue, 25 Mar 2025 20:31:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.212.145
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742934667; cv=none; b=FMqneEuYDLXZzj3OnZvP0zFY0TiTI7cYcOkCuiLCZP/sGEtNqOrApmjkpueE6rAbNqKA33ZXOQmWAcKD3c6ncdoWfmEpCUTAgwEhZdA/UI3LA13NFQjYGmBinSHuSMLEue0VDwoG9kfbJDbxxsAyhkH+TuHJ+3XzWNZOZtaCvPI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742934667; c=relaxed/simple;
+	bh=2GzSlRmtatqPtCfHt1WR2xSUG319WCmA98Pb02ndAls=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=fUwV3duZZ6Q31d/iC4CdJVr7EeDfyUSBmOIGp5J/eyEChB6roaLKKiT0HktdFUzAy4diV4LhYfS9oMmv+NggcyuMXmGf/P77qJX82Khw6vm+QwyxRCCdEIqZmE4/dSjen7tYFKYh2XJW614T5Jg8mtptlu6ap/7t2KBpo6bmAiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inai.de; spf=pass smtp.mailfrom=inai.de; arc=none smtp.client-ip=144.76.212.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inai.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inai.de
+Received: by a3.inai.de (Postfix, from userid 25121)
+	id BADD2100397F22; Tue, 25 Mar 2025 21:30:53 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by a3.inai.de (Postfix) with ESMTP id B8C6A110187122;
+	Tue, 25 Mar 2025 21:30:53 +0100 (CET)
+Date: Tue, 25 Mar 2025 21:30:53 +0100 (CET)
+From: Jan Engelhardt <ej@inai.de>
+To: guoren@kernel.org
+cc: arnd@arndb.de, gregkh@linuxfoundation.org, torvalds@linux-foundation.org, 
+    paul.walmsley@sifive.com, palmer@dabbelt.com, anup@brainfault.org, 
+    atishp@atishpatra.org, oleg@redhat.com, kees@kernel.org, 
+    tglx@linutronix.de, will@kernel.org, mark.rutland@arm.com, 
+    brauner@kernel.org, akpm@linux-foundation.org, rostedt@goodmis.org, 
+    edumazet@google.com, unicorn_wang@outlook.com, inochiama@outlook.com, 
+    gaohan@iscas.ac.cn, shihua@iscas.ac.cn, jiawei@iscas.ac.cn, 
+    wuwei2016@iscas.ac.cn, drew@pdp7.com, 
+    prabhakar.mahadev-lad.rj@bp.renesas.com, ctsai390@andestech.com, 
+    wefu@redhat.com, kuba@kernel.org, pabeni@redhat.com, josef@toxicpanda.com, 
+    dsterba@suse.com, mingo@redhat.com, peterz@infradead.org, 
+    boqun.feng@gmail.com, xiao.w.wang@intel.com, qingfang.deng@siflower.com.cn, 
+    leobras@redhat.com, jszhang@kernel.org, conor.dooley@microchip.com, 
+    samuel.holland@sifive.com, yongxuan.wang@sifive.com, 
+    luxu.kernel@bytedance.com, david@redhat.com, ruanjinjie@huawei.com, 
+    cuiyunhui@bytedance.com, wangkefeng.wang@huawei.com, qiaozhe@iscas.ac.cn, 
+    ardb@kernel.org, ast@kernel.org, linux-kernel@vger.kernel.org, 
+    linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+    kvm-riscv@lists.infradead.org, linux-mm@kvack.org, 
+    linux-crypto@vger.kernel.org, bpf@vger.kernel.org, 
+    linux-input@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+    linux-serial@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+    linux-arch@vger.kernel.org, maple-tree@lists.infradead.org, 
+    linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+    linux-atm-general@lists.sourceforge.net, linux-btrfs@vger.kernel.org, 
+    netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+    linux-nfs@vger.kernel.org, linux-sctp@vger.kernel.org, 
+    linux-usb@vger.kernel.org, linux-media@vger.kernel.org
+Subject: Re: [RFC PATCH V3 01/43] rv64ilp32_abi: uapi: Reuse lp64 ABI
+ interface
+In-Reply-To: <20250325121624.523258-2-guoren@kernel.org>
+Message-ID: <0024788o-35r0-73q1-1s54-q564p457q33s@vanv.qr>
+References: <20250325121624.523258-1-guoren@kernel.org> <20250325121624.523258-2-guoren@kernel.org>
+User-Agent: Alpine 2.26 (LSU 649 2022-06-02)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR21MB3437.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0c4630c7-ffd3-49a0-f7c4-08dd6bdb9e4c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Mar 2025 20:28:35.3702
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: bsn9MpCFBhd6P5+BDELUim8VAb24DmhaXkVUwVkfSgcw3pN0SuKrNvgSjerrKo7o+JREpHjoGSLibHPyMF+SiA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL6PEPF0002E785
+Content-Type: text/plain; charset=US-ASCII
 
 
+On Tuesday 2025-03-25 13:15, guoren@kernel.org wrote:
 
-> -----Original Message-----
-> From: Andrew Lunn <andrew@lunn.ch>
-> Sent: Tuesday, March 25, 2025 3:59 PM
-> To: Haiyang Zhang <haiyangz@microsoft.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>; Erni Sri Satya Vennela
-> <ernis@linux.microsoft.com>; KY Srinivasan <kys@microsoft.com>;
-> wei.liu@kernel.org; Dexuan Cui <decui@microsoft.com>;
-> andrew+netdev@lunn.ch; davem@davemloft.net; edumazet@google.com;
-> pabeni@redhat.com; Long Li <longli@microsoft.com>; Konstantin Taranov
-> <kotaranov@microsoft.com>; horms@kernel.org; brett.creeley@amd.com;
-> surenb@google.com; schakrabarti@linux.microsoft.com;
-> kent.overstreet@linux.dev; shradhagupta@linux.microsoft.com;
-> erick.archer@outlook.com; rosenp@gmail.com; linux-hyperv@vger.kernel.org;
-> netdev@vger.kernel.org; linux-kernel@vger.kernel.org; linux-
-> rdma@vger.kernel.org; Paul Rosswurm <paulros@microsoft.com>
-> Subject: Re: [EXTERNAL] Re: [PATCH 2/3] net: mana: Implement
-> set_link_ksettings in ethtool for speed
->=20
-> > This patch is just to support the ethtool option for the speed.
-> > And seems there is no option on ethtool to reset NIC to the default
-> > speed?
->=20
-> There is no such thing as default speed. Speed is either:
->=20
-> 1) Negotiated with the link partner, picking the highest speed link
-> modes both partners support
->=20
-> 2) Forced to a specific speed, based on one of the link modes the
-> interfaces supports.
->=20
-> Since you don't have link modes, you are abusing the API. You should
-> choose a different API which actually fits what you are doing,
-> configuring a leaky bucket shaper.
->=20
+>diff --git a/include/uapi/linux/netfilter/x_tables.h b/include/uapi/linux/netfilter/x_tables.h
+>index 796af83a963a..7e02e34c6fad 100644
+>--- a/include/uapi/linux/netfilter/x_tables.h
+>+++ b/include/uapi/linux/netfilter/x_tables.h
+>@@ -18,7 +18,11 @@ struct xt_entry_match {
+> 			__u8 revision;
+> 		} user;
+> 		struct {
+>+#if __riscv_xlen == 64
+>+			__u64 match_size;
+>+#else
+> 			__u16 match_size;
+>+#endif
+> 
+> 			/* Used inside the kernel */
+> 			struct xt_match *match;
 
-Could you please point us to the interface struct, callback function
-names, and/or docs you are suggesting us to use?
+The __u16 is the common prefix of the union which is exposed to userspace.
+If anything, you need to use __attribute__((aligned(8))) to move
+`match` to a fixed location.
 
-Thanks,
-- Haiyang
+However, that sub-struct is only used inside the kernel and never exposed,
+so the alignment of `match` should not play a role.
 
+Moreover, change from u16 to u64 would break RISC-V Big-Endian. Even if there
+currently is no big-endian variant, let's not introduce such breakage.
+
+
+>--- a/include/uapi/linux/netfilter_ipv4/ip_tables.h
+>+++ b/include/uapi/linux/netfilter_ipv4/ip_tables.h
+>@@ -200,7 +200,14 @@ struct ipt_replace {
+> 	/* Number of counters (must be equal to current number of entries). */
+> 	unsigned int num_counters;
+> 	/* The old entries' counters. */
+>+#if __riscv_xlen == 64
+>+	union {
+>+		struct xt_counters __user *counters;
+>+		__u64 __counters;
+>+	};
+>+#else
+> 	struct xt_counters __user *counters;
+>+#endif
+> 
+> 	/* The entries (hang off end: not really an array). */
+> 	struct ipt_entry entries[];
+
+This seems ok, but perhaps there is a better name for __riscv_xlen (ifdef
+CONFIG_????ilp32), so it is not strictly tied to riscv,
+in case other platform wants to try ilp32-self mode.
+
+>+#if __riscv_xlen == 64
+>+	union {
+>+		int __user *auth_flavours;		/* 1 */
+>+		__u64 __auth_flavours;
+>+	};
+>+#else
+> 	int __user *auth_flavours;		/* 1 */
+>+#endif
+> };
+> 
+> /* bits in the flags field */
+>diff --git a/include/uapi/linux/ppp-ioctl.h b/include/uapi/linux/ppp-ioctl.h
+>index 1cc5ce0ae062..8d48eab430c1 100644
+>--- a/include/uapi/linux/ppp-ioctl.h
+>+++ b/include/uapi/linux/ppp-ioctl.h
+>@@ -59,7 +59,14 @@ struct npioctl {
+> 
+> /* Structure describing a CCP configuration option, for PPPIOCSCOMPRESS */
+> struct ppp_option_data {
+>+#if __riscv_xlen == 64
+>+	union {
+>+		__u8	__user *ptr;
+>+		__u64	__ptr;
+>+	};
+>+#else
+> 	__u8	__user *ptr;
+>+#endif
+> 	__u32	length;
+> 	int	transmit;
+> };
+>diff --git a/include/uapi/linux/sctp.h b/include/uapi/linux/sctp.h
+>index b7d91d4cf0db..46a06fddcd2f 100644
+>--- a/include/uapi/linux/sctp.h
+>+++ b/include/uapi/linux/sctp.h
+>@@ -1024,6 +1024,9 @@ struct sctp_getaddrs_old {
+> #else
+> 	struct sockaddr		*addrs;
+> #endif
+>+#if (__riscv_xlen == 64) && (__SIZEOF_LONG__ == 4)
+>+	__u32			unused;
+>+#endif
+> };
+
+
+> 
+> struct sctp_getaddrs {
+>diff --git a/include/uapi/linux/sem.h b/include/uapi/linux/sem.h
+>index 75aa3b273cd9..de9f441913cd 100644
+>--- a/include/uapi/linux/sem.h
+>+++ b/include/uapi/linux/sem.h
+>@@ -26,10 +26,29 @@ struct semid_ds {
+> 	struct ipc_perm	sem_perm;		/* permissions .. see ipc.h */
+> 	__kernel_old_time_t sem_otime;		/* last semop time */
+> 	__kernel_old_time_t sem_ctime;		/* create/last semctl() time */
+>+#if __riscv_xlen == 64
+>+	union {
+>+		struct sem	*sem_base;		/* ptr to first semaphore in array */
+>+		__u64 __sem_base;
+>+	};
+>+	union {
+>+		struct sem_queue *sem_pending;		/* pending operations to be processed */
+>+		__u64 __sem_pending;
+>+	};
+>+	union {
+>+		struct sem_queue **sem_pending_last;	/* last pending operation */
+>+		__u64 __sem_pending_last;
+>+	};
+>+	union {
+>+		struct sem_undo	*undo;			/* undo requests on this array */
+>+		__u64 __undo;
+>+	};
+>+#else
+> 	struct sem	*sem_base;		/* ptr to first semaphore in array */
+> 	struct sem_queue *sem_pending;		/* pending operations to be processed */
+> 	struct sem_queue **sem_pending_last;	/* last pending operation */
+> 	struct sem_undo	*undo;			/* undo requests on this array */
+>+#endif
+> 	unsigned short	sem_nsems;		/* no. of semaphores in array */
+> };
+> 
+>@@ -46,10 +65,29 @@ struct sembuf {
+> /* arg for semctl system calls. */
+> union semun {
+> 	int val;			/* value for SETVAL */
+>+#if __riscv_xlen == 64
+>+	union {
+>+		struct semid_ds __user *buf;	/* buffer for IPC_STAT & IPC_SET */
+>+		__u64 ___buf;
+>+	};
+>+	union {
+>+		unsigned short __user *array;	/* array for GETALL & SETALL */
+>+		__u64 __array;
+>+	};
+>+	union {
+>+		struct seminfo __user *__buf;	/* buffer for IPC_INFO */
+>+		__u64 ____buf;
+>+	};
+>+	union {
+>+		void __user *__pad;
+>+		__u64 ____pad;
+>+	};
+>+#else
+> 	struct semid_ds __user *buf;	/* buffer for IPC_STAT & IPC_SET */
+> 	unsigned short __user *array;	/* array for GETALL & SETALL */
+> 	struct seminfo __user *__buf;	/* buffer for IPC_INFO */
+> 	void __user *__pad;
+>+#endif
+> };
+> 
+> struct  seminfo {
+>diff --git a/include/uapi/linux/socket.h b/include/uapi/linux/socket.h
+>index d3fcd3b5ec53..5f7a83649395 100644
+>--- a/include/uapi/linux/socket.h
+>+++ b/include/uapi/linux/socket.h
+>@@ -22,7 +22,14 @@ struct __kernel_sockaddr_storage {
+> 				/* space to achieve desired size, */
+> 				/* _SS_MAXSIZE value minus size of ss_family */
+> 		};
+>+#if __riscv_xlen == 64
+>+		union {
+>+			void *__align; /* implementation specific desired alignment */
+>+			u64 ___align;
+>+		};
+>+#else
+> 		void *__align; /* implementation specific desired alignment */
+>+#endif
+> 	};
+> };
+> 
+>diff --git a/include/uapi/linux/sysctl.h b/include/uapi/linux/sysctl.h
+>index 8981f00204db..8ed7b29897f9 100644
+>--- a/include/uapi/linux/sysctl.h
+>+++ b/include/uapi/linux/sysctl.h
+>@@ -33,13 +33,45 @@
+> 				   member of a struct __sysctl_args to have? */
+> 
+> struct __sysctl_args {
+>+#if __riscv_xlen == 64
+>+	union {
+>+		int __user *name;
+>+		__u64 __name;
+>+	};
+>+#else
+> 	int __user *name;
+>+#endif
+> 	int nlen;
+>+#if __riscv_xlen == 64
+>+	union {
+>+		void __user *oldval;
+>+		__u64 __oldval;
+>+	};
+>+#else
+> 	void __user *oldval;
+>+#endif
+>+#if __riscv_xlen == 64
+>+	union {
+>+		size_t __user *oldlenp;
+>+		__u64 __oldlenp;
+>+	};
+>+#else
+> 	size_t __user *oldlenp;
+>+#endif
+>+#if __riscv_xlen == 64
+>+	union {
+>+		void __user *newval;
+>+		__u64 __newval;
+>+	};
+>+#else
+> 	void __user *newval;
+>+#endif
+> 	size_t newlen;
+>+#if __riscv_xlen == 64
+>+	unsigned long long __unused[4];
+>+#else
+> 	unsigned long __unused[4];
+>+#endif
+> };
+> 
+> /* Define sysctl names first */
+>diff --git a/include/uapi/linux/uhid.h b/include/uapi/linux/uhid.h
+>index cef7534d2d19..4a774dbd3de8 100644
+>--- a/include/uapi/linux/uhid.h
+>+++ b/include/uapi/linux/uhid.h
+>@@ -130,7 +130,14 @@ struct uhid_create_req {
+> 	__u8 name[128];
+> 	__u8 phys[64];
+> 	__u8 uniq[64];
+>+#if __riscv_xlen == 64
+>+	union {
+>+		__u8 __user *rd_data;
+>+		__u64 __rd_data;
+>+	};
+>+#else
+> 	__u8 __user *rd_data;
+>+#endif
+> 	__u16 rd_size;
+> 
+> 	__u16 bus;
+>diff --git a/include/uapi/linux/uio.h b/include/uapi/linux/uio.h
+>index 649739e0c404..27dfd6032dc6 100644
+>--- a/include/uapi/linux/uio.h
+>+++ b/include/uapi/linux/uio.h
+>@@ -16,8 +16,19 @@
+> 
+> struct iovec
+> {
+>+#if __riscv_xlen == 64
+>+	union {
+>+		void __user *iov_base;	/* BSD uses caddr_t (1003.1g requires void *) */
+>+		__u64 __iov_base;
+>+	};
+>+	union {
+>+		__kernel_size_t iov_len; /* Must be size_t (1003.1g) */
+>+		__u64 __iov_len;
+>+	};
+>+#else
+> 	void __user *iov_base;	/* BSD uses caddr_t (1003.1g requires void *) */
+> 	__kernel_size_t iov_len; /* Must be size_t (1003.1g) */
+>+#endif
+> };
+> 
+> struct dmabuf_cmsg {
+>diff --git a/include/uapi/linux/usb/tmc.h b/include/uapi/linux/usb/tmc.h
+>index d791cc58a7f0..443ec5356caf 100644
+>--- a/include/uapi/linux/usb/tmc.h
+>+++ b/include/uapi/linux/usb/tmc.h
+>@@ -51,7 +51,14 @@ struct usbtmc_request {
+> 
+> struct usbtmc_ctrlrequest {
+> 	struct usbtmc_request req;
+>+#if __riscv_xlen == 64
+>+	union {
+>+		void __user *data; /* pointer to user space */
+>+		__u64 __data; /* pointer to user space */
+>+	};
+>+#else
+> 	void __user *data; /* pointer to user space */
+>+#endif
+> } __attribute__ ((packed));
+> 
+> struct usbtmc_termchar {
+>@@ -70,7 +77,14 @@ struct usbtmc_message {
+> 	__u32 transfer_size; /* size of bytes to transfer */
+> 	__u32 transferred; /* size of received/written bytes */
+> 	__u32 flags; /* bit 0: 0 = synchronous; 1 = asynchronous */
+>+#if __riscv_xlen == 64
+>+	union {
+>+		void __user *message; /* pointer to header and data in user space */
+>+		__u64 __message;
+>+	};
+>+#else
+> 	void __user *message; /* pointer to header and data in user space */
+>+#endif
+> } __attribute__ ((packed));
+> 
+> /* Request values for USBTMC driver's ioctl entry point */
+>diff --git a/include/uapi/linux/usbdevice_fs.h b/include/uapi/linux/usbdevice_fs.h
+>index 74a84e02422a..8c8efef74c3c 100644
+>--- a/include/uapi/linux/usbdevice_fs.h
+>+++ b/include/uapi/linux/usbdevice_fs.h
+>@@ -44,14 +44,28 @@ struct usbdevfs_ctrltransfer {
+> 	__u16 wIndex;
+> 	__u16 wLength;
+> 	__u32 timeout;  /* in milliseconds */
+>+#if __riscv_xlen == 64
+>+	union {
+>+		void __user *data;
+>+		__u64 __data;
+>+	};
+>+#else
+>  	void __user *data;
+>+#endif
+> };
+> 
+> struct usbdevfs_bulktransfer {
+> 	unsigned int ep;
+> 	unsigned int len;
+> 	unsigned int timeout; /* in milliseconds */
+>+#if __riscv_xlen == 64
+>+	union {
+>+		void __user *data;
+>+		__u64 __data;
+>+	};
+>+#else
+> 	void __user *data;
+>+#endif
+> };
+> 
+> struct usbdevfs_setinterface {
+>@@ -61,7 +75,14 @@ struct usbdevfs_setinterface {
+> 
+> struct usbdevfs_disconnectsignal {
+> 	unsigned int signr;
+>+#if __riscv_xlen == 64
+>+	union {
+>+		void __user *context;
+>+		__u64 __context;
+>+	};
+>+#else
+> 	void __user *context;
+>+#endif
+> };
+> 
+> #define USBDEVFS_MAXDRIVERNAME 255
+>@@ -119,7 +140,14 @@ struct usbdevfs_urb {
+> 	unsigned char endpoint;
+> 	int status;
+> 	unsigned int flags;
+>+#if __riscv_xlen == 64
+>+	union {
+>+		void __user *buffer;
+>+		__u64 __buffer;
+>+	};
+>+#else
+> 	void __user *buffer;
+>+#endif
+> 	int buffer_length;
+> 	int actual_length;
+> 	int start_frame;
+>@@ -130,7 +158,14 @@ struct usbdevfs_urb {
+> 	int error_count;
+> 	unsigned int signr;	/* signal to be sent on completion,
+> 				  or 0 if none should be sent. */
+>+#if __riscv_xlen == 64
+>+	union {
+>+		void __user *usercontext;
+>+		__u64 __usercontext;
+>+	};
+>+#else
+> 	void __user *usercontext;
+>+#endif
+> 	struct usbdevfs_iso_packet_desc iso_frame_desc[];
+> };
+> 
+>@@ -139,7 +174,14 @@ struct usbdevfs_ioctl {
+> 	int	ifno;		/* interface 0..N ; negative numbers reserved */
+> 	int	ioctl_code;	/* MUST encode size + direction of data so the
+> 				 * macros in <asm/ioctl.h> give correct values */
+>+#if __riscv_xlen == 64
+>+	union {
+>+		void __user *data;	/* param buffer (in, or out) */
+>+		__u64 __pad;
+>+	};
+>+#else
+> 	void __user *data;	/* param buffer (in, or out) */
+>+#endif
+> };
+> 
+> /* You can do most things with hubs just through control messages,
+>@@ -195,9 +237,17 @@ struct usbdevfs_streams {
+> #define USBDEVFS_SUBMITURB         _IOR('U', 10, struct usbdevfs_urb)
+> #define USBDEVFS_SUBMITURB32       _IOR('U', 10, struct usbdevfs_urb32)
+> #define USBDEVFS_DISCARDURB        _IO('U', 11)
+>+#if __riscv_xlen == 64
+>+#define USBDEVFS_REAPURB           _IOW('U', 12, __u64)
+>+#else
+> #define USBDEVFS_REAPURB           _IOW('U', 12, void *)
+>+#endif
+> #define USBDEVFS_REAPURB32         _IOW('U', 12, __u32)
+>+#if __riscv_xlen == 64
+>+#define USBDEVFS_REAPURBNDELAY     _IOW('U', 13, __u64)
+>+#else
+> #define USBDEVFS_REAPURBNDELAY     _IOW('U', 13, void *)
+>+#endif
+> #define USBDEVFS_REAPURBNDELAY32   _IOW('U', 13, __u32)
+> #define USBDEVFS_DISCSIGNAL        _IOR('U', 14, struct usbdevfs_disconnectsignal)
+> #define USBDEVFS_DISCSIGNAL32      _IOR('U', 14, struct usbdevfs_disconnectsignal32)
+>diff --git a/include/uapi/linux/uvcvideo.h b/include/uapi/linux/uvcvideo.h
+>index f86185456dc5..3ccb99039a43 100644
+>--- a/include/uapi/linux/uvcvideo.h
+>+++ b/include/uapi/linux/uvcvideo.h
+>@@ -54,7 +54,14 @@ struct uvc_xu_control_mapping {
+> 	__u32 v4l2_type;
+> 	__u32 data_type;
+> 
+>+#if __riscv_xlen == 64
+>+	union {
+>+		struct uvc_menu_info __user *menu_info;
+>+		__u64 __menu_info;
+>+	};
+>+#else
+> 	struct uvc_menu_info __user *menu_info;
+>+#endif
+> 	__u32 menu_count;
+> 
+> 	__u32 reserved[4];
+>@@ -66,7 +73,14 @@ struct uvc_xu_control_query {
+> 	__u8 query;		/* Video Class-Specific Request Code, */
+> 				/* defined in linux/usb/video.h A.8.  */
+> 	__u16 size;
+>+#if __riscv_xlen == 64
+>+	union {
+>+		__u8 __user *data;
+>+		__u64 __data;
+>+	};
+>+#else
+> 	__u8 __user *data;
+>+#endif
+> };
+> 
+> #define UVCIOC_CTRL_MAP		_IOWR('u', 0x20, struct uvc_xu_control_mapping)
+>diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+>index c8dbf8219c4f..0a1dc2a780fb 100644
+>--- a/include/uapi/linux/vfio.h
+>+++ b/include/uapi/linux/vfio.h
+>@@ -1570,7 +1570,14 @@ struct vfio_iommu_type1_dma_map {
+> struct vfio_bitmap {
+> 	__u64        pgsize;	/* page size for bitmap in bytes */
+> 	__u64        size;	/* in bytes */
+>+	#if __riscv_xlen == 64
+>+	union {
+>+		__u64 __user *data;	/* one bit per page */
+>+		__u64 __data;
+>+	};
+>+	#else
+> 	__u64 __user *data;	/* one bit per page */
+>+	#endif
+> };
+> 
+> /**
+>diff --git a/include/uapi/linux/videodev2.h b/include/uapi/linux/videodev2.h
+>index e7c4dce39007..8e5391f07626 100644
+>--- a/include/uapi/linux/videodev2.h
+>+++ b/include/uapi/linux/videodev2.h
+>@@ -1898,7 +1898,14 @@ struct v4l2_ext_controls {
+> 	__u32 error_idx;
+> 	__s32 request_fd;
+> 	__u32 reserved[1];
+>+#if __riscv_xlen == 64
+>+	union {
+>+		struct v4l2_ext_control *controls;
+>+		__u64 __controls;
+>+	};
+>+#else
+> 	struct v4l2_ext_control *controls;
+>+#endif
+> };
+> 
+> #define V4L2_CTRL_ID_MASK	  (0x0fffffff)
+>-- 
+>2.40.1
+>
+>
 
