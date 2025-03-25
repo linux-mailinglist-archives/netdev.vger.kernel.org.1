@@ -1,95 +1,108 @@
-Return-Path: <netdev+bounces-177526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8B24A7073D
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 17:44:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E182BA7074C
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 17:47:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C9BE3B463B
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 16:39:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EB3C3A4F04
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 16:43:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E37525E445;
-	Tue, 25 Mar 2025 16:40:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2426525DD07;
+	Tue, 25 Mar 2025 16:43:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J2yMsc99"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ke2EYGto"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D8D25DD12;
-	Tue, 25 Mar 2025 16:39:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815E625DCFA;
+	Tue, 25 Mar 2025 16:43:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742920800; cv=none; b=oUZOh7v8apTSljQYVZa8MgrcqwxNYBYcHNhtbhZEmahGJVTuLkb8DdLGAyYBsiUew9lnHfs6399enDPebXX8sIitccN5J/eWDsO+is+pb4as/WMUzxwL6OW/2ehoz/y20Mxo/Pp828xEqcjAhUPM4npoNt3E+/dcsLzSCvwMxnw=
+	t=1742921015; cv=none; b=L8l4h3SlGEpnlpshRBVG510EREMQT0EkCYt+IfvsiK667jGeXkqcc74akYpvx5Sxdq5rcFLI0VPv+JY3N9USsqtJxOiAJH2nHVkERhrrHe8R/3oxRNT9o3EbNANBqn6nCAq3T4C0ziIEeKjG7UnitQq/mbPoXAT9FNqCvJM+Pa4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742920800; c=relaxed/simple;
-	bh=NK1dlf8+8S3DrDw4WsveBGEmoi51gHV1zyG163bVKik=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DbcTu1AYXjFjNJm7Fo7czMiHNW4samwU9Sb9Dml41UtyRpM8UusihLwcXLZgqORLxUHOZErQXOdza5blwXe2tyL0mhTfkmMZtieZiyFbH0J5lM4YfJzi5hikI8BnGdqmkFN5Xe2WhtEAJWfDW3ZgtsfaTLd9A3doFUTcn8FmW7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J2yMsc99; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AEDFC4CEEA;
-	Tue, 25 Mar 2025 16:39:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742920799;
-	bh=NK1dlf8+8S3DrDw4WsveBGEmoi51gHV1zyG163bVKik=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=J2yMsc99AnqvdSenxe6ZwgbBNzbFfdGbEIxip5DysWJhEvXcPJjl4Z4ixHmAPTXMj
-	 Z0REwDPjKnwQD8lRapbTnv6WVV17807KkKmWTuXF51DsZDwYpFDiw7/I2KOsKhfYiJ
-	 4VLlXpxTWAr+lOMffvH0gzukItq5aG8MqQBS535JFRYmHbHCzeNkEp/k6RuQhrc99e
-	 +6O/zWa+mczzgzkiUYSkcwY35EqhlHRdLF6U0m2jOayvgW9NSaLj0p83I1KNXFbMSF
-	 YK28dbo0GGuQ/4YL2q9ezgDHN6fOdbvEVORbw0Elq3bzwcio0j4zP3Tg/VKugzn25S
-	 qcih1BFY7ShQg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAFFE380CFE7;
-	Tue, 25 Mar 2025 16:40:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1742921015; c=relaxed/simple;
+	bh=drMQDkgJmMbLDEmO3efWQL4mfA24GQIsptNGl51WiYQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aQoDwleDkSFuzYaEdFQjXKg4j5vIbQ/hsAPXEqE1a4v7ENWN/SR962lSW1WvyfZVDs+5JIYtc4ERkTaJE03kFfsdRkKa45mb5u2BKJ33yMEK9wrrgE30FnK8V+BvGLGrgyRVh6AZ6vFgMQePFv3C6sDab4g8vL+pYRBHtFpu+RQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ke2EYGto; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=5OahHluwUaYB0aciGU0SrFW4AnlsngHJ7Cwk3N7UL/0=; b=ke2EYGtoThSJpmkggihm8mOUMR
+	bU/dq43rafiwb8Su+ZBsA3suIQQvmQzOLmqjGkCukrZQbtez1c6ndU75o7nIFo2iRdk2hU37q4Q15
+	NVLhAsKOk3pqw+sGtLMKmLVLDUnDRrXScQZDHHFyeSrTsxOx6QVcD5xL3FvZaPrHrvYA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tx7Mx-00754F-Ms; Tue, 25 Mar 2025 17:43:15 +0100
+Date: Tue, 25 Mar 2025 17:43:15 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+	brett.creeley@amd.com, surenb@google.com,
+	schakrabarti@linux.microsoft.com, kent.overstreet@linux.dev,
+	shradhagupta@linux.microsoft.com, erick.archer@outlook.com,
+	rosenp@gmail.com, linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: Re: [PATCH 1/3] net: mana: Add speed support in
+ mana_get_link_ksettings
+Message-ID: <dcfd3551-acfc-4de3-b5c1-cf8a18730ad0@lunn.ch>
+References: <1742473341-15262-1-git-send-email-ernis@linux.microsoft.com>
+ <1742473341-15262-2-git-send-email-ernis@linux.microsoft.com>
+ <f4e84b99-53b5-455d-bad2-ef638cafdeae@lunn.ch>
+ <20250324174339.GA29274@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <909eae34-02ac-4acd-8f0e-1194f0049a21@lunn.ch>
+ <20250325162527.GA23398@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] octeontx2-af: mcs: Remove redundant
- 'flush_workqueue()' calls
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174292083576.643641.11253209858522638305.git-patchwork-notify@kernel.org>
-Date: Tue, 25 Mar 2025 16:40:35 +0000
-References: <20250324080854.408188-1-nichen@iscas.ac.cn>
-In-Reply-To: <20250324080854.408188-1-nichen@iscas.ac.cn>
-To: Chen Ni <nichen@iscas.ac.cn>
-Cc: sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
- jerinj@marvell.com, hkelam@marvell.com, sbhatta@marvell.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250325162527.GA23398@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 
-Hello:
+> The QoS control is at the hardware/firmware level and applies to the
+> egress rate.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+egress relative to the VM? So what the VM sends to the hypervisor.
+There is no restriction the other way, hypervisor to the VM?
 
-On Mon, 24 Mar 2025 16:08:54 +0800 you wrote:
-> 'destroy_workqueue()' already drains the queue before destroying it, so
-> there is no need to flush it explicitly.
-> 
-> Remove the redundant 'flush_workqueue()' calls.
-> 
-> This was generated with coccinelle:
-> 
-> [...]
+That is not what link modes do. 10Mbps is the limit in both
+directions.
 
-Here is the summary with links:
-  - [net-next] octeontx2-af: mcs: Remove redundant 'flush_workqueue()' calls
-    https://git.kernel.org/netdev/net-next/c/b2d1e4c2cb8a
+> > Also, if i understand correctly MANA is a virtual device and this is
+> > the VM side of it. If this is used for bandwidth limitation, why is
+> > the VM controlling this, not the hypervisor? What is the security
+> > model?
+> > 
+> In certain cluster and hardware versions, Azure allows this API to
+> restrict the bandwidth limit to a lesser value than what was configured
+> by the Azure control plane. The device will not allow a higher limit
+> than what was configured through the Azure control plane to be set by
+> the VM through this API.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+So all this information needs adding to the commit message. When you
+are using an API in a strange way, you have to expect questions to be
+asked, and you can save a lot of time by answering those questions in
+the commit message, before they are even asked.
 
+So, i think this is the wrong API.
 
+Please implement it as a TC offload. I'm not an TC expert, but htb
+might work.
+
+	Andrew
 
