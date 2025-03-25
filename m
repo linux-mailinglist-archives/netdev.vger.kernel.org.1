@@ -1,163 +1,113 @@
-Return-Path: <netdev+bounces-177311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FA9BA6EE2A
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 11:47:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95DC9A6EE57
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:01:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D7B9169C8D
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 10:47:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9526D188D5AD
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 11:00:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBCAF1F0E38;
-	Tue, 25 Mar 2025 10:46:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD6451C84A7;
+	Tue, 25 Mar 2025 11:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bwv2jgic"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="liVmaXlJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B07AA1C5D50;
-	Tue, 25 Mar 2025 10:46:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE322E3378;
+	Tue, 25 Mar 2025 11:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742899613; cv=none; b=jOdAGbCPTlJ8us7n3aq7HuCvzKNCcz4E5aF413O+E7SS6QjGBsEllaW6d1Gk+aGR2ymlgp9iaV+NvguYB5oaVDUq+Vl6VB0H/MTSO85AE7e2cjoelul0tdrndvp8cqK8HTvZg9KAm6b/eNOQuhyPVHhJwr4Z2gqwaUQH+GVHPBI=
+	t=1742900430; cv=none; b=KjxIA8lfCtkH9hu+9vYkrlFK8gyoMWoCntL4vCidFoZjF4GAoqEXkcB7XjQw/3I1EYwqSUYTa2t6FD5mpf/AjyW/F3zyIdR/F4/4XjeQ6wTkQIe//DuLvsfGKU8PIUyGoM0wSlSY4DQXG5Iv/es3Z0cRjLtPbk9dcgsngG/NA1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742899613; c=relaxed/simple;
-	bh=rqVeZKTsfR1Mw1ipXxcLoywYP3wysPSlC0jiSRkwu8w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L6CW0uLKRxyropIuMdJRG8iWU+xQt2Ui5tbO1GyOeIMAhhve7nn1h6dYAkNkhlx7u/F6qTxybifobFwzWXdQfsQTnaEzlpH04ib6uKY/wo4gPoaIgDD4OTDEyIpUBmgzDHaQ5woshJXEOS1+ZBr8u5eA647F/SWcmUnvUrycTfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bwv2jgic; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FD19C4CEE4;
-	Tue, 25 Mar 2025 10:46:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742899613;
-	bh=rqVeZKTsfR1Mw1ipXxcLoywYP3wysPSlC0jiSRkwu8w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bwv2jgicOKrT+0/PuMPF9JVYRWhWGnsPdExi0sLbALZIYWOLLSxskxBDkhsla5GyA
-	 EZMfb6D7WzVC2jaW5kDfwAXdNjd0dJ3LOwan4R9/mTR6jnpoOK9604glTKzGVKbedS
-	 zfjm6MsenHiUa+rXgA+Wva5BpGOQWSdN8UYH1nd2hR+1MnSb+YtlZYmLAXxdQfkbT1
-	 uGyZLOKh2xC3wLlmMOkZLkDAJEQAXwZ7tD1qOKrhL6SU2wlny48gLCy3GFAZ+Y6Jsi
-	 ED4DquLSM8QnZIj23rLbtF/0AQNUtkkmmR09IrclOq4rzrKxeUrQj4zx3PcWjlStsa
-	 afECIgclpRrwg==
-Date: Tue, 25 Mar 2025 03:46:41 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Gur Stavi <gur.stavi@huawei.com>
-Cc: Fan Gong <gongfan1@huawei.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Lee Trager
- <lee@trager.us>, <linux-doc@vger.kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, Bjorn Helgaas <helgaas@kernel.org>, Cai Huoqing
- <cai.huoqing@linux.dev>, luosifu <luosifu@huawei.com>, Xin Guo
- <guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>, Zhou
- Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
- <shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>, Suman Ghosh
- <sumang@marvell.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, Joe
- Damato <jdamato@fastly.com>
-Subject: Re: [PATCH net-next v09 1/1] hinic3: module initialization and
- tx/rx logic
-Message-ID: <20250325034641.65536e13@kernel.org>
-In-Reply-To: <60a3c7b146920eee8b15464e0b0d1ea35db0b30e.1742202778.git.gur.stavi@huawei.com>
-References: <cover.1742202778.git.gur.stavi@huawei.com>
-	<60a3c7b146920eee8b15464e0b0d1ea35db0b30e.1742202778.git.gur.stavi@huawei.com>
+	s=arc-20240116; t=1742900430; c=relaxed/simple;
+	bh=phowVCc4uTjG/AswATQd9ZKQuxqVfWCIa0kdrQaIi0I=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=e/5+aFK6BtehCMFLFPAkSH6DeMU7naB6wF0g3SsTNAh4EqAsY0yMYvOuQ2MX4LFOz/yQgEXQ/gNODq9VTGzRU8G6kQ9u/9phZdKQCZbxgg378LwQt0uSbjQj9N0gyRB6HmdNd9SgGlBX1XYu5/a2dexkKTXmmGE4hD+KGJbR0Dc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=liVmaXlJ; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1742900428; x=1774436428;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=phowVCc4uTjG/AswATQd9ZKQuxqVfWCIa0kdrQaIi0I=;
+  b=liVmaXlJL49FLenH8rZuetx7ONNZqCQrsHbh9Tf9deU8VXPs0NXtPLSf
+   whcB4xaiistSYWjjsP9v0LR3JsSmJtLyd1bD1dHldshAO+3cavbS2S7PX
+   pW7t1cY3eaQt5Fe7ZuAsRUijX331vfGrfebik8nmvpHLeInvXN/RcQ4Zg
+   8Lm+ZO0J7zjDnMbNRcFK0PF5xba0R49b9HBEIraF1ekIyLY1pdq9NAHKh
+   8kfg57Ibqh6sd5xXR9CO63fm/or/CHmVu/ekFXt16Kfl1tzwFxmj8fOAA
+   7v+hM6zPkSvWE2dtqt+bA6vgtumntI6OWy3+3P2zdNRVkHhcUnQFYLPTP
+   g==;
+X-CSE-ConnectionGUID: QCM7Q2TFRhOTjnxaI+S+Ng==
+X-CSE-MsgGUID: YxEN5IEmSd2KEJ+Bkl5RiA==
+X-IronPort-AV: E=Sophos;i="6.14,274,1736838000"; 
+   d="scan'208";a="271054509"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Mar 2025 04:00:21 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Tue, 25 Mar 2025 04:00:01 -0700
+Received: from che-ld-unglab06.microchip.com (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.44 via Frontend Transport; Tue, 25 Mar 2025 03:59:58 -0700
+From: Thangaraj Samynathan <thangaraj.s@microchip.com>
+To: <netdev@vger.kernel.org>
+CC: <bryan.whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH net v2] net: ethernet: microchip: lan743x: Fix memory allocation failure
+Date: Tue, 25 Mar 2025 16:26:53 +0530
+Message-ID: <20250325105653.6607-1-thangaraj.s@microchip.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Mon, 17 Mar 2025 11:40:39 +0200 Gur Stavi wrote:
-> +static int hinic3_poll(struct napi_struct *napi, int budget)
-> +{
-> +	struct hinic3_irq_cfg *irq_cfg =
-> +		container_of(napi, struct hinic3_irq_cfg, napi);
-> +	struct hinic3_nic_dev *nic_dev;
-> +	int tx_pkts, rx_pkts;
-> +
-> +	nic_dev = netdev_priv(irq_cfg->netdev);
-> +	rx_pkts = hinic3_rx_poll(irq_cfg->rxq, budget);
-> +
-> +	tx_pkts = hinic3_tx_poll(irq_cfg->txq, budget);
+The driver allocates ring elements using GFP_DMA flags. There is
+no dependency from LAN743x hardware on memory allocation should be
+in DMA_ZONE. Hence modifying the flags to use only GFP_ATOMIC
 
-You should service Tx first, it frees skbs into a cache which Rx 
-can then use, while they are hopefully still cache-warm.
+Fixes: e8684db191e4 ("net: ethernet: microchip: lan743x: Fix skb allocation failure")
+Signed-off-by: Thangaraj Samynathan <thangaraj.s@microchip.com>
+---
+v0
+-Initial Commit
 
-> +	if (tx_pkts >= budget || rx_pkts >= budget)
-> +		return budget;
-> +
-> +	napi_complete(napi);
+v1
+-Modified GFP flags from GFP_KERNEL to GFP_ATOMIC
+-added fixes tag
 
-Please use napi_complete_done().
+---
+ drivers/net/ethernet/microchip/lan743x_main.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-> +	hinic3_set_msix_state(nic_dev->hwdev, irq_cfg->msix_entry_idx,
-> +			      HINIC3_MSIX_ENABLE);
-> +
-> +	return max(tx_pkts, rx_pkts);
-> +}
-
-> +static int hinic3_nic_probe(struct auxiliary_device *adev,
-> +			    const struct auxiliary_device_id *id)
-
-> +	err = register_netdev(netdev);
-> +	if (err)
-> +		goto err_register_netdev;
-> +
-> +	netif_carrier_off(netdev);
-
-You should carrier_off before you register
-
-> +	err = pci_enable_device(pdev);
-> +	if (err) {
-> +		dev_err(&pdev->dev, "Failed to enable PCI device\n");
-> +		goto err_pci_enable;
-> +	}
-> +
-> +	err = pci_request_regions(pdev, HINIC3_NIC_DRV_NAME);
-> +	if (err) {
-> +		dev_err(&pdev->dev, "Failed to request regions\n");
-> +		goto err_pci_regions;
-> +	}
-> +
-> +	pci_set_master(pdev);
-> +
-> +	err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
-> +	if (err) {
-> +		dev_warn(&pdev->dev, "Couldn't set 64-bit DMA mask\n");
-> +		/* try 32 bit DMA mask if 64 bit fails */
-> +		err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
-> +		if (err) {
-> +			dev_err(&pdev->dev, "Failed to set DMA mask\n");
-> +			goto err_dma_mask;
-> +		}
-> +	}
-> +
-> +	return 0;
-> +
-> +err_dma_mask:
-> +	pci_clear_master(pdev);
-> +	pci_release_regions(pdev);
-> +
-> +err_pci_regions:
-> +	pci_disable_device(pdev);
-> +
-> +err_pci_enable:
-> +	pci_set_drvdata(pdev, NULL);
-> +	mutex_destroy(&pci_adapter->pdev_mutex);
-> +	kfree(pci_adapter);
-
-Please name the error labels after the target, not the source.
-
-Quoting documentation:
-
-  Choose label names which say what the goto does or why the goto exists.  An
-  example of a good name could be ``out_free_buffer:`` if the goto frees ``buffer``.
-
-See: https://www.kernel.org/doc/html/next/process/coding-style.html#centralized-exiting-of-functions
+diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
+index 23760b613d3e..8b6b9b6efe18 100644
+--- a/drivers/net/ethernet/microchip/lan743x_main.c
++++ b/drivers/net/ethernet/microchip/lan743x_main.c
+@@ -2495,8 +2495,7 @@ static int lan743x_rx_process_buffer(struct lan743x_rx *rx)
+ 
+ 	/* save existing skb, allocate new skb and map to dma */
+ 	skb = buffer_info->skb;
+-	if (lan743x_rx_init_ring_element(rx, rx->last_head,
+-					 GFP_ATOMIC | GFP_DMA)) {
++	if (lan743x_rx_init_ring_element(rx, rx->last_head, GFP_ATOMIC)) {
+ 		/* failed to allocate next skb.
+ 		 * Memory is very low.
+ 		 * Drop this packet and reuse buffer.
 -- 
-pw-bot: cr
+2.25.1
+
 
