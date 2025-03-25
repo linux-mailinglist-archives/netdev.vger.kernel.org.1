@@ -1,157 +1,127 @@
-Return-Path: <netdev+bounces-177646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCF0FA70DC9
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 00:55:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2146A70DD7
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 00:57:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2231E7A6E78
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 23:53:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73A2E177FDE
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 23:57:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 437F8269D1D;
-	Tue, 25 Mar 2025 23:54:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C42F26A084;
+	Tue, 25 Mar 2025 23:57:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bF6cOrUD"
+	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="j3i+yTRJ";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="MVc27JQa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F97E1991D2;
-	Tue, 25 Mar 2025 23:54:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C1EC19067C;
+	Tue, 25 Mar 2025 23:57:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742946894; cv=none; b=Iwajw/j5Dz1xrRSXhoeFsgwafdW2S7bSuoIQVa5dTF5x7agtuUPAgOSlWxJ7q9K/d/YkmzBq+dgSg7N8gqlDwzoc3fSHTrX6vCTsgSNGJZS/lfJn18I+Vmgta5V+/ZNIJUpi3hn7Ya2PHWn6xc1uDJwhnAROVS4+8/UPGAwmQT0=
+	t=1742947053; cv=none; b=GOXQcBli8SKxUEKaAujwtudC6n1rTSFIAhX2Vr4+B1N0V0oZE7NiXtkBZfbkuapozKu421ae0J9I7JW4V5yTFIUtLBKQxaYWsgBrd4l6++YznczO5Q5m7J15HuLk8j3wTibmL3zB42Wy3nM9B4AFDR6y6F2CHnbw8vwCMfXAbHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742946894; c=relaxed/simple;
-	bh=6UqvdtaSd9bhr0j5Ur9aT8CLuyVb17CgSPoBEK250RA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XrDyPAkIe11Vu7xfKU51oQPFd/4sTGBTepCOx+bQsJUGr3SAic+OG2tNlZmqGvhfj6kIUHcIfkmqgpgYvSooBsomypGn+UbDRC54xjTki4p0g7Bs/m4qfE2OlzctSlJzw3m42ExXWfLuvI5H6zozHREG4LraundhfY4GdR5sduk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bF6cOrUD; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-307bc125e2eso62693001fa.3;
-        Tue, 25 Mar 2025 16:54:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742946890; x=1743551690; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pB7DLVd4H6QiUxYIjx/2k/QTp6fyJCUONMOEFYG9jGU=;
-        b=bF6cOrUDnRAqpqviqgd/KrsCoZu4z51+X9AJbg6XKus2ce8yKfc7qAqje6huX65ozr
-         2Q+Rw70h7t3DhcvfvW44TeDGyPm4HqYIqEn+kJ8ehIWKv1SfoUW9slfnI7jNPkGN+bRC
-         HFIAJaW+VrG9dcB7muCDyKjpTRZYHbD9j4SP2TX0wGmEh+Q7bcemLjOOneOLM/BKdLw5
-         EzKQxLRFrW642l/DgY8eY+xh0tOSMRFwV7q+68YXA0vcwdvQk1JnB6wwolpp9VkYArNX
-         O7ZEaEP8rkKEdWRLk69pPYwzWVFAk8kBG3y0f8otyRkBILr8TnuGEkvkbBTI1LG5UbFY
-         oImw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742946890; x=1743551690;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pB7DLVd4H6QiUxYIjx/2k/QTp6fyJCUONMOEFYG9jGU=;
-        b=A+U1jat49ARJ+XfnQCIJcge02Kbs3hshjKAYGpVFjJn/8MF9peQhXIq3rp+/sc2Ub+
-         CYFcGjaZCAGTwG3ScNmcgukulv83U6FzhsvebyeohMqt4LpkyFQ33pHOHIzUKKES73EE
-         8r/9ds6uhGHkzrb27CsrCvg1q55k3tmdoMu0YmAUAFaGZfopWKxmYo3/pWbKVx+EUty5
-         OUzXNYASOYVWk60vCpczxs/NcnUu6wAMaRgJWCcLg/e2k84SfydwCOuwrRu+GepV6Rlx
-         OaKzs59IKHxvxM1eXWwOnU7JgYxdjqbnkP9cToq4MRGQB/mbj3L/Ik+0YA387c3FmJgg
-         TV9A==
-X-Forwarded-Encrypted: i=1; AJvYcCUfWXZbQVoyCKfJUpmQh9UowLdNXfwkrbnXqe2mKa/Myp3qfua6kOJCt7A39zxj5Y3o84NLqZqvQiFzkxMhz449@vger.kernel.org, AJvYcCVn6fBme+UzhNMzWBgvCX/46pEW2UDFp7zTkAQyNnzjlpcX7ajXrn37EUP2VpUwGPOP4W2bzsV/3PeBhTgD3G4=@vger.kernel.org, AJvYcCWGTAeEWvY89C8y0Gsj8c4CDKgqYmg+FHt08wLVV0r21D8QolhjYijWLxe9DOh4FEX3msTPO2Z4hNJe@vger.kernel.org, AJvYcCWV5VoHkR0De/Hew/VeIuAKFFOVRmq87Tezw/oIpwSV1LYH/WlqBud4y2NY1DwFHjrH4NQJq1ZzkW2qC+Dc@vger.kernel.org, AJvYcCXSdf80h6cqH+Xc7/yj1TB3nBstdnV2Wz/1XIDLQgRrwCQeEqLEGWu1OztdVQVhuoaU6LxoeumD2dbfaL/a@vger.kernel.org, AJvYcCXUMnQUibP9OjbYGZ7brujmOXaaKym9PRbVWpgKLn3OwRoWComUFALf+4A7qPemVpr7a0wjZ9r1d4BMt3Y=@vger.kernel.org, AJvYcCXypfuw71q/ZJG+c+s8S9IC3Uj9UNxGlxGdi7qIRAklD8+GRIbzHWc5yAiVN0hg6rdzVPlcnDtQkyUP@vger.kernel.org, AJvYcCXzntfbImOQCidjwUU38axyfILk950Kdui6F3ysNRqArFUttbVTsWWc3RZvpv8KU8nKdLHEUm29@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7SId7TPAQledO/lsUGC3LC2hZMkhonhqbOfWthomifDQGRjlg
-	iOYiHBDsKnU4NwXTY8AWs/08g7ASYN99H3AQdXEieUtMbDN6CCy+pnwTiAcA34xrH/3Go/3bub7
-	YDv8H/XKgL84mTPIcvBnvohUxv7k=
-X-Gm-Gg: ASbGncsd5KU/Az8Zjei/EG8Lqkth3znd4SqhK95YJjCkpDC9iiuyQFIVFnXoxhomR/h
-	pQgWCe3Oih0xhHIs1o+FMIdW/AOAyznvprdJwUEBOFSYhOClBqP7vb9DTup+U3BsqYz4zlzKEY/
-	pzzcmJQhZxr9YVQedZdUoIRcMRrqQms4ikAPcJBKPKXQgtNYkdn4Ok82GLtF3u
-X-Google-Smtp-Source: AGHT+IEg1mlV1KCvvMCOJZ2ohnF8J2y7cC9+rBdT4VizZQCJYeiV1bsXLR4jAOajsN9bSIhV3DiNsWgYsqG+SYPmsOQ=
-X-Received: by 2002:a2e:be1f:0:b0:30d:b216:ef0e with SMTP id
- 38308e7fff4ca-30db216f00cmr15397781fa.17.1742946890132; Tue, 25 Mar 2025
- 16:54:50 -0700 (PDT)
+	s=arc-20240116; t=1742947053; c=relaxed/simple;
+	bh=ulqDgHJi9xktfMH9rS+A6qVuAla4HJJ12RSIL32wVVU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V1e9fffriTlbUtF6yahvYQntcEhiV0AO7pk9DoDzLb9EJ7QCYT1mF/NQw08VRZb8fu5CtGHk6SQtU25/WSaCtCpyY/hcWPj/vUGetaCfpcCx/8mw9/ojKqMgBB4lzUcwHZ81IkDkyigT469QjaqN+oDj2baDMBOj03JZbH8+ktE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=j3i+yTRJ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=MVc27JQa; arc=none smtp.client-ip=202.12.124.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
+Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id A0A012540103;
+	Tue, 25 Mar 2025 19:57:29 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-04.internal (MEProxy); Tue, 25 Mar 2025 19:57:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm2; t=1742947049; x=1743033449; bh=53epuMkGW7
+	VVw4kHXV3f2OBjzCS034p7lIo4scoUYY4=; b=j3i+yTRJqHHE3+spz2ow3pS9QO
+	c8D7CXpevtAimcUH1unY8ZecbCsNzuAj6IHCZ7qY12SgfImzUrL3g04q3D4H7FkL
+	1vlvK+67YjFPEbKZcI2LNN2xn47K38YeoeYFP2aEolMtED4YHC4y3jQyPeGDisoB
+	Y6h4cOxGoyybTwFkqefcjZzbBBu9p1vseh6y+HWQwsrEVVFsBWNxIf9HYeeBg4gW
+	7NGEWubVTjlG/qx1VmcJ6NDGFF1r/729e4+ZhzLminl3/VCpKzzEsCD8fl57R/lh
+	3J1kGY5TV60YwjLVZlh/LIsoUcWAiAVR7KFXPKqB9Gbe6vw3W5Ro4X69tH1A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1742947049; x=1743033449; bh=53epuMkGW7VVw4kHXV3f2OBjzCS034p7lIo
+	4scoUYY4=; b=MVc27JQauJVoYrbojetHAZ9nUNDhSMUNKb/U7UHeH98I8Hacjwt
+	/gfb2V8m4GTMOvLH1UfckM3Jte8H/1QOmivThiGrVmM3U3SJw8Hd7ND9IoOYvJEc
+	qNB1huBXQlvNfe9sGKaewNfUKsbTO0M5B5c20xFQ9k8uQwRjWqAY8Drz+ntfpXom
+	p4GRWwExNpUgmzlvEj9az2539foimIMC4RjeN7ZlROBgItlZOzImWzzDR2vqixCO
+	4oSgu0YQGKZanZApQJifRFVxypQxiaf92VOkdJnlADyGK/RfmKJATKEC7uFO4+3S
+	INseQD/ylabewCylLflMPoZOjiCktk22Y3w==
+X-ME-Sender: <xms:6ELjZ5C2HyAO_6tHWf3aVhbyyVnDFYdweMcK5RJO8d_fJ6UA4KoBNw>
+    <xme:6ELjZ3g3PKCKY3BcCc0svPCCLB5Ti26iL-GkQdkFXvbFsQ4xmn_zNXvHeWxFLXgBD
+    fhdrmeljUSxvQ>
+X-ME-Received: <xmr:6ELjZ0nGeX3lJFhBJmfzwrfGRtKArx-S9sTteSDw8wL8i0CNW73nntwyfiSD>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduieegtdefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
+    vdenucfhrhhomhepifhrvghgucfmjfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecugg
+    ftrfgrthhtvghrnhepheegvdevvdeljeeugfdtudduhfekledtiefhveejkeejuefhtdeu
+    fefhgfehkeetnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrh
+    homhepghhrvghgsehkrhhorghhrdgtohhmpdhnsggprhgtphhtthhopedugedpmhhouggv
+    pehsmhhtphhouhhtpdhrtghpthhtohepshhfrhestggrnhgsrdgruhhughdrohhrghdrrg
+    hupdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthho
+    pehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhh
+    grthdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhr
+    ghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdroh
+    hrghdprhgtphhtthhopehlihhnuhigqdhnvgigthesvhhgvghrrdhkvghrnhgvlhdrohhr
+    gh
+X-ME-Proxy: <xmx:6ELjZzxvLjOKHCf2KhELkxcfewZeR8Eychfx7mgoQAvSmHkDfvFmLw>
+    <xmx:6ELjZ-QISVIqjaytnPUJ0ivBUiG5CMXFboYet_PGTOqoniZap2MvLA>
+    <xmx:6ELjZ2Y9LBJDbrDU7blyiW122iZ2bs0QRYDisDCx63CiaVTbACR5SQ>
+    <xmx:6ELjZ_RZpfwy7HWQvwbQg1438y3NhaEPLBqI9ka_w0VNZXvHFC37WQ>
+    <xmx:6ULjZ6qQTmsLQoB8y9BbrKlKjZKm4q__H6uFBgK3dZEIWRg-khRSLYiS>
+Feedback-ID: i787e41f1:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 25 Mar 2025 19:57:28 -0400 (EDT)
+Date: Tue, 25 Mar 2025 19:56:07 -0400
+From: Greg KH <greg@kroah.com>
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Networking <netdev@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: Re: linux-next: duplicate patch in the tty tree
+Message-ID: <2025032501-ominous-mongoose-e772@gregkh>
+References: <20250325173133.7dd68fb1@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250325-ptr-as-ptr-v7-0-87ab452147b9@gmail.com>
- <20250325-ptr-as-ptr-v7-7-87ab452147b9@gmail.com> <D8POWLFKWABG.37BVXN2QCL8MP@proton.me>
- <CAJ-ks9mUYw4FEJQfmDrHHt0oMy256jhp7qZ-CHp6R5c_sOCD4w@mail.gmail.com> <D8PPIYIJCNX8.13VPQULEI0ALN@proton.me>
-In-Reply-To: <D8PPIYIJCNX8.13VPQULEI0ALN@proton.me>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Tue, 25 Mar 2025 19:54:14 -0400
-X-Gm-Features: AQ5f1JrqN1yE_LZiN0APCcG96GfKe6UILX465X2ULhw-kc5Avbv5dHlRP2RM1po
-Message-ID: <CAJ-ks9k6220j6CQSOF4TDrgY9qq4PfV9uaMXz1Qk4m=eeSr5Ag@mail.gmail.com>
-Subject: Re: [PATCH v7 7/7] rust: enable `clippy::ref_as_ptr` lint
-To: Benno Lossin <benno.lossin@proton.me>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
-	Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
-	Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, 
-	devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250325173133.7dd68fb1@canb.auug.org.au>
 
-On Tue, Mar 25, 2025 at 6:40=E2=80=AFPM Benno Lossin <benno.lossin@proton.m=
-e> wrote:
->
-> On Tue Mar 25, 2025 at 11:33 PM CET, Tamir Duberstein wrote:
-> > On Tue, Mar 25, 2025 at 6:11=E2=80=AFPM Benno Lossin <benno.lossin@prot=
-on.me> wrote:
-> >>
-> >> On Tue Mar 25, 2025 at 9:07 PM CET, Tamir Duberstein wrote:
-> >> > diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
-> >> > index 40034f77fc2f..6233af50bab7 100644
-> >> > --- a/rust/kernel/str.rs
-> >> > +++ b/rust/kernel/str.rs
-> >> > @@ -29,7 +29,7 @@ pub const fn is_empty(&self) -> bool {
-> >> >      #[inline]
-> >> >      pub const fn from_bytes(bytes: &[u8]) -> &Self {
-> >> >          // SAFETY: `BStr` is transparent to `[u8]`.
-> >> > -        unsafe { &*(bytes as *const [u8] as *const BStr) }
-> >> > +        unsafe { &*(core::mem::transmute::<*const [u8], *const Self=
->(bytes)) }
-> >>
-> >> Hmm I'm not sure about using `transmute` here. Yes the types are
-> >> transparent, but I don't think that we should use it here.
-> >
-> > What's your suggestion? I initially tried
-> >
-> > let bytes: *const [u8] =3D bytes;
-> > unsafe { &*bytes.cast() }
-> >
-> > but that doesn't compile because of the implicit Sized bound on pointer=
-::cast.
->
-> This is AFAIK one of the only places where we cannot get rid of the `as`
-> cast. So:
->
->     let bytes: *const [u8] =3D bytes;
->     // CAST: `BStr` transparently wraps `[u8]`.
->     let bytes =3D bytes as *const BStr;
->     // SAFETY: `bytes` is derived from a reference.
->     unsafe { &*bytes }
->
-> IMO a `transmute` is worse than an `as` cast :)
+On Tue, Mar 25, 2025 at 05:31:33PM +1100, Stephen Rothwell wrote:
+> Hi all,
+> 
+> The following commit is also in the net-next tree as a different commit
+> (but the same patch):
+> 
+>   3c3cede051cd ("tty: caif: removed unused function debugfs_tx()")
+> 
+> This is commit
+> 
+>   29abdf662597 ("tty: caif: removed unused function debugfs_tx()")
+> 
+> in the net-next tree.
 
-Hmm, looking at this again we can just transmute ref-to-ref and avoid
-pointers entirely. We're already doing that in
-`CStr::from_bytes_with_nul_unchecked`
+Should be fine, thanks!
 
-Why is transmute worse than an `as` cast?
+greg k-h
 
