@@ -1,143 +1,161 @@
-Return-Path: <netdev+bounces-177320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5522A6EFD6
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:13:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FCCEA6F050
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:14:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6A76166D37
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 11:13:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E0053A9990
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 11:14:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3501E255252;
-	Tue, 25 Mar 2025 11:13:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2CDB254B1B;
+	Tue, 25 Mar 2025 11:14:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xm1dJWDj"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="zIUEg0XD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9563825522B
-	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 11:13:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70597A937;
+	Tue, 25 Mar 2025 11:14:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742901208; cv=none; b=E1fPJuBCcJOWaDtJA0L512DqYZNFjjKB8QZJ+vCOkuU7aIT/tUhKCLN1fui+JA2CgdgQnTRf4T9wgFbG+VJyJkFA9aWcsFC7FNCYAXwrdmRpfljWsJhQHCiAZ1fsO4EX6hAiPrweYOSkWg3hln2z3dk5mKjo1teSV9wQBxZJDaM=
+	t=1742901281; cv=none; b=unEUzEMC7HB8dAnRuEdYB6tiy89shcCTO79s9a+Zi9BdtyevujY3uoL7fWI1GRMcCrqha3JmSfjY2c7uCDc9/gdoQDU+Rkvrq5VyU43dcjgRM4pqNclRDkUNL0FdV1v26HIy4PJOyhm8tNthPhonrgl6Whg9AwH1E0cPAhZhoA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742901208; c=relaxed/simple;
-	bh=Q2yxI1Q/Hr9sYuRFxV7HJVN5ZugKG70HYOcnNN2SsQk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bDIjGY0b9J1HClosWWM2YTWWOyhRprRUPdy3LH+LHwjq8wH8csRUtWhJD8GqFws0sKi9w0xefjuWCjzrBertVS9S2eESg/lqNYA7IiNKQcBbUNgFigSWpu8OnLsrK/g/AF9C1wrhk6nw0m7FG4T7K3Rjcdp0OabsQgIKph7ncNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xm1dJWDj; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-477296dce76so29913591cf.3
-        for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 04:13:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742901205; x=1743506005; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y3uAc3PYom7+hjEmDD7g7OI0UHuQn+Z+q2xbe5aW1VI=;
-        b=Xm1dJWDj3WRCAalg4fS/5qPAFz9O7s0UlPlMU83z2Bq3OYNAeSpcX8hg+k4keOpNsy
-         /MWZvhtdSSTbixh8PDw4B08KScshvl0nk8kQ/ol4rTotjalGj0xykb9wRNVE5ubKw/Ns
-         lzD76++K9pjb/n6DV9iFaLU/e7hRyQC9KXDetX8vir6DmSv1CCLwQiQ4h02SAhbh0Wlf
-         t9lV2MM65WgyLkt1F8RP2twQp+CzGhbbYL8DexZ5eDkRE5hSBCv6yA7F2aGZ+ljOgZI4
-         CP9w0RKfMLXrCvdc9VKYB/S5EHBMxGx4Ptc9SaY1lvbkBVVQKYeRmfouDHLU/0sTjwgz
-         gDBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742901205; x=1743506005;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Y3uAc3PYom7+hjEmDD7g7OI0UHuQn+Z+q2xbe5aW1VI=;
-        b=KJ4yXCmbSODtGNcpNsCYYpw3MyTKmIqdH4E360WJcsLEC84D1+hy7ptg7rOTj1IbZr
-         mf3SQl3lkXc/P6jyo4WKmC+AP+37lbNbUop1hEVxmI35guzLsZDSCpWkFVfO3XvT6g+Y
-         6kBaBCFhw39d+KXJIqS38vUu83JaBLgXIW765Ul/8qQ/2/2LxKxbmrdctnP8omanCsIp
-         FWx0Dc7ZfdZtcNqc9YX/Tl2yOwulWveKyiY47qWUDVgOnbqj2ZZd7G/4AGESz1n+9LNf
-         706PGqwJNYcBdDTpiL8RIsNKp4TdsC0RH3h2Zatia3et7ujCUYKStbXXWOo790Prnmpz
-         j0cA==
-X-Forwarded-Encrypted: i=1; AJvYcCWMHgwzw25d0AHl5uXANGnh8J3hPHhHJv+HTMCD7l+kjP4QjW6r3zQq9Ec9VuFsgL5Z0x8vc98=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywxw/q33/uYnuPZnd/76dvUMsP6sz/Zt0sA7FtNYfWagPDCPYAT
-	X5wYhkgTwUjnFSh6aUFFDot9O0X/s/TbloK4glU1w+fqjJkt2PRiRisPklNWBQvrxoD5AeyeQxM
-	Fc1SRwz+Vby1l/0CD4pxN78KltmIASYuNSpy8
-X-Gm-Gg: ASbGnctjn+7vcwEdHA4FL+sU5fFPNqB6481gFBpQCmFU7RVPHuMf+OerSvAIr/54PJg
-	cbkT3ja1c8J0Uvlt1U1OcMixDcMeCTzqzlKb6nP64zeBU1if1kZQqYnWMhqkfqlR0i2ee3Cqhxp
-	U9n3UiuBWHyhRXN48WTobXifzobJ8uDtVtvXiy
-X-Google-Smtp-Source: AGHT+IEaAiGe4haR9nqNoPEalHx5BKFJ8fc4bRRrnPOLx3waFpwdRy0EsnxGhW5+bORN877ljDb2w7tjDioIf34Kw/8=
-X-Received: by 2002:a05:622a:5196:b0:476:7e6b:d297 with SMTP id
- d75a77b69052e-4771de14bc9mr304101391cf.41.1742901205094; Tue, 25 Mar 2025
- 04:13:25 -0700 (PDT)
+	s=arc-20240116; t=1742901281; c=relaxed/simple;
+	bh=N7nNpkGG93O1d4OuWsSH/Z9bDtptyVB0AGTzGeZOesE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=txCX62/psfhLL3qnkgXDm2zVrpVwVQccdzuzMhrKhjLMwpfykE4zedkckta8c32KcTYPeQh5xX7fOPbpZ94yZ9fSjZTH1qZcqhLX1H0fBHX3TCy5ispwN5eLs0w4FjroGPvJzcs5PuubF2qd33SO15Erruul0+FLf4z3Rxc4WAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=zIUEg0XD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E64DC4CEE4;
+	Tue, 25 Mar 2025 11:14:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1742901280;
+	bh=N7nNpkGG93O1d4OuWsSH/Z9bDtptyVB0AGTzGeZOesE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=zIUEg0XDvxh/kBD441/02kLatp7dQAtVOeiZaXVE6t8nmnadP1ReVBkoW35co3uF8
+	 qmWjVf6kcyiWA6jJTRalli8eyK983xMYsKg9tw0sSDN6gafp6q7eIBbNbfNAN9NbjK
+	 pEvEeBINzafqONQpZB40cDQewTeK+jabUl5AgMKQ=
+Date: Tue, 25 Mar 2025 07:13:18 -0400
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Lubomir Rintel <lkundrak@v3.sk>
+Cc: linux-usb@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>
+Subject: Re: [PATCH v3 net-next] rndis_host: Flag RNDIS modems as WWAN devices
+Message-ID: <2025032559-dispersal-humvee-bdfb@gregkh>
+References: <20250325095842.1567999-1-lkundrak@v3.sk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250317120314.41404-1-kerneljasonxing@gmail.com> <20250317120314.41404-3-kerneljasonxing@gmail.com>
-In-Reply-To: <20250317120314.41404-3-kerneljasonxing@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 25 Mar 2025 12:13:13 +0100
-X-Gm-Features: AQ5f1JrZPhYNm4XUkAjbB7yDctqve2LA3ai__4h1AShkaxQd003KvKdEFe-8_rs
-Message-ID: <CANn89iLTb_JgLAKk5omW82SH-h8qtZLs54nX5c9Y9GbKdmTFgg@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 2/2] tcp: support TCP_DELACK_MAX_US for
- set/getsockopt use
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	ncardwell@google.com, kuniyu@amazon.com, dsahern@kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250325095842.1567999-1-lkundrak@v3.sk>
 
-On Mon, Mar 17, 2025 at 1:03=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> Support adjusting/reading delayed ack max for socket level by using
-> set/getsockopt().
->
-> This option aligns with TCP_BPF_DELACK_MAX usage. Considering that bpf
-> option was implemented before this patch, so we need to use a standalone
-> new option for pure tcp set/getsockopt() use.
->
-> Add WRITE_ONCE/READ_ONCE() to prevent data-race if setsockopt()
-> happens to write one value to icsk_delack_max while icsk_delack_max is
-> being read.
->
-> Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
+On Tue, Mar 25, 2025 at 10:58:41AM +0100, Lubomir Rintel wrote:
+> Set FLAG_WWAN instead of FLAG_ETHERNET for RNDIS interfaces on Mobile
+> Broadband Modems, as opposed to regular Ethernet adapters.
+> 
+> Otherwise NetworkManager gets confused, misjudges the device type,
+> and wouldn't know it should connect a modem to get the device to work.
+> What would be the result depends on ModemManager version -- older
+> ModemManager would end up disconnecting a device after an unsuccessful
+> probe attempt (if it connected without needing to unlock a SIM), while
+> a newer one might spawn a separate PPP connection over a tty interface
+> instead, resulting in a general confusion and no end of chaos.
+> 
+> The only way to get this work reliably is to fix the device type
+> and have good enough version ModemManager (or equivalent).
+> 
+> Signed-off-by: Lubomir Rintel <lkundrak@v3.sk>
+> Fixes: 63ba395cd7a5 ("rndis_host: support Novatel Verizon USB730L")
+> 
 > ---
->  include/uapi/linux/tcp.h |  1 +
->  net/ipv4/tcp.c           | 13 ++++++++++++-
->  net/ipv4/tcp_output.c    |  2 +-
->  3 files changed, 14 insertions(+), 2 deletions(-)
->
-> diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
-> index b2476cf7058e..2377e22f2c4b 100644
-> --- a/include/uapi/linux/tcp.h
-> +++ b/include/uapi/linux/tcp.h
-> @@ -138,6 +138,7 @@ enum {
->  #define TCP_IS_MPTCP           43      /* Is MPTCP being used? */
->  #define TCP_RTO_MAX_MS         44      /* max rto time in ms */
->  #define TCP_RTO_MIN_US         45      /* min rto time in us */
-> +#define TCP_DELACK_MAX_US      46      /* max delayed ack time in us */
->
->  #define TCP_REPAIR_ON          1
->  #define TCP_REPAIR_OFF         0
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index b89c1b676b8e..578e79024955 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -3353,7 +3353,7 @@ int tcp_disconnect(struct sock *sk, int flags)
->         icsk->icsk_probes_tstamp =3D 0;
->         icsk->icsk_rto =3D TCP_TIMEOUT_INIT;
->         WRITE_ONCE(icsk->icsk_rto_min, TCP_RTO_MIN);
-> -       icsk->icsk_delack_max =3D TCP_DELACK_MAX;
-> +       WRITE_ONCE(icsk->icsk_delack_max, TCP_DELACK_MAX);
+> Changes since v1:
+> * Added Fixes tag, as suggested by Paolo Abeni
+> 
+> Changes since v2:
+> * Fixed Fixes tag... Suggested by Jakub Kicinski
+> 
+> ---
+>  drivers/net/usb/rndis_host.c | 16 ++++++++++++++--
+>  1 file changed, 14 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/usb/rndis_host.c b/drivers/net/usb/rndis_host.c
+> index 7b3739b29c8f7..bb0bf14158727 100644
+> --- a/drivers/net/usb/rndis_host.c
+> +++ b/drivers/net/usb/rndis_host.c
+> @@ -630,6 +630,16 @@ static const struct driver_info	zte_rndis_info = {
+>  	.tx_fixup =	rndis_tx_fixup,
+>  };
+>  
+> +static const struct driver_info	wwan_rndis_info = {
+> +	.description =	"Mobile Broadband RNDIS device",
+> +	.flags =	FLAG_WWAN | FLAG_POINTTOPOINT | FLAG_FRAMING_RN | FLAG_NO_SETINT,
+> +	.bind =		rndis_bind,
+> +	.unbind =	rndis_unbind,
+> +	.status =	rndis_status,
+> +	.rx_fixup =	rndis_rx_fixup,
+> +	.tx_fixup =	rndis_tx_fixup,
+> +};
+> +
+>  /*-------------------------------------------------------------------------*/
+>  
+>  static const struct usb_device_id	products [] = {
+> @@ -666,9 +676,11 @@ static const struct usb_device_id	products [] = {
+>  	USB_INTERFACE_INFO(USB_CLASS_WIRELESS_CONTROLLER, 1, 3),
+>  	.driver_info = (unsigned long) &rndis_info,
+>  }, {
+> -	/* Novatel Verizon USB730L */
+> +	/* Mobile Broadband Modem, seen in Novatel Verizon USB730L and
+> +	 * Telit FN990A (RNDIS)
+> +	 */
+>  	USB_INTERFACE_INFO(USB_CLASS_MISC, 4, 1),
+> -	.driver_info = (unsigned long) &rndis_info,
+> +	.driver_info = (unsigned long)&wwan_rndis_info,
+>  },
+>  	{ },		// END
+>  };
+> -- 
+> 2.48.1
+> 
+> 
 
-Same comment here as the first patch, I think we should not change
-csk->icsk_delack_max in tcp_disconnect(),
-otherwise a prior setsockopt() setting is erased.
+Hi,
 
-Probably not a big deal, and if it is, could be fixed in a followup patch.
+This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
+a patch that has triggered this response.  He used to manually respond
+to these common problems, but in order to save his sanity (he kept
+writing the same thing over and over, yet to different people), I was
+created.  Hopefully you will not take offence and will fix the problem
+in your patch and resubmit it so that it can be accepted into the Linux
+kernel tree.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+You are receiving this message because of the following common error(s)
+as indicated below:
+
+- You have marked a patch with a "Fixes:" tag for a commit that is in an
+  older released kernel, yet you do not have a cc: stable line in the
+  signed-off-by area at all, which means that the patch will not be
+  applied to any older kernel releases.  To properly fix this, please
+  follow the documented rules in the
+  Documentation/process/stable-kernel-rules.rst file for how to resolve
+  this.
+
+If you wish to discuss this problem further, or you have questions about
+how to resolve this issue, please feel free to respond to this email and
+Greg will reply once he has dug out from the pending patches received
+from other developers.
+
+thanks,
+
+greg k-h's patch email bot
 
