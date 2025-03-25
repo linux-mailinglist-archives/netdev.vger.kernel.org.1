@@ -1,223 +1,171 @@
-Return-Path: <netdev+bounces-177269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45BBCA6E72A
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 00:15:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7B8BA6E79F
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 01:38:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBC2E1898829
-	for <lists+netdev@lfdr.de>; Mon, 24 Mar 2025 23:16:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0401B3A8F9D
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 00:37:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 852FC1DDC3E;
-	Mon, 24 Mar 2025 23:15:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A266578F4C;
+	Tue, 25 Mar 2025 00:37:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="XFNswi0h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QRFNU9ZS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 537E719C55E
-	for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 23:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7522828F4;
+	Tue, 25 Mar 2025 00:37:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742858155; cv=none; b=IXT7ZSNkfY2Nno3IBprJXGrF7G+59hKB2gGtm9SQK3nhcu+m5tSLEUK51f+bU6dZccduvO36x+pJ90DliN576K5vNrQ/o4MWS4aoLBre+8kHE6RQwL9WiG7+FW9pap01IkcIle2e60WuOSMMwY+SQ+f94RB0FaLSyFsw681CY9E=
+	t=1742863079; cv=none; b=mxTWYSOM8nIDZxUm3INHIYgUC8THz9W7WYlvSR/e98qK0wsOVfh68qIVddmtUtvVLU2KInKzAlK8wxBuWAV4Rdg8Sm1l9gyCshM08VIQL7qbp1fEDUKakg2vZCCmvh4KNbl12VhLkmwAJyrU5IOwLwmukc4XOt06ejW/eec6RnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742858155; c=relaxed/simple;
-	bh=GO1ebrwdo1FSnwAlc77xXljzTyj9DumIqG0Jkgk/tts=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JRzQdfv0V42u5b9V6DTI8CLU+ZWEVVYAdfrOYHG1Ur1VvmInM7fJs60608NhZJ7BpqiosARz7MOskfMF8/g9RMskHiJWrvEkNnIrqWjk8EYIBxeqxsxacrKjHoxkap3dfwBQ7pYTtwCC0S7NdjXHVgBbtuGAHofG/kA/dn4LNTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=XFNswi0h; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5e5c7d6b96fso8910166a12.3
-        for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 16:15:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1742858151; x=1743462951; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=AgmGWXv0jfr3GGGkNjNS9jTuUghBVCf1z+AneBJm0qw=;
-        b=XFNswi0hf96Tq8rtuwMpIDOv6lUZUk4nDhOm+EsRRaYPRlWs0nuuvHj5IHpug8kYcm
-         0R2xZOH4zU0IzHP+wTCmpOo0RWV1DZa/TTvJh6/Ni3o8sg6NA9vRNq3aNDQY9zcvdqrg
-         oCx5HGOd93n62bEUMp+fdA6EViq3rm6b/IXHPAc4FgMERza4wHDDYUbc8L7XUEiRMfb/
-         EdyQRrih9lS35T8s12imovs3HY55rfx7RI7emSk5a2ax3/JWw4F8yEArMMhqNZ3adj95
-         ssqKQBw7mwCVutDvh8rdK1BrpelPyFoPW9e3QyWkpBdDXNdAmGBkV0VTV1wn1BE4fU6t
-         qJ0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742858151; x=1743462951;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AgmGWXv0jfr3GGGkNjNS9jTuUghBVCf1z+AneBJm0qw=;
-        b=aD2sq8p6GRSs/SOfpaSHFV4YkUqQQBFi2hu97XLki+PcZlnV3FyYjr6x6L+AWBcyhb
-         cwF2npJVDAnfctcvDZgI161nZFDlInPfCI5+VZ/SwNx5klKNFRoRW7Pg12StIfeCszxM
-         m/DJjh3nrYS4CR6QulWuoXc6m6w3wQObVCd8D6yWbbSQxrIhmJeM2X7ztbLmjsyURNZG
-         mNwLG5H/NuQjVbnTD6LrQBR8uC+nWNYP6W0p8POd4AffMynLyKpH2xvr1yY8bZ0AHmK2
-         6Lw3xC0Bw6E050yZDGG/KDzJNKzS3E1sNegB6udDkIlLxdMe0woy0qn0L3jCWPi9iu7t
-         SiZA==
-X-Gm-Message-State: AOJu0Yz9jUsylk9YeAkdtY9QVusCiljv/3MSATRAuf4PrxWPGvVDlq7b
-	QEBIahsh2/T4jzSKiMKiL2RD9wOO7M0LAr5r/SnM85GnhRrmysbI6Bj7j+bpToMw904ePQN7r4/
-	BXlZwH8QpqOBmV+F5bly5wmBEjx4wOouisPSCyJ4szEaYZ7A=
-X-Gm-Gg: ASbGncvcJcwG7aYpj9VN8yWMPu1RB8PbkBxGIcbGagZJI9X53uSGNBKXGBUBhQ4odU5
-	XCE71Yr216bbUte05wXBMMpvIdSHywbjCN5m5nO/G5mz/OD74WBapHFk93aBOSpUey5TbUEueoB
-	3JTrjiULr2b9P0yqCBMRBpsWqOxc8jVn4FdsBQxcRTaB33JMdZE6jdmTMLZ78S5lQ4VYofr+I2u
-	msHzxM5FwZ8hBO1mZnJDvEtBrbBHIiXZDQyXE5eUYJe5qMLjbbptvT9tjkxbyMfiC7fTu/LhKRR
-	n3wcfy/ok4N/dNadlygPvbVVYxgadG9/uyUEZJeO7symgJiT8htLfn5M1TDO1caQIxSHTDty/8F
-	3LTuWtjvQCNCr9CrRRA==
-X-Google-Smtp-Source: AGHT+IEt17iZNpdcR6SgMxLlZ4A8lGTl/ZXe0zo6nF6crB1UEU2qqCrAEPEV0yeB8qVk2vqUoQE1qw==
-X-Received: by 2002:a05:6402:2355:b0:5e5:bdfe:6bfb with SMTP id 4fb4d7f45d1cf-5ebcd467233mr13717191a12.16.1742858151435;
-        Mon, 24 Mar 2025 16:15:51 -0700 (PDT)
-Received: from ?IPV6:2001:67c:2fbc:1:a58e:e6d3:e372:ec08? ([2001:67c:2fbc:1:a58e:e6d3:e372:ec08])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5ebcd0e040dsm6680087a12.72.2025.03.24.16.15.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Mar 2025 16:15:51 -0700 (PDT)
-Message-ID: <86fea40c-6b8b-4ac3-bb14-4a24c63cf167@openvpn.net>
-Date: Tue, 25 Mar 2025 00:15:48 +0100
+	s=arc-20240116; t=1742863079; c=relaxed/simple;
+	bh=Wd1fKBHpnw5GtSiQwyCbFQYy3iHxItiuXfrybN65gWM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=WqI/e3Tpib1QX9OJjbcxPd5n0xdEsXdq/KPc5DEovsF8jIJ/sA6FvTv/HNgCnVjuHAVb+Px93x+/pQwuurALJmdvVFk5nyWmpn6/3hfF9ZKq/IYa45VL8J6o7Kr1hiSGWwqtpN/xLo1+elwCbmYRe6HutQGJ6yUJ95Uu2hOtg9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QRFNU9ZS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D9FFC4CEDD;
+	Tue, 25 Mar 2025 00:37:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742863078;
+	bh=Wd1fKBHpnw5GtSiQwyCbFQYy3iHxItiuXfrybN65gWM=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=QRFNU9ZSLIgoQ3/F3Aeqt0PCuFk+J/WnLsrdlQyvnRdQGayNUqaONZYpaV3KT7so1
+	 LFel/4t7rzGhl1Gn0Dze4kDqNDeatM/cdo8YO5peHHVjtLvGVqmZTPRvJoNYonKASM
+	 EOSM/2vIuF2jOah4FvnkS53B3RusPeKTx31xlFM8/6kLl8dmGflpfF+vk55YseQNOa
+	 ms4OmzuLdR2MDuhITWjRyH6zf4E+hCOLGTFzXCh9XlJf2/A9xXz0H/LYP9aAzVhGdd
+	 Z3rr9RWtrqqKJp7DSuDtr4/jPj3USd0vmoFmDDqJ6+rJTT8T+0juJlSa6EN3oN5MNq
+	 o/am3095ZBehw==
+Message-ID: <33f758b03548b869f75d72a24c3abbcf382427ae.camel@kernel.org>
+Subject: Re: [PATCH] net: add a debugfs files for showing netns refcount
+ tracking info
+From: Jeff Layton <jlayton@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski	 <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman	 <horms@kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Mon, 24 Mar 2025 20:37:57 -0400
+In-Reply-To: <59446182-8d60-40a0-975f-30069b0afe86@lunn.ch>
+References: <20250324-netns-debugfs-v1-1-c75e9d5a6266@kernel.org>
+	 <59446182-8d60-40a0-975f-30069b0afe86@lunn.ch>
+Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
+ keydata=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
+ QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v24 18/23] ovpn: implement peer
- add/get/dump/delete via netlink
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
-References: <20250318-b4-ovpn-v24-0-3ec4ab5c4a77@openvpn.net>
- <20250318-b4-ovpn-v24-18-3ec4ab5c4a77@openvpn.net> <Z-E4i587M54Os5Yo@krikkit>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <Z-E4i587M54Os5Yo@krikkit>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 24/03/2025 11:48, Sabrina Dubroca wrote:
-> Hello Antonio,
-> 
-> A few questions wrt the API:
-> 
-> 2025-03-18, 02:40:53 +0100, Antonio Quartulli wrote:
->> +static bool ovpn_nl_attr_sockaddr_remote(struct nlattr **attrs,
->> +					 struct sockaddr_storage *ss)
->> +{
->> +	struct sockaddr_in6 *sin6;
->> +	struct sockaddr_in *sin;
->> +	struct in6_addr *in6;
->> +	__be16 port = 0;
->> +	__be32 *in;
->> +
->> +	ss->ss_family = AF_UNSPEC;
->> +
->> +	if (attrs[OVPN_A_PEER_REMOTE_PORT])
->> +		port = nla_get_be16(attrs[OVPN_A_PEER_REMOTE_PORT]);
-> 
-> What's the expected behavior if REMOTE_PORT isn't provided? We'll send
-> packets do port 0 (which I'm guessing will get dropped on the other
-> side) until we get a message from the peer and float sets the correct
-> port/address?
+On Mon, 2025-03-24 at 21:50 +0100, Andrew Lunn wrote:
+> On Mon, Mar 24, 2025 at 04:24:47PM -0400, Jeff Layton wrote:
+> > CONFIG_NET_NS_REFCNT_TRACKER currently has no convenient way to display
+> > its tracking info. Add a new net_ns directory in debugfs. Have a
+> > directory in there for every net, with refcnt and notrefcnt files that
+> > show the currently tracked active and passive references.
+>=20
+> Hi Jeff
+>=20
+> CONFIG_NET_NS_REFCNT_TRACKER is just an instance of
+> CONFIG_REF_TRACKER.
+>=20
+> It would be good to explain why you are doing it at the netdev level,
+> rather than part of the generic CONFIG_REF_TRACKER level. Why would
+> other subsystems not benefit from having their reference trackers in
+> debugfs?
+>=20
+>=20
 
-I have never seen a packet going out with port 0 :)
-But being dropped is most likely what's going to happen.
+Mostly because I just needed the NS_REFCNT_TRACKER at the time.
 
-I'd say this is not something that we expect the user to do:
-if the remote address if specified, the user should specify a non-zero 
-port too.
+I'm OK with making this more general, but all of those subsystems using
+refcount trackers would need to add the infrastructure to create
+directories to track them.
 
-We could add a check to ensure that a port is always specified if the 
-remote address is there too, just to avoid the user to shoot himself in 
-the foot.
-But we expect the user to pass an addr:port where the peer is listening 
-to (and that can't be a 0 port).
+To whit:
 
-> 
-> 
->> +static int ovpn_nl_peer_modify(struct ovpn_peer *peer, struct genl_info *info,
->> +			       struct nlattr **attrs)
->> +{
-> [...]
->> +	/* when setting the keepalive, both parameters have to be configured */
->> +	if (attrs[OVPN_A_PEER_KEEPALIVE_INTERVAL] &&
->> +	    attrs[OVPN_A_PEER_KEEPALIVE_TIMEOUT]) {
->> +		interv = nla_get_u32(attrs[OVPN_A_PEER_KEEPALIVE_INTERVAL]);
->> +		timeout = nla_get_u32(attrs[OVPN_A_PEER_KEEPALIVE_TIMEOUT]);
->> +		ovpn_peer_keepalive_set(peer, interv, timeout);
-> 
-> Should we interpret OVPN_A_PEER_KEEPALIVE_INTERVAL = 0 &&
-> OVPN_A_PEER_KEEPALIVE_TIMEOUT == 0 as "disable keepalive/timeout" on
-> an active peer?  And maybe "one set to 0, the other set to some
-> non-zero value" as invalid?  Setting either value to 0 doesn't seem
-> very useful (timeout = 0 will probably kill the peer immediately, and
-> I suspect interval = 0 would be quite spammy).
-> 
-
-Considering "0" as "disable keepalive" is the current intention.
-
-In ovpn_peer_keepalive_work_single() you can see that if either one if 
-0, we just skip the peer:
-
-1217         /* we expect both timers to be configured at the same time,
-1218          * therefore bail out if either is not set
-1219          */
-1220         if (!peer->keepalive_timeout || !peer->keepalive_interval) {
-1221                 spin_unlock_bh(&peer->lock);
-1222                 return 0;
-1223         }
-
-does it make sense?
-
-Regards,
-
--- 
-Antonio Quartulli
-OpenVPN Inc.
-
+What would the directory structure look like for the more general case?
+--=20
+Jeff Layton <jlayton@kernel.org>
 
