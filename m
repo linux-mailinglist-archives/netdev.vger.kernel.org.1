@@ -1,59 +1,58 @@
-Return-Path: <netdev+bounces-177300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6511A6ECF7
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 10:48:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA0C0A6ED0E
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 10:52:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 682D33A590F
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 09:45:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78CC83A5AE4
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 09:50:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B76DE1DE8A5;
-	Tue, 25 Mar 2025 09:45:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C1531E5B7D;
+	Tue, 25 Mar 2025 09:51:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G1oobzg6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UVWVVx3Z"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93AEF1DC98B
-	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 09:45:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57B7219B5B4
+	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 09:51:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742895911; cv=none; b=BhdX3jtroywVzqDhfvZPmLnovd/lLEb+cl2xybdtcmhKVHSOF9v2FMu3axUvVq2v/C6/wdCvAgItNjWXRSG2WI26w5VAF2cjpNIQLOfI0WtvYHmfftFTatNEWHoZLsc0dBXTc95pG1X86EINGm/gn3cAdIKNFga5hu8K+n8Opdw=
+	t=1742896267; cv=none; b=fH17DQN+EX7l1Jmnc55B0rtHr8re0xwu5+Bql7wWq0CqhJzHlOV1HfQWBJ8vIqLWL0JAGTM8DzDAur2BIF0sLCz0ifts+Yxf6r3D41MkZQBT8SikF1xPLu7qRik8glwC18iG1kNkc+2GtuZs07i9qIPQouXZ7F+c5Vm5vJ+dcgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742895911; c=relaxed/simple;
-	bh=pherTIo/w/j1N99925KbcU52bpWwy9gIvp7yOTrRYIY=;
+	s=arc-20240116; t=1742896267; c=relaxed/simple;
+	bh=IawYsrs8weGdVP5mOwpSbt2Z7iDnmUBIne7UBChfphY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kWU+56pWHtJMaxgiGzSe2x/iaW/njWGisafam+DALlPnAeagiaHM5XwPtMOeFTKC7PEtkxnP0qVb2RO77td5c+CWDt+ZNtnAakvUBgp0BptdmotWmV4dtewC+tXlm/0llhCP5OQfmAPy2J6bF9VN0aIRvIjUkFse+nRPi1uDL+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G1oobzg6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7769DC4CEE4;
-	Tue, 25 Mar 2025 09:45:07 +0000 (UTC)
+	 MIME-Version:Content-Type; b=WZuiOgAihPt+njbJ/q6O7tNSSil4TYGwaDRPDvWQ0TnHB2jHOnNsvGf2ooOog5oGHyEUaH1iutGQq6RzVH9LG07x6vyvEb40IUExG/wDz14DgsJYWDvBkbLtyEeWvfDGeuBZbEzNuxj01nG3yW1Q9+Sbd9Mx9FDjaJN5mbzAYUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UVWVVx3Z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3182C4CEE4;
+	Tue, 25 Mar 2025 09:51:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742895910;
-	bh=pherTIo/w/j1N99925KbcU52bpWwy9gIvp7yOTrRYIY=;
+	s=k20201202; t=1742896265;
+	bh=IawYsrs8weGdVP5mOwpSbt2Z7iDnmUBIne7UBChfphY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=G1oobzg6d21UfzA9RU5QMVDyjRyPsYRf8hOZIiEnwBWfl5aNA1S+256wTMpijoB71
-	 eKej1TVfFnejG2Wt56UNHieZcT8I55kuXM8uSJKJvJ7jsVjr9EtwBDt/egglfrek5B
-	 lGQYTUckoM03GwXNsqgDWPTWSfK9yv4Dt1JTrxCdA8jU1oQywJM28iV6nCvYdf3PP9
-	 gzVrMvoB6NjU8q9VoM4qb7dj4SDKop8ntgXfxijsGG4HDzsheG0KGf2aH+35I4FseI
-	 lcE7tT6Xpd5qa0X8QrsA5odFRm6kXR0DbQR0hHPqLn3srU6Y8poL15y6dGa3xn6Brv
-	 l7i7GOC3/4k6Q==
-Date: Tue, 25 Mar 2025 02:45:02 -0700
+	b=UVWVVx3ZlVOB1/mBGwGr+A0cabmE1Z2hivpIWLUHvwYrJqCyJ7yoNjP9kOOyKh1Sm
+	 mrc3cIj82ToXVTaKdeXFHntW5NGQN1GKLavqgWAI8IVLBmb9TMpWhql1ElDBcnEtM9
+	 7ePvOoPZDwusifsRcvLTUecMKIppP97GdLI7mDSLDl4i+E+SKxyivHWyv3Q4IxmXRk
+	 lmbMg0tYRxjzwuDwk9aVfItGfWduK/KAQ6VxpRqZ7erzE+s8k/siGbTAe+fu70vHh8
+	 pUyk0dThQuUcfQO6mHIrPEimb8dSNZohoDaSjhi64RcCDDwXxw73DWlhiAOCCLCpEC
+	 Ni/VWtqSR+tVA==
+Date: Tue, 25 Mar 2025 02:50:58 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Johan Korsnes <johan.korsnes@gmail.com>
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
- netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH] net: au1000_eth: Mark au1000_ReleaseDB() static
-Message-ID: <20250325024502.70a84c3f@kernel.org>
-In-Reply-To: <16fd5d51-fc2e-453c-9e81-c2530e4d3ea7@gmail.com>
-References: <20250323190450.111241-1-johan.korsnes@gmail.com>
-	<Z+D1NpUDCsIZLAEP@mev-dev.igk.intel.com>
-	<16fd5d51-fc2e-453c-9e81-c2530e4d3ea7@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, sdf@fomichev.me
+Subject: Re: [PATCH net-next v2 07/11] net: protect rxq->mp_params with the
+ instance lock
+Message-ID: <20250325025058.067517d1@kernel.org>
+In-Reply-To: <CAHS8izMyS_y0o9EzJ8NaLnS99KYH+Ze6BaSw=+=hPPnuS9zP8A@mail.gmail.com>
+References: <20250324224537.248800-1-kuba@kernel.org>
+	<20250324224537.248800-8-kuba@kernel.org>
+	<CAHS8izMyS_y0o9EzJ8NaLnS99KYH+Ze6BaSw=+=hPPnuS9zP8A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,20 +62,23 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 24 Mar 2025 09:21:29 +0100 Johan Korsnes wrote:
-> > Thanks for fixing it
-> > Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> > 
-> > You didn't specify the tree (net vs net-next in [PATCH ...]). If you
-> > want it to go to net you will need fixes tag, if to net-next it is fine.  
+On Mon, 24 Mar 2025 22:34:43 -0700 Mina Almasry wrote:
+> > @@ -11957,9 +11957,9 @@ void unregister_netdevice_many_notify(struct list_head *head,
+> >                 dev_tcx_uninstall(dev);
+> >                 netdev_lock_ops(dev);
+> >                 dev_xdp_uninstall(dev);
+> > +               dev_memory_provider_uninstall(dev);
+> >                 netdev_unlock_ops(dev);
+> >                 bpf_dev_bound_netdev_unregister(dev);
+> > -               dev_memory_provider_uninstall(dev);  
 > 
-> Thank you for the review. I don't mind adding fixes tags and re-submit,
-> but would that be preferred in this case? Or will it just be noise for
-> the maintainers?
+> So initially I thought this may be wrong because netdev_lock_ops()
+> only locks if there are queue_mgmt_ops, but access to mp_params should
+> be locked anyway. But I guess you're relying on the fact that if the
+> device doesn't support queue_mgmt_ops memory providers don't work
+> anyway.
 
-Just noise.
-
-Michal, when PW bot guesses the tree correctly there is no need to flag
-the problem to the contributor. The tree designation makes our life
-easier but not enough to deal with reposts.
+Right, my expectation is that they must be NULL if device is not
+ops-locked. Not sure if that's what textbooks would consider "correct"
+but I think KCSAN will not complain :)
 
