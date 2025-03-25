@@ -1,113 +1,211 @@
-Return-Path: <netdev+bounces-177314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95DC9A6EE57
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:01:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 33618A6EE4D
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 11:57:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9526D188D5AD
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 11:00:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB950189827A
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 10:57:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD6451C84A7;
-	Tue, 25 Mar 2025 11:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D58253F00;
+	Tue, 25 Mar 2025 10:57:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="liVmaXlJ"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="Osp+HnJ2";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ErIcmw+O"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE322E3378;
-	Tue, 25 Mar 2025 11:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 051E71EA7E7;
+	Tue, 25 Mar 2025 10:56:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742900430; cv=none; b=KjxIA8lfCtkH9hu+9vYkrlFK8gyoMWoCntL4vCidFoZjF4GAoqEXkcB7XjQw/3I1EYwqSUYTa2t6FD5mpf/AjyW/F3zyIdR/F4/4XjeQ6wTkQIe//DuLvsfGKU8PIUyGoM0wSlSY4DQXG5Iv/es3Z0cRjLtPbk9dcgsngG/NA1M=
+	t=1742900222; cv=none; b=AjPrB8HbuOFCndEelrVCAVrDqDdRK1OvTD9VGsb/2KV91ABlFait7y2G9NkA8fpND80HaDT0bHEb0fWgZJuTSHpBh6NOFAMejVWxLQy/eIX149dkoMDi9d5u3Z0trp1HmnTZ+D+TmRE1xS0amesa1eqqjqIEz1uknBTO+fHlm98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742900430; c=relaxed/simple;
-	bh=phowVCc4uTjG/AswATQd9ZKQuxqVfWCIa0kdrQaIi0I=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=e/5+aFK6BtehCMFLFPAkSH6DeMU7naB6wF0g3SsTNAh4EqAsY0yMYvOuQ2MX4LFOz/yQgEXQ/gNODq9VTGzRU8G6kQ9u/9phZdKQCZbxgg378LwQt0uSbjQj9N0gyRB6HmdNd9SgGlBX1XYu5/a2dexkKTXmmGE4hD+KGJbR0Dc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=liVmaXlJ; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1742900428; x=1774436428;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=phowVCc4uTjG/AswATQd9ZKQuxqVfWCIa0kdrQaIi0I=;
-  b=liVmaXlJL49FLenH8rZuetx7ONNZqCQrsHbh9Tf9deU8VXPs0NXtPLSf
-   whcB4xaiistSYWjjsP9v0LR3JsSmJtLyd1bD1dHldshAO+3cavbS2S7PX
-   pW7t1cY3eaQt5Fe7ZuAsRUijX331vfGrfebik8nmvpHLeInvXN/RcQ4Zg
-   8Lm+ZO0J7zjDnMbNRcFK0PF5xba0R49b9HBEIraF1ekIyLY1pdq9NAHKh
-   8kfg57Ibqh6sd5xXR9CO63fm/or/CHmVu/ekFXt16Kfl1tzwFxmj8fOAA
-   7v+hM6zPkSvWE2dtqt+bA6vgtumntI6OWy3+3P2zdNRVkHhcUnQFYLPTP
-   g==;
-X-CSE-ConnectionGUID: QCM7Q2TFRhOTjnxaI+S+Ng==
-X-CSE-MsgGUID: YxEN5IEmSd2KEJ+Bkl5RiA==
-X-IronPort-AV: E=Sophos;i="6.14,274,1736838000"; 
-   d="scan'208";a="271054509"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Mar 2025 04:00:21 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Tue, 25 Mar 2025 04:00:01 -0700
-Received: from che-ld-unglab06.microchip.com (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.44 via Frontend Transport; Tue, 25 Mar 2025 03:59:58 -0700
-From: Thangaraj Samynathan <thangaraj.s@microchip.com>
-To: <netdev@vger.kernel.org>
-CC: <bryan.whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>,
-	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH net v2] net: ethernet: microchip: lan743x: Fix memory allocation failure
-Date: Tue, 25 Mar 2025 16:26:53 +0530
-Message-ID: <20250325105653.6607-1-thangaraj.s@microchip.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1742900222; c=relaxed/simple;
+	bh=VGuEs9GAhR2VAUZreWgSBdsNx10WltKzgPwRtTmiljE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H4h+xl8i6SWzs4+v/dvDx8pB9Qo4LGpC3LerLNSuTOimRfCn6p1rDZM/Eo2GpQzFa+vg/A1wcM+FoZB2UHsYV/3lBcCYyHS3CJxyEFcM07rdBVk/KUhSORiB6IEDRnTk6SmOBcBwYwOWUIaDfIAXZSdxYhHUsJGoLfvYnMyMLXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Osp+HnJ2; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ErIcmw+O; arc=none smtp.client-ip=103.168.172.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-07.internal (phl-compute-07.phl.internal [10.202.2.47])
+	by mailfout.phl.internal (Postfix) with ESMTP id C4EFE13835F4;
+	Tue, 25 Mar 2025 06:56:57 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-07.internal (MEProxy); Tue, 25 Mar 2025 06:56:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1742900217; x=
+	1742986617; bh=Ka5a/lmh7xXbALpsnZjARVQPNtw4y0XXkg0IjNB40d0=; b=O
+	sp+HnJ2Ox6Mm9fRvEChYVntBL0NkW3spAm6ZHLU1uuqHIRpQlAOLovqEYaCVVN4v
+	eLN+WBsM8F8Iqme4n43IBct+N2rCw+L6lFK2QZAbYaNdatzE3GeoQaE8eWYxzb02
+	pg7rFbDURHGuqogd8LQkt+LBe6i4H5aotykizKAwl8pDi/ri2oa/ff1KiisNozko
+	/9PmTJnKZ+lTxH5fhLquwfXDcZ4hXB/Uv6ryHvlYNSMoTi7DpNFEGs4Y1hEwOaIs
+	E6Lii6n1GmjN1zDZqGWz/B/d22s5OJKGqylvDMadljIpH2MlDiJXpvKPkG00YmGq
+	I2qqzAz2on6rhR/6ZPJJQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1742900217; x=1742986617; bh=Ka5a/lmh7xXbALpsnZjARVQPNtw4y0XXkg0
+	IjNB40d0=; b=ErIcmw+OPGSkLSqUV/ng4pqMZ+clg26bokn7XVWqsPlieC4cfDO
+	BIfB3KqgM8RnluD2r9fEDSkl9ioxp05yVGhdcOzKBBKdysWkFSbZWtrWGoJ2gdWB
+	SEEX/IXiqwQQOlHdcsBBk9bmvDYdvCW4g34gdrhD08pUZGr2CAnuhnhU8lH2spVK
+	6tG5CmLrcz1iKU3I8ZYqrjlRSymmcxlJBPYGmntPiQRc5rx3NbpP+hM0q7pzGrZ0
+	n4fJsYJNfTgt6zTEIM4twEQNDRtCbXRucBCHMGN6jr7l9tspKTIY9N4ngwx9R+Mf
+	xtHErfFLk7lYrbsE5fP6WcMiiUlZeGT/1TQ==
+X-ME-Sender: <xms:-YviZ5e7RxdEeFgcNGvRlDMbctsvCslNvKr_xKnBXFA0Vh3PnHU9mA>
+    <xme:-YviZ3OlPoVDeJjr5pbnys10xdiNZtmCxDfGnk_cMiakQQw-WBlxF7AisR64c3Tdb
+    -FjSOssj7IXDTUwQm8>
+X-ME-Received: <xmr:-YviZygctju4dGYFDr1SdpeI3exKEjf1alO7a4-PFLKdlyeCrWlgu9646RYh>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduiedvgeeiucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
+    jeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihsh
+    hnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdef
+    hfekgeetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenuc
+    frrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhn
+    sggprhgtphhtthhopedufedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnth
+    honhhiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghr
+    rdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrd
+    gtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehp
+    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepughonhgrlhgurdhhuhhnth
+    gvrhesghhmrghilhdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhr
+    ghdprhgtphhtthhopehrhigriigrnhhovhdrshdrrgesghhmrghilhdrtghomhdprhgtph
+    htthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghh
+X-ME-Proxy: <xmx:-YviZy9ZmfP4HIfW51hKQ7KE2deTUmbghQxX1TXe4e9kDaGBUn5HVg>
+    <xmx:-YviZ1v3ArQlVz00bk4jSIWWU1GwmAsBOqfs71u3RaOz5qfuBH4uLA>
+    <xmx:-YviZxGwScItnx89jPhiizSpp4sYgyzB4CBFKRPQvg8yk1FXQ_rhiw>
+    <xmx:-YviZ8PO2G3jCexmB6Fe3W2s2RQr8SJI13GnLrKRwB8J0wnBnZqIVQ>
+    <xmx:-YviZ2Mi4kzkrGyhDR6E6IFOT2hXANJNbkfo9GFqb55vbJGaKuJJqxsu>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 25 Mar 2025 06:56:56 -0400 (EDT)
+Date: Tue, 25 Mar 2025 11:56:54 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
+Subject: Re: [PATCH net-next v24 18/23] ovpn: implement peer
+ add/get/dump/delete via netlink
+Message-ID: <Z-KL9jKHNayqDLi2@krikkit>
+References: <20250318-b4-ovpn-v24-0-3ec4ab5c4a77@openvpn.net>
+ <20250318-b4-ovpn-v24-18-3ec4ab5c4a77@openvpn.net>
+ <Z-E4i587M54Os5Yo@krikkit>
+ <86fea40c-6b8b-4ac3-bb14-4a24c63cf167@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <86fea40c-6b8b-4ac3-bb14-4a24c63cf167@openvpn.net>
 
-The driver allocates ring elements using GFP_DMA flags. There is
-no dependency from LAN743x hardware on memory allocation should be
-in DMA_ZONE. Hence modifying the flags to use only GFP_ATOMIC
+2025-03-25, 00:15:48 +0100, Antonio Quartulli wrote:
+> On 24/03/2025 11:48, Sabrina Dubroca wrote:
+> > Hello Antonio,
+> > 
+> > A few questions wrt the API:
+> > 
+> > 2025-03-18, 02:40:53 +0100, Antonio Quartulli wrote:
+> > > +static bool ovpn_nl_attr_sockaddr_remote(struct nlattr **attrs,
+> > > +					 struct sockaddr_storage *ss)
+> > > +{
+> > > +	struct sockaddr_in6 *sin6;
+> > > +	struct sockaddr_in *sin;
+> > > +	struct in6_addr *in6;
+> > > +	__be16 port = 0;
+> > > +	__be32 *in;
+> > > +
+> > > +	ss->ss_family = AF_UNSPEC;
+> > > +
+> > > +	if (attrs[OVPN_A_PEER_REMOTE_PORT])
+> > > +		port = nla_get_be16(attrs[OVPN_A_PEER_REMOTE_PORT]);
+> > 
+> > What's the expected behavior if REMOTE_PORT isn't provided? We'll send
+> > packets do port 0 (which I'm guessing will get dropped on the other
+> > side) until we get a message from the peer and float sets the correct
+> > port/address?
+> 
+> I have never seen a packet going out with port 0 :)
 
-Fixes: e8684db191e4 ("net: ethernet: microchip: lan743x: Fix skb allocation failure")
-Signed-off-by: Thangaraj Samynathan <thangaraj.s@microchip.com>
----
-v0
--Initial Commit
+It will if you hack into ovpn-cli to skip OVPN_A_PEER_REMOTE_PORT.
+I don't know how networks/admins react to such packets.
 
-v1
--Modified GFP flags from GFP_KERNEL to GFP_ATOMIC
--added fixes tag
+> But being dropped is most likely what's going to happen.
+> 
+> I'd say this is not something that we expect the user to do:
+> if the remote address if specified, the user should specify a non-zero port
+> too.
+> 
+> We could add a check to ensure that a port is always specified if the remote
+> address is there too, just to avoid the user to shoot himself in the foot.
+> But we expect the user to pass an addr:port where the peer is listening to
+> (and that can't be a 0 port).
 
----
- drivers/net/ethernet/microchip/lan743x_main.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+If we expect that (even if a well-behaved userspace would never do
+it), I have a preference for enforcing that expectation. Since there's
+already a policy rejecting OVPN_A_PEER_REMOTE_PORT == 0, this would be
+more consistent IMO.
 
-diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
-index 23760b613d3e..8b6b9b6efe18 100644
---- a/drivers/net/ethernet/microchip/lan743x_main.c
-+++ b/drivers/net/ethernet/microchip/lan743x_main.c
-@@ -2495,8 +2495,7 @@ static int lan743x_rx_process_buffer(struct lan743x_rx *rx)
- 
- 	/* save existing skb, allocate new skb and map to dma */
- 	skb = buffer_info->skb;
--	if (lan743x_rx_init_ring_element(rx, rx->last_head,
--					 GFP_ATOMIC | GFP_DMA)) {
-+	if (lan743x_rx_init_ring_element(rx, rx->last_head, GFP_ATOMIC)) {
- 		/* failed to allocate next skb.
- 		 * Memory is very low.
- 		 * Drop this packet and reuse buffer.
+An alternative would be to select a default (non-zero) port if none is
+provided.
+
+> > 
+> > 
+> > > +static int ovpn_nl_peer_modify(struct ovpn_peer *peer, struct genl_info *info,
+> > > +			       struct nlattr **attrs)
+> > > +{
+> > [...]
+> > > +	/* when setting the keepalive, both parameters have to be configured */
+> > > +	if (attrs[OVPN_A_PEER_KEEPALIVE_INTERVAL] &&
+> > > +	    attrs[OVPN_A_PEER_KEEPALIVE_TIMEOUT]) {
+> > > +		interv = nla_get_u32(attrs[OVPN_A_PEER_KEEPALIVE_INTERVAL]);
+> > > +		timeout = nla_get_u32(attrs[OVPN_A_PEER_KEEPALIVE_TIMEOUT]);
+> > > +		ovpn_peer_keepalive_set(peer, interv, timeout);
+> > 
+> > Should we interpret OVPN_A_PEER_KEEPALIVE_INTERVAL = 0 &&
+> > OVPN_A_PEER_KEEPALIVE_TIMEOUT == 0 as "disable keepalive/timeout" on
+> > an active peer?  And maybe "one set to 0, the other set to some
+> > non-zero value" as invalid?  Setting either value to 0 doesn't seem
+> > very useful (timeout = 0 will probably kill the peer immediately, and
+> > I suspect interval = 0 would be quite spammy).
+> > 
+> 
+> Considering "0" as "disable keepalive" is the current intention.
+> 
+> In ovpn_peer_keepalive_work_single() you can see that if either one if 0, we
+> just skip the peer:
+> 
+> 1217         /* we expect both timers to be configured at the same time,
+> 1218          * therefore bail out if either is not set
+> 1219          */
+> 1220         if (!peer->keepalive_timeout || !peer->keepalive_interval) {
+> 1221                 spin_unlock_bh(&peer->lock);
+> 1222                 return 0;
+> 1223         }
+> 
+> does it make sense?
+
+Ah, true. Sorry, I forgot about that.  So after _NEW/_SET we'll run
+the work once, and that peer will be ignored. And if there's no other
+peer requiring keepalive, next_run will be 0 and we don't
+reschedule. That's good, thanks.
+
 -- 
-2.25.1
-
+Sabrina
 
