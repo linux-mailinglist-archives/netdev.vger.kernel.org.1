@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-177328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C3D9A6F461
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:40:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 664BFA6F463
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:40:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C05DB7A5276
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 11:39:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A6EB3AE74D
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 11:39:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7577A2561C8;
-	Tue, 25 Mar 2025 11:40:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB8032566C0;
+	Tue, 25 Mar 2025 11:40:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GyFp6Cvv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XnngVi02"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C6852561BF;
-	Tue, 25 Mar 2025 11:39:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A902561DF
+	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 11:40:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742902800; cv=none; b=NbRrUlbcpXK/T55MwK0J9Li/V5EjHpcjYxoppiRQzxJGq6yWemtSL8LMbvT6vEWq1io5tba0wbZyYGzWVt6QtIIHm0rQI92iWrwICJPP33PwAYKbOSHkF8q687cJ7ZHJYFDmoYwHvyZa9ovATk+PSTVcrS67ukFFfZzgRcRaSe0=
+	t=1742902801; cv=none; b=lXplPq4ebkZKlxdUwFF2akrgwB1/E23BbA76nrVF9XQK+yrsZD9edY//1eWPQj9iWikc2OxQYfJxDdAX92eLKNT83LduN2DvDb9jxHJ5SkjM/xroX7hVjRrNFWZ2Br0AyPH0pHLQW7O+3cs0vhKcC/0exjOKzt6wVliVdBXSHfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742902800; c=relaxed/simple;
-	bh=UJ3PR/aOzNTP/9EyaL5yfKfrM5PQAQcxIZh6cRaHv5o=;
+	s=arc-20240116; t=1742902801; c=relaxed/simple;
+	bh=iVel62Cown7t3ST0LVEeq5O5cDMS31FeysNAGL0XxyU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MJ4lbz5uTzcbwXu2NDbhl284xMPMY/ZAb5taMBCQ2PqCi4t+F5PG0kUF7gScqvYslX+lhw8SzUrXo1sr3EbMYbk+TfYGPes1eqU42nuo2XaB3GkzVX4BmFLfi8KY3ofgKEQj626lz33zCcitVoyiJmd/tmNhoe1z3JhGx2CBP8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GyFp6Cvv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2574C4CEE4;
-	Tue, 25 Mar 2025 11:39:59 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=pcd1eL+FUUJ/a/i3y40QA+p+h4PLBMNN8SxbVi395EOr9DS93sLf5JMCdG3DFHzmOE7JrFuujbx9248/Qrlo0ox/FqV16FU1/QYDeJn7hYfBAd2uDluzGNckLICsvUW9I8XQLbLA0GvDWaa33kWiJsIygogjQUT3Y1WR/r06PkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XnngVi02; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33681C4CEE4;
+	Tue, 25 Mar 2025 11:40:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742902799;
-	bh=UJ3PR/aOzNTP/9EyaL5yfKfrM5PQAQcxIZh6cRaHv5o=;
+	s=k20201202; t=1742902801;
+	bh=iVel62Cown7t3ST0LVEeq5O5cDMS31FeysNAGL0XxyU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GyFp6Cvvjiym38w/QOV2Q0F/Sd+TBFaHp5/hKLPOJPCGMV/izvygpSFlGA2dN2hB7
-	 rcQYhV1odBT2dTnW8FiDlUeoy9oFtEzD5TCIsKceMvJk3r6bnpE+Z9/KM0bi8Q1Sae
-	 rHXs9BLj5JLCUNChKPTSKOncVqX2hKq4GrmU9LHvdhzdBBeELz/DAIcg8q2GRlNZsy
-	 ZDfETDb3EQYEKp7YjfVBST1qAYK8CNyQqMO3Ub4vjDKV874i9FhBgoOX/LhuEM8mxh
-	 H5+erFp40Y56HGHYZqwU6JKgwQtnWL2beGXzcxHp1wz6ZErLNALNlcrytTm9x7B1+J
-	 HS4HFm4sJsrnQ==
+	b=XnngVi026wqU01fQzOpcXrQ+vA4Fr9U3bCuD/wf/oydW949AVDcb++Ri0j1dhk+/c
+	 Y05Gt85eSfbfnD8GeJKJ2AEi0Jpqh0oIQP7wKSMtynP2qKcRwohdqQLbXggKhE25Pd
+	 1TYYntNUcadyNuGvDWlnanTZIOO3DQEdYWa5zRJsFh+5Fy8QISqcKJrvNzGFGEo12i
+	 TdvtZZF48vo/7LZAFq2MEU4Rbjvtw2b8GjzOSSeVpxslE4x6sIZ6gSzTsUy0ijBUe2
+	 bFqTls9Abm2ThKESCWArlRHyIZWjLGqH9zrXCC/0MM2+gJOB/tnCB/v5Zs+kj17Iyo
+	 CuXkf6+6X5EdA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B96380CFE7;
-	Tue, 25 Mar 2025 11:40:37 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE17380CFE7;
+	Tue, 25 Mar 2025 11:40:38 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,36 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3] net: tulip: avoid unused variable warning
+Subject: Re: [PATCH net-next v4 0/2] support TCP_RTO_MIN_US and TCP_DELACK_MAX_US
+ for set/getsockopt
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174290283600.528269.2264732089213374671.git-patchwork-notify@kernel.org>
-Date: Tue, 25 Mar 2025 11:40:36 +0000
-References: <20250318-tulip-w1-v3-1-a813fadd164d@kernel.org>
-In-Reply-To: <20250318-tulip-w1-v3-1-a813fadd164d@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, deller@gmx.de, netdev@vger.kernel.org,
- linux-parisc@vger.kernel.org
+ <174290283724.528269.10411873053615633415.git-patchwork-notify@kernel.org>
+Date: Tue, 25 Mar 2025 11:40:37 +0000
+References: <20250317120314.41404-1-kerneljasonxing@gmail.com>
+In-Reply-To: <20250317120314.41404-1-kerneljasonxing@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, ncardwell@google.com, kuniyu@amazon.com,
+ dsahern@kernel.org, netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 18 Mar 2025 13:53:34 +0000 you wrote:
-> There is an effort to achieve W=1 kernel builds without warnings.
-> As part of that effort Helge Deller highlighted the following warnings
-> in the tulip driver when compiling with W=1 and CONFIG_TULIP_MWI=n:
+On Mon, 17 Mar 2025 20:03:12 +0800 you wrote:
+> Add set/getsockopt supports for TCP_RTO_MIN_US and TCP_DELACK_MAX_US.
 > 
->   .../tulip_core.c: In function ‘tulip_init_one’:
->   .../tulip_core.c:1309:22: warning: variable ‘force_csr0’ set but not used
+> v4
+> 1. add more detailed information into commit log (Eric)
+> 2. use val directly in do_tcp_getsockopt (Eric)
+> 
+> Jason Xing (2):
+>   tcp: support TCP_RTO_MIN_US for set/getsockopt use
+>   tcp: support TCP_DELACK_MAX_US for set/getsockopt use
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v3] net: tulip: avoid unused variable warning
-    https://git.kernel.org/netdev/net-next/c/6165feda3d8c
+  - [net-next,v4,1/2] tcp: support TCP_RTO_MIN_US for set/getsockopt use
+    https://git.kernel.org/netdev/net-next/c/f38805c5d26f
+  - [net-next,v4,2/2] tcp: support TCP_DELACK_MAX_US for set/getsockopt use
+    https://git.kernel.org/netdev/net-next/c/9552f90835ef
 
 You are awesome, thank you!
 -- 
