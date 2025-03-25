@@ -1,73 +1,78 @@
-Return-Path: <netdev+bounces-177555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D8AAA70894
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 18:54:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 252F7A70898
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 18:56:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBD61175F75
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 17:54:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6220F3BCFC2
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 17:54:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48422263F3A;
-	Tue, 25 Mar 2025 17:54:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="hRK/NU7Z"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5114263F41;
+	Tue, 25 Mar 2025 17:54:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 744B9188A0C
-	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 17:54:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 903CB2641E2;
+	Tue, 25 Mar 2025 17:54:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742925267; cv=none; b=nvJd+KD0o9KAno2hEyvVHqgaeeNA74GxJb3SjTzXnILA5z8zwTqZuMRxUwgw7c+GnpbZD2cBDWEnuK6b0hI02Ur2Vh9M52ev/WfeT0C8M39M5Kd4jt1TU6lkCjWAkREf5Wqvw1g5POjmEhKlHZDCHWIUirp/STim7CZQDj0VVbQ=
+	t=1742925272; cv=none; b=clUNFrsACjPT44+2Vr0x4UcjLKr7KOgB2Lmk2NAX6wL2sjIOMpkjMC90rzN+0PAiLOX4CglG2HLEdF8axS/KtPzqIFcpMMCYqVZNMY1sLvL3RA5mviEbBmEsobn1VW1a/4h2ijEmcwjugPRPRNK/L0htmmr6qCfPZicJSFC8QmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742925267; c=relaxed/simple;
-	bh=1JhfSuiPQte1a1zNm8aXexWcglo8GCNvOeIC5bKHJPU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hlzTVwstCkLp6AATEQDsjSY8gh+mhMuxY+MJ6t324FSUqCEADya4R8gBUsPqjIjzACm2jH3+FYzwYyhtwirNAIFDArOE0AxJ6e4Ii5Bj9BBvWh0Zp5KdZBNcSv6PK7p8V6aY9lS9U11blZRaZ3FLaP05KTrLkAGgkd29r+iI/f4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=hRK/NU7Z; arc=none smtp.client-ip=52.119.213.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1742925266; x=1774461266;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=fblqJ1pz/XHmKUMInh+XHC6b8yDLslicEfbeM3OwgdM=;
-  b=hRK/NU7Z2ufUbk5SZ33BSuRZ6XKaTDoAvJJoAvs1JfMFYk8AfxyALKlC
-   WFh76kXaCzc7g5qpPnseemZBWZxlCWVQpkqoS5g6ml2uNgzTdI9O5dPUS
-   IEWm+bSP5l8W/c+1XbKVeysVxwJS6P4zYWaYtmcGC7Q38TZnt0BwfjnAd
-   0=;
-X-IronPort-AV: E=Sophos;i="6.14,275,1736812800"; 
-   d="scan'208";a="708069142"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2025 17:54:22 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:62589]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.62.254:2525] with esmtp (Farcaster)
- id 47f46f58-9e3d-4a0f-ab21-452cf9e75f82; Tue, 25 Mar 2025 17:54:21 +0000 (UTC)
-X-Farcaster-Flow-ID: 47f46f58-9e3d-4a0f-ab21-452cf9e75f82
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 25 Mar 2025 17:54:20 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.106.100.12) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 25 Mar 2025 17:54:17 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <willemdebruijn.kernel@gmail.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<horms@kernel.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
-	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH v1 net 1/3] udp: Fix multiple wraparounds of sk->sk_rmem_alloc.
-Date: Tue, 25 Mar 2025 10:53:57 -0700
-Message-ID: <20250325175408.32112-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1742925272; c=relaxed/simple;
+	bh=+u1HyZPPd+R2u3/AXT9yxNUrkUbLjE2OSYzRgR7BXOw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sSXAZiXe4TLIHscfPQaWaRTrNOks3GqMH9PaFPL8ql65MY+lsxbx0Jl3UU1N79a3XAHL1Fpa+NvolWzb+JVaWNW1UCc5zTxjhZRKU/4f59Nq5QBCfMVzsDRdC/Me1MuqM0DJkTsZFQcYK8yhQlthQtLpim9+CCPCPaBiqwA1APw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2ff799d99dcso10019630a91.1;
+        Tue, 25 Mar 2025 10:54:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742925269; x=1743530069;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KL3xXNyveKKELLggKhdktNiKOym+xaaWn+kS6J3KeJI=;
+        b=VbA/7iLv3wqL9Btw+HQb8WoQVBHWwME+MA3GIQP64gCk2f93rEUVlzgMnSo5TTCIv4
+         CqKn1V/J5bGcQuFUnC2wceLs2oAUMgIfchCfsRQ4YHGpSBG1VfApSWmhx1LZvSybyvyC
+         /Upwtnra45iXbAyH8oTzrv6B4SAdNj6liqt317mAQvcp0lsHzP8Tn7LW8V5l8Xh4k/n1
+         u8N3XTlBKumiAnR+mbskOzQlqkZMvAW7Z8biP3IMLOpJm7SnO2qhxsRAv3e6wqaaBVp8
+         4gTCz+doJUdRsIR3Hr1WaaNDML5fgqLJ7pFM+H6qBeV0y874RW3sSMA+LNxw/bgNK7fo
+         fO9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUHeE+m+TJf/UIkSYiEyc1oliDXWylctQvOUQb9Dzl80j25GAv15CBHEL0Y45V3ZMUx3P96bu4C7HldTZo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEj8Ti/U40MSDjCzGSkcQfOQiUDtO77SXOJsjqAUrDdbgx4I0y
+	K48nqFAE4FWE3LTKg8C7UC9/6cjTE0sdnuEEechVPHKFcZd7jgDNinTFb+Q=
+X-Gm-Gg: ASbGncvwpxzs2MOGtC71TUrFffZXldDOvGMXGdcE+dnnBCpgJF7oSmg6gqfGDnWW2G+
+	7vlYkXtWedKqStIjzinBmdx92UHxxntVZXxVIRpXXDI7WmnTNskOO0Rx4bCxNwli3qXX6XAHuvM
+	Pb5YINYcYj171jbreolSfmRimV7XfOmq6HBTR3kMQCA6/WoSoM2rOmVVN5H+FuacM0qGoMbWwI7
+	uqZfAb6tCENzn+dOx8iqONMqRnaH070stOpS+9Pjnsp6XBC0fPmpiRmPQHTLh6TGWB2LGaiqt3R
+	6V0bAYJu8JmvSbHNW1Igv0gW13kHQLaRQ3TSK+zpEVvuAYmP2yeYUXw=
+X-Google-Smtp-Source: AGHT+IHRpLw1w9FOMNF/WEqbsCKznVqXm++T2qibIkMyWcdjpgvrf8acBwLi05NTUhlivjhGkd0qxQ==
+X-Received: by 2002:a17:90b:394c:b0:2ff:52b8:2767 with SMTP id 98e67ed59e1d1-3030fe9d786mr28288794a91.19.1742925268817;
+        Tue, 25 Mar 2025 10:54:28 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-3030f5f892dsm10671794a91.22.2025.03.25.10.54.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Mar 2025 10:54:28 -0700 (PDT)
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	horms@kernel.org,
+	sdf@fomichev.me
+Subject: [PATCH net-next] net: move replay logic to tc_modify_qdisc
+Date: Tue, 25 Mar 2025 10:54:27 -0700
+Message-ID: <20250325175427.3818808-1-sdf@fomichev.me>
 X-Mailer: git-send-email 2.48.1
-In-Reply-To: <67e2bb367b235_3b4cd829495@willemb.c.googlers.com.notmuch>
-References: <67e2bb367b235_3b4cd829495@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,157 +80,152 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWA004.ant.amazon.com (10.13.139.76) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Tue, 25 Mar 2025 10:18:30 -0400
-> Kuniyuki Iwashima wrote:
-> > From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> > Date: Mon, 24 Mar 2025 15:44:40 -0400
-> > > Kuniyuki Iwashima wrote:
-> > > > From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> > > > Date: Mon, 24 Mar 2025 10:59:49 -0400
-> > > > > Kuniyuki Iwashima wrote:
-> > > > > > __udp_enqueue_schedule_skb() has the following condition:
-> > > > > > 
-> > > > > >   if (atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf)
-> > > > > >           goto drop;
-> > > > > > 
-> > > > > > sk->sk_rcvbuf is initialised by net.core.rmem_default and later can
-> > > > > > be configured by SO_RCVBUF, which is limited by net.core.rmem_max,
-> > > > > > or SO_RCVBUFFORCE.
-> > > > > > 
-> > > > > > If we set INT_MAX to sk->sk_rcvbuf, the condition is always false
-> > > > > > as sk->sk_rmem_alloc is also signed int.
-> > > > > > 
-> > > > > > Then, the size of the incoming skb is added to sk->sk_rmem_alloc
-> > > > > > unconditionally.
-> > > > > > 
-> > > > > > This results in integer overflow (possibly multiple times) on
-> > > > > > sk->sk_rmem_alloc and allows a single socket to have skb up to
-> > > > > > net.core.udp_mem[1].
-> > > > > > 
-> > > > > > For example, if we set a large value to udp_mem[1] and INT_MAX to
-> > > > > > sk->sk_rcvbuf and flood packets to the socket, we can see multiple
-> > > > > > overflows:
-> > > > > > 
-> > > > > >   # cat /proc/net/sockstat | grep UDP:
-> > > > > >   UDP: inuse 3 mem 7956736  <-- (7956736 << 12) bytes > INT_MAX * 15
-> > > > > >                                              ^- PAGE_SHIFT
-> > > > > >   # ss -uam
-> > > > > >   State  Recv-Q      ...
-> > > > > >   UNCONN -1757018048 ...    <-- flipping the sign repeatedly
-> > > > > >          skmem:(r2537949248,rb2147483646,t0,tb212992,f1984,w0,o0,bl0,d0)
-> > > > > > 
-> > > > > > Previously, we had a boundary check for INT_MAX, which was removed by
-> > > > > > commit 6a1f12dd85a8 ("udp: relax atomic operation on sk->sk_rmem_alloc").
-> > > > > > 
-> > > > > > A complete fix would be to revert it and cap the right operand by
-> > > > > > INT_MAX:
-> > > > > > 
-> > > > > >   rmem = atomic_add_return(size, &sk->sk_rmem_alloc);
-> > > > > >   if (rmem > min(size + (unsigned int)sk->sk_rcvbuf, INT_MAX))
-> > > > > >           goto uncharge_drop;
-> > > > > > 
-> > > > > > but we do not want to add the expensive atomic_add_return() back just
-> > > > > > for the corner case.
-> > > > > > 
-> > > > > > So, let's perform the first check as unsigned int to detect the
-> > > > > > integer overflow.
-> > > > > > 
-> > > > > > Note that we still allow a single wraparound, which can be observed
-> > > > > > from userspace, but it's acceptable considering it's unlikely that
-> > > > > > no recv() is called for a long period, and the negative value will
-> > > > > > soon flip back to positive after a few recv() calls.
-> > > > > 
-> > > > > Can we do better than this?
-> > > > 
-> > > > Another approach I had in mind was to restore the original validation
-> > > > under the recvq lock but without atomic ops like
-> > > > 
-> > > >   1. add another u32 as union of sk_rmem_alloc (only for UDP)
-> > > >   2. access it with READ_ONCE() or under the recvq lock
-> > > >   3. perform the validation under the lock
-> > > > 
-> > > > But it requires more changes around the error queue handling and
-> > > > the general socket impl, so will be too invasive for net.git but
-> > > > maybe worth a try for net-next ?
-> > > 
-> > > Definitely not net material. Adding more complexity here
-> > > would also need some convincing benchmark data probably.
-> > > 
-> > > > 
-> > > > > Is this because of the "Always allow at least one packet" below, and
-> > > > > due to testing the value of the counter without skb->truesize added?
-> > > > 
-> > > > Yes, that's the reason although we don't receive a single >INT_MAX
-> > > > packet.
-> > > 
-> > > I was surprised that we don't take the current skb size into
-> > > account when doing this calculation.
-> > > 
-> > > Turns out that this code used to do that.
-> > > 
-> > > commit 363dc73acacb ("udp: be less conservative with sock rmem
-> > > accounting") made this change:
-> > > 
-> > > -       if (rmem && (rmem + size > sk->sk_rcvbuf))
-> > > +       if (rmem > sk->sk_rcvbuf)
-> > >                 goto drop;
-> > > 
-> > > The special consideration to allow one packet is to avoid starvation
-> > > with small rcvbuf, judging also from this review comment:
-> > > 
-> > > https://lore.kernel.org/netdev/1476938622.5650.111.camel@edumazet-glaptop3.roam.corp.google.com/
-> > 
-> > Interesting, thanks for the info !
-> > 
-> > Now it's allowed to exceed by the total size of the incoming skb
-> > on every CPUs, and a user may notice that rmem > rcvbuf via ss,
-> > but I guess it's allowed because the fast recovery is expected.
-> > 
-> > 
-> > > 
-> > > That clearly doesn't apply when rcvbuf is near INT_MAX.
-> > > Can we separate the tiny budget case and hard drop including the
-> > > skb->truesize for normal buffer sizes?
-> > 
-> > Maybe like this ?
-> > 
-> >         if (rcvbuf < UDP_MIN_RCVBUF) {
-> >                 if (rmem > rcvbuf)
-> >                         goto drop;
-> >         } else {
-> >                 if (rmem + size > rcvbuf)
-> >                         goto drop;
-> >         }
-> > 
-> > SOCK_MIN_RCVBUF is 2K + skb since 2013, but the regression was
-> > reported after that in 2016, so UDP_MIN_RCVBUF would be more ?
-> 
-> Since the only issue is the overflow, could use a higher bound like
-> INT_MAX >> 1.
->  
-> > But I wonder if adding new branches in the fast path is worth for
-> > the corner case, and that's why I chose integrating the cast into
-> > the exisintg branch, allowing a small overflow, which is observable
-> > only when no thread calls recv() and skbs are queued more than INT_MAX.
-> 
-> Okay. Though it can probably be structured that the likely path does
-> not even see this?
+Eric reports that by the time we call netdev_lock_ops after
+rtnl_unlock/rtnl_lock, the dev might point to an invalid device.
+As suggested by Jakub in [0], move rtnl lock/unlock and request_module
+outside of qdisc_create. This removes extra complexity with relocking
+the netdev.
 
-Ah exactly, will use this and update commit message in v2.
+0: https://lore.kernel.org/netdev/20250325032803.1542c15e@kernel.org/
 
-Thanks!
+Fixes: a0527ee2df3f ("net: hold netdev instance lock during qdisc ndo_setup_tc")
+Reported-by: Eric Dumazet <edumazet@google.com>
+Link: https://lore.kernel.org/netdev/20250305163732.2766420-1-sdf@fomichev.me/T/#me8dfd778ea4c4463acab55644e3f9836bc608771
+Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+---
+ net/sched/sch_api.c | 73 +++++++++++++++++----------------------------
+ 1 file changed, 27 insertions(+), 46 deletions(-)
 
-> 
->     if (rmem + size > rcvbuf) {
->             if (rcvbuf > INT_MAX << 1)
->                     goto drop;
->             if (rmem > rcvbuf)
->                     goto drop;
->     }
-> 
+diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+index aef39f6dc6a8..fcb07c03117e 100644
+--- a/net/sched/sch_api.c
++++ b/net/sched/sch_api.c
+@@ -1268,38 +1268,8 @@ static struct Qdisc *qdisc_create(struct net_device *dev,
+ 	struct qdisc_size_table *stab;
+ 
+ 	ops = qdisc_lookup_ops(kind);
+-#ifdef CONFIG_MODULES
+-	if (ops == NULL && kind != NULL) {
+-		char name[IFNAMSIZ];
+-		if (nla_strscpy(name, kind, IFNAMSIZ) >= 0) {
+-			/* We dropped the RTNL semaphore in order to
+-			 * perform the module load.  So, even if we
+-			 * succeeded in loading the module we have to
+-			 * tell the caller to replay the request.  We
+-			 * indicate this using -EAGAIN.
+-			 * We replay the request because the device may
+-			 * go away in the mean time.
+-			 */
+-			netdev_unlock_ops(dev);
+-			rtnl_unlock();
+-			request_module(NET_SCH_ALIAS_PREFIX "%s", name);
+-			rtnl_lock();
+-			netdev_lock_ops(dev);
+-			ops = qdisc_lookup_ops(kind);
+-			if (ops != NULL) {
+-				/* We will try again qdisc_lookup_ops,
+-				 * so don't keep a reference.
+-				 */
+-				module_put(ops->owner);
+-				err = -EAGAIN;
+-				goto err_out;
+-			}
+-		}
+-	}
+-#endif
+-
+-	err = -ENOENT;
+ 	if (!ops) {
++		err = -ENOENT;
+ 		NL_SET_ERR_MSG(extack, "Specified qdisc kind is unknown");
+ 		goto err_out;
+ 	}
+@@ -1624,8 +1594,7 @@ static int __tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
+ 			     struct netlink_ext_ack *extack,
+ 			     struct net_device *dev,
+ 			     struct nlattr *tca[TCA_MAX + 1],
+-			     struct tcmsg *tcm,
+-			     bool *replay)
++			     struct tcmsg *tcm)
+ {
+ 	struct Qdisc *q = NULL;
+ 	struct Qdisc *p = NULL;
+@@ -1790,13 +1759,8 @@ static int __tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
+ 				 tcm->tcm_parent, tcm->tcm_handle,
+ 				 tca, &err, extack);
+ 	}
+-	if (q == NULL) {
+-		if (err == -EAGAIN) {
+-			*replay = true;
+-			return 0;
+-		}
++	if (!q)
+ 		return err;
+-	}
+ 
+ graft:
+ 	err = qdisc_graft(dev, p, skb, n, clid, q, NULL, extack);
+@@ -1809,6 +1773,27 @@ static int __tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
+ 	return 0;
+ }
+ 
++static void request_qdisc_module(struct nlattr *kind)
++{
++	struct Qdisc_ops *ops;
++	char name[IFNAMSIZ];
++
++	if (!kind)
++		return;
++
++	ops = qdisc_lookup_ops(kind);
++	if (ops) {
++		module_put(ops->owner);
++		return;
++	}
++
++	if (nla_strscpy(name, kind, IFNAMSIZ) >= 0) {
++		rtnl_unlock();
++		request_module(NET_SCH_ALIAS_PREFIX "%s", name);
++		rtnl_lock();
++	}
++}
++
+ /*
+  * Create/change qdisc.
+  */
+@@ -1819,27 +1804,23 @@ static int tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
+ 	struct nlattr *tca[TCA_MAX + 1];
+ 	struct net_device *dev;
+ 	struct tcmsg *tcm;
+-	bool replay;
+ 	int err;
+ 
+-replay:
+-	/* Reinit, just in case something touches this. */
+ 	err = nlmsg_parse_deprecated(n, sizeof(*tcm), tca, TCA_MAX,
+ 				     rtm_tca_policy, extack);
+ 	if (err < 0)
+ 		return err;
+ 
++	request_qdisc_module(tca[TCA_KIND]);
++
+ 	tcm = nlmsg_data(n);
+ 	dev = __dev_get_by_index(net, tcm->tcm_ifindex);
+ 	if (!dev)
+ 		return -ENODEV;
+ 
+-	replay = false;
+ 	netdev_lock_ops(dev);
+-	err = __tc_modify_qdisc(skb, n, extack, dev, tca, tcm, &replay);
++	err = __tc_modify_qdisc(skb, n, extack, dev, tca, tcm);
+ 	netdev_unlock_ops(dev);
+-	if (replay)
+-		goto replay;
+ 
+ 	return err;
+ }
+-- 
+2.48.1
+
 
