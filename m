@@ -1,98 +1,102 @@
-Return-Path: <netdev+bounces-177329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 664BFA6F463
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:40:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C851CA6F539
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:43:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A6EB3AE74D
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 11:39:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D60E1170915
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 11:43:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB8032566C0;
-	Tue, 25 Mar 2025 11:40:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7152256C7A;
+	Tue, 25 Mar 2025 11:41:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XnngVi02"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UjIcrAY7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A902561DF
-	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 11:40:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 929AE2561AD;
+	Tue, 25 Mar 2025 11:41:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742902801; cv=none; b=lXplPq4ebkZKlxdUwFF2akrgwB1/E23BbA76nrVF9XQK+yrsZD9edY//1eWPQj9iWikc2OxQYfJxDdAX92eLKNT83LduN2DvDb9jxHJ5SkjM/xroX7hVjRrNFWZ2Br0AyPH0pHLQW7O+3cs0vhKcC/0exjOKzt6wVliVdBXSHfk=
+	t=1742902902; cv=none; b=HMbkwCziffKMCQK5pNVcBBsi4awYQ2PBZ4BeZBF6uzuMeZGTrVYhz+r5T/CgOBWyZZk1CI3md2wP9x9mqzAYYgKYf+9tXr8b0RKSfTLNHBvqEc43kvDSfmGHrDKIbXf+wZ4a8usjRlGTvFFQcllnMeJzPbt6UgnJaZdKKdMHJ0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742902801; c=relaxed/simple;
-	bh=iVel62Cown7t3ST0LVEeq5O5cDMS31FeysNAGL0XxyU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pcd1eL+FUUJ/a/i3y40QA+p+h4PLBMNN8SxbVi395EOr9DS93sLf5JMCdG3DFHzmOE7JrFuujbx9248/Qrlo0ox/FqV16FU1/QYDeJn7hYfBAd2uDluzGNckLICsvUW9I8XQLbLA0GvDWaa33kWiJsIygogjQUT3Y1WR/r06PkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XnngVi02; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33681C4CEE4;
-	Tue, 25 Mar 2025 11:40:01 +0000 (UTC)
+	s=arc-20240116; t=1742902902; c=relaxed/simple;
+	bh=zUelcqDDriz9SHJ6HG975vlFXTHLgPVDZutVhZothAA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Duj84mPmdTH4cXHKp2KuasO9je9J5x3KLqhO6nQGo1jxI5WyAOh5ZSLuK2teP6BzyO1gLGRXUg6Q/+To0ZSFZqnQx8TpKA3VyOd/fRuLPjaYWCiZvgUkFOWR2yytHLQjchE5MYBAL0gcAycYKUWceQKUNjM5gsyF1E4/FwEa90M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UjIcrAY7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 078DFC4CEE4;
+	Tue, 25 Mar 2025 11:41:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742902801;
-	bh=iVel62Cown7t3ST0LVEeq5O5cDMS31FeysNAGL0XxyU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XnngVi026wqU01fQzOpcXrQ+vA4Fr9U3bCuD/wf/oydW949AVDcb++Ri0j1dhk+/c
-	 Y05Gt85eSfbfnD8GeJKJ2AEi0Jpqh0oIQP7wKSMtynP2qKcRwohdqQLbXggKhE25Pd
-	 1TYYntNUcadyNuGvDWlnanTZIOO3DQEdYWa5zRJsFh+5Fy8QISqcKJrvNzGFGEo12i
-	 TdvtZZF48vo/7LZAFq2MEU4Rbjvtw2b8GjzOSSeVpxslE4x6sIZ6gSzTsUy0ijBUe2
-	 bFqTls9Abm2ThKESCWArlRHyIZWjLGqH9zrXCC/0MM2+gJOB/tnCB/v5Zs+kj17Iyo
-	 CuXkf6+6X5EdA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE17380CFE7;
-	Tue, 25 Mar 2025 11:40:38 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1742902902;
+	bh=zUelcqDDriz9SHJ6HG975vlFXTHLgPVDZutVhZothAA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UjIcrAY75aMFN3vXVfik+OFX0Uy5JnrBVRd5fjFX94lL3SFrNbHkKgQcaIA2VC/uF
+	 c2d7+SrvjPHqi3AbZvmgxIvY1UxRQw1jAJGd9d3ejma7XAkMJ9jHVUr0VdOT7lBd3B
+	 7FPhJeSfb/hWEt/mJCtOzTE4a5iZPKQyCm1dsixrg+kYQkSNd82p/JF1V6m1cUw/ZC
+	 Lcg/MJdd6r8tQjuNkSp6keZMt6LC86vUeKhTm2Ohaw2PdtTPuxtGB0ImPQpkjXtbmf
+	 H5elHwkT2m/vYSAJ7IqPJXyDiyrnd51xugQZFl94GUFuKOXJFsN97DLbXN66xX352G
+	 iZxetGKtfiGvQ==
+Date: Tue, 25 Mar 2025 04:41:26 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Marcin Wojtas <marcin.s.wojtas@gmail.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Russell King <linux@armlinux.org.uk>, Ilias
+ Apalodimas <ilias.apalodimas@linaro.org>, Masahisa Kojima
+ <kojima.masahisa@socionext.com>, Sunil Goutham <sgoutham@marvell.com>,
+ Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep
+ <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>, Bharat Bhushan
+ <bbhushan2@marvell.com>, Felix Fietkau <nbd@nbd.name>, Sean Wang
+ <sean.wang@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, "K.
+ Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
+ Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, Siddharth
+ Vadapalli <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ linux-hyperv@vger.kernel.org, linux-omap@vger.kernel.org, Michal Kubiak
+ <michal.kubiak@intel.com>
+Subject: Re: [PATCH net-next v2 4/7] net: octeontx2: Add metadata support
+ for xdp mode
+Message-ID: <20250325044126.1c0f9b83@kernel.org>
+In-Reply-To: <20250318-mvneta-xdp-meta-v2-4-b6075778f61f@kernel.org>
+References: <20250318-mvneta-xdp-meta-v2-0-b6075778f61f@kernel.org>
+	<20250318-mvneta-xdp-meta-v2-4-b6075778f61f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4 0/2] support TCP_RTO_MIN_US and TCP_DELACK_MAX_US
- for set/getsockopt
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174290283724.528269.10411873053615633415.git-patchwork-notify@kernel.org>
-Date: Tue, 25 Mar 2025 11:40:37 +0000
-References: <20250317120314.41404-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20250317120314.41404-1-kerneljasonxing@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, ncardwell@google.com, kuniyu@amazon.com,
- dsahern@kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Tue, 18 Mar 2025 12:46:08 +0100 Lorenzo Bianconi wrote:
+> @@ -1514,13 +1518,14 @@ static bool otx2_xdp_rcv_pkt_handler(struct otx2_nic *pfvf,
+>  
+>  	hard_start = (unsigned char *)phys_to_virt(pa);
+>  	xdp_prepare_buff(&xdp, hard_start, OTX2_HEAD_ROOM,
+> -			 cqe->sg.seg_size, false);
+> +			 cqe->sg.seg_size, true);
+>  
+>  	act = bpf_prog_run_xdp(prog, &xdp);
+>  
+>  handle_xdp_verdict:
+>  	switch (act) {
+>  	case XDP_PASS:
+> +		*metasize = xdp.data - xdp.data_meta;
+>  		break;
+>  	case XDP_TX:
+>  		qidx += pfvf->hw.tx_queues;
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 17 Mar 2025 20:03:12 +0800 you wrote:
-> Add set/getsockopt supports for TCP_RTO_MIN_US and TCP_DELACK_MAX_US.
-> 
-> v4
-> 1. add more detailed information into commit log (Eric)
-> 2. use val directly in do_tcp_getsockopt (Eric)
-> 
-> Jason Xing (2):
->   tcp: support TCP_RTO_MIN_US for set/getsockopt use
->   tcp: support TCP_DELACK_MAX_US for set/getsockopt use
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v4,1/2] tcp: support TCP_RTO_MIN_US for set/getsockopt use
-    https://git.kernel.org/netdev/net-next/c/f38805c5d26f
-  - [net-next,v4,2/2] tcp: support TCP_DELACK_MAX_US for set/getsockopt use
-    https://git.kernel.org/netdev/net-next/c/9552f90835ef
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+This one handles ABORT and invalid return codes as PASS not DROP.
+That should probably be fixed separately?
 
