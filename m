@@ -1,118 +1,86 @@
-Return-Path: <netdev+bounces-177438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAA8FA70372
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 15:19:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5039CA703A3
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 15:28:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6FE857A6318
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 14:18:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9B453A8EAD
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 14:21:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F7FA25A2B1;
-	Tue, 25 Mar 2025 14:19:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24A93259CB1;
+	Tue, 25 Mar 2025 14:21:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b="CNJSVftO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ix/myznc"
 X-Original-To: netdev@vger.kernel.org
-Received: from ksmg01.maxima.ru (ksmg01.maxima.ru [81.200.124.38])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFC6125A62B;
-	Tue, 25 Mar 2025 14:19:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.200.124.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33B22E3382;
+	Tue, 25 Mar 2025 14:21:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742912371; cv=none; b=qTqIJqWzJ/X11UtUFJq3duMgTj78OgJceyIw6zD+g/xUO6S2V6W0ML3UMlUc7GbGB6PYmfA+O/Y9m3XdyymVTjlyyMk7Fq1EXyxyPCzmSjtIcRdX2LswvuCGImB/DHZj66iKcqhhVnCvCyvbiky1ffGj5t7GLC5G4yXgr8WjdiI=
+	t=1742912511; cv=none; b=dV7iATtvc5Vc7Zc/cNYyhdWZVun9Xb1tI8CM5tx7FtZY3Lgui9b4xMmuN7qqFCMQC+IWxV+udrYD28DFg2ifFXr3wvmL7U7kAnlQNjswrAuHW7feASce3ihdkQMjR/poeTN0ESo+2CywzyAUKU1l9PcqxBOet61FZ+dzN7jrBT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742912371; c=relaxed/simple;
-	bh=GmM9nc0h7Rpsda36dj+2kNnrsCf+HAeRmCa1HiIvXRQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=I7wvCdBozfZ8H9YNgWT45GRvSRNUkXdF02yd+8og3suph4kK4eRPmsM7kvDr128BGLe8IUvlGnRsooLOQJkkbI2Y8vGiobMPuE/adSG7XIA9lPdGXQQVxk3lmvuTdBDm8Qbutx6eJu38zPDIqdQ18xELW1BkZgITvb0cfbNIDHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru; spf=pass smtp.mailfrom=mt-integration.ru; dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b=CNJSVftO; arc=none smtp.client-ip=81.200.124.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mt-integration.ru
-Received: from ksmg01.maxima.ru (localhost [127.0.0.1])
-	by ksmg01.maxima.ru (Postfix) with ESMTP id 1BAD5C001E;
-	Tue, 25 Mar 2025 17:19:28 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ksmg01.maxima.ru 1BAD5C001E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mt-integration.ru;
-	s=sl; t=1742912368; bh=xOIKQhfLeGn+BFImddppcHEQgCWq+xEUuCyR1dMleec=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=CNJSVftOKCqRKX5+oLBucq6KGFkuJIXJmSD9gEBUroZJAi6hOnGKYfhBCivitmyZh
-	 fVCiMNTbdBJXgJPLyQKt09ow1ycjBdUG4JGBbRjgiq3EAWWj1IY8Wds74Abt6x22/Z
-	 0DKgJ8qNj/7BK7RyLAuhNkeARzW52ltWp28hXbxJwOVNLtFP4bgI3UhUVz9EEZOgpf
-	 NMox4+BP8i8B7fhqPFQJV61QSDUDh8TdoWhFemBkEexlvGcEyWNuPqqvxVCbxUXtqD
-	 o46Cff3AHRDEI9Z4hnOVHgWBzF9d8brFEzl/Eorq0iqPT5P13RWjnXx3i0N2SlsFUz
-	 i7nlZe9Bl0sCA==
-Received: from ksmg01.maxima.ru (mail.maxima.ru [81.200.124.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client CN "*.maxima.ru", Issuer "GlobalSign GCC R3 DV TLS CA 2020" (verified OK))
-	by ksmg01.maxima.ru (Postfix) with ESMTPS;
-	Tue, 25 Mar 2025 17:19:27 +0300 (MSK)
-Received: from db126-1-abramov-14-d-mosos.mti-lab.com (172.25.20.118) by
- mmail-p-exch01.mt.ru (81.200.124.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Tue, 25 Mar 2025 17:19:26 +0300
-From: Ivan Abramov <i.abramov@mt-integration.ru>
-To: "David S. Miller" <davem@davemloft.net>
-CC: Ivan Abramov <i.abramov@mt-integration.ru>, Jakub Kicinski
-	<kuba@kernel.org>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<lvc-project@linuxtesting.org>
-Subject: [PATCH net 4/4] net: Avoid calling WARN_ON() on -ENOMEM in __dev_change_net_namespace()
-Date: Tue, 25 Mar 2025 17:19:12 +0300
-Message-ID: <20250325141912.499929-1-i.abramov@mt-integration.ru>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1742912511; c=relaxed/simple;
+	bh=1xaIholjSupcAo+TJuOzRRk0LYc/jKmHF8F7TI5RCNc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WMLz9dsNl25wIFULqhlLihJfZLcxZDn+5HveKBcvMPcDeTwgMVWSDmF7y24AqIP9ohIC9wdGJ2BWbhjxg934VCifB1eJ3Hc0VKCUsR+YhM8yySzXgRUyncJEEkZMYL9QO0t/sNTJf4pSmiyTUPDOlqjkvgaf0ZPFKlwuYU+SVA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ix/myznc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44E01C4CEE4;
+	Tue, 25 Mar 2025 14:21:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742912510;
+	bh=1xaIholjSupcAo+TJuOzRRk0LYc/jKmHF8F7TI5RCNc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Ix/myznchuQ712ZtKA5bn9E9Etfslzz32UKOW/7VLJ3EGZ9u3ILmx5R2Zg5BZSPlz
+	 DgNvHwivVMLuJ7L6dAndqmX4ZE+RBUDVjxbXbpInHZLIfQEGySnAxNqjze6x80+NMF
+	 GRfsquj4E4AMSWQ8Jb8EseoDf9EI3Y/Ok2a5/XEM97+TbTzTsEjeNo84anr4cZrXLm
+	 5+pI6WM4Kqu096zrblwZMOH2eR08X9c4n62m00/XXZVUOcg7CzAAredKhleZO1xVSX
+	 v0NOn08bh9LzJ2vTb5FZRKqLJ8aJR25/HyKVTyP0txAzf0D4RsSVpSEKa3Du4YZrZn
+	 PnizrTSSRfP0w==
+Date: Tue, 25 Mar 2025 07:21:41 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: Siddharth Vadapalli <s-vadapalli@ti.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell
+ King <linux@armlinux.org.uk>, danishanwar@ti.com, srk@ti.com,
+ linux-omap@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 6/9] net: ethernet: ti: cpsw_ale: add
+ cpsw_ale_policer_set/clr_entry()
+Message-ID: <20250325072141.026b643d@kernel.org>
+In-Reply-To: <20250319-am65-cpsw-rx-class-v1-6-2bfded07490e@kernel.org>
+References: <20250319-am65-cpsw-rx-class-v1-0-2bfded07490e@kernel.org>
+	<20250319-am65-cpsw-rx-class-v1-6-2bfded07490e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: mmail-p-exch02.mt.ru (81.200.124.62) To
- mmail-p-exch01.mt.ru (81.200.124.61)
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Auth: dmarc=none header.from=mt-integration.ru;spf=none smtp.mailfrom=mt-integration.ru;dkim=none
-X-KSMG-AntiSpam-Envelope-From: i.abramov@mt-integration.ru
-X-KSMG-AntiSpam-Info: LuaCore: 51 0.3.51 68896fb0083a027476849bf400a331a2d5d94398, {rep_avail}, {Tracking_from_domain_doesnt_match_to}, mt-integration.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;81.200.124.61:7.1.2;ksmg01.maxima.ru:7.1.1;127.0.0.199:7.1.2, FromAlignment: s, ApMailHostAddress: 81.200.124.61
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 192091 [Mar 25 2025]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.11
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/03/25 08:37:00 #27838357
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 7
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-It's pointless to call WARN_ON() in case of an allocation failure in
-device_rename(), since it only leads to useless splats caused by deliberate
-fault injections, so avoid it.
+On Wed, 19 Mar 2025 15:38:32 +0200 Roger Quadros wrote:
+> +/* FIXME: VLAN ID based flow routing not yet working, Only PCP matching for now
+> + *		u32 port_mask, unreg_mcast = 0;
+> + *
+> + *		port_mask = BIT(cfg->port_id) | ALE_PORT_HOST;
+> + *		if (!cfg->vid)
+> + *			unreg_mcast = port_mask;
+> + *		ale_idx = cpsw_ale_vlan_add_modify(ale, cfg->vid, port_mask,
+> + *				unreg_mcast, port_mask, 0);
+> + *		if (ale_idx < 0)
+> + *			return -ENOENT;
+> + *
+> + *		regmap_field_write(ale->fields[POL_OVLAN_INDEX], ale_idx);
+> + *		regmap_field_write(ale->fields[POL_OVLAN_MEN], 1);
+> + */
 
-Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
-
-Fixes: 8b41d1887db7 ("[NET]: Fix running without sysfs")
-Signed-off-by: Ivan Abramov <i.abramov@mt-integration.ru>
----
- net/core/dev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 2f7f5fd9ffec..14726cc8796b 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -12102,7 +12102,7 @@ int __dev_change_net_namespace(struct net_device *dev, struct net *net,
- 	dev_set_uevent_suppress(&dev->dev, 1);
- 	err = device_rename(&dev->dev, dev->name);
- 	dev_set_uevent_suppress(&dev->dev, 0);
--	WARN_ON(err);
-+	WARN_ON(err && err != -ENOMEM);
- 
- 	/* Send a netdev-add uevent to the new namespace */
- 	kobject_uevent(&dev->dev.kobj, KOBJ_ADD);
--- 
-2.39.5
-
+This commented out code is odd.
+Shouldn't you check if the user asked for ID match and return an error?
 
