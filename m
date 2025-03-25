@@ -1,77 +1,88 @@
-Return-Path: <netdev+bounces-177272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D246A6E7E1
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 02:13:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28B79A6E823
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 02:57:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D1CB1757CC
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 01:13:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 735B0189691A
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 01:57:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C102F1494CC;
-	Tue, 25 Mar 2025 01:13:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C33F1156C79;
+	Tue, 25 Mar 2025 01:56:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="fS/TbaFe"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WT1DjQ4L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B0B92E3381
-	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 01:13:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C002B42A9D
+	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 01:56:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742865186; cv=none; b=UAk/e+zEiEa/xKlfRhI+u7OE5Wq25JJpPuNRKOlW5d1bHSlWTuEQfN8HslUuqhN5gWImgG1oM+5GYwklWBHtKra2xRHnoN+9K35VQMyp9yQKENhJ+ZctbAjU8vAdRdlobOKnMbiNhsOiMiOLZxfUJnHAVrAts+g9iUnXc0iNOd4=
+	t=1742867792; cv=none; b=SC7iwTyIbECVjUFfi+RwZzJbwFH1OPMSi7oTX6N0m4FD+NorDm8iGJBkfL+SSEjSGHSZgWMzcuTQJEh7ebL39AaGw0dQ+U+Px9gTuePvbhiLW+gpGZBl2Jq0wrwED2D5qezFmFN22VSKkr3dwumjktUzvMxzoMpW4Nv/ALeNpmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742865186; c=relaxed/simple;
-	bh=59b8GxSKdHIoohtTVvoh6d2qSq20IxVL/ynPTXhEdgk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=gaJyJzlszC5iQ/CQbczvpHeCVOsY5hez4vhuEixcvd4xV89fmn3rKHFrWwv3Ltlwd6Lh6uvXhsjOpAvfz7p61ukiIoaB8BtRyHVVc1BCLbUhcQpt26mpT0S32q2XxoVK5B/rQvJDt1Jdk0oyAbFLiyF9uu+mZDQ6dzS7lWMNCMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org; spf=pass smtp.mailfrom=ieee.org; dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b=fS/TbaFe; arc=none smtp.client-ip=209.85.166.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ieee.org
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3d571ac3d2fso48238615ab.2
-        for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 18:13:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ieee.org; s=google; t=1742865184; x=1743469984; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=tilX7QnvKAF8sEocr5hjC3RCRlvcCP2GLlCgaOM9mZU=;
-        b=fS/TbaFeyrcMwOU69Oifk/aTtztKozl07K1xH4DNdY0LmOgvVJGesuaitLdkPnFQXj
-         ostoAvOyzLeLEJ5gZxtwj8IQAP9CYrYpSqz/Cb7VQsm6YIGRPf0YzpBRiWfkPxlcN2L8
-         GWmITUYWEkdYPEqIP+xdcRLv2WPgrMDxlJw3U=
+	s=arc-20240116; t=1742867792; c=relaxed/simple;
+	bh=fK/UsrCxMTb/bFeRcKZI1xKhJ5uNZYEiUm6hg7SWcH4=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=GQW+j2livK2KxR6qAonxO6km7Kp+fPuFyAKcW9DfvpZv23wOci6YYsjBX//LaX69jqDYKuNmVje5aR1TqFB4b4nTEcxfuwWexUcntMrX4Jzr4QGwspsWsvhtpkJ2tFRPwJxvZiwyvnqlH8LfvCYQ33ha45zhheHLoXE+mj58hkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WT1DjQ4L; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1742867789;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aGi7NAnxBHUh6gjg9N+ded9e6tq7Gp9efHz1x28aF8Y=;
+	b=WT1DjQ4LW2lZjnQL3JL0xOXnkIZInUDEoaRKFyAmanu3CvOufnzpmo/wfikAzfPUD3FcCA
+	Rde9VEkp4AWkJ+4KekqqUAG6KPZfskSDz++wFsRhNZqwQ0s1ykOgJ9k6cBrcV/MpwVT0E4
+	YlbIS+eoG46ZFNyDfrEkDPVocDy+tuc=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-463-2T2jsWKxOiG8E7b5rvNJyg-1; Mon, 24 Mar 2025 21:56:28 -0400
+X-MC-Unique: 2T2jsWKxOiG8E7b5rvNJyg-1
+X-Mimecast-MFC-AGG-ID: 2T2jsWKxOiG8E7b5rvNJyg_1742867788
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-4768656f608so104467841cf.1
+        for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 18:56:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742865184; x=1743469984;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1742867788; x=1743472588;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tilX7QnvKAF8sEocr5hjC3RCRlvcCP2GLlCgaOM9mZU=;
-        b=Wc1ZW+gex+tcGdMVEp0vBps/zRYWjcNpk10dpLRca5ES+1Ze/DBnYoJ0jgvnA8wQzo
-         QiotDYZ3CVwYlqoArPTRqPQX5GGen0EgwuPlkQ5CIAnbik5JHvOfeHpFEAgfSQiEL38k
-         nCG8blAOHfRjsaQzqnuR4ey0pxZcp5tYGebasskrXpSf/lbNCqJXggdNnLe/cqkI2xfD
-         XTRSNS88Cjm8PsvFh9jttSqJXh5VO9ZDRVlZhoQ/oio0f/bF2JkCzn/UN74N2M3u/Pwx
-         HJY6HKdin81hDgRuiz5KeqPZm99x8kdrcWJh7ioY57fyGG6nZsYusQRjkDsZnez/O1pd
-         l7Wg==
-X-Forwarded-Encrypted: i=1; AJvYcCX0vD5MkwDGzusvCUzwDG4iOBDyiuGih9LQtULoERnB0Q4ngfwFehUaY7ZMo2iKR/Ab2KEs6mg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZaYz4UMDqYiYh9haPwVSj7zSLAJeO08qcI2C5k2V1T1MLG0eh
-	xBRretljRP95vW9VbPmBw1+1JsWquzZL4AKbR9IIxlsT2Onr9kK9OVDE6Dw/bQ==
-X-Gm-Gg: ASbGncvGFhyvJsZvEcKvUeodhS/myhL0zSyaHIqFxOjuv/ShNuCTnlshs8JiJGLE4CY
-	FmOUdueJPV6MvD7ke4teZrG4BBI3ddR3XcXz9dB1tP1Fm40LOk+lyiJNkW2wBtCsMSVDQHAcbtO
-	EfQcBGy87B1dAEbFR+QaX2yVcexPGigd22kJwS5dQ/DR+dAdtHTUZgZYwN/TjfZqYC1Z7PqeFC2
-	pSJ9+uOlKFjDtyyqqhI4QgJVbrY1Z+2yILIUzD5UqE8TqqaIeOm2o0yqeVXQth15I2CS2VXgdLL
-	wruk83Z0kSMU5AKntfkm1dOO/K5lD3JhNl6vIVIGqdxvN2mPwu2IFMBwRTx1n4RZH9ma3baBxnr
-	PYs0bf73a1JFG
-X-Google-Smtp-Source: AGHT+IGSsAzB0Of7YOYUV68uvoK6ZCJ/6KJgHQicf12+sgaAuVAWuoM864+T45bF4b0vuJZt/1JG6w==
-X-Received: by 2002:a05:6e02:3904:b0:3d4:4010:4eff with SMTP id e9e14a558f8ab-3d596164076mr128011515ab.13.1742865183547;
-        Mon, 24 Mar 2025 18:13:03 -0700 (PDT)
-Received: from [10.211.55.5] (c-73-228-159-35.hsd1.mn.comcast.net. [73.228.159.35])
-        by smtp.googlemail.com with ESMTPSA id e9e14a558f8ab-3d59606ee04sm20819565ab.6.2025.03.24.18.13.00
+        bh=aGi7NAnxBHUh6gjg9N+ded9e6tq7Gp9efHz1x28aF8Y=;
+        b=rT95EKEYjsfJXa2fWzLuP7d2x0wTmcfJGEUateXa2yfDgE911hLmZ0PpOe9gU4WwUg
+         1DTgvRIUJqvvQaEpj+wlEA+ogU9EWwPy5TOlV22uZOKAycN60pdBOYpZqP/p2MXjNuFZ
+         K/cj1q2SdkGB8GyHzqX5tXw+5iHpx8IXvSpol31iuH/aTfyZopViZ0HfDl8q0vH70oVx
+         H9ALSjhsN6gKLd8QTx4eq38UDinbhkD4JtWebH8QTVfvdSMsZmHYETcK/0afc8WBolhS
+         Lv7r2RnlsE+DtiGYPKWRic2q0f6+9AuSC1JHRfQA+6lmUqgGgE98PP8hdzTZTrec1Y/z
+         UYOw==
+X-Forwarded-Encrypted: i=1; AJvYcCVNbrKHwJ2RACsvvA9aq3hUD1NgItl8zTmFXsrW5ncJarcPBN/MJoUlDufKe1bpBEsGS4/jZSg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQV7vgV5C1Wkb/y5GTJ4GAxz5wgs1gy4/sCMmxgu3/wFpb9ROl
+	F4h1agY5mi4ZK4FVBFO+J3bGlBiKauKrHtfvWaE2g3aOVOScul/6prSu2DBjYgd88FibegXKasy
+	Ci/AVX/LfuGUS+goX+BOi192it1RQc7sEkBU0YCBpx9ntJb7zgQ29MQ==
+X-Gm-Gg: ASbGncsdzXjql5Qx1ggPqnRyP1ZEvm85YLcZRUXlJFEMXbkFxRAhtlsEK7TUCZHKk3p
+	oVbVMHmPE99TfWsXjk9UxFOmRullzL3LON0vGaE63RdI83WcMLNT/vPDRwGFHlMlx0HKcvdtcjN
+	LWJ+JPldc+U2ysbl94ifAxp174yRU36SAwjKjR4baqeqWJODPQYROgmrKDW3bXvH3cGLUe3a+DD
+	+Oj8PXqvcn7jTq02oy9RmJzfVCRf0jjEtBY26WS2PLDPWmmFuuTgNWw3DsKp6DoqobYZFOE6VEr
+	f/I9I2qtubHOQKcji7Tz7OKu6N0zSFSalfAo2xPqCzoVD6qAcMDPONh1YHLyCA==
+X-Received: by 2002:a05:622a:4c8a:b0:476:aead:802c with SMTP id d75a77b69052e-4771ddf06a6mr253342351cf.36.1742867787641;
+        Mon, 24 Mar 2025 18:56:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEZHSdt8gryK7O+AdpXsKRXlm4DRU4seZmKB5+iQXgPpdf8Tf3GXj6xgUGJTZ621axJfD0q0A==
+X-Received: by 2002:a05:622a:4c8a:b0:476:aead:802c with SMTP id d75a77b69052e-4771ddf06a6mr253342101cf.36.1742867787152;
+        Mon, 24 Mar 2025 18:56:27 -0700 (PDT)
+Received: from ?IPV6:2601:188:c100:5710:315f:57b3:b997:5fca? ([2601:188:c100:5710:315f:57b3:b997:5fca])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4771d17b320sm54082861cf.31.2025.03.24.18.56.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Mar 2025 18:13:02 -0700 (PDT)
-Message-ID: <5c8fa538-6c04-4fcf-bcad-21fc1e2a0a9b@ieee.org>
-Date: Mon, 24 Mar 2025 20:12:59 -0500
+        Mon, 24 Mar 2025 18:56:26 -0700 (PDT)
+From: Waiman Long <llong@redhat.com>
+X-Google-Original-From: Waiman Long <longman@redhat.com>
+Message-ID: <c0a9a0d5-400b-4238-9242-bf21f875d419@redhat.com>
+Date: Mon, 24 Mar 2025 21:56:25 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,178 +90,103 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] dt-bindings: net: qcom,ipa: Correct indentation and style
- in DTS example
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Alex Elder <elder@kernel.org>,
- linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250324125222.82057-1-krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH] lockdep: Speed up lockdep_unregister_key() with expedited
+ RCU synchronization
+To: Boqun Feng <boqun.feng@gmail.com>, Eric Dumazet <edumazet@google.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Breno Leitao <leitao@debian.org>,
+ Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, aeh@meta.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, jhs@mojatatu.com,
+ kernel-team@meta.com, Erik Lundgren <elundgren@meta.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>
+References: <20250321-lockdep-v1-1-78b732d195fb@debian.org>
+ <20250324121202.GG14944@noisy.programming.kicks-ass.net>
+ <CANn89iKykrnUVUsqML7dqMuHx6OuGnKWg-xRUV4ch4vGJtUTeg@mail.gmail.com>
+ <67e1b0a6.050a0220.91d85.6caf@mx.google.com>
+ <67e1b2c4.050a0220.353291.663c@mx.google.com>
+ <67e1fd15.050a0220.bc49a.766e@mx.google.com>
 Content-Language: en-US
-From: Alex Elder <elder@ieee.org>
-In-Reply-To: <20250324125222.82057-1-krzysztof.kozlowski@linaro.org>
+In-Reply-To: <67e1fd15.050a0220.bc49a.766e@mx.google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 3/24/25 7:52 AM, Krzysztof Kozlowski wrote:
-> DTS example in the bindings should be indented with 2- or 4-spaces and
-> aligned with opening '- |', so correct any differences like 3-spaces or
-> mixtures 2- and 4-spaces in one binding.
-> 
-> No functional changes here, but saves some comments during reviews of
-> new patches built on existing code.
-> 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+On 3/24/25 8:47 PM, Boqun Feng wrote:
+> On Mon, Mar 24, 2025 at 12:30:10PM -0700, Boqun Feng wrote:
+>> On Mon, Mar 24, 2025 at 12:21:07PM -0700, Boqun Feng wrote:
+>>> On Mon, Mar 24, 2025 at 01:23:50PM +0100, Eric Dumazet wrote:
+>>> [...]
+>>>>>> ---
+>>>>>>   kernel/locking/lockdep.c | 6 ++++--
+>>>>>>   1 file changed, 4 insertions(+), 2 deletions(-)
+>>>>>>
+>>>>>> diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
+>>>>>> index 4470680f02269..a79030ac36dd4 100644
+>>>>>> --- a/kernel/locking/lockdep.c
+>>>>>> +++ b/kernel/locking/lockdep.c
+>>>>>> @@ -6595,8 +6595,10 @@ void lockdep_unregister_key(struct lock_class_key *key)
+>>>>>>        if (need_callback)
+>>>>>>                call_rcu(&delayed_free.rcu_head, free_zapped_rcu);
+>>>>>>
+>>>>>> -     /* Wait until is_dynamic_key() has finished accessing k->hash_entry. */
+>>>>>> -     synchronize_rcu();
+>>> I feel a bit confusing even for the old comment, normally I would expect
+>>> the caller of lockdep_unregister_key() should guarantee the key has been
+>>> unpublished, in other words, there is no way a lockdep_unregister_key()
+>>> could race with a register_lock_class()/lockdep_init_map_type(). The
+>>> synchronize_rcu() is not needed then.
+>>>
+>>> Let's say someone breaks my assumption above, then when doing a
+>>> register_lock_class() with a key about to be unregister, I cannot see
+>>> anything stops the following:
+>>>
+>>> 	CPU 0				CPU 1
+>>> 	=====				=====
+>>> 	register_lock_class():
+>>> 	  ...
+>>> 	  } else if (... && !is_dynamic_key(lock->key)) {
+>>> 	  	// ->key is not unregistered yet, so this branch is not
+>>> 		// taken.
+>>> 	  	return NULL;
+>>> 	  }
+>>> 	  				lockdep_unregister_key(..);
+>>> 					// key unregister, can be free
+>>> 					// any time.
+>>> 	  key = lock->key->subkeys + subclass; // BOOM! UAF.
+>>>
+>>> So either we don't need the synchronize_rcu() here or the
+>>> synchronize_rcu() doesn't help at all. Am I missing something subtle
+>>> here?
+>>>
+>> Oh! Maybe I was missing register_lock_class() must be called with irq
+>> disabled, which is also an RCU read-side critical section.
+>>
+> Since register_lock_class() will be call with irq disabled, maybe hazard
+> pointers [1] is better because most of the case we only have nr_cpus
+> readers, so the potential hazard pointer slots are fixed.
+>
+> So the below patch can reduce the time of the tc command from real ~1.7
+> second (v6.14) to real ~0.05 second (v6.14 + patch) in my test env,
+> which is not surprising given it's a dedicated hazard pointers for
+> lock_class_key.
+>
+> Thoughts?
 
-Looks identical with the exception of the white space change.
-Thanks Krzysztof.
+My understanding is that it is not a race between register_lock_class() 
+and lockdep_unregister_key(). It is the fact that the structure that 
+holds the lock_class_key may be freed immediately after return from 
+lockdep_unregister_key(). So any processes that are in the process of 
+iterating the hash_list containing the hash_entry to be unregistered may 
+hit a UAF problem. See commit 61cc4534b6550 ("locking/lockdep: Avoid 
+potential access of invalid memory in lock_class") for a discussion of 
+this kind of UAF problem.
 
-Reviewed-by: Alex Elder <elder@riscstar.com>
+As suggested by Eric, one possible solution is to add a 
+lockdep_unregister_key() variant function that presumes the structure 
+holding the key won't be freed until after a RCU delay. In this case, we 
+can skip the last synchronize_rcu() call. Any callers that need 
+immediate return should use kfree_rcu() to free the structure after 
+calling the lockdep_unregister_key() variant.
 
-> ---
->   .../devicetree/bindings/net/qcom,ipa.yaml     | 124 +++++++++---------
->   1 file changed, 62 insertions(+), 62 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/qcom,ipa.yaml b/Documentation/devicetree/bindings/net/qcom,ipa.yaml
-> index 1a46d80a66e8..b4a79912d473 100644
-> --- a/Documentation/devicetree/bindings/net/qcom,ipa.yaml
-> +++ b/Documentation/devicetree/bindings/net/qcom,ipa.yaml
-> @@ -210,70 +210,70 @@ additionalProperties: false
->   
->   examples:
->     - |
-> -        #include <dt-bindings/interrupt-controller/arm-gic.h>
-> -        #include <dt-bindings/clock/qcom,rpmh.h>
-> -        #include <dt-bindings/interconnect/qcom,sdm845.h>
-> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
-> +    #include <dt-bindings/clock/qcom,rpmh.h>
-> +    #include <dt-bindings/interconnect/qcom,sdm845.h>
->   
-> -        smp2p-mpss {
-> -                compatible = "qcom,smp2p";
-> -                interrupts = <GIC_SPI 576 IRQ_TYPE_EDGE_RISING>;
-> -                mboxes = <&apss_shared 6>;
-> -                qcom,smem = <94>, <432>;
-> -                qcom,local-pid = <0>;
-> -                qcom,remote-pid = <5>;
-> +    smp2p-mpss {
-> +        compatible = "qcom,smp2p";
-> +        interrupts = <GIC_SPI 576 IRQ_TYPE_EDGE_RISING>;
-> +        mboxes = <&apss_shared 6>;
-> +        qcom,smem = <94>, <432>;
-> +        qcom,local-pid = <0>;
-> +        qcom,remote-pid = <5>;
->   
-> -                ipa_smp2p_out: ipa-ap-to-modem {
-> -                        qcom,entry-name = "ipa";
-> -                        #qcom,smem-state-cells = <1>;
-> -                };
-> -
-> -                ipa_smp2p_in: ipa-modem-to-ap {
-> -                        qcom,entry-name = "ipa";
-> -                        interrupt-controller;
-> -                        #interrupt-cells = <2>;
-> -                };
-> +        ipa_smp2p_out: ipa-ap-to-modem {
-> +                qcom,entry-name = "ipa";
-> +                #qcom,smem-state-cells = <1>;
->           };
->   
-> -        ipa@1e40000 {
-> -                compatible = "qcom,sc7180-ipa";
-> -
-> -                qcom,gsi-loader = "self";
-> -                memory-region = <&ipa_fw_mem>;
-> -                firmware-name = "qcom/sc7180-trogdor/modem/modem.mbn";
-> -
-> -                iommus = <&apps_smmu 0x440 0x0>,
-> -                         <&apps_smmu 0x442 0x0>;
-> -                reg = <0x1e40000 0x7000>,
-> -                      <0x1e47000 0x2000>,
-> -                      <0x1e04000 0x2c000>;
-> -                reg-names = "ipa-reg",
-> -                            "ipa-shared",
-> -                            "gsi";
-> -
-> -                interrupts-extended = <&intc GIC_SPI 311 IRQ_TYPE_EDGE_RISING>,
-> -                                      <&intc GIC_SPI 432 IRQ_TYPE_LEVEL_HIGH>,
-> -                                      <&ipa_smp2p_in 0 IRQ_TYPE_EDGE_RISING>,
-> -                                      <&ipa_smp2p_in 1 IRQ_TYPE_EDGE_RISING>;
-> -                interrupt-names = "ipa",
-> -                                  "gsi",
-> -                                  "ipa-clock-query",
-> -                                  "ipa-setup-ready";
-> -
-> -                clocks = <&rpmhcc RPMH_IPA_CLK>;
-> -                clock-names = "core";
-> -
-> -                interconnects =
-> -                        <&aggre2_noc MASTER_IPA 0 &mc_virt SLAVE_EBI1 0>,
-> -                        <&aggre2_noc MASTER_IPA 0 &system_noc SLAVE_IMEM 0>,
-> -                        <&gem_noc MASTER_APPSS_PROC 0 &config_noc SLAVE_IPA_CFG 0>;
-> -                interconnect-names = "memory",
-> -                                     "imem",
-> -                                     "config";
-> -
-> -                qcom,qmp = <&aoss_qmp>;
-> -
-> -                qcom,smem-states = <&ipa_smp2p_out 0>,
-> -                                   <&ipa_smp2p_out 1>;
-> -                qcom,smem-state-names = "ipa-clock-enabled-valid",
-> -                                        "ipa-clock-enabled";
-> +        ipa_smp2p_in: ipa-modem-to-ap {
-> +                qcom,entry-name = "ipa";
-> +                interrupt-controller;
-> +                #interrupt-cells = <2>;
->           };
-> +    };
-> +
-> +    ipa@1e40000 {
-> +        compatible = "qcom,sc7180-ipa";
-> +
-> +        qcom,gsi-loader = "self";
-> +        memory-region = <&ipa_fw_mem>;
-> +        firmware-name = "qcom/sc7180-trogdor/modem/modem.mbn";
-> +
-> +        iommus = <&apps_smmu 0x440 0x0>,
-> +                 <&apps_smmu 0x442 0x0>;
-> +        reg = <0x1e40000 0x7000>,
-> +              <0x1e47000 0x2000>,
-> +              <0x1e04000 0x2c000>;
-> +        reg-names = "ipa-reg",
-> +                    "ipa-shared",
-> +                    "gsi";
-> +
-> +        interrupts-extended = <&intc GIC_SPI 311 IRQ_TYPE_EDGE_RISING>,
-> +                              <&intc GIC_SPI 432 IRQ_TYPE_LEVEL_HIGH>,
-> +                              <&ipa_smp2p_in 0 IRQ_TYPE_EDGE_RISING>,
-> +                              <&ipa_smp2p_in 1 IRQ_TYPE_EDGE_RISING>;
-> +        interrupt-names = "ipa",
-> +                          "gsi",
-> +                          "ipa-clock-query",
-> +                          "ipa-setup-ready";
-> +
-> +        clocks = <&rpmhcc RPMH_IPA_CLK>;
-> +        clock-names = "core";
-> +
-> +        interconnects =
-> +                <&aggre2_noc MASTER_IPA 0 &mc_virt SLAVE_EBI1 0>,
-> +                <&aggre2_noc MASTER_IPA 0 &system_noc SLAVE_IMEM 0>,
-> +                <&gem_noc MASTER_APPSS_PROC 0 &config_noc SLAVE_IPA_CFG 0>;
-> +        interconnect-names = "memory",
-> +                             "imem",
-> +                             "config";
-> +
-> +        qcom,qmp = <&aoss_qmp>;
-> +
-> +        qcom,smem-states = <&ipa_smp2p_out 0>,
-> +                           <&ipa_smp2p_out 1>;
-> +        qcom,smem-state-names = "ipa-clock-enabled-valid",
-> +                                "ipa-clock-enabled";
-> +    };
+Cheers,
+Longman
 
 
