@@ -1,104 +1,122 @@
-Return-Path: <netdev+bounces-177306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D13BEA6EDCE
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 11:35:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1F62A6EDE4
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 11:40:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF1233A62BB
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 10:33:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC56E167586
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 10:40:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 328F71F09B4;
-	Tue, 25 Mar 2025 10:33:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 559D7254AF2;
+	Tue, 25 Mar 2025 10:40:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="yHgiuPRB"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=proton.me header.i=@proton.me header.b="aIHo0FKZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from mail-24416.protonmail.ch (mail-24416.protonmail.ch [109.224.244.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7462F79F5;
-	Tue, 25 Mar 2025 10:33:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5230A253F38;
+	Tue, 25 Mar 2025 10:40:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742898822; cv=none; b=X0bUexvSOYU7lhX9SroUDw/p/2idblxNt9UbeUZhoovAdVWdJjPnFVAyd6PPdNlCjw5w4Os7B+InhUy3nJVhPMvnKtx6338qF5lU49bZWjN+YYbNfmW10qnGhIDEcWFryu7J+HY+zeAMueDoZ+ydTtRyS5K6xfB9haV634nGJzQ=
+	t=1742899210; cv=none; b=GOMZdWubszQOBlpB3prf3KeX+5SkUD3QaQJDZuZlKCBku/DxoPQhy/HRTD7b3Nl8PL8g9le/YEiW0RbWRMIIP3/58JKyrkwGU1TJ2woyjwalNJ/VgcfGByBifSCqfoViFSakZuUwCgPAji12s6HaH59vucq4EBhEtf1VJSoOuV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742898822; c=relaxed/simple;
-	bh=8MlHlktm9PBdFMf9Nxkh6Nsoqf+HfDwTdyg7XPwfpns=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=FughnH9H8BDmejFbUrK/GVFUDCMG48Ad6WscBNObku0ue0O1psVgEiJ0vrR4UWPVpdVTcEr7KE1jRPuXKVsw0NxS2oxqUlDjkN3CkskdgWnOgPpgxmV8qbpuWdTwcKMgEpGqZmT52aCZl+Qq2R2dWJNT8iUbvQwcsRz0pfwUTe4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=yHgiuPRB; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=8MlHlktm9PBdFMf9Nxkh6Nsoqf+HfDwTdyg7XPwfpns=;
-	t=1742898820; x=1744108420; b=yHgiuPRBF4NkVH1CRZjCHffo7ADupUiEN/PfEiUNR6189Bm
-	4M8KR/9mzrRuHJBiYUnAkh/34aEvl0AFKeghkSeawXcBq+8hKMhlYiJSaELPUCcr4mOszWtwkiYtW
-	t4QaZASE05tg0VmpL2AwDeWOMlF7NPJZ1mo+baz0qrSZA+A5gcVqduSYnHI6QyXIuwGjSNcRITaWe
-	fFDZQhUnyCpH2Zr3ilnklqTS9Y41vLKlx0KLz1okKoa/W4TXB+ZzZ2o8rukTiSwmECnJggluKDqoe
-	KJf/FxkYfwQzqbeX/BxiA+LgJwdgmmlmfOG+vVg3XvWxbrUPBJPCOlSDlam9epmQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1tx1b3-000000052CR-1hQL;
-	Tue, 25 Mar 2025 11:33:25 +0100
-Message-ID: <3452b67752228665fa275030a7d8100b73063392.camel@sipsolutions.net>
-Subject: Re: [PATCH v5 0/5] dt-bindings: net: Add network-class.yaml schema
-From: Johannes Berg <johannes@sipsolutions.net>
-To: david@ixit.cz, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"	
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski	
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>,  Krzysztof Kozlowski	 <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Mailing List	
- <devicetree-spec-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Lorenzo Bianconi
-	 <lorenzo@kernel.org>, van Spriel <arend@broadcom.com>, 
- =?ISO-8859-1?Q?J=E9r=F4me?= Pouiller	 <jerome.pouiller@silabs.com>, Bjorn
- Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>,
- Andy Gross <agross@kernel.org>, Mailing List	
- <devicetree-spec@vger.kernel.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, Janne Grunau <j@jannau.net>
-Date: Tue, 25 Mar 2025 11:33:24 +0100
-In-Reply-To: <20250324-dt-bindings-network-class-v5-0-f5c3fe00e8f0@ixit.cz>
-References: <20250324-dt-bindings-network-class-v5-0-f5c3fe00e8f0@ixit.cz>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+	s=arc-20240116; t=1742899210; c=relaxed/simple;
+	bh=L/9OZbHih+ThSpCoQVn5U45aw0Qkhz8V3Pr4tkwf4/U=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=W6VVyEL0vObXRy4GxxoriscY1KcjgO1kXlmFxOvZhNdrIjZSlKkrfGFXk9sD4jZmzfMGb16x477eZspxQILa79Dk+e0aeOgfQ8NpGnPf4YopQ+Rxcmo7wkKVIJGWdxFwsDtIs3zHD5usqUOwF+m4l/ScWAgK7PsesH/viKXORo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=aIHo0FKZ; arc=none smtp.client-ip=109.224.244.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=cazukxct4je5rfknpomo5ndhoy.protonmail; t=1742899198; x=1743158398;
+	bh=7Qxu14y7hXsByiWaRphWUIUPNCDRSXJiL8l6Iwsjd+o=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
+	b=aIHo0FKZH0kRllaPjkCGXFAr6LoxqTKm7hgdunLsTv4w5oVNQtrGYaBtwwFM+3+Xf
+	 qb4LhaahWEaV+TcejHjZHz9kb3ta7oFcwRu+LTwldD/khMWlbvdAjibUuTslYBolxf
+	 XXuNAfr8AkRPJ4BxpAOPyFK8CpuDZ0j7OmDpiAGN3D8IirMPcqDu3Jf3SliaHYKu3D
+	 P9xlyRyG9v1oxDDOrFqCEk2wLMAgSZf59WKZHklHsEj4PaYmqTT2wDB7bkKONR/Dod
+	 9ko2k1DPmIVnQTn6h28XdhksWdmirA7W0Xto5S73RspeL499sOmWaw9h52GP5aS/qy
+	 IFDNr70n0Yxig==
+Date: Tue, 25 Mar 2025 10:39:54 +0000
+To: Tamir Duberstein <tamird@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy
+	<robin.murphy@arm.com>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, FUJITA Tomonori <fujita.tomonori@gmail.com>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v6 6/6] rust: enable `clippy::cast_lossless` lint
+Message-ID: <D8PA773W07SS.3T2SZUIJH4HOH@proton.me>
+In-Reply-To: <20250324-ptr-as-ptr-v6-6-49d1b7fd4290@gmail.com>
+References: <20250324-ptr-as-ptr-v6-0-49d1b7fd4290@gmail.com> <20250324-ptr-as-ptr-v6-6-49d1b7fd4290@gmail.com>
+Feedback-ID: 71780778:user:proton
+X-Pm-Message-ID: d544dfa742d24e7be7a673d1c81bdd5dcc22818d
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2025-03-24 at 18:41 +0100, David Heidelberg via B4 Relay wrote:
-> The Devicetree Specification, Release v0.3 specifies in section 4.3.1
-> a "Network Class Binding". This covers MAC address and maximal frame
-> size properties. "local-mac-address" and "mac-address" with a fixed
-> "address-size" of 48 bits are already in the ethernet-controller.yaml
-> schema so move those over.
->=20
-> Keep "address-size" fixed to 48 bits as it's unclear if network protocols
-> using 64-bit mac addresses like ZigBee, 6LoWPAN and others are relevant f=
-or
-> this binding. This allows mac address array size validation for ethernet
-> and wireless lan devices.
->=20
-> "max-frame-size" in the Devicetree Specification is written to cover the
-> whole layer 2 ethernet frame but actual use for this property is the
-> payload size. Keep the description from ethernet-controller.yaml which
-> specifies the property as MTU.
->=20
+On Mon Mar 24, 2025 at 11:01 PM CET, Tamir Duberstein wrote:
+> Before Rust 1.29.0, Clippy introduced the `cast_lossless` lint [1]:
+>
+>> Rust=E2=80=99s `as` keyword will perform many kinds of conversions, incl=
+uding
+>> silently lossy conversions. Conversion functions such as `i32::from`
+>> will only perform lossless conversions. Using the conversion functions
+>> prevents conversions from becoming silently lossy if the input types
+>> ever change, and makes it clear for people reading the code that the
+>> conversion is lossless.
+>
+> While this doesn't eliminate unchecked `as` conversions, it makes such
+> conversions easier to scrutinize.  It also has the slight benefit of
+> removing a degree of freedom on which to bikeshed. Thus apply the
+> changes and enable the lint -- no functional change intended.
+>
+> Link: https://rust-lang.github.io/rust-clippy/master/index.html#cast_loss=
+less [1]
+> Suggested-by: Benno Lossin <benno.lossin@proton.me>
+> Link: https://lore.kernel.org/all/D8ORTXSUTKGL.1KOJAGBM8F8TN@proton.me/
+> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 
-I have no idea what tree this should go through, and you CC'ed enough
-people that I can't figure it out either ... I'll assume not wifi but DT
-for now?
+One nit below, but you may add:
 
-johannes
+Reviewed-by: Benno Lossin <benno.lossin@proton.me>
+
+> ---
+>  Makefile                        |  1 +
+>  drivers/gpu/drm/drm_panic_qr.rs | 10 +++++-----
+>  rust/bindings/lib.rs            |  2 +-
+>  rust/kernel/net/phy.rs          |  4 ++--
+>  4 files changed, 9 insertions(+), 8 deletions(-)
+
+> diff --git a/rust/bindings/lib.rs b/rust/bindings/lib.rs
+> index 0486a32ed314..591e4ca9bc54 100644
+> --- a/rust/bindings/lib.rs
+> +++ b/rust/bindings/lib.rs
+> @@ -25,7 +25,7 @@
+>  )]
+> =20
+>  #[allow(dead_code)]
+> -#[allow(clippy::ptr_as_ptr)]
+> +#[allow(clippy::cast_lossless, clippy::ptr_as_ptr)]
+
+Not sure if we instead want this in a separate attribute, ultimately it
+doesn't really matter, but why should `undocumented_unsafe_blocks` be
+special?
+
+---
+Cheers,
+Benno
+
+>  #[allow(clippy::undocumented_unsafe_blocks)]
+>  mod bindings_raw {
+>      // Manual definition for blocklisted types.
+
 
