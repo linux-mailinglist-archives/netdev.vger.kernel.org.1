@@ -1,275 +1,135 @@
-Return-Path: <netdev+bounces-177286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E670DA6E943
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 06:22:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A21BCA6E94D
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 06:34:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DA8116AE51
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 05:22:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE0E73AEE46
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 05:34:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29F7C1A2C06;
-	Tue, 25 Mar 2025 05:21:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MRS5CbMo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D29C0199935;
+	Tue, 25 Mar 2025 05:34:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72C65149DE8
-	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 05:21:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C22064D
+	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 05:34:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742880118; cv=none; b=m14H3aG1MuV+tSX00Qs7B/L4RbYA5PKYYZ6hb7uqzkSLbySYq8nSXMw++1aObUbqIDlFm/j758H/6q/p8rDgco2bIeDJcz2qcUoSbj9Kdxyu2Jz3M/nnooPMbyksH6yk1tFiqr1mqimAL5+zjoN9a0EhcSDdnejt3llTxYFgb5I=
+	t=1742880893; cv=none; b=pvnIze4EBtjEnlwHIxGhXpWwxHXcin8aaOUkSy74YzFfzFmikde62IPWRVdHP4Cj6TYGt8qf5I7Y4cNL/v6Tzy3EWxQNaxV/2FCd+4g1l1EiKx4ZULCK92GAXJAWrS6mSsVj+2hkg9pY1Lifpwtm3pKJjcbyZ9dvndVE/1NbjlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742880118; c=relaxed/simple;
-	bh=km3N0+p5UmnsX6COZ2KgI/JmqmDskXfPNFC8rI68hJ4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gT0Lvh3bn2VxY7QdvFkSSLW87xNp85dKWQQjVk24oz0dNCube9A+9k4R+wZQvh2G57GqwRybtKbzuCqYBBMDnUAwlu8YALAF5id/cWlDFJgqacThLuIULWt/KYRKeCWl7O2Pl+CA3m8xGp+VayCnTMaRZybVqhWF2s9fup4SHoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MRS5CbMo; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-476af5479feso47615481cf.2
-        for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 22:21:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1742880115; x=1743484915; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lomCUCbXgX6nE+LW1PH+Y2bS1fjA57fzR64X+WRuwbE=;
-        b=MRS5CbMo6n+bNcsym3mD2jrQ77amVZlbWHLpjNpPqxluA6oml8ikxOL1C9BIc6vLoB
-         yh+Nj2mkMcAOr9+PExP0Vs8RF1v+iuXAEBi5RZdPj/wk+E/chpSlWPQrZ7dO+dimutzY
-         GNu97O+Ne9SXhGPuncrs0L6nNou2cg5eYVOCJCA9T8iEbVenwn/szMDZ5GQURCXQ6TPu
-         g8gAutoOxlFiH2VgGVogzlI2X3ZugRnltK2Gy93PYU8fPwlL7ozj9wlag2qhyManTEqP
-         SUBxEpw1W6txUEnwv2phZm21HKrn8ukAWKHRwcawGs2IyUl3mwKkCgVaV4z5S/Kfql84
-         p7Mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742880115; x=1743484915;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lomCUCbXgX6nE+LW1PH+Y2bS1fjA57fzR64X+WRuwbE=;
-        b=PmjYDdxBdX/zUFHtOJ1K+AOl1q11/14FLZz44Jr8GLlDKXsw7QP7NK4NTAn0ZGUOPC
-         1DjGPIZY6BivdA/HbNbz11lNdsp8nWIvg+VogKmeHapS7pvyBsaJ9thi3BVSdAh5nm8v
-         yqRGiKb5bWnyYOHG4OYIpGJj+dWiKlsJdJFWSlbVW2duRHeGxCrw27GEzvQ2ICerbiKP
-         sqczunGILpb9aRwh2j1qi66v/wcR6HGpoibNdWFxLbBSPdbu7Li3GiW8aEa8G5inXKeq
-         xmd2nqC9tEDVx89fIm/bj3ouv8V7VLf2q7I1pV6yNDQGarKMipQUnN/e3PZGf8MTa8oS
-         EaPw==
-X-Forwarded-Encrypted: i=1; AJvYcCWk+Rm1xWqqylF3XwcSl5Yn81E7urHyB4+8XxSQgmNYFycum1OIlMuNcGFidsOtQ1E90xt4Ilo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyUZJxNWbHifVMKgyHxh/gif0SzVn8dXeDUrsF45Y2GDMvItx1r
-	em8buHHPzFHG9VzFAyanXAgSW/oUHTg2gl+0fjjEZtxrFBpWbqWIBmhuX0cr/NMlMNB2bYguaBD
-	9qhRdVdDYa8ZKF8PoLYNEVNBioRf9LGNN5Zh7
-X-Gm-Gg: ASbGnctlzVk0Jiyirg588C2C6qxvv55yj1xzmR9r/jKhQrQJTyPxxK5omUkAavPKaeU
-	CPS75d5rDthqT4Fwbcgez2ZGeHTFQslJrsy0oTP/ny/k7jYrLygwNG4vOUIgR3BS077Z6nRy9pI
-	udZLpeq1rBMYexsV6eb2D+OTH2qw==
-X-Google-Smtp-Source: AGHT+IFuoo9a80CaecGtUHiPU5cNU3ssgrGIkNvDUO0q8i3gYnU/YIjkCXifw+MTT/Xd2THwHK0JYHMFALY2+foT+sc=
-X-Received: by 2002:a05:622a:5e13:b0:476:980c:10a8 with SMTP id
- d75a77b69052e-4771dd89817mr275087661cf.21.1742880114991; Mon, 24 Mar 2025
- 22:21:54 -0700 (PDT)
+	s=arc-20240116; t=1742880893; c=relaxed/simple;
+	bh=c2Av66IXC/j5Ecmc1swHw1f2mz1THsByFbOQ2gd0qHM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UaE2B29KrjZEJYJE+6OFSsp4M8e69MV3HQt6KVwhHtERlCktyFRmBxHKXYzJAM31+O/Y4RLsYSOg573rmFqLvJVbwBC6JEheF7Nrax9Pm1puTod9y8+b3v+xs5TePx4ILrF/n4/d3tL9MCod9nRPY5cglmFf+PFhMsmwwZMO/DY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1twwve-0001R5-Q1; Tue, 25 Mar 2025 06:34:22 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1twwvY-001WnQ-2d;
+	Tue, 25 Mar 2025 06:34:17 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1twwvZ-00Fk6E-0G;
+	Tue, 25 Mar 2025 06:34:17 +0100
+Date: Tue, 25 Mar 2025 06:34:17 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kyle Swenson <kyle.swenson@est.tech>
+Cc: Kory Maincent <kory.maincent@bootlin.com>, Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	Dent Project <dentproject@linuxfoundation.org>,
+	"kernel@pengutronix.de" <kernel@pengutronix.de>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v6 06/12] net: pse-pd: Add support for budget
+ evaluation strategies
+Message-ID: <Z-JAWfL5U-hq79LZ@pengutronix.de>
+References: <20250304-feature_poe_port_prio-v6-0-3dc0c5ebaf32@bootlin.com>
+ <20250304-feature_poe_port_prio-v6-6-3dc0c5ebaf32@bootlin.com>
+ <Z9gYTRgH-b1fXJRQ@pengutronix.de>
+ <20250320173535.75e6419e@kmaincent-XPS-13-7390>
+ <20250324173907.3afa58d2@kmaincent-XPS-13-7390>
+ <Z-GXROTptwg3jh4J@p620>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250324-netns-debugfs-v1-1-c75e9d5a6266@kernel.org>
-In-Reply-To: <20250324-netns-debugfs-v1-1-c75e9d5a6266@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 25 Mar 2025 06:21:44 +0100
-X-Gm-Features: AQ5f1Jpo46yjmZxCGvmGXnjpHCubT1YLmkD_YwFqIO8scnLE13pByFExr1SBtRc
-Message-ID: <CANn89iL44SvNKgK-fbm2+bWUpCk+cT0LFVaMGj7HdVOkRiW9Vg@mail.gmail.com>
-Subject: Re: [PATCH] net: add a debugfs files for showing netns refcount
- tracking info
-To: Jeff Layton <jlayton@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Z-GXROTptwg3jh4J@p620>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, Mar 24, 2025 at 9:24=E2=80=AFPM Jeff Layton <jlayton@kernel.org> wr=
-ote:
->
-> CONFIG_NET_NS_REFCNT_TRACKER currently has no convenient way to display
-> its tracking info. Add a new net_ns directory in debugfs. Have a
-> directory in there for every net, with refcnt and notrefcnt files that
-> show the currently tracked active and passive references.
->
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> ---
-> Recently, I had a need to track down some long-held netns references,
-> and discovered CONFIG_NET_NS_REFCNT_TRACKER. The main thing that seemed
-> to be missing from it though is a simple way to view the currently held
-> references on the netns. This adds files in debugfs for this.
+Hi,
 
-Thanks for working on this, this is a very good idea.
+On Mon, Mar 24, 2025 at 05:33:18PM +0000, Kyle Swenson wrote:
+> Hello Kory,
+> 
+> On Mon, Mar 24, 2025 at 05:39:07PM +0100, Kory Maincent wrote:
+> > Hello Kyle, Oleksij,
+> ...
+> > 
+> > Small question on PSE core behavior for PoE users.
+> > 
+> > If we want to enable a port but we can't due to over budget.
+> > Should we :
+> > - Report an error (or not) and save the enable action from userspace. On that
+> >   case, if enough budget is available later due to priority change or port
+> >   disconnected the PSE core will try automatically to re enable the PoE port.
+> >   The port will then be enabled without any action from the user.
+> > - Report an error but do nothing. The user will need to rerun the enable
+> >   command later to try to enable the port again.
+> > 
+> > How is it currently managed in PoE poprietary userspace tools?
+> 
+> So in our implementation, we're using the first option you've presented.
+> That is, we save the enable action from the user and if we can't power
+> the device due to insufficient budget remaining, we'll indicate that status to the
+> user.  If enough power budget becomes available later, we'll power up
+> the device automatically.
 
+It seems to be similar to administrative UP state - "ip link set dev lan1 up".
+I'm ok with this behavior.
 
-> +#define MAX_NS_DEBUG_BUFSIZE   (32 * PAGE_SIZE)
-> +
-> +static int
-> +ns_debug_tracker_show(struct seq_file *f, void *v)
-> +{
-> +       struct ref_tracker_dir *tracker =3D f->private;
-> +       int len, bufsize =3D PAGE_SIZE;
-> +       char *buf;
-> +
-> +       for (;;) {
-> +               buf =3D kvmalloc(bufsize, GFP_KERNEL);
-> +               if (!buf)
-> +                       return -ENOMEM;
-> +
-> +               len =3D ref_tracker_dir_snprint(tracker, buf, bufsize);
-> +               if (len < bufsize)
-> +                       break;
-> +
-> +               kvfree(buf);
-> +               bufsize *=3D 2;
-> +               if (bufsize > MAX_NS_DEBUG_BUFSIZE)
-> +                       return -ENOBUFS;
-> +       }
-> +       seq_write(f, buf, len);
-> +       kvfree(buf);
-> +       return 0;
-> +}
-
-I guess we could first change ref_tracker_dir_snprint(tracker, buf, bufsize=
-)
-to ref_tracker_dir_snprint(tracker, buf, bufsize, &needed) to avoid
-too many tries in this loop.
-
-Most of ref_tracker_dir_snprint() runs with hard irq being disabled...
-
-
-diff --git a/drivers/gpu/drm/i915/intel_wakeref.c
-b/drivers/gpu/drm/i915/intel_wakeref.c
-index 87f2460473127af65a9a793c7f1934fafe41e79e..6650421b4f00c318adec72cd7c1=
-7a76832f14cce
-100644
---- a/drivers/gpu/drm/i915/intel_wakeref.c
-+++ b/drivers/gpu/drm/i915/intel_wakeref.c
-@@ -208,7 +208,7 @@ void intel_ref_tracker_show(struct ref_tracker_dir *dir=
-,
-        if (!buf)
-                return;
-
--       count =3D ref_tracker_dir_snprint(dir, buf, buf_size);
-+       count =3D ref_tracker_dir_snprint(dir, buf, buf_size, NULL);
-        if (!count)
-                goto free;
-        /* printk does not like big buffers, so we split it */
-diff --git a/include/linux/ref_tracker.h b/include/linux/ref_tracker.h
-index 8eac4f3d52547ccbaf9dcd09962ce80d26fbdff8..19bd42088434b661810082350a9=
-d5afcbff6a88a
-100644
---- a/include/linux/ref_tracker.h
-+++ b/include/linux/ref_tracker.h
-@@ -46,7 +46,7 @@ void ref_tracker_dir_print_locked(struct ref_tracker_dir =
-*dir,
- void ref_tracker_dir_print(struct ref_tracker_dir *dir,
-                           unsigned int display_limit);
-
--int ref_tracker_dir_snprint(struct ref_tracker_dir *dir, char *buf,
-size_t size);
-+int ref_tracker_dir_snprint(struct ref_tracker_dir *dir, char *buf,
-size_t size, size_t *needed);
-
- int ref_tracker_alloc(struct ref_tracker_dir *dir,
-                      struct ref_tracker **trackerp, gfp_t gfp);
-@@ -77,7 +77,7 @@ static inline void ref_tracker_dir_print(struct
-ref_tracker_dir *dir,
- }
-
- static inline int ref_tracker_dir_snprint(struct ref_tracker_dir *dir,
--                                         char *buf, size_t size)
-+                                         char *buf, size_t size,
-size_t *needed)
- {
-        return 0;
- }
-diff --git a/lib/ref_tracker.c b/lib/ref_tracker.c
-index cf5609b1ca79361763abe5a3a98484a3ee591ff2..d8d02dab7ce67caf91ae22f9391=
-abe2c92481c7f
-100644
---- a/lib/ref_tracker.c
-+++ b/lib/ref_tracker.c
-@@ -65,6 +65,7 @@ ref_tracker_get_stats(struct ref_tracker_dir *dir,
-unsigned int limit)
- struct ostream {
-        char *buf;
-        int size, used;
-+       size_t needed;
- };
-
- #define pr_ostream(stream, fmt, args...) \
-@@ -76,6 +77,7 @@ struct ostream {
-        } else { \
-                int ret, len =3D _s->size - _s->used; \
-                ret =3D snprintf(_s->buf + _s->used, len, pr_fmt(fmt), ##ar=
-gs); \
-+               _s->needed +=3D ret; \
-                _s->used +=3D min(ret, len); \
-        } \
- })
-@@ -141,7 +143,7 @@ void ref_tracker_dir_print(struct ref_tracker_dir *dir,
- }
- EXPORT_SYMBOL(ref_tracker_dir_print);
-
--int ref_tracker_dir_snprint(struct ref_tracker_dir *dir, char *buf,
-size_t size)
-+int ref_tracker_dir_snprint(struct ref_tracker_dir *dir, char *buf,
-size_t size, size_t *needed)
- {
-        struct ostream os =3D { .buf =3D buf, .size =3D size };
-        unsigned long flags;
-@@ -150,6 +152,8 @@ int ref_tracker_dir_snprint(struct ref_tracker_dir
-*dir, char *buf, size_t size)
-        __ref_tracker_dir_pr_ostream(dir, 16, &os);
-        spin_unlock_irqrestore(&dir->lock, flags);
-
-+       if (needed)
-+               *needed =3D os.needed;
-        return os.used;
- }
- EXPORT_SYMBOL(ref_tracker_dir_snprint);
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index ce4b01cc7aca15ddf74f4160580871868e693fb8..61ce889ab29c2b726eab064b0ec=
-b39838db30229
-100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -1529,13 +1529,14 @@ struct ns_debug_net {
-        struct dentry *notrefcnt;
- };
-
--#define MAX_NS_DEBUG_BUFSIZE   (32 * PAGE_SIZE)
-+#define MAX_NS_DEBUG_BUFSIZE   (1 << 20)
-
- static int
- ns_debug_tracker_show(struct seq_file *f, void *v)
- {
-        struct ref_tracker_dir *tracker =3D f->private;
-        int len, bufsize =3D PAGE_SIZE;
-+       size_t needed;
-        char *buf;
-
-        for (;;) {
-@@ -1543,12 +1544,12 @@ ns_debug_tracker_show(struct seq_file *f, void *v)
-                if (!buf)
-                        return -ENOMEM;
-
--               len =3D ref_tracker_dir_snprint(tracker, buf, bufsize);
-+               len =3D ref_tracker_dir_snprint(tracker, buf, bufsize, &nee=
-ded);
-                if (len < bufsize)
-                        break;
-
-                kvfree(buf);
--               bufsize *=3D 2;
-+               bufsize =3D round_up(needed, PAGE_SIZE);
-                if (bufsize > MAX_NS_DEBUG_BUFSIZE)
-                        return -ENOBUFS;
-        }
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
