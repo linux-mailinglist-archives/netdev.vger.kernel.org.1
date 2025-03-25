@@ -1,93 +1,87 @@
-Return-Path: <netdev+bounces-177473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE163A7047B
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 16:01:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2036AA7048E
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 16:06:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A0463B16F1
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 15:00:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABB821666DD
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 15:06:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D943F25C71F;
-	Tue, 25 Mar 2025 15:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D66825A338;
+	Tue, 25 Mar 2025 15:06:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="To8MPC85"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lC6ctQGR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6BE325C6F8
-	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 15:00:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67A701EB3E;
+	Tue, 25 Mar 2025 15:06:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742914811; cv=none; b=nAodAp17pQEG7pkRBHTkeqSDwpyPALG9p497XaneE2knhRDPl8hUOTeqRu9rGdhT9/l8jFX+rt+SBEDw4p4Dy54+UJMeAx8a5Pxz9SXmQtIidPNaXjGpcBhfpOei+XZU1eakoTLtPFDlgj/oUWas3oHBA2rimTWNdoghcXCF0bY=
+	t=1742915168; cv=none; b=GGwdpCKHZs0LcICNQYieian4FgbR5p+F07CVUO7jX0tLXXoIXvB6NW5/F/d2QOnTuqEg5yPoNSlabqt8AXNuFvgiA5HdzwwI6j4npunmrnOWjukSrHZXd+AB0GyhxJRadZtOHWMooIIvVifLeCVid+1uDPfwAcTSMYc8dbsi/qk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742914811; c=relaxed/simple;
-	bh=WaU/c0h+tGAATC4kS6vxy9TMJWbnhmBjIwstrx0pEK0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bSTWYarZcF4fovrCVxKiVQwS9ARet0WdtwsgQHlJ3l/+/9Au7+4cn4etDJp4H1KzlShEXpz7ItGMebHw5/emtaYU9aFhy7wrOQixtFh0/cwhZ61K1sJe/yz5QIQWecg/ivGF3sh5PrdFm6wKLtJscPSJbnpxdP2TcJW6zeFt2uA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=To8MPC85; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 341EFC4CEEA;
-	Tue, 25 Mar 2025 15:00:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742914811;
-	bh=WaU/c0h+tGAATC4kS6vxy9TMJWbnhmBjIwstrx0pEK0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=To8MPC853X3QBVXICcWBAGDnP2ZxIOYditbIIFDmUyTx4bBL95XN5dvtVVwCLnF7b
-	 VtvmaV9zBx3zB7a8zeJiTxLguxshmc33dc6xE9GrGPIX3tTTnrZQeiKOpl9XznvxBe
-	 YQXRBZ0BSTJv/1mV+XWDQJcR2JiVtyqJ93J9CbF7W+of0lkFFOlT6bNLNn2K3Um9ZM
-	 wZbeWHSM6Mffc7daYUO1f6YCM6fXm2sTaBFUX2kraJlXyWfFT8pJiS6aLli44R5h13
-	 vl06jUwHApOX/hs/Mff2aGOhG41TfhZ6eFP9iVw3fbDKmddV15DENVY/Vt+TE1yp33
-	 pdaJdAT1i9COg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE31380CFE7;
-	Tue, 25 Mar 2025 15:00:48 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1742915168; c=relaxed/simple;
+	bh=WwTs38cduZqd9qtuPegb9fIa68DDTyF9/BCKDH+jYZc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uzYbCIUDp3EN7Z+eCpSqwm4d8TUSEZuW/kU0MuA+M6sWyV/w8blPIPtAwOT+swYRPMdr7D1/ee72SVPXY/SzrpZpY0Wqg0RpFB9ThAuTfKjTiRKL2x2OZ/ro+UZJKebzZBONa2dPx+FlR1O/QC8F2EJwFk6M0hwPWdOvvm2j6rE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lC6ctQGR; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=RbNibk7vAHn+5HUmQKRDw9Q3Hr2VlQle5mTru3E9iuU=; b=lC6ctQGRJnnjgQd6d44kIc2Oxd
+	euHpZqofQd0+GoZrKsUg66OIffTd+fV+6Q1cAJy7bWbUddYTJazUOuxiYgztJs9E9F/wS3Twu0yUu
+	K/3Lyy5W2xEHlG6OUrJRDlrr0o15QJfGq54BUAuen3YFo3bKYQOXsc7hBvwD92tkc7X4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tx5qb-0074KB-TT; Tue, 25 Mar 2025 16:05:45 +0100
+Date: Tue, 25 Mar 2025 16:05:45 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>, devicetree@vger.kernel.org,
+	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH 2/5] dt-bindings: net: Add MTIP L2 switch description
+ (fec,mtip-switch.yaml)
+Message-ID: <2ccab52d-5ed1-4257-a8f1-328c76127ebe@lunn.ch>
+References: <20250325115736.1732721-1-lukma@denx.de>
+ <20250325115736.1732721-3-lukma@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] tcp: avoid atomic operations on sk->sk_rmem_alloc
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174291484726.606159.5377223002671909937.git-patchwork-notify@kernel.org>
-Date: Tue, 25 Mar 2025 15:00:47 +0000
-References: <20250320121604.3342831-1-edumazet@google.com>
-In-Reply-To: <20250320121604.3342831-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- ncardwell@google.com, kuniyu@amazon.com, horms@kernel.org,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250325115736.1732721-3-lukma@denx.de>
 
-Hello:
+> +  phy-reset-gpios:
+> +    deprecated: true
+> +    description:
+> +      Should specify the gpio for phy reset.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+It seem odd that a new binding has deprecated properties. Maybe add a
+comment in the commit message as to why they are there. I assume this
+is because you are re-using part of the FEC code as is, and it
+implements them?
 
-On Thu, 20 Mar 2025 12:16:04 +0000 you wrote:
-> TCP uses generic skb_set_owner_r() and sock_rfree()
-> for received packets, with socket lock being owned.
-> 
-> Switch to private versions, avoiding two atomic operations
-> per packet.
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] tcp: avoid atomic operations on sk->sk_rmem_alloc
-    https://git.kernel.org/netdev/net-next/c/0de2a5c4b824
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+	   Andrew
 
 
