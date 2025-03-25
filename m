@@ -1,72 +1,60 @@
-Return-Path: <netdev+bounces-177422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A422CA70223
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 14:38:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2E15A70227
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 14:38:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AABCD178AF0
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:30:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7DAB57A3CAF
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:30:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F9CB25C6E4;
-	Tue, 25 Mar 2025 13:23:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70DE1258CCD;
+	Tue, 25 Mar 2025 13:24:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="LKMr+1s0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RnFvzxnf"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8107925BAD6;
-	Tue, 25 Mar 2025 13:23:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484E819E7F8;
+	Tue, 25 Mar 2025 13:24:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742909000; cv=none; b=RMMimBNv6JTmndIZZHgg9TWQHwQAmXVttgm87DmPOSCn60S3idP4kcWEklQTQWbSSF0Fh7FHHij6y0qdXplQujaLPd9nijCi29IsdyqeppNEI87JXDU6i+y/F7dofi+WTVw1ZBnXc3PnjAn3/34VSFEoFnm1it5d101VvZyN2E4=
+	t=1742909065; cv=none; b=FxlCQ7GArnjR8sDs/YoE25fuG0L/kRsIPAyvCxBpV1bKWDuqa6bbVAqKqvr0vj+rAC58VMcMQpUZvEbbHSeq7t0W13xtz2KKuYiNtQVhlXLeROqE6dxSdejWpS+1On0mvjauOLFF8wisk+O38E3avVsXTGo9Q6oLw1Z2UrsM4X4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742909000; c=relaxed/simple;
-	bh=vdEsbEtk+7p0UT7+RlZ+OGgqnolY34sAgPNR7Nhsm0I=;
+	s=arc-20240116; t=1742909065; c=relaxed/simple;
+	bh=wozwOKQiaMagwbpwK6NFNx/fOsvnFGH61CvbZNCe3Gg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mXO0nFcDQhwZeLYCPOYrL88H7whLrxxlJ+yKmHPrNUosJN7r0fQKGOF6UGks4Jw+LfE85eqXeE9CH92xOb2zgfAzQ4J/R+lCA/Ce3YEL4yt17Y2o78TOY+ZTjuExCc1LEF6FgeHx/CG1M00Qf6SK1jwBjmZ3gAG8J3NGsJnuAw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=LKMr+1s0; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 422A44328C;
-	Tue, 25 Mar 2025 13:23:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1742908990;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=I0Y4rbi2Stkd9XDs1slFcKcfqbdAPedwVnV7eZWlBTw=;
-	b=LKMr+1s0QxpyenqwrJ5FOsOMT1KFchsJR6tnFf5EfFKfkrdU7q7IsdRiVQ9jcVQn5HgHSv
-	x8+0tNH4e4gH240CDTEsp4Uu3ygcWKyf0ghT60MSmgag2pqNY73ofHiw5rJpcCodkNhUlA
-	NC5S73rmFOSsEGNoKCtCCAoELK6mRmfRJR+m8OaJAccw4rLoaR9j9syGYosyKcDhZ+WVJU
-	SmYIXi6y1V+2ozKMIrrOBnU73GBomJ3UigtQBdwWGaF14Xx1GjSI83zDvLfpcfY9/jvYII
-	hZeazBA8DcAuYlVVyBQH3Bjh62QYG0KYUi49KYarNbcH5hlPFW8IzBjRc9+k0A==
-Date: Tue, 25 Mar 2025 14:23:07 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, linux-arm-kernel@lists.infradead.org,
- Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina
- <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Vladimir Oltean
- <vladimir.oltean@nxp.com>, Oleksij Rempel <o.rempel@pengutronix.de>, Simon
- Horman <horms@kernel.org>, Romain Gantois <romain.gantois@bootlin.com>,
- Piergiorgio Beruto <piergiorgio.beruto@gmail.com>
-Subject: Re: [PATCH net-next v4 4/8] net: ethtool: netlink: Introduce
- command-specific dump_one_dev
-Message-ID: <20250325142307.7c1b229d@kmaincent-XPS-13-7390>
-In-Reply-To: <20250324104012.367366-5-maxime.chevallier@bootlin.com>
-References: <20250324104012.367366-1-maxime.chevallier@bootlin.com>
-	<20250324104012.367366-5-maxime.chevallier@bootlin.com>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	 MIME-Version:Content-Type; b=tzlZHlOU2Aw4k8qmUvRsvgCy1qUnUyv4FO803R/Horw6xtcDJJQ7a8RAm+dH4v4i8H34JZodpUMnZLdCrlLLVpYVIEW9mvj2amjGhJvAMlog5n5aUjRfUinQtZ8Z1yMnL3wJ2dp2i03rIDSD0WffRLbiyanCFnLPZte0rBLMY08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RnFvzxnf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87FCEC4CEE4;
+	Tue, 25 Mar 2025 13:24:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742909064;
+	bh=wozwOKQiaMagwbpwK6NFNx/fOsvnFGH61CvbZNCe3Gg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RnFvzxnfSxNj3kF9oZmvyMhC+P8+Gb2kSHobDmo6DHmG/FPs8kGz3DrKMfesNMEn+
+	 JiX6c5Cmhlqf+1fNHrDLMcngAqk7qkN+VfLZ75dbGbt44A0/uQkibzR/C9ZFkV7m39
+	 Utbzgkf1fldCv1DftWRqK70jqDUDMYBVLyfmQbspaD5wJEKUN2WaTGrJUTACpsjtxI
+	 NNs2rIAhGz6X2FuC9Q9MRmo7VIwV2EYXwPAfEMZAcLweB/NDSX8L5vwka451h8FV4e
+	 6oy5XZp8k2RsrVkAifyLRHfNXLaJYpvrkuG7yyU7D8QVv7/xst2SVEaLCCdsfXdNrD
+	 kBNf3rQg2iTzA==
+Date: Tue, 25 Mar 2025 06:24:16 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Nikolay
+ Aleksandrov <razor@blackwall.org>, Simon Horman <horms@kernel.org>, Cosmin
+ Ratiu <cratiu@nvidia.com>, linux-kernel@vger.kernel.org, Liang Li
+ <liali@redhat.com>
+Subject: Re: [PATCH net] bonding: use permanent address for MAC swapping if
+ device address is same
+Message-ID: <20250325062416.4d60681b@kernel.org>
+In-Reply-To: <20250319080947.2001-1-liuhangbin@gmail.com>
+References: <20250319080947.2001-1-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,115 +63,108 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduiedvjeeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgfdutdefvedtudegvefgvedtgfdvhfdtueeltefffefffffhgfetkedvfeduieeinecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvddupdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhop
- egvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-GND-Sasl: kory.maincent@bootlin.com
 
-On Mon, 24 Mar 2025 11:40:06 +0100
-Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
+On Wed, 19 Mar 2025 08:09:47 +0000 Hangbin Liu wrote:
+> Similar with a951bc1e6ba5 ("bonding: correct the MAC address for "follow"
+> fail_over_mac policy"). The fail_over_mac follow mode requires the former=
+ly
+> active slave to swap MAC addresses with the newly active slave during
+> failover. However, the slave's MAC address can be same under certain
+> conditions:
+>=20
+> 1) ip link set eth0 master bond0
+>    bond0 adopts eth0's MAC address (MAC0).
+>=20
+> 1) ip link set eth1 master bond0
 
-> Prepare more generic ethnl DUMP hanldling, by allowing netlink commands
-> to register their own dump_one_dev() callback. This avoids having to
-> roll with a fully custom genl ->dumpit callback, allowing the re-use
-> of some ethnl plumbing.
+nit: 2)
+
+>    eth1 is added as a backup with its own MAC (MAC1).
 >=20
-> Fallback to the default dump_one_dev behaviour when no custom callback
-> is found.
+> 3) ip link set eth0 nomaster
+>    eth0 is released and restores its MAC (MAC0).
+>    eth1 becomes the active slave, and bond0 assigns MAC0 to eth1.
+
+I don't know much about bonding, but this seems like a problem already
+to me. Assuming both eth0 and eth1 are on the same segment we now have
+two interfaces with the same MAC on the network. Shouldn't we override
+the address of eth0 to a random one when it leaves?
+
+> 4) ip link set eth0 master bond0
+>    eth0 is re-added to bond0, but both eth0 and eth1 now have MAC0,
+>    breaking the follow policy.
 >=20
-> The command dump context is maintained within the ethnl_dump_ctx, that
-> we move in netlink.h so that command handlers can access it.
+> To resolve this issue, we need to swap the new active slave=E2=80=99s per=
+manent
+> MAC address with the old one. The new active slave then uses the old
+> dev_addr, ensuring that it matches the bond address. After the fix:
 >=20
-> This context can be allocated/freed in new ->dump_start() and
-> ->dump_done() callbacks. =20
+> 5) ip link set bond0 type bond active_slave eth0
+>    dev_addr is the same, swap old active eth1's MAC (MAC0) with eth0.
+>    Swap new active eth0's permanent MAC (MAC0) to eth1.
+>    MAC addresses remain unchanged.
 >=20
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> 6) ip link set bond0 type bond active_slave eth1
+>    dev_addr is the same, swap the old active eth0's MAC (MAC0) with eth1.
+>    Swap new active eth1's permanent MAC (MAC1) to eth0.
+>    The MAC addresses are now correctly differentiated.
+>=20
+> Fixes: 3915c1e8634a ("bonding: Add "follow" option to fail_over_mac")
+> Reported-by: Liang Li <liali@redhat.com>
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 > ---
-> V4 : No changes
+>  drivers/net/bonding/bond_main.c | 9 +++++++--
+>  include/net/bonding.h           | 8 ++++++++
+>  2 files changed, 15 insertions(+), 2 deletions(-)
 >=20
->  net/ethtool/netlink.c | 61 +++++++++++++++++++++++++------------------
->  net/ethtool/netlink.h | 35 +++++++++++++++++++++++++
->  2 files changed, 70 insertions(+), 26 deletions(-)
->=20
-> diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
-> index 63ede3638708..0345bffa0678 100644
-> --- a/net/ethtool/netlink.c
-> +++ b/net/ethtool/netlink.c
-> @@ -339,24 +339,6 @@ int ethnl_multicast(struct sk_buff *skb, struct
-> net_device *dev)=20
->  /* GET request helpers */
+> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_m=
+ain.c
+> index e45bba240cbc..9cc2348d4ee9 100644
+> --- a/drivers/net/bonding/bond_main.c
+> +++ b/drivers/net/bonding/bond_main.c
+> @@ -1107,8 +1107,13 @@ static void bond_do_fail_over_mac(struct bonding *=
+bond,
+>  			old_active =3D bond_get_old_active(bond, new_active);
 > =20
-> -/**
-> - * struct ethnl_dump_ctx - context structure for generic dumpit() callba=
-ck
-> - * @ops:        request ops of currently processed message type
-> - * @req_info:   parsed request header of processed request
-> - * @reply_data: data needed to compose the reply
-> - * @pos_ifindex: saved iteration position - ifindex
-> - *
-> - * These parameters are kept in struct netlink_callback as context prese=
-rved
-> - * between iterations. They are initialized by ethnl_default_start() and=
- used
-> - * in ethnl_default_dumpit() and ethnl_default_done().
-> - */
-> -struct ethnl_dump_ctx {
-> -	const struct ethnl_request_ops	*ops;
-> -	struct ethnl_req_info		*req_info;
-> -	struct ethnl_reply_data		*reply_data;
-> -	unsigned long			pos_ifindex;
-> -};
-> -
->  static const struct ethnl_request_ops *
->  ethnl_default_requests[__ETHTOOL_MSG_USER_CNT] =3D {
->  	[ETHTOOL_MSG_STRSET_GET]	=3D &ethnl_strset_request_ops,
-> @@ -540,9 +522,9 @@ static int ethnl_default_doit(struct sk_buff *skb, st=
-ruct
-> genl_info *info) return ret;
+>  		if (old_active) {
+> -			bond_hw_addr_copy(tmp_mac, new_active->dev->dev_addr,
+> -					  new_active->dev->addr_len);
+> +			if (bond_hw_addr_equal(old_active->dev->dev_addr, new_active->dev->de=
+v_addr,
+> +					       new_active->dev->addr_len))
+> +				bond_hw_addr_copy(tmp_mac, new_active->perm_hwaddr,
+> +						  new_active->dev->addr_len);
+> +			else
+> +				bond_hw_addr_copy(tmp_mac, new_active->dev->dev_addr,
+> +						  new_active->dev->addr_len);
+>  			bond_hw_addr_copy(ss.__data,
+>  					  old_active->dev->dev_addr,
+>  					  old_active->dev->addr_len);
+> diff --git a/include/net/bonding.h b/include/net/bonding.h
+> index 8bb5f016969f..de965c24dde0 100644
+> --- a/include/net/bonding.h
+> +++ b/include/net/bonding.h
+> @@ -463,6 +463,14 @@ static inline void bond_hw_addr_copy(u8 *dst, const =
+u8 *src, unsigned int len)
+>  	memcpy(dst, src, len);
 >  }
 > =20
-> -static int ethnl_default_dump_one_dev(struct sk_buff *skb, struct net_de=
-vice
-> *dev,
-> -				      const struct ethnl_dump_ctx *ctx,
-> -				      const struct genl_info *info)
-> +static int ethnl_default_dump_one(struct sk_buff *skb,
-> +				  const struct ethnl_dump_ctx *ctx,
-> +				  const struct genl_info *info)
->  {
->  	void *ehdr;
->  	int ret;
-> @@ -553,15 +535,15 @@ static int ethnl_default_dump_one_dev(struct sk_buff
-> *skb, struct net_device *de if (!ehdr)
->  		return -EMSGSIZE;
-> =20
-> -	ethnl_init_reply_data(ctx->reply_data, ctx->ops, dev);
->  	rtnl_lock();
-> -	netdev_lock_ops(dev);
-> +	netdev_lock_ops(ctx->reply_data->dev);
->  	ret =3D ctx->ops->prepare_data(ctx->req_info, ctx->reply_data, info);
-> -	netdev_unlock_ops(dev);
-> +	netdev_unlock_ops(ctx->reply_data->dev);
->  	rtnl_unlock();
->  	if (ret < 0)
->  		goto out;
-> -	ret =3D ethnl_fill_reply_header(skb, dev, ctx->ops->hdr_attr);
-> +	ret =3D ethnl_fill_reply_header(skb, ctx->reply_data->dev,
-> +				      ctx->ops->hdr_attr);
+> +static inline bool bond_hw_addr_equal(const u8 *dst, const u8 *src, unsi=
+gned int len)
+> +{
+> +	if (len =3D=3D ETH_ALEN)
+> +		return ether_addr_equal(dst, src);
+> +	else
+> +		return (memcmp(dst, src, len) =3D=3D 0);
 
-Instead of modifying all these lines you could simply add this at the begin=
-ning:
-struct net_device *dev =3D ctx->reply_data->dev;
+looks like this is on ctrl path, just always use memcmp directly ?
+not sure if this helper actually.. helps.
 
-With that:
-Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
-
-Thank you!
-
-Regards,
+> +}
+> +
+>  #define BOND_PRI_RESELECT_ALWAYS	0
+>  #define BOND_PRI_RESELECT_BETTER	1
+>  #define BOND_PRI_RESELECT_FAILURE	2
 --=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+pw-bot: cr
 
