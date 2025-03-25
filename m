@@ -1,176 +1,168 @@
-Return-Path: <netdev+bounces-177302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 559A5A6ED14
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 10:53:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFDFFA6ECE8
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 10:46:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3410418941BF
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 09:53:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4CB31890FF4
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 09:44:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B1252528FC;
-	Tue, 25 Mar 2025 09:53:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cACGKuYS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76A3B1946AA;
+	Tue, 25 Mar 2025 09:44:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE4C3254861
-	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 09:53:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD01C15666B;
+	Tue, 25 Mar 2025 09:44:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742896386; cv=none; b=Tipnph2jI2q2pG+IVVFVk35njfcFZwexbExO0JksaRxzhhrvFx/beVYRzvqHMo0FwwtXqxlIrlALv2c2v/JzfF3f5E9MlbFrP8SgklyAPZe9kpQNU52ZEy6ogV8F5ibF5374lz4lWJGbBv1W+ytr4axDfRMBXOop6C5U7kO65sM=
+	t=1742895866; cv=none; b=BwzbTP3G9j++kxCB3H2aO7ff2mTBwy+0CagVMnRzlbnx4AUFCAtiI4trN+Zk6FITn4qQ8MfJJTIq2zLNm3UWG3bUTcb6xbEM1acdgWVSdAyEcryIWAmY7j2bGKnvBbk6E7pSVReUUJhkdxtDgjYi2XchBr0OZYg87yAGmc9djgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742896386; c=relaxed/simple;
-	bh=g/PZojo7Vtmb/7rS+vDqEnvamhDirH6xExzh1cYK5UQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=V0Q60oDsC8dUSqOlaBGbUXT/TIlXp8PcSLyvnkgrCAYQq2b5RgzAV2nO2p0wlEc6u9aLHMKOKTcp9FhZetuZGjHBo/JwPWcDnrqxpG64JkEndIGeonUer+zDJf0HE1Uwy9xkseFeGhCQxWWkE8F5Z9nsn0Gp9/ihcbE2j7JZ6CY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cACGKuYS; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742896383;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7VwJ4qmAHW6mIQYvRMYR+1kBiCO1OoU67ZBajJ1aVd8=;
-	b=cACGKuYS7C8fZX0lRTcH8qYsvsGykVqixckxaXt+cz1+Rxd5pU5zIhw1XW7LCjCrg83LCw
-	WYwZMqb+lJrOEgsxidK376LsOArqiGoILkBQEdXk8N4hPYxmwHQt+nJAJMZVsJcj8SbRTK
-	DsZLLROHVurFMiY1MuhoOizCIuXfRP0=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-488-EkKwjQedPniiB6bl1mILQg-1; Tue, 25 Mar 2025 05:53:02 -0400
-X-MC-Unique: EkKwjQedPniiB6bl1mILQg-1
-X-Mimecast-MFC-AGG-ID: EkKwjQedPniiB6bl1mILQg_1742896382
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7c59ac9781fso945778685a.1
-        for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 02:53:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742896382; x=1743501182;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7VwJ4qmAHW6mIQYvRMYR+1kBiCO1OoU67ZBajJ1aVd8=;
-        b=I+F25LNH2puW7R0F7MCvfTyXfdvI6wbHd1sX/U6ijOpgDd6y4rjenWdu0yxtfKROt1
-         99DlAgJusrNmjKUUvalEw8rCvrdO6+ABWJPOQQ7bEq3375vBclV2B3w6GKaY/8Tnnvz9
-         9r4Edh9O7jqqLTL4uzVrmTGnh6zfVmf8aQR3NBEnxiPKn1/YdzT1R2xOWC0v5IV4ax99
-         XARlX0MaYYPhJ7noWdpNm90mCI2tjD0amwcx3mNcTPN54nuHpjdLAU1bQ4f+sL4yWFHC
-         k6296lFcbHzhvpNM0CLgnxojzQbPw14DU0OgMiS8a7L/6JSFSR1lhdjSJGenm5fUY9wT
-         aYiw==
-X-Forwarded-Encrypted: i=1; AJvYcCV3qkvIX68P407BDG0LA5Sa/ykgVscoYge/RxsWd+n6bzUDq7g92nPZFOblZznY/IugVSVA5Pk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKPvrbcwcp6RHRDCuMicKDKXLwvYvbFqpiYTKus6QFtp/xLGZ1
-	MrIxKZvrwYaWRxsp/jZVE8U4yph/U8PBv1z+qOdYJcJrVlXstcrolyXkokjqWNO/x204nmdoxpO
-	13eCRtOL8kItTYPJbk1g4NcSB+RGC8rjXBAYiv9/bUDUhr4TcX9eKzKM/wWRJhQ==
-X-Gm-Gg: ASbGncsMj+2BPf6kWUnVrATy6jdlNBQt5M+GEJ75f/1+tLaKkHSojMOMtSVlXZT67bN
-	7lbPC2GgwSsvb8RolzA3iSVKDlMugGLJ/KzG0FYma67gb9BgpRFjH+j+5DakC5LZu7nMAkUE1bN
-	GXmfD4CxSOlJ9f+gBV9j53l6Igw/Gb2J2zVJNErJZDH4cs1nc5FaYOvCeNFCZsruf60TX1xjgFb
-	iSPssZBnkUhnwMqcHRvW7sowvgG9pstaGiRECrJfEHTg0aKRn3ezkJj6HpDbudbjL99i+KyL210
-	z0Sib3YRG0Peips=
-X-Received: by 2002:a05:620a:c51:b0:7c5:3b8d:9f2f with SMTP id af79cd13be357-7c5b0527fd1mr3208996985a.17.1742896381627;
-        Tue, 25 Mar 2025 02:53:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHXoILeFeHwDpbK2MlPEHNgV0HFSkdRaMjudRdE2u/xjGXQh0gVmo0a+EY5Z+FvuFQcYV2u6A==
-X-Received: by 2002:a05:620a:c51:b0:7c5:3b8d:9f2f with SMTP id af79cd13be357-7c5b0527fd1mr3208994385a.17.1742896381126;
-        Tue, 25 Mar 2025 02:53:01 -0700 (PDT)
-Received: from [10.16.31.40] ([101.100.166.68])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c5b92dd9fdsm626398485a.35.2025.03.25.02.52.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Mar 2025 02:53:00 -0700 (PDT)
-Message-ID: <5432cc4f-99f2-43c2-b228-94fb38c2f2d0@redhat.com>
-Date: Tue, 25 Mar 2025 10:52:54 +0100
+	s=arc-20240116; t=1742895866; c=relaxed/simple;
+	bh=YExHr+2mn/5PLGawiihdqqA9Qe1EXHQUBAkBpbg9IW4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RWhvcV+vI/QIx67RbrDHM0rbK/JVkWCZQ9zEcGiv2BMMmhfso9dD1XRcex47yeAED+3GNraRQ5LprT9dZyaMpxrqd2gRvr3yk7bF/dYBR+3e8H2oy3PeYKZX9Auqv6/UE2cqhXZzYoS+hQy2Px9x0jMMb/hKU57zemyppHdTUgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4ZMPyj382Mz1jBPp;
+	Tue, 25 Mar 2025 17:39:41 +0800 (CST)
+Received: from kwepemg200005.china.huawei.com (unknown [7.202.181.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 54F7B1A0188;
+	Tue, 25 Mar 2025 17:44:19 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by kwepemg200005.china.huawei.com
+ (7.202.181.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 25 Mar
+ 2025 17:44:18 +0800
+From: Wang Liang <wangliang74@huawei.com>
+To: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<cong.wang@bytedance.com>, <kuniyu@amazon.com>
+CC: <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
+	<wangliang74@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH net] ipv6: sit: fix skb_under_panic with overflowed needed_headroom
+Date: Tue, 25 Mar 2025 17:54:49 +0800
+Message-ID: <20250325095449.2594874-1-wangliang74@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/5] udp_tunnel: properly deal with xfrm gro
- encap.
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
- Nathan Chancellor <nathan@kernel.org>
-References: <cover.1742557254.git.pabeni@redhat.com>
- <f4659f17b136eaec554d8678de0034c3578580c1.1742557254.git.pabeni@redhat.com>
- <67dd94e315ec3_14b1402947e@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <67dd94e315ec3_14b1402947e@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemg200005.china.huawei.com (7.202.181.32)
 
-Hi,
+When create ipip6 tunnel, if tunnel->parms.link is assigned to the previous
+created tunnel device, the dev->needed_headroom will increase based on the
+previous one.
 
-On 3/21/25 5:33 PM, Willem de Bruijn wrote:
-> Paolo Abeni wrote:
->> The blamed commit below does not take in account that xfrm
->> can enable GRO over UDP encapsulation without going through
->> setup_udp_tunnel_sock().
->>
->> At deletion time such socket will still go through
->> udp_tunnel_cleanup_gro(), and the failed GRO type lookup will
->> trigger the reported warning.
->>
->> Add the GRO accounting for XFRM tunnel when GRO is enabled, and
->> adjust the known gro types accordingly.
->>
->> Note that we can't use setup_udp_tunnel_sock() here, as the xfrm
->> tunnel setup can be "incremental" - e.g. the encapsulation is created
->> first and GRO is enabled later.
->>
->> Also we can not allow GRO sk lookup optimization for XFRM tunnels, as
->> the socket could match the selection criteria at enable time, and
->> later on the user-space could disconnect/bind it breaking such
->> criteria.
->>
->> Reported-by: syzbot+8c469a2260132cd095c1@syzkaller.appspotmail.com
->> Closes: https://syzkaller.appspot.com/bug?extid=8c469a2260132cd095c1
->> Fixes: 311b36574ceac ("udp_tunnel: use static call for GRO hooks when possible")
->> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
->> ---
->> v1 -> v2:
->>  - do proper account for xfrm, retain the warning
->> ---
->>  net/ipv4/udp.c         | 5 +++++
->>  net/ipv4/udp_offload.c | 4 +++-
->>  2 files changed, 8 insertions(+), 1 deletion(-)
->>
->> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
->> index db606f7e41638..79efbf465fb04 100644
->> --- a/net/ipv4/udp.c
->> +++ b/net/ipv4/udp.c
->> @@ -2903,10 +2903,15 @@ static void set_xfrm_gro_udp_encap_rcv(__u16 encap_type, unsigned short family,
->>  {
->>  #ifdef CONFIG_XFRM
->>  	if (udp_test_bit(GRO_ENABLED, sk) && encap_type == UDP_ENCAP_ESPINUDP) {
->> +		bool old_enabled = !!udp_sk(sk)->gro_receive;
->> +
->>  		if (family == AF_INET)
->>  			WRITE_ONCE(udp_sk(sk)->gro_receive, xfrm4_gro_udp_encap_rcv);
->>  		else if (IS_ENABLED(CONFIG_IPV6) && family == AF_INET6)
->>  			WRITE_ONCE(udp_sk(sk)->gro_receive, ipv6_stub->xfrm6_gro_udp_encap_rcv);
->> +
->> +		if (!old_enabled && udp_sk(sk)->gro_receive)
->> +			udp_tunnel_update_gro_rcv(sk, true);
-> 
-> The second part of the condition is always true right?
+If the number of tunnel device is sufficient, the needed_headroom can be
+overflowed. The overflow happens like this:
 
-Jakub noted my initial reply did not land on the ML, sorry.
+  ipip6_newlink
+    ipip6_tunnel_create
+      register_netdevice
+        ipip6_tunnel_init
+          ipip6_tunnel_bind_dev
+            t_hlen = tunnel->hlen + sizeof(struct iphdr); // 40
+            hlen = tdev->hard_header_len + tdev->needed_headroom; // 65496
+            dev->needed_headroom = t_hlen + hlen; // 65536 -> 0
 
-Yes, AFAICS the second part of the condition should be always true, or
-at least I fail to see how to reach there otherwise.
+The value of LL_RESERVED_SPACE(rt->dst.dev) may be HH_DATA_MOD, that leads
+to a small skb allocated in __ip_append_data(), which triggers a
+skb_under_panic:
 
-Still syzkaller is too good to prove me wrong, I guess it's good to err
-on the pedantic/safe side here - checking that condition explicitly.
-It's also IMHO more readable.
+  ------------[ cut here ]------------
+  kernel BUG at net/core/skbuff.c:209!
+  Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
+  CPU: 0 UID: 0 PID: 24133 Comm: test Tainted: G W 6.14.0-rc7-00067-g76b6905c11fd-dirty #1
+  Tainted: [W]=WARN
+  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.15.0-0-g2dd4b9b3f840-prebuilt.qemu.org 04/01/2014
+  RIP: 0010:skb_panic+0x156/0x1d0
+  Call Trace:
+   <TASK>
+   skb_push+0xc8/0xe0
+   fou_build_udp+0x31/0x3a0
+   gue_build_header+0xf7/0x150
+   ip_tunnel_xmit+0x684/0x3660
+   sit_tunnel_xmit__.isra.0+0xeb/0x150
+   sit_tunnel_xmit+0x2e3/0x2930
+   dev_hard_start_xmit+0x1a6/0x7b0
+   __dev_queue_xmit+0x2fa9/0x4120
+   neigh_connected_output+0x39e/0x590
+   ip_finish_output2+0x7bb/0x1f00
+   __ip_finish_output+0x442/0x940
+   ip_finish_output+0x31/0x380
+   ip_mc_output+0x1c4/0x6a0
+   ip_send_skb+0x339/0x570
+   udp_send_skb+0x905/0x1540
+   udp_sendmsg+0x17c8/0x28f0
+   udpv6_sendmsg+0x17f1/0x2c30
+   inet6_sendmsg+0x105/0x140
+   ____sys_sendmsg+0x801/0xc70
+   ___sys_sendmsg+0x110/0x1b0
+   __sys_sendmmsg+0x1f2/0x410
+   __x64_sys_sendmmsg+0x99/0x100
+   do_syscall_64+0x6e/0x1c0
+   entry_SYSCALL_64_after_hwframe+0x76/0x7e
+  ---[ end trace 0000000000000000 ]---
 
-Cheers,
+Fix this by add check for needed_headroom in ipip6_tunnel_bind_dev().
 
-Paolo
+Reported-by: syzbot+4c63f36709a642f801c5@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=4c63f36709a642f801c5
+Fixes: c88f8d5cd95f ("sit: update dev->needed_headroom in ipip6_tunnel_bind_dev()")
+Signed-off-by: Wang Liang <wangliang74@huawei.com>
+---
+ net/ipv6/sit.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/net/ipv6/sit.c b/net/ipv6/sit.c
+index 39bd8951bfca..1662b735c5e3 100644
+--- a/net/ipv6/sit.c
++++ b/net/ipv6/sit.c
+@@ -1095,7 +1095,7 @@ static netdev_tx_t sit_tunnel_xmit(struct sk_buff *skb,
+ 
+ }
+ 
+-static void ipip6_tunnel_bind_dev(struct net_device *dev)
++static int ipip6_tunnel_bind_dev(struct net_device *dev)
+ {
+ 	struct ip_tunnel *tunnel = netdev_priv(dev);
+ 	int t_hlen = tunnel->hlen + sizeof(struct iphdr);
+@@ -1134,7 +1134,12 @@ static void ipip6_tunnel_bind_dev(struct net_device *dev)
+ 		WRITE_ONCE(dev->mtu, mtu);
+ 		hlen = tdev->hard_header_len + tdev->needed_headroom;
+ 	}
++
++	if (t_hlen + hlen > U16_MAX)
++		return -EOVERFLOW;
++
+ 	dev->needed_headroom = t_hlen + hlen;
++	return 0;
+ }
+ 
+ static void ipip6_tunnel_update(struct ip_tunnel *t,
+@@ -1452,7 +1457,9 @@ static int ipip6_tunnel_init(struct net_device *dev)
+ 	tunnel->net = dev_net(dev);
+ 	strcpy(tunnel->parms.name, dev->name);
+ 
+-	ipip6_tunnel_bind_dev(dev);
++	err = ipip6_tunnel_bind_dev(dev);
++	if (err)
++		return err;
+ 
+ 	err = dst_cache_init(&tunnel->dst_cache, GFP_KERNEL);
+ 	if (err)
+-- 
+2.34.1
 
 
