@@ -1,156 +1,233 @@
-Return-Path: <netdev+bounces-177377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0D5BA6FCFD
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:40:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32B69A6FE4C
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:52:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E20EB1883A6E
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:35:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB8A0177807
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:46:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B416A25BAD4;
-	Tue, 25 Mar 2025 12:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B80B27D76D;
+	Tue, 25 Mar 2025 12:24:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=orbstack.dev header.i=@orbstack.dev header.b="lC9oN86t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s+/0HeFV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2909C26A1AD
-	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 12:21:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB0012571D1;
+	Tue, 25 Mar 2025 12:24:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742905297; cv=none; b=JPnqQPw8EuggHt+cQWwL1Nz9vbXRTB0km7unb5+pEEnH7KREQfO3T8YVgMXevwkVKmAm3ymJlQQYCP1042w3jzLmuClSFqNUEKmuZ1HzmJVsnJZq23mcoW/p2VzImZFk/WylJMo/jfv4j+/joGooud92p58Let8QP/6AyhSof6c=
+	t=1742905469; cv=none; b=ZtabhQvZpK7rLxUHnhOZL/JmtmdWgkxItI7QJfJJFl9Q4iLuMqyTSEp7tWAV7hQ2PVnq1hyPOrVRRUB7ZSOBlYVHurxuE98vSzlqc2Uxq+pI4ljXZD5JSOaLf9kM9wZt3Yfo44xoPtANn99l+hbAP+GeR0J+hmgFXhKLIyIq21c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742905297; c=relaxed/simple;
-	bh=BPdYS6xHL5QzpV7y0DGUk3cFXr0NpmjnOS6Qdgtx83A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=C3F3mYD57TzfvM1sdV70q7I7ckKcsPJn9rZ1IkxgMY3JiUGdL4qvC6IvBhmj/HNnUzEjChU2N49X7eeJRPHS92zwt6D37aPj6FUe0q81K83HROlDYhTfBpQbyreWciTurHwufcetS9IGFoXJ7XMAGLxovRmwapDtFXN4/dfarj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=orbstack.dev; spf=pass smtp.mailfrom=orbstack.dev; dkim=pass (2048-bit key) header.d=orbstack.dev header.i=@orbstack.dev header.b=lC9oN86t; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=orbstack.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=orbstack.dev
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-22622ddcc35so38530105ad.2
-        for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 05:21:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=orbstack.dev; s=google; t=1742905295; x=1743510095; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7oXGmD32nrFAaJW8Y4j0w8vdh1RENWFwbAfw9DIryH4=;
-        b=lC9oN86tJpt5j+/KmQSaAj/ti/cl4LAb1QJBROxj0VgpKDM6OqEcZ7UVZC6BwkzeYZ
-         BlYaxZ9o6tnUmAMTo2XiD2C2nNTArcXs6C590+27AGT6+P/zxCipXtx9mdpZMdXBEGPD
-         5PTZDVSmibu4TTryHd5JHv0aVw8RLGWJhCY9buMNgVeNM2L1x2WWpink7oXuDJLQftWn
-         5ASwEeNkmGAowg2Nf4JY+GUZ6TzyY53J/KhtA2YMPuH9i21M0yECx+HoffJSo5uhlBUX
-         xVGb5KOssxJFCSFIw898aTdE+TeKLQrnDoUCbSfFfv7C50DdlF/br39bzgeEIdLAxmC7
-         Zhnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742905295; x=1743510095;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7oXGmD32nrFAaJW8Y4j0w8vdh1RENWFwbAfw9DIryH4=;
-        b=gt/fS5uHsO7BoNonocQErZijFwPnZoqXSxqGUuSD1FSVseptL+Z535UGZlst8jWyBV
-         OmgC30uqaUbDLz1WffwEcDrJSXiD1Iwdffd6UaCMjirECM0XY6zjyKyyOD5MzDBvC4zn
-         CeSRu7njo6SM/fXj0gc+3T5+wGCWiX1Lo/TPGjgpK/+BB401B9rcPreJFAqV/mYxhSmV
-         wNyqaoBCZ11+P6IzJAFcPrVZ0nFYQtC/T9nwFQZytx5rZkFKhHnbH9F4aJJwRtADPlqy
-         9cZjuNMYQn0gDhx+n/3lWnuwqBztXYbVmrBeaTbSM/0FIfWh4KCK+Ijr2CjqGmUX6N7q
-         jQyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVEXsuAkHZ0DJaugEZ6qJfkuYLEL1g+95GGMWYWjrBfoQmX+vFDb1+R1PO878vr/Ma7oTorB9k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzo0xuJrmjCNNgmD3xPy0ZSP28ZPudCtCQXDQdHnQeQvwBs7BeU
-	F5LN3D6wvqNJGT0BlJ1+j+M4j5xO2t+jU0gGWQTszYl1qWzm6bCMta2cb28/T1TzOVWUMvWnAE4
-	pAGa+5FJ7gOetFMgWG+VwpAyyyI4oVurzEtCIug==
-X-Gm-Gg: ASbGncvyAH2Sry9G/LNScj2X6G6AamALdM2ONWVTuKesTn5agTT4Rj45LvFuisbpyKs
-	SeaNzll4BKG8Bgg27KmKxTcwz/o2Ki6c/xhDHwGL/IA/mBGzc7ltexCAGR+K8W1r5ah7BadayTq
-	UXrUhlyrJ4zx9naup2wLitxLqvLurbVGP0TYKd1rvYg8UZ8po4EjH6UiNrl16d
-X-Google-Smtp-Source: AGHT+IExz0YT/jp4uxzAo0Fs/pmpz4p7SGOWeBSgdx3aKf6wwX30Ixn/7csWEW/wAweIA22n99zce7ONy1aYp+CyqHE=
-X-Received: by 2002:a05:6a20:2d23:b0:1f5:6f5d:3366 with SMTP id
- adf61e73a8af0-1fe434371c4mr31719506637.37.1742905295200; Tue, 25 Mar 2025
- 05:21:35 -0700 (PDT)
+	s=arc-20240116; t=1742905469; c=relaxed/simple;
+	bh=Mf0PY1BZwER+HJ9Mbh8TvIu8FULZZyssZyyQhg3Lxog=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=G0canlWlTc9P+7pQCEAUjUwByCWEFW9FKshssW3cZmj61qMtYL2g1zp6/rX8KT0YKSZIDbayC1fN8cpJUw1Yughk6iK1s6oxlv7R12NReei1vEUAOy5n73C4txiFAwW1Xsi2sD/GGGgrUCj+lo51A/kvJNCT8jONa3Pj1C3Yxgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s+/0HeFV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EB37C4CEE9;
+	Tue, 25 Mar 2025 12:24:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742905468;
+	bh=Mf0PY1BZwER+HJ9Mbh8TvIu8FULZZyssZyyQhg3Lxog=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=s+/0HeFVYw6E9ENxuZrurwBQZjTKxbCYZUpzZpQQkhJ/91XayRTQsrh0ZrPcxL6VT
+	 kWPsswaWOu92ibYtKPVQ8cCX8tI/AovpWLUHxbRfI0/LYO+BNEKvw0jz9tSM+iNekY
+	 vYO8pjYDmfb/z5KEqYkNLmTBUw5TNSgx7s3Tm+/YAcmPn6gD38V4dkw/SWkZ+YlcxW
+	 su7X/NDNRXtlVjRTXmyVRJXFZaFDSzVdX/xcyiKo4eSPgyWNkviNI88lTVQL8Pypxt
+	 ZQYp+1CfBBYtXUeraYsyNCniBCJqLg9oYiWYeeJrfpwq4Grdag9K+D7WLkJGrdzDGX
+	 yL7UoRVqqlcPQ==
+Message-ID: <bf6d066c-f0dd-471a-bb61-9132476b515a@kernel.org>
+Date: Tue, 25 Mar 2025 13:24:16 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250321043504.9729-1-danny@orbstack.dev> <CANn89iLU6M3rvyzNuGtL2LsdYh97Nvy7TpXdGD30qq1yW1tQcA@mail.gmail.com>
-In-Reply-To: <CANn89iLU6M3rvyzNuGtL2LsdYh97Nvy7TpXdGD30qq1yW1tQcA@mail.gmail.com>
-From: Danny Lin <danny@orbstack.dev>
-Date: Tue, 25 Mar 2025 05:21:24 -0700
-X-Gm-Features: AQ5f1Jq3MHdMF6P_KWzoTKMwABmy019lYGhMwBdjWsyMs9-w-SbEFz0apr5rNyE
-Message-ID: <CAEFvpLebA8OauBWmGswM9ypdmBfQRisw4ksXY0sEGEfZGTFHPg@mail.gmail.com>
-Subject: Re: [PATCH v3] net: fully namespace net.core.{r,w}mem_{default,max} sysctls
-To: Eric Dumazet <edumazet@google.com>
-Cc: Matteo Croce <teknoraver@meta.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/5] dt-bindings: net: Add MTIP L2 switch description
+ (fec,mtip-switch.yaml)
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ davem@davemloft.net, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, devicetree@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Richard Cochran <richardcochran@gmail.com>,
+ netdev@vger.kernel.org, Maxime Chevallier <maxime.chevallier@bootlin.com>
+References: <20250325115736.1732721-1-lukma@denx.de>
+ <20250325115736.1732721-3-lukma@denx.de>
+ <2bf73cc2-c79a-4a06-9c5f-174e3b846f1d@kernel.org>
+ <20250325131507.692804cd@wsk>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20250325131507.692804cd@wsk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 25, 2025 at 4:39=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Fri, Mar 21, 2025 at 5:35=E2=80=AFAM Danny Lin <danny@orbstack.dev> wr=
-ote:
-> >
-> > This builds on commit 19249c0724f2 ("net: make net.core.{r,w}mem_{defau=
-lt,max} namespaced")
-> > by adding support for writing the sysctls from within net namespaces,
-> > rather than only reading the values that were set in init_net. These ar=
-e
-> > relatively commonly-used sysctls, so programs may try to set them witho=
-ut
-> > knowing that they're in a container. It can be surprising for such atte=
-mpts
-> > to fail with EACCES.
-> >
-> > Unlike other net sysctls that were converted to namespaced ones, many
-> > systems have a sysctl.conf (or other configs) that globally write to
-> > net.core.rmem_default on boot and expect the value to propagate to
-> > containers, and programs running in containers may depend on the increa=
-sed
-> > buffer sizes in order to work properly. This means that namespacing the
-> > sysctls and using the kernel default values in each new netns would bre=
-ak
-> > existing workloads.
-> >
-> > As a compromise, inherit the initial net.core.*mem_* values from the
-> > current process' netns when creating a new netns. This is not standard
-> > behavior for most netns sysctls, but it avoids breaking existing worklo=
-ads.
-> >
-> > Signed-off-by: Danny Lin <danny@orbstack.dev>
->
-> Patch looks good, but see below:
->
-> > diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
-> > index c7769ee0d9c5..aedc249bf0e2 100644
-> > --- a/net/core/sysctl_net_core.c
-> > +++ b/net/core/sysctl_net_core.c
-> > @@ -676,21 +676,9 @@ static struct ctl_table netns_core_table[] =3D {
-> >                 .extra2         =3D SYSCTL_ONE,
-> >                 .proc_handler   =3D proc_dou8vec_minmax,
-> >         },
-> > -       {
-> > -               .procname       =3D "tstamp_allow_data",
-> > -               .data           =3D &init_net.core.sysctl_tstamp_allow_=
-data,
-> > -               .maxlen         =3D sizeof(u8),
-> > -               .mode           =3D 0644,
-> > -               .proc_handler   =3D proc_dou8vec_minmax,
-> > -               .extra1         =3D SYSCTL_ZERO,
-> > -               .extra2         =3D SYSCTL_ONE
-> > -       },
-> > -       /* sysctl_core_net_init() will set the values after this
-> > -        * to readonly in network namespaces
-> > -        */
->
-> I think you have removed this sysctl :/
+On 25/03/2025 13:15, Lukasz Majewski wrote:
+> Hi Krzysztof,
+> 
+>> On 25/03/2025 12:57, Lukasz Majewski wrote:
+>>> This patch provides description of the MTIP L2 switch available in
+>>> some NXP's SOCs - imx287, vf610.
+>>>
+>>> Signed-off-by: Lukasz Majewski <lukma@denx.de>
+>>> ---
+>>>  .../bindings/net/fec,mtip-switch.yaml         | 160
+>>> ++++++++++++++++++  
+>>
+>> Use compatible as filename.
+> 
+> I've followed the fsl,fec.yaml as an example. This file has description
+> for all the device tree sources from fec_main.c
 
-Fixed, sorry about that!
 
-Best,
-Danny
-Founder @ OrbStack
+That's a 14 year old binding, so clear antipattern.
+
+> 
+> I've considered adding the full name - e.g. fec,imx287-mtip-switch.yaml
+> but this driver could (and probably will) be extended to vf610.
+
+Unless you add vf610 now, this should follow the compatible name.
+
+> 
+> So what is the advised way to go?
+> 
+>>
+>>>  1 file changed, 160 insertions(+)
+>>>  create mode 100644
+>>> Documentation/devicetree/bindings/net/fec,mtip-switch.yaml
+>>>
+>>> diff --git
+>>> a/Documentation/devicetree/bindings/net/fec,mtip-switch.yaml
+>>> b/Documentation/devicetree/bindings/net/fec,mtip-switch.yaml new
+>>> file mode 100644 index 000000000000..cd85385e0f79 --- /dev/null
+>>> +++ b/Documentation/devicetree/bindings/net/fec,mtip-switch.yaml
+>>> @@ -0,0 +1,160 @@
+>>> +# SPDX-License-Identifier: GPL-2.0-only
+>>> +%YAML 1.2
+>>> +---
+>>> +$id: http://devicetree.org/schemas/net/fsl,mtip-switch.yaml#
+>>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>>> +
+>>> +title: Freescale MTIP Level 2 (L2) switch
+>>> +
+>>> +maintainers:
+>>> +  - Lukasz Majewski <lukma@denx.de>
+>>> +  
+>>
+>> description?
+> 
+> Ok.
+> 
+>>
+>>> +allOf:
+>>> +  - $ref: ethernet-controller.yaml#
+>>> +
+>>> +properties:
+>>> +  compatible:
+>>> +    oneOf:  
+>>
+>> Drop, you have only one variant.
+> 
+> Ok, for imx287 this can be dropped, and then extended with vf610.
+> 
+>>
+>>> +      - enum:
+>>> +	  - imx287-mtip-switch  
+>>
+>> This wasn't tested. Except whitespace errors, above compatible does
+>> not have format of compatible. Please look at other NXP bindings.
+>>
+>> Missing blank line.
+>>
+>>> +  reg:
+>>> +    maxItems: 1
+>>> +
+>>> +  interrupts:
+>>> +    maxItems: 3  
+>>
+>> Need to list items instead.
+>>
+>>> +
+>>> +  clocks:
+>>> +    maxItems: 4
+>>> +    description:
+>>> +      The "ipg", for MAC ipg_clk_s, ipg_clk_mac_s that are for
+>>> register accessing.
+>>> +      The "ahb", for MAC ipg_clk, ipg_clk_mac that are bus clock.
+>>> +      The "ptp"(option), for IEEE1588 timer clock that requires
+>>> the clock.
+>>> +      The "enet_out"(option), output clock for external device,
+>>> like supply clock
+>>> +      for PHY. The clock is required if PHY clock source from SOC.
+>>>  
+>>
+>> Same problems. This binding does not look at all as any other
+>> binding. I finish review here, but the code has similar trivial
+>> issues all the way, including incorrect indentation. Start from well
+>> reviewed existing binding or example-schema.
+> 
+> As I've stated above - this code is reduced copy of fsl,fec.yaml...
+
+Don't take the worst, old code with all the anti-patterns we point out
+on each review, as an example.
+
+Take the most recent, well reviewed binding as an example. Or
+example-schema.
+
+Best regards,
+Krzysztof
 
