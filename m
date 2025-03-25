@@ -1,135 +1,196 @@
-Return-Path: <netdev+bounces-177368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58DB3A6FC70
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:35:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F9E2A6FCBB
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:37:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA5613BFB00
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:28:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E23153AC803
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:30:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB3B725A32D;
-	Tue, 25 Mar 2025 12:20:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FC35267B77;
+	Tue, 25 Mar 2025 12:20:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="iI10GOZx"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Jf7vlGGR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.denx.de (mx.denx.de [89.58.32.78])
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5507C25A323;
-	Tue, 25 Mar 2025 12:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E034267B7F
+	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 12:20:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742905205; cv=none; b=aG804TQdkK+FsRCdCa3uhJAknIs6SFoeqZS+PSNYuB7gScp3+edBz83SQfUiaIC63RCP1NA/7iKUzzZTtD1pgirBZ2jgtGteGsJDRYTdgaxjt0mWniKCS3YZEgI/7ajRnXsdGmbQvfQUoF1RpPaSBczmiFetNGVaskMTgiK+Vog=
+	t=1742905227; cv=none; b=DFyjWbR5QDoZA8gNfoScyHyGt/TGmZNF2akWD3RTdBO4Dnrqd94JSWtucei89bsM9KVFhiiKfC33GwXdrCYvF2MUrhR00Zqg/MovZdOjTaQKU9sDqYwo903K74Rij7RkBCwBEkXczbXQoc6uKYd1aBhudANKHw71C3BnwpC6jTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742905205; c=relaxed/simple;
-	bh=W+zbuGuOsjMsAwj1TeKVa2TREDPoShSYxlcNLgWYVEk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Kz6tPoVXGaGMpeLn9TskJhK/x7YpmeJ1L0oty1beP5HEjn25MtFpBdUx7rfGO+Olss6tHLgIA2UlaYLBY2jwr6F3YPJlmu2XbKzTz0fVP4jix9cA/HJznS11C5Oq3kzBN/ts7P+Xk5J/c8ApDXribHxi+lWR60A4KokOGEQxbOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=iI10GOZx; arc=none smtp.client-ip=89.58.32.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BAD1F102F66FF;
-	Tue, 25 Mar 2025 13:19:59 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1742905201; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=NWmWtlj/ywJV6x0SVa10Ru5jBz9yI3s7yAlnn7HAP+A=;
-	b=iI10GOZxX1mHgyM2u8+7/hdsGhCCl9XeQNlR9159nd7Yrmp1M9EzyoQznOCNezfJNl+mJ9
-	SugwMDIGDHQIt+JVt4gZ5jtXRMz5XkD7mYkyoH+3BBQsC6Wep4HQmwCEBLJguay3eUz7UO
-	a++388I8tOOmPQB3cMRAuhPNSnW6ZWmqKY49V2c5IiK5nn5VJccHfnIESBHN9fzadsHgW9
-	Xl3+WTEZKlPTP/gQXxOBNmcm+5pZf5nfRnW+HkKaqVdVO0M7unZEoNF4KEl9D0/hrc9Gqb
-	jTvv2XpW46Zt70RZ+tso/GL43Wd/7AiEZ0vMVJoY64YbV5uAx1kHujfKwWVfZw==
-Date: Tue, 25 Mar 2025 13:19:58 +0100
-From: Lukasz Majewski <lukma@denx.de>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha
- Hauer <s.hauer@pengutronix.de>, Paolo Abeni <pabeni@redhat.com>, Jakub
- Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- davem@davemloft.net, Andrew Lunn <andrew+netdev@lunn.ch>, Pengutronix
- Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>,
- devicetree@vger.kernel.org, imx@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Richard
- Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org, Maxime
- Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH 3/5] arm: dts: Adjust the 'reg' range for imx287 L2
- switch description
-Message-ID: <20250325131958.552fbd0b@wsk>
-In-Reply-To: <93c9bc3d-7ad8-438e-966e-cd28a91540af@kernel.org>
-References: <20250325115736.1732721-1-lukma@denx.de>
-	<20250325115736.1732721-4-lukma@denx.de>
-	<93c9bc3d-7ad8-438e-966e-cd28a91540af@kernel.org>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1742905227; c=relaxed/simple;
+	bh=fRI2Owqgw85GmBsf1kqLISTrjN6ADCz0KAC+v9Cbe1M=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=PxLAOcdWpIj6w0jGkgL4t8rbMcyhf094Xg8Mvn8jGKsUP0+K7ScunAULzDXZprolQUMiTZILF1YkwreYxhgk5ON5m1ft+ZihC5tdpIByhRMVqjGs9Dl4NdqzBWAP7ibQCfSc8pBT0XcW5qmeOgtHloQUjOSmFJHxsvXVXFWm2LM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Jf7vlGGR; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/iHkkBmAY=t74XA_T2X_ZYbS";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Last-TLS-Session-Version: TLSv1.3
-
---Sig_/iHkkBmAY=t74XA_T2X_ZYbS
-Content-Type: text/plain; charset=US-ASCII
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1742905220;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3g0qORwvvABSJ2Rv9GuvfAIXABDwBe5tSMPOLykHwsg=;
+	b=Jf7vlGGRkuuwY6Df1TuEaUfzikmOC1Dz/EVPuFgoj2acjNTNaj0kKju1JCDNsYz39FsBUC
+	H3k/t9v87SUbjw2Xo8r/A6WS9Ujo//l227v7OcoGCLDzUYDYZByIA5LlPu52DYlWjKQovi
+	I3Z4T17Gxs2HEc7/W42mPGZQDGXCPis=
+Date: Tue, 25 Mar 2025 12:20:18 +0000
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
+Message-ID: <5cdc1bdd9caee92a6ae932638a862fd5c67630e8@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH net-next v2] tcp: Support skb PAWS drop reason when
+ TIME-WAIT
+To: "Eric Dumazet" <edumazet@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuniyu@amazon.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, dsahern@kernel.org, ncardwell@google.com, mrpre@163.com
+In-Reply-To: <CANn89iKxTHZ1JoQ9g9ekWq9=29LjRmhbxsnwkQ2RgPT-yCYMig@mail.gmail.com>
+References: <20250325110325.51958-1-jiayuan.chen@linux.dev>
+ <CANn89iKxTHZ1JoQ9g9ekWq9=29LjRmhbxsnwkQ2RgPT-yCYMig@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Krzysztof,
+March 25, 2025 at 19:29, "Eric Dumazet" <edumazet@google.com> wrote:
 
-> On 25/03/2025 12:57, Lukasz Majewski wrote:
-> > The current range of 'reg' property is too small to allow full
-> > control of the L2 switch on imx287.
+> >  ---
 > >=20
-> > As this IP block also uses ENET-MAC blocks for its operation, the
-> > address range for it must be included as well.
-> >  =20
+>=20>  include/net/tcp.h | 3 ++-
+> >=20
+>=20>  net/ipv4/tcp_ipv4.c | 2 +-
+> >=20
+>=20>  net/ipv4/tcp_minisocks.c | 7 +++++--
+> >=20
+>=20>  net/ipv6/tcp_ipv6.c | 2 +-
+> >=20
+>=20>  4 files changed, 9 insertions(+), 5 deletions(-)
+> >=20
+>=20>  diff --git a/include/net/tcp.h b/include/net/tcp.h
+> >=20
+>=20>  index f8efe56bbccb..e1574e804530 100644
+> >=20
+>=20>  --- a/include/net/tcp.h
+> >=20
+>=20>  +++ b/include/net/tcp.h
+> >=20
+>=20>  @@ -427,7 +427,8 @@ enum tcp_tw_status {
+> >=20
+>=20>  enum tcp_tw_status tcp_timewait_state_process(struct inet_timewait=
+_sock *tw,
+> >=20
+>=20>  struct sk_buff *skb,
+> >=20
+>=20>  const struct tcphdr *th,
+> >=20
+>=20>  - u32 *tw_isn);
+> >=20
+>=20>  + u32 *tw_isn,
+> >=20
+>=20>  + enum skb_drop_reason *drop_reason);
+> >=20
+>=20>  struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+> >=20
+>=20>  struct request_sock *req, bool fastopen,
+> >=20
+>=20>  bool *lost_race, enum skb_drop_reason *drop_reason);
+> >=20
+>=20>  diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+> >=20
+>=20>  index 1cd0938d47e0..a9dde473a23f 100644
+> >=20
+>=20>  --- a/net/ipv4/tcp_ipv4.c
+> >=20
+>=20>  +++ b/net/ipv4/tcp_ipv4.c
+> >=20
+>=20>  @@ -2417,7 +2417,7 @@ int tcp_v4_rcv(struct sk_buff *skb)
+> >=20
+>=20>  goto csum_error;
+> >=20
+>=20>  }
+> >=20
+>=20>  - tw_status =3D tcp_timewait_state_process(inet_twsk(sk), skb, th,=
+ &isn);
+> >=20
+>=20>  + tw_status =3D tcp_timewait_state_process(inet_twsk(sk), skb, th,=
+ &isn, &drop_reason);
+> >=20
+>=20>  switch (tw_status) {
+> >=20
+>=20>  case TCP_TW_SYN: {
+> >=20
+>=20>  struct sock *sk2 =3D inet_lookup_listener(net,
+> >=20
+>=20>  diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+> >=20
+>=20>  index fb9349be36b8..d16dfd41397e 100644
+> >=20
+>=20>  --- a/net/ipv4/tcp_minisocks.c
+> >=20
+>=20>  +++ b/net/ipv4/tcp_minisocks.c
+> >=20
+>=20>  @@ -97,7 +97,8 @@ static void twsk_rcv_nxt_update(struct tcp_timew=
+ait_sock *tcptw, u32 seq,
+> >=20
+>=20>  */
+> >=20
+>=20>  enum tcp_tw_status
+> >=20
+>=20>  tcp_timewait_state_process(struct inet_timewait_sock *tw, struct s=
+k_buff *skb,
+> >=20
+>=20>  - const struct tcphdr *th, u32 *tw_isn)
+> >=20
+>=20>  + const struct tcphdr *th, u32 *tw_isn,
+> >=20
+>=20>  + enum skb_drop_reason *drop_reason)
+> >=20
+>=20>  {
+> >=20
+>=20>  struct tcp_timewait_sock *tcptw =3D tcp_twsk((struct sock *)tw);
+> >=20
+>=20>  u32 rcv_nxt =3D READ_ONCE(tcptw->tw_rcv_nxt);
+> >=20
+>=20>  @@ -245,8 +246,10 @@ tcp_timewait_state_process(struct inet_timewa=
+it_sock *tw, struct sk_buff *skb,
+> >=20
+>=20>  return TCP_TW_SYN;
+> >=20
+>=20>  }
+> >=20
+>=20>  - if (paws_reject)
+> >=20
+>=20>  + if (paws_reject) {
+> >=20
+>=20>  + *drop_reason =3D SKB_DROP_REASON_TCP_RFC7323_PAWS;
+> >=20
+>=20>  __NET_INC_STATS(twsk_net(tw), LINUX_MIB_PAWSESTABREJECTED);
+> >=20
 >=20
-> Please use subject prefixes matching the subsystem. You can get them
-> for example with `git log --oneline -- DIRECTORY_OR_FILE` on the
-> directory your patch is touching. For bindings, the preferred
-> subjects are explained here:
-> https://www.kernel.org/doc/html/latest/devicetree/bindings/submitting-pat=
-ches.html#i-for-patch-submitters
+> I think we should add a new SNMP value and drop reason for TW sockets.
 >=20
-> Missing nxp or mxs.
-
-Ok. I will add it.
-
+>=20SNMP_MIB_ITEM("PAWSTimewait", LINUX_MIB_PAWSTIMEWAIT),
 >=20
-> Best regards,
-> Krzysztof
+>=20and SKB_DROP_REASON_TCP_RFC7323_TW_PAWS ?
+>
 
+That makes sense, we've done similar things before, such as adding
+PAWS_OLD_ACK previously.
 
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/iHkkBmAY=t74XA_T2X_ZYbS
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmfin24ACgkQAR8vZIA0
-zr3N/gf8DYEFypnfPCvqTv0w1mjjvKAqlgERVYVIbxHIpd/6t5B0hhaY3vRUWPyJ
-VUqi8YCx8uavVTRzDM59fSfmYcFzOe7rUv9fVvS4+W3AtxqTmtndRXZUrFAtXrPf
-LwfMfvqJuoKPiLLcfPZQpNNY6iuzehkmrmcO+0MmOmsPNVHWsXUG/mmoefrSIy/Q
-yUysj6v1UeS8nm2XOXYf7Pij0CFaCgMDE7zdzziTkkLtBYywTPxMfUbNv8DjFUSX
-Xa6M/GMe39ehOU92VOjF0TRxyiDNXgRZ4kibznKZFpohskhQ1IugoT2tyXDspA6b
-JauuHhBMQ/y+Om9HVWaZV3LjzVe05Q==
-=TLOn
------END PGP SIGNATURE-----
-
---Sig_/iHkkBmAY=t74XA_T2X_ZYbS--
+Thanks for the suggestion!
+--=20
+pw-bot:=20cr
 
