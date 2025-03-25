@@ -1,83 +1,118 @@
-Return-Path: <netdev+bounces-177333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33384A6F77E
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:49:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 631E0A6F785
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:50:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B54D0188DE02
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 11:49:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6A3D16BBAD
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 11:50:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAE1C2561B5;
-	Tue, 25 Mar 2025 11:49:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9435254845;
+	Tue, 25 Mar 2025 11:49:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G1exCCd1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gGJRZLy1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6F322561A2
-	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 11:49:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883031E5B91;
+	Tue, 25 Mar 2025 11:49:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742903378; cv=none; b=g2YpZc9OMlfmzqS9C+Cx5ZJtv/XlTeMpdcKPqoEkcY9AYdgYpzYvlwHx5LSMGFgALFBnJMc29s1vdCJBzPIjwoOHv9VWw0nEdKM79reDv7aQucyl5ioMr6WIhGXs1CekagpuOE2NmFElMvEpTP5xOtRnbb89XI68rEhvCXJZgB8=
+	t=1742903399; cv=none; b=oADPqe4pX9MF7fZopanPJtisygDnPS7Gg16hJSystu0rOMKL3KOZsGF11njWVGMgKoNgCkIEgaObGVBUHKR58RPxHzUk1/gv4DBmRplhqdvfLyirtxmmI/GQv44s9Vcm7pT/4T7vpX/+d5N/fgRIXcqqPtSZX0oswlfnpJUiIFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742903378; c=relaxed/simple;
-	bh=QivTbn7O08VehRorW0PtwACizOffBANon6134iKMcfg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MgMyoSTg3yUbc2tYf3bV+Z3KuukdgLSmjXtCWG7F+wcrFNqfyauBMvoY8U02lofFnS5eMtoJnqCyq9+8aho1Hp9ygmlGIWvfYRyxZl0eZVa+u7ZkWti/Ot278Jy+ccViPiENueNLmktPXMErqAlcxguM/Swag2efTpNZuwXLDVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G1exCCd1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 047E0C4CEE9;
-	Tue, 25 Mar 2025 11:49:33 +0000 (UTC)
+	s=arc-20240116; t=1742903399; c=relaxed/simple;
+	bh=ZZdZYmOj1ovGoh5945Z2dttRqyMKc3WTfbIx0vwUbGU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=f7m5Q0R9ZBGOQxBlSSbj+2WUaaoXU9yWvwTZibMqs38BBVDUKr46WG3fojAxDoXKvb31yW8Jk/OCfSwAIrmLzbKbcN+P08GPCBm0GGGkK0UktyNKw2A7+AiJZ8KwLq1mJ5GtqZeiki3BQCrW23kjxlYPFzXuIaWiPvElUfpEnLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gGJRZLy1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08523C4CEE4;
+	Tue, 25 Mar 2025 11:49:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742903378;
-	bh=QivTbn7O08VehRorW0PtwACizOffBANon6134iKMcfg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=G1exCCd1tHUXzd4vtiTWHYw/xQOoyZfd8FqhTk8I0Iihkd7QHTEJg9RFWGVSqwp3j
-	 SIJ6XLgua2tkakESBIp0/gne3ebtJCSUb7uXS0TyjjJsQYexIi1GMQJgaUk++a998y
-	 p58gl5++7GaV7erz/WgglJ9oUyBTQuWMj8A2H0VYeTcijG73yO4QEFL/uOs/jOE0fv
-	 p66ukaToUmqYzgIUWLpVUbcPTRtmP9FpshnkSXDwVd0C+tEiy9Utd97JSrTUJMKODj
-	 0Bma4VQ+LsnGxPhn9aiYhtT5GfhFYHjCMeFa13sRArpvy5a5t0JcsqZX+4nK+A4Lhd
-	 jcDR+wc3GtINw==
-Date: Tue, 25 Mar 2025 04:49:29 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
- andrew+netdev@lunn.ch, horms@kernel.org, donald.hunter@gmail.com,
- parav@nvidia.com
-Subject: Re: [PATCH net-next v2 3/4] devlink: add function unique identifier
- to devlink dev info
-Message-ID: <20250325044929.5b3947c6@kernel.org>
-In-Reply-To: <20250320085947.103419-4-jiri@resnulli.us>
-References: <20250320085947.103419-1-jiri@resnulli.us>
-	<20250320085947.103419-4-jiri@resnulli.us>
+	s=k20201202; t=1742903399;
+	bh=ZZdZYmOj1ovGoh5945Z2dttRqyMKc3WTfbIx0vwUbGU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=gGJRZLy1WGT9Tlf+yIt17XTtbRhH1gW691Kv6DYWjKAY4BItY+DhyvHWMw5kkvaoL
+	 KKsPEXE9qRjWO3l1qgg7swuhUQzYBPxB1XcIvus+PE/QNvk+bvElBA9WlxrowNC+3J
+	 Y/E1Rxuk9kjweHN8UdkGlc5m2rSLwZIvT/4rpNOvPNwFhbJQndITX5eMQtV83H0FeO
+	 S6YgvuRJjN/6+ry/NbXtK79Sr+qsVpn1E7JVmhX4DfDtQ5yTeMmIqsK6sizO53MYAZ
+	 txFuebDaPwmCa22+MNq5Qg9wExdULRD/Zznoan+rsGvmEgpC921giO5iaFVjMikx8c
+	 dcr43+rM0WDCQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71530380CFE7;
+	Tue, 25 Mar 2025 11:50:36 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 0/7] net: xdp: Add missing metadata support for
+ some xdp drvs
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174290343526.531918.1341302638467898392.git-patchwork-notify@kernel.org>
+Date: Tue, 25 Mar 2025 11:50:35 +0000
+References: <20250318-mvneta-xdp-meta-v2-0-b6075778f61f@kernel.org>
+In-Reply-To: <20250318-mvneta-xdp-meta-v2-0-b6075778f61f@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: marcin.s.wojtas@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org,
+ daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+ linux@armlinux.org.uk, ilias.apalodimas@linaro.org,
+ kojima.masahisa@socionext.com, sgoutham@marvell.com, gakula@marvell.com,
+ sbhatta@marvell.com, hkelam@marvell.com, bbhushan2@marvell.com, nbd@nbd.name,
+ sean.wang@mediatek.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, kys@microsoft.com,
+ haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
+ s-vadapalli@ti.com, rogerq@kernel.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, linux-hyperv@vger.kernel.org,
+ linux-omap@vger.kernel.org, michal.kubiak@intel.com
 
-On Thu, 20 Mar 2025 09:59:46 +0100 Jiri Pirko wrote:
-> From: Jiri Pirko <jiri@nvidia.com>
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 18 Mar 2025 12:46:04 +0100 you wrote:
+> Introduce missing metadata support for some xdp drivers setting metadata
+> size building the skb from xdp_buff.
+> Please note most of the drivers are just compile tested.
 > 
-> Presently, for multi-PF NIC each PF reports the same serial_number and
-> board.serial_number.
+> ---
+> Changes in v2:
+> - Improve commit logs for each patch specifying xdp headroom size for
+>   each modified driver.
+> - Link to v1: https://lore.kernel.org/r/20250311-mvneta-xdp-meta-v1-0-36cf1c99790e@kernel.org
 > 
-> To universally identify a function, add function unique identifier (uid)
-> to be obtained from the driver as a string of arbitrary length.
+> [...]
 
-We need more explanation for the "why"; this:
+Here is the summary with links:
+  - [net-next,v2,1/7] net: mvneta: Add metadata support for xdp mode
+    https://git.kernel.org/netdev/net-next/c/07b2fbffaaea
+  - [net-next,v2,2/7] net: mvpp2: Add metadata support for xdp mode
+    https://git.kernel.org/netdev/net-next/c/9a45e193c88a
+  - [net-next,v2,3/7] net: netsec: Add metadata support for xdp mode
+    https://git.kernel.org/netdev/net-next/c/a5fec3c88142
+  - [net-next,v2,4/7] net: octeontx2: Add metadata support for xdp mode
+    https://git.kernel.org/netdev/net-next/c/33bfff8fc8ba
+  - [net-next,v2,5/7] net: ethernet: mediatek: Add metadata support for xdp mode
+    https://git.kernel.org/netdev/net-next/c/74fb1346bc77
+  - [net-next,v2,6/7] net: mana: Add metadata support for xdp mode
+    https://git.kernel.org/netdev/net-next/c/c313d35f60c1
+  - [net-next,v2,7/7] net: ti: cpsw: Add metadata support for xdp mode
+    https://git.kernel.org/netdev/net-next/c/b3a54be70ca6
 
-+   * - ``function.uid``
-+     - Function uniqueue identifier.
-+
-+       Vendor defined uniqueue identifier of a function.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-is really below bar in terms of documentation.
+
 
