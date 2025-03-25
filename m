@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-177494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC748A70554
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 16:43:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF56BA70541
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 16:40:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 591203A4A1D
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 15:39:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 803CF1886799
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 15:40:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A1D81A316E;
-	Tue, 25 Mar 2025 15:39:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F1F01F55F8;
+	Tue, 25 Mar 2025 15:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CLE7y3ot"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IbTTrK26"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43571A238D;
-	Tue, 25 Mar 2025 15:39:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 789C31A238D
+	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 15:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742917199; cv=none; b=AAnlVkW/H2meFg4F1G9UaUwGVa2nFqESZLhxVwK0/RKwQz0YeGveZxbwx35WU8eq2bQazXpooZ87cYE9o+F6gKXQTtDMVtQosg/fUMiENa7cwDHhKQZCl3aTiooQlfEuX0L02RCPAOWDi8Heva8UmBpiBAOi+3712cIgzecO2qE=
+	t=1742917200; cv=none; b=TluiDRA6+740K84x42jOfw/gGvDwoK2klu8SKsLYfbm4dKsGDJB9n/r0N6TOKj1B+2Ot+/F6M8v9397JMNxTVFRy9F9eWlckRvlHpSaCvr01b3BYY3DwtsyjU/XTkCNn5cE6397HrClMG6N/kjQ61Mftat+q2nhI51Ik8ZdmTg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742917199; c=relaxed/simple;
-	bh=am9FunDcKx0MSc3x6dOTCpKV2sXz1d5Pqt7ld9PVGEU=;
+	s=arc-20240116; t=1742917200; c=relaxed/simple;
+	bh=jAzpBi3pKsZpLeZTcGCAb6wrfMEyeOK5mLq+AVxhbmE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NuaRRN5dBG8zkUiqrpkMf6U1oYRdy9DpWfojlN+iNGPIMpt9ayBvwYyFs3+NIauNg1hHA2IZIBV4GcsLKLwqKIftyVHQ1RZpsFbx/1bgTB6hvqXWJ8HBpJJ8ln2v72N7UwtvDSDlEETr9uHxBg3H+QCTqNRW9YIzwkigMXn7JPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CLE7y3ot; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3DE7C4CEE4;
-	Tue, 25 Mar 2025 15:39:58 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=dFQBVtbGIB6qhoH/Gg7SSzMfBeSorPdJUTJ5SH48EewoPqtcfu5WXmGiDz9B698M/g2St8Yi7aTWeXzQVr9ZVq1iAqKMhXWKHM1joVhbiKd0DtH4hPNJd5azTpU6rgfzlgIq477IwY5ewgGMQsmxnxK4NoeUF4tA6S6EcbINWlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IbTTrK26; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7D67C4CEEA;
+	Tue, 25 Mar 2025 15:39:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742917198;
-	bh=am9FunDcKx0MSc3x6dOTCpKV2sXz1d5Pqt7ld9PVGEU=;
+	s=k20201202; t=1742917199;
+	bh=jAzpBi3pKsZpLeZTcGCAb6wrfMEyeOK5mLq+AVxhbmE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CLE7y3otIxitxaKDJUh6LoFJnrjkIyTTf/KyDLDDGw2mREPGjL9hlHkqOo+Lh7PK8
-	 FoRfIHRNs50pMNxKu01Suy9e07boGr6AU7V3Ou6X3ABikWock07dPIc5rTuHOwoSxr
-	 IrPwY1zW425UrSXsOP5CM6fY3hBd7i09mhSwHUz9NUlrW898CU1SgFIjvYF5ESHKv1
-	 XzFWb0YiSvwu8GTaYzReLVTzQzmzuABKMKslxQbhktkPADqobM7RI3rm41UW95MFGm
-	 talwCVQ486a/F29VcZ8cAGBGWYQNUDZmnR7zRISLB0r9LY2siTAjqhmMI2OdUR+eYY
-	 iD52aic6UYuwg==
+	b=IbTTrK26QzQRlMz9YI81CwDxxAqqTJxpnNk8iyKE1ild/DznNFUWV04RMjXZP0TVI
+	 vzxnAHPaj56hluzdWgg7TZ+7gyL3n8+YXWM9wEqLznVVuqtdkGrYtwyiCKlAt4x6a+
+	 qDPVdVCsJrL69Ban0xeSnh1YAuPZONXAYA5qx8h9mKWyjwsdT83cpYv+3kFSbdKFFG
+	 fV5l5jhsylNp4tnqQwDXixFmfSNdokaxrM5W5lF0a4/+w8jXTMzo7FB6jk4yCP5wNh
+	 OW0ao4q1uY1IEttqPO4uUBVOaGvmf8EuwDc+IIB6PdSNEshsw3TYK+eA0Acw+wJs4Q
+	 v8UEiSA+fkiZQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 341E7380CFE7;
-	Tue, 25 Mar 2025 15:40:36 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70EDC380CFE7;
+	Tue, 25 Mar 2025 15:40:37 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,51 +52,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 1/7] netfilter: xt_hashlimit: replace vmalloc calls
- with kvmalloc
+Subject: Re: [PATCH] net: au1000_eth: Mark au1000_ReleaseDB() static
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174291723501.621610.11595803602695403455.git-patchwork-notify@kernel.org>
-Date: Tue, 25 Mar 2025 15:40:35 +0000
-References: <20250323100922.59983-2-pablo@netfilter.org>
-In-Reply-To: <20250323100922.59983-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de, horms@kernel.org
+ <174291723625.621610.15007821431431312132.git-patchwork-notify@kernel.org>
+Date: Tue, 25 Mar 2025 15:40:36 +0000
+References: <20250323190450.111241-1-johan.korsnes@gmail.com>
+In-Reply-To: <20250323190450.111241-1-johan.korsnes@gmail.com>
+To: Johan Korsnes <johan.korsnes@gmail.com>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Sun, 23 Mar 2025 11:09:16 +0100 you wrote:
-> From: Denis Kirjanov <kirjanov@gmail.com>
-> 
-> Replace vmalloc allocations with kvmalloc since
-> kvmalloc is more flexible in memory allocation
-> 
-> Signed-off-by: Denis Kirjanov <kirjanov@gmail.com>
-> Reviewed-by: Florian Westphal <fw@strlen.de>
-> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+On Sun, 23 Mar 2025 20:04:50 +0100 you wrote:
+> This fixes the following build warning:
+> ```
+> drivers/net/ethernet/amd/au1000_eth.c:574:6: warning: no previous prototype for 'au1000_ReleaseDB' [-Wmissing-prototypes]
+>   574 | void au1000_ReleaseDB(struct au1000_private *aup, struct db_dest *pDB)
+>       |      ^~~~~~~~~~~~~~~~
+> ```
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/7] netfilter: xt_hashlimit: replace vmalloc calls with kvmalloc
-    https://git.kernel.org/netdev/net-next/c/ddf8dec6db31
-  - [net-next,2/7] netfilter: conntrack: Bound nf_conntrack sysctl writes
-    https://git.kernel.org/netdev/net-next/c/8b6861390ffe
-  - [net-next,3/7] netfilter: fib: avoid lookup if socket is available
-    https://git.kernel.org/netdev/net-next/c/eaaff9b6702e
-  - [net-next,4/7] netfilter: nfnetlink_queue: Initialize ctx to avoid memory allocation error
-    https://git.kernel.org/netdev/net-next/c/778b09d91baa
-  - [net-next,5/7] netfilter: xtables: Use strscpy() instead of strscpy_pad()
-    https://git.kernel.org/netdev/net-next/c/3b4aff61ca5d
-  - [net-next,6/7] netfilter: socket: Lookup orig tuple for IPv6 SNAT
-    https://git.kernel.org/netdev/net-next/c/932b32ffd760
-  - [net-next,7/7] netfilter: nf_tables: Only use nf_skip_indirect_calls() when MITIGATION_RETPOLINE
-    https://git.kernel.org/netdev/net-next/c/e3a4182edd1a
+  - net: au1000_eth: Mark au1000_ReleaseDB() static
+    https://git.kernel.org/netdev/net-next/c/5e8df79497ce
 
 You are awesome, thank you!
 -- 
