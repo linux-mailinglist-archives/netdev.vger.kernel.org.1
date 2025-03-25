@@ -1,116 +1,98 @@
-Return-Path: <netdev+bounces-177413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 620BAA701AF
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 14:28:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC552A701DA
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 14:31:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAA6417B722
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:19:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8829E189185F
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:21:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 770EE25E45D;
-	Tue, 25 Mar 2025 13:03:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 196882586C5;
+	Tue, 25 Mar 2025 13:08:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fkt2f92k"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="o7+yC9Kx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A455A95E;
-	Tue, 25 Mar 2025 13:03:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADC0E1A08CA;
+	Tue, 25 Mar 2025 13:08:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742907792; cv=none; b=CdaGbCCGvXxDlvuOUnQ0B2UpL73stVotCcqDsv2ZXBPkUg6nw8rrDCzAsMtCnW0QWk8TOSiIbpfjdbwFlJ0ErzTLyJjEteRfSkalJfrL3VjTo9w5oWgIUd+5RrTzIOJ61UYrd1BMkl3G+g8EKbynNPoxcI9A4UNP0UDV5W81jVI=
+	t=1742908103; cv=none; b=MUEf2aNAj+itA5QAGR7/86J1OU0i9Av5pFMvQBP7JkVBLpH3wdxy+3lgiaHcbDvX/ATbwxGJFePDRqZTJo629pDSAXncEVrPaVeWOccma5s7IkmKRqBQ08rlecyDzgvsKP/jjNxIeiGoqe7fvXdT8XdsvpgH6aASxT/15CmvDOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742907792; c=relaxed/simple;
-	bh=NOtSZO6+mIJhpKmav78FIQ7+8EjmLGHsFa+GzKNPUZg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dg2zp2IWCtjFhTd+TXZ6O45CndY0BAF9BKSOKHIdLWBTUHXqMxD4A8+Pk2tmvYHIIv3xRK/64wko6/SFQ6DagCECAAQUFA4IryJWlIATRM3kRalc7zbfb9+766VHFME21py5Go3WSE5vtwML2T7JuTTAi/kyXDjSV3RMpIcdLk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fkt2f92k; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 111C7C4CEF3;
-	Tue, 25 Mar 2025 13:03:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742907792;
-	bh=NOtSZO6+mIJhpKmav78FIQ7+8EjmLGHsFa+GzKNPUZg=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Fkt2f92kJiGWhH8dgk17/UoRqdJx0EFe/3P/dy4V1s5KFOcQBfhFPknqCwMCrbm6/
-	 xQjQOvggDEzDyOsIOE623THEpITveY2dRX8fO+8ia0MsnvPzH3VZCtioaeqCxzuBjy
-	 JaoZsexlhO6gfrDEN2F6R84U7RTlY1tzf+2VXUZZvzGoGB4oL1cGPJnw40aRmZVpU2
-	 N/M9WO1QdqSS6PBVtpgJQypgCL9UBhGszkA+cg0oNo1w2WVNHVRgsafoRthA/cgVJz
-	 KlRJZSKbHbQrWjY9jRq12NqOaBRm8MvivREYHKVonSwAKmbUfLZQJ9B3ALN3qcs8ae
-	 nAVXsi7XusNvg==
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5e5b6f3025dso8674346a12.1;
-        Tue, 25 Mar 2025 06:03:12 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCU4X3X5uabf4fdRLpBFAOBP91rSdxdhBlQ4V54FhgYfHLdB5+31LbK5+ksNOoBnQ0luNndG5qRGIGC1c4TRqJk=@vger.kernel.org, AJvYcCUPiKl7sGumk37Qo/LRDum9KYYbHfZhDIbC9xEAYDdXUGvkzcy10EC7YbxDYk1wLeXlLk/bmKif99FPf4gm4Q==@vger.kernel.org, AJvYcCVK06wdAIXemLnSaK70GvnDkFUVYa2kbfjKXRnxD4MrC0oSyobtzMI97pJxdHrqC37m+X0QfhnidtUfrw==@vger.kernel.org, AJvYcCVWyJ/1Sh8Fv9s4wLOUuAfkPFMNXSMXehx8awAI74DBHo9xV4SN96m16/ME1hd5lJj/XPy1Xw97kLv8Wc4G@vger.kernel.org, AJvYcCWwLqXvdcYzq7yZypByv3OGe3KWfoinL353dRklC0UbiWQWDEp32PV+f1MA3sVCuclikI5Vgh6BUgXvyDEVTiM=@vger.kernel.org, AJvYcCXPT1P0ZT44NE0qGLi4LpIq9TFCQHhjs31kWxIL3PLGVHjwxsIXL5QeVMnMouIkbK5+9kxKLRVI@vger.kernel.org
-X-Gm-Message-State: AOJu0YzyiU3GODGyL4a/LBV4c+txrLdnizbVXq1kYMqpIBpTKnysNpU2
-	01IkjShI/j3/6Tt14iRTQcc/cUBcEDUpL4+2dPk62niJyT61vYuUAebqdsLjYjYwnG670csdHPy
-	OD4Ay0mesMKaJ0OYdjrAKkrecUg==
-X-Google-Smtp-Source: AGHT+IE9YIgEdFy0C8MVlG0nopmhGsYdec5XnoCD98500ifVdHHqN4dUOGNkZiKuQcgs2ZSWsIpcRThQGaL/16F7l+4=
-X-Received: by 2002:a05:6402:5189:b0:5e5:4807:5441 with SMTP id
- 4fb4d7f45d1cf-5ebcd520049mr11476593a12.30.1742907790342; Tue, 25 Mar 2025
- 06:03:10 -0700 (PDT)
+	s=arc-20240116; t=1742908103; c=relaxed/simple;
+	bh=uA0Y4IGfMOTEaGgMSd1xC52XzeXBdijLF+i1Im/E2aM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KEpa/r6iGUuVSmSbxde7IsMKvoC9Bu78d4Dl2Iro+NRC+NW12Y5EVY5eybpL7ZmfaZnSr05mQNEjldRfYDCvsJCFqZRhP+dTs5rzlcSBlLm+X8pnpgBq0ng/AfATq8DeKpeMDx97s3Sq0p/8QWa5nSDU0NsHgu/VHc9KZ1sx6yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=o7+yC9Kx; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id CE7D144303;
+	Tue, 25 Mar 2025 13:08:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1742908093;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uA0Y4IGfMOTEaGgMSd1xC52XzeXBdijLF+i1Im/E2aM=;
+	b=o7+yC9KxCW1AxJhCD8ggkJd700ijEzCjn9BKgS55PHHdZ3ZG4uPPJkeXuwErF1YwvdFX/a
+	cubjFk7qUtGh9Zhk09vyz5RRsDYflUkqBx+1xt/4g5EHnyQKiG6i2GhMks9rxtFunD8UFt
+	yDnlgSrF8p8KS+cWGUMH0g3Jp+V6aWkM1vNRXvImESdP1csiXcZdRV9b3KOHq70Ns5xgjM
+	bR/xRC0Jf0MRN4n9bQBBxaNvaZWFn9YQhEAahTm61NLQYdXFqjaaC8vGaznx3WsIBow62V
+	9Zvf+znfWC4zDMVl8Lb09BULnDxVHyrn7ngpQG+e4TbkO1ggFJRbx7g4Q5lv+A==
+Date: Tue, 25 Mar 2025 14:08:10 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina
+ <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, Oleksij Rempel <o.rempel@pengutronix.de>, Simon
+ Horman <horms@kernel.org>, Romain Gantois <romain.gantois@bootlin.com>,
+ Piergiorgio Beruto <piergiorgio.beruto@gmail.com>
+Subject: Re: [PATCH net-next v4 3/8] net: ethtool: netlink: Rename
+ ethnl_default_dump_one
+Message-ID: <20250325140810.42abaa2a@kmaincent-XPS-13-7390>
+In-Reply-To: <20250324104012.367366-4-maxime.chevallier@bootlin.com>
+References: <20250324104012.367366-1-maxime.chevallier@bootlin.com>
+	<20250324104012.367366-4-maxime.chevallier@bootlin.com>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250324-dt-bindings-network-class-v5-0-f5c3fe00e8f0@ixit.cz> <3452b67752228665fa275030a7d8100b73063392.camel@sipsolutions.net>
-In-Reply-To: <3452b67752228665fa275030a7d8100b73063392.camel@sipsolutions.net>
-From: Rob Herring <robh@kernel.org>
-Date: Tue, 25 Mar 2025 08:02:59 -0500
-X-Gmail-Original-Message-ID: <CAL_JsqLv9THitHzj8nj7ppCp-aKn010-Oz=s+AUNKOCoDmBnbQ@mail.gmail.com>
-X-Gm-Features: AQ5f1JriMZBTiF3C2w64Aagyvo_O56C7A0zRxATovzxB1bkU0K4BsN971bbnmGo
-Message-ID: <CAL_JsqLv9THitHzj8nj7ppCp-aKn010-Oz=s+AUNKOCoDmBnbQ@mail.gmail.com>
-Subject: Re: [PATCH v5 0/5] dt-bindings: net: Add network-class.yaml schema
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: david@ixit.cz, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Mailing List <devicetree-spec-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, van Spriel <arend@broadcom.com>, 
-	=?UTF-8?B?SsOpcsO0bWUgUG91aWxsZXI=?= <jerome.pouiller@silabs.com>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Andy Gross <agross@kernel.org>, Mailing List <devicetree-spec@vger.kernel.org>, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, Janne Grunau <j@jannau.net>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduiedvjeefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgfdutdefvedtudegvefgvedtgfdvhfdtueeltefffefffffhgfetkedvfeduieeinecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvddupdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhop
+ egvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Tue, Mar 25, 2025 at 5:33=E2=80=AFAM Johannes Berg <johannes@sipsolution=
-s.net> wrote:
->
-> On Mon, 2025-03-24 at 18:41 +0100, David Heidelberg via B4 Relay wrote:
-> > The Devicetree Specification, Release v0.3 specifies in section 4.3.1
-> > a "Network Class Binding". This covers MAC address and maximal frame
-> > size properties. "local-mac-address" and "mac-address" with a fixed
-> > "address-size" of 48 bits are already in the ethernet-controller.yaml
-> > schema so move those over.
-> >
-> > Keep "address-size" fixed to 48 bits as it's unclear if network protoco=
-ls
-> > using 64-bit mac addresses like ZigBee, 6LoWPAN and others are relevant=
- for
-> > this binding. This allows mac address array size validation for etherne=
-t
-> > and wireless lan devices.
-> >
-> > "max-frame-size" in the Devicetree Specification is written to cover th=
-e
-> > whole layer 2 ethernet frame but actual use for this property is the
-> > payload size. Keep the description from ethernet-controller.yaml which
-> > specifies the property as MTU.
-> >
->
-> I have no idea what tree this should go through, and you CC'ed enough
-> people that I can't figure it out either ... I'll assume not wifi but DT
-> for now?
+On Mon, 24 Mar 2025 11:40:05 +0100
+Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
 
-Can you take it via wifi as the main target here is wifi bindings.
+> As we work on getting more objects out of a per-netdev DUMP, rename
+> ethnl_default_dump_one() into ethnl_default_dump_one_dev(), making it
+> explicit that this dumps everything for one netdev.
 
-Rob
+Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
+
+Thank you!
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
