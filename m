@@ -1,251 +1,227 @@
-Return-Path: <netdev+bounces-177524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F0FCA70723
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 17:41:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48D0DA7072E
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 17:43:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36C9E162B6F
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 16:39:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3018C16CE5A
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 16:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 976E225D8E1;
-	Tue, 25 Mar 2025 16:38:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83CCA25DCE0;
+	Tue, 25 Mar 2025 16:40:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="Mx9V1M2R"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dP2y91ry"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.denx.de (mx.denx.de [89.58.32.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F3AE1804A;
-	Tue, 25 Mar 2025 16:38:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBBE725D553
+	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 16:40:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742920736; cv=none; b=Q/ePmmdhvve2Une1WC90StqYxe5TCPKVN6+sbPPBOEIPyn92wNxxrXJmsyWoMAQIc3vF45DfU1mHfZVnXXdxN+/tPnRV81dhypze85b/Gkd3b9YQXZUkwAg6TTteiTPRZcFAjWlfSrZRDrey58DnJJZlrD4ll2sMEtKyLFT5ll8=
+	t=1742920825; cv=none; b=nGMaJFY7loHtTi5BiBww8i4bROyO+aVeUEf7//p0UzhvRSOn6q7PvIKluGDwuuLHx5QuSoOSClV1TsMgId4HENBdro5zHN2QR6qQbbdAkDgTJpsoN3lhevTZ+xvd9O956Rp36ehvS5AoNslKvFNRYOSO8ou665Cpbdp/iZAaRDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742920736; c=relaxed/simple;
-	bh=O2RYwhhNpo4HJ9P1BbPYVxFqvXi2CGF1yEc0iU7Kue4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mwlaNb4VyMsdrOBMuOXCpivnqJe0MHkGQC3ja9Kj14fPK6FtHbkUlZ3K3EUQtpJlnUdUNfjTA6k9Y5I27n3PdqJ+p5t78ipaU/gO0Hx+hd2KmjBNR9ZPdOXgUnTny31fX8cyHu2Y2vxKrmshfPznaEV2nRWQPuORZSJBskjkqR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=Mx9V1M2R; arc=none smtp.client-ip=89.58.32.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9CC6E102F66E4;
-	Tue, 25 Mar 2025 17:38:48 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1742920731; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=Jz4ZxvZa2//kqp9AQ5gwaJHWi0QoseUW2iD6QSxnqM0=;
-	b=Mx9V1M2RDAHcCHYsF8U3Er1w6YAozoeRBum4o/Jk96hSAGjxxWt2iV40fscfPeqsJHo6Di
-	u9dsm6pmuRZkf/pw29kBLDLswwWYtyYtG94xRSfEqIeBy/w9K0BKtxx+YeIfmsQAHG69un
-	SfeR2CJ7oe/UiV7asnifMttl6+H85s9ktnMa5PiNr17mtuW49h7b9xc90kcFni48Bfr+xq
-	QsJcWeLEYWg4e3/shtRuORJ4HOLyRNtr1bDnAt8VrR1xjcD9QHGDKg5QKBdg+esmIywldg
-	RpRhVdjkt6ZwlizYx2wG6jCdXIi+H7p3hOkv+Ucnw9XXKer7t/vvQdJQzS0j4g==
-Date: Tue, 25 Mar 2025 17:38:46 +0100
-From: Lukasz Majewski <lukma@denx.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
- <s.hauer@pengutronix.de>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
- Andrew Lunn <andrew+netdev@lunn.ch>, Pengutronix Kernel Team
- <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>,
- devicetree@vger.kernel.org, imx@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Richard
- Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org, Maxime
- Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH 5/5] net: mtip: The L2 switch driver for imx287
-Message-ID: <20250325173846.4c7db33c@wsk>
-In-Reply-To: <0a908dc7-55eb-4e23-8452-7b7d2e0f4289@lunn.ch>
-References: <20250325115736.1732721-1-lukma@denx.de>
-	<20250325115736.1732721-6-lukma@denx.de>
-	<32d93a90-3601-4094-8054-2737a57acbc7@kernel.org>
-	<20250325142810.0aa07912@wsk>
-	<0a908dc7-55eb-4e23-8452-7b7d2e0f4289@lunn.ch>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1742920825; c=relaxed/simple;
+	bh=UOwLVkQkonzry7bkGGEaKcMSUG6D6nem6DLREYv5Hm8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Kbgp3fSHqToNaFSh4yOyv9ytB2JgI9aswnqpE5K5KPyfEFlaQbo55X6gkzWNMffZN4lh0GZZ9NrjhMxzxWmYAsWDqZVOvcbQSLnJFX3T4/Ovv/j9pekhTBjJJVEMpzBhk7GoYzmXP4bR9RQ43XlgcYyfxAd/4Jw7n8/NPHQsu0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dP2y91ry; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2263428c8baso244165ad.1
+        for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 09:40:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1742920823; x=1743525623; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JzcunlF6wnrKASYtocX/K9ZqcfNy+ii4vXAg9PC3H4M=;
+        b=dP2y91ryINNbhxxFl2vQIqfRyxiqFsUnVdw0ydzXdT/eiZJ6o4b28A35CLhScbJIkl
+         cO9JsN+cKfq031AilW/G+FoFj8yEMl1fHNiPEB4eLAHJLsjLnOR6jyRB2T7xnnPxxmz8
+         i5zVTpJ6yl4UiFQbdLsyqUzCktN5COPj7KqF8/zOSn4nU9cZeXfnYuQ4i2hxq4vSSGDr
+         e4u+9DSoLyw5lf3+V38LfK5G363hwKdvV9sQhY5J0KHC8MwJMA4iLPFnrHB/WsWQM1iS
+         aU3r8AktgkTD3C8NwdBaezXxy6vKz2RHyVG5GhiXSjh/InIhI9+fKM6qRyg2iqrGiJtI
+         unXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742920823; x=1743525623;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JzcunlF6wnrKASYtocX/K9ZqcfNy+ii4vXAg9PC3H4M=;
+        b=SiIZo9PHoZTsBDEo11v1oUUrqpUO5tUuUEXBfjtOGmkZZoZK1sCL8EXQ7TSjiKrZq1
+         poi9DNrl+yevFGVsycgb9saeXHN56xRJzsiuni2ymc9kSjQ9L8hNxbLWAYQlXls2Fboa
+         12bZ1V9WPBAru2LRQDhoc7POZvAo7/ZaDgI/kbWyWiFFkTXzwGNIu/JeRthJV7zMyob+
+         Vx6vivyn55aTc2AH259X35jDK+YMw1VKs2m8hgSp471jO537fSe1vERHBIojtUEUL/vs
+         0s/thvwqDlm8yzCUclX5vKw16oLFu/c904FRK0jUH2Sk51WDttj+jCTgZ0RdxF3ujPZG
+         q1TQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWxoIEv4jZGM+x1gPKIvrXAaEJxNmvf25caDNaV7zDG+kwIAVOheSocn2NjrJg5so70IkwGt3I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxkk0IyjRCNUAKF5LjqwzIlvBisLtmh7pSIq0hGbNL/rO8EKSNo
+	KuDm4GJDFoVUIpF7ktGeseNaXnI1htP2QkP40io8uW6ZoYVgjoFnkXjPiTri7VtHh5gL3vEiNPP
+	sRj9OcEGmxxlSUBR8PglVmvLVLsoPHIlAjTAe
+X-Gm-Gg: ASbGncvegyk3jAOodyUoQEVWSwf86bGL0GZmExMtsm2zJ7POyRziXoMdzUjJkMfk1Fs
+	s07bpEp7JWHzAzlNubbuif3ZHN5esxUAGAKo9+s7lx8lRo2xHu5/6PoytoFd4Won6JRygYIswd4
+	amKK885Buvbjrxo+1WH6oDWEwtLVF3Id55AgihwZD/THUorxyYz8EkBU5ZXQ0nzVkF
+X-Google-Smtp-Source: AGHT+IEY0IdqmHVtfsYxHYtimAVp0FZIYmyupY5qvmLAtpmfOtXEKjDtWlVt+okqXY5F8t/DTDuKHn9Kx3xYLd7Hy+8=
+X-Received: by 2002:a17:902:f707:b0:21f:3e29:9cd4 with SMTP id
+ d9443c01a7336-2279832099dmr9382005ad.20.1742920822577; Tue, 25 Mar 2025
+ 09:40:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/B6bYGrpWKAySBj=BE3Lc1nK";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Last-TLS-Session-Version: TLSv1.3
-
---Sig_/B6bYGrpWKAySBj=BE3Lc1nK
-Content-Type: text/plain; charset=US-ASCII
+References: <20250321021521.849856-1-skhawaja@google.com> <451afb5a-3fed-43d4-93cc-1008dd6c028f@uwaterloo.ca>
+In-Reply-To: <451afb5a-3fed-43d4-93cc-1008dd6c028f@uwaterloo.ca>
+From: Samiullah Khawaja <skhawaja@google.com>
+Date: Tue, 25 Mar 2025 09:40:10 -0700
+X-Gm-Features: AQ5f1JobjXpjaxd7AGrr3Pw1PXAp9x0EuZRXLbWcjCsNINKQ19RVVNqBDmYh7qo
+Message-ID: <CAAywjhSGp6CaHXsO5EDANPHA=wpOO2C=4819+75fLoSuFL2dHA@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 0/4] Add support to do threaded napi busy poll
+To: Martin Karsten <mkarsten@uwaterloo.ca>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, 
+	willemb@google.com, jdamato@fastly.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
-
-> > > > +config FEC_MTIP_L2SW
-> > > > +	tristate "MoreThanIP L2 switch support to FEC driver"
-> > > > +	depends on OF
-> > > > +	depends on NET_SWITCHDEV
-> > > > +	depends on BRIDGE
-> > > > +	depends on ARCH_MXS || ARCH_MXC   =20
-> > >=20
-> > > Missing compile test =20
-> >=20
-> > Could you be more specific? =20
->=20
-> config FEC
->         tristate "FEC ethernet controller (of ColdFire and some i.MX
-> CPUs)" depends on (M523x || M527x || M5272 || M528x || M520x || M532x
-> || \ ARCH_MXC || ARCH_S32 || SOC_IMX28 || COMPILE_TEST)
->=20
-> || COMPILE_TEST
-
-^^^^^^^^^^^^^^^^^^ - ach ... this "compile test" :-)
-
-(Not that I've posted the code not even compiling ... :-D)
-
->=20
-> So that it also gets build on amd64, s390, powerpc etc. The code
-> should cleanly build on all architectures. It if does not, it probably
-> means the code is using the kernel abstractions wrong. Also, most
-> developers build test on amd64, not arm, so if they are making tree
-> wide changes, you want this driver to build on amd64 so such tree wide
-> changes get build tested.
->=20
-> > There have been attempts to upstream this driver since 2020...
-> > The original code is from - v4.4 for vf610 and 2.6.35 for imx287.
-> >=20
-> > It has been then subsequently updated/rewritten for:
-> >=20
-> > - 4.19-cip
-> > - 5.12 (two versions for switchdev and DSA)
-> > - 6.6 LTS
-> > - net-next.
-> >=20
-> > The pr_err() were probably added by me as replacement for
-> > "printk(KERN_ERR". I can change them to dev_* or netdev_*. This
-> > shall not be a problem. =20
->=20
-> With Ethernet switches, you need to look at the context. Is it
-> something specific to one interface? The netdev_err(). If it is global
-> to the whole switch, then dev_err().
-
-Ok.
-
->=20
-> > > > +	pr_info("Ethernet Switch Version %s\n", VERSION);   =20
-> > >=20
-> > > Drivers use dev, not pr. Anyway drop. Drivers do not have
-> > > versions and should be silent on success. =20
-> >=20
-> > As I've written above - there are several "versions" on this
-> > particular driver. Hence the information. =20
->=20
-> There is only one version in mainline, this version (maybe). Mainline
-> does not care about other versions. Such version information is also
-> useless, because once it is merged, it never changes. What you
-> actually want to know is the kernel git hash, so you can find the
-> exact sources. ethtool -I will return that, assuming your ethtool code
-> is correct.
-
-Ok. I will.
-
->=20
-> > > > +	pr_info("Ethernet Switch HW rev 0x%x:0x%x\n",
-> > > > +		MCF_MTIP_REVISION_CUSTOMER_REVISION(rev),
-> > > > +		MCF_MTIP_REVISION_CORE_REVISION(rev));   =20
-> > >=20
-> > > Drop =20
-> >=20
-> > Ok. =20
->=20
-> You can report this via ethtool -I. But i suggest you leave that for
-> later patches.
-
-I will remove it.
-
->=20
-> > > > +	fep->reg_phy =3D devm_regulator_get(&pdev->dev, "phy");
-> > > > +	if (!IS_ERR(fep->reg_phy)) {
-> > > > +		ret =3D regulator_enable(fep->reg_phy);
-> > > > +		if (ret) {
-> > > > +			dev_err(&pdev->dev,
-> > > > +				"Failed to enable phy
-> > > > regulator: %d\n", ret);
-> > > > +			goto failed_regulator;
-> > > > +		}
-> > > > +	} else {
-> > > > +		if (PTR_ERR(fep->reg_phy) =3D=3D -EPROBE_DEFER) {
-> > > > +			ret =3D -EPROBE_DEFER;
-> > > > +			goto failed_regulator;
-> > > > +		}
-> > > > +		fep->reg_phy =3D NULL;   =20
-> > >=20
-> > > I don't understand this code. Do you want to re-implement
-> > > get_optional? But why? =20
-> >=20
-> > Here the get_optional() shall be used. =20
->=20
-> This is the problem with trying to use old code. It needs more work
-> than just making it compile. It needs to be brought up to HEAD of
-> mainline standard, which often nearly ends in a re-write.
-
-But you cannot rewrite this code from scratch, as the IP block is not
-so well documented, and there maybe are some issues that you are not
-aware of.
-
-Moreover, this code is already in production use, and you don't want to
-be in situation when regression tests cannot be run.
-
->=20
-> > > > +	fep->clk_ipg =3D devm_clk_get(&pdev->dev, "ipg");
-> > > > +	if (IS_ERR(fep->clk_ipg))
-> > > > +		fep->clk_ipg =3D NULL;   =20
-> > >=20
-> > > Why? =20
-> >=20
-> > I will update the code. =20
->=20
-> FYI: NULL is a valid clock. But do you actually want _optional()?
-
-Yes, I will use _optional() and _bulk_ if applicable.
-
->=20
-> This is the sort of thing a 10 year old codebase will be missing, and
-> you need to re-write. You might also be able to use the clk _bulk_
-> API?
-
-The goal is to have this driver upstreamed (finally), so the starting
-point of further development would be in kernel.
-
->=20
-> 	Andrew
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/B6bYGrpWKAySBj=BE3Lc1nK
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmfi3BYACgkQAR8vZIA0
-zr0U6wgA3vXkBH+jCy2QZbpuVDHnkTY2IX0a2mxIgSyQ62yxZYUCdS4htowl2Z4j
-fAorqb7sMqbSOpu5omBLDDrTaHyHjYRdzfHgvYznt8DfhZCgfuuCIgmcwkaWV7SR
-tT7+04Qo/vfLDjHML8PkKKj41u6NsIExKL4KXzfuqTrEDaMBoMhaz6f2baQ8TCof
-DolrM+4E+SlbJg++sYM4OXeEj5mMwvfMybdmlFPRlIZoiu0EYkmA3b28xdbwogYY
-D9XMB052/7HJ1szx6fIwO4U6ucXzaD9a7I7rFRyuxSYCzhNFHgOyp8D5IgJyaSFV
-AZbGCYSW3maHQFMpag97WHtvWRVG4w==
-=yVa2
------END PGP SIGNATURE-----
-
---Sig_/B6bYGrpWKAySBj=BE3Lc1nK--
+On Sun, Mar 23, 2025 at 7:38=E2=80=AFPM Martin Karsten <mkarsten@uwaterloo.=
+ca> wrote:
+>
+> On 2025-03-20 22:15, Samiullah Khawaja wrote:
+> > Extend the already existing support of threaded napi poll to do continu=
+ous
+> > busy polling.
+> >
+> > This is used for doing continuous polling of napi to fetch descriptors
+> > from backing RX/TX queues for low latency applications. Allow enabling
+> > of threaded busypoll using netlink so this can be enabled on a set of
+> > dedicated napis for low latency applications.
+> >
+> > Once enabled user can fetch the PID of the kthread doing NAPI polling
+> > and set affinity, priority and scheduler for it depending on the
+> > low-latency requirements.
+> >
+> > Currently threaded napi is only enabled at device level using sysfs. Ad=
+d
+> > support to enable/disable threaded mode for a napi individually. This
+> > can be done using the netlink interface. Extend `napi-set` op in netlin=
+k
+> > spec that allows setting the `threaded` attribute of a napi.
+> >
+> > Extend the threaded attribute in napi struct to add an option to enable
+> > continuous busy polling. Extend the netlink and sysfs interface to allo=
+w
+> > enabling/disabling threaded busypolling at device or individual napi
+> > level.
+> >
+> > We use this for our AF_XDP based hard low-latency usecase with usecs
+> > level latency requirement. For our usecase we want low jitter and stabl=
+e
+> > latency at P99.
+> >
+> > Following is an analysis and comparison of available (and compatible)
+> > busy poll interfaces for a low latency usecase with stable P99. Please
+> > note that the throughput and cpu efficiency is a non-goal.
+> >
+> > For analysis we use an AF_XDP based benchmarking tool `xdp_rr`. The
+> > description of the tool and how it tries to simulate the real workload
+> > is following,
+> >
+> > - It sends UDP packets between 2 machines.
+> > - The client machine sends packets at a fixed frequency. To maintain th=
+e
+> >    frequency of the packet being sent, we use open-loop sampling. That =
+is
+> >    the packets are sent in a separate thread.
+> > - The server replies to the packet inline by reading the pkt from the
+> >    recv ring and replies using the tx ring.
+> > - To simulate the application processing time, we use a configurable
+> >    delay in usecs on the client side after a reply is received from the
+> >    server.
+> >
+> > The xdp_rr tool is posted separately as an RFC for tools/testing/selfte=
+st.
+>
+> Thanks very much for sending the benchmark program and these specific
+> experiments. I am able to build the tool and run the experiments in
+> principle. While I don't have a complete picture yet, one observation
+> seems already clear, so I want to report back on it.
+Thanks for reproducing this Martin. Really appreciate you reviewing
+this and your interest in this.
+>
+> > We use this tool with following napi polling configurations,
+> >
+> > - Interrupts only
+> > - SO_BUSYPOLL (inline in the same thread where the client receives the
+> >    packet).
+> > - SO_BUSYPOLL (separate thread and separate core)
+> > - Threaded NAPI busypoll
+>
+> The configurations that you describe as SO_BUSYPOLL here are not using
+> the best busy-polling configuration. The best busy-polling strictly
+> alternates between application processing and network polling. No
+> asynchronous processing due to hardware irq delivery or softirq
+> processing should happen.
+>
+> A high-level check is making sure that no softirq processing is reported
+> for the relevant cores (see, e.g., "%soft" in sar -P <cores> -u ALL 1).
+> In addition, interrupts can be counted in /proc/stat or /proc/interrupts.
+>
+> Unfortunately it is not always straightforward to enter this pattern. In
+> this particular case, it seems that two pieces are missing:
+>
+> 1) Because the XPD socket is created with XDP_COPY, it is never marked
+> with its corresponding napi_id. Without the socket being marked with a
+> valid napi_id, sk_busy_loop (called from __xsk_recvmsg) never invokes
+> napi_busy_loop. Instead the gro_flush_timeout/napi_defer_hard_irqs
+> softirq loop controls packet delivery.
+Nice catch. It seems a recent change broke the busy polling for AF_XDP
+and there was a fix for the XDP_ZEROCOPY but the XDP_COPY remained
+broken and seems in my experiments I didn't pick that up. During my
+experimentation I confirmed that all experiment modes are invoking the
+busypoll and not going through softirqs. I confirmed this through perf
+traces. I sent out a fix for XDP_COPY busy polling here in the link
+below. I will resent this for the net since the original commit has
+already landed in 6.13.
+https://lore.kernel.org/netdev/CAAywjhSEjaSgt7fCoiqJiMufGOi=3Doxa164_vTfk+3=
+P43H60qwQ@mail.gmail.com/T/#t
+>
+> I found code at the end of xsk_bind in xsk.c that is conditional on xs->z=
+c:
+>
+>         if (xs->zc && qid < dev->real_num_rx_queues) {
+>                 struct netdev_rx_queue *rxq;
+>
+>                 rxq =3D __netif_get_rx_queue(dev, qid);
+>                 if (rxq->napi)
+>                         __sk_mark_napi_id_once(sk, rxq->napi->napi_id);
+>         }
+>
+> I am not an expert on XDP sockets, so I don't know why that is or what
+> would be an acceptable workaround/fix, but when I simply remove the
+> check for xs->zc, the socket is being marked and napi_busy_loop is being
+> called. But maybe there's a better way to accomplish this.
++1
+>
+> 2) SO_PREFER_BUSY_POLL needs to be set on the XDP socket to make sure
+> that busy polling stays in control after napi_busy_loop, regardless of
+> how many packets were found. Without this setting, the gro_flush_timeout
+> timer is not extended in busy_poll_stop.
+>
+> With these two changes, both SO_BUSYPOLL alternatives perform noticeably
+> better in my experiments and come closer to Threaded NAPI busypoll, so I
+> was wondering if you could try that in your environment? While this
+> might not change the big picture, I think it's important to fully
+> understand and document the trade-offs.
+I agree. In my experiments the SO_BUSYPOLL works properly, please see
+the commit I mentioned above. But I will experiment with
+SO_PREFER_BUSY_POLL to see whether it makes any significant change.
+>
+> Thanks,
+> Martin
+>
 
