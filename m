@@ -1,157 +1,158 @@
-Return-Path: <netdev+bounces-177297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67221A6EC50
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 10:12:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44F0FA6ECD6
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 10:42:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 681B6169D40
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 09:11:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C7A77A1C7C
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 09:41:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C4761E9B06;
-	Tue, 25 Mar 2025 09:11:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38183253332;
+	Tue, 25 Mar 2025 09:40:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kCoTDpX6"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="XtLZHqs9";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="AujYp9nI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF292F5B;
-	Tue, 25 Mar 2025 09:11:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E53031FAC3D;
+	Tue, 25 Mar 2025 09:40:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742893889; cv=none; b=Nc0PPLbH9qk7ow23DdXKTbvR46nXCZZ6iORhc1WUk0rLVyNy0FR9a8RyyFr0i6i9RduXB/I+37KO5Y5yjqgrUpnwm9AcjJH5fQrNsYSWBvP06bR8JWO96Vb6bDEtxPpXOTrzYqovc8j3N32t80eyOBye/qb8kfaNsRpT4JxVA7Y=
+	t=1742895642; cv=none; b=Cpk9lDrgZwjWhAbjVgBtxdEi/e6VKTg1MbopVmbAwCb/HAbJhXuzxM/GS0rhbwA38nh2vNUTFeKh3nQR1usjU/IkYhPYkHYI3jhacfeiaRlaw5KozCI3N8n2KqjEMHecIOWbGFlW0M9ogjU2CGWW05inFAhxfV76Jyn1rvV1xEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742893889; c=relaxed/simple;
-	bh=8ZqXnrU0AKG02HNlyB5u3VfqeMfIfP0PQXI4TwJmruo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uaYIz9x3VjuGjIXoKiOp8TwB50WNFXb/B1+ixSLdQNKcbcG1yNVOtr9bKN0HqHVWkuyV/J68FL6rz5I+gBgZC2qjg4GON6F7JAW7YRYPfl6YSb2oytwvkyKQ5IeYQ9GSe0ToN+3L28O7S/2fnSqm8uItBSqPmr61M/Y+B+lnQA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kCoTDpX6; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2ff85fec403so13022021a91.1;
-        Tue, 25 Mar 2025 02:11:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742893887; x=1743498687; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6S3q00Ly2YEgnihClS5EXWQIAkjqOLphkLp6Zwb5Cuw=;
-        b=kCoTDpX6EhA6p6FikQbr127X8JTKskmP1/t/PC8H+7QnPIfNt6ZfzQrs5bxLZeu2fY
-         VkfOSrNDwkJ6XS03ZHArCn+JIV2lQaQmiB7yFvntBYRvX+v/ozCfWFCZuHqc1AnotzaH
-         KmUjyP0DuQrlcvf5F2M5xRbrmbf/BdbQfMI26917laC/+o+zTy0R8Fa6iznAS1VW27O5
-         3RuYI/jCuQ20WK2vUbYKYCC/qe+lnbsdmZGEVJE52G7iIXIqra9JEsTMdiJLG8MFu758
-         +5mu/1fy4p2GtsxJ84zN+gdnI9ALg+3EdafSz2vJj1okg/Vdg8X0Y7fU5s5mqj7Q5j8n
-         AnwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742893887; x=1743498687;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6S3q00Ly2YEgnihClS5EXWQIAkjqOLphkLp6Zwb5Cuw=;
-        b=o/dYB8hUjuC0juUbqiE3I2ZgToBMJQ3BZJD+slZY4SChjQVffa2cn/5pDiWVrdwsuw
-         9jL6+YCLZ3tVQ6g7LfIRT5GQ9iQA+jgNgV3bHQZMGWo/1xc1EGSPZJ2z5poFe8Ur/ytI
-         ZI5Y++ELo1kDVpB1mywX3+AEBQF6gnqzeLhN2sUHa3TnNsjse9dM2EIpgCUYAGxm0yc+
-         O1BEV8U53kuyF35RILIcj7sReFdFP19YWem1LVDj3Yk81XjZvS+9Igs2UqDJ8cJ2o25i
-         Xa+QVVn/VVYgGa5zLFSgGLcRIL/grHCNiMdhrJeVkvN4ItQAZpiRZHsLoNbmnZ4ie00/
-         4jdA==
-X-Forwarded-Encrypted: i=1; AJvYcCUYLruyRCYHYFgjzUD4jocMeFiHQVpZnRn19FDtAScT26BHOcrMg8yz67kLPseeRpfcY3KIukoV1U6g2FA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6u272XPmNZu8z2Uz/+JIVaTNX8sgjqZmLRRZPSL1Rky1f79jK
-	UG7t5PPFza26iFDvo1uMf5kxajo3RkYdcBMd5Tr380QXsLtIL3Tt
-X-Gm-Gg: ASbGncvT9kUVT6WDJGkOL8Geejm07+sEkpZvq1lOHsWN9z5DrVMP0nDhSjeHGLDSiNp
-	5nzDB7ZbBH5N39ylbCgcBx4XI1g5J9QUtw2lW2yhMH4pGWyXMkQXm6Woode2dKIH1BTW53wplxK
-	bZG3vTe61yN+0nzpD/951AdE31jMEEBJkSEyJoqPLoNscEimdCoHx1znaVAHVUxkr7kphLfeHu9
-	262FZ4mmLYHOLcjfSYbRfRoVF41kaKN1om561D3GOHrKUOZIN5+P8zDFhm2F7XqLUV958Do+2gW
-	Kok2LInE8hUcl8J0s68Wm42ZDhwII5WZkESrchPwqBZHJpWHfDoMd/PT58rSqQKMeRE=
-X-Google-Smtp-Source: AGHT+IGAgeeRx8c4qx0gwdM6u3mkeO/xzEJBfDsv8Qo3SDJ35nrMrCfdjOnwKQpjGh0bDrU0lgqtIA==
-X-Received: by 2002:a17:90b:5408:b0:2ee:5c9b:35c0 with SMTP id 98e67ed59e1d1-3030f200ebdmr20681087a91.9.1742893886955;
-        Tue, 25 Mar 2025 02:11:26 -0700 (PDT)
-Received: from cs20-buildserver.lan ([2403:c300:dc02:2d2e:2e0:4cff:fe68:863])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-301bf576be5sm13717402a91.6.2025.03.25.02.11.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Mar 2025 02:11:26 -0700 (PDT)
-From: Jim Liu <jim.t90615@gmail.com>
-X-Google-Original-From: Jim Liu <JJLIU0@nuvoton.com>
-To: JJLIU0@nuvoton.com,
-	jim.t90615@gmail.com,
-	florian.fainelli@broadcom.com,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	kuba@kernel.org,
-	linux@armlinux.org.uk,
-	edumazet@google.com,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	giulio.benetti+tekvox@benettiengineering.com,
-	bcm-kernel-feedback-list@broadcom.com,
-	linux-kernel@vger.kernel.org,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Subject: [v3,net] net: phy: broadcom: Correct BCM5221 PHY model detection failure
-Date: Tue, 25 Mar 2025 17:10:29 +0800
-Message-Id: <20250325091029.3511303-1-JJLIU0@nuvoton.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1742895642; c=relaxed/simple;
+	bh=eud//FrrPTn/NL9oNFt/scdtsVUNC3WUkl6HvB+h21I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hDiqjFJ+1Q7PVu1aEmVqeukrp5Olq6gr6jGuWC6smP58C9OQoljhM7JixslgVJGp+ptoi8i0UKL+2UYjHTibQ7KIiI9EepmTT+wPinA3c1soF5hco3dLdbaBYLgwE4vpVxjeTnz9whZ5XKJPVQO/mLI9N7MgJXgYRxNSgLSJohY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=XtLZHqs9; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=AujYp9nI; arc=none smtp.client-ip=103.168.172.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id B3DBE11402AF;
+	Tue, 25 Mar 2025 05:40:37 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-04.internal (MEProxy); Tue, 25 Mar 2025 05:40:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1742895637; x=
+	1742982037; bh=jJPAD2UcHldTjErdg3Kf7WH+pXGiXV6MKPRaF1AAmD8=; b=X
+	tLZHqs9AgHLr1kLcEAoRmL+WNrUdMjZNi/wlElR9ByrLL5zn6m/GxaiQKnHivG06
+	WvVjui0aG24m6qEh4cE7A6tAR46pGZpwfO1uCiI8Y8cDHwHJQD92VMG6meBQJojk
+	7+Cdps11bKHRiIlrBi/ar2kspXrT/SOqTMeJ4ZwFMko5ecbnzmNkUcnSzKebS1tm
+	QsMowBqYXF9tWW3FwhbiyKtH3iNtgf7lB+qgPtCH2HWMDZWm5uk2FiQ7kIVSniS6
+	NwCl0L26eA0T587BZ987x60v5s9uh3O9p7u2VrQWUK1ejNP08GD3CxGFdRDyp6Nk
+	MNkPGods9D2TxlrEAd6Ew==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1742895637; x=1742982037; bh=jJPAD2UcHldTjErdg3Kf7WH+pXGiXV6MKPR
+	aF1AAmD8=; b=AujYp9nITJlK//rS43Gr10ZLd+shKs1Og20Pb1uMq2JQ+HQN/M3
+	DEpErdnCWySL/BQhwE/Hks0OvlDsnCeklzWd+WkhHg48bq3ru+Ji1ItnBh8NDwDJ
+	jSpot9UVM7fRgJK4nQUOiZqUyQUA3mXTHRK0grTwyo/j1W2H4gAmDSudcscKx45E
+	k0e29rJ31hhqasNWsJAV5L0eeqoGH362N7UTYOqhTSxaJUFwAyhWy4M/RqSSbkvs
+	msnvuiawgrvJWrCcxcVc6QqUl+hL1wni4R25uZYuEGL8rOYFMEY2sEgQl+mXe9mx
+	py5yMwYMDYHmQkPq/2KCPmdpq4ShPIfisTA==
+X-ME-Sender: <xms:FXriZ8uJQWN9AMjb-7FeO80wRmTJN7u8IUt_VZfLzGje0zs8_zsJUA>
+    <xme:FXriZ5cpzn2OT48ugIRXwZHGUQOVBl6dVjQja735_6jPcx9YxGQbsEZ1PGvbwCdvc
+    hUaUFezBqVS9n9ilik>
+X-ME-Received: <xmr:FXriZ3y3uQpydWUEkAuBq5qDvag92B_B0djhDbD_fasn2Oi1wZjKxdMUix2T>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduiedvfeduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
+    jeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihsh
+    hnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdef
+    hfekgeetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenuc
+    frrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhn
+    sggprhgtphhtthhopedufedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnth
+    honhhiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghr
+    rdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrd
+    gtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehp
+    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepughonhgrlhgurdhhuhhnth
+    gvrhesghhmrghilhdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhr
+    ghdprhgtphhtthhopehrhigriigrnhhovhdrshdrrgesghhmrghilhdrtghomhdprhgtph
+    htthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghh
+X-ME-Proxy: <xmx:FXriZ_PzH1_2lmZRkmn8CYwcJqsqWo5i11g3ExFDqlzZW_5gm0OsVQ>
+    <xmx:FXriZ8_0DhBEqBhNrtDZ4b4QqaY3DkqPeXOjLLOUB1cuCmj4ze_I8A>
+    <xmx:FXriZ3XSCvioqBjHsh6m5MECSV_YYZ96ZhSOlUNusU_JOo3lqkjIOQ>
+    <xmx:FXriZ1dLKkIaPeuoheJeWz35FqaXM-hAr39j2AsDghQ9iIDaO6khBg>
+    <xmx:FXriZ2fuh1nrrdKCKQIBvDjIIdQQYbDBH3vcpDnpmDzTeYBj1sPFtKAZ>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 25 Mar 2025 05:40:36 -0400 (EDT)
+Date: Tue, 25 Mar 2025 10:40:34 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
+Subject: Re: [PATCH net-next v24 09/23] ovpn: implement packet processing
+Message-ID: <Z-J6EmX-wZRUYt4f@krikkit>
+References: <20250318-b4-ovpn-v24-0-3ec4ab5c4a77@openvpn.net>
+ <20250318-b4-ovpn-v24-9-3ec4ab5c4a77@openvpn.net>
+ <Z-E70n1tkzKdepTo@krikkit>
+ <ae9f3c18-7b03-4a49-83a4-a3e7d8c52a3e@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ae9f3c18-7b03-4a49-83a4-a3e7d8c52a3e@openvpn.net>
 
-Use "BRCM_PHY_MODEL" can be applied to the entire 5221 family of PHYs.
+2025-03-24, 21:53:02 +0100, Antonio Quartulli wrote:
+> On 24/03/2025 12:02, Sabrina Dubroca wrote:
+> > 2025-03-18, 02:40:44 +0100, Antonio Quartulli wrote:
+> > > +int ovpn_crypto_state_reset(struct ovpn_crypto_state *cs,
+> > > +			    const struct ovpn_peer_key_reset *pkr)
+> > > +{
+> > > +	struct ovpn_crypto_key_slot *old = NULL, *new;
+> > > +	u8 idx;
+> > > +
+> > > +	if (pkr->slot != OVPN_KEY_SLOT_PRIMARY &&
+> > > +	    pkr->slot != OVPN_KEY_SLOT_SECONDARY)
+> > > +		return -EINVAL;
+> > > +
+> > > +	new = ovpn_aead_crypto_key_slot_new(&pkr->key);
+> > > +	if (IS_ERR(new))
+> > > +		return PTR_ERR(new);
+> > > +
+> > > +	spin_lock_bh(&cs->lock);
+> > 
+> > At this point, should there be a check that we're not installing 2
+> > keys with the same key_id at the same time? I expect a well-behaved
+> > userspace never does that, but it would confuse
+> > ovpn_crypto_key_id_to_slot if it ever happened.
+> > 
+> > ["well, then the tunnel is broken. if userspace sets up a broken
+> > config that's not the kernel's problem." is an acceptable answer]
+> > 
+> 
+> The behaviour of ovpn_crypto_key_id_to_slot() is still "deterministic" as we
+> will first lookup the primary key.
+> 
+> Therefore we will simply always use the primary key and never the other,
+> which is what we should expect in this situation from the code.
+> 
+> I'd say this is just an ill-formed configuration, yet not invalid.
+> As per your statement, I'd say it's userspace's problem.
 
-Fixes: 3abbd0699b67 ("net: phy: broadcom: add support for BCM5221 phy")
-Signed-off-by: Jim Liu <jim.t90615@gmail.com>
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
----
-v3:
-   modify BRCM_PHY_MODEL define
----
- drivers/net/phy/broadcom.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+Ok, sounds good, thanks.
 
-diff --git a/drivers/net/phy/broadcom.c b/drivers/net/phy/broadcom.c
-index 22edb7e4c1a1..4327d946d524 100644
---- a/drivers/net/phy/broadcom.c
-+++ b/drivers/net/phy/broadcom.c
-@@ -23,8 +23,7 @@
- #include <linux/irq.h>
- #include <linux/gpio/consumer.h>
- 
--#define BRCM_PHY_MODEL(phydev) \
--	((phydev)->drv->phy_id & (phydev)->drv->phy_id_mask)
-+#define BRCM_PHY_MODEL(phydev) ((phydev)->drv->phy_id)
- 
- #define BRCM_PHY_REV(phydev) \
- 	((phydev)->drv->phy_id & ~((phydev)->drv->phy_id_mask))
-@@ -859,7 +858,7 @@ static int brcm_fet_config_init(struct phy_device *phydev)
- 		return reg;
- 
- 	/* Unmask events we are interested in and mask interrupts globally. */
--	if (phydev->phy_id == PHY_ID_BCM5221)
-+	if (BRCM_PHY_MODEL(phydev) == PHY_ID_BCM5221)
- 		reg = MII_BRCM_FET_IR_ENABLE |
- 		      MII_BRCM_FET_IR_MASK;
- 	else
-@@ -888,7 +887,7 @@ static int brcm_fet_config_init(struct phy_device *phydev)
- 		return err;
- 	}
- 
--	if (phydev->phy_id != PHY_ID_BCM5221) {
-+	if (BRCM_PHY_MODEL(phydev) != PHY_ID_BCM5221) {
- 		/* Set the LED mode */
- 		reg = __phy_read(phydev, MII_BRCM_FET_SHDW_AUXMODE4);
- 		if (reg < 0) {
-@@ -1009,7 +1008,7 @@ static int brcm_fet_suspend(struct phy_device *phydev)
- 		return err;
- 	}
- 
--	if (phydev->phy_id == PHY_ID_BCM5221)
-+	if (BRCM_PHY_MODEL(phydev) == PHY_ID_BCM5221)
- 		/* Force Low Power Mode with clock enabled */
- 		reg = BCM5221_SHDW_AM4_EN_CLK_LPM | BCM5221_SHDW_AM4_FORCE_LPM;
- 	else
 -- 
-2.34.1
-
+Sabrina
 
