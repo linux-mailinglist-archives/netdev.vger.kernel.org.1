@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-177419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CED4A701FF
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 14:35:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5401A7026A
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 14:45:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24F0F17BBC4
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:29:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC67B3BE3C3
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:29:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD72D257ACF;
-	Tue, 25 Mar 2025 13:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B51EC25A2B9;
+	Tue, 25 Mar 2025 13:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tZ+2ymBR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WpMnN8Ii"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88F2A125DF
-	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 13:19:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8979F2580CD;
+	Tue, 25 Mar 2025 13:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742908799; cv=none; b=f/y8rmhWLwBu3A0kNHYaORHZIo4Iv+Y7mZ3XxN1yY9568DqitiCMmI9Hj+uSrKgoybpM7e3fL0UXzFj9mwK44N58h/exnjANf3jY+rUzbZ3t1CC0Y/PvVAssz3Q2Ia9xoVC/eXHzy38MrsGhTgJmS1Y631dNEmooqhyiuIIJ8IY=
+	t=1742908807; cv=none; b=ooEnmovb0Em6sQZ3AegeNd0Ohu6f2+uoV0irEyySKGWYDUg3vN+DB0vrTp5cAgTaInrkr3Qxvd9F8qkGkolaPMqFcmRLC73nJZR3km20sUX2zvhOSI6gcBnZF8mmRIQWACgleRpkMGyG4jGw6rcx7A2225sXK253yqVIqhi+Umw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742908799; c=relaxed/simple;
-	bh=zD3oTdusjYfks/Pe8/LqLPUfg8W1q/BRRb42TdFIBNM=;
+	s=arc-20240116; t=1742908807; c=relaxed/simple;
+	bh=cK+5YAUzLq6jCKHW5OeuVB2g368h6AsALn6lCDxZysg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JM13wbiDQ+JWj9lryCgPBOcmrS9aUlG8XXobOyPiTc+21W/rzPxK3Uew6gAlTr9uNYSGydQMs3kCR+ybOedSvOoviu14nv6lQB8Wd3xX540l2/sDxdQseg4yAWE1HNiqdZgydTqlP2RjMEZzPGeWwm+mqjaHN88nA17wgi7ySiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tZ+2ymBR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00391C4CEE4;
-	Tue, 25 Mar 2025 13:19:58 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=fhQZjT4+PpVpwsBvtgqXECQQ8m1LwS6HbuGCoypKYu95S5fSMwCOrQTlLbHC67gSMo8fY6B8eim7Srf52GtApCnD9tBBTrBTAzoTrQHT0n3+TN6dKTbH3OxDf+OH3y2SIyHAdS6q+ZfY1w9yJPMMByKNG/foJD5YTf/KjHCjM4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WpMnN8Ii; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBFBCC4CEE4;
+	Tue, 25 Mar 2025 13:20:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742908798;
-	bh=zD3oTdusjYfks/Pe8/LqLPUfg8W1q/BRRb42TdFIBNM=;
+	s=k20201202; t=1742908807;
+	bh=cK+5YAUzLq6jCKHW5OeuVB2g368h6AsALn6lCDxZysg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tZ+2ymBRJhRlJZYWB4mo0h/8EyWuurZMFK04LaFUwTozbjjQFjy2G6V68o0LxllAA
-	 061nC7eksTN1jKDn/ntlT0075msB1tU4CUio15MAzJnLnQnoOGVPjPNuhcNrKuLtcD
-	 oAbbKIMpmlSTX2D8E1LWwbG/lKoBF+aT7vgcrPNARChyUcPbSaohFucjjMzplTCq0f
-	 sR+gA3P/jfFih0Qif4XTHh4P6IwbsTOJoYjc4ZWw9rTRs/pjpujdFcIC+YthwQWmiz
-	 F9qNu6ng+/76dBkNlP2sWt+OPcZF6mwLM4FU7URjYk9EFRVOIYXfQQuia8NFioRlT9
-	 suGjTiHbM/aCg==
+	b=WpMnN8IivBVyI7y/sbx70qAsbhiYfUPZoesYDqeHNxOeAPAUDFz6NX+Imca+YjU+V
+	 gyGcHtm/ZhD8xFgTHIikddhriBS9ubWxYVFhbTU0PXvhxsWdYOQCLjGXXYxIGIPE3h
+	 9acwbm+yfzl0brKBZ+nyygd5C/0nAy1i7hTvF4eRv4UIg6oICg0EOBa+Rm46ZLBpWt
+	 ZSgu1SX0+U61Y4KoP3qiKMgIHhsw92lRp/mr8petY3DPcw8rTorHqsl7uq0c6SqAwY
+	 u0yg3F23rzs2UorNoTzNILi8jD9gEZnUQa1+pGRT0Hb6ihJZycFNIHf0bh0PPG25Gm
+	 U/TqcSFcm5Vag==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D6A380CFE7;
-	Tue, 25 Mar 2025 13:20:35 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DA0380CFE7;
+	Tue, 25 Mar 2025 13:20:44 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,52 +52,58 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/9][pull request] Intel Wired LAN Driver Updates
- 2025-03-18 (ice, idpf)
+Subject: Re: [PATCH net-next v2 0/7] selftests/net: Mixed select()+polling mode
+ for TCP-AO tests
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174290883427.571725.8985593759731494858.git-patchwork-notify@kernel.org>
-Date: Tue, 25 Mar 2025 13:20:34 +0000
-References: <20250318200511.2958251-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20250318200511.2958251-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org
+ <174290884305.571725.8165425409134442696.git-patchwork-notify@kernel.org>
+Date: Tue, 25 Mar 2025 13:20:43 +0000
+References: <20250319-tcp-ao-selftests-polling-v2-0-da48040153d1@gmail.com>
+In-Reply-To: <20250319-tcp-ao-selftests-polling-v2-0-da48040153d1@gmail.com>
+To: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, 0x7f454c46@gmail.com,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 18 Mar 2025 13:04:44 -0700 you wrote:
-> For ice:
+On Wed, 19 Mar 2025 03:13:33 +0000 you wrote:
+> Should fix flaky tcp-ao/connect-deny-ipv6 test.
+> Begging pardon for the delay since the report and for sending it this
+> late in the release cycle.
 > 
-> Przemek modifies string declarations to resolve compile issues on gcc 7.5.
-> 
-> Karol adds padding to initial programming of GLTSYN_TIME* registers to
-> ensure it will occur in the future to prevent hardware issues.
+> To: David S. Miller <davem@davemloft.net>
+> To: Eric Dumazet <edumazet@google.com>
+> To: Jakub Kicinski <kuba@kernel.org>
+> To: Paolo Abeni <pabeni@redhat.com>
+> To: Simon Horman <horms@kernel.org>
+> To: Shuah Khan <shuah@kernel.org>
+> Cc: netdev@vger.kernel.org
+> Cc: linux-kselftest@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Dmitry Safonov <0x7f454c46@gmail.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/9] ice: health.c: fix compilation on gcc 7.5
-    https://git.kernel.org/netdev/net/c/fa8eda19015c
-  - [net,2/9] ice: ensure periodic output start time is in the future
-    https://git.kernel.org/netdev/net/c/53ce7166cbff
-  - [net,3/9] ice: fix reservation of resources for RDMA when disabled
-    https://git.kernel.org/netdev/net/c/7fd71f317288
-  - [net,4/9] virtchnl: make proto and filter action count unsigned
-    https://git.kernel.org/netdev/net/c/db5e8ea155fc
-  - [net,5/9] ice: stop truncating queue ids when checking
-    https://git.kernel.org/netdev/net/c/f91d0efcc3dd
-  - [net,6/9] ice: validate queue quanta parameters to prevent OOB access
-    https://git.kernel.org/netdev/net/c/e2f7d3f7331b
-  - [net,7/9] ice: fix input validation for virtchnl BW
-    https://git.kernel.org/netdev/net/c/c5be6562de5a
-  - [net,8/9] ice: fix using untrusted value of pkt_len in ice_vc_fdir_parse_raw()
-    https://git.kernel.org/netdev/net/c/1388dd564183
-  - [net,9/9] idpf: check error for register_netdev() on init
-    https://git.kernel.org/netdev/net/c/680811c67906
+  - [net-next,v2,1/7] selftests/net: Print TCP flags in more common format
+    https://git.kernel.org/netdev/net-next/c/65ffdf31be68
+  - [net-next,v2,2/7] selftests/net: Provide tcp-ao counters comparison helper
+    https://git.kernel.org/netdev/net-next/c/1fe4221093d1
+  - [net-next,v2,3/7] selftests/net: Fetch and check TCP-MD5 counters
+    https://git.kernel.org/netdev/net-next/c/5a0a3193f6c4
+  - [net-next,v2,4/7] selftests/net: Add mixed select()+polling mode to TCP-AO tests
+    https://git.kernel.org/netdev/net-next/c/3f36781e57b3
+  - [net-next,v2,5/7] selftests/net: Print the testing side in unsigned-md5
+    https://git.kernel.org/netdev/net-next/c/266ed1ace8ee
+  - [net-next,v2,6/7] selftests/net: Delete timeout from test_connect_socket()
+    https://git.kernel.org/netdev/net-next/c/1e1738faa2bb
+  - [net-next,v2,7/7] selftests/net: Drop timeout argument from test_client_verify()
+    https://git.kernel.org/netdev/net-next/c/edbac739e4d1
 
 You are awesome, thank you!
 -- 
