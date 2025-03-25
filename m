@@ -1,196 +1,156 @@
-Return-Path: <netdev+bounces-177371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F9E2A6FCBB
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:37:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0D5BA6FCFD
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:40:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E23153AC803
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:30:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E20EB1883A6E
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:35:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FC35267B77;
-	Tue, 25 Mar 2025 12:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B416A25BAD4;
+	Tue, 25 Mar 2025 12:21:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Jf7vlGGR"
+	dkim=pass (2048-bit key) header.d=orbstack.dev header.i=@orbstack.dev header.b="lC9oN86t"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E034267B7F
-	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 12:20:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2909C26A1AD
+	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 12:21:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742905227; cv=none; b=DFyjWbR5QDoZA8gNfoScyHyGt/TGmZNF2akWD3RTdBO4Dnrqd94JSWtucei89bsM9KVFhiiKfC33GwXdrCYvF2MUrhR00Zqg/MovZdOjTaQKU9sDqYwo903K74Rij7RkBCwBEkXczbXQoc6uKYd1aBhudANKHw71C3BnwpC6jTI=
+	t=1742905297; cv=none; b=JPnqQPw8EuggHt+cQWwL1Nz9vbXRTB0km7unb5+pEEnH7KREQfO3T8YVgMXevwkVKmAm3ymJlQQYCP1042w3jzLmuClSFqNUEKmuZ1HzmJVsnJZq23mcoW/p2VzImZFk/WylJMo/jfv4j+/joGooud92p58Let8QP/6AyhSof6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742905227; c=relaxed/simple;
-	bh=fRI2Owqgw85GmBsf1kqLISTrjN6ADCz0KAC+v9Cbe1M=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=PxLAOcdWpIj6w0jGkgL4t8rbMcyhf094Xg8Mvn8jGKsUP0+K7ScunAULzDXZprolQUMiTZILF1YkwreYxhgk5ON5m1ft+ZihC5tdpIByhRMVqjGs9Dl4NdqzBWAP7ibQCfSc8pBT0XcW5qmeOgtHloQUjOSmFJHxsvXVXFWm2LM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Jf7vlGGR; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1742905297; c=relaxed/simple;
+	bh=BPdYS6xHL5QzpV7y0DGUk3cFXr0NpmjnOS6Qdgtx83A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=C3F3mYD57TzfvM1sdV70q7I7ckKcsPJn9rZ1IkxgMY3JiUGdL4qvC6IvBhmj/HNnUzEjChU2N49X7eeJRPHS92zwt6D37aPj6FUe0q81K83HROlDYhTfBpQbyreWciTurHwufcetS9IGFoXJ7XMAGLxovRmwapDtFXN4/dfarj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=orbstack.dev; spf=pass smtp.mailfrom=orbstack.dev; dkim=pass (2048-bit key) header.d=orbstack.dev header.i=@orbstack.dev header.b=lC9oN86t; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=orbstack.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=orbstack.dev
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-22622ddcc35so38530105ad.2
+        for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 05:21:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=orbstack.dev; s=google; t=1742905295; x=1743510095; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7oXGmD32nrFAaJW8Y4j0w8vdh1RENWFwbAfw9DIryH4=;
+        b=lC9oN86tJpt5j+/KmQSaAj/ti/cl4LAb1QJBROxj0VgpKDM6OqEcZ7UVZC6BwkzeYZ
+         BlYaxZ9o6tnUmAMTo2XiD2C2nNTArcXs6C590+27AGT6+P/zxCipXtx9mdpZMdXBEGPD
+         5PTZDVSmibu4TTryHd5JHv0aVw8RLGWJhCY9buMNgVeNM2L1x2WWpink7oXuDJLQftWn
+         5ASwEeNkmGAowg2Nf4JY+GUZ6TzyY53J/KhtA2YMPuH9i21M0yECx+HoffJSo5uhlBUX
+         xVGb5KOssxJFCSFIw898aTdE+TeKLQrnDoUCbSfFfv7C50DdlF/br39bzgeEIdLAxmC7
+         Zhnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742905295; x=1743510095;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7oXGmD32nrFAaJW8Y4j0w8vdh1RENWFwbAfw9DIryH4=;
+        b=gt/fS5uHsO7BoNonocQErZijFwPnZoqXSxqGUuSD1FSVseptL+Z535UGZlst8jWyBV
+         OmgC30uqaUbDLz1WffwEcDrJSXiD1Iwdffd6UaCMjirECM0XY6zjyKyyOD5MzDBvC4zn
+         CeSRu7njo6SM/fXj0gc+3T5+wGCWiX1Lo/TPGjgpK/+BB401B9rcPreJFAqV/mYxhSmV
+         wNyqaoBCZ11+P6IzJAFcPrVZ0nFYQtC/T9nwFQZytx5rZkFKhHnbH9F4aJJwRtADPlqy
+         9cZjuNMYQn0gDhx+n/3lWnuwqBztXYbVmrBeaTbSM/0FIfWh4KCK+Ijr2CjqGmUX6N7q
+         jQyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVEXsuAkHZ0DJaugEZ6qJfkuYLEL1g+95GGMWYWjrBfoQmX+vFDb1+R1PO878vr/Ma7oTorB9k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzo0xuJrmjCNNgmD3xPy0ZSP28ZPudCtCQXDQdHnQeQvwBs7BeU
+	F5LN3D6wvqNJGT0BlJ1+j+M4j5xO2t+jU0gGWQTszYl1qWzm6bCMta2cb28/T1TzOVWUMvWnAE4
+	pAGa+5FJ7gOetFMgWG+VwpAyyyI4oVurzEtCIug==
+X-Gm-Gg: ASbGncvyAH2Sry9G/LNScj2X6G6AamALdM2ONWVTuKesTn5agTT4Rj45LvFuisbpyKs
+	SeaNzll4BKG8Bgg27KmKxTcwz/o2Ki6c/xhDHwGL/IA/mBGzc7ltexCAGR+K8W1r5ah7BadayTq
+	UXrUhlyrJ4zx9naup2wLitxLqvLurbVGP0TYKd1rvYg8UZ8po4EjH6UiNrl16d
+X-Google-Smtp-Source: AGHT+IExz0YT/jp4uxzAo0Fs/pmpz4p7SGOWeBSgdx3aKf6wwX30Ixn/7csWEW/wAweIA22n99zce7ONy1aYp+CyqHE=
+X-Received: by 2002:a05:6a20:2d23:b0:1f5:6f5d:3366 with SMTP id
+ adf61e73a8af0-1fe434371c4mr31719506637.37.1742905295200; Tue, 25 Mar 2025
+ 05:21:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742905220;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3g0qORwvvABSJ2Rv9GuvfAIXABDwBe5tSMPOLykHwsg=;
-	b=Jf7vlGGRkuuwY6Df1TuEaUfzikmOC1Dz/EVPuFgoj2acjNTNaj0kKju1JCDNsYz39FsBUC
-	H3k/t9v87SUbjw2Xo8r/A6WS9Ujo//l227v7OcoGCLDzUYDYZByIA5LlPu52DYlWjKQovi
-	I3Z4T17Gxs2HEc7/W42mPGZQDGXCPis=
-Date: Tue, 25 Mar 2025 12:20:18 +0000
-Content-Type: text/plain; charset="utf-8"
+References: <20250321043504.9729-1-danny@orbstack.dev> <CANn89iLU6M3rvyzNuGtL2LsdYh97Nvy7TpXdGD30qq1yW1tQcA@mail.gmail.com>
+In-Reply-To: <CANn89iLU6M3rvyzNuGtL2LsdYh97Nvy7TpXdGD30qq1yW1tQcA@mail.gmail.com>
+From: Danny Lin <danny@orbstack.dev>
+Date: Tue, 25 Mar 2025 05:21:24 -0700
+X-Gm-Features: AQ5f1Jq3MHdMF6P_KWzoTKMwABmy019lYGhMwBdjWsyMs9-w-SbEFz0apr5rNyE
+Message-ID: <CAEFvpLebA8OauBWmGswM9ypdmBfQRisw4ksXY0sEGEfZGTFHPg@mail.gmail.com>
+Subject: Re: [PATCH v3] net: fully namespace net.core.{r,w}mem_{default,max} sysctls
+To: Eric Dumazet <edumazet@google.com>
+Cc: Matteo Croce <teknoraver@meta.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Message-ID: <5cdc1bdd9caee92a6ae932638a862fd5c67630e8@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH net-next v2] tcp: Support skb PAWS drop reason when
- TIME-WAIT
-To: "Eric Dumazet" <edumazet@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuniyu@amazon.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, dsahern@kernel.org, ncardwell@google.com, mrpre@163.com
-In-Reply-To: <CANn89iKxTHZ1JoQ9g9ekWq9=29LjRmhbxsnwkQ2RgPT-yCYMig@mail.gmail.com>
-References: <20250325110325.51958-1-jiayuan.chen@linux.dev>
- <CANn89iKxTHZ1JoQ9g9ekWq9=29LjRmhbxsnwkQ2RgPT-yCYMig@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
 
-March 25, 2025 at 19:29, "Eric Dumazet" <edumazet@google.com> wrote:
-
-> >  ---
-> >=20
->=20>  include/net/tcp.h | 3 ++-
-> >=20
->=20>  net/ipv4/tcp_ipv4.c | 2 +-
-> >=20
->=20>  net/ipv4/tcp_minisocks.c | 7 +++++--
-> >=20
->=20>  net/ipv6/tcp_ipv6.c | 2 +-
-> >=20
->=20>  4 files changed, 9 insertions(+), 5 deletions(-)
-> >=20
->=20>  diff --git a/include/net/tcp.h b/include/net/tcp.h
-> >=20
->=20>  index f8efe56bbccb..e1574e804530 100644
-> >=20
->=20>  --- a/include/net/tcp.h
-> >=20
->=20>  +++ b/include/net/tcp.h
-> >=20
->=20>  @@ -427,7 +427,8 @@ enum tcp_tw_status {
-> >=20
->=20>  enum tcp_tw_status tcp_timewait_state_process(struct inet_timewait=
-_sock *tw,
-> >=20
->=20>  struct sk_buff *skb,
-> >=20
->=20>  const struct tcphdr *th,
-> >=20
->=20>  - u32 *tw_isn);
-> >=20
->=20>  + u32 *tw_isn,
-> >=20
->=20>  + enum skb_drop_reason *drop_reason);
-> >=20
->=20>  struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
-> >=20
->=20>  struct request_sock *req, bool fastopen,
-> >=20
->=20>  bool *lost_race, enum skb_drop_reason *drop_reason);
-> >=20
->=20>  diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-> >=20
->=20>  index 1cd0938d47e0..a9dde473a23f 100644
-> >=20
->=20>  --- a/net/ipv4/tcp_ipv4.c
-> >=20
->=20>  +++ b/net/ipv4/tcp_ipv4.c
-> >=20
->=20>  @@ -2417,7 +2417,7 @@ int tcp_v4_rcv(struct sk_buff *skb)
-> >=20
->=20>  goto csum_error;
-> >=20
->=20>  }
-> >=20
->=20>  - tw_status =3D tcp_timewait_state_process(inet_twsk(sk), skb, th,=
- &isn);
-> >=20
->=20>  + tw_status =3D tcp_timewait_state_process(inet_twsk(sk), skb, th,=
- &isn, &drop_reason);
-> >=20
->=20>  switch (tw_status) {
-> >=20
->=20>  case TCP_TW_SYN: {
-> >=20
->=20>  struct sock *sk2 =3D inet_lookup_listener(net,
-> >=20
->=20>  diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-> >=20
->=20>  index fb9349be36b8..d16dfd41397e 100644
-> >=20
->=20>  --- a/net/ipv4/tcp_minisocks.c
-> >=20
->=20>  +++ b/net/ipv4/tcp_minisocks.c
-> >=20
->=20>  @@ -97,7 +97,8 @@ static void twsk_rcv_nxt_update(struct tcp_timew=
-ait_sock *tcptw, u32 seq,
-> >=20
->=20>  */
-> >=20
->=20>  enum tcp_tw_status
-> >=20
->=20>  tcp_timewait_state_process(struct inet_timewait_sock *tw, struct s=
-k_buff *skb,
-> >=20
->=20>  - const struct tcphdr *th, u32 *tw_isn)
-> >=20
->=20>  + const struct tcphdr *th, u32 *tw_isn,
-> >=20
->=20>  + enum skb_drop_reason *drop_reason)
-> >=20
->=20>  {
-> >=20
->=20>  struct tcp_timewait_sock *tcptw =3D tcp_twsk((struct sock *)tw);
-> >=20
->=20>  u32 rcv_nxt =3D READ_ONCE(tcptw->tw_rcv_nxt);
-> >=20
->=20>  @@ -245,8 +246,10 @@ tcp_timewait_state_process(struct inet_timewa=
-it_sock *tw, struct sk_buff *skb,
-> >=20
->=20>  return TCP_TW_SYN;
-> >=20
->=20>  }
-> >=20
->=20>  - if (paws_reject)
-> >=20
->=20>  + if (paws_reject) {
-> >=20
->=20>  + *drop_reason =3D SKB_DROP_REASON_TCP_RFC7323_PAWS;
-> >=20
->=20>  __NET_INC_STATS(twsk_net(tw), LINUX_MIB_PAWSESTABREJECTED);
-> >=20
->=20
-> I think we should add a new SNMP value and drop reason for TW sockets.
->=20
->=20SNMP_MIB_ITEM("PAWSTimewait", LINUX_MIB_PAWSTIMEWAIT),
->=20
->=20and SKB_DROP_REASON_TCP_RFC7323_TW_PAWS ?
+On Tue, Mar 25, 2025 at 4:39=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
 >
+> On Fri, Mar 21, 2025 at 5:35=E2=80=AFAM Danny Lin <danny@orbstack.dev> wr=
+ote:
+> >
+> > This builds on commit 19249c0724f2 ("net: make net.core.{r,w}mem_{defau=
+lt,max} namespaced")
+> > by adding support for writing the sysctls from within net namespaces,
+> > rather than only reading the values that were set in init_net. These ar=
+e
+> > relatively commonly-used sysctls, so programs may try to set them witho=
+ut
+> > knowing that they're in a container. It can be surprising for such atte=
+mpts
+> > to fail with EACCES.
+> >
+> > Unlike other net sysctls that were converted to namespaced ones, many
+> > systems have a sysctl.conf (or other configs) that globally write to
+> > net.core.rmem_default on boot and expect the value to propagate to
+> > containers, and programs running in containers may depend on the increa=
+sed
+> > buffer sizes in order to work properly. This means that namespacing the
+> > sysctls and using the kernel default values in each new netns would bre=
+ak
+> > existing workloads.
+> >
+> > As a compromise, inherit the initial net.core.*mem_* values from the
+> > current process' netns when creating a new netns. This is not standard
+> > behavior for most netns sysctls, but it avoids breaking existing worklo=
+ads.
+> >
+> > Signed-off-by: Danny Lin <danny@orbstack.dev>
+>
+> Patch looks good, but see below:
+>
+> > diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
+> > index c7769ee0d9c5..aedc249bf0e2 100644
+> > --- a/net/core/sysctl_net_core.c
+> > +++ b/net/core/sysctl_net_core.c
+> > @@ -676,21 +676,9 @@ static struct ctl_table netns_core_table[] =3D {
+> >                 .extra2         =3D SYSCTL_ONE,
+> >                 .proc_handler   =3D proc_dou8vec_minmax,
+> >         },
+> > -       {
+> > -               .procname       =3D "tstamp_allow_data",
+> > -               .data           =3D &init_net.core.sysctl_tstamp_allow_=
+data,
+> > -               .maxlen         =3D sizeof(u8),
+> > -               .mode           =3D 0644,
+> > -               .proc_handler   =3D proc_dou8vec_minmax,
+> > -               .extra1         =3D SYSCTL_ZERO,
+> > -               .extra2         =3D SYSCTL_ONE
+> > -       },
+> > -       /* sysctl_core_net_init() will set the values after this
+> > -        * to readonly in network namespaces
+> > -        */
+>
+> I think you have removed this sysctl :/
 
-That makes sense, we've done similar things before, such as adding
-PAWS_OLD_ACK previously.
+Fixed, sorry about that!
 
-Thanks for the suggestion!
---=20
-pw-bot:=20cr
+Best,
+Danny
+Founder @ OrbStack
 
