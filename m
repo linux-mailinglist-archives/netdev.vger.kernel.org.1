@@ -1,198 +1,209 @@
-Return-Path: <netdev+bounces-177348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8222CA6FAD6
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:14:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 06E6BA6FADB
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:15:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0D8F3A628D
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:13:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7C573B18F9
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:15:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 162E3254B1B;
-	Tue, 25 Mar 2025 12:13:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B8BE2566E6;
+	Tue, 25 Mar 2025 12:15:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="HcNUhYj+";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="UO9vB2bh"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="RDAxNLLY"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
+Received: from mx.denx.de (mx.denx.de [89.58.32.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC11D255E40
-	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 12:13:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D33F1A073F;
+	Tue, 25 Mar 2025 12:15:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742904809; cv=none; b=QRpFtRMFKJ4ujVMTGvNMvqIKLN1NmdDk/uwcAYSCefG39JMyB8r9rNOjKNNsbNIe4fiQmd965mGJxfNSa/MNDYikov0pntEgpEKLmhI4OLr0MH1u1jollqNWe4rwZpVghv6J7kd4lw/FFQ6wqHZLoQ0OqJQ5Fsjc8LGtvTmGuR0=
+	t=1742904921; cv=none; b=NSazdjK7gypbvcOKDuXVuDOsb3IHPn5jGiu+F0Whcia52MHNeMCSZaS6gGGc+FDADhs7w+MjDIME9MEYGRG4XfuLyG6G5XsxgeiwY4pSGbPVdawDKITPBFhs00gD1I1gK6bWJ1vEVQtuG3BwWuglL3SU8zqzvk+/uptHfz4kA4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742904809; c=relaxed/simple;
-	bh=BKTozao8GZc+UZok2CGM3Q2kN0R71PdtG9BtRt+Z8bI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZZ1yT71x/e5csU4+fTH/zYwnk7APOPgNhjAvHUZ5UXIpVhwrtfLeEHmMZtMaMzPSAExD6khmGhTyXj4vCWrBL4SYOnny4uDuSREmzrKxHPt+eeSoCMyVauaBjPCb2WQUZxNlbj/w4RG81B0eWKJq2HRIif27CMIIBconKKsayJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=HcNUhYj+; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=UO9vB2bh; arc=none smtp.client-ip=103.168.172.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 5339411400FC;
-	Tue, 25 Mar 2025 08:12:35 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Tue, 25 Mar 2025 08:12:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1742904755; x=
-	1742991155; bh=ck5OhvMMt4irGrWpXsOw+SumFavrLUenbqs6aMCgdUQ=; b=H
-	cNUhYj+qzoQ30Q6MsANPMaVSwFEaLyZ/qp/8zRjx1gjxqYCldCF0dv2iwZkjQpDk
-	mwYl3HMnH9CNfnI9GbuHX6E1G9PdVw2N+L6PgvHABlkKOIp8D61Ysf+vVNOtgVyS
-	LT/s8KrkcbVJCpbw+uIcW0+hKAwHI0yh147rNJhCrpIXsUHtJph+Orcw+mhx6Kqh
-	m/6d78oraVmIfczzfTgehQEJH+vPqXXKCKypkkw3WLzI3O5DkPF3aPOi/vyRgLJh
-	+kapGjLf/o8rlLU0D0V/aCuOjRwRMgn7Q5yHDQnDq48TbP9b9DZ2kiPeZ3trAJMl
-	lYJaK7DjC9D6poUUTxeSw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1742904755; x=1742991155; bh=ck5OhvMMt4irGrWpXsOw+SumFavrLUenbqs
-	6aMCgdUQ=; b=UO9vB2bh9Ao2+6YzO1jeS86c5TgLf0vHFabg5yoTPZRMykPPc6u
-	SFmPDfJ24i0DNqhb8VIhY2Fi0RDYIe2JQUPRjA0tCtOJ5wSR34eyUL9WPNOpGf9p
-	+GTxfazvHpYxraVnniFAUhYvC3IJBRbJhNhKPCjqx8+0ZZyoeFswDorFH9L6iWDl
-	ik45Urnic7xLa7Eef3wCRtqm0wqSej/s11VLbpO7H0XDyGaX2zokPfnbApUxQvhL
-	V/MaluPOY0g1S17eENKjhG7ZTBw8pZXIWo5k9jB+4GB5uo+UXmU2nnGF0xgHZHch
-	GoFFQxuQkif/dIsFS5gUu5QHNFxDxwBt8Mg==
-X-ME-Sender: <xms:sp3iZ_-bc2XaPnMcnbv45WhaV2pwoC08dbxXXlm5ydTIBe0kcvv58A>
-    <xme:sp3iZ7uhaklfQf8b0Ne-k0hR26Zyj_axZw3vFZr8P_HtjRCKGT_AvLv0uYb3zWSz1
-    xWd3-BuBByE_ysuZnw>
-X-ME-Received: <xmr:sp3iZ9A2eUlaikNXIE3AKlcz5BOb9NLZHBGc8A-lKryCyJrSDAFGJmgoUfFC>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduiedviedvucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
-    jeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihsh
-    hnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhephffggeeivedthffgudffveegheeg
-    vedvteetvedvieffuddvleeuueegueeggeehnecuffhomhgrihhnpehshiiikhgrlhhlvg
-    hrrdgrphhpshhpohhtrdgtohhmnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghm
-    pehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtph
-    htthhopeelpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehprggsvghnihesrhgv
-    ughhrghtrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrd
-    horhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphht
-    thhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrse
-    hkvghrnhgvlhdrohhrghdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdp
-    rhgtphhtthhopeifihhllhgvmhguvggsrhhuihhjnhdrkhgvrhhnvghlsehgmhgrihhlrd
-    gtohhmpdhrtghpthhtohepughsrghhvghrnheskhgvrhhnvghlrdhorhhgpdhrtghpthht
-    ohepnhgrthhhrghnsehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:s53iZ7eiflxk6um2p7jdwFZFaCD-hXeetBxv5ocscEBxyIstGceiWA>
-    <xmx:s53iZ0N2ExdwGxni_XNWqCc8uOYxqV9ZB-SsYSlSmXf7qL4X-mWpNg>
-    <xmx:s53iZ9koNPAZEWAA5HF3AEt1EWZ2UfbCBZ2WhwWmFz_DUrdk6Fk6aQ>
-    <xmx:s53iZ-vrkWsu92aLe6SNLzHTBsLxNZapuc5ex1izqHKpEGIbPuRy0w>
-    <xmx:s53iZzrfbfF4AGIJC8bsdjl5CfSDjrfqC074yZpew8s8IFiSoQ7nYCff>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 25 Mar 2025 08:12:34 -0400 (EDT)
-Date: Tue, 25 Mar 2025 13:12:32 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	David Ahern <dsahern@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>
-Subject: Re: [PATCH net-next v2 1/5] udp_tunnel: properly deal with xfrm gro
- encap.
-Message-ID: <Z-KdsLBF9lCM1m34@krikkit>
-References: <cover.1742557254.git.pabeni@redhat.com>
- <f4659f17b136eaec554d8678de0034c3578580c1.1742557254.git.pabeni@redhat.com>
+	s=arc-20240116; t=1742904921; c=relaxed/simple;
+	bh=3EjRv+MDeGAnLpJRXA7dgB81OVwWdjtHPSO7rMKHRxI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nsLnBN+SflG/bQaOzVFMTT4W3qdYReH85dG6+bPsfQ7G5SHwJ5wk73GhqQ7kwchtylTYRepOunwDwnwe4DvZjIX3SGMweYdkpmI2uU2bcHz4QmQfrNtzJYCNAEccxtKGhIUVqrNq/WLZCtUCmk2j5vNVNfZ8u0HFlzFLmYps5+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=RDAxNLLY; arc=none smtp.client-ip=89.58.32.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4D418102F66FF;
+	Tue, 25 Mar 2025 13:15:09 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
+	t=1742904913; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=9okx19OZpA+5j+MdAvd2Ecd4r6SR5dnQkH8UTLcqtMA=;
+	b=RDAxNLLY7NjCYc9nDp9XPBY/sX9jaLljzG7jM3kuJVgUUJ9EGP9qnv20zqYq/jCVu+G+4s
+	Y6Wr+WsadOCDrZwhb1vFIbDRgtYoGK75k7F9LddbLAmfAKwLpflfidZjb57bIcB8EXz9DJ
+	v0mInSfgKtf+VOU4Kbbp+74/VXeritZ2UpIVVZ7YL6VvbF7DkyT6bTmrokO/JgDNJsDemf
+	XqIBUp6QbmHYp2A7kzlsuE/zbgB25xjpj22T6ApRlIQWs/JHgph7x3hqQ1gi1Ob+MggWzk
+	7b+y3ih4yqzdD98wb+etvWGhl/0QRboNwsoSJr9u2nq4U3R/8WlCsVym/ceK1A==
+Date: Tue, 25 Mar 2025 13:15:07 +0100
+From: Lukasz Majewski <lukma@denx.de>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha
+ Hauer <s.hauer@pengutronix.de>, Paolo Abeni <pabeni@redhat.com>, Jakub
+ Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ davem@davemloft.net, Andrew Lunn <andrew+netdev@lunn.ch>, Pengutronix
+ Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>,
+ devicetree@vger.kernel.org, imx@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Richard
+ Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org, Maxime
+ Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH 2/5] dt-bindings: net: Add MTIP L2 switch description
+ (fec,mtip-switch.yaml)
+Message-ID: <20250325131507.692804cd@wsk>
+In-Reply-To: <2bf73cc2-c79a-4a06-9c5f-174e3b846f1d@kernel.org>
+References: <20250325115736.1732721-1-lukma@denx.de>
+	<20250325115736.1732721-3-lukma@denx.de>
+	<2bf73cc2-c79a-4a06-9c5f-174e3b846f1d@kernel.org>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f4659f17b136eaec554d8678de0034c3578580c1.1742557254.git.pabeni@redhat.com>
+Content-Type: multipart/signed; boundary="Sig_/Zapl74rJPPeU2cp5Y+tnTMV";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Last-TLS-Session-Version: TLSv1.3
 
-2025-03-21, 12:52:52 +0100, Paolo Abeni wrote:
-> The blamed commit below does not take in account that xfrm
-> can enable GRO over UDP encapsulation without going through
-> setup_udp_tunnel_sock().
-> 
-> At deletion time such socket will still go through
-> udp_tunnel_cleanup_gro(), and the failed GRO type lookup will
-> trigger the reported warning.
-> 
-> Add the GRO accounting for XFRM tunnel when GRO is enabled, and
-> adjust the known gro types accordingly.
-> 
-> Note that we can't use setup_udp_tunnel_sock() here, as the xfrm
-> tunnel setup can be "incremental" - e.g. the encapsulation is created
-> first and GRO is enabled later.
-> 
-> Also we can not allow GRO sk lookup optimization for XFRM tunnels, as
-> the socket could match the selection criteria at enable time, and
-> later on the user-space could disconnect/bind it breaking such
-> criteria.
-> 
-> Reported-by: syzbot+8c469a2260132cd095c1@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=8c469a2260132cd095c1
-> Fixes: 311b36574ceac ("udp_tunnel: use static call for GRO hooks when possible")
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> ---
-> v1 -> v2:
->  - do proper account for xfrm, retain the warning
-> ---
->  net/ipv4/udp.c         | 5 +++++
->  net/ipv4/udp_offload.c | 4 +++-
->  2 files changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> index db606f7e41638..79efbf465fb04 100644
-> --- a/net/ipv4/udp.c
-> +++ b/net/ipv4/udp.c
-> @@ -2903,10 +2903,15 @@ static void set_xfrm_gro_udp_encap_rcv(__u16 encap_type, unsigned short family,
->  {
->  #ifdef CONFIG_XFRM
->  	if (udp_test_bit(GRO_ENABLED, sk) && encap_type == UDP_ENCAP_ESPINUDP) {
-> +		bool old_enabled = !!udp_sk(sk)->gro_receive;
-> +
->  		if (family == AF_INET)
->  			WRITE_ONCE(udp_sk(sk)->gro_receive, xfrm4_gro_udp_encap_rcv);
->  		else if (IS_ENABLED(CONFIG_IPV6) && family == AF_INET6)
->  			WRITE_ONCE(udp_sk(sk)->gro_receive, ipv6_stub->xfrm6_gro_udp_encap_rcv);
-> +
-> +		if (!old_enabled && udp_sk(sk)->gro_receive)
-> +			udp_tunnel_update_gro_rcv(sk, true);
+--Sig_/Zapl74rJPPeU2cp5Y+tnTMV
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-We're not under any lock at this point, so this is a bit racy. I think
-we'll "only" end up leaking a ref on cur->count if this happens. Not
-ideal, but much better than the current situation.
+Hi Krzysztof,
 
->  	}
->  #endif
->  }
-> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-> index 088aa8cb8ac0c..02365b818f1af 100644
-> --- a/net/ipv4/udp_offload.c
-> +++ b/net/ipv4/udp_offload.c
-> @@ -37,9 +37,11 @@ struct udp_tunnel_type_entry {
->  	refcount_t count;
->  };
->  
-> +/* vxlan, fou and xfrm have 2 different gro_receive hooks each */
->  #define UDP_MAX_TUNNEL_TYPES (IS_ENABLED(CONFIG_GENEVE) + \
->  			      IS_ENABLED(CONFIG_VXLAN) * 2 + \
-> -			      IS_ENABLED(CONFIG_NET_FOU) * 2)
-> +			      IS_ENABLED(CONFIG_NET_FOU) * 2 + \
-> +			      IS_ENABLED(CONFIG_XFRM) * 2)
->  
->  DEFINE_STATIC_CALL(udp_tunnel_gro_rcv, dummy_gro_rcv);
->  static DEFINE_STATIC_KEY_FALSE(udp_tunnel_static_call);
-> -- 
-> 2.48.1
-> 
-> 
+> On 25/03/2025 12:57, Lukasz Majewski wrote:
+> > This patch provides description of the MTIP L2 switch available in
+> > some NXP's SOCs - imx287, vf610.
+> >=20
+> > Signed-off-by: Lukasz Majewski <lukma@denx.de>
+> > ---
+> >  .../bindings/net/fec,mtip-switch.yaml         | 160
+> > ++++++++++++++++++ =20
+>=20
+> Use compatible as filename.
 
--- 
-Sabrina
+I've followed the fsl,fec.yaml as an example. This file has description
+for all the device tree sources from fec_main.c
+
+I've considered adding the full name - e.g. fec,imx287-mtip-switch.yaml
+but this driver could (and probably will) be extended to vf610.
+
+So what is the advised way to go?
+
+>=20
+> >  1 file changed, 160 insertions(+)
+> >  create mode 100644
+> > Documentation/devicetree/bindings/net/fec,mtip-switch.yaml
+> >=20
+> > diff --git
+> > a/Documentation/devicetree/bindings/net/fec,mtip-switch.yaml
+> > b/Documentation/devicetree/bindings/net/fec,mtip-switch.yaml new
+> > file mode 100644 index 000000000000..cd85385e0f79 --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/fec,mtip-switch.yaml
+> > @@ -0,0 +1,160 @@
+> > +# SPDX-License-Identifier: GPL-2.0-only
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/net/fsl,mtip-switch.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: Freescale MTIP Level 2 (L2) switch
+> > +
+> > +maintainers:
+> > +  - Lukasz Majewski <lukma@denx.de>
+> > + =20
+>=20
+> description?
+
+Ok.
+
+>=20
+> > +allOf:
+> > +  - $ref: ethernet-controller.yaml#
+> > +
+> > +properties:
+> > +  compatible:
+> > +    oneOf: =20
+>=20
+> Drop, you have only one variant.
+
+Ok, for imx287 this can be dropped, and then extended with vf610.
+
+>=20
+> > +      - enum:
+> > +	  - imx287-mtip-switch =20
+>=20
+> This wasn't tested. Except whitespace errors, above compatible does
+> not have format of compatible. Please look at other NXP bindings.
+>=20
+> Missing blank line.
+>=20
+> > +  reg:
+> > +    maxItems: 1
+> > +
+> > +  interrupts:
+> > +    maxItems: 3 =20
+>=20
+> Need to list items instead.
+>=20
+> > +
+> > +  clocks:
+> > +    maxItems: 4
+> > +    description:
+> > +      The "ipg", for MAC ipg_clk_s, ipg_clk_mac_s that are for
+> > register accessing.
+> > +      The "ahb", for MAC ipg_clk, ipg_clk_mac that are bus clock.
+> > +      The "ptp"(option), for IEEE1588 timer clock that requires
+> > the clock.
+> > +      The "enet_out"(option), output clock for external device,
+> > like supply clock
+> > +      for PHY. The clock is required if PHY clock source from SOC.
+> > =20
+>=20
+> Same problems. This binding does not look at all as any other
+> binding. I finish review here, but the code has similar trivial
+> issues all the way, including incorrect indentation. Start from well
+> reviewed existing binding or example-schema.
+
+As I've stated above - this code is reduced copy of fsl,fec.yaml...
+
+>=20
+> Best regards,
+> Krzysztof
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/Zapl74rJPPeU2cp5Y+tnTMV
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmfinksACgkQAR8vZIA0
+zr17vAgAgqtwGoPNUc3EI7NljZqJvIZf6svb+ViihSV8scb7rPfd86a83cfQZpfC
+Bo90ssMcSCwGTisf+VkcCumpXu3rH2TM7dC7eGc9ipr8dxD5sTgQtoek0kU51IUF
+T1TpgmyNMS8qSG+Y7Y0GRE6+iRYQQrZXSRGzBaLYmamuvJdQpIbBt1v8rSojc1R7
+qme7A5VKr8j+ERYCwjDxqV/K8PNeUaNEpRxl6QOLi2g9xqQuYWFuk5pow4OGzOv/
+/Dnv6w1tZQNueZLPtd7noEh9ic/3jNHm0/36sQBBvQZv/IWBCtHq76PH/f2dGKa2
+M2JTkCKr7K5WdSzlmXYoGCSQTrfs7g==
+=5nCI
+-----END PGP SIGNATURE-----
+
+--Sig_/Zapl74rJPPeU2cp5Y+tnTMV--
 
