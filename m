@@ -1,95 +1,142 @@
-Return-Path: <netdev+bounces-177505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE0E8A705E6
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 17:01:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 552E3A7061B
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 17:09:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C70518963CC
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 16:00:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFCA13A4E83
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 16:09:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2EE825BAD6;
-	Tue, 25 Mar 2025 15:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E83671A23B0;
+	Tue, 25 Mar 2025 16:09:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FKr6NAdT"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="CVA05s6i";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="tdpxsQGL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 848FA2561DF;
-	Tue, 25 Mar 2025 15:59:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F184B1990AB
+	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 16:09:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742918399; cv=none; b=rE0iMRwXZ8nPwpaI+c8xxsHLV7cKtYSmdzg0x8Ia2lwT+cN/jToMhfBJCiZp0AP/fSKClESo973YhAOS0wXcm1XkAx3TVW4dW7UxRKLBjTHnSujqhxsRfn5Mc5YUKo6ljxgxkP5qsBhapX28N3mlNAoZMZDJkc9awollynoO+ag=
+	t=1742918961; cv=none; b=Z5HH+Or0LGIlHp/oKyWzwhOXSC25ip6jMBlXv1BPaicAZlWHkar8LUWrzGRdl6rc5VYeUE/gjwkQkEza7JsXgTIMrZ5Ur/tlEG2gJgQ3aojKYrTgDqQVpXPoGDmR+6ki0nLmVZJUsk63JmZjjtTXXsrOhOVQK1hd5og/LX1p6Xs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742918399; c=relaxed/simple;
-	bh=deKQHsSTq91cU+gs/lwy9UU8fJWk/D/NAudGGh5pVbA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Nut+VzYge6oTv8g4ogl6s8G9+IbYYRAhB70NOxCSq27MdRAsAT5b+KXU9ZFbMD2muH7ToFlbe8xkfk4aPe7Iw2R3zl9SKEetBFb/6AmkmCFkOm6als+rR0KYavbwrJTT2Y0bKvgjKZtllCwxWowCUOEawJcX8TrTzmgqFBQs2SI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FKr6NAdT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00F95C4CEE4;
-	Tue, 25 Mar 2025 15:59:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742918398;
-	bh=deKQHsSTq91cU+gs/lwy9UU8fJWk/D/NAudGGh5pVbA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FKr6NAdT2DkrIev+vLUH0x0gkYXnPoWCXigmGKiCxn/+dQkLV4mqFWfcdB8+e7zgA
-	 R9ow3fUG3YK4sXvy9mifQe/LKclyGUer/PiYOeHszJX7fEFmU58Eyx7DSOsB6YxIFv
-	 YAdByilcq/JxlzWenEgtH7jbXzF6QT+0PyQviXJjkXSuUxixWhbWLVaBwD7TDfYV9R
-	 eNPZKkNDQrVHe+at5jgXtL3gHi5/FYcI60JaE6H3r7UEATewUesbNnwNNhYHUAdBqm
-	 QVVP9wGGoY+8EwoijU1y986STkiBffZzHOKGyIfVP2yFTrg65rXHUTuDsU+/xt5+wC
-	 KVPQMIuuJNO0g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7122A380CFE7;
-	Tue, 25 Mar 2025 16:00:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1742918961; c=relaxed/simple;
+	bh=baRaR0+5vJHHgE22T8Y0a4aIiQdCYnxz+TLrZboWH3o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CUSIni+34pDtIsKLHOTZtOrlMjBua1bdVHhYTgyUg4FOT+vmL7dEpxLOBBEeQTEAjXupwNpv6HsGDA3lr0p8yM4aiWFPEUsW9eQXNowDQAU1uoH9ucwCLd5dxYWAwbRcdFGk6qHPQovzMeTWl+b0YQwYTPEN+a6SnboEv8jAAbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=CVA05s6i; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=tdpxsQGL; arc=none smtp.client-ip=103.168.172.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id CAC0B1140212;
+	Tue, 25 Mar 2025 12:09:17 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-05.internal (MEProxy); Tue, 25 Mar 2025 12:09:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1742918957; x=
+	1743005357; bh=OVStg6MTlXqpkKBdUalJE1t5DHidQxBywguS5zNckmc=; b=C
+	VA05s6imqwr+rTboeqb0f0HCTFfoAuJG5ohaSvplcKZ9iI5+3hiJazSSmBA8Bqur
+	d74CV5SlSpQhSspV4lkDRI159UuLQctVVBs67eqIcELkTyX+mxmW7OBXPISlP3r6
+	Wlmz/r1FnI/rnDeV6AqOtESkjgCFnSw/PXetK12ZMzvpPhcRQiDVdbTnBgcK+wEa
+	u5+pfqY1SbEqYfxhjjQgtVld8DN+Im5cRlQ05Vgl9IyqKwfFfvQ00ZvwO6HYszU3
+	5/m75mVNajXbYNUUbZeNEKzqlsPelzyjXfYGeP3+QaEsbHudvGrzCCmDTgmfgTu2
+	cAhTRpWGAOU0T8sTce2Pg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1742918957; x=1743005357; bh=OVStg6MTlXqpkKBdUalJE1t5DHidQxBywgu
+	S5zNckmc=; b=tdpxsQGL1wvYcGjPCyS+ubG96+j+1CzR9kLu54AQcOuma1ve4mo
+	iSzcSmXWZPdPSpSqZZxaKj/ZGXcfy1zkjwnfjzCus2398iT67MIL8IzeMmwUu1Pn
+	+fVZesBavHK9F6BuEKzB+7ShkuAs8Z4aINuGfy0wlEAsiJbiQkdGLMPAM1yufG2r
+	LYUsdUYPBLr4AI1akCp4ZhfyYnb2cL+rcwJkRg8IQkIXqNC9vLF/6yG6VrotcUYz
+	9KrK11uvmlfO5267i5ND8a3SbmgqJmuu+R3TTkxDXM0PyeFMe9J78r78PH79yWzu
+	Ycbg13cRJWFzDltGWkFJdQ3Fm2Mkl8pzU9A==
+X-ME-Sender: <xms:LdXiZyAzdzr3kZbFAKvY0GzRIEgvza1XuXjnzKJsDzTuhKF6PakD4Q>
+    <xme:LdXiZ8igJSZLqw2lZFrB6nz46OZzQIHmlTVUedR8mHykUB8BR9eL4yw0w-DjOF986
+    BJ5tky1bEuj1JFgeNI>
+X-ME-Received: <xmr:LdXiZ1l9OawcpzYuJo4peHyMF1XCp3SxmeQYt14-_RyhNKXleRfGwBatZDy_>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduieefuddtucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
+    jeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihsh
+    hnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhepgefhffdtvedugfekffejvdeiieel
+    hfetffeffefghedvvefhjeejvdekfeelgefgnecuffhomhgrihhnpehkvghrnhgvlhdroh
+    hrghenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehs
+    ugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepledpmhhouggvpe
+    hsmhhtphhouhhtpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgt
+    phhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhope
+    gurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivght
+    sehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpd
+    hrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepfihilhhl
+    vghmuggvsghruhhijhhnrdhkvghrnhgvlhesghhmrghilhdrtghomhdprhgtphhtthhope
+    gushgrhhgvrhhnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehnrghthhgrnheskhgv
+    rhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:LdXiZwzBB_xY44Gs21BIQasybeec5o4nR1Vcjdir5-YjAfJ7Qe3K_w>
+    <xmx:LdXiZ3S-EeK4LGs9weaI2Uox8BfDPFMUa3RZQJEvEX2La8lfzKAJ1w>
+    <xmx:LdXiZ7brgN6yv143WXTFsABVe489tI3dj1SELAKYTRm9uCrPCRo1mw>
+    <xmx:LdXiZwRyDyOtB_6w9jHQpICkf4N4zx55hPImM91-GIBn3ySCemDvOQ>
+    <xmx:LdXiZ888_yMKr7taCyhL1Fx4r8s08j9b0JOpKY7BgkKgk3Z5JfnWnAbn>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 25 Mar 2025 12:09:16 -0400 (EDT)
+Date: Tue, 25 Mar 2025 17:09:14 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	David Ahern <dsahern@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>
+Subject: Re: [PATCH net-next v2 2/5] udp_tunnel: fix compile warning
+Message-ID: <Z-LVKpVcH_epgV9B@krikkit>
+References: <cover.1742557254.git.pabeni@redhat.com>
+ <5c4df4171225ab664c748da190c6f2c2f662c48b.1742557254.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] dt-bindings: net: qcom,ipa: Correct indentation and style in
- DTS example
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174291843429.628657.8812268848912438806.git-patchwork-notify@kernel.org>
-Date: Tue, 25 Mar 2025 16:00:34 +0000
-References: <20250324125222.82057-1-krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20250324125222.82057-1-krzysztof.kozlowski@linaro.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, elder@kernel.org, linux-arm-msm@vger.kernel.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5c4df4171225ab664c748da190c6f2c2f662c48b.1742557254.git.pabeni@redhat.com>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 24 Mar 2025 13:52:22 +0100 you wrote:
-> DTS example in the bindings should be indented with 2- or 4-spaces and
-> aligned with opening '- |', so correct any differences like 3-spaces or
-> mixtures 2- and 4-spaces in one binding.
+2025-03-21, 12:52:53 +0100, Paolo Abeni wrote:
+> Nathan reported that the compiler is not happy to use a zero
+> size udp_tunnel_gro_types array:
 > 
-> No functional changes here, but saves some comments during reviews of
-> new patches built on existing code.
+>   net/ipv4/udp_offload.c:130:8: warning: array index 0 is past the end of the array (that has type 'struct udp_tunnel_type_entry[0]') [-Warray-bounds]
+>     130 |                                    udp_tunnel_gro_types[0].gro_receive);
+>         |                                    ^                    ~
+>   include/linux/static_call.h:154:42: note: expanded from macro 'static_call_update'
+>     154 |         typeof(&STATIC_CALL_TRAMP(name)) __F = (func);                  \
+>         |                                                 ^~~~
+>   net/ipv4/udp_offload.c:47:1: note: array 'udp_tunnel_gro_types' declared here
+>      47 | static struct udp_tunnel_type_entry udp_tunnel_gro_types[UDP_MAX_TUNNEL_TYPES];
+>         | ^
+>   1 warning generated.
 > 
-> [...]
+> In such (unusual) configuration we should skip entirely the
+> static call optimization accounting.
+> 
+> Reported-by: syzbot+8c469a2260132cd095c1@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/cover.1741718157.git.pabeni@redhat.com/T/#m6e309a49f04330de81a618c3c166368252ba42e4
+> Fixes: 311b36574ceac ("udp_tunnel: use static call for GRO hooks when possible")
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 
-Here is the summary with links:
-  - dt-bindings: net: qcom,ipa: Correct indentation and style in DTS example
-    https://git.kernel.org/netdev/net-next/c/a8b4ea7857ff
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Sabrina
 
