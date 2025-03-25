@@ -1,122 +1,186 @@
-Return-Path: <netdev+bounces-177491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3937A70511
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 16:32:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26924A70525
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 16:35:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F7BE7A23D8
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 15:31:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA31F1885558
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 15:35:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8632019D06A;
-	Tue, 25 Mar 2025 15:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F238E19D071;
+	Tue, 25 Mar 2025 15:34:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="dqBa0NGx";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="q3qFTrXS"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tVuLplN5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1155442A96;
-	Tue, 25 Mar 2025 15:32:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CEFB18C903;
+	Tue, 25 Mar 2025 15:34:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742916726; cv=none; b=LWvTEx5McdhTeTdJP6M9wbNfFv5pq7zZF/FKzlRAXEbwblLIfVuN1D55f5kzUqmeUM1HwkEbOt5IgKL+BR99afQHE134PByH1tL6zTKWOvbTB8bMs4pKjpvct8ETDC2yOYMWm5w/bcJPCHxuoTAvT/TL7ECrbAJc1ASKm1iKmx4=
+	t=1742916888; cv=none; b=lePHyCc5N8c6n2OO2RVwj4Tr3ZpkIwolY1CEcpNIvv0w214s3tc1f+GERK+fVeIErywqAMll7LspT6d39BcahVFSEDvoM/RxATJw6nBpgFqQqGBcKY7eq0ezc7onjA7oAuM7wDaAtWfplSMAtINHxKTn6WXDTtgH+g9igun2T44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742916726; c=relaxed/simple;
-	bh=x2NmSt9yLbVIJPlyS82xD2DGNKCq8MlMoH8SFczXq3E=;
+	s=arc-20240116; t=1742916888; c=relaxed/simple;
+	bh=8KfyOJBAZFmXTBDgsO0EBqDFDRKm4ygoD0e/Y33iedw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OKPMlFiSMGQ8Z8ms4c/VR1lkYGdzKVS+/FXTxVEn9wwnbUCzB7KpNvf6MKRCedwB+k8GInWAqbRb3DiGcDF7ApfAKFEIewl+WzZb9Di2SvLNs/WfIrK4mOquZhlW+29Nx5IKRi0HauKhUHBWkM1fhpbv4BIbecAz1/RjXnhxX+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=dqBa0NGx; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=q3qFTrXS; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id DE3016032E; Tue, 25 Mar 2025 16:32:00 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1742916720;
-	bh=uqCXvfdB2apsnaT9FS0TOcbMaur2YtZsVJVBqKqOVhg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dqBa0NGxkoj44VfwN1i2rHQFWsvTKCPmfpuj7lnYou27otd2hiwa9RynLJfM39Jbf
-	 R2YAK1ZvEDr4aHAALJl4ZbDY5INvoqR50+cw93t4LeI3QnBL+C3ssbVFosNXGyvDxX
-	 ohy1mxW5luDd4JdEiWQdx7fujQu1cgq5OaY57Oo9tqGwphJ30RYE2CRThcJezbFsrl
-	 glnWX3Bh5x5/YIq8EQA2sV10KmgvMDJnNPLr40BmT/M8L82+zf9XFqY7afYp8R1+LO
-	 8CxkDu6ydQpfAK4Oe2W/jdUj0xH7kXTpDsFKqiJd8EjXkrBIycNyvyi085c5NXM+yR
-	 olJOiL0aquPFg==
-X-Spam-Level: 
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id 2F53960292;
-	Tue, 25 Mar 2025 16:31:58 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1742916718;
-	bh=uqCXvfdB2apsnaT9FS0TOcbMaur2YtZsVJVBqKqOVhg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=q3qFTrXSS2hEHC9r/3hWthMYvvglJvKbVle3F0+2hmRKzCoQ+jsZD2yNt83Wc1bJQ
-	 a39DMxUYuu2tblvm4pUi642xqNzPMqpHomiXBNaTnCsAEaQjfZpbV5DQ8PqlFDICV3
-	 dYAIcTW1Qzw2uvAh/dZKFRTErBbfwxeIjYqhJwNbUOyykemfDYv+Z03l4WO6zyQm/P
-	 S1kzLKcPme6R4/8EJBdwKkZuU1DgvvjZYpv9taiOrWKk7npBWiVr1mAh5Mt3oC+ZFc
-	 Qg+wdlx7OqKoTjPcxZzFcqKXtbys0gzH30zFctsq3hkH081K5M+GKaUyl5L8ckOlo1
-	 yIls4dFI5VUPA==
-Date: Tue, 25 Mar 2025 16:31:55 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, cgroups@vger.kernel.org,
-	Jan Engelhardt <ej@inai.de>, Florian Westphal <fw@strlen.de>
-Subject: Re: [PATCH v2] netfilter: Make xt_cgroup independent from net_cls
-Message-ID: <Z-LMa9k9q_tJolr3@calendula>
-References: <20250305170935.80558-1-mkoutny@suse.com>
- <Z9_SSuPu2TXeN2TD@calendula>
- <rpu5hl3jyvwhbvamjykjpxdxdvfmqllj4zyh7vygwdxhkpblbz@5i2abljyp2ts>
- <Z-GNBeCX0dg-rxgQ@calendula>
- <iy3wkjdtudq4m763oji7bhj6w7bj2pdst7sbtahtwgcjrhpx6i@a4cy47mlcnqf>
+	 Content-Type:Content-Disposition:In-Reply-To; b=U1ba8UuRAxphgJXBTib3Za0I98fwMT3/+6P4l0belG2sDasFLquYetth4pktAHOfwmiX23hNNtwxVX8/ev2C5w5NdoNufu6QI8sVnkp0zd56KydLJr3FdofIAKOdHDen1QveHuTZR2J6893nit6llvwc82UTs+nC+GdZtYvxA3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=tVuLplN5; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=UEb2Y00Ew1puHYL5oaOzdh6VZps8lUZ2BRTU7aqo884=; b=tVuLplN5WM4nKBrIbNca5mB2VL
+	XKuL5B8epwLBxeRFpLYyDpPUaP3agKjFVURZ2qFL68dSs8UpHYUFfCxOVzJK6OQkv1LjafhA2CSnZ
+	Tj/AFtGcuTk5o56Y7zIU5NOfRXY++dJA4S7kjstxekncmTK6cC9J0AuN/h9rSPirk+94=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tx6IX-0074Yt-MM; Tue, 25 Mar 2025 16:34:37 +0100
+Date: Tue, 25 Mar 2025 16:34:37 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>, devicetree@vger.kernel.org,
+	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH 5/5] net: mtip: The L2 switch driver for imx287
+Message-ID: <0a908dc7-55eb-4e23-8452-7b7d2e0f4289@lunn.ch>
+References: <20250325115736.1732721-1-lukma@denx.de>
+ <20250325115736.1732721-6-lukma@denx.de>
+ <32d93a90-3601-4094-8054-2737a57acbc7@kernel.org>
+ <20250325142810.0aa07912@wsk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <iy3wkjdtudq4m763oji7bhj6w7bj2pdst7sbtahtwgcjrhpx6i@a4cy47mlcnqf>
+In-Reply-To: <20250325142810.0aa07912@wsk>
 
-On Mon, Mar 24, 2025 at 07:01:14PM +0100, Michal Koutný wrote:
-> On Mon, Mar 24, 2025 at 05:49:09PM +0100, Pablo Neira Ayuso <pablo@netfilter.org> wrote:
-> > If !CONFIG_CGROUP_NET_CLASSID, then no classid matching is possible.
+> > > +config FEC_MTIP_L2SW
+> > > +	tristate "MoreThanIP L2 switch support to FEC driver"
+> > > +	depends on OF
+> > > +	depends on NET_SWITCHDEV
+> > > +	depends on BRIDGE
+> > > +	depends on ARCH_MXS || ARCH_MXC  
 > > 
-> > So why allow a rule to match on cgroup with classid == 0?
+> > Missing compile test
 > 
-> It is conservative approach to supposed users who may have filtering
-> rules with classid=0 but never mkdir any net_cls group. Only those who
-> eventually need to mkdir would realize there's nowhere to mkdir on (with
-> !CONFIG_CGROUP_NET_CLASSID). Admittedly, I have no idea if this helps to
-> 5% of net_cls users or 0.05% or 0%. Do you have any insights into that?
+> Could you be more specific?
 
-I suspect this partial support will not help anyway, because user will
-be most likely matching to classid != 0 in their rulesets, and the
-ruleset loads via iptables-restore in an atomic fashion, ie. take it
-all or nothing.
+config FEC
+        tristate "FEC ethernet controller (of ColdFire and some i.MX CPUs)"
+        depends on (M523x || M527x || M5272 || M528x || M520x || M532x || \
+                   ARCH_MXC || ARCH_S32 || SOC_IMX28 || COMPILE_TEST)
 
-> > Maybe simply do this instead?
+|| COMPILE_TEST
+
+So that it also gets build on amd64, s390, powerpc etc. The code
+should cleanly build on all architectures. It if does not, it probably
+means the code is using the kernel abstractions wrong. Also, most
+developers build test on amd64, not arm, so if they are making tree
+wide changes, you want this driver to build on amd64 so such tree wide
+changes get build tested.
+
+> There have been attempts to upstream this driver since 2020...
+> The original code is from - v4.4 for vf610 and 2.6.35 for imx287.
+> 
+> It has been then subsequently updated/rewritten for:
+> 
+> - 4.19-cip
+> - 5.12 (two versions for switchdev and DSA)
+> - 6.6 LTS
+> - net-next.
+> 
+> The pr_err() were probably added by me as replacement for
+> "printk(KERN_ERR". I can change them to dev_* or netdev_*. This shall
+> not be a problem.
+
+With Ethernet switches, you need to look at the context. Is it
+something specific to one interface? The netdev_err(). If it is global
+to the whole switch, then dev_err().
+
+> > > +	pr_info("Ethernet Switch Version %s\n", VERSION);  
 > > 
-> > static bool possible_classid(u32 classid)
-> > {
-> >        return IS_ENABLED(CONFIG_CGROUP_NET_CLASSID);
-> > }
+> > Drivers use dev, not pr. Anyway drop. Drivers do not have versions and
+> > should be silent on success.
 > 
-> Yes, if the above carefulness is unnecessary, I'd like to accompany this
-> with complete removal of sock_cgroup_classid() function then (to have it
-> compile-checked that it's really impossible to compare any classids w/o
-> CONFIG_CGROUP_NET_CLASSID).
+> As I've written above - there are several "versions" on this particular
+> driver. Hence the information.
 
-Go ahead remove this shim function and post v3.
+There is only one version in mainline, this version (maybe). Mainline
+does not care about other versions. Such version information is also
+useless, because once it is merged, it never changes. What you
+actually want to know is the kernel git hash, so you can find the
+exact sources. ethtool -I will return that, assuming your ethtool code
+is correct.
 
-Thanks.
+> > > +	pr_info("Ethernet Switch HW rev 0x%x:0x%x\n",
+> > > +		MCF_MTIP_REVISION_CUSTOMER_REVISION(rev),
+> > > +		MCF_MTIP_REVISION_CORE_REVISION(rev));  
+> > 
+> > Drop
+> 
+> Ok.
+
+You can report this via ethtool -I. But i suggest you leave that for
+later patches.
+
+> > > +	fep->reg_phy = devm_regulator_get(&pdev->dev, "phy");
+> > > +	if (!IS_ERR(fep->reg_phy)) {
+> > > +		ret = regulator_enable(fep->reg_phy);
+> > > +		if (ret) {
+> > > +			dev_err(&pdev->dev,
+> > > +				"Failed to enable phy regulator:
+> > > %d\n", ret);
+> > > +			goto failed_regulator;
+> > > +		}
+> > > +	} else {
+> > > +		if (PTR_ERR(fep->reg_phy) == -EPROBE_DEFER) {
+> > > +			ret = -EPROBE_DEFER;
+> > > +			goto failed_regulator;
+> > > +		}
+> > > +		fep->reg_phy = NULL;  
+> > 
+> > I don't understand this code. Do you want to re-implement
+> > get_optional? But why?
+> 
+> Here the get_optional() shall be used.
+
+This is the problem with trying to use old code. It needs more work
+than just making it compile. It needs to be brought up to HEAD of
+mainline standard, which often nearly ends in a re-write.
+
+> > > +	fep->clk_ipg = devm_clk_get(&pdev->dev, "ipg");
+> > > +	if (IS_ERR(fep->clk_ipg))
+> > > +		fep->clk_ipg = NULL;  
+> > 
+> > Why?
+> 
+> I will update the code.
+
+FYI: NULL is a valid clock. But do you actually want _optional()?
+
+This is the sort of thing a 10 year old codebase will be missing, and
+you need to re-write. You might also be able to use the clk _bulk_
+API?
+
+	Andrew
 
