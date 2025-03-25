@@ -1,55 +1,60 @@
-Return-Path: <netdev+bounces-177322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18665A6F084
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:15:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AD64A6F1AA
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:22:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8DA16188CA10
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 11:15:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A0AF716A293
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 11:22:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B2721EBA1C;
-	Tue, 25 Mar 2025 11:15:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90195255E3C;
+	Tue, 25 Mar 2025 11:21:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JJdhCv2+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KQRRb1h9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3166E16A395;
-	Tue, 25 Mar 2025 11:15:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 642372E337C;
+	Tue, 25 Mar 2025 11:21:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742901317; cv=none; b=HKUwr37fdJmHdTyLW/Dr1QW1QbNssR52wJzMHl4vtIBB2ZjAU9MOyYWGQ9cwr6AG+atIXVXOi8lpijfWTpHBWwk4LblR1VBY36H2z/z/seIyXT3SzdIhms3AsZeguQJkBdKiJhNfldP0gr2utgzYkXkmXlnDgkQeaq+S/Tbu0VU=
+	t=1742901713; cv=none; b=N0W8vooBoUZPQzWpF0olo6TcaPFyGaqUkbTSqTyIXeZ5ZeNYhUPgZOH7zjIm2F6SiKQWJbdlnjRgOPS0Hm/P+afQeMsEanlRfZENbElcLHs0t1Wls5G20mXsK645aj2kzTiEmtRf/se+WgmUG6QK1/EaEwQ5yJPCNvE3D5C/mbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742901317; c=relaxed/simple;
-	bh=uwGfJRKErRIwZ5CVP2cWpoqygQMndr3jzVcHrLK7bsA=;
+	s=arc-20240116; t=1742901713; c=relaxed/simple;
+	bh=ftwtZXIOCMaYAxzuWBdEbpL26cxxbkseuQptRaNUc+Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T86hO0e41uOSuXoraXgmgZIfoScdJ42aVsDYrcVLDzYcQbD8U4h3liWnc90hA3fpMrMsVWJ7zUvvJz6LyWZWgEs4ubI57v+a9/WTNXehtnasfdVoyeOoBJKbRGB5/v5S/9aKQVNhSsL7ixsgIZ10J7MzWeaeKQyv70HbhC2n4rA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JJdhCv2+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 186FCC4CEE4;
-	Tue, 25 Mar 2025 11:15:14 +0000 (UTC)
+	 MIME-Version:Content-Type; b=k1KgLeVe6xcxXMk6S5gFpBZfai5jC0VkJLC+/hyYazDwonL4kiTZf6urMwVE6YeRY2mnSvdzRsR/bWu6fnKHwfrH6Xs1gl2wBHxnNCZZTlpVvNCjTCVtigDJ2vQ4/0V3oP8kxd0q7Lm1sXUgzK+XIBpTqpF09QbBkUW4sJD97Ww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KQRRb1h9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F450C4CEE4;
+	Tue, 25 Mar 2025 11:21:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742901316;
-	bh=uwGfJRKErRIwZ5CVP2cWpoqygQMndr3jzVcHrLK7bsA=;
+	s=k20201202; t=1742901712;
+	bh=ftwtZXIOCMaYAxzuWBdEbpL26cxxbkseuQptRaNUc+Y=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JJdhCv2+iSYOmGjSYnYes2o+sxg7XWg2TOrEPEBxAQQU7v/LXaL1PkK4YAfxgVBpc
-	 MBcd66CJh11zdT/R+6ZHEkGFjSbI6gb14feXnmyTc7STR1W7tZE+95x64M47Ux7jPT
-	 oAl0f3sn9rAVwyeoG2RBcsx7eoRQPtwYCYwVNkkTx3+LQEUZg9f/oWMI/+Ucwq/3FO
-	 VplvucV/6ltf0zpugqI1K7B+tVCbXYVJcsEMayQHiTcjdSxgFTzG4ssZixzEWWTWsL
-	 j0D97/14fQ3sdjTKe+r9+6L4VMkhHA2ej+dPSAAR8/bvLGwqFnnGzuZpv4/NxIfEtS
-	 FoAIurzDQewjQ==
-Date: Tue, 25 Mar 2025 04:15:10 -0700
+	b=KQRRb1h9cWQhfU/gB9TJRz1RpitBikdcWCYG2g+XXI75psCXyQ5vOXFamDiKliebd
+	 PKHXhiBrabOZmAlPa+rs9piKbgAHdK2DIlAujwG/LP1qqIE3QrIHTkatlCIQc1m5jr
+	 7F8I+ykoIFV1aw7WSU7YZYIKGldI/5QKkmKF2Cecc6Vejq1GPnh8dRDqn/gnUyIGNv
+	 qrFi0Aciy0BoB7xqfJlk+aimtW7QfHHUzNEp4jWQ/45gbfnuI9KX+bxW4op8luOueY
+	 8/GXQcOXmFQCfNnRSxem8AAGJzNc0w2DErsETaALNMmtb2AVnJOM7yb+OQkRS4pQbC
+	 1qRB5TyEPz47A==
+Date: Tue, 25 Mar 2025 04:21:44 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Kirill Tkhai <tkhai@ya.ru>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH NET-PREV 00/51] Kill rtnl_lock using fine-grained
- nd_lock
-Message-ID: <20250325041510.590d938e@kernel.org>
-In-Reply-To: <174265415457.356712.10472727127735290090.stgit@pro.pro>
-References: <174265415457.356712.10472727127735290090.stgit@pro.pro>
+To: Murad Masimov <m.masimov@mt-integration.ru>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Joerg Reuter <jreuter@yaina.de>, Kuniyuki Iwashima
+ <kuniyu@amazon.com>, <linux-hams@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <lvc-project@linuxtesting.org>,
+ <syzbot+33841dc6aa3e1d86b78a@syzkaller.appspotmail.com>
+Subject: Re: [PATCH] ax25: Remove broken autobind
+Message-ID: <20250325042144.022c9121@kernel.org>
+In-Reply-To: <20250317105352.412-1-m.masimov@mt-integration.ru>
+References: <20250317105352.412-1-m.masimov@mt-integration.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,16 +64,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sat, 22 Mar 2025 17:37:41 +0300 Kirill Tkhai wrote:
-> I mostly write this mostly a few years ago, more or less recently
-> I rebased the patches on kernel around 6.11 (there should not
-> be many conflicts on that version). Currenly I have no plans
-> to complete this.
-> 
-> If anyone wants to continue, this person can take this patchset
-> and done the work.
+On Mon, 17 Mar 2025 13:53:52 +0300 Murad Masimov wrote:
+> Binding AX25 socket by using the autobind feature leads to memory leaks
+> in ax25_connect() and also refcount leaks in ax25_release(). Memory
+> leak was detected with kmemleak:
 
-Was there a pain point you were trying to address, or was rtnl_lock
-just an interesting challenge? Paolo mentioned trying to convert veth
-to instance locking, I guess he may need to reach for similar solutions.
+Looks like DaveM applied this yesterday, thanks!
+-- 
+pw-bot: accept
 
