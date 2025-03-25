@@ -1,92 +1,88 @@
-Return-Path: <netdev+bounces-177634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8310BA70C3D
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 22:41:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70C82A70C6B
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 22:54:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C73F0179269
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 21:40:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71CB63B1DE5
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 21:54:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 981E8269CE5;
-	Tue, 25 Mar 2025 21:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F7432580E1;
+	Tue, 25 Mar 2025 21:54:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dCgtDAco"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aFRtPxx6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70B4B269813;
-	Tue, 25 Mar 2025 21:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A0611DD0F6;
+	Tue, 25 Mar 2025 21:54:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742938802; cv=none; b=cYgSC21DZHdiICOGBv2JhJwy3F3C8yjwbAYmAyj4qie2u4A4BHv0wMMvxWSzIc2lFS0eoZ25SSMlSl2XkuHoMpuUH19pWQln5wPkFnr+rngRxLjJuIHwKB3CMGGY4QnCgCHXaNv8MlPbZCLg0943iGDp+FurO2lhQs4cuERereo=
+	t=1742939688; cv=none; b=aKjClFRkK6vTaICnViybGCjKK+F8UhaNADQ+sCbdMjNkGxM05ues5Loj3Z5MIYuRqCduT2AO/CxWg0ZZqVshYAWKY0SB40UM+Xp8ohexfCnXhDycaouZgvGSHlWEWZdwWC+jja/Rj8PzyBIvLbvk4OzjQZNJimrqoolhPd7kiug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742938802; c=relaxed/simple;
-	bh=/EdRSnBvY5AE1pbX1KsOAS0fRxwzyV8JWQjx6ib0lt8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RMV7mrK/GPbt/EEz1InFla+DkNfF8xTLilbQyiZ3zqCAf5nX/065gRzh2D4Wm7T0Lslm33yJCYPAhhYZPkDY7m65mbhaL0TZJPism8OkJ0oW65H8uRa5Q5Zb0D002F29vhefIq5cY0Dk9ch5U+BGCrtI9CnawawszFjfBAJE/Nc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dCgtDAco; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0056C4CEE9;
-	Tue, 25 Mar 2025 21:40:01 +0000 (UTC)
+	s=arc-20240116; t=1742939688; c=relaxed/simple;
+	bh=xxY53mJDy11RLGXH4SbC6QGMalVy5XEmiyyRgRTBCCU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NrhrlAyARAoXcDeJdWlRfArPHv++S4eCQEK1OlpFBYucZ3L9iuhAgVu0ZeOQ1MOwhr79IkK/cEDVBmtNef4hbZkmlwIpMt2/yuYf2ggphmXza4/uDj71by/2HEICJlVByBTrpyddOwW+j1c85bsP+CTLlp1GAyKrIM+4hsHg35Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aFRtPxx6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26E9CC4CEE4;
+	Tue, 25 Mar 2025 21:54:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742938801;
-	bh=/EdRSnBvY5AE1pbX1KsOAS0fRxwzyV8JWQjx6ib0lt8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dCgtDAcohUbzyaLNrFkF5IhI4OeSqT1k3cgUcFTH29r8VXGrABj4Ym97ZTtYCRC7j
-	 sJfILAPEUCUEBVUFuuUYq+NoIecz8ZKd5AquZJG0UzKrnLnX1mQtQShPUblSfgvB5n
-	 G08v6psqqtpZrVIMoj0wHcU8e7gUQYX/dIGFrsh9m7XbkXRTnVGjltIlwaP8rXIDyq
-	 C0PmE/X2Ax8ChL3wXMBfaL1QKXNbcyXzX0M+qny/+xTiJEB1bKYxWLBTyqva7tuaSI
-	 Lto5JaS8LIikah8kKKYoAwW2nRmkwQ1oiGxT5+j9/LUM1eHky6jWoZDVABQ42iHrA+
-	 Xqk0T5Zy5LvHg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FDF380DBFC;
-	Tue, 25 Mar 2025 21:40:39 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1742939687;
+	bh=xxY53mJDy11RLGXH4SbC6QGMalVy5XEmiyyRgRTBCCU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=aFRtPxx6zodyLX5IgRqM2hVFearmuSJZ6oXqq0gUNGRMxc8dh5EQqVT0QZlyXIQ4F
+	 etXT6i1vGeJ5RoX8EkRCINNDi3i8VT8ku5D4EZpdBrqzEzSeJSEf90GB+anLl4UoRH
+	 7FZ+cJ1/yj+d36rbw+s4MnoP5+A9hlD57j74uR2wz2nI221xsN3sa4Mi/uZUt8vHWP
+	 /rii2zr+aeHKQtFAxAiZSc5YF1Jl9qkr8Sd3UDTYAaoBmS/XJVc4aH7CpARh+BueKu
+	 hLAcyUbh7E2YgFBnDHASK21zvo365fKEw/Zg6PeTkHWjqbP18g9HGV6OuIGetJcFhC
+	 CvzEOeZ+y4CCg==
+Date: Tue, 25 Mar 2025 14:54:34 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: chia-yu.chang@nokia-bell-labs.com
+Cc: netdev@vger.kernel.org, dave.taht@gmail.com, pabeni@redhat.com,
+ jhs@mojatatu.com, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
+ horms@kernel.org, andrew+netdev@lunn.ch, donald.hunter@gmail.com,
+ ast@fiberby.net, liuhangbin@gmail.com, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org, ij@kernel.org, ncardwell@google.com,
+ koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com,
+ ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
+ cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
+ vidhi_goel@apple.com
+Subject: Re: [PATCH v10 net-next 0/5] DUALPI2 patch
+Message-ID: <20250325145434.6c4085df@kernel.org>
+In-Reply-To: <20250325142836.47048-1-chia-yu.chang@nokia-bell-labs.com>
+References: <20250325142836.47048-1-chia-yu.chang@nokia-bell-labs.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] bluetooth-next 2025-03-25
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174293883804.738412.14650381382474284681.git-patchwork-notify@kernel.org>
-Date: Tue, 25 Mar 2025 21:40:38 +0000
-References: <20250325192925.2497890-1-luiz.dentz@gmail.com>
-In-Reply-To: <20250325192925.2497890-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Tue, 25 Mar 2025 15:28:31 +0100 chia-yu.chang@nokia-bell-labs.com
+wrote:
+> Please find DUALPI2 patch v10.
 
-This pull request was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+## Form letter - net-next-closed
 
-On Tue, 25 Mar 2025 15:29:25 -0400 you wrote:
-> The following changes since commit 8fa649fd7d3009769c7289d0c31c319b72bc42c4:
-> 
->   net: phy: dp83822: fix transmit amplitude if CONFIG_OF_MDIO not defined (2025-03-24 09:52:36 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2025-03-25
-> 
-> [...]
+The merge window for v6.15 has begun and therefore net-next is closed for
+new drivers, features, code refactoring and optimizations. We are currently
+accepting bug fixes only.
 
-Here is the summary with links:
-  - [GIT,PULL] bluetooth-next 2025-03-25
-    https://git.kernel.org/netdev/net-next/c/4f74a45c6b19
+Please repost when net-next reopens after Apr 7th.
 
-You are awesome, thank you!
+RFC patches sent for review only are obviously welcome at any time.
+
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: defer
+pv-bot: closed
 
