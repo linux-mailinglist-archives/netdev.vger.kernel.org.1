@@ -1,65 +1,107 @@
-Return-Path: <netdev+bounces-177462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F805A7042E
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 15:48:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BF51A70425
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 15:47:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A510171646
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 14:48:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F8D7188B43F
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 14:47:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D4A625BAAC;
-	Tue, 25 Mar 2025 14:47:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 080CC257AC2;
+	Tue, 25 Mar 2025 14:47:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="M0GQ80LD"
+	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="AnIvuOts"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2048.outbound.protection.outlook.com [40.107.20.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2107725A640
-	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 14:47:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742914065; cv=none; b=sL9M57Ew5UJdQBF6wVbIS0CaRhcL+axNCyaxpM7CQt5hWXZSyVBAJC5OAWXBI/Afc7M3rt86JiEzIVfkwaghQ3DDqL+VgdRKa5BsVBRB2+iWY+q8MOU/T8yTXl6/nMkNoSvF5r1T7n45Dfr49x0GHpNKYHPyv3VTLlSpCuP8Vog=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742914065; c=relaxed/simple;
-	bh=6tCgdCxUoslKrQ/ImEbkLjcgZlfYHCZbXA2Xtm38wu0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fzMHvp5D9Ioja9nb/XZBMvxjP6nUeqsN8dlVvsqwK+mW0/mdnNnbRooT9fE3mGPGRbKzNcn6GkUtLqiiruK6s6Bmqr2tF6ISjWoPjw/CYdiiyKo/qPRrvcaiej/kah08JRaxNPeCCoQnhjhGY54UwnvgZRbumEflHd+rJxpU774=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=M0GQ80LD; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1742914062;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8xwJEyFiNpZJx3SaGRoYy6EGc/eXAk39jTVoaj7Yj4Y=;
-	b=M0GQ80LDJ/lC/A+AKKrvato8INN3kffgFKiNBRLjChpIIGsxc7DiHprLhehJ9EqGT09p0r
-	YLB21lNJ+5YNljlYUWPCVbklaEtJ99QzTa/83GKAOWDov5fpwRaecIRPZFu71YMTJ9VtFy
-	PH/TIitAGXu1VoNfAMRTRi1BplbRJOc=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC6441DE3D9;
+	Tue, 25 Mar 2025 14:47:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742914039; cv=fail; b=gzO6ePFzekOBC4pCVigTW4lnadNwZl6nEqmu6Y5/06AeCXtYdt6ncP0NHiKa8hqnvbE93HAp23FO8fUrsM/hj+kHbQSnpRBMx8M1+lAZPAo45+E2bRt/a+OUCce9IagAoEBSE7t76o7XneEzihRPhjYlJeJp4le+pfD1hlFOMCM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742914039; c=relaxed/simple;
+	bh=4sgpQ7f4I3yUANtvVpOPWHyCFoHGvRHomTsAc5RHcF8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Ob6zzf1NaX7OgT+Z3MTaUam3R1eHsoFBQNRQ45uPkmSNtw+N02qJVghEEMPT+WoZ40XYZk/FFIP1ImBwMaxFAbVsUlG5VZtM6faQ5zy5xLhn3R3sKNAS7tailzMm4h9ENpopEw0ZmfsjBO0vn5BnvearDo/WKwnSO7xO7hetZqQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=AnIvuOts; arc=fail smtp.client-ip=40.107.20.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=usOzQKKAbnnxa7UzcnAqLK4VCwE3frVF/rQTocjFePDuRVfAp8ARPGLVK7pNJBAs3Th9DjHDpU84Gc83iSJ4ZGTZRr35ne0isyM373cXFGs8NiLRMZQCTYnb/OR9vpgMEJrRbvxYaCdBs1+BxRqGK8Jp4GdcvEngfly8IG5HyU0oDmlGCPo2DLYR+TEMgjF4UNaCc6tXm4rsRKFz8gQoAbmihf+AnTc9fhfujjwjtuuU4DHt487qbV6Wv6Q7XTeubYnwJSfyI5fxHgMcuh92zRTKyK80ZcXSbZOOtycyWqAXdsGwCLAKQOEVJNzYlGlQ4EFNxuwThKh9qD33B9/Tlg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VOExgHc3dICviRF58uoTasWU3DOp9GwRx1JceNTDDqw=;
+ b=CzosL7V1DlT7OU4FaNsVerExSHspK5P+5TrO1En5gFGV8Yv20ZRuY1DvwKYc28hzGcL8EgTlyKUcGG03Inmb29M/rSVE2rSXYgv7W/XPRzIR96v+zEMCbzlRcrUiIf2jXX/6IaITNUcCFyBUQgI8sxBFzZBthyGolUSqx7SpKcaUuBySBjRMTYjPerSWr7Y8n9ttaS9dq6nsxdG7DopUSKjV8Sh8uixxaUZy7vlbzbM7obcQrQCTVhklCFfjCJ/HKK4ZmHEQgGdoXdu68EYbCbbsin+H0jjV8BDwoqeLswrO5HjMpc/4loIHfgSOqErjTTMKkLorfc+i9H/UCTXUCQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 131.228.2.20) smtp.rcpttodomain=apple.com smtp.mailfrom=nokia-bell-labs.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none
+ header.from=nokia-bell-labs.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VOExgHc3dICviRF58uoTasWU3DOp9GwRx1JceNTDDqw=;
+ b=AnIvuOts5/c1ZI+Khxoa97PKl9FS4xHZerhW1LmFKc97b1Xv2eqdsMruCj8LA3BlqqLkAAvmVXNCwab5AFJA6MCNS45l2/OxzacwALmmbX3BdUsTiB0I+doizcQ1iMcmAEmOEkl2UgQpVNt7MxGE9+0Du08K1ykKdq6c2tSdNGSpPcp/DC5As9Qhz7uuMPTlVFh5wPvAdlGRZisn7oIsgsIs8ypBsZEe+Etw8rh7jwEYcr8VeQ5tr1hio7D9eTZzsuE2SafRDq9OgKnhacx15X5KQVzjXtVkrFwX5i52sWzTCkInEKkXzrPMMzZkm7Ovi88NYvk92lUsyLUriJaDJw==
+Received: from AS4P250CA0008.EURP250.PROD.OUTLOOK.COM (2603:10a6:20b:5df::9)
+ by DBBPR07MB7644.eurprd07.prod.outlook.com (2603:10a6:10:1eb::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.42; Tue, 25 Mar
+ 2025 14:47:11 +0000
+Received: from AMS1EPF0000004B.eurprd04.prod.outlook.com
+ (2603:10a6:20b:5df:cafe::dd) by AS4P250CA0008.outlook.office365.com
+ (2603:10a6:20b:5df::9) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8534.42 via Frontend Transport; Tue,
+ 25 Mar 2025 14:47:10 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 131.228.2.20)
+ smtp.mailfrom=nokia-bell-labs.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nokia-bell-labs.com;
+Received-SPF: Pass (protection.outlook.com: domain of nokia-bell-labs.com
+ designates 131.228.2.20 as permitted sender) receiver=protection.outlook.com;
+ client-ip=131.228.2.20; helo=fihe3nok0734.emea.nsn-net.net; pr=C
+Received: from fihe3nok0734.emea.nsn-net.net (131.228.2.20) by
+ AMS1EPF0000004B.mail.protection.outlook.com (10.167.16.136) with Microsoft
+ SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.8534.20
+ via Frontend Transport; Tue, 25 Mar 2025 14:47:10 +0000
+Received: from sarah.nbl.nsn-rdnet.net (sarah.nbl.nsn-rdnet.net [10.0.73.150])
+	by fihe3nok0734.emea.nsn-net.net (Postfix) with ESMTP id 25D63201D1;
+	Tue, 25 Mar 2025 16:47:09 +0200 (EET)
+From: chia-yu.chang@nokia-bell-labs.com
 To: netdev@vger.kernel.org,
-	edumazet@google.com
-Cc: linux-kernel@vger.kernel.org,
-	kuniyu@amazon.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
+	dave.taht@gmail.com,
 	pabeni@redhat.com,
+	jhs@mojatatu.com,
+	kuba@kernel.org,
+	stephen@networkplumber.org,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
 	horms@kernel.org,
-	dsahern@kernel.org,
+	andrew+netdev@lunn.ch,
+	donald.hunter@gmail.com,
+	ast@fiberby.net,
+	liuhangbin@gmail.com,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	ij@kernel.org,
 	ncardwell@google.com,
-	mrpre@163.com,
-	Jiayuan Chen <jiayuan.chen@linux.dev>
-Subject: [PATCH net-next v3 2/2] tcp: add LINUX_MIB_PAWS_TW_REJECTED counter
-Date: Tue, 25 Mar 2025 22:47:04 +0800
-Message-ID: <20250325144704.14363-3-jiayuan.chen@linux.dev>
-In-Reply-To: <20250325144704.14363-1-jiayuan.chen@linux.dev>
-References: <20250325144704.14363-1-jiayuan.chen@linux.dev>
+	koen.de_schepper@nokia-bell-labs.com,
+	g.white@cablelabs.com,
+	ingemar.s.johansson@ericsson.com,
+	mirja.kuehlewind@ericsson.com,
+	cheshire@apple.com,
+	rs.ietf@gmx.at,
+	Jason_Livingood@comcast.com,
+	vidhi_goel@apple.com
+Cc: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+Subject: [PATCH v5 iproute2-next 0/1] DualPI2 iproute2 patch
+Date: Tue, 25 Mar 2025 15:47:06 +0100
+Message-Id: <20250325144707.47238-1-chia-yu.chang@nokia-bell-labs.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,97 +109,103 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AMS1EPF0000004B:EE_|DBBPR07MB7644:EE_
+Content-Type: text/plain
+X-MS-Office365-Filtering-Correlation-Id: 4abeed98-b474-4473-332d-08dd6babec68
+X-LD-Processed: 5d471751-9675-428d-917b-70f44f9630b0,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+ BCL:0;ARA:13230040|7416014|376014|82310400026|36860700013|1800799024|13003099007|921020;
+X-Microsoft-Antispam-Message-Info:
+ =?us-ascii?Q?0kUnX5u4IN9lx/iAyxvaxlxhB5Hpi1LAr4R74deTCEHRAkjIzwoiOzgIV3sT?=
+ =?us-ascii?Q?p++1FVBhByHLJTvWvy98THvRc721BjOvjkYkq6k0W0zQUqHe6Z6mEadiYbCd?=
+ =?us-ascii?Q?zuj8PBxmb0gFv16u7asYr55al/O2ytnw7EL8D1DeiDtVN47xRxjHlZlQc253?=
+ =?us-ascii?Q?kBo9JCEeaO8slP7ZzaDtYGwEaPyKHTzdBqkSlsgY9egEGXRGYDjL5B6X1wSI?=
+ =?us-ascii?Q?5sHXQperGplMsVRWtwszIeRl68AJOMh8qqg0hR83OsDpE+wf13+SixLY/Ks7?=
+ =?us-ascii?Q?Agj8Fr48d86/+VB0fKHKGNKY2l9qfBRLmifJbG4ghLuyQBXjzRirXZJIC0TG?=
+ =?us-ascii?Q?BWNHLCRrSXkaqkNSGR00Z5zkb9qnQ+1FLYRsEnpbrkarjQZzzVxK+hf7WvjA?=
+ =?us-ascii?Q?h17ocshHWdRo1OY66aVBNcz6DcSnNO8PNJz7r6F6qbuXKsZMtOuH1cwyYGte?=
+ =?us-ascii?Q?bG6DyYuk0zXzaPYzcz3dPkDFL1rpetUYiqFsXiW4YIk7ugSRANmHKUE7XTVg?=
+ =?us-ascii?Q?EDR12vdVxZv45pVEaNTbGHRYJx8HB5iq2GFwuu631BakudJ/+iLlImI+c4yo?=
+ =?us-ascii?Q?75+4wI8kKeGpMfxUDIWPMGTEkFIhLcs6uLV/JfdcyAQ0IZsjiTTIYJBNtx4K?=
+ =?us-ascii?Q?dmLnxEblEerbf/RQUZX3lOExQbrOUX8FM6ZnLBSvHzgTnMviZPMtA4U/ckV1?=
+ =?us-ascii?Q?KAtow/g8EsCKiZczSJG01cPJi3PHkfPxr899hC3Jtt4OpUUY33AtMIqgWhrr?=
+ =?us-ascii?Q?wxYgEA9PYsllgXABK6EMX2083VCYqI1LcKn3bOWR7RrmevFqZHbTScBCrQCc?=
+ =?us-ascii?Q?uOJ/o+9qgXP2OkMy4Mie8Zh/BEneCZa5qd9+Y5mnIrtqrETwfYZQ1RwH+/6B?=
+ =?us-ascii?Q?Xb8dxe4zstigq8fFWAIFKFvsXeb9Jg7yIUlgHCfn5VQr6y7YlFtjXqCbbDX0?=
+ =?us-ascii?Q?vTAXinjkre2sIvZvYtIEBjgvr7tIdyP59hUwD3VDzoSchFeaUfPW2JmQ99rT?=
+ =?us-ascii?Q?k04eyqrlA2m1tzMDRV2x4h+pzK0V6Ji3kP1x4wg5DhSpAbVdGKbas9hTwIkn?=
+ =?us-ascii?Q?/u7x1QlwTg0Y/o0HKlxNR7J+/pW+bWPJQsdwruPEla7CMXQWTBQosEGUUtJN?=
+ =?us-ascii?Q?oIMKF+SNAK8XKDTrLDrxs8TYe4yVAJaHE4ZP1yfg2FYcayVNfXMLb6lEhH7x?=
+ =?us-ascii?Q?sAofc7iDVhYEtDmbrxSoTiKz3hb1GjqwKBrJ5gaa8767aif2GFuTyao0/9mp?=
+ =?us-ascii?Q?Efqg4RcY28wGlDQtiSYDO/BZO1WHUtCGG+BDA3TVe1qYi9YQBHb6re/J8Ivp?=
+ =?us-ascii?Q?do0CrKCZAwn0RWsDRvYEXETyOOeP3XMpZcqonnWguz4zV9jnwaZdYCAcEtTL?=
+ =?us-ascii?Q?f+Gsr06xG1C6g4q8Ye15YSaXlIebcFBg/jNEkLwGndanMf6/EX91c12yQlGq?=
+ =?us-ascii?Q?HuPuJlNaPQngeVxSRoUQ/BxDHl/V/gzX9CNMb2vVKekryeTtWaReA887OLOJ?=
+ =?us-ascii?Q?Zax+OZNHkGxmXWKrINdAmsXWK67KY6MQgtfQNzDHeMS01Mn1K70XGy32Id1h?=
+ =?us-ascii?Q?BTKz38B6JfPHkgEwGEY=3D?=
+X-Forefront-Antispam-Report:
+ CIP:131.228.2.20;CTRY:FI;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:fihe3nok0734.emea.nsn-net.net;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(376014)(82310400026)(36860700013)(1800799024)(13003099007)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: nokia-bell-labs.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Mar 2025 14:47:10.5528
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4abeed98-b474-4473-332d-08dd6babec68
+X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5d471751-9675-428d-917b-70f44f9630b0;Ip=[131.228.2.20];Helo=[fihe3nok0734.emea.nsn-net.net]
+X-MS-Exchange-CrossTenant-AuthSource: AMS1EPF0000004B.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR07MB7644
 
-When TCP is in TIME_WAIT state, PAWS verification uses
-LINUX_PAWSESTABREJECTED, which is ambiguous and cannot be distinguished
-from other PAWS verification processes.
+From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
 
-Moreover, when PAWS occurs in TIME_WAIT, we typically need to pay special
-attention to upstream network devices, so we added a new counter, like the
-existing PAWS_OLD_ACK one.
+Hello,
 
-Also we update the doc with previously missing PAWS_OLD_ACK.
+  Please find DUALPI2 iproute2 patch v4.
 
-usage:
-'''
-nstat -az | grep PAWSTimewait
-TcpExtPAWSTimewait              1                  0.0
-'''
+v5 (25-Mar-25)
+- Use matches() to replace current strcmp() (Stephen Hemminger <stephen@networkplumber.org>)
+- Use general parse_percent() for handling scaled percentage values (Stephen Hemminger <stephen@networkplumber.org>)
+- Add print function for JSON of dualpi2 stats (Stephen Hemminger <stephen@networkplumber.org>)
 
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
----
- Documentation/networking/net_cachelines/snmp.rst | 2 ++
- include/net/dropreason-core.h                    | 1 +
- include/uapi/linux/snmp.h                        | 1 +
- net/ipv4/proc.c                                  | 1 +
- net/ipv4/tcp_minisocks.c                         | 2 +-
- 5 files changed, 6 insertions(+), 1 deletion(-)
+v4 (16-Mar-25)
+- Add min_qlen_step to dualpi2 attribute as the minimum queue length in number of packets in the L-queue to start step amrking.
 
-diff --git a/Documentation/networking/net_cachelines/snmp.rst b/Documentation/networking/net_cachelines/snmp.rst
-index bc96efc92cf5..bd44b3eebbef 100644
---- a/Documentation/networking/net_cachelines/snmp.rst
-+++ b/Documentation/networking/net_cachelines/snmp.rst
-@@ -37,6 +37,8 @@ unsigned_long  LINUX_MIB_TIMEWAITKILLED
- unsigned_long  LINUX_MIB_PAWSACTIVEREJECTED
- unsigned_long  LINUX_MIB_PAWSESTABREJECTED
- unsigned_long  LINUX_MIB_TSECR_REJECTED
-+unsigned_long  LINUX_MIB_PAWS_OLD_ACK
-+unsigned_long  LINUX_MIB_PAWS_TW_REJECTED
- unsigned_long  LINUX_MIB_DELAYEDACKLOST
- unsigned_long  LINUX_MIB_LISTENOVERFLOWS
- unsigned_long  LINUX_MIB_LISTENDROPS
-diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-index 9701d7f936f6..bea77934a235 100644
---- a/include/net/dropreason-core.h
-+++ b/include/net/dropreason-core.h
-@@ -287,6 +287,7 @@ enum skb_drop_reason {
- 	/**
- 	 * @SKB_DROP_REASON_TCP_RFC7323_TW_PAWS: PAWS check, socket is in
- 	 * TIME_WAIT state.
-+	 * Corresponds to LINUX_MIB_PAWS_TW_REJECTED.
- 	 */
- 	SKB_DROP_REASON_TCP_RFC7323_TW_PAWS,
- 	/**
-diff --git a/include/uapi/linux/snmp.h b/include/uapi/linux/snmp.h
-index eb9fb776fdc3..cca7f7eb6e9c 100644
---- a/include/uapi/linux/snmp.h
-+++ b/include/uapi/linux/snmp.h
-@@ -188,6 +188,7 @@ enum
- 	LINUX_MIB_PAWSESTABREJECTED,		/* PAWSEstabRejected */
- 	LINUX_MIB_TSECRREJECTED,		/* TSEcrRejected */
- 	LINUX_MIB_PAWS_OLD_ACK,			/* PAWSOldAck */
-+	LINUX_MIB_PAWS_TW_REJECTED,		/* PAWSTimewait */
- 	LINUX_MIB_DELAYEDACKS,			/* DelayedACKs */
- 	LINUX_MIB_DELAYEDACKLOCKED,		/* DelayedACKLocked */
- 	LINUX_MIB_DELAYEDACKLOST,		/* DelayedACKLost */
-diff --git a/net/ipv4/proc.c b/net/ipv4/proc.c
-index 10cbeb76c274..ea2f01584379 100644
---- a/net/ipv4/proc.c
-+++ b/net/ipv4/proc.c
-@@ -191,6 +191,7 @@ static const struct snmp_mib snmp4_net_list[] = {
- 	SNMP_MIB_ITEM("PAWSEstab", LINUX_MIB_PAWSESTABREJECTED),
- 	SNMP_MIB_ITEM("TSEcrRejected", LINUX_MIB_TSECRREJECTED),
- 	SNMP_MIB_ITEM("PAWSOldAck", LINUX_MIB_PAWS_OLD_ACK),
-+	SNMP_MIB_ITEM("PAWSTimewait", LINUX_MIB_PAWS_TW_REJECTED),
- 	SNMP_MIB_ITEM("DelayedACKs", LINUX_MIB_DELAYEDACKS),
- 	SNMP_MIB_ITEM("DelayedACKLocked", LINUX_MIB_DELAYEDACKLOCKED),
- 	SNMP_MIB_ITEM("DelayedACKLost", LINUX_MIB_DELAYEDACKLOST),
-diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-index 27511bf58c0f..43d7852ce07e 100644
---- a/net/ipv4/tcp_minisocks.c
-+++ b/net/ipv4/tcp_minisocks.c
-@@ -248,7 +248,7 @@ tcp_timewait_state_process(struct inet_timewait_sock *tw, struct sk_buff *skb,
- 
- 	if (paws_reject) {
- 		*drop_reason = SKB_DROP_REASON_TCP_RFC7323_TW_PAWS;
--		__NET_INC_STATS(twsk_net(tw), LINUX_MIB_PAWSESTABREJECTED);
-+		__NET_INC_STATS(twsk_net(tw), LINUX_MIB_PAWS_TW_REJECTED);
- 	}
- 
- 	if (!th->rst) {
+v3 (21-Feb-25)
+- Add memlimit to dualpi2 attribute, and add memory_used, max_memory_used, memory_limit in dualpi2 stats (Dave Taht <dave.taht@gmail.com>)
+- Update manual to align latest implementation and clarify the queue naming and default unit
+- Use common "get_scaled_alpha_beta" and clean print_opt for Dualpi2
+
+v2 (23-Oct-24)
+- Rename get_float in dualpi2 to get_float_min_max in utils.c
+- Move get_float from iplink_can.c in utils.c (Stephen Hemminger <stephen@networkplumber.org>)
+- Add print function for JSON of dualpi2 (Stephen Hemminger <stephen@networkplumber.org>)
+
+For more details of DualPI2, plesae refer IETF RFC9332
+(https://datatracker.ietf.org/doc/html/rfc9332).
+
+Best Regards,
+Chia-Yu
+
+Chia-Yu Chang (1):
+  tc: add dualpi2 scheduler module
+
+ bash-completion/tc             |  11 +-
+ include/uapi/linux/pkt_sched.h |  39 +++
+ include/utils.h                |   2 +
+ ip/iplink_can.c                |  14 -
+ lib/utils.c                    |  30 ++
+ man/man8/tc-dualpi2.8          | 249 ++++++++++++++++
+ tc/Makefile                    |   1 +
+ tc/q_dualpi2.c                 | 519 +++++++++++++++++++++++++++++++++
+ 8 files changed, 850 insertions(+), 15 deletions(-)
+ create mode 100644 man/man8/tc-dualpi2.8
+ create mode 100644 tc/q_dualpi2.c
+
 -- 
-2.47.1
+2.34.1
 
 
