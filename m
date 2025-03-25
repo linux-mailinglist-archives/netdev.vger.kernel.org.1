@@ -1,152 +1,136 @@
-Return-Path: <netdev+bounces-177538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9297A707EB
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 18:20:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F243DA70800
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 18:21:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 873791887BC5
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 17:20:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 881A4169CCD
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 17:21:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC88C2620C1;
-	Tue, 25 Mar 2025 17:19:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B08C261396;
+	Tue, 25 Mar 2025 17:20:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JrjVHxK4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1896313633F;
-	Tue, 25 Mar 2025 17:19:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C65C1ACEA6;
+	Tue, 25 Mar 2025 17:20:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742923195; cv=none; b=JVnlwqVX6P2mPQEyZ+/VCGqJ4P18sGpLohEiLA42NvMdcuwFnvm6Gts6MotbeIPjngeCkr7IXavTEdHtxZ54NYjKzjnieHJbw52OYu20xq+NTnzQV8+qEdFr9x29mvagLSgEdt93kTrsER3utBA5TBu0NaZouBObCpg2MWJ/vlo=
+	t=1742923258; cv=none; b=oMsSY2LdwRxHI6u//+LbK2qi4P+DSyBqHzn6oIooEl1aTJqR/EoawgXppVnUKphb0WWWA66ZnEsF+jiP6k3IT5/+B2KhMcj3GrsfF1POgZ/rIIpIgPeaW6dZ6tL156WAiEKTYtKJwP7UO81JGNzmAqk0hGH+rgEP9UocgyIP1TI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742923195; c=relaxed/simple;
-	bh=XhmLROfnnL3FtaOH27gIOe9sbljr3QNEJt4khOaoGEw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=thXfkLpcysvlslOLNwAsjXCeCS6JfK6KctSbO2VGPV3RuKnyk0b5C13uS18qMml/OaXFTQll1YJumJb0xtEBlz6OVXMzXwT+u0OP1YIXmFUMXF7N6mj6jdKsM0A+dPbTQIyLF0c2blFZmvdsLhtgQIwwYgh2AD86/cle9R4yFAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.2.102] (213.87.136.199) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 25 Mar
- 2025 20:19:41 +0300
-Message-ID: <05fec753-cdaa-45a5-a029-b6435c30eb07@omp.ru>
-Date: Tue, 25 Mar 2025 20:19:39 +0300
+	s=arc-20240116; t=1742923258; c=relaxed/simple;
+	bh=xc1ElJ+b62y35nkWclbBi+8sfEbTXnBuisi6UIeMPJ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CE/GmHQiZAbzpQYS1Q/ph9KBCd2XEL9LsnEFKrERs0P5nNrih2S8XCfniWs6TMp6vxeI2yk8zKQKCgslxIC4XtO4Ja+eiCbBhdqKtw+bpXgz+WVZABdOjx9mASPDH1Phyz+x0W7Rg7urIM3WfQLPgl4+FIZ9Vg83LdeB4Ot9LFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JrjVHxK4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AEABC4CEE4;
+	Tue, 25 Mar 2025 17:20:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742923257;
+	bh=xc1ElJ+b62y35nkWclbBi+8sfEbTXnBuisi6UIeMPJ8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JrjVHxK4qUYgdAElLMMKqzlJL6Nkc6XDXr0vM1YN5NBCHJG/j+YfSIXUjSSe7T6r9
+	 /deraSB+/od4aB7zmCzwXQz2DlVcoMq0mnilNc7CdQTK65JUJuogbM9tzBYmaUGMYP
+	 ute+DegIAWcQzgtAdujrIJBZ4xqzlW5YQJif1GO46z4ryTfaQ3IDVfG81bbS9m4v/6
+	 UcnBxZQjyhIl0/ymnIKFxFPSLwF88wtqfBmd1kAskMFlnIZ1Ut8VbIPVa0tEYP0gsd
+	 cimXHWRQOVEayDRaDhOoX3As6Ao03ASrQ1go6UJDitIKmveWaRelKhU1aLJ3AmJFIM
+	 nCeXT7uz7foJw==
+Date: Tue, 25 Mar 2025 17:20:53 +0000
+From: Simon Horman <horms@kernel.org>
+To: Justin Lai <justinlai0215@realtek.com>
+Cc: "kuba@kernel.org" <kuba@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Ping-Ke Shih <pkshih@realtek.com>,
+	Larry Chiu <larry.chiu@realtek.com>
+Subject: Re: [PATCH net-next] rtase: Add ndo_setup_tc support for CBS offload
+ in traffic control setup
+Message-ID: <20250325172053.GX892515@horms.kernel.org>
+References: <20250314094021.10120-1-justinlai0215@realtek.com>
+ <20250319123407.GC280585@kernel.org>
+ <6824bd62f05644ec8d301457449eae19@realtek.com>
+ <ab27fd1a1e9d40759e090346eafb5881@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH V3 25/43] rv64ilp32_abi: exec: Adapt 64lp64 env and
- argv
-To: <guoren@kernel.org>, <arnd@arndb.de>, <gregkh@linuxfoundation.org>,
-	<torvalds@linux-foundation.org>, <paul.walmsley@sifive.com>,
-	<palmer@dabbelt.com>, <anup@brainfault.org>, <atishp@atishpatra.org>,
-	<oleg@redhat.com>, <kees@kernel.org>, <tglx@linutronix.de>,
-	<will@kernel.org>, <mark.rutland@arm.com>, <brauner@kernel.org>,
-	<akpm@linux-foundation.org>, <rostedt@goodmis.org>, <edumazet@google.com>,
-	<unicorn_wang@outlook.com>, <inochiama@outlook.com>, <gaohan@iscas.ac.cn>,
-	<shihua@iscas.ac.cn>, <jiawei@iscas.ac.cn>, <wuwei2016@iscas.ac.cn>,
-	<drew@pdp7.com>, <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	<ctsai390@andestech.com>, <wefu@redhat.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <josef@toxicpanda.com>, <dsterba@suse.com>,
-	<mingo@redhat.com>, <peterz@infradead.org>, <boqun.feng@gmail.com>,
-	<xiao.w.wang@intel.com>, <qingfang.deng@siflower.com.cn>,
-	<leobras@redhat.com>, <jszhang@kernel.org>, <conor.dooley@microchip.com>,
-	<samuel.holland@sifive.com>, <yongxuan.wang@sifive.com>,
-	<luxu.kernel@bytedance.com>, <david@redhat.com>, <ruanjinjie@huawei.com>,
-	<cuiyunhui@bytedance.com>, <wangkefeng.wang@huawei.com>,
-	<qiaozhe@iscas.ac.cn>
-CC: <ardb@kernel.org>, <ast@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-riscv@lists.infradead.org>, <kvm@vger.kernel.org>,
-	<kvm-riscv@lists.infradead.org>, <linux-mm@kvack.org>,
-	<linux-crypto@vger.kernel.org>, <bpf@vger.kernel.org>,
-	<linux-input@vger.kernel.org>, <linux-perf-users@vger.kernel.org>,
-	<linux-serial@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-	<linux-arch@vger.kernel.org>, <maple-tree@lists.infradead.org>,
-	<linux-trace-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-atm-general@lists.sourceforge.net>, <linux-btrfs@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <coreteam@netfilter.org>,
-	<linux-nfs@vger.kernel.org>, <linux-sctp@vger.kernel.org>,
-	<linux-usb@vger.kernel.org>, <linux-media@vger.kernel.org>
-References: <20250325121624.523258-1-guoren@kernel.org>
- <20250325121624.523258-26-guoren@kernel.org>
-Content-Language: en-US
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-In-Reply-To: <20250325121624.523258-26-guoren@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 03/25/2025 16:50:54
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 192097 [Mar 25 2025]
-X-KSE-AntiSpam-Info: Version: 6.1.1.11
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 51 0.3.51
- 68896fb0083a027476849bf400a331a2d5d94398
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: {Tracking_ip_hunter}
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.136.199
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 03/25/2025 16:52:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 3/25/2025 3:18:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ab27fd1a1e9d40759e090346eafb5881@realtek.com>
 
-On 3/25/25 3:16 PM, guoren@kernel.org wrote:
-
-> From: "Guo Ren (Alibaba DAMO Academy)" <guoren@kernel.org>
+On Mon, Mar 24, 2025 at 12:06:09PM +0000, Justin Lai wrote:
+> > 
+> > > On Fri, Mar 14, 2025 at 05:40:21PM +0800, Justin Lai wrote:
+> > > > Add support for ndo_setup_tc to enable CBS offload functionality as
+> > > > part of traffic control configuration for network devices.
+> > > >
+> > > > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
+> > >
+> > > ...
+> > >
+> > > > diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > > b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > > index 2aacc1996796..2a61cd192026 100644
+> > > > --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > > +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+> > > > @@ -1661,6 +1661,54 @@ static void rtase_get_stats64(struct
+> > > > net_device
+> > > *dev,
+> > > >       stats->rx_length_errors = tp->stats.rx_length_errors;  }
+> > > >
+> > > > +static void rtase_set_hw_cbs(const struct rtase_private *tp, u32
+> > > > +queue) {
+> > > > +     u32 idle = tp->tx_qos[queue].idleslope * RTASE_1T_CLOCK;
+> > > > +     u32 val, i;
+> > > > +
+> > > > +     val = u32_encode_bits(idle / RTASE_1T_POWER,
+> > > RTASE_IDLESLOPE_INT_MASK);
+> > > > +     idle %= RTASE_1T_POWER;
+> > > > +
+> > > > +     for (i = 1; i <= RTASE_IDLESLOPE_INT_SHIFT; i++) {
+> > > > +             idle *= 2;
+> > > > +             if ((idle / RTASE_1T_POWER) == 1)
+> > > > +                     val |= BIT(RTASE_IDLESLOPE_INT_SHIFT - i);
+> > > > +
+> > > > +             idle %= RTASE_1T_POWER;
+> > > > +     }
+> > > > +
+> > > > +     rtase_w32(tp, RTASE_TXQCRDT_0 + queue * 4, val); }
+> > > > +
+> > > > +static void rtase_setup_tc_cbs(struct rtase_private *tp,
+> > > > +                            const struct tc_cbs_qopt_offload *qopt)
+> > {
+> > > > +     u32 queue = qopt->queue;
+> > >
+> > > Hi Justin,
+> > >
+> > > Does queue need to be checked somewhere to make sure it is in range?
+> > 
+> > Hi Simon,
+> > 
+> > Thank you for your response. I will add a check to ensure that the queue is
+> > within the specified range.
 > 
-> The rv64ilp32 abi reuses the env and argv memory layout of the
-> lp64 abi, so leave the space to fit the lp64 struct layout.
+> Hi Simon,
 > 
-> Signed-off-by: Guo Ren (Alibaba DAMO Academy) <guoren@kernel.org>
-> ---
->  fs/exec.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/fs/exec.c b/fs/exec.c
-> index 506cd411f4ac..548d18b7ae92 100644
-> --- a/fs/exec.c
-> +++ b/fs/exec.c
-> @@ -424,6 +424,10 @@ static const char __user *get_user_arg_ptr(struct user_arg_ptr argv, int nr)
->  	}
->  #endif
->  
-> +#if defined(CONFIG_64BIT) && (BITS_PER_LONG == 32)
+> Given that our hardware supports CBS offload on each queue, could it
+> be possible that checking the range of qopt->queue might not be
+> necessary?
 
-   Parens don't seem necessary...
+Hi Justin,
 
-> +	nr = nr * 2;
-
-   Why not nr *= 2?
-
-[...]
-
-MBR, Sergey
-
+If qopt->queue can only be a valid queue, and all queues support
+CBS, then I guess it would not be necessary.
 
