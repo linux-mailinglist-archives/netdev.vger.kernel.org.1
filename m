@@ -1,298 +1,273 @@
-Return-Path: <netdev+bounces-177573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 518A4A70A5F
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 20:27:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A386AA70A66
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 20:27:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF378189D735
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 19:26:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8A35189B8B4
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 19:26:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 788FB1F3FD7;
-	Tue, 25 Mar 2025 19:23:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C4111F3BA3;
+	Tue, 25 Mar 2025 19:24:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nm9f4hVn"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="jrdq2tHQ";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="ljT5YVPm"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9397F1EEA34
-	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 19:23:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742930620; cv=none; b=UL2J0WOQBYejCH2bVuf97aPyBYXQQXSqRofGvokeV6qG+vmdjBleAesLXSNVPNqPOqAeruLnkPQOcKsR4AXtiXD4y+VmiUr4Q5wBIGd0DsbGF0aoKY6e1KdzOH5Hf5JAGNEtzXUuQzZsYKygwC35gVhB+P5H4/xOUpc0bPmKxyA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742930620; c=relaxed/simple;
-	bh=8z94sMCyK4xn3BNGUZOo9yevWIuKH3eaWMKO1mo26yE=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=dmbzXHZp6WH1MWBrlZwfRMPwak80EL4sih5b88TeMZXA3A/Nt4Ah3TwvvxG89YsUuWBBjz27bhGpEHkwE5k0V2aEdRPTRsGqmBbCRkPOid8QbyP6F8a+/YmwftMGGp0zyNKJWWlf0zs7Wl1TK2gQqkDkM7AGMEeYJ7Gectht0K8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nm9f4hVn; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742930616;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dGPc+KKvUVF0/VjyiBK6ry9YOHGHtkPR3f81nyTsSVw=;
-	b=Nm9f4hVnhJD/WQilA7iHwerEzjxGxG/Qw3trHCkJSEFN3goFVRSTPWPEm447lL3tDEL8IF
-	9bEacy0AyL9mqqXdYCayf8EVU/0I4schgTv9b30QnFfbjsQEoUuT48LjBmBL9/TMJYj+fy
-	tSAVpXiB2bt5UqfUWHu4BdhUrtsKHhM=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-197-6o2r3U6ENt2LxGyVhr6oow-1; Tue, 25 Mar 2025 15:23:34 -0400
-X-MC-Unique: 6o2r3U6ENt2LxGyVhr6oow-1
-X-Mimecast-MFC-AGG-ID: 6o2r3U6ENt2LxGyVhr6oow_1742930614
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7c5cd0f8961so510986185a.1
-        for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 12:23:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742930613; x=1743535413;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dGPc+KKvUVF0/VjyiBK6ry9YOHGHtkPR3f81nyTsSVw=;
-        b=agpgrL5p8Wf9a+lYN+EPx8pQw3OIwoT3Mx4NaK8apIArwkkyYXzzxY8JNqoDBrmjmq
-         UrLBHEBE8r4AwE1JrJz0RHuzapfQVIrV+TMjRyjQlL2AKKguG1h7RfpctJ2/LJ+jtBpw
-         zfUfw+RJCb0ibT4ehJAgwhyYKF94/5EimH7YvUnsQ5IDujF+f4p7yEMP9JOgradxJ+B2
-         xqe6L031Hxf39dWO4fagbxR3lXFUnqfGw0jdd9x+GSPd2l8PxespMwYZdnphUkzhkIM0
-         IKHmjrdVMGZ+J4On4gcifzD2f/h9NAcyGvFqakPWCm0TiBOtEOhy+/DndEpKl/M600Rm
-         AvOg==
-X-Forwarded-Encrypted: i=1; AJvYcCV3wNDTOPPsT5KIO+/wLnER20ls5+V4UGY+ZoyoiYYRA04L5pYS+uVV7FB8ISAd6sW3epjvHUQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxV/2HO6f3+OkliQJGmTFRBLUL7yJX/K5e5sZxgZEB5LR3gpshf
-	GV96WT+sy1KLcQdz5x519MgFlu4rDPEfeIXsFFw3zJrlC8A8n4FXuqMvcv8Z0NuwJrPiUkS4aF0
-	/q8Y4zM8T22PF6oA9pDeclJIBQRk7f7iDSxHmxJ2XDY9pX5MYoC0aPQeqJbR/rg==
-X-Gm-Gg: ASbGnctERqRxcT2ztdsaDoUMnsGx45RpNfBRM5hqaTql4j33hBhKYj9bcGK4ft6uhJN
-	zwzeVxXTsMlehGS2A9idXzWbXUkQb0KP54dPSQ9QwRMoFuqqTOhj0wAqdIcsaJkCwtFlWi9Szry
-	dTDk3MtOFSJuYsTWY7kpZKYScdDNIeEiDlF6nH8ePu48nFX6lmwIva21Xw0B4CcnIFbdXdI75Zl
-	2rWdxPlMjfKBcZ3sdwHpT5GgK+j4kUIqdNh/6ZH257J9GqGr1T9DWhB7gAH4Gp9V7v9Pi0uMFQW
-	V+3lGAIwnXn5MDv84Io56dXPKnqTqMn870fBx6A957+0xsZGJsLFgawylllkcA==
-X-Received: by 2002:a05:620a:2683:b0:7c5:6b15:1483 with SMTP id af79cd13be357-7c5ba12cb62mr2775738785a.6.1742930613372;
-        Tue, 25 Mar 2025 12:23:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFogfXST9P0quyNTvTYHHUG/U9QamkUBcHk6+jhsZnC+sfG6DsPIcTVrpmHkrdnH+xI8GXzUA==
-X-Received: by 2002:a05:620a:2683:b0:7c5:6b15:1483 with SMTP id af79cd13be357-7c5ba12cb62mr2775733185a.6.1742930612876;
-        Tue, 25 Mar 2025 12:23:32 -0700 (PDT)
-Received: from ?IPV6:2601:188:c100:5710:315f:57b3:b997:5fca? ([2601:188:c100:5710:315f:57b3:b997:5fca])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c5b93554c6sm671693185a.101.2025.03.25.12.23.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Mar 2025 12:23:32 -0700 (PDT)
-From: Waiman Long <llong@redhat.com>
-X-Google-Original-From: Waiman Long <longman@redhat.com>
-Message-ID: <f1ae824f-f506-49f7-8864-1adc0f7cbee6@redhat.com>
-Date: Tue, 25 Mar 2025 15:23:30 -0400
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942E71EA7C7;
+	Tue, 25 Mar 2025 19:24:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742930697; cv=fail; b=sYQ/nlNzRUo9aNA0xC7OE0Ona0EyZpXmU6uxqTkNhSlh4CP5mHm3jm2aJpPMnp32qrdLfmrZpg6wWJHn9N60tgH4ibmG0z/Z3KhVfuE9z4hWJEcqyo0PS0wpP53SRN5qFMZCM3tlcAT2GYtApZvX/1H1ABKppjtRsNog6wJHMVA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742930697; c=relaxed/simple;
+	bh=3xsz5Gx3BJS7S8m/eM6qmHntPMpSOqWFMWXvCv3iRO8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=kH7s2NUcQcS3sT8xe04cmJEf9tlw3WyXYH0tFZ+3MvrFNEl3IBhpYG1D38uDRlZbLwYeQnSM7lV/WnujxzO2+FDHr9q7IRdpsSwgMrgE6TUFl+9S6Z4b4yY0q2e09+RG4cRwNb0/32167jFBlwCE9tanRd/CUa94YVV1epZ+qig=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=jrdq2tHQ; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=ljT5YVPm; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52PJMwnJ020296;
+	Tue, 25 Mar 2025 19:23:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=corp-2023-11-20; bh=kb2FKXJWcj0rPaG9CV
+	DjKRJvpUNE9pPyvVcWO8xHaN0=; b=jrdq2tHQADdQo0QLDXTeOLdEcJ3fY5QKJb
+	/DQyyAlhmI+S6Lm42lK48gYwG/RGt9pdHdY7l/2aUCbpgOhvlMw+OgFfvmqmMYuz
+	HbhTzTM1NVNG+L/RoAVOoTz3usEEEao+BmnKPqu/42stNpoeYlK9HIITfxe25aK3
+	o+EJHBJeHLU9JAVKbMiStrfD9JPq84JmWBcgbN4tYld/9hkaGt4Xjbo5kk2NWI56
+	YdunAxZnru8mUXgBQ5wK3nF/dwcit/olhaGvwN49FxrowQkchlJsSF3N5hiInsJK
+	W1p5gZBSdyk2pI5dY2pAm0KePQT5PgUC5TY1VrP6/lHDH2+SFnQQ==
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 45hn8b8553-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 25 Mar 2025 19:23:53 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 52PIJ7D8008240;
+	Tue, 25 Mar 2025 19:23:52 GMT
+Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2048.outbound.protection.outlook.com [104.47.58.48])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 45jj6uk3ek-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 25 Mar 2025 19:23:52 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=kN9K+lBv0X2i57LxALytpgy3R5PGRkbgusi+E14cVsI+KpaOYxLis0QFwzqz6i2dkDYZfHc8lNsddQQcG+jPA1ZILpNNfjPv0nou+cMfhoeigXZoWjNldFiqKHg37hnNOWDAm0C6BhS1BivHvwvho9YuIFN+fk1OQ274UrZ93Kn/FChXeCQYDRTuKOFTZyqgWsEGXmHOM2EXLLpqmG4a7yYQdUcc0ThIDlozBAlPdrIrCCj2PuC0pYxyqb5eVNBD1GcuE1LvJaELM8D/Fr5Iqnd2hlggpbWXZ8OltmKZC4Ya4n810w850CaQanngmHCh6gv/ao/dktsHF6sCO4Rtxw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kb2FKXJWcj0rPaG9CVDjKRJvpUNE9pPyvVcWO8xHaN0=;
+ b=gFJkabS7szCqDUJPCnJ8XfJmsDUZPz2NFgUaN+fRiq4rcNjxUy6th0vaDJB7B0vxHmudGX7jLNOC4rfWvOhFy0z+5t1/whjBJDVxWJ+A55pNJVF9HrrCJgEAZbRNJO8+riBAUZ/nlqbFvqfP+9AbaYfZUaWymzZsZqHYKoHtVperGcrT8dgiysCqa34z8aWcvjRzT5thTaOIcrWuZt1YNJ/yjDWm67Hx2BP7hkUsmWEzh0f4hnZ7WDcpulO+5E+ZK0IMn5fIyFM37GJL5rVnzPHEDRpj4TQgC8aeZ3fDfOCBokulWH8XmQbbF3JewkzfZBaB1dI45ALCK1OR705dUQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kb2FKXJWcj0rPaG9CVDjKRJvpUNE9pPyvVcWO8xHaN0=;
+ b=ljT5YVPmfy/gNaOttPiq3n/NHEYdTG2w2jWXfMls7WA8CXCt5ZId1giKIIQYcjf1xSdMeWGWEOoIGYD3dERXbZyOsrHw5c9WmDJO/i/ov/WctIS3PYYRsAa54Ve2z3FrjE8+tCxfJJOa3Iv/nFGDlXXmVaCj64rKPUtSgVT2Ycs=
+Received: from PH0PR10MB5777.namprd10.prod.outlook.com (2603:10b6:510:128::16)
+ by SJ0PR10MB5744.namprd10.prod.outlook.com (2603:10b6:a03:3ef::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.42; Tue, 25 Mar
+ 2025 19:23:48 +0000
+Received: from PH0PR10MB5777.namprd10.prod.outlook.com
+ ([fe80::75a8:21cc:f343:f68c]) by PH0PR10MB5777.namprd10.prod.outlook.com
+ ([fe80::75a8:21cc:f343:f68c%7]) with mapi id 15.20.8534.040; Tue, 25 Mar 2025
+ 19:23:47 +0000
+Date: Tue, 25 Mar 2025 15:23:39 -0400
+From: "Liam R. Howlett" <Liam.Howlett@oracle.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, guoren@kernel.org, arnd@arndb.de,
+        gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
+        paul.walmsley@sifive.com, palmer@dabbelt.com, anup@brainfault.org,
+        atishp@atishpatra.org, oleg@redhat.com, kees@kernel.org,
+        tglx@linutronix.de, will@kernel.org, mark.rutland@arm.com,
+        brauner@kernel.org, akpm@linux-foundation.org, rostedt@goodmis.org,
+        edumazet@google.com, unicorn_wang@outlook.com, inochiama@outlook.com,
+        gaohan@iscas.ac.cn, shihua@iscas.ac.cn, jiawei@iscas.ac.cn,
+        wuwei2016@iscas.ac.cn, drew@pdp7.com,
+        prabhakar.mahadev-lad.rj@bp.renesas.com, ctsai390@andestech.com,
+        wefu@redhat.com, kuba@kernel.org, pabeni@redhat.com,
+        josef@toxicpanda.com, dsterba@suse.com, mingo@redhat.com,
+        boqun.feng@gmail.com, xiao.w.wang@intel.com,
+        qingfang.deng@siflower.com.cn, leobras@redhat.com, jszhang@kernel.org,
+        conor.dooley@microchip.com, samuel.holland@sifive.com,
+        yongxuan.wang@sifive.com, luxu.kernel@bytedance.com,
+        ruanjinjie@huawei.com, cuiyunhui@bytedance.com,
+        wangkefeng.wang@huawei.com, qiaozhe@iscas.ac.cn, ardb@kernel.org,
+        ast@kernel.org, linux-kernel@vger.kernel.org,
+        linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, bpf@vger.kernel.org,
+        linux-input@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        linux-serial@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, maple-tree@lists.infradead.org,
+        linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net, linux-btrfs@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+        linux-nfs@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux-media@vger.kernel.org
+Subject: Re: [RFC PATCH V3 00/43] rv64ilp32_abi: Build CONFIG_64BIT
+ kernel-self with ILP32 ABI
+Message-ID: <svu4xdeo7a7ve3vorvgbkjxzrqmqk5oztgtfpbg556wjw4x7vc@yg4esoipmt7g>
+Mail-Followup-To: "Liam R. Howlett" <Liam.Howlett@oracle.com>, 
+	David Hildenbrand <david@redhat.com>, Peter Zijlstra <peterz@infradead.org>, guoren@kernel.org, 
+	arnd@arndb.de, gregkh@linuxfoundation.org, torvalds@linux-foundation.org, 
+	paul.walmsley@sifive.com, palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org, 
+	oleg@redhat.com, kees@kernel.org, tglx@linutronix.de, will@kernel.org, 
+	mark.rutland@arm.com, brauner@kernel.org, akpm@linux-foundation.org, 
+	rostedt@goodmis.org, edumazet@google.com, unicorn_wang@outlook.com, 
+	inochiama@outlook.com, gaohan@iscas.ac.cn, shihua@iscas.ac.cn, jiawei@iscas.ac.cn, 
+	wuwei2016@iscas.ac.cn, drew@pdp7.com, prabhakar.mahadev-lad.rj@bp.renesas.com, 
+	ctsai390@andestech.com, wefu@redhat.com, kuba@kernel.org, pabeni@redhat.com, 
+	josef@toxicpanda.com, dsterba@suse.com, mingo@redhat.com, boqun.feng@gmail.com, 
+	xiao.w.wang@intel.com, qingfang.deng@siflower.com.cn, leobras@redhat.com, 
+	jszhang@kernel.org, conor.dooley@microchip.com, samuel.holland@sifive.com, 
+	yongxuan.wang@sifive.com, luxu.kernel@bytedance.com, ruanjinjie@huawei.com, 
+	cuiyunhui@bytedance.com, wangkefeng.wang@huawei.com, qiaozhe@iscas.ac.cn, ardb@kernel.org, 
+	ast@kernel.org, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-mm@kvack.org, 
+	linux-crypto@vger.kernel.org, bpf@vger.kernel.org, linux-input@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, linux-serial@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, maple-tree@lists.infradead.org, 
+	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-atm-general@lists.sourceforge.net, 
+	linux-btrfs@vger.kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	linux-nfs@vger.kernel.org, linux-sctp@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-media@vger.kernel.org
+References: <20250325121624.523258-1-guoren@kernel.org>
+ <20250325122640.GK36322@noisy.programming.kicks-ass.net>
+ <0e1d8823-620f-420c-86a5-35495ccbd10f@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0e1d8823-620f-420c-86a5-35495ccbd10f@redhat.com>
+User-Agent: NeoMutt/20240425
+X-ClientProxiedBy: BL1PR13CA0008.namprd13.prod.outlook.com
+ (2603:10b6:208:256::13) To PH0PR10MB5777.namprd10.prod.outlook.com
+ (2603:10b6:510:128::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] lockdep: Speed up lockdep_unregister_key() with expedited
- RCU synchronization
-To: Boqun Feng <boqun.feng@gmail.com>, Waiman Long <llong@redhat.com>
-Cc: Eric Dumazet <edumazet@google.com>, Peter Zijlstra
- <peterz@infradead.org>, Breno Leitao <leitao@debian.org>,
- Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, aeh@meta.com,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, jhs@mojatatu.com,
- kernel-team@meta.com, Erik Lundgren <elundgren@meta.com>,
- "Paul E. McKenney" <paulmck@kernel.org>
-References: <20250321-lockdep-v1-1-78b732d195fb@debian.org>
- <20250324121202.GG14944@noisy.programming.kicks-ass.net>
- <CANn89iKykrnUVUsqML7dqMuHx6OuGnKWg-xRUV4ch4vGJtUTeg@mail.gmail.com>
- <67e1b0a6.050a0220.91d85.6caf@mx.google.com>
- <67e1b2c4.050a0220.353291.663c@mx.google.com>
- <67e1fd15.050a0220.bc49a.766e@mx.google.com>
- <c0a9a0d5-400b-4238-9242-bf21f875d419@redhat.com> <Z-Il69LWz6sIand0@Mac.home>
- <934d794b-7ebc-422c-b4fe-3e658a2e5e7a@redhat.com>
- <Z-L5ttC9qllTAEbO@boqun-archlinux>
-Content-Language: en-US
-In-Reply-To: <Z-L5ttC9qllTAEbO@boqun-archlinux>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR10MB5777:EE_|SJ0PR10MB5744:EE_
+X-MS-Office365-Filtering-Correlation-Id: d8670433-3a6b-4eaf-b92d-08dd6bd290fe
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|366016|376014|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?09EQf/jAtvZmfBkE9Hju9xGtT0+8CQaYXfxsPVm4saOg48RrcfwfQFy5HOPw?=
+ =?us-ascii?Q?N6CM8O/u2GB3hRVz78Lt7TV0dU8PznNimSpdvwlnfxGd3glTxV50XL1WR7oV?=
+ =?us-ascii?Q?thiyOVMqplVVvyf5QrMvbzSHU816bmrrtRx9tb1tjlKzYb1+oFtdRngPJIMQ?=
+ =?us-ascii?Q?+qMr1VSaKw7xX9sKfKiEq9/sqj1GRFvHpAvWFK/7jZLzycn40IzCVjQQkasR?=
+ =?us-ascii?Q?RVfD1mB6NmnOy4SCoi+zBBfwJDYlFoNicM5qN8c2LHN1Qb67c75pppnSLC2r?=
+ =?us-ascii?Q?KjJv5vhcvhcCm82b748XdFcqb2ZrHtgX9iBAecI/7hu+bSKiOpPCJcfith3K?=
+ =?us-ascii?Q?eisQbbY7d/U6dnz5Nru4cPpjdx1UPPypX7dTEcGQqt9ZQmTVs8bJjYe6K1VJ?=
+ =?us-ascii?Q?zA/CavcyQLzj/yd22K/A79KV1lAYEGLqB+rRF2DS4kY8tON+KHmKDWRHFIU0?=
+ =?us-ascii?Q?Y56rQHHa+8v6jnJXfieKmBKzThf/9EAQH+kM8jpFPyugcR+k6/0WByeH5O90?=
+ =?us-ascii?Q?IWlhR9Pwvr1x3BID/s1aRMCV7lzYf70Cv9nrLXlD5vDvVWsHI9VovYDWKvZG?=
+ =?us-ascii?Q?XE6Gdl1TvNj5ycvlN4y923sFLg3jj6Sicj86nTbl+9vPKaNkiE5Mk2ViYfkc?=
+ =?us-ascii?Q?iG6gDJcsFS4XID4nrmBvQpN+WvQ2g5FZaRXNErRbVNhLJrGDkzpN1RYwxUjz?=
+ =?us-ascii?Q?1/A8AzMmZvS3kS+vPSB2iNdjcqhteahZ/9ZfG2OXgoeiuqnVlOKvHWxV2CrX?=
+ =?us-ascii?Q?CWBaWaFp8xC+Qj7YMp7hy0G4S0ybncVQ0julds6ACpYt2Rs/4Q8jUXbzw0Iz?=
+ =?us-ascii?Q?bQqrn9CJo/CbOir6bz7e9cMRbgz9adwTYlW7DojA0eDbCQ2G1paL+yfyFVqN?=
+ =?us-ascii?Q?foQ35VQaD3LRi81Tc8BQOWvSDmdFLXeWccmodfd9qa9rqfiEGRNPeK/So0c6?=
+ =?us-ascii?Q?Kufs6iFoBb+Ph19agK2LP9xTkTziXFvib07by9YUsj6p0GQitlurDAUWbB8g?=
+ =?us-ascii?Q?wJuYf5wSVyeMPzk60Bj0iQMun1K1/MRXyYK1C7hN15/XAtEahNEW02qozxjg?=
+ =?us-ascii?Q?naj9OD/XS/Cre5wl60dzDlMs1Wi0kpotr8BiErM+gO1LECKows7RTVmJQMl4?=
+ =?us-ascii?Q?+HcUvO4FAbzsNha+qKHhx2WcRiKvmAMtUaqk3yRSVgqSn8Y8YwsZk1CRW46c?=
+ =?us-ascii?Q?Euz61IAcccGgAk2N3bamdQU6N813EUzSXp8eoW0Pii2gnED/ryWDNBc9+/nl?=
+ =?us-ascii?Q?3uwWNe+hl4lmIpfI3jQ+rB1zBmE1lWulBlJ9s2YaqJYX//bzPexUhmrq6zPy?=
+ =?us-ascii?Q?ziA7ZM44I99OmZkikSftCPj4+Oaop0A50iPYx5cO8aZEudn5CCbpGKR6L057?=
+ =?us-ascii?Q?dH/nfpsyji4jgcRBny5CSnlXpeR3?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB5777.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?111Kg08n+4/ITDNNLU86UN8ZNCNtbQIJI0FOZWJImbee2qFQpCUsY0DVzrdF?=
+ =?us-ascii?Q?3ep4AezwdTIjuAEMd4KjPEC6z8A7UNBMgLX2uOvd86BbftPleC46fwBWhCDC?=
+ =?us-ascii?Q?MLNqB/rsOUwjnAJxYNJHdJE5I3YutunBYeFnGB+s4Ywl7SxTXbrhqN0rYscN?=
+ =?us-ascii?Q?vQF+tbJ853A/COGsbh+DNe2UK/wDS8onehUqJWN+gtsHYtsPSFhJG0at92rf?=
+ =?us-ascii?Q?Z1za/wv41mTiH2Dhzhw+FQXd7K3dHfwfSLhnQf9ImHFH/PEUVmCMUJXtF+PT?=
+ =?us-ascii?Q?PKGQ9f1pN2SmQiz4SBu0cYN5emNcyeXGpeIe3cqaBAYK2GvH94KjJKVZbu7c?=
+ =?us-ascii?Q?xVUoQqDi7HjeAaWn0z+0RwtNcLCnqGfYou7GZsjTT0+3wLI5BLWiE+ezfNdC?=
+ =?us-ascii?Q?MWLQpc1MQAQTgqeKKq+FUbH3ZwBwgNKMnpfIJ7ivvtP+Lbt9F2GWRawa/nKe?=
+ =?us-ascii?Q?/gWnbDWfFUFWmIZPClcdhJcUQd88SrI4VZQHpFCiFMGFhksJRGdIqR+1luEV?=
+ =?us-ascii?Q?G+vx6L3rA1Adib+beauhJJWx5I1eirOLMnH9zhvOAlhSIpcGx1bMdiX25LHt?=
+ =?us-ascii?Q?k+8YYimYeBWKwRRbatYoNBm7i/uSjc5lkSp1BjupgVYVytcndujsCGUCAd23?=
+ =?us-ascii?Q?uNXblQl354nhJuWzE2+1vZIGf1XdD92zoz5bye7kgdgGaO9pegb1ulOiI6qH?=
+ =?us-ascii?Q?eUzbbEvgqPUKK0Ra5oEVGId9Qsak2a5gFerHhkfS4ZVwsSxpZdzos9OZAOLq?=
+ =?us-ascii?Q?CjmAaJ6awPPnnPFvP86dLUcHdKoLvomXWtS7pGTEvgcd/vyNcOtd5Jh7ofaR?=
+ =?us-ascii?Q?kdF9wY4YH+4C4E7xn9n0H+ClJ1bc+KEa/P7fDtH6Xf4nzC8QfF9IhUIriZQa?=
+ =?us-ascii?Q?0QYP4frZTSyHOmGQ+oFUZrs/AAxGYN8yXS6fmqTKCsZrJijcoqM3AhgpJu1a?=
+ =?us-ascii?Q?8XFbikqRfP8nifLEYMJwdocaF1JURBDks0SJDRycR6dIRMDoQ3XwczL0hiVx?=
+ =?us-ascii?Q?4lPUrRxmnjmaxmoCl/MvVWvuFTmrQbacN2bX/qSNctrLkjE5zXUV4buqFf0Z?=
+ =?us-ascii?Q?ItavshaUd9cJSzKDxFwTTPKnzpcDCyc5TE7ffOeKAWER/7ETRffOQ7Srfgk5?=
+ =?us-ascii?Q?49CwyxXxMYyKYoiJjP64exXfu3eHZAHFWxuYHJOjk8+N3RetqLbPJgeU2h4Y?=
+ =?us-ascii?Q?9b03IP+nOhctRAlLxIZTxAp2TNqJOqy4KimlY64l9QGQJwDnZH1HETYu7Td4?=
+ =?us-ascii?Q?JxNAv5a55Tf5F3T41tbM0buUYgnuq3f5VvJSqLkJRjj5Qks6U5+SjjxGCeeW?=
+ =?us-ascii?Q?mxYpLGQOtmX0drn5HJr5qFnceGsV1nFW8+SeHoubn+N+NnizlttLnMAE6DS2?=
+ =?us-ascii?Q?xLi6locEjX/x7VQicKDS+Oileq5CpZAbGCQpyfvQNf1oRRVRawYi2STx4kCh?=
+ =?us-ascii?Q?1WGXBMkxXdW6i63mTYqu+VlflJT7IzY706M7Qr2hITj1G2bOMQIbX9JtWqSn?=
+ =?us-ascii?Q?pcJNBFW8Js7eoxdPQQNQD7LKDH80/4cmGYqpc75ciavY5jiO3b0DY4l2EYOI?=
+ =?us-ascii?Q?tyukeVWvJXyzh/PD+7I/q+ZcvpYR2SFEE6dKkZpn?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	SUJDSJgpB+C8Ijx7kipRCFJlZ9g+mqlov1BQEKLYwUT8mebubjFNqW7F/4u637Nh5xNVSUkQ8vzNhRr0JdyHy3y0sNXbf5aU8LfwR7u0AK7lZMhJ3ZDUHvP/tgMFm+rFsvLesFloca7SY7zspOhuhxdy9glgO/bRGM6LyaewZZMpih5eYqZTRKC9ogyKvGM93MOnvvcvsr/qBrllrVZKO0ZJMK/m5dzDZ/8jYaHgfoXH7m8/tGfjdfpeclIbYoAkHlbmpVufO++w6pD1YSTOcUARAzQlnZIjetv40VQ/TnjpwyJ/jnLDQJyVb5IeGo2zlZYzhI2MkoasekX8GtgP/tKcynBlExfWRaL1xBQFknSRV+4EoW/yxnTC+5fxwJ5yMCGUbsMJzJh58Vm/jYvKwchsEmLTpzdd0XiGfGtmbzcDXukveY4oKb0QDZMgE2sy2ABDYwLMq+v5jQ+t5wipTm/hagLAOn+liRRS2QdxT7IF/rYfDFyVC6OCOe3a0QGRjPHRtSrRWUaH7NuF6lNgglJfyvPHmRLfOyH2V83kRROuc5oAPoIZ3pKoq/XkTAkEyp8fAvqjntq1vkYkRJdS2crMwn/4kxEb5Jrt1G0/yCE=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d8670433-3a6b-4eaf-b92d-08dd6bd290fe
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB5777.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Mar 2025 19:23:47.8322
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6+D4B1Ku05Fl325cql5y1h3R4Tp1gYkkfQx41g+6JduVZIzUTRpcQslfqwjBt2BIhzLUVYpJSQ29vy1zPjAQyw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR10MB5744
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-25_08,2025-03-25_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=999 adultscore=0
+ phishscore=0 suspectscore=0 malwarescore=0 spamscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2502280000
+ definitions=main-2503250131
+X-Proofpoint-GUID: NBcLF-M2ys9gfQOGFZ7I8lCw8SmvW81K
+X-Proofpoint-ORIG-GUID: NBcLF-M2ys9gfQOGFZ7I8lCw8SmvW81K
 
-On 3/25/25 2:45 PM, Boqun Feng wrote:
-> On Tue, Mar 25, 2025 at 10:52:16AM -0400, Waiman Long wrote:
->> On 3/24/25 11:41 PM, Boqun Feng wrote:
->>> On Mon, Mar 24, 2025 at 09:56:25PM -0400, Waiman Long wrote:
->>>> On 3/24/25 8:47 PM, Boqun Feng wrote:
->>>>> On Mon, Mar 24, 2025 at 12:30:10PM -0700, Boqun Feng wrote:
->>>>>> On Mon, Mar 24, 2025 at 12:21:07PM -0700, Boqun Feng wrote:
->>>>>>> On Mon, Mar 24, 2025 at 01:23:50PM +0100, Eric Dumazet wrote:
->>>>>>> [...]
->>>>>>>>>> ---
->>>>>>>>>>     kernel/locking/lockdep.c | 6 ++++--
->>>>>>>>>>     1 file changed, 4 insertions(+), 2 deletions(-)
->>>>>>>>>>
->>>>>>>>>> diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
->>>>>>>>>> index 4470680f02269..a79030ac36dd4 100644
->>>>>>>>>> --- a/kernel/locking/lockdep.c
->>>>>>>>>> +++ b/kernel/locking/lockdep.c
->>>>>>>>>> @@ -6595,8 +6595,10 @@ void lockdep_unregister_key(struct lock_class_key *key)
->>>>>>>>>>          if (need_callback)
->>>>>>>>>>                  call_rcu(&delayed_free.rcu_head, free_zapped_rcu);
->>>>>>>>>>
->>>>>>>>>> -     /* Wait until is_dynamic_key() has finished accessing k->hash_entry. */
->>>>>>>>>> -     synchronize_rcu();
->>>>>>> I feel a bit confusing even for the old comment, normally I would expect
->>>>>>> the caller of lockdep_unregister_key() should guarantee the key has been
->>>>>>> unpublished, in other words, there is no way a lockdep_unregister_key()
->>>>>>> could race with a register_lock_class()/lockdep_init_map_type(). The
->>>>>>> synchronize_rcu() is not needed then.
->>>>>>>
->>>>>>> Let's say someone breaks my assumption above, then when doing a
->>>>>>> register_lock_class() with a key about to be unregister, I cannot see
->>>>>>> anything stops the following:
->>>>>>>
->>>>>>> 	CPU 0				CPU 1
->>>>>>> 	=====				=====
->>>>>>> 	register_lock_class():
->>>>>>> 	  ...
->>>>>>> 	  } else if (... && !is_dynamic_key(lock->key)) {
->>>>>>> 	  	// ->key is not unregistered yet, so this branch is not
->>>>>>> 		// taken.
->>>>>>> 	  	return NULL;
->>>>>>> 	  }
->>>>>>> 	  				lockdep_unregister_key(..);
->>>>>>> 					// key unregister, can be free
->>>>>>> 					// any time.
->>>>>>> 	  key = lock->key->subkeys + subclass; // BOOM! UAF.
->>> This is not a UAF :(
->>>
->>>>>>> So either we don't need the synchronize_rcu() here or the
->>>>>>> synchronize_rcu() doesn't help at all. Am I missing something subtle
->>>>>>> here?
->>>>>>>
->>>>>> Oh! Maybe I was missing register_lock_class() must be called with irq
->>>>>> disabled, which is also an RCU read-side critical section.
->>>>>>
->>>>> Since register_lock_class() will be call with irq disabled, maybe hazard
->>>>> pointers [1] is better because most of the case we only have nr_cpus
->>>>> readers, so the potential hazard pointer slots are fixed.
->>>>>
->>>>> So the below patch can reduce the time of the tc command from real ~1.7
->>>>> second (v6.14) to real ~0.05 second (v6.14 + patch) in my test env,
->>>>> which is not surprising given it's a dedicated hazard pointers for
->>>>> lock_class_key.
->>>>>
->>>>> Thoughts?
->>>> My understanding is that it is not a race between register_lock_class() and
->>>> lockdep_unregister_key(). It is the fact that the structure that holds the
->>>> lock_class_key may be freed immediately after return from
->>>> lockdep_unregister_key(). So any processes that are in the process of
->>>> iterating the hash_list containing the hash_entry to be unregistered may hit
->>> You mean the lock_keys_hash table, right? I used register_lock_class()
->>> as an example, because it's one of the places that iterates
->>> lock_keys_hash. IIUC lock_keys_hash is only used in
->>> lockdep_{un,}register_key() and is_dynamic_key() (which are only called
->>> by lockdep_init_map_type() and register_lock_class()).
->>>
->>>> a UAF problem. See commit 61cc4534b6550 ("locking/lockdep: Avoid potential
->>>> access of invalid memory in lock_class") for a discussion of this kind of
->>>> UAF problem.
->>>>
->>> That commit seemed fixing a race between disabling lockdep and
->>> unregistering key, and most importantly, call zap_class() for the
->>> unregistered key even if lockdep is disabled (debug_locks = 0). It might
->>> be related, but I'm not sure that's the reason of putting
->>> synchronize_rcu() there. Say you want to synchronize between
->>> /proc/lockdep and lockdep_unregister_key(), and you have
->>> synchronize_rcu() in lockdep_unregister_key(), what's the RCU read-side
->>> critical section at /proc/lockdep?
->> I agree that the commit that I mentioned is not relevant to the current
->> case. You are right that is_dynamic_key() is the only function that is
->> problematic, the other two are protected by the lockdep_lock. So they are
->> safe. Anyway, I believe that the actual race happens in the iteration of the
->> hashed list in is_dynamic_key(). The key that you save in the
->> lockdep_key_hazptr in your proposed patch should never be the key (dead_key)
-> The key stored in lockdep_key_hazptr is the one that the rest of the
-> function will use after is_dynamic_key() return true. That is,
->
-> 	CPU 0				CPU 1
-> 	=====				=====
-> 	WRITE_ONCE(*lockdep_key_hazptr, key);
-> 	smp_mb();
->
-> 	is_dynamic_key():
-> 	  hlist_for_each_entry_rcu(k, hash_head, hash_entry) {
-> 	    if (k == key) {
-> 	      found = true;
-> 	      break;
-> 	    }
-> 	  }
-> 	  				lockdep_unregister_key():
-> 					  hlist_for_each_entry_rcu(k, hash_head, hash_entry) {
-> 					    if (k == key) {
-> 					      hlist_del_rcu(&k->hash_entry);
-> 				              found = true;
-> 				              break;
-> 					    }
-> 					  }
->
-> 				        smp_mb();
->
-> 					synchronize_lockdep_key_hazptr():
-> 					  for_each_possible_cpu(cpu) {
-> 					    <wait for the hazptr slot on
-> 					    that CPU to be not equal to
-> 					    the removed key>
-> 					  }
->
->
-> , so that if is_dynamic_key() finds a key was in the hash, even though
-> later on the key would be removed by lockdep_unregister_key(), the
-> hazard pointers guarantee lockdep_unregister_key() would wait for the
-> hazard pointer to release.
->
->> that is passed to lockdep_unregister_key(). In is_dynamic_key():
->>
->>      hlist_for_each_entry_rcu(k, hash_head, hash_entry) {
->>                  if (k == key) {
->>                          found = true;
->>                          break;
->>                  }
->>          }
->>
->> key != k (dead_key), but before accessing its content to get to hash_entry,
-> It is the dead_key.
->
->> an interrupt/NMI can happen. In the mean time, the structure holding the key
->> is freed and its content can be overwritten with some garbage. When
->> interrupt/NMI returns, hash_entry can point to anything leading to crash or
->> an infinite loop.  Perhaps we can use some kind of synchronization mechanism
-> No, hash_entry cannot be freed or overwritten because the user has
-> protect the key with hazard pointers, only when the user reset the
-> hazard pointer to NULL, lockdep_unregister_key() can then return and the
-> key can be freed.
->
->> between is_dynamic_key() and lockdep_unregister_key() to prevent this kind
->> of racing. For example, we can have an atomic counter associated with each
-> The hazard pointer I proposed provides the exact synchronization ;-)
+* David Hildenbrand <david@redhat.com> [250325 14:52]:
+> On 25.03.25 13:26, Peter Zijlstra wrote:
+> > On Tue, Mar 25, 2025 at 08:15:41AM -0400, guoren@kernel.org wrote:
+> > > From: "Guo Ren (Alibaba DAMO Academy)" <guoren@kernel.org>
+> > > 
+> > > Since 2001, the CONFIG_64BIT kernel has been built with the LP64 ABI,
+> > > but this patchset allows the CONFIG_64BIT kernel to use an ILP32 ABI
+> > 
+> > I'm thinking you're going to be finding a metric ton of assumptions
+> > about 'unsigned long' being 64bit when 64BIT=y throughout the kernel.
+> > 
+> > I know of a couple of places where 64BIT will result in different math
+> > such that a 32bit 'unsigned long' will trivially overflow.
+> > 
+> > Please, don't do this. This adds a significant maintenance burden on all
+> > of us.
+> > 
+> 
+> Fully agreed.
 
-What I am saying is that register_lock_class() is trying to find a 
-newkey while lockdep_unregister_key() is trying to take out an oldkey 
-(newkey != oldkey). If they happens in the same hash list, 
-register_lock_class() will put newkey into the hazard pointer, but 
-synchronize_lockdep_key_hazptr() call from lockdep_unregister_key() is 
-checking for oldkey which is not the one saved in the hazard pointer. So 
-lockdep_unregister_key() will return and the key will be freed and 
-reused while is_dynamic_key() may just have a reference to the oldkey 
-and trying to access its content which is invalid. I think this is a 
-possible scenario.
+I would go further and say I do not want this to go in.
 
-Cheers, Longman
+The open ended maintenance burden is not worth extending hardware life
+of a board with 16mb of ram (If I understand your 2023 LPC slides
+correctly).
 
->
-> Regards,
-> Boqun
->
->> head of the hashed table. is_dynamic_key() can increment the counter if it
->> is not zero to proceed and lockdep_unregister_key() have to make sure it can
->> safely decrement the counter to 0 before going ahead. Just a thought!
->>
->> Cheers,
->> Longman
-
+Thank you,
+Liam
 
