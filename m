@@ -1,79 +1,115 @@
-Return-Path: <netdev+bounces-177566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FCBDA70A33
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 20:22:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67A7FA70A90
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 20:33:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BAF4516EA4A
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 19:22:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B6613BFBDE
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 19:30:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A1BA1F150D;
-	Tue, 25 Mar 2025 19:21:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FC191EDA26;
+	Tue, 25 Mar 2025 19:30:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r0uaSQ+o"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="K9Dve6XZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay.smtp-ext.broadcom.com (relay.smtp-ext.broadcom.com [192.19.166.231])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AE401F0980;
-	Tue, 25 Mar 2025 19:21:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE51C1EB191;
+	Tue, 25 Mar 2025 19:30:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.166.231
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742930508; cv=none; b=SHisxi1UtjlS4k87SEajnaI2t9c0j6TQUrFKZhOR6+l7Gjdg6A2eOruyzgB3H7avalY7Go9f9CwM+xe9X3UwfH5wMooX54PtX0BJad/UIcOAYe0l7kRafKiHKBilH8STDcQXqPq1/wcsJuKrg07Vofy6VKLLkVJKRmjqq9ICqy8=
+	t=1742931049; cv=none; b=eMjieXa21PeI4GGhObLyThP66JR21BY8u05P+EbGZeqg1mVKtmxdlF35rnKtqIHUy4iO0ojjgIGH3neVRE2QZkFImJyhPjlaaoqvj9TI63z99tAmW9xjm3ONXSZJm1CNv9ojRxBxumCWggJnJX/2byGCtK/MR5RFRvOCcFPCrkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742930508; c=relaxed/simple;
-	bh=2lppo/h1Ns/+mEujlov/y1LOi8smo04jL6sSv9o4gwc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P0nYzmNHAvXydY5/mJYg3kcl2h3/A7U8Ox+rPXNIoavdCD/hC0Vc2KOcG+ShVbapmdMdb2L4xr58d0e3y+sMFYBD+EzK6dzHxUzU+JqKbYydQY9X6uQhcANMkrXTsG9rTLHUqi1iqiSY/A9PU1wl5VUs1jiD/1uKw6kH0kak6zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r0uaSQ+o; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 050EEC4CEE4;
-	Tue, 25 Mar 2025 19:21:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742930507;
-	bh=2lppo/h1Ns/+mEujlov/y1LOi8smo04jL6sSv9o4gwc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=r0uaSQ+ocYQ1u9k9URaaCwkzUpmlRgImuqi3zNjqtXINP35sRfm+vKf5apPUDL+G1
-	 tCD0nDtbSIBkjZeMOD1f8f5PZO4so2D/NR474GkrddzRXJ6rjpXFgPcATbfNm3C5bk
-	 FsGMPfeL4hJvg9LubcLf7naqdthfnDi7ZSGzfXQrHX69mh5pZr97AaPvoCquDFTonv
-	 0HBfLWcxhs/0aV5Qpnv2UtQxkhSPfaN9KEmWcGpfuOcgypvYPN0wP3OXntj+025TXC
-	 LH3PvMO7n2nuoI/caUA3xJKcAVsgvoR1U/8KhpA3f9RM7AahPM+Wa4JN7KE9udhiPC
-	 ZT+fZR+nRlJ2A==
-Date: Tue, 25 Mar 2025 12:21:35 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Erni Sri Satya Vennela <ernis@linux.microsoft.com>, kys@microsoft.com,
- haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, longli@microsoft.com, kotaranov@microsoft.com,
- horms@kernel.org, brett.creeley@amd.com, surenb@google.com,
- schakrabarti@linux.microsoft.com, kent.overstreet@linux.dev,
- shradhagupta@linux.microsoft.com, erick.archer@outlook.com,
- rosenp@gmail.com, linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH 2/3] net: mana: Implement set_link_ksettings in ethtool
- for speed
-Message-ID: <20250325122135.14ffa389@kernel.org>
-In-Reply-To: <adaaa2b0-c161-4d4f-8199-921002355d05@lunn.ch>
-References: <1742473341-15262-1-git-send-email-ernis@linux.microsoft.com>
-	<1742473341-15262-3-git-send-email-ernis@linux.microsoft.com>
-	<fb6b544f-f683-4307-8adf-82d37540c556@lunn.ch>
-	<20250325170955.GB23398@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-	<adaaa2b0-c161-4d4f-8199-921002355d05@lunn.ch>
+	s=arc-20240116; t=1742931049; c=relaxed/simple;
+	bh=5tGZSH7qmIlEZiTl3tTZmYCsJqF7oZCvY5s6A5p92No=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=X8uZVxUHwDnGoP1SKpU90Tf2syFpt369UJ7jpoQMq/7+m4HZkt1znElP1ViP2qq9nEvvap9vwrzJeFv6FchPnc2oDmM4krz5QjmypYlPtbgdz17o0xAjOlF7bdfmB4/b7OFDR4RbibGKrJuDP2uLYrCAAYsa7ZKYkWgY2Fbkw5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=K9Dve6XZ; arc=none smtp.client-ip=192.19.166.231
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: from mail-lvn-it-01.broadcom.com (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
+	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id CA3ABC000340;
+	Tue, 25 Mar 2025 12:22:24 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com CA3ABC000340
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
+	s=dkimrelay; t=1742930544;
+	bh=5tGZSH7qmIlEZiTl3tTZmYCsJqF7oZCvY5s6A5p92No=;
+	h=From:To:Cc:Subject:Date:From;
+	b=K9Dve6XZjFAyOl6QzGCqW0PzGE8jxIFFGEoCt6KzYRuNDSzKonSeiKz9j/08BowdY
+	 x0xPnR7nb8WaR+AeSPq01SQ7D2iYuIW2TEp5bP0DAnFS9qZJbN94VG7yyVNYbOnl0y
+	 EtQXoHeLfPddPkTksEjYVoFmLnMVvyWfMDC9lJv8=
+Received: from stbirv-lnx-1.igp.broadcom.net (stbirv-lnx-1.igp.broadcom.net [10.67.48.32])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail-lvn-it-01.broadcom.com (Postfix) with ESMTPSA id 71C2718000520;
+	Tue, 25 Mar 2025 12:22:24 -0700 (PDT)
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+To: stable@vger.kernel.org
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Pravin B Shelar <pshelar@ovn.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <kafai@fb.com>,
+	Song Liu <songliubraving@fb.com>,
+	Yonghong Song <yhs@fb.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Breno Leitao <leitao@debian.org>,
+	=?UTF-8?q?Beno=C3=AEt=20Monin?= <benoit.monin@gmx.fr>,
+	Yan Zhai <yan@cloudflare.com>,
+	Felix Huettner <felix.huettner@mail.schwarz>,
+	Joe Stringer <joestringer@nicira.com>,
+	Andy Zhou <azhou@nicira.com>,
+	Justin Pettit <jpettit@nicira.com>,
+	Thomas Graf <tgraf@suug.ch>,
+	Luca Czesla <luca.czesla@mail.schwarz>,
+	Simon Horman <simon.horman@corigine.com>,
+	netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
+	linux-kernel@vger.kernel.org (open list),
+	dev@openvswitch.org (open list:OPENVSWITCH),
+	bpf@vger.kernel.org (open list:BPF (Safe dynamic programs and tools))
+Subject: [PATCH stable 5.4 v2 0/2] openvswitch port output fixes
+Date: Tue, 25 Mar 2025 12:22:18 -0700
+Message-Id: <20250325192220.1849902-1-florian.fainelli@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Tue, 25 Mar 2025 18:52:40 +0100 Andrew Lunn wrote:
-> Using TC would be more natural in this case. The user action is to
-> remove the TC filter and that should set it back to unlimited.
+This patch series contains some missing openvswitch port output fixes
+for the stable 5.4 kernel.
 
-better still - net shapers
+Changes in v2:
+
+- use BUILD_BUG_ON_INVALID rather than DEBUG_NET_WARN_ON_ONCE which does
+  not exist in Linux 5.4
+
+Felix Huettner (1):
+  net: openvswitch: fix race on port output
+
+Ilya Maximets (1):
+  openvswitch: fix lockup on tx to unregistering netdev with carrier
+
+ net/core/dev.c            | 1 +
+ net/openvswitch/actions.c | 4 +++-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+-- 
+2.34.1
+
 
