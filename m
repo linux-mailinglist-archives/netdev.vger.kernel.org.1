@@ -1,168 +1,137 @@
-Return-Path: <netdev+bounces-177299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFDFFA6ECE8
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 10:46:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BE5CA6ED4B
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 11:05:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4CB31890FF4
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 09:44:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F4813AB638
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 10:05:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76A3B1946AA;
-	Tue, 25 Mar 2025 09:44:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DA221DF72C;
+	Tue, 25 Mar 2025 10:05:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from shell.v3.sk (mail.v3.sk [167.172.186.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD01C15666B;
-	Tue, 25 Mar 2025 09:44:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D4DA19B5B4;
+	Tue, 25 Mar 2025 10:05:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.172.186.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742895866; cv=none; b=BwzbTP3G9j++kxCB3H2aO7ff2mTBwy+0CagVMnRzlbnx4AUFCAtiI4trN+Zk6FITn4qQ8MfJJTIq2zLNm3UWG3bUTcb6xbEM1acdgWVSdAyEcryIWAmY7j2bGKnvBbk6E7pSVReUUJhkdxtDgjYi2XchBr0OZYg87yAGmc9djgw=
+	t=1742897115; cv=none; b=CJYIhVQEZuoBkZu/ZLQ2/SzjaAYUD/Cv+cCGiwkitzFpXVkf1z/RH0LxCqB+bcw0tXjur96oAuQNQTjsZ/t5AuMPwYlfTIQjZ6SF+HoNoECIfPdCDk301NYP3l2sUF+xopWt9ia8P/X77EHEN8Njadk/h0sI9AAEoSvGQkWF6tg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742895866; c=relaxed/simple;
-	bh=YExHr+2mn/5PLGawiihdqqA9Qe1EXHQUBAkBpbg9IW4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RWhvcV+vI/QIx67RbrDHM0rbK/JVkWCZQ9zEcGiv2BMMmhfso9dD1XRcex47yeAED+3GNraRQ5LprT9dZyaMpxrqd2gRvr3yk7bF/dYBR+3e8H2oy3PeYKZX9Auqv6/UE2cqhXZzYoS+hQy2Px9x0jMMb/hKU57zemyppHdTUgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4ZMPyj382Mz1jBPp;
-	Tue, 25 Mar 2025 17:39:41 +0800 (CST)
-Received: from kwepemg200005.china.huawei.com (unknown [7.202.181.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 54F7B1A0188;
-	Tue, 25 Mar 2025 17:44:19 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by kwepemg200005.china.huawei.com
- (7.202.181.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 25 Mar
- 2025 17:44:18 +0800
-From: Wang Liang <wangliang74@huawei.com>
-To: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
-	<cong.wang@bytedance.com>, <kuniyu@amazon.com>
-CC: <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
-	<wangliang74@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net] ipv6: sit: fix skb_under_panic with overflowed needed_headroom
-Date: Tue, 25 Mar 2025 17:54:49 +0800
-Message-ID: <20250325095449.2594874-1-wangliang74@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1742897115; c=relaxed/simple;
+	bh=r4+vCrXSiwD1JYN8XNj5yRZufyy/66JzJ3kOXSb0aQI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ys8DbP1oeDUma4M9TeSjKtw6EzJlKW8v58SqG1WEclu61EODnFMUYE6RuB+q0QAXQQMn4hMjidtvO3mEiR0vQKofVXHgC2fki5j3UF4EPMCsIWAGwimLNqqEc+hEukNKEtRbSAmTovtjAojUF8Y5Bv941HziuNLFRbCQ/SGUk/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v3.sk; spf=pass smtp.mailfrom=v3.sk; arc=none smtp.client-ip=167.172.186.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v3.sk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v3.sk
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by zimbra.v3.sk (Postfix) with ESMTP id 8E5F2DFF94;
+	Tue, 25 Mar 2025 09:52:52 +0000 (UTC)
+Received: from shell.v3.sk ([127.0.0.1])
+	by localhost (zimbra.v3.sk [127.0.0.1]) (amavisd-new, port 10032)
+	with ESMTP id K07svAyUELbJ; Tue, 25 Mar 2025 09:52:52 +0000 (UTC)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by zimbra.v3.sk (Postfix) with ESMTP id 1A71EDFFC0;
+	Tue, 25 Mar 2025 09:52:52 +0000 (UTC)
+X-Virus-Scanned: amavisd-new at zimbra.v3.sk
+Received: from shell.v3.sk ([127.0.0.1])
+	by localhost (zimbra.v3.sk [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id sMCkURTtwSQa; Tue, 25 Mar 2025 09:52:51 +0000 (UTC)
+Received: from localhost (unknown [109.183.109.54])
+	by zimbra.v3.sk (Postfix) with ESMTPSA id CE17BDFF94;
+	Tue, 25 Mar 2025 09:52:51 +0000 (UTC)
+From: Lubomir Rintel <lkundrak@v3.sk>
+To: linux-usb@vger.kernel.org
+Cc: Lubomir Rintel <lkundrak@v3.sk>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>
+Subject: [PATCH v3 net-next] rndis_host: Flag RNDIS modems as WWAN devices
+Date: Tue, 25 Mar 2025 10:58:41 +0100
+Message-ID: <20250325095842.1567999-1-lkundrak@v3.sk>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemg200005.china.huawei.com (7.202.181.32)
+Content-Transfer-Encoding: quoted-printable
 
-When create ipip6 tunnel, if tunnel->parms.link is assigned to the previous
-created tunnel device, the dev->needed_headroom will increase based on the
-previous one.
+Set FLAG_WWAN instead of FLAG_ETHERNET for RNDIS interfaces on Mobile
+Broadband Modems, as opposed to regular Ethernet adapters.
 
-If the number of tunnel device is sufficient, the needed_headroom can be
-overflowed. The overflow happens like this:
+Otherwise NetworkManager gets confused, misjudges the device type,
+and wouldn't know it should connect a modem to get the device to work.
+What would be the result depends on ModemManager version -- older
+ModemManager would end up disconnecting a device after an unsuccessful
+probe attempt (if it connected without needing to unlock a SIM), while
+a newer one might spawn a separate PPP connection over a tty interface
+instead, resulting in a general confusion and no end of chaos.
 
-  ipip6_newlink
-    ipip6_tunnel_create
-      register_netdevice
-        ipip6_tunnel_init
-          ipip6_tunnel_bind_dev
-            t_hlen = tunnel->hlen + sizeof(struct iphdr); // 40
-            hlen = tdev->hard_header_len + tdev->needed_headroom; // 65496
-            dev->needed_headroom = t_hlen + hlen; // 65536 -> 0
+The only way to get this work reliably is to fix the device type
+and have good enough version ModemManager (or equivalent).
 
-The value of LL_RESERVED_SPACE(rt->dst.dev) may be HH_DATA_MOD, that leads
-to a small skb allocated in __ip_append_data(), which triggers a
-skb_under_panic:
+Signed-off-by: Lubomir Rintel <lkundrak@v3.sk>
+Fixes: 63ba395cd7a5 ("rndis_host: support Novatel Verizon USB730L")
 
-  ------------[ cut here ]------------
-  kernel BUG at net/core/skbuff.c:209!
-  Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
-  CPU: 0 UID: 0 PID: 24133 Comm: test Tainted: G W 6.14.0-rc7-00067-g76b6905c11fd-dirty #1
-  Tainted: [W]=WARN
-  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.15.0-0-g2dd4b9b3f840-prebuilt.qemu.org 04/01/2014
-  RIP: 0010:skb_panic+0x156/0x1d0
-  Call Trace:
-   <TASK>
-   skb_push+0xc8/0xe0
-   fou_build_udp+0x31/0x3a0
-   gue_build_header+0xf7/0x150
-   ip_tunnel_xmit+0x684/0x3660
-   sit_tunnel_xmit__.isra.0+0xeb/0x150
-   sit_tunnel_xmit+0x2e3/0x2930
-   dev_hard_start_xmit+0x1a6/0x7b0
-   __dev_queue_xmit+0x2fa9/0x4120
-   neigh_connected_output+0x39e/0x590
-   ip_finish_output2+0x7bb/0x1f00
-   __ip_finish_output+0x442/0x940
-   ip_finish_output+0x31/0x380
-   ip_mc_output+0x1c4/0x6a0
-   ip_send_skb+0x339/0x570
-   udp_send_skb+0x905/0x1540
-   udp_sendmsg+0x17c8/0x28f0
-   udpv6_sendmsg+0x17f1/0x2c30
-   inet6_sendmsg+0x105/0x140
-   ____sys_sendmsg+0x801/0xc70
-   ___sys_sendmsg+0x110/0x1b0
-   __sys_sendmmsg+0x1f2/0x410
-   __x64_sys_sendmmsg+0x99/0x100
-   do_syscall_64+0x6e/0x1c0
-   entry_SYSCALL_64_after_hwframe+0x76/0x7e
-  ---[ end trace 0000000000000000 ]---
-
-Fix this by add check for needed_headroom in ipip6_tunnel_bind_dev().
-
-Reported-by: syzbot+4c63f36709a642f801c5@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=4c63f36709a642f801c5
-Fixes: c88f8d5cd95f ("sit: update dev->needed_headroom in ipip6_tunnel_bind_dev()")
-Signed-off-by: Wang Liang <wangliang74@huawei.com>
 ---
- net/ipv6/sit.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+Changes since v1:
+* Added Fixes tag, as suggested by Paolo Abeni
 
-diff --git a/net/ipv6/sit.c b/net/ipv6/sit.c
-index 39bd8951bfca..1662b735c5e3 100644
---- a/net/ipv6/sit.c
-+++ b/net/ipv6/sit.c
-@@ -1095,7 +1095,7 @@ static netdev_tx_t sit_tunnel_xmit(struct sk_buff *skb,
- 
- }
- 
--static void ipip6_tunnel_bind_dev(struct net_device *dev)
-+static int ipip6_tunnel_bind_dev(struct net_device *dev)
- {
- 	struct ip_tunnel *tunnel = netdev_priv(dev);
- 	int t_hlen = tunnel->hlen + sizeof(struct iphdr);
-@@ -1134,7 +1134,12 @@ static void ipip6_tunnel_bind_dev(struct net_device *dev)
- 		WRITE_ONCE(dev->mtu, mtu);
- 		hlen = tdev->hard_header_len + tdev->needed_headroom;
- 	}
+Changes since v2:
+* Fixed Fixes tag... Suggested by Jakub Kicinski
+
+---
+ drivers/net/usb/rndis_host.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/usb/rndis_host.c b/drivers/net/usb/rndis_host.c
+index 7b3739b29c8f7..bb0bf14158727 100644
+--- a/drivers/net/usb/rndis_host.c
++++ b/drivers/net/usb/rndis_host.c
+@@ -630,6 +630,16 @@ static const struct driver_info	zte_rndis_info =3D {
+ 	.tx_fixup =3D	rndis_tx_fixup,
+ };
+=20
++static const struct driver_info	wwan_rndis_info =3D {
++	.description =3D	"Mobile Broadband RNDIS device",
++	.flags =3D	FLAG_WWAN | FLAG_POINTTOPOINT | FLAG_FRAMING_RN | FLAG_NO_SE=
+TINT,
++	.bind =3D		rndis_bind,
++	.unbind =3D	rndis_unbind,
++	.status =3D	rndis_status,
++	.rx_fixup =3D	rndis_rx_fixup,
++	.tx_fixup =3D	rndis_tx_fixup,
++};
 +
-+	if (t_hlen + hlen > U16_MAX)
-+		return -EOVERFLOW;
-+
- 	dev->needed_headroom = t_hlen + hlen;
-+	return 0;
- }
- 
- static void ipip6_tunnel_update(struct ip_tunnel *t,
-@@ -1452,7 +1457,9 @@ static int ipip6_tunnel_init(struct net_device *dev)
- 	tunnel->net = dev_net(dev);
- 	strcpy(tunnel->parms.name, dev->name);
- 
--	ipip6_tunnel_bind_dev(dev);
-+	err = ipip6_tunnel_bind_dev(dev);
-+	if (err)
-+		return err;
- 
- 	err = dst_cache_init(&tunnel->dst_cache, GFP_KERNEL);
- 	if (err)
--- 
-2.34.1
+ /*----------------------------------------------------------------------=
+---*/
+=20
+ static const struct usb_device_id	products [] =3D {
+@@ -666,9 +676,11 @@ static const struct usb_device_id	products [] =3D {
+ 	USB_INTERFACE_INFO(USB_CLASS_WIRELESS_CONTROLLER, 1, 3),
+ 	.driver_info =3D (unsigned long) &rndis_info,
+ }, {
+-	/* Novatel Verizon USB730L */
++	/* Mobile Broadband Modem, seen in Novatel Verizon USB730L and
++	 * Telit FN990A (RNDIS)
++	 */
+ 	USB_INTERFACE_INFO(USB_CLASS_MISC, 4, 1),
+-	.driver_info =3D (unsigned long) &rndis_info,
++	.driver_info =3D (unsigned long)&wwan_rndis_info,
+ },
+ 	{ },		// END
+ };
+--=20
+2.48.1
 
 
