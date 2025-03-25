@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-177602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14006A70B98
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 21:34:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D129A70BA4
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 21:38:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 407071891AF6
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 20:33:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52B2F3B2F77
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 20:38:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 458CA1FFC4F;
-	Tue, 25 Mar 2025 20:33:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7705F266573;
+	Tue, 25 Mar 2025 20:38:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="q0GxFkxW"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eZWkwTAY"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 369191A0BF8;
-	Tue, 25 Mar 2025 20:33:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC5021A5B88;
+	Tue, 25 Mar 2025 20:38:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742934818; cv=none; b=UhUAZR5VCe/9EGK8Xv5kIcW5x4Den2SCE5t9JRal2pX0MP6lC7FImBjwmKHKMsqCqhGDmMHkpjb/6Z5j6nN5NqurJdNWgYbVksrsuWUFCwN1HgJV8IqF/ONoKkhz24jK3lQBdOWHizeo3J3DA9L9zq0E2A7BUB8MlbAFxdhp1w4=
+	t=1742935115; cv=none; b=hSo4LyLDAspYqokh2GET8vUt1s0kRi3wnQkKShu7xBTUJhLHsZZ/jYAZlgMOS7ssxOnRUpfLBV4cZ0LT7mL+UsJGw5QdDst2GXGtJyt61fGSTjzYQLI7Wl4zCzUPhgXZY/q6WYOCuQZGY8A9z38Na18iZKSxue4e9x0oGKh/PMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742934818; c=relaxed/simple;
-	bh=Sz2WL1G1NaIwqe39FIYWpMn+gO0sXXhznamMETN+r1A=;
+	s=arc-20240116; t=1742935115; c=relaxed/simple;
+	bh=eep9kvBkJcCshapLllM2aXRk30DdXOkhNpQwLtx8MaU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CwdwN1dsazCsJPEt7VHBsSTlsqL3J/xCCFzWM31hXPBya7396qgrNT196EXSa/BYAyLVPe0Z8G74ZdS2x6x/RXaZ611DlCdvYOusSmyNBDeZA9fTGobdEBPGPy/vci7ohuWaVmb54ua79Sg1QeH16pN9FAFNPA8CqcaKu7xnGJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=q0GxFkxW; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=XOm6ae+wApJY2Yt6uZwll2LFj9jsltAi6pRa8rf5M00nqzceo8/1iyYF60cOibq66oqTYA5gF1vuLE9EiqM/vuFBprMJKy3tgNMyqq+65gijG2u/iM7SajZgW69qZCTxXKFHPb3hALzmuyYZZvhH9nuedsO8qt6vYGI9YbbTGqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eZWkwTAY; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,32 +36,51 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=+MRzvg3hix3D3aX4/I3iSCDpR1ngitDWf6pexRiR87M=; b=q0GxFkxWgDhNs8d7jt//EUWTsr
-	YIMmQ905walh4pHUfthsk8pqglDW6LELTw1NsEpmDrmVzn8Svpfyztof8gWJZ1gLxzB5UN1oPHK4U
-	fgb1KdftVZ9GMCUBKNy2CcbY8FYoysqrD1wfkkbk+2M9D/kclnpfvD9OuVqYbkpUCYk0=;
+	bh=7JpyzTPxTIDtp6S7hw/3Jis3LGxTRMLKQRCEej/p3O0=; b=eZWkwTAYZsERGHkH8IgZA89n2I
+	CYvnb4lbmktg+Au5DTu2JSCZClWiREt/adBiFVqDF1dbAFnvk0f4MXIrqNEcP8uRlya8z01X1XMSM
+	rGdmwB/e8FlTd/oSzHF2Dlo2lFzxHBdHqiTvkoU9Q9XKF4id+01NBT18jHOMXwJYFd7k=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1txAxi-0076De-Oz; Tue, 25 Mar 2025 21:33:26 +0100
-Date: Tue, 25 Mar 2025 21:33:26 +0100
+	id 1txB2R-0076G2-MJ; Tue, 25 Mar 2025 21:38:19 +0100
+Date: Tue, 25 Mar 2025 21:38:19 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH 1/2] net: phy: Add support for new Aeonsemi PHYs
-Message-ID: <4f865b3a-0568-4fef-a56d-6360dfbd18f6@lunn.ch>
-References: <20250323225439.32400-1-ansuelsmth@gmail.com>
- <f0c685b0-b543-4038-a9bd-9db7fc00c808@lunn.ch>
- <67e1692c.050a0220.2b4ad0.c073@mx.google.com>
- <a9abc0c6-91c2-4366-88dd-83e993791508@lunn.ch>
- <67e29bce.050a0220.15db86.84a4@mx.google.com>
+To: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
+	KY Srinivasan <kys@microsoft.com>,
+	"wei.liu@kernel.org" <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	Long Li <longli@microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"brett.creeley@amd.com" <brett.creeley@amd.com>,
+	"surenb@google.com" <surenb@google.com>,
+	"schakrabarti@linux.microsoft.com" <schakrabarti@linux.microsoft.com>,
+	"kent.overstreet@linux.dev" <kent.overstreet@linux.dev>,
+	"shradhagupta@linux.microsoft.com" <shradhagupta@linux.microsoft.com>,
+	"erick.archer@outlook.com" <erick.archer@outlook.com>,
+	"rosenp@gmail.com" <rosenp@gmail.com>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	Paul Rosswurm <paulros@microsoft.com>
+Subject: Re: [EXTERNAL] Re: [PATCH 2/3] net: mana: Implement
+ set_link_ksettings in ethtool for speed
+Message-ID: <f2619b80-8d5d-4484-a154-18f902d43d63@lunn.ch>
+References: <1742473341-15262-1-git-send-email-ernis@linux.microsoft.com>
+ <1742473341-15262-3-git-send-email-ernis@linux.microsoft.com>
+ <fb6b544f-f683-4307-8adf-82d37540c556@lunn.ch>
+ <20250325170955.GB23398@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <adaaa2b0-c161-4d4f-8199-921002355d05@lunn.ch>
+ <20250325122135.14ffa389@kernel.org>
+ <MN0PR21MB3437DA2C43930B08036BB146CAA72@MN0PR21MB3437.namprd21.prod.outlook.com>
+ <6396c1f7-756d-476a-833e-7ea35ae41da8@lunn.ch>
+ <MN0PR21MB34376199FAFAE4901EF18E75CAA72@MN0PR21MB3437.namprd21.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,46 +89,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <67e29bce.050a0220.15db86.84a4@mx.google.com>
+In-Reply-To: <MN0PR21MB34376199FAFAE4901EF18E75CAA72@MN0PR21MB3437.namprd21.prod.outlook.com>
 
-On Tue, Mar 25, 2025 at 01:04:30PM +0100, Christian Marangi wrote:
-> On Mon, Mar 24, 2025 at 04:16:09PM +0100, Andrew Lunn wrote:
-> > On Mon, Mar 24, 2025 at 03:16:08PM +0100, Christian Marangi wrote:
-> > > On Mon, Mar 24, 2025 at 03:03:51PM +0100, Andrew Lunn wrote:
-> > > > > Supported PHYs AS21011JB1, AS21011PB1, AS21010JB1, AS21010PB1,
-> > > > > AS21511JB1, AS21511PB1, AS21510JB1, AS21510PB1, AS21210JB1,
-> > > > > AS21210PB1 that all register with the PHY ID 0x7500 0x7500
-> > > > > before the firmware is loaded.
+> Could you please point us to the interface struct, callback function
+> names, and/or docs you are suggesting us to use?
 
-Do you have details of how these different PHY differ? Do they have
-different features?
+If you cannot search the sources for tc htb, or net shaper, google the
+same, etc, you probably cannot write the code either.
 
-> Ok update on this... The PHY report 7500 7500 but on enabling PTP clock,
-> a more specific ""family"" ID is filled in MMD that is 0x7500 0x9410.
-
-Do they all support PTP?
-
-> They all use the same firmware so matching for the family ID might not
-> be a bad idea... The alternative is either load the firmware in
-> match_phy_device or introduce some additional OPs to handle this
-> correctly...
-> 
-> Considering how the thing are evolving with PHY I really feel it's time
-> we start introducing specific OP for firmware loading and we might call
-> this OP before PHY ID matching is done (or maybe do it again).
-
-You cannot download firmware before doing some sort of match, because
-you have no idea what PHY you actually have until you do a match, and
-if the PHY needs firmware.
-
-match_phy_device() gives you a bit more flexibility. It will be called
-for every PHY on the board, independent of the ID registers. So you
-can read the ID registers, see if it is at least a vendor you know how
-to download firmware to, do the download, and then look at the ID
-registers again to see if it is the version of the PHY you want to
-drive. If not, return -ENODEV, and the core will try the next driver
-entry.
+http://www.catb.org/esr/faqs/smart-questions.html
 
 	Andrew
-
 
