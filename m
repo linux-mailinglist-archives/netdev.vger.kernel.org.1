@@ -1,128 +1,80 @@
-Return-Path: <netdev+bounces-177508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7F92A7065C
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 17:13:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A114DA70679
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 17:16:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CE501897D1A
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 16:13:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1471A3B3B5A
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 16:13:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3860F25D1E2;
-	Tue, 25 Mar 2025 16:12:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 875082586C3;
+	Tue, 25 Mar 2025 16:13:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="aq0uJpy6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GtUQMttc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.denx.de (mx.denx.de [89.58.32.78])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6201743169;
-	Tue, 25 Mar 2025 16:12:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E43E255E20;
+	Tue, 25 Mar 2025 16:13:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742919144; cv=none; b=fFsapxDpJ2PB+0Epwk2Ctt50whCUBGCbkBrD2pr8vjHKes/q17zlLvuNARfDExks/cMqzHWLH77bLcwpJjVdN+sW8F6mk/v9F68fiHdFQ7FVLZ6RXBGZxpHdEOOd1ivFg/cki00RRhcR0lSfcN+BpW+THf6LckwaKHGcF/MgHPA=
+	t=1742919228; cv=none; b=KZoQBHEk1372QUGAcFACwIyYZV5oMZHHyxE941vdJRyimHrcuYZRMnklmp3c1Y0884OIprfrF3Zzc+2Q8JafMQqbIGgEsOr+DNAAxhkQ70z1vpjOr5wWGs9Cy4wBAfeWMKo8gaVAnyvt+kuzLm3Kj4B+P8fmCjkux4F8dAmcrm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742919144; c=relaxed/simple;
-	bh=+KdiDrFiarGEbf3kb9HlXSM9P6HlZDF5FlBfLt0MCHU=;
+	s=arc-20240116; t=1742919228; c=relaxed/simple;
+	bh=o5iqLNYHvWWuh4+BP/whWUchWJw/jZnSjKIg78yGgxY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VHZGXrRhjRLcoSGWkCmqYqn+vJS+RiTbMqEBl0AH0Vj7umEjzbTrgND+DPsxaAyvsXtEv/XW/ILda9RIxqys5VK899F+BPenbCR5fQn++YABbLpB/3re2FeBl2cyvnFbbmbzcLtKHi7DdR2msEYC44JzFCz3j8wpbedzn79fJvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=aq0uJpy6; arc=none smtp.client-ip=89.58.32.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 564B5102F66E4;
-	Tue, 25 Mar 2025 17:12:14 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1742919139; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=OCuZIdUEm0QWQuqdvQk8bF8aibatk8qGzYP76myy1Xo=;
-	b=aq0uJpy6Wp06yKfxV/hPNUiV24cd6mrnOWV4CE+8kfJBqN4oGmgoSUAcXMxOFAu5K8uoPq
-	aOOJI7VMVVHpQssTy9rh+Zxg+zWIJfrKhPErtAqbMYR1HxyWQ1fYv1i8SJbbOPP+jtWK+I
-	2w1/G0d9pKzC7lrHR+odcAgZqSkBD+uDrQnr9cIejI7sLvvN8PfA7/+HwmHP0ss0U5amVA
-	9uM1StWAo9+ovfCtq9IGG68B3G38MB40YR5IWv+mWqBtE7QZ/JEyCyuG80xA88fZyRURoC
-	scOhKT7Y5tgY+UlS0wn/6+bOVsFLoHR69E+bSx8QssbDMQUuBu3c/Mc/ZHJ3iQ==
-Date: Tue, 25 Mar 2025 17:12:13 +0100
-From: Lukasz Majewski <lukma@denx.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha
- Hauer <s.hauer@pengutronix.de>, Paolo Abeni <pabeni@redhat.com>, Jakub
- Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- davem@davemloft.net, Andrew Lunn <andrew+netdev@lunn.ch>, Pengutronix
- Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>,
- devicetree@vger.kernel.org, imx@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Richard
- Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org, Maxime
- Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH 2/5] dt-bindings: net: Add MTIP L2 switch description
- (fec,mtip-switch.yaml)
-Message-ID: <20250325171213.61de8d6b@wsk>
-In-Reply-To: <2ccab52d-5ed1-4257-a8f1-328c76127ebe@lunn.ch>
-References: <20250325115736.1732721-1-lukma@denx.de>
-	<20250325115736.1732721-3-lukma@denx.de>
-	<2ccab52d-5ed1-4257-a8f1-328c76127ebe@lunn.ch>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	 MIME-Version:Content-Type; b=jNF4YWkJtX7YxqTIkoXjkpg3ME/7cx5hZ9q3HpTY1H1etUDGaMZJGnxaaC0ueRKx33wU5NQh880nYIyIQSYMq/ypj3w7U/kxBFuK3CpUxcu2R+r0mjx5a547nOGCtTEYf8NxNrII7yJHBqj7QkXo3etlhg7I5Je5giNcR4WyCbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GtUQMttc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9DF7C4CEEA;
+	Tue, 25 Mar 2025 16:13:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742919228;
+	bh=o5iqLNYHvWWuh4+BP/whWUchWJw/jZnSjKIg78yGgxY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GtUQMttceRLoiK2pJwHCsiI50LMlR1+GN74eCrv2d/6gppnHAOFgvWuqWCPZ5hP0f
+	 lcwSpzatYgn3WKwxjcwuR8T8EVWiOM6TNGzG9sB3FprVFTQCfWNVKmfRg6bsvVuIDx
+	 q/qS+w/zAgrX7xgvrVvfxCd35LDOJVaa+86Yh4Lbj3Qx22rel36fYbZi2+FHvk3CLb
+	 jOpiUzUG9uQpM8k6Ni2r+qeiMx0Im4aTXYekEpJpf3SZvnghy2HToSsQGRprTfvtTI
+	 tiOAxCXtkx5dGpGVNhgUc2DIHA8Ul5zDasnJ4itO0wej6IpJoOl7Cq7r0MwMUJKa/w
+	 +cK4K3yYIty4Q==
+Date: Tue, 25 Mar 2025 09:13:35 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ decui@microsoft.com, stephen@networkplumber.org, kys@microsoft.com,
+ paulros@microsoft.com, olaf@aepfle.de, vkuznets@redhat.com,
+ davem@davemloft.net, wei.liu@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, leon@kernel.org, longli@microsoft.com,
+ ssengar@linux.microsoft.com, linux-rdma@vger.kernel.org,
+ daniel@iogearbox.net, john.fastabend@gmail.com, bpf@vger.kernel.org,
+ ast@kernel.org, hawk@kernel.org, tglx@linutronix.de,
+ shradhagupta@linux.microsoft.com, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+Subject: Re: [PATCH net] net: mana: Switch to page pool for jumbo frames
+Message-ID: <20250325091335.6833ed27@kernel.org>
+In-Reply-To: <1742605475-26937-1-git-send-email-haiyangz@microsoft.com>
+References: <1742605475-26937-1-git-send-email-haiyangz@microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/BTpJUUNgSsmMxe6X4ageVFE";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Last-TLS-Session-Version: TLSv1.3
-
---Sig_/BTpJUUNgSsmMxe6X4ageVFE
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-Hi Andrew,
+On Fri, 21 Mar 2025 18:04:35 -0700 Haiyang Zhang wrote:
+> Since commit 8218f62c9c9b ("mm: page_frag: use initial zero offset for
+> page_frag_alloc_align()"), the netdev_alloc_frag() no longer works for
+> fragsz > PAGE_SIZE. And, this behavior is by design.
 
-> > +  phy-reset-gpios:
-> > +    deprecated: true
-> > +    description:
-> > +      Should specify the gpio for phy reset. =20
->=20
-> It seem odd that a new binding has deprecated properties. Maybe add a
-> comment in the commit message as to why they are there. I assume this
-> is because you are re-using part of the FEC code as is, and it
-> implements them?
-
-+1
-
->=20
-> 	   Andrew
->=20
-
-
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/BTpJUUNgSsmMxe6X4ageVFE
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmfi1d0ACgkQAR8vZIA0
-zr2V+gf+JAQoDZbvVcOrU8Xf5yrlKENSX8KVhYJexfgs+qiD+wvn+CS8kUCphBCk
-rDQbqUh8g3qjogX3/PH1NWqIlXvz7EO55+P39PQExyszRX3HpW7ibOaTWMgnnWa4
-Ik2qLNREr7mWs83euMDjk21zx0+SacLsJ9I8A0k60wY720aUaxwAFm7p/uhTIvTo
-TdCeHqeaKWV/2ui8a2fnR5TNaM9LuCF2a+xxbv9OiqYdHlPVLQyFMtm7AZ4RWT+A
-AGnhGvNGIX87TACwdl5FRb85sSxbUbd2jLMzT04w268IgsXKhqMRmXyAxmktKSMx
-Z4U/nFhivYUqaXt05MM8Id9eAZ20/g==
-=vard
------END PGP SIGNATURE-----
-
---Sig_/BTpJUUNgSsmMxe6X4ageVFE--
+This is inaccurate, AFAIU. The user of frag allocator with fragsz >
+PAGE_SIZE has _always_ been incorrect. It's just that it fails in
+a more obvious way now? Please correct the commit message.
+-- 
+pw-bot: cr
 
