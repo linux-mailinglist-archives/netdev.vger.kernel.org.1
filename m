@@ -1,72 +1,67 @@
-Return-Path: <netdev+bounces-177309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39EFFA6EDFE
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 11:44:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FA9BA6EE2A
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 11:47:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20BAF3A93A7
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 10:44:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D7B9169C8D
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 10:47:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23A1C254AED;
-	Tue, 25 Mar 2025 10:44:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBCAF1F0E38;
+	Tue, 25 Mar 2025 10:46:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ll7LLZFj";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="3Gdo7Xpq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bwv2jgic"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AF1325487D
-	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 10:44:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B07AA1C5D50;
+	Tue, 25 Mar 2025 10:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742899468; cv=none; b=cLZv992gIk7gBLyMCv8zZCqyFc+l/7pnxjPmMsNJZOjS1FJ9E2+CWUAiRcD3O5A6OBQDnRKaStn5h9tLO9hCi8c8hLxOUBqOsFty0H26oR81kufGHx3oBoQ9oY2wSquIigFjSw9tpX6EE7p0wt0qW4Eb+VzizgGdCa5trt6BWnk=
+	t=1742899613; cv=none; b=jOdAGbCPTlJ8us7n3aq7HuCvzKNCcz4E5aF413O+E7SS6QjGBsEllaW6d1Gk+aGR2ymlgp9iaV+NvguYB5oaVDUq+Vl6VB0H/MTSO85AE7e2cjoelul0tdrndvp8cqK8HTvZg9KAm6b/eNOQuhyPVHhJwr4Z2gqwaUQH+GVHPBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742899468; c=relaxed/simple;
-	bh=N6hRMYy+MK85vVzpO/DUY6jOdzgjRqCiLpk8t7pXv0g=;
+	s=arc-20240116; t=1742899613; c=relaxed/simple;
+	bh=rqVeZKTsfR1Mw1ipXxcLoywYP3wysPSlC0jiSRkwu8w=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oXu07cbtgojSfOSvTq2vDDMuPh3xZet0bE1Q0Y8NeGozy8dfXqzK88H3WnikpmBLhTD78suEKcNpjbkStK7VZZEuzx6yZ+vHEr/S/WQizY8YwLXOE9lEMArlC6Vy2biYb8ELM0RWORg3LWOFB4VdLDL95ispulVmKPQqsnVDHDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ll7LLZFj; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=3Gdo7Xpq; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Tue, 25 Mar 2025 11:46:11 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1742899464;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a6xB2BErYVm3L4Qmt0N4AMI9m5or0sB4d/bwn8BYc7g=;
-	b=ll7LLZFjSBxx6ZPOBQfxIP2GkHNsDVkuwQCC15nIUEnZxghTyZ4zODPzOvFtcNmB5w4xhi
-	cdOl8GJBa/xbwdPFnCwzKEK5zbT747nY/RLeUsTASXd7NDzUCwq9e5k8xkB7cEYu76IrgQ
-	Vg2kEWUxTrtMJorksZAZIPZxMTluOgB2o1myBVBtgpIbEPNxRINxXX+2H0w041QESKxOL0
-	Bgu3HjgtKSyGfZV8nYT52PBoFLZHLpbH8inYoSOtTG9GPAOnUrlMTV0rwCrTXvzt10C2rg
-	9eM5FrLENffTG3jCXvd14cP0g7YGLonTf4CwGEcIxY89WFHZUM3aI8K0uHHBwQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1742899464;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a6xB2BErYVm3L4Qmt0N4AMI9m5or0sB4d/bwn8BYc7g=;
-	b=3Gdo7XpqYK9h0Ql+elvHd2RaL5gAgUhMNEMfJLAseXkUbsHtMbgdJ187rfdxZszvxgVC2J
-	TeW0kqC/0wCThrBA==
-From: Benedikt Spranger <b.spranger@linutronix.de>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: netdev@vger.kernel.org, MD Danish Anwar <danishanwar@ti.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>
-Subject: Re: [PATCH] net: ti: icssg-prueth: Check return value to avoid a
- kernel oops
-Message-ID: <20250325114611.4ac846b6@mitra>
-In-Reply-To: <3bd78b6a-3c6d-4130-b086-36f2f728bc3e@kernel.org>
-References: <20250322143314.1806893-1-b.spranger@linutronix.de>
-	<89f81b99-b505-48ad-b717-99e5d4d8e87b@kernel.org>
-	<20250323161826.5bcd9cf8@mitra>
-	<3bd78b6a-3c6d-4130-b086-36f2f728bc3e@kernel.org>
-Organization: Linutronix GmbH
+	 MIME-Version:Content-Type; b=L6CW0uLKRxyropIuMdJRG8iWU+xQt2Ui5tbO1GyOeIMAhhve7nn1h6dYAkNkhlx7u/F6qTxybifobFwzWXdQfsQTnaEzlpH04ib6uKY/wo4gPoaIgDD4OTDEyIpUBmgzDHaQ5woshJXEOS1+ZBr8u5eA647F/SWcmUnvUrycTfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bwv2jgic; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FD19C4CEE4;
+	Tue, 25 Mar 2025 10:46:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742899613;
+	bh=rqVeZKTsfR1Mw1ipXxcLoywYP3wysPSlC0jiSRkwu8w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bwv2jgicOKrT+0/PuMPF9JVYRWhWGnsPdExi0sLbALZIYWOLLSxskxBDkhsla5GyA
+	 EZMfb6D7WzVC2jaW5kDfwAXdNjd0dJ3LOwan4R9/mTR6jnpoOK9604glTKzGVKbedS
+	 zfjm6MsenHiUa+rXgA+Wva5BpGOQWSdN8UYH1nd2hR+1MnSb+YtlZYmLAXxdQfkbT1
+	 uGyZLOKh2xC3wLlmMOkZLkDAJEQAXwZ7tD1qOKrhL6SU2wlny48gLCy3GFAZ+Y6Jsi
+	 ED4DquLSM8QnZIj23rLbtF/0AQNUtkkmmR09IrclOq4rzrKxeUrQj4zx3PcWjlStsa
+	 afECIgclpRrwg==
+Date: Tue, 25 Mar 2025 03:46:41 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Gur Stavi <gur.stavi@huawei.com>
+Cc: Fan Gong <gongfan1@huawei.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Lee Trager
+ <lee@trager.us>, <linux-doc@vger.kernel.org>, Jonathan Corbet
+ <corbet@lwn.net>, Bjorn Helgaas <helgaas@kernel.org>, Cai Huoqing
+ <cai.huoqing@linux.dev>, luosifu <luosifu@huawei.com>, Xin Guo
+ <guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>, Zhou
+ Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
+ <shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>, Suman Ghosh
+ <sumang@marvell.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, Joe
+ Damato <jdamato@fastly.com>
+Subject: Re: [PATCH net-next v09 1/1] hinic3: module initialization and
+ tx/rx logic
+Message-ID: <20250325034641.65536e13@kernel.org>
+In-Reply-To: <60a3c7b146920eee8b15464e0b0d1ea35db0b30e.1742202778.git.gur.stavi@huawei.com>
+References: <cover.1742202778.git.gur.stavi@huawei.com>
+	<60a3c7b146920eee8b15464e0b0d1ea35db0b30e.1742202778.git.gur.stavi@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,46 +71,93 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 24 Mar 2025 16:44:20 +0200
-Roger Quadros <rogerq@kernel.org> wrote:
+On Mon, 17 Mar 2025 11:40:39 +0200 Gur Stavi wrote:
+> +static int hinic3_poll(struct napi_struct *napi, int budget)
+> +{
+> +	struct hinic3_irq_cfg *irq_cfg =
+> +		container_of(napi, struct hinic3_irq_cfg, napi);
+> +	struct hinic3_nic_dev *nic_dev;
+> +	int tx_pkts, rx_pkts;
+> +
+> +	nic_dev = netdev_priv(irq_cfg->netdev);
+> +	rx_pkts = hinic3_rx_poll(irq_cfg->rxq, budget);
+> +
+> +	tx_pkts = hinic3_tx_poll(irq_cfg->txq, budget);
 
-> On 23/03/2025 17:18, Benedikt Spranger wrote:
-> > On Sun, 23 Mar 2025 09:19:35 +0200
-> > Roger Quadros <rogerq@kernel.org> wrote:
-> >   
-> >> Did you actually get a kernel oops?  
-> > Yes. And I would like to attach the kernel output, but I do not have
-> > access to the board ATM.
-> >   
-> >> If yes, which part of code produces the oops.  
-> > I get an NULL pointer dereference in is_multicast_ether_addr().
-> > It happens here:
-> > 
-> >     u32 a = *(const u32 *)addr;  
-> 
-> But this should not happen. Because ndev->addr (pointer) should not
-> be zero. Driver allocated ndev with alloc_etherdev_mq() which
-> allocates memory for ndev->addr using dev_addr_init(dev)).
-Emphasis on *should* :)
-OK, got your point. Dig deeper into that.
+You should service Tx first, it frees skbs into a cache which Rx 
+can then use, while they are hopefully still cache-warm.
 
-> >> Even if it fails we do set a random MAC address and do not return
-> >> error. So above statement is false.  
-> > I doubt that. of_get_ethdev_address() do not set a random MAC
-> > address in case of a failure. It simply returns -ENODEV. Since
-> > is_valid_ether_addr() fails with a NULL pointer dereference in
-> > is_multicast_ether_addr() on the other hand, no random MAC address
-> > is set.   
-> 
-> What I meant was we set random address using eth_hw_addr_random().
-But that happens after the failing check. So evaluating the return of
-of_get_ethdev_address() seem to be a good thing in the first place.
+> +	if (tx_pkts >= budget || rx_pkts >= budget)
+> +		return budget;
+> +
+> +	napi_complete(napi);
 
-I my understanding (for now) it is nessesary to check both: the return
-of of_get_ethdev_address() *and* !is_valid_ether_addr(). If any of these
-checks fail eth_hw_addr_random() should be called and therefore a
-random MAC address be set.
+Please use napi_complete_done().
 
-Regards
-    Bene
+> +	hinic3_set_msix_state(nic_dev->hwdev, irq_cfg->msix_entry_idx,
+> +			      HINIC3_MSIX_ENABLE);
+> +
+> +	return max(tx_pkts, rx_pkts);
+> +}
+
+> +static int hinic3_nic_probe(struct auxiliary_device *adev,
+> +			    const struct auxiliary_device_id *id)
+
+> +	err = register_netdev(netdev);
+> +	if (err)
+> +		goto err_register_netdev;
+> +
+> +	netif_carrier_off(netdev);
+
+You should carrier_off before you register
+
+> +	err = pci_enable_device(pdev);
+> +	if (err) {
+> +		dev_err(&pdev->dev, "Failed to enable PCI device\n");
+> +		goto err_pci_enable;
+> +	}
+> +
+> +	err = pci_request_regions(pdev, HINIC3_NIC_DRV_NAME);
+> +	if (err) {
+> +		dev_err(&pdev->dev, "Failed to request regions\n");
+> +		goto err_pci_regions;
+> +	}
+> +
+> +	pci_set_master(pdev);
+> +
+> +	err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
+> +	if (err) {
+> +		dev_warn(&pdev->dev, "Couldn't set 64-bit DMA mask\n");
+> +		/* try 32 bit DMA mask if 64 bit fails */
+> +		err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
+> +		if (err) {
+> +			dev_err(&pdev->dev, "Failed to set DMA mask\n");
+> +			goto err_dma_mask;
+> +		}
+> +	}
+> +
+> +	return 0;
+> +
+> +err_dma_mask:
+> +	pci_clear_master(pdev);
+> +	pci_release_regions(pdev);
+> +
+> +err_pci_regions:
+> +	pci_disable_device(pdev);
+> +
+> +err_pci_enable:
+> +	pci_set_drvdata(pdev, NULL);
+> +	mutex_destroy(&pci_adapter->pdev_mutex);
+> +	kfree(pci_adapter);
+
+Please name the error labels after the target, not the source.
+
+Quoting documentation:
+
+  Choose label names which say what the goto does or why the goto exists.  An
+  example of a good name could be ``out_free_buffer:`` if the goto frees ``buffer``.
+
+See: https://www.kernel.org/doc/html/next/process/coding-style.html#centralized-exiting-of-functions
+-- 
+pw-bot: cr
 
