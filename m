@@ -1,122 +1,172 @@
-Return-Path: <netdev+bounces-177430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F29CDA702E8
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 14:55:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFB2AA7033A
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 15:10:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB500846BB7
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:37:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C8A1188C6BC
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 14:04:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E58EF25A338;
-	Tue, 25 Mar 2025 13:35:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FB9B25949A;
+	Tue, 25 Mar 2025 14:04:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mpCSdXTo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hnDM9VFY"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F6325A349;
-	Tue, 25 Mar 2025 13:35:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4450D2580C6;
+	Tue, 25 Mar 2025 14:04:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742909707; cv=none; b=M6HVFQoEoQmnvhh/ZIL0DEWqUFqGQOL3Zhgo5uiqDqv06WpNqdyHT0lOY6NB6vUlaMyP1iJtQBV6hepBRwdkSlPut6IHu5NLiqO7Bq1C/o8GssaSXD2cl4XTTnUYQIJTjm0sQQs9l6WtJajI7pxV5yjh1qT68eY8PFO2pQyVdSo=
+	t=1742911477; cv=none; b=mb+R9cwP9nz1Orx5StKaRWwM5mOmZ9Z9wgJYzBZFjiFIw/h8g86+8tuUz1h8qEZbsBYBt1SDpfiJWm1L12WzVCeThI7hesq/CxfGcxzE4n14+LgsRsAvmwN4ITgBXAW0tIlLWDQfnapKjh0PvpampAv9kKBbPBd0dzA2o/lWzw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742909707; c=relaxed/simple;
-	bh=WI41gQeUVwlwx/C5aVo4GOyLB3bQLZwTkYbzcXT0gJ8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bvn+m8KTYdIbhEBCUaZpp61nvX92MnO0+6A1pleQDznKlmLhgyI0NJGbLk1iQV1Fgw6Ro4UspMcPiPmGMu/9bpaVN40P9ie8IroF1TpzApNquNKn9NQIjPiAcT6nnXnRa5QwpbxbSI8ZMYcfZCDalsxFKf8rTr7x7nfv4bPte8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mpCSdXTo; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 65FFF44288;
-	Tue, 25 Mar 2025 13:35:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1742909704;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=laPzi6AI5df0hYY8xCpaxh0N0Q/AFGk3Kz/EhxGguPo=;
-	b=mpCSdXTo+eVQSvjH2mkqzNcJ3dA0St0l8cbiIWzog554Nstg13Ec+f9qeBFJZJya/rr6D/
-	PFmcm9zItkOtmf2lnVqHpcBqL2bFJ9zJl9wLDPMqcr8JeyZMO2J4/pCwm7oNanvkarN5D3
-	45OsuA6Y5Tldb2CzDwrr76OueVSWySifM9qRKj0caKixcai5PUiN45Cm6eHCixQOcc8AVr
-	Flp1Zyez1cNCQlvZgzSN9YqzI1K4nKlo9Xbvn+6z+XdcWYZmBOAB2nytcm4Hy8LLI8bpU4
-	dXIpO9aNq/GNYIFKuhA7TXj87qWGUeOxsckPFdbNQ939OzmXCp1fYpi1Y9jABA==
-Date: Tue, 25 Mar 2025 14:35:02 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, linux-arm-kernel@lists.infradead.org,
- Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina
- <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Vladimir Oltean
- <vladimir.oltean@nxp.com>, Oleksij Rempel <o.rempel@pengutronix.de>, Simon
- Horman <horms@kernel.org>, Romain Gantois <romain.gantois@bootlin.com>,
- Piergiorgio Beruto <piergiorgio.beruto@gmail.com>
-Subject: Re: [PATCH net-next v4 8/8] net: ethtool: pse-pd: Use per-PHY DUMP
- operations
-Message-ID: <20250325143502.515e0bde@kmaincent-XPS-13-7390>
-In-Reply-To: <20250324104012.367366-9-maxime.chevallier@bootlin.com>
-References: <20250324104012.367366-1-maxime.chevallier@bootlin.com>
-	<20250324104012.367366-9-maxime.chevallier@bootlin.com>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1742911477; c=relaxed/simple;
+	bh=eCpGgKH/0DbjMToSuoCrDG9Ex54recEd4ZozNnXJgME=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JzKPKl1tetGK//VOUfYMxMkCA94kqbK6cKUyiEUsrtyozrwwUoYPZlzOFj0TUwW9PBaS4sa2SVowrM501WUh+rgSz5Vdq1Sf+6XrecHyATA0A3E2cSjoxLlYm+EPbcEKxnwmP0ngAJx+0z8/+W2bKpIJLaOrEBwzLg1ydBf6mOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hnDM9VFY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C287DC4CEE4;
+	Tue, 25 Mar 2025 14:04:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742911476;
+	bh=eCpGgKH/0DbjMToSuoCrDG9Ex54recEd4ZozNnXJgME=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hnDM9VFY3BM2X5/OB0pfHu6tS/xTWJ/UGTjmPuWI26voXM+eVxvwYHzeKZCnGwZfB
+	 8EXIXrA1OjVINWM2ZswXBkeg/M0N8cwBvYCRxU9Mchkdl8ufsjxJiSzQQrUg/GshHc
+	 GfjCpT2YkUuVwL9FmTGbSalzLQfsYPJH3x/TP2+KJXXj0MKLYqg7tGfnDID2bmwiD/
+	 vV/rIYRJ7jAV6zLjeyf+qL7bfpP41SeAHkNSauQ8HauheSh/zN2ZNgnXm8FVV4ThjX
+	 K8rOVMd+we4Uv4ux2VjM/4k92e8fh1SHwPZZnbgEmvreh2LGeR1Vo6DfwkWW3oCYzY
+	 Z8uCBsql9PGqg==
+Date: Tue, 25 Mar 2025 14:04:31 +0000
+From: Simon Horman <horms@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Moshe Shemesh <moshe@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	Lama Kayal <lkayal@nvidia.com>
+Subject: Re: [PATCH net] net/mlx5e: SHAMPO, Make reserved size independent of
+ page size
+Message-ID: <20250325140431.GQ892515@horms.kernel.org>
+References: <1742732906-166564-1-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduiedvjeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgfdutdefvedtudegvefgvedtgfdvhfdtueeltefffefffffhgfetkedvfeduieeinecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgepudenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvddupdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhop
- egvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1742732906-166564-1-git-send-email-tariqt@nvidia.com>
 
-On Mon, 24 Mar 2025 11:40:10 +0100
-Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
+On Sun, Mar 23, 2025 at 02:28:26PM +0200, Tariq Toukan wrote:
+> From: Lama Kayal <lkayal@nvidia.com>
+> 
+> When hw-gro is enabled, the maximum number of header entries that are
+> needed per wqe (hd_per_wqe) is calculated based on the size of the
+> reservations among other parameters.
+> 
+> Miscalculation of the size of reservations leads to incorrect
+> calculation of hd_per_wqe as 0, particularly in the case of large page
+> size like in aarch64, this prevents the SHAMPO header from being
+> correctly initialized in the device, ultimately causing the following
+> cqe err that indicates a violation of PD.
 
-> Leverage the per-phy ethnl DUMP helpers in case we have more that one
-> PSE PHY on the link.
->=20
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Hi Lama, Tariq, all,
+
+If I understand things correctly, hd_per_wqe is calculated
+in mlx5e_shampo_hd_per_wqe() like this:
+
+u32 mlx5e_shampo_hd_per_wqe(struct mlx5_core_dev *mdev,
+                            struct mlx5e_params *params,                                                    struct mlx5e_rq_param *rq_param)
+{
+        int resv_size = BIT(mlx5e_shampo_get_log_rsrv_size(mdev, params)) * PAGE_SIZE;
+        u16 num_strides = BIT(mlx5e_mpwqe_get_log_num_strides(mdev, params, NULL));
+        int pkt_per_resv = BIT(mlx5e_shampo_get_log_pkt_per_rsrv(mdev, params));
+        u8 log_stride_sz = mlx5e_mpwqe_get_log_stride_size(mdev, params, NULL);
+        int wqe_size = BIT(log_stride_sz) * num_strides;                                u32 hd_per_wqe;
+
+        /* Assumption: hd_per_wqe % 8 == 0. */
+        hd_per_wqe = (wqe_size / resv_size) * pkt_per_resv;                             mlx5_core_dbg(mdev, "%s hd_per_wqe = %d rsrv_size = %d wqe_size = %d pkt_per_resv = %d\n",                                                                                    __func__, hd_per_wqe, resv_size, wqe_size, pkt_per_resv);
+        return hd_per_wqe;
+}
+
+I can see that if PAGE_SIZE was some multiple of 4k, and thus
+larger than wqe_size, then this could lead to hd_per_wqe being zero.
+
+But I note that mlx5e_mpwqe_get_log_stride_size() may return PAGE_SHIFT.
+And I wonder if that leads to wqe_size being larger than expected by this
+patch in cases where the PAGE_SIZE is greater than 4k.
+
+Likewise in mlx5e_shampo_get_log_cq_size(), which seems to have a large overlap
+codewise with mlx5e_shampo_hd_per_wqe().
+
+> 
+>  mlx5_core 0000:00:08.0 eth2: ERR CQE on RQ: 0x1180
+>  mlx5_core 0000:00:08.0 eth2: Error cqe on cqn 0x510, ci 0x0, qn 0x1180, opcode 0xe, syndrome  0x4, vendor syndrome 0x32
+>  00000000: 00 00 00 00 04 4a 00 00 00 00 00 00 20 00 93 32
+>  00000010: 55 00 00 00 fb cc 00 00 00 00 00 00 07 18 00 00
+>  00000020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 4a
+>  00000030: 00 00 00 9a 93 00 32 04 00 00 00 00 00 00 da e1
+> 
+> Use the correct formula for calculating the size of reservations,
+> precisely it shouldn't be dependent on page size, instead use the
+> correct multiply of MLX5E_SHAMPO_WQ_BASE_RESRV_SIZE.
+> 
+> Fixes: e5ca8fb08ab2 ("net/mlx5e: Add control path for SHAMPO feature")
+> Signed-off-by: Lama Kayal <lkayal@nvidia.com>
+> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 > ---
-> V4 : No changes
->=20
->  net/ethtool/pse-pd.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->=20
-> diff --git a/net/ethtool/pse-pd.c b/net/ethtool/pse-pd.c
-> index 4f6b99eab2a6..f3d14be8bdd9 100644
-> --- a/net/ethtool/pse-pd.c
-> +++ b/net/ethtool/pse-pd.c
-> @@ -314,4 +314,10 @@ const struct ethnl_request_ops ethnl_pse_request_ops=
- =3D {
-> =20
->  	.set			=3D ethnl_set_pse,
->  	/* PSE has no notification */
-> +
-> +	.dump_start		=3D ethnl_dump_start_perphy,
-> +	.dump_one_dev		=3D ethnl_dump_one_dev_perphy,
-> +	.dump_done		=3D ethnl_dump_done_perphy,
-> +
-> +	.allow_pernetdev_dump	=3D true,
->  };
-
-Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
-
-Thank you!
-
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+>  drivers/net/ethernet/mellanox/mlx5/core/en/params.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
+> index 64b62ed17b07..31eb99f09c63 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
+> @@ -423,7 +423,7 @@ u8 mlx5e_shampo_get_log_pkt_per_rsrv(struct mlx5_core_dev *mdev,
+>  				     struct mlx5e_params *params)
+>  {
+>  	u32 resrv_size = BIT(mlx5e_shampo_get_log_rsrv_size(mdev, params)) *
+> -			 PAGE_SIZE;
+> +			 MLX5E_SHAMPO_WQ_BASE_RESRV_SIZE;
+>  
+>  	return order_base_2(DIV_ROUND_UP(resrv_size, params->sw_mtu));
+>  }
+> @@ -827,7 +827,8 @@ static u32 mlx5e_shampo_get_log_cq_size(struct mlx5_core_dev *mdev,
+>  					struct mlx5e_params *params,
+>  					struct mlx5e_xsk_param *xsk)
+>  {
+> -	int rsrv_size = BIT(mlx5e_shampo_get_log_rsrv_size(mdev, params)) * PAGE_SIZE;
+> +	int rsrv_size = BIT(mlx5e_shampo_get_log_rsrv_size(mdev, params)) *
+> +		MLX5E_SHAMPO_WQ_BASE_RESRV_SIZE;
+>  	u16 num_strides = BIT(mlx5e_mpwqe_get_log_num_strides(mdev, params, xsk));
+>  	int pkt_per_rsrv = BIT(mlx5e_shampo_get_log_pkt_per_rsrv(mdev, params));
+>  	u8 log_stride_sz = mlx5e_mpwqe_get_log_stride_size(mdev, params, xsk);
+> @@ -1036,7 +1037,8 @@ u32 mlx5e_shampo_hd_per_wqe(struct mlx5_core_dev *mdev,
+>  			    struct mlx5e_params *params,
+>  			    struct mlx5e_rq_param *rq_param)
+>  {
+> -	int resv_size = BIT(mlx5e_shampo_get_log_rsrv_size(mdev, params)) * PAGE_SIZE;
+> +	int resv_size = BIT(mlx5e_shampo_get_log_rsrv_size(mdev, params)) *
+> +		MLX5E_SHAMPO_WQ_BASE_RESRV_SIZE;
+>  	u16 num_strides = BIT(mlx5e_mpwqe_get_log_num_strides(mdev, params, NULL));
+>  	int pkt_per_resv = BIT(mlx5e_shampo_get_log_pkt_per_rsrv(mdev, params));
+>  	u8 log_stride_sz = mlx5e_mpwqe_get_log_stride_size(mdev, params, NULL);
+> 
+> base-commit: ed3ba9b6e280e14cc3148c1b226ba453f02fa76c
+> -- 
+> 2.31.1
+> 
+> 
 
