@@ -1,109 +1,95 @@
-Return-Path: <netdev+bounces-177641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECAD9A70D19
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 23:42:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 067EFA70D40
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 23:50:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF676189F24B
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 22:41:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D8BC189BA10
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 22:50:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0679026A0AA;
-	Tue, 25 Mar 2025 22:40:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E79161F153C;
+	Tue, 25 Mar 2025 22:49:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=proton.me header.i=@proton.me header.b="Yv8ej2/G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KioAoJlp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-24417.protonmail.ch (mail-24417.protonmail.ch [109.224.244.17])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 748B31A5BB6;
-	Tue, 25 Mar 2025 22:40:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B03EA18A6A8;
+	Tue, 25 Mar 2025 22:49:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742942444; cv=none; b=T/EKSkTmeuI0eQ13MwKohz8TcMWf0yIov7oZp+IjRO660j4lWmPGYN7lDvCyH8ITcLznhR3wvAfsINg0jt5fnRLWACddcNQNhGpcj2kShDYJxh5yPGbi78/lK8rEdl5gHIHyUafhmFrSX5In8R8zKc0Nt/bPwpR13vIVPOvD9s4=
+	t=1742942996; cv=none; b=c5W/SxeEj9GpRKywXD2AbhtLbyz2v1PMp+SYvWq+NvIid2c8vKJdyRGrjHo5ucfCpnBfY0olgDFOU1vdRL+D9V4Nxjx+Iv0BSitWxZIjg6Ip57JMWAUbakdsifnYK82Jf3N9sgkB7hhk1TGlCXdoqQkCdj7Y0HYUybwu8g/flXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742942444; c=relaxed/simple;
-	bh=bJMuUrhBgieHgODh9Ef1/Vvjzr44+2SMwl4ab2flivU=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=n4pIe+NylszHgqxepg04i1HM7mv2XWiuKtI3Ia03N+Hw4OrqYzowA4Hb55rZQ9JdbFsNjPl7IqqBF7R0Y1SdVYnjcSCJmpEcppd5xsDyPsTJ02LkDSVAKvMMczJojuhqHSEn6ys7B4flXu7tzzkkz2oR+mzFk3D3CabwG2fJT2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=Yv8ej2/G; arc=none smtp.client-ip=109.224.244.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1742942439; x=1743201639;
-	bh=qKP6LXK3dUgc4q9ZnxoH7qOT+1VIzcyp4xZAhxfH/Y4=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
-	b=Yv8ej2/GgDpfnJGUKMTLt2zFKD3k3oVhZs8DxA4KQasGzpEorXx2FmLkMoaTMVp34
-	 Wg/JdjLV4weljwB0R4UHf8QnIoNYD5r7r767CCEJlGCyQKO1yYLSdSd+dbE7o8UJxa
-	 8RyMI8ELlSpF8vw+5BHbsxez/AFKCpadU0kqu+WslyevovfunkOq1KfbSepxLB9q6T
-	 WWsHFuHLedCagGm4o7ldrw2Ghmr9vLbkrYZykqD0fybXeA5g1sKWqX0HthUsxDpTaX
-	 Qa+IaNI2pPjUv2U1AyZiGRqcqbnb7QVqnFsFIlWo3pmlYqiLY2sSgT3TAcoNPMpBtd
-	 faWiuJdJwqfSA==
-Date: Tue, 25 Mar 2025 22:40:33 +0000
-To: Tamir Duberstein <tamird@gmail.com>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, Maarten Lankhorst
-	<maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, FUJITA Tomonori <fujita.tomonori@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v7 7/7] rust: enable `clippy::ref_as_ptr` lint
-Message-ID: <D8PPIYIJCNX8.13VPQULEI0ALN@proton.me>
-In-Reply-To: <CAJ-ks9mUYw4FEJQfmDrHHt0oMy256jhp7qZ-CHp6R5c_sOCD4w@mail.gmail.com>
-References: <20250325-ptr-as-ptr-v7-0-87ab452147b9@gmail.com> <20250325-ptr-as-ptr-v7-7-87ab452147b9@gmail.com> <D8POWLFKWABG.37BVXN2QCL8MP@proton.me> <CAJ-ks9mUYw4FEJQfmDrHHt0oMy256jhp7qZ-CHp6R5c_sOCD4w@mail.gmail.com>
-Feedback-ID: 71780778:user:proton
-X-Pm-Message-ID: 973acf25ffeb3c44b5b862f8356cb4304fe578ab
+	s=arc-20240116; t=1742942996; c=relaxed/simple;
+	bh=co7FgKBtgXbqkUapCkD5XvQqzZnsGyQFzcLTxm73rOE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=cGlfjyRjLfsQc5z58A/5Jdz6llBk9J6k3PikKYN5iR/Hdk3qVtZwEx2XWpOumZ3DtVI4hDRT5sxkCe1ktmwlaXqCH8Tler6OkKaauBxqcgQV60oDyYmWMau20sZy7zWODmigtJd4JrRdDLQhPNXs+s45K1d4fGHRAckIysD16a4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KioAoJlp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 343CCC4CEE4;
+	Tue, 25 Mar 2025 22:49:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742942996;
+	bh=co7FgKBtgXbqkUapCkD5XvQqzZnsGyQFzcLTxm73rOE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=KioAoJlp8TrQ2lQ5PkCok9PrazRfpeEGPMx6KBEy4tapX91RXJMZP22GvxLtutL08
+	 P+kuhq9hHOXNARTF40rFSea7ykhpMNRsL97iQBgUV8+TI8ag6NsnuojGrU3hzRzpee
+	 e1MBAb5CRAxSRrSnB7i+gjsxrvfC4rkRQyj4N9N7bXNhPXcTu5azqAhg0xCV/p79jz
+	 NPJ5tQwvf+Ig85GolUzHmN7qqhl4wstXgD+hUamBWe/Edd3AnAL2zxDLoHxTkFcQvH
+	 YRSla1gBrVi1QZqL9wGA/lkCMhla+Oad4ZUTBe5Me4Sfbi4etbdzl8iO/pwfXoUrVO
+	 +/jc3W+iBmxGw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF66380DBFC;
+	Tue, 25 Mar 2025 22:50:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3 0/2] net: usb: asix: ax88772: Fix potential string cut
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174294303252.764297.2012932671054650861.git-patchwork-notify@kernel.org>
+Date: Tue, 25 Mar 2025 22:50:32 +0000
+References: <20250324144751.1271761-1-andriy.shevchenko@linux.intel.com>
+In-Reply-To: <20250324144751.1271761-1-andriy.shevchenko@linux.intel.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ hkallweit1@gmail.com, linux@armlinux.org.uk
 
-On Tue Mar 25, 2025 at 11:33 PM CET, Tamir Duberstein wrote:
-> On Tue, Mar 25, 2025 at 6:11=E2=80=AFPM Benno Lossin <benno.lossin@proton=
-.me> wrote:
->>
->> On Tue Mar 25, 2025 at 9:07 PM CET, Tamir Duberstein wrote:
->> > diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
->> > index 40034f77fc2f..6233af50bab7 100644
->> > --- a/rust/kernel/str.rs
->> > +++ b/rust/kernel/str.rs
->> > @@ -29,7 +29,7 @@ pub const fn is_empty(&self) -> bool {
->> >      #[inline]
->> >      pub const fn from_bytes(bytes: &[u8]) -> &Self {
->> >          // SAFETY: `BStr` is transparent to `[u8]`.
->> > -        unsafe { &*(bytes as *const [u8] as *const BStr) }
->> > +        unsafe { &*(core::mem::transmute::<*const [u8], *const Self>(=
-bytes)) }
->>
->> Hmm I'm not sure about using `transmute` here. Yes the types are
->> transparent, but I don't think that we should use it here.
->
-> What's your suggestion? I initially tried
->
-> let bytes: *const [u8] =3D bytes;
-> unsafe { &*bytes.cast() }
->
-> but that doesn't compile because of the implicit Sized bound on pointer::=
-cast.
+Hello:
 
-This is AFAIK one of the only places where we cannot get rid of the `as`
-cast. So:
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-    let bytes: *const [u8] =3D bytes;
-    // CAST: `BStr` transparently wraps `[u8]`.
-    let bytes =3D bytes as *const BStr;
-    // SAFETY: `bytes` is derived from a reference.
-    unsafe { &*bytes }
+On Mon, 24 Mar 2025 16:39:28 +0200 you wrote:
+> The agreement and also PHY_MAX_ADDR limit suggest that the PHY address
+> can't occupy more than two hex digits. In some cases GCC complains about
+> potential string cut. In course of fixing this, introduce the PHY_ID_SIZE
+> predefined constant to make it easier for the users to know the bare
+> minimum for the buffer that holds PHY ID string (patch 1). With that,
+> fix the ASIX driver that triggers GCC accordingly (patch 2).
+> 
+> [...]
 
-IMO a `transmute` is worse than an `as` cast :)
+Here is the summary with links:
+  - [net,v3,1/2] net: phy: Introduce PHY_ID_SIZE — minimum size for PHY ID string
+    https://git.kernel.org/netdev/net-next/c/2c5ac026fd14
+  - [net,v3,2/2] net: usb: asix: ax88772: Increase phy_name size
+    https://git.kernel.org/netdev/net-next/c/61997271a5a7
 
----
-Cheers,
-Benno
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
