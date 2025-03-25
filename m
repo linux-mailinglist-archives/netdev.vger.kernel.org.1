@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-177586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36E25A70ADC
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 20:59:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7056EA70B11
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 21:09:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5483E1887CB9
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 19:59:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9CFA07A73A6
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 20:07:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A369C23A571;
-	Tue, 25 Mar 2025 19:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FEA2267723;
+	Tue, 25 Mar 2025 20:06:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="nMe+Ry21"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PV9bb6bG"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFD401F1913;
-	Tue, 25 Mar 2025 19:59:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995CF2676F3;
+	Tue, 25 Mar 2025 20:06:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742932752; cv=none; b=DtO2AJTicX9u5Tv1fqQFlK2KKRzB4g1m+VUQS5jE3F3gSwjdVEvj0zIZcNh4FE3UUGlov7P4FIuMEjMnK+0rINQAOP8RUELrNefSY+Oajwjnnh84efWPD/N8qPFIEzVEPUlxu72Q5XaFG0UH0688Xw32QPfSEAXkv/cn44gX3hk=
+	t=1742933218; cv=none; b=q2wcumHjuzd4RcrRjcXGEaDQBsSDVcr7bctPCQr2OAIVMq5pQ8rx57ka315++fjwrSyIkLsHC+z6uQpdS4Dkikia0qQfBoTCkYwMRYazScT550UhdB3C8JHmYjOR/Exj5dbBU1gGj9Ao0LvUKXxQcKqkf/U9bIJgSKdhpm8K/bI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742932752; c=relaxed/simple;
-	bh=Kmce4MR3+inOg7HfHkfr1xXue4qdR8d/2SSpd5/SfNE=;
+	s=arc-20240116; t=1742933218; c=relaxed/simple;
+	bh=l7C8LIRo3jzIHuUJ93UZmTfHkJn7Pu3Uak0d0iCS0yo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JHJFGKA0qfh6+Ipybr8TE2C0wMyKOxSLsj78wTNA+55lxrjmNi2ml4pLSnMkt3dmv6F3Y+Bmq5+ZZd8oNUN+YTO0iZ9muQ7luyPqo8/J9SnxW/WIH+GsUMjS8YEtWpB98Oi2emVla5rKzrI2MWwV2icGEn/pDvGsYK+pbU1iM74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=nMe+Ry21; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=jA5/bt3lhdatHxORNDXuByt3OuBD9EpqfVM3enYh3H/nmJt/lw5Zdb320+WNQy+3B1fyIYUIf0ERDFf5IXfZfdYwO3/dKNCxPTFA6AAQvns7I1j64+gSkXydsbA1KnBnAgXAY2vAtM4jNJwbJRXva1e9kats48Ywk8ssYIlNb2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PV9bb6bG; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,49 +36,28 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=zASb+pDKpANBRsEZlpC72O+O+RlCzusRinXEvy0fxqU=; b=nMe+Ry21jpk3cRkc5nVgAP1JUk
-	q4VJXR9zH6nu56ZEW7EvGapafBds7R97l1UOS1iypLq6k546wjGV974D7x3loABlnDVqiqUcOoYhn
-	H7asLD5Hj/awUS9uWgvbOwpHOBuJXL+Y9ePnPrkAugLjbTVzw5vPjuL9F/RT48D8Xr7o=;
+	bh=RAsui1tHpSbJgGexr5H0HED26l04puvhVJUKlrM78oU=; b=PV9bb6bGXb/fjjN4gsc629oAIo
+	4eV1l1Pd79eugrcACzEeJZQ5Wnd8ktYgMTeBCBzBRs+5v5s7YSG/IIYlEMsyncYN0w7Y9RBQ3yQD7
+	h3CH0ah22FLGTzbWfw69Dy4ZmcX7/WXetew5b9ILVo+FgvpBI/QONoJ4tMz828Mz+TOI=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1txAQI-00760q-Ox; Tue, 25 Mar 2025 20:58:54 +0100
-Date: Tue, 25 Mar 2025 20:58:54 +0100
+	id 1txAXv-00765D-Ba; Tue, 25 Mar 2025 21:06:47 +0100
+Date: Tue, 25 Mar 2025 21:06:47 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
-	KY Srinivasan <kys@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	Long Li <longli@microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"brett.creeley@amd.com" <brett.creeley@amd.com>,
-	"surenb@google.com" <surenb@google.com>,
-	"schakrabarti@linux.microsoft.com" <schakrabarti@linux.microsoft.com>,
-	"kent.overstreet@linux.dev" <kent.overstreet@linux.dev>,
-	"shradhagupta@linux.microsoft.com" <shradhagupta@linux.microsoft.com>,
-	"erick.archer@outlook.com" <erick.archer@outlook.com>,
-	"rosenp@gmail.com" <rosenp@gmail.com>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	Paul Rosswurm <paulros@microsoft.com>
-Subject: Re: [EXTERNAL] Re: [PATCH 2/3] net: mana: Implement
- set_link_ksettings in ethtool for speed
-Message-ID: <6396c1f7-756d-476a-833e-7ea35ae41da8@lunn.ch>
-References: <1742473341-15262-1-git-send-email-ernis@linux.microsoft.com>
- <1742473341-15262-3-git-send-email-ernis@linux.microsoft.com>
- <fb6b544f-f683-4307-8adf-82d37540c556@lunn.ch>
- <20250325170955.GB23398@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <adaaa2b0-c161-4d4f-8199-921002355d05@lunn.ch>
- <20250325122135.14ffa389@kernel.org>
- <MN0PR21MB3437DA2C43930B08036BB146CAA72@MN0PR21MB3437.namprd21.prod.outlook.com>
+To: Rengarajan.S@microchip.com
+Cc: andrew+netdev@lunn.ch, rmk+kernel@armlinux.org.uk, davem@davemloft.net,
+	Thangaraj.S@microchip.com, Woojung.Huh@microchip.com,
+	pabeni@redhat.com, o.rempel@pengutronix.de, edumazet@google.com,
+	kuba@kernel.org, phil@raspberrypi.org, kernel@pengutronix.de,
+	horms@kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
+	maxime.chevallier@bootlin.com
+Subject: Re: [PATCH net-next v5 1/6] net: usb: lan78xx: Improve error
+ handling in PHY initialization
+Message-ID: <d1ce9f0d-9158-47ee-a60f-640822e35610@lunn.ch>
+References: <20250319084952.419051-1-o.rempel@pengutronix.de>
+ <20250319084952.419051-2-o.rempel@pengutronix.de>
+ <5f9b4b549d45c1c1a422c6e683a566b7a125f2a5.camel@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,23 +66,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <MN0PR21MB3437DA2C43930B08036BB146CAA72@MN0PR21MB3437.namprd21.prod.outlook.com>
+In-Reply-To: <5f9b4b549d45c1c1a422c6e683a566b7a125f2a5.camel@microchip.com>
 
-> This patch is just to support the ethtool option for the speed.
-> And seems there is no option on ethtool to reset NIC to the default
-> speed?
+> >  static struct phy_device *lan7801_phy_init(struct lan78xx_net *dev)
+> >  {
+> > -       u32 buf;
+> > -       int ret;
+> >         struct fixed_phy_status fphy_status = {
+> >                 .link = 1,
+> >                 .speed = SPEED_1000,
+> >                 .duplex = DUPLEX_FULL,
+> >         };
+> >         struct phy_device *phydev;
+> > +       int ret;
+> > 
+> >         phydev = phy_find_first(dev->mdiobus);
+> >         if (!phydev) {
+> > @@ -2525,30 +2524,40 @@ static struct phy_device
+> > *lan7801_phy_init(struct lan78xx_net *dev)
+> >                 phydev = fixed_phy_register(PHY_POLL, &fphy_status,
+> > NULL);
+> >                 if (IS_ERR(phydev)) {
+> >                         netdev_err(dev->net, "No PHY/fixed_PHY
+> > found\n");
+> > -                       return NULL;
+> > +                       return ERR_PTR(-ENODEV);
+> >                 }
+> >                 netdev_dbg(dev->net, "Registered FIXED PHY\n");
+> >                 dev->interface = PHY_INTERFACE_MODE_RGMII;
+> >                 ret = lan78xx_write_reg(dev, MAC_RGMII_ID,
+> >                                         MAC_RGMII_ID_TXC_DELAY_EN_);
+> > +               if (ret < 0)
+> > +                       return ERR_PTR(ret);
+> > +
+> 
+> I noticed that fixed_phy_register is removed in later patches. However,
+> in the above implementation, if a failure occurs we exit without
+> unregistering it. To avoid this issue, can we include the patch that
+> removes fixed_phy_register first to avoid the cleanup scenario?
 
-There is no such thing as default speed. Speed is either:
+phylink itself implements fixed phy. So it is being removed later
+because it is not needed once the conversation to phylink is
+performed. If you remove it here, before the conversion to phylink,
+you break the driver when it is using fixed phy.
 
-1) Negotiated with the link partner, picking the highest speed link
-modes both partners support
+With this sort of refactoring, you should not break the normal
+case. But there is some wiggle room for error cases, which should not
+happen, so long as by the end of the patch series, it is all clean.
 
-2) Forced to a specific speed, based on one of the link modes the
-interfaces supports.
-
-Since you don't have link modes, you are abusing the API. You should
-choose a different API which actually fits what you are doing,
-configuring a leaky bucket shaper.
+So i personally don't care about this leak of a fixed link, at this
+stage.
 
 	Andrew
 
