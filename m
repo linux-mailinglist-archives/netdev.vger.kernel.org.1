@@ -1,149 +1,135 @@
-Return-Path: <netdev+bounces-177366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EFDDA6FC04
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:32:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58DB3A6FC70
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:35:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F36BE7A72E4
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:26:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA5613BFB00
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:28:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31CA5257AD7;
-	Tue, 25 Mar 2025 12:19:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB3B725A32D;
+	Tue, 25 Mar 2025 12:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HEamIZXM"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="iI10GOZx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.denx.de (mx.denx.de [89.58.32.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB54257AD1
-	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 12:19:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5507C25A323;
+	Tue, 25 Mar 2025 12:20:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742905185; cv=none; b=NnkUjl+KHobTlLd7yGJs5MTri56Cb3XDG0IUjgu7quIyj3V0x/K+a5tLihYlrual0z60bPvu8NLIWq1QZWyqrHYj6lQ6uhlKtL1Pi6eLj0gqkBEE+80zx20vqYp8sGm11Tm3I+XVWN0yz6h5dn+4Ua8FYq0Wwz8I41GUpU083bs=
+	t=1742905205; cv=none; b=aG804TQdkK+FsRCdCa3uhJAknIs6SFoeqZS+PSNYuB7gScp3+edBz83SQfUiaIC63RCP1NA/7iKUzzZTtD1pgirBZ2jgtGteGsJDRYTdgaxjt0mWniKCS3YZEgI/7ajRnXsdGmbQvfQUoF1RpPaSBczmiFetNGVaskMTgiK+Vog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742905185; c=relaxed/simple;
-	bh=AHw3OAeqYEIevLAEuV4OUVZNI/+WQmI7pKAw4wheSto=;
+	s=arc-20240116; t=1742905205; c=relaxed/simple;
+	bh=W+zbuGuOsjMsAwj1TeKVa2TREDPoShSYxlcNLgWYVEk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eUU+c+75AHNEimXNrUjf6OZetHIBu7LlFaF8/zyluZ6bb+f5tH/XuYURfmLDyKVQb4+AMnF6ErTHh8YMkbaQNf+PnawiHRo0gLHfVARTA1ZYJD9OKQ+ktVgJnUsjunG4G/VggCgFfIYvmXmraSW5zcS2qLiJqZbFyT8FE7ofRjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HEamIZXM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88005C4CEEE;
-	Tue, 25 Mar 2025 12:19:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742905184;
-	bh=AHw3OAeqYEIevLAEuV4OUVZNI/+WQmI7pKAw4wheSto=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HEamIZXM+SrHg1LT/2RLSku05/oFtT4HSKKAUQv7y3QOcfTfTMuVR49w68pbZg0Zb
-	 7++qfBPNM4iSQEnPf/1x/hc35JmDF6hNbnx89CehQqBf/Q9+UHcpM6ugst1r7nn8sQ
-	 AKNI8hNkLravjsO1Z994u9JaowVUkNMGH9lb1YIVo+4AdJsearhIAzidIJGdyHSFM/
-	 4c5y0mprfMKY7fwIiJ4bH9sPTLhleITzy0IBbTCA3+7IFyLGD0+Uja7YjG3BH3b/Ia
-	 xl47fyZVo183w7lvvFeGAo9XSCrKmg1ODuXL32hTSMbQeVS6/u1+4ZwuUyPlrCz+TV
-	 N8xH6gmfQKTYQ==
-Date: Tue, 25 Mar 2025 05:19:34 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Xin Tian" <tianx@yunsilicon.com>
-Cc: <netdev@vger.kernel.org>, <leon@kernel.org>, <andrew+netdev@lunn.ch>,
- <pabeni@redhat.com>, <edumazet@google.com>, <davem@davemloft.net>,
- <jeff.johnson@oss.qualcomm.com>, <przemyslaw.kitszel@intel.com>,
- <weihg@yunsilicon.com>, <wanry@yunsilicon.com>, <jacky@yunsilicon.com>,
- <horms@kernel.org>, <parthiban.veerasooran@microchip.com>,
- <masahiroy@kernel.org>, <kalesh-anakkur.purayil@broadcom.com>,
- <geert+renesas@glider.be>, <geert@linux-m68k.org>
-Subject: Re: [PATCH net-next v9 09/14] xsc: Init net device
-Message-ID: <20250325051934.002db3cd@kernel.org>
-In-Reply-To: <20250318151510.1376756-10-tianx@yunsilicon.com>
-References: <20250318151449.1376756-1-tianx@yunsilicon.com>
-	<20250318151510.1376756-10-tianx@yunsilicon.com>
+	 MIME-Version:Content-Type; b=Kz6tPoVXGaGMpeLn9TskJhK/x7YpmeJ1L0oty1beP5HEjn25MtFpBdUx7rfGO+Olss6tHLgIA2UlaYLBY2jwr6F3YPJlmu2XbKzTz0fVP4jix9cA/HJznS11C5Oq3kzBN/ts7P+Xk5J/c8ApDXribHxi+lWR60A4KokOGEQxbOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=iI10GOZx; arc=none smtp.client-ip=89.58.32.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BAD1F102F66FF;
+	Tue, 25 Mar 2025 13:19:59 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
+	t=1742905201; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=NWmWtlj/ywJV6x0SVa10Ru5jBz9yI3s7yAlnn7HAP+A=;
+	b=iI10GOZxX1mHgyM2u8+7/hdsGhCCl9XeQNlR9159nd7Yrmp1M9EzyoQznOCNezfJNl+mJ9
+	SugwMDIGDHQIt+JVt4gZ5jtXRMz5XkD7mYkyoH+3BBQsC6Wep4HQmwCEBLJguay3eUz7UO
+	a++388I8tOOmPQB3cMRAuhPNSnW6ZWmqKY49V2c5IiK5nn5VJccHfnIESBHN9fzadsHgW9
+	Xl3+WTEZKlPTP/gQXxOBNmcm+5pZf5nfRnW+HkKaqVdVO0M7unZEoNF4KEl9D0/hrc9Gqb
+	jTvv2XpW46Zt70RZ+tso/GL43Wd/7AiEZ0vMVJoY64YbV5uAx1kHujfKwWVfZw==
+Date: Tue, 25 Mar 2025 13:19:58 +0100
+From: Lukasz Majewski <lukma@denx.de>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha
+ Hauer <s.hauer@pengutronix.de>, Paolo Abeni <pabeni@redhat.com>, Jakub
+ Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ davem@davemloft.net, Andrew Lunn <andrew+netdev@lunn.ch>, Pengutronix
+ Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>,
+ devicetree@vger.kernel.org, imx@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Richard
+ Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org, Maxime
+ Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH 3/5] arm: dts: Adjust the 'reg' range for imx287 L2
+ switch description
+Message-ID: <20250325131958.552fbd0b@wsk>
+In-Reply-To: <93c9bc3d-7ad8-438e-966e-cd28a91540af@kernel.org>
+References: <20250325115736.1732721-1-lukma@denx.de>
+	<20250325115736.1732721-4-lukma@denx.de>
+	<93c9bc3d-7ad8-438e-966e-cd28a91540af@kernel.org>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/iHkkBmAY=t74XA_T2X_ZYbS";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Last-TLS-Session-Version: TLSv1.3
+
+--Sig_/iHkkBmAY=t74XA_T2X_ZYbS
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 18 Mar 2025 23:15:11 +0800 Xin Tian wrote:
-> +static int xsc_eth_set_hw_mtu(struct xsc_core_device *xdev,
-> +			      u16 mtu, u16 rx_buf_sz)
-> +{
-> +	struct xsc_set_mtu_mbox_out out;
-> +	struct xsc_set_mtu_mbox_in in;
-> +	int ret;
-> +
-> +	memset(&in, 0, sizeof(struct xsc_set_mtu_mbox_in));
-> +	memset(&out, 0, sizeof(struct xsc_set_mtu_mbox_out));
-> +
-> +	in.hdr.opcode = cpu_to_be16(XSC_CMD_OP_SET_MTU);
-> +	in.mtu = cpu_to_be16(mtu);
-> +	in.rx_buf_sz_min = cpu_to_be16(rx_buf_sz);
-> +	in.mac_port = xdev->mac_port;
-> +
-> +	ret = xsc_cmd_exec(xdev, &in, sizeof(struct xsc_set_mtu_mbox_in), &out,
-> +			   sizeof(struct xsc_set_mtu_mbox_out));
-> +	if (ret || out.hdr.status) {
-> +		netdev_err(((struct xsc_adapter *)xdev->eth_priv)->netdev,
+Hi Krzysztof,
 
-Please use temporary variable or define a local print macro.
-The cast is too ugly.
+> On 25/03/2025 12:57, Lukasz Majewski wrote:
+> > The current range of 'reg' property is too small to allow full
+> > control of the L2 switch on imx287.
+> >=20
+> > As this IP block also uses ENET-MAC blocks for its operation, the
+> > address range for it must be included as well.
+> >  =20
+>=20
+> Please use subject prefixes matching the subsystem. You can get them
+> for example with `git log --oneline -- DIRECTORY_OR_FILE` on the
+> directory your patch is touching. For bindings, the preferred
+> subjects are explained here:
+> https://www.kernel.org/doc/html/latest/devicetree/bindings/submitting-pat=
+ches.html#i-for-patch-submitters
+>=20
+> Missing nxp or mxs.
 
-> +			   "failed to set hw_mtu=%u rx_buf_sz=%u, err=%d, status=%d\n",
-> +			   mtu, rx_buf_sz, ret, out.hdr.status);
-> +		ret = -ENOEXEC;
+Ok. I will add it.
 
-Why are you overwriting the ret code from xsc_cmd_exec() ?
-And why with such an unusual errno ?
+>=20
+> Best regards,
+> Krzysztof
 
-> +static int xsc_eth_get_mac(struct xsc_core_device *xdev, char *mac)
-> +{
-> +	struct xsc_query_eth_mac_mbox_out *out;
-> +	struct xsc_query_eth_mac_mbox_in in;
-> +	int err = 0;
-> +
-> +	out = kzalloc(sizeof(*out), GFP_KERNEL);
-> +	if (!out)
-> +		return -ENOMEM;
-> +
-> +	memset(&in, 0, sizeof(in));
-> +	in.hdr.opcode = cpu_to_be16(XSC_CMD_OP_QUERY_ETH_MAC);
-> +
-> +	err = xsc_cmd_exec(xdev, &in, sizeof(in), out, sizeof(*out));
-> +	if (err || out->hdr.status) {
-> +		netdev_err(((struct xsc_adapter *)xdev->eth_priv)->netdev,
-> +			   "get mac failed! err=%d, out.status=%u\n",
-> +			   err, out->hdr.status);
-> +		err = -ENOEXEC;
-> +		goto err_free;
-> +	}
-> +
-> +	memcpy(mac, out->mac, 6);
 
-6 -> ETH_ALEN or ether_addr_copy()
 
-> +
-> +err_free:
-> +	kfree(out);
-> +	return err;
-> +}
-> +
-> +static void xsc_eth_l2_addr_init(struct xsc_adapter *adapter)
-> +{
-> +	struct net_device *netdev = adapter->netdev;
-> +	char mac[6] = {0};
-> +	int ret = 0;
-> +
-> +	ret = xsc_eth_get_mac(adapter->xdev, mac);
-> +	if (ret) {
-> +		netdev_err(netdev, "get mac failed %d, generate random mac...",
-> +			   ret);
-> +		eth_random_addr(mac);
 
-eth_hw_addr_random()
+Best regards,
 
-> +	}
-> +	dev_addr_mod(netdev, 0, mac, 6);
+Lukasz Majewski
 
-Why not dev_addr_set() ?!
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/iHkkBmAY=t74XA_T2X_ZYbS
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmfin24ACgkQAR8vZIA0
+zr3N/gf8DYEFypnfPCvqTv0w1mjjvKAqlgERVYVIbxHIpd/6t5B0hhaY3vRUWPyJ
+VUqi8YCx8uavVTRzDM59fSfmYcFzOe7rUv9fVvS4+W3AtxqTmtndRXZUrFAtXrPf
+LwfMfvqJuoKPiLLcfPZQpNNY6iuzehkmrmcO+0MmOmsPNVHWsXUG/mmoefrSIy/Q
+yUysj6v1UeS8nm2XOXYf7Pij0CFaCgMDE7zdzziTkkLtBYywTPxMfUbNv8DjFUSX
+Xa6M/GMe39ehOU92VOjF0TRxyiDNXgRZ4kibznKZFpohskhQ1IugoT2tyXDspA6b
+JauuHhBMQ/y+Om9HVWaZV3LjzVe05Q==
+=TLOn
+-----END PGP SIGNATURE-----
+
+--Sig_/iHkkBmAY=t74XA_T2X_ZYbS--
 
