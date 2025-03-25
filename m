@@ -1,136 +1,85 @@
-Return-Path: <netdev+bounces-177427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB97CA702A5
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 14:49:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71FF1A70268
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 14:45:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91C5684561D
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:33:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04206189EE13
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:36:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96C9A259CB1;
-	Tue, 25 Mar 2025 13:28:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54A721B85FD;
+	Tue, 25 Mar 2025 13:33:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EmLbCOHO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="agVramHM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E1A18C930;
-	Tue, 25 Mar 2025 13:28:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 244A681732;
+	Tue, 25 Mar 2025 13:33:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742909328; cv=none; b=kr1AtUE1GOZnMltcjommCjq0j2WyanETPMckyUGZvlTdTkWyYsIWDfcAi+/Lz/7N7g/cwNDTaEn7+krM1QdRHkwyyN2LHrmCe8UtBnyFoFmySoypggywZiArBzz2PNPHae0DhGMyggqDJtsQN3YnOVFtMvdhzt1f8G8Dc/0aXW8=
+	t=1742909596; cv=none; b=s1JSHh8OntY0m4Nqlpg05v0hw3qpIqBq70rMC6ms0JU/vmnxLpoBtYil+1URbZghP+WVTZEqc+8L0+/QCD/ckK2xYHaB4GP33pQrCoPmWi63EJZXdjbPaNjVr/0OdhWmPTYgVsRyN1+/tjEMokDURsxAbeU1hb/VxyTKUDMhfgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742909328; c=relaxed/simple;
-	bh=dmvM6IN5Dthvxa5kh8GBs+FInlsd/ahwhF0FbdrWGqQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e1DRX/OBeDPRlH1deCn+7sMZLEmwuJMxPjz5roSXJSHJyFJtSvxXAHtztSXfrhwALammIegg6apOFVy9MrDPB8ogBZfIot580BiWZ2eDtbArX4965KPkBilgWHrURrEXsVHNJtBvalH4njtsiYoP73tFAWdZy218/WSmvz4hzkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EmLbCOHO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 117DCC4CEE4;
-	Tue, 25 Mar 2025 13:28:47 +0000 (UTC)
+	s=arc-20240116; t=1742909596; c=relaxed/simple;
+	bh=UjX2RfNQ/VRIIJXNNKCUw29i1T0PQOAe9QlnPpWUqy0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JJpeQIATRoxl/V1wJWcsDnURb4xy2NEZAFtWGxcGpqt9lpBd/16rrEUBrK7p7GRXY25tvS9YKYM0Z2hLbqGbeA/ieLOiRk89yk+L2iawFOz/KPidikHMrxvtMl2Fo+i/psQL34D+ChsIbI+/f5zbOLIbJJpybyEVVyNhxI975F0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=agVramHM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B59FFC4CEE4;
+	Tue, 25 Mar 2025 13:33:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742909327;
-	bh=dmvM6IN5Dthvxa5kh8GBs+FInlsd/ahwhF0FbdrWGqQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EmLbCOHOih8hX0taTqKGfc5nAPd/Dpwg4C9VeIXPHSWWUjSbWi45uoM2BDlvUB+q0
-	 HkzPlh/SjtVAf1CjUps8m/r9f5auBR7XTojLfrSfaROckQVfpVZFdka7Y9mXcbDU80
-	 5ueJfukfGutY7ahZ6Gt1WaugQ3S8ITJiNT8M6PNHCepcqZQhi1AT0LFDo9HImWxW7p
-	 /GtDVP6DT4UMw5tp9xX8pNSFJYMcvaqzDeh+MjuJj68HIAmIfq/OBkVw+J/FxmDS9/
-	 k098C4S9DpBuIZKRDGBVSdBr7VcR9pMaa40u79KHwdi5vkmBjuIoJKJ7zvawCuApxq
-	 TmXu7t6vo1wEQ==
-Date: Tue, 25 Mar 2025 14:28:41 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Masahisa Kojima <kojima.masahisa@socionext.com>,
-	Sunil Goutham <sgoutham@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	hariprasad <hkelam@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Roger Quadros <rogerq@kernel.org>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-hyperv@vger.kernel.org,
-	linux-omap@vger.kernel.org, Michal Kubiak <michal.kubiak@intel.com>
-Subject: Re: [PATCH net-next v2 4/7] net: octeontx2: Add metadata support for
- xdp mode
-Message-ID: <Z-Kvia3EhrtAjKOG@lore-rh-laptop>
-References: <20250318-mvneta-xdp-meta-v2-0-b6075778f61f@kernel.org>
- <20250318-mvneta-xdp-meta-v2-4-b6075778f61f@kernel.org>
- <20250325044126.1c0f9b83@kernel.org>
+	s=k20201202; t=1742909595;
+	bh=UjX2RfNQ/VRIIJXNNKCUw29i1T0PQOAe9QlnPpWUqy0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=agVramHMhROTTc3Ff18vUmGKMkJl26P/zi/+hOjd/IwrOxATHM7Oi5N7eGIWuOC/k
+	 p4E5Sywk7zaIUcOXVESIsFDB/Sly2Ai45ZsP6Htl9rsdBrJaEC9khjFpHLmoQFqCkz
+	 8TwYWAFX3hhNdiZnh+yD6PMelLNElfig9JWxpzgYKjXkEIfJ7J7G08NVIlNlSv96up
+	 +3o/9IRmCtln+CvdeAx9KqkCHPbz+p9BS9eTIWqZYYv0NkfVDy6JhoPKF0Ja58Fcs6
+	 YAR8BdA0dhRmw9XKmPkQx4aVXqSZpFiKYk+0UCfwcJ6Aqr8cMxkoycsbkU4/beTZpg
+	 cvZ01qKqfd2kg==
+Date: Tue, 25 Mar 2025 06:33:07 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Qasim Ijaz <qasdev00@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, syzbot
+ <syzbot+3361c2d6f78a3e0892f9@syzkaller.appspotmail.com>,
+ stable@vger.kernel.org
+Subject: Re: [PATCH 1/4] net: fix uninitialised access in mii_nway_restart()
+Message-ID: <20250325063307.15336182@kernel.org>
+In-Reply-To: <20250319112156.48312-2-qasdev00@gmail.com>
+References: <20250319112156.48312-1-qasdev00@gmail.com>
+	<20250319112156.48312-2-qasdev00@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="E4yhCdChUNhJbUGb"
-Content-Disposition: inline
-In-Reply-To: <20250325044126.1c0f9b83@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Wed, 19 Mar 2025 11:21:53 +0000 Qasim Ijaz wrote:
+> --- a/drivers/net/mii.c
+> +++ b/drivers/net/mii.c
+> @@ -464,6 +464,8 @@ int mii_nway_restart (struct mii_if_info *mii)
+>  
+>  	/* if autoneg is off, it's an error */
+>  	bmcr = mii->mdio_read(mii->dev, mii->phy_id, MII_BMCR);
+> +	if (bmcr < 0)
+> +		return bmcr;
+>  
+>  	if (bmcr & BMCR_ANENABLE) {
+>  		bmcr |= BMCR_ANRESTART;
 
---E4yhCdChUNhJbUGb
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+We error check just one mdio_read() but there's a whole bunch of them
+in this file. What's the expected behavior then? Are all of them buggy?
 
-> On Tue, 18 Mar 2025 12:46:08 +0100 Lorenzo Bianconi wrote:
-> > @@ -1514,13 +1518,14 @@ static bool otx2_xdp_rcv_pkt_handler(struct otx=
-2_nic *pfvf,
-> > =20
-> >  	hard_start =3D (unsigned char *)phys_to_virt(pa);
-> >  	xdp_prepare_buff(&xdp, hard_start, OTX2_HEAD_ROOM,
-> > -			 cqe->sg.seg_size, false);
-> > +			 cqe->sg.seg_size, true);
-> > =20
-> >  	act =3D bpf_prog_run_xdp(prog, &xdp);
-> > =20
-> >  handle_xdp_verdict:
-> >  	switch (act) {
-> >  	case XDP_PASS:
-> > +		*metasize =3D xdp.data - xdp.data_meta;
-> >  		break;
-> >  	case XDP_TX:
-> >  		qidx +=3D pfvf->hw.tx_queues;
->=20
-> This one handles ABORT and invalid return codes as PASS not DROP.
-> That should probably be fixed separately?
-
-Yes, right. I will post a fix for it.
-
-Regards,
-Lorenzo
-
---E4yhCdChUNhJbUGb
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ+KvhgAKCRA6cBh0uS2t
-rJqvAP9OpMaZdQLvzyjRJ+yYPN1BtI+hjZJfXaRH2utWQHb7uwD+L6oltUUEGPYK
-Pxr4Ki69CfDwCdxPyDpzyKCdOPyfDAk=
-=cnQi
------END PGP SIGNATURE-----
-
---E4yhCdChUNhJbUGb--
+This patch should be split into core and driver parts.
+-- 
+pw-bot: cr
 
