@@ -1,135 +1,142 @@
-Return-Path: <netdev+bounces-177287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A21BCA6E94D
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 06:34:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C91CAA6E951
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 06:35:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE0E73AEE46
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 05:34:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF23E16CA51
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 05:35:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D29C0199935;
-	Tue, 25 Mar 2025 05:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 349121A23BA;
+	Tue, 25 Mar 2025 05:35:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uFhvc6k7"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C22064D
-	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 05:34:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A996A1ADFFB
+	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 05:34:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742880893; cv=none; b=pvnIze4EBtjEnlwHIxGhXpWwxHXcin8aaOUkSy74YzFfzFmikde62IPWRVdHP4Cj6TYGt8qf5I7Y4cNL/v6Tzy3EWxQNaxV/2FCd+4g1l1EiKx4ZULCK92GAXJAWrS6mSsVj+2hkg9pY1Lifpwtm3pKJjcbyZ9dvndVE/1NbjlA=
+	t=1742880900; cv=none; b=aJD1pC9aALMBp0cbPYSP5/lWHRWpkxBIoVsqjAvACDKltdUsiZq6CsPWvbpRVNIUpCfZVGD1iGugUy6v6tTqYIDwqLwoEHFohkRS3zym7Kg97BxpTKyCgKIEkK73hvZ2DPyIAy6yxQn334Wbqa+ijTrrgkfqP8FnCBlkKJLsjOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742880893; c=relaxed/simple;
-	bh=c2Av66IXC/j5Ecmc1swHw1f2mz1THsByFbOQ2gd0qHM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UaE2B29KrjZEJYJE+6OFSsp4M8e69MV3HQt6KVwhHtERlCktyFRmBxHKXYzJAM31+O/Y4RLsYSOg573rmFqLvJVbwBC6JEheF7Nrax9Pm1puTod9y8+b3v+xs5TePx4ILrF/n4/d3tL9MCod9nRPY5cglmFf+PFhMsmwwZMO/DY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1twwve-0001R5-Q1; Tue, 25 Mar 2025 06:34:22 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1twwvY-001WnQ-2d;
-	Tue, 25 Mar 2025 06:34:17 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1twwvZ-00Fk6E-0G;
-	Tue, 25 Mar 2025 06:34:17 +0100
-Date: Tue, 25 Mar 2025 06:34:17 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kyle Swenson <kyle.swenson@est.tech>
-Cc: Kory Maincent <kory.maincent@bootlin.com>, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	"kernel@pengutronix.de" <kernel@pengutronix.de>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v6 06/12] net: pse-pd: Add support for budget
- evaluation strategies
-Message-ID: <Z-JAWfL5U-hq79LZ@pengutronix.de>
-References: <20250304-feature_poe_port_prio-v6-0-3dc0c5ebaf32@bootlin.com>
- <20250304-feature_poe_port_prio-v6-6-3dc0c5ebaf32@bootlin.com>
- <Z9gYTRgH-b1fXJRQ@pengutronix.de>
- <20250320173535.75e6419e@kmaincent-XPS-13-7390>
- <20250324173907.3afa58d2@kmaincent-XPS-13-7390>
- <Z-GXROTptwg3jh4J@p620>
+	s=arc-20240116; t=1742880900; c=relaxed/simple;
+	bh=VZyZ+U03n/kYLr7nyU+6j/u+eDsCM/4aigx8fhbJ59k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=u3mcGVSThQDl9NFYFoRAGm98q0RFT/nGXQVm81kvK1pLbiZgecbHxBYM2zTW7X5euIagGGliFx29rBCTRzigH0pCWNvsi4f6My4omNIUosiKt2wygawnxIxeDdx42pnl4zgKKgd6it7KrBHyLS5dGyTTEMRt9RzS6mbUx+5lgUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uFhvc6k7; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2264c9d0295so144225ad.0
+        for <netdev@vger.kernel.org>; Mon, 24 Mar 2025 22:34:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1742880898; x=1743485698; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rwLeh8RhcdM/WIYZF7AMbpvd0gW+3hk38NS3nQGJDuw=;
+        b=uFhvc6k79fQt4plwlrVwX+rZGbF2vVc02vWMJJua+Sq/1t92QhbXDIagj+N47ddTS6
+         SL2swETNuz/urJBbicuva63Xkmvw0c/hZqAQ2D2NXNUgqLftcPKpjx5fbeFwDnAzIx+o
+         3fk5N92ByLX2vDD5rocA6lwbwHW3cMIbBENvz/qk1Q7F/qxXYlmokbliJCKfbZRRLU4T
+         hEa1MBzOT95vWyRTn/OaWRW8lfzTdQ5TsZsG3TkHlE9+wYCG0mVr/ZkR5bXAqL3ZpBhQ
+         eLOzkV+YdzJ7aaWz/UtlRt2xi5Vk09vVcn5nmnLNmsv/sMZWoh0BIlcEJABYgsBGP5BF
+         mtGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742880898; x=1743485698;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rwLeh8RhcdM/WIYZF7AMbpvd0gW+3hk38NS3nQGJDuw=;
+        b=fS6ycmIZt/RXvAw97+EEpjSm2FLB0VO600H5wA2rAtxOrqZ92O+wQB5kaNeetpepbF
+         ZyweSIqdSZaEYs7qpwCsynsVlSd4C/wTndE+WekF2EIw1PH+JsCDn+hh21I7cVdFpfV9
+         YfiRgmwXjVCKogwNd4Sgc1IGUTtalizy8drJQj14RCiwsBtC8g51AwPmaoOQDZv6xA12
+         rq4NXszf5fUkDu5j7MGWdnkt8+YHqfIK/tNSuH+SJwPOAW9MTxu4sUdqw95cgOkQ8Gyo
+         IYcuVgzqBMOk6Z+rdIc0rRMB/y6liT9sL5NFiYfXCMm2csjITeKpewjvHZcIrfSq9U8E
+         L5KA==
+X-Forwarded-Encrypted: i=1; AJvYcCU6Ri/2xy2lbbyGcxg2mTGdXO1mNWAgdJbBSOHdTCyEYxwuAW+1w6k9eCOwWP5njb+sAX8KujY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLX588jnT8XtK35gslfUf5qHp7GBytCsPK3i3AzYnA56OWrpLd
+	GMfvhBDqqRLvQhM8QMiaQcUqdixRYHUtrFPJ5qckW0U4Lce+Uxe2Sr96EfTv6kbbIq+xUaasAWy
+	UctuhTYRXllJRPXAKlDMiRvgYiUS5XhxehWPk
+X-Gm-Gg: ASbGncsmlIEYOmeRna281Zm1MuKvP2qCVivoiaY3GAGyQzS/iH2Y/8cQOo1+SrhGFR8
+	qAiz8D6qFQeKx9JEVODBknKaMksSyHF1O/R0QPRDR5ZBRjE7sGQq+qqqdCPNkk4CoslaO+WgL60
+	UmbdShZWWtTuzLoyj/vjgJuqp6oRQ=
+X-Google-Smtp-Source: AGHT+IEsb8DJ3jomOSB/M2jxmaFjVsSIc7TW2TcD18AjQCiUOXCPreUTFMUSnF7r4j4M+W86oVXxuN+zPJm+dXN8PJA=
+X-Received: by 2002:a17:902:f707:b0:21f:3e29:9cd4 with SMTP id
+ d9443c01a7336-2279832099dmr7540485ad.20.1742880897456; Mon, 24 Mar 2025
+ 22:34:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Z-GXROTptwg3jh4J@p620>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+References: <20250324224537.248800-1-kuba@kernel.org> <20250324224537.248800-8-kuba@kernel.org>
+In-Reply-To: <20250324224537.248800-8-kuba@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 24 Mar 2025 22:34:43 -0700
+X-Gm-Features: AQ5f1JpOzgQVDShicbEPF6lsAJY84A8DI1WZ40AT0_W7tI0Pli8T7aQFCSmMvzk
+Message-ID: <CAHS8izMyS_y0o9EzJ8NaLnS99KYH+Ze6BaSw=+=hPPnuS9zP8A@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 07/11] net: protect rxq->mp_params with the
+ instance lock
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, sdf@fomichev.me
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Mon, Mar 24, 2025 at 3:47=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> Ensure that all accesses to mp_params are under the netdev
+> instance lock. The only change we need is to move
+> dev_memory_provider_uninstall() under the lock.
+>
+> Appropriately swap the asserts.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-On Mon, Mar 24, 2025 at 05:33:18PM +0000, Kyle Swenson wrote:
-> Hello Kory,
-> 
-> On Mon, Mar 24, 2025 at 05:39:07PM +0100, Kory Maincent wrote:
-> > Hello Kyle, Oleksij,
-> ...
-> > 
-> > Small question on PSE core behavior for PoE users.
-> > 
-> > If we want to enable a port but we can't due to over budget.
-> > Should we :
-> > - Report an error (or not) and save the enable action from userspace. On that
-> >   case, if enough budget is available later due to priority change or port
-> >   disconnected the PSE core will try automatically to re enable the PoE port.
-> >   The port will then be enabled without any action from the user.
-> > - Report an error but do nothing. The user will need to rerun the enable
-> >   command later to try to enable the port again.
-> > 
-> > How is it currently managed in PoE poprietary userspace tools?
-> 
-> So in our implementation, we're using the first option you've presented.
-> That is, we save the enable action from the user and if we can't power
-> the device due to insufficient budget remaining, we'll indicate that status to the
-> user.  If enough power budget becomes available later, we'll power up
-> the device automatically.
+Reviewed-by: Mina Almasry <almasrymina@google.com>
 
-It seems to be similar to administrative UP state - "ip link set dev lan1 up".
-I'm ok with this behavior.
+> ---
+>  net/core/dev.c       | 4 ++--
+>  net/core/page_pool.c | 7 ++-----
+>  2 files changed, 4 insertions(+), 7 deletions(-)
+>
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 690d46497b2f..652f2c6f5674 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -10353,7 +10353,7 @@ u32 dev_get_min_mp_channel_count(const struct net=
+_device *dev)
+>  {
+>         int i;
+>
+> -       ASSERT_RTNL();
+> +       netdev_ops_assert_locked(dev);
+>
+>         for (i =3D dev->real_num_rx_queues - 1; i >=3D 0; i--)
+>                 if (dev->_rx[i].mp_params.mp_priv)
+> @@ -11957,9 +11957,9 @@ void unregister_netdevice_many_notify(struct list=
+_head *head,
+>                 dev_tcx_uninstall(dev);
+>                 netdev_lock_ops(dev);
+>                 dev_xdp_uninstall(dev);
+> +               dev_memory_provider_uninstall(dev);
+>                 netdev_unlock_ops(dev);
+>                 bpf_dev_bound_netdev_unregister(dev);
+> -               dev_memory_provider_uninstall(dev);
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+So initially I thought this may be wrong because netdev_lock_ops()
+only locks if there are queue_mgmt_ops, but access to mp_params should
+be locked anyway. But I guess you're relying on the fact that if the
+device doesn't support queue_mgmt_ops memory providers don't work
+anyway.
+
+--=20
+Thanks,
+Mina
 
