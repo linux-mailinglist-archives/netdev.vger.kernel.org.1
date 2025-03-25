@@ -1,145 +1,195 @@
-Return-Path: <netdev+bounces-177350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 740E0A6FADE
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:16:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6733A6FCC7
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:38:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 587F516E0F9
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:16:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB9361770F6
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:31:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14B252566F2;
-	Tue, 25 Mar 2025 12:16:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24EAD268C4D;
+	Tue, 25 Mar 2025 12:20:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="QLKfZA5h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oz8iARGb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.denx.de (mx.denx.de [89.58.32.78])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66D6A937;
-	Tue, 25 Mar 2025 12:16:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99A525A654;
+	Tue, 25 Mar 2025 12:20:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742904967; cv=none; b=gyb8KpQJ74g70iF5bKVYxbmfPYPMDcfLwEfZokBQNcKuaO0+bBSswI2zO0F8xr5Isiro7MAV1VB9vLiUROdsTJJaPGyjBc8EVHai8VSKoCrAckqocF4lWg6kCqLLzRK0Nz0MPaLLn6/wS6tp0nLc7AshSLWuhci/LMMZ0qEJciw=
+	t=1742905249; cv=none; b=PXA5/9Qb0S+RV8JZtCUOA/lBhL14/s2dk44d2hCQerhzIw5o/KQjCgVPjBaqvwa1/CSMRnHG3o6fy7wfjsR8YEoJZQS5k1UGO+YPhOFoyjbPzzqkGszC2Bi7TBfL1ugeq4jSg5auQvPPD4LMXUzicrv8PwSmdPT0jq/ckFsrf1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742904967; c=relaxed/simple;
-	bh=DguLGhX9kEpLPrUx76M1TNbQPbRQ0+l3RX/mmVVOTNM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CIZsaasSGpx0k5wy/Yj+ZvqfRCavEFVg8yg1qIeBhHLogmLqucSHOouicRPGM8AcBk+eLDTNd+++2OloLMTFPpR1GkbgDXFPKrHV5QubAIGKQ5zDfj5ArGAXA1GsnYKGQ2mptoxirngpz+pSGjmzdpM51NowrynzwEs8cEQxkvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=QLKfZA5h; arc=none smtp.client-ip=89.58.32.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 33CA1102EBA49;
-	Tue, 25 Mar 2025 13:15:58 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1742904959; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=Vw2aTZfKC8jL612WLeYf7YLLLB/WaqDvcUQ/QnVchBI=;
-	b=QLKfZA5hesyp7HKxl4wfAMJm/Eqm1iLloGyqwHdqYMYlU7JKUzljQH8FAvHiekj/fZ6IR6
-	nWKratYium4fr/hJiKgEkRw1BgDOPWdBf1mO7j/4sAsa2hiyK/Xx/axqfzxis7vnBd/H5S
-	5y8AiWj2Y+HsXX9uAAvp9KOSh4kka192Y9gxL/WN7nEJuwjRk2VgYYHTRHbFYSldPxP+2z
-	mvAZ1uGOg9Q2J+ddFJwrtxvLss3h17U1pd4acNFApe8ZIguAvv299V6369chRQffdhDxD2
-	Y9jN1ZDdRTvPJFGOhfnFIarSWpqVyc038v5zuXHEGRL+L8mO3lp7l43jL+F7kw==
-Date: Tue, 25 Mar 2025 13:15:57 +0100
-From: Lukasz Majewski <lukma@denx.de>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha
- Hauer <s.hauer@pengutronix.de>, Paolo Abeni <pabeni@redhat.com>, Jakub
- Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- davem@davemloft.net, Andrew Lunn <andrew+netdev@lunn.ch>, Pengutronix
- Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>,
- devicetree@vger.kernel.org, imx@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Richard
- Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org, Maxime
- Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH 1/5] MAINTAINERS: Add myself as the MTIP L2 switch
- maintainer (IMX SoCs: imx287)
-Message-ID: <20250325131557.275f7c5c@wsk>
-In-Reply-To: <e7d3f22f-4576-448a-a77e-644cd21c9a16@kernel.org>
-References: <20250325115736.1732721-1-lukma@denx.de>
-	<20250325115736.1732721-2-lukma@denx.de>
-	<e7d3f22f-4576-448a-a77e-644cd21c9a16@kernel.org>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1742905249; c=relaxed/simple;
+	bh=j18oLXPHFjnaGmgCwscTDaPTneiSyVqaoCKba61TqXg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=ksvMfmY3i/W6NiLN+klluOkriT32EGq0noZ3BusNVu2GF1AiyMz1e9hsraXsCjKqLoktGK0HuqvGxV7Chie2WyAg0trLkEr7HRdWJXG0YdGkmxxNSw4WqETQnjLPn6jZ97gwQJPhPeJNGOogJavJ9OO67radIxFoZ1IA8nnwXfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oz8iARGb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 213B1C4CEE4;
+	Tue, 25 Mar 2025 12:20:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742905248;
+	bh=j18oLXPHFjnaGmgCwscTDaPTneiSyVqaoCKba61TqXg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Oz8iARGb8tr7htUnaAeUCJ6IYWmPD2sUy6Fahrj1eenZT1kKMM+eFWJiKMQdGqcqw
+	 rqWz1qpr3jo3lVxFFYwrBasJ+tHw3PWT4Rv+apRvPWQa/i4K/2vaflC0hzKnPuX+P4
+	 8bTM1EjGGpOTuQHdC8TBFwQkrFBcJI49u7thNpghWlOyMzJ3hMkq6mroidX2glUScJ
+	 uyG/XkFYIxn9NAsEUQSTt4TYvFJgoGc/h+TFjpPprvl74n7fsNLu4FNEPQT7I99tBn
+	 keJQj/Yhn5p3/N2C2J6YITPpmyRqNzvFWJV+jSwmuHsx+jq6dfD8Ek+CQ8ONbZxS8/
+	 mQmFdBGqaAdYQ==
+From: guoren@kernel.org
+To: arnd@arndb.de,
+	gregkh@linuxfoundation.org,
+	torvalds@linux-foundation.org,
+	paul.walmsley@sifive.com,
+	palmer@dabbelt.com,
+	anup@brainfault.org,
+	atishp@atishpatra.org,
+	oleg@redhat.com,
+	kees@kernel.org,
+	tglx@linutronix.de,
+	will@kernel.org,
+	mark.rutland@arm.com,
+	brauner@kernel.org,
+	akpm@linux-foundation.org,
+	rostedt@goodmis.org,
+	edumazet@google.com,
+	unicorn_wang@outlook.com,
+	inochiama@outlook.com,
+	gaohan@iscas.ac.cn,
+	shihua@iscas.ac.cn,
+	jiawei@iscas.ac.cn,
+	wuwei2016@iscas.ac.cn,
+	drew@pdp7.com,
+	prabhakar.mahadev-lad.rj@bp.renesas.com,
+	ctsai390@andestech.com,
+	wefu@redhat.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	josef@toxicpanda.com,
+	dsterba@suse.com,
+	mingo@redhat.com,
+	peterz@infradead.org,
+	boqun.feng@gmail.com,
+	guoren@kernel.org,
+	xiao.w.wang@intel.com,
+	qingfang.deng@siflower.com.cn,
+	leobras@redhat.com,
+	jszhang@kernel.org,
+	conor.dooley@microchip.com,
+	samuel.holland@sifive.com,
+	yongxuan.wang@sifive.com,
+	luxu.kernel@bytedance.com,
+	david@redhat.com,
+	ruanjinjie@huawei.com,
+	cuiyunhui@bytedance.com,
+	wangkefeng.wang@huawei.com,
+	qiaozhe@iscas.ac.cn
+Cc: ardb@kernel.org,
+	ast@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-mm@kvack.org,
+	linux-crypto@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-input@vger.kernel.org,
+	linux-perf-users@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	maple-tree@lists.infradead.org,
+	linux-trace-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-atm-general@lists.sourceforge.net,
+	linux-btrfs@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	linux-nfs@vger.kernel.org,
+	linux-sctp@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-media@vger.kernel.org
+Subject: [RFC PATCH V3 17/43] rv64ilp32_abi: riscv: Adapt kasan memory layout
+Date: Tue, 25 Mar 2025 08:15:58 -0400
+Message-Id: <20250325121624.523258-18-guoren@kernel.org>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20250325121624.523258-1-guoren@kernel.org>
+References: <20250325121624.523258-1-guoren@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/24q=A/Ak_cTLWFZ0Fb5BUSM";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
 
---Sig_/24q=A/Ak_cTLWFZ0Fb5BUSM
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+From: "Guo Ren (Alibaba DAMO Academy)" <guoren@kernel.org>
 
-Hi Krzysztof,
+For generic KASAN, the size of each memory granule is 8, which
+needs 1/8 address space. The kernel space is 2GiB in rv64ilp32,
+so we need 256MiB range (0x80000000 ~ 0x90000000), and the offset
+is 0x7000000 for the whole 4GiB address space.
 
-> On 25/03/2025 12:57, Lukasz Majewski wrote:
-> > Add myself as a maintainer for this particular network driver.
-> >=20
-> > Signed-off-by: Lukasz Majewski <lukma@denx.de>
-> > ---
-> >  MAINTAINERS | 7 +++++++
-> >  1 file changed, 7 insertions(+)
-> >=20
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index 5959513a7359..255edd825fa1 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -9270,6 +9270,13 @@ S:	Maintained
-> >  F:	Documentation/devicetree/bindings/i2c/i2c-mpc.yaml
-> >  F:	drivers/i2c/busses/i2c-mpc.c
-> > =20
-> > +FREESCALE MTIP ETHERNET SWITCH DRIVER
-> > +M:	Lukasz Majewski <lukma@denx.de>
-> > +L:	netdev@vger.kernel.org
-> > +S:	Maintained
-> > +F:
-> > Documentation/devicetree/bindings/net/fec,mtip-switch.yaml
-> > +F:	drivers/net/ethernet/freescale/mtipsw/* =20
->=20
-> You need to re-order the patches, there are no such files yet, so this
-> causes warnings.
+ Virtual kernel memory layout:
+       fixmap : 0x90a00000 - 0x90ffffff   (6144 kB)
+       pci io : 0x91000000 - 0x91ffffff   (  16 MB)
+      vmemmap : 0x92000000 - 0x93ffffff   (  32 MB)
+      vmalloc : 0x94000000 - 0xb3ffffff   ( 512 MB)
+      modules : 0xb4000000 - 0xb7ffffff   (  64 MB)
+       lowmem : 0xc0000000 - 0xc7ffffff   ( 128 MB)
+        kasan : 0x80000000 - 0x8fffffff   ( 256 MB) <=
+       kernel : 0xb8000000 - 0xbfffffff   ( 128 MB)
 
-This shall be probably squashed with the patch adding mtipl2sw* files.
+Signed-off-by: Guo Ren (Alibaba DAMO Academy) <guoren@kernel.org>
+---
+ arch/riscv/include/asm/kasan.h | 6 +++++-
+ arch/riscv/mm/kasan_init.c     | 2 +-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
->=20
-> Best regards,
-> Krzysztof
+diff --git a/arch/riscv/include/asm/kasan.h b/arch/riscv/include/asm/kasan.h
+index e6a0071bdb56..dd3a211bc5d0 100644
+--- a/arch/riscv/include/asm/kasan.h
++++ b/arch/riscv/include/asm/kasan.h
+@@ -21,7 +21,7 @@
+  * [KASAN_SHADOW_OFFSET, KASAN_SHADOW_END) cover all 64-bits of virtual
+  * addresses. So KASAN_SHADOW_OFFSET should satisfy the following equation:
+  *      KASAN_SHADOW_OFFSET = KASAN_SHADOW_END -
+- *                              (1ULL << (64 - KASAN_SHADOW_SCALE_SHIFT))
++ *                              (1ULL << (BITS_PER_LONG - KASAN_SHADOW_SCALE_SHIFT))
+  */
+ #define KASAN_SHADOW_SCALE_SHIFT	3
+ 
+@@ -31,7 +31,11 @@
+  * aligned on PGDIR_SIZE, so force its alignment to ease its population.
+  */
+ #define KASAN_SHADOW_START	((KASAN_SHADOW_END - KASAN_SHADOW_SIZE) & PGDIR_MASK)
++#if defined(CONFIG_64BIT) && (BITS_PER_LONG == 32)
++#define KASAN_SHADOW_END	0x90000000UL
++#else
+ #define KASAN_SHADOW_END	MODULES_LOWEST_VADDR
++#endif
+ 
+ #ifdef CONFIG_KASAN
+ #define KASAN_SHADOW_OFFSET	_AC(CONFIG_KASAN_SHADOW_OFFSET, UL)
+diff --git a/arch/riscv/mm/kasan_init.c b/arch/riscv/mm/kasan_init.c
+index 41c635d6aca4..1e864598779a 100644
+--- a/arch/riscv/mm/kasan_init.c
++++ b/arch/riscv/mm/kasan_init.c
+@@ -324,7 +324,7 @@ asmlinkage void __init kasan_early_init(void)
+ 	uintptr_t i;
+ 
+ 	BUILD_BUG_ON(KASAN_SHADOW_OFFSET !=
+-		KASAN_SHADOW_END - (1UL << (64 - KASAN_SHADOW_SCALE_SHIFT)));
++		KASAN_SHADOW_END - (1UL << (BITS_PER_LONG - KASAN_SHADOW_SCALE_SHIFT)));
+ 
+ 	for (i = 0; i < PTRS_PER_PTE; ++i)
+ 		set_pte(kasan_early_shadow_pte + i,
+-- 
+2.40.1
 
-
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/24q=A/Ak_cTLWFZ0Fb5BUSM
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmfinn0ACgkQAR8vZIA0
-zr1emQf/fXhcxk4JMbU6x8ViPUfMGnNtieJNZbqixCSsbi5ttFkxRK5g2HwuGSNG
-wRfDDxs+yMejO2q2ZRPnboRHMmp0cPs7BBdLsw0cs81BEMqTQN5/IvymAf7sjUST
-JXRupMGgghbwq8fkESm2wYzRQE43AvpLM1bbykl+akDt7AVLhqJwHKWk9/NZYcPz
-+64fDpsM2Il0oUU2oe5B4SHry4OE33So1s0VyUanuWZxANZnBRvTeh9RA42bviuK
-ehdZQVGt2Hi3ZAi5l7WP3GRwzNAzDAK297M4koxXXNKY7JsIGrUTRsLw4ha63gX9
-3hia1jZ/itQzBJ+iqsKLdzEN7qHZUg==
-=rHL2
------END PGP SIGNATURE-----
-
---Sig_/24q=A/Ak_cTLWFZ0Fb5BUSM--
 
