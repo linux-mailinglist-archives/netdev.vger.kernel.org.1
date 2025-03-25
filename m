@@ -1,95 +1,107 @@
-Return-Path: <netdev+bounces-177493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5743A7053B
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 16:38:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC748A70554
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 16:43:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DC093B1005
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 15:34:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 591203A4A1D
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 15:39:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AC581922C6;
-	Tue, 25 Mar 2025 15:35:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A1D81A316E;
+	Tue, 25 Mar 2025 15:39:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d7egyPdm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CLE7y3ot"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73DA6179BF;
-	Tue, 25 Mar 2025 15:35:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43571A238D;
+	Tue, 25 Mar 2025 15:39:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742916900; cv=none; b=UwWzAoOZfMVK7Ol0nrb10XWo9IWWH2fUeh76hK+T+0TzzjvPAtEUMs3ECID+OJnzwv1X0SdR+XyxcHm07rILaC5KtAiUvkSyZ/dacre2nOeATL/c7OIoh+juhwZ0Zedan6ct131nZOlJ8ej1ra+GfzTKwnlQkLKg/vMDWq7x5tE=
+	t=1742917199; cv=none; b=AAnlVkW/H2meFg4F1G9UaUwGVa2nFqESZLhxVwK0/RKwQz0YeGveZxbwx35WU8eq2bQazXpooZ87cYE9o+F6gKXQTtDMVtQosg/fUMiENa7cwDHhKQZCl3aTiooQlfEuX0L02RCPAOWDi8Heva8UmBpiBAOi+3712cIgzecO2qE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742916900; c=relaxed/simple;
-	bh=RbHFCG8u32jSkaP1gyCE7hf+qUuT+BdMulLJcQtbFaQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cOFzfHXj3wjGDrrEaNYgD3dMMs9ewSwnTjDlp7SMW44eAMove5y/2Hoj2zmgEi5lqsg4y4Si7/87cztRv5kpyJCUbTlJ6UtvZ+pPWvQIecPrsvMb0hbOB78VZyVYLI2StR07S4IQUEfDVv2XTVhc7+MzpZkS2aVx6UfBgjCf0LU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d7egyPdm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21CBEC4CEE4;
-	Tue, 25 Mar 2025 15:34:56 +0000 (UTC)
+	s=arc-20240116; t=1742917199; c=relaxed/simple;
+	bh=am9FunDcKx0MSc3x6dOTCpKV2sXz1d5Pqt7ld9PVGEU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=NuaRRN5dBG8zkUiqrpkMf6U1oYRdy9DpWfojlN+iNGPIMpt9ayBvwYyFs3+NIauNg1hHA2IZIBV4GcsLKLwqKIftyVHQ1RZpsFbx/1bgTB6hvqXWJ8HBpJJ8ln2v72N7UwtvDSDlEETr9uHxBg3H+QCTqNRW9YIzwkigMXn7JPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CLE7y3ot; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3DE7C4CEE4;
+	Tue, 25 Mar 2025 15:39:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742916899;
-	bh=RbHFCG8u32jSkaP1gyCE7hf+qUuT+BdMulLJcQtbFaQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=d7egyPdmQkbGHqoImT2T6ErmiqmH8sKXQ16AywoY5X+5GT6W5yQkJpNmSztwiQOoY
-	 wOlUzOJQz4ajrRjAS4bh3Wtvbsyb5iOhSlwUYvbSwnS/kQ6ascQpqvCSK6SykjzP31
-	 /lR9JTcqzNOPfwKM/qCgrBajedFT5JSnjo5ZQWolj3gTNihHfLNMwB04Us/gPIfbAf
-	 0SAn+Jact8gEhrWvfG/X4Zez0mUbV/lDeFwUc1hx2rwy4pAkrgQXzqJvFcJG3J17sZ
-	 z6BKjr1JPJqqBo0lSxyZGqqbrGUka506D+L2qTHUw+2b5GH6hQ5eQRYj8HEb3jbQ1N
-	 Bt0zJ+mmUCCWQ==
-Date: Tue, 25 Mar 2025 15:34:55 +0000
-From: Simon Horman <horms@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	=?utf-8?B?U8O4cmVu?= Andersen <san@skov.dk>
-Subject: Re: [PATCH net v1 1/1] net: dsa: microchip: fix DCB apptrust
- configuration on KSZ88x3
-Message-ID: <20250325153455.GV892515@horms.kernel.org>
-References: <20250321141044.2128973-1-o.rempel@pengutronix.de>
+	s=k20201202; t=1742917198;
+	bh=am9FunDcKx0MSc3x6dOTCpKV2sXz1d5Pqt7ld9PVGEU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=CLE7y3otIxitxaKDJUh6LoFJnrjkIyTTf/KyDLDDGw2mREPGjL9hlHkqOo+Lh7PK8
+	 FoRfIHRNs50pMNxKu01Suy9e07boGr6AU7V3Ou6X3ABikWock07dPIc5rTuHOwoSxr
+	 IrPwY1zW425UrSXsOP5CM6fY3hBd7i09mhSwHUz9NUlrW898CU1SgFIjvYF5ESHKv1
+	 XzFWb0YiSvwu8GTaYzReLVTzQzmzuABKMKslxQbhktkPADqobM7RI3rm41UW95MFGm
+	 talwCVQ486a/F29VcZ8cAGBGWYQNUDZmnR7zRISLB0r9LY2siTAjqhmMI2OdUR+eYY
+	 iD52aic6UYuwg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 341E7380CFE7;
+	Tue, 25 Mar 2025 15:40:36 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250321141044.2128973-1-o.rempel@pengutronix.de>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 1/7] netfilter: xt_hashlimit: replace vmalloc calls
+ with kvmalloc
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174291723501.621610.11595803602695403455.git-patchwork-notify@kernel.org>
+Date: Tue, 25 Mar 2025 15:40:35 +0000
+References: <20250323100922.59983-2-pablo@netfilter.org>
+In-Reply-To: <20250323100922.59983-2-pablo@netfilter.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, fw@strlen.de, horms@kernel.org
 
-On Fri, Mar 21, 2025 at 03:10:44PM +0100, Oleksij Rempel wrote:
-> Remove KSZ88x3-specific priority and apptrust configuration logic that was
-> based on incorrect register access assumptions. Also fix the register
-> offset for KSZ8_REG_PORT_1_CTRL_0 to align with get_port_addr() logic.
-> 
-> The KSZ88x3 switch family uses a different register layout compared to
-> KSZ9477-compatible variants. Specifically, port control registers need
-> offset adjustment through get_port_addr(), and do not match the datasheet
-> values directly.
-> 
-> Commit a1ea57710c9d ("net: dsa: microchip: dcb: add special handling for
-> KSZ88X3 family") introduced quirks based on datasheet offsets, which do
-> not work with the driver's internal addressing model. As a result, these
-> quirks addressed the wrong ports and caused unstable behavior.
-> 
-> This patch removes all KSZ88x3-specific DCB quirks and corrects the port
-> control register offset, effectively restoring working and predictable
-> apptrust configuration.
-> 
-> Fixes: a1ea57710c9d ("net: dsa: microchip: dcb: add special handling for KSZ88X3 family")
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Hello:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+This series was applied to netdev/net-next.git (main)
+by Pablo Neira Ayuso <pablo@netfilter.org>:
+
+On Sun, 23 Mar 2025 11:09:16 +0100 you wrote:
+> From: Denis Kirjanov <kirjanov@gmail.com>
+> 
+> Replace vmalloc allocations with kvmalloc since
+> kvmalloc is more flexible in memory allocation
+> 
+> Signed-off-by: Denis Kirjanov <kirjanov@gmail.com>
+> Reviewed-by: Florian Westphal <fw@strlen.de>
+> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,1/7] netfilter: xt_hashlimit: replace vmalloc calls with kvmalloc
+    https://git.kernel.org/netdev/net-next/c/ddf8dec6db31
+  - [net-next,2/7] netfilter: conntrack: Bound nf_conntrack sysctl writes
+    https://git.kernel.org/netdev/net-next/c/8b6861390ffe
+  - [net-next,3/7] netfilter: fib: avoid lookup if socket is available
+    https://git.kernel.org/netdev/net-next/c/eaaff9b6702e
+  - [net-next,4/7] netfilter: nfnetlink_queue: Initialize ctx to avoid memory allocation error
+    https://git.kernel.org/netdev/net-next/c/778b09d91baa
+  - [net-next,5/7] netfilter: xtables: Use strscpy() instead of strscpy_pad()
+    https://git.kernel.org/netdev/net-next/c/3b4aff61ca5d
+  - [net-next,6/7] netfilter: socket: Lookup orig tuple for IPv6 SNAT
+    https://git.kernel.org/netdev/net-next/c/932b32ffd760
+  - [net-next,7/7] netfilter: nf_tables: Only use nf_skip_indirect_calls() when MITIGATION_RETPOLINE
+    https://git.kernel.org/netdev/net-next/c/e3a4182edd1a
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
