@@ -1,73 +1,92 @@
-Return-Path: <netdev+bounces-177633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0F83A70C4E
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 22:43:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8310BA70C3D
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 22:41:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC64D3BC765
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 21:39:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C73F0179269
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 21:40:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A965269D0A;
-	Tue, 25 Mar 2025 21:39:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 981E8269CE5;
+	Tue, 25 Mar 2025 21:40:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CzKoJZFy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dCgtDAco"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32EB1269CF8;
-	Tue, 25 Mar 2025 21:39:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70B4B269813;
+	Tue, 25 Mar 2025 21:40:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742938757; cv=none; b=M+I1oMvxoVpU62o/BblIT2ym+rBeAfxh8Lpf8vFFFI8/4EKMEwtN3VkrVc+OjmsmZ8GsGR4ZZIZQQ8J+OgwasNHZhXt+vbikZtLTcE9XJFCTq0DmKBABOw2AZXTTlDQzLYnu7YLTUCu+wf44EwtvF3fRc2FsCmYpf3Xt6Pi86ws=
+	t=1742938802; cv=none; b=cYgSC21DZHdiICOGBv2JhJwy3F3C8yjwbAYmAyj4qie2u4A4BHv0wMMvxWSzIc2lFS0eoZ25SSMlSl2XkuHoMpuUH19pWQln5wPkFnr+rngRxLjJuIHwKB3CMGGY4QnCgCHXaNv8MlPbZCLg0943iGDp+FurO2lhQs4cuERereo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742938757; c=relaxed/simple;
-	bh=rVZQHP1VFgPMmF7qiernxg6g25VDtAy5R/ucMyM61fw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pK1dG6YUIa6WqrGfXm6HyB/bnfhgTfyF1nQvJ5tNrcQyblqmp40AR01fyDubjYiqppFBKLksMlwu/dvtacD3E+JLjYCqhvCpMJpF5mbAY0oLI/jZWo6Oy0iBq5MmvFbhrMpcA+buAvy/w2RTX2BT26zVzGvXbxBKHycytTORXJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CzKoJZFy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01173C4CEE4;
-	Tue, 25 Mar 2025 21:39:14 +0000 (UTC)
+	s=arc-20240116; t=1742938802; c=relaxed/simple;
+	bh=/EdRSnBvY5AE1pbX1KsOAS0fRxwzyV8JWQjx6ib0lt8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=RMV7mrK/GPbt/EEz1InFla+DkNfF8xTLilbQyiZ3zqCAf5nX/065gRzh2D4Wm7T0Lslm33yJCYPAhhYZPkDY7m65mbhaL0TZJPism8OkJ0oW65H8uRa5Q5Zb0D002F29vhefIq5cY0Dk9ch5U+BGCrtI9CnawawszFjfBAJE/Nc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dCgtDAco; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0056C4CEE9;
+	Tue, 25 Mar 2025 21:40:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742938757;
-	bh=rVZQHP1VFgPMmF7qiernxg6g25VDtAy5R/ucMyM61fw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CzKoJZFyRSX8G43053R/JDulbeK4wHl8owE80Kso34BGDZ85v0O9TijshB1tQ3GTJ
-	 Pbn5tZZcu3N4djqcYU9mGbwcRZ1B/UZ4oFvIKgXW3j33XjwTYPuQN348ylYWgy6Axv
-	 NpQEvxUjFs81Q3xQKBbbADpL1E4NhKsoF36Bs+lbWeKlnNvdrwC+m5eBrU3wHvXnkc
-	 zdFxe0Qpu1erwknlf83dNGnGzTYFq8QZf5zIfC2TkdskfZoRaW+ECn/ig636PCkdoW
-	 dQt2RimVb4Seivn4ERksR8jEivs3bm7e/hgBvOEOboLlrCjpa/JQiVUTb8Nhs9Hye7
-	 inskh/zY4z9fA==
-Date: Tue, 25 Mar 2025 14:39:10 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ivan Abramov <i.abramov@mt-integration.ru>
-Cc: "David S. Miller" <davem@davemloft.net>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
-Subject: Re: [PATCH net 0/4] Avoid using WARN_ON() on allocation failure in
- device_rename()
-Message-ID: <20250325143910.02e183e1@kernel.org>
-In-Reply-To: <20250325141723.499850-1-i.abramov@mt-integration.ru>
-References: <20250325141723.499850-1-i.abramov@mt-integration.ru>
+	s=k20201202; t=1742938801;
+	bh=/EdRSnBvY5AE1pbX1KsOAS0fRxwzyV8JWQjx6ib0lt8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=dCgtDAcohUbzyaLNrFkF5IhI4OeSqT1k3cgUcFTH29r8VXGrABj4Ym97ZTtYCRC7j
+	 sJfILAPEUCUEBVUFuuUYq+NoIecz8ZKd5AquZJG0UzKrnLnX1mQtQShPUblSfgvB5n
+	 G08v6psqqtpZrVIMoj0wHcU8e7gUQYX/dIGFrsh9m7XbkXRTnVGjltIlwaP8rXIDyq
+	 C0PmE/X2Ax8ChL3wXMBfaL1QKXNbcyXzX0M+qny/+xTiJEB1bKYxWLBTyqva7tuaSI
+	 Lto5JaS8LIikah8kKKYoAwW2nRmkwQ1oiGxT5+j9/LUM1eHky6jWoZDVABQ42iHrA+
+	 Xqk0T5Zy5LvHg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FDF380DBFC;
+	Tue, 25 Mar 2025 21:40:39 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [GIT PULL] bluetooth-next 2025-03-25
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174293883804.738412.14650381382474284681.git-patchwork-notify@kernel.org>
+Date: Tue, 25 Mar 2025 21:40:38 +0000
+References: <20250325192925.2497890-1-luiz.dentz@gmail.com>
+In-Reply-To: <20250325192925.2497890-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 
-On Tue, 25 Mar 2025 17:17:19 +0300 Ivan Abramov wrote:
-> This patch series is based on
-> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/ and is
-> intended for the generic netdev maintainers, as it affects multiple
-> networking subsystems.
+Hello:
 
-But there is no dependency between the patches, AFAICT.
-Please send them individually to the respective maintainers.
+This pull request was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 25 Mar 2025 15:29:25 -0400 you wrote:
+> The following changes since commit 8fa649fd7d3009769c7289d0c31c319b72bc42c4:
+> 
+>   net: phy: dp83822: fix transmit amplitude if CONFIG_OF_MDIO not defined (2025-03-24 09:52:36 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2025-03-25
+> 
+> [...]
+
+Here is the summary with links:
+  - [GIT,PULL] bluetooth-next 2025-03-25
+    https://git.kernel.org/netdev/net-next/c/4f74a45c6b19
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
