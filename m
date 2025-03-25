@@ -1,223 +1,390 @@
-Return-Path: <netdev+bounces-177354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEAF7A6FB2D
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:23:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3608EA6FB2A
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:23:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7ECA3BBB93
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:19:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7518E174988
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:21:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E6325A2C4;
-	Tue, 25 Mar 2025 12:17:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70C382571AE;
+	Tue, 25 Mar 2025 12:17:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="uBoJEmLh"
+	dkim=pass (2048-bit key) header.d=orbstack.dev header.i=@orbstack.dev header.b="LvR8AKHU"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2089.outbound.protection.outlook.com [40.107.236.89])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B81325A2B4
-	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 12:17:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.89
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742905042; cv=fail; b=pyPVK0kKqAAcRPyL8x7mryzoaBaV0LDdNatup8UmGVGR8YtLozTYydgNkQPP979DyUZqlPnwdA04/qPA/4QCWIvmrYdF3SnFTelTlXUUAEi2LiNGh5rJmnL1F0/G0wB/sSB0TCjlXy6idkT8RUth8wPaK7a1QEpLRYnrAl6FFso=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742905042; c=relaxed/simple;
-	bh=gWIa8TlLOc6w6l6XR/XVrwhlrf92THs1CqS3op2igJo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=misOfTRlqI+tmuwss/9fdu+jYt+oTbqJL6sMJ+OPx61gZDb5YH0QUsWO1MPTsiNuj6/lDFAZoIE636H1wXJJbMQwIPP22Cf++VT+2LRUwo/rBmAeeRz/AM1lSHEU5ummEMfN3pD5hTH4V25tDAvtl1/gYfNXMSWwPRH2M0T06Yk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=uBoJEmLh; arc=fail smtp.client-ip=40.107.236.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=k6nQ75iHqHYiR2qJ3pE6Lwm/PBvwRFqJjlvKrtpFzldNEGWhEPfLPix4b0M5/F30DqrtbSH5JOxt0chWYW+NXijKDyKJlSB2CYuloGLBh2HrTaCwkPNRFIfgbsDUivXxWdDGw3K9a5f2aAVGG173kQqdmFRV3JiRtDXUF5LFSHLlSysGuLyc34Eas5p05uKf/9C2mftVtdhbNVlB+qH0UtxZipD/PKNAehOvHFmGwDZAA2V0gNFSgBYBemCm/mcm2Bb859AYGsfVCA1KRKInd8Uic7pB4k/jLuIkIvfGUF8fsxXF4IDkZqLRZ6bdgYst4/2af/HziBoYTNDITf7KwQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gWIa8TlLOc6w6l6XR/XVrwhlrf92THs1CqS3op2igJo=;
- b=Dw+J5AwyJdkfZhg9SJ4GwF+1AFLBFtOTiz2WxQiWHmo0+Jnx15C8tBP6lT9GtjDR7ym/TpJGzZKAtpJ6jqfkPerLDdJ/3enMyMUXr7ABValoVv1ROR9dOyIZ5ygclxtfJ7RIsP5GLq4bjN01rOnkLg4eVyw6i38KzK8N4A2AQXQ/2kPgvDG2uv1t2SwP5B0plB5sB49WrTOerw0vePnts3d0RwuKGAsgepq7b+USPtEPUl94ZwVDU5GnfX6We4uGGvUCP9VvLJI+Nj3knB6GtNCarWjrPJaP2WpoW9//3FdbCX20SBlqsjOYwR8LykMwgi8YvUb6rScyAJdca1pajQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gWIa8TlLOc6w6l6XR/XVrwhlrf92THs1CqS3op2igJo=;
- b=uBoJEmLh5xSheDZHrIwC4y2bCerIw1u6defoApC180OTIBIKwbnSzY9sJ2hCgT84FUxifMq0hl+qtIJyXHVuprMyqNzvn+RLftbKt0sfqWBwBpyLSJR69beUoxjHzzhFKfEaO647p75+WRrveCBk4eX32t+TUxxDawZKQygMJxOpT4Ij0zqJNAvAUsFKOFMMQbKzzsQuLVxqmeUoefLfIdyr+S1Tf750NgM1J81NDRo1Sh94CJg3TKIYX9G0O0wEbUTH1vz5Dm2IImTYwuC49+rjFBnSdJhSTj7GW8qTpX1KiLcQPA15CI6CKAgwPa8SpAW46+9qZV3Fx6TSyZueig==
-Received: from DS0PR12MB6560.namprd12.prod.outlook.com (2603:10b6:8:d0::22) by
- SJ0PR12MB5674.namprd12.prod.outlook.com (2603:10b6:a03:42c::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8534.42; Tue, 25 Mar 2025 12:17:15 +0000
-Received: from DS0PR12MB6560.namprd12.prod.outlook.com
- ([fe80::4c05:4274:b769:b8af]) by DS0PR12MB6560.namprd12.prod.outlook.com
- ([fe80::4c05:4274:b769:b8af%2]) with mapi id 15.20.8534.040; Tue, 25 Mar 2025
- 12:17:15 +0000
-From: Cosmin Ratiu <cratiu@nvidia.com>
-To: "kuba@kernel.org" <kuba@kernel.org>, "davem@davemloft.net"
-	<davem@davemloft.net>, "sdf@fomichev.me" <sdf@fomichev.me>
-CC: "horms@kernel.org" <horms@kernel.org>, "edumazet@google.com"
-	<edumazet@google.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "pabeni@redhat.com"
-	<pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2 08/11] net: make NETDEV_UNREGISTER and
- instance lock more consistent
-Thread-Topic: [PATCH net-next v2 08/11] net: make NETDEV_UNREGISTER and
- instance lock more consistent
-Thread-Index: AQHbnQ6wXfIZksHgm0+aIlfbXdNTJrODxY8A
-Date: Tue, 25 Mar 2025 12:17:15 +0000
-Message-ID: <0be167ba394a9485c78c67d187ec546131a5cbe1.camel@nvidia.com>
-References: <20250324224537.248800-1-kuba@kernel.org>
-	 <20250324224537.248800-9-kuba@kernel.org>
-In-Reply-To: <20250324224537.248800-9-kuba@kernel.org>
-Reply-To: Cosmin Ratiu <cratiu@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR12MB6560:EE_|SJ0PR12MB5674:EE_
-x-ms-office365-filtering-correlation-id: 79bbc595-40ef-4d83-ad15-08dd6b96fac2
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?VWxLNVBkQW1uUjUwU3FKWnNrRzFhWUFveWw5Sm4yMktUZWpsZzBmc1FSZnZE?=
- =?utf-8?B?YThNM01KVXRrNXBMcFdLRTFVZVErUExGbHVjLytid094V3NXU2hNem1EWTBC?=
- =?utf-8?B?THBKc0VVTU1HRFJNbzhHaCtxcm5Pcnorb1lXaExZNU02TmFTNWZUaFhwNytO?=
- =?utf-8?B?MDArQ1JZR1RYTEU5dG1qM0ZYUGtWVUJleEVVdXJ3bGhNbDdFR2ozNDR2SzQ4?=
- =?utf-8?B?WU1oenUrZmRIZkROL3NSSS9abmxHZ0hqL0RjbGltdCtlODQreHVIZWVlVDlB?=
- =?utf-8?B?cW9ReUF6Unk3djEzTGppZi9aZ2RCNTRlT3hFei9TcUNuc0NMK2J2OVhGY3p2?=
- =?utf-8?B?SlAvdkhqVHJEVDNtUU9ZRStxejRCSHFFVUlRbitZNlR2N3JYdi9LNlhjVDlV?=
- =?utf-8?B?c1B3ajl0Ykc1eDZScmhxcVVJNDdjUHZYUlJmR1I3bEhLSFk2emc3VGlzYnRJ?=
- =?utf-8?B?cVE3anQxUFo0ZlY3QXNBNmRyUHhTMmJRMG04VUFlWGZFaXl3VS9tOEMwd0sz?=
- =?utf-8?B?S2d6N09mZitCRDJNaWdRMVFhM3c2ME9YVWozVk9DcHhkeXlpRXlLNGZEeGlm?=
- =?utf-8?B?dy80VkFpNE5WS3RXNllvakdkNjZZczNFcUhiWG92SzFpNk9OME9SQVBUUGhw?=
- =?utf-8?B?V0hlSSt5U2lFWTd4V0lwUUxpclNqdVRYNTJ4dG5Ib05Ha0s0SHBBLzZ5WDJO?=
- =?utf-8?B?N3dIaStWcHNJTjV0R0hHVGhtbVB1S3pXN05pemF5THI3aHdQYWErOGxUZlJD?=
- =?utf-8?B?ZTNUTDhRejhuQzBMd3dUeDhBc2kzd2pxVXNJVDErVytMNjJLT0dyQnR5QTZw?=
- =?utf-8?B?blQveGxtaEdNbFdMREZXS0Fna2k0b2UwMVB6dSt3bkdMSjVhNWgwbWZ5SFUr?=
- =?utf-8?B?cEIweGNsalFKS3BSQVNlVnZKalJ6azU5MHZtSzlMaWs1bWVaT0lGYkdMWmgr?=
- =?utf-8?B?OFcwalk4TnNqZE9oYm5WdGgzOTlqOGdzTVVNblA4djVNTW5xcndZMkRPOWxR?=
- =?utf-8?B?VE9HazE3dk02aWNqM1M5YzRIOUJsUVZITGt3UUpDdjg3RlBqZmx3Y2Y3OUxs?=
- =?utf-8?B?Vi9abmk5QVJaNDZ5SmVyWmRhWXorem96MVRPT2FvY1ZOSVNPd0tqaUdYNmt3?=
- =?utf-8?B?Q2xKZEgxVHV4Sk1hZFc3UE5LZ2Jna2gzV1hIMkRYUkkxaWRON0dpZ1JrTU9s?=
- =?utf-8?B?OG9MaGI1bjdHVlRVZWExT3RnQ3g0UWh3cDh2cGp6OW02dFlhZnY0N2hzUGVT?=
- =?utf-8?B?eEdGbllvRUt3bDBtYTh1d0JpMjFDbGtORUVmRVNEd3k4ZCtSd1l3djlYencr?=
- =?utf-8?B?OEo1ck4zZk9DSFMyaHhYM2toMzZpU0RnUHVsTkdYRU5RcHFMeGFGb1ZFQmZM?=
- =?utf-8?B?cFVqclZYUnZHdkRTR3RNTzM2K2tEMFI0QnRZSStkMEtJMmhteUVIcDRabFd2?=
- =?utf-8?B?MHNhNDNzWHhmcEd5KzluclQ4U1p1TW1QWWhOOFoweVRCTUJhdm5FTmpXOHlQ?=
- =?utf-8?B?TTU4eGFhTEJ5d2orSjh4QjZaNFhPY3M2a1ZOOTRYeUtPYjVwU0MzY0Noek85?=
- =?utf-8?B?Q3NGZHc2K3BqeXhHdzBnYUJUNTFRSDBYbVpTckNuK0lhTGxQV0h0U245K3RZ?=
- =?utf-8?B?ZXNYbll3ZlBxQUpSTGU3MzQwR2NlV0JKNDk2eGxUR0crcHdBZTNIc1VpV1Mw?=
- =?utf-8?B?YmM5Y0JGYmlMaTdKVzRkVExDMTI5SXdkTVhlb2VGSkVYU0x1ZFJZRlhvNk0v?=
- =?utf-8?B?SjlCM3JhQWNwcENudzA1Ynh0anI1SEpDVzlNSEVjVXkyQWlWYTYvbGk4Slc2?=
- =?utf-8?B?eC9ITVJCd0ttVlp1clViaFczQXJ5UFEyUEo0MnZWL3djQ3hlYWNsK05Jd0Jo?=
- =?utf-8?B?N0UvMkdOUmtpdUQ5R0pXSUNBOW03SUdDTkJGQlVXdmV4cTIwaVE3NEJZVzVs?=
- =?utf-8?Q?LuCFYF92Y3QsjjGMiGx6ZYJpufyHS1Cz?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?V284S1VTM3ZJNjZaMHVyVlhnZjBhUFBLbStEUFY4WlJZK1ljTHI3eUE5M2I2?=
- =?utf-8?B?SmRnRldGK1A0eGwxTlB0aXBWL2pmRzdaa1R6V1ZycWRlNFFoYXZ4enFWYlB3?=
- =?utf-8?B?Y0pHZTR1U1ZoenRPbXEzQkhBcE5tZ3ZwKzB0V0RQSlh4emZsY1E2SzBPZnM2?=
- =?utf-8?B?N012T3FLTmFodGptWTkrcEhRcFNCVmgyYkIyMGdvUDRKV0x6K0pVR1hSK0ZT?=
- =?utf-8?B?dHlpZjZ6QWFsREkyQ3YxeU9ORVlJWStndTlGRGs1K0d2TUQ0R3NWTVN4LzBF?=
- =?utf-8?B?dkFTYWRVYnB4Vms2RVpZUmttL1M4Z042d282ZUVoUEdKdkVlNVVCZkNvVVlL?=
- =?utf-8?B?OUxaeENQMWtMblBGSEdXTzlmV29DSWR2NkV5bVJ5RUdFdHhZVGVpRGJsNk5N?=
- =?utf-8?B?eEtiSnB4QVFZc0tXc0owNTFuSDAzTjZQd3NjdnpSR1gxbTRXNGFzQnlhQmFW?=
- =?utf-8?B?ODBxZFlqNlRQQ1hwRFpOdmFTUnVDcmVHUTNDc21lNXlLM2ZwbGJCQWJPVmJQ?=
- =?utf-8?B?WUFrZ1BwUjFWZ2RtaEpUZUVOay9mRmNML0JFSDdUbUNuWXlHL3AxRkVXTDlP?=
- =?utf-8?B?Z1IwaE1GZXcwZWJXRll1RTVXYTJlS2M2R1JGb3RKbjhkYnNQMnRtazZQV1d0?=
- =?utf-8?B?dWtGUkhJejlrcGlZWm9yWnR1ZU9BbHEzOS9MWnMrT3djZmxxWDJzT2YxbE9h?=
- =?utf-8?B?M1NFRzJ3MzFrdkRVazVjcW1kRFNaVmsyMzJ3Z3c3QnBFTlB4TDNZYVEyTFo5?=
- =?utf-8?B?MTQyVW1SeGExenNaZkZ6SDFpa3dUWnRHNTQ5bVBMaUQ3Q25DcE5xN3pBMzRu?=
- =?utf-8?B?amIwNEl6Z3RYTjBVVXFiVlM3OE5EbTdyVTI2ZXlaNVkyVXdpUk0ybFNtRVBO?=
- =?utf-8?B?dHJYWlJhZjRCZE9VeHpMa1BYbEc1KzRSMHV3ZnZScFBycTBvRzJFNVkrcCtO?=
- =?utf-8?B?a3E1TmwvYTZoUWpzeUc1SENwWkFlMThTQlJBRDdnTXdiZUROaFNUVkQ1RGZC?=
- =?utf-8?B?VFdsTXdJdWpGa1BpMTNJZFRDQ2JxRXVyUjdRcWkrOUZDRlo5WFFIM3lKQ2tC?=
- =?utf-8?B?RjlaRTNFVW1FUFZNOWVCNHVXdkZFOCsydlNYYmo5OEgweWtKSFZET01VWCtO?=
- =?utf-8?B?OXB4a25ySi90WS94WitER0lPUGRkdGtMYW9yZHVNSEhvcVIzR25XMHppc3kx?=
- =?utf-8?B?bklNemh4eHJoRnJ4YTE0REY0d3ZZZEJkR2F6c3RmRmdmQjFKUTlLTlhlUTZK?=
- =?utf-8?B?WktTWk8vTkNiRktyYkgxMjNvMjJnQ2FGaU85QXJDTk9MYVo1YXlSV0FSWisz?=
- =?utf-8?B?Qzd4aUNYTnhBb0UvZlYyVmZWOVdkdUpud3hFYzdsWXJwYWRrTVh4UUVNUW1D?=
- =?utf-8?B?SGN2Qi9XVGJHczhvelJROU52NE9hOTFCY01ZdVB4cVNkS25Tejh4MlN5MGZ4?=
- =?utf-8?B?VGNZdmx6STBWaUZ6VWFyUHZEUE1sYVR5MGxheFpQTnRkdVJONnk2V3NnNUxh?=
- =?utf-8?B?RjFxNWZ5SGRDN2tDejRtS3lhTzQzY21nejJXVzF4VUV4Zm0vUDJ4K1RTeWJP?=
- =?utf-8?B?aGtreHJoMWNqa0xDQnhwSDlMOXdpNEYwUStNa1RDS2taN0NuaXNvRjdDVGox?=
- =?utf-8?B?SENMV0FHSElxV3VTaFp6cVN4eEdUYzlSM2c5S3dyS05laUtSWFhNVkk1M0JU?=
- =?utf-8?B?OFoyWUp4OExraDI5N0hSbFU0LzZwelVSNUF5RjFmUjZDRHFmN1plWHNhRXZV?=
- =?utf-8?B?Tm5mOTJjNVN6eHpQVmc5V2ozRXBtZUJUSlVxWG4vcnRHcTU3UHBQNThqcUV6?=
- =?utf-8?B?Sy9GSG1Uc1VvSmI0TlB1eG1FdWhIb2ViUk5HekJ4Q21MN3JKZWQ1VzZYUTk0?=
- =?utf-8?B?N0NocHNVQ0ZValozYS9HZVMwcWJXL3ZldXlmWGRMc1FxREZUbS9KRmp3NWNL?=
- =?utf-8?B?ZmdxMThwRGNCWU5oOGFLQWk5UnRsRlA2eDcxeU1zelJBaVpQeHMxaTJ5bitJ?=
- =?utf-8?B?NXJxbUVNcDlkVnNGTlZkdUxtQ2piSjZNeEFYQVllOGtBd1NjQUhCd01tTjFn?=
- =?utf-8?B?R0J1RUx2Q0dZUkhDclgyYllzcjFBak13aTJWL2ppLzF1ZEpld2EvWE5KK3lW?=
- =?utf-8?Q?ad4H5mHpC45Xqm+8nnUIiibok?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <77F00612CBD0BF4A8372A3D76F2F640C@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 649E22571AC
+	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 12:17:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742905078; cv=none; b=MN6zOmQaBJBRHZVo9hbxBHtT9cPqDBGMWlu/HQA9PIxZdVhiMJgMjed+GgJaWuY/KV3vbPoxzQjA7mqm6bsCfyhRY/E15XTPd82mLK9EKHeDChy/FaPunrVg5T9K8Z4v1RAb31RhkO/4qeStvdjrh6Soywajtnl5oRg2wSQcJFA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742905078; c=relaxed/simple;
+	bh=ybBxi4WQcURKoE4BxCGqK8VSt1MHM5Lsow1LinLQwcs=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=D6rU/hJlpeg0Fjg5L6WJWQJ+PYLUop+s0JfOkfRJhCDZO90xjAhtLX6A7P5TcH29ErTAx52ZBVl+OpAC3TrlsB5RPql2Ub11/DrC//3CG8sHlaF6XoyGEtlGK4G/ezSKHXXWtYHHib6r9Px64m1qntJ29udiafv0xfJeer38TkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=orbstack.dev; spf=pass smtp.mailfrom=orbstack.dev; dkim=pass (2048-bit key) header.d=orbstack.dev header.i=@orbstack.dev header.b=LvR8AKHU; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=orbstack.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=orbstack.dev
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-22401f4d35aso113014935ad.2
+        for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 05:17:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=orbstack.dev; s=google; t=1742905075; x=1743509875; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ag0uHziDOMxcedxURrdSLZ+7TR1r0QSkH/f14RF03UI=;
+        b=LvR8AKHULQZLQ+K8YgraiK+jfgudXpyPmlUSeOVnhktwBWzmwFFidKjebHr8OmIut2
+         uh2a8XkCfM6pWv+AEESft+ejpVfpt2B6nkfiKeWG4FM9D4BFhky59PXE2wyOggD1swTd
+         da4wwUslXhXCq9xiDsaglt3hhxb2+57yOdjGsBcy7jEVdDzTEvYR0Funx7hcZI7LIIv8
+         4n8yfDnvghcT3UHtF1BXAzJG0J43Bz5zjc7r88Pgw6c9ZuHIAdL+UEKllrytwgQTM+7d
+         AVkf++B41BaAMFTzotQBnLfpUVRRc5XG3gAndn1HDNix/VdUZKHiUywWr22Gm0ZMybTf
+         zS7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742905075; x=1743509875;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ag0uHziDOMxcedxURrdSLZ+7TR1r0QSkH/f14RF03UI=;
+        b=WYQJB/rNo3WiQIj1ztwjSip0WFEHmzACox5zukGJJcHMcWrYM4zMVwM8TT5+ztlv10
+         AbojqFSeDIBCOHcgThfPGqraXpL1X+COOLzSfBQX902PuQi7qK8Strita2U6+tjg+y5t
+         kbhn0nl6Mx4/QmC3iz4+oGMsl45Z6WiF5veBOZdr4VI7KPrYuV9St8A9oNqqPoRAy2kJ
+         mjkrqOWr/Cf7B0JnDvGf6xCz91YwkJ6F7XcX/6gTkpBDPCjiscRHDBPxSZsvCX2aGnB/
+         q4hIPrknaNkn4HwkT/i3WxTtzq5QHReKI8aZz7p/Aa57wHRCWCeN8gXeSG/TyTdpB9G/
+         wHvg==
+X-Forwarded-Encrypted: i=1; AJvYcCVSBRoQr44sonLuh2BGn28dIdX2AOXX8zuR+Tkb1Rx8Vb3PZwevvM319r3qO8jfrKuL7ka4bUk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpNW0Y0+437KFeE3JNoCDObvF9FE9XPCzsnMxm9V5ntLqHS3Rb
+	33VykEkROEkGE21lGsYTpUg4bLqG0IvOZ9hvEqx29h/Hx/rgq6X3JKBGstvgInU=
+X-Gm-Gg: ASbGncudccWc430crkyiyycR8MPtZeLNRK15f77Lv2cXm75uMP7oCripOOCNJkgOyJM
+	tvgJdg62JC6gRHxomT/Ki7Or6enOXoBPCIqO1+MK+MLhZuNIrAHdtgJo7KYGDcXX3o6lT6pBpKV
+	a+WLptRlXwyQTwGD5xdGLe+wYR5AsOX6i1NQNPUYDy6pwmJPlinLxsgXioNeuIEmOzQGPynTqnY
+	t0NNqWU50Fs0T+3r+aYyMeKuM/n2i4WqNeHcq7jxb6KQijGhmD9acw54UmBQU+qJqVtA1Nh0aJM
+	DDnWz7nC6AOkvFbjwZDquVDZVpidaDAsjPF/P5xrr4KifyCP
+X-Google-Smtp-Source: AGHT+IGBEROC9LwfVluDcJ1ldvUULQj+FL1dzyRB0E5diW93dVj83d6ug/a42wlQE8EVJ+A2LnbK7w==
+X-Received: by 2002:aa7:88c9:0:b0:730:7600:aeab with SMTP id d2e1a72fcca58-739059c5da7mr26790456b3a.13.1742905075272;
+        Tue, 25 Mar 2025 05:17:55 -0700 (PDT)
+Received: from debian.. ([136.24.187.18])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af8a284888bsm8900204a12.46.2025.03.25.05.17.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Mar 2025 05:17:54 -0700 (PDT)
+From: Danny Lin <danny@orbstack.dev>
+To: Matteo Croce <teknoraver@meta.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Danny Lin <danny@orbstack.dev>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v4] net: fully namespace net.core.{r,w}mem_{default,max} sysctls
+Date: Tue, 25 Mar 2025 05:17:33 -0700
+Message-ID: <20250325121745.8061-1-danny@orbstack.dev>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6560.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 79bbc595-40ef-4d83-ad15-08dd6b96fac2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Mar 2025 12:17:15.2345
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: MpS43U+NEfc1b/HYhT/YH6dt6DTjSpe6bh/Zl+7+hGQsG+UnMGB2jqycrrd8H7IhHLhgJWrztL07kgCkE6P9jg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB5674
+Content-Transfer-Encoding: 8bit
 
-T24gTW9uLCAyMDI1LTAzLTI0IGF0IDE1OjQ1IC0wNzAwLCBKYWt1YiBLaWNpbnNraSB3cm90ZToN
-Cj4gVGhlIE5FVERFVl9VTlJFR0lTVEVSIG5vdGlmaWVyIGdldHMgY2FsbGVkIHVuZGVyIHRoZSBv
-cHMgbG9jaw0KPiB3aGVuIGRldmljZSBjaGFuZ2VzIG5hbWVzcGFjZSBidXQgbm90IGR1cmluZyBy
-ZWFsIHVucmVnaXN0cmF0aW9uLg0KPiBUYWtlIGl0IGNvbnNpc3RlbnRseSwgWFNLIHRyaWVzIHRv
-IHBva2UgYXQgbmV0ZGV2IHF1ZXVlIHN0YXRlDQo+IGZyb20gdGhpcyBub3RpZmllci4NCj4gDQo+
-IFNpZ25lZC1vZmYtYnk6IEpha3ViIEtpY2luc2tpIDxrdWJhQGtlcm5lbC5vcmc+DQo+IC0tLQ0K
-PiDCoG5ldC9jb3JlL2Rldi5jIHwgOSArKysrKysrKy0NCj4gwqAxIGZpbGUgY2hhbmdlZCwgOCBp
-bnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvbmV0L2NvcmUv
-ZGV2LmMgYi9uZXQvY29yZS9kZXYuYw0KPiBpbmRleCA2NTJmMmM2ZjU2NzQuLjdiZDhiZDgyZjY2
-ZiAxMDA2NDQNCj4gLS0tIGEvbmV0L2NvcmUvZGV2LmMNCj4gKysrIGIvbmV0L2NvcmUvZGV2LmMN
-Cj4gQEAgLTE4NDgsNyArMTg0OCw5IEBAIHN0YXRpYyB2b2lkDQo+IGNhbGxfbmV0ZGV2aWNlX3Vu
-cmVnaXN0ZXJfbm90aWZpZXJzKHN0cnVjdCBub3RpZmllcl9ibG9jayAqbmIsDQo+IMKgCQkJCQlk
-ZXYpOw0KPiDCoAkJY2FsbF9uZXRkZXZpY2Vfbm90aWZpZXIobmIsIE5FVERFVl9ET1dOLCBkZXYp
-Ow0KPiDCoAl9DQo+ICsJbmV0ZGV2X2xvY2tfb3BzKGRldik7DQo+IMKgCWNhbGxfbmV0ZGV2aWNl
-X25vdGlmaWVyKG5iLCBORVRERVZfVU5SRUdJU1RFUiwgZGV2KTsNCj4gKwluZXRkZXZfdW5sb2Nr
-X29wcyhkZXYpOw0KPiDCoH0NCg0KVGhpcyBpbnRyb2R1Y2VzIGEgcG90ZW50aWFsIGRlYWRsb2Nr
-IHdoZW4gY2hhbmdpbmcgYSBkZXZpY2UgbmFtZXNwYWNlOg0KZG9fc2V0bGluayBhbHJlYWR5IGxv
-Y2tzIHRoZSBpbnN0YW5jZSBsb2NrIGFuZA0KY2FsbF9uZXRkZXZpY2VfdW5yZWdpc3Rlcl9ub3Rp
-ZmllcnMgd2lsbCB0aGVuIGRlYWRsb2NrLg0KDQo9PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PQ0KV0FSTklORzogcG9zc2libGUgcmVjdXJzaXZlIGxvY2tpbmcgZGV0
-ZWN0ZWQNCjYuMTQuMC1yYzYrICMxNDMgTm90IHRhaW50ZWQNCi0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQppcC8yNDU5IGlzIHRyeWluZyB0byBhY3F1aXJlIGxv
-Y2s6DQpmZmZmODg4MTEzY2E4YzgwICgmZGV2LT5sb2NrKXsrLisufS17NDo0fSwgYXQ6DQpjYWxs
-X25ldGRldmljZV91bnJlZ2lzdGVyX25vdGlmaWVycysweDczLzB4MTEwDQoNCmJ1dCB0YXNrIGlz
-IGFscmVhZHkgaG9sZGluZyBsb2NrOg0KZmZmZjg4ODE1NWExMGM4MCAoJmRldi0+bG9jayl7Ky4r
-Ln0tezQ6NH0sIGF0Og0KZG9fc2V0bGluay5pc3JhLjArMHg1Yi8weDEyMjANCg0Kb3RoZXIgaW5m
-byB0aGF0IG1pZ2h0IGhlbHAgdXMgZGVidWcgdGhpczoNCiBQb3NzaWJsZSB1bnNhZmUgbG9ja2lu
-ZyBzY2VuYXJpbzoNCg0KICAgICAgIENQVTANCiAgICAgICAtLS0tDQogIGxvY2soJmRldi0+bG9j
-ayk7DQogIGxvY2soJmRldi0+bG9jayk7DQoNCiAqKiogREVBRExPQ0sgKioqDQoNCiBNYXkgYmUg
-ZHVlIHRvIG1pc3NpbmcgbG9jayBuZXN0aW5nIG5vdGF0aW9uDQoNCjIgbG9ja3MgaGVsZCBieSBp
-cC8yNDU5Og0KICMwOiBmZmZmZmZmZjgyZGYxOGM4IChydG5sX211dGV4KXsrLisufS17NDo0fSwg
-YXQ6DQpydG5sX25ld2xpbmsrMHgzNWQvMHhiNTANCiAjMTogZmZmZjg4ODE1NWExMGM4MCAoJmRl
-di0+bG9jayl7Ky4rLn0tezQ6NH0sIGF0Og0KZG9fc2V0bGluay5pc3JhLjArMHg1Yi8weDEyMjAN
-Cg0KQ2FsbCBUcmFjZToNCiA8VEFTSz4NCiBkdW1wX3N0YWNrX2x2bCsweDYyLzB4OTANCiBwcmlu
-dF9kZWFkbG9ja19idWcrMHgyNzQvMHgzYjANCiBfX2xvY2tfYWNxdWlyZSsweDEyMjkvMHgyNDcw
-DQogbG9ja19hY3F1aXJlKzB4YjcvMHgyYjANCiBfX211dGV4X2xvY2srMHhhNi8weGQyMA0KIGNh
-bGxfbmV0ZGV2aWNlX3VucmVnaXN0ZXJfbm90aWZpZXJzKzB4NzMvMHgxMTANCiBuZXRpZl9jaGFu
-Z2VfbmV0X25hbWVzcGFjZSsweDRiNy8weGE5MA0KIGRvX3NldGxpbmsuaXNyYS4wKzB4ZDUvMHgx
-MjIwDQogcnRubF9uZXdsaW5rKzB4N2VhLzB4YjUwDQogcnRuZXRsaW5rX3Jjdl9tc2crMHg0NTkv
-MHg1ZTANCiBuZXRsaW5rX3Jjdl9za2IrMHg1NC8weDEwMA0KIG5ldGxpbmtfdW5pY2FzdCsweDE5
-My8weDI3MA0KIG5ldGxpbmtfc2VuZG1zZysweDIwNC8weDQ1MA0KIDxzbmlwPg0KDQo=
+This builds on commit 19249c0724f2 ("net: make net.core.{r,w}mem_{default,max} namespaced")
+by adding support for writing the sysctls from within net namespaces,
+rather than only reading the values that were set in init_net. These are
+relatively commonly-used sysctls, so programs may try to set them without
+knowing that they're in a container. It can be surprising for such attempts
+to fail with EACCES.
+
+Unlike other net sysctls that were converted to namespaced ones, many
+systems have a sysctl.conf (or other configs) that globally write to
+net.core.rmem_default on boot and expect the value to propagate to
+containers, and programs running in containers may depend on the increased
+buffer sizes in order to work properly. This means that namespacing the
+sysctls and using the kernel default values in each new netns would break
+existing workloads.
+
+As a compromise, inherit the initial net.core.*mem_* values from the
+current process' netns when creating a new netns. This is not standard
+behavior for most netns sysctls, but it avoids breaking existing workloads.
+
+Signed-off-by: Danny Lin <danny@orbstack.dev>
+---
+ include/net/netns/core.h                    |  5 +++++
+ include/net/sock.h                          |  6 ------
+ net/core/net_namespace.c                    | 21 ++++++++++++++++++
+ net/core/sock.c                             | 16 ++++----------
+ net/core/sysctl_net_core.c                  | 16 ++++----------
+ net/ipv4/ip_output.c                        |  2 +-
+ net/ipv4/tcp_output.c                       |  2 +-
+ net/netfilter/ipvs/ip_vs_sync.c             |  4 ++--
+ tools/testing/selftests/net/netns-sysctl.sh | 24 +++++++++++++++------
+ 9 files changed, 55 insertions(+), 41 deletions(-)
+
+diff --git a/include/net/netns/core.h b/include/net/netns/core.h
+index 9b36f0ff0c20..0459523602cb 100644
+--- a/include/net/netns/core.h
++++ b/include/net/netns/core.h
+@@ -17,6 +17,11 @@ struct netns_core {
+ 	u8	sysctl_txrehash;
+ 	u8	sysctl_tstamp_allow_data;
+ 
++	u32 sysctl_wmem_max;
++	u32 sysctl_rmem_max;
++	u32 sysctl_wmem_default;
++	u32 sysctl_rmem_default;
++
+ #ifdef CONFIG_PROC_FS
+ 	struct prot_inuse __percpu *prot_inuse;
+ #endif
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 8daf1b3b12c6..7aeddba44919 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -2849,12 +2849,6 @@ void sk_get_meminfo(const struct sock *sk, u32 *meminfo);
+ #define SK_WMEM_MAX		(_SK_MEM_OVERHEAD * _SK_MEM_PACKETS)
+ #define SK_RMEM_MAX		(_SK_MEM_OVERHEAD * _SK_MEM_PACKETS)
+ 
+-extern __u32 sysctl_wmem_max;
+-extern __u32 sysctl_rmem_max;
+-
+-extern __u32 sysctl_wmem_default;
+-extern __u32 sysctl_rmem_default;
+-
+ #define SKB_FRAG_PAGE_ORDER	get_order(32768)
+ DECLARE_STATIC_KEY_FALSE(net_high_order_alloc_disable_key);
+ 
+diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+index b0dfdf791ece..39fe16f1ab72 100644
+--- a/net/core/net_namespace.c
++++ b/net/core/net_namespace.c
+@@ -317,6 +317,27 @@ static __net_init void preinit_net_sysctl(struct net *net)
+ 	net->core.sysctl_optmem_max = 128 * 1024;
+ 	net->core.sysctl_txrehash = SOCK_TXREHASH_ENABLED;
+ 	net->core.sysctl_tstamp_allow_data = 1;
++
++	/*
++	 * net.core.{r,w}mem_{default,max} used to be non-namespaced.
++	 * For backward compatibility, inherit values from the current netns
++	 * when creating a new one, so that setting them in init_net
++	 * affects new namespaces like it used to. This avoids causing
++	 * surprising performance regressions for namespaced applications
++	 * relying on tuned rmem/wmem.
++	 */
++	if (net == &init_net) {
++		net->core.sysctl_wmem_max = SK_WMEM_MAX;
++		net->core.sysctl_rmem_max = SK_RMEM_MAX;
++		net->core.sysctl_wmem_default = SK_WMEM_MAX;
++		net->core.sysctl_rmem_default = SK_RMEM_MAX;
++	} else {
++		struct net *current_net = current->nsproxy->net_ns;
++		net->core.sysctl_wmem_max = current_net->core.sysctl_wmem_max;
++		net->core.sysctl_rmem_max = current_net->core.sysctl_rmem_max;
++		net->core.sysctl_wmem_default = current_net->core.sysctl_wmem_default;
++		net->core.sysctl_rmem_default = current_net->core.sysctl_rmem_default;
++	}
+ }
+ 
+ /* init code that must occur even if setup_net() is not called. */
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 323892066def..88694cd59abd 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -278,14 +278,6 @@ static struct lock_class_key af_wlock_keys[AF_MAX];
+ static struct lock_class_key af_elock_keys[AF_MAX];
+ static struct lock_class_key af_kern_callback_keys[AF_MAX];
+ 
+-/* Run time adjustable parameters. */
+-__u32 sysctl_wmem_max __read_mostly = SK_WMEM_MAX;
+-EXPORT_SYMBOL(sysctl_wmem_max);
+-__u32 sysctl_rmem_max __read_mostly = SK_RMEM_MAX;
+-EXPORT_SYMBOL(sysctl_rmem_max);
+-__u32 sysctl_wmem_default __read_mostly = SK_WMEM_MAX;
+-__u32 sysctl_rmem_default __read_mostly = SK_RMEM_MAX;
+-
+ DEFINE_STATIC_KEY_FALSE(memalloc_socks_key);
+ EXPORT_SYMBOL_GPL(memalloc_socks_key);
+ 
+@@ -1333,7 +1325,7 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
+ 		 * play 'guess the biggest size' games. RCVBUF/SNDBUF
+ 		 * are treated in BSD as hints
+ 		 */
+-		val = min_t(u32, val, READ_ONCE(sysctl_wmem_max));
++		val = min_t(u32, val, READ_ONCE(sock_net(sk)->core.sysctl_wmem_max));
+ set_sndbuf:
+ 		/* Ensure val * 2 fits into an int, to prevent max_t()
+ 		 * from treating it as a negative value.
+@@ -1365,7 +1357,7 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
+ 		 * play 'guess the biggest size' games. RCVBUF/SNDBUF
+ 		 * are treated in BSD as hints
+ 		 */
+-		__sock_set_rcvbuf(sk, min_t(u32, val, READ_ONCE(sysctl_rmem_max)));
++		__sock_set_rcvbuf(sk, min_t(u32, val, READ_ONCE(sock_net(sk)->core.sysctl_rmem_max)));
+ 		break;
+ 
+ 	case SO_RCVBUFFORCE:
+@@ -3618,8 +3610,8 @@ void sock_init_data_uid(struct socket *sock, struct sock *sk, kuid_t uid)
+ 	timer_setup(&sk->sk_timer, NULL, 0);
+ 
+ 	sk->sk_allocation	=	GFP_KERNEL;
+-	sk->sk_rcvbuf		=	READ_ONCE(sysctl_rmem_default);
+-	sk->sk_sndbuf		=	READ_ONCE(sysctl_wmem_default);
++	sk->sk_rcvbuf		=	READ_ONCE(sock_net(sk)->core.sysctl_rmem_default);
++	sk->sk_sndbuf		=	READ_ONCE(sock_net(sk)->core.sysctl_wmem_default);
+ 	sk->sk_state		=	TCP_CLOSE;
+ 	sk->sk_use_task_frag	=	true;
+ 	sk_set_socket(sk, sock);
+diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
+index c7769ee0d9c5..980f96703264 100644
+--- a/net/core/sysctl_net_core.c
++++ b/net/core/sysctl_net_core.c
+@@ -685,12 +685,9 @@ static struct ctl_table netns_core_table[] = {
+ 		.extra1		= SYSCTL_ZERO,
+ 		.extra2		= SYSCTL_ONE
+ 	},
+-	/* sysctl_core_net_init() will set the values after this
+-	 * to readonly in network namespaces
+-	 */
+ 	{
+ 		.procname	= "wmem_max",
+-		.data		= &sysctl_wmem_max,
++		.data		= &init_net.core.sysctl_wmem_max,
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+ 		.proc_handler	= proc_dointvec_minmax,
+@@ -698,7 +695,7 @@ static struct ctl_table netns_core_table[] = {
+ 	},
+ 	{
+ 		.procname	= "rmem_max",
+-		.data		= &sysctl_rmem_max,
++		.data		= &init_net.core.sysctl_rmem_max,
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+ 		.proc_handler	= proc_dointvec_minmax,
+@@ -706,7 +703,7 @@ static struct ctl_table netns_core_table[] = {
+ 	},
+ 	{
+ 		.procname	= "wmem_default",
+-		.data		= &sysctl_wmem_default,
++		.data		= &init_net.core.sysctl_wmem_default,
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+ 		.proc_handler	= proc_dointvec_minmax,
+@@ -714,7 +711,7 @@ static struct ctl_table netns_core_table[] = {
+ 	},
+ 	{
+ 		.procname	= "rmem_default",
+-		.data		= &sysctl_rmem_default,
++		.data		= &init_net.core.sysctl_rmem_default,
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+ 		.proc_handler	= proc_dointvec_minmax,
+@@ -748,13 +745,8 @@ static __net_init int sysctl_core_net_init(struct net *net)
+ 			goto err_dup;
+ 
+ 		for (i = 0; i < table_size; ++i) {
+-			if (tbl[i].data == &sysctl_wmem_max)
+-				break;
+-
+ 			tbl[i].data += (char *)net - (char *)&init_net;
+ 		}
+-		for (; i < table_size; ++i)
+-			tbl[i].mode &= ~0222;
+ 	}
+ 
+ 	net->core.sysctl_hdr = register_net_sysctl_sz(net, "net/core", tbl, table_size);
+diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+index 6e18d7ec5062..7b7c5e4ea5d8 100644
+--- a/net/ipv4/ip_output.c
++++ b/net/ipv4/ip_output.c
+@@ -1643,7 +1643,7 @@ void ip_send_unicast_reply(struct sock *sk, const struct sock *orig_sk,
+ 
+ 	sk->sk_protocol = ip_hdr(skb)->protocol;
+ 	sk->sk_bound_dev_if = arg->bound_dev_if;
+-	sk->sk_sndbuf = READ_ONCE(sysctl_wmem_default);
++	sk->sk_sndbuf = READ_ONCE(net->core.sysctl_wmem_default);
+ 	ipc.sockc.mark = fl4.flowi4_mark;
+ 	err = ip_append_data(sk, &fl4, ip_reply_glue_bits, arg->iov->iov_base,
+ 			     len, 0, &ipc, &rt, MSG_DONTWAIT);
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index 9a6061017114..abc766b3936d 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -241,7 +241,7 @@ void tcp_select_initial_window(const struct sock *sk, int __space, __u32 mss,
+ 	if (wscale_ok) {
+ 		/* Set window scaling on max possible window */
+ 		space = max_t(u32, space, READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_rmem[2]));
+-		space = max_t(u32, space, READ_ONCE(sysctl_rmem_max));
++		space = max_t(u32, space, READ_ONCE(sock_net(sk)->core.sysctl_rmem_max));
+ 		space = min_t(u32, space, window_clamp);
+ 		*rcv_wscale = clamp_t(int, ilog2(space) - 15,
+ 				      0, TCP_MAX_WSCALE);
+diff --git a/net/netfilter/ipvs/ip_vs_sync.c b/net/netfilter/ipvs/ip_vs_sync.c
+index 3402675bf521..62f30d5c25c7 100644
+--- a/net/netfilter/ipvs/ip_vs_sync.c
++++ b/net/netfilter/ipvs/ip_vs_sync.c
+@@ -1280,12 +1280,12 @@ static void set_sock_size(struct sock *sk, int mode, int val)
+ 	lock_sock(sk);
+ 	if (mode) {
+ 		val = clamp_t(int, val, (SOCK_MIN_SNDBUF + 1) / 2,
+-			      READ_ONCE(sysctl_wmem_max));
++			      READ_ONCE(sock_net(sk)->core.sysctl_wmem_max));
+ 		sk->sk_sndbuf = val * 2;
+ 		sk->sk_userlocks |= SOCK_SNDBUF_LOCK;
+ 	} else {
+ 		val = clamp_t(int, val, (SOCK_MIN_RCVBUF + 1) / 2,
+-			      READ_ONCE(sysctl_rmem_max));
++			      READ_ONCE(sock_net(sk)->core.sysctl_rmem_max));
+ 		sk->sk_rcvbuf = val * 2;
+ 		sk->sk_userlocks |= SOCK_RCVBUF_LOCK;
+ 	}
+diff --git a/tools/testing/selftests/net/netns-sysctl.sh b/tools/testing/selftests/net/netns-sysctl.sh
+index 45c34a3b9aae..bb6f173a28e2 100755
+--- a/tools/testing/selftests/net/netns-sysctl.sh
++++ b/tools/testing/selftests/net/netns-sysctl.sh
+@@ -20,21 +20,31 @@ fail() {
+ setup_ns test_ns
+ 
+ for sc in {r,w}mem_{default,max}; do
+-	# check that this is writable in a netns
++	initial_value="$(sysctl -n "net.core.$sc")"
++
++	# check that this is writable in the init netns
+ 	[ -w "/proc/sys/net/core/$sc" ] ||
+ 		fail "$sc isn't writable in the init netns!"
+ 
+-	# change the value in the host netns
++	# change the value in the init netns
+ 	sysctl -qw "net.core.$sc=300000" ||
+ 		fail "Can't write $sc in init netns!"
+ 
+-	# check that the value is read from the init netns
+-	[ "$(ip netns exec $test_ns sysctl -n "net.core.$sc")" -eq 300000 ] ||
++	# check that the value did not change in the test netns
++	[ "$(ip netns exec $test_ns sysctl -n "net.core.$sc")" -eq "$initial_value" ] ||
+ 		fail "Value for $sc mismatch!"
+ 
+-	# check that this isn't writable in a netns
+-	ip netns exec $test_ns [ -w "/proc/sys/net/core/$sc" ] &&
+-		fail "$sc is writable in a netns!"
++	# check that this is also writable in the test netns
++	ip netns exec $test_ns [ -w "/proc/sys/net/core/$sc" ] ||
++		fail "$sc isn't writable in the test netns!"
++
++	# change the value in the test netns
++	ip netns exec $test_ns sysctl -qw "net.core.$sc=200000" ||
++		fail "Can't write $sc in test netns!"
++
++	# check that the value is read from the test netns
++	[ "$(ip netns exec $test_ns sysctl -n "net.core.$sc")" -eq 200000 ] ||
++		fail "Value for $sc mismatch!"
+ done
+ 
+ echo 'Test passed OK'
+-- 
+2.47.2
+
 
