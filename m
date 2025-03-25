@@ -1,200 +1,246 @@
-Return-Path: <netdev+bounces-177280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3A4CA6E89D
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 04:17:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D75BCA6E8BA
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 04:51:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA1743B0A74
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 03:16:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0A833B4183
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 03:51:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7998E1A0BFE;
-	Tue, 25 Mar 2025 03:16:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31E3719EED3;
+	Tue, 25 Mar 2025 03:51:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nNf4iE0k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDDC0187FFA;
-	Tue, 25 Mar 2025 03:16:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.166.238
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742872618; cv=fail; b=EYOn9980i/NM2Bkwiiyp4TSYDISGhM5oPBawku7DqTnsx/G69S1vAaFbe277DbOg9raxAU+TigNdiF7/X0jaDzu7eaC6x22eFpaQ3KKkrvICPsFKJK9YVR10RD/3itBmj8lsq3g5sVXsBNnzvtW6bSLidfyzm3uA7VrzR1vF58s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742872618; c=relaxed/simple;
-	bh=FX5gP4qFjIkL7VMY8j4GEOUkjNjqSK5R8N5HSCOLLQo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=gEKKFkMvF69X0pGGi0T+TXuvvGIH6jUtK1g2ubC+iNIL9iFyHY/IVeBIzIbIZmjr+ntnHYUvjsfLIGBFaE0TmBR4tX1mM5wMkcpZeEXBXZ3ReCGSlHp956NTCTVG8SlFhTuQE9XCMTvLRur1prIixIh2AC2m2WfGe7m5EjFhTEI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=fail smtp.client-ip=205.220.166.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52P2g04L030879;
-	Mon, 24 Mar 2025 20:16:44 -0700
-Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2173.outbound.protection.outlook.com [104.47.56.173])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 45hrg42n6j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 24 Mar 2025 20:16:43 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=IAbwQsTaCdvTcdOovejqSrWNEN3NhwljzCvsq+KgeUpwlDL/7Lr/vQDPX7V1UBTBdRjbqQv+nXIhTD3LvjQRoNeFRvBjovOnSsTtmSD9CKeTkNTaExIhlaBH+52W3VQ4eplvegMxaknvDfFN/HRgKimQU8foKbHo5uEmlJjBRhHpgAFmVwKOJUqrrr1kNFmhioHVI5M3Au0PgV63SUONounwV4SeplfZcCyiaav3pIZmGnvr+9SZjjr6D6n5dS3nNOvV1tEc2oxPGA7GIaHCzW3gFnNzG3V2uGksl8wqEOsyssF+6ysJxrhkWGQomg/EhaShBNLqRD/p38H/jLvoyQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FX5gP4qFjIkL7VMY8j4GEOUkjNjqSK5R8N5HSCOLLQo=;
- b=Jg9JQYQq/qzhQl2KGq6ysGKS+x73/3cRO0dlgRvmCA+fZOO+6tcf2TfB1UwAN1p99Mvdb+A5k+vuq3zVTDkTec46IQvWOfIhVAM+SlFOweDnoyKUXHpFeFrDQ79J+FXhwN9CBOT9vIrwRj8AnSGSlToPVXeDkaLbBBsgQMB6YHhUTt5WwMs7B4cYPvUwiQYKFOOc8u0875KO9xLge8g/NZUUclEpUlg6OiIJtPD8YTzCSe7/tv3EwnZZ2niVpd4RmmNt5ZTmtoNSDO8m526LqEBrHE4XA1WDsh1HKr0k93CFa6aZzwaTdvfyIk/+j/nX7EVkh0tlm3/tNZP9BYbS/g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=windriver.com; dmarc=pass action=none
- header.from=windriver.com; dkim=pass header.d=windriver.com; arc=none
-Received: from IA1PR11MB6170.namprd11.prod.outlook.com (2603:10b6:208:3ea::11)
- by BL3PR11MB6412.namprd11.prod.outlook.com (2603:10b6:208:3bb::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.42; Tue, 25 Mar
- 2025 03:16:41 +0000
-Received: from IA1PR11MB6170.namprd11.prod.outlook.com
- ([fe80::f850:53da:e11b:1653]) by IA1PR11MB6170.namprd11.prod.outlook.com
- ([fe80::f850:53da:e11b:1653%3]) with mapi id 15.20.8534.040; Tue, 25 Mar 2025
- 03:16:41 +0000
-From: "Ren, Jianqi (Jacky) (CN)" <Jianqi.Ren.CN@windriver.com>
-To: "Ren, Jianqi (Jacky) (CN)" <Jianqi.Ren.CN@windriver.com>,
-        "kovalev@altlinux.org" <kovalev@altlinux.org>
-CC: "edumazet@google.com" <edumazet@google.com>,
-        "i.maximets@ovn.org"
-	<i.maximets@ovn.org>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "kuniyu@amazon.com" <kuniyu@amazon.com>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: RE: [PATCH 5.15] net: defer final 'struct net' free in netns
- dismantle
-Thread-Topic: [PATCH 5.15] net: defer final 'struct net' free in netns
- dismantle
-Thread-Index: AQHbnTNct0ic9WHbKUSERw/tXGKWebODLa6g
-Date: Tue, 25 Mar 2025 03:16:41 +0000
-Message-ID:
- <IA1PR11MB6170CD38BCB85D9FD1CD9A71BBA72@IA1PR11MB6170.namprd11.prod.outlook.com>
-References: <20250115091642.335047-1-kovalev@altlinux.org>
- <20250325030946.1111059-1-jianqi.ren.cn@windriver.com>
-In-Reply-To: <20250325030946.1111059-1-jianqi.ren.cn@windriver.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6170:EE_|BL3PR11MB6412:EE_
-x-ms-office365-filtering-correlation-id: a34dd07b-6570-4b68-fb10-08dd6b4b767c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|376014|38070700018|7053199007;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?MKe7NcuIrPrFteKVmJFWyraw3I4BGZFFD78P1iampDsjLhPIHzc0iSUCa9U5?=
- =?us-ascii?Q?IuAHqf7yCi6MnSSe106Gi/BFhdIayO0hwZgnQwPIqYZsExTv8RT+5vcuIe2K?=
- =?us-ascii?Q?9IMEKO1C0qpgDXa5WeF7le27gZ0M97lvz4noJLuU88YFxCedAewNiugUY+n0?=
- =?us-ascii?Q?/kH6/Mz7iipBXmfdW+Ky1K7u4kjO548sWmk8SD563Tc6xxnHGI95m/OkDfrb?=
- =?us-ascii?Q?6qmPOhbZMOAQfTFHaZVblxwoIVAlEyH6H0zvZoSGwMxLnwVdmJzU8875bw3A?=
- =?us-ascii?Q?OnTDwWYkrdfZuqYFOvqJgf3bJjm9ZyucJwiwPnEcVZ+Sy1Lx31ewpVcLicMM?=
- =?us-ascii?Q?CEnKdTr6Ku2A+nWVq+E9jAeXey5/hctoKrPTPyAf3o6OZ6hJnh9KCYe1RLkn?=
- =?us-ascii?Q?FCmG5luKeWBWdd69aaTQE85wbKSwVvVpKmPkHxMm/GjAoI7OJsPrxFJFdTKe?=
- =?us-ascii?Q?eBT//FkNoE5kAwOfX3HVIKWyGYTIAZsPQTymS6SzNC7LIZr/lI5ajMCkD+3f?=
- =?us-ascii?Q?PS4h4C6knzmJ3/XVXIhlbpvTknmvBys89HCVhj1ewqMo3YcxxCnRPnL65c6e?=
- =?us-ascii?Q?pgXJfkCGzyIpJQqOkxUfpN+pwyp0VpRkL0Lkwqv786czPeiXwm1yg6z9Q8FS?=
- =?us-ascii?Q?HzfIpVCQZOLc6TTkLXZCK4xB2jyi1W2hjX8dn81XhOt297bjpm5hqIQHk0l7?=
- =?us-ascii?Q?ACtr1fpqPUFPmoYpre+mH7SiFLr/CTSV/fl5k5pUqocAIce5Q71rlqAOQWG9?=
- =?us-ascii?Q?yO7WmBraOAEHpXzTYg83AqHVT+hVmAHrjR5uIZPB80vjwT1CK0f/bd3kkYZs?=
- =?us-ascii?Q?aR11KNw9AqnwX6viqUyJIWKqR4W0VIUsBWKXXOoZGZRwY8zvLjtU/M+r6zi7?=
- =?us-ascii?Q?PASytqP1IxekG6wgtW1WGX6NlFLI/pIhywlbQ3Xk60keGj0DKFR4CCaKslmb?=
- =?us-ascii?Q?yOgvWhPdM071wMui9c+lZH07sALBR9k8XPVO2yc4qFtjg3r7XHu3/qMk85oH?=
- =?us-ascii?Q?0J4pcilROvF7YxnER06kAN9bd84fddRFqydrqSYsTjrgDgfINFw+2/fW9dH5?=
- =?us-ascii?Q?RcmLL/DXD59bK0je970o13Gf1/STKxDfu4yq4I6rMM7wSj5rWIIoKIhnIQqj?=
- =?us-ascii?Q?X/TF7TIW3CRL/KputHWEKtvWM5IcdmqShqp2HraJfosM+DoBi7vraHeuYS90?=
- =?us-ascii?Q?Y1vQ85qDptGDTnyt+Jk/1jML9NP/gRmQENDS0qMb/iSG0wBcyxYFivDH582f?=
- =?us-ascii?Q?ivNRqUy/7TI739TWIjuFRgDkodGFuF4FaxEq0ajLTWTeTZcwPHfPZFAECtWn?=
- =?us-ascii?Q?uDVE6s8OYvbOAj0qrnNe+x7Brg+c+QIfKQ4aYLAkuHLik9zmYPW1pkGLRcLp?=
- =?us-ascii?Q?zoPUaH7KqSU2Nwxao0zj4Zcr1AJJ9zCP//bqE1GwQiFtOA0VGlgOGeyiPZeY?=
- =?us-ascii?Q?yMimHFNwc4X4jmDGykPYPPow1cMlMWSj?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6170.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018)(7053199007);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?WFr/D2hiEG07lXJhBNIXHQVL3ds9+viCZnOnEDEE6fClZ1MQza6bVsR5GFlp?=
- =?us-ascii?Q?TDgWXGrJDVkho9miASqujMNFSOkehoODrLqNQVi3atno0da5Iy9c279hSzyC?=
- =?us-ascii?Q?cn12NWZchiKLHEcnNxJEd3ZZSU9a0QUVoXBO/FzixIAb1isPxlQ+ygc0r9iP?=
- =?us-ascii?Q?4bCAAAu5mmZ0vxhBxbf+coeBhZUQUZAzygnvG0Wg+czkXX5S+Gejns4OTyrb?=
- =?us-ascii?Q?LxdwIPiDhMPXKVtpsJen4xFDqp44bhqtTE9bLK5UMeJeEzMCWP1qBjbZ8cgB?=
- =?us-ascii?Q?GmdFCO2IhBzgknzp/0e7EkPkWgJ4dziiJHECJwt9bs1ZpGGWjGwF1SDln0hj?=
- =?us-ascii?Q?tO89vao6aJi+d6wijFn5M7F2a+l0PD2E21xoQUBhL3ESEftIZgBfX7JS/3IM?=
- =?us-ascii?Q?6+IVFd2P/UCx2vX7fCQFy1S+8LpUzo1riWw6CqHCi8jAfzqm/mvWOrSFYGUY?=
- =?us-ascii?Q?tlhK+rg7mtlS2QTVuVJ3x1zUAV/NzAOIxybmd6Iv8k1wh2hWqQ9ZvbTwgWgm?=
- =?us-ascii?Q?WHgfj2LCIe9PHgjN7tasOluCNLG8OOlEZvMspzHGb7Ls5VpimR3QKIb9MepR?=
- =?us-ascii?Q?1XkEVASUFmtm14y33dXZDsmao/KoXjdfT5UR0l53jkUW2gT5IgRPh+IO6V4r?=
- =?us-ascii?Q?UEX7mMKeQaHEG/EJQ0zi3u+oGT1k2UfGopQ03XYodrxTGdslPP1+LV41zRll?=
- =?us-ascii?Q?odw1rX2ff64pzONlXqRY4InRfuVPGYya8hF7x7K2AGlV7BCic9lPxobEq1Mu?=
- =?us-ascii?Q?LO6ezao+Tfa/dIeaNkU89SHIzOhQiH6H2SK5OK8pyHbEDUFS8ojNyBXpCw3V?=
- =?us-ascii?Q?+5Gl/tHmHmZE4qr4lEmr4dtPrIL5zl0QA7aPZZXgrcv+10AqqBYTOgeP0UKw?=
- =?us-ascii?Q?k0LoDjoAAqCQF9hkVtLiPniwiaxT09RmU9A8uGoRduJhgQyyR4WWm1qye/h0?=
- =?us-ascii?Q?q+D3n2Gq2Ly4RfG6VBu6EXEO7V25QdkRs7pcxlnQXgPEje+sV3IBsliYpAl2?=
- =?us-ascii?Q?WAbQ2nhMspxcG0Nf7HJC5qzRiMSrdZC97yrqzQ77n7th7DhaOaAQYZCRkgto?=
- =?us-ascii?Q?duROJnnthuU9pfoxA+z6T6gpXKFG/jdCtcqCyJpNziGzob0Iv5UYz9365PtE?=
- =?us-ascii?Q?i0HIAPxHUIh8YIC1NGTw9ZhblOlI/BY6S4IeDq900aH8liZK5fgeCUOcND1x?=
- =?us-ascii?Q?VyBtGWzjFEr58s+0gTnmdW6IGePgRpytG9cb/6uvDmsSq6ttlGmURjq7M5lZ?=
- =?us-ascii?Q?PEPuqYGKtNGnMiNsZe85HmSCeRYT8xRKE6f4IJKHTAmW0rgxleLbj1H+dQoH?=
- =?us-ascii?Q?JTl3DVN8wPMnE1/04UAnc55rG3JuM9GN0B4c+aR1q1Vu+3d5DyVznlEHFO/5?=
- =?us-ascii?Q?jxjk3Wie0Z2erz1f+dGgHw+T8tyowLqQuGb4eAaMaIRTbDdKLHpc8MK3QwW6?=
- =?us-ascii?Q?8skYPhGWhBbud3O3Kw+xKY6CXdFJcC6bvraJjwRBhv5MmpYvtaQwy/lfL4j/?=
- =?us-ascii?Q?5TqV80R9TDqRJwY+w+NyNfWYDUPk3LTHi3cRVU3lTMzXyaAZ5AwiGREdgGRJ?=
- =?us-ascii?Q?0wJNh01MqFtCKZdE0aZ6I1WXQPAFl1Im7rmyJB87?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B48E502B1;
+	Tue, 25 Mar 2025 03:51:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742874675; cv=none; b=NA4PtmbDGQHNtZP/MxS+Zsek88Ek+1t5lSksGnCd9tJts978gvLetHAhWlxoQxnyiMuu8qqATPRKKzLeJKbQlu9vnZ+GdGtuNIZQDzR7QMPrWaT2QQmy0oE4L2RfK3t41d7UoAIAK7y0EqfML/Wgi9Bv3y0m6hVnLX4G7Imzzgw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742874675; c=relaxed/simple;
+	bh=eUs830lRhUAS0o8QXZJJqZihKu3k2SgBBk0bl9MB6Uo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o1Sj8xg4piAidWgHUrsceDnNvIQaoJNYXC9GKEmrQ4wimSRn7tZiocw2K3kujwHsmvNu1tRt3lwGPAGZQ9Tbiri0uRj9MuodiPB5PCOwoJ5R6UkClbQYSJ1H7FcQ/4eCriBRz5UcOVS4HxMEx5IqjaVDA8oz3vPEw8gnYGFWlLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nNf4iE0k; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7c58974ed57so519793085a.2;
+        Mon, 24 Mar 2025 20:51:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742874672; x=1743479472; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jACLMS8kLVgwcIoWZ4cpXM5EuNr98m6uVIclazt/90k=;
+        b=nNf4iE0kqTH4IXnHaaouaAlJeUnxC+jKQCWc41E+rCVV54EBvF70bOt3lm2i8S03fx
+         Z0VBwqFgfzEeQ53ZHlLE4AtaWyQfw9mS2pAOK2XDQZpNL4N+1TJrJmKY9GD9N4DreajP
+         J12ATjM1he+cM9VnqmoS17PmgjOGDzPFIZ7p1Fut14GPN8mppVO5dyc7rzHEZNjgu54f
+         f4xcCaRI1p0ppbGeah9zHKCkPwir44kcEE+0Ht213PfNHsiRrDwtr7nmuiTWRKzv3LJz
+         HAWQS3PUyXUnDETsPllS0ucGGFVD+gtDlXz2AHRHa9DqUHNMrnrYOuewJI0zMWX/ZK3P
+         dTfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742874672; x=1743479472;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jACLMS8kLVgwcIoWZ4cpXM5EuNr98m6uVIclazt/90k=;
+        b=cIioGk3CX3Rx6UMRwz2rBd6UorAkLWDfZurhOMLhlScfesuOU8YaXLNZpieNEYp/IF
+         7H9fZLgNERnr/Gxclv18vGKTzlMsbVk6HqGMxa4n5jyPQLGg4xqNHAuHWh8EU4vYFBos
+         wctLuBn6p2vyZ4GJNvV5HTkMkWjqfYM4Ax2nl7O88pgRqIUixDHxwqWsyLh7wHcFaLak
+         xylhtF7dXwMZhMzf2xjLZU2b5GCa1zXn5HmDs/g9isOrgvnSq+ktPV/sWPj7LngF2bxU
+         49ZzxP2O/8cQ2Rd4J9uHmj0yWj9Tukk6ROlJoDhu1aZbYPk9Cdc3aMTIdkxD6ieEex6b
+         3C0g==
+X-Forwarded-Encrypted: i=1; AJvYcCUK1de7hpAOcwf8p0xDrx51gvkr2DrFlUW1MlyKtfsw23W4UcnjTJr9RH8Bb+64U34IOK9Dli5B@vger.kernel.org, AJvYcCX5k6Hgyj1n0dTRiJLPYixBxES401YuPuI7XsunD1evn84xpvQDgwmKJlzswfRM+MFkgDOOiBUa9F1Y6Bg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZ/4Xfeq5AprwSas1zkbfDJJQ9AVWE0v4i1q+QjFPyRsKh+c8L
+	sEOKJpkTR9CceT3GOuv+0iIWpkLI5Md76Sl4SvoQgVAutrcn5B81
+X-Gm-Gg: ASbGncvTgQKWAqbdEAieyklAF56ZUDFvuJp9Upgds81k/EP09WNBMkmziFru8RTEDdm
+	7T5vowIA6X3VW88dFZj5qjYs+r5iWsoEN3GmsIc3eoJbLnJ+8UqcPKDyYgoFJYatQss7SQoJJN4
+	wvpZSH1FUjzSgLHQbB/AHDko8MPHsz0sjS3i7OBY/LZSVQIKcT209zNCVoxaqNqNHbUfgRUTNL7
+	otLsf2f6fn7STV9UAwIiyyHCwyZw3jERGHEluwqCI1IOYWRfbOY7lPgRaTDzEUslK2Jjjr0bqW4
+	bgqF0AlVRhVxCv/HgTCwCKcvtmwUkqFktE3uRAOk7saV0/FvtbYpSfNaGDqw6AYjcQdVIaaqAUG
+	9nebXDXLqsnqLxe5h9lClrhqjcwvjT3X0x1Q=
+X-Google-Smtp-Source: AGHT+IGZcrNcUIdofGMok+EQgbGq9PvMQUgblQJa8WffNGEiyeTDF7DfrYOWSiajp7tWBmDULC5BqA==
+X-Received: by 2002:a05:620a:2a10:b0:7c5:55c0:db9b with SMTP id af79cd13be357-7c5ba20f0afmr2021710085a.58.1742874671977;
+        Mon, 24 Mar 2025 20:51:11 -0700 (PDT)
+Received: from fauth-a1-smtp.messagingengine.com (fauth-a1-smtp.messagingengine.com. [103.168.172.200])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c5b9357ab8sm593610185a.92.2025.03.24.20.51.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Mar 2025 20:51:11 -0700 (PDT)
+Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 402411200043;
+	Mon, 24 Mar 2025 23:41:33 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-10.internal (MEProxy); Mon, 24 Mar 2025 23:41:33 -0400
+X-ME-Sender: <xms:7SXiZ7nOSPGtRcsSkym-A2pKYEJWObeNsPxSKA1kFoHSDt91TMti7w>
+    <xme:7SXiZ-1WPG54AQnRSTzRuc4pIseUaMFacQQh_8J4GexePzMFubJO1GcRbbRK2YL_R
+    AH_OAc0JPiEWwRxIg>
+X-ME-Received: <xmr:7SXiZxpJpsU6R2ngerUV2wMrEWrTupDsOe1gUNvT12QJvQxJJlvHcPtG>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduieduiedtucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
+    vdenucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrih
+    hlrdgtohhmqeenucggtffrrghtthgvrhhnpeehudfgudffffetuedtvdehueevledvhfel
+    leeivedtgeeuhfegueevieduffeivdenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
+    grmhepmhgrihhlfhhrohhmpegsohhquhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgr
+    lhhithihqdeiledvgeehtdeigedqudejjeekheehhedvqdgsohhquhhnrdhfvghngheppe
+    hgmhgrihhlrdgtohhmsehfihigmhgvrdhnrghmvgdpnhgspghrtghpthhtohepudegpdhm
+    ohguvgepshhmthhpohhuthdprhgtphhtthhopehllhhonhhgsehrvgguhhgrthdrtghomh
+    dprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohep
+    phgvthgvrhiisehinhhfrhgruggvrggurdhorhhgpdhrtghpthhtoheplhgvihhtrghose
+    guvggsihgrnhdrohhrghdprhgtphhtthhopehmihhnghhosehrvgguhhgrthdrtghomhdp
+    rhgtphhtthhopeifihhllheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprggvhhesmh
+    gvthgrrdgtohhmpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgv
+    rhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrd
+    horhhg
+X-ME-Proxy: <xmx:7SXiZznoVcKD5hTcANLgxtFF3_gPankIl-YnbGvMmkobiRH8J6QVew>
+    <xmx:7SXiZ53aBqzvqHeGHq-jM0H0AkCJwFC8bx38VlfPjnHC9hnUh5oE0Q>
+    <xmx:7SXiZyu_9pa_orIhE5PaJ9u3B8c1dULC4ygBEpz_zaYJRFArDFNNdg>
+    <xmx:7SXiZ9WYEe-nMMDInC9sZMX-ZkPs32yHD0sWrv8tbra5xE8-_XYwbQ>
+    <xmx:7SXiZ4092jwy67tX9FZK8JEqLI2TXqOQSjUJKcQNbwYJ9YzoFTTf7ZvL>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 24 Mar 2025 23:41:32 -0400 (EDT)
+Date: Mon, 24 Mar 2025 20:41:31 -0700
+From: Boqun Feng <boqun.feng@gmail.com>
+To: Waiman Long <llong@redhat.com>
+Cc: Eric Dumazet <edumazet@google.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Breno Leitao <leitao@debian.org>, Ingo Molnar <mingo@redhat.com>,
+	Will Deacon <will@kernel.org>, aeh@meta.com,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	jhs@mojatatu.com, kernel-team@meta.com,
+	Erik Lundgren <elundgren@meta.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>
+Subject: Re: [PATCH] lockdep: Speed up lockdep_unregister_key() with
+ expedited RCU synchronization
+Message-ID: <Z-Il69LWz6sIand0@Mac.home>
+References: <20250321-lockdep-v1-1-78b732d195fb@debian.org>
+ <20250324121202.GG14944@noisy.programming.kicks-ass.net>
+ <CANn89iKykrnUVUsqML7dqMuHx6OuGnKWg-xRUV4ch4vGJtUTeg@mail.gmail.com>
+ <67e1b0a6.050a0220.91d85.6caf@mx.google.com>
+ <67e1b2c4.050a0220.353291.663c@mx.google.com>
+ <67e1fd15.050a0220.bc49a.766e@mx.google.com>
+ <c0a9a0d5-400b-4238-9242-bf21f875d419@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: windriver.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6170.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a34dd07b-6570-4b68-fb10-08dd6b4b767c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Mar 2025 03:16:41.0804
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: MvfLdVOjB+fpimqzRf3dt3dnHkAwyU5+PKPaHRXAGNUmTu5oM1ewXHnrT5yjcxCuMJwoAnjuPB4UoBeEZbVSTk/6j7Vn873OfsIoo7ZX6ig=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR11MB6412
-X-Authority-Analysis: v=2.4 cv=HZwUTjE8 c=1 sm=1 tr=0 ts=67e2201b cx=c_pps a=5b96o3JgDboJA9an2DnXiA==:117 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
- a=Vs1iUdzkB0EA:10 a=H5OGdu5hBBwA:10 a=t7CeM3EgAAAA:8 a=bH78PYQqAAAA:8 a=1XWaLZrsAAAA:8 a=P8mRVJMrAAAA:8 a=VwQbUJbxAAAA:8 a=vggBfdFIAAAA:8 a=20KFwNOVAAAA:8 a=PPwAqyY7E_KhcWHKtxMA:9 a=CjuIK1q_8ugA:10 a=FdTzh2GWekK77mhwV6Dw:22 a=TrXR8j8ql9YpJ1_1srv2:22
- a=Vc1QvrjMcIoGonisw6Ob:22
-X-Proofpoint-GUID: 8BtSfcuHZC1MNuFgOU6_KnR5cySthGoC
-X-Proofpoint-ORIG-GUID: 8BtSfcuHZC1MNuFgOU6_KnR5cySthGoC
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-25_01,2025-03-21_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- suspectscore=0 bulkscore=0 phishscore=0 malwarescore=0 adultscore=0
- clxscore=1011 impostorscore=0 spamscore=0 priorityscore=1501
- mlxlogscore=705 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.21.0-2502280000
- definitions=main-2503250021
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c0a9a0d5-400b-4238-9242-bf21f875d419@redhat.com>
 
-For 5.10 correct the version number to 5.10-stable tree.
+On Mon, Mar 24, 2025 at 09:56:25PM -0400, Waiman Long wrote:
+> On 3/24/25 8:47 PM, Boqun Feng wrote:
+> > On Mon, Mar 24, 2025 at 12:30:10PM -0700, Boqun Feng wrote:
+> > > On Mon, Mar 24, 2025 at 12:21:07PM -0700, Boqun Feng wrote:
+> > > > On Mon, Mar 24, 2025 at 01:23:50PM +0100, Eric Dumazet wrote:
+> > > > [...]
+> > > > > > > ---
+> > > > > > >   kernel/locking/lockdep.c | 6 ++++--
+> > > > > > >   1 file changed, 4 insertions(+), 2 deletions(-)
+> > > > > > > 
+> > > > > > > diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
+> > > > > > > index 4470680f02269..a79030ac36dd4 100644
+> > > > > > > --- a/kernel/locking/lockdep.c
+> > > > > > > +++ b/kernel/locking/lockdep.c
+> > > > > > > @@ -6595,8 +6595,10 @@ void lockdep_unregister_key(struct lock_class_key *key)
+> > > > > > >        if (need_callback)
+> > > > > > >                call_rcu(&delayed_free.rcu_head, free_zapped_rcu);
+> > > > > > > 
+> > > > > > > -     /* Wait until is_dynamic_key() has finished accessing k->hash_entry. */
+> > > > > > > -     synchronize_rcu();
+> > > > I feel a bit confusing even for the old comment, normally I would expect
+> > > > the caller of lockdep_unregister_key() should guarantee the key has been
+> > > > unpublished, in other words, there is no way a lockdep_unregister_key()
+> > > > could race with a register_lock_class()/lockdep_init_map_type(). The
+> > > > synchronize_rcu() is not needed then.
+> > > > 
+> > > > Let's say someone breaks my assumption above, then when doing a
+> > > > register_lock_class() with a key about to be unregister, I cannot see
+> > > > anything stops the following:
+> > > > 
+> > > > 	CPU 0				CPU 1
+> > > > 	=====				=====
+> > > > 	register_lock_class():
+> > > > 	  ...
+> > > > 	  } else if (... && !is_dynamic_key(lock->key)) {
+> > > > 	  	// ->key is not unregistered yet, so this branch is not
+> > > > 		// taken.
+> > > > 	  	return NULL;
+> > > > 	  }
+> > > > 	  				lockdep_unregister_key(..);
+> > > > 					// key unregister, can be free
+> > > > 					// any time.
+> > > > 	  key = lock->key->subkeys + subclass; // BOOM! UAF.
 
------Original Message-----
-From: jianqi.ren.cn@windriver.com <jianqi.ren.cn@windriver.com>=20
-Sent: Tuesday, March 25, 2025 11:10
-To: kovalev@altlinux.org
-Cc: edumazet@google.com; i.maximets@ovn.org; kuba@kernel.org; kuniyu@amazon=
-.com; netdev@vger.kernel.org; pabeni@redhat.com; stable@vger.kernel.org; Re=
-n, Jianqi (Jacky) (CN) <Jianqi.Ren.CN@windriver.com>
-Subject: [PATCH 5.15] net: defer final 'struct net' free in netns dismantle
+This is not a UAF :(
 
-We also need this patch for both 5.15 and 5.10. For 5.15 it seems this patc=
-h has not been accepted yet. Any reason for that? For 5.10 I saw the patch =
-41467d2ff4df("net: net_namespace: Optimize the code") as a prerequisite for=
- 0f6ede9fbc74 ("net: defer final 'struct net' free in netns dismantle") is =
-already in the 5.10-stable tree. Would the original patch be accepted in ne=
-xt release?
+> > > > 
+> > > > So either we don't need the synchronize_rcu() here or the
+> > > > synchronize_rcu() doesn't help at all. Am I missing something subtle
+> > > > here?
+> > > > 
+> > > Oh! Maybe I was missing register_lock_class() must be called with irq
+> > > disabled, which is also an RCU read-side critical section.
+> > > 
+> > Since register_lock_class() will be call with irq disabled, maybe hazard
+> > pointers [1] is better because most of the case we only have nr_cpus
+> > readers, so the potential hazard pointer slots are fixed.
+> > 
+> > So the below patch can reduce the time of the tc command from real ~1.7
+> > second (v6.14) to real ~0.05 second (v6.14 + patch) in my test env,
+> > which is not surprising given it's a dedicated hazard pointers for
+> > lock_class_key.
+> > 
+> > Thoughts?
+> 
+> My understanding is that it is not a race between register_lock_class() and
+> lockdep_unregister_key(). It is the fact that the structure that holds the
+> lock_class_key may be freed immediately after return from
+> lockdep_unregister_key(). So any processes that are in the process of
+> iterating the hash_list containing the hash_entry to be unregistered may hit
+
+You mean the lock_keys_hash table, right? I used register_lock_class()
+as an example, because it's one of the places that iterates
+lock_keys_hash. IIUC lock_keys_hash is only used in
+lockdep_{un,}register_key() and is_dynamic_key() (which are only called
+by lockdep_init_map_type() and register_lock_class()).
+
+> a UAF problem. See commit 61cc4534b6550 ("locking/lockdep: Avoid potential
+> access of invalid memory in lock_class") for a discussion of this kind of
+> UAF problem.
+> 
+
+That commit seemed fixing a race between disabling lockdep and
+unregistering key, and most importantly, call zap_class() for the
+unregistered key even if lockdep is disabled (debug_locks = 0). It might
+be related, but I'm not sure that's the reason of putting
+synchronize_rcu() there. Say you want to synchronize between
+/proc/lockdep and lockdep_unregister_key(), and you have
+synchronize_rcu() in lockdep_unregister_key(), what's the RCU read-side
+critical section at /proc/lockdep?
+
+Regards,
+Boqun
+
+> As suggested by Eric, one possible solution is to add a
+> lockdep_unregister_key() variant function that presumes the structure
+> holding the key won't be freed until after a RCU delay. In this case, we can
+> skip the last synchronize_rcu() call. Any callers that need immediate return
+> should use kfree_rcu() to free the structure after calling the
+> lockdep_unregister_key() variant.
+> 
+> Cheers,
+> Longman
+> 
 
