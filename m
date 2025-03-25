@@ -1,172 +1,126 @@
-Return-Path: <netdev+bounces-177636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB428A70C7D
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 23:01:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56F14A70CAC
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 23:13:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A2233B9C89
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 22:01:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACC3F17A60C
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 22:11:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70C361A83E7;
-	Tue, 25 Mar 2025 22:01:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64391269B0C;
+	Tue, 25 Mar 2025 22:11:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Fx3KTu7t"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=proton.me header.i=@proton.me header.b="Znt9efbO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C676AD530;
-	Tue, 25 Mar 2025 22:01:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B542698BE;
+	Tue, 25 Mar 2025 22:11:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742940090; cv=none; b=al3EtaxuJWDoY/qrvfs4xPO8R/RmtqH65AYJQLSsZTzcWku8Bs+Dns7AqBtrTk3ABVlbvrc9PgUnc2hvEVcdEHWCwQVebTw+JVzw6tD7fXf3X4682ijjcG/pGlp+fVAzoxu+fE2MABiNRDLbmsxuyKQxryWoJJN/8E0Y53bT8Aw=
+	t=1742940702; cv=none; b=eWltTUyA2HHJs0RemxFmzViJLikejZyTDDmjEXo6FgGyC0/GsTTw93Y+rMIS1MWatr6Yd2XTVqzIE6J3acDZNVAA6aT8bssEfYbqEzoV87r66Kar1SRQ4cr8MEfGYwoUi9tbGhSNABBHiG5KIg4V7YeS3XR+n/8sJ+YBzr31xGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742940090; c=relaxed/simple;
-	bh=BQLtxhJ85Tld/lC/ncVMNKJQuS4VQZX8eMuRf6WuLvY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iXXWO58cdXZvaz+v/FNLvTNgMcesCP6rOjpuYtsKzzJXxFMELit7BEZw1YLG7dUPFJJRHj+SUIpPkmgV91AS1zECZDEliokCYJRKU8QxmXJsdPVMc8tUrQc5tSJvwOW0Jbj9DdCN3En5D/PRh0wXrukDXc9JiFd6LlcG+3O8tzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Fx3KTu7t; arc=none smtp.client-ip=99.78.197.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1742940088; x=1774476088;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=HYi90DVAyrf6sk195M81TGjvn40aKO20224itqCURZI=;
-  b=Fx3KTu7tLGE+39jsFbO/deQRY1GBAA+g0aatswhffhhAXpaJT7btzKte
-   bSfnaKsPfFPJl+DH5zo4YDSxtQcVZZHUJoE7FF33aKMTnMh2ebPS2eJmk
-   pbLMVYAcgkK2a7RDLHdVx5EdBDOChA2p5XcUvv67LzGIox4gRgLM1Gafh
-   k=;
-X-IronPort-AV: E=Sophos;i="6.14,276,1736812800"; 
-   d="scan'208";a="35114054"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2025 22:01:26 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:42592]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.0.51:2525] with esmtp (Farcaster)
- id 73e7438d-f8c3-4d69-9ccd-068c33d4b0ca; Tue, 25 Mar 2025 22:01:26 +0000 (UTC)
-X-Farcaster-Flow-ID: 73e7438d-f8c3-4d69-9ccd-068c33d4b0ca
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 25 Mar 2025 22:01:26 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.106.100.12) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 25 Mar 2025 22:01:23 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <i.abramov@mt-integration.ru>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<lvc-project@linuxtesting.org>, <netdev@vger.kernel.org>, <kuniyu@amazon.com>
-Subject: Re: [PATCH net 1/4] ieee802154: Restore initial state on failed device_rename() in cfg802154_switch_netns()
-Date: Tue, 25 Mar 2025 15:00:47 -0700
-Message-ID: <20250325220115.67524-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250325141723.499850-2-i.abramov@mt-integration.ru>
-References: <20250325141723.499850-2-i.abramov@mt-integration.ru>
+	s=arc-20240116; t=1742940702; c=relaxed/simple;
+	bh=INtxnLlua0m5+riRrCQCNfpZkOBwhMZMhtFEG3oNA9M=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=P1UTXS2UrKeo8Ig90ufqyPW32y8sfjar4Ahy525Ue6f8rh8LS/mAS1fIe9HpaIPNQoc6SDiGqkA0w26SD91QclNjw3VuEWnCn16Lk9Fht7GlF0b5coc4FS1nn1vTi8Ow9kCG4n+HVLcSGVXu4N8vOzzHvtV1bEmRhweb8vhd28I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=Znt9efbO; arc=none smtp.client-ip=185.70.43.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1742940696; x=1743199896;
+	bh=jMMA8zQorl8Tfb7BH49RE8xPD4Fjn3HXBR627pProcA=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
+	b=Znt9efbO5eyaROb7dMqTfzYXCP0EPddfjrbSr5TYhf67lh7PlD+HzDFoAgW3FCWcl
+	 UhMt7ieP8Xng5o1UHsVJ15IHrfRCnuHKni5ksbFlJULfyJMGfMs/ujvgnj3w6ITxV8
+	 e5HUtJhaWhST3TDk1ezjmyXBqQ7ZQIgx24Z/cHcCRgom7LTbPtoVPD4MMqPjQvWTUY
+	 ftXO/4TJo02vKzm907Kg6RhBarJ9GRjlbuVc3uVixaZQAEY940aUNBZzKIfNa1TPNc
+	 cQhXavsmny6cEvvvZTkvIuHqr937iMeNh1QGMuR9SFnZH7b4NeL/BTQb5buXFtbIG0
+	 NwpD4q2IYg9cA==
+Date: Tue, 25 Mar 2025 22:11:27 +0000
+To: Tamir Duberstein <tamird@gmail.com>, Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy
+	<robin.murphy@arm.com>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, FUJITA Tomonori <fujita.tomonori@gmail.com>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v7 7/7] rust: enable `clippy::ref_as_ptr` lint
+Message-ID: <D8POWLFKWABG.37BVXN2QCL8MP@proton.me>
+In-Reply-To: <20250325-ptr-as-ptr-v7-7-87ab452147b9@gmail.com>
+References: <20250325-ptr-as-ptr-v7-0-87ab452147b9@gmail.com> <20250325-ptr-as-ptr-v7-7-87ab452147b9@gmail.com>
+Feedback-ID: 71780778:user:proton
+X-Pm-Message-ID: 193ea9b5afc3597accae5dbd9f02f4fdde8ca624
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWC002.ant.amazon.com (10.13.139.238) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Ivan Abramov <i.abramov@mt-integration.ru>
-Date: Tue, 25 Mar 2025 17:17:20 +0300
-> Currently, the return value of device_rename() is not checked or acted
-> upon. There is also a pointless WARN_ON() call in case of an allocation
-> failure, since it only leads to useless splats caused by deliberate fault
-> injections.
-> 
-> Since it's possible to roll back the changes made before the
-> device_rename() call in case of failure, do it.
-> 
-> Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
-> 
-> Fixes: 66e5c2672cd1 ("ieee802154: add netns support")
-> Signed-off-by: Ivan Abramov <i.abramov@mt-integration.ru>
-> ---
->  net/ieee802154/core.c | 44 +++++++++++++++++++++++--------------------
->  1 file changed, 24 insertions(+), 20 deletions(-)
-> 
-> diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
-> index 88adb04e4072..f9865eb2c7cf 100644
-> --- a/net/ieee802154/core.c
-> +++ b/net/ieee802154/core.c
-> @@ -233,31 +233,35 @@ int cfg802154_switch_netns(struct cfg802154_registered_device *rdev,
->  		wpan_dev->netdev->netns_local = true;
->  	}
->  
-> -	if (err) {
-> -		/* failed -- clean up to old netns */
-> -		net = wpan_phy_net(&rdev->wpan_phy);
-> -
-> -		list_for_each_entry_continue_reverse(wpan_dev,
-> -						     &rdev->wpan_dev_list,
-> -						     list) {
-> -			if (!wpan_dev->netdev)
-> -				continue;
-> -			wpan_dev->netdev->netns_local = false;
-> -			err = dev_change_net_namespace(wpan_dev->netdev, net,
-> -						       "wpan%d");
-> -			WARN_ON(err);
-> -			wpan_dev->netdev->netns_local = true;
-> -		}
-> +	if (err)
-> +		goto errout;
->  
-> -		return err;
-> -	}
-> +	err = device_rename(&rdev->wpan_phy.dev, dev_name(&rdev->wpan_phy.dev));
->  
-> -	wpan_phy_net_set(&rdev->wpan_phy, net);
-> +	if (err)
-> +		goto errout;
->  
-> -	err = device_rename(&rdev->wpan_phy.dev, dev_name(&rdev->wpan_phy.dev));
-> -	WARN_ON(err);
-> +	wpan_phy_net_set(&rdev->wpan_phy, net);
->  
->  	return 0;
-> +
-> +errout:
-> +	/* failed -- clean up to old netns */
-> +	net = wpan_phy_net(&rdev->wpan_phy);
-> +
-> +	list_for_each_entry_continue_reverse(wpan_dev,
-> +					     &rdev->wpan_dev_list,
-> +					     list) {
-> +		if (!wpan_dev->netdev)
-> +			continue;
-> +		wpan_dev->netdev->netns_local = false;
-> +		err = dev_change_net_namespace(wpan_dev->netdev, net,
-> +					       "wpan%d");
-> +		WARN_ON(err);
+On Tue Mar 25, 2025 at 9:07 PM CET, Tamir Duberstein wrote:
+> diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
+> index 40034f77fc2f..6233af50bab7 100644
+> --- a/rust/kernel/str.rs
+> +++ b/rust/kernel/str.rs
+> @@ -29,7 +29,7 @@ pub const fn is_empty(&self) -> bool {
+>      #[inline]
+>      pub const fn from_bytes(bytes: &[u8]) -> &Self {
+>          // SAFETY: `BStr` is transparent to `[u8]`.
+> -        unsafe { &*(bytes as *const [u8] as *const BStr) }
+> +        unsafe { &*(core::mem::transmute::<*const [u8], *const Self>(byt=
+es)) }
 
-It's still possible to trigger this with -ENOMEM.
+Hmm I'm not sure about using `transmute` here. Yes the types are
+transparent, but I don't think that we should use it here.
 
-For example, see bitmap_zalloc() in __dev_alloc_name().
+>      }
+> =20
+>      /// Strip a prefix from `self`. Delegates to [`slice::strip_prefix`]=
+.
+> @@ -290,7 +290,7 @@ pub const fn from_bytes_with_nul(bytes: &[u8]) -> Res=
+ult<&Self, CStrConvertError
+>      #[inline]
+>      pub unsafe fn from_bytes_with_nul_unchecked_mut(bytes: &mut [u8]) ->=
+ &mut CStr {
+>          // SAFETY: Properties of `bytes` guaranteed by the safety precon=
+dition.
+> -        unsafe { &mut *(bytes as *mut [u8] as *mut CStr) }
+> +        unsafe { &mut *(core::mem::transmute::<*mut [u8], *mut Self>(byt=
+es)) }
+>      }
+> =20
+>      /// Returns a C pointer to the string.
+> diff --git a/rust/kernel/uaccess.rs b/rust/kernel/uaccess.rs
+> index 80a9782b1c6e..c042b1fe499e 100644
+> --- a/rust/kernel/uaccess.rs
+> +++ b/rust/kernel/uaccess.rs
+> @@ -242,7 +242,7 @@ pub fn read_raw(&mut self, out: &mut [MaybeUninit<u8>=
+]) -> Result {
+>      pub fn read_slice(&mut self, out: &mut [u8]) -> Result {
+>          // SAFETY: The types are compatible and `read_raw` doesn't write=
+ uninitialized bytes to
+>          // `out`.
+> -        let out =3D unsafe { &mut *(out as *mut [u8] as *mut [MaybeUnini=
+t<u8>]) };
+> +        let out =3D unsafe { &mut *(core::mem::transmute::<*mut [u8], *m=
+ut [MaybeUninit<u8>]>(out)) };
 
-Perhaps simply use pr_warn() or net_warn_ratelimited() as do_setlink().
+I have a patch that adds a `cast_slice_mut` method that could be used
+here, so I can fix it in that series. But let's not use `transmute` here
+either.
 
-I guess the stack trace from here is not so interesting as it doens't
-show where it actually failed.
+---
+Cheers,
+Benno
 
+>          self.read_raw(out)
+>      }
+> =20
 
-> +		wpan_dev->netdev->netns_local = true;
-> +	}
-> +
-> +	return err;
->  }
->  
->  void cfg802154_dev_free(struct cfg802154_registered_device *rdev)
-> -- 
-> 2.39.5
 
