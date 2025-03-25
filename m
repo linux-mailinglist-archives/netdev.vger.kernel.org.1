@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-177477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE3D9A704B1
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 16:14:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5CD5A704AE
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 16:13:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 512331894CB2
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 15:10:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BE081708D8
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 15:10:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0236025B681;
-	Tue, 25 Mar 2025 15:10:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6853125D1FA;
+	Tue, 25 Mar 2025 15:10:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OSv+owgN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qw5sPzUV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D225F1B85FD
-	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 15:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DF3C25D1EA;
+	Tue, 25 Mar 2025 15:10:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742915403; cv=none; b=TcwOThTmj7Ohf0w7awLg4IhD01tHm3Tt/TlPndzCFO9hQBdSelcRtM9wKd85lUGLEkzFQkNi4Z5zX3rQcPjNKn8CIRyBGV3lrpHtLaVHI7SDSrYJxJpmiuDy9TFVSVReGPASpy05vACMeiKevF6l2t+BJVG/dL74YlZfdcc1XhE=
+	t=1742915405; cv=none; b=MNolyxxSzTVnd7S3w0wp2dRAIoterr0JVq0Obcg0i2XdAmR8KcBRbUHt7wuwnJHxSfd41IlqYscII+GDEsCHe6b0IeZzGfX6clrziuvoqKRcPETD3DiaxRls8aRNd95+IncUjX5nxG3nHcZa0hXM9M1wRzSIoF2wnpVkkjpWBJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742915403; c=relaxed/simple;
-	bh=LeTQS4831V5MzsLiMC9LAw9t50lIBowdpyY0TiML4j8=;
+	s=arc-20240116; t=1742915405; c=relaxed/simple;
+	bh=rM2cEQEVYKda9LgagA18a6qU64i4bQNXa6hgu74L26A=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Lsl9Zb2WJSztqUWGyE7uH4zJzDl9fQACH2ytrIJhBKmpYHwWMA+xSIaFugh6kJaBnC+zw0gpX3vWQS79J0aliJDGTvYC3g0I13l0UpQ2XLaDyBXtt7oeu+bvIhQPG9B2ZVUytKWpRAFLWFaRlen9RGaaljLgaAJw0cTPaVUWbpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OSv+owgN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D5FDC4CEE4;
-	Tue, 25 Mar 2025 15:10:03 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=mBg6KodpQ9BFpbHKCu8Xf0LrAb28KgStA2binSAQRrW5RtPheoZ++KpsU4br30OFw9p3ijjN1dcaAqvn7i/e7t8jrsTu7k50xzuU1/u9lDEPrmNN6ob+hTsDGyDsx4PUeT+XScSQ/SvpRqgzl1TDLbq+e5I34gS1kYmv1AaQvuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qw5sPzUV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEB9EC4CEE4;
+	Tue, 25 Mar 2025 15:10:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742915403;
-	bh=LeTQS4831V5MzsLiMC9LAw9t50lIBowdpyY0TiML4j8=;
+	s=k20201202; t=1742915404;
+	bh=rM2cEQEVYKda9LgagA18a6qU64i4bQNXa6hgu74L26A=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=OSv+owgNR70SmVzshxqqtEMPZkBl/rNogjzzKsghyVHlQ28cLSkSU9S/GVwbqpgsq
-	 hUMhkGTKbJ4QDckbTjwRefRsG3C+58481bAz4v/iuCcIHMWR6LXkqfwdV2bMHUywZM
-	 5DLt3iDXsoGjGGu6GRI6rzgDeRTKkjRiC4ERjnzDbUyP5s7NTWOmL61d847gDli+aI
-	 r86gRcsJ0VfBhzqFu4Wmg0kAuLtov8i/nSGY52Odk9mDRowrmnZmS8WfIkJwGDCFY/
-	 sngqbstTr1Xy/huJRbp/lTdykx9mm7/aeG7I7zf37Rm5vsjWlXBPNTPtP1KESIqN1y
-	 BinaN4QGIvxaA==
+	b=Qw5sPzUVhPHUW9fD/il87+6z83Jw4hwaJrAGTBy9CUiqw3koPQWc9H/VQKqDTpEBV
+	 lXc88fT5IhlMVkV+F0G/kg8fb83Tpq931IlK+GqHe/rEujg345ZUB7aok1aGXWMvuu
+	 xIcn8DgX/oczkCxpSFxf7KsqehTQt6JdYIbjrHhTZpqi8xMsTkD+m1N0AX8d7CvoCp
+	 JZqSVQuFj65qOGbT/kOqgpeM0+ddZTzn1kryyBXmf3yaWWBMFNcWIBMEIDUpNn2B7I
+	 d0NwG3K9seJJEMRpMlunFvX3Kh/BWShA1U3y70fqWV+S7aBwKfecwr7/Pv5IkGho+h
+	 SMrIfjj19viBQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B0FBF380CFE7;
-	Tue, 25 Mar 2025 15:10:40 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34F0D380CFE7;
+	Tue, 25 Mar 2025 15:10:42 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,54 +52,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/5] net: improve stmmac resume rx clocking
+Subject: Re: [PATCH net-next v3 0/5] net: stmmac: dwmac-rk: Add GMAC support for
+ RK3528
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174291543949.609648.15797575724114490670.git-patchwork-notify@kernel.org>
-Date: Tue, 25 Mar 2025 15:10:39 +0000
-References: <Z9ySeo61VYTClIJJ@shell.armlinux.org.uk>
-In-Reply-To: <Z9ySeo61VYTClIJJ@shell.armlinux.org.uk>
-To: Russell King (Oracle) <linux@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com,
- netdev@vger.kernel.org, pabeni@redhat.com
+ <174291544076.609648.8594782943472190694.git-patchwork-notify@kernel.org>
+Date: Tue, 25 Mar 2025 15:10:40 +0000
+References: <20250319214415.3086027-1-jonas@kwiboo.se>
+In-Reply-To: <20250319214415.3086027-1-jonas@kwiboo.se>
+To: Jonas Karlman <jonas@kwiboo.se>
+Cc: heiko@sntech.de, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, david.wu@rock-chips.com,
+ ziyao@disroot.org, netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-rockchip@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 20 Mar 2025 22:11:06 +0000 you wrote:
-> Hi,
+On Wed, 19 Mar 2025 21:44:04 +0000 you wrote:
+> The Rockchip RK3528 has two Ethernet controllers, one 100/10 MAC to be
+> used with the integrated PHY and a second 1000/100/10 MAC to be used
+> with an external Ethernet PHY.
 > 
-> stmmac has had a long history of problems with resuming, illustrated by
-> reset failure due to the receive clock not running.
-> 
-> Several attempts have been attempted over the years to address this
-> issue, such as moving phylink_start() (now phylink_resume()) super
-> early in stmmac_resume() in commit 90702dcd19c0 ("net: stmmac: fix MAC
-> not working when system resume back with WoL a ctive.") However, this
-> has the downside that stmmac_mac_link_up() can (and demonstrably is)
-> called before or during the driver initialisation in another thread.
-> This can cause issues as packets could begin to be queued, and the
-> transmit/receive enable bits will be set before any initialisation has
-> been done.
+> This series add initial support for the Ethernet controllers found in
+> RK3528 and initial support to power up/down the integrated PHY.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/5] net: phylink: add phylink_prepare_resume()
-    https://git.kernel.org/netdev/net-next/c/367f1854d442
-  - [net-next,2/5] net: stmmac: address non-LPI resume failures properly
-    https://git.kernel.org/netdev/net-next/c/ef43e5132895
-  - [net-next,3/5] net: stmmac: socfpga: remove phy_resume() call
-    https://git.kernel.org/netdev/net-next/c/366aeeba7908
-  - [net-next,4/5] net: phylink: add functions to block/unblock rx clock stop
-    https://git.kernel.org/netdev/net-next/c/ddf4bd3f7384
-  - [net-next,5/5] net: stmmac: block PHY RXC clock-stop
-    https://git.kernel.org/netdev/net-next/c/dd557266cf5f
+  - [net-next,v3,1/5] dt-bindings: net: rockchip-dwmac: Add compatible string for RK3528
+    https://git.kernel.org/netdev/net-next/c/1b22f686f199
+  - [net-next,v3,2/5] net: stmmac: dwmac-rk: Add GMAC support for RK3528
+    https://git.kernel.org/netdev/net-next/c/1725f0eb37d6
+  - [net-next,v3,3/5] net: stmmac: dwmac-rk: Move integrated_phy_powerup/down functions
+    https://git.kernel.org/netdev/net-next/c/0bed91f2b183
+  - [net-next,v3,4/5] net: stmmac: dwmac-rk: Add integrated_phy_powerdown operation
+    https://git.kernel.org/netdev/net-next/c/32c7bc0747bb
+  - [net-next,v3,5/5] net: stmmac: dwmac-rk: Add initial support for RK3528 integrated PHY
+    https://git.kernel.org/netdev/net-next/c/83e7b35c7879
 
 You are awesome, thank you!
 -- 
