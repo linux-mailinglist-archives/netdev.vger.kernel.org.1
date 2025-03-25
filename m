@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-177335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B24A8A6FA94
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:01:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDC72A6FA8A
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 13:00:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 314A43BA98A
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 11:58:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85303170E20
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 11:59:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E072256C86;
-	Tue, 25 Mar 2025 11:58:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBA61257AF9;
+	Tue, 25 Mar 2025 11:58:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="hE9L4sZc"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="a75CWyZL"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx.denx.de (mx.denx.de [89.58.32.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5039254845;
-	Tue, 25 Mar 2025 11:58:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8223F256C8B;
+	Tue, 25 Mar 2025 11:58:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742903901; cv=none; b=SVtqpCrFtwV08NR/2/DNLeLpyfnseWaAk45hsJNqKpUR6XbxLJ9ufWA1R/B7WkKcxVM+8Sws80AyS3kMhSdYJQUeb18/Gnk2zc0YLuwebmhOfN8JoJ4sZA8EV+9D6z0c8c5eghdttPoLCLz8rYN7FS0M53uO+KfJhnbLJtCGhOc=
+	t=1742903903; cv=none; b=fyxx+41nSfVxdkuXPLJ4WNC1IaMwcPY9Rr5m2dxRkRf9e/VeMKAJPuGZGk5RwSg67dWnydoj41h+RtMxw1GYZlbs7HQSycThTOB2Wrsbl/zHf46Fw7a/i4oJzfAaq8sBSfNwyAFvLTPZs7wrVT+R1f+d/oDN6453G8oHmg269Gk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742903901; c=relaxed/simple;
-	bh=hKKHVnJAJWrf9Blr24e0dDIpt5a0WT1rLCETEy1eAd0=;
+	s=arc-20240116; t=1742903903; c=relaxed/simple;
+	bh=LbKDGPUsRzB21/dtuDv+AQH08uLt87W+n3tEi8+rwD8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=iv59C+gqnxTv7MFwPiz1vZ5hv+PW2bWlSqpF6vBmFTJj4qsPKhDxq17G573MlfCV7pidpbO2umIfZO7O49wHUFpfP4dnywDeK67MlZrXqG5aB8116Z3MMCBIlwnD6Io3sKmZ81v2ELIDK7V/Rd/oifBXqItMAK6ScoFwaZb6ABw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=hE9L4sZc; arc=none smtp.client-ip=89.58.32.78
+	 MIME-Version; b=QHB9vOqCs1HibOfoTSp5PaW/lQTzNYmIm/dSqQ6V12ykPmWFP9fSk7ZmPqvYwVOlpwIzZbs1iw3wr6R7+o67qPRtNMKdzNMZmfM8DiMCzPouxPWtOPCOP3KBBrFljpPtTuQ29iuiNBgU0sNaH+GS2btJ/yxUsEa+CaMaRqGfWdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=a75CWyZL; arc=none smtp.client-ip=89.58.32.78
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 97F9D102EBA43;
-	Tue, 25 Mar 2025 12:58:15 +0100 (CET)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 76329102EBA4A;
+	Tue, 25 Mar 2025 12:58:17 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1742903897; h=from:subject:date:message-id:to:cc:mime-version:
+	t=1742903898; h=from:subject:date:message-id:to:cc:mime-version:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=Nb+uumKIAlcQT03N8XP/zmijiZ83zsuKYhUq6ru23a8=;
-	b=hE9L4sZcZzz9FzHmEBdosqshpQdnTj6W+zRWPlaT00yc64jvRwPQ/olH5eIdJ8kR6wUrcC
-	LWNxVQGxsOs2ba95HFP2LKKWf9vcYHbYp6IWi8HTOw6eKAlpsySTTQaV000hiPzZMdiskr
-	jVyKTtAIuU8JfmsZL5Jf46JJ0y7aRXuSdxhniMd+3mI6DmDRb9AH8UdmZwXToI4b10wsPp
-	wbp4bU1ejZmpw7pG1l/Pb+n1iR9M8XPm+Cin3OTPj9gbE3i4ugBN3UU2AmFpLZhZwE2qCt
-	J7i3VWbs308Sl3qPCSXdJcIA0sJjCYmYZmcj8THMaTbnC8K1UHduDCQKWBfucA==
+	bh=wkjvXpluXHZIyk2FPJLHBibzQd9cgpPYKEkveOICekU=;
+	b=a75CWyZLI/mtX4BBgVvlvy0gl8YN7T8r6CFmKMRLIe1xop8h8A3BOkSRHm62mPSuH4m5Ab
+	DqHOIUQ+/VTodkeEYQoIQeyUMjX65j4r2aN27Y1kbW20eNWIp5oSQxsZRNmjQJ+U6MGkZ3
+	PJxIrKdRCJKU7KCShMtzgjaMKsZcaxoGoGXQ/dJBzTobByZgYyueHwI5+JEPfSWRAkuHBU
+	9p6rg5kodjQw90TrkFa2QQ8r4JVbQMrW6BBdqg79j+u8gAu6mU9jA92RTlk+D8rE4PGsQk
+	l1MvmgGQkHNkiC8k8uo4emYcgQMnIxeIuyDXmp1RtpsYUDVo0+7c6DgNfbDSDA==
 From: Lukasz Majewski <lukma@denx.de>
 To: Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
@@ -63,9 +63,9 @@ Cc: Pengutronix Kernel Team <kernel@pengutronix.de>,
 	netdev@vger.kernel.org,
 	Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Lukasz Majewski <lukma@denx.de>
-Subject: [PATCH 1/5] MAINTAINERS: Add myself as the MTIP L2 switch maintainer (IMX SoCs: imx287)
-Date: Tue, 25 Mar 2025 12:57:32 +0100
-Message-Id: <20250325115736.1732721-2-lukma@denx.de>
+Subject: [PATCH 2/5] dt-bindings: net: Add MTIP L2 switch description (fec,mtip-switch.yaml)
+Date: Tue, 25 Mar 2025 12:57:33 +0100
+Message-Id: <20250325115736.1732721-3-lukma@denx.de>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250325115736.1732721-1-lukma@denx.de>
 References: <20250325115736.1732721-1-lukma@denx.de>
@@ -78,31 +78,181 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Last-TLS-Session-Version: TLSv1.3
 
-Add myself as a maintainer for this particular network driver.
+This patch provides description of the MTIP L2 switch available in some
+NXP's SOCs - imx287, vf610.
 
 Signed-off-by: Lukasz Majewski <lukma@denx.de>
 ---
- MAINTAINERS | 7 +++++++
- 1 file changed, 7 insertions(+)
+ .../bindings/net/fec,mtip-switch.yaml         | 160 ++++++++++++++++++
+ 1 file changed, 160 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/fec,mtip-switch.yaml
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5959513a7359..255edd825fa1 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -9270,6 +9270,13 @@ S:	Maintained
- F:	Documentation/devicetree/bindings/i2c/i2c-mpc.yaml
- F:	drivers/i2c/busses/i2c-mpc.c
- 
-+FREESCALE MTIP ETHERNET SWITCH DRIVER
-+M:	Lukasz Majewski <lukma@denx.de>
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+F:	Documentation/devicetree/bindings/net/fec,mtip-switch.yaml
-+F:	drivers/net/ethernet/freescale/mtipsw/*
+diff --git a/Documentation/devicetree/bindings/net/fec,mtip-switch.yaml b/Documentation/devicetree/bindings/net/fec,mtip-switch.yaml
+new file mode 100644
+index 000000000000..cd85385e0f79
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/fec,mtip-switch.yaml
+@@ -0,0 +1,160 @@
++# SPDX-License-Identifier: GPL-2.0-only
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/fsl,mtip-switch.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
- FREESCALE QORIQ DPAA ETHERNET DRIVER
- M:	Madalin Bucur <madalin.bucur@nxp.com>
- L:	netdev@vger.kernel.org
++title: Freescale MTIP Level 2 (L2) switch
++
++maintainers:
++  - Lukasz Majewski <lukma@denx.de>
++
++allOf:
++  - $ref: ethernet-controller.yaml#
++
++properties:
++  compatible:
++    oneOf:
++      - enum:
++	  - imx287-mtip-switch
++  reg:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 3
++
++  clocks:
++    maxItems: 4
++    description:
++      The "ipg", for MAC ipg_clk_s, ipg_clk_mac_s that are for register accessing.
++      The "ahb", for MAC ipg_clk, ipg_clk_mac that are bus clock.
++      The "ptp"(option), for IEEE1588 timer clock that requires the clock.
++      The "enet_out"(option), output clock for external device, like supply clock
++      for PHY. The clock is required if PHY clock source from SOC.
++
++  clock-names:
++    minItems: 4
++    maxItems: 4
++    items:
++      enum:
++	- ipg
++	- ahb
++	- ptp
++	- enet_out
++
++  phy-supply:
++    description:
++      Regulator that powers the Ethernet PHY.
++
++  phy-reset-gpios:
++    deprecated: true
++    description:
++      Should specify the gpio for phy reset.
++
++  phy-reset-duration:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    deprecated: true
++    description:
++      Reset duration in milliseconds.  Should present only if property
++      "phy-reset-gpios" is available.  Missing the property will have the
++      duration be 1 millisecond.  Numbers greater than 1000 are invalid
++      and 1 millisecond will be used instead.
++
++  phy-reset-post-delay:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    deprecated: true
++    description:
++      Post reset delay in milliseconds. If present then a delay of phy-reset-post-delay
++      milliseconds will be observed after the phy-reset-gpios has been toggled.
++      Can be omitted thus no delay is observed. Delay is in range of 1ms to 1000ms.
++      Other delays are invalid.
++
++  mdio:
++    $ref: mdio.yaml#
++    unevaluatedProperties: false
++    description:
++      Specifies the mdio bus in the FEC, used as a container for phy nodes.
++
++  ethernet-ports:
++    type: object
++    additionalProperties: false
++
++    patternProperties:
++      "^port@[0-9a-f]+$":
++	$ref: /schemas/net/ethernet-switch-controller.yaml#
++	unevaluatedProperties: false
++
++	properties:
++	  reg:
++	    description: Switch port number
++
++	required:
++	  - reg
++	  - phy-mode
++	  - phy-handle
++
++required:
++  - compatible
++  - reg
++  - interrupts
++  - mdio
++  - ethernet-ports
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    switch@800f0000 {
++	compatible = "fsl,imx287-mtip-switch";
++	pinctrl-names = "default";
++	pinctrl-0 = <&mac0_pins_a>, <&mac1_pins_a>;
++	phy-supply = <&reg_fec_3v3>;
++	phy-reset-duration = <25>;
++	phy-reset-post-delay = <10>;
++	interrupts = <100>, <101>, <102>;
++	clocks = <&clks 57>, <&clks 57>, <&clks 64>, <&clks 35>;
++	clock-names = "ipg", "ahb", "enet_out", "ptp";
++	status = "okay";
++
++	ethernet-ports {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		mtip_port1: port@1 {
++			reg = <1>;
++			label = "lan0";
++			local-mac-address = [ 00 00 00 00 00 00 ];
++			phy-mode = "rmii";
++			phy-handle = <&ethphy0>;
++		};
++
++		mtip_port2: port@2 {
++			reg = <2>;
++			label = "lan1";
++			local-mac-address = [ 00 00 00 00 00 00 ];
++			phy-mode = "rmii";
++			phy-handle = <&ethphy1>;
++		};
++	};
++
++	mdio {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		ethphy0: ethernet-phy@0 {
++			reg = <0>;
++			smsc,disable-energy-detect;
++			/* Both PHYs (i.e. 0,1) have the same, single GPIO, */
++			/* line to handle both, their interrupts (AND'ed) */
++			interrupt-parent = <&gpio4>;
++			interrupts = <13 IRQ_TYPE_EDGE_FALLING>;
++		};
++
++		ethphy1: ethernet-phy@1 {
++			reg = <1>;
++			smsc,disable-energy-detect;
++			interrupt-parent = <&gpio4>;
++			interrupts = <13 IRQ_TYPE_EDGE_FALLING>;
++		};
++	};
++    };
 -- 
 2.39.5
 
