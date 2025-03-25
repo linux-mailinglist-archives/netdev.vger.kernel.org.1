@@ -1,75 +1,59 @@
-Return-Path: <netdev+bounces-177330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C851CA6F539
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:43:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 18F12A6F75B
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 12:47:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D60E1170915
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 11:43:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EE6616B355
+	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 11:47:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7152256C7A;
-	Tue, 25 Mar 2025 11:41:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51866433A8;
+	Tue, 25 Mar 2025 11:47:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UjIcrAY7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FZTFtWaT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 929AE2561AD;
-	Tue, 25 Mar 2025 11:41:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E0791E522
+	for <netdev@vger.kernel.org>; Tue, 25 Mar 2025 11:47:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742902902; cv=none; b=HMbkwCziffKMCQK5pNVcBBsi4awYQ2PBZ4BeZBF6uzuMeZGTrVYhz+r5T/CgOBWyZZk1CI3md2wP9x9mqzAYYgKYf+9tXr8b0RKSfTLNHBvqEc43kvDSfmGHrDKIbXf+wZ4a8usjRlGTvFFQcllnMeJzPbt6UgnJaZdKKdMHJ0I=
+	t=1742903222; cv=none; b=hFioOUn6goM42wl2CgJY96YQ/TjTl3eykk0zyRU9KyU3PSgT2fZrlabBzDO/N3ZE8fwJtR+1LCHXEQXYwpkE8zU77oMuHxONlLO6eZAiXFF4HveKh3K9E+35EG6D0DkIm5ci8jcScy7+FBp8FspX+rOHIjQB61LnsLkqKXIAdC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742902902; c=relaxed/simple;
-	bh=zUelcqDDriz9SHJ6HG975vlFXTHLgPVDZutVhZothAA=;
+	s=arc-20240116; t=1742903222; c=relaxed/simple;
+	bh=abhjxjX2KeYPpmSgc/huCWoKyTjZ8vCNokXNF8796p4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Duj84mPmdTH4cXHKp2KuasO9je9J5x3KLqhO6nQGo1jxI5WyAOh5ZSLuK2teP6BzyO1gLGRXUg6Q/+To0ZSFZqnQx8TpKA3VyOd/fRuLPjaYWCiZvgUkFOWR2yytHLQjchE5MYBAL0gcAycYKUWceQKUNjM5gsyF1E4/FwEa90M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UjIcrAY7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 078DFC4CEE4;
-	Tue, 25 Mar 2025 11:41:30 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ewE2n0uI4A0E0eMfDme5Pf4cRmtljVr3KNWfcj8RLN19idu8IiYIyPV1eE6G5aWGKvPE6igZG8fFOER163x8SLD6OCUqgIuU2DxJ/WcWr1MvPhfdq7uiXLrk/g+1vKW7jotoGvP0T4IGYptrSN1CFUwv6H4deUl9Iw83ZgW9H34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FZTFtWaT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C752C4CEE4;
+	Tue, 25 Mar 2025 11:46:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742902902;
-	bh=zUelcqDDriz9SHJ6HG975vlFXTHLgPVDZutVhZothAA=;
+	s=k20201202; t=1742903221;
+	bh=abhjxjX2KeYPpmSgc/huCWoKyTjZ8vCNokXNF8796p4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UjIcrAY75aMFN3vXVfik+OFX0Uy5JnrBVRd5fjFX94lL3SFrNbHkKgQcaIA2VC/uF
-	 c2d7+SrvjPHqi3AbZvmgxIvY1UxRQw1jAJGd9d3ejma7XAkMJ9jHVUr0VdOT7lBd3B
-	 7FPhJeSfb/hWEt/mJCtOzTE4a5iZPKQyCm1dsixrg+kYQkSNd82p/JF1V6m1cUw/ZC
-	 Lcg/MJdd6r8tQjuNkSp6keZMt6LC86vUeKhTm2Ohaw2PdtTPuxtGB0ImPQpkjXtbmf
-	 H5elHwkT2m/vYSAJ7IqPJXyDiyrnd51xugQZFl94GUFuKOXJFsN97DLbXN66xX352G
-	 iZxetGKtfiGvQ==
-Date: Tue, 25 Mar 2025 04:41:26 -0700
+	b=FZTFtWaTdB19Xdd1hG/XlnhsnTurXbXltVBYtdx98D7yIyPnuR+gfQNWc9e1lxiyv
+	 17GGLio9qN4ec6SRnTbM8axJiYwy889bUK6Ewiv5dhcxGMjRiAc6zGzunepyJTMfCq
+	 A9cINetTeobvh+IViFqZ+likUjsQ5MM8J5xcJdBE7w7rIjT29f7aZ521X/U/b+GxxP
+	 euPTyjD9Z4BwjNNqABLv/eXcVnK3KCgS9ZwKzGOLb1LGBjBzN/8iI6Qs2aFboo1eYS
+	 SfzEexyvXjxqh4AMhz+twyGqsqi11JmNLFgVsDmVwUHr891oIEU1CZi3MH5GT/6Q2x
+	 Z9W8dZ/P0ZWog==
+Date: Tue, 25 Mar 2025 04:46:53 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Marcin Wojtas <marcin.s.wojtas@gmail.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, Russell King <linux@armlinux.org.uk>, Ilias
- Apalodimas <ilias.apalodimas@linaro.org>, Masahisa Kojima
- <kojima.masahisa@socionext.com>, Sunil Goutham <sgoutham@marvell.com>,
- Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep
- <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>, Bharat Bhushan
- <bbhushan2@marvell.com>, Felix Fietkau <nbd@nbd.name>, Sean Wang
- <sean.wang@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, "K.
- Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
- Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, Siddharth
- Vadapalli <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>,
- netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- linux-hyperv@vger.kernel.org, linux-omap@vger.kernel.org, Michal Kubiak
- <michal.kubiak@intel.com>
-Subject: Re: [PATCH net-next v2 4/7] net: octeontx2: Add metadata support
- for xdp mode
-Message-ID: <20250325044126.1c0f9b83@kernel.org>
-In-Reply-To: <20250318-mvneta-xdp-meta-v2-4-b6075778f61f@kernel.org>
-References: <20250318-mvneta-xdp-meta-v2-0-b6075778f61f@kernel.org>
-	<20250318-mvneta-xdp-meta-v2-4-b6075778f61f@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, donald.hunter@gmail.com,
+ parav@nvidia.com
+Subject: Re: [PATCH net-next v2 2/4] net/mlx5: Expose serial numbers in
+ devlink info
+Message-ID: <20250325044653.52fea697@kernel.org>
+In-Reply-To: <20250320085947.103419-3-jiri@resnulli.us>
+References: <20250320085947.103419-1-jiri@resnulli.us>
+	<20250320085947.103419-3-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,24 +63,32 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 18 Mar 2025 12:46:08 +0100 Lorenzo Bianconi wrote:
-> @@ -1514,13 +1518,14 @@ static bool otx2_xdp_rcv_pkt_handler(struct otx2_nic *pfvf,
->  
->  	hard_start = (unsigned char *)phys_to_virt(pa);
->  	xdp_prepare_buff(&xdp, hard_start, OTX2_HEAD_ROOM,
-> -			 cqe->sg.seg_size, false);
-> +			 cqe->sg.seg_size, true);
->  
->  	act = bpf_prog_run_xdp(prog, &xdp);
->  
->  handle_xdp_verdict:
->  	switch (act) {
->  	case XDP_PASS:
-> +		*metasize = xdp.data - xdp.data_meta;
->  		break;
->  	case XDP_TX:
->  		qidx += pfvf->hw.tx_queues;
+On Thu, 20 Mar 2025 09:59:45 +0100 Jiri Pirko wrote:
+> +	start = pci_vpd_find_ro_info_keyword(vpd_data, vpd_size,
+> +					     PCI_VPD_RO_KEYWORD_SERIALNO, &kw_len);
+> +	if (start >= 0) {
+> +		str = kstrndup(vpd_data + start, kw_len, GFP_KERNEL);
+> +		if (!str) {
+> +			err = -ENOMEM;
+> +			goto end;
+> +		}
+> +		end = strchrnul(str, ' ');
+> +		*end = '\0';
+> +		err = devlink_info_board_serial_number_put(req, str);
+> +		kfree(str);
+> +	}
+> +
+> +	start = pci_vpd_find_ro_info_keyword(vpd_data, vpd_size, "V3", &kw_len);
+> +	if (start >= 0) {
+> +		str = kstrndup(vpd_data + start, kw_len, GFP_KERNEL);
+> +		if (!str) {
+> +			err = -ENOMEM;
+> +			goto end;
+> +		}
+> +		err = devlink_info_serial_number_put(req, str);
+> +		kfree(str);
+> +	}
 
-This one handles ABORT and invalid return codes as PASS not DROP.
-That should probably be fixed separately?
+I suppose you only expect one of the fields to be populated but 
+the code as is doesn't express that.
 
