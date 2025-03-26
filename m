@@ -1,263 +1,315 @@
-Return-Path: <netdev+bounces-177761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B7F8A71A08
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 16:18:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9D3AA71A28
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 16:24:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CE6E172794
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 15:17:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9C6816B95B
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 15:24:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B92F155300;
-	Wed, 26 Mar 2025 15:17:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4912D13C8EA;
+	Wed, 26 Mar 2025 15:24:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KeFSNSsG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mEYnLlFc"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2058.outbound.protection.outlook.com [40.107.220.58])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ED4B1487FE;
-	Wed, 26 Mar 2025 15:17:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.58
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743002226; cv=fail; b=MaQTxN/lOPARUSCvUbyCiTfJkvyoXnDjWdvuNo02AzKdgICSprcO/HfCRtAhCC7xCKMYO/+5u/d9nePa900+zlX3oLS98ZxOqPUtzvKJIefbHXJUnt2C8OsksCDDFDUa4OEHldjhxcVXIeI0gT9LgPhrk2PgRdupRQvUZN1iZxA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743002226; c=relaxed/simple;
-	bh=Hcw5P6Tu6kBvl6IRDavAAyciaR/coLlw6OLq/EAhby0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=a/B7CDHa57pY5LumfF4JWPboKmWvSvnJ86NdxP3SmvqLZpWjywMM2a4oDqUmXGfiE6iHSy1fz6Hx/SZ9jPoHNGxJQcHKi4Fkq1rfFEaC81ZZFrrUEvzpXM5p/MsJvv+P5V5zsinM2R7AXkaHQWorbnoNlB5wHkLPHZ6LnSxf+vs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=KeFSNSsG; arc=fail smtp.client-ip=40.107.220.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=lEc1QjdUnQJOc9l8E5UgkNQBT25WdlH6USmxDBZXvO7rZeqIRjqjPQ37KkwpG65JQE5s4lkBPgGePCpKEKmlTFxNXEJC7Lw+3C6jTjfU6yYvkQk8PH4OBgEzBT4rqQzjoEsZFQMgcvMcPtdJGR9c2VYq6Ixg3AQYFnfhLSzD4uV/6lObl/BLt3BBKj/8SdTlRgR0U6tufctvfXzMCzslrZaHbFGvOVx8wnw4sXdtNtDv+1w4Q3G7w4+imABMSFwgF2RiUpvMoFn3gyXOT7ryIOAXE/etjArfjlHQ+sQcVIOTPJQ1nnvKr8SwV6qg4XwkmdKFFU4Mw0yvosHPXdQnLg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rQuQZdF9VXB5x8927WzGMaqq3XP4regDor8X2dK5IxI=;
- b=UxaCLuMYiYRtaeDiTIa3V2v/b9Jw59N3Aok6Ge9DG1cTEb6DPT1/jweolZQ8kDKnKHU1VSGtzucCoDwrvd73QGioaiQMbqzA+mrvKbnS3whhTlSgMWvaJWoj6FoIL9mlQldHySuDk2fEiUNbrsH69b1iKP4EB2mU8wqwZI5HFDc6EitNt82dvmEDXef4g3BnjvZfTtSY/vwoC4jNkPScptjrTByxDB/aHr1rfZ352JqPkXE9WV+XGOmqsJLNwX4UYxR7raq3nctJBDXVxCFwmW2z9I0YfF2QwRRB34x3gBO6c+lWPj0AoZW79IWztpJgBBGy25g5NEN9+QORvbGBew==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rQuQZdF9VXB5x8927WzGMaqq3XP4regDor8X2dK5IxI=;
- b=KeFSNSsGoYGpXHTSTHju3/hEgAYhFacg9RXxOl/JyYBqANyCp0bHoDfxByB47jrF0cF/OCvziAeo6kNz2l2GGowOEfSljAmZIHTBuCJs4XWs4PvAh6vaA1j9adK0eTCgojpA6JZbLf6OFNY0WXxaiR0slFil+RhVOdi+5i0E5QXBJE/KwnqfByVKNaiqkYxCYrp2mHKkScA+diK3E9fPC9w5mOC8YKxXtiEMEUtDKZH8QNIrgge7jR59WqUIEV3xExuIY218QgmGSO2mYWbldomBZ4TiSXqnxDZrHcedxr8VSNESBQ4SeDe9yPoIiSdXwH6BU/949RZ2YQh0vFwlMA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
- by DM4PR12MB6423.namprd12.prod.outlook.com (2603:10b6:8:bd::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8534.42; Wed, 26 Mar 2025 15:17:00 +0000
-Received: from CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
- ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.8534.042; Wed, 26 Mar 2025
- 15:17:00 +0000
-Date: Wed, 26 Mar 2025 12:16:58 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Roland Dreier <roland@enfabrica.net>
-Cc: Nikolay Aleksandrov <nikolay@enfabrica.net>, netdev@vger.kernel.org,
-	shrijeet@enfabrica.net, alex.badea@keysight.com,
-	eric.davis@broadcom.com, rip.sohan@amd.com, dsahern@kernel.org,
-	bmt@zurich.ibm.com, winston.liu@keysight.com,
-	dan.mihailescu@keysight.com, kheib@redhat.com,
-	parth.v.parikh@keysight.com, davem@redhat.com, ian.ziemba@hpe.com,
-	andrew.tauferner@cornelisnetworks.com, welch@hpe.com,
-	rakhahari.bhunia@keysight.com, kingshuk.mandal@keysight.com,
-	linux-rdma@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [RFC PATCH 00/13] Ultra Ethernet driver introduction
-Message-ID: <Z+QaarAjCb8pCYpU@nvidia.com>
-References: <20250306230203.1550314-1-nikolay@enfabrica.net>
- <20250319164802.GA116657@nvidia.com>
- <CALgUMKhB7nZkU0RtJJRtcHFm2YVmahUPCQv2XpTwZw=PaaiNHg@mail.gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALgUMKhB7nZkU0RtJJRtcHFm2YVmahUPCQv2XpTwZw=PaaiNHg@mail.gmail.com>
-X-ClientProxiedBy: YQBPR01CA0105.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:c01:3::41) To CH3PR12MB8659.namprd12.prod.outlook.com
- (2603:10b6:610:17c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAE3323D
+	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 15:24:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743002645; cv=none; b=s2eAm239uxyE+Yv6PFbrStkATCE4cLecircBwnpSxAi1IpoGeSdRM0eYz+EK6PkcrOGuDBS9kEddDFGzP55thwB1alRjmpVzNzQwW5zEcpGKyxbEsO9yQlrQwEjjbTQ3j0P/V8l787Ev1sPE53v+vCakuV/FqFdya0iEiOtMW3E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743002645; c=relaxed/simple;
+	bh=4FfmYsnViXFaYj416TiGDriOpzCDWEUKPyt7GuMq9tg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lJ3kxeej6POGueJ0nSwx10xK2XVJx0m/HSlCSKjlTwMkUCaiO1LoCOPOA7JYC52aAMFvqPHheH51cIpL+3sQ0AISi8MuimSJ9SyaDmJSoEbzMnRjMtW9/UzSHXCmR0BxvV7KIqfjxOdYF04/3PwWKwo7zkjijSXK3AxV0hxNzfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mEYnLlFc; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-225477548e1so211155ad.0
+        for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 08:24:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743002643; x=1743607443; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Rky/bavuj14UmOnlVxS75L02uMQ3sgxL7B4eW9eWBKA=;
+        b=mEYnLlFcoH2wvy7bUuPdBbybsUmqR93DBr+GSG2vpgDPwnfbaKBXrjZpXcFvkB4nl1
+         FQKVA7O4FRsn84QzhfwFoIkumxLVtXvshpcl3ICUI7wYgNCxTA9YdM6PM+XzEKrrG59X
+         zbO1cqevy4NtMdBDeU9rDLafCg9JMRehUQy7eGQLuh/2K3yfy9cQhyfJ5xib2zBzTj5M
+         2zAkesHon562Gry2U5SEVkJQD7IA6PNFwXv4ZCouTWLLw11kSJKDL77J6eaZktXIMOZY
+         h+RZpkm0zy5xaVnLK+tFoZsrlzCwZISYQSqK55QuW9WTxsxvYCbM8XxyNuFYCSyvmRZ8
+         PwUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743002643; x=1743607443;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Rky/bavuj14UmOnlVxS75L02uMQ3sgxL7B4eW9eWBKA=;
+        b=fRvJ2ve+MKsz5Qm9w4oSaAIO7NVjqKAIniJnsl3MEL+nGkVBPyGQpjzGmpPFT/vwL1
+         y17iSuNqGXyxa4Q3KpbYXmaWhFgEGBcKydEtU00TFSWWPJ6arFsoN8z6DeSYn+C9rGE+
+         YfhX3jtXDmhIT4f6syRk1MoQtYVCMYGJxUNO6NpxGX6YPsTLjFrq+0G5UXSqumSHl/hj
+         A4yhqkj4eQjNY+QesMOw25x3Sb9oqjrzWVoEAtuDaqC7J3l7akFOdcebod+iSHN5hlks
+         hrHgxAtahFjaFK+KiYQUmtmOaMRaSIVmqii25V6wGGA7LZgtYMlcM6YVmv0v+LssvBRj
+         kjNQ==
+X-Gm-Message-State: AOJu0YyJzOJQXSHEmE4ymUJwOl5ang1+pcTZNj/rh57O4na7PyJrr1ey
+	upHsNhxNaxl1rFR8FmKVTW5hFC+LB5y5LRpNPA5PC6bdu1aaPL0=
+X-Gm-Gg: ASbGncukWYUlrhBf86Qvc72ILFnakWZo0Rq97hHncZ9AmqZLVq7tlhl1UZUu139T05L
+	Njj8vfGTXfvsuGpL6WvjcZLzxbxfi7Rkd2yj0H5Xm9yx9olcf4pXiNDMhsxoZLAT0FQ+nd8jLTF
+	YR7oRmurIsIn2sZ1LfxP+Du2mh0iQRpm2sm4e+hSqLFsQMRIH+sw+OPdDMh6Ste2jUUJAAFP85S
+	zHuECCMMMNWp6Mw5HYM8MebF1obdfryTpGaNcgQFii65akk9QiJT4mThpempmKDhGySHOr6131c
+	Jamle7PZPdF+3hE/6/SmlQ+i6jSnUYGwiPyfXRyeGQVs
+X-Google-Smtp-Source: AGHT+IECkXeB4qLUGLVES0ue7P5pKRS6gBpilYXh7ELJfgELi40OEEAUh4AoyzZaDbuCugJ0isgl8g==
+X-Received: by 2002:a05:6a20:3d84:b0:1f5:902e:1e97 with SMTP id adf61e73a8af0-1fea2fa6777mr272915637.41.1743002642512;
+        Wed, 26 Mar 2025 08:24:02 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-af8a284695dsm11137676a12.44.2025.03.26.08.24.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Mar 2025 08:24:01 -0700 (PDT)
+Date: Wed, 26 Mar 2025 08:23:59 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"sdf@fomichev.me" <sdf@fomichev.me>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 2/9] net: hold instance lock during
+ NETDEV_REGISTER/UP/UNREGISTER
+Message-ID: <Z-QcD5BXD5mY3BA_@mini-arch>
+References: <20250325213056.332902-1-sdf@fomichev.me>
+ <20250325213056.332902-3-sdf@fomichev.me>
+ <86b753c439badc25968a01d03ed59b734886ad9b.camel@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|DM4PR12MB6423:EE_
-X-MS-Office365-Filtering-Correlation-Id: 812d6ebc-a11a-48d4-2a88-08dd6c794138
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?/ZstiCU88vP/ccPFOurCdkbDHRYhunf+j9UB29gsp/wC9GTkrfmBkbFldR4g?=
- =?us-ascii?Q?8cQEcUGSlQYOhyfTm9JV+srmFql5pCZkyzryHCxkR75kNnBx/nMcLqlJsd3W?=
- =?us-ascii?Q?muoRglapXcPdwOmBHBU5RbcJ6kN8OZSTkUQCXQRYbjsrJwZQnNFimkiacjBL?=
- =?us-ascii?Q?cN3uRuUsUrFrUKQwV1kI+cMAbuYILbXx7sZYVoxA7W07A8Tqzu4Yu2xJAXSK?=
- =?us-ascii?Q?6+F75Es1KXW8KF1007wpv0Y+e1t7u32izqQNpM7AMHrIVP4fnHlSqkJYodoK?=
- =?us-ascii?Q?1e4j3t4gKyCvbZXv/2G0AD22ihLAAZT+aqzCkAzBn0q0DhYPiMR2Vc9OVLLg?=
- =?us-ascii?Q?zkUC7YNraNPM66JcQX/3Zbew16VDBgVbBVtrz4p+j2tSJNe4yHKkoq0im6m8?=
- =?us-ascii?Q?5sDq+FP5LwlcRdDavbyeLV+9a/J7lUwPa+LQqbOcF2z7mBHc0nWGoecE7AT2?=
- =?us-ascii?Q?MmtRkpp/YBujqg1gI+q1N5zdRomUllRdgzQXRG8OqQ4qwDKuaTbTrmeFmV6F?=
- =?us-ascii?Q?Zqq9VqLUXZY9G/BS9mNlYkE2BfdQITTMkxMYrQwTpnFRbi/Aj/qpP2mPN8l/?=
- =?us-ascii?Q?rQyhh3xxaa9QNB1Jdh8Q8/MiPc2qCwouQWVwlGxefrC3uYoDfCPSnzDwSo83?=
- =?us-ascii?Q?K7SF/IONjZX9lxnxwqTjr5fJY4caCFszwev8Xgb70m+RYbu1EE6fg/ZV9IdA?=
- =?us-ascii?Q?LgLDzskax1B/5Nfl7IZL1aV6eT7ro/9LoaQmilUVV4KgRcBAHPxzs65nxU6R?=
- =?us-ascii?Q?dBfEyFvKmx7Z+sZP4QwVovj4m9or4PvMhbl3wYi9XaJ9+wLh6T+EqFuws4/V?=
- =?us-ascii?Q?N2uiBsXA1HzfGPNUbJxizUgw3XPuYYm6+GBGUmc8u/hZek5hH673+n/2yWOU?=
- =?us-ascii?Q?4iSqpw4ns4W3gXm6aVRfehWMakuwkfmb5BknDuzHhRMAeGPfGl3zmFf3ZwQa?=
- =?us-ascii?Q?/H+/v3xjxpybBCW81ytnUg8NBbPcPV+NG7bj7jYyrwrMQfw304Qjb9c5iI68?=
- =?us-ascii?Q?ZN9MC0rAK2gCI3jGNFNL+8ZzVXPHIGKpLuAKrM8Lfr0VqTBk81E09JBVK70p?=
- =?us-ascii?Q?pV+TKGq+C9Y2AY3kuOL3ngit6ir360/MRlY2cnMvj6mUjvj2tOjbS/pD6GCV?=
- =?us-ascii?Q?5pGMG3f9HXyUDGcyjhgvbXMBcFQNq01x7NU2nRSydDzE/R4CEMAXXOEyf2D/?=
- =?us-ascii?Q?YaqVXFCiTguDcilFpRDvMbQqAV7HJvTjz9lHLyLY1J9ZF1DYQJPwlSlcDpEL?=
- =?us-ascii?Q?uvJ0JuqSXCV1i6ea+X4eP822Qn7NVtH4gP7ojbNY8wXwk46fCjM0dmW4W8WS?=
- =?us-ascii?Q?BnecXNJ3yEKo98bJ/JZ/nktwUPxO+2higzZLHU2i34rDg3awLPqk7XMaQAsq?=
- =?us-ascii?Q?lCAWGL1UqRUSCnSK98sRfIYaF02E?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?YTr4/kN7+B+QpmNOL/eKcxfYulZRLOvHmUWp33edKv2apAxI/znPnVJBgJuv?=
- =?us-ascii?Q?ykgjlK992RqUh7+GkvMfVnUyZb5zpw4NQ/cJehLJTivLCCTa11Zq8zG+IaCx?=
- =?us-ascii?Q?HU+Kvc3hhn+1TgXPvTODL4ODyFTPUCjjjPX1z75d5iuN2alJMp+aef1nz8DM?=
- =?us-ascii?Q?2iaDJC1JuEtKsiEZ0T3FgapxHB6vd5R1BZC2BdWqPdx+UemQbKiva+TD9mmG?=
- =?us-ascii?Q?hw8JmDwE3ScZ51JLVwRsvDBdLy+7XS7MtSgp+WcBvwc45b8LTJhRC6dSR1kW?=
- =?us-ascii?Q?3qcENNCCWcabe2diHxcn4hsAMdhx5lRvoelw0lfHwijU/henURzO+GEgrMMI?=
- =?us-ascii?Q?pJLK3UQSW/2a0Wvtyrpo6b+zPDkipdvAFNmqeFJtkj6rgbWTSiunvXqooQfW?=
- =?us-ascii?Q?Wl2U97YA+8e5MdxN2fkQkSrZQHrQ89oLNPsZ2soh0GQzWC58BTTbUJKd7VJU?=
- =?us-ascii?Q?GW8aVMlOchEazpHNBXrcEEWjSDpkaWI9CVPBpIbbqZdFl13GlUHVYUFUOTPS?=
- =?us-ascii?Q?FJq6JYRBoeHt2lqlE07l1w4zrwXGttbtXfv99ZgBUTMHiqfuV0mk5aw3uJZh?=
- =?us-ascii?Q?BKq/LhtRRtp6F7D4lu703hLA8MRwDpUm1cP7A3FW/p+5x36lIxM4wZBsEIJL?=
- =?us-ascii?Q?HMF/ml2LkB98IDDPoHkBhc/8/1+GZInVNQGVORykjzqFg9qLLNl3YMW369ka?=
- =?us-ascii?Q?uuX3CiEolom9tBC4m65gLYqtl2zveX0MV4mJ/6VYAgkAHRTM15YGs6J+9aXr?=
- =?us-ascii?Q?xVqtfFK8P0DwBQvGDNgS2y4FvYP03ASigNXF5HaHOZdVr9m45wtMq2rvi74B?=
- =?us-ascii?Q?N7lmdHKchBEp/w5k16KlWKVmoURwvbZeAp5gs3APhQiYMRPY2s6kT+ptYK6M?=
- =?us-ascii?Q?w/BsicoC4JxiB1YKLXTWvgdjX/GKJ6EVt5/ljQi6tXhaAX0Gx9q1RN/thtaj?=
- =?us-ascii?Q?vznWsA0Lzo3RTWhH7wEPu3QfGG3WJZxCuj4+fcHgk8K+IGIYzU/1PE9PKdbC?=
- =?us-ascii?Q?Kc67pHd9CsS5FHu2prcC36oPFXJ8wDSq7ThZLq/ufhB7DY4mEonI4N/e9GKM?=
- =?us-ascii?Q?i9mQYlWvHFquzvxl7PBwM8/gQlldhB8/JoigwdZGefdFcX2pGiYP/jpogYhI?=
- =?us-ascii?Q?Df+A/Y3SKscF8Zr2AwAiDFXGMhemGhmnMhBfs1MQEbAecvRONKGAAAqqLB62?=
- =?us-ascii?Q?siEeVCppLHB5e4WGjcjhxzPnx7tX4UbkqdkBCAcMKZl/sJjlo+R4kG4GVVWy?=
- =?us-ascii?Q?cylnOa05NXwRVlNqvlWSi06LDZnp8YX9BUYcMkqTUePBODVFre6NsIELEKEG?=
- =?us-ascii?Q?WG0aqIP661YqDyR6KKhT1oWs1pAf9huQ85xxWYFFqJHgoXh1e7e1r62obj96?=
- =?us-ascii?Q?wPjulOhC1qksyaTne2ltviyGrFzdHqAdV9VbxMhLM2N+cVuE8SHMcjs5j6SB?=
- =?us-ascii?Q?Rb8n9rdyPh6cKzDYhluNuRjrJDsJ6KtAvYX6ls/LmjgoXQvB19P5orJQ3jpj?=
- =?us-ascii?Q?DjSz+5qmu+s2KSJXWsnOkvJ+wEvtngkmQhq46EGHuIP8JSe3nljPn6rVevFX?=
- =?us-ascii?Q?VRWrbqALYyf6u8E3vbI=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 812d6ebc-a11a-48d4-2a88-08dd6c794138
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2025 15:16:59.9382
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fBaPwhpH+cnQHuygvWaAMsTOMxinnXs/5vCJlr078jMgSaepl/QReTu+BjI6ceOE
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6423
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <86b753c439badc25968a01d03ed59b734886ad9b.camel@nvidia.com>
 
-On Mon, Mar 24, 2025 at 01:22:13PM -0700, Roland Dreier wrote:
-> Hi Jason,
+On 03/26, Cosmin Ratiu wrote:
+> On Tue, 2025-03-25 at 14:30 -0700, Stanislav Fomichev wrote:
+> > @@ -2072,8 +2087,8 @@ static void
+> > __move_netdevice_notifier_net(struct net *src_net,
+> >  					  struct net *dst_net,
+> >  					  struct notifier_block *nb)
+> >  {
+> > -	__unregister_netdevice_notifier_net(src_net, nb);
+> > -	__register_netdevice_notifier_net(dst_net, nb, true);
+> > +	__unregister_netdevice_notifier_net(src_net, nb, false);
+> > +	__register_netdevice_notifier_net(dst_net, nb, true, false);
+> >  }
 > 
-> I think we were not clear on the overall discussion and so we are much
-> closer to agreement than you might think, see below.
+> I tested with your (and the rest of Jakub's) patches.
+> The problem with this approach is that when a netdev's net is changed,
+> its lock will be acquired, but the notifiers for ALL netdevs in the old
+> and the new namespace will be called, which will result in correct
+> behavior for that device and lockdep_assert_held failure for all
+> others.
 
-Certainly this was my impression after we talked, so is hard to
-understand what this series is supposed to be. It doesn't seem to
-advance things towards using the RDMA subsystem.
+Perfect, thanks for testing! At least we don't deadlock anymore, that's
+progress :-) So looks like we need to do something like the following
+below, maybe you can give it a run on your side? Since we don't
+have any locking hierarchy (yet), we should be able to lock all
+other netdevs besides the one that's already locked at netlink level.
+
+
+diff --git a/net/core/dev.c b/net/core/dev.c
+index afee19245401..125af0fc25d3 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -1895,32 +1895,32 @@ static int call_netdevice_register_notifiers(struct notifier_block *nb,
  
-> First, want to clarify that this patchset is collaborative development
-> within the overall Ultra Ethernet Consortium. 
-
-Consortiums don't get to vote their way into Linux patch acceptance.
-
-> UEC is definitely not trying to create anything new beyond adding
-> support for Ultra Ethernet. By far the bulk of this patchset is adding
-> a software model of the specific Ultra Ethernet transport's protocol /
-> packet handling, and that code is currently in drivers/ultraeth. I
-> don't feel that pathnames are particularly important, and we could
-> move the code to something like drivers/infiniband/ultraeth, but that
-> seems a bit silly. But certainly we are open to suggestions.
-
-It is not the directory name that is at issue, it is completely
-ignoring all the existing infrastructure and doing something entirely
-new and entirely isolated.
-
-I expect you will have uec named files under drivers/infiniband, and
-they should be integrated within existing architecture, including
-extensions.
-
-It is a shame we won't rename the directory name, or rename alot of
-other stuff, but I gather that is the community preference.
-
-> To be clear - we are not trying to reinvent or bypass uverbs, and
-> there is complete agreement within UEC that we should reuse the uverbs
-> infrastructure so that we get the advantages of solid, mature
-> mechanisms for memory pinning, resource tracking / cleanup ordering,
-> etc.
-
-My expectation is that the software interface path for a RDMA
-transport exist mainly for testing and development purposes. It should
-be deliberately designed to mimic a HW driver and exercise the same
-interfaces. Even if that is more work or inconvenient.
-
-> With that said, Ultra Ethernet devices likely will not have interfaces
-> that map well onto QPs, MRs, etc. so we will be sending patches to
-> drivers/infiniband/uverbs* that generalize things to allow "struct
-> ib_device" objects that do not implement "required verbs."
-
-That's fine, we can look at all those things as you go along.
-
-Just be mindful that given UEC's lack of a HW standard it will be hard
-to judge if things are HW specific or UEC general. Explain in the
-patches why you think many HW devices will be using new general common
-objects.
-
-Job ID is a good example that is obviously required by spec to be
-common.
-
-My advice, and the same advice I gave to Habana, is to ignore the
-spelling of things like PD, QP and MR and focus on the fundamental
-purpose they represent. UEC has a "QP" in that all HW devices will
-have some kind of queue structure to userspace. UEC has "PD" in that
-it must have some kind of HW security boundary to keep one uverbs
-context from touching another's resources (it may be that job is how
-UEC spells PD), and so on.
-
-Use driver specific calls when appropriate.
-
-kernel-uet will be a different conversation, and I suspect kernel uet
-will be very feature limited to focus just on something like storage.
-
-> I think the netlink API and job handling overall is the area where the
-> most discussion is probably required. UE is somewhat novel in
-
-Yes, that is new, but also an idea that is being copied.
-
-> elevating the concept of a "job" to a standard object with specific
-> properties that determine the values in packet headers. But I'm open
-> to making "job" a top-level RDMA object...
-
-I think this is right
-
-> I guess the idea would be
-> to define an interface for creating a new type of "job FD" with a
-> standard ABI for setting properties?
-
-I suspect so? /dev/infiniband/job perhaps where opening the FD creates
-a job container then some ioctls to realize it into a per-protocol job
-description with per-protocol additional properties?
-
-Present a job FD to a uverbs FD to join the job's security context
-
-Another variation might be an entire jobfs but I would probably start
-with job FD first and only do a jobfs later if people demand it..
-
-I think CAP_SYS_NET_ADMIN is a bad security model for jobs.
-
-Regards,
-Jason
+ static void call_netdevice_unregister_notifiers(struct notifier_block *nb,
+ 						struct net_device *dev,
+-						bool lock)
++						struct net_device *locked)
+ {
+ 	if (dev->flags & IFF_UP) {
+ 		call_netdevice_notifier(nb, NETDEV_GOING_DOWN,
+ 					dev);
+ 		call_netdevice_notifier(nb, NETDEV_DOWN, dev);
+ 	}
+-	if (lock)
++	if (dev != locked)
+ 		netdev_lock_ops(dev);
+ 	call_netdevice_notifier(nb, NETDEV_UNREGISTER, dev);
+-	if (lock)
++	if (dev != locked)
+ 		netdev_unlock_ops(dev);
+ }
+ 
+ static int call_netdevice_register_net_notifiers(struct notifier_block *nb,
+ 						 struct net *net,
+-						 bool lock)
++						 struct net_device *locked)
+ {
+ 	struct net_device *dev;
+ 	int err;
+ 
+ 	for_each_netdev(net, dev) {
+-		if (lock)
++		if (locked != dev)
+ 			netdev_lock_ops(dev);
+ 		err = call_netdevice_register_notifiers(nb, dev);
+-		if (lock)
++		if (locked != dev)
+ 			netdev_unlock_ops(dev);
+ 		if (err)
+ 			goto rollback;
+@@ -1929,18 +1929,18 @@ static int call_netdevice_register_net_notifiers(struct notifier_block *nb,
+ 
+ rollback:
+ 	for_each_netdev_continue_reverse(net, dev)
+-		call_netdevice_unregister_notifiers(nb, dev, lock);
++		call_netdevice_unregister_notifiers(nb, dev, locked);
+ 	return err;
+ }
+ 
+ static void call_netdevice_unregister_net_notifiers(struct notifier_block *nb,
+ 						    struct net *net,
+-						    bool lock)
++						    struct net_device *locked)
+ {
+ 	struct net_device *dev;
+ 
+ 	for_each_netdev(net, dev)
+-		call_netdevice_unregister_notifiers(nb, dev, lock);
++		call_netdevice_unregister_notifiers(nb, dev, locked);
+ }
+ 
+ static int dev_boot_phase = 1;
+@@ -1977,7 +1977,7 @@ int register_netdevice_notifier(struct notifier_block *nb)
+ 		goto unlock;
+ 	for_each_net(net) {
+ 		__rtnl_net_lock(net);
+-		err = call_netdevice_register_net_notifiers(nb, net, true);
++		err = call_netdevice_register_net_notifiers(nb, net, NULL);
+ 		__rtnl_net_unlock(net);
+ 		if (err)
+ 			goto rollback;
+@@ -1991,7 +1991,7 @@ int register_netdevice_notifier(struct notifier_block *nb)
+ rollback:
+ 	for_each_net_continue_reverse(net) {
+ 		__rtnl_net_lock(net);
+-		call_netdevice_unregister_net_notifiers(nb, net, true);
++		call_netdevice_unregister_net_notifiers(nb, net, NULL);
+ 		__rtnl_net_unlock(net);
+ 	}
+ 
+@@ -2028,7 +2028,7 @@ int unregister_netdevice_notifier(struct notifier_block *nb)
+ 
+ 	for_each_net(net) {
+ 		__rtnl_net_lock(net);
+-		call_netdevice_unregister_net_notifiers(nb, net, true);
++		call_netdevice_unregister_net_notifiers(nb, net, NULL);
+ 		__rtnl_net_unlock(net);
+ 	}
+ 
+@@ -2042,7 +2042,7 @@ EXPORT_SYMBOL(unregister_netdevice_notifier);
+ static int __register_netdevice_notifier_net(struct net *net,
+ 					     struct notifier_block *nb,
+ 					     bool ignore_call_fail,
+-					     bool lock)
++					     struct net_device *locked)
+ {
+ 	int err;
+ 
+@@ -2052,7 +2052,7 @@ static int __register_netdevice_notifier_net(struct net *net,
+ 	if (dev_boot_phase)
+ 		return 0;
+ 
+-	err = call_netdevice_register_net_notifiers(nb, net, lock);
++	err = call_netdevice_register_net_notifiers(nb, net, locked);
+ 	if (err && !ignore_call_fail)
+ 		goto chain_unregister;
+ 
+@@ -2065,7 +2065,7 @@ static int __register_netdevice_notifier_net(struct net *net,
+ 
+ static int __unregister_netdevice_notifier_net(struct net *net,
+ 					       struct notifier_block *nb,
+-					       bool lock)
++					       struct net_device *locked)
+ {
+ 	int err;
+ 
+@@ -2073,7 +2073,7 @@ static int __unregister_netdevice_notifier_net(struct net *net,
+ 	if (err)
+ 		return err;
+ 
+-	call_netdevice_unregister_net_notifiers(nb, net, lock);
++	call_netdevice_unregister_net_notifiers(nb, net, locked);
+ 	return 0;
+ }
+ 
+@@ -2097,7 +2097,7 @@ int register_netdevice_notifier_net(struct net *net, struct notifier_block *nb)
+ 	int err;
+ 
+ 	rtnl_net_lock(net);
+-	err = __register_netdevice_notifier_net(net, nb, false, true);
++	err = __register_netdevice_notifier_net(net, nb, false, NULL);
+ 	rtnl_net_unlock(net);
+ 
+ 	return err;
+@@ -2126,7 +2126,7 @@ int unregister_netdevice_notifier_net(struct net *net,
+ 	int err;
+ 
+ 	rtnl_net_lock(net);
+-	err = __unregister_netdevice_notifier_net(net, nb, true);
++	err = __unregister_netdevice_notifier_net(net, nb, NULL);
+ 	rtnl_net_unlock(net);
+ 
+ 	return err;
+@@ -2135,10 +2135,11 @@ EXPORT_SYMBOL(unregister_netdevice_notifier_net);
+ 
+ static void __move_netdevice_notifier_net(struct net *src_net,
+ 					  struct net *dst_net,
+-					  struct notifier_block *nb)
++					  struct notifier_block *nb,
++					  struct net_device *locked)
+ {
+-	__unregister_netdevice_notifier_net(src_net, nb, false);
+-	__register_netdevice_notifier_net(dst_net, nb, true, false);
++	__unregister_netdevice_notifier_net(src_net, nb, locked);
++	__register_netdevice_notifier_net(dst_net, nb, true, locked);
+ }
+ 
+ static void rtnl_net_dev_lock(struct net_device *dev)
+@@ -2184,7 +2185,7 @@ int register_netdevice_notifier_dev_net(struct net_device *dev,
+ 	int err;
+ 
+ 	rtnl_net_dev_lock(dev);
+-	err = __register_netdevice_notifier_net(dev_net(dev), nb, false, true);
++	err = __register_netdevice_notifier_net(dev_net(dev), nb, false, NULL);
+ 	if (!err) {
+ 		nn->nb = nb;
+ 		list_add(&nn->list, &dev->net_notifier_list);
+@@ -2203,7 +2204,7 @@ int unregister_netdevice_notifier_dev_net(struct net_device *dev,
+ 
+ 	rtnl_net_dev_lock(dev);
+ 	list_del(&nn->list);
+-	err = __unregister_netdevice_notifier_net(dev_net(dev), nb, true);
++	err = __unregister_netdevice_notifier_net(dev_net(dev), nb, NULL);
+ 	rtnl_net_dev_unlock(dev);
+ 
+ 	return err;
+@@ -2216,7 +2217,7 @@ static void move_netdevice_notifiers_dev_net(struct net_device *dev,
+ 	struct netdev_net_notifier *nn;
+ 
+ 	list_for_each_entry(nn, &dev->net_notifier_list, list)
+-		__move_netdevice_notifier_net(dev_net(dev), net, nn->nb);
++		__move_netdevice_notifier_net(dev_net(dev), net, nn->nb, dev);
+ }
+ 
+ /**
 
