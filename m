@@ -1,170 +1,186 @@
-Return-Path: <netdev+bounces-177836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED406A7200E
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 21:38:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 029E8A7202E
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 21:48:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D185168A13
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 20:38:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B49831896CBD
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 20:48:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9FEC2192E2;
-	Wed, 26 Mar 2025 20:38:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20A7225DB10;
+	Wed, 26 Mar 2025 20:48:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LuB7ipH4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="THEgUqLI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25FF0137930
-	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 20:38:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38A771F4736;
+	Wed, 26 Mar 2025 20:47:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743021482; cv=none; b=nxaGcaHsBC1wU8Q++XbVlXpebj1LhiXElj3E8K89bfmw8LBBL+6lHoDCXQrMYrWko73Z0Z4Rwj6Q0+LvWcz/L7C60JW7jeCUw8A9mbjRvU3zSdxYSN5He0BiuecNpoZz9rzLqXmFgy8JF7+hMsb2MX5NSfSt2V/+xlMiuyt3jAU=
+	t=1743022080; cv=none; b=U8xfZoxCp7IJhBEYBvesziNSAnxPxdVSIpJ/axHduH1AonJmaiUJ6Y0/XvDvgxTMlbVX60+UqAuzk3CBMsMVwYIJnWFcAPqK4fB6skoIOvLeyxp2KT6H+UJ32pBJbK5pDeZ1KZhHhs4Sfq8Tv3Ti9gOfr3a580rzUGNK5L0a9io=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743021482; c=relaxed/simple;
-	bh=bsv80saC4YRtAruQYOL7i3btQ31Y628tKi1leEfteJ8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RxPTijmlSd7EK4eWf1JIIcoLCWO8XdMEOrwH2B6/pYA0D4b3j4LPcHlVEMjRnaohjQ3yGEvIVeajsZ7WU01P6Goj4svzP6ZGsb3uatYkBFCmGr/Pjq4MkEIlRvVPQU11KLok0us6xv3am6scNM4p3uPDJRpZMXtUI7GiVXjU1Ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LuB7ipH4; arc=none smtp.client-ip=209.85.216.44
+	s=arc-20240116; t=1743022080; c=relaxed/simple;
+	bh=MNs4I+VY96qzVEnIeAX0i56gaLKwfzD5slXgEMkegvA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DdCA1nPtHIMMQP68Rj7iCUFE/6/5ISiT3NB23ND73FbqLzPUHmHHRdmJUNZeEfhZAXthjbOq1g0qxQOeqJUVeqTKZmSqh8Zhi/oICOCe/UjzxYTn4LhFDnw30/EhwQU9dmMahDYyD7Ugdjywd5ISH/CVr89l3L6Kq0F58HqxqZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=THEgUqLI; arc=none smtp.client-ip=209.85.208.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-301302a328bso388157a91.2
-        for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 13:38:00 -0700 (PDT)
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-30db2c2c609so3652721fa.3;
+        Wed, 26 Mar 2025 13:47:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743021480; x=1743626280; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=wZDOziDl+wlAYrzasrZTDtE0ds1SMnWLX8kiyFoieWc=;
-        b=LuB7ipH45Vo14ESRiVN9okiyg86KaPdU4wvUq4TSKSIh23VBx6PPVC37vKgHvB2lm/
-         HuzRC72x5Q8jYFYLikwe2ozseHNNwi0uUiCHSvqmdoesgbCiIgqEMEo0dSdUCTjX4VSk
-         44Jx+b2lvZt4ssY9N1xArIUr/3tM3k1Jo5Xx5g1hIntN8AmDZhaAPh03sJbH5RAD7Xl5
-         +9o3snbB/XG7tLGB/E2ZqOQgArWWiHT/uZF7o9CKHP9GR+Is/7OpOFqsvlhV/791LL1M
-         hGPbYQUjYPvnxX2ackZucf+iZG3vkxKPDaUz/tfXHGs+crRz3lJeI1AQPyx3uX8Vvhlh
-         kSpg==
+        d=gmail.com; s=20230601; t=1743022076; x=1743626876; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MNs4I+VY96qzVEnIeAX0i56gaLKwfzD5slXgEMkegvA=;
+        b=THEgUqLI7P3WLNpNoxFiAPfOXJcmdi3DS4SjIS322Vxyf/8iFVTbDeAAgv4wpSh/Mx
+         R0v5hUCPQqcbwcm0uRU/CQgi7g+CFq2lcZz/ZWTOkG2KmsQIMrg4ybDg7qCAxi1ixMZs
+         yGGqIti/Ee8MafwN1cZVL9unlZXqwbHqeG2ls+/H0WJKh5FTIBeIrRUlLzYxF7NYsMAm
+         96RorEGB/aSYlQeBKLl4q3cuLNEcHDK0sI7Vz4J7fROLKxYtBAq8Mn+i7QUZPogL9RHT
+         t2rFpONtuRQUfN55Z6CyfdtM8l7NB0y9U2HkuvDSPKHIaZgeJdyxjhpN0czjMxnYbHOG
+         9/RQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743021480; x=1743626280;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wZDOziDl+wlAYrzasrZTDtE0ds1SMnWLX8kiyFoieWc=;
-        b=BxiiSGX5ytrJmpT96iEJs+iBYtXpRRgq0tj3Fu1gvR6LpyUHJAExnpez+r6vr9JoEr
-         isKGfeLBw0d2e5iICtjeABhVGL6r8/lP/p0IKvsigfOBHr8GKA90Ekg7wqr0dx4YbgtK
-         vmVS0Xl3PCuCe5XGnroGxzUL0/k6FTL6PDmHLDM4cKCRq8rRx7DmW2WGSf7qxO0d1X2C
-         SIIE2yfqU+vUgnVrixKokjnn6liqmhadP4Hqa/A0q4gIyu+4w5fko58chCPlHO+OEy+f
-         VLaD/H1nnJAooWxahmlsUokC+74wOjh2l35uHU/QE7UoCTQqBHaIizs+vPZKMFpDaGzu
-         vQeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX9dWIDEySdm1ZtNpW7U3DRKMxQ3XoYIWgzK6j8st9FpvafkDQ9p5GqsqixHe3YPMPUB+5MXbk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUsDAQPK5pEEsDzxoxUzjYdsA/3Vl9pCPxI4rtSmbJDs3WZcS0
-	7NVudXSH3/bYqQXZT+li90/H+o/eQKDbLM/pm+LCYZ0BlgbJgZ0=
-X-Gm-Gg: ASbGncs+uVKh+W50MhxdzVFFuDXRtqJ1hsLrYCmCQvMR9iQZdOUd/DtWD3+F6zSyfwJ
-	vP3fUgzBdxEILVY+xTM1lwl9II76kOaadLBlF/9yY8NOt563omVRA1O3POCTA4ro0E7PE7gdEFV
-	sXmZbkn4GZ0iU8Yx7mRGmJs18kuaY/XE2SnFDWlNPYX8raGtYKpQhLdsApyp6dNF2eS0Ea5p3MB
-	/zP8OGb/gw3e6/itd6TATCTIxPF5r4NHdRvDqU3no0M3I70Hz4Cfr8astjJ310BBD8fynZtk0c/
-	KjPg+eBPUcZ21jwwTGzBb/9OW2QIOtYxl0OxTCnjw7l4saJZfu2qPmI=
-X-Google-Smtp-Source: AGHT+IGVrwfUKXLvqL9nLVebtnA/S9KIAHVbnTjjG3MpMoLgH+wT+veTulYE1OoiS5NSNd0x7zYkTg==
-X-Received: by 2002:a17:90b:5243:b0:2ee:8427:4b02 with SMTP id 98e67ed59e1d1-303a906c163mr1701009a91.28.1743021480164;
-        Wed, 26 Mar 2025 13:38:00 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-3039e10baa2sm755481a91.24.2025.03.26.13.37.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Mar 2025 13:37:59 -0700 (PDT)
-Date: Wed, 26 Mar 2025 13:37:58 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Cosmin Ratiu <cratiu@nvidia.com>
-Cc: "pabeni@redhat.com" <pabeni@redhat.com>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"sdf@fomichev.me" <sdf@fomichev.me>,
-	"kuba@kernel.org" <kuba@kernel.org>
-Subject: Re: [PATCH net-next 2/9] net: hold instance lock during
- NETDEV_REGISTER/UP/UNREGISTER
-Message-ID: <Z-Rlpgp3vb-zsgSM@mini-arch>
-References: <20250325213056.332902-1-sdf@fomichev.me>
- <20250325213056.332902-3-sdf@fomichev.me>
- <86b753c439badc25968a01d03ed59b734886ad9b.camel@nvidia.com>
- <Z-QcD5BXD5mY3BA_@mini-arch>
- <672305efd02d3d29520f49a1c18e2f4da6e90902.camel@nvidia.com>
- <Z-Q-QYvFvQG2usfv@mini-arch>
+        d=1e100.net; s=20230601; t=1743022076; x=1743626876;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MNs4I+VY96qzVEnIeAX0i56gaLKwfzD5slXgEMkegvA=;
+        b=mSH1GiGrMq4Y9nroCugSLGsUUIQOHGjzRNRx5+JSYbs7D1FzdvC4vfhXjZ24H5MFUP
+         Cn95M7QROTBM91w5+3hMWmsmX+dR+/QUl5UdLaWPUFkEEj5nAtsPOy4sEAz99UEGhZPH
+         oiP8zIsFnTcy7K2CX8RKmCF0hUZ9pfVI3ZGA9bEHdpI5vSaGqiiQHlo7YmM8xmEMYVV2
+         yy1NrzxGaVZmS/am/6z9NdRsuZIPx1YuFQOGMvosVF6IJuIPaPYwdf6HtzDH+PQ5ENms
+         VkiyvTKv9OCpTV1dNmpuIeq/bw1LcM07gP9+03ch1wYZczt2gpzVKwo3+FjzSoGj+wS6
+         716A==
+X-Forwarded-Encrypted: i=1; AJvYcCVX7wDb0k+9UbHqeIfLZ+v783lpCCrclgHJPUhn16xDJ1Emkxrzrr2nJDxy3ZrcaEjR12DLEIeDFXYkjPs0@vger.kernel.org, AJvYcCVds0dFwiQuQ9p0g0cLlv7BvOWOizFdusnPotpeU1yhYBdbWx4DoLQDLiHBSI22XJTneemZE/6thi9LDUT7Gh63@vger.kernel.org, AJvYcCVtFev2SNSfrsx9Snosb1CM3kOOoEzfPqyPgGRosFubMnWzM52smEflArhetxF74UtMq/8/GtQD@vger.kernel.org, AJvYcCXCDSkkRXkDxR+lzY5JJSnmC4u+zPUnQ7pMWPCf0WXhP+LotfXqAJNjT/J8cFdknyOguKSOLZ1NWE6r@vger.kernel.org, AJvYcCXM1I8ztHVDeJiy7yeto093/XRtV862ppqfegVuhCuNJDihw+WbgwIn0SOhmqp+pwOuaCI63IG+DCX3ekc=@vger.kernel.org, AJvYcCXUKD7XDNtUcIUPmUCRo1v9+GEyA2lpkbiBLffJgTWyNs+Gi7b3T47hKqEgZRvK5KkTwyi9kPq388YSuqRnlaU=@vger.kernel.org, AJvYcCXUwPchoJyDsxceTkf2TkfgnyMZFEif838pwEH5RnfyDFgAk+p7HtYplau43KR189ud0yzuPTmr/QtPL7F1@vger.kernel.org, AJvYcCXwdZAkCgkvKVTrH6wgT4/xBdxEDg/YmNKjAiS29QmgQlRBhTSbhoYfKRcOyj++wJfiBNNbTqoTwiJ6@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWmqywuzrrVdgeVi1/mN6lkJOEdUuxwxdRRtXBFLKzDjfTweV0
+	tyYjO04S+OiquYCeqon6YlOm9jX1dxr8zJo8dJRhXC8cF5USrBUaF9MC7yx9yIlK2UfBH3+m1WB
+	j93GhRIozDkI5djBZcMBdrF3lySI=
+X-Gm-Gg: ASbGncsrVOj4pgQxjqa8TxO1qMZxO17w2eS9NmLy9PaULsh9HzTMyqTqZuwbdOLpvJv
+	Y6K1MjJWmHBKVnCwr9275BkIvskoQodHCmRyoPSnuprq4NYZjbApl8GHuomuuIDM4GzzrVv/v6P
+	u2dE5xz/bnFgRDhO3rnAmmw5bmQtCFfWaxGP/X6s1HHQ==
+X-Google-Smtp-Source: AGHT+IFTkL17Jc/5tc+lwRysHk8MME6mG/fwpKugvVpwwiEAGHYsBQsULAH9u2w5eS9UmGc0jzIZJK6sghNVKBbuAwc=
+X-Received: by 2002:a2e:988c:0:b0:30c:177c:9e64 with SMTP id
+ 38308e7fff4ca-30dc5f4fc1cmr4487501fa.35.1743022076074; Wed, 26 Mar 2025
+ 13:47:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z-Q-QYvFvQG2usfv@mini-arch>
+References: <20250325-ptr-as-ptr-v7-0-87ab452147b9@gmail.com>
+ <20250325-ptr-as-ptr-v7-7-87ab452147b9@gmail.com> <D8POWLFKWABG.37BVXN2QCL8MP@proton.me>
+ <CAJ-ks9mUYw4FEJQfmDrHHt0oMy256jhp7qZ-CHp6R5c_sOCD4w@mail.gmail.com>
+ <D8PPIYIJCNX8.13VPQULEI0ALN@proton.me> <CAJ-ks9k6220j6CQSOF4TDrgY9qq4PfV9uaMXz1Qk4m=eeSr5Ag@mail.gmail.com>
+ <D8Q4MSXXZ7OI.1NC226MO02VSN@proton.me> <CAJ-ks9nHKpQPuSBypXTSATYhbAFkQTJzUq8jN0nu4t=Kw+0xxg@mail.gmail.com>
+ <D8QCK3CQES3Y.3LTZ4MVO5B3KT@proton.me> <CAJ-ks9nKT2PUDm6=b4AB1QUWwwvcqPn7Vz60=c0B+uFMZrqPew@mail.gmail.com>
+ <D8QDOBUM6NF0.CGJY7ZA5KD9S@proton.me> <CAJ-ks9ntTxBM=c5nUZWGv3MoRt-LveBchn-c1Xy-DGap7fLVRA@mail.gmail.com>
+In-Reply-To: <CAJ-ks9ntTxBM=c5nUZWGv3MoRt-LveBchn-c1Xy-DGap7fLVRA@mail.gmail.com>
+From: Tamir Duberstein <tamird@gmail.com>
+Date: Wed, 26 Mar 2025 16:47:20 -0400
+X-Gm-Features: AQ5f1JpxZvv_0238pnS7OYKOrg_jP5CAtUULUrbnzS777StxjTzB1jEvV5C3tbs
+Message-ID: <CAJ-ks9=dgQE_UF--Kv0HVTF_d1JzqK1gMoeE8GO8EGVtM-yt_Q@mail.gmail.com>
+Subject: Re: [PATCH v7 7/7] rust: enable `clippy::ref_as_ptr` lint
+To: Benno Lossin <benno.lossin@proton.me>
+Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
+	Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
+	Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, linux-kbuild@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, 
+	devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 03/26, Stanislav Fomichev wrote:
-> On 03/26, Cosmin Ratiu wrote:
-> > On Wed, 2025-03-26 at 08:23 -0700, Stanislav Fomichev wrote:
-> > > @@ -2028,7 +2028,7 @@ int unregister_netdevice_notifier(struct
-> > > notifier_block *nb)
-> > >  
-> > >  	for_each_net(net) {
-> > >  		__rtnl_net_lock(net);
-> > > -		call_netdevice_unregister_net_notifiers(nb, net,
-> > > true);
-> > > +		call_netdevice_unregister_net_notifiers(nb, net,
-> > > NULL);
-> > >  		__rtnl_net_unlock(net);
-> > >  	}
-> > 
-> > I tested. The deadlock is back now, because dev != NULL and if the lock
-> > is held (like in the below stack), the mutex_lock will be attempted
-> > again:
-> 
-> I think I'm missing something. In this case I'm not sure why the original
-> "fix" worked.
-> 
-> You, presumably, use mlx5? And you just move this single device into
-> a new netns? Or there is a couple of other mlx5 devices still hanging in
-> the root netns?
-> 
-> I'll try to take a look more at register_netdevice_notifier_net under
-> mlx5..
+On Wed, Mar 26, 2025 at 3:06=E2=80=AFPM Tamir Duberstein <tamird@gmail.com>=
+ wrote:
+>
+> On Wed, Mar 26, 2025 at 1:36=E2=80=AFPM Benno Lossin <benno.lossin@proton=
+.me> wrote:
+> >
+> > On Wed Mar 26, 2025 at 5:57 PM CET, Tamir Duberstein wrote:
+> > >
+> > >
+> > > In the current code you're looking at, yes. But in the code I have
+> > > locally I'm transmuting `[u8]` to `BStr`. See my earlier reply where =
+I
+> > > said "Hmm, looking at this again we can just transmute ref-to-ref and
+> > > avoid pointers entirely. We're already doing that in
+> > > `CStr::from_bytes_with_nul_unchecked`".
+> >
+> > `CStr::from_bytes_with_nul_unchecked` does the transmute with
+> > references. That is a usage that the docs of `transmute` explicitly
+> > recommend to change to an `as` cast [1].
+>
+> RIght. That guidance was written in 2016
+> (https://github.com/rust-lang/rust/pull/34609) and doesn't present any
+> rationale for `as` casts being preferred to transmute. I posted a
+> comment in the most relevant issue I could find:
+> https://github.com/rust-lang/rust/issues/34249#issuecomment-2755316610.
+>
+> > No idea about provenance still.
+>
+> Well that's not surprising, nobody was thinking about provenance in
+> 2016. But I really don't think we should blindly follow the advice in
+> this case. It doesn't make an iota of sense to me - does it make sense
+> to you?
+>
+> >
+> > [1]: https://doc.rust-lang.org/std/mem/fn.transmute.html#alternatives
+> >
+> > >> I tried to find some existing issues about the topic and found that
+> > >> there exists a clippy lint `transmute_ptr_to_ptr`. There is an issue
+> > >> asking for a better justification [1] and it seems like nobody provi=
+ded
+> > >> one there. Maybe we should ask the opsem team what happens to proven=
+ance
+> > >> when transmuting?
+> > >
+> > > Yeah, we should do this - but again: not relevant in this discussion.
+> >
+> > I think it's pretty relevant.
+>
+> It's not relevant because we're no longer talking about transmuting
+> pointer to pointer. The two options are:
+> 1. transmute reference to reference.
+> 2. coerce reference to pointer, `as` cast pointer to pointer (triggers
+> `ptr_as_ptr`), reborrow pointer to reference.
+>
+> If anyone can help me understand why (2) is better than (1), I'd
+> certainly appreciate it.
 
-I have a feeling that it's a spurious warning, the lock addresses
-are different:
+Turns out there's a tortured past even in the standard library. In
+2017 someone replaces trasmutes with pointer casts:
 
-ip/1766 is trying to acquire lock:
-ffff888110e18c80 (&dev->lock){+.+.}-{4:4}, at:
-call_netdevice_unregister_notifiers+0x7d/0x140
+https://github.com/rust-lang/rust/commit/2633b85ab2c89822d2c227fc9e81c6ec1c=
+0ed9b6
 
-but task is already holding lock:
-ffff888130ae0c80 (&dev->lock){+.+.}-{4:4}, at:
-do_setlink.isra.0+0x5b/0x1220
+In 2020 someone changes it back to transmute:
 
-Can you try to apply the following on top of previous patch? At least
-to confirm whether it matches my understanding.. We might also stick
-with that unless we find a better option.
+https://github.com/rust-lang/rust/pull/75157/files
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index 3506024c2453..e3d8d6c9bf03 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -40,6 +40,7 @@
- #include <linux/if_bridge.h>
- #include <linux/filter.h>
- #include <net/netdev_queues.h>
-+#include <net/netdev_lock.h>
- #include <net/page_pool/types.h>
- #include <net/pkt_sched.h>
- #include <net/xdp_sock_drv.h>
-@@ -5454,6 +5455,7 @@ static void mlx5e_build_nic_netdev(struct net_device *netdev)
- 	netdev->netdev_ops = &mlx5e_netdev_ops;
- 	netdev->xdp_metadata_ops = &mlx5e_xdp_metadata_ops;
- 	netdev->xsk_tx_metadata_ops = &mlx5e_xsk_tx_metadata_ops;
-+	netdev_lockdep_set_classes(netdev);
- 
- 	mlx5e_dcbnl_build_netdev(netdev);
- 
-
-
+See also https://github.com/rust-lang/rust/pull/34609#issuecomment-23055987=
+1
+which makes my point better than I have, particularly this snippet:
+"In addition, casting through raw pointers removes the check that both
+types have the same size that transmute does provide.".
 
