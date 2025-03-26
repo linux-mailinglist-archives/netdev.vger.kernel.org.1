@@ -1,232 +1,163 @@
-Return-Path: <netdev+bounces-177759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 516FFA719FD
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 16:16:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F781A71A1C
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 16:22:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 050DD16BD0B
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 15:14:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C2163BC84F
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 15:16:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1C461F3BB6;
-	Wed, 26 Mar 2025 15:14:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFB6C154430;
+	Wed, 26 Mar 2025 15:16:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UdzMKDui"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XjPTI6da"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2DF1F3BBB
-	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 15:14:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092121487FE;
+	Wed, 26 Mar 2025 15:16:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743002068; cv=none; b=cHqg7pPduibc3IDoLFB8WC3fpWCuPElzvyjHjZ0x5olb0nB+FPt4UWbedMw/DSb2er8L9rGkQvk73on1zfqnXL5RxbMK8eHoJtHG9nG1/qXx1dSCE01dvuKmAL6BMoRBQNE6FMNXJNNqpywy0EG8iVX+a9RR+bIcKm+Yr1iJYJw=
+	t=1743002203; cv=none; b=g0c5u5FiBDpdPa1bM/s+rm+Txt//qWdpvSbktZ2DuGEzWXxu/UyeFn9l2sosEiuNtriSGLbx6AoJve+FPvDkfZWAD441tuLuJ7pkNMEYI52+n+G1MyvjOQinf4yxv/Sba4UBfNb0d/kvNdPSJKLGG29l3B1cSURU9iwFVfunBcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743002068; c=relaxed/simple;
-	bh=HQUnbYOHztWJlIEUmRKH75bQVKxvC05Z8Czi7nqAq54=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k7WTbZPql4mR/WiOWOVdg9Oq43w+qcGLolEY4ZPFe4ZTowJoyEnG5d/QadTLN3fuQMF49h6DfROMxGD/YuZAcQuFgdlA2KW2s3pRJe1Rfan8wMC68fVsshXVvezMelOFhmnKFRYUffSogxFUTdvpGZcdgWhBzpp2QfbwqF67fiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UdzMKDui; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743002066;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xPLJoTpj9mwt9aNlegdCeCagVemKudQjbGtSj2yURtA=;
-	b=UdzMKDuiKuxZiAnAE2/3+j7ISnyxR07MvPkGqEsSjPC2C3rG8rK2bYZxkuvtmyXK4CCfNi
-	lUpyI7qf2covl9bsIC1gXff5lkSgrafZGiXUN8z03ACfawvOgM/3F/QnPXhnNW+GQ2uA66
-	F0NoLct/TZmsS1wTPozvhbJHG3iY8Kg=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-376-E5LhvtH_PHKmGnD4XBZafQ-1; Wed, 26 Mar 2025 11:14:24 -0400
-X-MC-Unique: E5LhvtH_PHKmGnD4XBZafQ-1
-X-Mimecast-MFC-AGG-ID: E5LhvtH_PHKmGnD4XBZafQ_1743002063
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3913f546dfdso3739318f8f.1
-        for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 08:14:24 -0700 (PDT)
+	s=arc-20240116; t=1743002203; c=relaxed/simple;
+	bh=24X/ZdyDqQkvrH6CWkwNHWJIQTB8tBU3RYiNFxsB0EI=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OTV5If9gRAiPKSvEfGc0605POUrJ4BhbP9dM7KlVtxRj6uep0/cpT9+LtT3zUMRisHUhYruzAeIZdmA7LemBIJ10gqF/k+eAnOL9W/tWJ9WGr1OvWpSD9X3G9hIGbPx6mVyvdO+xv4gWVKTMLSPw+wPz/RH8uGcb+HTEViCQbF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XjPTI6da; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43d07ca6a80so35624075e9.1;
+        Wed, 26 Mar 2025 08:16:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743002200; x=1743607000; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y85oIIcm8gxsyGNFmtbfLlnKY/DF/ZVUpoApBWzNdw4=;
+        b=XjPTI6daBoQibAYSGrnkbP2D29Xq5zjELN+deVVEWTFFEofj/skljMtRGenWJfgxCf
+         /U+4R5dpG9RHl131E3msqS4IQOC+BzTc8ylg5pxjl78MwT5Jeho/RjOu9RiWGP4J/ZuY
+         1TX2eNjGc8KbkXWhPqsQqvNQ8XtLg+en83mP9lbHSeMSz+07Aajq1XEkJ/Eda/Lyq6P0
+         Qq+8NcILPurC17vBsJMtqve4f6uylySXxYQvDlkaW7Yp8uj8O9RKJ87Ea8qTjgArfXCD
+         oCknbPJ36iwkmF4X0o3PRwIPxTSq8ww7utd+Qz79efVOcwNnVzBjOjV6lj33P54MpEB3
+         GOVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743002063; x=1743606863;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1743002200; x=1743607000;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xPLJoTpj9mwt9aNlegdCeCagVemKudQjbGtSj2yURtA=;
-        b=hxIBjwBRSscdMZfb8RmYmPhTud1xw+TVxXT/H//zjq+/okCq+OCrklpWKf7Z19LhQX
-         WaWP5LdVXYiSjdGWeye3YDY9SP4qI38JLBHMjXYPGEwwfdEjGqCPApSBD/NcxwdSuOVL
-         qDPSVQUdei24oee9vt1nH9MpElJLLQbU3JvDUPpIOZ7UKREKSvmbgEOoTj+rqQC7L34U
-         fvVGn5b9cpGavw6xgXhHcCdzOxEyFItu85vGU8biR/ryh8cW07+Rh/ZfySAZldFA4+c9
-         4VT9jAB7UTrAFpOu4yug0jLcl+UXeoIArhvvFMBVcbmFHtdWMQ1dB3qjTzuMfCChoeRr
-         Mp0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCV7NBj7uHCMEvuWIBvQ87H5LAmjSr8TIBGcbIhS7fnTeB3fWwT72sd7JBlWJ6/i4/YYkS9Tt3I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyprd0ycAHQzq9NzHI3uIIswnodDOIlUrOo9eStMhYr5jsJ++c9
-	xp566VlWKM3BDBe6u6dehMuToiLweaJBabn6CfePqazRmEJXW1PyvGiCKAv/IwyYjl3zC0rO5Do
-	DmGCJI5bQYFCJDfHtc40MnXCqpUbbhCM7vIeyLUPUujmNkb7/peH5Aw==
-X-Gm-Gg: ASbGncuOaonGqhh+NCt4RxyUPl0MmOEyIiSXD8Xv2X6/0p//XKFywg4UUN7gNZA29FU
-	149qpn1ft5SLRR05nr+SSjt+E6ocGJ3b/EliJHeLIFA8DPLv2unCyTg4XlDfozGhDn24W5YPdvq
-	pQVrlr22roNPfUUyXzuJGOX5jDXacS52DkZOI7tnYR9URRK2+vz3C6zR2LY+0JPhtZIiN1Kr3dD
-	LVLgKprC5FYYrRQfQkHJS/yULxh1PVr38ptXCEbCoKAszolMmZpnckIOBbRZ6g8DYoYc0y/GY0T
-	237U8mDeRtALy7pwgw==
-X-Received: by 2002:a5d:6c63:0:b0:38d:e304:7470 with SMTP id ffacd0b85a97d-3997f90aa79mr21794410f8f.25.1743002063261;
-        Wed, 26 Mar 2025 08:14:23 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGLDszGJVF0UQWbzTWPDs66IMD9GSVlTSXE4mrjhgf35Uxdu3u5FMnMzdvDiVttQywI4kT7Hw==
-X-Received: by 2002:a5d:6c63:0:b0:38d:e304:7470 with SMTP id ffacd0b85a97d-3997f90aa79mr21794380f8f.25.1743002062777;
-        Wed, 26 Mar 2025 08:14:22 -0700 (PDT)
-Received: from leonardi-redhat ([151.29.33.62])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d82efdff2sm4960435e9.17.2025.03.26.08.14.21
+        bh=Y85oIIcm8gxsyGNFmtbfLlnKY/DF/ZVUpoApBWzNdw4=;
+        b=VpCR7FsShxO/iVWU6QtPRQc21/2BxW43T+RO7bXPEMMGYd0OOq31FGquKqDDVfXQyr
+         7IC25mXvB3JmgH83zBWmOY0ExDkQZXgkZtUYZO27X9jnSSi51Zc9iIU5iqcwQPE5NiWZ
+         Rnw9z9xTqR2BeWriYVbo+nmOdBtpuF2Bg3/gFgS0P+Fdi0baSoiAAkUw2iMQvShasB84
+         0SFrGb7fRu0f8IlFPdZxzK2rBJf8FNs8iqwBHvn2lHQANQrNW+nt5LgTPWjxbOmhYC1q
+         DaXUEOxRgV9K4iHpgcu8ff75qEbZ9P301GspYt3kSOjzgymdHfi43e4LF22VAwX+kCi4
+         KhTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU7rjuRy2FCvfQaC4kFVL451gn0nrCqU0oeb4/ePkL1XwVujXeSJoU5GqmkjrEM7ms4uLP/mj6+@vger.kernel.org, AJvYcCUWecEuHLKUwROhYfpe4P7l5Y918eXE7Ga/d1hs/tjE36AsIAo73LL6IdzCCXEO+65pWAncAdm+KjCq@vger.kernel.org, AJvYcCWPHPbxOFlN6GAwgJV/kvMoG6uwrm048gMFyiyXh66U+6PSYUT47MmNpScx6B4JSibLbWpGO/tQWGHv6e2a@vger.kernel.org
+X-Gm-Message-State: AOJu0Yynh4Q1B5Rd+/QdMUb4dPFDBtCntgf7IRqt7gWU2HgUO5jXXFQM
+	dNZO4gvOIh2leLFAfjTzMuDzh/TjCPiHaFuWPlbGxR/CJy5znR7k
+X-Gm-Gg: ASbGncu/4/ZrvpUbAzNxWVa3xoQ94/vl8ok8brxuJo4lGhS5afX0UhiMgWT0ZEDUvte
+	DlcXu9cjdhPa4KV3pHo/xA71wDpOVgeQrwpQAXxR3uEMcXEVUDxIUOWFp723VQWz/faC6ueMnOf
+	9zV5oSPRhjAxd4NS0/WqQLjtZMwWmRoXAg+1jYS3bfNA4dNvcIT0oB7MYbNWNO1WCxd2Lpf+ema
+	KGTcDlTc8SYI4gG/6tLid/7RGdLe/bY1DxgwpvZbv4arncidx2PLROrpfNk4qQJy03MtSGjwqeM
+	CtIEnxsvol7yL2L5o+FgTga/oRRuFtGPGSyNXSrKIhnq8USKyTDs2bYXpPxAiXGBIYOpz34c6aa
+	M
+X-Google-Smtp-Source: AGHT+IHq4/YZ4/H5LWJdb571fFty3ntzrqohrYGC3QHhtf0iMCl7uuDPZdsJX1dTGPwHqjX0z+upeg==
+X-Received: by 2002:a05:600c:1d81:b0:43d:10a:1b90 with SMTP id 5b1f17b1804b1-43d509f8691mr209903635e9.16.1743002200098;
+        Wed, 26 Mar 2025 08:16:40 -0700 (PDT)
+Received: from Ansuel-XPS. (93-34-88-225.ip49.fastwebnet.it. [93.34.88.225])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3997f9b517csm17433341f8f.51.2025.03.26.08.16.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Mar 2025 08:14:22 -0700 (PDT)
-Date: Wed, 26 Mar 2025 16:14:20 +0100
-From: Luigi Leonardi <leonardi@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Hyunwoo Kim <v4bel@theori.io>
-Subject: Re: [PATCH net-next v2] vsock/test: Add test for null ptr deref when
- transport changes
-Message-ID: <ghik6xpa5oxhb5lc4ztmqlwm3tkv5qbkj63h5mfqs33vursd5y@6jttd2lwwo7h>
-References: <20250314-test_vsock-v2-1-3c0a1d878a6d@redhat.com>
- <85a034b7-a22d-438f-802e-ac193099dbe7@rbox.co>
+        Wed, 26 Mar 2025 08:16:39 -0700 (PDT)
+Message-ID: <67e41a57.df0a0220.21de93.f609@mx.google.com>
+X-Google-Original-Message-ID: <Z-QaVe1BiFCZ2Hqj@Ansuel-XPS.>
+Date: Wed, 26 Mar 2025 16:16:37 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next RFC PATCH v2 3/3] dt-bindings: net: Document support
+ for Aeonsemi PHYs
+References: <20250326002404.25530-1-ansuelsmth@gmail.com>
+ <20250326002404.25530-4-ansuelsmth@gmail.com>
+ <77a366f8-0b58-4e1f-9020-b57f7c90b3bb@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <85a034b7-a22d-438f-802e-ac193099dbe7@rbox.co>
+In-Reply-To: <77a366f8-0b58-4e1f-9020-b57f7c90b3bb@lunn.ch>
 
-Hi Michal,
-
-On Wed, Mar 19, 2025 at 01:27:35AM +0100, Michal Luczaj wrote:
->On 3/14/25 10:27, Luigi Leonardi wrote:
->> Add a new test to ensure that when the transport changes a null pointer
->> dereference does not occur[1].
->>
->> Note that this test does not fail, but it may hang on the client side if
->> it triggers a kernel oops.
->>
->> This works by creating a socket, trying to connect to a server, and then
->> executing a second connect operation on the same socket but to a
->> different CID (0). This triggers a transport change. If the connect
->> operation is interrupted by a signal, this could cause a null-ptr-deref.
->
->Just to be clear: that's the splat, right?
->
->Oops: general protection fault, probably for non-canonical address 0xdffffc000000000c: 0000 [#1] PREEMPT SMP KASAN NOPTI
->KASAN: null-ptr-deref in range [0x0000000000000060-0x0000000000000067]
->CPU: 2 UID: 0 PID: 463 Comm: kworker/2:3 Not tainted
->Workqueue: vsock-loopback vsock_loopback_work
->RIP: 0010:vsock_stream_has_data+0x44/0x70
->Call Trace:
-> virtio_transport_do_close+0x68/0x1a0
-> virtio_transport_recv_pkt+0x1045/0x2ae4
-> vsock_loopback_work+0x27d/0x3f0
-> process_one_work+0x846/0x1420
-> worker_thread+0x5b3/0xf80
-> kthread+0x35a/0x700
-> ret_from_fork+0x2d/0x70
-> ret_from_fork_asm+0x1a/0x30
->
-
-Yep! I'll add it to the commit message in v3.
->> ...
->> +static void test_stream_transport_change_client(const struct test_opts *opts)
->> +{
->> +	__sighandler_t old_handler;
->> +	pid_t pid = getpid();
->> +	pthread_t thread_id;
->> +	time_t tout;
->> +
->> +	old_handler = signal(SIGUSR1, test_transport_change_signal_handler);
->> +	if (old_handler == SIG_ERR) {
->> +		perror("signal");
->> +		exit(EXIT_FAILURE);
->> +	}
->> +
->> +	if (pthread_create(&thread_id, NULL, test_stream_transport_change_thread, &pid)) {
->> +		perror("pthread_create");
->
->Does pthread_create() set errno on failure?
-It does not, very good catch!
->
->> +		exit(EXIT_FAILURE);
->> +	}
->> +
->> +	tout = current_nsec() + TIMEOUT * NSEC_PER_SEC;
->
->Isn't 10 seconds a bit excessive? I see the oops pretty much immediately.
-Yeah it's probably excessive. I used because it's the default timeout 
-value.
->
->> +	do {
->> +		struct sockaddr_vm sa = {
->> +			.svm_family = AF_VSOCK,
->> +			.svm_cid = opts->peer_cid,
->> +			.svm_port = opts->peer_port,
->> +		};
->> +		int s;
->> +
->> +		s = socket(AF_VSOCK, SOCK_STREAM, 0);
->> +		if (s < 0) {
->> +			perror("socket");
->> +			exit(EXIT_FAILURE);
->> +		}
->> +
->> +		connect(s, (struct sockaddr *)&sa, sizeof(sa));
->> +
->> +		/* Set CID to 0 cause a transport change. */
->> +		sa.svm_cid = 0;
->> +		connect(s, (struct sockaddr *)&sa, sizeof(sa));
->> +
->> +		close(s);
->> +	} while (current_nsec() < tout);
->> +
->> +	if (pthread_cancel(thread_id)) {
->> +		perror("pthread_cancel");
->
->And errno here.
->
->> +		exit(EXIT_FAILURE);
->> +	}
->> +
->> +	/* Wait for the thread to terminate */
->> +	if (pthread_join(thread_id, NULL)) {
->> +		perror("pthread_join");
->
->And here.
->Aaand I've realized I've made exactly the same mistake elsewhere :)
->
->> ...
->> +static void test_stream_transport_change_server(const struct test_opts *opts)
->> +{
->> +	time_t tout = current_nsec() + TIMEOUT * NSEC_PER_SEC;
->> +
->> +	do {
->> +		int s = vsock_stream_listen(VMADDR_CID_ANY, opts->peer_port);
->> +
->> +		close(s);
->> +	} while (current_nsec() < tout);
->> +}
->
->I'm not certain you need to re-create the listener or measure the time
->here. What about something like
->
->	int s = vsock_stream_listen(VMADDR_CID_ANY, opts->peer_port);
->	control_expectln("DONE");
->	close(s);
->
-Just tried and it triggers the oops :)
-
->Thanks,
->Michal
+On Wed, Mar 26, 2025 at 04:08:31PM +0100, Andrew Lunn wrote:
+> > +  A PHY with not firmware loaded will be exposed on the MDIO bus with ID
+> > +  0x7500 0x7500 or 0x7500 0x9410 on C45 registers.
+> 
+> > +select:
+> > +  properties:
+> > +    compatible:
+> > +      contains:
+> > +        enum:
+> > +          - ethernet-phy-id7500.9410
+> > +          - ethernet-phy-id7500.9402
+> > +          - ethernet-phy-id7500.9412
+> > +          - ethernet-phy-id7500.9422
+> > +          - ethernet-phy-id7500.9432
+> > +          - ethernet-phy-id7500.9442
+> > +          - ethernet-phy-id7500.9452
+> > +          - ethernet-phy-id7500.9462
+> > +          - ethernet-phy-id7500.9472
+> > +          - ethernet-phy-id7500.9482
+> > +          - ethernet-phy-id7500.9492
+> 
+> > +        ethernet-phy@1f {
+> > +            compatible = "ethernet-phy-id7500.9410",
+> > +                         "ethernet-phy-ieee802.3-c45";
+> 
+> You need to be careful here. And fully understand what this means.  In
+> general, you don't list a compatible here, or only
+> ethernet-phy-ieee802.3-c45. This is because the bus can be enumerated,
+> you can get the ID from the device. What is in the device is more
+> likely to be correct than whatever the DT author put here. However,
+> you can state a compatible with an ID, and when you do that, it means
+> the PHY device ID in the silicon is broken, ignore it, probe based on
+> the value here.  So if you state ethernet-phy-id7500.9410, it does not
+> matter if there is firmware or not in the PHY, what ID the PHY has, it
+> will get probed as a ethernet-phy-id7500.9410.
+> 
+> Except, if there is a .match_phy_device in the driver ops. If there is
+> a .match_phy_device the driver does whatever it wants to try to
+> identify the device and perform a match.
 >
 
-Thanks for the review!
+Yep I will note this for the PHY driver. I really need to use
+match_phy_device for the FW load OPs to prevent any kind of bad
+compatible.
 
-Luigi
+In C22 75007500 is reported while in C45 a more correct 75009410 is
+reported, this is why the c45 compatible.
 
+Aside from this, the compatible listed here are really just to document
+the need for firmware-name and to what PHY it should be needed. It's a
+pattern I followed from the aquantia schema.
+
+Example for PHY with ID 7500.9410 in C45, firmware-name is required, for
+anything else (example 7500.9422) firmware-name property should not be
+used (case with a SPI attached for example).
+
+-- 
+	Ansuel
 
