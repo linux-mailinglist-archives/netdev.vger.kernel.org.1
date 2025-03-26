@@ -1,166 +1,107 @@
-Return-Path: <netdev+bounces-177815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12099A71E11
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 19:10:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93EE5A71E27
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 19:17:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E3AB7A2572
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 18:08:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 828811893890
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 18:17:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C27DA24EF7C;
-	Wed, 26 Mar 2025 18:09:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C56DB2512C8;
+	Wed, 26 Mar 2025 18:17:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j+P9K2n8"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="GNfEyULs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out162-62-57-137.mail.qq.com (out162-62-57-137.mail.qq.com [162.62.57.137])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438BC19E7E2;
-	Wed, 26 Mar 2025 18:09:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CFCE1DC9BE
+	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 18:17:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.137
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743012591; cv=none; b=GOzhlBfPx92KoyzcbVdaXyol7fTcd4hKrVMlLJKNXaCLUitLDFhm3QzW/q8VabQrOeAXbodAma9NHAYEhdncS4r/nm/7aBNuTTL/9FacqaFL54XcyTmgQOGBNIX5WRWEo/n9cqsFtNlu/b3Xwdaq+CXuCdlTkPy7PIUyCs+dQsM=
+	t=1743013063; cv=none; b=Uiv5HuMIkDWVEUWt7vH5TS0hfqZ2i27KDNp10RILNoAxap1FbEeKoZ1o/Xw7U/AdpV6AehLwjKOqba58ywc7uRG6OInn97e+8WxBTiMOi91YuH+ac+sXidOdL0Wj8ZJ6ODqESmOz4Ovb/MR/L9XmjTYnWoLyZ3sFjCHurIT/dGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743012591; c=relaxed/simple;
-	bh=j/t5CN71+dxUmTY6J6d1qYJvYghkCC3IizfACA9XDe0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=B4daLTd4NRLeAVH/2SERjQbyTlTUkhOBFiSblhk0qMDY3Bf+QJKI4r98/d+ex+qbQlXHFvGL82InFoCG1uotCNHOo6NCgPJOu3dDAKJjfZwIOJXgZN3PYgECxmSUuGpDxxURoHx7pgtFIdXzxRf09AVte+k3vlF72+x4XEt4o1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j+P9K2n8; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-224191d92e4so3893945ad.3;
-        Wed, 26 Mar 2025 11:09:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743012589; x=1743617389; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vQ+IB9rjAt2gQIsRhdVsMj0KNUUyg8jdNCXdtQ8HIbk=;
-        b=j+P9K2n8xcBQo5eZMeSB9FDtrM1y3Og07xbOIGWIhKYoCaTrgHqe5a9wDBxm81xHns
-         3H/Zt5p66Hg0b1flsTPGJqZ5SnBb9lsHcAENjiedcLVnD/iVxx2t/tqRBdKQEvqKJfZE
-         aWbDHbKScrzbu+PgbtWHgZH0xep/TdsBuo1iv0nNW0Xq+qTSQ1ue8vPiIZE/7c/m3i2L
-         Zyky2fmL2ExgYy303wGe3hnTnb5jd44VnPg+xfC9vJh42EAlpGfu9i1ywvhIwqKkw2km
-         qSIUSS4OgxdpBw0qnjCjOZKjebKvIag+uEm5VOSUKSI6Mrtv3yw8N5UiKX7bn6+jG4SV
-         djPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743012589; x=1743617389;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vQ+IB9rjAt2gQIsRhdVsMj0KNUUyg8jdNCXdtQ8HIbk=;
-        b=E/zrek3/FtINzS6/6pV/HZg7fsv6h9lGVc94yfmwEdrRjE4hNdHwdWu/quVJTWckyM
-         C2k0ZknvHeD1iUKuBFYRRdw0dgu6cGy+TywsGUgN6VgmbhrGYDAoiiopOPGnlnZ3gOa0
-         aqcj7Axx8CQdSyKKSX8uzJ6fpCAwbnAHWDS3rs4Vlv2uac5Ees0ezlpLUcKfs9Z3I0eo
-         lT5jQlHozAk5Oa8iR+cO2Mj3W9QLKsHk5z+8hv/K4xd40r8YHRolKRcuaUYbLoXnNOde
-         /4Jmbs+QOnCZcvjdMw04n5PH36mLotzBLUMjW/BH5IKyy/30FPTgXwSWTwkwnHp/IAkK
-         M+Nw==
-X-Forwarded-Encrypted: i=1; AJvYcCXwBT+mBGTfpS2Ptl0AJzxXzmBKpAorOS+/7X1zZGGlfIclwENv5I7D0QSHFkkcXXRZ4bUUcs0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxV/sjVbjtZtJPHNMfueDsoxkcwUMT3SsS42hnwOG9A+vWHzpvG
-	kdmDHy/YZXHsmuRnw7xgQw+PCapLk7yM0czRhiOYkVC2g8WAaiT8
-X-Gm-Gg: ASbGnct7CrG8vuCCFiBcttPlHlQZEslgmRe7KoIYaKG73X4TcB8oKo6Nl3ug/LFE8gv
-	Ic+AqdyxoW6SBBCS1mIGpCEiEUjmdYL03jvmavrgFl9mv+9lIxgV/495RszWLIxzONAMP7IkXvf
-	32lO7umZFXFDWDiPJ1SRWhbcRO2FffOokj4WsX6ArIa4h8bSLY5b8/xoZ3NE/6gZ0PjeQaJkpsu
-	Or0Ite+x3jpEZ4hHC6nPUSMKxVkc41K5Z1H3kMZMkw5c8NBsSywZFzBpDg+c/N0m4V2n6MvPzSR
-	pn5eFZ5IXZERuNWOSe2mEm05bN0lMMKa/ftjFc3EnUrwYJW82c9jnBK3MSiwyHRw
-X-Google-Smtp-Source: AGHT+IGIV/5RpyEFolfPNp6NtVC7IPlgGcgKn1BxA6Sqz74psmOuSJfhNw+6+wejp6T1ELtMWQjpEw==
-X-Received: by 2002:a05:6a00:2e18:b0:736:62a8:e52d with SMTP id d2e1a72fcca58-7396103a224mr644124b3a.12.1743012589314;
-        Wed, 26 Mar 2025 11:09:49 -0700 (PDT)
-Received: from localhost.localdomain ([187.60.93.157])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7390615302csm12434067b3a.128.2025.03.26.11.09.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Mar 2025 11:09:49 -0700 (PDT)
-From: Ramon Fontes <ramonreisfontes@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: linux-wpan@vger.kernel.org,
-	alex.aring@gmail.com,
-	miquel.raynal@bootlin.com,
-	netdev@vger.kernel.org,
-	Ramon Fontes <ramonreisfontes@gmail.com>
-Subject: [PATCH v2 1/1] mac802154_hwsim: define perm_extended_addr initialization
-Date: Wed, 26 Mar 2025 15:09:09 -0300
-Message-ID: <20250326180909.10406-2-ramonreisfontes@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250326180909.10406-1-ramonreisfontes@gmail.com>
-References: <20250326180909.10406-1-ramonreisfontes@gmail.com>
+	s=arc-20240116; t=1743013063; c=relaxed/simple;
+	bh=1UhRK95LP8hqlPseMawABnpT11GCkmJwEaKCs8WEWW8=;
+	h=Message-ID:From:To:Cc:Subject:Date; b=g4nSlDwYbDwo5UqyL8k39NrdE7YuugebaYaoN5OwD4bM+7kFbe1mJszcO4huyyHRrLsGGItiN5U1xHLgrSJxk7koLTzraDEf0l0sOLSrwsV/PTo7u66hK2yNsKEoCTgWC3Un9qdRWdOj3vw1ZLqu0DXH4N8G9tA+TJf+ER+lXIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=GNfEyULs; arc=none smtp.client-ip=162.62.57.137
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1743013054; bh=h7q4/X5vEb/MoGY6Kon60isqwwB6JHPQYp8IebAK9+8=;
+	h=From:To:Cc:Subject:Date;
+	b=GNfEyULstJtyftvjQWi99+ZzEgdz65pl4H2URjn7zVo4OaYWg45uYhSCbk3e7vBYM
+	 OyRIcsRz+b7tO13NaAgzgVpKGiU3K3cjr45Z0Z+V8k/Sy4apkFM+aJ1tFqzDK27jXC
+	 OPT7K7SE76Y94LSsxky2GsEctWEDUiZ8dXC+hzfQ=
+Received: from localhost.localdomain ([111.19.95.140])
+	by newxmesmtplogicsvrszgpua8-1.qq.com (NewEsmtp) with SMTP
+	id 2D7030FB; Thu, 27 Mar 2025 02:11:23 +0800
+X-QQ-mid: xmsmtpt1743012683tr4silwsz
+Message-ID: <tencent_4B358ADB8A54F04A32CD9933114B8B383606@qq.com>
+X-QQ-XMAILINFO: NtvpdyJXE1j9rTsJZGXp36RuJGdcd4cfQo+bmpS4rT6vnuQaugyzqnOI+uNC8s
+	 KxTx0gzAHsEdaqPze4ZGJ/OgIHedjsd+uWRzOtbnoKAaCIn5n/8Rb0E+AhRpjcAL1VsFehcFMia3
+	 FbbKRi8STTb2kDybragRDljfgu/PCle3JheOJit+g/y8GiulBfmOMCyIj4vrExNsfwVSJbeHAFkK
+	 ssVK+7JUIg09otzF3zBO1lsExNGlx5tiySzuXmWmMz+t/gD4gparwAGb+CJSNX1LshCa81FbKnY4
+	 v7rJnmjzcv8BONfOqcztsMxmOdutoFn3gXljX6NA7aH+GZ1TiRVzf87gaYYCcubKGSEvvpGPhlhL
+	 devgtzi/Rz0fmu/M4BKX3Q7eIhol/8A2F5hJOx4WDHpr3Q68Rg7TOn2VN69bUz1z5MMhR483Mtcv
+	 /xjpnaf31CZYa76k2jUXVHm/GBj6M9hajhOszKCJz1gMbg+FkqHaG9TQMvCS/zkIun+tAse7usgD
+	 9sn0NaqtVgY/fWA1daKpZAiK/BYz1Ii8Az14YlVb4s0DEqNhoq8On+aEH9b2+h/TdZar+pMu98oo
+	 HWIBi7dChmiJouDyJvB93Qwb7AG5j5yWjvWkTjt32cv+DdNlOe7E4s8xIDSg1u81kCoYxeApAepL
+	 rJ2gLLtLVmvWpunfQD4BooC8fPNU07W9bftztKFffvhAvn6QV7kJXBHossg3xpCkOKtvGMxss7gh
+	 /tZwtBE/UgWlTt3qT/kFrQpJl98cV2XcfwqKLm95B3HNEZawMlNafL0BeDjeiq+D6IE3msMinRhw
+	 RdBkbcSSq5YwLWi2iyCBjc8z0ja+pLGrGq7kr38mJz6hSqPSXbOqWNFqhBcIeStsSmYw++Oh7Lse
+	 D8kgICXJ4hw1v4RnBhIA0I02X/6rsH0qO+dFMGzylArGSOnV2FdpoTTd5lv7B0lk1+DLUx0lB0Ri
+	 NBy8iRxgZu28ztIp7E9DyvmssSaGJm
+X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
+From: inuc@qq.com
+To: bridge@lists.linux.dev
+Cc: netdev@vger.kernel.org,
+	roopa@nvidia.com,
+	razor@blackwall.org,
+	Liu Jie <inuc@qq.com>
+Subject: [PATCH] net: bridge: set skb->protocol for 802.1Q VLAN packets
+Date: Thu, 27 Mar 2025 02:11:17 +0800
+X-OQ-MSGID: <20250326181117.15513-1-inuc@qq.com>
+X-Mailer: git-send-email 2.16.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-This establishes an initialization method for perm_extended_addr,
-aligning it with the approach used in mac80211_hwsim.
+From: Liu Jie <inuc@qq.com>
 
-Signed-off-by: Ramon Fontes <ramonreisfontes@gmail.com>
+When bridging locally originated VLAN-tagged packets, we must ensure
+skb->protocol is properly set to ETH_P_8021Q. Currently, if this field
+remains unset, br_allowed_ingress() may incorrectly drop valid VLAN
+packets during the bridge transmission path.
+
+Fix this by explicitly checking eth_hdr(skb)->h_proto for VLAN tags when
+handling locally generated packets.
+
+Signed-off-by: Liu Jie <inuc@qq.com>
 ---
- drivers/net/ieee802154/mac802154_hwsim.c | 18 +++++++++++++++++-
- drivers/net/ieee802154/mac802154_hwsim.h |  2 ++
- 2 files changed, 19 insertions(+), 1 deletion(-)
+ net/bridge/br_device.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
-index 1cab20b5a..400cdac1f 100644
---- a/drivers/net/ieee802154/mac802154_hwsim.c
-+++ b/drivers/net/ieee802154/mac802154_hwsim.c
-@@ -41,6 +41,17 @@ enum hwsim_multicast_groups {
- 	HWSIM_MCGRP_CONFIG,
- };
+diff --git a/net/bridge/br_device.c b/net/bridge/br_device.c
+index 0ab4613aa..9094ba7e4 100644
+--- a/net/bridge/br_device.c
++++ b/net/bridge/br_device.c
+@@ -63,6 +63,9 @@ netdev_tx_t br_dev_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	skb_reset_mac_header(skb);
+ 	skb_pull(skb, ETH_HLEN);
  
-+__le64 addr_to_le64(u8 *addr) {
-+    return cpu_to_le64(((u64)addr[0] << 56) |
-+                        ((u64)addr[1] << 48) |
-+                        ((u64)addr[2] << 40) |
-+                        ((u64)addr[3] << 32) |
-+                        ((u64)addr[4] << 24) |
-+                        ((u64)addr[5] << 16) |
-+                        ((u64)addr[6] << 8)  |
-+                        ((u64)addr[7]));
-+}
++	if (eth_hdr(skb)->h_proto == htons(ETH_P_8021Q))
++		skb->protocol = htons(ETH_P_8021Q);
 +
- static const struct genl_multicast_group hwsim_mcgrps[] = {
- 	[HWSIM_MCGRP_CONFIG] = { .name = "config", },
- };
-@@ -896,6 +907,7 @@ static int hwsim_subscribe_all_others(struct hwsim_phy *phy)
- static int hwsim_add_one(struct genl_info *info, struct device *dev,
- 			 bool init)
- {
-+	u8 addr[8];
- 	struct ieee802154_hw *hw;
- 	struct hwsim_phy *phy;
- 	struct hwsim_pib *pib;
-@@ -942,7 +954,11 @@ static int hwsim_add_one(struct genl_info *info, struct device *dev,
- 	/* 950 MHz GFSK 802.15.4d-2009 */
- 	hw->phy->supported.channels[6] |= 0x3ffc00;
- 
--	ieee802154_random_extended_addr(&hw->phy->perm_extended_addr);
-+	memset(addr, 0, sizeof(addr));
-+	/* give a specific prefix to the address */
-+	addr[0] = 0x02;
-+	addr[7] = idx;
-+	hw->phy->perm_extended_addr = addr_to_le64(addr);
- 
- 	/* hwsim phy channel 13 as default */
- 	hw->phy->current_channel = 13;
-diff --git a/drivers/net/ieee802154/mac802154_hwsim.h b/drivers/net/ieee802154/mac802154_hwsim.h
-index 6c6e30e38..536d95eb1 100644
---- a/drivers/net/ieee802154/mac802154_hwsim.h
-+++ b/drivers/net/ieee802154/mac802154_hwsim.h
-@@ -1,6 +1,8 @@
- #ifndef __MAC802154_HWSIM_H
- #define __MAC802154_HWSIM_H
- 
-+__le64 addr_to_le64(u8 *addr);
-+
- /* mac802154 hwsim netlink commands
-  *
-  * @MAC802154_HWSIM_CMD_UNSPEC: unspecified command to catch error
+ 	if (!br_allowed_ingress(br, br_vlan_group_rcu(br), skb, &vid,
+ 				&state, &vlan))
+ 		goto out;
 -- 
-2.43.0
+2.17.1
 
 
