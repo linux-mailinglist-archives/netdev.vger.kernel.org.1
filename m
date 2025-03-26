@@ -1,110 +1,161 @@
-Return-Path: <netdev+bounces-177813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3D58A71E0B
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 19:08:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AEDEA71E10
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 19:09:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71DA51767CD
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 18:08:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F7EB7A5AC9
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 18:08:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A6A524EF7C;
-	Wed, 26 Mar 2025 18:08:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C5BA24CECE;
+	Wed, 26 Mar 2025 18:09:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="tIAaVPrl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WhNacgcv"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25E623E324;
-	Wed, 26 Mar 2025 18:08:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2DED19E7E2;
+	Wed, 26 Mar 2025 18:09:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743012505; cv=none; b=GuEEbJGRkIjTQT0RqsNB8Z7Fp2V0yoMaeCMI2UtsX/NdjQn7Az+VQ+WgE0QGa3th66owpLwXnD0/H4GxkQvk5Z9EYk3TrH7FT1UO+ph1cgxhLzgjEsKaGJGBa0nUEzYnjhbFYTDcw/mcCLq3doUWMRFTiYgrEjUzrceu6GdyNJo=
+	t=1743012575; cv=none; b=bvwiZR5Nwe7QY98HQfTGQNrF4N8Bvj3lBXhwOhzwuzeXOgiXm92l+YQDpnQWtiZDUppIbYcY/9lnkpmGk41ZZXs/aU7ovQevuSwjk0DPV49sBz54sHNUibym0NN7bnHmy6HNhPMeHHRo+j8TbwNRmLhzFEXB5eRA3Lgnya6n9PM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743012505; c=relaxed/simple;
-	bh=VUWIUj2hfkXI+Qy0S+bOeux5uwuJCkBDwdfH5H5+a04=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fF3sPpWgG8T/FhlqPCi5vVQvqZjZebGf3tZjiEZ0wtfbYiaEfb/u9AnEnu78pa6Ot0eYPOyB74c/klI48FAC/0S1ARK8KbVCaHaWeq0PfsVMbGb/S2fub5O8W96wpOu1lO6GezPJhSriGlvOHWk1o3JySxL6EF5ftxcYvfkcXuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=tIAaVPrl; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=W9NKf/8mTYUYfIRNEyzd9z7p8OnoYdqWiENexZcINQs=; b=tIAaVPrlQIYxF6Z16HmkxlO/zN
-	MaqTLGdwwrT2x1RDu/stzwNSmKYIVGWk30woItxKAlJwr0+SAxQPqT2H0NlPsNZ4DNQXcm/jboLPH
-	0DDitU52H/T04+xuGboip2+QSFHJhcz52keptJ5h8ASfrhiUvuu1C0OEVTcpAzDfS4gqA2hg48vcY
-	xnwh9+F9DuSSDViL/8GV2DKoWjDqQFw8IMGt02IwdE/3SYlW5aTmmC+ABAhIzxAvD/mZ8EHxs8vbb
-	JUtqFeELrOxuL72kYV9FhZNewMcGuQkyUHuo8PBg7NcEokKr13ADUO7Kx26NC4/ddTSSoW/yh3s81
-	R9OsymiQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33370)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1txVAi-0006RH-0w;
-	Wed, 26 Mar 2025 18:08:12 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1txVAg-0004c9-0c;
-	Wed, 26 Mar 2025 18:08:10 +0000
-Date: Wed, 26 Mar 2025 18:08:09 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Christian Marangi <ansuelsmth@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next RFC PATCH v2 2/3] net: phy: Add support for Aeonsemi
- AS21xxx PHYs
-Message-ID: <Z-RCiWzRWbv7RlHJ@shell.armlinux.org.uk>
-References: <20250326002404.25530-1-ansuelsmth@gmail.com>
- <20250326002404.25530-3-ansuelsmth@gmail.com>
- <dfa78876-d4a6-4226-b3d4-dbf112e001ee@lunn.ch>
+	s=arc-20240116; t=1743012575; c=relaxed/simple;
+	bh=tiWILF/OpXk2QiaHA4iIDbpOS8cEKKKELeSYLgcn/cw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p7+iDYwyU12hx+ViBlrWbpSe1rv87OnQS5qwawDUF1Aw5FKOz8zFWEet8gcdBXcLXG7y7WWUlOyrw/jrYJuZIkaTCcUosRpO2Ob97M+hsHifwLJdJ52JWziIehLpx3QRUr+5+pZaVJbH6ZEamtTdxzlFqbsnXSueEhesLq6Olsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WhNacgcv; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-224100e9a5cso3989665ad.2;
+        Wed, 26 Mar 2025 11:09:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743012573; x=1743617373; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7KMrhQf56Ur1zbJmPs1F0PkNskXi6jKeP+tiiR6jEI8=;
+        b=WhNacgcvg8wHNFDAWMvrCsluQ+/ck9tbCuOXgeWJJNYsfGnKlcWpSAZ0/URQZyNAuM
+         LxevYfAVN2REPanG1qY2upbrVJhycsP9FRcYYxptLONkTMa0kQUYenCWI0DJTBZIS7UG
+         jKlbQZ0py+BmFEZ9ceBnV0yhEFY8GG0iTKqIVPjdniYtehIzj/2EWjwbvJmiZ2C/hkg3
+         wC80ahh0nlIuuG93J72wpYGkCJIOlxFR1SeBUs7Ukx1C49cZUuT72Gqq8ag9qWT/PJpw
+         KJxQu9qOAuNKJHZRdMb0N4vWjHOPHUaVIq95VFSE3CLH3L85ON3NMf2bft5I2ys2hcRN
+         m4xQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743012573; x=1743617373;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7KMrhQf56Ur1zbJmPs1F0PkNskXi6jKeP+tiiR6jEI8=;
+        b=oclbBBnTBa7uNo9+9lUFxlDi8u6Bvor0+Lfl91jfZ9MdtRM0x3eH9pejH1hxDgEk51
+         Iy4SgoNXmghkp/c2d8zCZjer+JlcMzWnizgKK8g910l4P7l1LOxJhVm+PNqw7Dk4cFoZ
+         qSG88tX1olFAhOShxpAF7e3dOEYij+5s7lbXhParlFE1WFkasdf8IRR2wMxNt5Zgdjvz
+         5PR9EBsCgsvYKg5dpz1WT4CJjsRZzs0oH+7j9gIgN/euz+ScGdVBDFyuqiCgrr+iWJIi
+         PP8snVsOMoqMJ9gp3rOQLJ7z6zaE05yrqQh7ZM3emMJHbpcELqoYz/h9aeQxEK03a3Ku
+         I++w==
+X-Forwarded-Encrypted: i=1; AJvYcCX5s6gio1vnNBiqd5NeqCOgUGYNmUXCQaSlsYHRQfKIbfYTSqetXPfD1nMV5J0hsCu2c/HyMB8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5uoBgDS+BpxFVaMRxqwk5rs7Qbo+FDD2WqyDSASH266YU4HTb
+	BBmEPWgjQsOIFfoY5gR7HKDhW8PHrA5s87qAUW5F1dOBqvYNXERE
+X-Gm-Gg: ASbGncv6BUy2/PdCugHpa9UqbQFuMFyZQtBv2oZEdf8niPjekAqpG5AkYdB8sKz+wb9
+	I/5G6vB02TyFiiT4eZ9joN1oAFoUgwgqEOPtQZgtIJCTk5PQ6ROLTWozZ6ETWtK/fIQ8KTdGWF2
+	1HXjP4HG5DmLL95Sv2dI6on/B+2/f5vJrwFHhRoWP/d1cRyOZNxFoLCiSUDjeZmP/poR0fVM91T
+	R7QbgOZ5D0aCtK843OGC/JTwBudHXXIQDvZrHQZApHLUCQuKgN8NJr/DcK1JxISF6n9wvjUbf0l
+	LAUj6L7ePnGMji51IAcAF1Qsxmvb06QQH412rRVZDPSN7yQkwveHAGjioWAtpsMN
+X-Google-Smtp-Source: AGHT+IGCM7WayWgf2oiCYK5Za4POdAbBFQp4hvRXHayA7+gtCHdNFuJLeA1B3v1OBaXhifzNaI5c8Q==
+X-Received: by 2002:a17:902:c94d:b0:21a:8300:b9d5 with SMTP id d9443c01a7336-228048794b3mr6093655ad.23.1743012572677;
+        Wed, 26 Mar 2025 11:09:32 -0700 (PDT)
+Received: from localhost.localdomain ([187.60.93.157])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7390615302csm12434067b3a.128.2025.03.26.11.09.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Mar 2025 11:09:32 -0700 (PDT)
+From: Ramon Fontes <ramonreisfontes@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: linux-wpan@vger.kernel.org,
+	alex.aring@gmail.com,
+	miquel.raynal@bootlin.com,
+	netdev@vger.kernel.org,
+	Ramon Fontes <ramonreisfontes@gmail.com>
+Subject: [PATCH] mac802154_hwsim: define perm_extended_addr initialization
+Date: Wed, 26 Mar 2025 15:09:08 -0300
+Message-ID: <20250326180909.10406-1-ramonreisfontes@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dfa78876-d4a6-4226-b3d4-dbf112e001ee@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Mar 26, 2025 at 03:56:15PM +0100, Andrew Lunn wrote:
-> After the firmware download, the phylib core will still have the wrong
-> ID values. So you cannot use PHY_ID_MATCH_EXACT(PHY_ID_AS21011JB1).
-> But what you can do is have a .match_phy_device function. It will get
-> called, and it can read the real ID from the device, and perform a
-> match. If it does not match return -ENODEV, and the core will try the
-> next entry.
+This establishes an initialization method for perm_extended_addr, aligning it with the approach used in mac80211_hwsim.
 
-Before it returns -ENODEV, it could re-read the ID values and fill
-them into struct phy_device. This would allow phylib's matching to
-work.
+Signed-off-by: Ramon Fontes <ramonreisfontes@gmail.com>
+---
+ drivers/net/ieee802154/mac802154_hwsim.c | 18 +++++++++++++++++-
+ drivers/net/ieee802154/mac802154_hwsim.h |  2 ++
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
-> You either need N match_phy_device functions, one per ID value, or you
-> can make use of the .driver_data in phy_driver, and place the matching
-> data there.
-
-An alternative would be to change the match_phy_device() method to
-pass the phy_driver, which would allow a single match_phy_device
-function to match the new hardware ID values against the PHY IDs in
-the phy_driver without needing to modify the IDs in phy_device.
-
+diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
+index 1cab20b5a..400cdac1f 100644
+--- a/drivers/net/ieee802154/mac802154_hwsim.c
++++ b/drivers/net/ieee802154/mac802154_hwsim.c
+@@ -41,6 +41,17 @@ enum hwsim_multicast_groups {
+ 	HWSIM_MCGRP_CONFIG,
+ };
+ 
++__le64 addr_to_le64(u8 *addr) {
++    return cpu_to_le64(((u64)addr[0] << 56) |
++                        ((u64)addr[1] << 48) |
++                        ((u64)addr[2] << 40) |
++                        ((u64)addr[3] << 32) |
++                        ((u64)addr[4] << 24) |
++                        ((u64)addr[5] << 16) |
++                        ((u64)addr[6] << 8)  |
++                        ((u64)addr[7]));
++}
++
+ static const struct genl_multicast_group hwsim_mcgrps[] = {
+ 	[HWSIM_MCGRP_CONFIG] = { .name = "config", },
+ };
+@@ -896,6 +907,7 @@ static int hwsim_subscribe_all_others(struct hwsim_phy *phy)
+ static int hwsim_add_one(struct genl_info *info, struct device *dev,
+ 			 bool init)
+ {
++	u8 addr[8];
+ 	struct ieee802154_hw *hw;
+ 	struct hwsim_phy *phy;
+ 	struct hwsim_pib *pib;
+@@ -942,7 +954,11 @@ static int hwsim_add_one(struct genl_info *info, struct device *dev,
+ 	/* 950 MHz GFSK 802.15.4d-2009 */
+ 	hw->phy->supported.channels[6] |= 0x3ffc00;
+ 
+-	ieee802154_random_extended_addr(&hw->phy->perm_extended_addr);
++	memset(addr, 0, sizeof(addr));
++	/* give a specific prefix to the address */
++	addr[0] = 0x02;
++	addr[7] = idx;
++	hw->phy->perm_extended_addr = addr_to_le64(addr);
+ 
+ 	/* hwsim phy channel 13 as default */
+ 	hw->phy->current_channel = 13;
+diff --git a/drivers/net/ieee802154/mac802154_hwsim.h b/drivers/net/ieee802154/mac802154_hwsim.h
+index 6c6e30e38..536d95eb1 100644
+--- a/drivers/net/ieee802154/mac802154_hwsim.h
++++ b/drivers/net/ieee802154/mac802154_hwsim.h
+@@ -1,6 +1,8 @@
+ #ifndef __MAC802154_HWSIM_H
+ #define __MAC802154_HWSIM_H
+ 
++__le64 addr_to_le64(u8 *addr);
++
+ /* mac802154 hwsim netlink commands
+  *
+  * @MAC802154_HWSIM_CMD_UNSPEC: unspecified command to catch error
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.43.0
+
 
