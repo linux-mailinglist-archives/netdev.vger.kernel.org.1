@@ -1,138 +1,148 @@
-Return-Path: <netdev+bounces-177747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52DC7A71820
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 15:11:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A22F3A71833
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 15:15:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B5C83B8313
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 14:09:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6B1717234A
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 14:15:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BEE01EFFBC;
-	Wed, 26 Mar 2025 14:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A51F71F1913;
+	Wed, 26 Mar 2025 14:15:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MgJD9wLA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="garKwtRj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF041EFF98
-	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 14:10:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F7C1EA7F9;
+	Wed, 26 Mar 2025 14:15:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742998203; cv=none; b=tgfRnRc/2MIOztj1zCD6k19f6gZT6G+YEjwpWz3dBcLzYMaaWzuN+2rn2zcztq1zcULfrChiN51rcbWKYlJVoZT2fOXPcHje0wnO5T67RYwdv2uTLFPpuqwlKVZU7lx2w0xfFUYwk+0kqPc3q71NG2QzzTN9VdMRy9sdzcIPPcU=
+	t=1742998525; cv=none; b=TugAH4T2p3wlTXCO1rmOSoFstVCHF/1cO7RR2XdqgyDd36be8C51xQOW/b2Pix0ndmFs4hF0v7Q8hy7fCUZpj3GcvscbXGgmTiniSk6f6wyi8ItvCgi8zBwaZ2HdQzh2q+qaapAym3TYxMYYYJ3TZWhapqEhk44S/dzNEu4SB/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742998203; c=relaxed/simple;
-	bh=TiT5Ac7TPTnCg+kaSQKFZgIZG7AtDCZpkkpuxB0RSkU=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=SQBVi/IJaL0DbNfrJezT7jdVENjJap2afbTmGMcY9eWyjIWP7ZVUdd/AZ1E74tTOVIxCtOi/oflcuzotLS/X9OobZZG0NAtzLYnH06Z+q7a1bv+dinPacarZFmxFDnkVmX9+qtrfnU66FLXfQ3Tr20N+WFRLzlsW9O/Qx4Om5Zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MgJD9wLA; arc=none smtp.client-ip=209.85.222.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7c5e39d1db2so84352185a.3
-        for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 07:10:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742998201; x=1743603001; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CAknjqi5ofJbFzoVt7wCX3+vBejJwzZAlNg3vXeX8Nk=;
-        b=MgJD9wLAbhqqSE7mTjYhqhDmq8VuZNOv0Eb8tNBv5GUYo4cjb1G/6F4TUa6k9JHBdu
-         BXHZ9sX5lr1xlqtId6jteIbN9N2UZ18oJJrCdmQLJ5oyVFBysIYAttEw5+eqQ+DP6hca
-         Vi/Cu0rrwQad0znILFCBITy6d8Qagmw+B/7QShyUIsaTJY/NnSBeL/n4zgDpouAhcWt0
-         PbzwTtXuMzFCShwehMDQucfPNfjyGy9lmx9MAvxKETeuVCprCrdT1z69qauIjw44cOmM
-         t9rqDGpio+M36gd/TBPoMXqh7ZOGr06j8+mvWBMopksb5ptVEypLV02m7SxY3JzfVplb
-         XKLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742998201; x=1743603001;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=CAknjqi5ofJbFzoVt7wCX3+vBejJwzZAlNg3vXeX8Nk=;
-        b=KCKcI28Z6UzcnAyD0iR+begyehNjd7pdInwcmtzGKVWR7071aI7EOjaUqZpJpxhsyC
-         gD9XxD8UvbtcY4I2CVhRZe7WjxjEiuaxSiir58yW4wlQnbri0qZkc3tz7uTbcrAJ3St2
-         Oq0200ycE1xvAc/YG1vXhrlt7K9Rg/oc2+j73XlSXCoflXUhcRiuzHPTmJfu+eATmLyW
-         i4Y24ODYeSeYhxpK66yF1/Dus9Y0KKOtqbhIjm88kEwfHYBg6BOIrLinp/vy2NxuCoOJ
-         rGKRcL8pCUjSYO3YnproyB7ma1trgcrIImxDhPw3dQIO5rZYe57KaLXZ+EEcPUToUz1o
-         UKig==
-X-Forwarded-Encrypted: i=1; AJvYcCVBfbaQF+wAED8jykKy7pecMrD+h5SB917oK5+p+3E0EBZsvPKxWYNnuIF1EQ6Y009FqiCZb5k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJ+A/zZq1CrvU2HdZqkCJ+sWJ9U+S7jCSELi7ivLVoLvp/M6ng
-	AuDw/+W643DQHRLgyIt1bwuKI9ttd1MgRHDig8CIUgsgm1uUJYchLMzuIw==
-X-Gm-Gg: ASbGncvWzY+qrG5EudUUTsTViYpTu0+tLYtHrmzERJBwKktekCz1EjLIhLeWE+FqEoK
-	OhCqgtJKVDXxRYd/lHxYFWY8HZAMl+IXnGHcMOPZQLaAeCs+6AT5IqikZbT693ecV361YKNMOXL
-	+JLyhKKKQ0dr2bCrXIpQOMVzpMC6v4YpjF+viDujXe/1yfZtuDW4zb4bd0NNen961d7102Ugs48
-	P08gz3mh1VjAIn9M0kX6wSHK4Jix4Tjg2cVDPHR6wTo9uKcq3Xu0aAMhElVTyrQ13BDTqqO9EbN
-	dbw/nuTVgNYBsC9KuXJgzHAag1T4ZTSqpoyKeQVgXHhs4tS09XMHUq9lJYSUQhtTeYwZQj6kmFG
-	AamJGbpPmU5CygVpl+Rc97A==
-X-Google-Smtp-Source: AGHT+IFgp5uaWkit8xB/KTZidRyR4MAQpHvWQeO8eGBgFt2QfdLePIbqPRpdWlUIMtteM0hSelPVjA==
-X-Received: by 2002:a05:620a:40c7:b0:7c5:460d:45de with SMTP id af79cd13be357-7c5ba133d4cmr3302877285a.8.1742998200597;
-        Wed, 26 Mar 2025 07:10:00 -0700 (PDT)
-Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c5b92b49a2sm772286585a.1.2025.03.26.07.09.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Mar 2025 07:10:00 -0700 (PDT)
-Date: Wed, 26 Mar 2025 10:09:59 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- David Ahern <dsahern@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, 
- Kuniyuki Iwashima <kuniyu@amazon.com>, 
- Kuniyuki Iwashima <kuni1840@gmail.com>, 
- netdev@vger.kernel.org
-Message-ID: <67e40ab7ba532_4bb5c294e3@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250325195826.52385-4-kuniyu@amazon.com>
-References: <20250325195826.52385-1-kuniyu@amazon.com>
- <20250325195826.52385-4-kuniyu@amazon.com>
-Subject: Re: [PATCH v2 net 3/3] selftest: net: Check wraparounds for
- sk->sk_rmem_alloc.
+	s=arc-20240116; t=1742998525; c=relaxed/simple;
+	bh=vG0DOe3IBVr+HcgMZZgwW/F29/365bkkNGRl4wzfDMs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UBT7bYWjT/oIzMifn5flbJQ8lE6Pur1ntAbioby64lvTB+Mb/CmrGVdk7tIt6CG5+Qk2fcg+Lxi3s9FLdbpKZ0UHDQaLC51anbhWdycjeRMgErZLXvuwYpmDVVhqB+TehYkKTAvtB7QUaJX+x6s4jWkGmG5eeTYLJPHnouWSIkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=garKwtRj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E77DDC4CEE2;
+	Wed, 26 Mar 2025 14:15:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742998524;
+	bh=vG0DOe3IBVr+HcgMZZgwW/F29/365bkkNGRl4wzfDMs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=garKwtRj7KwpwKzUP4RYPlVsPY9w10dYR7v2T7G0zn1KWQjQO/+pPLlu/5HPtNNH2
+	 Bt5Jz9bs+LiWua3X+chxD6Oavk14NpoEDmTaxFTqJjXaOHhYrPdhPQXzUrOga8+VZ/
+	 ilxV3THATr5K4bGmCvfP+ay3tQLjujvlCxZVS30HpdGJodz65xwVXZ1t9V5iHf4UO3
+	 hXenuZ4YA9XEGeX7802BGi0hs65kwr2FRqpLVl4eAqKxzkYDIq47H0GBE+XuWcMFEr
+	 7UJGTtbfdoPQvc+DDRyV4hmm+X90csiIZJGboVhN+yongGOsIZu22jGSXuFCmnPnFU
+	 gt4/2/mdnh8EA==
+Message-ID: <aac75b30-d63e-4206-9173-231edeb69c05@kernel.org>
+Date: Wed, 26 Mar 2025 15:15:14 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/5] dt-bindings: net: Add MTIP L2 switch description
+ (fec,mtip-switch.yaml)
+To: Lukasz Majewski <lukma@denx.de>, Andrew Lunn <andrew@lunn.ch>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ davem@davemloft.net, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, devicetree@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Richard Cochran <richardcochran@gmail.com>,
+ netdev@vger.kernel.org, Maxime Chevallier <maxime.chevallier@bootlin.com>
+References: <20250325115736.1732721-1-lukma@denx.de>
+ <20250325115736.1732721-3-lukma@denx.de>
+ <2ccab52d-5ed1-4257-a8f1-328c76127ebe@lunn.ch> <20250326144316.2ca252f7@wsk>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20250326144316.2ca252f7@wsk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Kuniyuki Iwashima wrote:
-> The test creates client and server sockets and sets INT_MAX to the
-> server's SO_RCVBUFFORCE.
+On 26/03/2025 14:43, Lukasz Majewski wrote:
+> Hi Andrew,
 > 
-> Then, the client floods packets to the server until the UDP memory
-> usage reaches (INT_MAX + 1) >> PAGE_SHIFT.
+>>> +  phy-reset-gpios:
+>>> +    deprecated: true
+>>> +    description:
+>>> +      Should specify the gpio for phy reset.  
+>>
+>> It seem odd that a new binding has deprecated properties. Maybe add a
+>> comment in the commit message as to why they are there. I assume this
+>> is because you are re-using part of the FEC code as is, and it
+>> implements them?
+>>
 > 
-> Finally, both sockets are close()d, and the last assert makes sure
-> that the memory usage drops to 0.
-> 
-> If needed, we can extend the test later for other protocols.
-> 
-> Without patch 1:
-> 
->   # Starting 2 tests from 2 test cases.
->   #  RUN           so_rcvbuf.udp_ipv4.rmem_max ...
->   # so_rcvbuf.c:163:rmem_max:Expected pages (524800) <= *variant->max_pages (524288)
->   # rmem_max: Test terminated by assertion
->   #          FAIL  so_rcvbuf.udp_ipv4.rmem_max
->   not ok 1 so_rcvbuf.udp_ipv4.rmem_max
-> 
-> Without patch 2:
-> 
->   #  RUN           so_rcvbuf.udp_ipv4.rmem_max ...
->   # so_rcvbuf.c:170:rmem_max:max_pages: 524288
->   # so_rcvbuf.c:178:rmem_max:Expected get_prot_pages(_metadata, variant) (524288) == 0 (0)
->   # rmem_max: Test terminated by assertion
->   #          FAIL  so_rcvbuf.udp_ipv4.rmem_max
->   not ok 1 so_rcvbuf.udp_ipv4.rmem_max
-> 
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> In the case of MTIP L2 switch, the reset gpio line (in my case, but
+> also on e.g. imx28-evk, and vf610) is single for both PHYs.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+That's kind of proof that property was not placed in correct place.
+
+> 
+> I could move the reset to mdio child nodes, but this would be
+> problematic, as asserting reset on one PHY would reset the second one.
+
+It wouldn't if you used reset controller framework for that GPIO. Please
+move the GPIOs to the device actually having the line, so the GPIOs.
+
+Since a year such workarounds are not allowed in kernel anymore.
+
+Best regards,
+Krzysztof
 
