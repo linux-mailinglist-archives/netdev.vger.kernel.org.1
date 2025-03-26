@@ -1,113 +1,155 @@
-Return-Path: <netdev+bounces-177821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06D5DA71E79
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 19:33:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 364E9A71E84
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 19:36:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 988B31763B7
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 18:33:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BE76175EED
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 18:35:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6D4923FC54;
-	Wed, 26 Mar 2025 18:33:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58A7124C07F;
+	Wed, 26 Mar 2025 18:35:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="DY1KRstn"
+	dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b="fQX9At8r"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from ksmg01.maxima.ru (ksmg01.maxima.ru [81.200.124.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0F6649659;
-	Wed, 26 Mar 2025 18:33:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B784019CD19;
+	Wed, 26 Mar 2025 18:35:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.200.124.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743013989; cv=none; b=FaN/sCyO2i601MwgiEoEJgQMxpImGk7NX8WY4tmUV7/ayWzd1KDKXcnFkhTwX7JDNTLZaJAtFFdS3QeXjyRBAkQx41rwuCNAwyjQQHbyq4DabrI+janmJbfQbVaE2rRGhQh0GhgF6wLqOzoK/1oeqUUlSbKKNN2qgjyyTwC37hM=
+	t=1743014128; cv=none; b=BSebRK/MiL3thA0iQOPE3pxNVf2907BqKmU5uBYzOISHGhFUvTqBe5btwmjbm2oAfd0f5fUkSXKbzpz91VaBnxslzamv8hsp5ySYzsqkwvq/bm9pikzQKhLKODtwnI3gzzdcgvPhL2+//CpWPreG+Qn0xzigBMu6AKaUObAE0uc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743013989; c=relaxed/simple;
-	bh=H0WXYCkOruHYlRYfNbikAmGGuU6Z90xa4UIW4J8YeYw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hqPW+S7JvUzMsWMZluXtC3xldz6KUTrKeN52iIUk3joc4W+TUMKPlkrI4mhyyTutKEOuD6Ch0+cD/1BOjxLIY08LxNWTAty9tviBsL4aajZr9peMjhVKLBCQC++4kwR++vTj/XQvqXqTv0SJ70754L1xybt0vXijO6txUlTFLII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=DY1KRstn; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ryEB0XASAK2pygu+vzvMr1XOWAUfXVnhydu7SRIwMUY=; b=DY1KRstnirVjWnobv2tNwEo6CQ
-	awzsx1zrrP7fw2PPlf2/tlxDUtE1WR5pygD/tXvXwOm5jV4rEZm5VvdDGEoG5Pcm5gHoJTTL5NPxl
-	rYkxjqLz3XQ4tNhE/O2WdlXXYjCqh0lHub5AGZqrrVVlAK3YAtzHsBDrf3rCl4tvOMVKxvfcDs1yX
-	N89GZAcWfGZXmFzzWtYc10y7wSJWYXKBtGXnjq+3FtK6AYLkiHdY2ZLOC53tHQldMt5oP5jj8I1JK
-	aGdRtLZmf62R3FHjozjHmOgeB8qrktWabgkAPxWs1vrKRua5GQHjejhthtgCM956tpKX8Ky+dL+C0
-	rKYbzVDw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35980)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1txVYe-0006SW-2z;
-	Wed, 26 Mar 2025 18:32:57 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1txVYc-0004dJ-1m;
-	Wed, 26 Mar 2025 18:32:54 +0000
-Date: Wed, 26 Mar 2025 18:32:54 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next RFC PATCH v2 2/3] net: phy: Add support for Aeonsemi
- AS21xxx PHYs
-Message-ID: <Z-RIVkVOgpzTjKZv@shell.armlinux.org.uk>
-References: <20250326002404.25530-1-ansuelsmth@gmail.com>
- <20250326002404.25530-3-ansuelsmth@gmail.com>
- <dfa78876-d4a6-4226-b3d4-dbf112e001ee@lunn.ch>
- <Z-RCiWzRWbv7RlHJ@shell.armlinux.org.uk>
- <67e444e6.050a0220.81044.004e@mx.google.com>
+	s=arc-20240116; t=1743014128; c=relaxed/simple;
+	bh=2lgBBLJUUxgEd4UPG1SLJAQoj1g2+UrjIKRChLdrBmg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qWh0ZN9zJsgtkMA2ZK/Xi/BMbhoEbQs/Ft3IVTp+VZ2ANmESE/3t/EqVzBoKyAkl4eqAINURz3uNoqmgAXOvJOitSs5IeIVC2K3amLxgypRWYUIYHW3ywA7ccaRBgB9DSgzsi8fyc5UgHrgy067T3OhY0tDBowbjMnRtQsGsth8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru; spf=pass smtp.mailfrom=mt-integration.ru; dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b=fQX9At8r; arc=none smtp.client-ip=81.200.124.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mt-integration.ru
+Received: from ksmg01.maxima.ru (localhost [127.0.0.1])
+	by ksmg01.maxima.ru (Postfix) with ESMTP id 5FC49C001C;
+	Wed, 26 Mar 2025 21:35:23 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ksmg01.maxima.ru 5FC49C001C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mt-integration.ru;
+	s=sl; t=1743014123; bh=QwzNWD0m4wd3ds9iEF+6Fzl1TeTeKGkwr+542XGr2+Q=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=fQX9At8rdW9CrByFE9cv8yWphGwOlFGLDzLFaq3v0/tPXmYalLd6nhVKMMzH6WFM8
+	 X1xlZ+4AwWB8Yvi/qhMKyal5AMI2AB4Z/FqBv6BtsLeY+M01HUs4VcT0hNxyoDYYVC
+	 sJS2baPox7fc2/3cOQse2iGPjwUdlulMnGn6tMAsc7Kj1yxDo4hvyAQnZNRYz4dAW/
+	 Q2x1PvSGc+mFbH/PNBNLiSW/+/6PgdWNpExRXJo9RCZsaZA/QpQrqpSdELnDQ96wuS
+	 RTxp5irPtC4zYSWFTxO9FbL76w2rUuDpviED0bytBh8apNsShg+fiH7I/FyUyxa5J3
+	 CuhqMHH8+Xedg==
+Received: from ksmg01.maxima.ru (autodiscover.maxima.ru [81.200.124.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client CN "*.maxima.ru", Issuer "GlobalSign GCC R3 DV TLS CA 2020" (verified OK))
+	by ksmg01.maxima.ru (Postfix) with ESMTPS;
+	Wed, 26 Mar 2025 21:35:23 +0300 (MSK)
+Received: from localhost.maximatelecom.ru (5.1.51.21) by mmail-p-exch01.mt.ru
+ (81.200.124.61) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1544.4; Wed, 26 Mar
+ 2025 21:35:20 +0300
+From: Vitaliy Shevtsov <v.shevtsov@mt-integration.ru>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+CC: Vitaliy Shevtsov <v.shevtsov@mt-integration.ru>, Claudiu Manoil
+	<claudiu.manoil@nxp.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	<UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<lvc-project@linuxtesting.org>
+Subject: [PATCH v2] net: dsa: felix: check felix_cpu_port_for_conduit() for failure
+Date: Wed, 26 Mar 2025 23:34:57 +0500
+Message-ID: <20250326183504.16724-1-v.shevtsov@mt-integration.ru>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <67e444e6.050a0220.81044.004e@mx.google.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: mt-exch-01.mt.ru (91.220.120.210) To mmail-p-exch01.mt.ru
+ (81.200.124.61)
+X-KSMG-AntiPhishing: NotDetected
+X-KSMG-AntiSpam-Auth: dmarc=none header.from=mt-integration.ru;spf=none smtp.mailfrom=mt-integration.ru;dkim=none
+X-KSMG-AntiSpam-Envelope-From: v.shevtsov@mt-integration.ru
+X-KSMG-AntiSpam-Info: LuaCore: 51 0.3.51 68896fb0083a027476849bf400a331a2d5d94398, {rep_avail}, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;81.200.124.61:7.1.2;mt-integration.ru:7.1.1;ksmg01.maxima.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s, ApMailHostAddress: 81.200.124.61
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiSpam-Lua-Profiles: 192129 [Mar 26 2025]
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Version: 6.1.1.11
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/03/26 10:13:00 #27825781
+X-KSMG-AntiVirus-Status: NotDetected, skipped
+X-KSMG-LinksScanning: NotDetected
+X-KSMG-Message-Action: skipped
+X-KSMG-Rule-ID: 7
 
-On Wed, Mar 26, 2025 at 07:18:12PM +0100, Christian Marangi wrote:
-> On Wed, Mar 26, 2025 at 06:08:09PM +0000, Russell King (Oracle) wrote:
-> > An alternative would be to change the match_phy_device() method to
-> > pass the phy_driver, which would allow a single match_phy_device
-> > function to match the new hardware ID values against the PHY IDs in
-> > the phy_driver without needing to modify the IDs in phy_device.
-> > 
-> 
-> I also considered extending the function with additional stuff but then
-> I considered that would mean rework each PHY driver and destroy PHY
-> driver downstream, not something we should care but still quite a big
-> task. If the -ENODEV path is not OK, I feel an additional OP is better
-> than tweaking match_phy_device.
+felix_cpu_port_for_conduit() can return a negative value in case of failure
+and then it will be used as a port index causing buffer underflow. This can
+happen if a bonding interface in 802.1Q mode has no ports. This is unlikely
+to happen because the underlying driver handles IFF_TEAM, IFF_MASTER,
+IFF_BONDING bits and ports populating correctly, it is still better to
+check this for correctness if somehow it fails.
 
-For those in the kernel, 8 files, 26 initialisers.
+Check if cpu_port is non-negative before using it as an index.
+Errors from change_conduit() are already handled and no additional changes
+are required.
 
-drivers/net/phy/nxp-c45-tja11xx.c can probably be simplified with
-this idea, reducing it down to a pair of functions.
+Found by Linux Verification Center (linuxtesting.org) with Svace.
 
-drivers/net/phy/bcm87xx.c can probably be reduced to one match function.
+Signed-off-by: Vitaliy Shevtsov <v.shevtsov@mt-integration.ru>
+---
+v2: return the real cpu value instead of -EINVAL as per Andrew Lunn observation.
 
-So, doing so would appear to bring benefits to other PHY drivers.
+ drivers/net/dsa/ocelot/felix.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/net/dsa/ocelot/felix.c b/drivers/net/dsa/ocelot/felix.c
+index 0a4e682a55ef..1495f8e21f90 100644
+--- a/drivers/net/dsa/ocelot/felix.c
++++ b/drivers/net/dsa/ocelot/felix.c
+@@ -523,6 +523,7 @@ static int felix_tag_npi_change_conduit(struct dsa_switch *ds, int port,
+ {
+ 	struct dsa_port *dp = dsa_to_port(ds, port), *other_dp;
+ 	struct ocelot *ocelot = ds->priv;
++	int cpu;
+ 
+ 	if (netif_is_lag_master(conduit)) {
+ 		NL_SET_ERR_MSG_MOD(extack,
+@@ -546,7 +547,12 @@ static int felix_tag_npi_change_conduit(struct dsa_switch *ds, int port,
+ 	}
+ 
+ 	felix_npi_port_deinit(ocelot, ocelot->npi);
+-	felix_npi_port_init(ocelot, felix_cpu_port_for_conduit(ds, conduit));
++	cpu = felix_cpu_port_for_conduit(ds, conduit);
++	if (cpu < 0) {
++		dev_err(ds->dev, "Cpu port for conduit not found\n");
++		return cpu;
++	}
++	felix_npi_port_init(ocelot, cpu);
+ 
+ 	return 0;
+ }
+@@ -658,6 +664,11 @@ static int felix_tag_8021q_change_conduit(struct dsa_switch *ds, int port,
+ 	int cpu = felix_cpu_port_for_conduit(ds, conduit);
+ 	struct ocelot *ocelot = ds->priv;
+ 
++	if (cpu < 0) {
++		dev_err(ds->dev, "Cpu port for conduit not found\n");
++		return cpu;
++	}
++
+ 	ocelot_port_unassign_dsa_8021q_cpu(ocelot, port);
+ 	ocelot_port_assign_dsa_8021q_cpu(ocelot, port, cpu);
+ 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.48.1
+
 
