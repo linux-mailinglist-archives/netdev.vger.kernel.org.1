@@ -1,318 +1,170 @@
-Return-Path: <netdev+bounces-177835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24D2EA7200B
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 21:34:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED406A7200E
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 21:38:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A60251670C0
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 20:34:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D185168A13
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 20:38:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF7B217F36;
-	Wed, 26 Mar 2025 20:34:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9FEC2192E2;
+	Wed, 26 Mar 2025 20:38:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rpOmmimI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LuB7ipH4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE861A2541
-	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 20:34:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25FF0137930
+	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 20:38:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743021286; cv=none; b=kuSBA42He9q7CSwagiQy/sEi9tJk8JsH7L05wupJFYQL38kHIOeSZ2BcRYRzcEQq38RqxZR77JMRgwBfQaPOJl7ri4JDDDOiFQ+ch3XKylzj3hgspQei4QoQrmCso0ChOb0sWfOnf7eJj2R/2NqdHQubznFvF4gS1DV6nEyXc9Y=
+	t=1743021482; cv=none; b=nxaGcaHsBC1wU8Q++XbVlXpebj1LhiXElj3E8K89bfmw8LBBL+6lHoDCXQrMYrWko73Z0Z4Rwj6Q0+LvWcz/L7C60JW7jeCUw8A9mbjRvU3zSdxYSN5He0BiuecNpoZz9rzLqXmFgy8JF7+hMsb2MX5NSfSt2V/+xlMiuyt3jAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743021286; c=relaxed/simple;
-	bh=4jI7BPOWxCFJZt69ClErP/iLRGP1r6tfCjpgLD8azAg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sRIM1Hf9N1IfAqRtbyLQL5IzZucg1hbK2GdaW3viEgn0DBk4EMBlddLHGs8VpEP+Kpi8w52akRqBcpBHc4ykWdThpBzUmfqe81GB6D8//s55J22H7xpnhGAwk31a1y/wMrpIvPn82ILS7HvxafGnCCbVI5ry04ZNA31zU/xJV14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rpOmmimI; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2240aad70f2so62555ad.0
-        for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 13:34:43 -0700 (PDT)
+	s=arc-20240116; t=1743021482; c=relaxed/simple;
+	bh=bsv80saC4YRtAruQYOL7i3btQ31Y628tKi1leEfteJ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RxPTijmlSd7EK4eWf1JIIcoLCWO8XdMEOrwH2B6/pYA0D4b3j4LPcHlVEMjRnaohjQ3yGEvIVeajsZ7WU01P6Goj4svzP6ZGsb3uatYkBFCmGr/Pjq4MkEIlRvVPQU11KLok0us6xv3am6scNM4p3uPDJRpZMXtUI7GiVXjU1Ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LuB7ipH4; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-301302a328bso388157a91.2
+        for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 13:38:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743021283; x=1743626083; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/q9fdOzJIcQKZQnYODOVoJPDaxhtubiEVgPHEqA0OHQ=;
-        b=rpOmmimIkvt3eVoFvgheIRQrF7Zycp1ZgccZRVSetp+UhbSAfxtqFZEwVzdMNMhlRD
-         fCiTLAyMWZwmksMWHdOuiguNdIq02oWAVa+4c7SLdG2kXvB210ZVyKLzpbryAdZQ/tWh
-         6dV10cGTnC9VRG5v92vlQgMQr0i0IfJAc/uo+n1m9yfMHAH+2GucxB5iYeTt7CAhgXx0
-         Bc7ZUNvEnxLl/dwAw/Vxpq6Tah5tMjqE4qGxpVvH7vFd9yrMkpiW0YM9Vpas46k6F1B1
-         Qm7F4jliFnl+PZPbYnN2NnsdmXuW9RlYocZfmwfRX91ue0qf2cg2r1I22F+14Kje2KxT
-         TRhA==
+        d=gmail.com; s=20230601; t=1743021480; x=1743626280; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=wZDOziDl+wlAYrzasrZTDtE0ds1SMnWLX8kiyFoieWc=;
+        b=LuB7ipH45Vo14ESRiVN9okiyg86KaPdU4wvUq4TSKSIh23VBx6PPVC37vKgHvB2lm/
+         HuzRC72x5Q8jYFYLikwe2ozseHNNwi0uUiCHSvqmdoesgbCiIgqEMEo0dSdUCTjX4VSk
+         44Jx+b2lvZt4ssY9N1xArIUr/3tM3k1Jo5Xx5g1hIntN8AmDZhaAPh03sJbH5RAD7Xl5
+         +9o3snbB/XG7tLGB/E2ZqOQgArWWiHT/uZF7o9CKHP9GR+Is/7OpOFqsvlhV/791LL1M
+         hGPbYQUjYPvnxX2ackZucf+iZG3vkxKPDaUz/tfXHGs+crRz3lJeI1AQPyx3uX8Vvhlh
+         kSpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743021283; x=1743626083;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/q9fdOzJIcQKZQnYODOVoJPDaxhtubiEVgPHEqA0OHQ=;
-        b=M4v8c67gJz1aVLXh6E7ZC44qGvs13i2zDsiv/9NPIcQ+HpHMwpPeaDSE8SX2JsH9uT
-         pGAsXqTmaa33gi0cl6zLC6FuPZN3Jhc9QFBoeWRnuWCOXht4iHKV1+byN5k3643l7Lxm
-         Xy68SyJxMBW/palYBEruCEDERuEGZklWiM80O7eWDzpbwnWssuSg8Q1+810aok7MvARw
-         pegG30gJP8/bY4Y+dJ5ETY6bsx9vqeCkh1hOfn1KGtQj/VTUSf6VS7seaFhX/F0df28G
-         ZJPF+mKUNAE9GudEmCZsegB2+qdMrufncgkagVCt3jSvAbthG1tC2emN9t/UIwFj1oLu
-         qAGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXbBdcN+oNwWKul2kEa/4lRmCVQayLZ46g+/vcG/QZkGtO9U7dOTyVnWdxRbnn7upbptiF0AoA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSXh3/yNEzC3EZnLc57JU7UAcbmRRN2M9c1TzhGgxemYuH+RAB
-	GZH3LDjWFmcnGZfv3nPrrbjql0i7TBbWPzuyi5SwGnYgjs/MCuZ8DJnqDFWQCUtCmSLM3CxPA3+
-	qA0Ga9PtRqJ8t+QF777h2AEu4VLsRTP9kdL8r
-X-Gm-Gg: ASbGnctLdrFRLO6I1/1cjB2XAlKbt0ePkNNELwo1L/C+vay3KIysQxq6NX/hI9OHD6+
-	8w83tLS7daVfzKDn8X554b/JHn9U7grYGtUIX6gn59++qEQbDx82LJsOf4JIMNVfbbjPxVshS2r
-	USf8miX1QisiMWLuXmFuSjIuLJYLVAGDdrBUG2kJyCZ6vXudxjEVeKHb7Bpg==
-X-Google-Smtp-Source: AGHT+IG+X30YZBwojbi4Kt3B1IbwB55meKVtn2eks7YDYJiw3G7aafqU2Dv4SX6I+DXH+1kaeoJcbhBay6zPwvlySyM=
-X-Received: by 2002:a17:902:b20f:b0:21f:465d:c588 with SMTP id
- d9443c01a7336-22806c48d0amr207615ad.14.1743021282246; Wed, 26 Mar 2025
- 13:34:42 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743021480; x=1743626280;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wZDOziDl+wlAYrzasrZTDtE0ds1SMnWLX8kiyFoieWc=;
+        b=BxiiSGX5ytrJmpT96iEJs+iBYtXpRRgq0tj3Fu1gvR6LpyUHJAExnpez+r6vr9JoEr
+         isKGfeLBw0d2e5iICtjeABhVGL6r8/lP/p0IKvsigfOBHr8GKA90Ekg7wqr0dx4YbgtK
+         vmVS0Xl3PCuCe5XGnroGxzUL0/k6FTL6PDmHLDM4cKCRq8rRx7DmW2WGSf7qxO0d1X2C
+         SIIE2yfqU+vUgnVrixKokjnn6liqmhadP4Hqa/A0q4gIyu+4w5fko58chCPlHO+OEy+f
+         VLaD/H1nnJAooWxahmlsUokC+74wOjh2l35uHU/QE7UoCTQqBHaIizs+vPZKMFpDaGzu
+         vQeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX9dWIDEySdm1ZtNpW7U3DRKMxQ3XoYIWgzK6j8st9FpvafkDQ9p5GqsqixHe3YPMPUB+5MXbk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUsDAQPK5pEEsDzxoxUzjYdsA/3Vl9pCPxI4rtSmbJDs3WZcS0
+	7NVudXSH3/bYqQXZT+li90/H+o/eQKDbLM/pm+LCYZ0BlgbJgZ0=
+X-Gm-Gg: ASbGncs+uVKh+W50MhxdzVFFuDXRtqJ1hsLrYCmCQvMR9iQZdOUd/DtWD3+F6zSyfwJ
+	vP3fUgzBdxEILVY+xTM1lwl9II76kOaadLBlF/9yY8NOt563omVRA1O3POCTA4ro0E7PE7gdEFV
+	sXmZbkn4GZ0iU8Yx7mRGmJs18kuaY/XE2SnFDWlNPYX8raGtYKpQhLdsApyp6dNF2eS0Ea5p3MB
+	/zP8OGb/gw3e6/itd6TATCTIxPF5r4NHdRvDqU3no0M3I70Hz4Cfr8astjJ310BBD8fynZtk0c/
+	KjPg+eBPUcZ21jwwTGzBb/9OW2QIOtYxl0OxTCnjw7l4saJZfu2qPmI=
+X-Google-Smtp-Source: AGHT+IGVrwfUKXLvqL9nLVebtnA/S9KIAHVbnTjjG3MpMoLgH+wT+veTulYE1OoiS5NSNd0x7zYkTg==
+X-Received: by 2002:a17:90b:5243:b0:2ee:8427:4b02 with SMTP id 98e67ed59e1d1-303a906c163mr1701009a91.28.1743021480164;
+        Wed, 26 Mar 2025 13:38:00 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-3039e10baa2sm755481a91.24.2025.03.26.13.37.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Mar 2025 13:37:59 -0700 (PDT)
+Date: Wed, 26 Mar 2025 13:37:58 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: "pabeni@redhat.com" <pabeni@redhat.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"sdf@fomichev.me" <sdf@fomichev.me>,
+	"kuba@kernel.org" <kuba@kernel.org>
+Subject: Re: [PATCH net-next 2/9] net: hold instance lock during
+ NETDEV_REGISTER/UP/UNREGISTER
+Message-ID: <Z-Rlpgp3vb-zsgSM@mini-arch>
+References: <20250325213056.332902-1-sdf@fomichev.me>
+ <20250325213056.332902-3-sdf@fomichev.me>
+ <86b753c439badc25968a01d03ed59b734886ad9b.camel@nvidia.com>
+ <Z-QcD5BXD5mY3BA_@mini-arch>
+ <672305efd02d3d29520f49a1c18e2f4da6e90902.camel@nvidia.com>
+ <Z-Q-QYvFvQG2usfv@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250321021521.849856-1-skhawaja@google.com> <451afb5a-3fed-43d4-93cc-1008dd6c028f@uwaterloo.ca>
- <CAAywjhSGp6CaHXsO5EDANPHA=wpOO2C=4819+75fLoSuFL2dHA@mail.gmail.com> <b35fe4bf-25d7-41cd-90c9-f68e1819cded@uwaterloo.ca>
-In-Reply-To: <b35fe4bf-25d7-41cd-90c9-f68e1819cded@uwaterloo.ca>
-From: Samiullah Khawaja <skhawaja@google.com>
-Date: Wed, 26 Mar 2025 13:34:30 -0700
-X-Gm-Features: AQ5f1JpHSc3-3gGWlspKYfIzKoq497l3mqVDlJf8eP3wzcPSMzEqm-AQo3OHndw
-Message-ID: <CAAywjhRuJYakS4=zqtB7QzthJE+1UQfcaqT2bcj6sWPN_6Akeg@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 0/4] Add support to do threaded napi busy poll
-To: Martin Karsten <mkarsten@uwaterloo.ca>
-Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, 
-	willemb@google.com, jdamato@fastly.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z-Q-QYvFvQG2usfv@mini-arch>
 
-On Tue, Mar 25, 2025 at 10:47=E2=80=AFAM Martin Karsten <mkarsten@uwaterloo=
-.ca> wrote:
->
-> On 2025-03-25 12:40, Samiullah Khawaja wrote:
-> > On Sun, Mar 23, 2025 at 7:38=E2=80=AFPM Martin Karsten <mkarsten@uwater=
-loo.ca> wrote:
-> >>
-> >> On 2025-03-20 22:15, Samiullah Khawaja wrote:
-> >>> Extend the already existing support of threaded napi poll to do conti=
-nuous
-> >>> busy polling.
-> >>>
-> >>> This is used for doing continuous polling of napi to fetch descriptor=
-s
-> >>> from backing RX/TX queues for low latency applications. Allow enablin=
-g
-> >>> of threaded busypoll using netlink so this can be enabled on a set of
-> >>> dedicated napis for low latency applications.
-> >>>
-> >>> Once enabled user can fetch the PID of the kthread doing NAPI polling
-> >>> and set affinity, priority and scheduler for it depending on the
-> >>> low-latency requirements.
-> >>>
-> >>> Currently threaded napi is only enabled at device level using sysfs. =
-Add
-> >>> support to enable/disable threaded mode for a napi individually. This
-> >>> can be done using the netlink interface. Extend `napi-set` op in netl=
-ink
-> >>> spec that allows setting the `threaded` attribute of a napi.
-> >>>
-> >>> Extend the threaded attribute in napi struct to add an option to enab=
-le
-> >>> continuous busy polling. Extend the netlink and sysfs interface to al=
-low
-> >>> enabling/disabling threaded busypolling at device or individual napi
-> >>> level.
-> >>>
-> >>> We use this for our AF_XDP based hard low-latency usecase with usecs
-> >>> level latency requirement. For our usecase we want low jitter and sta=
-ble
-> >>> latency at P99.
-> >>>
-> >>> Following is an analysis and comparison of available (and compatible)
-> >>> busy poll interfaces for a low latency usecase with stable P99. Pleas=
-e
-> >>> note that the throughput and cpu efficiency is a non-goal.
-> >>>
-> >>> For analysis we use an AF_XDP based benchmarking tool `xdp_rr`. The
-> >>> description of the tool and how it tries to simulate the real workloa=
-d
-> >>> is following,
-> >>>
-> >>> - It sends UDP packets between 2 machines.
-> >>> - The client machine sends packets at a fixed frequency. To maintain =
-the
-> >>>     frequency of the packet being sent, we use open-loop sampling. Th=
-at is
-> >>>     the packets are sent in a separate thread.
-> >>> - The server replies to the packet inline by reading the pkt from the
-> >>>     recv ring and replies using the tx ring.
-> >>> - To simulate the application processing time, we use a configurable
-> >>>     delay in usecs on the client side after a reply is received from =
-the
-> >>>     server.
-> >>>
-> >>> The xdp_rr tool is posted separately as an RFC for tools/testing/self=
-test.
-> >>
-> >> Thanks very much for sending the benchmark program and these specific
-> >> experiments. I am able to build the tool and run the experiments in
-> >> principle. While I don't have a complete picture yet, one observation
-> >> seems already clear, so I want to report back on it.
-> > Thanks for reproducing this Martin. Really appreciate you reviewing
-> > this and your interest in this.
-> >>
-> >>> We use this tool with following napi polling configurations,
-> >>>
-> >>> - Interrupts only
-> >>> - SO_BUSYPOLL (inline in the same thread where the client receives th=
-e
-> >>>     packet).
-> >>> - SO_BUSYPOLL (separate thread and separate core)
-> >>> - Threaded NAPI busypoll
-> >>
-> >> The configurations that you describe as SO_BUSYPOLL here are not using
-> >> the best busy-polling configuration. The best busy-polling strictly
-> >> alternates between application processing and network polling. No
-> >> asynchronous processing due to hardware irq delivery or softirq
-> >> processing should happen.
-> >>
-> >> A high-level check is making sure that no softirq processing is report=
-ed
-> >> for the relevant cores (see, e.g., "%soft" in sar -P <cores> -u ALL 1)=
-.
-> >> In addition, interrupts can be counted in /proc/stat or /proc/interrup=
-ts.
-> >>
-> >> Unfortunately it is not always straightforward to enter this pattern. =
-In
-> >> this particular case, it seems that two pieces are missing:
-> >>
-> >> 1) Because the XPD socket is created with XDP_COPY, it is never marked
-> >> with its corresponding napi_id. Without the socket being marked with a
-> >> valid napi_id, sk_busy_loop (called from __xsk_recvmsg) never invokes
-> >> napi_busy_loop. Instead the gro_flush_timeout/napi_defer_hard_irqs
-> >> softirq loop controls packet delivery.
-> > Nice catch. It seems a recent change broke the busy polling for AF_XDP
-> > and there was a fix for the XDP_ZEROCOPY but the XDP_COPY remained
-> > broken and seems in my experiments I didn't pick that up. During my
-> > experimentation I confirmed that all experiment modes are invoking the
-> > busypoll and not going through softirqs. I confirmed this through perf
-> > traces. I sent out a fix for XDP_COPY busy polling here in the link
-> > below. I will resent this for the net since the original commit has
-> > already landed in 6.13.
-> > https://lore.kernel.org/netdev/CAAywjhSEjaSgt7fCoiqJiMufGOi=3Doxa164_vT=
-fk+3P43H60qwQ@mail.gmail.com/T/#t
-> >>
-> >> I found code at the end of xsk_bind in xsk.c that is conditional on xs=
-->zc:
-> >>
-> >>          if (xs->zc && qid < dev->real_num_rx_queues) {
-> >>                  struct netdev_rx_queue *rxq;
-> >>
-> >>                  rxq =3D __netif_get_rx_queue(dev, qid);
-> >>                  if (rxq->napi)
-> >>                          __sk_mark_napi_id_once(sk, rxq->napi->napi_id=
-);
-> >>          }
-> >>
-> >> I am not an expert on XDP sockets, so I don't know why that is or what
-> >> would be an acceptable workaround/fix, but when I simply remove the
-> >> check for xs->zc, the socket is being marked and napi_busy_loop is bei=
-ng
-> >> called. But maybe there's a better way to accomplish this.
-> > +1
-> >>
-> >> 2) SO_PREFER_BUSY_POLL needs to be set on the XDP socket to make sure
-> >> that busy polling stays in control after napi_busy_loop, regardless of
-> >> how many packets were found. Without this setting, the gro_flush_timeo=
-ut
-> >> timer is not extended in busy_poll_stop.
-> >>
-> >> With these two changes, both SO_BUSYPOLL alternatives perform noticeab=
-ly
-> >> better in my experiments and come closer to Threaded NAPI busypoll, so=
- I
-> >> was wondering if you could try that in your environment? While this
-> >> might not change the big picture, I think it's important to fully
-> >> understand and document the trade-offs.
-> > I agree. In my experiments the SO_BUSYPOLL works properly, please see
-> > the commit I mentioned above. But I will experiment with
-> > SO_PREFER_BUSY_POLL to see whether it makes any significant change.
->
-> I'd like to clarify: Your original experiments cannot have used
-> busypoll, because it was broken for XDP_COPY. Did you rerun the
-On my idpf test platform the AF_XDP support is broken with the latest
-kernel, so I didn't have the original commit that broke AF_XDP
-busypoll for zerocopy and copy mode. So in the experiments that I
-shared XDP_COPY busy poll has been working. Please see the traces
-below. Sorry for the confusion.
-> experiments with the XDP_COPY fix but without SO_PREFER_BUSY_POLL and
-I tried with SO_PREFER_BUSY_POLL as you suggested, I see results
-matching the previous observation:
+On 03/26, Stanislav Fomichev wrote:
+> On 03/26, Cosmin Ratiu wrote:
+> > On Wed, 2025-03-26 at 08:23 -0700, Stanislav Fomichev wrote:
+> > > @@ -2028,7 +2028,7 @@ int unregister_netdevice_notifier(struct
+> > > notifier_block *nb)
+> > >  
+> > >  	for_each_net(net) {
+> > >  		__rtnl_net_lock(net);
+> > > -		call_netdevice_unregister_net_notifiers(nb, net,
+> > > true);
+> > > +		call_netdevice_unregister_net_notifiers(nb, net,
+> > > NULL);
+> > >  		__rtnl_net_unlock(net);
+> > >  	}
+> > 
+> > I tested. The deadlock is back now, because dev != NULL and if the lock
+> > is held (like in the below stack), the mutex_lock will be attempted
+> > again:
+> 
+> I think I'm missing something. In this case I'm not sure why the original
+> "fix" worked.
+> 
+> You, presumably, use mlx5? And you just move this single device into
+> a new netns? Or there is a couple of other mlx5 devices still hanging in
+> the root netns?
+> 
+> I'll try to take a look more at register_netdevice_notifier_net under
+> mlx5..
 
-12Kpkts/sec with 78usecs delay:
+I have a feeling that it's a spurious warning, the lock addresses
+are different:
 
-INLINE:
-p5: 16700
-p50: 17100
-p95: 17200
-p99: 17200
+ip/1766 is trying to acquire lock:
+ffff888110e18c80 (&dev->lock){+.+.}-{4:4}, at:
+call_netdevice_unregister_notifiers+0x7d/0x140
 
-> see the same latency numbers as before? Also, can you provide more
-> details about the perf tracing that you used to see that busypoll is
-> invoked, but softirq is not?
-I used the following command to record the call graph and could see
-the calls to napi_busy_loop going from xsk_rcvmsg. Confirmed with
-SO_PREFER_BUSY_POLL also below,
-```
-perf record -o prefer.perf -a -e cycles -g sleep 10
-perf report --stdio -i prefer.perf
-```
+but task is already holding lock:
+ffff888130ae0c80 (&dev->lock){+.+.}-{4:4}, at:
+do_setlink.isra.0+0x5b/0x1220
 
-```
- --1.35%--entry_SYSCALL_64
-            |
-             --1.31%--do_syscall_64
-                       __x64_sys_recvfrom
-                       __sys_recvfrom
-                       sock_recvmsg
-                       xsk_recvmsg
-                       __xsk_recvmsg.constprop.0.isra.0
-                       napi_busy_loop
-                       __napi_busy_loop
-```
+Can you try to apply the following on top of previous patch? At least
+to confirm whether it matches my understanding.. We might also stick
+with that unless we find a better option.
 
-I do see softirq getting triggered occasionally, when inline the
-busy_poll thread is not able to pick up the packets. I used following
-command to find number of samples for each in the trace,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index 3506024c2453..e3d8d6c9bf03 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -40,6 +40,7 @@
+ #include <linux/if_bridge.h>
+ #include <linux/filter.h>
+ #include <net/netdev_queues.h>
++#include <net/netdev_lock.h>
+ #include <net/page_pool/types.h>
+ #include <net/pkt_sched.h>
+ #include <net/xdp_sock_drv.h>
+@@ -5454,6 +5455,7 @@ static void mlx5e_build_nic_netdev(struct net_device *netdev)
+ 	netdev->netdev_ops = &mlx5e_netdev_ops;
+ 	netdev->xdp_metadata_ops = &mlx5e_xdp_metadata_ops;
+ 	netdev->xsk_tx_metadata_ops = &mlx5e_xsk_tx_metadata_ops;
++	netdev_lockdep_set_classes(netdev);
+ 
+ 	mlx5e_dcbnl_build_netdev(netdev);
+ 
 
-```
-perf report -g -n -i prefer.perf
-```
 
-Filtered the results to include only the interesting symbols
-```
-<
-Children      Self       Samples  Command          Shared Object
-          Symbol
-+    1.48%     0.06%            46  xsk_rr           [idpf]
-            [k] idpf_vport_splitq_napi_poll
-
-+    1.28%     0.11%            86  xsk_rr           [kernel.kallsyms]
-            [k] __napi_busy_loop
-
-+    0.71%     0.02%            17  xsk_rr           [kernel.kallsyms]
-            [k] net_rx_action
-
-+    0.69%     0.01%             6  xsk_rr           [kernel.kallsyms]
-            [k] __napi_poll
-```
-
->
-> Thanks,
-> Martin
->
 
