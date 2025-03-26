@@ -1,150 +1,150 @@
-Return-Path: <netdev+bounces-177667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85067A71080
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 07:25:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AE2BA7109C
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 07:35:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FAF53AE928
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 06:25:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE7183AEB8D
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 06:34:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2489818A95A;
-	Wed, 26 Mar 2025 06:25:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9619F190696;
+	Wed, 26 Mar 2025 06:34:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bN/PfR54"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oqWCSEWg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F78917578;
-	Wed, 26 Mar 2025 06:25:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B49F15381A;
+	Wed, 26 Mar 2025 06:34:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742970325; cv=none; b=Z6UPNVlCcclEmo07NTEwZUh54XoXLgligHaI9/wyfcZe8v8XIn93mXhE35K8AG78t2tD7v5aaOTuUas9iZnbYdXp8mcuADC6eXb6jElGGdfv4ktpy921Gd2kAnaX1fpr5guqAwsIXdxzGIHMuzzgZ5PjEt29lL+BGDo/ZVnWcZA=
+	t=1742970889; cv=none; b=rc9ipidDLJ1K1tCNBOxyi5M37nQpYbh/5+j+1GkaeCQWxePYK0PHuWwQ//gg2tjT8jWGVylJbhEy8VO+Kfaqi6H0EZLukBNvI9PtQWPYDPmYNHxAzij0dDfTnR0GGTtZQBn9FGUFUjY/eclfJEPZR49LUu1VWNB6CJV6ZoxavaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742970325; c=relaxed/simple;
-	bh=VeS52Ya4cFStBppr0P0ppjIK+rOi6u5HKxczZOTGv/M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nT+CjZ4BTbCdE8x48nqm0XZxQGKO9zpo3gqmq0Nk7skgxOECA5qC3twF4428oe+eRiRhrtTZy81a5zBnlPxKJ+Fv72VbnK7N5VZ9q9aS9PUW6zoJdiUBAeN4VwP0YFWP2U4CotGtylLNXh2l1f/bRkibU6swJxqTjiGGXAIAPRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bN/PfR54; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-22580c9ee0aso132313035ad.2;
-        Tue, 25 Mar 2025 23:25:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742970323; x=1743575123; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=F6XnYyjWBkgMuV0QYpprdE1lSJS48p3YW3OVQycrQ3A=;
-        b=bN/PfR54DzzXsWB0XT9P5JjuodqZBi7sq4yLYm8sYEf+A8/5FsTN5PjOKwPjPb2q1U
-         Zg710SQXddhyYB0XS4sRXRNY2Xo0AIaamfR9cYReeSUOynsp70a7VnkEvXtWYp0uvDbI
-         Y+hC2ANGTzzNoih5pyKCSn/qlmRWkWwTLv32N1tfkqBT5M17y79Onv6xkovxdyn87cd2
-         0mck1ES5bhgIG15D8QEJyClUeMv+th+cbYTStL15AWl1Q8MBp+Q8ituPSp1WmRtA6UnX
-         6a0lyRVijR9735CiispUMA73guJkPu1qT+3vV2s6/mPXcJmSukPIANPadrH1cgQMmL9I
-         wU4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742970323; x=1743575123;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F6XnYyjWBkgMuV0QYpprdE1lSJS48p3YW3OVQycrQ3A=;
-        b=gWJKkpnKTDe852TyI2GbYzs7SrG4D40QDK3ioFn43kXUNyML9bPuwazplTA2+NbJNw
-         ak4tcrQrsNy2m+CmIc+7YGG3zm9Vc3droTRIIPngLKTFCnJTNbXzKbSvqy5ZUYok7U5c
-         /XATx6YlvnJROf5GOQjoAIWDiA9LsuKRQz777fAqVSZ3G+5HrDacSfbAErjM3yPYYcaB
-         Wgqs3a9tCo2ZVhWxXjkgCYQAa85G90gOn/mpyQqUnr+19O7pat6Kwwmzyz78oGw6kZi1
-         +PqEZiNL82HQvzWKJWW0lHR3rW0QFbjehJ/2MfUKCPW6Ml15yucDyqQUSkbBRRGW3XIR
-         lDiA==
-X-Forwarded-Encrypted: i=1; AJvYcCVOJr2eBjNl1I3akyog3gearpctWZ8qhOrXjNN/vxuPyUmkfJvhLb5s2/WPmk+T4izeSqmP5jSqp09fA6k=@vger.kernel.org, AJvYcCVpn1xd8I4Uv2eWEKauhnbJtf2ZvkjiBH/dyS41RkMc4tmX54H+x/rc/3rEGuwB/9F1tNJO1G3t9ZzU7foVGj2a@vger.kernel.org, AJvYcCWUgBo4yGwABpGPIs9oSXZvZi0/DD/k+qoGoFEkmi4JzXzN9wu5LjJ1kGVNDeSEKyeK2mKUXx/T@vger.kernel.org
-X-Gm-Message-State: AOJu0YwdcJEzNzAI4zgbOY+Gi8w7RCCN3xR+b3Op3qrJZSswzALeDO+s
-	h6UL0bILyC5Vr37RIhIJIjK47YnVo6FAUnffjfDvhg5vn0RE8io7
-X-Gm-Gg: ASbGncv+HSzTpWpEK7zGcpUSVjzaDrooKaRouiLJksHxFZTsgtgsV5esZFeNjlNE2/d
-	hntO4N0qiTCW1QGt+FfoGJEEq9rlehSGaBBkX/099Jlg9Ry7p0Z/yLbXl4rdy4tSCg1MsZCoMJX
-	Nx02E6Cmlkz1VoLJuyTkveO3HThceTUn5GSKR1SDz0eH/tgSLyb0vdTZenhXAyJ2JHzQZq1Ytsj
-	mKyeamgHz38UJcy+gdEMiqenuW3GOSfeUXU7pyYw5QRn1fnxRal8Mumzvc3ufwMqFZ/d+cnC9wW
-	PYqbT/Ay9D8qgBSKdWUaYa5CFPd5gpFIMIO1rDOHBorWFLGGAgkP2FgMPZM2
-X-Google-Smtp-Source: AGHT+IGbQzaER9p8NCvfFy6KxwukYMbDG7UbjOpY3wRp0sjpX6Rtq+5qFqml7esczeTeUbTF9chCJw==
-X-Received: by 2002:a17:902:ef12:b0:224:249f:9734 with SMTP id d9443c01a7336-22780c54cfemr331643715ad.4.1742970322675;
-        Tue, 25 Mar 2025 23:25:22 -0700 (PDT)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-227811f44aesm101809365ad.217.2025.03.25.23.25.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Mar 2025 23:25:21 -0700 (PDT)
-Date: Wed, 26 Mar 2025 06:25:13 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Phil Sutter <phil@nwl.cc>, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>,
-	Petr Mladek <pmladek@suse.com>,
-	Yoann Congal <yoann.congal@smile.fr>, wireguard@lists.zx2c4.com,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCHv5 net-next 1/2] wireguard: selftests: convert iptables to
- nft
-Message-ID: <Z-Odyf51XgIuldV7@fedora>
-References: <20250322093016.16631-1-liuhangbin@gmail.com>
- <20250322093016.16631-2-liuhangbin@gmail.com>
- <Z-B4yfBvm2aXW_Ar@orbyte.nwl.cc>
+	s=arc-20240116; t=1742970889; c=relaxed/simple;
+	bh=2MGPnAtzDlcfNFkgrjhcbs+PSZK/71xFqiqfm4ICurw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N1BwKyi41vq1bPoormQrP6RfW1WVndmK57FDr+17ZZ+F/MUx/p7rjhG3S8tCxsdTW+QOY8yMe9sUqX+ODXpLBlHsi4BVKiW1lcTtFMt1MKvdEzI+lB3LMkgDb++lOneohVJXnX82tGXPvClW90H2mIniMavmF/sE5YKdh6+usR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oqWCSEWg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E46EC4CEFD;
+	Wed, 26 Mar 2025 06:34:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742970888;
+	bh=2MGPnAtzDlcfNFkgrjhcbs+PSZK/71xFqiqfm4ICurw=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=oqWCSEWgqSzuZihIGSGxBq/NFjOUhZjOlwZMMZY+/2ybNPO86h100+06K+NuCc9Mt
+	 WYnoiWB1I5d60B7CRE6XuosOocePqX6eDdBEP/8SE+DYlhSfcxkLZF9LrlQ68Y4veL
+	 H8xWmZsln8RTeTMzlPXP6pl8crUOBBsMQcncsHm3UJYg5K3kU3IXi4FH/Qc4qv2wOO
+	 yEJnquI42uVFFeIsvvRh3GMWQ+sFTb7U/WMNtlSVXjGbMeRckEm9GTcI5P7A0b/Ro3
+	 nMSrwoZKByN/PZoX2e4Jn/Y5mLcclU97Oe6eskkQTsOcmnMnijIJvWokjpBxxC2uqF
+	 n5hVyTRxxXDfw==
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3913d45a148so5217717f8f.3;
+        Tue, 25 Mar 2025 23:34:48 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU0Z8fFKCF0vRhplQweEWYJYb4VDCWeUT4Bm1nCypoBk/n/uxsih6rHY58p6FeUcq+Wry1k9YuiK8p1@vger.kernel.org, AJvYcCU4GAChg4xxzAN3U6zdOKIqvtxfwHDLeuD2G5iqstMAIST5NKH7KjJxH5D7n8szeHjoA9LEIoZYfkCwTD+G@vger.kernel.org, AJvYcCUFkl+fLz2Ty4CUosoSsnoduEM8NcjlVOBB+wGeVVmhTCeluHI1NGAUhGT93dGFpJMBhk0kncI9ONob2JmU3K3D0g==@vger.kernel.org, AJvYcCULDFP2m8ArapfMbFHal25WKy2OQVT9dJFZNasejpHyPNDdlsIs1MfY6E262dno7+4xhui7b5SlOUfwGyyFk5b1@vger.kernel.org, AJvYcCUUsJfP0jLy3Jsw7aPbOSO8BKLtCSp+frnkq1Zls74YGFbVK6DtCKcjZNkFxTvGvDf5GObi5jPz/0EN@vger.kernel.org, AJvYcCUXr2P3qruuhJlosLngrSNHmvD70TBKJ6pnDElYTRlILCHOlPsQMooFdVGO2HAxQno3vDd8NzUmw3O/cuA=@vger.kernel.org, AJvYcCUZj9Pcy+b/+sBQHNmT0l0jL2Qw7x5GePbmuQH5lvxOggSGbmLq2ac+ILT5GNh/RW0fgUi5DkgxyoCUCA==@vger.kernel.org, AJvYcCUdyhsoB72OG79gi1NoOaqP78cOx+RMBeV0OLOvNFYEY5F3t33sbho+EKNBRc+LJ0xVKy6rEaX2P/XtYSk=@vger.kernel.org, AJvYcCUv+aZYOjNJCQBrjBYu2lhDf6McfFEOyLeTxcqAZLVC7XBo3afNbKcgvseKWbNSZMPihiT1+KKpw3zrWXI=@vger.kernel.org, AJvYcCV3puId
+ FA0KYAx327zBT/qFJcQ2dbJ7yxWunHB4vyO8kYVhtxsM42JSRNPrHb6ncDmiu83N@vger.kernel.org, AJvYcCVKvsdgscn4uqo6A/K28+75ZkFcH53m5a3RN7f9ysrXqDH155/YZuaO1ixmgv1ZO6RUNbKT/B0Y@vger.kernel.org, AJvYcCVguDGFLvtm/rcALP/PZ5+JqxAGWr/Z5FFnnkGQXwQeBRYpwVLDdyTK7ntwruahdlxwkzY=@vger.kernel.org, AJvYcCWCMyj1EvsfYGiSabQwTiT7uvTmasRiKXCDGdJ2HG6KIxn8nCMbQpW791eGMWH3g4iCnnbtk/yOM+SOTDVpKiWugrAb@vger.kernel.org, AJvYcCWEqtQIvpooCRV44g/lVmuuKDjUO/tE0l1IZGYe8b77mdtTRqrYT6msUdpnF7Me4UTdHrHSIdyuJ8LXmw==@vger.kernel.org, AJvYcCWPx+zO84CE/K6pV+HY5Ri9Z0F2AqInOdTtFBqiosG9yGtbL1jRWZ/EHQi0aUtXXcjsYQDBDokXAPltC3V2fg==@vger.kernel.org, AJvYcCWn0O9iCTJ9d/OvkKxW/Eh1PkNijLdm9bnrMSApgfS+yDT9xod9Du3vVK80Z6CoznHnPh+0d77p1rvpLsyw@vger.kernel.org, AJvYcCXmzcG79gR7jXjdwHfzZVXx+XUq+ZcO5IQljshTRFINu9zIzWvy0NnPErfx8A5/+Uv4wq8V5bpZVytIugLs@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsRDEZMjBSsppymsMoksIPjPv0rlVGrfIct04Ab/4Ug7QBY8St
+	bIVe21apUi5Bk6svytNeUK5qMJ0xgJJsi2cTcTkn0+HZojxoRXUcbw0No1yyLbGjddk7HqdRzne
+	kxb/9eVlCS6QwWzfVxO2b1dJrd08=
+X-Google-Smtp-Source: AGHT+IGIApydo9VgmdhIDcmOnmG1sSv1FEEmzeINRVbJ26tbvLOq+REJlE+tfl+WofDYebAF8b+RY6kbO+n3ISps8p8=
+X-Received: by 2002:a5d:47c6:0:b0:38d:d371:e04d with SMTP id
+ ffacd0b85a97d-3997f937cd7mr16526330f8f.34.1742970886849; Tue, 25 Mar 2025
+ 23:34:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z-B4yfBvm2aXW_Ar@orbyte.nwl.cc>
+References: <20250325121624.523258-1-guoren@kernel.org> <20250325121624.523258-2-guoren@kernel.org>
+ <CAHk-=wiVgTJpSxrQbEi28pUOmuWXrox45vV9kPhe9q5CcRxEbw@mail.gmail.com>
+In-Reply-To: <CAHk-=wiVgTJpSxrQbEi28pUOmuWXrox45vV9kPhe9q5CcRxEbw@mail.gmail.com>
+From: Guo Ren <guoren@kernel.org>
+Date: Wed, 26 Mar 2025 14:34:32 +0800
+X-Gmail-Original-Message-ID: <CAJF2gTRZyAAgrM1RMrTi7Zi+Vx_VBnM1=CWwZZtLy+uHZ=vZpw@mail.gmail.com>
+X-Gm-Features: AQ5f1JpGXhmRPDvCQOc_Kwk_PFeqm824JtKAYEkQji0TkGjMeyznsoqjkxAkPig
+Message-ID: <CAJF2gTRZyAAgrM1RMrTi7Zi+Vx_VBnM1=CWwZZtLy+uHZ=vZpw@mail.gmail.com>
+Subject: Re: [RFC PATCH V3 01/43] rv64ilp32_abi: uapi: Reuse lp64 ABI interface
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: arnd@arndb.de, gregkh@linuxfoundation.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org, 
+	oleg@redhat.com, kees@kernel.org, tglx@linutronix.de, will@kernel.org, 
+	mark.rutland@arm.com, brauner@kernel.org, akpm@linux-foundation.org, 
+	rostedt@goodmis.org, edumazet@google.com, unicorn_wang@outlook.com, 
+	inochiama@outlook.com, gaohan@iscas.ac.cn, shihua@iscas.ac.cn, 
+	jiawei@iscas.ac.cn, wuwei2016@iscas.ac.cn, drew@pdp7.com, 
+	prabhakar.mahadev-lad.rj@bp.renesas.com, ctsai390@andestech.com, 
+	wefu@redhat.com, kuba@kernel.org, pabeni@redhat.com, josef@toxicpanda.com, 
+	dsterba@suse.com, mingo@redhat.com, peterz@infradead.org, 
+	boqun.feng@gmail.com, xiao.w.wang@intel.com, qingfang.deng@siflower.com.cn, 
+	leobras@redhat.com, jszhang@kernel.org, conor.dooley@microchip.com, 
+	samuel.holland@sifive.com, yongxuan.wang@sifive.com, 
+	luxu.kernel@bytedance.com, david@redhat.com, ruanjinjie@huawei.com, 
+	cuiyunhui@bytedance.com, wangkefeng.wang@huawei.com, qiaozhe@iscas.ac.cn, 
+	ardb@kernel.org, ast@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-mm@kvack.org, 
+	linux-crypto@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-input@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	linux-serial@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, maple-tree@lists.infradead.org, 
+	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-atm-general@lists.sourceforge.net, linux-btrfs@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	linux-nfs@vger.kernel.org, linux-sctp@vger.kernel.org, 
+	linux-usb@vger.kernel.org, linux-media@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Mar 23, 2025 at 10:10:33PM +0100, Phil Sutter wrote:
-> On Sat, Mar 22, 2025 at 09:30:15AM +0000, Hangbin Liu wrote:
-> > Convert iptabels to nft as it is the replacement for iptables, which is used
->           ~~~~~~~~
-> 
-> Typo, but I would write "Convert the selftest to nft ..." instead since
-> that is what you're converting, iptables is just replaced. :)
+On Wed, Mar 26, 2025 at 4:41=E2=80=AFAM Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> On Tue, 25 Mar 2025 at 05:17, <guoren@kernel.org> wrote:
+> >
+> > The rv64ilp32 abi kernel accommodates the lp64 abi userspace and
+> > leverages the lp64 abi Linux interface. Hence, unify the
+> > BITS_PER_LONG =3D 32 memory layout to match BITS_PER_LONG =3D 64.
+>
+> No.
+>
+> This isn't happening.
+>
+> You can't do crazy things in the RISC-V code and then expect the rest
+> of the kernel to just go "ok, we'll do crazy things".
+>
+> We're not doing crazy __riscv_xlen hackery with random structures
+> containing 64-bit values that the kernel then only looks at the low 32
+> bits. That's wrong on *so* many levels.
+>
+> I'm willing to say "big-endian is dead", but I'm not willing to accept
+> this kind of crazy hackery.
+>
+> Not today, not ever.
+>
+> If you want to run a ilp32 kernel on 64-bit hardware (and support
+> 64-bit ABI just in a 32-bit virtual memory size), I would suggest you
+>
+>  (a) treat the kernel as natively 32-bit (obviously you can then tell
+> the compiler to use the rv64 instructions, which I presume you're
+> already doing - I didn't look)
+I used CONFIG_32BIT in v1 and v2, but I've abandoned them because,
+based on CONFIG_64BIT, I gain more functionality by inheriting the
+lp64-abi kernel. I want the full functionality of the CONFIG_64BIT
+Linux kernel, which can be equivalent, used interchangeably, and
+seamlessly.
 
-Hi Jason, I saw net-next is closed. Should I wait for net-next re-open to post
-the new version and fix the typo? I'm not sure about the wg branch policy.
+>
+>  (b) look at making the compat stuff do the conversion the "wrong way".
+>
+> And btw, that (b) implies *not* just ignoring the high bits. If
+> user-space gives 64-bit pointer, you don't just treat it as a 32-bit
+> one by dropping the high bits. You add some logic to convert it to an
+> invalid pointer so that user space gets -EFAULT.
+Thanks for the advice. I'm looking at how to make the compat stuff.
 
-Thanks
-Hangbin
-
-> 
-> > by default in most releases.
-> > 
-> > Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> > ---
-> >  tools/testing/selftests/wireguard/netns.sh | 29 ++++++++++++++--------
-> >  1 file changed, 19 insertions(+), 10 deletions(-)
-> > 
-> > diff --git a/tools/testing/selftests/wireguard/netns.sh b/tools/testing/selftests/wireguard/netns.sh
-> > index 55500f901fbc..8b840fef90af 100755
-> > --- a/tools/testing/selftests/wireguard/netns.sh
-> > +++ b/tools/testing/selftests/wireguard/netns.sh
-> > @@ -75,6 +75,11 @@ pp ip netns add $netns1
-> >  pp ip netns add $netns2
-> >  ip0 link set up dev lo
-> >  
-> > +# init nft tables
-> > +n0 nft add table ip wgtest
-> > +n1 nft add table ip wgtest
-> > +n2 nft add table ip wgtest
-> > +
-> >  ip0 link add dev wg0 type wireguard
-> >  ip0 link set wg0 netns $netns1
-> >  ip0 link add dev wg0 type wireguard
-> > @@ -196,13 +201,14 @@ ip1 link set wg0 mtu 1300
-> >  ip2 link set wg0 mtu 1300
-> >  n1 wg set wg0 peer "$pub2" endpoint 127.0.0.1:2
-> >  n2 wg set wg0 peer "$pub1" endpoint 127.0.0.1:1
-> > -n0 iptables -A INPUT -m length --length 1360 -j DROP
-> > +n0 nft add chain ip wgtest INPUT { type filter hook input priority filter \; policy accept \; }
-> 
-> You may skip the 'policy accept \;' part in all 'add chain' commands as
-> this is the default for all chains. Unless you prefer to explicitly
-> state the chain policy, of course.
-> 
-> Cheers, Phil
+--=20
+Best Regards
+ Guo Ren
 
