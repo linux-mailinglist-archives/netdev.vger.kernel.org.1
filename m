@@ -1,269 +1,156 @@
-Return-Path: <netdev+bounces-177807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FEF2A71D68
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 18:41:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB197A71D8A
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 18:43:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B16617396D
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 17:41:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 670A016AAF4
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 17:43:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F74123C8C4;
-	Wed, 26 Mar 2025 17:40:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RYBx8iZx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8C0D2405F2;
+	Wed, 26 Mar 2025 17:42:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25A4223BCE8;
-	Wed, 26 Mar 2025 17:40:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743010857; cv=fail; b=H1u+9dkI90ir/nQWba1/J5lP/ErBYYoqt1XbdiPMEv6cWTqsT/0wqXu3xfBbSiwSEY5EGREjUkKn6cWf2s+/VDmtZMqUVo3XPtPh3IFh3iezoz/WL54T0Ze9HEEBcw4/q924bFtFNVJOdIkh/PWCi7eFQSJNtflL/aMlW5Czxn8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743010857; c=relaxed/simple;
-	bh=FuoV59nXy7IXjmhZ2qfuivSuwQqS1McBN02Nqi7F4w8=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=iofm+JPFmnQbj6pnvdIKiEibJMeDoO+AOj+GhOghe6Q/zcdcZe8wwoccroE3XQ7VaPABXjrjjwzqewydw4bkfrf4mY5d53Z6/q/I1D3Nw4gHeinbQnmUK5xtRIGRMz7zDr301qmt34xsB19OsimD0E3U+dP2Ltbmg9UApO5jpX4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RYBx8iZx; arc=fail smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1743010856; x=1774546856;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=FuoV59nXy7IXjmhZ2qfuivSuwQqS1McBN02Nqi7F4w8=;
-  b=RYBx8iZxcGYbrlD9x5LMOBHvct/TqY7LLyHUe4N1djt9O3jMwbGWON+f
-   ocjX82aS6UsByNrIRls0uiYq+7d76oytnB0k5gCcty554JgIF2tiaUMst
-   LAZImZGf4YNSNqTrEfqzux6aTg7tp2UzrW4dOfPbIGPYhX+JdGyX+u0Zr
-   yQ9Ddfm8ERUnIgYAao1TzH8k7TZ2rM6n7b56CMazxT9JKKkahGXVH2Qvg
-   BlXnBjcIb7SEQcH3ixHU9QgSi4nSWWiWz66NvCpUHlavRfhyXOzmVsxeF
-   X62PepR/NZwQ0o3JF4tNceyFgo+/OOHHKQ8A996Py3qmUn6ZXRri3gcUB
-   w==;
-X-CSE-ConnectionGUID: GlRBwGhOSIm5E+7QD4/83A==
-X-CSE-MsgGUID: cTT8TIhyROG7pmnGggikNQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11385"; a="47054947"
-X-IronPort-AV: E=Sophos;i="6.14,278,1736841600"; 
-   d="scan'208";a="47054947"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2025 10:40:54 -0700
-X-CSE-ConnectionGUID: hU73KtbpR46eyG8iK/kjAw==
-X-CSE-MsgGUID: HQpRumhURsqI7War+Hz3jQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,278,1736841600"; 
-   d="scan'208";a="125791262"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2025 10:40:53 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Wed, 26 Mar 2025 10:40:53 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Wed, 26 Mar 2025 10:40:53 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.46) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Wed, 26 Mar 2025 10:40:52 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QXF3hnS9i5WHYjK/je8lR9mN39wR+HGF5mRxoouqCM1TRUwdKXIUuaQQZ42eYGpzi65digP0vqO/9Xgyvutd3TwZikizWNH6WqouOcx3e/DxHwndQSgmnWFab9fmc3PmSd1Q8bvGJLrAsPYViiGtOZZuxNvqU3QUpbJ3U9KIN3HxztGkoMbtkR8PDsPx1+wFMtvaB3hEJEktkTc3TCZGk/VUy1J98eElhBgG9XCmcvCPkuyyRulCHIoOXo3T5o8KwSh57xPUVtz17XipE/2prDQg86j5DAgxYlkLAkfb9v/K5z4VA0KLA89+woeC+YX4tW+5tCZRSshjvVh7wBl+Qg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4M5rJCbHpWOI3Pyhj5p6+Udcq+EsA5n2Cgqr9/1EhHw=;
- b=StIoc8C8VMXdmWyRj910U275QWeCZQLUO/FlWdo56VKLWf4gQ693L8JA+vb4R2FeFGCVmVtl5e+0Y7cc5DRw+8d9Jw/h8yqwVKE3ujOc//cWDJCE/xMUSPnGVYGJHZtJTTnna/XPowpcrutHkr57psTIKRUF+tNHypkn+q/CfY+wp9z4iRIzPi0oBqPesJ2qAkhLklKPjM7QR3CgkZzs/kT8vfJmSr7bCs39krWowOnRUQ5pUy/wZ3zcqDW37/mkQY88w1/DW9sfNmxIsiE8aZxL9p7jPtXRwDrWKEENKmRFAyRdn5uYJtwKJUED73AR9TqA9w++dBzLfA6fBCgroA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from LV8PR11MB8722.namprd11.prod.outlook.com (2603:10b6:408:207::12)
- by IA1PR11MB7822.namprd11.prod.outlook.com (2603:10b6:208:3f2::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.42; Wed, 26 Mar
- 2025 17:40:33 +0000
-Received: from LV8PR11MB8722.namprd11.prod.outlook.com
- ([fe80::314a:7f31:dfd4:694c]) by LV8PR11MB8722.namprd11.prod.outlook.com
- ([fe80::314a:7f31:dfd4:694c%7]) with mapi id 15.20.8534.043; Wed, 26 Mar 2025
- 17:40:33 +0000
-Message-ID: <b025e2b7-ff99-4659-811c-8071d4aa8031@intel.com>
-Date: Wed, 26 Mar 2025 18:40:27 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 2/3] page_pool: Turn dma_sync into a
- full-width bool field
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-CC: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, "Andrew
- Lunn" <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	"Simon Horman" <horms@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
-	"Mina Almasry" <almasrymina@google.com>, Yonglong Liu
-	<liuyonglong@huawei.com>, Yunsheng Lin <linyunsheng@huawei.com>, Pavel
- Begunkov <asml.silence@gmail.com>, Matthew Wilcox <willy@infradead.org>,
-	<netdev@vger.kernel.org>, <bpf@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <linux-mm@kvack.org>
-References: <20250326-page-pool-track-dma-v3-0-8e464016e0ac@redhat.com>
- <20250326-page-pool-track-dma-v3-2-8e464016e0ac@redhat.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <20250326-page-pool-track-dma-v3-2-8e464016e0ac@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: VI1PR0902CA0054.eurprd09.prod.outlook.com
- (2603:10a6:802:1::43) To LV8PR11MB8722.namprd11.prod.outlook.com
- (2603:10b6:408:207::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F50F2405E1
+	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 17:42:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743010930; cv=none; b=aj0tq7FEDxQt4vSpcaznEEvpLU4VCzPJYG54HqlpCiQPFMZsthE9Z441YgQiXwAzvAhsf6Bgr1mPzQE7gtq0USjDR6a068Vx8tY+gVIZwZVI/I4GUIdZKaRwS/YaWFZ84+/2xoL6o+ox7wqvZLL0JUDOCQSQuCG2NxF4SABzWDU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743010930; c=relaxed/simple;
+	bh=Z+kmXHGClhFpLj7Nta6mCo6WFt55JgT1HnxwLsMrksk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Sn4N0RLmS4OAFt7MqrkcdIcS2mhhbI1yn6Rim/0ut7QAcc0fbLRX7KJnAqTTtDD45gr1fZYTjnF4hoWG5hlQV8yAQyj3EUk+PQu/6J/htZEMcK68DQMIh2QZj0D0mtdLKdsaKNMRRImGb9yXqpZWXphzVFUu0k5KnXirGvFhHVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1txUky-0001hP-Qx; Wed, 26 Mar 2025 18:41:36 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1txUky-001nIV-1O;
+	Wed, 26 Mar 2025 18:41:36 +0100
+Received: from pengutronix.de (p5b1645f7.dip0.t-ipconnect.de [91.22.69.247])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id D680D3E7735;
+	Wed, 26 Mar 2025 17:41:35 +0000 (UTC)
+Date: Wed, 26 Mar 2025 18:41:35 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Ming Yu <a0282524688@gmail.com>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
+	brgl@bgdev.pl, andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org, 
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH v8 4/7] can: Add Nuvoton NCT6694 CANFD support
+Message-ID: <20250326-inventive-lavender-carp-1efca5-mkl@pengutronix.de>
+References: <20250225081644.3524915-1-a0282524688@gmail.com>
+ <20250225081644.3524915-5-a0282524688@gmail.com>
+ <20250227-spicy-grebe-of-dignity-68c847-mkl@pengutronix.de>
+ <CAOoeyxWSsy0Q0Y7iJE8-DZM5Yvcdto8mncFkM8X4BvVMEgfUiQ@mail.gmail.com>
+ <20250317-cuttlefish-of-simple-champagne-ee666c-mkl@pengutronix.de>
+ <CAOoeyxXSC3rjeB0g5BtHKvKy-Y9Dszd5X9WuHeBeH1bk39d_Eg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV8PR11MB8722:EE_|IA1PR11MB7822:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6060d9f8-ec95-480e-458a-08dd6c8d4f2b
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?N3lsU243M1hQR1NFbWdXWld5RW1BdXNoY1diNlZtMDU3UW5zYklQK0lpbEMw?=
- =?utf-8?B?NHZ3YlJET0lKNUdvQjVqQ0Juc0JycFVlaTBTUjNtbUxCWG5YRmcxekFybVdI?=
- =?utf-8?B?Tlg1cEp4N3hub0VwclpGZ1crNEVnMGliUXJHMGYwdzMxRXJUVE9YQXVBcGRM?=
- =?utf-8?B?ZnZYajdhL2lHUWJmdloyaWdyUkRlTk8vWFJLV2h2aWJQQkhPa3BBVXRJaGZl?=
- =?utf-8?B?UVpzdUVmSUhDQ2lkeEtMOXE2K3JmUmoxWW41Y2l5SWZncjcrZkVCSXR0NHBw?=
- =?utf-8?B?V3RSMjlXZm5Ib0pqaFlRTGJxaHJGNklXQUg1aHpCWUdpRk01bmZMT2JaeExp?=
- =?utf-8?B?VzBnN1NDOUNlN1VmUFd0YXpJS2NmOWtmc2N2OVFGQStTMHpHVzU3bS83VzNR?=
- =?utf-8?B?V0ErQkxvRHhuaTQ5cHZWMmxDZ0xqNHd0V0hidEZQWjhhdEpuYVZuckF0TEN6?=
- =?utf-8?B?S1BWaHFGRlFONkV6WUZxNjhaY1kxNkxRWmpvMm11aWZVWWoyRkRpNmFiL3g0?=
- =?utf-8?B?VGVpZE93Q3RsK2ZvdS95YUNnaVk4c0RPNExYYkhTYy8rZmNMSklUa2pwdWV6?=
- =?utf-8?B?UDA0VVZXb1ZDVFNEMkorc20wRDl6blM2aXdWYXBTUkdNQTdkbHBDdkZWMGlO?=
- =?utf-8?B?cEw5MFBmRmRHb0FXWTlxTVBMVVE2dmVCdjdrSkc0YWpZcFNqclJNRzQ3dHNv?=
- =?utf-8?B?Q1U5SlV1WTJvVWUrVzJCSUliSURMRUMxL3AyR0ZqZWlvMTFjeGVtWUZUY3Ux?=
- =?utf-8?B?OWQ2YlZoejVCL3lXaEVIV2ljSVhlUkVTVlQ5QlJVOTZiQ0hFUUI0SCtXMVR1?=
- =?utf-8?B?WFVDZ3M4UUo0V2xidzkwdUwzeGN6NU5XNnF6a3U2Y00zbW1lUnRPQWN0OGQv?=
- =?utf-8?B?NnNsT2N0TENvVUFuc1dDZzliTkxySno5WTRMck1nckp2NHdVMmt2ZlpWa0JB?=
- =?utf-8?B?TWFMdEwyY0FxcTZCeWJWTnl5S21zdmFxMWwxUHNGYVh2andwTmVoQWlnNm02?=
- =?utf-8?B?WGYvRDRpMjY1L2JsMCsrQUFkZWJ1WWM5Z2NXT2h5Ry9yUmtSVkU0cENGVkpG?=
- =?utf-8?B?RC9rc0IxazRURzJaRklZOGRqZEZaNzhySEhUV014VFNsVVdPZXhCVFpvMTBy?=
- =?utf-8?B?T20yOHpCcmRtc3hXQk1acTYrTUNCTXhJS2dkTVByTTUwUEUycEYycUVweXNE?=
- =?utf-8?B?c0ZZVmJTU01FMDN2Ymgzd2xReG9IY0Ywa0VkakY1U2hTR3Y5KzhvczVxZHBx?=
- =?utf-8?B?UmlEbmZ6QldDbVgzb1hENURVaHlGUjhUS2RlMzkrMG9RcUl0SElhUnlOV21H?=
- =?utf-8?B?WFowakFxdWEyQzlhNG84RFZrUXFBRWRFK3lNSUUzV2xTMTIzT0xqZ1JyQU9i?=
- =?utf-8?B?Q1dZSVROMTU0UG5heEdyQVpKa0tFSGx2ck82aUJvT2hnUzh4TVgvNWZtWml1?=
- =?utf-8?B?Tm9qak5aVUNsSXlXRk9nRHcyeHI3cnRWMXJLWFpMd203akJObTkwVVpTS3Q2?=
- =?utf-8?B?aVZSNG84bUNlcWE4a3ZiUkhCQ1E0NjBVVzBXVWxZSjVyYnVmbTZJellhK1Nx?=
- =?utf-8?B?UjBsZFBEL3plUEVpSzJIaktzQmZSQzdpcXI1WDVFMXJ4YlNJTk01ZmpWNzEr?=
- =?utf-8?B?Snp4eDRxYjE2dlJNNW5aKzZJa2oreldYSXQwQXUzRzFqTm8xQjJSVGRFQ1hz?=
- =?utf-8?B?RG9rY0hKQ2czVi90Vm9BUEhiampsMWZGWnhYaE1XaVAzZ0dWMU9TNjhHaUdo?=
- =?utf-8?B?bVJ4WXZkdVUxbHBkVXhpRjJHRXBBVXJLb0xoWkNQdEZZTFBHRVBFaTRJTk9X?=
- =?utf-8?B?QUZzUHJpaWpvTWpYa01kTHd2Wk9Ra2NwODlCZkpIWEZYMDAveitMOEJKeHFS?=
- =?utf-8?Q?c3O117H2wnws0?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR11MB8722.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?azNpTTZLejNvOHlEOUlhVCt4NjFqOThGTnJMZnpBUUhTWUlrclVLb0lWNEJz?=
- =?utf-8?B?dWRiRjdKRnhJdEw5VVo5ck53cVM5ak50Y2hvSGhxUElBM3cvWGxWbjk0VzlM?=
- =?utf-8?B?NklzZXJiM3JJSzN0VVYvQlRwb0JnQW1uM2dqSFVXZE1odDRTb2cyVnMzNUNS?=
- =?utf-8?B?SkN2STN0Vnh2LzYvTEdOV1d0Y2svTmNyVVBSOWFZL3FUTzJHeUYwaHRuYXNj?=
- =?utf-8?B?RTlQZ09xaDlKcW5idFBnVlZiV04yRTAzWTlPVEtEOHVjcDc4ZkgxdGVQZWFR?=
- =?utf-8?B?aGRKTytCTW1waUNsNTBma2dmVEt2QWVlZnBGYjhCTzRGSHlUT1VnMk40b0JF?=
- =?utf-8?B?d3ZkRXVhM3NOa3h5OXdwc0xuaUlUOVdsRmUxc3plYlNqV3NKdEt1dEIwSkhZ?=
- =?utf-8?B?cG5KMS83UUxZMzJPWGpoQzJpWG5lY1pkb0F4aHBHMmRWVmlCaGJmSWtjVlBJ?=
- =?utf-8?B?amFNSGh3bGljOXBhSEVHQjhwV3ovSHBBd3F3QVVYWm5JRWlScW9pQzRMYkFJ?=
- =?utf-8?B?NFJuNVVLTU02MlVKSEtGYXFkOVE2a3hyd1ZINVI4MytxaVdseDJIL0l0MnFa?=
- =?utf-8?B?RFpaOU9xblpCdTQ1U2IrT0JJM3lGNWxOK3NSVDM5M2RBcmNaaE1jWkd3VURR?=
- =?utf-8?B?Z0c5SEx6Ulh2QUFKN1A1TVdLVS9rZzlaT1owaWRDZkQ5YTZrY2dFU05FY0o4?=
- =?utf-8?B?b1hZN2pFRVo5cmtSN0RjOHMwK3dTR0pGU01qTHFKaUZIUVV4SCtYZXZvdThs?=
- =?utf-8?B?WmRpbVlGOUFTSTBmc2NtRktudGR5bVJ2SDhsZkEwSFBQTmxtU2kxcndlNFlo?=
- =?utf-8?B?dktHalZ0QjJJcUF1WDhHREtpaXdOU0hqZ3hONXFJcXRqR09CZEhNU1VtOUMx?=
- =?utf-8?B?M3VxVEdSR05CZHM2RVlrZXhUbXUyTDdrV2MvN3VBeFFVcFFaajB3V1JoVlJE?=
- =?utf-8?B?UTdjd0pKOXdPR05NVEY4R1NJV2g2R1JlWjU4b0hCNzN3NFNCTzdsYnJrbEx3?=
- =?utf-8?B?YnNuV3IxNFBrUEZ2UWtvQ1RJNzZGbysrUnh3N3BDTFBFRXBVMTIvNzZNblhq?=
- =?utf-8?B?MlJiZkp5cXpGeWtpN0NGUmVnVGNiZzZWVmJDTVlWWVFodVFZNnJsZk4wQ2hk?=
- =?utf-8?B?YTdiYWVpTi9xTmhuYVN5Z1FabGdyK1BrNCswYW4xdmF2SkRhVW52NEQ0WUxq?=
- =?utf-8?B?OWhQak9lR3NnMXVWSWtXVjFYSTMxMlFIdnFOZ3FSRnFkNE1uNm56bmFDV0Vi?=
- =?utf-8?B?QkhmL2I0ZEdoSkJIQ1BKSlNiUEYrekhKREtlWUtZN3VoUkk4Tm5Qb0RaaWdM?=
- =?utf-8?B?OTZHMmhQVnVNQk5xelpXdFBQNUpqcEdrWUJGRGFuekJiQ24zcm56UWdaem1u?=
- =?utf-8?B?VDJ0UE9leWVORXhwNGUzSi95OXYzTlJDUm96M2pZMUcvcjBobWNFS2Z5bmpZ?=
- =?utf-8?B?STU3dElIOUw3RVE4Sm1XTFVjSEJiWXpPNzFKb2hWZWNlWVpHWlhrNDk5eCtz?=
- =?utf-8?B?V0hobDZuRUVNTUhiMkNnYS9EakZVcWtYWTJXUy9VcG5qeDRwQ2tTU3FkUElL?=
- =?utf-8?B?cUp5YnA2NXRpZUh2N1d4dyt6ZzY0QkFOenorZDBETU5lM2t4RUVoS3JtR0sw?=
- =?utf-8?B?NmltL1NNdDQ1R3RNL0hEYUkwRWhORk5FM3BjZVE0K3dLdWU5YjVHU212bWxh?=
- =?utf-8?B?RTJWMTV2VXBCTG9iSHV1Qi9GV3ZyTmhHV2JpUEdTQWxPV1BMaElKanFzQVFR?=
- =?utf-8?B?eVBKb3c0TFcxanNybkFrV2RXUmRnY0FzY1lZZ25YaWZia3N4WVhZWWFxMGJ0?=
- =?utf-8?B?ZjNXRVp2U3BxYUhsbUFONHl2aWFhU2dDUFIzeDY0Mm9HZkZaTmozekwraktz?=
- =?utf-8?B?NkUwYVRUdnJvMm9DaWc1THlRUk42SXlWeG9jWDlrTGdOVVkzdTdGY2x2bHVU?=
- =?utf-8?B?WXpXUTkxSGg2WEFrM3Znd0F3OHp4NkFXOWp0em8xZjRzU1ZrelpUZlVTOWJM?=
- =?utf-8?B?NWd2UjJud3dyV0xyaFRVRElHUTV5bnlrZkVuVFRuRXQ1UHhqTW9aV3BSVy80?=
- =?utf-8?B?MU40WEw1dFd0ejd5TXkvaEZsbkJycGdhNVpFeTFYRERsZDNaQUFNRnNKdXVC?=
- =?utf-8?B?WUF6T1ZtMlBoUVAyaWFPdnFZYzNGODl0VCtnaEJkWlNqWnRBMGNkVzBhZ2p4?=
- =?utf-8?B?N3c9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6060d9f8-ec95-480e-458a-08dd6c8d4f2b
-X-MS-Exchange-CrossTenant-AuthSource: LV8PR11MB8722.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2025 17:40:33.3549
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VIjm6Oeos+BNiOIOa68JthgQMDtU5ohC9UTd+fjr3fqchkac3XY4zPJdXnqVg/9IRsA7o8Iu6kSfR+Tfh8TAkpEoJTfvInjaqJFxPsa9HKI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7822
-X-OriginatorOrg: intel.com
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="r56ki5hqfoc5hcq4"
+Content-Disposition: inline
+In-Reply-To: <CAOoeyxXSC3rjeB0g5BtHKvKy-Y9Dszd5X9WuHeBeH1bk39d_Eg@mail.gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-From: Toke Høiland-Jørgensen <toke@redhat.com>
-Date: Wed, 26 Mar 2025 09:18:39 +0100
 
-> Change the single-bit boolean for dma_sync into a full-width bool, so we
-> can read it as volatile with READ_ONCE(). A subsequent patch will add
-> writing with WRITE_ONCE() on teardown.
+--r56ki5hqfoc5hcq4
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v8 4/7] can: Add Nuvoton NCT6694 CANFD support
+MIME-Version: 1.0
 
-Don't we have something like READ_ONCE(), but for one bit? Like
-atomic-load-blah?
+On 26.03.2025 10:27:03, Ming Yu wrote:
+> Marc Kleine-Budde <mkl@pengutronix.de> =E6=96=BC 2025=E5=B9=B43=E6=9C=881=
+7=E6=97=A5 =E9=80=B1=E4=B8=80 =E4=B8=8B=E5=8D=885:21=E5=AF=AB=E9=81=93=EF=
+=BC=9A
+> >
+> > > > > +     priv->can.clock.freq =3D can_clk;
+> > > > > +     priv->can.bittiming_const =3D &nct6694_can_bittiming_nomina=
+l_const;
+> > > > > +     priv->can.data_bittiming_const =3D &nct6694_can_bittiming_d=
+ata_const;
+> > > > > +     priv->can.do_set_mode =3D nct6694_can_set_mode;
+> > > > > +     priv->can.do_get_berr_counter =3D nct6694_can_get_berr_coun=
+ter;
+> > > > > +     priv->can.ctrlmode_supported =3D CAN_CTRLMODE_LOOPBACK |
+> > > > > +             CAN_CTRLMODE_LISTENONLY | CAN_CTRLMODE_BERR_REPORTI=
+NG |
+> > > > > +             CAN_CTRLMODE_FD | CAN_CTRLMODE_FD_NON_ISO;
+> > > >
+> > > > Does your device run in CAN-FD mode all the time? If so, please use
+> > > > can_set_static_ctrlmode() to set it after priv->can.ctrlmode_suppor=
+ted
+> > > > and remove CAN_CTRLMODE_FD from ctrlmode_supported.
+> > > >
+> > >
+> > > Our device is designed to allow users to dynamically switch between
+> > > Classical CAN and CAN-FD mode via ip link set ... fd on/off.
+> > > Therefore, CAN_CTRLMODE_FD needs to remain in ctrlmode_supported, and
+> > > can_set_static_ctrlmode() is not suitable in this case.
+> > > Please let me know if you have any concerns about this approach.
+> >
+> > Where do you evaluate if the user has configured CAN_CTRLMODE_FD or not?
+> >
+>=20
+> Sorry, I was previously confused about our device's control mode. I
+> will use can_set_static_ctrlmode() to set CAN_FD mode in the next
+> patch.
 
-> 
-> Reviewed-by: Mina Almasry <almasrymina@google.com>
-> Tested-by: Yonglong Liu <liuyonglong@huawei.com>
-> Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
-> ---
->  include/net/page_pool/types.h | 6 +++---
->  net/core/page_pool.c          | 2 +-
->  2 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
-> index df0d3c1608929605224feb26173135ff37951ef8..d6c93150384fbc4579bb0d0afb357ebb26c564a3 100644
-> --- a/include/net/page_pool/types.h
-> +++ b/include/net/page_pool/types.h
-> @@ -173,10 +173,10 @@ struct page_pool {
->  	int cpuid;
->  	u32 pages_state_hold_cnt;
->  
-> -	bool has_init_callback:1;	/* slow::init_callback is set */
-> +	bool dma_sync;				/* Perform DMA sync for device */
-> +	bool dma_sync_for_cpu:1;		/* Perform DMA sync for cpu */
->  	bool dma_map:1;			/* Perform DMA mapping */
-> -	bool dma_sync:1;		/* Perform DMA sync for device */
-> -	bool dma_sync_for_cpu:1;	/* Perform DMA sync for cpu */
-> +	bool has_init_callback:1;	/* slow::init_callback is set */
->  #ifdef CONFIG_PAGE_POOL_STATS
->  	bool system:1;			/* This is a global percpu pool */
->  #endif
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index acef1fcd8ddcfd1853a6f2055c1f1820ab248e8d..fb32768a97765aacc7f1103bfee38000c988b0de 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -466,7 +466,7 @@ page_pool_dma_sync_for_device(const struct page_pool *pool,
->  			      netmem_ref netmem,
->  			      u32 dma_sync_size)
->  {
-> -	if (pool->dma_sync && dma_dev_need_sync(pool->p.dev))
-> +	if (READ_ONCE(pool->dma_sync) && dma_dev_need_sync(pool->p.dev))
->  		__page_pool_dma_sync_for_device(pool, netmem, dma_sync_size);
->  }
+Does your device support CAN-CC only mode? Does your device support to
+switch between CAN-CC only and CAN-FD mode?
 
-Thanks,
-Olek
+regards,
+Marc
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--r56ki5hqfoc5hcq4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmfkPEwACgkQDHRl3/mQ
+kZwXaAf/a0RArL3RY/rCsvGqnhAz/Nk1ljI1/sjXn6b6BRnEzwSev7b8LpGNMeTK
+ygCzVEDcFHwfjhcV2/C2irc0XtxnLLmh3YqpNF54IY/vAAFDzqPGqzOHYPiOE+Al
+ZFK6zjj26zmBDh011lfjyWk9EYvhDUfZNCUAX6N8Cdic+9wNGDiN9HKVfz6cUj9K
+oGTTUPVTU0Nh7bwnuHLuj5IIruIQlTPH6w0Yd56Uv4TvGZ0cQ+S9hgGvY2J6v4f8
+tdvZIe+xMQTR2d4kaK/HU+wA0iMdSoxKyu9sCszU3tWGH/Yb+UAF1/gcdc0f5Gk6
+0X0j7uJgXLMbbdpHbsWypGiIkORpqQ==
+=mUFO
+-----END PGP SIGNATURE-----
+
+--r56ki5hqfoc5hcq4--
 
