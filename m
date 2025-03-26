@@ -1,64 +1,61 @@
-Return-Path: <netdev+bounces-177715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52DC7A715F0
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 12:40:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2ECFEA715F4
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 12:41:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B27623B635D
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 11:39:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 532123B64E9
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 11:40:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CA991DDC0D;
-	Wed, 26 Mar 2025 11:39:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 038171DDC04;
+	Wed, 26 Mar 2025 11:40:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bS8lXcnj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tl8NgmRK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488181DDA3E
-	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 11:39:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCC1A1DD539;
+	Wed, 26 Mar 2025 11:40:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742989148; cv=none; b=oNhRU3rZlC2j/xNlUmkAPMXqbSnO5OZoEcEezlughP6egKUh8m0DSM/gdtKeBx9LKbguqdExK+5wqgEf73LU8oVYKq+JVXRZ8y4ivp6Kr3YcHg2kKwYUcT4IoAFffV8x2eeBwsKrCgSGW2F2bGmwi/43P/m9zMMCTZqliPsytT0=
+	t=1742989234; cv=none; b=brNBLkRz4nvc14SdpVf/yn75Rnjt1C6u3I8TP72cBr9Pap3NYjqslTA5dTfyGGl5sOXj5nxdLFNz4ibevIyVsnhlP+yBh0Jazkn/Iu16Nd9BPH7aEEU8U+7uNW8X/lbEmjLT7unhe/oGdl9vkMQZ9t0THRoomabha9nikOijbuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742989148; c=relaxed/simple;
-	bh=6VobI5ImsegYcGK115583MVGFlEBeW/Xgorsn1Of/8I=;
+	s=arc-20240116; t=1742989234; c=relaxed/simple;
+	bh=S4Y5Lp9S60CEFrO0+Skg6aj4t8NQylWLvEAiP2Hr4hA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jDp3Ie6DprqFTntmAJ5AT0nTufELQgK7XRKEnQPiJpeZXDd+s4kQE0XKIBG7yiVdM81V+uruZle4KYNAhM5q8GqH4vPg2kAH2FlQeNDBiPXjT21Hd8jwGR1QetRUyMi3/6v5CD0X6Dqi5yFnQnc1XqaFMqdev/D2wnV8g4QNJgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bS8lXcnj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F636C4CEEE;
-	Wed, 26 Mar 2025 11:39:07 +0000 (UTC)
+	 MIME-Version:Content-Type; b=gxpxe9tSClMSO8zBMd1RrtfjRL3RzEI2J+Ede5t8KNgY9VmhBI7oinf9eQwAIoC2Ui76qBi0X8oTkHmqVTqkbh3Bj+NDVVjy3+GE6t9MXhjNXWOv/Aaftm237Xp61kLc1DTjmnG40kKUU7AI/5m1UhOemcuFm2mjzGJBbpWn9nw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tl8NgmRK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCC01C4CEE2;
+	Wed, 26 Mar 2025 11:40:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742989147;
-	bh=6VobI5ImsegYcGK115583MVGFlEBeW/Xgorsn1Of/8I=;
+	s=k20201202; t=1742989234;
+	bh=S4Y5Lp9S60CEFrO0+Skg6aj4t8NQylWLvEAiP2Hr4hA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bS8lXcnj96MO+clCn+655oUqjKD/5SzmkT4sW3uKqI4Ia7sQ4pOrCLwAKeYcw/meO
-	 6Ki/5dmZ32fpmeVwhoO/kUZm00FWeYmK/n6Y01bLgUPX9giONQZXspfWXqt6a4vC/l
-	 KERjEQ2Yh99t0Ny7FbPPlvxjgA0fKyg0+CGwkOQcZDvXVCl8f7sfZl1OSZtw4DavP5
-	 t5sDtIWq1wng3Lv3O4iQegynBGRXmXg02BYebQK7bmwQP5/dW/sF2cCd5FvG8Xgzss
-	 9BpVp1I1Tt100V7HczvlWQspSbdUCjSjYB3xiZuq4aGVoMAS6UhSEk3FlKAaEaEDXp
-	 v+y506Ma97+hA==
-Date: Wed, 26 Mar 2025 04:39:06 -0700
+	b=tl8NgmRKuvPwdQPlOzI7hW11C6rkbyHIycr825TLIo5pfATVTMK5fH9v8knXlYJi9
+	 XYVLLQPGqH6mPw967lyZcAb7QhyialB5dxu8DsjpZZyo8sZk1h6NDoa5uFH46SXS4s
+	 wSYZTouMwpAU2PoK3ZAINJL2yblcK7S2tE68eARjQ0tsQ5wUGaVd+7q6E59FZGIEGO
+	 RBQGLFNczdj7+YZ3VXYqLFiKMtwe9WbNwwjApzQTm4Ejb5YwSUwJo1/teKgLKFTo1V
+	 2m01QUaLd5lb/hl3JNireEJaGdpxhfdUlZcKXLXxgpkSbhps7GkCFsYhsMaRXSLzar
+	 Bzfa/pDGNq+mg==
+Date: Wed, 26 Mar 2025 04:40:32 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jamal Hadi Salim <jhs@mojatatu.com>, Pedro Tammela
- <pctammela@mojatatu.com>
-Cc: Jonathan Lennox <jonathan.lennox42@gmail.com>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Lennox <jonathan.lennox@8x8.com>, David Ahern
- <dsahern@kernel.org>, netdev@vger.kernel.org, Stephen Hemminger
- <stephen@networkplumber.org>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri
- Pirko <jiri@resnulli.us>
-Subject: Re: [PATCH net-next] tc-tests: Update tc police action tests for tc
- buffer size rounding fixes.
-Message-ID: <20250326043906.2ab47b20@kernel.org>
-In-Reply-To: <CAM0EoMnmWXRWWEwanzTOZ_dLBoeCr7UM4DYwFkDmLfS93ijM2g@mail.gmail.com>
-References: <2d8adcbe-c379-45c3-9ca9-4f50dbe6a6da@mojatatu.com>
-	<20250304193813.3225343-1-jonathan.lennox@8x8.com>
-	<952d6b81-6ca9-428c-8d43-1eb28dc04d59@redhat.com>
-	<20250311104948.7481a995@kernel.org>
-	<CAM0EoMnmWXRWWEwanzTOZ_dLBoeCr7UM4DYwFkDmLfS93ijM2g@mail.gmail.com>
+To: Dominique Martinet <dominique.martinet@atmark-techno.com>
+Cc: Ahmed Naseef <naseefkm@gmail.com>, asmadeus@codewreck.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org, oneukum@suse.com, pabeni@redhat.com
+Subject: Re: [PATCH] net: usb: usbnet: restore usb%d name exception for
+ local mac addresses
+Message-ID: <20250326044032.7d85c359@kernel.org>
+In-Reply-To: <Z-PmScfnrMXqBL_z@atmark-techno.com>
+References: <20241203130457.904325-1-asmadeus@codewreck.org>
+	<20250326072726.1138-1-naseefkm@gmail.com>
+	<20250326041158.630cfdf7@kernel.org>
+	<Z-PmScfnrMXqBL_z@atmark-techno.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,25 +65,26 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 11 Mar 2025 07:15:26 -0400 Jamal Hadi Salim wrote:
-> > On Tue, 11 Mar 2025 10:16:14 +0100 Paolo Abeni wrote:  
-> > > AFAICS this fix will break the tests when running all version of
-> > > iproute2 except the upcoming one. I think this is not good enough; you
-> > > should detect the tc tool version and update expected output accordingly.
-> > >
-> > > If that is not possible, I think it would be better to simply revert the
-> > > TC commit.  
-> >
-> > Alternatively since it's a regex match, maybe we could accept both?
-> >
-> > -        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst 1024Kb mtu 2Kb action reclassify",
-> > +        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst (1Mb|1024Kb) mtu 2Kb action reclassify",
-> >
-> > ? Not sure which option is most "correct" from TDC's perspective..  
+On Wed, 26 Mar 2025 20:34:33 +0900 Dominique Martinet wrote:
+> Jakub Kicinski wrote on Wed, Mar 26, 2025 at 04:11:58AM -0700:
+> > On Wed, 26 Mar 2025 11:27:26 +0400 Ahmed Naseef wrote:  
+> > > I hope this feedback helps in reconsidering the patch for mainline inclusion.    
+> > 
+> > It needs to be reposted to be reconsidered, FWIW  
 > 
-> It should work. Paolo's suggestion is also reasonable.
+> I just reposted it here after this reminder:
+> https://lkml.kernel.org/r/20250326-usbnet_rename-v2-1-57eb21fcff26@atmark-techno.com
 
-Sorry for the ping but where are we with this? TDC has been "red" for
-the last 3 weeks, would be really neat to get a clear run before we
-ship the net-next tree to Linus :(
+Thanks!
+
+> I've just remembered the timing might not be great though with the merge
+> window that just started, and now I'm (re)reading through
+> Documentation/procss/maintainer-netdev.rst I pobably should have added
+> net-next? to the subject... If it weren't closed.
+> 
+> I'll re-repost for net-next after -rc1, unless something happens to the
+> patch earlier.
+
+It's in a gray zone between a fix and an improvement, we can take it
+via net at this stage.
 
