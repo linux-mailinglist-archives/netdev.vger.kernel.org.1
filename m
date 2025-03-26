@@ -1,173 +1,228 @@
-Return-Path: <netdev+bounces-177802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2A88A71D42
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 18:37:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D513BA71D5A
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 18:39:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FB8F189CFB3
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 17:36:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AFC5842B98
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 17:36:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BF7A23DE80;
-	Wed, 26 Mar 2025 17:36:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B387821931F;
+	Wed, 26 Mar 2025 17:36:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=proton.me header.i=@proton.me header.b="KLeAnQw7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XD/MfWyQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-10631.protonmail.ch (mail-10631.protonmail.ch [79.135.106.31])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3D323CF07
-	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 17:36:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.31
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743010577; cv=none; b=VYeWKFuIyucCSNiqYNtLJwtLfBncrbLux6sx681DQmHcvyp/c9Sr4yMtzYzor7QjjcGNqeWNYd986RXQKBRtCqRYAErnlqmkxCy2N6atfSPWR5XjRMlHqcePt5qOfCFp+HGCn/kVkTXZLmmkbHCpVU+P0uJbfQdmYJ8qX84J7rQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743010577; c=relaxed/simple;
-	bh=vmo70qi4jubeax8r03jesK1Pt//JC5tXOdcGJJd8Swc=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Y4Z/VGVu65KDKP4weiwOtEgN6W0yvCx/OxSkEhb4+TcWlvAKqWok/nYtKyaeo43UPYnjrFjQpwShO5obq5nfTlex2rigZaf+DTkKnSDZtoev585QLjPVyaTDHeAf4MzzSUtnugF5J1Ulm2guBsvUaqpgIGDMiGdr7xu56rtzDj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=KLeAnQw7; arc=none smtp.client-ip=79.135.106.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1743010566; x=1743269766;
-	bh=ISTNGVgFNAIYx4YxVawxUgwnjBdmAFD9xRz8nBxjPR4=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
-	b=KLeAnQw7pMwTIc0aP8iawFI8ULRG+OGlYN/wCnE45deKP4azWBgmStXT+icgK/+NK
-	 wv4nibfgtrEPn2ayPX1GCkqf/OcZ4xvleZX0dAm++M/xykGsV/A2eI5gFpsR+5p1ki
-	 uM4mSYToshLeMtIIXgxDyQvbB+R3/n2EpSPb6Aipx4oB7Ng10QGx/nRd50g76irVxH
-	 VFEJoigZu8OkUii3xC7p3pXKV/7QSBllcv8VGqOkzqLWdvI5gvuakA0M+osHV3k5R5
-	 ylVKJaUq+efycUbXXYSbzu5Zz9ssEVULj0ZPmQloCwKSrrONqFy77iu8W7tgUEDjRI
-	 22E/xuo2GEh3g==
-Date: Wed, 26 Mar 2025 17:36:01 +0000
-To: Tamir Duberstein <tamird@gmail.com>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?utf-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, Maarten Lankhorst
-	<maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, FUJITA Tomonori <fujita.tomonori@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v7 7/7] rust: enable `clippy::ref_as_ptr` lint
-Message-ID: <D8QDOBUM6NF0.CGJY7ZA5KD9S@proton.me>
-In-Reply-To: <CAJ-ks9nKT2PUDm6=b4AB1QUWwwvcqPn7Vz60=c0B+uFMZrqPew@mail.gmail.com>
-References: <20250325-ptr-as-ptr-v7-0-87ab452147b9@gmail.com> <20250325-ptr-as-ptr-v7-7-87ab452147b9@gmail.com> <D8POWLFKWABG.37BVXN2QCL8MP@proton.me> <CAJ-ks9mUYw4FEJQfmDrHHt0oMy256jhp7qZ-CHp6R5c_sOCD4w@mail.gmail.com> <D8PPIYIJCNX8.13VPQULEI0ALN@proton.me> <CAJ-ks9k6220j6CQSOF4TDrgY9qq4PfV9uaMXz1Qk4m=eeSr5Ag@mail.gmail.com> <D8Q4MSXXZ7OI.1NC226MO02VSN@proton.me> <CAJ-ks9nHKpQPuSBypXTSATYhbAFkQTJzUq8jN0nu4t=Kw+0xxg@mail.gmail.com> <D8QCK3CQES3Y.3LTZ4MVO5B3KT@proton.me> <CAJ-ks9nKT2PUDm6=b4AB1QUWwwvcqPn7Vz60=c0B+uFMZrqPew@mail.gmail.com>
-Feedback-ID: 71780778:user:proton
-X-Pm-Message-ID: c0a294e4fdda451a84b260cbeb67b2c355063bc8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 121A523C8CE
+	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 17:36:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743010603; cv=fail; b=mDWvpK4/E20qqkzGSW4fWO6cqDOrNHezmCHGgnicubMFE15/acjXvsO8AleWzRRpqmADLK45UAazNYZDRf3nTaPbnUutVICQAaAOj/as47gmu5MTMeZBUx+1fTYuVF447OhoS4SUR86/xI7uVHKBY1hiyXa8peSW9qvn1uRorbA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743010603; c=relaxed/simple;
+	bh=L28CvxnhcqfZQgT+LS+1eHJLDNd6DJvOXXdITzeCsHI=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=TaDBu9qj9Ap5mnhlOqEODfww35f3oEZQyQ9Ys5/vaXPnbgAEZHr/1aKSxYpB4+Ba4Hn+bWtFSk0aXdWdgJ4PxcQPvHBSEZb4tsKlXll3HZ+PhsfQbVFPRT/XLnFfpNvesO+MeHIRPZ5Nk7VZrsoTbJuAI8XejrdJNBTylHeW8wU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XD/MfWyQ; arc=fail smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1743010602; x=1774546602;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=L28CvxnhcqfZQgT+LS+1eHJLDNd6DJvOXXdITzeCsHI=;
+  b=XD/MfWyQRNwX/7lCP9lpmMi6YGbJGNaEVd2Esl2z80ICbVxYJlcKsiSb
+   l9buz5fQ59GA0v6n06R5YapAYC7sagum8eb069GM7ht8THFBX9drcdpg2
+   sZvwTwg08w2DIqX8cjdm4g7J8DqvANFzw4TSgekSI0dAEvwoMrDDcRYTK
+   IMo9VUiG8x1pVQ+h7+xeT5NY9tfNTyrGGwYomkoqwYrAWVHkmtwRF33xH
+   VXO89HazyrfPLqk4tfUqgrB51OOLrFX00zs165MBlesgxEWAj48jISgMn
+   mc/volx7/PxQih3YOZHLVgzQKUYCVcp/to0yAXJB9uZRok7bqmbWgL1LH
+   Q==;
+X-CSE-ConnectionGUID: xBKXIZe1TqK+iutTnuzgAQ==
+X-CSE-MsgGUID: wOFqc/ilRPKTj4s0JI9DGQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11385"; a="44038045"
+X-IronPort-AV: E=Sophos;i="6.14,278,1736841600"; 
+   d="scan'208";a="44038045"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2025 10:36:41 -0700
+X-CSE-ConnectionGUID: e+7/9jpoQCOCLqvcvy6y4w==
+X-CSE-MsgGUID: 4R2PBEIWTMeBLvbAH52iVQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,278,1736841600"; 
+   d="scan'208";a="129005313"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2025 10:36:41 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1544.14; Wed, 26 Mar 2025 10:36:40 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Wed, 26 Mar 2025 10:36:40 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.176)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Wed, 26 Mar 2025 10:36:40 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AvnPCWhfSUvzdZntmuceohLihyUw528mPD55DJvIEAKlPql58MLqwDIBRyjfoB52iq07V6otCcxudWhcORiBQdqf7FDI3+neIYV89KEv0e2IPkSX0iwUoM0PXzlCmUF+2E041cCveWfmFe3xroP5A39E9rZ82j63hwWS4Q0anCZWwl7ECgaMa8CCXJm6MzPLDt31Pis841vAxsJ5C5BGnnJxuzCt0SV/NW2gzQFHRdXtJP4FVXJFOcFzk/bOgTWHLNUof5+eXuC4ZA+4lYIQEg9Xau7N9P07ko/5dtDaMF34ikgkQTP+NIYq+JJtd5siBG2T79WO9yghb5YmgvlkhA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5LpdKJ5qcedp9d1IDxe0PMrFUB7smwUOgL8e2pWVavY=;
+ b=sYyKYrfG5KjVqMN5rkQqjWAteFPNcraROlWZvxdZSzUjdIzyGSoiJJgysrTsCPZbbi4fUEp45fhkoK6SS9PXoGgY2jqRNRKJD8ZQOo591sdijiAuflrirX/lMT3gyJntRQWtYIiRNg61Ms806lPYnnuMahpuH8z0WhEXpNb+7Yz6b7Jc9RFmuUGa7DxaL/7QNZ4KTTGCxrVhsGPlEVZg7GBF5UMLWJ4FoEdQYqRcsOuiNOeTZcHO9h7AdoLR9az6IezEwzDl/J0JEjRC8/Et7L1yUyLaqGVrqBtJBz3E6UEcr6MgT3zVn2D/EX3imgqp+39nFNTZzMd4RoUHZAoAVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7420.namprd11.prod.outlook.com (2603:10b6:806:328::20)
+ by SN7PR11MB6851.namprd11.prod.outlook.com (2603:10b6:806:2a3::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.42; Wed, 26 Mar
+ 2025 17:36:09 +0000
+Received: from SN7PR11MB7420.namprd11.prod.outlook.com
+ ([fe80::b8ba:be35:3903:118f]) by SN7PR11MB7420.namprd11.prod.outlook.com
+ ([fe80::b8ba:be35:3903:118f%5]) with mapi id 15.20.8534.042; Wed, 26 Mar 2025
+ 17:36:09 +0000
+Message-ID: <c5eede52-0d32-4677-bd2b-8e0f31dba857@intel.com>
+Date: Wed, 26 Mar 2025 11:36:01 -0600
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next 0/2] idpf: add flow steering
+ support
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<przemyslaw.kitszel@intel.com>, <anthony.l.nguyen@intel.com>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <almasrymina@google.com>,
+	<willemb@google.com>
+References: <20250324134939.253647-1-ahmed.zaki@intel.com>
+ <452e0969-9811-4853-86e0-ce1be0b848c9@intel.com>
+Content-Language: en-US
+From: Ahmed Zaki <ahmed.zaki@intel.com>
+In-Reply-To: <452e0969-9811-4853-86e0-ce1be0b848c9@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR04CA0115.namprd04.prod.outlook.com
+ (2603:10b6:303:83::30) To SN7PR11MB7420.namprd11.prod.outlook.com
+ (2603:10b6:806:328::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7420:EE_|SN7PR11MB6851:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3f44976a-b07d-48f6-737a-08dd6c8cb1c2
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?RjN4YVdKanBkTENkVkcrMzMxTk51TDhFajZwQkprRktRWnBRckZEQkozRUZT?=
+ =?utf-8?B?N0lhTGZ1RjlXVzJNY2o5WHQ1d2NWS2tmOVMzQ1N4ZVcwa3dkb0Fnc2E0QU9D?=
+ =?utf-8?B?YU1LWVRaSWhYUG8wdUpGWlhZcTdPNnloY3pBNTU0U3RtSW1tTjBYb1gyR3Iz?=
+ =?utf-8?B?VGVqQ1VValQ3Ry9CbnYxN21TdzVIcVh6dmVQZ0IzVk9GWEtkUFh1VmZ2SGI3?=
+ =?utf-8?B?VnhCc1lYUHkwT2s0M3pDOXJPbStJTHBocTR4aHRwY1kxM0ZXOFcxL0VNazl6?=
+ =?utf-8?B?bjRKa1FIQ0RDOUg3K3RaQzJsekJLbjhNWmxFbnZWdWloYmxFeWdBN3ZPbUhC?=
+ =?utf-8?B?cHBxMG41MU02eUpUa2FvTUpXWTJBdHcyRTlwSDNMYWRIS0RESE9hRDN2Mm5U?=
+ =?utf-8?B?WTNTQXlRbGdCQ2ozLzZkZ0pBd1c0YXhJNi9LMzZTYVFSNEExQmlYWmlrVjlB?=
+ =?utf-8?B?S2QvYS9TTnBiWWFNb1k2UXlsZktUaVBickV2Q1BrQzhCYjdnYWNkaHhUZjl4?=
+ =?utf-8?B?TVFra3VBblhQUFhDYTByNjZyOFoxWm1HVUpnVGNvMUx6eDJYOXB5UGVOMTJD?=
+ =?utf-8?B?eC9jY2IyN0p5Vm9MbllUNGFrdUJSdWp0ZEh5ZzlXTGZVcGZ1blJUNFMxN29F?=
+ =?utf-8?B?NHRFRHV3UkMvdHdJVkVKZG1kY043ajJ1dVJBV1hYdUp4aTYrVXBZZ2VXamVr?=
+ =?utf-8?B?ZzFrck1JUHNOZVh4c3VsVTN3MVIrcnE1c3NWeGdaSzlCd0FJbzZiT055TEFK?=
+ =?utf-8?B?djZjTjlNTS82eVd1WXp6d1JVTnR5UjZoME5YV0JrcEVMTmtYR0ZEdzlENDZY?=
+ =?utf-8?B?NWsxa3VhUVFwUml3V0Z5bHdCZXJSemk1cnUvaGZqYllxMGNVMkdyTWNBWGdF?=
+ =?utf-8?B?a040ditZWlEyTWFqdUhLSEo1eEtaRWpDL1BPbzNHaUR4WHpoSUxJd1gyVVly?=
+ =?utf-8?B?TVozR28veVhZbXY1VG1LZTJPclIrQ05tRTh4V0pqdG1jQnY3RXVkUzB2QTdY?=
+ =?utf-8?B?NWZJV0RaQzhvazI1NTkwajRXYTZOYkE0WW9oSFBkTnJoWm05dDI5TEJzQ2Na?=
+ =?utf-8?B?Yjg3MHJHQStsYmdQQmdNZy9JcHQ0SDBlZTRMckRjSGZSYUFwWjVsb2oyMFF6?=
+ =?utf-8?B?eFdjWHdrcWVSRFpQbkp2SFBlaXpJV2ZJZGxFZmN3L0FXM1N6SnFxOVd4MVJK?=
+ =?utf-8?B?ZGFNQWxwdlpMeDFVSGVPTm93QXRNc0lQYjlGMXVQbzI3K0V4ZUpVUHZsQUs0?=
+ =?utf-8?B?Vjk1RDVtRUg5TXZTbHV2REhWLzRXd3E0MDhvektFZGFKZ1YrZlpWSkpOa0to?=
+ =?utf-8?B?SUk5ZEVqZm5hbGRoNUlvUzUzTGdQc2J3RmprRUFOUHpNUThvUnR6cG9aTkVO?=
+ =?utf-8?B?c3orM2lDamRHVUpaVzZTS2VMWmRMTSszOHErYXBJc0Q3ODZBeVNxZjBBb0RF?=
+ =?utf-8?B?V3E2bW52RkVJWGRKcisvRm1UV3ovTjhhY1dZTkFDeDF0WVo4bmJZamlHTlN1?=
+ =?utf-8?B?MWt1NkJ1RDY3SFloaWtJTmdIKzlldWU0eXNSZGRSNWxvb2tCZytuUW5BVit5?=
+ =?utf-8?B?M0syTVNvaEc0VFV4UUFFUmJvMXhCNWFDWDNCdDAyQk1taGhEejBNZGllSVk4?=
+ =?utf-8?B?b1oyUnIzU2NqM2g3Z0FzQnlLUllENnRMNzJsNUFLZk1ZaXdJb1Z1RWdxU0Qv?=
+ =?utf-8?B?SFRuS3lNdDIrNTV1TWthSEdlTThrRHpIa3FnMEFPbnZsTzVPVFkwOFVLQzU5?=
+ =?utf-8?B?SnphNERuSVZCYjJoL0d6ZURzK1F6aXhJc3RpZXJ1SDlaNElZN0lKVHE4SDEr?=
+ =?utf-8?B?c1R0OHdsZDhvbDNjSlB2UVNvd3FGUGtyWkR3aTlBUHZFUXVrczNPd3U0Q3o3?=
+ =?utf-8?Q?Fha/76It5zMBc?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7420.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SUVmbnY3a3pYTDBicUdqZ0pqVTBMY1NhQXpsUllZRHdZUzhIMXdBNDhqMHg5?=
+ =?utf-8?B?SmgyY2hncWlCQjdaY0ptaDlsdnd6ZXlVdk04dTlnNXJxLzJ5cm9yUEUrdUpL?=
+ =?utf-8?B?Yk5EYTM4NWp6c3Voa0dsL3BMQkdYSlVKRy9odEtSbXE3QUZ5UVZyQ2ovMTA5?=
+ =?utf-8?B?ZmxmM3htSFQxYThYd3AwTlV6MXdWYzlzSzJ2TFhOenpMOGJ3V1dIQndzcWJp?=
+ =?utf-8?B?enQ4S0pxcWFqa3lveEZKM3M5TGhKTlU0NElLZFZ5d1dWczNocnFibWZ5OXda?=
+ =?utf-8?B?bVkvS0YzWDhDK1VHKzM2V1JmdFI3dHRPQ1JWV2VjRFFONkJMQTh5cEtiRDQw?=
+ =?utf-8?B?MkgzaEx1TTc0dTByalVhMGZRSU5aV3VxOVdJUU5LUWs5MHdYeHUzSlFmZkRv?=
+ =?utf-8?B?WEhrYzROL2RaM29nRHZaSEhsazRGQ3B6YkV2YVd4UlF2SnRtTFljQUQ1Z1Fj?=
+ =?utf-8?B?NVBBckN4UkZSSlF1d21PRW83RlJQN1VVUjQ0U21DaDBJVDQzS0I0T0pXMERD?=
+ =?utf-8?B?aS9seWpVRWNjdHg2bTNrblZpYXhTbGZSSHc2cVZpcnVJMGhDYWJtcVVQZHJt?=
+ =?utf-8?B?YXZCR21hMlVQajZIamlSRS9kV1Bid0tvUHhRVDl5eW5jTEdHaE5nRmVHZ1Bt?=
+ =?utf-8?B?OHdGOUpOdFhFREFKZm9qcVhDelJhVW1XVWtEalY1eUhCQ1E2SVNaZXlKck5R?=
+ =?utf-8?B?Y2lMd1JIM3JiZ0RzcWJsSHpaQzd5anZSRUtuS3BDelJqcGNmbGF0UDkwSG5k?=
+ =?utf-8?B?RnNTYXppZGYwVzdlN0ZXTEx1YUNjeXVWZ0dZNzRia1AweXFJMk5YWldsb1o3?=
+ =?utf-8?B?c0FjbGpWd045YXJjdzFETkNNMjdYZ2FTN3lxd004QTlzTU5LL0VzMmJYZVB6?=
+ =?utf-8?B?TldEMzlmaEZSOXB1bGtLUzhhNUFnMWFlVk1xNUZNT2FkNkVvVEZVbEY1RXZH?=
+ =?utf-8?B?RFRuR0dJTkllT3d3YTJvNndwUU9OcnVYMFpxL2h6MlFxeWhlRzJmVm9FYWFo?=
+ =?utf-8?B?NkRNZEF4dlZCUThPbDNlY0lOR2VTK3FLdExhQ2RGV2JMa0R3SzYxNk04dHUw?=
+ =?utf-8?B?cEZTdnBUYzZTT3NXcHMvakljOUtrMkl4VzVoZWVxTCtPUml3T1prbmlmS2xT?=
+ =?utf-8?B?b2JhNVE0dTVDQjV4QTVDNi9zNjNlRnF2TE9Ec2J3TkNHZkJuK2dvcysyVFJW?=
+ =?utf-8?B?L2x0ZS9IcG5HdjdHVUhoMHY5Y2ZjMm1OUW1GanYrTjBnVURyeWtVQ24yWFRt?=
+ =?utf-8?B?K0RSVm53dS9JbTdvY0IvaFlMa082SVphWUhmbk1aOUYzdUZtUldpTGRidVBn?=
+ =?utf-8?B?enlSMmR5V1FKd3dYU24yUFg4RWQ3WHRUNzY5UHh3WWlQeDJyN0xlNlp0b1Bi?=
+ =?utf-8?B?cktiSlJuSjArMUVUUGV4Y0NjUE50Tm5SRGU5TGNneWN6aHhBMjg1YllFNEQv?=
+ =?utf-8?B?M2lZZ2RaWm5OZ2l1bkdKeGFpMCtrUTJVSURGd0hoclFDcjE0bTlVVUlQSnow?=
+ =?utf-8?B?L0VOd0gwZTVoUEhvNkFOVWo4UzgzRi9YVWtHZDVYVE5YSVdvM1dYMW9MREdU?=
+ =?utf-8?B?alQyR3ZiTUNleHNpeXF5Z1NnN2FtS3BmRTB4WHdhbUFuM3UwMWl1WEgySGRx?=
+ =?utf-8?B?VTcvYnh2NE1BOU5uaUtoNnp1d2xIYzdoQytlbDR4VHNOTVJDTFQwaFpCZGhD?=
+ =?utf-8?B?TUQ0ZXBkeHVBMEdrOGNEa2hxTzY1eGVEZ3BYcEZoSC81UVphL1FYSG81WkFT?=
+ =?utf-8?B?TE9PZGw2bzRkbHNlbVNQTEpneUFJSWVUSmVRV0U1dlJqSzBwMDRHQXdncU1N?=
+ =?utf-8?B?TXZjemw0ampaUU8zTTg4MmovRUJ3R1Zra3lhZ2lIeUltai9uaSthbDljUWt1?=
+ =?utf-8?B?VHpPNE02RTZiL1VYOU5VWEgzSFd1UFZDNy9HNVZmUWtnQ054OFVydGw1Z0JI?=
+ =?utf-8?B?Njk5NFp6ZzRJbWVMelFONURMM3hUZUZVTG5jUGJPdEZHQTNCU1lzbHh6YkFO?=
+ =?utf-8?B?cHFvR01BL1M3ZjFjM0luV3lnbS9tWlFqeXI5ZysxWTVoZ0p5UEd2K0kzNHVn?=
+ =?utf-8?B?MmFnRldRZjgxN01TTU1TWW1mZnhRWVJWaW04cnFrMWpadmlmQzdYWWtNdElZ?=
+ =?utf-8?Q?sFLqVFMwk6nWSDFe3XIpoEwTf?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3f44976a-b07d-48f6-737a-08dd6c8cb1c2
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7420.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2025 17:36:09.2409
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YsRJeI73sMPY+w6ab3PWcoGt46gTSYIbYHpBiqQV6INx2Q7y1LrRZ66YuV1WnC4O35fLk5jXg8hW/WEZ0ofMdg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6851
+X-OriginatorOrg: intel.com
 
-On Wed Mar 26, 2025 at 5:57 PM CET, Tamir Duberstein wrote:
-> On Wed, Mar 26, 2025 at 12:43=E2=80=AFPM Benno Lossin <benno.lossin@proto=
-n.me> wrote:
->> On Wed Mar 26, 2025 at 11:35 AM CET, Tamir Duberstein wrote:
->> > On Wed, Mar 26, 2025 at 6:31=E2=80=AFAM Benno Lossin <benno.lossin@pro=
-ton.me> wrote:
->> >> On Wed Mar 26, 2025 at 12:54 AM CET, Tamir Duberstein wrote:
->> >> > On Tue, Mar 25, 2025 at 6:40=E2=80=AFPM Benno Lossin <benno.lossin@=
-proton.me> wrote:
->> >> >> On Tue Mar 25, 2025 at 11:33 PM CET, Tamir Duberstein wrote:
->> >> >> > On Tue, Mar 25, 2025 at 6:11=E2=80=AFPM Benno Lossin <benno.loss=
-in@proton.me> wrote:
->> >> >> >> On Tue Mar 25, 2025 at 9:07 PM CET, Tamir Duberstein wrote:
->> >> >> >> > diff --git a/rust/kernel/str.rs b/rust/kernel/str.rs
->> >> >> >> > index 40034f77fc2f..6233af50bab7 100644
->> >> >> >> > --- a/rust/kernel/str.rs
->> >> >> >> > +++ b/rust/kernel/str.rs
->> >> >> >> > @@ -29,7 +29,7 @@ pub const fn is_empty(&self) -> bool {
->> >> >> >> >      #[inline]
->> >> >> >> >      pub const fn from_bytes(bytes: &[u8]) -> &Self {
->> >> >> >> >          // SAFETY: `BStr` is transparent to `[u8]`.
->> >> >> >> > -        unsafe { &*(bytes as *const [u8] as *const BStr) }
->> >> >> >> > +        unsafe { &*(core::mem::transmute::<*const [u8], *con=
-st Self>(bytes)) }
->> >> >> >>
->> >> >> >> Hmm I'm not sure about using `transmute` here. Yes the types ar=
-e
->> >> >> >> transparent, but I don't think that we should use it here.
->> >> >> >
->> >> >> > What's your suggestion? I initially tried
->> >> >> >
->> >> >> > let bytes: *const [u8] =3D bytes;
->> >> >> > unsafe { &*bytes.cast() }
->> >> >> >
->> >> >> > but that doesn't compile because of the implicit Sized bound on =
-pointer::cast.
->> >> >>
->> >> >> This is AFAIK one of the only places where we cannot get rid of th=
-e `as`
->> >> >> cast. So:
->> >> >>
->> >> >>     let bytes: *const [u8] =3D bytes;
->> >> >>     // CAST: `BStr` transparently wraps `[u8]`.
->> >> >>     let bytes =3D bytes as *const BStr;
->> >> >>     // SAFETY: `bytes` is derived from a reference.
->> >> >>     unsafe { &*bytes }
->> >> >>
->> >> >> IMO a `transmute` is worse than an `as` cast :)
->> >> >
->> >> > Hmm, looking at this again we can just transmute ref-to-ref and avo=
-id
->> >> > pointers entirely. We're already doing that in
->> >> > `CStr::from_bytes_with_nul_unchecked`
->> >> >
->> >> > Why is transmute worse than an `as` cast?
->> >>
->> >> It's right in the docs: "`transmute` should be the absolute last
->> >> resort." [1]. IIRC, Gary was a bit more lenient in its use, but I thi=
-nk
->> >> we should avoid it as much as possible such that people copying code =
-or
->> >> taking inspiration also don't use it.
->> >>
->> >> So for both cases I'd prefer an `as` cast.
->> >>
->> >> [1]: https://doc.rust-lang.org/std/mem/fn.transmute.html
->> >
->> > I don't follow the logic. The trouble with `as` casts is that they are
->> > very lenient in what they allow, and to do these conversions with `as`
->> > casts requires ref -> pointer -> pointer -> pointer deref versus a
->> > single transmute. The safety comment perfectly describes why it's OK
->> > to do: the types are transparent. So why is `as` casting pointers
->> > better? It's just as unchecked as transmuting, and worse, it requires
->> > a raw pointer dereference.
->>
->> Note that you're not transmuting `[u8]` to `BStr`, but `*const [u8]` to
->> `*const BStr`. Those pointers have provenance and I'm not sure if
->> transmuting them preserves it.
->
-> In the current code you're looking at, yes. But in the code I have
-> locally I'm transmuting `[u8]` to `BStr`. See my earlier reply where I
-> said "Hmm, looking at this again we can just transmute ref-to-ref and
-> avoid pointers entirely. We're already doing that in
-> `CStr::from_bytes_with_nul_unchecked`".
 
-`CStr::from_bytes_with_nul_unchecked` does the transmute with
-references. That is a usage that the docs of `transmute` explicitly
-recommend to change to an `as` cast [1].
 
-No idea about provenance still.
+On 2025-03-26 11:14 a.m., Alexander Lobakin wrote:
+> From: Ahmed Zaki <ahmed.zaki@intel.com>
+> Date: Mon, 24 Mar 2025 07:49:36 -0600
+> 
+>> Add basic flow steering. For now, we support IPv4 and TCP/UDP only.
+> 
+> 1. Very poor cover letter. I'd suggest describing a bit more here.
 
-[1]: https://doc.rust-lang.org/std/mem/fn.transmute.html#alternatives
+I'd call it concise.  Let me know what is missing or needs clarification 
+  and I will add.
 
->> I tried to find some existing issues about the topic and found that
->> there exists a clippy lint `transmute_ptr_to_ptr`. There is an issue
->> asking for a better justification [1] and it seems like nobody provided
->> one there. Maybe we should ask the opsem team what happens to provenance
->> when transmuting?
->
-> Yeah, we should do this - but again: not relevant in this discussion.
+> 2. net-next is closed, so this is RFC at max.
 
-I think it's pretty relevant.
+It was sent before net-next was closed.
 
----
-Cheers,
-Benno
 
 
