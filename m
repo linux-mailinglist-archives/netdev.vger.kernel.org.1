@@ -1,166 +1,150 @@
-Return-Path: <netdev+bounces-177826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F06BA71EC8
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 20:07:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB24BA71ECF
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 20:08:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E681B16D8FC
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 19:07:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63DFC16DF13
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 19:08:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E773324EA9C;
-	Wed, 26 Mar 2025 19:06:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9632219E8F;
+	Wed, 26 Mar 2025 19:08:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aTiaoPUT"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="Q0yqjLNU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1804A28F4;
-	Wed, 26 Mar 2025 19:06:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70DE8191F8C
+	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 19:08:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743016019; cv=none; b=LW5i8X0o7ECsneNNaJJV38hM88vnamW6EnYLW1E3Ujtp/Sb9xu9pie3d0TUGQ+9zMZztvMkOB0aGvrYjEK03jG2tdbw27OMjxLafFsopahnXHJCB++hyTgZXk3h/GpzxPTnB4PCKYGm+xO3eq1MSUz5E+ngu+pgZh6hMstYryV8=
+	t=1743016084; cv=none; b=qDDGTVW87tt3IpzVUwhOjQqmoz98MQhiqgEMJ1izd0KZZl3e9Ch5AaquUOo5T8Ay0LO4GTd5OarM6gcX87EKsHzYR6U0AsslF+65MH1Ujl2RyZ9Z6hKTF4k/aJsNN/+xoMe3z6jtLm0nT1tqsnFnQ7yOvlJLpadpNJRBpfgKjQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743016019; c=relaxed/simple;
-	bh=xyxvZkbyduy9RmkQ3WSeK6/tBzwWPMrfRAoEJmlTmuE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XPRRJFjPZ3tUZYhJqdvDZd0R9AMtbCAd8+xdFbD0GIZGfj3M5E0oPAFCl2P4X22rz4lV8eA84QefGpIFAgwufX5pXGfzVoKUR2kwGfNH04vWnBETPlUfd0+bln6nnvcdmHvzmIQuQKXFAcN5BSRco/y/xIRzgXfmHXwc5lJ5an0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aTiaoPUT; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-30bfed67e08so2255321fa.2;
-        Wed, 26 Mar 2025 12:06:57 -0700 (PDT)
+	s=arc-20240116; t=1743016084; c=relaxed/simple;
+	bh=7RVgYIM4oj+y9+f7/CAA0dyO6P1l7KBbToFOhY1GXn4=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Hf0p5QOs5Wdw3v9R4914zokeLv55YqndHi4x1yK+1kZpo3XlH2cUAre5kEx0ex3JyJg5O97tBua+Ts6OC3aoegSXQkknt+aUfx8ZVTt8U203T4qDL+WX1kd/aUktQGyoPWWHDBcT9XWUvhnQP5cvzKSzRDIWx2kj/wnfgj835RA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=Q0yqjLNU; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2240b4de12bso6279195ad.2
+        for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 12:08:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743016016; x=1743620816; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xyxvZkbyduy9RmkQ3WSeK6/tBzwWPMrfRAoEJmlTmuE=;
-        b=aTiaoPUTXhlz0TWPtz+Y44JteqxaDLfRo2CXuDryjK/5Nef0PPICQBIUqY4YIhhTmU
-         i/w8AGV/lTNgNPYNX0ulVacg3IZAwpb6vEJa0jVz/TlWZXtmQYm0aiLO6pLvjVuav4Ul
-         aH3Pg62nzVPkXRmdrPv/aC9LoddjkxcuySQGlvO0ongu1fTtJhytIDkGYSLrZAH+wCzb
-         lCCEFdGDf8Q8bPct91/6D1LpnBe7A3cSuDnbyBc+lVvCuB6VfGrOJGFC9TyjjrbsZJuL
-         HZfrlp4hsiIl7BQsJz1daj/KyLt8q4ovKxNCr0DYCClG6RWXmaMkv3qg5Y4dQskrykJ/
-         Kx+A==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1743016083; x=1743620883; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=nx/hPE0jDwRnFgP5uI3XcutfB0Ey6NWCcZfWskoFM5s=;
+        b=Q0yqjLNU3sEuqmwhqaU40+1QwJro9YmhtUIiS+5gamzku/KiQkFVYRstW8UHMkG/3f
+         bd46mzuIrXK4Nh36pWmvrBl2uWaRQRfKTpbts5BEkF9QhTHUnQaQh6QB2Vlw/EDJHJzc
+         nJEeWVJHyL3N61M/134oFr+zcnc/T+uEAEUewpspTUnf7iRH8hmvI3FffJirW84lrIUr
+         MEyKbTDoo+w3LwPMuWzz13gDlN+ypNLcuZvuq+ouwj2Faw8aQ619+5GWpSW/0AUSlOyi
+         tQY0EmEklsEo9qCfanm2OhlXOwAWUGlTLbjjuvCiLS3jKRe2H5scEVvCEU9LxEOG9kLa
+         sTXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743016016; x=1743620816;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xyxvZkbyduy9RmkQ3WSeK6/tBzwWPMrfRAoEJmlTmuE=;
-        b=u7ASLFfjWU3+C4Hbd8ojDjidpvZA8E9wg5fXGtu2Oyu30jJjtQEfukZEmelEyUDeq/
-         Z1lIlXAz3uMD4JTFy0F+/LzxsZtXqhOUzy4H5EqzQDxiZ9YwhnhCENa15bBZsEat3w6u
-         ltwzmAMnK5RmkpsvYfOf1CybN1wToLbV5XeHBA3VwreXwYz5eDaXyS9nyQtiXQI77F9T
-         J2WzxuT+WLstCyq7zfKiqO6m62c/a/3w2INuw/SldqSxSXAR5SzZFnCRR3BCRUAk7KQo
-         qhorjFKUy2cY1CNfRaDzW8fQfY8UUvKvobnQuJmWk06mgqaPQhJ5fEDDAFHAyJMKlZ6L
-         S4zw==
-X-Forwarded-Encrypted: i=1; AJvYcCUjstPFP8AutMsI7KFZy2sxUcI8lpofjeaDtujc5nZb1KM+DSaDgiEDV5Ysph54mc2TjPjX0cKg@vger.kernel.org, AJvYcCUlWlE3gQ4V5qI4mnZA5OfZsXjeEkP0FnyYhEn/0UI5vw09LXjkBETsMNzz6dGwJMPRAlM0yLhyGIWY@vger.kernel.org, AJvYcCUxHO5cL5xOtYBwQ4ssyK3pbgD2Sx5vPX0/kCnar1Bt68z3AFL4c4bpwVyqynkAOWCpjAg95aaruIlAGIsG@vger.kernel.org, AJvYcCUzHrs9hhZPhJHdc8T2hQSfJtlajJClJaaTZZXirNG0rLunB5dfXHvrXxPP4ZrmRYVcf8al2TMrf496wno=@vger.kernel.org, AJvYcCV83ZrNc7qR83APq23ziwqVAqEMJHhCntcCJ2HPdrnQgF9M4z/LnkKOZRQmA7MMggUgv4aX1wtSOP6f@vger.kernel.org, AJvYcCW0MGnWhUKfW7WLe9XElSZ0h6mA+cr+9XzQYCzItXbThwc1R+4GA4KWxlm7eYWhA4LQBWDsQOH8dSP8Mka/ECg=@vger.kernel.org, AJvYcCWCLHlsCqrgPCLB4YzC8gG2XkkJwu2g8DsAqwyr/Kh6P6FfhT0tKSAIIJs7LpXZM+O244iUptxoqmHNfbmd@vger.kernel.org, AJvYcCWRPQKLEotIxfWvm7jfKl4WN43SEV3G8V1tEtQFTmCnMSyHUG5Ld5vnER6ofRGzWKRbMBrBRb3uCP8x9RZnoKPh@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzvx5V1cHjnkhzKrKY5P8Z1exSSq9Zq4BWDAxyt0QTmSthHycBf
-	gy970IOCP5mamWPyrxXOnU9xa0jcvhuiTPwtTM6oJZPXKPjgFlubsskDMFAbqWKF6PJL2i+MFp6
-	40fnd+cwpaboLAdwkBQnCtluHI/A=
-X-Gm-Gg: ASbGnctj9WgJZ7cCM3YPJaNxw5v6UwiJ+j7IeNOxGRp0wt24ooHXhLAGEJ0S9u9NLk2
-	fylV1BlBEoN3wpI8nMsMBO288/mmCph6NfqixLXVGcNuti+otdsyTbQzLqwTZHRRC+F2JYBLQd3
-	Iyi3B6OtmlcYHkTt1/o8iDkT32YFBnWeh6IYgFQMHXXQ==
-X-Google-Smtp-Source: AGHT+IHDYgVo8MGaQ9BkG5+GyvT0+QD0Hn1jlcmz/IJfG8ECGaCOtoHRacJDMqa8JoaxSiLcVOV3Dc1Whxt+lMktHno=
-X-Received: by 2002:a05:651c:4ca:b0:30b:e440:dbdb with SMTP id
- 38308e7fff4ca-30dc5f45b99mr3646831fa.37.1743016015848; Wed, 26 Mar 2025
- 12:06:55 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743016083; x=1743620883;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nx/hPE0jDwRnFgP5uI3XcutfB0Ey6NWCcZfWskoFM5s=;
+        b=e+fWlGP6HrA3opezAdVJufRv1A/ESW2Vn+ox/fKG+McFE91CvA/SC8eP84T7t8cNpf
+         SoRP1o3LMSssXud+4SUWxZTSSc+KP2qtV8KYhfq0JR2KdWT7777rPHCRRTx3wdvU/nB8
+         Iv+1vrkNEJYndJ0BDu8IEYjb+rVkThUnFY++Qw/M6t+f2MUCuDsSAxZKCt8mApzId09s
+         qu2M3va1kp7hjzLnsawKHU0B4aSLUS2/YBgrCVUAdp7YEMAK8CwjkFVKW6rIgSvjgt72
+         OzqM2RiVBG2s8mi+iJexT0Br37zwK+tibZNVmktelFPdJDQArqCFZrLxWGwKt0sR6QVW
+         vNWw==
+X-Forwarded-Encrypted: i=1; AJvYcCVd/d4tkfgMGWz40scqGLRl4VMzzp9laPkM2b/tUXeGifc9vb+sMIPbRp3jPB/GdGUkVl1swG8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcVAt4H4y6ttAYlBaZTFbg0pNpQ8qPek5Ctd3Tr2XmtG4uLokF
+	2jCrW+R5BZikjEIaW0Lr4Lj5UYWjep71SlQfvrB9AnWvafnByjPKbArlPzKyQmRv+uIegf0+cxw
+	=
+X-Gm-Gg: ASbGncu56JqOZLR1r3NNg+ubo0IWm6LCJW4iTstDNhbWbI9J+iVQ4qDzfn1WdhoB5Zb
+	JpUDybOj2YUD75GrvjmT9ByAsPCobU9q8RvFdfUfccOh5YKFyUUR9FF/eWgXUD7PeNwirtGqLvt
+	fxOX2xxoXEZyvpvcoh/Bw5i47Fx7nSSKoAVQiuQn4HsHt9teXvCsd3Fo9g3Cpeso8UFDLJyZguZ
+	dOUKtjYem8crTsvMytwzcKopVFlu0jqoJxbcEBtFvpBTIGZaelcPhQosLcEj1Gb63ETIh75b1BO
+	y/TOLBDGNaLbiwZVb0zhbUVIkOTYXad5EGUq4k1WLAiTavDrodbJ+Q==
+X-Google-Smtp-Source: AGHT+IEz0CLvFdTg/2IAsAJVcnbXhjPY3FIdgipM/EkEKYtdD6VzPL0YeolZTGeUP/+/3IROIFR7ZA==
+X-Received: by 2002:a17:903:3a8d:b0:21f:74ec:1ff0 with SMTP id d9443c01a7336-228049314eemr9545075ad.32.1743016082580;
+        Wed, 26 Mar 2025 12:08:02 -0700 (PDT)
+Received: from [192.168.50.25] ([179.218.14.134])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22780f4581csm114428695ad.59.2025.03.26.12.07.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Mar 2025 12:08:02 -0700 (PDT)
+Message-ID: <6c694107-5c99-4d3a-a741-eb1d798060ee@mojatatu.com>
+Date: Wed, 26 Mar 2025 16:07:58 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250325-ptr-as-ptr-v7-0-87ab452147b9@gmail.com>
- <20250325-ptr-as-ptr-v7-7-87ab452147b9@gmail.com> <D8POWLFKWABG.37BVXN2QCL8MP@proton.me>
- <CAJ-ks9mUYw4FEJQfmDrHHt0oMy256jhp7qZ-CHp6R5c_sOCD4w@mail.gmail.com>
- <D8PPIYIJCNX8.13VPQULEI0ALN@proton.me> <CAJ-ks9k6220j6CQSOF4TDrgY9qq4PfV9uaMXz1Qk4m=eeSr5Ag@mail.gmail.com>
- <D8Q4MSXXZ7OI.1NC226MO02VSN@proton.me> <CAJ-ks9nHKpQPuSBypXTSATYhbAFkQTJzUq8jN0nu4t=Kw+0xxg@mail.gmail.com>
- <D8QCK3CQES3Y.3LTZ4MVO5B3KT@proton.me> <CAJ-ks9nKT2PUDm6=b4AB1QUWwwvcqPn7Vz60=c0B+uFMZrqPew@mail.gmail.com>
- <D8QDOBUM6NF0.CGJY7ZA5KD9S@proton.me>
-In-Reply-To: <D8QDOBUM6NF0.CGJY7ZA5KD9S@proton.me>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Wed, 26 Mar 2025 15:06:19 -0400
-X-Gm-Features: AQ5f1Jou-JUIkYYZHmN0n0DjKziFwOI3NizL41USvJvQpjSfAnBz0gZwusssOLs
-Message-ID: <CAJ-ks9ntTxBM=c5nUZWGv3MoRt-LveBchn-c1Xy-DGap7fLVRA@mail.gmail.com>
-Subject: Re: [PATCH v7 7/7] rust: enable `clippy::ref_as_ptr` lint
-To: Benno Lossin <benno.lossin@proton.me>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
-	Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
-	Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, 
-	devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] tc-tests: Update tc police action tests for tc
+ buffer size rounding fixes.
+From: Pedro Tammela <pctammela@mojatatu.com>
+To: Jakub Kicinski <kuba@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Torben Nielsen <t8927095@gmail.com>
+Cc: Jonathan Lennox <jonathan.lennox42@gmail.com>,
+ Paolo Abeni <pabeni@redhat.com>, Jonathan Lennox <jonathan.lennox@8x8.com>,
+ David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+ Stephen Hemminger <stephen@networkplumber.org>,
+ Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>
+References: <2d8adcbe-c379-45c3-9ca9-4f50dbe6a6da@mojatatu.com>
+ <20250304193813.3225343-1-jonathan.lennox@8x8.com>
+ <952d6b81-6ca9-428c-8d43-1eb28dc04d59@redhat.com>
+ <20250311104948.7481a995@kernel.org>
+ <CAM0EoMnmWXRWWEwanzTOZ_dLBoeCr7UM4DYwFkDmLfS93ijM2g@mail.gmail.com>
+ <20250326043906.2ab47b20@kernel.org>
+ <d6231806-8666-4b07-982c-7061ca352b59@mojatatu.com>
+Content-Language: en-US
+In-Reply-To: <d6231806-8666-4b07-982c-7061ca352b59@mojatatu.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Mar 26, 2025 at 1:36=E2=80=AFPM Benno Lossin <benno.lossin@proton.m=
-e> wrote:
->
-> On Wed Mar 26, 2025 at 5:57 PM CET, Tamir Duberstein wrote:
-> >
-> >
-> > In the current code you're looking at, yes. But in the code I have
-> > locally I'm transmuting `[u8]` to `BStr`. See my earlier reply where I
-> > said "Hmm, looking at this again we can just transmute ref-to-ref and
-> > avoid pointers entirely. We're already doing that in
-> > `CStr::from_bytes_with_nul_unchecked`".
->
-> `CStr::from_bytes_with_nul_unchecked` does the transmute with
-> references. That is a usage that the docs of `transmute` explicitly
-> recommend to change to an `as` cast [1].
+On 26/03/2025 16:04, Pedro Tammela wrote:
+> On 26/03/2025 08:39, Jakub Kicinski wrote:
+>> On Tue, 11 Mar 2025 07:15:26 -0400 Jamal Hadi Salim wrote:
+>>>> On Tue, 11 Mar 2025 10:16:14 +0100 Paolo Abeni wrote:
+>>>>> AFAICS this fix will break the tests when running all version of
+>>>>> iproute2 except the upcoming one. I think this is not good enough; you
+>>>>> should detect the tc tool version and update expected output 
+>>>>> accordingly.
+>>>>>
+>>>>> If that is not possible, I think it would be better to simply 
+>>>>> revert the
+>>>>> TC commit.
+>>>>
+>>>> Alternatively since it's a regex match, maybe we could accept both?
+>>>>
+>>>> -        "matchPattern": "action order [0-9]*:  police 0x1 rate 
+>>>> 7Mbit burst 1024Kb mtu 2Kb action reclassify",
+>>>> +        "matchPattern": "action order [0-9]*:  police 0x1 rate 
+>>>> 7Mbit burst (1Mb|1024Kb) mtu 2Kb action reclassify",
+>>>>
+>>>> ? Not sure which option is most "correct" from TDC's perspective..
+>>>
+>>> It should work. Paolo's suggestion is also reasonable.
+>>
+>> Sorry for the ping but where are we with this? TDC has been "red" for
+>> the last 3 weeks, would be really neat to get a clear run before we
+>> ship the net-next tree to Linus :(
+> 
+> Jonathan's issue is solved.
+> A new one popped in iproute-2:
+> https://web.git.kernel.org/pub/scm/network/iproute2/iproute2.git/ 
+> commit/?id=afbfd2f2b0a633d068990775f8e1b73b8ee83733
 
-RIght. That guidance was written in 2016
-(https://github.com/rust-lang/rust/pull/34609) and doesn't present any
-rationale for `as` casts being preferred to transmute. I posted a
-comment in the most relevant issue I could find:
-https://github.com/rust-lang/rust/issues/34249#issuecomment-2755316610.
+I pasted the wrong commit, it should be this one:
+https://web.git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=667817b4c34944175deaf6ca9aa3afdf5b668fc5
 
-> No idea about provenance still.
-
-Well that's not surprising, nobody was thinking about provenance in
-2016. But I really don't think we should blindly follow the advice in
-this case. It doesn't make an iota of sense to me - does it make sense
-to you?
-
->
-> [1]: https://doc.rust-lang.org/std/mem/fn.transmute.html#alternatives
->
-> >> I tried to find some existing issues about the topic and found that
-> >> there exists a clippy lint `transmute_ptr_to_ptr`. There is an issue
-> >> asking for a better justification [1] and it seems like nobody provide=
-d
-> >> one there. Maybe we should ask the opsem team what happens to provenan=
-ce
-> >> when transmuting?
-> >
-> > Yeah, we should do this - but again: not relevant in this discussion.
->
-> I think it's pretty relevant.
-
-It's not relevant because we're no longer talking about transmuting
-pointer to pointer. The two options are:
-1. transmute reference to reference.
-2. coerce reference to pointer, `as` cast pointer to pointer (triggers
-`ptr_as_ptr`), reborrow pointer to reference.
-
-If anyone can help me understand why (2) is better than (1), I'd
-certainly appreciate it.
+> 
+> Changed the nat's "default" ip address from 0.0.0.0/32 to 0.0.0.0/0,
+> which makes tdc fail :)
+> 
+> https://github.com/p4tc-dev/tc-executor/blob/storage/artifacts/50205/1- 
+> tdc-sh/stdout#L2213
+> 
 
