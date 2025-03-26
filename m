@@ -1,174 +1,137 @@
-Return-Path: <netdev+bounces-177688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A70FA71462
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 11:05:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D312A7145C
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 11:03:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B3651882FCF
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 10:04:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F9FA16C356
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 10:03:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8EF1B3939;
-	Wed, 26 Mar 2025 10:03:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2465A1B042E;
+	Wed, 26 Mar 2025 10:03:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ziv9gCRa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lKs5JOkK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6671B042E;
-	Wed, 26 Mar 2025 10:03:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E77021ADFE4;
+	Wed, 26 Mar 2025 10:03:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742983422; cv=none; b=rdgAj1yNt7xkp8YskbtXcjjZwrg1+rEGN2v5y7obqg0Xcy63YZPXfLpsLEVwnj7Mg+tePQHBCPoTDcsFIYYq7fjhJ5XPXH6pGUTvE2+/eZ97ML69uEmmzlSvZEg0oTltVAjKSYVBMCVmsroXrh7O6+0KD/uu9qyf/6POfMQ4PXg=
+	t=1742983413; cv=none; b=Kq8V0n1d9vpeCrj0dBST7Fu9XhXOmBt1SFJCX1DXRMwDmt8APM32cKG/Aa/r4c8eecAOhjjki/5auHJ2jZquvcfdSHa5BYkt+kQCoCSsze5EfWqo3wLs+ELLFrV0W6ObHtju4bCxUVLAOYnDY/Fy5NtI0KCv+8TPpLVXiUdsrxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742983422; c=relaxed/simple;
-	bh=HJ3gprdMqDj0iPn/NsbKYPp2Aox6dbbVfA+al+1YtVc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=c74Dr+OzQgZtR334Q0J1KxbYej//6vF1Qrfx4BophO78oaPibZQZ+6hq2H6r+zG0DCmSDXEBl3GOelhUTxW9FmCiQ+eCbFVeJVCU/dgms2MJ7q33Sce6RWegqyaZWPVON61UWVoXpLBnD/WdVJRHiYo+q7DYezouTHQ/vMH5jeA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ziv9gCRa; arc=none smtp.client-ip=209.85.219.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-e60aef2711fso4553327276.2;
-        Wed, 26 Mar 2025 03:03:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742983419; x=1743588219; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Wvv2RTdKEHVFe+FXyA9kfktlP0uXuSbV+dmgE6Pnc+k=;
-        b=Ziv9gCRaSPet1NAyPwfhZUAvkYCgcwVmBL7mpYA84TI+pgNgEnatfbgd/kGtL7ohTI
-         Y6wmIHgo3vhAOfPpjyGHg+wm6lwDXoKF7bj2+jz0t0LCZuIuBt5Dp8quvRzbuSTmxcvp
-         7jcxhO6BtxD8K00bgXK17EyztnzrchbBffdH7CV93yP5EtwTTAw++FJdYW7ZRrXt91am
-         gllVhwVikJKLKxRUMC0opLw2itVScqEZatXmtn22n0IP72KSBvYSe24zBS8tVoSKmvKO
-         y40HEcIU2VTXQTsZljMTzP1cGrS56wBY4n7nkAbdBnuW3NSDXn/VrRVIoFMeELfRoK5i
-         hl+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742983419; x=1743588219;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Wvv2RTdKEHVFe+FXyA9kfktlP0uXuSbV+dmgE6Pnc+k=;
-        b=Bn/nPMVkbqmA1eMqFxgUq0IphEW1E+HB3evWWM8lydTzrhSfdBBf6XqOf+G3ZCM1kL
-         6OA5RQPfQj6tima9Z1pfgzH5jk+1K0yAghCmtdcuzySF2LOcyHLuz4eu4KpNE9tR7yNE
-         dfjWVOLpS46u3QPeqCz1xHnyMWwZEoBIz7YM516NS7jUP5I1rIlXdkj9zgS/TFHfHJEY
-         K/YNm6m2VUu8klW0h7+zZyt5Zd/U+gfNvcfkcbve2qSHDb2Ocse8TcfIz3qsaU5J/lqA
-         oCNMq74OMeS0TCnP4gHfZ4dH+PIc47EwzILK40MS7reLzuGfJvCI/xbFq+D+rDmezAyB
-         /lqg==
-X-Forwarded-Encrypted: i=1; AJvYcCU7nWjHxefgY1suAJz071rX9afDXuqbikqZzAnzuZ8OZ/HZtWO2b7VZHzcbFHLHUn0Rkwn05GdD6NCyXdI=@vger.kernel.org, AJvYcCXHSyiaeSnrkd15Rh9K62dj8KGXsg+zjQY5MPdrGJz/CcZkflvjJUIISWXdNrxYzivWJg28OMfv6AtQWck7d307@vger.kernel.org, AJvYcCXXgPc96lHLIZXKdGOjjKcVomLLMHL4gwUIuACmsA+NXb03Xf8+1aRZz1EtZ1ABzKqKjWBffO6C@vger.kernel.org
-X-Gm-Message-State: AOJu0YxA9JyrZsqan9K2cAMhihv01/YVNZeUGQbt6JRjkVw1y8BtKJy1
-	OIZcsHHGdwSV426KxlODzBQN316LSjNHcKc1s80nWRd55nGX/ba/NdK8v8WCZXbyiT9YLqzZLb4
-	3MpAtFYfS+ocrEZhbRENAk+Il00s=
-X-Gm-Gg: ASbGncsDDULw+Fh9h81v3+Yuiph9//4h4nM9QVwwUDC2MfMne5JydSOpTczWWDr0te2
-	KMkPTKndiU7B/cYpLnlMICR0K8LKKwrQgy1gJPnoVP6qIimvcCbpHSb1r/tvRc7MmnBSErS2x81
-	CRhc7jzS2Ze6rbLFiXHNcGt32IfixhcO2xHXgbuEiRr2WIkdFZ1YnvlciGxYY=
-X-Google-Smtp-Source: AGHT+IHfEOzHO1fYx7U+bN8g64kmS09vUyTz5cc994A7TecNF6Wc4s6Y44wxmCJ+lWJwy6Ib66Bha0rOE1l7VZLPNi0=
-X-Received: by 2002:a05:6902:230f:b0:e63:6f6a:ab01 with SMTP id
- 3f1490d57ef6-e66a4dafdf3mr25734001276.20.1742983419395; Wed, 26 Mar 2025
- 03:03:39 -0700 (PDT)
+	s=arc-20240116; t=1742983413; c=relaxed/simple;
+	bh=goOzdIpzzD09tIC7KbQNvYxByDWJjlXrWxqnwD6t3YA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DgOx9djWFoP5p6F+KaR79KC5iyKw6vqD+OgBFfINrK8x4H9H6vsWBRfvLRatVdcOJ3ucUUl0OzdMQ1vhsQ1jrcRad7cIJ7DOHTBc2NJzWKHpP9JxO5nVe1hQYih4kC3zaB8Wvm2iWbynaar72Ds1iJBcnbbeQ39DVYvL2vXJ9i0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lKs5JOkK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A652C4CEEA;
+	Wed, 26 Mar 2025 10:03:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742983411;
+	bh=goOzdIpzzD09tIC7KbQNvYxByDWJjlXrWxqnwD6t3YA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lKs5JOkKnH7ZF9Qp5x1uSaiN2bK68VkwyXC1Ix6cNzYZFFjhpIou+eLYNDTplx0Bo
+	 eyRnozYKcB8hbMYPAZIHzWCPBKbl7M8p+34HfsS5NU80zZmWbm18GysV7er+aqy8bs
+	 pJNImtQh119yM0sDtuVrot8pS698dMogqSCNLirQ4mUnUCesNTv+SZIgw2QKsSlku7
+	 bFArif5x4ioMdkp/UJW7ylD6A7YEw0I+vj6z1Cl2grCZkMDg7uN3xQsyWNfHBS8c5m
+	 QhzFd077+OgJMwo4KUSzM02axQ8UuJ9uONXyikLvVfWNxrW+RnB8ar5CAwh/jTaeNc
+	 9oKnxyBDV3Ccw==
+Date: Wed, 26 Mar 2025 10:03:27 +0000
+From: Simon Horman <horms@kernel.org>
+To: Thangaraj Samynathan <thangaraj.s@microchip.com>
+Cc: netdev@vger.kernel.org, bryan.whitehead@microchip.com,
+	UNGLinuxDriver@microchip.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] net: ethernet: microchip: lan743x: Fix memory
+ allocation failure
+Message-ID: <20250326100327.GY892515@horms.kernel.org>
+References: <20250325105653.6607-1-thangaraj.s@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250318-b4-ovpn-v24-9-3ec4ab5c4a77@openvpn.net>
- <20250325020802.7632-1-dqfext@gmail.com> <58712444-1de7-4076-b850-4c6035792931@openvpn.net>
-In-Reply-To: <58712444-1de7-4076-b850-4c6035792931@openvpn.net>
-From: Qingfang Deng <dqfext@gmail.com>
-Date: Wed, 26 Mar 2025 18:03:18 +0800
-X-Gm-Features: AQ5f1JodHKEa5grFLdeljTe4mQhPAz1IoFEnU6LC0ro2dUjIEtLY-zmsGMtFm9U
-Message-ID: <CALW65jZ=Jngf0THLTuWHuhpQb0NDM=4x4HN_Xj922nmq71EMUQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v24 09/23] ovpn: implement packet processing
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>, sd@queasysnail.net, 
-	ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Xiao Liang <shaw.leon@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250325105653.6607-1-thangaraj.s@microchip.com>
 
-Hi Antonio,
+On Tue, Mar 25, 2025 at 04:26:53PM +0530, Thangaraj Samynathan wrote:
+> The driver allocates ring elements using GFP_DMA flags. There is
+> no dependency from LAN743x hardware on memory allocation should be
+> in DMA_ZONE. Hence modifying the flags to use only GFP_ATOMIC
+> 
+> Fixes: e8684db191e4 ("net: ethernet: microchip: lan743x: Fix skb allocation failure")
+> Signed-off-by: Thangaraj Samynathan <thangaraj.s@microchip.com>
 
-On Wed, Mar 26, 2025 at 5:41=E2=80=AFPM Antonio Quartulli <antonio@openvpn.=
-net> wrote:
-> >> +/* Get the next packet ID for xmit */
-> >> +static inline int ovpn_pktid_xmit_next(struct ovpn_pktid_xmit *pid, u=
-32 *pktid)
-> >> +{
-> >> +    const s64 seq_num =3D atomic64_fetch_add_unless(&pid->seq_num, 1,
-> >> +                                                  0x100000000LL);
-> >> +    /* when the 32bit space is over, we return an error because the p=
-acket
-> >> +     * ID is used to create the cipher IV and we do not want to reuse=
- the
-> >> +     * same value more than once
-> >> +     */
-> >> +    if (unlikely(seq_num =3D=3D 0x100000000LL))
-> >> +            return -ERANGE;
-> >
-> > You may use a 32-bit atomic_t, instead of checking if it equals
-> > 0x1_00000000, check if it wraparounds to zero.
-> > Additionally, you don't need full memory ordering as you just want an
-> > incrementing value:
-> >
-> > int seq_num =3D atomic_fetch_inc_relaxed(&pid->seq_num);
-> >
-> > if (unlikely(!seq_num))
-> >       ...
->
-> But then if we have concurrent invocations of ovpn_pktid_xmit_next()
-> only the first one will error out on wrap-around, while the others will
-> return no error (seq_num becomes > 0) and will allow the packets to go
-> through.
->
-> This is not what we want.
+Hi Thangaraj,
 
-Got it. You could replace it with
-atomic_fetch_add_unless(&pid->seq_num, 1, 0) and check if it wraps
-around to zero.
+As per the discussion of v1 I agree that dropping GFP_DMA and keeping
+GFP_ATOMIC makes sense. So the code change looks good to me.
 
-However, what about the opposite scenario? If multiple threads
-concurrently invoke ovpn_pktid_xmit_next() and all detect the
-wraparound condition, could this lead to simultaneous calls to
-ovpn_crypto_kill_key() and ovpn_nl_key_swap_notify()?
+However, I am not clear that this is fixing a bug, which is
+the main pre-requisite for patches for 'net'.
 
->
-> >
-> >> +
-> >> +    *pktid =3D (u32)seq_num;
-> >> +
-> >> +    return 0;
-> >> +}
-> >> +
-> >> +/* Write 12-byte AEAD IV to dest */
-> >> +static inline void ovpn_pktid_aead_write(const u32 pktid,
-> >> +                                     const u8 nt[],
-> >> +                                     unsigned char *dest)
-> >> +{
-> >> +    *(__force __be32 *)(dest) =3D htonl(pktid);
-> >> +    BUILD_BUG_ON(4 + OVPN_NONCE_TAIL_SIZE !=3D OVPN_NONCE_SIZE);
-> >> +    memcpy(dest + 4, nt, OVPN_NONCE_TAIL_SIZE);
-> >> +}
-> >> +
->
-> Qingfang, may I ask you to remove from your reply non-relevant code
-> (like I did above), especially in such long patches, as it becomes a bit
-> tedious to spot your comments and I may miss something.
+If not, perhaps it should be targeted at 'net-next' instead.
+In which case the Fixes tag should be dropped, but you can refer to the
+commit that introduced this problem in the commit message using this
+syntax if you wish.
 
-Noted.
+   commit e8684db191e4 ("net: ethernet: microchip: lan743x: Fix skb
+   allocation failure")
 
->
-> Thanks a lot!
->
-> Regards,
->
-> --
-> Antonio Quartulli
-> OpenVPN Inc.
->
+e.g.:
+
+   The driver allocates ring elements using GFP_DMA flags. There is
+   no dependency from LAN743x hardware on memory allocation should be
+   in DMA_ZONE. Hence modifying the flags to use only GFP_ATOMIC
+
+   Introduced by commit e8684db191e4 ("net: ethernet: microchip: lan743x:
+   Fix skb allocation failure").
+
+   Signed-off-by: ...
+
+If you do post for net-next, keep in mind that net-next is currently closed
+for the merge window. I expect is should re-open around the 14th April.
+So please post any patches for net-next after it re-opens.
+
+> ---
+> v0
+> -Initial Commit
+> 
+> v1
+> -Modified GFP flags from GFP_KERNEL to GFP_ATOMIC
+> -added fixes tag
+
+Link to v1: https://lore.kernel.org/all/20250314070227.24423-1-thangaraj.s@microchip.com/
+
+> 
+> ---
+>  drivers/net/ethernet/microchip/lan743x_main.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
+> index 23760b613d3e..8b6b9b6efe18 100644
+> --- a/drivers/net/ethernet/microchip/lan743x_main.c
+> +++ b/drivers/net/ethernet/microchip/lan743x_main.c
+> @@ -2495,8 +2495,7 @@ static int lan743x_rx_process_buffer(struct lan743x_rx *rx)
+>  
+>  	/* save existing skb, allocate new skb and map to dma */
+>  	skb = buffer_info->skb;
+> -	if (lan743x_rx_init_ring_element(rx, rx->last_head,
+> -					 GFP_ATOMIC | GFP_DMA)) {
+> +	if (lan743x_rx_init_ring_element(rx, rx->last_head, GFP_ATOMIC)) {
+>  		/* failed to allocate next skb.
+>  		 * Memory is very low.
+>  		 * Drop this packet and reuse buffer.
+> -- 
+> 2.25.1
+> 
+> 
 
