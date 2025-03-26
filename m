@@ -1,112 +1,113 @@
-Return-Path: <netdev+bounces-177820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16EEDA71E6A
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 19:30:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 06D5DA71E79
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 19:33:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1196C179095
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 18:29:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 988B31763B7
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 18:33:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E88124EA9A;
-	Wed, 26 Mar 2025 18:29:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6D4923FC54;
+	Wed, 26 Mar 2025 18:33:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b="qydPoju+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="DY1KRstn"
 X-Original-To: netdev@vger.kernel.org
-Received: from ksmg01.maxima.ru (ksmg01.mt-integration.ru [81.200.124.38])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93C9923FC54;
-	Wed, 26 Mar 2025 18:29:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.200.124.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0F6649659;
+	Wed, 26 Mar 2025 18:33:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743013779; cv=none; b=UXk9acm+lCICo4239YJFAnQt+7IqP+ikw2M2thfUO1F+dfqf4X41owocjG+c6gUGpW3dZwflLwxvw5ryNPn/Jz5VfYSDVROnYGS5xblXfBVNj2hZjLjpyEShZ0drvsVmsDh8Ht1qyxn7hwSRHBBHov320cRJrH5L3NmF3S8zMnk=
+	t=1743013989; cv=none; b=FaN/sCyO2i601MwgiEoEJgQMxpImGk7NX8WY4tmUV7/ayWzd1KDKXcnFkhTwX7JDNTLZaJAtFFdS3QeXjyRBAkQx41rwuCNAwyjQQHbyq4DabrI+janmJbfQbVaE2rRGhQh0GhgF6wLqOzoK/1oeqUUlSbKKNN2qgjyyTwC37hM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743013779; c=relaxed/simple;
-	bh=g2yzAzX5o6xIyPWqMNLJGDsTUlNwj7m3G2jIFpQ0Z44=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bz0wM/j0wMOHjtRF+59GPQc0aCFUwoYwr5UrbgiF8gYj4JXoZK6Rd2Kqql6HzhF2sfBfkiHXrrP/6ZW1uyCghj6cDrJULdtIOPa+SKGI/ggrAh7aD7AusWFcRJucMjmLKyUhNIhr5XBhPodhWmaT3MuJkRAafD/fp+8YS4W6HgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru; spf=pass smtp.mailfrom=mt-integration.ru; dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b=qydPoju+; arc=none smtp.client-ip=81.200.124.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mt-integration.ru
-Received: from ksmg01.maxima.ru (localhost [127.0.0.1])
-	by ksmg01.maxima.ru (Postfix) with ESMTP id 6B459C000A;
-	Wed, 26 Mar 2025 21:29:32 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ksmg01.maxima.ru 6B459C000A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mt-integration.ru;
-	s=sl; t=1743013772; bh=A9Ek7r7bq0EEPg8qhhw8rnhM2LNnbRdf1rOlxeo2ymo=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:From;
-	b=qydPoju+mT0jIb1EUUDtgynECwYAKBIORWM6mwQHaqx4ExwIe48qWfHTTi8ojhaXz
-	 gi9rg9P6pYcTOBQF1SFDL7+X7EgpxnkUR2IUyYuyAy9SELZT//J7Pi+COpEQuQ/o1R
-	 gQgTl+aidP9tanJ+3StGgUqicn9dwdR2u5MWDUomyM1XB/Ente/azpGTmjDSkqW70a
-	 j8giPsENiZ7tqV2nBAdsZbY8wy2HJvc+YO4nT6la6rWyPMcTwZ5ZRod3U3EQ4u8cnK
-	 ZXH/Vc2WaCY2WuDy78kQZ79uoTtNbhuvGBTVaukUeaCfp0/Xd+bG+oSHRvXMahqpbk
-	 DYuJPvqXyEoiw==
-Received: from ksmg01.maxima.ru (mail.maxima.ru [81.200.124.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client CN "*.maxima.ru", Issuer "GlobalSign GCC R3 DV TLS CA 2020" (verified OK))
-	by ksmg01.maxima.ru (Postfix) with ESMTPS;
-	Wed, 26 Mar 2025 21:29:32 +0300 (MSK)
-Received: from localhost (5.1.51.21) by mmail-p-exch01.mt.ru (81.200.124.61)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1544.4; Wed, 26 Mar
- 2025 21:29:29 +0300
-Date: Wed, 26 Mar 2025 23:29:29 +0500
-From: Vitaliy Shevtsov <v.shevtsov@mt-integration.ru>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Vladimir Oltean <vladimir.oltean@nxp.com>, Claudiu Manoil
-	<claudiu.manoil@nxp.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	<UNGLinuxDriver@microchip.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
-Subject: Re: [PATCH] net: dsa: felix: check felix_cpu_port_for_conduit() for
- failure
-Message-ID: <20250326232929.809a37357877ef3168dfc097@mt-integration.ru>
-In-Reply-To: <dc85eb72-cdec-43a1-8ad7-6cd7db9c6b25@lunn.ch>
-References: <20250326161251.7233-1-v.shevtsov@mt-integration.ru>
-	<dc85eb72-cdec-43a1-8ad7-6cd7db9c6b25@lunn.ch>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64--netbsd)
+	s=arc-20240116; t=1743013989; c=relaxed/simple;
+	bh=H0WXYCkOruHYlRYfNbikAmGGuU6Z90xa4UIW4J8YeYw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hqPW+S7JvUzMsWMZluXtC3xldz6KUTrKeN52iIUk3joc4W+TUMKPlkrI4mhyyTutKEOuD6Ch0+cD/1BOjxLIY08LxNWTAty9tviBsL4aajZr9peMjhVKLBCQC++4kwR++vTj/XQvqXqTv0SJ70754L1xybt0vXijO6txUlTFLII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=DY1KRstn; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ryEB0XASAK2pygu+vzvMr1XOWAUfXVnhydu7SRIwMUY=; b=DY1KRstnirVjWnobv2tNwEo6CQ
+	awzsx1zrrP7fw2PPlf2/tlxDUtE1WR5pygD/tXvXwOm5jV4rEZm5VvdDGEoG5Pcm5gHoJTTL5NPxl
+	rYkxjqLz3XQ4tNhE/O2WdlXXYjCqh0lHub5AGZqrrVVlAK3YAtzHsBDrf3rCl4tvOMVKxvfcDs1yX
+	N89GZAcWfGZXmFzzWtYc10y7wSJWYXKBtGXnjq+3FtK6AYLkiHdY2ZLOC53tHQldMt5oP5jj8I1JK
+	aGdRtLZmf62R3FHjozjHmOgeB8qrktWabgkAPxWs1vrKRua5GQHjejhthtgCM956tpKX8Ky+dL+C0
+	rKYbzVDw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35980)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1txVYe-0006SW-2z;
+	Wed, 26 Mar 2025 18:32:57 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1txVYc-0004dJ-1m;
+	Wed, 26 Mar 2025 18:32:54 +0000
+Date: Wed, 26 Mar 2025 18:32:54 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next RFC PATCH v2 2/3] net: phy: Add support for Aeonsemi
+ AS21xxx PHYs
+Message-ID: <Z-RIVkVOgpzTjKZv@shell.armlinux.org.uk>
+References: <20250326002404.25530-1-ansuelsmth@gmail.com>
+ <20250326002404.25530-3-ansuelsmth@gmail.com>
+ <dfa78876-d4a6-4226-b3d4-dbf112e001ee@lunn.ch>
+ <Z-RCiWzRWbv7RlHJ@shell.armlinux.org.uk>
+ <67e444e6.050a0220.81044.004e@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: mt-exch-01.mt.ru (91.220.120.210) To mmail-p-exch01.mt.ru
- (81.200.124.61)
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Auth: dmarc=none header.from=mt-integration.ru;spf=none smtp.mailfrom=mt-integration.ru;dkim=none
-X-KSMG-AntiSpam-Envelope-From: v.shevtsov@mt-integration.ru
-X-KSMG-AntiSpam-Info: LuaCore: 51 0.3.51 68896fb0083a027476849bf400a331a2d5d94398, {rep_avail}, {Prob_CN_TRASH_MAILERS}, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;81.200.124.61:7.1.2;mt-integration.ru:7.1.1;ksmg01.maxima.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s, ApMailHostAddress: 81.200.124.61
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 192129 [Mar 26 2025]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 40
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.11
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/03/26 10:13:00 #27825781
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <67e444e6.050a0220.81044.004e@mx.google.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, 26 Mar 2025 19:22:07 +0100, Andrew Lunn wrote:
-
-> If i'm reading the code correctly you mean ocelot_bond_get_id()
-> returns -ENOENT?
+On Wed, Mar 26, 2025 at 07:18:12PM +0100, Christian Marangi wrote:
+> On Wed, Mar 26, 2025 at 06:08:09PM +0000, Russell King (Oracle) wrote:
+> > An alternative would be to change the match_phy_device() method to
+> > pass the phy_driver, which would allow a single match_phy_device
+> > function to match the new hardware ID values against the PHY IDs in
+> > the phy_driver without needing to modify the IDs in phy_device.
+> > 
 > 
-> If so, you should return the ENOENT, not replace it by EINVAL.
-> 
-> 	Andrew
+> I also considered extending the function with additional stuff but then
+> I considered that would mean rework each PHY driver and destroy PHY
+> driver downstream, not something we should care but still quite a big
+> task. If the -ENODEV path is not OK, I feel an additional OP is better
+> than tweaking match_phy_device.
 
-Or maybe it's better to just return negative cpu value instead?
-This variable will have the correct -ENOENT value in case of failure.
+For those in the kernel, 8 files, 26 initialisers.
+
+drivers/net/phy/nxp-c45-tja11xx.c can probably be simplified with
+this idea, reducing it down to a pair of functions.
+
+drivers/net/phy/bcm87xx.c can probably be reduced to one match function.
+
+So, doing so would appear to bring benefits to other PHY drivers.
 
 -- 
-Vitaliy Shevtsov <v.shevtsov@mt-integration.ru>
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
