@@ -1,171 +1,168 @@
-Return-Path: <netdev+bounces-177648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84953A70E17
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 01:16:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FBB2A70E2D
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 01:24:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B55147A234C
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 00:15:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13FC7188E7B4
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 00:24:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07BF328E8;
-	Wed, 26 Mar 2025 00:11:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5697C3D6A;
+	Wed, 26 Mar 2025 00:24:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OWjbrOoI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g/MLhh5Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C50046BF;
-	Wed, 26 Mar 2025 00:11:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BDF1323D;
+	Wed, 26 Mar 2025 00:24:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742947914; cv=none; b=BIE9i47+f94Qr7K2cOuz1zctz1EU71zBocf1qqIKsqgXxSwfiha6arIjKoZoyGQcQRpl8deHC1bAUfri8BvHJObGBAj138KGsmGeU7rJDK9D7uXmQWi8DS4E4sJ2WfXhK01ozip81FQeW5qKau/UO8Q9cmyDqMO7WrmTEV4ARz8=
+	t=1742948683; cv=none; b=qanIEyWr1fDFcEaWYNWSzcyZO1ylMGXDBwyUAGwKN5cwIOUnK3sW4yADwjjRUnIMN+wcqOy4dXFikcIU82ry4/ak62+HO4dT/Ap6qSNXh/YKiUvaJ55AkW6sjv1eEHTR5D/2woP3YNO+FdcKpFRWMdK/TD5oEv8WuRdRdsZzw4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742947914; c=relaxed/simple;
-	bh=Ds5elK0EiYSgBbG1o5wtpaJmT1vD/nl22PdcXN437WE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mak/FPWX+TefDV2gBa99z4IZxXMN4N1cJoSiJMt8ci12oP2DidNlv3m69jlxQbXrUzVAJ7Ae7+EvbT54sM8kWTVkzg3ZuwWnF8jw3sDXZHSRy3V+BFN59asnxm5qeNh7mn+w8Xq1TSiwbXcOmy3jZz4kdQ6wj0gwQtLGAmVyc7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OWjbrOoI; arc=none smtp.client-ip=209.85.214.177
+	s=arc-20240116; t=1742948683; c=relaxed/simple;
+	bh=IvSHZ7uW6XrC4TtmEYqJ60Tay1pUt+B4YYlFltXPxnc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=dCtgjnTFU88mEeux69nS5qC89fX2c1Sq3tGHjrjDPNtAGCaxqWGQtU9S1VkZsK9/Petm/ahLCHliSGH4bTtg2hnRp1GXnTprmMJn++s2Jq1GUlKIU5Li0i3rZgG3Y9zaCOgCU4ff24FMGJ+55HHAP8k+z9XMTkj4qdVxK7sp4jQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g/MLhh5Z; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-22580c9ee0aso128083715ad.2;
-        Tue, 25 Mar 2025 17:11:53 -0700 (PDT)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43cfdc2c8c9so37436565e9.2;
+        Tue, 25 Mar 2025 17:24:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742947912; x=1743552712; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CY8eIyZm61ckxiaVzTuPDCRXGNO6HtSN1mJX9W6zGQQ=;
-        b=OWjbrOoIwKJw2PMhyNl8Aed5JtKyt7PpilTzzyAyQy1NYsmBqoOwM5O8ajazIAWDpy
-         Lyf92+Iel+3/zgIAAhpnJ7UI8MwqXNHp1uuGYZHbzzubo9Q7F32tmmrp6TVS6UxIfhW4
-         1jxtpDgnDy6WjjO52onyadpNwcmOFUVopRFMHu/K64ZkZzODleyotFKJnbJQkzczbFe6
-         W+sSPpQNnGVUO6+1IVsygG85yK6jiGP+npE9dOb+lakD0OedIJ7GmvqKjrYTGLudnhke
-         Lk4Zgxf4olyOTl1c4+a7Yg3k2ApHv796wpAM9Lv0o2bY0AWgEdp9E6x6CccpSd2ZoZKb
-         /a5g==
+        d=gmail.com; s=20230601; t=1742948680; x=1743553480; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=psDzSiy+GefNpBKgyGrcVXnj36uOU8MvrpnX3Vh5YF8=;
+        b=g/MLhh5Z8cM5/ixg4SPc+1JPh+3QkUTZ0lGl4IupHXUhCAv5ibXGCDR8g5x/7uGx5X
+         knnKGTHaFPc/iYol7G7NFdbKAKR5GESqVFxLGSgIAGpt1obsN/MmBnVOqIHluE3n3Q99
+         gehQbf/IpqeT+l4WzsdJa6HBfP8ulWW6rNSh2sGsufgxl7LUjBKkdiD1MYVbhTYGjSUc
+         GD9rTJ4RqSliUaaux94Ywbg9q49x/Bfl/PQORUDioynqWQlq9XA2ZJLE9V8bd2S44Gmd
+         mjlVCGj2wgnsPTSy36d57+uKwrL/MH1YKgCwVisRcL6gPYruP1w/jqdY0R+6tGkDQsPs
+         dyug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742947912; x=1743552712;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CY8eIyZm61ckxiaVzTuPDCRXGNO6HtSN1mJX9W6zGQQ=;
-        b=Ji7Vx8Yp2B+yptMbM6GXiU53WRdN4dlFbVgV5zfpYdhajIGP81w1orfmDmHfK/Z9ed
-         D2uamK3yM1Rim9eK/oAhfEfON7N5s/wWPhhhlVBXqWaStxhm/gek9/9f+aKtHS6HDAFj
-         vwAg5c/pAI4NUS4vk8Wy4j51sqXSGyl/Sd9ZUImwj+pUpOQDbSdyawW8wunCw3ZpSoV7
-         Gv2rKyQ5JhonOBwzeZVfAKnB9dCAtohH+4h2UJxskDjtvlYNtHcEi/xUSQ8ylDPxjc5B
-         KAkW5aMvb2JvUuTvENTG/sfwrdhtR3/ptfF3JzTeu/qWxVlXVM1vmIAvkKFbPCArTaMS
-         wbrA==
-X-Forwarded-Encrypted: i=1; AJvYcCUDDixAYhmR9Xf50VY6mplwfx4bMSIBVQePY4NMYgzVJKg7DBqTbeGjnuHfUhxaorX8M06xLUn3@vger.kernel.org, AJvYcCVd4KRGVv29IKZCkdWKo5Y0Z58/hV1THo0Nc/gqG0z0M2fy/UCSWtbYIDiefa4woahZe84=@vger.kernel.org, AJvYcCWlho2IIr/FxL3Kp5F6i4P0jIn5OkrTiBnASYGuzoh0NWkDEBMP683kt2yri6HxqoYmnsBCncsA5VmqMyQC@vger.kernel.org, AJvYcCWlkLPzEl5tPxodAyvwpw5B95f8QQwrFyH+O6pGE+orGjKXShhCoypMbGf1TUDvwM5WPjkH0e36Ir4BRRGv@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNKsvjoCiGK+qhHkGDbdwyH2A12Sa1OgHmuuUFiayjClIGHnY1
-	qZk5h3WqJBoHPgXM9tEwqidUGjWt3dfWSaunGDXwLGesLFxM55kH
-X-Gm-Gg: ASbGncvKbpBAhQy1FsV0eXD0JTy03T+X71sUtG9eU3CiUIvxtSChIJJZEWi9HInUQ81
-	GBS5XWIK+mVNAY0jEtDvkQ21nYF/seZJUti7ZXDRQw8VO9pfvptBoRhfFQpZJINLh+cEDvXf9KM
-	u1z/EOIxxL5csEfoLgLMCYYcREKHy/OvBfH1Yxawuvoa0MGudr9wLaDBFFX2mwgKdJLwwAZC6q9
-	qFarNzeYHcYr1fZpkXuABb9iJviTZfUkOQDOlLSiD84BOlX2WLXAQrRCGOoSK3Epq1dtLLENe/p
-	0DSh9wxaAcAGZlqmPtzqh0gP7WJmJJFD0CyhLJA4bnMFIHsDjTsZs1gIBQzen/50wg==
-X-Google-Smtp-Source: AGHT+IHxY4Vgr8ATi1uVdyopW2+f/aLhWWNzfk7UHIfMOoRiFLbmaJkjO523spjjVjgNAJSnkFxkQQ==
-X-Received: by 2002:a05:6a21:339a:b0:1f5:51d5:9ef3 with SMTP id adf61e73a8af0-1fe42f995edmr26069754637.20.1742947912351;
-        Tue, 25 Mar 2025 17:11:52 -0700 (PDT)
-Received: from devvm6277.cco0.facebook.com ([2a03:2880:2ff:8::])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af8a280e572sm9690206a12.32.2025.03.25.17.11.51
+        d=1e100.net; s=20230601; t=1742948680; x=1743553480;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=psDzSiy+GefNpBKgyGrcVXnj36uOU8MvrpnX3Vh5YF8=;
+        b=LcrHTT1U4z9iPKoDSWl2FmmBsR5g4eegJ+alfjMu1X6y504tpveT1g5u0S+++2gJ8S
+         Tk3sMad/KLNJL+AD9gzOhdf0Yvk1gLAH+zqLLgDEitTeLmpegT276ArzshHQ7/eo+7kQ
+         J5ieY3eFFqoeO/20i6pDPx5k0W38GyMVPIiG8KIpa2rcso1Nne3tx7r3YaIX1GQHL2mo
+         hU2WbGNPmHBp6zzz/Hl5tsHtpi8/07r0TQt0jV6IBmVj8ViLF0sz/YNpzMfyZZSf6u5/
+         XhKERQorNCLrGrX3T2JriAg2JHsEfD9HVWiwzNzuF+SmZlNO4J+mvq0HUGRC/eYfyVFJ
+         8bPg==
+X-Forwarded-Encrypted: i=1; AJvYcCU1x2wfLA0x+Azr16XROrBOCJtCl6T4hx74glA6PVgYUtE8Rt+WqtJOjpN8aDfRSI7Iwe0nZy0E5a/8@vger.kernel.org, AJvYcCVhD3sqWrMMXkNfzIKBlMNgp7ljHupRqwjAsvqzL2YCkZ7flHWOOBmspgDq017REwQy1B3Zult1USSdDxeX@vger.kernel.org, AJvYcCVvJ9C0JTrM6KtP9epbaRFlHqrFAfwWfHmyooNFahKzEuBCCg6Wn2r3+h0PWo/1tD5AHN9sCwAi@vger.kernel.org
+X-Gm-Message-State: AOJu0YzaA14S2RT+LGnnElhAGB7R/UoM4gcEtibqH2eYEixT2sqL4+SU
+	3AWvtB0CGbCWzjIUFcn8ir4kKLw/L9tvf1q4vd6S5J2uIoWFsVpX
+X-Gm-Gg: ASbGncuNatDCh1otQ8bOr+ZMPQs985YBs5ltZENME+bdTAIn8lzkMxMcfmglAGIIHGz
+	WjL9DIwU3sPs6MxoUdeVJkA7gYHQyWdKlApmgbkMwgtP2otX8F5jLl+dmIq38rlPIYriUUyDU2x
+	oDMXKaegKhsRQvufiPDPRA59yO4bq3kZ9L/JY3D6vgfpA/yWDunmVkTnJ1VTBDi1RKADcchvrJP
+	iyFqeOsW3mENc1MV4FQdSbJq3z6NdbEP9lHKpAPW4PNeTikCU+e0G8vU7NHFg/3XXKjha2xfmrW
+	Csh2NiPxAHDtEJuWICigEoqcEwPMHlL2i91KBvZ5lDfh2yfDy/1mcwuN2TPHQcemHbvZ+CkD1S+
+	jj2abC6fbgiFMq3eSA434TOyO
+X-Google-Smtp-Source: AGHT+IFQE+PH0PmM1pimT6vM2pIPEUya0UWh7IaAgL2g81MnJ0RG9KhtPrnZ5Ff0hSKtqwY5YKQqkw==
+X-Received: by 2002:a05:600c:1f10:b0:43c:e2dd:98ea with SMTP id 5b1f17b1804b1-43d5a32ce3amr134428365e9.22.1742948679566;
+        Tue, 25 Mar 2025 17:24:39 -0700 (PDT)
+Received: from localhost.localdomain (93-34-90-129.ip49.fastwebnet.it. [93.34.90.129])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-39acb5d0c33sm1881990f8f.26.2025.03.25.17.24.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Mar 2025 17:11:51 -0700 (PDT)
-Date: Tue, 25 Mar 2025 17:11:49 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+        Tue, 25 Mar 2025 17:24:39 -0700 (PDT)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Christian Marangi <ansuelsmth@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] vhost/vsock: use netns of process that opens the
- vhost-vsock-netns device
-Message-ID: <Z+NGRX7g2CgV9ODM@devvm6277.cco0.facebook.com>
-References: <20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com>
- <20250312-vsock-netns-v2-3-84bffa1aa97a@gmail.com>
- <09c84a94-85f3-4e28-8e7d-bdc227bf99ab@redhat.com>
- <nwksousz7f4pkzwefvrpbgmmq6bt5kimv4icdkvm7n2nlom6yu@e62c5gdzmamg>
- <Z9yDIl8taTAmG873@devvm6277.cco0.facebook.com>
- <aqkgzoo2yswmb52x72fwmch2k7qh2vzq42rju7l5puxc775jjj@duqqm4h3rmlh>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [net-next RFC PATCH v2 0/3] net: phy: Add support for new Aeonsemi PHYs
+Date: Wed, 26 Mar 2025 01:23:56 +0100
+Message-ID: <20250326002404.25530-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aqkgzoo2yswmb52x72fwmch2k7qh2vzq42rju7l5puxc775jjj@duqqm4h3rmlh>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Mar 21, 2025 at 11:02:34AM +0100, Stefano Garzarella wrote:
-> On Thu, Mar 20, 2025 at 02:05:38PM -0700, Bobby Eshleman wrote:
-> > On Thu, Mar 20, 2025 at 10:08:02AM +0100, Stefano Garzarella wrote:
-> > > On Wed, Mar 19, 2025 at 10:09:44PM +0100, Paolo Abeni wrote:
-> > > > On 3/12/25 9:59 PM, Bobby Eshleman wrote:
-> > > > > @@ -753,6 +783,8 @@ static int vhost_vsock_dev_release(struct inode *inode, struct file *file)
-> > > > >  	virtio_vsock_skb_queue_purge(&vsock->send_pkt_queue);
-> > > > >
-> > > > >  	vhost_dev_cleanup(&vsock->dev);
-> > > > > +	if (vsock->net)
-> > > > > +		put_net(vsock->net);
-> > > >
-> > > > put_net() is a deprecated API, you should use put_net_track() instead.
-> > > >
-> > > > >  	kfree(vsock->dev.vqs);
-> > > > >  	vhost_vsock_free(vsock);
-> > > > >  	return 0;
-> > > >
-> > > > Also series introducing new features should also include the related
-> > > > self-tests.
-> > > 
-> > > Yes, I was thinking about testing as well, but to test this I think we need
-> > > to run QEMU with Linux in it, is this feasible in self-tests?
-> > > 
-> > > We should start looking at that, because for now I have my own ansible
-> > > script that runs tests (tools/testing/vsock/vsock_test) in nested VMs to
-> > > test both host (vhost-vsock) and guest (virtio-vsock).
-> > > 
-> > 
-> > Maybe as a baseline we could follow the model of
-> > tools/testing/selftests/bpf/vmtest.sh and start by reusing your
-> > vsock_test parameters from your Ansible script?
-> 
-> Yeah, my playbooks are here:
-> https://github.com/stefano-garzarella/ansible-vsock
-> 
-> Note: they are heavily customized on my env, I wrote some notes on how to
-> change various wired path.
-> 
-> > 
-> > I don't mind writing the patches.
-> 
-> That would be great and very much appreciated.
-> Maybe you can do it in a separate series and then here add just the
-> configuration we need.
-> 
-> Thanks,
-> Stefano
-> 
+Add support for new Aeonsemi 10G C45 PHYs. These PHYs intergate an IPC
+to setup some configuration and require special handling to sync with
+the parity bit. The parity bit is a way the IPC use to follow correct
+order of command sent.
 
-Hey Stefano,
+Supported PHYs AS21011JB1, AS21011PB1, AS21010JB1, AS21010PB1,
+AS21511JB1, AS21511PB1, AS21510JB1, AS21510PB1, AS21210JB1,
+AS21210PB1 that all register with the PHY ID 0x7500 0x7500
+before the firmware is loaded.
 
-I noticed that bpf/vmtest.sh uses images hosted from libbpf's CI/CD. I
-wonder if you have any thoughts on a good repo we may use to pull our
-qcow image(s)? Or a preferred way to host some images, if no repo
-exists?
+The big special thing about this PHY is that it does provide
+a generic PHY ID in C45 register that change to the correct one
+one the firmware is loaded.
 
-Thanks,
-Bobby
+In practice:
+- MMD 0x7 ID 0x7500 0x9410 -> FW LOAD -> ID 0x7500 0x9422
+
+To handle this, we apply a simple approach where the PHY
+is registered a first time, with the PHY driver maching for
+the generic PHY ID (0x7500 0x9410), probing and loading the fw.
+The PHY driver enable the new option "needs_reregister" in phy_device.
+
+This special option will detach the PHY driver from the PHY device,
+scan the MDIO BUS for that address and attach it again. This is
+done entirely in one go at the phy_register_device time.
+
+At the second time the driver will match the more specific PHY ID
+(0x7500 0x9422) as the PHY now provides it now that is had the FW
+loaded.
+
+We can assume the PHY doesn't change Vendor or Family after
+the PHY is loaded (that wouldn't make sense) and in the extreme
+case this happen, no PHY will be matched and the generic one is
+loaded.
+
+Changes v2:
+- Move to RFC as net-next closed :(
+- Add lock for IPC command
+- Better check size values from IPC
+- Add PHY ID for all supported PHYs
+- Drop .get_feature (correct values are exported by standard
+  regs)
+- Rework LED event to enum
+- Update .yaml with changes requested (firmware-name required
+  for generic PHY ID)
+- Better document C22 in C45
+- Document PHY name logic
+- Introduce patch to load PHY 2 times
+
+Christian Marangi (3):
+  net: phy: permit PHYs to register a second time
+  net: phy: Add support for Aeonsemi AS21xxx PHYs
+  dt-bindings: net: Document support for Aeonsemi PHYs
+
+ .../bindings/net/aeonsemi,as21xxx.yaml        | 122 +++
+ MAINTAINERS                                   |   7 +
+ drivers/net/phy/Kconfig                       |  12 +
+ drivers/net/phy/Makefile                      |   1 +
+ drivers/net/phy/as21xxx.c                     | 973 ++++++++++++++++++
+ drivers/net/phy/phy_device.c                  |  27 +
+ include/linux/phy.h                           |   5 +
+ 7 files changed, 1147 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/aeonsemi,as21xxx.yaml
+ create mode 100644 drivers/net/phy/as21xxx.c
+
+-- 
+2.48.1
+
 
