@@ -1,138 +1,185 @@
-Return-Path: <netdev+bounces-177864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72044A72522
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 23:38:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA525A726A0
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 23:49:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFD3A165ADA
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 22:38:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05AFC171318
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 22:49:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5741424EF90;
-	Wed, 26 Mar 2025 22:38:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1AD01C84D3;
+	Wed, 26 Mar 2025 22:49:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H/Xdtz18"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bNoHmogY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f196.google.com (mail-yw1-f196.google.com [209.85.128.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1D9239FCE;
-	Wed, 26 Mar 2025 22:38:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3127C1BC9F4
+	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 22:49:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743028728; cv=none; b=hXvKNpHD8Nf7SN2Iag1HXbjvLB7Lsb1m8RGzNWnfhod/uFbtoM6YhiB2cLiVyGePRQy31V9ncLqPB46H9di7i92gZqsyqjOqExdFVbNSYxnGtVz4dwYir6ExthbyoPaxh62/BL40Hd7TdeShWpwRpJBMur/1WPldThDQHZ0/Ays=
+	t=1743029362; cv=none; b=hSjV4cp0EFYtLepPim0nDUhlD8hZwKcG3oqsc1smRbmcf+ooNtkJ2UJxRyx4jzory/8YGXmHMMsYxvcYiPimGC/M3CKZEVuDYPCJXuN4ZvfgM5kf0/oEEAAqwY/Nq5ub2TDDshtpq/AQzZUB/gUB/5HGRV59BBoJeszuK5wuFPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743028728; c=relaxed/simple;
-	bh=H2y9HtTQmvQBzJD1T7U+UffAZs7WKkknHLjpbbnkIc4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bV3sbfufw4qAhfIjIzaeysBrn/khA4iNFjmSFcQ7N6wQogxx2TNcPn7cE/dYxJL38qvL0fy9Xzuh98Zlfb3WcRcQpBewuyXlUGM+AMV5In1oMC4D6JfHlabyMI7mkTRlPNSE90tUh8Con5oMFzLuL3kdYeh4m45ry7WS7qIwuhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H/Xdtz18; arc=none smtp.client-ip=209.85.128.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f196.google.com with SMTP id 00721157ae682-6fd80f30ba5so2669937b3.3;
-        Wed, 26 Mar 2025 15:38:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743028726; x=1743633526; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9D44QjpZljk+SGdrmPC7kTMGNHThYXdBfqrpwqLcab0=;
-        b=H/Xdtz183chCbDsdJYtyhTyOK/n+BP7XpaKbS0B1iTMwtyuP0yLCtxNXpdzo6Z0xTZ
-         a2a+5yqMmYFjRh8bMivO20fYtkTv1LrHf/76MwUyOdJkYa6t/6GJpZXJF8OSyIkeXE0I
-         deYSuf6oOkh3ug7t/rLjRIVCEiQdhbFEbZwpFXFMEn6RCbxo4y08Z3zq51IU2ATEMl9w
-         ImeXfvpdf2C3ESYKA8pHxzW9OvDDErh3YKeUy3TeUdtaDz/ZvTXszApe6QXyS2rpNIVY
-         vnBYIQjy/Y3wsEqj181dTWPmlPmLtuvoWP1tHqGn/uCpM6yA453qc6MgHIfhm6uh7NYL
-         /JoA==
+	s=arc-20240116; t=1743029362; c=relaxed/simple;
+	bh=pb62k3uPmcrFUbNnneW6CR+k/UDgFy/e/C8H10DakC4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=un16IYlKMW+XcBIlUSdFXbK9rbOjwvbe1NgbkgpkmBnsBuXAkzacMvrxfktsJ6NUGgDYMAQl6j3ls2oc3EKPy5NsdQdkG0UU2LWDsi72BZvJAyXqmwbcOyrFw/88GdhvJ5NOK0P2ZrabiGXjAtuXau2xOm0OGJH+I66VNB2aomg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bNoHmogY; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743029360;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qi8wdhM7rmWkvLOlU6keCbGUfSvgCk1Wxsh4f3EOl8Y=;
+	b=bNoHmogYplhApZ/9n8oJkLbjYvcIpojfxzPvabIJ+rVljnbdVL3VomktII5dPLyxFbuduv
+	V/YiDN08ecuYuEoe4hFGrCg8T2q03L3PGVqO/foBMPYKNvACk0nG+32qnd5ZCsxFe41IRZ
+	yDOBVcfWTnIoJbP+BHsHAC2GD3Z9zPs=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-325-4fVRtGZNPYynIgwJTZ4AhQ-1; Wed, 26 Mar 2025 18:49:15 -0400
+X-MC-Unique: 4fVRtGZNPYynIgwJTZ4AhQ-1
+X-Mimecast-MFC-AGG-ID: 4fVRtGZNPYynIgwJTZ4AhQ_1743029354
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-30db1d3b643so1880931fa.1
+        for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 15:49:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743028726; x=1743633526;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9D44QjpZljk+SGdrmPC7kTMGNHThYXdBfqrpwqLcab0=;
-        b=ufuJ85zL5/i5477UcIwm3PwA/YwZxU6GDv+FEkheOSJitV6r4nP1Cc9wRCEEMBeMav
-         MbBk5NHAMMi291EuFUqRtR/+g3awYZCUNLBKVm9vf7PjsyYrmWmhmeyzWjU26gzi9b7r
-         TGmGPbTaGuK2BmheRQ18XY7XAOXq9etNAoBITnsJosk4YmtHwDbGT7wWSmqxfBTQ25VL
-         c044JOlMcsUoTLDpsQR8x4L1k5yPeB50KKYxE5f1mzRFjOG0XMyEVrFR5xmEhSwkpQaY
-         Ce5jYRQ7aM6PF4mSSwl0wmWcspaGNhGWneg00WLPZ/gTczvPkq3GLKe1i43Qe7rayT4E
-         eBWg==
-X-Forwarded-Encrypted: i=1; AJvYcCXQGPOq0o7tl97d9d26Z24Yw7RW5Cq0DIRSJ1ZyKII0TQl4NfvpybuVTplp8vf0UHwyBubmzvKd@vger.kernel.org, AJvYcCXorxFyHPx368IZ/FTINw72RxWIZF8ISZa4i/aU6Z1xsFvRPQR14LQJ0NtB3RQXNEmdpnsStvtc/qiSPmM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHN0Gh5WQahNYKYkJZzJCWVPhGKbcobgdgZ2oB+6kB8gPpVl3Y
-	HDhhAYOBmYKaGVRtjGfijdQXX9exum46oQIJVFXVOeKVR0icC3vyQZExPv8+
-X-Gm-Gg: ASbGncsNKl3W8mR0LJ8+QoMd88HXYx7b2txEcl/MIp5PcA2MWCVxt5vTZlaRyVrKll0
-	juc3jirKXn/QTmwvTWuPflcnyDcnh2tIs+maTeSlbQkri/b0UwW0NfCbQeb9jnYd7Y48DclKUDI
-	CGgCngP3992rRr9k8lY9lR4H+1pIjA9evWuWWdLYg9QckNKiVuMK2RXPEhLFn0dRvQwNYc3Z9Wr
-	ER6klADiaabMdbiMbnxVhsT9c/ezt08kZ8YpaKyB9SiYdJOVPwA0QvpQXWW28NwdpeqqyQvzHL7
-	R8WAADcIkSPQvL/jmiyrc7S6rSrJGJ/o4o8KFsl3FE5JROJihB0bp1zXbQk5q+oQlRY=
-X-Google-Smtp-Source: AGHT+IFdgdXC0PO8hx8zYU5TTKZvweZhG74lAB4hPV2nUNafFDcA0T0mgJgKTjPM7YGUdKXT3THvYA==
-X-Received: by 2002:a05:690c:4b09:b0:6f9:544f:67dc with SMTP id 00721157ae682-70224f87e53mr19561247b3.1.1743028725541;
-        Wed, 26 Mar 2025 15:38:45 -0700 (PDT)
-Received: from [10.102.6.66] ([208.97.243.82])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-702283ec2e1sm517867b3.125.2025.03.26.15.38.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Mar 2025 15:38:45 -0700 (PDT)
-Message-ID: <85a52bd9-8107-4cb8-b967-2646d0e74ab4@gmail.com>
-Date: Wed, 26 Mar 2025 18:38:44 -0400
+        d=1e100.net; s=20230601; t=1743029354; x=1743634154;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qi8wdhM7rmWkvLOlU6keCbGUfSvgCk1Wxsh4f3EOl8Y=;
+        b=IRDmR6T5iF8ISvXu2HAchh0/rNYFEhnVcat0I8iBFb+zyYDHyhMm2A+x1Lg2O3KP0U
+         wCgcHMvdPif8AzvUN9MWzNnuiJMFGBeIKb9zjjI6z80ctE7qUB9FygNT2OH2Z6OmPZhh
+         GY2o5E6CsIUaVrQlwdhdkd98spihBlbsBZQpqDbLpP4rg12X/7t1gV8fT3yzcjAkettx
+         2dXfGezOC92diAhUQUtB3+rqOHd/BaAO4MT0I83srMs/U5U1wcdwcIQzPSqW5X+Vd5tj
+         GkaVzCV/bBFFcgGwJCiapkA/WNobRuDcAVHiudpZq2DuYKt0ActkhRcrCIGfzskb8vVX
+         UEPg==
+X-Forwarded-Encrypted: i=1; AJvYcCWwj5MfJSE4piw2QtEu7hJ/39EytdJq0rZCQ1YrSZdLjOEPXZ4FtpoOc7TbPDOulB15wZVN96Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXMizxr5sJ/wyWXGlhGPn7OyR1bzPF+hfclpI5UGN97zu4M2uL
+	cAV1jz4uAaWbmsmJ6/ftYAxZJ6PGvEAvf/43JQJhRczQ3EWWb+WM46BRKe427odsdNia4WOn1Wn
+	H6fhqsVlgxRSt3GWSuYA5GEUoxlOdWjSd+ng4Z1/+5gWLKN09ANCDsXD6wBZ1xQIFfedWF+zUjR
+	OJdOcQxY1FFUGPnC3JAwL+pGkVvttZ
+X-Gm-Gg: ASbGnctJwIUfKMRBRxtc9QEr7dmysyWcwE1ydrithvHM1w76KgeV5xcbHj0cwK1j43Z
+	yeOm5QcT0IOmoWRwbeY4XwC+c6M4IUC7ablKIFvcbfGM/XacotQpasgqHJcMGqnvyMZEXw5hKqM
+	fvHTg/dp5Yhi2sUjvNuPv3AWjswng0Fw==
+X-Received: by 2002:a05:651c:2050:b0:30b:bdb0:f09d with SMTP id 38308e7fff4ca-30dc5f515bbmr5510301fa.32.1743029354110;
+        Wed, 26 Mar 2025 15:49:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE8cMCyuMwWy76IQjJTWRHtr9mD0i57Aua495nDnRXXsLw6FXvJjoQX0xrXHm47p5VgTZevUnfzjDqhw/Un7Cc=
+X-Received: by 2002:a05:651c:2050:b0:30b:bdb0:f09d with SMTP id
+ 38308e7fff4ca-30dc5f515bbmr5510251fa.32.1743029353699; Wed, 26 Mar 2025
+ 15:49:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Patch net-next 1/3] net: bridge: mcast: Add offload failed mdb
- flag
-To: Nikolay Aleksandrov <razor@blackwall.org>,
- Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Roopa Prabhu <roopa@nvidia.com>, Simon Horman <horms@kernel.org>,
- linux-kernel@vger.kernel.org, bridge@lists.linux.dev
-References: <20250318224255.143683-1-Joseph.Huang@garmin.com>
- <20250318224255.143683-2-Joseph.Huang@garmin.com>
- <c90151bc-a529-4f4e-a0b9-5831a6b803f7@blackwall.org>
-Content-Language: en-US
-From: Joseph Huang <joseph.huang.2024@gmail.com>
-In-Reply-To: <c90151bc-a529-4f4e-a0b9-5831a6b803f7@blackwall.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250326180909.10406-1-ramonreisfontes@gmail.com>
+In-Reply-To: <20250326180909.10406-1-ramonreisfontes@gmail.com>
+From: Alexander Aring <aahringo@redhat.com>
+Date: Wed, 26 Mar 2025 18:49:02 -0400
+X-Gm-Features: AQ5f1JpGqx_OPjvXDypDk2rq6InmEg7NNHY5U7uN3dc0VBCMkBBj7u5F0xqSZks
+Message-ID: <CAK-6q+hkHByFK2hWkrbZqFT5=h9U9nXuZJNF+_LhqmqeEC+Sng@mail.gmail.com>
+Subject: Re: [PATCH] mac802154_hwsim: define perm_extended_addr initialization
+To: Ramon Fontes <ramonreisfontes@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	linux-wpan@vger.kernel.org, alex.aring@gmail.com, miquel.raynal@bootlin.com, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 3/21/2025 4:19 AM, Nikolay Aleksandrov wrote:
->> @@ -516,11 +513,14 @@ static void br_switchdev_mdb_complete(struct net_device *dev, int err, void *pri
->>   	     pp = &p->next) {
->>   		if (p->key.port != port)
->>   			continue;
->> -		p->flags |= MDB_PG_FLAGS_OFFLOAD;
->> +
->> +		if (err)
->> +			p->flags |= MDB_PG_FLAGS_OFFLOAD_FAILED;
->> +		else
->> +			p->flags |= MDB_PG_FLAGS_OFFLOAD;
-> 
-> These two should be mutually exclusive, either it's offloaded or it failed an offload,
-> shouldn't be possible to have both set. I'd recommend adding some helper that takes
-> care of that.
+Hi,
 
-It is true that these two are mutually exclusive, but strictly speaking 
-there are four types of entries:
+On Wed, Mar 26, 2025 at 2:09=E2=80=AFPM Ramon Fontes <ramonreisfontes@gmail=
+.com> wrote:
+>
+> This establishes an initialization method for perm_extended_addr, alignin=
+g it with the approach used in mac80211_hwsim.
+>
 
-1. Entries which are not offload-able (i.e., the ports are not backed by 
-switchdev)
-2. Entries which are being offloaded, but results yet unknown
-3. Entries which are successfully offloaded, and
-4. Entries which failed to be offloaded
+that is based on the phy index value instead of a random generated one?
 
-Even if we ignore the ones which are being offloaded (type 2 is 
-transient), we still need two flags, otherwise we won't be able to tell 
-type 1 from type 4 entries.
+> Signed-off-by: Ramon Fontes <ramonreisfontes@gmail.com>
+> ---
+>  drivers/net/ieee802154/mac802154_hwsim.c | 18 +++++++++++++++++-
+>  drivers/net/ieee802154/mac802154_hwsim.h |  2 ++
+>  2 files changed, 19 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee8=
+02154/mac802154_hwsim.c
+> index 1cab20b5a..400cdac1f 100644
+> --- a/drivers/net/ieee802154/mac802154_hwsim.c
+> +++ b/drivers/net/ieee802154/mac802154_hwsim.c
+> @@ -41,6 +41,17 @@ enum hwsim_multicast_groups {
+>         HWSIM_MCGRP_CONFIG,
+>  };
+>
+> +__le64 addr_to_le64(u8 *addr) {
+> +    return cpu_to_le64(((u64)addr[0] << 56) |
+> +                        ((u64)addr[1] << 48) |
+> +                        ((u64)addr[2] << 40) |
+> +                        ((u64)addr[3] << 32) |
+> +                        ((u64)addr[4] << 24) |
+> +                        ((u64)addr[5] << 16) |
+> +                        ((u64)addr[6] << 8)  |
+> +                        ((u64)addr[7]));
+> +}
+> +
+>  static const struct genl_multicast_group hwsim_mcgrps[] =3D {
+>         [HWSIM_MCGRP_CONFIG] =3D { .name =3D "config", },
+>  };
+> @@ -896,6 +907,7 @@ static int hwsim_subscribe_all_others(struct hwsim_ph=
+y *phy)
+>  static int hwsim_add_one(struct genl_info *info, struct device *dev,
+>                          bool init)
+>  {
+> +       u8 addr[8];
 
-If we need two flags anyway, having separate flags for type 3 and type 4 
-simplifies the logic.
+why not using directly __le64?
 
-Or did I misunderstood your comments?
+>         struct ieee802154_hw *hw;
+>         struct hwsim_phy *phy;
+>         struct hwsim_pib *pib;
+> @@ -942,7 +954,11 @@ static int hwsim_add_one(struct genl_info *info, str=
+uct device *dev,
+>         /* 950 MHz GFSK 802.15.4d-2009 */
+>         hw->phy->supported.channels[6] |=3D 0x3ffc00;
+>
+> -       ieee802154_random_extended_addr(&hw->phy->perm_extended_addr);
+> +       memset(addr, 0, sizeof(addr));
+> +       /* give a specific prefix to the address */
+> +       addr[0] =3D 0x02;
+> +       addr[7] =3D idx;
+> +       hw->phy->perm_extended_addr =3D addr_to_le64(addr);
+>
+>         /* hwsim phy channel 13 as default */
+>         hw->phy->current_channel =3D 13;
+> diff --git a/drivers/net/ieee802154/mac802154_hwsim.h b/drivers/net/ieee8=
+02154/mac802154_hwsim.h
+> index 6c6e30e38..536d95eb1 100644
+> --- a/drivers/net/ieee802154/mac802154_hwsim.h
+> +++ b/drivers/net/ieee802154/mac802154_hwsim.h
+> @@ -1,6 +1,8 @@
+>  #ifndef __MAC802154_HWSIM_H
+>  #define __MAC802154_HWSIM_H
+>
+> +__le64 addr_to_le64(u8 *addr);
+> +
 
-Thanks,
-Joseph
+This is a uapi header for netlink which is not yet delivered through
+kernel-headers installation.
+
+Why do we need this prototype declaration here?
+
+Thanks.
+
+- Alex
+
 
