@@ -1,109 +1,142 @@
-Return-Path: <netdev+bounces-177698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA6C6A714E7
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 11:32:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72B37A714F2
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 11:36:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24D953B55B5
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 10:31:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF6DA188B43B
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 10:34:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3D811B6D08;
-	Wed, 26 Mar 2025 10:31:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C56BD1B413D;
+	Wed, 26 Mar 2025 10:34:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DQ7lfIc+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RcVqKpjI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com [209.85.222.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF31C1B4242
-	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 10:31:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34F591B21A7;
+	Wed, 26 Mar 2025 10:34:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742985078; cv=none; b=ZXgyyEOXu8v2Ba/mt5L/H2bkh34jQI4dFA+w4p86KQN/W1Srv92X+ghi4diG6UFo3yXHyz4ZKR5/E5XStardrElz3EU50XZNCbmqMM0vkOkxiX/+5XaCfYs7UNaR29CmcqdcU4mIXH0cnHYHOTNMjmmbmtVRkmK31k/lgahPpng=
+	t=1742985268; cv=none; b=ayHQTgZl1p6S6ApXblIm+PoOjFRp+xljftNqWtFJWjhpwKpYbZY7cIvjuUIutToQPJghWBx/N+l6DszcTIg4NpXA3tWJQl1DdS0JqEQgxgnhlA4uXcxBwIn73gBTlWRw1WDflUqmYr3+oOx+535CUf28SV4oOr+nhHr9LDnm7Zs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742985078; c=relaxed/simple;
-	bh=mcWknBaxHnJ1w82lH1q/4q2+Roef2sO9EGG2NfMjQEA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DwUs4Bg8cKR5VyG8S+nK97qs+FCrzI+p2rGnhigYseCJjzOmYe0okQ80Um+d6vgort9Cwzm/E1TfW1myfvc+Xn2kEfeb+stl80ieHAl3YytbpnKkh/fl46fvwHiZZ6IRe2zjsNJ9fPFjkF9RGuiqWB+KAXbcAOq+6Z5+Z9mD0ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DQ7lfIc+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA817C4CEEA;
-	Wed, 26 Mar 2025 10:31:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742985077;
-	bh=mcWknBaxHnJ1w82lH1q/4q2+Roef2sO9EGG2NfMjQEA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DQ7lfIc+fN5CwKQcGccQ2RR2atX6iOXqb0DMHv49ONHMOmeogf9fpylmG6PMoDMX4
-	 yAiH0GBI6EwcxjVcolO1QMkS8N/Z2jsBMu+1PebdnwAWsiJrlDfxt7XPPBiWhSC2GU
-	 rbXWuwQKlzSV58Ny05TG+ddcR91RazTDDhcLtgiExzhiA/qmBfh+MmkZb7fqCYH8rV
-	 NpmT8WlUmoad47b0vY4V0m1bCguPyd0tql376i54CHdR1V+Qxk3zGBhSw1TwXUx+Zw
-	 joCfcQcgA5SMLM9IRC9mn3SyQQVaKAy8WLDHCteWaUdamdgQrflp7kz1TgcWl41ZT8
-	 sIJuVN7Hzt/0w==
-Date: Wed, 26 Mar 2025 10:31:11 +0000
-From: Simon Horman <horms@kernel.org>
-To: Xin Tian <tianx@yunsilicon.com>
-Cc: netdev@vger.kernel.org, leon@kernel.org, andrew+netdev@lunn.ch,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	davem@davemloft.net, jeff.johnson@oss.qualcomm.com,
-	przemyslaw.kitszel@intel.com, weihg@yunsilicon.com,
-	wanry@yunsilicon.com, jacky@yunsilicon.com,
-	parthiban.veerasooran@microchip.com, masahiroy@kernel.org,
-	kalesh-anakkur.purayil@broadcom.com, geert+renesas@glider.be,
-	geert@linux-m68k.org
-Subject: Re: [PATCH net-next v9 14/14] xsc: add ndo_get_stats64
-Message-ID: <20250326103111.GC892515@horms.kernel.org>
-References: <20250318151449.1376756-1-tianx@yunsilicon.com>
- <20250318151522.1376756-15-tianx@yunsilicon.com>
+	s=arc-20240116; t=1742985268; c=relaxed/simple;
+	bh=XVhx+0xc2df5xaZYfBfdVarl+QdD3rFpi2tF9uDlvGE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=O8sotgxYOn8XYf7B1gtXgG7XKM3M61a2mwJvNhsXn2N1ry1m5w1L1Tl2Ei1Ypf9PejHu6RuQvyoOaVE+hBWvBz0nTbDkr6pIFEr476+SOJIFx4YET1I0SNGJFJ92xDZ/XXZYOZ97ixAK2+nR7p2+NAyXFGQ8K72ppk1CtuYg8qQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RcVqKpjI; arc=none smtp.client-ip=209.85.222.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f47.google.com with SMTP id a1e0cc1a2514c-86dde90e7a3so2841570241.1;
+        Wed, 26 Mar 2025 03:34:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742985266; x=1743590066; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XVhx+0xc2df5xaZYfBfdVarl+QdD3rFpi2tF9uDlvGE=;
+        b=RcVqKpjI/MRfovGqpneL2+Tq0y74zmlnq5sxH8DIUWeck/Pu/xwMsAD1THTORMmnS+
+         TOyMMMe922qOxSz+XksCSMWC2I/sWqK/v7/adl2sPvHt6KdFnh41UHG+i3w0FUuUA8TS
+         7UJ411ax9gHehsNwySMt7gFXAJHaP1qoPHCHsTjUKh+rkcCnZWvQ3mMXRBbDsyD+H5uw
+         Uaz90IRdfD4CeacDufEK5TrMxv7wpc/Jo1XUlPahYoIANjiw7NbPPuCTpXIRXqq3puSt
+         p3nQScejx8mMXNObbryz+IF6rX47TGjuvR0ZuJa2oThsSdXVDNjJDP2tYzwEdUI8Coyh
+         J5UQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742985266; x=1743590066;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XVhx+0xc2df5xaZYfBfdVarl+QdD3rFpi2tF9uDlvGE=;
+        b=fgnvKFu88FK/JQPblJZrz5BL94ydvzbtO5/CiT6tt8X18pR/1AwNe0dOiVpNN3akcw
+         RewWSB8U0simCMyMmq9I0SieurzfwsV5TpkOxdtXAtPnrNlov+UqU4dQTRUdhMwm697K
+         JhJNgtWDB6RG39h+IVh/4mJC4UB40vfKHF/ZmSIhWJB7vg6p741s6nFzt86CV3dOgDjI
+         zrIxm5CEF6LIOxEm7dExRuK/lnhD5lUmLmfm3IcuVPOLGk27jXRjaIIHVw/LWVcACiPM
+         Xc1zgQ+La3mkmychz7gT1wpyEw3RfJZCr+3CqcWwGxzr3Lj2podvb6otCjUetOnzXiTX
+         hVow==
+X-Forwarded-Encrypted: i=1; AJvYcCUIMY59+8oYzlUfrciSSuE3dgbMkSd+DVmcbbjn13Xcv8QuW4tY+43FOQbgEs9XmAu91bfJuh1C@vger.kernel.org, AJvYcCVhNynfJFPeTJSknoJjvI42R/6IQQxIcbIimY61X4KY4t1tY+NAY3Qtb4IP6MqEwqcZJlJPW53hAYcc@vger.kernel.org
+X-Gm-Message-State: AOJu0YzphRaWlhhmCjIUIpFiRkThb601wqyDMFLjdnbVFnQPcxseaMP5
+	x++EECiX/qeMTe9Y1n9QC+9cHHg3LiS9RdX73AaMhFPlNxfQbt7NAWFzuCJzOLxa/fuXc15xmv2
+	6ddavCqpLedbEmdHa9OumabND8Ko=
+X-Gm-Gg: ASbGnctknJA20fILhtVW7tOLyWiPP3NEfU/04Acvi9qO+DLqwhsVQMDNWESRDcq7poD
+	u/JQ5plvQ+NQsQCEVqD0IcdXqu0H6Bwy/Z48Z+rXta01XvE11WZSwzw5nr3ZaPVXmBxvBk94nxC
+	2hq+Xz3zBa/unQvF0dH0wCFBFChQ==
+X-Google-Smtp-Source: AGHT+IEDPOHxt/s6wfWgziJqDs4+9yS59pv7JdGN6azVFRYtzqVO/xo5kZ1ubzaKKbSu2ky2Vw6yhTVhOMneze8RCbA=
+X-Received: by 2002:a05:6102:d92:b0:4c1:801e:deb2 with SMTP id
+ ada2fe7eead31-4c50d4c95d4mr15469496137.7.1742985265782; Wed, 26 Mar 2025
+ 03:34:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250318151522.1376756-15-tianx@yunsilicon.com>
+References: <20250325165312.26938-1-ramonreisfontes@gmail.com> <87cye4qexa.fsf@bootlin.com>
+In-Reply-To: <87cye4qexa.fsf@bootlin.com>
+From: Ramon Fontes <ramonreisfontes@gmail.com>
+Date: Wed, 26 Mar 2025 07:34:14 -0300
+X-Gm-Features: AQ5f1JrfPd7dKYF3jJjV8bbJ7EUTKhsoXUTcPlW5GITdeGDwzlP28-QFAwOvJb4
+Message-ID: <CAK8U23Z0fpJ7ogsGvdWjnQV7kEwdgEW8pSQwbjT9UPVzn3LXoQ@mail.gmail.com>
+Subject: Re: [PATCH] mac802154_hwsim: define perm_extended_addr initialization
+To: Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	linux-wpan@vger.kernel.org, alex.aring@gmail.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 18, 2025 at 11:15:24PM +0800, Xin Tian wrote:
+Hello Miqu=C3=A8l,
 
-...
+This PR aims to replicate functionality similar to what is implemented
+in mac80211_hwsim
+(https://github.com/torvalds/linux/blob/master/drivers/net/wireless/virtual=
+/mac80211_hwsim.c#L5223).
+This approach is useful for testing wireless medium emulation tools
+like wmediumd (https://github.com/bcopeland/wmediumd/blob/master/tests/)
+and I plan to submit more PRs soon.
 
-> diff --git a/drivers/net/ethernet/yunsilicon/xsc/net/main.c b/drivers/net/ethernet/yunsilicon/xsc/net/main.c
+I've started developing a wmediumd-like framework for mac802154_hwsim,
+which you can find here:
+https://github.com/ramonfontes/wmediumd_802154. However, it's still in
+its early stages.
 
-...
+Indeed, I'm responsible for Mininet-WiFi
+(https://github.com/intrig-unicamp/mininet-wifi) which supports IEEE
+802.15.4 emulation via mac802154_hwsim. Having a wireless medium
+emulation for mac802154_hwsim would be highly beneficial, as it
+enables controlled testing and facilitates prototyping.
 
-> @@ -1912,14 +1931,20 @@ static int xsc_eth_probe(struct auxiliary_device *adev,
->  		goto err_nic_cleanup;
->  	}
->  
-> +	adapter->stats = kvzalloc(sizeof(*adapter->stats), GFP_KERNEL);
-> +	if (!adapter->stats)
+> Also, please wrap the commit log.
+Apologies for any confusion. Could you clarify if there are any
+specific changes I need to make in the PR?
 
-Hi Xin Tian,
 
-I think you need to set err to -ENOMEM here, else the function will return 0
-even though a memory allocation error has occurred.
-
-Flagged by Smatch (please consider running this tool on your patches).
-
-> +		goto err_detach;
-> +
->  	err = register_netdev(netdev);
->  	if (err) {
->  		netdev_err(netdev, "register_netdev failed, err=%d\n", err);
-> -		goto err_detach;
-> +		goto err_free_stats;
->  	}
->  
->  	return 0;
->  
-> +err_free_stats:
-> +	kvfree(adapter->stats);
->  err_detach:
->  	xsc_eth_detach(xdev, adapter);
->  err_nic_cleanup:
-
-...
+Em qua., 26 de mar. de 2025 =C3=A0s 07:12, Miquel Raynal
+<miquel.raynal@bootlin.com> escreveu:
+>
+> Hello Ramon,
+>
+> On 25/03/2025 at 13:53:12 -03, Ramon Fontes <ramonreisfontes@gmail.com> w=
+rote:
+>
+> > This establishes an initialization method for perm_extended_addr, align=
+ing it with the approach used in mac80211_hwsim.
+>
+> You are now enforcing an (almost) static value, is that the intended
+> behaviour? If yes I would like a better explanation of why this is
+> relevant and how you picked eg. 0x02 as prefix to justify the change.
+>
+> In general I am not opposed, even though I kind of liked the idea of
+> generating random addresses, especially since hwsim is not the only one
+> to do that and having a simulator that behaves like regular device
+> drivers actually makes sense IMO.
+>
+> Also, please wrap the commit log.
+>
+> > Signed-off-by: Ramon Fontes <ramonreisfontes@gmail.com>
+>
+> Thanks,
+> Miqu=C3=A8l
 
