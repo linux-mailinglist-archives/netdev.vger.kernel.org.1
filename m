@@ -1,94 +1,87 @@
-Return-Path: <netdev+bounces-177729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D1B0A7171C
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 14:09:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A4A2A71759
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 14:22:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06B8D3B0460
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 13:09:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6BC0188A293
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 13:22:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D3B21DED5F;
-	Wed, 26 Mar 2025 13:09:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97CBC1E1DFE;
+	Wed, 26 Mar 2025 13:21:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GMUYdbxC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sct4qx68"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 661161CB9EA;
-	Wed, 26 Mar 2025 13:09:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61DC62A1B2;
+	Wed, 26 Mar 2025 13:21:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742994594; cv=none; b=TJQzogcayyxUdOoh1dr6TGdkPBupNry7u6RDXlEkwt0l933xHArciTGnXPVGUT3AFkDEFw51S3RrysxcVXwFonF5hNQ0C6g2XFGpIKWFANs5nbUFdOtHVEiXD3o5mrRU2CSqPq6BxtMVijESeOOuCqrYD7oW7bS2Zp/bSFn/I4U=
+	t=1742995310; cv=none; b=lqQiOZ1HkfQ6OrXHErq2ryDYojn6RM+/kb7/UlmKP/aje2YH3WVkPE9jqe3l7+k/5nRC9VUFNtdHxtHL81N7IkhENIIqR7D8w4q8fgmGkqiP/1tbIvaJMaLDpZlcFVDAGfclvH8CyVy2BCfIPtSdQ7wxs+2dxyAqwsD2pA1ABZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742994594; c=relaxed/simple;
-	bh=/CuSQAN5XtE3XMwAIx/e9yVUUn9SWfXEiOtAErZp3rI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YISSXnauykFSXzGaKT0o478bzUtlQdqsqY8U62SuASusluBtP1U2AOXIc2dPmDfT+gQuFn3UiLQGYvGAPYQwbkgRQ4VdJousUjZ82vhbcAc9KZBVzhI5JNBEn43f0mBCDYH0XqThOPMG7abXdFqXMobF/sD6kkJg1bZEVr+vSsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GMUYdbxC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E376EC4CEE2;
-	Wed, 26 Mar 2025 13:09:53 +0000 (UTC)
+	s=arc-20240116; t=1742995310; c=relaxed/simple;
+	bh=hyEYYCNCtYgpShUKbKEPZOrC0YhCaBy/YzCLuOkzVAE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NuO4XEMV4vLKU7LDPFJRUtNlAX3PJdYV3uQU/oRxHhIqMjFv1FC6xX1Qy2Gt798BBgHW3kbUeNQJVBCumXzVAmC/nZsUdXB86XAFvXzfR6J9YuHxJ5Vd/ggi1T5XAe3dQKqEImpvIL3EnsW6jVstg2o2hExH7eMQpMqqQMv+uQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sct4qx68; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3020C4CEE2;
+	Wed, 26 Mar 2025 13:21:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742994593;
-	bh=/CuSQAN5XtE3XMwAIx/e9yVUUn9SWfXEiOtAErZp3rI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GMUYdbxCXe9gU68uCK6/lbj6769d6nnoH6sgcu0R+miix6uCZFFWGmvlgFfI1cB38
-	 3n4zDy0evXaQDUj9yV7IxPqqDPVpdZsW5K+5lWwA4htdAXqUTOshxG5OcFCI9xhoS2
-	 UeN8VzJRWXSOqJ/AUc3jjlCb1sZACTywf93POSQD77487cN36qwrkMw89tiWevCz1w
-	 49DD8GPdHjdXo8SEtkwetr2awYEt37XrlYChrNGqBf+90jonkkcDO+mVChLqYRpMO2
-	 QAkrKaFyYXoyxXfZLLHOC/jzsuPtgAWxoJnPMQ1yrTWUMzCqgGs8dKKo0yGTycJegi
-	 juKpldD8zyJdw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DC83810901;
-	Wed, 26 Mar 2025 13:10:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1742995309;
+	bh=hyEYYCNCtYgpShUKbKEPZOrC0YhCaBy/YzCLuOkzVAE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=sct4qx68nLEfZ/vV+6oyo9kvjPnvx1ZMRz4KFk/+vGVzZ0Tk5695ia4M/T9ZCS9aZ
+	 pSp9pygFLJKma/WyQpKQtNyVRap5sIyIZKU5OPaGlnbtG9WAIT77mDCNkqtR0fOQJs
+	 /6XyuawavU2+RAGdFMnqqThBFDpDgLbdTfejKfizxRcjRPlE1OMgPB/IsBicLghQG4
+	 23KqxCyVavuaqGGTaIEBUB5ppIXZV/IjAC49rg7Q1cTpJjOSD6ARxoU1+VADHpWLg4
+	 Vu1+UI6DZtmTIkiL49exxAFvTzMADy0Vo2u4esaXDVxy27w/B4Imq5yVCSJxddsaTq
+	 IMrV4UA4ybSjQ==
+Date: Wed, 26 Mar 2025 06:21:48 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>,
+ Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
+ netdev@vger.kernel.org, Jose Abreu <joabreu@synopsys.com>, Giuseppe
+ Cavallaro <peppe.cavallaro@st.com>, "Russell King (Oracle)"
+ <rmk+kernel@armlinux.org.uk>, Magnus Damm <magnus.damm@gmail.com>, Geert
+ Uytterhoeven <geert+renesas@glider.be>, Eric Dumazet <edumazet@google.com>,
+ "David S. Miller" <davem@davemloft.net>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org, Biju Das
+ <biju.das.jz@bp.renesas.com>, Fabrizio Castro
+ <fabrizio.castro.jz@renesas.com>, Lad Prabhakar
+ <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH net-next v4 0/3] Add GBETH glue layer driver for Renesas
+ RZ/V2H(P) SoC
+Message-ID: <20250326062148.152e3daa@kernel.org>
+In-Reply-To: <CA+V-a8tBh1Ev-8=0vcmz0XB7iqKzZZ5dKefrZCrY49Je3KTCAg@mail.gmail.com>
+References: <20250318205735.122590-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	<CA+V-a8tBh1Ev-8=0vcmz0XB7iqKzZZ5dKefrZCrY49Je3KTCAg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] mctp: Fix incorrect tx flow invalidation condition in
- mctp-i2c
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174299463026.1310063.14750398423292359224.git-patchwork-notify@kernel.org>
-Date: Wed, 26 Mar 2025 13:10:30 +0000
-References: <20250325081008.3372960-1-Daniel-Hsu@quantatw.com>
-In-Reply-To: <20250325081008.3372960-1-Daniel-Hsu@quantatw.com>
-To: Daniel Hsu <d486250@gmail.com>
-Cc: jk@codeconstruct.com.au, matt@codeconstruct.com.au, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Daniel-Hsu@quantatw.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Wed, 26 Mar 2025 12:52:17 +0000 Lad, Prabhakar wrote:
+> This patch series has been marked as "Changes Requested" on Patchwork,
+> but there were no review comments on the series. If the status was
+> marked as "Changes Requested" due to build failures reported by the
+> kernel bots, I=E2=80=99d like to clarify that the failure was caused by a
+> patch dependency, which has now been merged into net-next [0]. As a
+> result, this series should now build successfully on net-next.
+>=20
+> Please let me know if you would like me to resend the series.
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Tue, 25 Mar 2025 16:10:08 +0800 you wrote:
-> Previously, the condition for invalidating the tx flow in
-> mctp_i2c_invalidate_tx_flow() checked if `rc` was nonzero.
-> However, this could incorrectly trigger the invalidation
-> even when `rc > 0` was returned as a success status.
-> 
-> This patch updates the condition to explicitly check for `rc < 0`,
-> ensuring that only error cases trigger the invalidation.
-> 
-> [...]
-
-Here is the summary with links:
-  - mctp: Fix incorrect tx flow invalidation condition in mctp-i2c
-    https://git.kernel.org/netdev/net/c/70facbf978ac
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Don't send patches which can't be immediately merged.
+You will have to repost, obviously, and after the merge window.
 
