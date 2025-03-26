@@ -1,135 +1,211 @@
-Return-Path: <netdev+bounces-177722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4046A71674
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 13:21:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FFB2A716AB
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 13:27:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2B9B3AE8C1
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 12:20:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8657B7A525B
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 12:26:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D59F61E51E2;
-	Wed, 26 Mar 2025 12:20:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72771E1020;
+	Wed, 26 Mar 2025 12:27:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OyPvISRM"
+	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="zDXdZbrH"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 401C81DF969
-	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 12:20:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86F78158A09
+	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 12:27:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742991644; cv=none; b=eJuzNDil+Atw5ud8MzGmX/g5XhBNUKLrVGBREGjWJ4LZPOEGIov6r6/S/l8xjENCm47KG5+dTpp2fdC5+ZTjWmbN2lOSU0+6mkQtcH1LmyCeXBW0QtHIljIq1X/ylmmgf1+bzPmbA390Ay8OQGqT4/qtH5h73XOYznxD18lFeLw=
+	t=1742992032; cv=none; b=FnjZhkPDoNlHixLPtupzVivgZpsoo5iFGOikvDRPCxCs+T6IhCGBu2NDtQBf1kbLyOx7xISVtpvRLsoA3OPxo6t66TYdO1SulefDYRNJ9nLnBypCtOJPb+sziocMqlL+9xLx6zJ4f4g3pL2TCXz51SY6AKPi9L7bsWVPHvQFMfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742991644; c=relaxed/simple;
-	bh=fDGZt+SqyiAW6zCfVM1bGeXtRYL5+861efZwXKZVyjc=;
+	s=arc-20240116; t=1742992032; c=relaxed/simple;
+	bh=SV+/e0uOpaXgdqdk1UV8GlqnRF/RD/ueS6pKXijqHyI=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=NQajiM/6CdAGiRCjnGpgTAFPkBh9O9BBY2clGRB0fEDoJrQOW3Z2yw3kI4cGj85OE/LNffu9YhmBfr+KsIzBmcLYg56/i6Ws8gh7mxuTGzf24WzvomUKB04F2/Ccy6YIWWP39gcCw8TqJq9GWdz0zItJu5EfFgI9rR1CpZxJaz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OyPvISRM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742991642;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fDGZt+SqyiAW6zCfVM1bGeXtRYL5+861efZwXKZVyjc=;
-	b=OyPvISRM1O7N2DrDBtYUfU1M3lZNR79xAUvEcl/4733LtWFE/ooQGt5l4ftsYYRePmAYMq
-	TXXTdW1DPVcyxBrHAVyjeDWm/X0dhN87OAKwCZwUMUMq8ppFK5AAz4HCQKILxJOSy1uJVx
-	h0U29bxapI/uWE9vnWYLkDonSHulV5c=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-201-gZ4gPYyCPdGGWQSSoRAUbw-1; Wed, 26 Mar 2025 08:20:40 -0400
-X-MC-Unique: gZ4gPYyCPdGGWQSSoRAUbw-1
-X-Mimecast-MFC-AGG-ID: gZ4gPYyCPdGGWQSSoRAUbw_1742991639
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-ac37ed2b99fso603657166b.3
-        for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 05:20:40 -0700 (PDT)
+	 MIME-Version:Content-Type; b=I7YEIfndEDFdpN/Rmh89n51b+EYBKtH8YNnS23wCnajONhbXuB8k7vOSTicrC23Dv83ve33dmm0R0J/GEu4dyq4crPNxc82ZAQPPtz3og0IsYXsFCLHpTNv+4Asa4FfSjjYhzgVjj56+IzCJ3dx9xAJHH8rKTfDqeE2Rxc5l/Fc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=zDXdZbrH; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-ac29af3382dso1135882766b.2
+        for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 05:27:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1742992027; x=1743596827; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WNXRzOksnIPDw2T5nHIgavLJ/ABfFnOewbwM5RTRJBA=;
+        b=zDXdZbrHv1Qrqq9SFM9FnHEZJnw7gBQnFba2hD+v/uvqqQU9bpNYpLV/Apl/SqFJh7
+         t6cl+Rp7p+s47MjBmvuaRKedRLVoG7EeCdaLE3+ZrK0elcniRe53JtUNlzSthIrYS6VK
+         AjlyZc7TubPofvp6BQNRu3ff7SrHaqke3eppdaHegfI5inTQf3dqoqzX2Uc+c2PgfiJu
+         EV7AIe5LjEbtEchAPDH7SipsMlogvjUpjopZSQnkDO0a442G1yUh27EVlgBUKNJwLa/t
+         TT1XGoDBjKXgp0XvXzjquEgiSbxrcmQgBjZ9rLLBOLrp9RVbdHhnGJt+Aj9r+ecqYcQB
+         9V+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742991639; x=1743596439;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fDGZt+SqyiAW6zCfVM1bGeXtRYL5+861efZwXKZVyjc=;
-        b=n8hR1juPgIMy8QS4OjCyqUcGO4Hj4aFch7iVCP8Z2WfPH49mSxI4otDjqpTJRwEl8H
-         /Xx6SyrTbxKEdek/abIZlbhk92/69ag+EDcz+F4Mf+a3/wVgLZyU5nnSZuzoYrs3NzCe
-         DE0XB1FA9XfxVMdKn3dct/1T4OojRTQVHlFkZw5l11jiTnzZM2I01eUL1ofJsjQS8udI
-         N7tCwYI09eAWTTaYif/YDg25EqRpOqKYbTN5RubLKnQaCMye+u532S6s1TXl5lQPvw5c
-         xVqK4amjsL05rGzfq4MOXOinczco5jastidvYP+d4/Z3pyxV9UAYJH/QbzUsDeUSw0kT
-         fmXA==
-X-Forwarded-Encrypted: i=1; AJvYcCUTuFNjDaqPoksJ1k/T/vxZMEJQv6H7I3qVkqGshRtKawyFJ2Kvp72pTIeD3b1VffYby6HqwIU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpHvbb3OxrIKPjYghbKVpIvSyEGO/Inrb4k+mj0S9ECvm/ReZA
-	WyZJfHcEvfUWvJlx1Pd6N7gKSOltjTUk1dWNT7TEITXiTrsOmfUd3GrQFfgn8du0AY6hut7+NGW
-	X98UkDCBWAG69O9l5jnESwKX7BRKxi/3J7tdm3imaFhDiVLZ73mGxWA==
-X-Gm-Gg: ASbGnctecXobdAXzyparRCxMu+gp7ILGYnPaYz9hQcb4qIvS2Zui3nbkoixPo5QrIDD
-	ovMLUso4HbQcaosQRTkGzam/1udt0QDdAXdN9r1SYY3zfjBAcIYvWB1KHd8BOqBVwIWzqwhLp2X
-	cnEYPM4qzu/VzT1pRGg/gWI1HOeGeBhRuIGsKRr3JrJtD3JjBhgAJdU6CoBVOdZyBB05yWWW0NT
-	aGibRujHtCyMRD4emZ9tuejRSMHAfkwHG2IyZPlC9CO2aEjRdWLrSZLT7sUHJW3X+jlwx3BzltN
-	Hu3R5oJx6F51ARedFZqrMniiisO2Xzvx4dirtiOK
-X-Received: by 2002:a17:906:c105:b0:ac1:fab4:a83 with SMTP id a640c23a62f3a-ac3f22aec3fmr1934591266b.25.1742991639121;
-        Wed, 26 Mar 2025 05:20:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGXpD8SKp1cf90maKHi6um2LlX8ejsXAgc5A98IWT9wYQriYmqy8j/0VlxO8lFqKGic1FYQjQ==
-X-Received: by 2002:a17:906:c105:b0:ac1:fab4:a83 with SMTP id a640c23a62f3a-ac3f22aec3fmr1934588766b.25.1742991638698;
-        Wed, 26 Mar 2025 05:20:38 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3efb65701sm1003437266b.122.2025.03.26.05.20.38
+        d=1e100.net; s=20230601; t=1742992027; x=1743596827;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WNXRzOksnIPDw2T5nHIgavLJ/ABfFnOewbwM5RTRJBA=;
+        b=TEJk4xH/fuKu2KSfrmpqQR+hpdB5bYQrISW2LBWUZ6w1rB9PyiZ0QXyrf3nnMgTcjV
+         EIep66gcGPiqwORecNsxFla9Lryl+0+cLV3mFLq7+SMjr1MxQk1L5O8I8Sv5yqiCD3ck
+         KY2VthQeOc3xiWb5E4JsPsXX4Lu5OpuD1s2NdQ9DTFZEqXPKI/sHh8h17zydZSFKDggG
+         FEPQ3KXN5RszJICRB5zflZLeMPLrL1l0c07RQHi4uUrjxwZ+c/IVnRyBz4psT3YFsLaH
+         l1Od7kNFOsSqbbUBT/vct+tGKdTX/qYHlyZGHQ/Myhkw7CrdJpHqvrHdLjxN0ZCf/xJd
+         PyLg==
+X-Forwarded-Encrypted: i=1; AJvYcCUmwGt8u0k2zhwIeVxfR5NR625QwoIWTBeEPA7uag6ytrDPtVzV5j0dzGkE3KMN8fHLi8Ho+OE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx00OkFQYEqOZseDX8atk1PX4paSABLvBi181NEq5qR8lf28GX2
+	YqKZ05LcZwA2goU1OxDEWFJ69W/Au42FbFiKzEBVvoyde6Bopq6/4GzjUbKGijmzpIK4U1IY8mP
+	K
+X-Gm-Gg: ASbGncvDRJanKvzNW3AfnMKja25SN/BfG723vLaXvVpADLRYavZyoFF5Dbk6mmvzy26
+	diRff8ySm9YSh6x8n0hIVpubAQpMHCL96H7FL4J0GkDlfMkCHXvsOaIx2o4QeCKTGXRdD7PoWa9
+	5Wwp7hOj5cY108udER+uAkm/KczlBDXpURFE+lFAWUx/8TfzBG5OQcoubx3KWCeos8vlCoKLxnI
+	SxHb6kGZGDrYh4qgBSOjxFg6PRKiydeQ4G1+yRaeRiRKbn3LhIHiQtDSwhsSqaOxW3CCBTpEqhn
+	V5dCEIW+esba/vtkKqOQKiNo8Xds91gCKJE4hE82t6JVvHUbCgHe9OVYRnfbtUbdrOWT8jlH5Zc
+	=
+X-Google-Smtp-Source: AGHT+IFPBtsAcJaLibETOYQEyo7vPUdMPrrhSAxNPFMy81iqRnoMoEXYFf087GIM9GGxwTxqpWW/CQ==
+X-Received: by 2002:a17:907:7295:b0:ac6:dfb0:292b with SMTP id a640c23a62f3a-ac6dfb02985mr384679466b.32.1742992027053;
+        Wed, 26 Mar 2025 05:27:07 -0700 (PDT)
+Received: from wkz-x13 (h-79-136-22-50.NA.cust.bahnhof.se. [79.136.22.50])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac6964189b3sm581380866b.3.2025.03.26.05.27.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Mar 2025 05:20:38 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 4474318FCA84; Wed, 26 Mar 2025 13:20:37 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
- <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Simon
- Horman <horms@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Mina
- Almasry <almasrymina@google.com>, Yonglong Liu <liuyonglong@huawei.com>,
- Yunsheng Lin <linyunsheng@huawei.com>, Pavel Begunkov
- <asml.silence@gmail.com>, Matthew Wilcox <willy@infradead.org>,
- netdev@vger.kernel.org, bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-mm@kvack.org, Qiuling Ren <qren@redhat.com>, Yuying Ma
- <yuma@redhat.com>
-Subject: Re: [PATCH net-next v3 0/3] Fix late DMA unmap crash for page pool
-In-Reply-To: <20250326044855.433a0ed1@kernel.org>
-References: <20250326-page-pool-track-dma-v3-0-8e464016e0ac@redhat.com>
- <20250326044855.433a0ed1@kernel.org>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Wed, 26 Mar 2025 13:20:37 +0100
-Message-ID: <874izgq8yy.fsf@toke.dk>
+        Wed, 26 Mar 2025 05:27:06 -0700 (PDT)
+From: Tobias Waldekranz <tobias@waldekranz.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, kuba@kernel.org, marcin.s.wojtas@gmail.com,
+ linux@armlinux.org.uk, andrew@lunn.ch, edumazet@google.com,
+ pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH v3 net] net: mvpp2: Prevent parser TCAM memory corruption
+In-Reply-To: <20250326120719.587afbf8@fedora.home>
+References: <20250326103821.3508139-1-tobias@waldekranz.com>
+ <20250326120719.587afbf8@fedora.home>
+Date: Wed, 26 Mar 2025 13:27:05 +0100
+Message-ID: <87iknw9duu.fsf@waldekranz.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-Jakub Kicinski <kuba@kernel.org> writes:
-
-> On Wed, 26 Mar 2025 09:18:37 +0100 Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> This series fixes the late dma_unmap crash for page pool first reported
->> by Yonglong Liu in [0]. It is an alternative approach to the one
->> submitted by Yunsheng Lin, most recently in [1]. The first two commits
->> are small refactors of the page pool code, in preparation of the main
->> change in patch 3. See the commit message of patch 3 for the details.
+On ons, mar 26, 2025 at 12:07, Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
+> Hi Tobias,
 >
-> Doesn't apply, FWIW,
+> On Wed, 26 Mar 2025 11:37:33 +0100
+> Tobias Waldekranz <tobias@waldekranz.com> wrote:
+>
+>> Protect the parser TCAM/SRAM memory, and the cached (shadow) SRAM
+>> information, from concurrent modifications.
+>> 
+>> Both the TCAM and SRAM tables are indirectly accessed by configuring
+>> an index register that selects the row to read or write to. This means
+>> that operations must be atomic in order to, e.g., avoid spreading
+>> writes across multiple rows. Since the shadow SRAM array is used to
+>> find free rows in the hardware table, it must also be protected in
+>> order to avoid TOCTOU errors where multiple cores allocate the same
+>> row.
+>> 
+>> This issue was detected in a situation where `mvpp2_set_rx_mode()` ran
+>> concurrently on two CPUs. In this particular case the
+>> MVPP2_PE_MAC_UC_PROMISCUOUS entry was corrupted, causing the
+>> classifier unit to drop all incoming unicast - indicated by the
+>> `rx_classifier_drops` counter.
+>> 
+>> Fixes: 3f518509dedc ("ethernet: Add new driver for Marvell Armada 375 network unit")
+>> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
+>> ---
+>> 
+>> @Andrew: I did finally manage to trigger sparse warnings that could be
+>> silenced with __must_hold() annotations, but I still do not understand
+>> how they work. I went back to the change that pulled this in:
+>> 
+>> https://lore.kernel.org/all/C5833F40-2EA6-43DA-B69C-AFF59E76E0C9@coraid.com/T/
+>> 
+>> The referenced function (tx()), still exists in aoenet.c. Using that
+>> as a template, I could construct an unlock+lock sequence that
+>> triggered a warning without __must_hold(). For example...
+>> 
+>> spin_unlock_bh(&priv->prs_spinlock);
+>> if (net_ratelimit())
+>> 	schedule();
+>> spin_lock_bh(&priv->prs_spinlock);
+>> 
+>> ...would generate a warning. But this...
+>> 
+>> spin_unlock_bh(&priv->prs_spinlock);
+>> net_ratelimit();
+>> schedule();
+>> spin_lock_bh(&priv->prs_spinlock);
+>> 
+>> ...would not.
+>> 
+>> Reading through the sparse validation suite, it does not seem to have
+>> any tests that covers this either:
+>> 
+>> https://web.git.kernel.org/pub/scm/devel/sparse/sparse.git/tree/validation/context.c
+>> 
+>> Therefore, I decided to take Jakub's advise and add lockdep assertions
+>> instead. That necessitated some more changes, since tables are updated
+>> in the init phase (where I originally omitted locking).
+>> 
+>> @Maxime: There was enough of a diff between v2->v3 that I did not feel
+>> comfortable including your signoff/testing tags. Would it be possible
+>> for you to run your tests again on this version?
+>
+> Sure thing, although I do have some comments :)
+>
+> [...]
+>
+>>  /* Parser default initialization */
+>> @@ -2118,6 +2163,8 @@ int mvpp2_prs_default_init(struct platform_device *pdev, struct mvpp2 *priv)
+>>  {
+>>  	int err, index, i;
+>>  
+>> +	spin_lock_bh(&priv->prs_spinlock);
+>> +
+>>  	/* Enable tcam table */
+>>  	mvpp2_write(priv, MVPP2_PRS_TCAM_CTRL_REG, MVPP2_PRS_TCAM_EN_MASK);
+>>  
+>> @@ -2139,8 +2186,10 @@ int mvpp2_prs_default_init(struct platform_device *pdev, struct mvpp2 *priv)
+>>  	priv->prs_shadow = devm_kcalloc(&pdev->dev, MVPP2_PRS_TCAM_SRAM_SIZE,
+>>  					sizeof(*priv->prs_shadow),
+>>  					GFP_KERNEL);
+>
+> GFP_KERNEL alloc while holding a spinlock isn't correct and triggers a
+> splat when building when CONFIG_DEBUG_ATOMIC_SLEEP :
 
-Ugh, sorry about that; rebased yesterday before reposting, but forgot to
-do so this morning :/
+I think I had pretty much every other debug flag enabled in my config :)
 
-> maybe rebase/repost after Linus pull net-next, in case something
-> conflicts on the MM side
+Thanks for catching this!
 
-As in, you want to wait until after the merge window? Sure, can do.
+> [    4.380325] BUG: sleeping function called from invalid context at ./include/linux/sched/mm.h:321
+> [    4.389217] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 1, name: swapper/0
+> [    4.397120] preempt_count: 201, expected: 0
+> [    4.401358] RCU nest depth: 0, expected: 0
+> [    4.405507] 2 locks held by swapper/0/1:
+> [    4.409488]  #0: ffff000100e168f8 (&dev->mutex){....}-{4:4}, at: __driver_attach+0x8c/0x1ac
+> [    4.417971]  #1: ffff00010ae15368 (&priv->prs_spinlock){+...}-{3:3}, at: mvpp2_prs_default_init+0x50/0x1570
+> [    4.427843] CPU: 1 UID: 0 PID: 1 Comm: swapper/0 Not tainted 6.14.0-rc7-01963-g02bf787e4750 #68
+> [    4.427851] Hardware name: Marvell 8040 MACCHIATOBin Double-shot (DT)
+> [    4.427855] Call trace:
+> [    4.427858]  show_stack+0x18/0x24 (C)
+> [    4.427867]  dump_stack_lvl+0xd8/0xf0
+> [    4.427875]  dump_stack+0x18/0x24
+> [    4.427880]  __might_resched+0x148/0x24c
+> [    4.427890]  __might_sleep+0x48/0x7c
+> [    4.427897]  __kmalloc_node_track_caller_noprof+0x200/0x480
+> [    4.427903]  devm_kmalloc+0x54/0x118
+> [    4.427910]  mvpp2_prs_default_init+0x138/0x1570
+> [    4.427919]  mvpp2_probe+0x904/0xfa4
+> [    4.427926]  platform_probe+0x68/0xc8
+> [...]
+>
+> I suggest you move that alloc and associated error handling outside of
+> the spinlock.
 
--Toke
-
+Will do. Sorry for the noise. I have fixed this locally - will send v4
+as soon as the rules permit.
 
