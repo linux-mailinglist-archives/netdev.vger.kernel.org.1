@@ -1,468 +1,236 @@
-Return-Path: <netdev+bounces-177734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0E48A717BB
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 14:46:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90EEEA717C8
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 14:51:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9C453B1D1F
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 13:46:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 221B43B1931
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 13:50:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56CE81DED5F;
-	Wed, 26 Mar 2025 13:46:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDEDD1EB5C0;
+	Wed, 26 Mar 2025 13:50:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="LJHgr7JG"
+	dkim=pass (2048-bit key) header.d=avride-ai.20230601.gappssmtp.com header.i=@avride-ai.20230601.gappssmtp.com header.b="EZtd1UcG"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2065.outbound.protection.outlook.com [40.107.236.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF57189919
-	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 13:46:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.65
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742996813; cv=fail; b=Kyy8JUS6oh4A3Wpi4duStV9dTndaFDxgWmzqp8h0VACq2HW7B53AVCqBbxJiVJItfS1EW5Ss2XmoQmyoerq7z0difT3VSRPU0KmYdssXWAOUBYVyspApeiqXfWZtgqRNKjteWCtLS255hkBp6d+6wBxXn3X0qfLprDQGqMAY3x0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742996813; c=relaxed/simple;
-	bh=5hHPSiqIB2SPy8oK3YgT4RHEGD8WlJ21yMfnHANb+0Y=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=LSWxbcVqDcsm63+CLWY4yvaBy+hSlhCq59RdOviVijW5gdqHMdK56fBGi8jbvvEXgIyZ/FJouN2pDB7RDvgBXWx9dGRnq5EVZJjfhyLQJaD7hPvvPoRORoJvkHIkZWx8wIeRN+MPADlFmEdEwG90dz/2Izm2EEPMCs+D/yRUoLQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=LJHgr7JG; arc=fail smtp.client-ip=40.107.236.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=X+8ryAKzp8lY/mCcC0015Cc1DQOZtNzWhLlPdSaaCrazhdxTN30M/x1pYOX0IloW/SvEj3LBJ8Ov2blfqNYhbPhdTdxomQx+qOliakfb38U+uKnlwXydEPamW5wPxgsx4gJDvSEy9y8bdFpX5QXrKW4tRcSPOBO7WouvYY65dDpduOYrJhbJDcjKIRh9mMx6TyJtPvix5B8XV3H7z3o47AIvIRMkBFVep9jWRzt3dtBmpa7JM10LdEDvB0kMdaYPr9UIPMoaq2sKjO8goDktAzkRxLrWSmMYGzXtiU43TSNY2olny+Are1zeRpqHjDpWXQRUalKru64vDfop6HFB+g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zp/Z7KIilyZKwbjlvY8bi2FDaOUQwnjTYsQ9zjdMa8E=;
- b=FPI6jPH/JTiZjh3XUUBOvT9Sxa2Cymn5q6yrf7kGtI8xptmQprBYiKHzCQPCm3VBRp8z5asL3NxJhwBJnk7Pfy0PjXP9o+dMI7kCTkb4o5XH3KX/8qk4rR9y6mv9Ji5kmyAjCNeOKZZ02RRjj5CPwlNSxFSM/tod4RBu/0Yom8aOeVkVmu98f7rW7tdCmD8j2mzF7w5oPsFoQCgZT+lKeJxFnfa1ahM+P2Rqm+VFZyRNbh+qpimD8wTsKfeNgz9z/EU7BEpr6oX0mpVJD3pYrmQFJO/ZnFqjn5Pw6oE9fY4H+6dghxIuhT/Gyt3N7TjadYUNbNpLNCw/TnOvtU65fQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zp/Z7KIilyZKwbjlvY8bi2FDaOUQwnjTYsQ9zjdMa8E=;
- b=LJHgr7JGyGlk88yRl8MTN9wtLFVxE2eS6Yzi5hW8rRBOtoJVQwLaLjjJbrQ3ZQpZvUHJ1YiHUhdS268I0SRvHw28F6ZLS7YlAs4vNTO8urWgbmGtJx0hEZZu5niiZG6l/zxTxgEiURtaj0MQ8sUV+EbCQcyMzeRYXaHUznrWBS6biQ9Pw0DrLAvPEkgSJXFvqfTqY/txeL4ZTn3zEcNzrzv6KdUxZfGOOpyqYXtvuy1o/8nPqfpA2TyHQ4NsfXnYqR7ReIvfgEjrLs8Tn6iJpU1w60GbDyqMxe74k7H55DUpkPrWZ6Q0CJe49jdoyhta32vx6P0Pg0X7CZflrsJ7jw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SN6PR12MB2847.namprd12.prod.outlook.com (2603:10b6:805:76::10)
- by MW4PR12MB7240.namprd12.prod.outlook.com (2603:10b6:303:226::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.44; Wed, 26 Mar
- 2025 13:46:46 +0000
-Received: from SN6PR12MB2847.namprd12.prod.outlook.com
- ([fe80::1b1e:e01d:667:9d6b]) by SN6PR12MB2847.namprd12.prod.outlook.com
- ([fe80::1b1e:e01d:667:9d6b%4]) with mapi id 15.20.8534.040; Wed, 26 Mar 2025
- 13:46:46 +0000
-Message-ID: <97a94886-1252-4004-9a88-13430da1d25d@nvidia.com>
-Date: Wed, 26 Mar 2025 15:46:40 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 net 2/3] net: Fix dev_net(dev) race in
- unregister_netdevice_notifier_dev_net().
-To: Kuniyuki Iwashima <kuniyu@amazon.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>
-Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-References: <20250217191129.19967-1-kuniyu@amazon.com>
- <20250217191129.19967-3-kuniyu@amazon.com>
-Content-Language: en-US
-From: Yael Chemla <ychemla@nvidia.com>
-In-Reply-To: <20250217191129.19967-3-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO2P123CA0093.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:139::8) To SN6PR12MB2847.namprd12.prod.outlook.com
- (2603:10b6:805:76::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9E7C1E1DE8
+	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 13:50:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742997021; cv=none; b=BGPhmBqbHI+spQ/oOhfnTnykRDu2MX3sm9A1Ykfjpo5+WaspgimZ5fApRWSsu5rfR8tMVbw30GGEAHQy6pz2zUwFK4MpPR7ug1wYNmLKKQu0eW9mZg5jsinHWqB/5H6aTGG8WYZx0sG50FeNE2K65Da7as7Mk/TfUrFcUSnROt0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742997021; c=relaxed/simple;
+	bh=AA4fYl5ss2AScsJa4WQ2By0P4vTUaQbcp4z0DUHId7o=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=t+aLgogAjbGokwFoP0Dnuh/xQTqKb638NfF9xaEli/EHxOiN+5LbECE6B65CPmjvNf91/xebmPC3sFBDM/6Q0STc+uoTCWLUUZUyeqV9AW7oXMXEcjcLMP0DFhEBrOWkpS/fISCDe888Lxl4Y00P9uMZQWcqG8k4zJ5IsCY8LRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=avride.ai; spf=none smtp.mailfrom=avride.ai; dkim=pass (2048-bit key) header.d=avride-ai.20230601.gappssmtp.com header.i=@avride-ai.20230601.gappssmtp.com header.b=EZtd1UcG; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=avride.ai
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=avride.ai
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3913d129c1aso652163f8f.0
+        for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 06:50:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=avride-ai.20230601.gappssmtp.com; s=20230601; t=1742997016; x=1743601816; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AA4fYl5ss2AScsJa4WQ2By0P4vTUaQbcp4z0DUHId7o=;
+        b=EZtd1UcGaeU12UU08EJ2icF7M7yxKhz7zuKFPTBwaYxsocbpiPFSZVBxKYdASl7byz
+         pZB4AahbVsbxAKvAodhO1qZSVink9rAkeFbVPpGwE1uGTwenjyJiuvdHQAuL4KAtTJ6t
+         qQJPUjCk8svAuxfexr/98v81PhKq6CarJAFaLO2tz7YcToJa4iFMkZA1BQbsdP047JVP
+         BCCIduY/2+Ihj9aNzpvN3SyFMJA3Wllb+NqXvH9sFZk5+tm8qsJhwdbUMEVO54iX6HLA
+         8+YWi70/ACN5msnAmiLJzYgFvK4DQ4X8WB9RUjN8e1UKIwFfxvoeGJlMl2WEAbhA59dR
+         cYVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742997016; x=1743601816;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AA4fYl5ss2AScsJa4WQ2By0P4vTUaQbcp4z0DUHId7o=;
+        b=EMn7Dsos3yQiSE7XNoULCVzFxB/w6odsv2VxTEbH4W8obj6GqgWgkJ7dqcphl0dXca
+         bo76t2I5fNyOzLQHuBI+d7nRp4phRDcEb1TpvHtINmAbZcGJEWZko1vG2U7HYr2/f825
+         1UKIJE0uRLnZLTbhuRBSbnwfPoviOIaAhIrk9n5JspSAw5QnxBJq+4I6J4lP7xn4zT3W
+         qpYGo65MD/FAinkEaZ6ZKM6d0/1llwnA3GRtND4/okT2aTb4VAAer/7k/DtyjGLxlIaP
+         ecK9dhGoFXpoeL038/sOfgFPBW23Itd/m+b+WGTte9dMjRKPO/P3RVuF/qaCVPbQWxr3
+         7/aA==
+X-Forwarded-Encrypted: i=1; AJvYcCWn+VR0oqSxOMk2c/19S1+t6rfPHAMDSr/uy8H/GQsjD0crRa297yrcsmWnSYu4EZHofCS8zhw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmAxoFuhHCOPMznF8eUj9tncoaKZm1yRt8yBlW1I/VGXACgIJx
+	6HpE2IM4EtBiok1VuuGkK71XFbgqh7LmGuAk0rEJYPx3JmFP0wt2YTOmgn5vIbI=
+X-Gm-Gg: ASbGncuQoTNKZtfyKuIZ+crnv4kDMbOMwy3IOiRqYZu3WVcTkD4AclkYBXQuBg5NVit
+	qRRZrFhaqN4/Bg71Edrp5u7NLbZ8xbamuNcFIVyuKdiSiQNPJX2JY1w2J2Kwtg8h5TttzRyH9O0
+	pd9YVGUl4vwEI7P6KeuFCorsFXT9cm4OT0ElAzLCFVjYJ+QxDqJf/qaSOvD1KnkH1jrdSTdRDzy
+	z5PCHpFgiIoweXmCkncIvEfc3sq4sWly86Wukwwms3CSe3WDQQMnfV9FSachm7zmFGaLkwXHLQ0
+	MVXDCOat53NyMPTGSFgsjoIgzyF/4tTxCOyE/zeCnnLAGi9cVPhXdAeFv7st744lyI3di2k9pGO
+	fchKaMc0R
+X-Google-Smtp-Source: AGHT+IFodC7E3FU1W8ZLhSnQH5tR1ENtZ/ME/aC2uDU71UdflN+c7QlCPNjoJlFrWjY4L1trUTIN8Q==
+X-Received: by 2002:a05:6000:1a88:b0:39a:c86d:e094 with SMTP id ffacd0b85a97d-39acc46dd0bmr3287301f8f.17.1742997015791;
+        Wed, 26 Mar 2025 06:50:15 -0700 (PDT)
+Received: from smtpclient.apple ([2a02:14a:105:a03:4178:8ead:91b6:bfe2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d82f1bb80sm2568465e9.28.2025.03.26.06.50.14
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 26 Mar 2025 06:50:15 -0700 (PDT)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2847:EE_|MW4PR12MB7240:EE_
-X-MS-Office365-Filtering-Correlation-Id: e871b327-eb7b-4d9c-0042-08dd6c6ca66b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?VzVmSzQwWVh1c3dPVWR0Ymd6WVpnQ0ZFS2FVNGpqQk1FMlJ2T2hYYll0dHhS?=
- =?utf-8?B?Vkg1U0p0R3FwTTVGNjZ1ZnFkR1E0QzVTTGtHT0pDeHdGdlZ0MUxLdXFCV1R5?=
- =?utf-8?B?OWJQN1dnZFR2b01aNnUzNVMxTE1ocWtCZXYwLzI5dXMrTFI4TTNBN2JCZEFt?=
- =?utf-8?B?Y1VrUVF4RjloTmZUSDF0cHcrcWRJdUF0VVVYQldTOHRpS1piWjVqM05Fc2JB?=
- =?utf-8?B?dW1uc29yT1RmZ1IwRmVFOFBidjY3dkVYN2kremlod0JvSFRsVHViNmtBTWpM?=
- =?utf-8?B?Zm5SaHRDdEpta29wVWtvOVFyblJnR1NxSmF2UktUZ0RsYVQ5QjJuUTZ4MElw?=
- =?utf-8?B?S2U4b2czdTlpZ3NMYlBHd0l2SmE4bmM4cVh4RmV0M2M5dUtWZGJTb1IxZ0dv?=
- =?utf-8?B?eVM2anQwaXczUmwxMW91S1lGNytWRHBGd2wvOWZGNmlZeFFwOC9xdjNBY1B3?=
- =?utf-8?B?NTlsK3NGelp6OFdKYU4zbjlGZjhKWlFtSmt3OTE2cGVWUzhSaFJWZGpsbzZV?=
- =?utf-8?B?RGs4cXJPL1dSbUlkZmNlK1hQMUZiYTZMUHZ0YTQ5T0VmbkU5V1dTODlkL0hi?=
- =?utf-8?B?MWRZMWNRMW85cDIwNG9WU3N3NHZ4YVVjTUtMWWFmSkVQbytud2NWeVhoaG5q?=
- =?utf-8?B?VUttMy9jZjF4d2lkbExYZElPYW5TYWdMUk5RaEhGSGhKQzAxTzdYaXo4SVJC?=
- =?utf-8?B?NFh3VVZoaDBhazBHS25rSG9QMEt6SnBHa2JMSk5oaGpYcjJ2b0VuNjhqMDQv?=
- =?utf-8?B?NTFBK3dPTmsxanZiTE5FYWx4UGUzME5QWkhFVloramJWWlA5SWphZHBxUCtE?=
- =?utf-8?B?QThjTDNTck9rNDVKS2R0clJ5UE1QaEw3RXZ1MXNqT3VYWTNrSDlYaEpwZGtH?=
- =?utf-8?B?VVErRUZPOTloWWx3eXZXV25jVUVLQjBXLzFKK3FqZVJvcFdHMW1WZTdyeGZF?=
- =?utf-8?B?YnJsVDBmYXpGQnVuaHRPS1UralREblVVVDBFbmdyVEl5dnFpU3ZWS1R4MzF3?=
- =?utf-8?B?V3hTdGMza3RVb29KUjhlSFg4Y0Jmd2FTcVYxUDcvN0l1bUloa3dqc3RUS1JZ?=
- =?utf-8?B?eVBKbVFYY1BHTDIrNjJLNWNmQW5FaE1vNXFFMzg5L25nKzhRNTJsWFFKVFFo?=
- =?utf-8?B?Z0ZlRHJlZmRtVzRXamFiWVdnbmYxUjljU3ZGSkRaZTE5aFY3VHBwc0ttVXBu?=
- =?utf-8?B?dUsxb25pWU9mdWNnZFhMVytmYnhFNkxXMjFhU1plUXRac0tPd1RIMVRQazVr?=
- =?utf-8?B?SVBPT1RyS1dScU5ERStmdG1pNUlWVG4vYm9OdXZIT0VoMk93MTFoVkRYR1J4?=
- =?utf-8?B?V1BrTUJUZmZubElCL2cwRERsaldiK0c4Ny9LcEgyQ2ZhZGY3M3V3eUN2QjhZ?=
- =?utf-8?B?c2pSVUtDb3V5MGttSmRCZ2NrZDFrenZxeS85cDkyZVdodTNjYk5lTURNTFhj?=
- =?utf-8?B?SE13dU9Sd211WlpTSS9ZQkw5Z3VCZ09DaHd2OWF6azRtc0ZIaXRwT2YrZE92?=
- =?utf-8?B?eG4vQ1VxWUpOSERzZTNCcTY3MFJkYVNpUVU2UDZjTlFrTVY4dndQZzEvcVVK?=
- =?utf-8?B?cDVkVWU0TjV6dCtaOERrdVVTNHY4b0UxVDRpVnp2dGpkcG9HTHNQWE1ueTNJ?=
- =?utf-8?B?Mk56TkVja0lSQTRGTW41emZOZTRiQlZyT01MSHdyZmt2Rno4RUVzOU5ndkNr?=
- =?utf-8?B?cUFLVWVwUW5GSG16N1FZcmFtYXBYRm1ud2ZlUXowQmdYQ25mbXQ3KzgyY2ow?=
- =?utf-8?B?bWxNT0kvR0Y4S3VCakdKd3RVREN2MjA2bFFnZmFsaEFOK0lQODdQT2NDVUNm?=
- =?utf-8?B?V1VUaDlhMSt1WDQwaWpaeEVEUFdVMTcyVVIybUpFdlpUTnBCbXhYUjlLQzAz?=
- =?utf-8?Q?W+xS3f/t3VM+J?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2847.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VVhhYlZDemE5VDZjcWxNcDZaL3BWZlJGV3RXNGNjTXlTQUQyRlIzZDFST2Ra?=
- =?utf-8?B?cjZhQ3A3YUNXMXBRWkduVUIranpaaU4xaThva2lvR01CaDZ1czhCbTZGYWxW?=
- =?utf-8?B?WTVTQmdpZlQ4L3p0K3B4eEhvNEwzNkZEaEdteTNzK0F2S1hpWDNhMjN4Z21u?=
- =?utf-8?B?YXpja3VrVEQrOHBsVkVNYngvZ0w0OVhKK0VmWjViYmR0QzNQQzd1MGdyaVFR?=
- =?utf-8?B?T2ZvUXBkTGw5NFNxRTZxSW1VTzhoQ3VKYVJXKzJ6alNwQzZIK3lXK011enh5?=
- =?utf-8?B?d01NS0RHK0tBU0RNdlQwNyttcWw4MWlzWC9uOXVqV3BnZ1BtQ1QyeStSQkFh?=
- =?utf-8?B?K0lDWW1BUnFKcDdvNVo5RjJxc0Rxbmk3MnFiQW1SRXJVejhHZzRuYTNvbEsr?=
- =?utf-8?B?dVR3Nk9GTUROeXh0WG1XZTFubkE0SmFmZFdpYUNYcng3NVhMYzlaaWNYSmIz?=
- =?utf-8?B?dEJzT2VxN2J6bS9EVVRrbUh0aDd4ODNEZWp0NkhLK1RSZFVlZjR3SU5ZelI3?=
- =?utf-8?B?aW1zVFhGVU9BQUV5Vkd6dDJqN3kwbjE2eTNZWTZ3T2Y4akN5RzZLYnlIWEx3?=
- =?utf-8?B?NkU1aWlCZWRTUG9UNDBqVDRpTHMrbU5PMFhpUVFRdDBMVjMyUHhpTndxczZT?=
- =?utf-8?B?SmV1T0VQSmtvYklHVTVHeVovdDdSK2src241R051OVF2VHBsNWhnWE12Qm9i?=
- =?utf-8?B?V0pQRURFZGZyRFRFblhCK3BlMEJ6RUVsVHdCaGhYOWc0NWl4QmdDSjdzbEto?=
- =?utf-8?B?VEV1djN2Y3hCb2E2ZWVlaE9sQzNYNE9WWXNSVnRRaS9ocThWSFFYWVpEZTBF?=
- =?utf-8?B?akdnS3E5dG5pYlJIS2lmYjZXYXNXbi9QSG5uSldBNVdrTmR3c01NdnVtTS9R?=
- =?utf-8?B?Z016MjJXa2pPV2s0ZFQ5M3J6N3hsNlhCRGtDZmFicjFMYTJaOXpZSDFzOU40?=
- =?utf-8?B?QmFIdTZjdUJQdjJTVmFSM2I2TzNFYnJrbnN6ZUs5QXBSY2JTYkF0aWhUZ2l6?=
- =?utf-8?B?Q1pSU3ovczF2emZsTFRHVzRZRzRCb3NIZ1hJcXJPUGozR24yNlUrdm83T0pI?=
- =?utf-8?B?ZlBKcUlndWkrUXRjamZuOENPREJaTHB2bUczNWlMbGRLeWsrRkJlY2Q5ZW9h?=
- =?utf-8?B?TnZ5djUzTUFuamE0ZC9GWHJVemZxU3FxcnJhMVQxL2RRYnRVeUNBdjcwK0ln?=
- =?utf-8?B?MEQvY1FOdjJLTTBmaHlDakZ6MzFJUEF4eVI3L3dkRmxzYzhpME1kNVpoVU1h?=
- =?utf-8?B?OEZmbGZTZzhmdSticFJBaVRRN0dSRG5FMWY4TkxGWHRIa0c4c3ZHOEcveXRK?=
- =?utf-8?B?cHFQSmxwNUp3WDZzMDFSVmNyNi9UYVhPWjJHYmZHUjlWanhEeTU0ZmN1NThU?=
- =?utf-8?B?L1RqTDN1UmZtUHNsRUFsR1o0bWNQTDNIbVdEaEpIWjMwekluNVV6L3lsMG9h?=
- =?utf-8?B?QUZYeS9ITjRuazFKeldXejdTVkNxY2NQM0JreENsbnlOaUYzTGEwbkxXVlJK?=
- =?utf-8?B?bzFhQVZvZ3oySjhYclhjTmpPNFA1OU91cldkNk1LVVNNTlcyY1F6VW85aTFn?=
- =?utf-8?B?aGNKWDBOYWpiTm1YRmV3VmNibE1lV3k4MTJXTEduaHNHR0FqajM0bkd5NmVy?=
- =?utf-8?B?QURjVVNrdldnR3IzcG9QN2g0WnNKMnY2ejhQVDJtekErM3BTcDc2eVVaZW9x?=
- =?utf-8?B?S3o2UVlMVHhoV1did3l5aStHSndWdDNZRmo3V2JCTmk0a2h4eHpxdmZPWEp0?=
- =?utf-8?B?eHZLZnk0bWZybFlXYXduWDRLbUtXOXc0UDV4QlNXUTVHMnNWTDErKzJpME5W?=
- =?utf-8?B?TkwwdTllcU9BR2tSUVA3L3psTzh3WWhBVHllQTlzZElsaWVEaGdKYStRSFFj?=
- =?utf-8?B?YTIvd1dpNGd4M0VhaWU1aGZ1c245ZWFFUGpiTkQ3ZnI3UktWMGlQQWlFNi94?=
- =?utf-8?B?VERGc2htaTlwSzFkd1A2N2tkUTBjN3N4ci9yWVVPSlFIRzQ1WkM5dW1BU2xv?=
- =?utf-8?B?d1FOU3VGdXpSYmZsamZrSzNmOFJxdlZHMzBBQ2dhQVR4T2I0TFNlc2Q2UWhJ?=
- =?utf-8?B?d1h5cjQyc1VtaUpUeGRjZ2JBcm5mbFVqL09ROG9vTGlVbmQyL0RCb0pIbGtR?=
- =?utf-8?Q?JJDOVS2dUMALAKNP/Sh6Kfxpt?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e871b327-eb7b-4d9c-0042-08dd6c6ca66b
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2847.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2025 13:46:46.3263
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2DuR+sOOKDqH81CP9dKJS1aRrffuVyjykacdsj6456SPwp/DNcqKGyM+gWO64bOkGYVmDvlYqhlbvNWbU3Ysqw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7240
-
-On 17/02/2025 21:11, Kuniyuki Iwashima wrote:
-> After the cited commit, dev_net(dev) is fetched before holding RTNL
-> and passed to __unregister_netdevice_notifier_net().
-> 
-> However, dev_net(dev) might be different after holding RTNL.
-> 
-> In the reported case [0], while removing a VF device, its netns was
-> being dismantled and the VF was moved to init_net.
-> 
-> So the following sequence is basically illegal when dev was fetched
-> without lookup:
-> 
->   net = dev_net(dev);
->   rtnl_net_lock(net);
-> 
-> Let's use a new helper rtnl_net_dev_lock() to fix the race.
-> 
-> It fetches dev_net_rcu(dev), bumps its net->passive, and checks if
-> dev_net_rcu(dev) is changed after rtnl_net_lock().
-> 
-> [0]:
-> BUG: KASAN: slab-use-after-free in notifier_call_chain (kernel/notifier.c:75 (discriminator 2))
-> Read of size 8 at addr ffff88810cefb4c8 by task test-bridge-lag/21127
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
-> Call Trace:
->  <TASK>
->  dump_stack_lvl (lib/dump_stack.c:123)
->  print_report (mm/kasan/report.c:379 mm/kasan/report.c:489)
->  kasan_report (mm/kasan/report.c:604)
->  notifier_call_chain (kernel/notifier.c:75 (discriminator 2))
->  call_netdevice_notifiers_info (net/core/dev.c:2011)
->  unregister_netdevice_many_notify (net/core/dev.c:11551)
->  unregister_netdevice_queue (net/core/dev.c:11487)
->  unregister_netdev (net/core/dev.c:11635)
->  mlx5e_remove (drivers/net/ethernet/mellanox/mlx5/core/en_main.c:6552 drivers/net/ethernet/mellanox/mlx5/core/en_main.c:6579) mlx5_core
->  auxiliary_bus_remove (drivers/base/auxiliary.c:230)
->  device_release_driver_internal (drivers/base/dd.c:1275 drivers/base/dd.c:1296)
->  bus_remove_device (./include/linux/kobject.h:193 drivers/base/base.h:73 drivers/base/bus.c:583)
->  device_del (drivers/base/power/power.h:142 drivers/base/core.c:3855)
->  mlx5_rescan_drivers_locked (./include/linux/auxiliary_bus.h:241 drivers/net/ethernet/mellanox/mlx5/core/dev.c:333 drivers/net/ethernet/mellanox/mlx5/core/dev.c:535 drivers/net/ethernet/mellanox/mlx5/core/dev.c:549) mlx5_core
->  mlx5_unregister_device (drivers/net/ethernet/mellanox/mlx5/core/dev.c:468) mlx5_core
->  mlx5_uninit_one (./include/linux/instrumented.h:68 ./include/asm-generic/bitops/instrumented-non-atomic.h:141 drivers/net/ethernet/mellanox/mlx5/core/main.c:1563) mlx5_core
->  remove_one (drivers/net/ethernet/mellanox/mlx5/core/main.c:965 drivers/net/ethernet/mellanox/mlx5/core/main.c:2019) mlx5_core
->  pci_device_remove (./include/linux/pm_runtime.h:129 drivers/pci/pci-driver.c:475)
->  device_release_driver_internal (drivers/base/dd.c:1275 drivers/base/dd.c:1296)
->  unbind_store (drivers/base/bus.c:245)
->  kernfs_fop_write_iter (fs/kernfs/file.c:338)
->  vfs_write (fs/read_write.c:587 (discriminator 1) fs/read_write.c:679 (discriminator 1))
->  ksys_write (fs/read_write.c:732)
->  do_syscall_64 (arch/x86/entry/common.c:52 (discriminator 1) arch/x86/entry/common.c:83 (discriminator 1))
->  entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
-> RIP: 0033:0x7f6a4d5018b7
-> 
-> Fixes: 7fb1073300a2 ("net: Hold rtnl_net_lock() in (un)?register_netdevice_notifier_dev_net().")
-> Reported-by: Yael Chemla <ychemla@nvidia.com>
-> Closes: https://lore.kernel.org/netdev/146eabfe-123c-4970-901e-e961b4c09bc3@nvidia.com/
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Reviewed-by: Eric Dumazet <edumazet@google.com>
-> ---
-> v5:
->   * Use do-while loop
-> 
-> v4:
->   * Fix build failure when !CONFIG_NET_NS
->   * Use net_passive_dec()
-> 
-> v3:
->   * Bump net->passive instead of maybe_get_net()
->   * Remove msleep(1) loop
->   * Use rcu_access_pointer() instead of rcu_read_lock().
-> 
-> v2:
->   * Use dev_net_rcu().
->   * Use msleep(1) instead of cond_resched() after maybe_get_net()
->   * Remove cond_resched() after net_eq() check
-> 
-> v1: https://lore.kernel.org/netdev/20250130232435.43622-2-kuniyu@amazon.com/
-> ---
->  net/core/dev.c | 48 ++++++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 44 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index b91658e8aedb..19e268568282 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -2070,6 +2070,42 @@ static void __move_netdevice_notifier_net(struct net *src_net,
->  	__register_netdevice_notifier_net(dst_net, nb, true);
->  }
->  
-> +static void rtnl_net_dev_lock(struct net_device *dev)
-> +{
-> +	bool again;
-> +
-> +	do {
-> +		struct net *net;
-> +
-> +		again = false;
-> +
-> +		/* netns might be being dismantled. */
-> +		rcu_read_lock();
-> +		net = dev_net_rcu(dev);
-> +		net_passive_inc(net);
-
-Hi Kuniyuki,
-It seems we are still encountering the previously reorted issue,
-even when running with your latest fix. However, the problem has become
-less frequent, now requiring multiple test iterations to reproduce.
-
-1) we identified the following warnings (each accompanied by a call
-trace; only one is detailed below, though others are similar):
-
-refcount_t: addition on 0; use-after-free.
-WARNING: CPU: 6 PID: 1105 at lib/refcount.c:25 refcount_warn_saturate
-(/usr/work/linux/lib/refcount.c:25 (discriminator 1))
-
-and also
-
-refcount_t: underflow; use-after-free.
-WARNING: CPU: 6 PID: 1105 at lib/refcount.c:28 refcount_warn_saturate
-(/usr/work/linux/lib/refcount.c:28 (discriminator 1))
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.600.62\))
+Subject: Re: bnxt_en: Incorrect tx timestamp report
+From: Kamil Zaripov <zaripov-kamil@avride.ai>
+In-Reply-To: <0316a190-6022-4656-bd5e-1a1f544efa2d@linux.dev>
+Date: Wed, 26 Mar 2025 15:50:03 +0200
+Cc: Michael Chan <michael.chan@broadcom.com>,
+ Jacob Keller <jacob.e.keller@intel.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>,
+ Linux Netdev List <netdev@vger.kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <CBBDA12F-05B4-4842-97BF-11B392AD21F1@avride.ai>
+References: <DE1DD9A1-3BB2-4AFB-AE3B-9389D3054875@avride.ai>
+ <8f128d86-a39c-4699-800a-67084671e853@intel.com>
+ <CAGtf3iaO+Q=He7xyCCfzfPQDH_dHYYG1rHbpaUe-oBo90JBtjA@mail.gmail.com>
+ <CACKFLinG2s5HVisa7YoWAZByty0AyCqO-gixAE8FSwVHKK8cjQ@mail.gmail.com>
+ <CALs4sv1H=rS96Jq_4i=S0kL57uR6v-sEKbZcqm2VgY6UXbVeMA@mail.gmail.com>
+ <9200948E-51F9-45A4-A04C-8AD0C749AD7B@avride.ai>
+ <0316a190-6022-4656-bd5e-1a1f544efa2d@linux.dev>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+X-Mailer: Apple Mail (2.3774.600.62)
 
 
-2) test scenario:
-sets up a network topology of two VFs on different eSwitch, performs
-ping tests between them, verifies traffic rules offloading, and cleans
-up the environment afterward.
 
-3) the warning is triggered upon reaching the
-unregister_netdevice_notifier_dev_net when both net->ns.count and
-net->passive reference counts are zero.
+> On 25 Mar 2025, at 12:41, Vadim Fedorenko <vadim.fedorenko@linux.dev> =
+wrote:
+>=20
+> On 25/03/2025 10:13, Kamil Zaripov wrote:
+>>=20
+>> I guess I don=E2=80=99t understand how does it work. Am I right that =
+if userspace program changes frequency of PHC devices 0,1,2,3 (one for =
+each port present in NIC) driver will send PHC frequency change 4 times =
+but firmware will drop 3 of these frequency change commands and will =
+pick up only one? How can I understand which PHC will actually represent =
+adjustable clock and which one is phony?
+>=20
+> It can be any of PHC devices, mostly the first to try to adjust will =
+be used.
 
- Call Trace:
-  <TASK>
- ? __warn (/usr/work/linux/kernel/panic.c:748)
- ? refcount_warn_saturate (/usr/work/linux/lib/refcount.c:25
-(discriminator 1))
- ? report_bug (/usr/work/linux/lib/bug.c:180 /usr/work/linux/lib/bug.c:219)
- ? handle_bug (/usr/work/linux/arch/x86/kernel/traps.c:285)
- ? exc_invalid_op (/usr/work/linux/arch/x86/kernel/traps.c:309
-(discriminator 1))
- ? asm_exc_invalid_op
-(/usr/work/linux/./arch/x86/include/asm/idtentry.h:574)
- ? refcount_warn_saturate (/usr/work/linux/lib/refcount.c:25
-(discriminator 1))
- ? refcount_warn_saturate (/usr/work/linux/lib/refcount.c:25
-(discriminator 1))
- rtnl_net_dev_lock (/usr/work/linux/./include/linux/refcount.h:190
-/usr/work/linux/./include/linux/refcount.h:241
-/usr/work/linux/./include/linux/refcount.h:258
-/usr/work/linux/./include/net/net_namespace.h:339
-/usr/work/linux/net/core/dev.c:2076)
- unregister_netdevice_notifier_dev_net
-(/usr/work/linux/./include/linux/list.h:218
-/usr/work/linux/./include/linux/list.h:229
-/usr/work/linux/net/core/dev.c:2125)
- mlx5e_tc_nic_cleanup
-(/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c:5352)
-mlx5_core
- mlx5e_cleanup_nic_rx
-(/usr/work/linux/./drivers/net/ethernet/mellanox/mlx5/core/en/fs.h:161
-/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/en_main.c:5765)
-mlx5_core
- mlx5e_detach_netdev
-(/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/en_main.c:6231)
-mlx5_core
- _mlx5e_suspend
-(/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/en_main.c:6399)
-mlx5_core
- mlx5e_remove
-(/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/en_main.c:6526
-/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/en_main.c:6553)
-mlx5_core
- auxiliary_bus_remove (/usr/work/linux/drivers/base/auxiliary.c:230)
- device_release_driver_internal (/usr/work/linux/drivers/base/dd.c:1275
-/usr/work/linux/drivers/base/dd.c:1296)
- bus_remove_device (/usr/work/linux/./include/linux/kobject.h:193
-/usr/work/linux/drivers/base/base.h:73
-/usr/work/linux/drivers/base/bus.c:586)
- device_del (/usr/work/linux/drivers/base/power/power.h:142
-/usr/work/linux/drivers/base/core.c:3856)
- ? devl_param_driverinit_value_get (/usr/work/linux/net/devlink/param.c:778)
- mlx5_rescan_drivers_locked
-(/usr/work/linux/./include/linux/auxiliary_bus.h:242
-/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/dev.c:333
-/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/dev.c:535
-/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/dev.c:549) mlx5_core
- mlx5_unregister_device
-(/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/dev.c:468)
-mlx5_core
- mlx5_uninit_one (/usr/work/linux/./arch/x86/include/asm/bitops.h:206
-/usr/work/linux/./arch/x86/include/asm/bitops.h:238
-/usr/work/linux/./include/asm-generic/bitops/instrumented-non-atomic.h:142
-/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/main.c:1576)
-mlx5_core
- remove_one
-(/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/main.c:969
-/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/main.c:2034)
-mlx5_core
- pci_device_remove (/usr/work/linux/./arch/x86/include/asm/atomic.h:23
-/usr/work/linux/./include/linux/atomic/atomic-arch-fallback.h:457
-/usr/work/linux/./include/linux/atomic/atomic-arch-fallback.h:2426
-/usr/work/linux/./include/linux/atomic/atomic-arch-fallback.h:2456
-/usr/work/linux/./include/linux/atomic/atomic-instrumented.h:1518
-/usr/work/linux/./include/linux/pm_runtime.h:129
-/usr/work/linux/drivers/pci/pci-driver.c:475)
- device_release_driver_internal (/usr/work/linux/drivers/base/dd.c:1275
-/usr/work/linux/drivers/base/dd.c:1296)
- pci_stop_bus_device (/usr/work/linux/drivers/pci/remove.c:46
-/usr/work/linux/drivers/pci/remove.c:106)
- pci_stop_and_remove_bus_device (/usr/work/linux/drivers/pci/remove.c:141)
- pci_iov_remove_virtfn (/usr/work/linux/drivers/pci/iov.c:377)
- sriov_disable (/usr/work/linux/drivers/pci/iov.c:712 (discriminator 1)
-/usr/work/linux/drivers/pci/iov.c:723 (discriminator 1))
- mlx5_sriov_disable
-(/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/sriov.c:208)
-mlx5_core
- mlx5_core_sriov_configure
-(/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/sriov.c:229)
-mlx5_core
- sriov_numvfs_store (/usr/work/linux/./include/linux/device.h:1045
-/usr/work/linux/drivers/pci/iov.c:471)
- kernfs_fop_write_iter (/usr/work/linux/fs/kernfs/file.c:338)
- vfs_write (/usr/work/linux/fs/read_write.c:587 (discriminator 1)
-/usr/work/linux/fs/read_write.c:679 (discriminator 1))
- ksys_write (/usr/work/linux/fs/read_write.c:732)
- do_syscall_64 (/usr/work/linux/arch/x86/entry/common.c:52
-(discriminator 1) /usr/work/linux/arch/x86/entry/common.c:83
-(discriminator 1))
- entry_SYSCALL_64_after_hwframe
-(/usr/work/linux/arch/x86/entry/entry_64.S:130)
- RIP: 0033:0x7fbe3e9018b7
+I believe that randomly selecting one of the PHC clock to control actual =
+PHC in NIC and directing commands received on other clocks to the =
+/dev/null is quite unexpected behavior for the userspace applications.
 
-let me know if you need more information
-Yael
+>> Another thing that I cannot understand is so-called RTC and non-RTC =
+mode. Is there any documentation that describes it? Or specific parts of =
+the driver that change its behavior on for RTC and non-RTC mode?
+>=20
+> Generally, non-RTC means free-running HW PHC clock with timecounter
+> adjustment on top of it. With RTC mode every adjfine() call tries to
+> adjust HW configuration to change the slope of PHC.
 
-> +		rcu_read_unlock();
-> +
-> +		rtnl_net_lock(net);
-> +
-> +#ifdef CONFIG_NET_NS
-> +		/* dev might have been moved to another netns. */
-> +		if (!net_eq(net, rcu_access_pointer(dev->nd_net.net))) {
-> +			rtnl_net_unlock(net);
-> +			net_passive_dec(net);
-> +			again = true;
-> +		}
-> +#endif
-> +	} while (again);
-> +}
-> +
-> +static void rtnl_net_dev_unlock(struct net_device *dev)
-> +{
-> +	struct net *net = dev_net(dev);
-> +
-> +	rtnl_net_unlock(net);
-> +	net_passive_dec(net);
-> +}
-> +
->  int register_netdevice_notifier_dev_net(struct net_device *dev,
->  					struct notifier_block *nb,
->  					struct netdev_net_notifier *nn)
-> @@ -2077,6 +2113,11 @@ int register_netdevice_notifier_dev_net(struct net_device *dev,
->  	struct net *net = dev_net(dev);
->  	int err;
->  
-> +	/* rtnl_net_lock() assumes dev is not yet published by
-> +	 * register_netdevice().
-> +	 */
-> +	DEBUG_NET_WARN_ON_ONCE(!list_empty(&dev->dev_list));
-> +
->  	rtnl_net_lock(net);
->  	err = __register_netdevice_notifier_net(net, nb, false);
->  	if (!err) {
-> @@ -2093,13 +2134,12 @@ int unregister_netdevice_notifier_dev_net(struct net_device *dev,
->  					  struct notifier_block *nb,
->  					  struct netdev_net_notifier *nn)
->  {
-> -	struct net *net = dev_net(dev);
->  	int err;
->  
-> -	rtnl_net_lock(net);
-> +	rtnl_net_dev_lock(dev);
->  	list_del(&nn->list);
-> -	err = __unregister_netdevice_notifier_net(net, nb);
-> -	rtnl_net_unlock(net);
-> +	err = __unregister_netdevice_notifier_net(dev_net(dev), nb);
-> +	rtnl_net_dev_unlock(dev);
->  
->  	return err;
->  }
+Just to clarify:
+
+Am I right that in RTC mode:
+1.1. All 64 bits of the PHC counter are stored on the NIC (both the =
+=E2=80=9Creadable=E2=80=9D 0=E2=80=9347 bits and the higher 48=E2=80=9363 =
+bits).
+1.2. When userspace attempts to change the PHC counter value (using =
+adjtime or settime), these changes are propagated to the NIC via the =
+PORT_MAC_CFG_REQ_ENABLES_PTP_ADJ_PHASE and =
+FUNC_PTP_CFG_REQ_ENABLES_PTP_SET_TIME requests.
+1.3. If one port of a four-port NIC is updated, the change is propagated =
+to all other ports via the =
+ASYNC_EVENT_CMPL_PHC_UPDATE_EVENT_DATA1_FLAGS_PHC_RTC_UPDATE event. As a =
+result, all four instances of the bnxt_en driver receive the event with =
+the high 48=E2=80=9363 bits of the counter in payload. They then =
+asynchronously read the 0=E2=80=9347 bits and update the timecounter =
+struct=E2=80=99s nsec field.
+1.4. If we ignore the bug related to unsynchronized reading of the =
+higher (48=E2=80=9363) and lower (0=E2=80=9347) bits of the PHC counter, =
+the time across each timecounter instance should remain in sync.
+1.5. When userspace calls adjfine, it triggers the =
+PORT_MAC_CFG_REQ_ENABLES_PTP_FREQ_ADJ_PPB request, causing the PHC tick =
+rate to change.
+
+In non-RTC mode:
+2.1. Only the lower 0=E2=80=9347 bits are stored on the NIC. The higher =
+48=E2=80=9363 bits are stored only in the timecounter struct.
+2.2. When userspace tries to change the PHC counter via adjtime or =
+settime, the change is reflected only in the timecounter struct.
+2.3. Each timecounter instance may have its own nsec field value, =
+potentially leading to different timestamps read from /dev/ptp[0-3].
+2.4. When userspace calls adjfine, it only modifies the mul field in the =
+cyclecounter struct, which means no real changeoccurs to the PHC tick =
+rate on the hardware.
+
+And about issue in general:
+3.1. Firmware versions 230+ operate in non-RTC mode in all environments.
+3.2. Firmware version 224 uses RTC mode because older driver versions =
+were not designed to track overflows (the higher 48=E2=80=9363 bits of =
+the PHC counter) on the driver side.
+
+
+>>> The latest driver handles the rollover on its own and we don't need =
+the firmware to tell us.
+>>> I checked with the firmware team and I gather that the version you =
+are using is very old.
+>>> Firmware version 230.x onwards, you should not receive this event =
+for rollovers.
+>>> Is it possible for you to update the firmware? Do you have access to =
+a more recent (230+) firmware?
+>> Yes, I can update firmware if you can tell where can I find the =
+latest firmware and the update instructions?
+>=20
+> Broadcom's web site has pretty easy support portal with NIC firmware
+> publicly available. Current version is 232 and it has all the
+> improvements Pavan mentioned.
+
+Yes, I have found the "Broadcom BCM57xx Fwupg Tools=E2=80=9D archive =
+with some precompiled binaries for x86_64 platform. The problem is that =
+our hosts are aarch64 and uses the Nix as a package manager, it will =
+take some time to make it work in our setup. I just hoped that there is =
+firmware binary itself that I can pass to ethtool =E2=80=94-flash.
+
+
+
+> On 25 Mar 2025, at 14:24, Pavan Chebbi <pavan.chebbi@broadcom.com> =
+wrote:
+>=20
+>>> Yes, I can update firmware if you can tell where can I find the =
+latest firmware and the update instructions?
+>>>=20
+>>=20
+>> Broadcom's web site has pretty easy support portal with NIC firmware
+>> publicly available. Current version is 232 and it has all the
+>> improvements Pavan mentioned.
+>>=20
+> Thanks Vadim for chiming in. I guess you answered all of Kamil's =
+questions.
+
+Yes, thank you for help. Without your explanation, I would have spent a =
+lot more time understanding it on my own.
+
+> I am curious about Kamil's use case of running PTP on 4 ports (in a
+> single host?) which seem to be using RTC mode.
+> Like Vadim pointed out earlier, this cannot be an accurate config
+> given we run a shared PHC.
+> Can Kamil give details of his configuration?
+
+I have a system equipped with a BCM57502 NIC that functions as a PTP =
+grandmaster in a small local network. Four PTP clients =E2=80=94 each =
+connected to one of the NIC=E2=80=99s four ports =E2=80=94 synchronize =
+their time with the grandmaster using the PTP L2P2P protocol. To support =
+this configuration, I run four ptp4l instances (one for each port) and a =
+single phc2sys daemon to synchronize system time and PHC time by =
+adjusting the PHC. Because the bnxt_en driver reports different PHC =
+device indexes for each NIC port, the phc2sys daemon treats each PHC =
+device as independent and adjusts their times separately.
+
+We also have a similar setup with a different network card, the Intel =
+E810-C, which has four ports as well. However, its ice driver exposes =
+only one PHC device and probably read PHC counter in a different way. I =
+do not remember similar issues with this setup.
 
 
