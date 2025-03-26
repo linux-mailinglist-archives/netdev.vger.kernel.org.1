@@ -1,232 +1,318 @@
-Return-Path: <netdev+bounces-177834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 253DAA72007
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 21:32:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24D2EA7200B
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 21:34:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A0F93B0541
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 20:32:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A60251670C0
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 20:34:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EFED1A2630;
-	Wed, 26 Mar 2025 20:32:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF7B217F36;
+	Wed, 26 Mar 2025 20:34:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bhDfk11H"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rpOmmimI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9A661F8738
-	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 20:32:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743021140; cv=fail; b=jXjsRjjux3XqgpbMJ6wNKDkLIgMORqbHCFrHbXNTkfJtI/XIYOC2uCuxq7k4kSABE5/CZ+ltz+D17gVnGRM/xPuLvJbX1cZxDwzx3dQu7ZC8vHGEjeBZLfM8g7yIn3K4JiWHFbW8Q09GZP/3hujDzC2ONnqK0bqfp8S/1WGvXTM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743021140; c=relaxed/simple;
-	bh=9s3VQIPaaovtflj5RmEdHD8Ul7EhDv3wkYlKjKe5nQE=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=qJbTmer+EUvij3qc+B5MWTkOB4xYNdm/YTIStdaMxRuaCnonG3CSXJO2gS7KLU4sDCMHvN2hNm64fZl0/S4bwe0i700owe8EpajwRI7oB289OEpPcA3KyAYYpQkmXkZ3MYX76as+RlruETuehCEseLfokrBVVw/Gq3jBCWQzcxI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bhDfk11H; arc=fail smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1743021137; x=1774557137;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=9s3VQIPaaovtflj5RmEdHD8Ul7EhDv3wkYlKjKe5nQE=;
-  b=bhDfk11HUNXCE03xF90W7PePQsxpAMv8dP4WOPYxcOJIWiA8axZlojAS
-   sc0ISuBTEQgPCFP05COP2M7Z2zjt1BpRFHVz8Td/We61JKjCPOIM/lTQ7
-   snT7G7/ecFH64AjLvWYi3lLUkmiU4x0bZpunY3hzY04z2ZPEwYyrXNEfU
-   ASG78OhPg42cfivi28wfEr/r1NFDIWJFlLbPtFKM2Ow5UiTa9I/XHae2l
-   9pzA8c3fH7ETc/wbV0qtSjiajSdsOdBKmNC2viyCqEP+GAQCiB6CJRIgq
-   0x7SvBPxJ5TJn7ZARgcyiEwmUGzicjEpbDeDuuTPLw7dY5UL2Sp2adWo9
-   g==;
-X-CSE-ConnectionGUID: OqAUG7W1TCiAmC6zMcN4dg==
-X-CSE-MsgGUID: eqsLrYpvQBuVjy3/Rd0/nw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11385"; a="55708526"
-X-IronPort-AV: E=Sophos;i="6.14,278,1736841600"; 
-   d="scan'208";a="55708526"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2025 13:32:17 -0700
-X-CSE-ConnectionGUID: wLUe9TxFS82uVPg1Ym9Z6w==
-X-CSE-MsgGUID: G8gdMP0xT7afM6WJGvXOeQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,278,1736841600"; 
-   d="scan'208";a="124710605"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2025 13:32:17 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Wed, 26 Mar 2025 13:32:16 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Wed, 26 Mar 2025 13:32:16 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.176)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Wed, 26 Mar 2025 13:32:16 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ENXChqUI5okLRkOV5tOfXlGanMjLbMmcJKn/lkK4/A8fvu08upmlloL41j829yH6/o80AgJU9/I0nqF7YMM9EefI5B9BUD8tMN0pyR5jwDCL7fSGzmeda0gqkNYvV6NCAo0BUDninpNljcE/ivoKF1Un31E5gDDZO3hIEzGFf4D1DSXsgPmEc6RE8miYe/i7NABrric2Z727F36FfsIWemnLvqyobOxVepsyDt8SjUJjQErNomPYgXbr3gIr5g3OwsAF0ZwBSmWB1AfYQBV4x95YFmt2nD3LnmqIuOiXyFhKJJmI9Wq+exLK5nnY7vFdFIF+lm2U16lZ7gtwnykhBQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DCaJIugpFZ1UYMGS/GTbzs6rT4PSLt2MhCLKIBltOQE=;
- b=dNSmnjkhIS0kWUt4uWvdtUODdIT2Fj4F7kWcs59OnEh5fl2lan4y2ox7ppyhNfkwiuzoeKqs1fcSHD28QctHGTxWdSqa6mkxNNJmXHCQTkqbHMA/SXf2BCQhs7x6jwjBg9V1obZsO0fK+8132zZLv3Qj0iONvBWW+HfLbiGww1grpajBGmI/0KaGJGGKYoBrjvj3SWsPB+GnZQ0a3x5ei5pkuZ7f9Sj3/m0o0w6krcQp4ElvONUuTYO8Jlwjp2dxaRJ2dSvpK9ce2L9a6L+QlNF0+ZIzmiVWYs9mnfFGOj79XCywbj2gTUh4vDszP152xABw6k9Hs0yVEHEi5GWPFg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH0PR11MB5095.namprd11.prod.outlook.com (2603:10b6:510:3b::14)
- by CO1PR11MB4817.namprd11.prod.outlook.com (2603:10b6:303:98::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.44; Wed, 26 Mar
- 2025 20:32:01 +0000
-Received: from PH0PR11MB5095.namprd11.prod.outlook.com
- ([fe80::215b:e85e:1973:8189]) by PH0PR11MB5095.namprd11.prod.outlook.com
- ([fe80::215b:e85e:1973:8189%6]) with mapi id 15.20.8534.043; Wed, 26 Mar 2025
- 20:32:00 +0000
-Message-ID: <eda6a7b5-8ac7-4602-ba4d-ab102e2a8005@intel.com>
-Date: Wed, 26 Mar 2025 13:31:59 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: bnxt_en: Incorrect tx timestamp report
-To: Kamil Zaripov <zaripov-kamil@avride.ai>, Vadim Fedorenko
-	<vadim.fedorenko@linux.dev>
-CC: Michael Chan <michael.chan@broadcom.com>, Pavan Chebbi
-	<pavan.chebbi@broadcom.com>, Linux Netdev List <netdev@vger.kernel.org>
-References: <DE1DD9A1-3BB2-4AFB-AE3B-9389D3054875@avride.ai>
- <8f128d86-a39c-4699-800a-67084671e853@intel.com>
- <CAGtf3iaO+Q=He7xyCCfzfPQDH_dHYYG1rHbpaUe-oBo90JBtjA@mail.gmail.com>
- <CACKFLinG2s5HVisa7YoWAZByty0AyCqO-gixAE8FSwVHKK8cjQ@mail.gmail.com>
- <CALs4sv1H=rS96Jq_4i=S0kL57uR6v-sEKbZcqm2VgY6UXbVeMA@mail.gmail.com>
- <9200948E-51F9-45A4-A04C-8AD0C749AD7B@avride.ai>
- <0316a190-6022-4656-bd5e-1a1f544efa2d@linux.dev>
- <CBBDA12F-05B4-4842-97BF-11B392AD21F1@avride.ai>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <CBBDA12F-05B4-4842-97BF-11B392AD21F1@avride.ai>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BYAPR06CA0071.namprd06.prod.outlook.com
- (2603:10b6:a03:14b::48) To PH0PR11MB5095.namprd11.prod.outlook.com
- (2603:10b6:510:3b::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE861A2541
+	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 20:34:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743021286; cv=none; b=kuSBA42He9q7CSwagiQy/sEi9tJk8JsH7L05wupJFYQL38kHIOeSZ2BcRYRzcEQq38RqxZR77JMRgwBfQaPOJl7ri4JDDDOiFQ+ch3XKylzj3hgspQei4QoQrmCso0ChOb0sWfOnf7eJj2R/2NqdHQubznFvF4gS1DV6nEyXc9Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743021286; c=relaxed/simple;
+	bh=4jI7BPOWxCFJZt69ClErP/iLRGP1r6tfCjpgLD8azAg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sRIM1Hf9N1IfAqRtbyLQL5IzZucg1hbK2GdaW3viEgn0DBk4EMBlddLHGs8VpEP+Kpi8w52akRqBcpBHc4ykWdThpBzUmfqe81GB6D8//s55J22H7xpnhGAwk31a1y/wMrpIvPn82ILS7HvxafGnCCbVI5ry04ZNA31zU/xJV14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rpOmmimI; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2240aad70f2so62555ad.0
+        for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 13:34:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1743021283; x=1743626083; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/q9fdOzJIcQKZQnYODOVoJPDaxhtubiEVgPHEqA0OHQ=;
+        b=rpOmmimIkvt3eVoFvgheIRQrF7Zycp1ZgccZRVSetp+UhbSAfxtqFZEwVzdMNMhlRD
+         fCiTLAyMWZwmksMWHdOuiguNdIq02oWAVa+4c7SLdG2kXvB210ZVyKLzpbryAdZQ/tWh
+         6dV10cGTnC9VRG5v92vlQgMQr0i0IfJAc/uo+n1m9yfMHAH+2GucxB5iYeTt7CAhgXx0
+         Bc7ZUNvEnxLl/dwAw/Vxpq6Tah5tMjqE4qGxpVvH7vFd9yrMkpiW0YM9Vpas46k6F1B1
+         Qm7F4jliFnl+PZPbYnN2NnsdmXuW9RlYocZfmwfRX91ue0qf2cg2r1I22F+14Kje2KxT
+         TRhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743021283; x=1743626083;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/q9fdOzJIcQKZQnYODOVoJPDaxhtubiEVgPHEqA0OHQ=;
+        b=M4v8c67gJz1aVLXh6E7ZC44qGvs13i2zDsiv/9NPIcQ+HpHMwpPeaDSE8SX2JsH9uT
+         pGAsXqTmaa33gi0cl6zLC6FuPZN3Jhc9QFBoeWRnuWCOXht4iHKV1+byN5k3643l7Lxm
+         Xy68SyJxMBW/palYBEruCEDERuEGZklWiM80O7eWDzpbwnWssuSg8Q1+810aok7MvARw
+         pegG30gJP8/bY4Y+dJ5ETY6bsx9vqeCkh1hOfn1KGtQj/VTUSf6VS7seaFhX/F0df28G
+         ZJPF+mKUNAE9GudEmCZsegB2+qdMrufncgkagVCt3jSvAbthG1tC2emN9t/UIwFj1oLu
+         qAGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXbBdcN+oNwWKul2kEa/4lRmCVQayLZ46g+/vcG/QZkGtO9U7dOTyVnWdxRbnn7upbptiF0AoA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSXh3/yNEzC3EZnLc57JU7UAcbmRRN2M9c1TzhGgxemYuH+RAB
+	GZH3LDjWFmcnGZfv3nPrrbjql0i7TBbWPzuyi5SwGnYgjs/MCuZ8DJnqDFWQCUtCmSLM3CxPA3+
+	qA0Ga9PtRqJ8t+QF777h2AEu4VLsRTP9kdL8r
+X-Gm-Gg: ASbGnctLdrFRLO6I1/1cjB2XAlKbt0ePkNNELwo1L/C+vay3KIysQxq6NX/hI9OHD6+
+	8w83tLS7daVfzKDn8X554b/JHn9U7grYGtUIX6gn59++qEQbDx82LJsOf4JIMNVfbbjPxVshS2r
+	USf8miX1QisiMWLuXmFuSjIuLJYLVAGDdrBUG2kJyCZ6vXudxjEVeKHb7Bpg==
+X-Google-Smtp-Source: AGHT+IG+X30YZBwojbi4Kt3B1IbwB55meKVtn2eks7YDYJiw3G7aafqU2Dv4SX6I+DXH+1kaeoJcbhBay6zPwvlySyM=
+X-Received: by 2002:a17:902:b20f:b0:21f:465d:c588 with SMTP id
+ d9443c01a7336-22806c48d0amr207615ad.14.1743021282246; Wed, 26 Mar 2025
+ 13:34:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB5095:EE_|CO1PR11MB4817:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6fb00810-7e05-4530-1053-08dd6ca54316
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?VFo4bTByS0RscGJCNThSeitUdHlPRktqMHo0ZnR2Yk9IRW4yanpWYlFNdWdS?=
- =?utf-8?B?MllhdjdMdzlnQjd0bXB5WVhGUjBzcWl1UUVXT3JvRHRsVUpxYU1YZWtOQzYx?=
- =?utf-8?B?RCthUTl2WU9DZDJ0VHQyYWY5dUp1QzdqL3NiYTU0bUpaV0FZRW02VDVvOGFq?=
- =?utf-8?B?Z0xUTnBMbmxSQU16Rkw2K0lGMHpJVTZ5Q0ZtVDkzQVlvb0ZxWkdHb3lxNktT?=
- =?utf-8?B?NWpQNzVpQldXbDZsbVBVcU9OUnRiMGJpRmxUL2gwU3U4dXBucy91VzVXbTdv?=
- =?utf-8?B?Q2VUY0FpSlF3TUZtLzRXMHRoZzJvRE5hWm9qaVQvMjhPNGRtVkYyRGw5YmIy?=
- =?utf-8?B?Q1lGdmtNbHdVQWJWdnpNaDNUSWdRZW9VTmh1bFBLcCtLRU5RQkt4VHhVL1Vw?=
- =?utf-8?B?MjV6WHlVVmorTTIxZ1lROE5DT3pLb0lIV1dSZmJialZVeklFQnVzNjJrK1pH?=
- =?utf-8?B?bmoyblhMaEovMWhWL3l3NythSWZzeE16UXBQNmMxKzVTUEQ0UVdZMllpeHVF?=
- =?utf-8?B?eWJHclp5Z09NbDM4T2hZVUM0VFUxMnRlbDVYRnNXU0VlbGJpRUFoWlJWb3U5?=
- =?utf-8?B?YU9UVVdGRExUUGJvREIzV2VTY1pxNWRvbEhXQitHRVEwaWpxTitaUHJmNUJG?=
- =?utf-8?B?cTVJclpDaERDRE1Tc3BPTEJCZG8zOVQ2YnpvU3VTYnVhbmRvblkvSlAzcEhQ?=
- =?utf-8?B?TW1lWEkydEF1MFQ3UWQyM2RDTE92ZGx0WWNEZnVhM3pYUUVwaFBMSmhQUkg4?=
- =?utf-8?B?dDdmYWVOa3BNUGQ1U3B4SlFnRFlxUEZLU0RRTm5tREJ6VStjdjY1LzdJTDNK?=
- =?utf-8?B?QmFYMkozTWtHQzVKWlFzV29jU1ZtdHRrL0JlNWduZ3hPNndWdXc5NUdJbCtl?=
- =?utf-8?B?MlVhVUJXdThrSUo4NGZGZ2ZWYU5PVkFrVHlMTUxBdlNjWEpzbGkzeDdaSmhx?=
- =?utf-8?B?ZWk4K2gwbW4rRFpJWE85OVl5aHVYTSsvS2U5d1FkYnBvb0s0LzN5SE03NWxh?=
- =?utf-8?B?Y2RtN3RmbWd0ZjE5aGhFQTFMRjNERlphaVlQNlZ1L3pRZzNMVmt4SzZpYWxy?=
- =?utf-8?B?eDk5UXBrTUJXTGlCTk9OZTlxMXpIMWU4Zk9aclArNXl3ejJEYnU2QnRrdGlU?=
- =?utf-8?B?VWVadS9NY1RYaHRxd3U2dHFtSUtnVUFkVUs1Uks4UTQ1eVB6UGQ0V3V1dk14?=
- =?utf-8?B?K3dPRllIU25WN253R0pFNEMwZmRVZUxvS0dBMVF2R256MEZjSmV3aVVWVTNX?=
- =?utf-8?B?NWU4QmdxSXFnb0xKRm43ZkR2d1lZZ3d6aTROOThLemNEVm1RdjZJWjhCWUth?=
- =?utf-8?B?V0dVVzE0RERpK1NQNFAzbkFqM3EyTE9uTEQxT2tBalJreURLNGord1V3azU2?=
- =?utf-8?B?c0cyekNFQnZnc2dUbm5hSkp3YkhvQjFmREpxWEUveVpXb1VncHlWWTVIVjVU?=
- =?utf-8?B?NVhVRk83TnBlUVIzaG5JV2dtRWtYcG92Q2s5azBTT09hNmZUOElqdzNxVWp5?=
- =?utf-8?B?RGF5N01tcGthVzE4ZWlWT2QwRStXS1BBR1hMTUF6b2lKcEdGM2JPTEw2eWdX?=
- =?utf-8?B?Zjl3RzlFUkhuRmxxbTVIcVpRZWFVRXVhbWJLUVNPbm9iYllQNFd1SE5xVGlM?=
- =?utf-8?B?QnNJcXVzUks1Mlk5TFlDRElUcnFuOEM4djNabytDUjFkZTBHQXhKVnh3VjZN?=
- =?utf-8?B?NDUwTDlZdU8xcStJWGp4dW1EMFRkbXNjTEtsVDZGRmJwck13ZU41aENiQWUr?=
- =?utf-8?B?TE9QS2s3VU5oVjZMZVhUNUxuVFlQdUpNcEVzVkxaTE1xcm11ckVTVjJEbVNE?=
- =?utf-8?B?Qjdhc1ZRRzNEVFBUbGd6aHE3a0UrdjQwVnhzam9pQ1JHNVBSYkZSbXE3TFFN?=
- =?utf-8?Q?ZRng+q0Js/rcT?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5095.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WlV0U1RPU090ai9ad0xHR1JBRmlrR0xYekFSOUFwVE05RGs2aG5TQktteTJZ?=
- =?utf-8?B?OU5IRkNrMDlOaVlxQXpMUkFhUWgzOXpSSzBaT1ErRDQySGZ6eXYzUUp0MHAy?=
- =?utf-8?B?Uk5NV1lqQ2JhLzJEbFpqRHdTcUtldzlmbXV1dm9WZXlqTW1mMFBBc3o0cnpj?=
- =?utf-8?B?SDliQ2srU1RWVmlsQVBBWGZNZXVnT3QzL3hocllwMkxSRE02VE5VWGh0NWpP?=
- =?utf-8?B?RXh5WGlsSTZjYk5ySUE2emgySjRkUVVmQmZpbmhjN2dYYU5TaTBXb2tLRThr?=
- =?utf-8?B?ay9NOXQ3TUVCL3QwUFhjSXZYOUJETHphbDlyOVJ2VGZRWlVaU05SNGk5dDVT?=
- =?utf-8?B?dTRPM1ExdkxrRmQ0eDNIWFpSUkhSV0llN3BmSVBNVUppNXFrTzRKZzkvK0Rq?=
- =?utf-8?B?aVJQQ2lLRDNhSHRmMnN4RGMyeVFrZjZDenRNa0JjcVdwMVp2T2lPZndHcjNT?=
- =?utf-8?B?bkhVeVh2R2hsc3BpWjFubmFwa2R2UWxtRFcwZTFRYzl1RlRXdnJaVVBaQkwx?=
- =?utf-8?B?ZUR6VUpSMWp4Y2hWTjU0TTBCL2lKMFFSVFRiNFo2dzltSVZZSk9QOHc0TWtj?=
- =?utf-8?B?SC9kV3U2NnFtQjZKUHBMVkhNMUxjOXcwNkd3RlRZZElTeWhnU3gzcnJnT0ow?=
- =?utf-8?B?aEkwKzd2ZTJIdDdpRm1SZis0MHpzaUZvZm1QNndMZXV3ajFtbThqVTQvcWtz?=
- =?utf-8?B?Rk9CZmhCcnlKeTZOUUFrcm8wVVY0dFQ4STFrM1MyVFNielltMHhmK2NnZWMz?=
- =?utf-8?B?MzBUUlJYUklxQmN5TGJueWxKOEs5R2hqNkNCVkQ3bnBRL3N1SDlMRy9MK2tO?=
- =?utf-8?B?bFk3Z2FRSTduQmlaZ2JiTjFvUVRMOTNJaFhpNVlUaUhpeUlJU2MwdnV0dS90?=
- =?utf-8?B?U3dESEJWa2V6RU9EQWxRM2hDOEpMTExyRGpIUnlCZzlPUFZFZHRHSlhhbnc1?=
- =?utf-8?B?VHU0OU8wT2FLZTR2TzF3VWgrMUgvTGlQR09BKzZFR01zd2JvVCtvS0M5TGhs?=
- =?utf-8?B?ejU1K2M3RjNpcnQ3bTZnb0pZTVNqUXVZU3k3MDA4RDI3RHByYnR2NnZjMDJp?=
- =?utf-8?B?ZDZBMUFqZXBDOWFRYjdKZGhPUHg5UitVbmlCT0lBZ3V1dHdBTFAvT0RUK1lj?=
- =?utf-8?B?dmZ5ZFJlTWE2dE9BU0Y1Z1JSa3lYZUREUUZCSzVjUGU0VnMzN21VZnhmMW9R?=
- =?utf-8?B?Z0ViQ2NVVCtrWWx1c1hyNTZFQUdVZmh5TzZmTW9ENUp3WWFwcjhRS0s4a0Q4?=
- =?utf-8?B?dVVQekt1UUlQSjRsK0JGZUNnV2xHY0lnWElROFNETm5WR09OSnBTbjNTbWs4?=
- =?utf-8?B?eWVPenRnWDBRblcrNnJmRGhneElCTytkWXRiaU8xTHZsb01VSSs3L1ZWMlpw?=
- =?utf-8?B?NWlmajBrRmV4dTRaOVhRaFV1VlYwSm5DTFFUdWUrQTR6ZEpKaVNlZ2Z0U0pJ?=
- =?utf-8?B?aTlpbnNWbEdvTmpsaEs3TDRrcUlBL3doMEhXYUhaUUFKUXA3elJ4SFFJdThr?=
- =?utf-8?B?Zm8xQWhDc1NqOStKbitLb2MwMWx4Zk9HMERqSEFuSGUrRVFBVWw1Y2M4UkMv?=
- =?utf-8?B?SVE3SlgrWGNaVmdiU3VuNmx5NW5RZVp3NDduTldqV0wzZjYyd1dpb1FzNGVx?=
- =?utf-8?B?bUFMN25kY1FrWGNuSy9VS0NTU3dMMngwYmE1ZGZ2eFdPMi9tbEdIbGN4WVBn?=
- =?utf-8?B?WnNMOTNIazFpTmY2NFdXNG9GMDdYMTlxQ3R1dzlXLzdwVXRHemo2YzVVY0JC?=
- =?utf-8?B?RG44dXA1S0JTL0FEL2xScUM4YVo2UE80NFZ0a3duYUZ6b1ZHd2RVOGQ5dU05?=
- =?utf-8?B?ZlNGMmpDR0UvajhFaFJNVUl5cUJDWEpiWDFReWlobTdmYk5wbFVxODJzWGF4?=
- =?utf-8?B?V0gyK210NVY4VE5XUk9HSUVrOGxjREpuUGVGWi9IbDBpQlZ3aWhvdkRSdzJr?=
- =?utf-8?B?Y3lwaC9xZVF0eW9pNy9FcC9hYnRkNmhDS0xmMjZHVEFVbzRUQnBnZHhWUmdo?=
- =?utf-8?B?OXVyTllzSzIvZjhZdkpnQWxrd0pxZzJmY21PRTVkYzJvalo1REczM3B0V1oz?=
- =?utf-8?B?cjVyZjJTRVhUNUVHbWR5WEp6RFduT2QyM05ueVpEanFSV3ZQbUtGdVJzaE5l?=
- =?utf-8?B?eDVwRnJUZVlRWVAxTWJBanFseU1uS3pKUlFKbG92WmdFUzI4aUdhbE0xOWNQ?=
- =?utf-8?B?aFE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6fb00810-7e05-4530-1053-08dd6ca54316
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5095.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2025 20:32:00.9026
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VXmnq/hAGTm3QdQ1l41+TG/1JO8fylXY3F1bvCnVPNjk1KWBtF1jc7yOM/hKgKjKOiJOyuutVgqbAYugQ8WHj4LMOGy+zlj3bVbMN49bn4E=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4817
-X-OriginatorOrg: intel.com
+References: <20250321021521.849856-1-skhawaja@google.com> <451afb5a-3fed-43d4-93cc-1008dd6c028f@uwaterloo.ca>
+ <CAAywjhSGp6CaHXsO5EDANPHA=wpOO2C=4819+75fLoSuFL2dHA@mail.gmail.com> <b35fe4bf-25d7-41cd-90c9-f68e1819cded@uwaterloo.ca>
+In-Reply-To: <b35fe4bf-25d7-41cd-90c9-f68e1819cded@uwaterloo.ca>
+From: Samiullah Khawaja <skhawaja@google.com>
+Date: Wed, 26 Mar 2025 13:34:30 -0700
+X-Gm-Features: AQ5f1JpHSc3-3gGWlspKYfIzKoq497l3mqVDlJf8eP3wzcPSMzEqm-AQo3OHndw
+Message-ID: <CAAywjhRuJYakS4=zqtB7QzthJE+1UQfcaqT2bcj6sWPN_6Akeg@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 0/4] Add support to do threaded napi busy poll
+To: Martin Karsten <mkarsten@uwaterloo.ca>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, 
+	willemb@google.com, jdamato@fastly.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Mar 25, 2025 at 10:47=E2=80=AFAM Martin Karsten <mkarsten@uwaterloo=
+.ca> wrote:
+>
+> On 2025-03-25 12:40, Samiullah Khawaja wrote:
+> > On Sun, Mar 23, 2025 at 7:38=E2=80=AFPM Martin Karsten <mkarsten@uwater=
+loo.ca> wrote:
+> >>
+> >> On 2025-03-20 22:15, Samiullah Khawaja wrote:
+> >>> Extend the already existing support of threaded napi poll to do conti=
+nuous
+> >>> busy polling.
+> >>>
+> >>> This is used for doing continuous polling of napi to fetch descriptor=
+s
+> >>> from backing RX/TX queues for low latency applications. Allow enablin=
+g
+> >>> of threaded busypoll using netlink so this can be enabled on a set of
+> >>> dedicated napis for low latency applications.
+> >>>
+> >>> Once enabled user can fetch the PID of the kthread doing NAPI polling
+> >>> and set affinity, priority and scheduler for it depending on the
+> >>> low-latency requirements.
+> >>>
+> >>> Currently threaded napi is only enabled at device level using sysfs. =
+Add
+> >>> support to enable/disable threaded mode for a napi individually. This
+> >>> can be done using the netlink interface. Extend `napi-set` op in netl=
+ink
+> >>> spec that allows setting the `threaded` attribute of a napi.
+> >>>
+> >>> Extend the threaded attribute in napi struct to add an option to enab=
+le
+> >>> continuous busy polling. Extend the netlink and sysfs interface to al=
+low
+> >>> enabling/disabling threaded busypolling at device or individual napi
+> >>> level.
+> >>>
+> >>> We use this for our AF_XDP based hard low-latency usecase with usecs
+> >>> level latency requirement. For our usecase we want low jitter and sta=
+ble
+> >>> latency at P99.
+> >>>
+> >>> Following is an analysis and comparison of available (and compatible)
+> >>> busy poll interfaces for a low latency usecase with stable P99. Pleas=
+e
+> >>> note that the throughput and cpu efficiency is a non-goal.
+> >>>
+> >>> For analysis we use an AF_XDP based benchmarking tool `xdp_rr`. The
+> >>> description of the tool and how it tries to simulate the real workloa=
+d
+> >>> is following,
+> >>>
+> >>> - It sends UDP packets between 2 machines.
+> >>> - The client machine sends packets at a fixed frequency. To maintain =
+the
+> >>>     frequency of the packet being sent, we use open-loop sampling. Th=
+at is
+> >>>     the packets are sent in a separate thread.
+> >>> - The server replies to the packet inline by reading the pkt from the
+> >>>     recv ring and replies using the tx ring.
+> >>> - To simulate the application processing time, we use a configurable
+> >>>     delay in usecs on the client side after a reply is received from =
+the
+> >>>     server.
+> >>>
+> >>> The xdp_rr tool is posted separately as an RFC for tools/testing/self=
+test.
+> >>
+> >> Thanks very much for sending the benchmark program and these specific
+> >> experiments. I am able to build the tool and run the experiments in
+> >> principle. While I don't have a complete picture yet, one observation
+> >> seems already clear, so I want to report back on it.
+> > Thanks for reproducing this Martin. Really appreciate you reviewing
+> > this and your interest in this.
+> >>
+> >>> We use this tool with following napi polling configurations,
+> >>>
+> >>> - Interrupts only
+> >>> - SO_BUSYPOLL (inline in the same thread where the client receives th=
+e
+> >>>     packet).
+> >>> - SO_BUSYPOLL (separate thread and separate core)
+> >>> - Threaded NAPI busypoll
+> >>
+> >> The configurations that you describe as SO_BUSYPOLL here are not using
+> >> the best busy-polling configuration. The best busy-polling strictly
+> >> alternates between application processing and network polling. No
+> >> asynchronous processing due to hardware irq delivery or softirq
+> >> processing should happen.
+> >>
+> >> A high-level check is making sure that no softirq processing is report=
+ed
+> >> for the relevant cores (see, e.g., "%soft" in sar -P <cores> -u ALL 1)=
+.
+> >> In addition, interrupts can be counted in /proc/stat or /proc/interrup=
+ts.
+> >>
+> >> Unfortunately it is not always straightforward to enter this pattern. =
+In
+> >> this particular case, it seems that two pieces are missing:
+> >>
+> >> 1) Because the XPD socket is created with XDP_COPY, it is never marked
+> >> with its corresponding napi_id. Without the socket being marked with a
+> >> valid napi_id, sk_busy_loop (called from __xsk_recvmsg) never invokes
+> >> napi_busy_loop. Instead the gro_flush_timeout/napi_defer_hard_irqs
+> >> softirq loop controls packet delivery.
+> > Nice catch. It seems a recent change broke the busy polling for AF_XDP
+> > and there was a fix for the XDP_ZEROCOPY but the XDP_COPY remained
+> > broken and seems in my experiments I didn't pick that up. During my
+> > experimentation I confirmed that all experiment modes are invoking the
+> > busypoll and not going through softirqs. I confirmed this through perf
+> > traces. I sent out a fix for XDP_COPY busy polling here in the link
+> > below. I will resent this for the net since the original commit has
+> > already landed in 6.13.
+> > https://lore.kernel.org/netdev/CAAywjhSEjaSgt7fCoiqJiMufGOi=3Doxa164_vT=
+fk+3P43H60qwQ@mail.gmail.com/T/#t
+> >>
+> >> I found code at the end of xsk_bind in xsk.c that is conditional on xs=
+->zc:
+> >>
+> >>          if (xs->zc && qid < dev->real_num_rx_queues) {
+> >>                  struct netdev_rx_queue *rxq;
+> >>
+> >>                  rxq =3D __netif_get_rx_queue(dev, qid);
+> >>                  if (rxq->napi)
+> >>                          __sk_mark_napi_id_once(sk, rxq->napi->napi_id=
+);
+> >>          }
+> >>
+> >> I am not an expert on XDP sockets, so I don't know why that is or what
+> >> would be an acceptable workaround/fix, but when I simply remove the
+> >> check for xs->zc, the socket is being marked and napi_busy_loop is bei=
+ng
+> >> called. But maybe there's a better way to accomplish this.
+> > +1
+> >>
+> >> 2) SO_PREFER_BUSY_POLL needs to be set on the XDP socket to make sure
+> >> that busy polling stays in control after napi_busy_loop, regardless of
+> >> how many packets were found. Without this setting, the gro_flush_timeo=
+ut
+> >> timer is not extended in busy_poll_stop.
+> >>
+> >> With these two changes, both SO_BUSYPOLL alternatives perform noticeab=
+ly
+> >> better in my experiments and come closer to Threaded NAPI busypoll, so=
+ I
+> >> was wondering if you could try that in your environment? While this
+> >> might not change the big picture, I think it's important to fully
+> >> understand and document the trade-offs.
+> > I agree. In my experiments the SO_BUSYPOLL works properly, please see
+> > the commit I mentioned above. But I will experiment with
+> > SO_PREFER_BUSY_POLL to see whether it makes any significant change.
+>
+> I'd like to clarify: Your original experiments cannot have used
+> busypoll, because it was broken for XDP_COPY. Did you rerun the
+On my idpf test platform the AF_XDP support is broken with the latest
+kernel, so I didn't have the original commit that broke AF_XDP
+busypoll for zerocopy and copy mode. So in the experiments that I
+shared XDP_COPY busy poll has been working. Please see the traces
+below. Sorry for the confusion.
+> experiments with the XDP_COPY fix but without SO_PREFER_BUSY_POLL and
+I tried with SO_PREFER_BUSY_POLL as you suggested, I see results
+matching the previous observation:
 
+12Kpkts/sec with 78usecs delay:
 
-On 3/26/2025 6:50 AM, Kamil Zaripov wrote:
-> 
-> 
->> On 25 Mar 2025, at 12:41, Vadim Fedorenko <vadim.fedorenko@linux.dev> wrote:
->>
->> On 25/03/2025 10:13, Kamil Zaripov wrote:
->>>
->>> I guess I don’t understand how does it work. Am I right that if userspace program changes frequency of PHC devices 0,1,2,3 (one for each port present in NIC) driver will send PHC frequency change 4 times but firmware will drop 3 of these frequency change commands and will pick up only one? How can I understand which PHC will actually represent adjustable clock and which one is phony?
->>
->> It can be any of PHC devices, mostly the first to try to adjust will be used.
-> 
-> I believe that randomly selecting one of the PHC clock to control actual PHC in NIC and directing commands received on other clocks to the /dev/null is quite unexpected behavior for the userspace applications.
-> 
+INLINE:
+p5: 16700
+p50: 17100
+p95: 17200
+p99: 17200
 
-At the very least this should somehow be predictable. Better would be
-for software to manage this and report only one PHC to userspace, with
-each netdev reporting the PHC associated via get_ts_info
+> see the same latency numbers as before? Also, can you provide more
+> details about the perf tracing that you used to see that busypoll is
+> invoked, but softirq is not?
+I used the following command to record the call graph and could see
+the calls to napi_busy_loop going from xsk_rcvmsg. Confirmed with
+SO_PREFER_BUSY_POLL also below,
+```
+perf record -o prefer.perf -a -e cycles -g sleep 10
+perf report --stdio -i prefer.perf
+```
+
+```
+ --1.35%--entry_SYSCALL_64
+            |
+             --1.31%--do_syscall_64
+                       __x64_sys_recvfrom
+                       __sys_recvfrom
+                       sock_recvmsg
+                       xsk_recvmsg
+                       __xsk_recvmsg.constprop.0.isra.0
+                       napi_busy_loop
+                       __napi_busy_loop
+```
+
+I do see softirq getting triggered occasionally, when inline the
+busy_poll thread is not able to pick up the packets. I used following
+command to find number of samples for each in the trace,
+
+```
+perf report -g -n -i prefer.perf
+```
+
+Filtered the results to include only the interesting symbols
+```
+<
+Children      Self       Samples  Command          Shared Object
+          Symbol
++    1.48%     0.06%            46  xsk_rr           [idpf]
+            [k] idpf_vport_splitq_napi_poll
+
++    1.28%     0.11%            86  xsk_rr           [kernel.kallsyms]
+            [k] __napi_busy_loop
+
++    0.71%     0.02%            17  xsk_rr           [kernel.kallsyms]
+            [k] net_rx_action
+
++    0.69%     0.01%             6  xsk_rr           [kernel.kallsyms]
+            [k] __napi_poll
+```
+
+>
+> Thanks,
+> Martin
+>
 
