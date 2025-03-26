@@ -1,140 +1,127 @@
-Return-Path: <netdev+bounces-177660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A69DA70FF6
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 05:54:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72015A71001
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 06:01:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 712143B88BD
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 04:54:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C59E9168809
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 05:01:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E304216DEB1;
-	Wed, 26 Mar 2025 04:54:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A53D45BE3;
+	Wed, 26 Mar 2025 05:01:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="LSUt4L88"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="YTnEXcHr"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEFAEEEBB;
-	Wed, 26 Mar 2025 04:54:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95AD3DF59;
+	Wed, 26 Mar 2025 05:01:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742964848; cv=none; b=toIrcmzetdYcWpWF8UkdNpbH4GFgptF7KBrEs1/aBX+k6evDGB/nhnxOkngSX4/gNnhig3iTtnq5LdKvLAHGl7go+RCeqlmmGBhAKXYtFnpU3dPklFCkydwPDqUjYmicfk2Q2SkuscIN1Ai2XwNylM8WjH9TIlwg6v5pIaViJr0=
+	t=1742965289; cv=none; b=M9SFq1l9SFjR1T0hdBQEEujcPJWYeMob2tVZvJmFTCBHGqvXGU3NJFUojg58PRE08rd9LrOx5gtO0XmmrRFvR0lkOBwNHsuUy/syuzLKRK1Kk6oJq677C1uB30Zu+DvKxotEeGWW3AGdBFmsf/D1HGHKJV8TQvmVDdMxiU72DcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742964848; c=relaxed/simple;
-	bh=VuGoz/xwlw7kYr3ecx01YvOEM8Jthtu0J0dyHUcL6BY=;
+	s=arc-20240116; t=1742965289; c=relaxed/simple;
+	bh=QnFWFZlnfU21CTQGC3W3+l4fgFB80jnUSbPZ9zblmcs=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VIKHykfAr5GYIjq3GVy7jbNVzxq0Ln0Prkp9+ai6bdn7w0fR9MYMeXwwHrarvBsOLbnBDr7Qy5OVNZ3hqm27Pjknpa9OuTvrPAATg3NbKHtpL+n95yShE+UhC56uK0HU4yTyQ+h4jDSvEUL/lo8eDa6zJV6HNxMDVBJRd4pUKqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=LSUt4L88; arc=none smtp.client-ip=150.107.74.76
+	 MIME-Version:Content-Type; b=kU/ap3YgGOcuB2LeDuMfQGrjOF+ApqE2REEwaZmmoUhWUk/FN1+Zw3TXFowYLsWi1IVSqh90bNjme4dBWCcf+jvSiwbFfML2eNl5zF4UU03PTRl7Rd4Tw6GzdcbhfsbtsT/w+dWnwmSA4SID/eaAzvlPDmYtFIR4Vi83bMScBAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=YTnEXcHr; arc=none smtp.client-ip=150.107.74.76
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1742964842;
-	bh=n8P2vqZQTi1XkXDVCJcE0ki1sFp8gyJvqMuQ+EhAdjw=;
+	s=201702; t=1742965285;
+	bh=tspo2aLn8PwBIq68eFO69iZhXR1dL5un1fBSD28/tXI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LSUt4L88En+aBeojYCqxLItxPdaV6e00pjs+TwuUB2zml5tWrv/xv2A2QqS7gyo4z
-	 x399evephmevJAi3ArkpvMoUy0yCL80cRIA2xsV2OUXO8lMuKuBPTcPs1dOWSGGSKG
-	 8aN441+FfaO5/Qr+rPgLju0T0Rzqqp8MuY6txFM7/J9ums+130hLcmkzRnoUgvqjf9
-	 TSgte997qb0h0hDS8UGB87dcmjWbGkoYwtwRwS4L2ZMefMsGy+UwKshClHDMz8Coyj
-	 wj6YW97vQ/ii5dFc1EfylWiMI7fmpOMRHoIr43J6YiEIME/amFZbpOs1UCemAhE0Hl
-	 QUTP9KJuGpRcw==
+	b=YTnEXcHrEOSayX9+P9GvRHJPJ/UQTCRDJZbrSIme4qlArpWzTRdEEvp3gvugJSQ49
+	 WFdssDCAfyw7fA3iQbenIATj9HqbP3LIQLBARwtAzEvoQ1QwL2H0geumhUKIYBrbRX
+	 0HyIm7YgATLlUdnCkqU6W+z6sp776ip6BKGG+NBkbd8WrtFkxmxkzlYQmyiXTTLpuc
+	 rnfWunA3q+JKpFcARa7LOGjrH0v8OKdl9C6AINETn6/oBM4ETki+hk/HR/W8Xfr+69
+	 1gR3wCYakO4KwdXDTU4z5ebd1W4c7x2YzxfoOeSTuXWcbkuS4ahd1eCFvubr7u8iIM
+	 b6VKwoWZEfG1A==
 Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4ZMvZd6vbvz4x21;
-	Wed, 26 Mar 2025 15:54:01 +1100 (AEDT)
-Date: Wed, 26 Mar 2025 15:54:01 +1100
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4ZMvl86bLgz4wd0;
+	Wed, 26 Mar 2025 16:01:24 +1100 (AEDT)
+Date: Wed, 26 Mar 2025 16:01:24 +1100
 From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Kees Cook <kees@kernel.org>, David Miller <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ "H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
+ David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, Linux Kernel Mailing List
  <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, Tamir Duberstein <tamird@gmail.com>
-Subject: Re: linux-next: manual merge of the kspp tree with the net-next
- tree
-Message-ID: <20250326155401.634d8c79@canb.auug.org.au>
-In-Reply-To: <20250213151927.1674562e@canb.auug.org.au>
-References: <20250213151927.1674562e@canb.auug.org.au>
+ <linux-next@vger.kernel.org>, Nam Cao <namcao@linutronix.de>
+Subject: Re: linux-next: manual merge of the tip tree with the net-next tree
+Message-ID: <20250326160124.29bb0250@canb.auug.org.au>
+In-Reply-To: <20250228154312.06484c0d@canb.auug.org.au>
+References: <20250228154312.06484c0d@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/dSRl7syyRB8ezowbLxeXi_h";
+Content-Type: multipart/signed; boundary="Sig_/ekkCJEeper_uGN6t=zKTw2o";
  protocol="application/pgp-signature"; micalg=pgp-sha256
 
---Sig_/dSRl7syyRB8ezowbLxeXi_h
+--Sig_/ekkCJEeper_uGN6t=zKTw2o
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
 Hi all,
 
-On Thu, 13 Feb 2025 15:19:27 +1100 Stephen Rothwell <sfr@canb.auug.org.au> =
+On Fri, 28 Feb 2025 15:43:12 +1100 Stephen Rothwell <sfr@canb.auug.org.au> =
 wrote:
 >
-> Today's linux-next merge of the kspp tree got a conflict in:
+> Today's linux-next merge of the tip tree got a conflict in:
 >=20
->   lib/Makefile
+>   net/core/dev.c
 >=20
 > between commit:
 >=20
->   b341f6fd45ab ("blackhole_dev: convert self-test to KUnit")
+>   388d31417ce0 ("net: gro: expose GRO init/cleanup to use outside of NAPI=
+")
 >=20
 > from the net-next tree and commit:
 >=20
->   db6fe4d61ece ("lib: Move KUnit tests into tests/ subdirectory")
+>   fe0b776543e9 ("netdev: Switch to use hrtimer_setup()")
 >=20
-> from the kspp tree.
+> from the tip tree.
 >=20
-> I fixed it up (I used the latter version of this file and applied the
-> following merge fix patch) and can carry the fix as necessary. This
+> I fixed it up (see below) and can carry the fix as necessary. This
 > is now fixed as far as linux-next is concerned, but any non trivial
 > conflicts should be mentioned to your upstream maintainer when your tree
 > is submitted for merging.  You may also want to consider cooperating
 > with the maintainer of the conflicting tree to minimise any particularly
 > complex conflicts.
 >=20
-> From: Stephen Rothwell <sfr@canb.auug.org.au>
-> Date: Thu, 13 Feb 2025 14:50:27 +1100
-> Subject: [PATCH] fix up for "lib: Move KUnit tests into tests/ subdirecto=
-ry"
 >=20
-> interacting with commit
->=20
->   b341f6fd45ab ("blackhole_dev: convert self-test to KUnit")
->=20
-> from the net-next tree.
->=20
-> Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
-> ---
->  lib/tests/Makefile                    | 1 +
->  lib/{ =3D> tests}/blackhole_dev_kunit.c | 0
->  2 files changed, 1 insertion(+)
->  rename lib/{ =3D> tests}/blackhole_dev_kunit.c (100%)
->=20
-> diff --git a/lib/tests/Makefile b/lib/tests/Makefile
-> index 8696d778d92f..8961fbcff7a4 100644
-> --- a/lib/tests/Makefile
-> +++ b/lib/tests/Makefile
-> @@ -6,6 +6,7 @@
->  CFLAGS_bitfield_kunit.o :=3D $(DISABLE_STRUCTLEAK_PLUGIN)
->  obj-$(CONFIG_BITFIELD_KUNIT) +=3D bitfield_kunit.o
->  obj-$(CONFIG_BITS_TEST) +=3D test_bits.o
-> +obj-$(CONFIG_BLACKHOLE_DEV_KUNIT_TEST) +=3D blackhole_dev_kunit.o
->  obj-$(CONFIG_CHECKSUM_KUNIT) +=3D checksum_kunit.o
->  obj-$(CONFIG_CMDLINE_KUNIT_TEST) +=3D cmdline_kunit.o
->  obj-$(CONFIG_CPUMASK_KUNIT_TEST) +=3D cpumask_kunit.o
-> diff --git a/lib/blackhole_dev_kunit.c b/lib/tests/blackhole_dev_kunit.c
-> similarity index 100%
-> rename from lib/blackhole_dev_kunit.c
-> rename to lib/tests/blackhole_dev_kunit.c
-> --=20
-> 2.45.2
+> diff --cc net/core/dev.c
+> index d6d68a2d2355,03a7f867c7b3..000000000000
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@@ -7169,10 -7013,11 +7169,9 @@@ void netif_napi_add_weight_locked(struc
+>  =20
+>   	INIT_LIST_HEAD(&napi->poll_list);
+>   	INIT_HLIST_NODE(&napi->napi_hash_node);
+> - 	hrtimer_init(&napi->timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL_PINNED);
+> - 	napi->timer.function =3D napi_watchdog;
+> + 	hrtimer_setup(&napi->timer, napi_watchdog, CLOCK_MONOTONIC, HRTIMER_MO=
+DE_REL_PINNED);
+>  -	init_gro_hash(napi);
+>  +	gro_init(&napi->gro);
+>   	napi->skb =3D NULL;
+>  -	INIT_LIST_HEAD(&napi->rx_list);
+>  -	napi->rx_count =3D 0;
+>   	napi->poll =3D poll;
+>   	if (weight > NAPI_POLL_WEIGHT)
+>   		netdev_err_once(dev, "%s() called with weight %d\n", __func__,
 
 This is now a conflict between Linus' tree and the net-next tree.
 
@@ -142,21 +129,21 @@ This is now a conflict between Linus' tree and the net-next tree.
 Cheers,
 Stephen Rothwell
 
---Sig_/dSRl7syyRB8ezowbLxeXi_h
+--Sig_/ekkCJEeper_uGN6t=zKTw2o
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmfjiGkACgkQAVBC80lX
-0GwuKwf7B9RhnPiIvGid2Ou93o3mJTsvXXGItsci28BgeezwHY9bAB6bWsenEdQJ
-7FKesiieWAVmrrwo03Geu6uDror5qSV67TEgmjmu1NirDdOn18FIut5zDHppifEH
-DGrWgMTphoZVFKIq7WfPFy06sLKxNPIYYsM7Wps7uuzb1jsPHPX72ddELvl3lsyK
-fNfKLUyBC5Ifo6+urEVwfaoJaiusGpPIUMteraKvfPx1wmT/Ts/Xwmqix7zzlBDO
-i1MFpyAr1kpfbLvAdQhIxILND0vDkUXxYR0hKJtuxLrduAoMxvMdFeO2qyHvk2j/
-cGsRH+M7Fvq9fB7di/s54MtAGfARPg==
-=SUpa
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmfjiiQACgkQAVBC80lX
+0GzFlAf8D395G//g1l6DIYDWdtkUEOunn2yuO/QICXSNOsNYFy/kp6F3MC5g/tdn
+tXqZH+IQWuZN9btEtbYwl6sU+hSlC2a5XxCPlv0cLjRVQjhvQYcDcoEEPvwmXvRO
+zeK9qg62ZiY/HFDiYCehwsHAruXCdU8e9/J2PZgXMSxKrU0ivURsy6P5D+JdttfG
+eRv+jd8P6XZcqvGJh92xw86wQdsvtyzK1fZWv25aHC+tNcrB+IskWEM/nwwkOpDL
+sdYFnpPVJbRBh+BIi8mSxi39e6VQJvEy5GLWL0FpoMBlVhVK4YXqmfwKBSnBIMfZ
+7JzQCGbfqq9kVNoM55o1YZ3ykLWEyA==
+=rT5Y
 -----END PGP SIGNATURE-----
 
---Sig_/dSRl7syyRB8ezowbLxeXi_h--
+--Sig_/ekkCJEeper_uGN6t=zKTw2o--
 
