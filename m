@@ -1,87 +1,90 @@
-Return-Path: <netdev+bounces-177705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1E69A7158B
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 12:18:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A2E0A715A5
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 12:24:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4501178EFF
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 11:14:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AAB816FF17
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 11:24:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B4E1D8E01;
-	Wed, 26 Mar 2025 11:12:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6C4A1DC19D;
+	Wed, 26 Mar 2025 11:23:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kazc2gzS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fHyDTT3h"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6429C1D7E54;
-	Wed, 26 Mar 2025 11:11:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D83A15278E;
+	Wed, 26 Mar 2025 11:23:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742987520; cv=none; b=U2/jx6asl10t1bZasypDj/nJzpep8sm5lBv6RdXETrAj+6IMJ/XvLV59w+MRn+dNqRz4X2puRhks8wf1Geqb0S8OWPVGddpJzQzFKGmhUOqGZ4y4r+iJcJuENvNoEV4JuyRT0EdghHUJ9+ibbtPAIJCBRpPKPouydsCYP4xR4zU=
+	t=1742988229; cv=none; b=YEAGzb+uECaPlMy0okmm26hsV4v90Rg38UwjeDMjcqFA8Ajnzx7Tj9zMGg+V4wO1EmuYaxTcHncX3j66oCkIMDub4ZTLmy2v981rSc818x5Sz3wGgvt9P92+uYqk/Yf7EafktgT3m2ze9zmg5gfz6CgCE04e+xZnnov+lkLz6tU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742987520; c=relaxed/simple;
-	bh=6lQDo1/++4c07P+ppiti/8QbofnLGa9D66WvR/soQ2U=;
+	s=arc-20240116; t=1742988229; c=relaxed/simple;
+	bh=R4BP1NptH+VhMdTtTgYwlNby7+SvfPrG7xuFOaIwVAU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YW6Aq+Na5FRhc/YRBBdO8UOThZra9dAScHNOI5alc81mvfHWJpnolu88PZ8z/Mr6nMZ2hB3Y4kI87XtUFsZEIv+5mZCcMfc7xBLObfWMsy70lsNs9nRksD+xWf2OSbrdM1I7PPj4uLPsaP1ChjO/C3VEBf6WHsIiXy3/PpeEj1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kazc2gzS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B457C4CEE2;
-	Wed, 26 Mar 2025 11:11:59 +0000 (UTC)
+	 MIME-Version:Content-Type; b=BsR4O6xHecz3se9xm9+/b6Lkf+fZMohqh9xgyx5OphTvsSQbpTxApY7h+kWF28uNWHed0CENNmWAIO5DpTYHDX6H6YncGPWQXYkSJ+z6NzcisNz3GupdU6GjfVIy/6LhCumsYnuZb9I8BhJmvEGNduvdG4oM/F59K3RcNRh7jPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fHyDTT3h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 284B8C4CEE2;
+	Wed, 26 Mar 2025 11:23:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742987519;
-	bh=6lQDo1/++4c07P+ppiti/8QbofnLGa9D66WvR/soQ2U=;
+	s=k20201202; t=1742988229;
+	bh=R4BP1NptH+VhMdTtTgYwlNby7+SvfPrG7xuFOaIwVAU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Kazc2gzSVEB9R3GGAgma8lXuZrUCQ1K2PmcvD3yrOVBRv7MVOfdvl6gs+l4cZyAGm
-	 vWlzcbizjvG+IRk0QOuXBq+GpZGdFGmofqh6BgOT618G275mXl4Gb1wxo74+ZwY06c
-	 T0l9CQsaVe9dXlhwbqoP9Uggw0a8TUVnSt1pmyeF6yIsi2PPA3sE4P/QeUZ8YjrjEd
-	 hJyam2AQL+hovJb6FrTYTO+UVyXRRv6km2T8Drtpk9L7RMZk6Ibm2/LJVcKiOipeuI
-	 Np68xy5lje/Cy8WmHnSZr37pbrptKJsCH/nbyUPx7QBQxg6WNGiapuE3oDcPk2/RCp
-	 922z+UvD6lXyA==
-Date: Wed, 26 Mar 2025 04:11:58 -0700
+	b=fHyDTT3hVuxBqyIU4oEseOMTj+c0VSHxKcZed0NNYmA8OSwZEWAgc0czFUZrjfiIh
+	 7qgJWSXwRu1JFezkFTqyOMeCVvRlWfo3MOM2LQ6FZLD8kG9CMmdARLvg5K3HiM1EXM
+	 qH7tsj6QIkVsJjz2p9vc2e0qp2DD2cRUB7hv5mlr3HXcC9MIczwjX6a5ZdEajSspI/
+	 KFSrtIwBx9RWXPKmVhZhdGTvbN58YkxQg11qW01Osi4T970lrdfdXamK8IDzLIQCRU
+	 evjIsSfOL5Po/jcZAKEqGd61AINteKB77XKZIxImWA2MlHI7tu66UeQ/5jW94bRPIN
+	 IPovHEz+vMqWw==
+Date: Wed, 26 Mar 2025 04:23:47 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Ahmed Naseef <naseefkm@gmail.com>
-Cc: asmadeus@codewreck.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- dominique.martinet@atmark-techno.com, edumazet@google.com,
- linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
- netdev@vger.kernel.org, oneukum@suse.com, pabeni@redhat.com
-Subject: Re: [PATCH] net: usb: usbnet: restore usb%d name exception for
- local mac addresses
-Message-ID: <20250326041158.630cfdf7@kernel.org>
-In-Reply-To: <20250326072726.1138-1-naseefkm@gmail.com>
-References: <20241203130457.904325-1-asmadeus@codewreck.org>
-	<20250326072726.1138-1-naseefkm@gmail.com>
+To: Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
+ <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Simon
+ Horman <horms@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Mina
+ Almasry <almasrymina@google.com>, Yonglong Liu <liuyonglong@huawei.com>,
+ Yunsheng Lin <linyunsheng@huawei.com>, Pavel Begunkov
+ <asml.silence@gmail.com>, Matthew Wilcox <willy@infradead.org>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-mm@kvack.org
+Subject: Re: [PATCH net-next v2 2/3] page_pool: Turn dma_sync and
+ dma_sync_cpu fields into a bitmap
+Message-ID: <20250326042347.279f23a8@kernel.org>
+In-Reply-To: <87cye4qkgd.fsf@toke.dk>
+References: <20250325-page-pool-track-dma-v2-0-113ebc1946f3@redhat.com>
+	<20250325-page-pool-track-dma-v2-2-113ebc1946f3@redhat.com>
+	<20250325151743.7ae425c3@kernel.org>
+	<87cye4qkgd.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 26 Mar 2025 11:27:26 +0400 Ahmed Naseef wrote:
-> Hello,  
-> 
-> I have tested this patch and can confirm that it works as expected with at least three models
-> of Quectel LTE modems.  
-> 
-> 
-> Tested-by: Ahmed Naseef <naseefkm@gmail.com> 
-> 
-> This issue affects many users of OpenWrt, where USB LTE modems are widely used. The device
-> name change has caused significant inconvenience, and as a result, this patch has already been
-> accepted in OpenWrt:
-> 
-> https://github.com/openwrt/openwrt/commit/ecd609f509f29ed1f75db5c7a623f359c64efb72  
-> 
-> Restoring the previous naming convention at the kernel level would greatly help in maintaining 
-> consistency and avoiding unnecessary workarounds in userspace which is not straightforward in openwrt.  
-> 
-> I hope this feedback helps in reconsidering the patch for mainline inclusion.  
+On Wed, 26 Mar 2025 09:12:34 +0100 Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+> > I don't see why we'd need to wipe them atomically.
+> > In fact I don't see why we're touching dma_sync_cpu, at all,
+> > it's driver-facing and the driver is gone in the problematic
+> > scenario. =20
+>=20
+> No you're right, but it felt weird to change just one of them, so
+> figured I'd go with both. But keeping them both as bool, and just making
+> dma_sync a full-width bool works, so I'll respin with that and leave
+> dma_sync_cpu as-is.
 
-It needs to be reposted to be reconsidered, FWIW
+Opinion on dma_sync_cpu clearing probably depends on mental model.
+No strong feelings but perhaps add a comment next to clearing it
+for the likes of myself saying that this technically shouldn't be
+needed as we only expect drivers to ask for CPU sync?
 
