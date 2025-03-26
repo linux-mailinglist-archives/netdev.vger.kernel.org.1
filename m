@@ -1,398 +1,222 @@
-Return-Path: <netdev+bounces-177751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BCD7A71958
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 15:50:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54256A7195C
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 15:51:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EEED188816B
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 14:46:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DF1417CD75
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 14:46:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2433A1F3BB4;
-	Wed, 26 Mar 2025 14:43:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E53181F2B8B;
+	Wed, 26 Mar 2025 14:45:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z8bo8WTs"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="kW1KVBOD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2085.outbound.protection.outlook.com [40.107.236.85])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F3E1C8638;
-	Wed, 26 Mar 2025 14:43:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743000234; cv=none; b=llY5esKZFNBIQMZQkJ00eFVH8HqkzWrqqlymGEbejlNazEIPM6/nBZCBVt9TiW3mJcItQZ+Bu6CI9CWJL8Lf5eyOxTVwOK3H6wpms6FsW3bFe59Evxmohycg6povo9q9qFGydfxHePOxZtGfE4M/YFTqbC1QIpskcAa3euzGIQA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743000234; c=relaxed/simple;
-	bh=zmNAXLfX6vVFsk7XoTaqoPPNY5mUL6YQzWOpahaYtoY=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u/ql2aNvzZZzTZlPLr1GYyamTEk5/XG+NJichM8VTuzmf5tLi4if3zeAerRowhI+UdaZNHYSri2XMRSBV8ZiXg+74BMkcDWSyUIa8+QfJRaoBnCSTalIVugxAcTQ8L97mp3hUNMwfnCvgP1Nzpc1frMsP3k3rdgYzUp/15NgrJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z8bo8WTs; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43cf034d4abso74057055e9.3;
-        Wed, 26 Mar 2025 07:43:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743000230; x=1743605030; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=USItuzRjyecBcYCWayksYYu+SxE+tLbi7zXzaoAOh/w=;
-        b=Z8bo8WTsEub33HOgE9xIKdKqFfoz8BTrNBZ1gdWT2l0m2ZEFw2kzHLLj6cN4Chcwl5
-         opF1SNJywjUI7BK7LXK0iDadv098s3hUK9AGGxGzKfj0FCFXG+NrIt69kNQRDII9GkCe
-         ShhFO4wa41twryBp9/xpSX3i061fzdjtoiu408NLGBwk8wV20kNYzU+5aY+1tu1hgFik
-         6oCrS8fvbF7RhZedxtl3w+mfg4A1HSpYhAZBRUgNTb+cQif3y7+0awpHEAks552FBzYB
-         F7d/jMMlza2iiQAr3qEZI/Ga18Awnnc5MIkvzYd3UcCflLGQyNNRGFRWZFeQ+J/3TaMi
-         MhxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743000230; x=1743605030;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=USItuzRjyecBcYCWayksYYu+SxE+tLbi7zXzaoAOh/w=;
-        b=RCetNnNGL0awDcOq/Imc0XW5jqcLznPQgENhCJ0VyYS/RO6gZBTPfpV9Kv75NYw+Mi
-         oVlSMaDw9hWAVugpehKf81BSwwEHMKXnA621H8Zhsi9NkH8YAcYQeU0OAxgycLkQXhND
-         RlhOCha/j1HKlZJTr60ZvjNIfrNhYDmmkGnjjkmQUwi+Cu0/SIDVI4C5pzGfKHXHY+mC
-         z+b1NK8NzQJVTBsm94DySl11TC9/VyJHl7LtjRXW3He1E4myeY612h6FZskbLChwSeOg
-         ICwCUEqFyN3+nvgtNdSgGDArEqmciQo7prgkE99BKlB+DB1fjxpypN/XaSyMug4Jfubn
-         MThA==
-X-Forwarded-Encrypted: i=1; AJvYcCV7ZldHr2oEf5Bt6Dk+azC3Cm5pR7UphOmET4IGJ1ScUv+mUWuH7wlPdjlDry131vjjbc5JD6hjiKJD@vger.kernel.org, AJvYcCWWluzUl2dcFS/VgngTtnUbg6eDzjKGNXk2rldyJuDvgp+d4Jhw9KgrX9YU1G+pmf/2LMqOkCn3@vger.kernel.org, AJvYcCWb8rqBnFoOMesNwrcmVLyLDGLgBdSHErJdovbbMZJ1j3u0Wzot1TS0/+gVXfA3i5g/SlXWQ0RtAWuVk7wV@vger.kernel.org
-X-Gm-Message-State: AOJu0YwyBAFIkKNxW4y5+uFmLJuSwv3b9lZqKKIX9Mht5EFiDSvGNDre
-	yK7JoexWOUhjcoPuEjpyLnwtk7XTCncyHGWsSaeh+r3TqdJznuXP
-X-Gm-Gg: ASbGncsMAVgrBNlzBCd4Yars+yrLgQezsscPm/TIztfaxhYjxqOjM9zKX39pAGUQ93F
-	pVHwH4Z3iDlSonXf3Ts7Lyw/AWgBEq8LZ6enuQEjyb56B8pevGWZ7wiaa1H4pu6w/m9CjEiWhxF
-	WRZi0kMqcHOByY9LhiFrh/awdxVmEmGwmTdKjOXolEDAVUj53Q2x/MND3iwEbI3xGet1zl0WQAg
-	Moj3XUqU03jkFJKBNLPnwZ8dsn8oh5l2xgN5eWv+DgTd6mLmMIwvhkUxO6g6geDeaxk1RHNdVph
-	hw3v6VtHqP0uzUAYPAQuoGm3fxPqlYc8CeMEK8an3coB6V0wpF25tdkpo/wfMhQJhfmIqmsMeTh
-	D
-X-Google-Smtp-Source: AGHT+IGgQjiWwnslMbixM5W6CdmGHIHnGkcbMW6OXVIG50+MsdgfOlxgH8XfA0a7K/5sg5QteBR6BA==
-X-Received: by 2002:a05:600c:b8d:b0:43b:ce08:c382 with SMTP id 5b1f17b1804b1-43d509f6797mr218781205e9.16.1743000229859;
-        Wed, 26 Mar 2025 07:43:49 -0700 (PDT)
-Received: from Ansuel-XPS. (93-34-88-225.ip49.fastwebnet.it. [93.34.88.225])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3997f9e65casm17264289f8f.69.2025.03.26.07.43.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Mar 2025 07:43:49 -0700 (PDT)
-Message-ID: <67e412a5.5d0a0220.28146a.e91b@mx.google.com>
-X-Google-Original-Message-ID: <Z-QSo-xfudg0LPCE@Ansuel-XPS.>
-Date: Wed, 26 Mar 2025 15:43:47 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next RFC PATCH v2 2/3] net: phy: Add support for Aeonsemi
- AS21xxx PHYs
-References: <20250326002404.25530-1-ansuelsmth@gmail.com>
- <20250326002404.25530-3-ansuelsmth@gmail.com>
- <Z-QG4w425UuYXZOX@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB7E1D95B4;
+	Wed, 26 Mar 2025 14:45:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.85
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743000343; cv=fail; b=UeNg/BTT1XtmDehSxjvWj0xcaJWru5NP5YwN40NFd1Fw1Yl49/h6ihHVgg1bq+lnvo46ETlvpvpEqgWXRbfBYTRyG6c3UD5Cka3G2YfoLmOHFnCocJvRsOkAYd6sg7Gsc4uzrCT0KPdprIQN7WOeBC1OkIdHYxTlTD9z4MDQAyY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743000343; c=relaxed/simple;
+	bh=X58NOOsrV2wQEkH8JtCXE6hIK2Y/mQ4l7FHfixNuXtU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=sa+o9rtE9AUndM+tmHEYJ6QSdHoJFtfsthkTl+bazdrHc4RuDNpCqtKN+jf0s8cpKdv/zAOWzJF78K9B9l5x3hvJ/ikHyr7dAYpcvn8EB7YjPd0sNXZGKQnHg+Zu7UvXduz0cLI8hygAr9RCE3TAxO55C8uYxr6S7wI2uVlWTg4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=kW1KVBOD; arc=fail smtp.client-ip=40.107.236.85
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=dzimlUTbob/T+d6v56JDbdJ6nvQm/KSk0JH35PqbeOJyg2DxOLoFxIngfUyD7QqZFF0D/mdSFRBz7vL0lAj6R3oEWrboPXIyKVvU7xhdz3vp7OJemB3lm2qaruQkGeS9CrHP0JiS6Nldil5vUwWU3aKI4nXER0KkUYfeu3s7nhk4xHwbr1VshHPX/WCINrUPTVT6k+yLpvzR+u3PhgJUSJXEHm9hs4/CYquyVCUU/TMMU7ez/L5IWh9rOrarhgHZP4Hh5f2RVSU2+ffK+nBRokWY+zu1nugn+ylA2nLfiKTcIvV9IvBSlPhCq4cvwSA+yqOCEtWCswG3/v9tCOralQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=v4ZEPLT8lU7M9j6fbmzCNc5t4nz2zz0yFQl8+NGGgYE=;
+ b=Cdibptqz2Xv4htbw15S5frBdXJDGq33FnBnuYKqfhVqLxOsAt2d4OmssQ9e+EElbji4upHHx2gstDe2Q3zptoVgPssUvWxYf4GLZQq9/R+H0bE/KLCLO7WPPqXktoSwboNtn3OrVMfGRAb3l0M6QN96n6fMCyfl2nYxFK7Ee/4rIO5ZV/2szQo6PcoiZ2BOYWxZCVdYHVtnKFljL8/kQo+hx3NtjA7ZQb+IcmLoN9oeqNvpTa2kqe+AYps6TywTo8kh+w2FwE3Lco35kwvJpR4rz6XnOTKgUVdTTiqhgVdqhDMblsvar59dWicPyTajWKIROtrwKWqe5SAmOYPWzFg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=v4ZEPLT8lU7M9j6fbmzCNc5t4nz2zz0yFQl8+NGGgYE=;
+ b=kW1KVBODCniCUG3jZhNiL1Hm72w3R3pKFOsixOoDvx6nlUWpuMQ9MaVzzgaogC+FVCI5+uWqccU4C7RM8U+ufqeORKo2usnImcpdLuOZFVc33T8uRPRzUlANLe3hhZAupUQGiFdIH9jV4rpOxeAtkx6a8uyB5QQ5dvYe9AAPg615gJM9+c1ZMP1KC9Dqb5A4PZdIECGK7Hnmc9svc/pEfFvXT+LoTslcGySOjpQpi7xh1ZRadzPOfuxEemn0wQJfuzR1/BQ1XyZGTiq3H+OUTbpa/2XiNGY5yyv1tecy8PLG5M96m2vZ6wgWBEP2QDzRGA2h+1zCLPEef1ervVGr7Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by SA3PR12MB8023.namprd12.prod.outlook.com (2603:10b6:806:320::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.42; Wed, 26 Mar
+ 2025 14:45:38 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.8534.042; Wed, 26 Mar 2025
+ 14:45:37 +0000
+Date: Wed, 26 Mar 2025 11:45:35 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Sean Hefty <shefty@nvidia.com>
+Cc: Bernard Metzler <BMT@zurich.ibm.com>,
+	Roland Dreier <roland@enfabrica.net>,
+	Nikolay Aleksandrov <nikolay@enfabrica.net>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"shrijeet@enfabrica.net" <shrijeet@enfabrica.net>,
+	"alex.badea@keysight.com" <alex.badea@keysight.com>,
+	"eric.davis@broadcom.com" <eric.davis@broadcom.com>,
+	"rip.sohan@amd.com" <rip.sohan@amd.com>,
+	"dsahern@kernel.org" <dsahern@kernel.org>,
+	"winston.liu@keysight.com" <winston.liu@keysight.com>,
+	"dan.mihailescu@keysight.com" <dan.mihailescu@keysight.com>,
+	Kamal Heib <kheib@redhat.com>,
+	"parth.v.parikh@keysight.com" <parth.v.parikh@keysight.com>,
+	Dave Miller <davem@redhat.com>,
+	"ian.ziemba@hpe.com" <ian.ziemba@hpe.com>,
+	"andrew.tauferner@cornelisnetworks.com" <andrew.tauferner@cornelisnetworks.com>,
+	"welch@hpe.com" <welch@hpe.com>,
+	"rakhahari.bhunia@keysight.com" <rakhahari.bhunia@keysight.com>,
+	"kingshuk.mandal@keysight.com" <kingshuk.mandal@keysight.com>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [RFC PATCH 00/13] Ultra Ethernet driver introduction
+Message-ID: <Z+QTD7ihtQSYI0bl@nvidia.com>
+References: <20250306230203.1550314-1-nikolay@enfabrica.net>
+ <20250319164802.GA116657@nvidia.com>
+ <CALgUMKhB7nZkU0RtJJRtcHFm2YVmahUPCQv2XpTwZw=PaaiNHg@mail.gmail.com>
+ <DM6PR12MB4313D576318921D47B3C61B5BDA42@DM6PR12MB4313.namprd12.prod.outlook.com>
+ <BN8PR15MB25131FB51A63577B5795614399A72@BN8PR15MB2513.namprd15.prod.outlook.com>
+ <DM6PR12MB431329322A0C0CCB7D5F85E6BDA72@DM6PR12MB4313.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM6PR12MB431329322A0C0CCB7D5F85E6BDA72@DM6PR12MB4313.namprd12.prod.outlook.com>
+X-ClientProxiedBy: BN9PR03CA0843.namprd03.prod.outlook.com
+ (2603:10b6:408:13d::8) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z-QG4w425UuYXZOX@shell.armlinux.org.uk>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|SA3PR12MB8023:EE_
+X-MS-Office365-Filtering-Correlation-Id: c7cacf9a-ba73-4dc5-1a8b-08dd6c74df36
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?qubxsUzns3MilOCFTMlElLUg5JG7XeUf2YQNLVV9YyovwYglQ3T0ZhBTsgOI?=
+ =?us-ascii?Q?AmqCwgDJNmHD189KYy38L+3g/KlkY+uSq1t8UITISyvWrmRcvfc6HhvhD8ka?=
+ =?us-ascii?Q?y5GWV3ULM0LoMc73yY7Yua1egzEGHeDngzzBHk11VrPl8c/WLGB+APAPNuC5?=
+ =?us-ascii?Q?LFmVTcJAZ+fSD62KAICUKSpckv6QXdvdF+52D8kfCLgme5UTAJwFl2u8BScQ?=
+ =?us-ascii?Q?BHI1FBKEE+tpcIe9mEMLfVPDABmD1qWW9TJpoHX9BXgO8un5ZaJrFwY3VBP0?=
+ =?us-ascii?Q?6IYvYe1b7SH0r47APs1SohLwWIPReaWE7jFdGGwG8sfk5+9NPt4C+6AJTp/n?=
+ =?us-ascii?Q?sWEG2B0YQXnRSs1eZ32DtbLJQn8oXL6HIXKpm85K9v7KNR4zeWUGpFKPaFYs?=
+ =?us-ascii?Q?7MvxDbEiOj82q0Emi7GuEJxwL616BUZ8xB1ddLeudD4YtgVVmy0e09WCpVVU?=
+ =?us-ascii?Q?g3DO4FYtzJGSMK1OJn1ggWA86kOZhmLMTWKj8DtO55a/SeqREBrzHh01FX9d?=
+ =?us-ascii?Q?H5bQoG/2pIWe/K59TBKastGjlsnegKDc7MSCC26Y6+qvuL71tixU6vs51nJI?=
+ =?us-ascii?Q?ijfhHJp7QIWsr1tB+1TObtEoZ7qJSQirXeGiGms2K9UY7uQR9YypAWh6bn4E?=
+ =?us-ascii?Q?ZydLS7GsIkXoixu4zSL4pgd+RxqLU/q6Zw4tA1vMfvp+lwh0v5rhdkuvA78b?=
+ =?us-ascii?Q?MUjTUsnxvNm0ThMsnEfMGlcK3Kz4ssTbMtxPeOIhHJJ1Kk2+sLb4j5/jH0Zr?=
+ =?us-ascii?Q?W8d/WRuehyyqsnkckCbfDFSianZuj+HZijhklfrG/FxhI5qajDiEqC7D7QB6?=
+ =?us-ascii?Q?1lMDqL8JoTZzyCrfXNisXvSGIJe5htK8Q4fgzD2lm/INMAaquHmOTvsS1brg?=
+ =?us-ascii?Q?ljBTmDp+j+6duFOWK4C7ythCAknpqd5VESzyhKnuWcjuzFIJgDo5j65kjTK4?=
+ =?us-ascii?Q?J4P/1aGkqXTxa+U6aTzYaC4hYTNpKbkTE6mTfrGHudevc0YQN5i2YT1L+S7T?=
+ =?us-ascii?Q?H54tD93pbhZ7cwMFCDVAhdrhr0ZKTmoQtiVB42MchiS5hDf5JGizDbMqefFy?=
+ =?us-ascii?Q?yoAOuZ1cg7o2WaqtjtYHAISBEvAEwQtQXBKlYjOX8tAVVGSBPGT+8j6QFvNR?=
+ =?us-ascii?Q?17D9mzLKbpshx9tS4qBcJjlWGEjgVLa+mBMaPY7mVHmt0z/eP09+dm7HIHyM?=
+ =?us-ascii?Q?Kxpj5/xkn1fUzMfXKR0ZyyyZro2FU6lrTWSQHFWpVwZ1Gq+QnZhtMVmIzl+j?=
+ =?us-ascii?Q?TvKtdRfCJ/GXji0RPJFzEureuschV9Ir4+ZejynegZw1up1nUL1ji2j/3f/a?=
+ =?us-ascii?Q?pvmPVsF+tGG9UUHNMiKVrHAeEyI+5gWQ0xiFJLQnGsSTLwHFTisBTiknhnRp?=
+ =?us-ascii?Q?tQBZPNf8YED1X5R5Ug/0eUPBR091?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?QKdSkdmZAtheqT94raZbFfob649CzNDess0C3oyeS1o14QuFwOcGyGWP6f/I?=
+ =?us-ascii?Q?nQZJbRwC19kqXqd7IVfI4FEsUCNi5nd2wRfM8v3rJWVse/hvB66A+CY1c/Rj?=
+ =?us-ascii?Q?BYLVj3s+8aTUcAWb7k0+34ISXIIeZkgDB5sc+aAcuR85Mf4rcvuSFMwyUbbt?=
+ =?us-ascii?Q?uSvpGTMPwI0vzQmsuWnL2xUSTcUrf9yMoUWnWJW+Im0MiU2ZAPbQd7mSUiZp?=
+ =?us-ascii?Q?kVyZAPPubivY+gClqsNe03yWk/a5Tidz0oeEfAvPWJswRhhR01qK2pqTgiG5?=
+ =?us-ascii?Q?2hs/mT5mKEaFWoe4Os61y6TurEXWb069Tg4c6rI2I8MEUlIK8UqAjfxCiPTe?=
+ =?us-ascii?Q?US6jilHuXXnjGqqq4goONlhEN4HQ0eBgA9kMvDHAdpVXcVovP37B73x3lyKV?=
+ =?us-ascii?Q?LIDN4R3LI2Bideqf5Z/c8ulrfe843jgmLvah2+fEmrTseXjAAKCFkk5FFjou?=
+ =?us-ascii?Q?56dChEmcOlkdMMi5VbpCuHLVfTrRCNUyC1SYJobxWcONkogyFtqKU8MXNIuL?=
+ =?us-ascii?Q?e9IOX0iiq0MQhMecgAPPMt7X/0FHc0s4P9mzttcmX3zcxYfvDJfFE4Cc+i0t?=
+ =?us-ascii?Q?Q/FUTZBFROrBdd+IAY/EnDzgNzl7BYQDDkMNJUMMoTPukLcBA472yEcPHjIs?=
+ =?us-ascii?Q?i74oOFWOIgJn8j9d+quB3jkELOmB9rgdBkt3uzvz3kCa7AruQFPxa3YLQN60?=
+ =?us-ascii?Q?jZUF6R1WS1RR3KSQpAgHCIKRp+anppIgHl+UYmoIlNJNuzVsdKlK4my2lVcn?=
+ =?us-ascii?Q?+f9BMOWtbyMkw3b4XuRjhDkbXKAEFkU7UdV9wPdsbk2gtA5+Ek/e9DGfXjDC?=
+ =?us-ascii?Q?h/9xQEHGGkKRmIZgHPeLr8daUC0GKanw/ERfeoQBdHgVa8es657Vzd3FJGJH?=
+ =?us-ascii?Q?nD+geSw6pHzg3fnlOwGrxg5b0Z4NQE7TExnqXPFQwSoFJ1XeFuH96u0dTlfi?=
+ =?us-ascii?Q?t+5PxKV6PcVOmSC5mjrxCACu4MD0jcqu6YrIExAj+3fzIJsoEbai8MVb/8yd?=
+ =?us-ascii?Q?aXo0IlEK+UGAgyVtJqIJxTceFd3PJs6z6GJUF8T3gQCvkrfsdo4x54hMaj6t?=
+ =?us-ascii?Q?adQam60+XEhKIXjZ9r76NbrwfMA/OsgJMAUiDcA1y9kumS0yby3QY1Pz8QaW?=
+ =?us-ascii?Q?l0WdBv5Lm90b+9tGqlu1Plqc/Tug91XnhFW0nFCFSBdcyO5/080vgdHra+Sv?=
+ =?us-ascii?Q?JL0b6sGIcVWDMooTTtIe+BzgCxQMuOsftZLj2FnpohnEwd6pAzoJUvAShHy3?=
+ =?us-ascii?Q?xM0BtpST3a+4nHLCX6eBYgUffaVz+4U3xCClmja5PRIWDGpjD6fOxiQApDQP?=
+ =?us-ascii?Q?xy1MaM+L8lwfYPes+ysYuqoOBie80Qoc3O0XOO4FCyzhGRVfUIwzrPqG6K70?=
+ =?us-ascii?Q?MmlqFaXLMThgwpSuGAOKHFjXHgEzLKbxbmdjU8xIbjJZQ3MVgmfSKv+9t1Fc?=
+ =?us-ascii?Q?xxTnL7nePSHZYgwLc5oDlrCXwAt9npmQVx5q8D4+V/u1CXsMMw5YUqQ9wD0H?=
+ =?us-ascii?Q?V1TH4lAFZKyDL6WMnqHsr40dMmEGHVFL44sTbBvuKRBlQ4ONdB4JZbMqCwu4?=
+ =?us-ascii?Q?dTcx6qK2NytBemJwIko=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c7cacf9a-ba73-4dc5-1a8b-08dd6c74df36
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Mar 2025 14:45:37.6155
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +xi+kDeStcKbxFo3EouwdNaoG7FRq+99hLJgRut2fwe40A94aakerP7qZvWeX3tu
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB8023
 
-On Wed, Mar 26, 2025 at 01:53:39PM +0000, Russell King (Oracle) wrote:
-> On Wed, Mar 26, 2025 at 01:23:58AM +0100, Christian Marangi wrote:
-> > +static int aeon_ipc_send_cmd(struct phy_device *phydev, u32 cmd,
-> > +			     u16 *ret_sts)
-> > +{
-> > +	struct as21xxx_priv *priv = phydev->priv;
-> > +	bool curr_parity;
-> > +	int ret;
-> > +
-> > +	/* The IPC sync by using a single parity bit.
-> > +	 * Each CMD have alternately this bit set or clear
-> > +	 * to understand correct flow and packet order.
-> > +	 */
-> > +	curr_parity = priv->parity_status;
-> > +	if (priv->parity_status)
-> > +		cmd |= AEON_IPC_CMD_PARITY;
-> > +
-> > +	/* Always update parity for next packet */
-> > +	priv->parity_status = !priv->parity_status;
-> > +
-> > +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_IPC_CMD, cmd);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	/* Wait for packet to be processed */
-> > +	usleep_range(AEON_IPC_DELAY, AEON_IPC_DELAY + 5000);
-> > +
-> > +	/* With no ret_sts, ignore waiting for packet completion
-> > +	 * (ipc parity bit sync)
-> > +	 */
-> > +	if (!ret_sts)
-> > +		return 0;
-> > +
-> > +	ret = aeon_ipcs_wait_cmd(phydev, curr_parity);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = phy_read_mmd(phydev, MDIO_MMD_VEND1, VEND1_IPC_STS);
-> > +	if (ret < 0)
-> > +		return ret;
-> > +
-> > +	*ret_sts = ret;
-> > +	if ((*ret_sts & AEON_IPC_STS_STATUS) != AEON_IPC_STS_STATUS_SUCCESS)
-> > +		return -EFAULT;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int aeon_ipc_send_msg(struct phy_device *phydev, u16 opcode,
-> > +			     u16 *data, unsigned int data_len, u16 *ret_sts)
-> > +{
-> > +	struct as21xxx_priv *priv = phydev->priv;
-> > +	u32 cmd;
-> > +	int ret;
-> > +	int i;
-> > +
-> > +	/* IPC have a max of 8 register to transfer data,
-> > +	 * make sure we never exceed this.
-> > +	 */
-> > +	if (data_len > AEON_IPC_DATA_MAX)
-> > +		return -EINVAL;
-> > +
-> > +	mutex_lock(&priv->ipc_lock);
-> > +
-> > +	for (i = 0; i < data_len / sizeof(u16); i++)
-> > +		phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_IPC_DATA(i),
-> > +			      data[i]);
-> > +
-> > +	cmd = FIELD_PREP(AEON_IPC_CMD_SIZE, data_len) |
-> > +	      FIELD_PREP(AEON_IPC_CMD_OPCODE, opcode);
-> > +	ret = aeon_ipc_send_cmd(phydev, cmd, ret_sts);
-> > +	if (ret)
-> > +		phydev_err(phydev, "failed to send ipc msg for %x: %d\n", opcode, ret);
-> > +
-> > +	mutex_unlock(&priv->ipc_lock);
-> > +
-> > +	return ret;
-> > +}
-> > +
-> > +static int aeon_ipc_rcv_msg(struct phy_device *phydev, u16 ret_sts,
-> > +			    u16 *data)
-> > +{
-> > +	unsigned int size = FIELD_GET(AEON_IPC_STS_SIZE, ret_sts);
-> > +	struct as21xxx_priv *priv = phydev->priv;
-> > +	int ret;
-> > +	int i;
-> > +
-> > +	if ((ret_sts & AEON_IPC_STS_STATUS) == AEON_IPC_STS_STATUS_ERROR)
-> > +		return -EINVAL;
-> > +
-> > +	/* Prevent IPC from stack smashing the kernel */
-> > +	if (size > AEON_IPC_DATA_MAX)
-> > +		return -EINVAL;
-> > +
-> > +	mutex_lock(&priv->ipc_lock);
-> > +
-> > +	for (i = 0; i < DIV_ROUND_UP(size, sizeof(u16)); i++) {
-> > +		ret = phy_read_mmd(phydev, MDIO_MMD_VEND1, VEND1_IPC_DATA(i));
-> > +		if (ret < 0) {
-> > +			size = ret;
-> > +			goto out;
-> > +		}
-> > +
-> > +		data[i] = ret;
-> > +	}
-> > +
-> > +out:
-> > +	mutex_unlock(&priv->ipc_lock);
-> > +
-> > +	return size;
-> > +}
-> > +
-> > +/* Logic to sync parity bit with IPC.
-> > + * We send 2 NOP cmd with same partity and we wait for IPC
-> > + * to handle the packet only for the second one. This way
-> > + * we make sure we are sync for every next cmd.
-> > + */
-> > +static int aeon_ipc_sync_parity(struct phy_device *phydev)
-> > +{
-> > +	struct as21xxx_priv *priv = phydev->priv;
-> > +	u16 ret_sts;
-> > +	u32 cmd;
-> > +	int ret;
-> > +
-> > +	mutex_lock(&priv->ipc_lock);
-> > +
-> > +	/* Send NOP with no parity */
-> > +	cmd = FIELD_PREP(AEON_IPC_CMD_SIZE, 0) |
-> > +	      FIELD_PREP(AEON_IPC_CMD_OPCODE, IPC_CMD_NOOP);
-> > +	aeon_ipc_send_cmd(phydev, cmd, NULL);
-> > +
-> > +	/* Reset packet parity */
-> > +	priv->parity_status = false;
-> > +
-> > +	/* Send second NOP with no parity */
-> > +	ret = aeon_ipc_send_cmd(phydev, cmd, &ret_sts);
-> > +
-> > +	mutex_unlock(&priv->ipc_lock);
-> > +
-> > +	/* We expect to return -EFAULT */
-> > +	if (ret != -EFAULT)
-> > +		return ret;
-> > +
-> > +	if ((ret_sts & AEON_IPC_STS_STATUS) != AEON_IPC_STS_STATUS_READY)
-> > +		return -EINVAL;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int aeon_ipc_get_fw_version(struct phy_device *phydev)
-> > +{
-> > +	u16 ret_data[8], data[1];
-> > +	u16 ret_sts;
-> > +	int ret;
-> > +
-> > +	data[0] = IPC_INFO_VERSION;
-> > +	ret = aeon_ipc_send_msg(phydev, IPC_CMD_INFO, data, sizeof(data),
-> > +				&ret_sts);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = aeon_ipc_rcv_msg(phydev, ret_sts, ret_data);
-> > +	if (ret < 0)
-> > +		return ret;
-> > +
-> > +	phydev_info(phydev, "Firmware Version: %s\n", (char *)ret_data);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int aeon_dpc_ra_enable(struct phy_device *phydev)
-> > +{
-> > +	u16 data[2];
-> > +	u16 ret_sts;
-> > +
-> > +	data[0] = IPC_CFG_PARAM_DIRECT;
-> > +	data[1] = IPC_CFG_PARAM_DIRECT_DPC_RA;
-> > +
-> > +	return aeon_ipc_send_msg(phydev, IPC_CMD_CFG_PARAM, data,
-> > +				 sizeof(data), &ret_sts);
-> > +}
-> > +
-> > +static int as21xxx_probe(struct phy_device *phydev)
-> > +{
-> > +	struct as21xxx_priv *priv;
-> > +	int ret;
-> > +
-> > +	priv = devm_kzalloc(&phydev->mdio.dev,
-> > +			    sizeof(*priv), GFP_KERNEL);
-> > +	if (!priv)
-> > +		return -ENOMEM;
-> > +	phydev->priv = priv;
-> > +
-> > +	ret = devm_mutex_init(&phydev->mdio.dev,
-> > +			      &priv->ipc_lock);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = aeon_firmware_load(phydev);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = aeon_ipc_sync_parity(phydev);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND1, VEND1_PTP_CLK,
-> > +			       VEND1_PTP_CLK_EN);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = aeon_dpc_ra_enable(phydev);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = aeon_ipc_get_fw_version(phydev);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	phydev->needs_reregister = true;
-> > +
-> > +	return 0;
-> > +}
+On Tue, Mar 25, 2025 at 05:02:37PM +0000, Sean Hefty wrote:
+> > > I view a job as scoped by a network address, versus a system global object.
+> > > So, I was looking at a per device scope, though I guess a per port
+> > > (similar to a pkey) is also possible.  My reasoning was that a device
+> > > _may_ need to allocate some per job resource.  Per device job objects
+> > > could be configured to have the same 'job address', for an indirect association.
+> > >
+> > 
+> > If I understand UEC's job semantics correctly, then the local scope of a job may
+> > span multiple local ports from multiple local devices.
+> > It would of course translate into device specific reservations.
 > 
-> This probe function allocates devres resources that wil lbe freed when
-> it returns through the unbinding in patch 1. This is a recipe for
-> confusion - struct as21xxx_priv must never be used from any of the
-> "real" driver.
+> Agreed.  I should have said job id/address has a network address
+> scope.  For example, job 3 at 10.0.0.1 _may_ be a different logical
+> job than job 3 at 10.0.0.2.  Or they could also belong to the same
+> logical job.  Or the same logical job may use different job id
+> values for different network addresses.
 > 
-> I would suggest:
-> 
-> 1. document that devres resources will not be preserved when
->    phydev->needs_reregister is set true.
-> 
-> 2. rename struct as21xxx_priv to struct as21xxx_fw_load_priv to make
->    it clear that it's for firmware loading.
-> 
-> 3. use a prefix that uniquely identifies those functions that can only
->    be called with this structure populated.
-> 
-> 4. set phydev->priv to NULL at the end of this probe function to ensure
->    no one dereferences the free'd pointer in a "real" driver, which
->    could lead to use-after-free errors.
-> 
-> In summary, I really don't like this approach - it feels too much of a
-> hack, _and_ introduces the potential for drivers that makes use of this
-> to get stuff really very wrong. In my opinion that's not a model that
-> we should add to the kernel.
-> 
-> I'll say again - why can't the PHY firmware be loaded by board firmware.
-> You've been silent on my feedback on this point. Given that you're
-> ignoring me... for this patch series...
-> 
-> Hard NAK.
-> 
-> until you start responding to my review comments.
->
+> A device-centric model is more aligned with the RDMA stack.  IMO,
+> higher-level SW would then be responsible for configuring and
+> managing the logical job.  For example, maybe it needs to assign and
+> configure non-RDMA resources as well.  For that reason, I would push
+> the logical job management outside the kernel subsystem.
 
-No I wasn't ignoring you, the description in v1 for this was very
-generic and confusing so the idea was to post a real implementation so
-we could discuss on the code in practice... My comments were done before
-checking how phy_registration worked so they were only ideas (the
-implementation changed a lot from what was my idea) Sorry if I gave this
-impression while I was answering only to Andrew...
+Like I said already, I think Job needs to be a first class RDMA object
+that is used by all transports that have job semantics.
 
-The problem of PHY firmware loaded by board firmware is that we
-introduce lots of assumption on the table. Also doesn't that goes
-against the idea that the kernel should not assume stuff set by the
-bootloader (if they can be reset and are not part of the core system?)
+I expect variation here, UEC made it's choices for how the job headers
+are stacked on the wire and I forsee that other protocols will make
+different choices.
 
-From what I'm seeing on devices that have this, SPI is never mounted and
-bootloader doesn't provide support for this and the thing is loaded only
-by the OS in a crap way.
+Jobs may have other data like addresses and encryption keys to define
+what packets are part of the job on the network.
 
-Also the PHY doesn't keep the FW with an hardware reset and permit the
-kernel to load an updated (probably fixed) firmware is only beneficial.
-(there is plan to upstream firmware to linux-firmware)
+So the specific scope of the job may change based on the protocol.
 
-I agree that the approach of declaring a "generic" PHY entry and "abuse"
-the probe function is an HACK, but I also feel using match_phy_device
-doesn't solve the problem.
+The act of creating a job is really creating a global security object
+with some protocol specific properties and must come with a sane
+security model to both restrict creation and restrict consuming the
+job security object. I favour FD passing for the latter and file
+system ACLs for the former.
 
-Correct me if I'm wrong but match_phy_device will only give true or
-false, it won't solve the problem of the PHY changing after the FW is
-loaded.
-
-This current approach permit to provide to the user the exact new OPs of
-the PHY detected after FW is loaded.
-
-Is it really that bad to introduce the idea that a PHY family require
-some initial tuneup before it can correctly identified?
-
--- 
-	Ansuel
+Jason
 
