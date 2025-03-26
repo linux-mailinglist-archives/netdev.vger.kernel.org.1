@@ -1,102 +1,104 @@
-Return-Path: <netdev+bounces-177647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2146A70DD7
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 00:57:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84953A70E17
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 01:16:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73A2E177FDE
-	for <lists+netdev@lfdr.de>; Tue, 25 Mar 2025 23:57:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B55147A234C
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 00:15:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C42F26A084;
-	Tue, 25 Mar 2025 23:57:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07BF328E8;
+	Wed, 26 Mar 2025 00:11:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="j3i+yTRJ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="MVc27JQa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OWjbrOoI"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C1EC19067C;
-	Tue, 25 Mar 2025 23:57:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C50046BF;
+	Wed, 26 Mar 2025 00:11:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742947053; cv=none; b=GOXQcBli8SKxUEKaAujwtudC6n1rTSFIAhX2Vr4+B1N0V0oZE7NiXtkBZfbkuapozKu421ae0J9I7JW4V5yTFIUtLBKQxaYWsgBrd4l6++YznczO5Q5m7J15HuLk8j3wTibmL3zB42Wy3nM9B4AFDR6y6F2CHnbw8vwCMfXAbHs=
+	t=1742947914; cv=none; b=BIE9i47+f94Qr7K2cOuz1zctz1EU71zBocf1qqIKsqgXxSwfiha6arIjKoZoyGQcQRpl8deHC1bAUfri8BvHJObGBAj138KGsmGeU7rJDK9D7uXmQWi8DS4E4sJ2WfXhK01ozip81FQeW5qKau/UO8Q9cmyDqMO7WrmTEV4ARz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742947053; c=relaxed/simple;
-	bh=ulqDgHJi9xktfMH9rS+A6qVuAla4HJJ12RSIL32wVVU=;
+	s=arc-20240116; t=1742947914; c=relaxed/simple;
+	bh=Ds5elK0EiYSgBbG1o5wtpaJmT1vD/nl22PdcXN437WE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V1e9fffriTlbUtF6yahvYQntcEhiV0AO7pk9DoDzLb9EJ7QCYT1mF/NQw08VRZb8fu5CtGHk6SQtU25/WSaCtCpyY/hcWPj/vUGetaCfpcCx/8mw9/ojKqMgBB4lzUcwHZ81IkDkyigT469QjaqN+oDj2baDMBOj03JZbH8+ktE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=j3i+yTRJ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=MVc27JQa; arc=none smtp.client-ip=202.12.124.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
-Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id A0A012540103;
-	Tue, 25 Mar 2025 19:57:29 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Tue, 25 Mar 2025 19:57:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm2; t=1742947049; x=1743033449; bh=53epuMkGW7
-	VVw4kHXV3f2OBjzCS034p7lIo4scoUYY4=; b=j3i+yTRJqHHE3+spz2ow3pS9QO
-	c8D7CXpevtAimcUH1unY8ZecbCsNzuAj6IHCZ7qY12SgfImzUrL3g04q3D4H7FkL
-	1vlvK+67YjFPEbKZcI2LNN2xn47K38YeoeYFP2aEolMtED4YHC4y3jQyPeGDisoB
-	Y6h4cOxGoyybTwFkqefcjZzbBBu9p1vseh6y+HWQwsrEVVFsBWNxIf9HYeeBg4gW
-	7NGEWubVTjlG/qx1VmcJ6NDGFF1r/729e4+ZhzLminl3/VCpKzzEsCD8fl57R/lh
-	3J1kGY5TV60YwjLVZlh/LIsoUcWAiAVR7KFXPKqB9Gbe6vw3W5Ro4X69tH1A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1742947049; x=1743033449; bh=53epuMkGW7VVw4kHXV3f2OBjzCS034p7lIo
-	4scoUYY4=; b=MVc27JQauJVoYrbojetHAZ9nUNDhSMUNKb/U7UHeH98I8Hacjwt
-	/gfb2V8m4GTMOvLH1UfckM3Jte8H/1QOmivThiGrVmM3U3SJw8Hd7ND9IoOYvJEc
-	qNB1huBXQlvNfe9sGKaewNfUKsbTO0M5B5c20xFQ9k8uQwRjWqAY8Drz+ntfpXom
-	p4GRWwExNpUgmzlvEj9az2539foimIMC4RjeN7ZlROBgItlZOzImWzzDR2vqixCO
-	4oSgu0YQGKZanZApQJifRFVxypQxiaf92VOkdJnlADyGK/RfmKJATKEC7uFO4+3S
-	INseQD/ylabewCylLflMPoZOjiCktk22Y3w==
-X-ME-Sender: <xms:6ELjZ5C2HyAO_6tHWf3aVhbyyVnDFYdweMcK5RJO8d_fJ6UA4KoBNw>
-    <xme:6ELjZ3g3PKCKY3BcCc0svPCCLB5Ti26iL-GkQdkFXvbFsQ4xmn_zNXvHeWxFLXgBD
-    fhdrmeljUSxvQ>
-X-ME-Received: <xmr:6ELjZ0nGeX3lJFhBJmfzwrfGRtKArx-S9sTteSDw8wL8i0CNW73nntwyfiSD>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduieegtdefucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
-    vdenucfhrhhomhepifhrvghgucfmjfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecugg
-    ftrfgrthhtvghrnhepheegvdevvdeljeeugfdtudduhfekledtiefhveejkeejuefhtdeu
-    fefhgfehkeetnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrh
-    homhepghhrvghgsehkrhhorghhrdgtohhmpdhnsggprhgtphhtthhopedugedpmhhouggv
-    pehsmhhtphhouhhtpdhrtghpthhtohepshhfrhestggrnhgsrdgruhhughdrohhrghdrrg
-    hupdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthho
-    pehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhh
-    grthdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhr
-    ghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdroh
-    hrghdprhgtphhtthhopehlihhnuhigqdhnvgigthesvhhgvghrrdhkvghrnhgvlhdrohhr
-    gh
-X-ME-Proxy: <xmx:6ELjZzxvLjOKHCf2KhELkxcfewZeR8Eychfx7mgoQAvSmHkDfvFmLw>
-    <xmx:6ELjZ-QISVIqjaytnPUJ0ivBUiG5CMXFboYet_PGTOqoniZap2MvLA>
-    <xmx:6ELjZ2Y9LBJDbrDU7blyiW122iZ2bs0QRYDisDCx63CiaVTbACR5SQ>
-    <xmx:6ELjZ_RZpfwy7HWQvwbQg1438y3NhaEPLBqI9ka_w0VNZXvHFC37WQ>
-    <xmx:6ULjZ6qQTmsLQoB8y9BbrKlKjZKm4q__H6uFBgK3dZEIWRg-khRSLYiS>
-Feedback-ID: i787e41f1:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 25 Mar 2025 19:57:28 -0400 (EDT)
-Date: Tue, 25 Mar 2025 19:56:07 -0400
-From: Greg KH <greg@kroah.com>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Networking <netdev@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: linux-next: duplicate patch in the tty tree
-Message-ID: <2025032501-ominous-mongoose-e772@gregkh>
-References: <20250325173133.7dd68fb1@canb.auug.org.au>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mak/FPWX+TefDV2gBa99z4IZxXMN4N1cJoSiJMt8ci12oP2DidNlv3m69jlxQbXrUzVAJ7Ae7+EvbT54sM8kWTVkzg3ZuwWnF8jw3sDXZHSRy3V+BFN59asnxm5qeNh7mn+w8Xq1TSiwbXcOmy3jZz4kdQ6wj0gwQtLGAmVyc7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OWjbrOoI; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-22580c9ee0aso128083715ad.2;
+        Tue, 25 Mar 2025 17:11:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742947912; x=1743552712; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CY8eIyZm61ckxiaVzTuPDCRXGNO6HtSN1mJX9W6zGQQ=;
+        b=OWjbrOoIwKJw2PMhyNl8Aed5JtKyt7PpilTzzyAyQy1NYsmBqoOwM5O8ajazIAWDpy
+         Lyf92+Iel+3/zgIAAhpnJ7UI8MwqXNHp1uuGYZHbzzubo9Q7F32tmmrp6TVS6UxIfhW4
+         1jxtpDgnDy6WjjO52onyadpNwcmOFUVopRFMHu/K64ZkZzODleyotFKJnbJQkzczbFe6
+         W+sSPpQNnGVUO6+1IVsygG85yK6jiGP+npE9dOb+lakD0OedIJ7GmvqKjrYTGLudnhke
+         Lk4Zgxf4olyOTl1c4+a7Yg3k2ApHv796wpAM9Lv0o2bY0AWgEdp9E6x6CccpSd2ZoZKb
+         /a5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742947912; x=1743552712;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CY8eIyZm61ckxiaVzTuPDCRXGNO6HtSN1mJX9W6zGQQ=;
+        b=Ji7Vx8Yp2B+yptMbM6GXiU53WRdN4dlFbVgV5zfpYdhajIGP81w1orfmDmHfK/Z9ed
+         D2uamK3yM1Rim9eK/oAhfEfON7N5s/wWPhhhlVBXqWaStxhm/gek9/9f+aKtHS6HDAFj
+         vwAg5c/pAI4NUS4vk8Wy4j51sqXSGyl/Sd9ZUImwj+pUpOQDbSdyawW8wunCw3ZpSoV7
+         Gv2rKyQ5JhonOBwzeZVfAKnB9dCAtohH+4h2UJxskDjtvlYNtHcEi/xUSQ8ylDPxjc5B
+         KAkW5aMvb2JvUuTvENTG/sfwrdhtR3/ptfF3JzTeu/qWxVlXVM1vmIAvkKFbPCArTaMS
+         wbrA==
+X-Forwarded-Encrypted: i=1; AJvYcCUDDixAYhmR9Xf50VY6mplwfx4bMSIBVQePY4NMYgzVJKg7DBqTbeGjnuHfUhxaorX8M06xLUn3@vger.kernel.org, AJvYcCVd4KRGVv29IKZCkdWKo5Y0Z58/hV1THo0Nc/gqG0z0M2fy/UCSWtbYIDiefa4woahZe84=@vger.kernel.org, AJvYcCWlho2IIr/FxL3Kp5F6i4P0jIn5OkrTiBnASYGuzoh0NWkDEBMP683kt2yri6HxqoYmnsBCncsA5VmqMyQC@vger.kernel.org, AJvYcCWlkLPzEl5tPxodAyvwpw5B95f8QQwrFyH+O6pGE+orGjKXShhCoypMbGf1TUDvwM5WPjkH0e36Ir4BRRGv@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNKsvjoCiGK+qhHkGDbdwyH2A12Sa1OgHmuuUFiayjClIGHnY1
+	qZk5h3WqJBoHPgXM9tEwqidUGjWt3dfWSaunGDXwLGesLFxM55kH
+X-Gm-Gg: ASbGncvKbpBAhQy1FsV0eXD0JTy03T+X71sUtG9eU3CiUIvxtSChIJJZEWi9HInUQ81
+	GBS5XWIK+mVNAY0jEtDvkQ21nYF/seZJUti7ZXDRQw8VO9pfvptBoRhfFQpZJINLh+cEDvXf9KM
+	u1z/EOIxxL5csEfoLgLMCYYcREKHy/OvBfH1Yxawuvoa0MGudr9wLaDBFFX2mwgKdJLwwAZC6q9
+	qFarNzeYHcYr1fZpkXuABb9iJviTZfUkOQDOlLSiD84BOlX2WLXAQrRCGOoSK3Epq1dtLLENe/p
+	0DSh9wxaAcAGZlqmPtzqh0gP7WJmJJFD0CyhLJA4bnMFIHsDjTsZs1gIBQzen/50wg==
+X-Google-Smtp-Source: AGHT+IHxY4Vgr8ATi1uVdyopW2+f/aLhWWNzfk7UHIfMOoRiFLbmaJkjO523spjjVjgNAJSnkFxkQQ==
+X-Received: by 2002:a05:6a21:339a:b0:1f5:51d5:9ef3 with SMTP id adf61e73a8af0-1fe42f995edmr26069754637.20.1742947912351;
+        Tue, 25 Mar 2025 17:11:52 -0700 (PDT)
+Received: from devvm6277.cco0.facebook.com ([2a03:2880:2ff:8::])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af8a280e572sm9690206a12.32.2025.03.25.17.11.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Mar 2025 17:11:51 -0700 (PDT)
+Date: Tue, 25 Mar 2025 17:11:49 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v2 3/3] vhost/vsock: use netns of process that opens the
+ vhost-vsock-netns device
+Message-ID: <Z+NGRX7g2CgV9ODM@devvm6277.cco0.facebook.com>
+References: <20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com>
+ <20250312-vsock-netns-v2-3-84bffa1aa97a@gmail.com>
+ <09c84a94-85f3-4e28-8e7d-bdc227bf99ab@redhat.com>
+ <nwksousz7f4pkzwefvrpbgmmq6bt5kimv4icdkvm7n2nlom6yu@e62c5gdzmamg>
+ <Z9yDIl8taTAmG873@devvm6277.cco0.facebook.com>
+ <aqkgzoo2yswmb52x72fwmch2k7qh2vzq42rju7l5puxc775jjj@duqqm4h3rmlh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,23 +107,65 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250325173133.7dd68fb1@canb.auug.org.au>
+In-Reply-To: <aqkgzoo2yswmb52x72fwmch2k7qh2vzq42rju7l5puxc775jjj@duqqm4h3rmlh>
 
-On Tue, Mar 25, 2025 at 05:31:33PM +1100, Stephen Rothwell wrote:
-> Hi all,
+On Fri, Mar 21, 2025 at 11:02:34AM +0100, Stefano Garzarella wrote:
+> On Thu, Mar 20, 2025 at 02:05:38PM -0700, Bobby Eshleman wrote:
+> > On Thu, Mar 20, 2025 at 10:08:02AM +0100, Stefano Garzarella wrote:
+> > > On Wed, Mar 19, 2025 at 10:09:44PM +0100, Paolo Abeni wrote:
+> > > > On 3/12/25 9:59 PM, Bobby Eshleman wrote:
+> > > > > @@ -753,6 +783,8 @@ static int vhost_vsock_dev_release(struct inode *inode, struct file *file)
+> > > > >  	virtio_vsock_skb_queue_purge(&vsock->send_pkt_queue);
+> > > > >
+> > > > >  	vhost_dev_cleanup(&vsock->dev);
+> > > > > +	if (vsock->net)
+> > > > > +		put_net(vsock->net);
+> > > >
+> > > > put_net() is a deprecated API, you should use put_net_track() instead.
+> > > >
+> > > > >  	kfree(vsock->dev.vqs);
+> > > > >  	vhost_vsock_free(vsock);
+> > > > >  	return 0;
+> > > >
+> > > > Also series introducing new features should also include the related
+> > > > self-tests.
+> > > 
+> > > Yes, I was thinking about testing as well, but to test this I think we need
+> > > to run QEMU with Linux in it, is this feasible in self-tests?
+> > > 
+> > > We should start looking at that, because for now I have my own ansible
+> > > script that runs tests (tools/testing/vsock/vsock_test) in nested VMs to
+> > > test both host (vhost-vsock) and guest (virtio-vsock).
+> > > 
+> > 
+> > Maybe as a baseline we could follow the model of
+> > tools/testing/selftests/bpf/vmtest.sh and start by reusing your
+> > vsock_test parameters from your Ansible script?
 > 
-> The following commit is also in the net-next tree as a different commit
-> (but the same patch):
+> Yeah, my playbooks are here:
+> https://github.com/stefano-garzarella/ansible-vsock
 > 
->   3c3cede051cd ("tty: caif: removed unused function debugfs_tx()")
+> Note: they are heavily customized on my env, I wrote some notes on how to
+> change various wired path.
 > 
-> This is commit
+> > 
+> > I don't mind writing the patches.
 > 
->   29abdf662597 ("tty: caif: removed unused function debugfs_tx()")
+> That would be great and very much appreciated.
+> Maybe you can do it in a separate series and then here add just the
+> configuration we need.
 > 
-> in the net-next tree.
+> Thanks,
+> Stefano
+> 
 
-Should be fine, thanks!
+Hey Stefano,
 
-greg k-h
+I noticed that bpf/vmtest.sh uses images hosted from libbpf's CI/CD. I
+wonder if you have any thoughts on a good repo we may use to pull our
+qcow image(s)? Or a preferred way to host some images, if no repo
+exists?
+
+Thanks,
+Bobby
 
