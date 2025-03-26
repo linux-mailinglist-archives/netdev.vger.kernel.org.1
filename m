@@ -1,134 +1,150 @@
-Return-Path: <netdev+bounces-177666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3985A71070
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 07:13:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85067A71080
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 07:25:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88106174955
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 06:13:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FAF53AE928
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 06:25:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2D5517B50A;
-	Wed, 26 Mar 2025 06:13:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2489818A95A;
+	Wed, 26 Mar 2025 06:25:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j8lt7XRO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bN/PfR54"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0141F5383;
-	Wed, 26 Mar 2025 06:13:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F78917578;
+	Wed, 26 Mar 2025 06:25:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742969586; cv=none; b=fra7zlxkkHa3L8jhzfDQzQVAayAns3QrrdR+XT980e7Gz0XqneIVFjvrAutbBP4hUMZ4zj4aVf/yLS0ne77bKh+lavlg7FMxdTiqkbgu7hEBCfyZqUMWVJewwB8d9blXMgCaOCjSiHYfG81uQIxgrSgTfaAibzZaW/R7A1tu/Qw=
+	t=1742970325; cv=none; b=Z6UPNVlCcclEmo07NTEwZUh54XoXLgligHaI9/wyfcZe8v8XIn93mXhE35K8AG78t2tD7v5aaOTuUas9iZnbYdXp8mcuADC6eXb6jElGGdfv4ktpy921Gd2kAnaX1fpr5guqAwsIXdxzGIHMuzzgZ5PjEt29lL+BGDo/ZVnWcZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742969586; c=relaxed/simple;
-	bh=txTzL2mhqhikibCqrU7LgF55lTKwKgl5EG6fOmSyzzE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=M/YmFb8PF0uSbsIus24snmosKxjtV2T/O5j5OpsuqMg8mvIjxXM1q4lOIXOpp5LIrEei2FGGsJyC+GlwCPM7SB4CxSsMA/ErRKMsC8uEBlN6D/ierHYAPOasdDoKRB7na0jD7/Y9Qb79hqQ31ofmGPA5ArikDLXpngZDy2Q7wl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j8lt7XRO; arc=none smtp.client-ip=209.85.221.48
+	s=arc-20240116; t=1742970325; c=relaxed/simple;
+	bh=VeS52Ya4cFStBppr0P0ppjIK+rOi6u5HKxczZOTGv/M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nT+CjZ4BTbCdE8x48nqm0XZxQGKO9zpo3gqmq0Nk7skgxOECA5qC3twF4428oe+eRiRhrtTZy81a5zBnlPxKJ+Fv72VbnK7N5VZ9q9aS9PUW6zoJdiUBAeN4VwP0YFWP2U4CotGtylLNXh2l1f/bRkibU6swJxqTjiGGXAIAPRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bN/PfR54; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-39133f709f5so3394306f8f.0;
-        Tue, 25 Mar 2025 23:13:04 -0700 (PDT)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-22580c9ee0aso132313035ad.2;
+        Tue, 25 Mar 2025 23:25:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742969583; x=1743574383; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qh5szxCrEAebk5GiCm8Dt2jH6xOERyFSJuhaK1L/FGQ=;
-        b=j8lt7XROtANGNcqA5zW/rOJ2l7e3uQofcx0Kz4ZMStV0dFKSpI33wWLTF0J1bWaIdo
-         iG+O3HvFpegCF8NNVlO6VBycX7GNFeIdVE2VQJYktYrwQr1WAMwiCTRmHouSTWsJTL8S
-         QbtOSPrF82aw/rpprhXzXYYvUIqK324akbsj6eU5a10IzI9pGaDWlq0lJsBSc22u2T7+
-         e9tC6jEtBnNIySdreQ2UwWmAVvHAVdAi+VswXIVUnA995JhmnWr7O2I++f8liXDXcBTt
-         lY5tmRcCxBLomh2Oif2e1Nm5LsqpEhukIgs/olhA5SpqRkGEBmpbyrDLjwDacI6jeGA2
-         aC5w==
+        d=gmail.com; s=20230601; t=1742970323; x=1743575123; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=F6XnYyjWBkgMuV0QYpprdE1lSJS48p3YW3OVQycrQ3A=;
+        b=bN/PfR54DzzXsWB0XT9P5JjuodqZBi7sq4yLYm8sYEf+A8/5FsTN5PjOKwPjPb2q1U
+         Zg710SQXddhyYB0XS4sRXRNY2Xo0AIaamfR9cYReeSUOynsp70a7VnkEvXtWYp0uvDbI
+         Y+hC2ANGTzzNoih5pyKCSn/qlmRWkWwTLv32N1tfkqBT5M17y79Onv6xkovxdyn87cd2
+         0mck1ES5bhgIG15D8QEJyClUeMv+th+cbYTStL15AWl1Q8MBp+Q8ituPSp1WmRtA6UnX
+         6a0lyRVijR9735CiispUMA73guJkPu1qT+3vV2s6/mPXcJmSukPIANPadrH1cgQMmL9I
+         wU4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742969583; x=1743574383;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qh5szxCrEAebk5GiCm8Dt2jH6xOERyFSJuhaK1L/FGQ=;
-        b=Mpyvjf/W/bAUgE2pXxIwmauhPxBIWC8xj7Xz5KZMwcVCUu0NUpGnhMgpbxiRj6U8Mj
-         6sYPiWNI5w+/bN4viEYeRcHCCdpEy3GD5g+SlvMVhv5anH+UOvoTwCfcP4NQO71L6jv0
-         jazeFeYtjh2XmEjbxQ/Sg3qEoIOPTxpzOv5vHis1TOtldzx8OOsb6uy3+H6Xk2hvnkqP
-         4L3+0K8dHfJkh3Gk1PIupn8/lV1jKua/p8Tnmqezu45C54MhguMc5x3azYfmX3SaNcH/
-         wvn76NaxxBrLk5COgMOBMFQ1pXNi/QkWuUjegEd22xKtww1GC45PzH8IByE9vUADYRwp
-         LGkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWTTQVOahk++I9Dimy6Ib5mq6bBpOAyrBDgpChecWTVGdUovUl3ue5oKG4VPD8IT9ZSwsAkInYTmtZxaA==@vger.kernel.org, AJvYcCXvakRQHW+qnQ4lk9MuHXOpPa2KWNyP7sSn/jrXwdIcA/K+8FbJK/ywHwaTgSYUHOPyH1DgR04jG4Hx4Qg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaWebH2Zs4qNyg51P3Q/HQGdDo07z0TRGqaEj20c0Ie9f4wd9u
-	s3dM0yPTYUi2jR0Lqhs1SIpZbLFKGyxI9kFl/l/it+BXJX8zsthi
-X-Gm-Gg: ASbGnctGh5OS6Zkp2r+WhBy8K7sdSVYq55lL2ZMEoa71Ha2f1y7qMw1W9ZxNn0KjnFS
-	ZFu4jXBD7uaeEL2RXKEZiVCQ6fQ8Oozi/zqKvjp6zXzwF58sZL78oguEdJwc4VHvBv9Etc3HDHr
-	teLWBmxxGi01ZBWcfnUZmIzpau4iwP1dIoKMR+PAJyPDsd57IpH6OGtEM4d05DsJpdraGdis34F
-	2K99fWFtZL5DuioXpqSUeijjxdgYWV3Hx71wnVnzY61b6EdyKe2yA31NoKNQeKq2Zy2DsfjCjQN
-	OmJ8PR9p/hKOiavlN3+QAtAFpUHcxsfEFyLc3B/3vFeFgx7pC0dUhH0LNx4DDA==
-X-Google-Smtp-Source: AGHT+IGbpx7mTUHQIYPmGKwz6J0qSyb+Q2qehyaUkSxFmr7Z272S/gKD9iq5r+TYNGyoJa7ZTVs91Q==
-X-Received: by 2002:a05:6000:2d84:b0:391:40bd:6222 with SMTP id ffacd0b85a97d-3997f8fd7camr10604910f8f.22.1742969582886;
-        Tue, 25 Mar 2025 23:13:02 -0700 (PDT)
-Received: from [10.80.1.87] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3997f9b55cdsm15905675f8f.52.2025.03.25.23.13.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Mar 2025 23:13:02 -0700 (PDT)
-Message-ID: <91285e69-91d6-4845-8381-46b55cb98d22@gmail.com>
-Date: Wed, 26 Mar 2025 08:13:00 +0200
+        d=1e100.net; s=20230601; t=1742970323; x=1743575123;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F6XnYyjWBkgMuV0QYpprdE1lSJS48p3YW3OVQycrQ3A=;
+        b=gWJKkpnKTDe852TyI2GbYzs7SrG4D40QDK3ioFn43kXUNyML9bPuwazplTA2+NbJNw
+         ak4tcrQrsNy2m+CmIc+7YGG3zm9Vc3droTRIIPngLKTFCnJTNbXzKbSvqy5ZUYok7U5c
+         /XATx6YlvnJROf5GOQjoAIWDiA9LsuKRQz777fAqVSZ3G+5HrDacSfbAErjM3yPYYcaB
+         Wgqs3a9tCo2ZVhWxXjkgCYQAa85G90gOn/mpyQqUnr+19O7pat6Kwwmzyz78oGw6kZi1
+         +PqEZiNL82HQvzWKJWW0lHR3rW0QFbjehJ/2MfUKCPW6Ml15yucDyqQUSkbBRRGW3XIR
+         lDiA==
+X-Forwarded-Encrypted: i=1; AJvYcCVOJr2eBjNl1I3akyog3gearpctWZ8qhOrXjNN/vxuPyUmkfJvhLb5s2/WPmk+T4izeSqmP5jSqp09fA6k=@vger.kernel.org, AJvYcCVpn1xd8I4Uv2eWEKauhnbJtf2ZvkjiBH/dyS41RkMc4tmX54H+x/rc/3rEGuwB/9F1tNJO1G3t9ZzU7foVGj2a@vger.kernel.org, AJvYcCWUgBo4yGwABpGPIs9oSXZvZi0/DD/k+qoGoFEkmi4JzXzN9wu5LjJ1kGVNDeSEKyeK2mKUXx/T@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdcJEzNzAI4zgbOY+Gi8w7RCCN3xR+b3Op3qrJZSswzALeDO+s
+	h6UL0bILyC5Vr37RIhIJIjK47YnVo6FAUnffjfDvhg5vn0RE8io7
+X-Gm-Gg: ASbGncv+HSzTpWpEK7zGcpUSVjzaDrooKaRouiLJksHxFZTsgtgsV5esZFeNjlNE2/d
+	hntO4N0qiTCW1QGt+FfoGJEEq9rlehSGaBBkX/099Jlg9Ry7p0Z/yLbXl4rdy4tSCg1MsZCoMJX
+	Nx02E6Cmlkz1VoLJuyTkveO3HThceTUn5GSKR1SDz0eH/tgSLyb0vdTZenhXAyJ2JHzQZq1Ytsj
+	mKyeamgHz38UJcy+gdEMiqenuW3GOSfeUXU7pyYw5QRn1fnxRal8Mumzvc3ufwMqFZ/d+cnC9wW
+	PYqbT/Ay9D8qgBSKdWUaYa5CFPd5gpFIMIO1rDOHBorWFLGGAgkP2FgMPZM2
+X-Google-Smtp-Source: AGHT+IGbQzaER9p8NCvfFy6KxwukYMbDG7UbjOpY3wRp0sjpX6Rtq+5qFqml7esczeTeUbTF9chCJw==
+X-Received: by 2002:a17:902:ef12:b0:224:249f:9734 with SMTP id d9443c01a7336-22780c54cfemr331643715ad.4.1742970322675;
+        Tue, 25 Mar 2025 23:25:22 -0700 (PDT)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-227811f44aesm101809365ad.217.2025.03.25.23.25.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Mar 2025 23:25:21 -0700 (PDT)
+Date: Wed, 26 Mar 2025 06:25:13 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: Phil Sutter <phil@nwl.cc>, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>,
+	Petr Mladek <pmladek@suse.com>,
+	Yoann Congal <yoann.congal@smile.fr>, wireguard@lists.zx2c4.com,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv5 net-next 1/2] wireguard: selftests: convert iptables to
+ nft
+Message-ID: <Z-Odyf51XgIuldV7@fedora>
+References: <20250322093016.16631-1-liuhangbin@gmail.com>
+ <20250322093016.16631-2-liuhangbin@gmail.com>
+ <Z-B4yfBvm2aXW_Ar@orbyte.nwl.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/mlx5: DR, remove redundant object_range assignment
-To: Qasim Ijaz <qasdev00@gmail.com>, saeedm@nvidia.com, leon@kernel.org,
- tariqt@nvidia.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, kliteyn@nvidia.com
-Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250324194159.24282-1-qasdev00@gmail.com>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20250324194159.24282-1-qasdev00@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z-B4yfBvm2aXW_Ar@orbyte.nwl.cc>
 
-
-
-On 24/03/2025 21:41, Qasim Ijaz wrote:
-> The initial assignment of object_range from
-> pool->dmn->info.caps.log_header_modify_argument_granularity is
-> redundant because it is immediately overwritten by the max_t() call.
+On Sun, Mar 23, 2025 at 10:10:33PM +0100, Phil Sutter wrote:
+> On Sat, Mar 22, 2025 at 09:30:15AM +0000, Hangbin Liu wrote:
+> > Convert iptabels to nft as it is the replacement for iptables, which is used
+>           ~~~~~~~~
 > 
-> Remove the unnecessary assignment.
+> Typo, but I would write "Convert the selftest to nft ..." instead since
+> that is what you're converting, iptables is just replaced. :)
+
+Hi Jason, I saw net-next is closed. Should I wait for net-next re-open to post
+the new version and fix the typo? I'm not sure about the wg branch policy.
+
+Thanks
+Hangbin
+
 > 
-> Signed-off-by: Qasim Ijaz <qasdev00@gmail.com>
-> ---
->   drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_arg.c | 3 ---
->   1 file changed, 3 deletions(-)
+> > by default in most releases.
+> > 
+> > Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> > ---
+> >  tools/testing/selftests/wireguard/netns.sh | 29 ++++++++++++++--------
+> >  1 file changed, 19 insertions(+), 10 deletions(-)
+> > 
+> > diff --git a/tools/testing/selftests/wireguard/netns.sh b/tools/testing/selftests/wireguard/netns.sh
+> > index 55500f901fbc..8b840fef90af 100755
+> > --- a/tools/testing/selftests/wireguard/netns.sh
+> > +++ b/tools/testing/selftests/wireguard/netns.sh
+> > @@ -75,6 +75,11 @@ pp ip netns add $netns1
+> >  pp ip netns add $netns2
+> >  ip0 link set up dev lo
+> >  
+> > +# init nft tables
+> > +n0 nft add table ip wgtest
+> > +n1 nft add table ip wgtest
+> > +n2 nft add table ip wgtest
+> > +
+> >  ip0 link add dev wg0 type wireguard
+> >  ip0 link set wg0 netns $netns1
+> >  ip0 link add dev wg0 type wireguard
+> > @@ -196,13 +201,14 @@ ip1 link set wg0 mtu 1300
+> >  ip2 link set wg0 mtu 1300
+> >  n1 wg set wg0 peer "$pub2" endpoint 127.0.0.1:2
+> >  n2 wg set wg0 peer "$pub1" endpoint 127.0.0.1:1
+> > -n0 iptables -A INPUT -m length --length 1360 -j DROP
+> > +n0 nft add chain ip wgtest INPUT { type filter hook input priority filter \; policy accept \; }
 > 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_arg.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_arg.c
-> index 01ed6442095d..c2218dc556c7 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_arg.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_arg.c
-> @@ -39,9 +39,6 @@ static int dr_arg_pool_alloc_objs(struct dr_arg_pool *pool)
->   
->   	INIT_LIST_HEAD(&cur_list);
->   
-> -	object_range =
-> -		pool->dmn->info.caps.log_header_modify_argument_granularity;
-> -
->   	object_range =
->   		max_t(u32, pool->dmn->info.caps.log_header_modify_argument_granularity,
->   		      DR_ICM_MODIFY_HDR_GRANULARITY_4K);
-
-Acked-by: Tariq Toukan <tariqt@nvidia.com>
-
-Thanks for your patch.
-This is net-next material. Please specify target branch in future 
-submissions.
-
-Regards,
-Tariq
+> You may skip the 'policy accept \;' part in all 'add chain' commands as
+> this is the default for all chains. Unless you prefer to explicitly
+> state the chain policy, of course.
+> 
+> Cheers, Phil
 
