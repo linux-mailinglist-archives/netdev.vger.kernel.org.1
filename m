@@ -1,87 +1,89 @@
-Return-Path: <netdev+bounces-177679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D665A7127E
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 09:21:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDD56A71276
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 09:19:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDFAC3B444E
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 08:19:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C213172E9E
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 08:19:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B592A191F84;
-	Wed, 26 Mar 2025 08:19:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A64A81A238A;
+	Wed, 26 Mar 2025 08:19:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SdUk/oRJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J22vLaSS"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4D091A2C25
-	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 08:19:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F5D2A1B2
+	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 08:19:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742977148; cv=none; b=UH5eroPdsg/nfBNyrIlkaERefgC13cPOJS9sVvvEBarCQK9Ca9Uq2tlnvOpE+xW2e32srBkBQ0p/Qu9BMtMm7JWPK2XzgP9drW0rDQRIKIeOt468o+KMOTUHlI9Wr0iq1rDWrMrnhMrSNYe/Ukfk937mbiUOA1aJCrdllOwociQ=
+	t=1742977144; cv=none; b=Zb6ghTFzXtch27TPLSDiQBSz8MomZ4J2fcT/iL3EEytyGy5YOdfPBG7rbUSroPDDU0xmyOXFfuNJ9qoWJs7GDEk02MXgr1Q9AZTiR/4M6c2RJADM0lAm5XIw2++z+L/rE9z8FT1ySwadP3lKDwiqt8IJ90fL5pNLFwWx49FbtOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742977148; c=relaxed/simple;
-	bh=iofBJfRVG4BOlspccJuOxKZ8GN7yJUVTePwGTFtKji8=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=JgvB56suz5nl8c7ZWFgs8P7e++S6d7+8h8N7ChCA/WDBomC71lb2+IypDhC9wYYPL6kyVxdlXa5kctkaMWfXiq/Gfrhx4uF2bbHyuGloVuDNG/MBgIS66w2fZpLmINXKnhgk/OHYqsktaDTV7cd8yyFJIdveSG+gZCGK2ACf1UM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SdUk/oRJ; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1742977144; c=relaxed/simple;
+	bh=4I05eVH/+uUp2ErZURt+83KwIztisW9+7S+LIhJyfXQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=mrCjqTMPECawanDmOe34og0GCl16WPESwcCmBLcq5B+8NsPivPHFf2jT51ZlWfXuLyENLhRdiKXDZW1VEh40ql5QmQ8nNSobP4HU2FnsHM4akcIPepDTGeH2s9r8wswoXpn2aRHnhkRgU/GUae8AZNqWFHe+kDn9RZjR8McgQbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J22vLaSS; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1742977145;
+	s=mimecast20190719; t=1742977141;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=BJrq4mLJiJXWNMpizUXhY6u/aCQe+JkhHXm5jj4+P0s=;
-	b=SdUk/oRJcafcxYMJSEKJTp87FSp1i6BHEJXKinqMpiCizWCtoQMEX6ZYjrWNNoMbxYIiQI
-	lE2+c52DZkNRgQ6KvQfCre22Qun1vUoTrTaoQ3Cadv9/u7nkQ+hYQ4AlpFmYCJXhF82QkK
-	kWTPsxbKT4F1UiSTuAlb3WYhHMg/KBo=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wHU3gd5R+PcFSPJyd+8lTgr7QvXzHN6SGWRXjaUKaHA=;
+	b=J22vLaSSnxBQ/+fEEXfKz2JG9l/0gToE3t/ZfoaZtDokhXHtSKCvaviGGVT4tUHLO68CoS
+	a11wXghv08PYiVadPmaRqnoot1HK5UL90WAJNeixZ/t3OvY3CW0iDQpDHJDKyr4Dqx0gJ2
+	yATLcNE+tNRjjjGipqL6VFHvzy3Ex44=
 Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
  [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-508-gqmEwktBMfS1gTJCd62_gg-1; Wed, 26 Mar 2025 04:19:03 -0400
-X-MC-Unique: gqmEwktBMfS1gTJCd62_gg-1
-X-Mimecast-MFC-AGG-ID: gqmEwktBMfS1gTJCd62_gg_1742977142
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-ac28a2c7c48so37704466b.3
-        for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 01:19:03 -0700 (PDT)
+ us-mta-624-R4krPqTaOvarIu9dcNjlaw-1; Wed, 26 Mar 2025 04:18:58 -0400
+X-MC-Unique: R4krPqTaOvarIu9dcNjlaw-1
+X-Mimecast-MFC-AGG-ID: R4krPqTaOvarIu9dcNjlaw_1742977137
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-abec83a498cso522333666b.1
+        for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 01:18:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742977142; x=1743581942;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BJrq4mLJiJXWNMpizUXhY6u/aCQe+JkhHXm5jj4+P0s=;
-        b=kxWcgeMYYqRXN41SCtp9u/iECMdGthFNBaPNr3kbqaBhIM3dTp1eOEzQdhBoB50Ley
-         1IyDW1KkZyLGrVsA3wdqYNhuRDgO6Vi80dEKRXTvZ7dxS4tnFXccTZcKJlEYaE5VN4CM
-         zR5yPWbdL261ZIQrZ+5Ck2XNWdtQI+VLQIzaT+mGRfy/vQ5YxKZU5UuicP//3Czjzh6b
-         L5zVicpQ5b2BgbaVgyBjI/Y+K9zMnF+a7VxBmDGw4cjFjXFgeK2bF+q7dSQohqxGEhCw
-         +4Ti8AMTp012AG9eahHY3W25PMVW+nnTTWru6aBclH4qD9mkX24shkbcCabSEG+G+ITX
-         66lg==
-X-Gm-Message-State: AOJu0YzzRqvmuO0SJ6h9lZgVFZxVVKdx4pQk4SJyudukhANY65GcEAsV
-	9mtpfdKlhqueOk8EGKxfMspuWJi7k4mgIrFtDxP7UBS3kP7vligrXorW7CXWCWHdni4aB0pw3Rc
-	daRmsD+kANsVz5Fp6BjVBLXild5skLU1iQ4jV3sGHOPdp4QgDlxvsGw==
-X-Gm-Gg: ASbGnctGsX2znZ7AKV1T95f1BjdO4X7JBliaAYlkPNAxkL+Kd7TaflVHuvYf36sT//o
-	fB+b8W4DF0iY+eQYV39XmyttNzfrja2zQICMAFo7wcqq4j3Wyl8Qk7v80QqmBXPGd3MWSR9y+WQ
-	LhAGp1UzrCIb+8UgdX5CLzwC0XlQS56gcQFXlzaOWWaxpNVjxGrb3alfWi1O6TWkhx3TPkbKTYR
-	NYAcbaivezo31LFbP+BrtlUUNZ6TBJ35dhVrI5wkswFrnVu/W3wF6we/68iyOpLjuoyqcgivQzx
-	72T9Dhu2gtRlxNYpNYwEd7QbsiRo1vdzsYzrermJ
-X-Received: by 2002:a17:907:96a5:b0:ac3:5c8e:d3f5 with SMTP id a640c23a62f3a-ac3f2238ac9mr1964306266b.27.1742977141985;
-        Wed, 26 Mar 2025 01:19:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHAVihNCBcqrY7fTmWzpMKedPdAfC8xKs8i1WcBmyCG1SOQFnIZkqUTCro3SjnL+rAel5iZ/A==
-X-Received: by 2002:a17:907:96a5:b0:ac3:5c8e:d3f5 with SMTP id a640c23a62f3a-ac3f2238ac9mr1964303566b.27.1742977141528;
-        Wed, 26 Mar 2025 01:19:01 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1742977137; x=1743581937;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wHU3gd5R+PcFSPJyd+8lTgr7QvXzHN6SGWRXjaUKaHA=;
+        b=eQLJeylkF1nFat3cxMOaVC999PqCmOLdR5SsbSRWuvSzMQc5KxkBOqzwpT3K/Tu0JJ
+         xqFK4EukAxrccASwBbmPA6HKG+pO7pbWHaQd2lmQnP6MRyunX2Nsns7a6CW0BRP1wYcD
+         2FiQNHa/s4Cm7D1ejao7C2EwbP07owkwUHLGk2JAperwyB8p0O+S8Az2t0VeMlWKEXr9
+         ieySKu28b2/C7GddC/Bg2e3ACinCuyhP46Wd9XZNl2SSfRm87UCNFBLQufo5L4EjF/eY
+         Q0idzR7z01iPP2ieC3jIvwC+9LDAHRnXTkIuuFA6jfUPxdMmm+pEfk4P85NfMWYutQ1u
+         YLHA==
+X-Gm-Message-State: AOJu0Ywx9SdI5zEqQJzw0S6w7MCFtZi9pjg5qn+dCrDi66bTTldg1R9I
+	WhHntwwavcARQqAC/okm4VNo8vbcQsptsrKt8b+bVCBXMgyiU0pH1c1qJYv6Uilz+9LydXnIpU8
+	MGiKJ2f3WtoksNQ8P9OI0uJocMGYGLscJDaz66W19qYgyTFrsRTDXig==
+X-Gm-Gg: ASbGncuWege+jON0xNpo1nD05KFyD46RVwtqm/vqq/vfQwo2Y+XJM1BG0YDE5gKOP7H
+	o5uux44Dos9pjrnzEOeX2ADlk8Hp0PhQsZeYGrh1Tqsn7BURHNH88sLR3SQRi2lGwsz/JWRGeYG
+	fhEuxoPPERiL7TESo8s44/Qj3dJ9tTp03IPFuzjdqTjbB8CibkSoCrdwCRwT9VNiqMlvsljXnBA
+	8vy/B9kv/muiGs2ecvb3pZzG2td8VqPxopSamiNpA8wKjy2yI5RMIr4/8CtWWk/oTF+E6AAGyMB
+	GxAtqVsSVAF5ZvQoVJEXVuFN3dH4EuIPv5WOkeMP
+X-Received: by 2002:a17:907:6ea6:b0:ac6:b731:d327 with SMTP id a640c23a62f3a-ac6b731d3dcmr641047166b.4.1742977136822;
+        Wed, 26 Mar 2025 01:18:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGwezWzI1MgFdP9DAT+/2zNUhExClr8nnWD8c6ObA/s1wOXjNoqUjslh6fgHhj93GwDZJxa9g==
+X-Received: by 2002:a17:907:6ea6:b0:ac6:b731:d327 with SMTP id a640c23a62f3a-ac6b731d3dcmr641044566b.4.1742977136301;
+        Wed, 26 Mar 2025 01:18:56 -0700 (PDT)
 Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3efbe0356sm1006017366b.144.2025.03.26.01.19.00
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5ebcd0c74b9sm8933274a12.62.2025.03.26.01.18.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Mar 2025 01:19:00 -0700 (PDT)
+        Wed, 26 Mar 2025 01:18:55 -0700 (PDT)
 Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 4E36118FC9CA; Wed, 26 Mar 2025 09:18:54 +0100 (CET)
+	id 50AE618FC9CC; Wed, 26 Mar 2025 09:18:54 +0100 (CET)
 From: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-Subject: [PATCH net-next v3 0/3] Fix late DMA unmap crash for page pool
-Date: Wed, 26 Mar 2025 09:18:37 +0100
-Message-Id: <20250326-page-pool-track-dma-v3-0-8e464016e0ac@redhat.com>
+Date: Wed, 26 Mar 2025 09:18:38 +0100
+Subject: [PATCH net-next v3 1/3] page_pool: Move pp_magic check into helper
+ functions
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,11 +92,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-B4-Tracking: v=1; b=H4sIAF2442cC/23NQQrCMBAF0KuUWRtJJmmLrryHuIjp1AZtU5IQK
- qV3NwQXCl3++fw3KwTylgKcqxU8JRusm3KQhwrMoKcHMdvlDMix5lJwNut8m517sei1ebJu1Ix
- LiVJJrRpOkJezp94uRb3CRJFNtES45WawITr/Lu+SKP1XVrtyEowzgwKpbnWrDF48dYOOR+PGA
- ib8QbDeRzAjQki6G3FSTS//kG3bPoiHBwcGAQAA
-X-Change-ID: 20250310-page-pool-track-dma-0332343a460e
+Message-Id: <20250326-page-pool-track-dma-v3-1-8e464016e0ac@redhat.com>
+References: <20250326-page-pool-track-dma-v3-0-8e464016e0ac@redhat.com>
+In-Reply-To: <20250326-page-pool-track-dma-v3-0-8e464016e0ac@redhat.com>
 To: "David S. Miller" <davem@davemloft.net>, 
  Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
  Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
@@ -109,61 +109,192 @@ To: "David S. Miller" <davem@davemloft.net>,
  Matthew Wilcox <willy@infradead.org>
 Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, linux-rdma@vger.kernel.org, 
  linux-mm@kvack.org, 
- =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>, 
- Qiuling Ren <qren@redhat.com>, Yuying Ma <yuma@redhat.com>
+ =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
 X-Mailer: b4 0.14.2
 
-This series fixes the late dma_unmap crash for page pool first reported
-by Yonglong Liu in [0]. It is an alternative approach to the one
-submitted by Yunsheng Lin, most recently in [1]. The first two commits
-are small refactors of the page pool code, in preparation of the main
-change in patch 3. See the commit message of patch 3 for the details.
+Since we are about to stash some more information into the pp_magic
+field, let's move the magic signature checks into a pair of helper
+functions so it can be changed in one place.
 
--Toke
-
-[0] https://lore.kernel.org/lkml/8067f204-1380-4d37-8ffd-007fc6f26738@kernel.org/T/
-[1] https://lore.kernel.org/r/20250307092356.638242-1-linyunsheng@huawei.com
-
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+Tested-by: Yonglong Liu <liuyonglong@huawei.com>
 Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
 ---
-Changes in v3:
-- Use a full-width bool for pp->dma_sync instead of a full unsigned
-  long (in patch 2), and leave pp->dma_sync_cpu alone.
+ drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c |  4 ++--
+ include/net/page_pool/types.h                    | 18 ++++++++++++++++++
+ mm/page_alloc.c                                  |  9 +++------
+ net/core/netmem_priv.h                           |  5 +++++
+ net/core/skbuff.c                                | 16 ++--------------
+ net/core/xdp.c                                   |  4 ++--
+ 6 files changed, 32 insertions(+), 24 deletions(-)
 
-- Link to v2: https://lore.kernel.org/r/20250325-page-pool-track-dma-v2-0-113ebc1946f3@redhat.com
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+index 6f3094a479e1ec61854bb48a6a0c812167487173..70c6f0b2abb921778c98fbd428594ebd7986a302 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+@@ -706,8 +706,8 @@ static void mlx5e_free_xdpsq_desc(struct mlx5e_xdpsq *sq,
+ 				xdpi = mlx5e_xdpi_fifo_pop(xdpi_fifo);
+ 				page = xdpi.page.page;
+ 
+-				/* No need to check ((page->pp_magic & ~0x3UL) == PP_SIGNATURE)
+-				 * as we know this is a page_pool page.
++				/* No need to check page_pool_page_is_pp() as we
++				 * know this is a page_pool page.
+ 				 */
+ 				page_pool_recycle_direct(page->pp, page);
+ 			} while (++n < num);
+diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
+index 36eb57d73abc6cfc601e700ca08be20fb8281055..df0d3c1608929605224feb26173135ff37951ef8 100644
+--- a/include/net/page_pool/types.h
++++ b/include/net/page_pool/types.h
+@@ -54,6 +54,14 @@ struct pp_alloc_cache {
+ 	netmem_ref cache[PP_ALLOC_CACHE_SIZE];
+ };
+ 
++/* Mask used for checking in page_pool_page_is_pp() below. page->pp_magic is
++ * OR'ed with PP_SIGNATURE after the allocation in order to preserve bit 0 for
++ * the head page of compound page and bit 1 for pfmemalloc page.
++ * page_is_pfmemalloc() is checked in __page_pool_put_page() to avoid recycling
++ * the pfmemalloc page.
++ */
++#define PP_MAGIC_MASK ~0x3UL
++
+ /**
+  * struct page_pool_params - page pool parameters
+  * @fast:	params accessed frequently on hotpath
+@@ -264,6 +272,11 @@ void page_pool_destroy(struct page_pool *pool);
+ void page_pool_use_xdp_mem(struct page_pool *pool, void (*disconnect)(void *),
+ 			   const struct xdp_mem_info *mem);
+ void page_pool_put_netmem_bulk(netmem_ref *data, u32 count);
++
++static inline bool page_pool_page_is_pp(struct page *page)
++{
++	return (page->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
++}
+ #else
+ static inline void page_pool_destroy(struct page_pool *pool)
+ {
+@@ -278,6 +291,11 @@ static inline void page_pool_use_xdp_mem(struct page_pool *pool,
+ static inline void page_pool_put_netmem_bulk(netmem_ref *data, u32 count)
+ {
+ }
++
++static inline bool page_pool_page_is_pp(struct page *page)
++{
++	return false;
++}
+ #endif
+ 
+ void page_pool_put_unrefed_netmem(struct page_pool *pool, netmem_ref netmem,
+diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+index 542d25f77be80304b731411ffd29b276ee13be0c..3535ee76afe946cbb042ecbce603bdbedc9233b9 100644
+--- a/mm/page_alloc.c
++++ b/mm/page_alloc.c
+@@ -55,6 +55,7 @@
+ #include <linux/delayacct.h>
+ #include <linux/cacheinfo.h>
+ #include <linux/pgalloc_tag.h>
++#include <net/page_pool/types.h>
+ #include <asm/div64.h>
+ #include "internal.h"
+ #include "shuffle.h"
+@@ -872,9 +873,7 @@ static inline bool page_expected_state(struct page *page,
+ #ifdef CONFIG_MEMCG
+ 			page->memcg_data |
+ #endif
+-#ifdef CONFIG_PAGE_POOL
+-			((page->pp_magic & ~0x3UL) == PP_SIGNATURE) |
+-#endif
++			page_pool_page_is_pp(page) |
+ 			(page->flags & check_flags)))
+ 		return false;
+ 
+@@ -901,10 +900,8 @@ static const char *page_bad_reason(struct page *page, unsigned long flags)
+ 	if (unlikely(page->memcg_data))
+ 		bad_reason = "page still charged to cgroup";
+ #endif
+-#ifdef CONFIG_PAGE_POOL
+-	if (unlikely((page->pp_magic & ~0x3UL) == PP_SIGNATURE))
++	if (unlikely(page_pool_page_is_pp(page)))
+ 		bad_reason = "page_pool leak";
+-#endif
+ 	return bad_reason;
+ }
+ 
+diff --git a/net/core/netmem_priv.h b/net/core/netmem_priv.h
+index 7eadb8393e002fd1cc2cef8a313d2ea7df76f301..f33162fd281c23e109273ba09950c5d0a2829bc9 100644
+--- a/net/core/netmem_priv.h
++++ b/net/core/netmem_priv.h
+@@ -18,6 +18,11 @@ static inline void netmem_clear_pp_magic(netmem_ref netmem)
+ 	__netmem_clear_lsb(netmem)->pp_magic = 0;
+ }
+ 
++static inline bool netmem_is_pp(netmem_ref netmem)
++{
++	return (netmem_get_pp_magic(netmem) & PP_MAGIC_MASK) == PP_SIGNATURE;
++}
++
+ static inline void netmem_set_pp(netmem_ref netmem, struct page_pool *pool)
+ {
+ 	__netmem_clear_lsb(netmem)->pp = pool;
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index ab8acb737b93299f503e5c298b87e18edd59d555..a64d777488e403d5fdef83ae42ae9e4924c1a0dc 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -893,11 +893,6 @@ static void skb_clone_fraglist(struct sk_buff *skb)
+ 		skb_get(list);
+ }
+ 
+-static bool is_pp_netmem(netmem_ref netmem)
+-{
+-	return (netmem_get_pp_magic(netmem) & ~0x3UL) == PP_SIGNATURE;
+-}
+-
+ int skb_pp_cow_data(struct page_pool *pool, struct sk_buff **pskb,
+ 		    unsigned int headroom)
+ {
+@@ -995,14 +990,7 @@ bool napi_pp_put_page(netmem_ref netmem)
+ {
+ 	netmem = netmem_compound_head(netmem);
+ 
+-	/* page->pp_magic is OR'ed with PP_SIGNATURE after the allocation
+-	 * in order to preserve any existing bits, such as bit 0 for the
+-	 * head page of compound page and bit 1 for pfmemalloc page, so
+-	 * mask those bits for freeing side when doing below checking,
+-	 * and page_is_pfmemalloc() is checked in __page_pool_put_page()
+-	 * to avoid recycling the pfmemalloc page.
+-	 */
+-	if (unlikely(!is_pp_netmem(netmem)))
++	if (unlikely(!netmem_is_pp(netmem)))
+ 		return false;
+ 
+ 	page_pool_put_full_netmem(netmem_get_pp(netmem), netmem, false);
+@@ -1042,7 +1030,7 @@ static int skb_pp_frag_ref(struct sk_buff *skb)
+ 
+ 	for (i = 0; i < shinfo->nr_frags; i++) {
+ 		head_netmem = netmem_compound_head(shinfo->frags[i].netmem);
+-		if (likely(is_pp_netmem(head_netmem)))
++		if (likely(netmem_is_pp(head_netmem)))
+ 			page_pool_ref_netmem(head_netmem);
+ 		else
+ 			page_ref_inc(netmem_to_page(head_netmem));
+diff --git a/net/core/xdp.c b/net/core/xdp.c
+index f86eedad586a77eb63a96a85aa6d068d3e94f077..0ba73943c6eed873b3d1c681b3b9a802b590f2d9 100644
+--- a/net/core/xdp.c
++++ b/net/core/xdp.c
+@@ -437,8 +437,8 @@ void __xdp_return(netmem_ref netmem, enum xdp_mem_type mem_type,
+ 		netmem = netmem_compound_head(netmem);
+ 		if (napi_direct && xdp_return_frame_no_direct())
+ 			napi_direct = false;
+-		/* No need to check ((page->pp_magic & ~0x3UL) == PP_SIGNATURE)
+-		 * as mem->type knows this a page_pool page
++		/* No need to check netmem_is_pp() as mem->type knows this a
++		 * page_pool page
+ 		 */
+ 		page_pool_put_full_netmem(netmem_get_pp(netmem), netmem,
+ 					  napi_direct);
 
-Changes in v2:
-- Always leave two bits at the top of pp_magic as zero, instead of one
-
-- Add an rcu_read_lock() around __page_pool_dma_sync_for_device()
-
-- Add a comment in poison.h with a reference to the bitmask definition
-
-- Add a longer description of the logic of the bitmask definitions to
-  the comment in types.h, and a summary of the security implications of
-  using the pp_magic field to the commit message of patch 3
-
-- Collect Mina's Reviewed-by and Yonglong's Tested-by tags
-
-- Link to v1: https://lore.kernel.org/r/20250314-page-pool-track-dma-v1-0-c212e57a74c2@redhat.com
-
----
-Toke Høiland-Jørgensen (3):
-      page_pool: Move pp_magic check into helper functions
-      page_pool: Turn dma_sync into a full-width bool field
-      page_pool: Track DMA-mapped pages and unmap them when destroying the pool
-
- drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c |  4 +-
- include/linux/poison.h                           |  4 ++
- include/net/page_pool/types.h                    | 65 ++++++++++++++++++-
- mm/page_alloc.c                                  |  9 +--
- net/core/netmem_priv.h                           | 33 +++++++++-
- net/core/page_pool.c                             | 81 ++++++++++++++++++++----
- net/core/skbuff.c                                | 16 +----
- net/core/xdp.c                                   |  4 +-
- 8 files changed, 176 insertions(+), 40 deletions(-)
----
-base-commit: 45e36a8e3c17c4d50ecbc863893f253fb46ac070
-change-id: 20250310-page-pool-track-dma-0332343a460e
+-- 
+2.48.1
 
 
