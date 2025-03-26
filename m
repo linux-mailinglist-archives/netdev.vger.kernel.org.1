@@ -1,132 +1,97 @@
-Return-Path: <netdev+bounces-177725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53EA9A716ED
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 13:52:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C8E6A716F3
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 13:55:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0FA616CD3E
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 12:52:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE97416F8C9
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 12:55:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A58E1DDC12;
-	Wed, 26 Mar 2025 12:52:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DBB11E1E0E;
+	Wed, 26 Mar 2025 12:55:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Grnt17tZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="THU3o0rI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA6B1B3950;
-	Wed, 26 Mar 2025 12:52:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CE861B3950;
+	Wed, 26 Mar 2025 12:55:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742993566; cv=none; b=a5djTvTjrJk4mige5GLOTDBWuVvH10BoVeuS7H7qiaOob7CbD1lxI55/I+tvVXSc3zRKcNGN627pTA/AYBQi5f04DmvwZqyqgIOMV/Wb8fPy2CrQZXOAj6ooRUO2DXy+QSbFD1fQIHRRkxGAxPHF9IFMdQ16IyZCUAIfCd3f7yU=
+	t=1742993727; cv=none; b=HTinBjZPjyAWpgzplcV8XlhLopbjLjMG/i7Dc5ClYlKglxuqUKXp45TReUXmVjtfb5tCn7TAzg9XcS0q/htV3UNylS4WNbC20MCWOpN61vaUDY9rqb/sbiAXQHvEgQaGeriyc2ykXaIoQTzbUl/VLgwBt+XqYItE98D5aOstBds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742993566; c=relaxed/simple;
-	bh=yCg1rgqOSeu+rLDpXWfBkyZmFWl++cTnnHvhB3T0ZmU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XC+CEYJ6L6bF5jqYGv8j36q7HVfgr0MFS74hIcpigkMgmDRIFplMlzWH/oF30BT1lfNjb3FzAahVRTTZIsinWoLrIY6S2eajptgYHjn6hAUU+ggQpg3KqebDNDO+J6fsQPhHERYRq03sf/n+LOSy2qMXV/nTLtCzIK0smbFSdLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Grnt17tZ; arc=none smtp.client-ip=209.85.221.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-521b84da5e9so2896550e0c.0;
-        Wed, 26 Mar 2025 05:52:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742993564; x=1743598364; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yCg1rgqOSeu+rLDpXWfBkyZmFWl++cTnnHvhB3T0ZmU=;
-        b=Grnt17tZgotgkdQ5lzTM7aeNu1bWMjxHTs9cVU8eEa/0xmudI2zh0GiTwl3S59jl4Q
-         zr2rdvaCGvWwYrMLHauKKWNl9zBdbv41ITXaDF+EWRdJab5cjbp0LgIO59Wmry9g6qt5
-         bswCBMhqrfwz/ipZB7BhGWdos0ziZK+rBddTmw/czO3TiNeX7nss22nvbRJ8rekvnrEn
-         FSvWMe+iR34CEeE++Ri2UkRKEdRaH7Kkb13SNvp8EWqWsUZ7wqGg8kGgzgTvD2FkxIJg
-         Qm5cQWopsvqL6AOGOkcLtR+UB8lxzUCMQeGzc6ZavbPxo4vjeO8ZBTVb3TGrv+Cr7spY
-         SQCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742993564; x=1743598364;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yCg1rgqOSeu+rLDpXWfBkyZmFWl++cTnnHvhB3T0ZmU=;
-        b=n9zAEuYgIC1+jC7i/0gtSoFhEp8zpb2mkpScLAvqz0x4LkF4zQnFgEoFCI0PAmiIsj
-         rzT4KllI0jwuPrORvq1c/OzYj2GI3Yw6/OiX+zotHPJ3OtxS6sQMBolUXn6NZEiZ0bXB
-         v0rFD3kUH4JzggGbKuhhz+U+vtx6W5jKDtBnCtVJMxuIcYxmCRWtlNPEsR4mDLMThzT6
-         oVgF2qTGP/PWz3kR0RgrVOyBDyB9hqa4oe60TEqvjMtW9nWpAn1bCb5lzgB6XU7p/XnN
-         /nGWYiT76Y6fTlhnGoOiHv399plSglSawYLfDJuEtsm+sEfbu7uBgv5qC71/CR5Tt4WW
-         ZLgw==
-X-Forwarded-Encrypted: i=1; AJvYcCVrsHXvY/j9MN49gE95JfJVmepR7U4/R+/l8JNxIzArjWuF3Q5O6UqBXr/8TnhPAtwTZjsjsfjQU15k@vger.kernel.org, AJvYcCVvVBeHl2+USTU+RtYGVb9Kuy/UoQ3uPyA5ZsvtV5MdAW5vqx4bXAwl/HagQI4z7KRyuaZMWrVKxA8FW3WK47eP4KQ=@vger.kernel.org, AJvYcCXR8tiUJqDvc6+kuDNm6mGKZYUs5yPmpqaoxTRYI+VUycFV1nz/9guO8U/YXcNzzIA21g9zQK9/buGszIA4@vger.kernel.org, AJvYcCXS1HFEx0urdAzykKW6zJGWG/97eeuUxswK+RPJAWI1C6ZNKaIfMjhVlxqKIkC4pj60Y6zkhNRW@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0MyKTjdlI56ySrux3riPwSEqUmApHWZ/uHOUVVYUM2rlpHwFv
-	R3dDrq3l+Zu2+jTN7jxIG1CoAAo8pLcONCCDFasivW3X11F2NQERxp0IkqdpBvWCzP+BjcaZ4MD
-	mirOsooeETzutSvjIhzdLu65moho=
-X-Gm-Gg: ASbGncsliD2LsrinKJRPFZA20obnS+PRXxRHZ0P/bHU411JiXIfdenDZfBr4CidekH/
-	izVi/Fh4H19MD/nUeoQGAsXSGiBq/CNr4Vlr4M3BHSZ+f3suxC01PyxzAERQEjAnlqYc7XCrQeS
-	93h5dA5aHcbxtRBCCF9rwjzobtbYwyIWhagGRtV8jTypfWwjUGu9oofbbcug==
-X-Google-Smtp-Source: AGHT+IF2GYlRCksm5iOmvAw5h/Nm2NCHn/eSKqWf0IIrVguqLczqhR9m/OA32gWx7ZdbP9xEUZ5cFF4uby3trZm3JSs=
-X-Received: by 2002:a05:6122:614d:b0:520:652b:cdf9 with SMTP id
- 71dfb90a1353d-525a838806amr14632718e0c.5.1742993563651; Wed, 26 Mar 2025
- 05:52:43 -0700 (PDT)
+	s=arc-20240116; t=1742993727; c=relaxed/simple;
+	bh=A0tYgISPZr3nBdVXsqT8eCy/AZW3HgsAo/r/eYIdF7k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tNgerwSkLrHqeEL/eQH5sz7Rn4qb6SPO1MtPKUC7JP66efacFfWpm/cycs8DQTCFaefFIDkyYgb9hod+vZ0YX0UefDuDe1UMWGQHlY+FV8XRu+LAjlYhxk7l33GsEjuCmIaZq979AGleDJ9Bi5uGVUiITt/SOtLW/t/MZyTla2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=THU3o0rI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 738A1C4CEE2;
+	Wed, 26 Mar 2025 12:55:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742993726;
+	bh=A0tYgISPZr3nBdVXsqT8eCy/AZW3HgsAo/r/eYIdF7k=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=THU3o0rIbjwHT9PJTSFjAw+msHz6bBCCCWbSbkZbzCpyNHz3DNnBQD3RJaYmZy4At
+	 diYGAQbunY5Z6PzvcefCNBo/l6d+Ji0PT5bdZLTGQLPCfjLHCOQoLCsnXJjwuuVho6
+	 gJEfgcLRetMnMGFe7ylOaz7C//gvUljt2JlrwxJg0W+VXESsrm8bGvVEV3O93lNZws
+	 XMDmwzOrXpuwM/uc0QRQ6RshQzXOIcxhWzXpRE0ynrjWXkysxrPtZQWeGFtR77RDfO
+	 SQjWlEUg4s+/XITtoFn8JgwxAPNsNdTFxgpQMvqkULaySHr5d/TLSyTKe75/lY4ry8
+	 WDvFHwE177O0w==
+Message-ID: <c91a9571-7893-4f9c-923b-f9d85fa4796f@kernel.org>
+Date: Wed, 26 Mar 2025 13:55:20 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250318205735.122590-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-In-Reply-To: <20250318205735.122590-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Wed, 26 Mar 2025 12:52:17 +0000
-X-Gm-Features: AQ5f1Jp8vxfqG0NLOvLDVY_2Yq7ayGqmlj-XifLUdImduJ_U681u5FCcCZ32CJM
-Message-ID: <CA+V-a8tBh1Ev-8=0vcmz0XB7iqKzZZ5dKefrZCrY49Je3KTCAg@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 0/3] Add GBETH glue layer driver for Renesas
- RZ/V2H(P) SoC
-To: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: Philipp Zabel <p.zabel@pengutronix.de>, Conor Dooley <conor+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, netdev@vger.kernel.org, 
-	Jose Abreu <joabreu@synopsys.com>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Magnus Damm <magnus.damm@gmail.com>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Eric Dumazet <edumazet@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew+netdev@lunn.ch>, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
-	Biju Das <biju.das.jz@bp.renesas.com>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 1/3] page_pool: Move pp_magic check into
+ helper functions
+To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Simon Horman <horms@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
+ Mina Almasry <almasrymina@google.com>, Yonglong Liu
+ <liuyonglong@huawei.com>, Yunsheng Lin <linyunsheng@huawei.com>,
+ Pavel Begunkov <asml.silence@gmail.com>, Matthew Wilcox <willy@infradead.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-mm@kvack.org
+References: <20250326-page-pool-track-dma-v3-0-8e464016e0ac@redhat.com>
+ <20250326-page-pool-track-dma-v3-1-8e464016e0ac@redhat.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20250326-page-pool-track-dma-v3-1-8e464016e0ac@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Paolo and Jakub
 
-On Tue, Mar 18, 2025 at 8:57=E2=80=AFPM Prabhakar <prabhakar.csengg@gmail.c=
-om> wrote:
->
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
->
-> Hi All,
->
-> This patch series adds support for the GBETH (Gigabit Ethernet) interface
-> on the Renesas RZ/V2H(P) SoC. The changes include updating the device tre=
-e
-> bindings, documenting the GBETH bindings, and adding the DWMAC glue layer
-> for the Renesas GBETH.
->
-> Note, this patch series depends on [0].
->
-> [0] https://lore.kernel.org/all/Z82tWYZulV12Pjir@shell.armlinux.org.uk/
->
-This patch series has been marked as "Changes Requested" on Patchwork,
-but there were no review comments on the series. If the status was
-marked as "Changes Requested" due to build failures reported by the
-kernel bots, I=E2=80=99d like to clarify that the failure was caused by a
-patch dependency, which has now been merged into net-next [0]. As a
-result, this series should now build successfully on net-next.
 
-Please let me know if you would like me to resend the series.
+On 26/03/2025 09.18, Toke Høiland-Jørgensen wrote:
+> Since we are about to stash some more information into the pp_magic
+> field, let's move the magic signature checks into a pair of helper
+> functions so it can be changed in one place.
+> 
+> Reviewed-by: Mina Almasry<almasrymina@google.com>
+> Tested-by: Yonglong Liu<liuyonglong@huawei.com>
+> Signed-off-by: Toke Høiland-Jørgensen<toke@redhat.com>
+> ---
+>   drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c |  4 ++--
+>   include/net/page_pool/types.h                    | 18 ++++++++++++++++++
+>   mm/page_alloc.c                                  |  9 +++------
+>   net/core/netmem_priv.h                           |  5 +++++
+>   net/core/skbuff.c                                | 16 ++--------------
+>   net/core/xdp.c                                   |  4 ++--
+>   6 files changed, 32 insertions(+), 24 deletions(-)
 
-[0] https://web.git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git=
-/commit/?id=3D0c1f1eb65425
+LGTM
 
-Cheers,
-Prabhakar
+Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
 
