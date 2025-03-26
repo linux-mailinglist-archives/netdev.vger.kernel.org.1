@@ -1,327 +1,336 @@
-Return-Path: <netdev+bounces-177662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2BC5A71004
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 06:01:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A484A7101D
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 06:25:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CBF216902B
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 05:01:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 632937A2E4E
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 05:24:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD88E16F8E5;
-	Wed, 26 Mar 2025 05:01:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 383E417B506;
+	Wed, 26 Mar 2025 05:25:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="R3BmUlfO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IK547f0z"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2063.outbound.protection.outlook.com [40.107.220.63])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E35CF42A8F;
-	Wed, 26 Mar 2025 05:01:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.63
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742965315; cv=fail; b=RT5nXDnPfa/eWFFs4zrG1ELWaSAxU1iAPip0iVhMxeQdRT5tFtXhactc82b/HPvGSBrAfniOcglCKa7QgmEtSdYjtVPYdiqVT7E2FG8e90TZ/1ls0TKtcPqYTvpzDC1m8Krv/3s4s1Hd2nkww4p6iAkwZrbARv1P+Ofzs0VX+E4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742965315; c=relaxed/simple;
-	bh=7d8zc1Uh+Cu6Pmybxq72LMlRKqP02Hv/qEnXKUgVxNQ=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=mcmhlFU2U4OPxmT3KcmDL/eMpXBVV80PEVGWfzgorRnafXXkx1ksiMLERGFwSmV43hKxrmQmx2PPCKORIIzSPqLk1dak7aEtEQh6bAXaN6DOPdNl7RZRTn2HPod/XoAd4QQm3pfIzoFou6WSovY+BJKlqMMLjH9+uk+inf2eSpc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=R3BmUlfO; arc=fail smtp.client-ip=40.107.220.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kRwPOI+ssIrgHw0naUHNQa6kWkYYNWIviXsv9+Ni9Mnp1vdSAfQZqTjtjo+jiKRQid7mjscTyxBDTe4BPOjm9fMhfV0rSHkYsAv4BqRFhLNuyyd7nkNgip86FYZm6U+SYDKzNWL0EIIAr96ITrSZgX6uCYPwDx9G1ih9v7qx/xldJl55tTbzS3S5R+XSt8OdIQg+ggxi2AaW29d7f5Mm66wiANukEKjINn+ZT+b2IX1+QrkvIU/UCrJ8KsUHmhdukt01hDWoAX7S6qNNCMvgBmNJxIfoqgf2POYolgLgjFYRRrk+5seWHTeaOqMy3vBxwh4hCchvcoKPxoQVA0XAdw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mCJuwk4J6Xmz2FR4NyHIzcJ+B7q2tjDGhln32EoxU64=;
- b=nmjoav79WZ2n2ZxrkXZ4+y54VYdO3b9uVX+5KWkpckBahijaIR0EYbtOaB8YtIMGYRPEUfs5EhMVF6yYqu5JHGzcG0PPbfEUBYCTd34wdNU4MsuDr2NqeRSOBKLiV9TWMlBBIn3XD0WGXbqlhpXhpKhb5Co5m4rErDyw2h1HoVgc0nitIiKiAdx+mBGAAlpCaxdz/FZpQiuOqX9ixc6tzJJ1WhcQtkBCAzhBQudkDk5k4Ji8fwL24f0FFWPTWB5CcwnfXqgbmh3BCYqe8zhLLjUK/+2kXfLpxhih7pMj3Bhqy38SbmNIjVlRNO/6AusI3g9m9IzndayKuYLswoLfKA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mCJuwk4J6Xmz2FR4NyHIzcJ+B7q2tjDGhln32EoxU64=;
- b=R3BmUlfO6QYlvYMjb2gRPYT6cOpbvcqOWojl+Cdqczk3qvBMEwSBjNr98XMofEoSOu/Qu9PT1FEfLtPf5aZd/j7vsNNPGKWZWpyzdpVfRFh4h9HShGRyCsq0kQ4pt8Q0ygdHldYtdONStcr2Rz8vkmhGKzYKHgG0sLPNJppbK7c=
-Received: from SJ2PR12MB8739.namprd12.prod.outlook.com (2603:10b6:a03:549::10)
- by IA0PR12MB7530.namprd12.prod.outlook.com (2603:10b6:208:440::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.42; Wed, 26 Mar
- 2025 05:01:50 +0000
-Received: from SJ2PR12MB8739.namprd12.prod.outlook.com
- ([fe80::29bb:9aa:2a72:df1b]) by SJ2PR12MB8739.namprd12.prod.outlook.com
- ([fe80::29bb:9aa:2a72:df1b%3]) with mapi id 15.20.8534.040; Wed, 26 Mar 2025
- 05:01:50 +0000
-From: "Katakam, Harini" <harini.katakam@amd.com>
-To: Andrew Lunn <andrew@lunn.ch>, =?iso-8859-1?Q?Th=E9o_Lebrun?=
-	<theo.lebrun@bootlin.com>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
-	<conor+dt@kernel.org>, Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu
- Beznea <claudiu.beznea@tuxon.dev>, Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
-	Alexandre Ghiti <alex@ghiti.fr>, Samuel Holland <samuel.holland@sifive.com>,
-	Richard Cochran <richardcochran@gmail.com>, Russell King
-	<linux@armlinux.org.uk>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>, Gregory CLEMENT
-	<gregory.clement@bootlin.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-riscv@lists.infradead.org"
-	<linux-riscv@lists.infradead.org>, "linux-mips@vger.kernel.org"
-	<linux-mips@vger.kernel.org>, Thomas Petazzoni
-	<thomas.petazzoni@bootlin.com>, Tawfik Bayouk <tawfik.bayouk@mobileye.com>
-Subject: RE: [PATCH net-next 07/13] net: macb: move HW IP alignment value to
- macb_config
-Thread-Topic: [PATCH net-next 07/13] net: macb: move HW IP alignment value to
- macb_config
-Thread-Index: AQHbmpXdimvWxTuoTUe8kI1qHgz0XrN+FQEAgAR/5YCAAA0jAIACOyiA
-Date: Wed, 26 Mar 2025 05:01:50 +0000
-Message-ID:
- <SJ2PR12MB8739A1E03E116F9D6A312EB99EA62@SJ2PR12MB8739.namprd12.prod.outlook.com>
-References: <20250321-macb-v1-0-537b7e37971d@bootlin.com>
- <20250321-macb-v1-7-537b7e37971d@bootlin.com>
- <45b3e613-90c6-4499-b50b-383106172184@lunn.ch>
- <D8OOPAXK16CI.3TE75O760JRSL@bootlin.com>
- <967fcb66-6a64-4e97-8293-a38b0ef1bc01@lunn.ch>
-In-Reply-To: <967fcb66-6a64-4e97-8293-a38b0ef1bc01@lunn.ch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_ActionId=782d21aa-4929-4c1e-9040-a62f9cf00242;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_ContentBits=0;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Enabled=true;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Method=Standard;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Name=AMD
- Internal Distribution
- Only;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_SetDate=2025-03-26T04:40:21Z;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;MSIP_Label_dce362fe-1558-4fb5-9f64-8a6240d76441_Tag=10,
- 3, 0, 1;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ2PR12MB8739:EE_|IA0PR12MB7530:EE_
-x-ms-office365-filtering-correlation-id: e7b8b480-76ef-4a58-6db8-08dd6c235170
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|366016|7416014|1800799024|38070700018;
-x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?6RHcrkqr/t64JxoYcePf+8W83HJDmPpusRSyuq6Zu21y8RB9fx2MmKts6G?=
- =?iso-8859-1?Q?nBH8LtjuAF69iLgVc6IF1u4xHkWafYCLfvXm8g+hi+LnQQcKWEjHypJaw3?=
- =?iso-8859-1?Q?1mhn7A03jGlsCtXgr67PvgPxBhmsP1LJDBnICCRRC7DQMOg9Th/1qye6lM?=
- =?iso-8859-1?Q?ontIMuhfheBjaXfCrZhpAicI4OCcBuqpyFzIbrd1I0B1yyYfXaI3+2u6Al?=
- =?iso-8859-1?Q?pJYeyYrhLMmWmfS/WK+n9jKw4QKRvasSw0iMxFrFVOwXzpssl8rAxN78/L?=
- =?iso-8859-1?Q?lG2jiFtNVjAc+7wJL0YNAwkaI4jKhiswuNQZf8Ckya6ZTNajtqaAVJkPgY?=
- =?iso-8859-1?Q?pC3Od9RWipZNMH6cEBv4LE+xh93Lkn1IE+p5aRkxa20gQ1yvsxOvD/1acg?=
- =?iso-8859-1?Q?21hnMRC0I+X27UIQua1/bqi2Q3d+VgGvosKpqOr6FVNyLa/ugJe4gX5SmI?=
- =?iso-8859-1?Q?knEf7NgajzoclUENXMWtnop9yH7gsk6mq+CRed4tb5WwUwcNZKN7x5Kx9j?=
- =?iso-8859-1?Q?SE+RpQNrwvtb6ji85OcJ3xcFV7jrtPdM2aHVi49mh/sVmSfYRHysuEDnku?=
- =?iso-8859-1?Q?I8iPIxSDGkLrb/WQxoTabP4TdnRFX4fmoSdPv/cXKdgBQIpowoSBEjW7E/?=
- =?iso-8859-1?Q?u03l0qMT5BmVSMTTsj8tyc3eKtxmU15hx5ghy34efnaMYoHoocwTY3seUR?=
- =?iso-8859-1?Q?S/IcEuYxE6I5ZpVhn69jJa/Y1zoDgUwAqY3KDmNXaS1KUyxCXJHnQHzpX0?=
- =?iso-8859-1?Q?CECykHIaJJjFHn3+hB0IO6zshCsNgJ5e5E7xphcIaDkDxCwoHalVgcuema?=
- =?iso-8859-1?Q?SwmRSFV2SRy3iSzbfIMOLqjqRuUXpVOLP/t69O/2y4UxtQHlh6LU1Miv9L?=
- =?iso-8859-1?Q?fpLgpRaxerLxXdIX4Q9KMgSdvns9saTd5vhR7deQLXKhrQEVeUs1DCFwDM?=
- =?iso-8859-1?Q?I3rQq/1clsNoXJPZ0os08G7X30UyRBoCFQI4btnYmMULTU6Ncra54udVMu?=
- =?iso-8859-1?Q?xRjWNu4uHv3ud12ZBXt0mi8Zj9F6VojfFInUWK9jkXBcUntk6m7wnR1Vbx?=
- =?iso-8859-1?Q?qeI5BE4dDlgOQ0h8Is/BwVebFYqXH5MXbDAqrt9bsWF9gvpE/l0kEvFl2k?=
- =?iso-8859-1?Q?ze8dvUd33Cr36TgA5J3c99rp3jf3C9Mdx60eoh/2MAVyy6QJlA2PNIIkMU?=
- =?iso-8859-1?Q?bATZTwOfHGX67Or18IlMMqqS6DrK9jb0NsTvabmvjr2ANquIr9copBrtRw?=
- =?iso-8859-1?Q?qBbJ5WnEx96P3unGoOKm4or5QGiU+iTJZBOn0ldGSpg99oQZhBih9IePvo?=
- =?iso-8859-1?Q?ORsQZgNcTyMiPQZ84gj1tqSn9Xmeuz62qJcZamsympsYFEpipaPN24vRAs?=
- =?iso-8859-1?Q?IQ4TygD1qstxZikZHpCPizDikPixwYNqtqe1J/W8hT8ZjDSnD2djazPQC8?=
- =?iso-8859-1?Q?JBwwBa2tAS2FtTcyRUsIiGBPP1gI9vnG7Y7Ke1gYbBR2E9LpFDVGAppZBv?=
- =?iso-8859-1?Q?HtrhWJudicAp0jcQ0W3fAJ?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR12MB8739.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?Czq2SMFaD2F1M+Pr6Z5e3UBRApGA0NTtaiNNXn2zv1B5+8B6bBkIiCd9oo?=
- =?iso-8859-1?Q?YagqdpuyKnIzLdq3QZMN4v679ZRlclga9gBbBETDAS3eXIDqzz8t4c06iO?=
- =?iso-8859-1?Q?3VfzXEU5IGd2/VhORBdCQaHu1qz1tl7HFCsCTPSvhZEPfYcWKdF/3n/poa?=
- =?iso-8859-1?Q?5VvdYEMJz2kRPA/RJ15POCSc1Du0x55SS3rlLR7Y6RJ+vGKO5WFHO0VbJg?=
- =?iso-8859-1?Q?dC0r5zDDXvitjLRE2rxcBe8Wo/nUH+MSohr04oTE30UZLMZzLtorYt8P9v?=
- =?iso-8859-1?Q?E9sXWfPhcoTXYhZjzmPRpXwP6hu9ORSU67t3tDSLr4uI7vVEb5R2q8TCIO?=
- =?iso-8859-1?Q?sea04zn7pVPfXGzspZFiKha9WLQl3Ft/tXorl1ox5Qr8KD8+/3m01Ipaxt?=
- =?iso-8859-1?Q?TXd+vMzSP2+IsvxdmoIGnNJC0ExmwDc0ITj6TSXQn6PYlX3u4tQSXyGTvn?=
- =?iso-8859-1?Q?gb/09QHmVMjW+CCjntAGktimAzuR5xd9fol7nirOo38iJPzG+WFENgQFDN?=
- =?iso-8859-1?Q?Mr9sIHRXAbTSQv4AlQjZLVmqG2xE3zb+PRGZk6ItakU1YvXTNfBY0eHC7S?=
- =?iso-8859-1?Q?4CshJdjuulpNy/gAysvqKc+76kXieKlmb/9vWjDttMXnrFP5DVL0w9SgX/?=
- =?iso-8859-1?Q?9OjRmVhZAvdEh9m7VPCEeOlJzLZdguxJFpzXK41mkYvmn8Zn3jaoh17P4H?=
- =?iso-8859-1?Q?ODCTSIUqcJYGxGg8wMjuresflCMPfBs1Dmw3DUU7i4nLaApcplshKbOJ+6?=
- =?iso-8859-1?Q?Ebox8y1qOKv0Cp7G3Gh2hNdcxI4XKVOWFjMFfjvUbHeVgbgOuI4Vx0zlc6?=
- =?iso-8859-1?Q?Yg7/IzmivlcFiFKdrSR5mOklQb0arJxo4Ic1reYCJ9xFIrbd7Yf5Dk4i94?=
- =?iso-8859-1?Q?5hbV7nziplLGLOBTfvAdNa0byjO4fzOfPnTngXg6PKmWHNgVjpiH1bgGNb?=
- =?iso-8859-1?Q?oRBsAE2+Ym1IPWvHnMMSqTMQFEPPgW847QaypuOWPm6xLMQFjMEWiy+tkd?=
- =?iso-8859-1?Q?WRzKH0es48r4laeZIiL0ilIu7mQ5nCHZxojHuATzI05Xqlg2IEnMtv4QAa?=
- =?iso-8859-1?Q?P6bYX2Rc6AHufye+3mwk+8SA7xITeXXR/mD8JC+ajwxOjEmDzR4fRoTV2Q?=
- =?iso-8859-1?Q?nfT0V/dziYVtCWDepTGVVftyWtzEYMRM7WawjbW9mlfdvcFJkuMFiCyzOV?=
- =?iso-8859-1?Q?0ApNXtV1yb8CIIISDt1Qse7ApHNyZ+ma+Bovof995zliReUeQD0nzVEx5a?=
- =?iso-8859-1?Q?WkXE6QLSXMjV6e3AU4GNTC6logZH11r70n2LYKvXY6Wz2YRfgMMcQj8kKj?=
- =?iso-8859-1?Q?M488ZnzYllPh1ZCRPs9+MRD6pqr1SINuSPtjBKcenYN/JWRdXcMTCmLtXI?=
- =?iso-8859-1?Q?V7G9Bd5CpT1fp5oYECEAXI5qlgHsI4btytFEPTS/oATpVM0fLRch/um3qO?=
- =?iso-8859-1?Q?Wr6f25Wxhce0FS1XCkCwQKZ4U5Ez9MomlIcwMsVTtr4e7+gLAZnOlswI3O?=
- =?iso-8859-1?Q?XDwGu7fdrF+1e1niOunKlF+SAYUzdbNPuqB44HVSol8kfwwwk18nJHx8Ip?=
- =?iso-8859-1?Q?xur8YC4nJwPis/XXaBPRxggeyjZyhLUOoYbL1tBRKftVYYe/KCEmPvUjTs?=
- =?iso-8859-1?Q?XtAtxHFu3BJOE=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D1A71F16B;
+	Wed, 26 Mar 2025 05:25:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742966735; cv=none; b=KMLpbvaByypr532Kuvl5ChHLPcZ7valxug2BywMZgBWcqOdkSJPsnGj9c5gOZN6M38WPF0qxuUEUTtXvkHgAk5wJ4xUosKpCOsqKRWSXZEcW2zWutjTcnQmPeECPAveD3aPDxu2Ra5pdMWbXwnVkgGA9iP0x2SckvB8TSIdFgDc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742966735; c=relaxed/simple;
+	bh=6p22P6aJ3R7iByl6TF3R4bJSCYXNPxwoS4bL5Twd4io=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O2SVf2HeHXn/rp1J6kYhYvAjlNYmdWb0Gk+awDh5HBFmbgo0wfTLSkSsPo71Y6NR9uX2dlfrAmNrLn7l/m+eHh1Gu+ukaMWCAduu5WTQLE3CeUwXxCsy3TdVeXnBCUoPouaDqcX5zzg9UtizLBMiSK08z74FbLrwOhVrFm8mEJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IK547f0z; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6e89a2501a0so61127656d6.1;
+        Tue, 25 Mar 2025 22:25:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742966732; x=1743571532; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :feedback-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=VJBvguYGH4f+pr17a1nyN6pA9fJBnK+7uyQqZIkKBzY=;
+        b=IK547f0zUF6t+Aoxn6jQZFP1p4NKoeo8hzeLgCPQGgERL62UPtuD76j9Cp07KOheAy
+         CwON3/nWsrQhwLUe7qdwWHiuwmvWysioJz9Lvzfr4T2Ly7B+zjnwpbelpclopXTseiJL
+         rGozCyqCU2Oagtz5mFBjdnWsQWhymXqNf72nxhJMk6tvEaIPL0K3EnUdtIHc/rf1yc3t
+         bZqgdXKeS/gHN+QPIMJ9COSEuvVl93PlUfFqBONt3glwcj4HBD8wSnTDNJgnxSU0MJKQ
+         naIVUzEh0Q98Tb0Y7aLcPGLarr/pYfcvkqbrJIcstqLWl7/LXWgHX3CHVKbBLoWwBIIr
+         j2Ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742966732; x=1743571532;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :feedback-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VJBvguYGH4f+pr17a1nyN6pA9fJBnK+7uyQqZIkKBzY=;
+        b=wAEz2cxFC0fdIo0FDyXcp9PyMEQS8vzsfoZoMkP2Z9rU4etDrjgpqjE1OTzT2uCtTi
+         JErAbja9NI+pACdddrICVUl/Llm+fkGO7Q8g3PNHMP05L30snrb61YZffsxDr6pXfumh
+         AakZT56TJCFUb9jkxwX0D0P5TDJPOc+yR6bJ4ghegrOan6ya6W2K2eaAm2/q6kSE2+UK
+         pmtDp6WXSzBEtnoCM7jw80KciZ/FVX/3Upp0q6J5i56pJ94+9TtkfHXIdviOtvqj1/0B
+         hIiMnNXlxqhfEjqTaizrbQl1VYRZWCjOYtOl0BYvpiCNNs3uapF/TMnt3ADtnD9tm/e7
+         XYgg==
+X-Forwarded-Encrypted: i=1; AJvYcCVBuwPmtfPyMYmatfrZFAxrpb4iYZcXSiYsmlZhMVOc/9ZA3aSFkJ5OS6njOW1LnK/oRHgp/JM9@vger.kernel.org, AJvYcCXC20HyndytiVoWUuXOZ1c0GfcdBa8Gx35lXq+I2NhVsvZsRbODoGbaMy7jKGTSN6SrBseV8i30hAhxbk8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMa04Ee0amWn91ASsk6T3sYf1U6tECHdS1/VLc5EnuW3WZnumn
+	ZCoBhL7Q/8We4hsdgsujAbI0Xnbr8poWUNeSJiyFdXtZv/fuhiCZ
+X-Gm-Gg: ASbGncuzV7frNlEvbyNUXMQ5Z4/CU0g4L7zGiV+t4Oo/WizWBm9WW16yb+rKYpPqOvj
+	2pWWT5r60Qid2pZUltbC5fBoMUI10XTwmFNMQWIpb9nENEeBzGrUP1cd1D/fA9ckKdR9jdSnUsq
+	kL1x8MRX9+P8MtUP1fNBLWE8/AQQOQdIgzKBZmQTPiN9Lq+7mifKFGbaOyWCYVKdIWEp11IYURH
+	GYA/dDuTxux2lKtO1UQqC4CxIlOec5UkJhK58no60JjTvz8QIU16LL6L6kuXx4GcXbJoGOTNpBA
+	nhlyHXM9TGmNqXaAG9T61+e13ETxET1w91WEHFiPfmABXgqg1qnqbv0f2dp4n3gFvUZK7t9z295
+	Mb44dkrY9qbJGigEWeEDeZ5+9HuBYs3oESqQ=
+X-Google-Smtp-Source: AGHT+IEX8Mm48J9uw8izft2BGYqHE2+syPpYZEFkQKomLSfbTA+OSh6ZP6WdswSV3v1dw6ZyzndIfQ==
+X-Received: by 2002:ad4:5cad:0:b0:6e8:fb7e:d33b with SMTP id 6a1803df08f44-6eb3f33c469mr344993366d6.33.1742966731843;
+        Tue, 25 Mar 2025 22:25:31 -0700 (PDT)
+Received: from fauth-a1-smtp.messagingengine.com (fauth-a1-smtp.messagingengine.com. [103.168.172.200])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6eb3ef1f5ccsm64051766d6.37.2025.03.25.22.25.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Mar 2025 22:25:31 -0700 (PDT)
+Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
+	by mailfauth.phl.internal (Postfix) with ESMTP id B05D91200066;
+	Wed, 26 Mar 2025 01:25:30 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Wed, 26 Mar 2025 01:25:30 -0400
+X-ME-Sender: <xms:yo_jZ-WuA8ihqbXKZy3KSNT-prpQ98xI87Q-fYd5__yiunjTpxqmtw>
+    <xme:yo_jZ6lRxZHWuCJPIMjRRuUUnCgNrmIE0IBoT7tUlf3wX5B6ZDtvV2jRQRffRHb5F
+    8aGrOFyx4UoI9YtIw>
+X-ME-Received: <xmr:yo_jZybzjSWirarXWH0cjQlzNadmHAXbXm8MbDvb00K4j7sYaa36hRHd>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduieegieelucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddt
+    tddunecuhfhrohhmpeeuohhquhhnucfhvghnghcuoegsohhquhhnrdhfvghnghesghhmrg
+    hilhdrtghomheqnecuggftrfgrthhtvghrnheptdegheelveffudejffegvdelgffhhfel
+    keeiieefgeevteejvdegveeuffeihefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
+    hrrghmpehmrghilhhfrhhomhepsghoqhhunhdomhgvshhmthhprghuthhhphgvrhhsohhn
+    rghlihhthidqieelvdeghedtieegqddujeejkeehheehvddqsghoqhhunhdrfhgvnhhgpe
+    epghhmrghilhdrtghomhesfhhigihmvgdrnhgrmhgvpdhnsggprhgtphhtthhopedugedp
+    mhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheplhhlohhnghesrhgvughhrghtrdgtoh
+    hmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthho
+    pehpvghtvghriiesihhnfhhrrgguvggrugdrohhrghdprhgtphhtthhopehlvghithgroh
+    esuggvsghirghnrdhorhhgpdhrtghpthhtohepmhhinhhgohesrhgvughhrghtrdgtohhm
+    pdhrtghpthhtohepfihilhhlsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrvghhse
+    hmvghtrgdrtghomhdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhk
+    vghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlh
+    drohhrgh
+X-ME-Proxy: <xmx:yo_jZ1UX0OWgB3smckJ99ZF1cL1kuBudxleKN0pC4tyWzR4Tjb9O_w>
+    <xmx:yo_jZ4kRMEPMoGXrRW3qULozRI7LAO_5ZLjnAa-R3zZj-vazfjjPLQ>
+    <xmx:yo_jZ6cpa0TyXRoitjuUUOybmu0gWFLdJIxgoQBwHltnU9ww6-13zg>
+    <xmx:yo_jZ6FXnhPJBLmHEdK_yOgx8wJNcIPuHTZCcz5Ejv1SNZYjSVOXrA>
+    <xmx:yo_jZ2nCQgxhjPxbsD-a3k2wTpLziz0acNUclk8OyyxOvWbTDzrhlTQ8>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 26 Mar 2025 01:25:30 -0400 (EDT)
+Date: Tue, 25 Mar 2025 22:25:29 -0700
+From: Boqun Feng <boqun.feng@gmail.com>
+To: Waiman Long <llong@redhat.com>
+Cc: Eric Dumazet <edumazet@google.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Breno Leitao <leitao@debian.org>, Ingo Molnar <mingo@redhat.com>,
+	Will Deacon <will@kernel.org>, aeh@meta.com,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	jhs@mojatatu.com, kernel-team@meta.com,
+	Erik Lundgren <elundgren@meta.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>
+Subject: Re: [PATCH] lockdep: Speed up lockdep_unregister_key() with
+ expedited RCU synchronization
+Message-ID: <Z-OPya5HoqbKmMGj@Mac.home>
+References: <67e1b0a6.050a0220.91d85.6caf@mx.google.com>
+ <67e1b2c4.050a0220.353291.663c@mx.google.com>
+ <67e1fd15.050a0220.bc49a.766e@mx.google.com>
+ <c0a9a0d5-400b-4238-9242-bf21f875d419@redhat.com>
+ <Z-Il69LWz6sIand0@Mac.home>
+ <934d794b-7ebc-422c-b4fe-3e658a2e5e7a@redhat.com>
+ <Z-L5ttC9qllTAEbO@boqun-archlinux>
+ <f1ae824f-f506-49f7-8864-1adc0f7cbee6@redhat.com>
+ <Z-MHHFTS3kcfWIlL@boqun-archlinux>
+ <1e4c0df6-cb4d-462c-9019-100044ea8016@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ2PR12MB8739.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e7b8b480-76ef-4a58-6db8-08dd6c235170
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Mar 2025 05:01:50.2413
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: JBRPMncZQ6oziIMy/QdcHsge/R9/NpctfdVhAM3UDOAw6xdgdoUKbc+dmySLcrlK
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7530
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1e4c0df6-cb4d-462c-9019-100044ea8016@redhat.com>
 
-[AMD Official Use Only - AMD Internal Distribution Only]
+On Tue, Mar 25, 2025 at 07:20:44PM -0400, Waiman Long wrote:
+> On 3/25/25 3:42 PM, Boqun Feng wrote:
+> > On Tue, Mar 25, 2025 at 03:23:30PM -0400, Waiman Long wrote:
+> > [...]
+> > > > > > That commit seemed fixing a race between disabling lockdep and
+> > > > > > unregistering key, and most importantly, call zap_class() for the
+> > > > > > unregistered key even if lockdep is disabled (debug_locks = 0). It might
+> > > > > > be related, but I'm not sure that's the reason of putting
+> > > > > > synchronize_rcu() there. Say you want to synchronize between
+> > > > > > /proc/lockdep and lockdep_unregister_key(), and you have
+> > > > > > synchronize_rcu() in lockdep_unregister_key(), what's the RCU read-side
+> > > > > > critical section at /proc/lockdep?
+> > > > > I agree that the commit that I mentioned is not relevant to the current
+> > > > > case. You are right that is_dynamic_key() is the only function that is
+> > > > > problematic, the other two are protected by the lockdep_lock. So they are
+> > > > > safe. Anyway, I believe that the actual race happens in the iteration of the
+> > > > > hashed list in is_dynamic_key(). The key that you save in the
+> > > > > lockdep_key_hazptr in your proposed patch should never be the key (dead_key)
+> > > > The key stored in lockdep_key_hazptr is the one that the rest of the
+> > > > function will use after is_dynamic_key() return true. That is,
+> > > > 
+> > > > 	CPU 0				CPU 1
+> > > > 	=====				=====
+> > > > 	WRITE_ONCE(*lockdep_key_hazptr, key);
+> > > > 	smp_mb();
+> > > > 
+> > > > 	is_dynamic_key():
+> > > > 	  hlist_for_each_entry_rcu(k, hash_head, hash_entry) {
+> > > > 	    if (k == key) {
+> > > > 	      found = true;
+> > > > 	      break;
+> > > > 	    }
+> > > > 	  }
+> > > > 	  				lockdep_unregister_key():
+> > > > 					  hlist_for_each_entry_rcu(k, hash_head, hash_entry) {
+> > > > 					    if (k == key) {
+> > > > 					      hlist_del_rcu(&k->hash_entry);
+> > > > 				              found = true;
+> > > > 				              break;
+> > > > 					    }
+> > > > 					  }
+> > > > 
+> > > > 				        smp_mb();
+> > > > 
+> > > > 					synchronize_lockdep_key_hazptr():
+> > > > 					  for_each_possible_cpu(cpu) {
+> > > > 					    <wait for the hazptr slot on
+> > > > 					    that CPU to be not equal to
+> > > > 					    the removed key>
+> > > > 					  }
+> > > > 
+> > > > 
+> > > > , so that if is_dynamic_key() finds a key was in the hash, even though
+> > > > later on the key would be removed by lockdep_unregister_key(), the
+> > > > hazard pointers guarantee lockdep_unregister_key() would wait for the
+> > > > hazard pointer to release.
+> > > > 
+> > > > > that is passed to lockdep_unregister_key(). In is_dynamic_key():
+> > > > > 
+> > > > >       hlist_for_each_entry_rcu(k, hash_head, hash_entry) {
+> > > > >                   if (k == key) {
+> > > > >                           found = true;
+> > > > >                           break;
+> > > > >                   }
+> > > > >           }
+> > > > > 
+> > > > > key != k (dead_key), but before accessing its content to get to hash_entry,
+> > > > It is the dead_key.
+> > > > 
+> > > > > an interrupt/NMI can happen. In the mean time, the structure holding the key
+> > > > > is freed and its content can be overwritten with some garbage. When
+> > > > > interrupt/NMI returns, hash_entry can point to anything leading to crash or
+> > > > > an infinite loop.  Perhaps we can use some kind of synchronization mechanism
+> > > > No, hash_entry cannot be freed or overwritten because the user has
+> > > > protect the key with hazard pointers, only when the user reset the
+> > > > hazard pointer to NULL, lockdep_unregister_key() can then return and the
+> > > > key can be freed.
+> > > > 
+> > > > > between is_dynamic_key() and lockdep_unregister_key() to prevent this kind
+> > > > > of racing. For example, we can have an atomic counter associated with each
+> > > > The hazard pointer I proposed provides the exact synchronization ;-)
+> > > What I am saying is that register_lock_class() is trying to find a newkey
+> > > while lockdep_unregister_key() is trying to take out an oldkey (newkey !=
+> > > oldkey). If they happens in the same hash list, register_lock_class() will
+> > > put newkey into the hazard pointer, but synchronize_lockdep_key_hazptr()
+> > > call from lockdep_unregister_key() is checking for oldkey which is not the
+> > > one saved in the hazard pointer. So lockdep_unregister_key() will return and
+> > > the key will be freed and reused while is_dynamic_key() may just have a
+> > > reference to the oldkey and trying to access its content which is invalid. I
+> > > think this is a possible scenario.
+> > > 
+> > Oh, I see. And yes, the hazard pointers I proposed cannot prevent this
+> > race unfortunately. (Well, technically we can still use an extra slot to
+> > hold the key in the hash list iteration, but that would generates a lot
+> > of stores, so it won't be ideal). But...
+> > 
+> > [...]
+> > > > > head of the hashed table. is_dynamic_key() can increment the counter if it
+> > > > > is not zero to proceed and lockdep_unregister_key() have to make sure it can
+> > > > > safely decrement the counter to 0 before going ahead. Just a thought!
+> > > > > 
+> > Your idea inspires another solution with hazard pointers, we can
+> > put the pointer of the hash_head into the hazard pointer slot ;-)
+> > 
+> > in register_lock_class():
+> > 
+> > 		/* hazptr: protect the key */
+> > 		WRITE_ONCE(*key_hazptr, keyhashentry(lock->key));
+> > 
+> > 		/* Synchronizes with the smp_mb() in synchronize_lockdep_key_hazptr() */
+> > 		smp_mb();
+> > 
+> > 		if (!static_obj(lock->key) && !is_dynamic_key(lock->key)) {
+> > 			return NULL;
+> > 		}
+> > 
+> > in lockdep_unregister_key():
+> > 
+> > 	/* Wait until register_lock_class() has finished accessing k->hash_entry. */
+> > 	synchronize_lockdep_key_hazptr(keyhashentry(key));
+> > 
+> > 
+> > which is more space efficient than per hash list atomic or lock unless
+> > you have 1024 or more CPUs.
+> 
+> It looks like you are trying hard to find a use case for hazard pointer in
+> the kernel :-)
+> 
 
-Hi Theo,
+Well, if it does the job, why not use it ;-) Also this shows how
+flexible hazard pointers can be.
 
-> -----Original Message-----
-> From: Andrew Lunn <andrew@lunn.ch>
-> Sent: Tuesday, March 25, 2025 12:06 AM
-> To: Th=E9o Lebrun <theo.lebrun@bootlin.com>
-> Cc: Andrew Lunn <andrew+netdev@lunn.ch>; David S. Miller
-> <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub Kicinski
-> <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Rob Herring
-> <robh@kernel.org>; Krzysztof Kozlowski <krzk+dt@kernel.org>; Conor Dooley
-> <conor+dt@kernel.org>; Nicolas Ferre <nicolas.ferre@microchip.com>; Claud=
-iu
-> Beznea <claudiu.beznea@tuxon.dev>; Paul Walmsley
-> <paul.walmsley@sifive.com>; Palmer Dabbelt <palmer@dabbelt.com>; Albert O=
-u
-> <aou@eecs.berkeley.edu>; Alexandre Ghiti <alex@ghiti.fr>; Samuel Holland
-> <samuel.holland@sifive.com>; Richard Cochran <richardcochran@gmail.com>;
-> Russell King <linux@armlinux.org.uk>; Thomas Bogendoerfer
-> <tsbogend@alpha.franken.de>; Vladimir Kondratiev
-> <vladimir.kondratiev@mobileye.com>; Gregory CLEMENT
-> <gregory.clement@bootlin.com>; netdev@vger.kernel.org;
-> devicetree@vger.kernel.org; linux-kernel@vger.kernel.org; linux-
-> riscv@lists.infradead.org; linux-mips@vger.kernel.org; Thomas Petazzoni
-> <thomas.petazzoni@bootlin.com>; Tawfik Bayouk <tawfik.bayouk@mobileye.com=
->
-> Subject: Re: [PATCH net-next 07/13] net: macb: move HW IP alignment value=
- to
-> macb_config
->
-> On Mon, Mar 24, 2025 at 06:49:05PM +0100, Th=E9o Lebrun wrote:
-> > Hello Andrew,
-> >
-> > On Fri Mar 21, 2025 at 10:06 PM CET, Andrew Lunn wrote:
-> > > On Fri, Mar 21, 2025 at 08:09:38PM +0100, Th=E9o Lebrun wrote:
-> > >> The controller does IP alignment (two bytes).
-> > >
-> > > I'm a bit confused here. Is this hard coded, baked into the silicon?
-> > > It will always do IP alignment? It cannot be turned off?
-> >
-> > Yes, the alignment is baked inside the silicon.
-> > I looked but haven't seen any register to configure the alignment.
-> >
-> > Sorry the commit message isn't clear, it needs improvements.
-> >
-> > >>  skb_reserve(skb, NET_IP_ALIGN);
-> > >
-> > > Why not just replace this with
-> > >
-> > >         skb_reserve(skb, 2);
-> >
-> > On arm64, NET_IP_ALIGN=3D0. I don't have HW to test, but the current
-> > code is telling us that the silicon doesn't do alignment on those:
->
-> This is part of the confusion. You say the hardware does alignment, and t=
-hen say it
-> does not....
->
-> >    skb =3D netdev_alloc_skb(...);
-> >    paddr =3D dma_map_single(..., skb->data, ...);
-> >    macb_set_addr(..., paddr);
-> >
-> >    // arm   =3D> NET_IP_ALIGN=3D2 =3D> silicon does alignment
-> >    // arm64 =3D> NET_IP_ALIGN=3D0 =3D> silicon doesn't do alignment
-> >    skb_reserve(skb, NET_IP_ALIGN);
-> >
-> > The platform we introduce is the first one where the silicon alignment
-> > (0 bytes) is different from the NET_IP_ALIGN value (MIPS, 2 bytes).
->
-> This is starting to make it clearer. So the first statement that the cont=
-roller does IP
-> alignment (two bytes) is not the full story. I would start there, explain=
- the full story,
-> otherwise readers get the wrong idea.
->
-> > >>     Compatible             |  DTS folders              |  hw_ip_alig=
-n
-> > >>    ------------------------|---------------------------|------------=
-----
-> > >>    cdns,at91sam9260-macb   | arch/arm/                 | 2
-> > >>    cdns,macb               | arch/{arm,riscv}/         | NET_IP_ALIG=
-N
-> > >>    cdns,np4-macb           | NULL                      | NET_IP_ALIG=
-N
-> > >>    cdns,pc302-gem          | NULL                      | NET_IP_ALIG=
-N
-> > >>    cdns,gem                | arch/{arm,arm64}/         | NET_IP_ALIG=
-N
-> > >>    cdns,sam9x60-macb       | arch/arm/                 | 2
-> > >>    atmel,sama5d2-gem       | arch/arm/                 | 2
-> > >>    atmel,sama5d29-gem      | arch/arm/                 | 2
-> > >>    atmel,sama5d3-gem       | arch/arm/                 | 2
-> > >>    atmel,sama5d3-macb      | arch/arm/                 | 2
-> > >>    atmel,sama5d4-gem       | arch/arm/                 | 2
-> > >>    cdns,at91rm9200-emac    | arch/arm/                 | 2
-> > >>    cdns,emac               | arch/arm/                 | 2
-> > >>    cdns,zynqmp-gem         | *same as xlnx,zynqmp-gem* | 0
-> > >>    cdns,zynq-gem           | *same as xlnx,zynq-gem*   | 2
-> > >>    sifive,fu540-c000-gem   | arch/riscv/               | 2
-> > >>    microchip,mpfs-macb     | arch/riscv/               | 2
-> > >>    microchip,sama7g5-gem   | arch/arm/                 | 2
-> > >>    microchip,sama7g5-emac  | arch/arm/                 | 2
-> > >>    xlnx,zynqmp-gem         | arch/arm64/               | 0
-> > >>    xlnx,zynq-gem           | arch/arm/                 | 2
-> > >>    xlnx,versal-gem         | NULL                      | NET_IP_ALIG=
-N
+At least when using hazard pointers, the reader side of the hash list
+iteration is still lockless. Plus, since the synchronization part
+doesn't need to wait for the RCU readers in the whole system, it will be
+faster (I tried with the protecting-the-whole-hash-list approach as
+well, it's the same result on the tc command). This is why I choose to
+look into hazard pointers. Another mechanism can achieve the similar
+behavior is SRCU, but SRCU is slightly heavier compared to hazard
+pointers in this case (of course SRCU has more functionalities).
 
-Thanks for the patch. xlnx,versal-gem is arm64 and NET_IP_ALIGN is 0.
+We can provide a lockdep_unregister_key_nosync() without the
+synchronize_rcu() in it and let users do the synchronization, but it's
+going to be hard to enforce and review, especially when someone
+refactors the code and move the free code to somewhere else.
 
-AFAIK, IP alignment is controlled by the register field " receive buffer of=
-fset "
-in the NW config register. The only exception is when " gem_pbuf_rsc " i.e.
-receive coalescing is enabled in the RTL in the IP. In that case, the Caden=
-c
-specification states that these bits are ignored.
-So to summarize, if RSC is not enabled (see bit 26 of designcfg_debug6),
-then the current implementation works for all architectures i.e. these two
-statements are in sync:
-config |=3D MACB_BF(RBOF, NET_IP_ALIGN);  /* Make eth data aligned */
-skb_reserve(skb, NET_IP_ALIGN);
+> Anyway, that may work. The only problem that I see is the issue of nesting
+> of an interrupt context on top of a task context. It is possible that the
+> first use of a raw_spinlock may happen in an interrupt context. If the
+> interrupt happens when the task has set the hazard pointer and iterating the
+> hash list, the value of the hazard pointer may be overwritten. Alternatively
+> we could have multiple slots for the hazard pointer, but that will make the
+> code more complicated. Or we could disable interrupt before setting the
+> hazard pointer.
 
-Hope this helps simplify the patch (and also fill up the table that Andrew =
-suggested)
+Or we can use lockdep_recursion:
+
+	preempt_disable();
+	lockdep_recursion_inc();
+	barrier();
+
+	WRITE_ONCE(*hazptr, ...);
+
+, it should prevent the re-entrant of lockdep in irq.
+
+> 
+> The solution that I am thinking about is to have a simple unfair rwlock to
+> protect just the hash list iteration. lockdep_unregister_key() and
+> lockdep_register_key() take the write lock with interrupt disabled. While
+> is_dynamic_key() takes the read lock. Nesting in this case isn't a problem
+> and we don't need RCU to protect the iteration process and so the last
+> synchronize_rcu() call isn't needed. The level of contention should be low
+> enough that live lock isn't an issue.
+> 
+
+This could work, one thing though is that locks don't compose. Using a
+hash write_lock in lockdep_unregister_key() will create a lockdep_lock()
+-> "hash write_lock" dependency, and that means you cannot
+lockdep_lock() while you're holding a hash read_lock, although it's
+not the case today, but it certainly complicates the locking design
+inside lockdep where there's no lockdep to help ;-)
 
 Regards,
-Harini
+Boqun
 
->
-> I'm not sure this table is useful. What might be more interesting is
->
->      Compatible             |  architecture |  hw_ip_align | value of NET=
-_IP_ALIGN
->
-> We can then see if there are cases when the 3rd and 4th column differ.
->
->       Andrew
-
+> Cheers,
+> Longman
+> 
+> 
 
