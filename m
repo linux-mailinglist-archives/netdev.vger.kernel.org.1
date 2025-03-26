@@ -1,236 +1,343 @@
-Return-Path: <netdev+bounces-177735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90EEEA717C8
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 14:51:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 027B0A717D5
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 14:54:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 221B43B1931
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 13:50:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96A8C172687
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 13:54:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDEDD1EB5C0;
-	Wed, 26 Mar 2025 13:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81E991EEA29;
+	Wed, 26 Mar 2025 13:53:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=avride-ai.20230601.gappssmtp.com header.i=@avride-ai.20230601.gappssmtp.com header.b="EZtd1UcG"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="l52CYGqi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9E7C1E1DE8
-	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 13:50:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DD0D189919;
+	Wed, 26 Mar 2025 13:53:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742997021; cv=none; b=BGPhmBqbHI+spQ/oOhfnTnykRDu2MX3sm9A1Ykfjpo5+WaspgimZ5fApRWSsu5rfR8tMVbw30GGEAHQy6pz2zUwFK4MpPR7ug1wYNmLKKQu0eW9mZg5jsinHWqB/5H6aTGG8WYZx0sG50FeNE2K65Da7as7Mk/TfUrFcUSnROt0=
+	t=1742997237; cv=none; b=hO9A0ujndsZxzdyc7vz72UBT71R9NlDkhhLvgJq9CbbE88Z7XEJGQ9T6nDJKSiOpbmB9u9bp7TC6U3w/T6YcnkSHRhu8fTegDpxtuvbsh839e9m2til6cZDStciDFBEORHg0tY9SfQGG3qAQq/x33wRWcd6X+baKi/b2Ck0RhVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742997021; c=relaxed/simple;
-	bh=AA4fYl5ss2AScsJa4WQ2By0P4vTUaQbcp4z0DUHId7o=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=t+aLgogAjbGokwFoP0Dnuh/xQTqKb638NfF9xaEli/EHxOiN+5LbECE6B65CPmjvNf91/xebmPC3sFBDM/6Q0STc+uoTCWLUUZUyeqV9AW7oXMXEcjcLMP0DFhEBrOWkpS/fISCDe888Lxl4Y00P9uMZQWcqG8k4zJ5IsCY8LRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=avride.ai; spf=none smtp.mailfrom=avride.ai; dkim=pass (2048-bit key) header.d=avride-ai.20230601.gappssmtp.com header.i=@avride-ai.20230601.gappssmtp.com header.b=EZtd1UcG; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=avride.ai
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=avride.ai
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3913d129c1aso652163f8f.0
-        for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 06:50:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=avride-ai.20230601.gappssmtp.com; s=20230601; t=1742997016; x=1743601816; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AA4fYl5ss2AScsJa4WQ2By0P4vTUaQbcp4z0DUHId7o=;
-        b=EZtd1UcGaeU12UU08EJ2icF7M7yxKhz7zuKFPTBwaYxsocbpiPFSZVBxKYdASl7byz
-         pZB4AahbVsbxAKvAodhO1qZSVink9rAkeFbVPpGwE1uGTwenjyJiuvdHQAuL4KAtTJ6t
-         qQJPUjCk8svAuxfexr/98v81PhKq6CarJAFaLO2tz7YcToJa4iFMkZA1BQbsdP047JVP
-         BCCIduY/2+Ihj9aNzpvN3SyFMJA3Wllb+NqXvH9sFZk5+tm8qsJhwdbUMEVO54iX6HLA
-         8+YWi70/ACN5msnAmiLJzYgFvK4DQ4X8WB9RUjN8e1UKIwFfxvoeGJlMl2WEAbhA59dR
-         cYVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742997016; x=1743601816;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AA4fYl5ss2AScsJa4WQ2By0P4vTUaQbcp4z0DUHId7o=;
-        b=EMn7Dsos3yQiSE7XNoULCVzFxB/w6odsv2VxTEbH4W8obj6GqgWgkJ7dqcphl0dXca
-         bo76t2I5fNyOzLQHuBI+d7nRp4phRDcEb1TpvHtINmAbZcGJEWZko1vG2U7HYr2/f825
-         1UKIJE0uRLnZLTbhuRBSbnwfPoviOIaAhIrk9n5JspSAw5QnxBJq+4I6J4lP7xn4zT3W
-         qpYGo65MD/FAinkEaZ6ZKM6d0/1llwnA3GRtND4/okT2aTb4VAAer/7k/DtyjGLxlIaP
-         ecK9dhGoFXpoeL038/sOfgFPBW23Itd/m+b+WGTte9dMjRKPO/P3RVuF/qaCVPbQWxr3
-         7/aA==
-X-Forwarded-Encrypted: i=1; AJvYcCWn+VR0oqSxOMk2c/19S1+t6rfPHAMDSr/uy8H/GQsjD0crRa297yrcsmWnSYu4EZHofCS8zhw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmAxoFuhHCOPMznF8eUj9tncoaKZm1yRt8yBlW1I/VGXACgIJx
-	6HpE2IM4EtBiok1VuuGkK71XFbgqh7LmGuAk0rEJYPx3JmFP0wt2YTOmgn5vIbI=
-X-Gm-Gg: ASbGncuQoTNKZtfyKuIZ+crnv4kDMbOMwy3IOiRqYZu3WVcTkD4AclkYBXQuBg5NVit
-	qRRZrFhaqN4/Bg71Edrp5u7NLbZ8xbamuNcFIVyuKdiSiQNPJX2JY1w2J2Kwtg8h5TttzRyH9O0
-	pd9YVGUl4vwEI7P6KeuFCorsFXT9cm4OT0ElAzLCFVjYJ+QxDqJf/qaSOvD1KnkH1jrdSTdRDzy
-	z5PCHpFgiIoweXmCkncIvEfc3sq4sWly86Wukwwms3CSe3WDQQMnfV9FSachm7zmFGaLkwXHLQ0
-	MVXDCOat53NyMPTGSFgsjoIgzyF/4tTxCOyE/zeCnnLAGi9cVPhXdAeFv7st744lyI3di2k9pGO
-	fchKaMc0R
-X-Google-Smtp-Source: AGHT+IFodC7E3FU1W8ZLhSnQH5tR1ENtZ/ME/aC2uDU71UdflN+c7QlCPNjoJlFrWjY4L1trUTIN8Q==
-X-Received: by 2002:a05:6000:1a88:b0:39a:c86d:e094 with SMTP id ffacd0b85a97d-39acc46dd0bmr3287301f8f.17.1742997015791;
-        Wed, 26 Mar 2025 06:50:15 -0700 (PDT)
-Received: from smtpclient.apple ([2a02:14a:105:a03:4178:8ead:91b6:bfe2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d82f1bb80sm2568465e9.28.2025.03.26.06.50.14
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 26 Mar 2025 06:50:15 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1742997237; c=relaxed/simple;
+	bh=Qbao9YeXZxdgK01PyrVgIBjBv1VDrobFPWDfuEd9Egs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gXqYkBB7OTyir/aypt5SRMR63nLLLc2oxhGRVdGQvMaW2MeLidee0J+1lNw7g8vhRu+5AYRFzptzOA+UkxPdQRSDJG+Sq/i6kYqN3MrmApGf5g2pftGq/mvYB0+HsWH2EGf1O87auXXRxJwSV+4tspoIjFErhYZCtD8Fg52VC8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=l52CYGqi; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=2kEtzjhjCfVdaJ2ri8dRDBHYx8JUUX5N2JgqZFWwsKA=; b=l52CYGqiaLnwsvnNWnn02MQg3r
+	AifLm520J6XGDam490Bwmtir7Sd4YUtpGU/+U9BJONo+8oz5H83ykXcndZLdA89gtRbDSjq3vl+y3
+	vi8+uPgI57q4+QEZGRm15REnq/lE37vNY2FfergrBIo5rm/83dmqeMhEAighVosn4WDvPyZPlH9aV
+	abpwjvsVxWU79fDSjZgvyJC6RilQXTea5QWvTXQ2pginnrsCIGaAs4oZw56KaQj5VzZvH/EySe6Y1
+	3B9geYI5Uf0MDAogssbdqJMzeH1XmwW5p8xphabFLxJXdL1I0seZz/yZw2dGA+fRAHz1TpOt6VvuQ
+	GMldUXMg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39450)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1txRCR-00066l-24;
+	Wed, 26 Mar 2025 13:53:43 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1txRCO-0004QQ-0W;
+	Wed, 26 Mar 2025 13:53:40 +0000
+Date: Wed, 26 Mar 2025 13:53:39 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next RFC PATCH v2 2/3] net: phy: Add support for Aeonsemi
+ AS21xxx PHYs
+Message-ID: <Z-QG4w425UuYXZOX@shell.armlinux.org.uk>
+References: <20250326002404.25530-1-ansuelsmth@gmail.com>
+ <20250326002404.25530-3-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.600.62\))
-Subject: Re: bnxt_en: Incorrect tx timestamp report
-From: Kamil Zaripov <zaripov-kamil@avride.ai>
-In-Reply-To: <0316a190-6022-4656-bd5e-1a1f544efa2d@linux.dev>
-Date: Wed, 26 Mar 2025 15:50:03 +0200
-Cc: Michael Chan <michael.chan@broadcom.com>,
- Jacob Keller <jacob.e.keller@intel.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>,
- Linux Netdev List <netdev@vger.kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <CBBDA12F-05B4-4842-97BF-11B392AD21F1@avride.ai>
-References: <DE1DD9A1-3BB2-4AFB-AE3B-9389D3054875@avride.ai>
- <8f128d86-a39c-4699-800a-67084671e853@intel.com>
- <CAGtf3iaO+Q=He7xyCCfzfPQDH_dHYYG1rHbpaUe-oBo90JBtjA@mail.gmail.com>
- <CACKFLinG2s5HVisa7YoWAZByty0AyCqO-gixAE8FSwVHKK8cjQ@mail.gmail.com>
- <CALs4sv1H=rS96Jq_4i=S0kL57uR6v-sEKbZcqm2VgY6UXbVeMA@mail.gmail.com>
- <9200948E-51F9-45A4-A04C-8AD0C749AD7B@avride.ai>
- <0316a190-6022-4656-bd5e-1a1f544efa2d@linux.dev>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-X-Mailer: Apple Mail (2.3774.600.62)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250326002404.25530-3-ansuelsmth@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+On Wed, Mar 26, 2025 at 01:23:58AM +0100, Christian Marangi wrote:
+> +static int aeon_ipc_send_cmd(struct phy_device *phydev, u32 cmd,
+> +			     u16 *ret_sts)
+> +{
+> +	struct as21xxx_priv *priv = phydev->priv;
+> +	bool curr_parity;
+> +	int ret;
+> +
+> +	/* The IPC sync by using a single parity bit.
+> +	 * Each CMD have alternately this bit set or clear
+> +	 * to understand correct flow and packet order.
+> +	 */
+> +	curr_parity = priv->parity_status;
+> +	if (priv->parity_status)
+> +		cmd |= AEON_IPC_CMD_PARITY;
+> +
+> +	/* Always update parity for next packet */
+> +	priv->parity_status = !priv->parity_status;
+> +
+> +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_IPC_CMD, cmd);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Wait for packet to be processed */
+> +	usleep_range(AEON_IPC_DELAY, AEON_IPC_DELAY + 5000);
+> +
+> +	/* With no ret_sts, ignore waiting for packet completion
+> +	 * (ipc parity bit sync)
+> +	 */
+> +	if (!ret_sts)
+> +		return 0;
+> +
+> +	ret = aeon_ipcs_wait_cmd(phydev, curr_parity);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = phy_read_mmd(phydev, MDIO_MMD_VEND1, VEND1_IPC_STS);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	*ret_sts = ret;
+> +	if ((*ret_sts & AEON_IPC_STS_STATUS) != AEON_IPC_STS_STATUS_SUCCESS)
+> +		return -EFAULT;
+> +
+> +	return 0;
+> +}
+> +
+> +static int aeon_ipc_send_msg(struct phy_device *phydev, u16 opcode,
+> +			     u16 *data, unsigned int data_len, u16 *ret_sts)
+> +{
+> +	struct as21xxx_priv *priv = phydev->priv;
+> +	u32 cmd;
+> +	int ret;
+> +	int i;
+> +
+> +	/* IPC have a max of 8 register to transfer data,
+> +	 * make sure we never exceed this.
+> +	 */
+> +	if (data_len > AEON_IPC_DATA_MAX)
+> +		return -EINVAL;
+> +
+> +	mutex_lock(&priv->ipc_lock);
+> +
+> +	for (i = 0; i < data_len / sizeof(u16); i++)
+> +		phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_IPC_DATA(i),
+> +			      data[i]);
+> +
+> +	cmd = FIELD_PREP(AEON_IPC_CMD_SIZE, data_len) |
+> +	      FIELD_PREP(AEON_IPC_CMD_OPCODE, opcode);
+> +	ret = aeon_ipc_send_cmd(phydev, cmd, ret_sts);
+> +	if (ret)
+> +		phydev_err(phydev, "failed to send ipc msg for %x: %d\n", opcode, ret);
+> +
+> +	mutex_unlock(&priv->ipc_lock);
+> +
+> +	return ret;
+> +}
+> +
+> +static int aeon_ipc_rcv_msg(struct phy_device *phydev, u16 ret_sts,
+> +			    u16 *data)
+> +{
+> +	unsigned int size = FIELD_GET(AEON_IPC_STS_SIZE, ret_sts);
+> +	struct as21xxx_priv *priv = phydev->priv;
+> +	int ret;
+> +	int i;
+> +
+> +	if ((ret_sts & AEON_IPC_STS_STATUS) == AEON_IPC_STS_STATUS_ERROR)
+> +		return -EINVAL;
+> +
+> +	/* Prevent IPC from stack smashing the kernel */
+> +	if (size > AEON_IPC_DATA_MAX)
+> +		return -EINVAL;
+> +
+> +	mutex_lock(&priv->ipc_lock);
+> +
+> +	for (i = 0; i < DIV_ROUND_UP(size, sizeof(u16)); i++) {
+> +		ret = phy_read_mmd(phydev, MDIO_MMD_VEND1, VEND1_IPC_DATA(i));
+> +		if (ret < 0) {
+> +			size = ret;
+> +			goto out;
+> +		}
+> +
+> +		data[i] = ret;
+> +	}
+> +
+> +out:
+> +	mutex_unlock(&priv->ipc_lock);
+> +
+> +	return size;
+> +}
+> +
+> +/* Logic to sync parity bit with IPC.
+> + * We send 2 NOP cmd with same partity and we wait for IPC
+> + * to handle the packet only for the second one. This way
+> + * we make sure we are sync for every next cmd.
+> + */
+> +static int aeon_ipc_sync_parity(struct phy_device *phydev)
+> +{
+> +	struct as21xxx_priv *priv = phydev->priv;
+> +	u16 ret_sts;
+> +	u32 cmd;
+> +	int ret;
+> +
+> +	mutex_lock(&priv->ipc_lock);
+> +
+> +	/* Send NOP with no parity */
+> +	cmd = FIELD_PREP(AEON_IPC_CMD_SIZE, 0) |
+> +	      FIELD_PREP(AEON_IPC_CMD_OPCODE, IPC_CMD_NOOP);
+> +	aeon_ipc_send_cmd(phydev, cmd, NULL);
+> +
+> +	/* Reset packet parity */
+> +	priv->parity_status = false;
+> +
+> +	/* Send second NOP with no parity */
+> +	ret = aeon_ipc_send_cmd(phydev, cmd, &ret_sts);
+> +
+> +	mutex_unlock(&priv->ipc_lock);
+> +
+> +	/* We expect to return -EFAULT */
+> +	if (ret != -EFAULT)
+> +		return ret;
+> +
+> +	if ((ret_sts & AEON_IPC_STS_STATUS) != AEON_IPC_STS_STATUS_READY)
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +}
+> +
+> +static int aeon_ipc_get_fw_version(struct phy_device *phydev)
+> +{
+> +	u16 ret_data[8], data[1];
+> +	u16 ret_sts;
+> +	int ret;
+> +
+> +	data[0] = IPC_INFO_VERSION;
+> +	ret = aeon_ipc_send_msg(phydev, IPC_CMD_INFO, data, sizeof(data),
+> +				&ret_sts);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = aeon_ipc_rcv_msg(phydev, ret_sts, ret_data);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	phydev_info(phydev, "Firmware Version: %s\n", (char *)ret_data);
+> +
+> +	return 0;
+> +}
+> +
+> +static int aeon_dpc_ra_enable(struct phy_device *phydev)
+> +{
+> +	u16 data[2];
+> +	u16 ret_sts;
+> +
+> +	data[0] = IPC_CFG_PARAM_DIRECT;
+> +	data[1] = IPC_CFG_PARAM_DIRECT_DPC_RA;
+> +
+> +	return aeon_ipc_send_msg(phydev, IPC_CMD_CFG_PARAM, data,
+> +				 sizeof(data), &ret_sts);
+> +}
+> +
+> +static int as21xxx_probe(struct phy_device *phydev)
+> +{
+> +	struct as21xxx_priv *priv;
+> +	int ret;
+> +
+> +	priv = devm_kzalloc(&phydev->mdio.dev,
+> +			    sizeof(*priv), GFP_KERNEL);
+> +	if (!priv)
+> +		return -ENOMEM;
+> +	phydev->priv = priv;
+> +
+> +	ret = devm_mutex_init(&phydev->mdio.dev,
+> +			      &priv->ipc_lock);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = aeon_firmware_load(phydev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = aeon_ipc_sync_parity(phydev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND1, VEND1_PTP_CLK,
+> +			       VEND1_PTP_CLK_EN);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = aeon_dpc_ra_enable(phydev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = aeon_ipc_get_fw_version(phydev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	phydev->needs_reregister = true;
+> +
+> +	return 0;
+> +}
 
+This probe function allocates devres resources that wil lbe freed when
+it returns through the unbinding in patch 1. This is a recipe for
+confusion - struct as21xxx_priv must never be used from any of the
+"real" driver.
 
-> On 25 Mar 2025, at 12:41, Vadim Fedorenko <vadim.fedorenko@linux.dev> =
-wrote:
->=20
-> On 25/03/2025 10:13, Kamil Zaripov wrote:
->>=20
->> I guess I don=E2=80=99t understand how does it work. Am I right that =
-if userspace program changes frequency of PHC devices 0,1,2,3 (one for =
-each port present in NIC) driver will send PHC frequency change 4 times =
-but firmware will drop 3 of these frequency change commands and will =
-pick up only one? How can I understand which PHC will actually represent =
-adjustable clock and which one is phony?
->=20
-> It can be any of PHC devices, mostly the first to try to adjust will =
-be used.
+I would suggest:
 
-I believe that randomly selecting one of the PHC clock to control actual =
-PHC in NIC and directing commands received on other clocks to the =
-/dev/null is quite unexpected behavior for the userspace applications.
+1. document that devres resources will not be preserved when
+   phydev->needs_reregister is set true.
 
->> Another thing that I cannot understand is so-called RTC and non-RTC =
-mode. Is there any documentation that describes it? Or specific parts of =
-the driver that change its behavior on for RTC and non-RTC mode?
->=20
-> Generally, non-RTC means free-running HW PHC clock with timecounter
-> adjustment on top of it. With RTC mode every adjfine() call tries to
-> adjust HW configuration to change the slope of PHC.
+2. rename struct as21xxx_priv to struct as21xxx_fw_load_priv to make
+   it clear that it's for firmware loading.
 
-Just to clarify:
+3. use a prefix that uniquely identifies those functions that can only
+   be called with this structure populated.
 
-Am I right that in RTC mode:
-1.1. All 64 bits of the PHC counter are stored on the NIC (both the =
-=E2=80=9Creadable=E2=80=9D 0=E2=80=9347 bits and the higher 48=E2=80=9363 =
-bits).
-1.2. When userspace attempts to change the PHC counter value (using =
-adjtime or settime), these changes are propagated to the NIC via the =
-PORT_MAC_CFG_REQ_ENABLES_PTP_ADJ_PHASE and =
-FUNC_PTP_CFG_REQ_ENABLES_PTP_SET_TIME requests.
-1.3. If one port of a four-port NIC is updated, the change is propagated =
-to all other ports via the =
-ASYNC_EVENT_CMPL_PHC_UPDATE_EVENT_DATA1_FLAGS_PHC_RTC_UPDATE event. As a =
-result, all four instances of the bnxt_en driver receive the event with =
-the high 48=E2=80=9363 bits of the counter in payload. They then =
-asynchronously read the 0=E2=80=9347 bits and update the timecounter =
-struct=E2=80=99s nsec field.
-1.4. If we ignore the bug related to unsynchronized reading of the =
-higher (48=E2=80=9363) and lower (0=E2=80=9347) bits of the PHC counter, =
-the time across each timecounter instance should remain in sync.
-1.5. When userspace calls adjfine, it triggers the =
-PORT_MAC_CFG_REQ_ENABLES_PTP_FREQ_ADJ_PPB request, causing the PHC tick =
-rate to change.
+4. set phydev->priv to NULL at the end of this probe function to ensure
+   no one dereferences the free'd pointer in a "real" driver, which
+   could lead to use-after-free errors.
 
-In non-RTC mode:
-2.1. Only the lower 0=E2=80=9347 bits are stored on the NIC. The higher =
-48=E2=80=9363 bits are stored only in the timecounter struct.
-2.2. When userspace tries to change the PHC counter via adjtime or =
-settime, the change is reflected only in the timecounter struct.
-2.3. Each timecounter instance may have its own nsec field value, =
-potentially leading to different timestamps read from /dev/ptp[0-3].
-2.4. When userspace calls adjfine, it only modifies the mul field in the =
-cyclecounter struct, which means no real changeoccurs to the PHC tick =
-rate on the hardware.
+In summary, I really don't like this approach - it feels too much of a
+hack, _and_ introduces the potential for drivers that makes use of this
+to get stuff really very wrong. In my opinion that's not a model that
+we should add to the kernel.
 
-And about issue in general:
-3.1. Firmware versions 230+ operate in non-RTC mode in all environments.
-3.2. Firmware version 224 uses RTC mode because older driver versions =
-were not designed to track overflows (the higher 48=E2=80=9363 bits of =
-the PHC counter) on the driver side.
+I'll say again - why can't the PHY firmware be loaded by board firmware.
+You've been silent on my feedback on this point. Given that you're
+ignoring me... for this patch series...
 
+Hard NAK.
 
->>> The latest driver handles the rollover on its own and we don't need =
-the firmware to tell us.
->>> I checked with the firmware team and I gather that the version you =
-are using is very old.
->>> Firmware version 230.x onwards, you should not receive this event =
-for rollovers.
->>> Is it possible for you to update the firmware? Do you have access to =
-a more recent (230+) firmware?
->> Yes, I can update firmware if you can tell where can I find the =
-latest firmware and the update instructions?
->=20
-> Broadcom's web site has pretty easy support portal with NIC firmware
-> publicly available. Current version is 232 and it has all the
-> improvements Pavan mentioned.
+until you start responding to my review comments.
 
-Yes, I have found the "Broadcom BCM57xx Fwupg Tools=E2=80=9D archive =
-with some precompiled binaries for x86_64 platform. The problem is that =
-our hosts are aarch64 and uses the Nix as a package manager, it will =
-take some time to make it work in our setup. I just hoped that there is =
-firmware binary itself that I can pass to ethtool =E2=80=94-flash.
-
-
-
-> On 25 Mar 2025, at 14:24, Pavan Chebbi <pavan.chebbi@broadcom.com> =
-wrote:
->=20
->>> Yes, I can update firmware if you can tell where can I find the =
-latest firmware and the update instructions?
->>>=20
->>=20
->> Broadcom's web site has pretty easy support portal with NIC firmware
->> publicly available. Current version is 232 and it has all the
->> improvements Pavan mentioned.
->>=20
-> Thanks Vadim for chiming in. I guess you answered all of Kamil's =
-questions.
-
-Yes, thank you for help. Without your explanation, I would have spent a =
-lot more time understanding it on my own.
-
-> I am curious about Kamil's use case of running PTP on 4 ports (in a
-> single host?) which seem to be using RTC mode.
-> Like Vadim pointed out earlier, this cannot be an accurate config
-> given we run a shared PHC.
-> Can Kamil give details of his configuration?
-
-I have a system equipped with a BCM57502 NIC that functions as a PTP =
-grandmaster in a small local network. Four PTP clients =E2=80=94 each =
-connected to one of the NIC=E2=80=99s four ports =E2=80=94 synchronize =
-their time with the grandmaster using the PTP L2P2P protocol. To support =
-this configuration, I run four ptp4l instances (one for each port) and a =
-single phc2sys daemon to synchronize system time and PHC time by =
-adjusting the PHC. Because the bnxt_en driver reports different PHC =
-device indexes for each NIC port, the phc2sys daemon treats each PHC =
-device as independent and adjusts their times separately.
-
-We also have a similar setup with a different network card, the Intel =
-E810-C, which has four ports as well. However, its ice driver exposes =
-only one PHC device and probably read PHC counter in a different way. I =
-do not remember similar issues with this setup.
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
