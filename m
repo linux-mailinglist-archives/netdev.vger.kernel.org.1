@@ -1,186 +1,121 @@
-Return-Path: <netdev+bounces-177830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86004A71F5A
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 20:42:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ED27A71F8B
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 20:50:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C03217B0AA
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 19:41:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C479189CC67
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 19:48:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF74A255E27;
-	Wed, 26 Mar 2025 19:38:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D6291F4734;
+	Wed, 26 Mar 2025 19:48:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="SPtI7YW9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JESayp4m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07CF4255E2E
-	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 19:38:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E891A18DB19;
+	Wed, 26 Mar 2025 19:48:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743017919; cv=none; b=GUo6hGEipLUDB/0weClJlOYD8GKy2MwRobuwm7yBdUnrFYltf2DGCtsrv1xIoHY7n6E0RhGO1bSxA40QDS9u7Cz5TWUQ/c17ihpliWwXdOMyNQwr8wjXtbkLkzE68V9BUMPVv1iyIACKg1rKNMcXZ+ghq4sxDIeU1aLMCzHuFcg=
+	t=1743018510; cv=none; b=Hs8EmIAhM8uABx+TzGHOoQcXSKwXtLyDIsuQsNWc0/bcBOdv6Ac6HyB3wiPWAB5fw8uPaUXdbR37PRpxK/yhRUbKG95vgOVXrtaNORQDHLh0DRLzx7vP63BY66iQkcqVVVr39xvSVL5J9OQh2My3xzSFPrlUW9oioft58A+leZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743017919; c=relaxed/simple;
-	bh=3w4M9U/6KMoXnHUmGA2Lbn4KvHbZmjf8oMnVhzAkMas=;
+	s=arc-20240116; t=1743018510; c=relaxed/simple;
+	bh=R3+jDwZHFgHkfpJeIfAi9iO05q2wjb/j47dvj3X/kVo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ucJ8974B7lAS+5OAhdq4SSPdo8lfe/ESGVAX0+1gVnGTjPdzrd5aXKy3KvnxOozw80MTDtN2zgOKt7rDjOHOt3Bw8WWEtsa3an/7fBV1sCbkaujscAG4B05uT5vTfDuoepbboWzPI8TNO62x76S8l6jJCSII80j/BUXVWwR77Sw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=SPtI7YW9; arc=none smtp.client-ip=209.85.219.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-e3c8ae3a3b2so246718276.0
-        for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 12:38:37 -0700 (PDT)
+	 To:Cc:Content-Type; b=OdRwcbOYQ+rEV5Azm+4vJIwR3LrTrXGY1D0tzV2BZJxHscDHcSZgBn/xgW91nxzEgfmQlKaRwHY7iK7Zw7OChB9gBT4HuHKE4H/0I5ruXb1HjKTBR4kvUPHsC69RN8UdaeBfnTrn4jowJL2BFpj9AOrKRxE3ITofGUt3YXVXgR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JESayp4m; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-301918a4e3bso298620a91.3;
+        Wed, 26 Mar 2025 12:48:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1743017917; x=1743622717; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=37blrJ4dA4pbuNAhm4qoJ4s8JjE8q0/IzkGXMncvmgs=;
-        b=SPtI7YW9hruD3jTLpYMd4BOFVnzWvq4gewA/J4It6G89jQ3IB4MYte098qHXDkg6ym
-         qCEmscQwUAEPxJO5g7IFw/22q/9NidZYeEmokN6lCtBFBpTS6IIokmpxNhoQsTSERmrD
-         UHf/D4hbfUrXezZRp878wok25HJT49imr8fsewED+nJL1ZvMESJzkdBmBb/6wfejUqnB
-         4+TG+Sg0L7hEHOhgvEm79R/o8YQN/g5dy1FcCk8LsvYbPfniJ61oUYfCyMiF1s+Xv4D9
-         s2PkoN2mI1Q1vv2Fi20x9YO+X+q5cM/ozD2TaU5CvW52KuCYK2nQUEuIfEOMM4ApM04s
-         QuOg==
+        d=gmail.com; s=20230601; t=1743018508; x=1743623308; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=hHm2axbpU3V3JFuuZFYjsCtM/7SwK7Lx7a+IQpShHrM=;
+        b=JESayp4mA4YkbXAkFG3cTTcTpFct+09BdkZNOHRVHf81qZ6UxP/tIYpMNfOMYzFTcE
+         7z5aQzryHntxwf1AReE7cDRSvRXjUryJLd9hC2b4Ouueo1YeBWAMy3OrJK2QrOFaQXC0
+         GRow6fCY/tVXLka8eSqYq4P15ElFbEbGTRUjv8RkWN+6pyA5bZmu4/tV5CHp/8S8WfAm
+         zEktVXvmb32lDLmknacb5ybz8rdn7/WXkaYCFIjapH+5HH/aUJxdNGUnd4n0ENfBrXRJ
+         6RLzYMSA8R9HEXc+4hEqv1dWN3UMeTQEevuAiVVTCapATulpVbQawbybkLWMPRdLjZoS
+         T69Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743017917; x=1743622717;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=37blrJ4dA4pbuNAhm4qoJ4s8JjE8q0/IzkGXMncvmgs=;
-        b=TEKUKDmhONpni0I680boJSMDpSMgnM7b65OH1BWh25rbvuS5+yv0vIqO5AANg34GnV
-         ufo5d6IABd3tl/lbpFXadQ9I79cwXPWmWW2BnJgAuhnph8rnNT+8lgH39y1zml0dxN9r
-         VWuEZh+UmUjhea5b4O6qlSiLyZHzDxihrIicZoxRVZ69Ratkq+FHt5SL6fg9JNuclHLO
-         bvm9VFJnTBK1OxsYWffVRdh/IXbxvNBsZ5+WjTOEJ37hrtur6peQnhxW2V9tlEBUZ5g0
-         Mk1jxU/E3rwM89rs/kvEGro/UfWr59RnLz6aIPbtmanAmXGpIdTStgi4bNxRrZ6CoOAo
-         wuVA==
-X-Forwarded-Encrypted: i=1; AJvYcCXT8IBGeXt4UQIkmkbIdTpgk6JasmNz6FxECYtOOv1FDclEdPKMa8XSDnAdgNmaAOB1/T1549c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1pORq9BykXtf75ls4hwzuG8WgGB4dkekuUif++n61Quw9NYw+
-	AEukQN2MC5DZpeGQuB9CfBlO8XT43Ymgt+4oQsgD4CSGkGqsSzdB4dL2BmDF/1pKp84km4IzGMF
-	bsZeLmja6AoAlrp6xg101IcjviVtum9TuUDfz
-X-Gm-Gg: ASbGncuDSXl2oAo+nqmjWybuDa7lc+K2plT6voXAsivLWOQlQLn+PBarR7Pmyssn8zD
-	Y3LUl7MpOKccYp6wllF9HyB/cqLdXOpPiEsLclUPvesHTXTVCAdMuuTMEQjf6g9mDOSlr+yyH+i
-	v3hEE48THh1LzJWaUjAIIOKfSEUg==
-X-Google-Smtp-Source: AGHT+IEKQn/nJM0uTtrV4JZhrCW9IJH+yJidlTMVM2nALH+VjfWmiWTfWqHmGlsegAJ2Tfw9AccjfAhu1hVM+OJq0PI=
-X-Received: by 2002:a05:690c:968a:b0:6f6:d01c:af1f with SMTP id
- 00721157ae682-70224fbfd87mr11354817b3.16.1743017916900; Wed, 26 Mar 2025
- 12:38:36 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743018508; x=1743623308;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hHm2axbpU3V3JFuuZFYjsCtM/7SwK7Lx7a+IQpShHrM=;
+        b=bU11EAilO+MH7QzDfaOp28TQsw2XYHowIdNH8KFWEv0Z3/dGM2yEgIhGRpxQmpcVOQ
+         VeaMuZDJAorcJCMhLbmn/LXau6jbfgfGgaqFnQxQ3f57/ln0VvLMDwUvBhMI3CEOphWS
+         h62j8YEKK0uMWcDXMHaIzhZCr+HE3M9O1SJxmO4fIzuk3eNc3NQPZKPZXEZwOAlNlbFc
+         wPBjkumDxYD0LQr2yRsYyLRiOKj1dJL2gKp9n1avcdMT6RdaAaIssBZUBvyKn765yEdu
+         lL4oCOogNlmYKPk9JvfGliMEDQwgGn181A2uTcpTVZUCdZxaJZO8tkqz00smMxZ09MFR
+         yOhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUweWlxPuiox3di5mRjFg+F738m57CoVR+G5PTguGZnZ9NJUKSCVp7SpCYQ9zEQpnWdKT06koFEaBJDeRA=@vger.kernel.org, AJvYcCV+fEuk6+EJfKZywEgUQFAmIQGd3FFqpq5ETwS0tbuqVrTa0kgvnpZyMHUkTgFd+DgIyYAakZllhKHAxtG0B4Vf@vger.kernel.org, AJvYcCXJECGmakaG2UYzdEUjbqf6Yvijaljo1NW4X/a2fJ1+u8ef2N8gNZqyRD6hmlIX92+LiZAgMd3W@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHBde2Aishcajd5drVndvhCLRCWuV0zJof36TApzTxlu9mo3P1
+	YLUeEh69eE0LqgRyeVRCvG68TAwkEAPoMLCL8tBzFLF9371K5ZmeEK6N79c7Ivhrp+0/SfMdQ1r
+	+pU+f43IWdqy8qrWyKFL/eU/Qe1o=
+X-Gm-Gg: ASbGnctw6w0iGRqTw3JBJlQ/8hdL0ej/+uxJBG3HVVt/5E/Xa7okIBNLWrmDn80EgPH
+	R7HqXgidA/NkGZ1NTrzzfVzjKWrz54eeQ8zMkViDZSuzfZsliDR944Gyw1kavLkNB/VC+1hR41p
+	h2wd9kXNXoCqSkNRIQx+G5S4kBcA==
+X-Google-Smtp-Source: AGHT+IGwBzhsBM/JtZ7k8EPOnm8VzW08zNVDCOOQIQOum2m1qGzqdwTQHZdQh6N2B1XfiAODZnDoTqlxbd0tJvyDTvU=
+X-Received: by 2002:a17:90a:fc48:b0:301:6343:1626 with SMTP id
+ 98e67ed59e1d1-303a7c5b67fmr1373695a91.1.1743018508012; Wed, 26 Mar 2025
+ 12:48:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250326074355.24016-1-mowenroot@163.com>
-In-Reply-To: <20250326074355.24016-1-mowenroot@163.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Wed, 26 Mar 2025 15:38:25 -0400
-X-Gm-Features: AQ5f1JpWlU1-iecgrVs8fJXGenKH2jxovnmTGIWOOp81NIsiGDtaZoSu2Wqu7J4
-Message-ID: <CAHC9VhRUq0yjGLhGf=GstDb8h5uC_Hh8W9zXkJRMXAgbNXQTZA@mail.gmail.com>
-Subject: Re: [PATCH] netlabel: Fix NULL pointer exception caused by CALIPSO on
- IPv4 sockets
-To: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Debin Zhu <mowenroot@163.com>, 
-	Bitao Ouyang <1985755126@qq.com>
+References: <20250319-tcp-ao-selftests-polling-v2-0-da48040153d1@gmail.com> <20250325061525.01d34952@kernel.org>
+In-Reply-To: <20250325061525.01d34952@kernel.org>
+From: Dmitry Safonov <0x7f454c46@gmail.com>
+Date: Wed, 26 Mar 2025 19:48:16 +0000
+X-Gm-Features: AQ5f1JqsOQUxjRbopti60kfef-_DXcXCMs3YF27faB8PqD1fpjLrlPmcae9aEhk
+Message-ID: <CAJwJo6YoGz1aPv5nkJJKa05mxF-Zhc+B4U6kRw95KSduLCApaw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 0/7] selftests/net: Mixed select()+polling
+ mode for TCP-AO tests
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 26, 2025 at 3:44=E2=80=AFAM Debin Zhu <mowenroot@163.com> wrote=
-:
+On Tue, 25 Mar 2025 at 13:15, Jakub Kicinski <kuba@kernel.org> wrote:
 >
-> Added IPv6 socket checks in `calipso_sock_getattr`, `calipso_sock_setattr=
-`,
-> and `calipso_sock_delattr` functions.
-> Return `-EAFNOSUPPORT` error code if the socket is not of the IPv6 type.
-> This fix prevents the IPv6 datagram code from
-> incorrectly calling the IPv4 datagram code,
-> thereby avoiding a NULL pointer exception.
+> On Wed, 19 Mar 2025 03:13:33 +0000 Dmitry Safonov via B4 Relay wrote:
+> > Should fix flaky tcp-ao/connect-deny-ipv6 test.
+> > Begging pardon for the delay since the report and for sending it this
+> > late in the release cycle.
 >
-> Signed-off-by: Debin Zhu <mowenroot@163.com>
-> Signed-off-by: Bitao Ouyang <1985755126@qq.com>
-> ---
->  net/ipv6/calipso.c | 27 +++++++++++++++++++++------
->  1 file changed, 21 insertions(+), 6 deletions(-)
+> Better late than never, thanks a lot! :)
 
-Adding netdev and Jakub to the To/CC line, original lore link below:
+Thank you, Jakub!
 
-https://lore.kernel.org/all/20250326074355.24016-1-mowenroot@163.com/
+I also noticed that recently, self-connect-ipv6 became slightly flaky:
+https://netdev.bots.linux.dev/flakes.html?br-cnt=75&tn-needle=tcp-ao
 
-> diff --git a/net/ipv6/calipso.c b/net/ipv6/calipso.c
-> index dbcea9fee..ef55e4176 100644
-> --- a/net/ipv6/calipso.c
-> +++ b/net/ipv6/calipso.c
-> @@ -1072,8 +1072,13 @@ static int calipso_sock_getattr(struct sock *sk,
->         struct ipv6_opt_hdr *hop;
->         int opt_len, len, ret_val =3D -ENOMSG, offset;
->         unsigned char *opt;
-> -       struct ipv6_txoptions *txopts =3D txopt_get(inet6_sk(sk));
-> -
-> +       struct ipv6_pinfo *pinfo =3D inet6_sk(sk);
-> +       struct ipv6_txoptions *txopts;
-> +       /* Prevent IPv6 datagram code from calling IPv4 datagram code, ca=
-using pinet6 to be NULL  */
-> +       if (!pinfo)
-> +               return -EAFNOSUPPORT;
-> +
-> +       txopts =3D txopt_get(pinfo);
->         if (!txopts || !txopts->hopopt)
->                 goto done;
+Seems unrelated to select()+poll selftests changes, but rather to
+timings in the kernel:
+# # 1249[lib/proc.c:213]    Snmp6            Ip6OutNoRoutes: 0 => 1
 
-For all three function, I'd probably add a single blank line between
-the local variable declarations and the code below for the sake of
-readability.  I'd probably also drop the comment as the code seems
-reasonably obvious (inet6_sk() can return NULL, we can't do anything
-with a NULL ptr so bail), but neither are reasons for not applying
-this patch, if anything they can be fixed up during the merge assuming
-the patch author agrees.
+It seems that the test relied on kernel adding a link-local route with
+a loopback interface, but probably adding the interface got faster.
+Seems like a trivial two-line fix by manually adding the link-local
+route in userspace. Though, can't reproduce that flake locally on
+thousands of runs.
 
-Anyway, this looks good to me, Jakub and/or other netdev folks, we
-should get this marked for stable and sent up to Linus, do you want to
-do that or should I?
+Should I send the potential fix now for -net or wait until the merge
+window closes and send for -net-next?
 
-Acked-by: Paul Moore <paul@paul-moore.com>
-
-> @@ -1125,8 +1130,13 @@ static int calipso_sock_setattr(struct sock *sk,
->  {
->         int ret_val;
->         struct ipv6_opt_hdr *old, *new;
-> -       struct ipv6_txoptions *txopts =3D txopt_get(inet6_sk(sk));
-> -
-> +       struct ipv6_pinfo *pinfo =3D inet6_sk(sk);
-> +       struct ipv6_txoptions *txopts;
-> +       /* Prevent IPv6 datagram code from calling IPv4 datagram code, ca=
-using pinet6 to be NULL  */
-> +       if (!pinfo)
-> +               return -EAFNOSUPPORT;
-> +
-> +       txopts =3D txopt_get(pinfo);
->         old =3D NULL;
->         if (txopts)
->                 old =3D txopts->hopopt;
-> @@ -1153,8 +1163,13 @@ static int calipso_sock_setattr(struct sock *sk,
->  static void calipso_sock_delattr(struct sock *sk)
->  {
->         struct ipv6_opt_hdr *new_hop;
-> -       struct ipv6_txoptions *txopts =3D txopt_get(inet6_sk(sk));
-> -
-> +       struct ipv6_pinfo *pinfo =3D inet6_sk(sk);
-> +       struct ipv6_txoptions *txopts;
-> +       /* Prevent IPv6 datagram code from calling IPv4 datagram code, ca=
-using pinet6 to be NULL  */
-> +       if (!pinfo)
-> +               return -EAFNOSUPPORT;
-> +
-> +       txopts =3D txopt_get(pinfo);
->         if (!txopts || !txopts->hopopt)
->                 goto done;
->
-> --
-> 2.34.1
-
---=20
-paul-moore.com
+Thanks,
+             Dmitry
 
