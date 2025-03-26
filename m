@@ -1,207 +1,190 @@
-Return-Path: <netdev+bounces-177693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD619A714B9
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 11:24:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BFDB3A714BD
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 11:24:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4AC6F1793E4
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 10:23:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BD0B163E3F
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 10:23:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CC101B653C;
-	Wed, 26 Mar 2025 10:22:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFF5B1C6FF6;
+	Wed, 26 Mar 2025 10:23:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="ghV426rt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bEGyM3Id"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4741B0F3C
-	for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 10:22:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ABB61AF0CE;
+	Wed, 26 Mar 2025 10:23:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742984564; cv=none; b=KqGCI1XhG87QfBJcoxOQQDNgXrL+MkCmbeNkhG3G5S67/ivSFiE8gwiXhKm25TdTZu/kZcH5to1QW/q/aaJ96YRfieFhbEDjaTiZlslbBfc4msLPPI/Vqp7uD0RLYfxj0Hxhqf1qkqCHdO//V0JuxHPcLqjbP2x7VkY9LmptPzE=
+	t=1742984588; cv=none; b=VWaBVkBkO2D/hcTLaf4o5mzqzQZo9Vf3UXyr4yoLcjjxRQj9SCoAwoCFaS7JVEDNBeBKFiQLMXmpmLwoTIdquXl9Wr5mE0F6/5XfmBfl8+2V9fiscDN+1LK4ON+cP9iW/C6GtPH5zXX6oW9HkPTvDYBQK3h6QK90x49yDem1csU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742984564; c=relaxed/simple;
-	bh=BqWwb0xLvwtow4UVNuwfZIbhHuDESy5C7BmEnmnVeLk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uycC+2ECn/hQ8Oar6EULw6m+V9M+Xgg9OeKnbfbCNnQ7NnGtgYTddDIhXgYo7iiEDIL0oMMJagD4aAvu10tFDLKPbxgoeE2DFyAhhtpl1x0bVncxmm0z+wWgil3RMSQfH5rrTrsoGuinJm+zk2XMxb5Xi96qrLIlgfzJ0w6PZDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=ghV426rt; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ac2a089fbbdso143924066b.1
-        for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 03:22:41 -0700 (PDT)
+	s=arc-20240116; t=1742984588; c=relaxed/simple;
+	bh=4pmQ2y0f7n8L7PyXZ04ncCO+er+ZinWzqA11dpsE8IU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GVuMriINH54V1geXPSQW3VxLsjtRsNtxHAYcQNTJf8rY2/uF+ffdaACcYYrbbl2Esm966xv9AAeb+V5CBNuaJ5v37Ty3OupJQqrK6z946p3L8zUS5AM8k7O+wltRHtzgri+LygXj2xLFTXupl1rTi3iI63OcuvISYVwSZ5mtjdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bEGyM3Id; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-227914acd20so10965065ad.1;
+        Wed, 26 Mar 2025 03:23:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1742984559; x=1743589359; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=XzGTmtio/DS5cJAgg4c6s0hQtINp6fDQ58QRoa7g8YE=;
-        b=ghV426rtpKgRwwYUiegxuH3SDEDoLlIBX0LBn5OlpgKbdOVSAiQUx4e/tCIt9hb+Ve
-         d7h7RHTWaZf3RLsRO8UDScTCbR6GIeTPZ3yB+orDVcvdiF1VtLuT46zDmjrQCP2eixxd
-         16AEi9/U0od/eBKwdCPh9M2bNcQrLJjnwZI5OBouLYPY+4oePGTf2tiD765ekdqTdgyf
-         c3gfgDse6eyW8eJqylpGgCHX6Kjdj79yylD9uakFzKBW825FTdCzZ6mKa+iCH4593E+M
-         x9taa9p8ZRpOzHbMZW5dX1uTkvx52dBCMCjHUpBxWwWFuDP25uZAYL/lOkaQdP4h0Xcv
-         EE5Q==
+        d=gmail.com; s=20230601; t=1742984586; x=1743589386; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=VNHTYKPineowADcTLJe/hNh23Pp93gtIdEBRwu9tXMo=;
+        b=bEGyM3IdS0go4ph9P9anawHpk6w6SitfUmd0SCqAhV+tRlyWjbvwG5xMpQO2uXCVv8
+         NrSfQzWOhEkYA55/b+gUvd79TVa3hWTFksQr/VwuP+8mcbgH5160GAGzRchEur96addJ
+         e0BuD3EE+who4DSxNMuSbHL9z5dI5eqitP8Yp0LBQme6vQcAb1PCBZ0Rk5Dt75vigtdF
+         i8jihUiC+OHabvtc3TkOtq1G+5c+wPZVPjGVhwWuNqPOTG60BPKZ/27xlj16lwMDW1TV
+         VAmSSkTxFMooskG4k9o22H7nxrcfUnVMdmemyBmuoIhv7uinHhtzqTZttnmL2Ey5R/1n
+         cZ7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742984559; x=1743589359;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XzGTmtio/DS5cJAgg4c6s0hQtINp6fDQ58QRoa7g8YE=;
-        b=oehfNSfJGCXoHivc2p3uh8ARYFot4CnmkdUGldclTqhIyY1E7+YMOIo2Z8owjdNz+C
-         DWApiaESS/sMFMXKXntvdVf9/gCzaBxTn2T+2+CHztXpQ0Yc7ItSkEU+cUzbXjWlo1Fs
-         RZJRFCdBU68MPGybsI7PN/eSpae2fPnVD8SOWp1j9CH8/M3fejR8eqce8c9xyk0BRudn
-         fQE9t0asaHuhJkO6LcWbOyTDVSFBngjT7NUh2hl6H9HKu2TXQYZDwBzVDiCL7+s+kNox
-         RDrYn2rQf4MP7bGBaqhAKdgxI2bmgB9XAM8W2c7e+JQa3wHkKvgHtqecw6/vOtfUXPyK
-         3Q4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVwA9JphQwKkppB8JeRLKK0GSGSi28JDSVsnU86irRTKQCZXAOKPbZAOmVWRLIVJq2Adh7FFP4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWSpb7BeXIoph/ClFGgA6A8NijEGUhH1StF+s9177IGyU7dEzm
-	Pi85Unr91mfXm6XJIap5SHIZ/7WmJJCMCpHqg/FfIeepy2dT2qvC9XvxtUds8Cac7c0Gvl4AyOY
-	Qe0B2dKDnGtNaOfzOk7uX4D2LUQRcm5lpw1G0w8TX5BZHaZeIRYe7uUrMX3q+
-X-Gm-Gg: ASbGncuZ/Iq+gUi7NaMFd74F7gpudvLY2XynJIelcz6EOYrYjiMWNAo7lMKraC4QWBT
-	9PyH8gNqEOfN+zIlUFBDALsa/aT6QcrUO2q2vnERiV6Wqn2TCDzJRDgN7M1IVOxwwIwjvQYulcm
-	VfR20XA7Jq5P9832AmXHiDi02FQ3R7P42e4EFYJKk/neYmlCud0uVj97D9M6mrLfvo8XnHTKVa6
-	EOwZJNfHbN3DEL22swFOAfoutTY5GxlMCVBRQCYmpf/f7zSpKQe/ryAIA9H7+bcwApJEZIMnov/
-	QvEmB3rZItcxUtoCEKqgoPIs5A3Zd8ESneJqXOgHhttq4lgdS/fAu93uaNL3UvIClmPbUvAdDV/
-	IazVLv+Y5jzfq
-X-Google-Smtp-Source: AGHT+IG4GaHZJSxp6hmrrP5ViD28WMg/hyB60xxx/rY+rgYW/EHG94yHvHwwfW6wMy2WLRTJwQlPEg==
-X-Received: by 2002:a17:907:7204:b0:ac3:25ea:822 with SMTP id a640c23a62f3a-ac6e050a9b6mr305008166b.4.1742984559412;
-        Wed, 26 Mar 2025 03:22:39 -0700 (PDT)
-Received: from ?IPV6:2001:67c:2fbc:1:e3b:3856:9645:30d? ([2001:67c:2fbc:1:e3b:3856:9645:30d])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac3ef21a99asm1008374866b.0.2025.03.26.03.22.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Mar 2025 03:22:38 -0700 (PDT)
-Message-ID: <bdcc035e-24c2-4469-a0fd-f63494d74169@openvpn.net>
-Date: Wed, 26 Mar 2025 11:22:37 +0100
+        d=1e100.net; s=20230601; t=1742984586; x=1743589386;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VNHTYKPineowADcTLJe/hNh23Pp93gtIdEBRwu9tXMo=;
+        b=h4zXECFjSbsjiiGSOQ/iwTKqCtq/ShlkKaaUf5WlANZtVASQSi3fEv7pYES5LmXWnL
+         3ooMHigMQ4rWID9zxVaB8kyqx6atssH31y0PWo4dydQ/2jFXcAK7uUM/t9PJttH8y8JT
+         RLoh7IC+zgBep5h+HsNEAyCI6EJJ0towO7uNVY+QjDdkQkI0L9pbfc/BoZFBnLMxaPFt
+         htGlN6H73ZsCzYFK9bkdSITVcTy+Jqy/vFSl2NcYxmRNXhD2HIryPwjioSfIQfqPsz3i
+         2FZQTezyzlfyFaMY2q6TmQDa5GVYlvt6ISKBGuVOMh0FCcAsH5k5m4Yedy0yJ6VL8px8
+         agdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWxmYoHoTDklwC0dr7DSoCNH+E3aIlE2tyE7z3Isn0CvRPH75tJrtY5ZfAJmZl4J1HVrf/ZDfYgxECZQJU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw34zvWOYlGG4yC38DymTcbHdNpUjmrPntLMuFzRZ/n5lG91P8f
+	URic1Ei87Z4JCDzqrP0YcddiXt2RU9kS7W+N3N6WLHvxRr98xMXr+WWoFT6PN4M=
+X-Gm-Gg: ASbGnctmM88UWr3SGheQ7c6RQQbHj/9gbTgirEEceJjm1VY9LVRRhFa95Jbj43pNPTg
+	nhNd6gowVbZ+nJuyj/Xcad1VhP1zvW6lWQkAMhVcBHJs6QeoTeVXg35T4sOw7r6/7Yb1ZvAsUzG
+	pymlO53V72Dw+zv27Vc/JteH3ePQEZrVQtRB+6et1Y91uUjogbB3wrsA9Tt95dltMxOjFlKAxk0
+	KRTMFxsxZVx477ylCzF6iz9Wyy76wSDk59YR1xp6NsYdiSSGULldR4z8Zw7YLvrFnMmJpd64KLG
+	OgRXZJQELEcjml2s94bAsvH7EYlzjqLAX22Hpa8tS6covKMocqjhj99qY5Pp
+X-Google-Smtp-Source: AGHT+IEiSTEs0O8Mqeelaa+ngbOSwLPNg7gFv6CbASrOTDFDQntYeOFMI3S6U+086acQ0TeURM9fdQ==
+X-Received: by 2002:a05:6a20:76a5:b0:1fe:90c5:7cf4 with SMTP id adf61e73a8af0-1fe93927fb1mr3490603637.19.1742984586274;
+        Wed, 26 Mar 2025 03:23:06 -0700 (PDT)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af8a28003b2sm10630763a12.28.2025.03.26.03.23.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Mar 2025 03:23:05 -0700 (PDT)
+Date: Wed, 26 Mar 2025 10:22:58 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>,
+	linux-kernel@vger.kernel.org, Liang Li <liali@redhat.com>
+Subject: Re: [PATCH net] bonding: use permanent address for MAC swapping if
+ device address is same
+Message-ID: <Z-PVgs4OIDZx5fZD@fedora>
+References: <20250319080947.2001-1-liuhangbin@gmail.com>
+ <20250325062416.4d60681b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v24 09/23] ovpn: implement packet processing
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
- Shuah Khan <shuah@kernel.org>, sd@queasysnail.net, ryazanov.s.a@gmail.com,
- Andrew Lunn <andrew+netdev@lunn.ch>, Xiao Liang <shaw.leon@gmail.com>
-References: <20250318-b4-ovpn-v24-9-3ec4ab5c4a77@openvpn.net>
- <20250325020802.7632-1-dqfext@gmail.com>
- <58712444-1de7-4076-b850-4c6035792931@openvpn.net>
- <CALW65jZ=Jngf0THLTuWHuhpQb0NDM=4x4HN_Xj922nmq71EMUQ@mail.gmail.com>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <CALW65jZ=Jngf0THLTuWHuhpQb0NDM=4x4HN_Xj922nmq71EMUQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250325062416.4d60681b@kernel.org>
 
-On 26/03/2025 11:03, Qingfang Deng wrote:
-> Hi Antonio,
+On Tue, Mar 25, 2025 at 06:24:16AM -0700, Jakub Kicinski wrote:
+> > 1) ip link set eth1 master bond0
 > 
-> On Wed, Mar 26, 2025 at 5:41 PM Antonio Quartulli <antonio@openvpn.net> wrote:
->>>> +/* Get the next packet ID for xmit */
->>>> +static inline int ovpn_pktid_xmit_next(struct ovpn_pktid_xmit *pid, u32 *pktid)
->>>> +{
->>>> +    const s64 seq_num = atomic64_fetch_add_unless(&pid->seq_num, 1,
->>>> +                                                  0x100000000LL);
->>>> +    /* when the 32bit space is over, we return an error because the packet
->>>> +     * ID is used to create the cipher IV and we do not want to reuse the
->>>> +     * same value more than once
->>>> +     */
->>>> +    if (unlikely(seq_num == 0x100000000LL))
->>>> +            return -ERANGE;
->>>
->>> You may use a 32-bit atomic_t, instead of checking if it equals
->>> 0x1_00000000, check if it wraparounds to zero.
->>> Additionally, you don't need full memory ordering as you just want an
->>> incrementing value:
->>>
->>> int seq_num = atomic_fetch_inc_relaxed(&pid->seq_num);
->>>
->>> if (unlikely(!seq_num))
->>>        ...
->>
->> But then if we have concurrent invocations of ovpn_pktid_xmit_next()
->> only the first one will error out on wrap-around, while the others will
->> return no error (seq_num becomes > 0) and will allow the packets to go
->> through.
->>
->> This is not what we want.
+> nit: 2)
 > 
-> Got it. You could replace it with
-> atomic_fetch_add_unless(&pid->seq_num, 1, 0) and check if it wraps
-> around to zero.
+> >    eth1 is added as a backup with its own MAC (MAC1).
+> > 
+> > 3) ip link set eth0 nomaster
+> >    eth0 is released and restores its MAC (MAC0).
+> >    eth1 becomes the active slave, and bond0 assigns MAC0 to eth1.
+> 
+> I don't know much about bonding, but this seems like a problem already
+> to me. Assuming both eth0 and eth1 are on the same segment we now have
+> two interfaces with the same MAC on the network. Shouldn't we override
+> the address of eth0 to a random one when it leaves?
 
-What about the first time when seq_num is 0? It will already stop, no?
+Can we change an interface mac to random value after leaving bond's control?
+It looks may break user's other configures.
 
 > 
-> However, what about the opposite scenario? If multiple threads
-> concurrently invoke ovpn_pktid_xmit_next() and all detect the
-> wraparound condition, could this lead to simultaneous calls to
-> ovpn_crypto_kill_key() and ovpn_nl_key_swap_notify()?
+> > 4) ip link set eth0 master bond0
+> >    eth0 is re-added to bond0, but both eth0 and eth1 now have MAC0,
+> >    breaking the follow policy.
+> > 
+> > To resolve this issue, we need to swap the new active slave’s permanent
+> > MAC address with the old one. The new active slave then uses the old
+> > dev_addr, ensuring that it matches the bond address. After the fix:
+> > 
+> > 5) ip link set bond0 type bond active_slave eth0
+> >    dev_addr is the same, swap old active eth1's MAC (MAC0) with eth0.
+> >    Swap new active eth0's permanent MAC (MAC0) to eth1.
+> >    MAC addresses remain unchanged.
+> > 
+> > 6) ip link set bond0 type bond active_slave eth1
+> >    dev_addr is the same, swap the old active eth0's MAC (MAC0) with eth1.
+> >    Swap new active eth1's permanent MAC (MAC1) to eth0.
+> >    The MAC addresses are now correctly differentiated.
+> > 
+> > Fixes: 3915c1e8634a ("bonding: Add "follow" option to fail_over_mac")
+> > Reported-by: Liang Li <liali@redhat.com>
+> > Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> > ---
+> >  drivers/net/bonding/bond_main.c | 9 +++++++--
+> >  include/net/bonding.h           | 8 ++++++++
+> >  2 files changed, 15 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+> > index e45bba240cbc..9cc2348d4ee9 100644
+> > --- a/drivers/net/bonding/bond_main.c
+> > +++ b/drivers/net/bonding/bond_main.c
+> > @@ -1107,8 +1107,13 @@ static void bond_do_fail_over_mac(struct bonding *bond,
+> >  			old_active = bond_get_old_active(bond, new_active);
+> >  
+> >  		if (old_active) {
+> > -			bond_hw_addr_copy(tmp_mac, new_active->dev->dev_addr,
+> > -					  new_active->dev->addr_len);
+> > +			if (bond_hw_addr_equal(old_active->dev->dev_addr, new_active->dev->dev_addr,
+> > +					       new_active->dev->addr_len))
+> > +				bond_hw_addr_copy(tmp_mac, new_active->perm_hwaddr,
+> > +						  new_active->dev->addr_len);
+> > +			else
+> > +				bond_hw_addr_copy(tmp_mac, new_active->dev->dev_addr,
+> > +						  new_active->dev->addr_len);
+> >  			bond_hw_addr_copy(ss.__data,
+> >  					  old_active->dev->dev_addr,
+> >  					  old_active->dev->addr_len);
+> > diff --git a/include/net/bonding.h b/include/net/bonding.h
+> > index 8bb5f016969f..de965c24dde0 100644
+> > --- a/include/net/bonding.h
+> > +++ b/include/net/bonding.h
+> > @@ -463,6 +463,14 @@ static inline void bond_hw_addr_copy(u8 *dst, const u8 *src, unsigned int len)
+> >  	memcpy(dst, src, len);
+> >  }
+> >  
+> > +static inline bool bond_hw_addr_equal(const u8 *dst, const u8 *src, unsigned int len)
+> > +{
+> > +	if (len == ETH_ALEN)
+> > +		return ether_addr_equal(dst, src);
+> > +	else
+> > +		return (memcmp(dst, src, len) == 0);
+> 
+> looks like this is on ctrl path, just always use memcmp directly ?
+> not sure if this helper actually.. helps.
 
-Calling ovpn_crypto_kill_key() multiple times is not an issue, as only 
-the first time it'll do something. Subsequent calls are no-op.
+This is just to align with bond_hw_addr_copy(). If you think it's not help.
+I can use memcmp() directly.
 
-But you're right about ovpn_nl_key_swap_notify(): each call will produce 
-a notification which we don't want.
-I'll make it conditional so that we'll send a notification only if 
-ovpn_crypto_kill_key() did the killing.
-
-Thanks for asking this!
-
-
-Regards,
-
--- 
-Antonio Quartulli
-OpenVPN Inc.
-
+Thanks
+Hangbin
 
