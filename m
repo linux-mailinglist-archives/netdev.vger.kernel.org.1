@@ -1,70 +1,73 @@
-Return-Path: <netdev+bounces-177786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99469A71B91
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 17:13:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40EFDA71BAD
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 17:21:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FFBD178A7F
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 16:13:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86DF9189A869
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 16:21:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F1CE1F463B;
-	Wed, 26 Mar 2025 16:13:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEE5E1F5853;
+	Wed, 26 Mar 2025 16:21:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b="ThQ78nL8"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="QS8p2MJB"
 X-Original-To: netdev@vger.kernel.org
-Received: from ksmg01.maxima.ru (ksmg01.maxima.ru [81.200.124.38])
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 978B81DB933;
-	Wed, 26 Mar 2025 16:13:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.200.124.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8BD41F5433;
+	Wed, 26 Mar 2025 16:21:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743005601; cv=none; b=X92R+DcENJIfgM2g8yE7YgcjoMVycRF2vkaClhzcbrcieS1GzZbBtwTicRLnc1hBQPNYCxi2JZw7L4nnSA+XqBMDMMl6V5FzLK9J+JZvjM5fLAckkJSKoGQppYzixGvIfM9Ac7GhyuNXK/UgZGJOdwRpnfhteg5ygEN7tawWse4=
+	t=1743006085; cv=none; b=kyU8pegQ4fXuBpb2vKxWQ1qfSHNl9XJT4sPbMvy6H7TuY5ZutVRsIrcsmYikLf+URNuadSlAG7iBs9vEpaIblfU3Q8jdJh1xFzaoTqK0jO/VZHpUt9lz3XsZ4T7rvOgYBQQ2jMi0z2FvGrOV0ZLc7RzWwU4iXJcfBw9ml82UCGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743005601; c=relaxed/simple;
-	bh=RS9rjV+oD4AQLsNqBufHGiDuQ/N96iUxTlgYBfA1elE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JvRsY/Wj+ehcSAbF5zHXfts+Q5XUVjCIok2PvfpCwnKBSVVZxNNsxLw7qxTU6F7FN127Q4IOgvoxWqLUIjLKz8UufjpbdWOm/RvkBdF3VLyCOqtIkgwgrWRpo+XNrLNpPwHZXNt/MWNfJRk6HI/Jo2MjErElZKqkA1jh4/nrdmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru; spf=pass smtp.mailfrom=mt-integration.ru; dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b=ThQ78nL8; arc=none smtp.client-ip=81.200.124.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mt-integration.ru
-Received: from ksmg01.maxima.ru (localhost [127.0.0.1])
-	by ksmg01.maxima.ru (Postfix) with ESMTP id 4B75EC001B;
-	Wed, 26 Mar 2025 19:13:07 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ksmg01.maxima.ru 4B75EC001B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mt-integration.ru;
-	s=sl; t=1743005587; bh=K3OdXdhmP3j0/JrBtArhPTsRcZ9ars3xQ/jtxHeTYyk=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=ThQ78nL884SDUKaXYETHgvOxEYNvA/3/QgcEsBhbnF+EmbhxAZBNofKbgvkBRs0zF
-	 qp130g/FXRKiyHWCOIJUahzm+sGVvPC5WkOVamHXNqGJDQiQ4SQGx6stYQv/X7RrlN
-	 IBxEIO70OctzNLlXa2FNnV0lLYiFJm3sEeK3gZiprj8N7XEoPUPuALnjVq0fAw6zWH
-	 TUU4atxbG7r+PV8zeNTDbbUzNFMqwPUNo8k2qX9YGB/oKGtTKPVyFvpzPCrPUvhmdG
-	 zKYR4CEWgqQhoy4O4h4A39iYADzFkIzcpX44XDUmMrSa7GpqExu9dMvO/nsojVTZpR
-	 d3hkAiyfb24mQ==
-Received: from ksmg01.maxima.ru (autodiscover.maxima.ru [81.200.124.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client CN "*.maxima.ru", Issuer "GlobalSign GCC R3 DV TLS CA 2020" (verified OK))
-	by ksmg01.maxima.ru (Postfix) with ESMTPS;
-	Wed, 26 Mar 2025 19:13:07 +0300 (MSK)
-Received: from localhost.maximatelecom.ru (5.1.51.21) by mmail-p-exch01.mt.ru
- (81.200.124.61) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1544.4; Wed, 26 Mar
- 2025 19:13:05 +0300
-From: Vitaliy Shevtsov <v.shevtsov@mt-integration.ru>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-CC: Vitaliy Shevtsov <v.shevtsov@mt-integration.ru>, Claudiu Manoil
-	<claudiu.manoil@nxp.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	<UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<lvc-project@linuxtesting.org>
-Subject: [PATCH] net: dsa: felix: check felix_cpu_port_for_conduit() for failure
-Date: Wed, 26 Mar 2025 21:12:45 +0500
-Message-ID: <20250326161251.7233-1-v.shevtsov@mt-integration.ru>
+	s=arc-20240116; t=1743006085; c=relaxed/simple;
+	bh=nT6VRtgopQ8G6LxyrDepOfBp6qLTXcRbja01PY+hu7M=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=n60JBnKj17gW5I1GaZVYeBi2ThsUtNFALdhb2mR54ZxAJuCvBem8E4myG7HfmMB2Y1ruqs/A2QSH/dvUycjXrHmfALooQdzrZJX/FFFAGX0KDszE/6bzeEYadUwQYgorESwJVqnY7aevYJ8FIBt+YLJf8vbjjVGDSLxipYMjmkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=QS8p2MJB; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1743006084; x=1774542084;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=nhr7gIYRxszAnMd29YWnQ+sqjq5QqSN5i/GFVwNuhZA=;
+  b=QS8p2MJBdiua1B492roh7kCbYQWNqmt7NC0MFSIZApqKL0G4ayyLbE3n
+   SHJEtiEflx0/IEHC8d70Z+MOqeMFDIqjfGley9I8oGQUB3WQcgEIZ4Nx8
+   9uRd9UM6nTWYIEbLYfo178Oy43S5AO6rku69oWusY/xVmH/u30aDSnldh
+   4=;
+X-IronPort-AV: E=Sophos;i="6.14,278,1736812800"; 
+   d="scan'208";a="77909939"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2025 16:21:19 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:64354]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.9.87:2525] with esmtp (Farcaster)
+ id 1abbc2fe-9a1d-48e3-9635-300968de39f9; Wed, 26 Mar 2025 16:21:18 +0000 (UTC)
+X-Farcaster-Flow-ID: 1abbc2fe-9a1d-48e3-9635-300968de39f9
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 26 Mar 2025 16:21:17 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.106.100.44) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 26 Mar 2025 16:21:14 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <john.johansen@canonical.com>, <kuniyu@amazon.com>,
+	<linux-kernel@vger.kernel.org>, <linux-next@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <sfr@canb.auug.org.au>
+Subject: Re: linux-next: build failure after merge of the apparmor tree
+Date: Wed, 26 Mar 2025 09:19:56 -0700
+Message-ID: <20250326162104.20801-1-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250326042655.4e160022@kernel.org>
+References: <20250326042655.4e160022@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,81 +76,89 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: mt-exch-01.mt.ru (91.220.120.210) To mmail-p-exch01.mt.ru
- (81.200.124.61)
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Auth: dmarc=none header.from=mt-integration.ru;spf=none smtp.mailfrom=mt-integration.ru;dkim=none
-X-KSMG-AntiSpam-Envelope-From: v.shevtsov@mt-integration.ru
-X-KSMG-AntiSpam-Info: LuaCore: 51 0.3.51 68896fb0083a027476849bf400a331a2d5d94398, {rep_avail}, {Tracking_from_domain_doesnt_match_to}, 81.200.124.61:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;mt-integration.ru:7.1.1;127.0.0.199:7.1.2;ksmg01.maxima.ru:7.1.1, FromAlignment: s, ApMailHostAddress: 81.200.124.61
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 192128 [Mar 26 2025]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.11
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/03/26 10:13:00 #27825781
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 7
+X-ClientProxiedBy: EX19D044UWB004.ant.amazon.com (10.13.139.134) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-felix_cpu_port_for_conduit() can return a negative value in case of failure
-and then it will be used as a port index causing buffer underflow. This can
-happen if a bonding interface in 802.1Q mode has no ports. This is unlikely
-to happen because the underlying driver handles IFF_TEAM, IFF_MASTER,
-IFF_BONDING bits and ports populating correctly, it is still better to
-check this for correctness if somehow it fails.
+From: Jakub Kicinski <kuba@kernel.org>
+Date: Wed, 26 Mar 2025 04:26:55 -0700
+> On Wed, 26 Mar 2025 15:01:48 +1100 Stephen Rothwell wrote:
+> > After merging the apparmor tree, today's linux-next build (x86_64
+> > allmodconfig) failed like this:
+> > 
+> > security/apparmor/af_unix.c: In function 'unix_state_double_lock':
+> > security/apparmor/af_unix.c:627:17: error: implicit declaration of function 'unix_state_lock'; did you mean 'unix_state_double_lock'? [-Wimplicit-function-declaration]
+> >   627 |                 unix_state_lock(sk1);
+> >       |                 ^~~~~~~~~~~~~~~
+> >       |                 unix_state_double_lock
+> > security/apparmor/af_unix.c: In function 'unix_state_double_unlock':
+> > security/apparmor/af_unix.c:642:17: error: implicit declaration of function 'unix_state_unlock'; did you mean 'unix_state_double_lock'? [-Wimplicit-function-declaration]
+> >   642 |                 unix_state_unlock(sk1);
+> >       |                 ^~~~~~~~~~~~~~~~~
+> >       |                 unix_state_double_lock
+> 
+> Thanks Stephen! I'll pop this into the tree in a few hours,
+> just giving Kuniyuki a bit more time to ack.
 
-Check if cpu_port is non-negative before using it as an index.
-Errors from change_conduit() are already handled and no additional changes
-are required.
+Thanks for catching this, Stephen !
 
-Found by Linux Verification Center (linuxtesting.org) with Svace.
+The patch itself looks good, for the patch:
 
-Signed-off-by: Vitaliy Shevtsov <v.shevtsov@mt-integration.ru>
----
- drivers/net/dsa/ocelot/felix.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-diff --git a/drivers/net/dsa/ocelot/felix.c b/drivers/net/dsa/ocelot/felix.c
-index 0a4e682a55ef..1495f8e21f90 100644
---- a/drivers/net/dsa/ocelot/felix.c
-+++ b/drivers/net/dsa/ocelot/felix.c
-@@ -523,6 +523,7 @@ static int felix_tag_npi_change_conduit(struct dsa_switch *ds, int port,
- {
- 	struct dsa_port *dp = dsa_to_port(ds, port), *other_dp;
- 	struct ocelot *ocelot = ds->priv;
-+	int cpu;
- 
- 	if (netif_is_lag_master(conduit)) {
- 		NL_SET_ERR_MSG_MOD(extack,
-@@ -546,7 +547,12 @@ static int felix_tag_npi_change_conduit(struct dsa_switch *ds, int port,
- 	}
- 
- 	felix_npi_port_deinit(ocelot, ocelot->npi);
--	felix_npi_port_init(ocelot, felix_cpu_port_for_conduit(ds, conduit));
-+	cpu = felix_cpu_port_for_conduit(ds, conduit);
-+	if (cpu < 0) {
-+		dev_err(ds->dev, "Cpu port for conduit not found\n");
-+		return -EINVAL;
-+	}
-+	felix_npi_port_init(ocelot, cpu);
- 
- 	return 0;
- }
-@@ -658,6 +664,11 @@ static int felix_tag_8021q_change_conduit(struct dsa_switch *ds, int port,
- 	int cpu = felix_cpu_port_for_conduit(ds, conduit);
- 	struct ocelot *ocelot = ds->priv;
- 
-+	if (cpu < 0) {
-+		dev_err(ds->dev, "Cpu port for conduit not found\n");
-+		return -EINVAL;
-+	}
+
+John:
+
+I had a cursory look at this commit and the exact user of
+unix_state_lock() is broken for SOCK_DGRAM.
+
+https://web.git.kernel.org/pub/scm/linux/kernel/git/jj/linux-apparmor.git/commit/?h=apparmor-next&id=c05e705812d179f4b85aeacc34a555a42bc4f9ac
+
+---8<---
 +
- 	ocelot_port_unassign_dsa_8021q_cpu(ocelot, port);
- 	ocelot_port_assign_dsa_8021q_cpu(ocelot, port, cpu);
- 
--- 
-2.48.1
++	/* TODO: update sock label with new task label */
++	unix_state_lock(sock->sk);
++	peer_sk = unix_peer(sock->sk);
++	if (peer_sk)
++		sock_hold(peer_sk);
++
++	is_sk_fs = is_unix_fs(sock->sk);
++	if (is_sk_fs && peer_sk)
++		sk_req = request;
++	if (sk_req)
++		error = unix_label_sock_perm(subj_cred, label, op, sk_req,
++					     sock);
++	unix_state_unlock(sock->sk);
++	if (!peer_sk)
++		return error;
++
++	unix_state_double_lock(sock->sk, peer_sk);
 
+Here, unix_peer(sock->sk) could have been changed and must be
+double checked.  See unix_dgram_sendmsg().
+
+The patch seems to be written in 2022 and recently merged.
+I'm not sure if it's reviewed by netdev folks at that time,
+but please cc me and netdev next time for patches regarding
+AF_UNIX.
+
+Thanks!
+
+
++	if (!is_sk_fs && is_unix_fs(peer_sk)) {
++		last_error(error,
++			   unix_fs_perm(op, request, subj_cred, label,
++					unix_sk(peer_sk)));
++	} else if (!is_sk_fs) {
++		struct aa_sk_ctx *pctx = aa_sock(peer_sk);
++
++		last_error(error,
++			xcheck(aa_unix_peer_perm(subj_cred, label, op,
++						 MAY_READ | MAY_WRITE,
++						 sock->sk, peer_sk, NULL),
++			       aa_unix_peer_perm(file->f_cred, pctx->label, op,
++						 MAY_READ | MAY_WRITE,
++						 peer_sk, sock->sk, label)));
++	}
++	unix_state_double_unlock(sock->sk, peer_sk);
+---8<---
 
