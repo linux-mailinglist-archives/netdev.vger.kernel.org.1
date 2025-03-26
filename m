@@ -1,140 +1,179 @@
-Return-Path: <netdev+bounces-177702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2FB0A7151E
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 11:52:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4FB1A7152C
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 11:59:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE3883B5709
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 10:52:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C1D17A57B0
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 10:58:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72CE41C84DE;
-	Wed, 26 Mar 2025 10:52:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 737ED1D8DFB;
+	Wed, 26 Mar 2025 10:59:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CTfFB6kl"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FUGEgc/7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A7C4A29;
-	Wed, 26 Mar 2025 10:52:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A971C8606;
+	Wed, 26 Mar 2025 10:59:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742986373; cv=none; b=BRIFua751LnCAP7ejN4OI8X9J6CY3A2orcyXqeE7nvCnDpw/r2yghPtHkGd4n7Q5JOOt2f4Q7Ochd62Dg2WwpdbUybk7JmZZOdStxNwg9LCQOeniLYT+F10EJXX9k2UMCMXhMERKLBGnEPE+GuEr/RqkZR2Y0CNabdwpkghuDWQ=
+	t=1742986763; cv=none; b=gz4SnmCQbnBpM5jxEgWpcJoCkr7RmVpqrXIYjfMeCxlHuPCl7v0P0df5pa3Y8AhPjv0pTJzW9+W6sEd7REu8HnFGKUMPScwVkD8PAbGmiYd4g5KFIYI8in/jePa2A8FPWwNUXd+8waeBo9Z/MiMlyUe19opuzIvTwcxEJokv+Do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742986373; c=relaxed/simple;
-	bh=Djiuh0TTQ+OQMWUiqRkRsKWbVm7hMusiXM1xRsAVliM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JLpLnKEKKiOBekp3bvgZjLhrC5nVUX16JXAo36oA+tsxSC0367eezPwgHpeM1qDVf51ZwdZmsY7nConTei4rrZEvPTgWXAqs3grk1ZoWVLL2CY9yGhe8P7gbtYBxDL8gc5+0T+i96l3b4Nay8rUsPCzThFzL3ihL/9JEDlNbWw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CTfFB6kl; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-223f4c06e9fso14561685ad.1;
-        Wed, 26 Mar 2025 03:52:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1742986371; x=1743591171; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wwRuOYtlCLzRZmhCJLfT7hvVNcHg1UTJcmJVtwUdAw0=;
-        b=CTfFB6kly2Pb3PAeWdu4wMQhxUmp/090nSRuGKz17qA4JJp4440pdc5LEslt4+veXt
-         Pb1KVKtvi6S+HCm9uoNmrctFdOEranZ04C7YhmwxkVtLQrIaNj/wBXEBTiFurqbWpJS+
-         GwrKTsmKfwWrRdAGPj7Ntc6y1ZnA+XJmJ6gwmb0IMRPLg/LPiTqgHgrXQloVR+P6u0X9
-         EO7PJA9lEIKflW+ptLUJZJJzUh/l35tHUyB9Sb26s7tCVnPbgzPSn6332ic5skdo8Uyl
-         8ipV50z+SP03ct390u1w0GlmSr85RMGw3qVCpXn4y2Ak5A6uL4YBfF1KbLXSwKAFV7AH
-         6J0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742986371; x=1743591171;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wwRuOYtlCLzRZmhCJLfT7hvVNcHg1UTJcmJVtwUdAw0=;
-        b=Eta6x3rccQ1C9CSW4BxSdxwjiQenKGkUA0pIFmRlxSKuOx/nsulQCIUZFXk2JlJIAk
-         S2YuYwZkTqfs4X8uOmMu1u6gPrLdi4VOjXHtyVx/+d9ZWawkeXxA79jCQ26k9uq91/y5
-         z5X7X7OHgpHPGJ4S+JnPxfqOWvzCRdZNAXY9/KS1B2nn2ltwVgZroxGoj95KMsO1o2+8
-         HSeUTfLB99oYoyreswRXHVqOiBnmQN9yytg4s+RDINZkFffmOMaXmdnz1BM+ikyaoO7z
-         lEHu3D22itKDyO5BCwDD/2zNU2mRzJwUQhEgoh6kCRqTibnoRopPXP4htVXZASHOTHsN
-         yZsw==
-X-Forwarded-Encrypted: i=1; AJvYcCVXzzeaB4S/frp3/koGSgIzrunAiMcCxWIsFetF21yWPTAPpf+04ruELoBT4IPjvhXzT88R1AED@vger.kernel.org, AJvYcCWa61y+iVRi/8utEGF4prvKftshkJdXWhqbPHYd0reQkVLG5s+JtouZIRkqQ3I9l0sPCNLcyfO5oRoy3vA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyc0jce/jV0IEnvHBu1u/s9X/IXVmR3zqzD2tUhCR2fXdFsi/dD
-	/1k641Aufi9PckLt6hvHIvWTOn8OPmHn0Spf+GKndnqMLg+5vHL1
-X-Gm-Gg: ASbGncu8aPFvSb7oon/GYvc7B2TXfegmPrgg97qKUNwCjTdEPNzdC1ePkacA+r3vLhn
-	bizvdSh+53PcT8X0Q9SXRa1DlT4rIsj4+67aPi+RRkATYlJEK9GI7Z4olozWb+jrg9uxIu4hZ5f
-	UiCuhqy+oVcSL+K3Eu/PREEs5AdBUvRKX8mQAP8FqWyrIRBMoTjGDahRf4MrsIsrVpXaLcJN7Qt
-	ASqKKVYVvCaLwCh3ReE2PmC9F7Yjrt+cQDslBwwC2REjjnR+LbmmB3vW6myqzPva7y+aoNAOnoc
-	nKyy0hi7IQxWzWNPMjQ7agYK3BcC1jA+nfiaVkucjakYAdNpKvS3d5LKEIqhhsDmT6Yz+9592Ug
-	=
-X-Google-Smtp-Source: AGHT+IE4QXqhpL4pCNd808nbhmu+o/NuYs7Ewl82eJ04YX9HoXM/cdykFs9gadLeiRj9Zk9KT9O3lQ==
-X-Received: by 2002:a17:902:e946:b0:220:e91f:4408 with SMTP id d9443c01a7336-227efb817ebmr55076935ad.22.1742986371125;
-        Wed, 26 Mar 2025 03:52:51 -0700 (PDT)
-Received: from purva-IdeaPad-Gaming-3-15IHU6.. ([14.139.108.62])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22780f4599fsm107516005ad.67.2025.03.26.03.52.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Mar 2025 03:52:50 -0700 (PDT)
-From: Purva Yeshi <purvayeshi550@gmail.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Purva Yeshi <purvayeshi550@gmail.com>
-Subject: [PATCH] net: ipv6: Fix NULL dereference in ipv6_route_check_nh
-Date: Wed, 26 Mar 2025 16:22:15 +0530
-Message-Id: <20250326105215.23853-1-purvayeshi550@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1742986763; c=relaxed/simple;
+	bh=xM0pKJ8sRe+w6GWU9I1Dy+FTjnKA3yceusf+jKEC0+A=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:Subject:Cc:To:
+	 References:In-Reply-To; b=K/QrADEqdLeFh7nr9vymLCy7o0HfSkXMQzgMHwQ7fp/PxHX8jGRlgu4sG/GIlT4ixMwZ1r3O/Bs66XHVZMuJeWMukO+mpZyE5e2582yxJBwPz4sw5z3Tm+biyfyDl1tCR0LQOHA5Fof3eeU3c4LqNlrTTL0sVfY9hzPviDQgxms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FUGEgc/7; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 080264435E;
+	Wed, 26 Mar 2025 10:59:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1742986758;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0t5QSc/Inlh5P0gL04QSWLOfREn/t3CkeGZkKLYdjDE=;
+	b=FUGEgc/7iedXlqTTbqAcAA02XV8B6oh9Y7Bqm+fFLGpWd49hbrCIc0l/Bom4tRDfAdpfxN
+	C+mSXaVZjS8viJztlY0tp1Jmw0hvhW/1ceZPdb5wiGtYc1je6aAFI5TiHdO+P9FJKmRmfx
+	eWncdS7EimoRYsZHB++4IT3E0MlwDx4w9Fe5zz49duRxQWN0qvat+MtfFrTz2J8U2Xd7HU
+	Hc/jtwjqt9d5o94wNdn1lcwKBr/jAF9Kb1AcdXPCVatvLn8mKVBVsKR/p4LNlXi6/kl63Q
+	qxddGv2E69HVgUqlyM1jbWK1dNqK8asjSsiq1ina4MTDSp9PAqFA/y2O6mk2EA==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 26 Mar 2025 11:59:13 +0100
+Message-Id: <D8Q58KMGV4R4.ELW8TLEK5W5V@bootlin.com>
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Subject: Re: [PATCH net-next 08/13] net: macb: introduce DMA descriptor
+ helpers (is 64bit? is PTP?)
+Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Rob
+ Herring" <robh@kernel.org>, "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
+ "Conor Dooley" <conor+dt@kernel.org>, "Nicolas Ferre"
+ <nicolas.ferre@microchip.com>, "Claudiu Beznea" <claudiu.beznea@tuxon.dev>,
+ "Paul Walmsley" <paul.walmsley@sifive.com>, "Palmer Dabbelt"
+ <palmer@dabbelt.com>, "Albert Ou" <aou@eecs.berkeley.edu>, "Alexandre
+ Ghiti" <alex@ghiti.fr>, "Samuel Holland" <samuel.holland@sifive.com>,
+ "Richard Cochran" <richardcochran@gmail.com>, "Russell King"
+ <linux@armlinux.org.uk>, "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>,
+ "Vladimir Kondratiev" <vladimir.kondratiev@mobileye.com>, "Gregory CLEMENT"
+ <gregory.clement@bootlin.com>, <netdev@vger.kernel.org>,
+ <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-riscv@lists.infradead.org>, <linux-mips@vger.kernel.org>, "Thomas
+ Petazzoni" <thomas.petazzoni@bootlin.com>, "Tawfik Bayouk"
+ <tawfik.bayouk@mobileye.com>
+To: "Maxime Chevallier" <maxime.chevallier@bootlin.com>
+X-Mailer: aerc 0.20.1-0-g2ecb8770224a
+References: <20250321-macb-v1-0-537b7e37971d@bootlin.com>
+ <20250321-macb-v1-8-537b7e37971d@bootlin.com>
+ <20250324095522.2ab1c38b@fedora.home>
+In-Reply-To: <20250324095522.2ab1c38b@fedora.home>
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduieehfeeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpegggfgtfffkhffuvefvofhfjgesthhqredtredtjeenucfhrhhomhepvfhhrohoucfnvggsrhhunhcuoehthhgvohdrlhgvsghruhhnsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeeluefgiefgtdegfeehjeetteevveejkefgiedtkeefteejgfdvkeffgeejhfduieenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepjeejrddufeehrdekuddrieehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepjeejrddufeehrdekuddrieehpdhhvghloheplhhotggrlhhhohhsthdpmhgrihhlfhhrohhmpehthhgvohdrlhgvsghruhhnsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvkedprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnv
+ ghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehrohgshheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhriihkodgutheskhgvrhhnvghlrdhorhhg
+X-GND-Sasl: theo.lebrun@bootlin.com
 
-Fix Smatch-detected error:
-net/ipv6/route.c:3427 ip6_route_check_nh() error:
-we previously assumed '_dev' could be null
+Hello Maxime,
 
-Ensure _dev and idev are checked for NULL before dereferencing in
-ip6_route_check_nh. Assign NULL explicitly when fib_nh_dev is NULL
-to prevent unintended dereferences.
+On Mon Mar 24, 2025 at 9:55 AM CET, Maxime Chevallier wrote:
+> On Fri, 21 Mar 2025 20:09:39 +0100
+> Th=C3=A9o Lebrun <theo.lebrun@bootlin.com> wrote:
+>
+>> Introduce macb_dma_is_64b() and macb_dma_is_ptp() helper functions.
+>> Many codepaths are made simpler by dropping conditional compilation.
+>>=20
+>> This implies three changes:
+>>  - Always compile related structure definitions inside <macb.h>.
+>>  - Make the field hw_dma_cap in struct macb always present.
+>>  - MACB_EXT_DESC can be dropped as it is useless now.
+>>=20
+>> The common case is:
+>>=20
+>> 	#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+>> 		struct macb_dma_desc_64 *desc_64;
+>> 		if (bp->hw_dma_cap & HW_DMA_CAP_64B) {
+>> 			desc_64 =3D macb_64b_desc(bp, desc);
+>> 			// ...
+>> 		}
+>> 	#endif
+>>=20
+>> And replaced by:
+>>=20
+>> 	struct macb_dma_desc_64 *desc_64;
+>> 	if (macb_dma_is_64b(bp)) {
+>> 		desc_64 =3D macb_64b_desc(bp, desc);
+>> 		// ...
+>> 	}
+>
+> Just a thought, but this is adding some more branches in the hotpath on
+> 32 bits DMA setups. Did you measure any performance changes on
+> these platforms (if you have access to one :) )
+>
+> As the caps can't be changed dynamically, maybe these helpers could be
+> replaced more efficiently with some static_key ? This would benefit
+> both 32 and 64 bits systems as the following would be more efficient
+>
+> 	if (bp->hw_dma_cap & HW_DMA_CAP_64B) {
+> 		//  ...
+> 	}
+>
+> Just a thought of course, maybe this patch doesn't really hurt perfs :)
 
-Signed-off-by: Purva Yeshi <purvayeshi550@gmail.com>
----
- net/ipv6/route.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+Good question! I asked myself the same thing before posting.
 
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index ef2d23a1e3d5..ad5b3098eba0 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -3424,9 +3424,20 @@ static int ip6_route_check_nh(struct net *net,
- 		if (dev != res.nh->fib_nh_dev)
- 			err = -EHOSTUNREACH;
- 	} else {
--		*_dev = dev = res.nh->fib_nh_dev;
--		netdev_hold(dev, dev_tracker, GFP_ATOMIC);
--		*idev = in6_dev_get(dev);
-+		if (res.nh->fib_nh_dev) {  /* Ensure fib_nh_dev is valid */
-+			dev = res.nh->fib_nh_dev;
-+
-+			if (_dev)  /* Only assign if _dev is not NULL */
-+				*_dev = dev;
-+
-+			netdev_hold(dev, dev_tracker, GFP_ATOMIC);
-+			*idev = in6_dev_get(dev);
-+		} else {
-+			if (_dev)
-+				*_dev = NULL;  /* Explicitly set NULL */
-+			if (idev)
-+				*idev = NULL;  /* Explicitly set NULL */
-+		}
- 	}
- 
- 	return err;
--- 
-2.34.1
+We go from:
+
+	void bar(struct macb *bp) {
+	#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+		if (bp->hw_dma_cap & HW_DMA_CAP_64B) {
+			foo();
+		}
+	#endif
+	}
+
+To:
+
+	static bool macb_dma_is_64b(struct macb *bp)
+	{
+		return IS_ENABLED(CONFIG_ARCH_DMA_ADDR_T_64BIT) &&
+		       bp->hw_dma_cap & HW_DMA_CAP_64B;
+	}
+
+	void bar(struct macb *bp) {
+		if (macb_dma_is_64b(bp)) {
+			foo();
+		}
+	}
+
+In the first case, we use explicit preprocessor directives to remove
+code if CONFIG_ARCH_DMA_ADDR_T_64BIT isn't defined.
+
+In the second case, our compiler optimises away the IS_ENABLED() call.
+ - If false, then the branch doesn't appear.
+ - If true, then only the capability check is inlined in bar().
+I checked the assembly on arm/arm64/MIPS.
+
+Conclusion: the hotpath doesn't change.
+
+Thanks,
+
+--
+Th=C3=A9o Lebrun, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
 
