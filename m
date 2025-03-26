@@ -1,148 +1,97 @@
-Return-Path: <netdev+bounces-177689-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177690-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2767FA71469
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 11:06:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 611A9A7147D
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 11:12:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 621D4189A6CF
-	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 10:04:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 521183AD389
+	for <lists+netdev@lfdr.de>; Wed, 26 Mar 2025 10:12:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C89C41B21B4;
-	Wed, 26 Mar 2025 10:04:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DB041B3939;
+	Wed, 26 Mar 2025 10:12:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="UnhEVOve"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="TL7/8zl1"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF0F58C1F;
-	Wed, 26 Mar 2025 10:04:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0B7D1B21B4;
+	Wed, 26 Mar 2025 10:12:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742983462; cv=none; b=QhUxQ+S8VQarIfQB1yZFVb7mZg2vMiW6lA4L8Ge3he3twjaXKcLWQwG5Z/iXJz5zLVUY0bb0qRXtl1LIvtGiSllcgnivNPQsoe4RLZTBlHXlu24Ou/65LuVMie1iIoKKKnnaf/HcZ3RXN/gcQW7i04cR6LXmzCfG72zX9V8yTlM=
+	t=1742983933; cv=none; b=susMPni192nV5QuIt92IEOOytrlTrqMH+EqgsqP5Me9UxKBc5YoZxy3sUIsYl8fFF5+aQqveiqFyaTuu82WbbD7Do6EGWaTiXwBqCHO+bKP8uIrx+d48EA3bIJJgI3MJwKa2WOa8wpIwX7vNE9WjSUxSBaQdTKNwUZofII8ELvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742983462; c=relaxed/simple;
-	bh=OSQzX4kBNdMJcD7vMO1kOYwadCccPeHTBGPWcJm7IY0=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=gdaq6eP1qBJS97vkWQ32rZuWTl3il3t7vIC9/U4Os6JHXIvUJT728iOOU87KqaC7umn/iqL88zMkstEQW866QhdU9PKtQ4YTuWNLn35+AFPAgi7IoTdKiiNi7jyFampFjkJW1xFbEjlFyPtzZOG8gKs8cJWV/dHh2/HRtKOyKX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=UnhEVOve; arc=none smtp.client-ip=217.70.183.195
+	s=arc-20240116; t=1742983933; c=relaxed/simple;
+	bh=q1ohoOoRigJG5BszVUpixxRxKWS2XGF2pVeV/7/Hxcg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=jeV+FKkLufnwmDDnkEQ51P1/vQFVQrjc8Gn15BWJauEb6ZrQBZyO8wKZHNBG9+2+yGHE0QJlvZ8JfSGsgrtlxE36Y0i8j+fcYW5mNAa2hMM0nKq9Z1Hj4D+1HPS2xRiyD1iPj/0+dj+JYNTR+ftJOriuRMKErji4t8efwEDQ7vM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=TL7/8zl1; arc=none smtp.client-ip=217.70.183.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 159D420483;
-	Wed, 26 Mar 2025 10:04:14 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E747B433F0;
+	Wed, 26 Mar 2025 10:12:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1742983456;
+	t=1742983922;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=R6SJe1q7HnXDWNnYhZ89APQIhGwWw4epexqG70iweUg=;
-	b=UnhEVOveRNaKW893lMfVvlDfa3mHmkxnR4jwgXzcsSN7fbcT78GzLuvdmauZlL98E+SY/w
-	gn2nY2B5yosz8Jpi6HOz+/IYsp9tNQfKceIoojhV6xJJUFrE2i2TuG3clP1w7HwYyMXP8K
-	g5IcszNCc1wdYrGeCSdyDP8Z5yc8MI17tVSv9ax4u+gi/Ifd76NQA9lpARaC+c0E1FE3xx
-	uNkHhFAjlJeX+PvLp4wBhJTwujuUtCdQKHoIKKlxJZZ0WnR3FU5KwFknwtX6UP1IO2hGGr
-	GsQGgAZjsIqA40iFtfASlu7vSv/TCQFfjWBzqX9d7HhjIQqfl/5DUwkDofpjEg==
+	bh=q1ohoOoRigJG5BszVUpixxRxKWS2XGF2pVeV/7/Hxcg=;
+	b=TL7/8zl1VMlxnGU0iUgG4lo6oyYL9bOqp3YJwJySnxZD4PuM8Ey+feDBN2QVqnndhCT/oP
+	gtiyBuC/HXJbYWpcbN5/kHlj/GT4GEX8Y6+y4/KTbaqR3rR2/9mnWgah61+Yzh5aSMokC9
+	2PSbgegEVvI9Qd+3+t9apcm2X4JcEpzQA4qtHekx0+noC92SxEMMz0zfXbPZjdL/MnJC8k
+	iD8gzeUBk8X/Ks9WU5h2R4r6oKa9jHAH+TOm4fgO6F3G+CSMbEk+0miWmtuin1YGGvfSsi
+	rGo/iWGI0o2AuBNL3WiNdqbQARY+SkNBmwxowIk3dTzpPoUiCUVi+ORXj8K/UA==
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Ramon Fontes <ramonreisfontes@gmail.com>
+Cc: davem@davemloft.net,  kuba@kernel.org,  pabeni@redhat.com,
+  linux-wpan@vger.kernel.org,  alex.aring@gmail.com,
+  netdev@vger.kernel.org
+Subject: Re: [PATCH] mac802154_hwsim: define perm_extended_addr initialization
+In-Reply-To: <20250325165312.26938-1-ramonreisfontes@gmail.com> (Ramon
+	Fontes's message of "Tue, 25 Mar 2025 13:53:12 -0300")
+References: <20250325165312.26938-1-ramonreisfontes@gmail.com>
+User-Agent: mu4e 1.12.7; emacs 29.4
+Date: Wed, 26 Mar 2025 11:12:01 +0100
+Message-ID: <87cye4qexa.fsf@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 26 Mar 2025 11:04:14 +0100
-Message-Id: <D8Q42H2O4AC0.1HV63W6F5L45U@bootlin.com>
-Subject: Re: [PATCH net-next 05/13] net: macb: add no LSO capability
- (MACB_CAPS_NO_LSO)
-Cc: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
- <linux-mips@vger.kernel.org>, "Thomas Petazzoni"
- <thomas.petazzoni@bootlin.com>, "Tawfik Bayouk"
- <tawfik.bayouk@mobileye.com>
-To: "Claudiu Beznea" <claudiu.beznea@tuxon.dev>, "Andrew Lunn"
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, "Rob Herring" <robh@kernel.org>, "Krzysztof
- Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>,
- "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Paul Walmsley"
- <paul.walmsley@sifive.com>, "Palmer Dabbelt" <palmer@dabbelt.com>, "Albert
- Ou" <aou@eecs.berkeley.edu>, "Alexandre Ghiti" <alex@ghiti.fr>, "Samuel
- Holland" <samuel.holland@sifive.com>, "Richard Cochran"
- <richardcochran@gmail.com>, "Russell King" <linux@armlinux.org.uk>, "Thomas
- Bogendoerfer" <tsbogend@alpha.franken.de>, "Vladimir Kondratiev"
- <vladimir.kondratiev@mobileye.com>, "Gregory CLEMENT"
- <gregory.clement@bootlin.com>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-X-Mailer: aerc 0.20.1-0-g2ecb8770224a
-References: <20250321-macb-v1-0-537b7e37971d@bootlin.com>
- <20250321-macb-v1-5-537b7e37971d@bootlin.com>
- <3e6cb322-bc8d-471c-87c8-286b98f12ad9@tuxon.dev>
-In-Reply-To: <3e6cb322-bc8d-471c-87c8-286b98f12ad9@tuxon.dev>
 X-GND-State: clean
 X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduieehvdegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpegggfgtfffkufevvffhofhfjgesthhqredtredtjeenucfhrhhomhepvfhhrohoucfnvggsrhhunhcuoehthhgvohdrlhgvsghruhhnsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeduteeltdevjedvkeelueejhfdvleeiueetvdfgveffffekueeghffhieduleejveenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepjeejrddufeehrdekuddrieehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepjeejrddufeehrdekuddrieehpdhhvghloheplhhotggrlhhhohhsthdpmhgrihhlfhhrohhmpehthhgvohdrlhgvsghruhhnsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvjedprhgtphhtthhopegtlhgruhguihhurdgsvgiinhgvrgesthhugihonhdruggvvhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrg
- hdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheprhhosghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkrhiikhdoughtsehkvghrnhgvlhdrohhrgh
-X-GND-Sasl: theo.lebrun@bootlin.com
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduieehvdeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufgjfhgffffkgggtgfesthhqredttderjeenucfhrhhomhepofhiqhhuvghlucftrgihnhgrlhcuoehmihhquhgvlhdrrhgrhihnrghlsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeffgefhjedtfeeigeduudekudejkedtiefhleelueeiueevheekvdeludehiedvfeenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghloheplhhotggrlhhhohhsthdpmhgrihhlfhhrohhmpehmihhquhgvlhdrrhgrhihnrghlsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeejpdhrtghpthhtoheprhgrmhhonhhrvghishhfohhnthgvshesghhmrghilhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhhinhhugidqfihprghnsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepr
+ ghlvgigrdgrrhhinhhgsehgmhgrihhlrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-GND-Sasl: miquel.raynal@bootlin.com
 
-Hello Claudiu,
+Hello Ramon,
 
-On Mon Mar 24, 2025 at 9:18 AM CET, Claudiu Beznea wrote:
-> On 21.03.2025 21:09, Th=C3=A9o Lebrun wrote:
->> LSO is runtime-detected using the PBUF_LSO field inside register
->> designcfg_debug6/GEM_DCFG6. Allow disabling that feature if it is
->> broken by using struct macb_config->caps.
->>=20
->> Signed-off-by: Th=C3=A9o Lebrun <theo.lebrun@bootlin.com>
->> ---
->>  drivers/net/ethernet/cadence/macb.h      | 1 +
->>  drivers/net/ethernet/cadence/macb_main.c | 5 +++--
->>  2 files changed, 4 insertions(+), 2 deletions(-)
->>=20
->> diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/=
-cadence/macb.h
->> index 3b43cb9468e3618754ff2bc6c5f360447bdeeed0..e9da6e3b869fc772613a0d6b=
-86308917c9bff7fe 100644
->> --- a/drivers/net/ethernet/cadence/macb.h
->> +++ b/drivers/net/ethernet/cadence/macb.h
->> @@ -739,6 +739,7 @@
->>  #define MACB_CAPS_MIIONRGMII			BIT(9)
->>  #define MACB_CAPS_NEED_TSUCLK			BIT(10)
->>  #define MACB_CAPS_QUEUE_DISABLE			BIT(11)
->> +#define MACB_CAPS_NO_LSO			BIT(12)
->>  #define MACB_CAPS_PCS				BIT(24)
->>  #define MACB_CAPS_HIGH_SPEED			BIT(25)
->>  #define MACB_CAPS_CLK_HW_CHG			BIT(26)
->> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethe=
-rnet/cadence/macb_main.c
->> index b5797c1ac0a41e9472883b013c1e44a01092f257..807f7abbd9941bf624f14a5d=
-dead68dad1c8deb2 100644
->> --- a/drivers/net/ethernet/cadence/macb_main.c
->> +++ b/drivers/net/ethernet/cadence/macb_main.c
->> @@ -4373,8 +4373,9 @@ static int macb_init(struct platform_device *pdev)
->>  	/* Set features */
->>  	dev->hw_features =3D NETIF_F_SG;
->> =20
->> -	/* Check LSO capability */
->> -	if (GEM_BFEXT(PBUF_LSO, gem_readl(bp, DCFG6)))
->> +	/* Check LSO capability; capability is for buggy HW */
->
-> The comment here is a bit confusing to me.
+On 25/03/2025 at 13:53:12 -03, Ramon Fontes <ramonreisfontes@gmail.com> wro=
+te:
 
-Proposal:
+> This establishes an initialization method for perm_extended_addr, alignin=
+g it with the approach used in mac80211_hwsim.
 
-+  /* Check LSO capability; runtime detection can be overridden by a cap
-+   * flag if the hardware is known to be buggy */
+You are now enforcing an (almost) static value, is that the intended
+behaviour? If yes I would like a better explanation of why this is
+relevant and how you picked eg. 0x02 as prefix to justify the change.
 
-I'll use that in V2, or feel free to reply if it's still unclear.
+In general I am not opposed, even though I kind of liked the idea of
+generating random addresses, especially since hwsim is not the only one
+to do that and having a simulator that behaves like regular device
+drivers actually makes sense IMO.
+
+Also, please wrap the commit log.
+
+> Signed-off-by: Ramon Fontes <ramonreisfontes@gmail.com>
 
 Thanks,
-
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+Miqu=C3=A8l
 
