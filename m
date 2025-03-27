@@ -1,61 +1,82 @@
-Return-Path: <netdev+bounces-177924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8A7CA72EF2
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 12:24:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2835A72EFE
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 12:25:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41825188BA6C
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 11:24:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2F3C189C266
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 11:25:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D232A211499;
-	Thu, 27 Mar 2025 11:24:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8C1212B00;
+	Thu, 27 Mar 2025 11:24:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Tg46yswV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YUMsxmSw"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3993619D88F;
-	Thu, 27 Mar 2025 11:24:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB1E019D88F;
+	Thu, 27 Mar 2025 11:24:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743074680; cv=none; b=j2P24dEDRao67kzOKZpFpfAGAMS3BNm7PcgBEPJcg94bdurEQ7BbVZn4Bm8ZnWENCKvkj9B5DYQ/DxbUYlCzz36+CMowb6sX/aIj+DBiSWfbzLmOio1zPF+rHa1RmqQvcqPxeEJ9yN7WD6/nqUDmLuBBt2M40ToOyzW0jvoSna4=
+	t=1743074690; cv=none; b=nZa+1E4TjQWi9WFwwmEnHfTGxHZqL+hDzEkr0bI5jVmmqPeUz886wLLuOIr78EIUAGagAADRF3PO1jLNRreJtjSY5Og/Q9rkeGm04D3ASe9FfOgZMGFiqosc9/fZc1tGk7MKVetSKlst/pFJ9hu2jdtvKModvWJIaVY1kLlGMN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743074680; c=relaxed/simple;
-	bh=o90eJ9r17sHcsxjv667qqNImLfONvscKSdVPajh8Zb8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rltjshOdiDxJ1XuLLkozlupTGXwXvgsPO7i2Df6qgZSbgaj4tnSR2Sj9pwmsrK4pavGwwTqsWSaHX58tC3GfmW9gbW7FrP1Xlr6/xKjUewNZkQk6l/MmD2QEJCG5nZAXa+/bMacqsXBOJsBLs8fJGsXlNwuOdr6Z61AvSERnrtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Tg46yswV; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=8Kd2m4/qDTBu4FgncmANR8l0RgY9la+y1Mod4stXgAI=; b=Tg46yswVdHA0FtJG6X00K5GDXS
-	ITlusgE6UxNSakQz1awgavBIMDV5nWn68+Lb4EUlvEJV8HVtQDEFl6ObnRH38FR40IZml8CTUZcvP
-	gGxMnv82tJexW/PWtMKzZNsSm+SYo6dDExr0VdE6RksAsChnEUZltKeFJiNikFCwCvvubT1JM/zdk
-	ZtC7cZI69vYfd3fp8nre+uHXpOC796CP6/Nudr4yLtsxmkKLLAztF233fQc53eWGp5CBLIv2UwtN3
-	WWdEY5Ss7s04C2eYPOasuwePnvPHYnn9jRO5GXR/G0lKvEwm9Pijzf2XkOQCDoqkw3eJpejirUwR4
-	nz+yJ+FA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38688)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1txlLY-0007AV-2e;
-	Thu, 27 Mar 2025 11:24:28 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1txlLW-0005ar-2U;
-	Thu, 27 Mar 2025 11:24:26 +0000
-Date: Thu, 27 Mar 2025 11:24:26 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Christian Marangi <ansuelsmth@gmail.com>
+	s=arc-20240116; t=1743074690; c=relaxed/simple;
+	bh=9vHCXQb60UYSWMuIwkUwNBBk1SD10XtmRQu83JxRez0=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YRdKpFgXT9MzuJUH1Qva3GL/ud0HIjMGkccG5+dQ+spj6aWksI+0DPjYhEPIKO8n4z0M1Q3V0vensWFuE5s3cP6s/XF9FRNKeQcA2DrAXjxICYA48ehl6QGNzGAfCb1P48rqftaDyaLqJRL+WDgJJ+Uh2k284nPLx97XXuBHWHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YUMsxmSw; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3912fdddf8fso1278621f8f.1;
+        Thu, 27 Mar 2025 04:24:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743074687; x=1743679487; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=r9uAUUnPvZxGPnm1O0BCAGuy1dtOvt8b3tdG1/p4Uso=;
+        b=YUMsxmSwsXM2BrzDlXtsujaVs8/Ky4VjKAwSwjmXtgYHZBBbVbbmgK9+X9aV74Y1X/
+         AlIeLyePBDSuRieVVqQFJJlXtcejhvctdVH4bE4HC7ysMZv4zqABNBkhaeFPVXmIrg1+
+         RAnCXHkHYYzPsgmdE62mVBoQs+cW+ZMaQ9pA6l28LfVa8+5R+Y9RmyqJqfdYsQdmb7tv
+         uOhTKHiPGYG3H5LNPWgI4ZaVSxLOiblGvdMupZCwQgF37ZSdEmdR6JPXdyCXAC5af6zN
+         ePg5Rn4xtlXovyWGaLa7QYt7WlJ3URv5QPvOYIwZ6kn7p0rdQkpGW516nXZufZo8/2Q+
+         VEMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743074687; x=1743679487;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r9uAUUnPvZxGPnm1O0BCAGuy1dtOvt8b3tdG1/p4Uso=;
+        b=fipF+RgSBSX2Kl8nvfFIjC7kNBq/7fjbFjyP3cMNHjQRa2soY9AjeJU9RFgj65/Xzd
+         J1/Ey9zc7CzqmDu85TasfecFT1wHHjq5Ia6knipWKy1tVPpGF9fu6xaHB+HzisYrx0/U
+         46XGdMc4ugImVBBpJHXieFi7cDtZBJ/KhNvoLDqfeAI096dLKyCt9Su/cD/yIfrjqWO/
+         2lX1g9st8+KWGhLFdTrktD6UWLDK8H2murWWLmpRnP8UA9QuwtHNVmaWfPq6Jm3u0Rs0
+         pmFKXH7o9BdrDG31D9w2rKr3qRpdUD5LLAt0vwtYlhSBjsYOtMpHDW/8MVVMpn20H8Wx
+         WlfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUNEbT3uNjpFUAiVHyaOyeVXMCelAmKLd7CguOCuAaxGPveoJz0wQb65qjYO4z2woOTG8Gu3Hy7VO3AQKoa@vger.kernel.org, AJvYcCUyIJoa7Vkjwdv4GRbuzfx47/1VZAiiQNBN+Dq3yhARHu/7JrDBypdxA7sRkgsWie5f9v2jC2pxoHWr@vger.kernel.org, AJvYcCV0k5V51gYYsRZ9lljltpHiR7xHwXptANVniGPf3ja/AZp/PevNp6k2dCAcQTgbL+LfOox8m8FS@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxfWDBL3dkBHJ1CdjJOFtxGBtQLA5yM5LG61gQoN0YtLKQG6L2
+	+9nIWpvfdIj1LEoFbf3Is+SqbTufFkq9vBFMpr9XEQWoih9wEliq
+X-Gm-Gg: ASbGncu7XLID4Usay+oEoJoYR3iQ2AVSE/O2JN5R4N5oAFOSPh7SuvU0udlO0I9iCHM
+	+HIoLM74SJ8W1KWZbg5h70pDSEkECDsjL/VClT0Y6Ry54+I7U/0agC4nq5sq5WnwLHXyr94eWfD
+	c1/BfHWMgLGvgDoDbeZYUja4xzUGzMWyNhdr5sh0AnvBg4wx+jgxHNQm77Vled4HvQyJJuMUpKz
+	o5+MUkFi+Sy0QhIzCx4IU6bvTQp3Q098OaRIvZMDwncEnFj9S+6H9xaaahYgMQR/iTVZd/eTtZP
+	lW3xF5kLe4ugzzqeWuoFdRJbSjE7m4fmTYroiKv+/TNw1MtArD3/V0xdua//Qpv6yw7cVVWqozQ
+	N
+X-Google-Smtp-Source: AGHT+IFLCphW5U7zd6c6SZfMhpK/aclXKGbAvS2gd0lfAQCxn3O3FLYOmoElgv4cGprAKQTjQsCX6w==
+X-Received: by 2002:a5d:64eb:0:b0:390:e9ee:f27a with SMTP id ffacd0b85a97d-39ad15234edmr3000901f8f.28.1743074686734;
+        Thu, 27 Mar 2025 04:24:46 -0700 (PDT)
+Received: from Ansuel-XPS. (93-34-88-225.ip49.fastwebnet.it. [93.34.88.225])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39ac8745d9csm7858640f8f.95.2025.03.27.04.24.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Mar 2025 04:24:46 -0700 (PDT)
+Message-ID: <67e5357e.df0a0220.14c972.64ad@mx.google.com>
+X-Google-Original-Message-ID: <Z-UuvuUlCmPvvpKf@Ansuel-XPS.>
+Date: Thu, 27 Mar 2025 12:24:44 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -64,6 +85,7 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	Florian Fainelli <florian.fainelli@broadcom.com>,
 	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
 	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
@@ -72,9 +94,9 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [net-next RFC PATCH v3 3/4] net: phy: Add support for Aeonsemi
  AS21xxx PHYs
-Message-ID: <Z-U1anj6IbSdPGoD@shell.armlinux.org.uk>
 References: <20250326233512.17153-1-ansuelsmth@gmail.com>
  <20250326233512.17153-4-ansuelsmth@gmail.com>
+ <20250327092418.78f55466@fedora-2.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,122 +105,127 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250326233512.17153-4-ansuelsmth@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250327092418.78f55466@fedora-2.home>
 
-On Thu, Mar 27, 2025 at 12:35:03AM +0100, Christian Marangi wrote:
-> +static int as21xxx_match_phy_device(struct phy_device *phydev,
-> +				    const struct phy_driver *phydrv)
-> +{
-> +	struct as21xxx_priv *priv;
-> +	u32 phy_id;
-> +	int ret;
-> +
-> +	/* Skip PHY that are not AS21xxx or already have firmware loaded */
-> +	if (phydev->c45_ids.device_ids[MDIO_MMD_PCS] != PHY_ID_AS21XXX)
-> +		return phydev->phy_id == phydrv->phy_id;
+On Thu, Mar 27, 2025 at 09:24:18AM +0100, Maxime Chevallier wrote:
+> Hi Christian,
+> 
+> On Thu, 27 Mar 2025 00:35:03 +0100
+> Christian Marangi <ansuelsmth@gmail.com> wrote:
+> 
+> > Add support for Aeonsemi AS21xxx 10G C45 PHYs. These PHYs integrate
+> > an IPC to setup some configuration and require special handling to
+> > sync with the parity bit. The parity bit is a way the IPC use to
+> > follow correct order of command sent.
+> > 
+> > Supported PHYs AS21011JB1, AS21011PB1, AS21010JB1, AS21010PB1,
+> > AS21511JB1, AS21511PB1, AS21510JB1, AS21510PB1, AS21210JB1,
+> > AS21210PB1 that all register with the PHY ID 0x7500 0x7510
+> > before the firmware is loaded.
+> > 
+> > They all support up to 5 LEDs with various HW mode supported.
+> > 
+> > While implementing it was found some strange coincidence with using the
+> > same logic for implementing C22 in MMD regs in Broadcom PHYs.
+> > 
+> > For reference here the AS21xxx PHY name logic:
+> > 
+> > AS21x1xxB1
+> >     ^ ^^
+> >     | |J: Supports SyncE/PTP
+> >     | |P: No SyncE/PTP support
+> >     | 1: Supports 2nd Serdes
+> >     | 2: Not 2nd Serdes support
+> >     0: 10G, 5G, 2.5G
+> >     5: 5G, 2.5G
+> >     2: 2.5G
+> > 
+> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> 	
+>  [...]
+> 
+> I know this is only RFC, but I have some questions
+> 
+> > +static int as21xxx_match_phy_device(struct phy_device *phydev,
+> > +				    const struct phy_driver *phydrv)
+> > +{
+> > +	struct as21xxx_priv *priv;
+> > +	u32 phy_id;
+> > +	int ret;
+> > +
+> > +	/* Skip PHY that are not AS21xxx or already have firmware loaded */
+> > +	if (phydev->c45_ids.device_ids[MDIO_MMD_PCS] != PHY_ID_AS21XXX)
+> > +		return phydev->phy_id == phydrv->phy_id;
+> > +
+> > +	/* Read PHY ID to handle firmware just loaded */
+> > +	ret = phy_read_mmd(phydev, MDIO_MMD_PCS, MII_PHYSID1);
+> > +	if (ret < 0)
+> > +		return ret;
+> > +	phy_id = ret << 16;
+> > +
+> > +	ret = phy_read_mmd(phydev, MDIO_MMD_PCS, MII_PHYSID2);
+> > +	if (ret < 0)
+> > +		return ret;	
+> > +	phy_id |= ret;
+> > +
+> > +	/* With PHY ID not the generic AS21xxx one assume
+> > +	 * the firmware just loaded
+> > +	 */
+> > +	if (phy_id != PHY_ID_AS21XXX)
+> > +		return phy_id == phydrv->phy_id;
+> > +
+> > +	/* Allocate temp priv and load the firmware */
+> > +	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
+> > +	if (!priv)
+> > +		return -ENOMEM;
+> > +
+> > +	mutex_init(&priv->ipc_lock);
+> > +
+> > +	ret = aeon_firmware_load(phydev);
+> > +	if (ret)
+> > +		return ret;
+> 
+> Here, and below, you leak priv by returning early.
+>
 
-Isn't phydev->phy_id zero here for a clause 45 PHY? If the firmware
-has been loaded, I believ eyou said that PHY_ID_AS21XXX won't be
-used, so the if() will be true, and because we've read clause 45
-IDs, phydev->phy_id will be zero meaning this will never match. So
-a PHY with firmware loaded won't ever match any of these drivers.
-This is probably not what you want.
+Yes copy paste error with migrating from devm to non-devmem.
 
-I'd suggest converting the tail of phy_bus_match() so that you can
-call that to do the standard matching using either C22 or C45 IDs
-as appropriate without duplicating that code.
+> > +
+> > +	ret = aeon_ipc_sync_parity(phydev, priv);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	/* Enable PTP clk if not already Enabled */
+> > +	ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND1, VEND1_PTP_CLK,
+> > +			       VEND1_PTP_CLK_EN);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	ret = aeon_dpc_ra_enable(phydev, priv);
+> > +	if (ret)
+> > +		return ret;
+> 
+> Does all of the above with sync_parity, PTP clock cfg and so on needs
+> to be done in this first pass of the matching process for this PHY ?
+> 
+> From what I got from the discussions, the only important bit is to load
+> the FW to get the correct PHY id ?
+> 
 
-> +
-> +	/* Read PHY ID to handle firmware just loaded */
-> +	ret = phy_read_mmd(phydev, MDIO_MMD_PCS, MII_PHYSID1);
-> +	if (ret < 0)
-> +		return ret;
-> +	phy_id = ret << 16;
-> +
-> +	ret = phy_read_mmd(phydev, MDIO_MMD_PCS, MII_PHYSID2);
-> +	if (ret < 0)
-> +		return ret;
-> +	phy_id |= ret;
-> +
-> +	/* With PHY ID not the generic AS21xxx one assume
-> +	 * the firmware just loaded
-> +	 */
-> +	if (phy_id != PHY_ID_AS21XXX)
-> +		return phy_id == phydrv->phy_id;
-> +
-> +	/* Allocate temp priv and load the firmware */
-> +	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
-> +	if (!priv)
-> +		return -ENOMEM;
-> +
-> +	mutex_init(&priv->ipc_lock);
-> +
-> +	ret = aeon_firmware_load(phydev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = aeon_ipc_sync_parity(phydev, priv);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* Enable PTP clk if not already Enabled */
-> +	ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND1, VEND1_PTP_CLK,
-> +			       VEND1_PTP_CLK_EN);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = aeon_dpc_ra_enable(phydev, priv);
-> +	if (ret)
-> +		return ret;
-> +
-> +	mutex_destroy(&priv->ipc_lock);
-> +	kfree(priv);
-> +
-> +	/* Return not maching anyway as PHY ID will change after
-> +	 * firmware is loaded.
+I will do further check on this. Waiting for the sync parity have the
+side effect of waiting for the firmware to finish loading.
 
-Also "This relies on the driver probe order."
-
-> +	 */
-> +	return 0;
-> +}
-> +
-> +static struct phy_driver as21xxx_drivers[] = {
-> +	{
-> +		/* PHY expose in C45 as 0x7500 0x9410
-> +		 * before firmware is loaded.
-
-Also "This driver entry must be attempted first to load the firmware and
-thus update the ID registers."
-
-> +		 */
-> +		PHY_ID_MATCH_EXACT(PHY_ID_AS21XXX),
-> +		.name		= "Aeonsemi AS21xxx",
-> +		.match_phy_device = as21xxx_match_phy_device,
-> +	},
-> +	{
-> +		PHY_ID_MATCH_EXACT(PHY_ID_AS21011JB1),
-> +		.name		= "Aeonsemi AS21011JB1",
-> +		.probe		= as21xxx_probe,
-> +		.match_phy_device = as21xxx_match_phy_device,
-> +		.read_status	= as21xxx_read_status,
-> +		.led_brightness_set = as21xxx_led_brightness_set,
-> +		.led_hw_is_supported = as21xxx_led_hw_is_supported,
-> +		.led_hw_control_set = as21xxx_led_hw_control_set,
-> +		.led_hw_control_get = as21xxx_led_hw_control_get,
-> +		.led_polarity_set = as21xxx_led_polarity_set,
-
-If I'm reading these driver entries correctly, the only reason for
-having separate entries is to be able to have a unique name printed
-for each - the methods themselves are all identical.
-
-My feeling is that is not a sufficient reason to duplicate the driver
-entries, which adds bloat (not only in terms of static data, but also
-the data structures necessary to support each entry in sysfs.) However,
-lets see what Andrew says.
+> > +	mutex_destroy(&priv->ipc_lock);
+> > +	kfree(priv);
+> > +
+> > +	/* Return not maching anyway as PHY ID will change after
+> > +	 * firmware is loaded.
+> > +	 */
+> > +	return 0;
+> > +}
+> 
+> Maxime
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+	Ansuel
 
