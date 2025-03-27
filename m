@@ -1,354 +1,238 @@
-Return-Path: <netdev+bounces-177949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CD7CA7332C
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 14:17:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 115C9A73356
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 14:26:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A04516AB7E
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 13:17:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7F913A602A
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 13:26:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE6302628D;
-	Thu, 27 Mar 2025 13:17:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F3C921506B;
+	Thu, 27 Mar 2025 13:26:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="DZ4CPpjB"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="oKiqw3hr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2066.outbound.protection.outlook.com [40.107.244.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F08BA175BF
-	for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 13:16:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743081420; cv=none; b=gUYe69uTh8GtDp6aWRICJCHCWfIbTarxO24UhWZkMFMfC7pPb7rWucjgU3Iauz3wjpLN+/Z0bFX7WWDc03Ms9f3Q06AFLCarxojVW9YK9ZVSrqxdoOGwQV/n9hRcSZk7yKdWoFfXXPgwZkP/yWiFbuohF8NL0hxU3jJKzIr69Mc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743081420; c=relaxed/simple;
-	bh=jOOuJIAO0y9K81MUdRMjB3nQxaSRryMo/eHsxYqHysA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BkxbG6KoXKKZKNB9cU7JOxOh787ryvdeaOKizKQnngGUPSR6ukJ3Dq/KR6Bml/1W7xQK/rMSDRV0xHVQBpWTq4BAV+CrEh99onz4FxlGsKvIiZSxw5mEEToDbf8ujn9ibSSBTrYMbcU+6Q9yI+bvY8OwBmKRDuvV1Fa1Bwa9JtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=DZ4CPpjB; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-22423adf751so17523545ad.2
-        for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 06:16:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1743081418; x=1743686218; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=jOOuJIAO0y9K81MUdRMjB3nQxaSRryMo/eHsxYqHysA=;
-        b=DZ4CPpjBwj1lxfU9kmC9eMInwUvLxkvRc5mvyxlwhIOMLIW+ou4zvKkXFmf/zo/qun
-         D5fiNiy5Tx+vJU14RlQimftD55wAuFwy3folcMjBQQi3Jc2TVqpDyGT5C1vr4/sGQ7YF
-         NEwGdh3fGzZ4MFKW8RACaL2Bpzjmeyvso0cNQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743081418; x=1743686218;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jOOuJIAO0y9K81MUdRMjB3nQxaSRryMo/eHsxYqHysA=;
-        b=BleAu0Gu3v8OUdce41ZB8lr1NUlwccQ5JDq5SFDTCuFGYRvpYH3E2IRckU+ywgj37P
-         lTMwlxJkGXs5gn/ythmEcU1NubyEYcD/M4+J2McTr3QAx/DwdZczH6rHDEKNMz85aeuu
-         EG7xXvuhrNx3/q8hC5y246YEffvL1Sk6QglA+/ISxgCOheFj4hl8ykO8ixFabMAMYw0t
-         JuI95OSnuj4Uva1HQBXETKqzqXwN9lvB6fq/2wruFD4xgM2fG+gMnvBtIiuCIOqJjN43
-         6XvUseTwuwDdjp7Hp/v41SY+xkvSankir5yXLLc1mDZ7g5huNU9euTPWvsF9vMKmZtZz
-         2dvA==
-X-Forwarded-Encrypted: i=1; AJvYcCUoYq+nCwMgwj52QTQ91KoQYCqDWO/dcw5pWb/3j86nK6tGADPrax0G4rOHQdVQmWZR6Ziglx0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzazSgL0Tg14kmvTAk0IHDJLD39/Qshw+tVFDGCdvGtvriPOx8F
-	l05+alGMbhfCLdbeWtoz5+/UtUybWzi4h/919ck5jdebtWhlgdHIOIURv0EbkHp0AR7HOyd9Zfi
-	XxD93R11YmeGXxHrMoV1CiYajXgBAD/7IkinY
-X-Gm-Gg: ASbGncv49A9+Ju/78M1UASlruNMPe9uGqs1AH1XBoaGvofe+784Wj5wpGwmgWzklqjt
-	iZXDJ7jCXkkUkC4RtJdjWE4C7Cy92VpkOXs9P28YENWUpZ5fUGb/izqBjvwZJ5hog36YcDN5iI5
-	fgnVqFNyzvwzdbMYS3odFcvBCDW5tghynd85B+EA4=
-X-Google-Smtp-Source: AGHT+IFR/fEG7uu7r+aubLZf7FFRW/HRSTEazujy8UNy8McAj8EPi5P+iIw5gEXXs0eOChMHDwQEo1NgTv+wLelyC3M=
-X-Received: by 2002:aa7:8890:0:b0:736:5725:59b9 with SMTP id
- d2e1a72fcca58-73960e0e55dmr5219350b3a.2.1743081417909; Thu, 27 Mar 2025
- 06:16:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B1D32AE95;
+	Thu, 27 Mar 2025 13:26:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.66
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743082013; cv=fail; b=T2pNQjMDfBZnRCrtoV8M1gO9sxQei+CfAHdKrCibTwxKo3YK6b82/UDjoc/r4oXJMREguM3HUw7HalCGgZ9Y9bDmKxgwPIkRfTS9jwhwIfDH4Ed59b9LPHyiR2R3/bzEHKe5A/FPMd24ngmVbaWOnJWmFeO8greQfnoSrjDJH9U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743082013; c=relaxed/simple;
+	bh=ONJ0CbdYLDiOUozPzsneri+UzsOeAajlyZ/Tm2EoKn8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=tMKlFQ2h7dKTYnHSIu9vGt0WJYZxoo17FhTo7LM2m8pHMhJmyYAKB6uCoAwNHHdC2Wo81w3HBdj2e170FPNo/EJ5BoJvg7ur+0rApGSLihMG+/kAhiw6IZJybOEIXPwS2eu5nO0ejhMIVqAlfQsuB6y747HfyjCVeWlC/CVbOnU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=oKiqw3hr; arc=fail smtp.client-ip=40.107.244.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Te62zU16diS8qXKbI0TbbevIEsz6CR5rABGhwjR17tOtYP+nxynvWBvJRyEyJCQUMNN3TqIsyjvMsnKURtlBcVyMhOOPTB5zYHbPIhLKr3xl7VzhHM+NwXTVoNGJSUDI78tvFunWABqSTqiBynEz4KpIpkXscaWZLyF61wXc0EZQ/NXVdvDXB9TljfOhAZBnfRfreSAMbDLhifC+bpg+09cMjYRmJ2d5GvauYjGr9q73AKIh/QwqNkmAB/ZcK5FAHRRkju3kSkjpblaJZSnHq5qvZccgeApHKXef7QBTD2wYlC0aKpP1cfQQ3puKBF7Lk4lBARHtfm4CqfN+nHrFQw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pjS+TA8GShJcDBD4o1edfur1vA0JrKnGRbE8bEz3Wh0=;
+ b=a5Z0zhSDyZ1nLx3q/MCknTX0hSY8FcylfzutA0xwAYhYph/RDplieImqwuzdsXwlnnBTYNITBCIphLjc+qfWu5RDrtx8waxRdCi+UBnBGEAhvOPIh+VlctQmWjgQ7tF0lM1akjs597z/ZnZHWx0/LotV8cW4xzzYbUUZidgAlRvCLeySywxQJ7OvsBJHvPfIxF9AHKisq1KhQIjt4Yg0V32qnWtQbiNl7EwxgfxN2d+u2sVDOosDCt0Ud5VzpYgMjMYbKZQi7diVmEFQjkhVsDqWWa7Y8xTltMSWsBqvZB+0YwA5uoxc0bQWPlUmK5piCJZS2aulwW/L5RQ7jrodCA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pjS+TA8GShJcDBD4o1edfur1vA0JrKnGRbE8bEz3Wh0=;
+ b=oKiqw3hrDX8Yfn23Ja15/fDU1hhHHue6YqWVUW2ZQtQAJ9uanx/NlgQeEILPrqEsGAx+jKgOk8+0v3BfAndLSr0Udi6pgayKhmIgI+2DJUgGDp2vuq19cSe6bbcTcDWu7xyjJUwY4LHY8HjuCJMY81MJyMvFg/ei709zl/0C1nHfKAqGZsP3zvoPWhIWSmTuDNqSVzHRp9OOtOxvtW2/Vyem36EBHj32w6OSDN71TTIdT54eIrQE4iIqdOWFg6BhFUl+bibSAfsq9TU8oq/7GlR0iOlDEjMctg8t0n7LIfVIOv/Ki8haKSYyuPEClMSXNSGhwa8ZwzpK5RiQ9vTHGA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by IA0PR12MB8695.namprd12.prod.outlook.com (2603:10b6:208:485::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.44; Thu, 27 Mar
+ 2025 13:26:47 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.8534.042; Thu, 27 Mar 2025
+ 13:26:47 +0000
+Date: Thu, 27 Mar 2025 10:26:45 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Sean Hefty <shefty@nvidia.com>
+Cc: Bernard Metzler <BMT@zurich.ibm.com>,
+	Roland Dreier <roland@enfabrica.net>,
+	Nikolay Aleksandrov <nikolay@enfabrica.net>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"shrijeet@enfabrica.net" <shrijeet@enfabrica.net>,
+	"alex.badea@keysight.com" <alex.badea@keysight.com>,
+	"eric.davis@broadcom.com" <eric.davis@broadcom.com>,
+	"rip.sohan@amd.com" <rip.sohan@amd.com>,
+	"dsahern@kernel.org" <dsahern@kernel.org>,
+	"winston.liu@keysight.com" <winston.liu@keysight.com>,
+	"dan.mihailescu@keysight.com" <dan.mihailescu@keysight.com>,
+	Kamal Heib <kheib@redhat.com>,
+	"parth.v.parikh@keysight.com" <parth.v.parikh@keysight.com>,
+	Dave Miller <davem@redhat.com>,
+	"ian.ziemba@hpe.com" <ian.ziemba@hpe.com>,
+	"andrew.tauferner@cornelisnetworks.com" <andrew.tauferner@cornelisnetworks.com>,
+	"welch@hpe.com" <welch@hpe.com>,
+	"rakhahari.bhunia@keysight.com" <rakhahari.bhunia@keysight.com>,
+	"kingshuk.mandal@keysight.com" <kingshuk.mandal@keysight.com>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [RFC PATCH 00/13] Ultra Ethernet driver introduction
+Message-ID: <Z+VSFRFG1gIbGsLQ@nvidia.com>
+References: <20250306230203.1550314-1-nikolay@enfabrica.net>
+ <20250319164802.GA116657@nvidia.com>
+ <CALgUMKhB7nZkU0RtJJRtcHFm2YVmahUPCQv2XpTwZw=PaaiNHg@mail.gmail.com>
+ <DM6PR12MB4313D576318921D47B3C61B5BDA42@DM6PR12MB4313.namprd12.prod.outlook.com>
+ <BN8PR15MB25131FB51A63577B5795614399A72@BN8PR15MB2513.namprd15.prod.outlook.com>
+ <DM6PR12MB431329322A0C0CCB7D5F85E6BDA72@DM6PR12MB4313.namprd12.prod.outlook.com>
+ <Z+QTD7ihtQSYI0bl@nvidia.com>
+ <DM6PR12MB43137AE666F19784D2832030BDA62@DM6PR12MB4313.namprd12.prod.outlook.com>
+ <Z+Qi+XxYizfhr06P@nvidia.com>
+ <DM6PR12MB431345D07D958CF0B784AE0EBDA62@DM6PR12MB4313.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM6PR12MB431345D07D958CF0B784AE0EBDA62@DM6PR12MB4313.namprd12.prod.outlook.com>
+X-ClientProxiedBy: YQZPR01CA0115.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:c01:83::8) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <DE1DD9A1-3BB2-4AFB-AE3B-9389D3054875@avride.ai>
- <8f128d86-a39c-4699-800a-67084671e853@intel.com> <CAGtf3iaO+Q=He7xyCCfzfPQDH_dHYYG1rHbpaUe-oBo90JBtjA@mail.gmail.com>
- <CACKFLinG2s5HVisa7YoWAZByty0AyCqO-gixAE8FSwVHKK8cjQ@mail.gmail.com>
- <CALs4sv1H=rS96Jq_4i=S0kL57uR6v-sEKbZcqm2VgY6UXbVeMA@mail.gmail.com>
- <9200948E-51F9-45A4-A04C-8AD0C749AD7B@avride.ai> <0316a190-6022-4656-bd5e-1a1f544efa2d@linux.dev>
- <CBBDA12F-05B4-4842-97BF-11B392AD21F1@avride.ai>
-In-Reply-To: <CBBDA12F-05B4-4842-97BF-11B392AD21F1@avride.ai>
-From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Date: Thu, 27 Mar 2025 18:46:45 +0530
-X-Gm-Features: AQ5f1JrtyS0UW1_uv92dzbS1wupG5tdWqZbmeZ5DFIC3L8-dyyY1U9Yg9yoSptI
-Message-ID: <CALs4sv1KFsXLMJhsXTr2by1+UAXAiLTz90EQR5dJ4bqrs6xZCg@mail.gmail.com>
-Subject: Re: bnxt_en: Incorrect tx timestamp report
-To: Kamil Zaripov <zaripov-kamil@avride.ai>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Michael Chan <michael.chan@broadcom.com>, 
-	Jacob Keller <jacob.e.keller@intel.com>, Linux Netdev List <netdev@vger.kernel.org>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000c3355a063152c481"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|IA0PR12MB8695:EE_
+X-MS-Office365-Filtering-Correlation-Id: 50aa2023-02e7-4506-d3b8-08dd6d33060d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?h3K/n+7/i+VOvMcVSX0bovd2v82ixewBpFUR84SWTKp1wyEzFzIOLqRlZC88?=
+ =?us-ascii?Q?aTPP8zQ/YkyS23YvXuhlE9efDBtNq/aho6FtqXG2EAELvNjE8FmlJsQ2NPDY?=
+ =?us-ascii?Q?2NP/x3y9OQmPFpiTQii7BHmCtWpQ8I0LEy0hkAdH+iSc8cyo97ez4C1E4U25?=
+ =?us-ascii?Q?+IhAIo0+5tHBbeoa5oUQV4udNf92S0AJaHMSw1rzYLj4OJQbKPav6Ubtoj8Y?=
+ =?us-ascii?Q?gufkt2eustRGOL4i5uq7YiBaW26DES3qUrtO/8MS4ia4j68TEQ/P3tO/gN+Q?=
+ =?us-ascii?Q?BmZLE+hoTZ1d+csgGSMdYjqA6Fs+H72XRlJ3dm1QDyzG+aNNtZMbKmu1Xo+E?=
+ =?us-ascii?Q?R8QGNA5yFXW4D+IAouYKvB+jjOsZddfgnWIpuJlfh5/ruDmbzUVmyRUUwJGn?=
+ =?us-ascii?Q?d6ZHCnE6Zqw54o5uJ8acUTYGZYEh6c0Fj4yLDOndirv8WZdxCPohPqRjmCKb?=
+ =?us-ascii?Q?P4Idl9WzkW8VGKqD0lwBYC57Wo1wrbZQy2QgVY7bwrXX8Hz8t9x7k57rcJJ0?=
+ =?us-ascii?Q?HYyiUjXSZCwFEolKprrdwEtH0s+KxL+jqxOxo3Hx4f6kwFpQB+ous6Mc1B8I?=
+ =?us-ascii?Q?WIh6k1ureYzvIo5rdftU8qVt8MN1M3tAxRuD/hZcTe3Vn2xZi8HNqvjv4TCj?=
+ =?us-ascii?Q?7f30JoXtLenRoLfUb6slpgzK6612L5hrXjEpnQ6kuhN2Gdeb8W/Ln8rlUr+f?=
+ =?us-ascii?Q?2JJ2gTkz9x2jl8I8HBEpBVVALryU5QxJlagAxICWV+DhXxEnwPqytcCwCuBT?=
+ =?us-ascii?Q?z1i1TMTr5aQaFb9jLhNMWFVvPy30VVZwCXSX+eeczts1NsMebQ85PLxlYIXw?=
+ =?us-ascii?Q?QEq5VmSpFTVo68m+GCSiEZLqyuXbdb6nACGU3GQPmbMGVyLH3/pkfw5lpqFU?=
+ =?us-ascii?Q?Uz8vjT/TMAyJMHjM3H9zpfs30f5cZS5DWhqGb+9FmsMWi+CAfvnrtIKSUdsc?=
+ =?us-ascii?Q?dk1BKj/89tzoMalnuI/rgDiGQGHuJsaSPHXQCEbXDIwFe0ZCs4otZOo6FKvY?=
+ =?us-ascii?Q?4AGESB9vtTBTVpAOL2JRAzNJyukRTyX/wSBk1182j5RC7oXzwmq0CG7zjsjx?=
+ =?us-ascii?Q?DXlQS1MWskmOUaU9wBoEMS90GJexQhWwxISjddEhuoRKTxLuqZqFxI+mBqPI?=
+ =?us-ascii?Q?mKdGE/WEuFIy1ODGHmZrKXpXVtfjsxCeN46Ni3IRLQ7c1qqdHpHYq/OG+WsU?=
+ =?us-ascii?Q?c22SNM8c32WWdWvkkLw+dgMIax3+t37c2XbD3QHhYq9UD+zXz/qCUsEOhAXA?=
+ =?us-ascii?Q?SU2F9sBhppy5Gl9CrOsVXOnTv3KIPou6W4TB3SdBBWX26LihgSX+usjtoTzN?=
+ =?us-ascii?Q?fIunK0LVdwoydeE/JFqJS1qnxHJxHa5xW99qb/ybMUO8ZIL3fyciKJ0oj7zF?=
+ =?us-ascii?Q?eqCikN2SS/zuAplekrntZJNIkUrw?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?s7knw56gPD7q7Jro3+zAdD6RXUeqMqlZ6iW55h1lmX0UUwD/LyMcGXZ8i2wR?=
+ =?us-ascii?Q?g9nisjsygTGL97uUNyQQ+aT5t3sUUnxMNxmahrn7mKbqpNy49tN8/FXzhQYV?=
+ =?us-ascii?Q?kv39+akUAWXVc8Yt+L7LPPCXvkys8H8atsveSBr0Q3LnEmb01fcJHI9idSat?=
+ =?us-ascii?Q?qtupsMgFSg9kjZ7XTwhz+VBQ3H7h0frrIOu2PZKPn/vUSoPMCLc/+9oBIYMq?=
+ =?us-ascii?Q?IiCL6SiIAUywzfSoUXUrC2kuurR722DC/eYEZEGDvmuMxyIAVFcONKdPyCx6?=
+ =?us-ascii?Q?jfIbU4Wa35mS6S7Ql/1Vu+zge1yYgoezIAnfdWcrc41l+uvN8XagYNcw9P4I?=
+ =?us-ascii?Q?OxOFCGmxfEp31SEuCJr9iuvCiKR3Uo/CNWVms1RUsXkF7XDXrBtvN/eHhwz1?=
+ =?us-ascii?Q?rkzJesp9P5vzb3EiiAjFrFxHqEVu5cWDI/cZHhpzhTUGUGQ71/4woNxPG12w?=
+ =?us-ascii?Q?t3uIxNgj43tb+r+LFxl0KR3ltQegug+04QgeXeQiafwHEul7gOTfTgk9U4Ab?=
+ =?us-ascii?Q?Hn4EOemFczuWGyk1NrNWF/y4QrvuMCUX2z0El4Md4N/0AwbxI8HTovdcNSFX?=
+ =?us-ascii?Q?amBbesboziDkckGn2b+uNug2D+1V0oYAtj8DQ/AxxGzAoDiRYfpCf4Jvr0JJ?=
+ =?us-ascii?Q?pxTBEWHykXcVtXbQmqIpIZhVDkqw4sfRNXaZGLbkjFX7Wnb0k94EmHuwDHrk?=
+ =?us-ascii?Q?sAXvTRjUoIxMLw4ytNpK0Wr6KP/Gr/KosHWIbvcn5rQNGj4QdcZ53Lo9IgGO?=
+ =?us-ascii?Q?7JC8eJN4QThkTbHZwSUfU9I8Njh7QLyL35YakaDDBfhtPmxu3mpjefveU+Io?=
+ =?us-ascii?Q?jJFfTB80wfUzTERq5v6B6T//22PW0DGDbe9hm0wiTk4oqCUMxgPMqiF1bNo9?=
+ =?us-ascii?Q?qnbXgeXYp8/IjWOEbRQ6RuwEIGcpkmqaroHRFSx/j/vPRtEwxYz6uv/9aEWF?=
+ =?us-ascii?Q?OGK/jipnnzI5/NqvjiZ+86RuX546U4X9ULbysyQSYJmJAzBaXxdXb7kXH7G7?=
+ =?us-ascii?Q?m0MivXS7E0PdMXFCufflvaj3BvCUgTsAHx7Mo0rKU6PLuMcLgKkjha+1Emws?=
+ =?us-ascii?Q?f3c0+//bpnGOw1iT6ik9X67Fx8pWOFC19NEwJiyxYRqY6qloGbhV2kbhLYCR?=
+ =?us-ascii?Q?THVd/m3BWe9rW/iXv3t4BfxquEWU0nTI7B/GFOO+RfB6JXQciT5ZNI+lA1DK?=
+ =?us-ascii?Q?8d6dmPLu1wYFo8P1a+oBEjjLzXp9ABBnJ4P3508M1ji2xW6leI361z1Jug0G?=
+ =?us-ascii?Q?wKcjN8y3E9yETui+uQEHWjiBRZYGORSdscuofWksx/vFy/GkcgbGmUb4UXp+?=
+ =?us-ascii?Q?dz5EFpRxg8UL9BbuxzzsAkneMoa7rjRewhENi7FCtsVNEuG83Alo6JicWOsp?=
+ =?us-ascii?Q?Vlw6eifAU+ZUdwrwUgXabjViQrN6SqSX6fkCwSTEjbN62OS+zlnc2yPozSNl?=
+ =?us-ascii?Q?QKBP1tg350kR/TeMgjyvy1ifuaEW6fJefrqKuTwengdTz1FiWXvlRt6l6x0m?=
+ =?us-ascii?Q?xN6CrUj7c9hUBgqy2wkXACMHNY6qzFRgq8L/hMdMIHwGUcT6q5PGogAqHAlO?=
+ =?us-ascii?Q?qrQyVWucQJDXKRAgdscpcV5woRs9eoEMH26Bi/26?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 50aa2023-02e7-4506-d3b8-08dd6d33060d
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Mar 2025 13:26:47.1702
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Yf91RR/Lmt0rBWBckBr7t/gBWjfWi8f389UP0igoBD2NxouCasOYCVSx6ejrqdkV
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8695
 
---000000000000c3355a063152c481
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Wed, Mar 26, 2025 at 05:39:52PM +0000, Sean Hefty wrote:
 
-On Wed, Mar 26, 2025 at 7:20=E2=80=AFPM Kamil Zaripov <zaripov-kamil@avride=
-.ai> wrote:
->
->
->
-> > On 25 Mar 2025, at 12:41, Vadim Fedorenko <vadim.fedorenko@linux.dev> w=
-rote:
-> >
-> > On 25/03/2025 10:13, Kamil Zaripov wrote:
-> >>
-> >> I guess I don=E2=80=99t understand how does it work. Am I right that i=
-f userspace program changes frequency of PHC devices 0,1,2,3 (one for each =
-port present in NIC) driver will send PHC frequency change 4 times but firm=
-ware will drop 3 of these frequency change commands and will pick up only o=
-ne? How can I understand which PHC will actually represent adjustable clock=
- and which one is phony?
-> >
-> > It can be any of PHC devices, mostly the first to try to adjust will be=
- used.
->
-> I believe that randomly selecting one of the PHC clock to control actual =
-PHC in NIC and directing commands received on other clocks to the /dev/null=
- is quite unexpected behavior for the userspace applications.
->
-> >> Another thing that I cannot understand is so-called RTC and non-RTC mo=
-de. Is there any documentation that describes it? Or specific parts of the =
-driver that change its behavior on for RTC and non-RTC mode?
-> >
-> > Generally, non-RTC means free-running HW PHC clock with timecounter
-> > adjustment on top of it. With RTC mode every adjfine() call tries to
-> > adjust HW configuration to change the slope of PHC.
->
-> Just to clarify:
->
-> Am I right that in RTC mode:
-> 1.1. All 64 bits of the PHC counter are stored on the NIC (both the =E2=
-=80=9Creadable=E2=80=9D 0=E2=80=9347 bits and the higher 48=E2=80=9363 bits=
-).
-In both RTC and non-RTC modes, the driver will use the lower 48b from
-HW as cycles to feed to the timecounter that driver has mapped to the
-PHC.
+> The PD is a problem, as it's not a transport function.  It's a
+> hardware implementation component; one which may NOT exist for a UEC
+> NIC.  (I know there are NICs which do not implement PDs and have
+> secure RDMA transfers.)
 
-> 1.2. When userspace attempts to change the PHC counter value (using adjti=
-me or settime), these changes are propagated to the NIC via the PORT_MAC_CF=
-G_REQ_ENABLES_PTP_ADJ_PHASE and FUNC_PTP_CFG_REQ_ENABLES_PTP_SET_TIME reque=
-sts.
-True.
+The PD is just a concept representing security, there are lots of ways
+to implement this, so long as it achieves an isolation you would label
+it a PD and the PD flows through all the objects that participate in
+the isolation.
 
-> 1.3. If one port of a four-port NIC is updated, the change is propagated =
-to all other ports via the ASYNC_EVENT_CMPL_PHC_UPDATE_EVENT_DATA1_FLAGS_PH=
-C_RTC_UPDATE event. As a result, all four instances of the bnxt_en driver r=
-eceive the event with the high 48=E2=80=9363 bits of the counter in payload=
-. They then asynchronously read the 0=E2=80=9347 bits and update the timeco=
-unter struct=E2=80=99s nsec field.
-Not true in the latest Firmware.
+The basic essential requirement is that a registered userspace memory
+cannot be accessed by things outside the definition of pd/shared pd.
 
-> 1.4. If we ignore the bug related to unsynchronized reading of the higher=
- (48=E2=80=9363) and lower (0=E2=80=9347) bits of the PHC counter, the time=
- across each timecounter instance should remain in sync.
-Well, no. It won't be very accurate. We designed non-RTC mode for such
-use cases. But yes, your use case is not exactly what non-RTC caters
-for.
+This is really important, I'm quite concerned that any RDMA protocol
+come with some solid definition of PD mapped to the underlying
+technology that matches Linux's inter-process security needs.
 
-> 1.5. When userspace calls adjfine, it triggers the PORT_MAC_CFG_REQ_ENABL=
-ES_PTP_FREQ_ADJ_PPB request, causing the PHC tick rate to change.
-Correct. But only the first ever port that made the freq adj will
-continue to make further freq adjustments. This was a policy decision,
-not exactly random. There is an option in our tools to see which is
-the interface that is currently making freq adjustments.
+For instance Habana defined a PD as a singleton object and the first
+process to get it had exclusive use of the HW. This is because their
+HW could not do any inter-process security.
 
->
-> In non-RTC mode:
-> 2.1. Only the lower 0=E2=80=9347 bits are stored on the NIC. The higher 4=
-8=E2=80=9363 bits are stored only in the timecounter struct.
-> 2.2. When userspace tries to change the PHC counter via adjtime or settim=
-e, the change is reflected only in the timecounter struct.
-Correct.
+>  I have a proposal to rework/redefine PDs to
+> support a more general model,
 
-> 2.3. Each timecounter instance may have its own nsec field value, potenti=
-ally leading to different timestamps read from /dev/ptp[0-3].
-Basically each of the timecounters is independent.
+It would certainly be good to have some text explaining some of the
+mappings to different technologies.
 
-> 2.4. When userspace calls adjfine, it only modifies the mul field in the =
-cyclecounter struct, which means no real changeoccurs to the PHC tick rate =
-on the hardware.
-Correct.
+> which I think will work for NICs that
+> need a PD and ones that don't.  It can support MR -> PD -> Job, but
+> I considered the PD -> job relationship as 1 to many. 
 
->
-> And about issue in general:
-> 3.1. Firmware versions 230+ operate in non-RTC mode in all environments.
-No, the driver makes the choice of when to shift to non-RTC from RTC.
-Currently this happens only in the multi-host environment, where each
-port is used to synchronize a different Linux system clock.
-But 230+ version has the change that will not track the rollover in
-FW, and the ASYNC_EVENT_CMPL_PHC_UPDATE_EVENT_DATA1_FLAGS_PHC_RTC_UPDATE
-deprecated.
+Yes, and the 1:1 is degenerate.
 
-> 3.2. Firmware version 224 uses RTC mode because older driver versions wer=
-e not designed to track overflows (the higher 48=E2=80=9363 bits of the PHC=
- counter) on the driver side.
->
->
-> >>> The latest driver handles the rollover on its own and we don't need t=
-he firmware to tell us.
-> >>> I checked with the firmware team and I gather that the version you ar=
-e using is very old.
-> >>> Firmware version 230.x onwards, you should not receive this event for=
- rollovers.
-> >>> Is it possible for you to update the firmware? Do you have access to =
-a more recent (230+) firmware?
-> >> Yes, I can update firmware if you can tell where can I find the latest=
- firmware and the update instructions?
-> >
-> > Broadcom's web site has pretty easy support portal with NIC firmware
-> > publicly available. Current version is 232 and it has all the
-> > improvements Pavan mentioned.
->
-> Yes, I have found the "Broadcom BCM57xx Fwupg Tools=E2=80=9D archive with=
- some precompiled binaries for x86_64 platform. The problem is that our hos=
-ts are aarch64 and uses the Nix as a package manager, it will take some tim=
-e to make it work in our setup. I just hoped that there is firmware binary =
-itself that I can pass to ethtool =E2=80=94-flash.
->
->
->
-> > On 25 Mar 2025, at 14:24, Pavan Chebbi <pavan.chebbi@broadcom.com> wrot=
-e:
-> >
-> >>> Yes, I can update firmware if you can tell where can I find the lates=
-t firmware and the update instructions?
-> >>>
-> >>
-> >> Broadcom's web site has pretty easy support portal with NIC firmware
-> >> publicly available. Current version is 232 and it has all the
-> >> improvements Pavan mentioned.
-> >>
-> > Thanks Vadim for chiming in. I guess you answered all of Kamil's questi=
-ons.
->
-> Yes, thank you for help. Without your explanation, I would have spent a l=
-ot more time understanding it on my own.
->
-> > I am curious about Kamil's use case of running PTP on 4 ports (in a
-> > single host?) which seem to be using RTC mode.
-> > Like Vadim pointed out earlier, this cannot be an accurate config
-> > given we run a shared PHC.
-> > Can Kamil give details of his configuration?
->
-> I have a system equipped with a BCM57502 NIC that functions as a PTP gran=
-dmaster in a small local network. Four PTP clients =E2=80=94 each connected=
- to one of the NIC=E2=80=99s four ports =E2=80=94 synchronize their time wi=
-th the grandmaster using the PTP L2P2P protocol. To support this configurat=
-ion, I run four ptp4l instances (one for each port) and a single phc2sys da=
-emon to synchronize system time and PHC time by adjusting the PHC. Because =
-the bnxt_en driver reports different PHC device indexes for each NIC port, =
-the phc2sys daemon treats each PHC device as independent and adjusts their =
-times separately.
->
-If you are using Broadcom NIC, and have only one system time to
-update, I don't see why we should have 4 PTP clients. Just one
-instance of ptp4l running on one of the ports and one phc2sys is going
-to be valid (and is sufficient?)
-I am thinking out loud, the phc2sys daemon could be picking up all the
-available clocks, but I think that needs to be modified, unless we
-decide to stop exposing multiple clocks for the same PHC in our
-design.
-Of course, I am not sure if you have a requirement of 4 GMs to sync with.
+> Sure, It's challenging in that a UET endpoint (QP) may communicate
+> with multiple jobs, and a MR may be accessible by a single job, all
+> jobs, or only a few.
 
-> We also have a similar setup with a different network card, the Intel E81=
-0-C, which has four ports as well. However, its ice driver exposes only one=
- PHC device and probably read PHC counter in a different way. I do not reme=
-mber similar issues with this setup.
->
- I think on the Intel NIC, this problem itself would not arise,
-because you will run only 1 client each of ptp4l and phc2sys, right?
-But I am not sure how you can run 4 GMs on Intel NIC if you are
-running that.
+I would suggest that the PD is a superset of all jobs and the objects
+(endpoint, mr, etc) get to choose a subset of the PD's jobs during
+allocation?
 
---000000000000c3355a063152c481
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+Or you keep job/pd as 1:1 and allow specifying multiple PDs during
+object allocation.
 
-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
-OltyqaGBuzv+bJTUL+bmV7E4QBLIqGt4jVr1R9hJdH6KxXwJdyfHZ9C6qXmoe2NQhiFUyBOJ0wgk
-dB9Z1IU7nCwvNKYg2JMoJs93tIgbhPJg/D7pqW8gabkCAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUEV6y/89alKPoFbKUaJXsvWu5
-fdowDQYJKoZIhvcNAQELBQADggEBAEHSIB6g652wVb+r2YCmfHW47Jo+5TuCBD99Hla8PYhaWGkd
-9HIyD3NPhb6Vb6vtMWJW4MFGQF42xYRrAS4LZj072DuMotr79rI09pbOiWg0FlRRFt6R9vgUgebu
-pWSH7kmwVXcPtY94XSMMak4b7RSKig2mKbHDpD4bC7eGlwl5RxzYkgrHtMNRmHmQor5Nvqe52cFJ
-25Azqtwvjt5nbrEd81iBmboNTEnLaKuxbbCtLaMEP8xKeDjAKnNOqHUMps0AsQT8c0EGq39YHpjp
-Wn1l67VU0rMShbEFsiUf9WYgE677oinpdm0t2mdCjxr35tryxptoTZXKHDxr/Yy6l6ExggJgMIIC
-XAIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwV/XkICjVscn4SNZMw
-DQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEIHis4hMMmcT5CpLQVwEzZToetVWPMI7M
-jVsp48kupRKeMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDMy
-NzEzMTY1OFowXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEB
-AQUABIIBAF2EKN+F41UsaY2bCkJ9xTnSqu/gyY8dwxJR8lkTXz5d4N3YCU3ph+GdahhEJVz2IwiT
-8xnRpjCaav9Qp9fM1yJiEuRkeODldIiz6KMKbXlO9v0h7SZ3sZUifXywsb504uQ4wblzYXra1Hih
-z4AKHuyewswyQGCdeevAVg0F0k9CXbqheVOKXkpKs6m80vMgcZZFVWrlezEf4YK8a/cgVD10KIzG
-jA4fxuBosYT76GjnQ9Hq3Djqyh6J4VMMq+kVJQMP6eigNt+O7EE6lALI2b68ipPyUQYOlVW2XK11
-uAUtfmSuzA0FeB5Rq+nl1OSQhTVCa0gMdJZ7VdgSnxFmcEA=
---000000000000c3355a063152c481--
+But to be clear, this is largely verbs modeling stuff - however there
+is a certain practicality to trying to fit this multi-job ability into
+a PD because it allow reusing alot of existing uAPI kernel code.
+
+Especially if people are going to take existing RDMA HW and tweak it
+to some level of UET (ie support only single job) and still require a
+HW level PD under the covers.
+
+Jason
 
