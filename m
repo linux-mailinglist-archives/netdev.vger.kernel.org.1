@@ -1,88 +1,86 @@
-Return-Path: <netdev+bounces-178012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45F2FA73FD9
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 22:07:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C6CDA73FE0
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 22:08:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 298881B63DCA
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 21:02:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C75B3BD917
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 21:04:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C26411D9A5D;
-	Thu, 27 Mar 2025 20:57:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D576D1C8634;
+	Thu, 27 Mar 2025 21:04:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SgrZjECp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D4qXzMsB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A76F1D6DD8
-	for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 20:57:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FCF31D618A
+	for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 21:04:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743109025; cv=none; b=iN/3DjSmZGnjkBjncRIKsLMTHMzdsJjgi7/w+wg9jMlcfFdmxDJ/3oUA/91IUjj4eb0MA/zSyRmkbRyv7VTHaEDY9O4u1jIwjm4v2l5LaeXawgc9pv0WDmKeIWROqlTl5+FGcpcHQ0HeSjJmqg+nnHWnptWz3DwTDR0G12Xzkgo=
+	t=1743109449; cv=none; b=Bkq7xH8H8ocBG4eQ2H5wvP2D5ofOqvxZp6vdReZ5WfA/mS1SaYmjQsJmErpMTcvVyqR5ldTbK7lvt1BnHqF1bMkBWqmfRN7ZdODIkkk13ScNI9NQE4jQplmOPuqrWAyol0kvvJ4eWg0vC5idZiLPjEAWinoSxsFL102ji1AdRuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743109025; c=relaxed/simple;
-	bh=4u68GZqQFu8WD4E8Eqgs0VIXNT7ep4tbCk4n8I6rRrk=;
+	s=arc-20240116; t=1743109449; c=relaxed/simple;
+	bh=56GotSQN4ROFjgLSPTSdcNaWmVPnl/qL5ycjeMVJhWs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K3BXKaW2vm6zxd3jkz/hGY4al610ZBxPZubvQ6GTKccuCWE8kR+HulhAjZpL2sx/bo66j90F5YE7XMXgX1S7ZPSuMAKHt/ArwdTObg3sqRH4kYHCXmqAiPkn4dKnCDRgWtY9YHZAykWy3T3IlJkS5+RKHgMrHoblMwqZbo1m7o8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SgrZjECp; arc=none smtp.client-ip=209.85.214.178
+	 Content-Type:Content-Disposition:In-Reply-To; b=TGBvb3lOKjqeGBPilTKWHZPzllPOI3Ib/PP0MNLrbfB+tyhbL7LcBfy9l5XO8WbOVkwJtGIkPHGGn9wZ2l38CaUL5b6Qx0Vz5AUSpmr2mJELVnmdtWb3CtmhFCALXJe6J8NGG0w6QGFdUyIOfTNLbvus1EGBZJA8e5TOYFL9jfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D4qXzMsB; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2260c915749so22667815ad.3
-        for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 13:57:03 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-226185948ffso32815615ad.0
+        for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 14:04:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743109023; x=1743713823; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1743109447; x=1743714247; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vI5wkIVDrrbhm+l4aOzsb3x8R5aGDet9ULJatnFQM1w=;
-        b=SgrZjECpUGTWUy85Cn7mjAhWLbP2FO+M+xZioMdFkd/mcQFbkLRrBgEfOwRpegOoar
-         LnULNXDj+fUKyiTdVcF03fsk3fH9IJHTmdsQnVuMrodu9q06NGeA2za4MBfPpsQSCc09
-         6xqBv5xqbnc1vbet+tIKTzhufn2nSuKteEJMRZfGvD6izU17JU3oe0L+cC12/t0cv+X0
-         aTF9qLR9yWKhfILp+r5EUW2F4sgFwV2USP0/rj11UE9PLeblRl1JE7BwDd89F4fJ9VNG
-         f8bMLV5aRHt2kNzLZXEngRR+yUshKfvF1coKIQO1u2g8DB/MgsUhzyk5KWXKWeSgZ7SZ
-         bIWA==
+        bh=RQ6IxZqIJcfCnMn17huE8Gly++WXsap5NI0ZzKKPPy8=;
+        b=D4qXzMsBchbRP0pJ1EAeojKctPv2SZquCd/y+9u2axpsZy1HESkEBqPHwoewgBwyGL
+         aE9uatIGvdC1WWvmOhqwBgptUrlVPzgj2tnXHJhKuVNlCm4A586D99UOwWyUPb297jWC
+         RXC37DLZHKzkSe/6fm1mE+D3tUcjevsycJeUvHCzGTNu9eJrNGsNk12H42BIAG86SCcD
+         aFIYOOxakoeZzNJAYkYzj8FuNAhCvIlW3DrKlCO3SC9J5d5XwczAW3LVIBvPnmfiP6VK
+         O9w/03xpOoPq0/j41MXaLeSWPveYykglOlnZA9RGYTxUMwuKO4pw2Cg++y7z3S+bU5YC
+         6CZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743109023; x=1743713823;
+        d=1e100.net; s=20230601; t=1743109447; x=1743714247;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vI5wkIVDrrbhm+l4aOzsb3x8R5aGDet9ULJatnFQM1w=;
-        b=HoF5TeNwMDAG8MsueZLsh/0ccsI6Pwb6w13ydgzD1XWiLvqS08Wl5enNhzjICE79mz
-         t3I6tqRflkKVQ/1LHs2OWGGIlzWQgZkggyqD0BwY7GKlw9KUpMW8vcXtct1vv7s6SGfL
-         dcR1IT050BVPnNSXG6YekNOahU4QRHFD/WfnKb0BNAalA/4QpgMC4Dw2zBZ0rA0YavyV
-         2tyv+RRZJ6pC9fidDIervAljO6QXV0uu57hQuylZGM5XV9cqC0UCSVX1tATsm2OyhweK
-         G/3d7TOq48dXM3dFLNVjVaUuRfuCs4wMQyR1Kze1tLRwl6upOB97ullcj6wTDZrKAxsO
-         6Zyw==
-X-Forwarded-Encrypted: i=1; AJvYcCUkuFKPecIzZ0DWK2Bg+XEj8CBOaO1mvi5EUTWl07XQl8667XiMhISbtYZMqcigpSAWZMrcz70=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrCrxahPe5IaH2PCsLefugNw3KEFlYJQGylJrSIBp/FUQGUj05
-	bVtCxLgJV+I0d1zqoyTTqSy/8NnpuqzAn5YDu/0uwRb4Je/FhDd8zFGFoHAJ7Q==
-X-Gm-Gg: ASbGncuxyVOEDqW0quprfQ2KWIDSVtr0OxDd65f4RgKkEENjcrPQbUNFJ2lFSqSkASc
-	LbWnz05hC538aMsRahQ1GLU1U/lct4d3raCGxWVQL3pjSFcPZVlOojIQDUmoQDr42Zxhg5Co2TD
-	TjQY7vwAgb7oMkQ32/+uPmpQRSqYAogoxNEWKFXjaw1bLrKesndY3Erm/N6vTm2IU3AtxsLPkum
-	F7OzD8blVwmxVdJ7UHeK/tgKT0IR+7rCpoLkDmxrOxnEwHd8GY9Qb7OB80dYzUQoBNZs2IMdmZo
-	lG2uyWfaKBuVUF+jR7WIRuh9fCIE6+KsN5/tGd/tk3YD
-X-Google-Smtp-Source: AGHT+IE3j+W+jk/u8ZquE9yKsEiWmztPX+XrfZmpzZnDNd8WJ7HYrJQCHe/tSnmC6mz25+GBXqeIyA==
-X-Received: by 2002:a05:6a21:33a2:b0:1f5:884a:7549 with SMTP id adf61e73a8af0-1fea2fe8434mr8818458637.41.1743109023194;
-        Thu, 27 Mar 2025 13:57:03 -0700 (PDT)
+        bh=RQ6IxZqIJcfCnMn17huE8Gly++WXsap5NI0ZzKKPPy8=;
+        b=sZc39deqpchmacQStXnIXMvalSZPN2265o6MPVU4dnZT8GFiGHiHzcEIpK6Bu4NLJf
+         bp5wHw5lDuTrgRPSoLoxFGzEelH8cehC/Kgl8SOFRWXlO85pMFsvJls5Hkf7Ry4+ozDt
+         sZ/NAjqvtzR+I5l17dcG+wfC60yG2VXiydx7OfL3fyuy64nLNld69TFSGOw1lmraPONf
+         Y1daFwkbUvxjMnckXpMOyw6OcQsC0ee9vbShaS7eC6/F4XH0cp70OrCXSkuWO4ni/XNj
+         7cjK7u2doocKGZcHYwrhn1dUyqs2qMe94aV4UczTlW/9cqcQAuufB7vEm9aWV7dBR12z
+         95qg==
+X-Forwarded-Encrypted: i=1; AJvYcCVtksrl+ybkEFyUhjvTTm7GpuQaYi8Pc8Cz/lsxAmkCl36VeQ1JZu/7taVSUiR25BEtQiwkxxU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywmof+/L4DVOXhEXVUhmROhwOrPOoqwBjEPBYt7akxRzATG3WMY
+	+F9g8SRN2hvXLyxShAPbT7E+90B+KlFaKiRPLdd4cXCXg+wvnSE=
+X-Gm-Gg: ASbGnctnJxJvQyQwlZTBRtN9enIWNo1CKZFbeMOfnzoMRh0gIvKF0itM+u/cbRZrLL3
+	e+9vCnN471gAzubA+Yf9PBkKkboJgM+sp6QD62lWwu3Zh5krX+QSfqpZ1F7kdzxT/At74iiJgZZ
+	PG2eCMcR3GAIIEBlHq0m16bH9Fv8D0gT8QFGillWb5UxLX04jZ1KoTPb1I1Pf0HqxqhxN96KEX0
+	LCdOiGDqK1kALUpUaR4C3TcNP5F10LEtkuWlKCCmgeJzKSKpkLSSPisrxka6U8AHpJFGph3I3mM
+	RDPBjRhDHxDtIsKzkXehFY6RzhMCMHL3WbesVfjhEwBT
+X-Google-Smtp-Source: AGHT+IHtwanHFU3X/tBKT0PN21rdYBhdcTO3jPdV/1NrEfScPeZuCwcrxzejTHYzB6zifudhXY6O0Q==
+X-Received: by 2002:a17:90b:2c84:b0:2ff:6e72:b8e2 with SMTP id 98e67ed59e1d1-303a8e76448mr7365323a91.31.1743109447290;
+        Thu, 27 Mar 2025 14:04:07 -0700 (PDT)
 Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-af93b6a093bsm342197a12.28.2025.03.27.13.57.02
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-30516d56521sm386244a91.19.2025.03.27.14.04.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Mar 2025 13:57:02 -0700 (PDT)
-Date: Thu, 27 Mar 2025 13:57:01 -0700
+        Thu, 27 Mar 2025 14:04:06 -0700 (PDT)
+Date: Thu, 27 Mar 2025 14:04:06 -0700
 From: Stanislav Fomichev <stfomichev@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
 	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com
-Subject: Re: [PATCH net v2 08/11] docs: net: document netdev notifier
- expectations
-Message-ID: <Z-W7nfFdv8u-SZTY@mini-arch>
+Subject: Re: [PATCH net v2 06/11] netdevsim: add dummy device notifiers
+Message-ID: <Z-W9Rkr07PbY3Qf4@mini-arch>
 References: <20250327135659.2057487-1-sdf@fomichev.me>
- <20250327135659.2057487-9-sdf@fomichev.me>
- <20250327121613.4d4f36ea@kernel.org>
- <20250327123403.6147088d@kernel.org>
+ <20250327135659.2057487-7-sdf@fomichev.me>
+ <20250327121203.69eb78d0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,46 +89,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250327123403.6147088d@kernel.org>
+In-Reply-To: <20250327121203.69eb78d0@kernel.org>
 
 On 03/27, Jakub Kicinski wrote:
-> On Thu, 27 Mar 2025 12:16:13 -0700 Jakub Kicinski wrote:
-> > > +* ``NETDEV_REGISTER``
-> > > +* ``NETDEV_UP``
-> > > +* ``NETDEV_UNREGISTER``  
-> > 
-> > Can I ask the obvious question - anything specific that's hard in also
-> > taking it in DOWN or just no time to investigate? Symmetry would be
-> > great.
-
-The latter: I added locks for DOWN, hit a dev_close somewhere, and
-decided no to go down the rabbit hole.
-
-> Looking at patch 4 maybe we should do the opposite. This was my
-> original commit msg for locking UNREGISTER:
+> On Thu, 27 Mar 2025 06:56:54 -0700 Stanislav Fomichev wrote:
+> > In order to exercise and verify notifiers' locking assumptions,
+> > register dummy notifiers and assert that netdev is ops locked
+> > for REGISTER/UNREGISTER/UP.
 > 
->     net: make NETDEV_UNREGISTER and instance lock more consistent
->     
->     The NETDEV_UNREGISTER notifier gets called under the ops lock
->     when device changes namespace but not during real unregistration.
->     Take it consistently, XSK tries to poke at netdev queue state
->     from this notifier.
+> > +static int nsim_net_event(struct notifier_block *this, unsigned long event,
+> > +			  void *ptr)
+> > +{
+> > +	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
+> > +
+> > +	switch (event) {
+> > +	case NETDEV_REGISTER:
+> > +	case NETDEV_UNREGISTER:
+> > +	case NETDEV_UP:
+> > +		netdev_ops_assert_locked(dev);
+> > +		break;
+> > +	default:
+> > +		break;
+> > +	}
+> > +
+> > +	return NOTIFY_DONE;
+> > +}
 > 
-> So if the only caller currently under the lock is netns change, and 
-> we already split that to release the lock - maybe we can make
-> UNREGISTER always unlocked instead?
+> Can we register empty notifiers in nsim (just to make sure it has 
+> a callback) but do the validation in rtnl_net_debug.c
+> I guess we'd need to transform rtnl_net_debug.c a little,
+> make it less rtnl specific, compile under DEBUG_NET and ifdef
+> out the small rtnl parts?
 
-That sounds very sensible, let me try it out and run the tests.
-I'll have to drop the lock twice, once for NETDEV_UNREGISTER
-and another time for move_netdevice_notifiers_dev_net, but since
-the device is unlisted, nothing should touch it (in theory)?
-
-netif_change_net_namespace is already the first thing that happens
-in do_setlink, so I won't be converting it to dev_xxx (lmk if I
-miss something here).
-
-If it goes well, I'll also hack your xsk patch to grab the ops lock
-in xsk_notifier:NETDEV_UNREGISTER, I think that's the only thing
-that needs changes. The ugly bonding and teaming unlock/locks
-will go away (which is a very nice side effect).
+s/rtnl_net_debug.c/notifiers_debug.c/ + DEBUG_NET? Or I can keep the
+name and only do the DEBUG_NET part. Not sure what needs to be ifdef-ed out,
+but will take a look (probably just enough to make it compile with
+!CONFIG_DEBUG_NET_SMALL_RTNL ?). That should work for the regular notifiers,
+but I think register_netdevice_notifier_dev_net needs a netdev?
 
