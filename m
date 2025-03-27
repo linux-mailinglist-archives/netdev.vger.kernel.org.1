@@ -1,155 +1,147 @@
-Return-Path: <netdev+bounces-177968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3A26A73424
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 15:17:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62450A7341F
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 15:17:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7541B189EC01
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 14:16:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D47A189C2ED
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 14:16:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 302E6217716;
-	Thu, 27 Mar 2025 14:16:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7F64217F27;
+	Thu, 27 Mar 2025 14:15:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i5Q8h+WB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IjGJ7ec1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58ADE1ADFE3;
-	Thu, 27 Mar 2025 14:16:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B24214A98;
+	Thu, 27 Mar 2025 14:15:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743084979; cv=none; b=brJxQZl2lCAzto3UZ70op87v5FPEZP7V83tZ11IeuENUrMGMkHWYiheJY1o/xF8i2XpDWxA62fp8lAvW59rMbsHu0FNDgR5PaeZ5cMN8H8C1gkkhWBMQYoCT5PvjWMGV/WHNpsx4wUCwv/m0QTkNb5hmx0myTnor/n4fO11stYk=
+	t=1743084951; cv=none; b=o2h2za0L6yVnytL2qgoN7Z8PUeMAoC/BBjbArdxl9hBJo4fiYYDxb1zGaEo9PMtVEG6UunVhdz+PL3W9cXLLdSIDZq46j2SrtoX7ErtWdxgAZauhLWTHHiy7cIqsFgJ2A7Gvu0/jt9PvQmQfLJxKSJ4FkVWLQTzmhb5kg1fc5k4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743084979; c=relaxed/simple;
-	bh=qmMBMM3UrIcbtHB3q5A5wIgeJbIGmGRCXOZxBsmVs9U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X61ZLOhzcRsCQwRU9N4BFWooocA0OFD0DJSdh2i5yTahy3qhJ4Bo1LpgAIenN7qhf3nOj7GG/ecgMdqFg0A57EuZmEfPPicVAVW9O+kp9H2h3r8g4aIlbYuef7MnFFiNfhrjArOPUrk6+hbkeYafnRy5cxfHNMLQbq/WlovauFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i5Q8h+WB; arc=none smtp.client-ip=209.85.208.169
+	s=arc-20240116; t=1743084951; c=relaxed/simple;
+	bh=M/9iLSgPAvBEvcRj/91c2/vxVJRa76X4X1+UONc6k7g=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LkFmekbhyEYqPmWY2xvyGC9hDWk0oFTLLw+rFDYHlQimF1OLRJL+KmrdX9kvQYyogOxtPSGmfU3N4zDHFi1w0QIcW0STcCOl/mXB9PRPY6hDNQhc9+CID5pY2mU0j98VmeD9H/X45zNm4ojnLAlE70yMh572cGXLOqcgjEhjvgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IjGJ7ec1; arc=none smtp.client-ip=209.85.221.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-30bf1d48843so9798081fa.2;
-        Thu, 27 Mar 2025 07:16:15 -0700 (PDT)
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-39149bccb69so890405f8f.2;
+        Thu, 27 Mar 2025 07:15:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743084974; x=1743689774; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i9M6C9E5diSoPsICencuKBeyAWQFDJEzmaVuf3K9CWQ=;
-        b=i5Q8h+WBi2CrTBt9UoyOI7KsCe5qbQzRRWq7WgFLzIGVyuSe1zpJiEIm5rfI5nyBHK
-         l5w9F2fLN82srXPQryp2cVyOXeUFPHl9FBvhQkEV7/gHrdpjzP6gAn0kB/84xB59JPBh
-         qiSS6F7MjSQ2TnJigNH3dqjMCm79LTCWNI9+biQKkxrsSIBWoU/iVu+XPf0dNsATA2e1
-         kfoa22ZHWw2pWzp6/o/rA5oXtXheE4vkhNaTBdlgg/9e9QGVokyLuDFVj5C2UZA9TSHI
-         TCkySEeVwFS+dd0Q+R74XYxTwynhG++tU4ThlexVjETx8eBQeMfiBp8oJ7lUwCBUWUrr
-         o3+w==
+        d=gmail.com; s=20230601; t=1743084948; x=1743689748; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZsPfvFNFiYpWeexMGdkrslH41pW1FMvcmq+GTlkBH+w=;
+        b=IjGJ7ec1Bd6jvKPZoDNI0z8iixTInzQPjfLRUlSaQ8WIEkV9HP3aeKjVeJmRk2damj
+         jLUGovlLGrm7KCk+MgKQu6V3Kb0bA0I8gelhuVf9YB2vEz2nLM+UW8EN+/3bbSfZUXXB
+         qCzvVovmNWTHO6wzSON0LD8g4eb6oWqjl+MokQiUo6qGIP0JroPJQO5W8WbPUGZ/IbOV
+         fHpJwYL/exEdN3ATid0XTapvaLLAxIpW8g+R3YIQZx4Y9/h9FnxlLk2YmKW1I3KeD1EG
+         0U/IPpczx3LkLva9Ll30DhoL9TqUq7RjNShvu3HWZXLsBJr1exPlM0pbe42H2TIqs8I9
+         /FgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743084974; x=1743689774;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=i9M6C9E5diSoPsICencuKBeyAWQFDJEzmaVuf3K9CWQ=;
-        b=lRJ2Tksdu5Mc0QktnmO2P2Lvuutv3+R86ont49YkG41slyk7l96bm0EG6cYkadqlhH
-         w3QJWmCaiNFU7NfcP5pdwqyylY575jzvIg6SJbc+fZiaTZxMQJP+xm4h9NHTd0VAnoBk
-         S0+Pnpr9zdzKYMeeV+bXpn+HI7IQesQd6g+Ihnyp9HIyPu+zao/qFWGbDe2ue96RuH3a
-         DwdtWpI8BoVlqmOcthGDNWJ0GuYhOazsyw4Gpko98z8XNytB2OmQNtsX/cXyuh3/HkU+
-         wP2fjcTDB3/Fq2bgRXXWjcsOwHqK59BLX4U7RyYx+HfQ77HO815pkLaM/a4LbvhVdQoD
-         3Ymw==
-X-Forwarded-Encrypted: i=1; AJvYcCUX12dXbZfxJJiDb0V2m3NyvNg79FJ5GSkyiiOfR25mtpSr9/9kvURtveQoZVbdCJ22wXwPd4PX+oVlyRBv@vger.kernel.org, AJvYcCUzzeJVTQJqtzGjK53OnRciNd21I7Uy/N7eW43dP1bHBx4+qGjhxWAzYrEFxIsYyuqtWNN5wV4Dh4cm@vger.kernel.org, AJvYcCViRl7gDISVFpVgAbJDgVg8aRqevAnx73BchE6VIjVMdNr2Y5nlCMkROcGH5tRDQT4KgdMwj7iD3y4+n/E=@vger.kernel.org, AJvYcCW26vhnp3IF7uV3PtsNPw+0gP+6ZneU4038tJ7A+Z8fb6xAdk8LwaEJZ4axTKz4+mCENt6M1SVn@vger.kernel.org, AJvYcCWG0iTbARWXbPtfbFIwYqwEjDPS4nmldNlmDuu2/sX+NfTWfOMDeQjxISm2+YbFF7vhGDToOoNciycbxX+s@vger.kernel.org, AJvYcCXGQL2UAWYEvTEhke6Pd6/1/tJy0wxF4P32G9zVJIxoKGd0vwr4EuBBtg03XqPXK3QKXkgtCjcPE3Ug@vger.kernel.org, AJvYcCXMrdEO9+Z9YG7WUuCpGXvNBI0SLVeRL045AppyyNlABWQ8TNsPmdWVDnzWKm29qIwjR//ulFuHhKBp7I8jtZIt@vger.kernel.org, AJvYcCXURuzVKYLHdsmNYUhcVNwf6wGZEIGI9zt97i1JFot/UAUCZdmHgfF2KHRRi9DQ7pO+bm232nrbNRW6/GfQAOo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgQd5D1q5x0dA2Nii+oePVw4aF+84Yx6NJDybvyAbb0vCFYy3X
-	eYCzln9bQZNWcBcHESPruzwouBK+W3FX13IImMysyDt2uoiZuGd99ceRzIE1l/IsWt0lOngVIqx
-	NKf4rK9IxRnduzPOIVsyxK1BePqE=
-X-Gm-Gg: ASbGnctXMURHwYIsvo2EqmjQ8OJ6C30vW6UXifkxeKkuUQTm3AKnogsHR+SiuX4ahJ0
-	vfwre+hTM8gCtykPevGTHePWh/EDkhXm91LLIXWpits1d6x+NrZDYgDa8aYShRVsFfLTgrw7kzY
-	bVkau9LFFNcEguMe/16W2t9AHFVNuLEZ+4K1bd8Hgg+UJNHpb5XNdS
-X-Google-Smtp-Source: AGHT+IHjppBBD1opK0cTIwYQL2MZ5xpzZ9akB5zDDLt1b7/nuVFx0XppIv3k3NpUnr+TUWw12KrQXCArIl36za09rHE=
-X-Received: by 2002:a2e:9997:0:b0:30c:460f:f56 with SMTP id
- 38308e7fff4ca-30dc5e5c919mr13153081fa.20.1743084973460; Thu, 27 Mar 2025
- 07:16:13 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743084948; x=1743689748;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZsPfvFNFiYpWeexMGdkrslH41pW1FMvcmq+GTlkBH+w=;
+        b=TyhKUPckJ+lHbDIhBRVjdOiTejXaH60qnqem6Ki2MEV2Z2ZBptDzxI5wf5POCetKpo
+         ufbSIdfhuhtax2/dKDj7p2TdXVo1l582Z4A7rlBG3wt+EMkk8WvFGn1MzVWjs0AOylw9
+         ocoS/GK0KBXweF7SER34XV1oP/n8u5kmBE7UgMNbqK7UvOp0nD087I18cFfjgv1v4G/s
+         qo9faOgqG5FQOPjbiSlRORhbl2KKrKX+K3nD5eKM4fKGP9LqVAgHYf1ELpQtaxKIhTBR
+         kDaIFrPQzjNWeZSyhapBFc2fVALwS+oqDdOSAYLFGNGungk+jtlvnyukOMceiydMoCU7
+         D01w==
+X-Forwarded-Encrypted: i=1; AJvYcCUhdZtq8o8G3YcbF2+HWHxzOnCeqisrHO0JDAc48ztfquNsLjp5pHDCRKJcSuGd+2SaaWh91eTkUbAB@vger.kernel.org, AJvYcCV3y62anG+Oy8TfnWrVltPU46M4Ke8DnJ/uErm0ZvHDrKinIAll4ns2gH9hbsotdMyxcRZBSciR+SfeBX/M@vger.kernel.org, AJvYcCWEL+QLTbXsZgErl+4fksctux8yKeKhF2NYB4a9/AF9RyOe1CVlXTg76Upbk7cIIfpxPPwCCGTX@vger.kernel.org
+X-Gm-Message-State: AOJu0YzX076B3+/FH0+yo71wgKWC95JWIHmrSI1xdffGm+fBEVc48XH4
+	IRNkkC6y1umBDxJSTJom+B5YocRwMCL0WvLGAH+FoddbL+2mTT3y
+X-Gm-Gg: ASbGncvUS+bZKmde3aOjVDw17iG53MhkFkyLCiEZnKiXKmBVZD7/lLgIEmjSQjYkxMA
+	qNE2BBMK+KqxfIEvZlBnebvHJbPzGl2PLWOGG+eTTNIBsgXrcLDPmrlbeHLuo65Z3SZJ4WDjru2
+	cny/47n5r78VjYEPx4sjxqeI/N3FcyTRkvvknypSH6HuxtMh4KNbPOp0Udh+HpFGzgOqjqn9y5Z
+	MCWb084ukCaLl3qUFGg5DLrUEXX0nueybieWy0by244jYdQjD/N3cV7rb37vFZQP07QQGheibX6
+	QbFtG51itzRgBgfXwK8qU2uzj/TRD2jfyNyJcs7pI6X/sd3hlJhlxw2ve0ycxk4BMchfobhIMWJ
+	8
+X-Google-Smtp-Source: AGHT+IGXejG6SSWE1qsqlV2SDFl6w1YGt8KTotTLV2mFe3yEQtSfi86doGIB0kaHG0uCeBfkHHrEAw==
+X-Received: by 2002:a05:6000:184b:b0:391:441b:baac with SMTP id ffacd0b85a97d-39ad1773e93mr2692945f8f.50.1743084947937;
+        Thu, 27 Mar 2025 07:15:47 -0700 (PDT)
+Received: from Ansuel-XPS. (93-34-88-225.ip49.fastwebnet.it. [93.34.88.225])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d82e83620sm38992435e9.12.2025.03.27.07.15.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Mar 2025 07:15:46 -0700 (PDT)
+Message-ID: <67e55d92.050a0220.2fa7e9.5d6b@mx.google.com>
+X-Google-Original-Message-ID: <Z-VdkOhLT-4q4NQb@Ansuel-XPS.>
+Date: Thu, 27 Mar 2025 15:15:44 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Eric Woudstra <ericwouds@gmail.com>,
+	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next RFC PATCH v3 1/4] net: phy: pass PHY driver to
+ .match_phy_device OP
+References: <20250326233512.17153-1-ansuelsmth@gmail.com>
+ <20250326233512.17153-2-ansuelsmth@gmail.com>
+ <Z-UxZMJR7-Hp_7d0@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250325-ptr-as-ptr-v7-0-87ab452147b9@gmail.com>
- <D8Q4MSXXZ7OI.1NC226MO02VSN@proton.me> <CAJ-ks9nHKpQPuSBypXTSATYhbAFkQTJzUq8jN0nu4t=Kw+0xxg@mail.gmail.com>
- <D8QCK3CQES3Y.3LTZ4MVO5B3KT@proton.me> <CAJ-ks9nKT2PUDm6=b4AB1QUWwwvcqPn7Vz60=c0B+uFMZrqPew@mail.gmail.com>
- <D8QDOBUM6NF0.CGJY7ZA5KD9S@proton.me> <CAJ-ks9ntTxBM=c5nUZWGv3MoRt-LveBchn-c1Xy-DGap7fLVRA@mail.gmail.com>
- <D8QI804Q3DAS.2BV4WSL81H52Z@proton.me> <CAJ-ks9mA5QDeZ3EvOD3THayFt4TtDysgm0jp2aiSF2mQCrhWiQ@mail.gmail.com>
- <D8QJMH5UR6VG.2OT5MXJJQU5QT@proton.me>
-In-Reply-To: <D8QJMH5UR6VG.2OT5MXJJQU5QT@proton.me>
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Thu, 27 Mar 2025 10:15:36 -0400
-X-Gm-Features: AQ5f1JplRmZYTNFbnfGLzU2zYeyjxmbSnSHIdkKg-vmw1A2gTwR43LO2IWo4jk0
-Message-ID: <CAJ-ks9m96vf_HxttuopuC_UfNGJbHHNdEGS2er6nZZG38pe3HQ@mail.gmail.com>
-Subject: Re: [PATCH v7 7/7] rust: enable `clippy::ref_as_ptr` lint
-To: Benno Lossin <benno.lossin@proton.me>
-Cc: Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nicolas Schier <nicolas@fjasle.eu>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
-	Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
-	Rae Moar <rmoar@google.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Rob Herring <robh@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, Abdiel Janulgue <abdiel.janulgue@gmail.com>, 
-	Daniel Almeida <daniel.almeida@collabora.com>, Robin Murphy <robin.murphy@arm.com>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, linux-kbuild@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
-	linux-pci@vger.kernel.org, linux-block@vger.kernel.org, 
-	devicetree@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z-UxZMJR7-Hp_7d0@shell.armlinux.org.uk>
 
-On Wed, Mar 26, 2025 at 6:15=E2=80=AFPM Benno Lossin <benno.lossin@proton.m=
-e> wrote:
+On Thu, Mar 27, 2025 at 11:07:16AM +0000, Russell King (Oracle) wrote:
+> On Thu, Mar 27, 2025 at 12:35:01AM +0100, Christian Marangi wrote:
+> > Pass PHY driver pointer to .match_phy_device OP in addition to phydev.
+> > Having access to the PHY driver struct might be useful to check the
+> > PHY ID of the driver is being matched for in case the PHY ID scanned in
+> > the phydev is not consistent.
+> > 
+> > A scenario for this is a PHY that change PHY ID after a firmware is
+> > loaded, in such case, the PHY ID stored in PHY device struct is not
+> > valid anymore and PHY will manually scan the ID in the match_phy_device
+> > function.
+> > 
+> > Having the PHY driver info is also useful for those PHY driver that
+> > implement multiple simple .match_phy_device OP to match specific MMD PHY
+> > ID. With this extra info if the parsing logic is the same, the matching
+> > function can be generalized by using the phy_id in the PHY driver
+> > instead of hardcoding.
+> > 
+> > Suggested-by: Russell King (Oracle) <linux@armlinux.org.uk>
+> 
+> Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> 
+> Please also update the email address in the suggested-by to match the
+> one in my reviewed-by for the next resend.
+> 
+> Thanks!
 >
-> On Wed Mar 26, 2025 at 11:09 PM CET, Tamir Duberstein wrote:
-> > On Wed, Mar 26, 2025 at 5:09=E2=80=AFPM Benno Lossin <benno.lossin@prot=
-on.me> wrote:
-> >> On Wed Mar 26, 2025 at 8:06 PM CET, Tamir Duberstein wrote:
-> >> > On Wed, Mar 26, 2025 at 1:36=E2=80=AFPM Benno Lossin <benno.lossin@p=
-roton.me> wrote:
-> >> >> On Wed Mar 26, 2025 at 5:57 PM CET, Tamir Duberstein wrote:
-> >> >> >
-> >> >> > Yeah, we should do this - but again: not relevant in this discuss=
-ion.
-> >> >>
-> >> >> I think it's pretty relevant.
-> >> >
-> >> > It's not relevant because we're no longer talking about transmuting
-> >> > pointer to pointer. The two options are:
-> >> > 1. transmute reference to reference.
-> >> > 2. coerce reference to pointer, `as` cast pointer to pointer (trigge=
-rs
-> >> > `ptr_as_ptr`), reborrow pointer to reference.
-> >> >
-> >> > If anyone can help me understand why (2) is better than (1), I'd
-> >> > certainly appreciate it.
-> >>
-> >> I am very confident that (2) is correct. With (1) I'm not sure (see
-> >> above), so that's why I mentioned it.
-> >
-> > Can you help me understand why you're confident about (2) but not (1)?
->
-> My explanation from above explains why I'm not confident about (1):
->
->     For ptr-to-int transmutes, I know that they will probably remove
->     provenance, hence I am a bit cautious about using them for ptr-to-ptr=
- or
->     ref-to-ref.
->
-> The reason I'm confident about (2) is that that is the canonical way to
-> cast the type of a reference pointing to an `!Sized` value.
 
-Do you have a citation, other than the transmute doc?
+kernel test robot made me aware that this cause error with
+nxp-c45-tja11xx. I was on an old net-next branch and didn't notice the
+""recent"" changes to macsec support. I'm updating this and keeping the
+reviewed-by tag, hope it's OK.
+
+Also adding the simplify commit as suggested that recive the
+match_phy_device.
+
+-- 
+	Ansuel
 
