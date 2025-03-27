@@ -1,111 +1,118 @@
-Return-Path: <netdev+bounces-177919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BB87A72E50
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 12:01:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1512A72E8A
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 12:09:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33F583B7A66
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 11:00:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D78E43B77C2
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 11:07:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AFE820FA93;
-	Thu, 27 Mar 2025 11:00:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26A2A211474;
+	Thu, 27 Mar 2025 11:07:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="NbCsH+Kd"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="WqKOpCJw"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C68AA20F08A;
-	Thu, 27 Mar 2025 11:00:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A26211261;
+	Thu, 27 Mar 2025 11:07:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743073225; cv=none; b=KKKxWvwpdgCONs8gJUKQFswLRya/+PtCFPpWaJIll67PLjxWOWQYaE6kQQYYzEmSVDstlFBPZ0pvBerWtfOF7kacH017zM7RSsodmPiI+LALUCuV08ZYa+wVDZhAEIV3TYIVx2Mkv6OLI857ZU+1aLHnuClfizBR2UqL/qsxEZA=
+	t=1743073659; cv=none; b=KbwbV+dbO3kJAuAQQd5RFoNEmqPfoiI08t9HvHj8YMsbe1QFV+ZrZNdbLTysikTz0kjb8uvfEvIBplfVY9qsV9ZNBpJdGu/QsgO+5qjActVUAB2wx8Rf322PlcyJMEO4v5QCYxmPBoSpPU3REamfSvRpvERj/oO0FDG+eDzKk40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743073225; c=relaxed/simple;
-	bh=w3JYCOGpygoGJ3y123UWwPLBHs+WM8VCObC2NhViTlA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GeibdIwZUpCP5xeax8fR2hMch0utG9TVDRWPd2HvBAAjvwCseaQn+sPjvDGxlyLE6ORXPw98mn/2mwIAas0JW0SBJyIVfAcXDXBI5BeL0Q7uoT/2E9nxH+fhFR3AozvxFLBxg8P5z+KLKwTyv5xBBdEXvrWxAbhHZzEqzZEWLNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=NbCsH+Kd; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id BA89D44398;
-	Thu, 27 Mar 2025 11:00:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1743073215;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=/QfWDYrwMkLZJOOtnbfBEwGvUQZ+rFNZUyw4fZaJqEA=;
-	b=NbCsH+KdjKpUhgit17/yawha+DWXowPoQ0nKI24bkOdE2voj0r0LzKXv50ukDDRjngzPbZ
-	8URO7qvWwcIP1h54a7KmiGjhtUoCQYG+D6HWr0sOBY1h+33paqem+UYYo741b7Y+p8X2BF
-	qWI2BZGGjkalc0nddixNHVtQlJXuelzt7EcKxlYo2ofteJLSEqsNmhQyqNk30GbroG6EoZ
-	44a4w+WlmFOIC5sJaQhQjosFtCj/9Ci2tSr490CNQANO9eCu5FKkYw1kTD9v4wIYGl9AQ8
-	CulovQAYsIYYfMi/v1b1NagcBxuPPCDErbXDpe7DetvRt+xTscigBXls/lzxQg==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
+	s=arc-20240116; t=1743073659; c=relaxed/simple;
+	bh=iUwlzKQcSJXS8+bcSJdrfEtFRAl1OnhjN9CsrsWizcU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LlsZJCOS6KgpudfWyvTgYgoDjjDk7mUP+QIhdFvf8PjA92dA5SHgHq2BeBmKcJUgBA9agfuKbl1JymO+o/der0Ka1YlnCuvZBqnw3HTFwc9hgYiVKd3A4RIyNmbYxDk0U/8eFyb//6OxVTak4Gq582eq+3jnBU065sBPO3NAHcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=WqKOpCJw; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=WZqb+6ZduzORjFqfT2budPi5gkMW/3J6mbS3Z4qhKJI=; b=WqKOpCJwUCCRxAWTzc+Zhf8/ag
+	qvEPB2pNoyfOnLwCRl4aTnPj2AnLckChSlAsqqOusG7XqUB4i2FOMVXO9hYO7+LfHb0bPjJWiYMyh
+	1na9SHYDsUrGTjkVw1T0I3DEwos1Lj8CNB18qpWAh+qIPMr88+5U9/BegR90MxQ/bkhrfhidZ4sKH
+	rBQarEIl0lC3f19L9k9nhMnqp6p4GzcZ3TphTWrZbe/nLacCEl98CftWI5Wj6c3THpTiRLuF3whi4
+	Tg+U2zaSuNflYbDsSf1pREbhXcVs/Whw4In2gRlw+7/uuAPxT087Lzab9gai4/weVc0boQ0B2bWxV
+	3XzYlkvg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40456)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1txl4z-00078z-0Z;
+	Thu, 27 Mar 2025 11:07:22 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1txl4u-0005Zf-2Q;
+	Thu, 27 Mar 2025 11:07:16 +0000
+Date: Thu, 27 Mar 2025 11:07:16 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Russell King <linux@armlinux.org.uk>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH RESEND net] MAINTAINERS: Add dedicated entries for phy_link_topology
-Date: Thu, 27 Mar 2025 12:00:12 +0100
-Message-ID: <20250327110013.106865-1-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.48.1
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Eric Woudstra <ericwouds@gmail.com>,
+	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next RFC PATCH v3 1/4] net: phy: pass PHY driver to
+ .match_phy_device OP
+Message-ID: <Z-UxZMJR7-Hp_7d0@shell.armlinux.org.uk>
+References: <20250326233512.17153-1-ansuelsmth@gmail.com>
+ <20250326233512.17153-2-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduieekvdegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhephedtheeufeeutdekudelfedvfefgieduveetveeuhffgffekkeehueffueehhfeunecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdqvddrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepuddvpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmr
- giivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250326233512.17153-2-ansuelsmth@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-The infrastructure to handle multi-phy devices is fairly standalone.
-Add myself as maintainer for that part as well as the netlink uAPI
-that exposes it.
+On Thu, Mar 27, 2025 at 12:35:01AM +0100, Christian Marangi wrote:
+> Pass PHY driver pointer to .match_phy_device OP in addition to phydev.
+> Having access to the PHY driver struct might be useful to check the
+> PHY ID of the driver is being matched for in case the PHY ID scanned in
+> the phydev is not consistent.
+> 
+> A scenario for this is a PHY that change PHY ID after a firmware is
+> loaded, in such case, the PHY ID stored in PHY device struct is not
+> valid anymore and PHY will manually scan the ID in the match_phy_device
+> function.
+> 
+> Having the PHY driver info is also useful for those PHY driver that
+> implement multiple simple .match_phy_device OP to match specific MMD PHY
+> ID. With this extra info if the parsing logic is the same, the matching
+> function can be generalized by using the phy_id in the PHY driver
+> instead of hardcoding.
+> 
+> Suggested-by: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Acked-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
-Re-sending the patch to target net instead of net-next, and aggregated
-the acks/reviews from Andrew and Jakub
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
- MAINTAINERS | 7 +++++++
- 1 file changed, 7 insertions(+)
+Please also update the email address in the suggested-by to match the
+one in my reviewed-by for the next resend.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 1cd25139cc58..36511ed5bf6a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -16577,6 +16577,13 @@ F:	net/ethtool/mm.c
- F:	tools/testing/selftests/drivers/net/hw/ethtool_mm.sh
- K:	ethtool_mm
- 
-+NETWORKING [ETHTOOL PHY TOPOLOGY]
-+M:	Maxime Chevallier <maxime.chevallier@bootlin.com>
-+F:	Documentation/networking/phy-link-topology.rst
-+F:	drivers/net/phy/phy_link_topology.c
-+F:	include/linux/phy_link_topology.h
-+F:	net/ethtool/phy.c
-+
- NETWORKING [GENERAL]
- M:	"David S. Miller" <davem@davemloft.net>
- M:	Eric Dumazet <edumazet@google.com>
+Thanks!
+
 -- 
-2.48.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
