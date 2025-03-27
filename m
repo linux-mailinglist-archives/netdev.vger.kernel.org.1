@@ -1,79 +1,161 @@
-Return-Path: <netdev+bounces-177889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA9DCA729CF
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 06:16:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7B39A729DE
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 06:31:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D28F416DD9E
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 05:16:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B812172FDE
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 05:31:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32FB4433B1;
-	Thu, 27 Mar 2025 05:16:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 221BE1BEF7D;
+	Thu, 27 Mar 2025 05:31:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zab0q4SG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aM5DG74t"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 079BA1FC8;
-	Thu, 27 Mar 2025 05:16:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 620AF1FAA;
+	Thu, 27 Mar 2025 05:31:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743052594; cv=none; b=SqdQT97dDgy8sCSwASYtpHXeao1nYKTckc6x1hFyMSMc7ZADkuZ1lVID4wzBwo7kfjORVnB3qL9iqDEkNXrwVIZOtYdP7eRMctHzQzidxZhOGAnLv20cAHSCQHCiHb+UBSM3ELWoJgnGFqQRzpQNqgp66U6dYvBhlz0vlCX9er4=
+	t=1743053473; cv=none; b=rKOgFJmd0WOLqkl9LncPPjch/YGTe3ZZkzFDzgkq8AwJ2NqEHs6H9GYKQ0MkfI9UNmz5/O1Z7mMNSnozqFt1FF43HX2WIpnzAeZHAh71I+5af+MRpXkTrKsZukY7z6UvQP2EF3i2VNi4jqZTPBTqhgAh1+UHG0CvoUq0mWvwy3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743052594; c=relaxed/simple;
-	bh=p4E3NIWKHCQ7Kh8PS4wy9jAsJGGPr7MV2B4owvu0tVU=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=VMHA/Ob7Ex47dvrLXu/xc6y89bCo/8eSs42Ksuk6C4HuLnn1hwic4ck7Q/U31tq1EpxGAYRIQzjiSLAwPd0vP+esZ9ztFGpfs5ABdx6giaqjaOHCt/6jNSKqyTfpKntIrxXKcPv8aXPQJqV5sz1e6gdg2zsoqJypHZK0u4rSfkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zab0q4SG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8A58C4CEDD;
-	Thu, 27 Mar 2025 05:16:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743052593;
-	bh=p4E3NIWKHCQ7Kh8PS4wy9jAsJGGPr7MV2B4owvu0tVU=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=Zab0q4SGvrBMtgoXJ4fEsv82KssbMczUCWoAPxwGW5Pu+PvN4NGoIuNyb2qf/uaUB
-	 ELscolavqsjliNC54ttcIKnHXiyDA+3X8S1sYahvwbL4aKm6uSvr4tU5SAjRMhDYSs
-	 00fYmEM7ngcohE3ZVXJ1RV27jVQozC7RSznUxmCPgKNshh+ki5q5YYu8RoY0A6ttHF
-	 /qLYctsD78P1349/vAQo4t+ohEGSV+FfKN+lRZ/VX7BzT4x6IWQKDYkcAHNmKOSMax
-	 GZZU1RKuMRvL4mlpbwg+uyGhSPHU/qAnmmx4XSF7kffXkg5IGL4p8qHGipPrWJOk6K
-	 Vqc13YsS72ZVA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7156F380AAFD;
-	Thu, 27 Mar 2025 05:17:11 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v6.15
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20250326163652.2730264-1-kuba@kernel.org>
-References: <20250326163652.2730264-1-kuba@kernel.org>
-X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20250326163652.2730264-1-kuba@kernel.org>
-X-PR-Tracked-Remote: https://lore.kernel.org/all/20250228132953.78a2b788@canb.auug.org.au/ net/core/dev.c
-X-PR-Tracked-Commit-Id: 023b1e9d265ca0662111a9df23d22b4632717a8a
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 1a9239bb4253f9076b5b4b2a1a4e8d7defd77a95
-Message-Id: <174305262992.1585001.7193079148343307430.pr-tracker-bot@kernel.org>
-Date: Thu, 27 Mar 2025 05:17:09 +0000
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
+	s=arc-20240116; t=1743053473; c=relaxed/simple;
+	bh=zlEk+nM0KMjO6BK5HgI9naEyY/gzus1ziRhcIU4nxZQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fBpb2Jnq5Z0GmcJZvKmUGHzeqZCb+r6Ln3Q3Ccw2emsZro52XzGgFP5UfLVeVg0VIzmYS0xj6DOKHcbyt2AZ/aNkmyClNxtWd0qXkeon1kX3IkYwMKdBh9TIf8LRdeDpb+0E5nCIr/djw9a9jiaxkrmW6TR2SHiZYwPSKyl8uyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aM5DG74t; arc=none smtp.client-ip=209.85.219.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-e549b0f8d57so575959276.3;
+        Wed, 26 Mar 2025 22:31:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743053470; x=1743658270; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=anfb6aMXjqKoh0pdnMJlZSbWmygDUF0+cL+VQ4pLtcU=;
+        b=aM5DG74tguKzfzyrCO/mAYlqKl1DHMbLm9KIauxGfOyYan2M5OLMGc1kcAKmNnObnJ
+         AGybSr4/CwF8Px7zSXjZA/wrq1YZiqEcNJMgYSoRKCehVl6Hb+vD6G5ydyEi9zhGXun1
+         wZCo1BrOfNKzERACFA3TWDY55Hvby2AwnFfOXI6zBkRT3UOLg8VCJdMEIMmNjy49Pr+8
+         kpo6tGqLHkyBNF9p50SpjzTukGERoU/OhoHOl55d2VZqynfi6yxkT0OS1rFBU2SN7EfA
+         lo+KGHps9ZEA8avhfxcfZQsKrsbAn579UtcGPF6AajjTFmd6ok4CHVWMZnom3h2FewlP
+         YUcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743053470; x=1743658270;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=anfb6aMXjqKoh0pdnMJlZSbWmygDUF0+cL+VQ4pLtcU=;
+        b=C/zMnfgMSJ02W5eg1tG9DF0+jfUF1gqts5fmxBEUYJW03UKp7avMEjOeSDIS53m9Qs
+         9PA8ZAWYm5pJUuGzh75Mah74IkbblgLuzEbjuM5Pq/WgDewuk/JNlhHmn3QQmco01MGH
+         ltf8ibVS1sP0Nb5P3HGdnZr88WJSJcPhtMgKbZ8OX1SWE1C/bPzpggGx7iIalZvjuAKR
+         Au8tfsczOFUuCTnQexhVpkA76Bu3Ny2kJCqqnxr0GcKK1aYGFu2zVoq6URl17s8qMtXu
+         mxBgKudabl+gw5+kwW0zVgn8LC42dHBd+KrJCBbFR+DmPmWKtNZrMVr6xiI9+QaWTzO7
+         0DKw==
+X-Forwarded-Encrypted: i=1; AJvYcCUOsdeYE2jDwlzaSLDPcmzRWpaxVehk5uqqqO1wa354U8plg3IqREI3Pw3CFr4NKyYdmVfGlgUJ@vger.kernel.org, AJvYcCUQotam4WAW87Z8UjCuN6M6RMXQaACqL+FbplQZ0DwgXPI7rHQYyZmdGjsAeL7fBdV70u2NFV6Clz3bkg==@vger.kernel.org, AJvYcCUh8ysWaPMYC2luAGekXx1bQh2cSQmJ9EstCFCEDCHSlYV1RadQgxefzvs6voSMkTzzDdFeS/5LMa5Uvi8zGng=@vger.kernel.org, AJvYcCV2z1SiL6/vvrUd/M6ySS0UcVJSzyaJ9m9alQJYdlx+Aw103KTXCzIzpgcd7RoIqhCJSOQv062c0E1C@vger.kernel.org, AJvYcCVdutZ8a/pkOUqghMmE4J4BLUP4cBUeoJuldrG4DJKBpZhAsqA0BkRh69ZMfZhQP7ov2kPzQfqNmScbaDw=@vger.kernel.org, AJvYcCVgNGVnlaocNeaUl7W8JRK0qrFTUCtJfhI6rqeGpUOBVkdgOAhv4gMCkhTe98P9qCxkPvb02PDhrV25ojTl@vger.kernel.org, AJvYcCVmUBH0IUu3MVZ6Ho9ama/4sxtkAEIOiEsoFj8XxnPuHOjHgY9+z423c8qDOzeLdKgeERwIptKni+Na@vger.kernel.org, AJvYcCWB9mhtKNun+IYls/751oYfkpfpd3S37cf+tA3LeTcAm/fnfgWH88JpR03aQkNyqVAv1xtWSGou2OU+@vger.kernel.org, AJvYcCWy/yWXkXuf+jeVIIn0GOb1Mw2BYbKC4lAwHEBtek+bcb8/urhSo9ANmgR2HefAU//BxdQSs1C10nM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWjN8MLGqoQnGTaTvB/oysDICluavSvCQKyHESMgEeFPAKPYmO
+	jBFM+H0cPPKVbK5Xq23evHBfgMEp5utAan0IdX3b0KYqgLwzqxPYQeffdWldjf48+apfABtw/5K
+	3oeiOifqqJSG2MWA6N5Yt2CoVs+I=
+X-Gm-Gg: ASbGnctZzRiL9RK44M85beDtezxhDj/3oj2tybRswKHY5IMKlRBMR1xrHRKPLSzrAeX
+	OuGxIxuDe1APs5EZVOoyaQGJ29JioKShPiMNmaFkbEaRUb6jHl0j8oBHUpq4l3UpOy6uYT8eRyw
+	LlTzgexkKOcWIPxSDJ6VcvFN+V747OVpuKiQO2VedRg6yGLaBp45r+wH572w1K
+X-Google-Smtp-Source: AGHT+IHsm/5tNxOhtqTseSel8U8cDVO7gbZGGe5VA4fyssBkjWJmJDSWCPGOq5ql1afQV4+vF574tKYXoEFyQTgNfCA=
+X-Received: by 2002:a05:6902:260e:b0:e5a:e39d:c2ad with SMTP id
+ 3f1490d57ef6-e69430b9e5emr3350436276.0.1743053470043; Wed, 26 Mar 2025
+ 22:31:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20250225081644.3524915-1-a0282524688@gmail.com>
+ <20250225081644.3524915-5-a0282524688@gmail.com> <20250317-outrageous-helpful-agama-39476f-mkl@pengutronix.de>
+ <CAOoeyxVF9baa8UKJKWcbTLzvMo3Ma=GRCbdnBSoGOw0Lk5j4sA@mail.gmail.com> <20250326-utopian-mega-scallop-5f6899-mkl@pengutronix.de>
+In-Reply-To: <20250326-utopian-mega-scallop-5f6899-mkl@pengutronix.de>
+From: Ming Yu <a0282524688@gmail.com>
+Date: Thu, 27 Mar 2025 13:30:58 +0800
+X-Gm-Features: AQ5f1JpwYaYKq-V3JQ6MJSoAPPPQl8Dr7KjIQEXlTvSTgSXvEJFYfp0Qb4l0Dhw
+Message-ID: <CAOoeyxUvoYsKpLMY6OU+Eo_4=Ka+au7e_awA4yVKswwtaDp6NQ@mail.gmail.com>
+Subject: Re: [PATCH v8 4/7] can: Add Nuvoton NCT6694 CANFD support
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
+	andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The pull request you sent on Wed, 26 Mar 2025 09:36:51 -0700:
+Marc Kleine-Budde <mkl@pengutronix.de> =E6=96=BC 2025=E5=B9=B43=E6=9C=8827=
+=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8A=E5=8D=881:35=E5=AF=AB=E9=81=93=EF=BC=
+=9A
+>
+> > > > +static int nct6694_can_start(struct net_device *ndev)
+> > > > +{
+> > > > +     struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+> > > > +     const struct can_bittiming *d_bt =3D &priv->can.data_bittimin=
+g;
+> > > > +     const struct can_bittiming *n_bt =3D &priv->can.bittiming;
+> > > > +     struct nct6694_can_setting *setting __free(kfree) =3D NULL;
+> > > > +     const struct nct6694_cmd_header cmd_hd =3D {
+> > > > +             .mod =3D NCT6694_CAN_MOD,
+> > > > +             .cmd =3D NCT6694_CAN_SETTING,
+> > > > +             .sel =3D ndev->dev_port,
+> > > > +             .len =3D cpu_to_le16(sizeof(*setting))
+> > > > +     };
+> > > > +     int ret;
+> > > > +
+> > > > +     setting =3D kzalloc(sizeof(*setting), GFP_KERNEL);
+> > > > +     if (!setting)
+> > > > +             return -ENOMEM;
+> > > > +
+> > > > +     setting->nbr =3D cpu_to_le32(n_bt->bitrate);
+> > > > +     setting->dbr =3D cpu_to_le32(d_bt->bitrate);
+> > >
+> > > I just noticed one thing that needs clarification/documentation.
+> > >
+> > > You have nct6694_can_bittiming_nominal_const and
+> > > nct6694_can_bittiming_data_const, but only pass the bit rates to your
+> > > device.
+> > >
+> > > Do the bit timing const really reflect the HW limitations of your
+> > > device?
+> > >
+> > > Are you sure your device uses the same algorithm as the kernel and
+> > > calculates the same bit timing parameters as the kernel, so that the
+> > > values given to the user space reflects the bit timing parameter chos=
+en
+> > > by your device?
+> > >
+> >
+> > Originally, I only intended to provide NBR and DBR for user
+> > configuration. In the next patch, I will add code to configure
+> > NBTP(Nominal Bit Timing Prescaler) and DBTP(Data Bit Timing Prescaler)
+> > based on the setting of nct6694_can_bittiming_nominal_const and
+> > nct6694_can_bittiming_data_const.
+>
+> Sounds good, but this doesn't answer my questions:
+>
+> You have nct6694_can_bittiming_nominal_const and
+> nct6694_can_bittiming_data_const, but only pass the bit rates and the
+> prescaler to your device.
+>
 
-> https://lore.kernel.org/all/20250228132953.78a2b788@canb.auug.org.au/ net/core/dev.c
+I understand.
+The prescaler field is used to calculate sjw, brp, prop_seg,
+phase_seg1 and phase_seg2. I will update the code in the next patch.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/1a9239bb4253f9076b5b4b2a1a4e8d7defd77a95
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Thanks,
+Ming
 
