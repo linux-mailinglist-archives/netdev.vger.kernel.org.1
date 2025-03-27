@@ -1,107 +1,145 @@
-Return-Path: <netdev+bounces-178014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 355EEA73FE7
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 22:10:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 143BDA73FF9
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 22:12:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2ADE189B606
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 21:05:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67ADD1B62657
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 21:07:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DE4C1D90B9;
-	Thu, 27 Mar 2025 21:05:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A8231DC197;
+	Thu, 27 Mar 2025 21:06:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mMi73lJs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kkm2litp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99D541D515B
-	for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 21:05:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 224C41CCB21;
+	Thu, 27 Mar 2025 21:06:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743109510; cv=none; b=tSXJUMcBPCbHFtj8TgkRGGoSEuGllzCylFdlmOoQP9dnj4J//ttY1+ubsec0SQ+LVx0bq3VA33mgHpTceDuhxN4aykYPuPgwh83rfjZqnZ4cBvKCive842UFtp/dBF0+mdnjsGfluvRPFElt94r+4NvMKSHR+UxeStj2TPlLpAI=
+	t=1743109595; cv=none; b=fARKbSeTJ8/45Ai7mR25GFooVQztkSWusmdY4kCBtWskO60FJ+Ag227n2gd3KtLW32JBOiOBCvDFym/liGH/Gk2Q7vqc/hklLiU1I4DCcjSKb+KiyZIVSSJKaxwNx5JxfcL3xf7IiuPPdutzBgFRoYKBkfX5JCoRuefiDRV8aYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743109510; c=relaxed/simple;
-	bh=Yt3BwsatZyNYaz2up+qbU7T5itRkatw2D+ZbGMF/REQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HnEZCgqwrDBj9sE17cRVwgieICrSKpOBcc7qqF0wcCaTDSv4Gq/Bh0tdb7gGYSBs6p8PZPYJjLYqckH+lzeo/AEW0YXhQe+1UPGx77CIJaEdF2UhrQfXg6qOVj4cdxuNIRo0T+ESNGPE2+ftxosY00wwBBGc1Rn/w4vPOLT2sSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mMi73lJs; arc=none smtp.client-ip=209.85.214.172
+	s=arc-20240116; t=1743109595; c=relaxed/simple;
+	bh=GLqglL9v23gJuG69hfxF1A3fwXDbnmKCTJK5LlaQ9fc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QEiXXZssRmxGpTgF3jRiQtt6VK6g4Cl8DgLRZ3Dnwn8lq7aNQ5gVlcH9GwTGOK1dam5RSgrNlKtZrUy4xAyParb77+8+sfTgBoXbDclRffJsWr92BYXAeAKli0/IFHqmCXmWL8T6B2uenJ5vcE7MJx3DtbnFQfSKDNJKYey4Tmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kkm2litp; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2255003f4c6so31191245ad.0
-        for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 14:05:08 -0700 (PDT)
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43948f77f1aso11174885e9.0;
+        Thu, 27 Mar 2025 14:06:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743109508; x=1743714308; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6TD4upKUsUkOyeQ3/iOW5P+JAVYEKJPZTLc6dlrhOSU=;
-        b=mMi73lJsvUDO2RxWKYnArS7VaQAoFkEvWNo2kUeMAtm5J6dQI1+9d6Kn/AO6z+iDnZ
-         +ryKUVJWHZiKV0JdoKHH2tap5UFQxc4MopjOqDfwR3NgVsqq4SRcme0NTWXixajfgW+b
-         NGc+5+jj8dQ1VdIB+4cIYYIwgY+eO2IpvEODgJYaPzzpw3ovGkeBcaJwwhVq6eWSdi48
-         nTxohqhoEmdtTD6JP01nppeu+VZWjQTlriW8vrQRgTdYwxZBTmwXxRQj82mA0wOOw16k
-         XToYKRtsJOAZsA0KZxFOhGYM3Yz1dlMPfpQB7B66ngirFVymarWFG8uRniKs0735sd+h
-         4/iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743109508; x=1743714308;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1743109592; x=1743714392; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6TD4upKUsUkOyeQ3/iOW5P+JAVYEKJPZTLc6dlrhOSU=;
-        b=OLiyW+/BSsYALAjC3LT3CdF4Nz6BlFEKqaPJBBUfWRRKi/LVbi2I2rPzpz532pBobJ
-         lw04g4Bxa9AZgWorMRvGrLTsIvdUlAVBKhG1TJHja6VG9GDSp20sFC6rN04xQy8RV8hW
-         5oDv5I3+ziFvCTkRS78K86ouloVhT6xsCDPVMGG3Cb1a+pN/7FS6kaT5JZ9BdMWJMJhy
-         AuajlUuyNWjodEd2JhjgGILMSZxa3vHJm2G9dEuUIAuzPEqtn8z2er/lCws8BDp+vg6v
-         XDjGVQCZSCIT8Qc6GWyhLBXrqN1jSSbrZHG6J9loZ+tv3zTKH2RtVEPuxxNXQWno2PiG
-         nUfw==
-X-Forwarded-Encrypted: i=1; AJvYcCVdAgwbSqQ4gZ8QMLISH93bb8KDFVkusrHaeUT0aU06CqR1Yo8KDkP/ZEj+vzVYZf/xAaSY7yk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyndo4P1ee5a8dbbivnJR31YRDs/mf3pnJji+yGdPMyFlfstpoj
-	uz1qgMV24bBbRodmDo5aJfNK1zeeowtb3ZkzoOrBQFkICdrWefM=
-X-Gm-Gg: ASbGncuc8n8ppFigc/m4xZi88fUmPt2VQ/xLttRGeRjMxJggSB6l5MFrPgrrlN0vMlv
-	OkXmpjHGScLtWLwHl9MMLI5s3uhWX3cbU76JlF0oy8rWZ8wm+kDkL2YTmHBqHEAKU3ewNiy6X24
-	aYsGL5hiNnXi20vaO6XMo4n0XNAl7wxUQVwigCJPKmZW9/MBB2JQEb2A5KKXlgjPEIbCi558ggC
-	Frg40PEWm/X6QgrMLWM6TNnZ9IGEQo9cI5b0l04q+o/IT8qUZBaYIs/qJG3sVb560Me+E6tBr/k
-	IX9AhoJMHEDA+AADoVe53MpiyKPotxCQY2dSzP/o0vC5
-X-Google-Smtp-Source: AGHT+IFS0x5Om06+R9h5h6unGVz2KWSwaMGhVMDRl+epbSYtthkU1CkJRehpNOXq2+HuSXBM4ab98A==
-X-Received: by 2002:a17:903:1d1:b0:224:2201:84da with SMTP id d9443c01a7336-2280481cc33mr48563395ad.6.1743109507655;
-        Thu, 27 Mar 2025 14:05:07 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2291f1cf632sm4249775ad.125.2025.03.27.14.05.06
+        bh=JFrrEKOtsin+8uVvD5v18PtpdZsRPpaDruCArBuJl1k=;
+        b=Kkm2litpaQ0gLSLmjnPKXuOxEHmTgt7X+ucU14TgE+Aw/CmeiSK1s9jAKuDfv3kKBy
+         +gHUaOA5l1MtjuzLB3Lat+OaTOj1p2jWLe0WbWOCPF3up6tb2a6N0bn9hmk93nBy0as5
+         zC+3pWlFwXiS9VxewszNANbqzfCF/Nlnz/Wq50xo0xJQdaNJ16pYsX6Vk8+81l2S+Hrg
+         Y5ejOGGq91ElguZc3MNBuQJEj3qIRmOPnY6o/GBwaAykpi67SeuQrmqlFrqGdyWNtpOz
+         VkUQ9eFajvm5b2GKlbSH+WlZAEQRcAAQiiOFjuH3Z2oqlRr9O86ntGL24G1YCouwM4g4
+         wM+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743109592; x=1743714392;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JFrrEKOtsin+8uVvD5v18PtpdZsRPpaDruCArBuJl1k=;
+        b=dlfpE8CFrAyNmY0xWUZYPgfrlccYh04z7JNTh9Uz4UuNL8JyeXH/qH0AiowhC1xONI
+         6EHbKuA/Q25unW3stsV7Zwaj5pDGxkRBdk9oMwZyRGerHCWzwrbDU2oOxo7O0lHOS32Q
+         VMHkEAYzqi1Jgj9Flp64CxmFv8LzM4Y0p+a3yOqCKYB4yU/oZudQ+52FYe1PxfPa8Zr/
+         MQczIm9DUOSpCYVw+e9tcu/qp1RZSx8UYbzEKqxDRpVDlBNQXqQQ3KrO6ueBg0SnuDqE
+         pCrigiP+6CIFNhxKJUSV5K8H/UocWDRskRpgk1ANg20Z7gAopBt7VTfSMu6aPqkQi5SR
+         fMOA==
+X-Forwarded-Encrypted: i=1; AJvYcCU03O20HeGKVC1/LSTPYV8yjwTjim//txTmSJWlruYwi9K33/fb5F5/F9tV6E+ZnJugywfrQCBoUiqS4TzjwDUF@vger.kernel.org, AJvYcCU8nmgKiFW0WywIIZdXePrafSwJ8rtX6CwOOYkGHAAjAqIPR19LnrEzWf9WZ64E0GiiBurSqto5pVXLVQo=@vger.kernel.org, AJvYcCUAnWhglOdTHw6g0tNmrthtL6Hcqi/u/o/iPiQyRXo2B0Z8oovXGzTi2u++YjnYujcZZWHJZQEOA8TLiBs8@vger.kernel.org, AJvYcCUUxxURu1mJm6KA0o2acp9uVMOg8f1c5qU9mQT83d982Rjf0rC4Rc2a7LnsTS7Wwyl8NUGLXsl7gt0tGw==@vger.kernel.org, AJvYcCUhGUEt0rvairnw0z5niNDLn5Z5SbM4xnr5Z+x4t1UBVNaF2TjmJAE7Rgi9oEM39CwKELRoZFYWRFIoY42Y7QQEmqW2@vger.kernel.org, AJvYcCUp88RW1e3Xfwjp4kRfV7di1O/MnE0yESPwf9M0ZorBHd33ng+qvcdZMCjmYJOvNIn/1ses2dZK1opznE95@vger.kernel.org, AJvYcCV5IgPu43ZaC8mjK5NLpsSuJqfJDnFTBo/Sl/9x+HzTeB5S/aA86u0r6rA6nFByZnGVXSSl/VnTJXMxRw==@vger.kernel.org, AJvYcCVCxjhH5xAGiYUUXrMnUHlZRqQHEZyJ/RDZrSr+Uh+yawD8i5Aua4I0BqqTRtX7r0W2Cqwz/26Xtt+wL3vRog==@vger.kernel.org, AJvYcCVqd5XuAEcnnZgaDhXhCW9P6hpB1mfJoWosJfQHbPuryMzY5z5BDnnSmGrV7QWnqBkhfr1ZQf0c+RBC@vger.kernel.org, AJvY
+ cCWSfOWumUpZu2absMG0N6+iQriIERlSoa3vRvUBZOiF3BlWIsyxuZhmAKc7KoqN0JDn5b4=@vger.kernel.org, AJvYcCWnXMjYcYFiXz/Fqshp0EnTFzS/EW33ey+YRXP2xhlSp2HVGrg/XEjyxFU4/5drvgqHviBE@vger.kernel.org, AJvYcCX1wOPJ68qoOL5Ka/LuBbbx5PfJU+1dpMR6uFXsMXbV2xZ1MeIWcfo0Zfz+akrAY6y98X+fmLCY@vger.kernel.org, AJvYcCX35mqW0E735dB7FMYMXjK7nCwXHSJcJm/gf5q2kjDtzkT+3FN+A9Rqq96U0DUH8YE6BdGdQwySXXAz@vger.kernel.org, AJvYcCXFXnwlHh0EcaT8A/cCSIgKg+zpCwTnCb4XpRaWUMbi4XqE/tfkDq6aIS+Roz+oWMHUK09Tny2cQZUna0c=@vger.kernel.org, AJvYcCXMkD5aWcsyREYDPWOxMweObii9/uOsDsi/laVUJzeU0v/iGTAcBf4F/C3q7Fh9dAYtJATe+fzpRl80VTQ=@vger.kernel.org, AJvYcCXgO4iUj6g68aVSmHi+0JU2B4zVRo7os36L4eRs//ciGd1Om5toAsxqIaYO85qpyf/NcLsisgUuRQ9vRdpO@vger.kernel.org, AJvYcCXwesdZbEqz2OBK0NvLd31E2XWE6Xrb7mqlk0+0YUURxxgXfxlJLajXfM8V5oe530nCgKU2NKYOozmtOAlSBdCbZg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyiSJvo39Wz7u6Ea1UTi+5uZ3ewG2dKwgA1ggl19j4WgW5ECz4J
+	Ea5VEEM0rxLtvW1bAgxcgEGvU7cAUPH/wDrI7meAoYGnm2QEKT+j
+X-Gm-Gg: ASbGncujgRpcj4OijFlrTCTg7ebhGT1gcQz5C4MlqpvYZa3jaabiRrDOpDJfKm3R+61
+	bEbMepDF+m4cwX3NkysWmqCDFpDiEbtzmlpS0deJlhTrPB+a+xunk1XrCBU9ieAVl3WrUYrl8SW
+	pHrz3iPeuLpYicZgKFjV1l3aVvLr9bOgBPd/i/vXxdTout04d2GGJsEKyG4v9e6EYd5WdXUrZrB
+	DV9TZc84aqlWSr5+T6CDdOTOpZ131yM1M4WB+bKNw3gMnRWPDqSz5jlD+2gPG51UJn4Ny0jstLU
+	roHGEk2GWz2nUCq+TwITjTEogSmXbCtWmbL5f2Hq0WyVdSNAhMlSrQsKO1G3zs5akgsZXRINA9s
+	ApFIpuJ4=
+X-Google-Smtp-Source: AGHT+IF3JVFu2jCYFxmmspP8DgX1SusdSEIsW7Os+9zvssuS6MfQig2v8nl6xgtDIG4B7nUqszDWww==
+X-Received: by 2002:a05:600c:4e05:b0:43d:26e3:f2f6 with SMTP id 5b1f17b1804b1-43d84f5e5bcmr60988395e9.5.1743109592161;
+        Thu, 27 Mar 2025 14:06:32 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d82dedc2dsm49307315e9.2.2025.03.27.14.06.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Mar 2025 14:05:07 -0700 (PDT)
-Date: Thu, 27 Mar 2025 14:05:06 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	Cosmin Ratiu <cratiu@nvidia.com>
-Subject: Re: [PATCH net v2 05/11] net/mlx5e: use netdev_lockdep_set_classes
-Message-ID: <Z-W9ghVoqyuHsVOH@mini-arch>
-References: <20250327135659.2057487-1-sdf@fomichev.me>
- <20250327135659.2057487-6-sdf@fomichev.me>
- <20250327120821.1706c0e3@kernel.org>
+        Thu, 27 Mar 2025 14:06:31 -0700 (PDT)
+Date: Thu, 27 Mar 2025 21:06:25 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: guoren@kernel.org
+Cc: arnd@arndb.de, gregkh@linuxfoundation.org,
+ torvalds@linux-foundation.org, paul.walmsley@sifive.com,
+ palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org,
+ oleg@redhat.com, kees@kernel.org, tglx@linutronix.de, will@kernel.org,
+ mark.rutland@arm.com, brauner@kernel.org, akpm@linux-foundation.org,
+ rostedt@goodmis.org, edumazet@google.com, unicorn_wang@outlook.com,
+ inochiama@outlook.com, gaohan@iscas.ac.cn, shihua@iscas.ac.cn,
+ jiawei@iscas.ac.cn, wuwei2016@iscas.ac.cn, drew@pdp7.com,
+ prabhakar.mahadev-lad.rj@bp.renesas.com, ctsai390@andestech.com,
+ wefu@redhat.com, kuba@kernel.org, pabeni@redhat.com, josef@toxicpanda.com,
+ dsterba@suse.com, mingo@redhat.com, peterz@infradead.org,
+ boqun.feng@gmail.com, xiao.w.wang@intel.com, qingfang.deng@siflower.com.cn,
+ leobras@redhat.com, jszhang@kernel.org, conor.dooley@microchip.com,
+ samuel.holland@sifive.com, yongxuan.wang@sifive.com,
+ luxu.kernel@bytedance.com, david@redhat.com, ruanjinjie@huawei.com,
+ cuiyunhui@bytedance.com, wangkefeng.wang@huawei.com, qiaozhe@iscas.ac.cn,
+ ardb@kernel.org, ast@kernel.org, linux-kernel@vger.kernel.org,
+ linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, linux-mm@kvack.org,
+ linux-crypto@vger.kernel.org, bpf@vger.kernel.org,
+ linux-input@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-serial@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-arch@vger.kernel.org, maple-tree@lists.infradead.org,
+ linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-atm-general@lists.sourceforge.net, linux-btrfs@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ linux-nfs@vger.kernel.org, linux-sctp@vger.kernel.org,
+ linux-usb@vger.kernel.org, linux-media@vger.kernel.org
+Subject: Re: [RFC PATCH V3 00/43] rv64ilp32_abi: Build CONFIG_64BIT
+ kernel-self with ILP32 ABI
+Message-ID: <20250327210625.7a3021d0@pumpkin>
+In-Reply-To: <20250325121624.523258-1-guoren@kernel.org>
+References: <20250325121624.523258-1-guoren@kernel.org>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250327120821.1706c0e3@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 03/27, Jakub Kicinski wrote:
-> On Thu, 27 Mar 2025 06:56:53 -0700 Stanislav Fomichev wrote:
-> > Cosmin reports a potential recursive lock warning in [0]. mlx5 is
-> > using register_netdevice_notifier_dev_net which might result in
-> > iteration over entire netns which triggers lock ordering issues.
-> > We know that lower devices are independent, so it's save to
-> > suppress the lockdep.
+On Tue, 25 Mar 2025 08:15:41 -0400
+guoren@kernel.org wrote:
+
+> From: "Guo Ren (Alibaba DAMO Academy)" <guoren@kernel.org>
 > 
-> But mlx5 does not use instance locking, yet, so lets defer this one?
+> Since 2001, the CONFIG_64BIT kernel has been built with the LP64 ABI,
+> but this patchset allows the CONFIG_64BIT kernel to use an ILP32 ABI
+> for construction to reduce cache & memory footprint (Compared to
+> kernel-lp64-abi, kernel-rv64ilp32-abi decreased the used memory by
+> about 20%, as shown in "free -h" in the following demo.)
+...
 
-SG! Maybe the mlx folks can have it as part of their queue mgmt work?
-Cosmin are you ok with adding this to your patch series?
+Why on earth would you want to run a 64bit application on a 32bit kernel.
+IIRC the main justification for 64bit was to get a larger address space.
+
+Now you might want to compile a 32bit (ILP32) system that actually
+runs in 64bit mode (c/f x32) so that 64bit maths (long long) is
+more efficient - but that is a different issue.
+(I suspect you'd need to change the process switch code to save
+all 64bits of the registers - but maybe not much else??)
+
+	David
 
