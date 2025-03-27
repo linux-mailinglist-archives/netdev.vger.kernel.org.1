@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-177958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDBF5A733AC
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 14:57:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86D9AA733AD
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 14:57:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4787189C19B
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 13:57:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5954E17BC56
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 13:57:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11EBA21766A;
-	Thu, 27 Mar 2025 13:57:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C380215F5C;
+	Thu, 27 Mar 2025 13:57:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933E7215F6C
-	for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 13:57:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF4D8217668
+	for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 13:57:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743083829; cv=none; b=X1dLQL5RWLr80JV/IlfLAYRqXZW0O9bIlHo/tyWeIVSWHkiWm9bo1yBu7X0bswGHujSElv8tb+DMeoiOrQ/eg/8F9FMGx9zO+HqoxaI4a2pnxui1HFMw+yp/sa6mO3L63SU5NN5CognihXvQN2br+ZMO5FU+QW9WPILg1MOPcJA=
+	t=1743083830; cv=none; b=CgqGjyLTvkzvTq5BdhlfXW1kbZd7kMxyIRt187moai5VrC0xRkYsSyKsehe4AFaPh8tdxrQsxLasYgBK6KMrRRv3P7MR2uz1A89dh1Kn0ao/yFDcufVTKQWhfUy4u/0YTGtGoMeIKdR6P9OIFKN4QElKgkAXL6hXPhaVSFC6uL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743083829; c=relaxed/simple;
-	bh=ULYcjFcYN8Ek24nx7HnK26yS90k5oRG32V8suQnV9aA=;
+	s=arc-20240116; t=1743083830; c=relaxed/simple;
+	bh=YEDPaib1in0t3FNqP8CqzxLx2cZwNmmLwkBr5DAIR2A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qBeSD2w8XDAcy/Y5d4n473J+TR44Bz2iEoaSr8frotEZa8DpqYqsX0EEIAojRQJzPPoIvJSq3GjwrTHV0K4nqcDOutFhiVjWDPCCF9U7TAPdPgKsWwyq77zTGmVapJruMUw+xvnHjdVhGtj2Gi+aiRVH09xZz0D6JHP7u5TAqvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.43
+	 MIME-Version; b=iJYsW0ExHcC4F0rTztEdOCWN50A9blI4w6ipcvmbsQf9NacNPicFxvFT9jOXhuUgmIl47OhBrqyCnzGI9jTNztZF8g9X+aI9Avjy+Y7nphiOARp3tvTLKnhJ9z35q3ZXfwk+y2YdttoCXwQ0Iiawv8jv0yoRJJuuv8m+Scoa5P4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2ff6cf448b8so2209312a91.3
-        for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 06:57:07 -0700 (PDT)
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-224191d92e4so19773535ad.3
+        for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 06:57:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743083826; x=1743688626;
+        d=1e100.net; s=20230601; t=1743083828; x=1743688628;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5vtkERddGy3ubQOVBjaWiY4FjSm3HKUTtr8vteqq4d8=;
-        b=X1Gxlyw3wHENS7wYiOmYx+Dua21P8njNxVdshQCepM4YMBGpEpTFcX4zFgSMXdmquc
-         2jEQ1/HbDodyRWO3/nvHQAbqq5omy5IkQw3NM3GzFpb3bYVMAcAxmX+Rq3y6RXmraCTy
-         Vj7QWA/yGu+nPaAMhfdfTh12p5zZBashykwRKF+HfkHyoQXqs49JP0u6+3ahKEfSaMZh
-         FdVfuVyJ4laejNSl5mvbqI9y0YTYhcTDmWUZ+Qi/YSHgkX1INL7w9p7JNmoGDIrOoKvo
-         v966CXtM5JQljHEuowHgS+UFBywz/JQusRH3hidf7t4Df9iSij95ZlgOJ71X/rM3ysDL
-         lijg==
-X-Gm-Message-State: AOJu0YwyqfKmsQEtDv3g7VrdKWcpTSG0hFDRur9B1A6tCz8ji9WS/o1r
-	PQVwftTUySkMisQeQnqrnlJENWf+bOtWyCBTh4HrZubPLRgyFKEt3iBhDp2Lhg==
-X-Gm-Gg: ASbGnctkWNCPb3CRZSTivhtgmqCLY7wRozDR164lLDMzc2Yk2Rv58BDpJ7GcLQv4Apb
-	fFFlCKfTABP/UkEHMGoEY05kHsc6GgmhTrPZv8hNYYwjfUu3HP1eIzjARTlE+BNP2fFnXZg0HhD
-	YAUgItYaG3ZnVk+4LWs2SbbZM6zaJxDvSU4vJafUT5EwqubHfN98U+X5/+DjufJPZ71bIgkY8fd
-	/VPSiP1KtF3z6T65CDrewClUd7PCP+SVKhT3EC3GfajDlm0iNb+5Os00Jpzb/UYEh8fjNnndnOD
-	g5wrrktMR7bM25z6gPi3mA4KtOM3JkPO79q2CqfU7+8c
-X-Google-Smtp-Source: AGHT+IFjWQdzWValeKzE46rdldVNCBkXUWUdaAhvYnjoPtVt7aVK7Ix5j6E9PWYQMJbPonnFTz1uNA==
-X-Received: by 2002:a17:90b:5344:b0:2ee:5958:828 with SMTP id 98e67ed59e1d1-303a7d64072mr5468601a91.9.1743083826297;
-        Thu, 27 Mar 2025 06:57:06 -0700 (PDT)
+        bh=64yh+WmiMEv8Bz4J35cqLkuK/gFRr8aAu8X3M/MtTfA=;
+        b=m5DRPhFGexa1IkNNHtXrdsaKIVFQOXwK0fIh0umwCO87xmv+bwtBffV8OijiDN0r/S
+         ilQVH0E/hxRoKZ3AXrZyLAzB1H6y2ODDAS9BC2Wt7UlYN7x568hpr6+fi6MBAzMa/tM7
+         RZ7k90qP7UTDSFTJqbYhij9qei6E7rgpGlKSorlhzPk0MrZIMd6Syz33suQd9RFvVKID
+         vw9nURuFZcxM5WwFGSATpsOXr6NvSYJCdnBgqbP8xsTmXlE/LGx3qLq5v5ZX6g0XC/1E
+         UzwUfujwKKzCpBP13Olm8mE/EXd9pxpw29zJFMiaSUs0QaU1Ly+K2zv2ny3PYqpso9b4
+         s+8Q==
+X-Gm-Message-State: AOJu0Yz1KV1rgfQv7tauin96KhUI3scpX26Phl4fBooKkTgsQrnPO/oo
+	wznW8dfzfhE4udePCpOnhbS/I5RGjXxmBQ1q8EqW9YaISkpLgb22NmqrtfmTDQ==
+X-Gm-Gg: ASbGncv4BqbtMvNOBkqMUcyxwJLKj7+zNCrXnm1KrRp6e/r93XA9RLB0xIq7Xhg6Xnh
+	tFNDXcf53dyXSlZChO1JdOqzSaTadWuEwRpYK2STJErk2xIvL3Nz54XR0aAVScZNeEcqC4OkERT
+	AHtpIx/HmhZGDLgzjrS6j0OgGCX+5SFiDmOhZErWrsOjOjMIKcYovywRzYHS5SUyAbybKQUnJbL
+	AEZEabafs37rEhfUmtipa7bVihras+lT3E0ccjubc5A4zg0UjQnNYcO73KZqcWr55MPyD36ZOPs
+	Bj/O7Wi78A4HlLUKm6Hq626LIWPb8UtMwlNLrVydcoYx
+X-Google-Smtp-Source: AGHT+IG9WmumP6ZIjvTkJj4yAAC9p4DnlK4weyAEqrrkAYlkhQL5AvCgsqTkpiaDIV4kDPOyuGWWmA==
+X-Received: by 2002:a17:902:d551:b0:216:794f:6d7d with SMTP id d9443c01a7336-2280495aa5bmr64331865ad.48.1743083827666;
+        Thu, 27 Mar 2025 06:57:07 -0700 (PDT)
 Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-3039dfd48e2sm2229046a91.9.2025.03.27.06.57.05
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-7390618f080sm14774159b3a.176.2025.03.27.06.57.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Mar 2025 06:57:05 -0700 (PDT)
+        Thu, 27 Mar 2025 06:57:07 -0700 (PDT)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	Taehee Yoo <ap420073@gmail.com>
-Subject: [PATCH net v2 04/11] net: release instance lock during NETDEV_UNREGISTER for bond/team
-Date: Thu, 27 Mar 2025 06:56:52 -0700
-Message-ID: <20250327135659.2057487-5-sdf@fomichev.me>
+	Cosmin Ratiu <cratiu@nvidia.com>
+Subject: [PATCH net v2 05/11] net/mlx5e: use netdev_lockdep_set_classes
+Date: Thu, 27 Mar 2025 06:56:53 -0700
+Message-ID: <20250327135659.2057487-6-sdf@fomichev.me>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250327135659.2057487-1-sdf@fomichev.me>
 References: <20250327135659.2057487-1-sdf@fomichev.me>
@@ -78,52 +78,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Running NETDEV_UNREGISTER under instance lock might be problematic for
-teaming/bonding [0] because they take their own lock and the ordering
-is reverse in the notifiers path. Release the instance lock in the notifiers
-and let the existing code paths take the lock in the correct
-order.
+Cosmin reports a potential recursive lock warning in [0]. mlx5 is
+using register_netdevice_notifier_dev_net which might result in
+iteration over entire netns which triggers lock ordering issues.
+We know that lower devices are independent, so it's save to
+suppress the lockdep.
 
-0: https://lore.kernel.org/netdev/CAMArcTW+5Lk0EWCaHOsUhf+p31S8yAZyQvi3C8zeRF3TxnC9Fg@mail.gmail.com/
+0: https://lore.kernel.org/netdev/672305efd02d3d29520f49a1c18e2f4da6e90902.camel@nvidia.com/
 
-Reported-by: Taehee Yoo <ap420073@gmail.com>
+Reported-by: Cosmin Ratiu <cratiu@nvidia.com>
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- drivers/net/bonding/bond_main.c | 2 ++
- drivers/net/team/team_core.c    | 2 ++
- 2 files changed, 4 insertions(+)
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 950d8e4d86f8..82f887adb33b 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -4022,10 +4022,12 @@ static int bond_slave_netdev_event(unsigned long event,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index 3506024c2453..e3d8d6c9bf03 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -40,6 +40,7 @@
+ #include <linux/if_bridge.h>
+ #include <linux/filter.h>
+ #include <net/netdev_queues.h>
++#include <net/netdev_lock.h>
+ #include <net/page_pool/types.h>
+ #include <net/pkt_sched.h>
+ #include <net/xdp_sock_drv.h>
+@@ -5454,6 +5455,7 @@ static void mlx5e_build_nic_netdev(struct net_device *netdev)
+ 	netdev->netdev_ops = &mlx5e_netdev_ops;
+ 	netdev->xdp_metadata_ops = &mlx5e_xdp_metadata_ops;
+ 	netdev->xsk_tx_metadata_ops = &mlx5e_xsk_tx_metadata_ops;
++	netdev_lockdep_set_classes(netdev);
  
- 	switch (event) {
- 	case NETDEV_UNREGISTER:
-+		netdev_unlock_ops(slave_dev);
- 		if (bond_dev->type != ARPHRD_ETHER)
- 			bond_release_and_destroy(bond_dev, slave_dev);
- 		else
- 			__bond_release_one(bond_dev, slave_dev, false, true);
-+		netdev_lock_ops(slave_dev);
- 		break;
- 	case NETDEV_UP:
- 	case NETDEV_CHANGE:
-diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
-index d8fc0c79745d..4a1815f50015 100644
---- a/drivers/net/team/team_core.c
-+++ b/drivers/net/team/team_core.c
-@@ -2997,7 +2997,9 @@ static int team_device_event(struct notifier_block *unused,
- 					       !!netif_oper_up(port->dev));
- 		break;
- 	case NETDEV_UNREGISTER:
-+		netdev_unlock_ops(dev);
- 		team_del_slave(port->team->dev, dev);
-+		netdev_lock_ops(dev);
- 		break;
- 	case NETDEV_FEAT_CHANGE:
- 		if (!port->team->notifier_ctx) {
+ 	mlx5e_dcbnl_build_netdev(netdev);
+ 
 -- 
 2.48.1
 
