@@ -1,82 +1,61 @@
-Return-Path: <netdev+bounces-177925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2835A72EFE
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 12:25:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E29F8A72F15
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 12:26:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2F3C189C266
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 11:25:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74C3F174BE1
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 11:26:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8C1212B00;
-	Thu, 27 Mar 2025 11:24:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F24A212B34;
+	Thu, 27 Mar 2025 11:26:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YUMsxmSw"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="qLBhByWi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB1E019D88F;
-	Thu, 27 Mar 2025 11:24:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6200E211A3F;
+	Thu, 27 Mar 2025 11:26:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743074690; cv=none; b=nZa+1E4TjQWi9WFwwmEnHfTGxHZqL+hDzEkr0bI5jVmmqPeUz886wLLuOIr78EIUAGagAADRF3PO1jLNRreJtjSY5Og/Q9rkeGm04D3ASe9FfOgZMGFiqosc9/fZc1tGk7MKVetSKlst/pFJ9hu2jdtvKModvWJIaVY1kLlGMN4=
+	t=1743074797; cv=none; b=kMkrhipEgpQDWWe1NnSL3DrmH32jtEZTtyEUUNYWa/X+qEHTsJSW6hpj2WURYOFlk/fSs+/i7nNQLrnp5s/kkekBj4g/iCn/wmiYrbqZ0wNYzNqYDleQn10z4JkoYFIDUhYzh2/tbDNZIWDCzCW/L5Lamdk3XKMgvujq0iIS/2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743074690; c=relaxed/simple;
-	bh=9vHCXQb60UYSWMuIwkUwNBBk1SD10XtmRQu83JxRez0=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YRdKpFgXT9MzuJUH1Qva3GL/ud0HIjMGkccG5+dQ+spj6aWksI+0DPjYhEPIKO8n4z0M1Q3V0vensWFuE5s3cP6s/XF9FRNKeQcA2DrAXjxICYA48ehl6QGNzGAfCb1P48rqftaDyaLqJRL+WDgJJ+Uh2k284nPLx97XXuBHWHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YUMsxmSw; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3912fdddf8fso1278621f8f.1;
-        Thu, 27 Mar 2025 04:24:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743074687; x=1743679487; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=r9uAUUnPvZxGPnm1O0BCAGuy1dtOvt8b3tdG1/p4Uso=;
-        b=YUMsxmSwsXM2BrzDlXtsujaVs8/Ky4VjKAwSwjmXtgYHZBBbVbbmgK9+X9aV74Y1X/
-         AlIeLyePBDSuRieVVqQFJJlXtcejhvctdVH4bE4HC7ysMZv4zqABNBkhaeFPVXmIrg1+
-         RAnCXHkHYYzPsgmdE62mVBoQs+cW+ZMaQ9pA6l28LfVa8+5R+Y9RmyqJqfdYsQdmb7tv
-         uOhTKHiPGYG3H5LNPWgI4ZaVSxLOiblGvdMupZCwQgF37ZSdEmdR6JPXdyCXAC5af6zN
-         ePg5Rn4xtlXovyWGaLa7QYt7WlJ3URv5QPvOYIwZ6kn7p0rdQkpGW516nXZufZo8/2Q+
-         VEMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743074687; x=1743679487;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r9uAUUnPvZxGPnm1O0BCAGuy1dtOvt8b3tdG1/p4Uso=;
-        b=fipF+RgSBSX2Kl8nvfFIjC7kNBq/7fjbFjyP3cMNHjQRa2soY9AjeJU9RFgj65/Xzd
-         J1/Ey9zc7CzqmDu85TasfecFT1wHHjq5Ia6knipWKy1tVPpGF9fu6xaHB+HzisYrx0/U
-         46XGdMc4ugImVBBpJHXieFi7cDtZBJ/KhNvoLDqfeAI096dLKyCt9Su/cD/yIfrjqWO/
-         2lX1g9st8+KWGhLFdTrktD6UWLDK8H2murWWLmpRnP8UA9QuwtHNVmaWfPq6Jm3u0Rs0
-         pmFKXH7o9BdrDG31D9w2rKr3qRpdUD5LLAt0vwtYlhSBjsYOtMpHDW/8MVVMpn20H8Wx
-         WlfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUNEbT3uNjpFUAiVHyaOyeVXMCelAmKLd7CguOCuAaxGPveoJz0wQb65qjYO4z2woOTG8Gu3Hy7VO3AQKoa@vger.kernel.org, AJvYcCUyIJoa7Vkjwdv4GRbuzfx47/1VZAiiQNBN+Dq3yhARHu/7JrDBypdxA7sRkgsWie5f9v2jC2pxoHWr@vger.kernel.org, AJvYcCV0k5V51gYYsRZ9lljltpHiR7xHwXptANVniGPf3ja/AZp/PevNp6k2dCAcQTgbL+LfOox8m8FS@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxfWDBL3dkBHJ1CdjJOFtxGBtQLA5yM5LG61gQoN0YtLKQG6L2
-	+9nIWpvfdIj1LEoFbf3Is+SqbTufFkq9vBFMpr9XEQWoih9wEliq
-X-Gm-Gg: ASbGncu7XLID4Usay+oEoJoYR3iQ2AVSE/O2JN5R4N5oAFOSPh7SuvU0udlO0I9iCHM
-	+HIoLM74SJ8W1KWZbg5h70pDSEkECDsjL/VClT0Y6Ry54+I7U/0agC4nq5sq5WnwLHXyr94eWfD
-	c1/BfHWMgLGvgDoDbeZYUja4xzUGzMWyNhdr5sh0AnvBg4wx+jgxHNQm77Vled4HvQyJJuMUpKz
-	o5+MUkFi+Sy0QhIzCx4IU6bvTQp3Q098OaRIvZMDwncEnFj9S+6H9xaaahYgMQR/iTVZd/eTtZP
-	lW3xF5kLe4ugzzqeWuoFdRJbSjE7m4fmTYroiKv+/TNw1MtArD3/V0xdua//Qpv6yw7cVVWqozQ
-	N
-X-Google-Smtp-Source: AGHT+IFLCphW5U7zd6c6SZfMhpK/aclXKGbAvS2gd0lfAQCxn3O3FLYOmoElgv4cGprAKQTjQsCX6w==
-X-Received: by 2002:a5d:64eb:0:b0:390:e9ee:f27a with SMTP id ffacd0b85a97d-39ad15234edmr3000901f8f.28.1743074686734;
-        Thu, 27 Mar 2025 04:24:46 -0700 (PDT)
-Received: from Ansuel-XPS. (93-34-88-225.ip49.fastwebnet.it. [93.34.88.225])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39ac8745d9csm7858640f8f.95.2025.03.27.04.24.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Mar 2025 04:24:46 -0700 (PDT)
-Message-ID: <67e5357e.df0a0220.14c972.64ad@mx.google.com>
-X-Google-Original-Message-ID: <Z-UuvuUlCmPvvpKf@Ansuel-XPS.>
-Date: Thu, 27 Mar 2025 12:24:44 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1743074797; c=relaxed/simple;
+	bh=MJfswdiszz/jsfopd5O6MRPtbPlWT5LbW0ckpCP1U8U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VKjorTYnQmsMmWIpC28KUC8MyTMnL4XAx0GEQm3xl2ZO6xdfHtUWJx+54rsPUrztqF0xIJuugN/fvgR2G2xPEzP3dsZbIDv8+dll4SWHgY61qTyAAWyVvhV6Sfp4K+jbWOVJ0h+htvQ0lB829wnkpIcKZi1jto1ZnuXNYDhOlro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=qLBhByWi; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=6NtYN4mXRZiQeFSzRJfC4lHgxGcXmDM920RCDFEB12s=; b=qLBhByWi2m4ErsKnTpR5MzuTFD
+	IglG4piMJNUpQR2HOEjLhjMxDaxyajTeDq5HTnC7Bormvev49EFte2dw/GStuBZF19CbrZjD6WRyl
+	dO7jpfeNQYGGaR+yz4FiT5MVa0cfZWt+ADhu1U1duC3KcEBrLppMa9uZV4EW2M6tm3usdkmpHW4gM
+	yV0O+VpvxpEKj1O5WrZ6KYwLji5JcvrowZ6TM8t1XQtyyo5dF+EgYWY1mUV980qQmxmui1y8Xg7ER
+	T3F7wjmav9ziN7toqmNMuXfxVb18RbjUJIjuk4Tl5kPf5qTEz5uqrHQiCrU4aQlIWneyKPYOxXKzm
+	VW3KSDBQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47800)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1txlNR-0007Ay-0B;
+	Thu, 27 Mar 2025 11:26:25 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1txlNP-0005az-2Q;
+	Thu, 27 Mar 2025 11:26:23 +0000
+Date: Thu, 27 Mar 2025 11:26:23 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Christian Marangi <ansuelsmth@gmail.com>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -85,7 +64,6 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
 	Florian Fainelli <florian.fainelli@broadcom.com>,
 	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
 	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
@@ -94,9 +72,10 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [net-next RFC PATCH v3 3/4] net: phy: Add support for Aeonsemi
  AS21xxx PHYs
+Message-ID: <Z+U1368bId9jTUKr@shell.armlinux.org.uk>
 References: <20250326233512.17153-1-ansuelsmth@gmail.com>
  <20250326233512.17153-4-ansuelsmth@gmail.com>
- <20250327092418.78f55466@fedora-2.home>
+ <Z-U1anj6IbSdPGoD@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,127 +84,184 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250327092418.78f55466@fedora-2.home>
+In-Reply-To: <Z-U1anj6IbSdPGoD@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Mar 27, 2025 at 09:24:18AM +0100, Maxime Chevallier wrote:
-> Hi Christian,
+On Thu, Mar 27, 2025 at 11:24:26AM +0000, Russell King (Oracle) wrote:
+> If I'm reading these driver entries correctly, the only reason for
+> having separate entries is to be able to have a unique name printed
+> for each - the methods themselves are all identical.
 > 
-> On Thu, 27 Mar 2025 00:35:03 +0100
-> Christian Marangi <ansuelsmth@gmail.com> wrote:
-> 
-> > Add support for Aeonsemi AS21xxx 10G C45 PHYs. These PHYs integrate
-> > an IPC to setup some configuration and require special handling to
-> > sync with the parity bit. The parity bit is a way the IPC use to
-> > follow correct order of command sent.
-> > 
-> > Supported PHYs AS21011JB1, AS21011PB1, AS21010JB1, AS21010PB1,
-> > AS21511JB1, AS21511PB1, AS21510JB1, AS21510PB1, AS21210JB1,
-> > AS21210PB1 that all register with the PHY ID 0x7500 0x7510
-> > before the firmware is loaded.
-> > 
-> > They all support up to 5 LEDs with various HW mode supported.
-> > 
-> > While implementing it was found some strange coincidence with using the
-> > same logic for implementing C22 in MMD regs in Broadcom PHYs.
-> > 
-> > For reference here the AS21xxx PHY name logic:
-> > 
-> > AS21x1xxB1
-> >     ^ ^^
-> >     | |J: Supports SyncE/PTP
-> >     | |P: No SyncE/PTP support
-> >     | 1: Supports 2nd Serdes
-> >     | 2: Not 2nd Serdes support
-> >     0: 10G, 5G, 2.5G
-> >     5: 5G, 2.5G
-> >     2: 2.5G
-> > 
-> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> 	
->  [...]
-> 
-> I know this is only RFC, but I have some questions
-> 
-> > +static int as21xxx_match_phy_device(struct phy_device *phydev,
-> > +				    const struct phy_driver *phydrv)
-> > +{
-> > +	struct as21xxx_priv *priv;
-> > +	u32 phy_id;
-> > +	int ret;
-> > +
-> > +	/* Skip PHY that are not AS21xxx or already have firmware loaded */
-> > +	if (phydev->c45_ids.device_ids[MDIO_MMD_PCS] != PHY_ID_AS21XXX)
-> > +		return phydev->phy_id == phydrv->phy_id;
-> > +
-> > +	/* Read PHY ID to handle firmware just loaded */
-> > +	ret = phy_read_mmd(phydev, MDIO_MMD_PCS, MII_PHYSID1);
-> > +	if (ret < 0)
-> > +		return ret;
-> > +	phy_id = ret << 16;
-> > +
-> > +	ret = phy_read_mmd(phydev, MDIO_MMD_PCS, MII_PHYSID2);
-> > +	if (ret < 0)
-> > +		return ret;	
-> > +	phy_id |= ret;
-> > +
-> > +	/* With PHY ID not the generic AS21xxx one assume
-> > +	 * the firmware just loaded
-> > +	 */
-> > +	if (phy_id != PHY_ID_AS21XXX)
-> > +		return phy_id == phydrv->phy_id;
-> > +
-> > +	/* Allocate temp priv and load the firmware */
-> > +	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
-> > +	if (!priv)
-> > +		return -ENOMEM;
-> > +
-> > +	mutex_init(&priv->ipc_lock);
-> > +
-> > +	ret = aeon_firmware_load(phydev);
-> > +	if (ret)
-> > +		return ret;
-> 
-> Here, and below, you leak priv by returning early.
->
+> My feeling is that is not a sufficient reason to duplicate the driver
+> entries, which adds bloat (not only in terms of static data, but also
+> the data structures necessary to support each entry in sysfs.) However,
+> lets see what Andrew says.
 
-Yes copy paste error with migrating from devm to non-devmem.
+I did have this patch from a previous discussion which adds support for
+a single phy_driver struct to have multiple matching IDs. I haven't
+rebased it on current net-next, so may no longer apply:
 
-> > +
-> > +	ret = aeon_ipc_sync_parity(phydev, priv);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	/* Enable PTP clk if not already Enabled */
-> > +	ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND1, VEND1_PTP_CLK,
-> > +			       VEND1_PTP_CLK_EN);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = aeon_dpc_ra_enable(phydev, priv);
-> > +	if (ret)
-> > +		return ret;
-> 
-> Does all of the above with sync_parity, PTP clock cfg and so on needs
-> to be done in this first pass of the matching process for this PHY ?
-> 
-> From what I got from the discussions, the only important bit is to load
-> the FW to get the correct PHY id ?
-> 
+ drivers/net/phy/phy_device.c | 64 +++++++++++++++++++++++++++++++++-----------
+ include/linux/phy.h          | 16 ++++++++++-
+ 2 files changed, 63 insertions(+), 17 deletions(-)
 
-I will do further check on this. Waiting for the sync parity have the
-side effect of waiting for the firmware to finish loading.
-
-> > +	mutex_destroy(&priv->ipc_lock);
-> > +	kfree(priv);
-> > +
-> > +	/* Return not maching anyway as PHY ID will change after
-> > +	 * firmware is loaded.
-> > +	 */
-> > +	return 0;
-> > +}
-> 
-> Maxime
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 2e7d5bfb338e..7e02bf51a2a5 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -522,12 +522,51 @@ static int phy_scan_fixups(struct phy_device *phydev)
+ 	return 0;
+ }
+ 
++static const struct mdio_device_id *
++phy_driver_match_id(struct phy_driver *phydrv, u32 id)
++{
++	const struct mdio_device_id *ids = phydrv->ids;
++
++	if (ids) {
++		while (ids->phy_id) {
++			if (phy_id_compare(id, ids->phy_id, ids->phy_id_mask))
++				return ids;
++			ids++;
++		}
++	}
++
++	if (phy_id_compare(id, phydrv->id.phy_id, phydrv->id.phy_id_mask))
++		return &phydrv->id;
++
++	return NULL;
++}
++
++static const struct mdio_device_id *
++phy_driver_match(struct phy_driver *phydrv, struct phy_device *phydev)
++{
++	const int num_ids = ARRAY_SIZE(phydev->c45_ids.device_ids);
++	const struct mdio_device_id *id;
++	int i;
++
++	if (!phydev->is_c45)
++		return phy_driver_match_id(phydrv, phydev->phy_id);
++
++	for (i = 1; i < num_ids; i++) {
++		if (phydev->c45_ids.device_ids[i] == 0xffffffff)
++			continue;
++
++		id = phy_driver_match_id(phydrv, phydev->c45_ids.device_ids[i]);
++		if (id)
++			return id;
++	}
++
++	return NULL;
++}
++
+ static int phy_bus_match(struct device *dev, struct device_driver *drv)
+ {
+ 	struct phy_device *phydev = to_phy_device(dev);
+ 	struct phy_driver *phydrv = to_phy_driver(drv);
+-	const int num_ids = ARRAY_SIZE(phydev->c45_ids.device_ids);
+-	int i;
+ 
+ 	if (!(phydrv->mdiodrv.flags & MDIO_DEVICE_IS_PHY))
+ 		return 0;
+@@ -535,20 +574,7 @@ static int phy_bus_match(struct device *dev, struct device_driver *drv)
+ 	if (phydrv->match_phy_device)
+ 		return phydrv->match_phy_device(phydev);
+ 
+-	if (phydev->is_c45) {
+-		for (i = 1; i < num_ids; i++) {
+-			if (phydev->c45_ids.device_ids[i] == 0xffffffff)
+-				continue;
+-
+-			if (phy_id_compare(phydev->c45_ids.device_ids[i],
+-					   phydrv->phy_id, phydrv->phy_id_mask))
+-				return 1;
+-		}
+-		return 0;
+-	} else {
+-		return phy_id_compare(phydev->phy_id, phydrv->phy_id,
+-				      phydrv->phy_id_mask);
+-	}
++	return !!phy_driver_match(phydrv, phydev);
+ }
+ 
+ static ssize_t
+@@ -3311,6 +3337,7 @@ static int phy_probe(struct device *dev)
+ 	int err = 0;
+ 
+ 	phydev->drv = phydrv;
++	phydev->drv_id = phy_driver_match(phydrv, phydev);
+ 
+ 	/* Disable the interrupt if the PHY doesn't support it
+ 	 * but the interrupt is still a valid one
+@@ -3485,6 +3512,11 @@ int phy_driver_register(struct phy_driver *new_driver, struct module *owner)
+ 	new_driver->mdiodrv.driver.owner = owner;
+ 	new_driver->mdiodrv.driver.probe_type = PROBE_FORCE_SYNCHRONOUS;
+ 
++	if (!new_driver->id.phy_id) {
++		new_driver->id.phy_id = new_driver->phy_id;
++		new_driver->id.phy_id_mask = new_driver->phy_id_mask;
++	}
++
+ 	retval = driver_register(&new_driver->mdiodrv.driver);
+ 	if (retval) {
+ 		pr_err("%s: Error %d in registering driver\n",
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index fd8dbea9b4d9..2f2ebbd41535 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -542,6 +542,7 @@ struct macsec_ops;
+  *
+  * @mdio: MDIO bus this PHY is on
+  * @drv: Pointer to the driver for this PHY instance
++ * @drv_id: The matched driver ID for this PHY instance
+  * @devlink: Create a link between phy dev and mac dev, if the external phy
+  *           used by current mac interface is managed by another mac interface.
+  * @phy_id: UID for this device found during discovery
+@@ -639,6 +640,7 @@ struct phy_device {
+ 	/* Information about the PHY type */
+ 	/* And management functions */
+ 	const struct phy_driver *drv;
++	const struct mdio_device_id *drv_id;
+ 
+ 	struct device_link *devlink;
+ 
+@@ -882,6 +884,9 @@ struct phy_led {
+  * struct phy_driver - Driver structure for a particular PHY type
+  *
+  * @mdiodrv: Data common to all MDIO devices
++ * @ids: array of mdio device IDs to match this driver (terminated with
++ *   zero phy_id)
++ * @id: mdio device ID to match
+  * @phy_id: The result of reading the UID registers of this PHY
+  *   type, and ANDing them with the phy_id_mask.  This driver
+  *   only works for PHYs with IDs which match this field
+@@ -903,6 +908,8 @@ struct phy_led {
+  */
+ struct phy_driver {
+ 	struct mdio_driver_common mdiodrv;
++	const struct mdio_device_id *ids;
++	struct mdio_device_id id;
+ 	u32 phy_id;
+ 	char *name;
+ 	u32 phy_id_mask;
+@@ -1203,7 +1210,14 @@ static inline bool phy_id_compare(u32 id1, u32 id2, u32 mask)
+  */
+ static inline bool phydev_id_compare(struct phy_device *phydev, u32 id)
+ {
+-	return phy_id_compare(id, phydev->phy_id, phydev->drv->phy_id_mask);
++	u32 mask;
++
++	if (phydev->drv_id)
++		mask = phydev->drv_id->phy_id_mask;
++	else
++		mask = phydev->drv->phy_id_mask;
++
++	return phy_id_compare(id, phydev->phy_id, mask);
+ }
+ 
+ /* A Structure for boards to register fixups with the PHY Lib */
 
 -- 
-	Ansuel
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
