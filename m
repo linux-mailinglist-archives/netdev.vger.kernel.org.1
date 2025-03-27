@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-177963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 508EFA733B4
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 14:58:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7942CA733BC
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 14:59:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA0AC17C1EB
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 13:57:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CA0A3BCF03
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 13:57:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1872E216396;
-	Thu, 27 Mar 2025 13:57:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DF2B217F56;
+	Thu, 27 Mar 2025 13:57:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97AF8217F56
-	for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 13:57:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC56421422C
+	for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 13:57:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743083836; cv=none; b=fLrzBdt1xGmEW6FU7FHMCirfzMK6z8ssMokszwpOFkGU2OfGSoOtFCrd1/cYFJmN5OgorZSI40WIklnQJuPw4p58/PVtuVlxsf0twrV6EjktVzC5gseCm6RWhwnZeDDvgnWPf+7wDYXC+PMtZAlv1EGI6HLJKTXz7osey82lBMs=
+	t=1743083837; cv=none; b=MC6iRHv5ck9zHey2PcR885x8XNHOdiW9Mae+giIS5iuBl7uSHolt2iCv8FmiTEa5RXPvAJIOvW4aoY40QQk0lh0AO83sP4Xs0nnBgsQZUa638GrmOaH6oPbGxOCC9kC7rRzVWAC02HGc6rEMhq4/UA8V81GpsamjGm8Ua7INo0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743083836; c=relaxed/simple;
-	bh=rycKGXFoqAeC5tPx/73rvy9De8EwBoLt/+IT2SfEVXY=;
+	s=arc-20240116; t=1743083837; c=relaxed/simple;
+	bh=of2BHr0ODb2uStHV41mgqAmOSbSLGSoE+Pr7pCR6LSQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZLEUwB/b6RUTAamDKQ/xD4cSlHcjPCSLESHOlygHc+g1NBUkOKL6m9MLwoizlCkL+L3G9103InWlvKKbP5O0sa8IflgVGDyLafiic3ekWDhcbdYnLsBEk4QwvnKPwcZiWk69yHyKKXHmYxG8Aa1qJ2aFe0afxFLIsD5AqvNkTdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.44
+	 MIME-Version; b=ApQCqpNHN1wS6s6zSiag1/FM6VEFuiexP/+hoB2Y04wRIYi+iFjGXBrHgKKRDJBwfDPlS3brNSop7mDWydFMZRz8XYEYNLcFT8Ol7wL3Ezw2bOdQ5wSQjZ4DvSvW0zBxiuMaAFdg0GzXumn6xdtOU2ar4Mj0yLSvkD9IPB/kATM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2ff615a114bso3276423a91.0
-        for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 06:57:14 -0700 (PDT)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-224191d92e4so19777575ad.3
+        for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 06:57:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743083833; x=1743688633;
+        d=1e100.net; s=20230601; t=1743083835; x=1743688635;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=aE5CppWR6I6v1fz3Mt2HH1HdiF5SrnQoNwkZhPjynWg=;
-        b=YAn3Lwrh6A1Ut22innZeyYuegERvBBtBTA4jYKPsjvz2TViKgLSeMGkgKBfEp0ddua
-         TiNlRC7ruN+nS49dWwjqE8zP7U3pC9FAJxAkn3oPwT0fEF2LobQAhroU7nbq3EQtfh1C
-         A/a4SdPqv7ar24CeEVBP/SPxYdeOM2TdPFH4yv0N8z2ljdmSppbguZJ14yWKp+vCO/MF
-         WiabjPlZJBLUcE2gVLcOx7aCXrN0Gb2cT6VU7GE+QYJIXhrhwyM5Obp7Lwl0lvCcvwZ9
-         9tCrm/8TOlIEAQ9YSX1k5BqX0elNDuMM4Xy58vFz88osl4fojB4YVpRHXiP+0hr+6Bi4
-         LyaA==
-X-Gm-Message-State: AOJu0Yx4V1V9t85+rnQeXDFjL1PV0Ax4p192l8/AH8DP9l8lrYyN5hlK
-	aWLK/5ObfBwP7f/Tt8D/kLK1QrbvbDHAW6l9dYU6J3mGkvA9qJgz190yAae6HQ==
-X-Gm-Gg: ASbGncukWFf+wqgy8cmajoIRXkPEWAdj1+4Ucr66cpdZXAVCTsc5fCTuEw0TBNgKk/z
-	oUHkDMDOaTETnKVXdVCt0b7nTVlO44Hmoq0lUskavCmuOWehitI3+c6WtZRq+lCOJymitwaWpDk
-	XIx83s9bR82oQ3N7h+EAHRBGdqX6zFzmS+sjFtCHacgNe10SdlISL2AImPF6Q4Vjr21bTSd0hUu
-	pSTTp/fg8CcqN89xSSNxWoPsSu6gbGZk5pzz0TucewJ4R2MMJxXMZN9THfxElE87qnEbInGt0Hu
-	vkxk5NPAHT3XY3Dkb+YITRakkpGBeRGPEEAaES0Wo9dQ
-X-Google-Smtp-Source: AGHT+IFptf22dZ+GwYUqkOeig0NbyZF2M1/LTtyae6cL703lhQmHjSqNbQZEofmIi5vZCinZlcKGjQ==
-X-Received: by 2002:a17:90b:3bc4:b0:2fa:603e:905c with SMTP id 98e67ed59e1d1-3050bcdab54mr376346a91.2.1743083833174;
-        Thu, 27 Mar 2025 06:57:13 -0700 (PDT)
+        bh=41eutsHNNUgp/YLlU9qv9rjhqH3AWJ6Bj/6el16QKro=;
+        b=h+s3Ib36M0uxhAoQQ1Jswy7zT1rvaBzn48NVyCOifK0we1URlGYt1whZDM+d2Z4gAc
+         Yp0x1sK/0lfD+RiKupJ1fcfc93FWoE3WfVB4/2/4xsCoYs/OfnT6NXXYKVtcW59nx+Rc
+         TtLP4JOT9lTlZO/2HmWeXPDmBpZHRwwAnhSrLj9vuiuTa4vZB3oeXu/+55tJYPJ8kKU0
+         fI39/fysLCrgLinvT62efYao4LwMGQHrGdweXri579L/klKP8lr/bBgMHHE1mFEcJljB
+         GyXZt4Z4ww6xvm/vx+jwQBMT1XYBmQomUcNJ3Oas8upejivne76HzIKOJINbf4zeVRSt
+         lt6Q==
+X-Gm-Message-State: AOJu0Yz8zFaAPUfWqGthaSiqwWRC3rTLCnxtnlFljq7R+AJYR/motVXa
+	SCRMHLxl8z+3CR+zugpKbSK3eFqLFGUqI7tqlxfY351vqY2UeRSEif6s9cfQZQ==
+X-Gm-Gg: ASbGncvfw7TVEEUjGZd5MDAZd7w6GV8ncPkDKqiYsCRb9vMLOgNoB9dqU9RB/C/Fvpb
+	JTshh/eVD6f9zut6mzG/4SwPWLFCqwzTBRct9+51mll9o6trjS31rR57Z3mIk+UxR+eoFBl4uDD
+	xvgE5UsFLXRAHylSDEIXmUzra4JcgY0wgvPQFQbFEFVWjpUikboWfq+C4G7RXsd0C/f79DzsgUh
+	ZfJkwX1cic5RLeIvjTy/uIpsnJQKvOo5iGR/HVHCd+BQZcObXMW3159YYBTb+aOlfxu16LCeloX
+	CVIsxCrlNoI4KsGRWJeItZhmvFWGe2njSxYMkjqBEWtC
+X-Google-Smtp-Source: AGHT+IHESlvLw+d/BF9Ru55e4YB+Dzgp51+JEFes9+XLZ340jqxTIQaoNlewillDkf+fea7VnSsqmg==
+X-Received: by 2002:a17:902:f644:b0:216:6901:d588 with SMTP id d9443c01a7336-228048ac56amr51471015ad.15.1743083834669;
+        Thu, 27 Mar 2025 06:57:14 -0700 (PDT)
 Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-3039e60bfd6sm2197782a91.41.2025.03.27.06.57.12
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-227811e3132sm129034435ad.200.2025.03.27.06.57.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Mar 2025 06:57:12 -0700 (PDT)
+        Thu, 27 Mar 2025 06:57:14 -0700 (PDT)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com
-Subject: [PATCH net v2 09/11] net: designate XSK pool pointers in queues as "ops protected"
-Date: Thu, 27 Mar 2025 06:56:57 -0700
-Message-ID: <20250327135659.2057487-10-sdf@fomichev.me>
+Subject: [PATCH net v2 10/11] netdev: add "ops compat locking" helpers
+Date: Thu, 27 Mar 2025 06:56:58 -0700
+Message-ID: <20250327135659.2057487-11-sdf@fomichev.me>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250327135659.2057487-1-sdf@fomichev.me>
 References: <20250327135659.2057487-1-sdf@fomichev.me>
@@ -79,75 +79,159 @@ Content-Transfer-Encoding: 8bit
 
 From: Jakub Kicinski <kuba@kernel.org>
 
-Read accesses go via xsk_get_pool_from_qid(), the call coming
-from the core and gve look safe (other "ops locked" drivers
-don't support XSK).
+Add helpers to "lock a netdev in a backward-compatible way",
+which for ops-locked netdevs will mean take the instance lock.
+For drivers which haven't opted into the ops locking we'll take
+rtnl_lock.
 
-Write accesses go via xsk_reg_pool_at_qid() and xsk_clear_pool_at_qid().
-Former is already under the ops lock, latter needs to be locked when
-coming from the workqueue via xp_clear_dev().
+The scoped foreach is dropping and re-taking the lock for each
+device, even if prev and next are both under rtnl_lock.
+I hope that's fine since we expect that netdev nl to be mostly
+supported by modern drivers, and modern drivers should also
+opt into the instance locking.
+
+Note that these helpers are mostly needed for queue related state,
+because drivers modify queue config in their ops in a non-atomic
+way. Or differently put, queue changes don't have a clear-cut API
+like NAPI configuration. Any state that can should just use the
+instance lock directly, not the "compat" hacks.
 
 Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- include/linux/netdevice.h     | 1 +
- include/net/netdev_rx_queue.h | 6 +++---
- net/xdp/xsk_buff_pool.c       | 7 ++++++-
- 3 files changed, 10 insertions(+), 4 deletions(-)
+ include/net/netdev_lock.h | 16 +++++++++++++
+ net/core/dev.c            | 49 +++++++++++++++++++++++++++++++++++++++
+ net/core/dev.h            | 15 ++++++++++++
+ 3 files changed, 80 insertions(+)
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index b2b4e31806d5..b3d1c1922ec0 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -688,6 +688,7 @@ struct netdev_queue {
- 	/* Subordinate device that the queue has been assigned to */
- 	struct net_device	*sb_dev;
- #ifdef CONFIG_XDP_SOCKETS
-+	/* "ops protected", see comment about net_device::lock */
- 	struct xsk_buff_pool    *pool;
- #endif
+diff --git a/include/net/netdev_lock.h b/include/net/netdev_lock.h
+index 1c0c9a94cc22..76cbf5a449b6 100644
+--- a/include/net/netdev_lock.h
++++ b/include/net/netdev_lock.h
+@@ -64,6 +64,22 @@ netdev_ops_assert_locked_or_invisible(const struct net_device *dev)
+ 		netdev_ops_assert_locked(dev);
+ }
  
-diff --git a/include/net/netdev_rx_queue.h b/include/net/netdev_rx_queue.h
-index b2238b551dce..8cdcd138b33f 100644
---- a/include/net/netdev_rx_queue.h
-+++ b/include/net/netdev_rx_queue.h
-@@ -20,12 +20,12 @@ struct netdev_rx_queue {
- 	struct net_device		*dev;
- 	netdevice_tracker		dev_tracker;
- 
-+	/* All fields below are "ops protected",
-+	 * see comment about net_device::lock
-+	 */
- #ifdef CONFIG_XDP_SOCKETS
- 	struct xsk_buff_pool            *pool;
- #endif
--	/* NAPI instance for the queue
--	 * "ops protected", see comment about net_device::lock
--	 */
- 	struct napi_struct		*napi;
- 	struct pp_memory_provider_params mp_params;
- } ____cacheline_aligned_in_smp;
-diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
-index 25a76c5ce0f1..c7e50fd86c6a 100644
---- a/net/xdp/xsk_buff_pool.c
-+++ b/net/xdp/xsk_buff_pool.c
-@@ -279,9 +279,14 @@ static void xp_release_deferred(struct work_struct *work)
++static inline void netdev_lock_ops_compat(struct net_device *dev)
++{
++	if (netdev_need_ops_lock(dev))
++		netdev_lock(dev);
++	else
++		rtnl_lock();
++}
++
++static inline void netdev_unlock_ops_compat(struct net_device *dev)
++{
++	if (netdev_need_ops_lock(dev))
++		netdev_unlock(dev);
++	else
++		rtnl_unlock();
++}
++
+ static inline int netdev_lock_cmp_fn(const struct lockdep_map *a,
+ 				     const struct lockdep_map *b)
  {
- 	struct xsk_buff_pool *pool = container_of(work, struct xsk_buff_pool,
- 						  work);
-+	struct net_device *netdev = pool->netdev;
+diff --git a/net/core/dev.c b/net/core/dev.c
+index bb4a135b1569..20ae7cb79163 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -1051,6 +1051,18 @@ struct net_device *__netdev_put_lock(struct net_device *dev)
+ 	return dev;
+ }
  
- 	rtnl_lock();
--	xp_clear_dev(pool);
-+	if (netdev) {
-+		netdev_lock_ops(netdev);
-+		xp_clear_dev(pool);
-+		netdev_unlock_ops(netdev);
++static struct net_device *__netdev_put_lock_ops_compat(struct net_device *dev)
++{
++	netdev_lock_ops_compat(dev);
++	if (dev->reg_state > NETREG_REGISTERED) {
++		netdev_unlock_ops_compat(dev);
++		dev_put(dev);
++		return NULL;
 +	}
- 	rtnl_unlock();
++	dev_put(dev);
++	return dev;
++}
++
+ /**
+  *	netdev_get_by_index_lock() - find a device by its ifindex
+  *	@net: the applicable net namespace
+@@ -1074,6 +1086,18 @@ struct net_device *netdev_get_by_index_lock(struct net *net, int ifindex)
+ }
+ EXPORT_SYMBOL(netdev_get_by_index_lock);
  
- 	if (pool->fq) {
++struct net_device *
++netdev_get_by_index_lock_ops_compat(struct net *net, int ifindex)
++{
++	struct net_device *dev;
++
++	dev = dev_get_by_index(net, ifindex);
++	if (!dev)
++		return NULL;
++
++	return __netdev_put_lock_ops_compat(dev);
++}
++
+ struct net_device *
+ netdev_xa_find_lock(struct net *net, struct net_device *dev,
+ 		    unsigned long *index)
+@@ -1099,6 +1123,31 @@ netdev_xa_find_lock(struct net *net, struct net_device *dev,
+ 	} while (true);
+ }
+ 
++struct net_device *
++netdev_xa_find_lock_ops_compat(struct net *net, struct net_device *dev,
++			       unsigned long *index)
++{
++	if (dev)
++		netdev_unlock_ops_compat(dev);
++
++	do {
++		rcu_read_lock();
++		dev = xa_find(&net->dev_by_index, index, ULONG_MAX, XA_PRESENT);
++		if (!dev) {
++			rcu_read_unlock();
++			return NULL;
++		}
++		dev_hold(dev);
++		rcu_read_unlock();
++
++		dev = __netdev_put_lock_ops_compat(dev);
++		if (dev)
++			return dev;
++
++		(*index)++;
++	} while (true);
++}
++
+ static DEFINE_SEQLOCK(netdev_rename_lock);
+ 
+ void netdev_copy_name(struct net_device *dev, char *name)
+diff --git a/net/core/dev.h b/net/core/dev.h
+index 8d35860f2e89..e7446b25bcde 100644
+--- a/net/core/dev.h
++++ b/net/core/dev.h
+@@ -40,6 +40,21 @@ DEFINE_FREE(netdev_unlock, struct net_device *, if (_T) netdev_unlock(_T));
+ 	     (var_name = netdev_xa_find_lock(net, var_name, &ifindex)); \
+ 	     ifindex++)
+ 
++struct net_device *
++netdev_get_by_index_lock_ops_compat(struct net *net, int ifindex);
++struct net_device *
++netdev_xa_find_lock_ops_compat(struct net *net, struct net_device *dev,
++			       unsigned long *index);
++
++DEFINE_FREE(netdev_unlock_ops_compat, struct net_device *,
++	    if (_T) netdev_unlock_ops_compat(_T));
++
++#define for_each_netdev_lock_ops_compat_scoped(net, var_name, ifindex)	\
++	for (struct net_device *var_name __free(netdev_unlock_ops_compat) = NULL; \
++	     (var_name = netdev_xa_find_lock_ops_compat(net, var_name,	\
++							&ifindex));	\
++	     ifindex++)
++
+ #ifdef CONFIG_PROC_FS
+ int __init dev_proc_init(void);
+ #else
 -- 
 2.48.1
 
