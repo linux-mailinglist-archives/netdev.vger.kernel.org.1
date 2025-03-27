@@ -1,132 +1,134 @@
-Return-Path: <netdev+bounces-177931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E90B5A73255
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 13:35:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D82CFA7326C
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 13:45:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B62C83A3BC4
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 12:35:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0D4EB7A7465
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 12:43:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4695E20B209;
-	Thu, 27 Mar 2025 12:35:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E432C2147E4;
+	Thu, 27 Mar 2025 12:44:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="m+/t5mH1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q5o3Trzf"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC40838FA6;
-	Thu, 27 Mar 2025 12:35:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3247620E6FF
+	for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 12:44:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743078939; cv=none; b=WFznovcKjE1HYStGnMQ9FCSVkkZ26thN2UfEhC2lUpfzrzn0vsNXi2bbUEZi/xavczZH34BOcAXb4XU+5yfk96aKJO47Xkt1A3JPXj+pNhRpI3P4L3McdSrqnvZ6gf+g1aMkaKbIjeeZ9XUC3KYWqC6HRAFKyg4UEQMY//e+fzA=
+	t=1743079489; cv=none; b=oRkIdrVI0ArKpDWYzyQx1lqGvgxaynf9Dqr9FF52W+BC8G3lgqzat0J/mS9pPF5mb7PYqnR4urMgmCCHkFOnLWDr25nirDOXo2zcB7PpICNditSe6okxeT6anWkkiMjLAL9La6yiMhWBKlk0WHtM3Pr8K7ZQGgSwBJx9dlhrx4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743078939; c=relaxed/simple;
-	bh=Lt9UQTIwLqmLVd5QOwg+Zd8a6+yM24ga6+JKTypDu04=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=AsZD7oGanPA5gH0HY0UdxhmX2XDap0gmlWzjkHWx9quUqVZDu/VngONy7mEc4uAv5kO/iynMwc9QlTTBfAeB5gSKhh9CtT6RKpExtYz0ig0FdGatpb32bboLkEC2Ydk1VcjDZyDFmpAhKilkEufScKP+TampS3Cr0B72m5ikANE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=m+/t5mH1; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 52RCZ46W0047706, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1743078904; bh=Lt9UQTIwLqmLVd5QOwg+Zd8a6+yM24ga6+JKTypDu04=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=m+/t5mH11TQeCax5Mr2U24SL8nwZv+OK1DrEsPmUfceTxn8mLLhmiXMcdTKg3cHDi
-	 LdejULDrvBFlwii5PXIKLlukAqnXHijmcN3hd2Afcpk04aK7OP5VFbBZzRI86PXbVK
-	 /ZNkUgbIP/oao9P1nBRjtmv2bMXxZL4D2w2uH+1I5HZ1DyRxvGYa0u8KXGTr1TaMz0
-	 Qub2lVJLD5WfLnNhDlHmcu57dg86NV+k/zP7xvPBWVqQkJlNfuM8Sd9EJuxYOmQLWL
-	 H07vUjKCjmC2XHHXE1mQgTAz41o6B5AyIXRvgr1Qv3nnxSmvhVwMMXEuRaN3WGLsx+
-	 sE/U4m579Y/nQ==
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 52RCZ46W0047706
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 27 Mar 2025 20:35:04 +0800
-Received: from RTEXMBS05.realtek.com.tw (172.21.6.98) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 27 Mar 2025 20:35:04 +0800
-Received: from RTEXDAG02.realtek.com.tw (172.21.6.101) by
- RTEXMBS05.realtek.com.tw (172.21.6.98) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 27 Mar 2025 20:34:59 +0800
-Received: from RTEXDAG02.realtek.com.tw ([fe80::1d65:b3df:d72:eb25]) by
- RTEXDAG02.realtek.com.tw ([fe80::1d65:b3df:d72:eb25%5]) with mapi id
- 15.01.2507.035; Thu, 27 Mar 2025 20:34:59 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Simon Horman <horms@kernel.org>
-CC: "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        Ping-Ke Shih <pkshih@realtek.com>,
-        Larry Chiu
-	<larry.chiu@realtek.com>
-Subject: RE: [PATCH net-next v2] rtase: Add ndo_setup_tc support for CBS offload in traffic control setup
-Thread-Topic: [PATCH net-next v2] rtase: Add ndo_setup_tc support for CBS
- offload in traffic control setup
-Thread-Index: AQHbnspnjt1ZroxVD0e8mPtSPQ9ZcLOGP7yAgACqpVA=
-Date: Thu, 27 Mar 2025 12:34:58 +0000
-Message-ID: <88849bcf554b4636b6914a2e041d160d@realtek.com>
-References: <20250327034313.12510-1-justinlai0215@realtek.com>
- <20250327101925.GF892515@horms.kernel.org>
-In-Reply-To: <20250327101925.GF892515@horms.kernel.org>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1743079489; c=relaxed/simple;
+	bh=i5JQm9DqrSRQ96Mfvrlb1RwHHX8YBXcxQ9y8zq+dgJg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OSV+o3u6CwVgRlfQgfwKlRjNzKEwAE3XJ95+qfEJB6YjRSTV/HLum5Ubf7W1heMx9zFRB20uy5an1WwE8IM6TBKtwj1q8RLv5ofgcetosOHYT0W/zefrWbdukCtFY1W7/8sxVAeNkfh4SNM199NAxcxRZ/z1Cs6ZRqJHJryJpU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q5o3Trzf; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743079486;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=kfyheL9jEG9357hLbmic+IF7J8U9ykncYZ9iUVWBbFY=;
+	b=Q5o3TrzfzgzscKq3hcqaB2MuUEMtIkT5EiT7ycJQs2Es6TJKOJ4vmg6ulW0p1Rv+j6LqMS
+	BD5+NRZEig+FXZVKYJOLyqBf487bhCiDdP5wu2VDDRarMY21LJEKs0HUEjd7i1rH74NwBw
+	ORF+2yZYiqFC9xqvFPx+fv4nKMTbOAg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-134-yH2ioMkvNSuXH8jnNgX8YA-1; Thu, 27 Mar 2025 08:44:45 -0400
+X-MC-Unique: yH2ioMkvNSuXH8jnNgX8YA-1
+X-Mimecast-MFC-AGG-ID: yH2ioMkvNSuXH8jnNgX8YA_1743079484
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3914608e90eso753542f8f.2
+        for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 05:44:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743079484; x=1743684284;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kfyheL9jEG9357hLbmic+IF7J8U9ykncYZ9iUVWBbFY=;
+        b=wL4AsMBj3Imsu3Fz3FtEkFo9CX7+Q7LcIrqIOapmHPlf5w8Llgx7cf8tA7cMV99ili
+         2BWSZ/JzHSNZK/5/Li0QtZa0XN0d18mAyy2ApV6cTqv+wmlU1eLypev4aqAdwOVTppDz
+         h3tvwzFhgrt6YpmqfijX5f0r6bbIoxGcXH7pK3rEdsbUgd3dn8VFiOMCFvm+iHP+604f
+         SQm+ArriMEdiqLUH55rOnNJ1d3me+ByZyLv3AOW0BL/Zs1AoU3a85Pe+AxPAuOOjWHWa
+         1Btr1bf6+8fJHjvWvx4VEV5GZvLqhKAsU9D2saSMON2SsjsPvqTVhlofau2EytJhy7Hc
+         WCKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVoupWtZhAkVNIY/vWzSSPd+JvhiMJSNT4repsC/enYw5GRE5j5eCqKSrosUob+qN3Ev+8avG8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXD0BAvEFA6Ie8pxXN8a+OnmwZF1ItG2nQnpdyPZzoZLbhGAjn
+	HVPZCsYiZWXAcOd8WGD2ys/df3eK+ZlJWYjMkX43946LHiBGmQ0iJIqsPQD8D2GLt9fKK6Uztz+
+	iETDpquWwJnvfVEsD3h8wY92r8QRPSVfMbifGzTUE+Zvn4lUXsNOoaA==
+X-Gm-Gg: ASbGncvVboXssvzjaKXQmKj2842KCh+Q+WrZ+H2sFKTBR8SbT6+2jdq4sy0s7lux4fd
+	7bCiL55WZjFEvipNvV8GAVPee5iYW9wtv5mZXL2sGUlYWz/XttLUlfHKdNYw9k5x4iwIE2u+RmH
+	tRhN7rOQ9MpONImSNo5hCR94JG/KBJPk2Kw5nZKBX4SSRIwM0OxPUnjqdmcj4R5tV01Gzr9TmXS
+	e8M5WE5LXOyYTht8llENX4O5fJBvk7Tfg3GVKuJym655Zx0pBVKq/w+xg6HOuCeGcHiHlPrW0uq
+	EeBspfiJS/7E3pI4GFAmEg91IOj/IKSmY12T0kU14EukhnSrOQQthGcGldDkmWRFbA==
+X-Received: by 2002:a5d:6c6c:0:b0:38c:2745:2df3 with SMTP id ffacd0b85a97d-39ad17845f7mr3077937f8f.37.1743079483832;
+        Thu, 27 Mar 2025 05:44:43 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFlm4s0EdoS5CN0bcv1wS4l/Yn0TLs2QyE9bGxPtaa+Rs3z5qIUN6VRMhNwAZdWNibUqtu8qg==
+X-Received: by 2002:a5d:6c6c:0:b0:38c:2745:2df3 with SMTP id ffacd0b85a97d-39ad17845f7mr3077908f8f.37.1743079483197;
+        Thu, 27 Mar 2025 05:44:43 -0700 (PDT)
+Received: from stex1.redhat.com (host-87-12-25-55.business.telecomitalia.it. [87.12.25.55])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3997f9a3f76sm19986612f8f.37.2025.03.27.05.44.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Mar 2025 05:44:42 -0700 (PDT)
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: mst@redhat.com
+Cc: Mike Christie <michael.christie@oracle.com>,
+	netdev@vger.kernel.org,
+	Keith Busch <kbusch@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	Jason Wang <jasowang@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	Stefano Garzarella <sgarzare@redhat.com>
+Subject: [PATCH] vhost_task: fix vhost_task_create() documentation
+Date: Thu, 27 Mar 2025 13:44:35 +0100
+Message-ID: <20250327124435.142831-1-sgarzare@redhat.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-> External mail : This email originated from outside the organization. Do n=
-ot
-> reply, click links, or open attachments unless you recognize the sender a=
-nd
-> know the content is safe.
->=20
->=20
->=20
-> On Thu, Mar 27, 2025 at 11:43:13AM +0800, Justin Lai wrote:
-> > Add support for ndo_setup_tc to enable CBS offload functionality as
-> > part of traffic control configuration for network devices.
-> >
-> > Signed-off-by: Justin Lai <justinlai0215@realtek.com>
-> > ---
-> > v1 -> v2:
-> > - Add a check to ensure that qopt->queue is within the specified range.
-> > - Add a check for qopt->enable and handle it appropriately.
->=20
-> Thanks Justin,
->=20
-> This patch looks good to me.
-> But net-next is currently closed for the merge-window.
-> So please repost this patch once it re-opens, which
-> I expect to be around the 14th April.
->=20
-> RFC patches are welcome any time.
->=20
-> --
-> pw-bot: deferred
+From: Stefano Garzarella <sgarzare@redhat.com>
 
-Hi Simon,
+Commit cb380909ae3b ("vhost: return task creation error instead of NULL")
+changed the return value of vhost_task_create(), but did not update the
+documentation.
 
-Thank you for your review. I will repost this patch once the net-next
-re-opens.
+Reflect the change in the documentation: on an error, vhost_task_create()
+returns an ERR_PTR() and no longer NULL.
 
-Justin
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ kernel/vhost_task.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kernel/vhost_task.c b/kernel/vhost_task.c
+index 2ef2e1b80091..2f844c279a3e 100644
+--- a/kernel/vhost_task.c
++++ b/kernel/vhost_task.c
+@@ -111,7 +111,7 @@ EXPORT_SYMBOL_GPL(vhost_task_stop);
+  * @arg: data to be passed to fn and handled_kill
+  * @name: the thread's name
+  *
+- * This returns a specialized task for use by the vhost layer or NULL on
++ * This returns a specialized task for use by the vhost layer or ERR_PTR() on
+  * failure. The returned task is inactive, and the caller must fire it up
+  * through vhost_task_start().
+  */
+-- 
+2.49.0
+
 
