@@ -1,154 +1,85 @@
-Return-Path: <netdev+bounces-177979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2FE4A736B3
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 17:22:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 67EB1A736BF
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 17:23:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D10A189D4AE
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 16:21:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 692681884D28
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 16:23:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D01315687D;
-	Thu, 27 Mar 2025 16:20:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b="kYpVbHXO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57FDE19CC11;
+	Thu, 27 Mar 2025 16:23:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D731018FC67
-	for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 16:20:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9702AF1C;
+	Thu, 27 Mar 2025 16:23:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743092417; cv=none; b=bJeNxnGo6iMy6otalY06UVt4oKPXqjSEf6K5/OE96Hzkj3deAMCYs/4K3nAae7gkqQ1xf0cKbgw3RLmYbrMVOdBnPPC4N14G4aJ15/msRwGCNZnCDJh3Tz/xUqzt9f/KbrpY85/7r5nOJJ0/LmnXBZKxTfYuirOQS8CzpJvZXlU=
+	t=1743092616; cv=none; b=OMC3vl8MhOt6Ch6uuL6J+feRN0ydVEmhXUpbBiGe03MJTvhm2jULcy8Z2t1XoH9e2c3AZzris11KW7Lr81OFiZ4ftQtS4KU5dwpVUArTeWC6w6VWqgdkHkDW7uB3rgP+R8J9qWuiWVfGNvMsDvCmemjySlHWnYHTIpHVNjGqyo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743092417; c=relaxed/simple;
-	bh=NVwNdpFq+nrFVf9YMmHiCb/6V19g4IwZkEMgGwL2onM=;
-	h=Date:Subject:In-Reply-To:CC:From:To:Message-ID:Mime-Version:
-	 Content-Type; b=CsVE3F0TGxfXroNgIBlNYYEhVfsGDsWVb1q6aT7OXos6NHvcWXaMxWDfmEKgTWop54rVkC40qPlzjs2U5WTfVfOottu/tvYDm+GTjgeyAa52faZ1yC99NrS47lPeFwjZu17H4p59tSKzbDcc81MZgF/HdJ3D/NCltq1UnBRtJTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com; spf=pass smtp.mailfrom=dabbelt.com; dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b=kYpVbHXO; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dabbelt.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-226185948ffso27191915ad.0
-        for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 09:20:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1743092412; x=1743697212; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kX05jx75Xb8+ENPYRjK+Gc3Ht1e9kjVMOGIod7/HdTg=;
-        b=kYpVbHXOgUpLRMTokda7b4lmD2DDWFPI2/1xILmmVtvv2Uw2c425hHMb6Mh3XvOHcy
-         nP8Sil2DtAmwEzSGosSFOLRmQxPK0h32eU2gWjNMDVPHCiA1hN9BeUxBlsKxkGufn3G3
-         TcU/USq5mdFBfH0YQ84YyaDyymgPlO23ua3WuznzjPqV//xHsgEpA/FAqpZZiXhxdgRb
-         dM7o2SRY3KiDdmyuRpL0DXg5EldGGr7oEX4+yMoTg1p2xyBHS0DPepwNmXiT2Elk7/6w
-         gzIfRy2jc5Y2IQle7KV3aoz4JzA3VybBDskwGHOBLoZbb2KnEXpw4TivDslOd9+I6MHq
-         GV+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743092412; x=1743697212;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kX05jx75Xb8+ENPYRjK+Gc3Ht1e9kjVMOGIod7/HdTg=;
-        b=NgqvZYTyWoeq1/ClU50/66JiMK9/AyI2sOO3L2LTyIe0KYirHBo9AwoDjqXAibt36P
-         TYjd6KTrshfFBjuvJUyhLG8UnjBhl5pRx0oWk9blPpda2nqpTMVnKLsKKwPHO3qcvgBH
-         +WkfWgMc1f+1Ja7AcNafI14xy2yS8mY24JpAKwuroxiTs5iFUnHXvjU8ODI9tLLUXGwt
-         ACcRcC9naNabjJFXKkBH97sh9iUo0mub5etSwyT8Ow3nJ46pFHxu3LOV9bh2FmMJI7Wp
-         Pj9S5CBl7iUHO5D3HfcOjjZ6DqUPs9DYTb1Lr7b4iLlT3qBqjZCmdWZqVtIU3cOvq8kC
-         wXHg==
-X-Forwarded-Encrypted: i=1; AJvYcCWdB0UMnI1idXzvftBzUmSYpGVO6f6agklt5bdQTFKabrlRAuuOP2rthMpAwQTUf1WGjeSoZAI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7vM3rWoUVSkROMV+3DFFJfZpVHVwnnrQ3raLnErqRiJT0CAvh
-	Don5N6CHypmfkAm34o3UteO7nLzlO8ndIWA9iChP6vRiHYmeMS/H7huArqhhxDg=
-X-Gm-Gg: ASbGnctWDX25S3moUjCGH3Pi7j6KnKozAdnAsZis9k3F8Okx1bdMb0jusvxE+6gYPDs
-	8oRxUeDnPuYA+u4UjpWnxnNlWBYCAwPc3vfjrgzPT9rRAH7RHUbas13eKe0AOw+bY/I3sB02apV
-	IgcsTVrjAiDjc4iNNvtFT9ftB2oanjs7Vo+peQr7OMC/wJV0qbWKXvz3kdvmy6bWdd5y6efm24M
-	AsOk9QHH+sWeYOcStsWgRLJIcyrdeQHs8glu/gJyDai/BAkQYWTFfA20nGFuCVH6Q9Ai//GMgC5
-	RtiyBc9eYBxxRjjVa/sbOwGGIwXF+jcUoJjMCQ==
-X-Google-Smtp-Source: AGHT+IGClNJzmnXOK1L/PFNFl5ogZb2gMU/Eqg4X3l9WVxApkZth9g72YE2t9vJ4dK3KZhjxhfYK+Q==
-X-Received: by 2002:a17:903:228c:b0:224:216e:332f with SMTP id d9443c01a7336-22804968a3cmr61064755ad.48.1743092411962;
-        Thu, 27 Mar 2025 09:20:11 -0700 (PDT)
-Received: from localhost ([50.145.13.30])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2291eec780bsm1682245ad.19.2025.03.27.09.20.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Mar 2025 09:20:11 -0700 (PDT)
-Date: Thu, 27 Mar 2025 09:20:11 -0700 (PDT)
-X-Google-Original-Date: Thu, 27 Mar 2025 09:20:02 PDT (-0700)
-Subject:     Re: [RFC PATCH V3 01/43] rv64ilp32_abi: uapi: Reuse lp64 ABI interface
-In-Reply-To: <CAHk-=wiVgTJpSxrQbEi28pUOmuWXrox45vV9kPhe9q5CcRxEbw@mail.gmail.com>
-CC: guoren@kernel.org, Arnd Bergmann <arnd@arndb.de>,
-  Greg KH <gregkh@linuxfoundation.org>, Paul Walmsley <paul.walmsley@sifive.com>, anup@brainfault.org,
-  atishp@atishpatra.org, oleg@redhat.com, kees@kernel.org, tglx@linutronix.de,
-  Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, brauner@kernel.org,
-  akpm@linux-foundation.org, rostedt@goodmis.org, edumazet@google.com, unicorn_wang@outlook.com,
-  inochiama@outlook.com, gaohan@iscas.ac.cn, shihua@iscas.ac.cn, jiawei@iscas.ac.cn,
-  wuwei2016@iscas.ac.cn, drew@pdp7.com, prabhakar.mahadev-lad.rj@bp.renesas.com, ctsai390@andestech.com,
-  wefu@redhat.com, kuba@kernel.org, pabeni@redhat.com, josef@toxicpanda.com, dsterba@suse.com,
-  mingo@redhat.com, peterz@infradead.org, boqun.feng@gmail.com, xiao.w.wang@intel.com,
-  qingfang.deng@siflower.com.cn, leobras@redhat.com, jszhang@kernel.org,
-  Conor Dooley <conor.dooley@microchip.com>, samuel.holland@sifive.com, yongxuan.wang@sifive.com, luxu.kernel@bytedance.com,
-  david@redhat.com, ruanjinjie@huawei.com, cuiyunhui@bytedance.com, wangkefeng.wang@huawei.com,
-  qiaozhe@iscas.ac.cn, Ard Biesheuvel <ardb@kernel.org>, ast@kernel.org, linux-kernel@vger.kernel.org,
-  linux-riscv@lists.infradead.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-mm@kvack.org,
-  linux-crypto@vger.kernel.org, bpf@vger.kernel.org, linux-input@vger.kernel.org,
-  linux-perf-users@vger.kernel.org, linux-serial@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-  linux-arch@vger.kernel.org, maple-tree@lists.infradead.org, linux-trace-kernel@vger.kernel.org,
-  netdev@vger.kernel.org, linux-atm-general@lists.sourceforge.net, linux-btrfs@vger.kernel.org,
-  netfilter-devel@vger.kernel.org, coreteam@netfilter.org, linux-nfs@vger.kernel.org, linux-sctp@vger.kernel.org,
-  linux-usb@vger.kernel.org, linux-media@vger.kernel.org
-From: Palmer Dabbelt <palmer@dabbelt.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Message-ID: <mhng-16d3c75b-cf60-499e-98b0-098d630874b4@palmer-ri-x1c9a>
+	s=arc-20240116; t=1743092616; c=relaxed/simple;
+	bh=1hdOmtZ+/j9nYxf8OsNXDo4/n40Gaky7jMOkBxXrKr4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fT29Up6Q2/wcTQYe85bayqWQRe7XOjoaUx5bWoZO/F2S4j9Es+ZhyLYBUDEqfP1NwU197Q1oE356mP8aStNgWA+dGKH5ToWlAkk4GzxZoRWCWBgI8+zNGQCwsYRvZTyB0CvRy9V8WC9w+uCRs2+4yXzRnmEbzUXgMUOfwFiu70M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1txq0r-00085B-93; Thu, 27 Mar 2025 17:23:25 +0100
+Date: Thu, 27 Mar 2025 17:23:25 +0100
+From: Florian Westphal <fw@strlen.de>
+To: I Hsin Cheng <richard120310@gmail.com>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
+	linux-kernel-mentees@lists.linux.dev
+Subject: Re: [RFC PATCH] net: sched: em_text: Replace strncpy() with
+ strscpy_pad()
+Message-ID: <20250327162325.GA30844@breakpoint.cc>
+References: <20250327143733.187438-1-richard120310@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250327143733.187438-1-richard120310@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Tue, 25 Mar 2025 13:41:30 PDT (-0700), Linus Torvalds wrote:
-> On Tue, 25 Mar 2025 at 05:17, <guoren@kernel.org> wrote:
->>
->> The rv64ilp32 abi kernel accommodates the lp64 abi userspace and
->> leverages the lp64 abi Linux interface. Hence, unify the
->> BITS_PER_LONG = 32 memory layout to match BITS_PER_LONG = 64.
+I Hsin Cheng <richard120310@gmail.com> wrote:
+> The content within "conf.algo" should be a valid NULL-terminated string,
+> however "strncpy()" doesn't guarantee that. Use strscpy_pad() to replace
+> it to make sure "conf.algo" is NULL-terminated. ( trailing NULL-padding
+> if source buffer is shorter. )
 >
-> No.
->
-> This isn't happening.
->
-> You can't do crazy things in the RISC-V code and then expect the rest
-> of the kernel to just go "ok, we'll do crazy things".
->
-> We're not doing crazy __riscv_xlen hackery with random structures
-> containing 64-bit values that the kernel then only looks at the low 32
-> bits. That's wrong on *so* many levels.
+> Link: https://github.com/KSPP/linux/issues/90
+> Signed-off-by: I Hsin Cheng <richard120310@gmail.com>
+> ---
+>  net/sched/em_text.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/sched/em_text.c b/net/sched/em_text.c
+> index 420c66203b17..c78b82931dc4 100644
+> --- a/net/sched/em_text.c
+> +++ b/net/sched/em_text.c
+> @@ -108,7 +108,7 @@ static int em_text_dump(struct sk_buff *skb, struct tcf_ematch *m)
+>  	struct text_match *tm = EM_TEXT_PRIV(m);
+>  	struct tcf_em_text conf;
+>  
+> -	strncpy(conf.algo, tm->config->ops->name, sizeof(conf.algo) - 1);
+> +	strscpy_pad(conf.algo, tm->config->ops->name, sizeof(conf.algo) - 1);
 
-FWIW: this has come up a few times and we've generally said "nobody 
-wants this", but that doesn't seem to stick...
+Please drop the 3rd argument and then resend with a fixes tag:
+Fixes: d675c989ed2d ("[PKT_SCHED]: Packet classification based on textsearch (ematch)")
 
-> I'm willing to say "big-endian is dead", but I'm not willing to accept
-> this kind of crazy hackery.
->
-> Not today, not ever.
-
-OK, maybe that will stick ;)
-
-> If you want to run a ilp32 kernel on 64-bit hardware (and support
-> 64-bit ABI just in a 32-bit virtual memory size), I would suggest you
->
->  (a) treat the kernel as natively 32-bit (obviously you can then tell
-> the compiler to use the rv64 instructions, which I presume you're
-> already doing - I didn't look)
->
->  (b) look at making the compat stuff do the conversion the "wrong way".
->
-> And btw, that (b) implies *not* just ignoring the high bits. If
-> user-space gives 64-bit pointer, you don't just treat it as a 32-bit
-> one by dropping the high bits. You add some logic to convert it to an
-> invalid pointer so that user space gets -EFAULT.
->
->             Linus
+As is, the last byte remains uninitialised.
 
