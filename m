@@ -1,148 +1,145 @@
-Return-Path: <netdev+bounces-177891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6ECC4A729E3
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 06:31:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1353A729EC
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 06:38:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 135E1189026B
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 05:31:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D7FE3B7590
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 05:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9373B1BC07E;
-	Thu, 27 Mar 2025 05:31:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA5771C3BE2;
+	Thu, 27 Mar 2025 05:38:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YOJzgHG1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAED613DDAA
-	for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 05:31:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D332A83CC7;
+	Thu, 27 Mar 2025 05:38:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743053494; cv=none; b=Mw59G93L6BFy4GE5cEUM0vY5UoXMHWx9jygkiBvyMatozSioRi0Wa/wQbLzEqx3RX1Ncxcnbya19HqWAHDNpF6lPCgZCMEswP+U1a/o80aSE5TuZBDu7o2phlUEN7DcTeTvs0vHx9YaKCN+bmfRV5sqknB3Mbjv8CyiBWuVqYjI=
+	t=1743053919; cv=none; b=LPI47Rm3aNxe2EVkXvcVfbv/HYLfU54XG7x/HFVaNm3XYH0rSukj0qeKvCZ8dmhaFiRc8Igetz25IIM6xzQ/XKmIRzC/QfZIJj3sUWuiYj42E4QZk+DGsZchVMJ61N1g4HYCrIA0CBWyAtm5n5ocEbsnUkXXdHg4oKmFOopOa2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743053494; c=relaxed/simple;
-	bh=cWKH2vFV0tX18Wz2aMHSdUvIAsgE6vzo8FOkAW8lLBg=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=AOFHczFoaHCAxVRfkldKQCnxBV2KObxnPieKow1lhS8KOjjXnfucEix/4BVELWHojy+Zc5t+LlrWnoLYYIDm+ZFYlMVR2AoLqOEenGmNoSvUKD3Z6yi7QFRJCR6aULBaWGHhrFRke7SE6ggRN8qEoIkLnYWctRxKIWkpfiDGh6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3d5bb1708e4so11357635ab.3
-        for <netdev@vger.kernel.org>; Wed, 26 Mar 2025 22:31:32 -0700 (PDT)
+	s=arc-20240116; t=1743053919; c=relaxed/simple;
+	bh=24i7HBzmg1Y/Pb50F99CjuJq8G9fArWMz0O4zZDVb4k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ACdNnTHLuYHPqSJinj5+2bxUbOIFZeeCG1rPiBQxBEDAm/7eTd2A+GJtjcic/t0m6VaAi7PRIVw3rQCUWJmpS4Cq9yY4BVKOD/1LusBnETcggmtHVHtEyPvrEzcNCC0dwQotjcoU6rqaLiGajgn5HiZrf4+ElIrLaZse/53IuUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YOJzgHG1; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5e5bc066283so853283a12.0;
+        Wed, 26 Mar 2025 22:38:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743053916; x=1743658716; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aEihfJ4ccIwm2OdmKc9Yshv/glNPrxHPhUYPq46sWO4=;
+        b=YOJzgHG1n0jDxN4VcLn6GvJVsUpWFxV/Wozv0ofbNAS8UGISffcGy3lyw1Th5soH+Z
+         MebTQCzEpEjftfiFow72lHGmNkmYl6zGf4Mt43WCzVlFs4mKT+3dybt/hFAkzTAS5oHr
+         iEkR7Er/xGvxyCX1QlS4WOrfxXpzhwWQXDs/etwDTn3p1akNBLG4PgnhCX3puVDuoVN7
+         BrJsM64xiNNWzK5+T3kLjZEbYXhXqlPlDi5ZDlRRHcLbJA573Rrnhn9Q3K6EzxALUolD
+         vupfB52VmL1nzhRBjQgRcxmBbkziAHAv2eUTgz56ZvVAbZCwpGYKn0AxDYEB02G4LIsC
+         xumg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743053492; x=1743658292;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=D+XI+Z+k/9cyGXpcpvELUu6pEI9pnj2OVm8/c+ZH5H8=;
-        b=tTPlHIqB2Shj+xIOkNrKYLpo3wIIcgSp2lANJgMRgym0aOvbkTIyuDaziqxOjWTD2z
-         AzA1DEkZinFfIg3LU7NI3Pm4Xp22gvBzqMvGnZTKgXqJSoPNwRBBl8ksK5eyDvvN8l3P
-         ZEw7zrO+C/LB/JPDMd1tehDj0y8L1LnFtjBVhrwCVd1CFCYayZ4XoO5r1rl8OFtkkIzE
-         xcB2dnrJ+yxwZFV+g3nHROUvS4q0i2hum7yQdbdnxcK4B71pvsodDF8K9nH8yZAM36mq
-         0aLzxQ0FsfSXPXhJjvrGw+2r3ELJhhi3OgAAryk7c1AtO9aT/H6Qyg1dQSgDdQTs1Gks
-         Jhtg==
-X-Forwarded-Encrypted: i=1; AJvYcCU7ST8cDrW/TLNPAAcVKp3O9euLaN5+6rRmGRuHdTLdF6KylhA8UvPsIdd/ppSwaImiCBxsbpQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUcNVgtyNHklb28ouHCLNqNEHsK/OIe/DJ6u/OofkiSjQOcS54
-	kDxtF7vFExrO5lZWuel3oYrJvFRVAANDHnJ/BiXr1D+zM3ayyyBd8/wrL+r+Xf0cJLMIIzkpwrY
-	Mc6YLhAveyOlYY8oNf2DMNjP3/NWHe5NjF/HCYkYf3exuj0fsLwBsbrc=
-X-Google-Smtp-Source: AGHT+IGyvnT+vm84j7lLHRM+O4q8cSsIrX4kls8FwqiU9KsTBPDp+0QCIRr/j7JnOP0uOC25rpa/bVyBAH7/v/y+gIxoLH5zScLm
+        d=1e100.net; s=20230601; t=1743053916; x=1743658716;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aEihfJ4ccIwm2OdmKc9Yshv/glNPrxHPhUYPq46sWO4=;
+        b=eBeb82v3T8RjUX4lbVmM7ntbG75no+HsCCNfGBODTpacaGbPuHSE6FTqHc52CP7CH7
+         6TSIZ//K2Ve/1ukoiNSh1EJiTlB4rJeV/g7XG8AybR9BBqJ+t1zaSF7FCyeFbGKlaRhA
+         U0eqOkkiQzm79TJdN7uO3DrGS8e119szF/SLzlLWQ7ceXOfVoObX5mjxqlgO1krZ0+Bw
+         NzqozBzHL0H8RvGeQoLvj3LPLTt5WJaiic6TwWbkOwz9Jgpqe3FScV0uFMx8KkwZDhyY
+         2MrIQ6nwPzaTaCkE6D4pbr2KVpFrh59eN6O+fmjKnj0f1qzyn/3302cwBQ9O6yEfquHI
+         cRpg==
+X-Forwarded-Encrypted: i=1; AJvYcCUPsh66o/Jj4vRTtAj5xlBCAag1pkUROXTUvIc6TApbGg10en/qUxYCnRCUJvIec/3biIyvpxl6FcqM@vger.kernel.org, AJvYcCUeZHxK56UO07iHEDlU6D69uT7rdB+FVzQF7iIxySiylkOOhvSEGfsmh8+Jrlkb78uyol5vaZupIKodVNXj@vger.kernel.org, AJvYcCUkYNddfvx6qe9hisnLu1FBHiNYcvqJ1mH6v6zFjNykjtTy2jkDXbuGMFsAW7wn8tkBwhU0ApLV@vger.kernel.org, AJvYcCUmqfYb6A6alGm1PulffuCN5GmitB9eT/WK6mQuGQKz1IwZjxrjn8ME7uctcjrE8Eo++ovRxfsbDNj59Q==@vger.kernel.org, AJvYcCUv3Y6WTk+9J6CGYB9PIIYeYcU2VCx1I8qs+yEOHKSH+Y4asVgpQeYPpFWqKyvk8s0bks6jS401HeQZ@vger.kernel.org, AJvYcCV6AONvTlcKML0OBNlBAFxOFz52BNAfTgbZag1vgHlVzOed1XX/nmm+6Kw5C/aulRPoLSfiV6ks5dnXG38tyqM=@vger.kernel.org, AJvYcCVqpl9sK3NrdAFApdINZXUjsGzVUKhX29AuWlynIFxmyXvmt3jnlRYYUCuibRj8M8xGkJQGKjUtSBA=@vger.kernel.org, AJvYcCWfKLcGJIucV8lFfFg/h8Q/4KpyabT00O0Jo/7jBr1X2YvSW0HLT37Q+lwO6R1O8ahClofq2dJLyXRcQHU=@vger.kernel.org, AJvYcCX0IyDa8bbjb0902Q9kBuh8FTYwSmDpRlhFrMH1vfPzYVRMkOiw8TiYrJpUmQzNOS1hWLi9bIkyxqNy@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZlZMTNCFZhUHuQp00gdW5d3rCJVtZqwtAYX/SHbTxOChg1ou1
+	b8fJ/SdC1UOVCyvERNZVbmhYCkzhDb+VAQj9OlFJ2EeX7FvL+EIAqylEuAei1vngNY0QrCBwdyX
+	Fgi+4d3dCy+Wc+FxR61aiJOo8iyk=
+X-Gm-Gg: ASbGncs+lT95UpkwxojUwCPx1CLOQ9zD/DUD9efbjrILri8ep1FgVaDzJ1GAlLYUea4
+	20NgVz/aUCo+mTshK8xsb/jlw+1p2AxAOZ6B5fNx+MMBWiLcj+GdXhPmp9t0ZchkRiZ6fzdPPTz
+	bETo9viXtvq6lFV55YgAyLZqXg94kO3aExy7z1Mhuzg6xXa8gm6cKcjP6a9WsGlYvk8pOhkkQ=
+X-Google-Smtp-Source: AGHT+IHELdNB91VYLFLjAbKGVENJUvBqrv8fyp7t3sj12vFCeisc8IASCRc7/obfLlMnXTCczI1ipHuaCXia3+WL37I=
+X-Received: by 2002:a17:907:1b27:b0:ac3:48e4:f8bb with SMTP id
+ a640c23a62f3a-ac6fb0ff0cemr205599766b.41.1743053915742; Wed, 26 Mar 2025
+ 22:38:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1fe6:b0:3d4:3d63:e076 with SMTP id
- e9e14a558f8ab-3d5cce1d546mr27504645ab.18.1743053491885; Wed, 26 Mar 2025
- 22:31:31 -0700 (PDT)
-Date: Wed, 26 Mar 2025 22:31:31 -0700
-In-Reply-To: <6749aac3.050a0220.253251.00b0.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67e4e2b3.050a0220.2f068f.0021.GAE@google.com>
-Subject: Re: [syzbot] [wpan?] WARNING in __dev_change_net_namespace (3)
-From: syzbot <syzbot+3344d668bbbc12996d46@syzkaller.appspotmail.com>
-To: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+References: <20250225081644.3524915-1-a0282524688@gmail.com>
+ <20250225081644.3524915-5-a0282524688@gmail.com> <20250227-spicy-grebe-of-dignity-68c847-mkl@pengutronix.de>
+ <CAOoeyxWSsy0Q0Y7iJE8-DZM5Yvcdto8mncFkM8X4BvVMEgfUiQ@mail.gmail.com>
+ <20250317-cuttlefish-of-simple-champagne-ee666c-mkl@pengutronix.de>
+ <CAOoeyxXSC3rjeB0g5BtHKvKy-Y9Dszd5X9WuHeBeH1bk39d_Eg@mail.gmail.com> <20250326-inventive-lavender-carp-1efca5-mkl@pengutronix.de>
+In-Reply-To: <20250326-inventive-lavender-carp-1efca5-mkl@pengutronix.de>
+From: Ming Yu <a0282524688@gmail.com>
+Date: Thu, 27 Mar 2025 13:38:22 +0800
+X-Gm-Features: AQ5f1JowskiduytSBp9N8KWLXt0RE_gU_jLrcjPD0WJE4dtxm3E_6kLUCKZJyco
+Message-ID: <CAOoeyxXw1x2HVXQYzxc1OuGimn7XPfCjj-aB=jAAfw733b_9OQ@mail.gmail.com>
+Subject: Re: [PATCH v8 4/7] can: Add Nuvoton NCT6694 CANFD support
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
+	andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-syzbot has found a reproducer for the following issue on:
+Marc Kleine-Budde <mkl@pengutronix.de> =E6=96=BC 2025=E5=B9=B43=E6=9C=8827=
+=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8A=E5=8D=881:41=E5=AF=AB=E9=81=93=EF=BC=
+=9A
+>
+> > > > > > +     priv->can.clock.freq =3D can_clk;
+> > > > > > +     priv->can.bittiming_const =3D &nct6694_can_bittiming_nomi=
+nal_const;
+> > > > > > +     priv->can.data_bittiming_const =3D &nct6694_can_bittiming=
+_data_const;
+> > > > > > +     priv->can.do_set_mode =3D nct6694_can_set_mode;
+> > > > > > +     priv->can.do_get_berr_counter =3D nct6694_can_get_berr_co=
+unter;
+> > > > > > +     priv->can.ctrlmode_supported =3D CAN_CTRLMODE_LOOPBACK |
+> > > > > > +             CAN_CTRLMODE_LISTENONLY | CAN_CTRLMODE_BERR_REPOR=
+TING |
+> > > > > > +             CAN_CTRLMODE_FD | CAN_CTRLMODE_FD_NON_ISO;
+> > > > >
+> > > > > Does your device run in CAN-FD mode all the time? If so, please u=
+se
+> > > > > can_set_static_ctrlmode() to set it after priv->can.ctrlmode_supp=
+orted
+> > > > > and remove CAN_CTRLMODE_FD from ctrlmode_supported.
+> > > > >
+> > > >
+> > > > Our device is designed to allow users to dynamically switch between
+> > > > Classical CAN and CAN-FD mode via ip link set ... fd on/off.
+> > > > Therefore, CAN_CTRLMODE_FD needs to remain in ctrlmode_supported, a=
+nd
+> > > > can_set_static_ctrlmode() is not suitable in this case.
+> > > > Please let me know if you have any concerns about this approach.
+> > >
+> > > Where do you evaluate if the user has configured CAN_CTRLMODE_FD or n=
+ot?
+> > >
+> >
+> > Sorry, I was previously confused about our device's control mode. I
+> > will use can_set_static_ctrlmode() to set CAN_FD mode in the next
+> > patch.
+>
+> Does your device support CAN-CC only mode? Does your device support to
+> switch between CAN-CC only and CAN-FD mode?
+>
 
-HEAD commit:    f6e0150b2003 Merge tag 'mtd/for-6.15' of git://git.kernel...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=10256198580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=46a07195688b794b
-dashboard link: https://syzkaller.appspot.com/bug?extid=3344d668bbbc12996d46
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10b2d804580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14256198580000
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-f6e0150b.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/7ade4c34c9b1/vmlinux-f6e0150b.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/1fe37b97ec9d/bzImage-f6e0150b.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3344d668bbbc12996d46@syzkaller.appspotmail.com
-
-R10: 0000000000000002 R11: 0000000000000246 R12: 00007fca2f73a048
-R13: 00007fca2f73fffc R14: 00007fca2f73a167 R15: 0000000000000001
- </TASK>
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5302 at net/core/dev.c:12104 __dev_change_net_namespace+0x16f9/0x1890 net/core/dev.c:12104
-Modules linked in:
-CPU: 0 UID: 0 PID: 5302 Comm: syz-executor142 Not tainted 6.14.0-syzkaller-03565-gf6e0150b2003 #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-RIP: 0010:__dev_change_net_namespace+0x16f9/0x1890 net/core/dev.c:12104
-Code: 01 90 48 c7 c7 80 88 2e 8d 48 c7 c6 60 88 2e 8d ba dd 2e 00 00 e8 47 60 a6 f7 90 0f 0b 90 90 e9 9d ea ff ff e8 b8 3b e7 f7 90 <0f> 0b 90 e9 06 fb ff ff e8 aa 3b e7 f7 90 0f 0b 90 e9 8b fe ff ff
-RSP: 0018:ffffc9000d336fa0 EFLAGS: 00010293
-RAX: ffffffff89dc3ad8 RBX: dffffc0000000000 RCX: ffff88800032c880
-RDX: 0000000000000000 RSI: 00000000fffffff4 RDI: 0000000000000000
-RBP: ffffc9000d3373b8 R08: ffffffff89dc35d9 R09: 1ffffffff2079d4e
-R10: dffffc0000000000 R11: fffffbfff2079d4f R12: dffffc0000000000
-R13: 1ffff92001a66e68 R14: ffff888043c7871c R15: 00000000fffffff4
-FS:  0000555581f64380(0000) GS:ffff88808c824000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffdafa37008 CR3: 0000000043cc2000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- dev_change_net_namespace include/linux/netdevice.h:4163 [inline]
- cfg802154_switch_netns+0xc5/0x3d0 net/ieee802154/core.c:230
- nl802154_wpan_phy_netns+0x13d/0x210 net/ieee802154/nl802154.c:1292
- genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0xb38/0xf00 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x208/0x480 net/netlink/af_netlink.c:2533
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1312 [inline]
- netlink_unicast+0x7f8/0x9a0 net/netlink/af_netlink.c:1338
- netlink_sendmsg+0x8e8/0xce0 net/netlink/af_netlink.c:1882
- sock_sendmsg_nosec net/socket.c:718 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:733
- ____sys_sendmsg+0x53c/0x870 net/socket.c:2573
- ___sys_sendmsg net/socket.c:2627 [inline]
- __sys_sendmsg+0x271/0x360 net/socket.c:2659
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fca2f6f7e99
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fffc5fcdf18 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fffc5fcdf30 RCX: 00007fca2f6f7e99
-RDX: 0000000000000000 RSI: 0000200000000280 RDI: 0000000000000006
-RBP: 0000000000000002 R08: 00007fffc5fcdcb6 R09: 0000555581f65610
-R10: 0000000000000002 R11: 0000000000000246 R12: 00007fca2f73a048
-R13: 00007fca2f73fffc R14: 00007fca2f73a167 R15: 0000000000000001
- </TASK>
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Our device supports both CAN-CC and CAN-FD mode.
 
