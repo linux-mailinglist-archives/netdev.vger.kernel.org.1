@@ -1,168 +1,95 @@
-Return-Path: <netdev+bounces-177881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E465A7285B
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 02:52:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12266A728FD
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 04:05:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0810117BA8D
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 01:50:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0C43189A1AA
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 03:05:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 733231A8F98;
-	Thu, 27 Mar 2025 01:48:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EE5E13C908;
+	Thu, 27 Mar 2025 03:05:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="JChE+cYy"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACFED45C14;
-	Thu, 27 Mar 2025 01:48:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A585579D2;
+	Thu, 27 Mar 2025 03:05:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743040090; cv=none; b=d3wKD7EJjg8n7Obhg1LOGYUqI92QKAQkYKH+ua4HeVDGF/na7J65/TCZ14MN7q5hR4lvxqxVg6HYTIQxNCMWAxb6+eExgEGaecE69vfTANQUpiEVBO7undZz6TRJhO9jb4Mfcx5hvcRpmcbPZ0b6wvSm4HDpEePiWGe9CSk6JIU=
+	t=1743044738; cv=none; b=UGdepy9WlSLWqyXcpwAJLxn1BYqSlaQUtoXh2jxHDvflSpbRDmxFwN9yKRsN/uXB9+mRYgg2BMn3xxVSpVvPlU5xco3w+mPNYBCBcbyGkb+l5fndQK561E1qfEuZRDsDSeqzN3WI7TPQN1SnJ+wCWMrqArAOpvgKpPsS0xCh8OA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743040090; c=relaxed/simple;
-	bh=YExHr+2mn/5PLGawiihdqqA9Qe1EXHQUBAkBpbg9IW4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fZoKrJp/3Zn36wcQ+BcVi3UlpaMD8CYQWN1z2Qpfg1mlO8aLOp6arpi0OtXB3fznsdM1a+nrdPb/Hmk4XoTxV+f7LUMlf2CVkLT8IUvQXLIuypqZwMDEBwc5RUb5wGhiZz81zf4Xb7SYqfF5xqbk7Qx/cRStlSqaVXjTz83iuVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4ZNRK06Z0tzvX0F;
-	Thu, 27 Mar 2025 09:44:04 +0800 (CST)
-Received: from kwepemg200005.china.huawei.com (unknown [7.202.181.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id F17111800B4;
-	Thu, 27 Mar 2025 09:48:01 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by kwepemg200005.china.huawei.com
- (7.202.181.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 27 Mar
- 2025 09:48:00 +0800
-From: Wang Liang <wangliang74@huawei.com>
-To: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
-	<kuniyu@amazon.com>
-CC: <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
-	<wangliang74@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net] ipv6: sit: fix skb_under_panic with overflowed needed_headroom
-Date: Thu, 27 Mar 2025 09:58:27 +0800
-Message-ID: <20250327015827.2729554-1-wangliang74@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1743044738; c=relaxed/simple;
+	bh=MCo8ZIxmGEDGSrPjvYiZIDrPNwkYgRNXm1IzE0Etl+o=;
+	h=Date:From:To:Cc:Subject:Mime-Version:Message-ID:Content-Type; b=jsadKEigIseEoeS6wmP0HYYeFPbuzN9muEBKCMtoiaKGBPXo5RHG0Tkw/UAl7O5GYkCcnYPCL0ieeStGNaCgheZdd10gbzW0lh9B3U4cvXeypq4NxKVxZa5ZHe4S/rN8aQKMjyOu/rbOnN4NNK/HBRDKMxJ1E7VHpNZ7KS95XNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=JChE+cYy; arc=none smtp.client-ip=117.135.210.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:Subject:Mime-Version:Message-ID:
+	Content-Type; bh=MCo8ZIxmGEDGSrPjvYiZIDrPNwkYgRNXm1IzE0Etl+o=;
+	b=JChE+cYy4NOqaoE6NmJ1/VmJQiNBMlnL2GAXCplQu6zz6AbEA92eS0Aea1+E9V
+	9dCTtMcmKOcioIrl9Q9vrnZQedQYPjio6hWjxTvu6STYPpDkNpzI0Cq5UBcmR2in
+	aW7QBCj/of8mL16i9gmAEJr9FYJFlXdIVBymY3hEteaAI=
+Received: from WIN-S4QB3VCT165 (unknown [])
+	by gzga-smtp-mtada-g1-2 (Coremail) with SMTP id _____wDXH21TwORn8CPxCA--.40412S2;
+	Thu, 27 Mar 2025 11:04:52 +0800 (CST)
+Date: Thu, 27 Mar 2025 11:04:53 +0800
+From: "mowenroot@163.com" <mowenroot@163.com>
+To: "Paul Moore" <paul@paul-moore.com>, 
+	"Jakub Kicinski" <kuba@kernel.org>, 
+	netdev <netdev@vger.kernel.org>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>, 
+	"Bitao  Ouyang" <1985755126@qq.com>
+Subject: Fw:  [PATCH] netlabel: Fix NULL pointer exception caused by CALIPSO on IPv4 sockets
+X-Priority: 3
+X-GUID: 8EFA12FD-24E2-4484-8D4E-7B3A30F62036
+X-Has-Attach: no
+X-Mailer: Foxmail 7.2.25.331[cn]
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemg200005.china.huawei.com (7.202.181.32)
+Mime-Version: 1.0
+Message-ID: <2025032711045196042914@163.com>
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: base64
+X-CM-TRANSID:_____wDXH21TwORn8CPxCA--.40412S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7ZrW5AF1fWF1UXryxKFy3Jwb_yoW8GrW8pF
+	Z8Kryjyw1kAa1xtr1vkF47Zwn0g34kJ3y3GFWfK34DZw45J3WxWF1xK3y0yFy7WrZagFW0
+	qr4jqF9xWayjvFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UljgsUUUUU=
+X-CM-SenderInfo: pprzv0hurr3qqrwthudrp/1tbiXwAdlGfkvzknSgAAs+
 
-When create ipip6 tunnel, if tunnel->parms.link is assigned to the previous
-created tunnel device, the dev->needed_headroom will increase based on the
-previous one.
-
-If the number of tunnel device is sufficient, the needed_headroom can be
-overflowed. The overflow happens like this:
-
-  ipip6_newlink
-    ipip6_tunnel_create
-      register_netdevice
-        ipip6_tunnel_init
-          ipip6_tunnel_bind_dev
-            t_hlen = tunnel->hlen + sizeof(struct iphdr); // 40
-            hlen = tdev->hard_header_len + tdev->needed_headroom; // 65496
-            dev->needed_headroom = t_hlen + hlen; // 65536 -> 0
-
-The value of LL_RESERVED_SPACE(rt->dst.dev) may be HH_DATA_MOD, that leads
-to a small skb allocated in __ip_append_data(), which triggers a
-skb_under_panic:
-
-  ------------[ cut here ]------------
-  kernel BUG at net/core/skbuff.c:209!
-  Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
-  CPU: 0 UID: 0 PID: 24133 Comm: test Tainted: G W 6.14.0-rc7-00067-g76b6905c11fd-dirty #1
-  Tainted: [W]=WARN
-  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.15.0-0-g2dd4b9b3f840-prebuilt.qemu.org 04/01/2014
-  RIP: 0010:skb_panic+0x156/0x1d0
-  Call Trace:
-   <TASK>
-   skb_push+0xc8/0xe0
-   fou_build_udp+0x31/0x3a0
-   gue_build_header+0xf7/0x150
-   ip_tunnel_xmit+0x684/0x3660
-   sit_tunnel_xmit__.isra.0+0xeb/0x150
-   sit_tunnel_xmit+0x2e3/0x2930
-   dev_hard_start_xmit+0x1a6/0x7b0
-   __dev_queue_xmit+0x2fa9/0x4120
-   neigh_connected_output+0x39e/0x590
-   ip_finish_output2+0x7bb/0x1f00
-   __ip_finish_output+0x442/0x940
-   ip_finish_output+0x31/0x380
-   ip_mc_output+0x1c4/0x6a0
-   ip_send_skb+0x339/0x570
-   udp_send_skb+0x905/0x1540
-   udp_sendmsg+0x17c8/0x28f0
-   udpv6_sendmsg+0x17f1/0x2c30
-   inet6_sendmsg+0x105/0x140
-   ____sys_sendmsg+0x801/0xc70
-   ___sys_sendmsg+0x110/0x1b0
-   __sys_sendmmsg+0x1f2/0x410
-   __x64_sys_sendmmsg+0x99/0x100
-   do_syscall_64+0x6e/0x1c0
-   entry_SYSCALL_64_after_hwframe+0x76/0x7e
-  ---[ end trace 0000000000000000 ]---
-
-Fix this by add check for needed_headroom in ipip6_tunnel_bind_dev().
-
-Reported-by: syzbot+4c63f36709a642f801c5@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=4c63f36709a642f801c5
-Fixes: c88f8d5cd95f ("sit: update dev->needed_headroom in ipip6_tunnel_bind_dev()")
-Signed-off-by: Wang Liang <wangliang74@huawei.com>
----
- net/ipv6/sit.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
-
-diff --git a/net/ipv6/sit.c b/net/ipv6/sit.c
-index 39bd8951bfca..1662b735c5e3 100644
---- a/net/ipv6/sit.c
-+++ b/net/ipv6/sit.c
-@@ -1095,7 +1095,7 @@ static netdev_tx_t sit_tunnel_xmit(struct sk_buff *skb,
- 
- }
- 
--static void ipip6_tunnel_bind_dev(struct net_device *dev)
-+static int ipip6_tunnel_bind_dev(struct net_device *dev)
- {
- 	struct ip_tunnel *tunnel = netdev_priv(dev);
- 	int t_hlen = tunnel->hlen + sizeof(struct iphdr);
-@@ -1134,7 +1134,12 @@ static void ipip6_tunnel_bind_dev(struct net_device *dev)
- 		WRITE_ONCE(dev->mtu, mtu);
- 		hlen = tdev->hard_header_len + tdev->needed_headroom;
- 	}
-+
-+	if (t_hlen + hlen > U16_MAX)
-+		return -EOVERFLOW;
-+
- 	dev->needed_headroom = t_hlen + hlen;
-+	return 0;
- }
- 
- static void ipip6_tunnel_update(struct ip_tunnel *t,
-@@ -1452,7 +1457,9 @@ static int ipip6_tunnel_init(struct net_device *dev)
- 	tunnel->net = dev_net(dev);
- 	strcpy(tunnel->parms.name, dev->name);
- 
--	ipip6_tunnel_bind_dev(dev);
-+	err = ipip6_tunnel_bind_dev(dev);
-+	if (err)
-+		return err;
- 
- 	err = dst_cache_init(&tunnel->dst_cache, GFP_KERNEL);
- 	if (err)
--- 
-2.34.1
+T24gVGh1LCBNYXIgMjcsIDIwMjUgYXQgMzozOCBBTSBQYXVsIE1vb3JlIHBhdWxAcGF1bC1tb29y
+ZS5jb20gd3JvdGU6Cgo+IEZvciBhbGwgdGhyZWUgZnVuY3Rpb24sIEknZCBwcm9iYWJseSBhZGQg
+YSBzaW5nbGUgYmxhbmsgbGluZSBiZXR3ZWVuIHRoZSBsb2NhbCB2YXJpYWJsZSBkZWNsYXJhdGlv
+bnMgYW5kIHRoZSBjb2RlIGJlbG93IGZvciB0aGUgc2FrZSBvZiByZWFkYWJpbGl0eS4gSSdkIHBy
+b2JhYmx5IGFsc28gZHJvcCB0aGUgY29tbWVudCBhcyB0aGUgY29kZSBzZWVtcyByZWFzb25hYmx5
+IG9idmlvdXMgKGluZXQ2X3NrKCkgY2FuIHJldHVybiBOVUxMLCB3ZSBjYW4ndCBkbyBhbnl0aGlu
+ZyB3aXRoIGEgTlVMTCBwdHIgc28gYmFpbCksIGJ1dCBuZWl0aGVyIGFyZSByZWFzb25zIGZvciBu
+b3QgYXBwbHlpbmcgdGhpcyBwYXRjaCwgaWYgYW55dGhpbmcgdGhleSBjYW4gYmUgZml4ZWQgdXAg
+ZHVyaW5nIHRoZSBtZXJnZSBhc3N1bWluZyB0aGUgcGF0Y2ggYXV0aG9yIGFncmVlcy4KPgo+IEFu
+eXdheSwgdGhpcyBsb29rcyBnb29kIHRvIG1lLCBKYWt1YiBhbmQvb3Igb3RoZXIgbmV0ZGV2IGZv
+bGtzLCB3ZSBzaG91bGQgZ2V0IHRoaXMgbWFya2VkIGZvciBzdGFibGUgYW5kIHNlbnQgdXAgdG8g
+TGludXMsIGRvIHlvdSB3YW50IHRvIGRvIHRoYXQgb3Igc2hvdWxkIEk/CgpUaGFuayB5b3UgZm9y
+IHlvdXIgYWNrbm93bGVkZ21lbnQgYW5kIHN1Z2dlc3Rpb25zISBZb3VyIGluc2lnaHRzIGhhdmUg
+YmVlbiB2ZXJ5IGhlbHBmdWwgdG8gdXMuCgpXZSBmdWxseSBhZ3JlZSB3aXRoIHlvdXIgc3VnZ2Vz
+dGlvbnMgcmVnYXJkaW5nIGNvZGUgZm9ybWF0dGluZyBhbmQgY29tbWVudCBhZGp1c3RtZW50cy4g
+U2luY2UgeW91IGFyZSBtb3JlIGZhbWlsaWFyIHdpdGggdGhlIGNvZGUsIHdlIHdvdWxkIGFwcHJl
+Y2lhdGUgaXQgaWYgeW91IGNvdWxkIGhlbHAgaGFuZGxlIHRoZXNlIG1vZGlmaWNhdGlvbnMgYW5k
+IGNvbXBsZXRlIHRoZSBtZXJnZS4gSWYgeW91IGFyZSB3aWxsaW5nIHRvIGRvIHNvLCB3ZSB3b3Vs
+ZCBiZSB2ZXJ5IGdyYXRlZnVsIQoKUHJldmlvdXNseSwgdGhlIGVtYWlsIGZhaWxlZCB0byBiZSBk
+ZWxpdmVyZWQgdG8gbmV0ZGV2QHZnZXIua2VybmVsLm9yZyBhbmQgbGludXgta2VybmVsQHZnZXIu
+a2VybmVsLm9yZyBkdWUgdG8gZm9ybWF0dGluZyBpc3N1ZXMuIFdlIHNpbmNlcmVseSBhcG9sb2dp
+emUgZm9yIGFueSBpbmNvbnZlbmllbmNlIHRoaXMgbWF5IGhhdmUgY2F1c2VkLgoKVGhhbmsgeW91
+IGFnYWluIGZvciB5b3VyIGd1aWRhbmNlIGFuZCBzdXBwb3J0LiBXZSBhcmUgZGVsaWdodGVkIHRv
+IGxlYXJuIGZyb20geW91IQoKVGhhbmtzIGFnYWluLgogRGViaW4gWmh1ICYgQml0YW8gT3V5YW5n
+Cg==
 
 
