@@ -1,286 +1,166 @@
-Return-Path: <netdev+bounces-177986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 869FAA73AB2
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 18:37:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19E0AA73DA8
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 18:58:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51D6C7A5429
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 17:36:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5D80189EA6D
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 17:58:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16387214813;
-	Thu, 27 Mar 2025 17:37:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02096219A8B;
+	Thu, 27 Mar 2025 17:58:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pj9RYzvm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jEu0YeFD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0610E20F08F;
-	Thu, 27 Mar 2025 17:37:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AC801B6D18;
+	Thu, 27 Mar 2025 17:58:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743097046; cv=none; b=Dz2BS9ZArWcM4P+5szbztKNYCDg4dIFry+/MNWfuSimjLboYPXdpG4oszsKIJp7WvCjU0Un7UY5FDFMQjbVOOYjb9TjIvxhS8e0IxnKyK0bhjHSmsk0jC7VHYanZ4JiwfMEynQGcCbMcqv7h0+y+PvfBYOgX9JaCY/jE8sxUJe0=
+	t=1743098318; cv=none; b=Fbxb5/WEea2pPhRzfqBMH6O5Zq8c6ZLP450iAvRB6wnwpPx0lwTJG/JXOnRIjRp8HK3PE/dEq3pU3lZbrBrDNC91X8Qa9eW4V7eWm/7XpEDYmFC0oq42zBy2lotPMlKO6Gy8xiwmfRvfp4QNcI61z7j4T8VLCs1HrR731OLUVhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743097046; c=relaxed/simple;
-	bh=HQpAQJh3muklwyCnyzlIWz6Pzj5ISyO1vcpTZ5xzMHQ=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LbGeP+86QJTMNTbKrziP1qG3EzzL5SbJOCv59osaehrMKLyqa6qigFdX7XlGbKYewnLWIsGuju/jqOEGUpZUoz2ZJ+7OQrg/SCC7+japTYz7+LNwY6DXGfLkrToQDV3+uMRUgxS2RSL2nR2WEQ1zoc0AbtrJGjb+Nfuz4jA/Q7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pj9RYzvm; arc=none smtp.client-ip=209.85.128.52
+	s=arc-20240116; t=1743098318; c=relaxed/simple;
+	bh=Mrrsr3fGnwTT6iJ6kMjdrgIfTMBV32KTwyyigzONlOE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Zrtzq4mWIRqRUhpUgAQ5uR6Q8FO72JSNfVdqPc7vNmPHqSZ0Lu/WNi+tk++XXqEKOpZuzkI/kVQrLTkBfPmgPBrsToxcS1YlbS6AEK4kFXxWC6r5aG1k1Q2A+7wyj2KHugseRDw6EMMer0oMmPrma7Xd4KAi9CIvuHkx/szQnzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jEu0YeFD; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4394a823036so13508765e9.0;
-        Thu, 27 Mar 2025 10:37:24 -0700 (PDT)
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43cfebc343dso10588335e9.2;
+        Thu, 27 Mar 2025 10:58:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743097043; x=1743701843; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=s6Ys2ZlQrZI75OHR8mzHVaydYXLMPUTzTOm26+iFbCo=;
-        b=Pj9RYzvmH72ivdRMHLvUKapdco5NGw/d09b5UNPKJD5HypOTUIPTZ87DpHE9JoMXR0
-         LIj11E9rYRzo/PhyMR4+rCIny0HXTZDZIP5SF96iKXQ+Vx3XqplkbyNsXpnjZji08z8A
-         6XCUrCkOthDVbBBs9C/ArTEvaxD6LAXVP61qRUHcprGcyJMZTiF+EIVvRMgjD4kkMac+
-         WsnismwkCuJN1m1IUCATNLbNzR1OUspWV9CvTTBYr3LTiX5urguV3zRTrz5AR9d6hBlp
-         jUw4UALw9U760V1CPLTXFTtuxWF69KckeYAq9l6JRuXPh4qdQMwRj/14MCuBJgF26q4q
-         VcVg==
+        d=gmail.com; s=20230601; t=1743098314; x=1743703114; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zNFPKRqMQqLZ9Eg05/SyM0SNg2unRMSrNmUUeu7DAM4=;
+        b=jEu0YeFDBCNjEkfFgIHKfChvLeFf673g9UoX7Ikf/KNlM6eH8eFB6xfjGTNMldFtF1
+         CxG1d5BXF+F537NWQr6CqclNmfrvQTAQNCpzNIXfxXW/I0CPmIOD2hjJ5azSP9Q4y/Cj
+         KgpP76cKR2v/MTn9ZZ2y2mkJWP+CF4O+E7n3XtmR2igobCW/Li/wgfAh4piSbBWxN9Q8
+         OMxugg2sB7uI7+g/SItD9odB5dIdG7jGGHRAdj04SK5Jv3YUhjPh0J0pHD/q6AZB4N54
+         m65s8qFOukqBMtbf8TstBEMcdZNFR0WUv9VBTMmzRuCulngF6DDBA2bEGUTxW/t1F1n+
+         rilA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743097043; x=1743701843;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s6Ys2ZlQrZI75OHR8mzHVaydYXLMPUTzTOm26+iFbCo=;
-        b=WL3lgQYPjRV+9N+ERIERIvJjmhrKxAEu0CVV0Y4KVB6exetAp9NNqmNtF7nncjL56J
-         dJTwz8Q8iSCHBccFlDYZnxwklSAxD9RERNBvFAWe1plVh4oykudokJeubpRPVy/tNYTG
-         gyC0sZexwSc3v+QtWgj5Co5rgopw5LWgq/HtxHNRCNF4Z4leWHZXYWFygLyElh5FudnA
-         cHITirbGDLDzDaatpt330Qw2hAt/5GogBYjSRdQojpV1dOjIqvDOwAVqABvAOxMCjxhK
-         5cV7CCR4MFMIOzcrZdoLxX8alBMh0DeHz4AGerBuRdRziNw7CMeov06XcyirYO2/973T
-         GxIA==
-X-Forwarded-Encrypted: i=1; AJvYcCWZ0UcNC+uHDAOOtWCFds9ziwuiIPxIejyt0BFVT5GTHIGn5D6aMqeHSb4MRURptwu8ZIWURBaX@vger.kernel.org, AJvYcCWiNjoarnxtBFyNeNeIbqm1rkMDwCC+CLPyl4rCWC+NVQwg4eW2x4z2UzCitBXdOWQbjAfc4/hv2eGPo5i/@vger.kernel.org, AJvYcCXnl9CIDV0s2XGQaUQ7DTTm9qXLzfbhVW30VNC8Wv/ssVfoESnO3gWqDVWrhHsDjONuDrJWNeVcpk2e@vger.kernel.org
-X-Gm-Message-State: AOJu0YxlfuOhaW8NtE7CRY1m+FqB7yPWC1duzUhh0cnLG/9AWeJyhTHw
-	i561Hsey9Kt7WHPr4a8SU7ezGL/26n1L05Jfz7Fv5QgV7gDOxVHp
-X-Gm-Gg: ASbGnct+oYlxa7wBgY9Q+HrThtItd8xpk92pN5ilR8irrdzfQbvBYeqTWvAQKRRejBV
-	mCkXeIqN+mqvIBg7fKeUdP4ozmPVPtI4Pe39aywxFMQIZpk3XwyRS0w7FjfJRAbgnDINMNlFH0Z
-	0S1bMpzkJEgPf7Xm9Am5jz/3cvpTIxfnvIVPYr+7VT7YroQ41AJpRURl7pX2KOppqnCgt6AMHmP
-	9qwrH4Px3G9Jo59ax1Ux7sywAPLxCXTELP0t6463SGtc+IDe4aqhqvJ/MShpK36LZ4eA0KIrmJY
-	LSh1L8isT0hE+WBhaQkcFT9GtNfbpgMjpPghWcPiwptw1dQwPIaQSz1SPzlMnX9RC+x5hUYV+xo
-	ho7Jt13ZRPfg=
-X-Google-Smtp-Source: AGHT+IHQVILieqXhfCmLgmCPwty7dU1zs9F7aNXcif4TGuQZJb9ahNm/UpFU22cG7bbu9z+sNoULSQ==
-X-Received: by 2002:a05:600c:3b08:b0:43c:eec7:eab7 with SMTP id 5b1f17b1804b1-43d905a8085mr801705e9.11.1743097042824;
-        Thu, 27 Mar 2025 10:37:22 -0700 (PDT)
-Received: from Ansuel-XPS. (93-34-88-225.ip49.fastwebnet.it. [93.34.88.225])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d8fccfd9bsm1616715e9.20.2025.03.27.10.37.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Mar 2025 10:37:22 -0700 (PDT)
-Message-ID: <67e58cd2.7b0a0220.289480.1e35@mx.google.com>
-X-Google-Original-Message-ID: <Z-WMz-YLtJjOYkmH@Ansuel-XPS.>
-Date: Thu, 27 Mar 2025 18:37:19 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [net-next PATCH 3/6] net: phylink: Correctly handle PCS probe
- defer from PCS provider
-References: <20250318235850.6411-1-ansuelsmth@gmail.com>
- <20250318235850.6411-4-ansuelsmth@gmail.com>
- <Z9rplhTelXb-oZdC@shell.armlinux.org.uk>
- <67daee6c.050a0220.31556f.dd73@mx.google.com>
- <Z9r4unqsYJkLl4fn@shell.armlinux.org.uk>
- <67db005c.df0a0220.f7398.ba6b@mx.google.com>
- <Z9sbeNTNy0dYhCgu@shell.armlinux.org.uk>
+        d=1e100.net; s=20230601; t=1743098314; x=1743703114;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zNFPKRqMQqLZ9Eg05/SyM0SNg2unRMSrNmUUeu7DAM4=;
+        b=qZ45NfFN8k+Rz0/xZP0ypktCNkn5s36kHhlb/yG8MXC3ZuSmdsTEuPFfbewu4kcsND
+         0KDPuQXtFiJrq7FSVlBrGzBBLL5knMpqQBML/2Mxc8MnLfZrd2fgEZE1z2gGGC+nXrv+
+         kOEwBLBT5OhZY9jZtYwjQoBhPRG2nwd6K2xdCXsZOlbg1yz93zG0C+p54hr1p7BA5M03
+         5gcl3aKENvqUdnZP0BDwFfPVyz4fnWkN9Srto3mB+fZR2GeG3wN5PSR/wE0CqSVpX0SU
+         o6A1XE/oGlmtBRmU8KCIDrPMoqrvp6WQzWg3fxPYPVg8Noy0sm57te6cA6TKBPDY9xMf
+         uovA==
+X-Forwarded-Encrypted: i=1; AJvYcCW5zIwFq1bOvHVN2fDlpNVa1w0A+ukYdTg5MHkUTknixJst3jm+seBb2nsBz1EWksYwDqCjVhpG6Qkmbg==@vger.kernel.org, AJvYcCWgF7n33ykmZh1rW5gLPquJVmWHpYsldjcwAtqdbnI0+Y3q7yD5VB4UhS3WgP6hJiKMGr6eoOBu@vger.kernel.org, AJvYcCXH1tXe6lF/ectf9vA1RfD6/nEHvGb+F5tflA6YQdgLfPk5fnnkdfQEhwqLhcFAqptogTX/bI3AZiqH32U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrpMVJz//rBQ4q+a6RNDhgmWeiQrZL4DDYWms+Jsr1d3H88agy
+	nF/CJSjDZXpS0f3qcfq7XO/lPjuQBVv4+Fzmor+aFsQQmoRSoRku
+X-Gm-Gg: ASbGncu+L7EWuuJ/duwQzdSypQXUvN/JvJWvoA8qM7v/MBar1pBkO9bk2sRs5n+7X4B
+	rPRZ4i6+0KMLEDvgIh44ZO75qHU97druufadzioCEeSrl3WK/i7RgBdfEjFtS57Xtv3VHTeDJXA
+	3ccU8k59o4TYZfdPu7NZJ4txhbBLbTobYJxjUlXSIZ3TQ2kE7AeWXYCB+/ves5sHIzKVgBuiW4Z
+	YIgHGDeAmAahTr8kU98vDPlajIkV3ROkAnAWc4l/PqztcO6Xh7CsTQ/TbJYj86e29dclyMcAd35
+	tAnBssAvJ7k6JyIa+YMIWah2uRpPFBeIUBYF9zAxLqXvNfDEpbKHAzCGBGtsSnHuxA==
+X-Google-Smtp-Source: AGHT+IGwPvCqvpr/tpWh0Z1pqQBc8JjT9+vNiek0QDxNjWt3pW1vfUneUWjh2F2SC5tL61T5+z6AIA==
+X-Received: by 2002:a05:6000:4205:b0:390:f902:f973 with SMTP id ffacd0b85a97d-39ad1742fc3mr4309017f8f.8.1743098314093;
+        Thu, 27 Mar 2025 10:58:34 -0700 (PDT)
+Received: from [172.27.19.238] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d82e6adf6sm44366535e9.15.2025.03.27.10.58.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Mar 2025 10:58:33 -0700 (PDT)
+Message-ID: <ea6a499b-c267-4fa3-8ed6-983ab96b3b9e@gmail.com>
+Date: Thu, 27 Mar 2025 19:58:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z9sbeNTNy0dYhCgu@shell.armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/mlx5e: SHAMPO, Make reserved size independent of
+ page size
+To: Simon Horman <horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Gal Pressman <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Moshe Shemesh <moshe@nvidia.com>,
+ Mark Bloch <mbloch@nvidia.com>, Lama Kayal <lkayal@nvidia.com>
+References: <1742732906-166564-1-git-send-email-tariqt@nvidia.com>
+ <20250325140431.GQ892515@horms.kernel.org>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20250325140431.GQ892515@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 19, 2025 at 07:31:04PM +0000, Russell King (Oracle) wrote:
-> On Wed, Mar 19, 2025 at 06:35:21PM +0100, Christian Marangi wrote:
-> > On Wed, Mar 19, 2025 at 05:02:50PM +0000, Russell King (Oracle) wrote:
-> > > My thoughts are that if a PCS goes away after a MAC driver has "got"
-> > > it, then:
-> > > 
-> > > 1. we need to recognise that those PHY interfaces and/or link modes
-> > >    are no longer available.
-> > > 2. if the PCS was in-use, then the link needs to be taken down at
-> > >    minimum and the .pcs_disable() method needs to be called to
-> > >    release any resources that .pcs_enable() enabled (e.g. irq masks,
-> > >    power enables, etc.)
-> > > 3. the MAC driver needs to be notified that the PCS pointer it
-> > >    stashed is no longer valid, so it doesn't return it for
-> > >    mac_select_pcs().
-> > 
-> > But why we need all these indirect handling and checks if we can
-> > make use of .remove and shutdown the interface. A removal of a PCS
-> > should cause the entire link to go down, isn't a dev_close enough to
-> > propagate this? If and when the interface will came up checks are done
-> > again and it will fail to go UP if PCS can't be found.
-> > 
-> > I know it's a drastic approach to call dev_close but link is down anyway
-> > so lets reinit everything from scratch. It should handle point 2 and 3
-> > right?
-> 
-> Let's look at what dev_close() does. This is how it's documented:
-> 
->  * dev_close() - shutdown an interface
->  * @dev: device to shutdown
->  *
->  * This function moves an active device into down state. A
->  * %NETDEV_GOING_DOWN is sent to the netdev notifier chain. The device
->  * is then deactivated and finally a %NETDEV_DOWN is sent to the notifier
->  * chain.
-> 
-> So, this is equivalent to userspace doing:
-> 
-> # ip li set dev ethX down
-> 
-> and nothing prevents userspace doing:
-> 
-> # ip li set dev ethX up
-> 
-> after that call to dev_close() has returned.
-> 
-> If this happens, then the netdev driver's .ndo_open will be called,
-> which will then call phylink_start(), and that will attempt to bring
-> the link back up. That will call .mac_select_pcs(), which _if_ the
-> PCS is still "published" means it is _still_ accessible.
-> 
-> So your call that results in dev_close() with the PCS still being
-> published is ineffectual.
-> 
-> It's *no* different from this crap in the stmmac driver:
-> 
->         stmmac_stop_all_dma(priv);
->         stmmac_mac_set(priv, priv->ioaddr, false);
->         unregister_netdev(ndev);
-> 
-> because *until* that unregister_netdev() call has completed, _userspace_
-> still has control over the netdev, and can do whatever it damn well
-> pleases.
-> 
-> Look, this is very very very simple.
-> 
-> If something is published to another part of the code, it is
-> discoverable, and it can be used or manipulated by new users.
-> 
-> If we wish to take something away, then first, it must be
-> unpublished to prevent new users discovering the resource. Then
-> existing users need to be dealt with in a safe way. Only at that
-> point can we be certain that there are no users, and thus the
-> underlying device begin to be torn down.
-> 
-> It's entirely logical!
->
 
-OK so (I think this was also suggested in the more specific PCS patch)
-- 1. unpublish the PCS from the provider
-- 2. put down the link...
 
-I feel point 2 is the big effort here to solve. Mainly your problem is
-the fact that phylink_major_config should not handle PROBE_DEFER and
-should always have all the expected PCS available. (returned from
-mac_select_pcs)
-
-So the validation MUST ALWAYS be done before reaching that code path.
-
-That means that when a PCS is removed, the entire phylink should be
-refreshed and reevaluated. And at the same time lock userspace from
-doing anything fancy (as there might be a possibility for
-phylink_major_config)
-
-Daniel at some point in the brainstorm process suggested that we might
-need something like phylink_impair() to lock it while it's getting
-""refreshed"". Do you think that might be a good path for this?
-
-One of the first implementation of this called phylink_stop (not
-dev_stop) so maybe I should reconsider keeping everything phylink
-related. But that wouldn't put the interface down from userspace if I'm
-not wrong.
-
-It's point 3 (of the old list) "the MAC driver needs to be notified that
-the PCS pointer it stashed is no longer valid, so it doesn't return it for
-mac_select_pcs()." my problem. I still feel MAC should not track PCS but
-only react on the presence (or absence) of them.
-
-And this point is really connected to point 1 so I guess point 1 is the
-first to handle, before this. (I also feel it will magically solved once
-point 1 is handled)
-
-> > For point 1, additional entry like available_interface? And gets updated
-> > once a PCS gets removed??? Or if we don't like the parsing hell we map
-> > every interface to a PCS pointer? (not worth the wasted space IMHO)
+On 25/03/2025 16:04, Simon Horman wrote:
+> On Sun, Mar 23, 2025 at 02:28:26PM +0200, Tariq Toukan wrote:
+>> From: Lama Kayal <lkayal@nvidia.com>
+>>
+>> When hw-gro is enabled, the maximum number of header entries that are
+>> needed per wqe (hd_per_wqe) is calculated based on the size of the
+>> reservations among other parameters.
+>>
+>> Miscalculation of the size of reservations leads to incorrect
+>> calculation of hd_per_wqe as 0, particularly in the case of large page
+>> size like in aarch64, this prevents the SHAMPO header from being
+>> correctly initialized in the device, ultimately causing the following
+>> cqe err that indicates a violation of PD.
 > 
-> At the moment, MAC drivers that I've updated will do things like:
+> Hi Lama, Tariq, all,
 > 
->                 phy_interface_or(priv->phylink_config.supported_interfaces,
->                                  priv->phylink_config.supported_interfaces,
->                                  pcs->supported_interfaces);
+> If I understand things correctly, hd_per_wqe is calculated
+> in mlx5e_shampo_hd_per_wqe() like this:
 > 
-> phylink_config.supported_interfaces is the set of interface modes that
-> the MAC _and_ PCS subsystem supports. It's not just the MAC, it's both
-> together.
+> u32 mlx5e_shampo_hd_per_wqe(struct mlx5_core_dev *mdev,
+>                              struct mlx5e_params *params,                                                    struct mlx5e_rq_param *rq_param)
+> {
+>          int resv_size = BIT(mlx5e_shampo_get_log_rsrv_size(mdev, params)) * PAGE_SIZE;
+>          u16 num_strides = BIT(mlx5e_mpwqe_get_log_num_strides(mdev, params, NULL));
+>          int pkt_per_resv = BIT(mlx5e_shampo_get_log_pkt_per_rsrv(mdev, params));
+>          u8 log_stride_sz = mlx5e_mpwqe_get_log_stride_size(mdev, params, NULL);
+>          int wqe_size = BIT(log_stride_sz) * num_strides;                                u32 hd_per_wqe;
 > 
-> So, if a PCS is going away, then clearing the interface modes that the
-> PCS was providing would make sense - but there's a problem here. What
-> if the PCS is a bought-in bit of IP where the driver supports many modes
-> but the MAC doesn't use it for all those modes. So... which interface
-> modes get cleared is up to the MAC driver to decide.
+>          /* Assumption: hd_per_wqe % 8 == 0. */
+>          hd_per_wqe = (wqe_size / resv_size) * pkt_per_resv;                             mlx5_core_dbg(mdev, "%s hd_per_wqe = %d rsrv_size = %d wqe_size = %d pkt_per_resv = %d\n",                                                                                    __func__, hd_per_wqe, resv_size, wqe_size, pkt_per_resv);
+>          return hd_per_wqe;
+> }
 > 
-
-Should we add an OP to handle removal of PCS from a MAC? Like
-.mac_release_pcs ? I might be wrong but isn't that giving too much
-freedom to the driver?
-
-I need to recheck how the interface validation work and what values are
-used but with this removal thing on the table, supported_interfaces OR
-with the PCS supported_interface might be problematic and maybe the
-original values should be stored somewhere.
-
-> > > There's probably a bunch more that needs to happen, and maybe need
-> > > to consider how to deal with "pcs came back".. but I haven't thought
-> > > that through yet.
-> > 
-> > Current approach supports PCS came back as we check the global provider
-> > list and the PCS is reachable again there.
-> > (we tasted various scenario with unbind/bind while the interface was
-> > up/down)
+> I can see that if PAGE_SIZE was some multiple of 4k, and thus
+> larger than wqe_size, then this could lead to hd_per_wqe being zero.
 > 
-> ... because you look up the PCS in the mac_select_pcs() callback which
-> leads to a different race to what we have today, this time inside the
-> phylink code which thankfully phylink prints an error which is *NEVER*
-> supposed to happen.
->
+> But I note that mlx5e_mpwqe_get_log_stride_size() may return PAGE_SHIFT.
+> And I wonder if that leads to wqe_size being larger than expected by this
+> patch in cases where the PAGE_SIZE is greater than 4k.
+> 
+> Likewise in mlx5e_shampo_get_log_cq_size(), which seems to have a large overlap
+> codewise with mlx5e_shampo_hd_per_wqe().
+> 
+>>
 
-I want to make sure tho you are ok with the usage of .mac_select_pcs
-for re-evaluation task.
+Hi Simon,
 
-Maybe a better approach is to introduce .mac_get_pcs and enforce the
-usage only on validation phase? (aka in phylink_validate_mac_and_pcs)
+Different settings lead to different combinations of num_strides and 
+stride_size. However, they affect each other in a way that the resulting 
+wqe_size has the expected (~preset) value.
 
-AFAIK in that phase .mac_select_pcs can return errors if the requested
-interface is not possible for one reason or another.
+In mlx5e_mpwqe_get_log_num_strides() you can see that if stride_size 
+grows, then num_strides decreases accordingly.
 
-What do you think? In short 2 additional OP that with the select one
-result in:
+In addition, to reduce mistakes/bugs, we have a few WARNs() along the 
+calculations, in addition to a verifier function 
+mlx5e_verify_rx_mpwqe_strides().
 
-- get
-- select
-- release
+Thanks,
+Tariq
 
--- 
-	Ansuel
 
