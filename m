@@ -1,187 +1,79 @@
-Return-Path: <netdev+bounces-177888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 126B6A729BD
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 06:01:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA9DCA729CF
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 06:16:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1D631894BBB
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 05:01:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D28F416DD9E
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 05:16:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EADC31ABED9;
-	Thu, 27 Mar 2025 05:01:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32FB4433B1;
+	Thu, 27 Mar 2025 05:16:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="KfJ4C1Vu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zab0q4SG"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5432618EB0;
-	Thu, 27 Mar 2025 05:01:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 079BA1FC8;
+	Thu, 27 Mar 2025 05:16:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743051703; cv=none; b=Fg6ibIlH+Q4maCym2xlHYwDpW0cGT9nTPsmHvw0UiV8EKKCF6bdprHDEaS/mxI++YYTsTABVqpKAe5Ce8V0Lr1sb0jvBqN8TesMaO0LpcEhyIM+dcsBLpS2hxiBpkUMc4Vc+7f/bIfK9n7hq83QjXvXsu20U5/QFr/fNMMHBNXI=
+	t=1743052594; cv=none; b=SqdQT97dDgy8sCSwASYtpHXeao1nYKTckc6x1hFyMSMc7ZADkuZ1lVID4wzBwo7kfjORVnB3qL9iqDEkNXrwVIZOtYdP7eRMctHzQzidxZhOGAnLv20cAHSCQHCiHb+UBSM3ELWoJgnGFqQRzpQNqgp66U6dYvBhlz0vlCX9er4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743051703; c=relaxed/simple;
-	bh=xYu6biCgRAvV54XDPXKBT2zX4ig7grodlwKFQMpKzuk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AvSsM3neFg1MDuU0ffby5biQm6XoivaOXE9oR5WZ30iiIn7CAJa+c2I9LkKPPI5BpJTsVaOn0hUY9aHzPK8a5DkElsP5s2jaYdaJU+41o+vzbBUv8KfRzTdE8QDIWbw/gnhUD3WJ6TMjJdgzD2pKrPOCIqRdKvw6KFeTC9OJBgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=KfJ4C1Vu; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id B3A5C211143F; Wed, 26 Mar 2025 22:01:40 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B3A5C211143F
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1743051700;
-	bh=TRzzvHz66Y/kUUMQcpHVIbr9k8vTxUvWBzzSkkTuLw0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KfJ4C1Vum9CP9IxbsicYpgcJT+JGr4ohXDEECm+2Lfiu2kJmGX9YXI/FBKq3JAVAp
-	 SBeY9fq7GC+OML/ZFYT1Yun5DEK1yZyZsZpD6RkHs/+xaPNHwzk9glQdFMLKLE3BRG
-	 cHyCaCLoKhemP//Z9NZpwGOVoLj82nyInV84LJHA=
-Date: Wed, 26 Mar 2025 22:01:40 -0700
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	decui@microsoft.com, stephen@networkplumber.org, kys@microsoft.com,
-	paulros@microsoft.com, olaf@aepfle.de, vkuznets@redhat.com,
-	davem@davemloft.net, wei.liu@kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, leon@kernel.org,
-	longli@microsoft.com, ssengar@linux.microsoft.com,
-	linux-rdma@vger.kernel.org, daniel@iogearbox.net,
-	john.fastabend@gmail.com, bpf@vger.kernel.org, ast@kernel.org,
-	hawk@kernel.org, tglx@linutronix.de, jesse.brandeburg@intel.com,
-	andrew+netdev@lunn.ch, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net,v2] net: mana: Switch to page pool for jumbo frames
-Message-ID: <20250327050140.GA13258@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1742920357-27263-1-git-send-email-haiyangz@microsoft.com>
+	s=arc-20240116; t=1743052594; c=relaxed/simple;
+	bh=p4E3NIWKHCQ7Kh8PS4wy9jAsJGGPr7MV2B4owvu0tVU=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=VMHA/Ob7Ex47dvrLXu/xc6y89bCo/8eSs42Ksuk6C4HuLnn1hwic4ck7Q/U31tq1EpxGAYRIQzjiSLAwPd0vP+esZ9ztFGpfs5ABdx6giaqjaOHCt/6jNSKqyTfpKntIrxXKcPv8aXPQJqV5sz1e6gdg2zsoqJypHZK0u4rSfkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zab0q4SG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8A58C4CEDD;
+	Thu, 27 Mar 2025 05:16:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743052593;
+	bh=p4E3NIWKHCQ7Kh8PS4wy9jAsJGGPr7MV2B4owvu0tVU=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=Zab0q4SGvrBMtgoXJ4fEsv82KssbMczUCWoAPxwGW5Pu+PvN4NGoIuNyb2qf/uaUB
+	 ELscolavqsjliNC54ttcIKnHXiyDA+3X8S1sYahvwbL4aKm6uSvr4tU5SAjRMhDYSs
+	 00fYmEM7ngcohE3ZVXJ1RV27jVQozC7RSznUxmCPgKNshh+ki5q5YYu8RoY0A6ttHF
+	 /qLYctsD78P1349/vAQo4t+ohEGSV+FfKN+lRZ/VX7BzT4x6IWQKDYkcAHNmKOSMax
+	 GZZU1RKuMRvL4mlpbwg+uyGhSPHU/qAnmmx4XSF7kffXkg5IGL4p8qHGipPrWJOk6K
+	 Vqc13YsS72ZVA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7156F380AAFD;
+	Thu, 27 Mar 2025 05:17:11 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.15
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20250326163652.2730264-1-kuba@kernel.org>
+References: <20250326163652.2730264-1-kuba@kernel.org>
+X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20250326163652.2730264-1-kuba@kernel.org>
+X-PR-Tracked-Remote: https://lore.kernel.org/all/20250228132953.78a2b788@canb.auug.org.au/ net/core/dev.c
+X-PR-Tracked-Commit-Id: 023b1e9d265ca0662111a9df23d22b4632717a8a
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 1a9239bb4253f9076b5b4b2a1a4e8d7defd77a95
+Message-Id: <174305262992.1585001.7193079148343307430.pr-tracker-bot@kernel.org>
+Date: Thu, 27 Mar 2025 05:17:09 +0000
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1742920357-27263-1-git-send-email-haiyangz@microsoft.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Tue, Mar 25, 2025 at 09:32:37AM -0700, Haiyang Zhang wrote:
-> Frag allocators, such as netdev_alloc_frag(), were not designed to
-> work for fragsz > PAGE_SIZE.
-> 
-> So, switch to page pool for jumbo frames instead of using page frag
-> allocators. This driver is using page pool for smaller MTUs already.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 80f6215b450e ("net: mana: Add support for jumbo frame")
-> Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
-> ---
-> v2: updated the commit msg as suggested by Jakub Kicinski.
-> 
-> ---
->  drivers/net/ethernet/microsoft/mana/mana_en.c | 46 ++++---------------
->  1 file changed, 9 insertions(+), 37 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> index 9a8171f099b6..4d41f4cca3d8 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> @@ -661,30 +661,16 @@ int mana_pre_alloc_rxbufs(struct mana_port_context *mpc, int new_mtu, int num_qu
->  	mpc->rxbpre_total = 0;
->  
->  	for (i = 0; i < num_rxb; i++) {
-> -		if (mpc->rxbpre_alloc_size > PAGE_SIZE) {
-> -			va = netdev_alloc_frag(mpc->rxbpre_alloc_size);
-> -			if (!va)
-> -				goto error;
-> -
-> -			page = virt_to_head_page(va);
-> -			/* Check if the frag falls back to single page */
-> -			if (compound_order(page) <
-> -			    get_order(mpc->rxbpre_alloc_size)) {
-> -				put_page(page);
-> -				goto error;
-> -			}
-> -		} else {
-> -			page = dev_alloc_page();
-> -			if (!page)
-> -				goto error;
-> +		page = dev_alloc_pages(get_order(mpc->rxbpre_alloc_size));
-> +		if (!page)
-> +			goto error;
->  
-> -			va = page_to_virt(page);
-> -		}
-> +		va = page_to_virt(page);
->  
->  		da = dma_map_single(dev, va + mpc->rxbpre_headroom,
->  				    mpc->rxbpre_datasize, DMA_FROM_DEVICE);
->  		if (dma_mapping_error(dev, da)) {
-> -			put_page(virt_to_head_page(va));
-> +			put_page(page);
->  			goto error;
->  		}
->  
-> @@ -1672,7 +1658,7 @@ static void mana_rx_skb(void *buf_va, bool from_pool,
->  }
->  
->  static void *mana_get_rxfrag(struct mana_rxq *rxq, struct device *dev,
-> -			     dma_addr_t *da, bool *from_pool, bool is_napi)
-> +			     dma_addr_t *da, bool *from_pool)
->  {
->  	struct page *page;
->  	void *va;
-> @@ -1683,21 +1669,6 @@ static void *mana_get_rxfrag(struct mana_rxq *rxq, struct device *dev,
->  	if (rxq->xdp_save_va) {
->  		va = rxq->xdp_save_va;
->  		rxq->xdp_save_va = NULL;
-> -	} else if (rxq->alloc_size > PAGE_SIZE) {
-> -		if (is_napi)
-> -			va = napi_alloc_frag(rxq->alloc_size);
-> -		else
-> -			va = netdev_alloc_frag(rxq->alloc_size);
-> -
-> -		if (!va)
-> -			return NULL;
-> -
-> -		page = virt_to_head_page(va);
-> -		/* Check if the frag falls back to single page */
-> -		if (compound_order(page) < get_order(rxq->alloc_size)) {
-> -			put_page(page);
-> -			return NULL;
-> -		}
->  	} else {
->  		page = page_pool_dev_alloc_pages(rxq->page_pool);
->  		if (!page)
-> @@ -1730,7 +1701,7 @@ static void mana_refill_rx_oob(struct device *dev, struct mana_rxq *rxq,
->  	dma_addr_t da;
->  	void *va;
->  
-> -	va = mana_get_rxfrag(rxq, dev, &da, &from_pool, true);
-> +	va = mana_get_rxfrag(rxq, dev, &da, &from_pool);
->  	if (!va)
->  		return;
->  
-> @@ -2172,7 +2143,7 @@ static int mana_fill_rx_oob(struct mana_recv_buf_oob *rx_oob, u32 mem_key,
->  	if (mpc->rxbufs_pre)
->  		va = mana_get_rxbuf_pre(rxq, &da);
->  	else
-> -		va = mana_get_rxfrag(rxq, dev, &da, &from_pool, false);
-> +		va = mana_get_rxfrag(rxq, dev, &da, &from_pool);
->  
->  	if (!va)
->  		return -ENOMEM;
-> @@ -2258,6 +2229,7 @@ static int mana_create_page_pool(struct mana_rxq *rxq, struct gdma_context *gc)
->  	pprm.nid = gc->numa_node;
->  	pprm.napi = &rxq->rx_cq.napi;
->  	pprm.netdev = rxq->ndev;
-> +	pprm.order = get_order(rxq->alloc_size);
->  
->  	rxq->page_pool = page_pool_create(&pprm);
->  
-> -- 
-Reviewed-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> 2.34.1
+The pull request you sent on Wed, 26 Mar 2025 09:36:51 -0700:
+
+> https://lore.kernel.org/all/20250228132953.78a2b788@canb.auug.org.au/ net/core/dev.c
+
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/1a9239bb4253f9076b5b4b2a1a4e8d7defd77a95
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
