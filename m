@@ -1,172 +1,164 @@
-Return-Path: <netdev+bounces-177977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23A84A735F1
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 16:49:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F36DA73699
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 17:20:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E599D1894FD8
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 15:49:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6767E16BC67
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 16:20:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86CC319ABAB;
-	Thu, 27 Mar 2025 15:49:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E5261A5B9C;
+	Thu, 27 Mar 2025 16:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m4Um6QHO"
+	dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b="kOYAPj8Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C067B155C83;
-	Thu, 27 Mar 2025 15:49:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D19C1A2846
+	for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 16:20:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743090566; cv=none; b=B5vPNgDO7naXiA8hjUN08eEd2cEqU7EDpciqzsz6GeASSGQCwQFMWa5/rk0rIzQkM22f5XIV38Rdtnn9r275bkeO1M7MLFqkfeWkojvrR9DlI+mV1Hh+FnC+X6GOMu73gi2UskZgA90zgslycl2skW+qobLCT0oK36B8iXX8QUI=
+	t=1743092414; cv=none; b=qiuSWfDTCVXrUdCZXeSMyYlO1SojS71IiZuBIRbo9dpzgdNvfFcPk/P8oNbDVpLk7nMbzsz5jL40DBJTUsaGZf8qwROyg+lNmH97I5g5tbSyLzGqP/jCG7RwYtPoUs5ssAADUxmwseFBT8iDkSupeBbigszqb0k99n54ULATBw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743090566; c=relaxed/simple;
-	bh=Fx0i3p4mlf7xc+F7De5cWrUOeKfN8zxZXVFfC6n4sEY=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KWC5ezaAjyrq51D0bRoGZ/TPedEEQe7zlK4ACe8TWLMTallqtW6w2aoiAfplTimqKukTqOHZYlGzgTrbZdpEvVDoZMfrW6hVU36y2TJj4F0hx/YpYwQoaVPP6vCuTrB6XoN9T1M3w1wsUg2Abt17saJq00rOGnNanUdxpbLIHNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m4Um6QHO; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43cf034d4abso12742335e9.3;
-        Thu, 27 Mar 2025 08:49:24 -0700 (PDT)
+	s=arc-20240116; t=1743092414; c=relaxed/simple;
+	bh=d7ElXG12q67ts9hPo9D4cCi81eQhC4QyN/csAlxbkk8=;
+	h=Date:Subject:In-Reply-To:CC:From:To:Message-ID:Mime-Version:
+	 Content-Type; b=DA99Nw5NNFKroq+bZq/9dQfffZBBhtg/uVfvxkzRW7lf99C2RBwV5guYj38Xu802JHhKeoEA8yuVXntpIxncze++yxtlyBBpoE8b4ud2U7ZbY8Ulfy6Q7KMLhYGfa16gaSUnZBsUGBZ+UsMEoKloH8u4Nwk1o+Mu7JuySpX4Cac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com; spf=pass smtp.mailfrom=dabbelt.com; dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b=kOYAPj8Z; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dabbelt.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-22435603572so25220855ad.1
+        for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 09:20:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743090563; x=1743695363; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q0IXK2rCyNqiPkcVyjGixix5uWCxqfElYtjg0TfVyEE=;
-        b=m4Um6QHOpzKXVwxZCxu2xvVa5mB5Ee2bEqU0h3HoJZ3uYuNSImi4n/qH32L68hL+dL
-         Jr5hc/e45WrxFwlvz3sJk/Rv0etyu8S+HMovQFqitfHxQxjr9yol5qx3J2eG3z6USwDM
-         bTBSHFGNh7fb+wnncZhw31VALuK9Yjz3Fo8OjnpA/6lf6g4T2ocsUsMk2nD75SHCEOdY
-         8HgwpdnMv+kZg+lHmM1BoClfTibfTJMIFmJx3aw0bOKtmWbRRDS6JxiFtjKs07GQ8v7/
-         49/iqzU481Tv8fK0VqRpnsQ1AnWW21JptPVBFLiiEEJfyBcQPdTfI9TyWpk4Ip1K+I7l
-         I3xg==
+        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1743092410; x=1743697210; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hQcfqS6ONRy4v+VAuw1r1bUFP3B6ufIgzXQvK3yZp0M=;
+        b=kOYAPj8ZAlZLOFNhrs9mchTgodx5+USr5guYG8Kx5M0JP8ixbwK1esti7rpswrGb06
+         rZ8bzKVq45I+F4VCYLj8Uyzv45ccDb4WFH942uFTDyknzHTy0czdcynotfuRLD2wg5js
+         9s1l+cPdq9QnkCuoEXgL6Mm+Oiy+oFZf5Yo4i+Q7RKiBePhd2E17Wv2UbwxAi5DtKxTB
+         JsVtgXqlomwNDp5h8fp8aMZdPPnYqZCWtkFo/vCEykJ/kRXGKYKXo+g3PrjhCX/nSS1t
+         FI5ZCmh2PQ14BKCflq1wX58jeyx9oUNg0aEAG1kI4tifINMvDnXCesxjzWtQG7O/35PI
+         ZZxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743090563; x=1743695363;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1743092410; x=1743697210;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Q0IXK2rCyNqiPkcVyjGixix5uWCxqfElYtjg0TfVyEE=;
-        b=p8xvbC4Db/IeeRlJ6Q0+w3N+BPrpyA4tmzRr14uJoHP7Zt95XXIra3fWxlxvVc9GgI
-         gj4+5LgIsgn7hXAwzKEPXKJj2+VgDMFuXbhb1eAbqywr961cq3xYP4JMsBr28FWoZ48C
-         8FV5cUTS0SsCWMvVIYuV0mIzpB++wZQmKEQcINSmeqmdxTj+1aOs+ro2HAprRegjjW/k
-         8MnnKu0U6PVZC6iL5bd1Tr7tsvnbElV1eI40NVW37kg7TWfe7omn4QET7SV98ra2fM6o
-         HX+cQo4/QLDQLeWh3JvQRgT+6OqcyzoROK+1m9ac9xUqxXO0DNCflbtNf38xkWVwk9q2
-         +4xw==
-X-Forwarded-Encrypted: i=1; AJvYcCUWcnAjC2/59pR1P4fnFVf5M6Pp92Zt0y2AFbwWAE/m1lOFlzOHAY4GStzoRq2aEIgQwwYRK5z26lNQ@vger.kernel.org, AJvYcCUtMlDRYhUNQuNylqzvzdEhRXBR5/6+2CvyNOSJ7FhqXT4FOC31Q2JR4yMbPZNMUy1udeFTgVxci+TQXQsE@vger.kernel.org, AJvYcCXX21wQaBYo69NaL7Xn00FQshfMjQlmyKH93wL40vwzDL4bwf/NVi8sR0DCYIpS198KQgJbLk5A@vger.kernel.org
-X-Gm-Message-State: AOJu0YyO9OPunZiWzYwotU7I4embsfRDM/FId9jfzXqkWltccLQb2/3Z
-	KfyWOotFRrXGNdb/mfiLKlwaNYwrUnv/qgmvX31vxShfG3OflHK/
-X-Gm-Gg: ASbGncvGDoNo773QKogKYI4CXgio4Jj7FFZQADwFuqyzzQFdlGAgVhKAPeHGoIXeJVc
-	/ReRCcK94CRtCKxuOBApAQkfsq3vwlDask3ZM1okZs5DkmtrAECYkQ5gRPGx/D9vKej03dA3y6Y
-	fBdMYH/jclMpBrHt8fqT0tIN1sTwdSznt8nGt9Z+LebgNfM3qNyUlSoYYrE4euva71MeaGZmEcT
-	zLkv2eAQUpfNT/kOB5abrXm0MVE+Ts2WsrM0/yzHl4pezkcC1ydj6KQwgfVHX0G3OhYzUanZHOm
-	WxyUvUkTELav2vGImI8M9HcQ+hc+8FnpjB2BmJIw96yzORdv3BgGbT9bta4/UJA5xlWumF/FRQi
-	J
-X-Google-Smtp-Source: AGHT+IGWLcvkiw2IlWT9/Bezt8to1CnGT4k9RihRRIS9ghrz6OqCYVFB+fUqZB1wJCuaLVEvvjMSXA==
-X-Received: by 2002:a05:600c:3150:b0:43b:c0fa:f9cd with SMTP id 5b1f17b1804b1-43d84f8a7dcmr45977415e9.7.1743090562763;
-        Thu, 27 Mar 2025 08:49:22 -0700 (PDT)
-Received: from Ansuel-XPS. (93-34-88-225.ip49.fastwebnet.it. [93.34.88.225])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d82efe678sm41416485e9.20.2025.03.27.08.49.21
+        bh=hQcfqS6ONRy4v+VAuw1r1bUFP3B6ufIgzXQvK3yZp0M=;
+        b=dLsqaFyIel2dlHWDEyw9YxiHr+zhIzi9kaxXMX58U2HIeGmc/X+wWIZBh5BiFu1tlp
+         nniA3ZhSCnXPmKFdotgUj18ZMaAtrd2y2xQxcsxC+6kzJInJk+DZioLlK/5nuSBrNFJK
+         JOzJyayfrngPu8Fq12bG03fQlL/g7bER51Wr97tyzA2R4KlIaK3lOC+A6077Be0BVFOI
+         U6dutBW+Q0Qc362TxaBf8ZCUzLar9AxgBCTMerhOzEGLcayBBIya7u1OfYVkEMSJrwL/
+         eztz+fg4FWuY//HjyM2l6yEYI6m5sAUEZiQ+5Y/B1TpWA2CLB5U6K3g0Dr7WyEOMs6fN
+         bLaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVdYXH+uPl1CR9cPQFaIy9wC23FYFLKAqRDo2rFGy7l72ftO34/akNr0lN0Q5i8O/DWlyXbvqw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz357Ux2Izyk7aQqx5wZgz/RksRBUFS3MBzn+CyLyEooJKpLIVL
+	Ci6OGrx6zyPM0sab6AIRNqzKAEZKjN3ZRJMi/WLajh7ZUW4X6dlQRCymDZTMDV8=
+X-Gm-Gg: ASbGncunHmOMn4zuBSGE7W/nu0qIMDLZLKjFoiusAKfv94HiFB2ppeYK1LsRzaqgkTd
+	sJ8Zjuc7lUbCwUo3c67GLp0sz/7uFSqUhN3C674uy4QmoTKJjLy01zCJC3TmaQdpkpWnTUGH1og
+	IHP40c56YlggjnL6XTjtY15kHigNmBIgg9klltb/QPQ2moLVIMs//VV9yunBcLh9ujXW+y6jxvg
+	wDWnJwHj/lAx/kW4tqt4uZL1PKL0RUyiKLcbiUX6dqiiqhvWgTcqgraYsNGcYoFAJjl41e7A/GH
+	PYtixd/mA8qXET/+utdpZ9OULC0CKf90hDhuzQ==
+X-Google-Smtp-Source: AGHT+IGhXmi8JOjZOP3Ikj3wo/1uBU9qt49Ql5SLHckRbeVG8HWYg9iWFYIxA94kzN1K7mL9F21TaQ==
+X-Received: by 2002:a17:903:22d2:b0:223:4816:3e9e with SMTP id d9443c01a7336-22804857854mr57168615ad.13.1743092410377;
+        Thu, 27 Mar 2025 09:20:10 -0700 (PDT)
+Received: from localhost ([50.145.13.30])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7390618e4b6sm14534202b3a.180.2025.03.27.09.20.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Mar 2025 08:49:22 -0700 (PDT)
-Message-ID: <67e57382.050a0220.3ce63f.a120@mx.google.com>
-X-Google-Original-Message-ID: <Z-VzgNZ8jyQp9yMS@Ansuel-XPS.>
-Date: Thu, 27 Mar 2025 16:49:20 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Rob Herring <robh@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [net-next PATCH 4/6] dt-bindings: net: ethernet-controller:
- permit to define multiple PCS
-References: <20250318235850.6411-1-ansuelsmth@gmail.com>
- <20250318235850.6411-5-ansuelsmth@gmail.com>
- <20250321161812.GA3466720-robh@kernel.org>
+        Thu, 27 Mar 2025 09:20:09 -0700 (PDT)
+Date: Thu, 27 Mar 2025 09:20:09 -0700 (PDT)
+X-Google-Original-Date: Thu, 27 Mar 2025 09:20:00 PDT (-0700)
+Subject:     Re: [RFC PATCH V3 00/43] rv64ilp32_abi: Build CONFIG_64BIT kernel-self with ILP32 ABI
+In-Reply-To: <svu4xdeo7a7ve3vorvgbkjxzrqmqk5oztgtfpbg556wjw4x7vc@yg4esoipmt7g>
+CC: david@redhat.com, peterz@infradead.org, guoren@kernel.org,
+  Arnd Bergmann <arnd@arndb.de>, Greg KH <gregkh@linuxfoundation.org>,
+  Linus Torvalds <torvalds@linux-foundation.org>, Paul Walmsley <paul.walmsley@sifive.com>, anup@brainfault.org,
+  atishp@atishpatra.org, oleg@redhat.com, kees@kernel.org, tglx@linutronix.de,
+  Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, brauner@kernel.org,
+  akpm@linux-foundation.org, rostedt@goodmis.org, edumazet@google.com, unicorn_wang@outlook.com,
+  inochiama@outlook.com, gaohan@iscas.ac.cn, shihua@iscas.ac.cn, jiawei@iscas.ac.cn,
+  wuwei2016@iscas.ac.cn, drew@pdp7.com, prabhakar.mahadev-lad.rj@bp.renesas.com, ctsai390@andestech.com,
+  wefu@redhat.com, kuba@kernel.org, pabeni@redhat.com, josef@toxicpanda.com, dsterba@suse.com,
+  mingo@redhat.com, boqun.feng@gmail.com, xiao.w.wang@intel.com, qingfang.deng@siflower.com.cn,
+  leobras@redhat.com, jszhang@kernel.org, Conor Dooley <conor.dooley@microchip.com>,
+  samuel.holland@sifive.com, yongxuan.wang@sifive.com, luxu.kernel@bytedance.com, ruanjinjie@huawei.com,
+  cuiyunhui@bytedance.com, wangkefeng.wang@huawei.com, qiaozhe@iscas.ac.cn,
+  Ard Biesheuvel <ardb@kernel.org>, ast@kernel.org, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+  kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-mm@kvack.org,
+  linux-crypto@vger.kernel.org, bpf@vger.kernel.org, linux-input@vger.kernel.org,
+  linux-perf-users@vger.kernel.org, linux-serial@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+  linux-arch@vger.kernel.org, maple-tree@lists.infradead.org, linux-trace-kernel@vger.kernel.org,
+  netdev@vger.kernel.org, linux-atm-general@lists.sourceforge.net, linux-btrfs@vger.kernel.org,
+  netfilter-devel@vger.kernel.org, coreteam@netfilter.org, linux-nfs@vger.kernel.org, linux-sctp@vger.kernel.org,
+  linux-usb@vger.kernel.org, linux-media@vger.kernel.org
+From: Palmer Dabbelt <palmer@dabbelt.com>
+To: Liam.Howlett@oracle.com
+Message-ID: <mhng-e8248074-b79c-42f6-986f-9993851b6be2@palmer-ri-x1c9a>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250321161812.GA3466720-robh@kernel.org>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Mar 21, 2025 at 11:18:12AM -0500, Rob Herring wrote:
-> On Wed, Mar 19, 2025 at 12:58:40AM +0100, Christian Marangi wrote:
-> > Drop the limitation of a single PCS in pcs-handle property. Multiple PCS
-> > can be defined for an ethrnet-controller node to support various PHY
-> 
-> typo
-> 
-> > interface mode type.
-> 
-> What limitation? It already supports multiple PCS phandles. It doesn't 
-> support arg cells. If you want that, either you have to fix the number 
-> of cells or define a #pcs-handle-cells property. You've done neither 
-> here.
-> 
-> Adding #pcs-handle-cells will also require some updates to the dtschema 
-> tools.
+On Tue, 25 Mar 2025 12:23:39 PDT (-0700), Liam.Howlett@oracle.com wrote:
+> * David Hildenbrand <david@redhat.com> [250325 14:52]:
+>> On 25.03.25 13:26, Peter Zijlstra wrote:
+>> > On Tue, Mar 25, 2025 at 08:15:41AM -0400, guoren@kernel.org wrote:
+>> > > From: "Guo Ren (Alibaba DAMO Academy)" <guoren@kernel.org>
+>> > >
+>> > > Since 2001, the CONFIG_64BIT kernel has been built with the LP64 ABI,
+>> > > but this patchset allows the CONFIG_64BIT kernel to use an ILP32 ABI
+>> >
+>> > I'm thinking you're going to be finding a metric ton of assumptions
+>> > about 'unsigned long' being 64bit when 64BIT=y throughout the kernel.
+>> >
+>> > I know of a couple of places where 64BIT will result in different math
+>> > such that a 32bit 'unsigned long' will trivially overflow.
+
+Ya, I write code that assumes "unsigned long" is the size of a register 
+pretty regularly.
+
+>> >
+>> > Please, don't do this. This adds a significant maintenance burden on all
+>> > of us.
+>> >
+>>
+>> Fully agreed.
 >
+> I would go further and say I do not want this to go in.
 
-I might be confused by doesn't 
+Seems reasonable to me, and I think it's also been the general sentiment 
+when this stuff comes up.  This specific implementation seems 
+particularly clunky, but I agree that it's going to be painful to do 
+this sort of thing.
 
-pcs-handle:
-  items:
-    maxItems: 1
+> The open ended maintenance burden is not worth extending hardware life
+> of a board with 16mb of ram (If I understand your 2023 LPC slides
+> correctly).
 
-limit it to 
+We can already run full 32-bit kernels on 64-bit hardware.  The hardware 
+needs to support configurable XLEN, but there's systems out there that 
+do already.
 
-pcs-handle = <&foo>;
+It's not like any of the existing RISC-V stuff ships in meaningful 
+volumes.  So I think it's fine to just say that vendors who want tiny 
+memories should build hardware that plays nice with those constraints, 
+and vendors who build hardware that doesn't make any sense get to pick 
+up the pieces.
 
-and make it not valid 
+I get RISC-V is where people go to have crazy ideas, but there's got to 
+be a line somewhere...
 
-pcs-handle = <&foo1>, <&foo2>;
-
-?
-
-The cells property will come but only when there will be an actual user
-for it (I assume QCOM PCS will make use of it)
-
-> > 
-> > It's very common for SoCs to have a dedicated PCS for SGMII mode and one
-> > for USXGMII mode.
-> > 
-> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> > ---
-> >  Documentation/devicetree/bindings/net/ethernet-controller.yaml | 2 --
-> >  1 file changed, 2 deletions(-)
-> > 
-> > diff --git a/Documentation/devicetree/bindings/net/ethernet-controller.yaml b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> > index 45819b235800..a260ab8e056e 100644
-> > --- a/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> > +++ b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> > @@ -110,8 +110,6 @@ properties:
-> >  
-> >    pcs-handle:
-> >      $ref: /schemas/types.yaml#/definitions/phandle-array
-> > -    items:
-> > -      maxItems: 1
-> >      description:
-> >        Specifies a reference to a node representing a PCS PHY device on a MDIO
-> >        bus to link with an external PHY (phy-handle) if exists.
-> > -- 
-> > 2.48.1
-> > 
-
--- 
-	Ansuel
+>
+> Thank you,
+> Liam
 
