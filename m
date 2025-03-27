@@ -1,109 +1,117 @@
-Return-Path: <netdev+bounces-177982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C78DA73730
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 17:45:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CC99A73799
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 18:00:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF9883A41A4
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 16:42:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCE4D166BC0
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 17:00:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FA1F1AA782;
-	Thu, 27 Mar 2025 16:43:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D41C115F306;
+	Thu, 27 Mar 2025 17:00:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fSvA+87D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nXKDU4JI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A985B19CC11
-	for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 16:43:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABB5F535D8;
+	Thu, 27 Mar 2025 17:00:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743093789; cv=none; b=DoX/Nl5s76n/Bf9hE6/WnD4J49dM50RMOE+W+Jb70yVJpm28T8VfjbQKqDRon+HvXEvi2fJoRHBW2M6kv4MLoYReGEJEx6XaHbmCfEFX14e3oMmKFC5z1ZcpUhia6Izdv7Zt1G6GFv8Rf5SvyhryUtZrBXHHgbvjft6+M+OMYSs=
+	t=1743094849; cv=none; b=s03jaaSP/1jefmRa1xHsBJ/avsDUOZrDC/XW+2iGvB4GMNGqnlHtAMRW+yJ+got8mbA9TZyKhvTfa56LxKz8EcGIb68OKtlcI0H4u9IKIeHdczH8d8DEJMgg4DWTDunD+baTXbnVuUcEijw0tBV6GFUmlSEHm6Sees3EnugFrXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743093789; c=relaxed/simple;
-	bh=WtTjh0X+dvaIJq5h1EK6KMZ4PmYitWpCFd9YeBm00wg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=LtPuPEo/IornXmOo8dHKyiAMzS//WD8N8uBbkydheXzC8Ya9jHZ+Dg4WB+34SuGqYc6I6sv403m5cBdggGieAQOV5+NmKe1wKIX4eIFXjjU5QlH48o2ROk5fSkdaIwkpDj2ykd+9yRSdNdKpPK7wvNymYv77dMaVOFUcSs0kELQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fSvA+87D; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2263428c8baso185ad.1
-        for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 09:43:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743093786; x=1743698586; darn=vger.kernel.org;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WtTjh0X+dvaIJq5h1EK6KMZ4PmYitWpCFd9YeBm00wg=;
-        b=fSvA+87DRb2ZvUxYqNhc8f9oRgDy0/UFUiQelqHFw3cB1vPRLbjdLgTko8b9+IxGtG
-         M9reLlABlLf3gtmwdaCNT3LHnie3svT6X9hF4+zIZQhvzb+NoPGWbl6CubWYL5xkeAYu
-         VkdS68bksdwgVcmUxu5c1omZkEUuFLs6loC9uh4BIox8PNlPlelmn/z2JfmBzdb2LOx0
-         +e777KkRlztgCG1GgbU+/3x4lP+Pr8NQ1R0bFUO1JTMe22B2anyHKnXXJtbvudC+BujM
-         wXZgdo5Rek8+p43nyg2NF5ZO47iz4D0GKL7vdQifKsfTTQ+bqLJm5bKEUhwVuksIPIKH
-         pLiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743093786; x=1743698586;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WtTjh0X+dvaIJq5h1EK6KMZ4PmYitWpCFd9YeBm00wg=;
-        b=F5F9VCDrNQE3gzVrMTO9IRdTptdD7KBgZ/6zpevrdkW3LY73JMsq17W+Vb6vG2dimQ
-         ADAGMTJ++AIUp0fD0NXSqJUVZ8qWfbZEGexNXFj5R/ojWZHel74LsdBHH1F9VWKEp9Tn
-         XQQ4RGNfatoWAShLnRB+1aOiBTvhmeHk6ykFx8JLFhnFdHga/jU/0bJfyeMs/9NOuGz3
-         3WiDOXhPs1mFSlrrPmSUZR5WhawYP9CRLj4be+Anc2AyV6BBLTc6FMLTGlgwN5N9+uLK
-         2fJzO58s9+1v7XN/7vK8ReoysCfzvKQbCoLRq7nX9fUOX8HCHY9DYNSmsKHzRY2M1gcW
-         Noaw==
-X-Forwarded-Encrypted: i=1; AJvYcCV7Qe3gx0M1TIHw9YOhCrl4751FVF09y0YQPSqJ4GloQ0sOiXK6J7+lslEX6uPgd4dbdqPYGjQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUpr6vFam7Gt4QHEQ5jFtdHHhEXqfJtFNEmInWofvWsJcC+vRK
-	MdwgpD62HBeX/JTnJ9YswbEkAjmKb4hC0QXfP5uT/x5rh91CwDoWt93yAsQCv7i94hfCIbdzrKp
-	SQ/hZNIeehJFoB/UNjD+O/lKp3QCDAsEIo1eF
-X-Gm-Gg: ASbGnctI3p1rR+7B+2PKmR/bz/xAbZ0q/7nd3ruRcMbUQuXiTgZF50tnWVen13P7Ksg
-	iiC6nx4YQH7anwGFKqkKuHCeyc/o5k/v24xJKAtM+F2iNIAanFWjehmTK9RQNeGrj3ZzRTXILu1
-	4FoWJRx4Flc7zBP1rwEtqN9XHE8cTKPBtId1syhW3hMaTMdVIWZEI85TfpTA==
-X-Google-Smtp-Source: AGHT+IExXRH5LdkM/NTRM73rB/SS23JWUn+R4JP+vnvkuEsfYEaHBVxp2CFl9+/8VtcRNw0Qvm7sceZO8wiZe8ovZfw=
-X-Received: by 2002:a17:903:3e28:b0:216:201e:1b63 with SMTP id
- d9443c01a7336-2291fa727f4mr80655ad.11.1743093785532; Thu, 27 Mar 2025
- 09:43:05 -0700 (PDT)
+	s=arc-20240116; t=1743094849; c=relaxed/simple;
+	bh=rnIm7xSXz/WBWTE43R0YHGZWzqA+dWsrh+VaEu1p+98=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k4b6H+IATZD0Wqecd8T5RnL0RLwjyFOX9HqGENKqO/VmDp+xgSM/t/a+uAE90DG61792s6t7JEmwewk0iIh719XEfgSfxm0zQeXWfuNOnJdMVlmZAVL9C31Fw6eN1Mv6kkRRywBcG7b1oakLzBGE1PM9hDSAb3tku/svISVd6oA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nXKDU4JI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 241E0C4CEE8;
+	Thu, 27 Mar 2025 17:00:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743094849;
+	bh=rnIm7xSXz/WBWTE43R0YHGZWzqA+dWsrh+VaEu1p+98=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nXKDU4JIvuO2ZvDBOkefSm6Z7L9RQE91yLLpOCEAJCGKMJogmPtLw9IFIsD7tTFtq
+	 zjUNKcXsC/LkYofecb32cRTHgomThPRQlkX+SIKe/oIbJ97EwmcXbVPEdUoCW1jsJp
+	 mqEwZOQqG80ZMlIJnXSkA00NMuDzu2Y89xU+mPOa3C/uvyuJfzaQ1fdnhXDCYap71/
+	 Tf9Bs0meqZ95wNcbF0jzRcWpedgLfUxd5LNOnt4JOuf0KSGDolSwA9KzqjMmLRgAIu
+	 Mu0aorlzUGqyMKkHtYa+4gdNFJpwIZ4vRFP7R4XbUIUXnmkJ9loB/9KtQScgLfIGwp
+	 Ci0XaT8pdR7DQ==
+Date: Thu, 27 Mar 2025 17:00:44 +0000
+From: Simon Horman <horms@kernel.org>
+To: Yu-Chun Lin <eleanor15x@gmail.com>
+Cc: isdn@linux-pingi.de, kuba@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, jserv@ccns.ncku.edu.tw,
+	visitorckw@gmail.com
+Subject: Re: [PATCH] mISDN: hfcsusb: Optimize performance by replacing
+ rw_lock with spinlock
+Message-ID: <20250327170044.GA1883535@horms.kernel.org>
+References: <20250321172024.3372381-1-eleanor15x@gmail.com>
+ <20250324142115.GF892515@horms.kernel.org>
+ <Z-VumXiqJJkZKNZZ@eleanor-wkdl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250321021521.849856-1-skhawaja@google.com> <20250321021521.849856-3-skhawaja@google.com>
- <Z92e2kCYXQ_RsrJh@LQ3V64L9R2>
-In-Reply-To: <Z92e2kCYXQ_RsrJh@LQ3V64L9R2>
-From: Samiullah Khawaja <skhawaja@google.com>
-Date: Thu, 27 Mar 2025 09:42:54 -0700
-X-Gm-Features: AQ5f1Jo2fQKABTN0IH8xAn7gJWxQrO470BWPkZjAfrB-qZ-rLmimDUmV1ht9Wfw
-Message-ID: <CAAywjhRKL+iriK6X5D4UPHAZt4-rP7_rwYRAjjM30voVDaxmqg@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 2/4] net: Create separate gro_flush helper function
-To: Joe Damato <jdamato@fastly.com>, Samiullah Khawaja <skhawaja@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, 
-	willemb@google.com, mkarsten@uwaterloo.ca, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z-VumXiqJJkZKNZZ@eleanor-wkdl>
 
-On Fri, Mar 21, 2025 at 10:16=E2=80=AFAM Joe Damato <jdamato@fastly.com> wr=
-ote:
->
-> On Fri, Mar 21, 2025 at 02:15:19AM +0000, Samiullah Khawaja wrote:
-> > Move multiple copies of same code snippet doing `gro_flush` and
-> > `gro_normal_list` into a separate helper function.
-> >
-> > Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
->
-> As mentioned in the previous review, I think this is missing a spot.
-> the instance in napi_complete_done was not addressed as suggested
-> previously.
-Oops... I did that internally, but it seems I missed that spot during
-rebase. Will send again.
->
-> Is there any particular reason why that feedback was not addressed
-> in this revision?
+On Thu, Mar 27, 2025 at 11:28:25PM +0800, Yu-Chun Lin wrote:
+> On Mon, Mar 24, 2025 at 02:21:15PM +0000, Simon Horman wrote:
+> > On Sat, Mar 22, 2025 at 01:20:24AM +0800, Yu-Chun Lin wrote:
+> > > The 'HFClock', an rwlock, is only used by writers, making it functionally
+> > > equivalent to a spinlock.
+> > > 
+> > > According to Documentation/locking/spinlocks.rst:
+> > > 
+> > > "Reader-writer locks require more atomic memory operations than simple
+> > > spinlocks. Unless the reader critical section is long, you are better
+> > > off just using spinlocks."
+> > > 
+> > > Since read_lock() is never called, switching to a spinlock reduces
+> > > overhead and improves efficiency.
+> > > 
+> > > Signed-off-by: Yu-Chun Lin <eleanor15x@gmail.com>
+> > > ---
+> > > Build tested only, as I don't have the hardware. 
+> > > Ensured all rw_lock -> spinlock conversions are complete, and replacing
+> > > rw_lock with spinlock should always be safe.
+> > > 
+> > >  drivers/isdn/hardware/mISDN/hfcsusb.c | 6 +++---
+> > >  1 file changed, 3 insertions(+), 3 deletions(-)
+> > 
+> > Hi Yu-Chun Lin,
+> > 
+> > Thanks for your patch.
+> > 
+> > Unfortunately I think it would be best to leave this rather old
+> > and probably little used driver as-is in this regard unless there
+> > is a demonstrable improvement on real hardware.
+> > 
+> > Otherwise the small risk of regression and overhead of driver
+> > changes seems to outweigh the theoretical benefit.
+> 
+> Thank you for your feedback.
+> 
+> I noticed that the MAINTAINERS file lists a maintainer for ISDN, so I
+> was wondering if he might have access to the necessary hardware for
+> quick testing.
+> 
+> Since I am new to the kernel, I would like to ask if there have been
+> any past cases or experiences where similar changes were considered
+> unsafe. Additionally, I have seen instances where the crypto maintainer
+> accepted similar patches even without hardware testing. [1]
+> 
+> [1]: https://lore.kernel.org/lkml/20240823183856.561166-1-visitorckw@gmail.com/
+
+I think it is a judgement call, and certainly the crypto maintainer is
+free to make their own call. But in this case I do lean towards leaving
+the code unchanged in the absence of hardware testing.
 
