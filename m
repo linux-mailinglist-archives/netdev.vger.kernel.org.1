@@ -1,109 +1,190 @@
-Return-Path: <netdev+bounces-178016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 644DAA74006
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 22:13:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7E6FA7400A
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 22:13:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A4693A764D
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 21:07:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 550DA1B63C19
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 21:08:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B9341D6DD8;
-	Thu, 27 Mar 2025 21:06:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54F641D5ADA;
+	Thu, 27 Mar 2025 21:08:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gCuJDAV+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gP3oo9ty"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E5011DF745
-	for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 21:06:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A61EB1CAA82;
+	Thu, 27 Mar 2025 21:08:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743109608; cv=none; b=Fo+ObUOWg3CE9dDuTwutNrTTl78f3dYS45at+7KWC+gE6bsFh0bX7sTUOJoFD9U4XvNfzlXVapX4j26MR6dRKbNfSky4HlYm9f+AOO1SaSR6B+8I4A0uira8bD4JepFSq2rKVE1TFC3F+GJ23RDE6KRo0Xx9vvrGozSzAZN2pXI=
+	t=1743109696; cv=none; b=b5JyKJfI6WRRz5lwa5uqpRbVD8/lT9RrqR4awdiOhGLBWgCTKldlC6T39bGc4FLaXRPhQ1U/tEibDCVxydlu8Tgzfc+TQmcVBiLjMSQD9CePk+AB5N1VkXnFMWmEhBDz5M00b4oNwgogTFKJ32/frzI29aITm+j4Jv5rTcztbos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743109608; c=relaxed/simple;
-	bh=Gy+LLw6ybjdIYfgA/o9zBWpnHK86ITj4xiFS/CWzrjY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uY2gNePo2r6YuO5aqVZ12Pca4VnrGvYCSoyeR3ZtMzZTExLtVM9B5RHRJFIJqvD37lSB+0Oh6GbeGpwe6E5b1K43aeRk6cXjiMt9RAU3VdXZj+hrfu9kaa1W8N9vw8qYGKxCyF9Fiuutd2+7MEzi2RWndlGGzZ/0e/TElDwixhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gCuJDAV+; arc=none smtp.client-ip=209.85.216.44
+	s=arc-20240116; t=1743109696; c=relaxed/simple;
+	bh=77EkUVszkmEbzEqLes/Nu+IUfijxLgcQ8T1ZcfYFY7U=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=GnmHrC9HI7o0Hul1wSOlZFwdAgj/1UmSqU2J+LmF4H78IhU7tz4QFQzbz3+9tSiINSPjSqpWlmUdEY4BpTEgc17DxQGLxY8PFZy7PDwBxwB+N1dHmWmnWB6+g+qO5W0SOR74kAD1xdgM+shB53ujx91Rys/cbtV1Zzijb6U7kZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gP3oo9ty; arc=none smtp.client-ip=209.85.222.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-301e05b90caso2506524a91.2
-        for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 14:06:45 -0700 (PDT)
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7c5c815f8efso140548885a.2;
+        Thu, 27 Mar 2025 14:08:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743109605; x=1743714405; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fHgAcXJFMuob9LQNZ8sVMr4LxkHsV+xpGq7f4PmJnxU=;
-        b=gCuJDAV+Hu++Kt/qxM1Waeg/tyw+sc2FnY+IFuUYblGZNxdGMHi+ry3QLfG4hoGynr
-         nbz2Bbedt9yaWtC7xCIf1uZGYIqX0E3DnUFscW3xDAeYdF7h1va3hneuyaAFPWTdxkLo
-         qOPAz2/TeTlZldOC/BbmYcuCJYnVswv1fssxcyIEv1PcRHU9I7M+1XhwobJ7UWhKL4Y/
-         1Z6C0NvOhQOAa5ksPoWjV5YwtsCMButFCqFTUI/e7wQPtG5kbm60rlVWZHssfHUq2NOd
-         GIrpEbOaa2NWzQcU5XeTbX5T8PfKTyZJfledbc+5YyOj7hm6eHPAKwB+VwmsaU7VrQGY
-         /R1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743109605; x=1743714405;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1743109693; x=1743714493; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fHgAcXJFMuob9LQNZ8sVMr4LxkHsV+xpGq7f4PmJnxU=;
-        b=of4qtDhlt6Lk4yL5bQF1IGYj0Aq0Q8TsVBjhRTs1xdceg0enzqVK/eNGPOzRjJJtmJ
-         xAAm42E0MZ3LbBx/7qEBETjdUDlvQmeZqge+DsVZ25qEdpy8jq+3kn0I5rPo5DWOyOex
-         7FqnGUR+b+J50Lfp+iXSpd1snRWtuxDoePjOo45cJ6cD8bVp8j0Uxk8e8YJfSAvi8jpF
-         cMnLusvMwrJnTzg/xIImFAEbF+YQpeWfiROcZWITzvcSRwqPYLkOmpEqiNBKfP4VdUHQ
-         h3HGuDhjkRBsCJo6vYbGTvWnk1acFl3d3vjYBuiuDlG/aO8/nUDwl9DZyUFRUx2oD56M
-         Kuow==
-X-Forwarded-Encrypted: i=1; AJvYcCXoL5OqQgDR97pHuO4re5/dfbBVISww6taQTnpiYCJqdeBP7tUHXob3FdQXkGgG/v9MNJJyfEg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcvdR2zhVExph5EkOx8T8N+YIDzTzMMHMglc+pSqpH4C6vtMm6
-	Ms7ROWfMypy+F53joHgT5m9VgeYoyZpsCfQjXws4CwcGfvC1YZY=
-X-Gm-Gg: ASbGncttpEJCdFe4iiDkvDaeAduqxAjsL/5uZBV8iwOdupebHivLnH2WVSL6cUukhhd
-	pYSXvFXlz+73tQDnBC5/BtDh9NgAhzzpCx2hityamca2DBUd0pQcj0hobCiBh2ys99EHNdez0u0
-	rKHzHmHmwqHbqRz69IkLFmnm/knrL7o/Cp2Kd31I68BezYAzEEbcborbyEa1TDNul1tlFqxpl+i
-	zq87NaeRYjGDMI3+GEsNShgPCUltK01ro0PjZ3ZNVgll5hGzquwaeGNwOWuMbgoJGirVx1QH+bS
-	3zqTIBKVFAfdRm3oHx+DAOMhTK4vSM1md8f3gp+TRuDn
-X-Google-Smtp-Source: AGHT+IHmChEXkFFAcWcb/9fMSxm6nxL5mgEXY2SgGDno41UV664JKWmaJQh1/alASOjG2GZM9kTiFw==
-X-Received: by 2002:a17:90b:3a0e:b0:2fa:1851:a023 with SMTP id 98e67ed59e1d1-303a9197d72mr7438343a91.35.1743109604683;
-        Thu, 27 Mar 2025 14:06:44 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-30516d3e049sm438193a91.6.2025.03.27.14.06.44
+        bh=oeu2JB+mx0KaM2uQS9V3X+ku0XSSDucc01lT5oToDO8=;
+        b=gP3oo9ty4TFP+UspnqsJydjriYdfe+LbvqH6E1q9uPQ8v2WlY/+iE6JFfZ4ywHSYdr
+         YmVWg/1Xzv9GnyTCtyjLmdEgQyJ7+cz5ewJyrYeXOwECdSBuatBbh63YWavDyInRns7z
+         GvPXNvJd+4qTZKiwStGkWRZJ15i2GNLmkvkIK3XXfsByrLsqjdOtbQ9jpJ7h6idqlxqF
+         B8G1FId07s7AbjZIVKaBpOfrHHRccq9Bv6iDf1u46Wh6RRun6VZd8j4El5PRLwryjEgT
+         IrkB2AYQXTAZMsAPK/lBdnng5+CbR+hC8h9gL1Q2meNJ9FBAJn70dEhO1PQGNesvvAiV
+         iitA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743109693; x=1743714493;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=oeu2JB+mx0KaM2uQS9V3X+ku0XSSDucc01lT5oToDO8=;
+        b=t4zG7fMo+WQCG8JenCweaQ6dCtyV/ABdZ5rlrGjUtlE5oijGi8DFNbDelkqvPnc/7U
+         FR2QnsByPhww5eUTWWESdSpt2iGSsm2Iak9K4npCQPjN2QgOR2w2CfWPAaBr2UeAU8UK
+         +toS65AOlf8rcVPL+SXe3fShWzPo22uIKfTuYac2BkxnCpGPg4jPyiU7pKRXwNW+lVDz
+         qAjf1dcwIjbG5cdkddQZeLUzsyMDKIQKxPTJBIKtYozs1V9DiO3F+/EqEZKzn/5Nspgk
+         R9Ijs35LQCo3y5lIl+N/XxrFqrmuq5vvgf9Al0usIGTHi2bG+53auCJHSGUPsT9mtMu7
+         RGqA==
+X-Forwarded-Encrypted: i=1; AJvYcCUI3RXLEQkrn1vVxyClySNkev0eALxmxywtWpkvk37E062nl4sUhinEPVH4CwtVadZN8n8mMu/5@vger.kernel.org, AJvYcCUX3pND8KU6MB2SEqrMMixzWLGKlyUaoaqBMVqRAsHcuWke9NFZ6s3tx5QmFNRzwQI+QA2VULj3+y97oO2i@vger.kernel.org, AJvYcCVsIO08x5k3NH2RQpSUaxLoXxbq+oWKayzc0DBHBE+8fqh5LJeRk3cHN608kAW5GCoMNOU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxc0VjIhohcR/77w3sJBIMQ6ttRZqAyaxfrLrGszaWaJC3fASnN
+	kJiYDQ1rA4KQJ80CiuQiHiRErdc2E+feCOOLmTJwxuC4hbpFWYTn
+X-Gm-Gg: ASbGncukutCckL10DbZEdCCKhCSOnrlb40IJwQ7qli7uXgvaaMzO+XingGYCwU2ZNGI
+	IDwYVA8k3O6QwdIw7LYNeE4+7MygVsZ80LFX/SbItA3TDHqGpmtc4IIoADd/skabSAJiKQsfdS/
+	E6gMccQoid0pEwAFPK0BJy4kwHWXGPDtOgVXvHhtEB751GfndhBu5ld94GAIbEjau0+Bn/8T6as
+	3hc0o2sYUiu2XR2jrnvpwaeDQPE8j0vm1/3TeprNC3wk1WN0vrDTwCiGK1Gvm19IONmplu3bkkn
+	zVzsECY4Zbw8sbktoIzd4A7FxtJmhP6KxIF4TVJRsa/Tp1ZC+ZnYQj0Z6kamdQqYRa22r7OR7/y
+	gcCjNH7CzqjfW54vT6ML9cQ==
+X-Google-Smtp-Source: AGHT+IGnG+gkYq6LUwDQr86gdBbLjdQ0dJkNas97bDnCLuL3B3wsSnncWxC+52muYTlWqmYhefrvbw==
+X-Received: by 2002:a05:620a:2492:b0:7c5:ad3c:8478 with SMTP id af79cd13be357-7c5ed9f4f9cmr685043085a.16.1743109693366;
+        Thu, 27 Mar 2025 14:08:13 -0700 (PDT)
+Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c5f76aacf9sm33654685a.54.2025.03.27.14.08.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Mar 2025 14:06:44 -0700 (PDT)
-Date: Thu, 27 Mar 2025 14:06:43 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	Cosmin Ratiu <cratiu@nvidia.com>
-Subject: Re: [PATCH net v2 03/11] net: use netif_disable_lro in ipv6_add_dev
-Message-ID: <Z-W945lsWMmZtisy@mini-arch>
-References: <20250327135659.2057487-1-sdf@fomichev.me>
- <20250327135659.2057487-4-sdf@fomichev.me>
- <20250327120225.7efd7c42@kernel.org>
+        Thu, 27 Mar 2025 14:08:12 -0700 (PDT)
+Date: Thu, 27 Mar 2025 17:08:12 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>, 
+ netdev@vger.kernel.org
+Cc: willemdebruijn.kernel@gmail.com, 
+ jasowang@redhat.com, 
+ andrew+netdev@lunn.ch, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ hawk@kernel.org, 
+ john.fastabend@gmail.com, 
+ linux-kernel@vger.kernel.org, 
+ Jiayuan Chen <jiayuan.chen@linux.dev>, 
+ syzbot+0e6ddb1ef80986bdfe64@syzkaller.appspotmail.com, 
+ bpf@vger.kernel.org
+Message-ID: <67e5be3c65de3_10636329488@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250327134122.399874-1-jiayuan.chen@linux.dev>
+References: <20250327134122.399874-1-jiayuan.chen@linux.dev>
+Subject: Re: [PATCH net v1] net: Fix tuntap uninitialized value
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250327120225.7efd7c42@kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On 03/27, Jakub Kicinski wrote:
-> On Thu, 27 Mar 2025 06:56:51 -0700 Stanislav Fomichev wrote:
-> > @@ -3151,11 +3153,12 @@ int addrconf_add_ifaddr(struct net *net, void __user *arg)
-> >  	cfg.plen = ireq.ifr6_prefixlen;
-> >  
-> >  	rtnl_net_lock(net);
-> > -	dev = __dev_get_by_index(net, ireq.ifr6_ifindex);
-> > +	dev = netdev_get_by_index_lock(net, ireq.ifr6_ifindex);
+Jiayuan Chen wrote:
+> Then tun/tap allocates an skb, it additionally allocates a prepad size
+> (usually equal to NET_SKB_PAD) but leaves it uninitialized.
 > 
-> I think you want ops locking here, no?
-> netdev_get_by_index_lock() will also lock devs which didn't opt in.
+> bpf_xdp_adjust_head() may move skb->data forward, which may lead to an
+> issue.
+> 
+> Since the linear address is likely to be allocated from kmem_cache, it's
+> unlikely to trigger a KMSAN warning. We need some tricks, such as forcing
+> kmem_cache_shrink in __do_kmalloc_node, to reproduce the issue and trigger
+> a KMSAN warning.
+> 
+> Reported-by: syzbot+0e6ddb1ef80986bdfe64@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/all/00000000000067f65105edbd295d@google.com/T/
+> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> ---
+>  drivers/net/tun.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> index f75f912a0225..111f83668b5e 100644
+> --- a/drivers/net/tun.c
+> +++ b/drivers/net/tun.c
+> @@ -1463,6 +1463,7 @@ static struct sk_buff *tun_alloc_skb(struct tun_file *tfile,
+>  	if (!skb)
+>  		return ERR_PTR(err);
+>  
+> +	memset(skb->data, 0, prepad);
+>  	skb_reserve(skb, prepad);
+>  	skb_put(skb, linear);
+>  	skb->data_len = len - linear;
 
-New netdev_get_by_index_lock_ops? I felt like we already have too many
-xxxdev_get_by, but agreed that it should be safer, will do!
+Is this specific to the tun device?
+
+This happens in generic (skb) xdp.
+
+The stackdump shows a napi poll call stack
+
+    bpf_prog_run_generic_xdp+0x13ff/0x1a30 net/core/dev.c:4782
+    netif_receive_generic_xdp+0x639/0x910 net/core/dev.c:4845
+    do_xdp_generic net/core/dev.c:4904 [inline]
+    __netif_receive_skb_core+0x290f/0x6360 net/core/dev.c:5310
+    __netif_receive_skb_one_core net/core/dev.c:5487 [inline]
+    __netif_receive_skb+0xc8/0x5d0 net/core/dev.c:5603
+    process_backlog+0x45a/0x890 net/core/dev.c:5931
+
+Since this is syzbot, the skb will have come from a tun device,
+seemingly with IFF_NAPI, and maybe IFF_NAPI_FRAGS.
+
+But relevant to bpf_xdp_adjust_head is how the xdp metadata
+was setup with xdp_prepare_buff, which here is called from
+bpf_prog_run_generic_xdp:
+
+        /* The XDP program wants to see the packet starting at the MAC
+         * header.
+         */
+        mac_len = skb->data - skb_mac_header(skb);
+        hard_start = skb->data - skb_headroom(skb);
+
+        /* SKB "head" area always have tailroom for skb_shared_info */
+        frame_sz = (void *)skb_end_pointer(skb) - hard_start;
+        frame_sz += SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+
+        rxqueue = netif_get_rxqueue(skb);
+        xdp_init_buff(xdp, frame_sz, &rxqueue->xdp_rxq);
+        xdp_prepare_buff(xdp, hard_start, skb_headroom(skb) - mac_len,
+                         skb_headlen(skb) + mac_len, true);
+
+> @@ -1621,6 +1622,7 @@ static struct sk_buff *tun_build_skb(struct tun_struct *tun,
+>  		return ERR_PTR(-ENOMEM);
+>  
+>  	buf = (char *)page_address(alloc_frag->page) + alloc_frag->offset;
+> +	memset(buf, 0, pad);
+>  	copied = copy_page_from_iter(alloc_frag->page,
+>  				     alloc_frag->offset + pad,
+>  				     len, from);
+> -- 
+> 2.47.1
+> 
+
+
 
