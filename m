@@ -1,194 +1,108 @@
-Return-Path: <netdev+bounces-177902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02DBEA72B66
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 09:24:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CC08A72C27
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 10:15:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84E0C16959D
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 08:24:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D81C1691E0
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 09:15:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 264AD2054E9;
-	Thu, 27 Mar 2025 08:24:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3876F20C022;
+	Thu, 27 Mar 2025 09:15:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="KZgKVwiF"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="UcyhD6X5"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0B5204F87;
-	Thu, 27 Mar 2025 08:24:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 919FB20C00C;
+	Thu, 27 Mar 2025 09:15:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743063865; cv=none; b=AHFjsXqHH7rBsYkX8xg5rjNNkkEfvxwTqTzaDYKi+gQeQF5tqi5cfeCsLAbdTFavoXsMeFKDyCbDmktgCePqsz1LPKzvPVO/v9Kom7MuTiNLmhOn/2GdyfvrOxUDb5mbA9lG5td3CDkO+VsUI60kyAp7xzeapioOfG5M95hTzxY=
+	t=1743066907; cv=none; b=PQ3q9qfpYVhC4VmsOOwhwCut2TXpVF1QrmuGcuIUW9AMELcYT2UFmKB0/aRD6HOT1gpGxuUS4aK5/XhyfUViOCIvOyc37SAkvCtmV1sZK4KfxAnTLhopDIZQzd53fwR5wBsYRLQ8RDeqZ7i09QrnRX8S9FczFT+xiravSiC0Gn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743063865; c=relaxed/simple;
-	bh=Oo9S+xOjeLws4diGw62TueYch40yhype9WmT5f8Bm7Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eLr7ZyVYtxMzPg58fLtQLaNWrVmeE++GSWGc/XHR8Fbr3BROJ9d5TxDUw42Jbv9tjlMzQQuWtlijY7qsh5HzAEvvmQDDwVbgNXoUfNORTkUXS3LNRKUK4P6XiGbByZ9p15aNWQ8moSyAzTKPfD0gmsrXkJZqeYdM/gLDgYDXBc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=KZgKVwiF; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D9D49442AC;
-	Thu, 27 Mar 2025 08:24:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1743063860;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cakyJcamr6ifEel+JnINPPg6H4O22U1iqk8+y8IL+AY=;
-	b=KZgKVwiFiDok0zNj49lyw5D4FkrgzsyLYQZvEGSYYA3irgreWf+6l2q+DBOU56ZnJW5wsA
-	z0kySULXDZJbPwysZ5bPRlOYDYGHyKTb2BscqmY/nEe3wXLd4eCAYwWyOmlECFjeOFiu7K
-	gAVC69qbrDQlfHlDzceJSEbEC7bzpCi0nUTP26F4hk8G0heA57Qc5inu17yd/EYMldik4C
-	CRYKF/+tBLAcUN512/gEL00e6oIuWFcPIGQFhtNwL6XzLKcFSNicyu4U/vlhod3XCHVC4L
-	WgvvXoKcSeHuLxgtu73pYV+r1iHHyry3owRj5DjRgtUF/GCU9WC+ikfUUk6Juw==
-Date: Thu, 27 Mar 2025 09:24:18 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Florian Fainelli <florian.fainelli@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Marek =?UTF-8?B?QmVow7pu?=
- <kabel@kernel.org>, Eric Woudstra <ericwouds@gmail.com>, Daniel Golle
- <daniel@makrotopia.org>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next RFC PATCH v3 3/4] net: phy: Add support for Aeonsemi
- AS21xxx PHYs
-Message-ID: <20250327092418.78f55466@fedora-2.home>
-In-Reply-To: <20250326233512.17153-4-ansuelsmth@gmail.com>
-References: <20250326233512.17153-1-ansuelsmth@gmail.com>
-	<20250326233512.17153-4-ansuelsmth@gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1743066907; c=relaxed/simple;
+	bh=Cw6ejRTqbNTRy1dOrLVVDEgZ0Ll7ZxSxIn2I5fiFSAI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=c2IH7ICwbgk6dWmCG+/3ABWadMhsP/HHmM8wNM7IHOdQc6Ne3/ZMWkelSeNHyy5bkUZBztcfyT/+pVegAyZojUMTQZ8I6ZQhM48di70RPIWTv2GplB/tgYSWba0pVUZstC0THjI+ABkUK4WvJPLa7eVTCwORDHg9oO1c74MVOzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=UcyhD6X5; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52R75vwR014009;
+	Thu, 27 Mar 2025 02:14:50 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:message-id:mime-version:subject:to; s=
+	pfpt0220; bh=qfACdZ3eEfdUgRMgQABnRXr5APgDUxRBai15XeOp4Gw=; b=Ucy
+	hD6X5n1NGelsCwcp5nff3o+veRXZqYYqFCf3c1R1XaABtwQZOvJeZ5UqGUGOMlzr
+	MeJXpxTjmdhui0HJPtOwmkw+7BQVX0eMNuug1At7TmXxpjby6SBUwIJYy8KRTYuj
+	giLw7oAGI+eOAl+zwn/OFqj5sr2WhCJBKk8uq3SUK7U+z4Xkd5ELggXWI32NAea/
+	Luhs15MB0RMh9TDst7XxlvpqkFumxJluXDmluXtmD7bERx6loyJvodF0Wmf2YqcH
+	Xogma/rKkbDRJHtM4XoQC35oGkxwl+illjhUp1Jp5pn169gQxwDB+lSvS1nuSh07
+	tk5zy4axqJCpbhwelXg==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 45mqr3hf38-3
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 27 Mar 2025 02:14:50 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Thu, 27 Mar 2025 02:14:45 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 27 Mar 2025 02:14:45 -0700
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id 701EF3F7063;
+	Thu, 27 Mar 2025 02:14:42 -0700 (PDT)
+From: Geetha sowjanya <gakula@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <sgoutham@marvell.com>, <gakula@marvell.com>,
+        <sbhatta@marvell.com>, <hkelam@marvell.com>, <tduszynski@marvell.com>
+Subject: [net PATCH] octeontx2-af: Fix mbox INTR handler when num VFs > 64
+Date: Thu, 27 Mar 2025 14:44:41 +0530
+Message-ID: <20250327091441.1284-1-gakula@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduieejledvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepveeiveeghefgkeegtdelvdelueeileehgeeiffdtuefhledvudefleehgeetveegnecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdqvddrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudelpdhrtghpthhtoheprghnshhuvghlshhmthhhsehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtr
- dhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehrohgshheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhriihkodgutheskhgvrhhnvghlrdhorhhg
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain
+X-Proofpoint-GUID: GORetHUyo1tBLtBLUj8WTAd9j0PlFgeR
+X-Authority-Analysis: v=2.4 cv=Yeq95xRf c=1 sm=1 tr=0 ts=67e5170a cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=Vs1iUdzkB0EA:10 a=M5GUcnROAAAA:8 a=M9fZB8FS68YcmyB56HsA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: GORetHUyo1tBLtBLUj8WTAd9j0PlFgeR
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-26_09,2025-03-26_02,2024-11-22_01
 
-Hi Christian,
+When number of RVU VFs > 64, the vfs value passed to "rvu_queue_work" 
+function is incorrect. Due to which mbox workqueue entries for
+VFs 0 to 63 never gets added to workqueue.
 
-On Thu, 27 Mar 2025 00:35:03 +0100
-Christian Marangi <ansuelsmth@gmail.com> wrote:
+Fixes: 9bdc47a6e328 ("octeontx2-af: Mbox communication support btw AF and it's VFs")
+Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> Add support for Aeonsemi AS21xxx 10G C45 PHYs. These PHYs integrate
-> an IPC to setup some configuration and require special handling to
-> sync with the parity bit. The parity bit is a way the IPC use to
-> follow correct order of command sent.
->=20
-> Supported PHYs AS21011JB1, AS21011PB1, AS21010JB1, AS21010PB1,
-> AS21511JB1, AS21511PB1, AS21510JB1, AS21510PB1, AS21210JB1,
-> AS21210PB1 that all register with the PHY ID 0x7500 0x7510
-> before the firmware is loaded.
->=20
-> They all support up to 5 LEDs with various HW mode supported.
->=20
-> While implementing it was found some strange coincidence with using the
-> same logic for implementing C22 in MMD regs in Broadcom PHYs.
->=20
-> For reference here the AS21xxx PHY name logic:
->=20
-> AS21x1xxB1
->     ^ ^^
->     | |J: Supports SyncE/PTP
->     | |P: No SyncE/PTP support
->     | 1: Supports 2nd Serdes
->     | 2: Not 2nd Serdes support
->     0: 10G, 5G, 2.5G
->     5: 5G, 2.5G
->     2: 2.5G
->=20
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-=09
- [...]
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+index cd0d7b7774f1..6575c422635b 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+@@ -2634,7 +2634,7 @@ static irqreturn_t rvu_mbox_intr_handler(int irq, void *rvu_irq)
+ 		rvupf_write64(rvu, RVU_PF_VFPF_MBOX_INTX(1), intr);
+ 
+ 		rvu_queue_work(&rvu->afvf_wq_info, 64, vfs, intr);
+-		vfs -= 64;
++		vfs = 64;
+ 	}
+ 
+ 	intr = rvupf_read64(rvu, RVU_PF_VFPF_MBOX_INTX(0));
+-- 
+2.25.1
 
-I know this is only RFC, but I have some questions
-
-> +static int as21xxx_match_phy_device(struct phy_device *phydev,
-> +				    const struct phy_driver *phydrv)
-> +{
-> +	struct as21xxx_priv *priv;
-> +	u32 phy_id;
-> +	int ret;
-> +
-> +	/* Skip PHY that are not AS21xxx or already have firmware loaded */
-> +	if (phydev->c45_ids.device_ids[MDIO_MMD_PCS] !=3D PHY_ID_AS21XXX)
-> +		return phydev->phy_id =3D=3D phydrv->phy_id;
-> +
-> +	/* Read PHY ID to handle firmware just loaded */
-> +	ret =3D phy_read_mmd(phydev, MDIO_MMD_PCS, MII_PHYSID1);
-> +	if (ret < 0)
-> +		return ret;
-> +	phy_id =3D ret << 16;
-> +
-> +	ret =3D phy_read_mmd(phydev, MDIO_MMD_PCS, MII_PHYSID2);
-> +	if (ret < 0)
-> +		return ret;=09
-> +	phy_id |=3D ret;
-> +
-> +	/* With PHY ID not the generic AS21xxx one assume
-> +	 * the firmware just loaded
-> +	 */
-> +	if (phy_id !=3D PHY_ID_AS21XXX)
-> +		return phy_id =3D=3D phydrv->phy_id;
-> +
-> +	/* Allocate temp priv and load the firmware */
-> +	priv =3D kzalloc(sizeof(*priv), GFP_KERNEL);
-> +	if (!priv)
-> +		return -ENOMEM;
-> +
-> +	mutex_init(&priv->ipc_lock);
-> +
-> +	ret =3D aeon_firmware_load(phydev);
-> +	if (ret)
-> +		return ret;
-
-Here, and below, you leak priv by returning early.
-
-> +
-> +	ret =3D aeon_ipc_sync_parity(phydev, priv);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* Enable PTP clk if not already Enabled */
-> +	ret =3D phy_set_bits_mmd(phydev, MDIO_MMD_VEND1, VEND1_PTP_CLK,
-> +			       VEND1_PTP_CLK_EN);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret =3D aeon_dpc_ra_enable(phydev, priv);
-> +	if (ret)
-> +		return ret;
-
-Does all of the above with sync_parity, PTP clock cfg and so on needs
-to be done in this first pass of the matching process for this PHY ?
-
-=46rom what I got from the discussions, the only important bit is to load
-the FW to get the correct PHY id ?
-
-> +	mutex_destroy(&priv->ipc_lock);
-> +	kfree(priv);
-> +
-> +	/* Return not maching anyway as PHY ID will change after
-> +	 * firmware is loaded.
-> +	 */
-> +	return 0;
-> +}
-
-Maxime
 
