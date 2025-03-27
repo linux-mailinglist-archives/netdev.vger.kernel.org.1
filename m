@@ -1,218 +1,173 @@
-Return-Path: <netdev+bounces-177884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D6E7A72952
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 04:44:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AE35A7295E
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 04:55:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 959EB16AA6F
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 03:44:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB8C816B365
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 03:54:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31CA7145B27;
-	Thu, 27 Mar 2025 03:44:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="a0g8BaYE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B262156C79;
+	Thu, 27 Mar 2025 03:54:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B38FADDD3;
-	Thu, 27 Mar 2025 03:44:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C24FA1DFF8;
+	Thu, 27 Mar 2025 03:54:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743047049; cv=none; b=Hv4x0+66g5QswRngY3tFMIcam3nfmw89Wk7+qDO6XVgOJoJZ3xydzLe8e0X+38qoMFGA9yyirONWQ1qlT/1BNg9+RXdi5COffzcL6thNfyMGy5IdJc/MtA5xK6D9/8qm4riXufYXYVoD1xfK2CTXP6UcRumNsh+fRIZ30qlVkG8=
+	t=1743047663; cv=none; b=tXcx82DS+0h/QCKyOuHyjePTk9qplKHneCZZNa+zt4UHXgJF3gnqTRNIlxpCb20MTpbbX0jadGF4b8/wZeW3gyyevsS5Coc7311H/UKnoEnZhuEIYUB3+ta+sWs1MDB3suY3h8LUW1umY4q7SkdSE5I3apk/uVU8Scs4EtZKGPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743047049; c=relaxed/simple;
-	bh=wwID+YnTjXD5IsTQaQ4B+T1wRedHMA+IaV2qrBB0KZw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=iupdDYyrv5QDdWUZGRaMNnlPOcLzxEbi5xNNqJ7/VlFc7SFMyKwuAu3WBV0dPEI5XTkb5omXOheDO1SYDN4VfjNTftpqvq/J9YsLhIdyigRDo4PVjl9FuSKJMcC0Wer+6Ei/K4Hi1CKmasY23pakJ9oMKBoxU8GGwELeevyi36g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=a0g8BaYE; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 52R3hToqD3435327, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1743047009; bh=wwID+YnTjXD5IsTQaQ4B+T1wRedHMA+IaV2qrBB0KZw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type;
-	b=a0g8BaYEKdm4/tv6MhwiulRJ8ekyebtzVvm8u92aErB0ZvMeZJsHm5ln0BMNGIvhe
-	 J4CRIGlalJ/Ca+fwLj+Qp4Xe28iDJH4kROoIpUplqW27sCpu3anvDJFXd+D9QpGNWs
-	 O73f35JuumC1+v+yaj14La1kzmGiLirlMaCteNDR9t7qZCwtdlaz33g/vSBAk7Rw1k
-	 yvX7oTzusJr5EV0CzUY8GqVVQrzXH5vmm50Ri5hy9n2XV5NGPveaBTchpzhmxr10XT
-	 +J1CnpaKdbPCi5BEDfObvZOGqP9cnjadzxgl4Lg+U7+lDWETJzuQyBJGraYLRkr4Gy
-	 +tl0RVbBIQmvA==
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 52R3hToqD3435327
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 27 Mar 2025 11:43:29 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+	s=arc-20240116; t=1743047663; c=relaxed/simple;
+	bh=IA+LK06a1j5hDSebQ1n7z6fLY39JQRegN6M6AkDs6E0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=iSTt8pfLPOgTTbiOgSzalPa8dKzFBmDyYIbhh0FmiuX31dIA975fZJBA+dbNeI7surZuXwHolc4awnx4jOlV9HNCCt0g0VNA5qxmcNHF7cVkSehStQ6CpEYEivTDz5HaBrf7VZQ7jcVIoLjcQMotlKTua45VcqcadbVrowtHtd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4ZNV7S3X2Hz2CdMH;
+	Thu, 27 Mar 2025 11:51:00 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id C8D521A0188;
+	Thu, 27 Mar 2025 11:54:17 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 27 Mar 2025 11:43:30 +0800
-Received: from RTDOMAIN (172.21.210.70) by RTEXMBS04.realtek.com.tw
- (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Thu, 27 Mar
- 2025 11:43:29 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: <kuba@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-        <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <horms@kernel.org>, <pkshih@realtek.com>,
-        <larry.chiu@realtek.com>, Justin Lai <justinlai0215@realtek.com>
-Subject: [PATCH net-next v2] rtase: Add ndo_setup_tc support for CBS offload in traffic control setup
-Date: Thu, 27 Mar 2025 11:43:13 +0800
-Message-ID: <20250327034313.12510-1-justinlai0215@realtek.com>
-X-Mailer: git-send-email 2.34.1
+ 15.2.1544.11; Thu, 27 Mar 2025 11:54:17 +0800
+Message-ID: <f1a33452-31a4-4651-8d4a-3650fd27174b@huawei.com>
+Date: Thu, 27 Mar 2025 11:53:44 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: RTEXH36506.realtek.com.tw (172.21.6.27) To
- RTEXMBS04.realtek.com.tw (172.21.6.97)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 3/3] page_pool: Track DMA-mapped pages and
+ unmap them when destroying the pool
+To: Saeed Mahameed <saeedm@nvidia.com>,
+	=?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+CC: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Ilias
+ Apalodimas <ilias.apalodimas@linaro.org>, Simon Horman <horms@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>, Mina Almasry
+	<almasrymina@google.com>, Yonglong Liu <liuyonglong@huawei.com>, Pavel
+ Begunkov <asml.silence@gmail.com>, Matthew Wilcox <willy@infradead.org>,
+	<netdev@vger.kernel.org>, <bpf@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <linux-mm@kvack.org>, Qiuling Ren
+	<qren@redhat.com>, Yuying Ma <yuma@redhat.com>
+References: <20250325-page-pool-track-dma-v2-0-113ebc1946f3@redhat.com>
+ <20250325-page-pool-track-dma-v2-3-113ebc1946f3@redhat.com>
+ <Z-RF4_yotcfvX0Xz@x130>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <Z-RF4_yotcfvX0Xz@x130>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-Add support for ndo_setup_tc to enable CBS offload functionality as
-part of traffic control configuration for network devices.
+On 2025/3/27 2:22, Saeed Mahameed wrote:
 
-Signed-off-by: Justin Lai <justinlai0215@realtek.com>
----
-v1 -> v2:
-- Add a check to ensure that qopt->queue is within the specified range.
-- Add a check for qopt->enable and handle it appropriately.
----
- drivers/net/ethernet/realtek/rtase/rtase.h    | 15 +++++
- .../net/ethernet/realtek/rtase/rtase_main.c   | 60 +++++++++++++++++++
- 2 files changed, 75 insertions(+)
+...
 
-diff --git a/drivers/net/ethernet/realtek/rtase/rtase.h b/drivers/net/ethernet/realtek/rtase/rtase.h
-index 2bbfcad613ab..498cfe4d0cac 100644
---- a/drivers/net/ethernet/realtek/rtase/rtase.h
-+++ b/drivers/net/ethernet/realtek/rtase/rtase.h
-@@ -170,6 +170,7 @@ enum rtase_registers {
- #define RTASE_TC_MODE_MASK GENMASK(11, 10)
- 
- 	RTASE_TOKSEL      = 0x2046,
-+	RTASE_TXQCRDT_0   = 0x2500,
- 	RTASE_RFIFONFULL  = 0x4406,
- 	RTASE_INT_MITI_TX = 0x0A00,
- 	RTASE_INT_MITI_RX = 0x0A80,
-@@ -259,6 +260,12 @@ union rtase_rx_desc {
- #define RTASE_VLAN_TAG_MASK     GENMASK(15, 0)
- #define RTASE_RX_PKT_SIZE_MASK  GENMASK(13, 0)
- 
-+/* txqos hardware definitions */
-+#define RTASE_1T_CLOCK            64
-+#define RTASE_1T_POWER            10000000
-+#define RTASE_IDLESLOPE_INT_SHIFT 25
-+#define RTASE_IDLESLOPE_INT_MASK  GENMASK(31, 25)
-+
- #define RTASE_IVEC_NAME_SIZE (IFNAMSIZ + 10)
- 
- struct rtase_int_vector {
-@@ -294,6 +301,13 @@ struct rtase_ring {
- 	u64 alloc_fail;
- };
- 
-+struct rtase_txqos {
-+	int hicredit;
-+	int locredit;
-+	int idleslope;
-+	int sendslope;
-+};
-+
- struct rtase_stats {
- 	u64 tx_dropped;
- 	u64 rx_dropped;
-@@ -313,6 +327,7 @@ struct rtase_private {
- 
- 	struct page_pool *page_pool;
- 	struct rtase_ring tx_ring[RTASE_NUM_TX_QUEUE];
-+	struct rtase_txqos tx_qos[RTASE_NUM_TX_QUEUE];
- 	struct rtase_ring rx_ring[RTASE_NUM_RX_QUEUE];
- 	struct rtase_counters *tally_vaddr;
- 	dma_addr_t tally_paddr;
-diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-index 2aacc1996796..6251548d50ff 100644
---- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
-+++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-@@ -1661,6 +1661,65 @@ static void rtase_get_stats64(struct net_device *dev,
- 	stats->rx_length_errors = tp->stats.rx_length_errors;
- }
- 
-+static void rtase_set_hw_cbs(const struct rtase_private *tp, u32 queue)
-+{
-+	u32 idle = tp->tx_qos[queue].idleslope * RTASE_1T_CLOCK;
-+	u32 val, i;
-+
-+	val = u32_encode_bits(idle / RTASE_1T_POWER, RTASE_IDLESLOPE_INT_MASK);
-+	idle %= RTASE_1T_POWER;
-+
-+	for (i = 1; i <= RTASE_IDLESLOPE_INT_SHIFT; i++) {
-+		idle *= 2;
-+		if ((idle / RTASE_1T_POWER) == 1)
-+			val |= BIT(RTASE_IDLESLOPE_INT_SHIFT - i);
-+
-+		idle %= RTASE_1T_POWER;
-+	}
-+
-+	rtase_w32(tp, RTASE_TXQCRDT_0 + queue * 4, val);
-+}
-+
-+static int rtase_setup_tc_cbs(struct rtase_private *tp,
-+			      const struct tc_cbs_qopt_offload *qopt)
-+{
-+	int queue = qopt->queue;
-+
-+	if (queue < 0 || queue >= tp->func_tx_queue_num)
-+		return -EINVAL;
-+
-+	if (!qopt->enable) {
-+		tp->tx_qos[queue].hicredit = 0;
-+		tp->tx_qos[queue].locredit = 0;
-+		tp->tx_qos[queue].idleslope = 0;
-+		tp->tx_qos[queue].sendslope = 0;
-+
-+		rtase_w32(tp, RTASE_TXQCRDT_0 + queue * 4, 0);
-+	} else {
-+		tp->tx_qos[queue].hicredit = qopt->hicredit;
-+		tp->tx_qos[queue].locredit = qopt->locredit;
-+		tp->tx_qos[queue].idleslope = qopt->idleslope;
-+		tp->tx_qos[queue].sendslope = qopt->sendslope;
-+
-+		rtase_set_hw_cbs(tp, queue);
-+	}
-+
-+	return 0;
-+}
-+
-+static int rtase_setup_tc(struct net_device *dev, enum tc_setup_type type,
-+			  void *type_data)
-+{
-+	struct rtase_private *tp = netdev_priv(dev);
-+
-+	switch (type) {
-+	case TC_SETUP_QDISC_CBS:
-+		return rtase_setup_tc_cbs(tp, type_data);
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
- static netdev_features_t rtase_fix_features(struct net_device *dev,
- 					    netdev_features_t features)
- {
-@@ -1696,6 +1755,7 @@ static const struct net_device_ops rtase_netdev_ops = {
- 	.ndo_change_mtu = rtase_change_mtu,
- 	.ndo_tx_timeout = rtase_tx_timeout,
- 	.ndo_get_stats64 = rtase_get_stats64,
-+	.ndo_setup_tc = rtase_setup_tc,
- 	.ndo_fix_features = rtase_fix_features,
- 	.ndo_set_features = rtase_set_features,
- };
--- 
-2.34.1
+> 
+> I know there's an extra check on fast path, but looking below it seems
+> like slow path is becoming unnecessarily complicated, and we are sacrificing
+> slow path performance significantly for the sake of not touching fast path
+> at all. page_pool slow path should _not_ be significantly slower
+> than using the page allocator directly! In many production environments and
+> some workloads, page pool recycling can happen at a very low rate resulting
+> on performance relying solely on slow path..
+
++1. And we also rely on the above 'slow path' to flush old nid-mismatched pages
+and refill new pages from the correct nid, see the nid checking and updating in
+page_pool_refill_alloc_cache() and page_pool_update_nid() when irq migrates
+between different numa nodes as it seems common for linux distributions to use
+irqbalance to tune performance.
+
+>> To fix this, implement a simple tracking of outstanding DMA-mapped pages
+>> in page pool using an xarray. This was first suggested by Mina[0], and
+>> turns out to be fairly straight forward: We simply store pointers to
+>> pages directly in the xarray with xa_alloc() when they are first DMA
+>> mapped, and remove them from the array on unmap. Then, when a page pool
+>> is torn down, it can simply walk the xarray and unmap all pages still
+>> present there before returning, which also allows us to get rid of the
+>> get/put_device() calls in page_pool. Using xa_cmpxchg(), no additional
+>> synchronisation is needed, as a page will only ever be unmapped once.
+>>
+>> To avoid having to walk the entire xarray on unmap to find the page
+>> reference, we stash the ID assigned by xa_alloc() into the page
+>> structure itself, using the upper bits of the pp_magic field. This
+>> requires a couple of defines to avoid conflicting with the
+>> POINTER_POISON_DELTA define, but this is all evaluated at compile-time,
+>> so does not affect run-time performance. The bitmap calculations in this
+>> patch gives the following number of bits for different architectures:
+>>
+>> - 23 bits on 32-bit architectures
+>> - 21 bits on PPC64 (because of the definition of ILLEGAL_POINTER_VALUE)
+>> - 32 bits on other 64-bit architectures
+>>
+>> Stashing a value into the unused bits of pp_magic does have the effect
+>> that it can make the value stored there lie outside the unmappable
+>> range (as governed by the mmap_min_addr sysctl), for architectures that
+>> don't define ILLEGAL_POINTER_VALUE. This means that if one of the
+>> pointers that is aliased to the pp_magic field (such as page->lru.next)
+>> is dereferenced while the page is owned by page_pool, that could lead to
+>> a dereference into userspace, which is a security concern. The risk of
+>> this is mitigated by the fact that (a) we always clear pp_magic before
+>> releasing a page from page_pool, and (b) this would need a
+>> use-after-free bug for struct page, which can have many other risks
+>> since page->lru.next is used as a generic list pointer in multiple
+>> places in the kernel. As such, with this patch we take the position that
+>> this risk is negligible in practice. For more discussion, see[1].
+
+The below is a recent UAF for a page, I guess it can be said that this
+patch seem to basically make mmap_min_addr mechanism useless for the above
+arches when a driver with page_pool dma mapping support is loaded:
+https://lore.kernel.org/all/Z878K7JQ93LqBdCB@casper.infradead.org/
+
+So how about logging a warning so that user can tell if their system may
+be in security compromised state for the above case?
+
+>>
+>> Since all the tracking added in this patch is performed on DMA
+>> map/unmap, no additional code is needed in the fast path, meaning the
+>> performance overhead of this tracking is negligible there. A
+>> micro-benchmark shows that the total overhead of the tracking itself is
+>> about 400 ns (39 cycles(tsc) 395.218 ns; sum for both map and unmap[2]).
+>> Since this cost is only paid on DMA map and unmap, it seems like an
+>> acceptable cost to fix the late unmap issue. Further optimisation can
+>> narrow the cases where this cost is paid (for instance by eliding the
+>> tracking when DMA map/unmap is a no-op).
+>>
+> What I am missing here, what is the added cost of those extra operations on
+> the slow path compared to before this patch? Total overhead being
+> acceptable doesn't justify the change, we need diff before and after.
+
+Toke used my data in [2] below:
+The above 400ns is the added cost of those extra operations on the slow path,
+before this patch the slow path only cost about 170ns, so there is more than
+200% performance degradation for the page tracking in this patch, which I
+failed to see why it is acceptable:(
+
+> 
+>> The extra memory needed to track the pages is neatly encapsulated inside
+>> xarray, which uses the 'struct xa_node' structure to track items. This
+>> structure is 576 bytes long, with slots for 64 items, meaning that a
+>> full node occurs only 9 bytes of overhead per slot it tracks (in
+>> practice, it probably won't be this efficient, but in any case it should
+>> be an acceptable overhead).
+>>
+>> [0] https://lore.kernel.org/all/CAHS8izPg7B5DwKfSuzz-iOop_YRbk3Sd6Y4rX7KBG9DcVJcyWg@mail.gmail.com/
+>> [1] https://lore.kernel.org/r/20250320023202.GA25514@openwall.com
+>> [2] https://lore.kernel.org/r/ae07144c-9295-4c9d-a400-153bb689fe9e@huawei.com
 
 
