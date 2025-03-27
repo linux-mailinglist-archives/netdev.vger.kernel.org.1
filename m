@@ -1,90 +1,118 @@
-Return-Path: <netdev+bounces-177974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-177975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CBDAA734ED
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 15:46:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A8FCA7351C
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 15:57:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C85533ADEE2
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 14:45:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C8771897ADB
+	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 14:56:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFEA6218851;
-	Thu, 27 Mar 2025 14:46:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96BBA218E91;
+	Thu, 27 Mar 2025 14:56:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CEW2RmAJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1828C218599
-	for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 14:46:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81075218AC3;
+	Thu, 27 Mar 2025 14:56:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743086764; cv=none; b=KFeElAWX7sJwTjepToSE1zj27jK5YAHzXHHPxs6u/DF56dAQJK9cEf9Lg36nGueInjRcBnKTSdBCqtp/PG40BLO/MUkVfxv2o2AjtYeJCz10awPbyQD/y70BTCueJ56kOT/Rs+yt7Lspe/9dRThqw5LXMv80VnNPalVRfhms6No=
+	t=1743087367; cv=none; b=pLGfpLYLkNXpoESTw9VJNozcmErCLyuIOMdKc1kDaavIyR1ejSnncU3M1QPYZ5Cqs0ItIqhg3e8Y1/ybmCi4IsKC7kEaVNMEcEjUyorOQ3Z0ninQylUMMNZfAzr2q9EN1+WZioumGMFH3NxtnnnvGDTpHS6+gzNtFPcgUyhWfr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743086764; c=relaxed/simple;
-	bh=bBLBi+/uszXJrNS0RExv+HyTwvtK2Dqw8vfB6OTf6tQ=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=prnneCDyK8Jg8YN3zcL9A0tHz5o2rPxXvkKIpmYaXCnkTckHky5ITEwnDeSPur6gzixYvCxF6hqpjYL1u9mlREJ+9SdwuHydsSBoD/iGG6RdLKfK8dU2+t1TbsHtPQFtnjdaDmegay19svjaNm4lW/969K/efU4alnD9HJ/EkMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3d2a6b4b2d4so19455495ab.2
-        for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 07:46:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743086762; x=1743691562;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=O31EDqZnf42bmiyYjE9Gv1Kig77RT2Jp/txzXzrDTBI=;
-        b=BCbPi+sEs8GLzuU4vSKcvJSdCKYR0175JTJ1W3z0KdNN/dnrVIZMGciJWmBELkXeE3
-         yxIkiBOqTKPszeQz4oDFNSRcKjFeFhYL63Xj5tthONJa32YbSg9JV2S1vig2rl97EbzZ
-         o4K5Az+G7DZowlLASAlCOcA+kzTSxoXmUFSX/hY7asGEMlvf/ZNOTGm7nGfIYr2ZpZF/
-         H67IS2sqm3Xqauv0KQWtku5aVodmX83/Ti4gtWVSofe6qnkYZTHORrYbjWXa8jzSnfYj
-         VOUjkxIe6fLZrnKcx0LMxuGJbPU49GCT66pM4Sh17jVyWurpUD2h31NxmA1hPwb8RbRo
-         OSuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVfwP0NYKlpIoTKFht7pK+Ce6K1gIk2JxD7fQf9zOei5Vx1ZJNLZRAS8s2JqFz3CkPzs9w5KHo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHexN8BXvFa3p2mFD6BXrniowJXw78xAzLT7VMx5RY4rtan+mn
-	qxxb0SJK9O5ezeBiNwV5iXLmDooYD6h3us00dMzUVcpaUpUVOHIas2g8AuoORjF3BAPjvQ7GTI1
-	3egPREWh5eNHoci6DGZrDukw+2VZiMhGU+tEioAcG3ZBb5lbEVPU/x74=
-X-Google-Smtp-Source: AGHT+IH3/YAoWyMyOT2ZmZKztUVHp0JJQajrmaritGZ7UtKATN1DB+AKdKLwXrPb1fsB9Cnl/8Zof7ODuhfQc/4UsqLHRutL++np
+	s=arc-20240116; t=1743087367; c=relaxed/simple;
+	bh=/grcYqbyYZQ5Vwrz2k3XVB96o14jNKChWN67TCZobuU=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:Subject:Cc:To:
+	 References:In-Reply-To; b=qaTBwnoEmTtUSpRCGPTTsLYOIavYUPWhWa9mTpI2jZhQ8LNubyJIkDQ50YBvkEk6MurYX/NyrV7jvIIjaG52772YRkbkb5srfGkpcKtf2pEMtzFpbp5JMBZ2/jp5mYIMPvDAucB+dKVuhVBekSSPjkNg2SPxSa91sVTE//ygzTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=CEW2RmAJ; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id CA2A8442C2;
+	Thu, 27 Mar 2025 14:55:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1743087355;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/grcYqbyYZQ5Vwrz2k3XVB96o14jNKChWN67TCZobuU=;
+	b=CEW2RmAJ0ZDIzcNCEGfqG12mMeklqkwNJKpzCSlg6383UsHweJQM18ErERVBaRnbRDiGie
+	Y7Ozeul3aVRs7XMAaBZTsKjhxCP9iXsJUJgx4cjfPqP4iGavMfaB2qDnQXDRSv0EDtV8Fm
+	16EdXjq/0Nj/GW2ZB2OLb0tSumrEwK+EEi4ZL5Vel9p/PmA0ItmJ5cfcX2LYoUPb04vcJr
+	kNqCv/yd/62DMcUWBXv9yv9ghC9WKt6sYUcWSkYTid/Lgzgnudv36zCZpXt+LObqISONbG
+	ZGSDXoVYRhfSjNaETztUFouCkasuhDQIjuoCcjBBiMoBjwfqES17kC9jtLA5uA==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1646:b0:3d3:dfc2:912f with SMTP id
- e9e14a558f8ab-3d5ccdd1496mr40599045ab.7.1743086762074; Thu, 27 Mar 2025
- 07:46:02 -0700 (PDT)
-Date: Thu, 27 Mar 2025 07:46:02 -0700
-In-Reply-To: <Z-ViZoezAdjY8TC-@mini-arch>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67e564aa.050a0220.2f068f.0031.GAE@google.com>
-Subject: Re: [syzbot] [x25?] possible deadlock in lapbeth_device_event
-From: syzbot <syzbot+377b71db585c9c705f8e@syzkaller.appspotmail.com>
-To: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	eric.dumazet@gmail.com, horms@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-x25@vger.kernel.org, lkp@intel.com, 
-	llvm@lists.linux.dev, ms@dev.tdt.de, netdev@vger.kernel.org, 
-	oe-kbuild-all@lists.linux.dev, pabeni@redhat.com, sdf@fomichev.me, 
-	stfomichev@gmail.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 27 Mar 2025 15:55:52 +0100
+Message-Id: <D8R4WB208RUL.14XIUFIVV416O@bootlin.com>
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Subject: Re: [PATCH net-next 02/13] dt-bindings: net: cdns,macb: allow
+ tsu_clk without tx_clk
+Cc: "Andrew Lunn" <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Krzysztof
+ Kozlowski" <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>,
+ "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
+ <claudiu.beznea@tuxon.dev>, "Paul Walmsley" <paul.walmsley@sifive.com>,
+ "Palmer Dabbelt" <palmer@dabbelt.com>, "Albert Ou" <aou@eecs.berkeley.edu>,
+ "Alexandre Ghiti" <alex@ghiti.fr>, "Samuel Holland"
+ <samuel.holland@sifive.com>, "Richard Cochran" <richardcochran@gmail.com>,
+ "Russell King" <linux@armlinux.org.uk>, "Thomas Bogendoerfer"
+ <tsbogend@alpha.franken.de>, "Vladimir Kondratiev"
+ <vladimir.kondratiev@mobileye.com>, "Gregory CLEMENT"
+ <gregory.clement@bootlin.com>, <netdev@vger.kernel.org>,
+ <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-riscv@lists.infradead.org>, <linux-mips@vger.kernel.org>, "Thomas
+ Petazzoni" <thomas.petazzoni@bootlin.com>, "Tawfik Bayouk"
+ <tawfik.bayouk@mobileye.com>
+To: "Rob Herring" <robh@kernel.org>
+X-Mailer: aerc 0.20.1-0-g2ecb8770224a
+References: <20250321-macb-v1-0-537b7e37971d@bootlin.com>
+ <20250321-macb-v1-2-537b7e37971d@bootlin.com>
+ <20250324163001.GA272324-robh@kernel.org>
+In-Reply-To: <20250324163001.GA272324-robh@kernel.org>
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduieekjedtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpegggfgtfffkhffuvefvofhfjgesthhqredtredtjeenucfhrhhomhepvfhhrohoucfnvggsrhhunhcuoehthhgvohdrlhgvsghruhhnsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeeluefgiefgtdegfeehjeetteevveejkefgiedtkeefteejgfdvkeffgeejhfduieenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepvdgrtddumegtsgdugeemheehieemjegrtddtmeeiieegsgemfhdtfhhfmehfvgdutdemlegvfhgunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgdugeemheehieemjegrtddtmeeiieegsgemfhdtfhhfmehfvgdutdemlegvfhgupdhhvghloheplhhotggrlhhhohhsthdpmhgrihhlfhhrohhmpehthhgvohdrlhgvsghruhhnsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvjedprhgtphhtthhopehrohgshheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhto
+ hepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehkrhiikhdoughtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegtohhnohhrodgutheskhgvrhhnvghlrdhorhhg
+X-GND-Sasl: theo.lebrun@bootlin.com
 
-Hello,
+On Mon Mar 24, 2025 at 5:30 PM CET, Rob Herring wrote:
+> On Fri, Mar 21, 2025 at 08:09:33PM +0100, Th=C3=A9o Lebrun wrote:
+>> Allow providing tsu_clk without a tx_clk as both are optional.
+>
+> Why? Is there some new h/w? Where's the compatible for it. Or this fixes=
+=20
+> some existing user? Which one?
 
-syzbot tried to test the proposed patch but the build/boot failed:
+I encountered this while supporting a new compatible yes:
+mobileye,eyeq5-gem.
 
-drivers/net/wan/lapbether.c:376:36: error: 'netdev' undeclared (first use in this function); did you mean 'net_eq'?
+But this is more about relaxing unneeded requirements: the previous
+bindings said "if you provide a tsu_clk, please provide a tx_clk". That
+constraint can be removed as there is no relation inbetween tx_clk and
+tsu_clk.
 
+So I'd describe that as a semantic fix of the dt-bindings, that happens
+to be useful for our newly introduced compatible.
 
-Tested on:
+Or am I mistaken? In any case, I should expand the commit message.
 
-commit:         1a9239bb Merge tag 'net-next-6.15' of git://git.kernel..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=95c3bbe7ce8436a7
-dashboard link: https://syzkaller.appspot.com/bug?extid=377b71db585c9c705f8e
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=15a66bb0580000
+Thanks,
+
+--
+Th=C3=A9o Lebrun, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
 
