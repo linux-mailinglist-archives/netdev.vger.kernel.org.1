@@ -1,63 +1,58 @@
-Return-Path: <netdev+bounces-178095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37CB5A74954
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 12:39:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 936B2A7497D
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 12:49:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12BE43BF17B
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 11:39:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEBCA16A442
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 11:49:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2078E21ABAD;
-	Fri, 28 Mar 2025 11:39:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 250321DC9AB;
+	Fri, 28 Mar 2025 11:49:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="od0lmCZE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bWFq4ERN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2690219E93;
-	Fri, 28 Mar 2025 11:39:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE3A26289;
+	Fri, 28 Mar 2025 11:49:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743161984; cv=none; b=PieYllGKkFx7diuKS020o5hkJPnIK5jtvdIfCQXhgzgV/Hnq65aWUfOAbNVWerdl/FQkx2ZPrajw6cEH5supv58EuPJDbPLApEztUtErq4Eso2hY9FgbiGKyOizQQmJ84NsfxcbyDHLh9ZToAnaL/ewXndzt3cXYpqoO2ufp5+s=
+	t=1743162560; cv=none; b=VgrkpBb7WqrorkPZQH+JT6JQk8RsjDePZxvIYdfVz3OVdHmSjsSs1ChrwNp8Dk9uYPTIw/U03Z69w/H1pADWZrotwmt2qf1g5F3Kxtki3E82UgoUsPCxi1s2Yx0vs+m4I/lNUjMM4il6Bt0OdvIryDU1oJHTplmlJ1IHKMElk84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743161984; c=relaxed/simple;
-	bh=VpclY77LC2UScTUAvSmsEmH/yJZOtBuiJg7uhPWchSA=;
+	s=arc-20240116; t=1743162560; c=relaxed/simple;
+	bh=h6ydLoR1ygT6038JNkdaPynVrS5SsAM4iLsC0fD3s54=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rZjWwktc2eQZ/DrODTQ2Xf3e588mRWBh2Mgw75TibV66GDQfKoYlja8/zFH7bb98o3MZR5cz4/ImU3w+F8xu7QYwmIDVY9NGdmOkgIcoL8aKjyVUL2Bu0Vz+tNz855BXsr9Kt4IIUL0tiym1BD6ieAVlmGfCvwECvuyAkGt01x8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=od0lmCZE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9EBBC4CEE4;
-	Fri, 28 Mar 2025 11:39:42 +0000 (UTC)
+	 MIME-Version:Content-Type; b=E+zbNgpJCE8X6QPvs1nZxlqDb9MvwGxeVKgOBl60J1P1eBGmQ/D0OwEGUK//lqmMgBxr5UkyS5jzbnPV9Wb9rHfpU5ZQlt70pDdxfIW2CBezoobVH8p/zJQ1d2LVXbXl+MsWHzvW3AsCx9Df6uL185w9upD1zF58UjuiUF0jvVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bWFq4ERN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 206FAC4CEE4;
+	Fri, 28 Mar 2025 11:49:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743161983;
-	bh=VpclY77LC2UScTUAvSmsEmH/yJZOtBuiJg7uhPWchSA=;
+	s=k20201202; t=1743162559;
+	bh=h6ydLoR1ygT6038JNkdaPynVrS5SsAM4iLsC0fD3s54=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=od0lmCZEqeq2uaZAtSxzMBD16GJUjxtNFigaGLkpuhGZQTG59fUuRB4e/5iW2AZc8
-	 wXxjNMcbgGI7rQYdQ+nYl9Agi8fUTJVnfTdkXhlBq/rB2qZwX322gvoyWgWW7wXErh
-	 uNU8WaDEgpDId/Aste1gXn7/8+NZsQDGWHgOymIqn4SH1e5YMDziquqUWlDJll3bpF
-	 wv4vyKKPWNmiTkhCrYEnVR7qjG8p+eebGSo44+xPUSsnhH7p/WLseo30U1f6G9GORI
-	 WMFDlJhYsdX1C0b83xju02cA9nI2ZP63VBJKELG4Nql2MRrTuCWddHpVgsWCBA9RlX
-	 XLkv9kMyffk3A==
-Date: Fri, 28 Mar 2025 04:39:41 -0700
+	b=bWFq4ERNXyE1g0r7zL3P6oqwYus2CfOtKHDKeQIqShIHk7imIxtVfMEnBDYlxG9hh
+	 Me/ObyC4e9KrM/4vMWW+x0LK0Q4oy8zFeZ8hD8OU91gi3ea7Ax9j8Fw4oTN+YW6w7p
+	 5n4rUtuwzte9qWoFovaiNRIeD1brIw/PO5ZosJfs/lMMGvvudQWJ5yz+IjJdc38V0v
+	 VkL1eOUqqdYBzFSX1CgAhWey7aT0xvNYmLC9U5PxJ5naDCvOZTWRs6IU4IXddjGlLt
+	 NH7ExgDqQnbIPFr21dEcfGQE5kcKonjrg9wM6vSxeEtOWczoupREo2rAzLiKP8nupv
+	 T86ZNI49XDPXA==
+Date: Fri, 28 Mar 2025 04:49:18 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Cc: "Willem de Bruijn" <willemdebruijn.kernel@gmail.com>,
- netdev@vger.kernel.org, jasowang@redhat.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
- john.fastabend@gmail.com, linux-kernel@vger.kernel.org,
- syzbot+0e6ddb1ef80986bdfe64@syzkaller.appspotmail.com, bpf@vger.kernel.org,
- martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- kpsingh@kernel.org, jolsa@kernel.org
-Subject: Re: [PATCH net v1] net: Fix tuntap uninitialized value
-Message-ID: <20250328043941.085de23b@kernel.org>
-In-Reply-To: <17a3bc7273fac6a2e647a6864212510b37b96ab2@linux.dev>
-References: <20250327134122.399874-1-jiayuan.chen@linux.dev>
-	<67e5be3c65de3_10636329488@willemb.c.googlers.com.notmuch>
-	<17a3bc7273fac6a2e647a6864212510b37b96ab2@linux.dev>
+To: Michael Klein <michael@fossekall.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next v5 0/4] net: phy: realtek: Add support for PHY LEDs
+ on
+Message-ID: <20250328044918.1082fccb@kernel.org>
+In-Reply-To: <20250326212125.100218-1-michael@fossekall.de>
+References: <20250326212125.100218-1-michael@fossekall.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,14 +62,23 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 28 Mar 2025 09:15:53 +0000 Jiayuan Chen wrote:
-> I'm wondering if we can directly perform a memset in bpf_xdp_adjust_head
-> when users execute an expand header (offset < 0).
+On Wed, 26 Mar 2025 22:21:21 +0100 Michael Klein wrote:
+> Changes in V5:
+> - Split cleanup patch and improve code formatting
 
-Same situation happens in bpf_xdp_adjust_meta(), but I'm pretty
-sure this was discussed and considered too high cost for XDP.
-Could you find the old discussions and double check the arguments
-made back then? Opinions may have changed but let's make sure we're
-not missing anything. And performance numbers would be good to have
-since the main reason this isn't done today was perf.
+## Form letter - net-next-closed
+
+Linus already pulled net-next material v6.15 and therefore net-next is closed
+for new drivers, features, code refactoring and optimizations. We are currently
+accepting bug fixes only.
+
+Please repost when net-next reopens after Apr 7th.
+
+RFC patches sent for review only are obviously welcome at any time.
+
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+-- 
+pw-bot: defer
+pv-bot: closed
+
 
