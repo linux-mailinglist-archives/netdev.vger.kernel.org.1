@@ -1,151 +1,117 @@
-Return-Path: <netdev+bounces-178039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63E0DA7412E
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 23:53:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AC56A741CA
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 01:40:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E98C1895EFF
-	for <lists+netdev@lfdr.de>; Thu, 27 Mar 2025 22:53:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 291B8188DE8F
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 00:40:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC74D1E1E03;
-	Thu, 27 Mar 2025 22:53:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABDD5195FE8;
+	Fri, 28 Mar 2025 00:40:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="AQQFg9Nu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l4vtLEHC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0F471DF257
-	for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 22:53:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A1419B5B8
+	for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 00:40:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743115985; cv=none; b=NIHFfxxQMe1A6M4wc8mPFZAnSMhI7f+uEbPg87xeTcvpyy7aWI3l+cdg+wvxwHZGi9YoY+dCZkyUmW1q6h7v2UbwyNNlrZdxCIvJUb5xMAK79kngieK/DINjUjrf30wakc0DYfYsMvcflNt6tBO/3n8JCjV9L+ZC34KCnhOeidw=
+	t=1743122435; cv=none; b=myK8Ut4mNSLX+q7UCj+4r9ajlvPUKr5WIll1O00332uaXGLgBiCXb8y6sA1YSRleNGywCxj9F5eLVK1vA7+LpNYhGRKKvsPopsVEiinrSmR4bZbrbJq0uoK5Be5tA4hBqPXiWVbBO56vxEjJGFRTUy9yg9iyiVs6jRU22xT1Y88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743115985; c=relaxed/simple;
-	bh=pKpgtM4kB/4K64gSh6vdxNp84Cah8MzlKXkdIhPEZ84=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LQBvOBGA2yx/7U9k57fQXT69z9Py07jqTz31B4LYjAVNexgdRE7Nwm+IdlGeF89cJq/+sXMdfKixbIRYFLGZLiit+mCjyIRrbmZuC5+1uaJ2pL9QoKqpRucydWQznCVA6krc6g4ioFEL3tvjUMSytTFm665P18NLcTfB+y4/gFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=AQQFg9Nu; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-ac28e66c0e1so233546666b.0
-        for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 15:53:03 -0700 (PDT)
+	s=arc-20240116; t=1743122435; c=relaxed/simple;
+	bh=g/ygJa+RZ8XNRbgEYDXmnjTw/baxuHEc1+D+TSHFEeI=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=BWzshCwO3s1rrOc1dFYrwXMpfkpQz9CufJ5OssN6jxP4t4Cio0dyJ8X4yOS7AgF/4UsIgc7wQgpNfD8oyPbtuULYBp9sybzqDymUgkOM2EChUArpInNIFpiLOeXVV6mK3unxd3mcqUXwEVyt7Pq9L30bOENf5dcwfZtvJFgln3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l4vtLEHC; arc=none smtp.client-ip=209.85.219.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6e8f254b875so13794156d6.1
+        for <netdev@vger.kernel.org>; Thu, 27 Mar 2025 17:40:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1743115982; x=1743720782; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=k12Y8dWe84nCJDuQsvD5DEjenxTgzdu2WJ45ZyGKWY8=;
-        b=AQQFg9Nu4aN8lHCdb/84wZfBMNSyJu14daXnGHBjd4gsAbCAUobS40yhZ9gf4bMv8Q
-         gXYCn/ESPMF41TNcb8vruTcV617corHL9H5WkmOp75DXUGUFgaWGjGSkh36PDewGAhlx
-         OjCqDEMLyPoMEJV1XX8WKNv4Qgtd+iZ7X3SraHETASDbyFLY1uHQ6ZZI0f18GULgEKRb
-         LlGyb5fiDbekP2fEvumsVCRwu6uZQvycZ+8eVTIoyl4PEJw5EE5xw5vcu0a6ifTaWXZj
-         YuOJe2dCz4WHLFxz35mFp98Q5Z1dCwr3WfQRPz+/I1aMcPDItJUj96i0AWYyrMXkGQRO
-         Mq+A==
+        d=gmail.com; s=20230601; t=1743122433; x=1743727233; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/8mA34LYhW+QoMFnfu2dYsGKV+/P3qeNjF/Imx8Axn0=;
+        b=l4vtLEHChV3agFDuUW2I53lUGuI/ie+lEx6kR479+ejMMt/vhixmE0VKRd3qaYPtaI
+         n7YP4FxvuiNaYyZLCOYeuFL7cRbcCNQzPaZ7YraH6m8Mcknous37Qi72QAq7jGfJ91xs
+         voyPtzymj2o8MpDqocdZCJ6MLK9k6VKiUgie+6FYwnKeLDipxUt2vk/Qx+SJEvY7C99Y
+         YRw/KJ4krHHLh9x7p7HvdffM7QlscELMXg2LtMLyMGOHbeusFiAYpp2klkvXPIR/fLwT
+         xKYJPAHoh7c1WgMRxWRDp9YJ80uyKhZfp/7GR1j3MODtmiVxrtTWMrfxMjviF/N9NOeB
+         pG0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743115982; x=1743720782;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=k12Y8dWe84nCJDuQsvD5DEjenxTgzdu2WJ45ZyGKWY8=;
-        b=EXzh3PdGSTCc7AoxQOjFC/ga2aqN78NEw6gxv006TTpwBZ6WhVPyAhQFiZP09uR2dE
-         6u+OLRRhg+vNkHBLZ6WJvcXeetydK/hRO8c2DcEay837BexCOI38mAcep85OR5vqMixB
-         BXhVaomNMioz5kmsTStSQbm2w2CqlV8agm1TWlFdM0MzlfA2xk8/rO63p6u/kic1nsBQ
-         RC8po+7FxQizLtpmIpA6cD5ugHT1iP7g2ixBHgNHhe7hfCqru2UcvLNVbZ+MzSPzX4oL
-         iH6IA2ZFBsTUOd/Pix1XJBz7NE4/0K37vsQ8/pBXox+cPsfovbRdBY3jWyT1mdwK52kk
-         8DHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVb+rzxvel2Qmi0qbN0AC33ddQr8JqSrchGAR+idU6yOzKungDxg9rcI7ZPLLL/ZaPYzROaeXs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxE4R6SFPtvmEz1PpC3HjflkhiTx0jIS/g0ygsGRDfrmnkY88RL
-	G0UlLKxHV9geoBu3zKFsAEmi+AjGVnFN9q6J4qYENsD5jYXhilQd7a1hCYHIOW4=
-X-Gm-Gg: ASbGnctebZN20b29nTkzW8wbXldDMLlcxjc5zCCE3WFkKtLd+YT0vtRp7mI8JtTjHvP
-	4N6CDqiRvG2qrLVaI1d2ci9/7NSzjWFP8ny5POF3B/E0p7oPC0d+vlS2rbQ7g0gGe2QsG1h7It5
-	PBJ8K5wDxfPH3izOXyUUjPCV+1iyIrBr3UYuuoD0+mrHshFKb0g28rok6U5ZT0bBj5yBJrELhHP
-	LXVOFO5ifLGDlK3M1Ndjk1mUKuwOFcgoRm9x8l2SpKa61Kbae9UuKvJd2FAjMsyBFAO1bxuy8zT
-	Rip/Ej4/5hI3AksOf3+mF9SJ43cAHjRg16LkgQ5Of4Yk9f98prM=
-X-Google-Smtp-Source: AGHT+IEQKYdXU4YRdq7AjkHureyIrp+bm+P0LupbshznRTrIcsjVjBe9WN63ZaIpC1RkUq+pZC7I3g==
-X-Received: by 2002:a17:906:c153:b0:ac3:bd68:24eb with SMTP id a640c23a62f3a-ac6fae46de8mr605017166b.1.1743115982075;
-        Thu, 27 Mar 2025 15:53:02 -0700 (PDT)
-Received: from [100.115.92.205] ([109.160.74.194])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac71922b965sm63206566b.20.2025.03.27.15.53.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Mar 2025 15:53:01 -0700 (PDT)
-Message-ID: <ffe6f6cc-7157-48ad-9cde-dc38d8427849@blackwall.org>
-Date: Fri, 28 Mar 2025 00:52:57 +0200
+        d=1e100.net; s=20230601; t=1743122433; x=1743727233;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=/8mA34LYhW+QoMFnfu2dYsGKV+/P3qeNjF/Imx8Axn0=;
+        b=PWnyZXwJfjiEmH1f2qEeBnMgjtCD/tk+ZuLJj6S/ExUr1zX1v0NvrohkrtPnbC+fiE
+         3FS4IgUgvhZreeMGvnK5tFVnhtVnI7n8oE01U1r9HYP9CyS7zK7ngJ7L28wHuKhBKAJ+
+         84pIvEK3xUZEIDyWNxyT/DRxUXNPli6MfrNSYanKEm2fr0AMjSUGqpOkxTa+qfwYCUgI
+         EgdnCRVtHJ+D+NfimgGpA1fcU1wKTKsDuHGY1ITgOR1TEQupzZ6if+JjGPEpexxk4SuP
+         pLuH95Q2r7jTbNFWKiOJTkZ4Yg2EFmYxUzF7vwIk/3tPu999wox8rAXwEOv0YB4rMa7+
+         7u/g==
+X-Gm-Message-State: AOJu0Yz1Xz1PSrk4OP58tMITQAFLkzThMg+4yirdnBt8KBOPBXl1Ek7D
+	GHNvPF+10aUGok6+nthSLjeFzf+v0WNeBKueEWeM27UU990NF0nO
+X-Gm-Gg: ASbGnctWN+iss16ikZpV5VBcPehJ19NDePm8boBYZiM0RXIx1mM1LPiZvHgI03RQxoo
+	837Z+oLIlkZozXFdmxHXZ2JmOj8YJTiABUQVSmtrxlxCC7y228FfJ/WdAoNHJyrWauS2OWtsGr6
+	z5SCR33R04kHP6HVOGj6lNbxzTOWG1LH9dJNjwzPPrmMP7SpU9ZccCaijGVgofTtR2om1l8Q/27
+	KemUlE1phWYBJpm1DAe1t/IKN6CfXJqNUcLM6MTgRM1YzcW1vwVPIci+ITkybTUNe+kJ9IYkLF7
+	FNYr9KAxitmKs3Yemvh9LmAHmJxAzta8V0a0yMf2tISz32xJ85knCT2rfUNJy1MBEfA2WOg3Tud
+	u5ypXY6HoYKofB+ufoEN4LQ==
+X-Google-Smtp-Source: AGHT+IELlAn4VdBD7tmzM8t3Pbr29VI/rLtt0D8yZ8Lk1gs1L21z45N2pUyYzARr7T8JGCTPF3HCxg==
+X-Received: by 2002:a05:6214:f2b:b0:6e8:f65a:67bd with SMTP id 6a1803df08f44-6ed238a562amr64175326d6.11.1743122432751;
+        Thu, 27 Mar 2025 17:40:32 -0700 (PDT)
+Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6eec9627d88sm4805586d6.8.2025.03.27.17.40.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Mar 2025 17:40:32 -0700 (PDT)
+Date: Thu, 27 Mar 2025 20:40:31 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ davem@davemloft.net
+Cc: netdev@vger.kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ andrew+netdev@lunn.ch, 
+ horms@kernel.org, 
+ sdf@fomichev.me, 
+ willemdebruijn.kernel@gmail.com, 
+ Jakub Kicinski <kuba@kernel.org>
+Message-ID: <67e5efffb2b39_11b3cc2949e@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250327222315.1098596-2-kuba@kernel.org>
+References: <20250327222315.1098596-1-kuba@kernel.org>
+ <20250327222315.1098596-2-kuba@kernel.org>
+Subject: Re: [PATCH net v3 1/3] selftests: drv-net: replace the rpath helper
+ with Path objects
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Patch net-next 1/3] net: bridge: mcast: Add offload failed mdb
- flag
-To: Joseph Huang <joseph.huang.2024@gmail.com>,
- Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Roopa Prabhu <roopa@nvidia.com>, Simon Horman <horms@kernel.org>,
- linux-kernel@vger.kernel.org, bridge@lists.linux.dev
-References: <20250318224255.143683-1-Joseph.Huang@garmin.com>
- <20250318224255.143683-2-Joseph.Huang@garmin.com>
- <c90151bc-a529-4f4e-a0b9-5831a6b803f7@blackwall.org>
- <85a52bd9-8107-4cb8-b967-2646d0e74ab4@gmail.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <85a52bd9-8107-4cb8-b967-2646d0e74ab4@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On 3/27/25 00:38, Joseph Huang wrote:
-> On 3/21/2025 4:19 AM, Nikolay Aleksandrov wrote:
->>> @@ -516,11 +513,14 @@ static void br_switchdev_mdb_complete(struct 
->>> net_device *dev, int err, void *pri
->>>            pp = &p->next) {
->>>           if (p->key.port != port)
->>>               continue;
->>> -        p->flags |= MDB_PG_FLAGS_OFFLOAD;
->>> +
->>> +        if (err)
->>> +            p->flags |= MDB_PG_FLAGS_OFFLOAD_FAILED;
->>> +        else
->>> +            p->flags |= MDB_PG_FLAGS_OFFLOAD;
->>
->> These two should be mutually exclusive, either it's offloaded or it 
->> failed an offload,
->> shouldn't be possible to have both set. I'd recommend adding some 
->> helper that takes
->> care of that.
+Jakub Kicinski wrote:
+> The single letter + "path" helpers do not have many fans (see Link).
+> Use a Path object with a better name. test_dir is the replacement
+> for rpath(), net_lib_dir is a new path of the $ksft/net/lib directory.
 > 
-> It is true that these two are mutually exclusive, but strictly speaking 
-> there are four types of entries:
+> The Path() class overloads the "/" operator and can be cast to string
+> automatically, so to get a path to a file tests can do:
 > 
-> 1. Entries which are not offload-able (i.e., the ports are not backed by 
-> switchdev)
-> 2. Entries which are being offloaded, but results yet unknown
-> 3. Entries which are successfully offloaded, and
-> 4. Entries which failed to be offloaded
+>     path = env.test_dir / "binary"
 > 
-> Even if we ignore the ones which are being offloaded (type 2 is 
-> transient), we still need two flags, otherwise we won't be able to tell 
-> type 1 from type 4 entries.
-> 
-> If we need two flags anyway, having separate flags for type 3 and type 4 
-> simplifies the logic.
-> 
-> Or did I misunderstood your comments?
-> 
-> Thanks,
-> Joseph
+> Link: https://lore.kernel.org/CA+FuTSemTNVZ5MxXkq8T9P=DYm=nSXcJnL7CJBPZNAT_9UFisQ@mail.gmail.com
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-I think you misunderstood me, I don't mind having the two flags. :)
-My point is that they must be managed correctly and shouldn't be allowed
-to be set simultaneously.
-
-Cheers,
-  Nik
-
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
