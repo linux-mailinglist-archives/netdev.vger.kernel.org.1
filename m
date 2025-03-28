@@ -1,84 +1,181 @@
-Return-Path: <netdev+bounces-178099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06461A749A4
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 13:15:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C320A749A8
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 13:19:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34192189901A
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 12:14:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEC8D3B4B00
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 12:19:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2DD521ADC5;
-	Fri, 28 Mar 2025 12:13:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A50821B19E;
+	Fri, 28 Mar 2025 12:19:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AinElruk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TwB5nudJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F15717548
-	for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 12:13:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 957DA21ABC4
+	for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 12:19:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743164032; cv=none; b=s04nT60vYT5RRnZ/m8LBFZP6CSa8l1uCVWUuZzNXUQGfeBCL6e/W+8zKXKEEcTm5BV4atSZ1rtw8nHc0e7cXYPTbUfgU65yZE4QytdORE877paPTDXRUoUVrIzGZ9DMnDUod13ZtAgcwE8Ixe+mPd31MvtSNPQxVzKKdKQMia0U=
+	t=1743164365; cv=none; b=Tcc0V1lQB78bmlIZs9UK2YyDyZP/c8QY7VU5BWNsD5q54OuQcyBmiEFpukwrKRW9DPwGHOz/4evZ1MkYtNpYKbdv1qwxgdae2nBDMUkynqktX0+/tVj6qmjIh+PG4B6uJLKbXqzEMcQUoZp0OZujqAyLIgz7hVKa/KQ90/wZef0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743164032; c=relaxed/simple;
-	bh=iGNlSHjFv3p0VawGhfsS7uxHBx8NruSpd/UPvO4BxwU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OwTISMZlZ8SI0mO+z2UicZghZ6FKWuBoqcnuFDNVSaJMvwsSnmqZt8Ut3IylC0tUSdhFu2vewQJERCMCHsgLPTFWDmUwY2eFdRki5CvtOaCvYvcKLUKEBBKMB+701jAil3dMVOenTXHDrT2qnJVbnJYMXY+sSyl8b56LMJ5fZEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AinElruk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0079C4CEE4;
-	Fri, 28 Mar 2025 12:13:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743164032;
-	bh=iGNlSHjFv3p0VawGhfsS7uxHBx8NruSpd/UPvO4BxwU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AinElrukTKkiBrDEZvQoB4dQG/k9e7j00odTufipSO7AVT8Bfqf06hEP94I5qoNHe
-	 jFUh0SRp6GBUr+Z15w5NiGzhgzr+eiifAA+njROlYKvLHsgf+DN2wFf2YfnevvgU+o
-	 eHvSImfKTk5G97hdB3Fk0N/N1ZJ4+B1qAVdXolGuVhW8MYoavYrbmoNu3bZo+i4PRu
-	 SxjtYmelseyjTC3p65sPdsrM8TmxPcY28u4X8VY2XUnGQGyn+OCOi3M3E5oH4ydHUr
-	 Bo2PWz0XG6yWDlYecsw+ppc+57Fpbep95RMK37P7DfPRPwEDa2FafBUGUL6gacVh3S
-	 6z2qWLCnu7Yew==
-Date: Fri, 28 Mar 2025 05:13:50 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Cosmin Ratiu <cratiu@nvidia.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "horms@kernel.org"
- <horms@kernel.org>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "davem@davemloft.net" <davem@davemloft.net>, Tariq Toukan
- <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, "jiri@resnulli.us"
- <jiri@resnulli.us>, Leon Romanovsky <leonro@nvidia.com>,
- "edumazet@google.com" <edumazet@google.com>, Saeed Mahameed
- <saeedm@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>,
- "pabeni@redhat.com" <pabeni@redhat.com>
-Subject: Re: net-shapers plan
-Message-ID: <20250328051350.5055efe9@kernel.org>
-In-Reply-To: <d9831d0c940a7b77419abe7c7330e822bbfd1cfb.camel@nvidia.com>
-References: <d9831d0c940a7b77419abe7c7330e822bbfd1cfb.camel@nvidia.com>
+	s=arc-20240116; t=1743164365; c=relaxed/simple;
+	bh=/hMtCMIMtDNnFFdvhLcexuO+Yqt2I6uJhhOrr7EDOh4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=EThBmmyeYMsSgaK2KZvzKdHfG0BzVpOtgaTawbneATILIipFzfBcShTlqkIbgX8tufE0K9E/ur6AeuUJs1qrxo6RXFJpHnyrx9fud0dnYAF1T0MpVwukbMrziDstLg03IeQnHEeieF0f9lh0b7LT2ksgubufeQmht6ev+Hf5wmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TwB5nudJ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743164362;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=FBsI3PcyVwGsbuzOR/tW+kxB5J9W8FFZwhDeFg/Emi0=;
+	b=TwB5nudJcBhtWbMHNTHUo/hfkwfD0kEl0NQEAnzT61wo+gedWtDnmXm+8QBctO05U9Yd0i
+	yjw7l6SwLhYArmTrqtp8fyYFFjOILESUnE3S/OPbWX16SWjOWSAtTpHyrTQ63R/vBP45C5
+	ZNmxKswJdpDT4FzyNS5sH/GbCWwo8N8=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-250-qYeEgJzXPEKyH7PAN3TJfw-1; Fri, 28 Mar 2025 08:19:21 -0400
+X-MC-Unique: qYeEgJzXPEKyH7PAN3TJfw-1
+X-Mimecast-MFC-AGG-ID: qYeEgJzXPEKyH7PAN3TJfw_1743164360
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-ac3d175fe71so139631166b.0
+        for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 05:19:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743164360; x=1743769160;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FBsI3PcyVwGsbuzOR/tW+kxB5J9W8FFZwhDeFg/Emi0=;
+        b=TRGYSGzYbIn+jwUED6Hs2qpEDaSXNZrc70Oi8/1cmMK5udNvYEflHdbViLHtsh7sUH
+         3qxa861rdHINPsUP/tsa/o4elVRAMt8VRv+xkuSSjRthTaLbJ9qxxKok9S+68mgjLpuE
+         JPHtmTfSUyw/2pcCux0VRoC1CBqsPzKjlAbezTBy6SxqraDLIWaROD8j0dCxTZTAdsCS
+         qKDhPY+vUUtLuAE6OkIW0jXIk8bjsuYo0i5RyHpkcnlFHVMyPUL82OyoiHJo82lh6VgT
+         3SioWjTwKpNGlt6KMESNURxuCqUqkk2Si8ALAT2G/xWAHJHTIexJU7MvVV5F7AgCKLMG
+         qzdQ==
+X-Gm-Message-State: AOJu0YzUJIhIscToCoqqqBFengrQh8HKxo7iQZxhRADpVWn6pZwHn5Vi
+	C3cs8IJFTTYURrloJwwLbulSueT5VlLUd5Q08VU6zSad6zAvWtlG5kGBl653OJEw48S/eMqaIxE
+	zrBo1lK7U1PQU6Rkm3GOpX4elfYUcGuPp0ZPPETxenFvygc8hNDbADg==
+X-Gm-Gg: ASbGncsfCPru1xG60/YasUSptSBU48mVm9fK5ruAzxVnAKvRRLHLFigTa34+UhKyLxg
+	cU2bea4SL0yQsjPXyJ3wpB+ozbgrekkBvueEdOjHI3Z3xU2glV7oXisoOyLxJbSm8vbBh67xS7H
+	ReEB+UjOX2mdG9+VZUKAwY7eCo7TRqv1WtKNjnxL9g9g7M4ozx7k0LZJ5lQ5NAaHnz5uxAPJoZM
+	qGtUTFOWqQqPLT9LpK5Nygv/NaBbb1KK4m3XJwx4mI0I0+BjMXo0gXaeGCUFF2dTAYcXA/ttdNZ
+	J46t4PN+6zVc
+X-Received: by 2002:a17:907:c12:b0:ac2:cae8:e153 with SMTP id a640c23a62f3a-ac6fae622b3mr773305666b.4.1743164359831;
+        Fri, 28 Mar 2025 05:19:19 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHP3NonXENFoGDvZyNLB/3DvTBmdD/0XZXIFjgnHlxwf5UEuMfTRP49tYjouTNp3FuAtJ81Hw==
+X-Received: by 2002:a17:907:c12:b0:ac2:cae8:e153 with SMTP id a640c23a62f3a-ac6fae622b3mr773299366b.4.1743164359287;
+        Fri, 28 Mar 2025 05:19:19 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac71961f8f0sm151499566b.95.2025.03.28.05.19.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Mar 2025 05:19:18 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 86B5E18FCDC3; Fri, 28 Mar 2025 13:19:17 +0100 (CET)
+From: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Subject: [PATCH net-next v5 0/2] Fix late DMA unmap crash for page pool
+Date: Fri, 28 Mar 2025 13:19:07 +0100
+Message-Id: <20250328-page-pool-track-dma-v5-0-55002af683ad@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIALuT5mcC/23NQW7CMBAF0Ksgr2s0npk4tKveo+rC2ENjAXHkW
+ BEI5e5YEYtUZPnn6795qFFylFF97R4qyxTHmPoamo+d8p3r/0THULNCwAbIgB5cvQ0pXXTJzp9
+ 1uDoNREhMji2IqsshyyneFvVH9VJ0L7eifmvTxbGkfF/eTWbpXzJvypPRoD0alKZ1LXv8zhI6V
+ /Y+XRdwwhWCzTaCFTGG5OjNJ9sTvSG0Ruw2QhU5CFsGYwWcf0N4jbTbCFfkSAcI3rZgA/xD5nl
+ +AixwIP2QAQAA
+X-Change-ID: 20250310-page-pool-track-dma-0332343a460e
+To: "David S. Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+ Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+ Simon Horman <horms@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+ Mina Almasry <almasrymina@google.com>, 
+ Yonglong Liu <liuyonglong@huawei.com>, 
+ Yunsheng Lin <linyunsheng@huawei.com>, 
+ Pavel Begunkov <asml.silence@gmail.com>, 
+ Matthew Wilcox <willy@infradead.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, linux-rdma@vger.kernel.org, 
+ linux-mm@kvack.org, 
+ =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>, 
+ Qiuling Ren <qren@redhat.com>, Yuying Ma <yuma@redhat.com>
+X-Mailer: b4 0.14.2
 
-On Thu, 6 Mar 2025 14:03:54 +0000 Cosmin Ratiu wrote:
-> It is not important which entity (kernel or hw) classifies packets as
-> long as the condition that a given txq only sends traffic for a single
-> traffic class holds.
+This series fixes the late dma_unmap crash for page pool first reported
+by Yonglong Liu in [0]. It is an alternative approach to the one
+submitted by Yunsheng Lin, most recently in [1]. The first commit just
+wraps some tests in a helper function, in preparation of the main change
+in patch 2. See the commit message of patch 2 for the details.
 
-> Furthermore, this cannot be done by simply grouping txqs for a given TC
-> with NET_SHAPER_SCOPE_NODE, because the TC for a txq is not always
-> known to the kernel and might only be known to the driver or the NIC.
-> With the new roots, net-shapers can relay the intent to shape traffic
-> for a particular TC to the driver without having knowledge of which
-> txqs service a TC. The association between txqs and TCs they service
-> doesn't need to be known to the kernel.
+-Toke
 
-As mentioned in Zagreb the part of HW reclassifying traffic does not
-make sense to me. Is this a real user scenario you have or more of 
-an attempt to "maximize flexibility"?
+[0] https://lore.kernel.org/lkml/8067f204-1380-4d37-8ffd-007fc6f26738@kernel.org/T/
+[1] https://lore.kernel.org/r/20250307092356.638242-1-linyunsheng@huawei.com
+
+Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
+---
+Changes in v5:
+- Dereferencing pp->p.dev if pp->pma_sync is unset could lead to a
+  crash, so make sure we don't do that.
+- With the change above, patch 2 was just changing a single field, so
+  squash it into patch 3
+- Link to v4: https://lore.kernel.org/r/20250327-page-pool-track-dma-v4-0-b380dc6706d0@redhat.com
+
+Changes in v4:
+- Rebase on net-next
+- Collect tags
+- Link to v3: https://lore.kernel.org/r/20250326-page-pool-track-dma-v3-0-8e464016e0ac@redhat.com
+
+Changes in v3:
+- Use a full-width bool for pp->dma_sync instead of a full unsigned
+  long (in patch 2), and leave pp->dma_sync_cpu alone.
+
+- Link to v2: https://lore.kernel.org/r/20250325-page-pool-track-dma-v2-0-113ebc1946f3@redhat.com
+
+Changes in v2:
+- Always leave two bits at the top of pp_magic as zero, instead of one
+
+- Add an rcu_read_lock() around __page_pool_dma_sync_for_device()
+
+- Add a comment in poison.h with a reference to the bitmask definition
+
+- Add a longer description of the logic of the bitmask definitions to
+  the comment in types.h, and a summary of the security implications of
+  using the pp_magic field to the commit message of patch 3
+
+- Collect Mina's Reviewed-by and Yonglong's Tested-by tags
+
+- Link to v1: https://lore.kernel.org/r/20250314-page-pool-track-dma-v1-0-c212e57a74c2@redhat.com
+
+---
+Toke Høiland-Jørgensen (2):
+      page_pool: Move pp_magic check into helper functions
+      page_pool: Track DMA-mapped pages and unmap them when destroying the pool
+
+ drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c |  4 +-
+ include/linux/poison.h                           |  4 ++
+ include/net/page_pool/types.h                    | 63 +++++++++++++++++-
+ mm/page_alloc.c                                  |  9 +--
+ net/core/netmem_priv.h                           | 33 +++++++++-
+ net/core/page_pool.c                             | 82 ++++++++++++++++++++----
+ net/core/skbuff.c                                | 16 +----
+ net/core/xdp.c                                   |  4 +-
+ 8 files changed, 176 insertions(+), 39 deletions(-)
+---
+base-commit: 1a9239bb4253f9076b5b4b2a1a4e8d7defd77a95
+change-id: 20250310-page-pool-track-dma-0332343a460e
+
 
