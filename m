@@ -1,383 +1,128 @@
-Return-Path: <netdev+bounces-178157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38051A750C9
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 20:31:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D82E1A750CC
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 20:31:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1BABD188DA6C
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 19:31:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7663317216A
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 19:31:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D7D41DF24F;
-	Fri, 28 Mar 2025 19:31:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F8C11DE3AA;
+	Fri, 28 Mar 2025 19:31:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Qg/RgZsH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C0VMFWQb"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC39B126C02;
-	Fri, 28 Mar 2025 19:30:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB7301531C5;
+	Fri, 28 Mar 2025 19:31:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743190264; cv=none; b=CofCZ9h+DTkStQKK3tn5BQlu5IyMZbx8EYoqkmbJZwkP+Xptp9LFWQjQ5SrG3E2srLKtK9w83RugCwvIctjfl+3j/C1BDfzAwsy/HcEBAuJ/NJAE0dWWPy6fWwxOjuNCfengN8YT+udyRqaaSa2vO0r87iIynAkk5fJoHwYzyNA=
+	t=1743190301; cv=none; b=ql5cBs5+qrdAaOZ2lOxaXHK5SIyhT4Pi3sEpUybksdq8YsUiUEdOKFVFvTA1zm2X37epUBWO+7YiihPxGojumjvxjm7w2TVsUapTvG38pbroDHkj5aF71+FH9TkVMcmEXJ4Gj09SEMSNgITn/sbnqWn0y+YDwuk7xRBNCcDVFj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743190264; c=relaxed/simple;
-	bh=5Vyke7PQtp35YSTCuyTIpzWCfCa5Ve46bWr/HsMvFQA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BHdHjpObZ3zJQJbcMKtOlQa4wNH9EouYsxBZtjC0j4UjR2d8UROPoIh4F+HFLc+66lhZLbpDx/CfO8vzbGcbwPpSFAV0hlfT8Zo3M9VYJ/CqGnx5OTTYWvvvPU8VJcECDEfWhe5pkUTvu6L8gmypW9C9l709SdcDERyBEGo/em4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Qg/RgZsH; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=TFduLiTfomk9uJG1Kj9Vc20+YiO1goOrnmEnJTn6ZxQ=; b=Qg/RgZsHJ6n5TSHc9kOVCiY3q+
-	jwDA83rcvHJ4eU0fyc6UKImuj4/1gn8A7Zj8trcIhavWYd/tLlc6Jwza6elEtnBv5D6hTLcXM6fNG
-	SH0IBUg5HRH7abQVfr6lIEul5kl1EzkzXwVfUVZ+h+O1ZB4wWRw0BT9lxJCLAQbC/m4w=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tyFPi-007O5S-8p; Fri, 28 Mar 2025 20:30:46 +0100
-Date: Fri, 28 Mar 2025 20:30:46 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 4/4] net: mtip: The L2 switch driver for imx287
-Message-ID: <3648e94f-93e6-4fb0-a432-f834fe755ee3@lunn.ch>
-References: <20250328133544.4149716-1-lukma@denx.de>
- <20250328133544.4149716-5-lukma@denx.de>
+	s=arc-20240116; t=1743190301; c=relaxed/simple;
+	bh=vUUOmaBsW00jSF2gRrb1rpo7FsoIYv4PkVoMJjSPa2M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HeSQR4NuwpSwV0vB+MoT0aK+VxQIG/zjXrADNv8tgUiTpeCGSxf+RE7yv3xq0RM5yRROEwm54K1bwNFzSH16mtWtfCwoOt8m/PbdBMQ3FOlrbkI6nMCVv1c083/fNfazsDGTfrNzvprBo/thABqFRzwQK03aaO83ur+vrWYuW1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C0VMFWQb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0ABDC4CEE4;
+	Fri, 28 Mar 2025 19:31:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743190299;
+	bh=vUUOmaBsW00jSF2gRrb1rpo7FsoIYv4PkVoMJjSPa2M=;
+	h=From:To:Cc:Subject:Date:From;
+	b=C0VMFWQb8cYGUvMuEndJm2THrABw3Y92jxwzHOxIFThfBQYab+AUk90h/LYeib/MW
+	 ya/XzXkgdDIqMCSDgPG4WXqXg+EWaNlT4aiqZegxpCHsQATBIHTNnO+ylP0KSmL3a7
+	 Lcfw7E5+D5nzddG3HVhHH0yv3bIG4CPMbt0ZjTK4YVgzIIWmKVQnGZAoJ9F9ptX7oY
+	 jhmhuaHMMHXzHx4hcUBngmKr27ZMiwVCGKBgTqeq2OybP0s3zy6umuSGYoGRNN5zQj
+	 nvjlTRpOVyiRW574lRNb7u9XhnRpDhVVkrrAM5O6dARu2TvTaY3Mb5EOcLTEBbKHtS
+	 +JP/Vp1kffFIg==
+From: Song Liu <song@kernel.org>
+To: bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	kernel-team@meta.com,
+	song@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH bpf-next] selftests/bpf: Fix verifier_bpf_fastcall
+Date: Fri, 28 Mar 2025 12:31:24 -0700
+Message-ID: <20250328193124.808784-1-song@kernel.org>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250328133544.4149716-5-lukma@denx.de>
+Content-Transfer-Encoding: 8bit
 
-> +static bool bridge_offload;
-> +module_param(bridge_offload, bool, 0644); /* Allow setting by root on boot */
-> +MODULE_PARM_DESC(bridge_offload, "L2 switch offload mode enable:1, disable:0");
+Commit [1] moves percpu data on x86 from address 0x000... to address
+0xfff...
 
-Please drop. module parameters are not liked.
+Before [1]:
 
-In Linux, ports of a switch always starting in isolated mode, and
-userspace needs to add them to the same bridge.
+159020: 0000000000030700     0 OBJECT  GLOBAL DEFAULT   23 pcpu_hot
 
-> +
-> +static netdev_tx_t mtip_start_xmit(struct sk_buff *skb,
-> +				   struct net_device *dev);
-> +static void mtip_switch_tx(struct net_device *dev);
-> +static int mtip_switch_rx(struct net_device *dev, int budget, int *port);
-> +static void mtip_set_multicast_list(struct net_device *dev);
-> +static void mtip_switch_restart(struct net_device *dev, int duplex0,
-> +				int duplex1);
+After [1]:
 
-Forwards references are not like. Put the functions in the correct
-order so they are not needed.
+152602: ffffffff83a3e034     4 OBJECT  GLOBAL DEFAULT   35 pcpu_hot
 
-> +/* Calculate Galois Field Arithmetic CRC for Polynom x^8+x^2+x+1.
-> + * It omits the final shift in of 8 zeroes a "normal" CRC would do
-> + * (getting the remainder).
-> + *
-> + *  Examples (hexadecimal values):<br>
-> + *   10-11-12-13-14-15  => CRC=0xc2
-> + *   10-11-cc-dd-ee-00  => CRC=0xe6
-> + *
-> + *   param: pmacaddress
-> + *          A 6-byte array with the MAC address.
-> + *          The first byte is the first byte transmitted
-> + *   return The 8-bit CRC in bits 7:0
-> + */
-> +static int crc8_calc(unsigned char *pmacaddress)
-> +{
-> +	/* byte index */
-> +	int byt;
-> +	/* bit index */
-> +	int bit;
-> +	int inval;
-> +	int crc;
+As a result, verifier_bpf_fastcall tests should now expect a negative
+value for pcpu_hot, IOW, the disassemble should show "r=" instead of
+"w=".
 
-Reverse Christmas tree. Please look through the whole driver and fix
-it up.
+Fix this in the test.
 
-> +/* updates MAC address lookup table with a static entry
-> + * Searches if the MAC address is already there in the block and replaces
-> + * the older entry with new one. If MAC address is not there then puts a
-> + * new entry in the first empty slot available in the block
-> + *
-> + * mac_addr Pointer to the array containing MAC address to
-> + *          be put as static entry
-> + * port     Port bitmask numbers to be added in static entry,
-> + *          valid values are 1-7
-> + * priority The priority for the static entry in table
-> + *
-> + * return 0 for a successful update else -1  when no slot available
+Note that, a later change created a new variable "cpu_number" for
+bpf_get_smp_processor_id() [2]. The inlining logic is updated properly
+as part of this change, so there is no need to fix anything on the
+kernel side.
 
-It would be nice to turn this into proper kerneldoc. It is not too far
-away at the moment.
+[1] commit 9d7de2aa8b41 ("x86/percpu/64: Use relative percpu offsets")
+[2] commit 01c7bc5198e9 ("x86/smp: Move cpu number to percpu hot section")
+Reported-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Song Liu <song@kernel.org>
+---
+ tools/testing/selftests/bpf/progs/verifier_bpf_fastcall.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Also, return a proper error code not -1. ENOSPC?
+diff --git a/tools/testing/selftests/bpf/progs/verifier_bpf_fastcall.c b/tools/testing/selftests/bpf/progs/verifier_bpf_fastcall.c
+index a9be6ae49454..c258b0722e04 100644
+--- a/tools/testing/selftests/bpf/progs/verifier_bpf_fastcall.c
++++ b/tools/testing/selftests/bpf/progs/verifier_bpf_fastcall.c
+@@ -12,7 +12,7 @@ SEC("raw_tp")
+ __arch_x86_64
+ __log_level(4) __msg("stack depth 8")
+ __xlated("4: r5 = 5")
+-__xlated("5: w0 = ")
++__xlated("5: r0 = ")
+ __xlated("6: r0 = &(void __percpu *)(r0)")
+ __xlated("7: r0 = *(u32 *)(r0 +0)")
+ __xlated("8: exit")
+@@ -704,7 +704,7 @@ SEC("raw_tp")
+ __arch_x86_64
+ __log_level(4) __msg("stack depth 32+0")
+ __xlated("2: r1 = 1")
+-__xlated("3: w0 =")
++__xlated("3: r0 =")
+ __xlated("4: r0 = &(void __percpu *)(r0)")
+ __xlated("5: r0 = *(u32 *)(r0 +0)")
+ /* bpf_loop params setup */
+@@ -753,7 +753,7 @@ __arch_x86_64
+ __log_level(4) __msg("stack depth 40+0")
+ /* call bpf_get_smp_processor_id */
+ __xlated("2: r1 = 42")
+-__xlated("3: w0 =")
++__xlated("3: r0 =")
+ __xlated("4: r0 = &(void __percpu *)(r0)")
+ __xlated("5: r0 = *(u32 *)(r0 +0)")
+ /* call bpf_get_prandom_u32 */
+-- 
+2.47.1
 
-> +static int mtip_update_atable_dynamic1(unsigned long write_lo,
-> +				       unsigned long write_hi, int block_index,
-> +				       unsigned int port,
-> +				       unsigned int curr_time,
-> +				       struct switch_enet_private *fep)
-
-It would be good to document the return value, because it is not the
-usual 0 success or negative error code.
-
-> +static const struct net_device_ops mtip_netdev_ops;
-
-more forward declarations.
-
-> +struct switch_enet_private *mtip_netdev_get_priv(const struct net_device *ndev)
-> +{
-> +	if (ndev->netdev_ops == &mtip_netdev_ops)
-> +		return netdev_priv(ndev);
-> +
-> +	return NULL;
-> +}
-
-I _think_ the return value is not actually used. So maybe 0 or
--ENODEV?
-
-> +static int esw_mac_addr_static(struct switch_enet_private *fep)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < SWITCH_EPORT_NUMBER; i++) {
-> +		if (is_valid_ether_addr(fep->ndev[i]->dev_addr)) {
-
-Is that possible? This is the interfaces own MAC address? If it is not
-valid, the probe should of failed.
-
-> +			mtip_update_atable_static((unsigned char *)
-> +						  fep->ndev[i]->dev_addr,
-> +						  7, 7, fep);
-> +		} else {
-> +			dev_err(&fep->pdev->dev,
-> +				"Can not add mac address %pM to switch!\n",
-> +				fep->ndev[i]->dev_addr);
-> +			return -EFAULT;
-> +		}
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static void mtip_print_link_status(struct phy_device *phydev)
-> +{
-> +	if (phydev->link)
-> +		netdev_info(phydev->attached_dev,
-> +			    "Link is Up - %s/%s - flow control %s\n",
-> +			    phy_speed_to_str(phydev->speed),
-> +			    phy_duplex_to_str(phydev->duplex),
-> +			    phydev->pause ? "rx/tx" : "off");
-> +	else
-> +		netdev_info(phydev->attached_dev, "Link is Down\n");
-> +}
-
-phy_print_status()
-
-> +static void mtip_adjust_link(struct net_device *dev)
-> +{
-> +	struct mtip_ndev_priv *priv = netdev_priv(dev);
-> +	struct switch_enet_private *fep = priv->fep;
-> +	struct phy_device *phy_dev;
-> +	int status_change = 0, idx;
-> +	unsigned long flags;
-> +
-> +	spin_lock_irqsave(&fep->hw_lock, flags);
-> +
-> +	idx = priv->portnum - 1;
-> +	phy_dev = fep->phy_dev[idx];
-> +
-> +	/* Prevent a state halted on mii error */
-> +	if (fep->mii_timeout && phy_dev->state == PHY_HALTED) {
-> +		phy_dev->state = PHY_UP;
-> +		goto spin_unlock;
-> +	}
-
-A MAC driver should not be playing around with the internal state of
-phylib.
-
-> +static int mtip_mii_probe(struct net_device *dev)
-> +{
-> +	struct mtip_ndev_priv *priv = netdev_priv(dev);
-> +	struct switch_enet_private *fep = priv->fep;
-> +	int port_idx = priv->portnum - 1;
-> +	struct phy_device *phy_dev = NULL;
-> +
-> +	if (fep->phy_np[port_idx]) {
-> +		phy_dev = of_phy_connect(dev, fep->phy_np[port_idx],
-> +					 &mtip_adjust_link, 0,
-> +					 fep->phy_interface[port_idx]);
-> +		if (!phy_dev) {
-> +			netdev_err(dev, "Unable to connect to phy\n");
-> +			return -ENODEV;
-> +		}
-> +	}
-> +
-> +	phy_set_max_speed(phy_dev, 100);
-> +	fep->phy_dev[port_idx] = phy_dev;
-> +	fep->link[port_idx] = 0;
-> +	fep->full_duplex[port_idx] = 0;
-> +
-> +	dev_info(&dev->dev,
-> +		 "MTIP PHY driver [%s] (mii_bus:phy_addr=%s, irq=%d)\n",
-> +		 fep->phy_dev[port_idx]->drv->name,
-> +		 phydev_name(fep->phy_dev[port_idx]),
-> +		 fep->phy_dev[port_idx]->irq);
-
-phylib already prints something like that.
-
-> +static int mtip_mdiobus_reset(struct mii_bus *bus)
-> +{
-> +	if (!bus || !bus->reset_gpiod) {
-> +		dev_err(&bus->dev, "Reset GPIO pin not provided!\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	gpiod_set_value_cansleep(bus->reset_gpiod, 1);
-> +
-> +	/* Extra time to allow:
-> +	 * 1. GPIO RESET pin go high to prevent situation where its value is
-> +	 *    "LOW" as it is NOT configured.
-> +	 * 2. The ENET CLK to stabilize before GPIO RESET is asserted
-> +	 */
-> +	usleep_range(200, 300);
-> +
-> +	gpiod_set_value_cansleep(bus->reset_gpiod, 0);
-> +	usleep_range(bus->reset_delay_us, bus->reset_delay_us + 1000);
-> +	gpiod_set_value_cansleep(bus->reset_gpiod, 1);
-> +
-> +	if (bus->reset_post_delay_us > 0)
-> +		usleep_range(bus->reset_post_delay_us,
-> +			     bus->reset_post_delay_us + 1000);
-> +
-> +	return 0;
-> +}
-
-What is wrong with the core code __mdiobus_register() which does the
-bus reset.
-
-> +static void mtip_get_drvinfo(struct net_device *dev,
-> +			     struct ethtool_drvinfo *info)
-> +{
-> +	struct mtip_ndev_priv *priv = netdev_priv(dev);
-> +	struct switch_enet_private *fep = priv->fep;
-> +
-> +	strscpy(info->driver, fep->pdev->dev.driver->name,
-> +		sizeof(info->driver));
-> +	strscpy(info->version, VERSION, sizeof(info->version));
-
-Leave this empty, so you get the git hash of the kernel.
-
-> +static void mtip_ndev_setup(struct net_device *dev)
-> +{
-> +	struct mtip_ndev_priv *priv = netdev_priv(dev);
-> +
-> +	ether_setup(dev);
-
-That is pretty unusual
-
-> +	dev->ethtool_ops = &mtip_ethtool_ops;
-> +	dev->netdev_ops = &mtip_netdev_ops;
-> +
-> +	memset(priv, 0, sizeof(struct mtip_ndev_priv));
-
-priv should already be zero....
-
-> +static int mtip_ndev_init(struct switch_enet_private *fep)
-> +{
-> +	struct mtip_ndev_priv *priv;
-> +	int i, ret = 0;
-> +
-> +	for (i = 0; i < SWITCH_EPORT_NUMBER; i++) {
-> +		fep->ndev[i] = alloc_netdev(sizeof(struct mtip_ndev_priv),
-> +					    fep->ndev_name[i], NET_NAME_USER,
-> +					    mtip_ndev_setup);
-
-This explains the ether_setup(). It would be more normal to pass
-ether_setup() here, and set dev->ethtool_ops and dev->netdev_ops here.
-
-> +		if (!fep->ndev[i]) {
-> +			ret = -1;
-
--ENOMEM?
-
-> +			break;
-> +		}
-> +
-> +		priv = netdev_priv(fep->ndev[i]);
-> +		priv->fep = fep;
-> +		priv->portnum = i + 1;
-> +		fep->ndev[i]->irq = fep->irq;
-> +
-> +		ret = mtip_setup_mac(fep->ndev[i]);
-> +		if (ret) {
-> +			dev_err(&fep->ndev[i]->dev,
-> +				"%s: ndev %s MAC setup err: %d\n",
-> +				__func__, fep->ndev[i]->name, ret);
-> +			break;
-> +		}
-> +
-> +		ret = register_netdev(fep->ndev[i]);
-> +		if (ret) {
-> +			dev_err(&fep->ndev[i]->dev,
-> +				"%s: ndev %s register err: %d\n", __func__,
-> +				fep->ndev[i]->name, ret);
-> +			break;
-> +		}
-> +		dev_info(&fep->ndev[i]->dev, "%s: MTIP eth L2 switch %pM\n",
-> +			 fep->ndev[i]->name, fep->ndev[i]->dev_addr);
-
-I would drop this. A driver is normally silent unless things go wrong.
-
-> +	}
-> +
-> +	if (ret)
-> +		mtip_ndev_cleanup(fep);
-> +
-> +	return 0;
-
-return ret?
-
-> +static int mtip_ndev_port_link(struct net_device *ndev,
-> +			       struct net_device *br_ndev)
-> +{
-> +	struct mtip_ndev_priv *priv = netdev_priv(ndev);
-> +	struct switch_enet_private *fep = priv->fep;
-> +
-> +	dev_dbg(&ndev->dev, "%s: ndev: %s br: %s fep: 0x%x\n",
-> +		__func__, ndev->name,  br_ndev->name, (unsigned int)fep);
-> +
-> +	/* Check if MTIP switch is already enabled */
-> +	if (!fep->br_offload) {
-> +		if (!priv->master_dev)
-> +			priv->master_dev = br_ndev;
-
-It needs to be a little bit more complex than that, because the two
-ports could be assigned to two different bridges. You should only
-enable hardware bridging if they are a member of the same bridge.
-
-	Andrew
 
