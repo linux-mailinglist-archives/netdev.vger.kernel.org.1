@@ -1,88 +1,86 @@
-Return-Path: <netdev+bounces-178166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8801A7517B
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 21:35:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F147BA751AA
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 21:53:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 962C63A3A31
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 20:35:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99E0C172087
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 20:53:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3BD31DE2B9;
-	Fri, 28 Mar 2025 20:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 288201E8357;
+	Fri, 28 Mar 2025 20:53:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KGH5Vrf7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BdtdVYXj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A352BA3D
-	for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 20:35:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A414AE545;
+	Fri, 28 Mar 2025 20:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743194123; cv=none; b=h8jkZnG2zW4pdC5xUf5i+qqtGDdFv90l7+rhY0W806jRTwjYS0CTu7UxwYsIzcgulFPM1t/iK4by6qA+imzH7S9JFyvkIZp1mpt2wev5CxWc/lK89POWKpRhrT1J7XFo+Ehg6MWeyaAEr3XQRi3QgTIPzyUOhZCWdSIQNiS5eTM=
+	t=1743195202; cv=none; b=RAVKTHi7wqj7Ur9EMN3SXxVO6uigwbBp2CuslH5o7pWVA1HbVcTWrzTgZ6v8N731lggU583Tgfdx/KYhxAEJYai2SlyPE2vS98SlZFd/GZjce5M3Rre6NDDUH+FDJaBoljba9i2YUasOG0if9Y7xOdLpvH7QIxNQinbKgfV2mDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743194123; c=relaxed/simple;
-	bh=PM6Z62MfR02vKSpMy6sfN/nCyMUKzAJ/XHGNJ035cqc=;
+	s=arc-20240116; t=1743195202; c=relaxed/simple;
+	bh=L1sxyt2yym+IHesz0d2Q6lVQk6i2aCG+WS1RD3gldYA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JFVYHyZnki0gkmkP9XjSObpbXbYfFGFT7a49mwsbTX7whGKVon1hISH9/42DGU6NDDKmGS8t5Z7cqQ/F4VYrVuoct5yRqOPDj0V/WIzDzaBExp9zFblMjlMtCrPbc6NbYZ++bSXM+EPatJfATZXywTiXaDh2GE2XEbFq4WipMcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KGH5Vrf7; arc=none smtp.client-ip=209.85.214.180
+	 Content-Type:Content-Disposition:In-Reply-To; b=FZXyFOtT/zKfVxh8Sa5yytPDZwXTjUqPfNIvgkOgTm8c0wFbj/CVhlN6eSqLH1fwXrImTtrHv36L6tmn1IOSUXVsm1DTWaVrn4SM8Xd6GKgC3ayY+IE+z3q55WrywfsESMOjunpU0UkUUeKbbgd7PXl2pwXkVGagsRJdh30zcO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BdtdVYXj; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-223fb0f619dso54994265ad.1
-        for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 13:35:21 -0700 (PDT)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-227aaa82fafso56196595ad.2;
+        Fri, 28 Mar 2025 13:53:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743194121; x=1743798921; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1743195200; x=1743800000; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LiVDZDo11D1xeuShSQAOHmn6RKHHazRapU0u1otqQ2M=;
-        b=KGH5Vrf75PxFXbdtjD4jz/vez9o7cNLyF37A5kw3Nd+LxTmYcTbqK4oyOKNkZicbdE
-         NlbQCJxkQsg7XH1HwQQUTiMrbcsUehoks5qB8t5WX8ZmtoooxhWmgQmRbomrtMyIh9Na
-         pcfnbtrTQuWdqhkvVqb4ry1MRQdt67TfPVVAbuzQV4Cep847LRYlNIAMWT/toYFcJvk8
-         XvGwZsZKxQNloXxJDK90pxPbnL+2uMc/hooXRNLGaFzbBkOgWLK85QkPBSW5nheTIOIn
-         6MrlMAbbkvibDpoL3JEgG2YdXdbZEBugKnoxdk3rp2ovfotIn5IaaMdAjvHolTUPjTxo
-         uVLg==
+        bh=GJQ1Sn7f/nJpTYs+G8/LKPPbwUGACYMbIrHKliEJEzc=;
+        b=BdtdVYXjthhpNy9+tzfYA23YlIhRTnMpXPh1l1A2GXSm11cyX1NvjAZQxw0cJ4IkC2
+         nfKdQmgElKgcIW2x4RLFqSTtBNYyiZ6uZXoYuh6OeGV4j1vCAiRw0qzeHvxUHCLo67jq
+         FQqFDCMLF9QA0zIgnFESjva+eCO5vP5+8zL47HkIPgcMBGDAnaLGqQdE6rAoiG9alHWg
+         jvkkDyGCuriclWlAWisirmHEVNFEHvMJFtOSa6sLNdIZCI5XC9Rm7w07LfnwHnh5sNL/
+         vCbo51jW3s2S433Gdhto7A1S97t1U6W+TLecIOgq3udzko8NL1ERbR91TyjCqBh4NlIr
+         qvQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743194121; x=1743798921;
+        d=1e100.net; s=20230601; t=1743195200; x=1743800000;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LiVDZDo11D1xeuShSQAOHmn6RKHHazRapU0u1otqQ2M=;
-        b=waLMskhXKdKc/RbUWv2CG5YeNipEy2Nd8KBscIWt/FEiC9miZ6zPfl8VBuv7Cfdvbf
-         WuRa4K5ODrgWB9zXpLfCzLxIyniv6+jGRn6dcHj3kWFO0m6GTwkaf51SFdHSII03SXn2
-         1gaGkGuMRZ4/GxjMWkYslIPCkFGtGJpJkrAGe5eHvT53wN7LFPfkeLzh+rj1lhDvR2Zn
-         SewTbUr2Bg5Z1OC3B44HRAAvca5zh+p/fF/O3yF8k/brnh+4Yxklv8s9nKYvLevBrKK7
-         HR0lkiP+1M2ii8ysMNx/OqmqDmosifB3CWNuP8ltiReJKLqyHJxdIx6Jb6VZO2qdHU5A
-         dPRQ==
-X-Gm-Message-State: AOJu0Yy4UzZnYDmFpNjJIpK/P2dkR/N14UeKZ9YjurEK2rVSA+Wzw8/w
-	Ju2OrpEfNfjaNfPwmGXOnIh4lKqRI4NoJ6L7aAqMDfjyLuF6vgo3NQ4MUcCe
-X-Gm-Gg: ASbGncsR3nQhRKiJBXkiBkb9wxbhRxoXwCQ4WNS2bob2vbubxg7ugHXInMYUb4T1mpO
-	L2TPglZ9YRUmK0nMkiMT/FmV9RqvBS9OCJgs5AtQggLrNoxTLZ/xZtP86Pv145QvfA3MF2bwIL1
-	EcevlTjx2MbWAK4MU3xmm9kCzCfMTWt9wDI7CwoXCx8jbVXMsEV9V2+skWXQppapVlQPhI3sMWZ
-	YErzqwJiF01AtjmOz7uffn1GsRXqm7tq9ZzDH6ltqKS6I6OKIXqg19G0CwVp3AWGLFs3T9s08ej
-	gXP8J/kUYZRphLky1JI+7LFljfu+m9jmzRb+DH+cUHE9eYVF
-X-Google-Smtp-Source: AGHT+IHFBID8oywZPQcQ5PtHRQ0ZkeaJ/mKCPQhAPek6Yltf/E2lmdoBzvxOPilf87A+/1Zjm/vhfw==
-X-Received: by 2002:a17:903:94e:b0:224:1c41:a4c0 with SMTP id d9443c01a7336-2292f944b84mr10498525ad.9.1743194121316;
-        Fri, 28 Mar 2025 13:35:21 -0700 (PDT)
+        bh=GJQ1Sn7f/nJpTYs+G8/LKPPbwUGACYMbIrHKliEJEzc=;
+        b=NQ8A1KlRccF9cG23R09HzaDcPnst4CTSYSBTmRPgfIgAb+pL1NADMC/VVCut8h4+4B
+         8+P2Kjkb9FEDG5Lc8HPYPcyvPOCNGVnedfCI93fGHAQeq6oV4/iWmjDRoYCXJeEUtjiD
+         3dzGxoss19Tf5muU0iMZtgCPRTfVIvTzl7B4z2TCQE7GrFUNZv167zt9FvU0a4fA0LHL
+         kxrUsh4d/ZxUDK5WKRPLLrMfRBFKT0064jxrPCh60Oat8w87pW5FLX/quyGmiypE4Xsk
+         FGZiKlxOgr963HMWyTbbRoOpE7Mee0KcrjImI6gNRoUHci4fCuUHPnZJgbUPHfIli/Yi
+         j+Ag==
+X-Forwarded-Encrypted: i=1; AJvYcCW2cvpT6YHSIy8dEfAMC7uYxv1mUHpqA00yDrUSacOI34R3U8bdAPw22Z5Hu8vh64dso4nGnlxy@vger.kernel.org, AJvYcCWNJhi710PhEDIKvyM5VZsJo/H8um4S/FLDmUxihXIub/irlvcDiO8s5EBcxYca231wSeW1ubMRyIe4MGE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTcPQyWy+NicAC4KdqGs3l+VIW+Ot9IJ1jA1Q3Cx+vTF817GDc
+	f3cyPSHWBr3Hi5ezyMo0Qc0v7nCIIxE0e/dGkBVPG57gZQ8TiV25
+X-Gm-Gg: ASbGncvIZsSQH/HFO2Z7sWIOK6hvkjShlcC2gptTa48IeKx8Qa8x2h550aLXlC5cHpC
+	+MFCK8K+cf5zHWay7d4DkGiJWmdd/wqf3/RIN3rU0I+UfFONE6ssbstyEd9ZJ9fvJXwpGY1e4Bn
+	IyGKwvn/rbsdgfXuZLrSmn5X97pUS+SDicG9ezMpBcCUe/o+kx4XNUxUa/hG1tWHoKIdAQXio1u
+	0ZuCsPHNaLpf4bwxUz7zkVguOP0NJA1nfofFOjap7GLkeZFoTCswUduFBXP0pWOczK/vIr/25og
+	QPuUBqt9XKa4sqaFJ9AJGByXfSHxubNSojQQTpNgu/p4delM
+X-Google-Smtp-Source: AGHT+IFDeGZ9vPA9qpQBzEUA3zSpURmz+wGI4PNW09mhj213tqyA/4063foRlK1avSu9yQpmRJpiPw==
+X-Received: by 2002:a05:6a00:1395:b0:736:5725:59b4 with SMTP id d2e1a72fcca58-7398034e500mr940648b3a.3.1743195199526;
+        Fri, 28 Mar 2025 13:53:19 -0700 (PDT)
 Received: from localhost ([129.210.115.104])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2291f1df01csm22698305ad.178.2025.03.28.13.35.20
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73970e271absm2340148b3a.51.2025.03.28.13.53.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Mar 2025 13:35:20 -0700 (PDT)
-Date: Fri, 28 Mar 2025 13:35:19 -0700
+        Fri, 28 Mar 2025 13:53:18 -0700 (PDT)
+Date: Fri, 28 Mar 2025 13:53:18 -0700
 From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Victor Nogueira <victor@mojatatu.com>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
-	edumazet@google.com, gerrard.tai@starlabs.sg,
-	Pedro Tammela <pctammela@mojatatu.com>
-Subject: Re: [Patch net 08/12] selftests/tc-testing: Add a test case for
- CODEL with HTB parent
-Message-ID: <Z+cIB3YrShvCtQry@pop-os.localdomain>
-References: <20250320232211.485785-1-xiyou.wangcong@gmail.com>
- <20250320232539.486091-1-xiyou.wangcong@gmail.com>
- <20250320232539.486091-8-xiyou.wangcong@gmail.com>
- <3a60ae0c-0b5f-44e9-8063-29d0d290699c@mojatatu.com>
+To: syzbot <syzbot+a3422a19b05ea96bee18@syzkaller.appspotmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] kernel BUG in skbprio_enqueue
+Message-ID: <Z+cMPsPQfpEFJz60@pop-os.localdomain>
+References: <67e521f9.050a0220.2f068f.0026.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,30 +89,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3a60ae0c-0b5f-44e9-8063-29d0d290699c@mojatatu.com>
+In-Reply-To: <67e521f9.050a0220.2f068f.0026.GAE@google.com>
 
-On Sun, Mar 23, 2025 at 07:48:39PM -0300, Victor Nogueira wrote:
-> On 20/03/2025 20:25, Cong Wang wrote:
-> > Add a test case for CODEL with HTB parent to verify packet drop
-> > behavior when the queue becomes empty. This helps ensure proper
-> > notification mechanisms between qdiscs.
-> > 
-> > Note this is best-effort, it is hard to play with those parameters
-> > perfectly to always trigger ->qlen_notify().
-> > 
-> > Cc: Pedro Tammela <pctammela@mojatatu.com>
-> > Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
+On Thu, Mar 27, 2025 at 03:01:29AM -0700, syzbot wrote:
+> Hello,
 > 
-> Cong, can you double check this test?
-> I ran all of your other tests and they all succeeded, however
-> this one specifically is always failing:
+> syzbot found the following issue on:
+> 
+> HEAD commit:    f6e0150b2003 Merge tag 'mtd/for-6.15' of git://git.kernel...
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=13a14a4c580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=46a07195688b794b
+> dashboard link: https://syzkaller.appspot.com/bug?extid=a3422a19b05ea96bee18
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=109e343f980000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1037abb0580000
+> 
+> Downloadable assets:
+> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-f6e0150b.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/7ade4c34c9b1/vmlinux-f6e0150b.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/1fe37b97ec9d/bzImage-f6e0150b.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+a3422a19b05ea96bee18@syzkaller.appspotmail.com
+> 
+> ------------[ cut here ]------------
+> kernel BUG at net/sched/sch_skbprio.c:127!
 
-Interesting, I thought I completely fixed this before posting after several
-rounds of playing with the parameters. I will double check it, maybe it
-just becomes less reproducible.
+I am looking into this bug.
 
-codel is indeed the hardest one, since fq_codel has a mem limit we can
-leverage. (In the worst case, we can drop the codel test case.)
+BTW, it is not related to my qlen_notify patchset since it is not yet
+merged and this stack trace does not even involve qlen_notify.
 
-Thanks!
+Thanks.
 
