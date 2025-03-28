@@ -1,188 +1,154 @@
-Return-Path: <netdev+bounces-178063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5624A74458
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 08:23:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E82FA744DF
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 09:02:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1BD5B175C93
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 07:23:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0D433BCB0D
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 08:02:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B2162116EE;
-	Fri, 28 Mar 2025 07:23:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5272211472;
+	Fri, 28 Mar 2025 08:02:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VIxcRODd"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF73D2116E7
-	for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 07:23:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C197C1A2622
+	for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 08:02:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743146612; cv=none; b=q1FpyT2ZvO3PnEum/1Er4gzF7bkkhZrsmM5S33TdZwoBj+LyIZQjlLsksUDrmMq2w1iyLKZrFrzdKXNb7bgt9zQZIBl7NpQ81+9HE1BxmjetU+lSasVBmtd+rIFvnlevHiAkr7Fuh7CeMhIGcf8ZG/nEVL1N1uTRxhtN7zzMtZo=
+	t=1743148932; cv=none; b=iUX86ihmLovtpXRKD2+I0TAf42xxcwg7oywsbWD0kPcuxK+9xLcOhJFc4C50KNiCf1il/wNHl4kQg2hdhuyP0iikFvmb4v7xdGCpb6DkMODmo3GY3zVrCCkWhOBjM9MDNFjydR0rWVgbiVRhxidnhR5CJmeAUO424Zow8BoZhZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743146612; c=relaxed/simple;
-	bh=JREqmQ3F44uxPOvDqNR52TR0Yop4pEtWE1iR0/YLCZ8=;
+	s=arc-20240116; t=1743148932; c=relaxed/simple;
+	bh=z2YDe1OU3wrVgPNLV8ZOOArWU+bI010amQn+oFWZ0So=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VQqrLo+rgc3J0SGyfKQoN8MgnXsGS1PJicBIhAhpTp0tn4L4txJum7fM88PcMXkNI5tNGOIVT7mTMvhayL/MpP4nxxk8n7915G8lXLc8nssNXKlx9uo3R/NDZca3KE6qjWfYfMnc7Ud7SUFM0yTndatDskaRWj05pJlmH+cjB3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1ty43D-0000Nn-Lv; Fri, 28 Mar 2025 08:22:47 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1ty439-0023qP-1p;
-	Fri, 28 Mar 2025 08:22:43 +0100
-Received: from pengutronix.de (p5b1645f7.dip0.t-ipconnect.de [91.22.69.247])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 1DB853E85BD;
-	Fri, 28 Mar 2025 07:22:43 +0000 (UTC)
-Date: Fri, 28 Mar 2025 08:22:42 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Ming Yu <a0282524688@gmail.com>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
-	brgl@bgdev.pl, andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org, 
-	linux-usb@vger.kernel.org
-Subject: Re: [PATCH v8 4/7] can: Add Nuvoton NCT6694 CANFD support
-Message-ID: <20250328-smart-thundering-asp-2536b0-mkl@pengutronix.de>
-References: <20250225081644.3524915-1-a0282524688@gmail.com>
- <20250225081644.3524915-5-a0282524688@gmail.com>
- <20250227-spicy-grebe-of-dignity-68c847-mkl@pengutronix.de>
- <CAOoeyxWSsy0Q0Y7iJE8-DZM5Yvcdto8mncFkM8X4BvVMEgfUiQ@mail.gmail.com>
- <20250317-cuttlefish-of-simple-champagne-ee666c-mkl@pengutronix.de>
- <CAOoeyxXSC3rjeB0g5BtHKvKy-Y9Dszd5X9WuHeBeH1bk39d_Eg@mail.gmail.com>
- <20250326-inventive-lavender-carp-1efca5-mkl@pengutronix.de>
- <CAOoeyxXw1x2HVXQYzxc1OuGimn7XPfCjj-aB=jAAfw733b_9OQ@mail.gmail.com>
- <20250327-awesome-mutant-cuscus-0f0314-mkl@pengutronix.de>
- <CAOoeyxWa5sB+YS6W=oG7xUeizXxigkdw3b=7w9aGftCWzWsw2A@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZUDIyq2TdmY0HbQbh5nqjvQmGPK3hnJ5H6RFT5ZmqKBEaURosOCSKRGcKbunm+DDRSA31rjglyAJ3+KlXs/kJe+ws69IlKgNFIMPPyscozz3n9SCHl5bZyhoo07axpd635BT+WbE6Ypg8BaAz41gxFsMHQh0N8/Uvc2CAQ6LlCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=VIxcRODd; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-38f2f391864so1008530f8f.3
+        for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 01:02:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1743148929; x=1743753729; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aSnI14BbYG44AW/1FazNe/GgOwu32Ov8br248K1Kr2c=;
+        b=VIxcRODdnhJqwpyGIGtCbjqCAkR6z3CTNGO2EWhYM/vZtXyCN3G0HyIm/oMvaC3vfw
+         fL1Tm6CKC4SRSWsrirQB6hCuekGGU+cZQ3iOca5P9Z2OYlfAJ7peQtLgb2Tf403Jk7N/
+         3gHlYAxWlRlh6yn8lPkAHm/plMnwNbUQ3TzGQ5OfwQxMrZyLD5CKExxhJ0eE1L0IMRMh
+         u4IAcEMZvlaj6qcfW1U9xt8TM/KLYguV1R9ili80ULJAehvgUVBzetTrReA910DcQpSn
+         vZ0q/EfbrwcG+qUFrcxqCG+aNY+rUVfmTrkcIfS6limM/QA3rjy/hE4JdEmnI6O/SCB4
+         1R9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743148929; x=1743753729;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aSnI14BbYG44AW/1FazNe/GgOwu32Ov8br248K1Kr2c=;
+        b=ZGflO2IuJ2RPWdJz0m00ydS7eQ7GqEQ1Fn6jM5X2oR7FeDgfzP3hBRsvDwf5MQXJG6
+         HyMYPgymJK5A/X0EKKiDRwlmRNpp0uOtPy7iApM0ZlWB2gGnrkgPh/bRHgKoiwU0X6AO
+         fym1s5gbMGDtKM/W19RppBvHnoeFs+muBSbQYzB/WgICpd8C185FdbiIWxHsXlBBPYkP
+         WdEEXXyOkMFrXv7ioj4BXz+yFWzI/HT0HSRUaZh6p+eFZDdaYtWjLfyCyuL6BaUTNc/g
+         4PhKI+zyJTMTGMUJtaX3+MMLHIqk+XpAHDVlAIOBZdIWr+eW7+hiRnhNr9tMqLFtZGzQ
+         97WQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUQ3+RzoPwd5LjPVNKWQ99/BIPaeC/CPmnAGnQAjBn5ZmPumZ+QZ29wOZ3Vd0TRHA24xTJjUlc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzQ4gEZn+5DLSdbifxLtpKc0xN5PPRMfqCYSIDCKB7zwGJIqP2
+	d2Qt5Pbx3VTme8rHbHurUhtO7obwdW2PJUvQtCqDWr3rXT7k6hHI4Ik3Q7OgPpo=
+X-Gm-Gg: ASbGncuVUFmRTlhoSwIuDmBsFh/PLuJ2X1ZLYOrQLusnqvHHg2hBWuPU9pHEa6D4ywC
+	SoEOYINCefNSxg3oNV3dMSWeygIbDsQofvnNyBBHUSTLyENWuLZAVI1QovdXXXUAAzHyJUWdysr
+	S5eGLsiLfAgzAtU7let6IhP/6igz0zgko8L8ZLfDHHkh0SvWFw8yfS8UcxhlhO6KuJKMIaT78dS
+	uNoU+t1cG5mQ8L4JL/pgjCQY6cFiNvBlyzqNv2rCBrNRq8JGWOnkjemt230lBXEko9iJWl0lOxm
+	AT7EQnRJLLfohEe8J6ixTyp3Xitcpd28JQiC62JCBTp6QqxlZA==
+X-Google-Smtp-Source: AGHT+IFJDzuS2myCBT8Z8eorHzwkBKAKIK4T2dNn586UW/tt61K1e2XI3JFfo+oVpAzMnbvgnYtY2g==
+X-Received: by 2002:a5d:5885:0:b0:391:4999:778b with SMTP id ffacd0b85a97d-39ad17505d5mr5896059f8f.28.1743148928856;
+        Fri, 28 Mar 2025 01:02:08 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-39c0b7a4482sm1795937f8f.86.2025.03.28.01.02.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Mar 2025 01:02:08 -0700 (PDT)
+Date: Fri, 28 Mar 2025 11:02:05 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: "Malladi, Meghana" <m-malladi@ti.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, pabeni@redhat.com,
+	edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
+	bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kory.maincent@bootlin.com, javier.carrasco.cruz@gmail.com,
+	diogo.ivo@siemens.com, jacob.e.keller@intel.com, horms@kernel.org,
+	john.fastabend@gmail.com, hawk@kernel.org, daniel@iogearbox.net,
+	ast@kernel.org, srk@ti.com, Vignesh Raghavendra <vigneshr@ti.com>,
+	Roger Quadros <rogerq@kernel.org>, danishanwar@ti.com
+Subject: Re: [PATCH net-next v2 3/3] net: ti: icss-iep: Fix possible NULL
+ pointer dereference for perout request
+Message-ID: <326ebaa2-7b8f-455c-bf22-12e95f32b71a@stanley.mountain>
+References: <20250321081313.37112-1-m-malladi@ti.com>
+ <20250321081313.37112-4-m-malladi@ti.com>
+ <20250325104801.632ff98d@kernel.org>
+ <0799d2f6-3777-45f6-a6b6-9ca3f145d611@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="a4tssny7k3xmom4i"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAOoeyxWa5sB+YS6W=oG7xUeizXxigkdw3b=7w9aGftCWzWsw2A@mail.gmail.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <0799d2f6-3777-45f6-a6b6-9ca3f145d611@ti.com>
 
+On Fri, Mar 28, 2025 at 11:46:49AM +0530, Malladi, Meghana wrote:
+> 
+> 
+> On 3/25/2025 11:18 PM, Jakub Kicinski wrote:
+> > On Fri, 21 Mar 2025 13:43:13 +0530 Meghana Malladi wrote:
+> > > Whenever there is a perout request from the user application,
+> > > kernel receives req structure containing the configuration info
+> > > for that req.
+> > 
+> > This doesn't really explain the condition under which the bug triggers.
+> > Presumably when user request comes in req is never NULL?
+> > 
+> 
+> You are right, I have looked into what would trigger this bug but seems like
+> user request can never be NULL, but the contents inside the req can be
+> invalid, but that is already being handled by the kernel. So this bug fix
+> makes no sense and I will be dropping this patch for v3. Thanks.
+> 
 
---a4tssny7k3xmom4i
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v8 4/7] can: Add Nuvoton NCT6694 CANFD support
-MIME-Version: 1.0
+I don't remember bug reports for more than a few hours so I had to dig
+this up on lore:
 
-On 28.03.2025 10:37:33, Ming Yu wrote:
-> Marc Kleine-Budde <mkl@pengutronix.de> =E6=96=BC 2025=E5=B9=B43=E6=9C=882=
-7=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=883:25=E5=AF=AB=E9=81=93=EF=
-=BC=9A
-> >
-> > On 27.03.2025 13:38:22, Ming Yu wrote:
-> > > Marc Kleine-Budde <mkl@pengutronix.de> =E6=96=BC 2025=E5=B9=B43=E6=9C=
-=8827=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8A=E5=8D=881:41=E5=AF=AB=E9=81=93=
-=EF=BC=9A
-> > > >
-> > > > > > > > > +     priv->can.clock.freq =3D can_clk;
-> > > > > > > > > +     priv->can.bittiming_const =3D &nct6694_can_bittimin=
-g_nominal_const;
-> > > > > > > > > +     priv->can.data_bittiming_const =3D &nct6694_can_bit=
-timing_data_const;
-> > > > > > > > > +     priv->can.do_set_mode =3D nct6694_can_set_mode;
-> > > > > > > > > +     priv->can.do_get_berr_counter =3D nct6694_can_get_b=
-err_counter;
-> > > > > > > > > +     priv->can.ctrlmode_supported =3D CAN_CTRLMODE_LOOPB=
-ACK |
-> > > > > > > > > +             CAN_CTRLMODE_LISTENONLY | CAN_CTRLMODE_BERR=
-_REPORTING |
-> > > > > > > > > +             CAN_CTRLMODE_FD | CAN_CTRLMODE_FD_NON_ISO;
-> > > > > > > >
-> > > > > > > > Does your device run in CAN-FD mode all the time? If so, pl=
-ease use
-> > > > > > > > can_set_static_ctrlmode() to set it after priv->can.ctrlmod=
-e_supported
-> > > > > > > > and remove CAN_CTRLMODE_FD from ctrlmode_supported.
-> > > > > > > >
-> > > > > > >
-> > > > > > > Our device is designed to allow users to dynamically switch b=
-etween
-> > > > > > > Classical CAN and CAN-FD mode via ip link set ... fd on/off.
-> > > > > > > Therefore, CAN_CTRLMODE_FD needs to remain in ctrlmode_suppor=
-ted, and
-> > > > > > > can_set_static_ctrlmode() is not suitable in this case.
-> > > > > > > Please let me know if you have any concerns about this approa=
-ch.
-> > > > > >
-> > > > > > Where do you evaluate if the user has configured CAN_CTRLMODE_F=
-D or not?
-> > > > > >
-> > > > >
-> > > > > Sorry, I was previously confused about our device's control mode.=
- I
-> > > > > will use can_set_static_ctrlmode() to set CAN_FD mode in the next
-> > > > > patch.
-> > > >
-> > > > Does your device support CAN-CC only mode? Does your device support=
- to
-> > > > switch between CAN-CC only and CAN-FD mode?
-> > > >
-> > >
-> > > Our device supports both CAN-CC and CAN-FD mode.
-> >
-> > This doesn't answer my question:
-> >
-> > Does your device support CAN-CC only mode?
->=20
-> It can dynamically switch between CAN-CC and CAN-FD mode when
-> trasmitting or receiving, depending on whether the nct6694_can_frame
-> passs the flag with NCT6694_CAN_FRAME_FLAG_FD.
+https://lore.kernel.org/all/7b1c7c36-363a-4085-b26c-4f210bee1df6@stanley.mountain/
 
-Ok, but what about the receive path? Does the device support CAN-CC only
-mode? Will it throw an error, if it receives a CAN-FD frame?
+This is definitely still a real bug on today's linux-next but yes, the
+fix is bad.
+
+drivers/net/ethernet/ti/icssg/icss_iep.c
+   814  int icss_iep_exit(struct icss_iep *iep)
+   815  {
+   816          if (iep->ptp_clock) {
+   817                  ptp_clock_unregister(iep->ptp_clock);
+   818                  iep->ptp_clock = NULL;
+   819          }
+   820          icss_iep_disable(iep);
+   821  
+   822          if (iep->pps_enabled)
+   823                  icss_iep_pps_enable(iep, false);
+   824          else if (iep->perout_enabled)
+   825                  icss_iep_perout_enable(iep, NULL, false);
+                                                    ^^^^
+A better fix probably to delete this function call instead of
+turning it into a no-op.
+
+   826  
+   827          return 0;
+   828  }
 
 regards,
-Marc
+dan carpenter
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---a4tssny7k3xmom4i
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmfmTj8ACgkQDHRl3/mQ
-kZxbBggAnvTDCDToJYkOojptUT65lDvDa1RdwRbTO+7MEEyuklVxALUQJmpsq1Yw
-Aw4gKcwEZE1Q3vdlXR9kF4hUCKczWT5QxeqCW9M/qEfSXgNXhX8CCHVDzl5b7Om+
-kB+tiH7jitYhp2s9dK0Muj/hl4QuOL35OW0Ayn6G/Pd/fKjNJlf4to2ziatUFtk6
-nWNfPrk9LhQq9B/Fy5yGxDpt7WwPU3MUMaYWHZSvSMyPawBPpj6nYtlXRn9FeVUK
-EEZIiOVW/orW9H5nu5XeGXbYM5OdwNqh83rqW94yYoeyE4A+2CX9UZ+kkLpabh7v
-Xz6Zr0RWQWzVT0cOQWKPGt0vY3Iw0Q==
-=Op9R
------END PGP SIGNATURE-----
-
---a4tssny7k3xmom4i--
 
