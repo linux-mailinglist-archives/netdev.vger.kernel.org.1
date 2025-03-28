@@ -1,107 +1,261 @@
-Return-Path: <netdev+bounces-178148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 222A7A74EBE
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 17:59:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 029EEA74ED0
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 18:03:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B60403B5499
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 16:59:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAD4A3AAC6A
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 17:03:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 604031DD0D5;
-	Fri, 28 Mar 2025 16:59:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D92FC1DE3A6;
+	Fri, 28 Mar 2025 17:03:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hKiGt76z"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MDN0aaDd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0DC1DB55D
-	for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 16:59:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 153371DD886
+	for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 17:03:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743181180; cv=none; b=iSvKBCDXMmsg6hvbL7kQY5H41pgsOP94xpTkZMuRDw14UnfeVuh1Apcvgc7886erP30ZJZWOFe44WHXll8WN+NW5L3CQOm3BdaCLphy9w62wvji4Kqpu7ekDS7XY1bq1dZkOTjpmkeY8YeHYahjDeR/rsHU0D0q/d8k9ZA50b44=
+	t=1743181411; cv=none; b=mkjGHAfOtWuJYBWbiuzrk80WqKTQIlI2mbDlb8ItWU8EXWYbrPLZYkX57nT2csVvfVoovOaYZ2LVTO5KXwcgE1vvHUShm8rb+SP+bAz4tWGTCDhjeZ5cMgrQ6go6+CuvQZboS4dpt9Mp5RMOCehVq0PpUaUPvLVnM7KXz3P5hPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743181180; c=relaxed/simple;
-	bh=vzvio6ovr7Iz1GQ3HS2YKO3+e9P4dpWRcYZONg2Q8Vw=;
+	s=arc-20240116; t=1743181411; c=relaxed/simple;
+	bh=5VL+nSlr4EcqTMw6hRb9pJpX+24HA7R7EtdOhFmG/0I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eTXzWvQVkKkA5TYtttAbYCxJtihMkGjIGLF1sRyZd/Y42ZlQ+o3w5+PaDJEGIZCkcFj9uy2RBJHDFRbvU4eF3NUxikfCLzaqD6eP49Gu9Od0b35Eq8brqb4XhhMNhrurk2+LiW8Mmqc3E4vxcBe7AOvVonTfRLhEkgvq0m1Y5Rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hKiGt76z; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2ff784dc055so4059607a91.1
-        for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 09:59:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743181178; x=1743785978; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ocHVTrCamovrJRcY0a74hjSp1PruFYlZ1n8m34ifyyU=;
-        b=hKiGt76zQlY4Bz0Jx4eoiJYPQseE8xILi1nKM0xrl0krEmfVvkyX+jsBLKEQdV2Kfr
-         QO1m489xEIiN7m7m22Gqq0F6nSM3Zr/dGZSj5hwQkQqadaKNKIUYfbkgCQjGBPVj36iy
-         TMuMS7o1NFe6DWQ/awxURWOZtlIKOYncoVdMT45pdAWCofz+d6JN6gOQHxmjZY+WzyY2
-         pqWkCabjhjQh0JIyiNmy31J3n0ZmEY+uN0jY+oLU0l98yormSBUEqKa0dYJVHDr8CSPO
-         V5knFYOOjabUkU/IW7c/exp5cALKgpjeMijCCbAf/o4yeUDrpshFyi4Qyq9O6jZtdRC5
-         hXFQ==
+	 Content-Type:Content-Disposition:In-Reply-To; b=GAtoAKdHJixpIU1NoNwNCDT9z3UV/ksSQV3FNoBN0pt2ULRHuLGdtPxJ2jF9LUzPJgkMLV0aomQmrW3aSkBKhpGgrHQp8a1j8l/sRif0X6QMEt6hqMt7ZOUOHTI55LZTE5USpIWWxrNyOkfbI4rewqPZ8qpg1CMASVB2+4GIWJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MDN0aaDd; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743181408;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9uf0+0Mizn7Wtg468+LZG3Q/0Otqz8lfJO3EiDJY7w4=;
+	b=MDN0aaDd5BB8sFE2d9mV4AeL2Dmu68I8kk3oXy1vbdsGrYiMto1+DUsracAjMmGyBAkCq0
+	heulOM3GNJn07dXmvCmAzWpoDuhVLV28IrsEbWpZrdvpcvVZUGQp7VVppZhHYxrsTvDUys
+	m74fGTea01WwGoYcSRsH0wbgDiCdDsc=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-512-c8HAGlJuNq-0kdtD4dFeoA-1; Fri, 28 Mar 2025 13:03:27 -0400
+X-MC-Unique: c8HAGlJuNq-0kdtD4dFeoA-1
+X-Mimecast-MFC-AGG-ID: c8HAGlJuNq-0kdtD4dFeoA_1743181406
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-ab397fff5a3so249513766b.1
+        for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 10:03:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743181178; x=1743785978;
+        d=1e100.net; s=20230601; t=1743181406; x=1743786206;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ocHVTrCamovrJRcY0a74hjSp1PruFYlZ1n8m34ifyyU=;
-        b=RE7KflY/+kmM++uspCQ7UpFkeenlhnTa0FTr0VHkURBnrU1pqkGxYptUW1kql/K3Gr
-         rcLrDk3zI93oLYZW3JZJip0gUWuVIQgWWuOV1gYq4a4EHyFisqhra+NrT1Nrmf78E5+x
-         W++ZcivNrwfOUsmVT7BNr1YWAZW5bKG+RoJEuBgZhjH163J8o//IDK1E9oM9nLQ7qXvF
-         0Z1GSNldL7TBzBB7SIF2+OTC3QSPYcd2+z3Gkq2aYMg5JwYSXDx0Qx20+VY1hCu50g6P
-         y3ezzwwGx99L3v6TMd9EtEkj6AuXUuTqAWywpSuGR9S5NUXsTCZBo54RxeA0Dwwcscfs
-         npvg==
-X-Forwarded-Encrypted: i=1; AJvYcCWiU5AfbA/qHxqBmOdFIe3Hus97xzDYPD3kGYX3G8pxJJXsMflVwQ81LA0hdrm+yCxP3tsDjYw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysCwtvCamhRiu7Uywa9L+ZSdpJntISUnP7iuUljX/ZK6YHTlnl
-	dDyVaozisHihf7buR7DOuQbq7yuCKP7D0mrIaC3rBoycI+KtbTGbB2SDtmoUHg==
-X-Gm-Gg: ASbGncu20xxszIfdzr8SoPmIPe7BmtQetPCojxMm5WHS+8Hj4eE5IzO2YdQ2xBH74Zq
-	1Ark8yXlqZWz4dJbjB28VxILLE9EpZ0jUT27WcoP5pwff1Ak0vBqgoW5mG5YRs/dpxahkxP7hmL
-	G/QTA0n2NifYG7cRspyrXoeXQYFUaYVGZGquH12GnMwNhLTOOg5t2b8NfAEqY9vbJRuxB6E3I7Z
-	Qo+OkqJl+cxlgMopgAkjp7tLmyVEqHPfXmSVinILCfI4OhwEQvNf0gThRdnbluqdZLLB5naToFn
-	1hjUtia4lA/gWLYoJX3bMSUjcynsQGL9mwBrPJlOKx/D
-X-Google-Smtp-Source: AGHT+IHhkQEzgHtuEB9Bv8dN7eeDi34cLgZEuYqyF7qT8CIdRb1gmF+vwe3y0ClCQ9j4bNnk2JL8hA==
-X-Received: by 2002:a17:90b:2641:b0:2ee:90a1:5d42 with SMTP id 98e67ed59e1d1-30531e8873emr100358a91.0.1743181177941;
-        Fri, 28 Mar 2025 09:59:37 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2291f1cfec1sm20561045ad.118.2025.03.28.09.59.37
+        bh=9uf0+0Mizn7Wtg468+LZG3Q/0Otqz8lfJO3EiDJY7w4=;
+        b=vXHq6CzVcJzzytRX/AETRA/5auy93hCAf2e0ENJWTse8cx5Vwg1vA0KZNCOBZaSwqh
+         oSDqjLqO25zlz3Es7lIpz4+dDJ8ken71O3HJsgaIKaVeHrPbAo7idD8i3r/0XwsmF6zg
+         gJgYZe7l0ctav7oODzgE3qzDmCnx4G7kYfVQsTqNZL32HgyJnbqJ0sN5Ndh62njUrIZb
+         2RXSWewCwaF/hJlozaj9Z2wxO9eG0q9ACPxuiTzm/toD+oB17oRgO75rst9qxRdyTP/W
+         Qz4BZsOLBdkNF+N7T3lxfwxchuTHm+JBvANryLCzkhur8iDFbpMNgT9YzSaIpD2kOfZr
+         d+8A==
+X-Forwarded-Encrypted: i=1; AJvYcCXnrVstUQd159Fxe3TCFMqwOAiV6hukkEwCbqSAmhpe6JrfXnvyrPJ6BCmfTP3JH5/L93i9314=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxk+i+vGndXrOaLrwfX89L5njBscPwFUMNqpsh2pHr1KLc3VjBM
+	h1vtx7LhFNK+o+p8aeJVV1sg0S2gv8u390gyTE8sFsivjIov4b+zimI9fkDrAWTNGiLIWQEWDtB
+	aksQont0HqKNLZPYmYcSeIzEwGbP+19n+/0iQwsG2OZku5KIjrRKbKQ==
+X-Gm-Gg: ASbGncsl0Inz0uojiZdcE4xZtU087u+AtSUGK7RJXj2RujQNj67tbn9rs0MVyYF0LRr
+	7X9pXreL5W6XJl7AWjnj+mrJKGi/vOYGzC879uxlKSE1lMvdMw4B9MoM3Pj7V2VBxgDXrnyY2oP
+	hyjYJ2BDhH4ZGfyTFZFCuBsSj9c1HgU0U0BGhEVZgrcJMK61TjghQ8Va8eDzFg+bw2RAmZzlpvQ
+	Dj8GH733kQ/FoJoE+QoYH5K28Gg4xobk+LhQR+VBufh29u0A0R2CRKvbnpbopE81TWP5B7/0OOz
+	zWdDurZ8EaW2s9ihLg6svmO3LOdWcOIHqmzpLpqgvoxoblanRSoy+qylXZIuxZyp
+X-Received: by 2002:a17:906:c115:b0:ac6:e29b:8503 with SMTP id a640c23a62f3a-ac71eac290amr421855466b.1.1743181405030;
+        Fri, 28 Mar 2025 10:03:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFGd9u9IUSVtU5cjE8R52KpOjUFspVo6+RZH/1O5CExd6Dpx7I7lN+krtxHcvzE1FAVtm4Ndw==
+X-Received: by 2002:a17:906:c115:b0:ac6:e29b:8503 with SMTP id a640c23a62f3a-ac71eac290amr421844466b.1.1743181404266;
+        Fri, 28 Mar 2025 10:03:24 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-12-25-55.business.telecomitalia.it. [87.12.25.55])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac71927b243sm191783266b.69.2025.03.28.10.03.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Mar 2025 09:59:37 -0700 (PDT)
-Date: Fri, 28 Mar 2025 09:59:36 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	jeroendb@google.com, hramamurthy@google.com,
-	pkaligineedi@google.com, willemb@google.com, shailend@google.com,
-	joshwash@google.com, sdf@fomichev.me
-Subject: Re: [PATCH net] eth: gve: add missing netdev locks on reset and
- shutdown paths
-Message-ID: <Z-bVeHQpkvzPrb0_@mini-arch>
-References: <20250328164742.1268069-1-kuba@kernel.org>
+        Fri, 28 Mar 2025 10:03:23 -0700 (PDT)
+Date: Fri, 28 Mar 2025 18:03:19 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>, 
+	Daniel =?utf-8?B?QmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, 
+	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, 
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Bryan Tan <bryan-bt.tan@broadcom.com>, 
+	Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, "David S. Miller" <davem@davemloft.net>, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 0/3] vsock: add namespace support to vhost-vsock
+Message-ID: <r6a6ihjw3etlb5chqsb65u7uhcav6q6pjxu65iqpp76423w2wd@kmctvoaywmbu>
+References: <20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20250328164742.1268069-1-kuba@kernel.org>
+In-Reply-To: <20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com>
 
-On 03/28, Jakub Kicinski wrote:
-> All the misc entry points end up calling into either gve_open()
-> or gve_close(), they take rtnl_lock today but since the recent
-> instance locking changes should also take the instance lock.
-> 
-> Found by code inspection and untested.
-> 
-> Fixes: cae03e5bdd9e ("net: hold netdev instance lock during queue operations")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+CCing Daniel
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+On Wed, Mar 12, 2025 at 01:59:34PM -0700, Bobby Eshleman wrote:
+>Picking up Stefano's v1 [1], this series adds netns support to
+>vhost-vsock. Unlike v1, this series does not address guest-to-host (g2h)
+>namespaces, defering that for future implementation and discussion.
+>
+>Any vsock created with /dev/vhost-vsock is a global vsock, accessible
+>from any namespace. Any vsock created with /dev/vhost-vsock-netns is a
+>"scoped" vsock, accessible only to sockets in its namespace. If a global
+>vsock or scoped vsock share the same CID, the scoped vsock takes
+>precedence.
+>
+>If a socket in a namespace connects with a global vsock, the CID becomes
+>unavailable to any VMM in that namespace when creating new vsocks. If
+>disconnected, the CID becomes available again.
+
+I was talking about this feature with Daniel and he pointed out 
+something interesting (Daniel please feel free to correct me):
+
+     If we have a process in the host that does a listen(AF_VSOCK) in a 
+     namespace, can this receive connections from guests connected to 
+     /dev/vhost-vsock in any namespace?
+
+     Should we provide something (e.g. sysctl/sysfs entry) to disable 
+     this behaviour, preventing a process in a namespace from receiving 
+     connections from the global vsock address space (i.e.  
+     /dev/vhost-vsock VMs)?
+
+I understand that by default maybe we should allow this behaviour in 
+order to not break current applications, but in some cases the user may 
+want to isolate sockets in a namespace also from being accessed by VMs 
+running in the global vsock address space.
+
+Indeed in this series we have talked mostly about the host -> guest path 
+(as the direction of the connection), but little about the guest -> host 
+path, maybe we should explain it better in the cover/commit 
+descriptions/documentation.
+
+Thanks,
+Stefano
+
+>
+>Testing
+>
+>QEMU with /dev/vhost-vsock-netns support:
+>	https://github.com/beshleman/qemu/tree/vsock-netns
+>
+>Test: Scoped vsocks isolated by namespace
+>
+>  host# ip netns add ns1
+>  host# ip netns add ns2
+>  host# ip netns exec ns1 \
+>				  qemu-system-x86_64 \
+>					  -m 8G -smp 4 -cpu host -enable-kvm \
+>					  -serial mon:stdio \
+>					  -drive if=virtio,file=${IMAGE1} \
+>					  -device vhost-vsock-pci,netns=on,guest-cid=15
+>  host# ip netns exec ns2 \
+>				  qemu-system-x86_64 \
+>					  -m 8G -smp 4 -cpu host -enable-kvm \
+>					  -serial mon:stdio \
+>					  -drive if=virtio,file=${IMAGE2} \
+>					  -device vhost-vsock-pci,netns=on,guest-cid=15
+>
+>  host# socat - VSOCK-CONNECT:15:1234
+>  2025/03/10 17:09:40 socat[255741] E connect(5, AF=40 cid:15 port:1234, 16): No such device
+>
+>  host# echo foobar1 | sudo ip netns exec ns1 socat - VSOCK-CONNECT:15:1234
+>  host# echo foobar2 | sudo ip netns exec ns2 socat - VSOCK-CONNECT:15:1234
+>
+>  vm1# socat - VSOCK-LISTEN:1234
+>  foobar1
+>  vm2# socat - VSOCK-LISTEN:1234
+>  foobar2
+>
+>Test: Global vsocks accessible to any namespace
+>
+>  host# qemu-system-x86_64 \
+>	  -m 8G -smp 4 -cpu host -enable-kvm \
+>	  -serial mon:stdio \
+>	  -drive if=virtio,file=${IMAGE2} \
+>	  -device vhost-vsock-pci,guest-cid=15,netns=off
+>
+>  host# echo foobar | sudo ip netns exec ns1 socat - VSOCK-CONNECT:15:1234
+>
+>  vm# socat - VSOCK-LISTEN:1234
+>  foobar
+>
+>Test: Connecting to global vsock makes CID unavailble to namespace
+>
+>  host# qemu-system-x86_64 \
+>	  -m 8G -smp 4 -cpu host -enable-kvm \
+>	  -serial mon:stdio \
+>	  -drive if=virtio,file=${IMAGE2} \
+>	  -device vhost-vsock-pci,guest-cid=15,netns=off
+>
+>  vm# socat - VSOCK-LISTEN:1234
+>
+>  host# sudo ip netns exec ns1 socat - VSOCK-CONNECT:15:1234
+>  host# ip netns exec ns1 \
+>				  qemu-system-x86_64 \
+>					  -m 8G -smp 4 -cpu host -enable-kvm \
+>					  -serial mon:stdio \
+>					  -drive if=virtio,file=${IMAGE1} \
+>					  -device vhost-vsock-pci,netns=on,guest-cid=15
+>
+>  qemu-system-x86_64: -device vhost-vsock-pci,netns=on,guest-cid=15: vhost-vsock: unable to set guest cid: Address already in use
+>
+>Signed-off-by: Bobby Eshleman <bobbyeshleman@gmail.com>
+>---
+>Changes in v2:
+>- only support vhost-vsock namespaces
+>- all g2h namespaces retain old behavior, only common API changes
+>  impacted by vhost-vsock changes
+>- add /dev/vhost-vsock-netns for "opt-in"
+>- leave /dev/vhost-vsock to old behavior
+>- removed netns module param
+>- Link to v1: https://lore.kernel.org/r/20200116172428.311437-1-sgarzare@redhat.com
+>
+>Changes in v1:
+>- added 'netns' module param to vsock.ko to enable the
+>  network namespace support (disabled by default)
+>- added 'vsock_net_eq()' to check the "net" assigned to a socket
+>  only when 'netns' support is enabled
+>- Link to RFC: https://patchwork.ozlabs.org/cover/1202235/
+>
+>---
+>Stefano Garzarella (3):
+>      vsock: add network namespace support
+>      vsock/virtio_transport_common: handle netns of received packets
+>      vhost/vsock: use netns of process that opens the vhost-vsock-netns device
+>
+> drivers/vhost/vsock.c                   | 96 +++++++++++++++++++++++++++------
+> include/linux/miscdevice.h              |  1 +
+> include/linux/virtio_vsock.h            |  2 +
+> include/net/af_vsock.h                  | 10 ++--
+> net/vmw_vsock/af_vsock.c                | 85 +++++++++++++++++++++++------
+> net/vmw_vsock/hyperv_transport.c        |  2 +-
+> net/vmw_vsock/virtio_transport.c        |  5 +-
+> net/vmw_vsock/virtio_transport_common.c | 14 ++++-
+> net/vmw_vsock/vmci_transport.c          |  4 +-
+> net/vmw_vsock/vsock_loopback.c          |  4 +-
+> 10 files changed, 180 insertions(+), 43 deletions(-)
+>---
+>base-commit: 0ea09cbf8350b70ad44d67a1dcb379008a356034
+>change-id: 20250312-vsock-netns-45da9424f726
+>
+>Best regards,
+>-- 
+>Bobby Eshleman <bobbyeshleman@gmail.com>
+>
+
 
