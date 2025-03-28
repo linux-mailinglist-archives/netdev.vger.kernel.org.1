@@ -1,276 +1,248 @@
-Return-Path: <netdev+bounces-178073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35396A745DF
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 10:00:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3730CA74657
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 10:27:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DDEE17822D
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 09:00:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 133EF1B60D9D
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 09:27:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DE25214236;
-	Fri, 28 Mar 2025 08:59:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAF0C2139B6;
+	Fri, 28 Mar 2025 09:27:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="bvedlF+W"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Uz31NG4/"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D69C214217;
-	Fri, 28 Mar 2025 08:59:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA9F213236
+	for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 09:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743152376; cv=none; b=YYGoR64ZoFvdlDdm8rwsHO6E7GmHYRC0Fn3NSaktv7URuKfE/4eBGRXtMHDpLOf25/Bi2ugi6vzLMEm3ZLdfNjVojmNQX34PTj9RjZTPUrrkhzXD8YVnOPt29wPTCVZM9ebhfooRSJgN7RrIvEzQPD1rlektGKg84NwRlx2+KH4=
+	t=1743154045; cv=none; b=r7WFHIlQX2R9jUXQRLIdfq6LSpSbp6oxsr8sQMmqDBOZvorVSsOmn7lPuemuw9+I2py2WPdd43FWo7+XRhLouc8vmkJy8cuUvCFOwe5edUx1zcfbC9tb+ewKYC8Hm62SKRZn5pXEXdBOY6C/q8Zn5opPBMbA1Wxbp+RL38Pb7A0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743152376; c=relaxed/simple;
-	bh=vckH85TCWtlpiEkZsVZxvAiOQglNq7EoGooS+6LrDyc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WiX84FEm+9ZFmVlwt1z6z+80ibZXn27t/xRpUEoBehELvqNfz9VOrBMSs64yv/8p6rcZA3OeGJsZfTqxtYlxD2Hub60cEVnBWYXACk0UDdIxQcfD3Q68+RjZLW8GtomlFtL5djOQUeFoljQBZZuCYtrPYmAzElmCxGEUPIDk7ig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=bvedlF+W; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=+Ed7x22gxcXzy6tcl8aXdoUEVTlRgFGdbAz/YQVnOSg=; b=bvedlF+WLf08RqHjdHuM2tFLzA
-	MsjWFWDHOgXENVACMmNnah6z+UPBsoMYjvBEuhULeR1RI8LPt0xkm8wnT3xLzrjXzJC92r26X/B31
-	UDBmYn5e0emo7eGHGdKNz9sOwdeFFrpI8aPQwbKAOD/3/Heczat6c28LHndYBVD1IZ6SRxn2AEsvb
-	Lsous30maM4v+KKlJZ6UJEH/pqXNcyes4qAlNSelcR88iHyTDRMutMLiMJAitl7d3svDsfJTXUrWV
-	bQLYApvpDKiFHecRUBQdgD9qAzRkkoFeQq1CDbo+aTAizJPXACedv/aEFPhSEcdSLiauDOjUT2gF1
-	xEGrCQAg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48142)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1ty5Yf-0008Dc-0U;
-	Fri, 28 Mar 2025 08:59:21 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1ty5Ya-00073g-2P;
-	Fri, 28 Mar 2025 08:59:16 +0000
-Date: Fri, 28 Mar 2025 08:59:16 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [net-next PATCH 3/6] net: phylink: Correctly handle PCS probe
- defer from PCS provider
-Message-ID: <Z-Zk5PPI8M551xti@shell.armlinux.org.uk>
-References: <20250318235850.6411-1-ansuelsmth@gmail.com>
- <20250318235850.6411-4-ansuelsmth@gmail.com>
- <Z9rplhTelXb-oZdC@shell.armlinux.org.uk>
- <67daee6c.050a0220.31556f.dd73@mx.google.com>
- <Z9r4unqsYJkLl4fn@shell.armlinux.org.uk>
- <67db005c.df0a0220.f7398.ba6b@mx.google.com>
- <Z9sbeNTNy0dYhCgu@shell.armlinux.org.uk>
- <67e58cd2.7b0a0220.289480.1e35@mx.google.com>
+	s=arc-20240116; t=1743154045; c=relaxed/simple;
+	bh=LUCMEUaiv8EVes6GPoXY7f00RtKchx+3B2MYCViqRi8=;
+	h=From:To:Cc:In-Reply-To:Subject:Date:Message-ID:MIME-Version:
+	 Content-Type:References; b=OgBAxCN39e4B25SakchCUx0UuTrUcBW6/HCN+MsCH8Aue5NiNxVYdgGE+Xbem9QqnGKGLwdymY676VqiLjMFzNV097KIuT7Xe0hXubWTXx9CYySQyb48MOnvIgEJCvItXNh9hCR38LecKDjtagXFsgu93tsnbBcZzWRu1oCDSkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=Uz31NG4/; arc=none smtp.client-ip=203.254.224.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20250328092721epoutp01646de2667d214fc4c8d7257330a42cf7~w7V1wvC3S2281522815epoutp01g
+	for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 09:27:21 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20250328092721epoutp01646de2667d214fc4c8d7257330a42cf7~w7V1wvC3S2281522815epoutp01g
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1743154041;
+	bh=S8yd+wAwjVEhTV+B7KiIbkLoLVffKXf5OlRZi1/WxgI=;
+	h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
+	b=Uz31NG4/vo82VL3A/+yDK5+Bb0pShD5RAlQjBYx7G8NDa5+91pksdXykcEAUq9CI1
+	 u756p/eJgP+f6X426wOOg5VZ6/KL07QuXgi3Cgoiw+KWGO4KY13VJrHFG5fK2WwVm9
+	 aVwi3AnRxOeR4anpWZBMsqt7Uf414/UB9plgq5AU=
+Received: from epsnrtp01.localdomain (unknown [182.195.42.153]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPS id
+	20250328092720epcas5p3ab2130f751f48e1a781f43532728a412~w7V03ySlA0978509785epcas5p3E;
+	Fri, 28 Mar 2025 09:27:20 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.178]) by
+	epsnrtp01.localdomain (Postfix) with ESMTP id 4ZPFY174tRz6B9m6; Fri, 28 Mar
+	2025 09:27:17 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+	epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	71.53.09853.57B66E76; Fri, 28 Mar 2025 18:27:17 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+	20250328083631epcas5p4aa338b11f5ee2603ed45db587400f2bf~w6pdwDqOG1980019800epcas5p4r;
+	Fri, 28 Mar 2025 08:36:31 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20250328083631epsmtrp19f58038bc815182691ba2acecd411457~w6pdvDVNM0925109251epsmtrp1F;
+	Fri, 28 Mar 2025 08:36:31 +0000 (GMT)
+X-AuditID: b6c32a4a-03cdf7000000267d-fa-67e66b75b094
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+	F3.A8.19478.F8F56E76; Fri, 28 Mar 2025 17:36:31 +0900 (KST)
+Received: from FDSFTE596 (unknown [107.122.82.131]) by epsmtip2.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20250328083629epsmtip2d4eaa182ed4aff098c8b3afb6b78fc40~w6pbuARHM2407524075epsmtip2j;
+	Fri, 28 Mar 2025 08:36:29 +0000 (GMT)
+From: "Swathi K S" <swathi.ks@samsung.com>
+To: <krzk+dt@kernel.org>, <linux-fsd@tesla.com>, <robh@kernel.org>,
+	<conor+dt@kernel.org>, <richardcochran@gmail.com>, <alim.akhtar@samsung.com>
+Cc: <jayati.sahu@samsung.com>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-samsung-soc@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pankaj.dubey@samsung.com>, <ravi.patel@samsung.com>, <gost.dev@samsung.com>
+In-Reply-To: 
+Subject: RE: [PATCH v8 0/2] arm64: dts: fsd: Add Ethernet support for FSD
+ SoC
+Date: Fri, 28 Mar 2025 14:06:11 +0530
+Message-ID: <017801db9fbc$81bfa490$853eedb0$@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <67e58cd2.7b0a0220.289480.1e35@mx.google.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQJibHmgcfwlBy49J8TQvpLbjGcZ7QJasif0slg38iCAD5HOoA==
+Content-Language: en-in
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrCJsWRmVeSWpSXmKPExsWy7bCmpm5p9rN0g/uvLSwezNvGZrFm7zkm
+	i/lHzrFa3Dywk8niyKklTBYvZ91js9j0+BqrxcNX4RaXd81hs5hxfh+TxbEFYhaLtn5ht3j4
+	YQ+7xZEzL5gt/u/Zwe7A77Fz1l12j02rOtk8Ni+p9+jbsorR41/TXHaPz5vkAtiism0yUhNT
+	UosUUvOS81My89JtlbyD453jTc0MDHUNLS3MlRTyEnNTbZVcfAJ03TJzgA5WUihLzCkFCgUk
+	Fhcr6dvZFOWXlqQqZOQXl9gqpRak5BSYFOgVJ+YWl+al6+WlllgZGhgYmQIVJmRn9Cxbzlyw
+	WK7i3ONpjA2M8yW7GDk5JARMJNb/amTqYuTiEBLYzSgxf+1UZgjnE6PEvUevWeGcz7d/AWU4
+	wFpWndaBiO9klHi26hZUxwtGiX2zZrOAzGUT0JJY1LePHSQhIjCJUeLF+QtgDrPANCaJIzNf
+	M4GM4hTglZjwzxrEFBbwl9hxrRrEZBFQlXj2yQBkDK+ApcSRK1OYIWxBiZMzn4CNZxbQlli2
+	8DUzxAsKEj+fLmMFsUUEnCR+TnvEBlEjLnH0Zw/YbRICFzgklk1/yQ7R4CKx8PFtVghbWOLV
+	8S1QcSmJl/1tULaHxMz1vVA1KRKvV51jgbDtJQ5cmcMCciezgKbE+l36EGFZiamn1jFB7OWT
+	6P39hAkiziuxYx6MrSzx9/U1qDGSEtuWvmefwKg0C8lrs5C8NgvJC7MQti1gZFnFKJlaUJyb
+	nlpsWmCUl1oOj+/k/NxNjODkrOW1g/Hhgw96hxiZOBgPMUpwMCuJ8EpeeZIuxJuSWFmVWpQf
+	X1Sak1p8iNEUGNwTmaVEk/OB+SGvJN7QxNLAxMzMzMTS2MxQSZy3eWdLupBAemJJanZqakFq
+	EUwfEwenVAPTqmP7ns9fyXIu9vZVhculX3nmnNS8Pflp09HC24azn566M61tfsD2U06806ZN
+	/fbi5k7lQpV5rd/YLX+ZXLZ1U5u+4Hfn75OpHj5/X/CumnWkizFnyga/igSnXzMPT79+lWPp
+	y6WsPU4i/O37NENsTJ7eZt0guOaF4f6sHXeVJMq8AurS5hjIX/rCExp8tc5bXc6KgTOg8Nzr
+	ALaaOfKFs1YnOle/+Sn1OiRxhayEgdH003MdVQ4apQvHHd084VfLrw7/Rb8ETnJsvG29R59l
+	4k5xKe6u3psZDh4PeaM9EpYYxz9ivf9MbUVu2DqNdg3Wv/srnp+w1W7uqr/K/qtgf9QSP7+L
+	t+6l/YxV08tOUWIpzkg01GIuKk4EAHoMX05XBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrJIsWRmVeSWpSXmKPExsWy7bCSvG5//LN0g52vjS0ezNvGZrFm7zkm
+	i/lHzrFa3Dywk8niyKklTBYvZ91js9j0+BqrxcNX4RaXd81hs5hxfh+TxbEFYhaLtn5ht3j4
+	YQ+7xZEzL5gt/u/Zwe7A77Fz1l12j02rOtk8Ni+p9+jbsorR41/TXHaPz5vkAtiiuGxSUnMy
+	y1KL9O0SuDLOfzzMVLBPtmLiofVMDYxbJLoYOTgkBEwkVp3W6WLk4hAS2M4osWHPH+YuRk6g
+	uKTEp+aprBC2sMTKf8/ZIYqeMUr8eHUYLMEmoCWxqG8fWEJEYBajxJGfU1hAHGaBBUwSH3r/
+	skG09DJKzN7xnxVkH6cAr8SEf9Yg3cICvhKvF/5jAgmzCKhKPPtkABLmFbCUOHJlCjOELShx
+	cuYTFhCbWUBbovdhKyOMvWzha6hLFSR+Pl0GdpCIgJPEz2mP2CBqxCWO/uxhnsAoPAvJqFlI
+	Rs1CMmoWkpYFjCyrGEVTC4pz03OTCwz1ihNzi0vz0vWS83M3MYJjUytoB+Oy9X/1DjEycTAe
+	YpTgYFYS4ZW88iRdiDclsbIqtSg/vqg0J7X4EKM0B4uSOK9yTmeKkEB6YklqdmpqQWoRTJaJ
+	g1OqgUnkhMIBmy3TjMvnXH2+QiDuqXVYI9fRdMaSMuO5rExpjbKd+8yDRJizmp5fc0tV6jtv
+	416rwexkdtmk9LbmfrHkuuPCW47PzDQ0PmYmMS3OJmluRadJxDGPjEQbHseohac4Fy78t+zp
+	vc/3XQVni0Vr25699JSp8F3Fx5tvk0P+7Hz4+XyfRoEuk3DbecOZO18/POgsZtm2hGlXVdzu
+	LA+ZdvO7nldWxGU5Kk35W8/1irPTu4lPOTWjOzJs5Xy/0KkPn5YoGaksnxmd77jwpvCEyss7
+	Ks0TvYwk/E9s+NCfsn+pxbvP26ylra9eO7X0UO8nbW1X3gtyWVt+iUs3b+RdlDl7X/LPeYc4
+	wxv/KbEUZyQaajEXFScCAC3VKoQ8AwAA
+X-CMS-MailID: 20250328083631epcas5p4aa338b11f5ee2603ed45db587400f2bf
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20250307045516epcas5p3b4006a5e2005beda04170179dc92ad16
+References: <CGME20250307045516epcas5p3b4006a5e2005beda04170179dc92ad16@epcas5p3.samsung.com>
+	<20250307044904.59077-1-swathi.ks@samsung.com> 
 
-On Thu, Mar 27, 2025 at 06:37:19PM +0100, Christian Marangi wrote:
-> On Wed, Mar 19, 2025 at 07:31:04PM +0000, Russell King (Oracle) wrote:
-> > If we wish to take something away, then first, it must be
-> > unpublished to prevent new users discovering the resource. Then
-> > existing users need to be dealt with in a safe way. Only at that
-> > point can we be certain that there are no users, and thus the
-> > underlying device begin to be torn down.
-> > 
-> > It's entirely logical!
-> 
-> OK so (I think this was also suggested in the more specific PCS patch)
-> - 1. unpublish the PCS from the provider
-> - 2. put down the link...
-> 
-> I feel point 2 is the big effort here to solve. Mainly your problem is
-> the fact that phylink_major_config should not handle PROBE_DEFER and
-> should always have all the expected PCS available. (returned from
-> mac_select_pcs)
-> 
-> So the validation MUST ALWAYS be done before reaching that code path.
 
-Yes, but there's a sting in the tail - e.g. if we take away link modes
-that are advertised on some media by a PCS going away.
 
-Here's a theoretical situation:
-
-- separate PCS for SGMII and 10GBASE-R with their own drivers, muxed
-  onto the same pins.
-- PHY which switches its host interface between these two modes.
-
-when both PCS are available, the PHY could be advertising 10base-T,
-100base-Tx, 1000base-T and 10000base-T.
-
-If one of these two PCS drivers becomes no longer available, then we
-need to revalidate and update the PHY's advertisement.
-
-> That means that when a PCS is removed, the entire phylink should be
-> refreshed and reevaluated. And at the same time lock userspace from
-> doing anything fancy (as there might be a possibility for
-> phylink_major_config)
-
-Taking the rtnl lock prevents userspace interfering with the interface
-configuration.
-
-> Daniel at some point in the brainstorm process suggested that we might
-> need something like phylink_impair() to lock it while it's getting
-> ""refreshed"". Do you think that might be a good path for this?
-
-Taking the rtnl should be sufficient.
-
-> One of the first implementation of this called phylink_stop (not
-> dev_stop) so maybe I should reconsider keeping everything phylink
-> related. But that wouldn't put the interface down from userspace if I'm
-> not wrong.
-> 
-> It's point 3 (of the old list) "the MAC driver needs to be notified that
-> the PCS pointer it stashed is no longer valid, so it doesn't return it for
-> mac_select_pcs()." my problem. I still feel MAC should not track PCS but
-> only react on the presence (or absence) of them.
-> 
-> And this point is really connected to point 1 so I guess point 1 is the
-> first to handle, before this. (I also feel it will magically solved once
-> point 1 is handled)
-
-I'm wondering whether the mac_select_pcs() interface needs to be
-revised - it's going to be difficult to do because there's many drivers
-that blindly return a PCS irrespective of the interface mode.
-
-I'm thinking that MAC drivers should register a PCS against a set of
-interface modes that it wants to use it for (the interface modes that
-a PCS supports is not necessarily the interface modes a MAC driver
-wants to use it for.) That means we could handle mac_select_pcs()
-entirely within phylink, which avoids storing PCS pointers in the MAC
-driver.
-
-I don't think this fully addresses the issues though.
-
-However..
-
-> > > For point 1, additional entry like available_interface? And gets updated
-> > > once a PCS gets removed??? Or if we don't like the parsing hell we map
-> > > every interface to a PCS pointer? (not worth the wasted space IMHO)
-> > 
-> > At the moment, MAC drivers that I've updated will do things like:
-> > 
-> >                 phy_interface_or(priv->phylink_config.supported_interfaces,
-> >                                  priv->phylink_config.supported_interfaces,
-> >                                  pcs->supported_interfaces);
-> > 
-> > phylink_config.supported_interfaces is the set of interface modes that
-> > the MAC _and_ PCS subsystem supports. It's not just the MAC, it's both
-> > together.
-> > 
-> > So, if a PCS is going away, then clearing the interface modes that the
-> > PCS was providing would make sense - but there's a problem here. What
-> > if the PCS is a bought-in bit of IP where the driver supports many modes
-> > but the MAC doesn't use it for all those modes. So... which interface
-> > modes get cleared is up to the MAC driver to decide.
-
-.. we would then know which modes to clear from
-phylink_config.supported_interfaces.
-
-> Should we add an OP to handle removal of PCS from a MAC? Like
-> .mac_release_pcs ? I might be wrong but isn't that giving too much
-> freedom to the driver?
-> 
-> I need to recheck how the interface validation work and what values are
-> used but with this removal thing on the table, supported_interfaces OR
-> with the PCS supported_interface might be problematic and maybe the
-> original values should be stored somewhere.
-
-That thought also crossed my mind too.
-
-> > > > There's probably a bunch more that needs to happen, and maybe need
-> > > > to consider how to deal with "pcs came back".. but I haven't thought
-> > > > that through yet.
-> > > 
-> > > Current approach supports PCS came back as we check the global provider
-> > > list and the PCS is reachable again there.
-> > > (we tasted various scenario with unbind/bind while the interface was
-> > > up/down)
-> > 
-> > ... because you look up the PCS in the mac_select_pcs() callback which
-> > leads to a different race to what we have today, this time inside the
-> > phylink code which thankfully phylink prints an error which is *NEVER*
-> > supposed to happen.
+> -----Original Message-----
+> From: Swathi K S <swathi.ks=40samsung.com>
+> Sent: 18 March 2025 16:22
+> To: 'krzk+dt=40kernel.org' <krzk+dt=40kernel.org>; 'linux-fsd=40tesla.com=
+'
+> <linux-fsd=40tesla.com>; 'robh=40kernel.org' <robh=40kernel.org>;
+> 'conor+dt=40kernel.org' <conor+dt=40kernel.org>; 'richardcochran=40gmail.=
+com'
+> <richardcochran=40gmail.com>; 'alim.akhtar=40samsung.com'
+> <alim.akhtar=40samsung.com>
+> Cc: 'jayati.sahu=40samsung.com' <jayati.sahu=40samsung.com>; 'linux-arm-
+> kernel=40lists.infradead.org' <linux-arm-kernel=40lists.infradead.org>; '=
+linux-
+> samsung-soc=40vger.kernel.org' <linux-samsung-soc=40vger.kernel.org>;
+> 'devicetree=40vger.kernel.org' <devicetree=40vger.kernel.org>; 'linux-
+> kernel=40vger.kernel.org' <linux-kernel=40vger.kernel.org>;
+> 'netdev=40vger.kernel.org' <netdev=40vger.kernel.org>;
+> 'pankaj.dubey=40samsung.com' <pankaj.dubey=40samsung.com>;
+> 'ravi.patel=40samsung.com' <ravi.patel=40samsung.com>;
+> 'gost.dev=40samsung.com' <gost.dev=40samsung.com>
+> Subject: RE: =5BPATCH v8 0/2=5D arm64: dts: fsd: Add Ethernet support for=
+ FSD
+> SoC
+>=20
+>=20
+>=20
+> > -----Original Message-----
+> > From: Swathi K S <swathi.ks=40samsung.com>
+> > Sent: 07 March 2025 10:19
+> > To: krzk+dt=40kernel.org; linux-fsd=40tesla.com; robh=40kernel.org;
+> > conor+dt=40kernel.org; richardcochran=40gmail.com;
+> > alim.akhtar=40samsung.com
+> > Cc: jayati.sahu=40samsung.com; swathi.ks=40samsung.com; linux-arm-
+> > kernel=40lists.infradead.org; linux-samsung-soc=40vger.kernel.org;
+> > devicetree=40vger.kernel.org; linux-kernel=40vger.kernel.org;
+> > netdev=40vger.kernel.org; pankaj.dubey=40samsung.com;
+> > ravi.patel=40samsung.com; gost.dev=40samsung.com
+> > Subject: =5BPATCH v8 0/2=5D arm64: dts: fsd: Add Ethernet support for F=
+SD
+> > SoC
 > >
-> 
-> I want to make sure tho you are ok with the usage of .mac_select_pcs
-> for re-evaluation task.
-> 
-> Maybe a better approach is to introduce .mac_get_pcs and enforce the
-> usage only on validation phase? (aka in phylink_validate_mac_and_pcs)
-> 
-> AFAIK in that phase .mac_select_pcs can return errors if the requested
-> interface is not possible for one reason or another.
+> > FSD platform has two instances of EQoS IP, one is in FSYS0 block and
+> > another one is in PERIC block. This patch series add required DT file
+> > modifications for the same.
+> >
+> > Changes since v1:
+> > 1. Addressed the format related corrections.
+> > 2. Addressed the MAC address correction.
+> >
+> > Changes since v2:
+> > 1. Corrected intendation issues.
+> >
+> > Changes since v3:
+> > 1. Removed alias names of ethernet nodes
+> >
+> > Changes since v4:
+> > 1. Added more details to the commit message as per review comment.
+> >
+> > Changes since v5:
+> > 1. Avoided inserting node in the end and inserted it in between as per
+> > address.
+> > 2. Changed the node label.
+> > 3. Separating DT patches from net patches and posting in different
+> branches.
+> >
+> > Changes since v6:
+> > 1. Addressed Andrew's review comment and removed phy-mode from
+> .dtsi
+> > to .dts
+> >
+> > Changes since v7:
+> > 1. Addressed Russell's review comment-Implemented clock tree setup in
+> > DT
+> >
+>=20
+> Hi,
+> The DT binding and driver patches corresponding to this patch is now
+> reflecting in linux-next
+> https://web.git.kernel.org/pub/scm/linux/kernel/git/next/linux-
+> next.git/diff/Documentation/devicetree/bindings/net/tesla,fsd-
+> ethqos.yaml?id=3Df654ead4682a1d351d4d780b1b59ab02477b1185
+>=20
 
-The problem is that the validation phase could happen in the distant
-past in relation to when we actually use the results.
+Hi reviewers,=20
+Could you please confirm whether this set of patches can be considered for =
+review or should I resend them?
 
-Consider the above case with SGMII + 10GBASE-R. We're running at
-10G speeds, so we're using the 10GBASE-R PCS, and have been running for
-a year. The cabling deteriorates, and the PHY renegotiates switching to
-1G speed now wanting to use the SGMII PCS but someone's removed the
-driver! The validation would've happened before the 10G link came up
-but the use is now a significant time in the future.
+- Swathi
 
-In that scenario, if the SGMII PCS driver is available, then switching
-to 1G speed is possible. If the driver isn't available, then the result
-is that the link has gone down. That's the same result if we stop
-advertising the slower speeds - the PHY basically wouldn't be able to
-establish link at a slower speed, so the link has gone down.
+> Could you consider these DT file patches for review/merge or do I need to
+> resend these?
+>=20
+> -Swathi
+>=20
+> > Swathi K S (2):
+> >   arm64: dts: fsd: Add Ethernet support for FSYS0 Block of FSD SoC
+> >   arm64: dts: fsd: Add Ethernet support for PERIC Block of FSD SoC
+> >
+> >  arch/arm64/boot/dts/tesla/fsd-evb.dts      =7C  20 ++++
+> >  arch/arm64/boot/dts/tesla/fsd-pinctrl.dtsi =7C 112
+> +++++++++++++++++++++
+> >  arch/arm64/boot/dts/tesla/fsd.dtsi         =7C  50 +++++++++
+> >  3 files changed, 182 insertions(+)
+> >
+> > --
+> > 2.17.1
 
-So, maybe than re-evaluate phylink, maybe just keep track of which
-PHY interface modes we can no longer support, and if we attempt to
-switch to one of those, force the link down. However, with:
 
-f1ae32a709e0 ("net: phylink: force link down on major_config failure")
-
-we now have the mechanics to do this - if mac_select_pcs returns an
-error for the interface mode at major_config time, we force the link
-down until such time that we do have a successful major configuration.
-Maybe we should just rely on that rather than trying to do a full
-re-evaluation and reprogram things like PHY advertisements.
-
-Maybe in this case, we need a way to inform phylib - if I remember
-correctly, there is a way to get the PHY to signal "remote fault" to
-the link partner, and this kind of situation seems an ideal use, but
-I'd need to check 802.3.
-
-Yes, the MAC driver still needs to be aware of a PCS going away so it
-can properly respond to mac_select_pcs().
-
-Part of the issue here is that phylink wasn't designed from the start
-to cope with PCS as separate drivers - it always assumed that the MAC
-was in control of the PCS and would ensure that the PCS would remain
-available. E.g. through a PCS specific create() method causing a direct
-module relationship without the involvement of the driver model, or the
-PCS driver being built-in to the MAC driver.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
