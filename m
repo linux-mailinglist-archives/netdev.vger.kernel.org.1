@@ -1,126 +1,137 @@
-Return-Path: <netdev+bounces-178136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18D60A74DF8
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 16:44:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F29FA74E17
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 16:51:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E48907A4258
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 15:42:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3EC717A6DEA
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 15:50:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B811C82F4;
-	Fri, 28 Mar 2025 15:43:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB8921D934D;
+	Fri, 28 Mar 2025 15:50:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dTDO+XQ2"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="A0TXKlbz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08B771C5F28
-	for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 15:43:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CB911D7E5C
+	for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 15:50:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743176638; cv=none; b=pPWPAVhZQeJ4RELjmzfDG3PSBfiSB1fDP1hftki3umN0wsapFKYap/kMWWN8573OQ0GEa5WUXSyVN4HXEy7WN96qpYfznOtwPmqa/xpsyL7QXG9VPuxJFILX05eCwEfUYqke9YDeONSBnT9aHv5XFYRdajwkUQ1K945Z2eXQGu0=
+	t=1743177058; cv=none; b=FibFfGgpfXnooWMWuHVC1eHquv3EIUgCzq5eihL5bumrdVekLT3ZcAwcxybOiieakOesR7SOall4vNBf6WrBDLb9v+pnOyTcql0RrexBcxzuqFzZbp8E6xxarzy+c1xm3kFyW4gvq4iEgFU3HuxOqiDoQO8892GWty/+0RzfrEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743176638; c=relaxed/simple;
-	bh=aM/uOR++5OEtS62Ve7u19hIjWS7ZMq+cJPMp3VCb8H4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h8eEt2uC7xlTHI2zan8PCyDqLZEnd+rQBbZlrivCh6ABR9Rf8E7jO2Jvo1IYw72aF/hG/fXGCkmSipX0nYGJZTS/Xrf0stpEO5u4OVScdL2ndChXdgp7bJcg+r39QR3CDXKze8znkzNZoVyberIZQR5TyOhVSefzQYYoVWLOb9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dTDO+XQ2; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-224341bbc1dso47343955ad.3
-        for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 08:43:56 -0700 (PDT)
+	s=arc-20240116; t=1743177058; c=relaxed/simple;
+	bh=IWTfqsVvVgi/hP71Z135wMU/o8EPNrZSl4azIVzxnCQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iXMduip+EJ9mN1HLde8AtL1z9ZIf6IX5nnNuaEqcR+nY0kbNj1mfRNowtScn9rVX7n4KFnMA+Jg5G+SzDjuVwMvyGAuzawjK25lqwVst7YL8vpMjBFYq14Y7NT9Ev20dlNsNLREBQDim/rSm3PL8t+6RzxGC/jOyhpX8w+Av+1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=A0TXKlbz; arc=none smtp.client-ip=209.85.219.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-e64165ae78cso1719925276.0
+        for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 08:50:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743176636; x=1743781436; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=sVhbbzDQ9l30dzJbf/Wz4ciphi5VBBhmH5tpr2sL8lE=;
-        b=dTDO+XQ25AaYLoY/khcQz+6xdiW7CLZ0RaSbwa/EGEABdbFWJnTmk27dw2hlGlaj6R
-         ZevIt5uB2X7oaGBdkOI4SMvyxkJVQKzTT1T7ID4Y/Opca+sssdKHsR259yLz8MjwxW8A
-         VUS199QUPWrJ7EFgOyIilMbgbEc8rxJX1XqJA74n9NPExEZmXqchwG8ijBUwGcEE+pnW
-         QogU2J7IZd48yMaewnxVFF4hX36iYU1/X2QIpXMnvJrgfdy65EMzxMntzJR0jcrWmZUY
-         ksr9+Q2fbbd1nfeC5dUYFe67M357W6Rk6Gp58pZYM2W4e3R5bzlgJGJoMxvZ6blFd+6L
-         Dc5w==
+        d=paul-moore.com; s=google; t=1743177055; x=1743781855; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IWTfqsVvVgi/hP71Z135wMU/o8EPNrZSl4azIVzxnCQ=;
+        b=A0TXKlbzgWoIJWUCcS1g6m4gB92pmVfS4ayaRmJRj8PfR5P+DadTlr1BlxYiyyszFo
+         KjenS1U4JF0tO/G9rnlg8I4x8rJoYhe4dcoAN380BIiqtVVZKA3IznFlwaeL+DPjK1en
+         DlWWURj6ompDlsJvvH1vhSE4vlkZ7JxBPxTxVj/vIM1eUz/LkWuoMvNZYEuyonEwlRLZ
+         8+Oy0KkvJcz1+Nqx8IvdGycX9Q0QIigXhhe+tGH46dFD9hNo/tXO97M/+CrtFyQBVdWA
+         lsY6mOFz14wHAlhnhMGYdHLygBtlEp8eRhA02FDPJJk+sS8hoSNLkBj8xGUL3y16pG4O
+         fJmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743176636; x=1743781436;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sVhbbzDQ9l30dzJbf/Wz4ciphi5VBBhmH5tpr2sL8lE=;
-        b=O9vJpMCTIqVtesAZkjIcMvjWkQ98dj6gO9QB1KNTs1pDbPmZ0YiFT34sMbToChUWKa
-         /cv8Dpl7baqPyRGJW9hB5835XCBTGnIeAEeXjs9RL4SdDhgqVMDlJVY0TDfu80FbwDzE
-         GSWB8qHIAG7gDQeZzT0AuRpcr+fErB83mBds0F3BmcY8R9MLflxFLvB4mHe2iGScaHf6
-         rRBXxJOXdUe4jno0FyL+3+PD9X4rIe6HWXWVhYPl+LUkscL4ugolsFP4B3E5Xf3oNKnL
-         +BB6IDabW4nDXFPFGqQAMVXXZs6JfKhxuQaF0fPDIcyaBXI2pKsPG7ue6+CHG6iFo/4R
-         tKIg==
-X-Forwarded-Encrypted: i=1; AJvYcCUt04YWt1UgrzW9YAs+VNp6TmtMwIx5/BKz1cbM1m7ITkYW/D7zqYTEjac8mwT3F0NBgkA0sfY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywjg17iWUVjOeHy6nR+vq4MMhLQjfLtmnKcBBKXFfiglxXyT8lr
-	OwPznWaojcPpo0P00y9Zl+J/cRsy6OvlOL9RqDLB92f/1FUKVWk=
-X-Gm-Gg: ASbGncuX9OR+bHCGGbypUDSpPzKCbY/mFVlwJskhwjYXyscOk/mhXBQSXssM74l0rOT
-	MWmSXyUPVA1/ZdBvOA8wlwcgAEs+I41UR71HYNqWoqRSaFIg2Fl02Rbgv4ZNhPw69/ZdxaarBEY
-	PSozguz6LrbvXn4MhMRjsfgxFVwKMzBa2g7X/N2gOtDqC1E9IRRYlpaKWjHR41rnCjJSsuZkBRT
-	KHBV54yoI3YVHcx9B+3824Tv7yzxIVvC0bRN9Eww1RKFul3D5+tcqGtiL9Ykv4IHE9JFYQvgATE
-	b6H8HQ4Mp1pM6/345TQlNW4eZPKWePB7maQsH86FsAljFDhkyPmuVNQ=
-X-Google-Smtp-Source: AGHT+IENs1UvjByAB40mp0rYpqUaOm/mdGxS4A6v3OOL3xRiHmLZ1cj+ciR9PfG+8UjQE+6WNPZ6yg==
-X-Received: by 2002:a17:902:e844:b0:223:5ada:88ff with SMTP id d9443c01a7336-228048cc3famr130916385ad.24.1743176636090;
-        Fri, 28 Mar 2025 08:43:56 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2291eee37fdsm19775075ad.102.2025.03.28.08.43.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Mar 2025 08:43:55 -0700 (PDT)
-Date: Fri, 28 Mar 2025 08:43:54 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH net v2 00/11] net: hold instance lock during
- NETDEV_UP/REGISTER/UNREGISTER
-Message-ID: <Z-bDuh3oB1ZnIrtj@mini-arch>
-References: <20250327135659.2057487-1-sdf@fomichev.me>
- <CAMArcTV4P8PFsc6O2tSgzRno050DzafgqkLA2b7t=Fv_SY=brw@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1743177055; x=1743781855;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IWTfqsVvVgi/hP71Z135wMU/o8EPNrZSl4azIVzxnCQ=;
+        b=vYMylCOgFDM33/vu0QuKWKhua5vdUr4Qa0kRgy/t1Cxbg/IwcYAwlHwSARFJYYcmFq
+         PmoT8VoMdUidsg0uszgLd4LrMrwQ02g0iZRcD7SQOq2TRCbc3G/UB0HRsgzUWVmDdj3j
+         WREPYmWzs5lYclfquTbNDWONRg31l3hWAc9UT/241RGdoRWChYBlDoxvUUr41uWFE6zb
+         Vf7GUEaYNDrDbnxDGiJI2CgZNQGzZnhIFLRmXYqPsALHyRUM0kVghZTeTkJDorslOkjL
+         O1ifnKZ7fPxNfFhinAHlh5ZDwjBG6P82h3S7ctY+xNAV0eto0hO1alRXffEBXLb5KsbV
+         PH/g==
+X-Forwarded-Encrypted: i=1; AJvYcCXmsKc9vhBSG08VTQyNbeawUi5NjRmwsjWnCLlohSv3IElAoUxMq58/dzfl+IudL+ByCWviwVU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4hOVrrxZvJmOkUVuDeryb5D7BL8whwaIZ6z5j3hwTMFQcAD/s
+	VtBhrxag/XSX/E+a8exedCXs1YAiHqKYMRYDfKuN6ZEtIURY+ejiRa/tpE3O8IZpirf1dzagmgR
+	T+vA5KFtzbulhmBdQIIWxA2KgyJoJa8UfM6n5
+X-Gm-Gg: ASbGncuUZb4Q39mJJM3UmIr79G5GfPpRzJMR1SE7T8uxxey5NzMOkQkFPh6qcFfh4g9
+	L7M6LQsv02xZeAMnwWL7IdvNmtSmWR/hTUiQj7aTVNdw3dSz42ZMEu3yDNCmYFWR+j1TpJgH/G9
+	g3HTJ0WWyTpYVfP+qH9mg/qWU2gw==
+X-Google-Smtp-Source: AGHT+IEpEvG12k9EhW0t6Ss1dI/+g3R223n9G7clkh8aJcJAyStHlnHfKcGU1LazGfTgQ6VJCqaeHdZrYN7ebpWksnU=
+X-Received: by 2002:a05:6902:1448:b0:e60:8a06:1ddd with SMTP id
+ 3f1490d57ef6-e6943648d55mr9900351276.36.1743177054737; Fri, 28 Mar 2025
+ 08:50:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMArcTV4P8PFsc6O2tSgzRno050DzafgqkLA2b7t=Fv_SY=brw@mail.gmail.com>
+References: <2025032711045196042914@163.com>
+In-Reply-To: <2025032711045196042914@163.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Fri, 28 Mar 2025 11:50:43 -0400
+X-Gm-Features: AQ5f1Jq4tu3wIwY65gUTiHaep4vWg7HYdfRwGAKu9fpF3-_Zc87Fp3qWLTVd26U
+Message-ID: <CAHC9VhTRUAV6P17TfXoODwowpAHwnhhLai6naVE300Y76Kk40Q@mail.gmail.com>
+Subject: Re: Fw: [PATCH] netlabel: Fix NULL pointer exception caused by
+ CALIPSO on IPv4 sockets
+To: "mowenroot@163.com" <mowenroot@163.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev <netdev@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, Bitao Ouyang <1985755126@qq.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 03/28, Taehee Yoo wrote:
-> On Thu, Mar 27, 2025 at 10:57 PM Stanislav Fomichev <sdf@fomichev.me> wrote:
+On Wed, Mar 26, 2025 at 11:05=E2=80=AFPM mowenroot@163.com <mowenroot@163.c=
+om> wrote:
+> On Thu, Mar 27, 2025 at 3:38 AM Paul Moore paul@paul-moore.com wrote:
+>
+> > For all three function, I'd probably add a single blank line between th=
+e local variable declarations and the code below for the sake of readabilit=
+y. I'd probably also drop the comment as the code seems reasonably obvious =
+(inet6_sk() can return NULL, we can't do anything with a NULL ptr so bail),=
+ but neither are reasons for not applying this patch, if anything they can =
+be fixed up during the merge assuming the patch author agrees.
 > >
-> 
-> Hi Stanislav,
-> Thanks a lot for the patch!
-> 
-> > Solving the issue reported by Cosmin in [0] requires consistent
-> > lock during NETDEV_UP/REGISTER/UNREGISTER notifiers. This series
-> > addresses that (along with some other fixes in net/ipv4/devinet.c
-> > and net/ipv6/addrconf.c) and appends the patches from Jakub
-> > that were conditional on locked NETDEV_UNREGISTER.
-> >
-> > 0: https://lore.kernel.org/netdev/700fa36b94cbd57cfea2622029b087643c80cbc9.camel@nvidia.com/
-> >
-> 
-> I tested it using netdevsim/veth and my Broadcom NIC.
-> It appears that netdevsim/veth has no issues, but I encountered many
-> RTNL assertions in the bnxt driver.
-> 
-> Reproducer:
->    interface=<bnxt interface>
->    ip a a 10.0.0.1/24 dev $interface
->    ip a a 2001:db8::1/64 dev $interface
->    ip link set $interface up
->    reboot
+> > Anyway, this looks good to me, Jakub and/or other netdev folks, we shou=
+ld get this marked for stable and sent up to Linus, do you want to do that =
+or should I?
+>
+> Thank you for your acknowledgment and suggestions! Your insights have bee=
+n very helpful to us.
+>
+> We fully agree with your suggestions regarding code formatting and commen=
+t adjustments. Since you are more familiar with the code, we would apprecia=
+te it if you could help handle these modifications and complete the merge. =
+If you are willing to do so, we would be very grateful!
+>
+> Previously, the email failed to be delivered to netdev@vger.kernel.org an=
+d linux-kernel@vger.kernel.org due to formatting issues. We sincerely apolo=
+gize for any inconvenience this may have caused.
 
-Ok, so, reboot triggers pci_driver.shutdown which triggers inetdev_event
-which asserts rtnl. Looks like I need to bring rtnl_lock back here.
+Most (all?) of the Linux kernel mailing lists have requirements around
+only sending plaintext email, no HTML, no MIME, etc.; I believe that
+was the issue with some of your email to the lists.
+
+The Linux kernel documentation does have some guidance on configuring
+popular email clients as well as submitting patches, you can browse
+the documentation online (relevant links below).
+
+https://docs.kernel.org/process/submitting-patches.html
+https://docs.kernel.org/process/email-clients.html
+
+> Thank you again for your guidance and support. We are delighted to learn =
+from you!
+
+Thanks for the problem report and your help with finding and testing a
+solution :)
+
+--=20
+paul-moore.com
 
