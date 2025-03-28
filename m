@@ -1,162 +1,167 @@
-Return-Path: <netdev+bounces-178174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E55D7A75348
-	for <lists+netdev@lfdr.de>; Sat, 29 Mar 2025 00:26:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B46AAA7534A
+	for <lists+netdev@lfdr.de>; Sat, 29 Mar 2025 00:27:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80F97172CCA
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 23:26:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0ADD1894C0F
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 23:27:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C33EF1F426F;
-	Fri, 28 Mar 2025 23:26:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E1801F4619;
+	Fri, 28 Mar 2025 23:26:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mT4R7yzn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kSZXgSYV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED14E4A35;
-	Fri, 28 Mar 2025 23:26:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB8FB1EF37E;
+	Fri, 28 Mar 2025 23:26:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743204405; cv=none; b=RmgIrjBNWpAoTTkzP1doQSXm/0PvivfmmdV3QpoaKC6oK6YnsEWKE7F0qYu4GFTjzP47TRUhPhXAISdQF3OdM3QB6eEh7N4s+zFBA+TSyiEVVgAECSkP64L85Xabo/t4xv+H4VXGVdlBUUkAMeiOs7bL8KvaV8/qvEC+6LLsW3I=
+	t=1743204414; cv=none; b=kYlY1kxs+T+PiWFx2uiVeOp9J/IjGpgsXXS21FqVIbR5ehUarhfBrZUP0jcaFPffE16169uL5RMT4cXuXECLN/folzOFuvTNTbdOEzerl7BvB7iIOik5Ok379fs2PTT6djycfHDDz7W85/7mRBVix9vElySxFvP4Bih1Xov2w9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743204405; c=relaxed/simple;
-	bh=JawYoD4Ca8+88pv0PMzL0lnzpoWfKoO/3BBdwzlSd2Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bnrR+FG/PM0iqp0/BTgt5bAlLu0JHKH42IG6bZrfEUKR33wPqJir+tDus58sDpESomnmQsCc6+M/CeJ2At6gURO1eMEjpuSWm9ydjXzxQkUrtwPxbTD3k9bxHB1KyAYpJ2Gxy5QWHCB+Z9b3xUqUQV1hVzsnwZEMfrj4/0s/V04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mT4R7yzn; arc=none smtp.client-ip=209.85.128.49
+	s=arc-20240116; t=1743204414; c=relaxed/simple;
+	bh=UpbGqH8VnuEqztXT7Wqaj0S0+Ybf4L7KVUBUnd5oI7g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NeGdQE657MoNqZSQ5k8tByGzYdLoMF0IAMmmlKH2WHdiBEIQDwuBlkmfjGbqQqGNXvR0m92N3bJUFtPvUAzjJ4qlPfiKZm1Wz+LnbbWGNRbKsZN/TITTAx/6brZuJrtawEv9v1pLUYYnLIJ3wdXHeCYRxq+Wf11kxhISycnIGBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kSZXgSYV; arc=none smtp.client-ip=209.85.214.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-43ce70f9afbso27422955e9.0;
-        Fri, 28 Mar 2025 16:26:43 -0700 (PDT)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-22580c9ee0aso59554375ad.2;
+        Fri, 28 Mar 2025 16:26:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743204402; x=1743809202; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=n6STaknpZNYUi31WfcbcFyYuyQ/X3QqoCZMhNEWphEY=;
-        b=mT4R7yznqmGZB0/bMR1e1Ae/Bf0OIuAwatlEy2tznj8kM4/4FpYYaDG1hnf6ioJD4/
-         WEGNvTaFr909AfI1ekf5e4+I9t9ViQXg0YtMuhEbueORn0fb/yTsMkL2Y69lQQyknYah
-         T/oMgmlNJ9SoX5OLg1b1NYsLyKscFg2JSPW7EaAzfXsGOZXnl3kjzHl0CP3ySxyiyHTK
-         5inATqzwpkKPi1IpdFJiAipnYvB0tLAropwX+57Qzdo6syRANql52k6psXsv3xrbREp8
-         7RspJmO8CkZjSd1q57ZLXM798k27PvvMUPY7tEkHNaFo3hd6ooKIjOi3pAzXpgwx76IW
-         fTIg==
+        d=gmail.com; s=20230601; t=1743204412; x=1743809212; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gFVxM5/AFD8071zR9wcbweFP3U/YhpdYqA1RhXQbuGA=;
+        b=kSZXgSYVeoCRDOFeoDsrebEf8lSyOBvmZ4IDQhY7WzhZirMPillS3ufSyLpnnjz4ls
+         QhrYQNJz/iZ7r6ky11qP1CbSvjJIANkRagXpXngmxd5/SHFxfYlTg01FhXk/Cu2JSx/E
+         9w2DyR7GBn49jZereHEAF7mCtEA37Q+ERLP0ufT4TjZHZ5hOrz3o7lQRD5KaGouapnNl
+         3c7Y4XjU1mefab/SR9ePLUtZ8Dn8eEZyYS3NjwXWy9TPg3b6K9RqnY5kWrPROUlX/8Eq
+         BDMGuM2uL4iV7yk/kr/zuk6SCQuSZn1CyUmUsJpxR0sWENFv5XWGkVmyQjPVEatEgZ3M
+         s9Ig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743204402; x=1743809202;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=n6STaknpZNYUi31WfcbcFyYuyQ/X3QqoCZMhNEWphEY=;
-        b=LWIF9SqcQzaIkgWumeLxJPCCFbBuUwyK5cUc1qRa08WGAdpsw3SU2eudu/2a4SmUq0
-         IuQ2nRtvJpGtZ9P8fVUpQeB56UmDuKJSx1OhkBYDvAdBQy58fSSLHPB9o1gPfAVCAYRQ
-         jdhC4y2rOw8TCnULl7wqDLl549fpWrk0dTXWGBG/DKuq5YYphdwIBUxwJ3K/pAlwXv78
-         10XTMZ/lBJgiLe4HfpaLEEnc8BALKWgQGZwQ+HrhmRC3GTYPQw2wpczdqU7LTeFuJBJM
-         EI1oZEq2OdhTJeuXa/A4jdJBMD5kmrLSHTwoeOF4sa4hG+FVR2iAUhkcC+CVU6EyB9YJ
-         ynDg==
-X-Forwarded-Encrypted: i=1; AJvYcCXe9igQaduo6GKMzbiQZiMH7KCUkWVlInYb0yu/AjgAau56MbopPemxtux+jd0dcU4k7Sa/oZXpmmvhClc=@vger.kernel.org, AJvYcCXhMX8aL9ndKqL7XM627PcB0cjTXnKtm3h2QNNzYKV4l7Ldu5mDZadWP+P9PQDqWQFiNohBkW6R@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXYJ8RxlulkAn4ngmLqK2KQkUIbC9z27HdKQxTTT4qxWikC/cj
-	B6S10LDMcp6xnkJlAflsxkNvvl/TZdwDg0aTteAnwWD3cKCicnwG36q7qOi1KlBTIIcNZ0yj52Z
-	Moy/6vafdr/R9Mv9AJSRndk5vgKM=
-X-Gm-Gg: ASbGncstyeczZVe2bcmionUgSy4mCWxFwh203dntC2P6ifS8O2+diFLr2qV5OqTPvLG
-	HXZ1cc2tsrfGj+99zb7qYc3mMlVQnfiEGM3fBuzEJEUxVqLXY9TMH+3D3HOFyt9j/29ftO4SPAH
-	sTDl40rD1mWghsYOYY8f0xdNR9SLc/Nn9kj8o3LHgvtTb1QdRrVk1ZBIaDQGU=
-X-Google-Smtp-Source: AGHT+IGqnOtE6iSguCCt/EOVRI29ntJXAd0Co1D5ys+CD+aLtuLOr2l+DKgmshYuKhMhJRzehRryDVjtuLL+QWYN8UA=
-X-Received: by 2002:a05:600c:1d1f:b0:43c:fceb:91f with SMTP id
- 5b1f17b1804b1-43db6226ecfmr11952995e9.11.1743204401846; Fri, 28 Mar 2025
- 16:26:41 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743204412; x=1743809212;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gFVxM5/AFD8071zR9wcbweFP3U/YhpdYqA1RhXQbuGA=;
+        b=neLZcTujoGzdw5dH6/nFz7iA30YyuDuFLMt7dKlLEeLspsTMPBTaQdXZndLPbeYi8l
+         ZmP50m560yPSKsZ29sccYi4nA9Y9t5y/kCHI1ffVL+fCW26YTVn7FDqYO6+Q+kdkeBgf
+         bA8yyKbhdNUbimHAY7x9A7iPe8N+wn6lncTpfwgHarNBsD0jpNvmhrUFBASFCmehMZ7e
+         TTjmq6eNlKcjFDtqthAsBwXD4sGGdfbAjKgM+l8eASP4Yy3ePa+rBSZS0w55WnvP+a5L
+         b+b7dRhEvS1eNES+DmmuCvEhub73KdR7sFlFznwrTIO1kRqwj5PK5ZAzc8Mo5wngMu7M
+         2L8g==
+X-Forwarded-Encrypted: i=1; AJvYcCWc1IeS4w4ydaMRzVBckC5Hp4K4EiD7B17aPXHwLXY4rw5bRewL95HUM8tLImWsEVgQ/K6Uq0QAyd/Phwnl@vger.kernel.org, AJvYcCXYUSFz3UVmFq8RVCN6L6L61aa8BsK+2+rmBlBf3I3R0KxMcjXmEknkJGcKrgMt+Ru8M7920N4p@vger.kernel.org, AJvYcCXb5eY+IjSOx/knzeXk7Odv+cmY62tDV5cu7icz7wggnxee+bW3UeqnSn9fMhsj5I5/gW8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyg2qONmWggOe/GPpQWsw6Wj3B8TFUJFB3lQ7ri7qDjVXceMeiT
+	y57cmZHw9KryHPJL4SFFYIA1QZRrKyzbUVNyIr5UuKEFsVlL0zw=
+X-Gm-Gg: ASbGncvGpvsbqlWKp26/hYAoR2Gbh+bVWsrrzcg1Gg8201Icc23XQpdxBeaOWw1+iup
+	eQzlGMDmtqyWMdt4RYYSJ+sqhbaETfgh43iNdIcgpS3tQyG6flQ3128xNm46WBj6Uyn6QF5lvD2
+	KLNpW6O1rA3htMvVmyI4THwBJF0ihX4DexnozpVb+4SeU6Js6a41hLZkOlL9xrtbhFNKaHHq3fA
+	eQDgIwtoh2TcIFWQjRB95fP/AScEw7PXau0Gsam/9YKPOFDjXptK2yV+i9yqa6I/OdLLx4XVqlF
+	Fn+gbUx//8dPEv4EMuITSJl2WvdIcUw/zyTqymhAexeL
+X-Google-Smtp-Source: AGHT+IFoiqjkZBuLt3a/3dPYy+hCYTG4B/7HbPK6GoIi9TFX6gkfFt6D8S3aMJOFg0zxKzzM1P3+6w==
+X-Received: by 2002:a17:903:1106:b0:215:b75f:a1cb with SMTP id d9443c01a7336-2292f9448a5mr15531045ad.9.1743204411609;
+        Fri, 28 Mar 2025 16:26:51 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2291f1f69desm24290395ad.253.2025.03.28.16.26.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Mar 2025 16:26:51 -0700 (PDT)
+Date: Fri, 28 Mar 2025 16:26:50 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: syzbot <syzbot+08936936fe8132f91f1a@syzkaller.appspotmail.com>
+Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, kuba@kernel.org, daniel@iogearbox.net,
+	eddyz87@gmail.com, haoluo@google.com, john.fastabend@gmail.com,
+	jolsa@kernel.org, kpsingh@kernel.org, linux-kernel@vger.kernel.org,
+	martin.lau@linux.dev, sdf@fomichev.me, song@kernel.org,
+	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Subject: Re: [syzbot] [bpf?] WARNING in dev_xdp_install
+Message-ID: <Z-cwOkotpxeSxirT@mini-arch>
+References: <67e6b3e8.050a0220.2f068f.0079.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250307173611.129125-1-maxime.chevallier@bootlin.com>
- <20250307173611.129125-10-maxime.chevallier@bootlin.com> <8d3a9c9bb76b1c6bc27d2bd01f4831b2cac83f7f.camel@gmail.com>
- <20250328090621.2d0b3665@fedora-2.home> <CAKgT0Ue_JzmJAPKBhe6XaMkDCy+YNNg5_5VvzOR6CCbqcaQg3Q@mail.gmail.com>
- <12e3b86d-27aa-420b-8676-97b603abb760@lunn.ch>
-In-Reply-To: <12e3b86d-27aa-420b-8676-97b603abb760@lunn.ch>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Fri, 28 Mar 2025 16:26:04 -0700
-X-Gm-Features: AQ5f1JqDq9Q7sgwto-hg2UInEPPfl2eOmLlxCBC65yTnf1VkUtCGKdQGnJ3L08E
-Message-ID: <CAKgT0UcZRi1Eg2PbBnx0pDG_pCSV8tfELinNoJ-WH4g3CJOh2A@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 09/13] net: phylink: Use phy_caps_lookup for
- fixed-link configuration
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net, 
-	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Russell King <linux@armlinux.org.uk>, Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, 
-	linux-arm-kernel@lists.infradead.org, 
-	Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, 
-	=?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>, 
-	Oleksij Rempel <o.rempel@pengutronix.de>, Simon Horman <horms@kernel.org>, 
-	Romain Gantois <romain.gantois@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <67e6b3e8.050a0220.2f068f.0079.GAE@google.com>
 
-On Fri, Mar 28, 2025 at 2:45=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> > Also I am not sure it makes sense to say we can't support multiple
-> > modes on a fixed connection. For example in the case of SerDes links
-> > and the like it isn't unusual to see support for CR/KR advertised at
-> > the same speed on the same link and use the exact same configuration
-> > so a fixed config could support both and advertise both at the same
-> > time if I am not mistaken.
->
-> Traditionally, fixed link has only supported one mode. The combination
-> of speed and duplex fully describes a base-T link. Even more
-> traditionally, it was implemented as an emulated C22 PHY, using the
-> genphy driver, so limited to just 1G. With multigige PHY we needed to
-> be a bit more flexible, so phylink gained its own fixed link
-> implementation which did not emulate a PHY, just the results of
-> talking to a multigige PHY.
->
-> But i don't think you are actually talking about a PHY. I think you
-> mean the PCS advertises CR/KR, and you want to emulate a fixed-link
-> PCS? That is a different beast.
->
->         Andrew
+On 03/28, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    1a9239bb4253 Merge tag 'net-next-6.15' of git://git.kernel..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=17989bb0580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=d48017cf0c2458bf
+> dashboard link: https://syzkaller.appspot.com/bug?extid=08936936fe8132f91f1a
+> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> 
+> Unfortunately, I don't have any reproducer for this issue yet.
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/0795c9a2c8ce/disk-1a9239bb.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/dfe4e652ed32/vmlinux-1a9239bb.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/34deb7756b26/bzImage-1a9239bb.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+08936936fe8132f91f1a@syzkaller.appspotmail.com
+> 
+> ------------[ cut here ]------------
+> WARNING: CPU: 1 PID: 8456 at ./include/net/netdev_lock.h:54 netdev_ops_assert_locked include/net/netdev_lock.h:54 [inline]
+> WARNING: CPU: 1 PID: 8456 at ./include/net/netdev_lock.h:54 dev_xdp_install+0x610/0x9b0 net/core/dev.c:9911
+> Modules linked in:
+> CPU: 1 UID: 0 PID: 8456 Comm: syz.5.847 Not tainted 6.14.0-syzkaller-05877-g1a9239bb4253 #0 PREEMPT(full) 
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
+> RIP: 0010:netdev_ops_assert_locked include/net/netdev_lock.h:54 [inline]
+> RIP: 0010:dev_xdp_install+0x610/0x9b0 net/core/dev.c:9911
+> Code: 8d bc 24 28 0d 00 00 be ff ff ff ff e8 69 c5 26 02 31 ff 89 c5 89 c6 e8 0e af 81 f8 85 ed 0f 85 59 fb ff ff e8 d1 b3 81 f8 90 <0f> 0b 90 e9 4b fb ff ff e8 c3 b3 81 f8 49 8d bc 24 28 0d 00 00 be
+> RSP: 0018:ffffc9001f13f950 EFLAGS: 00010287
+> RAX: 000000000000023c RBX: ffff888059e8ccbd RCX: ffffc9000da1b000
+> RDX: 0000000000080000 RSI: ffffffff89395ebf RDI: 0000000000000005
+> RBP: 0000000000000000 R08: 0000000000000005 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000000 R12: ffff888059e8c000
+> R13: ffffffff870484d0 R14: ffffc9000ec3f000 R15: 0000000000000001
+> FS:  00007f6e99bf66c0(0000) GS:ffff888124b41000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 000000110c2f3eb0 CR3: 000000007f4ec000 CR4: 0000000000350ef0
+> Call Trace:
+>  <TASK>
+>  dev_xdp_attach+0x6d1/0x16a0 net/core/dev.c:10094
+>  dev_xdp_attach_link net/core/dev.c:10113 [inline]
+>  bpf_xdp_link_attach+0x2c5/0x680 net/core/dev.c:10287
+>  link_create kernel/bpf/syscall.c:5379 [inline]
+>  __sys_bpf+0x1bc7/0x4c80 kernel/bpf/syscall.c:5865
+>  __do_sys_bpf kernel/bpf/syscall.c:5902 [inline]
+>  __se_sys_bpf kernel/bpf/syscall.c:5900 [inline]
+>  __x64_sys_bpf+0x78/0xc0 kernel/bpf/syscall.c:5900
+>  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>  do_syscall_64+0xcd/0x260 arch/x86/entry/syscall_64.c:94
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7f6e9bd8d169
 
-A serdes PHY is part of it, but not a traditional twisted pair PHY as
-we are talking about 25R, 50R(50GAUI & LAUI), and 100P interfaces. I
-agree it is a different beast, but are we saying that the fixed-link
-is supposed to be a twisted pair PHY only? That is the part I am
-confused with as there are multiple scenarios where you might end up
-with a fixed link configuration at a specific speed for something not
-twisted pair. For example in our case the firmware provides us with
-the fixed modulation/lanes/fec configuration so we can essentially
-take that and treat it as a fixed-link configuration.
+#syz test
 
-In addition one advantage is that it makes it possible to support
-speeds that don't yet have a type in the phy_interface_t, so as I was
-enabling things it allowed some backwards compatibility with older
-kernels. In the case of fbnic I was planning to use pcs_validate to
-strip down the supported features and essentially limit things based
-on the bitrate per lane and the number of lanes. We were only using CR
-so for us the result should only be 1 regardless based on the speed
-match.
-
-The general idea I had in mind for upstreaming the support for fbnic
-was to initially bring it up as a fixed-link setup using
-PHY_INTERFACE_MODE_INTERNAL as that is essentially what we have now
-and I can get rid of the extraneous 40G stuff that we aren't using.
-Then we pivot into enabling additional PHY interface modes and
-QSFP+/28 support in the kernel. Then I would add a mailbox based i2c
-and gpio to enable SFP/QSPF on fbnic. After that we could switch fbnic
-back to the inband setup with support for the higher speed interfaces.
-
-One option I would be open to is to have me take on addressing the
-issue in net-next instead of net since I would need to sort it out to
-enable my patches anyway. I was mostly bringing it up as I was
-concerned that I may have not been the only one impacted. I was using
-the fixed-link/internal combination to basically signal to the phylink
-interface that we were locked in and weren't going to change it, as
-such the only impact for me is it seemed to result in a warning
-message about the link configuration not being recognized and the
-supported/advertised modes being empty.
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 87cba93fa59f..534eda336f8d 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -10336,7 +10336,9 @@ int bpf_xdp_link_attach(const union bpf_attr *attr, struct bpf_prog *prog)
+ 		goto unlock;
+ 	}
+ 
++	netdev_lock_ops(dev);
+ 	err = dev_xdp_attach_link(dev, &extack, link);
++	netdev_unlock_ops(dev);
+ 	rtnl_unlock();
+ 
+ 	if (err) {
 
