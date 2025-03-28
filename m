@@ -1,82 +1,61 @@
-Return-Path: <netdev+bounces-178070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1922A7456E
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 09:31:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A368AA7456A
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 09:31:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 063481B60FCB
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 08:30:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A35447A7C70
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 08:30:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1128213233;
-	Fri, 28 Mar 2025 08:29:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECCAA212FAA;
+	Fri, 28 Mar 2025 08:31:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LvY9eNGo"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Soa0HlYE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AF59213221;
-	Fri, 28 Mar 2025 08:29:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 229A5212FA3;
+	Fri, 28 Mar 2025 08:31:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743150597; cv=none; b=h8IvXg6BFIlIA4Qh8MTUpavkPa7ntiZMafiNnA+GGvUeHX9WmQoIhVoxX5RVO4aCXPMQLH4xZU5MwYW8goP9PsqaItVNYgE5h50bX/h71wrcRrfuQY/uWP6n0aC2MqGKCaTiSaLdZZarY5F61AQ7PrHPOf99m7uXyNlLLhXc7Yk=
+	t=1743150679; cv=none; b=IuxUV4j3cTpl6zj3qsk5O2yOxmBlt6Ww6lzJK0wtT4qPrpQbop84USmhIxAVCzWNI7zW5ujsb/8g6ivUm2Q3eLeuFVPXTKLvV/q+CcOBOLr5GlriBJEvbjQ3lxTdGYDqmQjMvpKywq9nV0PQ4669ckioQ6/DwpiI0hDwCIKr3fs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743150597; c=relaxed/simple;
-	bh=nW7zIE83b7o3baRGZOQm5hGY7byhoIDbnlaKldlCgyU=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hPmAwCQdj4LQ9Har9cFHkWzeAVyCmc/zi/xiNc0TSjptI3ZZc+aJ2EBph+G7B+Ctme2KzOhL+1LXkGP7N/BrTp5Q46VREqtkI2y0inIPu6TprYJ0TRrcoTZ1nrvUA7JqxY1TrGhE5Pqk//z8o/hvrcNSnZGNnXZSNc2nBkCCl7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LvY9eNGo; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5e5e0caa151so3612892a12.0;
-        Fri, 28 Mar 2025 01:29:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743150593; x=1743755393; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=T0ZCqhCnbZVt3aUx2CnCXD1Nb9xtjZIuFPWPj7IStfM=;
-        b=LvY9eNGoqI470UFtKeWHD+KPXclbVM0IjPYEd7OuXGzwj3bEIKgzZn/dEvh26/wOCn
-         3rPwtS6rUFzegz506xfIXdyCebMIt/ucKTwaCMWYtjApGSUD1d/oj6TkityvfIZjpxT3
-         z5GgPRzRy/xtsI7gCCuiLVkl6ESmpRCKusYlov2rYGiogstRwFmNAKb9mB4MS524EqCO
-         nQQoQUlTdSFtpgqppvApgf8vW2ns1mt9AM+9hO+qME4OM3r+OJGWH4ASufWEwoJSEkO7
-         rN8xs29aGhy8JGCnkUXgYQxybAc6qR1aVk43fnD/2u35eKnM/QDlqXg4OibNDT4l7Jz5
-         SXjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743150593; x=1743755393;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T0ZCqhCnbZVt3aUx2CnCXD1Nb9xtjZIuFPWPj7IStfM=;
-        b=eBiFzpa5MiBOUi4q79NlyL4AdMFlGE8ynVf1iovAq2BfMpAMsmAjZUD0u8DEKPtNrN
-         7qod/DGnSa9+f5MZfVzWMaIyIdxafwlRYrVso5ne4mqMTNsrp2qLbZCFGCMkPP3c91st
-         d+p5sxPhCxCpfkhXwgJvx1iJWxhQTPOFwlrnWoZH1Jew29TkuP4ftuM78iPompscwEv2
-         o811FmKy5IVNn5QMOuxjAxNzlJ92Fgzmv8wXUnSMuczxt463LtaihF2J5oCD2VfCM+Qn
-         a55SKHSuHYHSbc7DhVj7EwU8Lvjk4KL30ncPhRYHFrXGcvcYbLSBljyNOq8id++3bUcP
-         ZViA==
-X-Forwarded-Encrypted: i=1; AJvYcCWa2/YWVOL2hdDw03wRtx/pGXPvnydEyZCX8Zz90tIoJlYlFgE+uhQtJirsgknjXdWQugxb3z6gBBG23F2s@vger.kernel.org, AJvYcCWxS2kLUTMgzOlWmxbEU6WW5qADKzziS+o1nu/ap+pJXivPoJqpHTdoWMiEj38Jrp1nH/WFPVhgbQAc@vger.kernel.org, AJvYcCXP+WoJmxS/Xe/S4FTB7f4RjOiD6LJs+DoBr9EYWbjXZTDEsEVFyVAOG9RQlShKRH70P5e3vixV@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3i7sEl/EtsGjhXQkkCi6btYKPX+cHalP2UtHqtKf0XOsurrtp
-	5ImRHYZTvpgOdWwUIM13r8gFlzMIQt9IkWc+P3wjLW1CtNW4g/kc
-X-Gm-Gg: ASbGncsV+grX/jf6vdBptQyXLrHuF8Ditn7b765rbiyfnCuxCOptn00tA/gG2NF5fKN
-	yXGQ9Z8rNceyMB0quq/Cce85oEc9Wa8m2spLmxn3icgNVnxqHU2LDDdGVpmZ7NNuIxbsQCC0PMC
-	JW3mhpsHVh3Mn8AJy3PbgkqBIKPMavDGuAYPbAH9FUrfatcrlCu1UIKz9uAGqSnRW8b+kRDx8al
-	phrZ/QMiJkn/gRIWw3z5B5TXpwFwXaO2Elvs8x6gbNhbuXAZvxJDaKBwRAYWtnsqh71C+f0IVY2
-	V4X1uFmGkvrYYosdorR/UUiqCX6pAsHa/Ra9xUmSGIYms4mIlRpoXUcqmQh9hveCG1sb2Mc7XLH
-	Q
-X-Google-Smtp-Source: AGHT+IFU5A+tMQOAWn3YOK3TuwhlooPf9EWNcK6YYqJEI8gHr+LaC/RNLcb/nAuMocNkgltFg5R5WQ==
-X-Received: by 2002:a17:907:3ea2:b0:ac6:e20f:fa48 with SMTP id a640c23a62f3a-ac6faf6a198mr640703066b.33.1743150593076;
-        Fri, 28 Mar 2025 01:29:53 -0700 (PDT)
-Received: from Ansuel-XPS. (93-34-88-225.ip49.fastwebnet.it. [93.34.88.225])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac725c71e95sm48434266b.76.2025.03.28.01.29.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Mar 2025 01:29:52 -0700 (PDT)
-Message-ID: <67e65e00.170a0220.1aedef.166f@mx.google.com>
-X-Google-Original-Message-ID: <Z-Zd_AIsKTYJZXGk@Ansuel-XPS.>
-Date: Fri, 28 Mar 2025 09:29:48 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+	s=arc-20240116; t=1743150679; c=relaxed/simple;
+	bh=W1ijLkVD+r1Mbr+dTxFg4hpHIKg9HGyAzzfPZkdDY/8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=L03UsR/u14VX7LlZjK/8orDPagWCJaNOSo8i7+8anjgbHe9VTHCInmNRIGE6jbTktING7mcHNXNHrCwY8MduUmugPl8AVfkCQ5l2c1GI652ySWy9PvGTatDrQ2G9G7OXIxamFHwm0zjKnJQlryx8jE8EnsoHXRDQmpZHCNiu8e8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Soa0HlYE; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=eiyjJ7Xvynv7EYyBA/dubhzSD/lLyCEcXIjuNUtW1O4=; b=Soa0HlYEcxrc+s6yMNOCZUAPoh
+	IaQhsnncS9m/K5dqQ/wpGchltuENVuLoC4q0Tm3fUnaW0br5TORezrjn+TlQgFThERhrTMrBzHkZZ
+	je7pIepkekfhJnpioFHZnZc61VFAtKE1yrXZJyZfhaLAeV/9fO3UBrOvLqeHaw8cOq8C0xm1D10BT
+	7J7SQpVz02FE3+2HN9Qt/hpA/mahDWemwIfkGYcbO2EnIZYjpA5PzBeQ0geEaswRaMMx7+8aqhIWp
+	JK7vJbGGkRMa7p2HAstGN9I3HfXrKqg8o2nbCowpYZUn4FqrxB8Cu/qtY0uQMoysqVXM++h/5DKVl
+	WZ1pFMdA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40544)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1ty57I-0008C7-1X;
+	Fri, 28 Mar 2025 08:31:04 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1ty57G-00072a-1O;
+	Fri, 28 Mar 2025 08:31:02 +0000
+Date: Fri, 28 Mar 2025 08:31:02 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Christian Marangi <ansuelsmth@gmail.com>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -93,11 +72,11 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Daniel Golle <daniel@makrotopia.org>,
 	Eric Woudstra <ericwouds@gmail.com>, netdev@vger.kernel.org,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next RFC PATCH v4 1/6] net: phy: pass PHY driver to
+Subject: Re: [net-next RFC PATCH v4 3/6] net: phy: nxp-c45-tja11xx: simplify
  .match_phy_device OP
+Message-ID: <Z-ZeRhR73FS4iOzz@shell.armlinux.org.uk>
 References: <20250327224529.814-1-ansuelsmth@gmail.com>
- <20250327224529.814-2-ansuelsmth@gmail.com>
- <Z-ZczBztZbnc8XPa@shell.armlinux.org.uk>
+ <20250327224529.814-4-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -106,35 +85,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z-ZczBztZbnc8XPa@shell.armlinux.org.uk>
+In-Reply-To: <20250327224529.814-4-ansuelsmth@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, Mar 28, 2025 at 08:24:44AM +0000, Russell King (Oracle) wrote:
-> On Thu, Mar 27, 2025 at 11:45:12PM +0100, Christian Marangi wrote:
-> > Pass PHY driver pointer to .match_phy_device OP in addition to phydev.
-> > Having access to the PHY driver struct might be useful to check the
-> > PHY ID of the driver is being matched for in case the PHY ID scanned in
-> > the phydev is not consistent.
-> > 
-> > A scenario for this is a PHY that change PHY ID after a firmware is
-> > loaded, in such case, the PHY ID stored in PHY device struct is not
-> > valid anymore and PHY will manually scan the ID in the match_phy_device
-> > function.
-> > 
-> > Having the PHY driver info is also useful for those PHY driver that
-> > implement multiple simple .match_phy_device OP to match specific MMD PHY
-> > ID. With this extra info if the parsing logic is the same, the matching
-> > function can be generalized by using the phy_id in the PHY driver
-> > instead of hardcoding.
-> > 
-> > Suggested-by: Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+On Thu, Mar 27, 2025 at 11:45:14PM +0100, Christian Marangi wrote:
+> Simplify .match_phy_device OP by using a generic function and using the
+> new phy_id PHY driver info instead of hardcoding the matching PHY ID
+> with new variant for macsec and no_macsec PHYs.
 > 
-> Too much copy'n'pasting?
->
+> Also make use of PHY_ID_MATCH_MODEL macro and drop PHY_ID_MASK define to
+> introduce phy_id and phy_id_mask again in phy_driver struct.
+> 
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
+>  drivers/net/phy/nxp-c45-tja11xx.c | 39 +++++++++++--------------------
+>  1 file changed, 14 insertions(+), 25 deletions(-)
+> 
+> diff --git a/drivers/net/phy/nxp-c45-tja11xx.c b/drivers/net/phy/nxp-c45-tja11xx.c
+> index bc2b7cc0cebe..fccfc1468698 100644
+> --- a/drivers/net/phy/nxp-c45-tja11xx.c
+> +++ b/drivers/net/phy/nxp-c45-tja11xx.c
+> @@ -19,7 +19,6 @@
+>  
+>  #include "nxp-c45-tja11xx.h"
+>  
+> -#define PHY_ID_MASK			GENMASK(31, 4)
+>  /* Same id: TJA1103, TJA1104 */
+>  #define PHY_ID_TJA_1103			0x001BB010
+>  /* Same id: TJA1120, TJA1121 */
+> @@ -1971,31 +1970,17 @@ static int nxp_c45_macsec_ability(struct phy_device *phydev)
+>  	return macsec_ability;
+>  }
+>  
+> -static int tja1103_match_phy_device(struct phy_device *phydev,
+> -				    const struct phy_driver *phydrv)
+> +static int tja11xx_no_macsec_match_phy_device(struct phy_device *phydev,
+> +					      const struct phy_driver *phydrv)
+>  {
+> -	return phy_id_compare(phydev->phy_id, PHY_ID_TJA_1103, PHY_ID_MASK) &&
+> +	return phy_id_compare(phydev->phy_id, phydrv->phy_id, phydrv->phy_id_mask) &&
 
-Nono it's me creating new Tag type. Also planned to use Suggested-by:
-Reviewed-by: Signed-off-by in one line. :D (joking... hope everything
-else is ok so v5 will have everything with tag)
+We try to keep to less than 80 columns in networking, and this driver
+does so, so please keep it that way.
+
+(Note: the 80 column limit doesn't apply to printing messages, which
+should not be line-wrapped to allow them to be searched for).
+
+Other than that, thanks for addressing the other driver I pointed out
+that benefits from this.
 
 -- 
-	Ansuel
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
