@@ -1,115 +1,116 @@
-Return-Path: <netdev+bounces-178130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9681A74D66
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 16:07:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27799A74D93
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 16:16:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B1841899EED
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 15:07:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD3C716D1A1
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 15:16:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 769911C84A9;
-	Fri, 28 Mar 2025 15:07:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAEDC1DA4E;
+	Fri, 28 Mar 2025 15:16:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZJJ9tpZL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gws2QELH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A11D1C5F29
-	for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 15:07:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E431A0BF1
+	for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 15:16:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743174438; cv=none; b=RySis3zzx7j8l5j8i32Xtr+GbKIp3Gkwiozz1pSngp9OeVYEEQkbA5sEJ8MnOXmRQafn8LgORSpWoEdqgUKWUAuo7KplSpuTxSWoZ4SwD/MOf/TEvmEyvOw38fqEUcqzK21hTxvQg8lh4VQ9u0ywwf3VkaB/PB7EY75OsKp9frA=
+	t=1743175004; cv=none; b=Krh8cLXX8VYxB13QbnJX5XsbHUwq8kEMvYSg/C8EtwHV3TAYTBrpzPOxqWoDBGkr/gX13DCaQ1jihq1Ho70DJoa0sH3OwbHqBL5A29G95eiAFEUXZ2vTsbXfDfutoZtGzRNL8/oERtcFaipSnvLOKpK+db8ZLcZprhGnNpXY1l4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743174438; c=relaxed/simple;
-	bh=bjg6F6yDZ6BrdBi8o776+9cALlJrYo3Msv+eIUVm1lU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m+naNlg8MFAS59Etb4zdoq5Y9SJPhiK9iBSOHa0c6Wkj7P3jFXBnXXLuQvsSanNpBFqGFa3xL36tPjeG4YEDOJkHQsXTKwamBNcTkZ7Xr2Hnqrypww7Jrkk1KGP7m3LjPXyTO2CGo+JsOQwGTayufLWNCfD5/DXNFoXk6eSDYW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZJJ9tpZL; arc=none smtp.client-ip=209.85.214.178
+	s=arc-20240116; t=1743175004; c=relaxed/simple;
+	bh=XLp8cXfLtQjmmFxadSFM7J6GZ1WQ3+/4K1FyXs8yhh4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=C0u/qiRiE4ylXoBYJAJK3y8wuxgS4xuZnUkCtZa3AQQAbZmN6ryYoYTKhjcu1jwXUIqaPMQ5rVV7HRUfWOw71LD0szJYTMuKFCnbKheLXMq2zqEh8LUMIX4LECdlMMtmOsnoPfyku2LDh7g284Ha7pgCfZ/E4s2GwRsGvkwT5Lw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gws2QELH; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-224171d6826so6241375ad.3
-        for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 08:07:15 -0700 (PDT)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-227b650504fso50770135ad.0
+        for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 08:16:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743174435; x=1743779235; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sdhnyiJpTmcaAAdBhHeVd6mnElE1m+IPxlVkqYmezsk=;
-        b=ZJJ9tpZLZ21SJly08C+siZLIVHtDGc56mL+Ub4hwf5dj7G3RBypcNkM5PbQs4/KUf8
-         rsogxgnZ/0UtOYmYQ2MFqPOa8GAzN7V6//XYlcyv8ezvCy62qLHpsflWRO+aWk+AGPyA
-         vMtEkXQkK4BpXQzQ+j1PeUzZjUVTARHI2q6KL3ScYJWooZnPMJl3hrMtoYB0jGDxMSX5
-         day+t7VPEnAbLqNBaTlpxZWqmTGKTreCOL5rjBsiK0beo53BJAhymqxflXjI+YW7V6sL
-         nHZmeMJItUIO2qtm9sby7QTl+RhFaKQMEXHaBUwbPxVIxCS3CU/jVkgCTyWSefegZJ5V
-         DzoA==
+        d=gmail.com; s=20230601; t=1743175001; x=1743779801; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KL46pdl62bzBaMquvC4YS0feFcpNYZxNvZS6lT2zC3Y=;
+        b=Gws2QELHAf1ZuWHECX4JCKwRRSotDWpQcIRClY8ZK7OEFwegzBTqXfrl275p0VFGCd
+         P8pHpB82GizYTNV2S/Hn13j3fVc08v7OmZA1THX3hd7WKeDRy1XDk34J2o90L0+lKMGu
+         X98h9jLRpzcReIKxt7YtsMxYmvTBGlNJgJQFE1BSzN588oGPzZ5Igq2aOESzJqCAOHir
+         H6DN9VC5jnk25NIxUFahlGhvjHrUpiEVs6x8X0xtGcaGD2h3NeNXusLfwZ77QwxG1q8x
+         Vvi5QzQVkWmCXDCP1UGHYIXkLTXkvd4XN5O2Y60B6YcYhdt83RdzeT1ZHShWpxDUsXPH
+         stVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743174435; x=1743779235;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sdhnyiJpTmcaAAdBhHeVd6mnElE1m+IPxlVkqYmezsk=;
-        b=nfD1ieNK1YonmRSsUJssjXKGqM9BnpkOpHUaAcnOmDB+iCyjRnJNIzQCoPqhIijinK
-         SRAhq5JattFaETF9f3Woswbou2RSELT5P4YEad1udH6Wz6wm6NrK8nHRgWjBcUpwxVDz
-         BBeS44etxmtRU+Hb88A9MtaY/JZTFca3K2DgwzaraSReYj3shhnYCSwPToaMeeqZYsJG
-         6Cd4jcFhL8x5WO2tNuOwermUx2AwNSzhsYmyJw2BhlgiVMH1Z5bxMJ3+yEz/E2bc6frA
-         nega2XjHrBVsNcUL25HYMWcYilTtUcsF9ZpqELAXKtRkXD5silBHN42JTPGrReM4GvLL
-         va3g==
-X-Forwarded-Encrypted: i=1; AJvYcCVAwWwf3XBZdlYszyRhbVapfof+8ACKzGpx/7Z75GCcs48mutp6w/ws/rfwSvDDBRJCqz5vkwg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypMSKegt1DKqWLM9Fnboj/F5016X+NWjGb4ftFw1b2PDaQlt+p
-	9ghHdhMJIhDAeH25AQWDCEODNjAeJU1MVZNd91D1jaZ0H54P8hPoWeXToPLRcw==
-X-Gm-Gg: ASbGnctG7Li5adRUBiRwtA5CtKREVsLYwAQY2iQC77RmzU/trx7VF5QCHQzjDghp2zD
-	UTC2kXEVcYfNLn4u0Zzisdn0lTAVCzHNurbmsHfcH/LWff2RaAGoONaeyZg8PlJtwCwRj0fgKTD
-	UR4DGYeuATsKwbm/zkfXNEahpPGAYGQyqI3YBry6eIi7w2skaWba0EDoPyk5DxrPUZsJG/CJmJc
-	rQTM/L6pdSAS/MVC8ckxknVTe2KSfBZWki/XL/HibjUc022o6fHU9SrVuVwU/ggS8CaWetxTBjv
-	GkejYNFcJL8/hxZ4pSJ30GPk5dNz0swwt0eK7EDCnyRs
-X-Google-Smtp-Source: AGHT+IHKuzZ75oh/Gb+WqzRGSBFmcysBvIX/cC1k0uKhfJNlFmgJ5VCccBOFMCck6WL6lOISEbo17A==
-X-Received: by 2002:a17:902:ebc3:b0:21f:617a:f1b2 with SMTP id d9443c01a7336-22804958326mr139960325ad.46.1743174435073;
-        Fri, 28 Mar 2025 08:07:15 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2291eec7bf9sm19263255ad.20.2025.03.28.08.07.14
+        d=1e100.net; s=20230601; t=1743175001; x=1743779801;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KL46pdl62bzBaMquvC4YS0feFcpNYZxNvZS6lT2zC3Y=;
+        b=QQG3I3MQe9EdRcg1yu4v9uqJLg8UPqlxOD0ZHj43OVlGfHbMGhkEYwjzMu/cf2xUey
+         mf/ad0VwAycDSFAUSSqhfiF+3oPIed7LAoyRH0y3q7VVmWnuesOGCFSkxl3onZAJpyyo
+         YWfVNJFmHXnxHHgvJuv3cI3IIZFWTN3b2c2H2A1IKmIB3hXZEW0QnoT1khVBA8lz9dww
+         wAOh66aTHyd4usxji+SiwGS4drmTHaI2VNRwWRj5CaEsUm4XhxO90/g8fSgNb4DmPDlo
+         /cVXGHnq+N+dFvxpnVrFxbFZ7lT/wtte2OrBZTApix9cPypWXsWyJAYwKy8oGfaX8u0e
+         v2Tg==
+X-Gm-Message-State: AOJu0Yy/YNBMl9Fp2ObD54fAn7vUsPa49Bzc3NpuMjgmKMGMkWqDVjxC
+	AatrVCX7QyMJYxh3ZWFpvLusP/pOvBwV1Q4muO+c2mQmIgYk5UBO
+X-Gm-Gg: ASbGncsEimH4SWak+m2WX9vHZNO6Wvu0JI0FlosCOYDpzHAj6wT+t1W1TZ/twaqSo0v
+	T9Cl2ePPtgbrKutG3jp4RVjfyCjrddZyGTYaRxILZUAqLD5UkiZKWCTSz8aTn224wOzsw1nIZsx
+	2LFROXmPEixXXDGC6UK5lRXz+fRuxk1YumkI3HpP9VLXH6i+eQG89jWqO+wt5sZ6xDTru24QaUv
+	exgsquKlwmUAVyGelmFHSyMzOc93oWYAZaA4Wk+Vs5cK1HVXMr2e4WOC4p53NJrXpItmEY8Mi7K
+	BJy0uVz1q71RDUkMoy4ltnblgkcYp3JYs4qSIyOnJRIdoc6eyfWk/kJu8XIGjhu//IN2Sh+YQn3
+	ge7pJJMI=
+X-Google-Smtp-Source: AGHT+IFmzAoRIlReGWxk+s49vyfMIGo6+EbUii8sLk1/q4QvAo43enMe9oOfmgQMLXYOA6gppDa3Fg==
+X-Received: by 2002:a05:6a00:3a0e:b0:736:491b:536d with SMTP id d2e1a72fcca58-739610ca56dmr13756274b3a.20.1743175001262;
+        Fri, 28 Mar 2025 08:16:41 -0700 (PDT)
+Received: from KERNELXING-MC1.tencent.com ([111.201.25.167])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7397109200csm1853985b3a.128.2025.03.28.08.16.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Mar 2025 08:07:14 -0700 (PDT)
-Date: Fri, 28 Mar 2025 08:07:13 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
-	netdev@vger.kernel.org, pabeni@redhat.com, sdf@fomichev.me
-Subject: Re: [PATCH net v2 06/11] netdevsim: add dummy device notifiers
-Message-ID: <Z-a7IYYTC_XEC8B6@mini-arch>
-References: <20250327144609.647403fa@kernel.org>
- <20250328060450.45064-1-kuniyu@amazon.com>
+        Fri, 28 Mar 2025 08:16:40 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	horms@kernel.org,
+	kuniyu@amazon.com,
+	ncardwell@google.com
+Cc: netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH RFC net-next 0/2] tcp: support initcwnd adjustment
+Date: Fri, 28 Mar 2025 23:16:31 +0800
+Message-Id: <20250328151633.30007-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250328060450.45064-1-kuniyu@amazon.com>
+Content-Transfer-Encoding: 8bit
 
-On 03/27, Kuniyuki Iwashima wrote:
-> From: Jakub Kicinski <kuba@kernel.org>
-> Date: Thu, 27 Mar 2025 14:46:09 -0700
-> > On Thu, 27 Mar 2025 14:04:06 -0700 Stanislav Fomichev wrote:
-> > > > Can we register empty notifiers in nsim (just to make sure it has 
-> > > > a callback) but do the validation in rtnl_net_debug.c
-> > > > I guess we'd need to transform rtnl_net_debug.c a little,
-> > > > make it less rtnl specific, compile under DEBUG_NET and ifdef
-> > > > out the small rtnl parts?  
-> > > 
-> > > s/rtnl_net_debug.c/notifiers_debug.c/ + DEBUG_NET? Or I can keep the
-> > > name and only do the DEBUG_NET part. 
-> > 
-> > I was thinking lock or locking as in net/core/lock_debug.c
-> 
-> Maybe lock.c (or netdev_lock.c like netdev_lock.h) and move all
-> locking stuff (netdev_lock_type[], netdev_lock_pos(), etc) there
-> later + ifdef where necessary ?
+From: Jason Xing <kernelxing@tencent.com>
 
-That might work as well, but will require move moving. Maybe I can
-start with s/rtnl_net_debug.c/lock.c/ and the we can move the other
-stuff separately?
+Patch 1 introduces a normal set/getsockopt for initcwnd.
+
+Patch 2 introduces a dynamic adjustment for initcwnd to contribute to
+small data transfer in data center.
+
+Jason Xing (2):
+  tcp: add TCP_IW for socksetopt
+  tcp: introduce dynamic initcwnd adjustment
+
+ include/linux/tcp.h      |  4 +++-
+ include/uapi/linux/tcp.h |  2 ++
+ net/ipv4/tcp.c           | 16 ++++++++++++++++
+ net/ipv4/tcp_input.c     | 13 ++++++++++---
+ 4 files changed, 31 insertions(+), 4 deletions(-)
+
+-- 
+2.43.5
+
 
