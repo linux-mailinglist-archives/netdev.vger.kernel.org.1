@@ -1,128 +1,108 @@
-Return-Path: <netdev+bounces-178158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D82E1A750CC
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 20:31:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F073A7510B
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 20:52:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7663317216A
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 19:31:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A28D189498E
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 19:52:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F8C11DE3AA;
-	Fri, 28 Mar 2025 19:31:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A8811E25E3;
+	Fri, 28 Mar 2025 19:52:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C0VMFWQb"
+	dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b="DsWrrv4p"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ixit.cz (ip-89-177-23-149.bb.vodafone.cz [89.177.23.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB7301531C5;
-	Fri, 28 Mar 2025 19:31:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B88E322B;
+	Fri, 28 Mar 2025 19:52:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.177.23.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743190301; cv=none; b=ql5cBs5+qrdAaOZ2lOxaXHK5SIyhT4Pi3sEpUybksdq8YsUiUEdOKFVFvTA1zm2X37epUBWO+7YiihPxGojumjvxjm7w2TVsUapTvG38pbroDHkj5aF71+FH9TkVMcmEXJ4Gj09SEMSNgITn/sbnqWn0y+YDwuk7xRBNCcDVFj0=
+	t=1743191554; cv=none; b=gYnwLt0+02ck4fuz17ADbcvxonxE+X3ot3mkuUiSfBha1YQEmO3KKDsY9OFKrwyF7Sla22SnL+2tJo7r4LU1Zojlj5nEZcmh+jmZchViLzPorwh1KBspomccwjeAWqu3ZWaid+Lkb8fco/D2zFsrewtGh9gvBEWimomODKbvEZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743190301; c=relaxed/simple;
-	bh=vUUOmaBsW00jSF2gRrb1rpo7FsoIYv4PkVoMJjSPa2M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HeSQR4NuwpSwV0vB+MoT0aK+VxQIG/zjXrADNv8tgUiTpeCGSxf+RE7yv3xq0RM5yRROEwm54K1bwNFzSH16mtWtfCwoOt8m/PbdBMQ3FOlrbkI6nMCVv1c083/fNfazsDGTfrNzvprBo/thABqFRzwQK03aaO83ur+vrWYuW1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C0VMFWQb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0ABDC4CEE4;
-	Fri, 28 Mar 2025 19:31:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743190299;
-	bh=vUUOmaBsW00jSF2gRrb1rpo7FsoIYv4PkVoMJjSPa2M=;
-	h=From:To:Cc:Subject:Date:From;
-	b=C0VMFWQb8cYGUvMuEndJm2THrABw3Y92jxwzHOxIFThfBQYab+AUk90h/LYeib/MW
-	 ya/XzXkgdDIqMCSDgPG4WXqXg+EWaNlT4aiqZegxpCHsQATBIHTNnO+ylP0KSmL3a7
-	 Lcfw7E5+D5nzddG3HVhHH0yv3bIG4CPMbt0ZjTK4YVgzIIWmKVQnGZAoJ9F9ptX7oY
-	 jhmhuaHMMHXzHx4hcUBngmKr27ZMiwVCGKBgTqeq2OybP0s3zy6umuSGYoGRNN5zQj
-	 nvjlTRpOVyiRW574lRNb7u9XhnRpDhVVkrrAM5O6dARu2TvTaY3Mb5EOcLTEBbKHtS
-	 +JP/Vp1kffFIg==
-From: Song Liu <song@kernel.org>
-To: bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	kernel-team@meta.com,
-	song@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH bpf-next] selftests/bpf: Fix verifier_bpf_fastcall
-Date: Fri, 28 Mar 2025 12:31:24 -0700
-Message-ID: <20250328193124.808784-1-song@kernel.org>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1743191554; c=relaxed/simple;
+	bh=YaO70SFlWiugUmK0UvlOIGdArpJwA4i3j0CMMhbaJtg=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=FfEbr4oM9gpShlR+xtvO5WCfamDlXLDiMPF9CtcUANxMn+6zwVv3JOCWOdL/rZOpG1T0OtC6nezvbDfx6LlY3sV7bs4/Wl7ZH3IFNGnIJHCyOqswBY4w5477kzVUBoP+jlX20f8ljcOdlo+rwjl710uAaQWx6tjJMvaA0D/5lh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz; spf=pass smtp.mailfrom=ixit.cz; dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b=DsWrrv4p; arc=none smtp.client-ip=89.177.23.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ixit.cz
+Received: from [127.0.0.1] (78-80-113-104.customers.tmcz.cz [78.80.113.104])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by ixit.cz (Postfix) with ESMTPSA id C7768166734;
+	Fri, 28 Mar 2025 20:52:20 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ixit.cz; s=dkim;
+	t=1743191541;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YaO70SFlWiugUmK0UvlOIGdArpJwA4i3j0CMMhbaJtg=;
+	b=DsWrrv4pATyhBjy330V52YVR7/U6IEbdIN0bLmMqS7u0ypYW1s9HicPipP+Ea+DVpEzYEo
+	J4KpYiRjNreuP0JfptcLoB5gKSZWxU1UlErJQiedYNLxo97rB6/s3m9O76C0MBhROW00Q+
+	vR9LNUtjnlr3vUIDJsJfqMoYoxOISS4=
+Date: Fri, 28 Mar 2025 19:52:18 +0000
+From: David Heidelberg <david@ixit.cz>
+To: Johannes Berg <johannes@sipsolutions.net>, Rob Herring <robh@kernel.org>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Mailing List <devicetree-spec-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, van Spriel <arend@broadcom.com>,
+ =?ISO-8859-1?Q?J=E9r=F4me_Pouiller?= <jerome.pouiller@silabs.com>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konradybcio@kernel.org>, Andy Gross <agross@kernel.org>,
+ Mailing List <devicetree-spec@vger.kernel.org>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ Janne Grunau <j@jannau.net>
+Subject: Re: [PATCH v5 0/5] dt-bindings: net: Add network-class.yaml schema
+In-Reply-To: <69bd300d79f7f6317a964030930252b307b85007.camel@sipsolutions.net>
+References: <20250324-dt-bindings-network-class-v5-0-f5c3fe00e8f0@ixit.cz> <3452b67752228665fa275030a7d8100b73063392.camel@sipsolutions.net> <CAL_JsqLv9THitHzj8nj7ppCp-aKn010-Oz=s+AUNKOCoDmBnbQ@mail.gmail.com> <bfb7433131cb9aeebc75666f86a67a6c71521229.camel@sipsolutions.net> <4B465FA3-E6B5-4EB1-A712-0C8874402FCE@ixit.cz> <69bd300d79f7f6317a964030930252b307b85007.camel@sipsolutions.net>
+Message-ID: <42F3BE66-15C3-4C95-8133-2EA19E54B32F@ixit.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Commit [1] moves percpu data on x86 from address 0x000... to address
-0xfff...
+Hi Johannes,
 
-Before [1]:
+from the functionality standpoint this bindings do not change anything=2E
 
-159020: 0000000000030700     0 OBJECT  GLOBAL DEFAULT   23 pcpu_hot
+From=20validation point, if the `make dtbs_check` will pass as expected, it =
+should yield only better results for integrators and developers=2E=20
 
-After [1]:
+Thou if you want to postpone it for 6=2E16, I'll understand=2E
 
-152602: ffffffff83a3e034     4 OBJECT  GLOBAL DEFAULT   35 pcpu_hot
+Thank you
+David
 
-As a result, verifier_bpf_fastcall tests should now expect a negative
-value for pcpu_hot, IOW, the disassemble should show "r=" instead of
-"w=".
+On Wed, 2025-03-26 at 23:08 +0000, David Heidelberg wrote:
+> > I can do that, but I suppose it's 6=2E16 material at this point=2E
+>=20
+> Hi Johannes=2E=20
+>=20
+> I assume you meant 6=2E15?=20
 
-Fix this in the test.
+No=2E 6=2E15 merge window just opened=2E
 
-Note that, a later change created a new variable "cpu_number" for
-bpf_get_smp_processor_id() [2]. The inlining logic is updated properly
-as part of this change, so there is no need to fix anything on the
-kernel side.
+> This patchset should mainly clarify where these properties can be used a=
+nd address incorrect warnings regarding device-tree verification=2E=20
 
-[1] commit 9d7de2aa8b41 ("x86/percpu/64: Use relative percpu offsets")
-[2] commit 01c7bc5198e9 ("x86/smp: Move cpu number to percpu hot section")
-Reported-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Song Liu <song@kernel.org>
----
- tools/testing/selftests/bpf/progs/verifier_bpf_fastcall.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+I'm not really convinced that makes it a bugfix for the rc series
+though?
 
-diff --git a/tools/testing/selftests/bpf/progs/verifier_bpf_fastcall.c b/tools/testing/selftests/bpf/progs/verifier_bpf_fastcall.c
-index a9be6ae49454..c258b0722e04 100644
---- a/tools/testing/selftests/bpf/progs/verifier_bpf_fastcall.c
-+++ b/tools/testing/selftests/bpf/progs/verifier_bpf_fastcall.c
-@@ -12,7 +12,7 @@ SEC("raw_tp")
- __arch_x86_64
- __log_level(4) __msg("stack depth 8")
- __xlated("4: r5 = 5")
--__xlated("5: w0 = ")
-+__xlated("5: r0 = ")
- __xlated("6: r0 = &(void __percpu *)(r0)")
- __xlated("7: r0 = *(u32 *)(r0 +0)")
- __xlated("8: exit")
-@@ -704,7 +704,7 @@ SEC("raw_tp")
- __arch_x86_64
- __log_level(4) __msg("stack depth 32+0")
- __xlated("2: r1 = 1")
--__xlated("3: w0 =")
-+__xlated("3: r0 =")
- __xlated("4: r0 = &(void __percpu *)(r0)")
- __xlated("5: r0 = *(u32 *)(r0 +0)")
- /* bpf_loop params setup */
-@@ -753,7 +753,7 @@ __arch_x86_64
- __log_level(4) __msg("stack depth 40+0")
- /* call bpf_get_smp_processor_id */
- __xlated("2: r1 = 42")
--__xlated("3: w0 =")
-+__xlated("3: r0 =")
- __xlated("4: r0 = &(void __percpu *)(r0)")
- __xlated("5: r0 = *(u32 *)(r0 +0)")
- /* call bpf_get_prandom_u32 */
--- 
-2.47.1
-
+johannes
 
