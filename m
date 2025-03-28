@@ -1,138 +1,169 @@
-Return-Path: <netdev+bounces-178053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8989A74255
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 03:35:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDF8DA7425A
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 03:37:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BB9C1897AB2
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 02:35:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1787189A359
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 02:38:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F66E1DD0F6;
-	Fri, 28 Mar 2025 02:35:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E32220E00B;
+	Fri, 28 Mar 2025 02:37:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="AaY2swOe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X9Rm8R9q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B6E7126C02;
-	Fri, 28 Mar 2025 02:35:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DD96224F6;
+	Fri, 28 Mar 2025 02:37:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743129326; cv=none; b=h9Ujm4o7YdzPrvOXU5WaflSLDhUdQuMEG4tQvzCRgLpxxjYKXNTOouNXD9w8y277tRF0UN00mssahCtJW0SVzN8+vdD6bqLx9g9CoS4q20e1uSS+t7i1MEk0xw0ol/wAQTaGYqxDumOe6mRA5hn12J4U0Uyp9DB4qvi++AyURFo=
+	t=1743129469; cv=none; b=udGSJWA7vN91QF9CLQ03MFePe55Z5TRTAmo+ELZJSAKg/V5T9kuvTrNPzBc5iCFRIGBNHGBIs6jihRCa3hpbixRGjPN+bWlc6d7O93QnZUK2bdn0LMr3IXOOZvqOI6D+4ZkbRIVf9rm0MG7kafVLlTitky3dyOMuP9maqpXjok4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743129326; c=relaxed/simple;
-	bh=iFvRia4aaKZCH3o10Z6PVTfzPzogLvwk1HTVm4uekUQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FLyE5ELkC0sRH5BmWozNdYlMcG7duJ6kXkw3RwNeHjeKluETxqvNAIdTpA7B9/nFOJcWo3qvOFTs4zV3sWHtI8UHFGvGKboQt5iZl9T70obkihPMc6sriyftzLzM2cviqAVPoYg4rLFrgTrvOKNgO62uLnCX/b9C6Eq4mSJVoKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=AaY2swOe; arc=none smtp.client-ip=52.119.213.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1743129469; c=relaxed/simple;
+	bh=8VdUetZ7XSbNdldMYhCuY+zyfCHSXJq5QXgqttchYZM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=S0fd4jvD5vwLU4w8nJkhE4i46flM/hisnH5axT2u6Ru4JuEa0FzpAmQJ3AOIrUgtN14L6rTlQVQjBcT58SAiG95GfCrELvll2UGYLXS88oFDIsXbGw5rDOnuK8oeJQcubywb2DuoMKErADDiNWTmR4N7CFwYAv+K/i6TJE5CYeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X9Rm8R9q; arc=none smtp.client-ip=209.85.128.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-6febf391132so17248147b3.1;
+        Thu, 27 Mar 2025 19:37:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1743129324; x=1774665324;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=AjIWyMoCN11bp6A0HB51G4mZ/1JeYJHAdSLyacO6ID0=;
-  b=AaY2swOewaPtiZW2w5vLhkwSA1nknfotgTmkUPMm+sXEAE8jESP8i86b
-   9Fiz9joJZJDzmVz/XMJmulctrw+WF+cWsugOE47ed2Uo1Lfw0n7MDrGa2
-   kGXTrZxKMO6LU50zX98Vtd4a2AHJPKkIVkiXL6aAPHObHNAMgxlwAHihs
-   w=;
-X-IronPort-AV: E=Sophos;i="6.14,282,1736812800"; 
-   d="scan'208";a="708865696"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2025 02:35:22 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:20585]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.41.16:2525] with esmtp (Farcaster)
- id c6d5e644-2b7b-4bbd-b0b3-7ab7e10b7c6c; Fri, 28 Mar 2025 02:35:22 +0000 (UTC)
-X-Farcaster-Flow-ID: c6d5e644-2b7b-4bbd-b0b3-7ab7e10b7c6c
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 28 Mar 2025 02:35:21 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.187.171.35) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 28 Mar 2025 02:35:19 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <i.abramov@mt-integration.ru>
-CC: <alex.aring@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<horms@kernel.org>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-wpan@vger.kernel.org>, <lvc-project@linuxtesting.org>,
-	<miquel.raynal@bootlin.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<stefan@datenfreihafen.org>
-Subject: Re: [PATCH 0/3] Avoid calling WARN_ON() on allocation failure in cfg802154_switch_netns()
-Date: Thu, 27 Mar 2025 19:35:03 -0700
-Message-ID: <20250328023511.14859-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250328010427.735657-1-i.abramov@mt-integration.ru>
-References: <20250328010427.735657-1-i.abramov@mt-integration.ru>
+        d=gmail.com; s=20230601; t=1743129465; x=1743734265; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6GU28AGd9UzkKZ2wP0uOwi7wHu7jsmeCOCAXcHHxD6M=;
+        b=X9Rm8R9qbUoRneqPufK1I55UOIovCTfuVn7jaY8mxgi/KVGnYejA40Xfu2BIOeeHSX
+         JWPcfixz/sK5qKnJvdvnuOU3IJB8XqbvrOOblIqFyUBMFLdKmXqoOIML93e4Wnte54yr
+         mow/TgBq4dgfc/LXOayywD+UxDPyhbUPS6FXhRRq1Js3KGNqNdlRk3wwZR2xHZN9NnFT
+         e2WXNATj0cef4+zVFWsdqYgQonN7leqXqB5soObZJszKbfzgxyXO3/wiTGq6GexYu2EQ
+         fXvxO/isys/dZIOmc9umYJUyhbOgeXtOszY22grW0wF5zzkIwAV9az5bTpK6pGolw2Rl
+         gcpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743129465; x=1743734265;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6GU28AGd9UzkKZ2wP0uOwi7wHu7jsmeCOCAXcHHxD6M=;
+        b=ZO/kVJDy32Iwg7/TpJ1v9apXWpIfgQDop2NGU6LBFvsZGocIDVI3MvkQylRTDBktcj
+         f6Le28s2HJVQrMPY3YJbTKPHmBtYPRzqzXWZEX8jJOZllpJXS6//wZ5ajbD30ZbhbTgw
+         d8E0Op0Bzd1yHWlU1pTd8xa1J7BxgPpXbY248FD85JF1h+iIv8l48oGftzhjNRXPyLeH
+         Vu+pzDShH/SIja47wa3LKawZXQjkQ8t8Nv8MOETquLmcEu1r+C9nPYqXrNO4KomNH2aw
+         bws3DKZiF6Ib5uQX4bA5BUSTQv9Xy64sxpzh2/FMWiCqWZV1xOwiAkAtdlzLWU8iJWeI
+         PYcA==
+X-Forwarded-Encrypted: i=1; AJvYcCU4CGM383Fz6eUy46nSU6JUWc7dXqz5v27w4BW8yPNQD1nF4oZVQNsuRlkk+1/NiNzHjH6+hKJ2wDyDlQ==@vger.kernel.org, AJvYcCUUZmzZ3j8vEffVH2YFyhmaFYfISZczVfSf9i3nuZWqhfk+f13CR4tGCjttAkKS/rn2stjJBCtbu1nu@vger.kernel.org, AJvYcCVBoq/AGcMsdow1YuHZHTRiAB+w9SwzC72NFwspyujWnmpou28iP8q1B902280G0I2lk8vVJa6GEvY=@vger.kernel.org, AJvYcCVC5ZFaOqGRL3OAshwaNDWg0LXotuvtmBm3mgQ2GQ9PNMr//acgGjWo+0xgKdRs6RJc1MjnLIsWv7Wz@vger.kernel.org, AJvYcCVVnM9qcs909jU2ggSVN8ro6iPURMHk7816zUPaCuiAtMv8JTmw0dFAuhOt9BIXJXjC9KmGy1W/Ecq1@vger.kernel.org, AJvYcCVp+95I9UkYVLmzHn1Px6yw7PO/w/HHTuPzPBVWQhAaw7VRwaMu2Vk775nQuv2rnE0qS2FOb1uLmbmf9aJ8aSE=@vger.kernel.org, AJvYcCVw/sy+DFF5WmiVJbu7shtcbP2y7yelTFNUicVP5ccy4r/3Pkd+Q6NMjJd1A1/PxuLIM1wtBJD3RVG++zRE@vger.kernel.org, AJvYcCVzErkJ/qS6fDM2N+1NumEvxpRrDLRLajyDFenrYdOjpCA7TRgQh6GvLCILKYl1XHedd0q/cfoq@vger.kernel.org, AJvYcCX2RRyIBQoE4dYUEOo9bOIPs3cZCpXbbVpLXoHyPf5oBFue2nK5FupWd/7VnMbBtgZ7Jq4jWAMrXrfQUNc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwG0d+WIk7LVdIpG0vzktq2iUC72Hb7vrB2CTpVeUjPxXb6lDtH
+	ZsV7EL1ACmRnnNb02npFhct3STsCJbJqm1NIhTar8SjZh/Uze8fGxlnGPNDxoUPqXsThhlS0PhJ
+	PuznUDy2zYCB7IQHgHP8qi88qaPevxQ==
+X-Gm-Gg: ASbGncvNmMATsR6iHAzryUGav3emf+/94n5i4GJd4I3w7uih+YusxnIZu0upFTwOjcn
+	UCMrxuiM1dKAlrR4otbx2B/8QivqhHGWwfPdmPtLmhg+8q/Bg/HPsgdF/cGIrdlcYDgT4KO7PVi
+	dUBMatW0Zj5+w3NBemA1XFD5HI1Oyr7CkFf1fLnIxxEHKDZoPGJ+a+yOVP
+X-Google-Smtp-Source: AGHT+IHOG7iBfbwOCAkCrj+zd2ekYGaqnGivRImk2Y9FvwnBEMCf7PKrjNYgFJdxvqYgl9G07WIFNT9mvTFJJt5g/60=
+X-Received: by 2002:a05:690c:48c1:b0:6fd:2fcf:12f5 with SMTP id
+ 00721157ae682-702250aedfemr85769427b3.27.1743129465091; Thu, 27 Mar 2025
+ 19:37:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWC004.ant.amazon.com (10.13.139.246) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+References: <20250225081644.3524915-1-a0282524688@gmail.com>
+ <20250225081644.3524915-5-a0282524688@gmail.com> <20250227-spicy-grebe-of-dignity-68c847-mkl@pengutronix.de>
+ <CAOoeyxWSsy0Q0Y7iJE8-DZM5Yvcdto8mncFkM8X4BvVMEgfUiQ@mail.gmail.com>
+ <20250317-cuttlefish-of-simple-champagne-ee666c-mkl@pengutronix.de>
+ <CAOoeyxXSC3rjeB0g5BtHKvKy-Y9Dszd5X9WuHeBeH1bk39d_Eg@mail.gmail.com>
+ <20250326-inventive-lavender-carp-1efca5-mkl@pengutronix.de>
+ <CAOoeyxXw1x2HVXQYzxc1OuGimn7XPfCjj-aB=jAAfw733b_9OQ@mail.gmail.com> <20250327-awesome-mutant-cuscus-0f0314-mkl@pengutronix.de>
+In-Reply-To: <20250327-awesome-mutant-cuscus-0f0314-mkl@pengutronix.de>
+From: Ming Yu <a0282524688@gmail.com>
+Date: Fri, 28 Mar 2025 10:37:33 +0800
+X-Gm-Features: AQ5f1JqhxPwd2S-wZQFXmJxMw8Ubb20oYpWkuak_vFPYWhy8Ch8Vy9Zr_nIuAfk
+Message-ID: <CAOoeyxWa5sB+YS6W=oG7xUeizXxigkdw3b=7w9aGftCWzWsw2A@mail.gmail.com>
+Subject: Re: [PATCH v8 4/7] can: Add Nuvoton NCT6694 CANFD support
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
+	andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Ivan Abramov <i.abramov@mt-integration.ru>
-Date: Fri, 28 Mar 2025 04:04:24 +0300
-> This series was inspired by Syzkaller report on warning in
-> cfg802154_switch_netns().
-> 
-> WARNING: CPU: 0 PID: 5837 at net/ieee802154/core.c:258 cfg802154_switch_netns+0x3c7/0x3d0 net/ieee802154/core.c:258
-> Modules linked in:
-> CPU: 0 UID: 0 PID: 5837 Comm: syz-executor125 Not tainted 6.13.0-rc6-syzkaller-00918-g7b24f164cf00 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-> RIP: 0010:cfg802154_switch_netns+0x3c7/0x3d0 net/ieee802154/core.c:258
-> Call Trace:
->  <TASK>
->  nl802154_wpan_phy_netns+0x13d/0x210 net/ieee802154/nl802154.c:1292
->  genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
->  genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
->  genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
->  netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2543
->  genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
->  netlink_unicast_kernel net/netlink/af_netlink.c:1322 [inline]
->  netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1348
->  netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1892
->  sock_sendmsg_nosec net/socket.c:711 [inline]
->  __sock_sendmsg+0x221/0x270 net/socket.c:726
->  ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2594
->  ___sys_sendmsg net/socket.c:2648 [inline]
->  __sys_sendmsg+0x269/0x350 net/socket.c:2680
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> This warning is caused by Syzkaller's fault injection, which causes
-> kstrdup() in device_rename() to fail, so device_rename() returns -ENOMEM.
-> 
-> Since practically such failure is not possible, avoid it, additionally
-> fixing similar pointless allocation-related warnings.
-> 
-> Ivan Abramov (3):
->   ieee802154: Restore initial state on failed device_rename() in
->     cfg802154_switch_netns()
->   ieee802154: Avoid calling WARN_ON() on -ENOMEM in
->     cfg802154_switch_netns()
->   ieee802154: Remove WARN_ON() in cfg802154_pernet_exit()
+Marc Kleine-Budde <mkl@pengutronix.de> =E6=96=BC 2025=E5=B9=B43=E6=9C=8827=
+=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=883:25=E5=AF=AB=E9=81=93=EF=BC=
+=9A
+>
+> On 27.03.2025 13:38:22, Ming Yu wrote:
+> > Marc Kleine-Budde <mkl@pengutronix.de> =E6=96=BC 2025=E5=B9=B43=E6=9C=
+=8827=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8A=E5=8D=881:41=E5=AF=AB=E9=81=93=
+=EF=BC=9A
+> > >
+> > > > > > > > +     priv->can.clock.freq =3D can_clk;
+> > > > > > > > +     priv->can.bittiming_const =3D &nct6694_can_bittiming_=
+nominal_const;
+> > > > > > > > +     priv->can.data_bittiming_const =3D &nct6694_can_bitti=
+ming_data_const;
+> > > > > > > > +     priv->can.do_set_mode =3D nct6694_can_set_mode;
+> > > > > > > > +     priv->can.do_get_berr_counter =3D nct6694_can_get_ber=
+r_counter;
+> > > > > > > > +     priv->can.ctrlmode_supported =3D CAN_CTRLMODE_LOOPBAC=
+K |
+> > > > > > > > +             CAN_CTRLMODE_LISTENONLY | CAN_CTRLMODE_BERR_R=
+EPORTING |
+> > > > > > > > +             CAN_CTRLMODE_FD | CAN_CTRLMODE_FD_NON_ISO;
+> > > > > > >
+> > > > > > > Does your device run in CAN-FD mode all the time? If so, plea=
+se use
+> > > > > > > can_set_static_ctrlmode() to set it after priv->can.ctrlmode_=
+supported
+> > > > > > > and remove CAN_CTRLMODE_FD from ctrlmode_supported.
+> > > > > > >
+> > > > > >
+> > > > > > Our device is designed to allow users to dynamically switch bet=
+ween
+> > > > > > Classical CAN and CAN-FD mode via ip link set ... fd on/off.
+> > > > > > Therefore, CAN_CTRLMODE_FD needs to remain in ctrlmode_supporte=
+d, and
+> > > > > > can_set_static_ctrlmode() is not suitable in this case.
+> > > > > > Please let me know if you have any concerns about this approach=
+.
+> > > > >
+> > > > > Where do you evaluate if the user has configured CAN_CTRLMODE_FD =
+or not?
+> > > > >
+> > > >
+> > > > Sorry, I was previously confused about our device's control mode. I
+> > > > will use can_set_static_ctrlmode() to set CAN_FD mode in the next
+> > > > patch.
+> > >
+> > > Does your device support CAN-CC only mode? Does your device support t=
+o
+> > > switch between CAN-CC only and CAN-FD mode?
+> > >
+> >
+> > Our device supports both CAN-CC and CAN-FD mode.
+>
+> This doesn't answer my question:
+>
+> Does your device support CAN-CC only mode?
+>
 
-While at it, apply the same change to cfg80211_switch_netns() and
-cfg80211_pernet_exit().
+It can dynamically switch between CAN-CC and CAN-FD mode when
+trasmitting or receiving, depending on whether the nct6694_can_frame
+passs the flag with NCT6694_CAN_FRAME_FLAG_FD.
 
-Thanks!
 
-
-> 
->  net/ieee802154/core.c | 51 ++++++++++++++++++++++++-------------------
->  1 file changed, 29 insertions(+), 22 deletions(-)
-> 
-> -- 
+Thanks,
+Ming
 
