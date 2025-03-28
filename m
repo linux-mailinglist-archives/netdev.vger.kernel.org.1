@@ -1,149 +1,120 @@
-Return-Path: <netdev+bounces-178165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23A9EA7515C
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 21:17:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8801A7517B
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 21:35:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39B8218955CD
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 20:17:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 962C63A3A31
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 20:35:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E758F1EB5EB;
-	Fri, 28 Mar 2025 20:16:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3BD31DE2B9;
+	Fri, 28 Mar 2025 20:35:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CQc7cF5f"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KGH5Vrf7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 741911E9B17
-	for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 20:16:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A352BA3D
+	for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 20:35:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743193005; cv=none; b=iWrs2vQb2cxQ30wDvZNn9Fvb5yvtaL5W3IcHMHLiR9pQWNBy66KHt9X9QlhPNHNBUkKkGww5e9RKQ1bVMt3YBTAvrtgWXFuWB3dJR129YJts9ZF/ZCXFfyOfn4Vps0MXgi5Fc3/dithU65j9moTDPJBy+TVUN+t+tE4DrLBia6c=
+	t=1743194123; cv=none; b=h8jkZnG2zW4pdC5xUf5i+qqtGDdFv90l7+rhY0W806jRTwjYS0CTu7UxwYsIzcgulFPM1t/iK4by6qA+imzH7S9JFyvkIZp1mpt2wev5CxWc/lK89POWKpRhrT1J7XFo+Ehg6MWeyaAEr3XQRi3QgTIPzyUOhZCWdSIQNiS5eTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743193005; c=relaxed/simple;
-	bh=le48TpsLIXgwRUE7JK2oXHpEVjkDjeIk8bkxcrTUacQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mqfIJ4jChd6x6uxJ+Fylef9vn20QrrkKJTJxNAwK3O9i3qTH+8nRSPX1OBH/M3Xma3lKm2q1Z5vItt6VwNCaFSr4u9vKYC7Hmd0VzxTYu9XoCz2SN7mUQD0p6Vf2S0a1IJOywDVhk/PDOavGyAydgu0aI6ytbi1TUESE6jA4xhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tavip.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CQc7cF5f; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tavip.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2240a96112fso74872685ad.2
-        for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 13:16:43 -0700 (PDT)
+	s=arc-20240116; t=1743194123; c=relaxed/simple;
+	bh=PM6Z62MfR02vKSpMy6sfN/nCyMUKzAJ/XHGNJ035cqc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JFVYHyZnki0gkmkP9XjSObpbXbYfFGFT7a49mwsbTX7whGKVon1hISH9/42DGU6NDDKmGS8t5Z7cqQ/F4VYrVuoct5yRqOPDj0V/WIzDzaBExp9zFblMjlMtCrPbc6NbYZ++bSXM+EPatJfATZXywTiXaDh2GE2XEbFq4WipMcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KGH5Vrf7; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-223fb0f619dso54994265ad.1
+        for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 13:35:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743193003; x=1743797803; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WR5OMrXI1sfyljYWNGyiK+AjZvbJe/Y00ticFJRI05Y=;
-        b=CQc7cF5fRIg/cVLPM418s4IZ7czghI291HBtM24bg9tG8Pr8jlmUw8bxvXISz5sQ8l
-         3YG7qv59Fj8bVLawjK83iYRQLFH79nng9SoarHQlQLMw/VLrYJOAR2cqbSQLAKWrwHek
-         fWbseJNwM/sDM9zgmjV6qEhY3lE+ZJdf5Xnc4RW771Sy34QsA2iflM6tfxXh8vsF4PQ+
-         q5XS+2tJWF4OfuyAhipJbMIuM5ob98wzM37yDuMst3PWDvG2mUiXRDuHjKY0vkQmppn7
-         oKQATCg14Sk0Cm3JchC8ivGhF4dVbiDpLq38yrMTAIbq6aiVNWi1hkWIpreZmPIlv1R8
-         IeAA==
+        d=gmail.com; s=20230601; t=1743194121; x=1743798921; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LiVDZDo11D1xeuShSQAOHmn6RKHHazRapU0u1otqQ2M=;
+        b=KGH5Vrf75PxFXbdtjD4jz/vez9o7cNLyF37A5kw3Nd+LxTmYcTbqK4oyOKNkZicbdE
+         NlbQCJxkQsg7XH1HwQQUTiMrbcsUehoks5qB8t5WX8ZmtoooxhWmgQmRbomrtMyIh9Na
+         pcfnbtrTQuWdqhkvVqb4ry1MRQdt67TfPVVAbuzQV4Cep847LRYlNIAMWT/toYFcJvk8
+         XvGwZsZKxQNloXxJDK90pxPbnL+2uMc/hooXRNLGaFzbBkOgWLK85QkPBSW5nheTIOIn
+         6MrlMAbbkvibDpoL3JEgG2YdXdbZEBugKnoxdk3rp2ovfotIn5IaaMdAjvHolTUPjTxo
+         uVLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743193003; x=1743797803;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WR5OMrXI1sfyljYWNGyiK+AjZvbJe/Y00ticFJRI05Y=;
-        b=WyU8YLyqYwE8WKwtVTyLSeJ8TYDtxRDHf+/yDAs2PIhluMzk3ovbg1dZh0YT5ugcgD
-         L+iif57Xov2IVco2if48KNxRQJ9SULkWur/+Jp0CeMBRm55JabP/sPLdHemJgJtt20J2
-         3TfxvIlsWMz1lnbyVNy07r8bH2ZOeLTZSyZ9/uKC8SdnoqtVcjeHVOWcAzboY70r+03Z
-         CVYYfjfU0wU9Pdh0icdU43IsZ/wlU64gGrJ5icN5qDMmmNzRq8Cx/I77YTKpXy0r/+4W
-         fOYZ152mFLnSPm/r+IPRTZaA36THuJUAuYL82E1t4fIQ1FUllH9/4p40elfPHwNriRar
-         UGrw==
-X-Forwarded-Encrypted: i=1; AJvYcCVk9g+5s2/XjOSlpl3y90cwrooGhw76oSFh+Wcwt6kdSpV1X1ajnejN9nhSl4+Q5mF9iHoBhpQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4yml3QR/ApY87yAaHUOBkhmo/SQm6Ih/q95nnSZulvNB2kZ0c
-	TxHPbQN9dYci2A+6U5LArpKet8VgrRc9bI3OOJQHKmiReUH1e9CEnQdr/Zwo3G3yitLe2crHjQ=
-	=
-X-Google-Smtp-Source: AGHT+IF/gmMBHEO5lFnJQmBUNEDIBqTm9oF7h64VgCkip8w3eGBGSWXUZKzfHz2IR6MvtfrZnBYeGVCPoQ==
-X-Received: from pfbit9.prod.google.com ([2002:a05:6a00:4589:b0:736:5b36:db8f])
- (user=tavip job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:1309:b0:736:546c:eb69
- with SMTP id d2e1a72fcca58-7398036fb06mr799581b3a.9.1743193002576; Fri, 28
- Mar 2025 13:16:42 -0700 (PDT)
-Date: Fri, 28 Mar 2025 13:16:34 -0700
-In-Reply-To: <20250328201634.3876474-1-tavip@google.com>
+        d=1e100.net; s=20230601; t=1743194121; x=1743798921;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LiVDZDo11D1xeuShSQAOHmn6RKHHazRapU0u1otqQ2M=;
+        b=waLMskhXKdKc/RbUWv2CG5YeNipEy2Nd8KBscIWt/FEiC9miZ6zPfl8VBuv7Cfdvbf
+         WuRa4K5ODrgWB9zXpLfCzLxIyniv6+jGRn6dcHj3kWFO0m6GTwkaf51SFdHSII03SXn2
+         1gaGkGuMRZ4/GxjMWkYslIPCkFGtGJpJkrAGe5eHvT53wN7LFPfkeLzh+rj1lhDvR2Zn
+         SewTbUr2Bg5Z1OC3B44HRAAvca5zh+p/fF/O3yF8k/brnh+4Yxklv8s9nKYvLevBrKK7
+         HR0lkiP+1M2ii8ysMNx/OqmqDmosifB3CWNuP8ltiReJKLqyHJxdIx6Jb6VZO2qdHU5A
+         dPRQ==
+X-Gm-Message-State: AOJu0Yy4UzZnYDmFpNjJIpK/P2dkR/N14UeKZ9YjurEK2rVSA+Wzw8/w
+	Ju2OrpEfNfjaNfPwmGXOnIh4lKqRI4NoJ6L7aAqMDfjyLuF6vgo3NQ4MUcCe
+X-Gm-Gg: ASbGncsR3nQhRKiJBXkiBkb9wxbhRxoXwCQ4WNS2bob2vbubxg7ugHXInMYUb4T1mpO
+	L2TPglZ9YRUmK0nMkiMT/FmV9RqvBS9OCJgs5AtQggLrNoxTLZ/xZtP86Pv145QvfA3MF2bwIL1
+	EcevlTjx2MbWAK4MU3xmm9kCzCfMTWt9wDI7CwoXCx8jbVXMsEV9V2+skWXQppapVlQPhI3sMWZ
+	YErzqwJiF01AtjmOz7uffn1GsRXqm7tq9ZzDH6ltqKS6I6OKIXqg19G0CwVp3AWGLFs3T9s08ej
+	gXP8J/kUYZRphLky1JI+7LFljfu+m9jmzRb+DH+cUHE9eYVF
+X-Google-Smtp-Source: AGHT+IHFBID8oywZPQcQ5PtHRQ0ZkeaJ/mKCPQhAPek6Yltf/E2lmdoBzvxOPilf87A+/1Zjm/vhfw==
+X-Received: by 2002:a17:903:94e:b0:224:1c41:a4c0 with SMTP id d9443c01a7336-2292f944b84mr10498525ad.9.1743194121316;
+        Fri, 28 Mar 2025 13:35:21 -0700 (PDT)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2291f1df01csm22698305ad.178.2025.03.28.13.35.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Mar 2025 13:35:20 -0700 (PDT)
+Date: Fri, 28 Mar 2025 13:35:19 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Victor Nogueira <victor@mojatatu.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
+	edumazet@google.com, gerrard.tai@starlabs.sg,
+	Pedro Tammela <pctammela@mojatatu.com>
+Subject: Re: [Patch net 08/12] selftests/tc-testing: Add a test case for
+ CODEL with HTB parent
+Message-ID: <Z+cIB3YrShvCtQry@pop-os.localdomain>
+References: <20250320232211.485785-1-xiyou.wangcong@gmail.com>
+ <20250320232539.486091-1-xiyou.wangcong@gmail.com>
+ <20250320232539.486091-8-xiyou.wangcong@gmail.com>
+ <3a60ae0c-0b5f-44e9-8063-29d0d290699c@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250328201634.3876474-1-tavip@google.com>
-X-Mailer: git-send-email 2.49.0.472.ge94155a9ec-goog
-Message-ID: <20250328201634.3876474-4-tavip@google.com>
-Subject: [PATCH net 3/3] selftests/tc-testing: sfq: check that a derived limit
- of 1 is rejected
-From: Octavian Purdila <tavip@google.com>
-To: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, netdev@vger.kernel.org, 
-	Octavian Purdila <tavip@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3a60ae0c-0b5f-44e9-8063-29d0d290699c@mojatatu.com>
 
-Because the limit is updated indirectly when other parameters are
-updated, there are cases where even though the user requests a limit
-of 2 it can actually be set to 1.
+On Sun, Mar 23, 2025 at 07:48:39PM -0300, Victor Nogueira wrote:
+> On 20/03/2025 20:25, Cong Wang wrote:
+> > Add a test case for CODEL with HTB parent to verify packet drop
+> > behavior when the queue becomes empty. This helps ensure proper
+> > notification mechanisms between qdiscs.
+> > 
+> > Note this is best-effort, it is hard to play with those parameters
+> > perfectly to always trigger ->qlen_notify().
+> > 
+> > Cc: Pedro Tammela <pctammela@mojatatu.com>
+> > Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
+> 
+> Cong, can you double check this test?
+> I ran all of your other tests and they all succeeded, however
+> this one specifically is always failing:
 
-Add the following test cases to check that the kernel rejects them:
-- limit 2 depth 1 flows 1
-- limit 2 depth 1 divisor 1
+Interesting, I thought I completely fixed this before posting after several
+rounds of playing with the parameters. I will double check it, maybe it
+just becomes less reproducible.
 
-Signed-off-by: Octavian Purdila <tavip@google.com>
----
- .../tc-testing/tc-tests/qdiscs/sfq.json       | 36 +++++++++++++++++++
- 1 file changed, 36 insertions(+)
+codel is indeed the hardest one, since fq_codel has a mem limit we can
+leverage. (In the worst case, we can drop the codel test case.)
 
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/sfq.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/sfq.json
-index 50e8d72781cb..28c6ce6da7db 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/sfq.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/sfq.json
-@@ -228,5 +228,41 @@
-         "matchCount": "0",
-         "teardown": [
-         ]
-+    },
-+    {
-+        "id": "7f8f",
-+        "name": "Check that a derived limit of 1 is rejected (limit 2 depth 1 flows 1)",
-+        "category": [
-+            "qdisc",
-+            "sfq"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [],
-+        "cmdUnderTest": "$TC qdisc add dev $DUMMY handle 1: root sfq limit 2 depth 1 flows 1",
-+        "expExitCode": "2",
-+        "verifyCmd": "$TC qdisc show dev $DUMMY",
-+        "matchPattern": "sfq",
-+        "matchCount": "0",
-+        "teardown": []
-+    },
-+    {
-+        "id": "5168",
-+        "name": "Check that a derived limit of 1 is rejected (limit 2 depth 1 divisor 1)",
-+        "category": [
-+            "qdisc",
-+            "sfq"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [],
-+        "cmdUnderTest": "$TC qdisc add dev $DUMMY handle 1: root sfq limit 2 depth 1 divisor 1",
-+        "expExitCode": "2",
-+        "verifyCmd": "$TC qdisc show dev $DUMMY",
-+        "matchPattern": "sfq",
-+        "matchCount": "0",
-+        "teardown": []
-     }
- ]
--- 
-2.49.0.472.ge94155a9ec-goog
-
+Thanks!
 
