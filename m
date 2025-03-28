@@ -1,166 +1,383 @@
-Return-Path: <netdev+bounces-178156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F5ECA75083
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 19:45:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38051A750C9
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 20:31:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3967B3B1724
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 18:45:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1BABD188DA6C
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 19:31:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43A7F1DF240;
-	Fri, 28 Mar 2025 18:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D7D41DF24F;
+	Fri, 28 Mar 2025 19:31:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jT2Cepiq"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Qg/RgZsH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 799691531C5;
-	Fri, 28 Mar 2025 18:45:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC39B126C02;
+	Fri, 28 Mar 2025 19:30:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743187527; cv=none; b=uMRUsIxsW9g7CU+dTE0Bhf8VrOSz3IL3nrYr98qW+E85MAh167ekxVLMZXwYqpmjq0zKwCj072JqT/zKUbD/nymJhk6OhebcYRgMmTjQSvjj+20SgT7FbbzdNdL6IeG6+zK3CRxXkEH+vFQ16ZqvqszZdhzN8U3AgkmqpRlzB0A=
+	t=1743190264; cv=none; b=CofCZ9h+DTkStQKK3tn5BQlu5IyMZbx8EYoqkmbJZwkP+Xptp9LFWQjQ5SrG3E2srLKtK9w83RugCwvIctjfl+3j/C1BDfzAwsy/HcEBAuJ/NJAE0dWWPy6fWwxOjuNCfengN8YT+udyRqaaSa2vO0r87iIynAkk5fJoHwYzyNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743187527; c=relaxed/simple;
-	bh=dmw/5m7IZXzUnE3b4KRIPY1KfLGFwtYZiQxylVjG4gI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CmEIOrTOnzGn8B1DUF1sJVNDJUlL7A5EVSH/IGzo8CGBWNkaIqDTRA5Tl6oe4xHZ1pbsz/GN83gVZ2VlOI7D/8H40WVTlJgi4DvsxLsqxFtzH68WsNcm2dn5WoaAkxZ6lNBXWzQXMYF1K2Zz0rZWEnoaz9PQSbmFqMd00gLbnKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jT2Cepiq; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-43948021a45so24744405e9.1;
-        Fri, 28 Mar 2025 11:45:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743187524; x=1743792324; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pv4obcckIMgIj8vAEDgrTtvOBA95aNakLopowEYoBPk=;
-        b=jT2CepiqK46pYLQTIPXyn9YDLkqxfWjeDgix3I4ODXQKL0zV1TkSCFqWss7gW2Dtfi
-         qPgzOhib7Cl3AIhpp/CT3rVW8X7UrEi4Zj/O9SNMixJ91NqxrTMfEcOH0VNBZtlwET87
-         K0vH1oCWL+dA7TH446+T8j+haaNSA0xv/quE2YyR5hI/+fXpLve9SMtafYakmmjHBS8M
-         7vsXcruVW8RAoaMiP+B6fMPtxcjziZtWTv+vr5hxhQUSk3A/qS5ykKOG0Kuu6KTf2oEz
-         MntEsyU6s27o3EeX4+AIy1lhfvFXQr6GvT0hD4IcvPjTCAx2vP54ZeCh5o+czQmbjoi/
-         6LiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743187524; x=1743792324;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pv4obcckIMgIj8vAEDgrTtvOBA95aNakLopowEYoBPk=;
-        b=dMekMwyfVsnBHR7/DhOFbn19Kh7bA5TYj1Ag2qxIjptCMI8nekmU4pY8wBJIQwlGYd
-         ZXRSb/ACpiiJE9iIhC/+tAwstXY0THi8KnKn3mZWKGuLt+KV4PJuZICqHE9xUf4zkpDY
-         WkP+6+0OJ/eJ/yol5qgBHyaDrtod/fpyUN7Bkgcx+fHeSgJYYe4K6vefzHX2H5BiDZJ5
-         QdFCMYyEgEAb3Iaa/YzGQ1qFitBrcCVlM6NwSeU5KKIfvDJy+s8Gqfb7qEUhH48nAttF
-         zQutOZKaMoMlYgmmVgxoNdxV98SIuo6ysjh0Krtdo0jXjoAaTS5bMiLRivz/H3RKS8Cw
-         jwmw==
-X-Forwarded-Encrypted: i=1; AJvYcCV2GTZbBdQhfLekMbLk0RZ9x/ye1YOnhS0JoWZTokdUGu0sJG7oCObBEMYzfDKuozZIeQg=@vger.kernel.org, AJvYcCX7aK1LJC/7apLxBmQORSyXYb/RMMN7oM1kxmx9c5d2ue+7SDPdEe39dVWTQPnoWvcrjiHB8nyN@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNB/P1o+9uzhayWtOuoSOA9Zwlcmbq9mfZk4EOrA2kpWRKHoCe
-	8xpmIaWpLy4H620YjdRaFy/WOAoGjwhw14mfbXvZdpx1+usezumyTVBAvhVzQXZ2RHBBGRSMg/S
-	/8cFmdD1QGUEvO5TbEiyq0tZ/8YA=
-X-Gm-Gg: ASbGnctqZ3+vufNKyGYpraYuTzohWA2aC4mDrDwjZobUnFRlCBIyXX9bNXd9wCW4Zk5
-	nzV1JXTDBZTSpl9QHLGTWyiC/0Gmc8pPUh6/h/5fndc5Ohhl6KTtNLXJLKFhfFEKzhLKgcl3QKp
-	h/NOyl6UVppEy4uqfFbOQjhHtLBJg1ueYUepCwNSwXHyeS/cEAC0wY
-X-Google-Smtp-Source: AGHT+IFyGnmq01FY0vYdjQzcrW7fmUD0RP5pkxyNqhytNeXUEYYAG5ibHD6g8NurkU/lZ8xYIaSoBZ/H/rlBD1Fvwvc=
-X-Received: by 2002:a05:600c:5108:b0:43c:f629:66f3 with SMTP id
- 5b1f17b1804b1-43db624be12mr4594605e9.18.1743187523423; Fri, 28 Mar 2025
- 11:45:23 -0700 (PDT)
+	s=arc-20240116; t=1743190264; c=relaxed/simple;
+	bh=5Vyke7PQtp35YSTCuyTIpzWCfCa5Ve46bWr/HsMvFQA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BHdHjpObZ3zJQJbcMKtOlQa4wNH9EouYsxBZtjC0j4UjR2d8UROPoIh4F+HFLc+66lhZLbpDx/CfO8vzbGcbwPpSFAV0hlfT8Zo3M9VYJ/CqGnx5OTTYWvvvPU8VJcECDEfWhe5pkUTvu6L8gmypW9C9l709SdcDERyBEGo/em4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Qg/RgZsH; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=TFduLiTfomk9uJG1Kj9Vc20+YiO1goOrnmEnJTn6ZxQ=; b=Qg/RgZsHJ6n5TSHc9kOVCiY3q+
+	jwDA83rcvHJ4eU0fyc6UKImuj4/1gn8A7Zj8trcIhavWYd/tLlc6Jwza6elEtnBv5D6hTLcXM6fNG
+	SH0IBUg5HRH7abQVfr6lIEul5kl1EzkzXwVfUVZ+h+O1ZB4wWRw0BT9lxJCLAQbC/m4w=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tyFPi-007O5S-8p; Fri, 28 Mar 2025 20:30:46 +0100
+Date: Fri, 28 Mar 2025 20:30:46 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 4/4] net: mtip: The L2 switch driver for imx287
+Message-ID: <3648e94f-93e6-4fb0-a432-f834fe755ee3@lunn.ch>
+References: <20250328133544.4149716-1-lukma@denx.de>
+ <20250328133544.4149716-5-lukma@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250327185528.1740787-1-song@kernel.org> <CAEf4BzagkTArcqnvqgu7kNq31QFsATM36OGPLs4-GFOo0TDxsg@mail.gmail.com>
- <8536CB49-0091-4019-839A-B460847995C2@fb.com>
-In-Reply-To: <8536CB49-0091-4019-839A-B460847995C2@fb.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Fri, 28 Mar 2025 11:45:11 -0700
-X-Gm-Features: AQ5f1Jqy_AJHDe8puoTrgHj1M2MYjACC1XVuYIZoez7xDk7dMtJXSEhEcUypv9A
-Message-ID: <CAADnVQ+dbiBVOuPXY6N8EjQh=7wtQt-mCXP3Ujd1xFfD5rLbew@mail.gmail.com>
-Subject: Re: [PATCH bpf-next] selftests/bpf: Fix tests after change in struct file
-To: Song Liu <songliubraving@meta.com>
-Cc: Andrii Nakryiko <andrii.nakryiko@gmail.com>, Song Liu <song@kernel.org>, 
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"ast@kernel.org" <ast@kernel.org>, "daniel@iogearbox.net" <daniel@iogearbox.net>, 
-	"andrii@kernel.org" <andrii@kernel.org>, Kernel Team <kernel-team@meta.com>, 
-	"kuba@kernel.org" <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250328133544.4149716-5-lukma@denx.de>
 
-On Fri, Mar 28, 2025 at 10:57=E2=80=AFAM Song Liu <songliubraving@meta.com>=
- wrote:
->
->
->
-> > On Mar 28, 2025, at 10:30=E2=80=AFAM, Andrii Nakryiko <andrii.nakryiko@=
-gmail.com> wrote:
-> >
-> > On Thu, Mar 27, 2025 at 11:55=E2=80=AFAM Song Liu <song@kernel.org> wro=
-te:
-> >>
-> >> Change in struct file [1] moves f_ref to the 3rd cache line. This make=
-s
-> >> deferencing file pointer as a 8-byte variable invalid, because
-> >> btf_struct_walk() will walk into f_lock, which is 4-byte long.
-> >>
-> >> Fix the selftests to deference the file pointer as a 4-byte variable.
-> >>
-> >> [1] commit e249056c91a2 ("fs: place f_ref to 3rd cache line in struct
-> >>                          file to resolve false sharing")
-> >> Reported-by: Jakub Kicinski <kuba@kernel.org>
-> >> Signed-off-by: Song Liu <song@kernel.org>
-> >> ---
-> >> tools/testing/selftests/bpf/progs/test_module_attach.c    | 2 +-
-> >> tools/testing/selftests/bpf/progs/test_subprogs_extable.c | 6 +++---
-> >> 2 files changed, 4 insertions(+), 4 deletions(-)
-> >>
-> >> diff --git a/tools/testing/selftests/bpf/progs/test_module_attach.c b/=
-tools/testing/selftests/bpf/progs/test_module_attach.c
-> >> index fb07f5773888..7f3c233943b3 100644
-> >> --- a/tools/testing/selftests/bpf/progs/test_module_attach.c
-> >> +++ b/tools/testing/selftests/bpf/progs/test_module_attach.c
-> >> @@ -117,7 +117,7 @@ int BPF_PROG(handle_fexit_ret, int arg, struct fil=
-e *ret)
-> >>
-> >>        bpf_probe_read_kernel(&buf, 8, ret);
-> >>        bpf_probe_read_kernel(&buf, 8, (char *)ret + 256);
-> >> -       *(volatile long long *)ret;
-> >> +       *(volatile int *)ret;
-> >
-> > we already have `*(volatile int *)&ret->f_mode;` below, do we really
-> > need this int casting case?.. Maybe instead of guessing the size of
-> > file's first field, let's just remove `*(volatile long long *)ret;`
-> > altogether?
->
-> I was assuming the original test covers two cases:
->   1) deref ret itself;
->   2) deref a member of ret (ret->f_mode);
->
-> Therefore, instead of doing something like
->
->    *(volatile long long *)&ret->f_ref;  /* first member of file */
->
-> I got current version.
->
-> If we don't need the first case, we sure can remove it.
+> +static bool bridge_offload;
+> +module_param(bridge_offload, bool, 0644); /* Allow setting by root on boot */
+> +MODULE_PARM_DESC(bridge_offload, "L2 switch offload mode enable:1, disable:0");
 
-The idea of the patch was to test the load from the address
-returned from bpf_testmod_return_ptr() twice.
-Once as that exact value and another with some offset,
-since JIT processing logic is different whether insn->off is zero.
-Doing &ret->f_lock /* first member of file */
-sort-of works, but the comment will be stale eventually.
-I think the current fix is the best:
--       *(volatile long long *)ret;
-+       *(volatile int *)ret;
+Please drop. module parameters are not liked.
 
-This way the load will have guaranteed insn->off =3D=3D 0,
-and when file layout changes we will notice the breakage right away.
-Like happened this time.
+In Linux, ports of a switch always starting in isolated mode, and
+userspace needs to add them to the same bridge.
 
-So I'm thinking of applying this patch as-is when bpf-next is ready.
+> +
+> +static netdev_tx_t mtip_start_xmit(struct sk_buff *skb,
+> +				   struct net_device *dev);
+> +static void mtip_switch_tx(struct net_device *dev);
+> +static int mtip_switch_rx(struct net_device *dev, int budget, int *port);
+> +static void mtip_set_multicast_list(struct net_device *dev);
+> +static void mtip_switch_restart(struct net_device *dev, int duplex0,
+> +				int duplex1);
+
+Forwards references are not like. Put the functions in the correct
+order so they are not needed.
+
+> +/* Calculate Galois Field Arithmetic CRC for Polynom x^8+x^2+x+1.
+> + * It omits the final shift in of 8 zeroes a "normal" CRC would do
+> + * (getting the remainder).
+> + *
+> + *  Examples (hexadecimal values):<br>
+> + *   10-11-12-13-14-15  => CRC=0xc2
+> + *   10-11-cc-dd-ee-00  => CRC=0xe6
+> + *
+> + *   param: pmacaddress
+> + *          A 6-byte array with the MAC address.
+> + *          The first byte is the first byte transmitted
+> + *   return The 8-bit CRC in bits 7:0
+> + */
+> +static int crc8_calc(unsigned char *pmacaddress)
+> +{
+> +	/* byte index */
+> +	int byt;
+> +	/* bit index */
+> +	int bit;
+> +	int inval;
+> +	int crc;
+
+Reverse Christmas tree. Please look through the whole driver and fix
+it up.
+
+> +/* updates MAC address lookup table with a static entry
+> + * Searches if the MAC address is already there in the block and replaces
+> + * the older entry with new one. If MAC address is not there then puts a
+> + * new entry in the first empty slot available in the block
+> + *
+> + * mac_addr Pointer to the array containing MAC address to
+> + *          be put as static entry
+> + * port     Port bitmask numbers to be added in static entry,
+> + *          valid values are 1-7
+> + * priority The priority for the static entry in table
+> + *
+> + * return 0 for a successful update else -1  when no slot available
+
+It would be nice to turn this into proper kerneldoc. It is not too far
+away at the moment.
+
+Also, return a proper error code not -1. ENOSPC?
+
+> +static int mtip_update_atable_dynamic1(unsigned long write_lo,
+> +				       unsigned long write_hi, int block_index,
+> +				       unsigned int port,
+> +				       unsigned int curr_time,
+> +				       struct switch_enet_private *fep)
+
+It would be good to document the return value, because it is not the
+usual 0 success or negative error code.
+
+> +static const struct net_device_ops mtip_netdev_ops;
+
+more forward declarations.
+
+> +struct switch_enet_private *mtip_netdev_get_priv(const struct net_device *ndev)
+> +{
+> +	if (ndev->netdev_ops == &mtip_netdev_ops)
+> +		return netdev_priv(ndev);
+> +
+> +	return NULL;
+> +}
+
+I _think_ the return value is not actually used. So maybe 0 or
+-ENODEV?
+
+> +static int esw_mac_addr_static(struct switch_enet_private *fep)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < SWITCH_EPORT_NUMBER; i++) {
+> +		if (is_valid_ether_addr(fep->ndev[i]->dev_addr)) {
+
+Is that possible? This is the interfaces own MAC address? If it is not
+valid, the probe should of failed.
+
+> +			mtip_update_atable_static((unsigned char *)
+> +						  fep->ndev[i]->dev_addr,
+> +						  7, 7, fep);
+> +		} else {
+> +			dev_err(&fep->pdev->dev,
+> +				"Can not add mac address %pM to switch!\n",
+> +				fep->ndev[i]->dev_addr);
+> +			return -EFAULT;
+> +		}
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static void mtip_print_link_status(struct phy_device *phydev)
+> +{
+> +	if (phydev->link)
+> +		netdev_info(phydev->attached_dev,
+> +			    "Link is Up - %s/%s - flow control %s\n",
+> +			    phy_speed_to_str(phydev->speed),
+> +			    phy_duplex_to_str(phydev->duplex),
+> +			    phydev->pause ? "rx/tx" : "off");
+> +	else
+> +		netdev_info(phydev->attached_dev, "Link is Down\n");
+> +}
+
+phy_print_status()
+
+> +static void mtip_adjust_link(struct net_device *dev)
+> +{
+> +	struct mtip_ndev_priv *priv = netdev_priv(dev);
+> +	struct switch_enet_private *fep = priv->fep;
+> +	struct phy_device *phy_dev;
+> +	int status_change = 0, idx;
+> +	unsigned long flags;
+> +
+> +	spin_lock_irqsave(&fep->hw_lock, flags);
+> +
+> +	idx = priv->portnum - 1;
+> +	phy_dev = fep->phy_dev[idx];
+> +
+> +	/* Prevent a state halted on mii error */
+> +	if (fep->mii_timeout && phy_dev->state == PHY_HALTED) {
+> +		phy_dev->state = PHY_UP;
+> +		goto spin_unlock;
+> +	}
+
+A MAC driver should not be playing around with the internal state of
+phylib.
+
+> +static int mtip_mii_probe(struct net_device *dev)
+> +{
+> +	struct mtip_ndev_priv *priv = netdev_priv(dev);
+> +	struct switch_enet_private *fep = priv->fep;
+> +	int port_idx = priv->portnum - 1;
+> +	struct phy_device *phy_dev = NULL;
+> +
+> +	if (fep->phy_np[port_idx]) {
+> +		phy_dev = of_phy_connect(dev, fep->phy_np[port_idx],
+> +					 &mtip_adjust_link, 0,
+> +					 fep->phy_interface[port_idx]);
+> +		if (!phy_dev) {
+> +			netdev_err(dev, "Unable to connect to phy\n");
+> +			return -ENODEV;
+> +		}
+> +	}
+> +
+> +	phy_set_max_speed(phy_dev, 100);
+> +	fep->phy_dev[port_idx] = phy_dev;
+> +	fep->link[port_idx] = 0;
+> +	fep->full_duplex[port_idx] = 0;
+> +
+> +	dev_info(&dev->dev,
+> +		 "MTIP PHY driver [%s] (mii_bus:phy_addr=%s, irq=%d)\n",
+> +		 fep->phy_dev[port_idx]->drv->name,
+> +		 phydev_name(fep->phy_dev[port_idx]),
+> +		 fep->phy_dev[port_idx]->irq);
+
+phylib already prints something like that.
+
+> +static int mtip_mdiobus_reset(struct mii_bus *bus)
+> +{
+> +	if (!bus || !bus->reset_gpiod) {
+> +		dev_err(&bus->dev, "Reset GPIO pin not provided!\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	gpiod_set_value_cansleep(bus->reset_gpiod, 1);
+> +
+> +	/* Extra time to allow:
+> +	 * 1. GPIO RESET pin go high to prevent situation where its value is
+> +	 *    "LOW" as it is NOT configured.
+> +	 * 2. The ENET CLK to stabilize before GPIO RESET is asserted
+> +	 */
+> +	usleep_range(200, 300);
+> +
+> +	gpiod_set_value_cansleep(bus->reset_gpiod, 0);
+> +	usleep_range(bus->reset_delay_us, bus->reset_delay_us + 1000);
+> +	gpiod_set_value_cansleep(bus->reset_gpiod, 1);
+> +
+> +	if (bus->reset_post_delay_us > 0)
+> +		usleep_range(bus->reset_post_delay_us,
+> +			     bus->reset_post_delay_us + 1000);
+> +
+> +	return 0;
+> +}
+
+What is wrong with the core code __mdiobus_register() which does the
+bus reset.
+
+> +static void mtip_get_drvinfo(struct net_device *dev,
+> +			     struct ethtool_drvinfo *info)
+> +{
+> +	struct mtip_ndev_priv *priv = netdev_priv(dev);
+> +	struct switch_enet_private *fep = priv->fep;
+> +
+> +	strscpy(info->driver, fep->pdev->dev.driver->name,
+> +		sizeof(info->driver));
+> +	strscpy(info->version, VERSION, sizeof(info->version));
+
+Leave this empty, so you get the git hash of the kernel.
+
+> +static void mtip_ndev_setup(struct net_device *dev)
+> +{
+> +	struct mtip_ndev_priv *priv = netdev_priv(dev);
+> +
+> +	ether_setup(dev);
+
+That is pretty unusual
+
+> +	dev->ethtool_ops = &mtip_ethtool_ops;
+> +	dev->netdev_ops = &mtip_netdev_ops;
+> +
+> +	memset(priv, 0, sizeof(struct mtip_ndev_priv));
+
+priv should already be zero....
+
+> +static int mtip_ndev_init(struct switch_enet_private *fep)
+> +{
+> +	struct mtip_ndev_priv *priv;
+> +	int i, ret = 0;
+> +
+> +	for (i = 0; i < SWITCH_EPORT_NUMBER; i++) {
+> +		fep->ndev[i] = alloc_netdev(sizeof(struct mtip_ndev_priv),
+> +					    fep->ndev_name[i], NET_NAME_USER,
+> +					    mtip_ndev_setup);
+
+This explains the ether_setup(). It would be more normal to pass
+ether_setup() here, and set dev->ethtool_ops and dev->netdev_ops here.
+
+> +		if (!fep->ndev[i]) {
+> +			ret = -1;
+
+-ENOMEM?
+
+> +			break;
+> +		}
+> +
+> +		priv = netdev_priv(fep->ndev[i]);
+> +		priv->fep = fep;
+> +		priv->portnum = i + 1;
+> +		fep->ndev[i]->irq = fep->irq;
+> +
+> +		ret = mtip_setup_mac(fep->ndev[i]);
+> +		if (ret) {
+> +			dev_err(&fep->ndev[i]->dev,
+> +				"%s: ndev %s MAC setup err: %d\n",
+> +				__func__, fep->ndev[i]->name, ret);
+> +			break;
+> +		}
+> +
+> +		ret = register_netdev(fep->ndev[i]);
+> +		if (ret) {
+> +			dev_err(&fep->ndev[i]->dev,
+> +				"%s: ndev %s register err: %d\n", __func__,
+> +				fep->ndev[i]->name, ret);
+> +			break;
+> +		}
+> +		dev_info(&fep->ndev[i]->dev, "%s: MTIP eth L2 switch %pM\n",
+> +			 fep->ndev[i]->name, fep->ndev[i]->dev_addr);
+
+I would drop this. A driver is normally silent unless things go wrong.
+
+> +	}
+> +
+> +	if (ret)
+> +		mtip_ndev_cleanup(fep);
+> +
+> +	return 0;
+
+return ret?
+
+> +static int mtip_ndev_port_link(struct net_device *ndev,
+> +			       struct net_device *br_ndev)
+> +{
+> +	struct mtip_ndev_priv *priv = netdev_priv(ndev);
+> +	struct switch_enet_private *fep = priv->fep;
+> +
+> +	dev_dbg(&ndev->dev, "%s: ndev: %s br: %s fep: 0x%x\n",
+> +		__func__, ndev->name,  br_ndev->name, (unsigned int)fep);
+> +
+> +	/* Check if MTIP switch is already enabled */
+> +	if (!fep->br_offload) {
+> +		if (!priv->master_dev)
+> +			priv->master_dev = br_ndev;
+
+It needs to be a little bit more complex than that, because the two
+ports could be assigned to two different bridges. You should only
+enable hardware bridging if they are a member of the same bridge.
+
+	Andrew
 
