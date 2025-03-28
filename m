@@ -1,106 +1,79 @@
-Return-Path: <netdev+bounces-178052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AA78A7424D
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 03:31:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A604A74247
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 03:29:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21E9B3B64F4
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 02:30:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 345227A796E
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 02:28:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 782CF20127E;
-	Fri, 28 Mar 2025 02:30:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8293E20DD64;
+	Fri, 28 Mar 2025 02:29:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="hPO/7+Kp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kvDVeIK6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 930C11DD0F6;
-	Fri, 28 Mar 2025 02:30:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E5BA13D89D;
+	Fri, 28 Mar 2025 02:29:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743129048; cv=none; b=JtGtfBeNTxk0noLYAwnVl4HvUK+QF8TbHTQQ6afVW8htIJTrhHZ9O/8OCVcYOa1qcZwbtZIEopwGXVgiQCOy2Z6tCQIH+Y3Q1YSnWHmtl1g2KQnfehHMceFBTJhE9Tn9FHpDRez3hZD5avbIEre3iU3Aec7gqwrPlk4dxA0ZP2M=
+	t=1743128991; cv=none; b=iuWBgGBmzSmFRto4pFDFAupWv8boV8sVIRYWSnIGrwttiGOzhjcbMW5ovYEuxv0DVcJASwXawA7fO6szUj2qU+QHVXkz/BoR3sqrUvIFY7sXzd9q9lZ43wR+x4wvA+uiAc7gddc3CkKQ2Q/2s/9I9RKNMUg0DPgkaYYaU47l8Qs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743129048; c=relaxed/simple;
-	bh=SzZGuMa6O49QtkMtvYLA+m6rqUUJ8TnCsKUMX/PQ1fM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eBlzkHOCXHtCAL/N8dx5jddHf2hMVWYS/vLUlFO77NTHPV7rfZ0EGSHlZViznRaxxzb6MqreVT3cBku1BjucVMf7ZT0o526QCabaHjAQDXsAV7lfdyZm9h9BrgCEPzl+wt6+lFkBxaTPJzUgGlzRP05aKHe6in9aQT1fLALt9/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=hPO/7+Kp; arc=none smtp.client-ip=52.119.213.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1743129048; x=1774665048;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=xuyC9tRIyCHv9mGz4HeexQdHyItb9SPLN1QQARs1t9s=;
-  b=hPO/7+KpKCwgbGumbnN1OK2nX5nxks09cwF233ar8fQxHpFgk/+QT7IC
-   kwcC0reVLXZT5o8eGyIc0juuJsK8L99FnTl87pT835Dz1gBW4CA03yEBs
-   IW9uRgJL1U7CTd3TOwDDctkpgOtDucdikqMW7LLqq+42gmg5sFmbz087i
-   k=;
-X-IronPort-AV: E=Sophos;i="6.14,282,1736812800"; 
-   d="scan'208";a="708865167"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2025 02:30:43 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:45012]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.55.83:2525] with esmtp (Farcaster)
- id 5067ac5d-06a6-43df-9352-1023f4a4f172; Fri, 28 Mar 2025 02:30:41 +0000 (UTC)
-X-Farcaster-Flow-ID: 5067ac5d-06a6-43df-9352-1023f4a4f172
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 28 Mar 2025 02:30:40 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.187.171.35) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 28 Mar 2025 02:30:37 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <i.abramov@mt-integration.ru>
-CC: <alex.aring@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<horms@kernel.org>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-	<linux-kernel@vger.kernel.org>, <linux-wpan@vger.kernel.org>,
-	<lvc-project@linuxtesting.org>, <miquel.raynal@bootlin.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <stefan@datenfreihafen.org>,
-	<syzbot+e0bd4e4815a910c0daa8@syzkaller.appspotmail.com>
-Subject: Re: [PATCH 2/3] ieee802154: Avoid calling WARN_ON() on -ENOMEM in cfg802154_switch_netns()
-Date: Thu, 27 Mar 2025 19:30:02 -0700
-Message-ID: <20250328023029.14249-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250328010427.735657-3-i.abramov@mt-integration.ru>
-References: <20250328010427.735657-3-i.abramov@mt-integration.ru>
+	s=arc-20240116; t=1743128991; c=relaxed/simple;
+	bh=fZjBQXKbzvp4PvIfvKMm/X6dbHEzS9oe17yDlVOH6iY=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=FFZcFcEcfceRCZJiKXJFuMWYo08vTakR+GRlXvmG9DUDVsY4+p03BMMUqUnG27zX+uKUH1+CIA8nq+eBcE9w6SCy3l0mIJWtdx3js9ooTXb/MZZo306RKMoZHwCHlInxea/QqthMCEMSN0PjMG767pXdlCOxwhbbATLYURsjfD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kvDVeIK6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 266EFC4CEDD;
+	Fri, 28 Mar 2025 02:29:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743128991;
+	bh=fZjBQXKbzvp4PvIfvKMm/X6dbHEzS9oe17yDlVOH6iY=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=kvDVeIK6nLtvnp5Ugw1+EXAjaxyWd45Cpym1dUHUmBb8ZW7Y5xLJ8UHLgSzCppVeT
+	 PUnvuzlqlQAuBpuNuiYtwZ0Xh+aouYJ+2EDKXsuaLsWEiOofwVukEFB9OcNrfpLQyZ
+	 nN51UN76iH3iJ07d2IVEbwUiQthKkfYYAq9JmjaoXLkCQQIe0SK2zRNjJiKxrYdaBl
+	 RlK5oTG3OCPzsJwncv0vZZGHarSMo1cISdD6N0uLn48SMT0rIIRdsksID2bXoZdt5k
+	 FSPa/ljnkK1tT1f5+EUsoHcTxQ7re1jnVKVS1tKfjSVWu75ZuNSIi/yNgGaN5gBoNi
+	 BdwlprbM6fbkA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AEBFB380AAEB;
+	Fri, 28 Mar 2025 02:30:28 +0000 (UTC)
+Subject: Re: [GIT PULL] kunit next update for Linux 6.15-rc1
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <2bc29da1-5c77-45a4-ab75-7afc6f9210be@linuxfoundation.org>
+References: <2bc29da1-5c77-45a4-ab75-7afc6f9210be@linuxfoundation.org>
+X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
+X-PR-Tracked-Message-Id: <2bc29da1-5c77-45a4-ab75-7afc6f9210be@linuxfoundation.org>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/shuah/linux-kselftest tags/linux_kselftest-kunit-6.15-rc1
+X-PR-Tracked-Commit-Id: 2e0cf2b32f72b20b0db5cc665cd8465d0f257278
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: a10c7949adf94356e56d5c8878f6fc3f25bd0c15
+Message-Id: <174312902723.2321319.13357008960559029910.pr-tracker-bot@kernel.org>
+Date: Fri, 28 Mar 2025 02:30:27 +0000
+To: Shuah Khan <skhan@linuxfoundation.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Kees Cook <keescook@chromium.org>, "kuba@kernel.org" <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, shuah <shuah@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>, "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Networking <netdev@vger.kernel.org>, Linux Next Mailing List <linux-next@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWC003.ant.amazon.com (10.13.139.231) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Ivan Abramov <i.abramov@mt-integration.ru>
-Date: Fri, 28 Mar 2025 04:04:26 +0300
-> It's pointless to call WARN_ON() in case of an allocation failure in
-> dev_change_net_namespace() and device_rename(), since it only leads to
-> useless splats caused by deliberate fault injections, so avoid it.
-> 
-> Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
-> 
-> Fixes: 66e5c2672cd1 ("ieee802154: add netns support")
-> Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+The pull request you sent on Wed, 26 Mar 2025 21:05:06 -0600:
 
-I suggested using net_warn_ratelimited() so this tag is not needed.
-The patch itself looks good to me:
+> git://git.kernel.org/pub/scm/linux/kernel/git/shuah/linux-kselftest tags/linux_kselftest-kunit-6.15-rc1
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/a10c7949adf94356e56d5c8878f6fc3f25bd0c15
 
+Thank you!
 
-> Signed-off-by: Ivan Abramov <i.abramov@mt-integration.ru>
-
-Reported-by: syzbot+e0bd4e4815a910c0daa8@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/000000000000f4a1b7061f9421de@google.com/#t
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
