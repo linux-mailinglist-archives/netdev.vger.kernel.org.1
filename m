@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-178096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 936B2A7497D
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 12:49:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27D5CA74983
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 12:51:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEBCA16A442
-	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 11:49:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B46D13BF1D2
+	for <lists+netdev@lfdr.de>; Fri, 28 Mar 2025 11:51:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 250321DC9AB;
-	Fri, 28 Mar 2025 11:49:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EC8E2192FC;
+	Fri, 28 Mar 2025 11:51:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bWFq4ERN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NtpikPw6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE3A26289;
-	Fri, 28 Mar 2025 11:49:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B289213E7D
+	for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 11:51:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743162560; cv=none; b=VgrkpBb7WqrorkPZQH+JT6JQk8RsjDePZxvIYdfVz3OVdHmSjsSs1ChrwNp8Dk9uYPTIw/U03Z69w/H1pADWZrotwmt2qf1g5F3Kxtki3E82UgoUsPCxi1s2Yx0vs+m4I/lNUjMM4il6Bt0OdvIryDU1oJHTplmlJ1IHKMElk84=
+	t=1743162699; cv=none; b=G/yygmUG9vOugX34ECjyhP/UeDdmlyL1gWhu/SnBjXSU39+xYPYUdt3TQEpOWBHIPMkKC+c+KXwyon08koh8+AGUMR4xHzpRMyAR4GBH6Q2tBFUT8rVuP+AR8EZnM/hNS6dpvYlLWuwkjz9DH3IubLkHjv3EgOlTwGGP6iy4KTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743162560; c=relaxed/simple;
-	bh=h6ydLoR1ygT6038JNkdaPynVrS5SsAM4iLsC0fD3s54=;
+	s=arc-20240116; t=1743162699; c=relaxed/simple;
+	bh=MVH5EuCt00aXD/uHtRbXKmk5SpPnle7FziGF2MoENTs=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=E+zbNgpJCE8X6QPvs1nZxlqDb9MvwGxeVKgOBl60J1P1eBGmQ/D0OwEGUK//lqmMgBxr5UkyS5jzbnPV9Wb9rHfpU5ZQlt70pDdxfIW2CBezoobVH8p/zJQ1d2LVXbXl+MsWHzvW3AsCx9Df6uL185w9upD1zF58UjuiUF0jvVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bWFq4ERN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 206FAC4CEE4;
-	Fri, 28 Mar 2025 11:49:19 +0000 (UTC)
+	 MIME-Version:Content-Type; b=EpAZbIPpyQBOw2Obepf6NQU+Is3EjIQbHUWF6xdUjLYH/v2yZdBQIVpkWfD8zD2okAKVdvyAzaAVyxj7bEWD7LgMfYPcqncC4fUw72M/9gbiXGk2TzC+NgIY5fvi70COW6RtIMqxQqxG291iig/6iw1gctVDlHzAlWzua2MBaOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NtpikPw6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E5BFC4CEE4;
+	Fri, 28 Mar 2025 11:51:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743162559;
-	bh=h6ydLoR1ygT6038JNkdaPynVrS5SsAM4iLsC0fD3s54=;
+	s=k20201202; t=1743162698;
+	bh=MVH5EuCt00aXD/uHtRbXKmk5SpPnle7FziGF2MoENTs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bWFq4ERNXyE1g0r7zL3P6oqwYus2CfOtKHDKeQIqShIHk7imIxtVfMEnBDYlxG9hh
-	 Me/ObyC4e9KrM/4vMWW+x0LK0Q4oy8zFeZ8hD8OU91gi3ea7Ax9j8Fw4oTN+YW6w7p
-	 5n4rUtuwzte9qWoFovaiNRIeD1brIw/PO5ZosJfs/lMMGvvudQWJ5yz+IjJdc38V0v
-	 VkL1eOUqqdYBzFSX1CgAhWey7aT0xvNYmLC9U5PxJ5naDCvOZTWRs6IU4IXddjGlLt
-	 NH7ExgDqQnbIPFr21dEcfGQE5kcKonjrg9wM6vSxeEtOWczoupREo2rAzLiKP8nupv
-	 T86ZNI49XDPXA==
-Date: Fri, 28 Mar 2025 04:49:18 -0700
+	b=NtpikPw6W3SVPGsBrEvfqwRQoMM5k8Cv0Ug9ME0/6sxdJvPUmAfyxDU2Wpz5Lcbke
+	 IJIR3QhNy26Cwh+O6YYEP1TQQS7PL6vHXcpmLQB3+UzVXLo5SaXfWa8YK3Mxm61IWl
+	 634NyApAPO2aKUE5L/QLEpZpK+d/KFDFr/xTJ0U7mxPx3AQOxTAu1jPZkNC3SuCYZG
+	 bCyZJPeZ2kHmtsC8KHthDuHuhXounvxIkYMx+/TDORxtyREew/nsNz1pAOLE42Ypva
+	 MIlWM2VP8XEmP4syFtnRmR7G8MHSLfjaGIpUa7H5u5aOF7G1fnkNeKDZfCPyQuvY78
+	 UxfJhmx0fyyjA==
+Date: Fri, 28 Mar 2025 04:51:37 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Michael Klein <michael@fossekall.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next v5 0/4] net: phy: realtek: Add support for PHY LEDs
- on
-Message-ID: <20250328044918.1082fccb@kernel.org>
-In-Reply-To: <20250326212125.100218-1-michael@fossekall.de>
-References: <20250326212125.100218-1-michael@fossekall.de>
+To: Taehee Yoo <ap420073@gmail.com>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, netdev@vger.kernel.org,
+ jdamato@fastly.com, sdf@fomichev.me, almasrymina@google.com,
+ xuanzhuo@linux.alibaba.com
+Subject: Re: [PATCH net] net: fix use-after-free in the
+ netdev_nl_sock_priv_destroy()
+Message-ID: <20250328045137.0730fc6c@kernel.org>
+In-Reply-To: <20250328062237.3746875-1-ap420073@gmail.com>
+References: <20250328062237.3746875-1-ap420073@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,23 +62,18 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 26 Mar 2025 22:21:21 +0100 Michael Klein wrote:
-> Changes in V5:
-> - Split cleanup patch and improve code formatting
+On Fri, 28 Mar 2025 06:22:37 +0000 Taehee Yoo wrote:
+> In the netdev_nl_sock_priv_destroy(), an instance lock is acquired
+> before calling net_devmem_unbind_dmabuf(), then releasing an instance
+> lock(netdev_unlock(binding->dev)).
+> However, a binding is freed in the net_devmem_unbind_dmabuf().
+> So using a binding after net_devmem_unbind_dmabuf() occurs UAF.
+> To fix this UAF, it needs to use temporary variable.
+> 
+> Fixes: ba6f418fbf64 ("net: bubble up taking netdev instance lock to callers of net_devmem_unbind_dmabuf()")
+> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 
-## Form letter - net-next-closed
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 
-Linus already pulled net-next material v6.15 and therefore net-next is closed
-for new drivers, features, code refactoring and optimizations. We are currently
-accepting bug fixes only.
-
-Please repost when net-next reopens after Apr 7th.
-
-RFC patches sent for review only are obviously welcome at any time.
-
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
--- 
-pw-bot: defer
-pv-bot: closed
-
+Thanks!
 
