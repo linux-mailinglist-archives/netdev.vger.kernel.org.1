@@ -1,142 +1,339 @@
-Return-Path: <netdev+bounces-178211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B16A4A757EB
-	for <lists+netdev@lfdr.de>; Sat, 29 Mar 2025 22:50:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 273C1A757F8
+	for <lists+netdev@lfdr.de>; Sat, 29 Mar 2025 23:10:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0E431889AF3
-	for <lists+netdev@lfdr.de>; Sat, 29 Mar 2025 21:50:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C66EB16A62E
+	for <lists+netdev@lfdr.de>; Sat, 29 Mar 2025 22:10:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8623C1DF74E;
-	Sat, 29 Mar 2025 21:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC5721DF74E;
+	Sat, 29 Mar 2025 22:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CLCzGBTu"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="AE8ZduE3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mx.denx.de (mx.denx.de [89.58.32.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A651B4138
-	for <netdev@vger.kernel.org>; Sat, 29 Mar 2025 21:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3DAF1B4138;
+	Sat, 29 Mar 2025 22:10:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743285030; cv=none; b=tb0HQYX8lJ85GCjGQ2W/sxgtRiZZw+W0C80rIrHtrIN9AYm3ySMxjWuNgSLYtBnp5AbyiIJDNX0g23Sy5MZFiwCWcU8u/hgzjtMUwFaBooRbFSSJ/naU/yqlPhygoKCduL/HyxY2UowyfbHFZzlWmmmifvDSyE48CK8IXY1uvjo=
+	t=1743286214; cv=none; b=ID9TCQxlGG+FrVvxOC4nK1JhFPC7qeOr86tDz8gHNmxA64nJGZImiM0X4EHbliG4peVTZ3eGqbR9joj9BgOXyb4VUlBfBou3Dq9n1RS5dqgtQ9V2lYnA/pWmXS9EmE3I2o2eNG0ha5JnkTsV8rk0rNKuBVPOzw2JUWM9ze/cKy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743285030; c=relaxed/simple;
-	bh=iPxZ8Ldb6PYOZVa90GDdFztH1FU38pAny2gaWtOz47w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dlZ42f5jB6rLOYZZ+A2YSisQj8t55VuFxhXBs6ZyOyeZ57VkGlf/PGYUmpINIEYB9lbhzaWTl7agOatJnvX483l6Tm+tRlL/Pam3pRjz/nhE9qQUwmXteaS4JSWgQJrNrsSllU4ugoJpdzalD1WhisN9ZSMDisjNigd8hjKLxog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CLCzGBTu; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1743285029; x=1774821029;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=iPxZ8Ldb6PYOZVa90GDdFztH1FU38pAny2gaWtOz47w=;
-  b=CLCzGBTurQRs2MuYAWbOuNp9Eb05NLPBOhNGCsRQcTGa5US17x6ecpwh
-   tWBqXxlEl2bXN5dctfgnhepCdWdQFMeX7pMldwedQsxaEMqXxSQllxBcH
-   5ENCMloJoa2zZYRcijs3qSmxdbSkq3tvc3ziXjkeQthCYuG/PB6FFuMu6
-   8P3XewR5V6eBCJrSHN9/LdXekoYfhrEzfaWKHRwX4BPkZzK9JNQcSGLeM
-   C3AMdZZDxN8AWz+VOEaKyNHT7JuXMhC1/sGKjZK7e67MvNpAE49KCBhGN
-   zeTtBdfgUknEW1kTpUYo9aWiHLDCW2DJ3jiXjLthGEukxTmlTaS9Pc9b1
-   w==;
-X-CSE-ConnectionGUID: CiAv3EiUQd2MEfx1P/yzKA==
-X-CSE-MsgGUID: nIPqj08dQsuDQfX0L9kFJw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11388"; a="62011077"
-X-IronPort-AV: E=Sophos;i="6.14,286,1736841600"; 
-   d="scan'208";a="62011077"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Mar 2025 14:50:29 -0700
-X-CSE-ConnectionGUID: J3P1M3csQLirtuyqwSQyIg==
-X-CSE-MsgGUID: DPKxeR4sQ3SiXpkalLyorA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,286,1736841600"; 
-   d="scan'208";a="125749777"
-Received: from lkp-server02.sh.intel.com (HELO e98e3655d6d2) ([10.239.97.151])
-  by orviesa006.jf.intel.com with ESMTP; 29 Mar 2025 14:50:26 -0700
-Received: from kbuild by e98e3655d6d2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tye4N-0008Ne-27;
-	Sat, 29 Mar 2025 21:50:23 +0000
-Date: Sun, 30 Mar 2025 05:49:35 +0800
-From: kernel test robot <lkp@intel.com>
-To: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, Cosmin Ratiu <cratiu@nvidia.com>
-Subject: Re: [PATCH net v3 01/11] net: switch to netif_disable_lro in
- inetdev_init
-Message-ID: <202503300552.i2jDOcpl-lkp@intel.com>
-References: <20250329185704.676589-2-sdf@fomichev.me>
+	s=arc-20240116; t=1743286214; c=relaxed/simple;
+	bh=pZpq9ghubjJLhD+JS8dYzRXBCv3CK7S4BnH8+Gq+jls=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eMqzwazn1/sw9/9utOImN+/lWAeWoiUSi0qyPtLDKaUaRwLmjZ0PgFGU+IoiD0D65NsxUXzrV7nk/CikErjK+FAlnM9yDN5G4hkMLJtKFh32UgkK2LOdHlbbNqdQG1Wx8IeAvwVTNJk+6BmPClTpYmxj2eMZEgnFaNocJ5RQbdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=AE8ZduE3; arc=none smtp.client-ip=89.58.32.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2117910290279;
+	Sat, 29 Mar 2025 23:10:06 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
+	t=1743286209; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=OfWmKzMpdhulgNMGGh3laefwHhLvWPtC8uEl5axzFsw=;
+	b=AE8ZduE3XoX4GiJCzdR+S+uagY3W1crhK/9Od/0Du+QVU4y8VvoDLlYYTDV9kGoIoNpilx
+	WR3M9k1vokP49/Jn1bmr8qz7R86785D0aJ3iKLhYhpS4gtcANNPMRIDso7WMGTKdMOUzX2
+	eO5q4adU7YC7IFkjmcY3sMOEPGgbqou7xoIuZ03aiLgGXXaUuk6FlMNdsGUOYE0+JS9Qgj
+	ncNBLIEhuz2buRy3I6eQinFMApz+GtQm1owfcp97isb/GbKyt6Dv9wIelTUU3mvWvc9H9z
+	O8GLVicWGe3phK+pjb6gV6wvRPH2H+OeHpQEHAjhrxQOJKgreOGqXSy9dYmM3A==
+Date: Sat, 29 Mar 2025 23:10:04 +0100
+From: Lukasz Majewski <lukma@denx.de>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Shawn Guo
+ <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix
+ Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 1/4] dt-bindings: net: Add MTIP L2 switch description
+Message-ID: <20250329231004.4432831b@wsk>
+In-Reply-To: <e6f3e50f-8d97-4dbc-9de3-1d9a137ae09c@kernel.org>
+References: <20250328133544.4149716-1-lukma@denx.de>
+	<20250328133544.4149716-2-lukma@denx.de>
+	<e6f3e50f-8d97-4dbc-9de3-1d9a137ae09c@kernel.org>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250329185704.676589-2-sdf@fomichev.me>
+Content-Type: multipart/signed; boundary="Sig_/GOaK/S/VyPuiJbaUJ6=UdAb";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Last-TLS-Session-Version: TLSv1.3
 
-Hi Stanislav,
+--Sig_/GOaK/S/VyPuiJbaUJ6=UdAb
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-kernel test robot noticed the following build errors:
+Hi Krzysztof,
 
-[auto build test ERROR on net/main]
+> On 28/03/2025 14:35, Lukasz Majewski wrote:
+> > This patch provides description of the MTIP L2 switch available in
+> > some NXP's SOCs - e.g. imx287.
+> >=20
+> > Signed-off-by: Lukasz Majewski <lukma@denx.de>
+> > ---
+> > Changes for v2:
+> > - Rename the file to match exactly the compatible
+> >   (nxp,imx287-mtip-switch) =20
+>=20
+> Please implement all the changes, not only the rename. I gave several
+> comments, although quick glance suggests you did implement them, so
+> then changelog is just incomplete.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Stanislav-Fomichev/net-switch-to-netif_disable_lro-in-inetdev_init/20250330-030132
-base:   net/main
-patch link:    https://lore.kernel.org/r/20250329185704.676589-2-sdf%40fomichev.me
-patch subject: [PATCH net v3 01/11] net: switch to netif_disable_lro in inetdev_init
-config: s390-randconfig-002-20250330 (https://download.01.org/0day-ci/archive/20250330/202503300552.i2jDOcpl-lkp@intel.com/config)
-compiler: clang version 15.0.7 (https://github.com/llvm/llvm-project 8dfdcc7b7bf66834a761bd8de445840ef68e4d1a)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250330/202503300552.i2jDOcpl-lkp@intel.com/reproduce)
+Those comments were IMHO addressed automatically, as this time I took
+(I suppose :-) ) better file as a starting point.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202503300552.i2jDOcpl-lkp@intel.com/
+To be more specific it was:
+./Documentation/devicetree/bindings/net/ti,cpsw-switch.yaml
 
-All errors (new ones prefixed by >>):
+as I've been advised to use for the MTIP driver the same DTS
+description as the above one has (i.e. they are conceptually similar,
+so DTS description ABI can be used for both).
 
->> net/core/dev.c:1774:1: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Werror,-Wimplicit-int]
-   EXPORT_IPV6_MOD(netif_disable_lro);
-   ^
-   int
->> net/core/dev.c:1774:17: error: a parameter list without types is only allowed in a function definition
-   EXPORT_IPV6_MOD(netif_disable_lro);
-                   ^
-   2 errors generated.
+I've also checked the:
+make CHECK_DTBS=3Dy DT_SCHEMA_FILES=3Dnxp,imx287-mtip-switch.yaml
+nxp/mxs/imx28-xea.dtb
+
+on Linux next and it gave no errors.
+
+>=20
+> > ---
+> >  .../bindings/net/nxp,imx287-mtip-switch.yaml  | 165
+> > ++++++++++++++++++ 1 file changed, 165 insertions(+)
+> >  create mode 100644
+> > Documentation/devicetree/bindings/net/nxp,imx287-mtip-switch.yaml
+> >=20
+> > diff --git
+> > a/Documentation/devicetree/bindings/net/nxp,imx287-mtip-switch.yaml
+> > b/Documentation/devicetree/bindings/net/nxp,imx287-mtip-switch.yaml
+> > new file mode 100644 index 000000000000..a3e0fe7783ec --- /dev/null
+> > +++
+> > b/Documentation/devicetree/bindings/net/nxp,imx287-mtip-switch.yaml
+> > @@ -0,0 +1,165 @@ +# SPDX-License-Identifier: (GPL-2.0-only OR
+> > BSD-2-Clause) +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/net/nxp,imx287-mtip-switch.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: NXP SoC Ethernet Switch Controller (L2 MoreThanIP switch)
+> > +
+> > +maintainers:
+> > +  - Lukasz Majewski <lukma@denx.de>
+> > +
+> > +description:
+> > +  The 2-port switch ethernet subsystem provides ethernet packet
+> > (L2)
+> > +  communication and can be configured as an ethernet switch. It
+> > provides the
+> > +  reduced media independent interface (RMII), the management data
+> > input
+> > +  output (MDIO) for physical layer device (PHY) management.
+> > + =20
+>=20
+> If this is ethernet switch, why it does not reference ethernet-switch
+> schema? or dsa.yaml or dsa/ethernet-ports? I am not sure which one
+> should go here, but surprising to see none.
+
+It uses:
+$ref:=C2=B7ethernet-controller.yaml#
+
+for "ports".
+
+Other crucial node is "mdio", which references $ref: mdio.yaml#
+
+>=20
+> > +properties:
+> > +  compatible:
+> > +    const: nxp,imx287-mtip--switch =20
+>=20
+> Just one -.
+>=20
+
+Ok.
+
+> > +
+> > +  reg:
+> > +    maxItems: 1
+> > +    description:
+> > +      The physical base address and size of the MTIP L2 SW module
+> > IO range =20
+>=20
+> Wasn't here, drop.
+>=20
+
+The 'reg' property (reg =3D <0x800f0000 0x20000>;) is defined in
+imx28.dtsi, where the SoC generic properties (as suggested by Andrew -
+like clocks, interrupts, clock-names) are moved.
+
+> > +
+> > +  phy-supply:
+> > +    description:
+> > +      Regulator that powers Ethernet PHYs.
+> > +
+> > +  clocks:
+> > +    items:
+> > +      - description: Register accessing clock
+> > +      - description: Bus access clock
+> > +      - description: Output clock for external device - e.g. PHY
+> > source clock
+> > +      - description: IEEE1588 timer clock
+> > +
+> > +  clock-names:
+> > +    items:
+> > +      - const: ipg
+> > +      - const: ahb
+> > +      - const: enet_out
+> > +      - const: ptp
+> > +
+> > +  interrupts:
+> > +    items:
+> > +      - description: Switch interrupt
+> > +      - description: ENET0 interrupt
+> > +      - description: ENET1 interrupt
+> > +
+> > +  pinctrl-names: true =20
+>=20
+> Drop
+
+The 'pinctrl-names =3D "default";' are specified.
+
+Shouldn't it be kept?
+
+>=20
+> > +
+> > +  ethernet-ports:
+> > +    type: object
+> > +    additionalProperties: false
+> > +
+> > +    properties:
+> > +      '#address-cells':
+> > +        const: 1
+> > +      '#size-cells':
+> > +        const: 0
+> > +
+> > +    patternProperties:
+> > +      "^port@[0-9]+$": =20
+>=20
+> Keep consistent quotes, either " or '. Also [01]
+>=20
+
+[12] - ports are numbered starting from 1.
+
+>=20
+> > +        type: object
+> > +        description: MTIP L2 switch external ports
+> > +
+> > +        $ref: ethernet-controller.yaml#
+> > +        unevaluatedProperties: false
+> > +
+> > +        properties:
+> > +          reg:
+> > +            items:
+> > +              - enum: [1, 2]
+> > +            description: MTIP L2 switch port number
+> > +
+> > +          label:
+> > +            description: Label associated with this port
+> > +
+> > +        required:
+> > +          - reg
+> > +          - label
+> > +          - phy-mode
+> > +          - phy-handle
+> > +
+> > +  mdio:
+> > +    type: object
+> > +    $ref: mdio.yaml#
+> > +    unevaluatedProperties: false
+> > +    description:
+> > +      Specifies the mdio bus in the switch, used as a container
+> > for phy nodes. +
+> > +required:
+> > +  - compatible
+> > +  - reg
+> > +  - clocks
+> > +  - clock-names
+> > +  - interrupts
+> > +  - mdio
+> > +  - ethernet-ports
+> > +  - '#address-cells'
+> > +  - '#size-cells'
+> > +
+> > +additionalProperties: false
+> > +
+> > +examples:
+> > +  - |
+> > +    #include<dt-bindings/interrupt-controller/irq.h>
+> > +    switch@800f0000 {
+> > +        compatible =3D "nxp,imx287-mtip-switch";
+> > +        reg =3D <0x800f0000 0x20000>;
+> > +        pinctrl-names =3D "default";
+> > +        pinctrl-0 =3D <&mac0_pins_a>, <&mac1_pins_a>;
+> > +        phy-supply =3D <&reg_fec_3v3>;
+> > +        interrupts =3D <100>, <101>, <102>;
+> > +        clocks =3D <&clks 57>, <&clks 57>, <&clks 64>, <&clks 35>;
+> > +        clock-names =3D "ipg", "ahb", "enet_out", "ptp";
+> > +        status =3D "okay"; =20
+>=20
+> Drop
+
+Ok.
+
+>=20
+> > +
+> > +        ethernet-ports {
+> > +                #address-cells =3D <1>;
+> > +                #size-cells =3D <0>; =20
+>=20
+> Messed indentation. See example-schema or writing-schema.
+>=20
+
+Ok.
+
+>=20
+>=20
+> Best regards,
+> Krzysztof
 
 
-vim +/int +1774 net/core/dev.c
 
-  1756	
-  1757	void netif_disable_lro(struct net_device *dev)
-  1758	{
-  1759		struct net_device *lower_dev;
-  1760		struct list_head *iter;
-  1761	
-  1762		dev->wanted_features &= ~NETIF_F_LRO;
-  1763		netdev_update_features(dev);
-  1764	
-  1765		if (unlikely(dev->features & NETIF_F_LRO))
-  1766			netdev_WARN(dev, "failed to disable LRO!\n");
-  1767	
-  1768		netdev_for_each_lower_dev(dev, lower_dev, iter) {
-  1769			netdev_lock_ops(lower_dev);
-  1770			netif_disable_lro(lower_dev);
-  1771			netdev_unlock_ops(lower_dev);
-  1772		}
-  1773	}
-> 1774	EXPORT_IPV6_MOD(netif_disable_lro);
-  1775	
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/GOaK/S/VyPuiJbaUJ6=UdAb
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmfob7wACgkQAR8vZIA0
+zr1dnAf+K8wn68GHQnDP8Ngyr4LbkqtyX9vgW/b3tfNaPTIZkL1lMEUZ2HD2n+yv
+zlFrkNAv/msNWFbZKT/+yFvX3YNPLS0gc8TV0SyMoZ6naIlto86WX8t4qv1pWi6X
+38gwP4DGcCYMSALmPwyn3JH2pOnY7LuGT2GbomsOYfdn8UgjACmHJIVDWyhn/AA3
+cQHdJbFC2p7J+7QFGihcig3Neoepo1vI76sProBWIw7U9dIu+ybP14y5tmBAaxpV
+Urcqt7Wg43hU7HgM27muOk7XFttDbfbt408y//qjkHKdsQehjfJKpT4NKhol0oDK
+baCZykor3+/dSnMz0IhemScHL+k6rw==
+=IoZW
+-----END PGP SIGNATURE-----
+
+--Sig_/GOaK/S/VyPuiJbaUJ6=UdAb--
 
