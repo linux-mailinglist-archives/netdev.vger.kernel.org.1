@@ -1,149 +1,118 @@
-Return-Path: <netdev+bounces-178184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DEDFA755BD
-	for <lists+netdev@lfdr.de>; Sat, 29 Mar 2025 11:25:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F692A75693
+	for <lists+netdev@lfdr.de>; Sat, 29 Mar 2025 15:20:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C01063AF64A
-	for <lists+netdev@lfdr.de>; Sat, 29 Mar 2025 10:25:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF5043AF9A3
+	for <lists+netdev@lfdr.de>; Sat, 29 Mar 2025 14:20:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47909189F43;
-	Sat, 29 Mar 2025 10:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C3871CB337;
+	Sat, 29 Mar 2025 14:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bgRDLvSA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CsRvviYf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 875C1DDC5;
-	Sat, 29 Mar 2025 10:25:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6B1F1C1AAA;
+	Sat, 29 Mar 2025 14:20:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743243938; cv=none; b=txMD8JmKa8Uj62xWzpBkScppUmpi93KxLJQL9L6qkgIgbiEkfYTwyJuIyO43j5V1Yz1DaR+rlXLlbzbr7SI2VF2FbYW8VkjxIe/h1q1OkiCudRZs65AfgVctt+0OLiL+rcYQsgoMu+B4ygLaC2M+kz0los/f/hqr6ZU1jCrP0Y4=
+	t=1743258023; cv=none; b=Rd6eLApMrwg0vafzRAMyKTQDJSzjfE3V57VOM+MtMnqBj1282zRtbDseowHhnNW1HhFuRad6LZ9ZGQKQQLypXgIoTVOUGXeY7iZ6F4I/jrnTVdoq3J3WRNIj8YAeDphazwSWSRJaBYeFZB2y/XJPnQxAt5nWiJPF45Q2XNfDu1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743243938; c=relaxed/simple;
-	bh=e8KFgAuXvgMLJ56yll//Wupj/W59FsnKhUFYXFD92v8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oug/5SID2c/vh0LI844pgpEuVDu4yuqJK6dD6m2XITmyaQFgVd8I8yZ3z9qIgx6tucl9mrBrigH9wINVjzQx6k+FalY6nDhSAgZMQF/3+0Z/2lIGp0o5y8r7PsbdxCsGmugq5LtCgmJhTINGsfHvf06HKfy3FZNx2jnlPSqku0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bgRDLvSA; arc=none smtp.client-ip=209.85.208.49
+	s=arc-20240116; t=1743258023; c=relaxed/simple;
+	bh=H9PTlw3vyhvNuYd+tGVSYwbEzbV7+29R+TRqtXAmnGI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KdCJsicR9SIMo4ooaT1GjFUH6UnJaNh+0ln6eZoY1dFn6bKpc8ogBL9M/Ps0pJrXkYJ1LKKW/d2TofdC0wo1cilErjutFjmRzaiDbGFNA6C3mgz1yjEI+x3byyYUhZFGlluQrUnIddR5bBYmmlg175YnNYUKi4D8pLEuVIjitSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CsRvviYf; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5e686d39ba2so1175401a12.2;
-        Sat, 29 Mar 2025 03:25:36 -0700 (PDT)
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2279915e06eso67890405ad.1;
+        Sat, 29 Mar 2025 07:20:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743243935; x=1743848735; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=skdz2J8vky2zwdmsTEpeak328qCERbX3VX3swBulodM=;
-        b=bgRDLvSAKFTuRqXdk1LaLp0O8kuB2BvBT/d9mOWnWRAvGHqZEVpCS2mfX3mWn0L+Ug
-         HNPT5OPLCiEQ5+0EREllOlcoGkQn14yhn7XVtbvR41jiOCLG/ar18gvfux4Ioy+6iveo
-         cUp68gnFEd8EfWuQp65u+EEApc1v9PFTUfuFqxNf2FxYklC+tcFv7eepmYqedL2cI60a
-         bByJ85b1fYp4N9/kNPR4D+mAfi1uCsMf1PEVfsuVOj2BbC/2e/IouOeUnMI+0dDmO9kR
-         RDA9pLOWYJN+96DHYBnTHYE5BCUTktM4uxKq1gh9Y10puTJLuDBBqahDetLt7awxVv2e
-         Vk1g==
+        d=gmail.com; s=20230601; t=1743258021; x=1743862821; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wVVtkTC1MI66TMM37oz7HRYzPGqHnnLO5URO2Srg6yM=;
+        b=CsRvviYf1JbvQSa1heN6UsXx5q5i1fEgStOaxgRTcJJOIM0EPCB+tT8EcSxJ5WUSfe
+         0q9WiiXhFSAyqp0+ud4tD/2IAgMp0+zfxY+yBXlkMzfSefkwwP82Tp79K66aJt/5s2UH
+         oj2oRPnYhg0mMNJaapuuUWd+mUeRUIdYhg/UdSDs+zz9LetE00u56vocTkTLIjXhu8+0
+         t+jS4daCgvzIeiwjpW04kdWD/FhQIvxquzHYEymRDsHcV4FSqh76xr4HpTIjiJ6CQYt/
+         kAITqESJ7LO8nHOwM+B9xFJpMcVFkAww3tqu6n2b8anY/uVNeQ3H/tu+9F1sev/DypI2
+         WKjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743243935; x=1743848735;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=skdz2J8vky2zwdmsTEpeak328qCERbX3VX3swBulodM=;
-        b=aBli25zN82++aGCyyg2qZ/5EepFbUQXsHUSWE6R375FrVUZYeFyFnR9bKlJa4diS9v
-         V9Mz0zGatI4JjWzOQMts+KQkFQ++BPbUXVaZ8M1Fbvqqt/5nGgqPz0OePC6316vwCDZ9
-         cSoU5RJ7Z2SWEDNeQ41WD9ie9T2lx0b34B3xehJLP1ORc/xyZkdJrnAlQCoRQLMbV15/
-         5mzA5P4Hz9I4xGSKtjz8NdEDrALRfXLyyNCAFp9GC3UVHolBFQWHX0nWZYzizvfo9W69
-         AqBnFXN7IBeWDPUXzg/hrdrxWdm3wQTAa861nTLulUssXX1oHOpJp0XqIOm39HqHUJwv
-         0Osw==
-X-Forwarded-Encrypted: i=1; AJvYcCUxB94DlSVPt3KqSsXJuCdkS4E7zgW3TtaouhDgwgNG8hkwkaQCDhTO0XnYRFZU4QLbGqF9qqOXwVKe6Do=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8oMBwwaTwxI9Jov/Iqru7Ze+n39RLi3TUrWY3FAClfcOY8iz7
-	G57ObOnNhhpMrLlgfEPuZlQbKDA/SWIW7kV35lOsybqlc+TwmSWgDCScM0iDsrTyTQyMgVPqUzD
-	7VVt8ko+NwAsrRrlDSu2z7PeIBl0=
-X-Gm-Gg: ASbGncsziIoDy+BBObtxrG9pc8vvpctq4ZFhrIWaHFCWuyh6PEH5ktV/P6FWaqFqEkP
-	jjU1eoH9++zYWt/iedj+mJmECclJlsCT2mLg0B9D70sgkckEBF16NFoy5N1+0PNp1Gvxwl6bKj+
-	XCjj7la1P18UZLiO/gt8ZGYvBdZCc=
-X-Google-Smtp-Source: AGHT+IH/ysz2hKHseoTKN+bQp8ZD1ck3UYjLHNFyo1DMrE4qsSXt6TBId2ymDv9u5fFo93SJET9TvhuCEN7P/zvSs3o=
-X-Received: by 2002:a05:6402:278f:b0:5ec:cba6:7d82 with SMTP id
- 4fb4d7f45d1cf-5edfcc1fbcdmr2118434a12.3.1743243934565; Sat, 29 Mar 2025
- 03:25:34 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743258021; x=1743862821;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wVVtkTC1MI66TMM37oz7HRYzPGqHnnLO5URO2Srg6yM=;
+        b=DofdXPpL+OHBolAUaFX9LWRw+QawXbNv7mGQvGI1WwCIgrsaOP+Iu2y5kyCfPRsU2z
+         YISzVICCaxJDju4g9xwNKvmNcTGELELFqYC6w2d1D1Q7oz+SJySTwZthzhLx9RYBCFsI
+         pLFRFcLv0zm6ZhWtdlnKPoDUZRkxDeCYolbVtBUhS4d3nRwEBHG5ajsVF9W1L5RRQeqD
+         CeXsJOMXSENkliR5MLYTx39IbKxIFGptaQfaJ7zgz3V/wwklnEWWXebNGXn84gLUC/AK
+         gbPo+eT3RkgNcjP5l95ZbLiMTiPjX68JkODFW15LpnLICRF7xIXbDeLfjrcJ7mwC7R4D
+         XRZg==
+X-Forwarded-Encrypted: i=1; AJvYcCXFVri7v+Yh1Kpe/nlo57ZHhwqWE1o2b/cyaoCaqMXTUlck/bfS8J/MLbY5rtFAdyFDw+6W4uU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0TJ5i2fe2qM2o2IJ98RdzYpyhytxv1OjU+SLbN+LBJy5xlBcz
+	gTf1uq8JH/zq9q+fP9i2Dt0U6pPnmk4FxKv6ExVbFeWARy/Fr/bS
+X-Gm-Gg: ASbGnct9bH8NTcWj53Vs40AEqFZiLsnbMa6EkPoc5U+zAYKCljpNucxPe81/jIwJH9g
+	3Ycv5ZuXdsCc2VmKMnTjzc8LWel8X80f5GnZJXLHjvZ/6vBAlaGks+UNQgJ/7XUDgq8a6+e3yNB
+	IeJ0/HFbGcfl6Iswiu34dVjKvA3l+7W2rNfPXNRKYuFaFTiBTV1FqLg7gJB+genE1dOoDEP4iv7
+	pG7rfRueh+dCUjrPtskDNWlgI8MrtkpIA8lIobaAW3p+ewv3jGsB35oXITnMjgp5ZOUnkSB8/13
+	WynzUsZiRcvqOi/+XoBhLbhmIump2sOBFEu7KPu1K3Z7Lqko53mDGdxTVVAXmCGm
+X-Google-Smtp-Source: AGHT+IFla13a8toqBz/M5BUsxjLegdz207/3XxjaV8SKHSC15/QtO2M7wO4LxrN0VoxRRhs+xxuE1Q==
+X-Received: by 2002:aa7:88c9:0:b0:732:5276:4ac9 with SMTP id d2e1a72fcca58-7398037e929mr4223900b3a.9.1743258020874;
+        Sat, 29 Mar 2025 07:20:20 -0700 (PDT)
+Received: from localhost.localdomain ([187.60.93.157])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73970e22433sm3729107b3a.52.2025.03.29.07.20.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 29 Mar 2025 07:20:20 -0700 (PDT)
+From: Ramon Fontes <ramonreisfontes@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: linux-wpan@vger.kernel.org,
+	alex.aring@gmail.com,
+	miquel.raynal@bootlin.com,
+	netdev@vger.kernel.org,
+	Ramon Fontes <ramonreisfontes@gmail.com>
+Subject: [PATCH] mac802154_hwsim: define perm_extended_addr initialization
+Date: Sat, 29 Mar 2025 11:20:10 -0300
+Message-ID: <20250329142010.17389-1-ramonreisfontes@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250328174216.3513079-1-sdf@fomichev.me>
-In-Reply-To: <20250328174216.3513079-1-sdf@fomichev.me>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Sat, 29 Mar 2025 19:25:22 +0900
-X-Gm-Features: AQ5f1Jq-HeWugC2XpX6jq-tfrgIkY9D9KShi2zZ13QuiHnYDaGgGvtz3y3Yu1Dc
-Message-ID: <CAMArcTV5gtpfM7CXP_s506YDGC8NbSLNmwPJ_FvY_k4Ej1cojw@mail.gmail.com>
-Subject: Re: [PATCH net] bnxt_en: bring back rtnl lock in bnxt_shutdown
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org, 
-	michael.chan@broadcom.com, pavan.chebbi@broadcom.com, andrew+netdev@lunn.ch
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, Mar 29, 2025 at 2:42=E2=80=AFAM Stanislav Fomichev <sdf@fomichev.me=
-> wrote:
->
+This establishes an initialization method for perm_extended_addr,
+aligning it with the approach used in mac80211_hwsim.
 
-Hi Stanislav,
-Thanks a lot for this fix!
+Signed-off-by: Ramon Fontes <ramonreisfontes@gmail.com>
+---
+ drivers/net/ieee802154/mac802154_hwsim.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> Taehee reports missing rtnl from bnxt_shutdown path:
->
-> inetdev_event (./include/linux/inetdevice.h:256 net/ipv4/devinet.c:1585)
-> notifier_call_chain (kernel/notifier.c:85)
-> __dev_close_many (net/core/dev.c:1732 (discriminator 3))
-> kernel/locking/mutex.c:713 kernel/locking/mutex.c:732)
-> dev_close_many (net/core/dev.c:1786)
-> netif_close (./include/linux/list.h:124 ./include/linux/list.h:215
-> bnxt_shutdown (drivers/net/ethernet/broadcom/bnxt/bnxt.c:16707) bnxt_en
-> pci_device_shutdown (drivers/pci/pci-driver.c:511)
-> device_shutdown (drivers/base/core.c:4820)
-> kernel_restart (kernel/reboot.c:271 kernel/reboot.c:285)
->
-> Bring back the rtnl lock.
+diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
+index 1cab20b5a..2f7520454 100644
+--- a/drivers/net/ieee802154/mac802154_hwsim.c
++++ b/drivers/net/ieee802154/mac802154_hwsim.c
+@@ -942,7 +942,7 @@ static int hwsim_add_one(struct genl_info *info, struct device *dev,
+ 	/* 950 MHz GFSK 802.15.4d-2009 */
+ 	hw->phy->supported.channels[6] |= 0x3ffc00;
+ 
+-	ieee802154_random_extended_addr(&hw->phy->perm_extended_addr);
++	hw->phy->perm_extended_addr = cpu_to_le64(((u64)0x02 << 56) | ((u64)idx));
+ 
+ 	/* hwsim phy channel 13 as default */
+ 	hw->phy->current_channel = 13;
+-- 
+2.43.0
 
-Tested-by: Taehee Yoo <ap420073@gmail.com>
-
->
-> Link: https://lore.kernel.org/netdev/CAMArcTV4P8PFsc6O2tSgzRno050DzafgqkL=
-A2b7t=3DFv_SY=3Dbrw@mail.gmail.com/
-> Fixes: 004b5008016a ("eth: bnxt: remove most dependencies on RTNL")
-> Reported-by: Taehee Yoo <ap420073@gmail.com>
-> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-> ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethe=
-rnet/broadcom/bnxt/bnxt.c
-> index 934ba9425857..1a70605fad38 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -16698,6 +16698,7 @@ static void bnxt_shutdown(struct pci_dev *pdev)
->         if (!dev)
->                 return;
->
-> +       rtnl_lock();
->         netdev_lock(dev);
->         bp =3D netdev_priv(dev);
->         if (!bp)
-> @@ -16717,6 +16718,7 @@ static void bnxt_shutdown(struct pci_dev *pdev)
->
->  shutdown_exit:
->         netdev_unlock(dev);
-> +       rtnl_unlock();
->  }
->
->  #ifdef CONFIG_PM_SLEEP
-> --
-> 2.48.1
->
 
