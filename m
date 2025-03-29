@@ -1,339 +1,105 @@
-Return-Path: <netdev+bounces-178212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 273C1A757F8
-	for <lists+netdev@lfdr.de>; Sat, 29 Mar 2025 23:10:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 59C6EA757FE
+	for <lists+netdev@lfdr.de>; Sat, 29 Mar 2025 23:27:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C66EB16A62E
-	for <lists+netdev@lfdr.de>; Sat, 29 Mar 2025 22:10:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F32B316B564
+	for <lists+netdev@lfdr.de>; Sat, 29 Mar 2025 22:27:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC5721DF74E;
-	Sat, 29 Mar 2025 22:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3554A12CDAE;
+	Sat, 29 Mar 2025 22:27:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="AE8ZduE3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AzcYcuzo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.denx.de (mx.denx.de [89.58.32.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3DAF1B4138;
-	Sat, 29 Mar 2025 22:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0E9320F
+	for <netdev@vger.kernel.org>; Sat, 29 Mar 2025 22:27:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743286214; cv=none; b=ID9TCQxlGG+FrVvxOC4nK1JhFPC7qeOr86tDz8gHNmxA64nJGZImiM0X4EHbliG4peVTZ3eGqbR9joj9BgOXyb4VUlBfBou3Dq9n1RS5dqgtQ9V2lYnA/pWmXS9EmE3I2o2eNG0ha5JnkTsV8rk0rNKuBVPOzw2JUWM9ze/cKy4=
+	t=1743287252; cv=none; b=d7IVWiZ2hfpbjOmYB+XPSm/RRCDafZOuB7jI1k1XjLIZEt02V5Nr7R3C5K7GQ/I7bcjjyvLeNmD3P7/TiHmWsXsyCOfAQJ5FdnS4Fw3fgFNZqyTFBezyx6Zrr4Pafo9r3v8DSqivEUchH8GULR2jikC/yEQhQ12W612+nmSf67A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743286214; c=relaxed/simple;
-	bh=pZpq9ghubjJLhD+JS8dYzRXBCv3CK7S4BnH8+Gq+jls=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eMqzwazn1/sw9/9utOImN+/lWAeWoiUSi0qyPtLDKaUaRwLmjZ0PgFGU+IoiD0D65NsxUXzrV7nk/CikErjK+FAlnM9yDN5G4hkMLJtKFh32UgkK2LOdHlbbNqdQG1Wx8IeAvwVTNJk+6BmPClTpYmxj2eMZEgnFaNocJ5RQbdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=AE8ZduE3; arc=none smtp.client-ip=89.58.32.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2117910290279;
-	Sat, 29 Mar 2025 23:10:06 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1743286209; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=OfWmKzMpdhulgNMGGh3laefwHhLvWPtC8uEl5axzFsw=;
-	b=AE8ZduE3XoX4GiJCzdR+S+uagY3W1crhK/9Od/0Du+QVU4y8VvoDLlYYTDV9kGoIoNpilx
-	WR3M9k1vokP49/Jn1bmr8qz7R86785D0aJ3iKLhYhpS4gtcANNPMRIDso7WMGTKdMOUzX2
-	eO5q4adU7YC7IFkjmcY3sMOEPGgbqou7xoIuZ03aiLgGXXaUuk6FlMNdsGUOYE0+JS9Qgj
-	ncNBLIEhuz2buRy3I6eQinFMApz+GtQm1owfcp97isb/GbKyt6Dv9wIelTUU3mvWvc9H9z
-	O8GLVicWGe3phK+pjb6gV6wvRPH2H+OeHpQEHAjhrxQOJKgreOGqXSy9dYmM3A==
-Date: Sat, 29 Mar 2025 23:10:04 +0100
-From: Lukasz Majewski <lukma@denx.de>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Shawn Guo
- <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix
- Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>,
- Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 1/4] dt-bindings: net: Add MTIP L2 switch description
-Message-ID: <20250329231004.4432831b@wsk>
-In-Reply-To: <e6f3e50f-8d97-4dbc-9de3-1d9a137ae09c@kernel.org>
-References: <20250328133544.4149716-1-lukma@denx.de>
-	<20250328133544.4149716-2-lukma@denx.de>
-	<e6f3e50f-8d97-4dbc-9de3-1d9a137ae09c@kernel.org>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1743287252; c=relaxed/simple;
+	bh=1Bijnf9Ef+510Y4xZbxll0el1f5S9bkez10VQ7cIRjI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Fkf3kvB1n3RVSGEi1oLwSdgCcLzLaiD8dvfMqShefwzhWEvYXzXJpz05DygJfk35QIxqqGnkO39ZocAyLF5ClwBzy0UO12wEFYC4lHFzzfOIWqtYzzIR9qJ8i7IxmVjyQdBCCqx8Wn4KdcXBQs0dZIGz9xT0Y/74c5M1G6oP7Js=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AzcYcuzo; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-22423adf751so62976735ad.2
+        for <netdev@vger.kernel.org>; Sat, 29 Mar 2025 15:27:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743287249; x=1743892049; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ziLnmYPU8Ew44YvrK1LmnC1UfhB/CSTytKDHmzJ0qZY=;
+        b=AzcYcuzocI6lHM7p2qn2SsIr8mSEO1lkc+/mg66gri0Q8ZAzrz58LqjMbtnYfGnLDy
+         W2AKFne934x9rKtqW60qpyCc3nfat/34LUYiaBxEaiAohYCyMMisINcxk18SA10t5rfs
+         hypkaoQs2v8BxQ6Osq5g84m510oE2xZm2wuPwS5EbaZTCOeyX1jQrf29DCcba7DqdqSF
+         vs7Yn+APB0DawkBubGQThC02MLdXc8Y/uvu+WBunXZMsq9jutG2t8oLGwV2Gwbi6t16A
+         nrY4NpE/WmLYcukQy7lapsN1inLizjWA+jF0BKc40WfDpLZGcXhWLkNPbILWJdXK8m3C
+         n/Vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743287249; x=1743892049;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ziLnmYPU8Ew44YvrK1LmnC1UfhB/CSTytKDHmzJ0qZY=;
+        b=V3hMVm0+noKA+TeJErcol9wemyNc9YjnXmuST1RPM4fxUq9n7oj6+lNGGkmGztkGEW
+         Z4qCqD88fHl//Zv7SwzhkTjpRv5dO6+iDw12oTiu4X0p2EOfHAZ8pArYvzrWjchB7c+S
+         5MoNCTyK7irird4u+r+sdl3NPGYPVR3F/njJDHwXHxXnD6sDIN+oa3KIZSYbuoz/Syvv
+         RmwVRMlULUjFrE0YgAAzR52HenTEw8vfY83Tt5pPCHObWyHUVto8r40yTcPSJ5UHcQQC
+         CzXcMzYNmPyOgLjBXAR9FrLr11ymsrrsUodQhpKsFXaKm5M1+BP2ADIBvZSq0TKr1MFP
+         Xo8Q==
+X-Gm-Message-State: AOJu0YxwcNTDuByfsXGl0/FK8d4vJzJSTCmHHEwba2oktIV80Ki3Zgfj
+	QlN3Y2I7Jdk4yQ+Br8DEGT49i3VdXCK4R1KrEnq5/QmUaF5/W0+J66sfQQ==
+X-Gm-Gg: ASbGncvi3mYqHbHZ9++0mqO5X+diNm3LJTfMJDjKV/aNOamVqLBwkqcAgB+woSWlQ/P
+	zuzGjHXXFkETxd04pZgL82tWZLOtynWghIbv/gr5O83L7HsyPBt00KIQR55zkqWWPCMgd4twwIr
+	6ozJ127yVpjdPoQPHx/Bae3jq5vfSOdOHTcLGIYXP4iDQ7pWhWdtaLFtC5ncJc+6/u5ispY0i6K
+	fbWu/gQPUZLgPmhnOWPMPcX5/PwySwbfgBWWmjv+X2qBzQ3UNaZHWFC5UxbRl6qpC7V5FYk6K95
+	pns3H+RFfox+eYTwUG9a8qfEYGWuOqk9AO5GN8PYOKfPSfN9uA==
+X-Google-Smtp-Source: AGHT+IGyn03MLLJX253OFH4nCDCFE1hESmep9Bo3RuzZdlj7g76JEOClqrQ3yym/lxz+5MwRxrcuhg==
+X-Received: by 2002:a17:902:ea02:b0:221:78a1:27fb with SMTP id d9443c01a7336-2292f94499emr54641345ad.11.1743287249479;
+        Sat, 29 Mar 2025 15:27:29 -0700 (PDT)
+Received: from pop-os.. ([2601:647:6881:9060:c022:127e:b74a:2420])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2291f1ecbc9sm41477335ad.215.2025.03.29.15.27.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 29 Mar 2025 15:27:28 -0700 (PDT)
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: netdev@vger.kernel.org
+Cc: jhs@mojatatu.com,
+	jiri@resnulli.us,
+	Cong Wang <xiyou.wangcong@gmail.com>
+Subject: [Patch net 0/2] net_sched: skbprio: Remove overly strict queue assertions
+Date: Sat, 29 Mar 2025 15:25:34 -0700
+Message-Id: <20250329222536.696204-1-xiyou.wangcong@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/GOaK/S/VyPuiJbaUJ6=UdAb";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
 
---Sig_/GOaK/S/VyPuiJbaUJ6=UdAb
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+This patchset contains a bug fix and its test case. Please see each
+patch description for more details.
 
-Hi Krzysztof,
+---
+Cong Wang (2):
+  net_sched: skbprio: Remove overly strict queue assertions
+  selftests: tc-testing: Add TBF with SKBPRIO queue length corner case
+    test
 
-> On 28/03/2025 14:35, Lukasz Majewski wrote:
-> > This patch provides description of the MTIP L2 switch available in
-> > some NXP's SOCs - e.g. imx287.
-> >=20
-> > Signed-off-by: Lukasz Majewski <lukma@denx.de>
-> > ---
-> > Changes for v2:
-> > - Rename the file to match exactly the compatible
-> >   (nxp,imx287-mtip-switch) =20
->=20
-> Please implement all the changes, not only the rename. I gave several
-> comments, although quick glance suggests you did implement them, so
-> then changelog is just incomplete.
+ net/sched/sch_skbprio.c                       |  3 --
+ .../tc-testing/tc-tests/infra/qdiscs.json     | 34 ++++++++++++++++++-
+ 2 files changed, 33 insertions(+), 4 deletions(-)
 
-Those comments were IMHO addressed automatically, as this time I took
-(I suppose :-) ) better file as a starting point.
+-- 
+2.34.1
 
-To be more specific it was:
-./Documentation/devicetree/bindings/net/ti,cpsw-switch.yaml
-
-as I've been advised to use for the MTIP driver the same DTS
-description as the above one has (i.e. they are conceptually similar,
-so DTS description ABI can be used for both).
-
-I've also checked the:
-make CHECK_DTBS=3Dy DT_SCHEMA_FILES=3Dnxp,imx287-mtip-switch.yaml
-nxp/mxs/imx28-xea.dtb
-
-on Linux next and it gave no errors.
-
->=20
-> > ---
-> >  .../bindings/net/nxp,imx287-mtip-switch.yaml  | 165
-> > ++++++++++++++++++ 1 file changed, 165 insertions(+)
-> >  create mode 100644
-> > Documentation/devicetree/bindings/net/nxp,imx287-mtip-switch.yaml
-> >=20
-> > diff --git
-> > a/Documentation/devicetree/bindings/net/nxp,imx287-mtip-switch.yaml
-> > b/Documentation/devicetree/bindings/net/nxp,imx287-mtip-switch.yaml
-> > new file mode 100644 index 000000000000..a3e0fe7783ec --- /dev/null
-> > +++
-> > b/Documentation/devicetree/bindings/net/nxp,imx287-mtip-switch.yaml
-> > @@ -0,0 +1,165 @@ +# SPDX-License-Identifier: (GPL-2.0-only OR
-> > BSD-2-Clause) +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/net/nxp,imx287-mtip-switch.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: NXP SoC Ethernet Switch Controller (L2 MoreThanIP switch)
-> > +
-> > +maintainers:
-> > +  - Lukasz Majewski <lukma@denx.de>
-> > +
-> > +description:
-> > +  The 2-port switch ethernet subsystem provides ethernet packet
-> > (L2)
-> > +  communication and can be configured as an ethernet switch. It
-> > provides the
-> > +  reduced media independent interface (RMII), the management data
-> > input
-> > +  output (MDIO) for physical layer device (PHY) management.
-> > + =20
->=20
-> If this is ethernet switch, why it does not reference ethernet-switch
-> schema? or dsa.yaml or dsa/ethernet-ports? I am not sure which one
-> should go here, but surprising to see none.
-
-It uses:
-$ref:=C2=B7ethernet-controller.yaml#
-
-for "ports".
-
-Other crucial node is "mdio", which references $ref: mdio.yaml#
-
->=20
-> > +properties:
-> > +  compatible:
-> > +    const: nxp,imx287-mtip--switch =20
->=20
-> Just one -.
->=20
-
-Ok.
-
-> > +
-> > +  reg:
-> > +    maxItems: 1
-> > +    description:
-> > +      The physical base address and size of the MTIP L2 SW module
-> > IO range =20
->=20
-> Wasn't here, drop.
->=20
-
-The 'reg' property (reg =3D <0x800f0000 0x20000>;) is defined in
-imx28.dtsi, where the SoC generic properties (as suggested by Andrew -
-like clocks, interrupts, clock-names) are moved.
-
-> > +
-> > +  phy-supply:
-> > +    description:
-> > +      Regulator that powers Ethernet PHYs.
-> > +
-> > +  clocks:
-> > +    items:
-> > +      - description: Register accessing clock
-> > +      - description: Bus access clock
-> > +      - description: Output clock for external device - e.g. PHY
-> > source clock
-> > +      - description: IEEE1588 timer clock
-> > +
-> > +  clock-names:
-> > +    items:
-> > +      - const: ipg
-> > +      - const: ahb
-> > +      - const: enet_out
-> > +      - const: ptp
-> > +
-> > +  interrupts:
-> > +    items:
-> > +      - description: Switch interrupt
-> > +      - description: ENET0 interrupt
-> > +      - description: ENET1 interrupt
-> > +
-> > +  pinctrl-names: true =20
->=20
-> Drop
-
-The 'pinctrl-names =3D "default";' are specified.
-
-Shouldn't it be kept?
-
->=20
-> > +
-> > +  ethernet-ports:
-> > +    type: object
-> > +    additionalProperties: false
-> > +
-> > +    properties:
-> > +      '#address-cells':
-> > +        const: 1
-> > +      '#size-cells':
-> > +        const: 0
-> > +
-> > +    patternProperties:
-> > +      "^port@[0-9]+$": =20
->=20
-> Keep consistent quotes, either " or '. Also [01]
->=20
-
-[12] - ports are numbered starting from 1.
-
->=20
-> > +        type: object
-> > +        description: MTIP L2 switch external ports
-> > +
-> > +        $ref: ethernet-controller.yaml#
-> > +        unevaluatedProperties: false
-> > +
-> > +        properties:
-> > +          reg:
-> > +            items:
-> > +              - enum: [1, 2]
-> > +            description: MTIP L2 switch port number
-> > +
-> > +          label:
-> > +            description: Label associated with this port
-> > +
-> > +        required:
-> > +          - reg
-> > +          - label
-> > +          - phy-mode
-> > +          - phy-handle
-> > +
-> > +  mdio:
-> > +    type: object
-> > +    $ref: mdio.yaml#
-> > +    unevaluatedProperties: false
-> > +    description:
-> > +      Specifies the mdio bus in the switch, used as a container
-> > for phy nodes. +
-> > +required:
-> > +  - compatible
-> > +  - reg
-> > +  - clocks
-> > +  - clock-names
-> > +  - interrupts
-> > +  - mdio
-> > +  - ethernet-ports
-> > +  - '#address-cells'
-> > +  - '#size-cells'
-> > +
-> > +additionalProperties: false
-> > +
-> > +examples:
-> > +  - |
-> > +    #include<dt-bindings/interrupt-controller/irq.h>
-> > +    switch@800f0000 {
-> > +        compatible =3D "nxp,imx287-mtip-switch";
-> > +        reg =3D <0x800f0000 0x20000>;
-> > +        pinctrl-names =3D "default";
-> > +        pinctrl-0 =3D <&mac0_pins_a>, <&mac1_pins_a>;
-> > +        phy-supply =3D <&reg_fec_3v3>;
-> > +        interrupts =3D <100>, <101>, <102>;
-> > +        clocks =3D <&clks 57>, <&clks 57>, <&clks 64>, <&clks 35>;
-> > +        clock-names =3D "ipg", "ahb", "enet_out", "ptp";
-> > +        status =3D "okay"; =20
->=20
-> Drop
-
-Ok.
-
->=20
-> > +
-> > +        ethernet-ports {
-> > +                #address-cells =3D <1>;
-> > +                #size-cells =3D <0>; =20
->=20
-> Messed indentation. See example-schema or writing-schema.
->=20
-
-Ok.
-
->=20
->=20
-> Best regards,
-> Krzysztof
-
-
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/GOaK/S/VyPuiJbaUJ6=UdAb
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmfob7wACgkQAR8vZIA0
-zr1dnAf+K8wn68GHQnDP8Ngyr4LbkqtyX9vgW/b3tfNaPTIZkL1lMEUZ2HD2n+yv
-zlFrkNAv/msNWFbZKT/+yFvX3YNPLS0gc8TV0SyMoZ6naIlto86WX8t4qv1pWi6X
-38gwP4DGcCYMSALmPwyn3JH2pOnY7LuGT2GbomsOYfdn8UgjACmHJIVDWyhn/AA3
-cQHdJbFC2p7J+7QFGihcig3Neoepo1vI76sProBWIw7U9dIu+ybP14y5tmBAaxpV
-Urcqt7Wg43hU7HgM27muOk7XFttDbfbt408y//qjkHKdsQehjfJKpT4NKhol0oDK
-baCZykor3+/dSnMz0IhemScHL+k6rw==
-=IoZW
------END PGP SIGNATURE-----
-
---Sig_/GOaK/S/VyPuiJbaUJ6=UdAb--
 
