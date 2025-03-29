@@ -1,134 +1,166 @@
-Return-Path: <netdev+bounces-178178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76C27A75386
-	for <lists+netdev@lfdr.de>; Sat, 29 Mar 2025 01:00:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80B31A753BB
+	for <lists+netdev@lfdr.de>; Sat, 29 Mar 2025 01:33:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A8E116EA9F
-	for <lists+netdev@lfdr.de>; Sat, 29 Mar 2025 00:00:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F41D1892700
+	for <lists+netdev@lfdr.de>; Sat, 29 Mar 2025 00:34:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A7D61F417D;
-	Sat, 29 Mar 2025 00:00:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08FA18F77;
+	Sat, 29 Mar 2025 00:33:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="pp2NSedk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BZVYP+6d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1D7A4A02
-	for <netdev@vger.kernel.org>; Sat, 29 Mar 2025 00:00:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 389636FBF
+	for <netdev@vger.kernel.org>; Sat, 29 Mar 2025 00:33:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743206438; cv=none; b=CrO3SnWSUiccOn0TEYEdCBzNPeccuXWeXAnI5/fhePzSn71o3PO48FUKazF8/4W7srWJQfVhz5jfHxm6X+ptcgAs6OpWZE63AyWAjY7Oc+ostHiTkAQEIkpGhN/JuF6gLdhi0Hjo7KfVCzY3vh1+PdVe9V6KRa6wZJDzAePcb98=
+	t=1743208434; cv=none; b=HVQg5ka2T9uATi6GrjLW7TNBZEPxBImhz2aRQK+TplxFUSN23Tbmc+u6Fola2SGAE9jnXxg3spMgKv2D1ACaGEBGsGxOr8xOHA2V1bZUwY/T/c/LGZzOHq9fnVgvCOt+QxDapjBhBHIPe7UPfZEX6OcMErTqSn8uu+A5cgDVkdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743206438; c=relaxed/simple;
-	bh=f3KSLRYztPZtU72e1oNCDVjGkG04iAkOXF18dQTDwcI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y01kCJSw3+k1ZKeEcSq+LmUOFBR7+dKT8QzSc22gUvdAsu0pFQBAF1urVxPjDGGM3sMRwZAANnQafxWWAVSZA2qaKlc1wPfYbk2BUX8CX9vXVSxYlOEEzltP1lpG66eFBOazndqAvjsGXoKhU9FpTG98xVZIgzSVHTRcBeGirZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=pp2NSedk; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2ff6cf448b8so6173075a91.3
-        for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 17:00:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1743206436; x=1743811236; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dPU1V9zbGuhTRVdKEH46RBvue6zoABp4B3V2TgOPmvI=;
-        b=pp2NSedkLSuzF1Yopb4MhjpcQ7J+jMgt0t2Rp4sfJoOPwXaudgj8M130kCw365X652
-         eMjH5Iv/B4n3uepLW1xMjQKo0MaSwDi57RWx6KKt9YkjISBwCd8+rqnfyq9ugv31q6ux
-         aUN47hqKNKatMClDxFcrJMwodz9wWj6PuK4pI=
+	s=arc-20240116; t=1743208434; c=relaxed/simple;
+	bh=tBavXW3W1qYFgtjWZ4/Hxj/KCIDHiJNuqr1vC05iqss=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=SLaZ2roAWqCV/onm/KYY9T1T1p+ZO1OVof5RszjSqSA6rx4VIvlwQ/iWezboHnXS4jEBOeXGXCZq24x790hUNkPV02LEX46QFgODR2oSMmgxLGoRPptMk80DYQys+wg9mKThau1sltnZgpEgrb067kL3W5NhJ3AtG7aiq0gFVFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BZVYP+6d; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743208432;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=Uo50sWXOSJizEdiktsorSdkq3F5t9pZ6OWVGuL0Oe+0=;
+	b=BZVYP+6dfqh+Z9e/wtkPCjNllcs02D2nnqoRgaLJG4HFXXpkYwAJuvzfvn6+Gv9qMxTLre
+	LPLmKDLXhrkVWH46/dDUrx1TzAibVKmrvNR0VbUu14PT90DVJXKDM1IBNNghsUqGp3moTA
+	2bnrJpO2kWo18BeAJfsJiyJVK1vhxUA=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-12-QKSX6yo0OGmf9APlusfrpA-1; Fri, 28 Mar 2025 20:33:50 -0400
+X-MC-Unique: QKSX6yo0OGmf9APlusfrpA-1
+X-Mimecast-MFC-AGG-ID: QKSX6yo0OGmf9APlusfrpA_1743208429
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-39131f2bbe5so1094356f8f.3
+        for <netdev@vger.kernel.org>; Fri, 28 Mar 2025 17:33:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743206436; x=1743811236;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dPU1V9zbGuhTRVdKEH46RBvue6zoABp4B3V2TgOPmvI=;
-        b=l+38ywskInkxSNTr1Crvvh4EauDqiB7zeV8wzyFTCITkVmHCPVoJfok0IeXpG6jdig
-         PMZEfuZtaAJyL4Ms3OgnNDpZyb8FRKNf+T6UzpkvHTHiyan5NSwVAvJOdEp/nD3/4Wv4
-         J954FqjRke+XDEeCfiMM2T/iUftpONLxCttup7ExnRhUtx6TLA6RHJ9JmhuRqa1+048M
-         k1EjVPPbIBkvCsNoPr9sRWzX0gqwLG2ABG2MQrVj13BqbWIJaMDWqO6BXiAVr1iMLpGG
-         kvtcac5C0PUDJmT02KvXGy3Hv0EAhGtRiuSloCanZqs+/fzTS+Z09JD+W3hpmGEcc5cB
-         C9ew==
-X-Gm-Message-State: AOJu0Yz4Jhs7V9bifm6xSoW+p0agVdLo5rHiR0ZhAKV5Zp8K5g8tJSui
-	i6HAIPGSGsRIxeVCq3ZxiMS2QFupQgnrHU/+OhboB0ZYRJ5yhC0No5qqVQcjJNcTSzOZSX6Qlqu
-	uJ3KRlv8o4zoq9ogVxHkPyllt/BDyXS7FGJ7O5Gskdveoong2aIh5bNMBZg9pnu7MipMyJxEO8V
-	fINa2w4UiObvTzxtr69z+97TKoAIhJVtz47F4=
-X-Gm-Gg: ASbGnctzW5vZ0RFXetN+FXOJYTBVZAkwE3K2O9bTCpe/53Q+mADUH1ZZqb8N5xkzE4S
-	xjq4DZlyl0cWTTAcaLiBNqPhFe1lg8ohLRJYBtioC4zV5gNV6cyXJ4nav8s9qMIw+LFADPdNAe8
-	pgSuNpDSpVhjIU/b0mymwy16ZU1s6rcHun8sRzqgFroXXlTqHUe8eGuAryaVDftP7fP+sbBfdYX
-	AXTcZmZkk0YbyeDeQAGJdOXzqgME5MsSw1guuGch6r5LeN6Grqiq4aaEf6yF5mLinFQbemHflRU
-	uHnCLRga99FifMPwlVu/cQAm7DPz/4N8PpW1FgYjTI6kWZrXwtk2
-X-Google-Smtp-Source: AGHT+IEiHctilbl5kXRUYriQQ4AJ9teIGPfWkfa8XK07O0x+MARn/bB66YVW99QeA5X5lwnZVkzjeA==
-X-Received: by 2002:a17:90b:2dc2:b0:2ee:5958:828 with SMTP id 98e67ed59e1d1-30531f9fb9dmr1727941a91.9.1743206435615;
-        Fri, 28 Mar 2025 17:00:35 -0700 (PDT)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3039f1d4ba4sm4857139a91.31.2025.03.28.17.00.34
+        d=1e100.net; s=20230601; t=1743208429; x=1743813229;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Uo50sWXOSJizEdiktsorSdkq3F5t9pZ6OWVGuL0Oe+0=;
+        b=qsOhEU6Cs3Dqj3fSkICRFxUfqZzJ9P7TSmImOiuQWDpj1F5E0+RqufyRFJrTEAsHjA
+         I7ufbyEKhVkD+QBjBmIwoEDCdoJSghMsRh4KgOarCmlpp7Xwcxfkp9j+IcW3dsjasbBM
+         o2w77hfJcRrTyJwtB4X7JUrnh8BN4HMBc9IdWq2s1JEym2TCA3jONZKuLoAUlckr0jaN
+         X6jNj9EWWoO5ue8Q+DxGxcKQolEnrQPctfNtx38Lnn5J7wWLLvt5LA7lh1YZkZ/7xt1S
+         2AAy0mYFpdfUdEi1tRB/9438nBe5rgAurGsaPRwCpEdh4L6TcaSAlpIPAoC516Wc3nkj
+         E6zw==
+X-Gm-Message-State: AOJu0YxM8M6ItPRw2oaFYYqJNQNCM6F+s55WK45eizRwMEy8Onu9Aiqk
+	Z/6tagoYfEqfsXINesWUkm7bfSVCdzwRC+2k+wV98l4SiSwZ7bw4eRKQ2wHejz5yddBdZVd12Wu
+	cXwC5pfBRsTXboQ7no/ZvVWydUbL9k4XlFJFt1vO0dENf2jpgK4/5Dw==
+X-Gm-Gg: ASbGnctpysDRmzxoVNdJRUTnwN0HEw3JwQovyW9XQY+mXi9RFeSygi3cPgTMlwMsH0L
+	07PJVftz4s5A+tIXbi+Z0iegLLDV4o1Ii4lpfJctPsYGFkAm5wqmiq7a8fS+623HJUXgK875gLl
+	+Y+8gDmWViQC/RNwkqeA42Q/oRTYm0JPWGdZtXN2BhrKp0CJjzxxzGKlA0CpI10BmHxLZBmrxZw
+	XCkZTTR7Tx2P+0RaykvBdhdfpeU1ZmvuDcZtWTzSEHY+nL/c0uG72iRzyTbFHV38gsF9B53xvUQ
+	nsvPXE0XByTPlzjo+Sy5lwjk6C+/O6h7tqPxrWOXose/NJxYtNUECfvbzWB5HDsg4ux0tmI=
+X-Received: by 2002:a05:6000:1fae:b0:39a:c9fe:f43a with SMTP id ffacd0b85a97d-39c120ca348mr911481f8f.2.1743208429239;
+        Fri, 28 Mar 2025 17:33:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFEoY9JbUavhjPVwsV5uKDRdhp3q4Y8sqD9sGbiMsTNPWLrcQVtAamGoqCTLyJQPWwQ/fLY7g==
+X-Received: by 2002:a05:6000:1fae:b0:39a:c9fe:f43a with SMTP id ffacd0b85a97d-39c120ca348mr911459f8f.2.1743208428731;
+        Fri, 28 Mar 2025 17:33:48 -0700 (PDT)
+Received: from debian (2a01cb058d23d600d0487be0e698eb88.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:d048:7be0:e698:eb88])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b6627bfsm4047261f8f.25.2025.03.28.17.33.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Mar 2025 17:00:35 -0700 (PDT)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	David Wei <dw@davidwei.uk>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [RFC net 1/1] netdevsim: Mark NAPI ID on skb in nsim_rcv
-Date: Sat, 29 Mar 2025 00:00:29 +0000
-Message-ID: <20250329000030.39543-2-jdamato@fastly.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250329000030.39543-1-jdamato@fastly.com>
-References: <20250329000030.39543-1-jdamato@fastly.com>
+        Fri, 28 Mar 2025 17:33:47 -0700 (PDT)
+Date: Sat, 29 Mar 2025 01:33:44 +0100
+From: Guillaume Nault <gnault@redhat.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	David Ahern <dsahern@kernel.org>, Pravin B Shelar <pshelar@ovn.org>,
+	Aaron Conole <aconole@redhat.com>,
+	Eelco Chaudron <echaudro@redhat.com>,
+	Stefano Brivio <sbrivio@redhat.com>, dev@openvswitch.org
+Subject: [PATCH net] tunnels: Accept PACKET_HOST in skb_tunnel_check_pmtu().
+Message-ID: <eac941652b86fddf8909df9b3bf0d97bc9444793.1743208264.git.gnault@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Previously, nsim_rcv was not marking the NAPI ID on the skb, leading to
-applications seeing a napi ID of 0 when using SO_INCOMING_NAPI_ID.
+Because skb_tunnel_check_pmtu() doesn't handle PACKET_HOST packets,
+commit 30a92c9e3d6b ("openvswitch: Set the skbuff pkt_type for proper
+pmtud support.") forced skb->pkt_type to PACKET_OUTGOING for
+openvswitch packets that are sent using the OVS_ACTION_ATTR_OUTPUT
+action. This allowed such packets to invoke the
+iptunnel_pmtud_check_icmp() or iptunnel_pmtud_check_icmpv6() helpers
+and thus trigger PMTU update on the input device.
 
-To add to the userland confusion, netlink appears to correctly report
-the NAPI IDs for netdevsim queues but the resulting file descriptor from
-a call to accept() was reporting a NAPI ID of 0.
+However, this also broke other parts of PMTU discovery. Since these
+packets don't have the PACKET_HOST type anymore, they won't trigger the
+sending of ICMP Fragmentation Needed or Packet Too Big messages to
+remote hosts when oversized (see the skb_in->pkt_type condition in
+__icmp_send() for example).
 
-Fixes: 3762ec05a9fb ("netdevsim: add NAPI support")
-Signed-off-by: Joe Damato <jdamato@fastly.com>
+These two skb->pkt_type checks are therefore incompatible as one
+requires skb->pkt_type to be PACKET_HOST, while the other requires it
+to be anything but PACKET_HOST.
+
+It makes sense to not trigger ICMP messages for non-PACKET_HOST packets
+as these messages should be generated only for incoming l2-unicast
+packets. However there doesn't seem to be any reason for
+skb_tunnel_check_pmtu() to ignore PACKET_HOST packets.
+
+Allow both cases to work by allowing skb_tunnel_check_pmtu() to work on
+PACKET_HOST packets and not overriding skb->pkt_type in openvswitch
+anymore.
+
+Fixes: 30a92c9e3d6b ("openvswitch: Set the skbuff pkt_type for proper pmtud support.")
+Fixes: 4cb47a8644cc ("tunnels: PMTU discovery support for directly bridged IP packets")
+Signed-off-by: Guillaume Nault <gnault@redhat.com>
 ---
- drivers/net/netdevsim/netdev.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ net/ipv4/ip_tunnel_core.c | 2 +-
+ net/openvswitch/actions.c | 6 ------
+ 2 files changed, 1 insertion(+), 7 deletions(-)
 
-diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
-index b67af4651185..1c67030fba6a 100644
---- a/drivers/net/netdevsim/netdev.c
-+++ b/drivers/net/netdevsim/netdev.c
-@@ -29,7 +29,7 @@
- #include <net/pkt_cls.h>
- #include <net/rtnetlink.h>
- #include <net/udp_tunnel.h>
+diff --git a/net/ipv4/ip_tunnel_core.c b/net/ipv4/ip_tunnel_core.c
+index a3676155be78..364ea798511e 100644
+--- a/net/ipv4/ip_tunnel_core.c
++++ b/net/ipv4/ip_tunnel_core.c
+@@ -416,7 +416,7 @@ int skb_tunnel_check_pmtu(struct sk_buff *skb, struct dst_entry *encap_dst,
+ 
+ 	skb_dst_update_pmtu_no_confirm(skb, mtu);
+ 
+-	if (!reply || skb->pkt_type == PACKET_HOST)
++	if (!reply)
+ 		return 0;
+ 
+ 	if (skb->protocol == htons(ETH_P_IP))
+diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
+index 704c858cf209..61fea7baae5d 100644
+--- a/net/openvswitch/actions.c
++++ b/net/openvswitch/actions.c
+@@ -947,12 +947,6 @@ static void do_output(struct datapath *dp, struct sk_buff *skb, int out_port,
+ 				pskb_trim(skb, ovs_mac_header_len(key));
+ 		}
+ 
+-		/* Need to set the pkt_type to involve the routing layer.  The
+-		 * packet movement through the OVS datapath doesn't generally
+-		 * use routing, but this is needed for tunnel cases.
+-		 */
+-		skb->pkt_type = PACKET_OUTGOING;
 -
-+#include <net/busy_poll.h>
- #include "netdevsim.h"
- 
- MODULE_IMPORT_NS("NETDEV_INTERNAL");
-@@ -357,6 +357,7 @@ static int nsim_rcv(struct nsim_rq *rq, int budget)
- 			break;
- 
- 		skb = skb_dequeue(&rq->skb_queue);
-+		skb_mark_napi_id(skb, &rq->napi);
- 		netif_receive_skb(skb);
- 	}
- 
+ 		if (likely(!mru ||
+ 		           (skb->len <= mru + vport->dev->hard_header_len))) {
+ 			ovs_vport_send(vport, skb, ovs_key_mac_proto(key));
 -- 
-2.43.0
+2.39.2
 
 
