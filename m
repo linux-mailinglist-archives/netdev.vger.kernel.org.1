@@ -1,140 +1,135 @@
-Return-Path: <netdev+bounces-178234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FF2BA75D59
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 01:29:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CB09A75D5C
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 01:32:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4ACA168824
-	for <lists+netdev@lfdr.de>; Sun, 30 Mar 2025 23:29:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D13B3A9140
+	for <lists+netdev@lfdr.de>; Sun, 30 Mar 2025 23:32:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AE711B85C5;
-	Sun, 30 Mar 2025 23:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF4E919259E;
+	Sun, 30 Mar 2025 23:32:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kOYHZ6xH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Izq9SwJ0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B6319D074;
-	Sun, 30 Mar 2025 23:29:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67CC32B2CF
+	for <netdev@vger.kernel.org>; Sun, 30 Mar 2025 23:32:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743377355; cv=none; b=KXc94WfbiGNiUG2XzICf0MKXjRIrSQ0LvZGdDWVGBpM3Kr+LUGuOmWwjJvCkGabGO3odSjFrD9os//Qg1znPQjTbt34rirsHFvukiOBCzNMdwcD7XduPZIg1t+2oKfMkzQzBNWjQVtgg8HDKo9zfwQOkDfYHPGxTLZbR6jP0A2k=
+	t=1743377549; cv=none; b=hIlx7INnr5hAkGlFx9DNyNOTPNyy/rRMPyaihW86VC+kKgZ+gU90TQHZJ/sI0CGJnEeXX6jn+La9ZbeeR7WEs7JQKf+kTdLVLizkRgyLURrjVPxN4nwQut4mwZ2iljk4d8Yj7dCKII20rOpWvMbsldde4fcvIi2aQEbtaJThZpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743377355; c=relaxed/simple;
-	bh=hxLHOo6kyERUZO3kQ/BGWhjwfTS+i2YDJevUnaDa2j8=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=pvpCVr6I685zJAfdH8Q+v4jtXCamhDbdw159XPgqXAUWyyBg7n13GfWaqIIIfr/HcIffD4tf8WWcCJIa6HA7xuwmTR90zv0LSVZl8hORxSrenJgxOEuNRWElEGwsRxGfeNa5rDa+1d4XQGBdhyu2CrOucZW1W8D+poyp25ZHOfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kOYHZ6xH; arc=none smtp.client-ip=209.85.221.54
+	s=arc-20240116; t=1743377549; c=relaxed/simple;
+	bh=ubOTaGccVyjM5jxI9jVSSL12WvpS5uEiqk00pDzWTEg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oOconbfy2uOAzRx5ER3fLMUp06ENJV2UqBo9vTP+UUVeOFy9HrN9QCiUfBStt+XrlfKWiCrK0Dt94KjQDdeYect9HUcnGeZOo5BfJ6GAHltjgQOS2n3JFRqZ1sP/rPNJy2PrBZ5xOyF2aJ0GgoKIfs5OBQDSELmf1yTiLT1riUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Izq9SwJ0; arc=none smtp.client-ip=209.85.216.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3912d2c89ecso3477827f8f.2;
-        Sun, 30 Mar 2025 16:29:12 -0700 (PDT)
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-3032aa1b764so4907687a91.1
+        for <netdev@vger.kernel.org>; Sun, 30 Mar 2025 16:32:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743377351; x=1743982151; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=9I+Xp8yRzQgrlV/+8pCg4bGECNRPu7ru1Ity71eMj/U=;
-        b=kOYHZ6xHIMiBEQPgktD7Sj6aXrWcYzS5P6acCuT9L8BNAhJl2eIebB5Uc1obXhpNHv
-         LIPAGym83vpRSgkBM7bYWMI4P7dZ6XB6vw0W+WpMaC4xyHPt3NDPPSsQWPyCZDNX9WyN
-         70gw/XVMbdtM7ZJ+HOUJ+tyZH7bslCpREjxG+VIT9SW5a7Wsu9TO+Iug9lH6ot/LRK01
-         64QKh6QktBThoYffqhuEATFUHj/Rw8IswHmGnMQ2EV9jL/RxF3/s3Yizdcq2PM08FrNe
-         iTmN2XVRMpuKeW0tW9DE0gIkLSAQe6zjAjOryflO6Z44wMo+YoLEYrnop9yS4KzANV0H
-         L7Tg==
+        d=gmail.com; s=20230601; t=1743377548; x=1743982348; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KuCIAzvn+ZxyxkSxMs5C0b5YboXJPBL4mavZXb+Xg/c=;
+        b=Izq9SwJ0IcGHj2LQIMpRxH44URmElkFpRwS6glcCNt+QWRfKxuePAMlmZb57t8J2GC
+         xNwVd/VFh+QCRvr2816fE/bArLJeMrF00ynVx7asYTeuAZGLa9fNJyjGx00ICoAEoMkJ
+         Gmjf4WoSjDru2TIMsSyW0kcWnLhlWdYpEzqTlx8ItrBxHfZgo2qfsEVR2k8xaTn1oy3s
+         K4Xi181JsUC+uA6cHoez7e75iyTewIqgm07fcKImAKmZ+frq6nO/h+PfpoXMIvquueU6
+         7Wg2ii14VIF3bQ0s5LJ6EsYJwrV8yg/JK7jn25r0W15VBJP2kJQ0mI7mrU1DMwfGkFop
+         sLEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743377351; x=1743982151;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9I+Xp8yRzQgrlV/+8pCg4bGECNRPu7ru1Ity71eMj/U=;
-        b=TJVsL9eJwH3jXhj0KUN8irx2sgOTn4PdULooyLxCHU87YvalPnkoAQOJnUvjOC6DVg
-         Wd9rEMdQvuhg9x9XxtiBPxcGqfepvZ+3RiWXWuEmxQf9xlqmMtrxXWOXhxKlJIdlHWuq
-         x12IjrUV+R5BOpsZCQDeb4HGTSf17YeOKZhqKdVXzO8JzGAcIQh7ehXLVPnry9DoFhAV
-         M6DY3fer4sWOo7M0VaOmY8lZuozxHI2GUY464GtxvyvqkptQyg9TSe1kPhlBBDKXunKX
-         mg69rKDMNLPcTxR1RFRFBGnj+AGsvz0XwBv4Ccn7pN8Acs51Xa3HXtvdep3o7P0MjpA/
-         HnRg==
-X-Forwarded-Encrypted: i=1; AJvYcCWw61uOzj8nXYkKKaDgOEvhZD5mbITh7UDUIB7xEZSGcOZhhccAfmrHk8cwAlEfrBDRR1NQ+aQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXvesW62ddvMmBVKVmUX40jhZdA8FXRsUBkfzJ2o+laGh1hNhX
-	fkmKf0tdY171o19pUHyl4kqOg/ilIUQrJRF5+dc3mtAISmRXHZPNB0r6TJrDH8JbUCfJ4W0vWn3
-	YzWfVjczU49c4KBxaVttsbrJ9IEFfTSae
-X-Gm-Gg: ASbGncuDOMEkPyDd5ERzRVC07WIJrU1jd8YQ8b6gV27smse78sAadQqhWZjrvLH/GYd
-	q4i3bdVtxfe7V3P6SjH4u3Hc9WLr7TzipaIZRIwjPqJZ0JRp6CkflAdSfeM0ZuPPI6yzMkqWRPd
-	SRiKODHOw757UwECGY/Xy1L8hsIQWBs3alb4q09EmGIQ==
-X-Google-Smtp-Source: AGHT+IGN/zMqm5apAK2a4MFuXhS/3xtLrXO8M0lfjdfXyxeDc6BLrEGE5hFHWNndur0/0EdbSIH84oMcSOuEMJvMwPU=
-X-Received: by 2002:a5d:6dab:0:b0:391:4559:876a with SMTP id
- ffacd0b85a97d-39c1211ccf7mr5585445f8f.46.1743377350768; Sun, 30 Mar 2025
- 16:29:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743377548; x=1743982348;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KuCIAzvn+ZxyxkSxMs5C0b5YboXJPBL4mavZXb+Xg/c=;
+        b=Cad6dnPpfFboILAct1UVsuazn4VDurUsOoi/aEZ6SKOuPlWjx8sZespJW1m55Y0jUU
+         K8Vhu+N0okTlMI860bKwnKOLkTewWnYcMBXknDRLLEpMzabDrTTwIsUE0mmfdpTNMLjx
+         jzeTp9Stiftm1Gz9G+KJbIJFUZ4mgs2J5o3EfCNWGMytvQuxcgJMK8Y5qJhGHUxKXXm8
+         0oWwLOEUV1FJ0qS/fcKa8ubC3eBrkkRU3Kb0pWh+rkAkJ8ZKFwZReeIikOAUtrU38Hfu
+         WCEywr1tcWNSBMT6RJVFWI1hgMSYTJK4JoQ98dJqKohISbiyj4kAFFM2nBkQchXXWXO3
+         nexA==
+X-Gm-Message-State: AOJu0YyzrhPLe7jo2idxzEQ+ePbWx/Qwg0P3IVcNMHDkN9+HogxFP1Wh
+	4x1DjaLJwbxcXl0+p1U8vD5IWyjU1mwpB+j6DeR1OC/rPdOm+z1/FGbX5g==
+X-Gm-Gg: ASbGncuETukjgIHheEH3smRix18pGHwOcPDfOiL9S89GBSF+K8fYOOo4HW5OcZvohse
+	XkI02qCQkNsJLlwXGpcHdDe3Zywp+Of9ycF0GH7oDJ4bdzMpifLimHcnpxa2/RvDenZWJi0vnM9
+	uYdAbMogp0D/GTeEfAfDoMF3AMWNi4Pffq6f/hcFTcMCEyRn0b+JQzRMmnHH2IMb4q0Tvdym/+1
+	/osqbQD+/cTN+N/nEhFrzHv5ChKqVfre13Bn3KzZ3eUFYbotusjtOnYCiD8I4T8NrdmgiMuOPD6
+	UM8rX24AHe7iqhOXc8yn2RKZFjyOgShlmK9SnGqcut0E7nBLhH4=
+X-Google-Smtp-Source: AGHT+IE0FxCFz4S325rS+8HT0pJlGxyJxdyMZvD21SUpQVf7yw8mXLCqWGX2yfAZ9rkekncuPL5VeA==
+X-Received: by 2002:a17:90a:f950:b0:2fe:b8ba:62e1 with SMTP id 98e67ed59e1d1-30532147209mr10999609a91.28.1743377547609;
+        Sun, 30 Mar 2025 16:32:27 -0700 (PDT)
+Received: from localhost ([2601:647:6881:9060:b144:63a1:57bb:af94])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2291f1ce283sm57812225ad.126.2025.03.30.16.32.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 30 Mar 2025 16:32:26 -0700 (PDT)
+Date: Sun, 30 Mar 2025 16:32:25 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Victor Nogueira <victor@mojatatu.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
+	edumazet@google.com, gerrard.tai@starlabs.sg,
+	Pedro Tammela <pctammela@mojatatu.com>
+Subject: Re: [Patch net 08/12] selftests/tc-testing: Add a test case for
+ CODEL with HTB parent
+Message-ID: <Z+nUiSlKoARY0Lj/@pop-os.localdomain>
+References: <20250320232211.485785-1-xiyou.wangcong@gmail.com>
+ <20250320232539.486091-1-xiyou.wangcong@gmail.com>
+ <20250320232539.486091-8-xiyou.wangcong@gmail.com>
+ <3a60ae0c-0b5f-44e9-8063-29d0d290699c@mojatatu.com>
+ <Z+cIB3YrShvCtQry@pop-os.localdomain>
+ <9a1b0c60-57d2-4e6d-baa2-38c3e4b7d3d5@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Sun, 30 Mar 2025 16:28:59 -0700
-X-Gm-Features: AQ5f1JrMOrsuhYGJ-9ptJEwEye7UCf5nsVU6XdYESxDNUNtm1HQYLK1B15QhF4c
-Message-ID: <CAADnVQJFWn3dBFJtY+ci6oN1pDFL=TzCmNbRgey7MdYxt_AP2g@mail.gmail.com>
-Subject: new splat
-To: bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9a1b0c60-57d2-4e6d-baa2-38c3e4b7d3d5@mojatatu.com>
 
-After bpf fast forward we see this new failure:
+On Sun, Mar 30, 2025 at 06:05:06PM -0300, Victor Nogueira wrote:
+> On 28/03/2025 17:35, Cong Wang wrote:
+> > On Sun, Mar 23, 2025 at 07:48:39PM -0300, Victor Nogueira wrote:
+> > > On 20/03/2025 20:25, Cong Wang wrote:
+> > > > Add a test case for CODEL with HTB parent to verify packet drop
+> > > > behavior when the queue becomes empty. This helps ensure proper
+> > > > notification mechanisms between qdiscs.
+> > > > 
+> > > > Note this is best-effort, it is hard to play with those parameters
+> > > > perfectly to always trigger ->qlen_notify().
+> > > > 
+> > > > Cc: Pedro Tammela <pctammela@mojatatu.com>
+> > > > Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
+> > > 
+> > > Cong, can you double check this test?
+> > > I ran all of your other tests and they all succeeded, however
+> > > this one specifically is always failing:
+> > 
+> > Interesting, I thought I completely fixed this before posting after several
+> > rounds of playing with the parameters. I will double check it, maybe it
+> > just becomes less reproducible.
+> 
+> I see.
+> I experimented with it a bit today and found out that changing the ping
+> command to:
+> 
+> ping -c 2 -i 0 -s 1500 -I $DUMMY 10.10.10.1 > /dev/null || true
+> 
+> makes the test pass consistently (at least in my environment).
+> So essentially just changing the "-s" option to 1500.
+> 
+> If you could, please try it out as well.
+> Maybe I just got lucky.
 
-[  138.359852] BUG: using __this_cpu_read() in preemptible [00000000]
-code: test_progs/9368
-[  138.362686] caller is lwtunnel_xmit+0x1c/0x2e0
-[  138.364363] CPU: 9 UID: 0 PID: 9368 Comm: test_progs Tainted: G
-      O        6.14.0-10767-g8be3a12f9f26 #1092 PREEMPT
-[  138.364366] Tainted: [O]=OOT_MODULE
-[  138.364366] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
-BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
-[  138.364368] Call Trace:
-[  138.364370]  <TASK>
-[  138.364375]  dump_stack_lvl+0x80/0x90
-[  138.364381]  check_preemption_disabled+0xc6/0xe0
-[  138.364385]  lwtunnel_xmit+0x1c/0x2e0
-[  138.364387]  ip_finish_output2+0x2f9/0x850
-[  138.364391]  ? __ip_finish_output+0xa0/0x320
-[  138.364394]  ip_send_skb+0x3f/0x90
-[  138.364397]  udp_send_skb+0x1a6/0x3d0
-[  138.364402]  udp_sendmsg+0x87b/0x1000
-[  138.364404]  ? ip_frag_init+0x60/0x60
-[  138.364406]  ? reacquire_held_locks+0xcd/0x1f0
-[  138.364414]  ? copy_process+0x2ae0/0x2fa0
-[  138.364418]  ? inet_autobind+0x41/0x60
-[  138.364420]  ? __local_bh_enable_ip+0x79/0xe0
-[  138.364422]  ? inet_autobind+0x41/0x60
-[  138.364424]  ? inet_send_prepare+0xe7/0x1e0
-[  138.364428]  __sock_sendmsg+0x38/0x70
-[  138.364432]  ____sys_sendmsg+0x1c9/0x200
-[  138.364437]  ___sys_sendmsg+0x73/0xa0
-[  138.364444]  ? __fget_files+0xb9/0x180
-[  138.364447]  ? lock_release+0x131/0x280
-[  138.364450]  ? __fget_files+0xc3/0x180
-[  138.364453]  __sys_sendmsg+0x5a/0xa0
+Sure, I will change it to 1500.
 
-and
-
-[  124.853349] BUG: using __this_cpu_read() in preemptible [00000000]
-code: ping/9212
-[  124.856062] caller is lwtunnel_xmit+0x1c/0x2e0
-[  124.857717] CPU: 5 UID: 0 PID: 9212 Comm: ping Tainted: G
-O        6.14.0-10767-g8be3a12f9f26 #1092 PREEMPT
-[  124.857720] Tainted: [O]=OOT_MODULE
-[  124.857721] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
-BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
-[  124.857722] Call Trace:
-[  124.857724]  <TASK>
-[  124.857726]  dump_stack_lvl+0x80/0x90
-[  124.857730]  check_preemption_disabled+0xc6/0xe0
-[  124.857734]  lwtunnel_xmit+0x1c/0x2e0
-[  124.857736]  ip_finish_output2+0x2f9/0x850
-[  124.857740]  ? __ip_finish_output+0xa0/0x320
-[  124.857743]  ip_push_pending_frames+0x63/0xb0
-[  124.857746]  raw_sendmsg+0x7d8/0x1530
-
-I couldn't find a responsible commit.
-Not sure what changed.
+Thanks!
 
